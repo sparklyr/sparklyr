@@ -1,0 +1,9 @@
+Package: sparkcluster
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: Javier Luraschi
+Maintainer: Javier Luraschi <yourfault@somewhere.net>
+Description: Utility to manage Spark clusters from R.
+License: TBD
+LazyData: TRUE
