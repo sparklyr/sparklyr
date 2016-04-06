@@ -4,7 +4,7 @@ download_spark <- function(version) {
   packageSource <- "http://d3kbcqa49mib13.cloudfront.net"
 
   if (!dir.exists("spark")) {
-    warning("Local spark directory for this project not found, creating.")
+    print("Local spark directory for this project not found, creating.")
     dir.create("spark")
   }
 
@@ -12,15 +12,31 @@ download_spark <- function(version) {
   packagePath <- file.path(sparkDir, packageName)
 
   if (!file.exists(packagePath)) {
-    warning("Spark package not found, downloading.")
+    print("Spark package not found, downloading.")
     download.file(file.path(packageSource, packageName), destfile = packagePath)
   }
 
-  extractionPath <- file.path(sparkDir, componentName)
+  sparkVersionDir <- file.path(sparkDir, componentName)
 
-  if (!dir.exists(extractionPath)) {
+  if (!dir.exists(sparkVersionDir)) {
     untar(tarfile = packagePath, exdir = sparkDir)
   }
 
-  return (extractionPath)
+  list (
+    sparkDir = sparkDir,
+    sparkVersionDir = sparkVersionDir
+  )
+}
+
+remove_extension <- function(file) {
+  sub("[.][^.]*$", "", file, perl=TRUE)
+}
+
+validate_pem <- function(pem_path) {
+  if (!file.exists(pem_path)) {
+    stop(".pem file does not exist")
+  }
+
+  chmodScript <- paste("chmod 400", pem_path)
+  system(chmodScript)
 }

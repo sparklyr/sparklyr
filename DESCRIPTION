@@ -1,6 +1,6 @@
 Package: sparkster
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Manage Spark clusters from R
 Version: 0.1.0
 Author: Javier Luraschi
 Maintainer: Javier Luraschi <yourfault@somewhere.net>
