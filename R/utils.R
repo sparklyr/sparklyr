@@ -1,5 +1,6 @@
-download_spark <- function() {
-  packageName <- "spark-1.6.1-bin-without-hadoop.tgz"
+download_spark <- function(version) {
+  componentName <- paste("spark-", version, "-bin-without-hadoop", sep = "")
+  packageName <- paste(componentName, ".tgz", sep = "")
   packageSource <- "http://d3kbcqa49mib13.cloudfront.net"
 
   if (!dir.exists("spark")) {
@@ -14,4 +15,12 @@ download_spark <- function() {
     warning("Spark package not found, downloading.")
     download.file(file.path(packageSource, packageName), destfile = packagePath)
   }
+
+  extractionPath <- file.path(sparkDir, componentName)
+
+  if (!dir.exists(extractionPath)) {
+    untar(tarfile = packagePath, exdir = sparkDir)
+  }
+
+  return (extractionPath)
 }
