@@ -1,8 +1,9 @@
 run_ec2_command <- function(command,
-                            sparkDir,
+                            command_params,
+                            input = "",
+                            spark_dir,
                             access_key_id,
                             secret_access_key,
-                            instance_count,
                             version,
                             pem_path) {
 
@@ -21,13 +22,9 @@ run_ec2_command <- function(command,
                   "--identity-file=",
                   pem_path,
                   " ",
-                  "--region=us-east-1 ",
-                  "--instance-type=m3.medium ",
-                  "--copy-aws-credentials ",
-                  "-s ",
-                  instance_count,
+                  command_params,
                   sep = "")
 
-  sparkEC2 <- file.path(sparkDir, "ec2/spark-ec2")
-  system(paste(variables, sparkEC2, params, command))
+  sparkEC2 <- file.path(spark_dir, "ec2/spark-ec2")
+  system(paste(variables, sparkEC2, params, command), input = input)
 }
