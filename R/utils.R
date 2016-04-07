@@ -1,5 +1,6 @@
 download_spark <- function(version) {
-  componentName <- paste("spark-", version, "-bin-without-hadoop", sep = "")
+  componentName <- paste("spark-", version, "-bin-hadoop2.6", sep = "")
+
   packageName <- paste(componentName, ".tgz", sep = "")
   packageSource <- "http://d3kbcqa49mib13.cloudfront.net"
 

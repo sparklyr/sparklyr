@@ -1,4 +1,33 @@
-#' Start an EC2 Spark Cluster
+#' Start a local Spark cluster
+#'
+#' This function will launch the local cluster.
+#'
+#' @param version The Spark version to use.
+#' @export
+start_local <- function(
+  version = "1.6.1") {
+
+  setup_local(version)
+
+  sc <<- sparkR.init(master = "local")
+  sqlContext <<- sparkRSQL.init(sc)
+}
+
+#' Stop a local Spark cluster
+#'
+#' This function will stop the local cluster.
+#'
+#' @param version The Spark version to use.
+#' @export
+stop_local <- function(
+  version = "1.6.1") {
+
+  setup_local(version)
+
+  sparkR.stop()
+}
+
+#' Start an EC2 Spark cluster
 #'
 #' This function will launch a new an EC2 cluster.
 #'
