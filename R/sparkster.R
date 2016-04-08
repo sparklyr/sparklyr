@@ -44,14 +44,16 @@ launch_ec2 <- function(
   pem_path,
   instance_count = 1,
   version = "1.6.1",
-  cluster_name = "sparkster") {
+  cluster_name = "sparkster",
+  instance_type = "c3.4xlarge",
+  region = "us-west-1") {
 
   sparkInfo <- download_spark(version)
 
   validate_pem(pem_path);
 
   command_params <- paste("--region=us-east-1 ",
-                          "--instance-type=m3.medium ",
+                          paste("--instance-type=", instance_type, sep = ""),
                           "--copy-aws-credentials ",
                           "-s ",
                           instance_count)
@@ -126,4 +128,26 @@ destroy_ec2 <- function(
                   secret_access_key = secret_access_key,
                   version = version,
                   pem_path = pem_path)
+}
+
+login_ec2 <- function(
+  access_key_id,
+  secret_access_key,
+  pem_path,
+  version = "1.6.1",
+  cluster_name = "sparkster") {
+
+  sparkInfo <- download_spark(version)
+
+  validate_pem(pem_path);
+
+  run_ec2_command(command = paste("login", cluster_name),
+                  command_params = "",
+                  input = "y",
+                  spark_dir = sparkInfo$sparkVersionDir,
+                  access_key_id = access_key_id,
+                  secret_access_key = secret_access_key,
+                  version = version,
+                  pem_path = pem_path,
+                  preview = TRUE)
 }

@@ -5,7 +5,8 @@ run_ec2_command <- function(command,
                             access_key_id,
                             secret_access_key,
                             version,
-                            pem_path) {
+                            pem_path,
+                            preview = FALSE) {
 
   variables <- paste("AWS_ACCESS_KEY_ID=",
                      access_key_id,
@@ -26,5 +27,11 @@ run_ec2_command <- function(command,
                   sep = "")
 
   sparkEC2 <- file.path(spark_dir, "ec2/spark-ec2")
-  system(paste(variables, sparkEC2, params, command), input = input)
+
+  command <- paste(variables, sparkEC2, params, command)
+  if (preview) {
+    return(command)
+  } else {
+    system(command, input = input)
+  }
 }
