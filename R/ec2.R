@@ -29,9 +29,23 @@ run_ec2_command <- function(command,
   sparkEC2 <- file.path(spark_dir, "ec2/spark-ec2")
 
   command <- paste(variables, sparkEC2, params, command)
-  if (preview) {
-    return(command)
-  } else {
-    system(command, input = input)
+
+  retval <- list(
+    command = command
+  )
+
+  if (!preview) {
+    stdoutFile <- tempfile(fileext="out")
+    stderrFile <- tempfile(fileext="err")
+
+    on.exit(unlink(stdoutFile))
+    on.exit(unlink(stderrFile))
+
+    system(paste(command, params, ">", stdoutFile, "2>", stderrFile), input = input)
+
+    retval$stdout <- readLines(stdoutFile)
+    retval$stderr <- readLines(stderrFile)
   }
+
+  return(retval)
 }
