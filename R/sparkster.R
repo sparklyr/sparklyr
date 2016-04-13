@@ -3,12 +3,14 @@
 #' This function will launch the local cluster.
 #'
 #' @param version The Spark version to use.
+#'
 #' @export
 start_local <- function(
   version = "1.6.0") {
 
   setup_local(version)
 
+  library(SparkR)
   sc <<- sparkR.init(master = "local")
   sqlContext <<- sparkRSQL.init(sc)
 }
@@ -24,6 +26,7 @@ stop_local <- function(
 
   setup_local(version)
 
+  library(SparkR)
   sparkR.stop()
 }
 
@@ -37,7 +40,7 @@ stop_local <- function(
 #' @param instance_count The total number of EC2 instances to be provisioned.
 #' @param version The Spark version to use.
 #' @param cluster_name Name used to identify cluster.
-#' @param instance_type Type of EC2 instance. Tested with 'm3.medium' and 'c3.4xlarge'.
+#' @param instance_type Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".
 #' @param region The EC2 region to host this cluster.
 #' @param preview Print the EC2 command without executing anything?
 #' @export

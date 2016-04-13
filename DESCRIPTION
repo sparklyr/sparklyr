@@ -7,3 +7,4 @@ Maintainer: Javier Luraschi <yourfault@somewhere.net>
 Description: Utility to manage Spark clusters from R.
 License: TBD
 LazyData: TRUE
+RoxygenNote: 5.0.1
