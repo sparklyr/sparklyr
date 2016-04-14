@@ -7,10 +7,12 @@ read_shell_file <- function(shellFile) {
 
   success <- length(backendPort) > 0 && backendPort > 0 &&
     length(monitorPort) > 0 && monitorPort > 0 &&
-    identical(length(rLibraryPath), 1)
+    length(rLibraryPath) == 1
+
+  if (!success)
+    stop("Invalid values found in shell output")
 
   list(
-    success = success,
     backendPort = backendPort,
     monitorPort = monitorPort
   )
@@ -47,7 +49,12 @@ start_shell <- function() {
   })
 
   tryCatch({
-    backend <- socketConnection(port = shellFile$backendPort)
+    backend <- socketConnection(host = "localhost",
+                                port = shellFile$backendPort,
+                                server = FALSE,
+                                blocking = TRUE,
+                                open = "wb",
+                                timeout = 6000)
   }, error = function(err) {
     stop("Failed to open connection to backend")
   })

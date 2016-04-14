@@ -8,3 +8,11 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
 RoxygenNote: 5.0.1
+Collate:
+    'apache_spark_deserialize.R'
+    'apache_spark_jobj.R'
+    'apache_spark_serialize.R'
+    'spark_api.R'
+    'spark_dplyr.R'
+    'spark_shell.R'
+    'utils.R'
