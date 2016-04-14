@@ -35,7 +35,7 @@ start_shell <- function() {
   on.exit(unlink(shellOutputPath))
 
   sparkCommand <- paste("sparkr-shell", shellOutputPath)
-  system2(sparkSubmitPath, sparkCommand, wait = F)
+  invisible(system2(sparkSubmitPath, sparkCommand, wait = F))
 
   if (!wait_file_exists(shellOutputPath))
     stop("Failed to launch Spark shell. Ports file does not exist")

@@ -94,3 +94,69 @@ spark_api_sql <- function(con, sql) {
     sql
   )
 }
+
+spark_api_schema <- function(con, sqlResult) {
+  spark_api(
+    con,
+
+    FALSE,
+    sqlResult$id,
+    "schema"
+  )
+}
+
+spark_api_object_method <- function(con, object, property) {
+  spark_api(
+    con,
+
+    FALSE,
+    object$id,
+    property
+  )
+}
+
+spark_api_field <- function(con, field) {
+  name <- spark_api_object_method(con, field, "name")
+  dataType <- spark_api_object_method(con, field, "dataType")
+  longType <- spark_api_object_method(con, dataType, "toString")
+  shortType <- spark_api_object_method(con, dataType, "simpleString")
+
+  list(
+    name = name,
+    longType = longType,
+    shortType = shortType
+  )
+}
+
+spark_api_schema_fields <- function(con, schemaResult) {
+  lapply(
+    spark_api(
+      con,
+
+      FALSE,
+      schemaResult$id,
+      "fields"
+    ),
+    function (field) {
+      spark_api_field(con, field)
+    }
+  )
+}
+
+spark_api_data_frame <- function(con, sqlResult) {
+  schema <- spark_api_schema(con, sqlResult)
+  fields <- spark_api_schema_fields(con, schema)
+
+  df <- spark_api(
+    con,
+
+    TRUE,
+    "org.apache.spark.sql.api.r.SQLUtils",
+    "dfToCols",
+
+    sqlResult
+  )
+
+  names(df) <- lapply(fields, function(x) x$name)
+  df
+}

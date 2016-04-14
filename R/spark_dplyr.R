@@ -7,7 +7,14 @@ src_spark <- function(master = "local",
   con <- start_shell()
 
   con$sc <- spark_api_create_context(con, master, appName)
+  if (identical(con$sc, NULL)) {
+    stop("Failed to create Spark context")
+  }
+
   con$sql <- spark_api_create_sql_context(con)
+  if (identical(con$sc, NULL)) {
+    stop("Failed to create SQL context")
+  }
 
   attr(con, "class") <- "SparkConnection"
 
@@ -21,7 +28,8 @@ db_has_table.SparkConnection <- function(con, table, ...) {
 
 #' @export
 db_list_tables.SparkConnection <- function(con) {
-  spark_api_sql(con, "SHOW TABLES")
+  sqlResult <- spark_api_sql(con, "SHOW TABLES")
+  spark_api_data_frame(con, sqlResult)
 }
 
 #' @export
