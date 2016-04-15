@@ -59,12 +59,18 @@ start_shell <- function() {
     stop("Failed to open connection to backend")
   })
 
-  return(list(
+  con <- list(
     monitor = monitor,
     backend = backend
-  ))
+  )
+
+  reg.finalizer(baseenv(), function(x) {
+    stop_shell(con)
+  }, onexit = TRUE)
+
+  con
 }
 
 stop_shell <- function(con) {
-  spark_api(con$backend, FALSE, "0", "stop")
+  spark_api(con, FALSE, "0", "stop")
 }
