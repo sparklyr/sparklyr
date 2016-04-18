@@ -41,3 +41,49 @@ db_data_type.SparkConnection <- function(con, table, ...) {
 src_desc.src_spark <- function(con) {
   "spark connection"
 }
+
+#' @export
+db_explain.src_spark <- function(con) {
+  ""
+}
+
+#' @export
+tbl.src_spark <- function(src, from, ...) {
+  tbl_sql("spark", src = src, from = from, ...)
+}
+
+#' @export
+db_data_type.src_spark <- function(...) {
+}
+
+#' @export
+sql_begin.src_spark <- function(...) {
+}
+
+#' @export
+sql_commit.src_spark <- function(...) {
+}
+
+#' @export
+sql_rollback.src_spark <- function(...) {
+}
+
+#' @export
+sql_create_table.src_spark <- function(...) {
+}
+
+#' @export
+sql_insert_into.src_spark <- function(...) {
+}
+
+#' @export
+sql_drop_table.src_spark <- function(...) {
+}
+
+#' @export
+sql_create_index.src_spark <- function(...) {
+}
+
+#' @export
+sql_analyze.src_spark <- function(...) {
+}
