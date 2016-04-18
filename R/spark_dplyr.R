@@ -38,6 +38,34 @@ db_data_type.SparkConnection <- function(con, table, ...) {
 }
 
 #' @export
+db_begin.SparkConnection <- function(con) {
+}
+
+#' @export
+db_rollback.SparkConnection <- function(con) {
+}
+
+#' @export
+db_create_table.SparkConnection <- function(con, name, types, temporary = temporary) {
+}
+
+#' @export
+db_insert_into.SparkConnection <- function(con, name, df) {
+}
+
+#' @export
+db_create_indexes.SparkConnection <- function(con, name, indexes) {
+}
+
+#' @export
+db_analyze.SparkConnection <- function(con, name) {
+}
+
+#' @export
+db_commit.SparkConnection <- function(con) {
+}
+
+#' @export
 src_desc.src_spark <- function(con) {
   "spark connection"
 }
@@ -77,7 +105,8 @@ sql_insert_into.src_spark <- function(...) {
 }
 
 #' @export
-sql_drop_table.src_spark <- function(...) {
+sql_drop_table.src_spark <- function(name) {
+  spark_api_sql(con, paste("DROP TABLE '", name, "'", sep = ""))
 }
 
 #' @export
