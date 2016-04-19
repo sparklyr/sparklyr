@@ -70,9 +70,10 @@ db_commit.SparkConnection <- function(con) {
 
 #' @export
 db_query_fields.SparkConnection <- function(con, sql) {
-  fields <- build_sql("SELECT * FROM ", sql, " LIMIT 1",  con = con)
-  qry <- sqlQuery(con, fields)
-  names(qry)
+  query <- build_sql("SELECT * FROM ", sql, " LIMIT 1",  con = con)
+  sqlResult <- spark_api_sql(con, as.character(query))
+  df <- spark_api_data_frame(con, sqlResult)
+  names(df)
 }
 
 #' @export
