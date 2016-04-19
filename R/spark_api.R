@@ -160,3 +160,13 @@ spark_api_data_frame <- function(con, sqlResult) {
   names(df) <- lapply(fields, function(x) x$name)
   df
 }
+
+spark_read_csv <- function(con, path) {
+  read <- spark_api(con, FALSE, con$sql$id, "read")
+  format <- spark_api(con, FALSE, read$id, "format", "com.databricks.spark.csv")
+  optionHeader <- spark_api(con, FALSE, format$id, "option", "header", "true")
+  optionSchema <- spark_api(con, FALSE, optionHeader$id, "option", "inferSchema", "true")
+  df <- spark_api(con, FALSE, optionSchema$id, "load", path)
+
+  df
+}

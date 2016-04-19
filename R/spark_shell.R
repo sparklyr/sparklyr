@@ -34,7 +34,10 @@ start_shell <- function() {
   shellOutputPath <- tempfile(fileext = ".out")
   on.exit(unlink(shellOutputPath))
 
-  sparkCommand <- paste("sparkr-shell", shellOutputPath)
+  sparkCommand <- paste("--packages com.databricks:spark-csv_2.11:1.2.0",
+                        "sparkr-shell",
+                        shellOutputPath)
+
   invisible(system2(sparkSubmitPath, sparkCommand, wait = F))
 
   if (!wait_file_exists(shellOutputPath))
@@ -61,11 +64,14 @@ start_shell <- function() {
 
   con <- list(
     monitor = monitor,
-    backend = backend
+    backend = backend,
+    finalized = FALSE
   )
 
   reg.finalizer(baseenv(), function(x) {
-    stop_shell(con)
+    if (!con$finalized) {
+      stop_shell(con)
+    }
   }, onexit = TRUE)
 
   con
@@ -73,4 +79,5 @@ start_shell <- function() {
 
 stop_shell <- function(con) {
   spark_api(con, FALSE, "0", "stop")
+  con$finalized <- TRUE
 }
