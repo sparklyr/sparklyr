@@ -70,7 +70,9 @@ db_commit.SparkConnection <- function(con) {
 
 #' @export
 db_query_fields.SparkConnection <- function(con, sql) {
-  list()
+  fields <- build_sql("SELECT * FROM ", sql, " LIMIT 1",  con = con)
+  qry <- sqlQuery(con, fields)
+  names(qry)
 }
 
 #' @export
@@ -179,10 +181,16 @@ sql_select.SparkConnection <- function(con, select, from, where = NULL,
                                        group_by = NULL, having = NULL,
                                        order_by = NULL, limit = NULL,
                                        offset = NULL, ...) {
+  dplyr:::sql_select.DBIConnection(con, select, from, where = where,
+                                   group_by = group_by, having = having, order_by = order_by,
+                                   limit = limit, offset = offset, ...)
 }
 
 #' @export
 sql_subquery.SparkConnection <- function(con, sql, name =  dplyr::unique_name(), ...) {
+  if (dplyr::is.ident(sql)) return(sql)
+
+  dplyr::build_sql("(", sql, ") AS ", dplyr::ident(name), con = con)
 }
 
 #' @export
