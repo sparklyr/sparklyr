@@ -69,7 +69,7 @@ start_shell <- function() {
   )
 
   reg.finalizer(baseenv(), function(x) {
-    if (!con$finalized) {
+    if (isOpen(con$backend) || isOpen(con$monitor)) {
       stop_shell(con)
     }
   }, onexit = TRUE)
@@ -79,5 +79,6 @@ start_shell <- function() {
 
 stop_shell <- function(con) {
   spark_api(con, FALSE, "0", "stop")
-  con$finalized <- TRUE
+  close(con$backend)
+  close(con$monitor)
 }

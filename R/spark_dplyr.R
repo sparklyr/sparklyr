@@ -16,7 +16,7 @@ src_spark <- function(master = "local",
     stop("Failed to create SQL context")
   }
 
-  attr(con, "class") <- "SparkConnection"
+  attr(con, "class") <- c("SparkConnection")
 
   src_sql("spark", con)
 }
@@ -53,7 +53,8 @@ db_create_table.SparkConnection <- function(con, name, types, temporary = tempor
 db_insert_into.SparkConnection <- function(con, name, df) {
   tempfile <- tempfile(fileext = ".csv")
   write.csv(df, tempfile)
-  spark_read_csv(con, tempfile)
+  df <- spark_read_csv(con, tempfile)
+  spark_register_temp_table(con, df, name)
 }
 
 #' @export
@@ -70,7 +71,11 @@ db_commit.SparkConnection <- function(con) {
 
 #' @export
 db_query_fields.SparkConnection <- function(con, sql) {
-  query <- build_sql("SELECT * FROM ", sql, " LIMIT 1",  con = con)
+  query <- build_sql("SELECT * FROM ",
+                     sql,
+                     " LIMIT 1",
+                     con = con)
+
   sqlResult <- spark_api_sql(con, as.character(query))
   df <- spark_api_data_frame(con, sqlResult)
   names(df)
@@ -182,9 +187,9 @@ sql_select.SparkConnection <- function(con, select, from, where = NULL,
                                        group_by = NULL, having = NULL,
                                        order_by = NULL, limit = NULL,
                                        offset = NULL, ...) {
-  dplyr:::sql_select.DBIConnection(con, select, from, where = where,
-                                   group_by = group_by, having = having, order_by = order_by,
-                                   limit = limit, offset = offset, ...)
+  dplyr:::sql_select.default(con, select, from, where = where,
+                             group_by = group_by, having = having, order_by = order_by,
+                             limit = limit, offset = offset, ...)
 }
 
 #' @export
@@ -196,6 +201,12 @@ sql_subquery.SparkConnection <- function(con, sql, name =  dplyr::unique_name(),
 
 #' @export
 query.SparkConnection <- function(con, sql, .vars) {
+  spark_api_sql(con, sql)
+}
+
+#' @export
+sql_escape_ident.SparkConnection <- function(con, x) {
+  sql_quote(x, '`')
 }
 
 #' @export

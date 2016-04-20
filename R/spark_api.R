@@ -170,3 +170,7 @@ spark_read_csv <- function(con, path) {
 
   df
 }
+
+spark_register_temp_table <- function(con, table, name) {
+  spark_api(con, FALSE, table$id, "registerTempTable", name)
+}
