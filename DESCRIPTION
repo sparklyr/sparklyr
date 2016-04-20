@@ -14,7 +14,16 @@ Collate:
     'apache_spark_serialize.R'
     'spark_api.R'
     'spark_connection.R'
+    'spark_dbi_driver.R'
+    'spark_dbi_connection.R'
+    'spark_dbi_result.R'
     'spark_dplyr.R'
     'spark_shell.R'
     'spark_table.R'
     'utils.R'
+Imports:
+    methods,
+    dplyr,
+    DBI
+Suggests:
+    devtools,testthat,DBItest
