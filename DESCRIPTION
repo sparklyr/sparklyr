@@ -13,6 +13,8 @@ Collate:
     'apache_spark_jobj.R'
     'apache_spark_serialize.R'
     'spark_api.R'
+    'spark_connection.R'
     'spark_dplyr.R'
     'spark_shell.R'
+    'spark_table.R'
     'utils.R'
