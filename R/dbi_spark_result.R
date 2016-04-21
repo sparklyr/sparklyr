@@ -1,9 +1,10 @@
-#' DBIResultSpark results.
+#' DBISparkResult results.
 #'
 #' @keywords internal
-#' @include spark_dbi_connection.R
+#' @include dbi_spark_connection.R
 #' @export
-setClass("DBIResultSpark",
+#' @rdname dbi-spark-query
+setClass("DBISparkResult",
          contains = "DBIResult",
          slots = list(
            sql = "character"
@@ -11,27 +12,31 @@ setClass("DBIResultSpark",
 )
 
 #' @export
-setMethod("dbGetStatement", "DBIResultSpark", function(res, ...) {
+#' @rdname dbi-spark-query
+setMethod("dbGetStatement", "DBISparkResult", function(res, ...) {
   res@sql
 })
 
 #' @export
-setMethod("dbIsValid", "DBIResultSpark", function(dbObj, ...) {
+#' @rdname dbi-spark-query
+setMethod("dbIsValid", "DBISparkResult", function(dbObj, ...) {
   result_active(dbObj@ptr)
 })
 
 #' @export
-setMethod("dbGetRowCount", "DBIResultSpark", function(res, ...) {
+#' @rdname dbi-spark-query
+setMethod("dbGetRowCount", "DBISparkResult", function(res, ...) {
   result_rows_fetched(res@ptr)
 })
 
 #' @export
-setMethod("dbGetRowsAffected", "DBIResultSpark", function(res, ...) {
+setMethod("dbGetRowsAffected", "DBISparkResult", function(res, ...) {
   result_rows_affected(res@ptr)
 })
 
 #' @export
-setMethod("dbColumnInfo", "DBIResultSpark", function(res, ...) {
+#' @rdname dbi-spark-query
+setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
   result_column_info(res@ptr)
 })
 
@@ -42,7 +47,7 @@ setMethod("dbColumnInfo", "DBIResultSpark", function(res, ...) {
 #' results (and they'll fit in memory) use \code{dbGetQuery} which sends,
 #' fetches and clears for you.
 #'
-#' @param conn A \code{\linkS4class{DBIConnectionSpark}} created by \code{dbConnect}.
+#' @param conn A \code{\linkS4class{DBISparkConnection}} created by \code{dbConnect}.
 #' @param statement An SQL string to execture
 #' @param params A list of query parameters to be substituted into
 #'   a parameterised query.
@@ -63,11 +68,12 @@ setMethod("dbColumnInfo", "DBIResultSpark", function(res, ...) {
 #' dbRemoveTable(db, "flights")
 #'
 #' dbDisconnect(db)
-#' @name postgres-query
+#' @name dbi-spark-query
 NULL
 
 #' @export
-setMethod("dbSendQuery", c("DBIConnectionSpark", "character"), function(conn, statement, params = NULL, ...) {
+#' @rdname dbi-spark-query
+setMethod("dbSendQuery", c("DBISparkConnection", "character"), function(conn, statement, params = NULL, ...) {
   statement <- enc2utf8(statement)
 
   rs <- new("PqResult",
@@ -81,29 +87,33 @@ setMethod("dbSendQuery", c("DBIConnectionSpark", "character"), function(conn, st
   rs
 })
 
-#' @param res Code a \linkS4class{DBIResultSpark} produced by
+#' @param res Code a \linkS4class{DBISparkResult} produced by
 #'   \code{\link[DBI]{dbSendQuery}}.
 #' @param n Number of rows to return. If less than zero returns all rows.
 #' @inheritParams DBI::sqlRownamesToColumn
 #' @export
-setMethod("dbFetch", "DBIResultSpark", function(res, n = -1, ..., row.names = NA) {
+#' @rdname dbi-spark-query
+setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
   sqlColumnToRownames(result_fetch(res@ptr, n = n), row.names)
 })
 
 #' @export
-setMethod("dbBind", "DBIResultSpark", function(res, params, ...) {
+#' @rdname dbi-spark-query
+setMethod("dbBind", "DBISparkResult", function(res, params, ...) {
   params <- lapply(params, as.character)
   result_bind_params(res@ptr, params)
   invisible(res)
 })
 
 #' @export
-setMethod("dbHasCompleted", "DBIResultSpark", function(res, ...) {
+#' @rdname dbi-spark-query
+setMethod("dbHasCompleted", "DBISparkResult", function(res, ...) {
   result_active(res@ptr)
 })
 
 #' @export
-setMethod("dbClearResult", "DBIResultSpark", function(res, ...) {
+#' @rdname dbi-spark-query
+setMethod("dbClearResult", "DBISparkResult", function(res, ...) {
   result_release(res@ptr)
   TRUE
 })

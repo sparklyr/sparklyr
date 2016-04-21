@@ -1,24 +1,27 @@
-#' @include spark_dbi_driver.R
+#' @include dbi_spark_driver.R
 NULL
 
-#' DBIConnectionSpark and methods.
+#' DBISparkConnection and methods.
 #'
 #' @keywords internal
 #' @export
-setClass("DBIConnectionSpark",
+#' @rdname dbi-spark-connection
+setClass("DBISparkConnection",
          contains = "DBIConnection"
 )
 
 #' @export
-setMethod("dbGetInfo", "DBIConnectionSpark", function(dbObj, ...) {
+#' @rdname dbi-spark-connection
+setMethod("dbGetInfo", "DBISparkConnection", function(dbObj, ...) {
   connection_info(dbObj)
 })
 
 #' @export
-setMethod("show", "DBIConnectionSpark", function(object) {
+#' @rdname dbi-spark-connection
+setMethod("show", "DBISparkConnection", function(object) {
   info <- dbGetInfo(object)
 
-  cat("<DBIConnectionSpark> ", info$master, "\n", sep = "")
+  cat("<DBISparkConnection> ", info$master, "\n", sep = "")
 })
 
 #' Connect to Spark
@@ -26,16 +29,18 @@ setMethod("show", "DBIConnectionSpark", function(object) {
 #' @param drv \code{splyr::DBISpark()}
 #' @param master Master location.
 #' @export
+#' @rdname dbi-spark-connection
 #' @examples
 #' library(DBI)
 #' con <- dbConnect(splyr::DBISpark())
 #' dbDisconnect(con)
-setMethod("dbConnect", "DBIConnectionSpark", function(drv, master = NULL, ...) {
-  new("DBIConnectionSpark")
+setMethod("dbConnect", "DBISparkConnection", function(drv, master = NULL, ...) {
+  new("DBISparkConnection")
 })
 
 #' @export
-setMethod("dbDisconnect", "DBIConnectionSpark", function(conn, ...) {
+#' @rdname dbi-spark-connection
+setMethod("dbDisconnect", "DBISparkConnection", function(conn, ...) {
   TRUE
 })
 
@@ -45,12 +50,14 @@ setMethod("dbDisconnect", "DBIConnectionSpark", function(conn, ...) {
 #' @param dbObj Spark driver or connection.
 #' @param obj Object to convert
 #' @keywords internal
-setMethod("dbDataType", "DBIDriverSpark", function(dbObj, obj) {
+#' @rdname dbi-spark-connection
+setMethod("dbDataType", "DBISparkDriver", function(dbObj, obj) {
   get_data_type(obj)
 })
 
 #' @export
-setMethod("dbDataType", "DBIConnectionSpark", function(dbObj, obj) {
+#' @rdname dbi-spark-connection
+setMethod("dbDataType", "DBISparkConnection", function(dbObj, obj) {
   get_data_type(obj)
 })
 
