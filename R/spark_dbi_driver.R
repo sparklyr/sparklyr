@@ -21,5 +21,5 @@ setClass("DBIDriverSpark", contains = "DBIDriver")
 #' @export
 #' @rdname DBIDriverSpark-class
 setMethod("dbUnloadDriver", "DBIDriverSpark", function(drv, ...) {
-  NULL
+  TRUE
 })

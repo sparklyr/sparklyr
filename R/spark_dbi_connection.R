@@ -35,7 +35,7 @@ setMethod("dbConnect", "DBIConnectionSpark", function(drv, master = NULL, ...) {
 })
 
 #' @export
-setMethod("dbDisconnect", "DBIConnectionSpark", function(con, ...) {
+setMethod("dbDisconnect", "DBIConnectionSpark", function(conn, ...) {
   TRUE
 })
 
@@ -45,12 +45,12 @@ setMethod("dbDisconnect", "DBIConnectionSpark", function(con, ...) {
 #' @param dbObj Spark driver or connection.
 #' @param obj Object to convert
 #' @keywords internal
-setMethod("dbDataType", "DBIDriverSpark", function(drv, obj) {
+setMethod("dbDataType", "DBIDriverSpark", function(dbObj, obj) {
   get_data_type(obj)
 })
 
 #' @export
-setMethod("dbDataType", "DBIConnectionSpark", function(con, obj) {
+setMethod("dbDataType", "DBIConnectionSpark", function(dbObj, obj) {
   get_data_type(obj)
 })
 

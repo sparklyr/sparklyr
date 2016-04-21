@@ -26,4 +26,6 @@ Imports:
     dplyr,
     DBI
 Suggests:
-    devtools,testthat,DBItest
+    devtools,
+    testthat,
+    DBItest
