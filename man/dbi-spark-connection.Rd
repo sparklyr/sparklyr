@@ -3,7 +3,7 @@
 \docType{class}
 \name{DBISparkConnection-class}
 \alias{DBISparkConnection-class}
-\alias{dbConnect,DBISparkConnection-method}
+\alias{dbConnect,DBISparkDriver-method}
 \alias{dbDataType,DBISparkConnection,ANY-method}
 \alias{dbDataType,DBISparkDriver,ANY-method}
 \alias{dbDisconnect,DBISparkConnection-method}
@@ -15,7 +15,7 @@
 
 \S4method{show}{DBISparkConnection}(object)
 
-\S4method{dbConnect}{DBISparkConnection}(drv, master = NULL, ...)
+\S4method{dbConnect}{DBISparkDriver}(drv, master = NULL, ...)
 
 \S4method{dbDisconnect}{DBISparkConnection}(conn, ...)
 

@@ -53,11 +53,12 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 #'   a parameterised query.
 #' @examples
 #' library(DBI)
+#' library(nycflights13)
 #' db <- dbConnect(splyr::DBISpark())
-#' dbWriteTable(db, "usarrests", datasets::USArrests, temporary = TRUE)
+#' dbWriteTable(db, "flights", flights, temporary = TRUE)
 #'
 #' # Run query to get results as dataframe
-#' dbGetQuery(db, "SELECT * FROM glights LIMIT 1")
+#' dbGetQuery(db, "SELECT * FROM flights LIMIT 1")
 #'
 #' # Send query to pull requests in batches
 #' res <- dbSendQuery(db, "SELECT * FROM usarrests")

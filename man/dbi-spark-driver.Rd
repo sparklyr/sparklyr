@@ -5,14 +5,14 @@
 \alias{DBISpark}
 \alias{DBISparkDriver-class}
 \alias{dbUnloadDriver,DBISparkDriver-method}
-\title{Spark Driver}
+\title{DBI Spark Driver}
 \usage{
 DBISpark()
 
 \S4method{dbUnloadDriver}{DBISparkDriver}(drv, ...)
 }
 \description{
-Spark Driver
+DBI Spark Driver
 
 DBISparkDriver and methods.
 }

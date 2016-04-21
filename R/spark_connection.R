@@ -28,10 +28,7 @@ db_create_table.SparkConnection <- function(con, name, types, temporary = tempor
 
 #' @export
 db_insert_into.SparkConnection <- function(con, name, df) {
-  tempfile <- tempfile(fileext = ".csv")
-  write.csv(df, tempfile)
-  df <- spark_read_csv(con, tempfile)
-  spark_register_temp_table(con, df, name)
+  spark_api_copy_data(con, name, df)
 }
 
 #' @export

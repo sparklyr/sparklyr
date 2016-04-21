@@ -15,6 +15,7 @@ Collate:
     'dbi_spark_driver.R'
     'dbi_spark_connection.R'
     'dbi_spark_result.R'
+    'dbi_spark_table.R'
     'spark_api.R'
     'spark_connection.R'
     'spark_dplyr.R'

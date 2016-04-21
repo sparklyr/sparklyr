@@ -4,17 +4,7 @@
 #' @export
 src_spark <- function(master = "local",
                       appName = "splyr") {
-  con <- start_shell()
-
-  con$sc <- spark_api_create_context(con, master, appName)
-  if (identical(con$sc, NULL)) {
-    stop("Failed to create Spark context")
-  }
-
-  con$sql <- spark_api_create_sql_context(con)
-  if (identical(con$sc, NULL)) {
-    stop("Failed to create SQL context")
-  }
+  spark_api_start(master, appName)
 
   attr(con, "class") <- c("SparkConnection")
 

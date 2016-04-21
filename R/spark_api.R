@@ -36,6 +36,22 @@ spark_api <- function (sparkCon, isStatic, objName, methodName, ...)
   readObject(sparkCon$backend)
 }
 
+spark_api_start <- function(master, appName) {
+  con <- start_shell()
+
+  con$sc <- spark_api_create_context(con, master, appName)
+  if (identical(con$sc, NULL)) {
+    stop("Failed to create Spark context")
+  }
+
+  con$sql <- spark_api_create_sql_context(con)
+  if (identical(con$sc, NULL)) {
+    stop("Failed to create SQL context")
+  }
+
+  con
+}
+
 # API into https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
 #
 # def createSparkContext(
@@ -169,6 +185,13 @@ spark_read_csv <- function(con, path) {
   df <- spark_api(con, FALSE, optionSchema$id, "load", path)
 
   df
+}
+
+spark_api_copy_data <- function(con, df, name) {
+  tempfile <- tempfile(fileext = ".csv")
+  write.csv(df, tempfile)
+  df <- spark_read_csv(con, tempfile)
+  spark_register_temp_table(con, df, name)
 }
 
 spark_register_temp_table <- function(con, table, name) {

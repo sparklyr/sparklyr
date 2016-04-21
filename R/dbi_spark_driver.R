@@ -1,4 +1,4 @@
-#' Spark Driver
+#' DBI Spark Driver
 #'
 #' @export
 #' @import methods DBI

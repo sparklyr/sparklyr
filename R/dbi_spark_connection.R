@@ -7,7 +7,8 @@ NULL
 #' @export
 #' @rdname dbi-spark-connection
 setClass("DBISparkConnection",
-         contains = "DBIConnection"
+         contains = "DBIConnection",
+         slots = c(con = "list")
 )
 
 #' @export
@@ -34,13 +35,16 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' library(DBI)
 #' con <- dbConnect(splyr::DBISpark())
 #' dbDisconnect(con)
-setMethod("dbConnect", "DBISparkConnection", function(drv, master = NULL, ...) {
-  new("DBISparkConnection")
+setMethod("dbConnect", "DBISparkDriver", function(drv, master = NULL, ...) {
+  con <- spark_api_start(master = "local", appName = "splyr")
+  new("DBISparkConnection", con = con)
 })
 
 #' @export
 #' @rdname dbi-spark-connection
 setMethod("dbDisconnect", "DBISparkConnection", function(conn, ...) {
+  stop_shell(conn@con)
+
   TRUE
 })
 
