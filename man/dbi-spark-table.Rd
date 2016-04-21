@@ -6,13 +6,11 @@
 \alias{dbListTables,DBISparkConnection-method}
 \alias{dbReadTable,DBISparkConnection,character-method}
 \alias{dbRemoveTable,DBISparkConnection,character-method}
-\alias{dbWriteTable,DBISparkConnection,character,data.frame-method}
+\alias{dbWriteTable,DBISparkConnection-method}
 \alias{dbi-spark-table}
 \title{DBI Spark Table}
 \usage{
-\S4method{dbWriteTable}{DBISparkConnection,character,data.frame}(conn, name,
-  value, row.names = NA, overwrite = FALSE, append = FALSE,
-  field.types = NULL, temporary = FALSE, copy = TRUE)
+\S4method{dbWriteTable}{DBISparkConnection}(conn, name, value)
 
 \S4method{dbReadTable}{DBISparkConnection,character}(conn, name,
   row.names = NA)
@@ -50,8 +48,6 @@ or not. Its default is \code{FALSE}.}
 \item{field.types}{character vector of named SQL field types where
 the names are the names of new table's columns. If missing, types inferred
 with \code{\link[DBI]{dbDataType}}).}
-
-\item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
 
 \item{Not}{supported.}
 }

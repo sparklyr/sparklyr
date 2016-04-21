@@ -7,7 +7,8 @@
 setClass("DBISparkResult",
          contains = "DBIResult",
          slots = list(
-           sql = "character"
+           sql = "character",
+           df = "data.frame"
          )
 )
 
@@ -20,24 +21,24 @@ setMethod("dbGetStatement", "DBISparkResult", function(res, ...) {
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbIsValid", "DBISparkResult", function(dbObj, ...) {
-  result_active(dbObj@ptr)
+  TRUE
 })
 
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbGetRowCount", "DBISparkResult", function(res, ...) {
-  result_rows_fetched(res@ptr)
+  nrow(res@df)
 })
 
 #' @export
 setMethod("dbGetRowsAffected", "DBISparkResult", function(res, ...) {
-  result_rows_affected(res@ptr)
+  nrow(res@df)
 })
 
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
-  result_column_info(res@ptr)
+  ""
 })
 
 #' Execute a SQL statement on a database connection
@@ -75,16 +76,11 @@ NULL
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbSendQuery", c("DBISparkConnection", "character"), function(conn, statement, params = NULL, ...) {
-  statement <- enc2utf8(statement)
+  df <- spark_api_sql_query(conn@con, statement)
 
-  rs <- new("PqResult",
-            ptr = result_create(conn@ptr, statement),
+  rs <- new("DBISparkResult",
+            df = df,
             sql = statement)
-
-  if (!is.null(params)) {
-    dbBind(rs, params)
-  }
-
   rs
 })
 
@@ -95,26 +91,23 @@ setMethod("dbSendQuery", c("DBISparkConnection", "character"), function(conn, st
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
-  sqlColumnToRownames(result_fetch(res@ptr, n = n), row.names)
+  res@df[n, ]
 })
 
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbBind", "DBISparkResult", function(res, params, ...) {
-  params <- lapply(params, as.character)
-  result_bind_params(res@ptr, params)
-  invisible(res)
+  TRUE
 })
 
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbHasCompleted", "DBISparkResult", function(res, ...) {
-  result_active(res@ptr)
+  TRUE
 })
 
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbClearResult", "DBISparkResult", function(res, ...) {
-  result_release(res@ptr)
   TRUE
 })

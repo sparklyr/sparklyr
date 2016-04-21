@@ -32,15 +32,10 @@ NULL
 
 #' @export
 #' @rdname dbi-spark-table
-setMethod("dbWriteTable", c("DBISparkConnection", "character", "data.frame"),
-  function(conn, name, value, row.names = NA, overwrite = FALSE, append = FALSE,
-           field.types = NULL, temporary = FALSE, copy = TRUE) {
-
-    if (overwrite && append)
-      stop("overwrite and append cannot both be TRUE")
-
+setMethod("dbWriteTable", "DBISparkConnection",
+  function(conn, name, value) {
     found <- dbExistsTable(conn, name)
-    if (found && !overwrite && !append) {
+    if (found) {
       stop("Table ", name, " already exists")
     }
 
@@ -61,7 +56,8 @@ setMethod("dbReadTable", c("DBISparkConnection", "character"),
 #' @export
 #' @rdname dbi-spark-table
 setMethod("dbListTables", "DBISparkConnection", function(conn) {
-
+  df <- spark_api_sql_tables(conn@con)
+  df$tableName
 })
 
 #' @export
@@ -73,7 +69,7 @@ setMethod("dbExistsTable", c("DBISparkConnection", "character"), function(conn, 
 #' @export
 #' @rdname dbi-spark-table
 setMethod("dbRemoveTable", c("DBISparkConnection", "character"),
-          function(conn, name) {
+  function(conn, name) {
 
-          }
+  }
 )

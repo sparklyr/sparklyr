@@ -173,7 +173,19 @@ spark_api_data_frame <- function(con, sqlResult) {
     sqlResult
   )
 
-  names(df) <- lapply(fields, function(x) x$name)
+  dfNames <- lapply(fields, function(x) x$name)
+
+  # If this is a resultset with no rows...
+  if (length(df[[1]]) == 0) {
+    dfEmpty <- lapply(dfNames, function(x) character(0))
+    names(dfEmpty) <- dfNames
+    df <- data.frame(dfEmpty, stringsAsFactors=FALSE)
+  }
+  else {
+    df <- data.frame(df, stringsAsFactors=FALSE)
+    colnames(df)  <- dfNames
+  }
+
   df
 }
 
