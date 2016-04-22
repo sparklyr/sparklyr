@@ -4,7 +4,7 @@
 \alias{src_spark}
 \title{Connect to Spark for Dplyr.}
 \usage{
-src_spark(master = "local", appName = "splyr")
+src_spark(master = "local", appName = "dplyrspark")
 }
 \description{
 Connect to Spark for Dplyr.

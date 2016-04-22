@@ -44,7 +44,7 @@ DBI Spark Table
 }
 \examples{
 library(DBI)
-con <- dbConnect(splyr::DBISpark())
+con <- dbConnect(spark::DBISpark())
 dbListTables(con)
 dbWriteTable(con, "mtcars", mtcars, temporary = TRUE)
 dbReadTable(con, "mtcars")

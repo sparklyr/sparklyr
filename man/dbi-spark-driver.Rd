@@ -18,7 +18,7 @@ DBISparkDriver and methods.
 }
 \examples{
 library(DBI)
-splyr::DBISpark()
+spark::DBISpark()
 }
 \keyword{internal}
 

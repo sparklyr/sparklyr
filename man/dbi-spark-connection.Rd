@@ -29,7 +29,7 @@
 \arguments{
 \item{dbObj}{Spark driver or connection.}
 
-\item{drv}{\code{splyr::DBISpark()}}
+\item{drv}{\code{spark::DBISpark()}}
 
 \item{master}{Master location.}
 
@@ -44,7 +44,7 @@ Determine database type for R vector.
 }
 \examples{
 library(DBI)
-con <- dbConnect(splyr::DBISpark())
+con <- dbConnect(spark::DBISpark())
 dbDisconnect(con)
 }
 \keyword{internal}

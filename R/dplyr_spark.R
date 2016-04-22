@@ -3,7 +3,7 @@
 #' @import dplyr
 #' @export
 src_spark <- function(master = "local",
-                      appName = "splyr") {
+                      appName = "dplyrspark") {
   con <- dbConnect(DBISpark())
   src_sql("spark", con)
 }

@@ -55,7 +55,7 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 #' @examples
 #' library(DBI)
 #' library(nycflights13)
-#' db <- dbConnect(splyr::DBISpark())
+#' db <- dbConnect(spark::DBISpark())
 #' dbWriteTable(db, "flights", flights, temporary = TRUE)
 #'
 #' # Run query to get results as dataframe

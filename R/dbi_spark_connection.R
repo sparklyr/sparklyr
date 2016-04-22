@@ -27,16 +27,16 @@ setMethod("show", "DBISparkConnection", function(object) {
 
 #' Connect to Spark
 #'
-#' @param drv \code{splyr::DBISpark()}
+#' @param drv \code{spark::DBISpark()}
 #' @param master Master location.
 #' @export
 #' @rdname dbi-spark-connection
 #' @examples
 #' library(DBI)
-#' con <- dbConnect(splyr::DBISpark())
+#' con <- dbConnect(spark::DBISpark())
 #' dbDisconnect(con)
 setMethod("dbConnect", "DBISparkDriver", function(drv, master = NULL, ...) {
-  con <- spark_api_start(master = "local", appName = "splyr")
+  con <- spark_api_start(master = "local", appName = "dbispark")
   new("DBISparkConnection", con = con)
 })
 

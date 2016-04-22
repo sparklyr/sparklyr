@@ -5,7 +5,7 @@
 #' @rdname dbi-spark-driver
 #' @examples
 #' library(DBI)
-#' splyr::DBISpark()
+#' spark::DBISpark()
 DBISpark <- function() {
   new("DBISparkDriver")
 }
