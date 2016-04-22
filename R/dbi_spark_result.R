@@ -91,7 +91,10 @@ setMethod("dbSendQuery", c("DBISparkConnection", "character"), function(conn, st
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
-  res@df[n, ]
+  if (n == -1)
+    res@df
+  else
+    res@df[n, ]
 })
 
 #' @export
