@@ -210,3 +210,7 @@ spark_api_copy_data <- function(con, df, name) {
 spark_register_temp_table <- function(con, table, name) {
   spark_api(con, FALSE, table$id, "registerTempTable", name)
 }
+
+spark_drop_temp_table <- function(con, name) {
+  spark_api(con, FALSE, con$sql$id, "dropTempTable", name)
+}

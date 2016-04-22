@@ -71,6 +71,8 @@ setMethod("dbExistsTable", c("DBISparkConnection", "character"), function(conn, 
 #' @rdname dbi-spark-table
 setMethod("dbRemoveTable", c("DBISparkConnection", "character"),
   function(conn, name) {
+    spark_drop_temp_table(conn@con, name)
 
+    TRUE
   }
 )
