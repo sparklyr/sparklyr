@@ -77,3 +77,14 @@ get_data_type <- function(obj) {
          stop("Unsupported type", call. = FALSE)
   )
 }
+
+#' @export
+#' @rdname dbi-spark-connection
+setMethod("dbQuoteIdentifier", c("DBISparkConnection", "character"), function(conn, x, ...) {
+  if (regexpr("`", x)[[1]] >= 0)
+    stop("Can't scape back tick from string")
+
+  y <- paste("`", x, "`", sep = "")
+
+  SQL(y)
+})

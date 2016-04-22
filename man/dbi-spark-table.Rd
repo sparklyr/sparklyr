@@ -12,8 +12,7 @@
 \usage{
 \S4method{dbWriteTable}{DBISparkConnection}(conn, name, value)
 
-\S4method{dbReadTable}{DBISparkConnection,character}(conn, name,
-  row.names = NA)
+\S4method{dbReadTable}{DBISparkConnection,character}(conn, name)
 
 \S4method{dbListTables}{DBISparkConnection}(conn)
 
@@ -28,17 +27,6 @@
 \item{name}{a character string specifying a table name.}
 
 \item{value}{A data.frame to write to the database.}
-
-\item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
-
-  If \code{TRUE}, always translate row names to a column called "row_names".
-  If \code{FALSE}, never translate row names. If \code{NA}, translate
-  rownames only if they're a character vector.
-
-  A string is equivalent to \code{TRUE}, but allows you to override the
-  default name.
-
-  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 
 \item{overwrite}{a logical specifying whether to overwrite an existing table
 or not. Its default is \code{FALSE}.}

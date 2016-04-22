@@ -48,8 +48,9 @@ setMethod("dbWriteTable", "DBISparkConnection",
 #' @export
 #' @rdname dbi-spark-table
 setMethod("dbReadTable", c("DBISparkConnection", "character"),
-  function(conn, name, row.names = NA) {
-
+  function(conn, name) {
+    name <- dbQuoteIdentifier(conn, name)
+    dbGetQuery(conn, paste("SELECT * FROM ", name))
   }
 )
 

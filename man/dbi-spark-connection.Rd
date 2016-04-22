@@ -8,6 +8,7 @@
 \alias{dbDataType,DBISparkDriver,ANY-method}
 \alias{dbDisconnect,DBISparkConnection-method}
 \alias{dbGetInfo,DBISparkConnection-method}
+\alias{dbQuoteIdentifier,DBISparkConnection,character-method}
 \alias{show,DBISparkConnection-method}
 \title{DBISparkConnection and methods.}
 \usage{
@@ -22,6 +23,8 @@
 \S4method{dbDataType}{DBISparkDriver,ANY}(dbObj, obj)
 
 \S4method{dbDataType}{DBISparkConnection,ANY}(dbObj, obj)
+
+\S4method{dbQuoteIdentifier}{DBISparkConnection,character}(conn, x, ...)
 }
 \arguments{
 \item{dbObj}{Spark driver or connection.}
