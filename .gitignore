@@ -5,11 +5,14 @@
 # Session Data files
 .RData
 
+# User Data files
+.Ruserdata
+
 # Example code in package build process
 *-Ex.R
 
 # RStudio files
-.Rproj.user/
+.Rproj.user
 
 # produced vignettes
 vignettes/*.html
@@ -17,7 +20,6 @@ vignettes/*.pdf
 
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
-.Rproj.user
-.Ruserdata
 
+# Spark binaries temp directory
 spark
