@@ -4,6 +4,7 @@
 #' @export
 src_spark <- function(master = "local",
                       appName = "dplyrspark") {
+  setup_local()
   con <- dbConnect(DBISpark())
   src_sql("spark", con)
 }
