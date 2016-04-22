@@ -13,6 +13,6 @@
 }
 \description{
 This function prints the type and id for an object stored
-in the SparkR JVM backend.
+in the Spark R API JVM backend.
 }
 

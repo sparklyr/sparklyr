@@ -63,7 +63,7 @@ jobj <- function(objId) {
 #' Print a JVM object reference.
 #'
 #' This function prints the type and id for an object stored
-#' in the SparkR JVM backend.
+#' in the Spark R API JVM backend.
 #'
 #' @param x The JVM object reference
 #' @param ... further arguments passed to or from other methods

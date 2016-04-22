@@ -5,6 +5,7 @@ wait_file_exists <- function(filename, retries = 50) {
   }
 
   file.exists(filename)
+}
 
 download_spark <- function(version) {
   componentName <- paste("spark-", version, "-bin-hadoop2.6", sep = "")

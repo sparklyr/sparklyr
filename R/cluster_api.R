@@ -1,35 +1,3 @@
-#' Start a local Spark cluster
-#'
-#' This function will launch the local cluster.
-#'
-#' @param version The Spark version to use.
-#'
-#' @export
-start_local <- function(
-  version = "1.6.0") {
-
-  setup_local(version)
-
-  library(SparkR)
-  sc <<- sparkR.init(master = "local")
-  sqlContext <<- sparkRSQL.init(sc)
-}
-
-#' Stop a local Spark cluster
-#'
-#' This function will stop the local cluster.
-#'
-#' @param version The Spark version to use.
-#' @export
-stop_local <- function(
-  version = "1.6.0") {
-
-  setup_local(version)
-
-  library(SparkR)
-  sparkR.stop()
-}
-
 #' Launch an EC2 Spark cluster
 #'
 #' This function will launch a new an EC2 cluster.
@@ -202,15 +170,10 @@ setup_ec2 <- function(
   Sys.setenv(SPARK_HOME = sparkHome)
   .libPaths(c(file.path(sparkHome, "R", "lib")))
 
-  library(SparkR)
-
   master <- master_ec2(access_key_id = access_key_id,
                        secret_access_key = secret_access_key,
                        pem_path = pem_path,
                        version = version,
                        cluster_name = cluster_name)
-
-  sc <<- sparkR.init(master = master)
-  sqlContext <<- sparkRSQL.init(sc)
 }
 
