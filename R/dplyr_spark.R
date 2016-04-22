@@ -4,10 +4,7 @@
 #' @export
 src_spark <- function(master = "local",
                       appName = "splyr") {
-  spark_api_start(master, appName)
-
-  attr(con, "class") <- c("SparkConnection")
-
+  con <- dbConnect(DBISpark())
   src_sql("spark", con)
 }
 
@@ -100,8 +97,13 @@ sql_insert_into.src_spark <- function(...) {
 }
 
 #' @export
-sql_drop_table.src_spark <- function(name) {
-  spark_api_sql(con, paste("DROP TABLE '", name, "'", sep = ""))
+sql_drop_table.src_spark <- function(con, name) {
+  dbRemoveTable(con, name)
+}
+
+#' @export
+copy_to.src_spark <- function(con, df, name) {
+  dbWriteTable(con$con, name, df)
 }
 
 #' @export

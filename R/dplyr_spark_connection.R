@@ -1,12 +1,11 @@
 #' @export
 db_has_table.SparkConnection <- function(con, table, ...) {
-  NA
+  dbExistsTable(con, table)
 }
 
 #' @export
 db_list_tables.SparkConnection <- function(con) {
-  sqlResult <- spark_api_sql(con, "SHOW TABLES")
-  spark_api_data_frame(con, sqlResult)
+  dbListTables(con)
 }
 
 #' @export
@@ -28,7 +27,7 @@ db_create_table.SparkConnection <- function(con, name, types, temporary = tempor
 
 #' @export
 db_insert_into.SparkConnection <- function(con, name, df) {
-  spark_api_copy_data(con, name, df)
+  dbWriteTable(con, name, df)
 }
 
 #' @export
@@ -82,3 +81,7 @@ sql_escape_ident.SparkConnection <- function(con, x) {
   sql_quote(x, '`')
 }
 
+#' @export
+sql_escape_ident.DBISparkConnection <- function(con, x) {
+  sql_quote(x, '`')
+}
