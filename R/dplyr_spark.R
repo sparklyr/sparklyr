@@ -41,7 +41,7 @@ src_translate_env.src_spark <- function(x) {
       .parent = dplyr::base_agg,
       n = nyi,
       "%||%" = nyi,
-      sd =nyi
+      sd = nyi
     ),
     dplyr::sql_translator(
       .parent = dplyr::base_win,

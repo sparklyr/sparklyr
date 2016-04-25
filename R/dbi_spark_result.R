@@ -8,7 +8,8 @@ setClass("DBISparkResult",
          contains = "DBIResult",
          slots = list(
            sql = "character",
-           df = "data.frame"
+           df = "data.frame",
+           lastFetch = "numeric"
          )
 )
 
@@ -93,8 +94,17 @@ setMethod("dbSendQuery", c("DBISparkConnection", "character"), function(conn, st
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
   if (n == -1)
     res@df
-  else
-    res@df[n, ]
+  else {
+    start <- 1
+    end <- n
+    if (!identical(res@lastFetch, NULL)) {
+      start <- res@lastFetch + 1
+      end <- res@lastFetch + end
+    }
+
+    res@lastFetch = end
+    res@df[1:n, ]
+  }
 })
 
 #' @export
