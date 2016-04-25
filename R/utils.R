@@ -19,7 +19,7 @@ download_spark <- function(version) {
 
   sparkDir <- file.path(getwd(), "spark")
   if (is.installed("rappdirs")) {
-    sparkDir <- app_dir("spark", "rstudio")$cache()
+    sparkDir <- rappdirs::app_dir("spark", "rstudio")$cache()
   }
 
   if (!dir.exists(sparkDir)) {
