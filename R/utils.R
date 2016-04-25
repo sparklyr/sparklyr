@@ -7,18 +7,26 @@ wait_file_exists <- function(filename, retries = 50) {
   file.exists(filename)
 }
 
+is.installed <- function(package){
+  is.element(package, installed.packages()[,1])
+}
+
 download_spark <- function(version) {
   componentName <- paste("spark-", version, "-bin-hadoop2.6", sep = "")
 
   packageName <- paste(componentName, ".tgz", sep = "")
   packageSource <- "http://d3kbcqa49mib13.cloudfront.net"
 
-  if (!dir.exists("spark")) {
-    print("Local spark directory for this project not found, creating.")
-    dir.create("spark")
+  sparkDir <- file.path(getwd(), "spark")
+  if (is.installed("rappdirs")) {
+    sparkDir <- app_dir("spark", "rstudio")$cache()
   }
 
-  sparkDir <- file.path(getwd(), "spark")
+  if (!dir.exists(sparkDir)) {
+    print("Local spark directory for this project not found, creating.")
+    dir.create(sparkDir)
+  }
+
   packagePath <- file.path(sparkDir, packageName)
 
   if (!file.exists(packagePath)) {

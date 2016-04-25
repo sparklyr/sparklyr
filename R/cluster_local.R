@@ -1,4 +1,5 @@
 #' @export
+#' @import rappdirs
 setup_local <- function(version = "1.6.0") {
   sparkInfo <- download_spark(version)
 
