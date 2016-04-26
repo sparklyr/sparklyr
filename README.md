@@ -28,7 +28,7 @@ db <- src_spark()
 copy_to(db, flights, "flights")
 src_tbls(db)
 
-tbl(db, "flights") %>% collect
+tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 
 ```
 
