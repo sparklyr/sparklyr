@@ -19,7 +19,7 @@ spark_read_csv <- function(con, path, columns = NULL) {
 spark_read_csv_types <- function(con, columns) {
   names <- names(columns)
   fields <- lapply(names, function(name) {
-    spark_api(con, TRUE, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, "string", TRUE)
+    spark_api(con, TRUE, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, columns[[name]], TRUE)
   })
 
   spark_api(con, TRUE, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
