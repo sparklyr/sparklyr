@@ -10,10 +10,10 @@ sql_translate_env.DBISparkConnection <- function(con) {
 
 #' @export
 #' @import assertthat
-sql_select_limt <- function(con, select, from, where = NULL,
-                                     group_by = NULL, having = NULL,
-                                     order_by = NULL, distinct = FALSE,
-                                     limit = NULL, ...) {
+sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
+                                          group_by = NULL, having = NULL,
+                                          order_by = NULL, distinct = FALSE,
+                                          limit = NULL, ...) {
   out <- vector("list", 6)
   names(out) <- c("select", "from", "where", "group_by", "having", "order_by")
 
@@ -31,7 +31,7 @@ sql_select_limt <- function(con, select, from, where = NULL,
     assert_that(is.character(where))
 
     where_paren <- escape(where, parens = TRUE, con = con)
-    out$where <- build_sql("WHERE ", sql_vector(where_paren, collapse = " AND "))
+    out$where <- build_sql("WHERE ", dplyr:::sql_vector(where_paren, collapse = " AND "))
   }
 
   if (length(group_by) > 0L) {
@@ -56,6 +56,8 @@ sql_select_limt <- function(con, select, from, where = NULL,
     assert_that(is.numeric(limit))
     out$limit <- build_sql("LIMIT ", escape(limit, con = con))
   }
+
+  compact <- function(x) Filter(Negate(is.null), x)
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }

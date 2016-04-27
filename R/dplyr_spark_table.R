@@ -13,18 +13,10 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
 
   con <- x$src$con
 
-  # TODO(dplyr): Remove condition check once limit becomes supported
-  if ("limit" %in% names(formals(select_query))) {
-    query <- select_query(
-      sql_build(x, con = con),
-      limit = limit
-    )
-  }
-  else {
-    query <- select_query(
-      sql_build(x, con = con)
-    )
-  }
+  query <- select_spark_query(
+    sql_build(x, con = con),
+    limit = limit
+  )
 
   sql <- sql_render(query, con = con)
   res <- dbSendQuery(con, sql)
