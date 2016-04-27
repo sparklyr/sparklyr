@@ -16,6 +16,7 @@ Collate:
     'apache_spark_jobj.R'
     'apache_spark_serialize.R'
     'api_spark.R'
+    'api_spark_databricks.R'
     'api_spark_sql.R'
     'cluster_api.R'
     'cluster_ec2.R'

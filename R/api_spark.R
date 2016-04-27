@@ -190,20 +190,13 @@ spark_api_data_frame <- function(con, sqlResult) {
   df
 }
 
-spark_read_csv <- function(con, path) {
-  read <- spark_api(con, FALSE, con$sql$id, "read")
-  format <- spark_api(con, FALSE, read$id, "format", "com.databricks.spark.csv")
-  optionHeader <- spark_api(con, FALSE, format$id, "option", "header", "true")
-  optionSchema <- spark_api(con, FALSE, optionHeader$id, "option", "inferSchema", "true")
-  df <- spark_api(con, FALSE, optionSchema$id, "load", path)
-
-  df
-}
-
 spark_api_copy_data <- function(con, df, name) {
   tempfile <- tempfile(fileext = ".csv")
   write.csv(df, tempfile)
-  df <- spark_read_csv(con, tempfile)
+
+  columns <- lapply(df, typeof)
+  df <- spark_read_csv(con, tempfile, columns)
+
   spark_register_temp_table(con, df, name)
 }
 

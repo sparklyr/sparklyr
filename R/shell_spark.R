@@ -34,7 +34,7 @@ start_shell <- function() {
   shellOutputPath <- tempfile(fileext = ".out")
   on.exit(unlink(shellOutputPath))
 
-  sparkCommand <- paste("--packages com.databricks:spark-csv_2.11:1.2.0",
+  sparkCommand <- paste("--packages com.databricks:spark-csv_2.11:1.3.0",
                         "sparkr-shell",
                         shellOutputPath)
 
