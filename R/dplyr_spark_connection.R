@@ -54,7 +54,7 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
 
   if (length(limit) > 0L) {
     assert_that(is.numeric(limit))
-    out$limit <- build_sql("LIMIT ", escape(limit, con = con))
+    out$limit <- build_sql("LIMIT ", escape(as.integer(limit), con = con))
   }
 
   compact <- function(x) Filter(Negate(is.null), x)
