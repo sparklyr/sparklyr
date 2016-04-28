@@ -100,7 +100,7 @@ spark_api_create_sql_context <- function(con) {
 }
 
 spark_api_sql <- function(con, sql) {
-  spark_api(
+  result <- spark_api(
     con,
 
     FALSE,
@@ -109,6 +109,16 @@ spark_api_sql <- function(con, sql) {
 
     sql
   )
+
+  spark_api(
+    con,
+
+    FALSE,
+    result$id,
+    "printSchema"
+  )
+
+  result
 }
 
 spark_api_schema <- function(con, sqlResult) {
