@@ -181,19 +181,22 @@ spark_api_data_frame_default_type <- function(field) {
          character())
 }
 
-spark_api_data_frame_convert_type <- function(i, stringData, fields, rows) {
-  columns <- length(fields)
-  shortType <- fields[[floor((i - 1) / rows) + 1]]$shortType
-  raw <- stringData[[i]]
+# Retrives a typed column for the given dataframe
+spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
+  shortType <- fields[[col]]$shortType
 
-  switch(shortType,
-         tinyint = as.integer(raw),
-         bigint = as.integer(raw),
-         smallint = as.integer(raw),
-         string = raw,
-         double = as.double(raw),
-         int = as.integer(raw),
-         raw)
+  unlist(lapply(seq_len(rows), function(row) {
+    raw <- stringData[[(col - 1) * rows + row]]
+
+    switch(shortType,
+           tinyint = as.integer(raw),
+           bigint = as.integer(raw),
+           smallint = as.integer(raw),
+           string = raw,
+           double = as.double(raw),
+           int = as.integer(raw),
+           raw)
+  }))
 }
 
 spark_api_data_frame <- function(con, sqlResult) {
@@ -223,14 +226,14 @@ spark_api_data_frame <- function(con, sqlResult) {
   }
   else {
     stringData <- unlist(df)
-    typedData <- lapply(seq_along(stringData),
-                        spark_api_data_frame_convert_type,
-                        stringData,
-                        fields,
-                        rows)
+    columns <- lapply(seq_along(fields),
+                      spark_api_data_frame_columns_typed,
+                      stringData,
+                      fields,
+                      rows)
+    names(columns) <- dfNames
 
-    df <- data.frame(matrix(typedData, nrow=rows), stringsAsFactors=FALSE)
-    colnames(df)  <- dfNames
+    df <- data.frame(columns, stringsAsFactors=FALSE)
   }
 
   df
