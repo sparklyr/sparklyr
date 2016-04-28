@@ -241,7 +241,7 @@ spark_api_data_frame <- function(con, sqlResult) {
 
 spark_api_copy_data <- function(con, df, name) {
   tempfile <- tempfile(fileext = ".csv")
-  write.csv(df, tempfile, row.names=FALSE)
+  write.csv(df, tempfile, row.names = FALSE, na = "")
 
   columns <- lapply(df, typeof)
   df <- spark_read_csv(con, tempfile, columns)
