@@ -169,6 +169,33 @@ spark_api_schema_fields <- function(con, schemaResult) {
   )
 }
 
+# See https://github.com/apache/spark/tree/branch-1.6/sql/catalyst/src/main/scala/org/apache/spark/sql/types
+spark_api_data_frame_default_type <- function(field) {
+  switch(field$shortType,
+         tinyint = integer(),
+         bigint = integer(),
+         smallint = integer(),
+         string = character(),
+         double = double(),
+         int = integer(),
+         character())
+}
+
+spark_api_data_frame_convert_type <- function(i, stringData, fields, rows) {
+  columns <- length(fields)
+  shortType <- fields[[floor((i - 1) / rows) + 1]]$shortType
+  raw <- stringData[[i]]
+
+  switch(shortType,
+         tinyint = as.integer(raw),
+         bigint = as.integer(raw),
+         smallint = as.integer(raw),
+         string = raw,
+         double = as.double(raw),
+         int = as.integer(raw),
+         raw)
+}
+
 spark_api_data_frame <- function(con, sqlResult) {
   schema <- spark_api_schema(con, sqlResult)
   fields <- spark_api_schema_fields(con, schema)
@@ -188,12 +215,21 @@ spark_api_data_frame <- function(con, sqlResult) {
 
   # If this is a resultset with no rows...
   if (rows == 0) {
-    dfEmpty <- lapply(dfNames, function(x) character(0))
+    dfEmpty <- lapply(fields, function(field) {
+      spark_api_data_frame_default_type(field)
+    })
     names(dfEmpty) <- dfNames
     df <- data.frame(dfEmpty, stringsAsFactors=FALSE)
   }
   else {
-    df <- data.frame(matrix(unlist(df), nrow=rows), stringsAsFactors=FALSE)
+    stringData <- unlist(df)
+    typedData <- lapply(seq_along(stringData),
+                        spark_api_data_frame_convert_type,
+                        stringData,
+                        fields,
+                        rows)
+
+    df <- data.frame(matrix(typedData, nrow=rows), stringsAsFactors=FALSE)
     colnames(df)  <- dfNames
   }
 
