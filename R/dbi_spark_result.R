@@ -97,13 +97,13 @@ setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA
   else {
     start <- 1
     end <- n
-    if (!identical(res@lastFetch, NULL)) {
+    if (length(res@lastFetch) > 0) {
       start <- res@lastFetch + 1
       end <- res@lastFetch + end
     }
 
     res@lastFetch = end
-    res@df[1:n, ]
+    as.data.frame(res@df[start:end, ], drop = FALSE)
   }
 })
 
