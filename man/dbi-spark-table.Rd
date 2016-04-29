@@ -8,6 +8,7 @@
 \alias{dbRemoveTable,DBISparkConnection,character-method}
 \alias{dbWriteTable,DBISparkConnection-method}
 \alias{dbi-spark-table}
+\alias{mutate_.tbl_spark}
 \title{DBI Spark Table}
 \usage{
 \S4method{dbWriteTable}{DBISparkConnection}(conn, name, value)
@@ -19,6 +20,8 @@
 \S4method{dbExistsTable}{DBISparkConnection,character}(conn, name)
 
 \S4method{dbRemoveTable}{DBISparkConnection,character}(conn, name)
+
+\method{mutate_}{tbl_spark}(.data, ..., .dots)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{DBISparkConnection}} object, produced by
@@ -27,6 +30,8 @@
 \item{name}{a character string specifying a table name.}
 
 \item{value}{A data.frame to write to the database.}
+
+\item{...}{Other arguments used by individual methods.}
 
 \item{overwrite}{a logical specifying whether to overwrite an existing table
 or not. Its default is \code{FALSE}.}
