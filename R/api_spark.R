@@ -113,14 +113,6 @@ spark_api_sql <- function(con, sql) {
     sql
   )
 
-  spark_api(
-    con,
-
-    FALSE,
-    result$id,
-    "printSchema"
-  )
-
   result
 }
 
@@ -258,4 +250,20 @@ spark_register_temp_table <- function(con, table, name) {
 
 spark_drop_temp_table <- function(con, name) {
   spark_api(con, FALSE, con$sql$id, "dropTempTable", name)
+}
+
+
+spark_print_schema <- function(con, tableName) {
+  result <- spark_api_sql(
+    con,
+    paste("SELECT * FROM", tableName, "LIMIT 1")
+  )
+
+  spark_api(
+    con,
+
+    FALSE,
+    result$id,
+    "printSchema"
+  )
 }
