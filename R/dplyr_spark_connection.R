@@ -5,7 +5,11 @@ sql_escape_ident.DBISparkConnection <- function(con, x) {
 
 #' @export
 sql_translate_env.DBISparkConnection <- function(con) {
-  sql_translate_env(NULL)
+  dplyr::sql_variant(
+    dplyr::sql_translator(.parent = dplyr::base_agg,
+                          n = function() dplyr::sql("count(*)")
+    )
+  )
 }
 
 #' @export
