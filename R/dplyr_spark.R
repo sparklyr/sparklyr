@@ -10,8 +10,8 @@ src_spark <- function(master = "local",
 }
 
 #' @export
-src_desc.src_spark <- function(con) {
-  cat(paste("spark connection", paste("master", con$master, sep = "="), paste("app", con$appName, sep = "=")))
+src_desc.src_spark <- function(db) {
+  paste("spark connection", paste("master", db$con@con$master, sep = "="), paste("app", db$con@con$appName, sep = "="))
 }
 
 #' @export
@@ -71,8 +71,8 @@ sql_analyze.src_spark <- function(...) {
 
 #' @export
 print.src_spark <- function(db = db, n = 5) {
-  cat(paste("src:  ", src_desc(db), sep = ""))
-  cat("log:")
+  cat(src_desc(db))
+  cat("\n\n")
 
   log <- file(db$con@con$outputFile)
   lines <- readLines(log)
