@@ -35,8 +35,11 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' library(DBI)
 #' con <- dbConnect(spark::DBISpark())
 #' dbDisconnect(con)
-setMethod("dbConnect", "DBISparkDriver", function(drv, master = NULL, ...) {
-  con <- spark_api_start(master = "local", appName = "dbispark")
+setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
+  master <-  if (length(drv@master) == 0) "local" else drv@master
+  appName <-  if (length(drv@appName) == 0) "dbispark" else drv@appName
+
+  con <- spark_api_start(master = master, appName = appName)
   new("DBISparkConnection", con = con)
 })
 

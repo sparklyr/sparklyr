@@ -5,13 +5,13 @@
 src_spark <- function(master = "local",
                       appName = "dplyrspark") {
   setup_local()
-  con <- dbConnect(DBISpark())
+  con <- dbConnect(DBISpark(master, appName))
   src_sql("spark", con)
 }
 
 #' @export
 src_desc.src_spark <- function(con) {
-  "spark connection"
+  cat(paste("spark connection", paste("master", con$master, sep = "="), paste("app", con$appName, sep = "=")))
 }
 
 #' @export
@@ -69,3 +69,16 @@ sql_create_index.src_spark <- function(...) {
 sql_analyze.src_spark <- function(...) {
 }
 
+#' @export
+print.src_spark <- function(db = db, n = 5) {
+  cat(paste("src:  ", src_desc(db), sep = ""))
+  cat("log:")
+
+  log <- file(db$con@con$outputFile)
+  lines <- readLines(log)
+  close(log)
+
+  lines <- tail(lines, n = n)
+
+  cat(paste(lines, collapse = "\n"))
+}

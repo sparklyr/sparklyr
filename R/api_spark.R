@@ -44,6 +44,9 @@ spark_api_start <- function(master, appName) {
     stop("Failed to create Spark context")
   }
 
+  con$master <- master
+  con$appName <- appName
+
   con$sql <- spark_api_create_sql_context(con)
   if (identical(con$sc, NULL)) {
     stop("Failed to create SQL context")

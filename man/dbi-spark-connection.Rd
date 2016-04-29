@@ -16,7 +16,7 @@
 
 \S4method{show}{DBISparkConnection}(object)
 
-\S4method{dbConnect}{DBISparkDriver}(drv, master = NULL, ...)
+\S4method{dbConnect}{DBISparkDriver}(drv, ...)
 
 \S4method{dbDisconnect}{DBISparkConnection}(conn, ...)
 
@@ -31,9 +31,9 @@
 
 \item{drv}{\code{spark::DBISpark()}}
 
-\item{master}{Master location.}
-
 \item{obj}{Object to convert}
+
+\item{master}{Master location.}
 }
 \description{
 DBISparkConnection and methods.

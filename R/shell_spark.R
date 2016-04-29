@@ -38,7 +38,8 @@ start_shell <- function() {
                         "sparkr-shell",
                         shellOutputPath)
 
-  invisible(system2(sparkSubmitPath, sparkCommand, wait = F))
+  outputFile <- tempfile(fileext = "_spark.log")
+  invisible(system2(sparkSubmitPath, sparkCommand, wait = F, stdout = outputFile, stderr = outputFile))
 
   if (!wait_file_exists(shellOutputPath))
     stop("Failed to launch Spark shell. Ports file does not exist")
@@ -65,6 +66,7 @@ start_shell <- function() {
   con <- list(
     monitor = monitor,
     backend = backend,
+    outputFile = outputFile,
     finalized = FALSE
   )
 

@@ -6,8 +6,8 @@
 #' @examples
 #' library(DBI)
 #' spark::DBISpark()
-DBISpark <- function() {
-  new("DBISparkDriver")
+DBISpark <- function(master = "master", appName = "dbispark") {
+  new("DBISparkDriver", master = master, appName = appName)
 }
 
 #' DBISparkDriver and methods.
@@ -15,7 +15,11 @@ DBISpark <- function() {
 #' @export
 #' @keywords internal
 #' @rdname dbi-spark-driver
-setClass("DBISparkDriver", contains = "DBIDriver")
+setClass("DBISparkDriver",
+         contains = "DBIDriver",
+         slots = c(
+           master = "character",
+           appName = "character"))
 
 #' @export
 #' @rdname dbi-spark-driver
