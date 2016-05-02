@@ -1,5 +1,5 @@
 spark_read_csv <- function(con, path, columns = NULL) {
-  read <- spark_api(con, FALSE, con$sql$id, "read")
+  read <- spark_api(con, FALSE, spark_sql_or_hive(con)$id, "read")
   format <- spark_api(con, FALSE, read$id, "format", "com.databricks.spark.csv")
   optionHeader <- spark_api(con, FALSE, format$id, "option", "header", "true")
 

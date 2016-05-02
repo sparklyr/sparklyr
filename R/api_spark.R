@@ -52,6 +52,11 @@ spark_api_start <- function(master, appName) {
     stop("Failed to create SQL context")
   }
 
+  con$hive <- spark_api_create_hive_context(con)
+  if (identical(con$sc, NULL)) {
+    warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
+  }
+
   con
 }
 
@@ -102,12 +107,32 @@ spark_api_create_sql_context <- function(con) {
   )
 }
 
+spark_api_create_hive_context <- function(con) {
+  spark_api(
+    con,
+
+    TRUE,
+    "org.apache.spark.sql.hive.HiveContext",
+    "<init>",
+
+    con$sc
+  )
+}
+
+spark_sql_or_hive <- function(con) {
+  if (!identical(con$hive, NULL))
+    con$hive
+  else
+    con$sql
+}
+
 spark_api_sql <- function(con, sql) {
+  id <- spark_sql_or_hive(con)$id
   result <- spark_api(
     con,
 
     FALSE,
-    con$sql$id,
+    id,
     "sql",
 
     sql
@@ -249,7 +274,8 @@ spark_register_temp_table <- function(con, table, name) {
 }
 
 spark_drop_temp_table <- function(con, name) {
-  spark_api(con, FALSE, con$sql$id, "dropTempTable", name)
+  id <- spark_sql_or_hive(con)$id
+  spark_api(con, FALSE, id, "dropTempTable", name)
 }
 
 

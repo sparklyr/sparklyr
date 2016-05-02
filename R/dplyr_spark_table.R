@@ -34,3 +34,19 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
 sql_build.tbl_spark <- function(op, con, ...) {
   sql_build(op$ops, con, ...)
 }
+
+sample_n.tbl_spark <- function(tbl, size,
+                               replace = FALSE,
+                               weight = NULL,
+                               .env = parent.frame()) {
+
+}
+
+#' @export
+sample_frac.tbl_spark <- function(tbl,
+                                  size = 1,
+                                  replace = FALSE,
+                                  weight = NULL,
+                                  .env = parent.frame()) {
+
+}

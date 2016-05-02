@@ -23,3 +23,7 @@ vignettes/*.pdf
 
 # Spark binaries temp directory
 spark
+
+# Hive metadata
+metastore_db/
+derby.log
