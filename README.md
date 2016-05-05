@@ -44,3 +44,29 @@ start_ec2(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
 ```
 
 The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.
+
+### Further Reading
+
+[Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples that can be used over dplyr with minimal modifications. For example, consider the last example from the tutorial which would be represented in spark and dplyr as follows:
+
+
+```
+library(spark)
+library(dplyr)
+library(nycflights13)
+library(ggplot2)
+
+db <- src_spark()
+copy_to(db, flights, "flights")
+
+delay <- tbl(db, "flights") %>% 
+         group_by(tailnum) %>%
+         summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+         filter(count > 20, dist < 2000) %>%
+         collect
+    
+ggplot(delay, aes(dist, delay)) +
+  geom_point(aes(size = count), alpha = 1/2) +
+  geom_smooth() +
+  scale_size_area()
+```
