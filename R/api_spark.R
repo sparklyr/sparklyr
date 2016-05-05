@@ -263,7 +263,12 @@ spark_api_copy_data <- function(con, df, name) {
   tempfile <- tempfile(fileext = ".csv")
   write.csv(df, tempfile, row.names = FALSE, na = "")
 
-  columns <- lapply(df, typeof)
+  columns <- lapply(df, function(e) {
+    if (is.factor(e))
+      "character"
+    else
+      typeof(e)
+  })
   df <- spark_read_csv(con, tempfile, columns)
 
   spark_register_temp_table(con, df, name)
