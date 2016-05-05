@@ -24,7 +24,7 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
 
   out <- dbFetch(res, n)
   if (warn_incomplete) {
-    res_warn_incomplete(res, "n = Inf")
+    dplyr:::res_warn_incomplete(res, "n = Inf")
   }
 
   grouped_df(out, groups(x))
@@ -35,18 +35,38 @@ sql_build.tbl_spark <- function(op, con, ...) {
   sql_build(op$ops, con, ...)
 }
 
-sample_n.tbl_spark <- function(tbl, size,
+#' @export
+sample_n.tbl_spark <- function(.data,
+                               size,
                                replace = FALSE,
                                weight = NULL,
-                               .env = parent.frame()) {
+                               .env = parent.frame(),
+                               ...,
+                               .dots) {
 
+  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
+  dplyr:::add_op_single("sample_n", .data = .data, dots = dots, args = list(
+    size = size,
+    replace = replace,
+    weight = weight,
+    .env = .env
+  ))
 }
 
 #' @export
-sample_frac.tbl_spark <- function(tbl,
+sample_frac.tbl_spark <- function(.data,
                                   size = 1,
                                   replace = FALSE,
                                   weight = NULL,
-                                  .env = parent.frame()) {
+                                  .env = parent.frame(),
+                                  ...,
+                                  .dots) {
 
+  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
+  dplyr:::add_op_single("sample_frac", .data = .data, dots = dots, args = list(
+    size = size,
+    replace = replace,
+    weight = weight,
+    .env = .env
+  ))
 }
