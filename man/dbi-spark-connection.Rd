@@ -42,5 +42,12 @@ Connect to Spark
 
 Determine database type for R vector.
 }
+\examples{
+\dontrun{
+setup_local()
+con <- dbConnect(spark::DBISpark())
+dbDisconnect(con)
+}
+}
 \keyword{internal}
 

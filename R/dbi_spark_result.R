@@ -54,7 +54,7 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 #' @param params A list of query parameters to be substituted into
 #'   a parameterised query.
 #' @examples
-#' @dontrun
+#' \dontrun{
 #' library(DBI)
 #' library(spark)
 #' library(nycflights13)
@@ -75,6 +75,7 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 #' dbRemoveTable(db, "flights")
 #'
 #' dbDisconnect(db)
+#' }
 #' @name dbi-spark-query
 NULL
 

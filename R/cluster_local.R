@@ -1,3 +1,5 @@
+#' Prepares the spark environment, downloading the spark binaries
+#' to a common directory if needed.
 #' @export
 setup_local <- function(version = "1.6.0") {
   sparkInfo <- download_spark(version)

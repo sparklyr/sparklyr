@@ -32,10 +32,11 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' @export
 #' @rdname dbi-spark-connection
 #' @examples
-#' @dontrun
+#' \dontrun{
 #' setup_local()
 #' con <- dbConnect(spark::DBISpark())
 #' dbDisconnect(con)
+#' }
 setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
   master <-  if (length(drv@master) == 0) "local" else drv@master
   appName <-  if (length(drv@appName) == 0) "dbispark" else drv@appName

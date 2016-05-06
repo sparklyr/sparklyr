@@ -66,5 +66,29 @@ To retrieve results a chunk at a time, use \code{dbSendQuery},
 results (and they'll fit in memory) use \code{dbGetQuery} which sends,
 fetches and clears for you.
 }
+\examples{
+\dontrun{
+library(DBI)
+library(spark)
+library(nycflights13)
+
+setup_local()
+db <- dbConnect(DBISpark())
+dbWriteTable(db, "flights", flights, temporary = TRUE)
+
+# Run query to get results as dataframe
+dbGetQuery(db, "SELECT * FROM flights LIMIT 1")
+
+# Send query to pull requests in batches
+res <- dbSendQuery(db, "SELECT * FROM usarrests")
+dbFetch(res, n = 1)
+dbHasCompleted(res)
+dbClearResult(res)
+
+dbRemoveTable(db, "flights")
+
+dbDisconnect(db)
+}
+}
 \keyword{internal}
 

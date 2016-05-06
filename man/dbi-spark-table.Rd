@@ -50,4 +50,23 @@ with \code{\link[DBI]{dbDataType}}).}
 \description{
 DBI Spark Table
 }
+\examples{
+\dontrun{
+con <- dbConnect(spark::DBISpark())
+
+setup_local()
+dbListTables(con)
+dbWriteTable(con, "mtcars", mtcars, temporary = TRUE)
+dbReadTable(con, "mtcars")
+
+dbListTables(con)
+dbExistsTable(con, "mtcars")
+
+# A zero row data frame just creates a table definition.
+dbWriteTable(con, "mtcars2", mtcars[0, ], temporary = TRUE)
+dbReadTable(con, "mtcars2")
+
+dbDisconnect(con)
+}
+}
 

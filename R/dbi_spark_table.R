@@ -13,7 +13,7 @@
 #'   with \code{\link[DBI]{dbDataType}}).
 #' @param Not supported.
 #' @examples
-#' @dontrun
+#' \dontrun{
 #' con <- dbConnect(spark::DBISpark())
 #'
 #' setup_local()
@@ -29,6 +29,7 @@
 #' dbReadTable(con, "mtcars2")
 #'
 #' dbDisconnect(con)
+#' }
 #' @name dbi-spark-table
 NULL
 
