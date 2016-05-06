@@ -4,10 +4,10 @@
 #' @name dplyr-spark-table
 NULL
 
-# Traverses and expression passing each component to test(), returns
-# TRUE if at any time the test() condition is met.
-spark_dplyr_any_expression <- function(expr, test) {
-  FALSE
+# TRUE when the component is found in the expression
+spark_dplyr_expression_contains <- function(expr, component) {
+  replaced <- substitute(expr, component)
+  replaced != expr
 }
 
 #' @export
@@ -43,7 +43,6 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
   grouped_df(out, groups(x))
 }
 
-#' @export
 #' @name dplyr-spark-table
 sql_build.tbl_spark <- function(op, con, ...) {
   sql_build(op$ops, con, ...)

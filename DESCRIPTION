@@ -40,6 +40,4 @@ Imports:
     assertthat,
     rappdirs
 Suggests:
-    devtools,
-    testthat,
-    DBItest
+    testthat
