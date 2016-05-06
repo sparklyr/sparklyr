@@ -1,5 +1,18 @@
+#' Dplyr table definitions for Spark
+#'
+#' @import dplyr
+#' @name dplyr-spark-table
+NULL
+
+# Traverses and expression passing each component to test(), returns
+# TRUE if at any time the test() condition is met.
+spark_dplyr_any_expression <- function(expr, test) {
+
+}
+
 #' @export
 #' @import assertthat
+#' @name dplyr-spark-table
 collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
   assert_that(length(n) == 1, n > 0L)
   if (n == Inf) {
@@ -31,11 +44,13 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
 }
 
 #' @export
+#' @name dplyr-spark-table
 sql_build.tbl_spark <- function(op, con, ...) {
   sql_build(op$ops, con, ...)
 }
 
 #' @export
+#' @name dplyr-spark-table
 sample_n.tbl_spark <- function(.data,
                                size,
                                replace = FALSE,
@@ -54,6 +69,7 @@ sample_n.tbl_spark <- function(.data,
 }
 
 #' @export
+#' @name dplyr-spark-table
 sample_frac.tbl_spark <- function(.data,
                                   size = 1,
                                   replace = FALSE,

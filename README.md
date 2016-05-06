@@ -1,6 +1,8 @@
 Spark
 =======
 
+[![Travis-CI Build Status](https://travis-ci.org/rstudio/spark.svg?branch=master)](https://travis-ci.org/rstudio/spark)
+
 A set of tools to provision, connect and interface to Apache Spark from within the
 R language and echosystem. This package supports connecting to local and remote
 Apache Spark clusters and provides support for R packages like dplyr and DBI.
