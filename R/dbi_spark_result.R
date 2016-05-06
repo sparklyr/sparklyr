@@ -54,9 +54,13 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 #' @param params A list of query parameters to be substituted into
 #'   a parameterised query.
 #' @examples
+#' @dontrun
 #' library(DBI)
+#' library(spark)
 #' library(nycflights13)
-#' db <- dbConnect(spark::DBISpark())
+#'
+#' setup_local()
+#' db <- dbConnect(DBISpark())
 #' dbWriteTable(db, "flights", flights, temporary = TRUE)
 #'
 #' # Run query to get results as dataframe

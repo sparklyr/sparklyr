@@ -13,8 +13,10 @@
 #'   with \code{\link[DBI]{dbDataType}}).
 #' @param Not supported.
 #' @examples
-#' library(DBI)
+#' @dontrun
 #' con <- dbConnect(spark::DBISpark())
+#'
+#' setup_local()
 #' dbListTables(con)
 #' dbWriteTable(con, "mtcars", mtcars, temporary = TRUE)
 #' dbReadTable(con, "mtcars")
@@ -33,7 +35,11 @@ NULL
 #' @export
 #' @rdname dbi-spark-table
 setMethod("dbWriteTable", "DBISparkConnection",
-  function(conn, name, value) {
+  function(conn, name, value, temporary = TRUE) {
+    if (!temporary) {
+      stop("Writting to non-temporary tables is not supported yet")
+    }
+
     found <- dbExistsTable(conn, name)
     if (found) {
       stop("Table ", name, " already exists")

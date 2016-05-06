@@ -4,8 +4,8 @@
 \name{DBISparkConnection-class}
 \alias{DBISparkConnection-class}
 \alias{dbConnect,DBISparkDriver-method}
-\alias{dbDataType,DBISparkConnection,ANY-method}
-\alias{dbDataType,DBISparkDriver,ANY-method}
+\alias{dbDataType,DBISparkConnection-method}
+\alias{dbDataType,DBISparkDriver-method}
 \alias{dbDisconnect,DBISparkConnection-method}
 \alias{dbGetInfo,DBISparkConnection-method}
 \alias{dbQuoteIdentifier,DBISparkConnection,character-method}
@@ -20,9 +20,9 @@
 
 \S4method{dbDisconnect}{DBISparkConnection}(conn, ...)
 
-\S4method{dbDataType}{DBISparkDriver,ANY}(dbObj, obj)
+\S4method{dbDataType}{DBISparkDriver}(dbObj, obj)
 
-\S4method{dbDataType}{DBISparkConnection,ANY}(dbObj, obj)
+\S4method{dbDataType}{DBISparkConnection}(dbObj, obj)
 
 \S4method{dbQuoteIdentifier}{DBISparkConnection,character}(conn, x, ...)
 }
@@ -41,11 +41,6 @@ DBISparkConnection and methods.
 Connect to Spark
 
 Determine database type for R vector.
-}
-\examples{
-library(DBI)
-con <- dbConnect(spark::DBISpark())
-dbDisconnect(con)
 }
 \keyword{internal}
 

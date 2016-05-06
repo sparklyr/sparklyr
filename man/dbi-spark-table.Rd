@@ -11,7 +11,8 @@
 \alias{mutate_.tbl_spark}
 \title{DBI Spark Table}
 \usage{
-\S4method{dbWriteTable}{DBISparkConnection}(conn, name, value)
+\S4method{dbWriteTable}{DBISparkConnection}(conn, name, value,
+  temporary = TRUE)
 
 \S4method{dbReadTable}{DBISparkConnection,character}(conn, name)
 
@@ -31,6 +32,8 @@
 
 \item{value}{A data.frame to write to the database.}
 
+\item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
+
 \item{...}{Other arguments used by individual methods.}
 
 \item{overwrite}{a logical specifying whether to overwrite an existing table
@@ -46,21 +49,5 @@ with \code{\link[DBI]{dbDataType}}).}
 }
 \description{
 DBI Spark Table
-}
-\examples{
-library(DBI)
-con <- dbConnect(spark::DBISpark())
-dbListTables(con)
-dbWriteTable(con, "mtcars", mtcars, temporary = TRUE)
-dbReadTable(con, "mtcars")
-
-dbListTables(con)
-dbExistsTable(con, "mtcars")
-
-# A zero row data frame just creates a table definition.
-dbWriteTable(con, "mtcars2", mtcars[0, ], temporary = TRUE)
-dbReadTable(con, "mtcars2")
-
-dbDisconnect(con)
 }
 

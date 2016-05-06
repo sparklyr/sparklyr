@@ -32,7 +32,8 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' @export
 #' @rdname dbi-spark-connection
 #' @examples
-#' library(DBI)
+#' @dontrun
+#' setup_local()
 #' con <- dbConnect(spark::DBISpark())
 #' dbDisconnect(con)
 setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {

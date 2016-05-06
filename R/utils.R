@@ -11,6 +11,7 @@ is.installed <- function(package){
   is.element(package, installed.packages()[,1])
 }
 
+#' @import rappdirs
 download_spark <- function(version) {
   componentName <- paste("spark-", version, "-bin-hadoop2.6", sep = "")
 

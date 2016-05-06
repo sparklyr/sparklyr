@@ -4,9 +4,8 @@
 #' @import methods DBI
 #' @rdname dbi-spark-driver
 #' @examples
-#' library(DBI)
 #' spark::DBISpark()
-DBISpark <- function(master = "master", appName = "dbispark") {
+DBISpark <- function(master = "local", appName = "dbispark") {
   new("DBISparkDriver", master = master, appName = appName)
 }
 

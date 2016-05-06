@@ -36,7 +36,9 @@ Collate:
 Imports:
     methods,
     dplyr,
-    DBI
+    DBI,
+    assertthat,
+    rappdirs
 Suggests:
     devtools,
     testthat,

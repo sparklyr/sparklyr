@@ -7,7 +7,7 @@
 \alias{dbUnloadDriver,DBISparkDriver-method}
 \title{DBI Spark Driver}
 \usage{
-DBISpark(master = "master", appName = "dbispark")
+DBISpark(master = "local", appName = "dbispark")
 
 \S4method{dbUnloadDriver}{DBISparkDriver}(drv, ...)
 }
@@ -17,7 +17,6 @@ DBI Spark Driver
 DBISparkDriver and methods.
 }
 \examples{
-library(DBI)
 spark::DBISpark()
 }
 \keyword{internal}
