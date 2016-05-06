@@ -7,7 +7,7 @@ NULL
 # Traverses and expression passing each component to test(), returns
 # TRUE if at any time the test() condition is met.
 spark_dplyr_any_expression <- function(expr, test) {
-
+  FALSE
 }
 
 #' @export
