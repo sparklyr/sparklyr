@@ -1,7 +1,7 @@
 Spark
 =======
 
-[![Travis-CI Build Status](https://travis-ci.com/rstudio/spark.svg?branch=master)](https://travis-ci.com/rstudio/spark)
+[![Travis-CI Build Status](https://travis-ci.com/rstudio/spark.svg?token=MxiS2SHZy3QzqFf34wQr&branch=master)](https://travis-ci.com/rstudio/spark)
 
 A set of tools to provision, connect and interface to Apache Spark from within the
 R language and echosystem. This package supports connecting to local and remote
