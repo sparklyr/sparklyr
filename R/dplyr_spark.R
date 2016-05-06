@@ -1,6 +1,7 @@
 #' Connect to Spark for Dplyr.
 #'
 #' @import dplyr
+#' @import DBItest
 #' @export
 src_spark <- function(master = "local",
                       appName = "dplyrspark") {
