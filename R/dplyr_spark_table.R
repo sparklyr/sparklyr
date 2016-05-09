@@ -4,16 +4,6 @@
 #' @name dplyr-spark-table
 NULL
 
-# TRUE when the component is found in the expression
-spark_dplyr_expression_contains <- function(expr, component) {
-  replaced <- substitute(expr, component)
-  replaced != expr
-}
-
-spark_dplyr_contains_window <- function(x) {
-  spark_dplyr_expression_contains(op$ops$expr, "rank_min")
-}
-
 #' @export
 #' @import assertthat
 #' @name dplyr-spark-table
