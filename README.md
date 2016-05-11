@@ -39,7 +39,7 @@ devtools::install_github("hadley/lazyeval")
 devtools::install_github("hadley/dplyr")
 ```
 
-### Local
+### Examples
 
 This example starts a new Spark local instance and performs basic table operations:
 
