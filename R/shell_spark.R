@@ -84,3 +84,4 @@ stop_shell <- function(con) {
   close(con$backend)
   close(con$monitor)
 }
+

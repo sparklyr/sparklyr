@@ -84,11 +84,15 @@ print.src_spark <- function(db = db, n = 5) {
   cat(src_desc(db))
   cat("\n\n")
 
-  log <- file(db$con@con$outputFile)
-  lines <- readLines(log)
-  close(log)
+  connection_log(db$con@con)
+}
 
-  lines <- tail(lines, n = n)
+#' @export
+web <- function(db, ...) {
+  UseMethod("web", db)
+}
 
-  cat(paste(lines, collapse = "\n"))
+#' @export
+web.src_spark <- function(db = db) {
+  connection_ui(db$con@con)
 }
