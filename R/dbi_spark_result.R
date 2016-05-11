@@ -59,8 +59,8 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 #' library(spark)
 #' library(nycflights13)
 #'
-#' setup_local()
-#' db <- dbConnect(DBISpark())
+#' sc <- spark_connect()
+#' db <- dbConnect(DBISpark(sc))
 #' dbWriteTable(db, "flights", flights, temporary = TRUE)
 #'
 #' # Run query to get results as dataframe
@@ -82,7 +82,7 @@ NULL
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbSendQuery", c("DBISparkConnection", "character"), function(conn, statement, params = NULL, ...) {
-  df <- spark_api_sql_query(conn@con, statement)
+  df <- spark_api_sql_query(conn@api, statement)
 
   rs <- new("DBISparkResult",
             df = df,

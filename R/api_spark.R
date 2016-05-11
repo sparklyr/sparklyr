@@ -3,136 +3,61 @@
 #
 #   See: https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RBackend.scala
 #
-# Particular methods are defined on their specific clases, for instance, for "createSparkContext" see:
-#
-#   See: https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
-#
-spark_api <- function (sparkCon, isStatic, objName, methodName, ...)
-{
-  rc <- rawConnection(raw(), "r+")
-  writeBoolean(rc, isStatic)
-  writeString(rc, objName)
-  writeString(rc, methodName)
-
-  args <- list(...)
-  writeInt(rc, length(args))
-  writeArgs(rc, args)
-  bytes <- rawConnectionValue(rc)
-  close(rc)
-
-  rc <- rawConnection(raw(0), "r+")
-  writeInt(rc, length(bytes))
-  writeBin(bytes, rc)
-  con <- rawConnectionValue(rc)
-  close(rc)
-
-  writeBin(con, sparkCon$backend)
-  returnStatus <- readInt(sparkCon$backend)
-
-  if (returnStatus != 0) {
-    stop(readString(sparkCon$backend))
-  }
-
-  readObject(sparkCon$backend)
-}
-
-spark_api_start <- function(master, appName) {
-  con <- start_shell()
-
-  con$sc <- spark_api_create_context(con, master, appName)
-  if (identical(con$sc, NULL)) {
-    stop("Failed to create Spark context")
-  }
-
-  con$master <- master
-  con$appName <- appName
-
-  con$sql <- spark_api_create_sql_context(con)
-  if (identical(con$sc, NULL)) {
-    stop("Failed to create SQL context")
-  }
-
-  con$hive <- spark_api_create_hive_context(con)
-  if (identical(con$sc, NULL)) {
-    warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
-  }
-
-  con
-}
-
-# API into https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
-#
-# def createSparkContext(
-#   master: String,                               // The Spark master URL.
-#   appName: String,                              // Application name to register with cluster manager
-#   sparkHome: String,                            // Spark Home directory
-#   jars: Array[String],                          // Character string vector of jar files to pass to the worker nodes.
-#   sparkEnvirMap: JMap[Object, Object],          // Named list of environment variables to set on worker nodes.
-#   sparkExecutorEnvMap: JMap[Object, Object])    // Named list of environment variables to be used when launching executors.
-#   : JavaSparkContext
-#
-spark_api_create_context <- function(con, master, appName) {
-  sparkHome <- as.character(normalizePath(Sys.getenv("SPARK_HOME"), mustWork = FALSE))
-
-  spark_api(
-    con,
-
-    TRUE,
-    "org.apache.spark.api.r.RRDD",
-    "createSparkContext",
-
-    master,
-    appName,
-    sparkHome,
-    list(),
-    new.env(),
-    new.env()
-  )
-}
-
 #
 # API into https://github.com/apache/spark/blob/branch-1.6/sql/core/src/main/scala/org/apache/spark/sql/api/r/SQLUtils.scala
 #
 # def createSQLContext(jsc: JavaSparkContext): SQLContext
 #
-spark_api_create_sql_context <- function(con) {
-  spark_api(
-    con,
+spark_api_create_sql_context <- function(scon) {
+  spark_connection_invoke_static(
+    scon,
 
-    TRUE,
     "org.apache.spark.sql.api.r.SQLUtils",
     "createSQLContext",
 
-    con$sc
+    scon$sc
   )
 }
 
-spark_api_create_hive_context <- function(con) {
-  spark_api(
-    con,
+spark_api_create_hive_context <- function(scon) {
+  spark_connection_invoke_static(
+    scon,
 
-    TRUE,
     "org.apache.spark.sql.hive.HiveContext",
     "<init>",
 
-    con$sc
+    scon$sc
   )
 }
 
-spark_sql_or_hive <- function(con) {
-  if (!identical(con$hive, NULL))
-    con$hive
-  else
-    con$sql
+spark_api_create <- function(sc) {
+  sql <- spark_api_create_sql_context(sc)
+  if (identical(sql, NULL)) {
+    stop("Failed to create SQL context")
+  }
+
+  hive <- spark_api_create_hive_context(sc)
+  if (identical(hive, NULL)) {
+    warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
+  }
+
+  list(scon = sc,
+       sql = sql,
+       hive = hive)
 }
 
-spark_api_sql <- function(con, sql) {
-  id <- spark_sql_or_hive(con)$id
-  result <- spark_api(
-    con,
+spark_sql_or_hive <- function(api) {
+  if (!identical(api$hive, NULL))
+    api$hive
+  else
+    api$sql
+}
 
-    FALSE,
-    id,
+spark_api_sql <- function(api, sql) {
+  result <- spark_connection_invoke(
+    api$scon,
+
+    spark_sql_or_hive(api),
     "sql",
 
     sql
@@ -141,31 +66,29 @@ spark_api_sql <- function(con, sql) {
   result
 }
 
-spark_api_schema <- function(con, sqlResult) {
-  spark_api(
-    con,
+spark_api_schema <- function(api, sqlResult) {
+  spark_connection_invoke(
+    api$scon,
 
-    FALSE,
-    sqlResult$id,
+    sqlResult,
     "schema"
   )
 }
 
-spark_api_object_method <- function(con, object, property) {
-  spark_api(
-    con,
+spark_api_object_method <- function(api, object, property) {
+  spark_connection_invoke(
+    api$scon,
 
-    FALSE,
-    object$id,
+    object,
     property
   )
 }
 
-spark_api_field <- function(con, field) {
-  name <- spark_api_object_method(con, field, "name")
-  dataType <- spark_api_object_method(con, field, "dataType")
-  longType <- spark_api_object_method(con, dataType, "toString")
-  shortType <- spark_api_object_method(con, dataType, "simpleString")
+spark_api_field <- function(api, field) {
+  name <- spark_api_object_method(api, field, "name")
+  dataType <- spark_api_object_method(api, field, "dataType")
+  longType <- spark_api_object_method(api, dataType, "toString")
+  shortType <- spark_api_object_method(api, dataType, "simpleString")
 
   list(
     name = name,
@@ -174,17 +97,16 @@ spark_api_field <- function(con, field) {
   )
 }
 
-spark_api_schema_fields <- function(con, schemaResult) {
+spark_api_schema_fields <- function(api, schemaResult) {
   lapply(
-    spark_api(
-      con,
+    spark_connection_invoke(
+      api$scon,
 
-      FALSE,
-      schemaResult$id,
+      schemaResult,
       "fields"
     ),
     function (field) {
-      spark_api_field(con, field)
+      spark_api_field(api, field)
     }
   )
 }
@@ -219,14 +141,13 @@ spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
   }))
 }
 
-spark_api_data_frame <- function(con, sqlResult) {
-  schema <- spark_api_schema(con, sqlResult)
-  fields <- spark_api_schema_fields(con, schema)
+spark_api_data_frame <- function(api, sqlResult) {
+  schema <- spark_api_schema(api, sqlResult)
+  fields <- spark_api_schema_fields(api, schema)
 
-  df <- spark_api(
-    con,
+  df <- spark_connection_invoke_static(
+    api$scon,
 
-    TRUE,
     "org.apache.spark.sql.api.r.SQLUtils",
     "dfToCols",
 
@@ -259,7 +180,7 @@ spark_api_data_frame <- function(con, sqlResult) {
   df
 }
 
-spark_api_copy_data <- function(con, df, name) {
+spark_api_copy_data <- function(api, df, name) {
   tempfile <- tempfile(fileext = ".csv")
   write.csv(df, tempfile, row.names = FALSE, na = "")
 
@@ -269,32 +190,32 @@ spark_api_copy_data <- function(con, df, name) {
     else
       typeof(e)
   })
-  df <- spark_read_csv(con, tempfile, columns)
+  df <- spark_read_csv(api, tempfile, columns)
 
-  spark_register_temp_table(con, df, name)
+  spark_register_temp_table(api, df, name)
 }
 
-spark_register_temp_table <- function(con, table, name) {
-  spark_api(con, FALSE, table$id, "registerTempTable", name)
+spark_register_temp_table <- function(api, table, name) {
+  spark_connection_invoke(api$scon, table, "registerTempTable", name)
 }
 
-spark_drop_temp_table <- function(con, name) {
-  id <- spark_sql_or_hive(con)$id
-  spark_api(con, FALSE, id, "dropTempTable", name)
+spark_drop_temp_table <- function(api, name) {
+  spark_connection_invoke(api$scon,
+                          spark_sql_or_hive(api),
+                          "dropTempTable",
+                          name)
 }
 
-
-spark_print_schema <- function(con, tableName) {
+spark_print_schema <- function(api, tableName) {
   result <- spark_api_sql(
-    con,
+    api,
     paste("SELECT * FROM", tableName, "LIMIT 1")
   )
 
-  spark_api(
-    con,
+  spark_connection_invoke(
+    api$scon,
 
-    FALSE,
-    result$id,
+    result,
     "printSchema"
   )
 }

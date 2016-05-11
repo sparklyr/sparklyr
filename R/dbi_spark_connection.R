@@ -8,7 +8,8 @@ NULL
 #' @rdname dbi-spark-connection
 setClass("DBISparkConnection",
          contains = "DBIConnection",
-         slots = c(con = "list")
+         slots = c(scon = "list",
+                   api = "list")
 )
 
 #' @export
@@ -33,22 +34,20 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' @rdname dbi-spark-connection
 #' @examples
 #' \dontrun{
-#' setup_local()
-#' con <- dbConnect(spark::DBISpark())
+#' sc <- spark_connect()
+#' con <- dbConnect(spark::DBISpark(sc))
 #' dbDisconnect(con)
 #' }
 setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
-  master <-  if (length(drv@master) == 0) "local" else drv@master
-  appName <-  if (length(drv@appName) == 0) "dbispark" else drv@appName
+  api <- spark_api_create(drv@scon)
 
-  con <- spark_api_start(master = master, appName = appName)
-  new("DBISparkConnection", con = con)
+  new("DBISparkConnection", scon = drv@scon, api = api)
 })
 
 #' @export
 #' @rdname dbi-spark-connection
 setMethod("dbDisconnect", "DBISparkConnection", function(conn, ...) {
-  stop_shell(conn@con)
+  stop_shell(conn@scon)
 
   TRUE
 })

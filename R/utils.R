@@ -7,7 +7,7 @@ wait_file_exists <- function(filename, retries = 50) {
   file.exists(filename)
 }
 
-is.installed <- function(package){
+is.installed <- function(package) {
   is.element(package, installed.packages()[,1])
 }
 

@@ -44,8 +44,8 @@ Determine database type for R vector.
 }
 \examples{
 \dontrun{
-setup_local()
-con <- dbConnect(spark::DBISpark())
+sc <- spark_connect()
+con <- dbConnect(spark::DBISpark(sc))
 dbDisconnect(con)
 }
 }

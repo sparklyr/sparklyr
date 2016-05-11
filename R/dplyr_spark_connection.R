@@ -6,10 +6,10 @@ sql_escape_ident.DBISparkConnection <- function(con, x) {
 #' @export
 sql_translate_env.DBISparkConnection <- function(con) {
   dplyr::sql_variant(
-    scalar = dplyr::sql_translator(.parent = dplyr::base_scalar,
-                                   n = function() dplyr::sql("count(*)")
+    scalar = dplyr::sql_translator(.parent = dplyr::base_scalar
     ),
-    aggregate = dplyr::sql_translator(.parent = dplyr::base_agg
+    aggregate = dplyr::sql_translator(.parent = dplyr::base_agg,
+                                      n = function() dplyr::sql("count(*)")
     ),
     window = dplyr::sql_translator(.parent = dplyr::base_win
     )

@@ -72,8 +72,8 @@ library(DBI)
 library(spark)
 library(nycflights13)
 
-setup_local()
-db <- dbConnect(DBISpark())
+sc <- spark_connect()
+db <- dbConnect(DBISpark(sc))
 dbWriteTable(db, "flights", flights, temporary = TRUE)
 
 # Run query to get results as dataframe

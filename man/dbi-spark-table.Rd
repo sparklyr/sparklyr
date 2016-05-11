@@ -52,9 +52,9 @@ DBI Spark Table
 }
 \examples{
 \dontrun{
-con <- dbConnect(spark::DBISpark())
+sc <- spark_connect()
+con <- dbConnect(spark::DBISpark(sc))
 
-setup_local()
 dbListTables(con)
 dbWriteTable(con, "mtcars", mtcars, temporary = TRUE)
 dbReadTable(con, "mtcars")

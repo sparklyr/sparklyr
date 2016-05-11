@@ -2,16 +2,14 @@
 #'
 #' @import dplyr
 #' @export
-src_spark <- function(master = "local",
-                      appName = "dplyrspark") {
-  setup_local()
-  con <- dbConnect(DBISpark(master, appName))
+src_spark <- function(sc) {
+  con <- dbConnect(DBISpark(sc))
   src_sql("spark", con)
 }
 
 #' @export
 src_desc.src_spark <- function(db) {
-  paste("spark connection", paste("master", db$con@con$master, sep = "="), paste("app", db$con@con$appName, sep = "="))
+  paste("spark connection", paste("master", db$con@scon$master, sep = "="), paste("app", db$con@scon$appName, sep = "="))
 }
 
 #' @export
@@ -84,15 +82,6 @@ print.src_spark <- function(db = db, n = 5) {
   cat(src_desc(db))
   cat("\n\n")
 
-  connection_log(db$con@con)
+  spark_log(db$con@scon)
 }
 
-#' @export
-web <- function(db, ...) {
-  UseMethod("web", db)
-}
-
-#' @export
-web.src_spark <- function(db = db) {
-  connection_ui(db$con@con)
-}

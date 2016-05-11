@@ -18,10 +18,8 @@ read_shell_file <- function(shellFile) {
   )
 }
 
-start_shell <- function() {
-  sparkHome <- Sys.getenv("SPARK_HOME")
-  if (nchar(sparkHome) == 0)
-    stop("SPARK_HOME environment variable not set.")
+start_shell <- function(installInfo) {
+  sparkHome <- installInfo$sparkVersionDir
 
   sparkSubmitByOs <- list(
     unix = "spark-submit",
@@ -79,9 +77,9 @@ start_shell <- function() {
   con
 }
 
-stop_shell <- function(con) {
-  spark_api(con, FALSE, "0", "stop")
-  close(con$backend)
-  close(con$monitor)
+stop_shell <- function(scon) {
+  spark_connection_invoke(scon, list(id = "0"), "stop")
+  close(scon$backend)
+  close(scon$monitor)
 }
 

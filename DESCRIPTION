@@ -20,7 +20,6 @@ Collate:
     'api_spark_sql.R'
     'cluster_api.R'
     'cluster_ec2.R'
-    'cluster_local.R'
     'connection_spark.R'
     'dbi_spark_driver.R'
     'dbi_spark_connection.R'

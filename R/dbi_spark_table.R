@@ -14,9 +14,9 @@
 #' @param Not supported.
 #' @examples
 #' \dontrun{
-#' con <- dbConnect(spark::DBISpark())
+#' sc <- spark_connect()
+#' con <- dbConnect(spark::DBISpark(sc))
 #'
-#' setup_local()
 #' dbListTables(con)
 #' dbWriteTable(con, "mtcars", mtcars, temporary = TRUE)
 #' dbReadTable(con, "mtcars")
@@ -46,7 +46,7 @@ setMethod("dbWriteTable", "DBISparkConnection",
       stop("Table ", name, " already exists")
     }
 
-    spark_api_copy_data(conn@con, value, name)
+    spark_api_copy_data(conn@api, value, name)
 
     TRUE
   }
@@ -64,7 +64,7 @@ setMethod("dbReadTable", c("DBISparkConnection", "character"),
 #' @export
 #' @rdname dbi-spark-table
 setMethod("dbListTables", "DBISparkConnection", function(conn) {
-  df <- spark_api_sql_tables(conn@con)
+  df <- spark_api_sql_tables(conn@api)
   df$tableName
 })
 
@@ -78,7 +78,7 @@ setMethod("dbExistsTable", c("DBISparkConnection", "character"), function(conn, 
 #' @rdname dbi-spark-table
 setMethod("dbRemoveTable", c("DBISparkConnection", "character"),
   function(conn, name) {
-    spark_drop_temp_table(conn@con, name)
+    spark_drop_temp_table(conn@api, name)
 
     TRUE
   }

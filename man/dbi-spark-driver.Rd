@@ -7,7 +7,7 @@
 \alias{dbUnloadDriver,DBISparkDriver-method}
 \title{DBI Spark Driver}
 \usage{
-DBISpark(master = "local", appName = "dbispark")
+DBISpark(scon)
 
 \S4method{dbUnloadDriver}{DBISparkDriver}(drv, ...)
 }
