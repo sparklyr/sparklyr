@@ -22,6 +22,20 @@ devtools::install_github("rstudio/spark")
 
 ## Examples
 
+### Basics
+
+Spark can automatically download the spark binaries and connect with ease to a local instance. Additionally, one can print the spark log entries and open the web interface as follows:
+
+```
+library(spark)
+library(dplyr)
+
+db <- src_spark()
+
+print(db, n = 100)
+web(db)
+```
+
 ### Local
 
 This example starts a new Spark local instance and performs basic table operations:
