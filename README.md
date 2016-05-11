@@ -12,6 +12,11 @@ Apache Spark clusters and provides support for R packages like dplyr and DBI.
 Spark is not yet on CRAN; it is currently available from GitHub. Install the devtools package followed by:
 
 ```R
+if (packageVersion("devtools") < 1.6) {
+  install.packages("devtools")
+}
+devtools::install_github("hadley/lazyeval")
+devtools::install_github("hadley/dplyr")
 devtools::install_github("rstudio/spark")
 ```
 
