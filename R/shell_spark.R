@@ -21,7 +21,7 @@ read_shell_file <- function(shellFile) {
 start_shell <- function() {
   sparkHome <- Sys.getenv("SPARK_HOME")
   if (nchar(sparkHome) == 0)
-    stop("SPARK_HOME environment vairbale not set.")
+    stop("SPARK_HOME environment variable not set.")
 
   sparkSubmitByOs <- list(
     unix = "spark-submit",
