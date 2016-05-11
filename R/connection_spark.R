@@ -20,8 +20,6 @@ connection_log <- function(con, n = 10) {
 #' @export
 #' @rname spark-connection
 connection_ui <- function(con) {
-  # Started SparkUI at http://172.16.158.1:4040
-
   log <- file(con$outputFile)
   lines <- readLines(log)
   close(log)
