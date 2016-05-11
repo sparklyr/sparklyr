@@ -42,6 +42,12 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
   ""
 })
 
+#' @export
+#' @rdname dbi-spark-query
+setMethod("dbListFields", "DBISparkResult", function(conn, name, ...) {
+  ""
+})
+
 #' Execute a SQL statement on a database connection
 #'
 #' To retrieve results a chunk at a time, use \code{dbSendQuery},
@@ -132,4 +138,8 @@ setMethod("dbHasCompleted", "DBISparkResult", function(res, ...) {
 #' @rdname dbi-spark-query
 setMethod("dbClearResult", "DBISparkResult", function(res, ...) {
   TRUE
+})
+
+setMethod("fetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
+  dbFetch(res, n, ..., row.names)
 })

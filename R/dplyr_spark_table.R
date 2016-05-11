@@ -20,6 +20,7 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
 
   con <- x$src$con
 
+  browser()
   query <- select_spark_query(
     sql_build(x, con = con),
     limit = limit
@@ -79,3 +80,8 @@ sample_frac.tbl_spark <- function(.data,
     .env = .env
   ))
 }
+
+# @export
+#escape.tbl_spark <- function(x, con = NULL) {
+#  x
+#}

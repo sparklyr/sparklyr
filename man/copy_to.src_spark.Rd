@@ -4,7 +4,7 @@
 \alias{copy_to.src_spark}
 \title{Copies the source data frame into a Spark table}
 \usage{
-\method{copy_to}{src_spark}(con, df, name)
+\method{copy_to}{src_spark}(db, df, name)
 }
 \description{
 Copies the source data frame into a Spark table

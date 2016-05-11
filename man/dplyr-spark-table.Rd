@@ -10,7 +10,7 @@
 \usage{
 \method{collect}{tbl_spark}(x, ..., n = 1e+05, warn_incomplete = TRUE)
 
-\method{sql_build}{tbl_spark}(op, con, ...)
+sql_build.tbl_spark(op, con, ...)
 
 \method{sample_n}{tbl_spark}(.data, size, replace = FALSE, weight = NULL,
   .env = parent.frame(), ..., .dots)

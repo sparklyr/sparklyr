@@ -21,10 +21,7 @@ db_explain.src_spark <- function(con) {
 
 #' @export
 tbl.src_spark <- function(src, from, ...) {
-  make_tbl(c("spark", "sql", "lazy"), src = src, ops = dplyr:::op_base_remote(src, from))
-
-  # TODO(dplyr): Uncomment once subclassing tables is supported
-  # tbl_sql("spark", src = src, from = from, ...)
+  tbl_sql("spark", src = src, from = from, ...)
 }
 
 #' This operation is currently not supported in Spark
@@ -59,14 +56,14 @@ sql_insert_into.src_spark <- function(...) {
 
 #' Removes a Spark table
 #' @export
-sql_drop_table.src_spark <- function(con, name) {
-  dbRemoveTable(con, name)
+sql_drop_table.src_spark <- function(db, name) {
+  dbRemoveTable(db, name)
 }
 
 #' Copies the source data frame into a Spark table
 #' @export
-copy_to.src_spark <- function(con, df, name) {
-  dbWriteTable(con$con, name, df)
+copy_to.src_spark <- function(db, df, name) {
+  dbWriteTable(db$con, name, df)
 }
 
 #' This operation is currently not supported in Spark
@@ -91,4 +88,10 @@ print.src_spark <- function(db = db, n = 5) {
   lines <- tail(lines, n = n)
 
   cat(paste(lines, collapse = "\n"))
+}
+
+#' @export
+#' @importFrom dplyr src_translate_env
+src_translate_env.src_spark <- function(db = db) {
+  sql_translate_env(db$con)
 }

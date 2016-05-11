@@ -4,6 +4,9 @@ sql_escape_ident.DBISparkConnection <- function(con, x) {
 }
 
 #' @export
+sql_translate_env <- function(con) UseMethod("sql_translate_env")
+
+#' @export
 sql_translate_env.DBISparkConnection <- function(con) {
   dplyr::sql_variant(
     scalar = dplyr::sql_translator(.parent = dplyr::base_scalar,
@@ -68,4 +71,12 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
   compact <- function(x) Filter(Negate(is.null), x)
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
+}
+
+#' @export
+db_query_fields.DBISparkConnection <- function(con, sql, ...) {
+  sql <- sql_select(con, sql("*"), sql_subquery(con, sql), limit = 1)
+  res <- dbGetQuery(con, sql)
+
+  names(res)
 }

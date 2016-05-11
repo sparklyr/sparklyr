@@ -11,6 +11,7 @@
 \alias{dbGetStatement,DBISparkResult-method}
 \alias{dbHasCompleted,DBISparkResult-method}
 \alias{dbIsValid,DBISparkResult-method}
+\alias{dbListFields,DBISparkResult-method}
 \alias{dbSendQuery,DBISparkConnection,character-method}
 \alias{dbi-spark-query}
 \title{DBISparkResult results.}
@@ -22,6 +23,8 @@
 \S4method{dbGetRowCount}{DBISparkResult}(res, ...)
 
 \S4method{dbColumnInfo}{DBISparkResult}(res, ...)
+
+\S4method{dbListFields}{DBISparkResult}(conn, name, ...)
 
 \S4method{dbSendQuery}{DBISparkConnection,character}(conn, statement,
   params = NULL, ...)

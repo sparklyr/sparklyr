@@ -4,7 +4,7 @@
 \alias{sql_drop_table.src_spark}
 \title{Removes a Spark table}
 \usage{
-sql_drop_table.src_spark(con, name)
+sql_drop_table.src_spark(db, name)
 }
 \description{
 Removes a Spark table
