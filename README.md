@@ -12,10 +12,29 @@ Apache Spark clusters and provides support for R packages like dplyr and DBI.
 Spark is not yet on CRAN; it is currently available from GitHub. Install the devtools package followed by:
 
 ```R
+if (packageVersion("devtools") < 1.6) {
+  install.packages("devtools")
+}
+devtools::install_github("hadley/lazyeval")
+devtools::install_github("hadley/dplyr")
 devtools::install_github("rstudio/spark")
 ```
 
 ## Examples
+
+### Basics
+
+Spark can automatically download the spark binaries and connect with ease to a local instance. Additionally, one can print the spark log entries and open the web interface as follows:
+
+```
+library(spark)
+library(dplyr)
+
+db <- src_spark()
+
+print(db, n = 100)
+web(db)
+```
 
 ### Local
 
@@ -51,7 +70,6 @@ The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved fro
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples that can be used over dplyr with minimal modifications. For example, consider the last example from the tutorial which would be represented in spark and dplyr as follows:
 
-
 ```
 library(spark)
 library(dplyr)
@@ -71,4 +89,21 @@ ggplot(delay, aes(dist, delay)) +
   geom_point(aes(size = count), alpha = 1/2) +
   geom_smooth() +
   scale_size_area()
+```
+
+[Window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) provides more advanced examples that can also be used with spark. For example:
+
+```
+library(dplyr)
+library(spark)
+library(Lahman)
+
+db <- src_spark()
+copy_to(db, Batting, "batting")
+
+select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
+  arrange(playerID, yearID, teamID) %>%
+  group_by(playerID) %>%
+  filter(min_rank(desc(H)) <= 2 & H > 0) %>%
+  head
 ```
