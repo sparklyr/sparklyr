@@ -1,12 +1,53 @@
 #' @export
-#' @rname spark-connection
+#' @import rappdirs
+#' @rdname spark-connection
+#' Provides support to download and install the given Spark version
+#' @examples
+#' spark::spark_install()
+spark_install <- function(version) {
+  componentName <- paste("spark-", version, "-bin-hadoop2.6", sep = "")
+
+  packageName <- paste(componentName, ".tgz", sep = "")
+  packageSource <- "http://d3kbcqa49mib13.cloudfront.net"
+
+  sparkDir <- file.path(getwd(), "spark")
+  if (is.installed("rappdirs")) {
+    sparkDir <- rappdirs::app_dir("spark", "rstudio")$cache()
+  }
+
+  if (!dir.exists(sparkDir)) {
+    print("Local spark directory for this project not found, creating.")
+    dir.create(sparkDir)
+  }
+
+  packagePath <- file.path(sparkDir, packageName)
+
+  if (!file.exists(packagePath)) {
+    print("Spark package not found, downloading.")
+    download.file(file.path(packageSource, packageName), destfile = packagePath)
+  }
+
+  sparkVersionDir <- file.path(sparkDir, componentName)
+
+  if (!dir.exists(sparkVersionDir)) {
+    untar(tarfile = packagePath, exdir = sparkDir)
+  }
+
+  list (
+    sparkDir = sparkDir,
+    sparkVersionDir = sparkVersionDir
+  )
+}
+
+#' @export
+#' @rdname spark-connection
 connect <- function(master = "local", appName = "rspark") {
   setup_local()
   spark_api_start(master, appName)
 }
 
 #' @export
-#' @rname spark-connection
+#' @rdname spark-connection
 connection_log <- function(con, n = 10) {
   log <- file(con$outputFile)
   lines <- readLines(log)
@@ -18,7 +59,7 @@ connection_log <- function(con, n = 10) {
 }
 
 #' @export
-#' @rname spark-connection
+#' @rdname spark-connection
 connection_ui <- function(con) {
   log <- file(con$outputFile)
   lines <- readLines(log)

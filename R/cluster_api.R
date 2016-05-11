@@ -23,7 +23,7 @@ launch_ec2 <- function(
   region = "us-west-1",
   preview = FALSE) {
 
-  sparkInfo <- download_spark(version)
+  sparkInfo <- spark_install(version)
 
   validate_pem(pem_path);
 
@@ -51,7 +51,7 @@ start_ec2 <- function(
   cluster_name = "sparkster",
   preview = FALSE) {
 
-  sparkInfo <- download_spark(version)
+  sparkInfo <- spark_install(version)
 
   validate_pem(pem_path);
 
@@ -73,7 +73,7 @@ stop_ec2 <- function(
   cluster_name = "sparkster",
   preview = FALSE) {
 
-  sparkInfo <- download_spark(version)
+  sparkInfo <- spark_install(version)
 
   validate_pem(pem_path);
 
@@ -96,7 +96,7 @@ destroy_ec2 <- function(
   cluster_name = "sparkster",
   preview = FALSE) {
 
-  sparkInfo <- download_spark(version)
+  sparkInfo <- spark_install(version)
 
   validate_pem(pem_path);
 
@@ -119,7 +119,7 @@ login_ec2 <- function(
   cluster_name = "sparkster",
   preview = FALSE) {
 
-  sparkInfo <- download_spark(version)
+  sparkInfo <- spark_install(version)
 
   validate_pem(pem_path);
 
@@ -142,7 +142,7 @@ master_ec2 <- function(
   cluster_name = "sparkster",
   preview = FALSE) {
 
-  sparkInfo <- download_spark(version)
+  sparkInfo <- spark_install(version)
 
   validate_pem(pem_path);
 
@@ -164,7 +164,7 @@ setup_ec2 <- function(
   version = "1.6.0",
   cluster_name = "sparkster") {
 
-  sparkInfo <- download_spark(version)
+  sparkInfo <- spark_install(version)
 
   sparkHome <- sparkInfo$sparkVersionDir
   Sys.setenv(SPARK_HOME = sparkHome)
