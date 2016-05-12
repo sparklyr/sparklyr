@@ -1,0 +1,121 @@
+---
+title: "Spark Package"
+output: html_notebook
+---
+
+A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE)
+library(spark)
+library(dplyr)
+library(nycflights13)
+library(ggplot2)
+library(Lahman)
+```
+
+
+## Installation
+
+Install various versions of Spark using the `spark_install` function:
+
+```{r, eval=FALSE}
+spark_install(version = "1.6.0")
+```
+
+
+## dplyr
+
+The spark package implements a dplyr back-end for Spark.
+
+```{r}
+# connect to local spark instance and get a dplyr interface
+sc <- spark_connect("local")
+db <- src_spark(sc)
+
+# copy the flights table to Spark
+copy_to(db, flights, "flights")
+
+# filter by departure delay and print the first few records
+tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
+```
+
+
+## ggplot2
+
+Filter and aggregate data then plot it with ggplot2:
+
+```{r}
+# summarize delays for plotting
+delay <- tbl(db, "flights") %>% 
+          group_by(tailnum) %>%
+          summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+          filter(count > 20, dist < 2000) %>%
+          collect
+    
+# plot delays
+ggplot(delay, aes(dist, delay)) +
+  geom_point(aes(size = count), alpha = 1/2) +
+  geom_smooth() +
+  scale_size_area()
+```
+
+
+## Window functions
+
+[Window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) provides more advanced examples that can also be used with spark. For example:
+
+```{r}
+# copy the Batting table to Spark
+copy_to(db, Batting, "batting")
+
+# select and display 
+select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
+  arrange(playerID, yearID, teamID) %>%
+  group_by(playerID) %>%
+  filter(min_rank(desc(H)) <= 2 & H > 0) %>%
+  head
+```
+
+
+## Extensibility
+
+Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
+
+```{r}
+# define an R interface to Spark line counting
+count_lines <- function(sc, path) {
+  read <- spark_invoke(sc, spark_context(sc), "textFile", path)
+  spark_invoke(sc, read, "count")
+}
+
+# write a CSV 
+tempfile <- tempfile(fileext = ".csv")
+write.csv(flights, tempfile, row.names = FALSE, na = "")
+
+# call spark to count the lines
+count_lines(sc, tempfile)
+```
+
+
+## Connection Utilities
+
+You can view the Spark web console or log for a Spark connection:
+
+```{r}
+# show web console
+spark_web(sc)
+
+# show log
+spark_log(sc, n = 10)
+```
+
+Finally, we disconnect from Spark:
+
+```{r}
+spark_disconnect(sc)
+```
+
+
+
+
