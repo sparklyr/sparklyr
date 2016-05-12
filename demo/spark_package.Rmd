@@ -6,12 +6,7 @@ output: github_document
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(warning = FALSE)
-library(spark)
-library(dplyr)
-library(nycflights13)
-library(ggplot2)
-library(Lahman)
+knitr::opts_chunk$set(warning = FALSE, cache = TRUE)
 ```
 
 
@@ -20,21 +15,24 @@ library(Lahman)
 Install various versions of Spark using the `spark_install` function:
 
 ```{r, eval=FALSE}
+library(spark)
 spark_install(version = "1.6.0")
 ```
 
 
 ## dplyr
 
-The spark package implements a dplyr back-end for Spark.
+The spark package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
 
-```{r}
+```{r, message=FALSE}
 # connect to local spark instance and get a dplyr interface
+library(spark)
+library(dplyr)
 sc <- spark_connect("local")
 db <- src_spark(sc)
 
-# copy the flights table to Spark
-copy_to(db, flights, "flights")
+# copy the flights table from the nycflights13 package to Spark
+copy_to(db, nycflights13::flights, "flights")
 
 # filter by departure delay and print the first few records
 tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
@@ -54,6 +52,7 @@ delay <- tbl(db, "flights") %>%
           collect
     
 # plot delays
+library(ggplot2)
 ggplot(delay, aes(dist, delay)) +
   geom_point(aes(size = count), alpha = 1/2) +
   geom_smooth() +
@@ -61,13 +60,13 @@ ggplot(delay, aes(dist, delay)) +
 ```
 
 
-## Window functions
+## Window Functions
 
 [Window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) provides more advanced examples that can also be used with spark. For example:
 
 ```{r}
-# copy the Batting table to Spark
-copy_to(db, Batting, "batting")
+# copy the Batting table from the Lahman package to Spark
+copy_to(db, Lahman::Batting, "batting")
 
 # select and display 
 select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
@@ -91,7 +90,7 @@ count_lines <- function(sc, path) {
 
 # write a CSV 
 tempfile <- tempfile(fileext = ".csv")
-write.csv(flights, tempfile, row.names = FALSE, na = "")
+write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 
 # call spark to count the lines
 count_lines(sc, tempfile)
