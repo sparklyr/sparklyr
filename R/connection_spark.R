@@ -86,9 +86,7 @@ spark_log <- function(scon, n = 100) {
   lines <- readLines(log)
   close(log)
 
-  lines <- tail(lines, n = n)
-
-  paste(lines, collapse = "\n")
+  tail(lines, n = n)
 }
 
 #' Opens the Spark web interface
