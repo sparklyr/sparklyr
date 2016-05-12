@@ -49,7 +49,7 @@ setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
 setMethod("dbDisconnect", "DBISparkConnection", function(conn, ...) {
   stop_shell(conn@scon)
 
-  TRUE
+  invisible(TRUE)
 })
 
 #' Determine database type for R vector.

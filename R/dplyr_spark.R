@@ -73,7 +73,7 @@ sql_drop_table.src_spark <- function(con, name) {
 #' @param df Data frame to copy from
 #' @param name Name of the destination table
 copy_to.src_spark <- function(con, df, name) {
-  dbWriteTable(con$con, name, df)
+  invisible(dbWriteTable(con$con, name, df))
 }
 
 #' This operation is currently not supported in Spark

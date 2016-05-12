@@ -26,5 +26,5 @@ setClass("DBISparkDriver",
 #' @export
 #' @rdname dbi-spark-driver
 setMethod("dbUnloadDriver", "DBISparkDriver", function(drv, ...) {
-  TRUE
+  invisible(TRUE)
 })

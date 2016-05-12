@@ -34,11 +34,7 @@ db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
 copy_to(db, nycflights13::flights, "flights")
-```
 
-    ## [1] TRUE
-
-``` r
 # filter by departure delay and print the first few records
 tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 ```
@@ -84,11 +80,7 @@ dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes
 ``` r
 # copy the Batting table from the Lahman package to Spark
 copy_to(db, Lahman::Batting, "batting")
-```
 
-    ## [1] TRUE
-
-``` r
 # select and display 
 select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
@@ -164,16 +156,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ##  [1] "16/05/12 08:48:26 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 11 (MapPartitionsRDD[49] at textFile at NativeMethodAccessorImpl.java:-2)"
-    ##  [2] "16/05/12 08:48:26 INFO TaskSchedulerImpl: Adding task set 11.0 with 1 tasks"                                                                               
-    ##  [3] "16/05/12 08:48:26 INFO TaskSetManager: Starting task 0.0 in stage 11.0 (TID 407, localhost, partition 0,PROCESS_LOCAL, 2425 bytes)"                        
-    ##  [4] "16/05/12 08:48:26 INFO Executor: Running task 0.0 in stage 11.0 (TID 407)"                                                                                 
-    ##  [5] "16/05/12 08:48:26 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpyVGiJa/fileeb57471c87b0.csv:0+33313106"           
-    ##  [6] "16/05/12 08:48:26 INFO Executor: Finished task 0.0 in stage 11.0 (TID 407). 2082 bytes result sent to driver"                                              
-    ##  [7] "16/05/12 08:48:26 INFO TaskSetManager: Finished task 0.0 in stage 11.0 (TID 407) in 98 ms on localhost (1/1)"                                              
-    ##  [8] "16/05/12 08:48:26 INFO TaskSchedulerImpl: Removed TaskSet 11.0, whose tasks have all completed, from pool "                                                
-    ##  [9] "16/05/12 08:48:26 INFO DAGScheduler: ResultStage 11 (count at NativeMethodAccessorImpl.java:-2) finished in 0.098 s"                                       
-    ## [10] "16/05/12 08:48:26 INFO DAGScheduler: Job 7 finished: count at NativeMethodAccessorImpl.java:-2, took 0.101564 s"
+    ##  [1] "16/05/12 08:56:59 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 11 (MapPartitionsRDD[49] at textFile at NativeMethodAccessorImpl.java:-2)"
+    ##  [2] "16/05/12 08:56:59 INFO TaskSchedulerImpl: Adding task set 11.0 with 1 tasks"                                                                               
+    ##  [3] "16/05/12 08:56:59 INFO TaskSetManager: Starting task 0.0 in stage 11.0 (TID 407, localhost, partition 0,PROCESS_LOCAL, 2425 bytes)"                        
+    ##  [4] "16/05/12 08:56:59 INFO Executor: Running task 0.0 in stage 11.0 (TID 407)"                                                                                 
+    ##  [5] "16/05/12 08:56:59 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpAAprUG/fileedf554a5ce86.csv:0+33313106"           
+    ##  [6] "16/05/12 08:56:59 INFO Executor: Finished task 0.0 in stage 11.0 (TID 407). 2082 bytes result sent to driver"                                              
+    ##  [7] "16/05/12 08:56:59 INFO TaskSetManager: Finished task 0.0 in stage 11.0 (TID 407) in 99 ms on localhost (1/1)"                                              
+    ##  [8] "16/05/12 08:56:59 INFO TaskSchedulerImpl: Removed TaskSet 11.0, whose tasks have all completed, from pool "                                                
+    ##  [9] "16/05/12 08:56:59 INFO DAGScheduler: ResultStage 11 (count at NativeMethodAccessorImpl.java:-2) finished in 0.099 s"                                       
+    ## [10] "16/05/12 08:56:59 INFO DAGScheduler: Job 7 finished: count at NativeMethodAccessorImpl.java:-2, took 0.102594 s"
 
 Finally, we disconnect from Spark:
 

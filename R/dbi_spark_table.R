@@ -41,7 +41,7 @@ setMethod("dbWriteTable", "DBISparkConnection",
 
     spark_api_copy_data(conn@api, value, name)
 
-    TRUE
+    invisible(TRUE)
   }
 )
 
@@ -73,7 +73,7 @@ setMethod("dbRemoveTable", c("DBISparkConnection", "character"),
   function(conn, name) {
     spark_drop_temp_table(conn@api, name)
 
-    TRUE
+    invisible(TRUE)
   }
 )
 
