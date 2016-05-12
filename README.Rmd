@@ -7,7 +7,11 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, cache = TRUE)
+library(spark)
+library(dplyr)
+library(ggplot2)
 ```
+
 
 ## Installation
 
@@ -26,7 +30,7 @@ spark_install(version = "1.6.0")
 ```
 
 
-## dplyr interface
+## dplyr Interface
 
 The spark package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
 
@@ -44,7 +48,7 @@ copy_to(db, nycflights13::flights, "flights")
 tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 ```
 
-[Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples that can be used over dplyr with minimal modifications. For example, consider the last example from the tutorial which would be represented in spark and dplyr as follows:
+[Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r}
 # summarize delays for plotting
@@ -63,7 +67,7 @@ ggplot(delay, aes(dist, delay)) +
 ```
 
 
-## Window functions
+### Window Functions
 
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
@@ -118,7 +122,7 @@ count_lines(sc, tempfile)
 Package authors can use this mechanism to create an R interface to any of Spark's underlying Java APIs.
 
 
-## Connection utilities
+## Connection Utilities
 
 You can view the Spark web console using the `spark_web` function:
 

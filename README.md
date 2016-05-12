@@ -20,7 +20,7 @@ library(spark)
 spark_install(version = "1.6.0")
 ```
 
-dplyr interface
+dplyr Interface
 ---------------
 
 The spark package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
@@ -57,7 +57,7 @@ tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
     ##   flight <int>, tailnum <chr>, origin <chr>, dest <chr>, air_time <dbl>,
     ##   distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dbl>.
 
-[Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples that can be used over dplyr with minimal modifications. For example, consider the last example from the tutorial which would be represented in spark and dplyr as follows:
+[Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ``` r
 # summarize delays for plotting
@@ -77,8 +77,7 @@ ggplot(delay, aes(dist, delay)) +
 
 ![](README_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
-Window functions
-----------------
+### Window Functions
 
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
@@ -150,7 +149,7 @@ count_lines(sc, tempfile)
 
 Package authors can use this mechanism to create an R interface to any of Spark's underlying Java APIs.
 
-Connection utilities
+Connection Utilities
 --------------------
 
 You can view the Spark web console using the `spark_web` function:
@@ -165,16 +164,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ##  [1] "16/05/12 08:39:22 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 11 (MapPartitionsRDD[49] at textFile at NativeMethodAccessorImpl.java:-2)"
-    ##  [2] "16/05/12 08:39:22 INFO TaskSchedulerImpl: Adding task set 11.0 with 1 tasks"                                                                               
-    ##  [3] "16/05/12 08:39:22 INFO TaskSetManager: Starting task 0.0 in stage 11.0 (TID 407, localhost, partition 0,PROCESS_LOCAL, 2425 bytes)"                        
-    ##  [4] "16/05/12 08:39:22 INFO Executor: Running task 0.0 in stage 11.0 (TID 407)"                                                                                 
-    ##  [5] "16/05/12 08:39:22 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpswMLDU/filee8ea158a99d1.csv:0+33313106"           
-    ##  [6] "16/05/12 08:39:22 INFO Executor: Finished task 0.0 in stage 11.0 (TID 407). 2082 bytes result sent to driver"                                              
-    ##  [7] "16/05/12 08:39:22 INFO TaskSetManager: Finished task 0.0 in stage 11.0 (TID 407) in 96 ms on localhost (1/1)"                                              
-    ##  [8] "16/05/12 08:39:22 INFO TaskSchedulerImpl: Removed TaskSet 11.0, whose tasks have all completed, from pool "                                                
-    ##  [9] "16/05/12 08:39:22 INFO DAGScheduler: ResultStage 11 (count at NativeMethodAccessorImpl.java:-2) finished in 0.096 s"                                       
-    ## [10] "16/05/12 08:39:22 INFO DAGScheduler: Job 7 finished: count at NativeMethodAccessorImpl.java:-2, took 0.100205 s"
+    ##  [1] "16/05/12 08:48:26 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 11 (MapPartitionsRDD[49] at textFile at NativeMethodAccessorImpl.java:-2)"
+    ##  [2] "16/05/12 08:48:26 INFO TaskSchedulerImpl: Adding task set 11.0 with 1 tasks"                                                                               
+    ##  [3] "16/05/12 08:48:26 INFO TaskSetManager: Starting task 0.0 in stage 11.0 (TID 407, localhost, partition 0,PROCESS_LOCAL, 2425 bytes)"                        
+    ##  [4] "16/05/12 08:48:26 INFO Executor: Running task 0.0 in stage 11.0 (TID 407)"                                                                                 
+    ##  [5] "16/05/12 08:48:26 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpyVGiJa/fileeb57471c87b0.csv:0+33313106"           
+    ##  [6] "16/05/12 08:48:26 INFO Executor: Finished task 0.0 in stage 11.0 (TID 407). 2082 bytes result sent to driver"                                              
+    ##  [7] "16/05/12 08:48:26 INFO TaskSetManager: Finished task 0.0 in stage 11.0 (TID 407) in 98 ms on localhost (1/1)"                                              
+    ##  [8] "16/05/12 08:48:26 INFO TaskSchedulerImpl: Removed TaskSet 11.0, whose tasks have all completed, from pool "                                                
+    ##  [9] "16/05/12 08:48:26 INFO DAGScheduler: ResultStage 11 (count at NativeMethodAccessorImpl.java:-2) finished in 0.098 s"                                       
+    ## [10] "16/05/12 08:48:26 INFO DAGScheduler: Job 7 finished: count at NativeMethodAccessorImpl.java:-2, took 0.101564 s"
 
 Finally, we disconnect from Spark:
 
