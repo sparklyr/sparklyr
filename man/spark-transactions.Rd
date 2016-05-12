@@ -14,6 +14,9 @@
 
 \S4method{dbRollback}{DBISparkConnection}(conn)
 }
+\arguments{
+\item{conn}{DBI Spark connection}
+}
 \description{
 \code{dbBegin}, \code{dbCommit} and \code{dbRollback}
 are currently not supported and are implementing as no-ops.

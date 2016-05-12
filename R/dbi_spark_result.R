@@ -1,7 +1,6 @@
 #' DBISparkResult results.
 #'
 #' @keywords internal
-#' @include dbi_spark_connection.R
 #' @export
 #' @rdname dbi-spark-query
 setClass("DBISparkResult",
@@ -32,6 +31,7 @@ setMethod("dbGetRowCount", "DBISparkResult", function(res, ...) {
 })
 
 #' @export
+#' @rdname dbi-spark-query
 setMethod("dbGetRowsAffected", "DBISparkResult", function(res, ...) {
   nrow(res@df)
 })

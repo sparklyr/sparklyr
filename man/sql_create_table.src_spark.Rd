@@ -6,6 +6,9 @@
 \usage{
 sql_create_table.src_spark(...)
 }
+\arguments{
+\item{...}{Additional parameters}
+}
 \description{
 This operation is currently not supported in Spark
 }

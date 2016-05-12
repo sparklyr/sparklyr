@@ -2,11 +2,21 @@
 #'
 #' @import dplyr
 #' @name dplyr-spark-table
+#' @param .data Reference to data and operations
+#' @param size The fraction of records to retrieve
+#' @param replace Currently not supported in Spark
+#' @param weight Currently not supported in Spark
+#' @param .env Currently not supported in Spark
+#' @param ... Additional parameters
+#' @param .dots Original parameters
 NULL
 
 #' @export
 #' @import assertthat
-#' @name dplyr-spark-table
+#' @rdname dplyr-spark-table
+#' @param x Collection of operations
+#' @param n Number of records to collect
+#' @param warn_incomplete Currently not supported in Spark
 collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
   assert_that(length(n) == 1, n > 0L)
   if (n == Inf) {
@@ -37,13 +47,17 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
   grouped_df(out, groups(x))
 }
 
-#' @name dplyr-spark-table
+#' @rdname dplyr-spark-table
+#' @param op A sequence of lazy operations
+#' @param con A database connection. The default \code{NULL} uses a set of
+#'   rules that should be very similar to ANSI 92, and allows for testing
+#'   without an active database connection.
 sql_build.tbl_spark <- function(op, con, ...) {
   sql_build(op$ops, con, ...)
 }
 
 #' @export
-#' @name dplyr-spark-table
+#' @rdname dplyr-spark-table
 sample_n.tbl_spark <- function(.data,
                                size,
                                replace = FALSE,
@@ -62,7 +76,7 @@ sample_n.tbl_spark <- function(.data,
 }
 
 #' @export
-#' @name dplyr-spark-table
+#' @rdname dplyr-spark-table
 sample_frac.tbl_spark <- function(.data,
                                   size = 1,
                                   replace = FALSE,

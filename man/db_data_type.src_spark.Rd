@@ -6,6 +6,9 @@
 \usage{
 \method{db_data_type}{src_spark}(...)
 }
+\arguments{
+\item{...}{Additional parameters}
+}
 \description{
 This operation is currently not supported in Spark
 }

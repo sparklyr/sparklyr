@@ -18,7 +18,8 @@ DBISparkDriver and methods.
 }
 \examples{
 \dontrun{
-spark::DBISpark()
+scon <- spark_connect("local")
+spark::DBISpark(scon)
 }
 }
 \keyword{internal}

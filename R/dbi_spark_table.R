@@ -5,13 +5,6 @@
 #' @param name a character string specifying a table name.
 #' @param value A data.frame to write to the database.
 #' @inheritParams DBI::sqlCreateTable
-#' @param overwrite a logical specifying whether to overwrite an existing table
-#'   or not. Its default is \code{FALSE}.
-#' @param append data to table. Its default is \code{FALSE}.
-#' @param field.types character vector of named SQL field types where
-#'   the names are the names of new table's columns. If missing, types inferred
-#'   with \code{\link[DBI]{dbDataType}}).
-#' @param Not supported.
 #' @examples
 #' \dontrun{
 #' sc <- spark_connect()
@@ -86,6 +79,9 @@ setMethod("dbRemoveTable", c("DBISparkConnection", "character"),
 
 #' @export
 #' @rdname dbi-spark-table
+#' @param .data Data and operations references
+#' @param ... Additional parameters
+#' @param .dots Original parameters
 mutate_.tbl_spark <- function(.data, ..., .dots) {
   dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
 

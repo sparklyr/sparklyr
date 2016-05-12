@@ -34,18 +34,11 @@
 
 \item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
 
-\item{...}{Other arguments used by individual methods.}
+\item{.data}{Data and operations references}
 
-\item{overwrite}{a logical specifying whether to overwrite an existing table
-or not. Its default is \code{FALSE}.}
+\item{...}{Additional parameters}
 
-\item{append}{data to table. Its default is \code{FALSE}.}
-
-\item{field.types}{character vector of named SQL field types where
-the names are the names of new table's columns. If missing, types inferred
-with \code{\link[DBI]{dbDataType}}).}
-
-\item{Not}{supported.}
+\item{.dots}{Original parameters}
 }
 \description{
 DBI Spark Table

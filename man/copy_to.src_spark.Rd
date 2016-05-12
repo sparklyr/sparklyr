@@ -6,6 +6,13 @@
 \usage{
 \method{copy_to}{src_spark}(con, df, name)
 }
+\arguments{
+\item{con}{Connection to dplyr source}
+
+\item{df}{Data frame to copy from}
+
+\item{name}{Name of the destination table}
+}
 \description{
 Copies the source data frame into a Spark table
 }

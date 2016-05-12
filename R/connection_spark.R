@@ -1,7 +1,8 @@
 #' Provides support to download and install the given Spark version
+#' @name spark_install
 #' @export
 #' @import rappdirs
-#' @rdname spark-connection
+#' @param version Version of Spark to install
 spark_install <- function(version = "1.6.0") {
   componentName <- paste("spark-", version, "-bin-hadoop2.6", sep = "")
 
@@ -52,26 +53,36 @@ spark_connect_with_shell <- function(master, appName, installInfo) {
 }
 
 #' Connects to Spark and establishes the Spark Context
+#' @name spark_connect
 #' @export
-#' @rdname spark-connection
-spark_connect <- function(master = "local", appName = "rspark", version = "1.6.0", installInfo = spark_install()) {
+#' @param master Master definition to Spark cluster
+#' @param appName Application name to be used while running in the Spark cluster
+#' @param version Version of the Spark cluster
+#' @param installInfo Description of installation paths
+spark_connect <- function(master = "local",
+                          appName = "rspark",
+                          version = "1.6.0",
+                          installInfo = spark_install()) {
   spark_connect_with_shell(master = master,
                            appName = appName,
                            installInfo = installInfo)
 }
 
 #' Disconnects from Spark and terminates the running application
+#' @name spark_disconnect
 #' @export
-#' @rdname spark-connection
-spark_disconnect <- function(sc) {
-  stop_shell(sc)
+#' @param scon Spark connection provided by spark_connect
+spark_disconnect <- function(scon) {
+  stop_shell(scon)
 }
 
 #' Prints the last n entries in the Spark log
+#' @name spark_log
 #' @export
-#' @rdname spark-connection
-spark_log <- function(con, n = 100) {
-  log <- file(con$outputFile)
+#' @param scon Spark connection provided by spark_connect
+#' @param n Max number of log entries to retrieve
+spark_log <- function(scon, n = 100) {
+  log <- file(scon$outputFile)
   lines <- readLines(log)
   close(log)
 
@@ -81,10 +92,11 @@ spark_log <- function(con, n = 100) {
 }
 
 #' Opens the Spark web interface
+#' @name spark_web
 #' @export
-#' @rdname spark-connection
-spark_web <- function(con) {
-  log <- file(con$outputFile)
+#' @param scon Spark connection provided by spark_connect
+spark_web <- function(scon) {
+  log <- file(scon$outputFile)
   lines <- readLines(log)
   close(log)
 
@@ -135,16 +147,24 @@ spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
 }
 
 #' Executes a method on the given object
+#' @name spark_invoke
 #' @export
-#' @rdname spark-connection
-spark_invoke <- function (scon, obj, methodName, ...)
+#' @param scon Spark connection provided by spark_connect
+#' @param jobj Reference to a jobj retrieved using spark_invoke
+#' @param methodName Name of class method to execute
+#' @param ... Additional parameters that method requires
+spark_invoke <- function (scon, jobj, methodName, ...)
 {
-  spark_invoke_method(scon, FALSE, obj$id, methodName, ...)
+  spark_invoke_method(scon, FALSE, jobj$id, methodName, ...)
 }
 
 #' Executes an static method on the given object
+#' @name spark_invoke_static
 #' @export
-#' @rdname spark-connection
+#' @param scon Spark connection provided by spark_connect
+#' @param objName Fully-qualified name to static class
+#' @param methodName Name of class method to execute
+#' @param ... Additional parameters that method requires
 spark_invoke_static <- function (scon, objName, methodName, ...)
 {
   spark_invoke_method(scon, TRUE, objName, methodName, ...)
@@ -180,8 +200,9 @@ spark_connection_create_context <- function(scon, master, appName, sparkHome) {
 }
 
 #' Retrieves the SparkContext reference from a Spark Connection
+#' @name spark_context
 #' @export
-#' @rdname spark-connection
+#' @param scon Spark connection provided by spark_connect
 spark_context <- function(scon) {
   scon$sc
 }

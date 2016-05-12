@@ -8,6 +8,7 @@
 \alias{dbColumnInfo,DBISparkResult-method}
 \alias{dbFetch,DBISparkResult-method}
 \alias{dbGetRowCount,DBISparkResult-method}
+\alias{dbGetRowsAffected,DBISparkResult-method}
 \alias{dbGetStatement,DBISparkResult-method}
 \alias{dbHasCompleted,DBISparkResult-method}
 \alias{dbIsValid,DBISparkResult-method}
@@ -20,6 +21,8 @@
 \S4method{dbIsValid}{DBISparkResult}(dbObj, ...)
 
 \S4method{dbGetRowCount}{DBISparkResult}(res, ...)
+
+\S4method{dbGetRowsAffected}{DBISparkResult}(res, ...)
 
 \S4method{dbColumnInfo}{DBISparkResult}(res, ...)
 

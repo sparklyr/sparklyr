@@ -6,6 +6,11 @@
 \usage{
 sql_drop_table.src_spark(con, name)
 }
+\arguments{
+\item{con}{Connection to dplyr source}
+
+\item{name}{Name of the table to remove}
+}
 \description{
 Removes a Spark table
 }

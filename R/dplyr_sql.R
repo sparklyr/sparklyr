@@ -1,5 +1,4 @@
-#' Helper functions to support dplyr sql operations
-#' @name dplyr-sql
+# Helper functions to support dplyr sql operations
 
 spark_sql_count_rows <- function(op, con) {
   countQuery <- select_spark_query(

@@ -4,6 +4,7 @@
 #' are currently not supported and are implementing as no-ops.
 #'
 #' @name spark-transactions
+#' @param conn DBI Spark connection
 NULL
 
 #' @export

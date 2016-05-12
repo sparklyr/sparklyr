@@ -18,6 +18,33 @@
 \method{sample_frac}{tbl_spark}(.data, size = 1, replace = FALSE,
   weight = NULL, .env = parent.frame(), ..., .dots)
 }
+\arguments{
+\item{x}{Collection of operations}
+
+\item{...}{Additional parameters}
+
+\item{n}{Number of records to collect}
+
+\item{warn_incomplete}{Currently not supported in Spark}
+
+\item{op}{A sequence of lazy operations}
+
+\item{con}{A database connection. The default \code{NULL} uses a set of
+rules that should be very similar to ANSI 92, and allows for testing
+without an active database connection.}
+
+\item{.data}{Reference to data and operations}
+
+\item{size}{The fraction of records to retrieve}
+
+\item{replace}{Currently not supported in Spark}
+
+\item{weight}{Currently not supported in Spark}
+
+\item{.env}{Currently not supported in Spark}
+
+\item{.dots}{Original parameters}
+}
 \description{
 Dplyr table definitions for Spark
 }
