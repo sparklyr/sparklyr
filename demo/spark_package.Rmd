@@ -1,6 +1,6 @@
 ---
 title: "Spark Package"
-output: html_notebook
+output: github_document
 ---
 
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
@@ -100,13 +100,15 @@ count_lines(sc, tempfile)
 
 ## Connection Utilities
 
-You can view the Spark web console or log for a Spark connection:
+You can view the Spark web console using the `spark_web` function:
+
+```{r, eval=FALSE}
+spark_web(sc)
+```
+
+You can show the log using the `spark_log` function:
 
 ```{r}
-# show web console
-spark_web(sc)
-
-# show log
 spark_log(sc, n = 10)
 ```
 
