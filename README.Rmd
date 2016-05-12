@@ -1,5 +1,5 @@
 ---
-title: "Spark Package"
+title: "Spark Interface for R"
 output: github_document
 ---
 
@@ -9,10 +9,16 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 knitr::opts_chunk$set(warning = FALSE, cache = TRUE)
 ```
 
-
 ## Installation
 
-Install various versions of Spark using the `spark_install` function:
+You can install the development version of the **spark** package using **devtools** as follows:
+
+```{r, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("rstudio/spark")
+```
+
+You can then nstall various versions of Spark using the `spark_install` function:
 
 ```{r, eval=FALSE}
 library(spark)
@@ -20,7 +26,7 @@ spark_install(version = "1.6.0")
 ```
 
 
-## dplyr
+## dplyr interface
 
 The spark package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
 
@@ -38,10 +44,7 @@ copy_to(db, nycflights13::flights, "flights")
 tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 ```
 
-
-## ggplot2
-
-Filter and aggregate data then plot it with ggplot2:
+[Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples that can be used over dplyr with minimal modifications. For example, consider the last example from the tutorial which would be represented in spark and dplyr as follows:
 
 ```{r}
 # summarize delays for plotting
@@ -60,9 +63,9 @@ ggplot(delay, aes(dist, delay)) +
 ```
 
 
-## Window Functions
+## Window functions
 
-[Window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) provides more advanced examples that can also be used with spark. For example:
+dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ```{r}
 # copy the Batting table from the Lahman package to Spark
@@ -75,6 +78,22 @@ select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
   filter(min_rank(desc(H)) <= 2 & H > 0) %>%
   head
 ```
+
+
+## EC2
+
+To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
+
+```{r, eval=FALSE}
+library(spark)
+master <- start_ec2(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
+                    secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+                    pem_file = "sparkster.pem")
+          
+sc <- spark_connect(master)
+```
+
+The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.
 
 
 ## Extensibility
@@ -96,8 +115,10 @@ write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 count_lines(sc, tempfile)
 ```
 
+Package authors can use this mechanism to create an R interface to any of Spark's underlying Java APIs.
 
-## Connection Utilities
+
+## Connection utilities
 
 You can view the Spark web console using the `spark_web` function:
 
