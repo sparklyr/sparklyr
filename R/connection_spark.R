@@ -100,7 +100,7 @@ spark_web <- function(con) {
   }
 }
 
-spark_connection_invoke_method <- function (scon, isStatic, objName, methodName, ...)
+spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
 {
   # Particular methods are defined on their specific clases, for instance, for "createSparkContext" see:
   #
@@ -137,17 +137,17 @@ spark_connection_invoke_method <- function (scon, isStatic, objName, methodName,
 #' Executes a method on the given object
 #' @export
 #' @rdname spark-connection
-spark_connection_invoke <- function (scon, obj, methodName, ...)
+spark_invoke <- function (scon, obj, methodName, ...)
 {
-  spark_connection_invoke_method(scon, FALSE, obj$id, methodName, ...)
+  spark_invoke_method(scon, FALSE, obj$id, methodName, ...)
 }
 
 #' Executes an static method on the given object
 #' @export
 #' @rdname spark-connection
-spark_connection_invoke_static <- function (scon, objName, methodName, ...)
+spark_invoke_static <- function (scon, objName, methodName, ...)
 {
-  spark_connection_invoke_method(scon, TRUE, objName, methodName, ...)
+  spark_invoke_method(scon, TRUE, objName, methodName, ...)
 }
 
 # API into https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
@@ -164,7 +164,7 @@ spark_connection_invoke_static <- function (scon, objName, methodName, ...)
 spark_connection_create_context <- function(scon, master, appName, sparkHome) {
   sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
 
-  spark_connection_invoke_static(
+  spark_invoke_static(
     scon,
 
     "org.apache.spark.api.r.RRDD",

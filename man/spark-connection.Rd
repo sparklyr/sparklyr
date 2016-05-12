@@ -2,11 +2,11 @@
 % Please edit documentation in R/connection_spark.R
 \name{spark_install}
 \alias{spark_connect}
-\alias{spark_connection_invoke}
-\alias{spark_connection_invoke_static}
 \alias{spark_context}
 \alias{spark_disconnect}
 \alias{spark_install}
+\alias{spark_invoke}
+\alias{spark_invoke_static}
 \alias{spark_log}
 \alias{spark_web}
 \title{Provides support to download and install the given Spark version}
@@ -22,9 +22,9 @@ spark_log(con, n = 100)
 
 spark_web(con)
 
-spark_connection_invoke(scon, obj, methodName, ...)
+spark_invoke(scon, obj, methodName, ...)
 
-spark_connection_invoke_static(scon, objName, methodName, ...)
+spark_invoke_static(scon, objName, methodName, ...)
 
 spark_context(scon)
 }

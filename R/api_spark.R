@@ -9,7 +9,7 @@
 # def createSQLContext(jsc: JavaSparkContext): SQLContext
 #
 spark_api_create_sql_context <- function(scon) {
-  spark_connection_invoke_static(
+  spark_invoke_static(
     scon,
 
     "org.apache.spark.sql.api.r.SQLUtils",
@@ -20,7 +20,7 @@ spark_api_create_sql_context <- function(scon) {
 }
 
 spark_api_create_hive_context <- function(scon) {
-  spark_connection_invoke_static(
+  spark_invoke_static(
     scon,
 
     "org.apache.spark.sql.hive.HiveContext",
@@ -54,7 +54,7 @@ spark_sql_or_hive <- function(api) {
 }
 
 spark_api_sql <- function(api, sql) {
-  result <- spark_connection_invoke(
+  result <- spark_invoke(
     api$scon,
 
     spark_sql_or_hive(api),
@@ -67,7 +67,7 @@ spark_api_sql <- function(api, sql) {
 }
 
 spark_api_schema <- function(api, sqlResult) {
-  spark_connection_invoke(
+  spark_invoke(
     api$scon,
 
     sqlResult,
@@ -76,7 +76,7 @@ spark_api_schema <- function(api, sqlResult) {
 }
 
 spark_api_object_method <- function(api, object, property) {
-  spark_connection_invoke(
+  spark_invoke(
     api$scon,
 
     object,
@@ -99,7 +99,7 @@ spark_api_field <- function(api, field) {
 
 spark_api_schema_fields <- function(api, schemaResult) {
   lapply(
-    spark_connection_invoke(
+    spark_invoke(
       api$scon,
 
       schemaResult,
@@ -145,7 +145,7 @@ spark_api_data_frame <- function(api, sqlResult) {
   schema <- spark_api_schema(api, sqlResult)
   fields <- spark_api_schema_fields(api, schema)
 
-  df <- spark_connection_invoke_static(
+  df <- spark_invoke_static(
     api$scon,
 
     "org.apache.spark.sql.api.r.SQLUtils",
@@ -196,11 +196,11 @@ spark_api_copy_data <- function(api, df, name) {
 }
 
 spark_register_temp_table <- function(api, table, name) {
-  spark_connection_invoke(api$scon, table, "registerTempTable", name)
+  spark_invoke(api$scon, table, "registerTempTable", name)
 }
 
 spark_drop_temp_table <- function(api, name) {
-  spark_connection_invoke(api$scon,
+  spark_invoke(api$scon,
                           spark_sql_or_hive(api),
                           "dropTempTable",
                           name)
@@ -212,7 +212,7 @@ spark_print_schema <- function(api, tableName) {
     paste("SELECT * FROM", tableName, "LIMIT 1")
   )
 
-  spark_connection_invoke(
+  spark_invoke(
     api$scon,
 
     result,

@@ -137,8 +137,8 @@ tempfile <- tempfile(fileext = ".csv")
 write.csv(flights, tempfile, row.names = FALSE, na = "")
 
 count_lines <- function(scon, path) {
-  read <- spark_connection_invoke(scon, spark_context(scon), "textFile", path)
-  spark_connection_invoke(scon, read, "count")
+  read <- spark_invoke(scon, spark_context(scon), "textFile", path)
+  spark_invoke(scon, read, "count")
 }
 
 count_lines(scon, tempfile)

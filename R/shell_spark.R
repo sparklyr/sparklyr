@@ -78,7 +78,7 @@ start_shell <- function(installInfo) {
 }
 
 stop_shell <- function(scon) {
-  spark_connection_invoke(scon, list(id = "0"), "stop")
+  spark_invoke(scon, list(id = "0"), "stop")
   close(scon$backend)
   close(scon$monitor)
 }
