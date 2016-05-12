@@ -17,7 +17,9 @@ DBI Spark Driver
 DBISparkDriver and methods.
 }
 \examples{
+\dontrun{
 spark::DBISpark()
+}
 }
 \keyword{internal}
 
