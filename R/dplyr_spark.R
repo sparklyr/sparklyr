@@ -19,10 +19,7 @@ db_explain.src_spark <- function(con) {
 
 #' @export
 tbl.src_spark <- function(src, from, ...) {
-  make_tbl(c("spark", "sql", "lazy"), src = src, ops = dplyr:::op_base_remote(src, from))
-
-  # TODO(dplyr): Uncomment once subclassing tables is supported
-  # tbl_sql("spark", src = src, from = from, ...)
+  tbl_sql("spark", src = src, from = from, ...)
 }
 
 #' This operation is currently not supported in Spark
