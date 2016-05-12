@@ -35,9 +35,11 @@ Collate:
     'utils.R'
 Imports:
     methods,
-    dplyr,
     DBI,
     assertthat,
     rappdirs
+Remotes:
+    hadley/lazyeval,
+    hadley/dplyr
 Suggests:
     testthat
