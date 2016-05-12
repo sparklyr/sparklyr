@@ -76,7 +76,7 @@ spark_disconnect <- function(scon) {
   stop_shell(scon)
 }
 
-#' Prints the last n entries in the Spark log
+#' Retrieves the last n entries in the Spark log
 #' @name spark_log
 #' @export
 #' @param scon Spark connection provided by spark_connect
@@ -86,7 +86,20 @@ spark_log <- function(scon, n = 100) {
   lines <- readLines(log)
   close(log)
 
-  tail(lines, n = n)
+  lines_log <- tail(lines, n = n)
+  attr(lines_log, "class") <- "spark_log"
+
+  lines_log
+}
+
+#' Prints a spark_log object
+#' @name spark_log
+#' @export
+#' @param x Spark connection provided by spark_connect
+#' @param ... Additional parameters
+print.spark_log <- function(x, ...) {
+  cat(x, sep = "\n")
+  cat("\n")
 }
 
 #' Opens the Spark web interface
