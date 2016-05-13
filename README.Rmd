@@ -124,6 +124,19 @@ count_lines(sc, tempfile)
 
 Package authors can use this mechanism to create an R interface to any of Spark's underlying Java APIs.
 
+## dplyr Utilities
+
+You can cache a table into memory with:
+
+```{r, eval=FALSE}
+tbl_cache(db, "batting")
+```
+
+and unload from memory using:
+
+```{r, eval=FALSE}
+tbl_uncache(db, "batting")
+```
 
 ## Connection Utilities
 
@@ -144,7 +157,3 @@ Finally, we disconnect from Spark:
 ```{r}
 spark_disconnect(sc)
 ```
-
-
-
-

@@ -77,11 +77,28 @@ copy_to.src_spark <- function(con, df, name, cache = TRUE) {
   result <- dbWriteTable(con$con, name, df)
 
   if (cache) {
-    dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
-    dbGetQuery(con$con, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = con$con)))
+    tbl_cache(con, name)
   }
 
   invisible(result)
+}
+
+#' Loads a table into memory
+#' @export
+#' @param con Connection to dplyr source
+#' @param name Name of the destination table
+#' @param force Forces data to be loaded in memory by executing a count(*) over the table
+tbl_cache <- function(con, name, force = TRUE) {
+  dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
+
+  if (force) {
+    dbGetQuery(con$con, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = con$con)))
+  }
+}
+
+#' Unloads table from memory
+tbl_uncache <- function(con, name) {
+  dbGetQuery(con$con, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = con$con)))
 }
 
 #' This operation is currently not supported in Spark
