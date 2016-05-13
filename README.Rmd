@@ -60,12 +60,14 @@ tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r}
-# summarize delays for plotting
-delay <- tbl(db, "flights") %>% 
-          group_by(tailnum) %>%
-          summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
-          filter(count > 20, dist < 2000) %>%
-          collect
+summarizeDelay <- function(source) {
+  source %>% group_by(tailnum) %>%
+    summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+    filter(count > 20, dist < 2000) %>%
+    collect
+}
+
+delay <- tbl(db, "flights") %>% summarizeDelay
     
 # plot delays
 library(ggplot2)
@@ -130,6 +132,7 @@ count_lines(sc, tempfile)
 
 Package authors can use this mechanism to create an R interface to any of Spark's underlying Java APIs.
 
+
 ## dplyr Utilities
 
 You can cache a table into memory with:
@@ -143,6 +146,18 @@ and unload from memory using:
 ```{r, eval=FALSE}
 tbl_uncache(db, "batting")
 ```
+
+
+## Performance
+
+```{r}
+system.time(nycflights13::flights %>% summarizeDelay)
+```
+
+```{r}
+system.time(tbl(db, "flights") %>%  summarizeDelay)
+```
+
 
 ## Connection Utilities
 

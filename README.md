@@ -64,12 +64,14 @@ tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ``` r
-# summarize delays for plotting
-delay <- tbl(db, "flights") %>% 
-          group_by(tailnum) %>%
-          summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
-          filter(count > 20, dist < 2000) %>%
-          collect
+summarizeDelay <- function(source) {
+  source %>% group_by(tailnum) %>%
+    summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+    filter(count > 20, dist < 2000) %>%
+    collect
+}
+
+delay <- tbl(db, "flights") %>% summarizeDelay
     
 # plot delays
 library(ggplot2)
@@ -164,6 +166,23 @@ and unload from memory using:
 tbl_uncache(db, "batting")
 ```
 
+Performance
+-----------
+
+``` r
+system.time(nycflights13::flights %>% summarizeDelay)
+```
+
+    ##    user  system elapsed 
+    ##   0.098   0.002   0.100
+
+``` r
+system.time(tbl(db, "flights") %>%  summarizeDelay)
+```
+
+    ##    user  system elapsed 
+    ##   0.396   0.018   0.917
+
 Connection Utilities
 --------------------
 
@@ -179,16 +198,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/13 18:00:21 INFO Executor: Running task 1.0 in stage 19.0 (TID 423)
-    ## 16/05/13 18:00:21 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpCfFKKV/file69007ea8ab5a.csv:0+11683590
-    ## 16/05/13 18:00:21 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpCfFKKV/file69007ea8ab5a.csv:11683590+11683590
-    ## 16/05/13 18:00:21 INFO Executor: Finished task 0.0 in stage 19.0 (TID 422). 2082 bytes result sent to driver
-    ## 16/05/13 18:00:21 INFO Executor: Finished task 1.0 in stage 19.0 (TID 423). 2082 bytes result sent to driver
-    ## 16/05/13 18:00:21 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 422) in 49 ms on localhost (1/2)
-    ## 16/05/13 18:00:21 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 423) in 49 ms on localhost (2/2)
-    ## 16/05/13 18:00:21 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.049 s
-    ## 16/05/13 18:00:21 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
-    ## 16/05/13 18:00:21 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.052177 s
+    ## 16/05/13 18:16:45 INFO TaskSetManager: Finished task 196.0 in stage 23.0 (TID 623) in 5 ms on localhost (196/199)
+    ## 16/05/13 18:16:45 INFO Executor: Finished task 186.0 in stage 23.0 (TID 613). 3619 bytes result sent to driver
+    ## 16/05/13 18:16:45 INFO Executor: Finished task 197.0 in stage 23.0 (TID 624). 3089 bytes result sent to driver
+    ## 16/05/13 18:16:45 INFO TaskSetManager: Finished task 186.0 in stage 23.0 (TID 613) in 15 ms on localhost (197/199)
+    ## 16/05/13 18:16:45 INFO TaskSetManager: Finished task 197.0 in stage 23.0 (TID 624) in 5 ms on localhost (198/199)
+    ## 16/05/13 18:16:45 INFO Executor: Finished task 198.0 in stage 23.0 (TID 625). 3388 bytes result sent to driver
+    ## 16/05/13 18:16:45 INFO TaskSetManager: Finished task 198.0 in stage 23.0 (TID 625) in 5 ms on localhost (199/199)
+    ## 16/05/13 18:16:45 INFO TaskSchedulerImpl: Removed TaskSet 23.0, whose tasks have all completed, from pool 
+    ## 16/05/13 18:16:45 INFO DAGScheduler: ResultStage 23 (dfToCols at NativeMethodAccessorImpl.java:-2) finished in 0.228 s
+    ## 16/05/13 18:16:45 INFO DAGScheduler: Job 13 finished: dfToCols at NativeMethodAccessorImpl.java:-2, took 0.242206 s
 
 Finally, we disconnect from Spark:
 
