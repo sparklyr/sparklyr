@@ -37,23 +37,29 @@ db <- src_spark(sc)
 # copy the flights table from the nycflights13 package to Spark
 copy_to(db, nycflights13::flights, "flights")
 
+# copy the Batting table from the Lahman package to Spark
+copy_to(db, Lahman::Batting, "batting")
+```
+
+Then you can run dplyr against Spark:
+
+``` r
 # filter by departure delay and print the first few records
 tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 ```
 
-    ## Source: local data frame [6 x 19]
+    ## Source: local data frame [6 x 16]
     ## 
-    ##    year month   day dep_time sched_dep_time dep_delay arr_time
-    ## * <int> <int> <int>    <int>          <int>     <dbl>    <int>
-    ## 1  2013     1     1      517            515         2      830
-    ## 2  2013     1     1      542            540         2      923
-    ## 3  2013     1     1      702            700         2     1058
-    ## 4  2013     1     1      715            713         2      911
-    ## 5  2013     1     1      752            750         2     1025
-    ## 6  2013     1     1      917            915         2     1206
-    ## Variables not shown: sched_arr_time <int>, arr_delay <dbl>, carrier <chr>,
-    ##   flight <int>, tailnum <chr>, origin <chr>, dest <chr>, air_time <dbl>,
-    ##   distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dbl>.
+    ##    year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
+    ## * <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
+    ## 1  2013     1     1      517         2      830        11      UA  N14228
+    ## 2  2013     1     1      542         2      923        33      AA  N619AA
+    ## 3  2013     1     1      702         2     1058        44      B6  N779JB
+    ## 4  2013     1     1      715         2      911        21      UA  N841UA
+    ## 5  2013     1     1      752         2     1025        -4      UA  N511UA
+    ## 6  2013     1     1      917         2     1206        -5      B6  N568JB
+    ## Variables not shown: flight <int>, origin <chr>, dest <chr>, air_time
+    ##   <dbl>, distance <dbl>, hour <dbl>, minute <dbl>.
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
@@ -80,9 +86,6 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ``` r
-# copy the Batting table from the Lahman package to Spark
-copy_to(db, Lahman::Batting, "batting")
-
 # select and display 
 select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
@@ -125,6 +128,8 @@ Extensibility
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
 
 ``` r
+library(magrittr)
+
 # define an R interface to Spark line counting
 count_lines <- function(scon, path) {
   spark_context(scon) %>%
@@ -144,6 +149,21 @@ count_lines(sc, tempfile)
 
 Package authors can use this mechanism to create an R interface to any of Spark's underlying Java APIs.
 
+dplyr Utilities
+---------------
+
+You can cache a table into memory with:
+
+``` r
+tbl_cache(db, "batting")
+```
+
+and unload from memory using:
+
+``` r
+tbl_uncache(db, "batting")
+```
+
 Connection Utilities
 --------------------
 
@@ -159,16 +179,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ##  ---------------------------------------------------------------------
-    ##  |                  |            modules            ||   artifacts   |
-    ##  |       conf       | number| search|dwnlded|evicted|| number|dwnlded|
-    ##  ---------------------------------------------------------------------
-    ##  |      default     |   3   |   0   |   0   |   0   ||   3   |   0   |
-    ##  ---------------------------------------------------------------------
-    ## :: retrieving :: org.apache.spark#spark-submit-parent
-    ##  confs: [default]
-    ##  0 artifacts copied, 3 already retrieved (0kB/5ms)
-    ## 2016-05-13 10:30:36.765 java[74854:5f03] Unable to load realm info from SCDynamicStore
+    ## 16/05/13 17:16:52 INFO TaskSchedulerImpl: Adding task set 19.0 with 1 tasks
+    ## 16/05/13 17:16:52 INFO TaskSetManager: Starting task 0.0 in stage 19.0 (TID 415, localhost, partition 0,PROCESS_LOCAL, 2425 bytes)
+    ## 16/05/13 17:16:52 INFO Executor: Running task 0.0 in stage 19.0 (TID 415)
+    ## 16/05/13 17:16:52 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpPOZDPP/file605a239328cd.csv:0+23367180
+    ## 16/05/13 17:16:52 INFO BlockManagerInfo: Removed broadcast_21_piece0 on localhost:62717 in memory (size: 7.9 KB, free: 487.0 MB)
+    ## 16/05/13 17:16:52 INFO Executor: Finished task 0.0 in stage 19.0 (TID 415). 2082 bytes result sent to driver
+    ## 16/05/13 17:16:52 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 415) in 94 ms on localhost (1/1)
+    ## 16/05/13 17:16:52 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
+    ## 16/05/13 17:16:52 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.095 s
+    ## 16/05/13 17:16:52 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.097819 s
 
 Finally, we disconnect from Spark:
 

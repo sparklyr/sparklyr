@@ -1,8 +1,7 @@
 spark_read_csv <- function(api, path, columns = NULL) {
-  optionHeader <- spark_sql_or_hive(api) %>%
-    spark_invoke("read") %>%
-    spark_invoke("format", "com.databricks.spark.csv") %>%
-    spark_invoke("option", "header", "true")
+  read <- spark_invoke(spark_sql_or_hive(api), "read")
+  format <- spark_invoke(read, "format", "com.databricks.spark.csv")
+  optionHeader <- spark_invoke(format, "option", "header", "true")
 
   if (identical(columns, NULL)) {
     optionSchema <- spark_invoke(optionHeader, "option", "inferSchema", "true")

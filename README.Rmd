@@ -8,7 +8,7 @@ output: github_document
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(warning = FALSE, cache = TRUE)
+knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
 library(spark)
 library(dplyr)
 library(ggplot2)
@@ -36,7 +36,7 @@ spark_install(version = "1.6.0")
 
 The spark package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
 
-```{r, message=FALSE}
+```{r connection, message=FALSE}
 # connect to local spark instance and get a dplyr interface
 library(spark)
 library(dplyr)
@@ -46,6 +46,13 @@ db <- src_spark(sc)
 # copy the flights table from the nycflights13 package to Spark
 copy_to(db, nycflights13::flights, "flights")
 
+# copy the Batting table from the Lahman package to Spark
+copy_to(db, Lahman::Batting, "batting")
+```
+
+Then you can run dplyr against Spark:
+
+```{r}
 # filter by departure delay and print the first few records
 tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 ```
@@ -74,9 +81,6 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ```{r}
-# copy the Batting table from the Lahman package to Spark
-copy_to(db, Lahman::Batting, "batting")
-
 # select and display 
 select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
@@ -107,6 +111,8 @@ The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved fro
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
 
 ```{r}
+library(magrittr)
+
 # define an R interface to Spark line counting
 count_lines <- function(scon, path) {
   spark_context(scon) %>%
