@@ -4,7 +4,7 @@
 \alias{copy_to.src_spark}
 \title{Copies the source data frame into a Spark table}
 \usage{
-\method{copy_to}{src_spark}(con, df, name)
+\method{copy_to}{src_spark}(con, df, name, cache = TRUE)
 }
 \arguments{
 \item{con}{Connection to dplyr source}
@@ -12,6 +12,8 @@
 \item{df}{Data frame to copy from}
 
 \item{name}{Name of the destination table}
+
+\item{cache}{Cache table for improved performance}
 }
 \description{
 Copies the source data frame into a Spark table

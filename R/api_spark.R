@@ -146,7 +146,7 @@ spark_api_data_frame <- function(api, sqlResult) {
   )
 
   dfNames <- lapply(fields, function(x) x$name)
-  rows <- length(df[[1]])
+  rows <- if (length(df) > 0) length(df[[1]]) else 0
 
   # If this is a resultset with no rows...
   if (rows == 0) {

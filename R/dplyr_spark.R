@@ -72,8 +72,16 @@ sql_drop_table.src_spark <- function(con, name) {
 #' @param con Connection to dplyr source
 #' @param df Data frame to copy from
 #' @param name Name of the destination table
-copy_to.src_spark <- function(con, df, name) {
-  invisible(dbWriteTable(con$con, name, df))
+#' @param cache Cache table for improved performance
+copy_to.src_spark <- function(con, df, name, cache = TRUE) {
+  result <- dbWriteTable(con$con, name, df)
+
+  if (cache) {
+    dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
+    dbGetQuery(con$con, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = con$con)))
+  }
+
+  invisible(result)
 }
 
 #' This operation is currently not supported in Spark
