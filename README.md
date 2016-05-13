@@ -36,27 +36,24 @@ db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
 copy_to(db, nycflights13::flights, "flights")
-```
 
-    ## [1] TRUE
-
-``` r
 # filter by departure delay and print the first few records
 tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 ```
 
-    ## Source: local data frame [6 x 16]
+    ## Source: local data frame [6 x 19]
     ## 
-    ##    year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
-    ## * <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
-    ## 1  2013     1     1      517         2      830        11      UA  N14228
-    ## 2  2013     1     1      542         2      923        33      AA  N619AA
-    ## 3  2013     1     1      702         2     1058        44      B6  N779JB
-    ## 4  2013     1     1      715         2      911        21      UA  N841UA
-    ## 5  2013     1     1      752         2     1025        -4      UA  N511UA
-    ## 6  2013     1     1      917         2     1206        -5      B6  N568JB
-    ## Variables not shown: flight <int>, origin <chr>, dest <chr>, air_time
-    ##   <dbl>, distance <dbl>, hour <dbl>, minute <dbl>.
+    ##    year month   day dep_time sched_dep_time dep_delay arr_time
+    ## * <int> <int> <int>    <int>          <int>     <dbl>    <int>
+    ## 1  2013     1     1      517            515         2      830
+    ## 2  2013     1     1      542            540         2      923
+    ## 3  2013     1     1      702            700         2     1058
+    ## 4  2013     1     1      715            713         2      911
+    ## 5  2013     1     1      752            750         2     1025
+    ## 6  2013     1     1      917            915         2     1206
+    ## Variables not shown: sched_arr_time <int>, arr_delay <dbl>, carrier <chr>,
+    ##   flight <int>, tailnum <chr>, origin <chr>, dest <chr>, air_time <dbl>,
+    ##   distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dbl>.
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
@@ -85,11 +82,7 @@ dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes
 ``` r
 # copy the Batting table from the Lahman package to Spark
 copy_to(db, Lahman::Batting, "batting")
-```
 
-    ## [1] TRUE
-
-``` r
 # select and display 
 select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
@@ -147,9 +140,7 @@ write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 count_lines(sc, tempfile)
 ```
 
-    ## <environment: 0x7ff477849ce0>
-    ## attr(,"class")
-    ## [1] "jobj"
+    ## [1] 336777
 
 Package authors can use this mechanism to create an R interface to any of Spark's underlying Java APIs.
 
@@ -168,16 +159,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/12 08:15:27 INFO TaskSchedulerImpl: Adding task set 11.0 with 1 tasks
-    ## 16/05/12 08:15:27 INFO TaskSetManager: Starting task 0.0 in stage 11.0 (TID 407, localhost, partition 0,PROCESS_LOCAL, 2421 bytes)
-    ## 16/05/12 08:15:27 INFO Executor: Running task 0.0 in stage 11.0 (TID 407)
-    ## 16/05/12 08:15:27 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/Rtmpfb5HnJ/file3642c28c75b.csv:0+23367180
-    ## 16/05/12 08:15:27 INFO BlockManagerInfo: Removed broadcast_14_piece0 on localhost:50001 in memory (size: 11.0 KB, free: 511.0 MB)
-    ## 16/05/12 08:15:27 INFO Executor: Finished task 0.0 in stage 11.0 (TID 407). 2082 bytes result sent to driver
-    ## 16/05/12 08:15:27 INFO TaskSetManager: Finished task 0.0 in stage 11.0 (TID 407) in 101 ms on localhost (1/1)
-    ## 16/05/12 08:15:27 INFO DAGScheduler: ResultStage 11 (count at NativeMethodAccessorImpl.java:-2) finished in 0.102 s
-    ## 16/05/12 08:15:27 INFO TaskSchedulerImpl: Removed TaskSet 11.0, whose tasks have all completed, from pool 
-    ## 16/05/12 08:15:27 INFO DAGScheduler: Job 7 finished: count at NativeMethodAccessorImpl.java:-2, took 0.105065 s
+    ##  ---------------------------------------------------------------------
+    ##  |                  |            modules            ||   artifacts   |
+    ##  |       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+    ##  ---------------------------------------------------------------------
+    ##  |      default     |   3   |   0   |   0   |   0   ||   3   |   0   |
+    ##  ---------------------------------------------------------------------
+    ## :: retrieving :: org.apache.spark#spark-submit-parent
+    ##  confs: [default]
+    ##  0 artifacts copied, 3 already retrieved (0kB/5ms)
+    ## 2016-05-13 10:30:36.765 java[74854:5f03] Unable to load realm info from SCDynamicStore
 
 Finally, we disconnect from Spark:
 
