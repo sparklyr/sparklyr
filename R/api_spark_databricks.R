@@ -1,19 +1,18 @@
 spark_read_csv <- function(api, path, columns = NULL) {
-  read <- spark_invoke(api$scon, spark_sql_or_hive(api), "read")
-  format <- spark_invoke(api$scon, read, "format", "com.databricks.spark.csv")
-  optionHeader <- spark_invoke(api$scon, format, "option", "header", "true")
+  optionHeader <- spark_sql_or_hive(api) %>%
+    spark_invoke("read") %>%
+    spark_invoke("format", "com.databricks.spark.csv") %>%
+    spark_invoke("option", "header", "true")
 
   if (identical(columns, NULL)) {
-    optionSchema <- spark_invoke(api$scon, optionHeader, "option", "inferSchema", "true")
+    optionSchema <- spark_invoke(optionHeader, "option", "inferSchema", "true")
   }
   else {
     columnDefs <- spark_read_csv_types(api, columns)
-    optionSchema <- spark_invoke(api$scon, optionHeader, "schema", columnDefs)
+    optionSchema <- spark_invoke(optionHeader, "schema", columnDefs)
   }
 
-  df <- spark_invoke(api$scon, optionSchema, "load", path)
-
-  df
+  spark_invoke(optionSchema, "load", path)
 }
 
 spark_read_csv_types <- function(api, columns) {

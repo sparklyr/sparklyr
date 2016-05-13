@@ -55,11 +55,8 @@ spark_sql_or_hive <- function(api) {
 
 spark_api_sql <- function(api, sql) {
   result <- spark_invoke(
-    api$scon,
-
     spark_sql_or_hive(api),
     "sql",
-
     sql
   )
 
@@ -68,8 +65,6 @@ spark_api_sql <- function(api, sql) {
 
 spark_api_schema <- function(api, sqlResult) {
   spark_invoke(
-    api$scon,
-
     sqlResult,
     "schema"
   )
@@ -77,8 +72,6 @@ spark_api_schema <- function(api, sqlResult) {
 
 spark_api_object_method <- function(api, object, property) {
   spark_invoke(
-    api$scon,
-
     object,
     property
   )
@@ -100,8 +93,6 @@ spark_api_field <- function(api, field) {
 spark_api_schema_fields <- function(api, schemaResult) {
   lapply(
     spark_invoke(
-      api$scon,
-
       schemaResult,
       "fields"
     ),
@@ -196,14 +187,13 @@ spark_api_copy_data <- function(api, df, name) {
 }
 
 spark_register_temp_table <- function(api, table, name) {
-  spark_invoke(api$scon, table, "registerTempTable", name)
+  spark_invoke(table, "registerTempTable", name)
 }
 
 spark_drop_temp_table <- function(api, name) {
-  spark_invoke(api$scon,
-                          spark_sql_or_hive(api),
-                          "dropTempTable",
-                          name)
+  spark_invoke(spark_sql_or_hive(api),
+               "dropTempTable",
+               name)
 }
 
 spark_print_schema <- function(api, tableName) {
@@ -213,8 +203,6 @@ spark_print_schema <- function(api, tableName) {
   )
 
   spark_invoke(
-    api$scon,
-
     result,
     "printSchema"
   )

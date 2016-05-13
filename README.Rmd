@@ -109,8 +109,9 @@ Spark provides low level access to native JVM objects, this topic targets users 
 ```{r}
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
-  read <- spark_invoke(sc, spark_context(sc), "textFile", path)
-  spark_invoke(sc, read, "count")
+  spark_context(sc) %>%
+    spark_invoke("textFile", path) %>%
+    spark_invoke("count")
 }
 
 # write a CSV 

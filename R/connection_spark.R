@@ -123,6 +123,29 @@ spark_web <- function(scon) {
   }
 }
 
+spark_attach_connection <- function(object, scon) {
+  if ("jobj" %in% attr(object, "class")) {
+    object$scon <- scon
+  }
+  else if (is.list(object) || "struct" %in% attr(object, "class")) {
+    object <- lapply(object, function(e) {
+      spark_attach_connection(e, scon)
+    })
+  }
+  else if (is.vector(object) && length(object) > 1) {
+    object <- vapply(object, function(e) {
+      spark_attach_connection(e, scon)
+    }, "")
+  }
+  else if (is.environment(object)) {
+    object <- eapply(object, function(e) {
+      spark_attach_connection(e, scon)
+    })
+  }
+
+  object
+}
+
 spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
 {
   # Particular methods are defined on their specific clases, for instance, for "createSparkContext" see:
@@ -154,19 +177,19 @@ spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
     stop(readString(scon$backend))
   }
 
-  readObject(scon$backend)
+  object <- readObject(scon$backend)
+  spark_attach_connection(object, scon)
 }
 
 #' Executes a method on the given object
 #' @name spark_invoke
 #' @export
-#' @param scon Spark connection provided by spark_connect
 #' @param jobj Reference to a jobj retrieved using spark_invoke
 #' @param methodName Name of class method to execute
 #' @param ... Additional parameters that method requires
-spark_invoke <- function (scon, jobj, methodName, ...)
+spark_invoke <- function (jobj, methodName, ...)
 {
-  spark_invoke_method(scon, FALSE, jobj$id, methodName, ...)
+  spark_invoke_method(jobj$scon, FALSE, jobj$id, methodName, ...)
 }
 
 #' Executes an static method on the given object

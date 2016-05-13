@@ -4,11 +4,9 @@
 \alias{spark_invoke}
 \title{Executes a method on the given object}
 \usage{
-spark_invoke(scon, jobj, methodName, ...)
+spark_invoke(jobj, methodName, ...)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
-
 \item{jobj}{Reference to a jobj retrieved using spark_invoke}
 
 \item{methodName}{Name of class method to execute}

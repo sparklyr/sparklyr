@@ -141,6 +141,15 @@ readEnv <- function(con) {
   env
 }
 
+# Convert a named list to struct so that
+# SerDe won't confuse between a normal named list and struct
+listToStruct <- function(list) {
+  stopifnot(class(list) == "list")
+  stopifnot(!is.null(names(list)))
+  class(list) <- "struct"
+  list
+}
+
 # Read a field of StructType from DataFrame
 # into a named list in R whose class is "struct"
 readStruct <- function(con) {
