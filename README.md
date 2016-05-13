@@ -31,7 +31,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(spark)
 library(dplyr)
-sc <- spark_connect("local")
+sc <- spark_connect("local[8]")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -179,16 +179,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/13 17:16:52 INFO TaskSchedulerImpl: Adding task set 19.0 with 1 tasks
-    ## 16/05/13 17:16:52 INFO TaskSetManager: Starting task 0.0 in stage 19.0 (TID 415, localhost, partition 0,PROCESS_LOCAL, 2425 bytes)
-    ## 16/05/13 17:16:52 INFO Executor: Running task 0.0 in stage 19.0 (TID 415)
-    ## 16/05/13 17:16:52 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpPOZDPP/file605a239328cd.csv:0+23367180
-    ## 16/05/13 17:16:52 INFO BlockManagerInfo: Removed broadcast_21_piece0 on localhost:62717 in memory (size: 7.9 KB, free: 487.0 MB)
-    ## 16/05/13 17:16:52 INFO Executor: Finished task 0.0 in stage 19.0 (TID 415). 2082 bytes result sent to driver
-    ## 16/05/13 17:16:52 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 415) in 94 ms on localhost (1/1)
-    ## 16/05/13 17:16:52 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
-    ## 16/05/13 17:16:52 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.095 s
-    ## 16/05/13 17:16:52 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.097819 s
+    ## 16/05/13 18:00:21 INFO Executor: Running task 1.0 in stage 19.0 (TID 423)
+    ## 16/05/13 18:00:21 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpCfFKKV/file69007ea8ab5a.csv:0+11683590
+    ## 16/05/13 18:00:21 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpCfFKKV/file69007ea8ab5a.csv:11683590+11683590
+    ## 16/05/13 18:00:21 INFO Executor: Finished task 0.0 in stage 19.0 (TID 422). 2082 bytes result sent to driver
+    ## 16/05/13 18:00:21 INFO Executor: Finished task 1.0 in stage 19.0 (TID 423). 2082 bytes result sent to driver
+    ## 16/05/13 18:00:21 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 422) in 49 ms on localhost (1/2)
+    ## 16/05/13 18:00:21 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 423) in 49 ms on localhost (2/2)
+    ## 16/05/13 18:00:21 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.049 s
+    ## 16/05/13 18:00:21 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
+    ## 16/05/13 18:00:21 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.052177 s
 
 Finally, we disconnect from Spark:
 

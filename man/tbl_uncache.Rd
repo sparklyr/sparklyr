@@ -6,6 +6,11 @@
 \usage{
 tbl_uncache(con, name)
 }
+\arguments{
+\item{con}{Connection to dplyr source}
+
+\item{name}{Name of the destination table}
+}
 \description{
 Unloads table from memory
 }

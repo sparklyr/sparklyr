@@ -97,6 +97,9 @@ tbl_cache <- function(con, name, force = TRUE) {
 }
 
 #' Unloads table from memory
+#' @export
+#' @param con Connection to dplyr source
+#' @param name Name of the destination table
 tbl_uncache <- function(con, name) {
   dbGetQuery(con$con, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = con$con)))
 }

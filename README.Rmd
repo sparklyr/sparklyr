@@ -40,7 +40,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(spark)
 library(dplyr)
-sc <- spark_connect("local")
+sc <- spark_connect("local[8]")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
