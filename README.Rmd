@@ -11,6 +11,7 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
 library(spark)
 library(dplyr)
+library(magrittr)
 library(ggplot2)
 ```
 
@@ -60,12 +61,15 @@ tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r}
-delay <- tbl(db, "flights") %>%
-  group_by(tailnum) %>%
-  summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
-  filter(count > 20, dist < 2000) %>%
-  collect
-    
+summarizeDelay <- function(source) {
+  source %>% group_by(tailnum) %>%
+    summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+    filter(count > 20, dist < 2000) %>%
+    collect
+}
+
+delay <- tbl(db, "flights") %>% summarizeDelay
+
 # plot delays
 library(ggplot2)
 ggplot(delay, aes(dist, delay)) +
@@ -85,7 +89,8 @@ topPlayers <- function(source) {
     select(playerID, yearID, teamID, G, AB:H) %>%
     arrange(playerID, yearID, teamID) %>%
     group_by(playerID) %>%
-    filter(min_rank(desc(H)) <= 2 & H > 0)
+    filter(min_rank(desc(H)) <= 2 & H > 0) %>%
+    collect
 }
 
 tbl(db, "batting") %>% topPlayers
@@ -114,8 +119,6 @@ The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved fro
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
 
 ```{r}
-library(magrittr)
-
 # define an R interface to Spark line counting
 count_lines <- function(scon, path) {
   spark_context(scon) %>%
@@ -150,6 +153,14 @@ tbl_uncache(db, "batting")
 
 
 ## Performance
+
+```{r}
+system.time(nycflights13::flights %>% summarizeDelay)
+```
+
+```{r}
+system.time(tbl(db, "flights") %>%  summarizeDelay)
+```
 
 ```{r}
 system.time(Lahman::Batting %>% topPlayers)

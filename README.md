@@ -64,12 +64,15 @@ tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ``` r
-delay <- tbl(db, "flights") %>%
-  group_by(tailnum) %>%
-  summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
-  filter(count > 20, dist < 2000) %>%
-  collect
-    
+summarizeDelay <- function(source) {
+  source %>% group_by(tailnum) %>%
+    summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+    filter(count > 20, dist < 2000) %>%
+    collect
+}
+
+delay <- tbl(db, "flights") %>% summarizeDelay
+
 # plot delays
 library(ggplot2)
 ggplot(delay, aes(dist, delay)) +
@@ -90,18 +93,18 @@ topPlayers <- function(source) {
     select(playerID, yearID, teamID, G, AB:H) %>%
     arrange(playerID, yearID, teamID) %>%
     group_by(playerID) %>%
-    filter(min_rank(desc(H)) <= 2 & H > 0)
+    filter(min_rank(desc(H)) <= 2 & H > 0) %>%
+    collect
 }
 
 tbl(db, "batting") %>% topPlayers
 ```
 
-    ## Source:   query [?? x 7]
-    ## Database: spark connection master=local app=rspark
-    ## Groups: playerID
+    ## Source: local data frame [100,000 x 7]
+    ## Groups: playerID [14,164]
     ## 
     ##     playerID yearID teamID     G    AB     R     H
-    ##        <chr>  <int>  <chr> <int> <int> <int> <int>
+    ## *      <chr>  <int>  <chr> <int> <int> <int> <int>
     ## 1  anderal01   1941    PIT    70   223    32    48
     ## 2  anderal01   1942    PIT    54   166    24    45
     ## 3  balesco01   2008    WAS    15    15     1     3
@@ -136,8 +139,6 @@ Extensibility
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
 
 ``` r
-library(magrittr)
-
 # define an R interface to Spark line counting
 count_lines <- function(scon, path) {
   spark_context(scon) %>%
@@ -176,18 +177,32 @@ Performance
 -----------
 
 ``` r
+system.time(nycflights13::flights %>% summarizeDelay)
+```
+
+    ##    user  system elapsed 
+    ##   0.084   0.001   0.084
+
+``` r
+system.time(tbl(db, "flights") %>%  summarizeDelay)
+```
+
+    ##    user  system elapsed 
+    ##   0.354   0.008   1.131
+
+``` r
 system.time(Lahman::Batting %>% topPlayers)
 ```
 
     ##    user  system elapsed 
-    ##   0.853   0.015   0.875
+    ##   0.768   0.004   0.774
 
 ``` r
 system.time(tbl(db, "batting") %>% topPlayers)
 ```
 
     ##    user  system elapsed 
-    ##   0.035   0.003   0.068
+    ##   4.338   0.025  16.540
 
 Connection Utilities
 --------------------
@@ -204,15 +219,15 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## [Stage 17:============================================>         (165 + 1) / 200]
-    ## [Stage 17:=============================================>        (169 + 1) / 200]
-    ## [Stage 17:==============================================>       (173 + 1) / 200]
-    ## [Stage 17:===============================================>      (177 + 1) / 200]
-    ## [Stage 17:================================================>     (181 + 1) / 200]
-    ## [Stage 17:=================================================>    (185 + 1) / 200]
-    ## [Stage 17:===================================================>  (189 + 1) / 200]
-    ## [Stage 17:====================================================> (193 + 1) / 200]
-    ## [Stage 17:=====================================================>(197 + 1) / 200]
+    ##                                                                                 
+    ## 
+    ## [Stage 33:===============>                                       (57 + 1) / 199]
+    ## [Stage 33:=====================>                                 (78 + 1) / 199]
+    ## [Stage 33:===========================>                          (103 + 1) / 199]
+    ## [Stage 33:=================================>                    (124 + 1) / 199]
+    ## [Stage 33:========================================>             (148 + 1) / 199]
+    ## [Stage 33:==============================================>       (173 + 1) / 199]
+    ## [Stage 33:====================================================> (195 + 1) / 199]
     ## 
 
 Finally, we disconnect from Spark:
