@@ -171,7 +171,7 @@ spark_api_data_frame <- function(api, sqlResult) {
   df
 }
 
-spark_api_copy_data <- function(api, df, name) {
+spark_api_copy_data <- function(api, df, name, repartition = 16) {
   tempfile <- tempfile(fileext = ".csv")
   write.csv(df, tempfile, row.names = FALSE, na = "")
 
@@ -182,6 +182,8 @@ spark_api_copy_data <- function(api, df, name) {
       typeof(e)
   })
   df <- spark_read_csv(api, tempfile, columns)
+
+  df <- spark_invoke(df, "repartition", as.integer(repartition))
 
   spark_register_temp_table(api, df, name)
 }

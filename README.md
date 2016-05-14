@@ -52,12 +52,12 @@ tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
     ## 
     ##    year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
     ## * <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
-    ## 1  2013     1     1      517         2      830        11      UA  N14228
-    ## 2  2013     1     1      542         2      923        33      AA  N619AA
-    ## 3  2013     1     1      702         2     1058        44      B6  N779JB
-    ## 4  2013     1     1      715         2      911        21      UA  N841UA
-    ## 5  2013     1     1      752         2     1025        -4      UA  N511UA
-    ## 6  2013     1     1      917         2     1206        -5      B6  N568JB
+    ## 1  2013     1     2      632         2      941         1      UA  N521UA
+    ## 2  2013     1     2      647         2      903        15      US  N565UW
+    ## 3  2013     1     2      734         2      844        -9      UA  N37408
+    ## 4  2013     1     3     1219         2     1534       -22      UA  N36272
+    ## 5  2013     1     4     1034         2     1238        -2      EV  N11137
+    ## 6  2013     1     4     1116         2     1332       -13      UA  N35204
     ## Variables not shown: flight <int>, origin <chr>, dest <chr>, air_time
     ##   <dbl>, distance <dbl>, hour <dbl>, minute <dbl>.
 
@@ -181,28 +181,28 @@ system.time(nycflights13::flights %>% summarizeDelay)
 ```
 
     ##    user  system elapsed 
-    ##   0.084   0.001   0.084
+    ##   0.105   0.002   0.114
 
 ``` r
 system.time(tbl(db, "flights") %>%  summarizeDelay)
 ```
 
     ##    user  system elapsed 
-    ##   0.354   0.008   1.131
+    ##   0.376   0.011   2.012
 
 ``` r
 system.time(Lahman::Batting %>% topPlayers)
 ```
 
     ##    user  system elapsed 
-    ##   0.768   0.004   0.774
+    ##   0.771   0.015   0.790
 
 ``` r
 system.time(tbl(db, "batting") %>% topPlayers)
 ```
 
     ##    user  system elapsed 
-    ##   4.338   0.025  16.540
+    ##   4.122   0.031  18.684
 
 Connection Utilities
 --------------------
@@ -219,15 +219,15 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
+    ## [Stage 43:=====================================================>(199 + 1) / 200]
     ##                                                                                 
     ## 
-    ## [Stage 33:===============>                                       (57 + 1) / 199]
-    ## [Stage 33:=====================>                                 (78 + 1) / 199]
-    ## [Stage 33:===========================>                          (103 + 1) / 199]
-    ## [Stage 33:=================================>                    (124 + 1) / 199]
-    ## [Stage 33:========================================>             (148 + 1) / 199]
-    ## [Stage 33:==============================================>       (173 + 1) / 199]
-    ## [Stage 33:====================================================> (195 + 1) / 199]
+    ## [Stage 48:================>                                      (61 + 1) / 199]
+    ## [Stage 48:=======================>                               (86 + 1) / 199]
+    ## [Stage 48:=============================>                        (110 + 1) / 199]
+    ## [Stage 48:===================================>                  (132 + 1) / 199]
+    ## [Stage 48:==========================================>           (156 + 1) / 199]
+    ## [Stage 48:================================================>     (178 + 1) / 199]
     ## 
 
 Finally, we disconnect from Spark:

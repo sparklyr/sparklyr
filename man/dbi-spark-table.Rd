@@ -12,7 +12,7 @@
 \title{DBI Spark Table}
 \usage{
 \S4method{dbWriteTable}{DBISparkConnection}(conn, name, value,
-  temporary = TRUE)
+  temporary = TRUE, repartition = 16)
 
 \S4method{dbReadTable}{DBISparkConnection,character}(conn, name)
 

@@ -73,8 +73,9 @@ sql_drop_table.src_spark <- function(con, name) {
 #' @param df Data frame to copy from
 #' @param name Name of the destination table
 #' @param cache Cache table for improved performance
-copy_to.src_spark <- function(con, df, name, cache = TRUE) {
-  result <- dbWriteTable(con$con, name, df)
+#' @param repartition Number of partitions to repartition table
+copy_to.src_spark <- function(con, df, name, cache = TRUE, repartition = 16) {
+  result <- dbWriteTable(con$con, name, df, repartition)
 
   if (cache) {
     tbl_cache(con, name)

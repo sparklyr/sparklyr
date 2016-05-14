@@ -29,7 +29,7 @@ NULL
 #' @export
 #' @rdname dbi-spark-table
 setMethod("dbWriteTable", "DBISparkConnection",
-  function(conn, name, value, temporary = TRUE) {
+  function(conn, name, value, temporary = TRUE, repartition = 16) {
     if (!temporary) {
       stop("Writting to non-temporary tables is not supported yet")
     }
@@ -39,7 +39,7 @@ setMethod("dbWriteTable", "DBISparkConnection",
       stop("Table ", name, " already exists")
     }
 
-    spark_api_copy_data(conn@api, value, name)
+    spark_api_copy_data(conn@api, value, name, repartition)
 
     invisible(TRUE)
   }
