@@ -31,7 +31,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(spark)
 library(dplyr)
-sc <- spark_connect("local[8]")
+sc <- spark_connect("local")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -64,14 +64,11 @@ tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ``` r
-summarizeDelay <- function(source) {
-  source %>% group_by(tailnum) %>%
-    summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
-    filter(count > 20, dist < 2000) %>%
-    collect
-}
-
-delay <- tbl(db, "flights") %>% summarizeDelay
+delay <- tbl(db, "flights") %>%
+  group_by(tailnum) %>%
+  summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+  filter(count > 20, dist < 2000) %>%
+  collect
     
 # plot delays
 library(ggplot2)
@@ -88,25 +85,34 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ``` r
-# select and display 
-select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
-  arrange(playerID, yearID, teamID) %>%
-  group_by(playerID) %>%
-  filter(min_rank(desc(H)) <= 2 & H > 0) %>%
-  head
+topPlayers <- function(source) {
+  source %>%
+    select(playerID, yearID, teamID, G, AB:H) %>%
+    arrange(playerID, yearID, teamID) %>%
+    group_by(playerID) %>%
+    filter(min_rank(desc(H)) <= 2 & H > 0)
+}
+
+tbl(db, "batting") %>% topPlayers
 ```
 
-    ## Source: local data frame [6 x 7]
-    ## Groups: playerID [3]
+    ## Source:   query [?? x 7]
+    ## Database: spark connection master=local app=rspark
+    ## Groups: playerID
     ## 
-    ##    playerID yearID teamID     G    AB     R     H
-    ## *     <chr>  <int>  <chr> <int> <int> <int> <int>
-    ## 1 anderal01   1941    PIT    70   223    32    48
-    ## 2 anderal01   1942    PIT    54   166    24    45
-    ## 3 balesco01   2008    WAS    15    15     1     3
-    ## 4 balesco01   2009    WAS     7     8     0     1
-    ## 5 bandoch01   1986    CLE    92   254    28    68
-    ## 6 bandoch01   1984    CLE    75   220    38    64
+    ##     playerID yearID teamID     G    AB     R     H
+    ##        <chr>  <int>  <chr> <int> <int> <int> <int>
+    ## 1  anderal01   1941    PIT    70   223    32    48
+    ## 2  anderal01   1942    PIT    54   166    24    45
+    ## 3  balesco01   2008    WAS    15    15     1     3
+    ## 4  balesco01   2009    WAS     7     8     0     1
+    ## 5  bandoch01   1986    CLE    92   254    28    68
+    ## 6  bandoch01   1984    CLE    75   220    38    64
+    ## 7  bedelho01   1962    ML1    58   138    15    27
+    ## 8  bedelho01   1968    PHI     9     7     0     1
+    ## 9  biittla01   1977    CHN   138   493    74   147
+    ## 10 biittla01   1975    MON   121   346    34   109
+    ## ..       ...    ...    ...   ...   ...   ...   ...
 
 EC2
 ---
@@ -170,18 +176,18 @@ Performance
 -----------
 
 ``` r
-system.time(nycflights13::flights %>% summarizeDelay)
+system.time(Lahman::Batting %>% topPlayers)
 ```
 
     ##    user  system elapsed 
-    ##   0.098   0.002   0.100
+    ##   0.851   0.015   0.867
 
 ``` r
-system.time(tbl(db, "flights") %>%  summarizeDelay)
+system.time(tbl(db, "batting") %>%  topPlayers)
 ```
 
     ##    user  system elapsed 
-    ##   0.396   0.018   0.917
+    ##   0.035   0.003   0.072
 
 Connection Utilities
 --------------------
@@ -198,16 +204,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/13 18:16:45 INFO TaskSetManager: Finished task 196.0 in stage 23.0 (TID 623) in 5 ms on localhost (196/199)
-    ## 16/05/13 18:16:45 INFO Executor: Finished task 186.0 in stage 23.0 (TID 613). 3619 bytes result sent to driver
-    ## 16/05/13 18:16:45 INFO Executor: Finished task 197.0 in stage 23.0 (TID 624). 3089 bytes result sent to driver
-    ## 16/05/13 18:16:45 INFO TaskSetManager: Finished task 186.0 in stage 23.0 (TID 613) in 15 ms on localhost (197/199)
-    ## 16/05/13 18:16:45 INFO TaskSetManager: Finished task 197.0 in stage 23.0 (TID 624) in 5 ms on localhost (198/199)
-    ## 16/05/13 18:16:45 INFO Executor: Finished task 198.0 in stage 23.0 (TID 625). 3388 bytes result sent to driver
-    ## 16/05/13 18:16:45 INFO TaskSetManager: Finished task 198.0 in stage 23.0 (TID 625) in 5 ms on localhost (199/199)
-    ## 16/05/13 18:16:45 INFO TaskSchedulerImpl: Removed TaskSet 23.0, whose tasks have all completed, from pool 
-    ## 16/05/13 18:16:45 INFO DAGScheduler: ResultStage 23 (dfToCols at NativeMethodAccessorImpl.java:-2) finished in 0.228 s
-    ## 16/05/13 18:16:45 INFO DAGScheduler: Job 13 finished: dfToCols at NativeMethodAccessorImpl.java:-2, took 0.242206 s
+    ## [Stage 17:=============================================>        (167 + 1) / 200]
+    ## [Stage 17:=============================================>        (170 + 1) / 200]
+    ## [Stage 17:==============================================>       (173 + 1) / 200]
+    ## [Stage 17:===============================================>      (177 + 1) / 200]
+    ## [Stage 17:================================================>     (181 + 1) / 200]
+    ## [Stage 17:=================================================>    (185 + 1) / 200]
+    ## [Stage 17:===================================================>  (189 + 1) / 200]
+    ## [Stage 17:====================================================> (193 + 1) / 200]
+    ## [Stage 17:=====================================================>(197 + 1) / 200]
+    ## 
 
 Finally, we disconnect from Spark:
 

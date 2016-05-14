@@ -4,10 +4,12 @@
 \alias{spark_install}
 \title{Provides support to download and install the given Spark version}
 \usage{
-spark_install(version = "1.6.0")
+spark_install(version = "1.6.0", reset = FALSE)
 }
 \arguments{
 \item{version}{Version of Spark to install}
+
+\item{reset}{Attempts to reset settings to defaults}
 }
 \description{
 Provides support to download and install the given Spark version

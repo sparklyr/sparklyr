@@ -40,7 +40,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(spark)
 library(dplyr)
-sc <- spark_connect("local[8]")
+sc <- spark_connect("local")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -60,14 +60,11 @@ tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r}
-summarizeDelay <- function(source) {
-  source %>% group_by(tailnum) %>%
-    summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
-    filter(count > 20, dist < 2000) %>%
-    collect
-}
-
-delay <- tbl(db, "flights") %>% summarizeDelay
+delay <- tbl(db, "flights") %>%
+  group_by(tailnum) %>%
+  summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+  filter(count > 20, dist < 2000) %>%
+  collect
     
 # plot delays
 library(ggplot2)
@@ -83,12 +80,16 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ```{r}
-# select and display 
-select(tbl(db, "batting"), playerID, yearID, teamID, G, AB:H) %>%
-  arrange(playerID, yearID, teamID) %>%
-  group_by(playerID) %>%
-  filter(min_rank(desc(H)) <= 2 & H > 0) %>%
-  head
+topPlayers <- function(source) {
+  source %>%
+    select(playerID, yearID, teamID, G, AB:H) %>%
+    arrange(playerID, yearID, teamID) %>%
+    group_by(playerID) %>%
+    filter(min_rank(desc(H)) <= 2 & H > 0)
+}
+
+tbl(db, "batting") %>% topPlayers
+
 ```
 
 
@@ -151,11 +152,11 @@ tbl_uncache(db, "batting")
 ## Performance
 
 ```{r}
-system.time(nycflights13::flights %>% summarizeDelay)
+system.time(Lahman::Batting %>% topPlayers)
 ```
 
 ```{r}
-system.time(tbl(db, "flights") %>%  summarizeDelay)
+system.time(tbl(db, "batting") %>%  topPlayers)
 ```
 
 

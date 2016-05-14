@@ -3,7 +3,8 @@
 #' @export
 #' @import rappdirs
 #' @param version Version of Spark to install
-spark_install <- function(version = "1.6.0") {
+#' @param reset Attempts to reset settings to defaults
+spark_install <- function(version = "1.6.0", reset = FALSE) {
   componentName <- paste("spark-", version, "-bin-hadoop2.6", sep = "")
 
   packageName <- paste(componentName, ".tgz", sep = "")
@@ -32,10 +33,31 @@ spark_install <- function(version = "1.6.0") {
     untar(tarfile = packagePath, exdir = sparkDir)
   }
 
-  list (
+  installInfo <- list (
     sparkDir = sparkDir,
-    sparkVersionDir = sparkVersionDir
+    sparkVersionDir = sparkVersionDir,
+    sparkConfDir = file.path(sparkVersionDir, "conf")
   )
+
+  spark_conf_file_set_value(installInfo, "log4j.rootCategory", "WARN, console", reset)
+
+  installInfo
+}
+
+spark_conf_file_set_value <- function(installInfo, property, value, reset) {
+  log4jPropertiesPath <- file.path(installInfo$sparkConfDir, "log4j.properties")
+  if (!file.exists(log4jPropertiesPath) || reset) {
+    log4jTemplatePath <- file.path(installInfo$sparkConfDir, "log4j.properties.template")
+    file.copy(log4jTemplatePath, log4jPropertiesPath, overwrite = TRUE)
+  }
+
+  log4jPropertiesFile <- file(log4jPropertiesPath)
+  lines <- readLines(log4jPropertiesFile)
+
+  lines <- gsub(paste(property, ".*", sep = ""), paste(property, value, sep = "="), lines, perl = TRUE)
+
+  writeLines(lines, log4jPropertiesFile)
+  close(log4jPropertiesFile)
 }
 
 spark_connect_with_shell <- function(master, appName, installInfo) {
@@ -86,10 +108,10 @@ spark_log <- function(scon, n = 100) {
   lines <- readLines(log)
   close(log)
 
-  lines_log <- tail(lines, n = n)
-  attr(lines_log, "class") <- "spark_log"
+  linesLog <- tail(lines, n = n)
+  attr(linesLog, "class") <- "spark_log"
 
-  lines_log
+  linesLog
 }
 
 #' Prints a spark_log object
@@ -113,10 +135,10 @@ spark_web <- function(scon) {
 
   lines <- head(lines, n = 200)
 
-  ui_line <- grep("Started SparkUI at ", lines, perl=TRUE, value=TRUE)
-  if (length(ui_line) > 0) {
-    matches <- regexpr("http://.*", ui_line, perl=TRUE)
-    match <-regmatches(ui_line, matches)
+  uiLine <- grep("Started SparkUI at ", lines, perl=TRUE, value=TRUE)
+  if (length(uiLine) > 0) {
+    matches <- regexpr("http://.*", uiLine, perl=TRUE)
+    match <-regmatches(uiLine, matches)
     if (length(match) > 0) {
       browseURL(match)
     }
