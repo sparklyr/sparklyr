@@ -156,7 +156,7 @@ system.time(Lahman::Batting %>% topPlayers)
 ```
 
 ```{r}
-system.time(tbl(db, "batting") %>%  topPlayers)
+system.time(tbl(db, "batting") %>% topPlayers)
 ```
 
 
