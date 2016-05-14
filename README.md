@@ -31,7 +31,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(spark)
 library(dplyr)
-sc <- spark_connect("local")
+sc <- spark_connect("local[*]")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -181,28 +181,28 @@ system.time(nycflights13::flights %>% summarizeDelay)
 ```
 
     ##    user  system elapsed 
-    ##   0.105   0.002   0.114
+    ##   0.104   0.001   0.106
 
 ``` r
 system.time(tbl(db, "flights") %>%  summarizeDelay)
 ```
 
     ##    user  system elapsed 
-    ##   0.376   0.011   2.012
+    ##   0.416   0.018   1.186
 
 ``` r
 system.time(Lahman::Batting %>% topPlayers)
 ```
 
     ##    user  system elapsed 
-    ##   0.771   0.015   0.790
+    ##   0.891   0.017   0.914
 
 ``` r
 system.time(tbl(db, "batting") %>% topPlayers)
 ```
 
     ##    user  system elapsed 
-    ##   4.122   0.031  18.684
+    ##   4.506   0.049  10.170
 
 Connection Utilities
 --------------------
@@ -219,15 +219,15 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## [Stage 43:=====================================================>(199 + 1) / 200]
-    ##                                                                                 
-    ## 
-    ## [Stage 48:================>                                      (61 + 1) / 199]
-    ## [Stage 48:=======================>                               (86 + 1) / 199]
-    ## [Stage 48:=============================>                        (110 + 1) / 199]
-    ## [Stage 48:===================================>                  (132 + 1) / 199]
-    ## [Stage 48:==========================================>           (156 + 1) / 199]
-    ## [Stage 48:================================================>     (178 + 1) / 199]
+    ## [Stage 43:===========================>                          (102 + 8) / 200]
+    ## [Stage 43:=============================>                        (111 + 8) / 200]
+    ## [Stage 43:================================>                     (122 + 8) / 200]
+    ## [Stage 43:===================================>                  (133 + 8) / 200]
+    ## [Stage 43:======================================>               (143 + 8) / 200]
+    ## [Stage 43:==========================================>           (157 + 8) / 200]
+    ## [Stage 43:=============================================>        (167 + 8) / 200]
+    ## [Stage 43:================================================>     (179 + 8) / 200]
+    ## [Stage 43:===================================================>  (189 + 8) / 200]
     ## 
 
 Finally, we disconnect from Spark:
