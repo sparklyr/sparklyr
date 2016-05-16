@@ -4,7 +4,7 @@
 \alias{spark_connect}
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
-spark_connect(master = "local", appName = "rspark", version = "1.6.0")
+spark_connect(master = "local[*]", appName = "rspark", version = "1.6.0")
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
