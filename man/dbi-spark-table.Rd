@@ -12,7 +12,7 @@
 \title{DBI Spark Table}
 \usage{
 \S4method{dbWriteTable}{DBISparkConnection}(conn, name, value,
-  temporary = TRUE, repartition = 16)
+  temporary = TRUE, repartition = 0)
 
 \S4method{dbReadTable}{DBISparkConnection,character}(conn, name)
 
@@ -34,7 +34,7 @@
 
 \item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
 
-\item{repartition}{Total of partitions used to distribute table}
+\item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 
 \item{.data}{Data and operations references}
 

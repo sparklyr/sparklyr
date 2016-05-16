@@ -44,4 +44,5 @@ Imports:
 Remotes: hadley/lazyeval,
     hadley/dplyr
 Suggests:
-    testthat
+    testthat,
+    reshape2

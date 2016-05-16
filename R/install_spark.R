@@ -30,7 +30,8 @@ spark_install_from_version <- function(version = "1.6.0") {
     packageLocalPath = file.path(sparkDir, packageName),
     packageRemotePath = file.path(packageSource, packageName),
     sparkVersionDir = sparkVersionDir,
-    sparkConfDir = file.path(sparkVersionDir, "conf")
+    sparkConfDir = file.path(sparkVersionDir, "conf"),
+    version = version
   )
 }
 
@@ -40,7 +41,8 @@ spark_install_from_version <- function(version = "1.6.0") {
 #' @import rappdirs
 #' @param version Version of Spark to install. Suppported versions: "1.6.0" (default), "2.0.0" (preview)
 #' @param reset Attempts to reset settings to defaults
-spark_install <- function(version = "1.6.0", reset = FALSE) {
+#' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
+spark_install <- function(version = "1.6.0", reset = FALSE, logging = "INFO") {
   installInfo <- spark_install_from_version(version)
 
   if (!dir.exists(installInfo$sparkDir)) {
@@ -57,7 +59,13 @@ spark_install <- function(version = "1.6.0", reset = FALSE) {
     untar(tarfile = installInfo$packageLocalPath, exdir = installInfo$sparkDir)
   }
 
-  spark_conf_file_set_value(installInfo, "log4j.rootCategory", "WARN, console", reset)
+  if (!identical(logging, NULL)) {
+    spark_conf_file_set_value(
+      installInfo,
+      "log4j.rootCategory",
+      paste(logging, "console", sep = ", "),
+      reset)
+  }
 
   installInfo
 }

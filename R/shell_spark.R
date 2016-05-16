@@ -20,6 +20,9 @@ read_shell_file <- function(shellFile) {
 
 start_shell <- function(installInfo) {
   sparkHome <- installInfo$sparkVersionDir
+  if (!dir.exists(sparkHome)) {
+    stop("Spark installation was not found. See spark_install.")
+  }
 
   sparkSubmitByOs <- list(
     unix = "spark-submit",

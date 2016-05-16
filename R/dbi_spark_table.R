@@ -28,9 +28,9 @@ NULL
 
 #' @export
 #' @rdname dbi-spark-table
-#' @param repartition Total of partitions used to distribute table
+#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 setMethod("dbWriteTable", "DBISparkConnection",
-  function(conn, name, value, temporary = TRUE, repartition = 16) {
+  function(conn, name, value, temporary = TRUE, repartition = 0) {
     if (!temporary) {
       stop("Writting to non-temporary tables is not supported yet")
     }

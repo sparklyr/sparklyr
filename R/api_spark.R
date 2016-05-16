@@ -174,7 +174,7 @@ spark_api_data_frame <- function(api, sqlResult) {
   df
 }
 
-spark_api_copy_data <- function(api, df, name, repartition = 16) {
+spark_api_copy_data <- function(api, df, name, repartition) {
   tempfile <- tempfile(fileext = ".csv")
   write.csv(df, tempfile, row.names = FALSE, na = "")
 
@@ -186,7 +186,13 @@ spark_api_copy_data <- function(api, df, name, repartition = 16) {
   })
   df <- spark_read_csv(api, tempfile, columns)
 
-  df <- spark_invoke(df, "repartition", as.integer(repartition))
+  if (!is.numeric(repartition)) {
+    stop("The repartition parameter must be an integer")
+  }
+
+  if (repartition > 0) {
+    df <- spark_invoke(df, "repartition", as.integer(repartition))
+  }
 
   spark_register_temp_table(api, df, name)
 }

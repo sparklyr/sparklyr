@@ -4,7 +4,7 @@
 \alias{copy_to.src_spark}
 \title{Copies the source data frame into a Spark table}
 \usage{
-\method{copy_to}{src_spark}(con, df, name, cache = TRUE, repartition = 16)
+\method{copy_to}{src_spark}(con, df, name, cache = TRUE, repartition = 0)
 }
 \arguments{
 \item{con}{Connection to dplyr source}
@@ -15,7 +15,7 @@
 
 \item{cache}{Cache table for improved performance}
 
-\item{repartition}{Total of partitions used to distribute table}
+\item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 }
 \description{
 Copies the source data frame into a Spark table

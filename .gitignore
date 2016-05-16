@@ -21,3 +21,5 @@ metastore_db/
 derby.log
 # README.md cache
 README_cache
+# Perf.md cache
+perf_cache

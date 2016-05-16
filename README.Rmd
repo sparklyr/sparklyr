@@ -11,7 +11,6 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
 library(spark)
 library(dplyr)
-library(magrittr)
 library(ggplot2)
 ```
 
@@ -29,7 +28,7 @@ You can then install various versions of Spark using the `spark_install` functio
 
 ```{r, eval=FALSE}
 library(spark)
-spark_install(version = "nightly")
+spark_install(version = "1.6.0")
 ```
 
 
@@ -41,7 +40,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(spark)
 library(dplyr)
-sc <- spark_connect("local[*]", version = "nightly")
+sc <- spark_connect("local[*]", version = "1.6.0")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -55,20 +54,18 @@ Then you can run dplyr against Spark:
 
 ```{r}
 # filter by departure delay and print the first few records
-tbl(db, "flights") %>% filter(dep_delay == 2) %>% head
+tbl(db, "flights") %>% filter(dep_delay == 2)
 ```
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r}
-summarizeDelay <- function(source) {
-  source %>% group_by(tailnum) %>%
-    summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
-    filter(count > 20, dist < 2000) %>%
-    collect
-}
 
-delay <- tbl(db, "flights") %>% summarizeDelay
+delay <- tbl(db, "flights") %>% 
+  group_by(tailnum) %>%
+  summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+  filter(count > 20, dist < 2000) %>%
+  collect
 
 # plot delays
 library(ggplot2)
@@ -84,16 +81,12 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ```{r}
-topPlayers <- function(source) {
-  source %>%
-    select(playerID, yearID, teamID, G, AB:H) %>%
-    arrange(playerID, yearID, teamID) %>%
-    group_by(playerID) %>%
-    filter(min_rank(desc(H)) <= 2 & H > 0) %>%
-    collect
-}
 
-tbl(db, "batting") %>% topPlayers
+tbl(db, "batting") %>%
+  select(playerID, yearID, teamID, G, AB:H) %>%
+  arrange(playerID, yearID, teamID) %>%
+  group_by(playerID) %>%
+  filter(min_rank(desc(H)) <= 2 & H > 0)
 
 ```
 
@@ -119,6 +112,8 @@ The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved fro
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
 
 ```{r}
+library(magrittr)
+
 # define an R interface to Spark line counting
 count_lines <- function(scon, path) {
   spark_context(scon) %>%
@@ -152,25 +147,6 @@ tbl_uncache(db, "batting")
 ```
 
 
-## Performance
-
-```{r}
-system.time(nycflights13::flights %>% summarizeDelay)
-```
-
-```{r}
-system.time(tbl(db, "flights") %>%  summarizeDelay)
-```
-
-```{r}
-system.time(Lahman::Batting %>% topPlayers)
-```
-
-```{r}
-system.time(tbl(db, "batting") %>% topPlayers)
-```
-
-
 ## Connection Utilities
 
 You can view the Spark web console using the `spark_web` function:
@@ -190,3 +166,7 @@ Finally, we disconnect from Spark:
 ```{r}
 spark_disconnect(sc)
 ```
+
+## Additional Resources
+
+For performance runs under various parameters, read: [Performance Tests](tests/perf/perf.md)

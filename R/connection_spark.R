@@ -20,7 +20,7 @@ spark_connect_with_shell <- function(master, appName, version, installInfo) {
 #' @param master Master definition to Spark cluster
 #' @param appName Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster
-spark_connect <- function(master = "local",
+spark_connect <- function(master = "local[*]",
                           appName = "rspark",
                           version = "1.6.0") {
   installInfo = spark_install_from_version(version)
