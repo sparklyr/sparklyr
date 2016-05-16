@@ -28,6 +28,7 @@ NULL
 
 #' @export
 #' @rdname dbi-spark-table
+#' @param repartition Total of partitions used to distribute table
 setMethod("dbWriteTable", "DBISparkConnection",
   function(conn, name, value, temporary = TRUE, repartition = 16) {
     if (!temporary) {

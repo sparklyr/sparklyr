@@ -2,13 +2,32 @@
 #' @name spark_install
 #' @export
 #' @import rappdirs
-#' @param version Version of Spark to install
+#' @param version Version of Spark to install. Suppported versions: "1.6.0" (default), "latest"
 #' @param reset Attempts to reset settings to defaults
+#' for the 2.0.0 nightly build and "stable" for the latest nightly build in a stable version
 spark_install <- function(version = "1.6.0", reset = FALSE) {
-  componentName <- paste("spark-", version, "-bin-hadoop2.6", sep = "")
+  versionInfo <- list(
+    `1.6.0` = list(
+      componentName = paste("spark-", version, "-bin-hadoop2.6", sep = ""),
+      packageSource = "http://d3kbcqa49mib13.cloudfront.net"
+    ),
+    nightly = list(
+      componentName = paste("spark-", version, "-SNAPSHOT-bin-hadoop2.7", sep = ""),
+      packageSource = "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/latest"
+    ),
+    stable = list(
+      componentName = paste("spark-", version, "-SNAPSHOT-bin-hadoop2.7", sep = ""),
+      packageSource = "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/spark-2.0.0-SNAPSHOT-2016_05_15_01_03-354f8f1-bin/"
+    )
+  )
 
+  if (!(version %in% names(versionInfo))) {
+    stop(paste("The Spark version", version, "is currently not supported"))
+  }
+
+  componentName <- versionInfo[[version]]$componentName
   packageName <- paste(componentName, ".tgz", sep = "")
-  packageSource <- "http://d3kbcqa49mib13.cloudfront.net"
+  packageSource <- versionInfo[[version]]$packageSource
 
   sparkDir <- file.path(getwd(), "spark")
   if (is.installed("rappdirs")) {

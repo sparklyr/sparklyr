@@ -34,6 +34,8 @@
 
 \item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
 
+\item{repartition}{Total of partitions used to distribute table}
+
 \item{.data}{Data and operations references}
 
 \item{...}{Additional parameters}

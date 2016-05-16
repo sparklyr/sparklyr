@@ -15,7 +15,7 @@
 
 \item{cache}{Cache table for improved performance}
 
-\item{repartition}{Number of partitions to repartition table}
+\item{repartition}{Total of partitions used to distribute table}
 }
 \description{
 Copies the source data frame into a Spark table

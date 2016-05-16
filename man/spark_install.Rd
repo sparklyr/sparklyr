@@ -7,9 +7,10 @@
 spark_install(version = "1.6.0", reset = FALSE)
 }
 \arguments{
-\item{version}{Version of Spark to install}
+\item{version}{Version of Spark to install. Suppported versions: "1.6.0" (default), "latest"}
 
-\item{reset}{Attempts to reset settings to defaults}
+\item{reset}{Attempts to reset settings to defaults
+for the 2.0.0 nightly build and "stable" for the latest nightly build in a stable version}
 }
 \description{
 Provides support to download and install the given Spark version
