@@ -6,7 +6,7 @@ output: github_document
 ## Initialization
 
 ```{r}
-knitr::opts_chunk$set(warning = FALSE, cache = TRUE)
+knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
 library(spark)
 library(dplyr)
 library(reshape2)

@@ -5,7 +5,7 @@ Initialization
 --------------
 
 ``` r
-knitr::opts_chunk$set(warning = FALSE, cache = TRUE)
+knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
 library(spark)
 library(dplyr)
 ```
@@ -159,14 +159,17 @@ results %>%
   dcast(params ~ test, value.var = "elapsed")
 ```
 
-    ##                          params dplyr summarize spark summarize
-    ## 1    1 local 1.6.0 FALSE INFO 0           0.088           4.136
-    ## 2 2 local[*] 1.6.0 FALSE INFO 0           0.103           3.629
-    ## 3 3 local[*] 1.6.0 FALSE WARN 0           0.088           3.265
-    ## 4  4 local[*] 1.6.0 TRUE WARN 0           0.091           0.633
-    ## 5  5 local[*] 1.6.0 TRUE WARN 8           0.090           0.862
-    ## 6  6 local[*] 2.0.0 TRUE WARN 8           0.087           0.901
-    ## 7  7 local[*] 2.0.0 TRUE WARN 0           0.091           0.606
+    ##                           params dplyr summarize spark summarize
+    ## 1     0 local 1.6.0 FALSE INFO 0           0.091           4.544
+    ## 2      1 local 1.6.0 TRUE INFO 0           0.086           0.614
+    ## 3     2 local 2.0.0 FALSE INFO 0           0.093           4.149
+    ## 4      3 local 2.0.0 TRUE INFO 0           0.093           0.675
+    ## 5  4 local[*] 1.6.0 FALSE INFO 0           0.099           3.379
+    ## 6  5 local[*] 1.6.0 FALSE WARN 0           0.086           3.239
+    ## 7   6 local[*] 1.6.0 TRUE WARN 0           0.089           0.690
+    ## 8   7 local[*] 1.6.0 TRUE WARN 8           0.090           0.785
+    ## 9   8 local[*] 2.0.0 TRUE WARN 8           0.090           0.777
+    ## 10  9 local[*] 2.0.0 TRUE WARN 0           0.088           0.697
 
 ``` r
 results %>%
@@ -174,14 +177,17 @@ results %>%
   dcast(params ~ test, value.var = "elapsed")
 ```
 
-    ##                          params dplyr rank spark rank
-    ## 1    1 local 1.6.0 FALSE INFO 0      0.827     13.257
-    ## 2 2 local[*] 1.6.0 FALSE INFO 0      0.991      6.431
-    ## 3 3 local[*] 1.6.0 FALSE WARN 0      0.900      6.220
-    ## 4  4 local[*] 1.6.0 TRUE WARN 0      0.940      6.792
-    ## 5  5 local[*] 1.6.0 TRUE WARN 8      1.024      6.704
-    ## 6  6 local[*] 2.0.0 TRUE WARN 8      1.026      7.022
-    ## 7  7 local[*] 2.0.0 TRUE WARN 0      0.966      6.065
+    ##                           params dplyr rank spark rank
+    ## 1     0 local 1.6.0 FALSE INFO 0      0.873     13.847
+    ## 2      1 local 1.6.0 TRUE INFO 0      0.791     12.674
+    ## 3     2 local 2.0.0 FALSE INFO 0      0.833     13.626
+    ## 4      3 local 2.0.0 TRUE INFO 0      0.883     12.961
+    ## 5  4 local[*] 1.6.0 FALSE INFO 0      0.901      6.395
+    ## 6  5 local[*] 1.6.0 FALSE WARN 0      0.935      6.734
+    ## 7   6 local[*] 1.6.0 TRUE WARN 0      0.979      6.154
+    ## 8   7 local[*] 1.6.0 TRUE WARN 8      0.932      6.277
+    ## 9   8 local[*] 2.0.0 TRUE WARN 8      0.927      6.577
+    ## 10  9 local[*] 2.0.0 TRUE WARN 0      0.974      5.720
 
 ``` r
 results %>%
