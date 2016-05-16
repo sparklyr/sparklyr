@@ -36,9 +36,12 @@ spark_api_create <- function(sc) {
     stop("Failed to create SQL context")
   }
 
-  hive <- spark_api_create_hive_context(sc)
-  if (identical(hive, NULL)) {
-    warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
+  hive <- NULL
+  if (sc$useHive) {
+    hive <- spark_api_create_hive_context(sc)
+    if (identical(hive, NULL)) {
+      warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
+    }
   }
 
   list(scon = sc,

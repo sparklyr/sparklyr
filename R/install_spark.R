@@ -4,12 +4,8 @@ spark_install_from_version <- function(version = "1.6.0") {
       componentName = paste("spark-", version, "-bin-hadoop2.6", sep = ""),
       packageSource = "http://d3kbcqa49mib13.cloudfront.net"
     ),
-    nightly = list(
-      componentName = paste("spark-2.0.0-SNAPSHOT-bin-hadoop2.7", sep = ""),
-      packageSource = "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/latest"
-    ),
-    stable = list(
-      componentName = paste("spark-2.0.0-SNAPSHOT-bin-hadoop2.7", sep = ""),
+    `2.0.0` = list(
+      componentName = paste("spark-", version, "-SNAPSHOT-bin-hadoop2.7", sep = ""),
       packageSource = "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/spark-2.0.0-SNAPSHOT-2016_05_15_01_03-354f8f1-bin/"
     )
   )
@@ -42,9 +38,8 @@ spark_install_from_version <- function(version = "1.6.0") {
 #' @name spark_install
 #' @export
 #' @import rappdirs
-#' @param version Version of Spark to install. Suppported versions: "1.6.0" (default), "latest"
+#' @param version Version of Spark to install. Suppported versions: "1.6.0" (default), "2.0.0" (preview)
 #' @param reset Attempts to reset settings to defaults
-#' for the 2.0.0 nightly build and "stable" for the latest nightly build in a stable version
 spark_install <- function(version = "1.6.0", reset = FALSE) {
   installInfo <- spark_install_from_version(version)
 

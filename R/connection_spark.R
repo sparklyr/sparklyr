@@ -1,4 +1,4 @@
-spark_connect_with_shell <- function(master, appName, installInfo) {
+spark_connect_with_shell <- function(master, appName, version, installInfo) {
   scon <- start_shell(installInfo)
 
   scon$sc <- spark_connection_create_context(scon, master, appName, installInfo$sparkVersionDir)
@@ -8,6 +8,8 @@ spark_connect_with_shell <- function(master, appName, installInfo) {
 
   scon$master <- master
   scon$appName <- appName
+  scon$version <- version
+  scon$useHive <- compareVersion(version, "2.0.0") < 0
 
   scon
 }
@@ -25,6 +27,7 @@ spark_connect <- function(master = "local",
 
   spark_connect_with_shell(master = master,
                            appName = appName,
+                           version = version,
                            installInfo = installInfo)
 }
 
