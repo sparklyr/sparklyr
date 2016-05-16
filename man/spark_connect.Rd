@@ -4,8 +4,7 @@
 \alias{spark_connect}
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
-spark_connect(master = "local", appName = "rspark", version = "1.6.0",
-  installInfo = spark_install())
+spark_connect(master = "local", appName = "rspark", version = "1.6.0")
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -13,8 +12,6 @@ spark_connect(master = "local", appName = "rspark", version = "1.6.0",
 \item{appName}{Application name to be used while running in the Spark cluster}
 
 \item{version}{Version of the Spark cluster}
-
-\item{installInfo}{Description of installation paths}
 }
 \description{
 Connects to Spark and establishes the Spark Context

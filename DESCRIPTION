@@ -2,10 +2,8 @@ Package: spark
 Type: Package
 Title: Provides an R Interface to Apache Spark
 Version: 0.1.0
-Author: c(
-    person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
-    person("RStudio", role = c("cph"))
-    )
+Author: c( person("Javier", "Luraschi", email = "javier@rstudio.com", role =
+    c("aut", "cre")), person("RStudio", role = c("cph")) )
 Maintainer: Javier Luraschi <javier@rstudio.com>
 Description: Provision, connect and interface to Apache Spark from within the
     R language and echosystem. This package supports connecting to local and remote
@@ -33,6 +31,7 @@ Collate:
     'dplyr_spark_connection.R'
     'dplyr_spark_table.R'
     'dplyr_sql.R'
+    'install_spark.R'
     'shell_spark.R'
     'utils.R'
 Imports:
@@ -42,8 +41,7 @@ Imports:
     assertthat,
     rappdirs,
     lazyeval
-Remotes:
-    hadley/lazyeval,
+Remotes: hadley/lazyeval,
     hadley/dplyr
 Suggests:
     testthat

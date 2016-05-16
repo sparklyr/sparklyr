@@ -1,84 +1,3 @@
-#' Provides support to download and install the given Spark version
-#' @name spark_install
-#' @export
-#' @import rappdirs
-#' @param version Version of Spark to install. Suppported versions: "1.6.0" (default), "latest"
-#' @param reset Attempts to reset settings to defaults
-#' for the 2.0.0 nightly build and "stable" for the latest nightly build in a stable version
-spark_install <- function(version = "1.6.0", reset = FALSE) {
-  versionInfo <- list(
-    `1.6.0` = list(
-      componentName = paste("spark-", version, "-bin-hadoop2.6", sep = ""),
-      packageSource = "http://d3kbcqa49mib13.cloudfront.net"
-    ),
-    nightly = list(
-      componentName = paste("spark-", version, "-SNAPSHOT-bin-hadoop2.7", sep = ""),
-      packageSource = "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/latest"
-    ),
-    stable = list(
-      componentName = paste("spark-", version, "-SNAPSHOT-bin-hadoop2.7", sep = ""),
-      packageSource = "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/spark-2.0.0-SNAPSHOT-2016_05_15_01_03-354f8f1-bin/"
-    )
-  )
-
-  if (!(version %in% names(versionInfo))) {
-    stop(paste("The Spark version", version, "is currently not supported"))
-  }
-
-  componentName <- versionInfo[[version]]$componentName
-  packageName <- paste(componentName, ".tgz", sep = "")
-  packageSource <- versionInfo[[version]]$packageSource
-
-  sparkDir <- file.path(getwd(), "spark")
-  if (is.installed("rappdirs")) {
-    sparkDir <- rappdirs::app_dir("spark", "rstudio")$cache()
-  }
-
-  if (!dir.exists(sparkDir)) {
-    print("Local spark directory for this project not found, creating.")
-    dir.create(sparkDir)
-  }
-
-  packagePath <- file.path(sparkDir, packageName)
-
-  if (!file.exists(packagePath)) {
-    print("Spark package not found, downloading.")
-    download.file(file.path(packageSource, packageName), destfile = packagePath)
-  }
-
-  sparkVersionDir <- file.path(sparkDir, componentName)
-
-  if (!dir.exists(sparkVersionDir)) {
-    untar(tarfile = packagePath, exdir = sparkDir)
-  }
-
-  installInfo <- list (
-    sparkDir = sparkDir,
-    sparkVersionDir = sparkVersionDir,
-    sparkConfDir = file.path(sparkVersionDir, "conf")
-  )
-
-  spark_conf_file_set_value(installInfo, "log4j.rootCategory", "WARN, console", reset)
-
-  installInfo
-}
-
-spark_conf_file_set_value <- function(installInfo, property, value, reset) {
-  log4jPropertiesPath <- file.path(installInfo$sparkConfDir, "log4j.properties")
-  if (!file.exists(log4jPropertiesPath) || reset) {
-    log4jTemplatePath <- file.path(installInfo$sparkConfDir, "log4j.properties.template")
-    file.copy(log4jTemplatePath, log4jPropertiesPath, overwrite = TRUE)
-  }
-
-  log4jPropertiesFile <- file(log4jPropertiesPath)
-  lines <- readLines(log4jPropertiesFile)
-
-  lines <- gsub(paste(property, ".*", sep = ""), paste(property, value, sep = "="), lines, perl = TRUE)
-
-  writeLines(lines, log4jPropertiesFile)
-  close(log4jPropertiesFile)
-}
-
 spark_connect_with_shell <- function(master, appName, installInfo) {
   scon <- start_shell(installInfo)
 
@@ -99,11 +18,11 @@ spark_connect_with_shell <- function(master, appName, installInfo) {
 #' @param master Master definition to Spark cluster
 #' @param appName Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster
-#' @param installInfo Description of installation paths
 spark_connect <- function(master = "local",
                           appName = "rspark",
-                          version = "1.6.0",
-                          installInfo = spark_install()) {
+                          version = "1.6.0") {
+  installInfo = spark_install_from_version(version)
+
   spark_connect_with_shell(master = master,
                            appName = appName,
                            installInfo = installInfo)
