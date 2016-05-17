@@ -1,6 +1,9 @@
 ---
 title: "Spark Interface for R"
-output: github_document
+output:
+  github_document:
+    fig_width: 9
+    fig_height: 5
 ---
 
 [![Travis-CI Build Status](https://travis-ci.com/rstudio/spark.svg?token=MxiS2SHZy3QzqFf34wQr&branch=master)](https://travis-ci.com/rstudio/spark)

@@ -188,18 +188,18 @@ results %>%
 ```
 
     ##    run   master version logging part cores dplyr summarize spark summarize
-    ## 1    0    local   1.6.0    INFO    0     0           0.091           2.966
-    ## 2    1    local   1.6.0    INFO    0     0           0.089           0.553
-    ## 3    2    local   2.0.0    INFO    0     0           0.089           1.959
-    ## 4    3    local   2.0.0    INFO    0     0           0.087           0.658
-    ## 5    4 local[*]   1.6.0    INFO    0     0           0.091           2.221
-    ## 6    5 local[*]   1.6.0    WARN    0     0           0.088           2.208
-    ## 7    6 local[*]   1.6.0    WARN    0     0           0.091           0.633
-    ## 8    7 local[*]   1.6.0    WARN    8     0           0.090           0.685
-    ## 9    8 local[*]   2.0.0    WARN    8     0           0.091           0.762
-    ## 10   9 local[*]   2.0.0    WARN    0     0           0.103           0.853
-    ## 11  10 local[*]   1.6.0    WARN    0    NA           0.091           0.522
-    ## 12  11 local[*]   2.0.0    WARN    0    NA           0.087           0.684
+    ## 1    0    local   1.6.0    INFO    0     0           0.087           3.042
+    ## 2    1    local   1.6.0    INFO    0     0           0.089           0.517
+    ## 3    2    local   2.0.0    INFO    0     0           0.088           2.086
+    ## 4    3    local   2.0.0    INFO    0     0           0.082           0.659
+    ## 5    4 local[*]   1.6.0    INFO    0     0           0.083           2.207
+    ## 6    5 local[*]   1.6.0    WARN    0     0           0.085           2.250
+    ## 7    6 local[*]   1.6.0    WARN    0     0           0.092           0.606
+    ## 8    7 local[*]   1.6.0    WARN    8     0           0.086           0.791
+    ## 9    8 local[*]   2.0.0    WARN    8     0           0.087           0.770
+    ## 10   9 local[*]   2.0.0    WARN    0     0           0.086           0.776
+    ## 11  10 local[*]   1.6.0    WARN    0    NA           0.090           0.506
+    ## 12  11 local[*]   2.0.0    WARN    0    NA           0.085           0.620
 
 ``` r
 results %>%
@@ -209,18 +209,18 @@ results %>%
 ```
 
     ##    run   master version logging part cores dplyr rank spark rank
-    ## 1    0    local   1.6.0    INFO    0     0      0.785     13.331
-    ## 2    1    local   1.6.0    INFO    0     0      0.778     12.164
-    ## 3    2    local   2.0.0    INFO    0     0      0.771      6.394
-    ## 4    3    local   2.0.0    INFO    0     0      0.777      6.015
-    ## 5    4 local[*]   1.6.0    INFO    0     0      0.876      6.301
-    ## 6    5 local[*]   1.6.0    WARN    0     0      0.908      6.423
-    ## 7    6 local[*]   1.6.0    WARN    0     0      0.928      5.798
-    ## 8    7 local[*]   1.6.0    WARN    8     0      0.910      6.177
-    ## 9    8 local[*]   2.0.0    WARN    8     0      0.859      2.901
-    ## 10   9 local[*]   2.0.0    WARN    0     0      0.875      2.740
-    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.794      1.630
-    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.809      0.792
+    ## 1    0    local   1.6.0    INFO    0     0      0.792     13.196
+    ## 2    1    local   1.6.0    INFO    0     0      0.762     12.201
+    ## 3    2    local   2.0.0    INFO    0     0      0.748      6.469
+    ## 4    3    local   2.0.0    INFO    0     0      0.780      5.987
+    ## 5    4 local[*]   1.6.0    INFO    0     0      0.888      6.224
+    ## 6    5 local[*]   1.6.0    WARN    0     0      0.865      6.161
+    ## 7    6 local[*]   1.6.0    WARN    0     0      0.918      5.675
+    ## 8    7 local[*]   1.6.0    WARN    8     0      0.907      6.066
+    ## 9    8 local[*]   2.0.0    WARN    8     0      0.819      2.894
+    ## 10   9 local[*]   2.0.0    WARN    0     0      0.849      2.892
+    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.783      1.441
+    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.739      0.837
 
 ``` r
 results %>%
@@ -230,18 +230,18 @@ results %>%
 ```
 
     ##    run   master version logging part cores dplyr warm spark warm
-    ## 1    0    local   1.6.0    INFO    0     0      0.811     11.760
-    ## 2    1    local   1.6.0    INFO    0     0      0.770     10.694
-    ## 3    2    local   2.0.0    INFO    0     0      0.750      5.455
-    ## 4    3    local   2.0.0    INFO    0     0      0.745      5.115
-    ## 5    4 local[*]   1.6.0    INFO    0     0      0.865      4.798
-    ## 6    5 local[*]   1.6.0    WARN    0     0      0.895      5.255
-    ## 7    6 local[*]   1.6.0    WARN    0     0      0.893      4.214
-    ## 8    7 local[*]   1.6.0    WARN    8     0      0.888      4.437
-    ## 9    8 local[*]   2.0.0    WARN    8     0      0.849      2.524
-    ## 10   9 local[*]   2.0.0    WARN    0     0      0.846      2.445
-    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.778      0.549
-    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.818      0.481
+    ## 1    0    local   1.6.0    INFO    0     0      0.798     11.824
+    ## 2    1    local   1.6.0    INFO    0     0      0.740     10.794
+    ## 3    2    local   2.0.0    INFO    0     0      0.747      5.478
+    ## 4    3    local   2.0.0    INFO    0     0      0.754      5.146
+    ## 5    4 local[*]   1.6.0    INFO    0     0      0.903      4.719
+    ## 6    5 local[*]   1.6.0    WARN    0     0      0.850      4.743
+    ## 7    6 local[*]   1.6.0    WARN    0     0      0.952      4.364
+    ## 8    7 local[*]   1.6.0    WARN    8     0      0.895      4.618
+    ## 9    8 local[*]   2.0.0    WARN    8     0      0.803      2.437
+    ## 10   9 local[*]   2.0.0    WARN    0     0      0.844      2.275
+    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.772      0.551
+    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.744      0.460
 
 ``` r
 results %>%

@@ -191,15 +191,15 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/17 15:09:32 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-    ## 16/05/17 15:09:34 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/17 15:09:34 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/17 15:09:36 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
-    ## 16/05/17 15:09:36 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
-    ## 16/05/17 15:09:37 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/17 15:09:37 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/17 15:45:18 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
+    ## 16/05/17 15:45:18 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
+    ## 16/05/17 15:45:19 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/17 15:45:19 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
     ## 
     ## [Stage 1:>                                                          (0 + 2) / 2]
+    ##                                                                                 
+    ## 
+    ## [Stage 6:>                                                          (0 + 2) / 2]
     ## 
 
 Finally, we disconnect from Spark:
