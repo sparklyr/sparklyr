@@ -1,4 +1,4 @@
-spark_connect_with_shell <- function(master, appName, version, installInfo) {
+spark_connect_with_shell <- function(master, appName, version, installInfo, cores) {
   scon <- start_shell(installInfo)
 
   scon$sc <- spark_connection_create_context(scon, master, appName, installInfo$sparkVersionDir)
@@ -10,6 +10,8 @@ spark_connect_with_shell <- function(master, appName, version, installInfo) {
   scon$appName <- appName
   scon$version <- version
   scon$useHive <- compareVersion(version, "2.0.0") < 0
+  scon$isLocal <- grepl("^local(\\[[0-9\\*]*\\])$", master, perl = TRUE)
+  scon$cores <- cores
 
   scon
 }
@@ -20,15 +22,20 @@ spark_connect_with_shell <- function(master, appName, version, installInfo) {
 #' @param master Master definition to Spark cluster
 #' @param appName Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster
+#' @param cores Number of cores available in the cluster. This if often usefull to optimize other parameters,
+#' for instance, to fine-tune the number of partitions to use when shuffling data. Use NULL to use default values
+#' or 0 to avoid any optimizations.
 spark_connect <- function(master = "local[*]",
                           appName = "rspark",
-                          version = "1.6.0") {
+                          version = "1.6.0",
+                          cores = NULL) {
   installInfo = spark_install_from_version(version)
 
   spark_connect_with_shell(master = master,
                            appName = appName,
                            version = version,
-                           installInfo = installInfo)
+                           installInfo = installInfo,
+                           cores = cores)
 }
 
 #' Disconnects from Spark and terminates the running application
@@ -202,4 +209,36 @@ spark_connection_create_context <- function(scon, master, appName, sparkHome) {
 #' @param scon Spark connection provided by spark_connect
 spark_context <- function(scon) {
   scon$sc
+}
+
+#' Retrieves master from a Spark Connection
+#' @name spark_context_master
+#' @export
+#' @param scon Spark connection provided by spark_connect
+spark_connection_master <- function(scon) {
+  scon$master
+}
+
+#' Retrieves the application name from a Spark Connection
+#' @name spark_connection_app_name
+#' @export
+#' @param scon Spark connection provided by spark_connect
+spark_connection_app_name <- function(scon) {
+  scon$appName
+}
+
+#' TRUE if the Spark Connection is a local install
+#' @name spark_connection_is_local
+#' @export
+#' @param scon Spark connection provided by spark_connect
+spark_connection_is_local <- function(scon) {
+  scon$isLocal
+}
+
+#' Number of cores available in the cluster
+#' @name spark_connection_cores
+#' @export
+#' @param scon Spark connection provided by spark_connect
+spark_connection_cores <- function(scon) {
+  scon$cores
 }

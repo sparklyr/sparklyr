@@ -4,13 +4,34 @@
 #' @export
 #' @param scon Spark connection provided by spark_connection
 src_spark <- function(scon) {
-  con <- dbConnect(DBISpark(scon))
-  src_sql("spark", con)
+  dbiCon <- dbConnect(DBISpark(scon))
+  db <- src_sql("spark", dbiCon)
+
+  if (spark_connection_is_local(scon)) {
+    cores <- spark_connection_cores(scon)
+    cores <- if (identical(cores, NULL)) 8 else cores
+    if (cores > 0) {
+      dbSetProperty(dbiCon, "spark.sql.shuffle.partitions", as.character(cores))
+    }
+  }
+
+  db
 }
 
 #' @export
 src_desc.src_spark <- function(db) {
-  paste("spark connection", paste("master", db$con@scon$master, sep = "="), paste("app", db$con@scon$appName, sep = "="))
+  scon <- src_context(db)
+  paste("spark connection",
+        paste("master", spark_connection_master(scon), sep = "="),
+        paste("app", spark_connection_app_name(scon), sep = "="),
+        paste("local", spark_connection_is_local(scon), sep = "="))
+}
+
+#' Retrieves the Spark connection object from a given dplyr src
+#' @export
+#' @param scon Spark connection provided by spark_connection
+src_context <- function(scon) {
+  db$con@scon
 }
 
 #' @export

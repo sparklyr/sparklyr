@@ -99,7 +99,7 @@ To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
 library(spark)
 master <- start_ec2(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
                     secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
-                    pem_file = "sparkster.pem")
+                    pem_file = "spark.pem")
           
 sc <- spark_connect(master)
 ```

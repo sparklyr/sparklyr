@@ -4,7 +4,8 @@
 \alias{spark_connect}
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
-spark_connect(master = "local[*]", appName = "rspark", version = "1.6.0")
+spark_connect(master = "local[*]", appName = "rspark", version = "1.6.0",
+  cores = NULL)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -12,6 +13,10 @@ spark_connect(master = "local[*]", appName = "rspark", version = "1.6.0")
 \item{appName}{Application name to be used while running in the Spark cluster}
 
 \item{version}{Version of the Spark cluster}
+
+\item{cores}{Number of cores available in the cluster. This if often usefull to optimize other parameters,
+for instance, to fine-tune the number of partitions to use when shuffling data. Use NULL to use default values
+or 0 to avoid any optimizations.}
 }
 \description{
 Connects to Spark and establishes the Spark Context
