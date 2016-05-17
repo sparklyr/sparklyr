@@ -45,23 +45,25 @@ db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
 copy_to(db, nycflights13::flights, "flights")
+flights <- tbl(db, "flights")
 
 # copy the Batting table from the Lahman package to Spark
 copy_to(db, Lahman::Batting, "batting")
+batting <- tbl(db, "batting")
 ```
 
 Then you can run dplyr against Spark:
 
 ```{r}
 # filter by departure delay and print the first few records
-tbl(db, "flights") %>% filter(dep_delay == 2)
+flights %>% filter(dep_delay == 2)
 ```
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r}
 
-delay <- tbl(db, "flights") %>% 
+delay <- flights %>% 
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000) %>%
@@ -82,7 +84,7 @@ dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes
 
 ```{r}
 
-tbl(db, "batting") %>%
+batting %>%
   select(playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
   group_by(playerID) %>%

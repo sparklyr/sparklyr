@@ -35,7 +35,10 @@ spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
     spark_install(version = param$version, reset = TRUE, logging = param$logging)
     
-    sc <- spark_connect(param$master, param$version)
+    sc <- spark_connect(master = param$master,
+                        version = param$version,
+                        cores = param$cores)
+    
     db <- src_spark(sc)
     
     copy_to(db,
@@ -50,15 +53,20 @@ spark_perf_test <- function(params, tests) {
             cache = param$cache,
             repartition = param$partitions)
     
+    sources <- list(
+      flights = tbl(db, "flights"),
+      batting = tbl(db, "batting")
+    )
+    
     testResults <- lapply(seq_along(tests), function(testNames, testNum) {
       test <-  tests[[testNum]]
       testName <- names(tests)[[testNum]]
       
       unname(c(
-        param,
+        lapply(param, function(e) if (is.null(e)) NA else e),
         list(
           test = testName,
-          elapsed = system.time(test(db))[["elapsed"]]
+          elapsed = system.time(test(db, sources))[["elapsed"]]
         )
       ))
     }, testNames = names(tests))
@@ -71,6 +79,8 @@ spark_perf_test <- function(params, tests) {
   columnNames <- c(names(params[[1]]), list("test", "elapsed"))
   
   resultsDF <- do.call(rbind.data.frame, unlist(resultsList, recursive = FALSE))
+  #resultsDF <- data.frame(do.call(rbind, unlist(resultsList, recursive = FALSE)))
+  
   colnames(resultsDF) <- columnNames
   
   resultsDF
@@ -78,7 +88,7 @@ spark_perf_test <- function(params, tests) {
 ```
 
 ```{r}
-spark_perf_single_test <- function(runResults, master, version, logging, cache, partitions) {
+spark_perf_single_test <- function(runResults, master, version, logging, cache, partitions, cores) {
   run <- length(runResults)
   
   c(
@@ -92,20 +102,21 @@ spark_perf_single_test <- function(runResults, master, version, logging, cache, 
             version = version,
             logging = logging,
             cache = cache,
-            partitions = partitions
+            partitions = partitions,
+            cores = cores
           )
         ),
         tests = list(
-          `spark summarize` = function(db) {
-            tbl(db, "flights") %>% summarize_delay %>% head
+          `spark summarize` = function(db, sources) {
+            sources$flights %>% summarize_delay %>% head
           },
-          `dplyr summarize` = function(db) {
+          `dplyr summarize` = function(db, sources) {
             nycflights13::flights %>% summarize_delay %>% head
           },
-          `spark rank` = function(db) {
-            tbl(db, "batting") %>% top_players %>% head
+          `spark rank` = function(db, sources) {
+            sources$batting %>% top_players %>% head
           },
-          `dplyr rank` = function(db) {
+          `dplyr rank` = function(db, sources) {
             Lahman::Batting %>% top_players %>% head
           }
         )
@@ -120,16 +131,18 @@ spark_perf_single_test <- function(runResults, master, version, logging, cache, 
 ```{r}
 runResults <- list()
 
-runResults <- spark_perf_single_test(runResults, "local", "1.6.0", "INFO", FALSE, 0)
-runResults <- spark_perf_single_test(runResults, "local", "1.6.0", "INFO", TRUE, 0)
-runResults <- spark_perf_single_test(runResults, "local", "2.0.0", "INFO", FALSE, 0)
-runResults <- spark_perf_single_test(runResults, "local", "2.0.0", "INFO", TRUE, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "INFO", FALSE, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", FALSE, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", TRUE, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", TRUE, 8)
-runResults <- spark_perf_single_test(runResults, "local[*]", "2.0.0", "WARN", TRUE, 8)
-runResults <- spark_perf_single_test(runResults, "local[*]", "2.0.0", "WARN", TRUE, 0)
+runResults <- spark_perf_single_test(runResults, "local", "1.6.0", "INFO", FALSE, 0, 0)
+runResults <- spark_perf_single_test(runResults, "local", "1.6.0", "INFO", TRUE, 0, 0)
+runResults <- spark_perf_single_test(runResults, "local", "2.0.0", "INFO", FALSE, 0, 0)
+runResults <- spark_perf_single_test(runResults, "local", "2.0.0", "INFO", TRUE, 0, 0)
+runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "INFO", FALSE, 0, 0)
+runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", FALSE, 0, 0)
+runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", TRUE, 0, 0)
+runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", TRUE, 8, 0)
+runResults <- spark_perf_single_test(runResults, "local[*]", "2.0.0", "WARN", TRUE, 8, 0)
+runResults <- spark_perf_single_test(runResults, "local[*]", "2.0.0", "WARN", TRUE, 0, 0)
+runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", TRUE, 0, NULL)
+runResults <- spark_perf_single_test(runResults, "local[*]", "2.0.0", "WARN", TRUE, 0, NULL)
 
 results <- do.call("rbind", runResults)
 
@@ -140,13 +153,13 @@ results <- results %>%
 ```{r}
 results %>%
   filter(test == "spark summarize" | test == "dplyr summarize") %>%
-  dcast(params ~ test, value.var = "elapsed")
+  dcast(run + master + version + logging + partitions + cores ~ test, value.var = "elapsed")
 ```
 
 ```{r}
 results %>%
   filter(test == "spark rank" | test == "dplyr rank") %>%
-  dcast(params ~ test, value.var = "elapsed")
+  dcast(run + master + version + logging + partitions + cores ~ test, value.var = "elapsed")
 ```
 
 ```{r}

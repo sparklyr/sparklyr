@@ -36,20 +36,22 @@ db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
 copy_to(db, nycflights13::flights, "flights")
+flights <- tbl(db, "flights")
 
 # copy the Batting table from the Lahman package to Spark
 copy_to(db, Lahman::Batting, "batting")
+batting <- tbl(db, "batting")
 ```
 
 Then you can run dplyr against Spark:
 
 ``` r
 # filter by departure delay and print the first few records
-tbl(db, "flights") %>% filter(dep_delay == 2)
+flights %>% filter(dep_delay == 2)
 ```
 
     ## Source:   query [?? x 16]
-    ## Database: spark connection master=local[*] app=rspark
+    ## Database: spark connection master=local[*] app=rspark local=TRUE
     ## 
     ##     year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
     ##    <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
@@ -70,7 +72,7 @@ tbl(db, "flights") %>% filter(dep_delay == 2)
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ``` r
-delay <- tbl(db, "flights") %>% 
+delay <- flights %>% 
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000) %>%
@@ -91,7 +93,7 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ``` r
-tbl(db, "batting") %>%
+batting %>%
   select(playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
   group_by(playerID) %>%
@@ -99,21 +101,21 @@ tbl(db, "batting") %>%
 ```
 
     ## Source:   query [?? x 7]
-    ## Database: spark connection master=local[*] app=rspark
+    ## Database: spark connection master=local[*] app=rspark local=TRUE
     ## Groups: playerID
     ## 
     ##     playerID yearID teamID     G    AB     R     H
     ##        <chr>  <int>  <chr> <int> <int> <int> <int>
-    ## 1  anderal01   1941    PIT    70   223    32    48
-    ## 2  anderal01   1942    PIT    54   166    24    45
-    ## 3  balesco01   2008    WAS    15    15     1     3
-    ## 4  balesco01   2009    WAS     7     8     0     1
-    ## 5  bandoch01   1986    CLE    92   254    28    68
-    ## 6  bandoch01   1984    CLE    75   220    38    64
-    ## 7  bedelho01   1962    ML1    58   138    15    27
-    ## 8  bedelho01   1968    PHI     9     7     0     1
-    ## 9  biittla01   1977    CHN   138   493    74   147
-    ## 10 biittla01   1975    MON   121   346    34   109
+    ## 1  abbotpa01   2000    SEA    35     5     1     2
+    ## 2  abbotpa01   2004    PHI    10    11     1     2
+    ## 3  abnersh01   1992    CHA    97   208    21    58
+    ## 4  abnersh01   1990    SDN    91   184    17    45
+    ## 5  abreujo02   2014    CHA   145   556    80   176
+    ## 6  acevejo01   2001    CIN    18    34     1     4
+    ## 7  acevejo01   2004    CIN    39    43     0     2
+    ## 8  adamsbe01   1919    PHI    78   232    14    54
+    ## 9  adamsbe01   1918    PHI    84   227    10    40
+    ## 10 adamsbu01   1945    SLN   140   578    98   169
     ## ..       ...    ...    ...   ...   ...   ...   ...
 
 EC2
@@ -125,7 +127,7 @@ To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
 library(spark)
 master <- start_ec2(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
                     secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
-                    pem_file = "sparkster.pem")
+                    pem_file = "spark.pem")
           
 sc <- spark_connect(master)
 ```
@@ -189,15 +191,15 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## [Stage 17:===========================>                          (103 + 8) / 200]
-    ## [Stage 17:===============================>                      (116 + 8) / 200]
-    ## [Stage 17:==================================>                   (126 + 8) / 200]
-    ## [Stage 17:====================================>                 (135 + 8) / 200]
-    ## [Stage 17:=======================================>              (146 + 8) / 200]
-    ## [Stage 17:==========================================>           (156 + 8) / 200]
-    ## [Stage 17:=============================================>        (167 + 8) / 200]
-    ## [Stage 17:================================================>     (178 + 8) / 200]
-    ## [Stage 17:==================================================>   (188 + 8) / 200]
+    ## 16/05/17 11:30:10 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
+    ## 16/05/17 11:30:10 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
+    ## 16/05/17 11:30:11 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/17 11:30:11 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 
+    ## [Stage 1:>                                                          (0 + 2) / 2]
+    ##                                                                                 
+    ## 
+    ## [Stage 15:>                                                         (0 + 0) / 2]
     ## 
 
 Finally, we disconnect from Spark:
