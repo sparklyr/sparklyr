@@ -28,6 +28,14 @@ top_players <- function(source) {
     group_by(playerID) %>%
     filter(min_rank(desc(H)) <= 2 & H > 0)
 }
+
+top_players_by_run <- function(source) {
+  source %>%
+    select(playerID, yearID, teamID, G, AB:H) %>%
+    arrange(playerID, yearID, teamID) %>%
+    group_by(playerID) %>%
+    filter(min_rank(desc(R)) <= 2 & R > 0)
+}
 ```
 
 ```{r}
@@ -118,6 +126,12 @@ spark_perf_single_test <- function(runResults, master, version, logging, cache, 
           },
           `dplyr rank` = function(db, sources) {
             Lahman::Batting %>% top_players %>% head
+          },
+          `spark warm` = function(db, sources) {
+            sources$batting %>% top_players_by_run %>% head
+          },
+          `dplyr warm` = function(db, sources) {
+            Lahman::Batting %>% top_players_by_run %>% head
           }
         )
       )
@@ -153,25 +167,52 @@ results <- results %>%
 ```{r}
 results %>%
   filter(test == "spark summarize" | test == "dplyr summarize") %>%
-  dcast(run + master + version + logging + partitions + cores ~ test, value.var = "elapsed")
+  rename(part = partitions) %>%
+  dcast(run + master + version + logging + part + cores ~ test, value.var = "elapsed")
 ```
 
 ```{r}
 results %>%
   filter(test == "spark rank" | test == "dplyr rank") %>%
-  dcast(run + master + version + logging + partitions + cores ~ test, value.var = "elapsed")
+  rename(part = partitions) %>%
+  dcast(run + master + version + logging + part + cores ~ test, value.var = "elapsed")
 ```
 
 ```{r}
 results %>%
-  filter(test == "spark rank" | test == "spark summarize") %>%
+  filter(test == "spark warm" | test == "dplyr warm") %>%
+  rename(part = partitions) %>%
+  dcast(run + master + version + logging + part + cores ~ test, value.var = "elapsed")
+```
+
+```{r}
+results %>%
+  filter(test != "dplyr summarize" | test != "spark summarize") %>%
   ggplot(aes(test, params)) + 
     geom_tile(aes(fill = elapsed), colour = "white") +
-    scale_fill_gradient(low = "steelblue", high = "black")
+    scale_fill_gradient(low = "steelblue", high = "black") +
+    theme(axis.text.x=element_text(angle=330, hjust = 0))
 ```
 
 ```{r}
 results %>%
+  filter(test == "dplyr summarize" | test == "spark summarize") %>%
+  ggplot(aes(x=run, y=elapsed, group = test, color = test)) + 
+    geom_line() + geom_point() +
+    ggtitle("Time per Run")
+```
+
+```{r}
+results %>%
+  filter(test == "dplyr rank" | test == "spark rank") %>%
+  ggplot(aes(x=run, y=elapsed, group = test, color = test)) + 
+    geom_line() + geom_point() +
+    ggtitle("Time per Run")
+```
+
+```{r}
+results %>%
+  filter(test == "dplyr warm" | test == "spark warm") %>%
   ggplot(aes(x=run, y=elapsed, group = test, color = test)) + 
     geom_line() + geom_point() +
     ggtitle("Time per Run")
