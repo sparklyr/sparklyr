@@ -29,7 +29,7 @@ spark_connect <- function(master = "local[*]",
                           appName = "rspark",
                           version = "1.6.0",
                           cores = NULL) {
-  installInfo = spark_install_from_version(version)
+  installInfo = spark_install_info(version)
 
   spark_connect_with_shell(master = master,
                            appName = appName,

@@ -11,7 +11,7 @@ output:
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
+knitr::opts_chunk$set(warning = FALSE, cache = FALSE, fig.path='res/')
 library(spark)
 library(dplyr)
 library(ggplot2)
@@ -64,7 +64,7 @@ flights %>% filter(dep_delay == 2)
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
-```{r}
+```{r ggplot2}
 delay <- flights %>% 
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
@@ -101,11 +101,17 @@ To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
 
 ```{r, eval=FALSE}
 library(spark)
-master <- start_ec2(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
-                    secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
-                    pem_file = "spark.pem")
-          
-sc <- spark_connect(master)
+ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
+                        secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+                        pem_file = "spark.pem")
+
+master <- spark_ec2_deploy(ci)
+
+spark_ec2_web(ci)
+spark_ec2_rstudio(ci)
+
+spark_ec2_stop(ci)
+spark_ec2_destroy(ci)
 ```
 
 The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.

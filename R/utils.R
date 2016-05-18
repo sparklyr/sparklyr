@@ -15,11 +15,13 @@ remove_extension <- function(file) {
   sub("[.][^.]*$", "", file, perl=TRUE)
 }
 
-validate_pem <- function(pem_path) {
-  if (!file.exists(pem_path)) {
+validate_pem <- function(pemPath) {
+  if (!file.exists(pemPath)) {
     stop(".pem file does not exist")
   }
 
-  chmodScript <- paste("chmod 400", pem_path)
-  system(chmodScript)
+  if (.Platform$OS.type == "unix") {
+    chmodScript <- paste("chmod 400", pemPath)
+    system(chmodScript)
+  }
 }

@@ -86,7 +86,7 @@ ggplot(delay, aes(dist, delay)) +
   scale_size_area()
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](res/ggplot2-1.png)
 
 ### Window Functions
 
@@ -125,11 +125,17 @@ To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
 
 ``` r
 library(spark)
-master <- start_ec2(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
-                    secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
-                    pem_file = "spark.pem")
-          
-sc <- spark_connect(master)
+ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
+                        secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+                        pem_file = "spark.pem")
+
+master <- spark_ec2_deploy(ci)
+
+spark_ec2_web(ci)
+spark_ec2_rstudio(ci)
+
+spark_ec2_stop(ci)
+spark_ec2_destroy(ci)
 ```
 
 The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.
@@ -191,16 +197,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/17 15:45:18 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
-    ## 16/05/17 15:45:18 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
-    ## 16/05/17 15:45:19 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/17 15:45:19 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 
-    ## [Stage 1:>                                                          (0 + 2) / 2]
-    ##                                                                                 
-    ## 
-    ## [Stage 6:>                                                          (0 + 2) / 2]
-    ## 
+    ## 16/05/18 16:35:46 INFO ContextCleaner: Cleaned shuffle 5
+    ## 16/05/18 16:35:46 INFO BlockManagerInfo: Removed broadcast_18_piece0 on localhost:51628 in memory (size: 10.3 KB, free: 487.0 MB)
+    ## 16/05/18 16:35:46 INFO ContextCleaner: Cleaned accumulator 71
+    ## 16/05/18 16:35:46 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
+    ## 16/05/18 16:35:46 INFO Executor: Finished task 1.0 in stage 19.0 (TID 39). 2082 bytes result sent to driver
+    ## 16/05/18 16:35:46 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 64 ms on localhost (1/2)
+    ## 16/05/18 16:35:46 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 39) in 65 ms on localhost (2/2)
+    ## 16/05/18 16:35:46 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
+    ## 16/05/18 16:35:46 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.065 s
+    ## 16/05/18 16:35:46 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.069294 s
 
 Finally, we disconnect from Spark:
 

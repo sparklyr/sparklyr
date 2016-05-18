@@ -1,4 +1,4 @@
-spark_install_from_version <- function(version = "1.6.0") {
+spark_install_info <- function(version = "1.6.0") {
   versionInfo <- list(
     `1.6.0` = list(
       componentName = paste("spark-", version, "-bin-hadoop2.6", sep = ""),
@@ -35,6 +35,21 @@ spark_install_from_version <- function(version = "1.6.0") {
   )
 }
 
+#' Validates that the given Spark version has been downloaded and installed locally
+#' @name spark_check_install
+#' @export
+#' @import rappdirs
+#' @param version Version of Spark to install. Suppported versions: "1.6.0" (default), "2.0.0" (preview)
+spark_check_install <- function(version = "1.6.0") {
+  installInfo <- spark_install_info(version)
+
+  if (!file.exists(installInfo$sparkDir)) {
+    stop("Spark version not found. Install with spark_install.")
+  }
+
+  installInfo
+}
+
 #' Provides support to download and install the given Spark version
 #' @name spark_install
 #' @export
@@ -43,7 +58,7 @@ spark_install_from_version <- function(version = "1.6.0") {
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
 spark_install <- function(version = "1.6.0", reset = FALSE, logging = "INFO") {
-  installInfo <- spark_install_from_version(version)
+  installInfo <- spark_install_info(version)
 
   if (!dir.exists(installInfo$sparkDir)) {
     warning("Local spark directory for this project not found, creating.")
@@ -57,6 +72,10 @@ spark_install <- function(version = "1.6.0", reset = FALSE, logging = "INFO") {
 
   if (!dir.exists(installInfo$sparkVersionDir)) {
     untar(tarfile = installInfo$packageLocalPath, exdir = installInfo$sparkDir)
+  }
+
+  if (!file.exists(installInfo$sparkDir)) {
+    stop("Spark version not found.")
   }
 
   if (!identical(logging, NULL)) {
