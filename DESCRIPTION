@@ -22,6 +22,7 @@ Collate:
     'api_spark_databricks.R'
     'api_spark_sql.R'
     'connection_spark.R'
+    'connection_viewer.R'
     'dbi_spark_driver.R'
     'dbi_spark_connection.R'
     'dbi_spark_query.R'

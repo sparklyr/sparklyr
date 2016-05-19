@@ -8,7 +8,7 @@ NULL
 #' @rdname dbi-spark-connection
 setClass("DBISparkConnection",
          contains = "DBIConnection",
-         slots = c(scon = "list",
+         slots = c(scon = "spark_connection",
                    api = "list")
 )
 
