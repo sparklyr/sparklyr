@@ -1,4 +1,8 @@
-spark_connect_with_shell <- function(master, appName, version, installInfo, cores) {
+
+# register the spark_connection S3 class for use in setClass slots
+methods::setOldClass("spark_connection")
+
+spark_connect_with_shell <- function(master, appName, version, installInfo, cores, connectCall) {
   scon <- start_shell(installInfo)
 
   scon$sc <- spark_connection_create_context(scon, master, appName, installInfo$sparkVersionDir)
@@ -13,7 +17,9 @@ spark_connect_with_shell <- function(master, appName, version, installInfo, core
   scon$isLocal <- grepl("^local(\\[[0-9\\*]*\\])$", master, perl = TRUE)
   scon$cores <- cores
 
-  scon
+  on_connection_opened(scon, connectCall)
+
+  structure(scon, class = "spark_connection")
 }
 
 #' Connects to Spark and establishes the Spark Context
@@ -31,11 +37,14 @@ spark_connect <- function(master = "local[*]",
                           cores = NULL) {
   installInfo = spark_install_info(version)
 
+  connectCall <- deparse(match.call())
+
   spark_connect_with_shell(master = master,
                            appName = appName,
                            version = version,
                            installInfo = installInfo,
-                           cores = cores)
+                           cores = cores,
+                           connectCall)
 }
 
 #' Disconnects from Spark and terminates the running application

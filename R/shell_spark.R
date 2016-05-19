@@ -84,5 +84,6 @@ stop_shell <- function(scon) {
   spark_invoke_method(scon, FALSE, "0", "stop")
   close(scon$backend)
   close(scon$monitor)
+  on_connection_closed(scon)
 }
 

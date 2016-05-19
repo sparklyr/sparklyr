@@ -20,7 +20,7 @@ DBISpark <- function(scon) {
 setClass("DBISparkDriver",
          contains = "DBIDriver",
          slots = c(
-           scon = "list")
+           scon = "spark_connection")
         )
 
 #' @export

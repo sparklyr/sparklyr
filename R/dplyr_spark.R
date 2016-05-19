@@ -30,7 +30,7 @@ src_desc.src_spark <- function(db) {
 #' Retrieves the Spark connection object from a given dplyr src
 #' @export
 #' @param scon Spark connection provided by spark_connection
-src_context <- function(scon) {
+src_context <- function(db) {
   db$con@scon
 }
 
@@ -101,6 +101,8 @@ copy_to.src_spark <- function(con, df, name, cache = TRUE, repartition = 0) {
   if (cache) {
     tbl_cache(con, name)
   }
+
+  on_connection_updated(src_context(con))
 
   invisible(result)
 }
