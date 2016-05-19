@@ -4,10 +4,10 @@
 \alias{src_context}
 \title{Retrieves the Spark connection object from a given dplyr src}
 \usage{
-src_context(scon)
+src_context(db)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connection}
+\item{db}{Spark dplyr source provided by src_spark}
 }
 \description{
 Retrieves the Spark connection object from a given dplyr src

@@ -15,7 +15,7 @@ spark_api_create_sql_context <- function(scon) {
     "org.apache.spark.sql.api.r.SQLUtils",
     "createSQLContext",
 
-    scon$sc
+    spark_context(scon)
   )
 }
 
@@ -26,34 +26,45 @@ spark_api_create_hive_context <- function(scon) {
     "org.apache.spark.sql.hive.HiveContext",
     "<init>",
 
-    scon$sc
+    spark_context(scon)
   )
 }
 
-spark_api_create <- function(sc) {
-  sql <- spark_api_create_sql_context(sc)
+spark_api_attach_scon <- function(scon) {
+  sconInst <- spark_connection_get_inst(scon)
+
+  sconInst$sql <- spark_api_create_sql_context(scon)
   if (identical(sql, NULL)) {
     stop("Failed to create SQL context")
   }
 
   hive <- NULL
-  if (sc$useHive) {
-    hive <- spark_api_create_hive_context(sc)
-    if (identical(hive, NULL)) {
+  if (scon$useHive) {
+    sconInst$hive <- spark_api_create_hive_context(scon)
+    if (identical(sconInst$hive, NULL)) {
       warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
     }
   }
 
-  list(scon = sc,
-       sql = sql,
-       hive = hive)
+  spark_connection_set_inst(scon, sconInst)
+  spark_connection_on_reconnect(scon, spark_api_attach_scon)
+}
+
+spark_api_create <- function(scon) {
+  spark_api_attach_scon(scon)
+
+  list(
+    scon = scon
+  )
 }
 
 spark_sql_or_hive <- function(api) {
-  if (!identical(api$hive, NULL))
-    api$hive
+  sconInst <- spark_connection_get_inst(api$scon)
+
+  if (!identical(sconInst$hive, NULL))
+    sconInst$hive
   else
-    api$sql
+    sconInst$sql
 }
 
 spark_api_sql <- function(api, sql) {

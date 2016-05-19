@@ -71,19 +71,19 @@ start_shell <- function(installInfo) {
     finalized = FALSE
   )
 
-  reg.finalizer(baseenv(), function(x) {
-    if (isOpen(con$backend) || isOpen(con$monitor)) {
-      stop_shell(con)
-    }
-  }, onexit = TRUE)
-
   con
 }
 
 stop_shell <- function(scon) {
+  sconInst <- spark_connection_get_inst(scon)
+  sconInst$finalized <- TRUE
+  spark_connection_set_inst(scon, sconInst)
+
   spark_invoke_method(scon, FALSE, "0", "stop")
-  close(scon$backend)
-  close(scon$monitor)
+
+  close(sconInst$backend)
+  close(sconInst$monitor)
+
   on_connection_closed(scon)
 }
 

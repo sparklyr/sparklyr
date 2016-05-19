@@ -29,7 +29,7 @@ src_desc.src_spark <- function(db) {
 
 #' Retrieves the Spark connection object from a given dplyr src
 #' @export
-#' @param scon Spark connection provided by spark_connection
+#' @param db Spark dplyr source provided by src_spark
 src_context <- function(db) {
   db$con@scon
 }
