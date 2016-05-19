@@ -4,10 +4,10 @@
 \alias{spark_connection_app_name}
 \title{Retrieves the application name from a Spark Connection}
 \usage{
-spark_connection_app_name(scon)
+spark_connection_app_name(sconref)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sconref}{Spark connection reference provided by spark_connect}
 }
 \description{
 Retrieves the application name from a Spark Connection

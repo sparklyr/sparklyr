@@ -5,16 +5,16 @@
 \alias{spark_log}
 \title{Retrieves the last n entries in the Spark log}
 \usage{
-spark_log(scon, n = 100)
+spark_log(sconref, n = 100)
 
 \method{print}{spark_log}(x, ...)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sconref}{Spark connection reference provided by spark_connect}
 
 \item{n}{Max number of log entries to retrieve}
 
-\item{x}{Spark connection provided by spark_connect}
+\item{x}{Spark log provided by spark_log}
 
 \item{...}{Additional parameters}
 }

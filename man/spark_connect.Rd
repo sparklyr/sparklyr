@@ -5,7 +5,7 @@
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
 spark_connect(master = "local[*]", appName = "rspark", version = "1.6.0",
-  cores = NULL)
+  cores = NULL, reconnect = TRUE)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -17,6 +17,8 @@ spark_connect(master = "local[*]", appName = "rspark", version = "1.6.0",
 \item{cores}{Number of cores available in the cluster. This if often usefull to optimize other parameters,
 for instance, to fine-tune the number of partitions to use when shuffling data. Use NULL to use default values
 or 0 to avoid any optimizations.}
+
+\item{reconnect}{Allows the Spark connection to reconnect when the connection is lost}
 }
 \description{
 Connects to Spark and establishes the Spark Context

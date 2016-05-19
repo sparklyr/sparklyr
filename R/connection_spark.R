@@ -1,19 +1,35 @@
-spark_connect_with_shell <- function(master, appName, version, installInfo, cores) {
-  scon <- start_shell(installInfo)
+# List of connections
+.rspark.connections <- new.env(parent = emptyenv())
 
-  scon$sc <- spark_connection_create_context(scon, master, appName, installInfo$sparkVersionDir)
+spark_connections_close_all <- function(x) {
+  lapply(.rspark.connections, function(scon) {
+    if (spark_connection_is_open(scon$id)) {
+      stop_shell(scon$id)
+    }
+    NULL
+  })
+}
+
+reg.finalizer(baseenv(), spark_connections_close_all, onexit = TRUE)
+
+spark_connect_with_shell <- function(scon) {
+  installInfo = spark_install_info(scon$version)
+  scon <- start_shell(scon, installInfo)
+
+  scon$id <- length(.rspark.connections)
+  .rspark.connections[[scon$id]] <- scon
+  sconref <- scon$id
+  attr(sconref, "class") <- "spark_connection"
+
+  scon$sc <- spark_connection_create_context(sconref, scon$master, scon$appName, installInfo$sparkVersionDir)
   if (identical(scon$sc, NULL)) {
     stop("Failed to create Spark context")
   }
 
-  scon$master <- master
-  scon$appName <- appName
-  scon$version <- version
-  scon$useHive <- compareVersion(version, "2.0.0") < 0
-  scon$isLocal <- grepl("^local(\\[[0-9\\*]*\\])$", master, perl = TRUE)
-  scon$cores <- cores
+  scon$useHive <- compareVersion(scon$version, "2.0.0") < 0
+  scon$isLocal <- grepl("^local(\\[[0-9\\*]*\\])$", scon$master, perl = TRUE)
 
-  scon
+  sconref
 }
 
 #' Connects to Spark and establishes the Spark Context
@@ -25,33 +41,41 @@ spark_connect_with_shell <- function(master, appName, version, installInfo, core
 #' @param cores Number of cores available in the cluster. This if often usefull to optimize other parameters,
 #' for instance, to fine-tune the number of partitions to use when shuffling data. Use NULL to use default values
 #' or 0 to avoid any optimizations.
+#' @param reconnect Allows the Spark connection to reconnect when the connection is lost
 spark_connect <- function(master = "local[*]",
                           appName = "rspark",
                           version = "1.6.0",
-                          cores = NULL) {
-  installInfo = spark_install_info(version)
+                          cores = NULL,
+                          reconnect = TRUE) {
+  scon <- list(
+    master = master,
+    appName = appName,
+    version = version,
+    cores = cores,
+    reconnect = reconnect
+  )
 
-  spark_connect_with_shell(master = master,
-                           appName = appName,
-                           version = version,
-                           installInfo = installInfo,
-                           cores = cores)
+  sconref <- spark_connect_with_shell(scon)
+
+  sconref
 }
 
 #' Disconnects from Spark and terminates the running application
 #' @name spark_disconnect
 #' @export
-#' @param scon Spark connection provided by spark_connect
-spark_disconnect <- function(scon) {
-  stop_shell(scon)
+#' @param sconref Spark connection reference provided by spark_connect
+spark_disconnect <- function(sconref) {
+  stop_shell(sconref)
 }
 
 #' Retrieves the last n entries in the Spark log
 #' @name spark_log
 #' @export
-#' @param scon Spark connection provided by spark_connect
+#' @param sconref Spark connection reference provided by spark_connect
 #' @param n Max number of log entries to retrieve
-spark_log <- function(scon, n = 100) {
+spark_log <- function(sconref, n = 100) {
+  scon <- spark_connection_from_ref(sconref)
+
   log <- file(scon$outputFile)
   lines <- readLines(log)
   close(log)
@@ -65,7 +89,7 @@ spark_log <- function(scon, n = 100) {
 #' Prints a spark_log object
 #' @name spark_log
 #' @export
-#' @param x Spark connection provided by spark_connect
+#' @param x Spark log provided by spark_log
 #' @param ... Additional parameters
 print.spark_log <- function(x, ...) {
   cat(x, sep = "\n")
@@ -75,8 +99,10 @@ print.spark_log <- function(x, ...) {
 #' Opens the Spark web interface
 #' @name spark_web
 #' @export
-#' @param scon Spark connection provided by spark_connect
-spark_web <- function(scon) {
+#' @param sconref Spark connection reference provided by spark_connect
+spark_web <- function(sconref) {
+  scon <- spark_connection_from_ref(sconref)
+
   log <- file(scon$outputFile)
   lines <- readLines(log)
   close(log)
@@ -93,35 +119,40 @@ spark_web <- function(scon) {
   }
 }
 
-spark_attach_connection <- function(object, scon) {
+spark_attach_connection <- function(object, sconref) {
   if ("jobj" %in% attr(object, "class")) {
-    object$scon <- scon
+    object$sconref <- sconref
   }
   else if (is.list(object) || "struct" %in% attr(object, "class")) {
     object <- lapply(object, function(e) {
-      spark_attach_connection(e, scon)
+      spark_attach_connection(e, sconref)
     })
   }
   else if (is.vector(object) && length(object) > 1) {
     object <- vapply(object, function(e) {
-      spark_attach_connection(e, scon)
+      spark_attach_connection(e, sconref)
     }, "")
   }
   else if (is.environment(object)) {
     object <- eapply(object, function(e) {
-      spark_attach_connection(e, scon)
+      spark_attach_connection(e, sconref)
     })
   }
 
   object
 }
 
-spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
+spark_invoke_method <- function (sconref, isStatic, objName, methodName, ...)
 {
   # Particular methods are defined on their specific clases, for instance, for "createSparkContext" see:
   #
   #   See: https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
   #
+  scon <- spark_connection_from_ref(sconref)
+
+  if (!spark_connection_is_open(scon) && scon$reconnect) {
+    spark_connect_with_shell(scon)
+  }
 
   rc <- rawConnection(raw(), "r+")
   writeBoolean(rc, isStatic)
@@ -148,7 +179,7 @@ spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
   }
 
   object <- readObject(scon$backend)
-  spark_attach_connection(object, scon)
+  spark_attach_connection(object, sconref)
 }
 
 #' Executes a method on the given object
@@ -159,19 +190,19 @@ spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
 #' @param ... Additional parameters that method requires
 spark_invoke <- function (jobj, methodName, ...)
 {
-  spark_invoke_method(jobj$scon, FALSE, jobj$id, methodName, ...)
+  spark_invoke_method(jobj$sconref, FALSE, jobj$id, methodName, ...)
 }
 
 #' Executes an static method on the given object
 #' @name spark_invoke_static
 #' @export
-#' @param scon Spark connection provided by spark_connect
+#' @param sconref Spark connection reference provided by spark_connect
 #' @param objName Fully-qualified name to static class
 #' @param methodName Name of class method to execute
 #' @param ... Additional parameters that method requires
-spark_invoke_static <- function (scon, objName, methodName, ...)
+spark_invoke_static <- function (sconref, objName, methodName, ...)
 {
-  spark_invoke_method(scon, TRUE, objName, methodName, ...)
+  spark_invoke_method(sconref, TRUE, objName, methodName, ...)
 }
 
 # API into https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
@@ -185,11 +216,11 @@ spark_invoke_static <- function (scon, objName, methodName, ...)
 #   sparkExecutorEnvMap: JMap[Object, Object])    // Named list of environment variables to be used when launching executors.
 #   : JavaSparkContext
 #
-spark_connection_create_context <- function(scon, master, appName, sparkHome) {
+spark_connection_create_context <- function(sconref, master, appName, sparkHome) {
   sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
 
   spark_invoke_static(
-    scon,
+    sconref,
 
     "org.apache.spark.api.r.RRDD",
     "createSparkContext",
@@ -206,39 +237,61 @@ spark_connection_create_context <- function(scon, master, appName, sparkHome) {
 #' Retrieves the SparkContext reference from a Spark Connection
 #' @name spark_context
 #' @export
-#' @param scon Spark connection provided by spark_connect
-spark_context <- function(scon) {
+#' @param sconef Spark connection reference provided by spark_connect
+spark_context <- function(sconref) {
+  scon <- spark_connection_from_ref(sconref)
   scon$sc
 }
 
 #' Retrieves master from a Spark Connection
 #' @name spark_context_master
 #' @export
-#' @param scon Spark connection provided by spark_connect
-spark_connection_master <- function(scon) {
+#' @param sconref Spark connection reference provided by spark_connect
+spark_connection_master <- function(sconref) {
+  scon <- spark_connection_from_ref(sconref)
   scon$master
 }
 
 #' Retrieves the application name from a Spark Connection
 #' @name spark_connection_app_name
 #' @export
-#' @param scon Spark connection provided by spark_connect
-spark_connection_app_name <- function(scon) {
+#' @param sconref Spark connection reference provided by spark_connect
+spark_connection_app_name <- function(sconref) {
+  scon <- spark_connection_from_ref(sconref)
   scon$appName
 }
 
 #' TRUE if the Spark Connection is a local install
 #' @name spark_connection_is_local
 #' @export
-#' @param scon Spark connection provided by spark_connect
-spark_connection_is_local <- function(scon) {
+#' @param sconref Spark connection reference provided by spark_connect
+spark_connection_is_local <- function(sconref) {
+  scon <- spark_connection_from_ref(sconref)
   scon$isLocal
 }
 
 #' Number of cores available in the cluster
 #' @name spark_connection_cores
 #' @export
-#' @param scon Spark connection provided by spark_connect
-spark_connection_cores <- function(scon) {
+#' @param sconref Spark connection reference provided by spark_connect
+spark_connection_cores <- function(sconref) {
+  scon <- spark_connection_from_ref(sconref)
   scon$cores
+}
+
+#' Checks to see if the connection into Spark is still open
+#' @name spark_connection_is_open
+#' @export
+#' @param sconref Spark connection reference provided by spark_connect
+spark_connection_is_open <- function(sconref) {
+  scon <- spark_connection_from_ref(sconref)
+  isOpen(scon$backend) && isOpen(scon$monitor)
+}
+
+spark_connection_from_ref <- function(sconref) {
+  if (!(sconref %in% .rspark.connections)) {
+    stop("Invalid Spark connection reference")
+  }
+
+  .rspark.connections[[sconref]]
 }

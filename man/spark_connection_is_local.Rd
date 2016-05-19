@@ -4,10 +4,10 @@
 \alias{spark_connection_is_local}
 \title{TRUE if the Spark Connection is a local install}
 \usage{
-spark_connection_is_local(scon)
+spark_connection_is_local(sconref)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sconref}{Spark connection reference provided by spark_connect}
 }
 \description{
 TRUE if the Spark Connection is a local install

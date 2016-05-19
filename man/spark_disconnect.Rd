@@ -4,10 +4,10 @@
 \alias{spark_disconnect}
 \title{Disconnects from Spark and terminates the running application}
 \usage{
-spark_disconnect(scon)
+spark_disconnect(sconref)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sconref}{Spark connection reference provided by spark_connect}
 }
 \description{
 Disconnects from Spark and terminates the running application

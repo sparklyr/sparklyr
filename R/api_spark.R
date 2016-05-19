@@ -15,7 +15,7 @@ spark_api_create_sql_context <- function(scon) {
     "org.apache.spark.sql.api.r.SQLUtils",
     "createSQLContext",
 
-    scon$sc
+    spark_context(scon)
   )
 }
 
@@ -26,7 +26,7 @@ spark_api_create_hive_context <- function(scon) {
     "org.apache.spark.sql.hive.HiveContext",
     "<init>",
 
-    scon$sc
+    spark_context(scon)
   )
 }
 

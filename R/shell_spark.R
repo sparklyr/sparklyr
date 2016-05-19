@@ -18,7 +18,7 @@ read_shell_file <- function(shellFile) {
   )
 }
 
-start_shell <- function(installInfo) {
+start_shell <- function(scon, installInfo) {
   sparkHome <- installInfo$sparkVersionDir
   if (!dir.exists(sparkHome)) {
     stop("Spark installation was not found. See spark_install.")
@@ -64,20 +64,12 @@ start_shell <- function(installInfo) {
     stop("Failed to open connection to backend")
   })
 
-  con <- list(
-    monitor = monitor,
-    backend = backend,
-    outputFile = outputFile,
-    finalized = FALSE
-  )
+  scon$monitor <- monitor
+  scon$backend <- backend
+  scon$outputFile <- outputFile
+  scon$finalized <- FALSE
 
-  reg.finalizer(baseenv(), function(x) {
-    if (isOpen(con$backend) || isOpen(con$monitor)) {
-      stop_shell(con)
-    }
-  }, onexit = TRUE)
-
-  con
+  scon
 }
 
 stop_shell <- function(scon) {

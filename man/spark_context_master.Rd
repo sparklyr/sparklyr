@@ -5,10 +5,10 @@
 \alias{spark_context_master}
 \title{Retrieves master from a Spark Connection}
 \usage{
-spark_connection_master(scon)
+spark_connection_master(sconref)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sconref}{Spark connection reference provided by spark_connect}
 }
 \description{
 Retrieves master from a Spark Connection

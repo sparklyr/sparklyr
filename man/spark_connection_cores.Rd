@@ -4,10 +4,10 @@
 \alias{spark_connection_cores}
 \title{Number of cores available in the cluster}
 \usage{
-spark_connection_cores(scon)
+spark_connection_cores(sconref)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sconref}{Spark connection reference provided by spark_connect}
 }
 \description{
 Number of cores available in the cluster
