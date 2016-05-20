@@ -105,7 +105,7 @@ ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
                         secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
                         pem_file = "spark.pem")
 
-master <- spark_ec2_deploy(ci)
+spark_ec2_deploy(ci)
 
 spark_ec2_web(ci)
 spark_ec2_rstudio(ci)
@@ -116,6 +116,7 @@ spark_ec2_destroy(ci)
 
 The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.
 
+For additional configuration and examples read: [Using RSpark in EC2](docs/ec2.md)
 
 ## Extensibility
 
@@ -179,4 +180,4 @@ spark_disconnect(sc)
 
 ## Additional Resources
 
-For performance runs under various parameters, read: [Performance Tests](tests/perf/perf.md)
+For performance runs under various parameters, read: [RSpark Performance](docs/perf.md)

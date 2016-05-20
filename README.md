@@ -129,7 +129,7 @@ ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
                         secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
                         pem_file = "spark.pem")
 
-master <- spark_ec2_deploy(ci)
+spark_ec2_deploy(ci)
 
 spark_ec2_web(ci)
 spark_ec2_rstudio(ci)
@@ -139,6 +139,8 @@ spark_ec2_destroy(ci)
 ```
 
 The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.
+
+For additional configuration and examples read: [Using RSpark in EC2](docs/ec2.md)
 
 Extensibility
 -------------
@@ -197,13 +199,13 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/20 09:15:20 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/20 09:15:22 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
-    ## 16/05/20 09:15:22 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
-    ## 16/05/20 09:15:23 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/20 09:15:23 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/20 09:15:25 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
-    ## 16/05/20 09:15:25 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
+    ## 16/05/20 16:17:03 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+    ## 16/05/20 16:17:06 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/20 16:17:06 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/20 16:17:08 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
+    ## 16/05/20 16:17:08 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
+    ## 16/05/20 16:17:10 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/20 16:17:10 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
     ## 
     ## [Stage 1:>                                                          (0 + 2) / 2]
     ## 
@@ -217,4 +219,4 @@ spark_disconnect(sc)
 Additional Resources
 --------------------
 
-For performance runs under various parameters, read: [Performance Tests](tests/perf/perf.md)
+For performance runs under various parameters, read: [RSpark Performance](docs/perf.md)
