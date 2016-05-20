@@ -62,7 +62,7 @@ spark_install <- function(version = "1.6.0", reset = FALSE, logging = "INFO") {
 
   if (!dir.exists(installInfo$sparkDir)) {
     warning("Local spark directory for this project not found, creating.")
-    dir.create(installInfo$sparkDir)
+    dir.create(installInfo$sparkDir, recursive = TRUE)
   }
 
   if (!file.exists(installInfo$packageLocalPath)) {
