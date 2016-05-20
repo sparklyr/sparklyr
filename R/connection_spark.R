@@ -31,6 +31,7 @@ spark_connect <- function(master = "local[*]",
   sconInst <- start_shell(list(), scon$installInfo)
   scon$sconRef <- spark_connection_add_inst(sconInst)
 
+  sconInst$connectCall <- deparse(match.call())
   sconInst$onReconnect = list()
 
   reg.finalizer(baseenv(), function(x) {
@@ -42,9 +43,7 @@ spark_connect <- function(master = "local[*]",
   sconInst <- spark_connection_attach_context(scon, sconInst)
   spark_connection_set_inst(scon, sconInst)
 
-  connectCall <- deparse(match.call())
-
-  on_connection_opened(scon, connectCall)
+  on_connection_opened(scon, sconInst$connectCall)
 
   structure(scon, class = "spark_connection")
 }
