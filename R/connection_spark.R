@@ -10,12 +10,13 @@ methods::setOldClass("spark_connection")
 #' @param cores Number of cores available in the cluster. This if often usefull to optimize other parameters,
 #' for instance, to fine-tune the number of partitions to use when shuffling data. Use NULL to use default values
 #' or 0 to avoid any optimizations.
-#' @param reconnect Reconnects automatically to Spark on the next attempt to access an Spark resource
+#' @param reconnect Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
+#' to support long running services that need to be always connected.
 spark_connect <- function(master = "local[*]",
                           appName = "rspark",
                           version = "1.6.0",
                           cores = NULL,
-                          reconnect = TRUE) {
+                          reconnect = FALSE) {
   scon <- list(
     master = master,
     appName = appName,
@@ -27,10 +28,10 @@ spark_connect <- function(master = "local[*]",
     installInfo = spark_install_info(version)
   )
 
-  sconInst <- start_shell(scon$installInfo)
+  sconInst <- start_shell(list(), scon$installInfo)
+  scon$sconRef <- spark_connection_add_inst(sconInst)
 
   sconInst$onReconnect = list()
-  scon$sconRef <- spark_connection_add_inst(sconInst)
 
   reg.finalizer(baseenv(), function(x) {
     if (spark_connection_is_open(scon)) {
@@ -38,7 +39,8 @@ spark_connect <- function(master = "local[*]",
     }
   }, onexit = TRUE)
 
-  spark_connection_attach_context(scon)
+  sconInst <- spark_connection_attach_context(scon, sconInst)
+  spark_connection_set_inst(scon, sconInst)
 
   connectCall <- deparse(match.call())
 
@@ -47,15 +49,13 @@ spark_connect <- function(master = "local[*]",
   structure(scon, class = "spark_connection")
 }
 
-spark_connection_attach_context <- function(scon) {
-  sconInst <- spark_connection_get_inst(scon)
-
+spark_connection_attach_context <- function(scon, sconInst) {
   sconInst$sc <- spark_connection_create_context(scon, scon$master, scon$appName, scon$installInfo$sparkVersionDir)
   if (identical(sconInst$sc, NULL)) {
     stop("Failed to create Spark context")
   }
 
-  spark_connection_set_inst(scon, sconInst)
+  sconInst
 }
 
 #' Disconnects from Spark and terminates the running application
@@ -72,8 +72,6 @@ spark_disconnect <- function(scon) {
 #' @param scon Spark connection provided by spark_connect
 #' @param n Max number of log entries to retrieve
 spark_log <- function(scon, n = 100) {
-  spark_reconnect_if_needed(scon)
-
   if (!spark_connection_is_open(scon)) {
     stop("The Spark conneciton is not open anymmore, log is not available")
   }
@@ -104,8 +102,6 @@ print.spark_log <- function(x, ...) {
 #' @export
 #' @param scon Spark connection provided by spark_connect
 spark_web <- function(scon) {
-  spark_reconnect_if_needed(scon)
-
   log <- file(scon$outputFile)
   lines <- readLines(log)
   close(log)
@@ -143,21 +139,6 @@ spark_attach_connection <- function(object, scon) {
   }
 
   object
-}
-
-spark_reconnect_if_needed <- function(scon) {
-  sconInst <- spark_connection_get_inst(scon)
-  if (!spark_connection_is_open(scon) && scon$reconnect == TRUE && (identical(sconInst, NULL) || sconInst$finalized == FALSE)) {
-    installInfo <- spark_install_info(scon$version)
-    sconInst <- start_shell(installInfo)
-
-    spark_connection_set_inst(scon, sconInst)
-    spark_connection_attach_context(scon)
-
-    lapply(sconInst$onReconnects, function(onReconnect) {
-      onReconnect()
-    })
-  }
 }
 
 spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
@@ -301,44 +282,16 @@ spark_connection_cores <- function(scon) {
 spark_connection_is_open <- function(scon) {
   sconInst <- spark_connection_get_inst(scon)
 
-  backend <- sconInst$backend
-  monitor <- sconInst$monitor
-
   bothOpen <- FALSE
-  tryCatch({
-    bothOpen <- isOpen(backend) && isOpen(monitor)
-  }, error = function(e) {
-  })
+  if (!identical(sconInst, NULL)) {
+    backend <- sconInst$backend
+    monitor <- sconInst$monitor
+
+    tryCatch({
+      bothOpen <- isOpen(backend) && isOpen(monitor)
+    }, error = function(e) {
+    })
+  }
 
   bothOpen
 }
-
-# List of low-level connection references
-.rspark.connection.instances <- new.env(parent = emptyenv())
-
-spark_connection_get_inst <- function(scon) {
-  sconRef <- scon$sconRef
-  sconInst <- NULL
-  if (sconRef %in% names(.rspark.connection.instances)) {
-    sconInst <- .rspark.connection.instances[[sconRef]]
-  }
-
-  sconInst
-}
-
-spark_connection_add_inst <- function(sconInst) {
-  sconRef <- as.character(length(.rspark.connection.instances) + 1)
-  .rspark.connection.instances[[sconRef]] <- sconInst
-  sconRef
-}
-
-spark_connection_set_inst <- function(scon, sconInst) {
-  .rspark.connection.instances[[scon$sconRef]] <- sconInst
-}
-
-spark_connection_on_reconnect <- function(scon, onReconnect) {
-  sconInst <- spark_connection_get_inst(scon)
-  sconInst$onReconnect[[length(sconInst$onReconnect) + 1]] <- onReconnect
-  spark_connection_set_inst(scon, sconInst)
-}
-

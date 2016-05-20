@@ -18,7 +18,7 @@ read_shell_file <- function(shellFile) {
   )
 }
 
-start_shell <- function(installInfo) {
+start_shell <- function(sconInst, installInfo) {
   sparkHome <- installInfo$sparkVersionDir
   if (!dir.exists(sparkHome)) {
     stop("Spark installation was not found. See spark_install.")
@@ -64,22 +64,17 @@ start_shell <- function(installInfo) {
     stop("Failed to open connection to backend")
   })
 
-  con <- list(
-    monitor = monitor,
-    backend = backend,
-    outputFile = outputFile,
-    finalized = FALSE
-  )
+  sconInst$monitor <- monitor
+  sconInst$backend <- backend
+  sconInst$outputFile <- outputFile
 
-  con
+  sconInst
 }
 
 stop_shell <- function(scon) {
-  sconInst <- spark_connection_get_inst(scon)
-  sconInst$finalized <- TRUE
-  spark_connection_set_inst(scon, sconInst)
-
   spark_invoke_method(scon, FALSE, "0", "stop")
+
+  sconInst <- spark_connection_remove_inst(scon)
 
   close(sconInst$backend)
   close(sconInst$monitor)
