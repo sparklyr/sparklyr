@@ -1,4 +1,4 @@
-Package: spark
+Package: rspark
 Type: Package
 Title: Provides an R Interface to Apache Spark
 Version: 0.1.0

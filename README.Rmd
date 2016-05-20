@@ -12,7 +12,7 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE, fig.path='res/')
-library(spark)
+library(rspark)
 library(dplyr)
 library(ggplot2)
 ```
@@ -30,7 +30,7 @@ devtools::install_github("rstudio/spark")
 You can then install various versions of Spark using the `spark_install` function:
 
 ```{r, eval=FALSE}
-library(spark)
+library(rspark)
 spark_install(version = "1.6.0")
 ```
 
@@ -41,7 +41,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 
 ```{r connection, message=FALSE}
 # connect to local spark instance and get a dplyr interface
-library(spark)
+library(rspark)
 library(dplyr)
 sc <- spark_connect("local[*]", version = "1.6.0")
 db <- src_spark(sc)
@@ -100,7 +100,7 @@ batting %>%
 To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
 
 ```{r, eval=FALSE}
-library(spark)
+library(rspark)
 ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
                         secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
                         pem_file = "spark.pem")

@@ -10,7 +10,7 @@ output:
 
 ```{r}
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
-library(spark)
+library(rspark)
 library(dplyr)
 library(reshape2)
 library(ggplot2)

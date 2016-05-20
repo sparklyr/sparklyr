@@ -6,7 +6,7 @@ Initialization
 
 ``` r
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
-library(spark)
+library(rspark)
 library(dplyr)
 ```
 

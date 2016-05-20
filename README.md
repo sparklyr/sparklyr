@@ -18,7 +18,7 @@ devtools::install_github("rstudio/spark")
 You can then install various versions of Spark using the `spark_install` function:
 
 ``` r
-library(spark)
+library(rspark)
 spark_install(version = "1.6.0")
 ```
 
@@ -29,7 +29,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 
 ``` r
 # connect to local spark instance and get a dplyr interface
-library(spark)
+library(rspark)
 library(dplyr)
 sc <- spark_connect("local[*]", version = "1.6.0")
 db <- src_spark(sc)
@@ -124,7 +124,7 @@ EC2
 To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
 
 ``` r
-library(spark)
+library(rspark)
 ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
                         secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
                         pem_file = "spark.pem")

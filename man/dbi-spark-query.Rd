@@ -72,7 +72,7 @@ fetches and clears for you.
 \examples{
 \dontrun{
 library(DBI)
-library(spark)
+library(rspark)
 library(nycflights13)
 
 sc <- spark_connect()
