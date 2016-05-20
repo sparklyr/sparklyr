@@ -101,19 +101,27 @@ print.spark_log <- function(x, ...) {
 #' @export
 #' @param scon Spark connection provided by spark_connect
 spark_web <- function(scon) {
-  log <- file(scon$outputFile)
+  sconInst <- spark_connection_get_inst(scon)
+  log <- file(sconInst$outputFile)
   lines <- readLines(log)
   close(log)
 
   lines <- head(lines, n = 200)
 
+  foundMatch <- FALSE
   uiLine <- grep("Started SparkUI at ", lines, perl=TRUE, value=TRUE)
   if (length(uiLine) > 0) {
     matches <- regexpr("http://.*", uiLine, perl=TRUE)
     match <-regmatches(uiLine, matches)
     if (length(match) > 0) {
       browseURL(match)
+      foundMatch <- TRUE
     }
+  }
+
+  if (!foundMatch) {
+    warning("Spark UI URL not found in logs, attempting to guess.")
+    browseURL("http://localhost:4040")
   }
 }
 
