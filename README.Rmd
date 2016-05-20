@@ -24,6 +24,7 @@ You can install the development version of the **spark** package using **devtool
 
 ```{r, eval=FALSE}
 install.packages("devtools")
+devtools::install_github("rstudio/dplyr")
 devtools::install_github("rstudio/rspark")
 ```
 
