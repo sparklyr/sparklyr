@@ -24,7 +24,7 @@ You can install the development version of the **spark** package using **devtool
 
 ```{r, eval=FALSE}
 install.packages("devtools")
-devtools::install_github("rstudio/spark")
+devtools::install_github("rstudio/rspark")
 ```
 
 You can then install various versions of Spark using the `spark_install` function:
