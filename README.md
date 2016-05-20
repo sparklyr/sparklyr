@@ -1,7 +1,7 @@
 Spark Interface for R
 ================
 
-[![Travis-CI Build Status](https://travis-ci.com/rstudio/spark.svg?token=MxiS2SHZy3QzqFf34wQr&branch=master)](https://travis-ci.com/rstudio/spark)
+[![Travis-CI Build Status](https://travis-ci.com/rstudio/rspark.svg?token=MxiS2SHZy3QzqFf34wQr&branch=master)](https://travis-ci.com/rstudio/rspark)
 
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
 
@@ -197,15 +197,15 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/19 17:13:42 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
-    ## 16/05/19 17:13:42 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
-    ## 16/05/19 17:13:43 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/19 17:13:43 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/20 09:15:20 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/20 09:15:22 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
+    ## 16/05/20 09:15:22 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
+    ## 16/05/20 09:15:23 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/20 09:15:23 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/20 09:15:25 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
+    ## 16/05/20 09:15:25 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
     ## 
     ## [Stage 1:>                                                          (0 + 2) / 2]
-    ##                                                                                 
-    ## 
-    ## [Stage 6:>                                                          (0 + 2) / 2]
     ## 
 
 Finally, we disconnect from Spark:
