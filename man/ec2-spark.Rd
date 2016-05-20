@@ -14,7 +14,7 @@
 \title{Install an EC2 Spark cluster}
 \usage{
 spark_ec2_cluster(accessKeyId, secretAccessKey, pemPath, version = "1.6.0",
-  clusterName = "spark", instanceType = "m3.medium", region = "us-west-1")
+  clusterName = "spark", instanceType = "m3.medium", region = "us-east-1")
 
 spark_ec2_deploy(clusterInfo, instanceCount = 1, copyDir = NULL)
 
@@ -50,6 +50,8 @@ spark_ec2_web(clusterInfo)
 \item{clusterInfo}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
 
 \item{instanceCount}{The total number of EC2 instances to be provisioned.}
+
+\item{copyDir}{Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy}
 }
 \description{
 This function will install and launch a new an EC2 cluster and download required client components.

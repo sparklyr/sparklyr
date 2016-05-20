@@ -7,6 +7,7 @@
 #' @param instanceType Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".
 #' @param region The EC2 region to host this cluster.
 #' @param clusterInfo A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.
+#' @param copyDir Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy
 #' @name ec2-spark
 NULL
 
