@@ -18,8 +18,8 @@ spark_ec2_cluster <- function(
   pemPath,
   version = "1.6.0",
   clusterName = "spark",
-  instanceType = "c3.4xlarge",
-  region = "us-west-1"
+  instanceType = "m3.medium",
+  region = "us-east-1"
 ) {
   sparkInfo <- spark_check_install(version)
   validate_pem(pemPath);
@@ -45,20 +45,28 @@ spark_ec2_cluster <- function(
 #' @export
 spark_ec2_deploy <- function(
   clusterInfo,
-  instanceCount = 1) {
+  instanceCount = 1,
+  copyDir = NULL) {
   spark_check_install(clusterInfo$version)
 
-  commandParams <- paste("--region=us-east-1 ",
+  commandParams <- paste(paste("--region=", clusterInfo$region, sep = ""),
                          paste("--instance-type=", clusterInfo$instanceType, sep = ""),
                          "--copy-aws-credentials ",
                          "-s ",
                          instanceCount)
 
+  if (!identical(copyDir, NULL)) {
+    commandParams <- paste(commandParams,
+                           "--deploy-root-dir",
+                           copyDir)
+  }
+
   command <- run_ec2_command(command = paste("launch", clusterInfo$clusterName),
                              commandParams = commandParams,
-                             clusterInfo = clusterInfo)
+                             clusterInfo = clusterInfo,
+                             parse = FALSE)
 
-  spark_ec2_master(clusterInfo)
+  command
 }
 
 #' Starts a previously stopped Spark instance in EC2
@@ -70,7 +78,8 @@ spark_ec2_start <- function(
 
   run_ec2_command(command = paste("launch", clusterInfo$clusterName),
                   commandParams = "",
-                  clusterInfo = clusterInfo)
+                  clusterInfo = clusterInfo,
+                  parse = FALSE)
 }
 
 #' Stops a running Spark instance in EC2
@@ -82,7 +91,8 @@ spark_ec2_stop <- function(
   run_ec2_command(command = paste("stop", clusterInfo$clusterName),
                   commandParams = "",
                   input = "y",
-                  clusterInfo =  clusterInfo)
+                  clusterInfo =  clusterInfo,
+                  parse = FALSE)
 }
 
 #' Deletes an Spark instance in EC2
@@ -94,7 +104,8 @@ spark_ec2_destroy <- function(
   run_ec2_command(command = paste("destroy", clusterInfo$clusterName),
                   commandParams = "",
                   input = "y",
-                  clusterInfo = clusterInfo)
+                  clusterInfo = clusterInfo,
+                  parse = FALSE)
 }
 
 #' Logins into Spark in EC2
@@ -129,7 +140,8 @@ run_ec2_command <- function(command,
                             commandParams,
                             input = "",
                             clusterInfo = clusterInfo,
-                            preview = FALSE) {
+                            preview = FALSE,
+                            parse = TRUE) {
 
   variables <- paste("AWS_ACCESS_KEY_ID=",
                      clusterInfo$accessKeyId,
@@ -164,13 +176,21 @@ run_ec2_command <- function(command,
     on.exit(unlink(stdoutFile))
     on.exit(unlink(stderrFile))
 
-    system(paste(command, params, ">", stdoutFile, "2>", stderrFile), input = input)
+    if (parse) {
+      system(paste(command, params, ">", stdoutFile, "2>", stderrFile), input = input)
 
-    retval$stdout <- readLines(stdoutFile)
-    retval$stderr <- readLines(stderrFile)
+      retval$stdout <- readLines(stdoutFile)
+      retval$stderr <- readLines(stderrFile)
+
+      retval
+    }
+    else {
+      system(paste(command, params), input = input)
+    }
   }
-
-  retval
+  else {
+    retval
+  }
 }
 
 #' Opens RStudio in EC2
