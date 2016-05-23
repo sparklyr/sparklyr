@@ -32,6 +32,7 @@ Collate:
     'dbi_spark_transactions.R'
     'dplyr_spark.R'
     'dplyr_spark_connection.R'
+    'dplyr_spark_data.R'
     'dplyr_spark_table.R'
     'dplyr_sql.R'
     'ec2_spark.R'

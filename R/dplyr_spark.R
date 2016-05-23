@@ -18,6 +18,18 @@ src_spark <- function(scon) {
   db
 }
 
+spark_dbi <- function(con) {
+  con$con
+}
+
+spark_api <- function(con) {
+  spark_dbi(con)@api
+}
+
+spark_scon <- function(con) {
+  spark_api(con)$scon
+}
+
 #' @export
 src_desc.src_spark <- function(db) {
   scon <- src_context(db)
