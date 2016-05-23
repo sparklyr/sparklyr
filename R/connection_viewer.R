@@ -24,10 +24,10 @@ on_connection_opened <- function(scon, connectCall) {
       },
 
       # connection code
-      paste("sc <-", connectCall),
+      paste("library(rspark)\nsc <-", connectCall),
 
       # disconnection code (object name will be determined via finder)
-      "spark_disconnect(%s)")
+      "library(rspark)\nspark_disconnect(%s)")
   }
 }
 
