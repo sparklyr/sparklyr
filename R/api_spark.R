@@ -229,3 +229,15 @@ spark_print_schema <- function(api, tableName) {
     "printSchema"
   )
 }
+
+spark_api_read_generic <- function(api, path, fileMethod) {
+  read <- spark_invoke(spark_sql_or_hive(api), "read")
+  spark_invoke(read, fileMethod, path)
+}
+
+spark_api_write_generic <- function(df, path, fileMethod) {
+  write <- spark_invoke(df, "write")
+  spark_invoke(write, fileMethod, path)
+
+  invisible(TRUE)
+}

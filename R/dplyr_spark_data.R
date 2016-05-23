@@ -6,19 +6,22 @@
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 NULL
 
-#' Loads a CSV file and provides a data source compatible with dplyr
-#' @rdname dplyr-spark-data
-#' @export
-load_csv <- function(con, name, path, repartition = 0) {
-  api <- spark_api(con)
-  df <- spark_read_csv(api, path)
-
+spark_partition_register_df <- function(df, api, name, repartition) {
   if (repartition > 0) {
     df <- spark_invoke(df, "repartition", as.integer(repartition))
   }
 
   spark_register_temp_table(api, df, name)
   tbl(con, name)
+}
+
+#' Loads a CSV file and provides a data source compatible with dplyr
+#' @rdname dplyr-spark-data
+#' @export
+load_csv <- function(con, name, path, repartition = 0) {
+  api <- spark_api(con)
+  df <- spark_read_csv(api, path)
+  spark_partition_register_df(df, api, name, repartition)
 }
 
 spark_source_from_ops <- function(x) {
@@ -47,10 +50,21 @@ save_csv <- function(x, path) {
   spark_save_csv(sqlResult, path)
 }
 
-load_parquet <- function() {
+#' Loads a parquet file and provides a data source compatible with dplyr
+#' @rdname dplyr-spark-data
+#' @export
+load_parquet <- function(con, name, path, repartition = 0) {
+  api <- spark_api(con)
+  df <- spark_api_read_generic(api, path, "parquet")
+  spark_partition_register_df(df, api, name, repartition)
 }
 
-save_parquet <- function() {
+#' Saves dplyr operation result as a parquet file
+#' @rdname dplyr-spark-data
+#' @export
+save_parquet <- function(x, path) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  spark_api_write_generic(sqlResult, path, "parquet")
 }
 
 #' Loads a JSON file and provides a data source compatible with dplyr
@@ -58,14 +72,8 @@ save_parquet <- function() {
 #' @export
 load_json <- function(con, name, path, repartition = 0) {
   api <- spark_api(con)
-  df <- spark_read_json(api, path)
-
-  if (repartition > 0) {
-    df <- spark_invoke(df, "repartition", as.integer(repartition))
-  }
-
-  spark_register_temp_table(api, df, name)
-  tbl(con, name)
+  df <- spark_api_read_generic(api, path, "json")
+  spark_partition_register_df(df, api, name, repartition)
 }
 
 #' Saves dplyr operation result as a JSON file
@@ -73,5 +81,5 @@ load_json <- function(con, name, path, repartition = 0) {
 #' @export
 save_json <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_save_json(sqlResult, path)
+  spark_api_write_generic(sqlResult, path, "json")
 }

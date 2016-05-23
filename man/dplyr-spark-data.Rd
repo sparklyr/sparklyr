@@ -4,13 +4,19 @@
 \alias{dplyr-spark-data}
 \alias{load_csv}
 \alias{load_json}
+\alias{load_parquet}
 \alias{save_csv}
 \alias{save_json}
+\alias{save_parquet}
 \title{Loads a CSV file and provides a data source compatible with dplyr}
 \usage{
 load_csv(con, name, path, repartition = 0)
 
 save_csv(x, path)
+
+load_parquet(con, name, path, repartition = 0)
+
+save_parquet(x, path)
 
 load_json(con, name, path, repartition = 0)
 
@@ -31,6 +37,10 @@ save_json(x, path)
 Loads a CSV file and provides a data source compatible with dplyr
 
 Saves a dplyr operation result as a CSV file
+
+Loads a parquet file and provides a data source compatible with dplyr
+
+Saves dplyr operation result as a parquet file
 
 Loads a JSON file and provides a data source compatible with dplyr
 

@@ -31,15 +31,3 @@ spark_save_csv <- function(df, path) {
 
   invisible(TRUE)
 }
-
-spark_read_json <- function(api, path) {
-  read <- spark_invoke(spark_sql_or_hive(api), "read")
-  spark_invoke(read, "json", path)
-}
-
-spark_save_json <- function(df, path) {
-  write <- spark_invoke(df, "write")
-  spark_invoke(write, "save", path)
-
-  invisible(TRUE)
-}
