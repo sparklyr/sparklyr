@@ -76,7 +76,7 @@ flights %>% filter(dep_delay == 2)
 delay <- flights %>% 
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
-  filter(count > 20, dist < 2000) %>%
+  filter(count > 20, dist < 2000, !is.na(delay)) %>%
   collect
 
 # plot delays
@@ -84,7 +84,7 @@ library(ggplot2)
 ggplot(delay, aes(dist, delay)) +
   geom_point(aes(size = count), alpha = 1/2) +
   geom_smooth() +
-  scale_size_area()
+  scale_size_area(max_size = 2)
 ```
 
 ![](res/ggplot2-1.png)
@@ -200,12 +200,12 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/20 16:27:38 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
-    ## 16/05/20 16:27:39 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/20 16:27:39 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/23 16:42:14 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
+    ## 16/05/23 16:42:14 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
+    ## 16/05/23 16:42:15 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
+    ## 16/05/23 16:42:15 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
     ## 
     ## [Stage 1:>                                                          (0 + 2) / 2]
-    ## [Stage 1:=============================>                             (1 + 1) / 2]
     ##                                                                                 
     ## 
     ## [Stage 6:>                                                          (0 + 2) / 2]
