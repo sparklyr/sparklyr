@@ -97,7 +97,7 @@ setMethod("dbSendQuery", c("DBISparkConnection", "character"), function(conn, st
 #' @export
 #' @rdname dbi-spark-query
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
-  if (n == -1)
+  if (n == -1 || NROW(res@df) < n)
     res@df
   else {
     start <- 1
