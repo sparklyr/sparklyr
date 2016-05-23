@@ -1,6 +1,7 @@
 #' Connect to Spark for Dplyr.
 #'
 #' @import dplyr
+#' @import parallel
 #' @export
 #' @param scon Spark connection provided by spark_connection
 src_spark <- function(scon) {
@@ -9,7 +10,7 @@ src_spark <- function(scon) {
 
   if (spark_connection_is_local(scon)) {
     cores <- spark_connection_cores(scon)
-    cores <- if (identical(cores, NULL)) 8 else cores
+    cores <- if (identical(cores, NULL)) parallel::detectCores() else cores
     if (cores > 0) {
       dbSetProperty(dbiCon, "spark.sql.shuffle.partitions", as.character(cores))
     }
