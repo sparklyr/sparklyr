@@ -17,7 +17,7 @@ on_connection_opened <- function(scon, connectCall) {
           x <- get(name, envir = env)
           if (inherits(x, "spark_connection") &&
               identical(x$master, host)) {
-            return(x)
+            return(name)
           }
         }
         NULL
@@ -27,7 +27,7 @@ on_connection_opened <- function(scon, connectCall) {
       paste("library(rspark)\nsc <-", connectCall),
 
       # disconnection code (object name will be determined via finder)
-      "library(rspark)\nspark_disconnect(%s)")
+      "rspark::spark_disconnect(%s)")
   }
 }
 
