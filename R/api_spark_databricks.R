@@ -24,10 +24,22 @@ spark_read_csv_types <- function(api, columns) {
 }
 
 spark_save_csv <- function(df, path) {
-  read <- spark_invoke(df, "write")
+  write <- spark_invoke(df, "write")
   format <- spark_invoke(read, "format", "com.databricks.spark.csv")
   optionHeader <- spark_invoke(format, "option", "header", "true")
   spark_invoke(optionHeader, "save", path)
+
+  invisible(TRUE)
+}
+
+spark_read_json <- function(api, path) {
+  read <- spark_invoke(spark_sql_or_hive(api), "read")
+  spark_invoke(read, "json", path)
+}
+
+spark_save_json <- function(df, path) {
+  write <- spark_invoke(df, "write")
+  spark_invoke(write, "save", path)
 
   invisible(TRUE)
 }

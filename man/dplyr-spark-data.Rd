@@ -3,15 +3,23 @@
 \name{dplyr-spark-data}
 \alias{dplyr-spark-data}
 \alias{load_csv}
+\alias{load_json}
 \alias{save_csv}
+\alias{save_json}
 \title{Loads a CSV file and provides a data source compatible with dplyr}
 \usage{
-load_csv(con, path, repartition = 0)
+load_csv(con, name, path, repartition = 0)
 
 save_csv(x, path)
+
+load_json(con, name, path, repartition = 0)
+
+save_json(x, path)
 }
 \arguments{
 \item{con}{Connection to dplyr source}
+
+\item{name}{Name to reference the data source once it's loaded}
 
 \item{path}{The path to the CSV file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
 
@@ -22,6 +30,10 @@ save_csv(x, path)
 \description{
 Loads a CSV file and provides a data source compatible with dplyr
 
-Saves a dplyr sources as a CSV file
+Saves a dplyr operation result as a CSV file
+
+Loads a JSON file and provides a data source compatible with dplyr
+
+Saves dplyr operation result as a JSON file
 }
 
