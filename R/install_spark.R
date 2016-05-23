@@ -61,12 +61,10 @@ spark_install <- function(version = "1.6.0", reset = FALSE, logging = "INFO") {
   installInfo <- spark_install_info(version)
 
   if (!dir.exists(installInfo$sparkDir)) {
-    warning("Local spark directory for this project not found, creating.")
     dir.create(installInfo$sparkDir, recursive = TRUE)
   }
 
   if (!file.exists(installInfo$packageLocalPath)) {
-    warning("Spark package not found, downloading.")
     download.file(installInfo$packageRemotePath, destfile = installInfo$packageLocalPath)
   }
 
