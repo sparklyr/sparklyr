@@ -7,15 +7,16 @@ methods::setOldClass("spark_connection")
 #' @param master Master definition to Spark cluster
 #' @param appName Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster
-#' @param cores Number of cores available in the cluster. This if often usefull to optimize other parameters,
-#' for instance, to fine-tune the number of partitions to use when shuffling data. Use NULL to use default values
-#' or 0 to avoid any optimizations.
+#' @param cores Cores available for use for Spark. This option is only applicable to local installations. Use NULL
+#' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
+#' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
+#' OS schedules one thread per core.
 #' @param reconnect Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
 #' to support long running services that need to be always connected.
-spark_connect <- function(master = "local[*]",
+spark_connect <- function(master = "local",
                           appName = "rspark",
                           version = "1.6.0",
-                          cores = NULL,
+                          cores = "auto",
                           reconnect = FALSE) {
   scon <- list(
     master = master,
@@ -23,7 +24,7 @@ spark_connect <- function(master = "local[*]",
     version = version,
     cores = cores,
     useHive = compareVersion(version, "2.0.0") < 0,
-    isLocal = grepl("^local(\\[[0-9\\*]*\\])$", master, perl = TRUE),
+    isLocal = grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE),
     reconnect = reconnect,
     installInfo = spark_install_info(version)
   )
@@ -49,7 +50,12 @@ spark_connect <- function(master = "local[*]",
 }
 
 spark_connection_attach_context <- function(scon, sconInst) {
-  sconInst$sc <- spark_connection_create_context(scon, scon$master, scon$appName, scon$installInfo$sparkVersionDir)
+  master <- scon$master
+
+  if (spark_connection_is_local(scon) && scon$master == "local")
+    master <- if (scon$cores == "auto") "local[*]" else paste("local[", scon$cores, "]", sep = "")
+
+  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
   if (identical(sconInst$sc, NULL)) {
     stop("Failed to create Spark context")
   }
@@ -274,11 +280,11 @@ spark_connection_is_local <- function(scon) {
   scon$isLocal
 }
 
-#' Number of cores available in the cluster
-#' @name spark_connection_cores
+#' Number of cores available in the local install
+#' @name spark_connection_local_cores
 #' @export
 #' @param scon Spark connection provided by spark_connect
-spark_connection_cores <- function(scon) {
+spark_connection_local_cores <- function(scon) {
   scon$cores
 }
 

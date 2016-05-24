@@ -4,8 +4,8 @@
 \alias{spark_connect}
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
-spark_connect(master = "local[*]", appName = "rspark", version = "1.6.0",
-  cores = NULL, reconnect = FALSE)
+spark_connect(master = "local", appName = "rspark", version = "1.6.0",
+  cores = "auto", reconnect = FALSE)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -14,9 +14,10 @@ spark_connect(master = "local[*]", appName = "rspark", version = "1.6.0",
 
 \item{version}{Version of the Spark cluster}
 
-\item{cores}{Number of cores available in the cluster. This if often usefull to optimize other parameters,
-for instance, to fine-tune the number of partitions to use when shuffling data. Use NULL to use default values
-or 0 to avoid any optimizations.}
+\item{cores}{Cores available for use for Spark. This option is only applicable to local installations. Use NULL
+to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
+speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
+OS schedules one thread per core.}
 
 \item{reconnect}{Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
 to support long running services that need to be always connected.}
