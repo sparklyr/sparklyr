@@ -32,7 +32,7 @@ spark_connect <- function(master = "local",
   sconInst <- start_shell(list(), scon$installInfo)
   scon$sconRef <- spark_connection_add_inst(sconInst)
 
-  sconInst$connectCall <- deparse(match.call())
+  sconInst$connectCall <- paste(deparse(match.call()), collapse = " ")
   sconInst$onReconnect = list()
 
   reg.finalizer(baseenv(), function(x) {
@@ -52,7 +52,7 @@ spark_connect <- function(master = "local",
 spark_connection_attach_context <- function(scon, sconInst) {
   master <- scon$master
 
-  if (spark_connection_is_local(scon) && scon$master == "local")
+  if (spark_connection_is_local(scon) && scon$master == "local" && !identical(scon$cores, NULL))
     master <- if (scon$cores == "auto") "local[*]" else paste("local[", scon$cores, "]", sep = "")
 
   sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
