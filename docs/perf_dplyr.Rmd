@@ -46,9 +46,9 @@ spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
     spark_install(version = param$version, reset = TRUE, logging = param$logging)
     
-    optimizeShuffleForCores <- getOption("rspark.dplyr.optimizeShuffleForCores", NULL)
-    options(rspark.dplyr.optimizeShuffleForCores = param$optimizeShuffleForCores)
-    on.exit(options(rspark.dplyr.optimizeShuffleForCores = optimizeShuffleForCores))
+    shuffle <- getOption("rspark.dplyr.optimizeShuffleForCores", NULL)
+    options(rspark.dplyr.optimizeShuffleForCores = param$shuffle)
+    on.exit(options(rspark.dplyr.optimizeShuffleForCores = shuffle))
     
     sc <- spark_connect(master = param$master, cores = param$cores, version = param$version)
     
@@ -116,7 +116,7 @@ spark_perf_single_test <- function(runResults, master, cores, version, logging, 
             logging = logging,
             cache = cache,
             partitions = partitions,
-            suffle = optimizeShuffleForCores
+            shuffle = optimizeShuffleForCores
           )
         ),
         tests = list(
@@ -166,28 +166,28 @@ runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN
 results <- do.call("rbind", runResults)
 
 results <- results %>% 
-  mutate(params = paste(run, version, cores, cache, logging, partitions, suffle))
+  mutate(params = paste(run, version, cores, cache, logging, partitions, shuffle))
 ```
 
 ```{r}
 results %>%
   filter(test == "spark summarize" | test == "dplyr summarize") %>%
   rename(part = partitions) %>%
-  dcast(run + cores + version + logging + part + suffle ~ test, value.var = "elapsed")
+  dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
 ```{r}
 results %>%
   filter(test == "spark rank" | test == "dplyr rank") %>%
   rename(part = partitions) %>%
-  dcast(run + cores + version + logging + part + suffle ~ test, value.var = "elapsed")
+  dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
 ```{r}
 results %>%
   filter(test == "spark warm" | test == "dplyr warm") %>%
   rename(part = partitions) %>%
-  dcast(run + cores + version + logging + part + suffle ~ test, value.var = "elapsed")
+  dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
 ```{r}
