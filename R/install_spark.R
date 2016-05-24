@@ -84,7 +84,7 @@ spark_install <- function(version = "1.6.0", reset = FALSE, logging = "INFO") {
       reset)
   }
 
-  installInfo
+  invisible(installInfo)
 }
 
 spark_conf_file_set_value <- function(installInfo, property, value, reset) {
