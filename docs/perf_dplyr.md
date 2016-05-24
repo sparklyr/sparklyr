@@ -1,4 +1,4 @@
-Performance Benchmark
+RSpark Performance: Dplyr Queries
 ================
 
 Initialization
@@ -188,18 +188,18 @@ results %>%
 ```
 
     ##    run   master version logging part cores dplyr summarize spark summarize
-    ## 1    0    local   1.6.0    INFO    0     0           0.090           3.069
-    ## 2    1    local   1.6.0    INFO    0     0           0.091           0.514
-    ## 3    2    local   2.0.0    INFO    0     0           0.096           2.323
-    ## 4    3    local   2.0.0    INFO    0     0           0.089           0.704
-    ## 5    4 local[*]   1.6.0    INFO    0     0           0.091           2.283
-    ## 6    5 local[*]   1.6.0    WARN    0     0           0.089           2.213
-    ## 7    6 local[*]   1.6.0    WARN    0     0           0.094           0.600
-    ## 8    7 local[*]   1.6.0    WARN    8     0           0.093           0.727
-    ## 9    8 local[*]   2.0.0    WARN    8     0           0.090           0.885
-    ## 10   9 local[*]   2.0.0    WARN    0     0           0.088           0.793
-    ## 11  10 local[*]   1.6.0    WARN    0    NA           0.089           0.459
-    ## 12  11 local[*]   2.0.0    WARN    0    NA           0.096           0.661
+    ## 1    0    local   1.6.0    INFO    0     0           0.093           2.992
+    ## 2    1    local   1.6.0    INFO    0     0           0.091           0.528
+    ## 3    2    local   2.0.0    INFO    0     0           0.094           1.989
+    ## 4    3    local   2.0.0    INFO    0     0           0.088           0.700
+    ## 5    4 local[*]   1.6.0    INFO    0     0           0.087           2.246
+    ## 6    5 local[*]   1.6.0    WARN    0     0           0.088           2.219
+    ## 7    6 local[*]   1.6.0    WARN    0     0           0.092           0.539
+    ## 8    7 local[*]   1.6.0    WARN    8     0           0.090           0.780
+    ## 9    8 local[*]   2.0.0    WARN    8     0           0.085           0.988
+    ## 10   9 local[*]   2.0.0    WARN    0     0           0.089           0.782
+    ## 11  10 local[*]   1.6.0    WARN    0    NA           0.088           0.470
+    ## 12  11 local[*]   2.0.0    WARN    0    NA           0.089           0.688
 
 ``` r
 results %>%
@@ -209,18 +209,18 @@ results %>%
 ```
 
     ##    run   master version logging part cores dplyr rank spark rank
-    ## 1    0    local   1.6.0    INFO    0     0      0.790     13.315
-    ## 2    1    local   1.6.0    INFO    0     0      0.866     12.760
-    ## 3    2    local   2.0.0    INFO    0     0      0.796      6.563
-    ## 4    3    local   2.0.0    INFO    0     0      0.797      6.089
-    ## 5    4 local[*]   1.6.0    INFO    0     0      0.950      6.659
-    ## 6    5 local[*]   1.6.0    WARN    0     0      0.932      6.770
-    ## 7    6 local[*]   1.6.0    WARN    0     0      0.885      5.675
-    ## 8    7 local[*]   1.6.0    WARN    8     0      0.941      6.155
-    ## 9    8 local[*]   2.0.0    WARN    8     0      0.839      2.830
-    ## 10   9 local[*]   2.0.0    WARN    0     0      0.894      2.759
-    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.828      1.503
-    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.803      0.799
+    ## 1    0    local   1.6.0    INFO    0     0      0.805     12.863
+    ## 2    1    local   1.6.0    INFO    0     0      0.841     11.749
+    ## 3    2    local   2.0.0    INFO    0     0      0.786      6.096
+    ## 4    3    local   2.0.0    INFO    0     0      0.773      5.913
+    ## 5    4 local[*]   1.6.0    INFO    0     0      0.896      6.171
+    ## 6    5 local[*]   1.6.0    WARN    0     0      0.900      6.212
+    ## 7    6 local[*]   1.6.0    WARN    0     0      0.968      5.871
+    ## 8    7 local[*]   1.6.0    WARN    8     0      0.960      6.170
+    ## 9    8 local[*]   2.0.0    WARN    8     0      0.832      2.819
+    ## 10   9 local[*]   2.0.0    WARN    0     0      0.843      2.820
+    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.794      1.493
+    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.798      0.886
 
 ``` r
 results %>%
@@ -230,18 +230,18 @@ results %>%
 ```
 
     ##    run   master version logging part cores dplyr warm spark warm
-    ## 1    0    local   1.6.0    INFO    0     0      0.810     11.753
-    ## 2    1    local   1.6.0    INFO    0     0      0.775     11.155
-    ## 3    2    local   2.0.0    INFO    0     0      0.763      5.573
-    ## 4    3    local   2.0.0    INFO    0     0      0.835      5.403
-    ## 5    4 local[*]   1.6.0    INFO    0     0      0.930      4.993
-    ## 6    5 local[*]   1.6.0    WARN    0     0      0.940      5.006
-    ## 7    6 local[*]   1.6.0    WARN    0     0      0.876      4.094
-    ## 8    7 local[*]   1.6.0    WARN    8     0      0.914      4.719
-    ## 9    8 local[*]   2.0.0    WARN    8     0      0.856      2.721
-    ## 10   9 local[*]   2.0.0    WARN    0     0      0.835      2.266
-    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.768      0.529
-    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.798      0.447
+    ## 1    0    local   1.6.0    INFO    0     0      0.774     11.417
+    ## 2    1    local   1.6.0    INFO    0     0      0.776     10.507
+    ## 3    2    local   2.0.0    INFO    0     0      0.769      5.262
+    ## 4    3    local   2.0.0    INFO    0     0      0.767      4.997
+    ## 5    4 local[*]   1.6.0    INFO    0     0      0.882      4.777
+    ## 6    5 local[*]   1.6.0    WARN    0     0      0.886      4.734
+    ## 7    6 local[*]   1.6.0    WARN    0     0      0.943      4.336
+    ## 8    7 local[*]   1.6.0    WARN    8     0      0.937      4.644
+    ## 9    8 local[*]   2.0.0    WARN    8     0      0.823      2.268
+    ## 10   9 local[*]   2.0.0    WARN    0     0      0.826      2.258
+    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.788      0.582
+    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.783      0.447
 
 ``` r
 results %>%
@@ -252,7 +252,7 @@ results %>%
     theme(axis.text.x=element_text(angle=330, hjust = 0))
 ```
 
-![](perf_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](perf_dplyr_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 ``` r
 results %>%
@@ -262,7 +262,7 @@ results %>%
     ggtitle("Time per Run")
 ```
 
-![](perf_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](perf_dplyr_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 ``` r
 results %>%
@@ -272,7 +272,7 @@ results %>%
     ggtitle("Time per Run")
 ```
 
-![](perf_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](perf_dplyr_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
 ``` r
 results %>%
@@ -282,4 +282,4 @@ results %>%
     ggtitle("Time per Run")
 ```
 
-![](perf_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](perf_dplyr_files/figure-markdown_github/unnamed-chunk-12-1.png)
