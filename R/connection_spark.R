@@ -12,7 +12,7 @@ methods::setOldClass("spark_connection")
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 #' OS schedules one thread per core.
 #' @param reconnect Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
-#' to support long running services that need to be always connected.
+#' to support long running services that need to be always connected. This parameter is only supported for local installs.
 spark_connect <- function(master = "local",
                           appName = "rspark",
                           version = "1.6.0",
@@ -28,6 +28,10 @@ spark_connect <- function(master = "local",
     reconnect = reconnect,
     installInfo = spark_install_info(version)
   )
+
+  if (reconnect && spark_connection_is_local(scon)) {
+    stop("Reconnect is not supported on local installs")
+  }
 
   sconInst <- start_shell(list(), scon$installInfo)
   scon$sconRef <- spark_connection_add_inst(sconInst)

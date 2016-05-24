@@ -18,7 +18,7 @@ You can then install various versions of Spark using the `spark_install` functio
 
 ``` r
 library(rspark)
-spark_install(version = "1.6.0")
+spark_install(version = "1.6.0", reset = TRUE)
 ```
 
 dplyr Interface
@@ -30,7 +30,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(rspark)
 library(dplyr)
-sc <- spark_connect("local[*]", version = "1.6.0")
+sc <- spark_connect("local", cores = "auto", version = "1.6.0")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -50,7 +50,7 @@ flights %>% filter(dep_delay == 2)
 ```
 
     ## Source:   query [?? x 16]
-    ## Database: spark connection master=local[*] app=rspark local=TRUE
+    ## Database: spark connection master=local app=rspark local=TRUE
     ## 
     ##     year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
     ##    <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
@@ -100,7 +100,7 @@ batting %>%
 ```
 
     ## Source:   query [?? x 7]
-    ## Database: spark connection master=local[*] app=rspark local=TRUE
+    ## Database: spark connection master=local app=rspark local=TRUE
     ## Groups: playerID
     ## 
     ##     playerID yearID teamID     G    AB     R     H
@@ -198,16 +198,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ##  ---------------------------------------------------------------------
-    ##  |                  |            modules            ||   artifacts   |
-    ##  |       conf       | number| search|dwnlded|evicted|| number|dwnlded|
-    ##  ---------------------------------------------------------------------
-    ##  |      default     |   3   |   0   |   0   |   0   ||   3   |   0   |
-    ##  ---------------------------------------------------------------------
-    ## :: retrieving :: org.apache.spark#spark-submit-parent
-    ##  confs: [default]
-    ##  0 artifacts copied, 3 already retrieved (0kB/11ms)
-    ## 2016-05-24 10:58:11.679 java[93346:5f03] Unable to load realm info from SCDynamicStore
+    ## 16/05/24 16:10:39 INFO ContextCleaner: Cleaned shuffle 5
+    ## 16/05/24 16:10:39 INFO BlockManagerInfo: Removed broadcast_18_piece0 on localhost:50586 in memory (size: 10.3 KB, free: 487.0 MB)
+    ## 16/05/24 16:10:39 INFO ContextCleaner: Cleaned accumulator 71
+    ## 16/05/24 16:10:39 INFO Executor: Finished task 1.0 in stage 19.0 (TID 39). 2082 bytes result sent to driver
+    ## 16/05/24 16:10:39 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 39) in 57 ms on localhost (1/2)
+    ## 16/05/24 16:10:39 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
+    ## 16/05/24 16:10:39 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 59 ms on localhost (2/2)
+    ## 16/05/24 16:10:39 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.059 s
+    ## 16/05/24 16:10:39 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
+    ## 16/05/24 16:10:39 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.062998 s
 
 Finally, we disconnect from Spark:
 

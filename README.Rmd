@@ -28,9 +28,9 @@ devtools::install_github("rstudio/rspark", auth_token = "b0a1ea10dd9a5c48a9c6ffd
 
 You can then install various versions of Spark using the `spark_install` function:
 
-```{r, eval=FALSE}
+```{r}
 library(rspark)
-spark_install(version = "1.6.0")
+spark_install(version = "1.6.0", reset = TRUE)
 ```
 
 

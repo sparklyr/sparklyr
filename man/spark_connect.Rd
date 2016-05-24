@@ -20,7 +20,7 @@ speaking, this option configures the number of available threads in a local spar
 OS schedules one thread per core.}
 
 \item{reconnect}{Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
-to support long running services that need to be always connected.}
+to support long running services that need to be always connected. This parameter is only supported for local installs.}
 }
 \description{
 Connects to Spark and establishes the Spark Context
