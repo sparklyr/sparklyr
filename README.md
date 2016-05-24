@@ -11,9 +11,7 @@ Installation
 You can install the development version of the **spark** package using **devtools** as follows:
 
 ``` r
-install.packages("devtools")
-devtools::install_github("rstudio/dplyr")
-devtools::install_github("rstudio/rspark")
+devtools::install_github("rstudio/rspark", auth_token = "b0a1ea10dd9a5c48a9c6ffdb7c3fc1aac04f4dce")
 ```
 
 You can then install various versions of Spark using the `spark_install` function:
@@ -200,16 +198,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/23 16:42:14 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
-    ## 16/05/23 16:42:14 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
-    ## 16/05/23 16:42:15 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 16/05/23 16:42:15 WARN Connection: BoneCP specified but not present in CLASSPATH (or one of dependencies)
-    ## 
-    ## [Stage 1:>                                                          (0 + 2) / 2]
-    ##                                                                                 
-    ## 
-    ## [Stage 6:>                                                          (0 + 2) / 2]
-    ## 
+    ##  ---------------------------------------------------------------------
+    ##  |                  |            modules            ||   artifacts   |
+    ##  |       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+    ##  ---------------------------------------------------------------------
+    ##  |      default     |   3   |   0   |   0   |   0   ||   3   |   0   |
+    ##  ---------------------------------------------------------------------
+    ## :: retrieving :: org.apache.spark#spark-submit-parent
+    ##  confs: [default]
+    ##  0 artifacts copied, 3 already retrieved (0kB/11ms)
+    ## 2016-05-24 10:58:11.679 java[93346:5f03] Unable to load realm info from SCDynamicStore
 
 Finally, we disconnect from Spark:
 
