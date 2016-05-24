@@ -58,9 +58,11 @@ spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
     spark_install(version = param$version, reset = TRUE, logging = param$logging)
     
-    sc <- spark_connect(master = param$master,
-                        version = param$version,
-                        cores = param$cores)
+    shuffle <- getOption("rspark.dplyr.optimizeShuffleForCores", NULL)
+    options(rspark.dplyr.optimizeShuffleForCores = param$shuffle)
+    on.exit(options(rspark.dplyr.optimizeShuffleForCores = shuffle))
+    
+    sc <- spark_connect(master = param$master, cores = param$cores, version = param$version)
     
     db <- src_spark(sc)
     
@@ -102,7 +104,6 @@ spark_perf_test <- function(params, tests) {
   columnNames <- c(names(params[[1]]), list("test", "elapsed"))
   
   resultsDF <- do.call(rbind.data.frame, unlist(resultsList, recursive = FALSE))
-  #resultsDF <- data.frame(do.call(rbind, unlist(resultsList, recursive = FALSE)))
   
   colnames(resultsDF) <- columnNames
   
@@ -111,7 +112,7 @@ spark_perf_test <- function(params, tests) {
 ```
 
 ``` r
-spark_perf_single_test <- function(runResults, master, version, logging, cache, partitions, cores) {
+spark_perf_single_test <- function(runResults, master, cores, version, logging, cache, partitions, optimizeShuffleForCores) {
   run <- length(runResults)
   
   c(
@@ -122,11 +123,12 @@ spark_perf_single_test <- function(runResults, master, version, logging, cache, 
           list(
             run = run,
             master = master,
+            cores = cores,
             version = version,
             logging = logging,
             cache = cache,
             partitions = partitions,
-            cores = cores
+            shuffle = optimizeShuffleForCores
           )
         ),
         tests = list(
@@ -161,87 +163,87 @@ Results
 ``` r
 runResults <- list()
 
-runResults <- spark_perf_single_test(runResults, "local", "1.6.0", "INFO", FALSE, 0, 0)
-runResults <- spark_perf_single_test(runResults, "local", "1.6.0", "INFO", TRUE, 0, 0)
-runResults <- spark_perf_single_test(runResults, "local", "2.0.0", "INFO", FALSE, 0, 0)
-runResults <- spark_perf_single_test(runResults, "local", "2.0.0", "INFO", TRUE, 0, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "INFO", FALSE, 0, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", FALSE, 0, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", TRUE, 0, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", TRUE, 8, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "2.0.0", "WARN", TRUE, 8, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "2.0.0", "WARN", TRUE, 0, 0)
-runResults <- spark_perf_single_test(runResults, "local[*]", "1.6.0", "WARN", TRUE, 0, NULL)
-runResults <- spark_perf_single_test(runResults, "local[*]", "2.0.0", "WARN", TRUE, 0, NULL)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", FALSE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", TRUE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "INFO", FALSE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "INFO", TRUE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "INFO", FALSE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", FALSE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 8, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 8, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, TRUE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 0, TRUE)
 
 results <- do.call("rbind", runResults)
 
 results <- results %>% 
-  mutate(params = paste(run, master, version, cache, logging, partitions))
+  mutate(params = paste(run, version, cores, cache, logging, partitions, shuffle))
 ```
 
 ``` r
 results %>%
   filter(test == "spark summarize" | test == "dplyr summarize") %>%
   rename(part = partitions) %>%
-  dcast(run + master + version + logging + part + cores ~ test, value.var = "elapsed")
+  dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
-    ##    run   master version logging part cores dplyr summarize spark summarize
-    ## 1    0    local   1.6.0    INFO    0     0           0.093           2.992
-    ## 2    1    local   1.6.0    INFO    0     0           0.091           0.528
-    ## 3    2    local   2.0.0    INFO    0     0           0.094           1.989
-    ## 4    3    local   2.0.0    INFO    0     0           0.088           0.700
-    ## 5    4 local[*]   1.6.0    INFO    0     0           0.087           2.246
-    ## 6    5 local[*]   1.6.0    WARN    0     0           0.088           2.219
-    ## 7    6 local[*]   1.6.0    WARN    0     0           0.092           0.539
-    ## 8    7 local[*]   1.6.0    WARN    8     0           0.090           0.780
-    ## 9    8 local[*]   2.0.0    WARN    8     0           0.085           0.988
-    ## 10   9 local[*]   2.0.0    WARN    0     0           0.089           0.782
-    ## 11  10 local[*]   1.6.0    WARN    0    NA           0.088           0.470
-    ## 12  11 local[*]   2.0.0    WARN    0    NA           0.089           0.688
+    ##    run cores version logging part shuffle dplyr summarize spark summarize
+    ## 1    0  <NA>   1.6.0    INFO    0   FALSE           0.099           3.314
+    ## 2    1  <NA>   1.6.0    INFO    0   FALSE           0.098           0.532
+    ## 3    2  <NA>   2.0.0    INFO    0   FALSE           0.086           2.119
+    ## 4    3  <NA>   2.0.0    INFO    0   FALSE           0.104           0.669
+    ## 5    4  auto   1.6.0    INFO    0   FALSE           0.091           2.174
+    ## 6    5  auto   1.6.0    WARN    0   FALSE           0.089           2.230
+    ## 7    6  auto   1.6.0    WARN    0   FALSE           0.089           0.574
+    ## 8    7  auto   1.6.0    WARN    8   FALSE           0.085           0.745
+    ## 9    8  auto   2.0.0    WARN    8   FALSE           0.092           0.806
+    ## 10   9  auto   2.0.0    WARN    0   FALSE           0.101           0.796
+    ## 11  10  auto   1.6.0    WARN    0    TRUE           0.091           0.523
+    ## 12  11  auto   2.0.0    WARN    0    TRUE           0.091           0.643
 
 ``` r
 results %>%
   filter(test == "spark rank" | test == "dplyr rank") %>%
   rename(part = partitions) %>%
-  dcast(run + master + version + logging + part + cores ~ test, value.var = "elapsed")
+  dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
-    ##    run   master version logging part cores dplyr rank spark rank
-    ## 1    0    local   1.6.0    INFO    0     0      0.805     12.863
-    ## 2    1    local   1.6.0    INFO    0     0      0.841     11.749
-    ## 3    2    local   2.0.0    INFO    0     0      0.786      6.096
-    ## 4    3    local   2.0.0    INFO    0     0      0.773      5.913
-    ## 5    4 local[*]   1.6.0    INFO    0     0      0.896      6.171
-    ## 6    5 local[*]   1.6.0    WARN    0     0      0.900      6.212
-    ## 7    6 local[*]   1.6.0    WARN    0     0      0.968      5.871
-    ## 8    7 local[*]   1.6.0    WARN    8     0      0.960      6.170
-    ## 9    8 local[*]   2.0.0    WARN    8     0      0.832      2.819
-    ## 10   9 local[*]   2.0.0    WARN    0     0      0.843      2.820
-    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.794      1.493
-    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.798      0.886
+    ##    run cores version logging part shuffle dplyr rank spark rank
+    ## 1    0  <NA>   1.6.0    INFO    0   FALSE      0.903     14.289
+    ## 2    1  <NA>   1.6.0    INFO    0   FALSE      0.962     12.564
+    ## 3    2  <NA>   2.0.0    INFO    0   FALSE      0.789      6.304
+    ## 4    3  <NA>   2.0.0    INFO    0   FALSE      0.823      5.981
+    ## 5    4  auto   1.6.0    INFO    0   FALSE      0.922      6.165
+    ## 6    5  auto   1.6.0    WARN    0   FALSE      0.901      6.203
+    ## 7    6  auto   1.6.0    WARN    0   FALSE      0.957      5.904
+    ## 8    7  auto   1.6.0    WARN    8   FALSE      0.944      6.740
+    ## 9    8  auto   2.0.0    WARN    8   FALSE      0.878      2.913
+    ## 10   9  auto   2.0.0    WARN    0   FALSE      0.839      2.851
+    ## 11  10  auto   1.6.0    WARN    0    TRUE      0.812      1.417
+    ## 12  11  auto   2.0.0    WARN    0    TRUE      0.778      0.834
 
 ``` r
 results %>%
   filter(test == "spark warm" | test == "dplyr warm") %>%
   rename(part = partitions) %>%
-  dcast(run + master + version + logging + part + cores ~ test, value.var = "elapsed")
+  dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
-    ##    run   master version logging part cores dplyr warm spark warm
-    ## 1    0    local   1.6.0    INFO    0     0      0.774     11.417
-    ## 2    1    local   1.6.0    INFO    0     0      0.776     10.507
-    ## 3    2    local   2.0.0    INFO    0     0      0.769      5.262
-    ## 4    3    local   2.0.0    INFO    0     0      0.767      4.997
-    ## 5    4 local[*]   1.6.0    INFO    0     0      0.882      4.777
-    ## 6    5 local[*]   1.6.0    WARN    0     0      0.886      4.734
-    ## 7    6 local[*]   1.6.0    WARN    0     0      0.943      4.336
-    ## 8    7 local[*]   1.6.0    WARN    8     0      0.937      4.644
-    ## 9    8 local[*]   2.0.0    WARN    8     0      0.823      2.268
-    ## 10   9 local[*]   2.0.0    WARN    0     0      0.826      2.258
-    ## 11  10 local[*]   1.6.0    WARN    0    NA      0.788      0.582
-    ## 12  11 local[*]   2.0.0    WARN    0    NA      0.783      0.447
+    ##    run cores version logging part shuffle dplyr warm spark warm
+    ## 1    0  <NA>   1.6.0    INFO    0   FALSE      0.865     11.572
+    ## 2    1  <NA>   1.6.0    INFO    0   FALSE      0.783     10.689
+    ## 3    2  <NA>   2.0.0    INFO    0   FALSE      0.804      5.442
+    ## 4    3  <NA>   2.0.0    INFO    0   FALSE      0.756      5.224
+    ## 5    4  auto   1.6.0    INFO    0   FALSE      0.889      4.687
+    ## 6    5  auto   1.6.0    WARN    0   FALSE      0.932      4.921
+    ## 7    6  auto   1.6.0    WARN    0   FALSE      0.961      4.257
+    ## 8    7  auto   1.6.0    WARN    8   FALSE      0.916      4.698
+    ## 9    8  auto   2.0.0    WARN    8   FALSE      0.826      2.416
+    ## 10   9  auto   2.0.0    WARN    0   FALSE      0.801      2.383
+    ## 11  10  auto   1.6.0    WARN    0    TRUE      0.783      0.579
+    ## 12  11  auto   2.0.0    WARN    0    TRUE      0.799      0.458
 
 ``` r
 results %>%
