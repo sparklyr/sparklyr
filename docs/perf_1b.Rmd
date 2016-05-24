@@ -20,8 +20,6 @@ spark_conf <- function(scon, config, value) {
 }
 
 spark_sum_range <- function(scon, range) {
-  # spark.range(1000L * 1000 * 1000).selectExpr("sum(id)").show()
-  
   spark_context(scon) %>%
     spark_invoke("range", range) %>%
     spark_invoke("selectExpr", "sum(id)") %>%
