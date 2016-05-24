@@ -1,5 +1,5 @@
 ---
-title: "RSpark Performance"
+title: "RSpark Performance: Dplyr Queries"
 output:
   github_document:
     fig_width: 9

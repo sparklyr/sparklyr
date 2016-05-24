@@ -1,0 +1,33 @@
+---
+title: "RSpark Performance: 1B Rows"
+output:
+  github_document:
+    fig_width: 9
+    fig_height: 5
+---
+
+# Setup
+```{r}
+spark_install(version = "2.0.0", reset = TRUE, logging = "WARN")
+sc <- spark_connect(master = "local[*]", version = "2.0.0")
+```
+
+## Spark 1.0
+
+```
+spark.conf.set("spark.sql.codegen.wholeStage", false)
+spark.range(1000L * 1000 * 1000).selectExpr("sum(id)").show()
+```
+
+## Spark 2.0
+
+```
+spark.conf.set("spark.sql.codegen.wholeStage", true)
+spark.range(1000L * 1000 * 1000).selectExpr("sum(id)").show()
+```
+
+# Cleanup
+
+```{r}
+spark_disconnect(sc)
+```
