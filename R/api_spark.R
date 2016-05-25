@@ -41,7 +41,7 @@ spark_api_attach_scon <- function(scon) {
     }
   }
 
-  if (is.null(scon$useHive)) {
+  if (is.null(sconInst$hive)) {
     sconInst$sql <- spark_api_create_sql_context(scon)
     if (identical(sql, NULL)) {
       stop("Failed to create SQL context")
