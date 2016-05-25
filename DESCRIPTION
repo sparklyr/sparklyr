@@ -52,4 +52,5 @@ Remotes: hadley/lazyeval,
     hadley/dplyr
 Suggests:
     testthat,
-    reshape2
+    reshape2,
+    RCurl
