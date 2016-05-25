@@ -5,7 +5,8 @@
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
 spark_connect(master = "local", appName = "rspark", version = "1.6.0",
-  cores = "auto", reconnect = FALSE)
+  cores = "auto", packages = c("com.databricks:spark-csv_2.11:1.3.0"),
+  reconnect = FALSE)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -18,6 +19,8 @@ spark_connect(master = "local", appName = "rspark", version = "1.6.0",
 to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
 speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 OS schedules one thread per core.}
+
+\item{packages}{Collection of packages to load into Spark}
 
 \item{reconnect}{Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
 to support long running services that need to be always connected. This parameter is only supported for local installs.}
