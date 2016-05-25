@@ -1,3 +1,5 @@
+
+spark_install()
 scon <- spark_connect("local")
 ctx <- DBItest::make_context(DBISpark(scon), NULL)
 
