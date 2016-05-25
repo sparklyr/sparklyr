@@ -23,7 +23,7 @@ spark_connect <- function(master = "local",
     appName = appName,
     version = version,
     cores = cores,
-    useHive = compareVersion(version, "2.0.0") < 0,
+    useHive = TRUE,
     isLocal = grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE),
     reconnect = reconnect,
     installInfo = spark_install_info(version)
