@@ -105,12 +105,20 @@ spark_versions_notes_url <- function(version) {
   browseURL(link)
 }
 
-#' Retrieves a download link for the given Spark and Hadoop versions
-#' @name spark_versions_download_url
+#' Retrieves download information for the given Spark and Hadoop versions
+#' @name spark_versions_download_info
 #' @export
 #' @param sparkVersion The Spark version.
 #' @param hadoopVersion The Hadoop version.
-spark_versions_download_url <- function(sparkVersion, hadoopVersion) {
+spark_versions_download_info <- function(sparkVersion, hadoopVersion) {
+  parameterize <- function(source, sparkVersion, hadoopRelease) {
+    source <- gsub("\\$ver", sparkVersion, source)
+    source <- gsub("\\$pkg", hadoopRelease$tag, source)
+    source <- gsub("-bin-sources", "", source)
+
+    source
+  }
+
   spark_versions_validate(sparkVersion)
 
   release <- releases[[sparkVersion]]
@@ -128,23 +136,31 @@ spark_versions_download_url <- function(sparkVersion, hadoopVersion) {
     warning(paste("Hadoop version", sparkVersion, "is only partially supported in rspark"))
   }
 
-  link = "http://d3kbcqa49mib13.cloudfront.net/spark-$ver-bin-$pkg.tgz";
+  componentName <- parameterize("spark-$ver-bin-$pkg", sparkVersion, hadoopRelease)
+
+  link = "http://d3kbcqa49mib13.cloudfront.net/";
   if (sparkVersion < "0.8.0") {
-    link <- "http://spark-project.org/download/spark-$ver-bin-$pkg.tgz";
+    link <- "http://spark-project.org/download/";
   }
 
   if (length(grep("mapr", hadoopVersion)) > 0) {
-    link <- "http://package.mapr.com/tools/apache-spark/$ver/spark-$ver-bin-$pkg.tgz"
+    link <- "http://package.mapr.com/tools/apache-spark/$ver/"
   }
 
   if (sparkVersion == "2.0.0") {
-    link <- "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/latest/spark-$ver-SNAPSHOT-bin-$pkg.tgz"
+    link <- "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/latest/"
+    componentName <- parameterize("spark-$ver-SNAPSHOT-bin-$pkg", sparkVersion, hadoopRelease)
   }
 
-  link <- gsub("\\$ver", sparkVersion, link)
-  link <- gsub("\\$pkg", hadoopRelease$tag, link)
-  link <- gsub("-bin-sources", "", link)
+  packageName <- paste0(componentName, ".tgz")
+  packageSource <- parameterize(link, sparkVersion, hadoopRelease)
+  packageRemotePath <- parameterize(paste0(link, packageName), sparkVersion, hadoopRelease)
 
-  link
+  list (
+    componentName = componentName,
+    packageName = packageName,
+    packageSource = packageSource,
+    packageRemotePath = packageRemotePath
+  )
 }
 
