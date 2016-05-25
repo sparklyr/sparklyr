@@ -44,7 +44,7 @@ top_players_by_run <- function(source) {
 ```{r}
 spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
-    spark_install(version = param$version, reset = TRUE, logging = param$logging)
+    spark_install(sparkVersion = param$version, reset = TRUE, logging = param$logging)
     
     shuffle <- getOption("rspark.dplyr.optimizeShuffleForCores", NULL)
     options(rspark.dplyr.optimizeShuffleForCores = param$shuffle)

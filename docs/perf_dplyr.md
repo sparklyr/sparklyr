@@ -56,7 +56,7 @@ top_players_by_run <- function(source) {
 ``` r
 spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
-    spark_install(version = param$version, reset = TRUE, logging = param$logging)
+    spark_install(sparkVersion = param$version, reset = TRUE, logging = param$logging)
     
     shuffle <- getOption("rspark.dplyr.optimizeShuffleForCores", NULL)
     options(rspark.dplyr.optimizeShuffleForCores = param$shuffle)
@@ -190,18 +190,18 @@ results %>%
 ```
 
     ##    run cores version logging part shuffle dplyr summarize spark summarize
-    ## 1    0  <NA>   1.6.0    INFO    0   FALSE           0.099           3.314
-    ## 2    1  <NA>   1.6.0    INFO    0   FALSE           0.098           0.532
-    ## 3    2  <NA>   2.0.0    INFO    0   FALSE           0.086           2.119
-    ## 4    3  <NA>   2.0.0    INFO    0   FALSE           0.104           0.669
-    ## 5    4  auto   1.6.0    INFO    0   FALSE           0.091           2.174
-    ## 6    5  auto   1.6.0    WARN    0   FALSE           0.089           2.230
-    ## 7    6  auto   1.6.0    WARN    0   FALSE           0.089           0.574
-    ## 8    7  auto   1.6.0    WARN    8   FALSE           0.085           0.745
-    ## 9    8  auto   2.0.0    WARN    8   FALSE           0.092           0.806
-    ## 10   9  auto   2.0.0    WARN    0   FALSE           0.101           0.796
-    ## 11  10  auto   1.6.0    WARN    0    TRUE           0.091           0.523
-    ## 12  11  auto   2.0.0    WARN    0    TRUE           0.091           0.643
+    ## 1    0  <NA>   1.6.0    INFO    0   FALSE           0.086           3.005
+    ## 2    1  <NA>   1.6.0    INFO    0   FALSE           0.092           0.577
+    ## 3    2  <NA>   2.0.0    INFO    0   FALSE           0.093           1.975
+    ## 4    3  <NA>   2.0.0    INFO    0   FALSE           0.083           0.672
+    ## 5    4  auto   1.6.0    INFO    0   FALSE           0.085           2.272
+    ## 6    5  auto   1.6.0    WARN    0   FALSE           0.084           2.187
+    ## 7    6  auto   1.6.0    WARN    0   FALSE           0.086           0.658
+    ## 8    7  auto   1.6.0    WARN    8   FALSE           0.089           0.767
+    ## 9    8  auto   2.0.0    WARN    8   FALSE           0.098           0.930
+    ## 10   9  auto   2.0.0    WARN    0   FALSE           0.102           0.818
+    ## 11  10  auto   1.6.0    WARN    0    TRUE           0.094           0.480
+    ## 12  11  auto   2.0.0    WARN    0    TRUE           0.084           0.670
 
 ``` r
 results %>%
@@ -211,18 +211,18 @@ results %>%
 ```
 
     ##    run cores version logging part shuffle dplyr rank spark rank
-    ## 1    0  <NA>   1.6.0    INFO    0   FALSE      0.903     14.289
-    ## 2    1  <NA>   1.6.0    INFO    0   FALSE      0.962     12.564
-    ## 3    2  <NA>   2.0.0    INFO    0   FALSE      0.789      6.304
-    ## 4    3  <NA>   2.0.0    INFO    0   FALSE      0.823      5.981
-    ## 5    4  auto   1.6.0    INFO    0   FALSE      0.922      6.165
-    ## 6    5  auto   1.6.0    WARN    0   FALSE      0.901      6.203
-    ## 7    6  auto   1.6.0    WARN    0   FALSE      0.957      5.904
-    ## 8    7  auto   1.6.0    WARN    8   FALSE      0.944      6.740
-    ## 9    8  auto   2.0.0    WARN    8   FALSE      0.878      2.913
-    ## 10   9  auto   2.0.0    WARN    0   FALSE      0.839      2.851
-    ## 11  10  auto   1.6.0    WARN    0    TRUE      0.812      1.417
-    ## 12  11  auto   2.0.0    WARN    0    TRUE      0.778      0.834
+    ## 1    0  <NA>   1.6.0    INFO    0   FALSE      0.815     13.050
+    ## 2    1  <NA>   1.6.0    INFO    0   FALSE      0.898     12.125
+    ## 3    2  <NA>   2.0.0    INFO    0   FALSE      0.810      6.616
+    ## 4    3  <NA>   2.0.0    INFO    0   FALSE      0.845      6.278
+    ## 5    4  auto   1.6.0    INFO    0   FALSE      0.914      6.262
+    ## 6    5  auto   1.6.0    WARN    0   FALSE      0.886      7.978
+    ## 7    6  auto   1.6.0    WARN    0   FALSE      0.957      5.746
+    ## 8    7  auto   1.6.0    WARN    8   FALSE      0.898      6.246
+    ## 9    8  auto   2.0.0    WARN    8   FALSE      0.811      3.070
+    ## 10   9  auto   2.0.0    WARN    0   FALSE      0.858      2.925
+    ## 11  10  auto   1.6.0    WARN    0    TRUE      0.807      1.572
+    ## 12  11  auto   2.0.0    WARN    0    TRUE      0.850      0.925
 
 ``` r
 results %>%
@@ -232,18 +232,18 @@ results %>%
 ```
 
     ##    run cores version logging part shuffle dplyr warm spark warm
-    ## 1    0  <NA>   1.6.0    INFO    0   FALSE      0.865     11.572
-    ## 2    1  <NA>   1.6.0    INFO    0   FALSE      0.783     10.689
-    ## 3    2  <NA>   2.0.0    INFO    0   FALSE      0.804      5.442
-    ## 4    3  <NA>   2.0.0    INFO    0   FALSE      0.756      5.224
-    ## 5    4  auto   1.6.0    INFO    0   FALSE      0.889      4.687
-    ## 6    5  auto   1.6.0    WARN    0   FALSE      0.932      4.921
-    ## 7    6  auto   1.6.0    WARN    0   FALSE      0.961      4.257
-    ## 8    7  auto   1.6.0    WARN    8   FALSE      0.916      4.698
-    ## 9    8  auto   2.0.0    WARN    8   FALSE      0.826      2.416
-    ## 10   9  auto   2.0.0    WARN    0   FALSE      0.801      2.383
-    ## 11  10  auto   1.6.0    WARN    0    TRUE      0.783      0.579
-    ## 12  11  auto   2.0.0    WARN    0    TRUE      0.799      0.458
+    ## 1    0  <NA>   1.6.0    INFO    0   FALSE      0.748     11.669
+    ## 2    1  <NA>   1.6.0    INFO    0   FALSE      0.850     10.512
+    ## 3    2  <NA>   2.0.0    INFO    0   FALSE      0.785      5.321
+    ## 4    3  <NA>   2.0.0    INFO    0   FALSE      0.771      5.119
+    ## 5    4  auto   1.6.0    INFO    0   FALSE      0.914      4.856
+    ## 6    5  auto   1.6.0    WARN    0   FALSE      0.977      5.509
+    ## 7    6  auto   1.6.0    WARN    0   FALSE      0.883      4.042
+    ## 8    7  auto   1.6.0    WARN    8   FALSE      0.906      4.418
+    ## 9    8  auto   2.0.0    WARN    8   FALSE      0.870      2.356
+    ## 10   9  auto   2.0.0    WARN    0   FALSE      0.854      2.245
+    ## 11  10  auto   1.6.0    WARN    0    TRUE      0.774      0.604
+    ## 12  11  auto   2.0.0    WARN    0    TRUE      0.790      0.573
 
 ``` r
 results %>%

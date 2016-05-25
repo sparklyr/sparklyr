@@ -30,7 +30,7 @@ You can then install various versions of Spark using the `spark_install` functio
 
 ```{r}
 library(rspark)
-spark_install(version = "1.6.0", reset = TRUE)
+spark_install(sparkVersion = "1.6.0", hadoopVersion = "2.6", reset = TRUE)
 ```
 
 
