@@ -39,7 +39,14 @@ spark_connect <- function(master = "local",
   sconInst <- start_shell(list(), scon$installInfo, scon$packages)
   scon$sconRef <- spark_connection_add_inst(sconInst)
 
-  sconInst$connectCall <- paste(deparse(match.call()), collapse = " ")
+  parentCall <- match.call()
+  lapply(seq_len(length(parentCall)), function(idxCall) {
+    if (idxCall > 1) {
+      parentCall[[idxCall]] <<- eval(parentCall[[idxCall]])
+    }
+  })
+
+  sconInst$connectCall <- paste(deparse(parentCall, width.cutoff = 500), collapse = " ")
   sconInst$onReconnect = list()
 
   reg.finalizer(baseenv(), function(x) {
