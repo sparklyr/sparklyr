@@ -19,7 +19,8 @@ spark_install_info <- function(sparkVersion = "1.6.0", hadoopVersion = "2.6") {
     packageRemotePath = packageRemotePath,
     sparkVersionDir = sparkVersionDir,
     sparkConfDir = file.path(sparkVersionDir, "conf"),
-    version = version
+    version = sparkVersion,
+    installed = file.exists(sparkVersionDir)
   )
 }
 
