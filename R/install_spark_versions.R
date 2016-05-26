@@ -3,9 +3,9 @@
 h <- list(
   "2.6" =     list(name = "Hadoop 2.6 and later",     tag = "hadoop2.6",      supported = TRUE),
   "2.7" =     list(name = "Hadoop 2.7 and later",     tag = "hadoop2.7",      supported = TRUE),
-  "no" =      list(name = "User-provided Hadoop",     tag = "without-hadoop", supported = TRUE),
   "cdh4" =    list(name = "CDH 4",                    tag = "cdh4",           supported = TRUE),
 
+  "no" =      list(name = "User-provided Hadoop",     tag = "without-hadoop", supported = FALSE),
   "sources" = list(name = "Source Code",              tag = "sources",        supported = FALSE),
   "1.0" =     list(name = "Pre-built for Hadoop 1.X", tag = "hadoop1",        supported = FALSE),
   "2.0" =     list(name = "Hadoop 2.2",               tag = "hadoop2",        supported = FALSE),
