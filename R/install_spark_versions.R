@@ -81,13 +81,14 @@ spark_versions <- function(supported = TRUE) {
 #' @param sparkVersion The Spark version to match for the available hadoop distributions
 #' @param supported If TRUE (default), returns only the fully supported versions in this package.
 #' Otherwise, retrieves all versions which may be only partially supported.
+#' @return Named list of Hadoop versions supported by this version of spark.
 spark_versions_hadoop <- function(sparkVersion = "1.6.0", supported = TRUE) {
   spark_versions_validate(sparkVersion)
 
   hadoopList <- releases[[sparkVersion]]$hadoop
   hadoopList <- Filter(function(e) e$supported || !supported, hadoopList)
 
-  names(hadoopList)
+  hadoopList
 }
 
 #' Opens the release notes for the given version of Spark

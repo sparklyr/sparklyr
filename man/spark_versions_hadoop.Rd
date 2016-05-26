@@ -12,6 +12,9 @@ spark_versions_hadoop(sparkVersion = "1.6.0", supported = TRUE)
 \item{supported}{If TRUE (default), returns only the fully supported versions in this package.
 Otherwise, retrieves all versions which may be only partially supported.}
 }
+\value{
+Named list of Hadoop versions supported by this version of spark.
+}
 \description{
 Retrieves available versions of Hadoop for Spark
 }
