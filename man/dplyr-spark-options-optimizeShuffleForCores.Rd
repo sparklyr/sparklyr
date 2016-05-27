@@ -13,6 +13,6 @@ This option is only applicable to local installations. The default TRUE provides
 automatic detection of cores. To avoid using this setting, set this value to FALSE.
 }
 \examples{
-getOption("rspark.dplyr.optimizeShuffleForCores", TRUE)
+getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)
 }
 

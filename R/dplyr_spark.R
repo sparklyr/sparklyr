@@ -31,6 +31,15 @@ spark_scon <- function(con) {
   spark_api(con)$scon
 }
 
+#' Executes arbitrary SQL statements
+#' @export
+#' @param con Connection to dplyr source
+#' @param sql SQL character string to execute
+spark_sql <- function(con, sql) {
+  dbiCon <- spark_dbi(con)
+  dbGetQuery(dbiCon, sql)
+}
+
 #' @export
 src_desc.src_spark <- function(db) {
   scon <- src_context(db)
