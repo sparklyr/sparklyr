@@ -90,12 +90,10 @@ spark_install <- function(spark_version = "1.6.0", hadoop_version = "2.6", reset
     dir.create(installInfo$sparkDir, recursive = TRUE)
   }
 
-  if (!file.exists(installInfo$packageLocalPath)) {
-    download.file(installInfo$packageRemotePath, destfile = installInfo$packageLocalPath)
-  }
-
   if (!dir.exists(installInfo$sparkVersionDir)) {
+    download.file(installInfo$packageRemotePath, destfile = installInfo$packageLocalPath)
     untar(tarfile = installInfo$packageLocalPath, exdir = installInfo$sparkDir)
+    unlink(installInfo$packageLocalPath)
   }
 
   if (!file.exists(installInfo$sparkDir)) {
