@@ -40,10 +40,6 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
   on.exit(dbClearResult(res))
 
   out <- dbFetch(res, n)
-  if (warn_incomplete) {
-    dplyr:::res_warn_incomplete(res, "n = Inf")
-  }
-
   grouped_df(out, groups(x))
 }
 
