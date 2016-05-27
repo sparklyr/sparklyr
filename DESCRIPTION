@@ -1,7 +1,7 @@
 Package: rspark
 Type: Package
 Title: Provides an R Interface to Apache Spark
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("RStudio", role = c("cph"))
