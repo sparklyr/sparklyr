@@ -4,3 +4,6 @@
 ^README\.Rmd$
 ^res/
 ^docs/
+^derby\.log$
+^metastore_db$
+^spark-warehouse$
