@@ -5,7 +5,7 @@ context("Install")
 test_that_spark_download <- function(supported = TRUE) {
   lapply(spark_versions(supported = supported), function(sparkVersion) {
     lapply(names(spark_versions_hadoop(sparkVersion, supported = supported)), function(hadoopVersion) {
-      info <- spark_versions_download_info(sparkVersion, hadoopVersion)
+      info <- spark_versions_info(sparkVersion, hadoopVersion)
       link <- info$packageRemotePath
 
       expect_true(RCurl::url.exists(link), label = paste(sparkVersion, hadoopVersion), info = link)

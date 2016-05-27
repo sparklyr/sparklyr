@@ -1,16 +1,50 @@
-spark_install_info <- function(sparkVersion = "1.6.0", hadoopVersion = "2.6") {
-  versionInfo <- spark_versions_download_info(sparkVersion, hadoopVersion)
+spark_install_dir <- function() {
+  sparkDir <- getOption("rspark.install.dir", NULL)
+  if (is.null(sparkDir)) {
+    sparkDir <- rappdirs::app_dir("spark", "rstudio")$cache()
+  }
+
+  sparkDir
+}
+
+#' Check if Spark can be installed in this system
+#' @name spark_can_install
+spark_can_install <- function() {
+  sparkDir <- installInfo$sparkVersionDir
+  dir.exists(sparkDir) && file.access(sparkDir, 2) == 0
+}
+
+#' Check if the given Spark version is available in this system
+#' @name spark_install_available
+#' @param spark_version Version of Spark to install. See spark_versions.
+#' @param hadoop_version Version of Spark to install. See spark_versions_hadoop.
+spark_install_available <- function(spark_version, hadoop_version) {
+  installInfo <- spark_versions_info(spark_version, hadoop_version)
+  dir.exists(installInfo$sparkVersionDir)
+}
+
+spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL) {
+  versions <- spark_versions_df()
+  versions <- versions[versions$installed, ]
+  versions <- if (is.null(sparkVersion)) versions else versions[versions$spark == sparkVersion, ]
+  versions <- if (is.null(hadoopVersion)) versions else versions[versions$hadoop == hadoopVersion, ]
+
+  if(NROW(versions) == 0) {
+    stop("Spark version not installed. To install, use spark_install.")
+  }
+
+  spark_install_info(as.character(versions[1,]$spark), as.character(versions[1,]$hadoop))
+}
+
+spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
+  versionInfo <- spark_versions_info(sparkVersion, hadoopVersion)
 
   componentName <- versionInfo$componentName
   packageName <- versionInfo$packageName
   packageSource <- versionInfo$packageSource
   packageRemotePath <- versionInfo$packageRemotePath
 
-  sparkDir <- file.path(getwd(), "spark")
-  if (is.installed("rappdirs")) {
-    sparkDir <- rappdirs::app_dir("spark", "rstudio")$cache()
-  }
-
+  sparkDir <- spark_install_dir()
   sparkVersionDir <- file.path(sparkDir, componentName)
 
   list (
@@ -19,7 +53,8 @@ spark_install_info <- function(sparkVersion = "1.6.0", hadoopVersion = "2.6") {
     packageRemotePath = packageRemotePath,
     sparkVersionDir = sparkVersionDir,
     sparkConfDir = file.path(sparkVersionDir, "conf"),
-    version = sparkVersion,
+    sparkVersion = sparkVersion,
+    hadoopVersion = hadoopVersion,
     installed = file.exists(sparkVersionDir)
   )
 }
@@ -28,9 +63,10 @@ spark_install_info <- function(sparkVersion = "1.6.0", hadoopVersion = "2.6") {
 #' @name spark_check_install
 #' @export
 #' @import rappdirs
-#' @param version Version of Spark to install. Suppported versions: "1.6.0" (default), "2.0.0" (preview)
-spark_check_install <- function(version = "1.6.0") {
-  installInfo <- spark_install_info(version)
+#' @param spark_version Version of Spark to install. See spark_versions.
+#' @param hadoop_version Version of Spark to install. See spark_versions_hadoop.
+spark_check_install <- function(spark_version = "1.6.0", hadoop_version = "2.6") {
+  installInfo <- spark_install_info(spark_version, hadoop_version)
 
   if (!file.exists(installInfo$sparkDir)) {
     stop("Spark version not found. Install with spark_install.")
@@ -43,8 +79,8 @@ spark_check_install <- function(version = "1.6.0") {
 #' @name spark_install
 #' @export
 #' @import rappdirs
-#' @param spark_version Version of Spark to install. Suppported versions: "1.6.0" (default), "2.0.0" (preview)
-#' @param hadoop_version Version of Hadoop to install. Supported versions: "2.6" (default), "2.4", "2.3", "1.X", "CDH 4", "user-provided"
+#' @param spark_version Version of Spark to install. See spark_versions for a list of supported versions
+#' @param hadoop_version Version of Hadoop to install. See spark_versions_hadoop for a list of supported versions
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
 spark_install <- function(spark_version = "1.6.0", hadoop_version = "2.6", reset = FALSE, logging = "INFO") {

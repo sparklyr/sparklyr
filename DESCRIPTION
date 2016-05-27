@@ -33,12 +33,12 @@ Collate:
     'dplyr_spark.R'
     'dplyr_spark_connection.R'
     'dplyr_spark_data.R'
-    'dplyr_spark_options.R'
     'dplyr_spark_table.R'
     'dplyr_sql.R'
     'ec2_spark.R'
     'install_spark.R'
     'install_spark_versions.R'
+    'options_spark.R'
     'shell_spark.R'
     'utils.R'
 Imports:

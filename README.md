@@ -30,7 +30,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(rspark)
 library(dplyr)
-sc <- spark_connect("local", cores = "auto", version = "1.6.0")
+sc <- spark_connect("local", cores = "auto", spark_version = "1.6.0")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -198,16 +198,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/26 21:23:29 INFO ContextCleaner: Cleaned shuffle 5
-    ## 16/05/26 21:23:29 INFO BlockManagerInfo: Removed broadcast_18_piece0 on localhost:60318 in memory (size: 10.3 KB, free: 487.0 MB)
-    ## 16/05/26 21:23:29 INFO ContextCleaner: Cleaned accumulator 71
-    ## 16/05/26 21:23:29 INFO Executor: Finished task 1.0 in stage 19.0 (TID 39). 2082 bytes result sent to driver
-    ## 16/05/26 21:23:29 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 39) in 61 ms on localhost (1/2)
-    ## 16/05/26 21:23:29 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
-    ## 16/05/26 21:23:29 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 62 ms on localhost (2/2)
-    ## 16/05/26 21:23:29 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
-    ## 16/05/26 21:23:29 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.062 s
-    ## 16/05/26 21:23:29 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.066377 s
+    ## 16/05/26 22:33:33 INFO ContextCleaner: Cleaned shuffle 5
+    ## 16/05/26 22:33:33 INFO BlockManagerInfo: Removed broadcast_18_piece0 on localhost:53668 in memory (size: 10.3 KB, free: 487.0 MB)
+    ## 16/05/26 22:33:33 INFO ContextCleaner: Cleaned accumulator 71
+    ## 16/05/26 22:33:33 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
+    ## 16/05/26 22:33:33 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 61 ms on localhost (1/2)
+    ## 16/05/26 22:33:33 INFO Executor: Finished task 1.0 in stage 19.0 (TID 39). 2082 bytes result sent to driver
+    ## 16/05/26 22:33:33 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 39) in 61 ms on localhost (2/2)
+    ## 16/05/26 22:33:33 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.062 s
+    ## 16/05/26 22:33:33 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
+    ## 16/05/26 22:33:33 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.066060 s
 
 Finally, we disconnect from Spark:
 

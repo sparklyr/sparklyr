@@ -8,9 +8,9 @@ spark_install(spark_version = "1.6.0", hadoop_version = "2.6",
   reset = FALSE, logging = "INFO")
 }
 \arguments{
-\item{spark_version}{Version of Spark to install. Suppported versions: "1.6.0" (default), "2.0.0" (preview)}
+\item{spark_version}{Version of Spark to install. See spark_versions for a list of supported versions}
 
-\item{hadoop_version}{Version of Hadoop to install. Supported versions: "2.6" (default), "2.4", "2.3", "1.X", "CDH 4", "user-provided"}
+\item{hadoop_version}{Version of Hadoop to install. See spark_versions_hadoop for a list of supported versions}
 
 \item{reset}{Attempts to reset settings to defaults}
 

@@ -4,23 +4,25 @@
 \alias{spark_connect}
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
-spark_connect(master = "local", app_name = "rspark", version = "1.6.0",
-  cores = "auto", packages = NULL, reconnect = FALSE)
+spark_connect(master = "local", app_name = "rspark", spark_version = NULL,
+  hadoop_version = NULL, cores = "auto", packages = NULL,
+  reconnect = FALSE)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
 
 \item{app_name}{Application name to be used while running in the Spark cluster}
 
-\item{version}{Version of the Spark cluster}
+\item{spark_version}{Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.}
+
+\item{hadoop_version}{Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.}
 
 \item{cores}{Cores available for use for Spark. This option is only applicable to local installations. Use NULL
 to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
 speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 OS schedules one thread per core.}
 
-\item{packages}{Collection of packages to load into Spark. In order to override the default list of packages that rspark
-loads, set the rspark.packages.default option with a list of packages.}
+\item{packages}{Collection of packages to load into Spark. See also, the rspark.packages.default option.}
 
 \item{reconnect}{Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
 to support long running services that need to be always connected. This parameter is only supported for local installs.}

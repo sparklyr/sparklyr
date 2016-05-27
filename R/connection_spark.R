@@ -12,33 +12,38 @@ spark_default_packages <- function() {
 #' @export
 #' @param master Master definition to Spark cluster
 #' @param app_name Application name to be used while running in the Spark cluster
-#' @param version Version of the Spark cluster
+#' @param spark_version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
+#' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
 #' @param cores Cores available for use for Spark. This option is only applicable to local installations. Use NULL
 #' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 #' OS schedules one thread per core.
-#' @param packages Collection of packages to load into Spark. In order to override the default list of packages that rspark
-#' loads, set the rspark.packages.default option with a list of packages.
+#' @param packages Collection of packages to load into Spark. See also, the rspark.packages.default option.
 #' @param reconnect Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
 #' to support long running services that need to be always connected. This parameter is only supported for local installs.
 spark_connect <- function(master = "local",
                           app_name = "rspark",
-                          version = "1.6.0",
+                          spark_version = NULL,
+                          hadoop_version = NULL,
                           cores = "auto",
                           packages = NULL,
                           reconnect = FALSE) {
+  installInfo <- spark_install_find(spark_version, hadoop_version)
+  sparkVersion <- installInfo$sparkVersion
+  hadoopVersion <- installInfo$hadoopVersion
 
   packages <- c(if(is.null(packages)) list() else packages, spark_default_packages())
 
   scon <- list(
     master = master,
     appName = app_name,
-    version = version,
+    sparkVersion = spark_version,
+    hadoopVersion = hadoop_version,
     cores = cores,
     useHive = TRUE,
     isLocal = grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE),
     reconnect = reconnect,
-    installInfo = spark_install_info(version),
+    installInfo = installInfo,
     packages = packages
   )
 

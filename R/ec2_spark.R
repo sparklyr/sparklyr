@@ -48,7 +48,7 @@ spark_ec2_deploy <- function(
   cluster_info,
   instance_count = 1,
   copy_dir = NULL) {
-  spark_check_install(cluster_info$version)
+  spark_check_install(cluster_info$sparkVersion, cluster_info$hadoopVersion)
 
   commandParams <- paste(paste("--region=", cluster_info$region, sep = ""),
                          paste("--instance-type=", cluster_info$instanceType, sep = ""),

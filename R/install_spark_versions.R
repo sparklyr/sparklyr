@@ -106,12 +106,12 @@ spark_versions_notes_url <- function(version) {
   browseURL(link)
 }
 
-#' Retrieves download information for the given Spark and Hadoop versions
-#' @name spark_versions_download_info
+#' Retrieves component information for the given Spark and Hadoop versions
+#' @name spark_versions_info
 #' @export
 #' @param spark_version The Spark version.
 #' @param hadoop_version The Hadoop version.
-spark_versions_download_info <- function(spark_version, hadoop_version) {
+spark_versions_info <- function(spark_version, hadoop_version) {
   parameterize <- function(source, spark_version, hadoopRelease) {
     source <- gsub("\\$ver", spark_version, source)
     source <- gsub("\\$pkg", hadoopRelease$tag, source)
@@ -165,3 +165,19 @@ spark_versions_download_info <- function(spark_version, hadoop_version) {
   )
 }
 
+spark_versions_df <- function() {
+  sparkVersions <- spark_versions()
+  versions <- lapply(sparkVersions, function(spark) {
+    hadoopVersions <- spark_versions_hadoop(spark)
+    lapply(names(hadoopVersions), function(hadoop) {
+      installInfo <- spark_install_info(spark, hadoop)
+      list(spark, hadoop, installInfo$installed)
+    })
+  })
+
+  versions <- unlist(versions, recursive = FALSE)
+  df <- do.call(rbind.data.frame, versions)
+  colnames(df) <- list("spark", "hadoop", "installed")
+  row.names(df) <- seq_len(NROW(df))
+  df
+}
