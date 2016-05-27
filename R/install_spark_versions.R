@@ -57,7 +57,7 @@ releases <- list(
   "0.8.0" = list(hadoop = pV1, enabled = TRUE,  supported = FALSE),
   "0.7.3" = list(hadoop = pV1, enabled = TRUE,  supported = FALSE),
   "0.7.2" = list(hadoop = pV1, enabled = FALSE, supported = FALSE),
-  "0.7.0" = list(hadoop = h$s, enabled = FALSE, supported = FALSE)
+  "0.7.0" = list(hadoop = h$sources, enabled = FALSE, supported = FALSE)
 )
 
 spark_versions_validate <- function(sparkVersion) {
