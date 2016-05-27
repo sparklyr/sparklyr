@@ -4,5 +4,5 @@
 #' automatic detection of cores. To avoid using this setting, set this value to FALSE.
 #' @name dplyr-spark-options-optimizeShuffleForCores
 #' @examples
-#' getOption("rspark.dplyr.optimizeShuffleForCores", TRUE)
+#' getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)
 NULL

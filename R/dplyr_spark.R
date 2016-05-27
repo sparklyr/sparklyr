@@ -9,7 +9,7 @@ src_spark <- function(scon) {
   db <- src_sql("spark", dbiCon)
 
   if (spark_connection_is_local(scon)) {
-    if (getOption("rspark.dplyr.optimizeShuffleForCores", TRUE)) {
+    if (getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)) {
       cores <- parallel::detectCores()
       dbSetProperty(dbiCon, "spark.sql.shuffle.partitions", as.character(cores))
     }

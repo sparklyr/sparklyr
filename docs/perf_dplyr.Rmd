@@ -46,9 +46,9 @@ spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
     spark_install(sparkVersion = param$version, reset = TRUE, logging = param$logging)
     
-    shuffle <- getOption("rspark.dplyr.optimizeShuffleForCores", NULL)
-    options(rspark.dplyr.optimizeShuffleForCores = param$shuffle)
-    on.exit(options(rspark.dplyr.optimizeShuffleForCores = shuffle))
+    shuffle <- getOption("rspark.dplyr.optimize_shuffle_cores", NULL)
+    options(rspark.dplyr.optimize_shuffle_cores = param$shuffle)
+    on.exit(options(rspark.dplyr.optimize_shuffle_cores = shuffle))
     
     sc <- spark_connect(master = param$master, cores = param$cores, version = param$version)
     
