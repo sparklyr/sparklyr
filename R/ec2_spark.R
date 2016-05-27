@@ -200,7 +200,7 @@ run_ec2_command <- function(command,
 spark_ec2_rstudio <- function(
   cluster_info) {
   master <- spark_ec2_master(cluster_info)
-  browseURL(paste("http://", master, ":8787", sep = ""))
+  utils::browseURL(paste("http://", master, ":8787", sep = ""))
 }
 
 #' Opens the Spark web interface in EC2
@@ -209,5 +209,5 @@ spark_ec2_rstudio <- function(
 spark_ec2_web <- function(
   cluster_info) {
   master <- spark_ec2_master(cluster_info)
-  browseURL(paste("http://", master, "8080", sep = ""))
+  utils::browseURL(paste("http://", master, "8080", sep = ""))
 }

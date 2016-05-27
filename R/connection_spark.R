@@ -149,14 +149,14 @@ spark_web <- function(scon) {
     matches <- regexpr("http://.*", uiLine, perl=TRUE)
     match <-regmatches(uiLine, matches)
     if (length(match) > 0) {
-      browseURL(match)
+      utils::browseURL(match)
       foundMatch <- TRUE
     }
   }
 
   if (!foundMatch) {
     warning("Spark UI URL not found in logs, attempting to guess.")
-    browseURL("http://localhost:4040")
+    utils::browseURL("http://localhost:4040")
   }
 }
 

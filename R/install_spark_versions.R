@@ -103,7 +103,7 @@ spark_versions_notes_url <- function(version) {
   }
 
   link <- paste0("http://spark.apache.org/releases/spark-release-", gsub("\\.", "-", version), ".html")
-  browseURL(link)
+  utils::browseURL(link)
 }
 
 #' Retrieves component information for the given Spark and Hadoop versions
