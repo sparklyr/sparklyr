@@ -48,7 +48,7 @@ Imports:
     assertthat,
     rappdirs,
     lazyeval
-Remotes: hadley/lazyeval,
+Remotes:
     hadley/dplyr
 Suggests:
     testthat,
