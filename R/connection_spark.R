@@ -47,7 +47,7 @@ spark_connect <- function(master = "local",
     packages = packages
   )
 
-  if (reconnect && spark_connection_is_local(scon)) {
+  if (reconnect && (spark_connection_is_local(scon) && !getOption("spark.connection.allow_local_reconnect", FALSE))) {
     stop("Reconnect is not supported on local installs")
   }
 

@@ -13,8 +13,15 @@ NULL
 #' getOption("rspark.packages.default", NULL)
 NULL
 
-#' The rspark.install.dir option, defined the default Spark installation directory
+#' The rspark.install.dir option, defines the default Spark installation directory
 #' @name options-spark
 #' @examples
 #' getOption("rspark.install.dir", TRUE)
+NULL
+
+#' The spark.connection.allow_local_reconnect option, allows reconnect to
+#' be enabled in local installations to help troubleshoot remote environments.
+#' @name options-spark
+#' @examples
+#` geOption("spark.connection.allow_local_reconnect", FALSE)
 NULL
