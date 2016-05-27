@@ -4,12 +4,12 @@
 \alias{spark_versions_download_info}
 \title{Retrieves download information for the given Spark and Hadoop versions}
 \usage{
-spark_versions_download_info(sparkVersion, hadoopVersion)
+spark_versions_download_info(spark_version, hadoop_version)
 }
 \arguments{
-\item{sparkVersion}{The Spark version.}
+\item{spark_version}{The Spark version.}
 
-\item{hadoopVersion}{The Hadoop version.}
+\item{hadoop_version}{The Hadoop version.}
 }
 \description{
 Retrieves download information for the given Spark and Hadoop versions

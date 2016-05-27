@@ -13,45 +13,46 @@
 \alias{spark_ec2_web}
 \title{Install an EC2 Spark cluster}
 \usage{
-spark_ec2_cluster(accessKeyId, secretAccessKey, pemPath, version = "1.6.0",
-  clusterName = "spark", instanceType = "m3.medium", region = "us-east-1")
+spark_ec2_cluster(access_key_id, secret_access_key, pem_path,
+  version = "1.6.0", cluster_name = "spark", instance_type = "m3.medium",
+  region = "us-east-1")
 
-spark_ec2_deploy(clusterInfo, instanceCount = 1, copyDir = NULL)
+spark_ec2_deploy(cluster_info, instance_count = 1, copy_dir = NULL)
 
-spark_ec2_start(clusterInfo, instanceCount = 1)
+spark_ec2_start(cluster_info, instance_count = 1)
 
-spark_ec2_stop(clusterInfo)
+spark_ec2_stop(cluster_info)
 
-spark_ec2_destroy(clusterInfo)
+spark_ec2_destroy(cluster_info)
 
-spark_ec2_login(clusterInfo)
+spark_ec2_login(cluster_info)
 
-spark_ec2_master(clusterInfo)
+spark_ec2_master(cluster_info)
 
-spark_ec2_rstudio(clusterInfo)
+spark_ec2_rstudio(cluster_info)
 
-spark_ec2_web(clusterInfo)
+spark_ec2_web(cluster_info)
 }
 \arguments{
-\item{accessKeyId}{EC2 access key id. Create a new access key from https://console.aws.amazon.com/iam/home?#security_credential}
+\item{access_key_id}{EC2 access key id. Create a new access key from https://console.aws.amazon.com/iam/home?#security_credential}
 
-\item{secretAccessKey}{EC2 secret access key.}
+\item{secret_access_key}{EC2 secret access key.}
 
-\item{pemPath}{Identity file for ssh connections.}
+\item{pem_path}{Identity file for ssh connections.}
 
 \item{version}{The Spark version to use.}
 
-\item{clusterName}{Name used to identify cluster.}
+\item{cluster_name}{Name used to identify cluster.}
 
-\item{instanceType}{Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".}
+\item{instance_type}{Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".}
 
 \item{region}{The EC2 region to host this cluster.}
 
-\item{clusterInfo}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
+\item{cluster_info}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
 
-\item{instanceCount}{The total number of EC2 instances to be provisioned.}
+\item{instance_count}{The total number of EC2 instances to be provisioned.}
 
-\item{copyDir}{Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy}
+\item{copy_dir}{Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy}
 }
 \description{
 This function will install and launch a new an EC2 cluster and download required client components.

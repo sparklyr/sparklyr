@@ -1,38 +1,38 @@
-#' @param accessKeyId EC2 access key id. Create a new access key from https://console.aws.amazon.com/iam/home?#security_credential
-#' @param secretAccessKey EC2 secret access key.
-#' @param pemPath Identity file for ssh connections.
-#' @param instanceCount The total number of EC2 instances to be provisioned.
+#' @param access_key_id EC2 access key id. Create a new access key from https://console.aws.amazon.com/iam/home?#security_credential
+#' @param secret_access_key EC2 secret access key.
+#' @param pem_path Identity file for ssh connections.
+#' @param instance_count The total number of EC2 instances to be provisioned.
 #' @param version The Spark version to use.
-#' @param clusterName Name used to identify cluster.
-#' @param instanceType Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".
+#' @param cluster_name Name used to identify cluster.
+#' @param instance_type Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".
 #' @param region The EC2 region to host this cluster.
-#' @param clusterInfo A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.
-#' @param copyDir Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy
+#' @param cluster_info A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.
+#' @param copy_dir Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy
 #' @name ec2-spark
 NULL
 
 #' @rdname ec2-spark
 #' @export
 spark_ec2_cluster <- function(
-  accessKeyId,
-  secretAccessKey,
-  pemPath,
+  access_key_id,
+  secret_access_key,
+  pem_path,
   version = "1.6.0",
-  clusterName = "spark",
-  instanceType = "m3.medium",
-  region = "us-east-1"
+  cluster_name = "spark",
+  instance_type = "m3.medium",
+  region = "us-east-1c"
 ) {
   sparkInfo <- spark_check_install(version)
-  validate_pem(pemPath);
+  validate_pem(pem_path);
 
   list(
-    accessKeyId = accessKeyId,
-    secretAccessKey = secretAccessKey,
-    pemPath = pemPath,
+    accessKeyId = access_key_id,
+    secretAccessKey = secret_access_key,
+    pemPath = pem_path,
     sparkDir = sparkInfo$sparkVersionDir,
     version = version,
-    clusterName = clusterName,
-    instanceType = instanceType,
+    clusterName = cluster_name,
+    instanceType = instance_type,
     region = region
   )
 }
@@ -45,26 +45,26 @@ spark_ec2_cluster <- function(
 #' @rdname ec2-spark
 #' @export
 spark_ec2_deploy <- function(
-  clusterInfo,
-  instanceCount = 1,
-  copyDir = NULL) {
-  spark_check_install(clusterInfo$version)
+  cluster_info,
+  instance_count = 1,
+  copy_dir = NULL) {
+  spark_check_install(cluster_info$version)
 
-  commandParams <- paste(paste("--region=", clusterInfo$region, sep = ""),
-                         paste("--instance-type=", clusterInfo$instanceType, sep = ""),
+  commandParams <- paste(paste("--region=", cluster_info$region, sep = ""),
+                         paste("--instance-type=", cluster_info$instanceType, sep = ""),
                          "--copy-aws-credentials ",
                          "-s ",
-                         instanceCount)
+                         instance_count)
 
-  if (!identical(copyDir, NULL)) {
+  if (!identical(copy_dir, NULL)) {
     commandParams <- paste(commandParams,
                            "--deploy-root-dir",
-                           copyDir)
+                           copy_dir)
   }
 
-  command <- run_ec2_command(command = paste("launch", clusterInfo$clusterName),
+  command <- run_ec2_command(command = paste("launch", cluster_info$clusterName),
                              commandParams = commandParams,
-                             clusterInfo = clusterInfo,
+                             clusterInfo = cluster_info,
                              parse = FALSE)
 
   command
@@ -74,12 +74,12 @@ spark_ec2_deploy <- function(
 #' @rdname ec2-spark
 #' @export
 spark_ec2_start <- function(
-  clusterInfo,
-  instanceCount = 1) {
+  cluster_info,
+  instance_count = 1) {
 
-  run_ec2_command(command = paste("launch", clusterInfo$clusterName),
+  run_ec2_command(command = paste("launch", cluster_info$clusterName),
                   commandParams = "",
-                  clusterInfo = clusterInfo,
+                  clusterInfo = cluster_info,
                   parse = FALSE)
 }
 
@@ -87,12 +87,12 @@ spark_ec2_start <- function(
 #' @rdname ec2-spark
 #' @export
 spark_ec2_stop <- function(
-  clusterInfo) {
+  cluster_info) {
 
-  run_ec2_command(command = paste("stop", clusterInfo$clusterName),
+  run_ec2_command(command = paste("stop", cluster_info$clusterName),
                   commandParams = "",
                   input = "y",
-                  clusterInfo =  clusterInfo,
+                  clusterInfo =  cluster_info,
                   parse = FALSE)
 }
 
@@ -100,12 +100,12 @@ spark_ec2_stop <- function(
 #' @rdname ec2-spark
 #' @export
 spark_ec2_destroy <- function(
-  clusterInfo) {
+  cluster_info) {
 
-  run_ec2_command(command = paste("destroy", clusterInfo$clusterName),
+  run_ec2_command(command = paste("destroy", cluster_info$clusterName),
                   commandParams = "",
                   input = "y",
-                  clusterInfo = clusterInfo,
+                  clusterInfo = cluster_info,
                   parse = FALSE)
 }
 
@@ -113,12 +113,12 @@ spark_ec2_destroy <- function(
 #' @rdname ec2-spark
 #' @export
 spark_ec2_login <- function(
-  clusterInfo) {
+  cluster_info) {
 
-  res <- run_ec2_command(command = paste("login", clusterInfo$clusterName),
+  res <- run_ec2_command(command = paste("login", cluster_info$clusterName),
                          commandParams = "",
                          input = "y",
-                         clusterInfo = clusterInfo,
+                         clusterInfo = cluster_info,
                          preview = TRUE)
 
   cat(res$command)
@@ -128,19 +128,19 @@ spark_ec2_login <- function(
 #' @rdname ec2-spark
 #' @export
 spark_ec2_master <- function(
-  clusterInfo) {
-  validate_pem(clusterInfo$pemPath);
+  cluster_info) {
+  validate_pem(cluster_info$pemPath);
 
-  run_ec2_command(command = paste("get-master", clusterInfo$clusterName),
+  run_ec2_command(command = paste("get-master", cluster_info$clusterName),
                   commandParams = "",
                   input = "",
-                  clusterInfo = clusterInfo)$stdout[[3]]
+                  clusterInfo = cluster_info)$stdout[[3]]
 }
 
 run_ec2_command <- function(command,
                             commandParams,
                             input = "",
-                            clusterInfo = clusterInfo,
+                            clusterInfo = cluster_info,
                             preview = FALSE,
                             parse = TRUE) {
 
@@ -198,8 +198,8 @@ run_ec2_command <- function(command,
 #' @rdname ec2-spark
 #' @export
 spark_ec2_rstudio <- function(
-  clusterInfo) {
-  master <- spark_ec2_master(clusterInfo)
+  cluster_info) {
+  master <- spark_ec2_master(cluster_info)
   browseURL(paste("http://", master, ":8787", sep = ""))
 }
 
@@ -207,7 +207,7 @@ spark_ec2_rstudio <- function(
 #' @rdname ec2-spark
 #' @export
 spark_ec2_web <- function(
-  clusterInfo) {
-  master <- spark_ec2_master(clusterInfo)
+  cluster_info) {
+  master <- spark_ec2_master(cluster_info)
   browseURL(paste("http://", master, "8080", sep = ""))
 }

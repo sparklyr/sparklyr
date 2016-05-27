@@ -43,12 +43,12 @@ spark_check_install <- function(version = "1.6.0") {
 #' @name spark_install
 #' @export
 #' @import rappdirs
-#' @param sparkVersion Version of Spark to install. Suppported versions: "1.6.0" (default), "2.0.0" (preview)
-#' @param hadoopVersion Version of Hadoop to install. Supported versions: "2.6" (default), "2.4", "2.3", "1.X", "CDH 4", "user-provided"
+#' @param spark_version Version of Spark to install. Suppported versions: "1.6.0" (default), "2.0.0" (preview)
+#' @param hadoop_version Version of Hadoop to install. Supported versions: "2.6" (default), "2.4", "2.3", "1.X", "CDH 4", "user-provided"
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
-spark_install <- function(sparkVersion = "1.6.0", hadoopVersion = "2.6", reset = FALSE, logging = "INFO") {
-  installInfo <- spark_install_info(sparkVersion, hadoopVersion)
+spark_install <- function(spark_version = "1.6.0", hadoop_version = "2.6", reset = FALSE, logging = "INFO") {
+  installInfo <- spark_install_info(spark_version, hadoop_version)
 
   if (!dir.exists(installInfo$sparkDir)) {
     dir.create(installInfo$sparkDir, recursive = TRUE)

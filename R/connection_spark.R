@@ -5,7 +5,7 @@ methods::setOldClass("spark_connection")
 #' @name spark_connect
 #' @export
 #' @param master Master definition to Spark cluster
-#' @param appName Application name to be used while running in the Spark cluster
+#' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster
 #' @param cores Cores available for use for Spark. This option is only applicable to local installations. Use NULL
 #' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
@@ -15,14 +15,14 @@ methods::setOldClass("spark_connection")
 #' @param reconnect Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
 #' to support long running services that need to be always connected. This parameter is only supported for local installs.
 spark_connect <- function(master = "local",
-                          appName = "rspark",
+                          app_name = "rspark",
                           version = "1.6.0",
                           cores = "auto",
                           packages = c("com.databricks:spark-csv_2.11:1.3.0"),
                           reconnect = FALSE) {
   scon <- list(
     master = master,
-    appName = appName,
+    appName = app_name,
     version = version,
     cores = cores,
     useHive = TRUE,
