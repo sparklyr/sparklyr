@@ -2,7 +2,7 @@
 spark_reconnect_if_needed <- function(scon) {
   sconInst <- spark_connection_get_inst(scon)
   if (!spark_connection_is_open(scon) && scon$reconnect == TRUE && !identical(sconInst, NULL)) {
-    installInfo <- spark_install_info(scon$sparkVersion, scon$hadoopVersion)
+    installInfo <- spark_install_find(scon$sparkVersion, scon$hadoopVersion)
 
     sconInst <- start_shell(sconInst, installInfo, scon$packages)
     spark_connection_set_inst(scon, sconInst)
