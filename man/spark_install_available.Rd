@@ -4,10 +4,10 @@
 \alias{spark_install_available}
 \title{Check if the given Spark version is available in this system}
 \usage{
-spark_install_available(spark_version, hadoop_version)
+spark_install_available(version, hadoop_version)
 }
 \arguments{
-\item{spark_version}{Version of Spark to install. See spark_versions.}
+\item{version}{Version of Spark to install. See spark_versions.}
 
 \item{hadoop_version}{Version of Spark to install. See spark_versions_hadoop.}
 }

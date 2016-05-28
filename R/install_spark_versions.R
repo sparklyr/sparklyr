@@ -78,14 +78,14 @@ spark_versions <- function(supported = TRUE) {
 #' Retrieves available versions of Hadoop for Spark
 #' @name spark_versions_hadoop
 #' @export
-#' @param spark_version The Spark version to match for the available hadoop distributions
+#' @param version The Spark version to match for the available hadoop distributions
 #' @param supported If TRUE (default), returns only the fully supported versions in this package.
 #' Otherwise, retrieves all versions which may be only partially supported.
 #' @return Named list of Hadoop versions supported by this version of spark.
-spark_versions_hadoop <- function(spark_version = "1.6.0", supported = TRUE) {
-  spark_versions_validate(spark_version)
+spark_versions_hadoop <- function(version = "1.6.0", supported = TRUE) {
+  spark_versions_validate(version)
 
-  hadoopList <- releases[[spark_version]]$hadoop
+  hadoopList <- releases[[version]]$hadoop
   hadoopList <- Filter(function(e) e$supported || !supported, hadoopList)
 
   hadoopList
@@ -109,38 +109,38 @@ spark_versions_notes_url <- function(version) {
 #' Retrieves component information for the given Spark and Hadoop versions
 #' @name spark_versions_info
 #' @export
-#' @param spark_version The Spark version.
+#' @param version The Spark version.
 #' @param hadoop_version The Hadoop version.
-spark_versions_info <- function(spark_version, hadoop_version) {
-  parameterize <- function(source, spark_version, hadoopRelease) {
-    source <- gsub("\\$ver", spark_version, source)
+spark_versions_info <- function(version, hadoop_version) {
+  parameterize <- function(source, version, hadoopRelease) {
+    source <- gsub("\\$ver", version, source)
     source <- gsub("\\$pkg", hadoopRelease$tag, source)
     source <- gsub("-bin-sources", "", source)
 
     source
   }
 
-  spark_versions_validate(spark_version)
+  spark_versions_validate(version)
 
-  release <- releases[[spark_version]]
+  release <- releases[[version]]
 
   if (!hadoop_version %in% names(release$hadoop)) {
     stop("Hadoop version is not available")
   }
-  hadoopRelease <- releases[[spark_version]]$hadoop[[hadoop_version]]
+  hadoopRelease <- releases[[version]]$hadoop[[hadoop_version]]
 
   if (!release$supported) {
-    warning(paste("Spark version", spark_version, "is only partially supported in rspark"))
+    warning(paste("Spark version", version, "is only partially supported in rspark"))
   }
 
   if (!hadoopRelease$supported) {
-    warning(paste("Hadoop version", spark_version, "is only partially supported in rspark"))
+    warning(paste("Hadoop version", version, "is only partially supported in rspark"))
   }
 
-  componentName <- parameterize("spark-$ver-bin-$pkg", spark_version, hadoopRelease)
+  componentName <- parameterize("spark-$ver-bin-$pkg", version, hadoopRelease)
 
   link = "http://d3kbcqa49mib13.cloudfront.net/";
-  if (spark_version < "0.8.0") {
+  if (version < "0.8.0") {
     link <- "http://spark-project.org/download/";
   }
 
@@ -148,14 +148,14 @@ spark_versions_info <- function(spark_version, hadoop_version) {
     link <- "http://package.mapr.com/tools/apache-spark/$ver/"
   }
 
-  if (spark_version == "2.0.0") {
+  if (version == "2.0.0") {
     link <- "http://people.apache.org/~pwendell/spark-nightly/spark-master-bin/latest/"
-    componentName <- parameterize("spark-$ver-SNAPSHOT-bin-$pkg", spark_version, hadoopRelease)
+    componentName <- parameterize("spark-$ver-SNAPSHOT-bin-$pkg", version, hadoopRelease)
   }
 
   packageName <- paste0(componentName, ".tgz")
-  packageSource <- parameterize(link, spark_version, hadoopRelease)
-  packageRemotePath <- parameterize(paste0(link, packageName), spark_version, hadoopRelease)
+  packageSource <- parameterize(link, version, hadoopRelease)
+  packageRemotePath <- parameterize(paste0(link, packageName), version, hadoopRelease)
 
   list (
     componentName = componentName,

@@ -4,11 +4,11 @@
 \alias{spark_install}
 \title{Provides support to download and install the given Spark version}
 \usage{
-spark_install(spark_version = "1.6.0", hadoop_version = "2.6",
-  reset = FALSE, logging = "INFO")
+spark_install(version = "1.6.0", hadoop_version = "2.6", reset = FALSE,
+  logging = "INFO")
 }
 \arguments{
-\item{spark_version}{Version of Spark to install. See spark_versions for a list of supported versions}
+\item{version}{Version of Spark to install. See spark_versions for a list of supported versions}
 
 \item{hadoop_version}{Version of Hadoop to install. See spark_versions_hadoop for a list of supported versions}
 

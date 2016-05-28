@@ -4,10 +4,10 @@
 \alias{spark_check_install}
 \title{Validates that the given Spark version has been downloaded and installed locally}
 \usage{
-spark_check_install(spark_version = "1.6.0", hadoop_version = "2.6")
+spark_check_install(version = "1.6.0", hadoop_version = "2.6")
 }
 \arguments{
-\item{spark_version}{Version of Spark to install. See spark_versions.}
+\item{version}{Version of Spark to install. See spark_versions.}
 
 \item{hadoop_version}{Version of Spark to install. See spark_versions_hadoop.}
 }

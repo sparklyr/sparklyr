@@ -30,7 +30,7 @@ You can then install various versions of Spark using the `spark_install` functio
 
 ```{r}
 library(rspark)
-spark_install(spark_version = "1.6.0", hadoop_version = "2.6", reset = TRUE)
+spark_install(version = "1.6.0", hadoop_version = "2.6", reset = TRUE)
 ```
 
 
@@ -42,7 +42,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(rspark)
 library(dplyr)
-sc <- spark_connect("local", cores = "auto", spark_version = "1.6.0")
+sc <- spark_connect("local", cores = "auto", version = "1.6.0")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark

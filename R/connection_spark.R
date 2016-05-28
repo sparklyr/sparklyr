@@ -12,7 +12,7 @@ spark_default_packages <- function() {
 #' @export
 #' @param master Master definition to Spark cluster
 #' @param app_name Application name to be used while running in the Spark cluster
-#' @param spark_version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
+#' @param version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
 #' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
 #' @param cores Cores available for use for Spark. This option is only applicable to local installations. Use NULL
 #' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
@@ -23,12 +23,12 @@ spark_default_packages <- function() {
 #' to support long running services that need to be always connected. This parameter is only supported for local installs.
 spark_connect <- function(master = "local",
                           app_name = "rspark",
-                          spark_version = NULL,
+                          version = NULL,
                           hadoop_version = NULL,
                           cores = "auto",
                           packages = NULL,
                           reconnect = FALSE) {
-  installInfo <- spark_install_find(spark_version, hadoop_version)
+  installInfo <- spark_install_find(version, hadoop_version)
   sparkVersion <- installInfo$sparkVersion
   hadoopVersion <- installInfo$hadoopVersion
 
@@ -37,7 +37,7 @@ spark_connect <- function(master = "local",
   scon <- list(
     master = master,
     appName = app_name,
-    sparkVersion = spark_version,
+    sparkVersion = version,
     hadoopVersion = hadoop_version,
     cores = cores,
     useHive = TRUE,

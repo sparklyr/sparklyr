@@ -14,7 +14,10 @@ automatic detection of cores. To avoid using this setting, set this value to FAL
 
 The rspark.packages.default option, overrides the default Spark packages
 
-The rspark.install.dir option, defined the default Spark installation directory
+The rspark.install.dir option, defines the default Spark installation directory
+
+The spark.connection.allow_local_reconnect option, allows reconnect to
+be enabled in local installations to help troubleshoot remote environments.
 }
 \examples{
 getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)

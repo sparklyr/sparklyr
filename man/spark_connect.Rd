@@ -4,7 +4,7 @@
 \alias{spark_connect}
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
-spark_connect(master = "local", app_name = "rspark", spark_version = NULL,
+spark_connect(master = "local", app_name = "rspark", version = NULL,
   hadoop_version = NULL, cores = "auto", packages = NULL,
   reconnect = FALSE)
 }
@@ -13,7 +13,7 @@ spark_connect(master = "local", app_name = "rspark", spark_version = NULL,
 
 \item{app_name}{Application name to be used while running in the Spark cluster}
 
-\item{spark_version}{Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.}
+\item{version}{Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.}
 
 \item{hadoop_version}{Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.}
 

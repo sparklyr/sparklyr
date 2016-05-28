@@ -4,10 +4,10 @@
 \alias{spark_versions_info}
 \title{Retrieves component information for the given Spark and Hadoop versions}
 \usage{
-spark_versions_info(spark_version, hadoop_version)
+spark_versions_info(version, hadoop_version)
 }
 \arguments{
-\item{spark_version}{The Spark version.}
+\item{version}{The Spark version.}
 
 \item{hadoop_version}{The Hadoop version.}
 }

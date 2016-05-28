@@ -4,10 +4,10 @@
 \alias{spark_versions_hadoop}
 \title{Retrieves available versions of Hadoop for Spark}
 \usage{
-spark_versions_hadoop(spark_version = "1.6.0", supported = TRUE)
+spark_versions_hadoop(version = "1.6.0", supported = TRUE)
 }
 \arguments{
-\item{spark_version}{The Spark version to match for the available hadoop distributions}
+\item{version}{The Spark version to match for the available hadoop distributions}
 
 \item{supported}{If TRUE (default), returns only the fully supported versions in this package.
 Otherwise, retrieves all versions which may be only partially supported.}
