@@ -23,5 +23,6 @@ be enabled in local installations to help troubleshoot remote environments.
 getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)
 getOption("rspark.packages.default", NULL)
 getOption("rspark.install.dir", TRUE)
+geOption("spark.connection.allow_local_reconnect", FALSE)
 }
 

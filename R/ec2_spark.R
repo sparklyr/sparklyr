@@ -18,22 +18,25 @@ spark_ec2_cluster <- function(
   secret_access_key,
   pem_file,
   version = "1.6.0",
+  hadoop_version = "2.6",
   cluster_name = "spark",
   instance_type = "m3.medium",
-  region = "us-east-1c"
+  region = NULL
 ) {
-  sparkInfo <- spark_check_install(version)
+  installInfo <- spark_install_find(version, hadoop_version)
   validate_pem(pem_file);
 
   list(
     accessKeyId = access_key_id,
     secretAccessKey = secret_access_key,
     pemFile = pem_file,
-    sparkDir = sparkInfo$sparkVersionDir,
+    sparkDir = installInfo$sparkVersionDir,
     version = version,
+    hadoopVersion = hadoop_version,
     clusterName = cluster_name,
     instanceType = instance_type,
-    region = region
+    region = region,
+    installInfo = installInfo
   )
 }
 
@@ -48,12 +51,22 @@ spark_ec2_deploy <- function(
   cluster_info,
   instance_count = 1,
   copy_dir = NULL) {
-  spark_check_install(cluster_info$sparkVersion, cluster_info$hadoopVersion)
 
-  commandParams <- paste(paste("--region=", cluster_info$region, sep = ""),
-                         paste("--instance-type=", cluster_info$instanceType, sep = ""),
-                         "--copy-aws-credentials ",
-                         "-s ",
+  commandParams <- ""
+  if (!is.null(cluster_info$region)) {
+    commandParams <- paste(commandParams,
+                           paste("--region", cluster_info$region, sep = "="))
+  }
+
+  commandParams <- ""
+  if (!is.null(cluster_info$instanceType)) {
+    commandParams <- paste(commandParams,
+                           paste("--instance-type", cluster_info$instanceType, sep = "="))
+  }
+
+  commandParams <- paste(commandParams,
+                         "--copy-aws-credentials",
+                         "-s",
                          instance_count)
 
   if (!identical(copy_dir, NULL)) {

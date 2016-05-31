@@ -14,8 +14,8 @@
 \title{Install an EC2 Spark cluster}
 \usage{
 spark_ec2_cluster(access_key_id, secret_access_key, pem_file,
-  version = "1.6.0", cluster_name = "spark", instance_type = "m3.medium",
-  region = "us-east-1c")
+  version = "1.6.0", hadoop_version = "2.6", cluster_name = "spark",
+  instance_type = "m3.medium", region = NULL)
 
 spark_ec2_deploy(cluster_info, instance_count = 1, copy_dir = NULL)
 

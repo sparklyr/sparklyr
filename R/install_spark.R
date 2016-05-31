@@ -24,7 +24,7 @@ spark_install_available <- function(version, hadoop_version) {
 }
 
 spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL) {
-  versions <- spark_versions_df()
+  versions <- spark_versions()
   versions <- versions[versions$installed, ]
   versions <- if (is.null(sparkVersion)) versions else versions[versions$spark == sparkVersion, ]
   versions <- if (is.null(hadoopVersion)) versions else versions[versions$hadoop == hadoopVersion, ]
@@ -45,7 +45,6 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 
   componentName <- versionInfo$componentName
   packageName <- versionInfo$packageName
-  packageSource <- versionInfo$packageSource
   packageRemotePath <- versionInfo$packageRemotePath
 
   sparkDir <- spark_install_dir()
@@ -61,22 +60,6 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
     hadoopVersion = hadoopVersion,
     installed = file.exists(sparkVersionDir)
   )
-}
-
-#' Validates that the given Spark version has been downloaded and installed locally
-#' @name spark_check_install
-#' @export
-#' @import rappdirs
-#' @param version Version of Spark to install. See spark_versions.
-#' @param hadoop_version Version of Spark to install. See spark_versions_hadoop.
-spark_check_install <- function(version = "1.6.0", hadoop_version = "2.6") {
-  installInfo <- spark_install_info(version, hadoop_version)
-
-  if (!file.exists(installInfo$sparkDir)) {
-    stop("Spark version not found. Install with spark_install.")
-  }
-
-  installInfo
 }
 
 #' Provides support to download and install the given Spark version

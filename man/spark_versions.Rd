@@ -4,11 +4,7 @@
 \alias{spark_versions}
 \title{Retrieves available versions of Spark}
 \usage{
-spark_versions(supported = TRUE)
-}
-\arguments{
-\item{supported}{If TRUE (default), returns only the fully supported versions in this package.
-Otherwise, retrieves all versions which may be only partially supported.}
+spark_versions()
 }
 \description{
 Retrieves available versions of Spark
