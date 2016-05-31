@@ -6,7 +6,7 @@ spark_versions_file_pattern <- function() {
 #' @name spark_versions
 #' @export
 spark_versions <- function() {
-  latestUrl <- "https://raw.githubusercontent.com/rstudio/rspark/master/inst/extdata/install_spark.csv"
+  latestUrl <- "https://raw.githubusercontent.com/rstudio/rspark/master/inst/extdata/install_spark.csv?token=ASpg1JXmAK-o17WIKBe1ZuoV2CC1gamKks5XVzebwA%3D%3D"
   packagePath <- system.file(file.path("extdata", "install_spark.csv"), package = "rspark")
 
   downloadData <- NULL
@@ -18,7 +18,7 @@ spark_versions <- function() {
   })
 
   if (is.null(downloadData) || is.null(downloadData$spark)) {
-    warning("Failed to retrieve the latest download links")
+    # warning("Failed to retrieve the latest download links")
     downloadData <- read.csv(packagePath, stringsAsFactors = FALSE)
   }
 
