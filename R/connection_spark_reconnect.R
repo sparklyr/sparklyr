@@ -18,16 +18,14 @@ spark_reconnect_if_needed <- function(scon) {
   }
 }
 
+sparkConnectionsEnv <- new.env(parent = emptyenv())
+
 spark_connection_global_inst <- function(instances = NULL) {
-  if (!exists(".rspark.connections", envir = globalenv())) {
-    assign(".rspark.connections", list(), envir = globalenv())
-  }
-
   if (!identical(instances, NULL)) {
-    assign(".rspark.connections", instances, envir = globalenv())
+    sparkConnectionsEnv$.rspark.connections <- instances
   }
 
-  get(".rspark.connections" , envir = globalenv())
+  sparkConnectionsEnv$.rspark.connections
 }
 
 spark_connection_get_inst <- function(scon) {

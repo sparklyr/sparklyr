@@ -20,7 +20,9 @@ spark_default_packages <- function() {
 #' OS schedules one thread per core.
 #' @param packages Collection of packages to load into Spark. See also, the rspark.packages.default option.
 #' @param reconnect Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
-#' to support long running services that need to be always connected. This parameter is only supported for local installs.
+#' to support long running services that need to be always connected. This parameter is not supported for local installs.
+#' Reconnect requires the package to not be unloaded, and therefore, is more suitable to improve intermittent connectivity
+#' with Spark.
 spark_connect <- function(master = "local",
                           app_name = "rspark",
                           version = NULL,
@@ -40,7 +42,6 @@ spark_connect <- function(master = "local",
     sparkVersion = version,
     hadoopVersion = hadoop_version,
     cores = cores,
-    useHive = TRUE,
     isLocal = grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE),
     reconnect = reconnect,
     installInfo = installInfo,
@@ -189,6 +190,10 @@ spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
   #
   #   See: https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
   #
+  if (is.null(scon)) {
+    stop("The connection is no longer valid. Recreate using spark_connect.")
+  }
+
   spark_reconnect_if_needed(scon)
 
   rc <- rawConnection(raw(), "r+")
