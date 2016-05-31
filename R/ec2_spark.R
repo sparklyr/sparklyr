@@ -17,8 +17,8 @@ spark_ec2_cluster <- function(
   access_key_id,
   secret_access_key,
   pem_file,
-  version = "1.6.0",
-  hadoop_version = "2.6",
+  version = NULL,
+  hadoop_version = NULL,
   cluster_name = "spark",
   instance_type = "m3.medium",
   region = NULL

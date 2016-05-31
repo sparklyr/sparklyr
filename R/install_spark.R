@@ -37,6 +37,7 @@ spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL) {
     stop(paste("Spark version not installed. To install, use ", deparse(sparkInstall)))
   }
 
+  versions <- versions[with(versions, order(-default, -hadoop_default)), ]
   spark_install_info(as.character(versions[1,]$spark), as.character(versions[1,]$hadoop))
 }
 
@@ -70,8 +71,8 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 #' @param hadoop_version Version of Hadoop to install. See spark_versions_hadoop for a list of supported versions
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
-spark_install <- function(version = "1.6.0", hadoop_version = "2.6", reset = FALSE, logging = "INFO") {
-  installInfo <- spark_install_info(version, hadoop_version)
+spark_install <- function(version = NULL, hadoop_version = NULL, reset = FALSE, logging = "INFO") {
+  installInfo <- spark_install_find(version, hadoop_version)
 
   if (!dir.exists(installInfo$sparkDir)) {
     dir.create(installInfo$sparkDir, recursive = TRUE)
