@@ -6,7 +6,7 @@
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 NULL
 
-spark_partition_register_df <- function(df, api, name, repartition) {
+spark_partition_register_df <- function(con, df, api, name, repartition) {
   if (repartition > 0) {
     df <- spark_invoke(df, "repartition", as.integer(repartition))
   }
@@ -21,7 +21,7 @@ spark_partition_register_df <- function(df, api, name, repartition) {
 load_csv <- function(con, name, path, repartition = 0) {
   api <- spark_api(con)
   df <- spark_read_csv(api, path)
-  spark_partition_register_df(df, api, name, repartition)
+  spark_partition_register_df(con, df, api, name, repartition)
 }
 
 spark_source_from_ops <- function(x) {
@@ -56,7 +56,7 @@ save_csv <- function(x, path) {
 load_parquet <- function(con, name, path, repartition = 0) {
   api <- spark_api(con)
   df <- spark_api_read_generic(api, path, "parquet")
-  spark_partition_register_df(df, api, name, repartition)
+  spark_partition_register_df(con, df, api, name, repartition)
 }
 
 #' Saves dplyr operation result as a parquet file
@@ -73,7 +73,7 @@ save_parquet <- function(x, path) {
 load_json <- function(con, name, path, repartition = 0) {
   api <- spark_api(con)
   df <- spark_api_read_generic(api, path, "json")
-  spark_partition_register_df(df, api, name, repartition)
+  spark_partition_register_df(con, df, api, name, repartition)
 }
 
 #' Saves dplyr operation result as a JSON file
