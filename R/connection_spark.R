@@ -19,17 +19,13 @@ spark_default_packages <- function() {
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 #' OS schedules one thread per core.
 #' @param packages Collection of packages to load into Spark. See also, the rspark.packages.default option.
-#' @param reconnect Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
-#' to support long running services that need to be always connected. This parameter is not supported for local installs.
-#' Reconnect requires the package to not be unloaded, and therefore, is more suitable to improve intermittent connectivity
-#' with Spark.
 spark_connect <- function(master = "local",
                           app_name = "rspark",
                           version = NULL,
                           hadoop_version = NULL,
                           cores = "auto",
-                          packages = NULL,
-                          reconnect = FALSE) {
+                          packages = NULL) {
+  reconnect <- FALSE
   installInfo <- spark_install_find(version, hadoop_version)
   sparkVersion <- installInfo$sparkVersion
   hadoopVersion <- installInfo$hadoopVersion

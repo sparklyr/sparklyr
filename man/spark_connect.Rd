@@ -5,8 +5,7 @@
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
 spark_connect(master = "local", app_name = "rspark", version = NULL,
-  hadoop_version = NULL, cores = "auto", packages = NULL,
-  reconnect = FALSE)
+  hadoop_version = NULL, cores = "auto", packages = NULL)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -23,11 +22,6 @@ speaking, this option configures the number of available threads in a local spar
 OS schedules one thread per core.}
 
 \item{packages}{Collection of packages to load into Spark. See also, the rspark.packages.default option.}
-
-\item{reconnect}{Reconnects automatically to Spark on the next attempt to access an Spark resource. This is useful
-to support long running services that need to be always connected. This parameter is not supported for local installs.
-Reconnect requires the package to not be unloaded, and therefore, is more suitable to improve intermittent connectivity
-with Spark.}
 }
 \description{
 Connects to Spark and establishes the Spark Context
