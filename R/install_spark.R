@@ -99,6 +99,26 @@ spark_install <- function(version = NULL, hadoop_version = NULL, reset = FALSE, 
   invisible(installInfo)
 }
 
+#' Provides support to install a version of Spark from a given TAR file
+#' @name spark_install_tar
+#' @export
+#' @param path Path to TAR file conforming to the pattern spark-###-bin-hadoop### where ###
+#' reference spark and hadoop versionsrespectevely.
+spark_install_tar <- function(path) {
+  if (!file.exists(path)) {
+    stop(paste0("The file \"", path, "\", does not exist."))
+  }
+
+  filePattern <- spark_versions_file_pattern();
+  fileName <- basename(path)
+  if (length(grep(filePattern, fileName)) == 0) {
+    stop(paste(
+      "The given file does not conform with the following pattern: ", filePattern))
+  }
+
+  untar(tarfile = path, exdir = spark_install_dir())
+}
+
 spark_conf_file_set_value <- function(installInfo, property, value, reset) {
   log4jPropertiesPath <- file.path(installInfo$sparkConfDir, "log4j.properties")
   if (!file.exists(log4jPropertiesPath) || reset) {

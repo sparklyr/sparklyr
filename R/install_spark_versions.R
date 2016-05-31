@@ -1,3 +1,7 @@
+spark_versions_file_pattern <- function() {
+  "spark-(.*)-bin-hadoop(.*)"
+}
+
 #' Retrieves available versions of Spark
 #' @name spark_versions
 #' @export
@@ -25,8 +29,8 @@ spark_versions <- function() {
     Filter(function(e) !is.null(e),
       lapply(dir(spark_install_dir(), full.names = TRUE), function(maybeDir) {
         if (dir.exists(maybeDir)) {
-          installDir <- maybeDir
-          m <- regmatches(installDir, regexec(".*spark-(.*)-bin-hadoop(.*)", installDir))[[1]]
+          fileName <- basename(maybeDir)
+          m <- regmatches(fileName, regexec(spark_versions_file_pattern(), fileName))[[1]]
           if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]]) else NULL
         }
       })

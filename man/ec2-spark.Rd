@@ -13,8 +13,8 @@
 \alias{spark_ec2_web}
 \title{Install an EC2 Spark cluster}
 \usage{
-spark_ec2_cluster(access_key_id, secret_access_key, pem_file,
-  version = "1.6.0", hadoop_version = "2.6", cluster_name = "spark",
+spark_ec2_cluster(access_key_id, secret_access_key, pem_file, version = NULL,
+  hadoop_version = NULL, cluster_name = "spark",
   instance_type = "m3.medium", region = NULL)
 
 spark_ec2_deploy(cluster_info, instance_count = 1, copy_dir = NULL)
