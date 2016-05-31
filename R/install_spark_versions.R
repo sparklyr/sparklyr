@@ -38,6 +38,7 @@ spark_versions <- function() {
       newRow <- c(row, installed = TRUE)
       newRow$default <- if (NROW(currentRow) > 0) currentRow$default else FALSE
       newRow$download <- if (NROW(currentRow) > 0) currentRow$download else ""
+      newRow$hadoop_label <- if (NROW(currentRow) > 0) currentRow$hadoop_label else paste("Hadoop", row$hadoop)
 
       mergedData <<- rbind(notCurrentRow, newRow)
     }
