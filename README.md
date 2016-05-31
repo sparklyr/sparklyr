@@ -199,16 +199,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/31 11:51:37 INFO ContextCleaner: Cleaned shuffle 5
-    ## 16/05/31 11:51:37 INFO BlockManagerInfo: Removed broadcast_18_piece0 on localhost:54525 in memory (size: 10.4 KB, free: 487.0 MB)
-    ## 16/05/31 11:51:37 INFO ContextCleaner: Cleaned accumulator 71
-    ## 16/05/31 11:51:37 INFO Executor: Finished task 1.0 in stage 19.0 (TID 39). 2082 bytes result sent to driver
-    ## 16/05/31 11:51:37 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
-    ## 16/05/31 11:51:37 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 39) in 64 ms on localhost (1/2)
-    ## 16/05/31 11:51:37 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 64 ms on localhost (2/2)
-    ## 16/05/31 11:51:37 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
-    ## 16/05/31 11:51:37 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.064 s
-    ## 16/05/31 11:51:37 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.067732 s
+    ## 16/05/31 16:02:28 INFO ContextCleaner: Cleaned shuffle 5
+    ## 16/05/31 16:02:28 INFO BlockManagerInfo: Removed broadcast_18_piece0 on localhost:59476 in memory (size: 10.4 KB, free: 487.0 MB)
+    ## 16/05/31 16:02:28 INFO ContextCleaner: Cleaned accumulator 71
+    ## 16/05/31 16:02:28 INFO Executor: Finished task 1.0 in stage 19.0 (TID 39). 2082 bytes result sent to driver
+    ## 16/05/31 16:02:28 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 39) in 62 ms on localhost (1/2)
+    ## 16/05/31 16:02:28 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
+    ## 16/05/31 16:02:28 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 63 ms on localhost (2/2)
+    ## 16/05/31 16:02:28 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
+    ## 16/05/31 16:02:28 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.063 s
+    ## 16/05/31 16:02:28 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.067186 s
 
 Finally, we disconnect from Spark:
 
@@ -219,4 +219,4 @@ spark_disconnect(sc)
 Additional Resources
 --------------------
 
-For performance runs under various parameters, read: [RSpark Performance](docs/perf.md)
+For performance runs under various parameters, read: [RSpark Performance](docs/perf_dplyr.md)

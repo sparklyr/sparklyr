@@ -180,4 +180,4 @@ spark_disconnect(sc)
 
 ## Additional Resources
 
-For performance runs under various parameters, read: [RSpark Performance](docs/perf.md)
+For performance runs under various parameters, read: [RSpark Performance](docs/perf_dplyr.md)
