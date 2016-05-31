@@ -1,6 +1,6 @@
 #' @param access_key_id EC2 access key id. Create a new access key from https://console.aws.amazon.com/iam/home?#security_credential
 #' @param secret_access_key EC2 secret access key.
-#' @param pem_path Identity file for ssh connections.
+#' @param pem_file Identity file for ssh connections.
 #' @param instance_count The total number of EC2 instances to be provisioned.
 #' @param version The Spark version to use.
 #' @param cluster_name Name used to identify cluster.
@@ -16,19 +16,19 @@ NULL
 spark_ec2_cluster <- function(
   access_key_id,
   secret_access_key,
-  pem_path,
+  pem_file,
   version = "1.6.0",
   cluster_name = "spark",
   instance_type = "m3.medium",
   region = "us-east-1c"
 ) {
   sparkInfo <- spark_check_install(version)
-  validate_pem(pem_path);
+  validate_pem(pem_file);
 
   list(
     accessKeyId = access_key_id,
     secretAccessKey = secret_access_key,
-    pemPath = pem_path,
+    pemFile = pem_file,
     sparkDir = sparkInfo$sparkVersionDir,
     version = version,
     clusterName = cluster_name,
@@ -129,7 +129,7 @@ spark_ec2_login <- function(
 #' @export
 spark_ec2_master <- function(
   cluster_info) {
-  validate_pem(cluster_info$pemPath);
+  validate_pem(cluster_info$pemFile);
 
   run_ec2_command(command = paste("get-master", cluster_info$clusterName),
                   commandParams = "",
@@ -151,13 +151,13 @@ run_ec2_command <- function(command,
                      clusterInfo$secretAccessKey,
                      sep = "")
 
-  pemPath <- path.expand(clusterInfo$pemPath)
-  pemName <- remove_extension(basename(clusterInfo$pemPath))
+  pemFile <- path.expand(clusterInfo$pemFile)
+  pemName <- remove_extension(basename(clusterInfo$pemFile))
   params <- paste("--key-pair=",
                   pemName,
                   " ",
                   "--identity-file=",
-                  pemPath,
+                  pemFile,
                   " ",
                   commandParams,
                   sep = "")

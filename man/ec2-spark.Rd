@@ -13,7 +13,7 @@
 \alias{spark_ec2_web}
 \title{Install an EC2 Spark cluster}
 \usage{
-spark_ec2_cluster(access_key_id, secret_access_key, pem_path,
+spark_ec2_cluster(access_key_id, secret_access_key, pem_file,
   version = "1.6.0", cluster_name = "spark", instance_type = "m3.medium",
   region = "us-east-1c")
 
@@ -38,7 +38,7 @@ spark_ec2_web(cluster_info)
 
 \item{secret_access_key}{EC2 secret access key.}
 
-\item{pem_path}{Identity file for ssh connections.}
+\item{pem_file}{Identity file for ssh connections.}
 
 \item{version}{The Spark version to use.}
 
