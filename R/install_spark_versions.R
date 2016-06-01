@@ -4,20 +4,21 @@ spark_versions_file_pattern <- function() {
 
 #' Retrieves available versions of Spark
 #' @name spark_versions
+#' @param latest TRUE to use the latest download URLs, FALSE to use the package defaults which might be out of date.
 #' @export
-spark_versions <- function() {
+spark_versions <- function(latest = TRUE) {
   latestUrl <- "https://raw.githubusercontent.com/rstudio/rspark/master/inst/extdata/install_spark.csv?token=ASpg1JXmAK-o17WIKBe1ZuoV2CC1gamKks5XVzebwA%3D%3D"
   packagePath <- system.file(file.path("extdata", "install_spark.csv"), package = "rspark")
 
   downloadData <- NULL
-  tryCatch({
-    suppressWarnings(
-      downloadData <- read.csv(latestUrl,
-                               colClasses = c(hadoop = "character"),
-                               stringsAsFactors = FALSE)
-    )
-  }, error = function(e) {
-  })
+  if (latest) {
+    tryCatch({
+      suppressWarnings(
+        downloadData <- read.csv(latestUrl, stringsAsFactors = FALSE)
+      )
+    }, error = function(e) {
+    })
+  }
 
   if (is.null(downloadData) || is.null(downloadData$spark)) {
     # warning("Failed to retrieve the latest download links")
