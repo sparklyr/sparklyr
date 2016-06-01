@@ -25,6 +25,13 @@ spark_connect <- function(master = "local",
                           hadoop_version = NULL,
                           cores = "auto",
                           packages = NULL) {
+
+  # verify that java is available
+  if (!is_java_available()) {
+    stop("Java is required to connect to Spark. Please download and install Java from ",
+         java_install_url())
+  }
+
   reconnect <- FALSE
   installInfo <- spark_install_find(version, hadoop_version)
   sparkVersion <- installInfo$sparkVersion

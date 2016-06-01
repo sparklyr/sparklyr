@@ -26,3 +26,17 @@ validate_pem <- function(pemFile) {
     system(chmodScript)
   }
 }
+
+is_java_available <- function() {
+  java_home <- Sys.getenv("JAVA_HOME", unset = NA)
+  if (!is.na(java_home))
+    java <- file.path(java_home, "bin", "java")
+  else
+    java <- Sys.which("java")
+  nzchar(java)
+}
+
+java_install_url <- function() {
+  "https://www.java.com/en/"
+}
+
