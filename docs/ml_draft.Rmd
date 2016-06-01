@@ -27,6 +27,8 @@ iris %>%
 
 ## Draft: KMeans in RSpark
 
+Basing kmeans over Spark on [http://spark.apache.org/docs/latest/mllib-clustering.html]
+
 ```{r}
 library(rspark)
 
@@ -36,6 +38,27 @@ db <- src_spark(sc)
 # copy the iris table to Spark
 copy_to(db, iris, "iris")
 iris_tbl <- tbl(db, "iris")
+
+sqlResult <- spark_invoke(
+    rspark:::spark_sql_or_hive(db$con@api),
+    "sql",
+    "SELECT * FROM iris"
+  )
+
+rdd <- spark_invoke(sqlResult, "rdd")
+
+# Cluster the data into two classes using KMeans
+numClusters <- 2
+numIterations <- 20
+clusters <- spark_invoke_static(sc, 
+                                "org.apache.spark.mllib.clustering.KMeans",
+                                "train",
+                                rdd,
+                                as.integer(numClusters),
+                                as.integer(numIterations))
+
+centers <- spark_invoke(clusters, "clusterCenters")
+centers
 
 iris_tbl %>%
   select(Petal.Width, Petal.Length) %>%
