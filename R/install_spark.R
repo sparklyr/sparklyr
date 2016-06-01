@@ -23,14 +23,15 @@ spark_install_available <- function(version, hadoop_version) {
   dir.exists(installInfo$sparkVersionDir)
 }
 
-spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL) {
+spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL, installedOnly = TRUE) {
   versions <- spark_versions()
-  versions <- versions[versions$installed, ]
+  if (installedOnly)
+    versions <- versions[versions$installed, ]
   versions <- if (is.null(sparkVersion)) versions else versions[versions$spark == sparkVersion, ]
   versions <- if (is.null(hadoopVersion)) versions else versions[versions$hadoop == hadoopVersion, ]
 
   if(NROW(versions) == 0) {
-    sparkInstall <- quote(spark_install(version = "", hadoopVersion = ""))
+    sparkInstall <- quote(spark_install(version = "", hadoop_version = ""))
     sparkInstall[[2]] <- sparkVersion
     sparkInstall[[3]] <- hadoopVersion
 
@@ -72,7 +73,7 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
 spark_install <- function(version = NULL, hadoop_version = NULL, reset = FALSE, logging = "INFO") {
-  installInfo <- spark_install_find(version, hadoop_version)
+  installInfo <- spark_install_find(version, hadoop_version, installedOnly = FALSE)
 
   if (!dir.exists(installInfo$sparkDir)) {
     dir.create(installInfo$sparkDir, recursive = TRUE)
