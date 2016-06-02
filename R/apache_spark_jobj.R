@@ -62,13 +62,24 @@ jobj <- function(objId) {
 
 #' Print a JVM object reference.
 #'
-#' This function prints the type and id for an object stored
-#' in the Spark R API JVM backend.
+#' Prints information about a JVM object reference.
+#'
+#' The underyling object id is printed; in addition, if the
+#' associated connection is active; prints the class and
+#' string representation of the underlying object.
 #'
 #' @param x The JVM object reference
 #' @param ... further arguments passed to or from other methods
+#' @export
 print.jobj <- function(x, ...) {
-  cat("Java ref id", x$id, "\n", sep = " ")
+  if (spark_connection_is_open(x$scon)) {
+    info <- spark_object_info(x)
+    fmt <- "<jobj [%s]>\n  %s\n  %s\n"
+    cat(sprintf(fmt, x$id, info$class, info$repr))
+  } else {
+    fmt <- "<jobj [%s; detached]>"
+    cat(sprintf(fmt, x$id))
+  }
 }
 
 cleanup.jobj <- function(jobj) {

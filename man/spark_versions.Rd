@@ -4,7 +4,10 @@
 \alias{spark_versions}
 \title{Retrieves available versions of Spark}
 \usage{
-spark_versions()
+spark_versions(latest = TRUE)
+}
+\arguments{
+\item{latest}{TRUE to use the latest download URLs, FALSE to use the package defaults which might be out of date.}
 }
 \description{
 Retrieves available versions of Spark

@@ -12,7 +12,11 @@
 \item{...}{further arguments passed to or from other methods}
 }
 \description{
-This function prints the type and id for an object stored
-in the Spark R API JVM backend.
+Prints information about a JVM object reference.
+}
+\details{
+The underyling object id is printed; in addition, if the
+associated connection is active; prints the class and
+string representation of the underlying object.
 }
 
