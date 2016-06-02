@@ -19,7 +19,44 @@ spark_api_create_sql_context <- function(scon) {
   )
 }
 
+is_spark_v2 <- function(scon) {
+  version <- sub("-preview", "", scon$sparkVersion)
+  compared <- utils::compareVersion(version, "2.0.0")
+  compared != -1
+}
+
 spark_api_create_hive_context <- function(scon) {
+
+  if (is_spark_v2(scon))
+    spark_api_create_hive_context_v2(scon)
+  else
+    spark_api_create_hive_context_v1(scon)
+}
+
+spark_api_create_hive_context_v2 <- function(scon) {
+
+  # SparkSession.builder().enableHiveSupport()
+  builder <- spark_invoke_static(
+    scon,
+    "org.apache.spark.sql.SparkSession",
+    "builder"
+  )
+
+  builder <- spark_invoke(
+    builder,
+    "enableHiveSupport"
+  )
+
+  session <- spark_invoke(
+    builder,
+    "getOrCreate"
+  )
+
+  session
+
+}
+
+spark_api_create_hive_context_v1 <- function(scon) {
   spark_invoke_static(
     scon,
 

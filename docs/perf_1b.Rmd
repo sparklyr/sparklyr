@@ -10,7 +10,7 @@ output:
 ```{r}
 library(rspark)
 
-spark_install(sparkVersion = "2.0.0", reset = TRUE, logging = "WARN")
+spark_install(version = "2.0.0", reset = TRUE, logging = "WARN")
 sc <- spark_connect(master = "local", version = "2.0.0")
 
 spark_conf <- function(scon, config, value) {

@@ -2,8 +2,9 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 ^README\.Rmd$
-^res/
+^examples/
 ^docs/
+^res/
 ^derby\.log$
 ^metastore_db$
 ^spark-warehouse$
