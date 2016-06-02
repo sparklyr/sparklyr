@@ -72,7 +72,13 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 #' @param hadoop_version Version of Hadoop to install. See spark_versions_hadoop for a list of supported versions
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
-spark_install <- function(version = NULL, hadoop_version = NULL, reset = FALSE, logging = "INFO") {
+#' @param verbose Report information as Spark is downloaded / installed?
+spark_install <- function(version = NULL,
+                          hadoop_version = NULL,
+                          reset = FALSE,
+                          logging = "INFO",
+                          verbose = interactive())
+{
   installInfo <- spark_install_find(version, hadoop_version, installedOnly = FALSE)
 
   if (!dir.exists(installInfo$sparkDir)) {
@@ -80,9 +86,40 @@ spark_install <- function(version = NULL, hadoop_version = NULL, reset = FALSE, 
   }
 
   if (!dir.exists(installInfo$sparkVersionDir)) {
-    download.file(installInfo$packageRemotePath, destfile = installInfo$packageLocalPath)
+
+    if (verbose) {
+
+      fmt <- paste(c(
+        "Installing Spark %s for Hadoop %s or later.",
+        "- Downloading from: '%s'",
+        "- Installing to:    '%s'"
+      ), collapse = "\n")
+
+      msg <- sprintf(fmt,
+                     installInfo$sparkVersion,
+                     installInfo$hadoopVersion,
+                     installInfo$packageRemotePath,
+                     installInfo$sparkVersionDir)
+
+      message(msg)
+    }
+
+    download.file(
+      installInfo$packageRemotePath,
+      destfile = installInfo$packageLocalPath,
+      quiet = !verbose
+    )
+
     untar(tarfile = installInfo$packageLocalPath, exdir = installInfo$sparkDir)
     unlink(installInfo$packageLocalPath)
+
+    if (verbose)
+      message("Installation complete.")
+
+  } else if (verbose) {
+    fmt <- "Spark %s for Hadoop %s or later already installed."
+    msg <- sprintf(fmt, installInfo$sparkVersion, installInfo$hadoopVersion)
+    message(msg)
   }
 
   if (!file.exists(installInfo$sparkDir)) {
