@@ -173,3 +173,11 @@ print.src_spark <- function(x, ...) {
   spark_log(x$con@scon)
 }
 
+#' @export
+spark_table_name <- function(x, ...) {
+  UseMethod("spark_table_name")
+}
+
+spark_table_name.tbl_spark <- function(x, ...) {
+  as.character(x$ops$x)
+}

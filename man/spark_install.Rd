@@ -5,7 +5,7 @@
 \title{Provides support to download and install the given Spark version}
 \usage{
 spark_install(version = NULL, hadoop_version = NULL, reset = FALSE,
-  logging = "INFO")
+  logging = "INFO", verbose = interactive())
 }
 \arguments{
 \item{version}{Version of Spark to install. See spark_versions for a list of supported versions}
@@ -15,6 +15,8 @@ spark_install(version = NULL, hadoop_version = NULL, reset = FALSE,
 \item{reset}{Attempts to reset settings to defaults}
 
 \item{logging}{Logging level to configure install. Supported options: "WARN", "INFO"}
+
+\item{verbose}{Report information as Spark is downloaded / installed?}
 }
 \description{
 Provides support to download and install the given Spark version

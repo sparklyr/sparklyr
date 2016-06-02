@@ -57,11 +57,10 @@ spark_api_create_hive_context_v2 <- function(scon) {
 }
 
 spark_api_create_hive_context_v1 <- function(scon) {
-  spark_invoke_static(
+  spark_invoke_static_ctor(
     scon,
 
     "org.apache.spark.sql.hive.HiveContext",
-    "<init>",
 
     spark_context(scon)
   )
@@ -290,4 +289,24 @@ spark_object_info <- function(jobj) {
     class = class,
     repr  = repr
   )
+}
+
+spark_connection <- function(jobj) {
+  jobj$scon
+}
+
+spark_collect <- function(jobj) {
+
+  collected <- spark_invoke_static(
+    spark_connection(jobj),
+    "org.apache.spark.sql.api.r.SQLUtils",
+    "dfToCols",
+    jobj
+  )
+
+  names <- spark_invoke(jobj, "columns")
+  list <- lapply(collected, unlist)
+  names(list) <- names
+  dplyr::as_data_frame(list)
+
 }

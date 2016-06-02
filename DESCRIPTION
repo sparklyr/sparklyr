@@ -38,6 +38,7 @@ Collate:
     'ec2_spark.R'
     'install_spark.R'
     'install_spark_versions.R'
+    'mllib_kmeans.R'
     'options_spark.R'
     'shell_spark.R'
     'utils.R'
@@ -48,8 +49,7 @@ Imports:
     assertthat,
     rappdirs,
     lazyeval
-Remotes:
-    hadley/dplyr
+Remotes: hadley/dplyr
 Suggests:
     testthat,
     reshape2,
