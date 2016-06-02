@@ -277,6 +277,18 @@ spark_invoke_static <- function (scon, objName, methodName, ...)
   spark_invoke_method(scon, TRUE, objName, methodName, ...)
 }
 
+#' Executes an static method on the given object
+#' @name spark_invoke_static
+#' @export
+#' @param scon Spark connection provided by spark_connect
+#' @param objName Fully-qualified name to static class
+#' @param methodName Name of class method to execute
+#' @param ... Additional parameters that method requires
+spark_invoke_ctor <- function(jobj, ...)
+{
+  spark_invoke_method(jobj$scon, FALSE, jobj$id, "<init>", ...)
+}
+
 # API into https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
 #
 # def createSparkContext(
