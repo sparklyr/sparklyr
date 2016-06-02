@@ -99,7 +99,7 @@ spark_install <- function(version = NULL,
                      installInfo$sparkVersion,
                      installInfo$hadoopVersion,
                      installInfo$packageRemotePath,
-                     installInfo$sparkVersionDir)
+                     aliased_path(installInfo$sparkVersionDir))
 
       message(msg)
     }
