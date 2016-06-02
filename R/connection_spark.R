@@ -187,7 +187,7 @@ spark_attach_connection <- function(object, scon) {
   object
 }
 
-spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
+spark_invoke_method <- function(scon, isStatic, objName, methodName, ...)
 {
   # Particular methods are defined on their specific clases, for instance, for "createSparkContext" see:
   #
@@ -222,12 +222,36 @@ spark_invoke_method <- function (scon, isStatic, objName, methodName, ...)
   writeBin(con, backend)
   returnStatus <- readInt(backend)
 
-  if (returnStatus != 0) {
-    stop(readString(backend))
-  }
+  if (returnStatus != 0)
+    spark_report_invoke_error(scon, backend)
 
   object <- readObject(backend)
   spark_attach_connection(object, scon)
+}
+
+spark_report_invoke_error <- function(scon, backend) {
+
+  # get error message from backend and report to R
+  msg <- readString(backend)
+  if (nzchar(msg))
+    stop(msg, call. = FALSE)
+
+  # if there was no error message reported, then
+  # return information from the Spark logs. return
+  # all those with most recent timestamp
+  msg <- "failed to invoke spark command (unknown reason)"
+  try(silent = TRUE, {
+    log <- spark_log(scon)
+    splat <- strsplit(log, "\\s+", perl = TRUE)
+    n <- length(splat)
+    timestamp <- splat[[n]][[2]]
+    regex <- paste("\\b", timestamp, "\\b", sep = "")
+    entries <- grep(regex, log, perl = TRUE, value = TRUE)
+    pasted <- paste(entries, collapse = "\n")
+    msg <- paste("failed to invoke spark command", pasted, sep = "\n")
+  })
+
+  stop(msg, call. = FALSE)
 }
 
 #' Executes a method on the given object
