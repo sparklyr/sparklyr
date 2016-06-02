@@ -1,4 +1,10 @@
 spark,hadoop,hadoop_label,download,default,hadoop_default
 "1.6.1","2.6",Hadoop 2.6 or later,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz,TRUE,TRUE
+"1.6.1","2.4",Hadoop 2.4 or later,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.4.tgz,FALSE,FALSE
+"1.6.1","CDH 4",Cloudera Hadoop 4,http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-cdh4.tgz,FALSE,FALSE
 "1.6.0","2.6",Hadoop 2.6 or later,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.0-bin-hadoop2.6.tgz,FALSE,TRUE
+"1.6.0","2.4",Hadoop 2.4 or later,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.0-bin-hadoop2.4.tgz,FALSE,FALSE
+"1.6.0","CDH 4",Cloudera Hadoop 4,http://d3kbcqa49mib13.cloudfront.net/spark-1.6.0-bin-cdh4.tgz,FALSE,FALSE
+"2.0.0-preview","2.7",Hadoop 2.7 or later,https://dist.apache.org/repos/dist/release/spark/spark-2.0.0-preview/spark-2.0.0-preview-bin-hadoop2.7.tgz,FALSE,FALSE
 "2.0.0-preview","2.6",Hadoop 2.6 or later,https://dist.apache.org/repos/dist/release/spark/spark-2.0.0-preview/spark-2.0.0-preview-bin-hadoop2.6.tgz,FALSE,TRUE
+"2.0.0-preview","2.4",Hadoop 2.4 or later,https://dist.apache.org/repos/dist/release/spark/spark-2.0.0-preview/spark-2.0.0-preview-bin-hadoop2.4.tgz,FALSE,FALSE
