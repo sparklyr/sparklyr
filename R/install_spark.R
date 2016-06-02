@@ -91,8 +91,8 @@ spark_install <- function(version = NULL,
 
       fmt <- paste(c(
         "Installing Spark %s for Hadoop %s or later.",
-        "- Downloading from: '%s'",
-        "- Installing to:    '%s'"
+        "Downloading from:\n- '%s'",
+        "Installing to:\n- '%s'"
       ), collapse = "\n")
 
       msg <- sprintf(fmt,
