@@ -8,7 +8,7 @@ library(rprojroot)
 
 execute <- function(...) {
   cmd <- paste(...)
-  message("> Executing '", cmd, "'")
+  message(cmd)
   system(cmd)
 }
 
@@ -58,7 +58,13 @@ if (!file.exists(inst_java_path))
 
 # call 'scalac' compiler
 rspark_scala <- file.path(root, "inst/scala/rspark.scala")
-execute("scalac -classpath", CLASSPATH, shQuote(rspark_scala))
+classpath <- Sys.getenv("CLASSPATH")
+
+# set CLASSPATH environment variable rather than passing
+# in on command line (mostly aesthetic)
+Sys.setenv(CLASSPATH = CLASSPATH)
+execute("scalac", shQuote(rspark_scala))
+Sys.setenv(CLASSPATH = classpath)
 
 # call 'jar' to create our jar
 class_files <- list.files(pattern = "class$")
