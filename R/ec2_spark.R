@@ -3,6 +3,7 @@
 #' @param pem_file Identity file for ssh connections.
 #' @param instance_count The total number of EC2 instances to be provisioned.
 #' @param version The Spark version to use.
+#' @param hadoop_version The Hadoop version to use.
 #' @param cluster_name Name used to identify cluster.
 #' @param instance_type Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".
 #' @param region The EC2 region to host this cluster.

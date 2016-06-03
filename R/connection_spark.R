@@ -7,6 +7,12 @@ spark_default_packages <- function() {
   if (is.null(packagesOption)) c("com.databricks:spark-csv_2.11:1.3.0") else packagesOption
 }
 
+spark_default_jars <- function() {
+  jarsOption <- getOption("rspark.jars.default", NULL)
+
+  if (is.null(jarsOption)) c("inst/jars/rspark_utils.jar") else jarsOption
+}
+
 #' Connects to Spark and establishes the Spark Context
 #' @name spark_connect
 #' @export
@@ -38,6 +44,7 @@ spark_connect <- function(master = "local",
   hadoopVersion <- installInfo$hadoopVersion
 
   packages <- c(if(is.null(packages)) list() else packages, spark_default_packages())
+  jars <- spark_default_jars()
 
   scon <- list(
     master = master,
@@ -48,14 +55,15 @@ spark_connect <- function(master = "local",
     isLocal = grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE),
     reconnect = reconnect,
     installInfo = installInfo,
-    packages = packages
+    packages = packages,
+    jars = jars
   )
 
   if (reconnect && (spark_connection_is_local(scon) && !getOption("spark.connection.allow_local_reconnect", FALSE))) {
     stop("Reconnect is not supported on local installs")
   }
 
-  sconInst <- start_shell(list(), scon$installInfo, scon$packages)
+  sconInst <- start_shell(list(), scon$installInfo, scon$packages, scon$jars)
   scon$sconRef <- spark_connection_add_inst(sconInst)
 
   parentCall <- match.call()

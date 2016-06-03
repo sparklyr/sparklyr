@@ -18,7 +18,7 @@ read_shell_file <- function(shellFile) {
   )
 }
 
-start_shell <- function(sconInst, installInfo, packages) {
+start_shell <- function(sconInst, installInfo, packages, jars) {
   sparkHome <- installInfo$sparkVersionDir
   if (!dir.exists(sparkHome)) {
     stop("Spark installation was not found. See spark_install.")
@@ -38,6 +38,10 @@ start_shell <- function(sconInst, installInfo, packages) {
   sparkCommand <- ""
   if (length(packages) > 0) {
     sparkCommand <- paste("--packages ", paste(packages, sep = ","))
+  }
+
+  if (length(jars) > 0) {
+    sparkCommand <- paste(sparkCommand, "--jars ", paste(jars, sep = ","))
   }
 
   sparkCommand <- paste(sparkCommand, "sparkr-shell", shellOutputPath)

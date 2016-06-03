@@ -42,6 +42,8 @@ spark_ec2_web(cluster_info)
 
 \item{version}{The Spark version to use.}
 
+\item{hadoop_version}{The Hadoop version to use.}
+
 \item{cluster_name}{Name used to identify cluster.}
 
 \item{instance_type}{Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".}

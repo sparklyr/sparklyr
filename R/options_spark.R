@@ -23,5 +23,5 @@ NULL
 #' be enabled in local installations to help troubleshoot remote environments.
 #' @name options-spark
 #' @examples
-#' geOption("spark.connection.allow_local_reconnect", FALSE)
+#' getOption("spark.connection.allow_local_reconnect", FALSE)
 NULL
