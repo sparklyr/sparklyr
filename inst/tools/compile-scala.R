@@ -6,6 +6,12 @@ if (!requireNamespace("rprojroot", quietly = TRUE))
 library(rspark)
 library(rprojroot)
 
+execute <- function(...) {
+  cmd <- paste(...)
+  message("> Executing '", cmd, "'")
+  system(cmd)
+}
+
 if (!nzchar(Sys.which("scalac")))
   stop("Failed to discover 'scalac' on the PATH")
 
@@ -51,21 +57,16 @@ if (!file.exists(inst_java_path))
     stop("Failed to create directory '", inst_java_path, "'")
 
 # call 'scalac' compiler
-system(paste(
-  "scalac",
-  "-classpath",
-  CLASSPATH,
-  file.path(root, "inst/scala/rspark.scala")
-))
+rspark_scala <- file.path(root, "inst/scala/rspark.scala")
+execute("scalac -classpath", CLASSPATH, shQuote(rspark_scala))
 
 # call 'jar' to create our jar
 class_files <- list.files(pattern = "class$")
 rspark_utils_path <- file.path(root, "inst/java/rspark_utils.jar")
-system(paste(
-  "jar cf",
-  rspark_utils_path,
-  paste(class_files)
-))
+if (file.exists(rspark_utils_path))
+  unlink(rspark_utils_path)
+
+execute("jar cvf", rspark_utils_path, paste(shQuote(class_files), collapse = " "))
 
 # double-check existence of 'rspark_utils.jar'
 if (file.exists(rspark_utils_path)) {
