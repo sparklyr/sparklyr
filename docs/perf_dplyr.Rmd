@@ -44,7 +44,7 @@ top_players_by_run <- function(source) {
 ```{r}
 spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
-    spark_install(sparkVersion = param$version, reset = TRUE, logging = param$logging)
+    spark_install(version = param$version, reset = TRUE, logging = param$logging)
     
     shuffle <- getOption("rspark.dplyr.optimize_shuffle_cores", NULL)
     options(rspark.dplyr.optimize_shuffle_cores = param$shuffle)
@@ -120,10 +120,10 @@ spark_perf_single_test <- function(runResults, master, cores, version, logging, 
           )
         ),
         tests = list(
-          `spark summarize` = function(db, sources) {
+          `spark` = function(db, sources) {
             sources$flights %>% summarize_delay %>% head
           },
-          `dplyr summarize` = function(db, sources) {
+          `dplyr` = function(db, sources) {
             nycflights13::flights %>% summarize_delay %>% head
           },
           `spark rank` = function(db, sources) {
@@ -152,16 +152,16 @@ runResults <- list()
 
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", FALSE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", TRUE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "INFO", FALSE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "INFO", TRUE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", FALSE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", TRUE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "INFO", FALSE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", FALSE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 8, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 8, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 8, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, TRUE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 0, TRUE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, TRUE)
 
 results <- do.call("rbind", runResults)
 
@@ -171,7 +171,7 @@ results <- results %>%
 
 ```{r}
 results %>%
-  filter(test == "spark summarize" | test == "dplyr summarize") %>%
+  filter(test == "spark" | test == "dplyr") %>%
   rename(part = partitions) %>%
   dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
@@ -192,7 +192,7 @@ results %>%
 
 ```{r}
 results %>%
-  filter(test != "dplyr summarize" | test != "spark summarize") %>%
+  filter(test != "dplyr" | test != "spark") %>%
   ggplot(aes(test, params)) + 
     geom_tile(aes(fill = elapsed), colour = "white") +
     scale_fill_gradient(low = "steelblue", high = "black") +
@@ -201,7 +201,7 @@ results %>%
 
 ```{r}
 results %>%
-  filter(test == "dplyr summarize" | test == "spark summarize") %>%
+  filter(test == "dplyr" | test == "spark") %>%
   ggplot(aes(x=run, y=elapsed, group = test, color = test)) + 
     geom_line() + geom_point() +
     ggtitle("Time per Run")
