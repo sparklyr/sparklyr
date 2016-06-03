@@ -305,7 +305,7 @@ spark_collect <- function(jobj) {
   )
 
   names <- spark_invoke(jobj, "columns")
-  list <- lapply(collected, unlist)
+  list <- lapply(collected, unlist, recursive = FALSE)
   names(list) <- names
   dplyr::as_data_frame(list)
 
