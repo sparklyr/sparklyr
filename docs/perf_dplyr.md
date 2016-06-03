@@ -56,11 +56,11 @@ top_players_by_run <- function(source) {
 ``` r
 spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
-    spark_install(sparkVersion = param$version, reset = TRUE, logging = param$logging)
+    spark_install(version = param$version, reset = TRUE, logging = param$logging)
     
-    shuffle <- getOption("rspark.dplyr.optimizeShuffleForCores", NULL)
-    options(rspark.dplyr.optimizeShuffleForCores = param$shuffle)
-    on.exit(options(rspark.dplyr.optimizeShuffleForCores = shuffle))
+    shuffle <- getOption("rspark.dplyr.optimize_shuffle_cores", NULL)
+    options(rspark.dplyr.optimize_shuffle_cores = param$shuffle)
+    on.exit(options(rspark.dplyr.optimize_shuffle_cores = shuffle))
     
     sc <- spark_connect(master = param$master, cores = param$cores, version = param$version)
     
@@ -132,10 +132,10 @@ spark_perf_single_test <- function(runResults, master, cores, version, logging, 
           )
         ),
         tests = list(
-          `spark summarize` = function(db, sources) {
+          `spark` = function(db, sources) {
             sources$flights %>% summarize_delay %>% head
           },
-          `dplyr summarize` = function(db, sources) {
+          `dplyr` = function(db, sources) {
             nycflights13::flights %>% summarize_delay %>% head
           },
           `spark rank` = function(db, sources) {
@@ -165,16 +165,16 @@ runResults <- list()
 
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", FALSE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", TRUE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "INFO", FALSE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "INFO", TRUE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", FALSE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", TRUE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "INFO", FALSE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", FALSE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 8, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 8, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 0, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 8, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, TRUE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0", "WARN", TRUE, 0, TRUE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, TRUE)
 
 results <- do.call("rbind", runResults)
 
@@ -184,24 +184,24 @@ results <- results %>%
 
 ``` r
 results %>%
-  filter(test == "spark summarize" | test == "dplyr summarize") %>%
+  filter(test == "spark" | test == "dplyr") %>%
   rename(part = partitions) %>%
   dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
-    ##    run cores version logging part shuffle dplyr summarize spark summarize
-    ## 1    0  <NA>   1.6.0    INFO    0   FALSE           0.086           3.005
-    ## 2    1  <NA>   1.6.0    INFO    0   FALSE           0.092           0.577
-    ## 3    2  <NA>   2.0.0    INFO    0   FALSE           0.093           1.975
-    ## 4    3  <NA>   2.0.0    INFO    0   FALSE           0.083           0.672
-    ## 5    4  auto   1.6.0    INFO    0   FALSE           0.085           2.272
-    ## 6    5  auto   1.6.0    WARN    0   FALSE           0.084           2.187
-    ## 7    6  auto   1.6.0    WARN    0   FALSE           0.086           0.658
-    ## 8    7  auto   1.6.0    WARN    8   FALSE           0.089           0.767
-    ## 9    8  auto   2.0.0    WARN    8   FALSE           0.098           0.930
-    ## 10   9  auto   2.0.0    WARN    0   FALSE           0.102           0.818
-    ## 11  10  auto   1.6.0    WARN    0    TRUE           0.094           0.480
-    ## 12  11  auto   2.0.0    WARN    0    TRUE           0.084           0.670
+    ##    run cores       version logging part shuffle dplyr spark
+    ## 1    0  <NA>         1.6.0    INFO    0   FALSE 0.092 3.181
+    ## 2    1  <NA>         1.6.0    INFO    0   FALSE 0.088 0.542
+    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE 0.092 2.036
+    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE 0.095 0.688
+    ## 5    4  auto         1.6.0    INFO    0   FALSE 0.100 2.238
+    ## 6    5  auto         1.6.0    WARN    0   FALSE 0.092 2.202
+    ## 7    6  auto         1.6.0    WARN    0   FALSE 0.092 0.574
+    ## 8    7  auto         1.6.0    WARN    8   FALSE 0.088 0.827
+    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE 0.096 0.989
+    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE 0.100 0.781
+    ## 11  10  auto         1.6.0    WARN    0    TRUE 0.088 0.484
+    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE 0.091 0.626
 
 ``` r
 results %>%
@@ -210,19 +210,19 @@ results %>%
   dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
-    ##    run cores version logging part shuffle dplyr rank spark rank
-    ## 1    0  <NA>   1.6.0    INFO    0   FALSE      0.815     13.050
-    ## 2    1  <NA>   1.6.0    INFO    0   FALSE      0.898     12.125
-    ## 3    2  <NA>   2.0.0    INFO    0   FALSE      0.810      6.616
-    ## 4    3  <NA>   2.0.0    INFO    0   FALSE      0.845      6.278
-    ## 5    4  auto   1.6.0    INFO    0   FALSE      0.914      6.262
-    ## 6    5  auto   1.6.0    WARN    0   FALSE      0.886      7.978
-    ## 7    6  auto   1.6.0    WARN    0   FALSE      0.957      5.746
-    ## 8    7  auto   1.6.0    WARN    8   FALSE      0.898      6.246
-    ## 9    8  auto   2.0.0    WARN    8   FALSE      0.811      3.070
-    ## 10   9  auto   2.0.0    WARN    0   FALSE      0.858      2.925
-    ## 11  10  auto   1.6.0    WARN    0    TRUE      0.807      1.572
-    ## 12  11  auto   2.0.0    WARN    0    TRUE      0.850      0.925
+    ##    run cores       version logging part shuffle dplyr rank spark rank
+    ## 1    0  <NA>         1.6.0    INFO    0   FALSE      0.939     13.657
+    ## 2    1  <NA>         1.6.0    INFO    0   FALSE      0.853     12.221
+    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE      0.824      6.444
+    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE      0.820      5.771
+    ## 5    4  auto         1.6.0    INFO    0   FALSE      0.950      6.438
+    ## 6    5  auto         1.6.0    WARN    0   FALSE      0.952      6.203
+    ## 7    6  auto         1.6.0    WARN    0   FALSE      0.950      5.658
+    ## 8    7  auto         1.6.0    WARN    8   FALSE      0.950      6.847
+    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE      0.844      2.781
+    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE      0.849      2.791
+    ## 11  10  auto         1.6.0    WARN    0    TRUE      0.798      1.538
+    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE      0.886      0.840
 
 ``` r
 results %>%
@@ -231,23 +231,23 @@ results %>%
   dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
 ```
 
-    ##    run cores version logging part shuffle dplyr warm spark warm
-    ## 1    0  <NA>   1.6.0    INFO    0   FALSE      0.748     11.669
-    ## 2    1  <NA>   1.6.0    INFO    0   FALSE      0.850     10.512
-    ## 3    2  <NA>   2.0.0    INFO    0   FALSE      0.785      5.321
-    ## 4    3  <NA>   2.0.0    INFO    0   FALSE      0.771      5.119
-    ## 5    4  auto   1.6.0    INFO    0   FALSE      0.914      4.856
-    ## 6    5  auto   1.6.0    WARN    0   FALSE      0.977      5.509
-    ## 7    6  auto   1.6.0    WARN    0   FALSE      0.883      4.042
-    ## 8    7  auto   1.6.0    WARN    8   FALSE      0.906      4.418
-    ## 9    8  auto   2.0.0    WARN    8   FALSE      0.870      2.356
-    ## 10   9  auto   2.0.0    WARN    0   FALSE      0.854      2.245
-    ## 11  10  auto   1.6.0    WARN    0    TRUE      0.774      0.604
-    ## 12  11  auto   2.0.0    WARN    0    TRUE      0.790      0.573
+    ##    run cores       version logging part shuffle dplyr warm spark warm
+    ## 1    0  <NA>         1.6.0    INFO    0   FALSE      0.844     12.201
+    ## 2    1  <NA>         1.6.0    INFO    0   FALSE      0.798     10.556
+    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE      0.807      5.479
+    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE      0.768      5.044
+    ## 5    4  auto         1.6.0    INFO    0   FALSE      0.957      5.018
+    ## 6    5  auto         1.6.0    WARN    0   FALSE      0.896      4.777
+    ## 7    6  auto         1.6.0    WARN    0   FALSE      0.949      4.544
+    ## 8    7  auto         1.6.0    WARN    8   FALSE      0.949      4.550
+    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE      0.846      2.440
+    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE      0.852      2.284
+    ## 11  10  auto         1.6.0    WARN    0    TRUE      0.808      0.539
+    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE      0.808      0.423
 
 ``` r
 results %>%
-  filter(test != "dplyr summarize" | test != "spark summarize") %>%
+  filter(test != "dplyr" | test != "spark") %>%
   ggplot(aes(test, params)) + 
     geom_tile(aes(fill = elapsed), colour = "white") +
     scale_fill_gradient(low = "steelblue", high = "black") +
@@ -258,7 +258,7 @@ results %>%
 
 ``` r
 results %>%
-  filter(test == "dplyr summarize" | test == "spark summarize") %>%
+  filter(test == "dplyr" | test == "spark") %>%
   ggplot(aes(x=run, y=elapsed, group = test, color = test)) + 
     geom_line() + geom_point() +
     ggtitle("Time per Run")
