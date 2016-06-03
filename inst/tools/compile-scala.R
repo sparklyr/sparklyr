@@ -39,10 +39,7 @@ jars <- list.files(
 )
 
 # construct classpath
-CLASSPATH <- paste(c(
-  file.path(root, "inst/scala"),
-  jars
-), collapse = ":")
+CLASSPATH <- paste(jars, collapse = .Platform$path.sep)
 
 # ensure 'inst/java' exists
 inst_java_path <- file.path(root, "inst/java")
@@ -59,20 +56,19 @@ system(paste(
 ))
 
 # call 'jar' to create our jar
-class_files <- list.files(file.path(root, "inst/scala"), pattern = "class$")
+class_files <- list.files(pattern = "class$")
 rspark_utils_path <- file.path(root, "inst/java/rspark_utils.jar")
 system(paste(
-  "jar",
-  "cf",
+  "jar cf",
   rspark_utils_path,
   paste(class_files)
 ))
 
 # double-check existence of 'rspark_utils.jar'
 if (file.exists(rspark_utils_path)) {
-  message(basename(rspark_utils_path), " successfully created.")
+  message("> ", basename(rspark_utils_path), " successfully created.")
 } else {
-  stop("Failed to create rspark utils .jar")
+  stop("> Failed to create rspark utils .jar")
 }
 
 setwd(owd)
