@@ -166,15 +166,17 @@ spark_web <- function(scon) {
     matches <- regexpr("http://.*", uiLine, perl=TRUE)
     match <-regmatches(uiLine, matches)
     if (length(match) > 0) {
-      utils::browseURL(match)
-      foundMatch <- TRUE
+      return(structure(match, class = "spark_web_url"))
     }
   }
 
-  if (!foundMatch) {
-    warning("Spark UI URL not found in logs, attempting to guess.")
-    utils::browseURL("http://localhost:4040")
-  }
+  warning("Spark UI URL not found in logs, attempting to guess.")
+  structure("http://localhost:4040", class = "spark_web_url")
+}
+
+#' @export
+print.spark_web_url <- function(x, ...) {
+  utils::browseURL(x)
 }
 
 spark_attach_connection <- function(object, scon) {
