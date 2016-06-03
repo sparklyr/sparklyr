@@ -298,3 +298,21 @@ spark_object_info <- function(jobj) {
 spark_connection <- function(jobj) {
   jobj$scon
 }
+
+spark_inspect <- function(jobj) {
+  print(jobj)
+  if (!spark_connection_is_open(spark_scon(jobj)))
+    return(jobj)
+
+  class <- spark_invoke(jobj, "getClass")
+
+  cat("Fields:\n")
+  fields <- spark_invoke(class, "getDeclaredFields")
+  lapply(fields, function(field) { print(field) })
+
+  cat("Methods:\n")
+  methods <- spark_invoke(class, "getDeclaredMethods")
+  lapply(methods, function(method) { print(method) })
+
+  jobj
+}

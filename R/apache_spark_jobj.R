@@ -74,10 +74,10 @@ jobj <- function(objId) {
 print.jobj <- function(x, ...) {
   if (spark_connection_is_open(x$scon)) {
     info <- spark_object_info(x)
-    fmt <- "<jobj [%s]>\n  %s\n  %s\n"
+    fmt <- "<jobj[%s]>\n  %s\n  %s\n"
     cat(sprintf(fmt, x$id, info$class, info$repr))
   } else {
-    fmt <- "<jobj [%s; detached]>"
+    fmt <- "<jobj[%s]>\n  <detached>"
     cat(sprintf(fmt, x$id))
   }
 }
