@@ -31,40 +31,27 @@ Basing kmeans over Spark on [http://spark.apache.org/docs/latest/mllib-clusterin
 
 ```{r}
 library(rspark)
+library(dplyr)
 
-sc <- spark_connect("local", cores = "auto", version = "1.6.1")
+sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
 db <- src_spark(sc)
 
 # copy the iris table to Spark
+names(iris) <- gsub("[^a-zA-Z0-9]", "_", names(iris))
 copy_to(db, iris, "iris")
 iris_tbl <- tbl(db, "iris")
 
-sqlResult <- spark_invoke(
-    rspark:::spark_sql_or_hive(db$con@api),
-    "sql",
-    "SELECT * FROM iris"
-  )
-
-rdd <- spark_invoke(sqlResult, "rdd")
-
-# Cluster the data into two classes using KMeans
-numClusters <- 2
-numIterations <- 20
-clusters <- spark_invoke_static(sc, 
-                                "org.apache.spark.mllib.clustering.KMeans",
-                                "train",
-                                rdd,
-                                as.integer(numClusters),
-                                as.integer(numIterations))
-
-centers <- spark_invoke(clusters, "clusterCenters")
-centers
+centers <- iris_tbl %>%
+  select(Petal_Width, Petal_Length) %>%
+  rspark:::spark_mllib_kmeans(3)
 
 iris_tbl %>%
   select(Petal.Width, Petal.Length) %>%
   collect %>%
   ggplot(aes(x=Petal.Length, y=Petal.Width)) +
     geom_point(aes(x=Petal.Width,y=Petal.Length), size=2, alpha=0.5)
+
+spark_disconnect(sc)
 
 ```
 
