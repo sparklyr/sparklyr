@@ -154,7 +154,7 @@ spark_ec2_master <- function(
 run_ec2_command <- function(command,
                             commandParams,
                             input = "",
-                            clusterInfo = cluster_info,
+                            clusterInfo = NULL,
                             preview = FALSE,
                             parse = TRUE) {
 

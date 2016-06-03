@@ -177,7 +177,7 @@ sql_analyze.src_spark <- function(...) {
 #' @param x Reference to dplyr source
 #' @param ... Additional parameters
 print.src_spark <- function(x, ...) {
-  cat(src_desc(db))
+  cat(src_desc(x))
   cat("\n\n")
 
   spark_log(x$con@scon)

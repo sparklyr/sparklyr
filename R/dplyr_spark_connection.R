@@ -39,7 +39,7 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
     assert_that(is.character(where))
 
     where_paren <- escape(where, parens = TRUE, con = con)
-    out$where <- build_sql("WHERE ", dplyr:::sql_vector(where_paren, collapse = " AND "))
+    out$where <- build_sql("WHERE ", dplyr::sql_vector(where_paren, collapse = " AND "))
   }
 
   if (length(group_by) > 0L) {

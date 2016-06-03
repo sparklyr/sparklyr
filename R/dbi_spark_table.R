@@ -88,7 +88,7 @@ mutate_.tbl_spark <- function(.data, ..., .dots) {
 
   data <- .data
   lapply(seq_along(dots), function(i) {
-    data <<- dplyr:::add_op_single("mutate", data, dots = dots[i])
+    data <<- dplyr::add_op_single("mutate", data, dots = dots[i])
   })
 
   data
