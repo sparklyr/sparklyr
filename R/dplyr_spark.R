@@ -37,8 +37,23 @@ spark_api <- function(con) {
   spark_dbi(con)@api
 }
 
-spark_scon <- function(con) {
-  spark_api(con)$scon
+spark_scon <- function(x, ...) {
+  UseMethod("spark_scon")
+}
+
+#' @export
+spark_scon.jobj <- function(x, ...) {
+  x
+}
+
+#' @export
+spark_scon.tbl_spark <- function(x, ...) {
+  spark_scon(iris_tbl$src)
+}
+
+#' @export
+spark_scon.src_spark <- function(x, ...) {
+  spark_dbi(x)@scon
 }
 
 #' Executes arbitrary SQL statements
@@ -181,4 +196,23 @@ print.src_spark <- function(x, ...) {
   cat("\n\n")
 
   spark_log(x$con@scon)
+}
+
+as_spark_dataframe <- function(x, ...) {
+  UseMethod("as_spark_dataframe")
+}
+
+#' @export
+as_spark_dataframe.jobj <- function(x, ...) {
+  x
+}
+
+#' @export
+as_spark_dataframe.tbl_spark <- function(x, ...) {
+  db <- x$src
+  con <- db$con
+
+  sql <- as.character(sql_render(sql_build(x, con = con), con = con))
+  api <- spark_sql_or_hive(spark_api(x$src))
+  spark_invoke(api, "sql", sql)
 }
