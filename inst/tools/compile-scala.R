@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 library(rspark)
 library(rprojroot)
 
