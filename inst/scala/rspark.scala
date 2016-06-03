@@ -16,6 +16,8 @@ object utils {
       Vectors.dense(row.toSeq.toArray.map({
         case s: String => s.toDouble
         case l: Long => l.toDouble
+        case i: Integer => i.toDouble
+        case d: Double => d
         case _ => 0.0
       }))
     })

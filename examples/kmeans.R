@@ -10,9 +10,11 @@ names(iris) <- gsub("[^a-zA-Z0-9]", "_", names(iris))
 copy_to(db, iris, "iris")
 iris_tbl <- tbl(db, "iris")
 
-kmm <- iris_tbl %>%
-  select(Sepal_Width, Sepal_Length) %>%
-  spark_mllib_kmeans(3)
+subset <- iris_tbl %>%
+  select(Sepal_Width, Sepal_Length)
 
-rspark:::spark_inspect(kmm)
-spark_invoke(kmm, "k")
+rdd <- rspark:::as_spark_rdd(subset)
+rspark:::spark_inspect(rdd)
+
+kmm <- spark_mllib_kmeans(subset, 3L, 20L)
+spark_invoke(kmm, "clusterCenters")
