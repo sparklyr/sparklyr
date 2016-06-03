@@ -2,13 +2,31 @@
 
 if (!requireNamespace("rprojroot", quietly = TRUE))
   install.packages("rprojroot")
-
-library(rspark)
 library(rprojroot)
+root <- rprojroot::find_package_root_file()
+
+# Bail if 'rspark.scala' hasn't changed
+if (!requireNamespace("digest", quietly = TRUE))
+  install.packages("digest")
+library(digest)
+
+rspark_utils_path <- file.path(root, "inst/java/rspark_utils.jar")
+rspark_scala <- file.path(root, "inst/scala/rspark.scala")
+rspark_scala_digest <- file.path(root, "inst/scala/rspark.scala.md5")
+
+md5 <- tools::md5sum(rspark_scala)
+if (file.exists(rspark_scala_digest) && file.exists(rspark_utils_path)) {
+  contents <- readChar(rspark_scala_digest, file.info(rspark_scala_digest)$size, TRUE)
+  if (identical(contents, md5[[rspark_scala]])) {
+    stop("*** Skipping compilation of 'rspark.scala': contents unchanged")
+  }
+}
+
+cat(md5, file = rspark_scala_digest)
 
 execute <- function(...) {
   cmd <- paste(...)
-  message(cmd)
+  message("*** ", cmd)
   system(cmd)
 }
 
@@ -17,8 +35,6 @@ if (!nzchar(Sys.which("scalac")))
 
 if (!nzchar(Sys.which("jar")))
   stop("Failed to discover 'jar' on the PATH")
-
-root <- rprojroot::find_package_root_file()
 
 # Work in temporary directory (as temporary class files
 # will be generated within there)
@@ -33,10 +49,10 @@ hadoop_version <- "2.6"
 
 # Get potential installation paths
 install_info <- tryCatch(
-  rspark:::spark_install_find(spark_version, hadoop_version),
+  spark_install_find(spark_version, hadoop_version),
   error = function(e) {
     spark_install(spark_version, hadoop_version)
-    rspark:::spark_install_find(spark_version, hadoop_version)
+    spark_install_find(spark_version, hadoop_version)
   }
 )
 
@@ -57,7 +73,6 @@ if (!file.exists(inst_java_path))
     stop("Failed to create directory '", inst_java_path, "'")
 
 # call 'scalac' compiler
-rspark_scala <- file.path(root, "inst/scala/rspark.scala")
 classpath <- Sys.getenv("CLASSPATH")
 
 # set CLASSPATH environment variable rather than passing
@@ -68,17 +83,13 @@ Sys.setenv(CLASSPATH = classpath)
 
 # call 'jar' to create our jar
 class_files <- list.files(pattern = "class$")
-rspark_utils_path <- file.path(root, "inst/java/rspark_utils.jar")
-if (file.exists(rspark_utils_path))
-  unlink(rspark_utils_path)
-
-execute("jar cvf", rspark_utils_path, paste(shQuote(class_files), collapse = " "))
+execute("jar cf", rspark_utils_path, paste(shQuote(class_files), collapse = " "))
 
 # double-check existence of 'rspark_utils.jar'
 if (file.exists(rspark_utils_path)) {
-  message("> ", basename(rspark_utils_path), " successfully created.")
+  message("*** ", basename(rspark_utils_path), " successfully created.")
 } else {
-  stop("> Failed to create rspark utils .jar")
+  stop("*** Failed to create rspark utils .jar")
 }
 
 setwd(owd)
