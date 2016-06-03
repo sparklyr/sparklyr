@@ -41,6 +41,7 @@ Collate:
     'mllib_kmeans.R'
     'options_spark.R'
     'shell_spark.R'
+    'spark_rdd.R'
     'utils.R'
 Imports:
     methods,

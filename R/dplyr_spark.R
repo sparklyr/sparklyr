@@ -42,8 +42,13 @@ spark_scon <- function(x, ...) {
 }
 
 #' @export
-spark_scon.jobj <- function(x, ...) {
+spark_scon.spark_connection <- function(x, ...) {
   x
+}
+
+#' @export
+spark_scon.jobj <- function(x, ...) {
+  x$scon
 }
 
 #' @export

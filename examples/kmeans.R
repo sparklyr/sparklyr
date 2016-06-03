@@ -10,6 +10,6 @@ names(iris) <- gsub("[^a-zA-Z0-9]", "_", names(iris))
 copy_to(db, iris, "iris")
 iris_tbl <- tbl(db, "iris")
 
-kmeans_wrapper <- rspark:::spark_mllib_kmeans(sc, iris_tbl, 3)
+kmeans_wrapper <- rspark:::spark_mllib_kmeans(iris_tbl, 3)
 centers <- spark_invoke(kmeans_wrapper, "fitted", "centers")
 spark_collect(centers)
