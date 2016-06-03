@@ -18,6 +18,5 @@ spark_mllib_kmeans <- function(x, centers, iter.max = 10) {
     as.integer(iter.max)
   )
 
-  # TODO: Return a nicer interface to the KMeans object or just centers?
-  spark_invoke(kmeans_model, "clusterCenters")
+  kmeans_model
 }
