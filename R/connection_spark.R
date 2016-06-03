@@ -10,7 +10,10 @@ spark_default_packages <- function() {
 spark_default_jars <- function() {
   jarsOption <- getOption("rspark.jars.default", NULL)
 
-  if (is.null(jarsOption)) c("inst/jars/rspark_utils.jar") else jarsOption
+  if (is.null(jarsOption))
+    system.file(file.path("java", "rspark_utils.jar"), package = "rspark")
+  else
+    jarsOption
 }
 
 #' Connects to Spark and establishes the Spark Context
@@ -69,7 +72,7 @@ spark_connect <- function(master = "local",
   parentCall <- match.call()
   lapply(seq_len(length(parentCall)), function(idxCall) {
     if (idxCall > 1) {
-      parentCall[[idxCall]] <<- eval(parentCall[[idxCall]])
+      parentCall[[idxCall]] <<- eval(parentCall[[idxCall]], parent.frame(n = 3))
     }
   })
 
