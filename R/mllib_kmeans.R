@@ -14,31 +14,31 @@ spark_mllib_kmeans <- function(x, centers, iter.max = 10) {
   sql <- as.character(sql_render(sql_build(x, con = db$con), con = db$con))
 
   # Extract a Spark DataFrame from the x object
-  if (inherits(x, "tbl_spark")) {
-    x <- spark_invoke(
-      spark_sql_or_hive(spark_api(x$src)),
-      "sql",
-      sql
-    )
+  if (!inherits(x, "tbl_spark")) {
+    stop("The kmeans source is expected to be compatible with dplyr.")
   }
 
-  if (!inherits(x, "jobj"))
-    stop("'x' should be a 'jobj' (referencing a Spark data set)")
+  sqlResult <- spark_invoke(
+    spark_sql_or_hive(spark_api(x$src)),
+    "sql",
+    sql
+  )
 
-  kmeans_wrapper <- spark_invoke_static(
+  rddRow <- spark_invoke(sqlResult, "rdd")
+
+  rddVector <- spark_invoke_static(scon, "utils", "schemaRddToVectorRdd", rddRow)
+
+  kMeansModel <- spark_invoke_static(
     scon,
 
-    "org.apache.spark.ml.r.KMeansWrapper",
-    "fit",
+    "org.apache.spark.mllib.clustering.KMeans",
+    "train",
 
-    x,
-    formula,
+    rddVector,
     as.integer(centers),
-    as.integer(iter.max),
-    "k-means||"
+    as.integer(iter.max)
   )
 
   # TODO: Return a nicer interface to the KMeans object or just centers?
-  centers <- spark_invoke(kmeans_wrapper, "fitted", "centers")
-  centers <- spark_collect(centers)
+  spark_invoke(kMeansModel, "clusterCenters")
 }

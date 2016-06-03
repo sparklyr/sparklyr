@@ -45,13 +45,13 @@ centers <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   rspark:::spark_mllib_kmeans(3)
 
-iris_tbl %>%
-  select(Petal.Width, Petal.Length) %>%
-  collect %>%
-  ggplot(aes(x=Petal.Length, y=Petal.Width)) +
-    geom_point(aes(x=Petal.Width,y=Petal.Length), size=2, alpha=0.5)
+centers
 
-spark_disconnect(sc)
+# iris_tbl %>%
+#  select(Petal.Width, Petal.Length) %>%
+#  collect %>%
+#  ggplot(aes(x=Petal.Length, y=Petal.Width)) +
+#    geom_point(aes(x=Petal.Width,y=Petal.Length), size=2, alpha=0.5)
 
 ```
 
