@@ -1,5 +1,8 @@
 #!/usr/bin/env Rscript
 
+if (!requireNamespace("rprojroot", quietly = TRUE))
+  install.packages("rprojroot")
+
 library(rspark)
 library(rprojroot)
 
