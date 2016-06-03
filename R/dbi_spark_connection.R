@@ -41,6 +41,15 @@ setMethod("show", "DBISparkConnection", function(object) {
 setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
   api <- spark_api_create(drv@scon)
 
+  # call connection opened with revised connectCall
+  sconInst <- spark_connection_get_inst(drv@scon)
+  connectCall <- strsplit(sconInst$connectCall, "\n")[[1]]
+  connectCall <- paste(connectCall[[1]],
+                       connectCall[[2]],
+                       "db <- dbConnect(DBISpark(sc))",
+                       sep = "\n")
+  on_connection_opened(drv@scon, connectCall)
+
   new("DBISparkConnection", scon = drv@scon, api = api)
 })
 

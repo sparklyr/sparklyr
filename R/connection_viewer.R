@@ -1,6 +1,7 @@
 
 
 on_connection_opened <- function(scon, connectCall) {
+
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer)) {
     viewer$connectionOpened(
@@ -24,10 +25,10 @@ on_connection_opened <- function(scon, connectCall) {
       },
 
       # connection code
-      paste("library(rspark)\nsc <-", connectCall),
+      connectCall,
 
       # disconnection code (object name will be determined via finder)
-      "rspark::spark_disconnect(%s)")
+      "spark_disconnect(%s)")
   }
 }
 

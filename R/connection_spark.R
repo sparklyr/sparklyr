@@ -73,7 +73,9 @@ spark_connect <- function(master = "local",
     }
   })
 
-  sconInst$connectCall <- paste(deparse(parentCall, width.cutoff = 500), collapse = " ")
+  sconInst$connectCall <- paste("library(rspark)",
+                                paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
+                                sep = "\n")
   sconInst$onReconnect = list()
 
   reg.finalizer(baseenv(), function(x) {
