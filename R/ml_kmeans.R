@@ -3,7 +3,7 @@
 #' @param x A dplyr source.
 #' @param centers Number of centers to compute.
 #' @param iter.max Maximum number of iterations used to compute kmeans.
-spark_mllib_kmeans <- function(x, centers, iter.max = 10) {
+ml_kmeans <- function(x, centers, iter.max = 10) {
   scon <- spark_scon(x)
   sparkRdd <- as_spark_rdd(x)
 

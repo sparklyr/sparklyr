@@ -1,5 +1,5 @@
 ---
-title: "RSpark ML: Draft"
+title: "RSpark ML: Examples"
 output:
   github_document:
     fig_width: 9
@@ -45,7 +45,7 @@ iris_tbl <- tbl(db, "iris")
 
 model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
-  rspark:::spark_mllib_kmeans(3)
+  ml_kmeans(3)
 
 iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
