@@ -18,3 +18,5 @@ rspark:::spark_inspect(rdd)
 
 kmm <- spark_mllib_kmeans(subset, 3L, 20L)
 spark_invoke(kmm, "clusterCenters")
+
+spark_disconnect(sc)

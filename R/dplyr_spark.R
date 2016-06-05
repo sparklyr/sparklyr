@@ -53,7 +53,7 @@ spark_scon.jobj <- function(x, ...) {
 
 #' @export
 spark_scon.tbl_spark <- function(x, ...) {
-  spark_scon(iris_tbl$src)
+  spark_scon(x$src)
 }
 
 #' @export
