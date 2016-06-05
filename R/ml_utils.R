@@ -3,7 +3,7 @@ spark_jobj_list_to_array_df <- function(data, dataNames) {
     spark_invoke(e, "toArray")
   })
 
-  df <- as.data.frame(matrix(unlist(listOfLists), nrow=length(listOfLists)))
+  df <- as.data.frame(t(matrix(unlist(listOfLists), nrow=length(dataNames))))
   colnames(df) <- dataNames
 
   df
