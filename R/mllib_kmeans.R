@@ -5,18 +5,23 @@
 #' @param iter.max Maximum number of iterations used to compute kmeans.
 spark_mllib_kmeans <- function(x, centers, iter.max = 10) {
   scon <- spark_scon(x)
-  spark_rdd <- as_spark_rdd(x)
+  sparkRdd <- as_spark_rdd(x)
 
-  kmeans_model <- spark_invoke_static(
+  kmeansModel <- spark_invoke_static(
     scon,
 
     "org.apache.spark.mllib.clustering.KMeans",
     "train",
 
-    spark_rdd,
+    sparkRdd,
     as.integer(centers),
     as.integer(iter.max)
   )
 
-  kmeans_model
+  list(
+    model = kmeansModel,
+    centers = spark_invoke(kmeansModel, "clusterCenters") %>%
+      spark_jobj_list_to_array_df(colnames(x))
+  )
 }
+
