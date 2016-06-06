@@ -37,15 +37,11 @@ as_lm_result <- function(model, features) {
   summary <- spark_invoke(model, "summary")
 
   residuals <- spark_invoke(summary, "residuals") %>%
-    spark_invoke("collect") %>%
-    unlist(recursive = TRUE) %>%
-    unname()
+    spark_collect()
 
   predictions <- spark_invoke(summary, "predictions") %>%
     spark_invoke("select", "prediction", list()) %>%
-    spark_invoke("collect") %>%
-    unlist(recursive = TRUE) %>%
-    unname()
+    spark_collect()
 
   errors <- spark_invoke(summary, "coefficientStandardErrors") %>%
     unlist(recursive = FALSE)

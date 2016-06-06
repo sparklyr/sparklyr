@@ -319,3 +319,19 @@ spark_inspect <- function(jobj) {
 
   jobj
 }
+
+spark_collect <- function(jobj) {
+  scon <- jobj$scon
+
+  colNames  <- as.character(spark_invoke(jobj, "columns"))
+  colValues <- spark_invoke_static(
+    scon,
+    "org.apache.spark.sql.api.r.SQLUtils",
+    "dfToCols",
+    jobj
+  )
+
+  df <- lapply(colValues, unlist, recursive = FALSE)
+  names(df) <- colNames
+  dplyr::as_data_frame(df, stringsAsFactors = FALSE, optional = TRUE)
+}
