@@ -230,6 +230,9 @@ spark_api_copy_data <- function(api, df, name, repartition) {
     stop("The repartition parameter must be an integer")
   }
 
+  # Escaping issues that used to work were brokend in Spark 2.0.0-preview, fix:
+  names(df) <- gsub("[^a-zA-Z0-9]", "_", names(df))
+
   tempfile <- tempfile(fileext = ".csv")
   write.csv(df, tempfile, row.names = FALSE, na = "")
 
