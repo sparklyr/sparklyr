@@ -20,7 +20,7 @@ spark_assemble_vector <- function(sc, df, input_cols, output_col) {
   )
 
   assembler %>%
-    spark_invoke("setInputCols", input_cols) %>%
+    spark_invoke("setInputCols", as.list(input_cols)) %>%
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("transform", df)
 }
