@@ -58,7 +58,6 @@ as_lm_result <- function(model, features) {
   list(
     coefficients = coefficients,
     residuals = residuals,
-    rank = length(coefficients),
     fitted.values = predictions,
     standard.errors = errors,
     t.values = tvalues,
