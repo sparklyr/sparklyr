@@ -1,11 +1,11 @@
 #!/usr/bin/env Rscript
+options(repos = c(CRAN = "https://cran.rstudio.com"))
 
 if (!requireNamespace("rprojroot", quietly = TRUE))
   install.packages("rprojroot")
 library(rprojroot)
 root <- rprojroot::find_package_root_file()
 
-# Bail if 'rspark.scala' hasn't changed
 if (!requireNamespace("digest", quietly = TRUE))
   install.packages("digest")
 library(digest)
@@ -14,13 +14,16 @@ rspark_utils_path <- file.path(root, "inst/java/rspark_utils.jar")
 rspark_scala <- file.path(root, "inst/scala/rspark.scala")
 rspark_scala_digest <- file.path(root, "inst/scala/rspark.scala.md5")
 
+# Bail if 'rspark.scala' hasn't changed
 md5 <- tools::md5sum(rspark_scala)
 if (file.exists(rspark_scala_digest) && file.exists(rspark_utils_path)) {
   contents <- readChar(rspark_scala_digest, file.info(rspark_scala_digest)$size, TRUE)
   if (identical(contents, md5[[rspark_scala]])) {
-    stop("*** Skipping compilation of 'rspark.scala': contents unchanged")
+    stop()
   }
 }
+
+message("** building 'rspark_utils.jar' ...")
 
 cat(md5, file = rspark_scala_digest)
 
@@ -31,10 +34,10 @@ execute <- function(...) {
 }
 
 if (!nzchar(Sys.which("scalac")))
-  stop("Failed to discover 'scalac' on the PATH")
+  stop("failed to discover 'scalac' on the PATH")
 
 if (!nzchar(Sys.which("jar")))
-  stop("Failed to discover 'jar' on the PATH")
+  stop("failed to discover 'jar' on the PATH")
 
 # Work in temporary directory (as temporary class files
 # will be generated within there)
@@ -70,7 +73,7 @@ CLASSPATH <- paste(jars, collapse = .Platform$path.sep)
 inst_java_path <- file.path(root, "inst/java")
 if (!file.exists(inst_java_path))
   if (!dir.create(inst_java_path, recursive = TRUE))
-    stop("Failed to create directory '", inst_java_path, "'")
+    stop("failed to create directory '", inst_java_path, "'")
 
 # call 'scalac' compiler
 classpath <- Sys.getenv("CLASSPATH")
@@ -89,7 +92,7 @@ execute("jar cf", rspark_utils_path, paste(shQuote(class_files), collapse = " ")
 if (file.exists(rspark_utils_path)) {
   message("*** ", basename(rspark_utils_path), " successfully created.")
 } else {
-  stop("*** Failed to create rspark utils .jar")
+  stop("*** failed to create rspark_utils.jar")
 }
 
 setwd(owd)
