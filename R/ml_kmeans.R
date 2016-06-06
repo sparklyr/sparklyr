@@ -2,22 +2,13 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10) {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
-  # use VectorAssembler to join columns into
-  # single 'features' column
-  assembler <- spark_invoke_static_ctor(
-    scon,
-    "org.apache.spark.ml.feature.VectorAssembler"
-  )
-
+  # collect vectors of interest into single column
   columns <- as.list(spark_invoke(df, "columns"))
-  tdf <- assembler %>%
-    spark_invoke("setInputCols", columns) %>%
-    spark_invoke("setOutputCol", "features") %>%
-    spark_invoke("transform", df)
+  tdf <- spark_assemble_vector(scon, df, columns, "features")
 
   # invoke KMeans
   kmeans <- spark_invoke_static_ctor(
-    sc,
+    scon,
     "org.apache.spark.ml.clustering.KMeans"
   )
 
