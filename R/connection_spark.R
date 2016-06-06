@@ -123,12 +123,7 @@ spark_disconnect <- function(scon) {
 #' @param scon Spark connection provided by spark_connect
 #' @param n Max number of log entries to retrieve
 spark_log <- function(scon, n = 100) {
-  if (!spark_connection_is_open(scon)) {
-    stop("The Spark conneciton is not open anymmore, log is not available")
-  }
-
-  sconInst <- spark_connection_get_inst(scon)
-  log <- file(sconInst$outputFile)
+  log <- file(spark_log_file(scon))
   lines <- readLines(log)
   close(log)
 
@@ -136,6 +131,16 @@ spark_log <- function(scon, n = 100) {
   attr(linesLog, "class") <- "spark_log"
 
   linesLog
+}
+
+#' @rdname spark_log
+#' @export
+spark_log_file <- function(scon) {
+  if (!spark_connection_is_open(scon)) {
+    stop("The Spark conneciton is not open anymmore, log is not available")
+  }
+  sconInst <- spark_connection_get_inst(scon)
+  sconInst$outputFile
 }
 
 #' Prints a spark_log object

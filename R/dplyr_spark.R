@@ -134,7 +134,7 @@ copy_to.src_spark <- function(con, df, name, cache = TRUE, repartition = 0) {
     tbl_cache(con, name)
   }
 
-  on_connection_updated(src_context(con))
+  on_connection_updated(src_context(con), name)
 
   invisible(result)
 }

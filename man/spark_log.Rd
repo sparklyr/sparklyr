@@ -3,9 +3,12 @@
 \name{spark_log}
 \alias{print.spark_log}
 \alias{spark_log}
+\alias{spark_log_file}
 \title{Retrieves the last n entries in the Spark log}
 \usage{
 spark_log(scon, n = 100)
+
+spark_log_file(scon)
 
 \method{print}{spark_log}(x, ...)
 }

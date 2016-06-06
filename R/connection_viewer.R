@@ -38,8 +38,8 @@ on_connection_closed <- function(scon) {
     viewer$connectionClosed(type = "Spark", host = scon$master)
 }
 
-on_connection_updated <- function(scon) {
+on_connection_updated <- function(scon, hint) {
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer))
-    viewer$connectionUpdated(type = "Spark", host = scon$master)
+    viewer$connectionUpdated(type = "Spark", host = scon$master, hint = hint)
 }
