@@ -4,6 +4,7 @@
 ^README\.Rmd$
 ^examples/
 ^docs/
+^internal/
 ^res/
 ^tools/
 ^derby\.log$
