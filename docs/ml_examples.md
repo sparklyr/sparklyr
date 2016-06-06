@@ -41,10 +41,10 @@ iris %>%
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
-Draft: KMeans in RSpark
------------------------
+KMeans in RSpark
+----------------
 
-Basing kmeans over Spark on \[<http://spark.apache.org/docs/latest/mllib-clustering.html>\]
+Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/latest/mllib-clustering.html#k-means)
 
 ``` r
 library(rspark)
@@ -55,9 +55,7 @@ sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
 db <- src_spark(sc)
 
 # copy the iris table to Spark
-iris_copy <- iris
-names(iris_copy) <- gsub("[^a-zA-Z0-9]", "_", names(iris))
-copy_to(db, iris_copy, "iris")
+copy_to(db, iris, "iris")
 iris_tbl <- tbl(db, "iris")
 
 model <- iris_tbl %>%
