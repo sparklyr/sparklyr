@@ -52,3 +52,7 @@ aliased_path <- function(path) {
     path <- file.path("~", substring(path, nchar(home) + 1))
   path
 }
+
+transpose_list <- function(list) {
+  do.call(Map, c(c, list, USE.NAMES = FALSE))
+}

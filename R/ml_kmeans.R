@@ -37,5 +37,17 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10) {
 #' @param iter.max Maximum number of iterations used to compute kmeans.
 ml_kmeans <- function(x, centers, iter.max = 10) {
   kmm <- spark_ml_kmeans(x, centers, iter.max)
-  kmm
+
+  # extract cluster centers
+  kmm_centers <- spark_invoke(kmm, "clusterCenters")
+
+  centers_list <- transpose_list(lapply(kmm_centers, function(center) {
+    unlist(spark_invoke(center, "toArray"), recursive = FALSE)
+  }))
+
+  names(centers_list) <- as.character(dplyr::tbl_vars(x))
+  centers <- as.data.frame(centers_list, stringsAsFactors = FALSE)
+
+  list(model = kmm, centers = centers)
+
 }
