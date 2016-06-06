@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+Rscript configure.R
+

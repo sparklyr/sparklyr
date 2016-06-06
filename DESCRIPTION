@@ -38,9 +38,11 @@ Collate:
     'ec2_spark.R'
     'install_spark.R'
     'install_spark_versions.R'
-    'mllib_kmeans.R'
+    'ml_kmeans.R'
+    'ml_utils.R'
     'options_spark.R'
     'shell_spark.R'
+    'spark_rdd.R'
     'utils.R'
 Imports:
     methods,

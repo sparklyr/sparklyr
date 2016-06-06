@@ -15,7 +15,7 @@ setClass("DBISparkConnection",
 #' @export
 #' @rdname dbi-spark-connection
 setMethod("dbGetInfo", "DBISparkConnection", function(dbObj, ...) {
-  connection_info(dbObj)
+  dbObj$con@scon
 })
 
 #' @export

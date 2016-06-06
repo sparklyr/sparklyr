@@ -20,9 +20,13 @@ spark_api_create_sql_context <- function(scon) {
 }
 
 is_spark_v2 <- function(scon) {
-  version <- sub("-preview", "", scon$sparkVersion)
-  compared <- utils::compareVersion(version, "2.0.0")
-  compared != -1
+  if (!is.null(scon$sparkVersion)) {
+    version <- sub("-preview", "", scon$sparkVersion)
+    compared <- utils::compareVersion(version, "2.0.0")
+    compared != -1
+  } else {
+    FALSE
+  }
 }
 
 spark_api_create_hive_context <- function(scon) {
@@ -295,18 +299,20 @@ spark_connection <- function(jobj) {
   jobj$scon
 }
 
-spark_collect <- function(jobj) {
+spark_inspect <- function(jobj) {
+  print(jobj)
+  if (!spark_connection_is_open(spark_scon(jobj)))
+    return(jobj)
 
-  collected <- spark_invoke_static(
-    spark_connection(jobj),
-    "org.apache.spark.sql.api.r.SQLUtils",
-    "dfToCols",
-    jobj
-  )
+  class <- spark_invoke(jobj, "getClass")
 
-  names <- spark_invoke(jobj, "columns")
-  list <- lapply(collected, unlist)
-  names(list) <- names
-  dplyr::as_data_frame(list)
+  cat("Fields:\n")
+  fields <- spark_invoke(class, "getDeclaredFields")
+  lapply(fields, function(field) { print(field) })
 
+  cat("Methods:\n")
+  methods <- spark_invoke(class, "getDeclaredMethods")
+  lapply(methods, function(method) { print(method) })
+
+  jobj
 }

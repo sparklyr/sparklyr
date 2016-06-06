@@ -1,4 +1,4 @@
-RSpark ML: Draft
+RSpark ML: Examples
 ================
 
 KMeans in R
@@ -39,29 +39,40 @@ iris %>%
     geom_point(data=iris, aes(x=Petal.Width,y=Petal.Length), size=2, alpha=0.5)
 ```
 
-![](ml_draft_files/figure-markdown_github/unnamed-chunk-1-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
 Draft: KMeans in RSpark
 -----------------------
 
+Basing kmeans over Spark on \[<http://spark.apache.org/docs/latest/mllib-clustering.html>\]
+
 ``` r
 library(rspark)
+library(dplyr)
+library(ggplot2)
 
-sc <- spark_connect("local", cores = "auto", version = "1.6.1")
+sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
 db <- src_spark(sc)
 
 # copy the iris table to Spark
-copy_to(db, iris, "iris")
+iris_copy <- iris
+names(iris_copy) <- gsub("[^a-zA-Z0-9]", "_", names(iris))
+copy_to(db, iris_copy, "iris")
 iris_tbl <- tbl(db, "iris")
 
+model <- iris_tbl %>%
+  select(Petal_Width, Petal_Length) %>%
+  ml_kmeans(3)
+
 iris_tbl %>%
-  select(Petal.Width, Petal.Length) %>%
+  select(Petal_Width, Petal_Length) %>%
   collect %>%
-  ggplot(aes(x=Petal.Length, y=Petal.Width)) +
-    geom_point(aes(x=Petal.Width,y=Petal.Length), size=2, alpha=0.5)
+  ggplot(aes(x=Petal_Length, y=Petal_Width)) +
+    geom_point(data=model$centers, aes(x=Petal_Width,y=Petal_Length), size=60, alpha=0.1) +
+    geom_point(aes(x=Petal_Width,y=Petal_Length), size=2, alpha=0.5)
 ```
 
-![](ml_draft_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-2-1.png)
 
 ``` r
 spark_disconnect(sc)

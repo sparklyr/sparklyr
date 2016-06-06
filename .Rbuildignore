@@ -5,6 +5,7 @@
 ^examples/
 ^docs/
 ^res/
+^tools/
 ^derby\.log$
 ^metastore_db$
 ^spark-warehouse$
