@@ -27,7 +27,8 @@ ml_kmeans <- function(x, centers, iter.max = 10) {
   )
 
   kmm <- kmeans %>%
-    spark_invoke("setK", 3L) %>%
+    spark_invoke("setK", as.integer(centers)) %>%
+    spark_invoke("setMaxIter", as.integer(iter.max)) %>%
     spark_invoke("setFeaturesCol", "features") %>%
     spark_invoke("fit", tdf)
 
