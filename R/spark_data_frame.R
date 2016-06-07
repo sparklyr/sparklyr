@@ -41,10 +41,15 @@ spark_dataframe_read_column <- function(jobj, colName, colType) {
     "readColumnInt"
   else if (colType == "BooleanType")
     "readColumnBoolean"
+  else if (colType == "StringType")
+    "readColumnString"
   else
     "readColumnDefault"
 
-  spark_invoke_static(jobj$scon, "utils", method, jobj, colName)
+  column <- spark_invoke_static(jobj$scon, "utils", method, jobj, colName)
+  if (colType == "StringType")
+    column <- strsplit(column, ",", fixed = TRUE)[[1]]
+  column
 }
 
 #' Read a Spark Dataset into R.
