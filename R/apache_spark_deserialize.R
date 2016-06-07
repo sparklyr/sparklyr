@@ -78,8 +78,8 @@ readDouble <- function(con, n = 1) {
   readBin(con, double(), n = n, endian = "big")
 }
 
-readBoolean <- function(con, n) {
-  as.logical(readInt(con, n))
+readBoolean <- function(con, n = 1) {
+  as.logical(readInt(con, n = n))
 }
 
 readType <- function(con) {
