@@ -1,12 +1,8 @@
-spark_ml_pca <- function(x, features = NULL) {
+spark_ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
-  # collect vectors of interest into single column
-  if (is.null(features))
-    features <- as.list(spark_invoke(df, "columns"))
-
-  tdf <- spark_assemble_vector(scon, df, as.list(features), "features")
+  tdf <- spark_assemble_vector(scon, df, features, "features")
 
   # invoke pca
   pca <- spark_invoke_static_ctor(
@@ -56,7 +52,7 @@ as_pca_result <- function(model, features) {
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
 #' @export
-ml_pca <- function(x, features = NULL) {
+ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
   model <- spark_ml_pca(x, features)
   as_pca_result(model, features)
 }

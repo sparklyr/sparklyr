@@ -1,4 +1,4 @@
-spark_ml_kmeans <- function(x, centers, iter.max = 10, features = NULL) {
+spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
@@ -30,7 +30,7 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10, features = NULL) {
 #' @param iter.max Maximum number of iterations used to compute kmeans.
 #' @param features Which columns to use in the kmeans fit. Defaults to
 #'   all columns within \code{x}.
-ml_kmeans <- function(x, centers, iter.max = 10, features = NULL) {
+ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
   kmm <- spark_ml_kmeans(x, centers, iter.max, features)
 
   # extract cluster centers
@@ -44,5 +44,4 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = NULL) {
   centers <- as.data.frame(centers_list, stringsAsFactors = FALSE)
 
   list(model = kmm, centers = centers)
-
 }

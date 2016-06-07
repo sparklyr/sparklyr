@@ -22,7 +22,6 @@ copy_to(db, iris, "iris")
 ## KMeans in R
 
 ```{r}
-
 cl <- iris %>%
   select(Petal.Width, Petal.Length) %>%
   kmeans(3)
@@ -55,7 +54,7 @@ tbl(db, "iris") %>%
 
 ```
 
-## Linear Model in R
+## Linear Regression in R
 
 ```{r}
 data <- iris %>%
@@ -72,7 +71,7 @@ iris %>%
                     color="red"))
 ```
 
-## Linear Model in RRspark
+## Linear Regression in RSpark
 
 ```{r}
 model <- tbl(db, "iris") %>%
@@ -88,6 +87,22 @@ iris %>%
                     color="red"))
 ```
 
+## Principal Components Analysis in R
+
+```{r}
+iris %>%
+  select(-Species) %>%
+  prcomp()
+```
+
+## Principal Components Analysis in RSpark
+
+```{r}
+model <- tbl(db, "iris") %>%
+  select(-Species) %>%
+  ml_pca()
+print(model)
+```
 
 ## Cleanup
 
