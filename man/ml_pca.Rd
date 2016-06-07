@@ -4,7 +4,7 @@
 \alias{ml_pca}
 \title{Perform Principal Components Analaysis using spark.ml}
 \usage{
-ml_pca(x, features = NULL)
+ml_pca(x, features = dplyr::tbl_vars(x))
 }
 \arguments{
 \item{x}{A \code{tbl_spark}.}

@@ -4,7 +4,7 @@
 \alias{ml_kmeans}
 \title{Computes kmeans from a dplyr source}
 \usage{
-ml_kmeans(x, centers, iter.max = 10, features = NULL)
+ml_kmeans(x, centers, iter.max = 10, features = dplyr::tbl_vars(x))
 }
 \arguments{
 \item{x}{A dplyr source.}

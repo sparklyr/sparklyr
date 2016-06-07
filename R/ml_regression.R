@@ -47,7 +47,7 @@ as_lm_result <- function(model, features) {
   tvalues <- spark_invoke(summary, "tValues")
   names(tvalues) <- names(coefficients)
 
-  list(
+  ml_model("lm", model,
     coefficients = coefficients,
     residuals = residuals,
     fitted.values = predictions,
@@ -60,7 +60,6 @@ as_lm_result <- function(model, features) {
     r.squared = spark_invoke(summary, "r2"),
     root.mean.squared.error = spark_invoke(summary, "rootMeanSquaredError")
   )
-
 }
 
 #' Linear regression from a dplyr source

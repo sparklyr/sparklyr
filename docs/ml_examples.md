@@ -144,16 +144,16 @@ model <- tbl(db, "iris") %>%
 print(model)
 ```
 
-    ## $components
+    ## Explained variance:
+    ## Sepal_Length  Sepal_Width Petal_Length  Petal_Width 
+    ##  0.924618723  0.053066483  0.017102610  0.005212184 
+    ## 
+    ## Rotation:
     ##                     [,1]        [,2]        [,3]       [,4]
     ## Sepal_Length -0.36138659 -0.65658877  0.58202985  0.3154872
     ## Sepal_Width   0.08452251 -0.73016143 -0.59791083 -0.3197231
     ## Petal_Length -0.85667061  0.17337266 -0.07623608 -0.4798390
     ## Petal_Width  -0.35828920  0.07548102 -0.54583143  0.7536574
-    ## 
-    ## $explained.variance
-    ## Sepal_Length  Sepal_Width Petal_Length  Petal_Width 
-    ##  0.924618723  0.053066483  0.017102610  0.005212184
 
 Cleanup
 -------

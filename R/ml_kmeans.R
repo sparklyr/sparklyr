@@ -31,10 +31,10 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_var
 #' @param features Which columns to use in the kmeans fit. Defaults to
 #'   all columns within \code{x}.
 ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
-  kmm <- spark_ml_kmeans(x, centers, iter.max, features)
+  model <- spark_ml_kmeans(x, centers, iter.max, features)
 
   # extract cluster centers
-  kmm_centers <- spark_invoke(kmm, "clusterCenters")
+  kmm_centers <- spark_invoke(model, "clusterCenters")
 
   centers_list <- transpose_list(lapply(kmm_centers, function(center) {
     unlist(spark_invoke(center, "toArray"), recursive = FALSE)
@@ -43,5 +43,5 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
   names(centers_list) <- as.character(dplyr::tbl_vars(x))
   centers <- as.data.frame(centers_list, stringsAsFactors = FALSE)
 
-  list(model = kmm, centers = centers)
+  ml_model("kmeans", model, centers = centers)
 }

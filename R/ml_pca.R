@@ -39,11 +39,10 @@ as_pca_result <- function(model, features) {
   rownames(components) <- features
   names(explainedVariance) <- features
 
-  list(
+  ml_model("pca", model,
     components = components,
     explained.variance = explainedVariance
   )
-
 }
 
 #' Perform Principal Components Analaysis using spark.ml
@@ -57,3 +56,10 @@ ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
   as_pca_result(model, features)
 }
 
+#' @export
+print.ml_model_pca <- function(x, ...) {
+  cat("Explained variance:", sep = "\n")
+  print(x$explained.variance)
+  cat("\nRotation:", sep = "\n")
+  print(x$components)
+}
