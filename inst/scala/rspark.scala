@@ -23,15 +23,19 @@ object utils {
     })
   }
 
-  def readColumnInt(df : DataFrame, column : String) : Array[Integer] = {
+  def readColumnInt(df: DataFrame, column: String): Array[Integer] = {
     df.select(column).rdd.map(row => row(0).asInstanceOf[Integer]).collect()
   }
 
-  def readColumnDouble(df : DataFrame, column : String) : Array[Double] = {
+  def readColumnDouble(df: DataFrame, column: String): Array[Double] = {
     df.select(column).rdd.map(row => row(0).asInstanceOf[Double]).collect()
   }
 
-  def readColumnBoolean(df : DataFrame, column : String) : Array[Boolean] = {
+  def readColumnBoolean(df: DataFrame, column: String): Array[Boolean] = {
     df.select(column).rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
+  }
+
+  def readColumnDefault(df: DataFrame, column: String): Array[Any] = {
+    df.select(column).rdd.map(row => row(0)).collect()
   }
 }

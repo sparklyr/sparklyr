@@ -33,19 +33,29 @@ spark_dataframe_schema <- function(jobj) {
   })
 }
 
+spark_dataframe_read_column <- function(jobj, colName, colType) {
+
+  method <- if (colType == "DoubleType")
+    "readColumnDouble"
+  else if (colType == "IntegerType")
+    "readColumnInt"
+  else if (colType == "BooleanType")
+    "readColumnBoolean"
+  else
+    "readColumnDefault"
+
+  spark_invoke_static(jobj$scon, "utils", method, jobj, colName)
+}
+
 #' Read a Spark Dataset into R.
 #' @param jobj The \code{jobj} underlying a Spark Dataset.
 #' @export
 spark_collect <- function(jobj) {
-  scon <- jobj$scon
-
+  schema <- spark_dataframe_schema(jobj)
   colNames <- as.character(spark_invoke(jobj, "columns"))
-  colValues <- spark_invoke_static(
-    scon,
-    "org.apache.spark.sql.api.r.SQLUtils",
-    "dfToCols",
-    jobj
-  )
+  colValues <- lapply(schema, function(colInfo) {
+    spark_dataframe_read_column(jobj, colInfo$name, colInfo$type)
+  })
 
   df <- lapply(colValues, unlist, recursive = FALSE)
   names(df) <- colNames
