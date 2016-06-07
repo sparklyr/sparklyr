@@ -66,3 +66,13 @@ as_lm_result <- function(model, features) {
   )
 
 }
+
+#' Linear regression from a dplyr source
+#' @export
+#' @param x A dplyr source.
+#' @param response The prediction column
+#' @param features List of columns to use as features
+#' @param intercept TRUE to fit the intercept
+ml_lm <- function(x, response, features, intercept = TRUE) {
+  spark_ml_linear_regression(x, response, features, intercept)
+}
