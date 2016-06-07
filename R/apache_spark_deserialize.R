@@ -70,16 +70,16 @@ readString <- function(con) {
   string
 }
 
-readInt <- function(con, n = 1) {
-  readBin(con, integer(), n = n, endian = "big")
+readInt <- function(con) {
+  readBin(con, integer(), n = 1, endian = "big")
 }
 
-readDouble <- function(con, n = 1) {
-  readBin(con, double(), n = n, endian = "big")
+readDouble <- function(con) {
+  readBin(con, double(), n = 1, endian = "big")
 }
 
-readBoolean <- function(con, n) {
-  as.logical(readInt(con, n))
+readBoolean <- function(con) {
+  as.logical(readInt(con))
 }
 
 readType <- function(con) {
@@ -90,24 +90,14 @@ readDate <- function(con) {
   as.Date(readString(con))
 }
 
-readTime <- function(con, n = 1) {
-  t <- readDouble(con, n)
+readTime <- function(con) {
+  t <- readDouble(con)
   as.POSIXct(t, origin = "1970-01-01")
 }
 
 readArray <- function(con) {
   type <- readType(con)
   len <- readInt(con)
-
-  # short-circuit for reading arrays of double, int, logical
-  if (type == "d") {
-    return(readDouble(con, n = len))
-  } else if (type == "i") {
-    return(readInt(con, n = len))
-  } else if (type == "b") {
-    return(readBoolean(con, n = len))
-  }
-
   if (len > 0) {
     l <- vector("list", len)
     for (i in 1:len) {

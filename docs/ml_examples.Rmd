@@ -17,16 +17,6 @@ sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
 db <- src_spark(sc)
 
 copy_to(db, iris, "iris")
-iris_tbl <- tbl(db, "iris")
-iris_sdf <- rspark:::as_spark_dataframe(iris_tbl)
-
-spark_invoke_static(
-  sc,
-  "utils",
-  "readColumnDouble",
-  iris_sdf,
-  "Sepal_Width"
-)
 ```
 
 ## KMeans in R
@@ -51,6 +41,7 @@ iris %>%
 Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/latest/mllib-clustering.html#k-means)
 
 ```{r}
+
 model <- tbl(db, "iris") %>%
   select(Petal_Width, Petal_Length) %>%
   ml_kmeans(3)
@@ -84,12 +75,9 @@ iris %>%
 ## Linear Model in RRspark
 
 ```{r}
-data(diamonds)
-copy_to(db, diamonds, "diamonds")
-profvis::profvis(
-  model <- tbl(db, "diamonds") %>%
-    ml_lm("carat", c("x", "y", "z"))
-)
+model <- tbl(db, "iris") %>%
+  select(Petal_Width, Petal_Length) %>%
+  ml_lm(response = "Petal_Length", features = c("Petal_Width"))
 
 iris %>%
   select(Petal.Width, Petal.Length) %>%
