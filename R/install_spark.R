@@ -23,8 +23,8 @@ spark_install_available <- function(version, hadoop_version) {
   dir.exists(installInfo$sparkVersionDir)
 }
 
-spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL, installedOnly = TRUE) {
-  versions <- spark_versions()
+spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL, installedOnly = TRUE, latest = FALSE) {
+  versions <- spark_versions(latest = latest)
   if (installedOnly)
     versions <- versions[versions$installed, ]
   versions <- if (is.null(sparkVersion)) versions else versions[versions$spark == sparkVersion, ]
@@ -79,7 +79,7 @@ spark_install <- function(version = NULL,
                           logging = "INFO",
                           verbose = interactive())
 {
-  installInfo <- spark_install_find(version, hadoop_version, installedOnly = FALSE)
+  installInfo <- spark_install_find(version, hadoop_version, installedOnly = FALSE, latest = TRUE)
 
   if (!dir.exists(installInfo$sparkDir)) {
     dir.create(installInfo$sparkDir, recursive = TRUE)

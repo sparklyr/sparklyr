@@ -43,7 +43,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(rspark)
 library(dplyr)
-sc <- spark_connect("local", cores = "auto", version = "1.6.1")
+sc <- spark_connect("local", cores = "auto", version = "1.6.1", memory = "8G")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -125,7 +125,7 @@ Spark provides low level access to native JVM objects, this topic targets users 
 ```{r}
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
-  file <- spark_invoke(sc, "textFile", path)
+  file <- spark_invoke(sc, "textFile", path, as.integer(1))
   spark_invoke(file, "count")
 }
 

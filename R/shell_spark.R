@@ -18,7 +18,7 @@ read_shell_file <- function(shellFile) {
   )
 }
 
-start_shell <- function(sconInst, installInfo, packages, jars) {
+start_shell <- function(sconInst, installInfo, packages, jars, memory, master) {
   sparkHome <- installInfo$sparkVersionDir
   if (!dir.exists(sparkHome)) {
     stop("Spark installation was not found. See spark_install.")
@@ -42,6 +42,13 @@ start_shell <- function(sconInst, installInfo, packages, jars) {
 
   if (length(jars) > 0) {
     sparkCommand <- paste(sparkCommand, "--jars ", paste(jars, sep = ","))
+  }
+
+  if (!is.null(memory)) {
+    sparkCommand <- paste(sparkCommand, "--executor-memory ", memory)
+    if (spark_master_is_local(master)) {
+      sparkCommand <- paste(sparkCommand, "--driver-memory ", memory)
+    }
   }
 
   sparkCommand <- paste(sparkCommand, "sparkr-shell", shellOutputPath)
@@ -79,7 +86,7 @@ start_shell <- function(sconInst, installInfo, packages, jars) {
 }
 
 stop_shell <- function(scon) {
-  spark_invoke_method(scon, FALSE, "0", "stop")
+  spark_invoke_method(scon, FALSE, "SparkRHandler", "stopBackend")
 
   sconInst <- spark_connection_remove_inst(scon)
 

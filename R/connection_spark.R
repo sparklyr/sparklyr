@@ -28,12 +28,14 @@ spark_default_jars <- function() {
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 #' OS schedules one thread per core.
 #' @param packages Collection of packages to load into Spark. See also, the rspark.packages.default option.
+#' @param memory Override default memory per executor (e.g. 1000M, 2G)
 spark_connect <- function(master = "local",
                           app_name = "rspark",
                           version = NULL,
                           hadoop_version = NULL,
                           cores = "auto",
-                          packages = NULL) {
+                          packages = NULL,
+                          memory = NULL) {
 
   # verify that java is available
   if (!is_java_available()) {
@@ -42,7 +44,7 @@ spark_connect <- function(master = "local",
   }
 
   reconnect <- FALSE
-  installInfo <- spark_install_find(version, hadoop_version)
+  installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
   sparkVersion <- installInfo$sparkVersion
   hadoopVersion <- installInfo$hadoopVersion
 
@@ -55,10 +57,11 @@ spark_connect <- function(master = "local",
     sparkVersion = version,
     hadoopVersion = hadoop_version,
     cores = cores,
-    isLocal = grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE),
+    isLocal = spark_master_is_local(master),
     reconnect = reconnect,
     installInfo = installInfo,
     packages = packages,
+    memory = memory,
     jars = jars
   )
 
@@ -66,7 +69,7 @@ spark_connect <- function(master = "local",
     stop("Reconnect is not supported on local installs")
   }
 
-  sconInst <- start_shell(list(), scon$installInfo, scon$packages, scon$jars)
+  sconInst <- start_shell(list(), scon$installInfo, scon$packages, scon$jars, scon$memory, scon$master)
   scon$sconRef <- spark_connection_add_inst(sconInst)
 
   parentCall <- match.call()
@@ -101,7 +104,7 @@ spark_connection_attach_context <- function(scon, sconInst) {
   if (spark_connection_is_local(scon) && scon$master == "local" && !identical(scon$cores, NULL))
     master <- if (scon$cores == "auto") "local[*]" else paste("local[", scon$cores, "]", sep = "")
 
-  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
+  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir, scon$memory)
   if (identical(sconInst$sc, NULL)) {
     stop("Failed to create Spark context")
   }
@@ -320,21 +323,20 @@ spark_invoke_static_ctor <- function(scon, objName, ...)
 #   sparkExecutorEnvMap: JMap[Object, Object])    // Named list of environment variables to be used when launching executors.
 #   : JavaSparkContext
 #
-spark_connection_create_context <- function(scon, master, appName, sparkHome) {
+spark_connection_create_context <- function(scon, master, appName, sparkHome, memory = NULL) {
   sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
 
-  spark_invoke_static(
+  conf <- spark_invoke_static_ctor(scon, "org.apache.spark.SparkConf")
+  conf <- spark_invoke(conf, "setAppName", appName)
+  conf <- spark_invoke(conf, "setMaster", master)
+  conf <- spark_invoke(conf, "setSparkHome", sparkHome)
+
+  conf <- if (!is.null(memory)) spark_invoke(conf, "set", "spark.executor.memory", memory) else conf
+
+  spark_invoke_static_ctor(
     scon,
-
-    "org.apache.spark.api.r.RRDD",
-    "createSparkContext",
-
-    master,
-    appName,
-    sparkHome,
-    list(),
-    new.env(),
-    new.env()
+    "org.apache.spark.SparkContext",
+    conf
   )
 }
 
@@ -371,6 +373,10 @@ spark_connection_app_name <- function(scon) {
 #' @param scon Spark connection provided by spark_connect
 spark_connection_is_local <- function(scon) {
   scon$isLocal
+}
+
+spark_master_is_local <- function(master) {
+  grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
 }
 
 #' Number of cores available in the local install
