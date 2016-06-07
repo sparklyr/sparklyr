@@ -4,7 +4,7 @@
 \alias{ml_kmeans}
 \title{Computes kmeans from a dplyr source}
 \usage{
-ml_kmeans(x, centers, iter.max = 10)
+ml_kmeans(x, centers, iter.max = 10, features = NULL)
 }
 \arguments{
 \item{x}{A dplyr source.}
@@ -12,6 +12,9 @@ ml_kmeans(x, centers, iter.max = 10)
 \item{centers}{Number of centers to compute.}
 
 \item{iter.max}{Maximum number of iterations used to compute kmeans.}
+
+\item{features}{Which columns to use in the kmeans fit. Defaults to
+all columns within \code{x}.}
 }
 \description{
 Computes kmeans from a dplyr source

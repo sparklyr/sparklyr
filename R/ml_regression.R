@@ -16,7 +16,7 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE) 
     spark_invoke("setFitIntercept", as.logical(intercept)) %>%
     spark_invoke("fit", tdf)
 
-  as_lm_result(fit, features)
+  fit
 }
 
 as_lm_result <- function(model, features) {
@@ -70,5 +70,6 @@ as_lm_result <- function(model, features) {
 #' @param features List of columns to use as features
 #' @param intercept TRUE to fit the intercept
 ml_lm <- function(x, response, features, intercept = TRUE) {
-  spark_ml_linear_regression(x, response, features, intercept)
+  fit <- spark_ml_linear_regression(x, response, features, intercept)
+  as_lm_result(fit, features)
 }

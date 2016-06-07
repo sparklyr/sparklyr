@@ -39,6 +39,7 @@ Collate:
     'install_spark.R'
     'install_spark_versions.R'
     'ml_kmeans.R'
+    'ml_pca.R'
     'ml_regression.R'
     'ml_utils.R'
     'options_spark.R'
