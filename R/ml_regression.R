@@ -23,8 +23,7 @@ as_lm_result <- function(model, features) {
 
   coefficients <- model %>%
     spark_invoke("coefficients") %>%
-    spark_invoke("toArray") %>%
-    unlist(recursive = FALSE)
+    spark_invoke("toArray")
   names(coefficients) <- features
 
   has_intercept <- spark_invoke(model, "getFitIntercept")
