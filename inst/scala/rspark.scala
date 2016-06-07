@@ -25,7 +25,7 @@ object utils {
   }
 
   def readColumnInt(df: DataFrame, colName: String): Array[Int] = {
-    df.select(colName).rdd.map(row => row(0).asInstanceOf[Integer]).collect()
+    df.select(colName).rdd.map(row => row(0).asInstanceOf[Int]).collect()
   }
 
   def readColumnDouble(df: DataFrame, colName: String): Array[Double] = {

@@ -53,6 +53,7 @@ spark_dataframe_read_column <- function(jobj, colName, colType) {
     df <- readr::read_csv(
       column,
       col_names = FALSE,
+      col_types = "c",
       na = character(),
       trim_ws = FALSE,
       progress = FALSE
