@@ -43,6 +43,7 @@ Collate:
     'ml_utils.R'
     'options_spark.R'
     'shell_spark.R'
+    'spark_data_frame.R'
     'spark_rdd.R'
     'utils.R'
 Imports:
