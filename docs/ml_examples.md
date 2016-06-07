@@ -22,11 +22,7 @@ library(dplyr)
 
 ``` r
 library(ggplot2)
-```
 
-    ## Warning: package 'ggplot2' was built under R version 3.2.4
-
-``` r
 sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
 db <- src_spark(sc)
 
