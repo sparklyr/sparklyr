@@ -193,11 +193,6 @@ spark_attach_connection <- function(object, scon) {
       spark_attach_connection(e, scon)
     })
   }
-  else if (is.vector(object) && length(object) > 1) {
-    object <- vapply(object, function(e) {
-      spark_attach_connection(e, scon)
-    }, "")
-  }
   else if (is.environment(object)) {
     object <- eapply(object, function(e) {
       spark_attach_connection(e, scon)
