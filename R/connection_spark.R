@@ -185,10 +185,10 @@ print.spark_web_url <- function(x, ...) {
 }
 
 spark_attach_connection <- function(object, scon) {
-  if ("jobj" %in% attr(object, "class")) {
+  if (inherits(object, "jobj")) {
     object$scon <- scon
   }
-  else if (is.list(object) || "struct" %in% attr(object, "class")) {
+  else if (is.list(object) || inherits(object, "struct")) {
     object <- lapply(object, function(e) {
       spark_attach_connection(e, scon)
     })
