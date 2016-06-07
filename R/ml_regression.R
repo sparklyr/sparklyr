@@ -19,7 +19,7 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE) 
   fit
 }
 
-as_lm_result <- function(model, features) {
+as_lm_result <- function(model, features, response) {
 
   coefficients <- model %>%
     spark_invoke("coefficients") %>%
@@ -54,6 +54,8 @@ as_lm_result <- function(model, features) {
     standard.errors = errors,
     t.values = tvalues,
     p.values = as.numeric(spark_invoke(summary, "pValues")),
+    features = features,
+    response = response,
     explained.variance = spark_invoke(summary, "explainedVariance"),
     mean.absolute.error = spark_invoke(summary, "meanAbsoluteError"),
     mean.squared.error = spark_invoke(summary, "meanSquaredError"),
@@ -70,5 +72,18 @@ as_lm_result <- function(model, features) {
 #' @param intercept TRUE to fit the intercept
 ml_lm <- function(x, response, features, intercept = TRUE) {
   fit <- spark_ml_linear_regression(x, response, features, intercept)
-  as_lm_result(fit, features)
+  as_lm_result(fit, features, response)
+}
+
+
+#' @export
+print.ml_model_lm <- function(x, ...) {
+
+  # report what model was fitted
+  formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
+  cat("Call: ", formula, "\n\n", sep = "")
+
+  # report coefficients
+  cat("Coefficients:", sep = "\n")
+  print(x$coefficients)
 }
