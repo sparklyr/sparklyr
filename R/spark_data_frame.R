@@ -47,8 +47,14 @@ spark_dataframe_read_column <- function(jobj, colName, colType) {
     "readColumnDefault"
 
   column <- spark_invoke_static(jobj$scon, "utils", method, jobj, colName)
-  if (colType == "StringType")
-    column <- strsplit(column, ",", fixed = TRUE)[[1]]
+  if (colType == "StringType") {
+    df <- readr::read_csv(
+      column,
+      col_names = FALSE
+    )
+    column <- df[[1]]
+    Encoding(column) <- "UTF-8"
+  }
   column
 }
 

@@ -1,3 +1,4 @@
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.linalg.distributed.RowMatrix
@@ -37,8 +38,9 @@ object utils {
 
   def readColumnString(df: DataFrame, colName: String): String = {
     val column = df.select(colName).rdd.map(row => row(0).asInstanceOf[String]).collect()
-    val joined = column.mkString(",")
-    return joined
+    val escaped = column.map(string => StringEscapeUtils.escapeCsv(string))
+    val joined = escaped.mkString("\n")
+    return joined + "\n"
   }
 
   def readColumnDefault(df: DataFrame, colName: String): Array[Any] = {
