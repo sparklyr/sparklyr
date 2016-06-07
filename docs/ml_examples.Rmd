@@ -90,9 +90,13 @@ iris %>%
 ## Principal Components Analysis in R
 
 ```{r}
-iris %>%
+model <- iris %>%
   select(-Species) %>%
   prcomp()
+print(model)
+
+# calculate explained variance
+model$sdev^2 / sum(model$sdev^2)
 ```
 
 ## Principal Components Analysis in RSpark

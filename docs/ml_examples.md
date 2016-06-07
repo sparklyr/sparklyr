@@ -111,20 +111,28 @@ Principal Components Analysis in R
 ----------------------------------
 
 ``` r
-iris %>%
+model <- iris %>%
   select(-Species) %>%
-  prcomp(center = FALSE, scale = FALSE)
+  prcomp()
+print(model)
 ```
 
     ## Standard deviations:
-    ## [1] 7.8613425 1.4550406 0.2835305 0.1544110
+    ## [1] 2.0562689 0.4926162 0.2796596 0.1543862
     ## 
     ## Rotation:
-    ##                     PC1        PC2         PC3        PC4
-    ## Sepal.Length -0.7511082  0.2841749  0.50215472  0.3208143
-    ## Sepal.Width  -0.3800862  0.5467445 -0.67524332 -0.3172561
-    ## Petal.Length -0.5130089 -0.7086646 -0.05916621 -0.4807451
-    ## Petal.Width  -0.1679075 -0.3436708 -0.53701625  0.7518717
+    ##                      PC1         PC2         PC3        PC4
+    ## Sepal.Length  0.36138659 -0.65658877  0.58202985  0.3154872
+    ## Sepal.Width  -0.08452251 -0.73016143 -0.59791083 -0.3197231
+    ## Petal.Length  0.85667061  0.17337266 -0.07623608 -0.4798390
+    ## Petal.Width   0.35828920  0.07548102 -0.54583143  0.7536574
+
+``` r
+# calculate explained variance
+model$sdev^2 / sum(model$sdev^2)
+```
+
+    ## [1] 0.924618723 0.053066483 0.017102610 0.005212184
 
 Principal Components Analysis in RSpark
 ---------------------------------------
