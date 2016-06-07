@@ -75,17 +75,17 @@ iris %>%
 ## Linear Model in RRspark
 
 ```{r}
-# model <- tbl(db, "iris") %>%
-#   select(Petal_Width, Petal_Length) %>%
-#   ml_lm()
+model <- tbl(db, "iris") %>%
+  select(Petal_Width, Petal_Length) %>%
+  ml_lm(response = "Petal_Length", features = c("Petal_Width"))
 
-# iris %>%
-#  select(Petal.Width, Petal.Length) %>%
-#  ggplot(aes(x = Petal.Length, y = Petal.Width)) +
-#    geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length), size=2, alpha=0.5) +
-#    geom_abline(aes(slope = coef(model)[["Petal.Width"]],
-#                    intercept = coef(model)[["(Intercept)"]],
-#                    color="red"))
+iris %>%
+  select(Petal.Width, Petal.Length) %>%
+  ggplot(aes(x = Petal.Length, y = Petal.Width)) +
+    geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length), size=2, alpha=0.5) +
+    geom_abline(aes(slope = coef(model)[["Petal_Width"]],
+                    intercept = coef(model)[["(Intercept)"]],
+                    color="red"))
 ```
 
 
