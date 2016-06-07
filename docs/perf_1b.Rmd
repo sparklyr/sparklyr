@@ -10,8 +10,8 @@ output:
 ```{r}
 library(rspark)
 
-spark_install(version = "2.0.0", reset = TRUE, logging = "WARN")
-sc <- spark_connect(master = "local", version = "2.0.0")
+spark_install(version = "2.0.0-preview", reset = TRUE, logging = "WARN")
+sc <- spark_connect(master = "local", version = "2.0.0-preview")
 
 spark_conf <- function(scon, config, value) {
   spark_context(scon) %>%
@@ -30,16 +30,20 @@ spark_sum_range <- function(scon, range) {
 
 ## Spark 1.0
 
-```
-spark_conf(sc, "spark.sql.codegen.wholeStage", false)
-spark_sum_range(sc, 1000)
+```{r}
+system.time({
+  spark_conf(sc, "spark.sql.codegen.wholeStage", FALSE)
+  spark_sum_range(sc, 1000)
+})
 ```
 
 ## Spark 2.0
 
-```
-spark.conf.set("spark.sql.codegen.wholeStage", true)
-spark.range(1000).selectExpr("sum(id)").show()
+```{r}
+system.time({
+  spark_invoke_static(sc, "org.apache.spark", "conf")
+  spark.range(1000).selectExpr("sum(id)").show()
+})
 ```
 
 # Cleanup
