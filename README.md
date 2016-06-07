@@ -31,7 +31,7 @@ The spark package implements a dplyr back-end for Spark. Connect to Spark using 
 # connect to local spark instance and get a dplyr interface
 library(rspark)
 library(dplyr)
-sc <- spark_connect("local", cores = "auto", version = "1.6.1")
+sc <- spark_connect("local", cores = "auto", version = "1.6.1", memory = "8G")
 db <- src_spark(sc)
 
 # copy the flights table from the nycflights13 package to Spark
@@ -148,13 +148,10 @@ Extensibility
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
 
 ``` r
-library(magrittr)
-
 # define an R interface to Spark line counting
-count_lines <- function(scon, path) {
-  spark_context(scon) %>%
-    spark_invoke("textFile", path) %>%
-    spark_invoke("count")
+count_lines <- function(sc, path) {
+  file <- spark_invoke(sc, "textFile", path, as.integer(1))
+  spark_invoke(file, "count")
 }
 
 # write a CSV 
@@ -199,16 +196,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/05/31 16:02:28 INFO ContextCleaner: Cleaned shuffle 5
-    ## 16/05/31 16:02:28 INFO BlockManagerInfo: Removed broadcast_18_piece0 on localhost:59476 in memory (size: 10.4 KB, free: 487.0 MB)
-    ## 16/05/31 16:02:28 INFO ContextCleaner: Cleaned accumulator 71
-    ## 16/05/31 16:02:28 INFO Executor: Finished task 1.0 in stage 19.0 (TID 39). 2082 bytes result sent to driver
-    ## 16/05/31 16:02:28 INFO TaskSetManager: Finished task 1.0 in stage 19.0 (TID 39) in 62 ms on localhost (1/2)
-    ## 16/05/31 16:02:28 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
-    ## 16/05/31 16:02:28 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 63 ms on localhost (2/2)
-    ## 16/05/31 16:02:28 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
-    ## 16/05/31 16:02:28 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.063 s
-    ## 16/05/31 16:02:28 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.067186 s
+    ## 16/06/07 16:37:34 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 19 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpLwdh8b/file1717140090bcb.csv MapPartitionsRDD[79] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/07 16:37:34 INFO TaskSchedulerImpl: Adding task set 19.0 with 1 tasks
+    ## 16/06/07 16:37:34 INFO TaskSetManager: Starting task 0.0 in stage 19.0 (TID 38, localhost, partition 0,PROCESS_LOCAL, 2486 bytes)
+    ## 16/06/07 16:37:34 INFO Executor: Running task 0.0 in stage 19.0 (TID 38)
+    ## 16/06/07 16:37:34 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpLwdh8b/file1717140090bcb.csv:0+23367180
+    ## 16/06/07 16:37:34 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
+    ## 16/06/07 16:37:34 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 91 ms on localhost (1/1)
+    ## 16/06/07 16:37:34 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
+    ## 16/06/07 16:37:34 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.091 s
+    ## 16/06/07 16:37:34 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.095116 s
 
 Finally, we disconnect from Spark:
 
