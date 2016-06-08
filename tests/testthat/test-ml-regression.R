@@ -9,6 +9,7 @@ expect_coef_equal <- function(lhs, rhs) {
 }
 
 test_that("ml_lm and 'penalized' produce similar model fits", {
+  skip_on_cran()
   skip_if_not_installed("glmnet")
 
   sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
