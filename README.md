@@ -14,7 +14,7 @@ You can install the development version of the **spark** package using **devtool
 devtools::install_github("hadley/devtools")
 devtools::reload(devtools::inst("devtools"))
 
-devtools::install_github("rstudio/rspark", auth_token = "b0a1ea10dd9a5c48a9c6ffdb7c3fc1aac04f4dce")
+devtools::install_github("rstudio/rspark", auth_token = "56aef3d82d3ef05755e40a4f6bdaab6fbed8a1f1")
 ```
 
 You can then install various versions of Spark using the `spark_install` function:
