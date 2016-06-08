@@ -66,7 +66,7 @@ as_lm_result <- function(model, features, response) {
 #'
 #' Fit a linear model using \code{spark.lm}.
 #'
-#' See \url{https://spark.apache.org/docs/1.6.1/ml-classification-regression.html}
+#' See \url{https://spark.apache.org/docs/latest/ml-classification-regression.html}
 #' for more information on how linear regression is implemented in Spark.
 #'
 #' @param x A dplyr source.
