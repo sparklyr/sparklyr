@@ -28,16 +28,16 @@ test_that("ml_lm and 'penalized' produce similar model fits", {
       x = as.matrix(mtcars[, c("cyl", "disp")]),
       y = mtcars$mpg,
       family = "gaussian",
-      alpha = 0.2,
-      lambda = 0.2
+      alpha = alpha,
+      lambda = lambda
     )
 
     sFit <- ml_lm(
       mtcars_tbl,
       "mpg",
       c("cyl", "disp"),
-      alpha = 0.2,
-      lambda = 0.2
+      alpha = alpha,
+      lambda = lambda
     )
 
     gCoef <- coefficients(gFit)[, 1]
