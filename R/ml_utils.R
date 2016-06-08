@@ -24,3 +24,7 @@ spark_assemble_vector <- function(sc, df, input_cols, output_col) {
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("transform", df)
 }
+
+try_null <- function(expr) {
+  tryCatch(expr, error = function(e) NULL)
+}

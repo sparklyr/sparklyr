@@ -1,4 +1,6 @@
-spark_ml_linear_regression <- function(x, response, features, intercept = TRUE) {
+spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
+                                       alpha = 0, lambda = 0)
+{
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
@@ -14,6 +16,8 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE) 
     spark_invoke("setLabelCol", response) %>%
     spark_invoke("setFeaturesCol", "features") %>%
     spark_invoke("setFitIntercept", as.logical(intercept)) %>%
+    spark_invoke("setElasticNetParam", as.double(alpha)) %>%
+    spark_invoke("setRegParam", as.double(lambda)) %>%
     spark_invoke("fit", tdf)
 
   fit
@@ -35,17 +39,19 @@ as_lm_result <- function(model, features, response) {
 
   summary <- spark_invoke(model, "summary")
 
-  errors <- spark_invoke(summary, "coefficientStandardErrors")
-  names(errors) <- names(coefficients)
+  errors <- try_null(spark_invoke(summary, "coefficientStandardErrors"))
+  if (!is.null(errors))
+    names(errors) <- names(coefficients)
 
-  tvalues <- spark_invoke(summary, "tValues")
-  names(tvalues) <- names(coefficients)
+  tvalues <- try_null(spark_invoke(summary, "tValues"))
+  if (!is.null(tvalues))
+    names(tvalues) <- names(coefficients)
 
   ml_model("lm", model,
     coefficients = coefficients,
     standard.errors = errors,
     t.values = tvalues,
-    p.values = as.numeric(spark_invoke(summary, "pValues")),
+    p.values = try_null(as.numeric(spark_invoke(summary, "pValues"))),
     features = features,
     response = response,
     explained.variance = spark_invoke(summary, "explainedVariance"),
@@ -57,13 +63,24 @@ as_lm_result <- function(model, features, response) {
 }
 
 #' Linear regression from a dplyr source
-#' @export
+#'
+#' Fit a linear model using \code{spark.lm}.
+#'
+#' See \url{https://spark.apache.org/docs/1.6.1/ml-classification-regression.html}
+#' for more information on how linear regression is implemented in Spark.
+#'
 #' @param x A dplyr source.
 #' @param response The prediction column
 #' @param features List of columns to use as features
 #' @param intercept TRUE to fit the intercept
-ml_lm <- function(x, response, features, intercept = TRUE) {
-  fit <- spark_ml_linear_regression(x, response, features, intercept)
+#' @param alpha The \textit{elastic net} mixing parameter.
+#' @param lambda The \textit{regularization penalty}.
+#'
+#' @export
+ml_lm <- function(x, response, features, intercept = TRUE,
+                  alpha = 0, lambda = 0) {
+  fit <- spark_ml_linear_regression(x, response, features, intercept,
+                                    alpha, lambda)
   as_lm_result(fit, features, response)
 }
 
