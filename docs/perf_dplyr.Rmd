@@ -50,7 +50,7 @@ spark_perf_test <- function(params, tests) {
     options(rspark.dplyr.optimize_shuffle_cores = param$shuffle)
     on.exit(options(rspark.dplyr.optimize_shuffle_cores = shuffle))
     
-    sc <- spark_connect(master = param$master, cores = param$cores, version = param$version)
+    sc <- spark_connect(master = param$master, cores = param$cores, version = param$version, codegen = param$codegen)
     
     db <- src_spark(sc)
     
@@ -100,7 +100,17 @@ spark_perf_test <- function(params, tests) {
 ```
 
 ```{r}
-spark_perf_single_test <- function(runResults, master, cores, version, logging, cache, partitions, optimizeShuffleForCores) {
+spark_perf_single_test <- function(
+  runResults,
+  master,
+  cores,
+  version,
+  logging,
+  cache,
+  partitions,
+  optimizeShuffleForCores,
+  codegen) {
+  
   run <- length(runResults)
   
   c(
@@ -116,7 +126,8 @@ spark_perf_single_test <- function(runResults, master, cores, version, logging, 
             logging = logging,
             cache = cache,
             partitions = partitions,
-            shuffle = optimizeShuffleForCores
+            shuffle = optimizeShuffleForCores,
+            codegen = codegen
           )
         ),
         tests = list(
@@ -150,30 +161,31 @@ spark_perf_single_test <- function(runResults, master, cores, version, logging, 
 ```{r}
 runResults <- list()
 
-runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", FALSE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", TRUE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", FALSE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", TRUE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "INFO", FALSE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", FALSE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 8, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 8, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, TRUE)
-runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, TRUE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "INFO", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 8, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 8, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, TRUE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, TRUE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, TRUE, TRUE)
 
 results <- do.call("rbind", runResults)
 
 results <- results %>% 
-  mutate(params = paste(run, version, cores, cache, logging, partitions, shuffle))
+  mutate(params = paste(run, version, cores, cache, logging, partitions, shuffle, codegen))
 ```
 
 ```{r}
 results %>%
   filter(test == "spark" | test == "dplyr") %>%
   rename(part = partitions) %>%
-  dcast(run + cores + version + logging + part + shuffle ~ test, value.var = "elapsed")
+  dcast(run + cores + version + logging + part + shuffle + codegen ~ test, value.var = "elapsed")
 ```
 
 ```{r}
