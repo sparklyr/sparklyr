@@ -40,7 +40,7 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
     unlist(spark_invoke(center, "toArray"), recursive = FALSE)
   }))
 
-  names(centers_list) <- as.character(dplyr::tbl_vars(x))
+  names(centers_list) <- features
   centers <- as.data.frame(centers_list, stringsAsFactors = FALSE)
 
   ml_model("kmeans", model, centers = centers)
