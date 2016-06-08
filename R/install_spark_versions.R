@@ -7,7 +7,7 @@ spark_versions_file_pattern <- function() {
 #' @param latest TRUE to use the latest download URLs, FALSE to use the package defaults which might be out of date.
 #' @export
 spark_versions <- function(latest = TRUE) {
-  latestUrl <- "https://raw.githubusercontent.com/rstudio/rspark/master/inst/extdata/install_spark.csv?token=ASpg1JXmAK-o17WIKBe1ZuoV2CC1gamKks5XVzebwA%3D%3D"
+  latestUrl <- "https://raw.githubusercontent.com/rstudio/rspark/master/inst/extdata/install_spark.csv?token=ASpg1NOA-Y-_Ir67ZLqzefBWo8URFxO5ks5XYZCAwA%3D%3D"
   packagePath <- system.file(file.path("extdata", "install_spark.csv"), package = "rspark")
 
   downloadData <- NULL
