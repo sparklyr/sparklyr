@@ -5,7 +5,7 @@
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
 spark_connect(master = "local", app_name = "rspark", version = NULL,
-  hadoop_version = NULL, cores = "auto", packages = NULL)
+  hadoop_version = NULL, cores = "auto", packages = NULL, memory = NULL)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -22,6 +22,8 @@ speaking, this option configures the number of available threads in a local spar
 OS schedules one thread per core.}
 
 \item{packages}{Collection of packages to load into Spark. See also, the rspark.packages.default option.}
+
+\item{memory}{Override default memory per executor (e.g. 1000M, 2G)}
 }
 \description{
 Connects to Spark and establishes the Spark Context

@@ -35,12 +35,6 @@ as_lm_result <- function(model, features, response) {
 
   summary <- spark_invoke(model, "summary")
 
-  residuals <- spark_invoke(summary, "residuals") %>%
-    spark_dataframe_read_column("residuals", "DoubleType")
-
-  predictions <- spark_invoke(summary, "predictions") %>%
-    spark_dataframe_read_column("prediction", "DoubleType")
-
   errors <- spark_invoke(summary, "coefficientStandardErrors")
   names(errors) <- names(coefficients)
 
@@ -49,8 +43,6 @@ as_lm_result <- function(model, features, response) {
 
   ml_model("lm", model,
     coefficients = coefficients,
-    residuals = residuals,
-    fitted.values = predictions,
     standard.errors = errors,
     t.values = tvalues,
     p.values = as.numeric(spark_invoke(summary, "pValues")),
@@ -86,4 +78,20 @@ print.ml_model_lm <- function(x, ...) {
   # report coefficients
   cat("Coefficients:", sep = "\n")
   print(x$coefficients)
+}
+
+#' @export
+residuals.ml_model_lm <- function(x, ...) {
+  x$.model %>%
+    spark_invoke("summary") %>%
+    spark_invoke("residuals") %>%
+    spark_dataframe_read_column("residuals", "DoubleType")
+}
+
+#' @export
+fitted.ml_model_lm <- function(x, ...) {
+  x$.model %>%
+    spark_invoke("summary") %>%
+    spark_invoke("predictions") %>%
+    spark_dataframe_read_column("prediction", "DoubleType")
 }
