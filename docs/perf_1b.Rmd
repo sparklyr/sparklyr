@@ -11,11 +11,17 @@ output:
 library(rspark)
 library(magrittr)
 
-spark_install(version = "2.0.0-preview", reset = TRUE, logging = "WARN")
+spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WARN")
 sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "12G ")
 
-spark_conf <- function(scon, config, value) {
-  spark_context(scon) %>%
+ses <- spark_invoke_static_ctor(sc, "org.apache.spark.sql.SparkSession", spark_context(sc)) %>%
+    spark_invoke("builder") %>%
+    spark_invoke("master", "local") %>%
+    spark_invoke("appName", "1btest") %>%
+    spark_invoke("getOrCreate")
+
+spark_conf <- function(ses, config, value) {
+  ses %>%
     spark_invoke("conf") %>%
     spark_invoke("set", config, value)
 }
@@ -23,12 +29,6 @@ spark_conf <- function(scon, config, value) {
 spark_sum_range <- function(scon) {
   billion <- spark_invoke_static_ctor(sc, "java.math.BigInteger", "1000000000") %>%
     spark_invoke("longValue")
-  
-  ses <- spark_invoke_static_ctor(sc, "org.apache.spark.sql.SparkSession", spark_context(sc)) %>%
-    spark_invoke("builder") %>%
-    spark_invoke("master", "local") %>%
-    spark_invoke("appName", "spark session example") %>%
-    spark_invoke("getOrCreate")
   
   result <- ses %>%
     spark_invoke("range", as.integer(billion)) %>%
@@ -44,7 +44,7 @@ spark_sum_range <- function(scon) {
 
 ```{r}
 system.time({
-  spark_conf(sc, "spark.sql.codegen.wholeStage", "false")
+  spark_conf(ses, "spark.sql.codegen.wholeStage", "false")
   result <- spark_sum_range(sc)
   sum <- spark_invoke(result, "collect")[[1]]
 })
@@ -56,7 +56,7 @@ sum
 
 ```{r}
 system.time({
-  spark_conf(sc, "spark.sql.codegen.wholeStage", "true")
+  spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
   result <- spark_sum_range(sc)
   sum <- spark_invoke(result, "collect")[[1]]
 })
