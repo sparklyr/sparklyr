@@ -95,3 +95,11 @@ fitted.ml_model_lm <- function(x, ...) {
     spark_invoke("predictions") %>%
     spark_dataframe_read_column("prediction", "DoubleType")
 }
+
+#' @export
+predict.ml_model_lm <- function(object, newdata, ...) {
+  sdf <- as_spark_dataframe(newdata)
+  assembled <- spark_assemble_vector(sdf$scon, sdf, features(object), "features")
+  predicted <- spark_invoke(object$.model, "transform", assembled)
+  spark_dataframe_read_column(predicted, "prediction", "DoubleType")
+}
