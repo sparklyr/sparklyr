@@ -26,14 +26,19 @@ as_spark_dataframe.tbl_spark <- function(x, ...) {
 spark_dataframe_schema <- function(jobj) {
   schema <- spark_invoke(jobj, "schema")
   fields <- spark_invoke(schema, "fields")
-  lapply(fields, function(field) {
+  list <- lapply(fields, function(field) {
     type <- spark_invoke(spark_invoke(field, "dataType"), "toString")
     name <- spark_invoke(field, "name")
     list(name = name, type = type)
   })
+  names(list) <- unlist(lapply(list, `[[`, "name"))
+  list
 }
 
-spark_dataframe_read_column <- function(jobj, colName, colType) {
+spark_dataframe_read_column <- function(dataFrame, colName) {
+  dataFrame <- as_spark_dataframe(dataFrame)
+  schema <- spark_dataframe_schema(dataFrame)
+  colType <- schema[[colName]]$type
 
   method <- if (colType == "DoubleType")
     "readColumnDouble"
@@ -46,7 +51,8 @@ spark_dataframe_read_column <- function(jobj, colName, colType) {
   else
     "readColumnDefault"
 
-  column <- spark_invoke_static(jobj$scon, "utils", method, jobj, colName)
+  scon <- spark_scon(dataFrame)
+  column <- spark_invoke_static(scon, "utils", method, dataFrame, colName)
 
   if (colType == "StringType") {
 
@@ -73,7 +79,7 @@ spark_collect <- function(jobj) {
   schema <- spark_dataframe_schema(jobj)
   colNames <- as.character(spark_invoke(jobj, "columns"))
   colValues <- lapply(schema, function(colInfo) {
-    spark_dataframe_read_column(jobj, colInfo$name, colInfo$type)
+    spark_dataframe_read_column(jobj, colInfo$name)
   })
 
   df <- lapply(colValues, unlist, recursive = FALSE)

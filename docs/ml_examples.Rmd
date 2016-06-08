@@ -17,6 +17,7 @@ sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
 db <- src_spark(sc)
 
 copy_to(db, iris, "iris")
+iris_tbl <- tbl(db, "iris")
 ```
 
 ## KMeans in R
