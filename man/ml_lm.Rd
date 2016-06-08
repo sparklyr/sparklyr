@@ -4,7 +4,7 @@
 \alias{ml_lm}
 \title{Linear regression from a dplyr source}
 \usage{
-ml_lm(x, response, features, intercept = TRUE)
+ml_lm(x, response, features, intercept = TRUE, alpha = 0, lambda = 0)
 }
 \arguments{
 \item{x}{A dplyr source.}
@@ -14,8 +14,16 @@ ml_lm(x, response, features, intercept = TRUE)
 \item{features}{List of columns to use as features}
 
 \item{intercept}{TRUE to fit the intercept}
+
+\item{alpha}{The \emph{elastic net} mixing parameter.}
+
+\item{lambda}{The \emph{regularization penalty}.}
 }
 \description{
-Linear regression from a dplyr source
+Fit a linear model using \code{spark.lm}.
+}
+\details{
+See \url{https://spark.apache.org/docs/1.6.1/ml-classification-regression.html}
+for more information on how linear regression is implemented in Spark.
 }
 

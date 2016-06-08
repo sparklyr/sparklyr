@@ -73,8 +73,8 @@ as_lm_result <- function(model, features, response) {
 #' @param response The prediction column
 #' @param features List of columns to use as features
 #' @param intercept TRUE to fit the intercept
-#' @param alpha The \textit{elastic net} mixing parameter.
-#' @param lambda The \textit{regularization penalty}.
+#' @param alpha The \emph{elastic net} mixing parameter.
+#' @param lambda The \emph{regularization penalty}.
 #'
 #' @export
 ml_lm <- function(x, response, features, intercept = TRUE,
