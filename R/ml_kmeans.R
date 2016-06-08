@@ -37,7 +37,7 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
   kmm_centers <- spark_invoke(model, "clusterCenters")
 
   centers_list <- transpose_list(lapply(kmm_centers, function(center) {
-    unlist(spark_invoke(center, "toArray"), recursive = FALSE)
+    as.numeric(spark_invoke(center, "toArray"))
   }))
 
   names(centers_list) <- features
