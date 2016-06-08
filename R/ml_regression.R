@@ -85,7 +85,7 @@ residuals.ml_model_lm <- function(x, ...) {
   x$.model %>%
     spark_invoke("summary") %>%
     spark_invoke("residuals") %>%
-    spark_dataframe_read_column("residuals", "DoubleType")
+    spark_dataframe_read_column("residuals")
 }
 
 #' @export
@@ -93,5 +93,13 @@ fitted.ml_model_lm <- function(x, ...) {
   x$.model %>%
     spark_invoke("summary") %>%
     spark_invoke("predictions") %>%
-    spark_dataframe_read_column("prediction", "DoubleType")
+    spark_dataframe_read_column("prediction")
+}
+
+#' @export
+predict.ml_model_lm <- function(object, newdata, ...) {
+  sdf <- as_spark_dataframe(newdata)
+  assembled <- spark_assemble_vector(sdf$scon, sdf, features(object), "features")
+  predicted <- spark_invoke(object$.model, "transform", assembled)
+  spark_dataframe_read_column(predicted, "prediction")
 }
