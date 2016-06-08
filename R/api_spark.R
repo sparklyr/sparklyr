@@ -288,10 +288,20 @@ spark_api_write_generic <- function(df, path, fileMethod) {
 spark_object_info <- function(jobj) {
   if (!inherits(jobj, "jobj"))
     stop("'spark_object_info' called on non-jobj")
-  class <- spark_invoke(jobj, "getClass")
-  if (inherits(class, "jobj"))
-    class <- spark_invoke(class, "toString")
-  repr <- spark_invoke(jobj, "toString")
+
+  class <- NULL
+  repr <- NULL
+
+  tryCatch({
+    class <- spark_invoke(jobj, "getClass")
+    if (inherits(class, "jobj"))
+      class <- spark_invoke(class, "toString")
+  }, error = function(e) {
+  })
+  tryCatch({
+    repr <- spark_invoke(jobj, "toString")
+  }, error = function(e) {
+  })
   list(
     class = class,
     repr  = repr
@@ -304,7 +314,7 @@ spark_connection <- function(jobj) {
 
 spark_inspect <- function(jobj) {
   print(jobj)
-  if (!spark_connection_is_open(jobj))
+  if (!spark_connection_is_open(spark_scon(jobj)))
     return(jobj)
 
   class <- spark_invoke(jobj, "getClass")
