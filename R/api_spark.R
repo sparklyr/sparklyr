@@ -56,6 +56,14 @@ spark_api_create_hive_context_v2 <- function(scon) {
     "getOrCreate"
   )
 
+  conf <- spark_invoke(session, "conf")
+  spark_invoke(
+    conf,
+    "set",
+    "spark.sql.codegen.wholeStage",
+    if (scon$codegen) "true" else "false"
+  )
+
   session
 
 }
