@@ -20,7 +20,7 @@ library(ggplot2)
 
 ## Installation
 
-You can install the development version of the **spark** package using **devtools** as follows (note that installation of the development version of **devtools** itself is also required):
+You can install the development version of the **rspark** package using **devtools** as follows (note that installation of the development version of **devtools** itself is also required):
 
 ```{r, eval=FALSE}
 devtools::install_github("hadley/devtools")
@@ -39,7 +39,7 @@ spark_install(version = "1.6.1", hadoop_version = "2.6", reset = TRUE)
 
 ## dplyr Interface
 
-The spark package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
+The rspark package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
 
 ```{r connection, message=FALSE}
 # connect to local spark instance and get a dplyr interface
