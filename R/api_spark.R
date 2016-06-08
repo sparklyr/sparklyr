@@ -304,7 +304,7 @@ spark_connection <- function(jobj) {
 
 spark_inspect <- function(jobj) {
   print(jobj)
-  if (!spark_connection_is_open(spark_scon(jobj)))
+  if (!spark_connection_is_open(jobj))
     return(jobj)
 
   class <- spark_invoke(jobj, "getClass")
