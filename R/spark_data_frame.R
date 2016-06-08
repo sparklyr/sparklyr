@@ -23,7 +23,8 @@ as_spark_dataframe.tbl_spark <- function(x, ...) {
   spark_invoke(api, "sql", sql)
 }
 
-spark_dataframe_schema <- function(jobj) {
+spark_dataframe_schema <- function(object) {
+  jobj <- as_spark_dataframe(object)
   schema <- spark_invoke(jobj, "schema")
   fields <- spark_invoke(schema, "fields")
   list <- lapply(fields, function(field) {
@@ -35,9 +36,9 @@ spark_dataframe_schema <- function(jobj) {
   list
 }
 
-spark_dataframe_read_column <- function(dataFrame, colName) {
-  dataFrame <- as_spark_dataframe(dataFrame)
-  schema <- spark_dataframe_schema(dataFrame)
+spark_dataframe_read_column <- function(object, colName) {
+  jobj <- as_spark_dataframe(object)
+  schema <- spark_dataframe_schema(jobj)
   colType <- schema[[colName]]$type
 
   method <- if (colType == "DoubleType")
@@ -51,8 +52,8 @@ spark_dataframe_read_column <- function(dataFrame, colName) {
   else
     "readColumnDefault"
 
-  scon <- spark_scon(dataFrame)
-  column <- spark_invoke_static(scon, "utils", method, dataFrame, colName)
+  scon <- spark_scon(jobj)
+  column <- spark_invoke_static(scon, "utils", method, jobj, colName)
 
   if (colType == "StringType") {
 
@@ -73,9 +74,10 @@ spark_dataframe_read_column <- function(dataFrame, colName) {
 }
 
 #' Read a Spark Dataset into R.
-#' @param jobj The \code{jobj} underlying a Spark Dataset.
+#' @param object An (object convertable to a) Spark DataFrame.
 #' @export
-spark_collect <- function(jobj) {
+spark_dataframe_collect <- function(object) {
+  jobj <- as_spark_dataframe(object)
   schema <- spark_dataframe_schema(jobj)
   colNames <- as.character(spark_invoke(jobj, "columns"))
   colValues <- lapply(schema, function(colInfo) {
@@ -85,4 +87,16 @@ spark_collect <- function(jobj) {
   df <- lapply(colValues, unlist, recursive = FALSE)
   names(df) <- colNames
   dplyr::as_data_frame(df, stringsAsFactors = FALSE, optional = TRUE)
+}
+
+#' Split a Spark DataFrame
+#'
+#' @param object An (object convertable to a) Spark DataFrame.
+#' @param weights A numeric vector of weights.
+#' @param seed A numeric seed.
+#'
+#' @export
+spark_dataframe_split <- function(object, weights = c(0.5, 0.5), seed = 11L) {
+  jobj <- as_spark_dataframe(object)
+  spark_invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
 }
