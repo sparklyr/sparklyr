@@ -9,7 +9,7 @@ on_connection_opened <- function(scon, connectCall, db) {
     if (db) {
       listTablesCode <- "rspark:::connection_list_tables(%s)"
       listColumnsCode <- "rspark:::connection_list_columns(%s, table)"
-      previewTableCode <- "rspark:::connection_preview_table(%s, table)"
+      previewTableCode <- "rspark:::connection_preview_table(%s, table, limit)"
     } else {
       listTablesCode <- NULL
       listColumnsCode <- NULL
@@ -67,17 +67,30 @@ on_connection_updated <- function(scon, hint) {
 }
 
 connection_list_tables <- function(sc) {
-  c("foo", "bar", "wins")
+  dbi <- spark_connection_get_dbi(sc)
+  dbListTables(dbi)
 }
 
 connection_list_columns <- function(sc, table) {
-  c("a", "b", "c")
+  dbi <- spark_connection_get_dbi(sc)
+  sql <- paste("SELECT * FROM", table, "LIMIT 1")
+  df <- dbGetQuery(dbi, sql)
+  data.frame(
+    name = names(df),
+    type = as.character(lapply(df, class)),
+    stringsAsFactors = FALSE
+  )
 }
 
-connection_preview_table <- function(sc, table) {
-  NULL
+connection_preview_table <- function(sc, table, limit) {
+  dbi <- spark_connection_get_dbi(sc)
+  sql <- paste("SELECT * FROM", table, "LIMIT", limit)
+  dbGetQuery(dbi, sql)
 }
 
+spark_connection_get_dbi <- function(scon) {
+  spark_connection_get_inst(scon)$dbi
+}
 
 
 
