@@ -13,7 +13,7 @@ select_spark_query <- function(from,
   stopifnot(is.character(having))
   stopifnot(is.character(order_by))
   stopifnot(is.logical(distinct), length(distinct) == 1L)
-  stopifnot(is.numeric(limit))
+  stopifnot(is.numeric(limit) || is.null(limit))
 
   structure(
     list(
