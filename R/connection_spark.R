@@ -93,7 +93,7 @@ spark_connect <- function(master = "local",
   sconInst <- spark_connection_attach_context(scon, sconInst)
   spark_connection_set_inst(scon, sconInst)
 
-  on_connection_opened(scon, sconInst$connectCall)
+  on_connection_opened(scon, sconInst$connectCall, db = FALSE)
 
   structure(scon, class = "spark_connection")
 }

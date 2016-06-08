@@ -10,7 +10,7 @@ spark_reconnect_if_needed <- function(scon) {
     sconInst <- spark_connection_attach_context(scon, sconInst)
     spark_connection_set_inst(scon, sconInst)
 
-    on_connection_opened(scon, sconInst$connectCall)
+    on_connection_opened(scon, sconInst$connectCall, db = !is.null(sconInst$dbi))
 
     lapply(sconInst$onReconnect, function(onReconnect) {
       onReconnect(scon)
