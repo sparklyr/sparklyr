@@ -13,8 +13,9 @@ test_that("ml_lm and 'penalized' produce similar model fits", {
   skip_if_not_installed("glmnet")
 
   sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
-  db <- src_spark(sc)
+  on.exit(spark_disconnect(sc))
 
+  db <- src_spark(sc)
   copy_to(db, mtcars, "mtcars")
   mtcars_tbl <- tbl(db, "mtcars")
 
