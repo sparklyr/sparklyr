@@ -13,6 +13,7 @@ spark_jobj_list_to_array_df <- function(data, dataNames) {
 # a new column with name 'output_col' where each element
 # is the concatenation of the 'input_cols'.
 spark_assemble_vector <- function(sc, df, input_cols, output_col) {
+  stopifnot(is.character(input_cols))
 
   assembler <- spark_invoke_static_ctor(
     sc,
