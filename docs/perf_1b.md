@@ -73,6 +73,16 @@ spark_sum_range <- function(sc, ses) {
   spark_invoke(result, "collect")[[1]]
 }
 
+spark_sum_range_parquet <- function(sc, ses) {
+  df <- spark_invoke(rspark:::spark_sql_or_hive(db$con@api), "read") %>%
+    spark_invoke("parquet", list(parquetPath))
+    
+  result <- spark_invoke(df, "selectExpr", list("sum(x)")) %>%
+    spark_invoke("collect")
+  
+  result[[1]]
+}
+
 spark_sum_range_mem <- function(ses) {
   ses %>%
     spark_invoke("table", "billion") %>%
@@ -125,22 +135,27 @@ logResults <- function(label, test) {
     sum = sum))
 }
 
-run1 <- logResults("1.6.1 Code", function() {
+runOldCode <- logResults("1.6.1 Code", function() {
   spark_conf(ses, "spark.sql.codegen.wholeStage", "false")
   spark_sum_range(sc, ses)
 })
 
-run2 <- logResults("2.0.0 Code", function() {
+runCode <- logResults("2.0.0 Code", function() {
   spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
   spark_sum_range(sc, ses)
 })
 
-run3 <- logResults("2.0.0 In-Mem", function() {
+runParquet <- logResults("2.0.0 Parquet", function() {
+  spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
+  sum <- spark_sum_range_parquet(ses)
+})
+
+runInMem <- logResults("2.0.0 In-Mem", function() {
   spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
   sum <- spark_sum_range_mem(ses)
 })
 
-run4 <- logResults("2.0.0 rspark", function() {
+runRSpark <- logResults("2.0.0 rspark", function() {
   spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
   sum <- spark_sum_range_dplyr(db)
 })
@@ -168,15 +183,15 @@ sparkRContext <- spark_sum_range_sparkr_prepare(sc)
     ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
     ##     rbind, sample, subset, summary, transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "8G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpjfsLPD/backend_port3bee7e16ec58
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "8G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpPpYGLj/backend_port498b4e4cddbd
 
 ``` r
-run5 <- logResults("2.0.0 SparkR", function() {
+runSparkR <- logResults("2.0.0 SparkR", function() {
   sum <- spark_sum_range_sparkr(sparkRContext)
 })
 spark_sum_range_sparkr_terminate()
 
-allRuns <- lapply(list(run1, run2, run3, run4, run5), function(e) {
+allRuns <- lapply(list(runOldCode, runCode, runParquet, runInMem, runRSpark, runSparkR), function(e) {
   colnames(e) <- c("label", "elapsed", "sum")
   e
 })

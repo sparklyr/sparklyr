@@ -10,15 +10,15 @@
 \alias{save_parquet}
 \title{Loads a CSV file and provides a data source compatible with dplyr}
 \usage{
-load_csv(con, name, path, repartition = 0)
+load_csv(con, name, path, repartition = 0, memory = TRUE)
 
 save_csv(x, path)
 
-load_parquet(con, name, path, repartition = 0)
+load_parquet(con, name, path, repartition = 0, memory = TRUE)
 
 save_parquet(x, path)
 
-load_json(con, name, path, repartition = 0)
+load_json(con, name, path, repartition = 0, memory = TRUE)
 
 save_json(x, path)
 }
@@ -30,6 +30,8 @@ save_json(x, path)
 \item{path}{The path to the CSV file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
 
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
+
+\item{memory}{Loads data into memory}
 
 \item{x}{A dplyr operation, for instance, `tbls(db, "flights")`}
 }
