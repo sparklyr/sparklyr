@@ -5,17 +5,6 @@ on_connection_opened <- function(scon, connectCall, db) {
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer)) {
 
-    # if this is a database connection then provide enumeration/preview functions
-    if (db) {
-      listTablesCode <- "rspark:::connection_list_tables(%s)"
-      listColumnsCode <- "rspark:::connection_list_columns(%s, table)"
-      previewTableCode <- "rspark:::connection_preview_table(%s, table, limit)"
-    } else {
-      listTablesCode <- NULL
-      listColumnsCode <- NULL
-      previewTableCode <- NULL
-    }
-
     viewer$connectionOpened(
       # connection type
       type = "Spark",
@@ -29,7 +18,8 @@ on_connection_opened <- function(scon, connectCall, db) {
         for (name in objs) {
           x <- get(name, envir = env)
           if (inherits(x, "spark_connection") &&
-              identical(x$master, host)) {
+              identical(x$master, host) &&
+              rspark:::spark_connection_is_open(x)) {
             return(name)
           }
         }
@@ -43,15 +33,19 @@ on_connection_opened <- function(scon, connectCall, db) {
       disconnectCode = "spark_disconnect(%s)",
 
       # table enumeration code
-      listTablesCode = listTablesCode,
+      listTablesCode =  "rspark:::connection_list_tables(%s)",
 
       # column enumeration code
-      listColumnsCode = listColumnsCode,
+      listColumnsCode = "rspark:::connection_list_columns(%s, table)",
 
       # table preview code
-      previewTableCode = previewTableCode
+      previewTableCode = "rspark:::connection_preview_table(%s, table, limit)"
     )
   }
+
+  # if this is a database connection then flag updated as well
+  if (db)
+    on_connection_updated(scon, "")
 }
 
 on_connection_closed <- function(scon) {
@@ -68,24 +62,35 @@ on_connection_updated <- function(scon, hint) {
 
 connection_list_tables <- function(sc) {
   dbi <- spark_connection_get_dbi(sc)
-  dbListTables(dbi)
+  if (!is.null(dbi))
+    dbListTables(dbi)
+  else
+    character()
 }
 
 connection_list_columns <- function(sc, table) {
   dbi <- spark_connection_get_dbi(sc)
-  sql <- paste("SELECT * FROM", table, "LIMIT 1")
-  df <- dbGetQuery(dbi, sql)
-  data.frame(
-    name = names(df),
-    type = as.character(lapply(df, class)),
-    stringsAsFactors = FALSE
-  )
+  if (!is.null(dbi)) {
+    sql <- paste("SELECT * FROM", table, "LIMIT 1")
+    df <- dbGetQuery(dbi, sql)
+    data.frame(
+      name = names(df),
+      type = as.character(lapply(df, class)),
+      stringsAsFactors = FALSE
+    )
+  } else {
+    NULL
+  }
 }
 
 connection_preview_table <- function(sc, table, limit) {
   dbi <- spark_connection_get_dbi(sc)
-  sql <- paste("SELECT * FROM", table, "LIMIT", limit)
-  dbGetQuery(dbi, sql)
+  if (!is.null(dbi)) {
+    sql <- paste("SELECT * FROM", table, "LIMIT", limit)
+    dbGetQuery(dbi, sql)
+  } else {
+    NULL
+  }
 }
 
 spark_connection_get_dbi <- function(scon) {
