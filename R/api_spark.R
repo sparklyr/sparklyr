@@ -185,7 +185,7 @@ spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
 
     switch(shortType,
            tinyint = as.integer(raw),
-           bigint = as.integer(raw),
+           bigint = as.numeric(raw),
            smallint = as.integer(raw),
            string = raw,
            double = as.double(raw),
