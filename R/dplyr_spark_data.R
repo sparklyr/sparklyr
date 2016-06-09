@@ -3,25 +3,32 @@
 #' @param name Name to reference the data source once it's loaded
 #' @param x A dplyr operation, for instance, `tbls(db, "flights")`
 #' @param path The path to the CSV file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"
+#' @param memory Loads data into memory
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 NULL
 
-spark_partition_register_df <- function(con, df, api, name, repartition) {
+spark_partition_register_df <- function(con, df, api, name, repartition, memory) {
   if (repartition > 0) {
     df <- spark_invoke(df, "repartition", as.integer(repartition))
   }
 
   spark_register_temp_table(api, df, name)
+
+  if (memory) {
+    dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
+    dbGetQuery(con$con, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = con$con)))
+  }
+
   tbl(con, name)
 }
 
 #' Loads a CSV file and provides a data source compatible with dplyr
 #' @rdname dplyr-spark-data
 #' @export
-load_csv <- function(con, name, path, repartition = 0) {
+load_csv <- function(con, name, path, repartition = 0, memory = TRUE) {
   api <- spark_api(con)
   df <- spark_read_csv(api, path)
-  spark_partition_register_df(con, df, api, name, repartition)
+  spark_partition_register_df(con, df, api, name, repartition, memory)
 }
 
 spark_source_from_ops <- function(x) {
@@ -53,10 +60,10 @@ save_csv <- function(x, path) {
 #' Loads a parquet file and provides a data source compatible with dplyr
 #' @rdname dplyr-spark-data
 #' @export
-load_parquet <- function(con, name, path, repartition = 0) {
+load_parquet <- function(con, name, path, repartition = 0, memory = TRUE) {
   api <- spark_api(con)
-  df <- spark_api_read_generic(api, path, "parquet")
-  spark_partition_register_df(con, df, api, name, repartition)
+  df <- spark_api_read_generic(api, list(path), "parquet")
+  spark_partition_register_df(con, df, api, name, repartition, memory)
 }
 
 #' Saves dplyr operation result as a parquet file
@@ -70,10 +77,10 @@ save_parquet <- function(x, path) {
 #' Loads a JSON file and provides a data source compatible with dplyr
 #' @rdname dplyr-spark-data
 #' @export
-load_json <- function(con, name, path, repartition = 0) {
+load_json <- function(con, name, path, repartition = 0, memory = TRUE) {
   api <- spark_api(con)
   df <- spark_api_read_generic(api, path, "json")
-  spark_partition_register_df(con, df, api, name, repartition)
+  spark_partition_register_df(con, df, api, name, repartition, memory)
 }
 
 #' Saves dplyr operation result as a JSON file
