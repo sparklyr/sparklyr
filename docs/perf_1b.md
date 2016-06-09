@@ -90,7 +90,7 @@ spark_sum_range_mem <- function(ses) {
     spark_invoke("collect")
 }
 
-spark_sum_range_dplyr <- function(db) {
+spark_sum_range_rspark <- function(db) {
   tbl(db, "billion") %>%
     summarise(total = sum(x)) %>%
     collect
@@ -117,6 +117,17 @@ spark_sum_range_sparkr <- function(sqlContextR) {
 
 spark_sum_range_sparkr_terminate <- function() {
   detach(name = "package:SparkR")
+}
+
+spark_sum_range_dplyr_prepare <- function() {
+  df <- as.data.frame(as.numeric(seq_len(1000000000)))
+  colnames(df) <- c("x")
+  head(df)
+  df
+}
+
+spark_sum_range_dplyr <- function(df) {
+  df %>% summarise(sum(x))
 }
 ```
 
@@ -157,7 +168,7 @@ runInMem <- logResults("2.0.0 In-Mem", function() {
 
 runRSpark <- logResults("2.0.0 rspark", function() {
   spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-  sum <- spark_sum_range_dplyr(db)
+  sum <- spark_sum_range_rspark(db)
 })
 
 sparkRContext <- spark_sum_range_sparkr_prepare(sc)
@@ -183,7 +194,7 @@ sparkRContext <- spark_sum_range_sparkr_prepare(sc)
     ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
     ##     rbind, sample, subset, summary, transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "8G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpPpYGLj/backend_port498b4e4cddbd
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "8G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpUXMYes/backend_port5adb135b85c6
 
 ``` r
 runSparkR <- logResults("2.0.0 SparkR", function() {
@@ -191,7 +202,13 @@ runSparkR <- logResults("2.0.0 SparkR", function() {
 })
 spark_sum_range_sparkr_terminate()
 
-allRuns <- lapply(list(runOldCode, runCode, runParquet, runInMem, runRSpark, runSparkR), function(e) {
+dplyrDf <- spark_sum_range_dplyr_prepare()
+runDplyr <- logResults("dplyr", function() {
+  sum <- spark_sum_range_dplyr(dplyrDf)
+})
+dplyrDf <- NULL
+
+allRuns <- lapply(list(runOldCode, runCode, runParquet, runInMem, runRSpark, runSparkR, runDplyr), function(e) {
   colnames(e) <- c("label", "elapsed", "sum")
   e
 })
