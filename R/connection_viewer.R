@@ -42,10 +42,6 @@ on_connection_opened <- function(scon, connectCall, db) {
       previewTableCode = "rspark:::connection_preview_table(%s, table, limit)"
     )
   }
-
-  # if this is a database connection then flag updated as well
-  if (db)
-    on_connection_updated(scon, "")
 }
 
 on_connection_closed <- function(scon) {
