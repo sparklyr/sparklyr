@@ -43,18 +43,16 @@ as_logistic_regression_result <- function(model, features, response) {
     names(coefficients) <- c(features, "(Intercept)")
   }
 
-  # TODO: extract logistic regression summary, and extract
-  # useful information. Documentation suggests we need to
-  # cast the model as appropriate. From the API docs (v1.6.1):
-  #
-  #    LogisticRegressionTrainingSummary provides a summary for a
-  #    LogisticRegressionModel. Currently, only binary classification is supported
-  #    and the summary must be explicitly cast to
-  #    BinaryLogisticRegressionTrainingSummary. This will likely change when
-  #    multiclass classification is supported.
-  #
+  summary <- spark_invoke(model, "summary")
+  areaUnderROC <- spark_invoke(summary, "areaUnderROC")
+  roc <- spark_dataframe_collect(spark_invoke(summary, "roc"))
+
   ml_model("logistic_regression", model,
-           coefficients = coefficients
+           response = response,
+           features = features,
+           coefficients = coefficients,
+           roc = roc,
+           area.under.roc = areaUnderROC
   )
 }
 
@@ -78,4 +76,37 @@ ml_logistic_regression <- function(x, response, features, intercept = TRUE,
   fit <- spark_ml_logistic_regression(x, response, features, intercept,
                                       alpha, lambda)
   as_logistic_regression_result(fit, features, response)
+}
+
+#' @export
+print.ml_model_logistic_regression <- function(x, ...) {
+
+  # report what model was fitted
+  formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
+  cat("Call: ", formula, "\n\n", sep = "")
+
+  # report coefficients
+  cat("Coefficients:", sep = "\n")
+  print(x$coefficients)
+}
+
+#' @export
+residuals.ml_model_logistic_regression <- function(x, ...) {
+  stop("residuals not yet available for Spark logistic regression")
+}
+
+#' @export
+fitted.ml_model_logistic_regression <- function(x, ...) {
+  x$.model %>%
+    spark_invoke("summary") %>%
+    spark_invoke("predictions") %>%
+    spark_dataframe_read_column("prediction")
+}
+
+#' @export
+predict.ml_model_logistic_regression <- function(object, newdata, ...) {
+  sdf <- as_spark_dataframe(newdata)
+  assembled <- spark_assemble_vector(sdf$scon, sdf, features(object), "features")
+  predicted <- spark_invoke(object$.model, "transform", assembled)
+  spark_dataframe_read_column(predicted, "prediction")
 }
