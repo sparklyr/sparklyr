@@ -36,15 +36,15 @@ KMeans in R
 ``` r
 cl <- iris %>%
   select(Petal.Width, Petal.Length) %>%
-  kmeans(3)
+  kmeans(centers = 3)
 
 centers <- as.data.frame(cl$centers)
 
 iris %>%
   select(Petal.Width, Petal.Length) %>%
-  ggplot(aes(x=Petal.Length, y=Petal.Width)) +
-    geom_point(data=centers, aes(x=Petal.Width,y=Petal.Length), size=60, alpha=0.1) +
-    geom_point(data=iris, aes(x=Petal.Width,y=Petal.Length), size=2, alpha=0.5)
+  ggplot(aes(Petal.Length, Petal.Width)) +
+    geom_point(data = centers, aes(Petal.Width, Petal.Length), size = 60, alpha = 0.1) +
+    geom_point(data = iris, aes(Petal.Width, Petal.Length), size = 2, alpha = 0.5)
 ```
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-2-1.png)
@@ -54,17 +54,19 @@ KMeans in RSpark
 
 Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/latest/mllib-clustering.html#k-means)
 
+Note that the names of variables within the iris `tbl` have been transformed (replacing `.` with `_`) to work around an issue in the Spark 2.0.0-preview used in constructing this document -- we expect the issue to be resolved with the release of Spark 2.0.0.
+
 ``` r
 model <- tbl(db, "iris") %>%
   select(Petal_Width, Petal_Length) %>%
-  ml_kmeans(3)
+  ml_kmeans(centers = 3)
 
 tbl(db, "iris") %>%
   select(Petal_Width, Petal_Length) %>%
   collect %>%
-  ggplot(aes(x=Petal_Length, y=Petal_Width)) +
-    geom_point(data=model$centers, aes(x=Petal_Width,y=Petal_Length), size=60, alpha=0.1) +
-    geom_point(aes(x=Petal_Width,y=Petal_Length), size=2, alpha=0.5)
+  ggplot(aes(Petal_Length, Petal_Width)) +
+    geom_point(data = model$centers, aes(Petal_Width, Petal_Length), size = 60, alpha = 0.1) +
+    geom_point(aes(Petal_Width, Petal_Length), size = 2, alpha = 0.5)
 ```
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-3-1.png)
@@ -80,11 +82,11 @@ model <- lm(Petal.Length ~ Petal.Width, data = iris)
 
 iris %>%
   select(Petal.Width, Petal.Length) %>%
-  ggplot(aes(x = Petal.Length, y = Petal.Width)) +
-    geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length), size=2, alpha=0.5) +
+  ggplot(aes(Petal.Length, Petal.Width)) +
+    geom_point(data = iris, aes(Petal.Width, Petal.Length), size = 2, alpha = 0.5) +
     geom_abline(aes(slope = coef(model)[["Petal.Width"]],
                     intercept = coef(model)[["(Intercept)"]],
-                    color="red"))
+                    color = "red"))
 ```
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-4-1.png)
@@ -99,11 +101,11 @@ model <- tbl(db, "iris") %>%
 
 iris %>%
   select(Petal.Width, Petal.Length) %>%
-  ggplot(aes(x = Petal.Length, y = Petal.Width)) +
-    geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length), size=2, alpha=0.5) +
+  ggplot(aes(Petal.Length, Petal.Width)) +
+    geom_point(data = iris, aes(Petal.Width, Petal.Length), size = 2, alpha = 0.5) +
     geom_abline(aes(slope = coef(model)[["Petal_Width"]],
                     intercept = coef(model)[["(Intercept)"]],
-                    color="red"))
+                    color = "red"))
 ```
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-5-1.png)
