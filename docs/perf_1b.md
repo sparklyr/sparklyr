@@ -77,7 +77,7 @@ logResults <- function(label, test) {
 }
 
 sparkTest <- function(test) {
-  sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "8G")
+  sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "12G")
   db <- src_spark(sc)
   ses <- rspark:::spark_sql_or_hive(db$con@api)
   
@@ -154,7 +154,7 @@ spark_sum_range_sparkr_prepare <- function() {
   
   Sys.setenv(SPARK_HOME = installInfo$sparkVersionDir)
   library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
-  scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="8G"))
+  scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="12G"))
   sqlContextR <- sparkRSQL.init(scR)
   
   df <- loadDF(sqlContextR, parquetPath, "parquet")
@@ -274,7 +274,7 @@ sparkRContext <- spark_sum_range_sparkr_prepare()
     ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
     ##     rbind, sample, subset, summary, transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "8G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpVdij30/backend_port6b13489e4049
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpWHoh6T/backend_port72c5d56a2ae
 
 ``` r
 runSparkR <- logResults("2.0.0 SparkR", function() {
@@ -323,10 +323,10 @@ results
 ```
 
     ##           label    min    max       mean
-    ## 1    1.6.1 Code  7.647  9.474  8.3383333
-    ## 2    2.0.0 Code  0.418  1.048  0.6293333
-    ## 3 2.0.0 Parquet 11.799 16.563 14.6933333
-    ## 4  2.0.0 In-Mem 11.857 15.814 13.9496667
-    ## 5  2.0.0 rspark 13.179 13.996 13.5233333
-    ## 6  2.0.0 SparkR 10.903 14.244 13.1226667
-    ## 7         dplyr  3.971 18.164 10.2056667
+    ## 1    1.6.1 Code  7.966  9.310  8.4296667
+    ## 2    2.0.0 Code  0.386  0.650  0.4833333
+    ## 3 2.0.0 Parquet  8.827 16.203 11.8313333
+    ## 4  2.0.0 In-Mem 10.579 15.606 12.5146667
+    ## 5  2.0.0 rspark 10.568 13.538 12.2470000
+    ## 6  2.0.0 SparkR  9.903 14.123 12.4763333
+    ## 7         dplyr  3.146 14.148  6.9516667

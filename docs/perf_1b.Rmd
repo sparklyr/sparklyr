@@ -61,7 +61,7 @@ logResults <- function(label, test) {
 }
 
 sparkTest <- function(test) {
-  sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "8G")
+  sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "12G")
   db <- src_spark(sc)
   ses <- rspark:::spark_sql_or_hive(db$con@api)
   
@@ -138,7 +138,7 @@ spark_sum_range_sparkr_prepare <- function() {
   
   Sys.setenv(SPARK_HOME = installInfo$sparkVersionDir)
   library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
-  scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="8G"))
+  scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="12G"))
   sqlContextR <- sparkRSQL.init(scR)
   
   df <- loadDF(sqlContextR, parquetPath, "parquet")
