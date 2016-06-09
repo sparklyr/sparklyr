@@ -40,6 +40,11 @@ iris %>%
 
 Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/latest/mllib-clustering.html#k-means)
 
+Note that the names of variables within the iris `tbl` have been transformed
+(replacing `.` with `_`) to work around an issue in the Spark 2.0.0-preview
+used in constructing this document -- we expect the issue to be resolved with
+the release of Spark 2.0.0.
+
 ```{r}
 model <- tbl(db, "iris") %>%
   select(Petal_Width, Petal_Length) %>%
