@@ -19,6 +19,8 @@ library(magrittr)
 library(dplyr)
 library(ggplot2)
 
+parquetPath <- file.path(getwd(), "billion.parquet")
+
 if (!file.exists(parquetPath)) {
   billion <- spark_invoke_static_ctor(sc, "java.math.BigInteger", "1000000000") %>%
     spark_invoke("longValue")
@@ -62,7 +64,6 @@ sparkTest <- function(test) {
   sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "8G")
   db <- src_spark(sc)
   ses <- rspark:::spark_sql_or_hive(db$con@api)
-  parquetPath <- file.path(getwd(), "billion.parquet")
   
   invisible(
     load_parquet(db, "billion", parquetPath)
