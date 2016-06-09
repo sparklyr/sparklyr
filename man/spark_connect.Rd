@@ -5,8 +5,7 @@
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
 spark_connect(master = "local", app_name = "rspark", version = NULL,
-  hadoop_version = NULL, packages = NULL, cores = "auto", memory = "1g",
-  codegen = TRUE)
+  hadoop_version = NULL, packages = NULL, cores = "auto", memory = "1g")
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}

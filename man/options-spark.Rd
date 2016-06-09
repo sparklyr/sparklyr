@@ -18,11 +18,14 @@ The rspark.install.dir option, defines the default Spark installation directory
 
 The spark.connection.allow_local_reconnect option, allows reconnect to
 be enabled in local installations to help troubleshoot remote environments.
+
+The spark.connection.codegen option, sets the spark.sql.codegen.wholeStage option.
 }
 \examples{
 getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)
 getOption("rspark.packages.default", NULL)
 getOption("rspark.install.dir", TRUE)
 getOption("spark.connection.allow_local_reconnect", FALSE)
+getOption("spark.connection.codegen", FALSE)
 }
 

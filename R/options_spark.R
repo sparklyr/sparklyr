@@ -25,3 +25,9 @@ NULL
 #' @examples
 #' getOption("spark.connection.allow_local_reconnect", FALSE)
 NULL
+
+#' The spark.connection.codegen option, sets the spark.sql.codegen.wholeStage option.
+#' @name options-spark
+#' @examples
+#' getOption("spark.connection.codegen", FALSE)
+NULL

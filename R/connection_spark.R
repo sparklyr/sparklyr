@@ -35,8 +35,7 @@ spark_connect <- function(master = "local",
                           hadoop_version = NULL,
                           packages = NULL,
                           cores = "auto",
-                          memory = "1g",
-                          codegen = TRUE) {
+                          memory = "1g") {
 
   # verify that java is available
   if (!is_java_available()) {
@@ -64,7 +63,7 @@ spark_connect <- function(master = "local",
     packages = packages,
     memory = memory,
     jars = jars,
-    codegen = codegen
+    codegen = getOption("spark.connection.codegen", TRUE)
   )
 
   if (reconnect && (spark_connection_is_local(scon) && !getOption("spark.connection.allow_local_reconnect", FALSE))) {
