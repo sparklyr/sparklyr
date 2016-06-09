@@ -17,7 +17,7 @@ NULL
 #' @param x Collection of operations
 #' @param n Number of records to collect
 #' @param warn_incomplete Currently not supported in Spark
-collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
+collect.tbl_spark <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
   assert_that(length(n) == 1, n > 0L)
   if (n == Inf) {
     n <- -1
@@ -30,12 +30,21 @@ collect.tbl_spark <- function(x, ..., n = 1e5, warn_incomplete = TRUE) {
 
   con <- x$src$con
 
-  query <- select_spark_query(
-    sql_build(x, con = con),
-    limit = limit
-  )
+  if (n == -1) {
+    sql <- sql_render(
+      sql_build(x, con = con),
+      con = con)
+  }
+  else {
+    query <- select_spark_query(
+      sql_build(x, con = con),
+      limit = limit
+    )
 
-  sql <- sql_render(query, con = con)
+    sql <- sql_render(query, con = con)
+  }
+
+
   res <- dbSendQuery(con, sql)
   on.exit(dbClearResult(res))
 
