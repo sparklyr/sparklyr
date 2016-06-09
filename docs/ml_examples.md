@@ -27,6 +27,7 @@ sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
 db <- src_spark(sc)
 
 copy_to(db, iris, "iris")
+iris_tbl <- tbl(db, "iris")
 ```
 
 KMeans in R
@@ -94,7 +95,7 @@ Linear Regression in RSpark
 ``` r
 model <- tbl(db, "iris") %>%
   select(Petal_Width, Petal_Length) %>%
-  ml_lm(response = "Petal_Length", features = c("Petal_Width"))
+  ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
 
 iris %>%
   select(Petal.Width, Petal.Length) %>%

@@ -23,7 +23,7 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
   fit
 }
 
-as_lm_result <- function(model, features, response) {
+as_linear_regression_result <- function(model, features, response) {
 
   coefficients <- model %>%
     spark_invoke("coefficients") %>%
@@ -47,7 +47,7 @@ as_lm_result <- function(model, features, response) {
   if (!is.null(tvalues))
     names(tvalues) <- names(coefficients)
 
-  ml_model("lm", model,
+  ml_model("linear_regression", model,
     coefficients = coefficients,
     standard.errors = errors,
     t.values = tvalues,
@@ -64,7 +64,7 @@ as_lm_result <- function(model, features, response) {
 
 #' Linear regression from a dplyr source
 #'
-#' Fit a linear model using \code{spark.lm}.
+#' Fit a linear model using Spark LinearRegression
 #'
 #' See \url{https://spark.apache.org/docs/latest/ml-classification-regression.html}
 #' for more information on how linear regression is implemented in Spark.
@@ -77,16 +77,16 @@ as_lm_result <- function(model, features, response) {
 #' @param lambda The \emph{regularization penalty}.
 #'
 #' @export
-ml_lm <- function(x, response, features, intercept = TRUE,
+ml_linear_regression <- function(x, response, features, intercept = TRUE,
                   alpha = 0, lambda = 0) {
   fit <- spark_ml_linear_regression(x, response, features, intercept,
                                     alpha, lambda)
-  as_lm_result(fit, features, response)
+  as_linear_regression_result(fit, features, response)
 }
 
 
 #' @export
-print.ml_model_lm <- function(x, ...) {
+print.ml_model_linear_regression <- function(x, ...) {
 
   # report what model was fitted
   formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
@@ -98,7 +98,7 @@ print.ml_model_lm <- function(x, ...) {
 }
 
 #' @export
-residuals.ml_model_lm <- function(x, ...) {
+residuals.ml_model_linear_regression <- function(x, ...) {
   x$.model %>%
     spark_invoke("summary") %>%
     spark_invoke("residuals") %>%
@@ -106,7 +106,7 @@ residuals.ml_model_lm <- function(x, ...) {
 }
 
 #' @export
-fitted.ml_model_lm <- function(x, ...) {
+fitted.ml_model_linear_regression <- function(x, ...) {
   x$.model %>%
     spark_invoke("summary") %>%
     spark_invoke("predictions") %>%
@@ -114,7 +114,7 @@ fitted.ml_model_lm <- function(x, ...) {
 }
 
 #' @export
-predict.ml_model_lm <- function(object, newdata, ...) {
+predict.ml_model_linear_regression <- function(object, newdata, ...) {
   sdf <- as_spark_dataframe(newdata)
   assembled <- spark_assemble_vector(sdf$scon, sdf, features(object), "features")
   predicted <- spark_invoke(object$.model, "transform", assembled)
