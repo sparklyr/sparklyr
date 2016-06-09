@@ -36,9 +36,10 @@ as_pca_result <- function(model, features) {
     as.numeric()
 
   # set names
+  pcNames <- paste("PC", seq_len(ncol(components)), sep = "")
   rownames(components) <- features
-  colnames(components) <- paste("PC", seq_len(ncol(components)), sep = "")
-  names(explainedVariance) <- features
+  colnames(components) <- pcNames
+  names(explainedVariance) <- pcNames
 
   ml_model("pca", model,
     components = components,

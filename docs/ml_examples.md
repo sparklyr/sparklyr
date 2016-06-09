@@ -148,8 +148,8 @@ print(model)
 ```
 
     ## Explained variance:
-    ## Sepal_Length  Sepal_Width Petal_Length  Petal_Width 
-    ##  0.924618723  0.053066483  0.017102610  0.005212184 
+    ##         PC1         PC2         PC3         PC4 
+    ## 0.924618723 0.053066483 0.017102610 0.005212184 
     ## 
     ## Rotation:
     ##                      PC1         PC2         PC3        PC4
