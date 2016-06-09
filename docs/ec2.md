@@ -37,7 +37,7 @@ Using the remote terminal into the cluster, run:
     yum install openssl-devel
     yum -y install libcurl libcurl-devel
 
-Then back from R install:
+From the RStudio in the cluster machine, install:
 
 ``` r
 install.packages("devtools")
@@ -51,7 +51,7 @@ Finally, build the RSpark package.
 Connection
 ----------
 
-Once all packages have compiled, connect to the EC2 cluster using:
+From the RStudio in the cluster machine, run:
 
 ``` r
 library(dplyr)
