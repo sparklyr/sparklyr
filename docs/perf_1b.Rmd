@@ -70,6 +70,29 @@ spark_sum_range_dplyr <- function(db) {
     collect
 }
 
+spark_sum_range_sparkr_prepare <- function(sc) {
+  Sys.setenv(SPARK_HOME = sc$installInfo$sparkVersionDir)
+  library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
+  scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="8G"))
+  sqlContextR <- sparkRSQL.init(scR)
+  
+  df <- loadDF(sqlContextR, parquetPath, "parquet")
+  registerTempTable(df, "billion")
+  
+  sql(sqlContextR, "CACHE TABLE billion")
+  collect(sql(sqlContextR, "SELECT count(*) FROM billion"))
+  
+  sqlContextR
+}
+
+spark_sum_range_sparkr <- function(sqlContextR) {
+  collect(sql(sqlContextR, "SELECT sum(*) FROM billion"))
+}
+
+spark_sum_range_sparkr_terminate <- function() {
+  detach(name = "package:SparkR")
+}
+
 ```
 
 ## Spark 1.0
@@ -101,12 +124,18 @@ run3 <- logResults("2.0.0 In-Mem", function() {
   sum <- spark_sum_range_mem(ses)
 })
 
-run4 <- logResults("2.0.0 dplyr", function() {
+run4 <- logResults("2.0.0 rspark", function() {
   spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
   sum <- spark_sum_range_dplyr(db)
 })
 
-allRuns <- lapply(list(run1, run2, run3, run4), function(e) {
+sparkRContext <- spark_sum_range_sparkr_prepare(sc)
+run5 <- logResults("2.0.0 SparkR", function() {
+  sum <- spark_sum_range_sparkr(sparkRContext)
+})
+spark_sum_range_sparkr_terminate()
+
+allRuns <- lapply(list(run1, run2, run3, run4, run5), function(e) {
   colnames(e) <- c("label", "elapsed", "sum")
   e
 })
