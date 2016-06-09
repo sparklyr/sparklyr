@@ -23,19 +23,19 @@ spark_default_jars <- function() {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
 #' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
+#' @param packages Collection of packages to load into Spark. See also, the rspark.packages.default option.
 #' @param cores Cores available for use for Spark. This option is only applicable to local installations. Use NULL
 #' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 #' OS schedules one thread per core.
-#' @param packages Collection of packages to load into Spark. See also, the rspark.packages.default option.
-#' @param memory Override default memory per executor (e.g. 1000M, 2G)
+#' @param memory Memory per executor (e.g. 1000m, 2g). Defaults to 1g
 spark_connect <- function(master = "local",
                           app_name = "rspark",
                           version = NULL,
                           hadoop_version = NULL,
-                          cores = "auto",
                           packages = NULL,
-                          memory = NULL) {
+                          cores = "auto",
+                          memory = "1g") {
 
   # verify that java is available
   if (!is_java_available()) {
