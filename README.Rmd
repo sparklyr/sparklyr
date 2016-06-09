@@ -47,7 +47,11 @@ library(rspark)
 library(dplyr)
 sc <- spark_connect("local", cores = "auto", version = "1.6.1", memory = "8G")
 db <- src_spark(sc)
+```
 
+Now we copy a couple of datasets from R into the Spark cluster:
+
+```{r}
 # copy the flights table from the nycflights13 package to Spark
 copy_to(db, nycflights13::flights, "flights")
 flights <- tbl(db, "flights")
