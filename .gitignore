@@ -26,3 +26,5 @@ README_cache
 # Perf.md cache
 perf_cache
 spark-warehouse
+# Temp parquet files
+docs/*.parquet
