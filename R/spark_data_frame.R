@@ -100,3 +100,4 @@ spark_dataframe_split <- function(object, weights = c(0.5, 0.5), seed = 11L) {
   jobj <- as_spark_dataframe(object)
   spark_invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
 }
+

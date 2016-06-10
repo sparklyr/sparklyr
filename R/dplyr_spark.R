@@ -202,3 +202,28 @@ print.src_spark <- function(x, ...) {
 
   spark_log(x$con@scon)
 }
+
+#' Partition a Spark Dataframe
+#'
+#' @param .data Data
+#' @param ... Named parameters, mapping table names to weights.
+#'
+#' @export
+partition <- function(.data, ..., seed = 11) {
+  weights <- list(...)
+  nm <- names(weights)
+  if (is.null(nm) || any(!nzchar(nm)))
+    stop("all weights must be named")
+
+  splat <- spark_dataframe_split(.data, as.numeric(weights), seed = seed)
+  names(splat) <- nm
+
+  db <- .data$src
+  partitions <- lapply(seq_along(splat), function(i) {
+    spark_invoke(splat[[i]], "registerTempTable", nm[[i]])
+    tbl(db, nm[[i]])
+  })
+
+  names(partitions) <- nm
+  partitions
+}
