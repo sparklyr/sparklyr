@@ -26,9 +26,18 @@ spark_ml_random_forest <- function(x, response, features, max.bins, max.depth, n
 
 as_random_forest_result <- function(fit, response, features)
 {
+  featureImportances <- fit %>%
+    spark_invoke("featureImportances") %>%
+    spark_invoke("toArray")
+
   ml_model("random_forest", fit,
     response = response,
-    features = features
+    features = features,
+    max.bins = spark_invoke(fit, "getMaxBins"),
+    max.depth = spark_invoke(fit, "getMaxDepth"),
+    num.trees = spark_invoke(fit, "getNumTrees"),
+    feature.importances = featureImportances,
+    trees = spark_invoke(fit, "trees")
   )
 }
 
