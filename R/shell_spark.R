@@ -37,7 +37,7 @@ start_shell <- function(sconInst, installInfo, packages, jars, memory, master) {
 
   sparkCommand <- ""
   if (length(packages) > 0) {
-    sparkCommand <- paste("--packages ", paste(packages, sep = ","))
+    sparkCommand <- paste("--packages ", paste(packages, collapse = ","))
   }
 
   if (length(jars) > 0) {
