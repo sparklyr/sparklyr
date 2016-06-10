@@ -32,8 +32,8 @@ spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL, instal
 
   if(NROW(versions) == 0) {
     sparkInstall <- quote(spark_install(version = "", hadoop_version = ""))
-    sparkInstall[[2]] <- sparkVersion
-    sparkInstall[[3]] <- hadoopVersion
+    sparkInstall$version <- sparkVersion
+    sparkInstall$hadoop_version <- hadoopVersion
 
     stop(paste("Spark version not installed. To install, use ", deparse(sparkInstall)))
   }
