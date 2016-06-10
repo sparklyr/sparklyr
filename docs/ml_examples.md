@@ -110,6 +110,51 @@ iris %>%
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
+Partitioning in R
+-----------------
+
+``` r
+ratio <- 0.75
+trainingSize <- floor(ratio * nrow(iris))
+indices <- sample(seq_len(nrow(iris)), size = trainingSize)
+
+training <- iris[ indices, ]
+test     <- iris[-indices, ]
+
+fit <- lm(Petal.Length ~ Petal.Width, data = iris)
+predict(fit, newdata = test)
+```
+
+    ##       11       12       14       16       26       29       33       37 
+    ## 1.529546 1.529546 1.306552 1.975534 1.529546 1.529546 1.306552 1.529546 
+    ##       38       39       44       45       46       48       55       57 
+    ## 1.306552 1.529546 2.421522 1.975534 1.752540 1.529546 4.428469 4.651463 
+    ##       62       64       67       72       75       77       82       88 
+    ## 4.428469 4.205475 4.428469 3.982481 3.982481 4.205475 3.313499 3.982481 
+    ##       94       95       98      104      105      118      121      124 
+    ## 3.313499 3.982481 3.982481 5.097451 5.989427 5.989427 6.212421 5.097451 
+    ##      133      134      135      136      138      150 
+    ## 5.989427 4.428469 4.205475 6.212421 5.097451 5.097451
+
+Partitioning in RSpark
+----------------------
+
+``` r
+partitions <- tbl(db, "iris") %>%
+  partition(training = 0.75, test = 0.25)
+
+fit <- partitions$training %>%
+  ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
+
+predict(fit, partitions$test)
+```
+
+    ##  [1] 1.348732 1.567477 1.567477 1.348732 1.786222 1.567477 1.348732
+    ##  [8] 3.317439 1.567477 1.567477 1.567477 2.442458 2.004967 1.567477
+    ## [15] 1.348732 1.567477 2.004967 3.536184 3.973674 3.754929 3.317439
+    ## [22] 4.629910 4.411165 3.973674 3.973674 5.067401 5.723636 6.161127
+    ## [29] 6.598617 6.161127 5.942381 5.504891
+
 Principal Components Analysis in R
 ----------------------------------
 

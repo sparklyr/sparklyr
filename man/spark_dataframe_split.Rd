@@ -4,7 +4,8 @@
 \alias{spark_dataframe_split}
 \title{Split a Spark DataFrame}
 \usage{
-spark_dataframe_split(object, weights = c(0.5, 0.5), seed = 11L)
+spark_dataframe_split(object, weights = c(0.5, 0.5),
+  seed = sample(.Machine$integer.max, 1))
 }
 \arguments{
 \item{object}{An (object convertable to a) Spark DataFrame.}

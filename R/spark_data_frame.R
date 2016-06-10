@@ -96,7 +96,10 @@ spark_dataframe_collect <- function(object) {
 #' @param seed A numeric seed.
 #'
 #' @export
-spark_dataframe_split <- function(object, weights = c(0.5, 0.5), seed = 11L) {
+spark_dataframe_split <- function(object,
+                                  weights = c(0.5, 0.5),
+                                  seed = sample(.Machine$integer.max, 1))
+{
   jobj <- as_spark_dataframe(object)
   spark_invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
 }

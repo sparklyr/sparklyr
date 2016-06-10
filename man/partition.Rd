@@ -4,7 +4,7 @@
 \alias{partition}
 \title{Partition a Spark Dataframe}
 \usage{
-partition(.data, ..., seed = 11)
+partition(.data, ..., seed = sample(.Machine$integer.max, 1))
 }
 \arguments{
 \item{.data}{Data}

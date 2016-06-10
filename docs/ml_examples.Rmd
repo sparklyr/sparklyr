@@ -92,6 +92,33 @@ iris %>%
                     color = "red"))
 ```
 
+## Partitioning in R
+
+```{r}
+ratio <- 0.75
+trainingSize <- floor(ratio * nrow(iris))
+indices <- sample(seq_len(nrow(iris)), size = trainingSize)
+
+training <- iris[ indices, ]
+test     <- iris[-indices, ]
+
+fit <- lm(Petal.Length ~ Petal.Width, data = iris)
+predict(fit, newdata = test)
+```
+
+## Partitioning in RSpark
+
+```{r}
+partitions <- tbl(db, "iris") %>%
+  partition(training = 0.75, test = 0.25)
+
+fit <- partitions$training %>%
+  ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
+
+predict(fit, partitions$test)
+```
+
+
 ## Principal Components Analysis in R
 
 ```{r}
