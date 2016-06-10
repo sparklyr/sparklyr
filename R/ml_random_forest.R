@@ -49,7 +49,7 @@ ml_random_forest <- function(x, response, features,
 {
   fit <- spark_ml_random_forest(x, response, features,
                                 max.bins, max.depth, num.trees)
-  as_random_forest_result(fit, features, response)
+  as_random_forest_result(fit, response, features)
 }
 
 #' @export
