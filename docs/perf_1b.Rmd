@@ -60,16 +60,33 @@ logResults <- function(label, test) {
   ))
 }
 
-sparkTest <- function(test) {
+sparkTest <- function(test, loadIntoDf = TRUE) {
   sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "12G")
-  db <- src_spark(sc)
-  ses <- rspark:::spark_sql_or_hive(db$con@api)
-  
-  invisible(
-    load_parquet(db, "billion", parquetPath)
+  sparkSql <- spark_invoke_static_ctor(
+    sc,
+    "org.apache.spark.sql.SQLContext",
+    spark_context(sc)
   )
   
-  result <- test(sc, db, ses)
+  db <- src_spark(sc)
+  ses <- rspark:::spark_sql_or_hive(rspark:::spark_api(db))
+  df <- NULL
+  
+  if (loadIntoDf) {
+    df <- sparkSql %>%
+      spark_invoke("read") %>%
+      spark_invoke("parquet", list(parquetPath))
+    
+    df %>%
+      spark_invoke("cache") %>%
+      spark_invoke("count")
+  } else {
+    invisible(
+      load_parquet(db, "billion", parquetPath)
+    )
+  }
+  
+  result <- test(sc, db, ses, df)
   
   spark_disconnect(sc)
   result
@@ -82,7 +99,7 @@ sparkTest <- function(test) {
 ### Sum range from formula
 
 ```{r}
-spark_sum_range <- function(sc, db, ses) {
+spark_sum_range <- function(sc, db, ses, df) {
   billion <- spark_invoke_static_ctor(sc, "java.math.BigInteger", "1000000000") %>%
     spark_invoke("longValue")
   
@@ -98,8 +115,8 @@ spark_sum_range <- function(sc, db, ses) {
 ### Sum range from parquet
 
 ```{r}
-spark_sum_range_parquet <- function(sc, db, ses) {
-  df <- spark_invoke(rspark:::spark_sql_or_hive(db$con@api), "read") %>%
+spark_sum_range_parquet <- function(sc, db, ses, df) {
+  df <- spark_invoke(rspark:::spark_sql_or_hive(rspark:::spark_api(db)), "read") %>%
     spark_invoke("parquet", list(parquetPath))
     
   result <- spark_invoke(df, "selectExpr", list("sum(x)")) %>%
@@ -112,9 +129,8 @@ spark_sum_range_parquet <- function(sc, db, ses) {
 ### Sum range from memory
 
 ```{r}
-spark_sum_range_mem <- function(sc, db, ses) {
-  ses %>%
-    spark_invoke("table", "billion") %>%
+spark_sum_range_mem <- function(sc, db, ses, df) {
+  df %>%
     spark_invoke("selectExpr", list("sum(x)")) %>%
     spark_invoke("collect")
 }
@@ -123,25 +139,25 @@ spark_sum_range_mem <- function(sc, db, ses) {
 ### Sum range using rspark
 
 ```{r}
-spark_sum_range_rspark <- function(sc, db, ses) {
+spark_sum_range_rspark <- function(sc, db, ses, df) {
   tbl(db, "billion") %>%
     summarise(total = sum(x)) %>%
     collect
 }
 ```
 
-### Sum range using SparkR
+### Sum range using SparkR SQL
 
 ```{r}
-spark_sum_range_sparkr_prepare <- function() {
+spark_sum_range_sparkr_sql_prepare <- function() {
   installInfo <- rspark:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
   
   Sys.setenv(SPARK_HOME = installInfo$sparkVersionDir)
   library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
   scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="12G"))
   sqlContextR <- sparkRSQL.init(scR)
-  
   df <- loadDF(sqlContextR, parquetPath, "parquet")
+  
   registerTempTable(df, "billion")
   
   sql(sqlContextR, "CACHE TABLE billion")
@@ -150,12 +166,36 @@ spark_sum_range_sparkr_prepare <- function() {
   sqlContextR
 }
 
-spark_sum_range_sparkr <- function(sqlContextR) {
+spark_sum_range_sparkr_sql <- function(sqlContextR) {
   collect(sql(sqlContextR, "SELECT sum(*) FROM billion"))
 }
 
 spark_sum_range_sparkr_terminate <- function() {
+  sparkR.stop()
   detach(name = "package:SparkR")
+}
+```
+
+### Sum range using SparkR Native
+
+```{r}
+spark_sum_range_sparkr_native_prepare <- function() {
+  installInfo <- rspark:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
+  
+  Sys.setenv(SPARK_HOME = installInfo$sparkVersionDir)
+  library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
+  scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="12G"))
+  sqlContextR <- sparkRSQL.init(scR)
+  
+  df <- loadDF(sqlContextR, parquetPath, "parquet")
+  cache(df)
+  count(df)
+  
+  df
+}
+
+spark_sum_range_sparkr_native <- function(df) {
+  collect(summarize(df, total = sum(df$x)))
 }
 ```
 
@@ -179,10 +219,10 @@ spark_sum_range_dplyr <- function(df) {
 ### Sum range from formula using 1.6
 
 ```{r runOldCode}
-runOldCode <- sparkTest(function(sc, db, ses) {
+runOldCode <- sparkTest(function(sc, db, ses, df) {
   logResults("1.6.1 Code", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "false")
-    spark_sum_range(sc, db, ses)
+    spark_sum_range(sc, db, ses, df)
   })
 })
 ```
@@ -190,10 +230,10 @@ runOldCode <- sparkTest(function(sc, db, ses) {
 ### Sum range from formula using 2.0
 
 ```{r runCode}
-runCode <- sparkTest(function(sc, db, ses) {
+runCode <- sparkTest(function(sc, db, ses, df) {
   logResults("2.0.0 Code", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    spark_sum_range(sc, db, ses)
+    spark_sum_range(sc, db, ses, df)
   })
 })
 ```
@@ -201,10 +241,10 @@ runCode <- sparkTest(function(sc, db, ses) {
 ### Sum range from parquet
 
 ```{r runParquet}
-runParquet <- sparkTest(function(sc, db, ses) {
+runParquet <- sparkTest(function(sc, db, ses, df) {
   logResults("2.0.0 Parquet", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    sum <- spark_sum_range_parquet(sc, db, ses)
+    sum <- spark_sum_range_parquet(sc, db, ses, df)
   })
 })
 ```
@@ -212,10 +252,10 @@ runParquet <- sparkTest(function(sc, db, ses) {
 ### Sum range from memory
 
 ```{r runInMem}
-runInMem <- sparkTest(function(sc, db, ses) {
+runInMem <- sparkTest(function(sc, db, ses, df) {
   logResults("2.0.0 In-Mem", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    sum <- spark_sum_range_mem(sc, db, ses)
+    sum <- spark_sum_range_mem(sc, db, ses, df)
   })
 })
 ```
@@ -223,20 +263,30 @@ runInMem <- sparkTest(function(sc, db, ses) {
 ### Sum range using rspark
 
 ```{r runRSpark}
-runRSpark <- sparkTest(function(sc, db, ses) {
+runRSpark <- sparkTest(function(sc, db, ses, df) {
   logResults("2.0.0 rspark", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    sum <- spark_sum_range_rspark(sc, db, ses)
+    sum <- spark_sum_range_rspark(sc, db, ses, df)
   })
-})
+}, loadIntoDf = FALSE)
 ```
 
-### Sum range using RSpark
+### Sum range using RSpark SQL
 
-```{r runSparkR}
-sparkRContext <- spark_sum_range_sparkr_prepare()
-runSparkR <- logResults("2.0.0 SparkR", function() {
-  sum <- spark_sum_range_sparkr(sparkRContext)
+```{r runSparkRSQL}
+sqlContextR <- spark_sum_range_sparkr_sql_prepare()
+runSparkRSQL <- logResults("2.0.0 SparkR SQL", function() {
+  sum <- spark_sum_range_sparkr_sql(sqlContextR)
+})
+spark_sum_range_sparkr_terminate()
+```
+
+### Sum range using RSpark SQL
+
+```{r runSparkRNative}
+dfSparkR <- spark_sum_range_sparkr_native_prepare()
+runSparkRNative <- logResults("2.0.0 SparkR Native", function() {
+  sum <- spark_sum_range_sparkr_native(dfSparkR)
 })
 spark_sum_range_sparkr_terminate()
 ```
@@ -254,10 +304,21 @@ dplyrDf <- NULL
 ## Results
 
 ```{r allRuns}
-allRuns <- lapply(list(runOldCode, runCode, runParquet, runInMem, runRSpark, runSparkR, runDplyr), function(e) {
-  colnames(e) <- c("label", "min", "max", "mean")
-  e
-})
+allRuns <- lapply(
+  list(
+    runOldCode,
+    runCode,
+    runParquet,
+    runInMem,
+    runRSpark,
+    runSparkRSQL,
+    runSparkRNative,
+    runDplyr
+  ),
+  function(e) {
+    colnames(e) <- c("label", "min", "max", "mean")
+    e
+  })
 results <- do.call("rbind", allRuns)
 ```
 
