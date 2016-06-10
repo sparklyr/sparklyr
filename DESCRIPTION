@@ -43,6 +43,7 @@ Collate:
     'ml_linear_regression.R'
     'ml_logistic_regression.R'
     'ml_pca.R'
+    'ml_random_forest.R'
     'ml_utils.R'
     'options_spark.R'
     'shell_spark.R'
