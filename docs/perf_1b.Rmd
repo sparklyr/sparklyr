@@ -75,14 +75,15 @@ sparkTest <- function(test, loadIntoDf = TRUE) {
   if (loadIntoDf) {
     df <- sparkSql %>%
       spark_invoke("read") %>%
-      spark_invoke("parquet", list(parquetPath))
+      spark_invoke("parquet", list(parquetPath)) %>%
+      spark_invoke("repartition", as.integer(parallel::detectCores()))
     
     df %>%
       spark_invoke("cache") %>%
       spark_invoke("count")
   } else {
     invisible(
-      load_parquet(db, "billion", parquetPath)
+      load_parquet(db, "billion", parquetPath, repartition = parallel::detectCores())
     )
   }
   
@@ -157,6 +158,7 @@ spark_sum_range_sparkr_sql_prepare <- function() {
   scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="12G"))
   sqlContextR <- sparkRSQL.init(scR)
   df <- loadDF(sqlContextR, parquetPath, "parquet")
+  df <- repartition(df, parallel::detectCores())
   
   registerTempTable(df, "billion")
   
@@ -188,6 +190,7 @@ spark_sum_range_sparkr_native_prepare <- function() {
   sqlContextR <- sparkRSQL.init(scR)
   
   df <- loadDF(sqlContextR, parquetPath, "parquet")
+  df <- repartition(df, parallel::detectCores())
   cache(df)
   count(df)
   

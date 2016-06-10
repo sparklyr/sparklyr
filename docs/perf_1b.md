@@ -91,14 +91,15 @@ sparkTest <- function(test, loadIntoDf = TRUE) {
   if (loadIntoDf) {
     df <- sparkSql %>%
       spark_invoke("read") %>%
-      spark_invoke("parquet", list(parquetPath))
+      spark_invoke("parquet", list(parquetPath)) %>%
+      spark_invoke("repartition", as.integer(parallel::detectCores()))
     
     df %>%
       spark_invoke("cache") %>%
       spark_invoke("count")
   } else {
     invisible(
-      load_parquet(db, "billion", parquetPath)
+      load_parquet(db, "billion", parquetPath, repartition = parallel::detectCores())
     )
   }
   
@@ -173,6 +174,7 @@ spark_sum_range_sparkr_sql_prepare <- function() {
   scR <- sparkR.init(master = "local[*]", sparkEnvir = list(spark.driver.memory="12G"))
   sqlContextR <- sparkRSQL.init(scR)
   df <- loadDF(sqlContextR, parquetPath, "parquet")
+  df <- repartition(df, parallel::detectCores())
   
   registerTempTable(df, "billion")
   
@@ -204,6 +206,7 @@ spark_sum_range_sparkr_native_prepare <- function() {
   sqlContextR <- sparkRSQL.init(scR)
   
   df <- loadDF(sqlContextR, parquetPath, "parquet")
+  df <- repartition(df, parallel::detectCores())
   cache(df)
   count(df)
   
@@ -314,7 +317,7 @@ sqlContextR <- spark_sum_range_sparkr_sql_prepare()
     ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
     ##     rbind, sample, subset, summary, transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//Rtmpz7blOh/backend_port841f5e91e175
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpkMqRoz/backend_port915b73511ca5
 
 ``` r
 runSparkRSQL <- logResults("2.0.0 SparkR SQL", function() {
@@ -349,7 +352,7 @@ dfSparkR <- spark_sum_range_sparkr_native_prepare()
     ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
     ##     rbind, sample, subset, summary, transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//Rtmpz7blOh/backend_port841f68a844c4
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpkMqRoz/backend_port915b40f27d9f
 
 ``` r
 runSparkRNative <- logResults("2.0.0 SparkR Native", function() {
@@ -408,12 +411,12 @@ results %>%
 results
 ```
 
-    ##                 label    min    max       mean
-    ## 1          1.6.1 Code  8.046  8.635  8.2836667
-    ## 2          2.0.0 Code  0.358  0.855  0.5343333
-    ## 3       2.0.0 Parquet 10.260 11.292 10.8026667
-    ## 4        2.0.0 In-Mem 10.139 11.030 10.5220000
-    ## 5        2.0.0 rspark 10.468 13.160 11.9756667
-    ## 6    2.0.0 SparkR SQL 10.327 14.607 12.5600000
-    ## 7 2.0.0 SparkR Native  9.865 13.400 11.1786667
-    ## 8               dplyr  2.823  3.200  2.9656667
+    ##                 label   min    max      mean
+    ## 1          1.6.1 Code 7.379  8.874 7.9140000
+    ## 2          2.0.0 Code 0.348  0.862 0.5423333
+    ## 3       2.0.0 Parquet 7.996 11.020 9.1100000
+    ## 4        2.0.0 In-Mem 6.598  7.163 6.8130000
+    ## 5        2.0.0 rspark 6.480  6.949 6.6916667
+    ## 6    2.0.0 SparkR SQL 6.390  6.573 6.4776667
+    ## 7 2.0.0 SparkR Native 6.535  7.097 6.7593333
+    ## 8               dplyr 2.881  3.202 2.9930000
