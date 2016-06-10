@@ -3,8 +3,13 @@ methods::setOldClass("spark_connection")
 
 spark_default_packages <- function() {
   packagesOption <- getOption("rspark.packages.default", NULL)
+  defaultPackages <- c(
+    "com.databricks:spark-csv_2.11:1.3.0",
+    "com.amazonaws:aws-java-sdk-pom:1.10.34",
+    "org.apache.hadoop:hadoop-aws:2.6.0"
+  )
 
-  if (is.null(packagesOption)) c("com.databricks:spark-csv_2.11:1.3.0") else packagesOption
+  if (is.null(packagesOption)) defaultPackages else packagesOption
 }
 
 spark_default_jars <- function() {
