@@ -36,10 +36,10 @@ on_connection_opened <- function(scon, connectCall, db) {
       listTablesCode =  "rspark:::connection_list_tables(%s)",
 
       # column enumeration code
-      listColumnsCode = "rspark:::connection_list_columns(%s, table)",
+      listColumnsCode = "rspark:::connection_list_columns(%s, '%s')",
 
       # table preview code
-      previewTableCode = "rspark:::connection_preview_table(%s, table, limit)"
+      previewTableCode = "rspark:::connection_preview_table(%s, '%s', %s)"
     )
   }
 }
