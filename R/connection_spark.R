@@ -41,9 +41,9 @@ spark_connect <- function(master = "local",
                           packages = NULL,
                           cores = "auto",
                           memory = "1g") {
-  scon <- spark_connection_find_scon(master, app_name)
-  if (!is.null(scon)) {
-    return(scon)
+  sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name })
+  if (length(sconFound) == 1) {
+    return(sconFound[[1]])
   }
 
   # verify that java is available
@@ -72,11 +72,11 @@ spark_connect <- function(master = "local",
     packages = packages,
     memory = memory,
     jars = jars,
-    codegen = getOption("spark.connection.codegen", TRUE)
+    codegen = getOption("rspark.connection.codegen", TRUE)
   )
   scon <- structure(scon, class = "spark_connection")
 
-  if (reconnect && (spark_connection_is_local(scon) && !getOption("spark.connection.allow_local_reconnect", FALSE))) {
+  if (reconnect && (spark_connection_is_local(scon) && !getOption("rspark.connection.allow_local_reconnect", FALSE))) {
     stop("Reconnect is not supported on local installs")
   }
 
@@ -417,4 +417,17 @@ spark_connection_is_open <- function(scon) {
   }
 
   bothOpen
+}
+
+#' Closes all existing connections. Returns the total of connections closed.
+#' @name spark_connections_close
+#' @export
+spark_connection_close_all <- function(test) {
+  scons <- spark_connection_find_scon(function(e) {
+    spark_connection_is_open(e)
+  })
+
+  length(lapply(scons, function(e) {
+    spark_disconnect(e)
+  }))
 }

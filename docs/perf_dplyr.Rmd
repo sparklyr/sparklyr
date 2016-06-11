@@ -50,9 +50,9 @@ spark_perf_test <- function(params, tests) {
     options(rspark.dplyr.optimize_shuffle_cores = param$shuffle)
     on.exit(options(rspark.dplyr.optimize_shuffle_cores = shuffle))
     
-    codegen <- getOption("spark.connection.codegen", NULL)
-    options(spark.connection.codegen = param$codegen)
-    on.exit(options(spark.connection.codegen = codegen))
+    codegen <- getOption("rspark.connection.codegen", NULL)
+    options(rspark.connection.codegen = param$codegen)
+    on.exit(options(rspark.connection.codegen = codegen))
     
     sc <- spark_connect(master = param$master, cores = param$cores, version = param$version)
     

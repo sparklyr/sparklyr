@@ -81,9 +81,10 @@ spark_connection_on_reconnect <- function(scon, onReconnect) {
   spark_connection_set_inst(scon, sconInst)
 }
 
-spark_connection_find_scon <- function(master, appName) {
+spark_connection_find_scon <- function(test) {
   instances <- spark_connection_global_inst()
-  instance <- Filter(function(e) e$master == master && e$appName == appName, instances)
+  instances <- Filter(function(e) { test(e$scon) }, instances)
 
-  if (NROW(instance) == 1) instance[[1]]$scon else NULL
+  lapply(instances, function(e) { e$scon })
 }
+
