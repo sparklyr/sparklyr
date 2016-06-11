@@ -41,6 +41,10 @@ spark_connect <- function(master = "local",
                           packages = NULL,
                           cores = "auto",
                           memory = "1g") {
+  scon <- spark_connection_find_scon(master, app_name)
+  if (!is.null(scon)) {
+    return(scon)
+  }
 
   # verify that java is available
   if (!is_java_available()) {
@@ -70,13 +74,14 @@ spark_connect <- function(master = "local",
     jars = jars,
     codegen = getOption("spark.connection.codegen", TRUE)
   )
+  scon <- structure(scon, class = "spark_connection")
 
   if (reconnect && (spark_connection_is_local(scon) && !getOption("spark.connection.allow_local_reconnect", FALSE))) {
     stop("Reconnect is not supported on local installs")
   }
 
   sconInst <- start_shell(list(), scon$installInfo, scon$packages, scon$jars, scon$memory, scon$master)
-  scon$sconRef <- spark_connection_add_inst(sconInst)
+  scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
   lapply(seq_len(length(parentCall)), function(idxCall) {
@@ -101,8 +106,7 @@ spark_connect <- function(master = "local",
   spark_connection_set_inst(scon, sconInst)
 
   on_connection_opened(scon, sconInst$connectCall, db = FALSE)
-
-  structure(scon, class = "spark_connection")
+  scon
 }
 
 spark_connection_attach_context <- function(scon, sconInst) {

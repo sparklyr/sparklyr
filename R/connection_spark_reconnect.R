@@ -31,23 +31,34 @@ spark_connection_global_inst <- function(instances = NULL) {
 spark_connection_get_inst <- function(scon) {
   instances <- spark_connection_global_inst()
 
-  if (!identical(scon$sconRef, NULL)) instances[[scon$sconRef]] else NULL
+  if (!identical(scon$sconRef, NULL)) instances[[scon$sconRef]]$sconInst else NULL
 }
 
-spark_connection_add_inst <- function(sconInst) {
+spark_connection_add_inst <- function(master, appName, scon, sconInst) {
   instances <- spark_connection_global_inst()
 
-  sconRef <- as.character(length(instances) + 1)
-  instances[[sconRef]] <- sconInst
+  scon$sconRef <- as.character(length(instances) + 1)
+
+  instances[[scon$sconRef]] <- list(
+    master = master,
+    appName = appName,
+    scon = scon,
+    sconInst = sconInst
+  )
 
   spark_connection_global_inst(instances)
-  sconRef
+  scon
 }
 
 spark_connection_set_inst <- function(scon, sconInst) {
   instances <- spark_connection_global_inst()
 
-  instances[[scon$sconRef]] <- sconInst
+  if (is.null(sconInst)) {
+    instances[[scon$sconRef]] <- NULL
+  }
+  else {
+    instances[[scon$sconRef]]$sconInst <- sconInst
+  }
 
   spark_connection_global_inst(instances)
 
@@ -68,4 +79,11 @@ spark_connection_on_reconnect <- function(scon, onReconnect) {
   sconInst <- spark_connection_get_inst(scon)
   sconInst$onReconnect[[length(sconInst$onReconnect) + 1]] <- onReconnect
   spark_connection_set_inst(scon, sconInst)
+}
+
+spark_connection_find_scon <- function(master, appName) {
+  instances <- spark_connection_global_inst()
+  instance <- Filter(function(e) e$master == master && e$appName == appName, instances)
+
+  if (NROW(instance) == 1) instance[[1]]$scon else NULL
 }
