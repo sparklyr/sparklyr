@@ -16,16 +16,22 @@ The rspark.packages.default option, overrides the default Spark packages
 
 The rspark.install.dir option, defines the default Spark installation directory
 
-The spark.connection.allow_local_reconnect option, allows reconnect to
+The rspark.connection.allow_local_reconnect option, allows reconnect to
 be enabled in local installations to help troubleshoot remote environments.
 
+The rspark.connection.codegen option, sets the spark.sql.codegen.wholeStage option.
+
 The spark.connection.codegen option, sets the spark.sql.codegen.wholeStage option.
+
+The rspark.install.override.hive.site option, enables overriding the hive-site.xml config.
 }
 \examples{
 getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)
 getOption("rspark.packages.default", NULL)
 getOption("rspark.install.dir", TRUE)
-getOption("spark.connection.allow_local_reconnect", FALSE)
-getOption("spark.connection.codegen", FALSE)
+getOption("rspark.connection.allow_local_reconnect", FALSE)
+getOption("rspark.connection.codegen", FALSE)
+getOption("rspark.connection.codegen", FALSE)
+getOption("rspark.install.override.hive.site", TRUE)
 }
 

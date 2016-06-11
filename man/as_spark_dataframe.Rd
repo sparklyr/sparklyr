@@ -8,6 +8,8 @@ as_spark_dataframe(x, ...)
 }
 \arguments{
 \item{x}{A \code{spark_tbl}.}
+
+\item{...}{Additional parameters.}
 }
 \description{
 Convert a tbl to a Spark Dataset.

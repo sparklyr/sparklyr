@@ -10,6 +10,8 @@ partition(.data, ..., seed = sample(.Machine$integer.max, 1))
 \item{.data}{Data}
 
 \item{...}{Named parameters, mapping table names to weights.}
+
+\item{seed}{Seed value for the partition}
 }
 \description{
 Partition a Spark Dataframe

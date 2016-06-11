@@ -207,7 +207,7 @@ print.src_spark <- function(x, ...) {
 #'
 #' @param .data Data
 #' @param ... Named parameters, mapping table names to weights.
-#'
+#' @param seed Seed value for the partition
 #' @export
 partition <- function(.data, ..., seed = sample(.Machine$integer.max, 1)) {
   weights <- list(...)

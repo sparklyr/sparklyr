@@ -3,6 +3,7 @@
 #' Convert a tbl to a Spark Dataset.
 #'
 #' @param x A \code{spark_tbl}.
+#' @param ... Additional parameters.
 #' @export
 as_spark_dataframe <- function(x, ...) {
   UseMethod("as_spark_dataframe")
