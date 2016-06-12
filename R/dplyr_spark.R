@@ -24,7 +24,7 @@ src_spark <- function(scon) {
                        connectCall[[2]],
                        "db <- src_spark(sc)",
                        sep = "\n")
-  on_connection_opened(scon, connectCall, db = TRUE)
+  on_connection_opened(scon, connectCall)
 
   db
 }

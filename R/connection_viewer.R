@@ -1,6 +1,6 @@
 
 
-on_connection_opened <- function(scon, connectCall, db) {
+on_connection_opened <- function(scon, connectCall) {
 
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer)) {

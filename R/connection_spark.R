@@ -105,7 +105,7 @@ spark_connect <- function(master = "local",
   sconInst$dbi <- NULL
   spark_connection_set_inst(scon, sconInst)
 
-  on_connection_opened(scon, sconInst$connectCall, db = FALSE)
+  on_connection_opened(scon, sconInst$connectCall)
   scon
 }
 

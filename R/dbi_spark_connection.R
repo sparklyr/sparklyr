@@ -57,7 +57,7 @@ setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
                        sep = "\n")
 
   # call connection opended
-  on_connection_opened(drv@scon, connectCall, db = TRUE)
+  on_connection_opened(drv@scon, connectCall)
 
   # return dbi
   dbi
