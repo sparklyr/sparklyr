@@ -140,6 +140,46 @@ model <- tbl(db, "iris") %>%
 print(model)
 ```
 
+## Random Forests with R
+
+```{r}
+library(randomForest)
+rForest <- randomForest(
+  Sepal.Length ~ Petal.Length + Petal.Width,
+  ntree = 20L,
+  nodesize = 20L,
+  data = iris
+)
+rPredict <- predict(rForest, iris)
+head(rPredict)
+```
+
+## Random Forests with RSpark
+
+```{r}
+mForest <- iris_tbl %>%
+  ml_random_forest(
+    response = "Sepal_Length",
+    features = c("Petal_Length", "Petal_Width"),
+    max.bins = 32L,
+    max.depth = 5L,
+    num.trees = 20L
+  )
+mPredict <- predict(mForest, iris_tbl)
+head(mPredict)
+```
+
+```{r}
+ggplot(data.frame(x = rPredict, y = mPredict)) +
+  geom_point(aes(x, y)) +
+  geom_abline(col = "red") +
+  labs(
+    x = "R-predicted Sepal Length",
+    y = "RSpark-predicted Sepal Length",
+    title = "Random Forest Regression — Comparing R and RSpark"
+  )
+```
+
 ## Cleanup
 
 ```{r}
