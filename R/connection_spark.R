@@ -93,8 +93,7 @@ spark_connect <- function(master = "local",
     packages = packages,
     memory = memory,
     jars = jars,
-    config = spark_config_build(master, config),
-    codegen = getOption("rspark.connection.codegen", TRUE)
+    config = spark_config_build(master, config)
   )
   scon <- structure(scon, class = "spark_connection")
 

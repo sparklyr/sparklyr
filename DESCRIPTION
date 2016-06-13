@@ -47,7 +47,6 @@ Collate:
     'ml_pca.R'
     'ml_random_forest.R'
     'ml_utils.R'
-    'options_spark.R'
     'shell_spark.R'
     'spark_data_frame.R'
     'spark_rdd.R'

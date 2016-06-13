@@ -52,9 +52,7 @@ spark_perf_test <- function(params, tests) {
       testConfig$sql$spark.sql.shuffle.partitions <- parallel::detectCores()
     }
     
-    codegen <- getOption("rspark.connection.codegen", NULL)
-    options(rspark.connection.codegen = param$codegen)
-    on.exit(options(rspark.connection.codegen = codegen))
+    testConfig$session$spark.sql.codegen.wholeStage <- param$codegen
     
     sc <- spark_connect(master = param$master, cores = param$cores, version = param$version, config = testConfig)
     
