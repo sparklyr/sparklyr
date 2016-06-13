@@ -143,9 +143,8 @@ print(model)
 ## Random Forests with R
 
 ```{r}
-library(randomForest)
-rForest <- randomForest(
-  Sepal.Length ~ Petal.Length + Petal.Width,
+rForest <- randomForest::randomForest(
+  Species ~ Petal.Length + Petal.Width,
   ntree = 20L,
   nodesize = 20L,
   data = iris
@@ -159,7 +158,7 @@ head(rPredict)
 ```{r}
 mForest <- iris_tbl %>%
   ml_random_forest(
-    response = "Sepal_Length",
+    response = "Species",
     features = c("Petal_Length", "Petal_Width"),
     max.bins = 32L,
     max.depth = 5L,
@@ -169,14 +168,22 @@ mPredict <- predict(mForest, iris_tbl)
 head(mPredict)
 ```
 
+## Comparing Random Forest Classification
+
+Using the model to predict the same data it was trained on is
+certainly not best practice, but it at least showcases that
+the results produced are concordant between R and RSpark.
+
 ```{r}
-ggplot(data.frame(x = rPredict, y = mPredict)) +
-  geom_point(aes(x, y)) +
-  geom_abline(col = "red") +
+df <- as.data.frame(table(x = rPredict, y = mPredict), stringsAsFactors = FALSE)
+ggplot(df) +
+  geom_raster(aes(x, y, fill = Freq)) +
+  geom_text(aes(x, y, label = Freq), col = "#222222", size = 6, nudge_x = 0.005, nudge_y = -0.005) +
+  geom_text(aes(x, y, label = Freq), col = "white", size = 6) +
   labs(
-    x = "R-predicted Sepal Length",
-    y = "RSpark-predicted Sepal Length",
-    title = "Random Forest Regression — Comparing R and RSpark"
+    x = "R-predicted Species",
+    y = "RSpark-predicted Species",
+    title = "Random Forest Classification — Comparing R and RSpark"
   )
 ```
 

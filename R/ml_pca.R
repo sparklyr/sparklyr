@@ -15,11 +15,6 @@ spark_ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
     spark_invoke("setInputCol", "features") %>%
     spark_invoke("fit", tdf)
 
-  model
-}
-
-as_pca_result <- function(model, features) {
-
   # extract principal components
   pc <- model %>% spark_invoke("pc")
   nrow <- pc %>% spark_invoke("numRows")
@@ -54,8 +49,7 @@ as_pca_result <- function(model, features) {
 #'   analysis. Defaults to all columns in \code{x}.
 #' @export
 ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
-  model <- spark_ml_pca(x, features)
-  as_pca_result(model, features)
+  spark_ml_pca(x, features)
 }
 
 #' @export

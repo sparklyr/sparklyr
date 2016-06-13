@@ -125,16 +125,16 @@ fit <- lm(Petal.Length ~ Petal.Width, data = iris)
 predict(fit, newdata = test)
 ```
 
-    ##       11       12       14       16       26       29       33       37 
-    ## 1.529546 1.529546 1.306552 1.975534 1.529546 1.529546 1.306552 1.529546 
-    ##       38       39       44       45       46       48       55       57 
-    ## 1.306552 1.529546 2.421522 1.975534 1.752540 1.529546 4.428469 4.651463 
-    ##       62       64       67       72       75       77       82       88 
-    ## 4.428469 4.205475 4.428469 3.982481 3.982481 4.205475 3.313499 3.982481 
-    ##       94       95       98      104      105      118      121      124 
-    ## 3.313499 3.982481 3.982481 5.097451 5.989427 5.989427 6.212421 5.097451 
-    ##      133      134      135      136      138      150 
-    ## 5.989427 4.428469 4.205475 6.212421 5.097451 5.097451
+    ##        6       10       20       29       32       40       42       43 
+    ## 1.975534 1.306552 1.752540 1.529546 1.975534 1.529546 1.752540 1.529546 
+    ##       44       46       48       50       51       52       58       61 
+    ## 2.421522 1.752540 1.529546 1.529546 4.205475 4.428469 3.313499 3.313499 
+    ##       65       71       72       75       78       79       80       83 
+    ## 3.982481 5.097451 3.982481 3.982481 4.874457 4.428469 3.313499 3.759487 
+    ##       86       91       93       95       99      102      103      114 
+    ## 4.651463 3.759487 3.759487 3.982481 3.536493 5.320445 5.766433 5.543439 
+    ##      117      122      125      137      139      140 
+    ## 5.097451 5.543439 5.766433 6.435415 5.097451 5.766433
 
 Partitioning in RSpark
 ----------------------
@@ -149,11 +149,11 @@ fit <- partitions$training %>%
 predict(fit, partitions$test)
 ```
 
-    ##  [1] 1.348732 1.567477 1.567477 1.348732 1.786222 1.567477 1.348732
-    ##  [8] 3.317439 1.567477 1.567477 1.567477 2.442458 2.004967 1.567477
-    ## [15] 1.348732 1.567477 2.004967 3.536184 3.973674 3.754929 3.317439
-    ## [22] 4.629910 4.411165 3.973674 3.973674 5.067401 5.723636 6.161127
-    ## [29] 6.598617 6.161127 5.942381 5.504891
+    ##  [1] 1.494930 1.719376 1.494930 1.494930 1.494930 1.494930 1.943823
+    ##  [8] 1.494930 1.494930 1.494930 3.963838 1.494930 3.290500 3.739392
+    ## [15] 3.290500 4.412730 4.412730 4.637177 5.086069 4.188284 3.739392
+    ## [22] 5.086069 3.963838 5.310515 5.983854 4.412730 5.983854 3.963838
+    ## [29] 4.861623 4.412730 5.759408 6.208300 5.759408
 
 Principal Components Analysis in R
 ----------------------------------
@@ -202,6 +202,62 @@ print(model)
     ## Sepal_Width   0.08452251 -0.73016143 -0.59791083 -0.3197231
     ## Petal_Length -0.85667061  0.17337266 -0.07623608 -0.4798390
     ## Petal_Width  -0.35828920  0.07548102 -0.54583143  0.7536574
+
+Random Forests with R
+---------------------
+
+``` r
+rForest <- randomForest::randomForest(
+  Species ~ Petal.Length + Petal.Width,
+  ntree = 20L,
+  nodesize = 20L,
+  data = iris
+)
+rPredict <- predict(rForest, iris)
+head(rPredict)
+```
+
+    ##      1      2      3      4      5      6 
+    ## setosa setosa setosa setosa setosa setosa 
+    ## Levels: setosa versicolor virginica
+
+Random Forests with RSpark
+--------------------------
+
+``` r
+mForest <- iris_tbl %>%
+  ml_random_forest(
+    response = "Species",
+    features = c("Petal_Length", "Petal_Width"),
+    max.bins = 32L,
+    max.depth = 5L,
+    num.trees = 20L
+  )
+mPredict <- predict(mForest, iris_tbl)
+head(mPredict)
+```
+
+    ## [1] "setosa" "setosa" "setosa" "setosa" "setosa" "setosa"
+
+Comparing Random Forest Classification
+--------------------------------------
+
+Using the model to predict the same data it was trained on is certainly not best practice, but it at least showcases that the results produced are concordant between R and RSpark.
+
+``` r
+df <- as.data.frame(table(x = rPredict, y = mPredict), stringsAsFactors = FALSE)
+ggplot(df) +
+  geom_raster(aes(x, y, fill = Freq)) +
+  geom_text(aes(x, y, label = Freq), col = "#222222", size = 6, nudge_x = 0.005, nudge_y = -0.005) +
+  geom_text(aes(x, y, label = Freq), col = "white", size = 6) +
+  labs(
+    x = "R-predicted Species",
+    y = "RSpark-predicted Species",
+    title = "Random Forest Classification — Comparing R and RSpark"
+  )
+```
+
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
 Cleanup
 -------

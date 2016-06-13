@@ -92,6 +92,34 @@ spark_dataframe_assemble_vector <- function(df, input_cols, output_col) {
     spark_invoke("transform", df)
 }
 
+# Given a string column in a Spark DataFrame, generate
+# a new column with name 'output_col' where each element
+# is a unique number mapping to the original column name.
+# use the StringIndexer to create a categorical variable
+spark_dataframe_index_string <- function(df, input_col, output_col, params = NULL) {
+  stopifnot(is.character(input_col))
+
+  scon <- spark_scon(df)
+  indexer <- spark_invoke_static_ctor(
+    scon,
+    "org.apache.spark.ml.feature.StringIndexer"
+  )
+
+  sim <- indexer %>%
+    spark_invoke("setInputCol", input_col) %>%
+    spark_invoke("setOutputCol", output_col) %>%
+    spark_invoke("fit", df)
+
+  # Report labels to caller if requested -- these map
+  # the discovered labels in the data set to an associated
+  # index.
+  if (is.environment(params)) {
+    params$labels <- spark_invoke(sim, "labels")
+  }
+
+  spark_invoke(sim, "transform", df)
+}
+
 #' Read a Spark Dataset into R.
 #' @param object An (object convertable to a) Spark DataFrame.
 #' @export

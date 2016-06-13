@@ -20,24 +20,19 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
     spark_invoke("setRegParam", as.double(lambda)) %>%
     spark_invoke("fit", tdf)
 
-  fit
-}
-
-as_linear_regression_result <- function(model, features, response) {
-
-  coefficients <- model %>%
+  coefficients <- fit %>%
     spark_invoke("coefficients") %>%
     spark_invoke("toArray")
   names(coefficients) <- features
 
-  has_intercept <- spark_invoke(model, "getFitIntercept")
+  has_intercept <- spark_invoke(fit, "getFitIntercept")
   if (has_intercept) {
-    intercept <- spark_invoke(model, "intercept")
+    intercept <- spark_invoke(fit, "intercept")
     coefficients <- c(coefficients, intercept)
     names(coefficients) <- c(features, "(Intercept)")
   }
 
-  summary <- spark_invoke(model, "summary")
+  summary <- spark_invoke(fit, "summary")
 
   errors <- try_null(spark_invoke(summary, "coefficientStandardErrors"))
   if (!is.null(errors))
@@ -47,7 +42,7 @@ as_linear_regression_result <- function(model, features, response) {
   if (!is.null(tvalues))
     names(tvalues) <- names(coefficients)
 
-  ml_model("linear_regression", model,
+  ml_model("linear_regression", fit,
     coefficients = coefficients,
     standard.errors = errors,
     t.values = tvalues,
@@ -79,9 +74,7 @@ as_linear_regression_result <- function(model, features, response) {
 #' @export
 ml_linear_regression <- function(x, response, features, intercept = TRUE,
                   alpha = 0, lambda = 0) {
-  fit <- spark_ml_linear_regression(x, response, features, intercept,
-                                    alpha, lambda)
-  as_linear_regression_result(fit, features, response)
+  spark_ml_linear_regression(x, response, features, intercept, alpha, lambda)
 }
 
 
