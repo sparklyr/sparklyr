@@ -74,6 +74,20 @@ spark_dataframe_read_column <- function(object, colName) {
   column
 }
 
+spark_dataframe_cast_column <- function(df, input_col, output_col, output_type)
+{
+  spark_invoke_static(
+
+    "utils",
+    "castColumn",
+
+    as_spark_dataframe(df),
+    input_col,
+    output_col,
+    output_type
+  )
+}
+
 # Given multiple columns in a Spark DataFrame, generate
 # a new column with name 'output_col' where each element
 # is the concatenation of the 'input_cols'.
@@ -113,9 +127,8 @@ spark_dataframe_index_string <- function(df, input_col, output_col, params = NUL
   # Report labels to caller if requested -- these map
   # the discovered labels in the data set to an associated
   # index.
-  if (is.environment(params)) {
-    params$labels <- spark_invoke(sim, "labels")
-  }
+  if (is.environment(params))
+    params$labels <- as.character(spark_invoke(sim, "labels"))
 
   spark_invoke(sim, "transform", df)
 }

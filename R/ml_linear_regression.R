@@ -4,17 +4,18 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
+  envir <- new.env(parent = emptyenv())
+  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
+
   lr <- spark_invoke_static_ctor(
     scon,
     "org.apache.spark.ml.regression.LinearRegression"
   )
 
-  tdf <- spark_dataframe_assemble_vector(df, features, "features")
-
   fit <- lr %>%
     spark_invoke("setMaxIter", 10L) %>%
-    spark_invoke("setLabelCol", response) %>%
-    spark_invoke("setFeaturesCol", "features") %>%
+    spark_invoke("setFeaturesCol", envir$features) %>%
+    spark_invoke("setLabelCol", envir$response) %>%
     spark_invoke("setFitIntercept", as.logical(intercept)) %>%
     spark_invoke("setElasticNetParam", as.double(alpha)) %>%
     spark_invoke("setRegParam", as.double(lambda)) %>%
@@ -43,17 +44,18 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
     names(tvalues) <- names(coefficients)
 
   ml_model("linear_regression", fit,
+    features = features,
+    response = response,
     coefficients = coefficients,
     standard.errors = errors,
     t.values = tvalues,
     p.values = try_null(as.numeric(spark_invoke(summary, "pValues"))),
-    features = features,
-    response = response,
     explained.variance = spark_invoke(summary, "explainedVariance"),
     mean.absolute.error = spark_invoke(summary, "meanAbsoluteError"),
     mean.squared.error = spark_invoke(summary, "meanSquaredError"),
     r.squared = spark_invoke(summary, "r2"),
-    root.mean.squared.error = spark_invoke(summary, "rootMeanSquaredError")
+    root.mean.squared.error = spark_invoke(summary, "rootMeanSquaredError"),
+    model.parameters = as.list(envir)
   )
 }
 
@@ -90,26 +92,3 @@ print.ml_model_linear_regression <- function(x, ...) {
   print(x$coefficients)
 }
 
-#' @export
-residuals.ml_model_linear_regression <- function(x, ...) {
-  x$.model %>%
-    spark_invoke("summary") %>%
-    spark_invoke("residuals") %>%
-    spark_dataframe_read_column("residuals")
-}
-
-#' @export
-fitted.ml_model_linear_regression <- function(x, ...) {
-  x$.model %>%
-    spark_invoke("summary") %>%
-    spark_invoke("predictions") %>%
-    spark_dataframe_read_column("prediction")
-}
-
-#' @export
-predict.ml_model_linear_regression <- function(object, newdata, ...) {
-  sdf <- as_spark_dataframe(newdata)
-  assembled <- spark_dataframe_assemble_vector(sdf, features(object), "features")
-  predicted <- spark_invoke(object$.model, "transform", assembled)
-  spark_dataframe_read_column(predicted, "prediction")
-}

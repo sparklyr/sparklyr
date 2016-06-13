@@ -4,37 +4,18 @@ spark_ml_logistic_regression <- function(x, response, features, intercept = TRUE
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
-  # convert character vector response to 'factor'
-  schema <- spark_dataframe_schema(x)
-  responseType <- schema[[response]]$type
-
-  # For character vectors, convert to DoubleType using the StringIndexer
-  labels <- NULL
-  if (responseType %in% "StringType") {
-    newResponse <- "responseIndex"
-    params <- new.env(parent = emptyenv())
-    df <- spark_dataframe_index_string(df, response, newResponse, params)
-    labels <- as.character(params$labels)
-    response <- newResponse
-  } else if (!responseType %in% "DoubleType") {
-    tbl <- eval(substitute(
-      mutate(x, response = as.double(response)),
-      list(response = as.name(response))
-    ))
-    df <- as_spark_dataframe(tbl)
-  }
+  envir <- new.env(parent = emptyenv())
+  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
   lr <- spark_invoke_static_ctor(
     scon,
     "org.apache.spark.ml.classification.LogisticRegression"
   )
 
-  tdf <- spark_dataframe_assemble_vector(df, features, "features")
-
   fit <- lr %>%
     spark_invoke("setMaxIter", 10L) %>%
-    spark_invoke("setLabelCol", response) %>%
-    spark_invoke("setFeaturesCol", "features") %>%
+    spark_invoke("setFeaturesCol", envir$features) %>%
+    spark_invoke("setLabelCol", envir$response) %>%
     spark_invoke("setFitIntercept", as.logical(intercept)) %>%
     spark_invoke("setElasticNetParam", as.double(alpha)) %>%
     spark_invoke("setRegParam", as.double(lambda)) %>%
@@ -57,11 +38,12 @@ spark_ml_logistic_regression <- function(x, response, features, intercept = TRUE
   roc <- spark_dataframe_collect(spark_invoke(summary, "roc"))
 
   ml_model("logistic_regression", fit,
-           response = response,
-           features = features,
-           coefficients = coefficients,
-           roc = roc,
-           area.under.roc = areaUnderROC
+    features = features,
+    response = response,
+    coefficients = coefficients,
+    roc = roc,
+    area.under.roc = areaUnderROC,
+    model.parameters = as.list(envir)
   )
 }
 
@@ -102,18 +84,3 @@ residuals.ml_model_logistic_regression <- function(x, ...) {
   stop("residuals not yet available for Spark logistic regression")
 }
 
-#' @export
-fitted.ml_model_logistic_regression <- function(x, ...) {
-  x$.model %>%
-    spark_invoke("summary") %>%
-    spark_invoke("predictions") %>%
-    spark_dataframe_read_column("prediction")
-}
-
-#' @export
-predict.ml_model_logistic_regression <- function(object, newdata, ...) {
-  sdf <- as_spark_dataframe(newdata)
-  assembled <- spark_dataframe_assemble_vector(sdf, features(object), "features")
-  predicted <- spark_invoke(object$.model, "transform", assembled)
-  spark_dataframe_read_column(predicted, "prediction")
-}

@@ -1,4 +1,5 @@
 import org.apache.commons.lang.StringEscapeUtils
+import org.apache.spark.sql.types.DataTypes
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.linalg.distributed.RowMatrix
@@ -22,6 +23,17 @@ object utils {
         case _ => 0.0
       }))
     })
+  }
+
+  def castColumnDouble(df: DataFrame, inputColName: String, outputColName: String): DataFrame = {
+    df.withColumn(outputColName, df.col(inputColName).cast(DataTypes.DoubleType))
+  }
+
+  def castColumn(df: DataFrame, inputColName: String, outputColName: String, outputType: String): DataFrame = {
+    outputType match {
+      case "DoubleType" => castColumnDouble(df, inputColName, outputColName)
+      case _ => throw new IllegalArgumentException(s"Casting to type '${outputType}' not yet implemented")
+    }
   }
 
   def readColumnInt(df: DataFrame, colName: String): Array[Int] = {

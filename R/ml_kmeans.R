@@ -1,12 +1,11 @@
-spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
+spark_ml_kmeans <- function(x, centers, iter.max = 10,
+                            features = dplyr::tbl_vars(x))
+{
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
-  # collect vectors of interest into single column
-  if (is.null(features))
-    features <- as.list(spark_invoke(df, "columns"))
-
-  tdf <- spark_dataframe_assemble_vector(df, features, "features")
+  envir <- new.env(parent = emptyenv())
+  tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
   # invoke KMeans
   kmeans <- spark_invoke_static_ctor(
@@ -17,7 +16,7 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_var
   fit <- kmeans %>%
     spark_invoke("setK", as.integer(centers)) %>%
     spark_invoke("setMaxIter", as.integer(iter.max)) %>%
-    spark_invoke("setFeaturesCol", "features") %>%
+    spark_invoke("setFeaturesCol", envir$features) %>%
     spark_invoke("fit", tdf)
 
 
@@ -31,7 +30,11 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_var
   names(centersList) <- features
   centers <- as.data.frame(centersList, stringsAsFactors = FALSE)
 
-  ml_model("kmeans", fit, centers = centers)
+  ml_model("kmeans", fit,
+    centers = centers,
+    features = features,
+    model.parameters = as.list(envir)
+  )
 }
 
 #' Computes kmeans from a dplyr source
