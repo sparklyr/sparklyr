@@ -59,7 +59,7 @@ on_connection_updated <- function(scon, hint) {
 connection_list_tables <- function(sc) {
   dbi <- spark_connection_get_dbi(sc)
   if (!is.null(dbi))
-    dbListTables(dbi)
+    sort(dbListTables(dbi))
   else
     character()
 }
