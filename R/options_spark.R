@@ -1,15 +1,3 @@
-#' The rspark.packages.default option, overrides the default Spark packages
-#' @name options-spark
-#' @examples
-#' getOption("rspark.packages.default", NULL)
-NULL
-
-#' The rspark.install.dir option, defines the default Spark installation directory
-#' @name options-spark
-#' @examples
-#' getOption("rspark.install.dir", TRUE)
-NULL
-
 #' The rspark.connection.allow_local_reconnect option, allows reconnect to
 #' be enabled in local installations to help troubleshoot remote environments.
 #' @name options-spark
@@ -18,12 +6,6 @@ NULL
 NULL
 
 #' The rspark.connection.codegen option, sets the spark.sql.codegen.wholeStage option.
-#' @name options-spark
-#' @examples
-#' getOption("rspark.connection.codegen", FALSE)
-NULL
-
-#' The spark.connection.codegen option, sets the spark.sql.codegen.wholeStage option.
 #' @name options-spark
 #' @examples
 #' getOption("rspark.connection.codegen", FALSE)

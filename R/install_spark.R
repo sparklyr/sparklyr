@@ -1,5 +1,6 @@
+#' @import config
 spark_install_dir <- function() {
-  sparkDir <- getOption("rspark.install.dir", NULL)
+  sparkDir <- config::get("options")[["rspark.install.dir"]]
   if (is.null(sparkDir)) {
     sparkDir <- rappdirs::app_dir("spark", "rstudio")$cache()
   }

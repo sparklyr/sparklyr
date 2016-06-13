@@ -57,12 +57,22 @@ spark_api_create_hive_context_v2 <- function(scon) {
   )
 
   conf <- spark_invoke(session, "conf")
-  spark_invoke(
-    conf,
-    "set",
-    "spark.sql.codegen.wholeStage",
-    if (scon$codegen) "true" else "false"
-  )
+  lapply(names(scon$config$session), function(configName) {
+    configValue <- scon$config$session[[configName]]
+    if (is.logical(configValue)) {
+      configValue <- if (configValue) "true" else "false"
+    }
+    else {
+      as.character(configValue)
+    }
+
+    spark_invoke(
+      conf,
+      "set",
+      configName,
+      configValue
+    )
+  })
 
   session
 

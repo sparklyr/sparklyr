@@ -1,17 +1,6 @@
 # register the spark_connection S3 class for use in setClass slots
 methods::setOldClass("spark_connection")
 
-spark_default_packages <- function() {
-  packagesOption <- getOption("rspark.packages.default", NULL)
-  defaultPackages <- c(
-    "com.databricks:spark-csv_2.11:1.3.0",
-    "com.amazonaws:aws-java-sdk-pom:1.10.34",
-    "org.apache.hadoop:hadoop-aws:2.6.0"
-  )
-
-  if (is.null(packagesOption)) defaultPackages else packagesOption
-}
-
 spark_default_jars <- function() {
   jarsOption <- getOption("rspark.jars.default", NULL)
 
@@ -53,7 +42,6 @@ spark_config_build <- function(master, config = NULL) {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
 #' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
-#' @param packages Collection of packages to load into Spark. See also, the rspark.packages.default option.
 #' @param cores Cores available for use for Spark. This option is only applicable to local installations. Use NULL
 #' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
@@ -72,7 +60,6 @@ spark_connect <- function(master = "local",
                           app_name = "rspark",
                           version = NULL,
                           hadoop_version = NULL,
-                          packages = NULL,
                           cores = "auto",
                           memory = "1g",
                           config = NULL) {
@@ -92,7 +79,6 @@ spark_connect <- function(master = "local",
   sparkVersion <- installInfo$sparkVersion
   hadoopVersion <- installInfo$hadoopVersion
 
-  packages <- c(if(is.null(packages)) list() else packages, spark_default_packages())
   jars <- spark_default_jars()
 
   scon <- list(
@@ -112,11 +98,11 @@ spark_connect <- function(master = "local",
   )
   scon <- structure(scon, class = "spark_connection")
 
-  if (reconnect && (spark_connection_is_local(scon) && !getOption("rspark.connection.allow_local_reconnect", FALSE))) {
+  if (reconnect && (spark_connection_is_local(scon) && !scon$config$allow_local_reconnect)) {
     stop("Reconnect is not supported on local installs")
   }
 
-  sconInst <- start_shell(list(), scon$installInfo, scon$packages, scon$jars, scon$memory, scon$master)
+  sconInst <- start_shell(list(), scon$installInfo, scon$config$packages, scon$jars, scon$memory, scon$master)
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
