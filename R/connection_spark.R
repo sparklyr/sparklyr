@@ -91,7 +91,6 @@ spark_connect <- function(master = "local",
     reconnect = reconnect,
     installInfo = installInfo,
     packages = packages,
-    memory = memory,
     jars = jars,
     config = spark_config_build(master, config)
   )
@@ -101,7 +100,7 @@ spark_connect <- function(master = "local",
     stop("Reconnect is not supported on local installs")
   }
 
-  sconInst <- start_shell(list(), scon$installInfo, scon$config$packages, scon$jars, scon$memory, scon$master)
+  sconInst <- start_shell(scon, list())
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
@@ -142,7 +141,7 @@ spark_connection_attach_context <- function(scon, sconInst) {
   if (spark_connection_is_local(scon) && scon$master == "local" && !identical(scon$cores, NULL))
     master <- if (scon$cores == "auto") "local[*]" else paste("local[", scon$cores, "]", sep = "")
 
-  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir, scon$memory)
+  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
   if (identical(sconInst$sc, NULL)) {
     stop("Failed to create Spark context")
   }
@@ -361,7 +360,7 @@ spark_invoke_static_ctor <- function(scon, objName, ...)
 #   sparkExecutorEnvMap: JMap[Object, Object])    // Named list of environment variables to be used when launching executors.
 #   : JavaSparkContext
 #
-spark_connection_create_context <- function(scon, master, appName, sparkHome, memory = NULL) {
+spark_connection_create_context <- function(scon, master, appName, sparkHome) {
   sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
 
   conf <- spark_invoke_static_ctor(scon, "org.apache.spark.SparkConf")
@@ -369,7 +368,10 @@ spark_connection_create_context <- function(scon, master, appName, sparkHome, me
   conf <- spark_invoke(conf, "setMaster", master)
   conf <- spark_invoke(conf, "setSparkHome", sparkHome)
 
-  conf <- if (!is.null(memory)) spark_invoke(conf, "set", "spark.executor.memory", memory) else conf
+  lapply(names(scon$config$context), function(contextName) {
+    contextValue <- scon$config$context[[contextName]]
+    conf <<- spark_invoke(conf, "set", contextName, contextValue)
+  })
 
   spark_invoke_static_ctor(
     scon,
