@@ -39,7 +39,9 @@ start_shell <- function(scon, sconInst) {
 
   lapply(names(scon$config$submit), function(paramName) {
     paramValue <- scon$config$submit[[paramName]]
-    sparkCommand <- paste0(sparkCommand, "--", paramName, " ", paste(paramValue, sep = ","))
+    if (!is.null(paramValue)) {
+      sparkCommand <<- paste0(sparkCommand, "--", paramName, " ", paste(paramValue, collapse = ","), " ")
+    }
   })
 
   sparkCommand <- paste(sparkCommand, "sparkr-shell", shellOutputPath)

@@ -20,7 +20,7 @@ local:
       override.hive.site: TRUE
     submit:
       executor-memory: 1G
-      driver-memory": 1G
+      driver-memory: 1G
     context:
       spark.executor.memory: 1G
     sql:

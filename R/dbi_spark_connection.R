@@ -63,7 +63,7 @@ setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
   # Apply sql connection level properties
   configValues <- drv@scon$config$sql
   lapply(names(configValues), function(configName) {
-    dbSetProperty(dbi, configName, configValues[[configName]])
+    dbSetProperty(dbi, configName, as.character(configValues[[configName]]))
   })
 
   # return dbi

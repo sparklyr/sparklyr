@@ -1,6 +1,11 @@
 #' @import config
 spark_install_dir <- function() {
-  sparkDir <- config::get("rspark")$install$dir
+  sparkDir <- NULL
+  tryCatch(function() {
+    sparkDir <- config::get("rspark")$install$dir
+  }, error = function(e) {
+  })
+
   if (is.null(sparkDir)) {
     sparkDir <- rappdirs::app_dir("spark", "rstudio")$cache()
   }
@@ -68,7 +73,7 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 #' Provides support to download and install the given Spark version
 #' @name spark_install
 #' @export
-#' @import rappdirs,conf
+#' @import rappdirs,config
 #' @param version Version of Spark to install. See spark_versions for a list of supported versions
 #' @param hadoop_version Version of Hadoop to install. See spark_versions_hadoop for a list of supported versions
 #' @param reset Attempts to reset settings to defaults
@@ -135,7 +140,13 @@ spark_install <- function(version = NULL,
       reset)
   }
 
-  if (isTRUE(conf::get("rspark")$install$override.hive.site)) {
+  overrideHiveSite <- TRUE
+  tryCatch(function() {
+    overrideHiveSite <- isTRUE(config::get("rspark")$install$override.hive.site)
+  }, error = function(e) {
+  })
+
+  if (overrideHiveSite) {
     hiveSitePath <- file.path(installInfo$sparkConfDir, "hive-site.xml")
     if (!file.exists(hiveSitePath) || reset) {
       hiveSiteTemplatePath <- system.file(package = "rspark", file.path("conf", "hive-site.xml"))

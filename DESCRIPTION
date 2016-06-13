@@ -23,6 +23,7 @@ Collate:
     'api_spark.R'
     'api_spark_databricks.R'
     'api_spark_sql.R'
+    'config_spark.R'
     'connection_spark.R'
     'connection_spark_reconnect.R'
     'connection_viewer.R'

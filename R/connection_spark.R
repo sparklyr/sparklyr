@@ -10,31 +10,6 @@ spark_default_jars <- function() {
     jarsOption
 }
 
-#' @import yaml
-spark_config_build <- function(master, config = NULL) {
-  baseConfig <- list()
-
-  if (spark_master_is_local(master)) {
-    localConfigFile <- system.file(file.path("conf", "config-template.yml"), package = "rspark")
-    baseConfig <- yaml::yaml.load_file(localConfigFile)$local$rspark
-  }
-
-  userConfig <- list()
-  tryCatch(function() {
-    userConfig <- config::get("rspark")
-  }, error = function(e) {
-  })
-
-  mergedConfig <- modifyList(baseConfig, userConfig)
-
-  # Give preference to config settings passed directly through spark_connect
-  if (!is.null(config)) {
-    mergedConfig <- modifyList(mergedConfig, config)
-  }
-
-  mergedConfig
-}
-
 #' Connects to Spark and establishes the Spark Context
 #' @name spark_connect
 #' @export
@@ -61,7 +36,6 @@ spark_connect <- function(master = "local",
                           version = NULL,
                           hadoop_version = NULL,
                           cores = "auto",
-                          memory = "1g",
                           config = NULL) {
   sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name })
   if (length(sconFound) == 1) {
@@ -90,8 +64,6 @@ spark_connect <- function(master = "local",
     isLocal = spark_master_is_local(master),
     reconnect = reconnect,
     installInfo = installInfo,
-    packages = packages,
-    jars = jars,
     config = spark_config_build(master, config)
   )
   scon <- structure(scon, class = "spark_connection")
