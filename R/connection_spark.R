@@ -21,6 +21,31 @@ spark_default_jars <- function() {
     jarsOption
 }
 
+#' @import yaml
+spark_config_build <- function(master, config = NULL) {
+  baseConfig <- list()
+
+  if (spark_master_is_local(master)) {
+    localConfigFile <- system.file(file.path("conf", "config-template.yml"), package = "rspark")
+    baseConfig <- yaml::yaml.load_file(localConfigFile)$local$rspark
+  }
+
+  userConfig <- list()
+  tryCatch(function() {
+    userConfig <- config::get("rspark")
+  }, error = function(e) {
+  })
+
+  mergedConfig <- modifyList(baseConfig, userConfig)
+
+  # Give preference to config settings passed directly through spark_connect
+  if (!is.null(config)) {
+    mergedConfig <- modifyList(mergedConfig, config)
+  }
+
+  mergedConfig
+}
+
 #' Connects to Spark and establishes the Spark Context
 #' @name spark_connect
 #' @export
@@ -34,13 +59,23 @@ spark_default_jars <- function() {
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 #' OS schedules one thread per core.
 #' @param memory Memory per executor (e.g. 1000m, 2g). Defaults to 1g
+#' @param config A list containing configurations settings. This file overrides settings set on config.yml.
+#' @examples
+#' \dontrun{
+#'  sc <- spark_connect(config = list(
+#'    sql = list(
+#'      spark.sql.shuffle.partitions = 1
+#'    )
+#'  ))
+#' }
 spark_connect <- function(master = "local",
                           app_name = "rspark",
                           version = NULL,
                           hadoop_version = NULL,
                           packages = NULL,
                           cores = "auto",
-                          memory = "1g") {
+                          memory = "1g",
+                          config = NULL) {
   sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name })
   if (length(sconFound) == 1) {
     return(sconFound[[1]])
@@ -72,6 +107,7 @@ spark_connect <- function(master = "local",
     packages = packages,
     memory = memory,
     jars = jars,
+    config = spark_config_build(master, config),
     codegen = getOption("rspark.connection.codegen", TRUE)
   )
   scon <- structure(scon, class = "spark_connection")
@@ -84,9 +120,15 @@ spark_connect <- function(master = "local",
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
-  lapply(seq_len(length(parentCall)), function(idxCall) {
+  parentCall <- lapply(seq_len(length(parentCall)), function(idxCall) {
     if (idxCall > 1) {
-      parentCall[[idxCall]] <<- eval(parentCall[[idxCall]], parent.frame(n = 3))
+      eval(parentCall[[idxCall]], parent.frame(n = 3))
+    }
+    else if (idxCall < length(parentCall)) {
+      parentCall[[idxCall]]
+    }
+    else {
+      NULL
     }
   })
 
@@ -420,9 +462,9 @@ spark_connection_is_open <- function(scon) {
 }
 
 #' Closes all existing connections. Returns the total of connections closed.
-#' @name spark_connections_close
+#' @name spark_disconnect_all
 #' @export
-spark_connection_close_all <- function() {
+spark_disconnect_all <- function() {
   scons <- spark_connection_find_scon(function(e) {
     spark_connection_is_open(e)
   })

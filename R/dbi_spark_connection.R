@@ -60,12 +60,11 @@ setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
   # call connection opended
   on_connection_opened(drv@scon, connectCall)
 
-  browse()
-
   # Apply sql connection level properties
-  config <- spark_config(scon)
-  cores <- config::get("rspark.dplyr.optimize_shuffle_cores")
-  dbSetProperty(dbiCon, "spark.sql.shuffle.partitions", as.character(cores))
+  configValues <- drv@scon$config$sql
+  lapply(names(configValues), function(configName) {
+    dbSetProperty(dbi, configName, configValues[[configName]])
+  })
 
   # return dbi
   dbi

@@ -5,6 +5,9 @@
 #' @export
 #' @param scon Spark connection provided by spark_connection
 src_spark <- function(scon) {
+  if (missing(scon))
+    stop("Need to specify an Spark connection created. See spark_connection.")
+
   dbiCon <- dbConnect(DBISpark(scon))
   db <- src_sql("spark", dbiCon)
 

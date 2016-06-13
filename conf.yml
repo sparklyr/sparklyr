@@ -1,2 +1,0 @@
-local:
-  spark.sql.shuffle.partitions: !expr parallel::detectCores()

@@ -2,16 +2,8 @@
 % Please edit documentation in R/options_spark.R
 \name{options-spark}
 \alias{options-spark}
-\title{The rspark.dplyr.optimize_shuffle_cores option optimizes the number of partitions
-to use when shuffling data based on the number of local cores.
-This option is only applicable to local installations. The default TRUE provides
-automatic detection of cores. To avoid using this setting, set this value to FALSE.}
+\title{The rspark.packages.default option, overrides the default Spark packages}
 \description{
-The rspark.dplyr.optimize_shuffle_cores option optimizes the number of partitions
-to use when shuffling data based on the number of local cores.
-This option is only applicable to local installations. The default TRUE provides
-automatic detection of cores. To avoid using this setting, set this value to FALSE.
-
 The rspark.packages.default option, overrides the default Spark packages
 
 The rspark.install.dir option, defines the default Spark installation directory
@@ -26,7 +18,6 @@ The spark.connection.codegen option, sets the spark.sql.codegen.wholeStage optio
 The rspark.install.override.hive.site option, enables overriding the hive-site.xml config.
 }
 \examples{
-getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)
 getOption("rspark.packages.default", NULL)
 getOption("rspark.install.dir", TRUE)
 getOption("rspark.connection.allow_local_reconnect", FALSE)

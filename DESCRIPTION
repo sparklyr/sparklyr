@@ -59,7 +59,8 @@ Imports:
     assertthat,
     rappdirs,
     lazyeval,
-    config
+    config,
+    yaml
 Remotes: hadley/dplyr
 Suggests:
     testthat,

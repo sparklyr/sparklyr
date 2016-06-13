@@ -1,0 +1,7 @@
+default:
+  name: default
+
+local:
+  rspark:
+    sql:
+      spark.sql.shuffle.partitions: !expr parallel::detectCores()

@@ -5,7 +5,8 @@
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
 spark_connect(master = "local", app_name = "rspark", version = NULL,
-  hadoop_version = NULL, packages = NULL, cores = "auto", memory = "1g")
+  hadoop_version = NULL, packages = NULL, cores = "auto", memory = "1g",
+  config = NULL)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -24,8 +25,19 @@ speaking, this option configures the number of available threads in a local spar
 OS schedules one thread per core.}
 
 \item{memory}{Memory per executor (e.g. 1000m, 2g). Defaults to 1g}
+
+\item{config}{A list containing configurations settings. This file overrides settings set on config.yml.}
 }
 \description{
 Connects to Spark and establishes the Spark Context
+}
+\examples{
+\dontrun{
+ sc <- spark_connect(config = list(
+   sql = list(
+     spark.sql.shuffle.partitions = 1
+   )
+ ))
+}
 }
 
