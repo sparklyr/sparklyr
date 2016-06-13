@@ -12,8 +12,26 @@ spark_ml_random_forest <- function(x, response, features, max.bins, max.depth, n
   else
     "org.apache.spark.ml.classification.RandomForestClassifier"
 
+  # For character vectors, convert to DoubleType using the StringIndexer
+  if (responseType %in% "StringType") {
+
+    # use the StringIndexer to create a categorical variable
+    indexer <- spark_invoke_static_ctor(
+      scon,
+      "org.apache.spark.ml.feature.StringIndexer"
+    )
+
+    sim <- indexer %>%
+      spark_invoke("setInputCol", response) %>%
+      spark_invoke("setOutputCol", "responseIndex") %>%
+      spark_invoke("fit", df)
+
+    df <- spark_invoke(sim, "transform", df)
+    response <- "responseIndex"
+  }
+
   rf <- spark_invoke_static_ctor(scon, model)
-  tdf <- spark_assemble_vector(scon, df, features, "features")
+  tdf <- spark_dataframe_assemble_vector(df, features, "features")
 
   rf %>%
     spark_invoke("setLabelCol", response) %>%
@@ -71,7 +89,7 @@ print.ml_model_random_forest <- function(x, ...) {
 #' @export
 predict.ml_model_random_forest <- function(object, newdata, ...) {
   sdf <- as_spark_dataframe(newdata)
-  assembled <- spark_assemble_vector(sdf$scon, sdf, features(object), "features")
+  assembled <- spark_dataframe_assemble_vector(sdf, features(object), "features")
   predicted <- spark_invoke(object$.model, "transform", assembled)
   spark_dataframe_read_column(predicted, "prediction")
 }

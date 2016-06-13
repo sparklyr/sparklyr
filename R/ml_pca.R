@@ -2,7 +2,7 @@ spark_ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
-  tdf <- spark_assemble_vector(scon, df, features, "features")
+  tdf <- spark_dataframe_assemble_vector(df, features, "features")
 
   # invoke pca
   pca <- spark_invoke_static_ctor(

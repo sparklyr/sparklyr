@@ -6,7 +6,7 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_var
   if (is.null(features))
     features <- as.list(spark_invoke(df, "columns"))
 
-  tdf <- spark_assemble_vector(scon, df, features, "features")
+  tdf <- spark_dataframe_assemble_vector(df, features, "features")
 
   # invoke KMeans
   kmeans <- spark_invoke_static_ctor(

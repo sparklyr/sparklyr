@@ -15,7 +15,7 @@ spark_ml_logistic_regression <- function(x, response, features, intercept = TRUE
     "org.apache.spark.ml.classification.LogisticRegression"
   )
 
-  tdf <- spark_assemble_vector(scon, df, features, "features")
+  tdf <- spark_dataframe_assemble_vector(df, features, "features")
 
   model <- lr %>%
     spark_invoke("setMaxIter", 10L) %>%
@@ -106,7 +106,7 @@ fitted.ml_model_logistic_regression <- function(x, ...) {
 #' @export
 predict.ml_model_logistic_regression <- function(object, newdata, ...) {
   sdf <- as_spark_dataframe(newdata)
-  assembled <- spark_assemble_vector(sdf$scon, sdf, features(object), "features")
+  assembled <- spark_dataframe_assemble_vector(sdf, features(object), "features")
   predicted <- spark_invoke(object$.model, "transform", assembled)
   spark_dataframe_read_column(predicted, "prediction")
 }
