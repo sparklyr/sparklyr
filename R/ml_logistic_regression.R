@@ -1,14 +1,28 @@
 spark_ml_logistic_regression <- function(x, response, features, intercept = TRUE,
                                          alpha = 0, lambda = 0)
 {
-  # ensure 'response' vector is encoded as numeric
-  tbl <- eval(substitute(
-    mutate(x, response = as.double(response)),
-    list(response = as.name(response))
-  ))
-
   scon <- spark_scon(x)
-  df <- as_spark_dataframe(tbl)
+  df <- as_spark_dataframe(x)
+
+  # convert character vector response to 'factor'
+  schema <- spark_dataframe_schema(x)
+  responseType <- schema[[response]]$type
+
+  # For character vectors, convert to DoubleType using the StringIndexer
+  labels <- NULL
+  if (responseType %in% "StringType") {
+    newResponse <- "responseIndex"
+    params <- new.env(parent = emptyenv())
+    df <- spark_dataframe_index_string(df, response, newResponse, params)
+    labels <- as.character(params$labels)
+    response <- newResponse
+  } else if (!responseType %in% "DoubleType") {
+    tbl <- eval(substitute(
+      mutate(x, response = as.double(response)),
+      list(response = as.name(response))
+    ))
+    df <- as_spark_dataframe(tbl)
+  }
 
   lr <- spark_invoke_static_ctor(
     scon,
@@ -19,7 +33,7 @@ spark_ml_logistic_regression <- function(x, response, features, intercept = TRUE
 
   fit <- lr %>%
     spark_invoke("setMaxIter", 10L) %>%
-    spark_invoke("setLabelCol", "response") %>%
+    spark_invoke("setLabelCol", response) %>%
     spark_invoke("setFeaturesCol", "features") %>%
     spark_invoke("setFitIntercept", as.logical(intercept)) %>%
     spark_invoke("setElasticNetParam", as.double(alpha)) %>%

@@ -75,9 +75,6 @@ Linear Regression in R
 ----------------------
 
 ``` r
-data <- iris %>%
-  select(Petal.Width, Petal.Length)
-
 model <- lm(Petal.Length ~ Petal.Width, data = iris)
 
 iris %>%
@@ -110,6 +107,75 @@ iris %>%
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
+Logistic Regression in R
+------------------------
+
+``` r
+# Prepare beaver dataset
+beaver <- beaver2
+beaver$activ <- factor(beaver$activ, labels = c("Non-Active", "Active"))
+
+# Fit model
+model <- glm(activ ~ temp, data = beaver, family = binomial(link = "logit"))
+print(model)
+```
+
+    ## 
+    ## Call:  glm(formula = activ ~ temp, family = binomial(link = "logit"), 
+    ##     data = beaver)
+    ## 
+    ## Coefficients:
+    ## (Intercept)         temp  
+    ##     -550.53        14.69  
+    ## 
+    ## Degrees of Freedom: 99 Total (i.e. Null);  98 Residual
+    ## Null Deviance:       132.8 
+    ## Residual Deviance: 18.73     AIC: 22.73
+
+``` r
+# Plot prediction curve
+newdata <- data.frame(
+  temp = seq(min(beaver$temp), max(beaver$temp), length.out = 128)
+)
+
+df <- data.frame(
+  x = newdata$temp,
+  y = predict(model, newdata = newdata, type = "response") + 1
+)
+
+ggplot(beaver, aes(x = temp, y = activ)) +
+  geom_point() +
+  geom_line(data = df, aes(x, y), col = "red") +
+  labs(
+    x = "Body Temperature (ºC)",
+    y = "Activity",
+    title = "Beaver Activity vs. Body Temperature",
+    subtitle = "From R's built-in 'beaver2' dataset"
+  )
+```
+
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
+Logistic Regression in RSpark
+-----------------------------
+
+``` r
+copy_to(db, beaver, "beaver")
+beaver_tbl <- tbl(db, "beaver")
+
+model <- beaver_tbl %>%
+  mutate(response = as.numeric(activ == "Active")) %>%
+  ml_logistic_regression(response = "response", features = "temp")
+
+print(model)
+```
+
+    ## Call: response ~ temp
+    ## 
+    ## Coefficients:
+    ##        temp (Intercept) 
+    ##    4.846724 -181.697214
+
 Partitioning in R
 -----------------
 
@@ -125,16 +191,16 @@ fit <- lm(Petal.Length ~ Petal.Width, data = iris)
 predict(fit, newdata = test)
 ```
 
-    ##        6       10       20       29       32       40       42       43 
-    ## 1.975534 1.306552 1.752540 1.529546 1.975534 1.529546 1.752540 1.529546 
-    ##       44       46       48       50       51       52       58       61 
-    ## 2.421522 1.752540 1.529546 1.529546 4.205475 4.428469 3.313499 3.313499 
-    ##       65       71       72       75       78       79       80       83 
-    ## 3.982481 5.097451 3.982481 3.982481 4.874457 4.428469 3.313499 3.759487 
-    ##       86       91       93       95       99      102      103      114 
-    ## 4.651463 3.759487 3.759487 3.982481 3.536493 5.320445 5.766433 5.543439 
-    ##      117      122      125      137      139      140 
-    ## 5.097451 5.543439 5.766433 6.435415 5.097451 5.766433
+    ##        1        6       12       13       20       24       28       30 
+    ## 1.529546 1.975534 1.529546 1.306552 1.752540 2.198528 1.529546 1.529546 
+    ##       36       42       44       47       49       55       58       59 
+    ## 1.529546 1.752540 2.421522 1.529546 1.529546 4.428469 3.313499 3.982481 
+    ##       60       62       66       72       76       80       88       91 
+    ## 4.205475 4.428469 4.205475 3.982481 4.205475 3.313499 3.982481 3.759487 
+    ##       93       95       98      111      113      115      118      122 
+    ## 3.759487 3.982481 3.982481 5.543439 5.766433 6.435415 5.989427 5.543439 
+    ##      124      125      129      135      142      146 
+    ## 5.097451 5.766433 5.766433 4.205475 6.212421 6.212421
 
 Partitioning in RSpark
 ----------------------
@@ -149,11 +215,11 @@ fit <- partitions$training %>%
 predict(fit, partitions$test)
 ```
 
-    ##  [1] 1.494930 1.719376 1.494930 1.494930 1.494930 1.494930 1.943823
-    ##  [8] 1.494930 1.494930 1.494930 3.963838 1.494930 3.290500 3.739392
-    ## [15] 3.290500 4.412730 4.412730 4.637177 5.086069 4.188284 3.739392
-    ## [22] 5.086069 3.963838 5.310515 5.983854 4.412730 5.983854 3.963838
-    ## [29] 4.861623 4.412730 5.759408 6.208300 5.759408
+    ##  [1] 1.742224 1.523396 1.523396 1.523396 1.961052 1.742224 1.742224
+    ##  [8] 4.368160 3.711676 3.492848 3.930504 3.930504 3.930504 3.711676
+    ## [15] 5.243472 5.243472 4.149332 3.930504 4.149332 3.930504 4.368160
+    ## [22] 5.899956 3.930504 4.368160 3.930504 4.805816 6.118784 6.118784
+    ## [29] 5.681128 5.024644 5.024644 6.118784 5.462300
 
 Principal Components Analysis in R
 ----------------------------------
@@ -257,7 +323,7 @@ ggplot(df) +
   )
 ```
 
-![](ml_examples_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
 Cleanup
 -------

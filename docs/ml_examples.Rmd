@@ -62,9 +62,6 @@ tbl(db, "iris") %>%
 ## Linear Regression in R
 
 ```{r}
-data <- iris %>%
-  select(Petal.Width, Petal.Length)
-
 model <- lm(Petal.Length ~ Petal.Width, data = iris)
 
 iris %>%
@@ -91,6 +88,52 @@ iris %>%
                     intercept = coef(model)[["(Intercept)"]],
                     color = "red"))
 ```
+
+## Logistic Regression in R
+
+```{r}
+# Prepare beaver dataset
+beaver <- beaver2
+beaver$activ <- factor(beaver$activ, labels = c("Non-Active", "Active"))
+
+# Fit model
+model <- glm(activ ~ temp, data = beaver, family = binomial(link = "logit"))
+print(model)
+
+# Plot prediction curve
+newdata <- data.frame(
+  temp = seq(min(beaver$temp), max(beaver$temp), length.out = 128)
+)
+
+df <- data.frame(
+  x = newdata$temp,
+  y = predict(model, newdata = newdata, type = "response") + 1
+)
+
+ggplot(beaver, aes(x = temp, y = activ)) +
+  geom_point() +
+  geom_line(data = df, aes(x, y), col = "red") +
+  labs(
+    x = "Body Temperature (ºC)",
+    y = "Activity",
+    title = "Beaver Activity vs. Body Temperature",
+    subtitle = "From R's built-in 'beaver2' dataset"
+  )
+```
+
+## Logistic Regression in RSpark
+
+```{r}
+copy_to(db, beaver, "beaver")
+beaver_tbl <- tbl(db, "beaver")
+
+model <- beaver_tbl %>%
+  mutate(response = as.numeric(activ == "Active")) %>%
+  ml_logistic_regression(response = "response", features = "temp")
+
+print(model)
+```
+
 
 ## Partitioning in R
 
