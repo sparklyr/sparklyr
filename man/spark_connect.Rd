@@ -5,8 +5,7 @@
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
 spark_connect(master = "local", app_name = "rspark", version = NULL,
-  hadoop_version = NULL, packages = NULL, cores = "auto", memory = "1g",
-  config = NULL)
+  hadoop_version = NULL, cores = "auto", config = NULL)
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -17,14 +16,10 @@ spark_connect(master = "local", app_name = "rspark", version = NULL,
 
 \item{hadoop_version}{Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.}
 
-\item{packages}{Collection of packages to load into Spark. See also, the rspark.packages.default option.}
-
 \item{cores}{Cores available for use for Spark. This option is only applicable to local installations. Use NULL
 to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
 speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 OS schedules one thread per core.}
-
-\item{memory}{Memory per executor (e.g. 1000m, 2g). Defaults to 1g}
 
 \item{config}{A list containing configurations settings. This file overrides settings set on config.yml.}
 }

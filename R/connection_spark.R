@@ -21,7 +21,6 @@ spark_default_jars <- function() {
 #' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 #' OS schedules one thread per core.
-#' @param memory Memory per executor (e.g. 1000m, 2g). Defaults to 1g
 #' @param config A list containing configurations settings. This file overrides settings set on config.yml.
 #' @examples
 #' \dontrun{

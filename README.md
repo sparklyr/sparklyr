@@ -33,9 +33,13 @@ The rspark package implements a dplyr back-end for Spark. Connect to Spark using
 # connect to local spark instance and get a dplyr interface
 library(rspark)
 library(dplyr)
-sc <- spark_connect("local", cores = "auto", version = "1.6.1", memory = "8G")
+sc <- spark_connect("local", cores = "auto", version = "1.6.1")
 db <- src_spark(sc)
+```
 
+Now we copy a couple of datasets from R into the Spark cluster:
+
+``` r
 # copy the flights table from the nycflights13 package to Spark
 copy_to(db, nycflights13::flights, "flights")
 flights <- tbl(db, "flights")
@@ -198,16 +202,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/08 17:33:35 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 19 (/tmp/RtmpmoZRfs/file2b812ff78a82.csv MapPartitionsRDD[79] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/06/08 17:33:35 INFO TaskSchedulerImpl: Adding task set 19.0 with 1 tasks
-    ## 16/06/08 17:33:35 INFO TaskSetManager: Starting task 0.0 in stage 19.0 (TID 38, localhost, partition 0,PROCESS_LOCAL, 2441 bytes)
-    ## 16/06/08 17:33:35 INFO Executor: Running task 0.0 in stage 19.0 (TID 38)
-    ## 16/06/08 17:33:35 INFO HadoopRDD: Input split: file:/tmp/RtmpmoZRfs/file2b812ff78a82.csv:0+23367180
-    ## 16/06/08 17:33:35 INFO Executor: Finished task 0.0 in stage 19.0 (TID 38). 2082 bytes result sent to driver
-    ## 16/06/08 17:33:35 INFO TaskSetManager: Finished task 0.0 in stage 19.0 (TID 38) in 85 ms on localhost (1/1)
-    ## 16/06/08 17:33:35 INFO DAGScheduler: ResultStage 19 (count at NativeMethodAccessorImpl.java:-2) finished in 0.085 s
-    ## 16/06/08 17:33:35 INFO TaskSchedulerImpl: Removed TaskSet 19.0, whose tasks have all completed, from pool 
-    ## 16/06/08 17:33:35 INFO DAGScheduler: Job 11 finished: count at NativeMethodAccessorImpl.java:-2, took 0.089154 s
+    ## 16/06/13 16:53:39 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 17 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpTMU8Nq/fileeacf68424855.csv MapPartitionsRDD[78] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/13 16:53:39 INFO TaskSchedulerImpl: Adding task set 17.0 with 1 tasks
+    ## 16/06/13 16:53:39 INFO TaskSetManager: Starting task 0.0 in stage 17.0 (TID 38, localhost, partition 0,PROCESS_LOCAL, 7854 bytes)
+    ## 16/06/13 16:53:39 INFO Executor: Running task 0.0 in stage 17.0 (TID 38)
+    ## 16/06/13 16:53:39 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpTMU8Nq/fileeacf68424855.csv:0+23367180
+    ## 16/06/13 16:53:39 INFO Executor: Finished task 0.0 in stage 17.0 (TID 38). 2082 bytes result sent to driver
+    ## 16/06/13 16:53:39 INFO TaskSetManager: Finished task 0.0 in stage 17.0 (TID 38) in 78 ms on localhost (1/1)
+    ## 16/06/13 16:53:39 INFO TaskSchedulerImpl: Removed TaskSet 17.0, whose tasks have all completed, from pool 
+    ## 16/06/13 16:53:39 INFO DAGScheduler: ResultStage 17 (count at NativeMethodAccessorImpl.java:-2) finished in 0.080 s
+    ## 16/06/13 16:53:39 INFO DAGScheduler: Job 10 finished: count at NativeMethodAccessorImpl.java:-2, took 0.082797 s
 
 Finally, we disconnect from Spark:
 
