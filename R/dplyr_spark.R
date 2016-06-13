@@ -8,14 +8,6 @@ src_spark <- function(scon) {
   dbiCon <- dbConnect(DBISpark(scon))
   db <- src_sql("spark", dbiCon)
 
-  if (spark_connection_is_local(scon)) {
-    if (getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)) {
-      cores <- parallel::detectCores()
-      cores <- if (is.na(cores)) 1 else cores
-      dbSetProperty(dbiCon, "spark.sql.shuffle.partitions", as.character(cores))
-    }
-  }
-
   # call connection opened with revised connectCall
   sconInst <- spark_connection_get_inst(scon)
   connectCall <- strsplit(sconInst$connectCall, "\n")[[1]]

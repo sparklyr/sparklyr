@@ -58,7 +58,8 @@ Imports:
     DBI,
     assertthat,
     rappdirs,
-    lazyeval
+    lazyeval,
+    config
 Remotes: hadley/dplyr
 Suggests:
     testthat,

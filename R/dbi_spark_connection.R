@@ -31,6 +31,7 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' @param drv \code{spark::DBISpark()}
 #' @param master Master location.
 #' @export
+#' @import config
 #' @rdname dbi-spark-connection
 #' @examples
 #' \dontrun{
@@ -58,6 +59,13 @@ setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
 
   # call connection opended
   on_connection_opened(drv@scon, connectCall)
+
+  browse()
+
+  # Apply sql connection level properties
+  config <- spark_config(scon)
+  cores <- config::get("rspark.dplyr.optimize_shuffle_cores")
+  dbSetProperty(dbiCon, "spark.sql.shuffle.partitions", as.character(cores))
 
   # return dbi
   dbi
