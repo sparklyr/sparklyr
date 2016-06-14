@@ -1,12 +1,11 @@
-spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
+spark_ml_kmeans <- function(x, centers, iter.max = 10,
+                            features = dplyr::tbl_vars(x))
+{
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
-  # collect vectors of interest into single column
-  if (is.null(features))
-    features <- as.list(spark_invoke(df, "columns"))
-
-  tdf <- spark_dataframe_assemble_vector(df, features, "features")
+  envir <- new.env(parent = emptyenv())
+  tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
   # invoke KMeans
   kmeans <- spark_invoke_static_ctor(
@@ -14,13 +13,28 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_var
     "org.apache.spark.ml.clustering.KMeans"
   )
 
-  kmm <- kmeans %>%
+  fit <- kmeans %>%
     spark_invoke("setK", as.integer(centers)) %>%
     spark_invoke("setMaxIter", as.integer(iter.max)) %>%
-    spark_invoke("setFeaturesCol", "features") %>%
+    spark_invoke("setFeaturesCol", envir$features) %>%
     spark_invoke("fit", tdf)
 
-  kmm
+
+  # extract cluster centers
+  kmmCenters <- spark_invoke(fit, "clusterCenters")
+
+  centersList <- transpose_list(lapply(kmmCenters, function(center) {
+    as.numeric(spark_invoke(center, "toArray"))
+  }))
+
+  names(centersList) <- features
+  centers <- as.data.frame(centersList, stringsAsFactors = FALSE)
+
+  ml_model("kmeans", fit,
+    centers = centers,
+    features = features,
+    model.parameters = as.list(envir)
+  )
 }
 
 #' Computes kmeans from a dplyr source
@@ -31,17 +45,5 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_var
 #' @param features Which columns to use in the kmeans fit. Defaults to
 #'   all columns within \code{x}.
 ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
-  model <- spark_ml_kmeans(x, centers, iter.max, features)
-
-  # extract cluster centers
-  kmm_centers <- spark_invoke(model, "clusterCenters")
-
-  centers_list <- transpose_list(lapply(kmm_centers, function(center) {
-    as.numeric(spark_invoke(center, "toArray"))
-  }))
-
-  names(centers_list) <- features
-  centers <- as.data.frame(centers_list, stringsAsFactors = FALSE)
-
-  ml_model("kmeans", model, centers = centers)
+  spark_ml_kmeans(x, centers, iter.max, features)
 }

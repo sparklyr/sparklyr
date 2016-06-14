@@ -5,16 +5,11 @@
 #' @export
 #' @param scon Spark connection provided by spark_connection
 src_spark <- function(scon) {
+  if (missing(scon))
+    stop("Need to specify an Spark connection created. See spark_connection.")
+
   dbiCon <- dbConnect(DBISpark(scon))
   db <- src_sql("spark", dbiCon)
-
-  if (spark_connection_is_local(scon)) {
-    if (getOption("rspark.dplyr.optimize_shuffle_cores", TRUE)) {
-      cores <- parallel::detectCores()
-      cores <- if (is.na(cores)) 1 else cores
-      dbSetProperty(dbiCon, "spark.sql.shuffle.partitions", as.character(cores))
-    }
-  }
 
   # call connection opened with revised connectCall
   sconInst <- spark_connection_get_inst(scon)

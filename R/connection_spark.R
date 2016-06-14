@@ -1,17 +1,6 @@
 # register the spark_connection S3 class for use in setClass slots
 methods::setOldClass("spark_connection")
 
-spark_default_packages <- function() {
-  packagesOption <- getOption("rspark.packages.default", NULL)
-  defaultPackages <- c(
-    "com.databricks:spark-csv_2.11:1.3.0",
-    "com.amazonaws:aws-java-sdk-pom:1.10.34",
-    "org.apache.hadoop:hadoop-aws:2.6.0"
-  )
-
-  if (is.null(packagesOption)) defaultPackages else packagesOption
-}
-
 spark_default_jars <- function() {
   jarsOption <- getOption("rspark.jars.default", NULL)
 
@@ -28,19 +17,25 @@ spark_default_jars <- function() {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
 #' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
-#' @param packages Collection of packages to load into Spark. See also, the rspark.packages.default option.
 #' @param cores Cores available for use for Spark. This option is only applicable to local installations. Use NULL
 #' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
 #' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
 #' OS schedules one thread per core.
-#' @param memory Memory per executor (e.g. 1000m, 2g). Defaults to 1g
+#' @param config A list containing configurations settings. This file overrides settings set on config.yml.
+#' @examples
+#' \dontrun{
+#'  sc <- spark_connect(config = list(
+#'    sql = list(
+#'      spark.sql.shuffle.partitions = 1
+#'    )
+#'  ))
+#' }
 spark_connect <- function(master = "local",
                           app_name = "rspark",
                           version = NULL,
                           hadoop_version = NULL,
-                          packages = NULL,
                           cores = "auto",
-                          memory = "1g") {
+                          config = NULL) {
   sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name })
   if (length(sconFound) == 1) {
     return(sconFound[[1]])
@@ -57,7 +52,6 @@ spark_connect <- function(master = "local",
   sparkVersion <- installInfo$sparkVersion
   hadoopVersion <- installInfo$hadoopVersion
 
-  packages <- c(if(is.null(packages)) list() else packages, spark_default_packages())
   jars <- spark_default_jars()
 
   scon <- list(
@@ -69,24 +63,27 @@ spark_connect <- function(master = "local",
     isLocal = spark_master_is_local(master),
     reconnect = reconnect,
     installInfo = installInfo,
-    packages = packages,
-    memory = memory,
-    jars = jars,
-    codegen = getOption("rspark.connection.codegen", TRUE)
+    config = spark_config_build(master, config)
   )
   scon <- structure(scon, class = "spark_connection")
 
-  if (reconnect && (spark_connection_is_local(scon) && !getOption("rspark.connection.allow_local_reconnect", FALSE))) {
+  if (reconnect && (spark_connection_is_local(scon) && !scon$config$allow_local_reconnect)) {
     stop("Reconnect is not supported on local installs")
   }
 
-  sconInst <- start_shell(list(), scon$installInfo, scon$packages, scon$jars, scon$memory, scon$master)
+  sconInst <- start_shell(scon, list())
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
-  lapply(seq_len(length(parentCall)), function(idxCall) {
+  parentCall <- lapply(seq_len(length(parentCall)), function(idxCall) {
     if (idxCall > 1) {
-      parentCall[[idxCall]] <<- eval(parentCall[[idxCall]], parent.frame(n = 3))
+      eval(parentCall[[idxCall]], parent.frame(n = 3))
+    }
+    else if (idxCall < length(parentCall)) {
+      parentCall[[idxCall]]
+    }
+    else {
+      NULL
     }
   })
 
@@ -115,7 +112,7 @@ spark_connection_attach_context <- function(scon, sconInst) {
   if (spark_connection_is_local(scon) && scon$master == "local" && !identical(scon$cores, NULL))
     master <- if (scon$cores == "auto") "local[*]" else paste("local[", scon$cores, "]", sep = "")
 
-  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir, scon$memory)
+  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
   if (identical(sconInst$sc, NULL)) {
     stop("Failed to create Spark context")
   }
@@ -334,7 +331,7 @@ spark_invoke_static_ctor <- function(scon, objName, ...)
 #   sparkExecutorEnvMap: JMap[Object, Object])    // Named list of environment variables to be used when launching executors.
 #   : JavaSparkContext
 #
-spark_connection_create_context <- function(scon, master, appName, sparkHome, memory = NULL) {
+spark_connection_create_context <- function(scon, master, appName, sparkHome) {
   sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
 
   conf <- spark_invoke_static_ctor(scon, "org.apache.spark.SparkConf")
@@ -342,7 +339,10 @@ spark_connection_create_context <- function(scon, master, appName, sparkHome, me
   conf <- spark_invoke(conf, "setMaster", master)
   conf <- spark_invoke(conf, "setSparkHome", sparkHome)
 
-  conf <- if (!is.null(memory)) spark_invoke(conf, "set", "spark.executor.memory", memory) else conf
+  lapply(names(scon$config$context), function(contextName) {
+    contextValue <- scon$config$context[[contextName]]
+    conf <<- spark_invoke(conf, "set", contextName, contextValue)
+  })
 
   spark_invoke_static_ctor(
     scon,
@@ -420,9 +420,9 @@ spark_connection_is_open <- function(scon) {
 }
 
 #' Closes all existing connections. Returns the total of connections closed.
-#' @name spark_connections_close
+#' @name spark_disconnect_all
 #' @export
-spark_connection_close_all <- function() {
+spark_disconnect_all <- function() {
   scons <- spark_connection_find_scon(function(e) {
     spark_connection_is_open(e)
   })

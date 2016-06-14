@@ -23,6 +23,7 @@ Collate:
     'api_spark.R'
     'api_spark_databricks.R'
     'api_spark_sql.R'
+    'config_spark.R'
     'connection_spark.R'
     'connection_spark_reconnect.R'
     'connection_viewer.R'
@@ -47,7 +48,6 @@ Collate:
     'ml_pca.R'
     'ml_random_forest.R'
     'ml_utils.R'
-    'options_spark.R'
     'shell_spark.R'
     'spark_data_frame.R'
     'spark_rdd.R'
@@ -58,7 +58,9 @@ Imports:
     DBI,
     assertthat,
     rappdirs,
-    lazyeval
+    lazyeval,
+    config,
+    yaml
 Remotes: hadley/dplyr
 Suggests:
     testthat,

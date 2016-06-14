@@ -1,27 +1,23 @@
-spark_ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
+spark_ml_pca <- function(x, features = dplyr::tbl_vars(x))
+{
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
-  tdf <- spark_dataframe_assemble_vector(df, features, "features")
+  envir <- new.env(parent = emptyenv())
+  tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
-  # invoke pca
   pca <- spark_invoke_static_ctor(
     scon,
     "org.apache.spark.ml.feature.PCA"
   )
 
-  model <- pca %>%
+  fit <- pca %>%
     spark_invoke("setK", length(features)) %>%
-    spark_invoke("setInputCol", "features") %>%
+    spark_invoke("setInputCol", envir$features) %>%
     spark_invoke("fit", tdf)
 
-  model
-}
-
-as_pca_result <- function(model, features) {
-
   # extract principal components
-  pc <- model %>% spark_invoke("pc")
+  pc <- fit %>% spark_invoke("pc")
   nrow <- pc %>% spark_invoke("numRows")
   ncol <- pc %>% spark_invoke("numCols")
   values <- pc %>% spark_invoke("values") %>% as.numeric()
@@ -30,7 +26,7 @@ as_pca_result <- function(model, features) {
   components <- matrix(values, nrow = nrow, ncol = ncol)
 
   # get explained variance as vector
-  explainedVariance <- model %>%
+  explainedVariance <- fit %>%
     spark_invoke("explainedVariance") %>%
     spark_invoke("toArray") %>%
     as.numeric()
@@ -41,9 +37,10 @@ as_pca_result <- function(model, features) {
   colnames(components) <- pcNames
   names(explainedVariance) <- pcNames
 
-  ml_model("pca", model,
+  ml_model("pca", fit,
     components = components,
-    explained.variance = explainedVariance
+    explained.variance = explainedVariance,
+    model.parameters = as.list(envir)
   )
 }
 
@@ -54,8 +51,7 @@ as_pca_result <- function(model, features) {
 #'   analysis. Defaults to all columns in \code{x}.
 #' @export
 ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
-  model <- spark_ml_pca(x, features)
-  as_pca_result(model, features)
+  spark_ml_pca(x, features)
 }
 
 #' @export

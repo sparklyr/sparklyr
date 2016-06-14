@@ -1,0 +1,27 @@
+default:
+  rspark:
+    install:
+      dir:
+    submit:
+      packages:
+        - com.databricks:spark-csv_2.11:1.3.0
+        - com.amazonaws:aws-java-sdk-pom:1.10.34
+        - org.apache.hadoop:hadoop-aws:2.6.0
+      jars:
+    connection:
+      allow_local_reconnect: FALSE
+    session:
+      spark.sql.codegen.wholeStage: TRUE
+
+local:
+  inherits: default
+  rspark:
+    install:
+      override.hive.site: TRUE
+    submit:
+      executor-memory: 1G
+      driver-memory: 1G
+    context:
+      spark.executor.memory: 1G
+    sql:
+      spark.sql.shuffle.partitions: !expr parallel::detectCores()

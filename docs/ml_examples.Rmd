@@ -62,9 +62,6 @@ tbl(db, "iris") %>%
 ## Linear Regression in R
 
 ```{r}
-data <- iris %>%
-  select(Petal.Width, Petal.Length)
-
 model <- lm(Petal.Length ~ Petal.Width, data = iris)
 
 iris %>%
@@ -92,9 +89,56 @@ iris %>%
                     color = "red"))
 ```
 
+## Logistic Regression in R
+
+```{r}
+# Prepare beaver dataset
+beaver <- beaver2
+beaver$activ <- factor(beaver$activ, labels = c("Non-Active", "Active"))
+
+# Fit model
+model <- glm(activ ~ temp, data = beaver, family = binomial(link = "logit"))
+print(model)
+
+# Plot prediction curve
+newdata <- data.frame(
+  temp = seq(min(beaver$temp), max(beaver$temp), length.out = 128)
+)
+
+df <- data.frame(
+  x = newdata$temp,
+  y = predict(model, newdata = newdata, type = "response") + 1
+)
+
+ggplot(beaver, aes(x = temp, y = activ)) +
+  geom_point() +
+  geom_line(data = df, aes(x, y), col = "red") +
+  labs(
+    x = "Body Temperature (ºC)",
+    y = "Activity",
+    title = "Beaver Activity vs. Body Temperature",
+    subtitle = "From R's built-in 'beaver2' dataset"
+  )
+```
+
+## Logistic Regression in RSpark
+
+```{r}
+copy_to(db, beaver, "beaver")
+beaver_tbl <- tbl(db, "beaver")
+
+model <- beaver_tbl %>%
+  mutate(response = as.numeric(activ == "Active")) %>%
+  ml_logistic_regression(response = "response", features = "temp")
+
+print(model)
+```
+
+
 ## Partitioning in R
 
 ```{r}
+set.seed(1099)
 ratio <- 0.75
 trainingSize <- floor(ratio * nrow(iris))
 indices <- sample(seq_len(nrow(iris)), size = trainingSize)
@@ -110,7 +154,7 @@ predict(fit, newdata = test)
 
 ```{r}
 partitions <- tbl(db, "iris") %>%
-  partition(training = 0.75, test = 0.25)
+  partition(training = 0.75, test = 0.25, seed = 1099)
 
 fit <- partitions$training %>%
   ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
@@ -143,9 +187,8 @@ print(model)
 ## Random Forests with R
 
 ```{r}
-library(randomForest)
-rForest <- randomForest(
-  Sepal.Length ~ Petal.Length + Petal.Width,
+rForest <- randomForest::randomForest(
+  Species ~ Petal.Length + Petal.Width,
   ntree = 20L,
   nodesize = 20L,
   data = iris
@@ -159,7 +202,7 @@ head(rPredict)
 ```{r}
 mForest <- iris_tbl %>%
   ml_random_forest(
-    response = "Sepal_Length",
+    response = "Species",
     features = c("Petal_Length", "Petal_Width"),
     max.bins = 32L,
     max.depth = 5L,
@@ -169,14 +212,22 @@ mPredict <- predict(mForest, iris_tbl)
 head(mPredict)
 ```
 
+## Comparing Random Forest Classification
+
+Using the model to predict the same data it was trained on is
+certainly not best practice, but it at least showcases that
+the results produced are concordant between R and RSpark.
+
 ```{r}
-ggplot(data.frame(x = rPredict, y = mPredict)) +
-  geom_point(aes(x, y)) +
-  geom_abline(col = "red") +
+df <- as.data.frame(table(x = rPredict, y = mPredict), stringsAsFactors = FALSE)
+ggplot(df) +
+  geom_raster(aes(x, y, fill = Freq)) +
+  geom_text(aes(x, y, label = Freq), col = "#222222", size = 6, nudge_x = 0.005, nudge_y = -0.005) +
+  geom_text(aes(x, y, label = Freq), col = "white", size = 6) +
   labs(
-    x = "R-predicted Sepal Length",
-    y = "RSpark-predicted Sepal Length",
-    title = "Random Forest Regression — Comparing R and RSpark"
+    x = "R-predicted Species",
+    y = "RSpark-predicted Species",
+    title = "Random Forest Classification — Comparing R and RSpark"
   )
 ```
 

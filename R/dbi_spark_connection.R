@@ -31,6 +31,7 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' @param drv \code{spark::DBISpark()}
 #' @param master Master location.
 #' @export
+#' @import config
 #' @rdname dbi-spark-connection
 #' @examples
 #' \dontrun{
@@ -58,6 +59,12 @@ setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
 
   # call connection opended
   on_connection_opened(drv@scon, connectCall)
+
+  # Apply sql connection level properties
+  configValues <- drv@scon$config$sql
+  lapply(names(configValues), function(configName) {
+    dbSetProperty(dbi, configName, as.character(configValues[[configName]]))
+  })
 
   # return dbi
   dbi

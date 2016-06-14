@@ -18,8 +18,8 @@ read_shell_file <- function(shellFile) {
   )
 }
 
-start_shell <- function(sconInst, installInfo, packages, jars, memory, master) {
-  sparkHome <- installInfo$sparkVersionDir
+start_shell <- function(scon, sconInst) {
+  sparkHome <- scon$installInfo$sparkVersionDir
   if (!dir.exists(sparkHome)) {
     stop("Spark installation was not found. See spark_install.")
   }
@@ -36,20 +36,13 @@ start_shell <- function(sconInst, installInfo, packages, jars, memory, master) {
   on.exit(unlink(shellOutputPath))
 
   sparkCommand <- ""
-  if (length(packages) > 0) {
-    sparkCommand <- paste("--packages ", paste(packages, collapse = ","))
-  }
 
-  if (length(jars) > 0) {
-    sparkCommand <- paste(sparkCommand, "--jars ", paste(jars, sep = ","))
-  }
-
-  if (!is.null(memory)) {
-    sparkCommand <- paste(sparkCommand, "--executor-memory ", memory)
-    if (spark_master_is_local(master)) {
-      sparkCommand <- paste(sparkCommand, "--driver-memory ", memory)
+  lapply(names(scon$config$submit), function(paramName) {
+    paramValue <- scon$config$submit[[paramName]]
+    if (!is.null(paramValue)) {
+      sparkCommand <<- paste0(sparkCommand, "--", paramName, " ", paste(paramValue, collapse = ","), " ")
     }
-  }
+  })
 
   sparkCommand <- paste(sparkCommand, "sparkr-shell", shellOutputPath)
 
