@@ -144,18 +144,10 @@ spark_install <- function(version = NULL,
       reset)
   }
 
-  overrideHiveSite <- TRUE
-  tryCatch(function() {
-    overrideHiveSite <- isTRUE(config::get("rspark")$install$override.hive.site)
-  }, error = function(e) {
-  })
-
-  if (overrideHiveSite) {
-    hiveSitePath <- file.path(installInfo$sparkConfDir, "hive-site.xml")
-    if (!file.exists(hiveSitePath) || reset) {
-      hiveSiteTemplatePath <- system.file(package = "rspark", file.path("conf", "hive-site.xml"))
-      file.copy(hiveSiteTemplatePath, hiveSitePath, overwrite = TRUE)
-    }
+  hiveSitePath <- file.path(installInfo$sparkConfDir, "hive-site.xml")
+  if (!file.exists(hiveSitePath) || reset) {
+    hiveSiteTemplatePath <- system.file(package = "rspark", file.path("conf", "hive-site.xml"))
+    file.copy(hiveSiteTemplatePath, hiveSitePath, overwrite = TRUE)
   }
 
   invisible(installInfo)
