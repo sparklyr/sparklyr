@@ -317,7 +317,7 @@ spark_connection_create_context <- function(scon, master, appName, sparkHome) {
   conf <- spark_invoke(conf, "setMaster", master)
   conf <- spark_invoke(conf, "setSparkHome", sparkHome)
 
-  params <- spark_config_params(scon$config, "spark.context.")
+  params <- spark_config_params(scon$config, scon$isLocal, "spark.context.")
   lapply(names(params), function(paramName) {
     conf <<- spark_invoke(conf, "set", paramName, params[[paramName]])
   })

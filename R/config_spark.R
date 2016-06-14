@@ -25,10 +25,10 @@ spark_config_params <- function(config, isLocal, pattern) {
   configNames <- Filter(function(e) {
     found <- substring(e, 1, nchar(pattern)) == pattern
 
-    if (grepl("\\.local$", configName) && !isLocal)
+    if (grepl("\\.local$", e) && !isLocal)
       found <- false
 
-    if (grepl("\\.remote$", configName) && isLocal)
+    if (grepl("\\.remote$", e) && isLocal)
       found <- false
 
     found
