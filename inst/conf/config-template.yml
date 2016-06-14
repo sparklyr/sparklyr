@@ -1,6 +1,7 @@
 default:
   # local-only configuration
   sparklyr.cores.local: !expr parallel::detectCores()
+  sparklyr.sql.shuffle.partitions.local: !expr parallel::detectCores()
 
   # default spark packages to load
   sparklyr.defaultPackages:

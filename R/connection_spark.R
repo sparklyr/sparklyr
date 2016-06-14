@@ -92,9 +92,9 @@ spark_connect <- function(master = "local",
 spark_connection_attach_context <- function(scon, sconInst) {
   master <- scon$master
 
-  cores <- if (scon$isLocal) scon$config[["sparklyr.cores.local"]] else NULL
-  if (spark_connection_is_local(scon) && scon$master == "local" && !identical(cores, NULL))
-    master <- if (cores == "auto") "local[*]" else paste("local[", cores, "]", sep = "")
+  cores <- scon$config[["sparklyr.cores"]]
+  if (scon$master == "local" && !identical(cores, NULL))
+    master <- paste("local[", cores, "]", sep = "")
 
   sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
   if (identical(sconInst$sc, NULL)) {

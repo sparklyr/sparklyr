@@ -21,11 +21,24 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   mergedConfig
 }
 
-spark_config_params <- function(config, pattern) {
-  configNames <- Filter(function(e) substring(e, 1, nchar(pattern)) == pattern , names(config))
+spark_config_params <- function(config, isLocal, pattern) {
+  configNames <- Filter(function(e) {
+    found <- substring(e, 1, nchar(pattern)) == pattern
+
+    if (grepl("\\.local$", configName) && !isLocal)
+      found <- false
+
+    if (grepl("\\.remote$", configName) && isLocal)
+      found <- false
+
+    found
+  }, names(config))
 
   paramsNames <- lapply(configNames, function(configName) {
-    substr(configName, nchar(pattern) + 1, nchar(configName))
+    paramName <- substr(configName, nchar(pattern) + 1, nchar(configName))
+    paramName <- sub("(\\.local$)|(\\.remote$)", "", paramName, perl = TRUE)
+
+    paramName
   })
 
   params <- lapply(configNames, function(configName) {
