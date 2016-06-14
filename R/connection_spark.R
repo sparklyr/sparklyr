@@ -75,18 +75,6 @@ spark_connect <- function(master = "local",
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
-  parentCall <- lapply(seq_len(length(parentCall)), function(idxCall) {
-    if (idxCall > 1) {
-      eval(parentCall[[idxCall]], parent.frame(n = 3))
-    }
-    else if (idxCall < length(parentCall)) {
-      parentCall[[idxCall]]
-    }
-    else {
-      NULL
-    }
-  })
-
   sconInst$connectCall <- paste("library(rspark)",
                                 paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
                                 sep = "\n")
