@@ -17,7 +17,10 @@ spark_install_dir <- function() {
 #' @name spark_can_install
 spark_can_install <- function() {
   sparkDir <- spark_install_dir()
-  dir.exists(sparkDir) && file.access(sparkDir, 2) == 0
+  if (dir.exists(sparkDir))
+    file.access(sparkDir, 2) == 0
+  else
+    TRUE
 }
 
 #' Check if the given Spark version is available in this system
