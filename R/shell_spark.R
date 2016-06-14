@@ -54,7 +54,12 @@ start_shell <- function(sconInst, installInfo, packages, jars, memory, master) {
   sparkCommand <- paste(sparkCommand, "sparkr-shell", shellOutputPath)
 
   outputFile <- tempfile(fileext = "_spark.log")
-  invisible(system2(sparkSubmitPath, sparkCommand, wait = F, stdout = outputFile, stderr = outputFile))
+
+  env <- character()
+  if (identical(master, "local"))
+    env <- paste0("SPARK_LOCAL_IP=127.0.0.1")
+
+  invisible(system2(sparkSubmitPath, sparkCommand, wait = FALSE, env = env, stdout = outputFile, stderr = outputFile))
 
   if (!wait_file_exists(shellOutputPath)) {
     stop(paste(
