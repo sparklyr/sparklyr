@@ -47,7 +47,6 @@ spark_connect <- function(master = "local",
          java_install_url())
   }
 
-  reconnect <- FALSE
   installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
   sparkVersion <- installInfo$sparkVersion
   hadoopVersion <- installInfo$hadoopVersion
@@ -61,15 +60,11 @@ spark_connect <- function(master = "local",
     hadoopVersion = hadoop_version,
     cores = cores,
     isLocal = spark_master_is_local(master),
-    reconnect = reconnect,
+    reconnect = FALSE,
     installInfo = installInfo,
     config = config
   )
   scon <- structure(scon, class = "spark_connection")
-
-  if (reconnect && (spark_connection_is_local(scon) && !scon$config$allow_local_reconnect)) {
-    stop("Reconnect is not supported on local installs")
-  }
 
   sconInst <- start_shell(scon, list(), jars)
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
@@ -97,8 +92,9 @@ spark_connect <- function(master = "local",
 spark_connection_attach_context <- function(scon, sconInst) {
   master <- scon$master
 
-  if (spark_connection_is_local(scon) && scon$master == "local" && !identical(scon$cores, NULL))
-    master <- if (scon$cores == "auto") "local[*]" else paste("local[", scon$cores, "]", sep = "")
+  cores <- if (scon$isLocal) scon$config[["sparklyr.cores.local"]] else NULL
+  if (spark_connection_is_local(scon) && scon$master == "local" && !identical(cores, NULL))
+    master <- if (cores == "auto") "local[*]" else paste("local[", cores, "]", sep = "")
 
   sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
   if (identical(sconInst$sc, NULL)) {
