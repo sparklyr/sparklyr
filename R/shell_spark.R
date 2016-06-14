@@ -49,7 +49,7 @@ start_shell <- function(scon, sconInst) {
   outputFile <- tempfile(fileext = "_spark.log")
 
   env <- character()
-  if (identical(master, "local"))
+  if (spark_connection_is_local(scon))
     env <- paste0("SPARK_LOCAL_IP=127.0.0.1")
 
   invisible(system2(sparkSubmitPath, sparkCommand, wait = FALSE, env = env, stdout = outputFile, stderr = outputFile))
