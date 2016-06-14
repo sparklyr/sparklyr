@@ -61,7 +61,6 @@ spark_ec2_deploy <- function(
                            paste("--region", cluster_info$region, sep = "="))
   }
 
-  commandParams <- ""
   if (!is.null(cluster_info$instanceType)) {
     commandParams <- paste(commandParams,
                            paste("--instance-type", cluster_info$instanceType, sep = "="))
@@ -211,7 +210,7 @@ run_ec2_command <- function(command,
         cat(paste("Params:", params))
       }
 
-      system(paste(command, params, ">", stdoutFile, "2>", stderrFile), input = input)
+      system(paste(sparkEC2, params, ">", stdoutFile, "2>", stderrFile), input = input)
 
       retval$stdout <- readLines(stdoutFile)
       retval$stderr <- readLines(stderrFile)
@@ -219,10 +218,9 @@ run_ec2_command <- function(command,
       retval
     }
     else {
-      commandLine <- paste(command, params)
-      if (verbose) cat(paste("Executing:", commandLine))
+      if (verbose) cat(paste("Executing:", command))
 
-      system(commandLine, input = input)
+      system(command, input = input)
     }
   }
   else {
