@@ -13,7 +13,7 @@ library(rspark)
 library(dplyr)
 library(ggplot2)
 
-sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
+sc <- spark_connect("local", version = "2.0.0-preview")
 db <- src_spark(sc)
 
 copy_to(db, iris, "iris")

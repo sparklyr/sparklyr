@@ -17,10 +17,6 @@ spark_default_jars <- function() {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
 #' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
-#' @param cores Cores available for use for Spark. This option is only applicable to local installations. Use NULL
-#' to prevent this package from making use of this parameter and "auto" to default to automatic core detection. Strictly
-#' speaking, this option configures the number of available threads in a local spark instance; however, in practice, the
-#' OS schedules one thread per core.
 #' @param config A list containing configurations settings. This file overrides settings set on config.yml.
 #' @examples
 #' \dontrun{
@@ -34,7 +30,6 @@ spark_connect <- function(master = "local",
                           app_name = "rspark",
                           version = NULL,
                           hadoop_version = NULL,
-                          cores = "auto",
                           config = spark_config()) {
   sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name })
   if (length(sconFound) == 1) {
@@ -58,7 +53,6 @@ spark_connect <- function(master = "local",
     appName = app_name,
     sparkVersion = version,
     hadoopVersion = hadoop_version,
-    cores = cores,
     isLocal = spark_master_is_local(master),
     reconnect = FALSE,
     installInfo = installInfo,
@@ -379,7 +373,7 @@ spark_master_is_local <- function(master) {
 #' @export
 #' @param scon Spark connection provided by spark_connect
 spark_connection_local_cores <- function(scon) {
-  scon$cores
+  scon$config[["sparklyr.cores"]]
 }
 
 #' Checks to see if the connection into Spark is still open

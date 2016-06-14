@@ -12,7 +12,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   skip_on_cran()
   skip_if_not_installed("glmnet")
 
-  sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
+  sc <- spark_connect("local", version = "2.0.0-preview")
   on.exit(spark_disconnect(sc))
 
   db <- src_spark(sc)
