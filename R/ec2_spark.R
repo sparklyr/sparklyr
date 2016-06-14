@@ -9,6 +9,7 @@
 #' @param region The EC2 region to host this cluster.
 #' @param cluster_info A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.
 #' @param copy_dir Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy
+#' @param verbose Logs verbose information while executing EC2 commands
 #' @name ec2-spark
 NULL
 
@@ -51,7 +52,8 @@ spark_ec2_cluster <- function(
 spark_ec2_deploy <- function(
   cluster_info,
   instance_count = 1,
-  copy_dir = NULL) {
+  copy_dir = NULL,
+  verbose = FALSE) {
 
   commandParams <- ""
   if (!is.null(cluster_info$region)) {
@@ -79,7 +81,8 @@ spark_ec2_deploy <- function(
   command <- run_ec2_command(command = paste("launch", cluster_info$clusterName),
                              commandParams = commandParams,
                              clusterInfo = cluster_info,
-                             parse = FALSE)
+                             parse = FALSE,
+                             verbose = verbose)
 
   command
 }
@@ -89,51 +92,59 @@ spark_ec2_deploy <- function(
 #' @export
 spark_ec2_start <- function(
   cluster_info,
-  instance_count = 1) {
+  instance_count = 1,
+  verbose = FALSE) {
 
   run_ec2_command(command = paste("launch", cluster_info$clusterName),
                   commandParams = "",
                   clusterInfo = cluster_info,
-                  parse = FALSE)
+                  parse = FALSE,
+                  verbose = verbose)
 }
 
 #' Stops a running Spark instance in EC2
 #' @rdname ec2-spark
 #' @export
 spark_ec2_stop <- function(
-  cluster_info) {
+  cluster_info,
+  verbose = FALSE) {
 
   run_ec2_command(command = paste("stop", cluster_info$clusterName),
                   commandParams = "",
                   input = "y",
                   clusterInfo =  cluster_info,
-                  parse = FALSE)
+                  parse = FALSE,
+                  verbose = verbose)
 }
 
 #' Deletes an Spark instance in EC2
 #' @rdname ec2-spark
 #' @export
 spark_ec2_destroy <- function(
-  cluster_info) {
+  cluster_info,
+  verbose = FALSE) {
 
   run_ec2_command(command = paste("destroy", cluster_info$clusterName),
                   commandParams = "",
                   input = "y",
                   clusterInfo = cluster_info,
-                  parse = FALSE)
+                  parse = FALSE,
+                  verbose = verbose)
 }
 
 #' Logins into Spark in EC2
 #' @rdname ec2-spark
 #' @export
 spark_ec2_login <- function(
-  cluster_info) {
+  cluster_info,
+  verbose = FALSE) {
 
   res <- run_ec2_command(command = paste("login", cluster_info$clusterName),
                          commandParams = "",
                          input = "y",
                          clusterInfo = cluster_info,
-                         preview = TRUE)
+                         preview = TRUE,
+                         verbose = verbose)
 
   cat(res$command)
 }
@@ -142,13 +153,15 @@ spark_ec2_login <- function(
 #' @rdname ec2-spark
 #' @export
 spark_ec2_master <- function(
-  cluster_info) {
+  cluster_info,
+  verbose = FALSE) {
   validate_pem(cluster_info$pemFile);
 
   run_ec2_command(command = paste("get-master", cluster_info$clusterName),
                   commandParams = "",
                   input = "",
-                  clusterInfo = cluster_info)$stdout[[3]]
+                  clusterInfo = cluster_info,
+                  verbose = verbose)$stdout[[3]]
 }
 
 run_ec2_command <- function(command,
@@ -156,7 +169,8 @@ run_ec2_command <- function(command,
                             input = "",
                             clusterInfo = NULL,
                             preview = FALSE,
-                            parse = TRUE) {
+                            parse = TRUE,
+                            verbose = FALSE) {
 
   variables <- paste("AWS_ACCESS_KEY_ID=",
                      clusterInfo$accessKeyId,
@@ -192,6 +206,11 @@ run_ec2_command <- function(command,
     on.exit(unlink(stderrFile))
 
     if (parse) {
+      if (verbose) {
+        cat(paste("Command:", command))
+        cat(paste("Params:", params))
+      }
+
       system(paste(command, params, ">", stdoutFile, "2>", stderrFile), input = input)
 
       retval$stdout <- readLines(stdoutFile)
@@ -200,7 +219,10 @@ run_ec2_command <- function(command,
       retval
     }
     else {
-      system(paste(command, params), input = input)
+      commandLine <- paste(command, params)
+      if (verbose) cat(paste("Executing:", commandLine))
+
+      system(commandLine, input = input)
     }
   }
   else {
