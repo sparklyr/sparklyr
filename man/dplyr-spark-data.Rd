@@ -3,6 +3,7 @@
 \name{dplyr-spark-data}
 \alias{dplyr-spark-data}
 \alias{load_csv}
+\alias{load_df}
 \alias{load_json}
 \alias{load_parquet}
 \alias{save_csv}
@@ -10,17 +11,23 @@
 \alias{save_parquet}
 \title{Loads a CSV file and provides a data source compatible with dplyr}
 \usage{
-load_csv(con, name, path, repartition = 0, memory = TRUE)
+load_csv(con, name, path, repartition = 0, memory = TRUE,
+  overwrite = TRUE)
 
 save_csv(x, path)
 
-load_parquet(con, name, path, repartition = 0, memory = TRUE)
+load_parquet(con, name, path, repartition = 0, memory = TRUE,
+  overwrite = TRUE)
 
 save_parquet(x, path)
 
-load_json(con, name, path, repartition = 0, memory = TRUE)
+load_json(con, name, path, repartition = 0, memory = TRUE,
+  overwrite = TRUE)
 
 save_json(x, path)
+
+load_df(con, name, value, memory = TRUE, repartition = 0,
+  overwrite = TRUE)
 }
 \arguments{
 \item{con}{Connection to dplyr source}
@@ -32,6 +39,8 @@ save_json(x, path)
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 
 \item{memory}{Loads data into memory}
+
+\item{overwrite}{Overwrite the table with the given name when it exists}
 
 \item{x}{A dplyr operation, for instance, `tbls(db, "flights")`}
 }
@@ -47,5 +56,7 @@ Saves dplyr operation result as a parquet file
 Loads a JSON file and provides a data source compatible with dplyr
 
 Saves dplyr operation result as a JSON file
+
+Loads a dataframe and provides a data source compatible with dplyr
 }
 
