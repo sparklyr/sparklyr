@@ -61,9 +61,9 @@ setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
   on_connection_opened(drv@scon, connectCall)
 
   # Apply sql connection level properties
-  configValues <- drv@scon$config$sql
-  lapply(names(configValues), function(configName) {
-    dbSetProperty(dbi, configName, as.character(configValues[[configName]]))
+  params <- spark_config_params(drv@scon$config, "spark.sql.")
+  lapply(names(params), function(paramName) {
+    dbSetProperty(dbi, paramName, as.character(params[[paramName]]))
   })
 
   # return dbi

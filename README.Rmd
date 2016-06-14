@@ -45,7 +45,7 @@ The rspark package implements a dplyr back-end for Spark. Connect to Spark using
 # connect to local spark instance and get a dplyr interface
 library(rspark)
 library(dplyr)
-sc <- spark_connect("local", cores = "auto", version = "1.6.1")
+sc <- spark_connect("local", version = "1.6.1")
 db <- src_spark(sc)
 ```
 
@@ -59,6 +59,10 @@ flights <- tbl(db, "flights")
 # copy the Batting table from the Lahman package to Spark
 copy_to(db, Lahman::Batting, "batting")
 batting <- tbl(db, "batting")
+
+# copy the iris table to Spark
+copy_to(db, iris, "iris")
+iris_tbl <- tbl(db, "iris")
 ```
 
 Then you can run dplyr against Spark:
@@ -100,6 +104,23 @@ batting %>%
 
 ```
 
+## ML Functions
+
+MLlib functions are also supported, see [ml samples](docs/ml_examples.md). For instasnce, k-means can be run as:
+
+```{r}
+model <- tbl(db, "iris") %>%
+  select(Petal_Width, Petal_Length) %>%
+  ml_kmeans(centers = 3)
+
+tbl(db, "iris") %>%
+  select(Petal_Width, Petal_Length) %>%
+  collect %>%
+  ggplot(aes(Petal_Length, Petal_Width)) +
+    geom_point(data = model$centers, aes(Petal_Width, Petal_Length), size = 60, alpha = 0.1) +
+    geom_point(aes(Petal_Width, Petal_Length), size = 2, alpha = 0.5)
+
+```
 
 ## EC2
 
@@ -183,4 +204,4 @@ spark_disconnect(sc)
 
 ## Additional Resources
 
-For performance runs under various parameters, read: [RSpark Performance](docs/perf_dplyr.md)
+For performance runs under various parameters, read: [RSpark Dplyr Performance](docs/perf_dplyr.md) and [RSpark 1B-Rows Performance](docs/perf_1b.md)

@@ -1,26 +1,37 @@
+#' Defines a configuration file based on the config package and built-in defaults
+#' @export
 #' @import yaml
-spark_config_build <- function(master, config = NULL) {
+#' @param file Name of the configuration file
+#' @param use_default TRUE to use the built-in detaults provided in this package
+spark_config <- function(file = "config.yml", use_default = TRUE) {
   baseConfig <- list()
 
-  if (spark_master_is_local(master)) {
+  if (use_default) {
     localConfigFile <- system.file(file.path("conf", "config-template.yml"), package = "rspark")
-
-    packageConfig <- yaml::yaml.load_file(localConfigFile)
-    baseConfig <- modifyList(packageConfig$default$rspark, packageConfig$local$rspark)
+    baseConfig <- config::get(file = localConfigFile)
   }
 
   userConfig <- list()
   tryCatch(function() {
-    userConfig <- config::get("rspark")
+    userConfig <- config::get(file = file)
   }, error = function(e) {
   })
 
   mergedConfig <- modifyList(baseConfig, userConfig)
-
-  # Give preference to config settings passed directly through spark_connect
-  if (!is.null(config)) {
-    mergedConfig <- modifyList(mergedConfig, config)
-  }
-
   mergedConfig
+}
+
+spark_config_params <- function(config, pattern) {
+  configNames <- Filter(function(e) substring(e, 1, nchar(pattern)) == pattern , names(config))
+
+  paramsNames <- lapply(configNames, function(configName) {
+    substr(configName, nchar(pattern) + 1, nchar(configName))
+  })
+
+  params <- lapply(configNames, function(configName) {
+    config[[configName]]
+  })
+
+  names(params) <- paramsNames
+  params
 }

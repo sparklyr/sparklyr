@@ -35,7 +35,7 @@ spark_connect <- function(master = "local",
                           version = NULL,
                           hadoop_version = NULL,
                           cores = "auto",
-                          config = NULL) {
+                          config = spark_config()) {
   sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name })
   if (length(sconFound) == 1) {
     return(sconFound[[1]])
@@ -63,7 +63,7 @@ spark_connect <- function(master = "local",
     isLocal = spark_master_is_local(master),
     reconnect = reconnect,
     installInfo = installInfo,
-    config = spark_config_build(master, config)
+    config = config
   )
   scon <- structure(scon, class = "spark_connection")
 
@@ -71,7 +71,7 @@ spark_connect <- function(master = "local",
     stop("Reconnect is not supported on local installs")
   }
 
-  sconInst <- start_shell(scon, list())
+  sconInst <- start_shell(scon, list(), jars)
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
@@ -327,9 +327,9 @@ spark_connection_create_context <- function(scon, master, appName, sparkHome) {
   conf <- spark_invoke(conf, "setMaster", master)
   conf <- spark_invoke(conf, "setSparkHome", sparkHome)
 
-  lapply(names(scon$config$context), function(contextName) {
-    contextValue <- scon$config$context[[contextName]]
-    conf <<- spark_invoke(conf, "set", contextName, contextValue)
+  params <- spark_config_params(scon$config, "spark.context.")
+  lapply(names(params), function(paramName) {
+    conf <<- spark_invoke(conf, "set", paramName, params[[paramName]])
   })
 
   spark_invoke_static_ctor(
