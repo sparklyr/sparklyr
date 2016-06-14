@@ -17,17 +17,18 @@ spark_ec2_cluster(access_key_id, secret_access_key, pem_file, version = NULL,
   hadoop_version = NULL, cluster_name = "spark",
   instance_type = "m3.medium", region = NULL)
 
-spark_ec2_deploy(cluster_info, instance_count = 1, copy_dir = NULL)
+spark_ec2_deploy(cluster_info, instance_count = 1, copy_dir = NULL,
+  verbose = FALSE)
 
-spark_ec2_start(cluster_info, instance_count = 1)
+spark_ec2_start(cluster_info, instance_count = 1, verbose = FALSE)
 
-spark_ec2_stop(cluster_info)
+spark_ec2_stop(cluster_info, verbose = FALSE)
 
-spark_ec2_destroy(cluster_info)
+spark_ec2_destroy(cluster_info, verbose = FALSE)
 
-spark_ec2_login(cluster_info)
+spark_ec2_login(cluster_info, verbose = FALSE)
 
-spark_ec2_master(cluster_info)
+spark_ec2_master(cluster_info, verbose = FALSE)
 
 spark_ec2_rstudio(cluster_info)
 
@@ -55,6 +56,8 @@ spark_ec2_web(cluster_info)
 \item{instance_count}{The total number of EC2 instances to be provisioned.}
 
 \item{copy_dir}{Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy}
+
+\item{verbose}{Logs verbose information while executing EC2 commands}
 }
 \description{
 This function will install and launch a new an EC2 cluster and download required client components.
