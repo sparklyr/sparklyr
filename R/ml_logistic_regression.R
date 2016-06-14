@@ -13,7 +13,7 @@ spark_ml_logistic_regression <- function(x, response, features, intercept = TRUE
   )
 
   fit <- lr %>%
-    spark_invoke("setMaxIter", 10L) %>%
+    spark_invoke("setMaxIter", 100L) %>%
     spark_invoke("setFeaturesCol", envir$features) %>%
     spark_invoke("setLabelCol", envir$response) %>%
     spark_invoke("setFitIntercept", as.logical(intercept)) %>%
