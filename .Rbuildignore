@@ -5,6 +5,7 @@
 ^examples/
 ^docs/
 ^internal/
+^man-roxygen/
 ^res/
 ^tools/
 ^derby\.log$

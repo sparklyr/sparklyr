@@ -59,19 +59,13 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
   )
 }
 
-#' Linear regression from a dplyr source
+#' Spark ML -- Linear Regression
 #'
-#' Fit a linear model using Spark LinearRegression
+#' Perform linear regression on a \code{spark_tbl}.
 #'
-#' See \url{https://spark.apache.org/docs/latest/ml-classification-regression.html}
-#' for more information on how linear regression is implemented in Spark.
+#' @template ml-regression
 #'
-#' @param x A dplyr source.
-#' @param response The prediction column
-#' @param features List of columns to use as features
-#' @param intercept TRUE to fit the intercept
-#' @param alpha The \emph{elastic net} mixing parameter.
-#' @param lambda The \emph{regularization penalty}.
+#' @family Spark ML routines
 #'
 #' @export
 ml_linear_regression <- function(x, response, features, intercept = TRUE,

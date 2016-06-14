@@ -2,21 +2,29 @@
 % Please edit documentation in R/ml_kmeans.R
 \name{ml_kmeans}
 \alias{ml_kmeans}
-\title{Computes kmeans from a dplyr source}
+\title{Spark ML -- K-Means Clustering}
 \usage{
 ml_kmeans(x, centers, iter.max = 10, features = dplyr::tbl_vars(x))
 }
 \arguments{
-\item{x}{A dplyr source.}
+\item{x}{A \code{spark_tbl}.}
 
-\item{centers}{Number of centers to compute.}
+\item{centers}{The number of cluster centers to compute.}
 
-\item{iter.max}{Maximum number of iterations used to compute kmeans.}
+\item{iter.max}{Maximum number of iterations allowed.}
 
 \item{features}{Which columns to use in the kmeans fit. Defaults to
 all columns within \code{x}.}
 }
 \description{
-Computes kmeans from a dplyr source
+Perform k-means clustering on a \code{spark_tbl}.
+}
+\seealso{
+For information on how Spark K-Means Clustering is implemented, please see
+  \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
+
+Other Spark ML routines: \code{\link{ml_linear_regression}},
+  \code{\link{ml_logistic_regression}},
+  \code{\link{ml_pca}}, \code{\link{ml_random_forest}}
 }
 

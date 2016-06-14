@@ -40,16 +40,21 @@ spark_ml_random_forest <- function(x, response, features,
   )
 }
 
-#' Random Forests with Spark ML
+#' Spark ML -- Random Forests
 #'
-#' @param x A dplyr source.
-#' @param response The response variable -- if the response is a factor or a logical
-#'   vector, then classification is performed (with the column treated as a label);
-#'   otherwise, regression is performed.
-#' @param features List of columns to use as features.
-#' @param max.bins Maximum number of bins.
-#' @param max.depth Maximum depth.
-#' @param num.trees Maximum number of trees.
+#' Perform regression or classification using random forests with a \code{spark_tbl}.
+#'
+#' @param x A \code{spark_tbl}.
+#' @param response The name of the response vector.
+#' @param features The names of features (terms) included in the model.
+#' @param max.bins The maximum number of bins used for discretizing
+#'   continuous features and for choosing how to split on features at
+#'   each node. More bins give higher granularity.
+#' @param max.depth Maximum depth of the tree (>= 0); that is, the maximum
+#'   number of nodes separating any leaves from the root of the tree.
+#' @param num.trees Number of trees to train (>= 1).
+#'
+#' @family Spark ML routines
 #'
 #' @export
 ml_random_forest <- function(x, response, features,

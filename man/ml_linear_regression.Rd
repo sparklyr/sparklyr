@@ -2,29 +2,42 @@
 % Please edit documentation in R/ml_linear_regression.R
 \name{ml_linear_regression}
 \alias{ml_linear_regression}
-\title{Linear regression from a dplyr source}
+\title{Spark ML -- Linear Regression}
 \usage{
 ml_linear_regression(x, response, features, intercept = TRUE, alpha = 0,
   lambda = 0)
 }
 \arguments{
-\item{x}{A dplyr source.}
+\item{x}{A \code{spark_tbl}.}
 
-\item{response}{The prediction column}
+\item{response}{The name of the response vector.}
 
-\item{features}{List of columns to use as features}
+\item{features}{The names of features (terms) to use as linear predictors
+for the response.}
 
-\item{intercept}{TRUE to fit the intercept}
+\item{intercept}{Fit the model with an intercept term?}
 
-\item{alpha}{The \emph{elastic net} mixing parameter.}
-
-\item{lambda}{The \emph{regularization penalty}.}
+\item{alpha, lambda}{Parameters controlling loss function penalization (for e.g.
+lasso, elastic net, and ridge regression). See \strong{Details} for more
+information.}
 }
 \description{
-Fit a linear model using Spark LinearRegression
+Perform linear regression on a \code{spark_tbl}.
 }
 \details{
-See \url{https://spark.apache.org/docs/latest/ml-classification-regression.html}
-for more information on how linear regression is implemented in Spark.
+Spark implements for both \eqn{L1} and \eqn{L2} regularization in linear
+regression models. See the preamble in the
+\href{http://spark.apache.org/docs/latest/ml-classification-regression.html}{Spark Classification and Regression}
+documentation for more details on how the loss function is parameterized.
+
+In particular, with \code{alpha} set to 1, the parameterization
+is equivalent to a \href{https://en.wikipedia.org/wiki/Lasso_(statistics)}{lasso}
+model; if \code{alpha} is set to 0, the parameterization is equivalent to
+a \href{https://en.wikipedia.org/wiki/Tikhonov_regularization}{ridge regression} model.
+}
+\seealso{
+Other Spark ML routines: \code{\link{ml_kmeans}},
+  \code{\link{ml_logistic_regression}},
+  \code{\link{ml_pca}}, \code{\link{ml_random_forest}}
 }
 

@@ -2,27 +2,34 @@
 % Please edit documentation in R/ml_random_forest.R
 \name{ml_random_forest}
 \alias{ml_random_forest}
-\title{Random Forests with Spark ML}
+\title{Spark ML -- Random Forests}
 \usage{
 ml_random_forest(x, response, features, max.bins = 32L, max.depth = 5L,
   num.trees = 20L)
 }
 \arguments{
-\item{x}{A dplyr source.}
+\item{x}{A \code{spark_tbl}.}
 
-\item{response}{The response variable -- if the response is a factor or a logical
-vector, then classification is performed (with the column treated as a label);
-otherwise, regression is performed.}
+\item{response}{The name of the response vector.}
 
-\item{features}{List of columns to use as features.}
+\item{features}{The names of features (terms) included in the model.}
 
-\item{max.bins}{Maximum number of bins.}
+\item{max.bins}{The maximum number of bins used for discretizing
+continuous features and for choosing how to split on features at
+each node. More bins give higher granularity.}
 
-\item{max.depth}{Maximum depth.}
+\item{max.depth}{Maximum depth of the tree (>= 0); that is, the maximum
+number of nodes separating any leaves from the root of the tree.}
 
-\item{num.trees}{Maximum number of trees.}
+\item{num.trees}{Number of trees to train (>= 1).}
 }
 \description{
-Random Forests with Spark ML
+Perform regression or classification using random forests with a \code{spark_tbl}.
+}
+\seealso{
+Other Spark ML routines: \code{\link{ml_kmeans}},
+  \code{\link{ml_linear_regression}},
+  \code{\link{ml_logistic_regression}},
+  \code{\link{ml_pca}}
 }
 

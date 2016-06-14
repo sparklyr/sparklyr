@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_pca.R
 \name{ml_pca}
 \alias{ml_pca}
-\title{Perform Principal Components Analaysis using spark.ml}
+\title{Spark ML -- Principal Components Analysis}
 \usage{
 ml_pca(x, features = dplyr::tbl_vars(x))
 }
@@ -13,6 +13,12 @@ ml_pca(x, features = dplyr::tbl_vars(x))
 analysis. Defaults to all columns in \code{x}.}
 }
 \description{
-Perform Principal Components Analaysis using spark.ml
+Perform principal components analysis on a \code{spark_tbl}.
+}
+\seealso{
+Other Spark ML routines: \code{\link{ml_kmeans}},
+  \code{\link{ml_linear_regression}},
+  \code{\link{ml_logistic_regression}},
+  \code{\link{ml_random_forest}}
 }
 

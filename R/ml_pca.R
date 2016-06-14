@@ -44,11 +44,16 @@ spark_ml_pca <- function(x, features = dplyr::tbl_vars(x))
   )
 }
 
-#' Perform Principal Components Analaysis using spark.ml
+#' Spark ML -- Principal Components Analysis
+#'
+#' Perform principal components analysis on a \code{spark_tbl}.
 #'
 #' @param x A \code{tbl_spark}.
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
+#'
+#' @family Spark ML routines
+#'
 #' @export
 ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
   spark_ml_pca(x, features)
