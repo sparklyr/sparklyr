@@ -5,6 +5,7 @@
 #' @param path The path to the CSV file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"
 #' @param memory Loads data into memory
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
+#' @param overwrite Overwrite the table with the given name when it exists
 NULL
 
 spark_partition_register_df <- function(con, df, api, name, repartition, memory) {
@@ -22,10 +23,18 @@ spark_partition_register_df <- function(con, df, api, name, repartition, memory)
   tbl(con, name)
 }
 
+spark_remove_table_if_exists <- function(con, name) {
+  if (name %in% src_tbls(con)) {
+    dbRemoveTable(con$con, name)
+  }
+}
+
 #' Loads a CSV file and provides a data source compatible with dplyr
 #' @rdname dplyr-spark-data
 #' @export
-load_csv <- function(con, name, path, repartition = 0, memory = TRUE) {
+load_csv <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  if (overwrite) spark_remove_table_if_exists(con, name)
+
   api <- spark_api(con)
   df <- spark_read_csv(api, path)
   spark_partition_register_df(con, df, api, name, repartition, memory)
@@ -60,7 +69,9 @@ save_csv <- function(x, path) {
 #' Loads a parquet file and provides a data source compatible with dplyr
 #' @rdname dplyr-spark-data
 #' @export
-load_parquet <- function(con, name, path, repartition = 0, memory = TRUE) {
+load_parquet <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  if (overwrite) spark_remove_table_if_exists(con, name)
+
   api <- spark_api(con)
   df <- spark_api_read_generic(api, list(path), "parquet")
   spark_partition_register_df(con, df, api, name, repartition, memory)
@@ -77,7 +88,9 @@ save_parquet <- function(x, path) {
 #' Loads a JSON file and provides a data source compatible with dplyr
 #' @rdname dplyr-spark-data
 #' @export
-load_json <- function(con, name, path, repartition = 0, memory = TRUE) {
+load_json <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  if (overwrite) spark_remove_table_if_exists(con, name)
+
   api <- spark_api(con)
   df <- spark_api_read_generic(api, path, "json")
   spark_partition_register_df(con, df, api, name, repartition, memory)
@@ -89,4 +102,21 @@ load_json <- function(con, name, path, repartition = 0, memory = TRUE) {
 save_json <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   spark_api_write_generic(sqlResult, path, "json")
+}
+
+#' Loads a dataframe and provides a data source compatible with dplyr
+#' @rdname dplyr-spark-data
+#' @export
+load_df <- function(con, name, value, memory = TRUE, repartition = 0, overwrite = TRUE) {
+  if (overwrite) spark_remove_table_if_exists(con, name)
+
+  dbWriteTable(con$con, name, value, TRUE, repartition)
+
+  if (memory) {
+    tbl_cache(con, name)
+  }
+
+  on_connection_updated(src_context(con), name)
+
+  tbl(con, name)
 }
