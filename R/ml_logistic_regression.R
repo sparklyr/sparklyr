@@ -74,7 +74,7 @@ print.ml_model_logistic_regression <- function(x, ...) {
 }
 
 #' @export
-residuals.ml_model_logistic_regression <- function(x, ...) {
+residuals.ml_model_logistic_regression <- function(object, ...) {
   stop("residuals not yet available for Spark logistic regression")
 }
 

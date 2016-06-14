@@ -13,14 +13,14 @@ ml_kmeans(x, centers, iter.max = 10, features = dplyr::tbl_vars(x))
 
 \item{iter.max}{Maximum number of iterations allowed.}
 
-\item{features}{Which columns to use in the kmeans fit. Defaults to
+\item{features}{Which columns to use in the k-means fit. Defaults to
 all columns within \code{x}.}
 }
 \description{
 Perform k-means clustering on a \code{spark_tbl}.
 }
 \seealso{
-For information on how Spark K-Means Clustering is implemented, please see
+For information on how Spark k-means clustering is implemented, please see
   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
 
 Other Spark ML routines: \code{\link{ml_linear_regression}},

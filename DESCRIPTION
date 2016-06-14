@@ -55,6 +55,7 @@ Collate:
 Imports:
     methods,
     dplyr,
+    readr,
     DBI,
     assertthat,
     rappdirs,

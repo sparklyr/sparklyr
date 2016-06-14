@@ -2,6 +2,9 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 ^README\.Rmd$
+^configure$
+^configure\.win$
+^configure\.R$
 ^examples/
 ^docs/
 ^internal/

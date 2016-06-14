@@ -44,7 +44,7 @@ try_null <- function(expr) {
 predict.ml_model <- function(object, newdata, ...) {
   sdf <- as_spark_dataframe(newdata)
   params <- object$model.parameters
-  assembled <- spark_dataframe_assemble_vector(sdf, features(object), params$features)
+  assembled <- spark_dataframe_assemble_vector(sdf, object$features, params$features)
   predicted <- spark_invoke(object$.model, "transform", assembled)
   column <- spark_dataframe_read_column(predicted, "prediction")
   if (is.character(params$labels) && is.numeric(column))
@@ -53,16 +53,16 @@ predict.ml_model <- function(object, newdata, ...) {
 }
 
 #' @export
-fitted.ml_model <- function(x, ...) {
-  x$.model %>%
+fitted.ml_model <- function(object, ...) {
+  object$.model %>%
     spark_invoke("summary") %>%
     spark_invoke("predictions") %>%
     spark_dataframe_read_column("prediction")
 }
 
 #' @export
-residuals.ml_model <- function(x, ...) {
-  x$.model %>%
+residuals.ml_model <- function(object, ...) {
+  object$.model %>%
     spark_invoke("summary") %>%
     spark_invoke("residuals") %>%
     spark_dataframe_read_column("residuals")

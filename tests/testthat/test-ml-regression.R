@@ -8,7 +8,7 @@ expect_coef_equal <- function(lhs, rhs) {
   expect_true(all.equal(lhs, rhs, tolerance = 0.01))
 }
 
-test_that("ml_lm and 'penalized' produce similar model fits", {
+test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   skip_on_cran()
   skip_if_not_installed("glmnet")
 
@@ -34,7 +34,7 @@ test_that("ml_lm and 'penalized' produce similar model fits", {
       lambda = lambda
     )
 
-    sFit <- ml_lm(
+    sFit <- ml_linear_regression(
       mtcars_tbl,
       "mpg",
       c("cyl", "disp"),

@@ -16,7 +16,7 @@ on_connection_opened <- function(scon, connectCall) {
       finder = function(env, host) {
         objs <- ls(env)
         for (name in objs) {
-          x <- get(name, envir = env)
+          x <- base::get(name, envir = env)
           if (inherits(x, "spark_connection") &&
               identical(x$master, host) &&
               rspark::spark_connection_is_open(x)) {
