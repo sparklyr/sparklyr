@@ -14,7 +14,9 @@ spark_versions <- function(latest = TRUE) {
   if (latest) {
     tryCatch({
       suppressWarnings(
-        downloadData <- read.csv(latestUrl, stringsAsFactors = FALSE)
+        downloadData <- read.csv(latestUrl,
+                                 colClasses = c(hadoop = "character"),
+                                 stringsAsFactors = FALSE)
       )
     }, error = function(e) {
     })
