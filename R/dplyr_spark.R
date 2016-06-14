@@ -142,7 +142,12 @@ sql_drop_table.src_spark <- function(con, name) {
 #' @param name Name of the destination table
 #' @param cache Cache table for improved performance
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
-copy_to.src_spark <- function(con, df, name, cache = TRUE, repartition = 0) {
+#' @param overwrite When TRUE, overwrites table with existing name
+copy_to.src_spark <- function(con, df, name, cache = TRUE, repartition = 0, overwrite = TRUE) {
+  if (overwrite && name %in% src_tbls(con)) {
+    db_drop_table(con$con, name)
+  }
+
   result <- dbWriteTable(con$con, name, df, TRUE, repartition)
 
   if (cache) {

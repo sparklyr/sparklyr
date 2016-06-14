@@ -109,11 +109,11 @@ batting %>%
 MLlib functions are also supported, see [ml samples](docs/ml_examples.md). For instasnce, k-means can be run as:
 
 ```{r}
-model <- tbl(db, "iris") %>%
+model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   ml_kmeans(centers = 3)
 
-tbl(db, "iris") %>%
+iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   collect %>%
   ggplot(aes(Petal_Length, Petal_Width)) +
