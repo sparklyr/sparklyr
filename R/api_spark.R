@@ -263,7 +263,7 @@ spark_api_copy_data <- function(api, df, name, repartition) {
     else
       typeof(e)
   })
-  df <- spark_read_csv(api, tempfile, columns)
+  df <- spark_api_read_csv(api, tempfile, columns)
 
   if (repartition > 0) {
     df <- spark_invoke(df, "repartition", as.integer(repartition))

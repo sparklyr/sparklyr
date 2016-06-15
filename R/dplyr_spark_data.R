@@ -39,7 +39,7 @@ load_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite =
   if (overwrite) spark_remove_table_if_exists(con, name)
 
   api <- spark_api(con)
-  df <- spark_read_csv(api, path)
+  df <- spark_api_read_csv(api, path)
   spark_partition_register_df(con, df, api, name, repartition, memory)
 }
 
