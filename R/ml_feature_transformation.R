@@ -1,8 +1,6 @@
-register_spark_tbl <- function(tbl, df) {
+register_spark_tbl <- function(tbl, df, name = random_string()) {
   if (!inherits(tbl, "tbl"))
     return(df)
-
-  name <- random_string("table-")
   spark_invoke(df, "registerTempTable", name)
   tbl(tbl$src, name)
 }
