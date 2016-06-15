@@ -4,14 +4,15 @@
 \alias{ml_apply_discrete_cosine_transform}
 \title{Feature Transformation -- Discrete Cosine Transform (DCT)}
 \usage{
-ml_apply_discrete_cosine_transform(df, input.col, output.col, inverse = FALSE)
+ml_apply_discrete_cosine_transform(tbl, input_col, output_col,
+  inverse = FALSE)
 }
 \arguments{
-\item{df}{A Spark Dataset.}
+\item{tbl}{An object coercable to a Spark DataFrame.}
 
-\item{input.col}{The name of the input column(s).}
+\item{input_col}{The name of the input column(s).}
 
-\item{output.col}{The name of the output column.}
+\item{output_col}{The name of the output column.}
 
 \item{inverse}{Perform inverse DCT?}
 }
