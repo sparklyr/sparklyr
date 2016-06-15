@@ -28,7 +28,11 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
       df <- ft_string_indexer(df, response, envir$response, envir)
     } else if (responseType != "DoubleType") {
       envir$response <- random_string("response")
-      df <- spark_dataframe_cast_column(df, response, envir$response, "DoubleType")
+      castedColumn <- df %>%
+        spark_invoke("col", response) %>%
+        spark_invoke("cast", "double")
+      df <- df %>%
+        spark_invoke("withColumn", envir$response, castedColumn)
     }
   }
 

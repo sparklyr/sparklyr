@@ -8,17 +8,6 @@ import org.apache.spark.sql._
 
 object utils {
 
-  def castColumnDouble(df: DataFrame, inputColName: String, outputColName: String): DataFrame = {
-    df.withColumn(outputColName, df.col(inputColName).cast(DataTypes.DoubleType))
-  }
-
-  def castColumn(df: DataFrame, inputColName: String, outputColName: String, outputType: String): DataFrame = {
-    outputType match {
-      case "DoubleType" => castColumnDouble(df, inputColName, outputColName)
-      case _ => throw new IllegalArgumentException(s"Casting to type '${outputType}' not yet implemented")
-    }
-  }
-
   def readColumnInt(rdd: RDD[Row]): Array[Int] = {
     rdd.map(row => row(0).asInstanceOf[Int]).collect()
   }

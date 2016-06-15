@@ -77,21 +77,6 @@ spark_dataframe_read_column <- function(object, colName) {
   column
 }
 
-spark_dataframe_cast_column <- function(df, input_col, output_col, output_type)
-{
-  spark_invoke_static(
-    spark_scon(df),
-
-    "utils",
-    "castColumn",
-
-    as_spark_dataframe(df),
-    input_col,
-    output_col,
-    output_type
-  )
-}
-
 #' Read a Spark Dataset into R.
 #' @param object An (object convertable to a) Spark DataFrame.
 #' @export
