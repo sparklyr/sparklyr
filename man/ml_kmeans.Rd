@@ -25,6 +25,7 @@ For information on how Spark k-means clustering is implemented, please see
 
 Other Spark ML routines: \code{\link{ml_linear_regression}},
   \code{\link{ml_logistic_regression}},
+  \code{\link{ml_multilayer_perceptron}},
   \code{\link{ml_pca}}, \code{\link{ml_random_forest}}
 }
 

@@ -30,6 +30,7 @@ Perform regression or classification using random forests with a \code{spark_tbl
 Other Spark ML routines: \code{\link{ml_kmeans}},
   \code{\link{ml_linear_regression}},
   \code{\link{ml_logistic_regression}},
+  \code{\link{ml_multilayer_perceptron}},
   \code{\link{ml_pca}}
 }
 

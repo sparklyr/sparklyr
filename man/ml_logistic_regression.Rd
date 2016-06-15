@@ -37,7 +37,8 @@ a \href{https://en.wikipedia.org/wiki/Tikhonov_regularization}{ridge regression}
 }
 \seealso{
 Other Spark ML routines: \code{\link{ml_kmeans}},
-  \code{\link{ml_linear_regression}}, \code{\link{ml_pca}},
-  \code{\link{ml_random_forest}}
+  \code{\link{ml_linear_regression}},
+  \code{\link{ml_multilayer_perceptron}},
+  \code{\link{ml_pca}}, \code{\link{ml_random_forest}}
 }
 
