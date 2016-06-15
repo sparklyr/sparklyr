@@ -1,7 +1,7 @@
 Package: rspark
 Type: Package
 Title: Provides an R Interface to Apache Spark
-Version: 0.1.14
+Version: 0.1.15
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
@@ -46,6 +46,7 @@ Collate:
     'ml_kmeans.R'
     'ml_linear_regression.R'
     'ml_logistic_regression.R'
+    'ml_multilayer_perceptron.R'
     'ml_pca.R'
     'ml_random_forest.R'
     'ml_utils.R'
@@ -67,5 +68,6 @@ Suggests:
     testthat,
     reshape2,
     RCurl,
+    yaml,
     glmnet,
-    yaml
+    neuralnet
