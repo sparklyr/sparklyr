@@ -36,10 +36,10 @@ ml_mutate_ <- function(.data, ..., .dots) {
     # construct a new call with the input variable injected
     # for evaluation
     preamble <- list(
-      lazy_expr[[1]],
-      data,
-      as.character(lazy_expr[[2]]),
-      as.character(names(dots)[[i]])
+      lazy_expr[[1]],                                        # function
+      data,                                                  # data
+      as.character(eval(lazy_expr[[2]], envir = lazy_env)),  # input column
+      as.character(names(dots)[[i]])                         # output column
     )
 
     call <- as.call(c(
