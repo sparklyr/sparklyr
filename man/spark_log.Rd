@@ -6,14 +6,14 @@
 \alias{spark_log_file}
 \title{Retrieves the last n entries in the Spark log}
 \usage{
-spark_log(scon, n = 100)
+spark_log(sc, n = 100)
 
-spark_log_file(scon)
+spark_log_file(sc)
 
 \method{print}{spark_log}(x, ...)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sc}{Spark connection provided by spark_connect}
 
 \item{n}{Max number of log entries to retrieve}
 

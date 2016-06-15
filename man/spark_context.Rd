@@ -4,10 +4,10 @@
 \alias{spark_context}
 \title{Retrieves the SparkContext reference from a Spark Connection}
 \usage{
-spark_context(scon)
+spark_context(sc)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sc}{Spark connection provided by spark_connect}
 }
 \description{
 Retrieves the SparkContext reference from a Spark Connection

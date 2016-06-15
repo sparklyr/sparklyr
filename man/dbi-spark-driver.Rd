@@ -7,7 +7,7 @@
 \alias{dbUnloadDriver,DBISparkDriver-method}
 \title{DBI Spark Driver}
 \usage{
-DBISpark(scon)
+DBISpark(sc)
 
 \S4method{dbUnloadDriver}{DBISparkDriver}(drv, ...)
 }
@@ -18,7 +18,7 @@ DBISparkDriver and methods.
 }
 \examples{
 \dontrun{
-scon <- spark_connect("local")
+sc <- spark_connect("local")
 spark::DBISpark(scon)
 }
 }

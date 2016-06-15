@@ -4,7 +4,7 @@
 \alias{spark_connection_is_open}
 \title{Checks to see if the connection into Spark is still open}
 \usage{
-spark_connection_is_open(scon)
+spark_connection_is_open(sc)
 }
 \arguments{
 \item{scon}{Spark connection}

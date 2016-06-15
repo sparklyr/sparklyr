@@ -3,11 +3,12 @@
 #' @import dplyr
 #' @import parallel
 #' @export
-#' @param scon Spark connection provided by spark_connection
-src_spark <- function(scon) {
-  if (missing(scon))
+#' @param sc Spark connection provided by spark_connection
+src_spark <- function(sc) {
+  if (missing(sc))
     stop("Need to specify an Spark connection created. See spark_connection.")
 
+  scon <- sc
   dbiCon <- dbConnect(DBISpark(scon))
   db <- src_sql("spark", dbiCon)
 
@@ -86,24 +87,25 @@ db_data_type.src_spark <- function(...) {
 
 #' Copies the source data frame into a Spark table
 #' @export
-#' @param con Connection to dplyr source
+#' @param sc Connection to dplyr source
 #' @param df Data frame to copy from
 #' @param name Name of the destination table
 #' @param cache Cache table into memory for improved performance
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite When TRUE, overwrites table with existing name
-copy_to.src_spark <- function(con, df, name, cache = TRUE, repartition = 0, overwrite = TRUE) {
-  result <- load_df(con, name, df, memory = cache, repartition = repartition, overwrite = overwrite)
+copy_to.src_spark <- function(sc, df, name, cache = TRUE, repartition = 0, overwrite = TRUE) {
+  result <- load_df(sc, name, df, memory = cache, repartition = repartition, overwrite = overwrite)
 
   invisible(result)
 }
 
 #' Loads a table into memory
 #' @export
-#' @param con Connection to dplyr source
+#' @param sc Connection to dplyr source
 #' @param name Name of the destination table
 #' @param force Forces data to be loaded in memory by executing a count(*) over the table
-tbl_cache <- function(con, name, force = TRUE) {
+tbl_cache <- function(sc, name, force = TRUE) {
+  con <- sc
   dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
 
   if (force) {
@@ -113,9 +115,10 @@ tbl_cache <- function(con, name, force = TRUE) {
 
 #' Unloads table from memory
 #' @export
-#' @param con Connection to dplyr source
+#' @param sc Connection to dplyr source
 #' @param name Name of the destination table
-tbl_uncache <- function(con, name) {
+tbl_uncache <- function(sc, name) {
+  con <- sc
   dbGetQuery(con$con, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = con$con)))
 }
 

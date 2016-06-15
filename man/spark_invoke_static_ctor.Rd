@@ -4,10 +4,10 @@
 \alias{spark_invoke_static_ctor}
 \title{Executes an static method on the given object}
 \usage{
-spark_invoke_static_ctor(scon, objName, ...)
+spark_invoke_static_ctor(sc, objName, ...)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sc}{Spark connection provided by spark_connect}
 
 \item{objName}{Fully-qualified name to static class}
 

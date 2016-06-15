@@ -5,11 +5,11 @@
 #' @rdname dbi-spark-driver
 #' @examples
 #' \dontrun{
-#' scon <- spark_connect("local")
+#' sc <- spark_connect("local")
 #' spark::DBISpark(scon)
 #' }
-DBISpark <- function(scon) {
-  new("DBISparkDriver", scon = scon)
+DBISpark <- function(sc) {
+  new("DBISparkDriver", scon = sc)
 }
 
 #' DBISparkDriver and methods.

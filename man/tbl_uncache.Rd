@@ -4,10 +4,10 @@
 \alias{tbl_uncache}
 \title{Unloads table from memory}
 \usage{
-tbl_uncache(con, name)
+tbl_uncache(sc, name)
 }
 \arguments{
-\item{con}{Connection to dplyr source}
+\item{sc}{Connection to dplyr source}
 
 \item{name}{Name of the destination table}
 }

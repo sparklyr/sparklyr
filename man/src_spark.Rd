@@ -4,10 +4,10 @@
 \alias{src_spark}
 \title{Connect to Spark for Dplyr.}
 \usage{
-src_spark(scon)
+src_spark(sc)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connection}
+\item{sc}{Spark connection provided by spark_connection}
 }
 \description{
 Connect to Spark for Dplyr.

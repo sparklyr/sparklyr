@@ -5,12 +5,12 @@
 \alias{spark_disconnect_all}
 \title{Disconnects from Spark and terminates the running application}
 \usage{
-spark_disconnect(scon)
+spark_disconnect(sc)
 
 spark_disconnect_all()
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sc}{Spark connection provided by spark_connect}
 }
 \description{
 Disconnects from Spark and terminates the running application

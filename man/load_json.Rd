@@ -4,11 +4,11 @@
 \alias{load_json}
 \title{Loads a JSON file and provides a data source compatible with dplyr}
 \usage{
-load_json(con, name, path, repartition = 0, memory = TRUE,
+load_json(sc, name, path, repartition = 0, memory = TRUE,
   overwrite = TRUE)
 }
 \arguments{
-\item{con}{Connection to dplyr source}
+\item{sc}{Connection to dplyr source}
 
 \item{name}{Name to reference the data source once it's loaded}
 

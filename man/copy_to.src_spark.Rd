@@ -4,11 +4,11 @@
 \alias{copy_to.src_spark}
 \title{Copies the source data frame into a Spark table}
 \usage{
-\method{copy_to}{src_spark}(con, df, name, cache = TRUE, repartition = 0,
+\method{copy_to}{src_spark}(sc, df, name, cache = TRUE, repartition = 0,
   overwrite = TRUE)
 }
 \arguments{
-\item{con}{Connection to dplyr source}
+\item{sc}{Connection to dplyr source}
 
 \item{df}{Data frame to copy from}
 

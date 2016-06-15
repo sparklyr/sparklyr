@@ -4,10 +4,10 @@
 \alias{spark_web}
 \title{Opens the Spark web interface}
 \usage{
-spark_web(scon)
+spark_web(sc)
 }
 \arguments{
-\item{scon}{Spark connection provided by spark_connect}
+\item{sc}{Spark connection provided by spark_connect}
 }
 \description{
 Opens the Spark web interface

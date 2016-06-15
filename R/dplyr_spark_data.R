@@ -26,7 +26,7 @@ spark_remove_table_if_exists <- function(con, name) {
 #' Loads a CSV file and provides a data source compatible with dplyr
 #'
 #'
-#' @param con Connection to dplyr source
+#' @param sc Connection to dplyr source
 #' @param name Name to reference the data source once it's loaded
 #' @param path The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"
 #' @param memory Loads data into memory
@@ -34,7 +34,8 @@ spark_remove_table_if_exists <- function(con, name) {
 #' @param overwrite Overwrite the table with the given name when it exists
 #'
 #' @export
-load_csv <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+load_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  con <- sc
   if (overwrite) spark_remove_table_if_exists(con, name)
 
   api <- spark_api(con)
@@ -80,7 +81,8 @@ save_csv <- function(x, path) {
 #' @inheritParams load_csv
 #'
 #' @export
-load_parquet <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+load_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  con <- sc
   if (overwrite) spark_remove_table_if_exists(con, name)
 
   api <- spark_api(con)
@@ -107,7 +109,8 @@ save_parquet <- function(x, path) {
 #' @inheritParams load_csv
 #'
 #' @export
-load_json <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+load_json <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  con <- sc
   if (overwrite) spark_remove_table_if_exists(con, name)
 
   api <- spark_api(con)
@@ -135,7 +138,8 @@ save_json <- function(x, path) {
 #' @param value R data frame to load into Spark
 #'
 #' @export
-load_df <- function(con, name, value, memory = TRUE, repartition = 0, overwrite = TRUE) {
+load_df <- function(sc, name, value, memory = TRUE, repartition = 0, overwrite = TRUE) {
+  con <- sc
   if (overwrite) spark_remove_table_if_exists(con, name)
 
   dbWriteTable(con$con, name, value, TRUE, repartition)

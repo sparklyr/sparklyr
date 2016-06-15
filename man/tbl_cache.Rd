@@ -4,10 +4,10 @@
 \alias{tbl_cache}
 \title{Loads a table into memory}
 \usage{
-tbl_cache(con, name, force = TRUE)
+tbl_cache(sc, name, force = TRUE)
 }
 \arguments{
-\item{con}{Connection to dplyr source}
+\item{sc}{Connection to dplyr source}
 
 \item{name}{Name of the destination table}
 

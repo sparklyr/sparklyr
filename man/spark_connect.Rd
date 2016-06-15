@@ -16,18 +16,9 @@ spark_connect(master = "local", app_name = "rspark", version = NULL,
 
 \item{hadoop_version}{Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.}
 
-\item{config}{A list containing configurations settings. This file overrides settings set on config.yml.}
+\item{config}{Configuration for connection (see \code{\link{spark_config} for details}).}
 }
 \description{
 Connects to Spark and establishes the Spark Context
-}
-\examples{
-\dontrun{
- sc <- spark_connect(config = list(
-   sql = list(
-     spark.sql.shuffle.partitions = 1
-   )
- ))
-}
 }
 

@@ -4,11 +4,10 @@
 \alias{load_df}
 \title{Loads a dataframe and provides a data source compatible with dplyr}
 \usage{
-load_df(con, name, value, memory = TRUE, repartition = 0,
-  overwrite = TRUE)
+load_df(sc, name, value, memory = TRUE, repartition = 0, overwrite = TRUE)
 }
 \arguments{
-\item{con}{Connection to dplyr source}
+\item{sc}{Connection to dplyr source}
 
 \item{name}{Name to reference the data source once it's loaded}
 
