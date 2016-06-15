@@ -1,6 +1,5 @@
 #' Defines a configuration file based on the config package and built-in defaults
 #' @export
-#' @import yaml
 #' @param file Name of the configuration file
 #' @param use_default TRUE to use the built-in detaults provided in this package
 spark_config <- function(file = "config.yml", use_default = TRUE) {

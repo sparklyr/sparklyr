@@ -68,6 +68,5 @@ Suggests:
     testthat,
     reshape2,
     RCurl,
-    yaml,
     glmnet,
     neuralnet
