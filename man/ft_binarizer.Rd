@@ -4,7 +4,7 @@
 \alias{ft_binarizer}
 \title{Feature Transformation -- Binarizer}
 \usage{
-ft_binarizer(x, input_col, output_col, threshold = 0.5)
+ft_binarizer(x, input_col = NULL, output_col = NULL, threshold = 0.5)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

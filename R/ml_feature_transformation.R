@@ -65,7 +65,9 @@ ml_mutate_ <- function(.data, ..., .dots) {
 #' @template ml-transformation
 #'
 #' @export
-ft_vector_assembler <- function(x, input_col, output_col)
+ft_vector_assembler <- function(x,
+                                input_col = NULL,
+                                output_col = NULL)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -98,8 +100,10 @@ ft_vector_assembler <- function(x, input_col, output_col)
 #'   key.
 #'
 #' @export
-ft_string_indexer <- function(x, input_col, output_col,
-                                    params = NULL)
+ft_string_indexer <- function(x,
+                              input_col = NULL,
+                              output_col = NULL,
+                              params = NULL)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -135,8 +139,10 @@ ft_string_indexer <- function(x, input_col, output_col,
 #' @param threshold The numeric threshold.
 #'
 #' @export
-ft_binarizer <- function(x, input_col, output_col,
-                               threshold = 0.5)
+ft_binarizer <- function(x,
+                         input_col = NULL,
+                         output_col = NULL,
+                         threshold = 0.5)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -165,8 +171,10 @@ ft_binarizer <- function(x, input_col, output_col,
 #' @param inverse Perform inverse DCT?
 #'
 #' @export
-ft_discrete_cosine_transform <- function(x, input_col, output_col,
-                                               inverse = FALSE)
+ft_discrete_cosine_transform <- function(x,
+                                         input_col = NULL,
+                                         output_col = NULL,
+                                         inverse = FALSE)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -194,7 +202,9 @@ ft_discrete_cosine_transform <- function(x, input_col, output_col,
 #' @template ml-transformation
 #'
 #' @export
-ft_index_to_string <- function(x, input_col, output_col)
+ft_index_to_string <- function(x,
+                               input_col = NULL,
+                               output_col = NULL)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -263,8 +273,10 @@ ft_index_to_string <- function(x, input_col, output_col)
 #'   boundaries.
 #'
 #' @export
-ft_bucketizer <- function(x, input_col, output_col,
-                                splits)
+ft_bucketizer <- function(x,
+                          input_col = NULL,
+                          output_col = NULL,
+                          splits)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -295,7 +307,10 @@ ft_bucketizer <- function(x, input_col, output_col,
 #' @param scaling_col The column used to scale \code{input_col}.
 #'
 #' @export
-ft_elementwise_product <- function(x, input_col, output_col, scaling_col)
+ft_elementwise_product <- function(x,
+                                   input_col = NULL,
+                                   output_col = NULL,
+                                   scaling_col)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -324,7 +339,10 @@ ft_elementwise_product <- function(x, input_col, output_col, scaling_col)
 #' @param sql A SQL statement.
 #'
 #' @export
-ft_sql_transformer <- function(x, input_col, output_col, sql)
+ft_sql_transformer <- function(x,
+                               input_col = NULL,
+                               output_col = NULL,
+                               sql)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -358,7 +376,10 @@ ft_sql_transformer <- function(x, input_col, output_col, sql)
 #' @param n_buckets The number of buckets to use.
 #'
 #' @export
-ft_quantile_discretizer <- function(x, input_col, output_col, n_buckets = 5)
+ft_quantile_discretizer <- function(x,
+                                    input_col = NULL,
+                                    output_col = NULL,
+                                    n_buckets = 5)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)

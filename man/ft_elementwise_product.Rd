@@ -4,7 +4,7 @@
 \alias{ft_elementwise_product}
 \title{Feature Transformation -- ElementwiseProduct}
 \usage{
-ft_elementwise_product(x, input_col, output_col, scaling_col)
+ft_elementwise_product(x, input_col = NULL, output_col = NULL, scaling_col)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

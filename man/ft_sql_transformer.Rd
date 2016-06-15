@@ -4,7 +4,7 @@
 \alias{ft_sql_transformer}
 \title{Feature Transformation -- SQLTransformer}
 \usage{
-ft_sql_transformer(x, input_col, output_col, sql)
+ft_sql_transformer(x, input_col = NULL, output_col = NULL, sql)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

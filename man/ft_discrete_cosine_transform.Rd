@@ -4,7 +4,8 @@
 \alias{ft_discrete_cosine_transform}
 \title{Feature Transformation -- Discrete Cosine Transform (DCT)}
 \usage{
-ft_discrete_cosine_transform(x, input_col, output_col, inverse = FALSE)
+ft_discrete_cosine_transform(x, input_col = NULL, output_col = NULL,
+  inverse = FALSE)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
