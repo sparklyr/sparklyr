@@ -19,26 +19,26 @@ object utils {
     }
   }
 
-  def readColumnInt(df: DataFrame, colName: String): Array[Int] = {
-    df.select(colName).rdd.map(row => row(0).asInstanceOf[Int]).collect()
+  def readColumnInt(rdd: RDD[Row]): Array[Int] = {
+    rdd.map(row => row(0).asInstanceOf[Int]).collect()
   }
 
-  def readColumnDouble(df: DataFrame, colName: String): Array[Double] = {
-    df.select(colName).rdd.map(row => row(0).asInstanceOf[Double]).collect()
+  def readColumnDouble(rdd: RDD[Row]): Array[Double] = {
+    rdd.map(row => row(0).asInstanceOf[Double]).collect()
   }
 
-  def readColumnBoolean(df: DataFrame, colName: String): Array[Boolean] = {
-    df.select(colName).rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
+  def readColumnBoolean(rdd: RDD[Row]): Array[Boolean] = {
+    rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
   }
 
-  def readColumnString(df: DataFrame, colName: String): String = {
-    val column = df.select(colName).rdd.map(row => row(0).asInstanceOf[String]).collect()
+  def readColumnString(rdd: RDD[Row]): String = {
+    val column = rdd.map(row => row(0).asInstanceOf[String]).collect()
     val escaped = column.map(string => StringEscapeUtils.escapeCsv(string))
     val joined = escaped.mkString("\n")
     return joined + "\n"
   }
 
-  def readColumnDefault(df: DataFrame, colName: String): Array[Any] = {
-    df.select(colName).rdd.map(row => row(0)).collect()
+  def readColumnDefault(rdd: RDD[Row]): Array[Any] = {
+    rdd.map(row => row(0)).collect()
   }
 }
