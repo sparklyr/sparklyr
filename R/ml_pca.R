@@ -25,17 +25,22 @@ spark_ml_pca <- function(x, features = dplyr::tbl_vars(x))
   # convert to matrix
   components <- matrix(values, nrow = nrow, ncol = ncol)
 
-  # get explained variance as vector
-  explainedVariance <- fit %>%
-    spark_invoke("explainedVariance") %>%
-    spark_invoke("toArray") %>%
-    as.numeric()
-
   # set names
   pcNames <- paste("PC", seq_len(ncol(components)), sep = "")
   rownames(components) <- features
   colnames(components) <- pcNames
-  names(explainedVariance) <- pcNames
+
+  # get explained variance as vector
+  # (NOTE: not available in Spark 1.6.1)
+  explainedVariance <- try_null({
+    fit %>%
+      spark_invoke("explainedVariance") %>%
+      spark_invoke("toArray") %>%
+      as.numeric()
+  })
+
+  if (!is.null(explainedVariance))
+    names(explainedVariance) <- pcNames
 
   ml_model("pca", fit,
     components = components,
