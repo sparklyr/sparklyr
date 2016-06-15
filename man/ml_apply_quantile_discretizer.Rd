@@ -4,10 +4,10 @@
 \alias{ml_apply_quantile_discretizer}
 \title{Feature Transformation -- QuantileDiscretizer}
 \usage{
-ml_apply_quantile_discretizer(tbl, input_col, output_col, n_buckets = 5)
+ml_apply_quantile_discretizer(x, input_col, output_col, n_buckets = 5)
 }
 \arguments{
-\item{tbl}{An object coercable to a Spark DataFrame.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{input_col}{The name of the input column(s).}
 

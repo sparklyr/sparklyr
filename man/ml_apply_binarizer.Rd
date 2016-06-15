@@ -4,10 +4,10 @@
 \alias{ml_apply_binarizer}
 \title{Feature Transformation -- Binarizer}
 \usage{
-ml_apply_binarizer(tbl, input_col, output_col, threshold = 0.5)
+ml_apply_binarizer(x, input_col, output_col, threshold = 0.5)
 }
 \arguments{
-\item{tbl}{An object coercable to a Spark DataFrame.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{input_col}{The name of the input column(s).}
 

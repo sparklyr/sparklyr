@@ -4,10 +4,10 @@
 \alias{ml_apply_string_indexer}
 \title{Feature Transformation -- StringIndexer}
 \usage{
-ml_apply_string_indexer(tbl, input_col, output_col, params = NULL)
+ml_apply_string_indexer(x, input_col, output_col, params = NULL)
 }
 \arguments{
-\item{tbl}{An object coercable to a Spark DataFrame.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{input_col}{The name of the input column(s).}
 

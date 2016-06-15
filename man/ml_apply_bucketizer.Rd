@@ -4,10 +4,10 @@
 \alias{ml_apply_bucketizer}
 \title{Feature Transformation -- Bucketizer}
 \usage{
-ml_apply_bucketizer(tbl, input_col, output_col, splits)
+ml_apply_bucketizer(x, input_col, output_col, splits)
 }
 \arguments{
-\item{tbl}{An object coercable to a Spark DataFrame.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{input_col}{The name of the input column(s).}
 

@@ -4,10 +4,10 @@
 \alias{ml_apply_vector_assembler}
 \title{Feature Transformation -- VectorAssembler}
 \usage{
-ml_apply_vector_assembler(tbl, input_col, output_col)
+ml_apply_vector_assembler(x, input_col, output_col)
 }
 \arguments{
-\item{tbl}{An object coercable to a Spark DataFrame.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{input_col}{The name of the input column(s).}
 

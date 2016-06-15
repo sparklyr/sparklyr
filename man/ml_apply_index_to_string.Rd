@@ -4,10 +4,10 @@
 \alias{ml_apply_index_to_string}
 \title{Feature Transformation -- IndexToString}
 \usage{
-ml_apply_index_to_string(tbl, input_col, output_col)
+ml_apply_index_to_string(x, input_col, output_col)
 }
 \arguments{
-\item{tbl}{An object coercable to a Spark DataFrame.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{input_col}{The name of the input column(s).}
 

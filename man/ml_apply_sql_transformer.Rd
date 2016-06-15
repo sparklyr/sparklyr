@@ -4,10 +4,10 @@
 \alias{ml_apply_sql_transformer}
 \title{Feature Transformation -- SQLTransformer}
 \usage{
-ml_apply_sql_transformer(tbl, input_col, output_col, sql)
+ml_apply_sql_transformer(x, input_col, output_col, sql)
 }
 \arguments{
-\item{tbl}{An object coercable to a Spark DataFrame.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{input_col}{The name of the input column(s).}
 

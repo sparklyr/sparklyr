@@ -4,10 +4,10 @@
 \alias{ml_apply_elementwise_product}
 \title{Feature Transformation -- ElementwiseProduct}
 \usage{
-ml_apply_elementwise_product(tbl, input_col, output_col, scaling_col)
+ml_apply_elementwise_product(x, input_col, output_col, scaling_col)
 }
 \arguments{
-\item{tbl}{An object coercable to a Spark DataFrame.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{input_col}{The name of the input column(s).}
 
