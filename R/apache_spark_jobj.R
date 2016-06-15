@@ -60,16 +60,6 @@ jobj <- function(objId) {
   obj
 }
 
-#' Print a JVM object reference.
-#'
-#' Prints information about a JVM object reference.
-#'
-#' The underyling object id is printed; in addition, if the
-#' associated connection is active; prints the class and
-#' string representation of the underlying object.
-#'
-#' @param x The JVM object reference
-#' @param ... further arguments passed to or from other methods
 #' @export
 print.jobj <- function(x, ...) {
   if (spark_connection_is_open(x$scon)) {

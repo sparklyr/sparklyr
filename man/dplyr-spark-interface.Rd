@@ -1,6 +1,6 @@
 
-\name{dplyr-spark-interface}
-\alias{dplyr-spark-interface}
+\name{dplyr-interface}
+\alias{dplyr-interface}
 
 \title{Connect to Spark for Dplyr.}
 

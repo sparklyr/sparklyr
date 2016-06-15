@@ -3,8 +3,7 @@ spark_versions_file_pattern <- function() {
 }
 
 #' Retrieves available versions of Spark
-#' @name spark_versions
-#' @param latest TRUE to use the latest download URLs, FALSE to use the package defaults which might be out of date.
+#' @rdname spark_install
 #' @export
 spark_versions <- function(latest = TRUE) {
   latestUrl <- "https://raw.githubusercontent.com/rstudio/rspark/master/inst/extdata/install_spark.csv?token=ASpg1NOA-Y-_Ir67ZLqzefBWo8URFxO5ks5XYZCAwA%3D%3D"
@@ -60,11 +59,7 @@ spark_versions <- function(latest = TRUE) {
   mergedData
 }
 
-#' Retrieves component information for the given Spark and Hadoop versions
-#' @name spark_versions_info
-#' @export
-#' @param version The Spark version.
-#' @param hadoop_version The Hadoop version.
+# Retrieves component information for the given Spark and Hadoop versions
 spark_versions_info <- function(version, hadoop_version) {
   versions <- spark_versions()
 

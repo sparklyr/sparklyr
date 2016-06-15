@@ -1,26 +1,18 @@
-#' Spark Transactions.
-#'
-#' \code{dbBegin}, \code{dbCommit} and \code{dbRollback}
-#' are currently not supported and are implementing as no-ops.
-#'
-#' @name spark-transactions
-#' @param conn DBI Spark connection
-NULL
 
 #' @export
-#' @rdname spark-transactions
+#' @rdname DBI-interface
 setMethod("dbBegin", "DBISparkConnection", function(conn) {
   TRUE
 })
 
 #' @export
-#' @rdname spark-transactions
+#' @rdname DBI-interface
 setMethod("dbCommit", "DBISparkConnection", function(conn) {
   TRUE
 })
 
 #' @export
-#' @rdname spark-transactions
+#' @rdname DBI-interface
 setMethod("dbRollback", "DBISparkConnection", function(conn) {
   TRUE
 })

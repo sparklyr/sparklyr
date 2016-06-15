@@ -1,4 +1,4 @@
-#' DBI Spark Table
+#' DBI interface for Spark
 #'
 #' @param conn a \code{\linkS4class{DBISparkConnection}} object, produced by
 #'   \code{\link[DBI]{dbConnect}}
@@ -23,11 +23,11 @@
 #'
 #' dbDisconnect(con)
 #' }
-#' @name dbi-spark-table
+#' @name DBI-interface
 NULL
 
 #' @export
-#' @rdname dbi-spark-table
+#' @rdname DBI-interface
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 setMethod("dbWriteTable", "DBISparkConnection",
   function(conn, name, value, temporary = TRUE, repartition = 0) {
@@ -47,7 +47,7 @@ setMethod("dbWriteTable", "DBISparkConnection",
 )
 
 #' @export
-#' @rdname dbi-spark-table
+#' @rdname DBI-interface
 setMethod("dbReadTable", c("DBISparkConnection", "character"),
   function(conn, name) {
     name <- dbQuoteIdentifier(conn, name)
@@ -56,20 +56,20 @@ setMethod("dbReadTable", c("DBISparkConnection", "character"),
 )
 
 #' @export
-#' @rdname dbi-spark-table
+#' @rdname DBI-interface
 setMethod("dbListTables", "DBISparkConnection", function(conn) {
   df <- spark_api_sql_tables(conn@api)
   df$tableName
 })
 
 #' @export
-#' @rdname dbi-spark-table
+#' @rdname DBI-interface
 setMethod("dbExistsTable", c("DBISparkConnection", "character"), function(conn, name) {
   name %in% dbListTables(conn)
 })
 
 #' @export
-#' @rdname dbi-spark-table
+#' @rdname DBI-interface
 setMethod("dbRemoveTable", c("DBISparkConnection", "character"),
   function(conn, name) {
     spark_drop_temp_table(conn@api, name)
@@ -79,7 +79,7 @@ setMethod("dbRemoveTable", c("DBISparkConnection", "character"),
 )
 
 #' @export
-#' @rdname dbi-spark-table
+#' @rdname DBI-interface
 #' @param .data Data and operations references
 #' @param ... Additional parameters
 #' @param .dots Original parameters

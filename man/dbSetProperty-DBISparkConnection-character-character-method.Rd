@@ -9,13 +9,10 @@
   value)
 }
 \arguments{
-\item{conn}{DBI Spark connection}
-
 \item{property}{The name of the property, for instance, "spark.sql.shuffle.partitions"}
-
-\item{value}{The value to set the property to.}
 }
 \description{
 Sets a property for the connection
 }
+\keyword{internal}
 

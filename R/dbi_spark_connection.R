@@ -120,16 +120,13 @@ setMethod("dbQuoteIdentifier", c("DBISparkConnection", "character"), function(co
 })
 
 #' Sets a property for the connection
-#' @param conn DBI Spark connection
-#' @param property The name of the property, for instance, "spark.sql.shuffle.partitions"
-#' @param value The value to set the property to.
+#' @keywords internal
 setGeneric("dbSetProperty", function(conn, property, value) standardGeneric("dbSetProperty"));
 
 #' Sets a property for the connection
 #' @export
-#' @param conn DBI Spark connection
+#' @keywords internal
 #' @param property The name of the property, for instance, "spark.sql.shuffle.partitions"
-#' @param value The value to set the property to.
 setMethod("dbSetProperty", c("DBISparkConnection", "character", "character"), function(conn, property, value) {
   dbGetQuery(
     conn,

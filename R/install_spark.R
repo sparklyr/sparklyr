@@ -13,8 +13,7 @@ spark_install_dir <- function() {
   sparkDir
 }
 
-#' Check if Spark can be installed in this system
-#' @name spark_can_install
+# Check if Spark can be installed in this system
 spark_can_install <- function() {
   sparkDir <- spark_install_dir()
   if (dir.exists(sparkDir))
@@ -23,10 +22,7 @@ spark_can_install <- function() {
     TRUE
 }
 
-#' Check if the given Spark version is available in this system
-#' @name spark_install_available
-#' @param version Version of Spark to install. See spark_versions.
-#' @param hadoop_version Version of Spark to install. See spark_versions_hadoop.
+# Check if the given Spark version is available in this system
 spark_install_available <- function(version, hadoop_version) {
   installInfo <- spark_versions_info(version, hadoop_version)
   dir.exists(installInfo$sparkVersionDir)
@@ -75,7 +71,6 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 
 #' Provides support to download and install the given Spark version
 #' @name spark_install
-#' @export
 #' @import rappdirs
 #' @import config
 #' @param version Version of Spark to install. See spark_versions for a list of supported versions
@@ -83,6 +78,10 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
 #' @param verbose Report information as Spark is downloaded / installed?
+#' @param path Path to TAR file conforming to the pattern spark-###-bin-hadoop### where ###
+#' reference spark and hadoop versions respectevely.
+#' @param latest TRUE to use the latest download URLs, FALSE to use the package defaults which might be out of date.
+#' @export
 spark_install <- function(version = NULL,
                           hadoop_version = NULL,
                           reset = FALSE,
@@ -154,10 +153,8 @@ spark_install <- function(version = NULL,
 }
 
 #' Provides support to install a version of Spark from a given TAR file
-#' @name spark_install_tar
+#' @rdname spark_install
 #' @export
-#' @param path Path to TAR file conforming to the pattern spark-###-bin-hadoop### where ###
-#' reference spark and hadoop versionsrespectevely.
 spark_install_tar <- function(path) {
   if (!file.exists(path)) {
     stop(paste0("The file \"", path, "\", does not exist."))

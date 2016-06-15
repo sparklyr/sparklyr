@@ -1,6 +1,7 @@
-sd_section("Connections",
-           "Functions for managing connections to Spark clusters.",
-           c("spark_connect",
+sd_section("Connecting to Spark",
+           "Functions for installing Spark components and managing connections to Spark.",
+           c("spark_install",
+             "spark_connect",
              "spark_disconnect",
              "spark_config",
              "spark_log",
@@ -20,11 +21,16 @@ sd_section("Reading and Writing DataFrames",
 
 sd_section("Manipulating DataFrames",
            "Functions for manipulating Spark DataFrames",
-           c("dplyr-spark-interface",
+           c("dplyr-interface",
+             "src_spark",
+             "copy_to.src_spark",
+             "tbl_cache",
+             "tbl_uncache",
+             "as_spark_dataframe",
              "spark_dataframe_collect",
              "spark_dataframe_split",
              "partition",
-             "as_spark_dataframe")
+             "DBI-interface")
 )
 
 sd_section("MLlib Interface",
@@ -52,34 +58,7 @@ sd_section("Spark API",
            c("spark_context",
              "spark_invoke",
              "spark_invoke_static",
-             "spark_invoke_static_ctor",
-             "print.jobj")
-)
-
-sd_section("dplyr Interface",
-           "Implementation of dplyr S3 methods for Spark",
-           c("src_spark",
-             "copy_to.src_spark",
-             "tbl_cache",
-             "tbl_uncache")
-)
-
-sd_section("DBI Interface",
-           "Implentation of DBI S3 methods for Spark",
-          c("dbi-spark-table",
-            "dbSetProperty",
-            "dbSetProperty,DBISparkConnection,character,character-method",
-            "spark-transactions")
-)
-
-sd_section("Installation",
-           "Functions for managing the installation of Spark components",
-           c("spark_install",
-             "spark_install_tar",
-             "spark_install_available",
-             "spark_can_install",
-             "spark_versions",
-             "spark_versions_info")
+             "spark_invoke_static_ctor")
 )
 
 sd_section("EC2",
