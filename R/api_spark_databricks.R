@@ -23,7 +23,7 @@ spark_api_read_csv_types <- function(api, columns) {
   spark_invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
 }
 
-spark_save_csv <- function(df, path) {
+spark_api_write_csv <- function(df, path) {
   write <- spark_invoke(df, "write")
   format <- spark_invoke("read", "format", "com.databricks.spark.csv")
   optionHeader <- spark_invoke(format, "option", "header", "true")

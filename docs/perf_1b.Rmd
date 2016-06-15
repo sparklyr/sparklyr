@@ -83,7 +83,7 @@ sparkTest <- function(test, loadIntoDf = TRUE) {
       spark_invoke("count")
   } else {
     invisible(
-      load_parquet(db, "billion", parquetPath, repartition = parallel::detectCores())
+      spark_read_parquet(db, "billion", parquetPath, repartition = parallel::detectCores())
     )
   }
   

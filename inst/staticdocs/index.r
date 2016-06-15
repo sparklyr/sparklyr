@@ -10,13 +10,12 @@ sd_section("Connecting to Spark",
 
 sd_section("Reading and Writing Data",
            "Functions for reading and writing Spark DataFrames",
-           c("load_df",
-             "load_csv",
-             "load_json",
-             "load_parquet",
-             "save_csv",
-             "save_json",
-             "save_parquet")
+           c("spark_read_csv",
+             "spark_read_json",
+             "spark_read_parquet",
+             "spark_write_csv",
+             "spark_write_json",
+             "spark_write_parquet")
 )
 
 sd_section("Manipulating Data",
@@ -27,6 +26,7 @@ sd_section("Manipulating Data",
              "tbl_cache",
              "tbl_uncache",
              "as_spark_dataframe",
+             "load_df",
              "spark_dataframe_collect",
              "spark_dataframe_split",
              "partition",
