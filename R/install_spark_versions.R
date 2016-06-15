@@ -14,9 +14,9 @@ spark_versions <- function(latest = TRUE) {
   if (latest) {
     tryCatch({
       suppressWarnings(
-        downloadData <- read.csv(latestUrl,
-                                 colClasses = c(hadoop = "character"),
-                                 stringsAsFactors = FALSE)
+        downloadData <- utils::read.csv(latestUrl,
+                                        colClasses = c(hadoop = "character"),
+                                        stringsAsFactors = FALSE)
       )
     }, error = function(e) {
     })
@@ -24,9 +24,9 @@ spark_versions <- function(latest = TRUE) {
 
   if (is.null(downloadData) || is.null(downloadData$spark)) {
     # warning("Failed to retrieve the latest download links")
-    downloadData <- read.csv(packagePath,
-                             colClasses = c(hadoop = "character"),
-                             stringsAsFactors = FALSE)
+    downloadData <- utils::read.csv(packagePath,
+                                    colClasses = c(hadoop = "character"),
+                                    stringsAsFactors = FALSE)
   }
 
 

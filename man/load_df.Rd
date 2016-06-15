@@ -12,6 +12,8 @@ load_df(con, name, value, memory = TRUE, repartition = 0,
 
 \item{name}{Name to reference the data source once it's loaded}
 
+\item{value}{R data frame to load into Spark}
+
 \item{memory}{Loads data into memory}
 
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}

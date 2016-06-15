@@ -364,7 +364,10 @@ spark_connection_local_cores <- function(scon) {
   scon$config[["sparklyr.cores"]]
 }
 
-# Checks to see if the connection into Spark is still open
+#' Checks to see if the connection into Spark is still open
+#' @param scon Spark connection
+#' @keywords internal
+#' @export
 spark_connection_is_open <- function(scon) {
   sconInst <- spark_connection_get_inst(scon)
 

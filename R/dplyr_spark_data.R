@@ -132,6 +132,7 @@ save_json <- function(x, path) {
 #' Loads a dataframe and provides a data source compatible with dplyr
 #'
 #' @inheritParams load_csv
+#' @param value R data frame to load into Spark
 #'
 #' @export
 load_df <- function(con, name, value, memory = TRUE, repartition = 0, overwrite = TRUE) {
