@@ -80,6 +80,7 @@ spark_dataframe_read_column <- function(object, colName) {
 spark_dataframe_cast_column <- function(df, input_col, output_col, output_type)
 {
   spark_invoke_static(
+    spark_scon(df),
 
     "utils",
     "castColumn",
