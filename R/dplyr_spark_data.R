@@ -1,12 +1,4 @@
-#' @name dplyr-spark-data
-#' @param con Connection to dplyr source
-#' @param name Name to reference the data source once it's loaded
-#' @param x A dplyr operation, for instance, `tbls(db, "flights")`
-#' @param path The path to the CSV file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"
-#' @param memory Loads data into memory
-#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
-#' @param overwrite Overwrite the table with the given name when it exists
-NULL
+
 
 spark_partition_register_df <- function(con, df, api, name, repartition, memory) {
   if (repartition > 0) {
@@ -30,7 +22,17 @@ spark_remove_table_if_exists <- function(con, name) {
 }
 
 #' Loads a CSV file and provides a data source compatible with dplyr
-#' @rdname dplyr-spark-data
+#'
+#' Loads a CSV file and provides a data source compatible with dplyr
+#'
+#'
+#' @param con Connection to dplyr source
+#' @param name Name to reference the data source once it's loaded
+#' @param path The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"
+#' @param memory Loads data into memory
+#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
+#' @param overwrite Overwrite the table with the given name when it exists
+#'
 #' @export
 load_csv <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
   if (overwrite) spark_remove_table_if_exists(con, name)
@@ -59,7 +61,12 @@ spark_sqlresult_from_dplyr <- function(x) {
 }
 
 #' Saves a dplyr operation result as a CSV file
-#' @rdname dplyr-spark-data
+#'
+#' Saves a dplyr operation result as a CSV file
+#'
+#' @inheritParams load_csv
+#' @param x A dplyr operation, for instance, `tbls(db, "flights")`
+#'
 #' @export
 save_csv <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
@@ -67,7 +74,11 @@ save_csv <- function(x, path) {
 }
 
 #' Loads a parquet file and provides a data source compatible with dplyr
-#' @rdname dplyr-spark-data
+#'
+#' Loads a parquet file and provides a data source compatible with dplyr
+#'
+#' @inheritParams load_csv
+#'
 #' @export
 load_parquet <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
   if (overwrite) spark_remove_table_if_exists(con, name)
@@ -78,7 +89,11 @@ load_parquet <- function(con, name, path, repartition = 0, memory = TRUE, overwr
 }
 
 #' Saves dplyr operation result as a parquet file
-#' @rdname dplyr-spark-data
+#'
+#' Saves dplyr operation result as a parquet file
+#'
+#' @inheritParams save_csv
+#'
 #' @export
 save_parquet <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
@@ -86,7 +101,11 @@ save_parquet <- function(x, path) {
 }
 
 #' Loads a JSON file and provides a data source compatible with dplyr
-#' @rdname dplyr-spark-data
+#'
+#' Loads a JSON file and provides a data source compatible with dplyr
+#'
+#' @inheritParams load_csv
+#'
 #' @export
 load_json <- function(con, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
   if (overwrite) spark_remove_table_if_exists(con, name)
@@ -97,7 +116,11 @@ load_json <- function(con, name, path, repartition = 0, memory = TRUE, overwrite
 }
 
 #' Saves dplyr operation result as a JSON file
-#' @rdname dplyr-spark-data
+#'
+#' Saves dplyr operation result as a JSON file
+#'
+#' @inheritParams save_csv
+#'
 #' @export
 save_json <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
@@ -105,7 +128,11 @@ save_json <- function(x, path) {
 }
 
 #' Loads a dataframe and provides a data source compatible with dplyr
-#' @rdname dplyr-spark-data
+#'
+#' Loads a dataframe and provides a data source compatible with dplyr
+#'
+#' @inheritParams load_csv
+#'
 #' @export
 load_df <- function(con, name, value, memory = TRUE, repartition = 0, overwrite = TRUE) {
   if (overwrite) spark_remove_table_if_exists(con, name)
