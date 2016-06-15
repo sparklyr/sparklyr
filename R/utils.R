@@ -57,6 +57,6 @@ transpose_list <- function(list) {
   do.call(Map, c(c, list, USE.NAMES = FALSE))
 }
 
-random_string <- function(prefix = "table-") {
+random_string <- function(prefix = "table") {
   basename(tempfile(prefix))
 }

@@ -16,7 +16,7 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
   schema <- spark_dataframe_schema(df)
 
   # default report for feature, response variable names
-  envir$features <- random_string("features-")
+  envir$features <- random_string("features")
   envir$response <- response
   envir$labels <- NULL
 
@@ -24,10 +24,10 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
   if (!is.null(response)) {
     responseType <- schema[[response]]$type
     if (responseType == "StringType") {
-      envir$response <- random_string("response-")
+      envir$response <- random_string("response")
       df <- ft_string_indexer(df, response, envir$response, envir)
     } else if (responseType != "DoubleType") {
-      envir$response <- random_string("response-")
+      envir$response <- random_string("response")
       df <- spark_dataframe_cast_column(df, response, envir$response, "DoubleType")
     }
   }
