@@ -1,11 +1,16 @@
 sd_section("Connecting to Spark",
     "Functions for installing Spark components and connecting to Spark clusters.",
-    c("install_spark",
-      "spark_connect")
+    c("spark_connect",
+      "spark_disconnect",
+      "spark_log",
+      "spark_web")
 )
 
-sd_section("Reading and Writing Data",
-    "Functions for reading and writing Spark data frames",
-    c("load_csv",
-      "load_json")
+sd_section("MLlib Interface",
+    "Functions for invoking MLlib algorithms",
+    c("ml_kmeans",
+      "ml_linear_regression",
+      "ml_logistic_regression",
+      "ml_random_forest",
+      "ml_pca")
 )
