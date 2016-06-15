@@ -4,14 +4,14 @@
 \alias{ml_apply_bucketizer}
 \title{Feature Transformation -- Bucketizer}
 \usage{
-ml_apply_bucketizer(df, input.col, output.col, splits)
+ml_apply_bucketizer(x, input_col, output_col, splits)
 }
 \arguments{
-\item{df}{A Spark Dataset.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input.col}{The name of the input column(s).}
+\item{input_col}{The name of the input column(s).}
 
-\item{output.col}{The name of the output column.}
+\item{output_col}{The name of the output column.}
 
 \item{splits}{A numeric vector of cutpoints, indicating the bucket
 boundaries.}

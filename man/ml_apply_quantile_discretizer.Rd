@@ -4,16 +4,16 @@
 \alias{ml_apply_quantile_discretizer}
 \title{Feature Transformation -- QuantileDiscretizer}
 \usage{
-ml_apply_quantile_discretizer(df, input.col, output.col, n.buckets = 5)
+ml_apply_quantile_discretizer(x, input_col, output_col, n_buckets = 5)
 }
 \arguments{
-\item{df}{A Spark Dataset.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input.col}{The name of the input column(s).}
+\item{input_col}{The name of the input column(s).}
 
-\item{output.col}{The name of the output column.}
+\item{output_col}{The name of the output column.}
 
-\item{n.buckets}{The number of buckets to use.}
+\item{n_buckets}{The number of buckets to use.}
 }
 \description{
 Takes a column with continuous features and outputs a column with binned

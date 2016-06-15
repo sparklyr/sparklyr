@@ -8,10 +8,9 @@
 #' @template ml-transformation
 #'
 #' @export
-ml_apply_vector_assembler <- function(df, input.col, output.col)
+ml_apply_vector_assembler <- function(x, input_col, output_col)
 {
-  stopifnot(is.character(input.col))
-
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
   assembler <- spark_invoke_static_ctor(
@@ -20,8 +19,8 @@ ml_apply_vector_assembler <- function(df, input.col, output.col)
   )
 
   assembler %>%
-    spark_invoke("setInputCols", as.list(input.col)) %>%
-    spark_invoke("setOutputCol", output.col) %>%
+    spark_invoke("setInputCols", as.list(input_col)) %>%
+    spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("transform", df)
 }
 
@@ -40,20 +39,20 @@ ml_apply_vector_assembler <- function(df, input.col, output.col)
 #'   key.
 #'
 #' @export
-ml_apply_string_indexer <- function(df, input.col, output.col,
+ml_apply_string_indexer <- function(x, input_col, output_col,
                                     params = NULL)
 {
-  stopifnot(is.character(input.col))
-
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
+
   indexer <- spark_invoke_static_ctor(
     scon,
     "org.apache.spark.ml.feature.StringIndexer"
   )
 
   sim <- indexer %>%
-    spark_invoke("setInputCol", input.col) %>%
-    spark_invoke("setOutputCol", output.col) %>%
+    spark_invoke("setInputCol", input_col) %>%
+    spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("fit", df)
 
   # Report labels to caller if requested -- these map
@@ -76,9 +75,10 @@ ml_apply_string_indexer <- function(df, input.col, output.col,
 #' @param threshold The numeric threshold.
 #'
 #' @export
-ml_apply_binarizer <- function(df, input.col, output.col,
+ml_apply_binarizer <- function(x, input_col, output_col,
                                threshold = 0.5)
 {
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
   binarizer <- spark_invoke_static_ctor(
@@ -87,8 +87,8 @@ ml_apply_binarizer <- function(df, input.col, output.col,
   )
 
   binarizer %>%
-    spark_invoke("setInputCol", input.col) %>%
-    spark_invoke("setOutputCol", output.col) %>%
+    spark_invoke("setInputCol", input_col) %>%
+    spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("setThreshold", as.double(threshold)) %>%
     spark_invoke("transform", df)
 }
@@ -103,9 +103,10 @@ ml_apply_binarizer <- function(df, input.col, output.col,
 #' @param inverse Perform inverse DCT?
 #'
 #' @export
-ml_apply_discrete_cosine_transform <- function(df, input.col, output.col,
+ml_apply_discrete_cosine_transform <- function(x, input_col, output_col,
                                                inverse = FALSE)
 {
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
   dct <- spark_invoke_static_ctor(
@@ -114,8 +115,8 @@ ml_apply_discrete_cosine_transform <- function(df, input.col, output.col,
   )
 
   dct %>%
-    spark_invoke("setInputCol", input.col) %>%
-    spark_invoke("setOutputCol", output.col) %>%
+    spark_invoke("setInputCol", input_col) %>%
+    spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("setInverse", as.logical(inverse)) %>%
     spark_invoke("transform", df)
 }
@@ -129,8 +130,9 @@ ml_apply_discrete_cosine_transform <- function(df, input.col, output.col,
 #' @template ml-transformation
 #'
 #' @export
-ml_apply_index_to_string <- function(df, input.col, output.col)
+ml_apply_index_to_string <- function(x, input_col, output_col)
 {
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
   converter <- spark_invoke_static_ctor(
@@ -139,15 +141,15 @@ ml_apply_index_to_string <- function(df, input.col, output.col)
   )
 
   converter %>%
-    spark_invoke("setInputCol", input.col) %>%
-    spark_invoke("setOutputCol", output.col) %>%
+    spark_invoke("setInputCol", input_col) %>%
+    spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("transform", df)
 }
 
 ## TODO: These routines with so-called 'row vector' features by
 ## default, but it would be much nicer to implement routines to
 ## scale whole columns instead.
-# ml_apply_standard_scaler <- function(df, input.col, output.col,
+# ml_apply_standard_scaler <- function(df, input_col, output_col,
 #                                      with.mean, with.std)
 # {
 #   scon <- spark_scon(df)
@@ -158,14 +160,14 @@ ml_apply_index_to_string <- function(df, input.col, output.col)
 #   )
 #
 #   scaler %>%
-#     spark_invoke("setInputCol", input.col) %>%
-#     spark_invoke("setOutputCol", output.col) %>%
+#     spark_invoke("setInputCol", input_col) %>%
+#     spark_invoke("setOutputCol", output_col) %>%
 #     spark_invoke("setWithMean", as.logical(with.mean)) %>%
 #     spark_invoke("setWithStd", as.logical(with.std)) %>%
 #     spark_invoke("transform", df)
 # }
 #
-# ml_apply_min_max_scaler <- function(df, input.col, output.col,
+# ml_apply_min_max_scaler <- function(df, input_col, output_col,
 #                                     min = 0, max = 1)
 # {
 #   scon <- spark_scon(df)
@@ -176,8 +178,8 @@ ml_apply_index_to_string <- function(df, input.col, output.col)
 #   )
 #
 #   scaler %>%
-#     spark_invoke("setInputCol", input.col) %>%
-#     spark_invoke("setOutputCol", output.col) %>%
+#     spark_invoke("setInputCol", input_col) %>%
+#     spark_invoke("setOutputCol", output_col) %>%
 #     spark_invoke("setMin", as.numeric(min)) %>%
 #     spark_invoke("setMax", as.numeric(max)) %>%
 #     spark_invoke("transform", df)
@@ -195,11 +197,10 @@ ml_apply_index_to_string <- function(df, input.col, output.col)
 #'   boundaries.
 #'
 #' @export
-ml_apply_bucketizer <- function(df, input.col, output.col,
+ml_apply_bucketizer <- function(x, input_col, output_col,
                                 splits)
 {
-  stopifnot(is.numeric(splits))
-
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
   bucketizer <- spark_invoke_static_ctor(
@@ -208,8 +209,8 @@ ml_apply_bucketizer <- function(df, input.col, output.col,
   )
 
   bucketizer %>%
-    spark_invoke("setInputCol", input.col) %>%
-    spark_invoke("setOutputCol", output.col) %>%
+    spark_invoke("setInputCol", input_col) %>%
+    spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("setSplits", as.list(splits)) %>%
     spark_invoke("transform", df)
 }
@@ -223,11 +224,12 @@ ml_apply_bucketizer <- function(df, input.col, output.col,
 #'
 #' @template ml-transformation
 #'
-#' @param scaling.col The column used to scale \code{input.col}.
+#' @param scaling_col The column used to scale \code{input_col}.
 #'
 #' @export
-ml_apply_elementwise_product <- function(df, input.col, output.col, scaling.col)
+ml_apply_elementwise_product <- function(x, input_col, output_col, scaling_col)
 {
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
   transformer <- spark_invoke_static_ctor(
@@ -236,9 +238,9 @@ ml_apply_elementwise_product <- function(df, input.col, output.col, scaling.col)
   )
 
   transformer %>%
-    spark_invoke("setInputCol", input.col) %>%
-    spark_invoke("setOutputCol", output.col) %>%
-    spark_invoke("setScalingVec", scaling.col) %>%
+    spark_invoke("setInputCol", input_col) %>%
+    spark_invoke("setOutputCol", output_col) %>%
+    spark_invoke("setScalingVec", scaling_col) %>%
     spark_invoke("transform", df)
 }
 
@@ -252,8 +254,9 @@ ml_apply_elementwise_product <- function(df, input.col, output.col, scaling.col)
 #' @param sql A SQL statement.
 #'
 #' @export
-ml_apply_sql_transformer <- function(df, input.col, output.col, sql)
+ml_apply_sql_transformer <- function(x, input_col, output_col, sql)
 {
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
   transformer <- spark_invoke_static_ctor(
@@ -280,12 +283,13 @@ ml_apply_sql_transformer <- function(df, input.col, output.col, sql)
 #'
 #' @template ml-transformation
 #'
-#' @param n.buckets The number of buckets to use.
+#' @param n_buckets The number of buckets to use.
 #'
 #' @export
-ml_apply_quantile_discretizer <- function(df, input.col, output.col,
-                                          n.buckets = 5)
+ml_apply_quantile_discretizer <- function(x, input_col, output_col,
+                                          n_buckets = 5)
 {
+  df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
   discretizer <- spark_invoke_static_ctor(
@@ -294,9 +298,9 @@ ml_apply_quantile_discretizer <- function(df, input.col, output.col,
   )
 
   discretizer %>%
-    spark_invoke("setInputCol", input.col) %>%
-    spark_invoke("setOutputCol", output.col) %>%
-    spark_invoke("setNumBuckets", as.numeric(n.buckets)) %>%
+    spark_invoke("setInputCol", input_col) %>%
+    spark_invoke("setOutputCol", output_col) %>%
+    spark_invoke("setNumBuckets", as.numeric(n_buckets)) %>%
     spark_invoke("fit", df) %>%
     spark_invoke("transform", df)
 }

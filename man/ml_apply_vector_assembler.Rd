@@ -4,14 +4,14 @@
 \alias{ml_apply_vector_assembler}
 \title{Feature Transformation -- VectorAssembler}
 \usage{
-ml_apply_vector_assembler(df, input.col, output.col)
+ml_apply_vector_assembler(x, input_col, output_col)
 }
 \arguments{
-\item{df}{A Spark Dataset.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input.col}{The name of the input column(s).}
+\item{input_col}{The name of the input column(s).}
 
-\item{output.col}{The name of the output column.}
+\item{output_col}{The name of the output column.}
 }
 \description{
 Combine multiple vectors into a single row-vector; that is,

@@ -4,14 +4,14 @@
 \alias{ml_apply_index_to_string}
 \title{Feature Transformation -- IndexToString}
 \usage{
-ml_apply_index_to_string(df, input.col, output.col)
+ml_apply_index_to_string(x, input_col, output_col)
 }
 \arguments{
-\item{df}{A Spark Dataset.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input.col}{The name of the input column(s).}
+\item{input_col}{The name of the input column(s).}
 
-\item{output.col}{The name of the output column.}
+\item{output_col}{The name of the output column.}
 }
 \description{
 Symmetrically to \code{\link{ml_apply_string_indexer}},

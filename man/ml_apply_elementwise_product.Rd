@@ -4,16 +4,16 @@
 \alias{ml_apply_elementwise_product}
 \title{Feature Transformation -- ElementwiseProduct}
 \usage{
-ml_apply_elementwise_product(df, input.col, output.col, scaling.col)
+ml_apply_elementwise_product(x, input_col, output_col, scaling_col)
 }
 \arguments{
-\item{df}{A Spark Dataset.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input.col}{The name of the input column(s).}
+\item{input_col}{The name of the input column(s).}
 
-\item{output.col}{The name of the output column.}
+\item{output_col}{The name of the output column.}
 
-\item{scaling.col}{The column used to scale \code{input.col}.}
+\item{scaling_col}{The column used to scale \code{input_col}.}
 }
 \description{
 Computes the element-wise product between two columns. Generally, this is

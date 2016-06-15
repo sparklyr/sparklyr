@@ -4,14 +4,14 @@
 \alias{ml_apply_binarizer}
 \title{Feature Transformation -- Binarizer}
 \usage{
-ml_apply_binarizer(df, input.col, output.col, threshold = 0.5)
+ml_apply_binarizer(x, input_col, output_col, threshold = 0.5)
 }
 \arguments{
-\item{df}{A Spark Dataset.}
+\item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input.col}{The name of the input column(s).}
+\item{input_col}{The name of the input column(s).}
 
-\item{output.col}{The name of the output column.}
+\item{output_col}{The name of the output column.}
 
 \item{threshold}{The numeric threshold.}
 }
