@@ -8,7 +8,7 @@ sd_section("Connecting to Spark",
              "spark_web")
 )
 
-sd_section("Reading and Writing DataFrames",
+sd_section("Reading and Writing Data",
            "Functions for reading and writing Spark DataFrames",
            c("load_df",
              "load_csv",
@@ -19,7 +19,7 @@ sd_section("Reading and Writing DataFrames",
              "save_parquet")
 )
 
-sd_section("Manipulating DataFrames",
+sd_section("Manipulating Data",
            "Functions for manipulating Spark DataFrames",
            c("dplyr-interface",
              "src_spark",
