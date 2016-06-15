@@ -340,26 +340,17 @@ spark_context <- function(scon) {
   sconInst$sc
 }
 
-#' Retrieves master from a Spark Connection
-#' @name spark_context_master
-#' @export
-#' @param scon Spark connection provided by spark_connect
+# Retrieves master from a Spark Connection
 spark_connection_master <- function(scon) {
   scon$master
 }
 
-#' Retrieves the application name from a Spark Connection
-#' @name spark_connection_app_name
-#' @export
-#' @param scon Spark connection provided by spark_connect
+# Retrieves the application name from a Spark Connection
 spark_connection_app_name <- function(scon) {
   scon$appName
 }
 
-#' TRUE if the Spark Connection is a local install
-#' @name spark_connection_is_local
-#' @export
-#' @param scon Spark connection provided by spark_connect
+# TRUE if the Spark Connection is a local install
 spark_connection_is_local <- function(scon) {
   scon$isLocal
 }
@@ -368,18 +359,12 @@ spark_master_is_local <- function(master) {
   grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
 }
 
-#' Number of cores available in the local install
-#' @name spark_connection_local_cores
-#' @export
-#' @param scon Spark connection provided by spark_connect
+# Number of cores available in the local install
 spark_connection_local_cores <- function(scon) {
   scon$config[["sparklyr.cores"]]
 }
 
-#' Checks to see if the connection into Spark is still open
-#' @name spark_connection_is_open
-#' @export
-#' @param scon Spark connection provided by spark_connect
+# Checks to see if the connection into Spark is still open
 spark_connection_is_open <- function(scon) {
   sconInst <- spark_connection_get_inst(scon)
 

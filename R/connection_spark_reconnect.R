@@ -72,9 +72,7 @@ spark_connection_remove_inst <- function(scon) {
   sconInst
 }
 
-#' Provides an extension mechanism to allow package builders to support spark_connect(reconnect = TRUE)
-#' @param scon Spark connection provided by spark_connect
-#' @param onReconnect A function with signature onReconnect(scon, sconInst) that returns an updated sconInst
+# Provides an extension mechanism to allow package builders to support spark_connect(reconnect = TRUE)
 spark_connection_on_reconnect <- function(scon, onReconnect) {
   sconInst <- spark_connection_get_inst(scon)
   sconInst$onReconnect[[length(sconInst$onReconnect) + 1]] <- onReconnect
