@@ -1,19 +1,15 @@
+#' Create a Spark cluster on EC2
+#'
 #' @param access_key_id EC2 access key id. Create a new access key from https://console.aws.amazon.com/iam/home?#security_credential
 #' @param secret_access_key EC2 secret access key.
 #' @param pem_file Identity file for ssh connections.
-#' @param instance_count The total number of EC2 instances to be provisioned.
 #' @param version The Spark version to use.
 #' @param hadoop_version The Hadoop version to use.
 #' @param cluster_name Name used to identify cluster.
 #' @param instance_type Type of EC2 instance. Tested with "m3.medium" and "c3.4xlarge".
 #' @param region The EC2 region to host this cluster.
-#' @param cluster_info A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.
-#' @param copy_dir Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy
-#' @param verbose Logs verbose information while executing EC2 commands
-#' @name ec2-spark
-NULL
-
-#' @rdname ec2-spark
+#'
+#'
 #' @export
 spark_ec2_cluster <- function(
   access_key_id,
@@ -47,7 +43,11 @@ spark_ec2_cluster <- function(
 #' This function will install and launch a new an EC2 cluster and download required client components.
 #' Returns a cluster information list to enable further commands.
 #'
-#' @rdname ec2-spark
+#' @param instance_count The total number of EC2 instances to be provisioned.
+#' @param cluster_info A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.
+#' @param copy_dir Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy
+#' @param verbose Logs verbose information while executing EC2 commands
+#'
 #' @export
 spark_ec2_deploy <- function(
   cluster_info,
@@ -90,7 +90,9 @@ spark_ec2_deploy <- function(
 }
 
 #' Starts a previously stopped Spark instance in EC2
-#' @rdname ec2-spark
+#'
+#' @inheritParams spark_ec2_deploy
+#'
 #' @export
 spark_ec2_start <- function(
   cluster_info,
@@ -105,7 +107,9 @@ spark_ec2_start <- function(
 }
 
 #' Stops a running Spark instance in EC2
-#' @rdname ec2-spark
+#'
+#' @inheritParams spark_ec2_deploy
+#'
 #' @export
 spark_ec2_stop <- function(
   cluster_info,
@@ -120,7 +124,9 @@ spark_ec2_stop <- function(
 }
 
 #' Deletes an Spark instance in EC2
-#' @rdname ec2-spark
+#'
+#' @inheritParams spark_ec2_deploy
+#'
 #' @export
 spark_ec2_destroy <- function(
   cluster_info,
@@ -135,7 +141,9 @@ spark_ec2_destroy <- function(
 }
 
 #' Logins into Spark in EC2
-#' @rdname ec2-spark
+#'
+#' @inheritParams spark_ec2_deploy
+#'
 #' @export
 spark_ec2_login <- function(
   cluster_info,
@@ -152,7 +160,9 @@ spark_ec2_login <- function(
 }
 
 #' Retrieves master location from EC2
-#' @rdname ec2-spark
+#'
+#' @inheritParams spark_ec2_deploy
+#'
 #' @export
 spark_ec2_master <- function(
   cluster_info,
@@ -229,7 +239,9 @@ run_ec2_command <- function(command,
 }
 
 #' Opens RStudio in EC2
-#' @rdname ec2-spark
+#'
+#' @inheritParams spark_ec2_deploy
+#'
 #' @export
 spark_ec2_rstudio <- function(
   cluster_info) {
@@ -238,7 +250,9 @@ spark_ec2_rstudio <- function(
 }
 
 #' Opens the Spark web interface in EC2
-#' @rdname ec2-spark
+#'
+#' @inheritParams spark_ec2_deploy
+#'
 #' @export
 spark_ec2_web <- function(
   cluster_info) {

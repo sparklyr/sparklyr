@@ -8,8 +8,8 @@ sd_section("Connections",
              "spark_web")
 )
 
-sd_section("Reading and Writing Data",
-           "Functions for reading and writing data within Spark clusters.",
+sd_section("Reading and Writing DataFrames",
+           "Functions for reading and writing Spark DataFrames",
            c("load_df",
              "load_csv",
              "load_json",
@@ -17,6 +17,15 @@ sd_section("Reading and Writing Data",
              "save_csv",
              "save_json",
              "save_parquet")
+)
+
+sd_section("Manipulating DataFrames",
+           "Functions for manipulating Spark DataFrames",
+           c("spark_sql",
+             "dplyr-spark-interface",
+             "spark_dataframe_collect",
+             "spark_dataframe_split",
+             "partition")
 )
 
 sd_section("MLlib Interface",
@@ -48,7 +57,7 @@ sd_section("Spark API",
 )
 
 sd_section("dplyr Interface",
-           "Implementation of dplyr S3 interface for Spark",
+           "Implementation of dplyr S3 methods for Spark",
            c("src_spark",
              "src_context",
              "tbl_cache",
@@ -63,7 +72,17 @@ sd_section("dplyr Interface",
              "sql_create_table.src_spark",
              "sql_insert_into.src_spark",
              "sql_rollback.src_spark",
-             "db_data_type.src_spark")
+             "db_data_type.src_spark",
+             "dplyr-spark-table",
+             "as_spark_dataframe")
+)
+
+sd_section("DBI Interface",
+           "Implentation of DBI S3 methods for Spark",
+          c("dbi-spark-table",
+            "dbSetProperty",
+            "dbSetProperty,DBISparkConnection,character,character-method",
+            "spark-transactions")
 )
 
 sd_section("Installation",
@@ -76,4 +95,16 @@ sd_section("Installation",
              "spark_versions_info")
 )
 
+sd_section("EC2",
+           "Functions for creating and managing Spark EC2 clusters",
+           c("spark_ec2_cluster",
+             "spark_ec2_deploy",
+             "spark_ec2_start",
+             "spark_ec2_stop",
+             "spark_ec2_master",
+             "spark_ec2_login",
+             "spark_ec2_web",
+             "spark_ec2_rstudio",
+             "spark_ec2_destroy")
+)
 
