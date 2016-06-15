@@ -57,24 +57,27 @@ spark_ec2_deploy <- function(
 
   commandParams <- ""
   if (!is.null(cluster_info$region)) {
-    commandParams <- paste(commandParams,
+    commandParams <- paste0(commandParams,
                            paste("--region", cluster_info$region, sep = "="))
   }
 
   if (!is.null(cluster_info$instanceType)) {
     commandParams <- paste(commandParams,
-                           paste("--instance-type", cluster_info$instanceType, sep = "="))
+                           paste("--instance-type", cluster_info$instanceType, sep = "="),
+                           sep = if (nchar(commandParams) > 0) " " else "")
   }
 
   commandParams <- paste(commandParams,
                          "--copy-aws-credentials",
                          "-s",
-                         instance_count)
+                         instance_count,
+                         sep = if (nchar(commandParams) > 0) " " else "")
 
   if (!identical(copy_dir, NULL)) {
     commandParams <- paste(commandParams,
                            "--deploy-root-dir",
-                           copy_dir)
+                           copy_dir,
+                           sep = if (nchar(commandParams) > 0) " " else "")
   }
 
   command <- run_ec2_command(command = paste("launch", cluster_info$clusterName),
@@ -206,7 +209,7 @@ run_ec2_command <- function(command,
 
     if (parse) {
       if (verbose) {
-        cat(paste("Command:", command))
+        cat(paste("Command:", sparkEC2))
         cat(paste("Params:", params))
       }
 
@@ -214,8 +217,6 @@ run_ec2_command <- function(command,
 
       retval$stdout <- readLines(stdoutFile)
       retval$stderr <- readLines(stderrFile)
-
-      retval
     }
     else {
       if (verbose) cat(paste("Executing:", command))
@@ -223,9 +224,8 @@ run_ec2_command <- function(command,
       system(command, input = input)
     }
   }
-  else {
-    retval
-  }
+
+  retval
 }
 
 #' Opens RStudio in EC2

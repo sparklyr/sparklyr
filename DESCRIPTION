@@ -61,10 +61,11 @@ Imports:
     assertthat,
     rappdirs,
     lazyeval,
-    config,
-    yaml
+    config
 Remotes: hadley/dplyr
 Suggests:
     testthat,
     reshape2,
-    RCurl
+    RCurl,
+    glmnet,
+    yaml
