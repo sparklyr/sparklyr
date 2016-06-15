@@ -47,7 +47,7 @@ if (!file.exists(dir))
     stop("Failed to create '", dir, "'")
 owd <- setwd(dir)
 
-spark_version <- "2.0.0-preview"
+spark_version <- "1.6.1"
 hadoop_version <- "2.6"
 
 # Get potential installation paths
@@ -60,11 +60,21 @@ install_info <- tryCatch(
 )
 
 # list jars in the installation folder
-jars <- list.files(
-  file.path(install_info$sparkVersionDir, "jars"),
-  full.names = TRUE,
-  pattern = "jar$"
-)
+candidates <- c("jars", "lib")
+jars <- NULL
+for (candidate in candidates) {
+  jars <- list.files(
+    file.path(install_info$sparkVersionDir, candidate),
+    full.names = TRUE,
+    pattern = "jar$"
+  )
+
+  if (length(jars))
+    break
+}
+
+if (!length(jars))
+  stop("failed to discover Spark jars")
 
 # construct classpath
 CLASSPATH <- paste(jars, collapse = .Platform$path.sep)
