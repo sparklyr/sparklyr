@@ -91,48 +91,8 @@ tbl.src_spark <- function(src, from, ...) {
   tbl_sql("spark", src = src, from = from, ...)
 }
 
-#' This operation is currently not supported in Spark
 #' @export
-#' @param ... Additional parameters
 db_data_type.src_spark <- function(...) {
-}
-
-#' This operation is currently not supported in Spark
-#' @export
-#' @param ... Additional parameters
-sql_begin.src_spark <- function(...) {
-}
-
-#' This operation is currently not supported in Spark
-#' @export
-#' @param ... Additional parameters
-sql_commit.src_spark <- function(...) {
-}
-
-#' This operation is currently not supported in Spark
-#' @export
-#' @param ... Additional parameters
-sql_rollback.src_spark <- function(...) {
-}
-
-#' This operation is currently not supported in Spark
-#' @export
-#' @param ... Additional parameters
-sql_create_table.src_spark <- function(...) {
-}
-
-#' This operation is currently not supported in Spark
-#' @export
-#' @param ... Additional parameters
-sql_insert_into.src_spark <- function(...) {
-}
-
-#' Removes a Spark table
-#' @export
-#' @param con Connection to dplyr source
-#' @param name Name of the table to remove
-sql_drop_table.src_spark <- function(con, name) {
-  dbRemoveTable(con, name)
 }
 
 #' Copies the source data frame into a Spark table
@@ -170,22 +130,7 @@ tbl_uncache <- function(con, name) {
   dbGetQuery(con$con, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = con$con)))
 }
 
-#' This operation is currently not supported in Spark
 #' @export
-#' @param ... Additional parameters
-sql_create_index.src_spark <- function(...) {
-}
-
-#' This operation is currently not supported in Spark
-#' @export
-#' @param ... Additional parameters
-sql_analyze.src_spark <- function(...) {
-}
-
-#' Prints information associated to the dplyr source
-#' @export
-#' @param x Reference to dplyr source
-#' @param ... Additional parameters
 print.src_spark <- function(x, ...) {
   cat(src_desc(x))
   cat("\n\n")

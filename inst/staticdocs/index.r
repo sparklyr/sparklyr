@@ -25,7 +25,8 @@ sd_section("Manipulating DataFrames",
              "dplyr-spark-interface",
              "spark_dataframe_collect",
              "spark_dataframe_split",
-             "partition")
+             "partition",
+             "as_spark_dataframe")
 )
 
 sd_section("MLlib Interface",
@@ -59,22 +60,10 @@ sd_section("Spark API",
 sd_section("dplyr Interface",
            "Implementation of dplyr S3 methods for Spark",
            c("src_spark",
+             "copy_to.src_spark",
              "src_context",
              "tbl_cache",
-             "tbl_uncache",
-             "print.src_spark",
-             "copy_to.src_spark",
-             "sql_drop_table.src_spark",
-             "sql_analyze.src_spark",
-             "sql_begin.src_spark",
-             "sql_commit.src_spark",
-             "sql_create_index.src_spark",
-             "sql_create_table.src_spark",
-             "sql_insert_into.src_spark",
-             "sql_rollback.src_spark",
-             "db_data_type.src_spark",
-             "dplyr-spark-table",
-             "as_spark_dataframe")
+             "tbl_uncache")
 )
 
 sd_section("DBI Interface",
