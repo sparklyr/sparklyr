@@ -269,10 +269,10 @@ spark_api_copy_data <- function(api, df, name, repartition) {
     df <- spark_invoke(df, "repartition", as.integer(repartition))
   }
 
-  spark_register_temp_table(api, df, name)
+  spark_register_temp_table(df, name)
 }
 
-spark_register_temp_table <- function(api, table, name) {
+spark_register_temp_table <- function(table, name) {
   spark_invoke(table, "registerTempTable", name)
 }
 

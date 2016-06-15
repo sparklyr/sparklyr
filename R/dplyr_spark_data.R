@@ -5,7 +5,7 @@ spark_partition_register_df <- function(con, df, api, name, repartition, memory)
     df <- spark_invoke(df, "repartition", as.integer(repartition))
   }
 
-  spark_register_temp_table(api, df, name)
+  spark_register_temp_table(df, name)
 
   if (memory) {
     dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
