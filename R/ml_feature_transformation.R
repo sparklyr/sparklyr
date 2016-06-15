@@ -1,3 +1,12 @@
+register_spark_tbl <- function(tbl, df) {
+  if (!inherits(tbl, "tbl"))
+    return(df)
+
+  name <- random_string("table-")
+  spark_invoke(df, "registerTempTable", name)
+  tbl(tbl$src, name)
+}
+
 #' Feature Transformation -- VectorAssembler
 #'
 #' Combine multiple vectors into a single row-vector; that is,
@@ -18,10 +27,12 @@ ml_apply_vector_assembler <- function(x, input_col, output_col)
     "org.apache.spark.ml.feature.VectorAssembler"
   )
 
-  assembler %>%
+  transformed <- assembler %>%
     spark_invoke("setInputCols", as.list(input_col)) %>%
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("transform", df)
+
+  register_spark_tbl(x, transformed)
 }
 
 #' Feature Transformation -- StringIndexer
@@ -61,7 +72,8 @@ ml_apply_string_indexer <- function(x, input_col, output_col,
   if (is.environment(params))
     params$labels <- as.character(spark_invoke(sim, "labels"))
 
-  spark_invoke(sim, "transform", df)
+  transformed <- spark_invoke(sim, "transform", df)
+  register_spark_tbl(x, transformed)
 }
 
 #' Feature Transformation -- Binarizer
@@ -86,11 +98,13 @@ ml_apply_binarizer <- function(x, input_col, output_col,
     "org.apache.spark.ml.feature.Binarizer"
   )
 
-  binarizer %>%
+  transformed <- binarizer %>%
     spark_invoke("setInputCol", input_col) %>%
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("setThreshold", as.double(threshold)) %>%
     spark_invoke("transform", df)
+
+  register_spark_tbl(x, transformed)
 }
 
 #' Feature Transformation -- Discrete Cosine Transform (DCT)
@@ -114,11 +128,13 @@ ml_apply_discrete_cosine_transform <- function(x, input_col, output_col,
     "org.apache.spark.ml.feature.DCT"
   )
 
-  dct %>%
+  transformed <- dct %>%
     spark_invoke("setInputCol", input_col) %>%
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("setInverse", as.logical(inverse)) %>%
     spark_invoke("transform", df)
+
+  register_spark_tbl(x, transformed)
 }
 
 #' Feature Transformation -- IndexToString
@@ -140,10 +156,12 @@ ml_apply_index_to_string <- function(x, input_col, output_col)
     "org.apache.spark.ml.feature.IndexToString"
   )
 
-  converter %>%
+  transformed <- converter %>%
     spark_invoke("setInputCol", input_col) %>%
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("transform", df)
+
+  register_spark_tbl(x, transformed)
 }
 
 ## TODO: These routines with so-called 'row vector' features by
@@ -208,11 +226,13 @@ ml_apply_bucketizer <- function(x, input_col, output_col,
     "org.apache.spark.ml.feature.Bucketizer"
   )
 
-  bucketizer %>%
+  transformed <- bucketizer %>%
     spark_invoke("setInputCol", input_col) %>%
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("setSplits", as.list(splits)) %>%
     spark_invoke("transform", df)
+
+  register_spark_tbl(x, transformed)
 }
 
 #' Feature Transformation -- ElementwiseProduct
@@ -237,11 +257,13 @@ ml_apply_elementwise_product <- function(x, input_col, output_col, scaling_col)
     "org.apache.spark.ml.feature.ElementwiseProduct"
   )
 
-  transformer %>%
+  transformed <- transformer %>%
     spark_invoke("setInputCol", input_col) %>%
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("setScalingVec", scaling_col) %>%
     spark_invoke("transform", df)
+
+  register_spark_tbl(x, transformed)
 }
 
 #' Feature Transformation -- SQLTransformer
@@ -264,9 +286,11 @@ ml_apply_sql_transformer <- function(x, input_col, output_col, sql)
     "org.apache.spark.ml.feature.SQLTransformer"
   )
 
-  transformer %>%
+  transformed <- transformer %>%
     spark_invoke("setStatement", paste(sql, collapse = "\n")) %>%
     spark_invoke("transform", df)
+
+  register_spark_tbl(x, transformed)
 }
 
 #' Feature Transformation -- QuantileDiscretizer
@@ -297,10 +321,12 @@ ml_apply_quantile_discretizer <- function(x, input_col, output_col,
     "org.apache.spark.ml.feature.QuantileDiscretizer"
   )
 
-  discretizer %>%
+  transformed <- discretizer %>%
     spark_invoke("setInputCol", input_col) %>%
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("setNumBuckets", as.numeric(n_buckets)) %>%
     spark_invoke("fit", df) %>%
     spark_invoke("transform", df)
+
+  register_spark_tbl(x, transformed)
 }
