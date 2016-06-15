@@ -74,9 +74,6 @@ src_desc.src_spark <- function(db) {
         paste("local", spark_connection_is_local(scon), sep = "="))
 }
 
-#' Retrieves the Spark connection object from a given dplyr src
-#' @export
-#' @param db Spark dplyr source provided by src_spark
 src_context <- function(db) {
   db$con@scon
 }

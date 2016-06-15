@@ -2,14 +2,19 @@
 % Please edit documentation in R/connection_spark.R
 \name{spark_disconnect}
 \alias{spark_disconnect}
+\alias{spark_disconnect_all}
 \title{Disconnects from Spark and terminates the running application}
 \usage{
 spark_disconnect(scon)
+
+spark_disconnect_all()
 }
 \arguments{
 \item{scon}{Spark connection provided by spark_connect}
 }
 \description{
 Disconnects from Spark and terminates the running application
+
+Closes all existing connections. Returns the total of connections closed.
 }
 

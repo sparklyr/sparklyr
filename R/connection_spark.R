@@ -387,6 +387,7 @@ spark_connection_is_open <- function(scon) {
 
 #' Closes all existing connections. Returns the total of connections closed.
 #' @name spark_disconnect_all
+#' @rdname spark_disconnect
 #' @export
 spark_disconnect_all <- function() {
   scons <- spark_connection_find_scon(function(e) {
