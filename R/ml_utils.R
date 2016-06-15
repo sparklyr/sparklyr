@@ -25,7 +25,7 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
     responseType <- schema[[response]]$type
     if (responseType == "StringType") {
       envir$response <- random_string("response-")
-      df <- ml_apply_string_indexer(df, response, envir$response, envir)
+      df <- ft_string_indexer(df, response, envir$response, envir)
     } else if (responseType != "DoubleType") {
       envir$response <- random_string("response-")
       df <- spark_dataframe_cast_column(df, response, envir$response, "DoubleType")
@@ -33,7 +33,7 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
   }
 
   # assemble features vector and return
-  ml_apply_vector_assembler(df, features, envir$features)
+  ft_vector_assembler(df, features, envir$features)
 }
 
 try_null <- function(expr) {
@@ -44,7 +44,7 @@ try_null <- function(expr) {
 predict.ml_model <- function(object, newdata, ...) {
   sdf <- as_spark_dataframe(newdata)
   params <- object$model.parameters
-  assembled <- ml_apply_vector_assembler(sdf, object$features, params$features)
+  assembled <- ft_vector_assembler(sdf, object$features, params$features)
   predicted <- spark_invoke(object$.model, "transform", assembled)
   column <- spark_dataframe_read_column(predicted, "prediction")
   if (is.character(params$labels) && is.numeric(column))

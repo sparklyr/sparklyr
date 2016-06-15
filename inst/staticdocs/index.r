@@ -41,15 +41,15 @@ sd_section("MLlib Interface",
              "ml_random_forest",
              "ml_pca",
              "ml_multilayer_perceptron",
-             "ml_apply_binarizer",
-             "ml_apply_bucketizer",
-             "ml_apply_discrete_cosine_transform",
-             "ml_apply_elementwise_product",
-             "ml_apply_index_to_string",
-             "ml_apply_quantile_discretizer",
-             "ml_apply_sql_transformer",
-             "ml_apply_string_indexer",
-             "ml_apply_vector_assembler"
+             "ft_binarizer",
+             "ft_bucketizer",
+             "ft_discrete_cosine_transform",
+             "ft_elementwise_product",
+             "ft_index_to_string",
+             "ft_quantile_discretizer",
+             "ft_sql_transformer",
+             "ft_string_indexer",
+             "ft_vector_assembler"
            )
 )
 

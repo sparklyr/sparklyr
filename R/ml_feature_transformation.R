@@ -5,6 +5,56 @@ register_spark_tbl <- function(tbl, df, name = random_string()) {
   tbl(tbl$src, name)
 }
 
+#' Mutate a Spark DataFrame
+#'
+#' Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}
+#' to mutate a Spark DataFrame.
+#'
+#' @param .data A \code{spark_tbl}.
+#' @param ... Named arguments, mapping new column names to the transformation to
+#'   be applied.
+#' @param .dots A named list, mapping output names to transformations.
+#'
+#' @name ml_mutate
+#' @export
+ml_mutate <- function(.data, ...) {
+  ml_mutate_(.data, .dots = lazyeval::lazy_dots(...))
+}
+
+#' @name ml_mutate
+#' @export
+ml_mutate_ <- function(.data, ..., .dots) {
+  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
+  data <- .data
+
+  for (i in seq_along(dots)) {
+
+    # extract expression to be evaluated
+    lazy_expr <- dots[[i]]$expr
+    lazy_env  <- dots[[i]]$env
+
+    # construct a new call with the input variable injected
+    # for evaluation
+    preamble <- list(
+      lazy_expr[[1]],
+      data,
+      as.character(lazy_expr[[2]]),
+      as.character(names(dots)[[i]])
+    )
+
+    call <- as.call(c(
+      preamble,
+      as.list(lazy_expr[-c(1, 2)])
+    ))
+
+    # evaluate call
+    data <- eval(call, envir = lazy_env)
+  }
+
+  # return mutated dataset
+  data
+}
+
 #' Feature Transformation -- VectorAssembler
 #'
 #' Combine multiple vectors into a single row-vector; that is,
@@ -15,7 +65,7 @@ register_spark_tbl <- function(tbl, df, name = random_string()) {
 #' @template ml-transformation
 #'
 #' @export
-ml_apply_vector_assembler <- function(x, input_col, output_col)
+ft_vector_assembler <- function(x, input_col, output_col)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -38,7 +88,7 @@ ml_apply_vector_assembler <- function(x, input_col, output_col)
 #' Encode a column of labels into a column of label indices.
 #' The indices are in [0, numLabels), ordered by label frequencies, with
 #' the most frequent label assigned index 0. The transformation
-#' can be reversed with \code{\link{ml_apply_index_to_string}}.
+#' can be reversed with \code{\link{ft_index_to_string}}.
 #'
 #' @template ml-transformation
 #'
@@ -48,7 +98,7 @@ ml_apply_vector_assembler <- function(x, input_col, output_col)
 #'   key.
 #'
 #' @export
-ml_apply_string_indexer <- function(x, input_col, output_col,
+ft_string_indexer <- function(x, input_col, output_col,
                                     params = NULL)
 {
   df <- as_spark_dataframe(x)
@@ -85,7 +135,7 @@ ml_apply_string_indexer <- function(x, input_col, output_col,
 #' @param threshold The numeric threshold.
 #'
 #' @export
-ml_apply_binarizer <- function(x, input_col, output_col,
+ft_binarizer <- function(x, input_col, output_col,
                                threshold = 0.5)
 {
   df <- as_spark_dataframe(x)
@@ -115,7 +165,7 @@ ml_apply_binarizer <- function(x, input_col, output_col,
 #' @param inverse Perform inverse DCT?
 #'
 #' @export
-ml_apply_discrete_cosine_transform <- function(x, input_col, output_col,
+ft_discrete_cosine_transform <- function(x, input_col, output_col,
                                                inverse = FALSE)
 {
   df <- as_spark_dataframe(x)
@@ -137,14 +187,14 @@ ml_apply_discrete_cosine_transform <- function(x, input_col, output_col,
 
 #' Feature Transformation -- IndexToString
 #'
-#' Symmetrically to \code{\link{ml_apply_string_indexer}},
-#' \code{ml_apply_index_to_string} maps a column of label indices back to a
+#' Symmetrically to \code{\link{ft_string_indexer}},
+#' \code{ft_index_to_string} maps a column of label indices back to a
 #' column containing the original labels as strings.
 #'
 #' @template ml-transformation
 #'
 #' @export
-ml_apply_index_to_string <- function(x, input_col, output_col)
+ft_index_to_string <- function(x, input_col, output_col)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -165,7 +215,7 @@ ml_apply_index_to_string <- function(x, input_col, output_col)
 ## TODO: These routines with so-called 'row vector' features by
 ## default, but it would be much nicer to implement routines to
 ## scale whole columns instead.
-# ml_apply_standard_scaler <- function(df, input_col, output_col,
+# ft_standard_scaler <- function(df, input_col, output_col,
 #                                      with.mean, with.std)
 # {
 #   scon <- spark_scon(df)
@@ -183,7 +233,7 @@ ml_apply_index_to_string <- function(x, input_col, output_col)
 #     spark_invoke("transform", df)
 # }
 #
-# ml_apply_min_max_scaler <- function(df, input_col, output_col,
+# ft_min_max_scaler <- function(df, input_col, output_col,
 #                                     min = 0, max = 1)
 # {
 #   scon <- spark_scon(df)
@@ -213,7 +263,7 @@ ml_apply_index_to_string <- function(x, input_col, output_col)
 #'   boundaries.
 #'
 #' @export
-ml_apply_bucketizer <- function(x, input_col, output_col,
+ft_bucketizer <- function(x, input_col, output_col,
                                 splits)
 {
   df <- as_spark_dataframe(x)
@@ -245,7 +295,7 @@ ml_apply_bucketizer <- function(x, input_col, output_col,
 #' @param scaling_col The column used to scale \code{input_col}.
 #'
 #' @export
-ml_apply_elementwise_product <- function(x, input_col, output_col, scaling_col)
+ft_elementwise_product <- function(x, input_col, output_col, scaling_col)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -274,7 +324,7 @@ ml_apply_elementwise_product <- function(x, input_col, output_col, scaling_col)
 #' @param sql A SQL statement.
 #'
 #' @export
-ml_apply_sql_transformer <- function(x, input_col, output_col, sql)
+ft_sql_transformer <- function(x, input_col, output_col, sql)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
@@ -308,8 +358,7 @@ ml_apply_sql_transformer <- function(x, input_col, output_col, sql)
 #' @param n_buckets The number of buckets to use.
 #'
 #' @export
-ml_apply_quantile_discretizer <- function(x, input_col, output_col,
-                                          n_buckets = 5)
+ft_quantile_discretizer <- function(x, input_col, output_col, n_buckets = 5)
 {
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
