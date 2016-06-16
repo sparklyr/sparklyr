@@ -25,7 +25,7 @@ to mutate a Spark DataFrame.
 \dontrun{
 # using the 'beaver1' dataset, binarize the 'temp' column
 # encode 'warm' as 'temp > 37'
-beaver_tbl <- copy_to(db, beaver1, "beaver")
+beaver_tbl <- copy_to(sc, beaver1, "beaver")
 beaver_tbl \%>\%
   df_mutate(warm = ft_binarizer(temp, 37))
 }
