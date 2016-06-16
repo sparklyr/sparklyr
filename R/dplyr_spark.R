@@ -107,7 +107,7 @@ copy_to.src_spark <- function(dest, df, name = deparse(substitute(df)), ...,
   if (overwrite)
     spark_remove_table_if_exists(dest, name)
   else if (spark_table_exists(dest, name))
-    stop("table ", name, "already exists (pass overwrite = TRUE to overwrite)")
+    stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
   dbWriteTable(dest$con, name, df, TRUE, repartition)
 
