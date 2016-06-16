@@ -13,7 +13,6 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE, fig.path='res/')
 library(rspark)
-library(dplyr)
 library(ggplot2)
 library(nycflights13)
 library(Lahman)
@@ -46,7 +45,6 @@ The rspark package implements a dplyr back-end for Spark. Connect to Spark using
 ```{r connection, message=FALSE}
 # connect to local spark instance and get a dplyr interface
 library(rspark)
-library(dplyr)
 sc <- spark_connect("local", version = "1.6.1")
 ```
 

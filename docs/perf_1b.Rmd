@@ -16,7 +16,6 @@ rspark:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WARN
 ```{r}
 library(rspark)
 library(magrittr)
-library(dplyr)
 library(ggplot2)
 
 parquetPath <- file.path(getwd(), "billion.parquet")
