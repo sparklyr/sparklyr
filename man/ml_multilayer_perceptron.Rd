@@ -4,10 +4,25 @@
 \alias{ml_multilayer_perceptron}
 \title{Spark ML -- Multilayer Perceptron}
 \usage{
-ml_multilayer_perceptron(x)
+ml_multilayer_perceptron(x, response, features, layers, max.iter = 100,
+  seed = sample(.Machine$integer.max, 1))
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
+
+\item{response}{The name of the response vector.}
+
+\item{features}{The names of features (terms) to use as linear predictors
+for the response.}
+
+\item{layers}{A numeric vector describing the layers -- each element in the vector
+gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three layers,
+with an input (feature) layer of size 4, an intermediate layer of size 5, and an
+output (class) layer of size 2.}
+
+\item{max.iter}{Maximum number of iterations to perform in model fit.}
+
+\item{seed}{A random seed.}
 }
 \description{
 Creates and trains multilayer perceptron on a \code{spark_tbl}.
