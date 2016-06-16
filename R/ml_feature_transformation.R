@@ -17,6 +17,15 @@ register_spark_tbl <- function(tbl, df, name = random_string()) {
 #'
 #' @name ml_mutate
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' # using the 'beaver1' dataset, binarize the 'temp' column
+#' # encode 'warm' as 'temp > 37'
+#' beaver_tbl <- copy_to(db, beaver1, "beaver")
+#' beaver_tbl %>%
+#'   ml_mutate(warm = ft_binarizer(temp, 37))
+#' }
 ml_mutate <- function(.data, ...) {
   ml_mutate_(.data, .dots = lazyeval::lazy_dots(...))
 }
@@ -36,10 +45,10 @@ ml_mutate_ <- function(.data, ..., .dots) {
     # construct a new call with the input variable injected
     # for evaluation
     preamble <- list(
-      lazy_expr[[1]],                                        # function
-      data,                                                  # data
-      as.character(eval(lazy_expr[[2]], envir = lazy_env)),  # input column
-      as.character(names(dots)[[i]])                         # output column
+      lazy_expr[[1]],                 # function
+      data,                           # data
+      as.character(lazy_expr[[2]]),   # input column
+      as.character(names(dots)[[i]])  # output column
     )
 
     call <- as.call(c(

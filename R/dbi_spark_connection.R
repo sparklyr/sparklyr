@@ -40,24 +40,27 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' dbDisconnect(con)
 #' }
 setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
-  api <- spark_api_create(drv@scon)
-
-  # create the DBI connection
-  dbi <- new("DBISparkConnection", scon = drv@scon, api = api)
-
   # get the inst and update it with a dbi reference
   sconInst <- spark_connection_get_inst(drv@scon)
-  sconInst$dbi <- dbi
-  spark_connection_set_inst(drv@scon, sconInst)
+  if (is.null(sconInst$dbi)) {
+    api <- spark_api_create(drv@scon)
 
-  # Apply sql connection level properties
-  params <- spark_config_params(drv@scon$config, drv@scon$isLocal, "spark.sql.")
-  lapply(names(params), function(paramName) {
-    dbSetProperty(dbi, paramName, as.character(params[[paramName]]))
-  })
+    # create the DBI connection
+    dbi <- new("DBISparkConnection", scon = drv@scon, api = api)
+
+    sconInst <- spark_connection_get_inst(drv@scon)
+    sconInst$dbi <- dbi
+    spark_connection_set_inst(drv@scon, sconInst)
+
+    # Apply sql connection level properties
+    params <- spark_config_params(drv@scon$config, drv@scon$isLocal, "spark.sql.")
+    lapply(names(params), function(paramName) {
+      dbSetProperty(dbi, paramName, as.character(params[[paramName]]))
+    })
+  }
 
   # return dbi
-  dbi
+  sconInst$dbi
 })
 
 #' @export

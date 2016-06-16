@@ -68,13 +68,16 @@ spark_connect <- function(master = "local",
   }, onexit = TRUE)
 
   sconInst <- spark_connection_attach_context(scon, sconInst)
-  sconInst$dbi <- NULL
+  spark_connection_set_inst(scon, sconInst)
+
+  sconInst <- spark_connection_attach_sql_session_context(scon, sconInst)
   spark_connection_set_inst(scon, sconInst)
 
   on_connection_opened(scon, sconInst$connectCall)
   scon
 }
 
+# Attaches the SparkContext to the connection
 spark_connection_attach_context <- function(sc, sconInst) {
   scon <- sc
   master <- scon$master
@@ -86,6 +89,27 @@ spark_connection_attach_context <- function(sc, sconInst) {
   sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
   if (identical(sconInst$sc, NULL)) {
     stop("Failed to create Spark context")
+  }
+
+  sconInst
+}
+
+# Attaches the SqlContext/SessionContext to the connection
+spark_connection_attach_sql_session_context <- function(sc, sconInst) {
+  scon <- sc
+
+  if (is.null(sconInst$hive)) {
+    sconInst$hive <- spark_api_create_hive_context(scon)
+    if (identical(sconInst$hive, NULL)) {
+      warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
+    }
+  }
+
+  if (is.null(sconInst$hive)) {
+    sconInst$sql <- spark_api_create_sql_context(scon)
+    if (identical(sql, NULL)) {
+      stop("Failed to create SQL context")
+    }
   }
 
   sconInst

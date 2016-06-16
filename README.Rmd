@@ -48,15 +48,14 @@ The sparklyr package implements a dplyr back-end for Spark. Connect to Spark usi
 library(sparklyr)
 library(dplyr)
 sc <- spark_connect("local", version = "1.6.1")
-db <- src_spark(sc)
 ```
 
 Now we copy some datasets from R into the Spark cluster:
 
 ```{r}
-iris_tbl <- copy_to(db, iris)
-flights_tbl <- copy_to(db, flights)
-batting_tbl <- copy_to(db, Batting, "batting")
+iris_tbl <- copy_to(sc, iris)
+flights_tbl <- copy_to(sc, flights)
+batting_tbl <- copy_to(sc, Batting, "batting")
 ```
 
 Then you can run dplyr against Spark:
@@ -166,13 +165,13 @@ Package authors can use this mechanism to create an R interface to any of Spark'
 You can cache a table into memory with:
 
 ```{r, eval=FALSE}
-tbl_cache(db, "batting")
+tbl_cache(sc, "batting")
 ```
 
 and unload from memory using:
 
 ```{r, eval=FALSE}
-tbl_uncache(db, "batting")
+tbl_uncache(sc, "batting")
 ```
 
 

@@ -1,19 +1,5 @@
-#' Connect to Spark for Dplyr.
-#'
 #' @import dplyr
 #' @import parallel
-#' @export
-#' @param sc Spark connection provided by spark_connection
-src_spark <- function(sc) {
-  if (missing(sc))
-    stop("Need to specify an Spark connection created. See spark_connection.")
-
-  scon <- sc
-  dbiCon <- dbConnect(DBISpark(scon))
-  db <- src_sql("spark", dbiCon)
-
-  db
-}
 
 spark_dbi <- function(con) {
   con$con
@@ -72,6 +58,18 @@ tbl.src_spark <- function(src, from, ...) {
 }
 
 #' @export
+tbl.spark_connection <- function(sc, from, ...) {
+  src <- src_sql("spark", dbConnect(DBISpark(sc)))
+  tbl_sql("spark", src = src, from = from, ...)
+}
+
+#' @export
+src_tbls.spark_connection <- function(sc, ...) {
+  src <- src_sql("spark", dbConnect(DBISpark(sc)))
+  src_tbls("spark", src, ...)
+}
+
+#' @export
 db_data_type.src_spark <- function(...) {
 }
 
@@ -80,7 +78,7 @@ db_data_type.src_spark <- function(...) {
 #'
 #' Copy a local R dataframe to Spark and provide a data source compatible with dplyr
 #'
-#' @param dest dplyr database interface
+#' @param sc The Spark connection
 #' @param name Name of the destination table
 #' @param df Local data frame to copy
 #' @param memory Cache table into memory for improved performance
@@ -91,8 +89,9 @@ db_data_type.src_spark <- function(...) {
 #' @name copy_to
 #'
 #' @export
-copy_to.src_spark <- function(dest, df, name = deparse(substitute(df)), ...,
-                              memory = TRUE, repartition = 0, overwrite = FALSE) {
+copy_to.spark_connection <- function(sc, df, name = deparse(substitute(df)), ...,
+                                     memory = TRUE, repartition = 0, overwrite = FALSE) {
+  dest <- src_sql("spark", dbConnect(DBISpark(sc)))
 
   if (overwrite)
     spark_remove_table_if_exists(dest, name)
@@ -102,7 +101,7 @@ copy_to.src_spark <- function(dest, df, name = deparse(substitute(df)), ...,
   dbWriteTable(dest$con, name, df, TRUE, repartition)
 
   if (memory) {
-    tbl_cache(dest, name)
+    tbl_cache(sc, name)
   }
 
   on_connection_updated(src_context(dest), name)
@@ -116,11 +115,12 @@ copy_to.src_spark <- function(dest, df, name = deparse(substitute(df)), ...,
 #' @param name Name of the destination table
 #' @param force Forces data to be loaded in memory by executing a count(*) over the table
 tbl_cache <- function(sc, name, force = TRUE) {
-  con <- sc
-  dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
+  dbiCon <- dbConnect(DBISpark(sc))
+
+  dbGetQuery(dbiCon, paste("CACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))
 
   if (force) {
-    dbGetQuery(con$con, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = con$con)))
+    dbGetQuery(dbiCon, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = dbiCon)))
   }
 }
 
@@ -129,8 +129,8 @@ tbl_cache <- function(sc, name, force = TRUE) {
 #' @param sc Connection to dplyr source
 #' @param name Name of the destination table
 tbl_uncache <- function(sc, name) {
-  con <- sc
-  dbGetQuery(con$con, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = con$con)))
+  dbiCon <- dbConnect(DBISpark(sc))
+  dbGetQuery(dbiCon, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))
 }
 
 #' @export
