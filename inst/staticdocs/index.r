@@ -10,8 +10,7 @@ sd_section("Connecting to Spark",
 
 sd_section("Reading and Writing Data",
            "Functions for reading and writing Spark DataFrames",
-           c("spark_read_df",
-             "spark_read_csv",
+           c("spark_read_csv",
              "spark_read_json",
              "spark_read_parquet",
              "spark_write_csv",
@@ -19,11 +18,19 @@ sd_section("Reading and Writing Data",
              "spark_write_parquet")
 )
 
-sd_section("dplyr Interface",
-           "Functions which provide a dplyr interface to Spark DataFrames",
-           c("src_spark",
+sd_section("Manipulating Data",
+           "Functions for manipulating Spark DataFrames",
+           c("dplyr-interface",
+             "src_spark",
+             "copy_to.src_spark",
              "tbl_cache",
-             "tbl_uncache")
+             "tbl_uncache",
+             "as_spark_dataframe",
+             "load_df",
+             "spark_dataframe_collect",
+             "spark_dataframe_split",
+             "partition",
+             "DBI-interface")
 )
 
 sd_section("MLlib Interface",
@@ -34,7 +41,6 @@ sd_section("MLlib Interface",
              "ml_random_forest",
              "ml_pca",
              "ml_multilayer_perceptron",
-             "ml_partition",
              "ml_mutate",
              "ft_binarizer",
              "ft_bucketizer",
@@ -53,8 +59,7 @@ sd_section("Spark API",
            c("spark_context",
              "spark_invoke",
              "spark_invoke_static",
-             "spark_invoke_static_ctor",
-             "spark_jobj") # S3 method which can pull a jobj out of "things"
+             "spark_invoke_static_ctor")
 )
 
 sd_section("EC2",
