@@ -1,5 +1,10 @@
-spark_ml_random_forest <- function(x, response, features,
-                                   max.bins, max.depth, num.trees)
+spark_ml_random_forest <- function(x,
+                                   response,
+                                   features,
+                                   max.bins,
+                                   max.depth,
+                                   num.trees,
+                                   type)
 {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
@@ -10,10 +15,15 @@ spark_ml_random_forest <- function(x, response, features,
   # choose classification vs. regression model based on column type
   schema <- spark_dataframe_schema(df)
   responseType <- schema[[response]]$type
-  model <- if (responseType %in% c("DoubleType", "IntegerType"))
+  model <- if (identical(type, "regression"))
+    "org.apache.spark.ml.regression.RandomForestRegressor"
+  else if (identical(type, "classification"))
+    "org.apache.spark.ml.classification.RandomForestClassifier"
+  else if (responseType %in% c("DoubleType", "IntegerType"))
     "org.apache.spark.ml.regression.RandomForestRegressor"
   else
     "org.apache.spark.ml.classification.RandomForestClassifier"
+
   rf <- spark_invoke_static_ctor(scon, model)
 
   fit <- rf %>%
@@ -53,14 +63,25 @@ spark_ml_random_forest <- function(x, response, features,
 #' @param max.depth Maximum depth of the tree (>= 0); that is, the maximum
 #'   number of nodes separating any leaves from the root of the tree.
 #' @param num.trees Number of trees to train (>= 1).
+#' @param type The type of model to fit. \code{"regression"} treats the response
+#'   as a continuous variable, while \code{"classification"} treats the response
+#'   as a categorical variable. When \code{"auto"} is used, the model type is
+#'   inferred based on the response variable type -- if it is a numeric type,
+#'   then regression is used; classification otherwise.
 #'
 #' @family Spark ML routines
 #'
 #' @export
-ml_random_forest <- function(x, response, features,
-                             max.bins = 32L, max.depth = 5L, num.trees = 20L)
+ml_random_forest <- function(x,
+                             response,
+                             features,
+                             max.bins = 32L,
+                             max.depth = 5L,
+                             num.trees = 20L,
+                             type = c("auto", "regression", "classification"))
 {
-  spark_ml_random_forest(x, response, features, max.bins, max.depth, num.trees)
+  type <- match.arg(type)
+  spark_ml_random_forest(x, response, features, max.bins, max.depth, num.trees, type)
 }
 
 #' @export
