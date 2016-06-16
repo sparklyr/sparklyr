@@ -54,6 +54,7 @@ Now we copy some datasets from R into the Spark cluster:
 iris_tbl <- copy_to(sc, iris)
 flights_tbl <- copy_to(sc, flights)
 batting_tbl <- copy_to(sc, Batting, "batting")
+src_tbls(sc)
 ```
 
 Then you can run dplyr against Spark:
