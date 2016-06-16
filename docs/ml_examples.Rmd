@@ -14,10 +14,9 @@ library(dplyr)
 library(ggplot2)
 
 sc <- spark_connect("local", version = "2.0.0-preview")
-db <- src_spark(sc)
 
-copy_to(db, iris, "iris")
-iris_tbl <- tbl(db, "iris")
+copy_to(sc, iris, "iris")
+iris_tbl <- tbl(sc, "iris")
 ```
 
 ## KMeans in R
@@ -46,11 +45,11 @@ used in constructing this document -- we expect the issue to be resolved with
 the release of Spark 2.0.0.
 
 ```{r}
-model <- tbl(db, "iris") %>%
+model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   ml_kmeans(centers = 3)
 
-tbl(db, "iris") %>%
+iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   collect %>%
   ggplot(aes(Petal_Length, Petal_Width)) +
@@ -76,14 +75,15 @@ iris %>%
 ## Linear Regression in RSpark
 
 ```{r}
-model <- tbl(db, "iris") %>%
+model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
 
-iris %>%
-  select(Petal.Width, Petal.Length) %>%
-  ggplot(aes(Petal.Length, Petal.Width)) +
-    geom_point(data = iris, aes(Petal.Width, Petal.Length), size = 2, alpha = 0.5) +
+iris_tbl %>%
+  select(Petal_Width, Petal_Length) %>%
+  collect %>%
+  ggplot(aes(Petal_Length, Petal_Width)) +
+    geom_point(aes(Petal_Width, Petal_Length), size = 2, alpha = 0.5) +
     geom_abline(aes(slope = coef(model)[["Petal_Width"]],
                     intercept = coef(model)[["(Intercept)"]],
                     color = "red"))
@@ -124,8 +124,8 @@ ggplot(beaver, aes(x = temp, y = activ)) +
 ## Logistic Regression in RSpark
 
 ```{r}
-copy_to(db, beaver, "beaver")
-beaver_tbl <- tbl(db, "beaver")
+copy_to(sc, beaver, "beaver")
+beaver_tbl <- tbl(sc, "beaver")
 
 model <- beaver_tbl %>%
   mutate(response = as.numeric(activ == "Active")) %>%
@@ -153,7 +153,7 @@ predict(fit, newdata = test)
 ## Partitioning in RSpark
 
 ```{r}
-partitions <- tbl(db, "iris") %>%
+partitions <- tbl(sc, "iris") %>%
   ml_partition(training = 0.75, test = 0.25, seed = 1099)
 
 fit <- partitions$training %>%
@@ -178,7 +178,7 @@ model$sdev^2 / sum(model$sdev^2)
 ## Principal Components Analysis in RSpark
 
 ```{r}
-model <- tbl(db, "iris") %>%
+model <- tbl(sc, "iris") %>%
   select(-Species) %>%
   ml_pca()
 print(model)
