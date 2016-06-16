@@ -34,35 +34,27 @@ The rspark package implements a dplyr back-end for Spark. Connect to Spark using
 library(rspark)
 library(dplyr)
 sc <- spark_connect("local", version = "1.6.1")
-db <- src_spark(sc)
 ```
 
-Now we copy a couple of datasets from R into the Spark cluster:
+Now we copy some datasets from R into the Spark cluster:
 
 ``` r
-# copy the flights table from the nycflights13 package to Spark
-copy_to(db, nycflights13::flights, "flights")
-flights <- tbl(db, "flights")
-
-# copy the Batting table from the Lahman package to Spark
-copy_to(db, Lahman::Batting, "batting")
-batting <- tbl(db, "batting")
-
-# copy the iris table to Spark
-copy_to(db, iris, "iris")
-iris_tbl <- tbl(db, "iris")
+iris_tbl <- copy_to(sc, iris)
+flights_tbl <- copy_to(sc, flights)
+batting_tbl <- copy_to(sc, Batting, "batting")
 ```
 
 Then you can run dplyr against Spark:
 
 ``` r
 # filter by departure delay and print the first few records
-flights %>% filter(dep_delay == 2)
+flights_tbl %>% filter(dep_delay == 2)
 ```
 
     ## Source:   query [?? x 16]
     ## Database: spark connection master=local app=rspark local=TRUE
     ## 
+    ## <S3: tbl_spark>
     ##     year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
     ##    <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
     ## 1   2013     1     1      517         2      830        11      UA  N14228
@@ -75,14 +67,13 @@ flights %>% filter(dep_delay == 2)
     ## 8   2013     1     1     1028         2     1350        11      UA  N76508
     ## 9   2013     1     1     1042         2     1325        -1      B6  N529JB
     ## 10  2013     1     1     1231         2     1523        -6      UA  N402UA
-    ## ..   ...   ...   ...      ...       ...      ...       ...     ...     ...
-    ## Variables not shown: flight <int>, origin <chr>, dest <chr>, air_time
-    ##   <dbl>, distance <dbl>, hour <dbl>, minute <dbl>.
+    ## ... with more rows, and 7 more variables: flight <int>, origin <chr>,
+    ##   dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ``` r
-delay <- flights %>% 
+delay <- flights_tbl %>% 
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000, !is.na(delay)) %>%
@@ -103,7 +94,7 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ``` r
-batting %>%
+batting_tbl %>%
   select(playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
   group_by(playerID) %>%
@@ -114,6 +105,7 @@ batting %>%
     ## Database: spark connection master=local app=rspark local=TRUE
     ## Groups: playerID
     ## 
+    ## <S3: tbl_spark>
     ##     playerID yearID teamID     G    AB     R     H
     ##        <chr>  <int>  <chr> <int> <int> <int> <int>
     ## 1  anderal01   1941    PIT    70   223    32    48
@@ -126,7 +118,7 @@ batting %>%
     ## 8  bedelho01   1968    PHI     9     7     0     1
     ## 9  biittla01   1977    CHN   138   493    74   147
     ## 10 biittla01   1975    MON   121   346    34   109
-    ## ..       ...    ...    ...   ...   ...   ...   ...
+    ## ... with more rows
 
 ML Functions
 ------------
@@ -134,11 +126,11 @@ ML Functions
 MLlib functions are also supported, see [ml samples](docs/ml_examples.md). For instasnce, k-means can be run as:
 
 ``` r
-model <- tbl(db, "iris") %>%
+model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   ml_kmeans(centers = 3)
 
-tbl(db, "iris") %>%
+iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   collect %>%
   ggplot(aes(Petal_Length, Petal_Width)) +
@@ -202,13 +194,13 @@ dplyr Utilities
 You can cache a table into memory with:
 
 ``` r
-tbl_cache(db, "batting")
+tbl_cache(sc, "batting")
 ```
 
 and unload from memory using:
 
 ``` r
-tbl_uncache(db, "batting")
+tbl_uncache(sc, "batting")
 ```
 
 Connection Utilities
@@ -226,16 +218,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/14 11:18:04 INFO ContextCleaner: Cleaned shuffle 11
-    ## 16/06/14 11:18:04 INFO BlockManagerInfo: Removed broadcast_51_piece0 on localhost:54213 in memory (size: 351.0 B, free: 487.0 MB)
-    ## 16/06/14 11:18:04 INFO ContextCleaner: Cleaned accumulator 114
-    ## 16/06/14 11:18:04 INFO BlockManagerInfo: Removed broadcast_50_piece0 on localhost:54213 in memory (size: 1678.0 B, free: 487.0 MB)
-    ## 16/06/14 11:18:04 INFO ContextCleaner: Cleaned accumulator 113
-    ## 16/06/14 11:18:04 INFO Executor: Finished task 0.0 in stage 45.0 (TID 475). 2082 bytes result sent to driver
-    ## 16/06/14 11:18:04 INFO TaskSetManager: Finished task 0.0 in stage 45.0 (TID 475) in 91 ms on localhost (1/1)
-    ## 16/06/14 11:18:04 INFO TaskSchedulerImpl: Removed TaskSet 45.0, whose tasks have all completed, from pool 
-    ## 16/06/14 11:18:04 INFO DAGScheduler: ResultStage 45 (count at NativeMethodAccessorImpl.java:-2) finished in 0.091 s
-    ## 16/06/14 11:18:04 INFO DAGScheduler: Job 31 finished: count at NativeMethodAccessorImpl.java:-2, took 0.093238 s
+    ## 16/06/16 11:18:35 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 47 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpL9Ee70/filec4864976028e.csv MapPartitionsRDD[147] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/16 11:18:35 INFO TaskSchedulerImpl: Adding task set 47.0 with 1 tasks
+    ## 16/06/16 11:18:35 INFO TaskSetManager: Starting task 0.0 in stage 47.0 (TID 445, localhost, partition 0,PROCESS_LOCAL, 2473 bytes)
+    ## 16/06/16 11:18:35 INFO Executor: Running task 0.0 in stage 47.0 (TID 445)
+    ## 16/06/16 11:18:35 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpL9Ee70/filec4864976028e.csv:0+23367180
+    ## 16/06/16 11:18:35 INFO Executor: Finished task 0.0 in stage 47.0 (TID 445). 2082 bytes result sent to driver
+    ## 16/06/16 11:18:35 INFO TaskSetManager: Finished task 0.0 in stage 47.0 (TID 445) in 86 ms on localhost (1/1)
+    ## 16/06/16 11:18:35 INFO TaskSchedulerImpl: Removed TaskSet 47.0, whose tasks have all completed, from pool 
+    ## 16/06/16 11:18:35 INFO DAGScheduler: ResultStage 47 (count at NativeMethodAccessorImpl.java:-2) finished in 0.086 s
+    ## 16/06/16 11:18:35 INFO DAGScheduler: Job 32 finished: count at NativeMethodAccessorImpl.java:-2, took 0.089126 s
 
 Finally, we disconnect from Spark:
 
