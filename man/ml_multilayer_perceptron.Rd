@@ -28,7 +28,8 @@ output (class) layer of size 2.}
 Creates and trains multilayer perceptron on a \code{spark_tbl}.
 }
 \seealso{
-Other Spark ML routines: \code{\link{ml_kmeans}},
+Other Spark ML routines: \code{\link{ml_gradient_boosted_trees}},
+  \code{\link{ml_kmeans}},
   \code{\link{ml_linear_regression}},
   \code{\link{ml_logistic_regression}},
   \code{\link{ml_pca}}, \code{\link{ml_random_forest}}
