@@ -51,8 +51,8 @@ spark_perf_test <- function(params, tests) {
     config[["sparklyr.sql.shuffle.partitions"]] <- if(param$shuffle) parallel::detectCores() else NULL
     config[["spark.sql.codegen.wholeStage"]] <- param$codegen
     config[["sparklyr.cores"]] <- param$cores
-  
-    sc <- spark_connect(master = param$master, version = param$version, config = testConfig)
+    
+    sc <- spark_connect(master = param$master, version = param$version, config = config)
     
     copy_to(sc,
             nycflights13::flights,
