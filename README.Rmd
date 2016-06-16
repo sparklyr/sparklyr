@@ -114,6 +114,25 @@ iris_tbl %>%
 
 ```
 
+## Reading and Writing Data
+
+```{r}
+  temp_csv <- tempfile(fileext = ".csv")
+  temp_parquet <- tempfile(fileext = ".parquet")
+  temp_json <- tempfile(fileext = ".json")
+  
+  spark_write_csv(iris_tbl, temp_csv)
+  iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
+  
+  spark_write_parquet(iris_tbl, temp_parquet)
+  iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
+  
+  spark_write_csv(iris_tbl, temp_json)
+  iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
+  
+  src_tbls(sc)
+```
+
 ## EC2
 
 To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
