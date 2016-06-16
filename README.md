@@ -1,67 +1,59 @@
 Spark Interface for R
 ================
 
-[![Travis-CI Build Status](https://travis-ci.com/rstudio/rspark.svg?token=MxiS2SHZy3QzqFf34wQr&branch=master)](https://travis-ci.com/rstudio/rspark)
+[![Travis-CI Build Status](https://travis-ci.com/rstudio/sparklyr.svg?token=MxiS2SHZy3QzqFf34wQr&branch=master)](https://travis-ci.com/rstudio/sparklyr)
 
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
 
 Installation
 ------------
 
-You can install the development version of the **rspark** package using **devtools** as follows (note that installation of the development version of **devtools** itself is also required):
+You can install the development version of the **sparklyr** package using **devtools** as follows (note that installation of the development version of **devtools** itself is also required):
 
 ``` r
 devtools::install_github("hadley/devtools")
 devtools::reload(devtools::inst("devtools"))
 
-devtools::install_github("rstudio/rspark", auth_token = "56aef3d82d3ef05755e40a4f6bdaab6fbed8a1f1")
+devtools::install_github("rstudio/sparklyr", auth_token = "56aef3d82d3ef05755e40a4f6bdaab6fbed8a1f1")
 ```
 
 You can then install various versions of Spark using the `spark_install` function:
 
 ``` r
-library(rspark)
+library(sparklyr)
 spark_install(version = "1.6.1", hadoop_version = "2.6", reset = TRUE)
 ```
 
 dplyr Interface
 ---------------
 
-The rspark package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
+The sparklyr package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
 
 ``` r
 # connect to local spark instance and get a dplyr interface
-library(rspark)
+library(sparklyr)
 library(dplyr)
 sc <- spark_connect("local", version = "1.6.1")
 db <- src_spark(sc)
 ```
 
-Now we copy a couple of datasets from R into the Spark cluster:
+Now we copy some datasets from R into the Spark cluster:
 
 ``` r
-# copy the flights table from the nycflights13 package to Spark
-copy_to(db, nycflights13::flights, "flights")
-flights <- tbl(db, "flights")
-
-# copy the Batting table from the Lahman package to Spark
-copy_to(db, Lahman::Batting, "batting")
-batting <- tbl(db, "batting")
-
-# copy the iris table to Spark
-copy_to(db, iris, "iris")
-iris_tbl <- tbl(db, "iris")
+iris_tbl <- copy_to(db, iris)
+flights_tbl <- copy_to(db, flights)
+batting_tbl <- copy_to(db, Batting, "batting")
 ```
 
 Then you can run dplyr against Spark:
 
 ``` r
 # filter by departure delay and print the first few records
-flights %>% filter(dep_delay == 2)
+flights_tbl %>% filter(dep_delay == 2)
 ```
 
     ## Source:   query [?? x 16]
-    ## Database: spark connection master=local app=rspark local=TRUE
+    ## Database: spark connection master=local app=sparklyr local=TRUE
     ## 
     ##     year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
     ##    <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
@@ -82,7 +74,7 @@ flights %>% filter(dep_delay == 2)
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ``` r
-delay <- flights %>% 
+delay <- flights_tbl %>% 
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000, !is.na(delay)) %>%
@@ -103,7 +95,7 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ``` r
-batting %>%
+batting_tbl %>%
   select(playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
   group_by(playerID) %>%
@@ -111,7 +103,7 @@ batting %>%
 ```
 
     ## Source:   query [?? x 7]
-    ## Database: spark connection master=local app=rspark local=TRUE
+    ## Database: spark connection master=local app=sparklyr local=TRUE
     ## Groups: playerID
     ## 
     ##     playerID yearID teamID     G    AB     R     H
@@ -134,11 +126,11 @@ ML Functions
 MLlib functions are also supported, see [ml samples](docs/ml_examples.md). For instasnce, k-means can be run as:
 
 ``` r
-model <- tbl(db, "iris") %>%
+model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   ml_kmeans(centers = 3)
 
-tbl(db, "iris") %>%
+iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   collect %>%
   ggplot(aes(Petal_Length, Petal_Width)) +
@@ -154,7 +146,7 @@ EC2
 To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
 
 ``` r
-library(rspark)
+library(sparklyr)
 ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
                         secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
                         pem_file = "spark.pem")
@@ -170,7 +162,7 @@ spark_ec2_destroy(ci)
 
 The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.
 
-For additional configuration and examples read: [Using RSpark in EC2](docs/ec2.md)
+For additional configuration and examples read: [Using Spark in EC2](docs/ec2.md)
 
 Extensibility
 -------------
@@ -226,16 +218,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/14 11:18:04 INFO ContextCleaner: Cleaned shuffle 11
-    ## 16/06/14 11:18:04 INFO BlockManagerInfo: Removed broadcast_51_piece0 on localhost:54213 in memory (size: 351.0 B, free: 487.0 MB)
-    ## 16/06/14 11:18:04 INFO ContextCleaner: Cleaned accumulator 114
-    ## 16/06/14 11:18:04 INFO BlockManagerInfo: Removed broadcast_50_piece0 on localhost:54213 in memory (size: 1678.0 B, free: 487.0 MB)
-    ## 16/06/14 11:18:04 INFO ContextCleaner: Cleaned accumulator 113
-    ## 16/06/14 11:18:04 INFO Executor: Finished task 0.0 in stage 45.0 (TID 475). 2082 bytes result sent to driver
-    ## 16/06/14 11:18:04 INFO TaskSetManager: Finished task 0.0 in stage 45.0 (TID 475) in 91 ms on localhost (1/1)
-    ## 16/06/14 11:18:04 INFO TaskSchedulerImpl: Removed TaskSet 45.0, whose tasks have all completed, from pool 
-    ## 16/06/14 11:18:04 INFO DAGScheduler: ResultStage 45 (count at NativeMethodAccessorImpl.java:-2) finished in 0.091 s
-    ## 16/06/14 11:18:04 INFO DAGScheduler: Job 31 finished: count at NativeMethodAccessorImpl.java:-2, took 0.093238 s
+    ## 16/06/16 13:56:20 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 47 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpnkJuJ9/fileb43a43a5fafe.csv MapPartitionsRDD[147] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/16 13:56:20 INFO TaskSchedulerImpl: Adding task set 47.0 with 1 tasks
+    ## 16/06/16 13:56:20 INFO TaskSetManager: Starting task 0.0 in stage 47.0 (TID 445, localhost, partition 0,PROCESS_LOCAL, 7908 bytes)
+    ## 16/06/16 13:56:20 INFO Executor: Running task 0.0 in stage 47.0 (TID 445)
+    ## 16/06/16 13:56:20 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpnkJuJ9/fileb43a43a5fafe.csv:0+23367180
+    ## 16/06/16 13:56:20 INFO Executor: Finished task 0.0 in stage 47.0 (TID 445). 2082 bytes result sent to driver
+    ## 16/06/16 13:56:20 INFO TaskSetManager: Finished task 0.0 in stage 47.0 (TID 445) in 85 ms on localhost (1/1)
+    ## 16/06/16 13:56:20 INFO TaskSchedulerImpl: Removed TaskSet 47.0, whose tasks have all completed, from pool 
+    ## 16/06/16 13:56:20 INFO DAGScheduler: ResultStage 47 (count at NativeMethodAccessorImpl.java:-2) finished in 0.086 s
+    ## 16/06/16 13:56:20 INFO DAGScheduler: Job 32 finished: count at NativeMethodAccessorImpl.java:-2, took 0.088747 s
 
 Finally, we disconnect from Spark:
 
@@ -246,4 +238,4 @@ spark_disconnect(sc)
 Additional Resources
 --------------------
 
-For performance runs under various parameters, read: [RSpark Dplyr Performance](docs/perf_dplyr.md) and [RSpark 1B-Rows Performance](docs/perf_1b.md)
+For performance runs under various parameters, read: [Dplyr Performance](docs/perf_dplyr.md) and [Spark 1B-Rows Performance](docs/perf_1b.md)

@@ -1,5 +1,5 @@
 ---
-title: "RSpark Performance: Dplyr Queries"
+title: "Performance: Dplyr Queries"
 output:
   github_document:
     fig_width: 9
@@ -10,7 +10,7 @@ output:
 
 ```{r}
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
-library(rspark)
+library(sparklyr)
 library(dplyr)
 library(reshape2)
 library(ggplot2)
@@ -52,7 +52,7 @@ spark_perf_test <- function(params, tests) {
     config[["sparklyr.sql.shuffle.partitions"]] <- if(param$shuffle) parallel::detectCores() else NULL
     config[["spark.sql.codegen.wholeStage"]] <- param$codegen
     config[["sparklyr.cores"]] <- param$cores
-    
+  
     sc <- spark_connect(master = param$master, version = param$version, config = testConfig)
     
     db <- src_spark(sc)

@@ -4,7 +4,7 @@
 \alias{spark_connect}
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
-spark_connect(master = "local", app_name = "rspark", version = NULL,
+spark_connect(master = "local", app_name = "sparklyr", version = NULL,
   hadoop_version = NULL, config = spark_config())
 }
 \arguments{

@@ -1,4 +1,4 @@
-Using RSpark in EC2
+Using sparklyr in EC2
 ================
 
 Spark provides some utilities that make it simpler to provision a Spark cluster on Amazon EC2. sparklyr wraps these utilities to make them available from within R. You should realize, however, that the default security settings for such clusters are very permissive; you should not use this technique to create a cluster that hosts any sensitive data.
@@ -61,7 +61,7 @@ devtools::install_github("nycflights13")
 Finally, build the sparklyr package:
 
 ``` r
-devtools::install_github("rstudio/rspark")
+devtools::install_github("rstudio/sparklyr")
 ```
 
 ### Connection

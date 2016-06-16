@@ -1,5 +1,5 @@
 ---
-title: "RSpark ML: Examples"
+title: "Spark MLlib: Examples"
 output:
   github_document:
     fig_width: 9
@@ -9,7 +9,7 @@ output:
 ## Initialization
 
 ```{r}
-library(rspark)
+library(sparklyr)
 library(dplyr)
 library(ggplot2)
 
@@ -36,7 +36,7 @@ iris %>%
     geom_point(data = iris, aes(Petal.Width, Petal.Length), size = 2, alpha = 0.5)
 ```
 
-## KMeans in RSpark
+## KMeans in Spark
 
 Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/latest/mllib-clustering.html#k-means)
 
@@ -73,7 +73,7 @@ iris %>%
                     color = "red"))
 ```
 
-## Linear Regression in RSpark
+## Linear Regression in Spark
 
 ```{r}
 model <- tbl(db, "iris") %>%
@@ -121,7 +121,7 @@ ggplot(beaver, aes(x = temp, y = activ)) +
   )
 ```
 
-## Logistic Regression in RSpark
+## Logistic Regression in Spark
 
 ```{r}
 copy_to(db, beaver, "beaver")
@@ -150,7 +150,7 @@ fit <- lm(Petal.Length ~ Petal.Width, data = iris)
 predict(fit, newdata = test)
 ```
 
-## Partitioning in RSpark
+## Partitioning in Spark
 
 ```{r}
 partitions <- tbl(db, "iris") %>%
@@ -175,7 +175,7 @@ print(model)
 model$sdev^2 / sum(model$sdev^2)
 ```
 
-## Principal Components Analysis in RSpark
+## Principal Components Analysis in Spark
 
 ```{r}
 model <- tbl(db, "iris") %>%
@@ -197,7 +197,7 @@ rPredict <- predict(rForest, iris)
 head(rPredict)
 ```
 
-## Random Forests with RSpark
+## Random Forests with Spark
 
 ```{r}
 mForest <- iris_tbl %>%
@@ -216,7 +216,7 @@ head(mPredict)
 
 Using the model to predict the same data it was trained on is
 certainly not best practice, but it at least showcases that
-the results produced are concordant between R and RSpark.
+the results produced are concordant between R and Spark.
 
 ```{r}
 df <- as.data.frame(table(x = rPredict, y = mPredict), stringsAsFactors = FALSE)
@@ -226,8 +226,8 @@ ggplot(df) +
   geom_text(aes(x, y, label = Freq), col = "white", size = 6) +
   labs(
     x = "R-predicted Species",
-    y = "RSpark-predicted Species",
-    title = "Random Forest Classification — Comparing R and RSpark"
+    y = "Spark-predicted Species",
+    title = "Random Forest Classification — Comparing R and Spark"
   )
 ```
 

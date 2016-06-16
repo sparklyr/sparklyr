@@ -1,11 +1,11 @@
-RSpark ML: Examples
+Spark MLlib: Examples
 ================
 
 Initialization
 --------------
 
 ``` r
-library(rspark)
+library(sparklyr)
 library(dplyr)
 ```
 
@@ -23,10 +23,30 @@ library(dplyr)
 ``` r
 library(ggplot2)
 
-sc <- spark_connect("local", cores = "auto", version = "2.0.0-preview")
+sc <- spark_connect("local", version = "2.0.0-preview")
 db <- src_spark(sc)
 
 copy_to(db, iris, "iris")
+```
+
+    ## Source:   query [?? x 5]
+    ## Database: spark connection master=local app=sparklyr local=TRUE
+    ## 
+    ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
+    ##           <dbl>       <dbl>        <dbl>       <dbl>   <chr>
+    ## 1           5.1         3.5          1.4         0.2  setosa
+    ## 2           4.9         3.0          1.4         0.2  setosa
+    ## 3           4.7         3.2          1.3         0.2  setosa
+    ## 4           4.6         3.1          1.5         0.2  setosa
+    ## 5           5.0         3.6          1.4         0.2  setosa
+    ## 6           5.4         3.9          1.7         0.4  setosa
+    ## 7           4.6         3.4          1.4         0.3  setosa
+    ## 8           5.0         3.4          1.5         0.2  setosa
+    ## 9           4.4         2.9          1.4         0.2  setosa
+    ## 10          4.9         3.1          1.5         0.1  setosa
+    ## ..          ...         ...          ...         ...     ...
+
+``` r
 iris_tbl <- tbl(db, "iris")
 ```
 
@@ -49,8 +69,8 @@ iris %>%
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-2-1.png)
 
-KMeans in RSpark
-----------------
+KMeans in Spark
+---------------
 
 Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/latest/mllib-clustering.html#k-means)
 
@@ -88,8 +108,8 @@ iris %>%
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
-Linear Regression in RSpark
----------------------------
+Linear Regression in Spark
+--------------------------
 
 ``` r
 model <- tbl(db, "iris") %>%
@@ -156,11 +176,31 @@ ggplot(beaver, aes(x = temp, y = activ)) +
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
-Logistic Regression in RSpark
------------------------------
+Logistic Regression in Spark
+----------------------------
 
 ``` r
 copy_to(db, beaver, "beaver")
+```
+
+    ## Source:   query [?? x 4]
+    ## Database: spark connection master=local app=sparklyr local=TRUE
+    ## 
+    ##      day  time  temp      activ
+    ##    <dbl> <dbl> <dbl>      <chr>
+    ## 1    307   930 36.58 Non-Active
+    ## 2    307   940 36.73 Non-Active
+    ## 3    307   950 36.93 Non-Active
+    ## 4    307  1000 37.15 Non-Active
+    ## 5    307  1010 37.23 Non-Active
+    ## 6    307  1020 37.24 Non-Active
+    ## 7    307  1030 37.24 Non-Active
+    ## 8    307  1040 36.90 Non-Active
+    ## 9    307  1050 36.95 Non-Active
+    ## 10   307  1100 36.89 Non-Active
+    ## ..   ...   ...   ...        ...
+
+``` r
 beaver_tbl <- tbl(db, "beaver")
 
 model <- beaver_tbl %>%
@@ -203,12 +243,12 @@ predict(fit, newdata = test)
     ##      130      132      141      144      146      147 
     ## 4.651463 5.543439 6.435415 6.212421 6.212421 5.320445
 
-Partitioning in RSpark
-----------------------
+Partitioning in Spark
+---------------------
 
 ``` r
 partitions <- tbl(db, "iris") %>%
-  partition(training = 0.75, test = 0.25, seed = 1099)
+  ml_partition(training = 0.75, test = 0.25, seed = 1099)
 
 fit <- partitions$training %>%
   ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
@@ -250,8 +290,8 @@ model$sdev^2 / sum(model$sdev^2)
 
     ## [1] 0.924618723 0.053066483 0.017102610 0.005212184
 
-Principal Components Analysis in RSpark
----------------------------------------
+Principal Components Analysis in Spark
+--------------------------------------
 
 ``` r
 model <- tbl(db, "iris") %>%
@@ -289,8 +329,8 @@ head(rPredict)
     ## setosa setosa setosa setosa setosa setosa 
     ## Levels: setosa versicolor virginica
 
-Random Forests with RSpark
---------------------------
+Random Forests with Spark
+-------------------------
 
 ``` r
 mForest <- iris_tbl %>%
@@ -310,7 +350,7 @@ head(mPredict)
 Comparing Random Forest Classification
 --------------------------------------
 
-Using the model to predict the same data it was trained on is certainly not best practice, but it at least showcases that the results produced are concordant between R and RSpark.
+Using the model to predict the same data it was trained on is certainly not best practice, but it at least showcases that the results produced are concordant between R and Spark.
 
 ``` r
 df <- as.data.frame(table(x = rPredict, y = mPredict), stringsAsFactors = FALSE)
@@ -320,12 +360,57 @@ ggplot(df) +
   geom_text(aes(x, y, label = Freq), col = "white", size = 6) +
   labs(
     x = "R-predicted Species",
-    y = "RSpark-predicted Species",
-    title = "Random Forest Classification — Comparing R and RSpark"
+    y = "Spark-predicted Species",
+    title = "Random Forest Classification — Comparing R and Spark"
   )
 ```
 
 ![](ml_examples_files/figure-markdown_github/unnamed-chunk-14-1.png)
+
+Neural Networks with R
+----------------------
+
+``` r
+library(neuralnet)
+```
+
+    ## Loading required package: grid
+
+    ## Loading required package: MASS
+
+    ## 
+    ## Attaching package: 'MASS'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     select
+
+    ## 
+    ## Attaching package: 'neuralnet'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     compute
+
+``` r
+XOR <- c(0,1,1,0)
+xor.data <- data.frame(expand.grid(c(0,1), c(0,1)), XOR)
+
+xor.data
+```
+
+    ##   Var1 Var2 XOR
+    ## 1    0    0   0
+    ## 2    1    0   1
+    ## 3    0    1   1
+    ## 4    1    1   0
+
+``` r
+net.xor <- neuralnet( XOR~Var1+Var2, xor.data, hidden = 2, rep = 5)
+plot(net.xor, rep="best")
+```
+
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-15-1.png)
 
 Cleanup
 -------

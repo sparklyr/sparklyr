@@ -56,7 +56,7 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 #' @examples
 #' \dontrun{
 #' library(DBI)
-#' library(rspark)
+#' library(sparklyr)
 #' library(nycflights13)
 #'
 #' sc <- spark_connect()

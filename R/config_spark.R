@@ -6,7 +6,7 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   baseConfig <- list()
 
   if (use_default) {
-    localConfigFile <- system.file(file.path("conf", "config-template.yml"), package = "rspark")
+    localConfigFile <- system.file(file.path("conf", "config-template.yml"), package = "sparklyr")
     baseConfig <- config::get(file = localConfigFile)
   }
 

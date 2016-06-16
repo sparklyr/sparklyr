@@ -5,9 +5,9 @@ spark_versions_file_pattern <- function() {
 #' Retrieves available versions of Spark
 #' @rdname spark_install
 #' @export
-spark_versions <- function(latest = TRUE) {
-  latestUrl <- "https://raw.githubusercontent.com/rstudio/rspark/master/inst/extdata/install_spark.csv?token=ASpg1NOA-Y-_Ir67ZLqzefBWo8URFxO5ks5XYZCAwA%3D%3D"
-  packagePath <- system.file(file.path("extdata", "install_spark.csv"), package = "rspark")
+spark_versions <- function(latest = FALSE) {
+  latestUrl <- "https://raw.githubusercontent.com/rstudio/sparklyr/master/inst/extdata/install_spark.csv?token=ASpg1NOA-Y-_Ir67ZLqzefBWo8URFxO5ks5XYZCAwA%3D%3D"
+  packagePath <- system.file(file.path("extdata", "install_spark.csv"), package = "sparklyr")
 
   downloadData <- NULL
   if (latest) {

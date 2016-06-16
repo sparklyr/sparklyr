@@ -1,5 +1,5 @@
 ---
-title: "Using RSpark in EC2"
+title: "Using sparklyr in EC2"
 output: github_document
 ---
 
@@ -63,7 +63,7 @@ devtools::install_github("nycflights13")
 Finally, build the sparklyr package:
 
 ```{r, eval=FALSE}
-devtools::install_github("rstudio/rspark")
+devtools::install_github("rstudio/sparklyr")
 ```
 
 ### Connection

@@ -22,10 +22,10 @@ sparkConnectionsEnv <- new.env(parent = emptyenv())
 
 spark_connection_global_inst <- function(instances = NULL) {
   if (!identical(instances, NULL)) {
-    sparkConnectionsEnv$.rspark.connections <- instances
+    sparkConnectionsEnv$.sparklyr.connections <- instances
   }
 
-  sparkConnectionsEnv$.rspark.connections
+  sparkConnectionsEnv$.sparklyr.connections
 }
 
 spark_connection_get_inst <- function(scon) {

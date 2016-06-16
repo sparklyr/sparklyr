@@ -1,7 +1,7 @@
 
 
 spark_install_dir <- function() {
-  getOption("rspark.spark.install.dir", rappdirs::app_dir("spark", "rstudio")$cache())
+  getOption("spark.install.dir", rappdirs::app_dir("spark", "rstudio")$cache())
 }
 
 # Check if Spark can be installed in this system
@@ -136,7 +136,7 @@ spark_install <- function(version = NULL,
 
   hiveSitePath <- file.path(installInfo$sparkConfDir, "hive-site.xml")
   if (!file.exists(hiveSitePath) || reset) {
-    hiveSiteTemplatePath <- system.file(package = "rspark", file.path("conf", "hive-site.xml"))
+    hiveSiteTemplatePath <- system.file(package = "sparklyr", file.path("conf", "hive-site.xml"))
     file.copy(hiveSiteTemplatePath, hiveSitePath, overwrite = TRUE)
   }
 

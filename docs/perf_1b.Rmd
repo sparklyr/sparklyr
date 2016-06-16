@@ -1,5 +1,5 @@
 ---
-title: "RSpark Performance: 1B Rows"
+title: "Spark Performance: 1B Rows"
 output:
   github_document:
     fig_width: 9
@@ -8,13 +8,13 @@ output:
 
 ## Setup
 ```{r}
-rspark:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WARN")
+sparklyr:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WARN")
 ```
 
 ## Initialization
 
 ```{r}
-library(rspark)
+library(sparklyr)
 library(magrittr)
 library(dplyr)
 library(ggplot2)
@@ -69,7 +69,7 @@ sparkTest <- function(test, loadIntoDf = TRUE) {
   )
   
   db <- src_spark(sc)
-  ses <- rspark:::spark_sql_or_hive(rspark:::spark_api(db))
+  ses <- sparklyr:::spark_sql_or_hive(sparklyr:::spark_api(db))
   df <- NULL
   
   if (loadIntoDf) {
@@ -117,7 +117,7 @@ spark_sum_range <- function(sc, db, ses, df) {
 
 ```{r}
 spark_sum_range_parquet <- function(sc, db, ses, df) {
-  df <- spark_invoke(rspark:::spark_sql_or_hive(rspark:::spark_api(db)), "read") %>%
+  df <- spark_invoke(sparklyr:::spark_sql_or_hive(sparklyr:::spark_api(db)), "read") %>%
     spark_invoke("parquet", list(parquetPath))
     
   result <- spark_invoke(df, "selectExpr", list("sum(x)")) %>%
@@ -137,10 +137,10 @@ spark_sum_range_mem <- function(sc, db, ses, df) {
 }
 ```
 
-### Sum range using rspark
+### Sum range using sparklyr
 
 ```{r}
-spark_sum_range_rspark <- function(sc, db, ses, df) {
+spark_sum_range_sparklyr <- function(sc, db, ses, df) {
   tbl(db, "billion") %>%
     summarise(total = sum(x)) %>%
     collect
@@ -151,7 +151,7 @@ spark_sum_range_rspark <- function(sc, db, ses, df) {
 
 ```{r}
 spark_sum_range_sparkr_sql_prepare <- function() {
-  installInfo <- rspark:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
+  installInfo <- sparklyr:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
   
   Sys.setenv(SPARK_HOME = installInfo$sparkVersionDir)
   library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
@@ -182,7 +182,7 @@ spark_sum_range_sparkr_terminate <- function() {
 
 ```{r}
 spark_sum_range_sparkr_native_prepare <- function() {
-  installInfo <- rspark:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
+  installInfo <- sparklyr:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
   
   Sys.setenv(SPARK_HOME = installInfo$sparkVersionDir)
   library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
@@ -263,18 +263,18 @@ runInMem <- sparkTest(function(sc, db, ses, df) {
 })
 ```
 
-### Sum range using rspark
+### Sum range using sparklyr
 
-```{r runRSpark}
-runRSpark <- sparkTest(function(sc, db, ses, df) {
-  logResults("2.0.0 rspark", function() {
+```{r runSparklyr}
+runSparklyr <- sparkTest(function(sc, db, ses, df) {
+  logResults("2.0.0 sparklyr", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    sum <- spark_sum_range_rspark(sc, db, ses, df)
+    sum <- spark_sum_range_run_sparklyr(sc, db, ses, df)
   })
 }, loadIntoDf = FALSE)
 ```
 
-### Sum range using RSpark SQL
+### Sum range using SparkR SQL
 
 ```{r runSparkRSQL}
 sqlContextR <- spark_sum_range_sparkr_sql_prepare()
@@ -284,7 +284,7 @@ runSparkRSQL <- logResults("2.0.0 SparkR SQL", function() {
 spark_sum_range_sparkr_terminate()
 ```
 
-### Sum range using RSpark SQL
+### Sum range using SparkR native
 
 ```{r runSparkRNative}
 dfSparkR <- spark_sum_range_sparkr_native_prepare()
@@ -313,7 +313,7 @@ allRuns <- lapply(
     runCode,
     runParquet,
     runInMem,
-    runRSpark,
+    runSparklyr,
     runSparkRSQL,
     runSparkRNative,
     runDplyr

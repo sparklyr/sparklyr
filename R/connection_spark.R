@@ -2,10 +2,10 @@
 methods::setOldClass("spark_connection")
 
 spark_default_jars <- function() {
-  jarsOption <- getOption("rspark.jars.default", NULL)
+  jarsOption <- getOption("spark.jars.default", NULL)
 
   if (is.null(jarsOption))
-    system.file(file.path("java", "rspark_utils.jar"), package = "rspark")
+    system.file(file.path("java", "rspark_utils.jar"), package = "sparklyr")
   else
     jarsOption
 }
@@ -19,7 +19,7 @@ spark_default_jars <- function() {
 #' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
 spark_connect <- function(master = "local",
-                          app_name = "rspark",
+                          app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
                           config = spark_config()) {
@@ -56,7 +56,7 @@ spark_connect <- function(master = "local",
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
-  sconInst$connectCall <- paste("library(rspark)",
+  sconInst$connectCall <- paste("library(sparklyr)",
                                 paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
                                 sep = "\n")
   sconInst$onReconnect = list()

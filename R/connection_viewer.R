@@ -19,7 +19,7 @@ on_connection_opened <- function(scon, connectCall) {
           x <- base::get(name, envir = env)
           if (inherits(x, "spark_connection") &&
               identical(x$master, host) &&
-              rspark::spark_connection_is_open(x)) {
+              sparklyr::spark_connection_is_open(x)) {
             return(name)
           }
         }
@@ -33,13 +33,13 @@ on_connection_opened <- function(scon, connectCall) {
       disconnectCode = "spark_disconnect(%s)",
 
       # table enumeration code
-      listTablesCode =  "rspark:::connection_list_tables(%s)",
+      listTablesCode =  "sparklyr:::connection_list_tables(%s)",
 
       # column enumeration code
-      listColumnsCode = "rspark:::connection_list_columns(%s, '%s')",
+      listColumnsCode = "sparklyr:::connection_list_columns(%s, '%s')",
 
       # table preview code
-      previewTableCode = "rspark:::connection_preview_table(%s, '%s', %s)"
+      previewTableCode = "sparklyr:::connection_preview_table(%s, '%s', %s)"
     )
   }
 }
