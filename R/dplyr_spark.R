@@ -148,20 +148,38 @@ print.src_spark <- function(x, ...) {
 
 #' Partition a Spark Dataframe
 #'
-#' @param .data Data
+#' Partition a Spark DataFrame into multiple groups. This routine is useful
+#' for splitting a DataFrame into, for example, training and test datasets.
+#'
+#' @param x A \code{tbl_spark}.
 #' @param ... Named parameters, mapping table names to weights.
-#' @param seed Seed value for the partition
+#' @param seed Random seed to use for randomly partitioning the dataset. Set
+#'   this if you want your partitioning to be reproducible on repeated runs.
+#'
+#' @return An \R \code{list} of \code{tbl_spark}s.
+#'
 #' @export
-df_partition <- function(.data, ..., seed = sample(.Machine$integer.max, 1)) {
+#'
+#' @examples
+#' \dontrun{
+#' # randomly partition data into a 'training' and 'test'
+#' # dataset, with 60% of the observations assigned to the
+#' # 'training' dataset, and 40% assigned to the 'test' dataset
+#' diamonds_tbl <- copy_to(sc, diamonds, "diamonds")
+#' partitions <- diamonds_tbl %>%
+#'   df_partition(training = 0.6, test = 0.4)
+#' print(partitions)
+#' }
+df_partition <- function(x, ..., seed = sample(.Machine$integer.max, 1)) {
   weights <- list(...)
   nm <- names(weights)
   if (is.null(nm) || any(!nzchar(nm)))
     stop("all weights must be named")
 
-  splat <- spark_dataframe_split(.data, as.numeric(weights), seed = seed)
+  splat <- spark_dataframe_split(x, as.numeric(weights), seed = seed)
   names(splat) <- nm
 
-  db <- .data$src
+  db <- x$src
   partitions <- lapply(seq_along(splat), function(i) {
     spark_invoke(splat[[i]], "registerTempTable", nm[[i]])
     tbl(db, nm[[i]])

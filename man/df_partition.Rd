@@ -4,16 +4,32 @@
 \alias{df_partition}
 \title{Partition a Spark Dataframe}
 \usage{
-df_partition(.data, ..., seed = sample(.Machine$integer.max, 1))
+df_partition(x, ..., seed = sample(.Machine$integer.max, 1))
 }
 \arguments{
-\item{.data}{Data}
+\item{x}{A \code{tbl_spark}.}
 
 \item{...}{Named parameters, mapping table names to weights.}
 
-\item{seed}{Seed value for the partition}
+\item{seed}{Random seed to use for randomly partitioning the dataset. Set
+this if you want your partitioning to be reproducible on repeated runs.}
+}
+\value{
+An \R \code{list} of \code{tbl_spark}s.
 }
 \description{
-Partition a Spark Dataframe
+Partition a Spark DataFrame into multiple groups. This routine is useful
+for splitting a DataFrame into, for example, training and test datasets.
+}
+\examples{
+\dontrun{
+# randomly partition data into a 'training' and 'test'
+# dataset, with 60\% of the observations assigned to the
+# 'training' dataset, and 40\% assigned to the 'test' dataset
+diamonds_tbl <- copy_to(sc, diamonds, "diamonds")
+partitions <- diamonds_tbl \%>\%
+  df_partition(training = 0.6, test = 0.4)
+print(partitions)
+}
 }
 
