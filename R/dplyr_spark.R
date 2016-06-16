@@ -1,19 +1,5 @@
-#' Connect to Spark for Dplyr.
-#'
 #' @import dplyr
 #' @import parallel
-#' @export
-#' @param sc Spark connection provided by spark_connection
-src_spark <- function(sc) {
-  if (missing(sc))
-    stop("Need to specify an Spark connection created. See spark_connection.")
-
-  scon <- sc
-  dbiCon <- dbConnect(DBISpark(scon))
-  db <- src_sql("spark", dbiCon)
-
-  db
-}
 
 spark_dbi <- function(con) {
   con$con
