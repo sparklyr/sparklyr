@@ -1,6 +1,8 @@
 Using RSpark in EC2
 ================
 
+Spark provides some utilities that make it simpler to provision a Spark cluster on Amazon EC2. sparklyr wraps these utilities to make them available from within R. You should realize, however, that the default security settings for such clusters are very permissive; you should not use this technique to create a cluster that hosts any sensitive data.
+
 Deployment
 ----------
 
@@ -10,34 +12,44 @@ Deploy a 1-master 1-worker cluster using:
 ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
                         secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
                         pem_file = "spark.pem")
+```
+
+This gives you a handle to an unprovisioned cluster on EC2. You can bring this cluster to life by running `spark_ec2_deploy(ci)` or later destroy the cluster using `spark_ec2_destroy(ci)`.
+
+To bring this cluster to life:
+
+``` r
 spark_ec2_deploy(ci)
 ```
 
-Remote connect to the master node by running the following command and running the result in a terminal window:
+You may need to remotely SSH into the master node to manage the system or install system-level dependencies. The following R command will give you the command you need to run in a terminal shell to log in to the Spark master on EC2:
 
 ``` r
 spark_ec2_login(ci)
 ```
 
-Once connected, change the password using:
+Once connected in a terminal shell, change the password for the `rstudio` user using:
 
 `passwd rstudio`
 
-Back from R, launch R studio in the cluster machine using:
+You now have a Spark cluster running remotely on EC2. You can interact with this cluster in one of two ways: 1.) You can login to the cluster remotely using SSH and an instance of RStudio already installed on the cluster, or 2.) You can connect to this remote cluster from your local machine, using your own computer to run R and only using this EC2 cluster to host Spark for you.
+
+Login and Interact
+------------------
+
+You can choose to login to the cluster and run your R code on the cluster itself. The EC2 cluster has an instance of [RStudio Server](https://www.rstudio.com/products/rstudio/#Server) installed on it by default. Run the following command to open that instance in your web browser.
 
 ``` r
 spark_ec2_rstudio(ci)
 ```
 
-Compilation
------------
+### Compilation
 
-Using the remote terminal into the cluster, run:
+Using the remote SSH terminal into the cluster, run:
 
-    yum install openssl-devel
-    yum -y install libcurl libcurl-devel
+    yum -y install openssl-devel libcurl libcurl-devel
 
-From the RStudio in the cluster machine, install:
+Now in the RStudio window that you opened by running `spark_ec2_rstudio()`, run the following R commands to install the packages you'll want on this cluster.
 
 ``` r
 install.packages("devtools")
@@ -46,12 +58,15 @@ devtools::install_github("hadley/dplyr")
 devtools::install_github("nycflights13")
 ```
 
-Finally, build the RSpark package.
+Finally, build the sparklyr package:
 
-Connection
-----------
+``` r
+devtools::install_github("rstudio/rspark")
+```
 
-From the RStudio in the cluster machine, run:
+### Connection
+
+Once you've installed all the necessary packages on the RStudio instance running on the EC2 Spark cluster, you can establish a connection to Spark by running:
 
 ``` r
 library(dplyr)
@@ -62,3 +77,12 @@ db <- src_spark(sc)
 
 src_tbls(db)
 ```
+
+Remote Connection
+-----------------
+
+The alternative approach to leverage the cluster on EC2 would be to run sparklyr on your own machine locally, and connect from your local machine to the remote Spark instance.
+
+This connection isn't permitted in the default configuration of the cluster, so you'll need to [open port 7077 in the EC2 security group](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html) associated with your Spark Master. You can enable TCP traffic on port 7077 from whatever IP addresses will be running sparklyr that you want to be able to connect.
+
+Once you've changed the firewall settings, you can now connect to your EC2 Spark cluster from a local sparklyr. In the IDE, you can merely click the "New Connection" button, then configure "Master" to be a "Remote server..." and provide the address and port of your remote EC2 instance. You can find this information by running `spark_ec2_web(ci)` and pulling the value for the `URL` field on that page. It should look something like `spark://1.2.3.4.compute-1.amazonaws.com:7077`. Use that value for the "Remote Server" URL in your local IDE.
