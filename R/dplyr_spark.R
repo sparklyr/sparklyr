@@ -1,12 +1,20 @@
 #' @import dplyr
 #' @import parallel
 
-spark_dbi <- function(con) {
-  con$con
+spark_dbi <- function(x, ...) {
+  UseMethod("spark_dbi", x)
 }
 
-spark_api <- function(con) {
-  spark_dbi(con)@api
+spark_dbi.src_spark <- function(x) {
+  x$con
+}
+
+spark_dbi.spark_connection <- function(x) {
+  dbConnect(DBISpark(x))
+}
+
+spark_api <- function(x) {
+  spark_dbi(x)@api
 }
 
 spark_scon <- function(x, ...) {
@@ -66,7 +74,7 @@ tbl.spark_connection <- function(src, from, ...) {
 #' @export
 src_tbls.spark_connection <- function(x, ...) {
   src <- src_sql("spark", dbConnect(DBISpark(x)))
-  src_tbls(src, ...)
+  sort(src_tbls(src, ...))
 }
 
 #' @export
@@ -95,7 +103,7 @@ copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)), .
 
   if (overwrite)
     spark_remove_table_if_exists(dest, name)
-  if (spark_table_exists(dest, name))
+  if (name %in% src_tbls(sc))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
   dbWriteTable(dest$con, name, df)
