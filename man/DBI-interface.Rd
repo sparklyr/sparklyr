@@ -73,4 +73,5 @@ dbReadTable(con, "mtcars2")
 dbDisconnect(con)
 }
 }
+\keyword{internal}
 

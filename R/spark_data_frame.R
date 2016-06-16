@@ -77,9 +77,7 @@ spark_dataframe_read_column <- function(object, colName) {
   column
 }
 
-#' Read a Spark Dataset into R.
-#' @param object An (object convertable to a) Spark DataFrame.
-#' @export
+# Read a Spark Dataset into R.
 spark_dataframe_collect <- function(object) {
   jobj <- as_spark_dataframe(object)
   schema <- spark_dataframe_schema(jobj)
@@ -93,13 +91,7 @@ spark_dataframe_collect <- function(object) {
   dplyr::as_data_frame(df, stringsAsFactors = FALSE, optional = TRUE)
 }
 
-#' Split a Spark DataFrame
-#'
-#' @param object An (object convertable to a) Spark DataFrame.
-#' @param weights A numeric vector of weights.
-#' @param seed A numeric seed.
-#'
-#' @export
+# Split a Spark DataFrame
 spark_dataframe_split <- function(object,
                                   weights = c(0.5, 0.5),
                                   seed = sample(.Machine$integer.max, 1))

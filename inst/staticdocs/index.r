@@ -26,11 +26,7 @@ sd_section("Manipulating Data",
              "tbl_cache",
              "tbl_uncache",
              "as_spark_dataframe",
-             "load_df",
-             "spark_dataframe_collect",
-             "spark_dataframe_split",
-             "partition",
-             "DBI-interface")
+             "load_df")
 )
 
 sd_section("MLlib Interface",
@@ -41,6 +37,7 @@ sd_section("MLlib Interface",
              "ml_random_forest",
              "ml_pca",
              "ml_multilayer_perceptron",
+             "ml_partition",
              "ml_mutate",
              "ft_binarizer",
              "ft_bucketizer",

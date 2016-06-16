@@ -24,6 +24,7 @@
 #' dbDisconnect(con)
 #' }
 #' @name DBI-interface
+#' @keywords internal
 NULL
 
 #' @export
