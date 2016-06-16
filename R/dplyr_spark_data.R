@@ -5,36 +5,30 @@ spark_partition_register_df <- function(con, df, api, name, repartition, memory)
     df <- spark_invoke(df, "repartition", as.integer(repartition))
   }
 
+  dbi <- spark_dbi(con)
   spark_register_temp_table(df, name)
 
   if (memory) {
-    dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
-    dbGetQuery(con$con, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = con$con)))
+    dbGetQuery(dbi, paste("CACHE TABLE", dplyr::escape(ident(name), con = dbi)))
+    dbGetQuery(dbi, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = dbi)))
   }
 
   tbl(con, name)
 }
 
-spark_remove_table_if_exists <- function(con, name) {
-  if (spark_table_exists(con, name)) {
-    spark_remove_table(con, name)
+spark_remove_table_if_exists <- function(sc, name) {
+  if (name %in% src_tbls(sc)) {
+    dbi <- spark_dbi(sc)
+    dbRemoveTable(dbi, name)
   }
 }
 
-spark_table_exists <- function(con, name) {
-  name %in% src_tbls(con)
-}
-
-spark_remove_table <- function(con, name) {
-  dbRemoveTable(con$con, name)
-}
-
 #' Reads a CSV file and provides a data source compatible with dplyr
 #'
 #' Reads a CSV file and provides a data source compatible with dplyr
 #'
 #'
-#' @param db dplyr interface
+#' @param sc The Spark connection
 #' @param name Name to reference the data source once it's loaded
 #' @param path The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"
 #' @param memory Loads data into memory
@@ -42,12 +36,12 @@ spark_remove_table <- function(con, name) {
 #' @param overwrite Overwrite the table with the given name when it exists
 #'
 #' @export
-spark_read_csv <- function(db, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
-  if (overwrite) spark_remove_table_if_exists(db, name)
+spark_read_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  api <- spark_api(db)
+  api <- spark_api(sc)
   df <- spark_api_read_csv(api, path)
-  spark_partition_register_df(db, df, api, name, repartition, memory)
+  spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
 spark_source_from_ops <- function(x) {
