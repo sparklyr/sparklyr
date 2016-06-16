@@ -21,4 +21,13 @@ be applied.}
 Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}
 to mutate a Spark DataFrame.
 }
+\examples{
+\dontrun{
+# using the 'beaver1' dataset, binarize the 'temp' column
+# encode 'warm' as 'temp > 37'
+beaver_tbl <- copy_to(db, beaver1, "beaver")
+beaver_tbl \%>\%
+  ml_mutate(warm = ft_binarizer(temp, 37))
+}
+}
 
