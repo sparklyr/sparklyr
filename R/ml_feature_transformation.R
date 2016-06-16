@@ -15,7 +15,7 @@ register_spark_tbl <- function(tbl, df, name = random_string()) {
 #'   be applied.
 #' @param .dots A named list, mapping output names to transformations.
 #'
-#' @name ml_mutate
+#' @name df_mutate
 #' @export
 #'
 #' @examples
@@ -24,15 +24,15 @@ register_spark_tbl <- function(tbl, df, name = random_string()) {
 #' # encode 'warm' as 'temp > 37'
 #' beaver_tbl <- copy_to(db, beaver1, "beaver")
 #' beaver_tbl %>%
-#'   ml_mutate(warm = ft_binarizer(temp, 37))
+#'   df_mutate(warm = ft_binarizer(temp, 37))
 #' }
-ml_mutate <- function(.data, ...) {
-  ml_mutate_(.data, .dots = lazyeval::lazy_dots(...))
+df_mutate <- function(.data, ...) {
+  df_mutate_(.data, .dots = lazyeval::lazy_dots(...))
 }
 
-#' @name ml_mutate
+#' @name df_mutate
 #' @export
-ml_mutate_ <- function(.data, ..., .dots) {
+df_mutate_ <- function(.data, ..., .dots) {
   dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
   data <- .data
 

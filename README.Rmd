@@ -13,7 +13,6 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE, fig.path='res/')
 library(sparklyr)
-library(dplyr)
 library(ggplot2)
 library(nycflights13)
 library(Lahman)
@@ -44,9 +43,8 @@ spark_install(version = "1.6.1", hadoop_version = "2.6", reset = TRUE)
 The sparklyr package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
 
 ```{r connection, message=FALSE}
-# connect to local spark instance and get a dplyr interface
+# connect to local spark instance 
 library(sparklyr)
-library(dplyr)
 sc <- spark_connect("local", version = "1.6.1")
 ```
 

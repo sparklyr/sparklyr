@@ -16,7 +16,6 @@ sparklyr:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WA
 ```{r}
 library(sparklyr)
 library(magrittr)
-library(dplyr)
 library(ggplot2)
 
 parquetPath <- file.path(getwd(), "billion.parquet")
