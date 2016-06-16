@@ -23,8 +23,7 @@ sd_section("dplyr Interface",
            "Functions implementing a dplyr backend for Spark DataFrames",
            c("src_spark",
              "tbl_cache",
-             "tbl_uncache",
-             "as_spark_dataframe")
+             "tbl_uncache")
 )
 
 sd_section("MLlib Interface",
@@ -54,7 +53,8 @@ sd_section("Spark API",
            c("spark_context",
              "spark_invoke",
              "spark_invoke_static",
-             "spark_invoke_static_ctor")
+             "spark_invoke_static_ctor",
+             "as_spark_dataframe")
 )
 
 sd_section("EC2",
