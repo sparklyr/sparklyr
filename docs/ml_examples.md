@@ -6,8 +6,9 @@ Initialization
 
 ``` r
 library(sparklyr)
-library(dplyr)
 ```
+
+    ## Loading required package: dplyr
 
     ## 
     ## Attaching package: 'dplyr'
@@ -24,9 +25,8 @@ library(dplyr)
 library(ggplot2)
 
 sc <- spark_connect("local", version = "2.0.0-preview")
-db <- src_spark(sc)
 
-copy_to(db, iris, "iris")
+copy_to(sc, iris, "iris")
 ```
 
     ## Source:   query [?? x 5]
@@ -47,7 +47,7 @@ copy_to(db, iris, "iris")
     ## ..          ...         ...          ...         ...     ...
 
 ``` r
-iris_tbl <- tbl(db, "iris")
+iris_tbl <- tbl(sc, "iris")
 ```
 
 KMeans in R
@@ -77,11 +77,11 @@ Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/l
 Note that the names of variables within the iris `tbl` have been transformed (replacing `.` with `_`) to work around an issue in the Spark 2.0.0-preview used in constructing this document -- we expect the issue to be resolved with the release of Spark 2.0.0.
 
 ``` r
-model <- tbl(db, "iris") %>%
+model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   ml_kmeans(centers = 3)
 
-tbl(db, "iris") %>%
+iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   collect %>%
   ggplot(aes(Petal_Length, Petal_Width)) +
@@ -112,14 +112,15 @@ Linear Regression in Spark
 --------------------------
 
 ``` r
-model <- tbl(db, "iris") %>%
+model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
   ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
 
-iris %>%
-  select(Petal.Width, Petal.Length) %>%
-  ggplot(aes(Petal.Length, Petal.Width)) +
-    geom_point(data = iris, aes(Petal.Width, Petal.Length), size = 2, alpha = 0.5) +
+iris_tbl %>%
+  select(Petal_Width, Petal_Length) %>%
+  collect %>%
+  ggplot(aes(Petal_Length, Petal_Width)) +
+    geom_point(aes(Petal_Width, Petal_Length), size = 2, alpha = 0.5) +
     geom_abline(aes(slope = coef(model)[["Petal_Width"]],
                     intercept = coef(model)[["(Intercept)"]],
                     color = "red"))
@@ -180,7 +181,7 @@ Logistic Regression in Spark
 ----------------------------
 
 ``` r
-copy_to(db, beaver, "beaver")
+copy_to(sc, beaver, "beaver")
 ```
 
     ## Source:   query [?? x 4]
@@ -201,7 +202,7 @@ copy_to(db, beaver, "beaver")
     ## ..   ...   ...   ...        ...
 
 ``` r
-beaver_tbl <- tbl(db, "beaver")
+beaver_tbl <- tbl(sc, "beaver")
 
 model <- beaver_tbl %>%
   mutate(response = as.numeric(activ == "Active")) %>%
@@ -247,8 +248,8 @@ Partitioning in Spark
 ---------------------
 
 ``` r
-partitions <- tbl(db, "iris") %>%
-  ml_partition(training = 0.75, test = 0.25, seed = 1099)
+partitions <- tbl(sc, "iris") %>%
+  df_partition(training = 0.75, test = 0.25, seed = 1099)
 
 fit <- partitions$training %>%
   ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
@@ -294,7 +295,7 @@ Principal Components Analysis in Spark
 --------------------------------------
 
 ``` r
-model <- tbl(db, "iris") %>%
+model <- tbl(sc, "iris") %>%
   select(-Species) %>%
   ml_pca()
 print(model)

@@ -67,8 +67,7 @@ sparkTest <- function(test, loadIntoDf = TRUE) {
     spark_context(sc)
   )
   
-  db <- src_spark(sc)
-  ses <- sparklyr:::spark_sql_or_hive(sparklyr:::spark_api(db))
+  ses <- sparklyr:::spark_sql_or_hive(sparklyr:::spark_api(sc))
   df <- NULL
   
   if (loadIntoDf) {

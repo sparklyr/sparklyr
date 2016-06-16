@@ -15,9 +15,8 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   sc <- spark_connect("local", version = "2.0.0-preview")
   on.exit(spark_disconnect(sc))
 
-  db <- src_spark(sc)
-  copy_to(db, mtcars, "mtcars")
-  mtcars_tbl <- tbl(db, "mtcars")
+  copy_to(sc, mtcars, "mtcars")
+  mtcars_tbl <- tbl(sc, "mtcars")
 
   values <- seq(0, 0.5, by = 0.1)
   parMatrix <- expand.grid(values, values, KEEP.OUT.ATTRS = FALSE)

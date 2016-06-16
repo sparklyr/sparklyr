@@ -69,13 +69,10 @@ devtools::install_github("rstudio/sparklyr")
 Once you've installed all the necessary packages on the RStudio instance running on the EC2 Spark cluster, you can establish a connection to Spark by running:
 
 ``` r
-library(dplyr)
-
 master <- system('cat /root/spark-ec2/cluster-url', intern=TRUE)
 sc <- spark_connect(master)
-db <- src_spark(sc)
 
-src_tbls(db)
+src_tbls(sc)
 ```
 
 Remote Connection

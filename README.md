@@ -27,7 +27,7 @@ spark_install(version = "1.6.1", hadoop_version = "2.6", reset = TRUE)
 dplyr Interface
 ---------------
 
-The sparklyr package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then obtain a dplyr interface using `src_spark` function:
+The sparklyr package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then use the returned connection as a remote dplyr source.
 
 ``` r
 # connect to local spark instance 

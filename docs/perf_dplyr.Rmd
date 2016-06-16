@@ -54,23 +54,21 @@ spark_perf_test <- function(params, tests) {
   
     sc <- spark_connect(master = param$master, version = param$version, config = testConfig)
     
-    db <- src_spark(sc)
-    
-    copy_to(db,
+    copy_to(sc,
             nycflights13::flights,
             "flights",
             cache = param$cache,
             repartition = param$partitions)
     
-    copy_to(db,
+    copy_to(sc,
             Lahman::Batting,
             "batting",
             cache = param$cache,
             repartition = param$partitions)
     
     sources <- list(
-      flights = tbl(db, "flights"),
-      batting = tbl(db, "batting")
+      flights = tbl(sc, "flights"),
+      batting = tbl(sc, "batting")
     )
     
     testResults <- lapply(seq_along(tests), function(testNames, testNum) {

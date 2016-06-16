@@ -73,9 +73,8 @@ Once you've installed all the necessary packages on the RStudio instance running
 ```{r, eval=FALSE}
 master <- system('cat /root/spark-ec2/cluster-url', intern=TRUE)
 sc <- spark_connect(master)
-db <- src_spark(sc)
 
-src_tbls(db)
+src_tbls(sc)
 ```
 
 ## Remote Connection
