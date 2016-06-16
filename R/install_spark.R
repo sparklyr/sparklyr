@@ -1,16 +1,7 @@
-#' @import config
+
+
 spark_install_dir <- function() {
-  sparkDir <- NULL
-  tryCatch(function() {
-    sparkDir <- config::get("rspark")$install$dir
-  }, error = function(e) {
-  })
-
-  if (is.null(sparkDir)) {
-    sparkDir <- rappdirs::app_dir("spark", "rstudio")$cache()
-  }
-
-  sparkDir
+  getOption("rspark.spark.install.dir", rappdirs::app_dir("spark", "rstudio")$cache())
 }
 
 # Check if Spark can be installed in this system
