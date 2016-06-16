@@ -1,8 +1,8 @@
 # Utilities for interacting with Spark DataFrames (sql.Dataset)s.
 
-#' Convert a tbl to a Spark Dataset.
+#' Convert objects of various types to Spark DataFrames
 #'
-#' @param x A \code{spark_tbl}.
+#' @param x An object
 #' @param ... Additional parameters.
 #' @export
 as_spark_dataframe <- function(x, ...) {

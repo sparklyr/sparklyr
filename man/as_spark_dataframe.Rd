@@ -2,16 +2,16 @@
 % Please edit documentation in R/spark_data_frame.R
 \name{as_spark_dataframe}
 \alias{as_spark_dataframe}
-\title{Convert a tbl to a Spark Dataset.}
+\title{Convert objects of various types to Spark DataFrames}
 \usage{
 as_spark_dataframe(x, ...)
 }
 \arguments{
-\item{x}{A \code{spark_tbl}.}
+\item{x}{An object}
 
 \item{...}{Additional parameters.}
 }
 \description{
-Convert a tbl to a Spark Dataset.
+Convert objects of various types to Spark DataFrames
 }
 
