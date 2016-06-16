@@ -147,7 +147,7 @@ print.src_spark <- function(x, ...) {
 #' @param ... Named parameters, mapping table names to weights.
 #' @param seed Seed value for the partition
 #' @export
-ml_partition <- function(.data, ..., seed = sample(.Machine$integer.max, 1)) {
+df_partition <- function(.data, ..., seed = sample(.Machine$integer.max, 1)) {
   weights <- list(...)
   nm <- names(weights)
   if (is.null(nm) || any(!nzchar(nm)))

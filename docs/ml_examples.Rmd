@@ -153,7 +153,7 @@ predict(fit, newdata = test)
 
 ```{r}
 partitions <- tbl(sc, "iris") %>%
-  ml_partition(training = 0.75, test = 0.25, seed = 1099)
+  df_partition(training = 0.75, test = 0.25, seed = 1099)
 
 fit <- partitions$training %>%
   ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
