@@ -49,20 +49,12 @@ sc <- spark_connect("local", version = "1.6.1")
 db <- src_spark(sc)
 ```
 
-Now we copy a couple of datasets from R into the Spark cluster:
+Now we copy some datasets from R into the Spark cluster:
 
 ```{r}
-# copy the flights table from the nycflights13 package to Spark
-copy_to(db, nycflights13::flights, "flights")
-flights <- tbl(db, "flights")
-
-# copy the Batting table from the Lahman package to Spark
-copy_to(db, Lahman::Batting, "batting")
-batting <- tbl(db, "batting")
-
-# copy the iris table to Spark
-copy_to(db, iris, "iris")
-iris_tbl <- tbl(db, "iris")
+flights <- copy_to(db, nycflights13::flights, "flights")
+batting <- copy_to(db, Lahman::Batting, "batting")
+iris_tbl <- copy_to(db, iris, "iris")
 ```
 
 Then you can run dplyr against Spark:

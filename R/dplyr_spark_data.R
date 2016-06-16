@@ -127,25 +127,3 @@ spark_write_json <- function(x, path) {
   spark_api_write_generic(sqlResult, path, "json")
 }
 
-#' Reads a local R dataframe and provides a data source compatible with dplyr
-#'
-#' Reads a local R dataframe and provides a data source compatible with dplyr
-#'
-#' @inheritParams spark_read_csv
-#' @param value R data frame to load into Spark
-#'
-#' @export
-spark_read_df <- function(db, name, value, memory = TRUE, repartition = 0, overwrite = TRUE) {
-
-  if (overwrite) spark_remove_table_if_exists(db, name)
-
-  dbWriteTable(db$con, name, value, TRUE, repartition)
-
-  if (memory) {
-    tbl_cache(db, name)
-  }
-
-  on_connection_updated(src_context(db), name)
-
-  tbl(db, name)
-}
