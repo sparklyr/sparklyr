@@ -2,25 +2,13 @@
 % Please edit documentation in R/dplyr_spark.R
 \name{copy_to.src_spark}
 \alias{copy_to.src_spark}
-\title{Copies the source data frame into a Spark table}
+\title{Copy a local R dataframe to Spark and provide a data source compatible with dplyr}
 \usage{
 \method{copy_to}{src_spark}(sc, df, name, cache = TRUE, repartition = 0,
   overwrite = TRUE)
 }
-\arguments{
-\item{sc}{Connection to dplyr source}
-
-\item{df}{Data frame to copy from}
-
-\item{name}{Name of the destination table}
-
-\item{cache}{Cache table into memory for improved performance}
-
-\item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
-
-\item{overwrite}{When TRUE, overwrites table with existing name}
-}
 \description{
-Copies the source data frame into a Spark table
+Copy a local R dataframe to Spark and provide a data source compatible with dplyr
 }
+\keyword{internal}
 

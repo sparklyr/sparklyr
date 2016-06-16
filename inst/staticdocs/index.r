@@ -13,20 +13,18 @@ sd_section("Reading and Writing Data",
            c("spark_read_csv",
              "spark_read_json",
              "spark_read_parquet",
+             "spark_read_df",
              "spark_write_csv",
              "spark_write_json",
              "spark_write_parquet")
 )
 
-sd_section("Manipulating Data",
-           "Functions for manipulating Spark DataFrames",
-           c("dplyr-interface",
-             "src_spark",
-             "copy_to.src_spark",
+sd_section("dplyr Interface",
+           "Functions implementing a dplyr backend for Spark DataFrames",
+           c("src_spark",
              "tbl_cache",
              "tbl_uncache",
-             "as_spark_dataframe",
-             "load_df")
+             "as_spark_dataframe")
 )
 
 sd_section("MLlib Interface",

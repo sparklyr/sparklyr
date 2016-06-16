@@ -85,18 +85,15 @@ tbl.src_spark <- function(src, from, ...) {
 db_data_type.src_spark <- function(...) {
 }
 
-#' Copies the source data frame into a Spark table
-#' @export
-#' @param sc Connection to dplyr source
-#' @param df Data frame to copy from
-#' @param name Name of the destination table
-#' @param cache Cache table into memory for improved performance
-#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
-#' @param overwrite When TRUE, overwrites table with existing name
-copy_to.src_spark <- function(sc, df, name, cache = TRUE, repartition = 0, overwrite = TRUE) {
-  result <- load_df(sc, name, df, memory = cache, repartition = repartition, overwrite = overwrite)
 
-  invisible(result)
+#' Copy a local R dataframe to Spark and provide a data source compatible with dplyr
+#'
+#' @inheritParams spark_read_df
+#'
+#' @keywords internal
+#' @export
+copy_to.src_spark <- function(sc, df, name, cache = TRUE, repartition = 0, overwrite = TRUE) {
+  spark_read_df(sc, name, df, memory = cache, repartition = repartition, overwrite = overwrite)
 }
 
 #' Loads a table into memory
