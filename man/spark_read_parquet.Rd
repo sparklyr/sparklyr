@@ -8,7 +8,6 @@ spark_read_parquet(sc, name, path, repartition = 0, memory = TRUE,
   overwrite = TRUE)
 }
 \arguments{
-
 \item{sc}{The Spark connection}
 
 \item{name}{Name to reference the data source once it's loaded}
