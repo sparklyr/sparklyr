@@ -50,16 +50,6 @@ setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
   sconInst$dbi <- dbi
   spark_connection_set_inst(drv@scon, sconInst)
 
-  # build connect call that includes DBI connection
-  connectCall <- strsplit(sconInst$connectCall, "\n")[[1]]
-  connectCall <- paste(connectCall[[1]],
-                       connectCall[[2]],
-                       "db <- dbConnect(DBISpark(sc))",
-                       sep = "\n")
-
-  # call connection opended
-  on_connection_opened(drv@scon, connectCall)
-
   # Apply sql connection level properties
   params <- spark_config_params(drv@scon$config, drv@scon$isLocal, "spark.sql.")
   lapply(names(params), function(paramName) {

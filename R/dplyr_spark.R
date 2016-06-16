@@ -12,16 +12,6 @@ src_spark <- function(sc) {
   dbiCon <- dbConnect(DBISpark(scon))
   db <- src_sql("spark", dbiCon)
 
-  # call connection opened with revised connectCall
-  sconInst <- spark_connection_get_inst(scon)
-  connectCall <- strsplit(sconInst$connectCall, "\n")[[1]]
-  connectCall <- paste(connectCall[[1]],
-                       "library(dplyr)",
-                       connectCall[[2]],
-                       "db <- src_spark(sc)",
-                       sep = "\n")
-  on_connection_opened(scon, connectCall)
-
   db
 }
 
