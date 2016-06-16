@@ -82,12 +82,12 @@ spark_write_csv <- function(x, path) {
 #' @inheritParams spark_read_csv
 #'
 #' @export
-spark_read_parquet <- function(db, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
-  if (overwrite) spark_remove_table_if_exists(db, name)
+spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  api <- spark_api(db)
+  api <- spark_api(sc)
   df <- spark_api_read_generic(api, list(path), "parquet")
-  spark_partition_register_df(db, df, api, name, repartition, memory)
+  spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
 #' Writes a dplyr operation result as a parquet file
@@ -109,12 +109,12 @@ spark_write_parquet <- function(x, path) {
 #' @inheritParams spark_read_csv
 #'
 #' @export
-spark_read_json <- function(db, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
-  if (overwrite) spark_remove_table_if_exists(db, name)
+spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  api <- spark_api(db)
+  api <- spark_api(sc)
   df <- spark_api_read_generic(api, path, "json")
-  spark_partition_register_df(db, df, api, name, repartition, memory)
+  spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
 #' Writes a dplyr operation result as a JSON file
