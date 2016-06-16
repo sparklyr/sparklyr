@@ -9,13 +9,21 @@
 # def createSQLContext(jsc: JavaSparkContext): SQLContext
 #
 spark_api_create_sql_context <- function(scon) {
+  ctx <- spark_context(scon)
+  jsc <- spark_invoke_static(
+    scon,
+    "org.apache.spark.api.java.JavaSparkContext",
+    "fromSparkContext",
+    ctx
+  )
+
   spark_invoke_static(
     scon,
 
     "org.apache.spark.sql.api.r.SQLUtils",
     "createSQLContext",
 
-    spark_context(scon)
+    jsc
   )
 }
 
