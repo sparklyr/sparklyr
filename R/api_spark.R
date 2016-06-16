@@ -90,30 +90,7 @@ spark_api_create_hive_context_v1 <- function(scon) {
   )
 }
 
-spark_api_attach_scon <- function(scon) {
-  sconInst <- spark_connection_get_inst(scon)
-
-  if (is.null(sconInst$hive)) {
-    sconInst$hive <- spark_api_create_hive_context(scon)
-    if (identical(sconInst$hive, NULL)) {
-      warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
-    }
-  }
-
-  if (is.null(sconInst$hive)) {
-    sconInst$sql <- spark_api_create_sql_context(scon)
-    if (identical(sql, NULL)) {
-      stop("Failed to create SQL context")
-    }
-  }
-
-  spark_connection_set_inst(scon, sconInst)
-  spark_connection_on_reconnect(scon, spark_api_attach_scon)
-}
-
 spark_api_create <- function(scon) {
-  spark_api_attach_scon(scon)
-
   list(
     scon = scon
   )
