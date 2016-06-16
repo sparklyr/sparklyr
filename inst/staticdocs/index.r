@@ -20,7 +20,7 @@ sd_section("Reading and Writing Data",
 
 sd_section("dplyr Interface",
            "Functions implementing a dplyr backend for Spark DataFrames",
-           c("src_spark",
+           ac("src_spark",
              "copy_to",
              "collect",
              "tbl_cache",
