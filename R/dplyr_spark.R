@@ -58,6 +58,18 @@ tbl.src_spark <- function(src, from, ...) {
 }
 
 #' @export
+tbl.spark_connection <- function(sc, from, ...) {
+  src <- src_sql("spark", dbConnect(DBISpark(sc)))
+  tbl_sql("spark", src = src, from = from, ...)
+}
+
+#' @export
+src_tbls.spark_connection <- function(sc, ...) {
+  src <- src_sql("spark", dbConnect(DBISpark(sc)))
+  src_tbls("spark", src, ...)
+}
+
+#' @export
 db_data_type.src_spark <- function(...) {
 }
 
