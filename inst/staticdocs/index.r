@@ -54,7 +54,7 @@ sd_section("Spark API",
              "spark_invoke",
              "spark_invoke_static",
              "spark_invoke_static_ctor",
-             "as_spark_jobj") # S3 method which can pull a jobj out of "things"
+             "spark_jobj") # S3 method which can pull a jobj out of "things"
 )
 
 sd_section("EC2",
