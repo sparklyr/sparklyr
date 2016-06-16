@@ -216,16 +216,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/16 14:21:41 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 47 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//Rtmput84Ce/filebcc46c584a86.csv MapPartitionsRDD[147] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/06/16 14:21:41 INFO TaskSchedulerImpl: Adding task set 47.0 with 1 tasks
-    ## 16/06/16 14:21:41 INFO TaskSetManager: Starting task 0.0 in stage 47.0 (TID 445, localhost, partition 0,PROCESS_LOCAL, 7908 bytes)
-    ## 16/06/16 14:21:41 INFO Executor: Running task 0.0 in stage 47.0 (TID 445)
-    ## 16/06/16 14:21:41 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/Rtmput84Ce/filebcc46c584a86.csv:0+23367180
-    ## 16/06/16 14:21:41 INFO Executor: Finished task 0.0 in stage 47.0 (TID 445). 2082 bytes result sent to driver
-    ## 16/06/16 14:21:41 INFO TaskSetManager: Finished task 0.0 in stage 47.0 (TID 445) in 82 ms on localhost (1/1)
-    ## 16/06/16 14:21:41 INFO TaskSchedulerImpl: Removed TaskSet 47.0, whose tasks have all completed, from pool 
-    ## 16/06/16 14:21:41 INFO DAGScheduler: ResultStage 47 (count at NativeMethodAccessorImpl.java:-2) finished in 0.083 s
-    ## 16/06/16 14:21:41 INFO DAGScheduler: Job 32 finished: count at NativeMethodAccessorImpl.java:-2, took 0.086051 s
+    ## 16/06/16 14:48:15 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 47 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//Rtmpx9LMbh/filec44be7ca976.csv MapPartitionsRDD[147] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/16 14:48:15 INFO TaskSchedulerImpl: Adding task set 47.0 with 1 tasks
+    ## 16/06/16 14:48:15 INFO TaskSetManager: Starting task 0.0 in stage 47.0 (TID 445, localhost, partition 0,PROCESS_LOCAL, 7907 bytes)
+    ## 16/06/16 14:48:15 INFO Executor: Running task 0.0 in stage 47.0 (TID 445)
+    ## 16/06/16 14:48:15 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/Rtmpx9LMbh/filec44be7ca976.csv:0+23367180
+    ## 16/06/16 14:48:15 INFO Executor: Finished task 0.0 in stage 47.0 (TID 445). 2082 bytes result sent to driver
+    ## 16/06/16 14:48:15 INFO TaskSetManager: Finished task 0.0 in stage 47.0 (TID 445) in 85 ms on localhost (1/1)
+    ## 16/06/16 14:48:15 INFO TaskSchedulerImpl: Removed TaskSet 47.0, whose tasks have all completed, from pool 
+    ## 16/06/16 14:48:15 INFO DAGScheduler: ResultStage 47 (count at NativeMethodAccessorImpl.java:-2) finished in 0.085 s
+    ## 16/06/16 14:48:15 INFO DAGScheduler: Job 32 finished: count at NativeMethodAccessorImpl.java:-2, took 0.088094 s
 
 Finally, we disconnect from Spark:
 

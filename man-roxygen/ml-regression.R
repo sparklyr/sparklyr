@@ -1,4 +1,4 @@
-#' @param x A \code{spark_tbl}.
+#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
 #' @param response The name of the response vector.
 #' @param features The names of features (terms) to use as linear predictors
 #'   for the response.

@@ -1,5 +1,18 @@
-spark_ml_logistic_regression <- function(x, response, features, intercept = TRUE,
-                                         alpha = 0, lambda = 0)
+#' Spark ML -- Logistic Regression
+#'
+#' Perform logistic regression on a \code{spark_tbl}.
+#'
+#' @template ml-regression
+#'
+#' @family Spark ML routines
+#'
+#' @export
+ml_logistic_regression <- function(x,
+                                   response,
+                                   features,
+                                   intercept = TRUE,
+                                   alpha = 0,
+                                   lambda = 0)
 {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
@@ -38,27 +51,13 @@ spark_ml_logistic_regression <- function(x, response, features, intercept = TRUE
   roc <- spark_dataframe_collect(spark_invoke(summary, "roc"))
 
   ml_model("logistic_regression", fit,
-    features = features,
-    response = response,
-    coefficients = coefficients,
-    roc = roc,
-    area.under.roc = areaUnderROC,
-    model.parameters = as.list(envir)
+           features = features,
+           response = response,
+           coefficients = coefficients,
+           roc = roc,
+           area.under.roc = areaUnderROC,
+           model.parameters = as.list(envir)
   )
-}
-
-#' Spark ML -- Logistic Regression
-#'
-#' Perform logistic regression on a \code{spark_tbl}.
-#'
-#' @template ml-regression
-#'
-#' @family Spark ML routines
-#'
-#' @export
-ml_logistic_regression <- function(x, response, features, intercept = TRUE,
-                                   alpha = 0, lambda = 0) {
-  spark_ml_logistic_regression(x, response, features, intercept, alpha, lambda)
 }
 
 #' @export

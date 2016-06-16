@@ -5,10 +5,10 @@
 \title{Spark ML -- Random Forests}
 \usage{
 ml_random_forest(x, response, features, max.bins = 32L, max.depth = 5L,
-  num.trees = 20L)
+  num.trees = 20L, type = c("auto", "regression", "classification"))
 }
 \arguments{
-\item{x}{A \code{spark_tbl}.}
+\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
 
 \item{response}{The name of the response vector.}
 
@@ -22,6 +22,12 @@ each node. More bins give higher granularity.}
 number of nodes separating any leaves from the root of the tree.}
 
 \item{num.trees}{Number of trees to train (>= 1).}
+
+\item{type}{The type of model to fit. \code{"regression"} treats the response
+as a continuous variable, while \code{"classification"} treats the response
+as a categorical variable. When \code{"auto"} is used, the model type is
+inferred based on the response variable type -- if it is a numeric type,
+then regression is used; classification otherwise.}
 }
 \description{
 Perform regression or classification using random forests with a \code{spark_tbl}.

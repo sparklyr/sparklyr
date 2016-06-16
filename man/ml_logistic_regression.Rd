@@ -8,7 +8,7 @@ ml_logistic_regression(x, response, features, intercept = TRUE, alpha = 0,
   lambda = 0)
 }
 \arguments{
-\item{x}{A \code{spark_tbl}.}
+\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
 
 \item{response}{The name of the response vector.}
 

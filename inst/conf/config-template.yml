@@ -7,7 +7,6 @@ default:
   sparklyr.defaultPackages:
     - com.databricks:spark-csv_2.11:1.3.0
     - com.amazonaws:aws-java-sdk-pom:1.10.34
-    - org.apache.hadoop:hadoop-aws:2.6.0
 
   # additional shell, context, session and sql values
   # sparklyr.shell.*

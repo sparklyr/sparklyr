@@ -18,11 +18,13 @@ register_spark_tbl <- function(tbl, df, name = random_string()) {
 #' @name df_mutate
 #' @export
 #'
+#' @family feature transformation routines
+#'
 #' @examples
 #' \dontrun{
 #' # using the 'beaver1' dataset, binarize the 'temp' column
 #' # encode 'warm' as 'temp > 37'
-#' beaver_tbl <- copy_to(db, beaver1, "beaver")
+#' beaver_tbl <- copy_to(sc, beaver1, "beaver")
 #' beaver_tbl %>%
 #'   df_mutate(warm = ft_binarizer(temp, 37))
 #' }

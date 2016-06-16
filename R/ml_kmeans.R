@@ -1,6 +1,20 @@
-spark_ml_kmeans <- function(x, centers, iter.max = 10,
-                            features = dplyr::tbl_vars(x))
-{
+#' Spark ML -- K-Means Clustering
+#'
+#' Perform k-means clustering on a \code{spark_tbl}.
+#'
+#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
+#' @param centers The number of cluster centers to compute.
+#' @param iter.max Maximum number of iterations allowed.
+#' @param features Which columns to use in the k-means fit. Defaults to
+#'   all columns within \code{x}.
+#'
+#' @seealso For information on how Spark k-means clustering is implemented, please see
+#'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
+#'
+#' @family Spark ML routines
+#'
+#' @export
+ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
@@ -31,28 +45,8 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10,
   centers <- as.data.frame(centersList, stringsAsFactors = FALSE)
 
   ml_model("kmeans", fit,
-    centers = centers,
-    features = features,
-    model.parameters = as.list(envir)
+           centers = centers,
+           features = features,
+           model.parameters = as.list(envir)
   )
-}
-
-#' Spark ML -- K-Means Clustering
-#'
-#' Perform k-means clustering on a \code{spark_tbl}.
-#'
-#' @param x A \code{spark_tbl}.
-#' @param centers The number of cluster centers to compute.
-#' @param iter.max Maximum number of iterations allowed.
-#' @param features Which columns to use in the k-means fit. Defaults to
-#'   all columns within \code{x}.
-#'
-#' @seealso For information on how Spark k-means clustering is implemented, please see
-#'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
-#'
-#' @family Spark ML routines
-#'
-#' @export
-ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
-  spark_ml_kmeans(x, centers, iter.max, features)
 }

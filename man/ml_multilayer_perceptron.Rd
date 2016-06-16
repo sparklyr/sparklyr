@@ -7,7 +7,7 @@
 ml_multilayer_perceptron(x)
 }
 \arguments{
-\item{x}{A \code{spark_tbl}.}
+\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
 }
 \description{
 Creates and trains multilayer perceptron on a \code{spark_tbl}.

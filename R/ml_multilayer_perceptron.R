@@ -1,5 +1,13 @@
-spark_ml_multilayer_perceptron <- function(x)
-{
+#' Spark ML -- Multilayer Perceptron
+#'
+#' Creates and trains multilayer perceptron on a \code{spark_tbl}.
+#'
+#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
+#'
+#' @family Spark ML routines
+#'
+#' @export
+ml_multilayer_perceptron <- function(x) {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
 
@@ -20,19 +28,6 @@ spark_ml_multilayer_perceptron <- function(x)
     spark_invoke("setMaxIter", as.logical(intercept)) %>%
 
     spark_invoke("fit", tdf)
-}
-
-#' Spark ML -- Multilayer Perceptron
-#'
-#' Creates and trains multilayer perceptron on a \code{spark_tbl}.
-#'
-#' @param x A \code{spark_tbl}.
-#'
-#' @family Spark ML routines
-#'
-#' @export
-ml_multilayer_perceptron <- function(x) {
-  spark_ml_multilayer_perceptron(x)
 }
 
 #' @export

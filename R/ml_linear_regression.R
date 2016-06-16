@@ -1,5 +1,18 @@
-spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
-                                       alpha = 0, lambda = 0)
+#' Spark ML -- Linear Regression
+#'
+#' Perform linear regression on a Spark DataFrame.
+#'
+#' @template ml-regression
+#'
+#' @family Spark ML routines
+#'
+#' @export
+ml_linear_regression <- function(x,
+                                 response,
+                                 features,
+                                 intercept = TRUE,
+                                 alpha = 0,
+                                 lambda = 0)
 {
   scon <- spark_scon(x)
   df <- as_spark_dataframe(x)
@@ -44,35 +57,20 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
     names(tvalues) <- names(coefficients)
 
   ml_model("linear_regression", fit,
-    features = features,
-    response = response,
-    coefficients = coefficients,
-    standard.errors = errors,
-    t.values = tvalues,
-    p.values = try_null(as.numeric(spark_invoke(summary, "pValues"))),
-    explained.variance = spark_invoke(summary, "explainedVariance"),
-    mean.absolute.error = spark_invoke(summary, "meanAbsoluteError"),
-    mean.squared.error = spark_invoke(summary, "meanSquaredError"),
-    r.squared = spark_invoke(summary, "r2"),
-    root.mean.squared.error = spark_invoke(summary, "rootMeanSquaredError"),
-    model.parameters = as.list(envir)
+           features = features,
+           response = response,
+           coefficients = coefficients,
+           standard.errors = errors,
+           t.values = tvalues,
+           p.values = try_null(as.numeric(spark_invoke(summary, "pValues"))),
+           explained.variance = spark_invoke(summary, "explainedVariance"),
+           mean.absolute.error = spark_invoke(summary, "meanAbsoluteError"),
+           mean.squared.error = spark_invoke(summary, "meanSquaredError"),
+           r.squared = spark_invoke(summary, "r2"),
+           root.mean.squared.error = spark_invoke(summary, "rootMeanSquaredError"),
+           model.parameters = as.list(envir)
   )
 }
-
-#' Spark ML -- Linear Regression
-#'
-#' Perform linear regression on a \code{spark_tbl}.
-#'
-#' @template ml-regression
-#'
-#' @family Spark ML routines
-#'
-#' @export
-ml_linear_regression <- function(x, response, features, intercept = TRUE,
-                  alpha = 0, lambda = 0) {
-  spark_ml_linear_regression(x, response, features, intercept, alpha, lambda)
-}
-
 
 #' @export
 print.ml_model_linear_regression <- function(x, ...) {
