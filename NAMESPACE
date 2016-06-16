@@ -3,7 +3,7 @@
 S3method(as_spark_dataframe,jobj)
 S3method(as_spark_dataframe,tbl_spark)
 S3method(collect,tbl_spark)
-S3method(copy_to,src_spark)
+S3method(copy_to,spark_connection)
 S3method(db_data_type,src_spark)
 S3method(db_explain,src_spark)
 S3method(fitted,ml_model)

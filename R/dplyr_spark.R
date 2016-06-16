@@ -66,7 +66,7 @@ db_data_type.src_spark <- function(...) {
 #'
 #' Copy a local R dataframe to Spark and provide a data source compatible with dplyr
 #'
-#' @param dest dplyr database interface
+#' @param sc The Spark connection
 #' @param name Name of the destination table
 #' @param df Local data frame to copy
 #' @param memory Cache table into memory for improved performance
@@ -77,8 +77,9 @@ db_data_type.src_spark <- function(...) {
 #' @name copy_to
 #'
 #' @export
-copy_to.src_spark <- function(dest, df, name = deparse(substitute(df)), ...,
-                              memory = TRUE, repartition = 0, overwrite = FALSE) {
+copy_to.spark_connection <- function(sc, df, name = deparse(substitute(df)), ...,
+                                     memory = TRUE, repartition = 0, overwrite = FALSE) {
+  dest <- src_sql("spark", dbConnect(DBISpark(sc)))
 
   if (overwrite)
     spark_remove_table_if_exists(dest, name)

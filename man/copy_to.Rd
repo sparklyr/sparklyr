@@ -2,14 +2,14 @@
 % Please edit documentation in R/dplyr_spark.R
 \name{copy_to}
 \alias{copy_to}
-\alias{copy_to.src_spark}
+\alias{copy_to.spark_connection}
 \title{Copy a local R dataframe to Spark and provide a data source compatible with dplyr}
 \usage{
-\method{copy_to}{src_spark}(dest, df, name = deparse(substitute(df)), ...,
-  memory = TRUE, repartition = 0, overwrite = FALSE)
+\method{copy_to}{spark_connection}(sc, df, name = deparse(substitute(df)),
+  ..., memory = TRUE, repartition = 0, overwrite = FALSE)
 }
 \arguments{
-\item{dest}{dplyr database interface}
+\item{sc}{The Spark connection}
 
 \item{df}{Local data frame to copy}
 
