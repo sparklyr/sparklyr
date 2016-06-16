@@ -6,6 +6,8 @@ if (!requireNamespace("rprojroot", quietly = TRUE))
 library(rprojroot)
 root <- rprojroot::find_package_root_file()
 
+Sys.setenv(R_SPARKLYR_INSTALL_INFO_PATH = file.path(root, "inst/extdata/install_spark.csv"))
+
 if (!requireNamespace("digest", quietly = TRUE))
   install.packages("digest")
 library(digest)
