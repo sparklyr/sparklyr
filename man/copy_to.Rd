@@ -5,23 +5,23 @@
 \alias{copy_to.src_spark}
 \title{Copy a local R dataframe to Spark and provide a data source compatible with dplyr}
 \usage{
-\method{copy_to}{src_spark}(db, df, name, memory = TRUE, repartition = 0,
-  overwrite = TRUE)
+\method{copy_to}{src_spark}(dest, df, name = deparse(substitute(df)), ...,
+  memory = TRUE, repartition = 0, overwrite = FALSE)
 }
 \arguments{
-\item{db}{dplyr database interface}
+\item{dest}{dplyr database interface}
 
-\item{df}{Data frame to copy from}
+\item{df}{Local data frame to copy}
 
 \item{name}{Name of the destination table}
+
+\item{...}{Unused}
 
 \item{memory}{Cache table into memory for improved performance}
 
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 
 \item{overwrite}{When TRUE, overwrites table with existing name}
-
-\item{df}{Local data frame to copy}
 }
 \description{
 Copy a local R dataframe to Spark and provide a data source compatible with dplyr

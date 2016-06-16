@@ -16,9 +16,17 @@ spark_partition_register_df <- function(con, df, api, name, repartition, memory)
 }
 
 spark_remove_table_if_exists <- function(con, name) {
-  if (name %in% src_tbls(con)) {
-    dbRemoveTable(con$con, name)
+  if (spark_table_exists(con, name)) {
+    spark_remove_table(con, name)
   }
+}
+
+spark_table_exists <- function(con, name) {
+  name %in% src_tbls(con)
+}
+
+spark_remove_table <- function(con, name) {
+  dbRemoveTable(con$con, name)
 }
 
 #' Reads a CSV file and provides a data source compatible with dplyr

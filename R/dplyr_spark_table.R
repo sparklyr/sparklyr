@@ -7,14 +7,14 @@
 #'
 #' @param x A \code{tbl_spark}.
 #' @param n Limit on the number of records to copy
-#' @param warn_incomplete Warn if all of the records are not copied
+#' @param ... Unused
 #' @return An R data frame with classes \code{data.frame} and \code{tbl_df}.
 #'
 #' @import assertthat
 #'
 #' @name collect
 #' @export
-collect.tbl_spark <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
+collect.tbl_spark <- function(x, ..., n = Inf) {
   assert_that(length(n) == 1, n > 0L)
   if (n == Inf) {
     n <- -1

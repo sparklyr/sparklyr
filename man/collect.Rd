@@ -5,14 +5,14 @@
 \alias{collect.tbl_spark}
 \title{Collect results of dplyr expression}
 \usage{
-\method{collect}{tbl_spark}(x, ..., n = Inf, warn_incomplete = TRUE)
+\method{collect}{tbl_spark}(x, ..., n = Inf)
 }
 \arguments{
 \item{x}{A \code{tbl_spark}.}
 
-\item{n}{Limit on the number of records to copy}
+\item{...}{Unused}
 
-\item{warn_incomplete}{Warn if all of the records are not copied}
+\item{n}{Limit on the number of records to copy}
 }
 \value{
 An R data frame with classes \code{data.frame} and \code{tbl_df}.
