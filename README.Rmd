@@ -55,21 +55,21 @@ Now we copy some datasets from R into the Spark cluster:
 
 ```{r}
 iris_tbl <- copy_to(db, iris)
-flights <- copy_to(db, flights)
-batting <- copy_to(db, Batting, "batting")
+flights_tbl <- copy_to(db, flights)
+batting_tbl <- copy_to(db, Batting, "batting")
 ```
 
 Then you can run dplyr against Spark:
 
 ```{r}
 # filter by departure delay and print the first few records
-flights %>% filter(dep_delay == 2)
+flights_tbl %>% filter(dep_delay == 2)
 ```
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r ggplot2}
-delay <- flights %>% 
+delay <- flights_tbl %>% 
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000, !is.na(delay)) %>%
@@ -90,7 +90,7 @@ dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes
 
 ```{r}
 
-batting %>%
+batting_tbl %>%
   select(playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
   group_by(playerID) %>%
