@@ -29,8 +29,8 @@ sql_translate_env.DBISparkConnection <- function(con) {
 #' @import assertthat
 sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
                                           group_by = NULL, having = NULL,
-                                          order_by = NULL, distinct = FALSE,
-                                          limit = NULL, ...) {
+                                          order_by = NULL, limit = NULL,
+                                          distinct = FALSE, ...) {
   out <- vector("list", 6)
   names(out) <- c("select", "from", "where", "group_by", "having", "order_by")
 

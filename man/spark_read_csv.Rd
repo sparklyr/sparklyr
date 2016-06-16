@@ -4,11 +4,11 @@
 \alias{spark_read_csv}
 \title{Reads a CSV file and provides a data source compatible with dplyr}
 \usage{
-spark_read_csv(db, name, path, repartition = 0, memory = TRUE,
+spark_read_csv(sc, name, path, repartition = 0, memory = TRUE,
   overwrite = TRUE)
 }
 \arguments{
-\item{db}{dplyr interface}
+\item{sc}{The Spark connection}
 
 \item{name}{Name to reference the data source once it's loaded}
 

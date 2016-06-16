@@ -57,6 +57,7 @@ spark_dataframe_read_column <- function(object, colName) {
   rdd <- jobj %>%
     spark_invoke("select", colName, list()) %>%
     spark_invoke("rdd")
+
   column <- spark_invoke_static(scon, "utils", method, rdd)
 
   if (colType == "StringType") {

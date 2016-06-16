@@ -8,8 +8,6 @@ spark_read_json(db, name, path, repartition = 0, memory = TRUE,
   overwrite = TRUE)
 }
 \arguments{
-\item{db}{dplyr interface}
-
 \item{name}{Name to reference the data source once it's loaded}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}

@@ -16,7 +16,8 @@ analysis. Defaults to all columns in \code{x}.}
 Perform principal components analysis on a \code{spark_tbl}.
 }
 \seealso{
-Other Spark ML routines: \code{\link{ml_kmeans}},
+Other Spark ML routines: \code{\link{ml_gradient_boosted_trees}},
+  \code{\link{ml_kmeans}},
   \code{\link{ml_linear_regression}},
   \code{\link{ml_logistic_regression}},
   \code{\link{ml_multilayer_perceptron}},

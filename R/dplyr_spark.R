@@ -1,12 +1,20 @@
 #' @import dplyr
 #' @import parallel
 
-spark_dbi <- function(con) {
-  con$con
+spark_dbi <- function(x, ...) {
+  UseMethod("spark_dbi", x)
 }
 
-spark_api <- function(con) {
-  spark_dbi(con)@api
+spark_dbi.src_spark <- function(x) {
+  x$con
+}
+
+spark_dbi.spark_connection <- function(x) {
+  dbConnect(DBISpark(x))
+}
+
+spark_api <- function(x) {
+  spark_dbi(x)@api
 }
 
 spark_scon <- function(x, ...) {
@@ -35,8 +43,8 @@ spark_scon.src_spark <- function(x, ...) {
 
 
 #' @export
-src_desc.src_spark <- function(db) {
-  scon <- src_context(db)
+src_desc.src_spark <- function(x) {
+  scon <- src_context(x)
   paste("spark connection",
         paste("master", spark_connection_master(scon), sep = "="),
         paste("app", spark_connection_app_name(scon), sep = "="),
@@ -48,7 +56,7 @@ src_context <- function(db) {
 }
 
 #' @export
-db_explain.src_spark <- function(con) {
+db_explain.src_spark <- function(con, sql, ...) {
   ""
 }
 
@@ -58,15 +66,15 @@ tbl.src_spark <- function(src, from, ...) {
 }
 
 #' @export
-tbl.spark_connection <- function(sc, from, ...) {
-  src <- src_sql("spark", dbConnect(DBISpark(sc)))
+tbl.spark_connection <- function(src, from, ...) {
+  src <- src_sql("spark", dbConnect(DBISpark(src)))
   tbl_sql("spark", src = src, from = from, ...)
 }
 
 #' @export
-src_tbls.spark_connection <- function(sc, ...) {
-  src <- src_sql("spark", dbConnect(DBISpark(sc)))
-  src_tbls("spark", src, ...)
+src_tbls.spark_connection <- function(x, ...) {
+  src <- src_sql("spark", dbConnect(DBISpark(x)))
+  sort(src_tbls(src, ...))
 }
 
 #' @export
@@ -78,32 +86,29 @@ db_data_type.src_spark <- function(...) {
 #'
 #' Copy a local R dataframe to Spark and provide a data source compatible with dplyr
 #'
-#' @param sc The Spark connection
+#' @param dest A Spark connection
 #' @param name Name of the destination table
 #' @param df Local data frame to copy
-#' @param memory Cache table into memory for improved performance
-#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
-#' @param overwrite When TRUE, overwrites table with existing name
 #' @param ... Unused
 #'
 #' @name copy_to
 #'
 #' @export
-copy_to.spark_connection <- function(sc, df, name = deparse(substitute(df)), ...,
-                                     memory = TRUE, repartition = 0, overwrite = FALSE) {
+copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)), ...) {
+  sc <- dest
+  args <- list(...)
+  overwrite <- if (is.null(args$overwrite)) FALSE else args$overwrite
+
   dest <- src_sql("spark", dbConnect(DBISpark(sc)))
 
   if (overwrite)
     spark_remove_table_if_exists(dest, name)
-  else if (spark_table_exists(dest, name))
+  if (name %in% src_tbls(sc))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  dbWriteTable(dest$con, name, df, TRUE, repartition)
+  dbWriteTable(dest$con, name, df)
 
-  if (memory) {
-    tbl_cache(sc, name)
-  }
-
+  tbl_cache(sc, name)
   on_connection_updated(src_context(dest), name)
 
   tbl(dest, name)
@@ -143,20 +148,39 @@ print.src_spark <- function(x, ...) {
 
 #' Partition a Spark Dataframe
 #'
-#' @param .data Data
+#' Partition a Spark DataFrame into multiple groups. This routine is useful
+#' for splitting a DataFrame into, for example, training and test datasets.
+#'
+#' @param x A \code{tbl_spark}.
 #' @param ... Named parameters, mapping table names to weights.
-#' @param seed Seed value for the partition
+#' @param seed Random seed to use for randomly partitioning the dataset. Set
+#'   this if you want your partitioning to be reproducible on repeated runs.
+#'
+#' @return An \R \code{list} of \code{tbl_spark}s.
+#'
 #' @export
-df_partition <- function(.data, ..., seed = sample(.Machine$integer.max, 1)) {
+#'
+#' @examples
+#' \dontrun{
+#' # randomly partition data into a 'training' and 'test'
+#' # dataset, with 60% of the observations assigned to the
+#' # 'training' dataset, and 40% assigned to the 'test' dataset
+#' data(diamonds, package = "ggplot2")
+#' diamonds_tbl <- copy_to(sc, diamonds, "diamonds")
+#' partitions <- diamonds_tbl %>%
+#'   df_partition(training = 0.6, test = 0.4)
+#' print(partitions)
+#' }
+df_partition <- function(x, ..., seed = sample(.Machine$integer.max, 1)) {
   weights <- list(...)
   nm <- names(weights)
   if (is.null(nm) || any(!nzchar(nm)))
     stop("all weights must be named")
 
-  splat <- spark_dataframe_split(.data, as.numeric(weights), seed = seed)
+  splat <- spark_dataframe_split(x, as.numeric(weights), seed = seed)
   names(splat) <- nm
 
-  db <- .data$src
+  db <- x$src
   partitions <- lapply(seq_along(splat), function(i) {
     spark_invoke(splat[[i]], "registerTempTable", nm[[i]])
     tbl(db, nm[[i]])

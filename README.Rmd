@@ -54,6 +54,7 @@ Now we copy some datasets from R into the Spark cluster:
 iris_tbl <- copy_to(sc, iris)
 flights_tbl <- copy_to(sc, flights)
 batting_tbl <- copy_to(sc, Batting, "batting")
+src_tbls(sc)
 ```
 
 Then you can run dplyr against Spark:
@@ -111,6 +112,25 @@ iris_tbl %>%
     geom_point(data = model$centers, aes(Petal_Width, Petal_Length), size = 60, alpha = 0.1) +
     geom_point(aes(Petal_Width, Petal_Length), size = 2, alpha = 0.5)
 
+```
+
+## Reading and Writing Data
+
+```{r}
+  temp_csv <- tempfile(fileext = ".csv")
+  temp_parquet <- tempfile(fileext = ".parquet")
+  temp_json <- tempfile(fileext = ".json")
+  
+  spark_write_csv(iris_tbl, temp_csv)
+  iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
+  
+  spark_write_parquet(iris_tbl, temp_parquet)
+  iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
+  
+  spark_write_csv(iris_tbl, temp_json)
+  iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
+  
+  src_tbls(sc)
 ```
 
 ## EC2
