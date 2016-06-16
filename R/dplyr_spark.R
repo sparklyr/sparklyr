@@ -101,7 +101,7 @@ copy_to.spark_connection <- function(sc, df, name = deparse(substitute(df)), ...
   dbWriteTable(dest$con, name, df, TRUE, repartition)
 
   if (memory) {
-    tbl_cache(dest, name)
+    tbl_cache(sc, name)
   }
 
   on_connection_updated(src_context(dest), name)
@@ -117,7 +117,7 @@ copy_to.spark_connection <- function(sc, df, name = deparse(substitute(df)), ...
 tbl_cache <- function(sc, name, force = TRUE) {
   dbiCon <- dbConnect(DBISpark(sc))
 
-  dbGetQuery(dbiCon, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
+  dbGetQuery(dbiCon, paste("CACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))
 
   if (force) {
     dbGetQuery(dbiCon, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = dbiCon)))
