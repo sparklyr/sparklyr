@@ -115,11 +115,12 @@ copy_to.spark_connection <- function(sc, df, name = deparse(substitute(df)), ...
 #' @param name Name of the destination table
 #' @param force Forces data to be loaded in memory by executing a count(*) over the table
 tbl_cache <- function(sc, name, force = TRUE) {
-  con <- sc
-  dbGetQuery(con$con, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
+  dbiCon <- dbConnect(DBISpark(sc))
+
+  dbGetQuery(dbiCon, paste("CACHE TABLE", dplyr::escape(ident(name), con = con$con)))
 
   if (force) {
-    dbGetQuery(con$con, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = con$con)))
+    dbGetQuery(dbiCon, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = dbiCon)))
   }
 }
 
@@ -128,8 +129,8 @@ tbl_cache <- function(sc, name, force = TRUE) {
 #' @param sc Connection to dplyr source
 #' @param name Name of the destination table
 tbl_uncache <- function(sc, name) {
-  con <- sc
-  dbGetQuery(con$con, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = con$con)))
+  dbiCon <- dbConnect(DBISpark(sc))
+  dbGetQuery(dbiCon, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))
 }
 
 #' @export
