@@ -26,7 +26,7 @@ spark_ml_multilayer_perceptron <- function(x)
 #'
 #' Creates and trains multilayer perceptron on a \code{spark_tbl}.
 #'
-#' @param x A \code{spark_tbl}.
+#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
 #'
 #' @family Spark ML routines
 #'

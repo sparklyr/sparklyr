@@ -61,7 +61,7 @@ spark_ml_linear_regression <- function(x, response, features, intercept = TRUE,
 
 #' Spark ML -- Linear Regression
 #'
-#' Perform linear regression on a \code{spark_tbl}.
+#' Perform linear regression on a Spark DataFrame.
 #'
 #' @template ml-regression
 #'

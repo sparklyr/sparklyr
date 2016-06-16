@@ -41,7 +41,7 @@ spark_ml_kmeans <- function(x, centers, iter.max = 10,
 #'
 #' Perform k-means clustering on a \code{spark_tbl}.
 #'
-#' @param x A \code{spark_tbl}.
+#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
 #' @param centers The number of cluster centers to compute.
 #' @param iter.max Maximum number of iterations allowed.
 #' @param features Which columns to use in the k-means fit. Defaults to

@@ -44,7 +44,7 @@ spark_ml_random_forest <- function(x, response, features,
 #'
 #' Perform regression or classification using random forests with a \code{spark_tbl}.
 #'
-#' @param x A \code{spark_tbl}.
+#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
 #' @param response The name of the response vector.
 #' @param features The names of features (terms) included in the model.
 #' @param max.bins The maximum number of bins used for discretizing

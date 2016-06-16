@@ -8,7 +8,7 @@ ml_linear_regression(x, response, features, intercept = TRUE, alpha = 0,
   lambda = 0)
 }
 \arguments{
-\item{x}{A \code{spark_tbl}.}
+\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
 
 \item{response}{The name of the response vector.}
 
@@ -22,7 +22,7 @@ lasso, elastic net, and ridge regression). See \strong{Details} for more
 information.}
 }
 \description{
-Perform linear regression on a \code{spark_tbl}.
+Perform linear regression on a Spark DataFrame.
 }
 \details{
 Spark implements for both \eqn{L1} and \eqn{L2} regularization in linear

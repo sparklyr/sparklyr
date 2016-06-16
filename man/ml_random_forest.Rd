@@ -8,7 +8,7 @@ ml_random_forest(x, response, features, max.bins = 32L, max.depth = 5L,
   num.trees = 20L)
 }
 \arguments{
-\item{x}{A \code{spark_tbl}.}
+\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
 
 \item{response}{The name of the response vector.}
 

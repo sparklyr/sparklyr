@@ -7,7 +7,7 @@
 ml_kmeans(x, centers, iter.max = 10, features = dplyr::tbl_vars(x))
 }
 \arguments{
-\item{x}{A \code{spark_tbl}.}
+\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
 
 \item{centers}{The number of cluster centers to compute.}
 
