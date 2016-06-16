@@ -1,55 +1,3 @@
-spark_ml_random_forest <- function(x,
-                                   response,
-                                   features,
-                                   max.bins,
-                                   max.depth,
-                                   num.trees,
-                                   type)
-{
-  scon <- spark_scon(x)
-  df <- as_spark_dataframe(x)
-
-  envir <- new.env(parent = emptyenv())
-  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
-
-  # choose classification vs. regression model based on column type
-  schema <- spark_dataframe_schema(df)
-  responseType <- schema[[response]]$type
-  model <- if (identical(type, "regression"))
-    "org.apache.spark.ml.regression.RandomForestRegressor"
-  else if (identical(type, "classification"))
-    "org.apache.spark.ml.classification.RandomForestClassifier"
-  else if (responseType %in% c("DoubleType", "IntegerType"))
-    "org.apache.spark.ml.regression.RandomForestRegressor"
-  else
-    "org.apache.spark.ml.classification.RandomForestClassifier"
-
-  rf <- spark_invoke_static_ctor(scon, model)
-
-  fit <- rf %>%
-    spark_invoke("setFeaturesCol", envir$features) %>%
-    spark_invoke("setLabelCol", envir$response) %>%
-    spark_invoke("setMaxBins", max.bins) %>%
-    spark_invoke("setMaxDepth", max.depth) %>%
-    spark_invoke("setNumTrees", num.trees) %>%
-    spark_invoke("fit", tdf)
-
-  featureImportances <- fit %>%
-    spark_invoke("featureImportances") %>%
-    spark_invoke("toArray")
-
-  ml_model("random_forest", fit,
-    features = features,
-    response = response,
-    max.bins = max.bins,
-    max.depth = max.depth,
-    num.trees = num.trees,
-    feature.importances = featureImportances,
-    trees = spark_invoke(fit, "trees"),
-    model.parameters = as.list(envir)
-  )
-}
-
 #' Spark ML -- Random Forests
 #'
 #' Perform regression or classification using random forests with a \code{spark_tbl}.
@@ -80,8 +28,49 @@ ml_random_forest <- function(x,
                              num.trees = 20L,
                              type = c("auto", "regression", "classification"))
 {
+  scon <- spark_scon(x)
+  df <- as_spark_dataframe(x)
+
   type <- match.arg(type)
-  spark_ml_random_forest(x, response, features, max.bins, max.depth, num.trees, type)
+  envir <- new.env(parent = emptyenv())
+  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
+
+  # choose classification vs. regression model based on column type
+  schema <- spark_dataframe_schema(df)
+  responseType <- schema[[response]]$type
+  model <- if (identical(type, "regression"))
+    "org.apache.spark.ml.regression.RandomForestRegressor"
+  else if (identical(type, "classification"))
+    "org.apache.spark.ml.classification.RandomForestClassifier"
+  else if (responseType %in% c("DoubleType", "IntegerType"))
+    "org.apache.spark.ml.regression.RandomForestRegressor"
+  else
+    "org.apache.spark.ml.classification.RandomForestClassifier"
+
+  rf <- spark_invoke_static_ctor(scon, model)
+
+  fit <- rf %>%
+    spark_invoke("setFeaturesCol", envir$features) %>%
+    spark_invoke("setLabelCol", envir$response) %>%
+    spark_invoke("setMaxBins", max.bins) %>%
+    spark_invoke("setMaxDepth", max.depth) %>%
+    spark_invoke("setNumTrees", num.trees) %>%
+    spark_invoke("fit", tdf)
+
+  featureImportances <- fit %>%
+    spark_invoke("featureImportances") %>%
+    spark_invoke("toArray")
+
+  ml_model("random_forest", fit,
+           features = features,
+           response = response,
+           max.bins = max.bins,
+           max.depth = max.depth,
+           num.trees = num.trees,
+           feature.importances = featureImportances,
+           trees = spark_invoke(fit, "trees"),
+           model.parameters = as.list(envir)
+  )
 }
 
 #' @export
