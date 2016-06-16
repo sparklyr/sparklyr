@@ -26,6 +26,7 @@ for splitting a DataFrame into, for example, training and test datasets.
 # randomly partition data into a 'training' and 'test'
 # dataset, with 60\% of the observations assigned to the
 # 'training' dataset, and 40\% assigned to the 'test' dataset
+data(diamonds, package = "ggplot2")
 diamonds_tbl <- copy_to(sc, diamonds, "diamonds")
 partitions <- diamonds_tbl \%>\%
   df_partition(training = 0.6, test = 0.4)
