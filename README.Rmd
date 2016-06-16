@@ -33,7 +33,7 @@ devtools::install_github("rstudio/rspark", auth_token = "56aef3d82d3ef05755e40a4
 
 You can then install various versions of Spark using the `spark_install` function:
 
-```{r}
+```{r, eval=FALSE}
 library(rspark)
 spark_install(version = "1.6.1", hadoop_version = "2.6", reset = TRUE)
 ```
