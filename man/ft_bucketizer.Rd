@@ -26,7 +26,8 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformation routines: \code{\link{ft_binarizer}},
+Other feature transformation routines: \code{\link{df_mutate}},
+  \code{\link{ft_binarizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
