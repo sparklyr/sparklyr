@@ -56,16 +56,12 @@ sql_build.tbl_spark <- function(op, con, ...) {
 
 
 #' @export
-sample_n.tbl_spark <- function(.data,
+sample_n.tbl_spark <- function(tbl,
                                size,
                                replace = FALSE,
                                weight = NULL,
-                               .env = parent.frame(),
-                               ...,
-                               .dots) {
-
-  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
-  dplyr::add_op_single("sample_n", .data = .data, dots = dots, args = list(
+                               .env = parent.frame()) {
+  dplyr::add_op_single("sample_n", .data = tbl, args = list(
     size = size,
     replace = replace,
     weight = weight,
@@ -74,16 +70,12 @@ sample_n.tbl_spark <- function(.data,
 }
 
 #' @export
-sample_frac.tbl_spark <- function(.data,
+sample_frac.tbl_spark <- function(tbl,
                                   size = 1,
                                   replace = FALSE,
                                   weight = NULL,
-                                  .env = parent.frame(),
-                                  ...,
-                                  .dots) {
-
-  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
-  dplyr::add_op_single("sample_frac", .data = .data, dots = dots, args = list(
+                                  .env = parent.frame()) {
+  dplyr::add_op_single("sample_frac", .data = tbl, args = list(
     size = size,
     replace = replace,
     weight = weight,

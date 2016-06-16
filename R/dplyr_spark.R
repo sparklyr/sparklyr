@@ -35,8 +35,8 @@ spark_scon.src_spark <- function(x, ...) {
 
 
 #' @export
-src_desc.src_spark <- function(db) {
-  scon <- src_context(db)
+src_desc.src_spark <- function(x) {
+  scon <- src_context(x)
   paste("spark connection",
         paste("master", spark_connection_master(scon), sep = "="),
         paste("app", spark_connection_app_name(scon), sep = "="),
@@ -48,7 +48,7 @@ src_context <- function(db) {
 }
 
 #' @export
-db_explain.src_spark <- function(con) {
+db_explain.src_spark <- function(con, sql, ...) {
   ""
 }
 
@@ -58,15 +58,15 @@ tbl.src_spark <- function(src, from, ...) {
 }
 
 #' @export
-tbl.spark_connection <- function(sc, from, ...) {
-  src <- src_sql("spark", dbConnect(DBISpark(sc)))
+tbl.spark_connection <- function(src, from, ...) {
+  src <- src_sql("spark", dbConnect(DBISpark(src)))
   tbl_sql("spark", src = src, from = from, ...)
 }
 
 #' @export
-src_tbls.spark_connection <- function(sc, ...) {
-  src <- src_sql("spark", dbConnect(DBISpark(sc)))
-  src_tbls("spark", src, ...)
+src_tbls.spark_connection <- function(x, ...) {
+  src <- src_sql("spark", dbConnect(DBISpark(x)))
+  src_tbls(src, ...)
 }
 
 #' @export
@@ -78,32 +78,29 @@ db_data_type.src_spark <- function(...) {
 #'
 #' Copy a local R dataframe to Spark and provide a data source compatible with dplyr
 #'
-#' @param sc The Spark connection
+#' @param dest A Spark connection
 #' @param name Name of the destination table
 #' @param df Local data frame to copy
-#' @param memory Cache table into memory for improved performance
-#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
-#' @param overwrite When TRUE, overwrites table with existing name
 #' @param ... Unused
 #'
 #' @name copy_to
 #'
 #' @export
-copy_to.spark_connection <- function(sc, df, name = deparse(substitute(df)), ...,
-                                     memory = TRUE, repartition = 0, overwrite = FALSE) {
+copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)), ...) {
+  sc <- dest
+  args <- list(...)
+  overwrite <- if (is.null(args$overwrite)) FALSE else args$overwrite
+
   dest <- src_sql("spark", dbConnect(DBISpark(sc)))
 
   if (overwrite)
     spark_remove_table_if_exists(dest, name)
-  else if (spark_table_exists(dest, name))
+  if (spark_table_exists(dest, name))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  dbWriteTable(dest$con, name, df, TRUE, repartition)
+  dbWriteTable(dest$con, name, df)
 
-  if (memory) {
-    tbl_cache(sc, name)
-  }
-
+  tbl_cache(sc, name)
   on_connection_updated(src_context(dest), name)
 
   tbl(dest, name)
