@@ -95,7 +95,7 @@ ft_vector_assembler <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  assembler <- spark_invoke_static_ctor(
+  assembler <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.VectorAssembler"
   )
@@ -131,7 +131,7 @@ ft_string_indexer <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  indexer <- spark_invoke_static_ctor(
+  indexer <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.StringIndexer"
   )
@@ -170,7 +170,7 @@ ft_binarizer <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  binarizer <- spark_invoke_static_ctor(
+  binarizer <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.Binarizer"
   )
@@ -202,7 +202,7 @@ ft_discrete_cosine_transform <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  dct <- spark_invoke_static_ctor(
+  dct <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.DCT"
   )
@@ -232,7 +232,7 @@ ft_index_to_string <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  converter <- spark_invoke_static_ctor(
+  converter <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.IndexToString"
   )
@@ -253,7 +253,7 @@ ft_index_to_string <- function(x,
 # {
 #   scon <- spark_scon(df)
 #
-#   scaler <- spark_invoke_static_ctor(
+#   scaler <- spark_invoke_new(
 #     scon,
 #     "org.apache.spark.ml.feature.StandardScaler"
 #   )
@@ -271,7 +271,7 @@ ft_index_to_string <- function(x,
 # {
 #   scon <- spark_scon(df)
 #
-#   scaler <- spark_invoke_static_ctor(
+#   scaler <- spark_invoke_new(
 #     scon,
 #     "org.apache.spark.ml.feature.MinMaxScaler"
 #   )
@@ -304,7 +304,7 @@ ft_bucketizer <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  bucketizer <- spark_invoke_static_ctor(
+  bucketizer <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.Bucketizer"
   )
@@ -338,7 +338,7 @@ ft_elementwise_product <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  transformer <- spark_invoke_static_ctor(
+  transformer <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.ElementwiseProduct"
   )
@@ -370,7 +370,7 @@ ft_sql_transformer <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  transformer <- spark_invoke_static_ctor(
+  transformer <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.SQLTransformer"
   )
@@ -407,7 +407,7 @@ ft_quantile_discretizer <- function(x,
   df <- as_spark_dataframe(x)
   scon <- spark_scon(df)
 
-  discretizer <- spark_invoke_static_ctor(
+  discretizer <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.QuantileDiscretizer"
   )

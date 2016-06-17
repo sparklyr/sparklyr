@@ -31,7 +31,7 @@ ml_multilayer_perceptron <- function(x,
 
   ml_multilayer_perceptron_validate_layers(x, response, features, layers)
 
-  mpc <- spark_invoke_static_ctor(
+  mpc <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.classification.MultilayerPerceptronClassifier"
   )

@@ -344,13 +344,13 @@ spark_invoke_static <- function (sc, class, method, ...)
   spark_invoke_method(sc, TRUE, class, method, ...)
 }
 
-#' Executes an static method on the given object
-#' @name spark_invoke_static_ctor
+#' Creates a new object of the specified class
+#' @name spark_invoke_new
 #' @export
 #' @param sc Spark connection provided by spark_connect
 #' @param class Fully-qualified name to static class
 #' @param ... Additional parameters that method requires
-spark_invoke_static_ctor <- function(sc, class, ...)
+spark_invoke_new <- function(sc, class, ...)
 {
   spark_invoke_method(sc, TRUE, class, "<init>", ...)
 }
@@ -370,7 +370,7 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
   scon <- sc
   sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
 
-  conf <- spark_invoke_static_ctor(scon, "org.apache.spark.SparkConf")
+  conf <- spark_invoke_new(scon, "org.apache.spark.SparkConf")
   conf <- spark_invoke(conf, "setAppName", appName)
   conf <- spark_invoke(conf, "setMaster", master)
   conf <- spark_invoke(conf, "setSparkHome", sparkHome)
@@ -380,7 +380,7 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
     conf <<- spark_invoke(conf, "set", paramName, params[[paramName]])
   })
 
-  spark_invoke_static_ctor(
+  spark_invoke_new(
     scon,
     "org.apache.spark.SparkContext",
     conf

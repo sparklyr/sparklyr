@@ -89,7 +89,7 @@ spark_api_create_hive_context_v2 <- function(scon) {
 }
 
 spark_api_create_hive_context_v1 <- function(scon) {
-  spark_invoke_static_ctor(
+  spark_invoke_new(
     scon,
 
     "org.apache.spark.sql.hive.HiveContext",

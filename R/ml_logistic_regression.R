@@ -20,7 +20,7 @@ ml_logistic_regression <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  lr <- spark_invoke_static_ctor(
+  lr <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.classification.LogisticRegression"
   )

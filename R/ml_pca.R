@@ -16,7 +16,7 @@ ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
-  pca <- spark_invoke_static_ctor(
+  pca <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.feature.PCA"
   )

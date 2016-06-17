@@ -38,7 +38,7 @@ library(ggplot2)
 parquetPath <- file.path(getwd(), "billion.parquet")
 
 if (!file.exists(parquetPath)) {
-  billion <- spark_invoke_static_ctor(sc, "java.math.BigInteger", "1000000000") %>%
+  billion <- spark_invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
     spark_invoke("longValue")
   
   ses %>%
@@ -78,7 +78,7 @@ logResults <- function(label, test) {
 
 sparkTest <- function(test, loadIntoDf = TRUE) {
   sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "12G")
-  sparkSql <- spark_invoke_static_ctor(
+  sparkSql <- spark_invoke_new(
     sc,
     "org.apache.spark.sql.SQLContext",
     spark_context(sc)
@@ -117,7 +117,7 @@ Tests
 
 ``` r
 spark_sum_range <- function(sc, db, ses, df) {
-  billion <- spark_invoke_static_ctor(sc, "java.math.BigInteger", "1000000000") %>%
+  billion <- spark_invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
     spark_invoke("longValue")
   
   result <- ses %>%

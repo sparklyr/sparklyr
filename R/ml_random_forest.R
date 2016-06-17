@@ -47,7 +47,7 @@ ml_random_forest <- function(x,
   else
     "org.apache.spark.ml.classification.RandomForestClassifier"
 
-  rf <- spark_invoke_static_ctor(scon, model)
+  rf <- spark_invoke_new(scon, model)
 
   fit <- rf %>%
     spark_invoke("setFeaturesCol", envir$features) %>%

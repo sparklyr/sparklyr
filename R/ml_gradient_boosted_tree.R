@@ -49,7 +49,7 @@ ml_gradient_boosted_trees <- function(x,
   else
     classifier
 
-  rf <- spark_invoke_static_ctor(scon, model)
+  rf <- spark_invoke_new(scon, model)
 
   fit <- rf %>%
     spark_invoke("setFeaturesCol", envir$features) %>%

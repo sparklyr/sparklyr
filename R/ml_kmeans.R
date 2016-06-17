@@ -22,7 +22,7 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
   # invoke KMeans
-  kmeans <- spark_invoke_static_ctor(
+  kmeans <- spark_invoke_new(
     scon,
     "org.apache.spark.ml.clustering.KMeans"
   )
