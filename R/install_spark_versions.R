@@ -9,7 +9,7 @@ spark_versions <- function(latest = TRUE) {
 
   latestUrl <- "https://raw.githubusercontent.com/rstudio/sparklyr/master/inst/extdata/install_spark.csv?token=ASpg1NOA-Y-_Ir67ZLqzefBWo8URFxO5ks5XYZCAwA%3D%3D"
 
-  # NOTE: this function is called during configure and the 'rspark' package
+  # NOTE: this function is called during configure and the 'sparklyr' package
   # will not be available at that time; allow overriding with environment variable
   packagePathEnv <- Sys.getenv("R_SPARKLYR_INSTALL_INFO_PATH", unset = NA)
   packagePath <- if (!is.na(packagePathEnv))
