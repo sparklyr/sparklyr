@@ -1,12 +1,13 @@
 Package: sparklyr
 Type: Package
 Title: Provides an R Interface to Apache Spark
-Version: 0.2
+Version: 0.2.1
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
     person("JJ", "Allaire", role = "aut", email = "jj@rstudio.com"),
-    person("RStudio", role = c("cph"))
+    person(family = "RStudio", role = c("cph")),
+    person(family = "The Apache Software Foundation", role = c("aut", "cph"))
     )
 Date: 2016-05-17
 Maintainer: Javier Luraschi <javier@rstudio.com>
