@@ -15,7 +15,7 @@ Description: Provision, connect and interface to Apache Spark from within the
     Apache Spark clusters and provides support for R packages like dplyr and DBI.
 License: file LICENSE
 LazyData: TRUE
-RoxygenNote: 5.0.1
+RoxygenNote: 5.0.1.9000
 Collate:
     'apache_spark_deserialize.R'
     'apache_spark_jobj.R'

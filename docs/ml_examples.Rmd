@@ -12,10 +12,9 @@ output:
 library(rspark)
 library(ggplot2)
 
-sc <- spark_connect("local", version = "2.0.0-preview")
+sc <- spark_connect("local", version = "1.6.1")
 
-copy_to(sc, iris, "iris")
-iris_tbl <- tbl(sc, "iris")
+iris_tbl <- copy_to(sc, iris, "iris", overwrite = TRUE)
 ```
 
 ## KMeans in R
