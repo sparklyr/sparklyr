@@ -4,10 +4,10 @@
 \alias{spark_ec2_web}
 \title{Opens the Spark web interface in EC2}
 \usage{
-spark_ec2_web(cluster_info)
+spark_ec2_web(cluster)
 }
 \arguments{
-\item{cluster_info}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
+\item{cluster}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
 }
 \description{
 Opens the Spark web interface in EC2

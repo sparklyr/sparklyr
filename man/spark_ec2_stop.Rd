@@ -4,10 +4,10 @@
 \alias{spark_ec2_stop}
 \title{Stops a running Spark instance in EC2}
 \usage{
-spark_ec2_stop(cluster_info, verbose = FALSE)
+spark_ec2_stop(cluster, verbose = FALSE)
 }
 \arguments{
-\item{cluster_info}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
+\item{cluster}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
 
 \item{verbose}{Logs verbose information while executing EC2 commands}
 }

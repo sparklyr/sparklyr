@@ -24,7 +24,7 @@ spark_ec2_cluster <- function(
   installInfo <- spark_install_find(version, hadoop_version)
   validate_pem(pem_file);
 
-  list(
+  structure(class = "spark_ec2_cluster", list(
     accessKeyId = access_key_id,
     secretAccessKey = secret_access_key,
     pemFile = pem_file,
@@ -35,7 +35,7 @@ spark_ec2_cluster <- function(
     instanceType = instance_type,
     region = region,
     installInfo = installInfo
-  )
+  ))
 }
 
 #' Install an EC2 Spark cluster
@@ -44,26 +44,26 @@ spark_ec2_cluster <- function(
 #' Returns a cluster information list to enable further commands.
 #'
 #' @param instance_count The total number of EC2 instances to be provisioned.
-#' @param cluster_info A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.
+#' @param cluster A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.
 #' @param copy_dir Copies all the contents (recursevely) of the given path into the driver node durint spark_ec2_deploy
 #' @param verbose Logs verbose information while executing EC2 commands
 #'
 #' @export
 spark_ec2_deploy <- function(
-  cluster_info,
+  cluster,
   instance_count = 1,
   copy_dir = NULL,
   verbose = FALSE) {
 
   commandParams <- ""
-  if (!is.null(cluster_info$region)) {
+  if (!is.null(cluster$region)) {
     commandParams <- paste0(commandParams,
-                           paste("--region", cluster_info$region, sep = "="))
+                           paste("--region", cluster$region, sep = "="))
   }
 
-  if (!is.null(cluster_info$instanceType)) {
+  if (!is.null(cluster$instanceType)) {
     commandParams <- paste(commandParams,
-                           paste("--instance-type", cluster_info$instanceType, sep = "="),
+                           paste("--instance-type", cluster$instanceType, sep = "="),
                            sep = if (nchar(commandParams) > 0) " " else "")
   }
 
@@ -80,9 +80,9 @@ spark_ec2_deploy <- function(
                            sep = if (nchar(commandParams) > 0) " " else "")
   }
 
-  command <- run_ec2_command(command = paste("launch", cluster_info$clusterName),
+  command <- run_ec2_command(command = paste("launch", cluster$clusterName),
                              commandParams = commandParams,
-                             clusterInfo = cluster_info,
+                             clusterInfo = cluster,
                              parse = FALSE,
                              verbose = verbose)
 
@@ -95,13 +95,13 @@ spark_ec2_deploy <- function(
 #'
 #' @export
 spark_ec2_start <- function(
-  cluster_info,
+  cluster,
   instance_count = 1,
   verbose = FALSE) {
 
-  run_ec2_command(command = paste("launch", cluster_info$clusterName),
+  run_ec2_command(command = paste("launch", cluster$clusterName),
                   commandParams = "",
-                  clusterInfo = cluster_info,
+                  clusterInfo = cluster,
                   parse = FALSE,
                   verbose = verbose)
 }
@@ -112,13 +112,13 @@ spark_ec2_start <- function(
 #'
 #' @export
 spark_ec2_stop <- function(
-  cluster_info,
+  cluster,
   verbose = FALSE) {
 
-  run_ec2_command(command = paste("stop", cluster_info$clusterName),
+  run_ec2_command(command = paste("stop", cluster$clusterName),
                   commandParams = "",
                   input = "y",
-                  clusterInfo =  cluster_info,
+                  clusterInfo =  cluster,
                   parse = FALSE,
                   verbose = verbose)
 }
@@ -129,13 +129,13 @@ spark_ec2_stop <- function(
 #'
 #' @export
 spark_ec2_destroy <- function(
-  cluster_info,
+  cluster,
   verbose = FALSE) {
 
-  run_ec2_command(command = paste("destroy", cluster_info$clusterName),
+  run_ec2_command(command = paste("destroy", cluster$clusterName),
                   commandParams = "",
                   input = "y",
-                  clusterInfo = cluster_info,
+                  clusterInfo = cluster,
                   parse = FALSE,
                   verbose = verbose)
 }
@@ -146,13 +146,13 @@ spark_ec2_destroy <- function(
 #'
 #' @export
 spark_ec2_login <- function(
-  cluster_info,
+  cluster,
   verbose = FALSE) {
 
-  res <- run_ec2_command(command = paste("login", cluster_info$clusterName),
+  res <- run_ec2_command(command = paste("login", cluster$clusterName),
                          commandParams = "",
                          input = "y",
-                         clusterInfo = cluster_info,
+                         clusterInfo = cluster,
                          preview = TRUE,
                          verbose = verbose)
 
@@ -165,14 +165,14 @@ spark_ec2_login <- function(
 #'
 #' @export
 spark_ec2_master <- function(
-  cluster_info,
+  cluster,
   verbose = FALSE) {
-  validate_pem(cluster_info$pemFile);
+  validate_pem(cluster$pemFile);
 
-  run_ec2_command(command = paste("get-master", cluster_info$clusterName),
+  run_ec2_command(command = paste("get-master", cluster$clusterName),
                   commandParams = "",
                   input = "",
-                  clusterInfo = cluster_info,
+                  clusterInfo = cluster,
                   verbose = verbose)$stdout[[3]]
 }
 
@@ -244,8 +244,8 @@ run_ec2_command <- function(command,
 #'
 #' @export
 spark_ec2_rstudio <- function(
-  cluster_info) {
-  master <- spark_ec2_master(cluster_info)
+  cluster) {
+  master <- spark_ec2_master(cluster)
   utils::browseURL(paste("http://", master, ":8787", sep = ""))
 }
 
@@ -255,7 +255,7 @@ spark_ec2_rstudio <- function(
 #'
 #' @export
 spark_ec2_web <- function(
-  cluster_info) {
-  master <- spark_ec2_master(cluster_info)
+  cluster) {
+  master <- spark_ec2_master(cluster)
   utils::browseURL(paste("http://", master, ":8080", sep = ""))
 }

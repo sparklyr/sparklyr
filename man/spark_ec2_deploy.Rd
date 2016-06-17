@@ -4,11 +4,11 @@
 \alias{spark_ec2_deploy}
 \title{Install an EC2 Spark cluster}
 \usage{
-spark_ec2_deploy(cluster_info, instance_count = 1, copy_dir = NULL,
+spark_ec2_deploy(cluster, instance_count = 1, copy_dir = NULL,
   verbose = FALSE)
 }
 \arguments{
-\item{cluster_info}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
+\item{cluster}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
 
 \item{instance_count}{The total number of EC2 instances to be provisioned.}
 

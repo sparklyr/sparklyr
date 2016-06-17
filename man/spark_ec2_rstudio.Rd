@@ -4,10 +4,10 @@
 \alias{spark_ec2_rstudio}
 \title{Opens RStudio in EC2}
 \usage{
-spark_ec2_rstudio(cluster_info)
+spark_ec2_rstudio(cluster)
 }
 \arguments{
-\item{cluster_info}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
+\item{cluster}{A collection of parameters required to use the EC2 cluster, initialized with spark_ec2_cluster.}
 }
 \description{
 Opens RStudio in EC2
