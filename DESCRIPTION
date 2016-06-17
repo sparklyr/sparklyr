@@ -48,6 +48,7 @@ Collate:
     'ml_kmeans.R'
     'ml_linear_regression.R'
     'ml_logistic_regression.R'
+    'ml_model_print_methods.R'
     'ml_multilayer_perceptron.R'
     'ml_pca.R'
     'ml_random_forest.R'

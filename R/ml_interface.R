@@ -55,18 +55,3 @@ sdf_summarize <- function(df, columns = NULL) {
   
   result
 }
-
-ml_model_print_residuals_summary <- function(model) {
-  
-  residuals <- model$.model %>%
-    spark_invoke("summary") %>%
-    spark_invoke("residuals")
-
-  summary <- sdf_summarize(residuals, "residuals")$residuals
-  fns <- summary[c("Minimum", "Q1", "Median", "Q3", "Maximum")]
-  names(fns) <- c("Min", "1Q", "Median", "3Q", "Max")
-  
-  cat("Residuals:", sep = "\n")
-  print(fns)
-  invisible(fns)
-}
