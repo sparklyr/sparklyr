@@ -4,10 +4,12 @@
 \alias{spark_read_json}
 \title{Reads a JSON file and provides a data source compatible with dplyr}
 \usage{
-spark_read_json(db, name, path, repartition = 0, memory = TRUE,
+spark_read_json(sc, name, path, repartition = 0, memory = TRUE,
   overwrite = TRUE)
 }
 \arguments{
+\item{sc}{The Spark connection}
+
 \item{name}{Name to reference the data source once it's loaded}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}

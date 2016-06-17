@@ -90,15 +90,16 @@ db_data_type.src_spark <- function(...) {
 #' @param name Name of the destination table
 #' @param df Local data frame to copy
 #' @param ... Unused
+#' @param memory Cache table into memory for improved performance
+#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
+#' @param overwrite When TRUE, overwrites table with existing name
 #'
 #' @name copy_to
 #'
 #' @export
-copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)), ...) {
+copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
+                                     memory = TRUE, repartition = 0, overwrite = FALSE, ...) {
   sc <- dest
-  args <- list(...)
-  overwrite <- if (is.null(args$overwrite)) FALSE else args$overwrite
-
   dest <- src_sql("spark", dbConnect(DBISpark(sc)))
 
   if (overwrite)
@@ -106,9 +107,12 @@ copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)), .
   if (name %in% src_tbls(sc))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  dbWriteTable(dest$con, name, df)
+  dbWriteTable(dest$con, name, df, TRUE, repartition)
 
-  tbl_cache(sc, name)
+  if (memory) {
+    tbl_cache(sc, name)
+  }
+
   on_connection_updated(src_context(dest), name)
 
   tbl(dest, name)

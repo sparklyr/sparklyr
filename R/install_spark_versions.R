@@ -5,9 +5,17 @@ spark_versions_file_pattern <- function() {
 #' Retrieves available versions of Spark
 #' @rdname spark_install
 #' @export
-spark_versions <- function(latest = FALSE) {
+spark_versions <- function(latest = TRUE) {
+
   latestUrl <- "https://raw.githubusercontent.com/rstudio/sparklyr/master/inst/extdata/install_spark.csv?token=ASpg1NOA-Y-_Ir67ZLqzefBWo8URFxO5ks5XYZCAwA%3D%3D"
-  packagePath <- system.file(file.path("extdata", "install_spark.csv"), package = "sparklyr")
+
+  # NOTE: this function is called during configure and the 'rspark' package
+  # will not be available at that time; allow overriding with environment variable
+  packagePathEnv <- Sys.getenv("R_SPARKLYR_INSTALL_INFO_PATH", unset = NA)
+  packagePath <- if (!is.na(packagePathEnv))
+    packagePathEnv
+  else
+    system.file(file.path("extdata", "install_spark.csv"), package = "sparklyr")
 
   downloadData <- NULL
   if (latest) {

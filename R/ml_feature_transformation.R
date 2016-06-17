@@ -45,13 +45,24 @@ df_mutate_ <- function(.data, ..., .dots) {
     lazy_expr <- dots[[i]]$expr
     lazy_env  <- dots[[i]]$env
 
+    # figure out the input column -- we aren't being very
+    # principled about non-standard evaluation here
+    el <- lazy_expr[[2]]
+    input_col <- if (is.call(el)) {
+      eval(el, envir = lazy_env)
+    } else {
+      as.character(el)
+    }
+
+    output_col <- as.character(names(dots)[[i]])
+
     # construct a new call with the input variable injected
     # for evaluation
     preamble <- list(
-      lazy_expr[[1]],                 # function
-      data,                           # data
-      as.character(lazy_expr[[2]]),   # input column
-      as.character(names(dots)[[i]])  # output column
+      lazy_expr[[1]], # function
+      data,           # data
+      input_col,      # input column
+      output_col      # output column
     )
 
     call <- as.call(c(
