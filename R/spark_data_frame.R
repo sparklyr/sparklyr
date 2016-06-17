@@ -53,12 +53,12 @@ spark_dataframe_read_column <- function(object, colName) {
   else
     "readColumnDefault"
 
-  scon <- spark_connection(jobj)
+  sc <- spark_connection(jobj)
   rdd <- jobj %>%
     spark_invoke("select", colName, list()) %>%
     spark_invoke("rdd")
 
-  column <- spark_invoke_static(scon, "utils", method, rdd)
+  column <- spark_invoke_static(sc, "utils", method, rdd)
 
   if (colType == "StringType") {
 

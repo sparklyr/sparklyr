@@ -93,10 +93,10 @@ ft_vector_assembler <- function(x,
                                 output_col = NULL)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   assembler <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.VectorAssembler"
   )
 
@@ -129,10 +129,10 @@ ft_string_indexer <- function(x,
                               params = NULL)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   indexer <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.StringIndexer"
   )
 
@@ -168,10 +168,10 @@ ft_binarizer <- function(x,
                          threshold = 0.5)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   binarizer <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.Binarizer"
   )
 
@@ -200,10 +200,10 @@ ft_discrete_cosine_transform <- function(x,
                                          inverse = FALSE)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   dct <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.DCT"
   )
 
@@ -230,10 +230,10 @@ ft_index_to_string <- function(x,
                                output_col = NULL)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   converter <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.IndexToString"
   )
 
@@ -251,10 +251,10 @@ ft_index_to_string <- function(x,
 # ft_standard_scaler <- function(df, input_col, output_col,
 #                                      with.mean, with.std)
 # {
-#   scon <- spark_connection(df)
+#   sc <- spark_connection(df)
 #
 #   scaler <- spark_invoke_new(
-#     scon,
+#     sc,
 #     "org.apache.spark.ml.feature.StandardScaler"
 #   )
 #
@@ -269,10 +269,10 @@ ft_index_to_string <- function(x,
 # ft_min_max_scaler <- function(df, input_col, output_col,
 #                                     min = 0, max = 1)
 # {
-#   scon <- spark_connection(df)
+#   sc <- spark_connection(df)
 #
 #   scaler <- spark_invoke_new(
-#     scon,
+#     sc,
 #     "org.apache.spark.ml.feature.MinMaxScaler"
 #   )
 #
@@ -302,10 +302,10 @@ ft_bucketizer <- function(x,
                           splits)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   bucketizer <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.Bucketizer"
   )
 
@@ -336,10 +336,10 @@ ft_elementwise_product <- function(x,
                                    scaling_col)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   transformer <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.ElementwiseProduct"
   )
 
@@ -368,10 +368,10 @@ ft_sql_transformer <- function(x,
                                sql)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   transformer <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.SQLTransformer"
   )
 
@@ -405,10 +405,10 @@ ft_quantile_discretizer <- function(x,
                                     n_buckets = 5)
 {
   df <- as_spark_dataframe(x)
-  scon <- spark_connection(df)
+  sc <- spark_connection(df)
 
   discretizer <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.QuantileDiscretizer"
   )
 

@@ -14,14 +14,14 @@ ml_linear_regression <- function(x,
                                  alpha = 0,
                                  lambda = 0)
 {
-  scon <- spark_connection(x)
   df <- as_spark_dataframe(x)
-
+  sc <- spark_connection(df)
+  
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
   lr <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.regression.LinearRegression"
   )
 

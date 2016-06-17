@@ -26,9 +26,9 @@ ml_gradient_boosted_trees <- function(x,
                                       max.depth = 5L,
                                       type = c("auto", "regression", "classification"))
 {
-  scon <- spark_connection(x)
   df <- as_spark_dataframe(x)
-
+  sc <- spark_connection(df)
+  
   type <- match.arg(type)
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
@@ -49,7 +49,7 @@ ml_gradient_boosted_trees <- function(x,
   else
     classifier
 
-  rf <- spark_invoke_new(scon, model)
+  rf <- spark_invoke_new(sc, model)
 
   fit <- rf %>%
     spark_invoke("setFeaturesCol", envir$features) %>%

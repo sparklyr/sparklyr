@@ -10,14 +10,15 @@
 #'
 #' @export
 ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
-  scon <- spark_connection(x)
+  
   df <- as_spark_dataframe(x)
+  sc <- spark_connection(df)
 
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
   pca <- spark_invoke_new(
-    scon,
+    sc,
     "org.apache.spark.ml.feature.PCA"
   )
 

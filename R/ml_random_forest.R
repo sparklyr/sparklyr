@@ -28,8 +28,8 @@ ml_random_forest <- function(x,
                              num.trees = 20L,
                              type = c("auto", "regression", "classification"))
 {
-  scon <- spark_connection(x)
   df <- as_spark_dataframe(x)
+  sc <- spark_connection(df)
 
   type <- match.arg(type)
   envir <- new.env(parent = emptyenv())
@@ -47,7 +47,7 @@ ml_random_forest <- function(x,
   else
     "org.apache.spark.ml.classification.RandomForestClassifier"
 
-  rf <- spark_invoke_new(scon, model)
+  rf <- spark_invoke_new(sc, model)
 
   fit <- rf %>%
     spark_invoke("setFeaturesCol", envir$features) %>%
