@@ -172,10 +172,10 @@ print.src_spark <- function(x, ...) {
 #' data(diamonds, package = "ggplot2")
 #' diamonds_tbl <- copy_to(sc, diamonds, "diamonds")
 #' partitions <- diamonds_tbl %>%
-#'   df_partition(training = 0.6, test = 0.4)
+#'   sdf_partition(training = 0.6, test = 0.4)
 #' print(partitions)
 #' }
-df_partition <- function(x, ..., seed = sample(.Machine$integer.max, 1)) {
+sdf_partition <- function(x, ..., seed = sample(.Machine$integer.max, 1)) {
   weights <- list(...)
   nm <- names(weights)
   if (is.null(nm) || any(!nzchar(nm)))

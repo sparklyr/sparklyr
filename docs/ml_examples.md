@@ -249,7 +249,7 @@ Partitioning in Spark
 
 ``` r
 partitions <- tbl(sc, "iris") %>%
-  df_partition(training = 0.75, test = 0.25, seed = 1099)
+  sdf_partition(training = 0.75, test = 0.25, seed = 1099)
 
 fit <- partitions$training %>%
   ml_linear_regression(response = "Petal_Length", features = c("Petal_Width"))
