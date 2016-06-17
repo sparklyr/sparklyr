@@ -15,7 +15,7 @@
 \title{DBI interface for Spark}
 \usage{
 \S4method{dbWriteTable}{DBISparkConnection}(conn, name, value,
-  temporary = TRUE, repartition = 0)
+  temporary = TRUE, repartition = 0, local_file = NULL)
 
 \S4method{dbReadTable}{DBISparkConnection,character}(conn, name)
 
@@ -44,6 +44,8 @@
 \item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
 
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
+
+\item{local_file}{When TRUE, uses a local file to copy the data frame, this is only available in local installs.}
 
 \item{.data}{Data and operations references}
 

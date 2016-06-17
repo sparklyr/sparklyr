@@ -215,3 +215,10 @@ sdf_partition <- function(x, ..., seed = sample(.Machine$integer.max, 1)) {
   names(partitions) <- nm
   partitions
 }
+
+#' @export
+db_save_query.DBISparkConnection <- function (conn, sql, name, temporary = TRUE, ...) 
+{
+  df <- as_spark_dataframe(conn@scon, sql)
+  registerTempTable(df, name)
+}

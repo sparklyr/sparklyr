@@ -24,6 +24,11 @@ as_spark_dataframe.tbl_spark <- function(x, ...) {
   spark_invoke(api, "sql", sql)
 }
 
+#' @export
+as_spark_dataframe.spark_connection <- function(x, sql = NULL, ...) {
+  spark_invoke(spark_sql_or_hive(spark_api(x)), "sql", as.character(sql))
+}
+
 spark_dataframe_schema <- function(object) {
   jobj <- as_spark_dataframe(object)
   schema <- spark_invoke(jobj, "schema")
