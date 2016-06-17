@@ -84,3 +84,9 @@ print.ml_model_linear_regression <- function(x, ...) {
   print(x$coefficients)
 }
 
+#' @export
+summary.ml_model_linear_regression <- function(object, ...) {
+  ml_model_print_call(object)
+  ml_model_print_residuals(object)
+  ml_model_print_coefficients(object)
+}

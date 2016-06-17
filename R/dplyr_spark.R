@@ -77,6 +77,11 @@ db_explain.src_spark <- function(con, sql, ...) {
 }
 
 #' @export
+tbl_vars.jobj <- function(x) {
+  as.character(spark_invoke(x, "columns"))
+}
+
+#' @export
 tbl.src_spark <- function(src, from, ...) {
   tbl_sql("spark", src = src, from = from, ...)
 }
