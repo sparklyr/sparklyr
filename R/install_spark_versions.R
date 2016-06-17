@@ -1,5 +1,5 @@
 spark_versions_file_pattern <- function() {
-  "spark-(.*)-bin-hadoop(.*)"
+  "spark-(.*)-bin-(?:hadoop)?(.*)"
 }
 
 #' Retrieves available versions of Spark
