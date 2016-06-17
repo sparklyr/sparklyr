@@ -12,4 +12,5 @@ spark_context(sc)
 \description{
 Retrieves the SparkContext reference from a Spark Connection
 }
+\keyword{internal}
 

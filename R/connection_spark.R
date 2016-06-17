@@ -389,6 +389,7 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
 
 #' Retrieves the SparkContext reference from a Spark Connection
 #' @name spark_context
+#' @keywords internal
 #' @export
 #' @param sc Spark connection provided by spark_connect
 spark_context <- function(sc) {
