@@ -240,7 +240,7 @@ spark_api_build_types <- function(api, columns) {
   spark_invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
 }
 
-spark_api_copy_data <- function(api, df, name, repartition, useCsv = FALSE) {
+spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -255,7 +255,7 @@ spark_api_copy_data <- function(api, df, name, repartition, useCsv = FALSE) {
       typeof(e)
   })
 
-  if (useCsv) {
+  if (local_file) {
     tempfile <- tempfile(fileext = ".csv")
     write.csv(df, tempfile, row.names = FALSE, na = "")
     df <- spark_api_read_csv(api, tempfile, columns)
@@ -271,7 +271,7 @@ spark_api_copy_data <- function(api, df, name, repartition, useCsv = FALSE) {
     rdd <- spark_invoke_static(
       api$scon,
       "utils",
-      "listOfListsToListOfRows3",
+      "createDataFrame",
       spark_context(sc),
       rows,
       as.integer(if (repartition <= 0) 1 else repartition)
