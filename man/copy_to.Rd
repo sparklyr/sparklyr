@@ -6,7 +6,8 @@
 \title{Copy a local R dataframe to Spark and provide a data source compatible with dplyr}
 \usage{
 \method{copy_to}{spark_connection}(dest, df, name = deparse(substitute(df)),
-  memory = TRUE, repartition = 0, overwrite = FALSE, ...)
+  memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL,
+  ...)
 }
 \arguments{
 \item{dest}{A Spark connection}
@@ -20,6 +21,8 @@
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 
 \item{overwrite}{When TRUE, overwrites table with existing name}
+
+\item{local_file}{When TRUE, uses a local file to copy the data frame, this is only available in local installs.}
 
 \item{...}{Unused}
 }

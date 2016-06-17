@@ -30,18 +30,25 @@ NULL
 #' @export
 #' @rdname DBI-interface
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
+#' @param local_file When TRUE, uses a local file to copy the data frame, this is only available in local installs.
 setMethod("dbWriteTable", "DBISparkConnection",
-  function(conn, name, value, temporary = TRUE, repartition = 0) {
+  function(conn, name, value, temporary = TRUE, repartition = 0, local_file = NULL) {
     if (!temporary) {
       stop("Writting to non-temporary tables is not supported yet")
     }
+    
+    if (!conn@scon$isLocal && identical(local_file, TRUE)) {
+      stop("Using a local file to copy data is not supported for remote clusters")
+    }
+    
+    local_file <- if (is.null(local_file)) conn@scon$isLocal else local_file
 
     found <- dbExistsTable(conn, name)
     if (found) {
       stop("Table ", name, " already exists")
     }
 
-    spark_api_copy_data(conn@api, value, name, repartition)
+    spark_api_copy_data(conn@api, value, name, repartition, local_file)
 
     invisible(TRUE)
   }

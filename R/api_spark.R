@@ -231,7 +231,16 @@ spark_api_data_frame <- function(api, sqlResult) {
   df
 }
 
-spark_api_copy_data <- function(api, df, name, repartition) {
+spark_api_build_types <- function(api, columns) {
+  names <- names(columns)
+  fields <- lapply(names, function(name) {
+    spark_invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, columns[[name]], TRUE)
+  })
+
+  spark_invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
+}
+
+spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -239,19 +248,36 @@ spark_api_copy_data <- function(api, df, name, repartition) {
   # Escaping issues that used to work were broken in Spark 2.0.0-preview, fix:
   names(df) <- gsub("[^a-zA-Z0-9]", "_", names(df))
 
-  tempfile <- tempfile(fileext = ".csv")
-  write.csv(df, tempfile, row.names = FALSE, na = "")
-
   columns <- lapply(df, function(e) {
     if (is.factor(e))
       "character"
     else
       typeof(e)
   })
-  df <- spark_api_read_csv(api, tempfile, columns)
 
-  if (repartition > 0) {
-    df <- spark_invoke(df, "repartition", as.integer(repartition))
+  if (local_file) {
+    tempfile <- tempfile(fileext = ".csv")
+    write.csv(df, tempfile, row.names = FALSE, na = "")
+    df <- spark_api_read_csv(api, tempfile, columns)
+
+    if (repartition > 0) {
+      df <- spark_invoke(df, "repartition", as.integer(repartition))
+    }
+  } else {
+    structType <- spark_api_build_types(api, columns)
+
+    rows <- lapply(seq_len(NROW(df)), function(e) as.list(df[e,]))
+
+    rdd <- spark_invoke_static(
+      api$scon,
+      "utils",
+      "createDataFrame",
+      spark_context(sc),
+      rows,
+      as.integer(if (repartition <= 0) 1 else repartition)
+    )
+
+    df <- spark_invoke(spark_sql_or_hive(api), "createDataFrame", rdd, structType)
   }
 
   spark_register_temp_table(df, name)

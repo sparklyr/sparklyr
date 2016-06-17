@@ -85,6 +85,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          Date = writeDate(con, object),
          POSIXlt = writeTime(con, object),
          POSIXct = writeTime(con, object),
+         factor = writeFactor(con, object),
          stop(paste("Unsupported type for serialization", type)))
 }
 
@@ -159,6 +160,7 @@ writeType <- function(con, class) {
                  Date = "D",
                  POSIXlt = "t",
                  POSIXct = "t",
+                 factor = "c",
                  stop(paste("Unsupported type for serialization", class)))
   writeBin(charToRaw(type), con)
 }
@@ -209,6 +211,10 @@ writeDate <- function(con, date) {
 
 writeTime <- function(con, time) {
   writeDouble(con, as.double(time))
+}
+
+writeFactor <- function(con, factor) {
+  writeString(con, as.character(factor))
 }
 
 # Used to serialize in a list of objects where each

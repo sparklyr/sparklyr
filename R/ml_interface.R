@@ -12,41 +12,61 @@ spark_connection.ml_model <- function(x, ...) {
   spark_connection(x$.model)
 }
 
-ml_model_print_residuals_summary <- function(model) {
-  scon <- spark_connection(model)
+sdf_summarize <- function(df, columns = NULL) {
+  sdf <- as_spark_dataframe(df)
+  if (is.null(columns))
+    columns <- dplyr::tbl_vars(sdf)
+  
+  # register table (drop when we're done)
+  name <- random_string()
+  ctx <- spark_invoke(sdf, "sqlContext")
+  spark_invoke(sdf, "registerTempTable", name)
+  on.exit(spark_invoke(ctx, "dropTempTable", name))
+  
+  # compute summary on each of the set columns
+  summaries <- lapply(columns, function(column) {
+    
+    template <- paste(
+      "SELECT",
+      paste(
+        "AVG(%s) as Average",
+        "VARIANCE(%s) as Variance",
+        "MIN(%s) as Minimum",
+        "PERCENTILE_APPROX(%s, 0.25) AS Q1",
+        "PERCENTILE_APPROX(%s, 0.50) AS Median",
+        "PERCENTILE_APPROX(%s, 0.75) AS Q3",
+        "MAX(%s) as Maximum",
+        sep = ", "
+      ),
+      "FROM", name
+    )
+    
+    sql <- gsub("%s", column, template, fixed = TRUE)
+    spark_invoke(ctx, "sql", sql)
+    
+  })
+  
+  result <- lapply(summaries, function(summary) {
+    summary %>%
+      spark_invoke("collect") %>%
+      `[[`(1)
+  })
+  names(result) <- columns
+  
+  result
+}
 
+ml_model_print_residuals_summary <- function(model) {
+  
   residuals <- model$.model %>%
     spark_invoke("summary") %>%
     spark_invoke("residuals")
 
-  name <- random_string()
-  spark_invoke(residuals, "registerTempTable", name)
-
-  ctx <- spark_invoke(residuals, "sqlContext")
-
-  sql <- paste(
-    "SELECT",
-    paste(
-      "MIN(residuals) as Min",
-      "PERCENTILE_APPROX(residuals, 0.25) AS Q1",
-      "PERCENTILE_APPROX(residuals, 0.50) AS Median",
-      "PERCENTILE_APPROX(residuals, 0.75) AS Q3",
-      "MAX(residuals) as Max",
-      sep = ", "
-    ),
-    "FROM", name
-  )
-
-  summary <-
-    spark_invoke(ctx, "sql", sql) %>%
-    spark_invoke("collect") %>%
-    unlist(recursive = FALSE) %>%
-    as.numeric()
-
-  names(summary) <- c("Min", "1Q", "Median", "3Q", "Max")
-
+  summary <- sdf_summarize(residuals, "residuals")$residuals
+  fns <- summary[c("Minimum", "Q1", "Median", "Q3", "Maximum")]
+  names(fns) <- c("Min", "1Q", "Median", "3Q", "Max")
+  
   cat("Residuals:", sep = "\n")
-  print(summary)
-
-  invisible(summary)
+  print(fns)
+  invisible(fns)
 }

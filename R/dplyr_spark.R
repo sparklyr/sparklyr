@@ -77,6 +77,11 @@ db_explain.src_spark <- function(con, sql, ...) {
 }
 
 #' @export
+tbl_vars.jobj <- function(x) {
+  as.character(spark_invoke(x, "columns"))
+}
+
+#' @export
 tbl.src_spark <- function(src, from, ...) {
   tbl_sql("spark", src = src, from = from, ...)
 }
@@ -109,12 +114,13 @@ db_data_type.src_spark <- function(...) {
 #' @param memory Cache table into memory for improved performance
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite When TRUE, overwrites table with existing name
+#' @param local_file When TRUE, uses a local file to copy the data frame, this is only available in local installs.
 #'
 #' @name copy_to
 #'
 #' @export
 copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
-                                     memory = TRUE, repartition = 0, overwrite = FALSE, ...) {
+                                     memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL, ...) {
   sc <- dest
   dest <- src_sql("spark", dbConnect(DBISpark(sc)))
 
@@ -123,7 +129,7 @@ copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
   if (name %in% src_tbls(sc))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  dbWriteTable(dest$con, name, df, TRUE, repartition)
+  dbWriteTable(dest$con, name, df, TRUE, repartition, local_file)
 
   if (memory) {
     tbl_cache(sc, name)
@@ -208,4 +214,11 @@ sdf_partition <- function(x, ..., seed = sample(.Machine$integer.max, 1)) {
 
   names(partitions) <- nm
   partitions
+}
+
+#' @export
+db_save_query.DBISparkConnection <- function (conn, sql, name, temporary = TRUE, ...) 
+{
+  df <- as_spark_dataframe(conn@scon, sql)
+  spark_invoke(df, "registerTempTable", name)
 }
