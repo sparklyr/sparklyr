@@ -231,9 +231,6 @@ spark_api_data_frame <- function(api, sqlResult) {
   df
 }
 
-<<<<<<< HEAD
-spark_api_copy_data <- function(api, df, name, repartition) {
-=======
 spark_api_build_types <- function(api, columns) {
   names <- names(columns)
   fields <- lapply(names, function(name) {
