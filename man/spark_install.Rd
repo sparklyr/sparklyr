@@ -11,7 +11,7 @@ spark_install(version = NULL, hadoop_version = NULL, reset = FALSE,
 
 spark_install_tar(path)
 
-spark_versions(latest = FALSE)
+spark_versions(latest = TRUE)
 }
 \arguments{
 \item{version}{Version of Spark to install. See spark_versions for a list of supported versions}

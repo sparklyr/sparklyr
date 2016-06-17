@@ -151,11 +151,7 @@ spark_log_file <- function(sc) {
   sconInst$outputFile
 }
 
-#' Prints a spark_log object
-#' @name spark_log
 #' @export
-#' @param x Spark connection provided by spark_connect
-#' @param ... Additional parameters
 print.spark_log <- function(x, ...) {
   cat(x, sep = "\n")
   cat("\n")
