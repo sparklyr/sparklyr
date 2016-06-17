@@ -5,7 +5,7 @@
 \title{Connects to Spark and establishes the Spark Context}
 \usage{
 spark_connect(master = "local", app_name = "sparklyr", version = NULL,
-  hadoop_version = NULL, config = spark_config())
+  hadoop_version = NULL, extensions = NULL, config = spark_config())
 }
 \arguments{
 \item{master}{Master definition to Spark cluster}
@@ -15,6 +15,8 @@ spark_connect(master = "local", app_name = "sparklyr", version = NULL,
 \item{version}{Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.}
 
 \item{hadoop_version}{Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.}
+
+\item{extensions}{Extensions to enable for this connection (see \link{sparklyr-extensions}).}
 
 \item{config}{Configuration for connection (see \code{\link{spark_config} for details}).}
 }

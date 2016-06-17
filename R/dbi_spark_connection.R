@@ -31,7 +31,6 @@ setMethod("show", "DBISparkConnection", function(object) {
 #' @param drv \code{spark::DBISpark()}
 #' @param master Master location.
 #' @export
-#' @import config
 #' @rdname dbi-spark-connection
 #' @examples
 #' \dontrun{

@@ -18,7 +18,7 @@ read_shell_file <- function(shellFile) {
   )
 }
 
-start_shell <- function(scon, sconInst, jars) {
+start_shell <- function(scon, sconInst, jars, packages) {
   sparkHome <- scon$installInfo$sparkVersionDir
   if (!dir.exists(sparkHome)) {
     stop("Spark installation was not found. See spark_install.")
@@ -40,7 +40,7 @@ start_shell <- function(scon, sconInst, jars) {
   parameters <- scon$config[["sparklyr.shell."]]
   parameters <- if(is.null(parameters)) list() else parameters
 
-  parameters[["packages"]] <- unique(c(parameters[["--packages"]], scon$config[["sparklyr.defaultPackages"]]))
+  parameters[["packages"]] <- unique(c(parameters[["--packages"]], packages))
   parameters[["jars"]] <- unique(c(parameters[["--jars"]], jars))
 
   lapply(names(parameters), function(paramName) {

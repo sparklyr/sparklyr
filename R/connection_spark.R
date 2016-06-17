@@ -17,11 +17,13 @@ spark_default_jars <- function() {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
 #' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
+#' @param extensions Extensions to enable for this connection (see \link{sparklyr-extensions}).
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
 spark_connect <- function(master = "local",
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
+                          extensions = NULL,
                           config = spark_config()) {
   sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name })
   if (length(sconFound) == 1) {
@@ -38,8 +40,6 @@ spark_connect <- function(master = "local",
   sparkVersion <- installInfo$sparkVersion
   hadoopVersion <- installInfo$hadoopVersion
 
-  jars <- spark_default_jars()
-
   scon <- list(
     master = master,
     appName = app_name,
@@ -52,7 +52,17 @@ spark_connect <- function(master = "local",
   )
   scon <- structure(scon, class = "spark_connection")
 
-  sconInst <- start_shell(scon, list(), jars)
+  
+  # determine jars and packages
+  jars <- spark_default_jars()
+  packages <- config[["sparklyr.defaultPackages"]]
+  
+  # call extensions to get additional jars and packages
+  dependencies <- resolve_extensions(extensions, sparkVersion, hadoopVersion, config)
+  jars <- c(jars, dependencies$jars)
+  packages <- c(packages, dependencies$packages)
+  
+  sconInst <- start_shell(scon, list(), jars, packages)
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
@@ -74,7 +84,33 @@ spark_connect <- function(master = "local",
   spark_connection_set_inst(scon, sconInst)
 
   on_connection_opened(scon, sconInst$connectCall)
-  invisible(scon)
+  scon
+}
+
+resolve_extensions <- function(extensions, spark_version, hadoop_version, config) {
+  
+  # return list with additional jars and packages
+  dependencies <- list(jars = c(), packages = c())
+    
+  # call spark_dependencies function within each extension package
+  lapply(extensions, function(package) {
+    # attempt to find and call the function
+    spark_dependencies <- tryCatch(get("spark_dependencies", 
+                                       asNamespace(package), 
+                                       inherits = FALSE),
+                                   error = function(e) {
+                                     stop("spark_dependencies function not found within ",
+                                          "extension package ", package, call. = FALSE)
+                                   })
+    extension_deps <- spark_dependencies(spark_version, hadoop_version, config)
+    
+    # append dependencies to resolved list
+    dependencies$jars <<- c(dependencies$jars, extension_deps$jars)
+    dependencies$packages <<- c(dependencies$packages, extension_deps$packages)
+  })
+  
+  # return dependencies
+  dependencies
 }
 
 # Attaches the SparkContext to the connection

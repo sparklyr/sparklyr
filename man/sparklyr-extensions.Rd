@@ -3,4 +3,8 @@
 
 \title{Creating sparklyr extensions}
 
+\description{
+Creating sparklyr extensions
+}
+
 

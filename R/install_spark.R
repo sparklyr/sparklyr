@@ -63,7 +63,6 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 #' Provides support to download and install the given Spark version
 #' @name spark_install
 #' @import rappdirs
-#' @import config
 #' @param version Version of Spark to install. See spark_versions for a list of supported versions
 #' @param hadoop_version Version of Hadoop to install. See spark_versions_hadoop for a list of supported versions
 #' @param reset Attempts to reset settings to defaults
