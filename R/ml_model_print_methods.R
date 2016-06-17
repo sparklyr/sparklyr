@@ -21,13 +21,34 @@ ml_model_print_residuals <- function(model) {
     spark_invoke("summary") %>%
     spark_invoke("residuals")
   
-  summary <- sdf_summarize(residuals, "residuals")$residuals
-  fns <- as.numeric(summary[c("Minimum", "Q1", "Median", "Q3", "Maximum")])
-  names(fns) <- c("Min", "1Q", "Median", "3Q", "Max")
+  # randomly sample residuals and produce quantiles based on
+  # sample to avoid slowness in Spark's 'percentile_approx()'
+  # implementation
+  count <- spark_invoke(residuals, "count")
+  limit <- 1E5
+  isApproximate <- count > limit
   
-  cat("Residuals:", sep = "\n")
-  print(fns)
-  invisible(fns)
+  values <- if (isApproximate) {
+    fraction <- limit / count
+    residuals %>%
+      spark_invoke("sample", FALSE, fraction) %>%
+      spark_dataframe_read_column("residuals") %>%
+      quantile()
+  } else {
+    residuals %>%
+      spark_dataframe_read_column("residuals") %>%
+      quantile()
+  }
+  names(values) <- c("Min", "1Q", "Median", "3Q", "Max")
+  
+  header <- if (isApproximate)
+    "Residuals (approximate):"
+  else
+    "Residuals:"
+  
+  cat(header, sep = "\n")
+  print(values, digits = max(3L, getOption("digits") - 3L))
+  invisible(values)
 }
 
 ml_model_print_coefficients <- function(model) {
