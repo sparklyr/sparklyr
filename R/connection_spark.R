@@ -74,7 +74,7 @@ spark_connect <- function(master = "local",
   spark_connection_set_inst(scon, sconInst)
 
   on_connection_opened(scon, sconInst$connectCall)
-  scon
+  invisible(scon)
 }
 
 # Attaches the SparkContext to the connection
