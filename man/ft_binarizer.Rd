@@ -25,14 +25,14 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformation routines: \code{\link{sdf_mutate}},
-  \code{\link{ft_bucketizer}},
+Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_quantile_discretizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_string_indexer}},
-  \code{\link{ft_vector_assembler}}
+  \code{\link{ft_vector_assembler}},
+  \code{\link{sdf_mutate}}
 }
 

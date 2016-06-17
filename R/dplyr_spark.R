@@ -1,5 +1,4 @@
 #' @import dplyr
-#' @import parallel
 
 spark_dbi <- function(x, ...) {
   UseMethod("spark_dbi", x)
