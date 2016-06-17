@@ -6,8 +6,6 @@ output:
     fig_height: 5
 ---
 
-[![Travis-CI Build Status](https://travis-ci.com/rstudio/sparklyr.svg?token=MxiS2SHZy3QzqFf34wQr&branch=master)](https://travis-ci.com/rstudio/sparklyr)
-
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
 
 ```{r setup, include = FALSE}
@@ -163,8 +161,8 @@ Spark provides low level access to native JVM objects, this topic targets users 
 ```{r}
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
-  file <- spark_invoke(sc, "textFile", path, as.integer(1))
-  spark_invoke(file, "count")
+  spark_invoke(sc, "textFile", path, as.integer(1)) %>% 
+    spark_invoke("count")
 }
 
 # write a CSV 

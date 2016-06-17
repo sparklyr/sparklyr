@@ -1,8 +1,6 @@
 Spark Interface for R
 ================
 
-[![Travis-CI Build Status](https://travis-ci.com/rstudio/sparklyr.svg?token=MxiS2SHZy3QzqFf34wQr&branch=master)](https://travis-ci.com/rstudio/sparklyr)
-
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
 
 Installation
@@ -196,8 +194,8 @@ Spark provides low level access to native JVM objects, this topic targets users 
 ``` r
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
-  file <- spark_invoke(sc, "textFile", path, as.integer(1))
-  spark_invoke(file, "count")
+  spark_invoke(sc, "textFile", path, as.integer(1)) %>% 
+    spark_invoke("count")
 }
 
 # write a CSV 
@@ -242,16 +240,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/16 16:16:33 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 67 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//Rtmpnei9Zq/filecc43440ff268.csv MapPartitionsRDD[229] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/06/16 16:16:33 INFO TaskSchedulerImpl: Adding task set 67.0 with 1 tasks
-    ## 16/06/16 16:16:33 INFO TaskSetManager: Starting task 0.0 in stage 67.0 (TID 465, localhost, partition 0,PROCESS_LOCAL, 2473 bytes)
-    ## 16/06/16 16:16:33 INFO Executor: Running task 0.0 in stage 67.0 (TID 465)
-    ## 16/06/16 16:16:33 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/Rtmpnei9Zq/filecc43440ff268.csv:0+23367180
-    ## 16/06/16 16:16:34 INFO Executor: Finished task 0.0 in stage 67.0 (TID 465). 2082 bytes result sent to driver
-    ## 16/06/16 16:16:34 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 465) in 84 ms on localhost (1/1)
-    ## 16/06/16 16:16:34 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/06/16 16:16:34 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.084 s
-    ## 16/06/16 16:16:34 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.087401 s
+    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 180
+    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 179
+    ## 16/06/17 17:10:39 INFO BlockManagerInfo: Removed broadcast_88_piece0 on localhost:59402 in memory (size: 4.6 KB, free: 487.3 MB)
+    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 188
+    ## 16/06/17 17:10:39 INFO BlockManagerInfo: Removed broadcast_87_piece0 on localhost:59402 in memory (size: 8.5 KB, free: 487.3 MB)
+    ## 16/06/17 17:10:39 INFO BlockManagerInfo: Removed broadcast_90_piece0 on localhost:59402 in memory (size: 4.6 KB, free: 487.3 MB)
+    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 198
+    ## 16/06/17 17:10:39 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:59402 in memory (size: 8.5 KB, free: 487.3 MB)
+    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 197
+    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned shuffle 20
 
 Finally, we disconnect from Spark:
 
