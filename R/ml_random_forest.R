@@ -28,7 +28,7 @@ ml_random_forest <- function(x,
                              num.trees = 20L,
                              type = c("auto", "regression", "classification"))
 {
-  scon <- spark_scon(x)
+  scon <- spark_connection(x)
   df <- as_spark_dataframe(x)
 
   type <- match.arg(type)

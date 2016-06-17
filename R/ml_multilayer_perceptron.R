@@ -23,7 +23,7 @@ ml_multilayer_perceptron <- function(x,
                                      max.iter = 100,
                                      seed = sample(.Machine$integer.max, 1))
 {
-  scon <- spark_scon(x)
+  scon <- spark_connection(x)
   df <- as_spark_dataframe(x)
 
   envir <- new.env(parent = emptyenv())

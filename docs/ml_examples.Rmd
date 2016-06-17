@@ -117,6 +117,7 @@ ggplot(beaver, aes(x = temp, y = activ)) +
     title = "Beaver Activity vs. Body Temperature",
     subtitle = "From R's built-in 'beaver2' dataset"
   )
+
 ```
 
 ## Logistic Regression in Spark
@@ -218,6 +219,7 @@ the results produced are concordant between R and Spark.
 
 ```{r}
 df <- as.data.frame(table(x = rPredict, y = mPredict), stringsAsFactors = FALSE)
+
 ggplot(df) +
   geom_raster(aes(x, y, fill = Freq)) +
   geom_text(aes(x, y, label = Freq), col = "#222222", size = 6, nudge_x = 0.005, nudge_y = -0.005) +
@@ -225,8 +227,9 @@ ggplot(df) +
   labs(
     x = "R-predicted Species",
     y = "Spark-predicted Species",
-    title = "Random Forest Classification — Comparing R and Spark"
-  )
+    title = "Random Forest Classification — Comparing R and Spark")
+
+
 ```
 
 ## Neural Networks with R

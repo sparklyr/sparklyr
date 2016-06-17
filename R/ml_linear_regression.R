@@ -14,7 +14,7 @@ ml_linear_regression <- function(x,
                                  alpha = 0,
                                  lambda = 0)
 {
-  scon <- spark_scon(x)
+  scon <- spark_connection(x)
   df <- as_spark_dataframe(x)
 
   envir <- new.env(parent = emptyenv())

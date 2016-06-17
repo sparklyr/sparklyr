@@ -53,7 +53,7 @@ spark_dataframe_read_column <- function(object, colName) {
   else
     "readColumnDefault"
 
-  scon <- spark_scon(jobj)
+  scon <- spark_connection(jobj)
   rdd <- jobj %>%
     spark_invoke("select", colName, list()) %>%
     spark_invoke("rdd")

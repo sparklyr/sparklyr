@@ -10,7 +10,7 @@
 #'
 #' @export
 ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
-  scon <- spark_scon(x)
+  scon <- spark_connection(x)
   df <- as_spark_dataframe(x)
 
   envir <- new.env(parent = emptyenv())

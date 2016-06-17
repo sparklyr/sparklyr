@@ -8,12 +8,12 @@ ml_model <- function(class, model, ...) {
 }
 
 #' @export
-spark_scon.ml_model <- function(x, ...) {
-  spark_scon(x$.model)
+spark_connection.ml_model <- function(x, ...) {
+  spark_connection(x$.model)
 }
 
 ml_model_print_residuals_summary <- function(model) {
-  scon <- spark_scon(model)
+  scon <- spark_connection(model)
 
   residuals <- model$.model %>%
     spark_invoke("summary") %>%

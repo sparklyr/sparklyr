@@ -16,27 +16,44 @@ spark_api <- function(x) {
   spark_dbi(x)@api
 }
 
-spark_scon <- function(x, ...) {
-  UseMethod("spark_scon")
+#' Get the spark_connection associated with an object
+#' 
+#' S3 method to get the spark_connection (sc) associated with objects of
+#' various types.
+#' 
+#' @param x Object to extract connection from
+#' @param ... Reserved for future use
+#' @return A \code{spark_connection} object that can be passed to 
+#'   \code{\link{spark_invoke}} and related functions.
+#'   
+#' @export
+spark_connection <- function(x, ...) {
+  UseMethod("spark_connection")
 }
 
 #' @export
-spark_scon.spark_connection <- function(x, ...) {
+spark_connection.default <- function(x, ...) {
+  stop("Unable to retreive a spark_connection from object of class ",
+       class(x), call. = FALSE)
+}
+
+#' @export
+spark_connection.spark_connection <- function(x, ...) {
   x
 }
 
 #' @export
-spark_scon.jobj <- function(x, ...) {
+spark_connection.jobj <- function(x, ...) {
   x$scon
 }
 
 #' @export
-spark_scon.tbl_spark <- function(x, ...) {
-  spark_scon(x$src)
+spark_connection.tbl_spark <- function(x, ...) {
+  spark_connection(x$src)
 }
 
 #' @export
-spark_scon.src_spark <- function(x, ...) {
+spark_connection.src_spark <- function(x, ...) {
   spark_dbi(x)@scon
 }
 

@@ -52,10 +52,9 @@ sd_section("MLlib Interface",
 sd_section("Extensions",
            "Functions for interacting directly with the Spark Scala API",
            c("spark_context",
-             "spark_invoke_new"
+             "spark_invoke_new",
              "spark_invoke",
              "spark_invoke_static",
-             "spark_invoke_static_ctor",
              "as_spark_dataframe")
 )
 
