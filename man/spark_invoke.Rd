@@ -4,7 +4,7 @@
 \alias{spark_invoke}
 \title{Executes a method on the given object}
 \usage{
-spark_invoke(jobj, methodName, ...)
+spark_invoke(jobj, method, ...)
 }
 \arguments{
 \item{jobj}{Reference to a jobj retrieved using spark_invoke.
@@ -12,7 +12,7 @@ Can alternately be a Spark connection, in this case it is
 converted to the Spark context jobj via the
 \code{\link{spark_context}} function.}
 
-\item{methodName}{Name of class method to execute}
+\item{method}{Method to execute}
 
 \item{...}{Additional parameters that method requires}
 }

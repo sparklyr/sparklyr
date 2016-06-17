@@ -286,37 +286,37 @@ spark_report_invoke_error <- function(sc, backend) {
 #'   Can alternately be a Spark connection, in this case it is
 #'   converted to the Spark context jobj via the
 #'   \code{\link{spark_context}} function.
-#' @param methodName Name of class method to execute
+#' @param method Method to execute
 #' @param ... Additional parameters that method requires
-spark_invoke <- function (jobj, methodName, ...)
+spark_invoke <- function (jobj, method, ...)
 {
   if (inherits(jobj, "spark_connection"))
     jobj <- spark_context(jobj)
 
-  spark_invoke_method(jobj$scon, FALSE, jobj$id, methodName, ...)
+  spark_invoke_method(jobj$scon, FALSE, jobj$id, method, ...)
 }
 
 #' Executes an static method on the given object
 #' @name spark_invoke_static
 #' @export
 #' @param sc Spark connection provided by spark_connect
-#' @param objName Fully-qualified name to static class
-#' @param methodName Name of class method to execute
+#' @param class Fully-qualified name to static class
+#' @param method Name of method to execute
 #' @param ... Additional parameters that method requires
-spark_invoke_static <- function (sc, objName, methodName, ...)
+spark_invoke_static <- function (sc, class, method, ...)
 {
-  spark_invoke_method(sc, TRUE, objName, methodName, ...)
+  spark_invoke_method(sc, TRUE, class, method, ...)
 }
 
 #' Executes an static method on the given object
 #' @name spark_invoke_static_ctor
 #' @export
 #' @param sc Spark connection provided by spark_connect
-#' @param objName Fully-qualified name to static class
+#' @param class Fully-qualified name to static class
 #' @param ... Additional parameters that method requires
-spark_invoke_static_ctor <- function(sc, objName, ...)
+spark_invoke_static_ctor <- function(sc, class, ...)
 {
-  spark_invoke_method(sc, TRUE, objName, "<init>", ...)
+  spark_invoke_method(sc, TRUE, class, "<init>", ...)
 }
 
 # API into https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
