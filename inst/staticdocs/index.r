@@ -51,11 +51,12 @@ sd_section("MLlib Interface",
 
 sd_section("Extensions",
            "Functions for interacting directly with the Spark Scala API",
-           c("spark_invoke_new",
-             "spark_invoke",
+           c("spark_invoke",
+             "spark_invoke_new",
              "spark_invoke_static",
              "spark_connection",
-             "as_spark_dataframe")
+             "as_spark_dataframe",
+             "spark_dependency")
 )
 
 sd_section("EC2",

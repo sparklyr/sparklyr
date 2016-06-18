@@ -55,6 +55,7 @@ Collate:
     'ml_utils.R'
     'shell_spark.R'
     'spark_data_frame.R'
+    'spark_dependencies.R'
     'utils.R'
 Depends:
     dplyr
