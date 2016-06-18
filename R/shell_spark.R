@@ -46,7 +46,9 @@ start_shell <- function(scon, sconInst, jars, packages) {
   lapply(names(parameters), function(paramName) {
     paramValue <- parameters[[paramName]]
     if (!is.null(paramValue)) {
-      sparkCommand <<- paste0(sparkCommand, "--", paramName, " ", paste(paramValue, collapse = ","), " ")
+      sparkCommand <<- paste0(sparkCommand, 
+                              shQuote(paste0("--", paramName)), " ", 
+                              shQuote(paste(paramValue, collapse = ",")), " ")
     }
   })
 
