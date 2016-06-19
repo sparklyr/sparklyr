@@ -42,7 +42,7 @@ spark_read_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overw
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   api <- spark_api(sc)
-  df <- spark_api_read_csv(api, path)
+  df <- spark_api_read_csv(api, path.expand(path))
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
@@ -74,7 +74,7 @@ spark_sqlresult_from_dplyr <- function(x) {
 #' @export
 spark_write_csv <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_api_write_csv(sqlResult, path)
+  spark_api_write_csv(sqlResult, path.expand(path))
 }
 
 #' Reads a parquet file and provides a data source compatible with dplyr
@@ -88,7 +88,7 @@ spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, o
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   api <- spark_api(sc)
-  df <- spark_api_read_generic(api, list(path), "parquet")
+  df <- spark_api_read_generic(api, list(path.expand(path)), "parquet")
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
@@ -101,7 +101,7 @@ spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, o
 #' @export
 spark_write_parquet <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_api_write_generic(sqlResult, path, "parquet")
+  spark_api_write_generic(sqlResult, path.expand(path), "parquet")
 }
 
 #' Reads a JSON file and provides a data source compatible with dplyr
@@ -115,7 +115,7 @@ spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, over
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   api <- spark_api(sc)
-  df <- spark_api_read_generic(api, path, "json")
+  df <- spark_api_read_generic(api, path.expand(path), "json")
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
@@ -128,6 +128,6 @@ spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, over
 #' @export
 spark_write_json <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_api_write_generic(sqlResult, path, "json")
+  spark_api_write_generic(sqlResult, path.expand(path), "json")
 }
 
