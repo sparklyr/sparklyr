@@ -12,6 +12,8 @@ spark_partition_register_df <- function(con, df, api, name, repartition, memory)
     dbGetQuery(dbi, paste("CACHE TABLE", dplyr::escape(ident(name), con = dbi)))
     dbGetQuery(dbi, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = dbi)))
   }
+  
+  on_connection_updated(sc, name)
 
   tbl(con, name)
 }
