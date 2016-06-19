@@ -135,7 +135,7 @@ copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
     tbl_cache(sc, name)
   }
 
-  on_connection_updated(src_context(dest), name)
+  on_connection_updated(sc, name)
 
   tbl(dest, name)
 }
