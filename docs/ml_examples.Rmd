@@ -10,6 +10,7 @@ output:
 
 ```{r}
 library(sparklyr)
+library(dplyr)
 library(ggplot2)
 
 sc <- spark_connect("local", version = "1.6.1")

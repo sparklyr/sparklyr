@@ -11,6 +11,7 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE, fig.path='res/')
 library(sparklyr)
+library(dplyr)
 library(ggplot2)
 library(nycflights13)
 library(Lahman)
