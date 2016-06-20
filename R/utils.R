@@ -3,7 +3,7 @@
 #' @importFrom utils browseURL download.file head installed.packages tail untar write.csv
 NULL
 
-wait_file_exists <- function(filename, retries = 200) {
+wait_file_exists <- function(filename, retries = 1000) {
   while(!file.exists(filename) && retries >= 0) {
     retries <- retries  - 1;
     Sys.sleep(0.1)
