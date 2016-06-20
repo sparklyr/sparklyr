@@ -1,11 +1,5 @@
 
 
-#' @rdname spark_install
-#' @export
-spark_install_dir <- function() {
-  getOption("spark.install.dir", rappdirs::app_dir("spark", "rstudio")$cache())
-}
-
 # Check if Spark can be installed in this system
 spark_can_install <- function() {
   sparkDir <- spark_install_dir()
@@ -141,6 +135,13 @@ spark_install <- function(version = NULL,
 
   invisible(installInfo)
 }
+
+#' @rdname spark_install
+#' @export
+spark_install_dir <- function() {
+  getOption("spark.install.dir", rappdirs::app_dir("spark", "rstudio")$cache())
+}
+
 
 #' @rdname spark_install
 #' @export
