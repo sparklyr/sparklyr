@@ -1,14 +1,42 @@
-register_spark_tbl <- function(tbl, df, name = random_string()) {
-  if (!inherits(tbl, "tbl"))
-    return(df)
-  spark_invoke(df, "registerTempTable", name)
-  tbl(tbl$src, name)
+#' Register a Spark DataFrame
+#' 
+#' Registers a Spark DataFrame (giving it a table name for the
+#' Spark SQL context), and returns a \code{tbl_spark}.
+#' 
+#' @param x A Spark DataFrame.
+#' @param name A name to assign this table.
+#' 
+#' @export
+sdf_register <- function(x, name = random_string()) {
+  spark_invoke(x, "registerTempTable", name)
+  on_connection_updated(sc, name)
+  tbl(spark_connection(x), name)
 }
 
 #' Mutate a Spark DataFrame
 #'
 #' Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}
 #' to mutate a Spark DataFrame.
+#' 
+#' \code{sdf_mutate()} differs from \code{mutate} in a number of important ways:
+#' 
+#' \itemize{
+#' 
+#' \item \code{mutate} returns a \code{tbl_spark}, while \code{sdf_mutate} returns
+#'   a Spark DataFrame (represented by a \code{jobj}),
+#'   
+#' \item \code{mutate} works 'lazily' (the generated SQL is not evaluated until \code{collect}
+#'   is called), while \code{sdf_mutate} works 'eagerly' (the feature transformer, as well as
+#'   and pending SQL from a previous pipeline, is applied),
+#'   
+#' \item To transform the Spark DataFrame back to a \code{tbl_spark}, you should
+#'   use \code{\link{sdf_register}}.
+#'  
+#' }
+#' 
+#' Overall, this implies that if you wish to mix a \code{dplyr} pipeline with \code{sdf_mutate},
+#' you should generally apply your \code{dplyr} pipeline first, then finalize your output with
+#' \code{sdf_mutate}. See \strong{Examples} for an example of how this might be done.
 #'
 #' @param .data A \code{spark_tbl}.
 #' @param ... Named arguments, mapping new column names to the transformation to
@@ -23,11 +51,18 @@ register_spark_tbl <- function(tbl, df, name = random_string()) {
 #' @examples
 #' \dontrun{
 #' # using the 'beaver1' dataset, binarize the 'temp' column
-#' # encode 'warm' as 'temp > 37'
 #' data(beavers, package = "datasets")
 #' beaver_tbl <- copy_to(sc, beaver1, "beaver")
 #' beaver_tbl %>%
-#'   sdf_mutate(warm = ft_binarizer(temp, 37))
+#'   mutate(squared = temp ^ 2) %>%
+#'   sdf_mutate(warm = ft_binarizer(squared, 1000)) %>%
+#'   sdf_register("mutated")
+#' 
+#' # view our newly constructed tbl
+#' head(beaver_tbl)
+#' 
+#' # note that we have two separate tbls registered
+#' dplyr::src_tbls(sc)
 #' }
 sdf_mutate <- function(.data, ...) {
   sdf_mutate_(.data, .dots = lazyeval::lazy_dots(...))
@@ -105,7 +140,7 @@ ft_vector_assembler <- function(x,
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("transform", df)
 
-  register_spark_tbl(x, transformed)
+  transformed
 }
 
 #' Feature Transformation -- StringIndexer
@@ -147,8 +182,7 @@ ft_string_indexer <- function(x,
   if (is.environment(params))
     params$labels <- as.character(spark_invoke(sim, "labels"))
 
-  transformed <- spark_invoke(sim, "transform", df)
-  register_spark_tbl(x, transformed)
+  spark_invoke(sim, "transform", df)
 }
 
 #' Feature Transformation -- Binarizer
@@ -181,7 +215,7 @@ ft_binarizer <- function(x,
     spark_invoke("setThreshold", as.double(threshold)) %>%
     spark_invoke("transform", df)
 
-  register_spark_tbl(x, transformed)
+  transformed
 }
 
 #' Feature Transformation -- Discrete Cosine Transform (DCT)
@@ -213,7 +247,7 @@ ft_discrete_cosine_transform <- function(x,
     spark_invoke("setInverse", as.logical(inverse)) %>%
     spark_invoke("transform", df)
 
-  register_spark_tbl(x, transformed)
+  transformed
 }
 
 #' Feature Transformation -- IndexToString
@@ -242,7 +276,7 @@ ft_index_to_string <- function(x,
     spark_invoke("setOutputCol", output_col) %>%
     spark_invoke("transform", df)
 
-  register_spark_tbl(x, transformed)
+  transformed
 }
 
 ## TODO: These routines with so-called 'row vector' features by
@@ -315,7 +349,7 @@ ft_bucketizer <- function(x,
     spark_invoke("setSplits", as.list(splits)) %>%
     spark_invoke("transform", df)
 
-  register_spark_tbl(x, transformed)
+  transformed
 }
 
 #' Feature Transformation -- ElementwiseProduct
@@ -349,7 +383,7 @@ ft_elementwise_product <- function(x,
     spark_invoke("setScalingVec", scaling_col) %>%
     spark_invoke("transform", df)
 
-  register_spark_tbl(x, transformed)
+  transformed
 }
 
 #' Feature Transformation -- SQLTransformer
@@ -379,7 +413,7 @@ ft_sql_transformer <- function(x,
     spark_invoke("setStatement", paste(sql, collapse = "\n")) %>%
     spark_invoke("transform", df)
 
-  register_spark_tbl(x, transformed)
+  transformed
 }
 
 #' Feature Transformation -- QuantileDiscretizer
@@ -419,5 +453,5 @@ ft_quantile_discretizer <- function(x,
     spark_invoke("fit", df) %>%
     spark_invoke("transform", df)
 
-  register_spark_tbl(x, transformed)
+  transformed
 }

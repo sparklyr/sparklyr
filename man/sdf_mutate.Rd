@@ -21,14 +21,42 @@ be applied.}
 Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}
 to mutate a Spark DataFrame.
 }
+\details{
+\code{sdf_mutate()} differs from \code{mutate} in a number of important ways:
+
+\itemize{
+
+\item \code{mutate} returns a \code{tbl_spark}, while \code{sdf_mutate} returns
+  a Spark DataFrame (represented by a \code{jobj}),
+  
+\item \code{mutate} works 'lazily' (the generated SQL is not evaluated until \code{collect}
+  is called), while \code{sdf_mutate} works 'eagerly' (the feature transformer, as well as
+  and pending SQL from a previous pipeline, is applied),
+  
+\item To transform the Spark DataFrame back to a \code{tbl_spark}, you should
+  use \code{\link{sdf_register}}.
+ 
+}
+
+Overall, this implies that if you wish to mix a \code{dplyr} pipeline with \code{sdf_mutate},
+you should generally apply your \code{dplyr} pipeline first, then finalize your output with
+\code{sdf_mutate}. See \strong{Examples} for an example of how this might be done.
+}
 \examples{
 \dontrun{
 # using the 'beaver1' dataset, binarize the 'temp' column
-# encode 'warm' as 'temp > 37'
 data(beavers, package = "datasets")
 beaver_tbl <- copy_to(sc, beaver1, "beaver")
 beaver_tbl \%>\%
-  sdf_mutate(warm = ft_binarizer(temp, 37))
+  mutate(squared = temp ^ 2) \%>\%
+  sdf_mutate(warm = ft_binarizer(squared, 1000)) \%>\%
+  sdf_register("mutated")
+
+# view our newly constructed tbl
+head(beaver_tbl)
+
+# note that we have two separate tbls registered
+dplyr::src_tbls(sc)
 }
 }
 \seealso{
