@@ -217,8 +217,8 @@ sdf_partition <- function(x, ..., seed = sample(.Machine$integer.max, 1)) {
 }
 
 #' @export
-db_save_query.DBISparkConnection <- function (conn, sql, name, temporary = TRUE, ...) 
+db_save_query.DBISparkConnection <- function (con, sql, name, temporary = TRUE, ...) 
 {
-  df <- as_spark_dataframe(conn@scon, sql)
+  df <- as_spark_dataframe(con@scon, sql)
   spark_invoke(df, "registerTempTable", name)
 }
