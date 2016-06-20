@@ -51,6 +51,7 @@ ml_model_print_residuals <- function(model) {
   invisible(values)
 }
 
+#' @importFrom stats coefficients quantile
 ml_model_print_coefficients <- function(model) {
   
   coef <- coefficients(model)
