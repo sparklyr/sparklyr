@@ -2,12 +2,57 @@ spark_versions_file_pattern <- function() {
   "spark-(.*)-bin-(?:hadoop)?(.*)"
 }
 
-#' Retrieves available versions of Spark
+spark_versions_url <- function() {
+  "https://raw.githubusercontent.com/rstudio/sparklyr/master/inst/extdata/install_spark.csv?token=ASpg1HosYFH-QE3279veAFm_lG77Hz55ks5XcAvNwA%3D%3D"
+}
+
+read_spark_versions_csv <- function(file = spark_versions_url()) {
+  utils::read.csv(file,
+                  colClasses = c(hadoop = "character"),
+                  stringsAsFactors = FALSE)
+}
+
+
 #' @rdname spark_install
 #' @export
-spark_versions <- function(latest = TRUE) {
+spark_installed_versions <- function() {
+  
+  spark <- character()
+  hadoop <- character()
+  dir <- character()
+  lapply(dir(spark_install_dir(), full.names = TRUE), function(maybeDir) {
+    if (dir.exists(maybeDir)) {
+      fileName <- basename(maybeDir)
+      m <- regmatches(fileName, regexec(spark_versions_file_pattern(), fileName))[[1]]
+      if (length(m) > 2) {
+        spark <<- c(spark, m[[2]])
+        hadoop <<- c(hadoop, m[[3]])
+        dir <<- c(dir, basename(maybeDir))
+      }
+    }
+  })
+  versions <- data.frame(spark = spark, 
+                         hadoop = hadoop,
+                         dir = dir)
+  
+  versions
+}
 
-  latestUrl <- "https://raw.githubusercontent.com/rstudio/sparklyr/master/inst/extdata/install_spark.csv?token=ASpg1NOA-Y-_Ir67ZLqzefBWo8URFxO5ks5XYZCAwA%3D%3D"
+
+#' @rdname spark_install
+#' @export
+spark_available_versions <- function() {
+  versions <- read_spark_versions_csv()
+  versions <- versions[,1:2]
+  versions$install <- paste0("spark_install(version = \"", 
+                             versions$spark, "\", ",
+                             "hadoop_version = \"", versions$hadoop,
+                             "\")")
+  versions
+}
+
+
+spark_versions <- function(latest = TRUE) {
 
   # NOTE: this function is called during configure and the 'sparklyr' package
   # will not be available at that time; allow overriding with environment variable
@@ -21,9 +66,7 @@ spark_versions <- function(latest = TRUE) {
   if (latest) {
     tryCatch({
       suppressWarnings(
-        downloadData <- utils::read.csv(latestUrl,
-                                        colClasses = c(hadoop = "character"),
-                                        stringsAsFactors = FALSE)
+        downloadData <- read_spark_versions_csv()
       )
     }, error = function(e) {
     })
@@ -31,9 +74,7 @@ spark_versions <- function(latest = TRUE) {
 
   if (is.null(downloadData) || is.null(downloadData$spark)) {
     # warning("Failed to retrieve the latest download links")
-    downloadData <- utils::read.csv(packagePath,
-                                    colClasses = c(hadoop = "character"),
-                                    stringsAsFactors = FALSE)
+    downloadData <- read_spark_versions_csv(packagePath)
   }
 
 

@@ -60,14 +60,14 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
   )
 }
 
-#' Provides support to download and install the given Spark version
-#' @name spark_install
-#' @param version Version of Spark to install. See spark_versions for a list of supported versions
-#' @param hadoop_version Version of Hadoop to install. See spark_versions_hadoop for a list of supported versions
+#' Download and install various versions of Spark
+#' 
+#' @param version Version of Spark to install. See \code{spark_available_versions} for a list of supported versions
+#' @param hadoop_version Version of Hadoop to install. See \code{spark_available_versions} for a list of supported versions
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
 #' @param verbose Report information as Spark is downloaded / installed?
-#' @param path Path to TAR file conforming to the pattern spark-###-bin-hadoop### where ###
+#' @param tarfile Path to TAR file conforming to the pattern spark-###-bin-hadoop### where ###
 #' reference spark and hadoop versions respectevely.
 #' @param latest TRUE to use the latest download URLs, FALSE to use the package defaults which might be out of date.
 #' @export
@@ -141,22 +141,21 @@ spark_install <- function(version = NULL,
   invisible(installInfo)
 }
 
-#' Provides support to install a version of Spark from a given TAR file
 #' @rdname spark_install
 #' @export
-spark_install_tar <- function(path) {
-  if (!file.exists(path)) {
-    stop(paste0("The file \"", path, "\", does not exist."))
+spark_install_tar <- function(tarfile) {
+  if (!file.exists(tarfile)) {
+    stop(paste0("The file \"", tarfile, "\", does not exist."))
   }
 
   filePattern <- spark_versions_file_pattern();
-  fileName <- basename(path)
+  fileName <- basename(tarfile)
   if (length(grep(filePattern, fileName)) == 0) {
     stop(paste(
       "The given file does not conform with the following pattern: ", filePattern))
   }
 
-  untar(tarfile = path, exdir = spark_install_dir())
+  untar(tarfile = tarfile, exdir = spark_install_dir())
 }
 
 spark_conf_file_set_value <- function(installInfo, property, value, reset) {
