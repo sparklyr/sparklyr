@@ -3,7 +3,7 @@ spark_versions_file_pattern <- function() {
 }
 
 spark_versions_url <- function() {
-  "https://raw.githubusercontent.com/rstudio/sparklyr/master/inst/extdata/install_spark.csv?token=ASpg1HosYFH-QE3279veAFm_lG77Hz55ks5XcAvNwA%3D%3D"
+  "https://raw.githubusercontent.com/rstudio/sparklyr/master/inst/extdata/install_spark.csv?token=ASpg1A2AQCGIzWG8PS6PlheYl7HrgWGuks5XcY2HwA%3D%3D"
 }
 
 read_spark_versions_csv <- function(file = spark_versions_url()) {

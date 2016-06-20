@@ -12,7 +12,7 @@ You can install the development version of the **sparklyr** package using **devt
 devtools::install_github("hadley/devtools")
 devtools::reload(devtools::inst("devtools"))
 
-devtools::install_github("rstudio/sparklyr", auth_token = "56aef3d82d3ef05755e40a4f6bdaab6fbed8a1f1")
+devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
 ```
 
 You can then install various versions of Spark using the `spark_install` function:
@@ -216,16 +216,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/20 10:17:19 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 67 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpBJV9Jk/file3bc0c553697.csv MapPartitionsRDD[229] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/06/20 10:17:19 INFO TaskSchedulerImpl: Adding task set 67.0 with 1 tasks
-    ## 16/06/20 10:17:19 INFO TaskSetManager: Starting task 0.0 in stage 67.0 (TID 465, localhost, partition 0,PROCESS_LOCAL, 2472 bytes)
-    ## 16/06/20 10:17:19 INFO Executor: Running task 0.0 in stage 67.0 (TID 465)
-    ## 16/06/20 10:17:19 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpBJV9Jk/file3bc0c553697.csv:0+23367180
-    ## 16/06/20 10:17:19 INFO Executor: Finished task 0.0 in stage 67.0 (TID 465). 2082 bytes result sent to driver
-    ## 16/06/20 10:17:19 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 465) in 81 ms on localhost (1/1)
-    ## 16/06/20 10:17:19 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/06/20 10:17:19 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.081 s
-    ## 16/06/20 10:17:19 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.084125 s
+    ## 16/06/20 16:32:14 INFO Executor: Finished task 0.0 in stage 67.0 (TID 465). 2082 bytes result sent to driver
+    ## 16/06/20 16:32:14 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 465) in 97 ms on localhost (1/1)
+    ## 16/06/20 16:32:14 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/06/20 16:32:14 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.098 s
+    ## 16/06/20 16:32:14 INFO BlockManagerInfo: Removed broadcast_90_piece0 on localhost:51958 in memory (size: 4.6 KB, free: 487.3 MB)
+    ## 16/06/20 16:32:14 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.100419 s
+    ## 16/06/20 16:32:14 INFO ContextCleaner: Cleaned accumulator 198
+    ## 16/06/20 16:32:14 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:51958 in memory (size: 8.5 KB, free: 487.3 MB)
+    ## 16/06/20 16:32:14 INFO ContextCleaner: Cleaned accumulator 197
+    ## 16/06/20 16:32:14 INFO ContextCleaner: Cleaned shuffle 20
 
 Finally, we disconnect from Spark:
 

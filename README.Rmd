@@ -26,7 +26,7 @@ You can install the development version of the **sparklyr** package using **devt
 devtools::install_github("hadley/devtools")
 devtools::reload(devtools::inst("devtools"))
 
-devtools::install_github("rstudio/sparklyr", auth_token = "56aef3d82d3ef05755e40a4f6bdaab6fbed8a1f1")
+devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
 ```
 
 You can then install various versions of Spark using the `spark_install` function:
