@@ -60,16 +60,4 @@ sd_section("Extensions",
              "spark_dependency")
 )
 
-sd_section("EC2",
-           "Functions for creating and managing Spark EC2 clusters",
-           c("spark_ec2_cluster",
-             "spark_ec2_deploy",
-             "spark_ec2_start",
-             "spark_ec2_stop",
-             "spark_ec2_master",
-             "spark_ec2_login",
-             "spark_ec2_web",
-             "spark_ec2_rstudio",
-             "spark_ec2_destroy")
-)
 

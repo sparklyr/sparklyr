@@ -131,29 +131,6 @@ iris_tbl %>%
   src_tbls(sc)
 ```
 
-## EC2
-
-To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
-
-```{r, eval=FALSE}
-library(sparklyr)
-ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
-                        secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
-                        pem_file = "spark.pem")
-
-spark_ec2_deploy(ci)
-
-spark_ec2_web(ci)
-spark_ec2_rstudio(ci)
-
-spark_ec2_stop(ci)
-spark_ec2_destroy(ci)
-```
-
-The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.
-
-For additional configuration and examples read: [Using Spark in EC2](docs/ec2.md)
-
 ## Extensibility
 
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.

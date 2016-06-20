@@ -162,30 +162,6 @@ Reading and Writing Data
     ## [1] "batting"      "flights"      "iris"         "iris_csv"    
     ## [5] "iris_json"    "iris_parquet"
 
-EC2
----
-
-To start a new 1-master 1-slave Spark cluster in EC2 run the following code:
-
-``` r
-library(sparklyr)
-ci <- spark_ec2_cluster(access_key_id = "AAAAAAAAAAAAAAAAAAAA",
-                        secret_access_key = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
-                        pem_file = "spark.pem")
-
-spark_ec2_deploy(ci)
-
-spark_ec2_web(ci)
-spark_ec2_rstudio(ci)
-
-spark_ec2_stop(ci)
-spark_ec2_destroy(ci)
-```
-
-The `access_key_id`, `secret_access_key` and `pem_file` need to be retrieved from the AWS console.
-
-For additional configuration and examples read: [Using Spark in EC2](docs/ec2.md)
-
 Extensibility
 -------------
 
@@ -240,16 +216,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 180
-    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 179
-    ## 16/06/17 17:10:39 INFO BlockManagerInfo: Removed broadcast_88_piece0 on localhost:59402 in memory (size: 4.6 KB, free: 487.3 MB)
-    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 188
-    ## 16/06/17 17:10:39 INFO BlockManagerInfo: Removed broadcast_87_piece0 on localhost:59402 in memory (size: 8.5 KB, free: 487.3 MB)
-    ## 16/06/17 17:10:39 INFO BlockManagerInfo: Removed broadcast_90_piece0 on localhost:59402 in memory (size: 4.6 KB, free: 487.3 MB)
-    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 198
-    ## 16/06/17 17:10:39 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:59402 in memory (size: 8.5 KB, free: 487.3 MB)
-    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned accumulator 197
-    ## 16/06/17 17:10:39 INFO ContextCleaner: Cleaned shuffle 20
+    ## 16/06/20 10:17:19 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 67 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpBJV9Jk/file3bc0c553697.csv MapPartitionsRDD[229] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/20 10:17:19 INFO TaskSchedulerImpl: Adding task set 67.0 with 1 tasks
+    ## 16/06/20 10:17:19 INFO TaskSetManager: Starting task 0.0 in stage 67.0 (TID 465, localhost, partition 0,PROCESS_LOCAL, 2472 bytes)
+    ## 16/06/20 10:17:19 INFO Executor: Running task 0.0 in stage 67.0 (TID 465)
+    ## 16/06/20 10:17:19 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpBJV9Jk/file3bc0c553697.csv:0+23367180
+    ## 16/06/20 10:17:19 INFO Executor: Finished task 0.0 in stage 67.0 (TID 465). 2082 bytes result sent to driver
+    ## 16/06/20 10:17:19 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 465) in 81 ms on localhost (1/1)
+    ## 16/06/20 10:17:19 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/06/20 10:17:19 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.081 s
+    ## 16/06/20 10:17:19 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.084125 s
 
 Finally, we disconnect from Spark:
 

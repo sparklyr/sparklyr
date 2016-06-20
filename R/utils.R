@@ -12,20 +12,6 @@ is.installed <- function(package) {
   is.element(package, installed.packages()[,1])
 }
 
-remove_extension <- function(file) {
-  sub("[.][^.]*$", "", file, perl=TRUE)
-}
-
-validate_pem <- function(pemFile) {
-  if (!file.exists(pemFile)) {
-    stop(".pem file does not exist")
-  }
-
-  if (.Platform$OS.type == "unix") {
-    chmodScript <- paste("chmod 400", pemFile)
-    system(chmodScript)
-  }
-}
 
 is_java_available <- function() {
   java_home <- Sys.getenv("JAVA_HOME", unset = NA)
