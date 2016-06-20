@@ -11,6 +11,7 @@ output:
 ```{r}
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
 library(sparklyr)
+library(dplyr)
 library(reshape2)
 library(ggplot2)
 ```

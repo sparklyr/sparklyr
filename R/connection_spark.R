@@ -80,9 +80,6 @@ spark_connect <- function(master = "local",
   sconInst <- spark_connection_attach_context(scon, sconInst)
   spark_connection_set_inst(scon, sconInst)
 
-  sconInst <- spark_connection_attach_sql_session_context(scon, sconInst)
-  spark_connection_set_inst(scon, sconInst)
-
   on_connection_opened(scon, sconInst$connectCall)
   scon
 }

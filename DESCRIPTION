@@ -56,9 +56,8 @@ Collate:
     'spark_data_frame.R'
     'spark_dependencies.R'
     'utils.R'
-Depends:
-    dplyr
 Imports:
+    dplyr,
     methods,
     readr,
     DBI,
