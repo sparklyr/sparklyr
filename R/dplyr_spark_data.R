@@ -1,11 +1,11 @@
 
 
-spark_partition_register_df <- function(con, df, api, name, repartition, memory) {
+spark_partition_register_df <- function(sc, df, api, name, repartition, memory) {
   if (repartition > 0) {
     df <- spark_invoke(df, "repartition", as.integer(repartition))
   }
 
-  dbi <- spark_dbi(con)
+  dbi <- spark_dbi(sc)
   spark_register_temp_table(df, name)
 
   if (memory) {
@@ -15,7 +15,7 @@ spark_partition_register_df <- function(con, df, api, name, repartition, memory)
   
   on_connection_updated(sc, name)
 
-  tbl(con, name)
+  tbl(sc, name)
 }
 
 spark_remove_table_if_exists <- function(sc, name) {

@@ -29,8 +29,6 @@ spark_available_versions()
 
 \item{tarfile}{Path to TAR file conforming to the pattern spark-###-bin-hadoop### where ###
 reference spark and hadoop versions respectevely.}
-
-\item{latest}{TRUE to use the latest download URLs, FALSE to use the package defaults which might be out of date.}
 }
 \description{
 Download and install various versions of Spark

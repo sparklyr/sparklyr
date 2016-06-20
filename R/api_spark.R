@@ -272,7 +272,7 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
       api$scon,
       "utils",
       "createDataFrame",
-      spark_context(sc),
+      spark_context(api$scon),
       rows,
       as.integer(if (repartition <= 0) 1 else repartition)
     )
