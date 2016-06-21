@@ -1,3 +1,8 @@
+
+
+#' @import sparkapi
+NULL
+
 # register the spark_connection S3 class for use in setClass slots
 methods::setOldClass("spark_connection")
 
@@ -85,29 +90,7 @@ spark_connect <- function(master = "local",
 }
 
 resolve_extensions <- function(extensions, spark_version, hadoop_version, config) {
-  
-  # return list with additional jars and packages
-  dependencies <- list(jars = c(), packages = c())
-    
-  # call spark_dependencies function within each extension package
-  lapply(extensions, function(package) {
-    # attempt to find and call the function
-    spark_dependencies <- tryCatch(get("spark_dependencies", 
-                                       asNamespace(package), 
-                                       inherits = FALSE),
-                                   error = function(e) {
-                                     stop("spark_dependencies function not found within ",
-                                          "extension package ", package, call. = FALSE)
-                                   })
-    extension_deps <- spark_dependencies(spark_version, hadoop_version, config)
-    
-    # append dependencies to resolved list
-    dependencies$jars <<- c(dependencies$jars, extension_deps$jars)
-    dependencies$packages <<- c(dependencies$packages, extension_deps$packages)
-  })
-  
-  # return dependencies
-  dependencies
+  sparkapi_dependencies_from_extensions(config, extensions)
 }
 
 # Attaches the SparkContext to the connection
@@ -224,8 +207,8 @@ print.spark_web_url <- function(x, ...) {
 
 spark_attach_connection <- function(object, sc) {
   scon <- sc
-  if (inherits(object, "jobj")) {
-    object$scon <- scon
+  if (inherits(object, "sparkapi_jobj")) {
+    assign("scon", scon, envir = object)
   }
   else if (is.list(object) || inherits(object, "struct")) {
     object <- lapply(object, function(e) {
@@ -241,65 +224,64 @@ spark_attach_connection <- function(object, sc) {
   object
 }
 
-spark_invoke_method <- function(sc, isStatic, objName, methodName, ...)
+spark_invoke <- function (jobj, method, ...)
 {
-  scon <- sc
+  if (inherits(jobj, "spark_connection"))
+    jobj <- spark_context(jobj)
 
-  # Particular methods are defined on their specific clases, for instance, for "createSparkContext" see:
-  #
-  #   See: https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
-  #
-  if (is.null(scon)) {
-    stop("The connection is no longer valid. Recreate using spark_connect.")
-  }
-
-  spark_reconnect_if_needed(scon)
-
-  rc <- rawConnection(raw(), "r+")
-  writeBoolean(rc, isStatic)
-  writeString(rc, objName)
-  writeString(rc, methodName)
-
-  args <- list(...)
-  writeInt(rc, length(args))
-  writeArgs(rc, args)
-  bytes <- rawConnectionValue(rc)
-  close(rc)
-
-  rc <- rawConnection(raw(0), "r+")
-  writeInt(rc, length(bytes))
-  writeBin(bytes, rc)
-  con <- rawConnectionValue(rc)
-  close(rc)
-
-  sconInst <- spark_connection_get_inst(scon)
-
-  backend <- sconInst$backend
-  writeBin(con, backend)
-  returnStatus <- readInt(backend)
-
-  if (returnStatus != 0)
-    spark_report_invoke_error(scon, backend)
-
-  object <- readObject(backend)
-  spark_attach_connection(object, scon)
+  # get connection
+  sc <- spark_connection(jobj)
+  
+  # reconnect if needed
+  spark_reconnect_if_needed(sc)
+  
+  # call the api
+  tryCatch({
+    result <- sparkapi_invoke(jobj, method, ...) 
+    spark_attach_connection(result, sc)
+  }, error = spark_invoke_error_handler(sc))
 }
 
-spark_report_invoke_error <- function(sc, backend) {
+spark_invoke_static <- function (sc, class, method, ...)
+{
+  # reconnect if needed
+  spark_reconnect_if_needed(sc)
+  
+  # call the api
+  tryCatch({
+    result <- sparkapi_invoke_static(sparkapi_connection(sc), class, method, ...)
+    spark_attach_connection(result, sc)
+  }, error = spark_invoke_error_handler(sc))
+}
 
-  scon <- sc
+spark_invoke_new <- function(sc, class, ...)
+{
+  # reconnect if needed
+  spark_reconnect_if_needed(sc)
+  
+  # call the api
+  tryCatch({
+    result <- sparkapi_invoke_new(sparkapi_connection(sc), class, ...)
+    spark_attach_connection(result, sc)
+  }, error = spark_invoke_error_handler(sc))
+}
 
-  # get error message from backend and report to R
-  msg <- readString(backend)
-  if (nzchar(msg))
+spark_invoke_error_handler <- function(sc) {
+  function(e) {
+    msg <- as.character(e)
+    if (msg == "<unknown error>")
+      msg <- read_spark_log_error(sc)
     stop(msg, call. = FALSE)
+  }
+}
 
+read_spark_log_error <- function(sc) {
   # if there was no error message reported, then
   # return information from the Spark logs. return
   # all those with most recent timestamp
   msg <- "failed to invoke spark command (unknown reason)"
   try(silent = TRUE, {
-    log <- spark_log(scon)
+    log <- spark_log(sc)
     splat <- strsplit(log, "\\s+", perl = TRUE)
     n <- length(splat)
     timestamp <- splat[[n]][[2]]
@@ -308,49 +290,9 @@ spark_report_invoke_error <- function(sc, backend) {
     pasted <- paste(entries, collapse = "\n")
     msg <- paste("failed to invoke spark command", pasted, sep = "\n")
   })
-
-  stop(msg, call. = FALSE)
+  msg
 }
 
-#' Executes a method on the given object
-#' @name spark_invoke
-#' @export
-#' @param jobj Reference to a jobj retrieved using spark_invoke.
-#'   Can alternately be a Spark connection, in this case it is
-#'   converted to the Spark context jobj via the
-#'   \code{\link{spark_context}} function.
-#' @param method Method to execute
-#' @param ... Additional parameters that method requires
-spark_invoke <- function (jobj, method, ...)
-{
-  if (inherits(jobj, "spark_connection"))
-    jobj <- spark_context(jobj)
-
-  spark_invoke_method(jobj$scon, FALSE, jobj$id, method, ...)
-}
-
-#' Executes an static method on the given object
-#' @name spark_invoke_static
-#' @export
-#' @param sc Spark connection provided by spark_connect
-#' @param class Fully-qualified name to static class
-#' @param method Name of method to execute
-#' @param ... Additional parameters that method requires
-spark_invoke_static <- function (sc, class, method, ...)
-{
-  spark_invoke_method(sc, TRUE, class, method, ...)
-}
-
-#' Creates a new object of the specified class
-#' @name spark_invoke_new
-#' @export
-#' @param sc Spark connection provided by spark_connect
-#' @param class Fully-qualified name to static class
-#' @param ... Additional parameters that method requires
-spark_invoke_new <- function(sc, class, ...)
-{
-  spark_invoke_method(sc, TRUE, class, "<init>", ...)
-}
 
 # API into https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
 #
@@ -384,11 +326,7 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
   )
 }
 
-#' Retrieves the SparkContext reference from a Spark Connection
-#' @name spark_context
-#' @keywords internal
-#' @export
-#' @param sc Spark connection provided by spark_connect
+# Retrieves the SparkContext reference from a Spark Connection
 spark_context <- function(sc) {
   spark_reconnect_if_needed(sc)
 

@@ -1,22 +1,3 @@
-read_shell_file <- function(shellFile) {
-  shellOutputFile <- file(shellFile, open = "rb")
-  backendPort <- readInt(shellOutputFile)
-  monitorPort <- readInt(shellOutputFile)
-  rLibraryPath <- readString(shellOutputFile)
-  close(shellOutputFile)
-
-  success <- length(backendPort) > 0 && backendPort > 0 &&
-    length(monitorPort) > 0 && monitorPort > 0 &&
-    length(rLibraryPath) == 1
-
-  if (!success)
-    stop("Invalid values found in shell output")
-
-  list(
-    backendPort = backendPort,
-    monitorPort = monitorPort
-  )
-}
 
 start_shell <- function(scon, sconInst, jars, packages) {
   sparkHome <- scon$installInfo$sparkVersionDir
@@ -70,7 +51,7 @@ start_shell <- function(scon, sconInst, jars, packages) {
       sep = ""))
   }
 
-  shellFile <- read_shell_file(shellOutputPath)
+  shellFile <- sparkapi_read_shell_file(shellOutputPath)
 
   tryCatch({
     monitor <- socketConnection(port = shellFile$monitorPort)
@@ -97,7 +78,8 @@ start_shell <- function(scon, sconInst, jars, packages) {
 }
 
 stop_shell <- function(scon) {
-  spark_invoke_method(scon, FALSE, "SparkRHandler", "stopBackend")
+  
+  sparkapi_stop_backend(sparkapi_connection(scon))
 
   sconInst <- spark_connection_remove_inst(scon)
 

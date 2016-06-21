@@ -10,7 +10,7 @@ as_spark_dataframe <- function(x, ...) {
 }
 
 #' @export
-as_spark_dataframe.jobj <- function(x, ...) {
+as_spark_dataframe.sparkapi_jobj <- function(x, ...) {
   x
 }
 

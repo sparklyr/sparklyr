@@ -1,7 +1,7 @@
 Package: sparklyr
 Type: Package
 Title: Provides an R Interface to Apache Spark
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
@@ -18,9 +18,6 @@ License: file LICENSE
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Collate:
-    'apache_spark_deserialize.R'
-    'apache_spark_jobj.R'
-    'apache_spark_serialize.R'
     'api_spark.R'
     'api_spark_databricks.R'
     'api_spark_sql.R'
@@ -54,7 +51,6 @@ Collate:
     'ml_utils.R'
     'shell_spark.R'
     'spark_data_frame.R'
-    'spark_dependencies.R'
     'utils.R'
 Imports:
     dplyr,
@@ -64,8 +60,11 @@ Imports:
     assertthat,
     rappdirs,
     lazyeval,
-    config
-Remotes: hadley/dplyr
+    config,
+    sparkapi
+Remotes: 
+    hadley/dplyr,
+    rstudio/sparkapi
 Suggests:
     testthat,
     reshape2,

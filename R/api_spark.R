@@ -326,28 +326,6 @@ spark_api_write_generic <- function(df, path, fileMethod) {
   invisible(TRUE)
 }
 
-spark_object_info <- function(jobj) {
-  if (!inherits(jobj, "jobj"))
-    stop("'spark_object_info' called on non-jobj")
-
-  class <- NULL
-  repr <- NULL
-
-  tryCatch({
-    class <- spark_invoke(jobj, "getClass")
-    if (inherits(class, "jobj"))
-      class <- spark_invoke(class, "toString")
-  }, error = function(e) {
-  })
-  tryCatch({
-    repr <- spark_invoke(jobj, "toString")
-  }, error = function(e) {
-  })
-  list(
-    class = class,
-    repr  = repr
-  )
-}
 
 spark_inspect <- function(jobj) {
   print(jobj)

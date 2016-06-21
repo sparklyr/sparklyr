@@ -137,10 +137,13 @@ iris_tbl %>%
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
 
 ```{r}
+library(sparkapi)
+
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
-  spark_invoke(sc, "textFile", path, as.integer(1)) %>% 
-    spark_invoke("count")
+  sparkapi_spark_context(sc) %>% 
+    sparkapi_invoke("textFile", path, as.integer(1)) %>% 
+      sparkapi_invoke("count")
 }
 
 # write a CSV 

@@ -16,17 +16,7 @@ spark_api <- function(x) {
   spark_dbi(x)@api
 }
 
-#' Get the spark_connection associated with an object
-#' 
-#' S3 method to get the spark_connection (sc) associated with objects of
-#' various types.
-#' 
-#' @param x Object to extract connection from
-#' @param ... Reserved for future use
-#' @return A \code{spark_connection} object that can be passed to 
-#'   \code{\link{spark_invoke}} and related functions.
-#'   
-#' @export
+
 spark_connection <- function(x, ...) {
   UseMethod("spark_connection")
 }
@@ -43,7 +33,7 @@ spark_connection.spark_connection <- function(x, ...) {
 }
 
 #' @export
-spark_connection.jobj <- function(x, ...) {
+spark_connection.sparkapi_jobj <- function(x, ...) {
   x$scon
 }
 
@@ -56,6 +46,26 @@ spark_connection.tbl_spark <- function(x, ...) {
 spark_connection.src_spark <- function(x, ...) {
   spark_dbi(x)@scon
 }
+
+#' @export
+sparkapi_connection.spark_connection <- function(x, ...) {
+  
+  # get the instance
+  sconInst <- spark_connection_get_inst(x)
+  
+  # create sparkapi_connection on demand if necessary
+  if (is.null(sconInst$sparkapi_connection)) {
+    sconInst$sparkapi_connection <- sparkapi_connection_create(
+      spark_context = sconInst$sc,
+      backend = sconInst$backend, 
+      monitor = sconInst$monitor)
+    spark_connection_set_inst(x, sconInst)
+  }
+  
+  # return the sparkapi_connection
+  sconInst$sparkapi_connection
+}
+
 
 
 #' @export
@@ -77,7 +87,7 @@ db_explain.src_spark <- function(con, sql, ...) {
 }
 
 #' @export
-tbl_vars.jobj <- function(x) {
+tbl_vars.sparkapi_jobj <- function(x) {
   as.character(spark_invoke(x, "columns"))
 }
 
