@@ -243,6 +243,20 @@ net.xor <- neuralnet( XOR~Var1+Var2, xor.data, hidden = 2, rep = 5)
 plot(net.xor, rep="best")
 ```
 
+## Decision Tree with Spark
+
+```{r}
+mDecisionTree <- iris_tbl %>%
+  ml_decision_tree(
+    response = "Species",
+    features = c("Petal_Length", "Petal_Width"),
+    max.bins = 32L,
+    max.depth = 5L
+  )
+mPredict <- predict(mDecisionTree, iris_tbl)
+head(mPredict)
+```
+
 ## Cleanup
 
 ```{r}
