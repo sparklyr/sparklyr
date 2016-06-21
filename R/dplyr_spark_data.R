@@ -42,31 +42,3 @@ spark_sqlresult_from_dplyr <- function(x) {
   sql <- dplyr::sql_render(x)
   sqlResult <- spark_api_sql(api, as.character(sql))
 }
-
-#' Reads a JSON file and provides a data source compatible with dplyr
-#'
-#' REads a JSON file and provides a data source compatible with dplyr
-#'
-#' @inheritParams spark_read_csv
-#'
-#' @export
-spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
-  if (overwrite) spark_remove_table_if_exists(sc, name)
-
-  api <- spark_api(sc)
-  df <- spark_api_read_generic(api, path.expand(path), "json")
-  spark_partition_register_df(sc, df, api, name, repartition, memory)
-}
-
-#' Writes a dplyr operation result as a JSON file
-#'
-#' Writes a dplyr operation result as a JSON file
-#'
-#' @inheritParams spark_write_csv
-#'
-#' @export
-spark_write_json <- function(x, path) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_api_write_generic(sqlResult, path.expand(path), "json")
-}
-

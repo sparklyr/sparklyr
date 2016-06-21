@@ -12,6 +12,7 @@ spark_read_csv <- function(x, name, path, repartition = 0, memory = TRUE, overwr
   UseMethod("spark_read_csv")
 }
 
+#' @export
 spark_read_csv.spark_connection <- function(x, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
   sc <- x
   if (overwrite) spark_remove_table_if_exists(sc, name)
@@ -31,6 +32,7 @@ spark_write_csv <- function(x, path) {
   UseMethod("spark_write_csv")
 }
 
+#' @export
 spark_write_csv.spark_connection <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   spark_api_write_csv(sqlResult, path.expand(path))
@@ -67,4 +69,37 @@ spark_write_parquet <- function(x, path) {
 spark_write_parquet.spark_connection <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   spark_api_write_generic(sqlResult, path.expand(path), "parquet")
+}
+
+#' Reads a JSON file and provides a data source compatible with dplyr
+#'
+#' @inheritParams spark_read_csv
+#'
+#' @export
+spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  UseMethod("spark_read_json")
+}
+
+#' @export
+spark_read_json.spark_connection <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+  
+  api <- spark_api(sc)
+  df <- spark_api_read_generic(api, path.expand(path), "json")
+  spark_partition_register_df(sc, df, api, name, repartition, memory)
+}
+
+#' Writes a dplyr operation result as a JSON file
+#'
+#' @inheritParams spark_write_csv
+#'
+#' @export
+spark_write_json <- function(x, path) {
+  UseMethod("spark_write_json")
+}
+
+#' @export
+spark_write_json.spark_connection <- function(x, path) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  spark_api_write_generic(sqlResult, path.expand(path), "json")
 }
