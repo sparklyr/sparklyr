@@ -16,7 +16,7 @@ spark_connect(master = "local", app_name = "sparklyr", version = NULL,
 
 \item{hadoop_version}{Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.}
 
-\item{extensions}{Extensions to enable for this connection (see \link{sparklyr-extensions}).}
+\item{extensions}{Extensions to enable for this connection.}
 
 \item{config}{Configuration for connection (see \code{\link{spark_config} for details}).}
 }

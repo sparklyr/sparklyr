@@ -17,7 +17,7 @@ spark_default_jars <- function() {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
 #' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
-#' @param extensions Extensions to enable for this connection (see \link{sparklyr-extensions}).
+#' @param extensions Extensions to enable for this connection.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
 spark_connect <- function(master = "local",
                           app_name = "sparklyr",
