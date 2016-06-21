@@ -9,7 +9,7 @@
 #' @export
 sdf_register <- function(x, name = random_string()) {
   spark_invoke(x, "registerTempTable", name)
-  on_connection_updated(sc, name)
+  on_connection_updated(spark_connection(x), name)
   tbl(spark_connection(x), name)
 }
 
