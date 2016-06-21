@@ -34,14 +34,15 @@ spark_connection_get_inst <- function(scon) {
   if (!identical(scon$sconRef, NULL)) instances[[scon$sconRef]]$sconInst else NULL
 }
 
-spark_connection_add_inst <- function(master, appName, scon, sconInst) {
+spark_connection_add_inst <- function(scon, sconInst) {
   instances <- spark_connection_global_inst()
 
   scon$sconRef <- as.character(length(instances) + 1)
 
   instances[[scon$sconRef]] <- list(
-    master = master,
-    appName = appName,
+    master = scon$master,
+    appName = scon$appName,
+    version = scon$sparkVersion,
     scon = scon,
     sconInst = sconInst
   )

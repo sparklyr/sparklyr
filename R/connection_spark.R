@@ -30,7 +30,7 @@ spark_connect <- function(master = "local",
                           hadoop_version = NULL,
                           extensions = NULL,
                           config = spark_config()) {
-  sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name })
+  sconFound <- spark_connection_find_scon(function(e) { e$master == master && e$appName == app_name && e$version == version })
   if (length(sconFound) == 1) {
     return(sconFound[[1]])
   }
@@ -74,7 +74,7 @@ spark_connect <- function(master = "local",
   scon$backend = sconInst$backend
   scon$monitor = sconInst$monitor
   
-  scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
+  scon <- spark_connection_add_inst(scon, sconInst)
 
   parentCall <- match.call()
   sconInst$connectCall <- paste("library(sparklyr)",
