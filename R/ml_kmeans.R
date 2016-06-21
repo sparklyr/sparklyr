@@ -67,3 +67,8 @@ print.ml_model_kmeans <- function(x, ...) {
   ml_model_print_centers(x)
 
 }
+
+#' @export
+fitted.ml_model_kmeans <- function(object, ...) {
+  predict(object)
+}
