@@ -26,7 +26,7 @@ ml_gradient_boosted_trees <- function(x,
                                       max.depth = 5L,
                                       type = c("auto", "regression", "classification"))
 {
-  df <- as_spark_dataframe(x)
+  df <- sparkapi_dataframe(x)
   sc <- spark_connection(df)
   
   type <- match.arg(type)

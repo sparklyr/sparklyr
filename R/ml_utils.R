@@ -12,7 +12,7 @@ spark_jobj_list_to_array_df <- function(data, dataNames) {
 ml_prepare_dataframe <- function(df, features, response = NULL, ...,
                                  envir = new.env(parent = emptyenv()))
 {
-  df <- as_spark_dataframe(df)
+  df <- sparkapi_dataframe(df)
   schema <- spark_dataframe_schema(df)
 
   # default report for feature, response variable names
@@ -48,7 +48,7 @@ try_null <- function(expr) {
 predict.ml_model <- function(object, newdata, ...) {
   if (missing(newdata) || is.null(newdata))
     newdata <- object$data
-  sdf <- as_spark_dataframe(newdata)
+  sdf <- sparkapi_dataframe(newdata)
   params <- object$model.parameters
   assembled <- ft_vector_assembler(sdf, object$features, params$features)
   predicted <- spark_invoke(object$.model, "transform", assembled)
