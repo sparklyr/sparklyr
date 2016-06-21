@@ -4,12 +4,17 @@
 \alias{sdf_partition}
 \title{Partition a Spark Dataframe}
 \usage{
-sdf_partition(x, ..., seed = sample(.Machine$integer.max, 1))
+sdf_partition(x, ..., weights = NULL, seed = sample(.Machine$integer.max,
+  1))
 }
 \arguments{
 \item{x}{A \code{tbl_spark}.}
 
-\item{...}{Named parameters, mapping table names to weights.}
+\item{...}{Named parameters, mapping table names to weights. The weights
+will be normalized such that they sum to 1.}
+
+\item{weights}{An alternate mechanism for supplying weights -- when
+specified, this takes precedence over the \code{...} arguments.}
 
 \item{seed}{Random seed to use for randomly partitioning the dataset. Set
 this if you want your partitioning to be reproducible on repeated runs.}
@@ -21,6 +26,16 @@ An \R \code{list} of \code{tbl_spark}s.
 Partition a Spark DataFrame into multiple groups. This routine is useful
 for splitting a DataFrame into, for example, training and test datasets.
 }
+\details{
+The sampling weights define the probability that a particular observation
+will be assigned to a particular partition, not the resulting size of the
+partition. This implies that partitioning a DataFrame with, for example,
+
+\code{sdf_partition(x, training = 0.5, test = 0.5)}
+
+is not guaranteed to produce \code{training} and \code{test} partitions
+of equal size.
+}
 \examples{
 \dontrun{
 # randomly partition data into a 'training' and 'test'
@@ -31,6 +46,10 @@ diamonds_tbl <- copy_to(sc, diamonds, "diamonds")
 partitions <- diamonds_tbl \%>\%
   sdf_partition(training = 0.6, test = 0.4)
 print(partitions)
+
+# alternate way of specifying weights
+weights <- c(training = 0.6, test = 0.4)
+diamonds_tbl \%>\% sdf_partition(weights = weights)
 }
 }
 
