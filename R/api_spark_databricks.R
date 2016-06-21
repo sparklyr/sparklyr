@@ -1,24 +1,24 @@
 spark_api_read_csv <- function(api, path, columns = NULL) {
-  read <- spark_invoke(spark_sql_or_hive(api), "read")
-  format <- spark_invoke(read, "format", "com.databricks.spark.csv")
-  optionHeader <- spark_invoke(format, "option", "header", "true")
+  read <- sparkapi_invoke(spark_sql_or_hive(api), "read")
+  format <- sparkapi_invoke(read, "format", "com.databricks.spark.csv")
+  optionHeader <- sparkapi_invoke(format, "option", "header", "true")
 
   if (identical(columns, NULL)) {
-    optionSchema <- spark_invoke(optionHeader, "option", "inferSchema", "true")
+    optionSchema <- sparkapi_invoke(optionHeader, "option", "inferSchema", "true")
   }
   else {
     columnDefs <- spark_api_build_types(api, columns)
-    optionSchema <- spark_invoke(optionHeader, "schema", columnDefs)
+    optionSchema <- sparkapi_invoke(optionHeader, "schema", columnDefs)
   }
 
-  spark_invoke(optionSchema, "load", path)
+  sparkapi_invoke(optionSchema, "load", path)
 }
 
 spark_api_write_csv <- function(df, path) {
-  write <- spark_invoke(df, "write")
-  format <- spark_invoke(write, "format", "com.databricks.spark.csv")
-  optionHeader <- spark_invoke(format, "option", "header", "true")
-  spark_invoke(optionHeader, "save", path)
+  write <- sparkapi_invoke(df, "write")
+  format <- sparkapi_invoke(write, "format", "com.databricks.spark.csv")
+  optionHeader <- sparkapi_invoke(format, "option", "header", "true")
+  sparkapi_invoke(optionHeader, "save", path)
 
   invisible(TRUE)
 }

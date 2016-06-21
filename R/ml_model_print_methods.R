@@ -18,20 +18,20 @@ ml_model_print_call <- function(model) {
 ml_model_print_residuals <- function(model) {
   
   residuals <- model$.model %>%
-    spark_invoke("summary") %>%
-    spark_invoke("residuals")
+    sparkapi_invoke("summary") %>%
+    sparkapi_invoke("residuals")
   
   # randomly sample residuals and produce quantiles based on
   # sample to avoid slowness in Spark's 'percentile_approx()'
   # implementation
-  count <- spark_invoke(residuals, "count")
+  count <- sparkapi_invoke(residuals, "count")
   limit <- 1E5
   isApproximate <- count > limit
   
   values <- if (isApproximate) {
     fraction <- limit / count
     residuals %>%
-      spark_invoke("sample", FALSE, fraction) %>%
+      sparkapi_invoke("sample", FALSE, fraction) %>%
       spark_dataframe_read_column("residuals") %>%
       quantile()
   } else {

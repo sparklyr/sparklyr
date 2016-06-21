@@ -1,6 +1,6 @@
 spark_jobj_list_to_array_df <- function(data, dataNames) {
   listOfLists <- lapply(data, function(e) {
-    spark_invoke(e, "toArray")
+    sparkapi_invoke(e, "toArray")
   })
 
   df <- as.data.frame(t(matrix(unlist(listOfLists), nrow=length(dataNames))))
@@ -29,10 +29,10 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
     } else if (responseType != "DoubleType") {
       envir$response <- random_string("response")
       castedColumn <- df %>%
-        spark_invoke("col", response) %>%
-        spark_invoke("cast", "double")
+        sparkapi_invoke("col", response) %>%
+        sparkapi_invoke("cast", "double")
       df <- df %>%
-        spark_invoke("withColumn", envir$response, castedColumn)
+        sparkapi_invoke("withColumn", envir$response, castedColumn)
     }
   }
 
@@ -51,7 +51,7 @@ predict.ml_model <- function(object, newdata, ...) {
   sdf <- sparkapi_dataframe(newdata)
   params <- object$model.parameters
   assembled <- ft_vector_assembler(sdf, object$features, params$features)
-  predicted <- spark_invoke(object$.model, "transform", assembled)
+  predicted <- sparkapi_invoke(object$.model, "transform", assembled)
   column <- spark_dataframe_read_column(predicted, "prediction")
   if (is.character(params$labels) && is.numeric(column))
     column <- params$labels[column + 1]
@@ -61,15 +61,15 @@ predict.ml_model <- function(object, newdata, ...) {
 #' @export
 fitted.ml_model <- function(object, ...) {
   object$.model %>%
-    spark_invoke("summary") %>%
-    spark_invoke("predictions") %>%
+    sparkapi_invoke("summary") %>%
+    sparkapi_invoke("predictions") %>%
     spark_dataframe_read_column("prediction")
 }
 
 #' @export
 residuals.ml_model <- function(object, ...) {
   object$.model %>%
-    spark_invoke("summary") %>%
-    spark_invoke("residuals") %>%
+    sparkapi_invoke("summary") %>%
+    sparkapi_invoke("residuals") %>%
     spark_dataframe_read_column("residuals")
 }

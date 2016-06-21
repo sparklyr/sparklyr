@@ -7,21 +7,21 @@ sparkapi_dataframe.tbl_spark <- function(x, ...) {
 
   sql <- as.character(sql_render(sql_build(x, con = con), con = con))
   api <- spark_sql_or_hive(spark_api(x$src))
-  spark_invoke(api, "sql", sql)
+  sparkapi_invoke(api, "sql", sql)
 }
 
 #' @export
 sparkapi_dataframe.sparklyr_connection <- function(x, sql = NULL, ...) {
-  spark_invoke(spark_sql_or_hive(spark_api(x)), "sql", as.character(sql))
+  sparkapi_invoke(spark_sql_or_hive(spark_api(x)), "sql", as.character(sql))
 }
 
 spark_dataframe_schema <- function(object) {
   jobj <- sparkapi_dataframe(object)
-  schema <- spark_invoke(jobj, "schema")
-  fields <- spark_invoke(schema, "fields")
+  schema <- sparkapi_invoke(jobj, "schema")
+  fields <- sparkapi_invoke(schema, "fields")
   list <- lapply(fields, function(field) {
-    type <- spark_invoke(spark_invoke(field, "dataType"), "toString")
-    name <- spark_invoke(field, "name")
+    type <- sparkapi_invoke(sparkapi_invoke(field, "dataType"), "toString")
+    name <- sparkapi_invoke(field, "name")
     list(name = name, type = type)
   })
   names(list) <- unlist(lapply(list, `[[`, "name"))
@@ -46,10 +46,10 @@ spark_dataframe_read_column <- function(object, colName) {
 
   sc <- sparkapi_connection(jobj)
   rdd <- jobj %>%
-    spark_invoke("select", colName, list()) %>%
-    spark_invoke("rdd")
+    sparkapi_invoke("select", colName, list()) %>%
+    sparkapi_invoke("rdd")
 
-  column <- spark_invoke_static(sc, "utils", method, rdd)
+  column <- sparkapi_invoke_static(sc, "utils", method, rdd)
 
   if (colType == "StringType") {
 
@@ -73,7 +73,7 @@ spark_dataframe_read_column <- function(object, colName) {
 spark_dataframe_collect <- function(object) {
   jobj <- sparkapi_dataframe(object)
   schema <- spark_dataframe_schema(jobj)
-  colNames <- as.character(spark_invoke(jobj, "columns"))
+  colNames <- as.character(sparkapi_invoke(jobj, "columns"))
   colValues <- lapply(schema, function(colInfo) {
     spark_dataframe_read_column(jobj, colInfo$name)
   })
@@ -89,6 +89,6 @@ spark_dataframe_split <- function(object,
                                   seed = sample(.Machine$integer.max, 1))
 {
   jobj <- sparkapi_dataframe(object)
-  spark_invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
+  sparkapi_invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
 }
 

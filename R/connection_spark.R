@@ -40,6 +40,9 @@ spark_connect <- function(master = "local",
     stop("Java is required to connect to Spark. Please download and install Java from ",
          java_install_url())
   }
+  
+  # attach unknown error handler
+  sparkapi_unknown_error_handler(read_spark_log_error)
 
   installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
   sparkVersion <- installInfo$sparkVersion
@@ -216,55 +219,6 @@ print.spark_web_url <- function(x, ...) {
   utils::browseURL(x)
 }
 
-spark_attach_connection <- function(object, sc) {
-  scon <- sc
-  if (inherits(object, "sparkapi_jobj")) {
-    assign("scon", scon, envir = object)
-  }
-  else if (is.list(object) || inherits(object, "struct")) {
-    object <- lapply(object, function(e) {
-      spark_attach_connection(e, scon)
-    })
-  }
-  else if (is.environment(object)) {
-    object <- eapply(object, function(e) {
-      spark_attach_connection(e, scon)
-    })
-  }
-
-  object
-}
-
-spark_invoke <- function (jobj, method, ...)
-{
-  tryCatch({
-    sparkapi_invoke(jobj, method, ...) 
-  }, error = spark_invoke_error_handler(sc))
-}
-
-spark_invoke_static <- function (sc, class, method, ...)
-{
-  tryCatch({
-    sparkapi_invoke_static(sc, class, method, ...)
-  }, error = spark_invoke_error_handler(sc))
-}
-
-spark_invoke_new <- function(sc, class, ...)
-{
-  tryCatch({
-    sparkapi_invoke_new(sc, class, ...)
-  }, error = spark_invoke_error_handler(sc))
-}
-
-spark_invoke_error_handler <- function(sc) {
-  function(e) {
-    msg <- as.character(e)
-    if (msg == "<unknown error>")
-      msg <- read_spark_log_error(sc)
-    stop(msg, call. = FALSE)
-  }
-}
-
 read_spark_log_error <- function(sc) {
   # if there was no error message reported, then
   # return information from the Spark logs. return
@@ -299,17 +253,17 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
   scon <- sc
   sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
 
-  conf <- spark_invoke_new(scon, "org.apache.spark.SparkConf")
-  conf <- spark_invoke(conf, "setAppName", appName)
-  conf <- spark_invoke(conf, "setMaster", master)
-  conf <- spark_invoke(conf, "setSparkHome", sparkHome)
+  conf <- sparkapi_invoke_new(scon, "org.apache.spark.SparkConf")
+  conf <- sparkapi_invoke(conf, "setAppName", appName)
+  conf <- sparkapi_invoke(conf, "setMaster", master)
+  conf <- sparkapi_invoke(conf, "setSparkHome", sparkHome)
 
   params <- spark_config_params(scon$config, scon$isLocal, "spark.context.")
   lapply(names(params), function(paramName) {
-    conf <<- spark_invoke(conf, "set", paramName, params[[paramName]])
+    conf <<- sparkapi_invoke(conf, "set", paramName, params[[paramName]])
   })
 
-  spark_invoke_new(
+  sparkapi_invoke_new(
     scon,
     "org.apache.spark.SparkContext",
     conf

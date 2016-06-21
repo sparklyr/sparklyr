@@ -23,23 +23,23 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
   # invoke KMeans
-  kmeans <- spark_invoke_new(
+  kmeans <- sparkapi_invoke_new(
     sc,
     "org.apache.spark.ml.clustering.KMeans"
   )
 
   fit <- kmeans %>%
-    spark_invoke("setK", as.integer(centers)) %>%
-    spark_invoke("setMaxIter", as.integer(iter.max)) %>%
-    spark_invoke("setFeaturesCol", envir$features) %>%
-    spark_invoke("fit", tdf)
+    sparkapi_invoke("setK", as.integer(centers)) %>%
+    sparkapi_invoke("setMaxIter", as.integer(iter.max)) %>%
+    sparkapi_invoke("setFeaturesCol", envir$features) %>%
+    sparkapi_invoke("fit", tdf)
 
 
   # extract cluster centers
-  kmmCenters <- spark_invoke(fit, "clusterCenters")
+  kmmCenters <- sparkapi_invoke(fit, "clusterCenters")
 
   centersList <- transpose_list(lapply(kmmCenters, function(center) {
-    as.numeric(spark_invoke(center, "toArray"))
+    as.numeric(sparkapi_invoke(center, "toArray"))
   }))
 
   names(centersList) <- features

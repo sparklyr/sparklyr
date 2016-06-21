@@ -15,26 +15,27 @@ sparklyr:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WA
 
 ```{r}
 library(sparklyr)
+library(sparkapi)
 library(dplyr)
 library(ggplot2)
 
 parquetPath <- file.path(getwd(), "billion.parquet")
 
 if (!file.exists(parquetPath)) {
-  billion <- spark_invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
-    spark_invoke("longValue")
+  billion <- sparkapi_invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
+    sparkapi_invoke("longValue")
   
   ses %>%
-    spark_invoke("range", as.integer(billion)) %>%
-    spark_invoke("toDF") %>%
-    spark_invoke("write") %>%
-    spark_invoke("save", "billion.parquet")
+    sparkapi_invoke("range", as.integer(billion)) %>%
+    sparkapi_invoke("toDF") %>%
+    sparkapi_invoke("write") %>%
+    sparkapi_invoke("save", "billion.parquet")
 }
 
 spark_conf <- function(ses, config, value) {
   ses %>%
-    spark_invoke("conf") %>%
-    spark_invoke("set", config, value)
+    sparkapi_invoke("conf") %>%
+    sparkapi_invoke("set", config, value)
 }
 
 logResults <- function(label, test) {
@@ -61,7 +62,7 @@ logResults <- function(label, test) {
 
 sparkTest <- function(test, loadIntoDf = TRUE) {
   sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "12G")
-  sparkSql <- spark_invoke_new(
+  sparkSql <- sparkapi_invoke_new(
     sc,
     "org.apache.spark.sql.SQLContext",
     spark_context(sc)
@@ -72,13 +73,13 @@ sparkTest <- function(test, loadIntoDf = TRUE) {
   
   if (loadIntoDf) {
     df <- sparkSql %>%
-      spark_invoke("read") %>%
-      spark_invoke("parquet", list(parquetPath)) %>%
-      spark_invoke("repartition", as.integer(parallel::detectCores()))
+      sparkapi_invoke("read") %>%
+      sparkapi_invoke("parquet", list(parquetPath)) %>%
+      sparkapi_invoke("repartition", as.integer(parallel::detectCores()))
     
     df %>%
-      spark_invoke("cache") %>%
-      spark_invoke("count")
+      sparkapi_invoke("cache") %>%
+      sparkapi_invoke("count")
   } else {
     invisible(
       spark_read_parquet(db, "billion", parquetPath, repartition = parallel::detectCores())
@@ -99,15 +100,15 @@ sparkTest <- function(test, loadIntoDf = TRUE) {
 
 ```{r}
 spark_sum_range <- function(sc, db, ses, df) {
-  billion <- spark_invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
-    spark_invoke("longValue")
+  billion <- sparkapi_invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
+    sparkapi_invoke("longValue")
   
   result <- ses %>%
-    spark_invoke("range", as.integer(billion)) %>%
-    spark_invoke("toDF", list("x")) %>%
-    spark_invoke("selectExpr", list("sum(x)"))
+    sparkapi_invoke("range", as.integer(billion)) %>%
+    sparkapi_invoke("toDF", list("x")) %>%
+    sparkapi_invoke("selectExpr", list("sum(x)"))
     
-  spark_invoke(result, "collect")[[1]]
+  sparkapi_invoke(result, "collect")[[1]]
 }
 ```
 
@@ -115,11 +116,11 @@ spark_sum_range <- function(sc, db, ses, df) {
 
 ```{r}
 spark_sum_range_parquet <- function(sc, db, ses, df) {
-  df <- spark_invoke(sparklyr:::spark_sql_or_hive(sparklyr:::spark_api(db)), "read") %>%
-    spark_invoke("parquet", list(parquetPath))
+  df <- sparkapi_invoke(sparklyr:::spark_sql_or_hive(sparklyr:::spark_api(db)), "read") %>%
+    sparkapi_invoke("parquet", list(parquetPath))
     
-  result <- spark_invoke(df, "selectExpr", list("sum(x)")) %>%
-    spark_invoke("collect")
+  result <- sparkapi_invoke(df, "selectExpr", list("sum(x)")) %>%
+    sparkapi_invoke("collect")
   
   result[[1]]
 }
@@ -130,8 +131,8 @@ spark_sum_range_parquet <- function(sc, db, ses, df) {
 ```{r}
 spark_sum_range_mem <- function(sc, db, ses, df) {
   df %>%
-    spark_invoke("selectExpr", list("sum(x)")) %>%
-    spark_invoke("collect")
+    sparkapi_invoke("selectExpr", list("sum(x)")) %>%
+    sparkapi_invoke("collect")
 }
 ```
 

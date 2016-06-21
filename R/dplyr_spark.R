@@ -48,7 +48,7 @@ db_explain.src_spark <- function(con, sql, ...) {
 
 #' @export
 tbl_vars.sparkapi_jobj <- function(x) {
-  as.character(spark_invoke(x, "columns"))
+  as.character(sparkapi_invoke(x, "columns"))
 }
 
 #' @export
@@ -146,5 +146,5 @@ print.src_spark <- function(x, ...) {
 db_save_query.DBISparkConnection <- function (con, sql, name, temporary = TRUE, ...) 
 {
   df <- sparkapi_dataframe(con@scon, sql)
-  spark_invoke(df, "registerTempTable", name)
+  sparkapi_invoke(df, "registerTempTable", name)
 }

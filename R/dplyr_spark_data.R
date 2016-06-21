@@ -2,7 +2,7 @@
 
 spark_partition_register_df <- function(sc, df, api, name, repartition, memory) {
   if (repartition > 0) {
-    df <- spark_invoke(df, "repartition", as.integer(repartition))
+    df <- sparkapi_invoke(df, "repartition", as.integer(repartition))
   }
 
   dbi <- spark_dbi(sc)

@@ -110,8 +110,8 @@ spark_write_json.jobj <- function(x, path) {
 }
 
 spark_expect_jobj_class <- function(jobj, expectedClassName) {
-  class <- spark_invoke(jobj, "getClass")
-  className <- spark_invoke(class, "getName")
+  class <- sparkapi_invoke(jobj, "getClass")
+  className <- sparkapi_invoke(class, "getName")
   if (!identical(className, expectedClassName)) {
     stop(paste(
       "This operation is only supported on", 

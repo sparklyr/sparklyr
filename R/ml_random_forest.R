@@ -47,19 +47,19 @@ ml_random_forest <- function(x,
   else
     "org.apache.spark.ml.classification.RandomForestClassifier"
 
-  rf <- spark_invoke_new(sc, model)
+  rf <- sparkapi_invoke_new(sc, model)
 
   fit <- rf %>%
-    spark_invoke("setFeaturesCol", envir$features) %>%
-    spark_invoke("setLabelCol", envir$response) %>%
-    spark_invoke("setMaxBins", max.bins) %>%
-    spark_invoke("setMaxDepth", max.depth) %>%
-    spark_invoke("setNumTrees", num.trees) %>%
-    spark_invoke("fit", tdf)
+    sparkapi_invoke("setFeaturesCol", envir$features) %>%
+    sparkapi_invoke("setLabelCol", envir$response) %>%
+    sparkapi_invoke("setMaxBins", max.bins) %>%
+    sparkapi_invoke("setMaxDepth", max.depth) %>%
+    sparkapi_invoke("setNumTrees", num.trees) %>%
+    sparkapi_invoke("fit", tdf)
 
   featureImportances <- fit %>%
-    spark_invoke("featureImportances") %>%
-    spark_invoke("toArray")
+    sparkapi_invoke("featureImportances") %>%
+    sparkapi_invoke("toArray")
 
   ml_model("random_forest", fit,
            features = features,
@@ -68,7 +68,7 @@ ml_random_forest <- function(x,
            max.depth = max.depth,
            num.trees = num.trees,
            feature.importances = featureImportances,
-           trees = spark_invoke(fit, "trees"),
+           trees = sparkapi_invoke(fit, "trees"),
            model.parameters = as.list(envir)
   )
 }
@@ -77,5 +77,5 @@ ml_random_forest <- function(x,
 print.ml_model_random_forest <- function(x, ...) {
   formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
   cat("Call: ", formula, "\n\n", sep = "")
-  cat(spark_invoke(x$.model, "toString"), sep = "\n")
+  cat(sparkapi_invoke(x$.model, "toString"), sep = "\n")
 }
