@@ -7,7 +7,21 @@
 #' @param name A name to assign this table.
 #' 
 #' @export
-sdf_register <- function(x, name = random_string()) {
+sdf_register <- function(x, name) {
+  UseMethod("sdf_register")
+}
+
+#' @export
+sdf_register.list <- function(x, name = names(x)) {
+  result <- lapply(seq_along(x), function(i) {
+    sdf_register(x[[i]], name[[i]])
+  })
+  names(result) <- name
+  result
+}
+
+#' @export
+sdf_register.sparkapi_jobj <- function(x, name = random_string()) {
   spark_invoke(x, "registerTempTable", name)
   on_connection_updated(spark_connection(x), name)
   tbl(spark_connection(x), name)
