@@ -48,6 +48,22 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
   ml_model("kmeans", fit,
            centers = centers,
            features = features,
+           data = df,
            model.parameters = as.list(envir)
   )
+}
+
+#' @export
+print.ml_model_kmeans <- function(x, ...) {
+  
+  preamble <- sprintf(
+    "K-means clustering with %s %s",
+    nrow(x$centers),
+    if (nrow(x$centers) == 1) "cluster" else "clusters"
+  )
+  
+  cat(preamble, sep = "\n")
+  print_newline()
+  ml_model_print_centers(x)
+
 }

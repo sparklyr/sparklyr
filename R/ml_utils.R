@@ -46,6 +46,8 @@ try_null <- function(expr) {
 
 #' @export
 predict.ml_model <- function(object, newdata, ...) {
+  if (missing(newdata) || is.null(newdata))
+    newdata <- object$data
   sdf <- as_spark_dataframe(newdata)
   params <- object$model.parameters
   assembled <- ft_vector_assembler(sdf, object$features, params$features)
