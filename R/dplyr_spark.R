@@ -8,7 +8,7 @@ spark_dbi.src_spark <- function(x) {
   x$con
 }
 
-spark_dbi.spark_connection <- function(x) {
+spark_dbi.sparklyr_connection <- function(x) {
   dbConnect(DBISpark(x))
 }
 
@@ -57,13 +57,13 @@ tbl.src_spark <- function(src, from, ...) {
 }
 
 #' @export
-tbl.spark_connection <- function(src, from, ...) {
+tbl.sparklyr_connection <- function(src, from, ...) {
   src <- src_sql("spark", dbConnect(DBISpark(src)))
   tbl_sql("spark", src = src, from = from, ...)
 }
 
 #' @export
-src_tbls.spark_connection <- function(x, ...) {
+src_tbls.sparklyr_connection <- function(x, ...) {
   src <- src_sql("spark", dbConnect(DBISpark(x)))
   sort(src_tbls(src, ...))
 }
@@ -89,8 +89,8 @@ db_data_type.src_spark <- function(...) {
 #' @name copy_to
 #'
 #' @export
-copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
-                                     memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL, ...) {
+copy_to.sparklyr_connection <- function(dest, df, name = deparse(substitute(df)),
+                                        memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL, ...) {
   sc <- dest
   dest <- src_sql("spark", dbConnect(DBISpark(sc)))
 

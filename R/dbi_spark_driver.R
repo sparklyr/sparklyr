@@ -10,7 +10,7 @@ DBISpark <- function(sc) {
 setClass("DBISparkDriver",
          contains = "DBIDriver",
          slots = c(
-           scon = "spark_connection")
+           scon = "sparklyr_connection")
         )
 
 setMethod("dbUnloadDriver", "DBISparkDriver", function(drv, ...) {

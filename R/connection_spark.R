@@ -4,7 +4,7 @@
 NULL
 
 # register the spark_connection S3 class for use in setClass slots
-methods::setOldClass("spark_connection")
+methods::setOldClass("sparklyr_connection")
 
 spark_default_jars <- function() {
   jarsOption <- getOption("spark.jars.default", NULL)
@@ -55,7 +55,7 @@ spark_connect <- function(master = "local",
     installInfo = installInfo,
     config = config
   )
-  scon <- structure(scon, class = c("spark_connection", "sparkapi_connection"))
+  scon <- structure(scon, class = c("sparklyr_connection", "sparkapi_connection"))
 
   
   # determine jars and packages

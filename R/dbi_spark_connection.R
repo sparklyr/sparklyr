@@ -2,7 +2,7 @@
 # DBISparkConnection and methods.
 setClass("DBISparkConnection",
          contains = "DBIConnection",
-         slots = c(scon = "spark_connection",
+         slots = c(scon = "sparklyr_connection",
                    api = "list")
 )
 

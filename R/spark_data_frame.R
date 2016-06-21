@@ -11,7 +11,7 @@ sparkapi_dataframe.tbl_spark <- function(x, ...) {
 }
 
 #' @export
-sparkapi_dataframe.spark_connection <- function(x, sql = NULL, ...) {
+sparkapi_dataframe.sparklyr_connection <- function(x, sql = NULL, ...) {
   spark_invoke(spark_sql_or_hive(spark_api(x)), "sql", as.character(sql))
 }
 
