@@ -93,7 +93,7 @@ sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ..
   
   # Spark < 2.0 does not support "USING" keyword and therefore, we use custom implementation
   # based on dplyrs sql_join
-  on <- sql_vector(paste0(sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, by$y)),
+  on <- sql_vector(paste0(sql_escape_ident(con, x), ".", sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, y), ".", sql_escape_ident(con, by$y)),
                    collapse = " AND ", parens = TRUE)
   cond <- build_sql("ON ", on, con = con)
   
