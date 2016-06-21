@@ -8,12 +8,12 @@ output:
 
 ## Initialization
 
-```{r}
+```{r setup}
 library(sparklyr)
 library(dplyr)
 library(ggplot2)
 
-sc <- spark_connect("local", version = "1.6.1")
+sc <- spark_connect("local", version = "2.0.0-preview")
 
 iris_tbl <- copy_to(sc, iris, "iris", overwrite = TRUE)
 ```
@@ -124,8 +124,7 @@ ggplot(beaver, aes(x = temp, y = activ)) +
 ## Logistic Regression in Spark
 
 ```{r}
-copy_to(sc, beaver, "beaver")
-beaver_tbl <- tbl(sc, "beaver")
+beaver_tbl <- copy_to(sc, beaver, "beaver", overwrite = TRUE)
 
 model <- beaver_tbl %>%
   mutate(response = as.numeric(activ == "Active")) %>%
