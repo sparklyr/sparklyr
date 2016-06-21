@@ -8,7 +8,7 @@ sdf_partition(x, ..., weights = NULL, seed = sample(.Machine$integer.max,
   1))
 }
 \arguments{
-\item{x}{A \code{tbl_spark}.}
+\item{x}{An object coercable to a Spark DataFrame.}
 
 \item{...}{Named parameters, mapping table names to weights. The weights
 will be normalized such that they sum to 1.}

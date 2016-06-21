@@ -41,7 +41,7 @@ sdf_register.sparkapi_jobj <- function(x, name = random_string()) {
 #' is not guaranteed to produce \code{training} and \code{test} partitions
 #' of equal size.
 #'
-#' @param x A \code{tbl_spark}.
+#' @param x An object coercable to a Spark DataFrame.
 #' @param ... Named parameters, mapping table names to weights. The weights
 #'   will be normalized such that they sum to 1.
 #' @param weights An alternate mechanism for supplying weights -- when
@@ -73,13 +73,37 @@ sdf_partition <- function(x,
                           weights = NULL,
                           seed = sample(.Machine$integer.max, 1))
 {
+  sdf <- sparkapi_dataframe(x)
   weights <- weights %||% list(...)
   nm <- names(weights)
   if (is.null(nm) || any(!nzchar(nm)))
     stop("all weights must be named")
-  partitions <- spark_dataframe_split(x, as.numeric(weights), seed = seed)
+  partitions <- spark_dataframe_split(sdf, as.numeric(weights), seed = seed)
   names(partitions) <- nm
   partitions
+}
+
+#' Randomly Sample Rows from a Spark DataFrame
+#' 
+#' @param x An object coercable to a Spark DataFrame.
+#' @param fraction The fraction to sample.
+#' @param replacement Boolean; sample with replacement?
+#' @param seed An (optional) integer seed.
+#' 
+#' @export
+sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
+{
+  sdf <- sparkapi_dataframe(x)
+  
+  sampled <- if (is.null(seed)) {
+    sdf %>%
+      sparkapi_invoke("sample", as.logical(replacement), as.double(fraction))
+  } else {
+    sdf %>%
+      sparkapi_invoke("sample", as.logical(replacement), as.double(fraction), as.integer(seed))
+  }
+  
+  sampled
 }
 
 #' Mutate a Spark DataFrame
