@@ -11,7 +11,7 @@
 #' @export
 ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
   
-  df <- as_spark_dataframe(x)
+  df <- sparkapi_dataframe(x)
   sc <- spark_connection(df)
 
   envir <- new.env(parent = emptyenv())

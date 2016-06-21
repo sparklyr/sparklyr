@@ -13,7 +13,7 @@ spark_connection.ml_model <- function(x, ...) {
 }
 
 sdf_summarize <- function(df, columns = NULL) {
-  sdf <- as_spark_dataframe(df)
+  sdf <- sparkapi_dataframe(df)
   if (is.null(columns))
     columns <- dplyr::tbl_vars(sdf)
   

@@ -4,10 +4,12 @@
 \alias{spark_read_csv}
 \title{Reads a CSV file and provides a data source compatible with dplyr}
 \usage{
-spark_read_csv(x, name, path, repartition = 0, memory = TRUE,
+spark_read_csv(sc, name, path, repartition = 0, memory = TRUE,
   overwrite = TRUE)
 }
 \arguments{
+\item{sc}{The Spark connection}
+
 \item{name}{Name to reference the data source once it's loaded}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
@@ -17,8 +19,6 @@ spark_read_csv(x, name, path, repartition = 0, memory = TRUE,
 \item{memory}{Loads data into memory}
 
 \item{overwrite}{Overwrite the table with the given name when it exists}
-
-\item{sc}{The Spark connection}
 }
 \description{
 Reads a CSV file and provides a data source compatible with dplyr

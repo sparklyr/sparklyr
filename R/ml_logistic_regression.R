@@ -14,7 +14,7 @@ ml_logistic_regression <- function(x,
                                    alpha = 0,
                                    lambda = 0)
 {
-  df <- as_spark_dataframe(x)
+  df <- sparkapi_dataframe(x)
   sc <- spark_connection(df)
 
   envir <- new.env(parent = emptyenv())

@@ -8,13 +8,8 @@
 #' @param overwrite Overwrite the table with the given name when it exists
 #'
 #' @export
-spark_read_csv <- function(x, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
-  UseMethod("spark_read_csv")
-}
-
-#' @export
-spark_read_csv.spark_connection <- function(x, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
-  sc <- x
+spark_read_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
   api <- spark_api(sc)
@@ -44,11 +39,7 @@ spark_write_csv.tbl_spark <- function(x, path) {
 #'
 #' @export
 spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
-  UseMethod("spark_read_parquet")
-}
 
-#' @export
-spark_read_parquet.spark_connection <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
   api <- spark_api(sc)
@@ -77,11 +68,7 @@ spark_write_parquet.tbl_spark <- function(x, path) {
 #'
 #' @export
 spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
-  UseMethod("spark_read_json")
-}
-
-#' @export
-spark_read_json.spark_connection <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+  
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
   api <- spark_api(sc)
