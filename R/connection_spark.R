@@ -30,7 +30,13 @@ spark_connect <- function(master = "local",
                           hadoop_version = NULL,
                           extensions = NULL,
                           config = spark_config()) {
-  sconFound <- spark_connection_find_scon(function(e) { identical(e$master, master) && identical(e$appName, app_name) && identical(e$version, version) })
+  filter <- function(e) {
+    identical(e$master, master) &&
+    identical(e$appName, app_name) &&
+    identical(e$sparkVersion, version)
+  }
+  
+  sconFound <- spark_connection_find_scon(filter)
   if (length(sconFound) == 1) {
     return(sconFound[[1]])
   }
