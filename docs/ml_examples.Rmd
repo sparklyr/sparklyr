@@ -13,8 +13,7 @@ library(sparklyr)
 library(dplyr)
 library(ggplot2)
 
-sc <- spark_connect("local", version = "2.0.0-preview")
-
+sc <- spark_connect("local", version = "1.6.1")
 iris_tbl <- copy_to(sc, iris, "iris", overwrite = TRUE)
 ```
 
@@ -228,8 +227,6 @@ ggplot(df) +
     x = "R-predicted Species",
     y = "Spark-predicted Species",
     title = "Random Forest Classification — Comparing R and Spark")
-
-
 ```
 
 ## Neural Networks with R
