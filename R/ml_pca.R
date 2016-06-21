@@ -62,8 +62,16 @@ ml_pca <- function(x, features = dplyr::tbl_vars(x)) {
 
 #' @export
 print.ml_model_pca <- function(x, ...) {
+  
   cat("Explained variance:", sep = "\n")
-  print(x$explained.variance)
-  cat("\nRotation:", sep = "\n")
+  if (is.null(x$explained.variance)) {
+    cat("[not available in this version of Spark]", sep = "\n")
+  } else {
+    print_newline()
+    print(x$explained.variance)
+  }
+  
+  print_newline()
+  cat("Rotation:", sep = "\n")
   print(x$components)
 }
