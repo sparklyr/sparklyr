@@ -42,7 +42,7 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
   packageRemotePath <- versionInfo$packageRemotePath
 
   sparkDir <- spark_install_dir()
-  sparkVersionDir <- file.path(sparkDir, componentName)
+  sparkVersionDir <- getOption("spark_home", file.path(sparkDir, componentName))
 
   list (
     sparkDir = sparkDir,
