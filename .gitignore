@@ -29,3 +29,5 @@ spark-warehouse
 # Temp parquet files
 docs/*.parquet
 .DS_Store
+demo.R
+
