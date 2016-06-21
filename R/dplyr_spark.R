@@ -53,18 +53,13 @@ sparkapi_connection.spark_connection <- function(x, ...) {
   # get the instance
   sconInst <- spark_connection_get_inst(x)
   
-  # create sparkapi_connection on demand if necessary
-  if (is.null(sconInst$sparkapi_connection)) {
-    sconInst$sparkapi_connection <- sparkapi_connection_create(
-      spark_context = sconInst$sc,
-      hive_context = NULL,
-      backend = sconInst$backend, 
-      monitor = sconInst$monitor)
-    spark_connection_set_inst(x, sconInst)
-  }
-  
-  # return the sparkapi_connection
-  sconInst$sparkapi_connection
+  # create the connection
+  sparkapi_connection_create(
+    spark_context = sconInst$sc,
+    hive_context = sconInst$hive,
+    backend = sconInst$backend, 
+    monitor = sconInst$monitor
+  )
 }
 
 

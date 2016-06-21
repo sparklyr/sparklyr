@@ -105,17 +105,8 @@ spark_api_create <- function(scon) {
 }
 
 spark_sql_or_hive <- function(api) {
-  
-  # get the connection instance
   sconInst <- spark_connection_get_inst(api$scon)
 
-  # if both hive and sql are null create sql context on demand
-  if (is.null(sconInst$hive) && is.null(sconInst$sql)) {
-    sconInst <- spark_connection_attach_sql_session_context(api$scon, sconInst)
-    spark_connection_set_inst(api$scon, sconInst)
-    on_connection_updated(api$scon, "")
-  }
-  
   if (!identical(sconInst$hive, NULL))
     sconInst$hive
   else
