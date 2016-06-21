@@ -37,6 +37,7 @@ sd_section("MLlib Interface",
              "ml_multilayer_perceptron",
              "sdf_partition",
              "sdf_mutate",
+             "sdf_register",
              "ft_binarizer",
              "ft_bucketizer",
              "ft_discrete_cosine_transform",
@@ -49,14 +50,5 @@ sd_section("MLlib Interface",
            )
 )
 
-sd_section("Extensions",
-           "Functions for interacting directly with the Spark Scala API",
-           c("spark_invoke",
-             "spark_invoke_new",
-             "spark_invoke_static",
-             "spark_connection",
-             "as_spark_dataframe",
-             "spark_dependency")
-)
 
 
