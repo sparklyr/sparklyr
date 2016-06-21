@@ -17,7 +17,7 @@
 ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
   
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)

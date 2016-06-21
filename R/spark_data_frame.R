@@ -44,7 +44,7 @@ spark_dataframe_read_column <- function(object, colName) {
   else
     "readColumnDefault"
 
-  sc <- spark_connection(jobj)
+  sc <- sparkapi_connection(jobj)
   rdd <- jobj %>%
     spark_invoke("select", colName, list()) %>%
     spark_invoke("rdd")

@@ -55,7 +55,7 @@ spark_connect <- function(master = "local",
     installInfo = installInfo,
     config = config
   )
-  scon <- structure(scon, class = "spark_connection")
+  scon <- structure(scon, class = c("spark_connection", "sparkapi_connection"))
 
   
   # determine jars and packages
@@ -68,6 +68,9 @@ spark_connect <- function(master = "local",
   packages <- c(packages, dependencies$packages)
   
   sconInst <- start_shell(scon, list(), jars, packages)
+  scon$backend = sconInst$backend
+  scon$monitor = sconInst$monitor
+  
   scon <- spark_connection_add_inst(scon$master, scon$appName, scon, sconInst)
 
   parentCall <- match.call()
@@ -83,12 +86,17 @@ spark_connect <- function(master = "local",
   }, onexit = TRUE)
 
   sconInst <- spark_connection_attach_context(scon, sconInst)
+  scon$spark_context <- sconInst$sc
   spark_connection_set_inst(scon, sconInst)
 
   sconInst <- spark_connection_attach_sql_session_context(scon, sconInst)
+  scon$hive_context <- sconInst$hive
   spark_connection_set_inst(scon, sconInst)
-
+  
+  # notify listeners
   on_connection_opened(scon, sconInst$connectCall)
+  
+  # return scon
   scon
 }
 
@@ -229,43 +237,22 @@ spark_attach_connection <- function(object, sc) {
 
 spark_invoke <- function (jobj, method, ...)
 {
-  if (inherits(jobj, "spark_connection"))
-    jobj <- spark_context(jobj)
-
-  # get connection
-  sc <- spark_connection(jobj)
-  
-  # reconnect if needed
-  spark_reconnect_if_needed(sc)
-  
-  # call the api
   tryCatch({
-    result <- sparkapi_invoke(jobj, method, ...) 
-    spark_attach_connection(result, sc)
+    sparkapi_invoke(jobj, method, ...) 
   }, error = spark_invoke_error_handler(sc))
 }
 
 spark_invoke_static <- function (sc, class, method, ...)
 {
-  # reconnect if needed
-  spark_reconnect_if_needed(sc)
-  
-  # call the api
   tryCatch({
-    result <- sparkapi_invoke_static(sparkapi_connection(sc), class, method, ...)
-    spark_attach_connection(result, sc)
+    sparkapi_invoke_static(sc, class, method, ...)
   }, error = spark_invoke_error_handler(sc))
 }
 
 spark_invoke_new <- function(sc, class, ...)
 {
-  # reconnect if needed
-  spark_reconnect_if_needed(sc)
-  
-  # call the api
   tryCatch({
-    result <- sparkapi_invoke_new(sparkapi_connection(sc), class, ...)
-    spark_attach_connection(result, sc)
+    sparkapi_invoke_new(sc, class, ...)
   }, error = spark_invoke_error_handler(sc))
 }
 
@@ -329,13 +316,6 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
   )
 }
 
-# Retrieves the SparkContext reference from a Spark Connection
-spark_context <- function(sc) {
-  spark_reconnect_if_needed(sc)
-
-  sconInst <- spark_connection_get_inst(sc)
-  sconInst$sc
-}
 
 # Retrieves master from a Spark Connection
 spark_connection_master <- function(sc) {

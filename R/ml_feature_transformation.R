@@ -9,8 +9,8 @@
 #' @export
 sdf_register <- function(x, name = random_string()) {
   spark_invoke(x, "registerTempTable", name)
-  on_connection_updated(spark_connection(x), name)
-  tbl(spark_connection(x), name)
+  on_connection_updated(sparkapi_connection(x), name)
+  tbl(sparkapi_connection(x), name)
 }
 
 #' Mutate a Spark DataFrame
@@ -128,7 +128,7 @@ ft_vector_assembler <- function(x,
                                 output_col = NULL)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   assembler <- spark_invoke_new(
     sc,
@@ -164,7 +164,7 @@ ft_string_indexer <- function(x,
                               params = NULL)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   indexer <- spark_invoke_new(
     sc,
@@ -202,7 +202,7 @@ ft_binarizer <- function(x,
                          threshold = 0.5)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   binarizer <- spark_invoke_new(
     sc,
@@ -234,7 +234,7 @@ ft_discrete_cosine_transform <- function(x,
                                          inverse = FALSE)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   dct <- spark_invoke_new(
     sc,
@@ -264,7 +264,7 @@ ft_index_to_string <- function(x,
                                output_col = NULL)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   converter <- spark_invoke_new(
     sc,
@@ -285,7 +285,7 @@ ft_index_to_string <- function(x,
 # ft_standard_scaler <- function(df, input_col, output_col,
 #                                      with.mean, with.std)
 # {
-#   sc <- spark_connection(df)
+#   sc <- sparkapi_connection(df)
 #
 #   scaler <- spark_invoke_new(
 #     sc,
@@ -303,7 +303,7 @@ ft_index_to_string <- function(x,
 # ft_min_max_scaler <- function(df, input_col, output_col,
 #                                     min = 0, max = 1)
 # {
-#   sc <- spark_connection(df)
+#   sc <- sparkapi_connection(df)
 #
 #   scaler <- spark_invoke_new(
 #     sc,
@@ -336,7 +336,7 @@ ft_bucketizer <- function(x,
                           splits)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   bucketizer <- spark_invoke_new(
     sc,
@@ -370,7 +370,7 @@ ft_elementwise_product <- function(x,
                                    scaling_col)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   transformer <- spark_invoke_new(
     sc,
@@ -402,7 +402,7 @@ ft_sql_transformer <- function(x,
                                sql)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   transformer <- spark_invoke_new(
     sc,
@@ -439,7 +439,7 @@ ft_quantile_discretizer <- function(x,
                                     n_buckets = 5)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   discretizer <- spark_invoke_new(
     sc,

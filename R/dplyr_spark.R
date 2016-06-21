@@ -17,51 +17,15 @@ spark_api <- function(x) {
 }
 
 
-spark_connection <- function(x, ...) {
-  UseMethod("spark_connection")
+#' @export
+sparkapi_connection.tbl_spark <- function(x, ...) {
+  sparkapi_connection(x$src)
 }
 
 #' @export
-spark_connection.default <- function(x, ...) {
-  stop("Unable to retreive a spark_connection from object of class ",
-       class(x), call. = FALSE)
-}
-
-#' @export
-spark_connection.spark_connection <- function(x, ...) {
-  x
-}
-
-#' @export
-spark_connection.sparkapi_jobj <- function(x, ...) {
-  x$scon
-}
-
-#' @export
-spark_connection.tbl_spark <- function(x, ...) {
-  spark_connection(x$src)
-}
-
-#' @export
-spark_connection.src_spark <- function(x, ...) {
+sparkapi_connection.src_spark <- function(x, ...) {
   spark_dbi(x)@scon
 }
-
-#' @export
-sparkapi_connection.spark_connection <- function(x, ...) {
-  
-  # get the instance
-  sconInst <- spark_connection_get_inst(x)
-  
-  # create the connection
-  sparkapi_connection_create(
-    spark_context = sconInst$sc,
-    hive_context = sconInst$hive,
-    backend = sconInst$backend, 
-    monitor = sconInst$monitor
-  )
-}
-
 
 
 #' @export

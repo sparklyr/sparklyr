@@ -15,7 +15,7 @@ ml_linear_regression <- function(x,
                                  lambda = 0)
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)

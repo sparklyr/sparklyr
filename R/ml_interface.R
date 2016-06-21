@@ -8,8 +8,8 @@ ml_model <- function(class, model, ...) {
 }
 
 #' @export
-spark_connection.ml_model <- function(x, ...) {
-  spark_connection(x$.model)
+sparkapi_connection.ml_model <- function(x, ...) {
+  sparkapi_connection(x$.model)
 }
 
 sdf_summarize <- function(df, columns = NULL) {

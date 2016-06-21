@@ -24,7 +24,7 @@ ml_multilayer_perceptron <- function(x,
                                      seed = sample(.Machine$integer.max, 1))
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)

@@ -29,7 +29,7 @@ ml_random_forest <- function(x,
                              type = c("auto", "regression", "classification"))
 {
   df <- sparkapi_dataframe(x)
-  sc <- spark_connection(df)
+  sc <- sparkapi_connection(df)
 
   type <- match.arg(type)
   envir <- new.env(parent = emptyenv())

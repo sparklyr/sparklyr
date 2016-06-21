@@ -9,7 +9,7 @@
 # def createSQLContext(jsc: JavaSparkContext): SQLContext
 #
 spark_api_create_sql_context <- function(scon) {
-  ctx <- spark_context(scon)
+  ctx <- sparkapi_spark_context(scon)
   jsc <- spark_invoke_static(
     scon,
     "org.apache.spark.api.java.JavaSparkContext",
@@ -94,7 +94,7 @@ spark_api_create_hive_context_v1 <- function(scon) {
 
     "org.apache.spark.sql.hive.HiveContext",
 
-    spark_context(scon)
+    sparkapi_spark_context(scon)
   )
 }
 
@@ -272,7 +272,7 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
       api$scon,
       "utils",
       "createDataFrame",
-      spark_context(api$scon),
+      sparkapi_spark_context(api$scon),
       rows,
       as.integer(if (repartition <= 0) 1 else repartition)
     )
@@ -320,7 +320,7 @@ spark_api_write_generic <- function(df, path, fileMethod) {
 
 spark_inspect <- function(jobj) {
   print(jobj)
-  if (!spark_connection_is_open(spark_connection(jobj)))
+  if (!spark_connection_is_open(sparkapi_connection(jobj)))
     return(jobj)
 
   class <- spark_invoke(jobj, "getClass")
