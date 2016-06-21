@@ -106,6 +106,31 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
   sampled
 }
 
+#' Sort a Spark DataFrame
+#' 
+#' Sort a Spark DataFrame by one or more columns, with each column
+#' sorted in ascending order.
+#' 
+#' @param x An object coercable to a Spark DataFrame.
+#' @param columns The column(s) to sort by.
+#' 
+#' @export
+sdf_sort <- function(x, columns) {
+  df <- sparkapi_dataframe(x)
+  
+  columns <- as.character(columns)
+  n <- length(columns)
+  if (n == 0)
+    stop("must supply one or more column names")
+  
+  if (n == 1) {
+    sparkapi_invoke(df, "sort", columns, list())
+  } else {
+    sparkapi_invoke(df, "sort", columns[[1]], as.list(columns[-1]))
+  }
+  
+}
+
 #' Mutate a Spark DataFrame
 #'
 #' Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}

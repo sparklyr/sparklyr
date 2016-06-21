@@ -50,6 +50,11 @@ collect.tbl_spark <- function(x, ..., n = Inf) {
 }
 
 #' @export
+collect.sparkapi_jobj <- function(x, ...) {
+  spark_dataframe_collect(x)
+}
+
+#' @export
 sql_build.tbl_spark <- function(op, con, ...) {
   sql_build(op$ops, con, ...)
 }
