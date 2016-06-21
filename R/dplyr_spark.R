@@ -57,6 +57,7 @@ sparkapi_connection.spark_connection <- function(x, ...) {
   if (is.null(sconInst$sparkapi_connection)) {
     sconInst$sparkapi_connection <- sparkapi_connection_create(
       spark_context = sconInst$sc,
+      hive_context = NULL,
       backend = sconInst$backend, 
       monitor = sconInst$monitor)
     spark_connection_set_inst(x, sconInst)
