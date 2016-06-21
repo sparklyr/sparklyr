@@ -54,6 +54,7 @@ flights_tbl %>% filter(dep_delay == 2)
     ## Source:   query [?? x 16]
     ## Database: spark connection master=local app=sparklyr local=TRUE
     ## 
+    ## # S3: tbl_spark
     ##     year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
     ##    <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
     ## 1   2013     1     1      517         2      830        11      UA  N14228
@@ -66,9 +67,8 @@ flights_tbl %>% filter(dep_delay == 2)
     ## 8   2013     1     1     1028         2     1350        11      UA  N76508
     ## 9   2013     1     1     1042         2     1325        -1      B6  N529JB
     ## 10  2013     1     1     1231         2     1523        -6      UA  N402UA
-    ## ..   ...   ...   ...      ...       ...      ...       ...     ...     ...
-    ## Variables not shown: flight <int>, origin <chr>, dest <chr>, air_time
-    ##   <dbl>, distance <dbl>, hour <dbl>, minute <dbl>.
+    ## ... with more rows, and 7 more variables: flight <int>, origin <chr>,
+    ##   dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
@@ -105,6 +105,7 @@ batting_tbl %>%
     ## Database: spark connection master=local app=sparklyr local=TRUE
     ## Groups: playerID
     ## 
+    ## # S3: tbl_spark
     ##     playerID yearID teamID     G    AB     R     H
     ##        <chr>  <int>  <chr> <int> <int> <int> <int>
     ## 1  anderal01   1941    PIT    70   223    32    48
@@ -117,7 +118,7 @@ batting_tbl %>%
     ## 8  bedelho01   1968    PHI     9     7     0     1
     ## 9  biittla01   1977    CHN   138   493    74   147
     ## 10 biittla01   1975    MON   121   346    34   109
-    ## ..       ...    ...    ...   ...   ...   ...   ...
+    ## ... with more rows
 
 ML Functions
 ------------
@@ -168,10 +169,13 @@ Extensibility
 Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
 
 ``` r
+library(sparkapi)
+
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
-  spark_invoke(sc, "textFile", path, as.integer(1)) %>% 
-    spark_invoke("count")
+  sparkapi_spark_context(sc) %>% 
+    sparkapi_invoke("textFile", path, as.integer(1)) %>% 
+      sparkapi_invoke("count")
 }
 
 # write a CSV 
@@ -216,16 +220,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/20 16:32:14 INFO Executor: Finished task 0.0 in stage 67.0 (TID 465). 2082 bytes result sent to driver
-    ## 16/06/20 16:32:14 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 465) in 97 ms on localhost (1/1)
-    ## 16/06/20 16:32:14 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/06/20 16:32:14 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.098 s
-    ## 16/06/20 16:32:14 INFO BlockManagerInfo: Removed broadcast_90_piece0 on localhost:51958 in memory (size: 4.6 KB, free: 487.3 MB)
-    ## 16/06/20 16:32:14 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.100419 s
-    ## 16/06/20 16:32:14 INFO ContextCleaner: Cleaned accumulator 198
-    ## 16/06/20 16:32:14 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:51958 in memory (size: 8.5 KB, free: 487.3 MB)
-    ## 16/06/20 16:32:14 INFO ContextCleaner: Cleaned accumulator 197
-    ## 16/06/20 16:32:14 INFO ContextCleaner: Cleaned shuffle 20
+    ## 16/06/21 10:23:53 INFO BlockManagerInfo: Removed broadcast_90_piece0 on localhost:58376 in memory (size: 4.6 KB, free: 486.9 MB)
+    ## 16/06/21 10:23:53 INFO ContextCleaner: Cleaned accumulator 198
+    ## 16/06/21 10:23:53 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:58376 in memory (size: 8.5 KB, free: 486.9 MB)
+    ## 16/06/21 10:23:53 INFO ContextCleaner: Cleaned accumulator 197
+    ## 16/06/21 10:23:53 INFO ContextCleaner: Cleaned shuffle 20
+    ## 16/06/21 10:23:53 INFO Executor: Finished task 0.0 in stage 67.0 (TID 465). 2082 bytes result sent to driver
+    ## 16/06/21 10:23:53 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 465) in 95 ms on localhost (1/1)
+    ## 16/06/21 10:23:53 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/06/21 10:23:53 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.095 s
+    ## 16/06/21 10:23:53 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.097874 s
 
 Finally, we disconnect from Spark:
 
