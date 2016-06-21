@@ -1,10 +1,4 @@
-# Utilities for interacting with Spark DataFrames (sql.Dataset)s.
 
-#' Convert objects of various types to Spark DataFrames
-#'
-#' @param x An object
-#' @param ... Additional parameters.
-#' @export
 as_spark_dataframe <- function(x, ...) {
   UseMethod("as_spark_dataframe")
 }
