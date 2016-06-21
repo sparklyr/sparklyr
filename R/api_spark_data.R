@@ -33,7 +33,7 @@ spark_write_csv <- function(x, path) {
 }
 
 #' @export
-spark_write_csv.spark_connection <- function(x, path) {
+spark_write_csv.tbl_spark <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   spark_api_write_csv(sqlResult, path.expand(path))
 }
@@ -66,7 +66,7 @@ spark_write_parquet <- function(x, path) {
 }
 
 #' @export
-spark_write_parquet.spark_connection <- function(x, path) {
+spark_write_parquet.tbl_spark <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   spark_api_write_generic(sqlResult, path.expand(path), "parquet")
 }
@@ -99,7 +99,7 @@ spark_write_json <- function(x, path) {
 }
 
 #' @export
-spark_write_json.spark_connection <- function(x, path) {
+spark_write_json.tbl_spark <- function(x, path) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   spark_api_write_generic(sqlResult, path.expand(path), "json")
 }
