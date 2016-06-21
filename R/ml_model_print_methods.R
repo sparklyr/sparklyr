@@ -60,3 +60,14 @@ ml_model_print_coefficients <- function(model) {
   print(coef)
   invisible(coef)
 }
+
+ml_model_print_centers <- function(model) {
+  
+  centers <- model$centers
+  if (is.null(centers))
+    return()
+  
+  cat("Cluster centers:", sep = "\n")
+  print(model$centers)
+  
+}

@@ -73,6 +73,17 @@ print.ml_model_logistic_regression <- function(x, ...) {
 }
 
 #' @export
+summary.ml_model_logistic_regression <- function(object, ...) {
+  ml_model_print_call(object)
+  print_newline()
+  # ml_model_print_residuals(object)
+  # print_newline()
+  ml_model_print_coefficients(object)
+  print_newline()
+}
+
+
+#' @export
 residuals.ml_model_logistic_regression <- function(object, ...) {
   stop("residuals not yet available for Spark logistic regression")
 }

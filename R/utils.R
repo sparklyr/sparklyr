@@ -50,3 +50,7 @@ transpose_list <- function(list) {
 random_string <- function(prefix = "table") {
   basename(tempfile(prefix))
 }
+
+"%||%" <- function(x, y) {
+  if (is.null(x)) y else x
+}
