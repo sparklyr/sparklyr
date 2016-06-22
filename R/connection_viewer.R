@@ -67,18 +67,15 @@ connection_list_tables <- function(sc) {
 connection_list_columns <- function(sc, table) {
   dbi <- spark_connection_get_dbi(sc)
   if (!is.null(dbi)) {
-    sql <- paste("SELECT * FROM", table, "LIMIT 1")
+    sql <- paste("SELECT * FROM", table, "LIMIT 5")
     df <- dbGetQuery(dbi, sql)
     data.frame(
       name = names(df),
-      type = as.character(lapply(df, function(x) {
-        clz <- class(x)
-        switch(clz,
-               character = "chr",
-               integer = "int",
-               numeric = "num",
-               logical = "logi",
-               clz)
+      type = as.character(lapply(names(df), function(f) {
+        capture.output(str(df[[f]], 
+                           give.length = FALSE,
+                           width = 30,
+                           strict.width = "cut"))
       })),
       stringsAsFactors = FALSE
     )
