@@ -33,6 +33,7 @@ Other Spark ML routines: \code{\link{ml_decision_tree}},
   \code{\link{ml_kmeans}},
   \code{\link{ml_linear_regression}},
   \code{\link{ml_logistic_regression}},
-  \code{\link{ml_pca}}, \code{\link{ml_random_forest}}
+  \code{\link{ml_naive_bayes}}, \code{\link{ml_pca}},
+  \code{\link{ml_random_forest}}
 }
 
