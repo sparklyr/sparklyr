@@ -54,3 +54,7 @@ random_string <- function(prefix = "table") {
 "%||%" <- function(x, y) {
   if (is.null(x)) y else x
 }
+
+# place for us to store state
+.globals <- new.env(parent = emptyenv())
+

@@ -54,6 +54,10 @@ spark_available_versions <- function() {
 
 spark_versions <- function(latest = TRUE) {
 
+  # see if we have a cached version
+  if (exists("versionsDownloadData", envir = .globals))
+    return (.globals$versionsDownloadData)
+  
   # NOTE: this function is called during configure and the 'sparklyr' package
   # will not be available at that time; allow overriding with environment variable
   packagePathEnv <- Sys.getenv("R_SPARKLYR_INSTALL_INFO_PATH", unset = NA)
@@ -105,6 +109,9 @@ spark_versions <- function(latest = TRUE) {
     }
   )
 
+  # cache it before we return
+  assign("versionsDownloadData", mergedData, envir = .globals)
+  
   mergedData
 }
 
