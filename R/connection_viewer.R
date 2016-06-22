@@ -71,7 +71,15 @@ connection_list_columns <- function(sc, table) {
     df <- dbGetQuery(dbi, sql)
     data.frame(
       name = names(df),
-      type = as.character(lapply(df, class)),
+      type = as.character(lapply(df, function(x) {
+        clz <- class(x)
+        switch(clz,
+               character = "chr",
+               integer = "int",
+               numeric = "num",
+               logical = "logi",
+               clz)
+      })),
       stringsAsFactors = FALSE
     )
   } else {
