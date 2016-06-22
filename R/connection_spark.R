@@ -61,14 +61,6 @@ spark_connect <- function(master = "local",
     if (is.null(sparkHome)) {
       stop("Failed to launch in cluster mode, SPARK_HOME environment variable is not set.")
     }
-    
-    if (!is.null(version)) {
-      stop("version parameter is not supported when cluster configured in cluster mode")
-    }
-    
-    if (!is.null(hadoop_version)) {
-      stop("hadoop_version parameter is not supported when cluster configured in cluster mode")
-    }
   }
   
   scon <- list(

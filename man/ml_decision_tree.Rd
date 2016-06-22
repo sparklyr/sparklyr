@@ -37,6 +37,7 @@ Other Spark ML routines: \code{\link{ml_gradient_boosted_trees}},
   \code{\link{ml_logistic_regression}},
   \code{\link{ml_multilayer_perceptron}},
   \code{\link{ml_naive_bayes}}, \code{\link{ml_pca}},
-  \code{\link{ml_random_forest}}
+  \code{\link{ml_random_forest}},
+  \code{\link{ml_survival_regression}}
 }
 
