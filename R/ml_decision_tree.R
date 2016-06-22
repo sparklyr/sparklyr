@@ -1,6 +1,6 @@
-#' Spark ML -- Decission Tree
+#' Spark ML -- Decision Trees
 #'
-#' Perform regression or classification using decission trees.
+#' Perform regression or classification using decision trees.
 #'
 #' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
 #' @param response The name of the response vector.

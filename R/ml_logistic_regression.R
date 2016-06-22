@@ -2,7 +2,7 @@
 #'
 #' Perform logistic regression on a \code{spark_tbl}.
 #'
-#' @template ml-regression
+#' @template roxlate-ml-regression
 #'
 #' @family Spark ML routines
 #'

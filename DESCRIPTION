@@ -39,7 +39,7 @@ Collate:
     'dplyr_sql.R'
     'install_spark.R'
     'install_spark_versions.R'
-    'ml_decission_tree.R'
+    'ml_decision_tree.R'
     'ml_feature_transformation.R'
     'ml_gradient_boosted_tree.R'
     'ml_interface.R'

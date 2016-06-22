@@ -36,6 +36,19 @@ partition. This implies that partitioning a DataFrame with, for example,
 is not guaranteed to produce \code{training} and \code{test} partitions
 of equal size.
 }
+\section{Transforming Spark DataFrames}{
+
+
+The family of functions prefixed with \code{sdf_} generally
+access the Scala Spark DataFrame API directly, and return a
+lower-level Spark DataFrame object (represented in \R as a
+\code{sparkapi_jobj}). To bring these back to the \code{dplyr}
+world (in order to use, for example, \code{mutate}), you need
+to invoke \code{\link{sdf_register}()}. This gives the Spark
+DataFrame a table name in the associated Spark SQL context, and
+then returns a \code{tbl_spark} which you can then use with
+the \code{dplyr} interface.
+}
 \examples{
 \dontrun{
 # randomly partition data into a 'training' and 'test'
@@ -51,5 +64,9 @@ print(partitions)
 weights <- c(training = 0.6, test = 0.4)
 diamonds_tbl \%>\% sdf_partition(weights = weights)
 }
+}
+\seealso{
+Other Spark DataFrame functions: \code{\link{sdf_sample}},
+  \code{\link{sdf_sort}}
 }
 
