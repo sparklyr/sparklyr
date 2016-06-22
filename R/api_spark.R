@@ -66,7 +66,7 @@ spark_api_create_hive_context_v2 <- function(scon) {
 
   conf <- sparkapi_invoke(session, "conf")
 
-  params <- spark_config_params(scon$config, scon$isLocal, "spark.session.")
+  params <- spark_config_params(scon$config, spark_connection_is_local(scon), "spark.session.")
   lapply(names(params), function(paramName) {
     configValue <- params[[paramName]]
     if (is.logical(configValue)) {

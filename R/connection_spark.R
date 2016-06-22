@@ -71,8 +71,7 @@ spark_connect <- function(master = "local",
     master = master,
     appName = app_name,
     sparkVersion = version,
-    hadoopVersion = hadoop_version,
-    isLocal = spark_master_is_local(master),
+    hadoopVersion = hadoop_version,$i
     reconnect = FALSE,
     installInfo = installInfo,
     config = config
@@ -277,7 +276,7 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
   conf <- sparkapi_invoke(conf, "setMaster", master)
   conf <- sparkapi_invoke(conf, "setSparkHome", sparkHome)
 
-  params <- spark_config_params(scon$config, scon$isLocal, "spark.context.")
+  params <- spark_config_params(scon$config, spark_connection_is_local(scon), "spark.context.")
   lapply(names(params), function(paramName) {
     conf <<- sparkapi_invoke(conf, "set", paramName, params[[paramName]])
   })
@@ -302,10 +301,8 @@ spark_connection_app_name <- function(sc) {
 
 # TRUE if the Spark Connection is a local install
 spark_connection_is_local <- function(sc) {
-  sc$isLocal
-}
-
-spark_master_is_local <- function(master) {
+  master <- sc$master
+  
   grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
 }
 
