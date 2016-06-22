@@ -34,6 +34,27 @@ spark_install_find <- function(sparkVersion = NULL, hadoopVersion = NULL, instal
   spark_install_info(as.character(versions[1,]$spark), as.character(versions[1,]$hadoop))
 }
 
+# determine the version that will be used by default if version is NULL
+spark_default_version <- function() {
+  # if we have versions installed then use the same logic as spark_connect to figure out
+  # which version we will bind to when we pass version = NULL and hadoop_version = NULL
+  if (nrow(spark_installed_versions()) > 0) {
+    version <- spark_install_find(sparkVersion = NULL, hadoopVersion = NULL, installedOnly = TRUE, latest = FALSE)
+    spark <- version$sparkVersion
+    hadoop <- version$hadoopVersion
+  # otherwise check available versions and take the default
+  } else {
+    versions <- read_spark_versions_csv()
+    versions <- subset(versions, versions$default == TRUE & versions$hadoop_default == TRUE)
+    version <- versions[1,]
+    spark <- version$spark
+    hadoop <- version$hadoop
+  }
+    
+  list(spark = spark, 
+       hadoop = hadoop)
+}
+
 spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
   versionInfo <- spark_versions_info(sparkVersion, hadoopVersion)
 
