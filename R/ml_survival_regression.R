@@ -6,6 +6,7 @@
 #' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
 #' @param response The name of the response vector.
 #' @param features The names of features (terms) to use in the model.
+#' @param intercept Fit the model with an intercept term?
 #' @param censor The name of the vector that provides censoring information.
 #'   This should be a numeric vector, with 0 marking uncensored data, and
 #'   1 marking right-censored data.

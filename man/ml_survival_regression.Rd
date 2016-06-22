@@ -14,6 +14,8 @@ ml_survival_regression(x, response, features, intercept = TRUE,
 
 \item{features}{The names of features (terms) to use in the model.}
 
+\item{intercept}{Fit the model with an intercept term?}
+
 \item{censor}{The name of the vector that provides censoring information.
 This should be a numeric vector, with 0 marking uncensored data, and
 1 marking right-censored data.}
