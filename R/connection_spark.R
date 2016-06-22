@@ -31,9 +31,10 @@ spark_connect <- function(master = "local",
                           extensions = NULL,
                           config = spark_config()) {
   filter <- function(e) {
+    spark_connection_is_open(e) &&
     identical(e$master, master) &&
     identical(e$appName, app_name) &&
-    identical(e$sparkVersion, version)
+    identical(spark_connection_version(e), version)
   }
   
   sconFound <- spark_connection_find_scon(filter)
@@ -326,6 +327,10 @@ spark_connection_is_open <- function(sc) {
   }
 
   bothOpen
+}
+
+spark_connection_version <- function(sc) {
+  sparkapi_invoke(sparkapi_spark_context(sc), "version")
 }
 
 #' Closes all existing connections. Returns the total of connections closed.

@@ -28,8 +28,9 @@ spark_api_create_sql_context <- function(scon) {
 }
 
 is_spark_v2 <- function(scon) {
-  if (!is.null(scon$sparkVersion)) {
-    version <- sub("-preview", "", scon$sparkVersion)
+  sparkVersion <- spark_connection_version(scon)
+  if (!is.null(sparkVersion)) {
+    version <- sub("-preview", "", sparkVersion)
     compared <- utils::compareVersion(version, "2.0.0")
     compared != -1
   } else {
