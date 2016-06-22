@@ -53,11 +53,13 @@ spark_connect <- function(master = "local",
 
   sparkHome <- spark_home()
   if (spark_master_is_local(master)) {
-    installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
-    sparkHome <- installInfo$sparkVersionDir
+    if (is.null(sparkHome) || !is.null(version) || !is.null(hadoop_version)) {
+      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
+      sparkHome <- installInfo$sparkVersionDir
+    }
   } else {
     if (is.null(sparkHome)) {
-      stop("Failed to launch in cluster mode, spark_home environment variable is not set.")
+      stop("Failed to launch in cluster mode, SPARK_HOME environment variable is not set.")
     }
     
     if (!is.null(version)) {
