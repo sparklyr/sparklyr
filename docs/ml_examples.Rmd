@@ -132,6 +132,34 @@ model <- beaver_tbl %>%
 print(model)
 ```
 
+## Survival Regression in R
+
+```{r}
+library(survival)
+data(ovarian, package = "survival")
+
+fit <- survreg(
+  Surv(futime, fustat) ~ ecog.ps + rx,
+  data = ovarian,
+  dist = "weibull"
+)
+
+coefficients(fit)
+```
+
+## Survival Regression in Spark
+
+```{r}
+ovarian_tbl <- copy_to(sc, ovarian)
+fit <- ovarian_tbl %>%
+  ml_survival_regression(
+    response = "futime",
+    censor = "fustat",
+    features = c("ecog_ps", "rx")
+  )
+
+coefficients(fit)
+```
 
 ## Partitioning in R
 
