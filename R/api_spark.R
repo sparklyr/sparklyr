@@ -211,10 +211,15 @@ spark_api_data_frame <- function(api, sqlResult) {
 
   # If this is a resultset with no rows...
   if (rows == 0) {
+    # Remove invalid fields that have zero length
+    fields <- Filter(function(e) nchar(e$name) > 0, fields)
+    dfNames <- Filter(function(e) nchar(e) > 0, dfNames)
+    
     dfEmpty <- lapply(fields, function(field) {
       spark_api_data_frame_default_type(field)
     })
     names(dfEmpty) <- dfNames
+    
     df <- data.frame(dfEmpty, stringsAsFactors=FALSE)
   }
   else {
