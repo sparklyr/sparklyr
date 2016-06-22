@@ -60,7 +60,10 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
 }
 
 spark_home <- function() {
-  Sys.getenv("SPARK_HOME", unset = NULL)
+  home <- Sys.getenv("SPARK_HOME", unset = NA)
+  if (is.na(home))
+    home <- NULL
+  home
 }
 
 #' Download and install various versions of Spark
