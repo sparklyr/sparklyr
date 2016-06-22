@@ -31,7 +31,7 @@ name <- "sampled"  # name for temporary sampled table
 estimates <- replicate(n, simplify = "list", {
   diamonds_sdf %>%
     sdf_sample(replacement = TRUE) %>%       # take a random sample with replacement
-    sdf_register(name = name) %>%            # register our Spark DataFrame
+    sdf_register(name = name) %>%            # register our Spark DataFrame (bridge to dplyr)
     summarize(statistic = mean(depth)) %>%   # compute the mean
     collect() %>%                            # collect results back to R
     .[["statistic"]]                         # extract our statistic
