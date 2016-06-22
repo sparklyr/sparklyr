@@ -19,15 +19,15 @@ ml_survival_regression <- function(x,
                                    intercept = TRUE,
                                    censor = "censor")
 {
-  df <- sparkapi:::sparkapi_dataframe(x)
-  sc <- sparkapi:::sparkapi_connection(df)
+  df <- sparkapi_dataframe(x)
+  sc <- sparkapi_connection(df)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
   
   model <- "org.apache.spark.ml.regression.AFTSurvivalRegression"
   
-  rf <- sparkapi:::sparkapi_invoke_new(sc, model)
+  rf <- sparkapi_invoke_new(sc, model)
   
   fit <- rf %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
