@@ -257,6 +257,18 @@ mPredict <- predict(mDecisionTree, iris_tbl)
 head(mPredict)
 ```
 
+## Naive-Bayes with Spark
+
+```{r}
+mNaiveBayes <- iris_tbl %>%
+  ml_naive_bayes(
+    response = "Species",
+    features = c("Petal_Length", "Petal_Width")
+  )
+mPredict <- predict(mNaiveBayes, iris_tbl)
+head(mPredict)
+```
+
 ## Cleanup
 
 ```{r}
