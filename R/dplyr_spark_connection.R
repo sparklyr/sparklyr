@@ -78,30 +78,3 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
-
-#' @export
-sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ...) {
-  join <- switch(type,
-                 left = sql("LEFT"),
-                 inner = sql("INNER"),
-                 right = sql("RIGHT"),
-                 full = sql("FULL"),
-                 stop("Unknown join type:", type, call. = FALSE)
-  )
-  
-  using <- all(by$x == by$y)
-  
-  # Spark < 2.0 does not support "USING" keyword and therefore, we use custom implementation
-  # based on dplyrs sql_join
-  on <- sql_vector(paste0(sql_escape_ident(con, x), ".", sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, y), ".", sql_escape_ident(con, by$y)),
-                   collapse = " AND ", parens = TRUE)
-  cond <- build_sql("ON ", on, con = con)
-  
-  build_sql(
-    'SELECT * FROM ',x, "\n\n",
-    join, " JOIN\n\n" ,
-    y, "\n\n",
-    cond,
-    con = con
-  )
-}
