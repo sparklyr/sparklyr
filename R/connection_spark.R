@@ -52,7 +52,7 @@ spark_connect <- function(master = "local",
   sparkapi_unknown_error_handler(read_spark_log_error)
 
   sparkHome <- spark_home()
-  if (spark_connection_is_local(master)) {
+  if (spark_master_is_local(master)) {
     installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
     sparkHome <- installInfo$sparkVersionDir
   } else {
@@ -298,9 +298,7 @@ spark_connection_app_name <- function(sc) {
 }
 
 # TRUE if the Spark Connection is a local install
-spark_connection_is_local <- function(sc) {
-  master <- sc$master
-  
+spark_master_is_local <- function(master) {
   grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
 }
 
