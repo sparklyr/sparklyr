@@ -2,7 +2,7 @@
 #'
 #' Perform linear regression on a Spark DataFrame.
 #'
-#' @template ml-regression
+#' @template roxlate-ml-regression
 #'
 #' @family Spark ML routines
 #'

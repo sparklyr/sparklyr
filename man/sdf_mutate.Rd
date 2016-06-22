@@ -42,6 +42,19 @@ Overall, this implies that if you wish to mix a \code{dplyr} pipeline with \code
 you should generally apply your \code{dplyr} pipeline first, then finalize your output with
 \code{sdf_mutate}. See \strong{Examples} for an example of how this might be done.
 }
+\section{Transforming Spark DataFrames}{
+
+
+The family of functions prefixed with \code{sdf_} generally
+access the Scala Spark DataFrame API directly, and return a
+lower-level Spark DataFrame object (represented in \R as a
+\code{sparkapi_jobj}). To bring these back to the \code{dplyr}
+world (in order to use, for example, \code{mutate}), you need
+to invoke \code{\link{sdf_register}()}. This gives the Spark
+DataFrame a table name in the associated Spark SQL context, and
+then returns a \code{tbl_spark} which you can then use with
+the \code{dplyr} interface.
+}
 \examples{
 \dontrun{
 # using the 'beaver1' dataset, binarize the 'temp' column
