@@ -42,7 +42,10 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
   packageRemotePath <- versionInfo$packageRemotePath
 
   sparkDir <- spark_install_dir()
-  sparkVersionDir <- getOption("spark_home", file.path(sparkDir, componentName))
+  
+  sparkVersionDir <- spark_home()
+  if (is.null(sparkVersionDir))
+    sparkVersionDir <- file.path(sparkDir, componentName)
 
   list (
     sparkDir = sparkDir,
@@ -54,6 +57,10 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
     hadoopVersion = hadoopVersion,
     installed = file.exists(sparkVersionDir)
   )
+}
+
+spark_home <- function() {
+  Sys.getenv("SPARK_HOME", unset = NULL)
 }
 
 #' Download and install various versions of Spark
