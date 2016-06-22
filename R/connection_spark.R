@@ -72,7 +72,7 @@ spark_connect <- function(master = "local",
   packages <- config[["sparklyr.defaultPackages"]]
   
   # call extensions to get additional jars and packages
-  dependencies <- resolve_extensions(extensions, sparkVersion, hadoopVersion, config)
+  dependencies <- resolve_extensions(extensions, config)
   jars <- c(jars, dependencies$jars)
   packages <- c(packages, dependencies$packages)
   
@@ -109,7 +109,7 @@ spark_connect <- function(master = "local",
   scon
 }
 
-resolve_extensions <- function(extensions, spark_version, hadoop_version, config) {
+resolve_extensions <- function(extensions, config) {
   sparkapi_dependencies_from_extensions(config, extensions)
 }
 
