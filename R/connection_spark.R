@@ -65,13 +65,11 @@ spark_connect <- function(master = "local",
   
   installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
   sparkVersion <- installInfo$sparkVersion
-  hadoopVersion <- installInfo$hadoopVersion
 
   scon <- list(
     master = master,
     appName = app_name,
     sparkVersion = version,
-    hadoopVersion = hadoop_version,
     installInfo = installInfo,
     config = config
   )
