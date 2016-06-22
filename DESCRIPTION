@@ -54,6 +54,7 @@ Collate:
     'ml_random_forest.R'
     'ml_survival_regression.R'
     'ml_utils.R'
+    'reexports.R'
     'shell_spark.R'
     'spark_data_frame.R'
     'utils.R'
