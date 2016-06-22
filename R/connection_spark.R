@@ -72,13 +72,11 @@ spark_connect <- function(master = "local",
     appName = app_name,
     sparkVersion = version,
     hadoopVersion = hadoop_version,
-    reconnect = FALSE,
     installInfo = installInfo,
     config = config
   )
   scon <- structure(scon, class = c("sparklyr_connection", "sparkapi_connection"))
 
-  
   # determine jars and packages
   jars <- spark_default_jars()
   packages <- config[["sparklyr.defaultPackages"]]
