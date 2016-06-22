@@ -69,7 +69,7 @@ spark_connect <- function(master = "local",
   scon <- list(
     master = master,
     appName = app_name,
-    installInfo = installInfo,
+    sparkHome = installInfo$sparkVersionDir,
     config = config
   )
   scon <- structure(scon, class = c("sparklyr_connection", "sparkapi_connection"))
@@ -129,7 +129,7 @@ spark_connection_attach_context <- function(sc, sconInst) {
   if (scon$master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
 
-  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$installInfo$sparkVersionDir)
+  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$sparkHome)
   if (identical(sconInst$sc, NULL)) {
     stop("Failed to create Spark context")
   }

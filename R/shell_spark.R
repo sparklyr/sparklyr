@@ -1,6 +1,6 @@
 
 start_shell <- function(scon, sconInst, jars, packages) {
-  sparkHome <- scon$installInfo$sparkVersionDir
+  sparkHome <- scon$sparkHome
   if (!dir.exists(sparkHome)) {
     stop("Spark installation was not found. See spark_install.")
   }
