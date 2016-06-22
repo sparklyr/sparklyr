@@ -32,9 +32,7 @@ spark_connect <- function(master = "local",
                           config = spark_config()) {
   filter <- function(e) {
     spark_connection_is_open(e) &&
-    identical(e$master, master) &&
-    identical(e$appName, app_name) &&
-    identical(spark_connection_version(e), version)
+    identical(e$master, master)
   }
   
   sconFound <- spark_connection_find_scon(filter)
