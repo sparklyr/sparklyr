@@ -298,6 +298,10 @@ spark_connection_app_name <- function(sc) {
 }
 
 # TRUE if the Spark Connection is a local install
+spark_connection_is_local <- function(sc) {
+  spark_master_is_local(sc$master)
+}
+
 spark_master_is_local <- function(master) {
   grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
 }
