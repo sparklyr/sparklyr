@@ -50,6 +50,19 @@ spark_connect <- function(master = "local",
   # attach unknown error handler
   sparkapi_unknown_error_handler(read_spark_log_error)
 
+  # is it local or cluster?
+  #  "local" vs. "spark://"
+  
+  # if it's cluster then:
+  #   spark_home() must exist (ERROR!)
+  #   ignore version and hadoop_version (ERROR! if they are passed)
+  
+  # we never call spark_install_find for cluster mode, which means that
+  # we don't have installInfo or sparkVersion or hadoopVersion in cluster
+  # mode -- do we need these and where can we get them?
+  
+  # all we have from installInfo is sparkVersionDir
+  
   installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
   sparkVersion <- installInfo$sparkVersion
   hadoopVersion <- installInfo$hadoopVersion
