@@ -39,7 +39,6 @@ spark_connection_add_inst <- function(scon, sconInst) {
   instances[[scon$sconRef]] <- list(
     master = scon$master,
     appName = scon$appName,
-    version = scon$sparkVersion,
     scon = scon,
     sconInst = sconInst
   )
