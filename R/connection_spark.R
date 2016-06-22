@@ -51,25 +51,28 @@ spark_connect <- function(master = "local",
   # attach unknown error handler
   sparkapi_unknown_error_handler(read_spark_log_error)
 
-  # is it local or cluster?
-  #  "local" vs. "spark://"
+  sparkHome <- spark_home()
+  if (spark_connection_is_local(master)) {
+    installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
+    sparkHome <- installInfo$sparkVersionDir
+  } else {
+    if (is.null(sparkHome)) {
+      stop("Failed to launch in cluster mode, spark_home environment variable is not set.")
+    }
+    
+    if (!is.null(version)) {
+      stop("version parameter is not supported when cluster configured in cluster mode")
+    }
+    
+    if (!is.null(hadoop_version)) {
+      stop("hadoop_version parameter is not supported when cluster configured in cluster mode")
+    }
+  }
   
-  # if it's cluster then:
-  #   spark_home() must exist (ERROR!)
-  #   ignore version and hadoop_version (ERROR! if they are passed)
-  
-  # we never call spark_install_find for cluster mode, which means that
-  # we don't have installInfo or sparkVersion or hadoopVersion in cluster
-  # mode -- do we need these and where can we get them?
-  
-  # all we have from installInfo is sparkVersionDir
-  
-  installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
-
   scon <- list(
     master = master,
     appName = app_name,
-    sparkHome = installInfo$sparkVersionDir,
+    sparkHome = sparkHome,
     config = config
   )
   scon <- structure(scon, class = c("sparklyr_connection", "sparkapi_connection"))
