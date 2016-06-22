@@ -39,8 +39,8 @@ ml_logistic_regression <- function(x,
     sparkapi_invoke("toArray")
   names(coefficients) <- features
 
-  has_intercept <- sparkapi_invoke(fit, "getFitIntercept")
-  if (has_intercept) {
+  hasIntercept <- sparkapi_invoke(fit, "getFitIntercept")
+  if (hasIntercept) {
     intercept <- sparkapi_invoke(fit, "intercept")
     coefficients <- c(coefficients, intercept)
     names(coefficients) <- c(features, "(Intercept)")
@@ -49,6 +49,8 @@ ml_logistic_regression <- function(x,
   summary <- sparkapi_invoke(fit, "summary")
   areaUnderROC <- sparkapi_invoke(summary, "areaUnderROC")
   roc <- spark_dataframe_collect(sparkapi_invoke(summary, "roc"))
+  
+  coefficients <- intercept_first(coefficients)
 
   ml_model("logistic_regression", fit,
            features = features,

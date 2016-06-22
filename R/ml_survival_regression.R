@@ -41,12 +41,14 @@ ml_survival_regression <- function(x,
     sparkapi_invoke("toArray")
   names(coefficients) <- features
   
-  has_intercept <- sparkapi_invoke(fit, "getFitIntercept")
-  if (has_intercept) {
+  hasIntercept <- sparkapi_invoke(fit, "getFitIntercept")
+  if (hasIntercept) {
     intercept <- sparkapi_invoke(fit, "intercept")
     coefficients <- c(coefficients, intercept)
     names(coefficients) <- c(features, "(Intercept)")
   }
+  
+  coefficients <- intercept_first(coefficients)
   
   ml_model("survival_regression", fit,
            features = features,

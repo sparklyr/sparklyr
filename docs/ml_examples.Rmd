@@ -8,7 +8,7 @@ output:
 
 ## Initialization
 
-```{r setup}
+```{r setup, results="hide"}
 library(sparklyr)
 library(dplyr)
 library(ggplot2)
@@ -150,7 +150,7 @@ coefficients(fit)
 ## Survival Regression in Spark
 
 ```{r}
-ovarian_tbl <- copy_to(sc, ovarian)
+ovarian_tbl <- copy_to(sc, ovarian, overwrite = TRUE)
 fit <- ovarian_tbl %>%
   ml_survival_regression(
     response = "futime",

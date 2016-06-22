@@ -6,9 +6,8 @@ Initialization
 
 ``` r
 library(sparklyr)
+library(dplyr)
 ```
-
-    ## Loading required package: dplyr
 
     ## 
     ## Attaching package: 'dplyr'
@@ -24,30 +23,8 @@ library(sparklyr)
 ``` r
 library(ggplot2)
 
-sc <- spark_connect("local", version = "2.0.0-preview")
-
-copy_to(sc, iris, "iris")
-```
-
-    ## Source:   query [?? x 5]
-    ## Database: spark connection master=local app=sparklyr local=TRUE
-    ## 
-    ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
-    ##           <dbl>       <dbl>        <dbl>       <dbl>   <chr>
-    ## 1           5.1         3.5          1.4         0.2  setosa
-    ## 2           4.9         3.0          1.4         0.2  setosa
-    ## 3           4.7         3.2          1.3         0.2  setosa
-    ## 4           4.6         3.1          1.5         0.2  setosa
-    ## 5           5.0         3.6          1.4         0.2  setosa
-    ## 6           5.4         3.9          1.7         0.4  setosa
-    ## 7           4.6         3.4          1.4         0.3  setosa
-    ## 8           5.0         3.4          1.5         0.2  setosa
-    ## 9           4.4         2.9          1.4         0.2  setosa
-    ## 10          4.9         3.1          1.5         0.1  setosa
-    ## ..          ...         ...          ...         ...     ...
-
-``` r
-iris_tbl <- tbl(sc, "iris")
+sc <- spark_connect("local", version = "1.6.1")
+iris_tbl <- copy_to(sc, iris, "iris", overwrite = TRUE)
 ```
 
 KMeans in R
@@ -67,7 +44,7 @@ iris %>%
     geom_point(data = iris, aes(Petal.Width, Petal.Length), size = 2, alpha = 0.5)
 ```
 
-![](ml_examples_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
 KMeans in Spark
 ---------------
@@ -89,7 +66,7 @@ iris_tbl %>%
     geom_point(aes(Petal_Width, Petal_Length), size = 2, alpha = 0.5)
 ```
 
-![](ml_examples_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-2-1.png)
 
 Linear Regression in R
 ----------------------
@@ -106,7 +83,7 @@ iris %>%
                     color = "red"))
 ```
 
-![](ml_examples_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-3-1.png)
 
 Linear Regression in Spark
 --------------------------
@@ -126,7 +103,7 @@ iris_tbl %>%
                     color = "red"))
 ```
 
-![](ml_examples_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 Logistic Regression in R
 ------------------------
@@ -175,34 +152,13 @@ ggplot(beaver, aes(x = temp, y = activ)) +
   )
 ```
 
-![](ml_examples_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
 Logistic Regression in Spark
 ----------------------------
 
 ``` r
-copy_to(sc, beaver, "beaver")
-```
-
-    ## Source:   query [?? x 4]
-    ## Database: spark connection master=local app=sparklyr local=TRUE
-    ## 
-    ##      day  time  temp      activ
-    ##    <dbl> <dbl> <dbl>      <chr>
-    ## 1    307   930 36.58 Non-Active
-    ## 2    307   940 36.73 Non-Active
-    ## 3    307   950 36.93 Non-Active
-    ## 4    307  1000 37.15 Non-Active
-    ## 5    307  1010 37.23 Non-Active
-    ## 6    307  1020 37.24 Non-Active
-    ## 7    307  1030 37.24 Non-Active
-    ## 8    307  1040 36.90 Non-Active
-    ## 9    307  1050 36.95 Non-Active
-    ## 10   307  1100 36.89 Non-Active
-    ## ..   ...   ...   ...        ...
-
-``` r
-beaver_tbl <- tbl(sc, "beaver")
+beaver_tbl <- copy_to(sc, beaver, "beaver", overwrite = TRUE)
 
 model <- beaver_tbl %>%
   mutate(response = as.numeric(activ == "Active")) %>%
@@ -214,8 +170,45 @@ print(model)
     ## Call: response ~ temp
     ## 
     ## Coefficients:
-    ##        temp (Intercept) 
-    ##    14.69184  -550.52331
+    ## (Intercept)        temp 
+    ##  -550.52331    14.69184
+
+Survival Regression in R
+------------------------
+
+``` r
+library(survival)
+data(ovarian, package = "survival")
+
+fit <- survreg(
+  Surv(futime, fustat) ~ ecog.ps + rx,
+  data = ovarian,
+  dist = "weibull"
+)
+
+coefficients(fit)
+```
+
+    ## (Intercept)     ecog.ps          rx 
+    ##   6.8966931  -0.3850425   0.5286455
+
+Survival Regression in Spark
+----------------------------
+
+``` r
+ovarian_tbl <- copy_to(sc, ovarian, overwrite = TRUE)
+fit <- ovarian_tbl %>%
+  ml_survival_regression(
+    response = "futime",
+    censor = "fustat",
+    features = c("ecog_ps", "rx")
+  )
+
+coefficients(fit)
+```
+
+    ## (Intercept)     ecog_ps          rx 
+    ##   6.8966932  -0.3850426   0.5286455
 
 Partitioning in R
 -----------------
@@ -302,8 +295,7 @@ print(model)
 ```
 
     ## Explained variance:
-    ##         PC1         PC2         PC3         PC4 
-    ## 0.924618723 0.053066483 0.017102610 0.005212184 
+    ## [not available in this version of Spark]
     ## 
     ## Rotation:
     ##                      PC1         PC2         PC3        PC4
@@ -355,6 +347,7 @@ Using the model to predict the same data it was trained on is certainly not best
 
 ``` r
 df <- as.data.frame(table(x = rPredict, y = mPredict), stringsAsFactors = FALSE)
+
 ggplot(df) +
   geom_raster(aes(x, y, fill = Freq)) +
   geom_text(aes(x, y, label = Freq), col = "#222222", size = 6, nudge_x = 0.005, nudge_y = -0.005) +
@@ -362,11 +355,10 @@ ggplot(df) +
   labs(
     x = "R-predicted Species",
     y = "Spark-predicted Species",
-    title = "Random Forest Classification — Comparing R and Spark"
-  )
+    title = "Random Forest Classification — Comparing R and Spark")
 ```
 
-![](ml_examples_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-15-1.png)
 
 Neural Networks with R
 ----------------------
@@ -411,7 +403,40 @@ net.xor <- neuralnet( XOR~Var1+Var2, xor.data, hidden = 2, rep = 5)
 plot(net.xor, rep="best")
 ```
 
-![](ml_examples_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](ml_examples_files/figure-markdown_github/unnamed-chunk-16-1.png)
+
+Decision Tree with Spark
+------------------------
+
+``` r
+mDecisionTree <- iris_tbl %>%
+  ml_decision_tree(
+    response = "Species",
+    features = c("Petal_Length", "Petal_Width"),
+    max.bins = 32L,
+    max.depth = 5L
+  )
+mPredict <- predict(mDecisionTree, iris_tbl)
+head(mPredict)
+```
+
+    ## [1] "setosa" "setosa" "setosa" "setosa" "setosa" "setosa"
+
+Naive-Bayes with Spark
+----------------------
+
+``` r
+mNaiveBayes <- iris_tbl %>%
+  ml_naive_bayes(
+    response = "Species",
+    features = c("Petal_Length", "Petal_Width")
+  )
+mPredict <- predict(mNaiveBayes, iris_tbl)
+head(mPredict)
+```
+
+    ## [1] "setosa"     "setosa"     "setosa"     "setosa"     "setosa"    
+    ## [6] "versicolor"
 
 Cleanup
 -------

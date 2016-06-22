@@ -73,3 +73,19 @@ residuals.ml_model <- function(object, ...) {
     sparkapi_invoke("residuals") %>%
     spark_dataframe_read_column("residuals")
 }
+
+reorder_first <- function(vector, name) {
+  if (is.null(vector))
+    return(vector)
+  
+  nm <- names(vector)
+  if (is.null(nm) || !name %in% nm)
+    return(vector)
+  
+  ordered <- c(name, base::setdiff(nm, name)) 
+  vector[ordered]
+}
+
+intercept_first <- function(vector) {
+  reorder_first(vector, "(Intercept)")
+}

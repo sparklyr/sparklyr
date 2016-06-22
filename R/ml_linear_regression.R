@@ -39,8 +39,8 @@ ml_linear_regression <- function(x,
     sparkapi_invoke("toArray")
   names(coefficients) <- features
 
-  has_intercept <- sparkapi_invoke(fit, "getFitIntercept")
-  if (has_intercept) {
+  hasIntercept <- sparkapi_invoke(fit, "getFitIntercept")
+  if (hasIntercept) {
     intercept <- sparkapi_invoke(fit, "intercept")
     coefficients <- c(coefficients, intercept)
     names(coefficients) <- c(features, "(Intercept)")
@@ -55,6 +55,16 @@ ml_linear_regression <- function(x,
   tvalues <- try_null(sparkapi_invoke(summary, "tValues"))
   if (!is.null(tvalues))
     names(tvalues) <- names(coefficients)
+  
+  pvalues <- try_null(as.numeric(sparkapi_invoke(summary, "pValues")))
+  if (!is.null(pvalues))
+    names(pvalues) <- names(coefficients)
+  
+  # reorder coefficient names to place intercept first if available
+  coefficients <- intercept_first(coefficients)
+  errors <- intercept_first(errors)
+  tvalues <- intercept_first(tvalues)
+  pvalues <- intercept_first(pvalues)
 
   ml_model("linear_regression", fit,
            features = features,
@@ -62,7 +72,7 @@ ml_linear_regression <- function(x,
            coefficients = coefficients,
            standard.errors = errors,
            t.values = tvalues,
-           p.values = try_null(as.numeric(sparkapi_invoke(summary, "pValues"))),
+           p.values = pvalues,
            explained.variance = sparkapi_invoke(summary, "explainedVariance"),
            mean.absolute.error = sparkapi_invoke(summary, "meanAbsoluteError"),
            mean.squared.error = sparkapi_invoke(summary, "meanSquaredError"),
