@@ -30,6 +30,15 @@ spark_connect <- function(master = "local",
                           hadoop_version = NULL,
                           extensions = NULL,
                           config = spark_config()) {
+  
+  # master can be missing if it's specified in the config file
+  if (missing(master)) {
+    master <- config$spark.master
+    if (is.null(master))
+      stop("You must either pass a value for master or include a spark.master ",
+           "entry in your config.yml")
+  }
+  
   filter <- function(e) {
     spark_connection_is_open(e) &&
     identical(e$master, master)
