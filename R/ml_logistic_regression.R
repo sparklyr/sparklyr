@@ -32,7 +32,7 @@ ml_logistic_regression <- function(x,
     sparkapi_invoke("setLabelCol", envir$response) %>%
     sparkapi_invoke("setFitIntercept", as.logical(intercept)) %>%
     sparkapi_invoke("setElasticNetParam", as.double(alpha)) %>%
-    sparkapi_invoke("setRegParam", as.double(lambda)) %>%
+    sparkapi_invoke("setRegParam", as.double(lambda))
   
   if (only_model) return(model)  
   
