@@ -9,7 +9,7 @@ output:
 A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(warning = FALSE, cache = FALSE, fig.path='res/')
+knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
 library(sparklyr)
 library(dplyr)
 library(ggplot2)
