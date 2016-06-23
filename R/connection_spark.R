@@ -84,8 +84,15 @@ spark_connect <- function(master = "local",
   
   scon <- spark_connection_add_inst(scon, sconInst)
 
+  # start with library(sparklyr)
+  libs <- "library(sparklyr)"
+  
+  # check for dplyr on search path
+  if ("package:dplyr" %in% search())
+    libs <- paste(libs, "library(dplyr)", sep = "\n")
+  
   parentCall <- match.call()
-  sconInst$connectCall <- paste("library(sparklyr)",
+  sconInst$connectCall <- paste(libs,
                                 paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
                                 sep = "\n")
   sconInst$onReconnect = list()
