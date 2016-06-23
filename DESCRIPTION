@@ -1,6 +1,6 @@
 Package: sparklyr
 Type: Package
-Title: Provides an R Interface to Apache Spark
+Title: R Interface to Apache Spark
 Version: 0.2.5
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
@@ -9,11 +9,10 @@ Authors@R: c(
     person(family = "RStudio", role = c("cph")),
     person(family = "The Apache Software Foundation", role = c("aut", "cph"))
     )
-Date: 2016-05-17
 Maintainer: Javier Luraschi <javier@rstudio.com>
-Description: Provision, connect and interface to Apache Spark from within the
-    R language and echosystem. This package supports connecting to local and remote
-    Apache Spark clusters and provides support for R packages like dplyr and DBI.
+Description: Provision, connect and interface to Apache Spark from within R. This
+    package supports connecting to local and remote Apache Spark clusters, provides
+    a dplyr-compatible back-end, and provides an interface to Spark MLlib.
 License: file LICENSE
 LazyData: TRUE
 RoxygenNote: 5.0.1
@@ -76,7 +75,4 @@ Remotes:
     rstudio/sparkapi
 Suggests:
     testthat,
-    reshape2,
-    RCurl,
-    glmnet,
-    neuralnet
+    RCurl
