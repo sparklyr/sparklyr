@@ -69,6 +69,7 @@ Imports:
     rappdirs,
     lazyeval,
     config,
+    digest,
     sparkapi
 Remotes: 
     hadley/dplyr,
