@@ -19,14 +19,12 @@ sdf_import(x, sc, ...)
 \description{
 Copy an object into Spark, and return a Spark DataFrame.
 }
-\details{
-\code{sdf_copy_to} is an S3 generic that, by default, dispatches to
-\code{sdf_import}, itself also an S3 generic, but parameterized on the data
-type rather than the connection type. If you'd like to implement
-\code{sdf_copy_to} for a custom object type, you can accomplish this by
-implementing the associated method on \code{sdf_import}.
+\section{Advanced Usage}{
 
-A method for copying \R \code{data.frame}s to Spark is provided;
-alternate methods can be provided by implementing the appropriate
+
+\code{sdf_copy_to} is an S3 generic that, by default, dispatches to 
+\code{sdf_import}. Package authors that would like to implement
+\code{sdf_copy_to} for a custom object type can accomplish this by 
+implementing the associated method on \code{sdf_import}.
 }
 
