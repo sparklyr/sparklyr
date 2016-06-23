@@ -297,6 +297,22 @@ mPredict <- predict(mNaiveBayes, iris_tbl)
 head(mPredict)
 ```
 
+## One vs Rest in Spark
+
+```{r}
+beaver_tbl <- copy_to(sc, beaver, "beaver", overwrite = TRUE)
+
+classifier <- beaver_tbl %>%
+  mutate(response = as.numeric(activ == "Active")) %>%
+  ml_logistic_regression(response = "response", features = "temp", only_model = TRUE)
+
+model <- beaver_tbl %>%
+  mutate(response = as.numeric(activ == "Active")) %>%
+  ml_one_vs_rest(classifier = classifier, response = "response", features = "temp")
+
+print(model)
+```
+
 ## Cleanup
 
 ```{r}
