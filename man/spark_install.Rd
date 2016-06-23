@@ -6,10 +6,13 @@
 \alias{spark_install_dir}
 \alias{spark_install_tar}
 \alias{spark_installed_versions}
+\alias{spark_uninstall}
 \title{Download and install various versions of Spark}
 \usage{
 spark_install(version = NULL, hadoop_version = NULL, reset = FALSE,
   logging = "INFO", verbose = interactive())
+
+spark_uninstall(version, hadoop_version)
 
 spark_install_dir()
 

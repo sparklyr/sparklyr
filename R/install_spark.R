@@ -169,6 +169,21 @@ spark_install <- function(version = NULL,
 
 #' @rdname spark_install
 #' @export
+spark_uninstall <- function(version, hadoop_version) {
+  info <- spark_versions_info(version, hadoop_version)
+  sparkDir <- file.path(spark_install_dir(), info$componentName)
+  if (dir.exists(sparkDir)) {
+    unlink(sparkDir, recursive = TRUE)
+    message(info$componentName, " successfully uninstalled.")
+    invisible(TRUE)
+  } else {
+    message(info$componentName, " not found (no uninstall performed)")
+    invisible(FALSE)
+  }
+}
+
+#' @rdname spark_install
+#' @export
 spark_install_dir <- function() {
   getOption("spark.install.dir", rappdirs::app_dir("spark", "rstudio")$cache())
 }
