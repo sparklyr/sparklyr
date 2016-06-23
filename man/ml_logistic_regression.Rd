@@ -20,6 +20,8 @@ for the response.}
 \item{alpha, lambda}{Parameters controlling loss function penalization (for e.g.
 lasso, elastic net, and ridge regression). See \strong{Details} for more
 information.}
+
+\item{only_model}{Return the model without fitting it.}
 }
 \description{
 Perform logistic regression on a \code{spark_tbl}.

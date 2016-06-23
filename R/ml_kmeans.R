@@ -69,6 +69,7 @@ print.ml_model_kmeans <- function(x, ...) {
 }
 
 #' @export
+#' @importFrom stats predict
 fitted.ml_model_kmeans <- function(object, ...) {
   predict(object)
 }

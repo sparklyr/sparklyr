@@ -4,6 +4,8 @@
 #'
 #' @template roxlate-ml-regression
 #'
+#' @param only_model Return the model without fitting it.
+#'
 #' @family Spark ML routines
 #'
 #' @export
