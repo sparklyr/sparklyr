@@ -10,11 +10,7 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
     baseConfig <- config::get(file = localConfigFile)
   }
 
-  userConfig <- list()
-  tryCatch(function() {
-    userConfig <- config::get(file = file)
-  }, error = function(e) {
-  })
+  userConfig <- tryCatch(config::get(file = file), error = function(e) NULL)
 
   mergedConfig <- merge_lists(baseConfig, userConfig)
   mergedConfig
