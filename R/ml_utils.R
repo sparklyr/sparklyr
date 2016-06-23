@@ -89,3 +89,16 @@ reorder_first <- function(vector, name) {
 intercept_first <- function(vector) {
   reorder_first(vector, "(Intercept)")
 }
+
+read_spark_vector <- function(jobj, field) {
+  object <- sparkapi_invoke(jobj, field)
+  sparkapi_invoke(object, "toArray")
+}
+
+read_spark_matrix <- function(jobj, field) {
+  object <- sparkapi_invoke(jobj, field)
+  nrow <- sparkapi_invoke(object, "numRows")
+  ncol <- sparkapi_invoke(object, "numCols")
+  data <- sparkapi_invoke(object, "toArray")
+  matrix(data, nrow = nrow, ncol = ncol)
+}

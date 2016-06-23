@@ -44,6 +44,7 @@ Collate:
     'ml_gradient_boosted_tree.R'
     'ml_interface.R'
     'ml_kmeans.R'
+    'ml_lda.R'
     'ml_linear_regression.R'
     'ml_logistic_regression.R'
     'ml_model_print_methods.R'
