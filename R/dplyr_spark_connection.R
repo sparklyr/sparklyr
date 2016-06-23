@@ -15,7 +15,8 @@ sql_translate_env.DBISparkConnection <- function(con) {
 
     aggregate = dplyr::sql_translator(
       .parent = dplyr::base_agg,
-      n = function() dplyr::sql("count(*)")
+      n = function() dplyr::sql("count(*)"),
+      count = function() dplyr::sql("count(*)")
     ),
 
     window = dplyr::sql_translator(
