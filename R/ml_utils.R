@@ -46,12 +46,8 @@ try_null <- function(expr) {
 
 #' @export
 predict.ml_model <- function(object, newdata, ...) {
-  if (missing(newdata) || is.null(newdata))
-    newdata <- object$data
-  sdf <- sparkapi_dataframe(newdata)
   params <- object$model.parameters
-  assembled <- ft_vector_assembler(sdf, object$features, params$features)
-  predicted <- sparkapi_invoke(object$.model, "transform", assembled)
+  predicted <- sdf_predict(object, newdata, ...)
   column <- spark_dataframe_read_column(predicted, "prediction")
   if (is.character(params$labels) && is.numeric(column))
     column <- params$labels[column + 1]

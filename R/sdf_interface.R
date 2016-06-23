@@ -372,3 +372,21 @@ sdf_mutate_ <- function(.data, ..., .dots) {
   # return mutated dataset
   data
 }
+
+#' Model Predictions with Spark DataFrames
+#' 
+#' Give a \code{ml_model} fit alongside a new data set, produce a new Spark
+#' DataFrame with predicted values encoded in the \code{"prediction"} column.
+#' 
+#' @param object,newdata An object coercable to a Spark DataFrame.
+#' @param ... Optional arguments; currently unused.
+#' 
+#' @export
+sdf_predict <- function(object, newdata, ...) {
+  if (missing(newdata) || is.null(newdata))
+    newdata <- object$data
+  sdf <- sparkapi_dataframe(newdata)
+  params <- object$model.parameters
+  assembled <- ft_vector_assembler(sdf, object$features, params$features)
+  sparkapi_invoke(object$.model, "transform", assembled)
+}
