@@ -26,7 +26,7 @@ sd_section("dplyr Interface",
              "tbl_uncache")
 )
 
-sd_section("MLlib Interface",
+sd_section("MLlib Algorithms",
            "Functions for invoking MLlib algorithms.",
            c("ml_kmeans",
              "ml_linear_regression",
@@ -37,17 +37,14 @@ sd_section("MLlib Interface",
              "ml_gradient_boosted_trees",
              "ml_pca",
              "ml_naive_bayes",
-             "ml_multilayer_perceptron")
+             "ml_multilayer_perceptron",
+             "ml_lda",
+             "ml_one_vs_rest")
 )
 
-sd_section("MLlib Feature Transformation",
+sd_section("MLlib Feature Transformers",
            "Functions for transforming features in Spark DataFrames",
-           c("sdf_partition",
-             "sdf_mutate",
-             "sdf_sample",
-             "sdf_sort",
-             "sdf_register",
-             "ft_binarizer",
+           c("ft_binarizer",
              "ft_bucketizer",
              "ft_discrete_cosine_transform",
              "ft_elementwise_product",
@@ -57,6 +54,15 @@ sd_section("MLlib Feature Transformation",
              "ft_string_indexer",
              "ft_vector_assembler"
            )
+)
+
+sd_section("Spark DataFrames",
+           "Functions for maniplulating Spark DataFrames",
+           c("sdf_partition",
+             "sdf_mutate",
+             "sdf_sample",
+             "sdf_sort",
+             "sdf_register")
 )
 
 
