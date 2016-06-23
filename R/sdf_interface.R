@@ -1,3 +1,126 @@
+#' Copy an Object into Spark
+#' 
+#' Copy an object into Spark, and return a Spark DataFrame.
+#' 
+#' \code{sdf_copy_to} is an S3 generic that, by default, dispatches to
+#' \code{sdf_import}, itself also an S3 generic, but parameterized on the data
+#' type rather than the connection type. If you'd like to implement
+#' \code{sdf_copy_to} for a custom object type, you can accomplish this by
+#' implementing the associated method on \code{sdf_import}.
+#' 
+#' A method for copying \R \code{data.frame}s to Spark is provided;
+#' alternate methods can be provided by implementing the appropriate
+#' 
+#' @param sc The associated Spark connection.
+#' @param x An \R object from which a Spark DataFrame can be generated.
+#' @param ... Optional arguments, passed to implementing methods.
+#' 
+#' @name sdf_import_export
+#' @export
+sdf_copy_to <- function(sc, x, ...) {
+  UseMethod("sdf_copy_to")
+}
+
+#' @export
+sdf_copy_to.default <- function(sc, x, ...) {
+  sdf_import(x, sc)
+}
+
+#' @name sdf_import_export
+#' @export
+sdf_import <- function(x, sc, ...) {
+  UseMethod("sdf_import")
+}
+
+#' @export
+sdf_import.default <- function(x, sc, ...) {
+  
+  # ensure data.frame
+  if (!is.data.frame(x)) {
+    x <- as.data.frame(
+      x,
+      stringsAsFactors = FALSE,
+      row.names = FALSE,
+      optional = TRUE
+    )
+  }
+  
+  # generate a CSV file from the associated data frame
+  # note that these files need to live for the R session
+  # duration so we don't clean these up eagerly
+  # write file based on hash to avoid writing too many files
+  # on repeated import calls
+  hash <- digest::digest(x, algo = "sha256")
+  filename <- paste("spark_csv_", hash, ".csv", sep = "")
+  tempfile <- file.path(tempdir(), filename)
+  
+  if (!file.exists(tempfile)) {
+    readr::write_csv(
+      x,
+      path = tempfile,
+      col_names = TRUE
+    )
+  }
+  
+  # generate path that Spark can use
+  path <- normalizePath(tempfile, winslash = "/", mustWork = TRUE)
+  
+  # generate the Spark CSV reader
+  ctx <- spark_api_create_sql_context(sc)
+  reader <- sparkapi_invoke(ctx, "read")
+  
+  # construct schema
+  # TODO: move to separate function?
+  fields <- lapply(names(x), function(name) {
+    
+    # infer the type
+    value <- x[[name]]
+    type <- if (is.factor(value))
+      "character"
+    else
+      typeof(value)
+    
+    # create struct field
+    sparkapi_invoke_static(
+      sc,
+      
+      "org.apache.spark.sql.api.r.SQLUtils",
+      "createStructField",
+      
+      name,
+      type,
+      TRUE
+      
+    )
+  })
+  
+  schema <- sparkapi_invoke_static(
+    sc,
+    
+    "org.apache.spark.sql.api.r.SQLUtils",
+    "createStructType",
+    
+    fields
+  )
+  
+  # invoke CSV reader with our schema
+  reader %>%
+    sparkapi_invoke("format", "com.databricks.spark.csv") %>%
+    sparkapi_invoke("option", "header", "true") %>%
+    sparkapi_invoke("schema", schema) %>%
+    sparkapi_invoke("load", path) %>%
+    sparkapi_invoke("cache")
+}
+
+#' Return a Spark DataFrame to R
+#' 
+#' @param x a Spark DataFrame.
+#' 
+#' @export
+sdf_collect <- function(x) {
+  spark_dataframe_collect(x)
+}
+
 #' Register a Spark DataFrame
 #' 
 #' Registers a Spark DataFrame (giving it a table name for the

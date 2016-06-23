@@ -5,7 +5,7 @@
 \title{Spark ML -- Logistic Regression}
 \usage{
 ml_logistic_regression(x, response, features, intercept = TRUE, alpha = 0,
-  lambda = 0)
+  lambda = 0, only_model = FALSE)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
@@ -41,7 +41,8 @@ Other Spark ML routines: \code{\link{ml_decision_tree}},
   \code{\link{ml_kmeans}}, \code{\link{ml_lda}},
   \code{\link{ml_linear_regression}},
   \code{\link{ml_multilayer_perceptron}},
-  \code{\link{ml_naive_bayes}}, \code{\link{ml_pca}},
+  \code{\link{ml_naive_bayes}},
+  \code{\link{ml_one_vs_rest}}, \code{\link{ml_pca}},
   \code{\link{ml_random_forest}},
   \code{\link{ml_survival_regression}}
 }

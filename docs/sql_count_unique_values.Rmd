@@ -20,6 +20,11 @@ data(diamonds, package = "ggplot2")
 
 sc <- spark_connect(master = "local", version = "1.6.1")
 diamonds_tbl <- copy_to(sc, diamonds, "diamonds", overwrite = TRUE)
+
+sdf <- sdf_copy_to(sc, diamonds)
+sdf %>%
+  sdf_sample(fraction = 0.001) %>%
+  sdf_collect()
 ```
 
 Now that we have `diamonds_tbl` available, we can use the `dplyr` interface to compute the number of times each entry in the `cut` column occurs.
