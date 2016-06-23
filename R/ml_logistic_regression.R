@@ -12,7 +12,8 @@ ml_logistic_regression <- function(x,
                                    features,
                                    intercept = TRUE,
                                    alpha = 0,
-                                   lambda = 0)
+                                   lambda = 0,
+                                   only_model = FALSE)
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
@@ -25,13 +26,17 @@ ml_logistic_regression <- function(x,
     "org.apache.spark.ml.classification.LogisticRegression"
   )
 
-  fit <- lr %>%
+  model <- lr %>%
     sparkapi_invoke("setMaxIter", 100L) %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("setLabelCol", envir$response) %>%
     sparkapi_invoke("setFitIntercept", as.logical(intercept)) %>%
     sparkapi_invoke("setElasticNetParam", as.double(alpha)) %>%
     sparkapi_invoke("setRegParam", as.double(lambda)) %>%
+  
+  if (only_model) return(model)  
+  
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
 
   coefficients <- fit %>%
