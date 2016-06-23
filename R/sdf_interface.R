@@ -15,7 +15,7 @@
 #' @param x An \R object from which a Spark DataFrame can be generated.
 #' @param ... Optional arguments, passed to implementing methods.
 #' 
-#' @name sdf_import_export
+#' @name sdf_copy_to
 #' @export
 sdf_copy_to <- function(sc, x, ...) {
   UseMethod("sdf_copy_to")
@@ -26,7 +26,7 @@ sdf_copy_to.default <- function(sc, x, ...) {
   sdf_import(x, sc)
 }
 
-#' @name sdf_import_export
+#' @name sdf_copy_to
 #' @export
 sdf_import <- function(x, sc, ...) {
   UseMethod("sdf_import")
