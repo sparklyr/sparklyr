@@ -19,6 +19,13 @@ ml_logistic_regression <- function(x,
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
+  
+  response <- ensure_scalar_character(response)
+  features <- as.character(features)
+  intercept <- ensure_scalar_boolean(intercept)
+  alpha <- ensure_scalar_double(alpha)
+  lambda <- ensure_scalar_double(lambda)
+  only_model <- ensure_scalar_boolean(only_model)
 
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)

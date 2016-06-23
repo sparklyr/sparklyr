@@ -14,6 +14,8 @@ ml_lda <- function(x, features = dplyr::tbl_vars(x)) {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
   
+  features <- as.character(features)
+  
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
   

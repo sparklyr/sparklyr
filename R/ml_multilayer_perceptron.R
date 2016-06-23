@@ -25,6 +25,12 @@ ml_multilayer_perceptron <- function(x,
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
+  
+  response <- ensure_scalar_character(response)
+  features <- as.character(features)
+  layers <- as.integer(layers)
+  max.iter <- ensure_scalar_integer(max.iter)
+  seed <- ensure_scalar_integer(seed)
 
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
@@ -39,9 +45,9 @@ ml_multilayer_perceptron <- function(x,
   fit <- mpc %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setLayers", as.list(as.integer(layers))) %>%
-    sparkapi_invoke("setSeed", as.integer(seed)) %>%
-    sparkapi_invoke("setMaxIter", as.integer(max.iter)) %>%
+    sparkapi_invoke("setLayers", as.list(layers)) %>%
+    sparkapi_invoke("setSeed", seed) %>%
+    sparkapi_invoke("setMaxIter", max.iter) %>%
     sparkapi_invoke("fit", tdf)
 
   ml_model("multilayer_perceptron", fit,

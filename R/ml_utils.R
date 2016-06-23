@@ -102,3 +102,51 @@ read_spark_matrix <- function(jobj, field) {
   data <- sparkapi_invoke(object, "toArray")
   matrix(data, nrow = nrow, ncol = ncol)
 }
+
+ensure_scalar_integer <- function(object) {
+  
+  if (length(object) != 1 || !is.numeric(object)) {
+    deparsed <- deparse(substitute(object))
+    errMsg <- sprintf("'%s' is not a length-one numeric value", deparsed)
+    stop(errMsg)
+  }
+  
+  as.integer(object)
+}
+
+ensure_scalar_double <- function(object) {
+  
+  if (length(object) != 1 || !is.numeric(object)) {
+    deparsed <- deparse(substitute(object))
+    errMsg <- sprintf("'%s' is not a length-one numeric value", deparsed)
+    stop(errMsg)
+  }
+  
+  as.double(object)
+}
+
+ensure_scalar_boolean <- function(object, allow.na = FALSE) {
+  
+  if (length(object) != 1) {
+    deparsed <- deparse(substitute(object))
+    stop(sprintf("'%s' is not a length-one logical value", deparsed))
+  }
+  
+  value <- as.logical(object)
+  if (!allow.na && is.na(value)) {
+    deparsed <- deparse(substitute(object))
+    stop(sprintf("'%s' is NA (must be TRUE/FALSE)", deparsed))
+  }
+  
+  value
+}
+
+ensure_scalar_character <- function(object) {
+  
+  if (length(object) != 1 || !is.character(object)) {
+    deparsed <- deparse(substitute(object))
+    stop(sprintf("'%s' is not a length-one character vector", deparsed))
+  }
+  
+  as.character(object)
+}

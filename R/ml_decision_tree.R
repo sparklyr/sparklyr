@@ -29,7 +29,12 @@ ml_decision_tree <- function(x,
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
   
+  response <- ensure_scalar_character(response)
+  features <- as.character(features)
+  max.bins <- ensure_scalar_integer(max.bins)
+  max.depth <- ensure_scalar_integer(max.depth)
   type <- match.arg(type)
+  
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
   

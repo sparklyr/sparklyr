@@ -18,6 +18,9 @@ ml_naive_bayes <- function(x,
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
   
+  response <- ensure_scalar_character(response)
+  features <- as.character(features)
+  
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
   

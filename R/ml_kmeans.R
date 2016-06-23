@@ -19,6 +19,10 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
   
+  features <- as.character(features)
+  centers <- ensure_scalar_integer(centers)
+  iter.max <- ensure_scalar_integer(iter.max)
+  
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
@@ -29,8 +33,8 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
   )
 
   fit <- kmeans %>%
-    sparkapi_invoke("setK", as.integer(centers)) %>%
-    sparkapi_invoke("setMaxIter", as.integer(iter.max)) %>%
+    sparkapi_invoke("setK", centers) %>%
+    sparkapi_invoke("setMaxIter", iter.max) %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("fit", tdf)
 

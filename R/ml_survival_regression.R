@@ -23,6 +23,11 @@ ml_survival_regression <- function(x,
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
   
+  response <- ensure_scalar_character(response)
+  features <- as.character(features)
+  intercept <- ensure_scalar_boolean(intercept)
+  censor <- ensure_scalar_character(censor)
+  
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
   
