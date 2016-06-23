@@ -108,5 +108,5 @@ summary.ml_model_linear_regression <- function(object, ...) {
   print_newline()
   
   cat(paste("R-Squared:", signif(object$r.squared, 4)), sep = "\n")
-  cat(paste("Root Mean Squared Error:", signif(model$root.mean.squared.error, 4)), sep = "\n")
+  cat(paste("Root Mean Squared Error:", signif(object$root.mean.squared.error, 4)), sep = "\n")
 }
