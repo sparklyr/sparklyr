@@ -65,10 +65,12 @@ tbl.sparklyr_connection <- function(src, from, ...) {
 #' @export
 src_tbls.sparklyr_connection <- function(x, ...) {
   
-  ctx <- if (is.null(x$hive_context))
-    x$spark_context
+  sconInst <- spark_connection_get_inst(x)
+  
+  ctx <- if (!is.null(sconInst$hive))
+    sconInst$hive
   else
-    x$hive_context
+    sconInst$sql
   
   tbls <- sparkapi_invoke(ctx, "sql", "SHOW TABLES")
   tableNames <- spark_dataframe_read_column(tbls, "tableName")
