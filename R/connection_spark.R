@@ -299,6 +299,10 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
   conf <- sparkapi_invoke(conf, "setAppName", appName)
   conf <- sparkapi_invoke(conf, "setMaster", master)
   conf <- sparkapi_invoke(conf, "setSparkHome", sparkHome)
+  
+  if (.Platform$OS.type == "windows") {
+    conf <- sparkapi_invoke(conf, "mapreduce.app-submission.cross-platform", "true")
+  }
 
   params <- spark_config_params(scon$config, spark_connection_is_local(scon), "spark.context.")
   lapply(names(params), function(paramName) {
