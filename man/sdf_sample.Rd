@@ -22,15 +22,15 @@ from a Spark DataFrame.
 \section{Transforming Spark DataFrames}{
 
 
-The family of functions prefixed with \code{sdf_} generally
-access the Scala Spark DataFrame API directly, and return a
-lower-level Spark DataFrame object (represented in \R as a
-\code{sparkapi_jobj}). To bring these back to the \code{dplyr}
-world (in order to use, for example, \code{mutate}), you need
-to invoke \code{\link{sdf_register}()}. This gives the Spark
-DataFrame a table name in the associated Spark SQL context, and
-then returns a \code{tbl_spark} which you can then use with
-the \code{dplyr} interface.
+The family of functions prefixed with \code{sdf_} generally access the Scala
+Spark DataFrame API directly, as opposed to the \code{dplyr} interface which
+uses Spark SQL. These functions will 'force' any pending SQL in a
+\code{dplyr} pipeline, such that the resulting \code{tbl_spark} object
+returned will no longer have the attached 'lazy' SQL operations. Note that
+the underlying Spark DataFrame \emph{does} execute its operations lazily, so
+that even though the pending set of operations (currently) are not exposed at
+the \R level, these operations will only be executed when you explicitly
+\code{collect()} the table.
 }
 \seealso{
 Other Spark data frames: \code{\link{sdf_collect}},
