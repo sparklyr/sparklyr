@@ -7,6 +7,12 @@
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite Overwrite the table with the given name if it already exists
 #'
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
+#'   the local file system (\code{file://}). 
+#'   
+#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and 
+#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.    
+#'
 #' @return Reference to a Spark DataFrame / dplyr tbl
 #' 
 #' @family reading and writing data
@@ -49,6 +55,13 @@ spark_write_csv.sparkapi_jobj <- function(x, path) {
 #'
 #' @inheritParams spark_read_csv
 #'
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
+#'   the local file system (\code{file://}). 
+#'   
+#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and 
+#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.    
+#'
+#'
 #' @family reading and writing data
 #'
 #' @export
@@ -87,6 +100,13 @@ spark_write_parquet.sparkapi_jobj <- function(x, path) {
 #' Read a JSON file into a Spark DataFrame
 #'
 #' @inheritParams spark_read_csv
+#'
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
+#'   the local file system (\code{file://}). 
+#'   
+#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and 
+#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.    
+#'
 #'
 #' @family reading and writing data
 #'
