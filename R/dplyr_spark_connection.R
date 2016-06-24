@@ -82,7 +82,7 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
 
 #' @export
 sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ...) {
-  sparkVersion <- spark_connection_version(con@scon)
+  sparkVersion <- spark_connection_version(con@scon, onlyVersion = TRUE)
   
   if (compareVersion(sparkVersion, "2.0.0") < 0) {
     sameNameColumns <- length(Filter(function(e) by$x[[e]] == by$y[[e]], seq_len(length(by$x))))
@@ -92,7 +92,30 @@ sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ..
     }
   }
   
-  # Invoke dplyrs default join
-  class(sc) <- Filter(function(e) e == "sparklyr_connection", class(sc))
-  sql_join(sc)
+  # Invoke dplyrs default join:
+  join <- switch(type,
+                 left = sql("LEFT"),
+                 inner = sql("INNER"),
+                 right = sql("RIGHT"),
+                 full = sql("FULL"),
+                 stop("Unknown join type:", type, call. = FALSE)
+  )
+  
+  using <- all(by$x == by$y)
+  
+  if (using) {
+    cond <- build_sql("USING ", lapply(by$x, ident), con = con)
+  } else {
+    on <- sql_vector(paste0(sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, by$y)),
+                     collapse = " AND ", parens = TRUE)
+    cond <- build_sql("ON ", on, con = con)
+  }
+  
+  build_sql(
+    'SELECT * FROM ',x, "\n\n",
+    join, " JOIN\n\n" ,
+    y, "\n\n",
+    cond,
+    con = con
+  )
 }
