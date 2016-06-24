@@ -32,7 +32,9 @@ setMethod("dbReadTable", c("DBISparkConnection", "character"),
 
 setMethod("dbListTables", "DBISparkConnection", function(conn) {
   df <- spark_api_sql_tables(conn@api)
-  df$tableName
+  tableNames <- df$tableName
+  filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
+  sort(filtered)
 })
 
 

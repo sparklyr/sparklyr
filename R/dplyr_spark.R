@@ -64,8 +64,17 @@ tbl.sparklyr_connection <- function(src, from, ...) {
 
 #' @export
 src_tbls.sparklyr_connection <- function(x, ...) {
-  src <- src_sql("spark", dbConnect(DBISpark(x)))
-  sort(src_tbls(src, ...))
+  
+  ctx <- if (is.null(x$hive_context))
+    x$spark_context
+  else
+    x$hive_context
+  
+  tbls <- sparkapi_invoke(ctx, "sql", "SHOW TABLES")
+  tableNames <- spark_dataframe_read_column(tbls, "tableName")
+  
+  filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
+  sort(filtered)
 }
 
 #' @export

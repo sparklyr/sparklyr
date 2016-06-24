@@ -4,7 +4,7 @@
 \alias{sdf_register}
 \title{Register a Spark DataFrame}
 \usage{
-sdf_register(x, name)
+sdf_register(x, name = NULL)
 }
 \arguments{
 \item{x}{A Spark DataFrame.}
