@@ -373,7 +373,7 @@ sdf_predict <- function(object, newdata, prediction = "prediction", ...) {
     newdata <- object$data
   sdf <- sparkapi_dataframe(newdata)
   params <- object$model.parameters
-  assembled <- ft_vector_assembler(sdf, object$features, params$features)
+  assembled <- sparkapi_dataframe(ft_vector_assembler(sdf, object$features, params$features))
   model <- object$.model
   model <- sparkapi_invoke(model, "setPredictionCol", prediction)
   transformed <- sparkapi_invoke(model, "transform", assembled)
