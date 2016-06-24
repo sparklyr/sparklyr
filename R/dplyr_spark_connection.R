@@ -82,10 +82,6 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
 
 #' @export
 sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ...) {
-  random_table_name <- function(n = 10) {
-    paste0(sample(letters, n, replace = TRUE), collapse = "")
-  }
-  
   join <- switch(type,
                  left = sql("LEFT"),
                  inner = sql("INNER"),
@@ -96,29 +92,18 @@ sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ..
   
   using <- all(by$x == by$y)
   
-  xSubQueryName <- random_table_name()
-  xSubQuery <- build_sql(
-    '(SELECT * FROM ', x, ')', sql_vector(sql_escape_ident(con, xSubQueryName)),
-    con = con
-  )
-  sql_subquery(con, x, name = xSubQueryName)
-  
-  ySubQueryName <- random_table_name()
-  ySubQuery <- build_sql(
-    '(SELECT * FROM ', y, ')', sql_vector(sql_escape_ident(con, ySubQueryName)),
-    con = con
-  )
-  
-  # Spark < 2.0 does not support "USING" keyword and therefore, we use custom implementation
-  # based on dplyrs sql_join
-  on <- sql_vector(paste0(sql_escape_ident(con, xSubQueryName), ".", sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, ySubQueryName), ".", sql_escape_ident(con, by$y)),
-                   collapse = " AND ", parens = TRUE)
-  cond <- build_sql("ON ", on, con = con)
+  if (using) {
+    cond <- build_sql("USING ", lapply(by$x, ident), con = con)
+  } else {
+    on <- sql_vector(paste0(sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, by$y)),
+                     collapse = " AND ", parens = TRUE)
+    cond <- build_sql("ON ", on, con = con)
+  }
   
   build_sql(
-    'SELECT * FROM ', xSubQuery, "\n\n",
+    'SELECT * FROM ',x, "\n\n",
     join, " JOIN\n\n" ,
-    ySubQuery, "\n\n",
+    y, "\n\n",
     cond,
     con = con
   )
