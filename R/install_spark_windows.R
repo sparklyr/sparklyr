@@ -31,8 +31,6 @@ spark_install_windows_local <- function() {
     "\n\n",
     "3. From the command prompt application run:",
     "\n\n",
-    paste("   <path-to-file>\\winutils.exe chmod 777", hadoopPath),
-    "\n\n",
     "References: ",
     "\n\n",
     "   https://hernandezpaul.wordpress.com/2016/01/24/apache-spark-installation-on-windows-10/"
