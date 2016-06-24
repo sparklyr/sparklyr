@@ -169,6 +169,11 @@ spark_install <- function(version = NULL,
     hiveSiteTemplatePath <- system.file(package = "sparklyr", file.path("conf", "hive-site.xml"))
     file.copy(hiveSiteTemplatePath, hiveSitePath, overwrite = TRUE)
   }
+  
+  if (.Platform$OS.type == "windows") {
+    windowsMessage <- spark_install_windows_local()
+    message(windowsMessage)
+  }
 
   invisible(installInfo)
 }
