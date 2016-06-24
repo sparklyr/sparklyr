@@ -37,7 +37,10 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
   }
 
   # assemble features vector and return
-  ft_vector_assembler(df, features, envir$features)
+  transformed <- ft_vector_assembler(df, features, envir$features)
+  
+  # return as vanilla spark dataframe
+  sparkapi_dataframe(transformed)
 }
 
 try_null <- function(expr) {
