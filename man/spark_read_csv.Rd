@@ -5,7 +5,7 @@
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
 spark_read_csv(sc, name, path, repartition = 0, memory = TRUE,
-  overwrite = FALSE)
+  overwrite = TRUE)
 }
 \arguments{
 \item{sc}{The Spark connection}

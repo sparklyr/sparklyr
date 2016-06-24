@@ -12,7 +12,7 @@
 #' @family reading and writing data
 #' 
 #' @export
-spark_read_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = FALSE) {
+spark_read_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
   
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
