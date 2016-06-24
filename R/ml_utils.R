@@ -121,7 +121,10 @@ ensure_scalar_double <- function(object) {
   as.double(object)
 }
 
-ensure_scalar_boolean <- function(object, allow.na = FALSE) {
+ensure_scalar_boolean <- function(object, allow.na = FALSE, default = NULL) {
+  if (!is.null(default) && is.null(object)) {
+    object = default
+  }
   
   if (length(object) != 1) {
     deparsed <- deparse(substitute(object))
