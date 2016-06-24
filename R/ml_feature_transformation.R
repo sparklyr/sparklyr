@@ -25,7 +25,7 @@ ft_vector_assembler <- function(x,
     sparkapi_invoke("setOutputCol", output_col) %>%
     sparkapi_invoke("transform", df)
 
-  transformed
+  sdf_register(transformed)
 }
 
 #' Feature Transformation -- StringIndexer
@@ -67,7 +67,9 @@ ft_string_indexer <- function(x,
   if (is.environment(params))
     params$labels <- as.character(sparkapi_invoke(sim, "labels"))
 
-  sparkapi_invoke(sim, "transform", df)
+  transformed <- sparkapi_invoke(sim, "transform", df)
+  
+  sdf_register(transformed)
 }
 
 #' Feature Transformation -- Binarizer
@@ -102,7 +104,7 @@ ft_binarizer <- function(x,
     sparkapi_invoke("setThreshold", as.double(threshold)) %>%
     sparkapi_invoke("transform", df)
 
-  transformed
+  sdf_register(transformed)
 }
 
 #' Feature Transformation -- Discrete Cosine Transform (DCT)
@@ -134,7 +136,7 @@ ft_discrete_cosine_transform <- function(x,
     sparkapi_invoke("setInverse", as.logical(inverse)) %>%
     sparkapi_invoke("transform", df)
 
-  transformed
+  sdf_register(transformed)
 }
 
 #' Feature Transformation -- IndexToString
@@ -163,7 +165,7 @@ ft_index_to_string <- function(x,
     sparkapi_invoke("setOutputCol", output_col) %>%
     sparkapi_invoke("transform", df)
 
-  transformed
+  sdf_register(transformed)
 }
 
 ## TODO: These routines with so-called 'row vector' features by
@@ -236,7 +238,7 @@ ft_bucketizer <- function(x,
     sparkapi_invoke("setSplits", as.list(splits)) %>%
     sparkapi_invoke("transform", df)
 
-  transformed
+  sdf_register(transformed)
 }
 
 #' Feature Transformation -- ElementwiseProduct
@@ -270,7 +272,7 @@ ft_elementwise_product <- function(x,
     sparkapi_invoke("setScalingVec", scaling_col) %>%
     sparkapi_invoke("transform", df)
 
-  transformed
+  sdf_register(transformed)
 }
 
 #' Feature Transformation -- SQLTransformer
@@ -300,7 +302,7 @@ ft_sql_transformer <- function(x,
     sparkapi_invoke("setStatement", paste(sql, collapse = "\n")) %>%
     sparkapi_invoke("transform", df)
 
-  transformed
+  sdf_register(transformed)
 }
 
 #' Feature Transformation -- QuantileDiscretizer
@@ -340,5 +342,5 @@ ft_quantile_discretizer <- function(x,
     sparkapi_invoke("fit", df) %>%
     sparkapi_invoke("transform", df)
 
-  transformed
+  sdf_register(transformed)
 }
