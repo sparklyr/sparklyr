@@ -134,6 +134,11 @@ sdf_register <- function(x, name = NULL) {
 }
 
 #' @export
+sdf_register.tbl_spark <- function(x, name = NULL) {
+  x
+}
+
+#' @export
 sdf_register.list <- function(x, name = NULL) {
   if (is.null(name))
     name <- replicate(length(x), random_string("sparklyr_tmp_"))
