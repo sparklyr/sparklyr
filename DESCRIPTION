@@ -62,16 +62,17 @@ Collate:
 Depends:
     R (>= 3.1.2)
 Imports:
-    dplyr (>= 0.5.0),
     methods,
-    readr,
-    DBI (>= 0.4-1),
-    assertthat,
-    rappdirs,
+    magrittr,
     lazyeval (>= 0.2.0),
-    config,
+    dplyr (>= 0.5.0),
+    DBI (>= 0.4-1),
+    sparkapi,
+    readr,
     digest,
-    sparkapi
+    config,
+    rappdirs,
+    assertthat
 Remotes: 
     hadley/dplyr,
     rstudio/sparkapi
