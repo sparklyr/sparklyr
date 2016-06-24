@@ -64,6 +64,7 @@ sd_section("Spark DataFrames",
              "sdf_mutate",
              "sdf_sample",
              "sdf_sort",
+             "sdf_predict",
              "sdf_register")
 )
 
