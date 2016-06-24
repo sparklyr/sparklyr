@@ -16,7 +16,6 @@
 #' @family Spark data frames
 #' 
 #' @name sdf_copy_to
-#' @export
 sdf_copy_to <- function(sc, x, ...) {
   UseMethod("sdf_copy_to")
 }
@@ -27,7 +26,6 @@ sdf_copy_to.default <- function(sc, x, ...) {
 }
 
 #' @name sdf_copy_to
-#' @export
 sdf_import <- function(x, sc, ...) {
   UseMethod("sdf_import")
 }
@@ -118,7 +116,6 @@ sdf_import.default <- function(x, sc, ...) {
 #' 
 #' @family Spark data frames
 #' 
-#' @export
 sdf_collect <- function(x) {
   spark_dataframe_collect(x)
 }
@@ -135,13 +132,14 @@ sdf_collect <- function(x) {
 #' 
 #' @family Spark data frames
 #' 
-#' @export
-sdf_register <- function(x, name) {
+sdf_register <- function(x, name = NULL) {
   UseMethod("sdf_register")
 }
 
 #' @export
-sdf_register.list <- function(x, name = names(x)) {
+sdf_register.list <- function(x, name = NULL) {
+  if (is.null(name))
+    name <- replicate(length(x), random_string("sparklyr_tmp_"))
   result <- lapply(seq_along(x), function(i) {
     sdf_register(x[[i]], name[[i]])
   })
@@ -150,10 +148,11 @@ sdf_register.list <- function(x, name = names(x)) {
 }
 
 #' @export
-sdf_register.sparkapi_jobj <- function(x, name = random_string()) {
+sdf_register.sparkapi_jobj <- function(x, name = random_string("sparklyr_tmp_")) {
   sparkapi_invoke(x, "registerTempTable", name)
-  on_connection_updated(sparkapi_connection(x), name)
-  tbl(sparkapi_connection(x), name)
+  sc <- sparkapi_connection(x)
+  on_connection_updated(sc, name)
+  tbl(sc, name)
 }
 
 #' Partition a Spark Dataframe
@@ -213,7 +212,7 @@ sdf_partition <- function(x,
     stop("all weights must be named")
   partitions <- spark_dataframe_split(sdf, as.numeric(weights), seed = seed)
   names(partitions) <- nm
-  partitions
+  sdf_register(partitions)
 }
 
 #' Randomly Sample Rows from a Spark DataFrame
@@ -243,7 +242,7 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
       sparkapi_invoke("sample", as.logical(replacement), as.double(fraction), as.integer(seed))
   }
   
-  sampled
+  sdf_register(sampled)
 }
 
 #' Sort a Spark DataFrame
@@ -267,12 +266,13 @@ sdf_sort <- function(x, columns) {
   if (n == 0)
     stop("must supply one or more column names")
   
-  if (n == 1) {
+  sorted <- if (n == 1) {
     sparkapi_invoke(df, "sort", columns, list())
   } else {
     sparkapi_invoke(df, "sort", columns[[1]], as.list(columns[-1]))
   }
   
+  sdf_register(sorted)
 }
 
 #' Mutate a Spark DataFrame
@@ -375,7 +375,7 @@ sdf_mutate_ <- function(.data, ..., .dots) {
   }
   
   # return mutated dataset
-  data
+  sdf_register(data)
 }
 
 #' Model Predictions with Spark DataFrames
@@ -395,5 +395,6 @@ sdf_predict <- function(object, newdata, ...) {
   sdf <- sparkapi_dataframe(newdata)
   params <- object$model.parameters
   assembled <- ft_vector_assembler(sdf, object$features, params$features)
-  sparkapi_invoke(object$.model, "transform", assembled)
+  transformed <- sparkapi_invoke(object$.model, "transform", assembled)
+  sdf_register(transformed)
 }
