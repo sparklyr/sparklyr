@@ -6,12 +6,10 @@ A set of tools to provision, connect and interface to Apache Spark from within t
 Installation
 ------------
 
-You can install the development version of the **sparklyr** package using **devtools** as follows (note that installation of the development version of **devtools** itself is also required):
+You can install the development version of the **sparklyr** package using [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html) as follows:
 
 ``` r
-devtools::install_github("hadley/devtools")
-devtools::reload(devtools::inst("devtools"))
-
+install.packages("dplyr", type = "source")
 devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
 ```
 
@@ -28,9 +26,8 @@ dplyr Interface
 The sparklyr package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then use the returned connection as a remote dplyr source.
 
 ``` r
-# connect to local spark instance 
 library(sparklyr)
-sc <- spark_connect("local", version = "1.6.1")
+sc <- spark_connect(master = "local")
 ```
 
 Now we copy some datasets from R into the Spark cluster:
@@ -143,20 +140,20 @@ Reading and Writing Data
 ------------------------
 
 ``` r
-  temp_csv <- tempfile(fileext = ".csv")
-  temp_parquet <- tempfile(fileext = ".parquet")
-  temp_json <- tempfile(fileext = ".json")
-  
-  spark_write_csv(iris_tbl, temp_csv)
-  iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
-  
-  spark_write_parquet(iris_tbl, temp_parquet)
-  iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
-  
-  spark_write_csv(iris_tbl, temp_json)
-  iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
-  
-  src_tbls(sc)
+temp_csv <- tempfile(fileext = ".csv")
+temp_parquet <- tempfile(fileext = ".parquet")
+temp_json <- tempfile(fileext = ".json")
+
+spark_write_csv(iris_tbl, temp_csv)
+iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
+
+spark_write_parquet(iris_tbl, temp_parquet)
+iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
+
+spark_write_csv(iris_tbl, temp_json)
+iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
+
+src_tbls(sc)
 ```
 
     ## [1] "batting"      "flights"      "iris"         "iris_csv"    
@@ -173,7 +170,7 @@ library(sparkapi)
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
   sparkapi_spark_context(sc) %>% 
-    sparkapi_invoke("textFile", path, as.integer(1)) %>% 
+    sparkapi_invoke("textFile", path, 1L) %>% 
       sparkapi_invoke("count")
 }
 
@@ -219,24 +216,19 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/23 16:13:01 INFO BlockManagerInfo: Removed broadcast_90_piece0 on localhost:59777 in memory (size: 4.6 KB, free: 487.3 MB)
-    ## 16/06/23 16:13:01 INFO ContextCleaner: Cleaned accumulator 198
-    ## 16/06/23 16:13:01 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:59777 in memory (size: 8.5 KB, free: 487.3 MB)
-    ## 16/06/23 16:13:01 INFO ContextCleaner: Cleaned accumulator 197
-    ## 16/06/23 16:13:01 INFO ContextCleaner: Cleaned shuffle 20
-    ## 16/06/23 16:13:01 INFO Executor: Finished task 0.0 in stage 67.0 (TID 465). 2082 bytes result sent to driver
-    ## 16/06/23 16:13:01 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 465) in 93 ms on localhost (1/1)
-    ## 16/06/23 16:13:01 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/06/23 16:13:01 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.093 s
-    ## 16/06/23 16:13:01 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.095794 s
+    ## 16/06/24 11:53:42 INFO ContextCleaner: Cleaned shuffle 16
+    ## 16/06/24 11:53:42 INFO BlockManagerInfo: Removed broadcast_71_piece0 on localhost:59317 in memory (size: 4.6 KB, free: 487.2 MB)
+    ## 16/06/24 11:53:42 INFO ContextCleaner: Cleaned accumulator 164
+    ## 16/06/24 11:53:42 INFO BlockManagerInfo: Removed broadcast_77_piece0 on localhost:59317 in memory (size: 6.8 KB, free: 487.2 MB)
+    ## 16/06/24 11:53:42 INFO ContextCleaner: Cleaned accumulator 163
+    ## 16/06/24 11:53:42 INFO Executor: Finished task 0.0 in stage 67.0 (TID 465). 2082 bytes result sent to driver
+    ## 16/06/24 11:53:42 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 465) in 100 ms on localhost (1/1)
+    ## 16/06/24 11:53:42 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/06/24 11:53:42 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.100 s
+    ## 16/06/24 11:53:42 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.102575 s
 
 Finally, we disconnect from Spark:
 
 ``` r
 spark_disconnect(sc)
 ```
-
-Additional Resources
---------------------
-
-For performance runs under various parameters, read: [Dplyr Performance](docs/perf_dplyr.md) and [Spark 1B-Rows Performance](docs/perf_1b.md)
