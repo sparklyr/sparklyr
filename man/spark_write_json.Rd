@@ -2,16 +2,23 @@
 % Please edit documentation in R/api_spark_data.R
 \name{spark_write_json}
 \alias{spark_write_json}
-\title{Writes a dplyr operation result as a JSON file}
+\title{Write a Spark DataFrame to a JSON file}
 \usage{
 spark_write_json(x, path)
 }
 \arguments{
-\item{x}{A dplyr operation, for instance, `tbls(db, "flights")`}
+\item{x}{A Spark DataFrame or dplyr operation}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
 }
 \description{
-Writes a dplyr operation result as a JSON file
+Write a Spark DataFrame to a JSON file
+}
+\seealso{
+Other reading and writing data: \code{\link{spark_read_csv}},
+  \code{\link{spark_read_json}},
+  \code{\link{spark_read_parquet}},
+  \code{\link{spark_write_csv}},
+  \code{\link{spark_write_parquet}}
 }
 

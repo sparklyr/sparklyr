@@ -2,18 +2,22 @@
 % Please edit documentation in R/dplyr_spark.R
 \name{tbl_cache}
 \alias{tbl_cache}
-\title{Loads a table into memory}
+\title{Load a table into memory}
 \usage{
 tbl_cache(sc, name, force = TRUE)
 }
 \arguments{
-\item{sc}{Connection to dplyr source}
+\item{sc}{Spark connection}
 
 \item{name}{Name of the destination table}
 
 \item{force}{Forces data to be loaded in memory by executing a count(*) over the table}
 }
 \description{
-Loads a table into memory
+Load a table into memory
+}
+\seealso{
+Other dplyr: \code{\link{collect}}, \code{\link{copy_to}},
+  \code{\link{tbl_uncache}}
 }
 

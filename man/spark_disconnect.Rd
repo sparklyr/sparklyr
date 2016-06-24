@@ -3,18 +3,27 @@
 \name{spark_disconnect}
 \alias{spark_disconnect}
 \alias{spark_disconnect_all}
-\title{Disconnects from Spark and terminates the running application}
+\title{Disconnect from Spark}
 \usage{
 spark_disconnect(sc)
 
 spark_disconnect_all()
 }
 \arguments{
-\item{sc}{Spark connection provided by spark_connect}
+\item{sc}{Spark connection provided by \code{\link{spark_connect}}}
 }
 \description{
-Disconnects from Spark and terminates the running application
+Disconnect from Spark
 
-Closes all existing connections. Returns the total of connections closed.
+Close all existing connections
+}
+\seealso{
+Other Spark connections: \code{\link{spark_connection_is_open}},
+  \code{\link{spark_connect}}, \code{\link{spark_log}},
+  \code{\link{spark_web}}
+
+Other Spark connections: \code{\link{spark_connection_is_open}},
+  \code{\link{spark_connect}}, \code{\link{spark_log}},
+  \code{\link{spark_web}}
 }
 

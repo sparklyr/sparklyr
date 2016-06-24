@@ -3,18 +3,27 @@
 \name{spark_log}
 \alias{spark_log}
 \alias{spark_log_file}
-\title{Retrieves the last n entries in the Spark log}
+\title{Retrieves entries from the Spark log}
 \usage{
 spark_log(sc, n = 100)
 
 spark_log_file(sc)
 }
 \arguments{
-\item{sc}{Spark connection provided by spark_connect}
+\item{sc}{Spark connection provided by \code{\link{spark_connect}}}
 
 \item{n}{Max number of log entries to retrieve}
 }
+\value{
+Character vector with last \code{n} lines of the Spark log 
+  or for \code{spark_log_file} the full path to the log file.
+}
 \description{
-Retrieves the last n entries in the Spark log
+Retrieves entries from the Spark log
+}
+\seealso{
+Other Spark connections: \code{\link{spark_connection_is_open}},
+  \code{\link{spark_connect}},
+  \code{\link{spark_disconnect}}, \code{\link{spark_web}}
 }
 

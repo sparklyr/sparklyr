@@ -9,6 +9,8 @@
 #' @param n Limit on the number of records to copy
 #' @param ... Unused
 #' @return An R data frame with classes \code{data.frame} and \code{tbl_df}.
+#' 
+#' @family dplyr
 #'
 #' @import assertthat
 #'

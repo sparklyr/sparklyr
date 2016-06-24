@@ -21,4 +21,8 @@ An R data frame with classes \code{data.frame} and \code{tbl_df}.
 Force computation of remote Spark DataFrame and copy the results back
 to the client as an R data.frame
 }
+\seealso{
+Other dplyr: \code{\link{copy_to}},
+  \code{\link{tbl_cache}}, \code{\link{tbl_uncache}}
+}
 

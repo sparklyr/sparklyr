@@ -31,12 +31,16 @@ spark_available_versions()
 
 \item{logging}{Logging level to configure install. Supported options: "WARN", "INFO"}
 
-\item{verbose}{Report information as Spark is downloaded / installed?}
+\item{verbose}{Report information as Spark is downloaded / installed}
 
-\item{tarfile}{Path to TAR file conforming to the pattern spark-###-bin-hadoop### where ###
-reference spark and hadoop versions respectevely.}
+\item{tarfile}{Path to TAR file conforming to the pattern spark-###-bin-(hadoop)?### where ###
+reference spark and hadoop versions respectively.}
+}
+\value{
+List with information about the installed version.
 }
 \description{
-Download and install various versions of Spark
+Install versions of Spark for use with local Spark connections 
+  (i.e. \code{spark_connect(master = "local"})
 }
 

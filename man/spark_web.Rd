@@ -2,14 +2,19 @@
 % Please edit documentation in R/connection_spark.R
 \name{spark_web}
 \alias{spark_web}
-\title{Opens the Spark web interface}
+\title{Open the Spark web interface}
 \usage{
 spark_web(sc)
 }
 \arguments{
-\item{sc}{Spark connection provided by spark_connect}
+\item{sc}{Spark connection provided by \code{\link{spark_connect}}}
 }
 \description{
-Opens the Spark web interface
+Open the Spark web interface
+}
+\seealso{
+Other Spark connections: \code{\link{spark_connection_is_open}},
+  \code{\link{spark_connect}},
+  \code{\link{spark_disconnect}}, \code{\link{spark_log}}
 }
 

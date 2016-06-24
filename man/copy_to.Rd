@@ -3,7 +3,7 @@
 \name{copy_to}
 \alias{copy_to}
 \alias{copy_to.sparklyr_connection}
-\title{Copy a local R dataframe to Spark and provide a data source compatible with dplyr}
+\title{Copy a local R data frame to Spark}
 \usage{
 \method{copy_to}{sparklyr_connection}(dest, df,
   name = deparse(substitute(df)), memory = TRUE, repartition = 0,
@@ -16,9 +16,9 @@
 
 \item{name}{Name of the destination table}
 
-\item{memory}{Cache table into memory for improved performance}
+\item{memory}{Cache table into memory}
 
-\item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
+\item{repartition}{Partitions used to distribute table or 0 (default) to avoid partitioning}
 
 \item{overwrite}{When TRUE, overwrites table with existing name}
 
@@ -26,7 +26,14 @@
 
 \item{...}{Unused}
 }
+\value{
+dplyr compatible reference to table
+}
 \description{
-Copy a local R dataframe to Spark and provide a data source compatible with dplyr
+Copy a local R data frame to Spark
+}
+\seealso{
+Other dplyr: \code{\link{collect}},
+  \code{\link{tbl_cache}}, \code{\link{tbl_uncache}}
 }
 

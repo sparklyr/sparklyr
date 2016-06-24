@@ -13,6 +13,8 @@
 #' @param x An \R object from which a Spark DataFrame can be generated.
 #' @param ... Optional arguments, passed to implementing methods.
 #' 
+#' @family Spark data frames
+#' 
 #' @name sdf_copy_to
 #' @export
 sdf_copy_to <- function(sc, x, ...) {
@@ -114,6 +116,8 @@ sdf_import.default <- function(x, sc, ...) {
 #' 
 #' @param x a Spark DataFrame.
 #' 
+#' @family Spark data frames
+#' 
 #' @export
 sdf_collect <- function(x) {
   spark_dataframe_collect(x)
@@ -128,6 +132,8 @@ sdf_collect <- function(x) {
 #' 
 #' @param x A Spark DataFrame.
 #' @param name A name to assign this table.
+#' 
+#' @family Spark data frames
 #' 
 #' @export
 sdf_register <- function(x, name) {
@@ -176,7 +182,7 @@ sdf_register.sparkapi_jobj <- function(x, name = random_string()) {
 #'
 #' @return An \R \code{list} of \code{tbl_spark}s.
 #' 
-#' @family Spark DataFrame functions
+#' @family Spark data frames
 #'
 #' @export
 #'
@@ -222,7 +228,7 @@ sdf_partition <- function(x,
 #' @param replacement Boolean; sample with replacement?
 #' @param seed An (optional) integer seed.
 #' 
-#' @family Spark DataFrame functions
+#' @family Spark data frames
 #' 
 #' @export
 sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
@@ -250,7 +256,7 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
 #' @param x An object coercable to a Spark DataFrame.
 #' @param columns The column(s) to sort by.
 #' 
-#' @family Spark DataFrame functions
+#' @family Spark data frames
 #' 
 #' @export
 sdf_sort <- function(x, columns) {
@@ -304,6 +310,7 @@ sdf_sort <- function(x, columns) {
 #' @name sdf_mutate
 #' @export
 #'
+#' @family Spark data frames
 #' @family feature transformation routines
 #'
 #' @examples
@@ -378,6 +385,8 @@ sdf_mutate_ <- function(.data, ..., .dots) {
 #' 
 #' @param object,newdata An object coercable to a Spark DataFrame.
 #' @param ... Optional arguments; currently unused.
+#' 
+#' @family Spark data frames
 #' 
 #' @export
 sdf_predict <- function(object, newdata, ...) {

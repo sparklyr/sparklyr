@@ -2,7 +2,7 @@
 % Please edit documentation in R/connection_spark.R
 \name{spark_connect}
 \alias{spark_connect}
-\title{Connects to Spark and establishes the Spark Context}
+\title{Connect to Spark}
 \usage{
 spark_connect(master = "local", app_name = "sparklyr", version = NULL,
   hadoop_version = NULL, extensions = NULL, config = spark_config())
@@ -12,15 +12,23 @@ spark_connect(master = "local", app_name = "sparklyr", version = NULL,
 
 \item{app_name}{Application name to be used while running in the Spark cluster}
 
-\item{version}{Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.}
+\item{version}{Version of the Spark (only applicable for local mode)}
 
-\item{hadoop_version}{Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.}
+\item{hadoop_version}{Version of Hadoop (only applicable for local mode)}
 
-\item{extensions}{Extensions to enable for this connection.}
+\item{extensions}{Extension packages to enable for this connection.}
 
 \item{config}{Configuration for connection (see \code{\link{spark_config} for details}).}
 }
+\value{
+Connection to Spark local instance or remote cluster
+}
 \description{
-Connects to Spark and establishes the Spark Context
+Connect to Spark
+}
+\seealso{
+Other Spark connections: \code{\link{spark_connection_is_open}},
+  \code{\link{spark_disconnect}}, \code{\link{spark_log}},
+  \code{\link{spark_web}}
 }
 

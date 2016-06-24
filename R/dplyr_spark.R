@@ -73,21 +73,23 @@ db_data_type.src_spark <- function(...) {
 }
 
 
-#' Copy a local R dataframe to Spark and provide a data source compatible with dplyr
-#'
-#' Copy a local R dataframe to Spark and provide a data source compatible with dplyr
+#' Copy a local R data frame to Spark
 #'
 #' @param dest A Spark connection
-#' @param name Name of the destination table
 #' @param df Local data frame to copy
-#' @param ... Unused
-#' @param memory Cache table into memory for improved performance
-#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
+#' @param name Name of the destination table
+#' @param memory Cache table into memory 
+#' @param repartition Partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite When TRUE, overwrites table with existing name
 #' @param local_file When TRUE, uses a local file to copy the data frame, this is only available in local installs.
+#' @param ... Unused
+#' 
+#' @return dplyr compatible reference to table
 #'
 #' @name copy_to
 #'
+#' @family dplyr
+#' 
 #' @export
 copy_to.sparklyr_connection <- function(dest, df, name = deparse(substitute(df)),
                                         memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL, ...) {
@@ -110,11 +112,15 @@ copy_to.sparklyr_connection <- function(dest, df, name = deparse(substitute(df))
   tbl(dest, name)
 }
 
-#' Loads a table into memory
-#' @export
-#' @param sc Connection to dplyr source
+#' Load a table into memory
+#' 
+#' @param sc Spark connection
 #' @param name Name of the destination table
 #' @param force Forces data to be loaded in memory by executing a count(*) over the table
+#' 
+#' @family dplyr
+#' 
+#' @export
 tbl_cache <- function(sc, name, force = TRUE) {
   dbiCon <- dbConnect(DBISpark(sc))
 
@@ -125,10 +131,14 @@ tbl_cache <- function(sc, name, force = TRUE) {
   }
 }
 
-#' Unloads table from memory
-#' @export
-#' @param sc Connection to dplyr source
+#' Unload table from memory
+#' 
+#' @param sc Spark connection
 #' @param name Name of the destination table
+#' 
+#' @family dplyr
+#' 
+#' @export
 tbl_uncache <- function(sc, name) {
   dbiCon <- dbConnect(DBISpark(sc))
   dbGetQuery(dbiCon, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))

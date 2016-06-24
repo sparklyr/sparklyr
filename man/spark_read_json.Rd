@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_spark_data.R
 \name{spark_read_json}
 \alias{spark_read_json}
-\title{Reads a JSON file and provides a data source compatible with dplyr}
+\title{Read a JSON file into a Spark DataFrame}
 \usage{
 spark_read_json(sc, name, path, repartition = 0, memory = TRUE,
   overwrite = TRUE)
@@ -10,17 +10,24 @@ spark_read_json(sc, name, path, repartition = 0, memory = TRUE,
 \arguments{
 \item{sc}{The Spark connection}
 
-\item{name}{Name to reference the data source once it's loaded}
+\item{name}{Name of table}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
 
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 
-\item{memory}{Loads data into memory}
+\item{memory}{Load data eagerly into memory}
 
-\item{overwrite}{Overwrite the table with the given name when it exists}
+\item{overwrite}{Overwrite the table with the given name if it already exists}
 }
 \description{
-Reads a JSON file and provides a data source compatible with dplyr
+Read a JSON file into a Spark DataFrame
+}
+\seealso{
+Other reading and writing data: \code{\link{spark_read_csv}},
+  \code{\link{spark_read_parquet}},
+  \code{\link{spark_write_csv}},
+  \code{\link{spark_write_json}},
+  \code{\link{spark_write_parquet}}
 }
 

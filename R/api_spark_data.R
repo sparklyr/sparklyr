@@ -1,14 +1,18 @@
-#' Reads a CSV file and provides a data source compatible with dplyr
+#' Read a CSV file into a Spark DataFrame
 #'
 #' @param sc The Spark connection
-#' @param name Name to reference the data source once it's loaded
+#' @param name Name of table
 #' @param path The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"
-#' @param memory Loads data into memory
+#' @param memory Load data eagerly into memory
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
-#' @param overwrite Overwrite the table with the given name when it exists
+#' @param overwrite Overwrite the table with the given name if it already exists
 #'
+#' @return Reference to a Spark DataFrame / dplyr tbl
+#' 
+#' @family reading and writing data
+#' 
 #' @export
-spark_read_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+spark_read_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = FALSE) {
   
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
@@ -17,11 +21,13 @@ spark_read_csv <- function(sc, name, path, repartition = 0, memory = TRUE, overw
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
-#' Writes a dplyr operation result as a CSV file
+#' Write a Spark DataFrame to a CSV
 #'
 #' @inheritParams spark_read_csv
-#' @param x A dplyr operation, for instance, `tbls(db, "flights")`
-#'
+#' @param x A Spark DataFrame or dplyr operation
+#' 
+#' @family reading and writing data
+#' 
 #' @export
 spark_write_csv <- function(x, path) {
   UseMethod("spark_write_csv")
@@ -39,9 +45,11 @@ spark_write_csv.sparkapi_jobj <- function(x, path) {
   spark_api_write_csv(x, path.expand(path))
 }
 
-#' Reads a parquet file and provides a data source compatible with dplyr
+#' Read a parquet file into a Spark DataFrame
 #'
 #' @inheritParams spark_read_csv
+#'
+#' @family reading and writing data
 #'
 #' @export
 spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
@@ -53,9 +61,11 @@ spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, o
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
-#' Writes a dplyr operation result as a parquet file
+#' Write a Spark DataFrame to a parquet file
 #'
 #' @inheritParams spark_write_csv
+#'
+#' @family reading and writing data
 #'
 #' @export
 spark_write_parquet <- function(x, path) {
@@ -74,9 +84,11 @@ spark_write_parquet.sparkapi_jobj <- function(x, path) {
   spark_api_write_generic(x, path.expand(path), "parquet")
 }
 
-#' Reads a JSON file and provides a data source compatible with dplyr
+#' Read a JSON file into a Spark DataFrame
 #'
 #' @inheritParams spark_read_csv
+#'
+#' @family reading and writing data
 #'
 #' @export
 spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
@@ -88,9 +100,11 @@ spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, over
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
-#' Writes a dplyr operation result as a JSON file
+#' Write a Spark DataFrame to a JSON file
 #'
 #' @inheritParams spark_write_csv
+#'
+#' @family reading and writing data
 #'
 #' @export
 spark_write_json <- function(x, path) {

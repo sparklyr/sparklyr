@@ -28,4 +28,10 @@ DataFrame a table name in the associated Spark SQL context, and
 then returns a \code{tbl_spark} which you can then use with
 the \code{dplyr} interface.
 }
+\seealso{
+Other Spark data frames: \code{\link{sdf_collect}},
+  \code{\link{sdf_copy_to}}, \code{\link{sdf_mutate}},
+  \code{\link{sdf_partition}}, \code{\link{sdf_predict}},
+  \code{\link{sdf_sample}}, \code{\link{sdf_sort}}
+}
 

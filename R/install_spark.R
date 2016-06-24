@@ -89,13 +89,19 @@ spark_home <- function() {
 
 #' Download and install various versions of Spark
 #' 
+#' Install versions of Spark for use with local Spark connections 
+#'   (i.e. \code{spark_connect(master = "local"})
+#' 
 #' @param version Version of Spark to install. See \code{spark_available_versions} for a list of supported versions
 #' @param hadoop_version Version of Hadoop to install. See \code{spark_available_versions} for a list of supported versions
 #' @param reset Attempts to reset settings to defaults
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
-#' @param verbose Report information as Spark is downloaded / installed?
-#' @param tarfile Path to TAR file conforming to the pattern spark-###-bin-hadoop### where ###
-#' reference spark and hadoop versions respectevely.
+#' @param verbose Report information as Spark is downloaded / installed
+#' @param tarfile Path to TAR file conforming to the pattern spark-###-bin-(hadoop)?### where ###
+#' reference spark and hadoop versions respectively.
+#' 
+#' @return List with information about the installed version.
+#' 
 #' @export
 spark_install <- function(version = NULL,
                           hadoop_version = NULL,

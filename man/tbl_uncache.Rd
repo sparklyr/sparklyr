@@ -2,16 +2,20 @@
 % Please edit documentation in R/dplyr_spark.R
 \name{tbl_uncache}
 \alias{tbl_uncache}
-\title{Unloads table from memory}
+\title{Unload table from memory}
 \usage{
 tbl_uncache(sc, name)
 }
 \arguments{
-\item{sc}{Connection to dplyr source}
+\item{sc}{Spark connection}
 
 \item{name}{Name of the destination table}
 }
 \description{
-Unloads table from memory
+Unload table from memory
+}
+\seealso{
+Other dplyr: \code{\link{collect}}, \code{\link{copy_to}},
+  \code{\link{tbl_cache}}
 }
 

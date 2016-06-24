@@ -15,15 +15,20 @@ spark_default_jars <- function() {
     jarsOption
 }
 
-#' Connects to Spark and establishes the Spark Context
-#' @name spark_connect
-#' @export
+#' Connect to Spark
+#' 
 #' @param master Master definition to Spark cluster
 #' @param app_name Application name to be used while running in the Spark cluster
-#' @param version Version of the Spark cluster. Use spark_versions() for a list of supported Spark versions.
-#' @param hadoop_version Version of Hadoop. Use spark_versions_hadoop() for a list of supported Hadoop versions.
-#' @param extensions Extensions to enable for this connection.
+#' @param version Version of the Spark (only applicable for local mode)
+#' @param hadoop_version Version of Hadoop (only applicable for local mode)
+#' @param extensions Extension packages to enable for this connection.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
+#' 
+#' @return Connection to Spark local instance or remote cluster
+#' 
+#' @family Spark connections
+#' 
+#' @export
 spark_connect <- function(master = "local",
                           app_name = "sparklyr",
                           version = NULL,
@@ -169,19 +174,28 @@ spark_connection_attach_sql_session_context <- function(sc, sconInst) {
   sconInst
 }
 
-#' Disconnects from Spark and terminates the running application
-#' @name spark_disconnect
+#' Disconnect from Spark
+#' 
+#' @param sc Spark connection provided by \code{\link{spark_connect}}
+#' 
+#' @family Spark connections
+#' 
 #' @export
-#' @param sc Spark connection provided by spark_connect
 spark_disconnect <- function(sc) {
   stop_shell(sc)
 }
 
-#' Retrieves the last n entries in the Spark log
-#' @name spark_log
-#' @export
-#' @param sc Spark connection provided by spark_connect
+#' Retrieves entries from the Spark log
+#' 
+#' @inheritParams spark_disconnect
 #' @param n Max number of log entries to retrieve
+#' 
+#' @return Character vector with last \code{n} lines of the Spark log 
+#'   or for \code{spark_log_file} the full path to the log file.
+#' 
+#' @family Spark connections
+#' 
+#' @export
 spark_log <- function(sc, n = 100) {
   scon <- sc
   log <- file(spark_log_file(scon))
@@ -211,10 +225,13 @@ print.spark_log <- function(x, ...) {
   cat("\n")
 }
 
-#' Opens the Spark web interface
-#' @name spark_web
+#' Open the Spark web interface
+#' 
+#' @inheritParams spark_disconnect
+#' 
+#' @family Spark connections
+#' 
 #' @export
-#' @param sc Spark connection provided by spark_connect
 spark_web <- function(sc) {
   scon <- sc
   sconInst <- spark_connection_get_inst(scon)
@@ -319,9 +336,14 @@ spark_connection_local_cores <- function(sc) {
   sc$config[["sparklyr.cores"]]
 }
 
-#' Checks to see if the connection into Spark is still open
-#' @param scon Spark connection
+#' Check to see if the connection to Spark is still open
+#' 
+#' @inheritParams spark_disconnect
+#' 
+#' @family Spark connections
+#' 
 #' @keywords internal
+#' 
 #' @export
 spark_connection_is_open <- function(sc) {
   sconInst <- spark_connection_get_inst(sc)
@@ -344,8 +366,10 @@ spark_connection_version <- function(sc) {
   sparkapi_invoke(sparkapi_spark_context(sc), "version")
 }
 
-#' Closes all existing connections. Returns the total of connections closed.
-#' @name spark_disconnect_all
+#' Close all existing connections
+#' 
+#' @family Spark connections
+#' 
 #' @rdname spark_disconnect
 #' @export
 spark_disconnect_all <- function() {

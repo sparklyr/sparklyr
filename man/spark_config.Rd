@@ -2,7 +2,7 @@
 % Please edit documentation in R/config_spark.R
 \name{spark_config}
 \alias{spark_config}
-\title{Defines a configuration file based on the config package and built-in defaults}
+\title{Read Spark Configuration}
 \usage{
 spark_config(file = "config.yml", use_default = TRUE)
 }
@@ -11,7 +11,13 @@ spark_config(file = "config.yml", use_default = TRUE)
 
 \item{use_default}{TRUE to use the built-in detaults provided in this package}
 }
+\value{
+Named list with configuration data
+}
 \description{
-Defines a configuration file based on the config package and built-in defaults
+Read Spark Configuration
+}
+\details{
+Read Spark configuration using the \pkg{\link[config]{config}} package.
 }
 

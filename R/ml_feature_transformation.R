@@ -78,6 +78,8 @@ ft_string_indexer <- function(x,
 #'
 #' @template roxlate-ml-transformation
 #'
+#' @family feature transformation routines
+#'
 #' @param threshold The numeric threshold.
 #'
 #' @export
