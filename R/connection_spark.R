@@ -17,10 +17,11 @@ spark_default_jars <- function() {
 
 #' Connect to Spark
 #' 
-#' @param master Master definition to Spark cluster
+#' @param master Spark cluster url to connect to. Use \code{"local"} to connect to a local 
+#'   instance of Spark installed via \code{\link{spark_install}}.
 #' @param app_name Application name to be used while running in the Spark cluster
-#' @param version Version of the Spark (only applicable for local mode)
-#' @param hadoop_version Version of Hadoop (only applicable for local mode)
+#' @param version Version of the Spark (only applicable for local master)
+#' @param hadoop_version Version of Hadoop (only applicable for local master)
 #' @param extensions Extension packages to enable for this connection.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
 #' 
@@ -29,7 +30,7 @@ spark_default_jars <- function() {
 #' @family Spark connections
 #' 
 #' @export
-spark_connect <- function(master = "local",
+spark_connect <- function(master,
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,

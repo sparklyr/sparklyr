@@ -73,6 +73,11 @@ dplyr::src_tbls(sc)
 }
 }
 \seealso{
+Other Spark data frames: \code{\link{sdf_collect}},
+  \code{\link{sdf_copy_to}}, \code{\link{sdf_partition}},
+  \code{\link{sdf_predict}}, \code{\link{sdf_register}},
+  \code{\link{sdf_sample}}, \code{\link{sdf_sort}}
+
 Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_bucketizer}},
   \code{\link{ft_discrete_cosine_transform}},
@@ -82,10 +87,5 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_string_indexer}},
   \code{\link{ft_vector_assembler}}
-
-Other Spark data frames: \code{\link{sdf_collect}},
-  \code{\link{sdf_copy_to}}, \code{\link{sdf_partition}},
-  \code{\link{sdf_predict}}, \code{\link{sdf_register}},
-  \code{\link{sdf_sample}}, \code{\link{sdf_sort}}
 }
 

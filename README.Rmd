@@ -42,9 +42,8 @@ spark_install(version = "1.6.1", hadoop_version = "2.6", reset = TRUE)
 The sparklyr package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then use the returned connection as a remote dplyr source.
 
 ```{r connection, message=FALSE}
-# connect to local spark instance 
 library(sparklyr)
-sc <- spark_connect("local", version = "1.6.1")
+sc <- spark_connect(master = "local")
 ```
 
 Now we copy some datasets from R into the Spark cluster:
@@ -116,20 +115,20 @@ iris_tbl %>%
 ## Reading and Writing Data
 
 ```{r}
-  temp_csv <- tempfile(fileext = ".csv")
-  temp_parquet <- tempfile(fileext = ".parquet")
-  temp_json <- tempfile(fileext = ".json")
-  
-  spark_write_csv(iris_tbl, temp_csv)
-  iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
-  
-  spark_write_parquet(iris_tbl, temp_parquet)
-  iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
-  
-  spark_write_csv(iris_tbl, temp_json)
-  iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
-  
-  src_tbls(sc)
+temp_csv <- tempfile(fileext = ".csv")
+temp_parquet <- tempfile(fileext = ".parquet")
+temp_json <- tempfile(fileext = ".json")
+
+spark_write_csv(iris_tbl, temp_csv)
+iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
+
+spark_write_parquet(iris_tbl, temp_parquet)
+iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
+
+spark_write_csv(iris_tbl, temp_json)
+iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
+
+src_tbls(sc)
 ```
 
 ## Extensibility
@@ -142,7 +141,7 @@ library(sparkapi)
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
   sparkapi_spark_context(sc) %>% 
-    sparkapi_invoke("textFile", path, as.integer(1)) %>% 
+    sparkapi_invoke("textFile", path, 1L) %>% 
       sparkapi_invoke("count")
 }
 
@@ -192,6 +191,3 @@ Finally, we disconnect from Spark:
 spark_disconnect(sc)
 ```
 
-## Additional Resources
-
-For performance runs under various parameters, read: [Dplyr Performance](docs/perf_dplyr.md) and [Spark 1B-Rows Performance](docs/perf_1b.md)

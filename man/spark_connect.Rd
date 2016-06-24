@@ -4,17 +4,18 @@
 \alias{spark_connect}
 \title{Connect to Spark}
 \usage{
-spark_connect(master = "local", app_name = "sparklyr", version = NULL,
+spark_connect(master, app_name = "sparklyr", version = NULL,
   hadoop_version = NULL, extensions = NULL, config = spark_config())
 }
 \arguments{
-\item{master}{Master definition to Spark cluster}
+\item{master}{Spark cluster url to connect to. Use \code{"local"} to connect to a local 
+instance of Spark installed via \code{\link{spark_install}}.}
 
 \item{app_name}{Application name to be used while running in the Spark cluster}
 
-\item{version}{Version of the Spark (only applicable for local mode)}
+\item{version}{Version of the Spark (only applicable for local master)}
 
-\item{hadoop_version}{Version of Hadoop (only applicable for local mode)}
+\item{hadoop_version}{Version of Hadoop (only applicable for local master)}
 
 \item{extensions}{Extension packages to enable for this connection.}
 
