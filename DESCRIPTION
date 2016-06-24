@@ -59,14 +59,16 @@ Collate:
     'shell_spark.R'
     'spark_data_frame.R'
     'utils.R'
+Depends:
+    R (>= 3.1.2)
 Imports:
-    dplyr,
+    dplyr (>= 0.5.0),
     methods,
     readr,
-    DBI,
+    DBI (>= 0.4-1),
     assertthat,
     rappdirs,
-    lazyeval,
+    lazyeval (>= 0.2.0),
     config,
     digest,
     sparkapi
