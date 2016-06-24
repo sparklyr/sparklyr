@@ -32,6 +32,8 @@ ml_one_vs_rest <- function(x,
   
   fit <- ovrc %>%
     sparkapi_invoke("setClassifier", classifier) %>%
+    sparkapi_invoke("setFeaturesCol", envir$features) %>%
+    sparkapi_invoke("setLabelCol", envir$response) %>%
     sparkapi_invoke("fit", tdf)
   
   ml_model("one_vs_rest", fit,
