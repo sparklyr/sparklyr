@@ -61,9 +61,9 @@ Collate:
     'spark_data_frame.R'
     'utils.R'
 Depends:
-    R (>= 3.1.2)
+    R (>= 3.1.2),
+    methods
 Imports:
-    methods,
     magrittr,
     lazyeval (>= 0.2.0),
     dplyr (>= 0.5.0),
