@@ -358,20 +358,25 @@ sdf_mutate_ <- function(.data, ..., .dots) {
 #' Model Predictions with Spark DataFrames
 #' 
 #' Given a \code{ml_model} fit alongside a new data set, produce a new Spark
-#' DataFrame with predicted values encoded in the \code{"prediction"} column.
+#' DataFrame with predicted values encoded in the \code{prediction} column.
 #' 
 #' @param object,newdata An object coercable to a Spark DataFrame.
+#' @param prediction The name to assign to the column hosting the predicted values.
 #' @param ... Optional arguments; currently unused.
 #' 
 #' @family Spark data frames
 #' 
 #' @export
-sdf_predict <- function(object, newdata, ...) {
+sdf_predict <- function(object, newdata, prediction = "prediction", ...) {
+  prediction <- ensure_scalar_character(prediction)
   if (missing(newdata) || is.null(newdata))
     newdata <- object$data
   sdf <- sparkapi_dataframe(newdata)
   params <- object$model.parameters
   assembled <- ft_vector_assembler(sdf, object$features, params$features)
-  transformed <- sparkapi_invoke(object$.model, "transform", assembled)
-  sdf_register(transformed)
+  model <- object$.model
+  model <- sparkapi_invoke(model, "setPredictionCol", prediction)
+  transformed <- sparkapi_invoke(model, "transform", assembled)
+  dropped <- sparkapi_invoke(transformed, "drop", params$features)
+  sdf_register(dropped)
 }
