@@ -45,7 +45,7 @@ ml_kmeans <- function(x,
   
   if (only_model) return(model)
   
-  model <- fit %>%
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
 
   # extract cluster centers

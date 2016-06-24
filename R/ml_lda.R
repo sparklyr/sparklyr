@@ -34,7 +34,7 @@ ml_lda <- function(x,
   
   if (only_model) return(model)
   
-  model <- fit %>%
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
   
   topics.matrix <- read_spark_matrix(fit, "topicsMatrix")

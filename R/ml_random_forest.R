@@ -67,7 +67,7 @@ ml_random_forest <- function(x,
   
   if (only_model) return(model)
   
-  model <- fit %>%
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
 
   featureImportances <- fit %>%

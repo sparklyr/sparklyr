@@ -67,7 +67,7 @@ ml_gradient_boosted_trees <- function(x,
   
   if (only_model) return(model)
   
-  model <- fit %>%
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
 
   ml_model("gradient_boosted_trees", fit,

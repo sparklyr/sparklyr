@@ -67,7 +67,7 @@ ml_decision_tree <- function(x,
   
   if (only_model) return(model)
   
-  model <- fit %>%
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
   
   ml_model("decision_tree", fit,
