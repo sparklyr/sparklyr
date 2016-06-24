@@ -45,7 +45,7 @@ spark_write_csv.sparkapi_jobj <- function(x, path) {
   spark_api_write_csv(x, path.expand(path))
 }
 
-#' Read a parquet file into a Spark DataFrame
+#' Read a Parquet file into a Spark DataFrame
 #'
 #' @inheritParams spark_read_csv
 #'
@@ -61,7 +61,7 @@ spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, o
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
-#' Write a Spark DataFrame to a parquet file
+#' Write a Spark DataFrame to a Parquet file
 #'
 #' @inheritParams spark_write_csv
 #'

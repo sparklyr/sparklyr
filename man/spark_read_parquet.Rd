@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_spark_data.R
 \name{spark_read_parquet}
 \alias{spark_read_parquet}
-\title{Read a parquet file into a Spark DataFrame}
+\title{Read a Parquet file into a Spark DataFrame}
 \usage{
 spark_read_parquet(sc, name, path, repartition = 0, memory = TRUE,
   overwrite = TRUE)
@@ -21,7 +21,7 @@ spark_read_parquet(sc, name, path, repartition = 0, memory = TRUE,
 \item{overwrite}{Overwrite the table with the given name if it already exists}
 }
 \description{
-Read a parquet file into a Spark DataFrame
+Read a Parquet file into a Spark DataFrame
 }
 \seealso{
 Other reading and writing data: \code{\link{spark_read_csv}},

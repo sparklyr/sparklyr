@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_spark_data.R
 \name{spark_write_parquet}
 \alias{spark_write_parquet}
-\title{Write a Spark DataFrame to a parquet file}
+\title{Write a Spark DataFrame to a Parquet file}
 \usage{
 spark_write_parquet(x, path)
 }
@@ -12,7 +12,7 @@ spark_write_parquet(x, path)
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
 }
 \description{
-Write a Spark DataFrame to a parquet file
+Write a Spark DataFrame to a Parquet file
 }
 \seealso{
 Other reading and writing data: \code{\link{spark_read_csv}},
