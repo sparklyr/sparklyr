@@ -363,8 +363,11 @@ spark_connection_is_open <- function(sc) {
   bothOpen
 }
 
-spark_connection_version <- function(sc) {
-  sparkapi_invoke(sparkapi_spark_context(sc), "version")
+spark_connection_version <- function(sc, onlyVersion = FALSE) {
+  rawVersion <- sparkapi_invoke(sparkapi_spark_context(sc), "version")
+  
+  # Get rid of -preview and other suffix variations if needed
+  if (onlyVersion) gsub("([0-9]+\\.?)[^0-9\\.](.*)","\\1", rawVersion) else rawVersion
 }
 
 #' Close all existing connections
