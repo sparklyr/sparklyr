@@ -102,7 +102,8 @@ copy_to.sparklyr_connection <- function(dest, df, name = deparse(substitute(df))
   dest <- src_sql("spark", dbConnect(DBISpark(sc)))
 
   if (overwrite)
-    spark_remove_table_if_exists(dest, name)
+    spark_remove_table_if_exists(sc, name)
+  
   if (name %in% src_tbls(sc))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
