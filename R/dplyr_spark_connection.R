@@ -82,6 +82,8 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
 
 #' @export
 sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ...) {
+  # TODO: This function needs to be removed once dplyr can workaround this issue by avoiding USING statements.
+  
   sparkVersion <- spark_connection_version(con@scon, onlyVersion = TRUE)
   
   if (compareVersion(sparkVersion, "2.0.0") < 0) {
