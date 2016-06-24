@@ -29,9 +29,9 @@ the \R level, these operations will only be executed when you explicitly
 \code{collect()} the table.
 }
 \seealso{
-Other Spark data frames: \code{\link{sdf_collect}},
-  \code{\link{sdf_copy_to}}, \code{\link{sdf_mutate}},
-  \code{\link{sdf_partition}}, \code{\link{sdf_predict}},
-  \code{\link{sdf_register}}, \code{\link{sdf_sample}}
+Other Spark data frames: \code{\link{sdf_copy_to}},
+  \code{\link{sdf_mutate}}, \code{\link{sdf_partition}},
+  \code{\link{sdf_predict}}, \code{\link{sdf_register}},
+  \code{\link{sdf_sample}}
 }
 

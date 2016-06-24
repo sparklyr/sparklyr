@@ -16,9 +16,9 @@ Give a \code{ml_model} fit alongside a new data set, produce a new Spark
 DataFrame with predicted values encoded in the \code{"prediction"} column.
 }
 \seealso{
-Other Spark data frames: \code{\link{sdf_collect}},
-  \code{\link{sdf_copy_to}}, \code{\link{sdf_mutate}},
-  \code{\link{sdf_partition}}, \code{\link{sdf_register}},
-  \code{\link{sdf_sample}}, \code{\link{sdf_sort}}
+Other Spark data frames: \code{\link{sdf_copy_to}},
+  \code{\link{sdf_mutate}}, \code{\link{sdf_partition}},
+  \code{\link{sdf_register}}, \code{\link{sdf_sample}},
+  \code{\link{sdf_sort}}
 }
 

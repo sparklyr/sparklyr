@@ -16,6 +16,7 @@
 #' @family Spark data frames
 #' 
 #' @name sdf_copy_to
+#' @export
 sdf_copy_to <- function(sc, x, ...) {
   UseMethod("sdf_copy_to")
 }
@@ -26,12 +27,13 @@ sdf_copy_to.default <- function(sc, x, ...) {
 }
 
 #' @name sdf_copy_to
+#' @export
 sdf_import <- function(x, sc, ...) {
   UseMethod("sdf_import")
 }
 
 #' @export
-sdf_import.default <- function(x, sc, ...) {
+sdf_import.default <- function(x, sc, ..., name = NULL, cache = TRUE) {
   
   # ensure data.frame
   if (!is.data.frame(x)) {
@@ -102,22 +104,16 @@ sdf_import.default <- function(x, sc, ...) {
   )
   
   # invoke CSV reader with our schema
-  reader %>%
+  sdf <- reader %>%
     sparkapi_invoke("format", "com.databricks.spark.csv") %>%
     sparkapi_invoke("option", "header", "true") %>%
     sparkapi_invoke("schema", schema) %>%
-    sparkapi_invoke("load", path) %>%
-    sparkapi_invoke("cache")
-}
-
-#' Return a Spark DataFrame to R
-#' 
-#' @param x a Spark DataFrame.
-#' 
-#' @family Spark data frames
-#' 
-sdf_collect <- function(x) {
-  spark_dataframe_collect(x)
+    sparkapi_invoke("load", path)
+  
+  if (cache)
+    sdf <- sparkapi_invoke(sdf, "cache")
+  
+  sdf_register(sdf, name)
 }
 
 #' Register a Spark DataFrame
@@ -131,7 +127,7 @@ sdf_collect <- function(x) {
 #' @param name A name to assign this table.
 #' 
 #' @family Spark data frames
-#' 
+#' @export
 sdf_register <- function(x, name = NULL) {
   UseMethod("sdf_register")
 }
@@ -211,8 +207,9 @@ sdf_partition <- function(x,
   if (is.null(nm) || any(!nzchar(nm)))
     stop("all weights must be named")
   partitions <- spark_dataframe_split(sdf, as.numeric(weights), seed = seed)
-  names(partitions) <- nm
-  sdf_register(partitions)
+  registered <- sdf_register(partitions)
+  names(registered) <- nm
+  registered
 }
 
 #' Randomly Sample Rows from a Spark DataFrame
