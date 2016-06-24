@@ -4,13 +4,15 @@
 \alias{ml_lda}
 \title{Spark ML -- Latent Dirichlet Allocation}
 \usage{
-ml_lda(x, features = dplyr::tbl_vars(x))
+ml_lda(x, features = dplyr::tbl_vars(x), ...)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
 
 \item{features}{The columns to use in the principal components
 analysis. Defaults to all columns in \code{x}.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Fit a Latent Dirichlet Allocation (LDA) model to a Spark DataFrame.

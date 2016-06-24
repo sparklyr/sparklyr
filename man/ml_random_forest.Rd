@@ -5,7 +5,7 @@
 \title{Spark ML -- Random Forests}
 \usage{
 ml_random_forest(x, response, features, max.bins = 32L, max.depth = 5L,
-  num.trees = 20L, type = c("auto", "regression", "classification"))
+  num.trees = 20L, type = c("auto", "regression", "classification"), ...)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
@@ -28,6 +28,8 @@ as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Perform regression or classification using random forests with a \code{spark_tbl}.

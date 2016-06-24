@@ -5,7 +5,7 @@
 \title{Spark ML -- Linear Regression}
 \usage{
 ml_linear_regression(x, response, features, intercept = TRUE, alpha = 0,
-  lambda = 0)
+  lambda = 0, ...)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
@@ -20,6 +20,8 @@ for the response.}
 \item{alpha, lambda}{Parameters controlling loss function penalization (for e.g.
 lasso, elastic net, and ridge regression). See \strong{Details} for more
 information.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Perform linear regression on a Spark DataFrame.

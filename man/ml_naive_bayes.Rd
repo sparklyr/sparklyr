@@ -4,7 +4,7 @@
 \alias{ml_naive_bayes}
 \title{Spark ML -- Naive-Bayes}
 \usage{
-ml_naive_bayes(x, response, features, lambda = 0)
+ml_naive_bayes(x, response, features, lambda = 0, ...)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
@@ -14,6 +14,8 @@ ml_naive_bayes(x, response, features, lambda = 0)
 \item{features}{The names of features (terms) included in the model.}
 
 \item{lambda}{The (Laplace) smoothing parameter. Defaults to zero.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Perform regression or classification using naive bayes.

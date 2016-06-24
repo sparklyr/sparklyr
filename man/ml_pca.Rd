@@ -4,13 +4,15 @@
 \alias{ml_pca}
 \title{Spark ML -- Principal Components Analysis}
 \usage{
-ml_pca(x, features = dplyr::tbl_vars(x))
+ml_pca(x, features = dplyr::tbl_vars(x), ...)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
 
 \item{features}{The columns to use in the principal components
 analysis. Defaults to all columns in \code{x}.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Perform principal components analysis on a \code{spark_tbl}.

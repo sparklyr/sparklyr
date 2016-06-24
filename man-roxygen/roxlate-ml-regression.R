@@ -6,6 +6,7 @@
 #' @param alpha,lambda Parameters controlling loss function penalization (for e.g.
 #'   lasso, elastic net, and ridge regression). See \strong{Details} for more
 #'   information.
+#' @param ... Other arguments passed on to methods.
 #'
 #' @details
 #' Spark implements for both \eqn{L1} and \eqn{L2} regularization in linear

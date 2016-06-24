@@ -5,7 +5,7 @@
 \title{Spark ML -- Multilayer Perceptron}
 \usage{
 ml_multilayer_perceptron(x, response, features, layers, max.iter = 100,
-  seed = sample(.Machine$integer.max, 1))
+  seed = sample(.Machine$integer.max, 1), ...)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
@@ -23,6 +23,8 @@ output (class) layer of size 2.}
 \item{max.iter}{Maximum number of iterations to perform in model fit.}
 
 \item{seed}{A random seed.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Creates and trains multilayer perceptron on a \code{spark_tbl}.

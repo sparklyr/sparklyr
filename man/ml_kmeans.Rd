@@ -4,7 +4,7 @@
 \alias{ml_kmeans}
 \title{Spark ML -- K-Means Clustering}
 \usage{
-ml_kmeans(x, centers, iter.max = 10, features = dplyr::tbl_vars(x))
+ml_kmeans(x, centers, iter.max = 10, features = dplyr::tbl_vars(x), ...)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
@@ -15,6 +15,8 @@ ml_kmeans(x, centers, iter.max = 10, features = dplyr::tbl_vars(x))
 
 \item{features}{Which columns to use in the k-means fit. Defaults to
 all columns within \code{x}.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Perform k-means clustering on a \code{spark_tbl}.

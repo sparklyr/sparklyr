@@ -5,7 +5,7 @@
 \title{Spark ML -- Survival Regression}
 \usage{
 ml_survival_regression(x, response, features, intercept = TRUE,
-  censor = "censor")
+  censor = "censor", ...)
 }
 \arguments{
 \item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
@@ -19,6 +19,8 @@ ml_survival_regression(x, response, features, intercept = TRUE,
 \item{censor}{The name of the vector that provides censoring information.
 This should be a numeric vector, with 0 marking uncensored data, and
 1 marking right-censored data.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Perform survival regression on a Spark DataFrame, using an Accelerated
