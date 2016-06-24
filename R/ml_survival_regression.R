@@ -10,7 +10,8 @@
 #' @param censor The name of the vector that provides censoring information.
 #'   This should be a numeric vector, with 0 marking uncensored data, and
 #'   1 marking right-censored data.
-#'
+#' @param ... Other arguments passed on to methods.
+#' 
 #' @family Spark ML routines
 #'
 #' @export
@@ -18,7 +19,8 @@ ml_survival_regression <- function(x,
                                    response,
                                    features,
                                    intercept = TRUE,
-                                   censor = "censor")
+                                   censor = "censor",
+                                   ...)
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
@@ -27,6 +29,7 @@ ml_survival_regression <- function(x,
   features <- as.character(features)
   intercept <- ensure_scalar_boolean(intercept)
   censor <- ensure_scalar_character(censor)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
@@ -35,11 +38,15 @@ ml_survival_regression <- function(x,
   
   rf <- sparkapi_invoke_new(sc, model)
   
-  fit <- rf %>%
+  model <- rf %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("setLabelCol", envir$response) %>%
     sparkapi_invoke("setFitIntercept", as.logical(intercept)) %>%
-    sparkapi_invoke("setCensorCol", censor) %>%
+    sparkapi_invoke("setCensorCol", censor)
+    
+  if (only_model) return(model)
+  
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
   
   coefficients <- fit %>%

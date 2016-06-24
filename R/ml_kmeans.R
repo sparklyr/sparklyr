@@ -7,14 +7,19 @@
 #' @param iter.max Maximum number of iterations allowed.
 #' @param features Which columns to use in the k-means fit. Defaults to
 #'   all columns within \code{x}.
-#'
+#' @param ... Other arguments passed on to methods.
+#' 
 #' @seealso For information on how Spark k-means clustering is implemented, please see
 #'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
 #'
 #' @family Spark ML routines
 #'
 #' @export
-ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) {
+ml_kmeans <- function(x,
+                      centers,
+                      iter.max = 10,
+                      features = dplyr::tbl_vars(x),
+                      ...) {
   
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
@@ -22,6 +27,7 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
   features <- as.character(features)
   centers <- ensure_scalar_integer(centers)
   iter.max <- ensure_scalar_integer(iter.max)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
@@ -32,12 +38,15 @@ ml_kmeans <- function(x, centers, iter.max = 10, features = dplyr::tbl_vars(x)) 
     "org.apache.spark.ml.clustering.KMeans"
   )
 
-  fit <- kmeans %>%
+  model <- kmeans %>%
     sparkapi_invoke("setK", centers) %>%
     sparkapi_invoke("setMaxIter", iter.max) %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
+    sparkapi_invoke("setFeaturesCol", envir$features)
+  
+  if (only_model) return(model)
+  
+  model <- fit %>%
     sparkapi_invoke("fit", tdf)
-
 
   # extract cluster centers
   kmmCenters <- sparkapi_invoke(fit, "clusterCenters")

@@ -5,16 +5,20 @@
 #' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
-#'
+#' @param ... Other arguments passed on to methods.
+#' 
 #' @family Spark ML routines
 #'
 #' @export
-ml_lda <- function(x, features = dplyr::tbl_vars(x)) {
+ml_lda <- function(x,
+                   features = dplyr::tbl_vars(x),
+                   ...) {
   
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
   
   features <- as.character(features)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
@@ -24,9 +28,13 @@ ml_lda <- function(x, features = dplyr::tbl_vars(x)) {
     "org.apache.spark.ml.clustering.LDA"
   )
   
-  fit <- lda %>%
+  model <- lda %>%
     sparkapi_invoke("setK", length(features)) %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
+    sparkapi_invoke("setFeaturesCol", envir$features)
+  
+  if (only_model) return(model)
+  
+  model <- fit %>%
     sparkapi_invoke("fit", tdf)
   
   topics.matrix <- read_spark_matrix(fit, "topicsMatrix")

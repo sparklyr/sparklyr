@@ -12,7 +12,8 @@
 #'   output (class) layer of size 2.
 #' @param max.iter Maximum number of iterations to perform in model fit.
 #' @param seed A random seed.
-#'
+#' @param ... Other arguments passed on to methods.
+#' 
 #' @family Spark ML routines
 #'
 #' @export
@@ -21,7 +22,8 @@ ml_multilayer_perceptron <- function(x,
                                      features,
                                      layers,
                                      max.iter = 100,
-                                     seed = sample(.Machine$integer.max, 1))
+                                     seed = sample(.Machine$integer.max, 1),
+                                     ...)
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
@@ -31,6 +33,7 @@ ml_multilayer_perceptron <- function(x,
   layers <- as.integer(layers)
   max.iter <- ensure_scalar_integer(max.iter)
   seed <- ensure_scalar_integer(seed)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
@@ -42,14 +45,18 @@ ml_multilayer_perceptron <- function(x,
     "org.apache.spark.ml.classification.MultilayerPerceptronClassifier"
   )
 
-  fit <- mpc %>%
+  model <- mpc %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("setLabelCol", envir$response) %>%
     sparkapi_invoke("setLayers", as.list(layers)) %>%
     sparkapi_invoke("setSeed", seed) %>%
-    sparkapi_invoke("setMaxIter", max.iter) %>%
-    sparkapi_invoke("fit", tdf)
+    sparkapi_invoke("setMaxIter", max.iter)
 
+  if (only_model) return(model)
+  
+  fit <- model %>%
+    sparkapi_invoke("fit", tdf)
+  
   ml_model("multilayer_perceptron", fit,
     features = features,
     response = response,

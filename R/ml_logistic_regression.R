@@ -4,8 +4,6 @@
 #'
 #' @template roxlate-ml-regression
 #'
-#' @param only_model Return the model without fitting it.
-#'
 #' @family Spark ML routines
 #'
 #' @export
@@ -15,7 +13,7 @@ ml_logistic_regression <- function(x,
                                    intercept = TRUE,
                                    alpha = 0,
                                    lambda = 0,
-                                   only_model = FALSE)
+                                   ...)
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
@@ -25,7 +23,7 @@ ml_logistic_regression <- function(x,
   intercept <- ensure_scalar_boolean(intercept)
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
-  only_model <- ensure_scalar_boolean(only_model)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)

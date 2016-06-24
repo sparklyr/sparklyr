@@ -15,7 +15,8 @@
 #'   as a categorical variable. When \code{"auto"} is used, the model type is
 #'   inferred based on the response variable type -- if it is a numeric type,
 #'   then regression is used; classification otherwise.
-#'
+#' @param ... Other arguments passed on to methods.
+#' 
 #' @family Spark ML routines
 #'
 #' @export
@@ -24,7 +25,8 @@ ml_gradient_boosted_trees <- function(x,
                                       features,
                                       max.bins = 32L,
                                       max.depth = 5L,
-                                      type = c("auto", "regression", "classification"))
+                                      type = c("auto", "regression", "classification"),
+                                      ...)
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
@@ -37,6 +39,7 @@ ml_gradient_boosted_trees <- function(x,
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   # choose classification vs. regression model based on column type
   schema <- spark_dataframe_schema(df)
@@ -56,11 +59,15 @@ ml_gradient_boosted_trees <- function(x,
 
   rf <- sparkapi_invoke_new(sc, model)
 
-  fit <- rf %>%
+  model <- rf %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("setLabelCol", envir$response) %>%
     sparkapi_invoke("setMaxBins", max.bins) %>%
-    sparkapi_invoke("setMaxDepth", max.depth) %>%
+    sparkapi_invoke("setMaxDepth", max.depth)
+  
+  if (only_model) return(model)
+  
+  model <- fit %>%
     sparkapi_invoke("fit", tdf)
 
   ml_model("gradient_boosted_trees", fit,

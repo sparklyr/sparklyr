@@ -6,20 +6,23 @@
 #' @param response The name of the response vector.
 #' @param features The names of features (terms) included in the model.
 #' @param lambda The (Laplace) smoothing parameter. Defaults to zero.
-#'
+#' @param ... Other arguments passed on to methods.
+#' 
 #' @family Spark ML routines
 #'
 #' @export
 ml_naive_bayes <- function(x,
                            response,
                            features,
-                           lambda = 0)
+                           lambda = 0,
+                           ...)
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
   
   response <- ensure_scalar_character(response)
   features <- as.character(features)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
@@ -28,10 +31,14 @@ ml_naive_bayes <- function(x,
   
   rf <- sparkapi_invoke_new(sc, model)
   
-  fit <- rf %>%
+  model <- rf %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setSmoothing", lambda) %>%
+    sparkapi_invoke("setSmoothing", lambda)
+  
+  if (only_model) return(model)
+  
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
   
   pi <- fit %>%

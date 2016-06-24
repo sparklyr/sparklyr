@@ -12,7 +12,8 @@ ml_linear_regression <- function(x,
                                  features,
                                  intercept = TRUE,
                                  alpha = 0,
-                                 lambda = 0)
+                                 lambda = 0,
+                                 ...)
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
@@ -22,6 +23,7 @@ ml_linear_regression <- function(x,
   intercept <- ensure_scalar_boolean(intercept)
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
@@ -31,13 +33,17 @@ ml_linear_regression <- function(x,
     "org.apache.spark.ml.regression.LinearRegression"
   )
 
-  fit <- lr %>%
+  model <- lr %>%
     sparkapi_invoke("setMaxIter", 10L) %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("setLabelCol", envir$response) %>%
     sparkapi_invoke("setFitIntercept", intercept) %>%
     sparkapi_invoke("setElasticNetParam", alpha) %>%
-    sparkapi_invoke("setRegParam", lambda) %>%
+    sparkapi_invoke("setRegParam", lambda)
+  
+  if (only_model) return(model)
+  
+  fit <- model %>%
     sparkapi_invoke("fit", tdf)
 
   coefficients <- fit %>%

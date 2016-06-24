@@ -16,7 +16,8 @@
 #'   as a categorical variable. When \code{"auto"} is used, the model type is
 #'   inferred based on the response variable type -- if it is a numeric type,
 #'   then regression is used; classification otherwise.
-#'
+#' @param ... Other arguments passed on to methods.
+#' 
 #' @family Spark ML routines
 #'
 #' @export
@@ -26,7 +27,8 @@ ml_random_forest <- function(x,
                              max.bins = 32L,
                              max.depth = 5L,
                              num.trees = 20L,
-                             type = c("auto", "regression", "classification"))
+                             type = c("auto", "regression", "classification"),
+                             ...)
 {
   df <- sparkapi_dataframe(x)
   sc <- sparkapi_connection(df)
@@ -37,6 +39,7 @@ ml_random_forest <- function(x,
   max.depth <- ensure_scalar_integer(max.depth)
   num.trees <- ensure_scalar_integer(num.trees)
   type <- match.arg(type)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
@@ -55,12 +58,16 @@ ml_random_forest <- function(x,
 
   rf <- sparkapi_invoke_new(sc, model)
 
-  fit <- rf %>%
+  model <- rf %>%
     sparkapi_invoke("setFeaturesCol", envir$features) %>%
     sparkapi_invoke("setLabelCol", envir$response) %>%
     sparkapi_invoke("setMaxBins", max.bins) %>%
     sparkapi_invoke("setMaxDepth", max.depth) %>%
-    sparkapi_invoke("setNumTrees", num.trees) %>%
+    sparkapi_invoke("setNumTrees", num.trees)
+  
+  if (only_model) return(model)
+  
+  model <- fit %>%
     sparkapi_invoke("fit", tdf)
 
   featureImportances <- fit %>%
