@@ -21,27 +21,6 @@ be applied.}
 Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}
 to mutate a Spark DataFrame.
 }
-\details{
-\code{sdf_mutate()} differs from \code{mutate} in a number of important ways:
-
-\itemize{
-
-\item \code{mutate} returns a \code{tbl_spark}, while \code{sdf_mutate} returns
-  a Spark DataFrame (represented by a \code{jobj}),
-  
-\item \code{mutate} works 'lazily' (the generated SQL is not evaluated until \code{collect}
-  is called), while \code{sdf_mutate} works 'eagerly' (the feature transformer, as well as
-  and pending SQL from a previous pipeline, is applied),
-  
-\item To transform the Spark DataFrame back to a \code{tbl_spark}, you should
-  use \code{\link{sdf_register}}.
- 
-}
-
-Overall, this implies that if you wish to mix a \code{dplyr} pipeline with \code{sdf_mutate},
-you should generally apply your \code{dplyr} pipeline first, then finalize your output with
-\code{sdf_mutate}. See \strong{Examples} for an example of how this might be done.
-}
 \section{Transforming Spark DataFrames}{
 
 
@@ -73,11 +52,6 @@ dplyr::src_tbls(sc)
 }
 }
 \seealso{
-Other Spark data frames: \code{\link{sdf_copy_to}},
-  \code{\link{sdf_partition}}, \code{\link{sdf_predict}},
-  \code{\link{sdf_register}}, \code{\link{sdf_sample}},
-  \code{\link{sdf_sort}}
-
 Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_bucketizer}},
   \code{\link{ft_discrete_cosine_transform}},

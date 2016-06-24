@@ -1,6 +1,7 @@
 #' Copy an Object into Spark
 #' 
-#' Copy an object into Spark, and return a Spark DataFrame.
+#' Copy an object into Spark, and return an \R object wrapping the
+#' copied object (typically, a Spark DataFrame).
 #' 
 #' @section Advanced Usage:
 #' 
@@ -277,26 +278,6 @@ sdf_sort <- function(x, columns) {
 #' Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}
 #' to mutate a Spark DataFrame.
 #' 
-#' \code{sdf_mutate()} differs from \code{mutate} in a number of important ways:
-#' 
-#' \itemize{
-#' 
-#' \item \code{mutate} returns a \code{tbl_spark}, while \code{sdf_mutate} returns
-#'   a Spark DataFrame (represented by a \code{jobj}),
-#'   
-#' \item \code{mutate} works 'lazily' (the generated SQL is not evaluated until \code{collect}
-#'   is called), while \code{sdf_mutate} works 'eagerly' (the feature transformer, as well as
-#'   and pending SQL from a previous pipeline, is applied),
-#'   
-#' \item To transform the Spark DataFrame back to a \code{tbl_spark}, you should
-#'   use \code{\link{sdf_register}}.
-#'  
-#' }
-#' 
-#' Overall, this implies that if you wish to mix a \code{dplyr} pipeline with \code{sdf_mutate},
-#' you should generally apply your \code{dplyr} pipeline first, then finalize your output with
-#' \code{sdf_mutate}. See \strong{Examples} for an example of how this might be done.
-#' 
 #' @template roxlate-sdf
 #'
 #' @param .data A \code{spark_tbl}.
@@ -307,7 +288,6 @@ sdf_sort <- function(x, columns) {
 #' @name sdf_mutate
 #' @export
 #'
-#' @family Spark data frames
 #' @family feature transformation routines
 #'
 #' @examples
@@ -377,7 +357,7 @@ sdf_mutate_ <- function(.data, ..., .dots) {
 
 #' Model Predictions with Spark DataFrames
 #' 
-#' Give a \code{ml_model} fit alongside a new data set, produce a new Spark
+#' Given a \code{ml_model} fit alongside a new data set, produce a new Spark
 #' DataFrame with predicted values encoded in the \code{"prediction"} column.
 #' 
 #' @param object,newdata An object coercable to a Spark DataFrame.

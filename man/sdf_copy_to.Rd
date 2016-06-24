@@ -17,7 +17,8 @@ sdf_import(x, sc, ...)
 \item{...}{Optional arguments, passed to implementing methods.}
 }
 \description{
-Copy an object into Spark, and return a Spark DataFrame.
+Copy an object into Spark, and return an \R object wrapping the
+copied object (typically, a Spark DataFrame).
 }
 \section{Advanced Usage}{
 
@@ -28,9 +29,8 @@ Copy an object into Spark, and return a Spark DataFrame.
 implementing the associated method on \code{sdf_import}.
 }
 \seealso{
-Other Spark data frames: \code{\link{sdf_mutate}},
-  \code{\link{sdf_partition}}, \code{\link{sdf_predict}},
-  \code{\link{sdf_register}}, \code{\link{sdf_sample}},
-  \code{\link{sdf_sort}}
+Other Spark data frames: \code{\link{sdf_partition}},
+  \code{\link{sdf_predict}}, \code{\link{sdf_register}},
+  \code{\link{sdf_sample}}, \code{\link{sdf_sort}}
 }
 
