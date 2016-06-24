@@ -57,6 +57,7 @@ Collate:
     'reexports.R'
     'sdf_interface.R'
     'shell_spark.R'
+    'spark_accessors.R'
     'spark_data_frame.R'
     'utils.R'
 Depends:

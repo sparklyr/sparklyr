@@ -65,14 +65,8 @@ tbl.sparklyr_connection <- function(src, from, ...) {
 #' @export
 src_tbls.sparklyr_connection <- function(x, ...) {
   
-  sconInst <- spark_connection_get_inst(x)
-  
-  ctx <- if (!is.null(sconInst$hive))
-    sconInst$hive
-  else
-    sconInst$sql
-  
-  tbls <- sparkapi_invoke(ctx, "sql", "SHOW TABLES")
+  sql <- spark_get_sql_context(x)
+  tbls <- sparkapi_invoke(sql, "sql", "SHOW TABLES")
   tableNames <- spark_dataframe_read_column(tbls, "tableName")
   
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
