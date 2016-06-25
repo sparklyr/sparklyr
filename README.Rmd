@@ -223,15 +223,15 @@ The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/do
 
 Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
 
-<img src="README_images/spark-connect.png" class="screenshot" width=639 height=447/>
+<img src="README_files/images/spark-connect.png" class="screenshot" width=639 height=447/>
 
 Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster:
 
-<img src="README_images/spark-tab.png" class="screenshot" width=639 height=393/>
+<img src="README_files/images/spark-tab.png" class="screenshot" width=639 height=393/>
 
 The Spark DataFrame preview uses the standard RStudio data viewer:
 
-<img src="README_images/spark-dataview.png" class="screenshot" width=639 height=446/>
+<img src="README_files/images/spark-dataview.png" class="screenshot" width=639 height=446/>
 
 <div style="margin-bottom: 15px;"></div>
 

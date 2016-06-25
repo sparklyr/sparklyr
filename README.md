@@ -273,16 +273,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/25 08:11:35 INFO ContextCleaner: Cleaned accumulator 227
-    ## 16/06/25 08:11:35 INFO ContextCleaner: Cleaned shuffle 17
-    ## 16/06/25 08:11:35 INFO BlockManagerInfo: Removed broadcast_68_piece0 on localhost:54701 in memory (size: 4.6 KB, free: 487.2 MB)
-    ## 16/06/25 08:11:35 INFO BlockManagerInfo: Removed broadcast_70_piece0 on localhost:54701 in memory (size: 3.0 KB, free: 487.2 MB)
-    ## 16/06/25 08:11:35 INFO BlockManagerInfo: Removed broadcast_72_piece0 on localhost:54701 in memory (size: 1910.0 B, free: 487.3 MB)
-    ## 16/06/25 08:11:35 INFO Executor: Finished task 0.0 in stage 66.0 (TID 464). 2082 bytes result sent to driver
-    ## 16/06/25 08:11:35 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 464) in 130 ms on localhost (1/1)
-    ## 16/06/25 08:11:35 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/06/25 08:11:35 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.130 s
-    ## 16/06/25 08:11:35 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.132732 s
+    ## 16/06/25 09:10:06 INFO ContextCleaner: Cleaned accumulator 223
+    ## 16/06/25 09:10:06 INFO ContextCleaner: Cleaned accumulator 222
+    ## 16/06/25 09:10:06 INFO ContextCleaner: Cleaned accumulator 221
+    ## 16/06/25 09:10:06 INFO BlockManagerInfo: Removed broadcast_63_piece0 on localhost:55109 in memory (size: 20.6 KB, free: 487.2 MB)
+    ## 16/06/25 09:10:06 INFO ContextCleaner: Cleaned accumulator 219
+    ## 16/06/25 09:10:06 INFO Executor: Finished task 0.0 in stage 66.0 (TID 464). 2082 bytes result sent to driver
+    ## 16/06/25 09:10:06 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 464) in 91 ms on localhost (1/1)
+    ## 16/06/25 09:10:06 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
+    ## 16/06/25 09:10:06 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.091 s
+    ## 16/06/25 09:10:06 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.093646 s
 
 Finally, we disconnect from Spark:
 
@@ -301,14 +301,14 @@ The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/do
 
 Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
 
-<img src="README_images/spark-connect.png" class="screenshot" width=639 height=447/>
+<img src="README_files/images/spark-connect.png" class="screenshot" width=639 height=447/>
 
 Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster:
 
-<img src="README_images/spark-tab.png" class="screenshot" width=639 height=393/>
+<img src="README_files/images/spark-tab.png" class="screenshot" width=639 height=393/>
 
 The Spark DataFrame preview uses the standard RStudio data viewer:
 
-<img src="README_images/spark-dataview.png" class="screenshot" width=639 height=446/>
+<img src="README_files/images/spark-dataview.png" class="screenshot" width=639 height=446/>
 
 The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
