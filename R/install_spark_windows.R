@@ -1,6 +1,7 @@
 spark_install_windows_local <- function() {
-  hadoopPath <- "\\tmp\\hadoop"
-  hadoopBinPath <- file.path(hadoopPath, "bin", fsep = "\\")
+  hivePath <- normalizePath("\\tmp\\hive")
+  hadoopPath <- normalizePath("\\tmp\\hadoop")
+  hadoopBinPath <- normalizePath(file.path(hadoopPath, "bin"))
   if (!dir.exists(hadoopPath)) {
     dir.create(hadoopBinPath, recursive = TRUE)
     message(paste("Created default hadoop bin directory under:", hadoopPath))
@@ -18,8 +19,13 @@ spark_install_windows_local <- function() {
     winutilsDownload <- "https://github.com/steveloughran/winutils/tree/master/hadoop-2.6.0/bin"
   }
   
+  rsessionName <- if (Sys.getenv("RSTUDIO") == "1") "RStudio" else "this session"
+  
   message(
-    "1. Download and install Microsoft Visual C++ Redistributable for Visual Studio 2015:",
+    "\n",
+    "To complete the installation:",
+    "\n\n",
+    "1. Download and install Microsoft Visual C++ Redistributable for Visual Studio 2010:",
     "\n\n",
     paste("  ", vcRedistDownload),
     "\n\n",
@@ -29,7 +35,11 @@ spark_install_windows_local <- function() {
     "\n\n",
     paste("3. Copy winutils.exe to", hadoopBinPath),
     "\n\n",
-    "3. From the command prompt application run:",
+    "4. Launch the command prompt as an administrator and run:",
+    "\n\n",
+    paste0(hadoopBinPath, "\\winutils.exe ", "chmod 777 ", hivePath),
+    "\n\n",
+    paste("5. Close", rsessionName, "and relaunch as an administrator"),
     "\n\n",
     "References: ",
     "\n\n",
