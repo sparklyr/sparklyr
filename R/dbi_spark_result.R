@@ -7,6 +7,8 @@
 #' @slot df data.frame. 
 #' @slot lastFetch numeric. 
 #'
+#' @keywords internal
+#'
 #' @export
 setClass("DBISparkResult",
          contains = "DBIResult",

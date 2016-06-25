@@ -12,4 +12,5 @@ DBI Spark Driver.
 \describe{
 \item{\code{scon}}{A Spark connection.}
 }}
+\keyword{internal}
 

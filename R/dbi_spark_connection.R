@@ -6,6 +6,8 @@
 #' @slot scon A Spark connection.
 #' @slot api Access to Spark API.
 #' 
+#' @keywords internal
+#' 
 #' @export
 setClass("DBISparkConnection",
          contains = "DBIConnection",

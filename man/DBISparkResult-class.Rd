@@ -16,4 +16,5 @@ DBI Spark Result.
 
 \item{\code{lastFetch}}{numeric.}
 }}
+\keyword{internal}
 

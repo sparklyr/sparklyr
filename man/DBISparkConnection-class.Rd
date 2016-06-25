@@ -14,4 +14,5 @@ DBI Spark Connection.
 
 \item{\code{api}}{Access to Spark API.}
 }}
+\keyword{internal}
 
