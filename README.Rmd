@@ -1,22 +1,15 @@
 ---
-title: "Spark Interface for R"
+title: "sparklyr: R interface for Apache Spark"
 output:
   github_document:
     fig_width: 9
     fig_height: 5
 ---
 
-A set of tools to provision, connect and interface to Apache Spark from within the R language and ecosystem. This package supports connecting to local and remote Apache Spark clusters and provides support for R packages like dplyr and DBI.
-
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
-library(sparklyr)
-library(dplyr)
-library(ggplot2)
-library(nycflights13)
-library(Lahman)
-```
-
+- Connect to [Spark](http://spark.apache.org/) from R --- the sparklyr package provides a complete [dplyr](https://github.com/hadley/dplyr) backend.
+- Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
+- Leverage Spark's [MLlib](http://spark.apache.org/docs/latest/mllib-guide.html) (machine learning library) for distributed machine learning from R.
+- Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide interfaces to Spark packages. 
 
 ## Installation
 
@@ -27,33 +20,43 @@ install.packages("dplyr", type = "source")
 devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
 ```
 
-You can then install various versions of Spark using the `spark_install` function:
+You should also install a local version of Spark for development purposes:
 
 ```{r, eval=FALSE}
 library(sparklyr)
-spark_install(version = "1.6.1", hadoop_version = "2.6", reset = TRUE)
+spark_install(version = "1.6.1")
 ```
 
+If you use the RStudio IDE, you should also download the latest [preview release](https://www.rstudio.com/products/rstudio/download/preview/) of the IDE which includes several enhancements for interacting with Spark (see the [RStudio IDE] section below for more details).
 
-## dplyr Interface
+## Connecting to Spark
 
-The sparklyr package implements a dplyr back-end for Spark. Connect to Spark using the `spark_connect` function then use the returned connection as a remote dplyr source.
+You can connect to both local instances of Spark as well as remote Spark clusters. Here we'll connect to a local instance of Spark via the [spark_connect](http://spark.rstudio.com/reference/sparklyr/latest/spark_connect.html) function: 
 
-```{r connection, message=FALSE}
+```{r, message=FALSE}
 library(sparklyr)
+library(dplyr)
 sc <- spark_connect(master = "local")
 ```
 
-Now we copy some datasets from R into the Spark cluster:
+The returned Spark connection (`sc`) provides a remote dplyr data source to the Spark cluster.
+
+For more information on connecting to remote Spark clusters see the [Deployment](http://spark.rstudio.com/deployment.html) section.of the sparklyr website.
+
+## Using dplyr
+
+We can new use all of the available dplyr verbs against the tables within the cluster.
+
+We'l start by copying some datasets from R into the Spark cluster:
 
 ```{r}
 iris_tbl <- copy_to(sc, iris)
-flights_tbl <- copy_to(sc, flights)
-batting_tbl <- copy_to(sc, Batting, "batting")
+flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
+batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
 src_tbls(sc)
 ```
 
-Then you can run dplyr against Spark:
+To start with here's a simple filtering example:
 
 ```{r}
 # filter by departure delay and print the first few records
@@ -92,25 +95,41 @@ batting_tbl %>%
 
 ```
 
-## ML Functions
+For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
 
-MLlib functions are also supported, see [ml samples](docs/ml_examples.md). For instasnce, k-means can be run as:
+## Using MLlib
+
+You can orchestrate machine learning algorithms in a Spark cluster via the [MLlib](http://spark.apache.org/docs/latest/mllib-guide.html) functions in **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows. 
+
+Here's an example where we use [ml_linear_regression](http://spark.rstudio.com/reference/sparklyr/latest/ml_linear_regression.html) to fit a linear regression model. We'll use the built-in `mtcars` dataset, and see if we can predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`). We'll assume in each case that the relationship between `mpg` and each of our features is linear.
 
 ```{r}
-model <- iris_tbl %>%
-  select(Petal_Width, Petal_Length) %>%
-  ml_kmeans(centers = 3)
+# copy mtcars into spark
+mtcars_tbl <- copy_to(sc, mtcars)
 
-iris_tbl %>%
-  select(Petal_Width, Petal_Length) %>%
-  collect %>%
-  ggplot(aes(Petal_Length, Petal_Width)) +
-    geom_point(data = model$centers, aes(Petal_Width, Petal_Length), size = 60, alpha = 0.1) +
-    geom_point(aes(Petal_Width, Petal_Length), size = 2, alpha = 0.5)
+# transform our data set, and then partition into 'training', 'test'
+partitions <- mtcars_tbl %>%
+  filter(hp >= 100) %>%
+  mutate(cyl8 = cyl == 8) %>%
+  sdf_partition(training = 0.5, test = 0.5, seed = 1099)
 
+# fit a linear model to the training dataset
+fit <- partitions$training %>%
+  ml_linear_regression(response = "mpg", features = c("wt", "cyl"))
+fit
 ```
 
+For linear regression models produced by Spark, we can use `summary()` to learn a bit more about the quality of our fit, and the statistical significance of each of our predictors.
+
+```{r}
+summary(fit)
+```
+
+Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [MLlib](mllib.html) section.
+
 ## Reading and Writing Data
+
+You can read and write data in CSV, JSON, and Parquet formats. Data can be stored in HDFS, S3, or on the lcoal filesystem of cluster nodes.
 
 ```{r}
 temp_csv <- tempfile(fileext = ".csv")
@@ -129,9 +148,11 @@ iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
 src_tbls(sc)
 ```
 
-## Extensibility
+## Extensions
 
-Spark provides low level access to native JVM objects, this topic targets users creating packages based on low-level spark integration. Here's an example of an R `count_lines` function built by calling Spark functions for reading and counting the lines of a text file.
+The facilities used internally by sparklyr for its dplyr and MLlib interfaces are available to extension packages via the [sparkapi](https://github.com/rstudio/sparkapi) package. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).
+
+Here's a simple example that wraps a Spark text file line counting function with an R function:
 
 ```{r}
 library(sparkapi)
@@ -151,7 +172,8 @@ write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 count_lines(sc, tempfile)
 ```
 
-Package authors can use this mechanism to create an R interface to any of Spark's underlying Java APIs.
+
+To learn more about creating extensions see the [Extensions](http://spark.rstudio.com/extensions.html) section of the sparklyr website.
 
 
 ## dplyr Utilities
@@ -188,4 +210,30 @@ Finally, we disconnect from Spark:
 ```{r}
 spark_disconnect(sc)
 ```
+
+## RStudio IDE
+
+The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/download/preview/) of the RStudio IDE includes integrated support for Spark and the sparklyr package, including tools for:
+
+- Creating and managing Spark connections
+- Browsing the tables and columns of Spark DataFrames
+- Previewing the first 1,000 rows of Spark DataFrames
+
+
+
+Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
+
+<img src="README_images/spark-connect.png" class="screenshot" width=639 height=447/>
+
+Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster:
+
+<img src="README_images/spark-tab.png" class="screenshot" width=639 height=393/>
+
+The Spark DataFrame preview uses the standard RStudio data viewer:
+
+<img src="README_images/spark-dataview.png" class="screenshot" width=639 height=446/>
+
+<div style="margin-bottom: 15px;"></div>
+
+The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
 

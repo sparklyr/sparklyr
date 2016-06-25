@@ -3,6 +3,7 @@
 ^\.travis\.yml$
 ^README\.Rmd$
 ^README_files$
+^README_images$
 ^configure$
 ^configure\.win$
 ^configure\.R$
