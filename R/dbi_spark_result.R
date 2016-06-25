@@ -1,4 +1,13 @@
 # DBISparkResult results.
+
+
+#' DBI Spark Result.
+#'
+#' @slot sql character. 
+#' @slot df data.frame. 
+#' @slot lastFetch numeric. 
+#'
+#' @export
 setClass("DBISparkResult",
          contains = "DBIResult",
          slots = list(

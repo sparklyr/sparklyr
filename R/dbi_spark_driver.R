@@ -7,6 +7,11 @@ DBISpark <- function(sc) {
 }
 
 # DBISparkDriver and methods.
+#' DBI Spark Driver.
+#' 
+#' @slot scon A Spark connection.
+#' 
+#' @export
 setClass("DBISparkDriver",
          contains = "DBIDriver",
          slots = c(

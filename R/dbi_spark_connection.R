@@ -1,5 +1,12 @@
 
 # DBISparkConnection and methods.
+
+#' DBI Spark Connection.
+#' 
+#' @slot scon A Spark connection.
+#' @slot api Access to Spark API.
+#' 
+#' @export
 setClass("DBISparkConnection",
          contains = "DBIConnection",
          slots = c(scon = "sparklyr_connection",

@@ -371,8 +371,7 @@ sdf_mutate_ <- function(.data, ..., .dots) {
 #' @family Spark data frames
 #' 
 #' @export
-sdf_predict <- function(object, newdata, prediction = "prediction", ...) {
-  prediction <- ensure_scalar_character(prediction)
+sdf_predict <- function(object, newdata, ...) {
   if (missing(newdata) || is.null(newdata))
     newdata <- object$data
   sdf <- sparkapi_dataframe(newdata)

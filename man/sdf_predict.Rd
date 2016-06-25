@@ -4,18 +4,16 @@
 \alias{sdf_predict}
 \title{Model Predictions with Spark DataFrames}
 \usage{
-sdf_predict(object, newdata, prediction = "prediction", ...)
+sdf_predict(object, newdata, ...)
 }
 \arguments{
 \item{object, newdata}{An object coercable to a Spark DataFrame.}
-
-\item{prediction}{The name to assign to the column hosting the predicted values.}
 
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
 Given a \code{ml_model} fit alongside a new data set, produce a new Spark
-DataFrame with predicted values encoded in the \code{prediction} column.
+DataFrame with predicted values encoded in the \code{"prediction"} column.
 }
 \seealso{
 Other Spark data frames: \code{\link{sdf_copy_to}},
