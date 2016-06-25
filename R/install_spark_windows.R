@@ -7,7 +7,7 @@ spark_install_windows_local <- function() {
   }
   
   if (!"HADOOP_HOME" %in% names(Sys.getenv())) {
-    Sys.setenv("HADOOP_HOME" = hivePath)
+    system2("SETX", c("HADOOP_HOME", hadoopPath), stdout = NULL)
     message(paste("Set HADOOP_HOME to:", hadoopPath))
   }
   
