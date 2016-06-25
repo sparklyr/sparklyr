@@ -58,12 +58,13 @@ sd_section("MLlib Feature Transformers",
 
 sd_section("Spark DataFrames",
            "Functions for maniplulating Spark DataFrames",
-           c("sdf_register",
+           c("sdf_copy_to",
              "sdf_partition",
              "sdf_mutate",
              "sdf_sample",
              "sdf_sort",
-             "sdf_predict")
+             "sdf_predict",
+             "sdf_register")
 )
 
 
