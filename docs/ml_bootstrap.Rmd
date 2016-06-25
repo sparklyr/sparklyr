@@ -28,7 +28,7 @@ Next, we compute our bootstrap estimates of the mean. Note that all of the compu
 n <- 500           # number of bootstrap samples
 name <- "sampled"  # name for temporary sampled table
 estimates <- replicate(n, simplify = "list", {
-  diamonds_sdf %>%
+  diamonds_tbl %>%
     sdf_sample(replacement = TRUE) %>%       # take a random sample with replacement
     summarize(statistic = mean(depth)) %>%   # compute the mean
     collect() %>%                            # collect results back to R
