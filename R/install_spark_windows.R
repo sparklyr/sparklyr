@@ -24,9 +24,7 @@ spark_install_windows_local <- function() {
     vcRedistDownload <- "http://www.microsoft.com/download/en/details.aspx?id=8328"
     winutilsDownload <- "https://github.com/steveloughran/winutils/tree/master/hadoop-2.6.0/bin"
   }
-  
-  rsessionName <- if (Sys.getenv("RSTUDIO") == "1") "RStudio" else "this session"
-  
+   
   message(
     "\n",
     "To complete the installation:",
@@ -41,11 +39,9 @@ spark_install_windows_local <- function() {
     "\n\n",
     paste("3. Copy winutils.exe to", hadoopBinPath),
     "\n\n",
-    "4. Launch the command prompt as an administrator and run:",
+    "4. Launch the command prompt and run:",
     "\n\n",
     paste0(hadoopBinPath, "\\winutils.exe ", "chmod 777 ", hivePath),
-    "\n\n",
-    paste("5. Close", rsessionName, "and relaunch as an administrator"),
     "\n\n",
     "References: ",
     "\n\n",
