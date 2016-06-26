@@ -7,6 +7,12 @@ spark_install_windows_local <- function() {
     message(paste("Created default hadoop bin directory under:", hadoopPath))
   }
   
+  appUserTempDir <- normalizePath(file.path(rappdirs::app_dir("")$data(), "temp", Sys.info()[["login"]]))
+  if (!dir.exists(appUserTempDir)) {
+    # create directory from using current user which will assign the right permissions to execute in non-admin mode
+    dir.create(appUserTempDir, recursive = FALSE)
+  }
+  
   if (!"HADOOP_HOME" %in% names(Sys.getenv())) {
     system2("SETX", c("HADOOP_HOME", hadoopPath), stdout = NULL)
     message(paste("Set HADOOP_HOME to:", hadoopPath))
