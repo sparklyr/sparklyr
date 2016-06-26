@@ -89,7 +89,7 @@ spark_connect <- function(master,
   packages <- config[["sparklyr.defaultPackages"]]
   
   # call extensions to get additional jars and packages
-  dependencies <- resolve_extensions(extensions, config)
+  dependencies <- resolve_extensions(extensions)
   jars <- c(jars, dependencies$jars)
   packages <- c(packages, dependencies$packages)
   
@@ -140,8 +140,8 @@ spark_connect <- function(master,
   scon
 }
 
-resolve_extensions <- function(extensions, config) {
-  spark_dependencies_from_extensions(config, extensions)
+resolve_extensions <- function(extensions) {
+  spark_dependencies_from_extensions(extensions)
 }
 
 # Attaches the SparkContext to the connection
