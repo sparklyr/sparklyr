@@ -11,7 +11,7 @@ knitr::opts_chunk$set(eval = TRUE)
 ```
 
 
-<img src="README_files/images/sparklyr_ref_gradient.png" align="right" width=367 height=200/>
+<img src="README_files/images/sparklyr-illustration.png" align="right"/>
 
 - Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
 - Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
