@@ -1,7 +1,7 @@
 sparklyr: R interface for Apache Spark
 ================
 
-<img src="README_files/images/sparklyr-illustration.png" align="right"/>
+<img src="README_files/images/sparklyr-illustration.png" width=364 height=197 align="right"/>
 
 -   Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
 -   Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
@@ -274,16 +274,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/26 08:14:34 INFO BlockManagerInfo: Removed broadcast_78_piece0 on localhost:55182 in memory (size: 8.6 KB, free: 487.2 MB)
-    ## 16/06/26 08:14:34 INFO ContextCleaner: Cleaned accumulator 265
-    ## 16/06/26 08:14:34 INFO ContextCleaner: Cleaned shuffle 19
-    ## 16/06/26 08:14:34 INFO BlockManagerInfo: Removed broadcast_77_piece0 on localhost:55182 in memory (size: 4.6 KB, free: 487.2 MB)
-    ## 16/06/26 08:14:34 INFO ContextCleaner: Cleaned accumulator 256
-    ## 16/06/26 08:14:34 INFO Executor: Finished task 0.0 in stage 66.0 (TID 464). 2082 bytes result sent to driver
-    ## 16/06/26 08:14:34 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 464) in 92 ms on localhost (1/1)
-    ## 16/06/26 08:14:34 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/06/26 08:14:34 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.092 s
-    ## 16/06/26 08:14:34 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.095793 s
+    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 249
+    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 248
+    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 247
+    ## 16/06/26 12:42:40 INFO BlockManagerInfo: Removed broadcast_80_piece0 on localhost:56158 in memory (size: 3.0 KB, free: 487.2 MB)
+    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 268
+    ## 16/06/26 12:42:40 INFO BlockManagerInfo: Removed broadcast_79_piece0 on localhost:56158 in memory (size: 4.6 KB, free: 487.2 MB)
+    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 266
+    ## 16/06/26 12:42:40 INFO BlockManagerInfo: Removed broadcast_78_piece0 on localhost:56158 in memory (size: 8.6 KB, free: 487.3 MB)
+    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 265
+    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned shuffle 19
 
 Finally, we disconnect from Spark:
 
