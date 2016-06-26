@@ -12,18 +12,18 @@ ft_vector_assembler <- function(x,
                                 input_col = NULL,
                                 output_col = NULL)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  assembler <- sparkapi_invoke_new(
+  assembler <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.VectorAssembler"
   )
 
   transformed <- assembler %>%
-    sparkapi_invoke("setInputCols", as.list(input_col)) %>%
-    sparkapi_invoke("setOutputCol", output_col) %>%
-    sparkapi_invoke("transform", df)
+    invoke("setInputCols", as.list(input_col)) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("transform", df)
 
   sdf_register(transformed)
 }
@@ -48,26 +48,26 @@ ft_string_indexer <- function(x,
                               output_col = NULL,
                               params = NULL)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  indexer <- sparkapi_invoke_new(
+  indexer <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.StringIndexer"
   )
 
   sim <- indexer %>%
-    sparkapi_invoke("setInputCol", input_col) %>%
-    sparkapi_invoke("setOutputCol", output_col) %>%
-    sparkapi_invoke("fit", df)
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("fit", df)
 
   # Report labels to caller if requested -- these map
   # the discovered labels in the data set to an associated
   # index.
   if (is.environment(params))
-    params$labels <- as.character(sparkapi_invoke(sim, "labels"))
+    params$labels <- as.character(invoke(sim, "labels"))
 
-  transformed <- sparkapi_invoke(sim, "transform", df)
+  transformed <- invoke(sim, "transform", df)
   
   sdf_register(transformed)
 }
@@ -90,19 +90,19 @@ ft_binarizer <- function(x,
                          output_col = NULL,
                          threshold = 0.5)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  binarizer <- sparkapi_invoke_new(
+  binarizer <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.Binarizer"
   )
 
   transformed <- binarizer %>%
-    sparkapi_invoke("setInputCol", input_col) %>%
-    sparkapi_invoke("setOutputCol", output_col) %>%
-    sparkapi_invoke("setThreshold", as.double(threshold)) %>%
-    sparkapi_invoke("transform", df)
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("setThreshold", as.double(threshold)) %>%
+    invoke("transform", df)
 
   sdf_register(transformed)
 }
@@ -122,19 +122,19 @@ ft_discrete_cosine_transform <- function(x,
                                          output_col = NULL,
                                          inverse = FALSE)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  dct <- sparkapi_invoke_new(
+  dct <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.DCT"
   )
 
   transformed <- dct %>%
-    sparkapi_invoke("setInputCol", input_col) %>%
-    sparkapi_invoke("setOutputCol", output_col) %>%
-    sparkapi_invoke("setInverse", as.logical(inverse)) %>%
-    sparkapi_invoke("transform", df)
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("setInverse", as.logical(inverse)) %>%
+    invoke("transform", df)
 
   sdf_register(transformed)
 }
@@ -152,18 +152,18 @@ ft_index_to_string <- function(x,
                                input_col = NULL,
                                output_col = NULL)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  converter <- sparkapi_invoke_new(
+  converter <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.IndexToString"
   )
 
   transformed <- converter %>%
-    sparkapi_invoke("setInputCol", input_col) %>%
-    sparkapi_invoke("setOutputCol", output_col) %>%
-    sparkapi_invoke("transform", df)
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("transform", df)
 
   sdf_register(transformed)
 }
@@ -174,37 +174,37 @@ ft_index_to_string <- function(x,
 # ft_standard_scaler <- function(df, input_col, output_col,
 #                                      with.mean, with.std)
 # {
-#   sc <- sparkapi_connection(df)
+#   sc <- spark_connection(df)
 #
-#   scaler <- sparkapi_invoke_new(
+#   scaler <- invoke_new(
 #     sc,
 #     "org.apache.spark.ml.feature.StandardScaler"
 #   )
 #
 #   scaler %>%
-#     sparkapi_invoke("setInputCol", input_col) %>%
-#     sparkapi_invoke("setOutputCol", output_col) %>%
-#     sparkapi_invoke("setWithMean", as.logical(with.mean)) %>%
-#     sparkapi_invoke("setWithStd", as.logical(with.std)) %>%
-#     sparkapi_invoke("transform", df)
+#     invoke("setInputCol", input_col) %>%
+#     invoke("setOutputCol", output_col) %>%
+#     invoke("setWithMean", as.logical(with.mean)) %>%
+#     invoke("setWithStd", as.logical(with.std)) %>%
+#     invoke("transform", df)
 # }
 #
 # ft_min_max_scaler <- function(df, input_col, output_col,
 #                                     min = 0, max = 1)
 # {
-#   sc <- sparkapi_connection(df)
+#   sc <- spark_connection(df)
 #
-#   scaler <- sparkapi_invoke_new(
+#   scaler <- invoke_new(
 #     sc,
 #     "org.apache.spark.ml.feature.MinMaxScaler"
 #   )
 #
 #   scaler %>%
-#     sparkapi_invoke("setInputCol", input_col) %>%
-#     sparkapi_invoke("setOutputCol", output_col) %>%
-#     sparkapi_invoke("setMin", as.numeric(min)) %>%
-#     sparkapi_invoke("setMax", as.numeric(max)) %>%
-#     sparkapi_invoke("transform", df)
+#     invoke("setInputCol", input_col) %>%
+#     invoke("setOutputCol", output_col) %>%
+#     invoke("setMin", as.numeric(min)) %>%
+#     invoke("setMax", as.numeric(max)) %>%
+#     invoke("transform", df)
 # }
 
 #' Feature Transformation -- Bucketizer
@@ -224,19 +224,19 @@ ft_bucketizer <- function(x,
                           output_col = NULL,
                           splits)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  bucketizer <- sparkapi_invoke_new(
+  bucketizer <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.Bucketizer"
   )
 
   transformed <- bucketizer %>%
-    sparkapi_invoke("setInputCol", input_col) %>%
-    sparkapi_invoke("setOutputCol", output_col) %>%
-    sparkapi_invoke("setSplits", as.list(splits)) %>%
-    sparkapi_invoke("transform", df)
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("setSplits", as.list(splits)) %>%
+    invoke("transform", df)
 
   sdf_register(transformed)
 }
@@ -258,19 +258,19 @@ ft_elementwise_product <- function(x,
                                    output_col = NULL,
                                    scaling_col)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  transformer <- sparkapi_invoke_new(
+  transformer <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.ElementwiseProduct"
   )
 
   transformed <- transformer %>%
-    sparkapi_invoke("setInputCol", input_col) %>%
-    sparkapi_invoke("setOutputCol", output_col) %>%
-    sparkapi_invoke("setScalingVec", scaling_col) %>%
-    sparkapi_invoke("transform", df)
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("setScalingVec", scaling_col) %>%
+    invoke("transform", df)
 
   sdf_register(transformed)
 }
@@ -290,17 +290,17 @@ ft_sql_transformer <- function(x,
                                output_col = NULL,
                                sql)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  transformer <- sparkapi_invoke_new(
+  transformer <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.SQLTransformer"
   )
 
   transformed <- transformer %>%
-    sparkapi_invoke("setStatement", paste(sql, collapse = "\n")) %>%
-    sparkapi_invoke("transform", df)
+    invoke("setStatement", paste(sql, collapse = "\n")) %>%
+    invoke("transform", df)
 
   sdf_register(transformed)
 }
@@ -327,20 +327,20 @@ ft_quantile_discretizer <- function(x,
                                     output_col = NULL,
                                     n_buckets = 5)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
-  discretizer <- sparkapi_invoke_new(
+  discretizer <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.QuantileDiscretizer"
   )
 
   transformed <- discretizer %>%
-    sparkapi_invoke("setInputCol", input_col) %>%
-    sparkapi_invoke("setOutputCol", output_col) %>%
-    sparkapi_invoke("setNumBuckets", as.numeric(n_buckets)) %>%
-    sparkapi_invoke("fit", df) %>%
-    sparkapi_invoke("transform", df)
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("setNumBuckets", as.numeric(n_buckets)) %>%
+    invoke("fit", df) %>%
+    invoke("transform", df)
 
   sdf_register(transformed)
 }

@@ -46,7 +46,7 @@ spark_write_csv.tbl_spark <- function(x, path) {
 }
 
 #' @export
-spark_write_csv.sparkapi_jobj <- function(x, path) {
+spark_write_csv.spark_jobj <- function(x, path) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   spark_api_write_csv(x, path.expand(path))
 }
@@ -92,7 +92,7 @@ spark_write_parquet.tbl_spark <- function(x, path) {
 }
 
 #' @export
-spark_write_parquet.sparkapi_jobj <- function(x, path) {
+spark_write_parquet.spark_jobj <- function(x, path) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   spark_api_write_generic(x, path.expand(path), "parquet")
 }
@@ -138,14 +138,14 @@ spark_write_json.tbl_spark <- function(x, path) {
 }
 
 #' @export
-spark_write_json.sparkapi_jobj <- function(x, path) {
+spark_write_json.spark_jobj <- function(x, path) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   spark_api_write_generic(x, path.expand(path), "json")
 }
 
 spark_expect_jobj_class <- function(jobj, expectedClassName) {
-  class <- sparkapi_invoke(jobj, "getClass")
-  className <- sparkapi_invoke(class, "getName")
+  class <- invoke(jobj, "getClass")
+  className <- invoke(class, "getName")
   if (!identical(className, expectedClassName)) {
     stop(paste(
       "This operation is only supported on", 

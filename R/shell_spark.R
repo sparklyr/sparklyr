@@ -51,7 +51,7 @@ start_shell <- function(scon, sconInst, jars, packages) {
       sep = ""))
   }
 
-  shellFile <- sparkapi_read_shell_file(shellOutputPath)
+  shellFile <- sparkapi::read_shell_file(shellOutputPath)
 
   tryCatch({
     monitor <- socketConnection(port = shellFile$monitorPort)
@@ -79,7 +79,7 @@ start_shell <- function(scon, sconInst, jars, packages) {
 
 stop_shell <- function(scon) {
   
-  sparkapi_stop_backend(scon)
+  sparkapi::stop_backend(scon)
 
   sconInst <- spark_connection_remove_inst(scon)
 

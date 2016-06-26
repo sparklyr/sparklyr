@@ -17,8 +17,8 @@ ml_naive_bayes <- function(x,
                            lambda = 0,
                            ...)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -29,34 +29,34 @@ ml_naive_bayes <- function(x,
   
   model <- "org.apache.spark.ml.classification.NaiveBayes"
   
-  rf <- sparkapi_invoke_new(sc, model)
+  rf <- invoke_new(sc, model)
   
   model <- rf %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
-    sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setSmoothing", lambda)
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setLabelCol", envir$response) %>%
+    invoke("setSmoothing", lambda)
   
   if (only_model) return(model)
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
   
   pi <- fit %>%
-    sparkapi_invoke("pi") %>%
-    sparkapi_invoke("toArray")
+    invoke("pi") %>%
+    invoke("toArray")
   names(pi) <- envir$labels
   
-  thetaMatrix <- fit %>% sparkapi_invoke("theta")
-  thetaValues <- thetaMatrix %>% sparkapi_invoke("toArray")
+  thetaMatrix <- fit %>% invoke("theta")
+  thetaValues <- thetaMatrix %>% invoke("toArray")
   theta <- matrix(thetaValues,
-                  nrow = sparkapi_invoke(thetaMatrix, "numRows"),
-                  ncol = sparkapi_invoke(thetaMatrix, "numCols"))
+                  nrow = invoke(thetaMatrix, "numRows"),
+                  ncol = invoke(thetaMatrix, "numCols"))
   rownames(theta) <- envir$labels
   colnames(theta) <- features
   
   ml_model("naive_bayes", fit,
-           pi = sparkapi_invoke(fit, "pi"),
-           theta = sparkapi_invoke(fit, "theta"),
+           pi = invoke(fit, "pi"),
+           theta = invoke(fit, "theta"),
            features = features,
            response = response,
            model.parameters = as.list(envir)
@@ -67,5 +67,5 @@ ml_naive_bayes <- function(x,
 print.ml_model_naive_bayes <- function(x, ...) {
   formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
   cat("Call: ", formula, "\n\n", sep = "")
-  cat(sparkapi_invoke(x$.model, "toString"), sep = "\n")
+  cat(invoke(x$.model, "toString"), sep = "\n")
 }

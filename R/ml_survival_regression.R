@@ -22,8 +22,8 @@ ml_survival_regression <- function(x,
                                    censor = "censor",
                                    ...)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -36,27 +36,27 @@ ml_survival_regression <- function(x,
   
   model <- "org.apache.spark.ml.regression.AFTSurvivalRegression"
   
-  rf <- sparkapi_invoke_new(sc, model)
+  rf <- invoke_new(sc, model)
   
   model <- rf %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
-    sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setFitIntercept", as.logical(intercept)) %>%
-    sparkapi_invoke("setCensorCol", censor)
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setLabelCol", envir$response) %>%
+    invoke("setFitIntercept", as.logical(intercept)) %>%
+    invoke("setCensorCol", censor)
     
   if (only_model) return(model)
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
   
   coefficients <- fit %>%
-    sparkapi_invoke("coefficients") %>%
-    sparkapi_invoke("toArray")
+    invoke("coefficients") %>%
+    invoke("toArray")
   names(coefficients) <- features
   
-  hasIntercept <- sparkapi_invoke(fit, "getFitIntercept")
+  hasIntercept <- invoke(fit, "getFitIntercept")
   if (hasIntercept) {
-    intercept <- sparkapi_invoke(fit, "intercept")
+    intercept <- invoke(fit, "intercept")
     coefficients <- c(coefficients, intercept)
     names(coefficients) <- c(features, "(Intercept)")
   }
@@ -76,5 +76,5 @@ ml_survival_regression <- function(x,
 print.ml_model_survival_regression <- function(x, ...) {
   formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
   cat("Call: ", formula, "\n\n", sep = "")
-  cat(sparkapi_invoke(x$.model, "toString"), sep = "\n")
+  cat(invoke(x$.model, "toString"), sep = "\n")
 }

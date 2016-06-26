@@ -8,6 +8,6 @@ ml_model <- function(class, model, ...) {
 }
 
 #' @export
-sparkapi_connection.ml_model <- function(x, ...) {
-  sparkapi_connection(x$.model)
+spark_connection.ml_model <- function(x, ...) {
+  spark_connection(x$.model)
 }

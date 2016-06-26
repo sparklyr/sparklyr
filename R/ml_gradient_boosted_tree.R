@@ -28,8 +28,8 @@ ml_gradient_boosted_trees <- function(x,
                                       type = c("auto", "regression", "classification"),
                                       ...)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -57,25 +57,25 @@ ml_gradient_boosted_trees <- function(x,
   else
     classifier
 
-  rf <- sparkapi_invoke_new(sc, model)
+  rf <- invoke_new(sc, model)
 
   model <- rf %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
-    sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setMaxBins", max.bins) %>%
-    sparkapi_invoke("setMaxDepth", max.depth)
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setLabelCol", envir$response) %>%
+    invoke("setMaxBins", max.bins) %>%
+    invoke("setMaxDepth", max.depth)
   
   if (only_model) return(model)
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
 
   ml_model("gradient_boosted_trees", fit,
     features = features,
     response = response,
     max.bins = max.bins,
     max.depth = max.depth,
-    trees = sparkapi_invoke(fit, "trees"),
+    trees = invoke(fit, "trees"),
     model.parameters = as.list(envir)
   )
 }
@@ -84,5 +84,5 @@ ml_gradient_boosted_trees <- function(x,
 print.ml_model_gradient_boosted_trees <- function(x, ...) {
   formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
   cat("Call: ", formula, "\n\n", sep = "")
-  cat(sparkapi_invoke(x$.model, "toString"), sep = "\n")
+  cat(invoke(x$.model, "toString"), sep = "\n")
 }

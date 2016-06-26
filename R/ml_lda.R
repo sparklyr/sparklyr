@@ -14,8 +14,8 @@ ml_lda <- function(x,
                    features = dplyr::tbl_vars(x),
                    ...) {
   
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   features <- as.character(features)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
@@ -23,19 +23,19 @@ ml_lda <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
   
-  lda <- sparkapi_invoke_new(
+  lda <- invoke_new(
     sc,
     "org.apache.spark.ml.clustering.LDA"
   )
   
   model <- lda %>%
-    sparkapi_invoke("setK", length(features)) %>%
-    sparkapi_invoke("setFeaturesCol", envir$features)
+    invoke("setK", length(features)) %>%
+    invoke("setFeaturesCol", envir$features)
   
   if (only_model) return(model)
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
   
   topics.matrix <- read_spark_matrix(fit, "topicsMatrix")
   estimated.doc.concentration <- read_spark_vector(fit, "estimatedDocConcentration")

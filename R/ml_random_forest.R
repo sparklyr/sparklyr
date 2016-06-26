@@ -30,8 +30,8 @@ ml_random_forest <- function(x,
                              type = c("auto", "regression", "classification"),
                              ...)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
 
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -56,23 +56,23 @@ ml_random_forest <- function(x,
   else
     "org.apache.spark.ml.classification.RandomForestClassifier"
 
-  rf <- sparkapi_invoke_new(sc, model)
+  rf <- invoke_new(sc, model)
 
   model <- rf %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
-    sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setMaxBins", max.bins) %>%
-    sparkapi_invoke("setMaxDepth", max.depth) %>%
-    sparkapi_invoke("setNumTrees", num.trees)
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setLabelCol", envir$response) %>%
+    invoke("setMaxBins", max.bins) %>%
+    invoke("setMaxDepth", max.depth) %>%
+    invoke("setNumTrees", num.trees)
   
   if (only_model) return(model)
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
 
   featureImportances <- fit %>%
-    sparkapi_invoke("featureImportances") %>%
-    sparkapi_invoke("toArray")
+    invoke("featureImportances") %>%
+    invoke("toArray")
 
   ml_model("random_forest", fit,
            features = features,
@@ -81,7 +81,7 @@ ml_random_forest <- function(x,
            max.depth = max.depth,
            num.trees = num.trees,
            feature.importances = featureImportances,
-           trees = sparkapi_invoke(fit, "trees"),
+           trees = invoke(fit, "trees"),
            model.parameters = as.list(envir)
   )
 }
@@ -90,5 +90,5 @@ ml_random_forest <- function(x,
 print.ml_model_random_forest <- function(x, ...) {
   formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
   cat("Call: ", formula, "\n\n", sep = "")
-  cat(sparkapi_invoke(x$.model, "toString"), sep = "\n")
+  cat(invoke(x$.model, "toString"), sep = "\n")
 }

@@ -1,6 +1,6 @@
 spark_jobj_list_to_array_df <- function(data, dataNames) {
   listOfLists <- lapply(data, function(e) {
-    sparkapi_invoke(e, "toArray")
+    invoke(e, "toArray")
   })
 
   df <- as.data.frame(t(matrix(unlist(listOfLists), nrow=length(dataNames))))
@@ -12,7 +12,7 @@ spark_jobj_list_to_array_df <- function(data, dataNames) {
 ml_prepare_dataframe <- function(df, features, response = NULL, ...,
                                  envir = new.env(parent = emptyenv()))
 {
-  df <- sparkapi_dataframe(df)
+  df <- spark_dataframe(df)
   schema <- spark_dataframe_schema(df)
 
   # default report for feature, response variable names
@@ -29,10 +29,10 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
     } else if (responseType != "DoubleType") {
       envir$response <- random_string("response")
       castedColumn <- df %>%
-        sparkapi_invoke("col", response) %>%
-        sparkapi_invoke("cast", "double")
+        invoke("col", response) %>%
+        invoke("cast", "double")
       df <- df %>%
-        sparkapi_invoke("withColumn", envir$response, castedColumn)
+        invoke("withColumn", envir$response, castedColumn)
     }
   }
 
@@ -40,7 +40,7 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
   transformed <- ft_vector_assembler(df, features, envir$features)
   
   # return as vanilla spark dataframe
-  sparkapi_dataframe(transformed)
+  spark_dataframe(transformed)
 }
 
 try_null <- function(expr) {
@@ -60,16 +60,16 @@ predict.ml_model <- function(object, newdata, ...) {
 #' @export
 fitted.ml_model <- function(object, ...) {
   object$.model %>%
-    sparkapi_invoke("summary") %>%
-    sparkapi_invoke("predictions") %>%
+    invoke("summary") %>%
+    invoke("predictions") %>%
     spark_dataframe_read_column("prediction")
 }
 
 #' @export
 residuals.ml_model <- function(object, ...) {
   object$.model %>%
-    sparkapi_invoke("summary") %>%
-    sparkapi_invoke("residuals") %>%
+    invoke("summary") %>%
+    invoke("residuals") %>%
     spark_dataframe_read_column("residuals")
 }
 
@@ -90,15 +90,15 @@ intercept_first <- function(vector) {
 }
 
 read_spark_vector <- function(jobj, field) {
-  object <- sparkapi_invoke(jobj, field)
-  sparkapi_invoke(object, "toArray")
+  object <- invoke(jobj, field)
+  invoke(object, "toArray")
 }
 
 read_spark_matrix <- function(jobj, field) {
-  object <- sparkapi_invoke(jobj, field)
-  nrow <- sparkapi_invoke(object, "numRows")
-  ncol <- sparkapi_invoke(object, "numCols")
-  data <- sparkapi_invoke(object, "toArray")
+  object <- invoke(jobj, field)
+  nrow <- invoke(object, "numRows")
+  ncol <- invoke(object, "numCols")
+  data <- invoke(object, "toArray")
   matrix(data, nrow = nrow, ncol = ncol)
 }
 

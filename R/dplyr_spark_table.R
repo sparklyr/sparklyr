@@ -52,7 +52,7 @@ collect.tbl_spark <- function(x, ..., n = Inf) {
 }
 
 #' @export
-collect.sparkapi_jobj <- function(x, ...) {
+collect.spark_jobj <- function(x, ...) {
   spark_dataframe_collect(x)
 }
 

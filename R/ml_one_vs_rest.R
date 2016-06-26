@@ -16,8 +16,8 @@ ml_one_vs_rest <- function(x,
                            response,
                            features)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -25,16 +25,16 @@ ml_one_vs_rest <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
   
-  ovrc <- sparkapi_invoke_new(
+  ovrc <- invoke_new(
     sc,
     "org.apache.spark.ml.classification.OneVsRest"
   )
   
   fit <- ovrc %>%
-    sparkapi_invoke("setClassifier", classifier) %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
-    sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("setClassifier", classifier) %>%
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setLabelCol", envir$response) %>%
+    invoke("fit", tdf)
   
   ml_model("one_vs_rest", fit,
            features = features,

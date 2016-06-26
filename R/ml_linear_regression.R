@@ -15,8 +15,8 @@ ml_linear_regression <- function(x,
                                  lambda = 0,
                                  ...)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -28,47 +28,47 @@ ml_linear_regression <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  lr <- sparkapi_invoke_new(
+  lr <- invoke_new(
     sc,
     "org.apache.spark.ml.regression.LinearRegression"
   )
 
   model <- lr %>%
-    sparkapi_invoke("setMaxIter", 10L) %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
-    sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setFitIntercept", intercept) %>%
-    sparkapi_invoke("setElasticNetParam", alpha) %>%
-    sparkapi_invoke("setRegParam", lambda)
+    invoke("setMaxIter", 10L) %>%
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setLabelCol", envir$response) %>%
+    invoke("setFitIntercept", intercept) %>%
+    invoke("setElasticNetParam", alpha) %>%
+    invoke("setRegParam", lambda)
   
   if (only_model) return(model)
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
 
   coefficients <- fit %>%
-    sparkapi_invoke("coefficients") %>%
-    sparkapi_invoke("toArray")
+    invoke("coefficients") %>%
+    invoke("toArray")
   names(coefficients) <- features
 
-  hasIntercept <- sparkapi_invoke(fit, "getFitIntercept")
+  hasIntercept <- invoke(fit, "getFitIntercept")
   if (hasIntercept) {
-    intercept <- sparkapi_invoke(fit, "intercept")
+    intercept <- invoke(fit, "intercept")
     coefficients <- c(coefficients, intercept)
     names(coefficients) <- c(features, "(Intercept)")
   }
 
-  summary <- sparkapi_invoke(fit, "summary")
+  summary <- invoke(fit, "summary")
 
-  errors <- try_null(sparkapi_invoke(summary, "coefficientStandardErrors"))
+  errors <- try_null(invoke(summary, "coefficientStandardErrors"))
   if (!is.null(errors))
     names(errors) <- names(coefficients)
 
-  tvalues <- try_null(sparkapi_invoke(summary, "tValues"))
+  tvalues <- try_null(invoke(summary, "tValues"))
   if (!is.null(tvalues))
     names(tvalues) <- names(coefficients)
   
-  pvalues <- try_null(as.numeric(sparkapi_invoke(summary, "pValues")))
+  pvalues <- try_null(as.numeric(invoke(summary, "pValues")))
   if (!is.null(pvalues))
     names(pvalues) <- names(coefficients)
   
@@ -85,11 +85,11 @@ ml_linear_regression <- function(x,
            standard.errors = errors,
            t.values = tvalues,
            p.values = pvalues,
-           explained.variance = sparkapi_invoke(summary, "explainedVariance"),
-           mean.absolute.error = sparkapi_invoke(summary, "meanAbsoluteError"),
-           mean.squared.error = sparkapi_invoke(summary, "meanSquaredError"),
-           r.squared = sparkapi_invoke(summary, "r2"),
-           root.mean.squared.error = sparkapi_invoke(summary, "rootMeanSquaredError"),
+           explained.variance = invoke(summary, "explainedVariance"),
+           mean.absolute.error = invoke(summary, "meanAbsoluteError"),
+           mean.squared.error = invoke(summary, "meanSquaredError"),
+           r.squared = invoke(summary, "r2"),
+           root.mean.squared.error = invoke(summary, "rootMeanSquaredError"),
            model.parameters = as.list(envir)
   )
 }

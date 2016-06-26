@@ -164,18 +164,18 @@ Here's a simple example that wraps a Spark text file line counting function with
 ```{r}
 library(sparkapi)
 
-# define an R interface to Spark line counting
-count_lines <- function(sc, path) {
-  sparkapi_spark_context(sc) %>% 
-    sparkapi_invoke("textFile", path, 1L) %>% 
-      sparkapi_invoke("count")
-}
-
 # write a CSV 
 tempfile <- tempfile(fileext = ".csv")
 write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 
-# call spark to count the lines
+# define an R interface to Spark line counting
+count_lines <- function(sc, path) {
+  spark_context(sc) %>% 
+    invoke("textFile", path, 1L) %>% 
+      invoke("count")
+}
+
+# call spark to count the lines of the CSV
 count_lines(sc, tempfile)
 ```
 

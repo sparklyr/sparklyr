@@ -14,8 +14,8 @@ ml_pca <- function(x,
                    features = dplyr::tbl_vars(x),
                    ...) {
   
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   features <- as.character(features)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
@@ -23,25 +23,25 @@ ml_pca <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
-  pca <- sparkapi_invoke_new(
+  pca <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.PCA"
   )
 
   model <- pca %>%
-    sparkapi_invoke("setK", length(features)) %>%
-    sparkapi_invoke("setInputCol", envir$features)
+    invoke("setK", length(features)) %>%
+    invoke("setInputCol", envir$features)
     
   if (only_model) return(model)
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
 
   # extract principal components
-  pc <- fit %>% sparkapi_invoke("pc")
-  nrow <- pc %>% sparkapi_invoke("numRows")
-  ncol <- pc %>% sparkapi_invoke("numCols")
-  values <- pc %>% sparkapi_invoke("values") %>% as.numeric()
+  pc <- fit %>% invoke("pc")
+  nrow <- pc %>% invoke("numRows")
+  ncol <- pc %>% invoke("numCols")
+  values <- pc %>% invoke("values") %>% as.numeric()
 
   # convert to matrix
   components <- matrix(values, nrow = nrow, ncol = ncol)
@@ -55,8 +55,8 @@ ml_pca <- function(x,
   # (NOTE: not available in Spark 1.6.1)
   explainedVariance <- try_null({
     fit %>%
-      sparkapi_invoke("explainedVariance") %>%
-      sparkapi_invoke("toArray") %>%
+      invoke("explainedVariance") %>%
+      invoke("toArray") %>%
       as.numeric()
   })
 

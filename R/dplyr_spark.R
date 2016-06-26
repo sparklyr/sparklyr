@@ -18,12 +18,12 @@ spark_api <- function(x) {
 
 
 #' @export
-sparkapi_connection.tbl_spark <- function(x, ...) {
-  sparkapi_connection(x$src)
+spark_connection.tbl_spark <- function(x, ...) {
+  spark_connection(x$src)
 }
 
 #' @export
-sparkapi_connection.src_spark <- function(x, ...) {
+spark_connection.src_spark <- function(x, ...) {
   spark_dbi(x)@scon
 }
 
@@ -47,8 +47,8 @@ db_explain.src_spark <- function(con, sql, ...) {
 }
 
 #' @export
-tbl_vars.sparkapi_jobj <- function(x) {
-  as.character(sparkapi_invoke(x, "columns"))
+tbl_vars.spark_jobj <- function(x) {
+  as.character(invoke(x, "columns"))
 }
 
 #' @export
@@ -66,7 +66,7 @@ tbl.sparklyr_connection <- function(src, from, ...) {
 src_tbls.sparklyr_connection <- function(x, ...) {
   
   sql <- spark_get_sql_context(x)
-  tbls <- sparkapi_invoke(sql, "sql", "SHOW TABLES")
+  tbls <- invoke(sql, "sql", "SHOW TABLES")
   tableNames <- spark_dataframe_read_column(tbls, "tableName")
   
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
@@ -161,6 +161,6 @@ print.src_spark <- function(x, ...) {
 #' @export
 db_save_query.DBISparkConnection <- function (con, sql, name, temporary = TRUE, ...) 
 {
-  df <- sparkapi_dataframe(con@scon, sql)
-  sparkapi_invoke(df, "registerTempTable", name)
+  df <- spark_dataframe(con@scon, sql)
+  invoke(df, "registerTempTable", name)
 }

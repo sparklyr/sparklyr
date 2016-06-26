@@ -9,15 +9,15 @@
 # def createSQLContext(jsc: JavaSparkContext): SQLContext
 #
 spark_api_create_sql_context <- function(scon) {
-  ctx <- sparkapi_spark_context(scon)
-  jsc <- sparkapi_invoke_static(
+  ctx <- spark_context(scon)
+  jsc <- invoke_static(
     scon,
     "org.apache.spark.api.java.JavaSparkContext",
     "fromSparkContext",
     ctx
   )
 
-  sparkapi_invoke_static(
+  invoke_static(
     scon,
 
     "org.apache.spark.sql.api.r.SQLUtils",
@@ -49,23 +49,23 @@ spark_api_create_hive_context <- function(scon) {
 spark_api_create_hive_context_v2 <- function(scon) {
 
   # SparkSession.builder().enableHiveSupport()
-  builder <- sparkapi_invoke_static(
+  builder <- invoke_static(
     scon,
     "org.apache.spark.sql.SparkSession",
     "builder"
   )
 
-  builder <- sparkapi_invoke(
+  builder <- invoke(
     builder,
     "enableHiveSupport"
   )
 
-  session <- sparkapi_invoke(
+  session <- invoke(
     builder,
     "getOrCreate"
   )
 
-  conf <- sparkapi_invoke(session, "conf")
+  conf <- invoke(session, "conf")
 
   params <- spark_config_params(scon$config, spark_connection_is_local(scon), "spark.session.")
   lapply(names(params), function(paramName) {
@@ -77,7 +77,7 @@ spark_api_create_hive_context_v2 <- function(scon) {
       as.character(configValue)
     }
 
-    sparkapi_invoke(
+    invoke(
       conf,
       "set",
       paramName,
@@ -90,12 +90,12 @@ spark_api_create_hive_context_v2 <- function(scon) {
 }
 
 spark_api_create_hive_context_v1 <- function(scon) {
-  sparkapi_invoke_new(
+  invoke_new(
     scon,
 
     "org.apache.spark.sql.hive.HiveContext",
 
-    sparkapi_spark_context(scon)
+    spark_context(scon)
   )
 }
 
@@ -115,7 +115,7 @@ spark_sql_or_hive <- function(api) {
 }
 
 spark_api_sql <- function(api, sql) {
-  result <- sparkapi_invoke(
+  result <- invoke(
     spark_sql_or_hive(api),
     "sql",
     sql
@@ -125,14 +125,14 @@ spark_api_sql <- function(api, sql) {
 }
 
 spark_api_schema <- function(api, sqlResult) {
-  sparkapi_invoke(
+  invoke(
     sqlResult,
     "schema"
   )
 }
 
 spark_api_object_method <- function(api, object, property) {
-  sparkapi_invoke(
+  invoke(
     object,
     property
   )
@@ -153,7 +153,7 @@ spark_api_field <- function(api, field) {
 
 spark_api_schema_fields <- function(api, schemaResult) {
   lapply(
-    sparkapi_invoke(
+    invoke(
       schemaResult,
       "fields"
     ),
@@ -197,7 +197,7 @@ spark_api_data_frame <- function(api, sqlResult) {
   schema <- spark_api_schema(api, sqlResult)
   fields <- spark_api_schema_fields(api, schema)
 
-  df <- sparkapi_invoke_static(
+  df <- invoke_static(
     api$scon,
 
     "org.apache.spark.sql.api.r.SQLUtils",
@@ -240,10 +240,10 @@ spark_api_data_frame <- function(api, sqlResult) {
 spark_api_build_types <- function(api, columns) {
   names <- names(columns)
   fields <- lapply(names, function(name) {
-    sparkapi_invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, columns[[name]], TRUE)
+    invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, columns[[name]], TRUE)
   })
 
-  sparkapi_invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
+  invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
 }
 
 spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
@@ -267,34 +267,34 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
     df <- spark_api_read_csv(api, tempfile, columns)
 
     if (repartition > 0) {
-      df <- sparkapi_invoke(df, "repartition", as.integer(repartition))
+      df <- invoke(df, "repartition", as.integer(repartition))
     }
   } else {
     structType <- spark_api_build_types(api, columns)
 
     rows <- lapply(seq_len(NROW(df)), function(e) as.list(df[e,]))
 
-    rdd <- sparkapi_invoke_static(
+    rdd <- invoke_static(
       api$scon,
       "utils",
       "createDataFrame",
-      sparkapi_spark_context(api$scon),
+      spark_context(api$scon),
       rows,
       as.integer(if (repartition <= 0) 1 else repartition)
     )
 
-    df <- sparkapi_invoke(spark_sql_or_hive(api), "createDataFrame", rdd, structType)
+    df <- invoke(spark_sql_or_hive(api), "createDataFrame", rdd, structType)
   }
 
   spark_register_temp_table(df, name)
 }
 
 spark_register_temp_table <- function(table, name) {
-  sparkapi_invoke(table, "registerTempTable", name)
+  invoke(table, "registerTempTable", name)
 }
 
 spark_drop_temp_table <- function(api, name) {
-  sparkapi_invoke(spark_sql_or_hive(api),
+  invoke(spark_sql_or_hive(api),
                "dropTempTable",
                name)
 }
@@ -305,20 +305,20 @@ spark_print_schema <- function(api, tableName) {
     paste("SELECT * FROM", tableName, "LIMIT 1")
   )
 
-  sparkapi_invoke(
+  invoke(
     result,
     "printSchema"
   )
 }
 
 spark_api_read_generic <- function(api, path, fileMethod) {
-  read <- sparkapi_invoke(spark_sql_or_hive(api), "read")
-  sparkapi_invoke(read, fileMethod, path)
+  read <- invoke(spark_sql_or_hive(api), "read")
+  invoke(read, fileMethod, path)
 }
 
 spark_api_write_generic <- function(df, path, fileMethod) {
-  write <- sparkapi_invoke(df, "write")
-  sparkapi_invoke(write, fileMethod, path)
+  write <- invoke(df, "write")
+  invoke(write, fileMethod, path)
 
   invisible(TRUE)
 }
@@ -326,17 +326,17 @@ spark_api_write_generic <- function(df, path, fileMethod) {
 
 spark_inspect <- function(jobj) {
   print(jobj)
-  if (!spark_connection_is_open(sparkapi_connection(jobj)))
+  if (!spark_connection_is_open(spark_connection(jobj)))
     return(jobj)
 
-  class <- sparkapi_invoke(jobj, "getClass")
+  class <- invoke(jobj, "getClass")
 
   cat("Fields:\n")
-  fields <- sparkapi_invoke(class, "getDeclaredFields")
+  fields <- invoke(class, "getDeclaredFields")
   lapply(fields, function(field) { print(field) })
 
   cat("Methods:\n")
-  methods <- sparkapi_invoke(class, "getDeclaredMethods")
+  methods <- invoke(class, "getDeclaredMethods")
   lapply(methods, function(method) { print(method) })
 
   jobj

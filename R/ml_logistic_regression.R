@@ -15,8 +15,8 @@ ml_logistic_regression <- function(x,
                                    lambda = 0,
                                    ...)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -28,39 +28,39 @@ ml_logistic_regression <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  lr <- sparkapi_invoke_new(
+  lr <- invoke_new(
     sc,
     "org.apache.spark.ml.classification.LogisticRegression"
   )
 
   model <- lr %>%
-    sparkapi_invoke("setMaxIter", 100L) %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
-    sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setFitIntercept", as.logical(intercept)) %>%
-    sparkapi_invoke("setElasticNetParam", as.double(alpha)) %>%
-    sparkapi_invoke("setRegParam", as.double(lambda))
+    invoke("setMaxIter", 100L) %>%
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setLabelCol", envir$response) %>%
+    invoke("setFitIntercept", as.logical(intercept)) %>%
+    invoke("setElasticNetParam", as.double(alpha)) %>%
+    invoke("setRegParam", as.double(lambda))
   
   if (only_model) return(model)  
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
 
   coefficients <- fit %>%
-    sparkapi_invoke("coefficients") %>%
-    sparkapi_invoke("toArray")
+    invoke("coefficients") %>%
+    invoke("toArray")
   names(coefficients) <- features
 
-  hasIntercept <- sparkapi_invoke(fit, "getFitIntercept")
+  hasIntercept <- invoke(fit, "getFitIntercept")
   if (hasIntercept) {
-    intercept <- sparkapi_invoke(fit, "intercept")
+    intercept <- invoke(fit, "intercept")
     coefficients <- c(coefficients, intercept)
     names(coefficients) <- c(features, "(Intercept)")
   }
 
-  summary <- sparkapi_invoke(fit, "summary")
-  areaUnderROC <- sparkapi_invoke(summary, "areaUnderROC")
-  roc <- spark_dataframe_collect(sparkapi_invoke(summary, "roc"))
+  summary <- invoke(fit, "summary")
+  areaUnderROC <- invoke(summary, "areaUnderROC")
+  roc <- spark_dataframe_collect(invoke(summary, "roc"))
   
   coefficients <- intercept_first(coefficients)
 

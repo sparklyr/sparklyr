@@ -62,7 +62,7 @@ spark_connect <- function(master,
   }
   
   # attach unknown error handler
-  sparkapi_unknown_error_handler(read_spark_log_error)
+  sparkapi::unknown_error_handler(read_spark_log_error)
 
   sparkHome <- spark_home()
   if (spark_master_is_local(master)) {
@@ -82,7 +82,7 @@ spark_connect <- function(master,
     sparkHome = sparkHome,
     config = config
   )
-  scon <- structure(scon, class = c("sparklyr_connection", "sparkapi_connection"))
+  scon <- structure(scon, class = c("sparklyr_connection", "spark_connection"))
 
   # determine jars and packages
   jars <- spark_default_jars()
@@ -134,7 +134,7 @@ spark_connect <- function(master,
 }
 
 resolve_extensions <- function(extensions, config) {
-  sparkapi_dependencies_from_extensions(config, extensions)
+  spark_dependencies_from_extensions(config, extensions)
 }
 
 # Attaches the SparkContext to the connection
@@ -295,17 +295,17 @@ spark_connection_create_context <- function(sc, master, appName, sparkHome) {
   scon <- sc
   sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
 
-  conf <- sparkapi_invoke_new(scon, "org.apache.spark.SparkConf")
-  conf <- sparkapi_invoke(conf, "setAppName", appName)
-  conf <- sparkapi_invoke(conf, "setMaster", master)
-  conf <- sparkapi_invoke(conf, "setSparkHome", sparkHome)
+  conf <- invoke_new(scon, "org.apache.spark.SparkConf")
+  conf <- invoke(conf, "setAppName", appName)
+  conf <- invoke(conf, "setMaster", master)
+  conf <- invoke(conf, "setSparkHome", sparkHome)
 
   params <- spark_config_params(scon$config, spark_connection_is_local(scon), "spark.context.")
   lapply(names(params), function(paramName) {
-    conf <<- sparkapi_invoke(conf, "set", paramName, params[[paramName]])
+    conf <<- invoke(conf, "set", paramName, params[[paramName]])
   })
 
-  sparkapi_invoke_new(
+  invoke_new(
     scon,
     "org.apache.spark.SparkContext",
     conf
@@ -364,7 +364,7 @@ spark_connection_is_open <- function(sc) {
 }
 
 spark_connection_version <- function(sc, onlyVersion = FALSE) {
-  rawVersion <- sparkapi_invoke(sparkapi_spark_context(sc), "version")
+  rawVersion <- invoke(spark_context(sc), "version")
   
   # Get rid of -preview and other suffix variations if needed
   if (onlyVersion) gsub("([0-9]+\\.?)[^0-9\\.](.*)","\\1", rawVersion) else rawVersion

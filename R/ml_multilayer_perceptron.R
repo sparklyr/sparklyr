@@ -25,8 +25,8 @@ ml_multilayer_perceptron <- function(x,
                                      seed = sample(.Machine$integer.max, 1),
                                      ...)
 {
-  df <- sparkapi_dataframe(x)
-  sc <- sparkapi_connection(df)
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
   
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -40,22 +40,22 @@ ml_multilayer_perceptron <- function(x,
 
   ml_multilayer_perceptron_validate_layers(x, response, features, layers)
 
-  mpc <- sparkapi_invoke_new(
+  mpc <- invoke_new(
     sc,
     "org.apache.spark.ml.classification.MultilayerPerceptronClassifier"
   )
 
   model <- mpc %>%
-    sparkapi_invoke("setFeaturesCol", envir$features) %>%
-    sparkapi_invoke("setLabelCol", envir$response) %>%
-    sparkapi_invoke("setLayers", as.list(layers)) %>%
-    sparkapi_invoke("setSeed", seed) %>%
-    sparkapi_invoke("setMaxIter", max.iter)
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setLabelCol", envir$response) %>%
+    invoke("setLayers", as.list(layers)) %>%
+    invoke("setSeed", seed) %>%
+    invoke("setMaxIter", max.iter)
 
   if (only_model) return(model)
   
   fit <- model %>%
-    sparkapi_invoke("fit", tdf)
+    invoke("fit", tdf)
   
   ml_model("multilayer_perceptron", fit,
     features = features,

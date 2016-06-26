@@ -15,7 +15,7 @@ data(diamonds, package = "ggplot2")
 
 sc <- spark_connect(master = "local", version = "1.6.1")
 diamonds_tbl <- copy_to(sc, diamonds, "diamonds", overwrite = TRUE)
-diamonds_sdf <- sparkapi_dataframe(diamonds_tbl)
+diamonds_sdf <- spark_dataframe(diamonds_tbl)
 ```
 
 Next, we compute our bootstrap estimates of the mean. Note that all of the computational sampling work is occurring on the Spark side; only the computed statistic is returned to the R session on each bootstrap iteration.

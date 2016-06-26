@@ -68,7 +68,7 @@ sdf_import.default <- function(x, sc, ..., name = NULL, cache = TRUE) {
   
   # generate the Spark CSV reader
   ctx <- spark_api_create_sql_context(sc)
-  reader <- sparkapi_invoke(ctx, "read")
+  reader <- invoke(ctx, "read")
   
   # construct schema
   # TODO: move to separate function?
@@ -82,7 +82,7 @@ sdf_import.default <- function(x, sc, ..., name = NULL, cache = TRUE) {
       typeof(value)
     
     # create struct field
-    sparkapi_invoke_static(
+    invoke_static(
       sc,
       
       "org.apache.spark.sql.api.r.SQLUtils",
@@ -95,7 +95,7 @@ sdf_import.default <- function(x, sc, ..., name = NULL, cache = TRUE) {
     )
   })
   
-  schema <- sparkapi_invoke_static(
+  schema <- invoke_static(
     sc,
     
     "org.apache.spark.sql.api.r.SQLUtils",
@@ -106,13 +106,13 @@ sdf_import.default <- function(x, sc, ..., name = NULL, cache = TRUE) {
   
   # invoke CSV reader with our schema
   sdf <- reader %>%
-    sparkapi_invoke("format", "com.databricks.spark.csv") %>%
-    sparkapi_invoke("option", "header", "true") %>%
-    sparkapi_invoke("schema", schema) %>%
-    sparkapi_invoke("load", path)
+    invoke("format", "com.databricks.spark.csv") %>%
+    invoke("option", "header", "true") %>%
+    invoke("schema", schema) %>%
+    invoke("load", path)
   
   if (cache)
-    sdf <- sparkapi_invoke(sdf, "cache")
+    sdf <- invoke(sdf, "cache")
   
   sdf_register(sdf, name)
 }
@@ -150,9 +150,9 @@ sdf_register.list <- function(x, name = NULL) {
 }
 
 #' @export
-sdf_register.sparkapi_jobj <- function(x, name = random_string("sparklyr_tmp_")) {
-  sparkapi_invoke(x, "registerTempTable", name)
-  sc <- sparkapi_connection(x)
+sdf_register.spark_jobj <- function(x, name = random_string("sparklyr_tmp_")) {
+  invoke(x, "registerTempTable", name)
+  sc <- spark_connection(x)
   on_connection_updated(sc, name)
   tbl(sc, name)
 }
@@ -207,7 +207,7 @@ sdf_partition <- function(x,
                           weights = NULL,
                           seed = sample(.Machine$integer.max, 1))
 {
-  sdf <- sparkapi_dataframe(x)
+  sdf <- spark_dataframe(x)
   weights <- weights %||% list(...)
   nm <- names(weights)
   if (is.null(nm) || any(!nzchar(nm)))
@@ -235,14 +235,14 @@ sdf_partition <- function(x,
 #' @export
 sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
 {
-  sdf <- sparkapi_dataframe(x)
+  sdf <- spark_dataframe(x)
   
   sampled <- if (is.null(seed)) {
     sdf %>%
-      sparkapi_invoke("sample", as.logical(replacement), as.double(fraction))
+      invoke("sample", as.logical(replacement), as.double(fraction))
   } else {
     sdf %>%
-      sparkapi_invoke("sample", as.logical(replacement), as.double(fraction), as.integer(seed))
+      invoke("sample", as.logical(replacement), as.double(fraction), as.integer(seed))
   }
   
   sdf_register(sampled)
@@ -262,7 +262,7 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
 #' 
 #' @export
 sdf_sort <- function(x, columns) {
-  df <- sparkapi_dataframe(x)
+  df <- spark_dataframe(x)
   
   columns <- as.character(columns)
   n <- length(columns)
@@ -270,9 +270,9 @@ sdf_sort <- function(x, columns) {
     stop("must supply one or more column names")
   
   sorted <- if (n == 1) {
-    sparkapi_invoke(df, "sort", columns, list())
+    invoke(df, "sort", columns, list())
   } else {
-    sparkapi_invoke(df, "sort", columns[[1]], as.list(columns[-1]))
+    invoke(df, "sort", columns[[1]], as.list(columns[-1]))
   }
   
   sdf_register(sorted)
@@ -374,10 +374,10 @@ sdf_mutate_ <- function(.data, ..., .dots) {
 sdf_predict <- function(object, newdata, ...) {
   if (missing(newdata) || is.null(newdata))
     newdata <- object$data
-  sdf <- sparkapi_dataframe(newdata)
+  sdf <- spark_dataframe(newdata)
   params <- object$model.parameters
-  assembled <- sparkapi_dataframe(ft_vector_assembler(sdf, object$features, params$features))
-  transformed <- sparkapi_invoke(object$.model, "transform", assembled)
-  dropped <- sparkapi_invoke(transformed, "drop", params$features)
+  assembled <- spark_dataframe(ft_vector_assembler(sdf, object$features, params$features))
+  transformed <- invoke(object$.model, "transform", assembled)
+  dropped <- invoke(transformed, "drop", params$features)
   sdf_register(dropped)
 }

@@ -1,27 +1,27 @@
 
 
 #' @export
-sparkapi_dataframe.tbl_spark <- function(x, ...) {
+spark_dataframe.tbl_spark <- function(x, ...) {
   db <- x$src
   con <- db$con
 
   sql <- as.character(sql_render(sql_build(x, con = con), con = con))
   api <- spark_sql_or_hive(spark_api(x$src))
-  sparkapi_invoke(api, "sql", sql)
+  invoke(api, "sql", sql)
 }
 
 #' @export
-sparkapi_dataframe.sparklyr_connection <- function(x, sql = NULL, ...) {
-  sparkapi_invoke(spark_sql_or_hive(spark_api(x)), "sql", as.character(sql))
+spark_dataframe.sparklyr_connection <- function(x, sql = NULL, ...) {
+  invoke(spark_sql_or_hive(spark_api(x)), "sql", as.character(sql))
 }
 
 spark_dataframe_schema <- function(object) {
-  jobj <- sparkapi_dataframe(object)
-  schema <- sparkapi_invoke(jobj, "schema")
-  fields <- sparkapi_invoke(schema, "fields")
+  jobj <- spark_dataframe(object)
+  schema <- invoke(jobj, "schema")
+  fields <- invoke(schema, "fields")
   list <- lapply(fields, function(field) {
-    type <- sparkapi_invoke(sparkapi_invoke(field, "dataType"), "toString")
-    name <- sparkapi_invoke(field, "name")
+    type <- invoke(invoke(field, "dataType"), "toString")
+    name <- invoke(field, "name")
     list(name = name, type = type)
   })
   names(list) <- unlist(lapply(list, `[[`, "name"))
@@ -29,7 +29,7 @@ spark_dataframe_schema <- function(object) {
 }
 
 spark_dataframe_read_column <- function(object, colName) {
-  jobj <- sparkapi_dataframe(object)
+  jobj <- spark_dataframe(object)
   schema <- spark_dataframe_schema(jobj)
   colType <- schema[[colName]]$type
 
@@ -44,12 +44,12 @@ spark_dataframe_read_column <- function(object, colName) {
   else
     "readColumnDefault"
 
-  sc <- sparkapi_connection(jobj)
+  sc <- spark_connection(jobj)
   rdd <- jobj %>%
-    sparkapi_invoke("select", colName, list()) %>%
-    sparkapi_invoke("rdd")
+    invoke("select", colName, list()) %>%
+    invoke("rdd")
 
-  column <- sparkapi_invoke_static(sc, "utils", method, rdd)
+  column <- invoke_static(sc, "utils", method, rdd)
 
   if (colType == "StringType") {
 
@@ -71,9 +71,9 @@ spark_dataframe_read_column <- function(object, colName) {
 
 # Read a Spark Dataset into R.
 spark_dataframe_collect <- function(object) {
-  jobj <- sparkapi_dataframe(object)
+  jobj <- spark_dataframe(object)
   schema <- spark_dataframe_schema(jobj)
-  colNames <- as.character(sparkapi_invoke(jobj, "columns"))
+  colNames <- as.character(invoke(jobj, "columns"))
   colValues <- lapply(schema, function(colInfo) {
     spark_dataframe_read_column(jobj, colInfo$name)
   })
@@ -88,7 +88,7 @@ spark_dataframe_split <- function(object,
                                   weights = c(0.5, 0.5),
                                   seed = sample(.Machine$integer.max, 1))
 {
-  jobj <- sparkapi_dataframe(object)
-  sparkapi_invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
+  jobj <- spark_dataframe(object)
+  invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
 }
 
