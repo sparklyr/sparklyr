@@ -14,7 +14,6 @@ Installation
 You can install the development version of the **sparklyr** package using [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html) as follows:
 
 ``` r
-install.packages("dplyr", type = "source")
 devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
 ```
 
@@ -226,18 +225,18 @@ Here's a simple example that wraps a Spark text file line counting function with
 ``` r
 library(sparkapi)
 
-# define an R interface to Spark line counting
-count_lines <- function(sc, path) {
-  sparkapi_spark_context(sc) %>% 
-    sparkapi_invoke("textFile", path, 1L) %>% 
-      sparkapi_invoke("count")
-}
-
 # write a CSV 
 tempfile <- tempfile(fileext = ".csv")
 write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 
-# call spark to count the lines
+# define an R interface to Spark line counting
+count_lines <- function(sc, path) {
+  spark_context(sc) %>% 
+    invoke("textFile", path, 1L) %>% 
+      invoke("count")
+}
+
+# call spark to count the lines of the CSV
 count_lines(sc, tempfile)
 ```
 
@@ -275,16 +274,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/25 09:19:25 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 66 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpBz9gjq/file865426b6805a.csv MapPartitionsRDD[297] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/06/25 09:19:25 INFO TaskSchedulerImpl: Adding task set 66.0 with 1 tasks
-    ## 16/06/25 09:19:25 INFO TaskSetManager: Starting task 0.0 in stage 66.0 (TID 464, localhost, partition 0,PROCESS_LOCAL, 2473 bytes)
-    ## 16/06/25 09:19:25 INFO Executor: Running task 0.0 in stage 66.0 (TID 464)
-    ## 16/06/25 09:19:25 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpBz9gjq/file865426b6805a.csv:0+23367180
-    ## 16/06/25 09:19:25 INFO Executor: Finished task 0.0 in stage 66.0 (TID 464). 2082 bytes result sent to driver
-    ## 16/06/25 09:19:25 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 464) in 93 ms on localhost (1/1)
-    ## 16/06/25 09:19:25 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/06/25 09:19:25 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.093 s
-    ## 16/06/25 09:19:25 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.096511 s
+    ## 16/06/26 06:55:41 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 66 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpgparOL/fileaca172de92c.csv MapPartitionsRDD[297] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/26 06:55:41 INFO TaskSchedulerImpl: Adding task set 66.0 with 1 tasks
+    ## 16/06/26 06:55:41 INFO TaskSetManager: Starting task 0.0 in stage 66.0 (TID 464, localhost, partition 0,PROCESS_LOCAL, 2472 bytes)
+    ## 16/06/26 06:55:41 INFO Executor: Running task 0.0 in stage 66.0 (TID 464)
+    ## 16/06/26 06:55:41 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpgparOL/fileaca172de92c.csv:0+23367180
+    ## 16/06/26 06:55:41 INFO Executor: Finished task 0.0 in stage 66.0 (TID 464). 2082 bytes result sent to driver
+    ## 16/06/26 06:55:41 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 464) in 84 ms on localhost (1/1)
+    ## 16/06/26 06:55:41 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
+    ## 16/06/26 06:55:41 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.084 s
+    ## 16/06/26 06:55:41 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.087294 s
 
 Finally, we disconnect from Spark:
 

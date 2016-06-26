@@ -23,7 +23,6 @@ knitr::opts_chunk$set(eval = TRUE)
 You can install the development version of the **sparklyr** package using [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html) as follows:
 
 ```{r, eval=FALSE}
-install.packages("dplyr", type = "source")
 devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
 ```
 
