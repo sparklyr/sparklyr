@@ -64,11 +64,3 @@ prepare_windows_environment <- function() {
   # execute the file permission command
   system2(winutils, c("chmod", "777", hivePath))
 }
-
-
-
-
-verify_msvcr100 <- function() {
-  
-  
-}
