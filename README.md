@@ -47,7 +47,7 @@ Using dplyr
 
 We can new use all of the available dplyr verbs against the tables within the cluster.
 
-We'l start by copying some datasets from R into the Spark cluster:
+We'l start by copying some datasets from R into the Spark cluster (note that you may need to install the nycflights13 and Lahman packages in order to execute this code):
 
 ``` r
 iris_tbl <- copy_to(sc, iris)
@@ -275,16 +275,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/27 08:53:01 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 66 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpvX84PB/file23ab710b7fd8.csv MapPartitionsRDD[297] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/06/27 08:53:01 INFO TaskSchedulerImpl: Adding task set 66.0 with 1 tasks
-    ## 16/06/27 08:53:01 INFO TaskSetManager: Starting task 0.0 in stage 66.0 (TID 464, localhost, partition 0,PROCESS_LOCAL, 2473 bytes)
-    ## 16/06/27 08:53:01 INFO Executor: Running task 0.0 in stage 66.0 (TID 464)
-    ## 16/06/27 08:53:01 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpvX84PB/file23ab710b7fd8.csv:0+23367180
-    ## 16/06/27 08:53:01 INFO Executor: Finished task 0.0 in stage 66.0 (TID 464). 2082 bytes result sent to driver
-    ## 16/06/27 08:53:01 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 464) in 86 ms on localhost (1/1)
-    ## 16/06/27 08:53:01 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/06/27 08:53:01 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.086 s
-    ## 16/06/27 08:53:01 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.088448 s
+    ## 16/06/27 14:26:47 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 66 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpyOF1S3/file35397e3018b3.csv MapPartitionsRDD[297] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/27 14:26:47 INFO TaskSchedulerImpl: Adding task set 66.0 with 1 tasks
+    ## 16/06/27 14:26:47 INFO TaskSetManager: Starting task 0.0 in stage 66.0 (TID 464, localhost, partition 0,PROCESS_LOCAL, 2473 bytes)
+    ## 16/06/27 14:26:47 INFO Executor: Running task 0.0 in stage 66.0 (TID 464)
+    ## 16/06/27 14:26:47 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpyOF1S3/file35397e3018b3.csv:0+23367180
+    ## 16/06/27 14:26:48 INFO Executor: Finished task 0.0 in stage 66.0 (TID 464). 2082 bytes result sent to driver
+    ## 16/06/27 14:26:48 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 464) in 82 ms on localhost (1/1)
+    ## 16/06/27 14:26:48 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
+    ## 16/06/27 14:26:48 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.083 s
+    ## 16/06/27 14:26:48 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.085829 s
 
 Finally, we disconnect from Spark:
 
