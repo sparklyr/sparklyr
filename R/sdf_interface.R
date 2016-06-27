@@ -34,8 +34,10 @@ sdf_import <- function(x, sc, ...) {
 }
 
 #' @export
-sdf_import.default <- function(x, sc, ..., name = NULL, cache = TRUE) {
-  
+sdf_import.default <- function(x, sc, ...,
+                               name = random_string("sparklyr_tmp_"),
+                               cache = TRUE)
+{
   # ensure data.frame
   if (!is.data.frame(x)) {
     x <- as.data.frame(
@@ -67,7 +69,7 @@ sdf_import.default <- function(x, sc, ..., name = NULL, cache = TRUE) {
   path <- normalizePath(tempfile, winslash = "/", mustWork = TRUE)
   
   # generate the Spark CSV reader
-  ctx <- spark_api_create_sql_context(sc)
+  ctx <- spark_get_sql_context(sc)
   reader <- invoke(ctx, "read")
   
   # construct schema
