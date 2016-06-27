@@ -53,15 +53,67 @@ prepare_windows_environment <- function() {
   }
   
   # form path to winutils.exe
-  winutils <-  normalizePath(file.path(hadoopBinPath, "winutils.exe"), 
-                             mustWork = FALSE)
+  winutils <- normalizePath(file.path(hadoopBinPath, "winutils.exe"), 
+                            mustWork = FALSE)
   
-  # ensure that winutils.exe is on the hadoop bin path
-  file.copy(system.file("winutils", 
-                        paste0("winutils", ifelse(is_win64(), "64", "32"), ".dat"),
-                        package = "sparklyr"),
-            winutils)
+  # get a copy of winutils if we don't already have it
+  if (!file.exists(winutils)) {
+    winutilsSrc <- winutils_source_path()
+    if (nzchar(winutilsSrc))
+      file.copy(winutilsSrc, winutils)
+    else
+      stop_with_winutils_error(hadoopBinPath)
+  }
   
-  # execute the file permission command
+  # ensure correct permissions on hive path
   system2(winutils, c("chmod", "777", hivePath))
 }
+
+
+winutils_source_path <- function() {
+  
+  # check for rstudio version of winutils
+  rstudioWinutils <- Sys.getenv("RSTUDIO_WINUTILS", unset = NA)
+  if (!is.na(rstudioWinutils)) {
+    if (is_win64())
+      rstudioWinutils <- file.path(rstudioWinutils, "x64")
+    rstudioWinutils <- file.path(rstudioWinutils, "winutils.exe")
+    normalizePath(rstudioWinutils, mustWork = FALSE)
+  # use embedded version (NOTE: this branch will go away once we
+  # drop the embedded version)
+  } else {
+    system.file("winutils", 
+                paste0("winutils", ifelse(is_win64(), "64", "32"), ".dat"),
+                package = "sparklyr")
+  }
+}
+
+
+stop_with_winutils_error <- function(hadoopBinPath) {
+  
+  if (is_win64()) {
+    winutilsDownload <- "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/"
+  } else {
+    winutilsDownload <- "https://code.google.com/archive/p/rrd-hadoop-win32/source/default/source"
+  }
+ 
+  stop(
+    "\n\n",
+    "To run Spark on Windows you need a copy of Hadoop winutils.exe:",
+    "\n\n",
+    "1. Download Hadoop winutils.exe from:",
+    "\n\n",
+    paste("  ", winutilsDownload),
+    "\n\n",
+    paste("2. Copy winutils.exe to", hadoopBinPath),
+    "\n\n",
+    "Alternatively, if you are using RStudio you can install the RStudio Preview Release,\n",
+    "which includes an embedded copy of Hadoop winutils.exe:\n\n",
+    "  https://www.rstudio.com/products/rstudio/download/preview/",
+    "\n\n",
+    call. = FALSE
+  )
+}
+
+
+
