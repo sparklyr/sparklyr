@@ -16,7 +16,7 @@ verify_msvcr100 <- function() {
                                 winslash = "/", mustWork = FALSE)
   haveMsvcr100 <- file.exists(msvcr100Path)
   if (!haveMsvcr100) {
-    msvcr100Url <- ifelse(is_win64(), 
+    msvcr100Url <- ifelse(is_win64() && !is_wow64() , 
                           "https://www.microsoft.com/download/en/details.aspx?id=13523",
                           "https://www.microsoft.com/download/en/details.aspx?id=8328")
     stop("Running Spark on Windows requires the ",
