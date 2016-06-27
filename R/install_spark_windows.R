@@ -22,7 +22,7 @@ spark_install_windows_local <- function() {
   winutilsDownload <- "https://code.google.com/archive/p/rrd-hadoop-win32/source/default/source"
   if (!grepl("x64", version$platform)) {
     vcRedistDownload <- "https://www.microsoft.com/download/en/details.aspx?id=8328"
-    winutilsDownload <- "https://github.com/steveloughran/winutils/tree/master/hadoop-2.6.0/bin"
+    winutilsDownload <- "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/winutils.exe"
   }
    
   message(
