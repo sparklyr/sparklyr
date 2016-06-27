@@ -1,3 +1,6 @@
+quote_shell <- function(param) {
+  if (.Platform$OS.type == "windows") param else shQuote(param)
+}
 
 start_shell <- function(scon, sconInst, jars, packages) {
   sparkHome <- scon$sparkHome
@@ -11,7 +14,7 @@ start_shell <- function(scon, sconInst, jars, packages) {
   )
 
   sparkSubmit <- sparkSubmitByOs[[.Platform$OS.type]]
-  sparkSubmitPath <- file.path(sparkHome, "bin", sparkSubmit)
+  sparkSubmitPath <- normalizePath(file.path(sparkHome, "bin", sparkSubmit))
 
   shellOutputPath <- tempfile(fileext = ".out")
   on.exit(unlink(shellOutputPath))
@@ -22,14 +25,14 @@ start_shell <- function(scon, sconInst, jars, packages) {
   parameters <- if(is.null(parameters)) list() else parameters
 
   parameters[["packages"]] <- unique(c(parameters[["--packages"]], packages))
-  parameters[["jars"]] <- unique(c(parameters[["--jars"]], jars))
+  parameters[["jars"]] <- unique(c(parameters[["--jars"]], normalizePath(jars)))
 
   lapply(names(parameters), function(paramName) {
     paramValue <- parameters[[paramName]]
     if (!is.null(paramValue)) {
       sparkCommand <<- paste0(sparkCommand, 
-                              shQuote(paste0("--", paramName)), " ", 
-                              shQuote(paste(paramValue, collapse = ",")), " ")
+                              quote_shell(paste0("--", paramName)), " ", 
+                              quote_shell(paste(paramValue, collapse = ",")), " ")
     }
   })
 
@@ -38,8 +41,10 @@ start_shell <- function(scon, sconInst, jars, packages) {
   outputFile <- tempfile(fileext = "_spark.log")
 
   env <- character()
-  if (spark_connection_is_local(scon))
-    env <- paste0("SPARK_LOCAL_IP=127.0.0.1")
+  if (.Platform$OS.type != "windows") {
+    if (spark_connection_is_local(scon))
+      env <- paste0("SPARK_LOCAL_IP=127.0.0.1")
+  }
 
   invisible(system2(sparkSubmitPath, sparkCommand, wait = FALSE, env = env, stdout = outputFile, stderr = outputFile))
 
@@ -47,7 +52,9 @@ start_shell <- function(scon, sconInst, jars, packages) {
     stop(paste(
       "Failed to launch Spark shell. Ports file does not exist.\n",
       "    Path: ", sparkSubmitPath, "\n",
-      "    Parameters: ", sparkCommand,
+      "    Parameters: ", sparkCommand, "\n",
+      "    \n",
+      paste(readLines(outputFile), collapse = "\n"),
       sep = ""))
   }
 
