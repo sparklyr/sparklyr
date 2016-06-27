@@ -15,7 +15,7 @@ You can install the development version of the **sparklyr** package using [**dev
 
 ``` r
 install.packages("devtools")
-devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
+devtools::install_github("rstudio/sparklyr")
 ```
 
 You should also install a local version of Spark for development purposes:
