@@ -109,8 +109,6 @@ spark_install <- function(version = NULL,
                           logging = "INFO",
                           verbose = interactive())
 {
-  fail_on_windows()
-  
   installInfo <- spark_install_find(version, hadoop_version, installedOnly = FALSE, latest = TRUE)
 
   if (!dir.exists(installInfo$sparkDir)) {
@@ -170,11 +168,6 @@ spark_install <- function(version = NULL,
   if (!file.exists(hiveSitePath) || reset) {
     hiveSiteTemplatePath <- system.file(package = "sparklyr", file.path("conf", "hive-site.xml"))
     file.copy(hiveSiteTemplatePath, hiveSitePath, overwrite = TRUE)
-  }
-  
-  if (.Platform$OS.type == "windows") {
-    windowsMessage <- spark_install_windows_local()
-    message(windowsMessage)
   }
 
   invisible(installInfo)

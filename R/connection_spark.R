@@ -36,8 +36,9 @@ spark_connect <- function(master,
                           hadoop_version = NULL,
                           extensions = NULL,
                           config = spark_config()) {
-  
-  fail_on_windows()
+
+  # prepare windows environment
+  prepare_windows_environment()
   
   # master can be missing if it's specified in the config file
   if (missing(master)) {
