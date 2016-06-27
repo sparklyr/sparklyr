@@ -1,17 +1,22 @@
 
-is_win64 <- function(){
+is_win64 <- function() {
   Sys.getenv("PROCESSOR_ARCHITECTURE") == "AMD64" ||
+  Sys.getenv("PROCESSOR_ARCHITEW6432") == "AMD64"
+}
+
+is_wow64 <- function() {
+  Sys.getenv("PROCESSOR_ARCHITECTURE") == "x86" ||
   Sys.getenv("PROCESSOR_ARCHITEW6432") == "AMD64"
 }
 
 verify_msvcr100 <- function() {
   # determine location of MSVCR100.DLL
   systemRoot <- Sys.getenv("SystemRoot")
-  msvcr100Path <- normalizePath(file.path(systemRoot, "System32", "msvcr100.dll"),
+  msvcr100Path <- normalizePath(file.path(systemRoot, ifelse(is_wow64(), "SysWOW64", "System32"), "msvcr100.dll"),
                                 winslash = "/", mustWork = FALSE)
   haveMsvcr100 <- file.exists(msvcr100Path)
   if (!haveMsvcr100) {
-    msvcr100Url <- ifelse(is_win64(), 
+    msvcr100Url <- ifelse(is_win64() && !is_wow64() , 
                           "https://www.microsoft.com/download/en/details.aspx?id=13523",
                           "https://www.microsoft.com/download/en/details.aspx?id=8328")
     stop("Running Spark on Windows requires the ",
