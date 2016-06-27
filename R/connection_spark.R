@@ -130,7 +130,7 @@ spark_connect <- function(master,
   on_connection_opened(scon, sconInst$connectCall)
   
   # Register a finalizer to sleep on R exit to support older versions of the RStudio ide
-  reg.finalizer(as.environment("package:stats"), function(x) {
+  reg.finalizer(as.environment("package:sparklyr"), function(x) {
     if (spark_connection_is_open(scon)) {
       Sys.sleep(1)
     }
