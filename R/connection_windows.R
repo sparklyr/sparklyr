@@ -57,8 +57,9 @@ prepare_windows_environment <- function() {
                              mustWork = FALSE)
   
   # ensure that winutils.exe is on the hadoop bin path
-  file.copy(system.file("inst", "winutils", 
-                        paste0("winutils", ifelse(is_win64(), "64", "32"), ".dat")),
+  file.copy(system.file("winutils", 
+                        paste0("winutils", ifelse(is_win64(), "64", "32"), ".dat"),
+                        package = "sparklyr"),
             winutils)
   
   # execute the file permission command
