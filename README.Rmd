@@ -23,6 +23,7 @@ knitr::opts_chunk$set(eval = TRUE)
 You can install the development version of the **sparklyr** package using [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html) as follows:
 
 ```{r, eval=FALSE}
+install.packages("devtools")
 devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
 ```
 
@@ -92,7 +93,6 @@ ggplot(delay, aes(dist, delay)) +
 dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
 
 ```{r}
-
 batting_tbl %>%
   select(playerID, yearID, teamID, G, AB:H) %>%
   arrange(playerID, yearID, teamID) %>%
@@ -224,8 +224,6 @@ The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/do
 - Creating and managing Spark connections
 - Browsing the tables and columns of Spark DataFrames
 - Previewing the first 1,000 rows of Spark DataFrames
-
-
 
 Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
 

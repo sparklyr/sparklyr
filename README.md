@@ -14,6 +14,7 @@ Installation
 You can install the development version of the **sparklyr** package using [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html) as follows:
 
 ``` r
+install.packages("devtools")
 devtools::install_github("rstudio/sparklyr", auth_token = "1296316f10e7fe4adc675c77366265b5f180933d")
 ```
 
@@ -274,16 +275,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 249
-    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 248
-    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 247
-    ## 16/06/26 12:42:40 INFO BlockManagerInfo: Removed broadcast_80_piece0 on localhost:56158 in memory (size: 3.0 KB, free: 487.2 MB)
-    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 268
-    ## 16/06/26 12:42:40 INFO BlockManagerInfo: Removed broadcast_79_piece0 on localhost:56158 in memory (size: 4.6 KB, free: 487.2 MB)
-    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 266
-    ## 16/06/26 12:42:40 INFO BlockManagerInfo: Removed broadcast_78_piece0 on localhost:56158 in memory (size: 8.6 KB, free: 487.3 MB)
-    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned accumulator 265
-    ## 16/06/26 12:42:40 INFO ContextCleaner: Cleaned shuffle 19
+    ## 16/06/27 08:53:01 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 66 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpvX84PB/file23ab710b7fd8.csv MapPartitionsRDD[297] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/06/27 08:53:01 INFO TaskSchedulerImpl: Adding task set 66.0 with 1 tasks
+    ## 16/06/27 08:53:01 INFO TaskSetManager: Starting task 0.0 in stage 66.0 (TID 464, localhost, partition 0,PROCESS_LOCAL, 2473 bytes)
+    ## 16/06/27 08:53:01 INFO Executor: Running task 0.0 in stage 66.0 (TID 464)
+    ## 16/06/27 08:53:01 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpvX84PB/file23ab710b7fd8.csv:0+23367180
+    ## 16/06/27 08:53:01 INFO Executor: Finished task 0.0 in stage 66.0 (TID 464). 2082 bytes result sent to driver
+    ## 16/06/27 08:53:01 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 464) in 86 ms on localhost (1/1)
+    ## 16/06/27 08:53:01 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
+    ## 16/06/27 08:53:01 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.086 s
+    ## 16/06/27 08:53:01 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.088448 s
 
 Finally, we disconnect from Spark:
 
