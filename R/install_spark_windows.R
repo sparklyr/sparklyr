@@ -1,7 +1,7 @@
 spark_install_windows_local <- function() {
-  hivePath <- normalizePath("\\tmp\\hive")
-  hadoopPath <- normalizePath("\\tmp\\hadoop")
-  hadoopBinPath <- normalizePath(file.path(hadoopPath, "bin"))
+  hivePath <- normalizePath("\\tmp\\hive", mustWork = FALSE)
+  hadoopPath <- normalizePath("\\tmp\\hadoop", mustWork = FALSE)
+  hadoopBinPath <- normalizePath(file.path(hadoopPath, "bin"), mustWork = FALSE)
   if (!dir.exists(hadoopPath)) {
     dir.create(hadoopBinPath, recursive = TRUE)
     message(paste("Created default hadoop bin directory under:", hadoopPath))
