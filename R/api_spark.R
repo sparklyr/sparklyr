@@ -273,11 +273,12 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
     structType <- spark_api_build_types(api, columns)
     
     # Map date and time columns as standard doubles
-    as.data.frame(lapply(df, function(e) {
+    df <- as.data.frame(lapply(df, function(e) {
       if (is.time(e) || is.date(e))
         sapply(e, function(t) {
           class(t) <- NULL
-          t})
+          t
+        })
       else
         e
     }))
