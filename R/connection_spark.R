@@ -37,6 +37,8 @@ spark_connect <- function(master,
                           extensions = NULL,
                           config = spark_config()) {
   
+  fail_on_windows()
+  
   # master can be missing if it's specified in the config file
   if (missing(master)) {
     master <- config$spark.master

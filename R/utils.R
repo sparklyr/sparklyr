@@ -17,6 +17,14 @@ is.installed <- function(package) {
 }
 
 
+fail_on_windows <- function() {
+  if ((.Platform$OS.type == "windows") && 
+      !getOption("sparklyr.windows_enabled", FALSE)) {
+    stop("sparklyr is not currently supported on Windows ",
+         "(https://github.com/rstudio/sparklyr/issues/42)")
+  }
+}
+
 is_java_available <- function() {
   java_home <- Sys.getenv("JAVA_HOME", unset = NA)
   if (!is.na(java_home))
