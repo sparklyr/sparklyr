@@ -34,8 +34,10 @@ sdf_import <- function(x, sc, ...) {
 }
 
 #' @export
-sdf_import.default <- function(x, sc, ..., name = NULL, cache = TRUE) {
-  
+sdf_import.default <- function(x, sc, ...,
+                               name = random_string("sparklyr_tmp_"),
+                               cache = TRUE)
+{
   # ensure data.frame
   if (!is.data.frame(x)) {
     x <- as.data.frame(
