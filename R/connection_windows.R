@@ -12,11 +12,12 @@ is_wow64 <- function() {
 verify_msvcr100 <- function() {
   # determine location of MSVCR100.DLL
   systemRoot <- Sys.getenv("SystemRoot")
-  msvcr100Path <- normalizePath(file.path(systemRoot, ifelse(is_wow64(), "SysWOW64", "System32"), "msvcr100.dll"),
+  systemDir <- ifelse(is_win64(), ifelse(is_wow64(), "sysnative", "SysWOW64"), "SysWOW64")
+  msvcr100Path <- normalizePath(file.path(systemRoot, systemDir, "msvcr100.dll"),
                                 winslash = "/", mustWork = FALSE)
   haveMsvcr100 <- file.exists(msvcr100Path)
   if (!haveMsvcr100) {
-    msvcr100Url <- ifelse(is_win64() && !is_wow64() , 
+    msvcr100Url <- ifelse(is_win64() , 
                           "https://www.microsoft.com/download/en/details.aspx?id=13523",
                           "https://www.microsoft.com/download/en/details.aspx?id=8328")
     stop("Running Spark on Windows requires the ",
