@@ -5,7 +5,7 @@ is_win64 <- function() {
 }
 
 is_wow64 <- function() {
-  Sys.getenv("PROCESSOR_ARCHITECTURE") == "x86" ||
+  Sys.getenv("PROCESSOR_ARCHITECTURE") == "x86" &&
   Sys.getenv("PROCESSOR_ARCHITEW6432") == "AMD64"
 }
 
