@@ -12,7 +12,7 @@ is_wow64 <- function() {
 verify_msvcr100 <- function() {
   # determine location of MSVCR100.DLL
   systemRoot <- Sys.getenv("SystemRoot")
-  systemDir <- ifelse(is_win64(), ifelse(is_wow64(), "sysnative", "SysWOW64"), "SysWOW64")
+  systemDir <- ifelse(is_win64(), ifelse(is_wow64(), "sysnative", "system32"), "system32")
   msvcr100Path <- normalizePath(file.path(systemRoot, systemDir, "msvcr100.dll"),
                                 winslash = "/", mustWork = FALSE)
   haveMsvcr100 <- file.exists(msvcr100Path)
