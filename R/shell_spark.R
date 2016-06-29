@@ -1,5 +1,9 @@
-quote_shell <- function(param) {
-  if (.Platform$OS.type == "windows") param else shQuote(param)
+quote_shell <- function(param, windows = FALSE) {
+  if (.Platform$OS.type == "windows") {
+    if (windows) shQuote(param) else param
+  } else {
+    shQuote(param)
+  }
 }
 
 start_shell <- function(scon, sconInst, jars, packages) {
@@ -32,7 +36,7 @@ start_shell <- function(scon, sconInst, jars, packages) {
     if (!is.null(paramValue)) {
       sparkCommand <<- paste0(sparkCommand, 
                               quote_shell(paste0("--", paramName)), " ", 
-                              quote_shell(paste(paramValue, collapse = ",")), " ")
+                              quote_shell(paste(paramValue, collapse = ","), windows = TRUE), " ")
     }
   })
 
