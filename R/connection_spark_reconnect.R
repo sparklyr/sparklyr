@@ -80,7 +80,11 @@ spark_connection_find_scon <- function(test) {
   instances <- spark_connection_global_inst()
   instances <- Filter(function(e) { test(e$scon) }, instances)
 
-  lapply(instances, function(e) { e$scon })
+  lapply(instances, function(e) {
+    scon <- e$scon
+    scon$hive_context <- e$sconInst$hive
+    scon
+  })
 }
 
 spark_connection_can_reconnect <- function(scon) {
