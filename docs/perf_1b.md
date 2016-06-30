@@ -1,19 +1,25 @@
-RSpark Performance: 1B Rows
+Spark Performance: 1B Rows
 ================
 
 Setup
 -----
 
 ``` r
-rspark:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WARN")
+sparklyr:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WARN")
 ```
+
+    ## Warning: replacing previous import by 'sparkapi::%>%' when loading
+    ## 'sparklyr'
+
+    ## Warning: replacing previous import by 'magrittr::%>%' when loading
+    ## 'sparklyr'
 
 Initialization
 --------------
 
 ``` r
-library(rspark)
-library(magrittr)
+library(sparklyr)
+library(sparkapi)
 library(dplyr)
 ```
 
@@ -35,23 +41,39 @@ library(ggplot2)
     ## Warning: package 'ggplot2' was built under R version 3.2.4
 
 ``` r
-parquetPath <- file.path(getwd(), "billion.parquet")
+parquetName <- "billion.parquet"
+parquetPath <- file.path(getwd(), parquetName)
 
-if (!file.exists(parquetPath)) {
-  billion <- spark_invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
-    spark_invoke("longValue")
-  
-  ses %>%
-    spark_invoke("range", as.integer(billion)) %>%
-    spark_invoke("toDF") %>%
-    spark_invoke("write") %>%
-    spark_invoke("save", "billion.parquet")
+if (dir.exists(parquetPath)) {
+  unlink(parquetPath, recursive = TRUE)
 }
+
+config <- spark_config()
+  config[["sparklyr.shell.driver-memory"]] <- "12G"
+  config[["sparklyr.shell.executor-memory"]] <- "12G"
+  config[["spark.context.spark.executor.memory"]] <- "12G"
+  
+sc <- spark_connect(master = "local", config = config)
+
+billion <- invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
+  invoke("longValue")
+
+sparkapi::hive_context(sc) %>%
+  invoke("range", as.integer(billion)) %>%
+  invoke("toDF") %>%
+  invoke("write") %>%
+  invoke("save", parquetName)
+```
+
+    ## NULL
+
+``` r
+spark_disconnect(sc)
 
 spark_conf <- function(ses, config, value) {
   ses %>%
-    spark_invoke("conf") %>%
-    spark_invoke("set", config, value)
+    invoke("conf") %>%
+    invoke("set", config, value)
 }
 
 logResults <- function(label, test) {
@@ -76,34 +98,32 @@ logResults <- function(label, test) {
   ))
 }
 
-sparkTest <- function(test, loadIntoDf = TRUE) {
-  sc <- spark_connect(master = "local", version = "2.0.0-preview", memory = "12G")
-  sparkSql <- spark_invoke_new(
-    sc,
-    "org.apache.spark.sql.SQLContext",
-    spark_context(sc)
-  )
+sparkTest <- function(test, loadIntoDf = TRUE, loadData = TRUE) {
+  sc <- spark_connect(master = "local",
+                      version = "2.0.0-preview",
+                      config = config)
   
-  db <- src_spark(sc)
-  ses <- rspark:::spark_sql_or_hive(rspark:::spark_api(db))
+  ses <- sparkapi::hive_context(sc)
   df <- NULL
   
-  if (loadIntoDf) {
-    df <- sparkSql %>%
-      spark_invoke("read") %>%
-      spark_invoke("parquet", list(parquetPath)) %>%
-      spark_invoke("repartition", as.integer(parallel::detectCores()))
-    
-    df %>%
-      spark_invoke("cache") %>%
-      spark_invoke("count")
-  } else {
-    invisible(
-      load_parquet(db, "billion", parquetPath, repartition = parallel::detectCores())
-    )
+  if (loadData) {
+    if (loadIntoDf) {
+      df <- ses %>%
+        invoke("read") %>%
+        invoke("parquet", list(parquetPath)) %>%
+        invoke("repartition", as.integer(parallel::detectCores()))
+      
+      df %>%
+        invoke("cache") %>%
+        invoke("count")
+    } else {
+      invisible(
+        spark_read_parquet(sc, "billion", parquetPath, repartition = parallel::detectCores())
+      )
+    }
   }
   
-  result <- test(sc, db, ses, df)
+  result <- test(sc, ses, df)
   
   spark_disconnect(sc)
   result
@@ -116,49 +136,51 @@ Tests
 ### Sum range from formula
 
 ``` r
-spark_sum_range <- function(sc, db, ses, df) {
-  billion <- spark_invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
-    spark_invoke("longValue")
+spark_sum_range <- function(sc, ses, df) {
+  billion <- invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
+    invoke("longValue")
   
   result <- ses %>%
-    spark_invoke("range", as.integer(billion)) %>%
-    spark_invoke("toDF", list("x")) %>%
-    spark_invoke("selectExpr", list("sum(x)"))
+    invoke("range", as.integer(billion)) %>%
+    invoke("toDF", list("x")) %>%
+    invoke("selectExpr", list("sum(x)"))
     
-  spark_invoke(result, "collect")[[1]]
+  invoke(invoke(result, "collect")[[1]], "get", as.integer(0))
 }
 ```
 
 ### Sum range from parquet
 
 ``` r
-spark_sum_range_parquet <- function(sc, db, ses, df) {
-  df <- spark_invoke(rspark:::spark_sql_or_hive(rspark:::spark_api(db)), "read") %>%
-    spark_invoke("parquet", list(parquetPath))
+spark_sum_range_parquet <- function(sc, ses, df) {
+  df <- invoke(sparkapi::hive_context(sc), "read") %>%
+    invoke("parquet", list(parquetPath))
     
-  result <- spark_invoke(df, "selectExpr", list("sum(x)")) %>%
-    spark_invoke("collect")
+  result <- invoke(df, "selectExpr", list("sum(id)")) %>%
+    invoke("collect")
   
-  result[[1]]
+  invoke(result[[1]], "get", as.integer(0))
 }
 ```
 
 ### Sum range from memory
 
 ``` r
-spark_sum_range_mem <- function(sc, db, ses, df) {
-  df %>%
-    spark_invoke("selectExpr", list("sum(x)")) %>%
-    spark_invoke("collect")
+spark_sum_range_mem <- function(sc, ses, df) {
+  result <- df %>%
+    invoke("selectExpr", list("sum(id)")) %>%
+    invoke("collect")
+  
+  invoke(result[[1]], "get", as.integer(0))
 }
 ```
 
-### Sum range using rspark
+### Sum range using sparklyr
 
 ``` r
-spark_sum_range_rspark <- function(sc, db, ses, df) {
-  tbl(db, "billion") %>%
-    summarise(total = sum(x)) %>%
+spark_sum_range_sparklyr <- function(sc, ses, df) {
+  tbl(sc, "billion") %>%
+    summarise(total = sum(id)) %>%
     collect
 }
 ```
@@ -167,7 +189,7 @@ spark_sum_range_rspark <- function(sc, db, ses, df) {
 
 ``` r
 spark_sum_range_sparkr_sql_prepare <- function() {
-  installInfo <- rspark:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
+  installInfo <- sparklyr:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
   
   Sys.setenv(SPARK_HOME = installInfo$sparkVersionDir)
   library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
@@ -198,7 +220,7 @@ spark_sum_range_sparkr_terminate <- function() {
 
 ``` r
 spark_sum_range_sparkr_native_prepare <- function() {
-  installInfo <- rspark:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
+  installInfo <- sparklyr:::spark_install_info(sparkVersion = "2.0.0-preview", hadoopVersion = "2.6")
   
   Sys.setenv(SPARK_HOME = installInfo$sparkVersionDir)
   library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
@@ -214,7 +236,7 @@ spark_sum_range_sparkr_native_prepare <- function() {
 }
 
 spark_sum_range_sparkr_native <- function(df) {
-  collect(summarize(df, total = sum(df$x)))
+  collect(summarize(df, total = sum(df$id)))
 }
 ```
 
@@ -239,32 +261,32 @@ Results
 ### Sum range from formula using 1.6
 
 ``` r
-runOldCode <- sparkTest(function(sc, db, ses, df) {
+runOldCode <- sparkTest(function(sc, ses, df) {
   logResults("1.6.1 Code", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "false")
-    spark_sum_range(sc, db, ses, df)
+    spark_sum_range(sc, ses, df)
   })
-})
+}, loadData = FALSE)
 ```
 
 ### Sum range from formula using 2.0
 
 ``` r
-runCode <- sparkTest(function(sc, db, ses, df) {
+runCode <- sparkTest(function(sc, ses, df) {
   logResults("2.0.0 Code", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    spark_sum_range(sc, db, ses, df)
+    spark_sum_range(sc, ses, df)
   })
-})
+}, loadData = FALSE)
 ```
 
 ### Sum range from parquet
 
 ``` r
-runParquet <- sparkTest(function(sc, db, ses, df) {
+runParquet <- sparkTest(function(sc, ses, df) {
   logResults("2.0.0 Parquet", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    sum <- spark_sum_range_parquet(sc, db, ses, df)
+    sum <- spark_sum_range_parquet(sc, ses, df)
   })
 })
 ```
@@ -272,26 +294,26 @@ runParquet <- sparkTest(function(sc, db, ses, df) {
 ### Sum range from memory
 
 ``` r
-runInMem <- sparkTest(function(sc, db, ses, df) {
+runInMem <- sparkTest(function(sc, ses, df) {
   logResults("2.0.0 In-Mem", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    sum <- spark_sum_range_mem(sc, db, ses, df)
+    sum <- spark_sum_range_mem(sc, ses, df)
   })
 })
 ```
 
-### Sum range using rspark
+### Sum range using sparklyr
 
 ``` r
-runRSpark <- sparkTest(function(sc, db, ses, df) {
-  logResults("2.0.0 rspark", function() {
+runSparklyr <- sparkTest(function(sc, ses, df) {
+  logResults("2.0.0 sparklyr", function() {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
-    sum <- spark_sum_range_rspark(sc, db, ses, df)
+    sum <- spark_sum_range_sparklyr(sc, ses, df)
   })
 }, loadIntoDf = FALSE)
 ```
 
-### Sum range using RSpark SQL
+### Sum range using SparkR SQL
 
 ``` r
 sqlContextR <- spark_sum_range_sparkr_sql_prepare()
@@ -317,7 +339,7 @@ sqlContextR <- spark_sum_range_sparkr_sql_prepare()
     ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
     ##     rbind, sample, subset, summary, transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpkMqRoz/backend_port915b73511ca5
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmppTj8Ri/backend_port684619073c3c
 
 ``` r
 runSparkRSQL <- logResults("2.0.0 SparkR SQL", function() {
@@ -326,7 +348,7 @@ runSparkRSQL <- logResults("2.0.0 SparkR SQL", function() {
 spark_sum_range_sparkr_terminate()
 ```
 
-### Sum range using RSpark SQL
+### Sum range using SparkR native
 
 ``` r
 dfSparkR <- spark_sum_range_sparkr_native_prepare()
@@ -352,7 +374,7 @@ dfSparkR <- spark_sum_range_sparkr_native_prepare()
     ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
     ##     rbind, sample, subset, summary, transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpkMqRoz/backend_port915b40f27d9f
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmppTj8Ri/backend_port684650e817a2
 
 ``` r
 runSparkRNative <- logResults("2.0.0 SparkR Native", function() {
@@ -381,7 +403,7 @@ allRuns <- lapply(
     runCode,
     runParquet,
     runInMem,
-    runRSpark,
+    runSparklyr,
     runSparkRSQL,
     runSparkRNative,
     runDplyr
@@ -411,12 +433,12 @@ results %>%
 results
 ```
 
-    ##                 label   min    max      mean
-    ## 1          1.6.1 Code 7.379  8.874 7.9140000
-    ## 2          2.0.0 Code 0.348  0.862 0.5423333
-    ## 3       2.0.0 Parquet 7.996 11.020 9.1100000
-    ## 4        2.0.0 In-Mem 6.598  7.163 6.8130000
-    ## 5        2.0.0 rspark 6.480  6.949 6.6916667
-    ## 6    2.0.0 SparkR SQL 6.390  6.573 6.4776667
-    ## 7 2.0.0 SparkR Native 6.535  7.097 6.7593333
-    ## 8               dplyr 2.881  3.202 2.9930000
+    ##                 label   min    max     mean
+    ## 1          1.6.1 Code 6.976 11.852 8.917667
+    ## 2          2.0.0 Code 0.509  3.406 1.506333
+    ## 3       2.0.0 Parquet 5.243  6.185 5.655000
+    ## 4        2.0.0 In-Mem 6.610  7.476 7.036667
+    ## 5      2.0.0 sparklyr 6.521  8.301 7.125000
+    ## 6    2.0.0 SparkR SQL 6.504  6.918 6.775000
+    ## 7 2.0.0 SparkR Native 6.776  7.694 7.158000
+    ## 8               dplyr 3.065 12.673 6.393000

@@ -79,65 +79,74 @@ spark_connect <- function(master,
     }
   }
   
-  scon <- list(
-    master = master,
-    appName = app_name,
-    sparkHome = sparkHome,
-    config = config
-  )
-  scon <- structure(scon, class = c("sparklyr_connection", "spark_connection"))
-
-  # determine jars and packages
-  jars <- spark_default_jars()
-  packages <- config[["sparklyr.defaultPackages"]]
+  tryCatch({
+    scon <- list(
+      master = master,
+      appName = app_name,
+      sparkHome = sparkHome,
+      config = config
+    )
+    scon <- structure(scon, class = c("sparklyr_connection", "spark_connection"))
   
-  # call extensions to get additional jars and packages
-  dependencies <- resolve_extensions(extensions)
-  jars <- c(jars, dependencies$jars)
-  packages <- c(packages, dependencies$packages)
+    # determine jars and packages
+    jars <- spark_default_jars()
+    packages <- config[["sparklyr.defaultPackages"]]
+    
+    # call extensions to get additional jars and packages
+    dependencies <- resolve_extensions(extensions)
+    jars <- c(jars, dependencies$jars)
+    packages <- c(packages, dependencies$packages)
+    
+    sconInst <- start_shell(scon, list(), jars, packages)
+    scon$backend = sconInst$backend
+    scon$monitor = sconInst$monitor
+    
+    scon <- spark_connection_add_inst(scon, sconInst)
   
-  sconInst <- start_shell(scon, list(), jars, packages)
-  scon$backend = sconInst$backend
-  scon$monitor = sconInst$monitor
+    # start with library(sparklyr)
+    libs <- "library(sparklyr)"
+    
+    # check for dplyr on search path
+    if ("package:dplyr" %in% search())
+      libs <- paste(libs, "library(dplyr)", sep = "\n")
+    
+    parentCall <- match.call()
+    sconInst$connectCall <- paste(libs,
+                                  paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
+                                  sep = "\n")
+    sconInst$onReconnect = list()
   
-  scon <- spark_connection_add_inst(scon, sconInst)
-
-  # start with library(sparklyr)
-  libs <- "library(sparklyr)"
+    reg.finalizer(baseenv(), function(x) {
+      if (spark_connection_is_open(scon)) {
+        stop_shell(scon)
+      }
+    }, onexit = TRUE)
   
-  # check for dplyr on search path
-  if ("package:dplyr" %in% search())
-    libs <- paste(libs, "library(dplyr)", sep = "\n")
+    sconInst <- spark_connection_attach_context(scon, sconInst)
+    scon$spark_context <- sconInst$sc
+    spark_connection_set_inst(scon, sconInst)
   
-  parentCall <- match.call()
-  sconInst$connectCall <- paste(libs,
-                                paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
-                                sep = "\n")
-  sconInst$onReconnect = list()
-
-  reg.finalizer(baseenv(), function(x) {
-    if (spark_connection_is_open(scon)) {
-      stop_shell(scon)
-    }
-  }, onexit = TRUE)
-
-  sconInst <- spark_connection_attach_context(scon, sconInst)
-  scon$spark_context <- sconInst$sc
-  spark_connection_set_inst(scon, sconInst)
-
-  sconInst <- spark_connection_attach_sql_session_context(scon, sconInst)
-  scon$hive_context <- sconInst$hive
-  spark_connection_set_inst(scon, sconInst)
-  
-  # notify listeners
-  on_connection_opened(scon, sconInst$connectCall)
-  
-  # Register a finalizer to sleep on R exit to support older versions of the RStudio ide
-  reg.finalizer(as.environment("package:sparklyr"), function(x) {
-    if (spark_connection_is_open(scon)) {
-      Sys.sleep(1)
-    }
-  }, onexit = TRUE)
+    sconInst <- spark_connection_attach_sql_session_context(scon, sconInst)
+    scon$hive_context <- sconInst$hive
+    spark_connection_set_inst(scon, sconInst)
+    
+    # notify listeners
+    on_connection_opened(scon, sconInst$connectCall)
+    
+    # Register a finalizer to sleep on R exit to support older versions of the RStudio ide
+    reg.finalizer(as.environment("package:sparklyr"), function(x) {
+      if (spark_connection_is_open(scon)) {
+        Sys.sleep(1)
+      }
+    }, onexit = TRUE)
+  }, error = function(err) {
+    spark_connection_remove_inst(scon)
+    tryCatch({
+      spark_log(scon)
+    }, error = function(e) {
+    })
+    stop(err)
+  })
   
   # return scon
   scon
@@ -152,7 +161,7 @@ spark_connection_attach_context <- function(sc, sconInst) {
   scon <- sc
   master <- scon$master
 
-  cores <- scon$config[["sparklyr.cores"]]
+  cores <- scon$config[["sparklyr.cores.local"]]
   if (scon$master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
 
