@@ -25,7 +25,7 @@ start_shell <- function(scon, sconInst, jars, packages) {
 
   sparkCommand <- ""
 
-  parameters <- scon$config[["sparklyr.shell."]]
+  parameters <- spark_config_params(scon$config, spark_connection_is_local(scon), "sparklyr.shell.")
   parameters <- if(is.null(parameters)) list() else parameters
 
   parameters[["packages"]] <- unique(c(parameters[["--packages"]], packages))
