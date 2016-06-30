@@ -22,20 +22,27 @@ library(ggplot2)
 parquetName <- "billion.parquet"
 parquetPath <- file.path(getwd(), parquetName)
 
-if (!file.exists(parquetPath)) {
-  sc <- spark_connect(master = "local")
-  
-  billion <- invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
-    invoke("longValue")
-  
-  sparkapi::hive_context(sc) %>%
-    invoke("range", as.integer(billion)) %>%
-    invoke("toDF") %>%
-    invoke("write") %>%
-    invoke("save", parquetName)
-  
-  spark_disconnect(sc)
+if (dir.exists(parquetPath)) {
+  unlink(parquetPath, recursive = TRUE)
 }
+
+config <- spark_config()
+  config[["sparklyr.shell.driver-memory"]] <- "12G"
+  config[["sparklyr.shell.executor-memory"]] <- "12G"
+  config[["spark.context.spark.executor.memory"]] <- "12G"
+  
+sc <- spark_connect(master = "local", config = config)
+
+billion <- invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
+  invoke("longValue")
+
+sparkapi::hive_context(sc) %>%
+  invoke("range", as.integer(billion)) %>%
+  invoke("toDF") %>%
+  invoke("write") %>%
+  invoke("save", parquetName)
+
+spark_disconnect(sc)
 
 spark_conf <- function(ses, config, value) {
   ses %>%
@@ -66,11 +73,6 @@ logResults <- function(label, test) {
 }
 
 sparkTest <- function(test, loadIntoDf = TRUE, loadData = TRUE) {
-  config <- spark_config()
-  config[["sparklyr.shell.driver-memory"]] <- "12G"
-  config[["sparklyr.shell.executor-memory"]] <- "12G"
-  config[["spark.context.spark.executor.memory"]] <- "12G"
-  
   sc <- spark_connect(master = "local",
                       version = "2.0.0-preview",
                       config = config)
