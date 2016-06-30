@@ -65,31 +65,34 @@ logResults <- function(label, test) {
   ))
 }
 
-sparkTest <- function(test, loadIntoDf = TRUE) {
+sparkTest <- function(test, loadIntoDf = TRUE, loadData = TRUE) {
+  config <- spark_config()
+  config[["sparklyr.shell.driver-memory"]] <- "12G"
+  config[["sparklyr.shell.executor-memory"]] <- "12G"
+  config[["spark.context.spark.executor.memory"]] <- "12G"
+  
   sc <- spark_connect(master = "local",
                       version = "2.0.0-preview",
-                      config = list(
-                        "sparklyr.shell.driver-memory" = "12G",
-                        "sparklyr.shell.executor-memory" = "12G",
-                        "spark.context.spark.executor.memory" = "12G")
-                      )
+                      config = config)
   
   ses <- sparkapi::hive_context(sc)
   df <- NULL
   
-  if (loadIntoDf) {
-    df <- ses %>%
-      invoke("read") %>%
-      invoke("parquet", list(parquetPath)) %>%
-      invoke("repartition", as.integer(parallel::detectCores()))
-    
-    df %>%
-      invoke("cache") %>%
-      invoke("count")
-  } else {
-    invisible(
-      spark_read_parquet(sc, "billion", parquetPath, repartition = parallel::detectCores())
-    )
+  if (loadData) {
+    if (loadIntoDf) {
+      df <- ses %>%
+        invoke("read") %>%
+        invoke("parquet", list(parquetPath)) %>%
+        invoke("repartition", as.integer(parallel::detectCores()))
+      
+      df %>%
+        invoke("cache") %>%
+        invoke("count")
+    } else {
+      invisible(
+        spark_read_parquet(sc, "billion", parquetPath, repartition = parallel::detectCores())
+      )
+    }
   }
   
   result <- test(sc, ses, df)
@@ -234,7 +237,7 @@ runOldCode <- sparkTest(function(sc, ses, df) {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "false")
     spark_sum_range(sc, ses, df)
   })
-})
+}, loadData = FALSE)
 ```
 
 ### Sum range from formula using 2.0
@@ -245,7 +248,7 @@ runCode <- sparkTest(function(sc, ses, df) {
     spark_conf(ses, "spark.sql.codegen.wholeStage", "true")
     spark_sum_range(sc, ses, df)
   })
-})
+}, loadData = FALSE)
 ```
 
 ### Sum range from parquet
