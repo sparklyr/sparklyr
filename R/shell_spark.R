@@ -89,8 +89,10 @@ start_shell <- function(scon, sconInst, jars, packages) {
 }
 
 stop_shell <- function(scon) {
-  
-  sparkapi::stop_backend(scon)
+  tryCatch({
+    sparkapi::stop_backend(scon)
+  }, errpr = function(err) {
+  })
 
   sconInst <- spark_connection_remove_inst(scon)
 
