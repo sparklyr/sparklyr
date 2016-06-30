@@ -305,9 +305,12 @@ spark_register_temp_table <- function(table, name) {
 }
 
 spark_drop_temp_table <- function(api, name) {
-  invoke(spark_sql_or_hive(api),
-               "dropTempTable",
-               name)
+  context <- spark_sql_or_hive(api)
+  if (is_spark_v2(api$scon)) {
+    context <- invoke(context, "wrapped")
+  }
+  
+  invoke(context, "dropTempTable", name)
 }
 
 spark_print_schema <- function(api, tableName) {
