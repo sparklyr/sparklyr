@@ -161,7 +161,7 @@ spark_connection_attach_context <- function(sc, sconInst) {
   scon <- sc
   master <- scon$master
 
-  cores <- scon$config[["sparklyr.cores"]]
+  cores <- scon$config[["sparklyr.cores.local"]]
   if (scon$master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
 
