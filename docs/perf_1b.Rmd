@@ -69,7 +69,9 @@ sparkTest <- function(test, loadIntoDf = TRUE) {
   sc <- spark_connect(master = "local",
                       version = "2.0.0-preview",
                       config = list(
-                        "spark.driver.memory", "12G")
+                        "sparklyr.shell.driver-memory" = "12G",
+                        "sparklyr.shell.executor-memory" = "12G",
+                        "spark.context.spark.executor.memory" = "12G")
                       )
   
   ses <- sparkapi::hive_context(sc)
