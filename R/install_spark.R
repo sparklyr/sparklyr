@@ -157,17 +157,25 @@ spark_install <- function(version = NULL,
   }
 
   if (!identical(logging, NULL)) {
-    spark_conf_file_set_value(
-      installInfo,
-      "log4j.rootCategory",
-      paste(logging, "console", sep = ", "),
-      reset)
+    tryCatch({
+      spark_conf_file_set_value(
+        installInfo,
+        "log4j.rootCategory",
+        paste(logging, "console", sep = ", "),
+        reset)
+    }, error = function(e) {
+      warning("Failed to set logging settings")
+    })
   }
 
   hiveSitePath <- file.path(installInfo$sparkConfDir, "hive-site.xml")
   if (!file.exists(hiveSitePath) || reset) {
-    hiveSiteTemplatePath <- system.file(package = "sparklyr", file.path("conf", "hive-site.xml"))
-    file.copy(hiveSiteTemplatePath, hiveSitePath, overwrite = TRUE)
+    tryCatch({
+      hiveSiteTemplatePath <- system.file(package = "sparklyr", file.path("conf", "hive-site.xml"))
+      file.copy(hiveSiteTemplatePath, hiveSitePath, overwrite = TRUE)
+    }, error = function(e) {
+      warning("Failed to apply custom hive-site.xml configuration")
+    })
   }
 
   invisible(installInfo)
