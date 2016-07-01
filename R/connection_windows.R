@@ -77,6 +77,7 @@ prepare_windows_environment <- function() {
 
 
 winutils_source_path <- function() {
+  winutilsSrc <- ""
   
   # check for rstudio version of winutils
   rstudioWinutils <- Sys.getenv("RSTUDIO_WINUTILS", unset = NA)
@@ -84,14 +85,10 @@ winutils_source_path <- function() {
     if (is_win64())
       rstudioWinutils <- file.path(rstudioWinutils, "x64")
     rstudioWinutils <- file.path(rstudioWinutils, "winutils.exe")
-    normalizePath(rstudioWinutils, mustWork = FALSE)
-  # use embedded version (NOTE: this branch will go away once we
-  # drop the embedded version)
-  } else {
-    system.file("winutils", 
-                paste0("winutils", ifelse(is_win64(), "64", "32"), ".dat"),
-                package = "sparklyr")
+    winutilsSrc <- normalizePath(rstudioWinutils, mustWork = FALSE)
   }
+  
+  winutilsSrc
 }
 
 
