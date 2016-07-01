@@ -8,7 +8,7 @@ ml_model <- function(class, model, ...) {
 }
 
 #' @export
-sparkapi_jobj.ml_model <- function(x, ...) {
+spark_jobj.ml_model <- function(x, ...) {
   x$.model
 }
 
