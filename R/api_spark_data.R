@@ -27,9 +27,9 @@ spark_csv_options <- function(header,
 #' @param header Should the first row of data be used as a header? Defaults to \code{TRUE}.
 #' @param delimiter The character used to delimit each column, defaults to \code{,}.
 #' @param quote The character used as a quote, defaults to \code{"hdfs://"}.
-#' @param escape The chatacter used to escape other characters, defaults to \code{\}.
+#' @param escape The chatacter used to escape other characters, defaults to \code{\\}.
 #' @param charset The character set, defaults to \code{"UTF-8"}.
-#' @param nullValue The character to use for default values, defaults to \code{NULL}.
+#' @param null_value The character to use for default values, defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite Overwrite the table with the given name if it already exists
@@ -53,7 +53,7 @@ spark_read_csv <- function(sc,
                            quote = "\"",
                            escape = "\\",
                            charset = "UTF-8",
-                           nullValue = NULL,
+                           null_value = NULL,
                            options = list(),
                            repartition = 0,
                            memory = TRUE,
@@ -63,7 +63,7 @@ spark_read_csv <- function(sc,
   
   api <- spark_api(sc)
   
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, nullValue, options)
+  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
   df <- spark_api_read_csv(api, path.expand(path), options)
   
   spark_partition_register_df(sc, df, api, name, repartition, memory)
@@ -76,9 +76,9 @@ spark_read_csv <- function(sc,
 #' @param header Should the first row of data be used as a header? Defaults to \code{TRUE}.
 #' @param delimiter The character used to delimit each column, defaults to \code{,}.
 #' @param quote The character used as a quote, defaults to \code{"hdfs://"}.
-#' @param escape The chatacter used to escape other characters, defaults to \code{\}.
+#' @param escape The chatacter used to escape other characters, defaults to \code{\\}.
 #' @param charset The character set, defaults to \code{"UTF-8"}.
-#' @param nullValue The character to use for default values, defaults to \code{NULL}.
+#' @param null_value The character to use for default values, defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
 #' 
 #' @family reading and writing data
@@ -90,7 +90,7 @@ spark_write_csv <- function(x, path,
                             quote = "\"",
                             escape = "\\",
                             charset = "UTF-8",
-                            nullValue = NULL,
+                            null_value = NULL,
                             options = list()) {
   UseMethod("spark_write_csv")
 }
@@ -103,10 +103,10 @@ spark_write_csv.tbl_spark <- function(x,
                                       quote = "\"",
                                       escape = "\\",
                                       charset = "UTF-8",
-                                      nullValue = NULL,
+                                      null_value = NULL,
                                       options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, nullValue, options)
+  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
   
   spark_api_write_csv(sqlResult, path.expand(path), options)
 }
@@ -119,10 +119,10 @@ spark_write_csv.spark_jobj <- function(x,
                                        quote = "\"",
                                        escape = "\\",
                                        charset = "UTF-8",
-                                       nullValue = NULL,
+                                       null_value = NULL,
                                        options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, nullValue, options)
+  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
   
   spark_api_write_csv(x, path.expand(path), options)
 }

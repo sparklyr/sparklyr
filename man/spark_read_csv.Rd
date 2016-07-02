@@ -5,7 +5,7 @@
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
 spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
-  quote = "\\"", escape = "\\\\", charset = "UTF-8", nullValue = NULL,
+  quote = "\\"", escape = "\\\\", charset = "UTF-8", null_value = NULL,
   options = list(), repartition = 0, memory = TRUE, overwrite = TRUE)
 }
 \arguments{
@@ -21,9 +21,11 @@ spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
 
 \item{quote}{The character used as a quote, defaults to \code{"hdfs://"}.}
 
+\item{escape}{The chatacter used to escape other characters, defaults to \code{\\}.}
+
 \item{charset}{The character set, defaults to \code{"UTF-8"}.}
 
-\item{nullValue}{The character to use for default values, defaults to \code{NULL}.}
+\item{null_value}{The character to use for default values, defaults to \code{NULL}.}
 
 \item{options}{A list of strings with additional options.}
 

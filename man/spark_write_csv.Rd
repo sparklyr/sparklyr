@@ -5,7 +5,7 @@
 \title{Write a Spark DataFrame to a CSV}
 \usage{
 spark_write_csv(x, path, header = TRUE, delimiter = ",", quote = "\\"",
-  escape = "\\\\", charset = "UTF-8", nullValue = NULL,
+  escape = "\\\\", charset = "UTF-8", null_value = NULL,
   options = list())
 }
 \arguments{
@@ -19,9 +19,11 @@ spark_write_csv(x, path, header = TRUE, delimiter = ",", quote = "\\"",
 
 \item{quote}{The character used as a quote, defaults to \code{"hdfs://"}.}
 
+\item{escape}{The chatacter used to escape other characters, defaults to \code{\\}.}
+
 \item{charset}{The character set, defaults to \code{"UTF-8"}.}
 
-\item{nullValue}{The character to use for default values, defaults to \code{NULL}.}
+\item{null_value}{The character to use for default values, defaults to \code{NULL}.}
 
 \item{options}{A list of strings with additional options.}
 }
