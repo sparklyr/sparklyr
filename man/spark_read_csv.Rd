@@ -4,8 +4,9 @@
 \alias{spark_read_csv}
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
-spark_read_csv(sc, name, path, repartition = 0, memory = TRUE,
-  overwrite = TRUE)
+spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
+  quote = "\\"", escape = "\\\\", charset = "UTF-8", nullValue = NULL,
+  options = list(), repartition = 0, memory = TRUE, overwrite = TRUE)
 }
 \arguments{
 \item{sc}{The Spark connection}
@@ -13,6 +14,18 @@ spark_read_csv(sc, name, path, repartition = 0, memory = TRUE,
 \item{name}{Name of table}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
+
+\item{header}{Should the first row of data be used as a header? Defaults to \code{TRUE}.}
+
+\item{delimiter}{The character used to delimit each column, defaults to \code{,}.}
+
+\item{quote}{The character used as a quote, defaults to \code{"hdfs://"}.}
+
+\item{charset}{The character set, defaults to \code{"UTF-8"}.}
+
+\item{nullValue}{The character to use for default values, defaults to \code{NULL}.}
+
+\item{options}{A list of strings with additional options.}
 
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 

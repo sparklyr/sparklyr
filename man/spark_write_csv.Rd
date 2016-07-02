@@ -4,12 +4,26 @@
 \alias{spark_write_csv}
 \title{Write a Spark DataFrame to a CSV}
 \usage{
-spark_write_csv(x, path)
+spark_write_csv(x, path, header = TRUE, delimiter = ",", quote = "\\"",
+  escape = "\\\\", charset = "UTF-8", nullValue = NULL,
+  options = list())
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
+
+\item{header}{Should the first row of data be used as a header? Defaults to \code{TRUE}.}
+
+\item{delimiter}{The character used to delimit each column, defaults to \code{,}.}
+
+\item{quote}{The character used as a quote, defaults to \code{"hdfs://"}.}
+
+\item{charset}{The character set, defaults to \code{"UTF-8"}.}
+
+\item{nullValue}{The character to use for default values, defaults to \code{NULL}.}
+
+\item{options}{A list of strings with additional options.}
 }
 \description{
 Write a Spark DataFrame to a CSV
