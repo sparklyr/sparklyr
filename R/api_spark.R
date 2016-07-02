@@ -264,7 +264,9 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
   if (local_file) {
     tempfile <- tempfile(fileext = ".csv")
     write.csv(df, tempfile, row.names = FALSE, na = "")
-    df <- spark_api_read_csv(api, tempfile, columns)
+    df <- spark_api_read_csv(api, tempfile, csvOptions = list(
+      header = "true"
+    ), columns = columns)
 
     if (repartition > 0) {
       df <- invoke(df, "repartition", as.integer(repartition))
