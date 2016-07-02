@@ -1,20 +1,4 @@
-
-
-#' Collect results of dplyr expression
-#'
-#' Force computation of remote Spark DataFrame and copy the results back
-#' to the client as an R data.frame
-#'
-#' @param x A \code{tbl_spark}.
-#' @param n Limit on the number of records to copy
-#' @param ... Unused
-#' @return An R data frame with classes \code{data.frame} and \code{tbl_df}.
-#' 
-#' @family dplyr
-#'
 #' @import assertthat
-#'
-#' @name collect
 #' @export
 collect.tbl_spark <- function(x, ..., n = Inf) {
   assert_that(length(n) == 1, n > 0L)
