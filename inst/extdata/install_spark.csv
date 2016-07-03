@@ -1,5 +1,10 @@
 spark,hadoop,hadoop_label,download,default,hadoop_default
-"1.6.1","2.6",Hadoop 2.6,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz,TRUE,TRUE
+"1.6.2","2.6",Hadoop 2.6,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz,TRUE,TRUE
+"1.6.2","2.4",Hadoop 2.4,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.4.tgz,FALSE,FALSE
+"1.6.2","2.3",Hadoop 2.3,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.3.tgz,FALSE,FALSE
+"1.6.2","1.X",Hadoop 1.X,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop1.tgz,FALSE,FALSE
+"1.6.2","cdh4",CDH 4,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-cdh4.tgz,FALSE,FALSE
+"1.6.1","2.6",Hadoop 2.6,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz,FALSE,TRUE
 "1.6.1","2.4",Hadoop 2.4,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.4.tgz,FALSE,FALSE
 "1.6.1","2.3",Hadoop 2.3,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.3.tgz,FALSE,FALSE
 "1.6.1","1.X",Hadoop 1.X,https://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop1.tgz,FALSE,FALSE
