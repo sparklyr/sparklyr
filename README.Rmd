@@ -33,7 +33,7 @@ You should also install a local version of Spark for development purposes:
 
 ```{r, eval=FALSE}
 library(sparklyr)
-spark_install(version = "1.6.1")
+spark_install(version = "1.6.2")
 ```
 
 If you use the RStudio IDE, you should also download the latest [preview release](https://www.rstudio.com/products/rstudio/download/preview/) of the IDE which includes several enhancements for interacting with Spark (see the [RStudio IDE] section below for more details).
