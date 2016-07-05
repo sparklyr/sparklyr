@@ -21,7 +21,6 @@ sd_section("Reading and Writing Data",
 sd_section("dplyr Interface",
            "Functions implementing a dplyr backend for Spark DataFrames",
            c("copy_to",
-             "collect",
              "tbl_cache",
              "tbl_uncache")
 )

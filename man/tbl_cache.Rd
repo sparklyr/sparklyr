@@ -17,7 +17,7 @@ tbl_cache(sc, name, force = TRUE)
 Load a table into memory
 }
 \seealso{
-Other dplyr: \code{\link{collect}}, \code{\link{copy_to}},
+Other dplyr: \code{\link{copy_to}},
   \code{\link{tbl_uncache}}
 }
 

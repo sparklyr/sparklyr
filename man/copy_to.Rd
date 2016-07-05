@@ -33,7 +33,7 @@ dplyr compatible reference to table
 Copy a local R data frame to Spark
 }
 \seealso{
-Other dplyr: \code{\link{collect}},
-  \code{\link{tbl_cache}}, \code{\link{tbl_uncache}}
+Other dplyr: \code{\link{tbl_cache}},
+  \code{\link{tbl_uncache}}
 }
 
