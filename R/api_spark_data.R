@@ -30,6 +30,7 @@ spark_csv_options <- function(header,
 #' @param escape The chatacter used to escape other characters, defaults to \code{\\}.
 #' @param charset The character set, defaults to \code{"UTF-8"}.
 #' @param null_value The character to use for default values, defaults to \code{NULL}.
+#' @param mode Specifies the behavior when data or table already exists.
 #' @param options A list of strings with additional options.
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite Overwrite the table with the given name if it already exists
@@ -141,12 +142,18 @@ spark_write_csv.spark_jobj <- function(x,
 #' @family reading and writing data
 #'
 #' @export
-spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+spark_read_parquet <- function(sc,
+                               name,
+                               path,
+                               options = list(),
+                               repartition = 0,
+                               memory = TRUE,
+                               overwrite = TRUE) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
   api <- spark_api(sc)
-  df <- spark_api_read_generic(api, list(path.expand(path)), "parquet")
+  df <- spark_api_read_generic(api, list(path.expand(path)), "parquet", options)
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
@@ -157,20 +164,20 @@ spark_read_parquet <- function(sc, name, path, repartition = 0, memory = TRUE, o
 #' @family reading and writing data
 #'
 #' @export
-spark_write_parquet <- function(x, path) {
+spark_write_parquet <- function(x, path, mode = NULL, options = list()) {
   UseMethod("spark_write_parquet")
 }
 
 #' @export
-spark_write_parquet.tbl_spark <- function(x, path) {
+spark_write_parquet.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_api_write_generic(sqlResult, path.expand(path), "parquet")
+  spark_api_write_generic(sqlResult, path.expand(path), "parquet", mode, options)
 }
 
 #' @export
-spark_write_parquet.spark_jobj <- function(x, path) {
+spark_write_parquet.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_api_write_generic(x, path.expand(path), "parquet")
+  spark_api_write_generic(x, path.expand(path), "parquet", mode, options)
 }
 
 #' Read a JSON file into a Spark DataFrame
@@ -187,12 +194,18 @@ spark_write_parquet.spark_jobj <- function(x, path) {
 #' @family reading and writing data
 #'
 #' @export
-spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE) {
+spark_read_json <- function(sc,
+                            name,
+                            path,
+                            options = list(),
+                            repartition = 0,
+                            memory = TRUE,
+                            overwrite = TRUE) {
   
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
   api <- spark_api(sc)
-  df <- spark_api_read_generic(api, path.expand(path), "json")
+  df <- spark_api_read_generic(api, path.expand(path), "json", options)
   spark_partition_register_df(sc, df, api, name, repartition, memory)
 }
 
@@ -203,20 +216,20 @@ spark_read_json <- function(sc, name, path, repartition = 0, memory = TRUE, over
 #' @family reading and writing data
 #'
 #' @export
-spark_write_json <- function(x, path) {
+spark_write_json <- function(x, path, mode = NULL, options = list()) {
   UseMethod("spark_write_json")
 }
 
 #' @export
-spark_write_json.tbl_spark <- function(x, path) {
+spark_write_json.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_api_write_generic(sqlResult, path.expand(path), "json")
+  spark_api_write_generic(sqlResult, path.expand(path), "json", mode, options)
 }
 
 #' @export
-spark_write_json.spark_jobj <- function(x, path) {
+spark_write_json.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_api_write_generic(x, path.expand(path), "json")
+  spark_api_write_generic(x, path.expand(path), "json", mode, options)
 }
 
 spark_expect_jobj_class <- function(jobj, expectedClassName) {
