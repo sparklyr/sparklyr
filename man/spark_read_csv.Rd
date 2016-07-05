@@ -34,6 +34,8 @@ spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
 \item{memory}{Load data eagerly into memory}
 
 \item{overwrite}{Overwrite the table with the given name if it already exists}
+
+\item{mode}{Specifies the behavior when data or table already exists.}
 }
 \value{
 Reference to a Spark DataFrame / dplyr tbl

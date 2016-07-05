@@ -4,12 +4,14 @@
 \alias{spark_write_parquet}
 \title{Write a Spark DataFrame to a Parquet file}
 \usage{
-spark_write_parquet(x, path)
+spark_write_parquet(x, path, mode = NULL, options = list())
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
+
+\item{options}{A list of strings with additional options.}
 }
 \description{
 Write a Spark DataFrame to a Parquet file
