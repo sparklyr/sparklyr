@@ -11,6 +11,8 @@ spark_write_json(x, path, mode = NULL, options = list())
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
 
+\item{mode}{Specifies the behavior when data or table already exists.}
+
 \item{options}{A list of strings with additional options.}
 }
 \description{

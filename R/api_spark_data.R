@@ -30,7 +30,6 @@ spark_csv_options <- function(header,
 #' @param escape The chatacter used to escape other characters, defaults to \code{\\}.
 #' @param charset The character set, defaults to \code{"UTF-8"}.
 #' @param null_value The character to use for default values, defaults to \code{NULL}.
-#' @param mode Specifies the behavior when data or table already exists.
 #' @param options A list of strings with additional options.
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite Overwrite the table with the given name if it already exists
@@ -160,7 +159,8 @@ spark_read_parquet <- function(sc,
 #' Write a Spark DataFrame to a Parquet file
 #'
 #' @inheritParams spark_write_csv
-#'
+#' @param mode Specifies the behavior when data or table already exists.
+#' 
 #' @family reading and writing data
 #'
 #' @export
@@ -183,7 +183,7 @@ spark_write_parquet.spark_jobj <- function(x, path, mode = NULL, options = list(
 #' Read a JSON file into a Spark DataFrame
 #'
 #' @inheritParams spark_read_csv
-#'
+#' 
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
 #'   the local file system (\code{file://}). 
 #'   
@@ -212,7 +212,8 @@ spark_read_json <- function(sc,
 #' Write a Spark DataFrame to a JSON file
 #'
 #' @inheritParams spark_write_csv
-#'
+#' @param mode Specifies the behavior when data or table already exists.
+#' 
 #' @family reading and writing data
 #'
 #' @export
