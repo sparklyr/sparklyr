@@ -52,6 +52,11 @@ We can new use all of the available dplyr verbs against the tables within the cl
 We'll start by copying some datasets from R into the Spark cluster (note that you may need to install the nycflights13 and Lahman packages in order to execute this code):
 
 ``` r
+install.packages("Lahman")
+install.packages("nycflights13")
+```
+
+``` r
 iris_tbl <- copy_to(sc, iris)
 flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
 batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
@@ -67,24 +72,25 @@ To start with here's a simple filtering example:
 flights_tbl %>% filter(dep_delay == 2)
 ```
 
-    ## Source:   query [?? x 16]
+    ## Source:   query [?? x 19]
     ## Database: spark connection master=local app=sparklyr local=TRUE
     ## 
-    ##     year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
-    ##    <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
-    ## 1   2013     1     1      517         2      830        11      UA  N14228
-    ## 2   2013     1     1      542         2      923        33      AA  N619AA
-    ## 3   2013     1     1      702         2     1058        44      B6  N779JB
-    ## 4   2013     1     1      715         2      911        21      UA  N841UA
-    ## 5   2013     1     1      752         2     1025        -4      UA  N511UA
-    ## 6   2013     1     1      917         2     1206        -5      B6  N568JB
-    ## 7   2013     1     1      932         2     1219        -6      VX  N641VA
-    ## 8   2013     1     1     1028         2     1350        11      UA  N76508
-    ## 9   2013     1     1     1042         2     1325        -1      B6  N529JB
-    ## 10  2013     1     1     1231         2     1523        -6      UA  N402UA
-    ## ..   ...   ...   ...      ...       ...      ...       ...     ...     ...
-    ## Variables not shown: flight <int>, origin <chr>, dest <chr>, air_time
-    ##   <dbl>, distance <dbl>, hour <dbl>, minute <dbl>.
+    ##     year month   day dep_time sched_dep_time dep_delay arr_time
+    ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
+    ## 1   2013     1     1      517            515         2      830
+    ## 2   2013     1     1      542            540         2      923
+    ## 3   2013     1     1      702            700         2     1058
+    ## 4   2013     1     1      715            713         2      911
+    ## 5   2013     1     1      752            750         2     1025
+    ## 6   2013     1     1      917            915         2     1206
+    ## 7   2013     1     1      932            930         2     1219
+    ## 8   2013     1     1     1028           1026         2     1350
+    ## 9   2013     1     1     1042           1040         2     1325
+    ## 10  2013     1     1     1231           1229         2     1523
+    ## # ... with more rows, and 12 more variables: sched_arr_time <int>,
+    ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
+    ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
+    ## #   minute <dbl>, time_hour <dbl>
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
@@ -133,7 +139,7 @@ batting_tbl %>%
     ## 8  bedelho01   1968    PHI     9     7     0     1
     ## 9  biittla01   1977    CHN   138   493    74   147
     ## 10 biittla01   1975    MON   121   346    34   109
-    ## ..       ...    ...    ...   ...   ...   ...   ...
+    ## # ... with more rows
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
 
@@ -165,7 +171,7 @@ fit
     ## 
     ## Coefficients:
     ## (Intercept)          wt         cyl 
-    ##   33.499452   -2.818463   -0.923187
+    ##   37.066699   -2.309504   -1.639546
 
 For linear regression models produced by Spark, we can use `summary()` to learn a bit more about the quality of our fit, and the statistical significance of each of our predictors.
 
@@ -177,19 +183,19 @@ summary(fit)
     ## mpg ~ wt + cyl
     ## 
     ## Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -1.752 -1.134 -0.499  1.296  2.282 
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.6881 -1.0507 -0.4420  0.4757  3.3858 
     ## 
     ## Coefficients:
     ##             Estimate Std. Error t value  Pr(>|t|)    
-    ## (Intercept) 33.49945    3.62256  9.2475 0.0002485 ***
-    ## wt          -2.81846    0.96619 -2.9171 0.0331257 *  
-    ## cyl         -0.92319    0.54639 -1.6896 0.1518998    
+    ## (Intercept) 37.06670    2.76494 13.4059 2.981e-07 ***
+    ## wt          -2.30950    0.84748 -2.7252   0.02341 *  
+    ## cyl         -1.63955    0.58635 -2.7962   0.02084 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## R-Squared: 0.8274
-    ## Root Mean Squared Error: 1.422
+    ## R-Squared: 0.8665
+    ## Root Mean Squared Error: 1.799
 
 Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [MLlib](mllib.html) section.
 
@@ -277,16 +283,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/07/01 08:41:34 INFO ContextCleaner: Cleaned accumulator 225
-    ## 16/07/01 08:41:34 INFO ContextCleaner: Cleaned accumulator 224
-    ## 16/07/01 08:41:34 INFO ContextCleaner: Cleaned accumulator 223
-    ## 16/07/01 08:41:34 INFO ContextCleaner: Cleaned accumulator 222
-    ## 16/07/01 08:41:34 INFO ContextCleaner: Cleaned accumulator 221
-    ## 16/07/01 08:41:34 INFO Executor: Finished task 0.0 in stage 66.0 (TID 500). 2082 bytes result sent to driver
-    ## 16/07/01 08:41:34 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 500) in 108 ms on localhost (1/1)
-    ## 16/07/01 08:41:34 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/07/01 08:41:34 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.108 s
-    ## 16/07/01 08:41:34 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.111044 s
+    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 252
+    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 251
+    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 250
+    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 249
+    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 248
+    ## 16/07/05 14:51:19 INFO Executor: Finished task 0.0 in stage 66.0 (TID 500). 2082 bytes result sent to driver
+    ## 16/07/05 14:51:19 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 500) in 113 ms on localhost (1/1)
+    ## 16/07/05 14:51:19 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
+    ## 16/07/05 14:51:19 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.113 s
+    ## 16/07/05 14:51:19 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.114894 s
 
 Finally, we disconnect from Spark:
 
