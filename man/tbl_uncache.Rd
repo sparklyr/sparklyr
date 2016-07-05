@@ -15,7 +15,6 @@ tbl_uncache(sc, name)
 Unload table from memory
 }
 \seealso{
-Other dplyr: \code{\link{collect}}, \code{\link{copy_to}},
-  \code{\link{tbl_cache}}
+Other dplyr: \code{\link{copy_to}}, \code{\link{tbl_cache}}
 }
 
