@@ -16,19 +16,19 @@ spark_default_jars <- function() {
 }
 
 #' Connect to Spark
-#' 
-#' @param master Spark cluster url to connect to. Use \code{"local"} to connect to a local 
+#'
+#' @param master Spark cluster url to connect to. Use \code{"local"} to connect to a local
 #'   instance of Spark installed via \code{\link{spark_install}}.
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark (only applicable for local master)
 #' @param hadoop_version Version of Hadoop (only applicable for local master)
 #' @param extensions Extension packages to enable for this connection.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
-#' 
+#'
 #' @return Connection to Spark local instance or remote cluster
-#' 
+#'
 #' @family Spark connections
-#' 
+#'
 #' @export
 spark_connect <- function(master,
                           app_name = "sparklyr",
@@ -39,7 +39,7 @@ spark_connect <- function(master,
 
   # prepare windows environment
   prepare_windows_environment()
-  
+
   # master can be missing if it's specified in the config file
   if (missing(master)) {
     master <- config$spark.master
@@ -47,12 +47,12 @@ spark_connect <- function(master,
       stop("You must either pass a value for master or include a spark.master ",
            "entry in your config.yml")
   }
-  
+
   filter <- function(e) {
     spark_connection_is_open(e) &&
     identical(e$master, master)
   }
-  
+
   sconFound <- spark_connection_find_scon(filter)
   if (length(sconFound) == 1) {
     return(sconFound[[1]])
@@ -63,9 +63,6 @@ spark_connect <- function(master,
     stop("Java is required to connect to Spark. Please download and install Java from ",
          java_install_url())
   }
-  
-  # attach unknown error handler
-  sparkapi::unknown_error_handler(read_spark_log_error)
 
   sparkHome <- spark_home()
   if (spark_master_is_local(master)) {
@@ -78,61 +75,82 @@ spark_connect <- function(master,
       stop("Failed to launch in cluster mode, SPARK_HOME environment variable is not set.")
     }
   }
-  
+
+  scon <- NULL
   tryCatch({
-    scon <- list(
+
+    # determine whether we need cores in master
+    cores <- config[["sparklyr.cores.local"]]
+    if (master == "local" && !identical(cores, NULL))
+      master <- paste("local[", cores, "]", sep = "")
+
+    # determine environment
+    environment <- character()
+    if (.Platform$OS.type != "windows") {
+      if (spark_master_is_local(master))
+        environment <- paste0("SPARK_LOCAL_IP=127.0.0.1")
+    }
+
+    # determine shell_args
+    shell_args <- spark_read_config(config, master, "sparklyr.shell.")
+
+    # create connection
+    scon <- sparkapi::start_shell(
       master = master,
-      appName = app_name,
-      sparkHome = sparkHome,
-      config = config
+      spark_home = sparkHome,
+      app_name = app_name,
+      config = spark_config,
+      jars = spark_default_jars(),
+      packages = config[["sparklyr.defaultPackages"]],
+      extensions = extensions,
+      environment = environment,
+      shell_args = shell_args
     )
-    scon <- structure(scon, class = c("sparklyr_connection", "spark_connection"))
-  
-    # determine jars and packages
-    jars <- spark_default_jars()
-    packages <- config[["sparklyr.defaultPackages"]]
+
+    # add sparklyr_connection class to object (reflects inclusion of db fields)
+    class(scon) <- c("sparklyr_connection", class(scon))
     
-    # call extensions to get additional jars and packages
-    dependencies <- resolve_extensions(extensions)
-    jars <- c(jars, dependencies$jars)
-    packages <- c(packages, dependencies$packages)
+    # attach hive_context or sql_context as a fallback
+    scon$hive_context <- spark_api_create_hive_context(scon)
+    if (is.null(scon$hive_context)) {
+      warning("Failed to create Hive context, falling back to SQL. Some operations, ",
+              "like window-funcitons, will not work")
+      scon$sql_context <- spark_api_create_sql_context(scon)
+      if (is.null(scon$sql_context))
+        stop("Failed to create SQL context")
+    }
     
-    sconInst <- start_shell(scon, list(), jars, packages)
-    scon$backend = sconInst$backend
-    scon$monitor = sconInst$monitor
+    # create dbi interface
+    api <- spark_api_create(scon)
+    scon$dbi <- new("DBISparkConnection", scon = scon, api = api)
+    params <- spark_read_config(scon$config, scon$master, "spark.sql.")
+    lapply(names(params), function(paramName) {
+      dbSetProperty(scon$dbi, paramName, as.character(params[[paramName]]))
+    })
     
-    scon <- spark_connection_add_inst(scon, sconInst)
-  
-    # start with library(sparklyr)
+    # update spark_context connection with fields we've added
+    scon$spark_context$connection$hive_context <- scon$hive_context
+    scon$spark_context$connection$dbi <- scon$dbi
+   
+    # update hive_context / sql_context with fields we've added
+    if (!is.null(scon$hive_context)) {
+      scon$hive_context$connection$hive_context <- scon$hive_context
+      scon$hive_context$connection$dbi <- scon$dbi
+    } else {
+      scon$sql_context$connection$sql_context <- scon$sql_context
+      scon$sql_context$connection$dbi <- scon$dbi
+    }
+    
+    # notify connection viewer of connection
     libs <- "library(sparklyr)"
-    
-    # check for dplyr on search path
     if ("package:dplyr" %in% search())
       libs <- paste(libs, "library(dplyr)", sep = "\n")
-    
     parentCall <- match.call()
-    sconInst$connectCall <- paste(libs,
-                                  paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
-                                  sep = "\n")
-    sconInst$onReconnect = list()
-  
-    reg.finalizer(baseenv(), function(x) {
-      if (spark_connection_is_open(scon)) {
-        stop_shell(scon)
-      }
-    }, onexit = TRUE)
-  
-    sconInst <- spark_connection_attach_context(scon, sconInst)
-    scon$spark_context <- sconInst$sc
-    spark_connection_set_inst(scon, sconInst)
-  
-    sconInst <- spark_connection_attach_sql_session_context(scon, sconInst)
-    scon$hive_context <- sconInst$hive
-    spark_connection_set_inst(scon, sconInst)
-    
-    # notify listeners
-    on_connection_opened(scon, sconInst$connectCall)
-    
+    connectCall <- paste(libs,
+                         paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
+                         sep = "\n")
+    on_connection_opened(scon, connectCall)
+
     # Register a finalizer to sleep on R exit to support older versions of the RStudio ide
     reg.finalizer(as.environment("package:sparklyr"), function(x) {
       if (spark_connection_is_open(scon)) {
@@ -140,206 +158,64 @@ spark_connect <- function(master,
       }
     }, onexit = TRUE)
   }, error = function(err) {
-    spark_connection_remove_inst(scon)
     tryCatch({
       spark_log(scon)
     }, error = function(e) {
     })
     stop(err)
   })
+
+  # add to our internal list
+  spark_connections_add(scon)
   
   # return scon
   scon
 }
 
-resolve_extensions <- function(extensions) {
-  spark_dependencies_from_extensions(extensions)
-}
 
-# Attaches the SparkContext to the connection
-spark_connection_attach_context <- function(sc, sconInst) {
-  scon <- sc
-  master <- scon$master
+#' @importFrom sparkapi spark_connection_is_open
+#' @export
+sparkapi::spark_connection_is_open
 
-  cores <- scon$config[["sparklyr.cores.local"]]
-  if (scon$master == "local" && !identical(cores, NULL))
-    master <- paste("local[", cores, "]", sep = "")
+#' @importFrom sparkapi spark_log
+#' @export
+sparkapi::spark_log
 
-  sconInst$sc <- spark_connection_create_context(scon, master, scon$appName, scon$sparkHome)
-  if (identical(sconInst$sc, NULL)) {
-    stop("Failed to create Spark context")
-  }
-
-  sconInst
-}
-
-# Attaches the SqlContext/SessionContext to the connection
-spark_connection_attach_sql_session_context <- function(sc, sconInst) {
-  scon <- sc
-
-  if (is.null(sconInst$hive)) {
-    sconInst$hive <- spark_api_create_hive_context(scon)
-    if (identical(sconInst$hive, NULL)) {
-      warning("Failed to create Hive context, falling back to SQL. Some operations, like window-funcitons, will not work")
-    }
-  }
-
-  if (is.null(sconInst$hive)) {
-    sconInst$sql <- spark_api_create_sql_context(scon)
-    if (identical(sql, NULL)) {
-      stop("Failed to create SQL context")
-    }
-  }
-
-  sconInst
-}
+#' @importFrom sparkapi spark_web
+#' @export
+sparkapi::spark_web
 
 #' Disconnect from Spark
-#' 
+#'
 #' @param sc Spark connection provided by \code{\link{spark_connect}}
-#' 
+#'
 #' @family Spark connections
-#' 
+#'
 #' @export
 spark_disconnect <- function(sc) {
-  stop_shell(sc)
+  tryCatch({
+    sparkapi::stop_shell(sc)
+  }, error = function(err) {
+  })
+
+  spark_connections_remove(sc)
+  
+  on_connection_closed(sc)
 }
 
-#' Retrieves entries from the Spark log
-#' 
-#' @inheritParams spark_disconnect
-#' @param n Max number of log entries to retrieve
-#' 
-#' @return Character vector with last \code{n} lines of the Spark log 
-#'   or for \code{spark_log_file} the full path to the log file.
-#' 
-#' @family Spark connections
-#' 
-#' @export
-spark_log <- function(sc, n = 100) {
-  scon <- sc
-  log <- file(spark_log_file(scon))
-  lines <- readLines(log)
-  close(log)
 
-  linesLog <- tail(lines, n = n)
-  attr(linesLog, "class") <- "spark_log"
-
-  linesLog
-}
-
-#' @rdname spark_log
-#' @export
+# Get the path to a temp file containing the current spark log (used by IDE)
 spark_log_file <- function(sc) {
   scon <- sc
   if (!spark_connection_is_open(scon)) {
     stop("The Spark conneciton is not open anymmore, log is not available")
   }
-  sconInst <- spark_connection_get_inst(scon)
-  sconInst$outputFile
-}
-
-#' @export
-print.spark_log <- function(x, ...) {
-  cat(x, sep = "\n")
-  cat("\n")
-}
-
-#' Open the Spark web interface
-#' 
-#' @inheritParams spark_disconnect
-#' 
-#' @family Spark connections
-#' 
-#' @export
-spark_web <- function(sc) {
-  scon <- sc
-  sconInst <- spark_connection_get_inst(scon)
-  log <- file(sconInst$outputFile)
-  lines <- readLines(log)
-  close(log)
-
-  lines <- head(lines, n = 200)
-
-  foundMatch <- FALSE
-  uiLine <- grep("Started SparkUI at ", lines, perl=TRUE, value=TRUE)
-  if (length(uiLine) > 0) {
-    matches <- regexpr("http://.*", uiLine, perl=TRUE)
-    match <-regmatches(uiLine, matches)
-    if (length(match) > 0) {
-      return(structure(match, class = "spark_web_url"))
-    }
-  }
-
-  warning("Spark UI URL not found in logs, attempting to guess.")
-  structure("http://localhost:4040", class = "spark_web_url")
-}
-
-#' @export
-print.spark_web_url <- function(x, ...) {
-  utils::browseURL(x)
-}
-
-read_spark_log_error <- function(sc) {
-  # if there was no error message reported, then
-  # return information from the Spark logs. return
-  # all those with most recent timestamp
-  msg <- "failed to invoke spark command (unknown reason)"
-  try(silent = TRUE, {
-    log <- spark_log(sc)
-    splat <- strsplit(log, "\\s+", perl = TRUE)
-    n <- length(splat)
-    timestamp <- splat[[n]][[2]]
-    regex <- paste("\\b", timestamp, "\\b", sep = "")
-    entries <- grep(regex, log, perl = TRUE, value = TRUE)
-    pasted <- paste(entries, collapse = "\n")
-    msg <- paste("failed to invoke spark command", pasted, sep = "\n")
-  })
-  msg
-}
-
-
-# API into https://github.com/apache/spark/blob/branch-1.6/core/src/main/scala/org/apache/spark/api/r/RRDD.scala
-#
-# def createSparkContext(
-#   master: String,                               // The Spark master URL.
-#   appName: String,                              // Application name to register with cluster manager
-#   sparkHome: String,                            // Spark Home directory
-#   jars: Array[String],                          // Character string vector of jar files to pass to the worker nodes.
-#   sparkEnvirMap: JMap[Object, Object],          // Named list of environment variables to set on worker nodes.
-#   sparkExecutorEnvMap: JMap[Object, Object])    // Named list of environment variables to be used when launching executors.
-#   : JavaSparkContext
-#
-spark_connection_create_context <- function(sc, master, appName, sparkHome) {
-  scon <- sc
-  sparkHome <- as.character(normalizePath(sparkHome, mustWork = FALSE))
-
-  conf <- invoke_new(scon, "org.apache.spark.SparkConf")
-  conf <- invoke(conf, "setAppName", appName)
-  conf <- invoke(conf, "setMaster", master)
-  conf <- invoke(conf, "setSparkHome", sparkHome)
-
-  params <- spark_config_params(scon$config, spark_connection_is_local(scon), "spark.context.")
-  lapply(names(params), function(paramName) {
-    conf <<- invoke(conf, "set", paramName, params[[paramName]])
-  })
-
-  invoke_new(
-    scon,
-    "org.apache.spark.SparkContext",
-    conf
-  )
-}
-
-
-# Retrieves master from a Spark Connection
-spark_connection_master <- function(sc) {
-  sc$master
-}
-
-# Retrieves the application name from a Spark Connection
-spark_connection_app_name <- function(sc) {
-  sc$appName
+  
+  lines <- spark_log(sc, n = NULL)
+  tempLog <- tempfile(pattern = "spark", fileext = ".log")
+  writeLines(tempLog)
+  
+  tempLog
 }
 
 # TRUE if the Spark Connection is a local install
@@ -356,43 +232,18 @@ spark_connection_local_cores <- function(sc) {
   sc$config[["sparklyr.cores"]]
 }
 
-#' Check to see if the connection to Spark is still open
-#' 
-#' @inheritParams spark_disconnect
-#' 
-#' @family Spark connections
-#' 
-#' @keywords internal
-#' 
-#' @export
-spark_connection_is_open <- function(sc) {
-  sconInst <- spark_connection_get_inst(sc)
-
-  bothOpen <- FALSE
-  if (!identical(sconInst, NULL)) {
-    backend <- sconInst$backend
-    monitor <- sconInst$monitor
-
-    tryCatch({
-      bothOpen <- isOpen(backend) && isOpen(monitor)
-    }, error = function(e) {
-    })
-  }
-
-  bothOpen
-}
 
 spark_connection_version <- function(sc, onlyVersion = FALSE) {
   rawVersion <- invoke(spark_context(sc), "version")
-  
+
   # Get rid of -preview and other suffix variations if needed
   if (onlyVersion) gsub("([0-9]+\\.?)[^0-9\\.](.*)","\\1", rawVersion) else rawVersion
 }
 
 #' Close all existing connections
-#' 
+#'
 #' @family Spark connections
-#' 
+#'
 #' @rdname spark_disconnect
 #' @export
 spark_disconnect_all <- function() {

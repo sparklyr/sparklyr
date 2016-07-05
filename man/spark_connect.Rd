@@ -8,7 +8,7 @@ spark_connect(master, app_name = "sparklyr", version = NULL,
   hadoop_version = NULL, extensions = NULL, config = spark_config())
 }
 \arguments{
-\item{master}{Spark cluster url to connect to. Use \code{"local"} to connect to a local 
+\item{master}{Spark cluster url to connect to. Use \code{"local"} to connect to a local
 instance of Spark installed via \code{\link{spark_install}}.}
 
 \item{app_name}{Application name to be used while running in the Spark cluster}
@@ -28,8 +28,6 @@ Connection to Spark local instance or remote cluster
 Connect to Spark
 }
 \seealso{
-Other Spark connections: \code{\link{spark_connection_is_open}},
-  \code{\link{spark_disconnect}}, \code{\link{spark_log}},
-  \code{\link{spark_web}}
+Other Spark connections: \code{\link{spark_disconnect}}
 }
 

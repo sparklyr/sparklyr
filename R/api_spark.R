@@ -67,7 +67,7 @@ spark_api_create_hive_context_v2 <- function(scon) {
 
   conf <- invoke(session, "conf")
 
-  params <- spark_config_params(scon$config, spark_connection_is_local(scon), "spark.session.")
+  params <- spark_read_config(scon$config, scon$master, "spark.session.")
   lapply(names(params), function(paramName) {
     configValue <- params[[paramName]]
     if (is.logical(configValue)) {
@@ -106,12 +106,7 @@ spark_api_create <- function(scon) {
 }
 
 spark_sql_or_hive <- function(api) {
-  sconInst <- spark_connection_get_inst(api$scon)
-
-  if (!identical(sconInst$hive, NULL))
-    sconInst$hive
-  else
-    sconInst$sql
+  spark_get_sql_context(api$scon)
 }
 
 spark_api_sql <- function(api, sql) {
@@ -122,6 +117,11 @@ spark_api_sql <- function(api, sql) {
   )
 
   result
+}
+
+# Get the HiveContext associated with a connection
+hive_context <- function(sc) {
+  spark_connection(sc)$hive_context
 }
 
 spark_api_schema <- function(api, sqlResult) {

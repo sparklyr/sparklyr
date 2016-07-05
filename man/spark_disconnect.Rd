@@ -18,12 +18,8 @@ Disconnect from Spark
 Close all existing connections
 }
 \seealso{
-Other Spark connections: \code{\link{spark_connection_is_open}},
-  \code{\link{spark_connect}}, \code{\link{spark_log}},
-  \code{\link{spark_web}}
+Other Spark connections: \code{\link{spark_connect}}
 
-Other Spark connections: \code{\link{spark_connection_is_open}},
-  \code{\link{spark_connect}}, \code{\link{spark_log}},
-  \code{\link{spark_web}}
+Other Spark connections: \code{\link{spark_connect}}
 }
 

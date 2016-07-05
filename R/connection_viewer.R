@@ -96,7 +96,7 @@ connection_preview_table <- function(sc, table, limit) {
 }
 
 spark_connection_get_dbi <- function(scon) {
-  spark_connection_get_inst(scon)$dbi
+  scon$dbi
 }
 
 

@@ -32,8 +32,8 @@ spark_connection.src_spark <- function(x, ...) {
 src_desc.src_spark <- function(x) {
   scon <- src_context(x)
   paste("spark connection",
-        paste("master", spark_connection_master(scon), sep = "="),
-        paste("app", spark_connection_app_name(scon), sep = "="),
+        paste("master", scon$master, sep = "="),
+        paste("app", scon$app_name, sep = "="),
         paste("local", spark_connection_is_local(scon), sep = "="))
 }
 
@@ -58,7 +58,7 @@ tbl.src_spark <- function(src, from, ...) {
 
 #' @export
 tbl.sparklyr_connection <- function(src, from, ...) {
-  src <- src_sql("spark", dbConnect(DBISpark(src)))
+  src <- src_sql("spark", src$dbi)
   tbl_sql("spark", src = src, from = from, ...)
 }
 
@@ -99,7 +99,7 @@ db_data_type.src_spark <- function(...) {
 copy_to.sparklyr_connection <- function(dest, df, name = deparse(substitute(df)),
                                         memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL, ...) {
   sc <- dest
-  dest <- src_sql("spark", dbConnect(DBISpark(sc)))
+  dest <- src_sql("spark", sc$dbi)
 
   if (overwrite)
     spark_remove_table_if_exists(sc, name)
@@ -107,7 +107,7 @@ copy_to.sparklyr_connection <- function(dest, df, name = deparse(substitute(df))
   if (name %in% src_tbls(sc))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  dbWriteTable(dest$con, name, df, TRUE, repartition, local_file)
+  dbWriteTable(sc$dbi, name, df, TRUE, repartition, local_file)
 
   if (memory) {
     tbl_cache(sc, name)
@@ -128,7 +128,7 @@ copy_to.sparklyr_connection <- function(dest, df, name = deparse(substitute(df))
 #' 
 #' @export
 tbl_cache <- function(sc, name, force = TRUE) {
-  dbiCon <- dbConnect(DBISpark(sc))
+  dbiCon <- sc$dbi
 
   dbGetQuery(dbiCon, paste("CACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))
 
@@ -146,7 +146,7 @@ tbl_cache <- function(sc, name, force = TRUE) {
 #' 
 #' @export
 tbl_uncache <- function(sc, name) {
-  dbiCon <- dbConnect(DBISpark(sc))
+  dbiCon <- sc$dbi
   dbGetQuery(dbiCon, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))
 }
 

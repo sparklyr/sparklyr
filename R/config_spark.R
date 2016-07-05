@@ -23,33 +23,6 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   mergedConfig
 }
 
-spark_config_params <- function(config, isLocal, pattern) {
-  configNames <- Filter(function(e) {
-    found <- substring(e, 1, nchar(pattern)) == pattern
-
-    if (grepl("\\.local$", e) && !isLocal)
-      found <- FALSE
-
-    if (grepl("\\.remote$", e) && isLocal)
-      found <- FALSE
-
-    found
-  }, names(config))
-
-  paramsNames <- lapply(configNames, function(configName) {
-    paramName <- substr(configName, nchar(pattern) + 1, nchar(configName))
-    paramName <- sub("(\\.local$)|(\\.remote$)", "", paramName, perl = TRUE)
-
-    paramName
-  })
-
-  params <- lapply(configNames, function(configName) {
-    config[[configName]]
-  })
-
-  names(params) <- paramsNames
-  params
-}
 
 # recursively merge two lists (extracted from code used by rmarkdown
 # package to merge _output.yml, _site.yml, front matter, etc.:

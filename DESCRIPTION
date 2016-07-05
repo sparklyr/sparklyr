@@ -23,7 +23,7 @@ Collate:
     'api_spark_sql.R'
     'config_spark.R'
     'connection_spark.R'
-    'connection_spark_reconnect.R'
+    'connection_instances.R'
     'connection_viewer.R'
     'connection_windows.R'
     'dbi_spark_driver.R'
@@ -57,7 +57,6 @@ Collate:
     'ml_utils.R'
     'reexports.R'
     'sdf_interface.R'
-    'shell_spark.R'
     'spark_accessors.R'
     'spark_data_frame.R'
     'utils.R'
@@ -69,7 +68,7 @@ Imports:
     lazyeval (>= 0.2.0),
     dplyr (>= 0.5.0),
     DBI (>= 0.4.1),
-    sparkapi (>= 0.2.0),
+    sparkapi (>= 0.3.0),
     readr (>= 0.2.0),
     digest,
     config,
