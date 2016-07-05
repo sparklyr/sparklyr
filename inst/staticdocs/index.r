@@ -3,9 +3,7 @@ sd_section("Connecting to Spark",
            c("spark_install",
              "spark_connect",
              "spark_disconnect",
-             "spark_config",
-             "spark_log",
-             "spark_web")
+             "spark_config")
 )
 
 sd_section("Reading and Writing Data",

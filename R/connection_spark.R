@@ -177,11 +177,17 @@ spark_connect <- function(master,
 #' @export
 sparkapi::spark_connection_is_open
 
-#' @importFrom sparkapi spark_log
+#' @docType NULL
+#' @name spark_log
+#' @rdname spark_log
+#' 
 #' @export
 sparkapi::spark_log
 
-#' @importFrom sparkapi spark_web
+#' @docType NULL
+#' @name spark_web
+#' @rdname spark_web
+#' 
 #' @export
 sparkapi::spark_web
 
