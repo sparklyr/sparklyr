@@ -189,6 +189,7 @@ spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
            string = raw,
            double = as.double(raw),
            int = as.integer(raw),
+           boolean = as.logical(raw),
            raw)
   }))
 }
