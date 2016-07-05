@@ -4,8 +4,8 @@
 \alias{spark_read_parquet}
 \title{Read a Parquet file into a Spark DataFrame}
 \usage{
-spark_read_parquet(sc, name, path, repartition = 0, memory = TRUE,
-  overwrite = TRUE)
+spark_read_parquet(sc, name, path, options = list(), repartition = 0,
+  memory = TRUE, overwrite = TRUE)
 }
 \arguments{
 \item{sc}{The Spark connection}
@@ -13,6 +13,8 @@ spark_read_parquet(sc, name, path, repartition = 0, memory = TRUE,
 \item{name}{Name of table}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
+
+\item{options}{A list of strings with additional options.}
 
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 

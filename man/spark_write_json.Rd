@@ -4,12 +4,16 @@
 \alias{spark_write_json}
 \title{Write a Spark DataFrame to a JSON file}
 \usage{
-spark_write_json(x, path)
+spark_write_json(x, path, mode = NULL, options = list())
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
+
+\item{mode}{Specifies the behavior when data or table already exists.}
+
+\item{options}{A list of strings with additional options.}
 }
 \description{
 Write a Spark DataFrame to a JSON file
