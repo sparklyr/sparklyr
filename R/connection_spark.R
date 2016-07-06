@@ -118,10 +118,6 @@ spark_connect <- function(master,
     # create dbi interface
     api <- spark_api_create(scon)
     scon$dbi <- new("DBISparkConnection", scon = scon, api = api)
-    params <- read_config(scon$config, scon$master, "spark.sql.")
-    lapply(names(params), function(paramName) {
-      dbSetProperty(scon$dbi, paramName, as.character(params[[paramName]]))
-    })
     
     # update spark_context and hive_context connections with dbi field
     scon$spark_context$connection$dbi <- scon$dbi
