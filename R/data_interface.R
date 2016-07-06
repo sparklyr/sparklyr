@@ -128,7 +128,8 @@ spark_write_csv.spark_jobj <- function(x,
 #' Read a Parquet file into a Spark DataFrame
 #'
 #' @inheritParams spark_read_csv
-#'
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' 
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
 #'   the local file system (\code{file://}). 
 #'   
@@ -157,6 +158,7 @@ spark_read_parquet <- function(sc,
 #'
 #' @inheritParams spark_write_csv
 #' @param mode Specifies the behavior when data or table already exists.
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' 
 #' @family reading and writing data
 #'
@@ -242,7 +244,6 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
     )
   }
 }
-
 
 spark_data_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
   options <- invoke(hive_context(sc), "read")

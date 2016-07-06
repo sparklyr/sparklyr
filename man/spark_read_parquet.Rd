@@ -14,7 +14,7 @@ spark_read_parquet(sc, name, path, options = list(), repartition = 0,
 
 \item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
 
-\item{options}{A list of strings with additional options.}
+\item{options}{A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.}
 
 \item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
 
