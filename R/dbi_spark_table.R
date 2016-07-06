@@ -46,8 +46,8 @@ setMethod("dbExistsTable", c("spark_connection", "character"), function(conn, na
 
 setMethod("dbRemoveTable", c("spark_connection", "character"),
   function(conn, name) {
-    hive <- hive_context(sc)
-    if (is_spark_v2(sc)) {
+    hive <- hive_context(conn)
+    if (is_spark_v2(conn)) {
       hive <- invoke(hive, "wrapped")
     }
     
