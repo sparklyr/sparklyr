@@ -1,16 +1,15 @@
 
 
-spark_partition_register_df <- function(sc, df, api, name, repartition, memory) {
+spark_partition_register_df <- function(sc, df, name, repartition, memory) {
   if (repartition > 0) {
     df <- invoke(df, "repartition", as.integer(repartition))
   }
 
-  dbi <- spark_dbi(sc)
   spark_register_temp_table(df, name)
 
   if (memory) {
-    dbGetQuery(dbi, paste("CACHE TABLE", dplyr::escape(ident(name), con = dbi)))
-    dbGetQuery(dbi, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = dbi)))
+    dbGetQuery(sc, paste("CACHE TABLE", dplyr::escape(ident(name), con = sc)))
+    dbGetQuery(sc, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = sc)))
   }
   
   on_connection_updated(sc, name)
@@ -20,8 +19,7 @@ spark_partition_register_df <- function(sc, df, api, name, repartition, memory) 
 
 spark_remove_table_if_exists <- function(sc, name) {
   if (name %in% src_tbls(sc)) {
-    dbi <- spark_dbi(sc)
-    dbRemoveTable(dbi, name)
+    dbRemoveTable(sc, name)
   }
 }
 
@@ -38,7 +36,6 @@ spark_source_from_ops <- function(x) {
 spark_sqlresult_from_dplyr <- function(x) {
   sparkSource <- spark_source_from_ops(x)
 
-  api <- spark_api(sparkSource)
   sql <- dplyr::sql_render(x)
-  sqlResult <- spark_api_sql(api, as.character(sql))
+  sqlResult <- spark_api_sql(sparkSource$con, as.character(sql))
 }

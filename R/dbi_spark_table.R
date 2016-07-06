@@ -16,7 +16,7 @@ setMethod("dbWriteTable", "spark_connection",
       stop("Table ", name, " already exists")
     }
 
-    spark_api_copy_data(conn@api, value, name, repartition, local_file)
+    spark_api_copy_data(conn, value, name, repartition, local_file)
 
     invisible(TRUE)
   }
@@ -31,7 +31,7 @@ setMethod("dbReadTable", c("spark_connection", "character"),
 
 
 setMethod("dbListTables", "spark_connection", function(conn) {
-  df <- spark_api_sql_tables(conn@api)
+  df <- spark_api_sql_tables(conn)
   tableNames <- df$tableName
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
   sort(filtered)
@@ -45,7 +45,7 @@ setMethod("dbExistsTable", c("spark_connection", "character"), function(conn, na
 
 setMethod("dbRemoveTable", c("spark_connection", "character"),
   function(conn, name) {
-    spark_drop_temp_table(conn@api, name)
+    spark_drop_temp_table(conn, name)
 
     invisible(TRUE)
   }

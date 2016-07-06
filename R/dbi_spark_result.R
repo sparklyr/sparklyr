@@ -40,7 +40,7 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 })
 
 setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, statement, params = NULL, ...) {
-  df <- spark_api_sql_query(conn@api, statement)
+  df <- spark_api_sql_query(conn, statement)
 
   rs <- new("DBISparkResult",
             df = df,

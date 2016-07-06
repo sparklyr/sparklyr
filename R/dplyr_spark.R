@@ -1,18 +1,5 @@
 #' @import dplyr
 
-spark_dbi <- function(x, ...) {
-  UseMethod("spark_dbi", x)
-}
-
-spark_dbi.src_spark <- function(x) {
-  x$con
-}
-
-spark_api <- function(x) {
-  spark_dbi(x)@api
-}
-
-
 #' @export
 spark_connection.tbl_spark <- function(x, ...) {
   spark_connection(x$src)
@@ -20,7 +7,7 @@ spark_connection.tbl_spark <- function(x, ...) {
 
 #' @export
 spark_connection.src_spark <- function(x, ...) {
-  spark_dbi(x)@scon
+  x$con
 }
 
 

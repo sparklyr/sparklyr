@@ -13,30 +13,25 @@ spark_api_sql <- function(sc, sql) {
   result
 }
 
-# Get the HiveContext associated with a connection
-hive_context <- function(sc) {
-  spark_connection(sc)$hive_context
-}
-
-spark_api_schema <- function(api, sqlResult) {
+spark_api_schema <- function(sqlResult) {
   invoke(
     sqlResult,
     "schema"
   )
 }
 
-spark_api_object_method <- function(api, object, property) {
+spark_api_object_method <- function(object, property) {
   invoke(
     object,
     property
   )
 }
 
-spark_api_field <- function(api, field) {
-  name <- spark_api_object_method(api, field, "name")
-  dataType <- spark_api_object_method(api, field, "dataType")
-  longType <- spark_api_object_method(api, dataType, "toString")
-  shortType <- spark_api_object_method(api, dataType, "simpleString")
+spark_api_field <- function(field) {
+  name <- spark_api_object_method(field, "name")
+  dataType <- spark_api_object_method(field, "dataType")
+  longType <- spark_api_object_method(dataType, "toString")
+  shortType <- spark_api_object_method(dataType, "simpleString")
 
   list(
     name = name,
@@ -45,14 +40,14 @@ spark_api_field <- function(api, field) {
   )
 }
 
-spark_api_schema_fields <- function(api, schemaResult) {
+spark_api_schema_fields <- function(schemaResult) {
   lapply(
     invoke(
       schemaResult,
       "fields"
     ),
     function (field) {
-      spark_api_field(api, field)
+      spark_api_field(field)
     }
   )
 }
@@ -91,12 +86,12 @@ spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
   if (!shortType %in% c("vector")) unlist(result) else result
 }
 
-spark_api_data_frame <- function(api, sqlResult) {
-  schema <- spark_api_schema(api, sqlResult)
-  fields <- spark_api_schema_fields(api, schema)
+spark_api_data_frame <- function(sc, sqlResult) {
+  schema <- spark_api_schema(sqlResult)
+  fields <- spark_api_schema_fields(schema)
 
   df <- invoke_static(
-    api$scon,
+    sc,
 
     "org.apache.spark.sql.api.r.SQLUtils",
     "dfToCols",
@@ -138,13 +133,13 @@ spark_api_data_frame <- function(api, sqlResult) {
   df
 }
 
-spark_api_build_types <- function(api, columns) {
+spark_api_build_types <- function(sc, columns) {
   names <- names(columns)
   fields <- lapply(names, function(name) {
-    invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, columns[[name]], TRUE)
+    invoke_static(sc, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, columns[[name]], TRUE)
   })
 
-  invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
+  invoke_static(sc, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
 }
 
 spark_api_copy_data <- function(sc, df, name, repartition, local_file = TRUE) {
@@ -192,7 +187,7 @@ spark_api_copy_data <- function(sc, df, name, repartition, local_file = TRUE) {
       sc,
       "utils",
       "createDataFrame",
-      spark_context(api$scon),
+      spark_context(sc),
       rows,
       as.integer(if (repartition <= 0) 1 else repartition)
     )
@@ -216,9 +211,9 @@ spark_drop_temp_table <- function(sc, name) {
   invoke(context, "dropTempTable", name)
 }
 
-spark_print_schema <- function(api, tableName) {
+spark_print_schema <- function(sc, tableName) {
   result <- spark_api_sql(
-    api,
+    sc,
     paste("SELECT * FROM", tableName, "LIMIT 1")
   )
 
