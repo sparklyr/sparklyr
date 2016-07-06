@@ -108,22 +108,6 @@ spark_connect <- function(master,
       environment = environment,
       shell_args = shell_args
     )
-
-    # add sparklyr_connection class to object (reflects inclusion of db fields)
-    class(scon) <- c("sparklyr_connection", class(scon))
-    
-    # assign connection to spark_context / hive_context (so it carries the
-    # sparklyr_connection class)
-    scon$spark_context$connection <- scon
-    scon$hive_context$connection <- scon
-    
-    # create dbi interface
-    api <- spark_api_create(scon)
-    scon$dbi <- new("DBISparkConnection", scon = scon, api = api)
-    
-    # update spark_context and hive_context connections with dbi field
-    scon$spark_context$connection$dbi <- scon$dbi
-    scon$hive_context$connection$dbi <- scon$dbi
    
     # notify connection viewer of connection
     libs <- "library(sparklyr)"
