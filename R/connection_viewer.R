@@ -10,7 +10,7 @@ on_connection_opened <- function(scon, connectCall) {
       type = "Spark",
 
       # host (unique identifier within type, used as default name)
-      host = scon$master,
+      host = to_host(scon$master),
 
       # finder function
       finder = function(env, host) {
@@ -18,8 +18,8 @@ on_connection_opened <- function(scon, connectCall) {
         for (name in objs) {
           x <- base::get(name, envir = env)
           if (inherits(x, "sparklyr_connection") &&
-              identical(x$master, host) &&
-              sparkapi::connection_is_open(x)) {
+              identical(sparklyr:::to_host(x$master), host) &&
+              sparkapi:::connection_is_open(x)) {
             return(name)
           }
         }
@@ -47,13 +47,13 @@ on_connection_opened <- function(scon, connectCall) {
 on_connection_closed <- function(scon) {
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer))
-    viewer$connectionClosed(type = "Spark", host = scon$master)
+    viewer$connectionClosed(type = "Spark", host = to_host(scon$master))
 }
 
 on_connection_updated <- function(scon, hint) {
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer))
-    viewer$connectionUpdated(type = "Spark", host = scon$master, hint = hint)
+    viewer$connectionUpdated(type = "Spark", host = to_host(scon$master), hint = hint)
 }
 
 connection_list_tables <- function(sc) {
@@ -99,6 +99,10 @@ spark_connection_get_dbi <- function(scon) {
   scon$dbi
 }
 
+# function to convert master to host
+to_host <- function(master) {
+  gsub("local\\[(\\d+|\\*)\\]", "local", master)
+}
 
 
 
