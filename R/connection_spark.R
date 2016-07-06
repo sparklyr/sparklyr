@@ -69,18 +69,25 @@ spark_connect <- function(master,
          java_install_url())
   }
 
+  # value for SPARK_HOME from environment
   sparkHome <- spark_home()
-  if (spark_master_is_local(master)) {
-    if (is.null(sparkHome) || !is.null(version) || !is.null(hadoop_version)) {
-      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
-      sparkHome <- installInfo$sparkVersionDir
-    }
-  } else {
-    if (is.null(sparkHome)) {
-      stop("Failed to launch in cluster mode, SPARK_HOME environment variable is not set.")
-    }
+  
+  # warn if a SPARK_HOME was specified along with a local version
+  if (!is.null(sparkHome) && (!is.null(version) || !is.null(hadoop_version))) {
+    message("Using SPARK_HOME specified in environment rather than ",
+            "local version specified in spark_connect")
   }
-
+  
+  # if no SPARK_HOME and local then resolve from local installs
+  if (is.null(sparkHome) && spark_master_is_local(master)) {
+    installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
+    sparkHome <- installInfo$sparkVersionDir  
+  }
+  
+  # error if there is no SPARK_HOME
+  if (is.null(sparkHome))
+    stop("Failed to connect to Spark (SPARK_HOME is not set).")
+  
   scon <- NULL
   tryCatch({
     # determine environment
@@ -96,9 +103,9 @@ spark_connect <- function(master,
     shell_args <- connection_config(config_sc, "sparklyr.shell.")
 
     # create connection
+    Sys.setenv(SPARK_HOME = sparkHome)
     scon <- sparkapi::start_shell(
       master = master,
-      spark_home = sparkHome,
       app_name = app_name,
       config = config,
       jars = spark_default_jars(),
