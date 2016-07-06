@@ -149,7 +149,7 @@ spark_read_parquet <- function(sc,
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
-  df <- spark_api_read_generic(sc, list(path.expand(path)), "parquet", options)
+  df <- spark_data_read_generic(sc, list(path.expand(path)), "parquet", options)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -168,13 +168,13 @@ spark_write_parquet <- function(x, path, mode = NULL, options = list()) {
 #' @export
 spark_write_parquet.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_api_write_generic(sqlResult, path.expand(path), "parquet", mode, options)
+  spark_data_write_generic(sqlResult, path.expand(path), "parquet", mode, options)
 }
 
 #' @export
 spark_write_parquet.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_api_write_generic(x, path.expand(path), "parquet", mode, options)
+  spark_data_write_generic(x, path.expand(path), "parquet", mode, options)
 }
 
 #' Read a JSON file into a Spark DataFrame
@@ -201,7 +201,7 @@ spark_read_json <- function(sc,
   
   if (overwrite) spark_remove_table_if_exists(sc, name)
   
-  df <- spark_api_read_generic(sc, path.expand(path), "json", options)
+  df <- spark_data_read_generic(sc, path.expand(path), "json", options)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -220,13 +220,13 @@ spark_write_json <- function(x, path, mode = NULL, options = list()) {
 #' @export
 spark_write_json.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_api_write_generic(sqlResult, path.expand(path), "json", mode, options)
+  spark_data_write_generic(sqlResult, path.expand(path), "json", mode, options)
 }
 
 #' @export
 spark_write_json.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_api_write_generic(x, path.expand(path), "json", mode, options)
+  spark_data_write_generic(x, path.expand(path), "json", mode, options)
 }
 
 spark_expect_jobj_class <- function(jobj, expectedClassName) {
@@ -244,7 +244,7 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
 }
 
 
-spark_api_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
+spark_data_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
   options <- invoke(hive_context(sc), "read")
   
   lapply(names(csvOptions), function(csvOptionName) {
@@ -254,7 +254,7 @@ spark_api_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
   invoke(options, fileMethod, path)
 }
 
-spark_api_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptions = list()) {
+spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptions = list()) {
   options <- invoke(df, "write")
   
   if (!is.null(mode)) {
