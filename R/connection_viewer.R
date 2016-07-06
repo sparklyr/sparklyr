@@ -14,12 +14,15 @@ on_connection_opened <- function(scon, connectCall) {
 
       # finder function
       finder = function(env, host) {
+        to_host <- function(master) {
+          gsub("local\\[(\\d+|\\*)\\]", "local", master)
+        }
         objs <- ls(env)
         for (name in objs) {
           x <- base::get(name, envir = env)
           if (inherits(x, "spark_connection") &&
-              identical(sparklyr:::to_host(x$master), host) &&
-              sparkapi:::connection_is_open(x)) {
+              identical(to_host(x$master), host) &&
+              sparkapi::connection_is_open(x)) {
             return(name)
           }
         }

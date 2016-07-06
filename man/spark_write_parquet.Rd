@@ -13,7 +13,7 @@ spark_write_parquet(x, path, mode = NULL, options = list())
 
 \item{mode}{Specifies the behavior when data or table already exists.}
 
-\item{options}{A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html}.}
+\item{options}{A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.}
 }
 \description{
 Write a Spark DataFrame to a Parquet file
