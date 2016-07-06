@@ -49,7 +49,7 @@ spark_connect <- function(master,
   }
 
   filter <- function(e) {
-    spark_connection_is_open(e) &&
+    connection_is_open(e) &&
     identical(e$master, master)
   }
 
@@ -92,7 +92,7 @@ spark_connect <- function(master,
     }
 
     # determine shell_args
-    shell_args <- spark_read_config(config, master, "sparklyr.shell.")
+    shell_args <- read_config(config, master, "sparklyr.shell.")
 
     # create connection
     scon <- sparkapi::start_shell(
@@ -123,7 +123,7 @@ spark_connect <- function(master,
     # create dbi interface
     api <- spark_api_create(scon)
     scon$dbi <- new("DBISparkConnection", scon = scon, api = api)
-    params <- spark_read_config(scon$config, scon$master, "spark.sql.")
+    params <- read_config(scon$config, scon$master, "spark.sql.")
     lapply(names(params), function(paramName) {
       dbSetProperty(scon$dbi, paramName, as.character(params[[paramName]]))
     })
@@ -153,7 +153,7 @@ spark_connect <- function(master,
 
     # Register a finalizer to sleep on R exit to support older versions of the RStudio ide
     reg.finalizer(as.environment("package:sparklyr"), function(x) {
-      if (spark_connection_is_open(scon)) {
+      if (connection_is_open(scon)) {
         Sys.sleep(1)
       }
     }, onexit = TRUE)
@@ -172,11 +172,6 @@ spark_connect <- function(master,
   scon
 }
 
-
-#' @importFrom sparkapi spark_connection_is_open
-#' @export
-sparkapi::spark_connection_is_open
-
 #' @docType NULL
 #' @name spark_log
 #' @rdname spark_log
@@ -190,6 +185,19 @@ sparkapi::spark_log
 #' 
 #' @export
 sparkapi::spark_web
+
+
+#' Check if a Spark connection is open
+#' 
+#' @param sc \code{spark_connection}
+#' 
+#' @rdname spark_connect
+#' 
+#' @export
+spark_connection_is_open <- function(sc) {
+  sparkapi::connection_is_open(sc)
+}
+
 
 #' Disconnect from Spark
 #'
@@ -213,7 +221,7 @@ spark_disconnect <- function(sc) {
 # Get the path to a temp file containing the current spark log (used by IDE)
 spark_log_file <- function(sc) {
   scon <- sc
-  if (!spark_connection_is_open(scon)) {
+  if (!connection_is_open(scon)) {
     stop("The Spark conneciton is not open anymmore, log is not available")
   }
   
@@ -254,7 +262,7 @@ spark_connection_version <- function(sc, onlyVersion = FALSE) {
 #' @export
 spark_disconnect_all <- function() {
   scons <- spark_connection_find_scon(function(e) {
-    spark_connection_is_open(e)
+    connection_is_open(e)
   })
 
   length(lapply(scons, function(e) {

@@ -19,7 +19,7 @@ on_connection_opened <- function(scon, connectCall) {
           x <- base::get(name, envir = env)
           if (inherits(x, "sparklyr_connection") &&
               identical(x$master, host) &&
-              sparklyr::spark_connection_is_open(x)) {
+              sparkapi::connection_is_open(x)) {
             return(name)
           }
         }

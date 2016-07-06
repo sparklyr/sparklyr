@@ -67,7 +67,7 @@ spark_api_create_hive_context_v2 <- function(scon) {
 
   conf <- invoke(session, "conf")
 
-  params <- spark_read_config(scon$config, scon$master, "spark.session.")
+  params <- read_config(scon$config, scon$master, "spark.session.")
   lapply(names(params), function(paramName) {
     configValue <- params[[paramName]]
     if (is.logical(configValue)) {
@@ -356,7 +356,7 @@ spark_api_write_generic <- function(df, path, fileMethod, mode = NULL, csvOption
 
 spark_inspect <- function(jobj) {
   print(jobj)
-  if (!spark_connection_is_open(spark_connection(jobj)))
+  if (!connection_is_open(spark_connection(jobj)))
     return(jobj)
 
   class <- invoke(jobj, "getClass")

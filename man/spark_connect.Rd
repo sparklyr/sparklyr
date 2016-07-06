@@ -2,10 +2,13 @@
 % Please edit documentation in R/connection_spark.R
 \name{spark_connect}
 \alias{spark_connect}
+\alias{spark_connection_is_open}
 \title{Connect to Spark}
 \usage{
 spark_connect(master, app_name = "sparklyr", version = NULL,
   hadoop_version = NULL, extensions = NULL, config = spark_config())
+
+spark_connection_is_open(sc)
 }
 \arguments{
 \item{master}{Spark cluster url to connect to. Use \code{"local"} to connect to a local
@@ -20,12 +23,16 @@ instance of Spark installed via \code{\link{spark_install}}.}
 \item{extensions}{Extension packages to enable for this connection.}
 
 \item{config}{Configuration for connection (see \code{\link{spark_config} for details}).}
+
+\item{sc}{\code{spark_connection}}
 }
 \value{
 Connection to Spark local instance or remote cluster
 }
 \description{
 Connect to Spark
+
+Check if a Spark connection is open
 }
 \seealso{
 Other Spark connections: \code{\link{spark_disconnect}}
