@@ -2,12 +2,11 @@
 
 #' @export
 spark_dataframe.tbl_spark <- function(x, ...) {
-  db <- x$src
-  con <- db$con
+  sc <- x$src
 
-  sql <- as.character(sql_render(sql_build(x, con = con), con = con))
-  api <- spark_sql_or_hive(spark_api(x$src))
-  invoke(api, "sql", sql)
+  sql <- as.character(sql_render(sql_build(x, con = sc), con = sc))
+  hive <- hive_context(sc)
+  invoke(hive, "sql", sql)
 }
 
 #' @export

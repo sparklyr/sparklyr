@@ -3,19 +3,9 @@ is_spark_v2 <- function(scon) {
   spark_version(scon) >= "2.0.0"
 }
 
-spark_api_create <- function(scon) {
-  list(
-    scon = scon
-  )
-}
-
-spark_sql_or_hive <- function(api) {
-  spark_get_sql_context(api$scon)
-}
-
-spark_api_sql <- function(api, sql) {
+spark_api_sql <- function(sc, sql) {
   result <- invoke(
-    spark_sql_or_hive(api),
+    hive_context(sc),
     "sql",
     sql
   )
@@ -157,7 +147,7 @@ spark_api_build_types <- function(api, columns) {
   invoke_static(api$scon, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
 }
 
-spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
+spark_api_copy_data <- function(sc, df, name, repartition, local_file = TRUE) {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -175,7 +165,7 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
   if (local_file) {
     tempfile <- tempfile(fileext = ".csv")
     write.csv(df, tempfile, row.names = FALSE, na = "")
-    df <- spark_api_read_csv(api, tempfile, csvOptions = list(
+    df <- spark_api_read_csv(sc, tempfile, csvOptions = list(
       header = "true"
     ), columns = columns)
 
@@ -183,7 +173,7 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
       df <- invoke(df, "repartition", as.integer(repartition))
     }
   } else {
-    structType <- spark_api_build_types(api, columns)
+    structType <- spark_api_build_types(sc, columns)
     
     # Map date and time columns as standard doubles
     df <- as.data.frame(lapply(df, function(e) {
@@ -199,7 +189,7 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
     rows <- lapply(seq_len(NROW(df)), function(e) as.list(df[e,]))
 
     rdd <- invoke_static(
-      api$scon,
+      sc,
       "utils",
       "createDataFrame",
       spark_context(api$scon),
@@ -207,7 +197,7 @@ spark_api_copy_data <- function(api, df, name, repartition, local_file = TRUE) {
       as.integer(if (repartition <= 0) 1 else repartition)
     )
 
-    df <- invoke(spark_sql_or_hive(api), "createDataFrame", rdd, structType)
+    df <- invoke(hive_context(sc), "createDataFrame", rdd, structType)
   }
 
   spark_register_temp_table(df, name)
@@ -217,9 +207,9 @@ spark_register_temp_table <- function(table, name) {
   invoke(table, "registerTempTable", name)
 }
 
-spark_drop_temp_table <- function(api, name) {
-  context <- spark_sql_or_hive(api)
-  if (is_spark_v2(api$scon)) {
+spark_drop_temp_table <- function(sc, name) {
+  hive <- hive_context(sc)
+  if (is_spark_v2(sc)) {
     context <- invoke(context, "wrapped")
   }
   
@@ -238,8 +228,8 @@ spark_print_schema <- function(api, tableName) {
   )
 }
 
-spark_api_read_generic <- function(api, path, fileMethod, csvOptions = list()) {
-  options <- invoke(spark_sql_or_hive(api), "read")
+spark_api_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
+  options <- invoke(hive_context(sc), "read")
   
   lapply(names(csvOptions), function(csvOptionName) {
     options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
