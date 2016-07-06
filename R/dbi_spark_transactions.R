@@ -1,12 +1,12 @@
 
-setMethod("dbBegin", "DBISparkConnection", function(conn) {
+setMethod("dbBegin", "spark_connection", function(conn) {
   TRUE
 })
 
-setMethod("dbCommit", "DBISparkConnection", function(conn) {
+setMethod("dbCommit", "spark_connection", function(conn) {
   TRUE
 })
 
-setMethod("dbRollback", "DBISparkConnection", function(conn) {
+setMethod("dbRollback", "spark_connection", function(conn) {
   TRUE
 })

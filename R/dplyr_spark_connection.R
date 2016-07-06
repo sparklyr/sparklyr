@@ -1,10 +1,10 @@
 #' @export
-sql_escape_ident.DBISparkConnection <- function(con, x) {
+sql_escape_ident.spark_connection <- function(con, x) {
   sql_quote(x, '`')
 }
 
 #' @export
-sql_translate_env.DBISparkConnection <- function(con) {
+sql_translate_env.spark_connection <- function(con) {
   dplyr::sql_variant(
 
     scalar = dplyr::sql_translator(
@@ -28,10 +28,10 @@ sql_translate_env.DBISparkConnection <- function(con) {
 
 #' @export
 #' @import assertthat
-sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
-                                          group_by = NULL, having = NULL,
-                                          order_by = NULL, limit = NULL,
-                                          distinct = FALSE, ...) {
+sql_select.spark_connection <- function(con, select, from, where = NULL,
+                                        group_by = NULL, having = NULL,
+                                        order_by = NULL, limit = NULL,
+                                        distinct = FALSE, ...) {
   out <- vector("list", 6)
   names(out) <- c("select", "from", "where", "group_by", "having", "order_by")
 
@@ -82,10 +82,10 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
 
 #' @importFrom utils compareVersion
 #' @export
-sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ...) {
+sql_join.spark_connection <- function(con, x, y, type = "inner", by = NULL, ...) {
   # TODO: This function needs to be removed once dplyr can workaround this issue by avoiding USING statements.
   
-  sparkVersion <- spark_version(con@scon)
+  sparkVersion <- spark_version(con)
   
   if (compareVersion(sparkVersion, "2.0.0") < 0) {
     sameNameColumns <- length(Filter(function(e) by$x[[e]] == by$y[[e]], seq_len(length(by$x))))

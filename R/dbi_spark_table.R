@@ -1,5 +1,5 @@
 
-setMethod("dbWriteTable", "DBISparkConnection",
+setMethod("dbWriteTable", "spark_connection",
   function(conn, name, value, temporary = TRUE, repartition = 0, local_file = NULL) {
     if (!temporary) {
       stop("Writting to non-temporary tables is not supported yet")
@@ -22,7 +22,7 @@ setMethod("dbWriteTable", "DBISparkConnection",
   }
 )
 
-setMethod("dbReadTable", c("DBISparkConnection", "character"),
+setMethod("dbReadTable", c("spark_connection", "character"),
   function(conn, name) {
     name <- dbQuoteIdentifier(conn, name)
     dbGetQuery(conn, paste("SELECT * FROM ", name))
@@ -30,7 +30,7 @@ setMethod("dbReadTable", c("DBISparkConnection", "character"),
 )
 
 
-setMethod("dbListTables", "DBISparkConnection", function(conn) {
+setMethod("dbListTables", "spark_connection", function(conn) {
   df <- spark_api_sql_tables(conn@api)
   tableNames <- df$tableName
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
@@ -38,12 +38,12 @@ setMethod("dbListTables", "DBISparkConnection", function(conn) {
 })
 
 
-setMethod("dbExistsTable", c("DBISparkConnection", "character"), function(conn, name) {
+setMethod("dbExistsTable", c("spark_connection", "character"), function(conn, name) {
   name %in% dbListTables(conn)
 })
 
 
-setMethod("dbRemoveTable", c("DBISparkConnection", "character"),
+setMethod("dbRemoveTable", c("spark_connection", "character"),
   function(conn, name) {
     spark_drop_temp_table(conn@api, name)
 

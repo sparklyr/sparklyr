@@ -1,33 +1,22 @@
 
 # DBISparkConnection and methods.
 
-setMethod("dbGetInfo", "DBISparkConnection", function(dbObj, ...) {
+setMethod("dbGetInfo", "spark_connection", function(dbObj, ...) {
   dbObj$con@scon
 })
 
-setMethod("show", "DBISparkConnection", function(object) {
+setMethod("show", "spark_connection", function(object) {
   info <- dbGetInfo(object)
 
-  cat("<DBISparkConnection> ", info$master, "\n", sep = "")
-})
-
-# Connect to Spark
-setMethod("dbConnect", "DBISparkDriver", function(drv, ...) {
-  drv@scon$dbi
-})
-
-setMethod("dbDisconnect", "DBISparkConnection", function(conn, ...) {
-  spark_disconnect(conn@scon)
-
-  invisible(TRUE)
+  cat("<spark_connection> ", info$master, "\n", sep = "")
 })
 
 # Determine database type for R vector.
-setMethod("dbDataType", "DBISparkDriver", function(dbObj, obj) {
+setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
   get_data_type(obj)
 })
 
-setMethod("dbDataType", "DBISparkConnection", function(dbObj, obj) {
+setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
   get_data_type(obj)
 })
 
@@ -44,7 +33,7 @@ get_data_type <- function(obj) {
   )
 }
 
-setMethod("dbQuoteIdentifier", c("DBISparkConnection", "character"), function(conn, x, ...) {
+setMethod("dbQuoteIdentifier", c("spark_connection", "character"), function(conn, x, ...) {
   if (regexpr("`", x)[[1]] >= 0)
     stop("Can't scape back tick from string")
 
@@ -57,7 +46,7 @@ setMethod("dbQuoteIdentifier", c("DBISparkConnection", "character"), function(co
 setGeneric("dbSetProperty", function(conn, property, value) standardGeneric("dbSetProperty"));
 
 # Sets a property for the connection
-setMethod("dbSetProperty", c("DBISparkConnection", "character", "character"), function(conn, property, value) {
+setMethod("dbSetProperty", c("spark_connection", "character", "character"), function(conn, property, value) {
   dbGetQuery(
     conn,
     paste(

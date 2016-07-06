@@ -1,7 +1,7 @@
 
 spark_install()
 scon <- spark_connect("local")
-ctx <- DBItest::make_context(DBISpark(scon), NULL)
+ctx <- DBItest::make_context(scon, NULL)
 
 DBItest::test_getting_started(ctx = ctx, skip = c("package_name"))
 
