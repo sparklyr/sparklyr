@@ -16,7 +16,7 @@ setMethod("dbWriteTable", "spark_connection",
       stop("Table ", name, " already exists")
     }
 
-    spark_api_copy_data(conn, value, name, repartition, local_file)
+    spark_data_copy(conn, value, name, repartition, local_file)
 
     invisible(TRUE)
   }

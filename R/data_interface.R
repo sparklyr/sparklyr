@@ -62,7 +62,7 @@ spark_read_csv <- function(sc,
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
-  df <- spark_api_read_csv(sc, path.expand(path), options)
+  df <- spark_csv_read(sc, path.expand(path), options)
   
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
@@ -106,7 +106,7 @@ spark_write_csv.tbl_spark <- function(x,
   sqlResult <- spark_sqlresult_from_dplyr(x)
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
   
-  spark_api_write_csv(sqlResult, path.expand(path), options)
+  spark_csv_write(sqlResult, path.expand(path), options)
 }
 
 #' @export
@@ -122,7 +122,7 @@ spark_write_csv.spark_jobj <- function(x,
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
   
-  spark_api_write_csv(x, path.expand(path), options)
+  spark_csv_write(x, path.expand(path), options)
 }
 
 #' Read a Parquet file into a Spark DataFrame

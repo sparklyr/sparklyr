@@ -1,7 +1,7 @@
-spark_api_read_csv <- function(sc,
-                               path,
-                               csvOptions = list(),
-                               columns = NULL) {
+spark_csv_read <- function(sc,
+                           path,
+                           csvOptions = list(),
+                           columns = NULL) {
   read <- invoke(hive_context(sc), "read")
   options <- invoke(read, "format", "com.databricks.spark.csv")
   
@@ -13,14 +13,14 @@ spark_api_read_csv <- function(sc,
     optionSchema <- invoke(options, "option", "inferSchema", "true")
   }
   else {
-    columnDefs <- spark_api_build_types(sc, columns)
+    columnDefs <- spark_data_build_types(sc, columns)
     optionSchema <- invoke(options, "schema", columnDefs)
   }
 
   invoke(optionSchema, "load", path)
 }
 
-spark_api_write_csv <- function(df, path, csvOptions) {
+spark_csv_write <- function(df, path, csvOptions) {
   write <- invoke(df, "write")
   options <- invoke(write, "format", "com.databricks.spark.csv")
   

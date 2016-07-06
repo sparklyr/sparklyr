@@ -1,5 +1,5 @@
 
-spark_api_build_types <- function(sc, columns) {
+spark_data_build_types <- function(sc, columns) {
   names <- names(columns)
   fields <- lapply(names, function(name) {
     invoke_static(sc, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, columns[[name]], TRUE)
@@ -8,7 +8,7 @@ spark_api_build_types <- function(sc, columns) {
   invoke_static(sc, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
 }
 
-spark_api_copy_data <- function(sc, df, name, repartition, local_file = TRUE) {
+spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -26,7 +26,7 @@ spark_api_copy_data <- function(sc, df, name, repartition, local_file = TRUE) {
   if (local_file) {
     tempfile <- tempfile(fileext = ".csv")
     write.csv(df, tempfile, row.names = FALSE, na = "")
-    df <- spark_api_read_csv(sc, tempfile, csvOptions = list(
+    df <- spark_csv_read(sc, tempfile, csvOptions = list(
       header = "true"
     ), columns = columns)
     
@@ -34,7 +34,7 @@ spark_api_copy_data <- function(sc, df, name, repartition, local_file = TRUE) {
       df <- invoke(df, "repartition", as.integer(repartition))
     }
   } else {
-    structType <- spark_api_build_types(sc, columns)
+    structType <- spark_data_build_types(sc, columns)
     
     # Map date and time columns as standard doubles
     df <- as.data.frame(lapply(df, function(e) {
