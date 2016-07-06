@@ -26,7 +26,6 @@ Collate:
     'connection_instances.R'
     'connection_viewer.R'
     'connection_windows.R'
-    'dbi_spark_driver.R'
     'dbi_spark_connection.R'
     'dbi_spark_query.R'
     'dbi_spark_result.R'
