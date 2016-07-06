@@ -31,15 +31,3 @@ spark_drop_temp_table <- function(sc, name) {
   
   invoke(context, "dropTempTable", name)
 }
-
-spark_print_schema <- function(sc, tableName) {
-  result <- spark_api_sql(
-    sc,
-    paste("SELECT * FROM", tableName, "LIMIT 1")
-  )
-  
-  invoke(
-    result,
-    "printSchema"
-  )
-}

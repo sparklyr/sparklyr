@@ -57,6 +57,7 @@ Collate:
     'ml_utils.R'
     'reexports.R'
     'sdf_interface.R'
+    'sdf_sql.R'
     'sdf_wrapper.R'
     'utils.R'
 Depends:
