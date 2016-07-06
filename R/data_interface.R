@@ -242,3 +242,29 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
     )
   }
 }
+
+
+spark_api_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
+  options <- invoke(hive_context(sc), "read")
+  
+  lapply(names(csvOptions), function(csvOptionName) {
+    options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+  })
+  
+  invoke(options, fileMethod, path)
+}
+
+spark_api_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptions = list()) {
+  options <- invoke(df, "write")
+  
+  if (!is.null(mode)) {
+    options <- invoke(options, "mode", mode)
+  }
+  
+  lapply(names(csvOptions), function(csvOptionName) {
+    options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+  })
+  
+  invoke(options, fileMethod, path)
+  invisible(TRUE)
+}
