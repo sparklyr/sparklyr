@@ -73,7 +73,7 @@ flights_tbl %>% filter(dep_delay == 2)
 ```
 
     ## Source:   query [?? x 19]
-    ## Database: spark connection master=local app=sparklyr local=TRUE
+    ## Database: spark connection master=local[8] app=sparklyr local=TRUE
     ## 
     ##     year month   day dep_time sched_dep_time dep_delay arr_time
     ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
@@ -124,7 +124,7 @@ batting_tbl %>%
 ```
 
     ## Source:   query [?? x 7]
-    ## Database: spark connection master=local app=sparklyr local=TRUE
+    ## Database: spark connection master=local[8] app=sparklyr local=TRUE
     ## Groups: playerID
     ## 
     ##     playerID yearID teamID     G    AB     R     H
@@ -283,16 +283,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 252
-    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 251
-    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 250
-    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 249
-    ## 16/07/05 14:51:19 INFO ContextCleaner: Cleaned accumulator 248
-    ## 16/07/05 14:51:19 INFO Executor: Finished task 0.0 in stage 66.0 (TID 500). 2082 bytes result sent to driver
-    ## 16/07/05 14:51:19 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 500) in 113 ms on localhost (1/1)
-    ## 16/07/05 14:51:19 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/07/05 14:51:19 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.113 s
-    ## 16/07/05 14:51:19 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.114894 s
+    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 225
+    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 224
+    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 223
+    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 222
+    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 221
+    ## 16/07/06 12:41:30 INFO Executor: Finished task 0.0 in stage 66.0 (TID 500). 2082 bytes result sent to driver
+    ## 16/07/06 12:41:30 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 500) in 126 ms on localhost (1/1)
+    ## 16/07/06 12:41:30 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
+    ## 16/07/06 12:41:30 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.126 s
+    ## 16/07/06 12:41:30 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.127807 s
 
 Finally, we disconnect from Spark:
 
