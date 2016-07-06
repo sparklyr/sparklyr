@@ -87,7 +87,7 @@ sql_join.spark_connection <- function(con, x, y, type = "inner", by = NULL, ...)
   
   sparkVersion <- spark_version(con)
   
-  if (compareVersion(sparkVersion, "2.0.0") < 0) {
+  if (compareVersion(toString(sparkVersion), "2.0.0") < 0) {
     sameNameColumns <- length(Filter(function(e) by$x[[e]] == by$y[[e]], seq_len(length(by$x))))
     if (sameNameColumns > 0) {
       stop(paste("This dplyr operation requires a feature not supported in Spark", sparkVersion,
