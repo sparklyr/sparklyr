@@ -47,6 +47,11 @@ spark_connect <- function(master,
       stop("You must either pass a value for master or include a spark.master ",
            "entry in your config.yml")
   }
+  
+  # determine whether we need cores in master
+  cores <- config[["sparklyr.cores.local"]]
+  if (master == "local" && !identical(cores, NULL))
+    master <- paste("local[", cores, "]", sep = "")
 
   filter <- function(e) {
     connection_is_open(e) &&
@@ -78,12 +83,6 @@ spark_connect <- function(master,
 
   scon <- NULL
   tryCatch({
-
-    # determine whether we need cores in master
-    cores <- config[["sparklyr.cores.local"]]
-    if (master == "local" && !identical(cores, NULL))
-      master <- paste("local[", cores, "]", sep = "")
-
     # determine environment
     environment <- character()
     if (.Platform$OS.type != "windows") {
