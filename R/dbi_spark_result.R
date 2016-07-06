@@ -50,6 +50,28 @@ setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, stat
   rs
 })
 
+#' @export
+#' Ideally, dbGetQuery uses the default DBIConnection signature by registering
+#' the spark_connection S3 class in S4 deriving from S4 DBIConnection class.
+setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, statement, ...) {
+  rs <- dbSendQuery(conn, statement, ...)
+  on.exit(dbClearResult(rs))
+  
+  df <- tryCatch(
+    dbFetch(rs, n = -1, ...),
+    error = function(e) {
+      warning(conditionMessage(e), call. = conditionCall(e))
+      NULL
+    }
+  )
+  
+  if (!dbHasCompleted(rs)) {
+    warning("Pending rows", call. = FALSE)
+  }
+  
+  df
+})
+
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
   if (n == -1 || NROW(res@df) < n)
     res@df
