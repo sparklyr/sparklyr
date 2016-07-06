@@ -48,7 +48,6 @@ setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, stat
   rs
 })
 
-#' @export
 setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, statement, ...) {
   # TODO: Use default dbGetQuery method defined in DBIConnection
   rs <- dbSendQuery(conn, statement, ...)
