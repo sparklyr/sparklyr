@@ -8,10 +8,6 @@ spark_dbi.src_spark <- function(x) {
   x$con
 }
 
-spark_dbi.sparklyr_connection <- function(x) {
-  dbConnect(DBISpark(x))
-}
-
 spark_api <- function(x) {
   spark_dbi(x)@api
 }
@@ -57,15 +53,14 @@ tbl.src_spark <- function(src, from, ...) {
 }
 
 #' @export
-tbl.sparklyr_connection <- function(src, from, ...) {
-  src <- src_sql("spark", src$dbi)
+tbl.spark_connection <- function(src, from, ...) {
+  src <- src_sql("spark", src)
   tbl_sql("spark", src = src, from = from, ...)
 }
 
 #' @export
-src_tbls.sparklyr_connection <- function(x, ...) {
-  
-  sql <- spark_get_sql_context(x)
+src_tbls.spark_connection <- function(x, ...) {
+  sql <- hive_context(x)
   tbls <- invoke(sql, "sql", "SHOW TABLES")
   tableNames <- spark_dataframe_read_column(tbls, "tableName")
   
@@ -96,10 +91,10 @@ db_data_type.src_spark <- function(...) {
 #' @family dplyr
 #' 
 #' @export
-copy_to.sparklyr_connection <- function(dest, df, name = deparse(substitute(df)),
-                                        memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL, ...) {
+copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
+                                     memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL, ...) {
   sc <- dest
-  dest <- src_sql("spark", sc$dbi)
+  dest <- src_sql("spark", sc)
 
   if (overwrite)
     spark_remove_table_if_exists(sc, name)

@@ -17,7 +17,7 @@ on_connection_opened <- function(scon, connectCall) {
         objs <- ls(env)
         for (name in objs) {
           x <- base::get(name, envir = env)
-          if (inherits(x, "sparklyr_connection") &&
+          if (inherits(x, "spark_connection") &&
               identical(sparklyr:::to_host(x$master), host) &&
               sparkapi:::connection_is_open(x)) {
             return(name)

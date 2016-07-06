@@ -1,20 +1,6 @@
 
 # DBISparkConnection and methods.
 
-#' DBI Spark Connection.
-#' 
-#' @slot scon A Spark connection.
-#' @slot api Access to Spark API.
-#' 
-#' @keywords internal
-#' 
-#' @export
-setClass("DBISparkConnection",
-         contains = "DBIConnection",
-         slots = c(scon = "sparklyr_connection",
-                   api = "list")
-)
-
 setMethod("dbGetInfo", "DBISparkConnection", function(dbObj, ...) {
   dbObj$con@scon
 })

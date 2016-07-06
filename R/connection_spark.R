@@ -4,7 +4,7 @@
 NULL
 
 # register the spark_connection S3 class for use in setClass slots
-methods::setOldClass("sparklyr_connection")
+methods::setOldClass("spark_connection")
 
 spark_default_jars <- function() {
   jarsOption <- getOption("spark.jars.default", NULL)
