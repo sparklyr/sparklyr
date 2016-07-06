@@ -91,8 +91,10 @@ spark_connect <- function(master,
         environment <- paste0("SPARK_LOCAL_IP=127.0.0.1")
     }
 
-    # determine shell_args
-    shell_args <- read_config(config, master, "sparklyr.shell.")
+    # determine shell_args (use fake connection b/c we don't yet
+    # have a real connection)
+    config_sc <- list(config = config, master = master)
+    shell_args <- connection_config(config_sc, "sparklyr.shell.")
 
     # create connection
     scon <- sparkapi::start_shell(
