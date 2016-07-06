@@ -49,9 +49,8 @@ setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, stat
 })
 
 #' @export
-#' Ideally, dbGetQuery uses the default DBIConnection signature by registering
-#' the spark_connection S3 class in S4 deriving from S4 DBIConnection class.
 setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, statement, ...) {
+  # TODO: Use default dbGetQuery method defined in DBIConnection
   rs <- dbSendQuery(conn, statement, ...)
   on.exit(dbClearResult(rs))
   
