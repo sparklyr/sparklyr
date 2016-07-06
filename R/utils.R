@@ -3,26 +3,8 @@
 #' @importFrom utils browseURL download.file head installed.packages tail untar write.csv
 NULL
 
-wait_file_exists <- function(filename, retries = 1000) {
-  while(!file.exists(filename) && retries >= 0) {
-    retries <- retries  - 1;
-    Sys.sleep(0.1)
-  }
-
-  file.exists(filename)
-}
-
 is.installed <- function(package) {
   is.element(package, installed.packages()[,1])
-}
-
-
-fail_on_windows <- function() {
-  if ((.Platform$OS.type == "windows") && 
-      !getOption("sparklyr.windows_enabled", FALSE)) {
-    stop("sparklyr is not currently supported on Windows ",
-         "(https://github.com/rstudio/sparklyr/issues/42)")
-  }
 }
 
 is_java_available <- function() {
