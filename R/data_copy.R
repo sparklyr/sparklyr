@@ -61,5 +61,5 @@ spark_api_copy_data <- function(sc, df, name, repartition, local_file = TRUE) {
     df <- invoke(hive_context(sc), "createDataFrame", rdd, structType)
   }
   
-  spark_register_temp_table(df, name)
+  invoke(df, "registerTempTable", name)
 }

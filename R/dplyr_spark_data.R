@@ -5,7 +5,7 @@ spark_partition_register_df <- function(sc, df, name, repartition, memory) {
     df <- invoke(df, "repartition", as.integer(repartition))
   }
 
-  spark_register_temp_table(df, name)
+  invoke(df, "registerTempTable", name)
 
   if (memory) {
     dbGetQuery(sc, paste("CACHE TABLE", dplyr::escape(ident(name), con = sc)))
@@ -37,5 +37,5 @@ spark_sqlresult_from_dplyr <- function(x) {
   sparkSource <- spark_source_from_ops(x)
 
   sql <- dplyr::sql_render(x)
-  sqlResult <- spark_api_sql(sparkSource$con, as.character(sql))
+  sqlResult <- invoke(hive_context(sparkSource$con), "sql", as.character(sql))
 }

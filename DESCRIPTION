@@ -17,8 +17,6 @@ License: file LICENSE
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Collate:
-    'api_spark.R'
-    'api_spark_sql.R'
     'config_spark.R'
     'connection_spark.R'
     'connection_instances.R'

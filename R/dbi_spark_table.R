@@ -31,7 +31,9 @@ setMethod("dbReadTable", c("spark_connection", "character"),
 
 
 setMethod("dbListTables", "spark_connection", function(conn) {
-  df <- spark_api_sql_tables(conn)
+  sqlResult <- invoke(hive_context(conn), "sql", "SHOW TABLES")
+  df <- spark_api_data_frame(conn, sqlResult)
+  
   tableNames <- df$tableName
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
   sort(filtered)
@@ -45,8 +47,12 @@ setMethod("dbExistsTable", c("spark_connection", "character"), function(conn, na
 
 setMethod("dbRemoveTable", c("spark_connection", "character"),
   function(conn, name) {
-    spark_drop_temp_table(conn, name)
-
+    hive <- hive_context(sc)
+    if (is_spark_v2(sc)) {
+      hive <- invoke(hive, "wrapped")
+    }
+    
+    invoke(hive, "dropTempTable", name)
     invisible(TRUE)
   }
 )
