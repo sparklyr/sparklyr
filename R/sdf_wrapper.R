@@ -2,7 +2,7 @@
 
 #' @export
 spark_dataframe.tbl_spark <- function(x, ...) {
-  sc <- x$src
+  sc <- spark_connection(x)
 
   sql <- as.character(sql_render(sql_build(x, con = sc), con = sc))
   hive <- hive_context(sc)
