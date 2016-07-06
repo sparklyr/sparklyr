@@ -69,7 +69,7 @@ sdf_import.default <- function(x, sc, ...,
   path <- normalizePath(tempfile, winslash = "/", mustWork = TRUE)
   
   # generate the Spark CSV reader
-  ctx <- spark_get_sql_context(sc)
+  ctx <- hive_context(sc)
   reader <- invoke(ctx, "read")
   
   # construct schema
