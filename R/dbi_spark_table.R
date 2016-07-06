@@ -5,11 +5,11 @@ setMethod("dbWriteTable", "spark_connection",
       stop("Writting to non-temporary tables is not supported yet")
     }
     
-    if (!spark_connection_is_local(conn@scon) && identical(local_file, TRUE)) {
+    if (!spark_connection_is_local(conn) && identical(local_file, TRUE)) {
       stop("Using a local file to copy data is not supported for remote clusters")
     }
     
-    local_file <- if (is.null(local_file)) spark_connection_is_local(conn@scon) else local_file
+    local_file <- if (is.null(local_file)) spark_connection_is_local(conn) else local_file
 
     found <- dbExistsTable(conn, name)
     if (found) {

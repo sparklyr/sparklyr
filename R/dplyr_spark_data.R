@@ -35,7 +35,8 @@ spark_source_from_ops <- function(x) {
 
 spark_sqlresult_from_dplyr <- function(x) {
   sparkSource <- spark_source_from_ops(x)
-
+  sc <- spark_connection(sparkSource)
+  
   sql <- dplyr::sql_render(x)
-  sqlResult <- invoke(hive_context(sparkSource$con), "sql", as.character(sql))
+  sqlResult <- invoke(hive_context(sc), "sql", as.character(sql))
 }

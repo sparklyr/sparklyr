@@ -11,7 +11,7 @@ collect.tbl_spark <- function(x, ..., n = Inf) {
     limit <- n
   }
 
-  con <- x$src$con
+  con <- spark_connection(x)
 
   if (n == -1) {
     sql <- sql_render(

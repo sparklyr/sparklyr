@@ -10,18 +10,13 @@ spark_connection.src_spark <- function(x, ...) {
   x$con
 }
 
-
 #' @export
 src_desc.src_spark <- function(x) {
-  scon <- src_context(x)
+  sc <- spark_connection(x)
   paste("spark connection",
-        paste("master", scon$master, sep = "="),
-        paste("app", scon$app_name, sep = "="),
-        paste("local", spark_connection_is_local(scon), sep = "="))
-}
-
-src_context <- function(db) {
-  db$con@scon
+        paste("master", sc$master, sep = "="),
+        paste("app", sc$app_name, sep = "="),
+        paste("local", spark_connection_is_local(sc), sep = "="))
 }
 
 #' @export
@@ -134,7 +129,7 @@ print.src_spark <- function(x, ...) {
   cat(src_desc(x))
   cat("\n\n")
 
-  spark_log(x$con@scon)
+  spark_log(spark_connection(x))
 }
 
 #' @export

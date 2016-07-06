@@ -2,7 +2,7 @@
 # DBISparkConnection and methods.
 
 setMethod("dbGetInfo", "spark_connection", function(dbObj, ...) {
-  dbObj$con@scon
+  dbObj
 })
 
 setMethod("show", "spark_connection", function(object) {
