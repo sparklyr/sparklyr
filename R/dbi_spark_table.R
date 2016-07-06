@@ -31,8 +31,7 @@ setMethod("dbReadTable", c("spark_connection", "character"),
 
 
 setMethod("dbListTables", "spark_connection", function(conn) {
-  sqlResult <- invoke(hive_context(conn), "sql", "SHOW TABLES")
-  df <- spark_api_data_frame(conn, sqlResult)
+  df <- sdf_from_sql(conn, "SHOW TABLES")
   
   tableNames <- df$tableName
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)

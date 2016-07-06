@@ -1,23 +1,23 @@
 
-spark_api_schema <- function(sqlResult) {
+sdf_sql_schema <- function(sqlResult) {
   invoke(
     sqlResult,
     "schema"
   )
 }
 
-spark_api_object_method <- function(object, property) {
+sdf_sql_object_method <- function(object, property) {
   invoke(
     object,
     property
   )
 }
 
-spark_api_field <- function(field) {
-  name <- spark_api_object_method(field, "name")
-  dataType <- spark_api_object_method(field, "dataType")
-  longType <- spark_api_object_method(dataType, "toString")
-  shortType <- spark_api_object_method(dataType, "simpleString")
+sdf_sql_field <- function(field) {
+  name <- sdf_sql_object_method(field, "name")
+  dataType <- sdf_sql_object_method(field, "dataType")
+  longType <- sdf_sql_object_method(dataType, "toString")
+  shortType <- sdf_sql_object_method(dataType, "simpleString")
 
   list(
     name = name,
@@ -26,20 +26,20 @@ spark_api_field <- function(field) {
   )
 }
 
-spark_api_schema_fields <- function(schemaResult) {
+sdf_sql_schema_fields <- function(schemaResult) {
   lapply(
     invoke(
       schemaResult,
       "fields"
     ),
     function (field) {
-      spark_api_field(field)
+      sdf_sql_field(field)
     }
   )
 }
 
 # See https://github.com/apache/spark/tree/branch-1.6/sql/catalyst/src/main/scala/org/apache/spark/sql/types
-spark_api_data_frame_default_type <- function(field) {
+sdf_sql_default_type <- function(field) {
   switch(field$shortType,
          tinyint = integer(),
          bigint = integer(),
@@ -51,7 +51,7 @@ spark_api_data_frame_default_type <- function(field) {
 }
 
 # Retrives a typed column for the given dataframe
-spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
+sdf_sql_columns_typed <- function(col, stringData, fields, rows) {
   shortType <- fields[[col]]$shortType
 
   result <- lapply(seq_len(rows), function(row) {
@@ -72,9 +72,11 @@ spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
   if (!shortType %in% c("vector")) unlist(result) else result
 }
 
-spark_api_data_frame <- function(sc, sqlResult) {
-  schema <- spark_api_schema(sqlResult)
-  fields <- spark_api_schema_fields(schema)
+sdf_from_sql <- function(sc, sql) {
+  sqlResult <- invoke(hive_context(conn), "sql", as.character(sql))
+  
+  schema <- sdf_sql_schema(sqlResult)
+  fields <- sdf_sql_schema_fields(schema)
 
   df <- invoke_static(
     sc,
@@ -95,7 +97,7 @@ spark_api_data_frame <- function(sc, sqlResult) {
     dfNames <- Filter(function(e) nchar(e) > 0, dfNames)
     
     dfEmpty <- lapply(fields, function(field) {
-      spark_api_data_frame_default_type(field)
+      sdf_sql_default_type(field)
     })
     names(dfEmpty) <- dfNames
     
@@ -106,7 +108,7 @@ spark_api_data_frame <- function(sc, sqlResult) {
     df <- as.data.frame(seq_len(rows))
     
     lapply(seq_along(fields), function(col) {
-      df[[dfNames[[col]]]] <<- spark_api_data_frame_columns_typed(
+      df[[dfNames[[col]]]] <<- sdf_sql_columns_typed(
         col,
         stringData,
         fields,
