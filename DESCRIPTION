@@ -24,6 +24,7 @@ Collate:
     'connection_instances.R'
     'connection_viewer.R'
     'connection_windows.R'
+    'data_copy.R'
     'data_csv.R'
     'data_interface.R'
     'dbi_spark_connection.R'

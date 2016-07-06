@@ -17,3 +17,29 @@ spark_api_sql_query <- function(sc, query) {
   sqlResult <- spark_api_sql(sc, as.character(query))
   spark_api_data_frame(sc, sqlResult)
 }
+
+
+spark_register_temp_table <- function(table, name) {
+  invoke(table, "registerTempTable", name)
+}
+
+spark_drop_temp_table <- function(sc, name) {
+  hive <- hive_context(sc)
+  if (is_spark_v2(sc)) {
+    context <- invoke(context, "wrapped")
+  }
+  
+  invoke(context, "dropTempTable", name)
+}
+
+spark_print_schema <- function(sc, tableName) {
+  result <- spark_api_sql(
+    sc,
+    paste("SELECT * FROM", tableName, "LIMIT 1")
+  )
+  
+  invoke(
+    result,
+    "printSchema"
+  )
+}
