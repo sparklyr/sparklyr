@@ -110,15 +110,10 @@ spark_connect <- function(master,
     # add sparklyr_connection class to object (reflects inclusion of db fields)
     class(scon) <- c("sparklyr_connection", class(scon))
     
-    # attach hive_context or sql_context as a fallback
-    scon$hive_context <- spark_api_create_hive_context(scon)
-    if (is.null(scon$hive_context)) {
-      warning("Failed to create Hive context, falling back to SQL. Some operations, ",
-              "like window-funcitons, will not work")
-      scon$sql_context <- spark_api_create_sql_context(scon)
-      if (is.null(scon$sql_context))
-        stop("Failed to create SQL context")
-    }
+    # assign connection to spark_context / hive_context (so it carries the
+    # sparklyr_connection class)
+    scon$spark_context$connection <- scon
+    scon$hive_context$connection <- scon
     
     # create dbi interface
     api <- spark_api_create(scon)
@@ -128,19 +123,10 @@ spark_connect <- function(master,
       dbSetProperty(scon$dbi, paramName, as.character(params[[paramName]]))
     })
     
-    # update spark_context connection with fields we've added
-    scon$spark_context$connection$hive_context <- scon$hive_context
+    # update spark_context and hive_context connections with dbi field
     scon$spark_context$connection$dbi <- scon$dbi
+    scon$hive_context$connection$dbi <- scon$dbi
    
-    # update hive_context / sql_context with fields we've added
-    if (!is.null(scon$hive_context)) {
-      scon$hive_context$connection$hive_context <- scon$hive_context
-      scon$hive_context$connection$dbi <- scon$dbi
-    } else {
-      scon$sql_context$connection$sql_context <- scon$sql_context
-      scon$sql_context$connection$dbi <- scon$dbi
-    }
-    
     # notify connection viewer of connection
     libs <- "library(sparklyr)"
     if ("package:dplyr" %in% search())

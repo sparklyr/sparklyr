@@ -68,7 +68,7 @@ Imports:
     lazyeval (>= 0.2.0),
     dplyr (>= 0.5.0),
     DBI (>= 0.4.1),
-    sparkapi (>= 0.3.1),
+    sparkapi (>= 0.3.2),
     readr (>= 0.2.0),
     digest,
     config,
