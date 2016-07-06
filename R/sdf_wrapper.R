@@ -14,7 +14,7 @@ spark_dataframe.spark_connection <- function(x, sql = NULL, ...) {
   invoke(hive_context(x), "sql", as.character(sql))
 }
 
-spark_dataframe_schema <- function(object) {
+sdf_schema <- function(object) {
   jobj <- spark_dataframe(object)
   schema <- invoke(jobj, "schema")
   fields <- invoke(schema, "fields")
@@ -27,9 +27,9 @@ spark_dataframe_schema <- function(object) {
   list
 }
 
-spark_dataframe_read_column <- function(object, colName) {
+sdf_read_column <- function(object, colName) {
   jobj <- spark_dataframe(object)
-  schema <- spark_dataframe_schema(jobj)
+  schema <- sdf_schema(jobj)
   colType <- schema[[colName]]$type
 
   method <- if (colType == "DoubleType")
@@ -69,12 +69,12 @@ spark_dataframe_read_column <- function(object, colName) {
 }
 
 # Read a Spark Dataset into R.
-spark_dataframe_collect <- function(object) {
+sdf_collect <- function(object) {
   jobj <- spark_dataframe(object)
-  schema <- spark_dataframe_schema(jobj)
+  schema <- sdf_schema(jobj)
   colNames <- as.character(invoke(jobj, "columns"))
   colValues <- lapply(schema, function(colInfo) {
-    spark_dataframe_read_column(jobj, colInfo$name)
+    sdf_read_column(jobj, colInfo$name)
   })
 
   df <- lapply(colValues, unlist, recursive = FALSE)
@@ -83,9 +83,9 @@ spark_dataframe_collect <- function(object) {
 }
 
 # Split a Spark DataFrame
-spark_dataframe_split <- function(object,
-                                  weights = c(0.5, 0.5),
-                                  seed = sample(.Machine$integer.max, 1))
+sdf_split <- function(object,
+                      weights = c(0.5, 0.5),
+                      seed = sample(.Machine$integer.max, 1))
 {
   jobj <- spark_dataframe(object)
   invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))

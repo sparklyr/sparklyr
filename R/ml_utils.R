@@ -13,7 +13,7 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
                                  envir = new.env(parent = emptyenv()))
 {
   df <- spark_dataframe(df)
-  schema <- spark_dataframe_schema(df)
+  schema <- sdf_schema(df)
 
   # default report for feature, response variable names
   envir$features <- random_string("features")
@@ -51,7 +51,7 @@ try_null <- function(expr) {
 predict.ml_model <- function(object, newdata, ...) {
   params <- object$model.parameters
   predicted <- sdf_predict(object, newdata, ...)
-  column <- spark_dataframe_read_column(predicted, "prediction")
+  column <- sdf_read_column(predicted, "prediction")
   if (is.character(params$labels) && is.numeric(column))
     column <- params$labels[column + 1]
   column
@@ -62,7 +62,7 @@ fitted.ml_model <- function(object, ...) {
   object$.model %>%
     invoke("summary") %>%
     invoke("predictions") %>%
-    spark_dataframe_read_column("prediction")
+    sdf_read_column("prediction")
 }
 
 #' @export
@@ -70,7 +70,7 @@ residuals.ml_model <- function(object, ...) {
   object$.model %>%
     invoke("summary") %>%
     invoke("residuals") %>%
-    spark_dataframe_read_column("residuals")
+    sdf_read_column("residuals")
 }
 
 reorder_first <- function(vector, name) {

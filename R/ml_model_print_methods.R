@@ -32,11 +32,11 @@ ml_model_print_residuals <- function(model) {
     fraction <- limit / count
     residuals %>%
       invoke("sample", FALSE, fraction) %>%
-      spark_dataframe_read_column("residuals") %>%
+      sdf_read_column("residuals") %>%
       quantile()
   } else {
     residuals %>%
-      spark_dataframe_read_column("residuals") %>%
+      sdf_read_column("residuals") %>%
       quantile()
   }
   names(values) <- c("Min", "1Q", "Median", "3Q", "Max")

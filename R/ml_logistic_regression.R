@@ -60,7 +60,7 @@ ml_logistic_regression <- function(x,
 
   summary <- invoke(fit, "summary")
   areaUnderROC <- invoke(summary, "areaUnderROC")
-  roc <- spark_dataframe_collect(invoke(summary, "roc"))
+  roc <- sdf_collect(invoke(summary, "roc"))
   
   coefficients <- intercept_first(coefficients)
 

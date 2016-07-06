@@ -42,7 +42,7 @@ ml_decision_tree <- function(x,
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
   
   # choose classification vs. regression model based on column type
-  schema <- spark_dataframe_schema(df)
+  schema <- sdf_schema(df)
   responseType <- schema[[response]]$type
   
   regressor  <- "org.apache.spark.ml.regression.DecisionTreeRegressor"

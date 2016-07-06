@@ -37,7 +37,7 @@ collect.tbl_spark <- function(x, ..., n = Inf) {
 
 #' @export
 collect.spark_jobj <- function(x, ...) {
-  spark_dataframe_collect(x)
+  sdf_collect(x)
 }
 
 #' @export

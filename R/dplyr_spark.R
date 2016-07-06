@@ -44,7 +44,7 @@ tbl.spark_connection <- function(src, from, ...) {
 src_tbls.spark_connection <- function(x, ...) {
   sql <- hive_context(x)
   tbls <- invoke(sql, "sql", "SHOW TABLES")
-  tableNames <- spark_dataframe_read_column(tbls, "tableName")
+  tableNames <- sdf_read_column(tbls, "tableName")
   
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
   sort(filtered)

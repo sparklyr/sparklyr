@@ -214,7 +214,7 @@ sdf_partition <- function(x,
   nm <- names(weights)
   if (is.null(nm) || any(!nzchar(nm)))
     stop("all weights must be named")
-  partitions <- spark_dataframe_split(sdf, as.numeric(weights), seed = seed)
+  partitions <- sdf_split(sdf, as.numeric(weights), seed = seed)
   registered <- sdf_register(partitions)
   names(registered) <- nm
   registered
