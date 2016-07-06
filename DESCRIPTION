@@ -26,7 +26,6 @@ Collate:
     'connection_instances.R'
     'connection_viewer.R'
     'connection_windows.R'
-    'dataframe_spark.R'
     'dbi_spark_connection.R'
     'dbi_spark_query.R'
     'dbi_spark_result.R'
@@ -57,6 +56,7 @@ Collate:
     'ml_utils.R'
     'reexports.R'
     'sdf_interface.R'
+    'sdf_wrapper.R'
     'utils.R'
 Depends:
     R (>= 3.1.2)
