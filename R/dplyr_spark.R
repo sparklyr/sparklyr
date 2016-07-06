@@ -102,7 +102,7 @@ copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
   if (name %in% src_tbls(sc))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  dbWriteTable(sc$dbi, name, df, TRUE, repartition, local_file)
+  dbWriteTable(sc, name, df, TRUE, repartition, local_file)
 
   if (memory) {
     tbl_cache(sc, name)
@@ -123,12 +123,10 @@ copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
 #' 
 #' @export
 tbl_cache <- function(sc, name, force = TRUE) {
-  dbiCon <- sc$dbi
-
-  dbGetQuery(dbiCon, paste("CACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))
+  dbGetQuery(sc, paste("CACHE TABLE", dplyr::escape(ident(name), con = sc)))
 
   if (force) {
-    dbGetQuery(dbiCon, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = dbiCon)))
+    dbGetQuery(sc, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = sc)))
   }
 }
 
@@ -141,8 +139,7 @@ tbl_cache <- function(sc, name, force = TRUE) {
 #' 
 #' @export
 tbl_uncache <- function(sc, name) {
-  dbiCon <- sc$dbi
-  dbGetQuery(dbiCon, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = dbiCon)))
+  dbGetQuery(sc, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = sc)))
 }
 
 #' @export

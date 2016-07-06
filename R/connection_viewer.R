@@ -57,7 +57,7 @@ on_connection_updated <- function(scon, hint) {
 }
 
 connection_list_tables <- function(sc) {
-  dbi <- spark_connection_get_dbi(sc)
+  dbi <- sc
   if (!is.null(dbi))
     sort(dbListTables(dbi))
   else
@@ -66,7 +66,7 @@ connection_list_tables <- function(sc) {
 
 #' @importFrom utils capture.output str 
 connection_list_columns <- function(sc, table) {
-  dbi <- spark_connection_get_dbi(sc)
+  dbi <- sc
   if (!is.null(dbi)) {
     sql <- paste("SELECT * FROM", table, "LIMIT 5")
     df <- dbGetQuery(dbi, sql)
@@ -86,7 +86,7 @@ connection_list_columns <- function(sc, table) {
 }
 
 connection_preview_table <- function(sc, table, limit) {
-  dbi <- spark_connection_get_dbi(sc)
+  dbi <- sc
   if (!is.null(dbi)) {
     sql <- paste("SELECT * FROM", table, "LIMIT", limit)
     dbGetQuery(dbi, sql)
@@ -94,11 +94,6 @@ connection_preview_table <- function(sc, table, limit) {
     NULL
   }
 }
-
-spark_connection_get_dbi <- function(scon) {
-  scon$dbi
-}
-
 # function to convert master to host
 to_host <- function(master) {
   gsub("local\\[(\\d+|\\*)\\]", "local", master)
