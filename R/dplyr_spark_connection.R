@@ -85,7 +85,7 @@ sql_select.DBISparkConnection <- function(con, select, from, where = NULL,
 sql_join.DBISparkConnection <- function(con, x, y, type = "inner", by = NULL, ...) {
   # TODO: This function needs to be removed once dplyr can workaround this issue by avoiding USING statements.
   
-  sparkVersion <- spark_connection_version(con@scon, onlyVersion = TRUE)
+  sparkVersion <- spark_version(con@scon)
   
   if (compareVersion(sparkVersion, "2.0.0") < 0) {
     sameNameColumns <- length(Filter(function(e) by$x[[e]] == by$y[[e]], seq_len(length(by$x))))

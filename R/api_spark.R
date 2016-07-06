@@ -28,14 +28,7 @@ spark_api_create_sql_context <- function(scon) {
 }
 
 is_spark_v2 <- function(scon) {
-  sparkVersion <- spark_connection_version(scon)
-  if (!is.null(sparkVersion)) {
-    version <- sub("-preview", "", sparkVersion)
-    compared <- utils::compareVersion(version, "2.0.0")
-    compared != -1
-  } else {
-    FALSE
-  }
+  spark_version(scon) >= "2.0.0"
 }
 
 spark_api_create_hive_context <- function(scon) {

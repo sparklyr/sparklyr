@@ -246,14 +246,6 @@ spark_connection_local_cores <- function(sc) {
   sc$config[["sparklyr.cores"]]
 }
 
-
-spark_connection_version <- function(sc, onlyVersion = FALSE) {
-  rawVersion <- invoke(spark_context(sc), "version")
-
-  # Get rid of -preview and other suffix variations if needed
-  if (onlyVersion) gsub("([0-9]+\\.?)[^0-9\\.](.*)","\\1", rawVersion) else rawVersion
-}
-
 #' Close all existing connections
 #'
 #' @family Spark connections
