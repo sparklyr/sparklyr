@@ -118,7 +118,7 @@ Here's an example where we use [ml_linear_regression](http://spark.rstudio.com/r
 
 ```{r}
 # copy mtcars into spark
-mtcars_tbl <- copy_to(sc, mtcars, overwrite = TRUE)
+mtcars_tbl <- copy_to(sc, mtcars)
 
 # transform our data set, and then partition into 'training', 'test'
 partitions <- mtcars_tbl %>%
