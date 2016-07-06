@@ -73,7 +73,7 @@ sdf_sql_columns_typed <- function(col, stringData, fields, rows) {
 }
 
 sdf_from_sql <- function(sc, sql) {
-  sqlResult <- invoke(hive_context(conn), "sql", as.character(sql))
+  sqlResult <- invoke(hive_context(sc), "sql", as.character(sql))
   
   schema <- sdf_sql_schema(sqlResult)
   fields <- sdf_sql_schema_fields(schema)
