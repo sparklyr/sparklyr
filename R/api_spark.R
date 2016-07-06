@@ -83,7 +83,7 @@ spark_api_data_frame_default_type <- function(field) {
 spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
   shortType <- fields[[col]]$shortType
 
-  unlist(lapply(seq_len(rows), function(row) {
+  result <- lapply(seq_len(rows), function(row) {
     raw <- stringData[[(col - 1) * rows + row]]
 
     switch(shortType,
@@ -94,8 +94,11 @@ spark_api_data_frame_columns_typed <- function(col, stringData, fields, rows) {
            double = as.double(raw),
            int = as.integer(raw),
            boolean = as.logical(raw),
+           vector = invoke(raw, "toArray"),
            raw)
-  }))
+  })
+  
+  if (!shortType %in% c("vector")) unlist(result) else result
 }
 
 spark_api_data_frame <- function(api, sqlResult) {
@@ -129,14 +132,17 @@ spark_api_data_frame <- function(api, sqlResult) {
   }
   else {
     stringData <- unlist(df)
-    columns <- lapply(seq_along(fields),
-                      spark_api_data_frame_columns_typed,
-                      stringData,
-                      fields,
-                      rows)
-    names(columns) <- dfNames
-
-    df <- data.frame(columns, stringsAsFactors=FALSE)
+    df <- as.data.frame(seq_len(rows))
+    
+    lapply(seq_along(fields), function(col) {
+      df[[dfNames[[col]]]] <<- spark_api_data_frame_columns_typed(
+        col,
+        stringData,
+        fields,
+        rows)
+    })
+    
+    df[[1]] <- NULL
   }
 
   df
