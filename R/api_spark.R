@@ -1,18 +1,4 @@
 
-is_spark_v2 <- function(scon) {
-  spark_version(scon) >= "2.0.0"
-}
-
-spark_api_sql <- function(sc, sql) {
-  result <- invoke(
-    hive_context(sc),
-    "sql",
-    sql
-  )
-
-  result
-}
-
 spark_api_schema <- function(sqlResult) {
   invoke(
     sqlResult,
@@ -246,23 +232,4 @@ spark_api_write_generic <- function(df, path, fileMethod, mode = NULL, csvOption
   
   invoke(options, fileMethod, path)
   invisible(TRUE)
-}
-
-
-spark_inspect <- function(jobj) {
-  print(jobj)
-  if (!connection_is_open(spark_connection(jobj)))
-    return(jobj)
-
-  class <- invoke(jobj, "getClass")
-
-  cat("Fields:\n")
-  fields <- invoke(class, "getDeclaredFields")
-  lapply(fields, function(field) { print(field) })
-
-  cat("Methods:\n")
-  methods <- invoke(class, "getDeclaredMethods")
-  lapply(methods, function(method) { print(method) })
-
-  jobj
 }

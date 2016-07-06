@@ -48,3 +48,6 @@ random_string <- function(prefix = "table") {
 # place for us to store state
 .globals <- new.env(parent = emptyenv())
 
+is_spark_v2 <- function(scon) {
+  spark_version(scon) >= "2.0.0"
+}

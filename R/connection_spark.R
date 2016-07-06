@@ -229,3 +229,22 @@ spark_disconnect_all <- function() {
     spark_disconnect(e)
   }))
 }
+
+spark_inspect <- function(jobj) {
+  print(jobj)
+  if (!connection_is_open(spark_connection(jobj)))
+    return(jobj)
+  
+  class <- invoke(jobj, "getClass")
+  
+  cat("Fields:\n")
+  fields <- invoke(class, "getDeclaredFields")
+  lapply(fields, function(field) { print(field) })
+  
+  cat("Methods:\n")
+  methods <- invoke(class, "getDeclaredMethods")
+  lapply(methods, function(method) { print(method) })
+  
+  jobj
+}
+
