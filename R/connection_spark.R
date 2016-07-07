@@ -202,6 +202,11 @@ spark_disconnect <- function(sc) {
   on_connection_closed(sc)
 }
 
+# get the spark_web url (used by IDE)
+spark_web <- function(sc) {
+  sparkapi::spark_web(sc)
+}
+
 
 # Get the path to a temp file containing the current spark log (used by IDE)
 spark_log_file <- function(sc) {
@@ -212,7 +217,7 @@ spark_log_file <- function(sc) {
   
   lines <- spark_log(sc, n = NULL)
   tempLog <- tempfile(pattern = "spark", fileext = ".log")
-  writeLines(tempLog)
+  writeLines(lines, tempLog)
   
   tempLog
 }
