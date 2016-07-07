@@ -102,8 +102,17 @@ spark_connect <- function(master,
     config_sc <- list(config = config, master = master)
     shell_args <- connection_config(config_sc, "sparklyr.shell.")
 
-    # create connection
+    # set SPARK_HOME (also save and restore previous value)
+    oldSparkHome <- Sys.getenv("SPARK_HOME", unset = NA)
+    on.exit({
+      if (!is.na(oldSparkHome))
+        Sys.setenv(SPARK_HOME = oldSparkHome)
+      else
+        Sys.unsetenv("SPARK_HOME")
+    }, add = TRUE)
     Sys.setenv(SPARK_HOME = sparkHome)
+    
+    # start shell
     scon <- sparkapi::start_shell(
       master = master,
       app_name = app_name,
