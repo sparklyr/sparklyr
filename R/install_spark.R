@@ -167,8 +167,10 @@ spark_install <- function(version = NULL,
     tryCatch({
       spark_conf_file_set_value(
         installInfo,
-        "log4j.rootCategory",
-        paste(logging, "console", sep = ", "),
+        list(
+          "log4j.rootCategory" = paste("log4j.rootCategory=", logging, "console", sep = ", "),
+          "log4j.appender.console" = "log4j.appender.console=org.apache.log4j.FileAppender",
+          "log4j.appender.console.target" = "log4j.appender.console.file=spark.log"),
         reset)
     }, error = function(e) {
       warning("Failed to set logging settings")
@@ -227,7 +229,7 @@ spark_install_tar <- function(tarfile) {
   untar(tarfile = tarfile, exdir = spark_install_dir())
 }
 
-spark_conf_file_set_value <- function(installInfo, property, value, reset) {
+spark_conf_file_set_value <- function(installInfo, properties, reset) {
   log4jPropertiesPath <- file.path(installInfo$sparkConfDir, "log4j.properties")
   if (!file.exists(log4jPropertiesPath) || reset) {
     log4jTemplatePath <- file.path(installInfo$sparkConfDir, "log4j.properties.template")
@@ -237,8 +239,11 @@ spark_conf_file_set_value <- function(installInfo, property, value, reset) {
   log4jPropertiesFile <- file(log4jPropertiesPath)
   lines <- readLines(log4jPropertiesFile)
 
-  lines <- gsub(paste(property, ".*", sep = ""), paste(property, value, sep = "="), lines, perl = TRUE)
-
+  lapply(names(properties), function(property) {
+    value <- properties[[property]]
+    lines <<- gsub(paste(property, "=.*", sep = ""), value, lines, perl = TRUE)
+  })
+  
   writeLines(lines, log4jPropertiesFile)
   close(log4jPropertiesFile)
 }

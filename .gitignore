@@ -30,4 +30,5 @@ spark-warehouse
 docs/*.parquet
 .DS_Store
 demo.R
-
+# Spark log
+spark.log

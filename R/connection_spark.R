@@ -162,7 +162,25 @@ spark_connect <- function(master,
 #' @rdname spark_log
 #' 
 #' @export
-sparkapi::spark_log
+spark_log.spark_connection <- function(sc, n = 100, ...) {
+  log <- file("spark.log")
+  lines <- readLines(log)
+  close(log)
+  
+  if (!is.null(n))
+    linesLog <- utils::tail(lines, n = n)
+  else
+    linesLog <- lines
+  attr(linesLog, "class") <- "sparklyr_log"
+  
+  linesLog
+}
+
+#' @export
+print.sparklyr_log <- function(x, ...) {
+  cat(x, sep = "\n")
+  cat("\n")
+}
 
 #' @docType NULL
 #' @name spark_web
