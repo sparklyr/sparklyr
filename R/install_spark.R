@@ -101,7 +101,7 @@ spark_home <- function() {
 #' 
 #' @param version Version of Spark to install. See \code{spark_available_versions} for a list of supported versions
 #' @param hadoop_version Version of Hadoop to install. See \code{spark_available_versions} for a list of supported versions
-#' @param reset Attempts to reset settings to defaults
+#' @param reset Attempts to reset settings to defaults.
 #' @param logging Logging level to configure install. Supported options: "WARN", "INFO"
 #' @param verbose Report information as Spark is downloaded / installed
 #' @param tarfile Path to TAR file conforming to the pattern spark-###-bin-(hadoop)?### where ###
@@ -112,7 +112,7 @@ spark_home <- function() {
 #' @export
 spark_install <- function(version = NULL,
                           hadoop_version = NULL,
-                          reset = FALSE,
+                          reset = TRUE,
                           logging = "INFO",
                           verbose = interactive())
 {
@@ -168,9 +168,11 @@ spark_install <- function(version = NULL,
       spark_conf_file_set_value(
         installInfo,
         list(
-          "log4j.rootCategory" = paste("log4j.rootCategory=", logging, "console", sep = ", "),
-          "log4j.appender.console" = "log4j.appender.console=org.apache.log4j.FileAppender",
-          "log4j.appender.console.target" = "log4j.appender.console.file=spark.log"),
+          "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
+          "log4j.appender.localfile" = "log4j.appender.localfile=org.apache.log4j.DailyRollingFileAppender",
+          "log4j.appender.localfile.file" = "log4j.appender.localfile.file=log4j.spark.log",
+          "log4j.appender.localfile.layout" = "log4j.appender.localfile.layout=org.apache.log4j.PatternLayout",
+          "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"),
         reset)
     }, error = function(e) {
       warning("Failed to set logging settings")
@@ -238,10 +240,20 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
 
   log4jPropertiesFile <- file(log4jPropertiesPath)
   lines <- readLines(log4jPropertiesFile)
-
+  
+  lines[[length(lines) + 1]] <- ""
+  lines[[length(lines) + 1]] <- "# Other settings"
+  
   lapply(names(properties), function(property) {
     value <- properties[[property]]
-    lines <<- gsub(paste(property, "=.*", sep = ""), value, lines, perl = TRUE)
+    pattern <- paste(property, "=.*", sep = "")
+    
+    if (length(grep(pattern, lines)) > 0) {
+      lines <<- gsub(pattern, value, lines, perl = TRUE)
+    }
+    else {
+      lines[[length(lines) + 1]] <<- value
+    }
   })
   
   writeLines(lines, log4jPropertiesFile)

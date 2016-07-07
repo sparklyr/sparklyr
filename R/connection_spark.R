@@ -163,17 +163,23 @@ spark_connect <- function(master,
 #' 
 #' @export
 spark_log.spark_connection <- function(sc, n = 100, ...) {
-  log <- file("spark.log")
-  lines <- readLines(log)
-  close(log)
-  
-  if (!is.null(n))
-    linesLog <- utils::tail(lines, n = n)
-  else
-    linesLog <- lines
-  attr(linesLog, "class") <- "sparklyr_log"
-  
-  linesLog
+  if (.Platform$OS.type == "windows") {
+    log <- file("log4j.spark.log")
+    lines <- readLines(log, warn = FALSE)
+    close(log)
+    
+    if (!is.null(n))
+      linesLog <- utils::tail(lines, n = n)
+    else
+      linesLog <- lines
+    attr(linesLog, "class") <- "sparklyr_log"
+    
+    linesLog
+  }
+  else {
+    class(sc) <- "spark_shell_connection"
+    sparkapi::spark_log(sc, n, ...)
+  }
 }
 
 #' @export

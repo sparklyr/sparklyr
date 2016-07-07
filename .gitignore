@@ -31,4 +31,4 @@ docs/*.parquet
 .DS_Store
 demo.R
 # Spark log
-spark.log
+log4j.spark.log
