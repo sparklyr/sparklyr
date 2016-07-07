@@ -84,7 +84,7 @@ spark_connect <- function(master,
   
   # if no SPARK_HOME and local then resolve from local installs
   if (is.null(sparkHome) && spark_master_is_local(master)) {
-    installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
+    installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
     sparkHome <- installInfo$sparkVersionDir  
   }
   
