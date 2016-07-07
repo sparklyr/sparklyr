@@ -55,15 +55,11 @@ spark_connect <- function(master,
 
   filter <- function(e) {
     connection_is_open(e) &&
-    identical(e$master, master) &&
-    identical(e$app_name, app_name)
+    identical(e$master, master)
   }
 
   sconFound <- spark_connection_find_scon(filter)
   if (length(sconFound) == 1) {
-    message("Reusing existing connection to: ",
-            master,
-            ". If you need a new connection to this cluster use a different app_name.")
     return(sconFound[[1]])
   }
 
