@@ -81,8 +81,8 @@ prepare_response_features_intercept <- function(response,
   intercept <- ensure_scalar_boolean(intercept)
   
   # mutate in environment
-  assign("response", parsed$response, envir = envir)
-  assign("features", parsed$features, envir = envir)
-  assign("intercept", parsed$intercept, envir = envir)
+  assign("response", response, envir = envir)
+  assign("features", features, envir = envir)
+  assign("intercept", intercept, envir = envir)
   
 }
