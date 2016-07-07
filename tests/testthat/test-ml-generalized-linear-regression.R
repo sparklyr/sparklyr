@@ -1,7 +1,8 @@
-context("generalized linear regression")
+context("GLM")
 
 test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits", {
   skip_on_cran()
+  skip("Requires Spark 2.0.0")
   
   sc <- tryCatch(
     spark_connect("local", version = "2.0.0-preview"),
