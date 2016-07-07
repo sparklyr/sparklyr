@@ -9,7 +9,7 @@
 \alias{spark_uninstall}
 \title{Download and install various versions of Spark}
 \usage{
-spark_install(version = NULL, hadoop_version = NULL, reset = FALSE,
+spark_install(version = NULL, hadoop_version = NULL, reset = TRUE,
   logging = "INFO", verbose = interactive())
 
 spark_uninstall(version, hadoop_version)
@@ -27,7 +27,7 @@ spark_available_versions()
 
 \item{hadoop_version}{Version of Hadoop to install. See \code{spark_available_versions} for a list of supported versions}
 
-\item{reset}{Attempts to reset settings to defaults}
+\item{reset}{Attempts to reset settings to defaults.}
 
 \item{logging}{Logging level to configure install. Supported options: "WARN", "INFO"}
 

@@ -162,6 +162,9 @@ spark_connect <- function(master,
 #' @rdname spark_log
 #' 
 #' @export
+sparkapi::spark_log
+
+#' @export
 spark_log.spark_connection <- function(sc, n = 100, ...) {
   if (.Platform$OS.type == "windows") {
     log <- file("log4j.spark.log")

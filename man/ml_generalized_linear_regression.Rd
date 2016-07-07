@@ -23,7 +23,8 @@ passed in to calls to \R's own \code{glm}.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Perform generalized linear regression on a Spark DataFrame.
+Perform generalized linear regression on a Spark DataFrame. Only available
+with Spark 2.0.0 and above.
 }
 \details{
 In contrast to \code{\link{ml_linear_regression}()} and 
