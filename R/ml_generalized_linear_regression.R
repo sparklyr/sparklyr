@@ -62,6 +62,7 @@ ml_generalized_linear_regression <-
   )
   
   model <- glr %>%
+    invoke("setMaxIter", 100L) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", intercept) %>%

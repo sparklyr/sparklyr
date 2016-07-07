@@ -1,4 +1,4 @@
-context("regression")
+context("linear regression")
 
 expect_coef_equal <- function(lhs, rhs) {
   nm <- names(lhs)
