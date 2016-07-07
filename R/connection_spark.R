@@ -97,6 +97,11 @@ spark_connect <- function(master,
     # have a real connection)
     config_sc <- list(config = config, master = master)
     shell_args <- connection_config(config_sc, "sparklyr.shell.")
+    
+    # flatten shell_args to make them compatible with sparkapi
+    shell_args <- unlist(lapply(names(shell_args), function(name) {
+      list(paste0("--", name), shell_args[[name]])
+    }))
 
     # start shell
     scon <- sparkapi::start_shell(
