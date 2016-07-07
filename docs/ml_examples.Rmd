@@ -1,5 +1,5 @@
 ---
-title: "Spark MLlib: Examples"
+title: "Spark ML: Examples"
 output:
   github_document:
     fig_width: 9

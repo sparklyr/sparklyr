@@ -1,4 +1,4 @@
-Spark MLlib: Examples
+Spark ML: Examples
 ================
 
 Initialization
@@ -250,12 +250,12 @@ fit <- partitions$training %>%
 predict(fit, partitions$test)
 ```
 
-    ##  [1] 1.744571 1.521752 1.521752 1.521752 1.298933 1.521752 2.413029
-    ##  [8] 1.521752 1.967390 1.521752 1.521752 1.521752 1.521752 3.527124
-    ## [15] 3.972763 3.972763 3.749944 5.309678 4.418401 5.086858 4.641220
-    ## [22] 4.418401 4.641220 4.195582 5.086858 3.972763 5.309678 5.086858
-    ## [29] 3.972763 5.532497 5.532497 3.972763 4.195582 6.423773 6.200954
-    ## [36] 4.641220 5.086858
+    ##  [1] 1.743840 1.524058 1.524058 1.524058 3.282310 1.963621 2.183403
+    ##  [8] 1.524058 1.524058 1.524058 3.941654 3.282310 1.524058 4.381216
+    ## [15] 3.721872 3.941654 4.161435 4.161435 3.941654 3.941654 3.721872
+    ## [22] 5.260342 4.600998 4.161435 5.040561 6.139468 4.381216 5.699905
+    ## [29] 5.699905 6.139468 5.699905 4.600998 5.699905 6.139468 6.139468
+    ## [36] 5.919686
 
 Principal Components Analysis in R
 ----------------------------------
@@ -437,6 +437,48 @@ head(mPredict)
 
     ## [1] "setosa"     "setosa"     "setosa"     "setosa"     "setosa"    
     ## [6] "versicolor"
+
+One vs Rest in Spark
+--------------------
+
+``` r
+beaver_tbl <- copy_to(sc, beaver, "beaver", overwrite = TRUE)
+
+classifier <- beaver_tbl %>%
+  mutate(response = as.numeric(activ == "Active")) %>%
+  ml_logistic_regression(response = "response", features = "temp", only_model = TRUE)
+
+model <- beaver_tbl %>%
+  mutate(response = as.numeric(activ == "Active")) %>%
+  ml_one_vs_rest(classifier = classifier, response = "response", features = "temp")
+
+print(model)
+```
+
+    ## $features
+    ## [1] "temp"
+    ## 
+    ## $response
+    ## [1] "response"
+    ## 
+    ## $model.parameters
+    ## $model.parameters$features
+    ## [1] "features13d5b17205ffb"
+    ## 
+    ## $model.parameters$labels
+    ## NULL
+    ## 
+    ## $model.parameters$response
+    ## [1] "response"
+    ## 
+    ## 
+    ## $.model
+    ## <jobj[1031]>
+    ##   class org.apache.spark.ml.classification.OneVsRestModel
+    ##   oneVsRest_ce3d1fa69a1d
+    ## 
+    ## attr(,"class")
+    ## [1] "ml_model_one_vs_rest" "ml_model"
 
 Cleanup
 -------

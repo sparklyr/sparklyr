@@ -1,4 +1,4 @@
-Spark MLlib: Bootstrapping
+Spark ML: Bootstrapping
 ================
 
 In this article, we demonstrate how you might use `sdf_sample`, alongside the `dplyr` interface provided by `sparklyr`, to compute bootstrapped estimates of a statistic. To keep things simple, we'll focus on computation of the mean for the `diamonds` dataset, but this could expand to any other statistic you might want to compute using `sparklyr` and Spark.
@@ -15,18 +15,16 @@ data(diamonds, package = "ggplot2")
 
 sc <- spark_connect(master = "local", version = "1.6.1")
 diamonds_tbl <- copy_to(sc, diamonds, "diamonds", overwrite = TRUE)
-diamonds_sdf <- spark_dataframe(diamonds_tbl)
 ```
 
 Next, we compute our bootstrap estimates of the mean. Note that all of the computational sampling work is occurring on the Spark side; only the computed statistic is returned to the R session on each bootstrap iteration.
 
 ``` r
-n <- 500 # number of bootstrap samples
+n <- 500           # number of bootstrap samples
+name <- "sampled"  # name for temporary sampled table
 estimates <- replicate(n, simplify = "list", {
-  name <- "sampled"
-  diamonds_sdf %>%
+  diamonds_tbl %>%
     sdf_sample(replacement = TRUE) %>%       # take a random sample with replacement
-    sdf_register(name = name) %>%            # register our Spark DataFrame
     summarize(statistic = mean(depth)) %>%   # compute the mean
     collect() %>%                            # collect results back to R
     .[["statistic"]]                         # extract our statistic

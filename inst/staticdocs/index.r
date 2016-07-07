@@ -23,8 +23,8 @@ sd_section("dplyr Interface",
              "tbl_uncache")
 )
 
-sd_section("MLlib Algorithms",
-           "Functions for invoking MLlib algorithms.",
+sd_section("Machine Learning Algorithms.",
+           "Functions for invoking machine learning algorithms.",
            c("ml_kmeans",
              "ml_linear_regression",
              "ml_logistic_regression",
@@ -39,7 +39,7 @@ sd_section("MLlib Algorithms",
              "ml_one_vs_rest")
 )
 
-sd_section("MLlib Feature Transformers",
+sd_section("Machine Learning Transformers",
            "Functions for transforming features in Spark DataFrames",
            c("ft_binarizer",
              "ft_bucketizer",

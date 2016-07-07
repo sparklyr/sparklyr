@@ -7,7 +7,7 @@ sparklyr: R interface for Apache Spark
 
 -   Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
 -   Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
--   Leverage Spark's [MLlib](http://spark.apache.org/docs/latest/mllib-guide.html) (machine learning library) for distributed machine learning from R.
+-   Use Spark's distributed [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) library from R.
 -   Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide <br/> interfaces to Spark packages.
 
 Installation
@@ -72,25 +72,23 @@ To start with here's a simple filtering example:
 flights_tbl %>% filter(dep_delay == 2)
 ```
 
-    ## Source:   query [?? x 19]
+    ## Source:   query [?? x 16]
     ## Database: spark connection master=local[8] app=sparklyr local=TRUE
     ## 
-    ##     year month   day dep_time sched_dep_time dep_delay arr_time
-    ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
-    ## 1   2013     1     1      517            515         2      830
-    ## 2   2013     1     1      542            540         2      923
-    ## 3   2013     1     1      702            700         2     1058
-    ## 4   2013     1     1      715            713         2      911
-    ## 5   2013     1     1      752            750         2     1025
-    ## 6   2013     1     1      917            915         2     1206
-    ## 7   2013     1     1      932            930         2     1219
-    ## 8   2013     1     1     1028           1026         2     1350
-    ## 9   2013     1     1     1042           1040         2     1325
-    ## 10  2013     1     1     1231           1229         2     1523
-    ## # ... with more rows, and 12 more variables: sched_arr_time <int>,
-    ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
-    ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
-    ## #   minute <dbl>, time_hour <dbl>
+    ##     year month   day dep_time dep_delay arr_time arr_delay carrier tailnum
+    ##    <int> <int> <int>    <int>     <dbl>    <int>     <dbl>   <chr>   <chr>
+    ## 1   2013     1     1      517         2      830        11      UA  N14228
+    ## 2   2013     1     1      542         2      923        33      AA  N619AA
+    ## 3   2013     1     1      702         2     1058        44      B6  N779JB
+    ## 4   2013     1     1      715         2      911        21      UA  N841UA
+    ## 5   2013     1     1      752         2     1025        -4      UA  N511UA
+    ## 6   2013     1     1      917         2     1206        -5      B6  N568JB
+    ## 7   2013     1     1      932         2     1219        -6      VX  N641VA
+    ## 8   2013     1     1     1028         2     1350        11      UA  N76508
+    ## 9   2013     1     1     1042         2     1325        -1      B6  N529JB
+    ## 10  2013     1     1     1231         2     1523        -6      UA  N402UA
+    ## # ... with more rows, and 7 more variables: flight <int>, origin <chr>,
+    ## #   dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>
 
 [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
@@ -129,24 +127,24 @@ batting_tbl %>%
     ## 
     ##     playerID yearID teamID     G    AB     R     H
     ##        <chr>  <int>  <chr> <int> <int> <int> <int>
-    ## 1  anderal01   1941    PIT    70   223    32    48
-    ## 2  anderal01   1942    PIT    54   166    24    45
-    ## 3  balesco01   2008    WAS    15    15     1     3
-    ## 4  balesco01   2009    WAS     7     8     0     1
-    ## 5  bandoch01   1986    CLE    92   254    28    68
-    ## 6  bandoch01   1984    CLE    75   220    38    64
-    ## 7  bedelho01   1962    ML1    58   138    15    27
-    ## 8  bedelho01   1968    PHI     9     7     0     1
-    ## 9  biittla01   1977    CHN   138   493    74   147
-    ## 10 biittla01   1975    MON   121   346    34   109
+    ## 1  adamsac01   1943    NY1    70    32     3     4
+    ## 2  adamsac01   1944    NY1    65    29     2     3
+    ## 3  adamsac01   1945    NY1    65    16     2     3
+    ## 4  allisdo01   1874    NY2    65   318    68    90
+    ## 5  allisdo01   1875    HR1    61   269    38    67
+    ## 6  ayraujo01   1996    ATL     7     5     0     1
+    ## 7  backebr01   2008    HOU    32    47     8    13
+    ## 8  backebr01   2005    HOU    28    45     5    10
+    ## 9  bakerfr02   1969    CLE    52   172    21    44
+    ## 10 bakerfr02   1971    CLE    73   181    18    38
     ## # ... with more rows
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
 
-Using MLlib
------------
+Machine Learning
+----------------
 
-You can orchestrate machine learning algorithms in a Spark cluster via the [MLlib](http://spark.apache.org/docs/latest/mllib-guide.html) functions in **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows.
+You can orchestrate machine learning algorithms in a Spark cluster via the [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) functions within **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows.
 
 Here's an example where we use [ml\_linear\_regression](http://spark.rstudio.com/reference/sparklyr/latest/ml_linear_regression.html) to fit a linear regression model. We'll use the built-in `mtcars` dataset, and see if we can predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`). We'll assume in each case that the relationship between `mpg` and each of our features is linear.
 
@@ -171,7 +169,7 @@ fit
     ## 
     ## Coefficients:
     ## (Intercept)          wt         cyl 
-    ##   37.066699   -2.309504   -1.639546
+    ##   33.499452   -2.818463   -0.923187
 
 For linear regression models produced by Spark, we can use `summary()` to learn a bit more about the quality of our fit, and the statistical significance of each of our predictors.
 
@@ -183,21 +181,21 @@ summary(fit)
     ## mpg ~ wt + cyl
     ## 
     ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.6881 -1.0507 -0.4420  0.4757  3.3858 
+    ##    Min     1Q Median     3Q    Max 
+    ## -1.752 -1.134 -0.499  1.296  2.282 
     ## 
     ## Coefficients:
     ##             Estimate Std. Error t value  Pr(>|t|)    
-    ## (Intercept) 37.06670    2.76494 13.4059 2.981e-07 ***
-    ## wt          -2.30950    0.84748 -2.7252   0.02341 *  
-    ## cyl         -1.63955    0.58635 -2.7962   0.02084 *  
+    ## (Intercept) 33.49945    3.62256  9.2475 0.0002485 ***
+    ## wt          -2.81846    0.96619 -2.9171 0.0331257 *  
+    ## cyl         -0.92319    0.54639 -1.6896 0.1518998    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## R-Squared: 0.8665
-    ## Root Mean Squared Error: 1.799
+    ## R-Squared: 0.8274
+    ## Root Mean Squared Error: 1.422
 
-Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [MLlib](mllib.html) section.
+Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [machine learning](mllib.html) section.
 
 Reading and Writing Data
 ------------------------
@@ -227,7 +225,7 @@ src_tbls(sc)
 Extensions
 ----------
 
-The facilities used internally by sparklyr for its dplyr and MLlib interfaces are available to extension packages via the [sparkapi](https://github.com/rstudio/sparkapi) package. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).
+The facilities used internally by sparklyr for its dplyr and machine learning interfaces are available to extension packages via the [sparkapi](https://github.com/rstudio/sparkapi) package. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).
 
 Here's a simple example that wraps a Spark text file line counting function with an R function:
 
@@ -283,16 +281,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 225
-    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 224
-    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 223
-    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 222
-    ## 16/07/06 12:41:30 INFO ContextCleaner: Cleaned accumulator 221
-    ## 16/07/06 12:41:30 INFO Executor: Finished task 0.0 in stage 66.0 (TID 500). 2082 bytes result sent to driver
-    ## 16/07/06 12:41:30 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 500) in 126 ms on localhost (1/1)
-    ## 16/07/06 12:41:30 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/07/06 12:41:30 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.126 s
-    ## 16/07/06 12:41:30 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.127807 s
+    ## [Stage 21:==================================================>   (186 + 8) / 200]
+    ##                                                                                 
+    ## 16/07/07 10:02:20 WARN WeightedLeastSquares: regParam is zero, which might cause numerical instability and overfitting.
+    ## 16/07/07 10:02:20 WARN BLAS: Failed to load implementation from: com.github.fommil.netlib.NativeSystemBLAS
+    ## 16/07/07 10:02:20 WARN BLAS: Failed to load implementation from: com.github.fommil.netlib.NativeRefBLAS
+    ## 16/07/07 10:02:20 WARN LAPACK: Failed to load implementation from: com.github.fommil.netlib.NativeSystemLAPACK
+    ## 16/07/07 10:02:20 WARN LAPACK: Failed to load implementation from: com.github.fommil.netlib.NativeRefLAPACK
+    ## SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+    ## SLF4J: Defaulting to no-operation (NOP) logger implementation
+    ## SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 
 Finally, we disconnect from Spark:
 
