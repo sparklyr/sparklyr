@@ -36,6 +36,7 @@ Collate:
     'dplyr_spark_data.R'
     'dplyr_spark_table.R'
     'dplyr_sql.R'
+    'formulas.R'
     'install_spark.R'
     'install_spark_versions.R'
     'ml_decision_tree.R'

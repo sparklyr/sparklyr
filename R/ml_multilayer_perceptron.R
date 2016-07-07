@@ -28,8 +28,8 @@ ml_multilayer_perceptron <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  response <- ensure_scalar_character(response)
-  features <- as.character(features)
+  prepare_response_features_intercept(response, features, NULL)
+  
   layers <- as.integer(layers)
   max.iter <- ensure_scalar_integer(max.iter)
   seed <- ensure_scalar_integer(seed)

@@ -32,9 +32,9 @@ ml_random_forest <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
+  
+  prepare_response_features_intercept(response, features, NULL)
 
-  response <- ensure_scalar_character(response)
-  features <- as.character(features)
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
   num.trees <- ensure_scalar_integer(num.trees)

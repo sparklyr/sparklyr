@@ -24,7 +24,8 @@ ml_kmeans <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  features <- as.character(features)
+  prepare_features(features)
+  
   centers <- ensure_scalar_integer(centers)
   iter.max <- ensure_scalar_integer(iter.max)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)

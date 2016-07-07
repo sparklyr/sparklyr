@@ -19,9 +19,8 @@ ml_linear_regression <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  response <- ensure_scalar_character(response)
-  features <- as.character(features)
-  intercept <- ensure_scalar_boolean(intercept)
+  prepare_response_features_intercept(response, features, intercept)
+  
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
   max.iter <- ensure_scalar_integer(max.iter)
