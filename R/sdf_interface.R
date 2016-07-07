@@ -137,13 +137,11 @@ sdf_register <- function(x, name = NULL) {
 
 #' @export
 sdf_register.tbl_spark <- function(x, name = NULL) {
-  x
+  sdf_register(spark_dataframe(x), name)
 }
 
 #' @export
 sdf_register.list <- function(x, name = NULL) {
-  if (is.null(name))
-    name <- replicate(length(x), random_string("sparklyr_tmp_"))
   result <- lapply(seq_along(x), function(i) {
     sdf_register(x[[i]], name[[i]])
   })
@@ -152,7 +150,8 @@ sdf_register.list <- function(x, name = NULL) {
 }
 
 #' @export
-sdf_register.spark_jobj <- function(x, name = random_string("sparklyr_tmp_")) {
+sdf_register.spark_jobj <- function(x, name = NULL) {
+  name <- name %||% random_string("sparklyr_tmp_")
   invoke(x, "registerTempTable", name)
   sc <- spark_connection(x)
   on_connection_updated(sc, name)
