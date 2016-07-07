@@ -31,6 +31,8 @@ ml_generalized_linear_regression <-
            max.iter = 100L,
            ...)
 {
+  spark_require_version(sc, "2.0.0")
+  
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
