@@ -3,6 +3,8 @@
 #' @importFrom utils browseURL download.file head installed.packages tail untar write.csv
 NULL
 
+.globals <- new.env(parent = emptyenv())
+
 is.installed <- function(package) {
   is.element(package, installed.packages()[,1])
 }
@@ -45,9 +47,10 @@ random_string <- function(prefix = "table") {
   if (is.null(x)) y else x
 }
 
-# place for us to store state
-.globals <- new.env(parent = emptyenv())
-
 is_spark_v2 <- function(scon) {
   spark_version(scon) >= "2.0.0"
+}
+
+printf <- function(fmt, ...) {
+  cat(sprintf(fmt, ...))
 }

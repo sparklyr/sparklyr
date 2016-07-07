@@ -40,6 +40,7 @@ Collate:
     'install_spark_versions.R'
     'ml_decision_tree.R'
     'ml_feature_transformation.R'
+    'ml_generalized_linear_regression.R'
     'ml_gradient_boosted_tree.R'
     'ml_interface.R'
     'ml_kmeans.R'

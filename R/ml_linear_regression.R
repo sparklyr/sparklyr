@@ -34,7 +34,6 @@ ml_linear_regression <- function(x,
   )
 
   model <- lr %>%
-    invoke("setMaxIter", 10L) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", intercept) %>%
@@ -112,7 +111,7 @@ summary.ml_model_linear_regression <- function(object, ...) {
   
   ml_model_print_call(object)
   print_newline()
-  ml_model_print_residuals(object)
+  ml_model_print_residuals(object, residuals.header = "Deviance Residuals:")
   print_newline()
   
   cat("Coefficients:", sep = "\n")

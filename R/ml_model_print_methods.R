@@ -15,7 +15,8 @@ ml_model_print_call <- function(model) {
   invisible(formula)
 }
 
-ml_model_print_residuals <- function(model) {
+ml_model_print_residuals <- function(model,
+                                     residuals.header = "Residuals") {
   
   residuals <- model$.model %>%
     invoke("summary") %>%
@@ -27,24 +28,25 @@ ml_model_print_residuals <- function(model) {
   count <- invoke(residuals, "count")
   limit <- 1E5
   isApproximate <- count > limit
+  column <- invoke(residuals, "columns")[[1]]
   
   values <- if (isApproximate) {
     fraction <- limit / count
     residuals %>%
       invoke("sample", FALSE, fraction) %>%
-      sdf_read_column("residuals") %>%
+      sdf_read_column(column) %>%
       quantile()
   } else {
     residuals %>%
-      sdf_read_column("residuals") %>%
+      sdf_read_column(column) %>%
       quantile()
   }
   names(values) <- c("Min", "1Q", "Median", "3Q", "Max")
   
   header <- if (isApproximate)
-    "Residuals (approximate):"
+    paste(residuals.header, "(approximate):")
   else
-    "Residuals:"
+    paste(residuals.header, ":", sep = "") 
   
   cat(header, sep = "\n")
   print(values, digits = max(3L, getOption("digits") - 3L))

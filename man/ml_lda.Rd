@@ -19,6 +19,7 @@ Fit a Latent Dirichlet Allocation (LDA) model to a Spark DataFrame.
 }
 \seealso{
 Other Spark ML routines: \code{\link{ml_decision_tree}},
+  \code{\link{ml_generalized_linear_regression}},
   \code{\link{ml_gradient_boosted_trees}},
   \code{\link{ml_kmeans}},
   \code{\link{ml_linear_regression}},
