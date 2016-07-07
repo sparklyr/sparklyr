@@ -59,7 +59,8 @@ spark_connect <- function(master,
 
   filter <- function(e) {
     connection_is_open(e) &&
-    identical(e$master, master)
+    identical(e$master, master) &&
+    identical(e$app_name, app_name)
   }
 
   sconFound <- spark_connection_find_scon(filter)
