@@ -5,14 +5,19 @@
 \alias{spark_connection_is_open}
 \title{Connect to Spark}
 \usage{
-spark_connect(master, app_name = "sparklyr", version = NULL,
-  hadoop_version = NULL, extensions = NULL, config = spark_config())
+spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
+  app_name = "sparklyr", version = NULL, hadoop_version = NULL,
+  extensions = NULL, config = spark_config())
 
 spark_connection_is_open(sc)
 }
 \arguments{
 \item{master}{Spark cluster url to connect to. Use \code{"local"} to connect to a local
 instance of Spark installed via \code{\link{spark_install}}.}
+
+\item{spark_home}{Spark home directory (defaults to SPARK_HOME environment variable).
+If \code{SPARK_HOME} is defined it will be always be used unless the \code{version}
+paramater is specified to force the use of a locally installed version.}
 
 \item{app_name}{Application name to be used while running in the Spark cluster}
 

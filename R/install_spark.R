@@ -86,6 +86,7 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
   )
 }
 
+# Do not remove (it's used by the RStudio IDE)
 spark_home <- function() {
   home <- Sys.getenv("SPARK_HOME", unset = NA)
   if (is.na(home))
