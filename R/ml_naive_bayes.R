@@ -6,7 +6,7 @@
 #' @param response The name of the response vector.
 #' @param features The names of features (terms) included in the model.
 #' @param lambda The (Laplace) smoothing parameter. Defaults to zero.
-#' @param ... Other arguments passed on to methods.
+#' @param ... Optional arguments; currently unused.
 #' 
 #' @family Spark ML routines
 #'

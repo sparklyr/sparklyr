@@ -12,7 +12,7 @@
 #'   output (class) layer of size 2.
 #' @param max.iter Maximum number of iterations to perform in model fit.
 #' @param seed A random seed.
-#' @param ... Other arguments passed on to methods.
+#' @param ... Optional arguments; currently unused.
 #' 
 #' @family Spark ML routines
 #'

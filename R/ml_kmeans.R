@@ -7,7 +7,7 @@
 #' @param iter.max Maximum number of iterations allowed.
 #' @param features Which columns to use in the k-means fit. Defaults to
 #'   all columns within \code{x}.
-#' @param ... Other arguments passed on to methods.
+#' @param ... Optional arguments; currently unused.
 #' 
 #' @seealso For information on how Spark k-means clustering is implemented, please see
 #'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.

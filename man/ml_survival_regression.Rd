@@ -20,7 +20,7 @@ ml_survival_regression(x, response, features, intercept = TRUE,
 This should be a numeric vector, with 0 marking uncensored data, and
 1 marking right-censored data.}
 
-\item{...}{Other arguments passed on to methods.}
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Perform survival regression on a Spark DataFrame, using an Accelerated

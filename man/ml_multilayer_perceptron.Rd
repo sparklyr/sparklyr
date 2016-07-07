@@ -24,7 +24,7 @@ output (class) layer of size 2.}
 
 \item{seed}{A random seed.}
 
-\item{...}{Other arguments passed on to methods.}
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Creates and trains multilayer perceptron on a \code{spark_tbl}.

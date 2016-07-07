@@ -15,7 +15,7 @@ ml_naive_bayes(x, response, features, lambda = 0, ...)
 
 \item{lambda}{The (Laplace) smoothing parameter. Defaults to zero.}
 
-\item{...}{Other arguments passed on to methods.}
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Perform regression or classification using naive bayes.

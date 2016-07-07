@@ -15,7 +15,7 @@
 #'   as a categorical variable. When \code{"auto"} is used, the model type is
 #'   inferred based on the response variable type -- if it is a numeric type,
 #'   then regression is used; classification otherwise.
-#' @param ... Other arguments passed on to methods.
+#' @param ... Optional arguments; currently unused.
 #' 
 #' @family Spark ML routines
 #'

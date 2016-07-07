@@ -12,7 +12,7 @@ ml_lda(x, features = dplyr::tbl_vars(x), ...)
 \item{features}{The columns to use in the principal components
 analysis. Defaults to all columns in \code{x}.}
 
-\item{...}{Other arguments passed on to methods.}
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Fit a Latent Dirichlet Allocation (LDA) model to a Spark DataFrame.

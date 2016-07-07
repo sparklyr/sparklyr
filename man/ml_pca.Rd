@@ -12,7 +12,7 @@ ml_pca(x, features = dplyr::tbl_vars(x), ...)
 \item{features}{The columns to use in the principal components
 analysis. Defaults to all columns in \code{x}.}
 
-\item{...}{Other arguments passed on to methods.}
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Perform principal components analysis on a \code{spark_tbl}.

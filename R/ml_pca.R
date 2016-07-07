@@ -5,7 +5,7 @@
 #' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
-#' @param ... Other arguments passed on to methods.
+#' @param ... Optional arguments; currently unused.
 #' 
 #' @family Spark ML routines
 #'

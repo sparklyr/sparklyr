@@ -10,7 +10,7 @@
 #' @param censor The name of the vector that provides censoring information.
 #'   This should be a numeric vector, with 0 marking uncensored data, and
 #'   1 marking right-censored data.
-#' @param ... Other arguments passed on to methods.
+#' @param ... Optional arguments; currently unused.
 #' 
 #' @family Spark ML routines
 #'
