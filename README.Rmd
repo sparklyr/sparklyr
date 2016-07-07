@@ -36,6 +36,12 @@ library(sparklyr)
 spark_install(version = "1.6.2")
 ```
 
+To upgrade to the latest version of sparklyr, run the following command and restart your r session:
+
+```{r, eval=FALSE}
+devtools::install_github("rstudio/sparklyr")
+```
+
 If you use the RStudio IDE, you should also download the latest [preview release](https://www.rstudio.com/products/rstudio/download/preview/) of the IDE which includes several enhancements for interacting with Spark (see the [RStudio IDE] section below for more details).
 
 ## Connecting to Spark
