@@ -1,3 +1,4 @@
+#' @import tibble
 #' @import dplyr
 
 #' @export
