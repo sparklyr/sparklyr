@@ -53,17 +53,20 @@ spark_connect <- function(master,
   }
   
   # determine whether we need cores in master
+  passedMaster <- master
   cores <- config[["sparklyr.cores.local"]]
   if (master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
 
   filter <- function(e) {
     connection_is_open(e) &&
-    identical(e$master, master)
+    identical(e$master, master) &&
+    identical(e$app_name, app_name)
   }
 
   sconFound <- spark_connection_find_scon(filter)
   if (length(sconFound) == 1) {
+    message("Re-using existing Spark connection to ", passedMaster)
     return(sconFound[[1]])
   }
 

@@ -10,18 +10,23 @@ on_connection_opened <- function(scon, connectCall) {
       type = "Spark",
 
       # host (unique identifier within type, used as default name)
-      host = to_host(scon$master),
+      host = to_host(scon),
 
       # finder function
       finder = function(env, host) {
-        to_host <- function(master) {
-          gsub("local\\[(\\d+|\\*)\\]", "local", master)
+        # we duplicate the to_host function here b/c R CMD check
+        # doesn't like our using ::: to access to_host in the 
+        # finder function
+        to_host <- function(sc) {
+          paste0(gsub("local\\[(\\d+|\\*)\\]", "local", sc$master),
+                 " - ",
+                 sc$app_name)
         }
         objs <- ls(env)
         for (name in objs) {
           x <- base::get(name, envir = env)
           if (inherits(x, "spark_connection") &&
-              identical(to_host(x$master), host) &&
+              identical(to_host(x), host) &&
               sparkapi::connection_is_open(x)) {
             return(name)
           }
@@ -50,13 +55,13 @@ on_connection_opened <- function(scon, connectCall) {
 on_connection_closed <- function(scon) {
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer))
-    viewer$connectionClosed(type = "Spark", host = to_host(scon$master))
+    viewer$connectionClosed(type = "Spark", host = to_host(scon))
 }
 
 on_connection_updated <- function(scon, hint) {
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer))
-    viewer$connectionUpdated(type = "Spark", host = to_host(scon$master), hint = hint)
+    viewer$connectionUpdated(type = "Spark", host = to_host(scon), hint = hint)
 }
 
 connection_list_tables <- function(sc) {
@@ -98,8 +103,10 @@ connection_preview_table <- function(sc, table, limit) {
   }
 }
 # function to convert master to host
-to_host <- function(master) {
-  gsub("local\\[(\\d+|\\*)\\]", "local", master)
+to_host <- function(sc) {
+  paste0(gsub("local\\[(\\d+|\\*)\\]", "local", sc$master),
+         " - ",
+         sc$app_name)
 }
 
 
