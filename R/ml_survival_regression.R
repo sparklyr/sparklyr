@@ -10,6 +10,7 @@
 #' @param censor The name of the vector that provides censoring information.
 #'   This should be a numeric vector, with 0 marking uncensored data, and
 #'   1 marking right-censored data.
+#' @param max.iter Maximum number of iterations used in model fitting process.
 #' @param ... Optional arguments; currently unused.
 #' 
 #' @family Spark ML routines
@@ -20,6 +21,7 @@ ml_survival_regression <- function(x,
                                    features,
                                    intercept = TRUE,
                                    censor = "censor",
+                                   max.iter = 100L,
                                    ...)
 {
   df <- spark_dataframe(x)
@@ -29,6 +31,7 @@ ml_survival_regression <- function(x,
   features <- as.character(features)
   intercept <- ensure_scalar_boolean(intercept)
   censor <- ensure_scalar_character(censor)
+  max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   envir <- new.env(parent = emptyenv())
@@ -39,6 +42,7 @@ ml_survival_regression <- function(x,
   rf <- invoke_new(sc, model)
   
   model <- rf %>%
+    invoke("setMaxIter", max.iter) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", as.logical(intercept)) %>%

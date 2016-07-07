@@ -16,6 +16,7 @@
 #' @param intercept Fit the model with an intercept term?
 #' @param family The family / link function to use; analogous to those normally
 #'   passed in to calls to \R's own \code{glm}.
+#' @param max.iter Maximum number of iterations used in model fitting process.
 #' @param ... Optional arguments; currently unused.
 #' 
 #' @family Spark ML routines
@@ -27,6 +28,7 @@ ml_generalized_linear_regression <-
            features,
            intercept = TRUE,
            family = gaussian(link = "identity"),
+           max.iter = 100L,
            ...)
 {
   df <- spark_dataframe(x)
@@ -35,6 +37,7 @@ ml_generalized_linear_regression <-
   response <- ensure_scalar_character(response)
   features <- as.character(features)
   intercept <- ensure_scalar_boolean(intercept)
+  max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   # parse 'family' argument in similar way to R's glm
@@ -62,7 +65,7 @@ ml_generalized_linear_regression <-
   )
   
   model <- glr %>%
-    invoke("setMaxIter", 100L) %>%
+    invoke("setMaxIter", max.iter) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", intercept) %>%

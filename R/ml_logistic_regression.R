@@ -13,6 +13,7 @@ ml_logistic_regression <- function(x,
                                    intercept = TRUE,
                                    alpha = 0,
                                    lambda = 0,
+                                   max.iter = 100L,
                                    ...)
 {
   df <- spark_dataframe(x)
@@ -23,6 +24,7 @@ ml_logistic_regression <- function(x,
   intercept <- ensure_scalar_boolean(intercept)
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
+  max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
@@ -34,7 +36,7 @@ ml_logistic_regression <- function(x,
   )
 
   model <- lr %>%
-    invoke("setMaxIter", 100L) %>%
+    invoke("setMaxIter", max.iter) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", as.logical(intercept)) %>%

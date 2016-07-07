@@ -6,6 +6,7 @@
 #' @param alpha,lambda Parameters controlling loss function penalization (for e.g.
 #'   lasso, elastic net, and ridge regression). See \strong{Details} for more
 #'   information.
+#' @param max.iter Maximum number of iterations used in model fitting process.
 #' @param ... Other arguments passed on to methods.
 #'
 #' @details
