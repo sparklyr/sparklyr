@@ -28,7 +28,7 @@ ml_multilayer_perceptron <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  prepare_response_features_intercept(response, features, NULL)
+  prepare_response_features_intercept(df, response, features, NULL)
   
   layers <- as.integer(layers)
   max.iter <- ensure_scalar_integer(max.iter)

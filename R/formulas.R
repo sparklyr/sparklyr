@@ -2,7 +2,7 @@ is.formula <- function(x) {
   inherits(x, "formula")
 }
 
-parse_formula <- function(formula) {
+parse_formula <- function(formula, data = NULL) {
   formula <- validate_formula(formula)
   n <- length(formula)
   
@@ -15,7 +15,7 @@ parse_formula <- function(formula) {
   }
   
   # extract features
-  terms <- stats::terms(formula)
+  terms <- stats::terms(formula, data = data)
   features <- attr(terms, "term.labels")
   intercept <- as.logical(attr(terms, "intercept"))
   
@@ -50,7 +50,7 @@ validate_formula_operators <- function(object) {
   }
 }
 
-prepare_features <- function(features, envir = parent.frame()) {
+prepare_features <- function(df, features, envir = parent.frame()) {
   
   if (is.formula(features)) {
     parsed <- parse_formula(features)
@@ -62,14 +62,20 @@ prepare_features <- function(features, envir = parent.frame()) {
   assign("features", features, envir = envir)
 }
 
-prepare_response_features_intercept <- function(response,
+prepare_response_features_intercept <- function(df,
+                                                response,
                                                 features,
                                                 intercept,
                                                 envir = parent.frame())
 {
+  # construct dummy data.frame from Spark DataFrame schema
+  schema <- sdf_schema(df)
+  names <- lapply(schema, `[[`, "name")
+  rdf <- as.data.frame(names, stringsAsFactors = FALSE)
+  
   # handle formulas as response
   if (is.formula(response)) {
-    parsed <- parse_formula(response)
+    parsed <- parse_formula(response, data = rdf)
     response <- parsed$response
     features <- parsed$features
     intercept <- parsed$intercept

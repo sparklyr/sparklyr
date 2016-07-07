@@ -19,7 +19,7 @@ ml_linear_regression <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  prepare_response_features_intercept(response, features, intercept)
+  prepare_response_features_intercept(df, response, features, intercept)
   
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
