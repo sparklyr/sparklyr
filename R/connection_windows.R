@@ -28,7 +28,7 @@ verify_msvcr100 <- function() {
   }
 }
 
-prepare_windows_environment <- function() {
+prepare_windows_environment <- function(sparkHome) {
   
   # don't do anything if aren't on windows
   if (.Platform$OS.type != "windows")
@@ -38,26 +38,27 @@ prepare_windows_environment <- function() {
   verify_msvcr100()
   
   # set HADOOP_HOME
-  hivePath <- normalizePath("\\tmp\\hive", mustWork = FALSE)
+  hivePath <- normalizePath(file.path(sparkHome, "tmp", "hive"), mustWork = FALSE)
   if (!dir.exists(hivePath))
     dir.create(hivePath, recursive = TRUE)
-  hadoopPath <- normalizePath("\\tmp\\hadoop", mustWork = FALSE)
+  hadoopPath <- normalizePath(file.path(sparkHome, "tmp", "hadoop"), mustWork = FALSE)
   hadoopBinPath <- normalizePath(file.path(hadoopPath, "bin"), mustWork = FALSE)
   if (!dir.exists(hadoopPath)) {
     dir.create(hadoopBinPath, recursive = TRUE)
     message(paste("Created default hadoop bin directory under:", hadoopPath))
   }
-  system2("SETX", c("HADOOP_HOME", hadoopPath), stdout = NULL)
+  system2("SETX", c("HADOOP_HOME", shQuote(hadoopPath)), stdout = NULL)
 
   # pre-create the hive temp folder to manage permissions issues  
   appUserTempDir <- normalizePath(
     file.path(Sys.getenv("LOCALAPPDATA"), "temp", Sys.info()[["login"]]), 
     mustWork = FALSE
   )
+  
   if (!dir.exists(appUserTempDir)) {
     # create directory from using current user which will assign the right
     # permissions to execute in non-admin mode
-    dir.create(appUserTempDir, recursive = FALSE)
+    dir.create(appUserTempDir, recursive = TRUE)
   }
   
   # form path to winutils.exe
@@ -74,7 +75,7 @@ prepare_windows_environment <- function() {
   }
   
   # ensure correct permissions on hive path
-  system2(winutils, c("chmod", "777", hivePath))
+  system2(winutils, c("chmod", "777", shQuote(hivePath)))
 }
 
 
