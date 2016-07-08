@@ -72,7 +72,6 @@ connection_list_tables <- function(sc) {
     character()
 }
 
-#' @importFrom utils capture.output str 
 connection_list_columns <- function(sc, table) {
   dbi <- sc
   if (!is.null(dbi)) {

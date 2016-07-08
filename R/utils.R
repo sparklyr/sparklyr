@@ -1,9 +1,3 @@
-#' @import methods
-#' @importFrom tibble data_frame
-#' @import DBI
-#' @importFrom utils browseURL download.file head installed.packages tail untar write.csv
-NULL
-
 .globals <- new.env(parent = emptyenv())
 
 is.installed <- function(package) {

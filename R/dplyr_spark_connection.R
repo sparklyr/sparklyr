@@ -80,7 +80,6 @@ sql_select.spark_connection <- function(con, select, from, where = NULL,
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
-#' @importFrom utils compareVersion
 #' @export
 sql_join.spark_connection <- function(con, x, y, type = "inner", by = NULL, ...) {
   # TODO: This function needs to be removed once dplyr can workaround this issue by avoiding USING statements.
