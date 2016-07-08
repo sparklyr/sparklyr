@@ -8,18 +8,22 @@ Setup
 sparklyr:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WARN")
 ```
 
-    ## Warning: replacing previous import by 'sparkapi::%>%' when loading
-    ## 'sparklyr'
-
-    ## Warning: replacing previous import by 'magrittr::%>%' when loading
-    ## 'sparklyr'
-
 Initialization
 --------------
 
 ``` r
 library(sparklyr)
 library(sparkapi)
+```
+
+    ## 
+    ## Attaching package: 'sparkapi'
+
+    ## The following object is masked from 'package:sparklyr':
+    ## 
+    ##     spark_web
+
+``` r
 library(dplyr)
 ```
 
@@ -36,11 +40,7 @@ library(dplyr)
 
 ``` r
 library(ggplot2)
-```
 
-    ## Warning: package 'ggplot2' was built under R version 3.2.4
-
-``` r
 parquetName <- "billion.parquet"
 parquetPath <- file.path(getwd(), parquetName)
 
@@ -51,14 +51,14 @@ if (dir.exists(parquetPath)) {
 config <- spark_config()
   config[["sparklyr.shell.driver-memory"]] <- "12G"
   config[["sparklyr.shell.executor-memory"]] <- "12G"
-  config[["spark.context.spark.executor.memory"]] <- "12G"
+  config[["spark.executor.memory"]] <- "12G"
   
 sc <- spark_connect(master = "local", config = config)
 
 billion <- invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
   invoke("longValue")
 
-sparkapi::hive_context(sc) %>%
+hive_context(sc) %>%
   invoke("range", as.integer(billion)) %>%
   invoke("toDF") %>%
   invoke("write") %>%
@@ -103,7 +103,7 @@ sparkTest <- function(test, loadIntoDf = TRUE, loadData = TRUE) {
                       version = "2.0.0-preview",
                       config = config)
   
-  ses <- sparkapi::hive_context(sc)
+  ses <- hive_context(sc)
   df <- NULL
   
   if (loadData) {
@@ -153,7 +153,7 @@ spark_sum_range <- function(sc, ses, df) {
 
 ``` r
 spark_sum_range_parquet <- function(sc, ses, df) {
-  df <- invoke(sparkapi::hive_context(sc), "read") %>%
+  df <- invoke(hive_context(sc), "read") %>%
     invoke("parquet", list(parquetPath))
     
   result <- invoke(df, "selectExpr", list("sum(id)")) %>%
@@ -336,10 +336,11 @@ sqlContextR <- spark_sum_range_sparkr_sql_prepare()
 
     ## The following objects are masked from 'package:base':
     ## 
-    ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
-    ##     rbind, sample, subset, summary, transform
+    ##     as.data.frame, colnames, colnames<-, drop, endsWith,
+    ##     intersect, rank, rbind, sample, startsWith, subset, summary,
+    ##     transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmppTj8Ri/backend_port684619073c3c
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpcEA7DC/backend_port6ce43c5fb478
 
 ``` r
 runSparkRSQL <- logResults("2.0.0 SparkR SQL", function() {
@@ -371,10 +372,11 @@ dfSparkR <- spark_sum_range_sparkr_native_prepare()
 
     ## The following objects are masked from 'package:base':
     ## 
-    ##     as.data.frame, colnames, colnames<-, drop, intersect, rank,
-    ##     rbind, sample, subset, summary, transform
+    ##     as.data.frame, colnames, colnames<-, drop, endsWith,
+    ##     intersect, rank, rbind, sample, startsWith, subset, summary,
+    ##     transform
 
-    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmppTj8Ri/backend_port684650e817a2
+    ## Launching java with spark-submit command /Users/javierluraschi/Library/Caches/spark/spark-2.0.0-preview-bin-hadoop2.6/bin/spark-submit   --driver-memory "12G" sparkr-shell /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpcEA7DC/backend_port6ce4693d1755
 
 ``` r
 runSparkRNative <- logResults("2.0.0 SparkR Native", function() {
@@ -433,12 +435,12 @@ results %>%
 results
 ```
 
-    ##                 label   min    max     mean
-    ## 1          1.6.1 Code 6.976 11.852 8.917667
-    ## 2          2.0.0 Code 0.509  3.406 1.506333
-    ## 3       2.0.0 Parquet 5.243  6.185 5.655000
-    ## 4        2.0.0 In-Mem 6.610  7.476 7.036667
-    ## 5      2.0.0 sparklyr 6.521  8.301 7.125000
-    ## 6    2.0.0 SparkR SQL 6.504  6.918 6.775000
-    ## 7 2.0.0 SparkR Native 6.776  7.694 7.158000
-    ## 8               dplyr 3.065 12.673 6.393000
+    ##                 label   min    max      mean
+    ## 1          1.6.1 Code 9.389 10.998 10.375667
+    ## 2          2.0.0 Code 0.480  3.398  1.459333
+    ## 3       2.0.0 Parquet 5.050  5.875  5.431000
+    ## 4        2.0.0 In-Mem 6.900  8.311  7.611667
+    ## 5      2.0.0 sparklyr 6.633  8.583  7.330000
+    ## 6    2.0.0 SparkR SQL 6.935  7.874  7.300333
+    ## 7 2.0.0 SparkR Native 6.750  7.226  6.973333
+    ## 8               dplyr 3.123 16.016  7.578333
