@@ -7,7 +7,7 @@
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
   app_name = "sparklyr", version = NULL, hadoop_version = NULL,
-  extensions = NULL, config = spark_config())
+  config = spark_config(), extensions = sparkapi::registered_extensions())
 
 spark_connection_is_open(sc)
 }
@@ -25,9 +25,10 @@ paramater is specified to force the use of a locally installed version.}
 
 \item{hadoop_version}{Version of Hadoop (only applicable for local master)}
 
-\item{extensions}{Extension packages to enable for this connection.}
-
 \item{config}{Configuration for connection (see \code{\link{spark_config} for details}).}
+
+\item{extensions}{Extension packages to enable for this connection. By default will
+enable all packages that previously called \code{sparkapi::register_extension}.}
 
 \item{sc}{\code{spark_connection}}
 }

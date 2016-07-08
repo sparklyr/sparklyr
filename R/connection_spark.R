@@ -25,7 +25,8 @@ spark_default_jars <- function() {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of the Spark (only applicable for local master)
 #' @param hadoop_version Version of Hadoop (only applicable for local master)
-#' @param extensions Extension packages to enable for this connection.
+#' @param extensions Extension packages to enable for this connection. By default will
+#'   enable all packages that previously called \code{sparkapi::register_extension}.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
 #'
 #' @return Connection to Spark local instance or remote cluster
@@ -38,8 +39,8 @@ spark_connect <- function(master,
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
-                          extensions = NULL,
-                          config = spark_config()) {
+                          config = spark_config(),
+                          extensions = sparkapi::registered_extensions()) {
 
   # prepare windows environment
   prepare_windows_environment()
@@ -127,7 +128,12 @@ spark_connect <- function(master,
     scon$hive_context$connection <- scon
    
     # notify connection viewer of connection
-    libs <- "library(sparklyr)"
+    libs <- c(extensions, "sparklyr")
+    libs <- vapply(libs, 
+                   function(lib) paste0("library(", lib, ")"), 
+                   character("1"), 
+                   USE.NAMES = FALSE)
+    libs <- paste(libs, collapse = "\n")
     if ("package:dplyr" %in% search())
       libs <- paste(libs, "library(dplyr)", sep = "\n")
     parentCall <- match.call()
