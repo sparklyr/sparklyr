@@ -182,8 +182,22 @@ spark_install <- function(version = NULL,
   hiveSitePath <- file.path(installInfo$sparkConfDir, "hive-site.xml")
   if (!file.exists(hiveSitePath) || reset) {
     tryCatch({
-      hiveSiteTemplatePath <- system.file(package = "sparklyr", file.path("conf", "hive-site.xml"))
-      file.copy(hiveSiteTemplatePath, hiveSitePath, overwrite = TRUE)
+      hiveProperties <- list(
+        "javax.jdo.option.ConnectionURL" = "jdbc:derby:memory:databaseName=metastore_db;create=true",
+        "javax.jdo.option.ConnectionDriverName" = "org.apache.derby.jdbc.EmbeddedDriver"
+      )
+      
+      if (.Platform$OS.type == "windows") {
+        hivePath <- normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "hive"), mustWork = FALSE)
+        
+        hiveProperties <- c(hiveProperties, list(
+          "hive.exec.scratchdir" = hivePath,
+          "hive.exec.local.scratchdir" = hivePath,
+          "hive.metastore.warehouse.dir" = hivePath
+        ))
+      }
+      
+      spark_hive_file_set_value(hiveSitePath, hiveProperties)
     }, error = function(e) {
       warning("Failed to apply custom hive-site.xml configuration")
     })
@@ -258,4 +272,24 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
   
   writeLines(lines, log4jPropertiesFile)
   close(log4jPropertiesFile)
+}
+
+spark_hive_file_set_value <- function(hivePath, properties) {
+  lines <- list()
+  lines[[length(lines) + 1]] <- "<configuration>"
+  
+  lapply(names(properties), function(property) {
+    value <- properties[[property]]
+    
+    lines[[length(lines) + 1]] <<- "  <property>"
+    lines[[length(lines) + 1]] <<- paste0("    <name>", property, "</name>")
+    lines[[length(lines) + 1]] <<- paste0("    <value>", value, "</value>")
+    lines[[length(lines) + 1]] <<- "  </property>"
+  })
+  
+  lines[[length(lines) + 1]] <- "</configuration>"
+  
+  hiveFile <- file(hivePath)
+  writeLines(unlist(lines), hiveFile)
+  close(hiveFile)
 }

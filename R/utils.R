@@ -54,3 +54,22 @@ is_spark_v2 <- function(scon) {
 printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }
+
+spark_require_version <- function(sc, required, module = NULL) {
+  
+  # guess module based on calling function
+  if (is.null(module)) {
+    call <- sys.call(sys.parent())
+    module <- as.character(call[[1]])
+  }
+  
+  # check and report version requirements
+  version <- spark_version(sc)
+  if (version < required) {
+    fmt <- "'%s' requires Spark %s but you are using Spark %s"
+    msg <- sprintf(fmt, module, required, version)
+    stop(msg, call. = FALSE)
+  }
+  
+  TRUE
+}

@@ -41,9 +41,17 @@ spark_connect <- function(master,
                           hadoop_version = NULL,
                           config = spark_config(),
                           extensions = sparkapi::registered_extensions()) {
-
+  
+  # for local mode we support SPARK_HOME via locally installed versions
+  if (spark_master_is_local(master)) {
+    if (!nzchar(spark_home) || !is.null(version) || !is.null(hadoop_version)) {
+      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
+      spark_home <- installInfo$sparkVersionDir  
+    }
+  }
+  
   # prepare windows environment
-  prepare_windows_environment()
+  prepare_windows_environment(spark_home)
 
   # master can be missing if it's specified in the config file
   if (missing(master)) {
@@ -75,14 +83,6 @@ spark_connect <- function(master,
   if (!is_java_available()) {
     stop("Java is required to connect to Spark. Please download and install Java from ",
          java_install_url())
-  }
-
-  # for local mode we support SPARK_HOME via locally installed versions
-  if (spark_master_is_local(master)) {
-    if (!nzchar(spark_home) || !is.null(version) || !is.null(hadoop_version)) {
-      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
-      spark_home <- installInfo$sparkVersionDir  
-    }
   }
   
   # error if there is no SPARK_HOME

@@ -17,7 +17,8 @@ ml_pca <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  features <- as.character(features)
+  prepare_features(features)
+  
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
