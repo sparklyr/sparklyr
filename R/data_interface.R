@@ -38,7 +38,10 @@ spark_csv_options <- function(header,
 #'   the local file system (\code{file://}). 
 #'   
 #' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and 
-#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.    
+#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
+#'   
+#' When \code{header} is \code{FALSE}, the column names are generated with a \code{V} prefix;
+#'   e.g. \code{V1, V2, ...}.
 #'
 #' @return Reference to a Spark DataFrame / dplyr tbl
 #' 
