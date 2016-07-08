@@ -113,18 +113,11 @@ print.ml_model_linear_regression <- function(x, ...) {
 #' @export
 summary.ml_model_linear_regression <- function(object, ...) {
   
-  columns <- c("coefficients", "standard.errors", "t.values", "p.values")
-  values <- as.list(object[columns])
-  matrix <- do.call(base::cbind, values)
-  colnames(matrix) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
-  
   ml_model_print_call(object)
   print_newline()
   ml_model_print_residuals(object, residuals.header = "Deviance Residuals:")
   print_newline()
-  
-  cat("Coefficients:", sep = "\n")
-  stats::printCoefmat(matrix)
+  ml_model_print_coefficients_detailed(object)
   print_newline()
   
   cat(paste("R-Squared:", signif(object$r.squared, 4)), sep = "\n")

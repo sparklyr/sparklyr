@@ -64,6 +64,24 @@ ml_model_print_coefficients <- function(model) {
   invisible(coef)
 }
 
+ml_model_print_coefficients_detailed <- function(model) {
+  
+  # extract relevant columns for stats::printCoefmat call
+  # (protect against routines that don't provide standard
+  # error estimates, etc)
+  columns <- c("coefficients", "standard.errors", "t.values", "p.values")
+  values <- as.list(model[columns])
+  for (value in values)
+    if (is.null(value))
+      return(ml_model_print_coefficients(model))
+  
+  matrix <- do.call(base::cbind, values)
+  colnames(matrix) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
+  
+  cat("Coefficients:", sep = "\n")
+  stats::printCoefmat(matrix)
+}
+
 ml_model_print_centers <- function(model) {
   
   centers <- model$centers
