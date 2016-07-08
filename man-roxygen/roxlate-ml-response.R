@@ -4,4 +4,5 @@
 #'   parameters to set the \code{response}, \code{features}, and \code{intercept}
 #'   parameters (if available). Currently, only simple linear combinations of
 #'   existing parameters is supposed; e.g. \code{response ~ feature1 + feature2 + ...}.
-#'   \code{- 1} can be used to fit a model without an intercept term.
+#'   The intercept term can be omitted by using \code{- 1} in the model fit.
+
