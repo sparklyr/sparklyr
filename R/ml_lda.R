@@ -16,7 +16,7 @@ ml_lda <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  prepare_features(features)
+  prepare_features(df, features)
   
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   

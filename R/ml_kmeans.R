@@ -23,10 +23,10 @@ ml_kmeans <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  prepare_features(features)
+  prepare_features(df, features)
   
   centers <- ensure_scalar_integer(centers)
-  iter.max <- ensure_scalar_integer(iter.max)
+  max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   
   envir <- new.env(parent = emptyenv())
@@ -40,7 +40,7 @@ ml_kmeans <- function(x,
 
   model <- kmeans %>%
     invoke("setK", centers) %>%
-    invoke("setMaxIter", iter.max) %>%
+    invoke("setMaxIter", max.iter) %>%
     invoke("setFeaturesCol", envir$features)
   
   if (only_model) return(model)
