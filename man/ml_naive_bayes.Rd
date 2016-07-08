@@ -7,11 +7,16 @@
 ml_naive_bayes(x, response, features, lambda = 0, ...)
 }
 \arguments{
-\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
+\item{x}{An object coercable to a Spark DataFrame (typically, a
+\code{tbl_spark}).}
 
-\item{response}{The name of the response vector.}
+\item{response}{The name of the response vector (as a length-one character
+vector), or a formula, giving a symbolic description of the model to be
+fitted. When \code{response} is a formula, it is used in preference to other
+parameters to set the \code{response}, \code{features}, and \code{intercept}
+parameters (if available).}
 
-\item{features}{The names of features (terms) included in the model.}
+\item{features}{The name of features (terms) to use for the model fit.}
 
 \item{lambda}{The (Laplace) smoothing parameter. Defaults to zero.}
 

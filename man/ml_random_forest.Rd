@@ -8,11 +8,16 @@ ml_random_forest(x, response, features, max.bins = 32L, max.depth = 5L,
   num.trees = 20L, type = c("auto", "regression", "classification"), ...)
 }
 \arguments{
-\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
+\item{x}{An object coercable to a Spark DataFrame (typically, a
+\code{tbl_spark}).}
 
-\item{response}{The name of the response vector.}
+\item{response}{The name of the response vector (as a length-one character
+vector), or a formula, giving a symbolic description of the model to be
+fitted. When \code{response} is a formula, it is used in preference to other
+parameters to set the \code{response}, \code{features}, and \code{intercept}
+parameters (if available).}
 
-\item{features}{The names of features (terms) included in the model.}
+\item{features}{The name of features (terms) to use for the model fit.}
 
 \item{max.bins}{The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at

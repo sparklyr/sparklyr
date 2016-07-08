@@ -1,22 +1,15 @@
 #' Spark ML -- Random Forests
 #'
 #' Perform regression or classification using random forests with a \code{spark_tbl}.
-#'
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
-#' @param response The name of the response vector.
-#' @param features The names of features (terms) included in the model.
-#' @param max.bins The maximum number of bins used for discretizing
-#'   continuous features and for choosing how to split on features at
-#'   each node. More bins give higher granularity.
-#' @param max.depth Maximum depth of the tree (>= 0); that is, the maximum
-#'   number of nodes separating any leaves from the root of the tree.
-#' @param num.trees Number of trees to train (>= 1).
-#' @param type The type of model to fit. \code{"regression"} treats the response
-#'   as a continuous variable, while \code{"classification"} treats the response
-#'   as a categorical variable. When \code{"auto"} is used, the model type is
-#'   inferred based on the response variable type -- if it is a numeric type,
-#'   then regression is used; classification otherwise.
-#' @param ... Optional arguments; currently unused.
+#' 
+#' @template roxlate-ml-x
+#' @template roxlate-ml-response
+#' @template roxlate-ml-features
+#' @template roxlate-ml-decision-trees-max-bins
+#' @template roxlate-ml-decision-trees-max-depth
+#' @template roxlate-ml-decision-trees-num-trees
+#' @template roxlate-ml-decision-trees-type
+#' @template roxlate-ml-dots
 #' 
 #' @family Spark ML routines
 #'

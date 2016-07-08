@@ -8,19 +8,24 @@ ml_survival_regression(x, response, features, intercept = TRUE,
   censor = "censor", max.iter = 100L, ...)
 }
 \arguments{
-\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
+\item{x}{An object coercable to a Spark DataFrame (typically, a
+\code{tbl_spark}).}
 
-\item{response}{The name of the response vector.}
+\item{response}{The name of the response vector (as a length-one character
+vector), or a formula, giving a symbolic description of the model to be
+fitted. When \code{response} is a formula, it is used in preference to other
+parameters to set the \code{response}, \code{features}, and \code{intercept}
+parameters (if available).}
 
-\item{features}{The names of features (terms) to use in the model.}
+\item{features}{The name of features (terms) to use for the model fit.}
 
-\item{intercept}{Fit the model with an intercept term?}
+\item{intercept}{Boolean; should the model be fit with an intercept term?}
 
 \item{censor}{The name of the vector that provides censoring information.
 This should be a numeric vector, with 0 marking uncensored data, and
 1 marking right-censored data.}
 
-\item{max.iter}{Maximum number of iterations used in model fitting process.}
+\item{max.iter}{The maximum number of iterations to use.}
 
 \item{...}{Optional arguments; currently unused.}
 }

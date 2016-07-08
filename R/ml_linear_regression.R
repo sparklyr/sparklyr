@@ -2,7 +2,13 @@
 #'
 #' Perform linear regression on a Spark DataFrame.
 #'
-#' @template roxlate-ml-regression
+#' @template roxlate-ml-x
+#' @template roxlate-ml-response
+#' @template roxlate-ml-features
+#' @template roxlate-ml-intercept
+#' @template roxlate-ml-regression-penalty
+#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
 #'

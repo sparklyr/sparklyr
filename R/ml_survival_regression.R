@@ -3,15 +3,15 @@
 #' Perform survival regression on a Spark DataFrame, using an Accelerated
 #' failure time (AFT) model with potentially right-censored data.
 #'
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
-#' @param response The name of the response vector.
-#' @param features The names of features (terms) to use in the model.
-#' @param intercept Fit the model with an intercept term?
+#' @template roxlate-ml-x
+#' @template roxlate-ml-response
+#' @template roxlate-ml-features
+#' @template roxlate-ml-intercept
 #' @param censor The name of the vector that provides censoring information.
 #'   This should be a numeric vector, with 0 marking uncensored data, and
 #'   1 marking right-censored data.
-#' @param max.iter Maximum number of iterations used in model fitting process.
-#' @param ... Optional arguments; currently unused.
+#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-dots
 #' 
 #' @family Spark ML routines
 #'

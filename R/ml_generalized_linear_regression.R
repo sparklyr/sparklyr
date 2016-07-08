@@ -1,7 +1,6 @@
 #' Spark ML -- Generalized Linear Regression
 #'
-#' Perform generalized linear regression on a Spark DataFrame. Only available
-#' with Spark 2.0.0 and above.
+#' Perform generalized linear regression on a Spark DataFrame.
 #'
 #' In contrast to \code{\link{ml_linear_regression}()} and 
 #' \code{\link{ml_logistic_regression}()}, these routines do not allow you to
@@ -9,15 +8,14 @@
 #' fits returned by this routine are generally richer in regards to information
 #' provided for assessing the quality of fit.
 #' 
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
-#' @param response The name of the response vector.
-#' @param features The names of features (terms) to use as linear predictors
-#'   for the response.
-#' @param intercept Fit the model with an intercept term?
+#' @template roxlate-ml-x
+#' @template roxlate-ml-response
+#' @template roxlate-ml-features
+#' @template roxlate-ml-intercept
 #' @param family The family / link function to use; analogous to those normally
-#'   passed in to calls to \R's own \code{glm}.
-#' @param max.iter Maximum number of iterations used in model fitting process.
-#' @param ... Optional arguments; currently unused.
+#'   passed in to calls to \R's own \code{\link{glm}}.
+#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-dots
 #' 
 #' @family Spark ML routines
 #'

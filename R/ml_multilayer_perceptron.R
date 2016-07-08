@@ -2,17 +2,16 @@
 #'
 #' Creates and trains multilayer perceptron on a \code{spark_tbl}.
 #'
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
-#' @param response The name of the response vector.
-#' @param features The names of features (terms) to use as linear predictors
-#'   for the response.
+#' @template roxlate-ml-x
+#' @template roxlate-ml-response
+#' @template roxlate-ml-features
 #' @param layers A numeric vector describing the layers -- each element in the vector
 #'   gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three layers,
 #'   with an input (feature) layer of size 4, an intermediate layer of size 5, and an
 #'   output (class) layer of size 2.
-#' @param max.iter Maximum number of iterations to perform in model fit.
-#' @param seed A random seed.
-#' @param ... Optional arguments; currently unused.
+#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-seed
+#' @template roxlate-ml-dots
 #' 
 #' @family Spark ML routines
 #'

@@ -2,12 +2,11 @@
 #'
 #' Perform k-means clustering on a \code{spark_tbl}.
 #'
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
+#' @template roxlate-ml-x
 #' @param centers The number of cluster centers to compute.
-#' @param iter.max Maximum number of iterations allowed.
-#' @param features Which columns to use in the k-means fit. Defaults to
-#'   all columns within \code{x}.
-#' @param ... Optional arguments; currently unused.
+#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-features
+#' @template roxlate-ml-dots
 #' 
 #' @seealso For information on how Spark k-means clustering is implemented, please see
 #'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
@@ -17,7 +16,7 @@
 #' @export
 ml_kmeans <- function(x,
                       centers,
-                      iter.max = 10,
+                      max.iter = 100,
                       features = dplyr::tbl_vars(x),
                       ...) {
   

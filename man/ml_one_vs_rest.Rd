@@ -7,14 +7,18 @@
 ml_one_vs_rest(x, classifier, response, features)
 }
 \arguments{
-\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
+\item{x}{An object coercable to a Spark DataFrame (typically, a
+\code{tbl_spark}).}
 
 \item{classifier}{The classifier model. Can be obtained using the \code{only_model} parameter.}
 
-\item{response}{The name of the response vector.}
+\item{response}{The name of the response vector (as a length-one character
+vector), or a formula, giving a symbolic description of the model to be
+fitted. When \code{response} is a formula, it is used in preference to other
+parameters to set the \code{response}, \code{features}, and \code{intercept}
+parameters (if available).}
 
-\item{features}{The names of features (terms) to use as linear predictors
-for the response.}
+\item{features}{The name of features (terms) to use for the model fit.}
 }
 \description{
 Perform regression or classification using one vs rest.

@@ -1,12 +1,12 @@
 #' Spark ML -- Naive-Bayes
 #'
 #' Perform regression or classification using naive bayes.
-#'
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
-#' @param response The name of the response vector.
-#' @param features The names of features (terms) included in the model.
+#' 
+#' @template roxlate-ml-x
+#' @template roxlate-ml-response
+#' @template roxlate-ml-features
 #' @param lambda The (Laplace) smoothing parameter. Defaults to zero.
-#' @param ... Optional arguments; currently unused.
+#' @template roxlate-ml-dots
 #' 
 #' @family Spark ML routines
 #'

@@ -7,7 +7,8 @@
 ml_pca(x, features = dplyr::tbl_vars(x), ...)
 }
 \arguments{
-\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
+\item{x}{An object coercable to a Spark DataFrame (typically, a
+\code{tbl_spark}).}
 
 \item{features}{The columns to use in the principal components
 analysis. Defaults to all columns in \code{x}.}

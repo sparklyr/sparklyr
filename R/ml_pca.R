@@ -2,10 +2,10 @@
 #'
 #' Perform principal components analysis on a \code{spark_tbl}.
 #'
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
+#' @template roxlate-ml-x
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
-#' @param ... Optional arguments; currently unused.
+#' @template roxlate-ml-dots
 #' 
 #' @family Spark ML routines
 #'

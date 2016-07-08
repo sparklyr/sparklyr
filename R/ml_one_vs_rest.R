@@ -2,11 +2,10 @@
 #'
 #' Perform regression or classification using one vs rest.
 #'
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
+#' @template roxlate-ml-x
 #' @param classifier The classifier model. Can be obtained using the \code{only_model} parameter.
-#' @param response The name of the response vector.
-#' @param features The names of features (terms) to use as linear predictors
-#'   for the response.
+#' @template roxlate-ml-response
+#' @template roxlate-ml-features
 #'
 #' @family Spark ML routines
 #'

@@ -2,10 +2,9 @@
 #'
 #' Fit a Latent Dirichlet Allocation (LDA) model to a Spark DataFrame.
 #'
-#' @param x An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).
-#' @param features The columns to use in the principal components
-#'   analysis. Defaults to all columns in \code{x}.
-#' @param ... Optional arguments; currently unused.
+#' @template roxlate-ml-x
+#' @template roxlate-ml-features
+#' @template roxlate-ml-dots
 #' 
 #' @family Spark ML routines
 #'

@@ -8,21 +8,26 @@ ml_multilayer_perceptron(x, response, features, layers, max.iter = 100,
   seed = sample(.Machine$integer.max, 1), ...)
 }
 \arguments{
-\item{x}{An object convertable to a Spark DataFrame (typically, a \code{tbl_spark}).}
+\item{x}{An object coercable to a Spark DataFrame (typically, a
+\code{tbl_spark}).}
 
-\item{response}{The name of the response vector.}
+\item{response}{The name of the response vector (as a length-one character
+vector), or a formula, giving a symbolic description of the model to be
+fitted. When \code{response} is a formula, it is used in preference to other
+parameters to set the \code{response}, \code{features}, and \code{intercept}
+parameters (if available).}
 
-\item{features}{The names of features (terms) to use as linear predictors
-for the response.}
+\item{features}{The name of features (terms) to use for the model fit.}
 
 \item{layers}{A numeric vector describing the layers -- each element in the vector
 gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three layers,
 with an input (feature) layer of size 4, an intermediate layer of size 5, and an
 output (class) layer of size 2.}
 
-\item{max.iter}{Maximum number of iterations to perform in model fit.}
+\item{max.iter}{The maximum number of iterations to use.}
 
-\item{seed}{A random seed.}
+\item{seed}{A random seed. Set this value if you need your results to be
+reproducible across repeated calls.}
 
 \item{...}{Optional arguments; currently unused.}
 }
