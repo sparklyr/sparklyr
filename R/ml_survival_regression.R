@@ -67,17 +67,16 @@ ml_survival_regression <- function(x,
   coefficients <- intercept_first(coefficients)
   
   ml_model("survival_regression", fit,
-           features = features,
-           response = response,
-           coefficients = coefficients,
-           intercept = intercept,
-           model.parameters = as.list(envir)
+    features = features,
+    response = response,
+    intercept = intercept,
+    coefficients = coefficients,
+    intercept = intercept,
+    model.parameters = as.list(envir)
   )
 }
 
 #' @export
 print.ml_model_survival_regression <- function(x, ...) {
-  formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
-  cat("Call: ", formula, "\n\n", sep = "")
-  cat(invoke(x$.model, "toString"), sep = "\n")
+  ml_model_print_call(x)
 }

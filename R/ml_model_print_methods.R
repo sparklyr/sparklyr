@@ -7,7 +7,8 @@ ml_model_print_call <- function(model) {
   formula <- paste(
     paste(model$response, collapse = " + "),
     "~",
-    paste(model$features, collapse = " + ")
+    paste(model$features, collapse = " + "),
+    if (identical(model$intercept, FALSE)) "- 1"
   )
   
   cat("Call:", sep = "\n")

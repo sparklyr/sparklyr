@@ -120,6 +120,7 @@ ml_generalized_linear_regression <-
   ml_model("generalized_linear_regression", fit,
     features = features,
     response = response,
+    intercept = intercept,
     family = family,
     link = link,
     coefficients = coefficients,
