@@ -27,7 +27,7 @@ ml_survival_regression <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
   
-  prepare_response_features_intercept(df, response, features, NULL)
+  prepare_response_features_intercept(df, response, features, intercept)
   
   censor <- ensure_scalar_character(censor)
   max.iter <- ensure_scalar_integer(max.iter)

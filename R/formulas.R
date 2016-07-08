@@ -78,13 +78,13 @@ prepare_response_features_intercept <- function(df,
     parsed <- parse_formula(response, data = rdf)
     response <- parsed$response
     features <- parsed$features
-    intercept <- parsed$intercept
+    intercept <- if (is.logical(parsed$intercept)) parsed$intercept
   }
   
   # ensure output format
   response <- ensure_scalar_character(response)
   features <- as.character(features)
-  intercept <- ensure_scalar_boolean(intercept)
+  intercept <- if (!is.null(intercept)) ensure_scalar_boolean(intercept)
   
   # mutate in environment
   assign("response", response, envir = envir)
