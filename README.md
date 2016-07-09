@@ -188,7 +188,7 @@ summary(fit)
     ## Call:
     ## mpg ~ wt + cyl
     ## 
-    ## Residuals:
+    ## Deviance Residuals::
     ##     Min      1Q  Median      3Q     Max 
     ## -2.6881 -1.0507 -0.4420  0.4757  3.3858 
     ## 
@@ -239,7 +239,16 @@ Here's a simple example that wraps a Spark text file line counting function with
 
 ``` r
 library(sparkapi)
+```
 
+    ## 
+    ## Attaching package: 'sparkapi'
+
+    ## The following object is masked from 'package:sparklyr':
+    ## 
+    ##     spark_web
+
+``` r
 # write a CSV 
 tempfile <- tempfile(fileext = ".csv")
 write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
@@ -289,16 +298,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/07/07 11:55:47 INFO ContextCleaner: Cleaned accumulator 225
-    ## 16/07/07 11:55:47 INFO ContextCleaner: Cleaned accumulator 224
-    ## 16/07/07 11:55:47 INFO ContextCleaner: Cleaned accumulator 223
-    ## 16/07/07 11:55:47 INFO ContextCleaner: Cleaned accumulator 222
-    ## 16/07/07 11:55:47 INFO ContextCleaner: Cleaned accumulator 221
-    ## 16/07/07 11:55:47 INFO Executor: Finished task 0.0 in stage 66.0 (TID 500). 2082 bytes result sent to driver
-    ## 16/07/07 11:55:47 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 500) in 117 ms on localhost (1/1)
-    ## 16/07/07 11:55:47 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/07/07 11:55:47 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.117 s
-    ## 16/07/07 11:55:47 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.119336 s
+    ## 16/07/08 17:10:03 INFO ContextCleaner: Cleaned accumulator 245
+    ## 16/07/08 17:10:03 INFO BlockManagerInfo: Removed broadcast_73_piece0 on localhost:64156 in memory (size: 19.3 KB, free: 483.0 MB)
+    ## 16/07/08 17:10:03 INFO BlockManagerInfo: Removed broadcast_72_piece0 on localhost:64156 in memory (size: 1905.0 B, free: 483.0 MB)
+    ## 16/07/08 17:10:03 INFO ContextCleaner: Cleaned accumulator 244
+    ## 16/07/08 17:10:03 INFO BlockManagerInfo: Removed broadcast_71_piece0 on localhost:64156 in memory (size: 19.3 KB, free: 483.0 MB)
+    ## 16/07/08 17:10:03 INFO Executor: Finished task 0.0 in stage 66.0 (TID 500). 2082 bytes result sent to driver
+    ## 16/07/08 17:10:03 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 500) in 110 ms on localhost (1/1)
+    ## 16/07/08 17:10:03 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
+    ## 16/07/08 17:10:03 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.111 s
+    ## 16/07/08 17:10:03 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.113858 s
 
 Finally, we disconnect from Spark:
 
