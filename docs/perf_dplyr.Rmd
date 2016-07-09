@@ -46,25 +46,26 @@ spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
     spark_install(version = param$version, reset = TRUE, logging = param$logging)
     
-    testConfig <- list()
-    
     config <- spark_config()
-    config[["sparklyr.sql.shuffle.partitions"]] <- if(param$shuffle) parallel::detectCores() else NULL
+    config[["spark.sql.shuffle.partitions"]] <- if(param$shuffle) parallel::detectCores() else NULL
     config[["spark.sql.codegen.wholeStage"]] <- param$codegen
-    config[["sparklyr.cores"]] <- param$cores
+    
+    if (is.null(param$cores)) {
+      config[["sparklyr.cores.local"]] <- param$cores
+    }
     
     sc <- spark_connect(master = param$master, version = param$version, config = config)
     
     copy_to(sc,
             nycflights13::flights,
             "flights",
-            cache = param$cache,
+            memory = param$cache,
             repartition = param$partitions)
     
     copy_to(sc,
             Lahman::Batting,
             "batting",
-            cache = param$cache,
+            memory = param$cache,
             repartition = param$partitions)
     
     sources <- list(
@@ -80,7 +81,7 @@ spark_perf_test <- function(params, tests) {
         lapply(param, function(e) if (is.null(e)) NA else e),
         list(
           test = testName,
-          elapsed = system.time(test(db, sources))[["elapsed"]]
+          elapsed = system.time(test(db, sources) %>% collect)[["elapsed"]]
         )
       ))
     }, testNames = names(tests))
@@ -126,9 +127,9 @@ spark_perf_single_test <- function(
             version = version,
             logging = logging,
             cache = cache,
-            partitions = partitions,
             shuffle = optimizeShuffleForCores,
-            codegen = codegen
+            codegen = codegen,
+            partitions = partitions
           )
         ),
         tests = list(
@@ -163,6 +164,23 @@ spark_perf_single_test <- function(
 runResults <- list()
 
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "INFO", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "INFO", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 8, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 8, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "1.6.0", "WARN", TRUE, 0, TRUE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, TRUE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview", "WARN", TRUE, 0, TRUE, TRUE)
+
+results <- do.call("rbind", runResults)
+
+results <- results %>% 
+  mutate(params = paste(run, version, cores, cache, logging, partitions, shuffle))
 
 ```
 
