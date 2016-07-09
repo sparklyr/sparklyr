@@ -1,4 +1,4 @@
-RSpark Performance: Dplyr Queries
+Performance: Dplyr Queries
 ================
 
 Initialization
@@ -6,7 +6,7 @@ Initialization
 
 ``` r
 knitr::opts_chunk$set(warning = FALSE, cache = FALSE)
-library(rspark)
+library(sparklyr)
 library(dplyr)
 ```
 
@@ -25,8 +25,6 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 ```
-
-    ## Warning: package 'ggplot2' was built under R version 3.2.4
 
 ``` r
 summarize_delay <- function(source) {
@@ -58,29 +56,31 @@ spark_perf_test <- function(params, tests) {
   resultsList <- lapply(params, function(param) {
     spark_install(version = param$version, reset = TRUE, logging = param$logging)
     
-    shuffle <- getOption("rspark.dplyr.optimize_shuffle_cores", NULL)
-    options(rspark.dplyr.optimize_shuffle_cores = param$shuffle)
-    on.exit(options(rspark.dplyr.optimize_shuffle_cores = shuffle))
+    config <- spark_config()
+    config[["spark.sql.shuffle.partitions"]] <- if(param$shuffle) parallel::detectCores() else NULL
+    config[["spark.sql.codegen.wholeStage"]] <- param$codegen
     
-    sc <- spark_connect(master = param$master, cores = param$cores, version = param$version, codegen = param$codegen)
+    if (is.null(param$cores)) {
+      config[["sparklyr.cores.local"]] <- param$cores
+    }
     
-    db <- src_spark(sc)
+    sc <- spark_connect(master = param$master, version = param$version, config = config)
     
-    copy_to(db,
+    copy_to(sc,
             nycflights13::flights,
             "flights",
-            cache = param$cache,
+            memory = param$cache,
             repartition = param$partitions)
     
-    copy_to(db,
+    copy_to(sc,
             Lahman::Batting,
             "batting",
-            cache = param$cache,
+            memory = param$cache,
             repartition = param$partitions)
     
     sources <- list(
-      flights = tbl(db, "flights"),
-      batting = tbl(db, "batting")
+      flights = tbl(sc, "flights"),
+      batting = tbl(sc, "batting")
     )
     
     testResults <- lapply(seq_along(tests), function(testNames, testNum) {
@@ -91,7 +91,7 @@ spark_perf_test <- function(params, tests) {
         lapply(param, function(e) if (is.null(e)) NA else e),
         list(
           test = testName,
-          elapsed = system.time(test(db, sources))[["elapsed"]]
+          elapsed = system.time(test(db, sources) %>% collect)[["elapsed"]]
         )
       ))
     }, testNames = names(tests))
@@ -137,9 +137,9 @@ spark_perf_single_test <- function(
             version = version,
             logging = logging,
             cache = cache,
-            partitions = partitions,
             shuffle = optimizeShuffleForCores,
-            codegen = codegen
+            codegen = codegen,
+            partitions = partitions
           )
         ),
         tests = list(
@@ -191,7 +191,7 @@ runResults <- spark_perf_single_test(runResults, "local", "auto", "2.0.0-preview
 results <- do.call("rbind", runResults)
 
 results <- results %>% 
-  mutate(params = paste(run, version, cores, cache, logging, partitions, shuffle, codegen))
+  mutate(params = paste(run, version, cores, cache, logging, partitions, shuffle))
 ```
 
 ``` r
@@ -202,19 +202,19 @@ results %>%
 ```
 
     ##    run cores       version logging part shuffle codegen dplyr spark
-    ## 1    0  <NA>         1.6.0    INFO    0   FALSE   FALSE 0.101 3.144
-    ## 2    1  <NA>         1.6.0    INFO    0   FALSE   FALSE 0.090 0.515
-    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE   FALSE 0.084 1.986
-    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE   FALSE 0.085 0.582
-    ## 5    4  auto         1.6.0    INFO    0   FALSE   FALSE 0.086 2.223
-    ## 6    5  auto         1.6.0    WARN    0   FALSE   FALSE 0.087 2.181
-    ## 7    6  auto         1.6.0    WARN    0   FALSE   FALSE 0.092 0.584
-    ## 8    7  auto         1.6.0    WARN    8   FALSE   FALSE 0.088 0.738
-    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE   FALSE 0.087 0.949
-    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE   FALSE 0.105 0.673
-    ## 11  10  auto         1.6.0    WARN    0    TRUE   FALSE 0.094 0.485
-    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE   FALSE 0.094 0.554
-    ## 13  12  auto 2.0.0-preview    WARN    0    TRUE    TRUE 0.086 0.687
+    ## 1    0  <NA>         1.6.0    INFO    0   FALSE   FALSE 0.092 2.915
+    ## 2    1  <NA>         1.6.0    INFO    0   FALSE   FALSE 0.092 0.645
+    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE   FALSE 0.092 1.493
+    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE   FALSE 0.088 0.654
+    ## 5    4  auto         1.6.0    INFO    0   FALSE   FALSE 0.086 1.957
+    ## 6    5  auto         1.6.0    WARN    0   FALSE   FALSE 0.088 2.020
+    ## 7    6  auto         1.6.0    WARN    0   FALSE   FALSE 0.090 0.563
+    ## 8    7  auto         1.6.0    WARN    8   FALSE   FALSE 0.088 0.663
+    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE   FALSE 0.087 1.004
+    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE   FALSE 0.096 1.110
+    ## 11  10  auto         1.6.0    WARN    0    TRUE   FALSE 0.089 0.520
+    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE   FALSE 0.088 0.650
+    ## 13  12  auto 2.0.0-preview    WARN    0    TRUE    TRUE 0.088 0.653
 
 ``` r
 results %>%
@@ -224,19 +224,19 @@ results %>%
 ```
 
     ##    run cores       version logging part shuffle dplyr rank spark rank
-    ## 1    0  <NA>         1.6.0    INFO    0   FALSE      0.793     12.430
-    ## 2    1  <NA>         1.6.0    INFO    0   FALSE      0.753     11.473
-    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE      0.766      5.886
-    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE      0.753      5.587
-    ## 5    4  auto         1.6.0    INFO    0   FALSE      0.876      6.169
-    ## 6    5  auto         1.6.0    WARN    0   FALSE      0.870      6.107
-    ## 7    6  auto         1.6.0    WARN    0   FALSE      0.873      5.409
-    ## 8    7  auto         1.6.0    WARN    8   FALSE      0.878      5.742
-    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE      0.805      2.724
-    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE      0.841      2.656
-    ## 11  10  auto         1.6.0    WARN    0    TRUE      0.813      1.436
-    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE      0.791      0.733
-    ## 13  12  auto 2.0.0-preview    WARN    0    TRUE      0.801      0.787
+    ## 1    0  <NA>         1.6.0    INFO    0   FALSE      0.797     13.495
+    ## 2    1  <NA>         1.6.0    INFO    0   FALSE      0.778     12.450
+    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE      0.866      6.387
+    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE      0.792      6.053
+    ## 5    4  auto         1.6.0    INFO    0   FALSE      0.881      6.224
+    ## 6    5  auto         1.6.0    WARN    0   FALSE      0.927      6.483
+    ## 7    6  auto         1.6.0    WARN    0   FALSE      0.889      5.806
+    ## 8    7  auto         1.6.0    WARN    8   FALSE      0.910      6.826
+    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE      0.828      2.927
+    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE      0.840      2.734
+    ## 11  10  auto         1.6.0    WARN    0    TRUE      0.776      1.465
+    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE      0.776      0.909
+    ## 13  12  auto 2.0.0-preview    WARN    0    TRUE      0.794      0.759
 
 ``` r
 results %>%
@@ -246,19 +246,19 @@ results %>%
 ```
 
     ##    run cores       version logging part shuffle dplyr warm spark warm
-    ## 1    0  <NA>         1.6.0    INFO    0   FALSE      0.773     10.938
-    ## 2    1  <NA>         1.6.0    INFO    0   FALSE      0.739      9.889
-    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE      0.735      5.053
-    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE      0.741      4.789
-    ## 5    4  auto         1.6.0    INFO    0   FALSE      0.864      4.729
-    ## 6    5  auto         1.6.0    WARN    0   FALSE      0.856      4.999
-    ## 7    6  auto         1.6.0    WARN    0   FALSE      0.856      3.965
-    ## 8    7  auto         1.6.0    WARN    8   FALSE      0.898      4.181
-    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE      0.813      2.175
-    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE      0.817      2.082
-    ## 11  10  auto         1.6.0    WARN    0    TRUE      0.807      0.517
-    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE      0.782      0.403
-    ## 13  12  auto 2.0.0-preview    WARN    0    TRUE      0.758      0.477
+    ## 1    0  <NA>         1.6.0    INFO    0   FALSE      0.789     11.913
+    ## 2    1  <NA>         1.6.0    INFO    0   FALSE      0.767     10.788
+    ## 3    2  <NA> 2.0.0-preview    INFO    0   FALSE      0.774      5.474
+    ## 4    3  <NA> 2.0.0-preview    INFO    0   FALSE      0.783      5.242
+    ## 5    4  auto         1.6.0    INFO    0   FALSE      0.878      4.951
+    ## 6    5  auto         1.6.0    WARN    0   FALSE      0.935      4.956
+    ## 7    6  auto         1.6.0    WARN    0   FALSE      0.866      4.135
+    ## 8    7  auto         1.6.0    WARN    8   FALSE      0.930      4.525
+    ## 9    8  auto 2.0.0-preview    WARN    8   FALSE      0.815      2.275
+    ## 10   9  auto 2.0.0-preview    WARN    0   FALSE      0.820      2.198
+    ## 11  10  auto         1.6.0    WARN    0    TRUE      0.804      0.559
+    ## 12  11  auto 2.0.0-preview    WARN    0    TRUE      0.765      0.386
+    ## 13  12  auto 2.0.0-preview    WARN    0    TRUE      0.776      0.432
 
 ``` r
 results %>%

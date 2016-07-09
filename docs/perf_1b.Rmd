@@ -29,14 +29,14 @@ if (dir.exists(parquetPath)) {
 config <- spark_config()
   config[["sparklyr.shell.driver-memory"]] <- "12G"
   config[["sparklyr.shell.executor-memory"]] <- "12G"
-  config[["spark.context.spark.executor.memory"]] <- "12G"
+  config[["spark.executor.memory"]] <- "12G"
   
 sc <- spark_connect(master = "local", config = config)
 
 billion <- invoke_new(sc, "java.math.BigInteger", "1000000000") %>%
   invoke("longValue")
 
-sparklyr:::hive_context(sc) %>%
+hive_context(sc) %>%
   invoke("range", as.integer(billion)) %>%
   invoke("toDF") %>%
   invoke("write") %>%
@@ -77,7 +77,7 @@ sparkTest <- function(test, loadIntoDf = TRUE, loadData = TRUE) {
                       version = "2.0.0-preview",
                       config = config)
   
-  ses <- sparklyr:::hive_context(sc)
+  ses <- hive_context(sc)
   df <- NULL
   
   if (loadData) {
@@ -127,7 +127,7 @@ spark_sum_range <- function(sc, ses, df) {
 
 ```{r}
 spark_sum_range_parquet <- function(sc, ses, df) {
-  df <- invoke(sparklyr:::hive_context(sc), "read") %>%
+  df <- invoke(hive_context(sc), "read") %>%
     invoke("parquet", list(parquetPath))
     
   result <- invoke(df, "selectExpr", list("sum(id)")) %>%
