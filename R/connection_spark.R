@@ -128,7 +128,7 @@ spark_connect <- function(master,
     scon$hive_context$connection <- scon
    
     # notify connection viewer of connection
-    libs <- c(extensions, "sparklyr")
+    libs <- c("sparklyr", extensions)
     libs <- vapply(libs, 
                    function(lib) paste0("library(", lib, ")"), 
                    character("1"), 
