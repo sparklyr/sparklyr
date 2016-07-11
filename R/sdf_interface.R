@@ -437,7 +437,7 @@ sdf_create_dummy_variables <- function(x, input, reference = NULL, labels = list
     sdf_collect()
 
   # validate that 'reference' is a valid label for this column
-  levels <- counts[[input]]
+  levels <- sort(counts[[input]])
   if (!is.null(reference) && !reference %in% levels) {
     fmt <- "no label called '%s' in column '%s'; valid labels are:\n- %s\n"
     msg <- sprintf(fmt, reference, input, paste(shQuote(levels), collapse = ", "))
