@@ -12,7 +12,7 @@
 #'   1 marking right-censored data.
 #' @template roxlate-ml-max-iter
 #' @template roxlate-ml-dots
-#' 
+#'
 #' @family Spark ML routines
 #'
 #' @export
@@ -26,46 +26,46 @@ ml_survival_regression <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   prepare_response_features_intercept(df, response, features, intercept)
-  
+
   censor <- ensure_scalar_character(censor)
   max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
-  
+
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
-  
+
   model <- "org.apache.spark.ml.regression.AFTSurvivalRegression"
-  
+
   rf <- invoke_new(sc, model)
-  
+
   model <- rf %>%
     invoke("setMaxIter", max.iter) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", as.logical(intercept)) %>%
     invoke("setCensorCol", censor)
-    
+
   if (only_model) return(model)
-  
+
   fit <- model %>%
     invoke("fit", tdf)
-  
+
   coefficients <- fit %>%
     invoke("coefficients") %>%
     invoke("toArray")
   names(coefficients) <- features
-  
+
   hasIntercept <- invoke(fit, "getFitIntercept")
   if (hasIntercept) {
     intercept <- invoke(fit, "intercept")
     coefficients <- c(coefficients, intercept)
     names(coefficients) <- c(features, "(Intercept)")
   }
-  
+
   coefficients <- intercept_first(coefficients)
-  
+
   ml_model("survival_regression", fit,
     features = features,
     response = response,

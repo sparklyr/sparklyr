@@ -7,16 +7,16 @@ spark_versions_url <- function() {
 }
 
 read_spark_versions_csv <- function(file = spark_versions_url()) {
-  
+
   # see if we have a cached version
   if (!exists("sparkVersionsCsv", envir = .globals))
   {
     versionsCsv <- utils::read.csv(file,
                                    colClasses = c(hadoop = "character"),
                                    stringsAsFactors = FALSE)
-    
+
     assign("sparkVersionsCsv", versionsCsv, envir = .globals)
-    
+
   }
 
   .globals$sparkVersionsCsv
@@ -26,7 +26,7 @@ read_spark_versions_csv <- function(file = spark_versions_url()) {
 #' @rdname spark_install
 #' @export
 spark_installed_versions <- function() {
-  
+
   spark <- character()
   hadoop <- character()
   dir <- character()
@@ -41,10 +41,10 @@ spark_installed_versions <- function() {
       }
     }
   })
-  versions <- data.frame(spark = spark, 
+  versions <- data.frame(spark = spark,
                          hadoop = hadoop,
                          dir = dir)
-  
+
   versions
 }
 
@@ -54,7 +54,7 @@ spark_installed_versions <- function() {
 spark_available_versions <- function() {
   versions <- read_spark_versions_csv()
   versions <- versions[,1:2]
-  versions$install <- paste0("spark_install(version = \"", 
+  versions$install <- paste0("spark_install(version = \"",
                              versions$spark, "\", ",
                              "hadoop_version = \"", versions$hadoop,
                              "\")")

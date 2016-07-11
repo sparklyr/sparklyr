@@ -12,7 +12,7 @@
 #' @template roxlate-ml-max-iter
 #' @template roxlate-ml-seed
 #' @template roxlate-ml-dots
-#' 
+#'
 #' @family Spark ML routines
 #'
 #' @export
@@ -26,9 +26,9 @@ ml_multilayer_perceptron <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   prepare_response_features_intercept(df, response, features, NULL)
-  
+
   layers <- as.integer(layers)
   max.iter <- ensure_scalar_integer(max.iter)
   seed <- ensure_scalar_integer(seed)
@@ -52,10 +52,10 @@ ml_multilayer_perceptron <- function(x,
     invoke("setMaxIter", max.iter)
 
   if (only_model) return(model)
-  
+
   fit <- model %>%
     invoke("fit", tdf)
-  
+
   ml_model("multilayer_perceptron", fit,
     features = features,
     response = response,

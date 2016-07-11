@@ -38,7 +38,7 @@ ml_prepare_dataframe <- function(df, features, response = NULL, ...,
 
   # assemble features vector and return
   transformed <- ft_vector_assembler(df, features, envir$features)
-  
+
   # return as vanilla spark dataframe
   spark_dataframe(transformed)
 }
@@ -76,12 +76,12 @@ residuals.ml_model <- function(object, ...) {
 reorder_first <- function(vector, name) {
   if (is.null(vector))
     return(vector)
-  
+
   nm <- names(vector)
   if (is.null(nm) || !name %in% nm)
     return(vector)
-  
-  ordered <- c(name, base::setdiff(nm, name)) 
+
+  ordered <- c(name, base::setdiff(nm, name))
   vector[ordered]
 }
 
@@ -103,24 +103,24 @@ read_spark_matrix <- function(jobj, field) {
 }
 
 ensure_scalar_integer <- function(object) {
-  
+
   if (length(object) != 1 || !is.numeric(object)) {
     deparsed <- deparse(substitute(object))
     errMsg <- sprintf("'%s' is not a length-one numeric value", deparsed)
     stop(errMsg)
   }
-  
+
   as.integer(object)
 }
 
 ensure_scalar_double <- function(object) {
-  
+
   if (length(object) != 1 || !is.numeric(object)) {
     deparsed <- deparse(substitute(object))
     errMsg <- sprintf("'%s' is not a length-one numeric value", deparsed)
     stop(errMsg)
   }
-  
+
   as.double(object)
 }
 
@@ -128,27 +128,27 @@ ensure_scalar_boolean <- function(object, allow.na = FALSE, default = NULL) {
   if (!is.null(default) && is.null(object)) {
     object = default
   }
-  
+
   if (length(object) != 1) {
     deparsed <- deparse(substitute(object))
     stop(sprintf("'%s' is not a length-one logical value", deparsed))
   }
-  
+
   value <- as.logical(object)
   if (!allow.na && is.na(value)) {
     deparsed <- deparse(substitute(object))
     stop(sprintf("'%s' is NA (must be TRUE/FALSE)", deparsed))
   }
-  
+
   value
 }
 
 ensure_scalar_character <- function(object) {
-  
+
   if (length(object) != 1 || !is.character(object)) {
     deparsed <- deparse(substitute(object))
     stop(sprintf("'%s' is not a length-one character vector", deparsed))
   }
-  
+
   as.character(object)
 }

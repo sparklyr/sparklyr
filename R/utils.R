@@ -51,13 +51,13 @@ printf <- function(fmt, ...) {
 }
 
 spark_require_version <- function(sc, required, module = NULL) {
-  
+
   # guess module based on calling function
   if (is.null(module)) {
     call <- sys.call(sys.parent())
     module <- as.character(call[[1]])
   }
-  
+
   # check and report version requirements
   version <- spark_version(sc)
   if (version < required) {
@@ -65,6 +65,6 @@ spark_require_version <- function(sc, required, module = NULL) {
     msg <- sprintf(fmt, module, required, version)
     stop(msg, call. = FALSE)
   }
-  
+
   TRUE
 }

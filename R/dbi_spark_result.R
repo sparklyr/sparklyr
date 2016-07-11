@@ -3,9 +3,9 @@
 
 #' DBI Spark Result.
 #'
-#' @slot sql character. 
-#' @slot df data.frame. 
-#' @slot lastFetch numeric. 
+#' @slot sql character.
+#' @slot df data.frame.
+#' @slot lastFetch numeric.
 #'
 #' @keywords internal
 #'
@@ -41,7 +41,7 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 
 setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, statement, params = NULL, ...) {
   df <- sdf_from_sql(conn, statement)
-  
+
   rs <- new("DBISparkResult",
             df = df,
             sql = statement)
@@ -52,7 +52,7 @@ setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, state
   # TODO: Use default dbGetQuery method defined in DBIConnection
   rs <- dbSendQuery(conn, statement, ...)
   on.exit(dbClearResult(rs))
-  
+
   df <- tryCatch(
     dbFetch(rs, n = -1, ...),
     error = function(e) {
@@ -60,11 +60,11 @@ setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, state
       NULL
     }
   )
-  
+
   if (!dbHasCompleted(rs)) {
     warning("Pending rows", call. = FALSE)
   }
-  
+
   df
 })
 

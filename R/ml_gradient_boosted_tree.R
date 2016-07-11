@@ -9,7 +9,7 @@
 #' @template roxlate-ml-decision-trees-max-depth
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-dots
-#' 
+#'
 #' @family Spark ML routines
 #'
 #' @export
@@ -23,13 +23,13 @@ ml_gradient_boosted_trees <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   prepare_response_features_intercept(df, response, features, NULL)
-  
+
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
   type <- match.arg(type)
-  
+
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
@@ -57,9 +57,9 @@ ml_gradient_boosted_trees <- function(x,
     invoke("setLabelCol", envir$response) %>%
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth)
-  
+
   if (only_model) return(model)
-  
+
   fit <- model %>%
     invoke("fit", tdf)
 

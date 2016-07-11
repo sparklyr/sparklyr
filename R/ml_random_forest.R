@@ -1,7 +1,7 @@
 #' Spark ML -- Random Forests
 #'
 #' Perform regression or classification using random forests with a \code{spark_tbl}.
-#' 
+#'
 #' @template roxlate-ml-x
 #' @template roxlate-ml-response
 #' @template roxlate-ml-features
@@ -10,7 +10,7 @@
 #' @template roxlate-ml-decision-trees-num-trees
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-dots
-#' 
+#'
 #' @family Spark ML routines
 #'
 #' @export
@@ -25,7 +25,7 @@ ml_random_forest <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   prepare_response_features_intercept(df, response, features, NULL)
 
   max.bins <- ensure_scalar_integer(max.bins)
@@ -33,7 +33,7 @@ ml_random_forest <- function(x,
   num.trees <- ensure_scalar_integer(num.trees)
   type <- match.arg(type)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
-  
+
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
@@ -57,9 +57,9 @@ ml_random_forest <- function(x,
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth) %>%
     invoke("setNumTrees", num.trees)
-  
+
   if (only_model) return(model)
-  
+
   fit <- model %>%
     invoke("fit", tdf)
 

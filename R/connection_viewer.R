@@ -15,7 +15,7 @@ on_connection_opened <- function(scon, connectCall) {
       # finder function
       finder = function(env, host) {
         # we duplicate the to_host function here b/c R CMD check
-        # doesn't like our using ::: to access to_host in the 
+        # doesn't like our using ::: to access to_host in the
         # finder function
         to_host <- function(sc) {
           paste0(gsub("local\\[(\\d+|\\*)\\]", "local", sc$master),
@@ -80,7 +80,7 @@ connection_list_columns <- function(sc, table) {
     data.frame(
       name = names(df),
       type = as.character(lapply(names(df), function(f) {
-        capture.output(str(df[[f]], 
+        capture.output(str(df[[f]],
                            give.length = FALSE,
                            width = 30,
                            strict.width = "cut"))

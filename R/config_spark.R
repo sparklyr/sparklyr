@@ -1,13 +1,13 @@
 #' Read Spark Configuration
-#' 
+#'
 #' @export
 #' @param file Name of the configuration file
 #' @param use_default TRUE to use the built-in detaults provided in this package
-#' 
-#' @details 
-#' 
+#'
+#' @details
+#'
 #' Read Spark configuration using the \pkg{\link[config]{config}} package.
-#' 
+#'
 #' @return Named list with configuration data
 spark_config <- function(file = "config.yml", use_default = TRUE) {
   baseConfig <- list()

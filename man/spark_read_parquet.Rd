@@ -26,10 +26,10 @@ spark_read_parquet(sc, name, path, options = list(), repartition = 0,
 Read a Parquet file into a Spark DataFrame
 }
 \details{
-You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
-  the local file system (\code{file://}). 
-  
-If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and 
+You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
+  the local file system (\code{file://}).
+
+If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and
   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
 }
 \seealso{

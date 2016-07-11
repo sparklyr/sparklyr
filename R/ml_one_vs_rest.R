@@ -17,23 +17,23 @@ ml_one_vs_rest <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   prepare_response_features_intercept(df, response, features, NULL)
-  
+
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
-  
+
   ovrc <- invoke_new(
     sc,
     "org.apache.spark.ml.classification.OneVsRest"
   )
-  
+
   fit <- ovrc %>%
     invoke("setClassifier", classifier) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("fit", tdf)
-  
+
   ml_model("one_vs_rest", fit,
            features = features,
            response = response,

@@ -83,9 +83,9 @@ sql_select.spark_connection <- function(con, select, from, where = NULL,
 #' @export
 sql_join.spark_connection <- function(con, x, y, type = "inner", by = NULL, ...) {
   # TODO: This function needs to be removed once dplyr can workaround this issue by avoiding USING statements.
-  
+
   sparkVersion <- spark_version(con)
-  
+
   if (compareVersion(toString(sparkVersion), "2.0.0") < 0) {
     sameNameColumns <- length(Filter(function(e) by$x[[e]] == by$y[[e]], seq_len(length(by$x))))
     if (sameNameColumns > 0) {
@@ -93,7 +93,7 @@ sql_join.spark_connection <- function(con, x, y, type = "inner", by = NULL, ...)
                 ". Try Spark 2.0.0 instead or avoid using same-column names in joins."))
     }
   }
-  
+
   # Invoke dplyrs default join:
   join <- switch(type,
                  left = sql("LEFT"),
@@ -102,9 +102,9 @@ sql_join.spark_connection <- function(con, x, y, type = "inner", by = NULL, ...)
                  full = sql("FULL"),
                  stop("Unknown join type:", type, call. = FALSE)
   )
-  
+
   using <- all(by$x == by$y)
-  
+
   if (using) {
     cond <- build_sql("USING ", lapply(by$x, ident), con = con)
   } else {
@@ -112,7 +112,7 @@ sql_join.spark_connection <- function(con, x, y, type = "inner", by = NULL, ...)
                      collapse = " AND ", parens = TRUE)
     cond <- build_sql("ON ", on, con = con)
   }
-  
+
   build_sql(
     'SELECT * FROM ',x, "\n\n",
     join, " JOIN\n\n" ,

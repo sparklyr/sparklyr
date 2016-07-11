@@ -68,13 +68,13 @@ sdf_sql_columns_typed <- function(col, stringData, fields, rows) {
            vector = invoke(raw, "toArray"),
            raw)
   })
-  
+
   if (!shortType %in% c("vector")) unlist(result) else result
 }
 
 sdf_from_sql <- function(sc, sql) {
   sqlResult <- invoke(hive_context(sc), "sql", as.character(sql))
-  
+
   schema <- sdf_sql_schema(sqlResult)
   fields <- sdf_sql_schema_fields(schema)
 
@@ -95,18 +95,18 @@ sdf_from_sql <- function(sc, sql) {
     # Remove invalid fields that have zero length
     fields <- Filter(function(e) nchar(e$name) > 0, fields)
     dfNames <- Filter(function(e) nchar(e) > 0, dfNames)
-    
+
     dfEmpty <- lapply(fields, function(field) {
       sdf_sql_default_type(field)
     })
     names(dfEmpty) <- dfNames
-    
+
     df <- data.frame(dfEmpty, stringsAsFactors=FALSE)
   }
   else {
     stringData <- unlist(df)
     df <- as.data.frame(seq_len(rows))
-    
+
     lapply(seq_along(fields), function(col) {
       df[[dfNames[[col]]]] <<- sdf_sql_columns_typed(
         col,
@@ -114,7 +114,7 @@ sdf_from_sql <- function(sc, sql) {
         fields,
         rows)
     })
-    
+
     df[[1]] <- NULL
   }
 

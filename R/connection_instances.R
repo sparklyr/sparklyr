@@ -4,7 +4,7 @@ sparkConnectionsEnv <- new.env(parent = emptyenv())
 spark_connection_instances <- function() {
   if (is.null(sparkConnectionsEnv$instances))
     sparkConnectionsEnv$instances <- list()
-  
+
   sparkConnectionsEnv$instances
 }
 

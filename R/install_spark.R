@@ -31,7 +31,7 @@ spark_install_find <- function(sparkVersion = NULL,
       sparkInstall <- quote(spark_install(version = "", hadoop_version = ""))
       sparkInstall$version <- sparkVersion
       sparkInstall$hadoop_version <- hadoopVersion
-      
+
       stop(paste("Spark version not installed. To install, use", deparse(sparkInstall)))
     } else {
       stop("Spark version not available. Find available versions, using spark_available_versions()")
@@ -58,8 +58,8 @@ spark_default_version <- function() {
     spark <- version$spark
     hadoop <- version$hadoop
   }
-    
-  list(spark = spark, 
+
+  list(spark = spark,
        hadoop = hadoop)
 }
 
@@ -71,7 +71,7 @@ spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
   packageRemotePath <- versionInfo$packageRemotePath
 
   sparkDir <- spark_install_dir()
-  
+
   sparkVersionDir <- file.path(sparkDir, componentName)
 
   list (
@@ -95,10 +95,10 @@ spark_home <- function() {
 }
 
 #' Download and install various versions of Spark
-#' 
-#' Install versions of Spark for use with local Spark connections 
+#'
+#' Install versions of Spark for use with local Spark connections
 #'   (i.e. \code{spark_connect(master = "local"})
-#' 
+#'
 #' @param version Version of Spark to install. See \code{spark_available_versions} for a list of supported versions
 #' @param hadoop_version Version of Hadoop to install. See \code{spark_available_versions} for a list of supported versions
 #' @param reset Attempts to reset settings to defaults.
@@ -106,9 +106,9 @@ spark_home <- function() {
 #' @param verbose Report information as Spark is downloaded / installed
 #' @param tarfile Path to TAR file conforming to the pattern spark-###-bin-(hadoop)?### where ###
 #' reference spark and hadoop versions respectively.
-#' 
+#'
 #' @return List with information about the installed version.
-#' 
+#'
 #' @export
 spark_install <- function(version = NULL,
                           hadoop_version = NULL,
@@ -186,17 +186,17 @@ spark_install <- function(version = NULL,
         "javax.jdo.option.ConnectionURL" = "jdbc:derby:memory:databaseName=metastore_db;create=true",
         "javax.jdo.option.ConnectionDriverName" = "org.apache.derby.jdbc.EmbeddedDriver"
       )
-      
+
       if (.Platform$OS.type == "windows") {
         hivePath <- normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "hive"), mustWork = FALSE)
-        
+
         hiveProperties <- c(hiveProperties, list(
           "hive.exec.scratchdir" = hivePath,
           "hive.exec.local.scratchdir" = hivePath,
           "hive.metastore.warehouse.dir" = hivePath
         ))
       }
-      
+
       spark_hive_file_set_value(hiveSitePath, hiveProperties)
     }, error = function(e) {
       warning("Failed to apply custom hive-site.xml configuration")
@@ -254,14 +254,14 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
 
   log4jPropertiesFile <- file(log4jPropertiesPath)
   lines <- readLines(log4jPropertiesFile)
-  
+
   lines[[length(lines) + 1]] <- ""
   lines[[length(lines) + 1]] <- "# Other settings"
-  
+
   lapply(names(properties), function(property) {
     value <- properties[[property]]
     pattern <- paste(property, "=.*", sep = "")
-    
+
     if (length(grep(pattern, lines)) > 0) {
       lines <<- gsub(pattern, value, lines, perl = TRUE)
     }
@@ -269,7 +269,7 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
       lines[[length(lines) + 1]] <<- value
     }
   })
-  
+
   writeLines(lines, log4jPropertiesFile)
   close(log4jPropertiesFile)
 }
@@ -277,18 +277,18 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
 spark_hive_file_set_value <- function(hivePath, properties) {
   lines <- list()
   lines[[length(lines) + 1]] <- "<configuration>"
-  
+
   lapply(names(properties), function(property) {
     value <- properties[[property]]
-    
+
     lines[[length(lines) + 1]] <<- "  <property>"
     lines[[length(lines) + 1]] <<- paste0("    <name>", property, "</name>")
     lines[[length(lines) + 1]] <<- paste0("    <value>", value, "</value>")
     lines[[length(lines) + 1]] <<- "  </property>"
   })
-  
+
   lines[[length(lines) + 1]] <- "</configuration>"
-  
+
   hiveFile <- file(hivePath)
   writeLines(unlist(lines), hiveFile)
   close(hiveFile)

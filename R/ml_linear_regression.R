@@ -24,14 +24,14 @@ ml_linear_regression <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   prepare_response_features_intercept(df, response, features, intercept)
-  
+
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
   max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
-  
+
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
@@ -47,9 +47,9 @@ ml_linear_regression <- function(x,
     invoke("setFitIntercept", intercept) %>%
     invoke("setElasticNetParam", alpha) %>%
     invoke("setRegParam", lambda)
-  
+
   if (only_model) return(model)
-  
+
   fit <- model %>%
     invoke("fit", tdf)
 
@@ -74,11 +74,11 @@ ml_linear_regression <- function(x,
   tvalues <- try_null(invoke(summary, "tValues"))
   if (!is.null(tvalues))
     names(tvalues) <- names(coefficients)
-  
+
   pvalues <- try_null(as.numeric(invoke(summary, "pValues")))
   if (!is.null(pvalues))
     names(pvalues) <- names(coefficients)
-  
+
   # reorder coefficient names to place intercept first if available
   coefficients <- intercept_first(coefficients)
   errors <- intercept_first(errors)
@@ -112,14 +112,14 @@ print.ml_model_linear_regression <- function(x, ...) {
 
 #' @export
 summary.ml_model_linear_regression <- function(object, ...) {
-  
+
   ml_model_print_call(object)
   print_newline()
   ml_model_print_residuals(object, residuals.header = "Deviance Residuals:")
   print_newline()
   ml_model_print_coefficients_detailed(object)
   print_newline()
-  
+
   cat(paste("R-Squared:", signif(object$r.squared, 4)), sep = "\n")
   cat(paste("Root Mean Squared Error:", signif(object$root.mean.squared.error, 4)), sep = "\n")
 }

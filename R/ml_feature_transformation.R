@@ -68,7 +68,7 @@ ft_string_indexer <- function(x,
     params$labels <- as.character(invoke(sim, "labels"))
 
   transformed <- invoke(sim, "transform", df)
-  
+
   sdf_register(transformed)
 }
 
@@ -356,19 +356,19 @@ ft_quantile_discretizer <- function(x,
 #'
 #' @export
 ft_one_hot_encoder <- function(x, input_col = NULL, output_col = NULL) {
-  
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   discretizer <- invoke_new(
     sc,
     "org.apache.spark.ml.feature.OneHotEncoder"
   )
-  
+
   transformed <- discretizer %>%
     invoke("setInputCol", input_col) %>%
     invoke("setOutputCol", output_col) %>%
     invoke("transform", df)
-  
+
   sdf_register(transformed)
 }

@@ -9,7 +9,7 @@
 #' @template roxlate-ml-decision-trees-max-depth
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-dots
-#' 
+#'
 #' @family Spark ML routines
 #'
 #' @export
@@ -23,24 +23,24 @@ ml_decision_tree <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   prepare_response_features_intercept(df, response, features, NULL)
-  
+
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
   type <- match.arg(type)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
-  
+
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
-  
+
   # choose classification vs. regression model based on column type
   schema <- sdf_schema(df)
   responseType <- schema[[response]]$type
-  
+
   regressor  <- "org.apache.spark.ml.regression.DecisionTreeRegressor"
   classifier <- "org.apache.spark.ml.classification.DecisionTreeClassifier"
-  
+
   model <- if (identical(type, "regression"))
     regressor
   else if (identical(type, "classification"))
@@ -49,20 +49,20 @@ ml_decision_tree <- function(x,
     regressor
   else
     classifier
-  
+
   rf <- invoke_new(sc, model)
-  
+
   model <- rf %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth)
-  
+
   if (only_model) return(model)
-  
+
   fit <- model %>%
     invoke("fit", tdf)
-  
+
   ml_model("decision_tree", fit,
            features = features,
            response = response,

@@ -34,19 +34,19 @@ spark_csv_options <- function(header,
 #' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite Overwrite the table with the given name if it already exists
 #'
-#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
-#'   the local file system (\code{file://}). 
-#'   
-#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and 
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
+#'   the local file system (\code{file://}).
+#'
+#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and
 #'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
-#'   
+#'
 #' When \code{header} is \code{FALSE}, the column names are generated with a \code{V} prefix;
 #'   e.g. \code{V1, V2, ...}.
 #'
 #' @return Reference to a Spark DataFrame / dplyr tbl
-#' 
+#'
 #' @family reading and writing data
-#' 
+#'
 #' @export
 spark_read_csv <- function(sc,
                            name,
@@ -61,12 +61,12 @@ spark_read_csv <- function(sc,
                            repartition = 0,
                            memory = TRUE,
                            overwrite = TRUE) {
-  
+
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
   df <- spark_csv_read(sc, path.expand(path), options)
-  
+
   # normalize column names when header = FALSE
   if (identical(header, FALSE)) {
     columns <- invoke(df, "columns")
@@ -74,7 +74,7 @@ spark_read_csv <- function(sc,
     newNames <- sprintf("V%s", seq_len(n))
     df <- invoke(df, "toDF", as.list(newNames))
   }
-  
+
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -89,9 +89,9 @@ spark_read_csv <- function(sc,
 #' @param charset The character set, defaults to \code{"UTF-8"}.
 #' @param null_value The character to use for default values, defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
-#' 
+#'
 #' @family reading and writing data
-#' 
+#'
 #' @export
 spark_write_csv <- function(x, path,
                             header = TRUE,
@@ -116,7 +116,7 @@ spark_write_csv.tbl_spark <- function(x,
                                       options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
-  
+
   spark_csv_write(sqlResult, path.expand(path), options)
 }
 
@@ -132,7 +132,7 @@ spark_write_csv.spark_jobj <- function(x,
                                        options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
-  
+
   spark_csv_write(x, path.expand(path), options)
 }
 
@@ -140,12 +140,12 @@ spark_write_csv.spark_jobj <- function(x,
 #'
 #' @inheritParams spark_read_csv
 #' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
-#' 
-#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
-#'   the local file system (\code{file://}). 
-#'   
-#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and 
-#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.    
+#'
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
+#'   the local file system (\code{file://}).
+#'
+#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and
+#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
 #'
 #'
 #' @family reading and writing data
@@ -160,7 +160,7 @@ spark_read_parquet <- function(sc,
                                overwrite = TRUE) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
-  
+
   df <- spark_data_read_generic(sc, list(path.expand(path)), "parquet", options)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
@@ -170,7 +170,7 @@ spark_read_parquet <- function(sc,
 #' @inheritParams spark_write_csv
 #' @param mode Specifies the behavior when data or table already exists.
 #' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
-#' 
+#'
 #' @family reading and writing data
 #'
 #' @export
@@ -193,12 +193,12 @@ spark_write_parquet.spark_jobj <- function(x, path, mode = NULL, options = list(
 #' Read a JSON file into a Spark DataFrame
 #'
 #' @inheritParams spark_read_csv
-#' 
-#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as 
-#'   the local file system (\code{file://}). 
-#'   
-#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and 
-#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.    
+#'
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
+#'   the local file system (\code{file://}).
+#'
+#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and
+#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
 #'
 #'
 #' @family reading and writing data
@@ -211,9 +211,9 @@ spark_read_json <- function(sc,
                             repartition = 0,
                             memory = TRUE,
                             overwrite = TRUE) {
-  
+
   if (overwrite) spark_remove_table_if_exists(sc, name)
-  
+
   df <- spark_data_read_generic(sc, path.expand(path), "json", options)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
@@ -222,7 +222,7 @@ spark_read_json <- function(sc,
 #'
 #' @inheritParams spark_write_csv
 #' @param mode Specifies the behavior when data or table already exists.
-#' 
+#'
 #' @family reading and writing data
 #'
 #' @export
@@ -247,7 +247,7 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
   className <- invoke(class, "getName")
   if (!identical(className, expectedClassName)) {
     stop(paste(
-      "This operation is only supported on", 
+      "This operation is only supported on",
       expectedClassName,
       "jobjs but found",
       className,
@@ -258,25 +258,25 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
 
 spark_data_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
   options <- invoke(hive_context(sc), "read")
-  
+
   lapply(names(csvOptions), function(csvOptionName) {
     options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
   })
-  
+
   invoke(options, fileMethod, path)
 }
 
 spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptions = list()) {
   options <- invoke(df, "write")
-  
+
   if (!is.null(mode)) {
     options <- invoke(options, "mode", mode)
   }
-  
+
   lapply(names(csvOptions), function(csvOptionName) {
     options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
   })
-  
+
   invoke(options, fileMethod, path)
   invisible(TRUE)
 }

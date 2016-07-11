@@ -34,7 +34,7 @@ passed in to calls to \R's own \code{\link{glm}}.}
 Perform generalized linear regression on a Spark DataFrame.
 }
 \details{
-In contrast to \code{\link{ml_linear_regression}()} and 
+In contrast to \code{\link{ml_linear_regression}()} and
 \code{\link{ml_logistic_regression}()}, these routines do not allow you to
 tweak the loss function (e.g. for elastic net regression); however, the model
 fits returned by this routine are generally richer in regards to information

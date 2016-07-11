@@ -17,7 +17,7 @@ verify_msvcr100 <- function() {
                                 winslash = "/", mustWork = FALSE)
   haveMsvcr100 <- file.exists(msvcr100Path)
   if (!haveMsvcr100) {
-    msvcr100Url <- ifelse(is_win64() , 
+    msvcr100Url <- ifelse(is_win64() ,
                           "https://www.microsoft.com/download/en/details.aspx?id=13523",
                           "https://www.microsoft.com/download/en/details.aspx?id=8328")
     stop("Running Spark on Windows requires the ",
@@ -29,14 +29,14 @@ verify_msvcr100 <- function() {
 }
 
 prepare_windows_environment <- function(sparkHome) {
-  
+
   # don't do anything if aren't on windows
   if (.Platform$OS.type != "windows")
     return()
-  
+
   # verify we have msvcr100
   verify_msvcr100()
-  
+
   # set HADOOP_HOME
   hivePath <- normalizePath(file.path(sparkHome, "tmp", "hive"), mustWork = FALSE)
   if (!dir.exists(hivePath))
@@ -49,22 +49,22 @@ prepare_windows_environment <- function(sparkHome) {
   }
   system2("SETX", c("HADOOP_HOME", shQuote(hadoopPath)), stdout = NULL)
 
-  # pre-create the hive temp folder to manage permissions issues  
+  # pre-create the hive temp folder to manage permissions issues
   appUserTempDir <- normalizePath(
-    file.path(Sys.getenv("LOCALAPPDATA"), "temp", Sys.info()[["login"]]), 
+    file.path(Sys.getenv("LOCALAPPDATA"), "temp", Sys.info()[["login"]]),
     mustWork = FALSE
   )
-  
+
   if (!dir.exists(appUserTempDir)) {
     # create directory from using current user which will assign the right
     # permissions to execute in non-admin mode
     dir.create(appUserTempDir, recursive = TRUE)
   }
-  
+
   # form path to winutils.exe
-  winutils <- normalizePath(file.path(hadoopBinPath, "winutils.exe"), 
+  winutils <- normalizePath(file.path(hadoopBinPath, "winutils.exe"),
                             mustWork = FALSE)
-  
+
   # get a copy of winutils if we don't already have it
   if (!file.exists(winutils)) {
     winutilsSrc <- winutils_source_path()
@@ -73,7 +73,7 @@ prepare_windows_environment <- function(sparkHome) {
     else
       stop_with_winutils_error(hadoopBinPath)
   }
-  
+
   # ensure correct permissions on hive path
   system2(winutils, c("chmod", "777", shQuote(hivePath)))
 }
@@ -81,7 +81,7 @@ prepare_windows_environment <- function(sparkHome) {
 
 winutils_source_path <- function() {
   winutilsSrc <- ""
-  
+
   # check for rstudio version of winutils
   rstudioWinutils <- Sys.getenv("RSTUDIO_WINUTILS", unset = NA)
   if (!is.na(rstudioWinutils)) {
@@ -90,19 +90,19 @@ winutils_source_path <- function() {
     rstudioWinutils <- file.path(rstudioWinutils, "winutils.exe")
     winutilsSrc <- normalizePath(rstudioWinutils, mustWork = FALSE)
   }
-  
+
   winutilsSrc
 }
 
 
 stop_with_winutils_error <- function(hadoopBinPath) {
-  
+
   if (is_win64()) {
     winutilsDownload <- "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/"
   } else {
     winutilsDownload <- "https://code.google.com/archive/p/rrd-hadoop-win32/source/default/source"
   }
- 
+
   stop(
     "\n\n",
     "To run Spark on Windows you need a copy of Hadoop winutils.exe:",

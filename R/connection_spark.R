@@ -41,15 +41,15 @@ spark_connect <- function(master,
                           hadoop_version = NULL,
                           config = spark_config(),
                           extensions = sparkapi::registered_extensions()) {
-  
+
   # for local mode we support SPARK_HOME via locally installed versions
   if (spark_master_is_local(master)) {
     if (!nzchar(spark_home) || !is.null(version) || !is.null(hadoop_version)) {
       installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
-      spark_home <- installInfo$sparkVersionDir  
+      spark_home <- installInfo$sparkVersionDir
     }
   }
-  
+
   # prepare windows environment
   prepare_windows_environment(spark_home)
 
@@ -60,7 +60,7 @@ spark_connect <- function(master,
       stop("You must either pass a value for master or include a spark.master ",
            "entry in your config.yml")
   }
-  
+
   # determine whether we need cores in master
   passedMaster <- master
   cores <- config[["sparklyr.cores.local"]]
@@ -84,24 +84,24 @@ spark_connect <- function(master,
     stop("Java is required to connect to Spark. Please download and install Java from ",
          java_install_url())
   }
-  
+
   # error if there is no SPARK_HOME
   if (!nzchar(spark_home))
     stop("Failed to connect to Spark (SPARK_HOME is not set).")
-  
+
   scon <- NULL
   tryCatch({
-    
+
     # determine environment
     environment <- list()
     if (spark_master_is_local(master))
       environment$SPARK_LOCAL_IP = "127.0.0.1"
-    
+
     # determine shell_args (use fake connection b/c we don't yet
     # have a real connection)
     config_sc <- list(config = config, master = master)
     shell_args <- connection_config(config_sc, "sparklyr.shell.")
-    
+
     # flatten shell_args to make them compatible with sparkapi
     shell_args <- unlist(lapply(names(shell_args), function(name) {
       list(paste0("--", name), shell_args[[name]])
@@ -119,19 +119,19 @@ spark_connect <- function(master,
       environment = environment,
       shell_args = shell_args
     )
-    
+
     # mark the connection as a DBIConnection class to allow DBI to use defaults
     attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
-    
+
     # update spark_context and hive_context connections with DBIConnection
     scon$spark_context$connection <- scon
     scon$hive_context$connection <- scon
-   
+
     # notify connection viewer of connection
     libs <- c("sparklyr", extensions)
-    libs <- vapply(libs, 
-                   function(lib) paste0("library(", lib, ")"), 
-                   character("1"), 
+    libs <- vapply(libs,
+                   function(lib) paste0("library(", lib, ")"),
+                   character("1"),
                    USE.NAMES = FALSE)
     libs <- paste(libs, collapse = "\n")
     if ("package:dplyr" %in% search())
@@ -158,7 +158,7 @@ spark_connect <- function(master,
 
   # add to our internal list
   spark_connections_add(scon)
-  
+
   # return scon
   scon
 }
@@ -166,7 +166,7 @@ spark_connect <- function(master,
 #' @docType NULL
 #' @name spark_log
 #' @rdname spark_log
-#' 
+#'
 #' @export
 sparkapi::spark_log
 
@@ -176,13 +176,13 @@ spark_log.spark_connection <- function(sc, n = 100, ...) {
     log <- file("log4j.spark.log")
     lines <- readLines(log, warn = FALSE)
     close(log)
-    
+
     if (!is.null(n))
       linesLog <- utils::tail(lines, n = n)
     else
       linesLog <- lines
     attr(linesLog, "class") <- "sparklyr_log"
-    
+
     linesLog
   }
   else {
@@ -200,17 +200,17 @@ print.sparklyr_log <- function(x, ...) {
 #' @docType NULL
 #' @name spark_web
 #' @rdname spark_web
-#' 
+#'
 #' @export
 sparkapi::spark_web
 
 
 #' Check if a Spark connection is open
-#' 
+#'
 #' @param sc \code{spark_connection}
-#' 
+#'
 #' @rdname spark_connect
-#' 
+#'
 #' @export
 spark_connection_is_open <- function(sc) {
   sparkapi::connection_is_open(sc)
@@ -231,7 +231,7 @@ spark_disconnect <- function(sc) {
   })
 
   spark_connections_remove(sc)
-  
+
   on_connection_closed(sc)
 }
 
@@ -247,11 +247,11 @@ spark_log_file <- function(sc) {
   if (!connection_is_open(scon)) {
     stop("The Spark conneciton is not open anymmore, log is not available")
   }
-  
+
   lines <- spark_log(sc, n = NULL)
   tempLog <- tempfile(pattern = "spark", fileext = ".log")
   writeLines(lines, tempLog)
-  
+
   tempLog
 }
 
@@ -289,17 +289,17 @@ spark_inspect <- function(jobj) {
   print(jobj)
   if (!connection_is_open(spark_connection(jobj)))
     return(jobj)
-  
+
   class <- invoke(jobj, "getClass")
-  
+
   cat("Fields:\n")
   fields <- invoke(class, "getDeclaredFields")
   lapply(fields, function(field) { print(field) })
-  
+
   cat("Methods:\n")
   methods <- invoke(class, "getDeclaredMethods")
   lapply(methods, function(method) { print(method) })
-  
+
   jobj
 }
 

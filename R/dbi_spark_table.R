@@ -4,11 +4,11 @@ setMethod("dbWriteTable", "spark_connection",
     if (!temporary) {
       stop("Writting to non-temporary tables is not supported yet")
     }
-    
+
     if (!spark_connection_is_local(conn) && identical(local_file, TRUE)) {
       stop("Using a local file to copy data is not supported for remote clusters")
     }
-    
+
     local_file <- if (is.null(local_file)) spark_connection_is_local(conn) else local_file
 
     found <- dbExistsTable(conn, name)
@@ -32,7 +32,7 @@ setMethod("dbReadTable", c("spark_connection", "character"),
 
 setMethod("dbListTables", "spark_connection", function(conn) {
   df <- sdf_from_sql(conn, "SHOW TABLES")
-  
+
   tableNames <- df$tableName
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
   sort(filtered)
@@ -50,7 +50,7 @@ setMethod("dbRemoveTable", c("spark_connection", "character"),
     if (is_spark_v2(conn)) {
       hive <- invoke(hive, "wrapped")
     }
-    
+
     invoke(hive, "dropTempTable", name)
     invisible(TRUE)
   }

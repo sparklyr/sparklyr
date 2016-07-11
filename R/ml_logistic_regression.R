@@ -24,9 +24,9 @@ ml_logistic_regression <- function(x,
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  
+
   prepare_response_features_intercept(df, response, features, intercept)
-  
+
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
   max.iter <- ensure_scalar_integer(max.iter)
@@ -47,9 +47,9 @@ ml_logistic_regression <- function(x,
     invoke("setFitIntercept", as.logical(intercept)) %>%
     invoke("setElasticNetParam", as.double(alpha)) %>%
     invoke("setRegParam", as.double(lambda))
-  
-  if (only_model) return(model)  
-  
+
+  if (only_model) return(model)
+
   fit <- model %>%
     invoke("fit", tdf)
 
@@ -68,7 +68,7 @@ ml_logistic_regression <- function(x,
   summary <- invoke(fit, "summary")
   areaUnderROC <- invoke(summary, "areaUnderROC")
   roc <- sdf_collect(invoke(summary, "roc"))
-  
+
   coefficients <- intercept_first(coefficients)
 
   ml_model("logistic_regression", fit,
