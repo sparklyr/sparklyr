@@ -445,32 +445,22 @@ sdf_create_dummy_variables <- function(x, input, reference = NULL, labels = list
   }
 
   # generate dummy variables for each non-reference level
-  # TODO: this could likely be optimized, but might require
-  # some Scala-specific code
-  tbl <- sdf_register(sdf)
   columns <- unlist(lapply(setdiff(levels, reference), function(level) {
 
-    # generate and evaluate mutate call
-    call <- substitute(
-      mutate(tbl, name = as.numeric(column == value)),
-      list(
-        column = as.name(input),
-        value = level
-      )
-    )
+    # check what values are equal to this level (return as double)
+    column <- sdf %>%
+      invoke("col", input) %>%
+      invoke("equalTo", level) %>%
+      invoke("cast", "double")
 
-    # determine a name for this column -- if not supplied,
-    # we construct it by concatenating the column name with
-    # the level
-    column <- labels[[level]] %||% paste(input, level, sep = "")
-    names(call)[[3]] <- column
+    # generate an appropriate name for this column
+    name <- labels[[level]] %||% paste(input, level, sep = "")
 
-    # evaluate call to augment our table
-    tbl <<- eval(call)
+    # update the sdf
+    sdf <<- sdf %>% invoke("withColumn", name, column)
 
     # return the generated column name
-    column
-
+    name
   }))
 
   # report useful information in output env
@@ -482,5 +472,5 @@ sdf_create_dummy_variables <- function(x, input, reference = NULL, labels = list
   }
 
   # return our new table
-  tbl
+  sdf_register(sdf)
 }
