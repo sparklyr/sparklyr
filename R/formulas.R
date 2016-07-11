@@ -81,6 +81,21 @@ prepare_response_features_intercept <- function(df,
     intercept <- if (is.logical(parsed$intercept)) parsed$intercept
   }
 
+  # for categorical features, split them into dummy variables
+  # TODO: provide a mechanism for setting reference labels?
+  auxiliary <- new.env(parent = emptyenv())
+  features <- unlist(lapply(features, function(feature) {
+    entry <- schema[[feature]]
+    if (entry$type != "StringType")
+      return(feature)
+
+    # update data set with dummy variable columns
+    df <<- sdf_create_dummy_variables(df, feature, envir = auxiliary)
+
+    # drop one level (to avoid perfect multi-collinearity)
+    tail(auxiliary$columns, n = -1)
+  }))
+
   # ensure output format
   response <- ensure_scalar_character(response)
   features <- as.character(features)
@@ -91,4 +106,6 @@ prepare_response_features_intercept <- function(df,
   assign("features", features, envir = envir)
   assign("intercept", intercept, envir = envir)
 
+  # return mutated dataset
+  df
 }

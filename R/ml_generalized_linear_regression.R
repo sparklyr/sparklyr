@@ -34,7 +34,7 @@ ml_generalized_linear_regression <-
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  prepare_response_features_intercept(df, response, features, intercept)
+  df <- prepare_response_features_intercept(df, response, features, intercept)
 
   max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)

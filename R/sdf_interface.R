@@ -429,7 +429,7 @@ sdf_create_dummy_variables <- function(x, input, reference = NULL, labels = list
   reference <- if (!is.null(reference)) ensure_scalar_character(reference)
 
   # read unique values (levels) for our categorical variable
-  uniq <- sdf %>%
+  counts <- sdf %>%
     invoke("select", input, list()) %>%
     invoke("groupBy", input, list()) %>%
     invoke("count") %>%
@@ -437,8 +437,8 @@ sdf_create_dummy_variables <- function(x, input, reference = NULL, labels = list
     sdf_collect()
 
   # validate that 'reference' is a valid label for this column
-  levels <- uniq[[input]]
-  if (!reference %in% levels) {
+  levels <- counts[[input]]
+  if (!is.null(reference) && !reference %in% levels) {
     fmt <- "no label called '%s' in column '%s'; valid labels are:\n- %s\n"
     msg <- sprintf(fmt, reference, input, paste(shQuote(levels), collapse = ", "))
     stop(msg, call. = FALSE)
@@ -475,8 +475,10 @@ sdf_create_dummy_variables <- function(x, input, reference = NULL, labels = list
 
   # report useful information in output env
   if (is.environment(envir)) {
-    envir$levels <- levels
-    envir$columns <- columns
+    envir$levels    <- levels
+    envir$reference <- reference
+    envir$columns   <- columns
+    envir$counts    <- counts
   }
 
   # return our new table

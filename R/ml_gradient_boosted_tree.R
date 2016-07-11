@@ -24,7 +24,7 @@ ml_gradient_boosted_trees <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  prepare_response_features_intercept(df, response, features, NULL)
+  df <- prepare_response_features_intercept(df, response, features, NULL)
 
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)

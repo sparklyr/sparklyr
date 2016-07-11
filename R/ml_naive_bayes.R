@@ -20,7 +20,7 @@ ml_naive_bayes <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  prepare_response_features_intercept(df, response, features, NULL)
+  df <- prepare_response_features_intercept(df, response, features, NULL)
 
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
