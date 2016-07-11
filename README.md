@@ -42,7 +42,6 @@ You can connect to both local instances of Spark as well as remote Spark cluster
 
 ``` r
 library(sparklyr)
-library(dplyr)
 sc <- spark_connect(master = "local")
 ```
 
@@ -58,11 +57,11 @@ We can new use all of the available dplyr verbs against the tables within the cl
 We'll start by copying some datasets from R into the Spark cluster (note that you may need to install the nycflights13 and Lahman packages in order to execute this code):
 
 ``` r
-install.packages("Lahman")
-install.packages("nycflights13")
+install.packages(c("nycflights13", "Lahman"))
 ```
 
 ``` r
+library(dplyr)
 iris_tbl <- copy_to(sc, iris)
 flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
 batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
@@ -149,6 +148,29 @@ batting_tbl %>%
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
 
+Using SQL
+---------
+
+It's also possible to execute SQL queries directly against tables within a Spark cluster. The `spark_connection` object implements a [DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can use `dbGetQuery` to execute SQL and return the result as an R data frame:
+
+``` r
+library(DBI)
+iris_preview <- dbGetQuery(sc, "SELECT * FROM iris LIMIT 10")
+iris_preview
+```
+
+    ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
+    ## 1           5.1         3.5          1.4         0.2  setosa
+    ## 2           4.9         3.0          1.4         0.2  setosa
+    ## 3           4.7         3.2          1.3         0.2  setosa
+    ## 4           4.6         3.1          1.5         0.2  setosa
+    ## 5           5.0         3.6          1.4         0.2  setosa
+    ## 6           5.4         3.9          1.7         0.4  setosa
+    ## 7           4.6         3.4          1.4         0.3  setosa
+    ## 8           5.0         3.4          1.5         0.2  setosa
+    ## 9           4.4         2.9          1.4         0.2  setosa
+    ## 10          4.9         3.1          1.5         0.1  setosa
+
 Machine Learning
 ----------------
 
@@ -173,7 +195,7 @@ fit
 ```
 
     ## Call:
-    ## mpg ~ wt + cyl
+    ## mpg ~ wt + cyl 
     ## 
     ## Coefficients:
     ## (Intercept)          wt         cyl 
@@ -186,7 +208,7 @@ summary(fit)
 ```
 
     ## Call:
-    ## mpg ~ wt + cyl
+    ## mpg ~ wt + cyl 
     ## 
     ## Deviance Residuals::
     ##     Min      1Q  Median      3Q     Max 
@@ -298,16 +320,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/07/08 17:10:03 INFO ContextCleaner: Cleaned accumulator 245
-    ## 16/07/08 17:10:03 INFO BlockManagerInfo: Removed broadcast_73_piece0 on localhost:64156 in memory (size: 19.3 KB, free: 483.0 MB)
-    ## 16/07/08 17:10:03 INFO BlockManagerInfo: Removed broadcast_72_piece0 on localhost:64156 in memory (size: 1905.0 B, free: 483.0 MB)
-    ## 16/07/08 17:10:03 INFO ContextCleaner: Cleaned accumulator 244
-    ## 16/07/08 17:10:03 INFO BlockManagerInfo: Removed broadcast_71_piece0 on localhost:64156 in memory (size: 19.3 KB, free: 483.0 MB)
-    ## 16/07/08 17:10:03 INFO Executor: Finished task 0.0 in stage 66.0 (TID 500). 2082 bytes result sent to driver
-    ## 16/07/08 17:10:03 INFO TaskSetManager: Finished task 0.0 in stage 66.0 (TID 500) in 110 ms on localhost (1/1)
-    ## 16/07/08 17:10:03 INFO TaskSchedulerImpl: Removed TaskSet 66.0, whose tasks have all completed, from pool 
-    ## 16/07/08 17:10:03 INFO DAGScheduler: ResultStage 66 (count at NativeMethodAccessorImpl.java:-2) finished in 0.111 s
-    ## 16/07/08 17:10:03 INFO DAGScheduler: Job 46 finished: count at NativeMethodAccessorImpl.java:-2, took 0.113858 s
+    ## 16/07/11 08:02:53 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 67 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpxqBOpz/file74f16edc3460.csv MapPartitionsRDD[300] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/07/11 08:02:53 INFO TaskSchedulerImpl: Adding task set 67.0 with 1 tasks
+    ## 16/07/11 08:02:53 INFO TaskSetManager: Starting task 0.0 in stage 67.0 (TID 501, localhost, partition 0,PROCESS_LOCAL, 2473 bytes)
+    ## 16/07/11 08:02:53 INFO Executor: Running task 0.0 in stage 67.0 (TID 501)
+    ## 16/07/11 08:02:53 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpxqBOpz/file74f16edc3460.csv:0+33313106
+    ## 16/07/11 08:02:53 INFO Executor: Finished task 0.0 in stage 67.0 (TID 501). 2082 bytes result sent to driver
+    ## 16/07/11 08:02:53 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 501) in 103 ms on localhost (1/1)
+    ## 16/07/11 08:02:53 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/07/11 08:02:53 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.103 s
+    ## 16/07/11 08:02:53 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.107400 s
 
 Finally, we disconnect from Spark:
 

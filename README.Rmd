@@ -50,7 +50,6 @@ You can connect to both local instances of Spark as well as remote Spark cluster
 
 ```{r, message=FALSE}
 library(sparklyr)
-library(dplyr)
 sc <- spark_connect(master = "local")
 ```
 
@@ -65,11 +64,11 @@ We can new use all of the available dplyr verbs against the tables within the cl
 We'll start by copying some datasets from R into the Spark cluster (note that you may need to install the nycflights13 and Lahman packages in order to execute this code):
 
 ```{r, eval=FALSE}
-install.packages("Lahman")
-install.packages("nycflights13")
+install.packages(c("nycflights13", "Lahman"))
 ```
 
-```{r}
+```{r, message=FALSE}
+library(dplyr)
 iris_tbl <- copy_to(sc, iris)
 flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
 batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
@@ -115,6 +114,16 @@ batting_tbl %>%
 ```
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
+
+## Using SQL
+
+It's also possible to execute SQL queries directly against tables within a Spark cluster. The `spark_connection` object implements a [DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can use `dbGetQuery` to execute SQL and return the result as an R data frame:
+
+```{r}
+library(DBI)
+iris_preview <- dbGetQuery(sc, "SELECT * FROM iris LIMIT 10")
+iris_preview
+```
 
 ## Machine Learning
 
