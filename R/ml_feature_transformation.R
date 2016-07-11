@@ -344,3 +344,31 @@ ft_quantile_discretizer <- function(x,
 
   sdf_register(transformed)
 }
+
+#' Feature Transformation -- OneHotEncoder
+#'
+#' One-hot encoding maps a column of label indices to a column of binary
+#' vectors, with at most a single one-value. This encoding allows algorithms
+#' which expect continuous features, such as Logistic Regression, to use
+#' categorical features.
+#'
+#' @template roxlate-ml-transformation
+#'
+#' @export
+ft_one_hot_encoder <- function(x, input_col = NULL, output_col = NULL) {
+  
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
+  
+  discretizer <- invoke_new(
+    sc,
+    "org.apache.spark.ml.feature.OneHotEncoder"
+  )
+  
+  transformed <- discretizer %>%
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col) %>%
+    invoke("transform", df)
+  
+  sdf_register(transformed)
+}
