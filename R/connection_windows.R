@@ -47,7 +47,10 @@ prepare_windows_environment <- function(sparkHome) {
     dir.create(hadoopBinPath, recursive = TRUE)
     message(paste("Created default hadoop bin directory under:", hadoopPath))
   }
-  system2("SETX", c("HADOOP_HOME", shQuote(hadoopPath)), stdout = NULL)
+
+  if (nchar(Sys.getenv("HADOOP_HOME")) == 0) {
+    system2("SETX", c("HADOOP_HOME", shQuote(hadoopPath)), stdout = NULL)
+  }
 
   # pre-create the hive temp folder to manage permissions issues
   appUserTempDir <- normalizePath(
