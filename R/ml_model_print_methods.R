@@ -3,17 +3,8 @@ print_newline <- function() {
 }
 
 ml_model_print_call <- function(model) {
-
-  formula <- paste(
-    paste(model$response, collapse = " + "),
-    "~",
-    paste(model$features, collapse = " + "),
-    if (identical(model$intercept, FALSE)) "- 1"
-  )
-
-  cat("Call:", sep = "\n")
-  cat(formula, sep = "\n")
-  invisible(formula)
+  printf("Call: %s\n", format(model$.call))
+  invisible(model$.call)
 }
 
 ml_model_print_residuals <- function(model,
