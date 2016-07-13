@@ -14,7 +14,10 @@ spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
   }
 
   # Escaping issues that used to work were broken in Spark 2.0.0-preview, fix:
-  names(df) <- gsub("[^a-zA-Z0-9]", "_", names(df))
+  version <- invoke(spark_context(sc), "version")
+  if (identical(version, "2.0.0-preview")) {
+    names(df) <- gsub("[^a-zA-Z0-9]", "_", names(df))
+  }
 
   columns <- lapply(df, function(e) {
     if (is.factor(e))
@@ -45,7 +48,7 @@ spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
         })
       else
         e
-    }))
+    }), optional = TRUE)
 
     rows <- lapply(seq_len(NROW(df)), function(e) as.list(df[e,]))
 

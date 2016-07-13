@@ -81,7 +81,7 @@ setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA
 
     res@lastFetch = end
 
-    dfFetch <- as.data.frame(res@df[start:end, ], drop = FALSE)
+    dfFetch <- as.data.frame(res@df[start:end, ], drop = FALSE, optional = TRUE)
     colnames(dfFetch) <- colnames(res@df)
 
     dfFetch
