@@ -13,10 +13,36 @@ spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
     stop("The repartition parameter must be an integer")
   }
 
-  # Escaping issues that used to work were broken in Spark 2.0.0-preview, fix:
-  version <- invoke(spark_context(sc), "version")
-  if (identical(version, "2.0.0-preview")) {
-    names(df) <- gsub("[^a-zA-Z0-9]", "_", names(df))
+  # Spark unfortunately has a number of issues with '.'s in column names, e.g.
+  #
+  #    https://issues.apache.org/jira/browse/SPARK-5632
+  #    https://issues.apache.org/jira/browse/SPARK-13455
+  #
+  # Many of these issues are marked as resolved, but it appears this is
+  # a common regression in Spark and the handling is not uniform across
+  # the Spark API.
+  reNotAlpha <- "[^a-zA-Z0-9]"
+  badNamesIdx <- grep(reNotAlpha, names(df))
+  if (length(badNamesIdx)) {
+    oldNames <- names(df)[badNamesIdx]
+    newNames <- gsub(reNotAlpha, "_", oldNames)
+    names(df)[badNamesIdx] <- newNames
+    if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
+
+      nLhs <- max(nchar(oldNames))
+      nRhs <- max(nchar(newNames))
+
+      lhs <- sprintf(paste("%-", nLhs + 2, "s", sep = ""), shQuote(oldNames))
+      rhs <- sprintf(paste("%-", nRhs + 2, "s", sep = ""), shQuote(newNames))
+
+      msg <- paste(
+        "The following columns have been renamed:",
+        paste("-", lhs, "=>", rhs, collapse = "\n"),
+        sep = "\n"
+      )
+
+      message(msg)
+    }
   }
 
   columns <- lapply(df, function(e) {
