@@ -3,7 +3,7 @@ print_newline <- function() {
 }
 
 ml_model_print_call <- function(model) {
-  printf("Call: %s\n", format(model$.call))
+  printf("Call: %s\n", paste(format(model$.call), collapse = " "))
   invisible(model$.call)
 }
 
