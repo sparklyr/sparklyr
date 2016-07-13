@@ -68,3 +68,12 @@ spark_require_version <- function(sc, required, module = NULL) {
 
   TRUE
 }
+
+# normalize a path we are going to send to spark (pass mustWork = FALSE
+# so that e.g. hdfs:// and s3n:// paths don't produce a warning). note
+# that this will take care of path.expand ("~") as well as converting
+# relative paths to absolute (necessary since the path will be read by
+# another process that has a different current working directory)
+spark_normalize_path <- function(path) {
+  normalizePath(path, mustWork = FALSE)
+}
