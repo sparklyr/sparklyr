@@ -71,7 +71,7 @@ prepare_response_features_intercept <- function(df,
   # construct dummy data.frame from Spark DataFrame schema
   schema <- sdf_schema(df)
   names <- lapply(schema, `[[`, "name")
-  rdf <- as.data.frame(names, stringsAsFactors = FALSE)
+  rdf <- as.data.frame(names, stringsAsFactors = FALSE, optional = TRUE)
 
   # handle formulas as response
   if (is.formula(response)) {

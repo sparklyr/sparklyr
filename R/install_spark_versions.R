@@ -43,7 +43,8 @@ spark_installed_versions <- function() {
   })
   versions <- data.frame(spark = spark,
                          hadoop = hadoop,
-                         dir = dir)
+                         dir = dir,
+                         stringsAsFactors = FALSE)
 
   versions
 }
