@@ -444,33 +444,38 @@ sdf_create_dummy_variables <- function(x, input, reference = NULL, labels = list
     stop(msg, call. = FALSE)
   }
 
-  # generate dummy variables for each non-reference level
-  columns <- unlist(lapply(setdiff(levels, reference), function(level) {
+  # extract columns of dataset (as Spark Column objects)
+  colNames  <- invoke(sdf, "columns")
+  colValues <- lapply(colNames, function(colName) {
+    invoke(sdf, "col", colName)
+  })
 
-    # check what values are equal to this level (return as double)
-    column <- sdf %>%
+  # generate dummy variables for each level
+  dummyValues <- lapply(levels, function(level) {
+    sdf %>%
       invoke("col", input) %>%
       invoke("equalTo", level) %>%
       invoke("cast", "double")
+  })
 
-    # generate an appropriate name for this column
-    name <- labels[[level]] %||% paste(input, level, sep = "")
-
-    # update the sdf
-    sdf <<- sdf %>% invoke("withColumn", name, column)
-
-    # return the generated column name
-    name
+  # generate appropriate names for the columns
+  dummyNames <- unlist(lapply(levels, function(level) {
+    labels[[level]] %||% paste(input, level, sep = "")
   }))
+
+  # extract a new Spark DataFrame with these columns
+  mutated <- sdf %>%
+    invoke("select", c(colValues, dummyValues)) %>%
+    invoke("toDF", c(colNames, dummyNames))
 
   # report useful information in output env
   if (is.environment(envir)) {
     envir$levels    <- levels
     envir$reference <- reference
-    envir$columns   <- columns
+    envir$columns   <- dummyNames
     envir$counts    <- counts
   }
 
   # return our new table
-  sdf_register(sdf)
+  sdf_register(mutated)
 }
