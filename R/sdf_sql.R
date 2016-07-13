@@ -101,9 +101,8 @@ sdf_from_sql <- function(sc, sql) {
     })
     names(dfEmpty) <- dfNames
 
-    df <- data.frame(dfEmpty, stringsAsFactors=FALSE)
-  }
-  else {
+    df <- data.frame(dfEmpty, stringsAsFactors = FALSE, check.names = FALSE)
+  } else {
     stringData <- unlist(df)
     df <- as.data.frame(seq_len(rows))
 
