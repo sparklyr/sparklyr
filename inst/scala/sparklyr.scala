@@ -31,10 +31,19 @@ object utils {
   def readColumnDefault(rdd: RDD[Row]): Array[Any] = {
     rdd.map(row => row(0)).collect()
   }
-  
+
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
     var data = rows.map(o => {
       val r = o.asInstanceOf[Array[_]]
+      org.apache.spark.sql.Row.fromSeq(r)
+    })
+
+    sc.parallelize(data, partitions)
+  }
+
+  def createDataFrameFromText(sc: SparkContext, rows: Array[String], partitions: Int): RDD[Row] = {
+    var data = rows.map(o => {
+      val r = o.split("|")
       org.apache.spark.sql.Row.fromSeq(r)
     })
 
