@@ -12,5 +12,5 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
   for (i in 2:n)
     sdf <- invoke(sdf, "unionAll", spark_dataframe(dots[[i]]))
 
-  sdf_register(sdf)
+  sdf_register(sdf, name = name)
 }
