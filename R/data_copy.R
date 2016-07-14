@@ -21,29 +21,7 @@ spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
   # Many of these issues are marked as resolved, but it appears this is
   # a common regression in Spark and the handling is not uniform across
   # the Spark API.
-  reNotAlpha <- "[^a-zA-Z0-9]"
-  badNamesIdx <- grep(reNotAlpha, names(df))
-  if (length(badNamesIdx)) {
-    oldNames <- names(df)[badNamesIdx]
-    newNames <- gsub(reNotAlpha, "_", oldNames)
-    names(df)[badNamesIdx] <- newNames
-    if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
-
-      nLhs <- max(nchar(oldNames))
-      nRhs <- max(nchar(newNames))
-
-      lhs <- sprintf(paste("%-", nLhs + 2, "s", sep = ""), shQuote(oldNames))
-      rhs <- sprintf(paste("%-", nRhs + 2, "s", sep = ""), shQuote(newNames))
-
-      msg <- paste(
-        "The following columns have been renamed:",
-        paste("-", lhs, "=>", rhs, collapse = "\n"),
-        sep = "\n"
-      )
-
-      message(msg)
-    }
-  }
+  names(df) <- spark_sanitize_names(names(df))
 
   columns <- lapply(df, function(e) {
     if (is.factor(e))

@@ -68,3 +68,57 @@ spark_require_version <- function(sc, required, module = NULL) {
 
   TRUE
 }
+
+regex_replace <- function(string, ...) {
+  dots <- list(...)
+  nm <- names(dots)
+  for (i in seq_along(dots))
+    string <- gsub(nm[[i]], dots[[i]], string, perl = TRUE)
+  string
+}
+
+spark_sanitize_names <- function(names) {
+
+  # sanitize names by default, but opt out with global option
+  if (!isTRUE(getOption("sparklyr.sanitize.column.names", TRUE)))
+    return(names)
+
+  # valid names start with letter, followed by alphanumeric characters
+  reValidName <- "^[a-zA-Z][a-zA-Z0-9_]*$"
+  badNamesIdx <- grep(reValidName, names, invert = TRUE)
+
+  if (length(badNamesIdx)) {
+
+    oldNames <- names[badNamesIdx]
+
+    # replace spaces with '_', and discard other characters
+    newNames <- regex_replace(oldNames,
+      "^\\s*|\\s*$" = "",
+      "[\\s.]+"        = "_",
+      "[^\\w_]"     = "",
+      "^(\\W)"      = "V\\1"
+    )
+
+    names[badNamesIdx] <- newNames
+
+    # report translations
+    if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
+
+      nLhs <- max(nchar(oldNames))
+      nRhs <- max(nchar(newNames))
+
+      lhs <- sprintf(paste("%-", nLhs + 2, "s", sep = ""), shQuote(oldNames))
+      rhs <- sprintf(paste("%-", nRhs + 2, "s", sep = ""), shQuote(newNames))
+
+      msg <- paste(
+        "The following columns have been renamed:",
+        paste("-", lhs, "=>", rhs, collapse = "\n"),
+        sep = "\n"
+      )
+
+      message(msg)
+    }
+  }
+
+  names
+}

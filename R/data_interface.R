@@ -67,12 +67,18 @@ spark_read_csv <- function(sc,
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
   df <- spark_csv_read(sc, path.expand(path), options)
 
-  # normalize column names when header = FALSE
   if (identical(header, FALSE)) {
+    # normalize column names when header = FALSE
     columns <- invoke(df, "columns")
     n <- length(columns)
     newNames <- sprintf("V%s", seq_len(n))
     df <- invoke(df, "toDF", as.list(newNames))
+  } else {
+    # sanitize column names
+    colNames <- invoke(df, "columns")
+    sanitized <- spark_sanitize_names(colNames)
+    if (!identical(colNames, sanitized))
+      df <- invoke(df, "toDF", as.list(sanitized))
   }
 
   spark_partition_register_df(sc, df, name, repartition, memory)
