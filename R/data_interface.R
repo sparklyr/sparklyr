@@ -65,7 +65,7 @@ spark_read_csv <- function(sc,
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
-  df <- spark_csv_read(sc, path.expand(path), options)
+  df <- spark_csv_read(sc, spark_normalize_path(path), options)
 
   if (identical(header, FALSE)) {
     # normalize column names when header = FALSE
@@ -123,7 +123,7 @@ spark_write_csv.tbl_spark <- function(x,
   sqlResult <- spark_sqlresult_from_dplyr(x)
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
 
-  spark_csv_write(sqlResult, path.expand(path), options)
+  spark_csv_write(sqlResult, spark_normalize_path(path), options)
 }
 
 #' @export
@@ -139,7 +139,7 @@ spark_write_csv.spark_jobj <- function(x,
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
 
-  spark_csv_write(x, path.expand(path), options)
+  spark_csv_write(x, spark_normalize_path(path), options)
 }
 
 #' Read a Parquet file into a Spark DataFrame
@@ -167,7 +167,7 @@ spark_read_parquet <- function(sc,
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, list(path.expand(path)), "parquet", options)
+  df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "parquet", options)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -187,13 +187,13 @@ spark_write_parquet <- function(x, path, mode = NULL, options = list()) {
 #' @export
 spark_write_parquet.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, path.expand(path), "parquet", mode, options)
+  spark_data_write_generic(sqlResult, spark_normalize_path(path), "parquet", mode, options)
 }
 
 #' @export
 spark_write_parquet.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, path.expand(path), "parquet", mode, options)
+  spark_data_write_generic(x, normalizePath(path), "parquet", mode, options)
 }
 
 #' Read a JSON file into a Spark DataFrame
@@ -220,7 +220,7 @@ spark_read_json <- function(sc,
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, path.expand(path), "json", options)
+  df <- spark_data_read_generic(sc, spark_normalize_path(path), "json", options)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -239,13 +239,13 @@ spark_write_json <- function(x, path, mode = NULL, options = list()) {
 #' @export
 spark_write_json.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, path.expand(path), "json", mode, options)
+  spark_data_write_generic(sqlResult, spark_normalize_path(path), "json", mode, options)
 }
 
 #' @export
 spark_write_json.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, path.expand(path), "json", mode, options)
+  spark_data_write_generic(x, spark_normalize_path(path), "json", mode, options)
 }
 
 spark_expect_jobj_class <- function(jobj, expectedClassName) {
