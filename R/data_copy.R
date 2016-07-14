@@ -45,7 +45,7 @@ spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
 
     # Map date and time columns as standard doubles
     df <- as.data.frame(lapply(df, function(e) {
-      if (is.time(e) || is.date(e))
+      if (inherits(e, "POSIXt") || inherits(e, "Date"))
         sapply(e, function(t) {
           class(t) <- NULL
           t
