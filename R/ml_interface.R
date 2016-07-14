@@ -1,5 +1,6 @@
 ml_model <- function(class, model, ...) {
-  object <- list(..., .model = model)
+  call <- sys.call(sys.parent())
+  object <- list(..., .call = call, .model = model)
   class(object) <- c(
     paste("ml_model", class, sep = "_"),
     "ml_model"

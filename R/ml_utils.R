@@ -1,14 +1,3 @@
-spark_jobj_list_to_array_df <- function(data, dataNames) {
-  listOfLists <- lapply(data, function(e) {
-    invoke(e, "toArray")
-  })
-
-  df <- as.data.frame(t(matrix(unlist(listOfLists), nrow=length(dataNames))))
-  colnames(df) <- dataNames
-
-  df
-}
-
 ml_prepare_dataframe <- function(df, features, response = NULL, ...,
                                  envir = new.env(parent = emptyenv()))
 {

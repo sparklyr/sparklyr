@@ -70,22 +70,21 @@ setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, state
 
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
   if (n == -1 || NROW(res@df) < n)
-    res@df
-  else {
-    start <- 1
-    end <- n
-    if (length(res@lastFetch) > 0) {
-      start <- res@lastFetch + 1
-      end <- res@lastFetch + end
-    }
+    return(res@df)
 
-    res@lastFetch = end
-
-    dfFetch <- as.data.frame(res@df[start:end, ], drop = FALSE)
-    colnames(dfFetch) <- colnames(res@df)
-
-    dfFetch
+  start <- 1
+  end <- n
+  if (length(res@lastFetch) > 0) {
+    start <- res@lastFetch + 1
+    end <- res@lastFetch + end
   }
+
+  res@lastFetch = end
+
+  dfFetch <- as.data.frame(res@df[start:end, ], drop = FALSE, optional = TRUE)
+  colnames(dfFetch) <- colnames(res@df)
+
+  dfFetch
 })
 
 setMethod("dbBind", "DBISparkResult", function(res, params, ...) {

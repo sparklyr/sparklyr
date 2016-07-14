@@ -56,7 +56,7 @@ ml_kmeans <- function(x,
   }))
 
   names(centersList) <- features
-  centers <- as.data.frame(centersList, stringsAsFactors = FALSE)
+  centers <- as.data.frame(centersList, stringsAsFactors = FALSE, optional = TRUE)
 
   ml_model("kmeans", fit,
            centers = centers,
