@@ -20,6 +20,16 @@ setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
   get_data_type(obj)
 })
 
+setMethod("sqlParseVariables", "spark_connection", function(con, sql, ...) {
+  method <- getMethod("sqlParseVariables", "DBIConnection")
+  method(con, sql, ...)
+})
+
+setMethod("sqlInterpolate", "spark_connection", function(`_con`, `_sql`, ...) {
+  method <- getMethod("sqlInterpolate", "DBIConnection")
+  method(`_con`, `_sql`, ...)
+})
+
 get_data_type <- function(obj) {
   if (is.factor(obj)) return("TEXT")
 

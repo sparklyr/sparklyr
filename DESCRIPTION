@@ -10,10 +10,10 @@ Authors@R: c(
     person(family = "The Apache Software Foundation", role = c("aut", "cph"))
     )
 Maintainer: Javier Luraschi <javier@rstudio.com>
-Description: Provision, connect and interface to Apache Spark from within R. This
-    package supports connecting to local and remote Apache Spark clusters, provides
-    a dplyr-compatible back-end, and provides an interface to Spark's built-in machine
-    learning algorithms.
+Description: Provision, connect and interface to Apache Spark from within R.
+    This package supports connecting to local and remote Apache Spark clusters,
+    provides a dplyr-compatible back-end, and provides an interface to Spark's
+    built-in machine learning algorithms.
 License: file LICENSE
 LazyData: TRUE
 RoxygenNote: 5.0.1
@@ -32,8 +32,7 @@ Imports:
     config,
     rappdirs,
     assertthat
-Remotes:
-    rstudio/sparkapi
+Remotes: rstudio/sparkapi
 Suggests:
     testthat,
     RCurl
