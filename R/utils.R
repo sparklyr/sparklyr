@@ -120,7 +120,7 @@ spark_sanitize_names <- function(names) {
     }
   }
 
-  names
+  make.unique(names, sep = "_")
 }
 
 # normalize a path we are going to send to spark (pass mustWork = FALSE
