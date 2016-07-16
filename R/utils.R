@@ -1,5 +1,3 @@
-.globals <- new.env(parent = emptyenv())
-
 is.installed <- function(package) {
   is.element(package, installed.packages()[,1])
 }

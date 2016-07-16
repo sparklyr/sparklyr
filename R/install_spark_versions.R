@@ -1,3 +1,5 @@
+.globals <- new.env(parent = emptyenv())
+
 spark_versions_file_pattern <- function() {
   "spark-(.*)-bin-(?:hadoop)?(.*)"
 }
