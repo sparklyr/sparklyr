@@ -75,7 +75,7 @@ spark_read_csv <- function(sc,
     df <- invoke(df, "toDF", as.list(newNames))
   } else {
     # sanitize column names
-    colNames <- invoke(df, "columns")
+    colNames <- as.character(invoke(df, "columns"))
     sanitized <- spark_sanitize_names(colNames)
     if (!identical(colNames, sanitized))
       df <- invoke(df, "toDF", as.list(sanitized))

@@ -90,6 +90,30 @@ spark_sanitize_names <- function(names) {
   if (length(badNamesIdx)) {
 
     oldNames <- names[badNamesIdx]
+    newNames <- oldNames
+
+    # detect Windows
+    windows <- Sys.info()[["sysname"]] == "Windows"
+
+    # use 'iconv' to translate names to ASCII if possible
+    newNames <- unlist(lapply(newNames, function(name) {
+
+      # ensure UTF-8
+      if (windows || !Encoding(name) %in% c("unknown", "UTF-8"))
+        name <- iconv(name, to = "UTF-8")
+
+      # attempt to translate from UTF-8 to ASCII
+      transformed <- tryCatch(
+        iconv(name, from = "UTF-8", to = "ASCII//TRANSLIT"),
+        error = function(e) NA
+      )
+
+      # on success, return the transformed name
+      if (!is.na(transformed))
+        transformed
+      else
+        name
+    }))
 
     # replace spaces with '_', and discard other characters
     newNames <- regex_replace(oldNames,
@@ -100,6 +124,10 @@ spark_sanitize_names <- function(names) {
     )
 
     names[badNamesIdx] <- newNames
+
+    # ensure unique
+    names <- make.unique(names, sep = "_")
+    newNames <- names[badNamesIdx]
 
     # report translations
     if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
@@ -120,7 +148,7 @@ spark_sanitize_names <- function(names) {
     }
   }
 
-  make.unique(names, sep = "_")
+  names
 }
 
 # normalize a path we are going to send to spark (pass mustWork = FALSE
