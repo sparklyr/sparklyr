@@ -97,7 +97,7 @@ spark_sanitize_names <- function(names) {
 
       # attempt to translate to ASCII
       transformed <- tryCatch(
-        iconv(name, to = "ASCII//TRANSLIT"),
+        iconv(name, to = "ASCII//TRANSLIT//IGNORE"),
         error = function(e) NA
       )
 
