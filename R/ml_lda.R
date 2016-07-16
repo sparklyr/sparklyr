@@ -4,6 +4,7 @@
 #'
 #' @template roxlate-ml-x
 #' @template roxlate-ml-features
+#' @param k The number of topics to estimate.
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -11,6 +12,7 @@
 #' @export
 ml_lda <- function(x,
                    features = dplyr::tbl_vars(x),
+                   k = length(features),
                    ...) {
 
   df <- spark_dataframe(x)
@@ -18,6 +20,7 @@ ml_lda <- function(x,
 
   prepare_features(df, features)
 
+  k <- ensure_scalar_integer(k)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
@@ -29,7 +32,7 @@ ml_lda <- function(x,
   )
 
   model <- lda %>%
-    invoke("setK", length(features)) %>%
+    invoke("setK", k) %>%
     invoke("setFeaturesCol", envir$features)
 
   if (only_model) return(model)

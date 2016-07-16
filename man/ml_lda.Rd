@@ -4,13 +4,15 @@
 \alias{ml_lda}
 \title{Spark ML -- Latent Dirichlet Allocation}
 \usage{
-ml_lda(x, features = dplyr::tbl_vars(x), ...)
+ml_lda(x, features = dplyr::tbl_vars(x), k = length(features), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
 \code{tbl_spark}).}
 
 \item{features}{The name of features (terms) to use for the model fit.}
+
+\item{k}{The number of topics to estimate.}
 
 \item{...}{Optional arguments; currently unused.}
 }
