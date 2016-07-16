@@ -118,22 +118,29 @@ spark_sanitize_names <- function(names) {
   if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
 
     changedIdx <- which(oldNames != newNames)
-    changedOldNames <- oldNames[changedIdx]
-    changedNewNames <- newNames[changedIdx]
+    if (length(changedIdx)) {
 
-    nLhs <- max(nchar(changedOldNames))
-    nRhs <- max(nchar(changedNewNames))
+      changedOldNames <- oldNames[changedIdx]
+      changedNewNames <- newNames[changedIdx]
 
-    lhs <- sprintf(paste("%-", nLhs + 2, "s", sep = ""), shQuote(changedOldNames))
-    rhs <- sprintf(paste("%-", nRhs + 2, "s", sep = ""), shQuote(changedNewNames))
+      nLhs <- max(nchar(changedOldNames))
+      nRhs <- max(nchar(changedNewNames))
 
-    msg <- paste(
-      "The following columns have been renamed:",
-      paste("-", lhs, "=>", rhs, collapse = "\n"),
-      sep = "\n"
-    )
+      lhs <- sprintf(paste("%-", nLhs + 2, "s", sep = ""), shQuote(changedOldNames))
+      rhs <- sprintf(paste("%-", nRhs + 2, "s", sep = ""), shQuote(changedNewNames))
 
-    message(msg)
+      n <- floor(log10(max(changedIdx)))
+      index <- sprintf(paste("(#%-", n, "s)", sep = ""), changedIdx)
+
+      msg <- paste(
+        "The following columns have been renamed:",
+        paste("-", lhs, "=>", rhs, index, collapse = "\n"),
+        sep = "\n"
+      )
+
+      message(msg)
+
+    }
   }
 
   newNames
