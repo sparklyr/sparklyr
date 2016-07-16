@@ -91,7 +91,7 @@ spark_sanitize_names <- function(names) {
 
     # attempt to translate to ASCII
     transformed <- tryCatch(
-      iconv(name, to = "ASCII//TRANSLIT//IGNORE"),
+      iconv(name, to = "ASCII//TRANSLIT"),
       error = function(e) NA
     )
 
@@ -104,7 +104,7 @@ spark_sanitize_names <- function(names) {
 
   # replace spaces with '_', and discard other characters
   newNames <- regex_replace(
-    oldNames,
+    newNames,
     "^\\s*|\\s*$" = "",
     "[\\s.]+"        = "_",
     "[^\\w_]"     = "",
