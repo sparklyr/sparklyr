@@ -83,65 +83,60 @@ spark_sanitize_names <- function(names) {
   if (!isTRUE(getOption("sparklyr.sanitize.column.names", TRUE)))
     return(names)
 
-  # valid names start with letter, followed by alphanumeric characters
-  reValidName <- "^[a-zA-Z][a-zA-Z0-9_]*$"
-  badNamesIdx <- grep(reValidName, names, invert = TRUE)
+  # begin transforming names
+  oldNames <- newNames <- names
 
-  if (length(badNamesIdx)) {
+  # use 'iconv' to translate names to ASCII if possible
+  newNames <- unlist(lapply(newNames, function(name) {
 
-    oldNames <- names[badNamesIdx]
-    newNames <- oldNames
-
-    # use 'iconv' to translate names to ASCII if possible
-    newNames <- unlist(lapply(newNames, function(name) {
-
-      # attempt to translate to ASCII
-      transformed <- tryCatch(
-        iconv(name, to = "ASCII//TRANSLIT//IGNORE"),
-        error = function(e) NA
-      )
-
-      # on success, return the transformed name
-      if (!is.na(transformed))
-        transformed
-      else
-        name
-    }))
-
-    # replace spaces with '_', and discard other characters
-    newNames <- regex_replace(oldNames,
-      "^\\s*|\\s*$" = "",
-      "[\\s.]+"        = "_",
-      "[^\\w_]"     = "",
-      "^(\\W)"      = "V\\1"
+    # attempt to translate to ASCII
+    transformed <- tryCatch(
+      iconv(name, to = "ASCII//TRANSLIT//IGNORE"),
+      error = function(e) NA
     )
 
-    names[badNamesIdx] <- newNames
+    # on success, return the transformed name
+    if (!is.na(transformed))
+      transformed
+    else
+      name
+  }))
 
-    # ensure unique
-    names <- make.unique(names, sep = "_")
-    newNames <- names[badNamesIdx]
+  # replace spaces with '_', and discard other characters
+  newNames <- regex_replace(
+    oldNames,
+    "^\\s*|\\s*$" = "",
+    "[\\s.]+"        = "_",
+    "[^\\w_]"     = "",
+    "^(\\W)"      = "V\\1"
+  )
 
-    # report translations
-    if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
+  # ensure new names are unique
+  newNames <- make.unique(newNames, sep = "_")
 
-      nLhs <- max(nchar(oldNames))
-      nRhs <- max(nchar(newNames))
+  # report translations
+  if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
 
-      lhs <- sprintf(paste("%-", nLhs + 2, "s", sep = ""), shQuote(oldNames))
-      rhs <- sprintf(paste("%-", nRhs + 2, "s", sep = ""), shQuote(newNames))
+    changedIdx <- which(oldNames != newNames)
+    changedOldNames <- oldNames[changedIdx]
+    changedNewNames <- newNames[changedIdx]
 
-      msg <- paste(
-        "The following columns have been renamed:",
-        paste("-", lhs, "=>", rhs, collapse = "\n"),
-        sep = "\n"
-      )
+    nLhs <- max(nchar(changedOldNames))
+    nRhs <- max(nchar(changedNewNames))
 
-      message(msg)
-    }
+    lhs <- sprintf(paste("%-", nLhs + 2, "s", sep = ""), shQuote(changedOldNames))
+    rhs <- sprintf(paste("%-", nRhs + 2, "s", sep = ""), shQuote(changedNewNames))
+
+    msg <- paste(
+      "The following columns have been renamed:",
+      paste("-", lhs, "=>", rhs, collapse = "\n"),
+      sep = "\n"
+    )
+
+    message(msg)
   }
 
-  names
+  newNames
 }
 
 # normalize a path we are going to send to spark (pass mustWork = FALSE
