@@ -92,19 +92,12 @@ spark_sanitize_names <- function(names) {
     oldNames <- names[badNamesIdx]
     newNames <- oldNames
 
-    # detect Windows
-    windows <- Sys.info()[["sysname"]] == "Windows"
-
     # use 'iconv' to translate names to ASCII if possible
     newNames <- unlist(lapply(newNames, function(name) {
 
-      # ensure UTF-8
-      if (windows || !Encoding(name) %in% c("unknown", "UTF-8"))
-        name <- iconv(name, to = "UTF-8")
-
-      # attempt to translate from UTF-8 to ASCII
+      # attempt to translate to ASCII
       transformed <- tryCatch(
-        iconv(name, from = "UTF-8", to = "ASCII//TRANSLIT"),
+        iconv(name, to = "ASCII//TRANSLIT"),
         error = function(e) NA
       )
 
