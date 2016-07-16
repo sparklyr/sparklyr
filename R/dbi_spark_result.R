@@ -14,7 +14,8 @@ setClass("DBISparkResult",
          contains = "DBIResult",
          slots = list(
            sql = "character",
-           df = "data.frame",
+           sdf = "spark_jobj",
+           conn = "spark_connection",
            lastFetch = "numeric"
          )
 )
@@ -28,11 +29,11 @@ setMethod("dbIsValid", "DBISparkResult", function(dbObj, ...) {
 })
 
 setMethod("dbGetRowCount", "DBISparkResult", function(res, ...) {
-  nrow(res@df)
+  invoke(res@sdf, "count")
 })
 
 setMethod("dbGetRowsAffected", "DBISparkResult", function(res, ...) {
-  nrow(res@df)
+  invoke(res@sdf, "count")
 })
 
 setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
@@ -40,11 +41,13 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 })
 
 setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, statement, params = NULL, ...) {
-  df <- sdf_from_sql(conn, statement)
+  sql <- as.character(statement)
 
+  sdf <- invoke(hive_context(conn), "sql", sql)
   rs <- new("DBISparkResult",
-            df = df,
-            sql = statement)
+            sql = sql,
+            conn = conn,
+            sdf = sdf)
   rs
 })
 
@@ -69,9 +72,6 @@ setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, state
 })
 
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
-  if (n == -1 || NROW(res@df) < n)
-    return(res@df)
-
   start <- 1
   end <- n
   if (length(res@lastFetch) > 0) {
@@ -81,8 +81,14 @@ setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA
 
   res@lastFetch = end
 
-  dfFetch <- as.data.frame(res@df[start:end, ], drop = FALSE, optional = TRUE)
-  colnames(dfFetch) <- colnames(res@df)
+  df <- df_from_sdf(res@conn, res@sdf, end)
+
+  if (n > 0) {
+    df <- df[start:end, ]
+  }
+
+  dfFetch <- as.data.frame(df, drop = FALSE, optional = TRUE)
+  colnames(dfFetch) <- colnames(df)
 
   dfFetch
 })

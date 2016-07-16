@@ -72,19 +72,26 @@ sdf_sql_columns_typed <- function(col, stringData, fields, rows) {
   if (!shortType %in% c("vector")) unlist(result) else result
 }
 
-sdf_from_sql <- function(sc, sql) {
-  sqlResult <- invoke(hive_context(sc), "sql", as.character(sql))
+df_from_sql <- function(sc, sql) {
+  sdf <- invoke(hive_context(sc), "sql", as.character(sql))
+  df_from_sdf(sc, sdf)
+}
 
-  schema <- sdf_sql_schema(sqlResult)
+df_from_sdf <- function(sc, sdf, take = -1) {
+  schema <- sdf_sql_schema(sdf)
   fields <- sdf_sql_schema_fields(schema)
 
+  if (take >= 0) {
+    sdf <- invoke(sdf, "limit", as.integer(take))
+  }
+
   df <- invoke_static(
-    sc,
+    spark_connection(sdf),
 
     "org.apache.spark.sql.api.r.SQLUtils",
     "dfToCols",
 
-    sqlResult
+    sdf
   )
 
   dfNames <- lapply(fields, function(x) x$name)
