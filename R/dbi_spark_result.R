@@ -4,8 +4,9 @@
 #' DBI Spark Result.
 #'
 #' @slot sql character.
-#' @slot df data.frame.
-#' @slot lastFetch numeric.
+#' @slot sdf spark_jobj.
+#' @slot conn spark_connection.
+#' @slot state environment.
 #'
 #' @keywords internal
 #'
@@ -16,7 +17,7 @@ setClass("DBISparkResult",
            sql = "character",
            sdf = "spark_jobj",
            conn = "spark_connection",
-           lastFetch = "numeric"
+           state = "environment"
          )
 )
 
@@ -47,7 +48,8 @@ setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, stat
   rs <- new("DBISparkResult",
             sql = sql,
             conn = conn,
-            sdf = sdf)
+            sdf = sdf,
+            state = new.env())
   rs
 })
 
@@ -74,13 +76,14 @@ setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, state
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
   start <- 1
   end <- n
-  if (length(res@lastFetch) > 0) {
-    start <- res@lastFetch + 1
-    end <- res@lastFetch + end
+  lastFetch <- res@state$lastFetch
+
+  if (length(lastFetch) > 0) {
+    start <- lastFetch + 1
+    end <- lastFetch + end
   }
 
-  res@lastFetch = end
-
+  res@state$lastFetch <- end
   df <- df_from_sdf(res@conn, res@sdf, end)
 
   if (n > 0) {
