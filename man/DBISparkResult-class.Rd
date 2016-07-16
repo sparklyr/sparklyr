@@ -12,9 +12,11 @@ DBI Spark Result.
 \describe{
 \item{\code{sql}}{character.}
 
-\item{\code{df}}{data.frame.}
+\item{\code{sdf}}{spark_jobj.}
 
-\item{\code{lastFetch}}{numeric.}
+\item{\code{conn}}{spark_connection.}
+
+\item{\code{state}}{environment.}
 }}
 \keyword{internal}
 

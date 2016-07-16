@@ -1,4 +1,4 @@
-#' @S3method rbind tbl_spark
+#' @rawNamespace S3method(rbind,tbl_spark)
 rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparklyr_tmp_"))
 {
   dots <- list(...)
