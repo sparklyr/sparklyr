@@ -5,7 +5,7 @@ Setup
 -----
 
 ``` r
-sparklyr:::spark_install(version = "2.0.0-SNAPSHOT", reset = TRUE, logging = "WARN")
+sparklyr:::spark_install(version = "2.0.0-preview", reset = TRUE, logging = "WARN")
 ```
 
 Initialization
