@@ -10,7 +10,7 @@ setMethod("dbWriteTable", "spark_connection",
     }
 
     serializer <- ifelse(is.null(serializer),
-                         ifelse(spark_connection_is_local(conn), "csv_file", "typed_list"),
+                         ifelse(spark_connection_is_local(conn), "csv_file", "csv_string"),
                          serializer)
 
     found <- dbExistsTable(conn, name)
