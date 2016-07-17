@@ -63,7 +63,6 @@ db_data_type.src_spark <- function(...) {
 #' @param memory Cache table into memory
 #' @param repartition Partitions used to distribute table or 0 (default) to avoid partitioning
 #' @param overwrite When TRUE, overwrites table with existing name
-#' @param local_file When TRUE, uses a local file to copy the data frame, this is only available in local installs.
 #' @param ... Unused
 #'
 #' @return dplyr compatible reference to table
@@ -74,9 +73,10 @@ db_data_type.src_spark <- function(...) {
 #'
 #' @export
 copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
-                                     memory = TRUE, repartition = 0, overwrite = FALSE, local_file = NULL, ...) {
+                                     memory = TRUE, repartition = 0, overwrite = FALSE, ...) {
   sc <- dest
   dest <- src_sql("spark", sc)
+  args <- list(...)
 
   if (overwrite)
     spark_remove_table_if_exists(sc, name)
@@ -84,7 +84,7 @@ copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
   if (name %in% src_tbls(sc))
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  dbWriteTable(sc, name, df, TRUE, repartition, local_file)
+  dbWriteTable(sc, name, df, TRUE, repartition, args$serializer)
 
   if (memory) {
     tbl_cache(sc, name)

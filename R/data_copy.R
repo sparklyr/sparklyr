@@ -8,7 +8,84 @@ spark_data_build_types <- function(sc, columns) {
   invoke_static(sc, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
 }
 
-spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE, use_text = FALSE) {
+spark_serialize_csv_file <- function(sc, df, columns, repartition) {
+  tempfile <- tempfile(fileext = ".csv")
+  write.csv(df, tempfile, row.names = FALSE, na = "")
+  df <- spark_csv_read(sc, tempfile, csvOptions = list(
+    header = "true"
+  ), columns = columns)
+
+  if (repartition > 0) {
+    df <- invoke(df, "repartition", as.integer(repartition))
+  }
+
+  df
+}
+
+spark_serialize_typed_list <- function(sc, df, columns, repartition) {
+  structType <- spark_data_build_types(sc, columns)
+
+  # Map date and time columns as standard doubles
+  df <- as.data.frame(lapply(df, function(e) {
+    if (inherits(e, "POSIXt") || inherits(e, "Date"))
+      sapply(e, function(t) {
+        class(t) <- NULL
+        t
+      })
+    else
+      e
+  }), optional = TRUE)
+
+  rows <- lapply(seq_len(NROW(df)), function(e) as.list(df[e,]))
+
+  rdd <- invoke_static(
+    sc,
+    "utils",
+    "createDataFrame",
+    spark_context(sc),
+    rows,
+    as.integer(if (repartition <= 0) 1 else repartition)
+  )
+
+  invoke(hive_context(sc), "createDataFrame", rdd, structType)
+}
+
+spark_serialize_csv_string <- function(sc, df, columns, repartition) {
+  columns <- lapply(df, function(e) { "character" })
+
+  structType <- spark_data_build_types(sc, columns)
+
+  # Map date and time columns as standard doubles
+  df <- as.data.frame(lapply(df, function(e) {
+    if (inherits(e, "POSIXt") || inherits(e, "Date"))
+      sapply(e, function(t) {
+        class(t) <- NULL
+        t
+      })
+    else
+      e
+  }), optional = TRUE)
+
+  tc <- textConnection("spark_data_copy", "w")
+
+  tryCatch({
+    write.table(df, tc, sep = "|")
+    textData <- as.list(textConnectionValue(tc))
+  }, finally = close(tc))
+
+  rdd <- invoke_static(
+    sc,
+    "utils",
+    "createDataFrameFromText",
+    spark_context(sc),
+    textData,
+    as.integer(if (repartition <= 0) 1 else repartition)
+  )
+
+  invoke(hive_context(sc), "createDataFrame", rdd, structType)
+}
+
+spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -30,76 +107,13 @@ spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE, use_te
       typeof(e)
   })
 
-  if (local_file) {
-    tempfile <- tempfile(fileext = ".csv")
-    write.csv(df, tempfile, row.names = FALSE, na = "")
-    df <- spark_csv_read(sc, tempfile, csvOptions = list(
-      header = "true"
-    ), columns = columns)
+  serializers <- list(
+    "csv_file" = spark_serialize_csv_file,
+    "typed_list" = spark_serialize_typed_list,
+    "csv_string" = spark_serialize_csv_string
+  )
 
-    if (repartition > 0) {
-      df <- invoke(df, "repartition", as.integer(repartition))
-    }
-  } else if (!use_text){
-    structType <- spark_data_build_types(sc, columns)
-
-    # Map date and time columns as standard doubles
-    df <- as.data.frame(lapply(df, function(e) {
-      if (inherits(e, "POSIXt") || inherits(e, "Date"))
-        sapply(e, function(t) {
-          class(t) <- NULL
-          t
-        })
-      else
-        e
-    }), optional = TRUE)
-
-    rows <- lapply(seq_len(NROW(df)), function(e) as.list(df[e,]))
-
-    rdd <- invoke_static(
-      sc,
-      "utils",
-      "createDataFrame",
-      spark_context(sc),
-      rows,
-      as.integer(if (repartition <= 0) 1 else repartition)
-    )
-
-    df <- invoke(hive_context(sc), "createDataFrame", rdd, structType)
-  } else {
-    columns <- lapply(df, function(e) { "character" })
-
-    structType <- spark_data_build_types(sc, columns)
-
-    # Map date and time columns as standard doubles
-    df <- as.data.frame(lapply(df, function(e) {
-      if (inherits(e, "POSIXt") || inherits(e, "Date"))
-        sapply(e, function(t) {
-          class(t) <- NULL
-          t
-        })
-      else
-        e
-    }), optional = TRUE)
-
-    tc <- textConnection("spark_data_copy", "w")
-
-    tryCatch({
-      write.table(df, tc, sep = "|")
-      textData <- as.list(textConnectionValue(tc))
-    }, finally = close(tc))
-
-    rdd <- invoke_static(
-      sc,
-      "utils",
-      "createDataFrameFromText",
-      spark_context(sc),
-      textData,
-      as.integer(if (repartition <= 0) 1 else repartition)
-    )
-
-    df <- invoke(hive_context(sc), "createDataFrame", rdd, structType)
-  }
+  df <- serializers[[serializer]](sc, df, columns, repartition)
 
   invoke(df, "registerTempTable", name)
 }
