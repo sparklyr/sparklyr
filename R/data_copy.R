@@ -66,12 +66,9 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
       e
   }), optional = TRUE)
 
-  tc <- textConnection("spark_data_copy", "w")
-
-  tryCatch({
-    write.table(df, tc, sep = "|")
-    textData <- as.list(textConnectionValue(tc))
-  }, finally = close(tc))
+  tempFile <- tempfile(fileext = ".csv")
+  write.table(df, tempFile, sep = "|", col.names = FALSE, row.names = FALSE)
+  textData <- as.list(readLines(tempFile))
 
   rdd <- invoke_static(
     sc,
