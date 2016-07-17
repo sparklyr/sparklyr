@@ -74,6 +74,7 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
     "createDataFrameFromText",
     spark_context(sc),
     textData,
+    columns,
     as.integer(if (repartition <= 0) 1 else repartition)
   )
 
