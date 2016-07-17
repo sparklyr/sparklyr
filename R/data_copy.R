@@ -51,8 +51,6 @@ spark_serialize_typed_list <- function(sc, df, columns, repartition) {
 }
 
 spark_serialize_csv_string <- function(sc, df, columns, repartition) {
-  columns <- lapply(df, function(e) { "character" })
-
   structType <- spark_data_build_types(sc, columns)
 
   # Map date and time columns as standard doubles
