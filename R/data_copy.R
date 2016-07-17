@@ -8,7 +8,7 @@ spark_data_build_types <- function(sc, columns) {
   invoke_static(sc, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
 }
 
-spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
+spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE, use_text = FALSE) {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -40,7 +40,7 @@ spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
     if (repartition > 0) {
       df <- invoke(df, "repartition", as.integer(repartition))
     }
-  } else {
+  } else if (!use_text){
     structType <- spark_data_build_types(sc, columns)
 
     # Map date and time columns as standard doubles
@@ -62,6 +62,39 @@ spark_data_copy <- function(sc, df, name, repartition, local_file = TRUE) {
       "createDataFrame",
       spark_context(sc),
       rows,
+      as.integer(if (repartition <= 0) 1 else repartition)
+    )
+
+    df <- invoke(hive_context(sc), "createDataFrame", rdd, structType)
+  } else {
+    columns <- lapply(df, function(e) { "character" })
+
+    structType <- spark_data_build_types(sc, columns)
+
+    # Map date and time columns as standard doubles
+    df <- as.data.frame(lapply(df, function(e) {
+      if (inherits(e, "POSIXt") || inherits(e, "Date"))
+        sapply(e, function(t) {
+          class(t) <- NULL
+          t
+        })
+      else
+        e
+    }), optional = TRUE)
+
+    tc <- textConnection("spark_data_copy", "w")
+
+    tryCatch({
+      write.table(df, tc, sep = "|")
+      textData <- as.list(textConnectionValue(tc))
+    }, finally = close(tc))
+
+    rdd <- invoke_static(
+      sc,
+      "utils",
+      "createDataFrameFromText",
+      spark_context(sc),
+      textData,
       as.integer(if (repartition <= 0) 1 else repartition)
     )
 
