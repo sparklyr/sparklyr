@@ -43,7 +43,7 @@ object utils {
 
   def createDataFrameFromText(sc: SparkContext, rows: Array[String], partitions: Int): RDD[Row] = {
     var data = rows.map(o => {
-      val r = o.split("|")
+      val r = o.split('|')
       org.apache.spark.sql.Row.fromSeq(r)
     })
 
