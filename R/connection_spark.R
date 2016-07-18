@@ -210,7 +210,7 @@ sparkapi::spark_web
 #'
 #' @param sc \code{spark_connection}
 #'
-#' @rdname spark_connect
+#' @rdname spark_connection_is_open
 #'
 #' @export
 spark_connection_is_open <- function(sc) {
