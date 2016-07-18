@@ -12,15 +12,27 @@ if (!requireNamespace("digest", quietly = TRUE))
   install.packages("digest")
 library(digest)
 
-sparklyr_utils_path <- file.path(root, "inst/java/sparklyr.jar")
-sparklyr_scala <- file.path(root, "inst/scala/sparklyr.scala")
+sparklyr_path <- file.path(root, "inst/java/sparklyr.jar")
+sparklyr_scala <- lapply(
+  Filter(
+    function(e) grepl(".*\\.scala$", e),
+    list.files(file.path(root, "inst", "scala"))
+  ),
+  function(e) file.path(root, "inst", "scala", e)
+)
 sparklyr_scala_digest <- file.path(root, "inst/scala/sparklyr.scala.md5")
 
+sparklyr_scala_contents <- paste(lapply(sparklyr_scala, function(e) readLines(e)))
+sparklyr_scala_contents_path <- tempfile()
+sparklyr_scala_contents_file <- file(sparklyr_scala_contents_path, "w")
+writeLines(sparklyr_scala_contents, sparklyr_scala_contents_file)
+close(sparklyr_scala_contents_file)
+
 # Bail if 'sparklyr.scala' hasn't changed
-md5 <- tools::md5sum(sparklyr_scala)
-if (file.exists(sparklyr_scala_digest) && file.exists(sparklyr_utils_path)) {
+md5 <- tools::md5sum(sparklyr_scala_contents_file)
+if (file.exists(sparklyr_scala_digest) && file.exists(sparklyr_path)) {
   contents <- readChar(sparklyr_scala_digest, file.info(sparklyr_scala_digest)$size, TRUE)
-  if (identical(contents, md5[[sparklyr_scala]])) {
+  if (identical(contents, md5[[sparklyr_scala_contents_file]])) {
     stop()
   }
 }
@@ -93,16 +105,16 @@ classpath <- Sys.getenv("CLASSPATH")
 # set CLASSPATH environment variable rather than passing
 # in on command line (mostly aesthetic)
 Sys.setenv(CLASSPATH = CLASSPATH)
-execute("scalac", shQuote(sparklyr_scala))
+execute("scalac", paste(shQuote(sparklyr_scala), collapse = " "))
 Sys.setenv(CLASSPATH = classpath)
 
 # call 'jar' to create our jar
 class_files <- list.files(pattern = "class$")
-execute("jar cf", sparklyr_utils_path, paste(shQuote(class_files), collapse = " "))
+execute("jar cf", sparklyr_path, paste(shQuote(class_files), collapse = " "))
 
 # double-check existence of 'sparklyr.jar'
-if (file.exists(sparklyr_utils_path)) {
-  message("*** ", basename(sparklyr_utils_path), " successfully created.")
+if (file.exists(sparklyr_path)) {
+  message("*** ", basename(sparklyr_path), " successfully created.")
 } else {
   stop("*** failed to create sparklyr.jar")
 }
