@@ -8,12 +8,10 @@ methods::setOldClass("spark_connection")
 methods::setOldClass("spark_jobj")
 
 spark_default_jars <- function() {
-  jarsOption <- getOption("spark.jars.default", NULL)
-
-  if (is.null(jarsOption))
+  jarsOption <- getOption(
+    "spark.jars.default",
     system.file(file.path("java", "sparklyr.jar"), package = "sparklyr")
-  else
-    jarsOption
+  )
 }
 
 #' Connect to Spark
