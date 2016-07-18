@@ -101,6 +101,11 @@ spark_connect <- function(master,
     config_sc <- list(config = config, master = master)
     shell_args <- connection_config(config_sc, "sparklyr.shell.")
 
+    # add spark-submit class
+    shell_args <- c(shell_args, list(
+      class = "submit"
+    ))
+
     # flatten shell_args to make them compatible with sparkapi
     shell_args <- unlist(lapply(names(shell_args), function(name) {
       list(paste0("--", name), shell_args[[name]])
@@ -116,7 +121,8 @@ spark_connect <- function(master,
       packages = config[["sparklyr.defaultPackages"]],
       extensions = extensions,
       environment = environment,
-      shell_args = shell_args
+      shell_args = shell_args,
+      app_jar = system.file(file.path("java", "sparklyr.jar"), package = "sparklyr")
     )
 
     # mark the connection as a DBIConnection class to allow DBI to use defaults
