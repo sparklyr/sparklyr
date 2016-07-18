@@ -86,6 +86,17 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
     stop("The repartition parameter must be an integer")
   }
 
+  if (!spark_connection_is_local(sc) && identical(serializer, "csv_file")) {
+    stop("Using a local file to copy data is not supported for remote clusters")
+  }
+
+  csv_exists <- invoke_static(sc, "utils", "classExists", "com.databricks.spark.csv")
+  serializer <- ifelse(is.null(serializer),
+                       ifelse(spark_connection_is_local(sc) && csv_exists,
+                              "csv_file",
+                              "csv_string"),
+                       serializer)
+
   # Spark unfortunately has a number of issues with '.'s in column names, e.g.
   #
   #    https://issues.apache.org/jira/browse/SPARK-5632

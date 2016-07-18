@@ -5,14 +5,6 @@ setMethod("dbWriteTable", "spark_connection",
       stop("Writting to non-temporary tables is not supported yet")
     }
 
-    if (!spark_connection_is_local(conn) && identical(serializer, "csv_file")) {
-      stop("Using a local file to copy data is not supported for remote clusters")
-    }
-
-    serializer <- ifelse(is.null(serializer),
-                         ifelse(spark_connection_is_local(conn), "csv_file", "csv_string"),
-                         serializer)
-
     found <- dbExistsTable(conn, name)
     if (found) {
       stop("Table ", name, " already exists")
