@@ -109,7 +109,7 @@ execute("scalac", paste(shQuote(sparklyr_scala), collapse = " "))
 Sys.setenv(CLASSPATH = classpath)
 
 # call 'jar' to create our jar
-class_files <- list.files(pattern = "class$")
+class_files <- file.path("sparklyr", list.files("sparklyr", pattern = "class$"))
 execute("jar cf", sparklyr_path, paste(shQuote(class_files), collapse = " "))
 
 # double-check existence of 'sparklyr.jar'
