@@ -253,7 +253,7 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
   }
 
   log4jPropertiesFile <- file(log4jPropertiesPath)
-  lines <- readLines(log4jPropertiesFile)
+  lines <- readr::read_lines(log4jPropertiesFile)
 
   lines[[length(lines) + 1]] <- ""
   lines[[length(lines) + 1]] <- "# Other settings"

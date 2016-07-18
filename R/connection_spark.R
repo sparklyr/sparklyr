@@ -175,7 +175,7 @@ sparkapi::spark_log
 spark_log.spark_connection <- function(sc, n = 100, ...) {
   if (.Platform$OS.type == "windows") {
     log <- file("log4j.spark.log")
-    lines <- readLines(log, warn = FALSE)
+    lines <- readr::read_lines(log)
     close(log)
 
     if (!is.null(n))
