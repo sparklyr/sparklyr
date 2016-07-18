@@ -67,4 +67,8 @@ object utils {
 
     sc.parallelize(data, partitions)
   }
+
+  def classExists(name: String): Boolean = {
+    scala.util.Try(Class.forName(name)).isSuccess
+  }
 }
