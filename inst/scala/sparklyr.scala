@@ -1,3 +1,5 @@
+package sparklyr
+
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.spark.sql.types.DataTypes
 import org.apache.spark.mllib.linalg.Vectors

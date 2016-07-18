@@ -48,7 +48,7 @@ sdf_read_column <- function(object, colName) {
     invoke("select", colName, list()) %>%
     invoke("rdd")
 
-  column <- invoke_static(sc, "utils", method, rdd)
+  column <- invoke_static(sc, "sparklyr.utils", method, rdd)
 
   if (colType == "StringType") {
 
