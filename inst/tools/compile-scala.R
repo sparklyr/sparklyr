@@ -12,7 +12,7 @@ if (!requireNamespace("digest", quietly = TRUE))
   install.packages("digest")
 library(digest)
 
-sparklyr_utils_path <- file.path(root, "inst/java/sparklyr_utils.jar")
+sparklyr_utils_path <- file.path(root, "inst/java/sparklyr.jar")
 sparklyr_scala <- file.path(root, "inst/scala/sparklyr.scala")
 sparklyr_scala_digest <- file.path(root, "inst/scala/sparklyr.scala.md5")
 
@@ -25,7 +25,7 @@ if (file.exists(sparklyr_scala_digest) && file.exists(sparklyr_utils_path)) {
   }
 }
 
-message("** building 'sparklyr_utils.jar' ...")
+message("** building 'sparklyr.jar' ...")
 
 cat(md5, file = sparklyr_scala_digest)
 
@@ -100,11 +100,11 @@ Sys.setenv(CLASSPATH = classpath)
 class_files <- list.files(pattern = "class$")
 execute("jar cf", sparklyr_utils_path, paste(shQuote(class_files), collapse = " "))
 
-# double-check existence of 'sparklyr_utils.jar'
+# double-check existence of 'sparklyr.jar'
 if (file.exists(sparklyr_utils_path)) {
   message("*** ", basename(sparklyr_utils_path), " successfully created.")
 } else {
-  stop("*** failed to create sparklyr_utils.jar")
+  stop("*** failed to create sparklyr.jar")
 }
 
 setwd(owd)

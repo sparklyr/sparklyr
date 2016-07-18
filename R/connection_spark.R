@@ -11,7 +11,7 @@ spark_default_jars <- function() {
   jarsOption <- getOption("spark.jars.default", NULL)
 
   if (is.null(jarsOption))
-    system.file(file.path("java", "sparklyr_utils.jar"), package = "sparklyr")
+    system.file(file.path("java", "sparklyr.jar"), package = "sparklyr")
   else
     jarsOption
 }
