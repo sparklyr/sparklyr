@@ -90,7 +90,7 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
     stop("Using a local file to copy data is not supported for remote clusters")
   }
 
-  csv_exists <- invoke_static(sc, "utils", "classExists", "com.databricks.spark.csv")
+  csv_exists <- invoke_static(sc, "utils", "classExists", "com.databricks.spark.csv.CsvParser")
   serializer <- ifelse(is.null(serializer),
                        ifelse(spark_connection_is_local(sc) && csv_exists,
                               "csv_file",
