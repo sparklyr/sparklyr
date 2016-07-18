@@ -10,7 +10,12 @@ sql_translate_env.spark_connection <- function(con) {
     scalar = dplyr::sql_translator(
       .parent = dplyr::base_scalar,
       as.numeric = function(x) build_sql("CAST(", x, " AS DOUBLE)"),
-      as.double  = function(x) build_sql("CAST(", x, " AS DOUBLE)")
+      as.double  = function(x) build_sql("CAST(", x, " AS DOUBLE)"),
+      as.integer  = function(x) build_sql("CAST(", x, " AS INT)"),
+      as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
+      as.character  = function(x) build_sql("CAST(", x, " AS STRING)"),
+      as.date  = function(x) build_sql("CAST(", x, " AS DATE)"),
+      paste = function(...) build_sql("CONCAT", list(...))
     ),
 
     aggregate = dplyr::sql_translator(
