@@ -29,10 +29,10 @@ writeLines(sparklyr_scala_contents, sparklyr_scala_contents_file)
 close(sparklyr_scala_contents_file)
 
 # Bail if 'sparklyr.scala' hasn't changed
-md5 <- tools::md5sum(sparklyr_scala_contents_file)
+md5 <- tools::md5sum(sparklyr_scala_contents_path)
 if (file.exists(sparklyr_scala_digest) && file.exists(sparklyr_path)) {
   contents <- readChar(sparklyr_scala_digest, file.info(sparklyr_scala_digest)$size, TRUE)
-  if (identical(contents, md5[[sparklyr_scala_contents_file]])) {
+  if (identical(contents, md5[[sparklyr_scala_contents_path]])) {
     stop()
   }
 }
