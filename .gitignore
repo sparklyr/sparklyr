@@ -32,3 +32,4 @@ docs/*.parquet
 demo.R
 # Spark log
 log4j.spark*
+/configure
