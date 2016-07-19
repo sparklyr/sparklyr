@@ -85,7 +85,7 @@ object Backend extends Logging {
 
       // tell the R process via temporary file
       val path = args(0)
-      val f = new File(path)
+      val f = new File(path + ".tmp")
       val dos = new DataOutputStream(new FileOutputStream(f))
       dos.writeInt(boundPort)
       dos.writeInt(listenPort)
