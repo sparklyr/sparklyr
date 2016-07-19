@@ -7,7 +7,7 @@ import java.sql.{Date, Time, Timestamp}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.WrappedArray
 
-object SerDe {
+object BackendSerializer {
   type ReadObject = (DataInputStream, Char) => Object
   type WriteObject = (DataOutputStream, Object) => Boolean
 

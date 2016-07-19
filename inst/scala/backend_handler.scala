@@ -9,9 +9,8 @@ import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
 import io.netty.channel.ChannelHandler.Sharable
 
 import org.apache.spark.Logging
-import org.apache.spark.util.Utils
 
-import sparklyr.SerDe._
+import sparklyr.BackendSerializer._
 
 @Sharable
 class BackendHandler(server: Backend)
