@@ -40,7 +40,7 @@ spark_serialize_typed_list <- function(sc, df, columns, repartition) {
 
   rdd <- invoke_static(
     sc,
-    "sparklyr.utils",
+    "sparklyr.Utils",
     "createDataFrame",
     spark_context(sc),
     rows,
@@ -70,7 +70,7 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
 
   rdd <- invoke_static(
     sc,
-    "sparklyr.utils",
+    "sparklyr.Utils",
     "createDataFrameFromText",
     spark_context(sc),
     textData,
@@ -91,7 +91,7 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
   }
 
   csv_exists <- invoke_static(sc,
-                              "sparklyr.utils",
+                              "sparklyr.Utils",
                               "classExists",
                               "com.databricks.spark.csv.CsvParser")
 

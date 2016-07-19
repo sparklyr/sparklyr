@@ -10,7 +10,7 @@ import org.apache.spark.sql._
 import org.apache.spark.SparkContext
 import scala.util.Try
 
-object utils {
+object Utils {
 
   def readColumnInt(rdd: RDD[Row]): Array[Int] = {
     rdd.map(row => row(0).asInstanceOf[Int]).collect()
