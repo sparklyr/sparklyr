@@ -103,7 +103,7 @@ spark_connect <- function(master,
 
     # add spark-submit class
     shell_args <- c(shell_args, list(
-      class = "submit"
+      class = "sparklyr.Backend"
     ))
 
     # flatten shell_args to make them compatible with sparkapi
