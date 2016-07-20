@@ -174,7 +174,10 @@ spark_log.spark_connection <- function(sc, n = 100, ...) {
   if (.Platform$OS.type == "windows") {
     log <- file("log4j.spark.log")
     lines <- readr::read_lines(log)
-    close(log)
+
+    tryCatch(function() {
+      close(log)
+    })
 
     if (!is.null(n))
       linesLog <- utils::tail(lines, n = n)
