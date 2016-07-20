@@ -86,10 +86,8 @@ sdf_import.default <- function(x, sc, ...,
     # create struct field
     invoke_static(
       sc,
-
-      "org.apache.spark.sql.api.r.SQLUtils",
+      "sparklyr.SQLUtils",
       "createStructField",
-
       name,
       type,
       TRUE
@@ -99,10 +97,8 @@ sdf_import.default <- function(x, sc, ...,
 
   schema <- invoke_static(
     sc,
-
-    "org.apache.spark.sql.api.r.SQLUtils",
+    "sparklyr.SQLUtils",
     "createStructType",
-
     fields
   )
 
