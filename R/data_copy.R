@@ -2,10 +2,10 @@
 spark_data_build_types <- function(sc, columns) {
   names <- names(columns)
   fields <- lapply(names, function(name) {
-    invoke_static(sc, "org.apache.spark.sql.api.r.SQLUtils", "createStructField", name, columns[[name]], TRUE)
+    invoke_static(sc, "sparklyr.SQLUtils", "createStructField", name, columns[[name]], TRUE)
   })
 
-  invoke_static(sc, "org.apache.spark.sql.api.r.SQLUtils", "createStructType", fields)
+  invoke_static(sc, "sparklyr.SQLUtils", "createStructType", fields)
 }
 
 spark_serialize_csv_file <- function(sc, df, columns, repartition) {
