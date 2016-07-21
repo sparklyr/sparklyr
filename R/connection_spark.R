@@ -126,13 +126,15 @@ spark_connect <- function(master,
       list(paste0("--", name), shell_args[[name]])
     }))
 
+    versionSparkHome <- sparkapi::spark_version(spark_home)
+
     # start shell
     scon <- sparkapi::start_shell(
       master = master,
       spark_home = spark_home,
       app_name = app_name,
       config = config,
-      jars = spark_default_jars(version, hadoop_version),
+      jars = spark_default_jars(versionSparkHome),
       packages = config[["sparklyr.defaultPackages"]],
       extensions = extensions,
       environment = environment,
