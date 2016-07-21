@@ -87,7 +87,7 @@ df_from_sdf <- function(sc, sdf, take = -1) {
 
   df <- invoke_static(
     spark_connection(sdf),
-    "sparklyr.SQLUtils",
+    "sparklyr.Translator",
     "dfToCols",
     sdf
   )
