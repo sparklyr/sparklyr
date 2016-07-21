@@ -7,10 +7,30 @@ NULL
 methods::setOldClass("spark_connection")
 methods::setOldClass("spark_jobj")
 
-spark_default_jars <- function() {
+spark_version_numeric <- function(version) {
+  gsub("[-_a-zA-Z]", "", version)
+}
+
+spark_default_jars <- function(version, hadoop_version) {
+  sparkJarPathFromVersion <- function(version) {
+    system.file(
+      file.path("java",
+              paste0("sparklyr-",
+                     spark_version_numeric(version),
+                     ".jar")
+      ),
+      package = "sparklyr")
+  }
+
+  if (is.null(version) ||
+      !file.exists(sparkJarPathFromVersion(version))) {
+    # use version 1.6.1 as the default
+    version <- "1.6.1"
+  }
+
   jarsOption <- getOption(
     "spark.jars.default",
-    system.file(file.path("java", "sparklyr.jar"), package = "sparklyr")
+    sparkJarPathFromVersion(version)
   )
 }
 
@@ -112,7 +132,7 @@ spark_connect <- function(master,
       spark_home = spark_home,
       app_name = app_name,
       config = config,
-      jars = spark_default_jars(),
+      jars = spark_default_jars(version, hadoop_version),
       packages = config[["sparklyr.defaultPackages"]],
       extensions = extensions,
       environment = environment,
