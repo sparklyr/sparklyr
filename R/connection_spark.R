@@ -11,7 +11,7 @@ spark_version_numeric <- function(version) {
   gsub("[-_a-zA-Z]", "", version)
 }
 
-spark_default_jars <- function(version, hadoop_version) {
+spark_default_jars <- function(version) {
   sparkJarPathFromVersion <- function(version) {
     system.file(
       file.path("java",
@@ -231,7 +231,7 @@ sparkapi::spark_web
 
 #' Check if a Spark connection is open
 #'
-#' @param sc \code{spark_connection}
+#' @param x \code{spark_connection}
 #'
 #' @rdname spark_connection_is_open
 #'
@@ -240,23 +240,45 @@ spark_connection_is_open <- function(sc) {
   sparkapi::connection_is_open(sc)
 }
 
-
 #' Disconnect from Spark
 #'
-#' @param sc Spark connection provided by \code{\link{spark_connect}}
+#' @param x A \code{\link{spark_connect}} connection or the Spark master
 #'
 #' @family Spark connections
 #'
 #' @export
-spark_disconnect <- function(sc) {
+spark_disconnect <- function(x, ...) {
+  UseMethod("spark_disconnect")
+}
+
+#' @export
+spark_disconnect.spark_connection <- function(x, ...) {
   tryCatch({
-    sparkapi::stop_shell(sc)
+    sparkapi::stop_shell(x)
   }, error = function(err) {
   })
 
-  spark_connections_remove(sc)
+  spark_connections_remove(x)
 
-  on_connection_closed(sc)
+  on_connection_closed(x)
+}
+
+#' @export
+spark_disconnect.character <- function(x, ...) {
+  args <- list(...)
+  master <- if (!is.null(args$master)) args$master else x
+  app_name <- args$app_name
+
+  connections <- spark_connection_find_scon(function(e) {
+    e$master <- gsub("\\[\\d*\\]", "", e$master)
+
+    e$master == master &&
+      (is.null(app_name) || e$app_name == app_name)
+  })
+
+  length(lapply(connections, function(sc) {
+    spark_disconnect(sc)
+  }))
 }
 
 # get the spark_web url (used by IDE)

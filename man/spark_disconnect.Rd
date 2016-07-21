@@ -5,12 +5,12 @@
 \alias{spark_disconnect_all}
 \title{Disconnect from Spark}
 \usage{
-spark_disconnect(sc)
+spark_disconnect(x, ...)
 
 spark_disconnect_all()
 }
 \arguments{
-\item{sc}{Spark connection provided by \code{\link{spark_connect}}}
+\item{x}{A \code{\link{spark_connect}} connection or the Spark master}
 }
 \description{
 Disconnect from Spark
