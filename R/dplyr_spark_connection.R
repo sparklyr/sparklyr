@@ -15,13 +15,20 @@ sql_translate_env.spark_connection <- function(con) {
       as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
       as.character  = function(x) build_sql("CAST(", x, " AS STRING)"),
       as.date  = function(x) build_sql("CAST(", x, " AS DATE)"),
-      paste = function(...) build_sql("CONCAT", list(...))
+      paste = function(...) build_sql("CONCAT", list(...)),
+      xor = function(x, y) build_sql(x, " ^ ", y),
+      or = function(x, y) build_sql(x, " or ", y),
+      and = function(x, y) build_sql(x, " and ", y)
     ),
 
     aggregate = dplyr::sql_translator(
       .parent = dplyr::base_agg,
       n = function() dplyr::sql("count(*)"),
-      count = function() dplyr::sql("count(*)")
+      count = function() dplyr::sql("count(*)"),
+      cor = sql_prefix("corr"),
+      cov = sql_prefix("covar_samp"),
+      sd =  sql_prefix("stddev_samp"),
+      var = sql_prefix("var_samp")
     ),
 
     window = dplyr::sql_translator(

@@ -73,3 +73,8 @@ sample_frac.tbl_spark <- function(tbl,
     .env = .env
   ))
 }
+
+#' @export
+slice_.tbl_spark <- function(x, ...) {
+  stop("Slice is not supported in this version of sparklyr")
+}
