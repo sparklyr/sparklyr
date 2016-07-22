@@ -1,23 +1,27 @@
 #' @import rprojroot
 #' @import digest
-spark_compile <- function(spark_version = "1.6.1", hadoop_version = "2.6") {
+#' @export
+spark_compile <- function(name, spark_version = "1.6.1", hadoop_version = "2.6") {
   version_numeric <- gsub("[-_a-zA-Z]", "", spark_version)
   version_sufix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
-  jar_name <- paste0("sparklyr-", version_numeric, ".jar")
+  jar_name <- paste0(name, "-", version_numeric, ".jar")
 
   if (!requireNamespace("rprojroot", quietly = TRUE))
     install.packages("rprojroot")
   library(rprojroot)
   root <- rprojroot::find_package_root_file()
 
-  Sys.setenv(R_SPARKLYR_INSTALL_INFO_PATH = file.path(root, "inst/extdata/install_spark.csv"))
+  Sys.setenv(R_SPARKLYR_INSTALL_INFO_PATH = system.file(
+    "extdata/install_spark.csv",
+    package = "sparklyr")
+  )
 
   if (!requireNamespace("digest", quietly = TRUE))
     install.packages("digest")
   library(digest)
 
-  sparklyr_path <- file.path(root, "inst", "java", jar_name)
-  sparklyr_scala <- lapply(
+  jar_path <- file.path(root, "inst", "java", jar_name)
+  scala_files <- lapply(
     Filter(
       function(e) {
         # if filename has version only include version being built
@@ -32,28 +36,28 @@ spark_compile <- function(spark_version = "1.6.1", hadoop_version = "2.6") {
     ),
     function(e) file.path(root, "inst", "scala", e)
   )
-  sparklyr_scala_digest <- file.path(root, paste0(
+  scala_files_digest <- file.path(root, paste0(
     "inst/scala/sparklyr-", version_numeric, ".md5"
   ))
 
-  sparklyr_scala_contents <- paste(lapply(sparklyr_scala, function(e) readLines(e)))
-  sparklyr_scala_contents_path <- tempfile()
-  sparklyr_scala_contents_file <- file(sparklyr_scala_contents_path, "w")
-  writeLines(sparklyr_scala_contents, sparklyr_scala_contents_file)
-  close(sparklyr_scala_contents_file)
+  scala_files_contents <- paste(lapply(scala_files, function(e) readLines(e)))
+  scala_files_contents_path <- tempfile()
+  scala_files_contents_file <- file(scala_files_contents_path, "w")
+  writeLines(scala_files_contents, scala_files_contents_file)
+  close(scala_files_contents_file)
 
-  # Bail if 'sparklyr.*' hasn't changed
-  md5 <- tools::md5sum(sparklyr_scala_contents_path)
-  if (file.exists(sparklyr_scala_digest) && file.exists(sparklyr_path)) {
-    contents <- readChar(sparklyr_scala_digest, file.info(sparklyr_scala_digest)$size, TRUE)
-    if (identical(contents, md5[[sparklyr_scala_contents_path]])) {
+  # Bail if files havent changed
+  md5 <- tools::md5sum(scala_files_contents_path)
+  if (file.exists(scala_files_digest) && file.exists(jar_path)) {
+    contents <- readChar(scala_files_digest, file.info(scala_files_digest)$size, TRUE)
+    if (identical(contents, md5[[scala_files_contents_path]])) {
       return()
     }
   }
 
   message("** building '", jar_name, "' ...")
 
-  cat(md5, file = sparklyr_scala_digest)
+  cat(md5, file = scala_files_digest)
 
   execute <- function(...) {
     cmd <- paste(...)
@@ -69,7 +73,7 @@ spark_compile <- function(spark_version = "1.6.1", hadoop_version = "2.6") {
 
   # Work in temporary directory (as temporary class files
   # will be generated within there)
-  dir <- file.path(tempdir(), paste0("sparklyr-", version_sufix, "-scala-compile"))
+  dir <- file.path(tempdir(), paste0(name, "-", version_sufix, "-scala-compile"))
   if (!file.exists(dir))
     if (!dir.create(dir))
       stop("Failed to create '", dir, "'")
@@ -116,16 +120,16 @@ spark_compile <- function(spark_version = "1.6.1", hadoop_version = "2.6") {
   # set CLASSPATH environment variable rather than passing
   # in on command line (mostly aesthetic)
   Sys.setenv(CLASSPATH = CLASSPATH)
-  execute("scalac", paste(shQuote(sparklyr_scala), collapse = " "))
+  execute("scalac", paste(shQuote(scala_files), collapse = " "))
   Sys.setenv(CLASSPATH = classpath)
 
   # call 'jar' to create our jar
-  class_files <- file.path("sparklyr", list.files("sparklyr", pattern = "class$"))
-  execute("jar cf", sparklyr_path, paste(shQuote(class_files), collapse = " "))
+  class_files <- file.path(name, list.files(name, pattern = "class$"))
+  execute("jar cf", jar_path, paste(shQuote(class_files), collapse = " "))
 
   # double-check existence of jar
-  if (file.exists(sparklyr_path)) {
-    message("*** ", basename(sparklyr_path), " successfully created.")
+  if (file.exists(jar_path)) {
+    message("*** ", basename(jar_path), " successfully created.")
   } else {
     stop("*** failed to create ", jar_name)
   }
