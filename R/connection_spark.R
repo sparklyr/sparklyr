@@ -231,7 +231,7 @@ sparkapi::spark_web
 
 #' Check if a Spark connection is open
 #'
-#' @param x \code{spark_connection}
+#' @param sc \code{spark_connection}
 #'
 #' @rdname spark_connection_is_open
 #'
@@ -243,6 +243,7 @@ spark_connection_is_open <- function(sc) {
 #' Disconnect from Spark
 #'
 #' @param x A \code{\link{spark_connect}} connection or the Spark master
+#' @param ... Additional arguments
 #'
 #' @family Spark connections
 #'

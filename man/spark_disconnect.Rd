@@ -11,6 +11,8 @@ spark_disconnect_all()
 }
 \arguments{
 \item{x}{A \code{\link{spark_connect}} connection or the Spark master}
+
+\item{...}{Additional arguments}
 }
 \description{
 Disconnect from Spark

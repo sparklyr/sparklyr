@@ -1,3 +1,5 @@
+#' @import rprojroot
+#' @import digest
 spark_compile <- function(spark_version = "1.6.1", hadoop_version = "2.6") {
   version_numeric <- gsub("[-_a-zA-Z]", "", spark_version)
   version_sufix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)

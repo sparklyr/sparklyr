@@ -31,8 +31,11 @@ Imports:
     digest,
     config,
     rappdirs,
-    assertthat
+    assertthat,
+    rprojroot
 Remotes: rstudio/sparkapi
 Suggests:
     testthat,
-    RCurl
+    RCurl,
+    rprojroot,
+    digest

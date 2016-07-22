@@ -7,7 +7,7 @@
 spark_connection_is_open(sc)
 }
 \arguments{
-\item{x}{\code{spark_connection}}
+\item{sc}{\code{spark_connection}}
 }
 \description{
 Check if a Spark connection is open
