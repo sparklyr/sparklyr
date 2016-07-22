@@ -126,7 +126,7 @@ spark_connect <- function(master,
       list(paste0("--", name), shell_args[[name]])
     }))
 
-    versionSparkHome <- sparkapi::spark_version(spark_home)
+    versionSparkHome <- sparkapi::spark_version_from_home(spark_home)
 
     # start shell
     scon <- sparkapi::start_shell(
