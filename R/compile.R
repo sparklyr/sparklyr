@@ -1,6 +1,14 @@
+#' Compiles scala sources and packages into a jar file
+#'
+#' @export
+#' @param name The name of the target jar
+#' @param spark_version Spark version
+#' @param hadoop_version Hadoop version
+#'
 #' @import rprojroot
 #' @import digest
-#' @export
+#'
+#' @keywords internal
 spark_compile <- function(name, spark_version = "1.6.1", hadoop_version = "2.6") {
   version_numeric <- gsub("[-_a-zA-Z]", "", spark_version)
   version_sufix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
