@@ -23,7 +23,7 @@ ml_kmeans <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  prepare_features(df, features)
+  ml_prepare_features(df, features)
 
   centers <- ensure_scalar_integer(centers)
   max.iter <- ensure_scalar_integer(max.iter)

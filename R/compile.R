@@ -14,19 +14,12 @@ spark_compile <- function(name, spark_version = "1.6.1", hadoop_version = "2.6")
   version_sufix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
   jar_name <- paste0(name, "-", version_numeric, ".jar")
 
-  if (!requireNamespace("rprojroot", quietly = TRUE))
-    install.packages("rprojroot")
-  library(rprojroot)
   root <- rprojroot::find_package_root_file()
 
   Sys.setenv(R_SPARKLYR_INSTALL_INFO_PATH = system.file(
     "extdata/install_spark.csv",
     package = "sparklyr")
   )
-
-  if (!requireNamespace("digest", quietly = TRUE))
-    install.packages("digest")
-  library(digest)
 
   jar_path <- file.path(root, "inst", "java", jar_name)
   scala_files <- lapply(

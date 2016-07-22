@@ -50,25 +50,52 @@ validate_formula_operators <- function(object) {
   }
 }
 
-prepare_features <- function(df, features, envir = parent.frame()) {
-
-  if (is.formula(features)) {
-    parsed <- parse_formula(features)
-    features <- parsed$features
-  }
-
-  features <- as.character(features)
-
-  assign("features", features, envir = envir)
-}
-
-prepare_response_features_intercept <- function(df,
-                                                response,
-                                                features,
-                                                intercept,
-                                                envir = parent.frame())
+#' Pre-process the Inputs to a Spark ML Routine
+#'
+#' Pre-process / normalize the inputs typically passed to a
+#' Spark ML routine.
+#'
+#' Pre-processing of these inputs typically involves:
+#'
+#' \enumerate{
+#' \item Handling the case where \code{response} is itself a formula
+#'       describing the model to be fit, thereby extracting the names
+#'       of the \code{response} and \code{features} to be used,
+#' \item Splitting categorical features into dummy variables (so they
+#'       can easily be accommodated + specified in the underlying
+#'       Spark ML model fit),
+#' \item Mutating the associated variables \emph{in the specified environment}.
+#' }
+#'
+#' Please take heed of the last point, as while this is useful in practice,
+#' the behavior will be very surprising if you are not expecting it.
+#'
+#' @template roxlate-ml-x
+#' @template roxlate-ml-response
+#' @template roxlate-ml-features
+#' @template roxlate-ml-intercept
+#' @param envir The R environment in which the \code{response}, \code{features}
+#'   and \code{intercept} bindings should be mutated. (Typically, the parent frame).
+#'
+#' @rdname ml_prepare_inputs
+#' @rdname ml_prepare_inputs
+#' @export
+#'
+#' @examples
+#' # note that ml_prepare_features, by default, mutates the 'features'
+#' # binding in the same environment in which the function was called
+#' local({
+#'    ml_prepare_features(features = ~ x1 + x2 + x3)
+#'    print(features) # c("x1", "x2", "x3")
+#' })
+ml_prepare_response_features_intercept <- function(x = NULL,
+                                                   response,
+                                                   features,
+                                                   intercept,
+                                                   envir = parent.frame())
 {
   # construct dummy data.frame from Spark DataFrame schema
+  df <- x
   schema <- sdf_schema(df)
   names <- lapply(schema, `[[`, "name")
   rdf <- as.data.frame(names, stringsAsFactors = FALSE, optional = TRUE)
@@ -109,3 +136,19 @@ prepare_response_features_intercept <- function(df,
   # return mutated dataset
   df
 }
+
+#' @rdname ml_prepare_inputs
+#' @name   ml_prepare_inputs
+#' @export
+ml_prepare_features <- function(x, features, envir = parent.frame()) {
+
+  if (is.formula(features)) {
+    parsed <- parse_formula(features)
+    features <- parsed$features
+  }
+
+  features <- as.character(features)
+
+  assign("features", features, envir = envir)
+}
+

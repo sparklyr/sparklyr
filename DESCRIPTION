@@ -36,6 +36,4 @@ Imports:
 Remotes: rstudio/sparkapi
 Suggests:
     testthat,
-    RCurl,
-    rprojroot,
-    digest
+    RCurl

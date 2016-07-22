@@ -18,7 +18,7 @@ ml_one_vs_rest <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- prepare_response_features_intercept(df, response, features, NULL)
+  df <- ml_prepare_response_features_intercept(df, response, features, NULL)
 
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)

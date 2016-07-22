@@ -24,7 +24,7 @@ ml_decision_tree <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- prepare_response_features_intercept(df, response, features, NULL)
+  df <- ml_prepare_response_features_intercept(df, response, features, NULL)
 
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
