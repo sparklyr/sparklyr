@@ -132,6 +132,8 @@ spark_connect <- function(master,
     scon <- sparkapi::start_shell(
       master = master,
       spark_home = spark_home,
+      spark_version = version,
+      hadoop_version = hadoop_version,
       app_name = app_name,
       config = config,
       jars = spark_default_jars(versionSparkHome),
