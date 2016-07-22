@@ -152,3 +152,7 @@ spark_sanitize_names <- function(names) {
 spark_normalize_path <- function(path) {
   normalizePath(path, mustWork = FALSE)
 }
+
+stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
+  stop(sprintf(fmt, ...), call. = call., domain = domain)
+}

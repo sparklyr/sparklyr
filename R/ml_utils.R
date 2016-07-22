@@ -144,53 +144,122 @@ read_spark_matrix <- function(jobj, field) {
   matrix(data, nrow = nrow, ncol = ncol)
 }
 
-ensure_scalar_integer <- function(object) {
+ensure_not_na <- function(object) {
+  if (any(is.na(object))) {
+    stopf(
+      "'%s' %s",
+      deparse(substitute(object)),
+      if (length(object) > 1) "contains NA values" else "is NA"
+    )
+  }
+
+  object
+}
+
+ensure_not_null <- function(object) {
+  object %||% stop(sprintf("'%s' is NULL", deparse(substitute(object))))
+}
+
+ensure_scalar <- function(object) {
 
   if (length(object) != 1 || !is.numeric(object)) {
-    deparsed <- deparse(substitute(object))
-    errMsg <- sprintf("'%s' is not a length-one numeric value", deparsed)
-    stop(errMsg)
+    stopf(
+      "'%s' is not a length-one numeric value",
+      deparse(substitute(object))
+    )
   }
 
-  as.integer(object)
+  object
 }
 
-ensure_scalar_double <- function(object) {
+#' Enforce Specific Structure for R Objects
+#'
+#' These routines are useful when preparing to pass objects to
+#' a Spark routine, as it is often necessary to ensure certain
+#' parameters are scalar integers, or scalar doubles, and so on.
+#'
+#' @param object An \R object.
+#' @param allow.na Are \code{NA} values permitted for this object?
+#' @param allow.null Are \code{NULL} values permitted for this object?
+#' @param default If \code{object} is \code{NULL}, what value should
+#'   be used in its place? If \code{default} is specified, \code{allow.null}
+#'   is ignored (and assumed to be \code{TRUE}).
+#'
+#' @name ensure
+#' @rdname ensure
+NULL
 
-  if (length(object) != 1 || !is.numeric(object)) {
-    deparsed <- deparse(substitute(object))
-    errMsg <- sprintf("'%s' is not a length-one numeric value", deparsed)
-    stop(errMsg)
-  }
+ensure_scalar_impl <- function(object,
+                               allow.na,
+                               allow.null,
+                               default,
+                               checker,
+                               message,
+                               converter)
+{
+  object <- object %||% default
 
-  as.double(object)
+  if (!checker(object)) stopf("'%s' is %s", deparse(substitute(object)), message)
+
+  if (is.na(object)) object <- NA_integer_
+  if (!allow.na)     ensure_not_na(object)
+  if (!allow.null)   ensure_not_null(object)
+
+  converter(object)
 }
 
-ensure_scalar_boolean <- function(object, allow.na = FALSE, default = NULL) {
-  if (!is.null(default) && is.null(object)) {
-    object = default
-  }
-
-  if (length(object) != 1) {
-    deparsed <- deparse(substitute(object))
-    stop(sprintf("'%s' is not a length-one logical value", deparsed))
-  }
-
-  value <- as.logical(object)
-  if (!allow.na && is.na(value)) {
-    deparsed <- deparse(substitute(object))
-    stop(sprintf("'%s' is NA (must be TRUE/FALSE)", deparsed))
-  }
-
-  value
+#' @rdname ensure
+#' @name ensure
+#' @export
+ensure_scalar_integer <- function(object,
+                                  allow.na = FALSE,
+                                  allow.null = FALSE,
+                                  default = NULL)
+{
+  ensure_scalar_impl(object, allow.na, allow.null, default,
+                     is.numeric,
+                     "not a length-one integer vector",
+                     as.integer)
 }
 
-ensure_scalar_character <- function(object) {
+#' @rdname ensure
+#' @name ensure
+#' @export
+ensure_scalar_double <- function(object,
+                                 allow.na = FALSE,
+                                 allow.null = FALSE,
+                                 default = NULL)
+{
+  ensure_scalar_impl(object, allow.na, allow.null, default,
+                     is.numeric,
+                     "not a length-one numeric vector",
+                     as.double)
+}
 
-  if (length(object) != 1 || !is.character(object)) {
-    deparsed <- deparse(substitute(object))
-    stop(sprintf("'%s' is not a length-one character vector", deparsed))
-  }
+#' @rdname ensure
+#' @name ensure
+#' @export
+ensure_scalar_boolean <- function(object,
+                                  allow.na = FALSE,
+                                  allow.null = FALSE,
+                                  default = NULL)
+{
+  ensure_scalar_impl(object, allow.na, allow.null, default,
+                     is.logical,
+                     "not a length-one logical vector",
+                     as.logical)
+}
 
-  as.character(object)
+#' @rdname ensure
+#' @name ensure
+#' @export
+ensure_scalar_character <- function(object,
+                                    allow.na = FALSE,
+                                    allow.null = FALSE,
+                                    default = NULL)
+{
+  ensure_scalar_impl(object, allow.na, allow.null, default,
+                     function(x) is.character(x) || is.factor(x),
+                     "not a length-one character vector",
+                     as.character)
 }
