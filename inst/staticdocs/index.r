@@ -66,6 +66,16 @@ sd_section("Machine Learning Transformers",
            )
 )
 
+sd_section("Machine Learning Utility Functions",
+           "Functions for creating custom wrappers to other Spark ML algorithms",
+           c("ensure",
+             "ml_model",
+             "ml_prepare_dataframe",
+             "ml_prepare_response_features_intercept",
+             "ml_create_dummy_variables"
+           )
+)
+
 
 
 
