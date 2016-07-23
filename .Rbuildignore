@@ -16,5 +16,6 @@
 ^derby\.log$
 ^metastore_db$
 ^spark-warehouse$
+^log4j\..*$
 demo.R
 
