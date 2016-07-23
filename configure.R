@@ -26,7 +26,6 @@ compile_jars <- function() {
   # the pieces necessary for determing spark versions + install paths
   source("R/install_spark.R")
   source("R/install_spark_versions.R")
-  source("R/compile.R")
 
   tryCatch(
     source("inst/tools/compile-scala.R"),

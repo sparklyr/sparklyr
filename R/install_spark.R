@@ -15,6 +15,8 @@ spark_install_available <- function(version, hadoop_version) {
   dir.exists(installInfo$sparkVersionDir)
 }
 
+#' @export
+#' @internal
 spark_install_find <- function(sparkVersion = NULL,
                                hadoopVersion = NULL,
                                installedOnly = TRUE,
