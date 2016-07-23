@@ -42,7 +42,7 @@ spark_default_jars <- function(version) {
 #'   If \code{SPARK_HOME} is defined it will be always be used unless the \code{version}
 #'   paramater is specified to force the use of a locally installed version.
 #' @param app_name Application name to be used while running in the Spark cluster
-#' @param version Version of the Spark (only applicable for local master)
+#' @param version Version of Spark (only applicable for local master)
 #' @param hadoop_version Version of Hadoop (only applicable for local master)
 #' @param extensions Extension packages to enable for this connection. By default will
 #'   enable all packages that previously called \code{sparkapi::register_extension}.

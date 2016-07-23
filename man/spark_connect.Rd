@@ -18,7 +18,7 @@ paramater is specified to force the use of a locally installed version.}
 
 \item{app_name}{Application name to be used while running in the Spark cluster}
 
-\item{version}{Version of the Spark (only applicable for local master)}
+\item{version}{Version of Spark (only applicable for local master)}
 
 \item{hadoop_version}{Version of Hadoop (only applicable for local master)}
 
