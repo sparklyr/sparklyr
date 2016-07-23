@@ -117,7 +117,7 @@ ml_prepare_response_features_intercept <- function(x = NULL,
       return(feature)
 
     # update data set with dummy variable columns
-    df <<- sdf_create_dummy_variables(df, feature, envir = auxiliary)
+    df <<- ml_create_dummy_variables(df, feature, envir = auxiliary)
 
     # drop one level (to avoid perfect multi-collinearity)
     tail(auxiliary$columns, n = -1)

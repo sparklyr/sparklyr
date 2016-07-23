@@ -416,7 +416,7 @@ sdf_predict <- function(object, newdata, ...) {
 #'   more information.
 #'
 #' @export
-sdf_create_dummy_variables <- function(x, input, reference = NULL, labels = list(),
+ml_create_dummy_variables <- function(x, input, reference = NULL, labels = list(),
                                        envir = new.env(parent = emptyenv())) {
   sdf <- spark_dataframe(x)
 

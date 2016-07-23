@@ -31,8 +31,7 @@ sd_section("Spark DataFrames",
              "sdf_sample",
              "sdf_sort",
              "sdf_predict",
-             "sdf_register",
-             "sdf_create_dummy_variables")
+             "sdf_register")
 )
 
 sd_section("Machine Learning Algorithms.",
