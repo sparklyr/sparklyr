@@ -8,15 +8,13 @@ Sys.setenv(R_SPARKLYR_INSTALL_INFO_PATH = system.file(
 )
 
 spark_home_from_version <- function(spark_version, hadoop_version = "2.6") {
-  install_info <- tryCatch(
-    spark_install_find(spark_version, hadoop_version),
-    error = function(e) {
-      spark_install(spark_version, hadoop_version)
-      spark_install_find(spark_version, hadoop_version)
-    }
-  )
-
-  install_info$sparkVersionDir
+  spark_home <- spark_home_dir(spark_version, hadoop_version)
+  if (is.null(spark_home)) {
+    spark_install(spark_version, hadoop_version)
+    spark_home_dir(spark_version, hadoop_version)
+  }
+  else
+    spark_home
 }
 
 sparkapi::spark_compile("sparklyr", spark_home = spark_home_from_version("1.6.1"))
