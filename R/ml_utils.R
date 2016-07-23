@@ -189,77 +189,76 @@ ensure_scalar <- function(object) {
 #' @rdname ensure
 NULL
 
-ensure_scalar_impl <- function(object,
-                               allow.na,
-                               allow.null,
-                               default,
-                               checker,
-                               message,
-                               converter)
+make_ensure_scalar_impl <- function(checker,
+                                    message,
+                                    converter)
 {
-  object <- object %||% default
+  fn <- function(object,
+                 allow.na = FALSE,
+                 allow.null = FALSE,
+                 default = NULL)
+  {
+    object <- object %||% default
 
-  if (!checker(object)) stopf("'%s' is %s", deparse(substitute(object)), message)
+    if (!checker(object))
+      stopf("'%s' is not %s", deparse(substitute(object)), message)
 
-  if (is.na(object)) object <- NA_integer_
-  if (!allow.na)     ensure_not_na(object)
-  if (!allow.null)   ensure_not_null(object)
+    if (is.na(object)) object <- NA_integer_
+    if (!allow.na)     ensure_not_na(object)
+    if (!allow.null)   ensure_not_null(object)
 
-  converter(object)
+    converter(object)
+  }
+
+  environment(fn) <- parent.frame()
+
+  body(fn) <- do.call(
+    substitute,
+    list(
+      body(fn),
+      list(
+        checker = substitute(checker),
+        message = substitute(message),
+        converter = substitute(converter)
+      )
+    )
+  )
+
+  fn
 }
 
 #' @rdname ensure
 #' @name ensure
 #' @export
-ensure_scalar_integer <- function(object,
-                                  allow.na = FALSE,
-                                  allow.null = FALSE,
-                                  default = NULL)
-{
-  ensure_scalar_impl(object, allow.na, allow.null, default,
-                     is.numeric,
-                     "not a length-one integer vector",
-                     as.integer)
-}
+ensure_scalar_integer <- make_ensure_scalar_impl(
+  is.numeric,
+  "a length-one integer vector",
+  as.integer
+)
 
 #' @rdname ensure
 #' @name ensure
 #' @export
-ensure_scalar_double <- function(object,
-                                 allow.na = FALSE,
-                                 allow.null = FALSE,
-                                 default = NULL)
-{
-  ensure_scalar_impl(object, allow.na, allow.null, default,
-                     is.numeric,
-                     "not a length-one numeric vector",
-                     as.double)
-}
+ensure_scalar_double <- make_ensure_scalar_impl(
+  is.numeric,
+  "a length-one numeric vector",
+  as.double
+)
 
 #' @rdname ensure
 #' @name ensure
 #' @export
-ensure_scalar_boolean <- function(object,
-                                  allow.na = FALSE,
-                                  allow.null = FALSE,
-                                  default = NULL)
-{
-  ensure_scalar_impl(object, allow.na, allow.null, default,
-                     is.logical,
-                     "not a length-one logical vector",
-                     as.logical)
-}
+ensure_scalar_boolean <- make_ensure_scalar_impl(
+  is.logical,
+  "a length-one logical vector",
+  as.logical
+)
 
 #' @rdname ensure
 #' @name ensure
 #' @export
-ensure_scalar_character <- function(object,
-                                    allow.na = FALSE,
-                                    allow.null = FALSE,
-                                    default = NULL)
-{
-  ensure_scalar_impl(object, allow.na, allow.null, default,
-                     function(x) is.character(x) || is.factor(x),
-                     "not a length-one character vector",
-                     as.character)
-}
+ensure_scalar_character <- make_ensure_scalar_impl(
+  is.character,
+  "a length-one character vector",
+  as.character
+)

@@ -154,5 +154,8 @@ spark_normalize_path <- function(path) {
 }
 
 stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
-  stop(sprintf(fmt, ...), call. = call., domain = domain)
+  stop(simpleError(
+    sprintf(fmt, ...),
+    if (call.) sys.call(sys.parent())
+  ))
 }
