@@ -12,4 +12,5 @@ spark_connection_is_open(sc)
 \description{
 Check if a Spark connection is open
 }
+\keyword{internal}
 

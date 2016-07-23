@@ -236,6 +236,8 @@ sparkapi::spark_web
 #'
 #' @rdname spark_connection_is_open
 #'
+#' @keywords internal
+#'
 #' @export
 spark_connection_is_open <- function(sc) {
   sparkapi::connection_is_open(sc)
