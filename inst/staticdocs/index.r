@@ -23,6 +23,18 @@ sd_section("dplyr Interface",
              "tbl_uncache")
 )
 
+sd_section("Spark DataFrames",
+           "Functions for maniplulating Spark DataFrames",
+           c("sdf_copy_to",
+             "sdf_partition",
+             "sdf_mutate",
+             "sdf_sample",
+             "sdf_sort",
+             "sdf_predict",
+             "sdf_register",
+             "sdf_create_dummy_variables")
+)
+
 sd_section("Machine Learning Algorithms.",
            "Functions for invoking machine learning algorithms.",
            c("ml_kmeans",
@@ -50,20 +62,11 @@ sd_section("Machine Learning Transformers",
              "ft_quantile_discretizer",
              "ft_sql_transformer",
              "ft_string_indexer",
-             "ft_vector_assembler"
+             "ft_vector_assembler",
+             "ft_one_hot_encoder"
            )
 )
 
-sd_section("Spark DataFrames",
-           "Functions for maniplulating Spark DataFrames",
-           c("sdf_copy_to",
-             "sdf_partition",
-             "sdf_mutate",
-             "sdf_sample",
-             "sdf_sort",
-             "sdf_predict",
-             "sdf_register")
-)
 
 
 
