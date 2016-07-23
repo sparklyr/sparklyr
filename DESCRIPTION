@@ -1,7 +1,7 @@
 Package: sparklyr
 Type: Package
 Title: R Interface to Apache Spark
-Version: 0.2.29
+Version: 0.2.30
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
@@ -26,7 +26,7 @@ Imports:
     tibble (>= 1.1),
     dplyr (>= 0.5.0),
     DBI (>= 0.4.1),
-    sparkapi (>= 0.3.19),
+    sparkapi (>= 0.3.20),
     readr (>= 0.2.0),
     digest,
     config,
