@@ -65,6 +65,7 @@ ml_survival_regression <- function(x,
   }
 
   coefficients <- intercept_first(coefficients)
+  scale <- invoke(fit, "scale")
 
   ml_model("survival_regression", fit,
     features = features,
@@ -72,6 +73,7 @@ ml_survival_regression <- function(x,
     intercept = intercept,
     coefficients = coefficients,
     intercept = intercept,
+    scale = scale,
     model.parameters = as.list(envir)
   )
 }
