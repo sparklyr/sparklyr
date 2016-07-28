@@ -486,3 +486,30 @@ na.omit.tbl_spark <- function(object, columns = NULL, ...) {
     invoke(na, "drop", as.list(columns))
   sdf_register(dropped)
 }
+
+#' Replace Missing Values in Objects
+#'
+#' This S3 generic provides an interface for replacing
+#' \code{\link{NA}} values within an object.
+#'
+#' @param object An \R object.
+#' @param ... Arguments passed along to implementing methods.
+#'
+#' @export
+na.replace <- function(object, ...) {
+  UseMethod("na.replace")
+}
+
+#' @export
+na.replace.tbl_spark <- function(object, ...) {
+  sdf <- spark_dataframe(object)
+  dots <- list(...)
+  enumerate(dots, function(key, val) {
+    na <- invoke(sdf, "na")
+    sdf <<- if (is.null(key))
+      invoke(na, "fill", val)
+    else
+      invoke(na, "fill", val, as.list(key))
+  })
+  sdf_register(sdf)
+}

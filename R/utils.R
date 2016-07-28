@@ -159,3 +159,12 @@ stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
     if (call.) sys.call(sys.parent())
   ))
 }
+
+enumerate <- function(object, f, ...) {
+  nm <- names(object)
+  result <- lapply(seq_along(object), function(i) {
+    f(nm[[i]], object[[i]], ...)
+  })
+  names(result) <- names(object)
+  result
+}
