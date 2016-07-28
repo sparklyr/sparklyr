@@ -1,6 +1,6 @@
 #' Spark ML -- K-Means Clustering
 #'
-#' Perform k-means clustering on a \code{spark_tbl}.
+#' Perform k-means clustering on a Spark DataFrame.
 #'
 #' @template roxlate-ml-x
 #' @param centers The number of cluster centers to compute.
@@ -32,11 +32,8 @@ ml_kmeans <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
-  # invoke KMeans
-  kmeans <- invoke_new(
-    sc,
-    "org.apache.spark.ml.clustering.KMeans"
-  )
+  envir$model <- "org.apache.spark.ml.clustering.KMeans"
+  kmeans <- invoke_new(sc, envir$model)
 
   model <- kmeans %>%
     invoke("setK", centers) %>%

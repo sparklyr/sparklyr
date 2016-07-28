@@ -58,10 +58,8 @@ ml_generalized_linear_regression <-
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  glr <- invoke_new(
-    sc,
-    "org.apache.spark.ml.regression.GeneralizedLinearRegression"
-  )
+  envir$model <- "org.apache.spark.ml.regression.GeneralizedLinearRegression"
+  glr <- invoke_new(sc, envir$model)
 
   model <- glr %>%
     invoke("setMaxIter", max.iter) %>%

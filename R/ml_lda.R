@@ -26,10 +26,8 @@ ml_lda <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
-  lda <- invoke_new(
-    sc,
-    "org.apache.spark.ml.clustering.LDA"
-  )
+  envir$model <- "org.apache.spark.ml.clustering.LDA"
+  lda <- invoke_new(sc, envir$model)
 
   model <- lda %>%
     invoke("setK", k) %>%

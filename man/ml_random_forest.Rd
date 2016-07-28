@@ -39,7 +39,7 @@ then regression is used; classification otherwise.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Perform regression or classification using random forests with a \code{spark_tbl}.
+Perform regression or classification using random forests with a Spark DataFrame.
 }
 \seealso{
 Other Spark ML routines: \code{\link{ml_decision_tree}},

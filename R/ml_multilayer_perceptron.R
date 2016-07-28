@@ -1,6 +1,6 @@
 #' Spark ML -- Multilayer Perceptron
 #'
-#' Creates and trains multilayer perceptron on a \code{spark_tbl}.
+#' Creates and trains multilayer perceptron on a Spark DataFrame.
 #'
 #' @template roxlate-ml-x
 #' @template roxlate-ml-response
@@ -39,10 +39,8 @@ ml_multilayer_perceptron <- function(x,
 
   ml_multilayer_perceptron_validate_layers(x, response, features, layers)
 
-  mpc <- invoke_new(
-    sc,
-    "org.apache.spark.ml.classification.MultilayerPerceptronClassifier"
-  )
+  envir$model <- "org.apache.spark.ml.classification.MultilayerPerceptronClassifier"
+  mpc <- invoke_new(sc, envir$model)
 
   model <- mpc %>%
     invoke("setFeaturesCol", envir$features) %>%

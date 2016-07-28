@@ -36,9 +36,8 @@ ml_survival_regression <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  model <- "org.apache.spark.ml.regression.AFTSurvivalRegression"
-
-  rf <- invoke_new(sc, model)
+  envir$model <- "org.apache.spark.ml.regression.AFTSurvivalRegression"
+  rf <- invoke_new(sc, envir$model)
 
   model <- rf %>%
     invoke("setMaxIter", max.iter) %>%

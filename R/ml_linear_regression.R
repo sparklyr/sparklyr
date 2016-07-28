@@ -35,18 +35,16 @@ ml_linear_regression <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  lr <- invoke_new(
-    sc,
-    "org.apache.spark.ml.regression.LinearRegression"
-  )
+  envir$model <- "org.apache.spark.ml.regression.LinearRegression"
+  lr <- invoke_new(sc, envir$model)
 
   model <- lr %>%
     invoke("setMaxIter", max.iter) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
-    invoke("setFitIntercept", intercept) %>%
-    invoke("setElasticNetParam", alpha) %>%
-    invoke("setRegParam", lambda)
+    invoke("setFitIntercept", as.logical(intercept)) %>%
+    invoke("setElasticNetParam", as.double(alpha)) %>%
+    invoke("setRegParam", as.double(lambda))
 
   if (only_model) return(model)
 

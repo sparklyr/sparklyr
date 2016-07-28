@@ -1,6 +1,6 @@
 #' Spark ML -- Random Forests
 #'
-#' Perform regression or classification using random forests with a \code{spark_tbl}.
+#' Perform regression or classification using random forests with a Spark DataFrame.
 #'
 #' @template roxlate-ml-x
 #' @template roxlate-ml-response
@@ -40,7 +40,8 @@ ml_random_forest <- function(x,
   # choose classification vs. regression model based on column type
   schema <- sdf_schema(df)
   responseType <- schema[[response]]$type
-  model <- if (identical(type, "regression"))
+
+  envir$model <- if (identical(type, "regression"))
     "org.apache.spark.ml.regression.RandomForestRegressor"
   else if (identical(type, "classification"))
     "org.apache.spark.ml.classification.RandomForestClassifier"
@@ -49,7 +50,7 @@ ml_random_forest <- function(x,
   else
     "org.apache.spark.ml.classification.RandomForestClassifier"
 
-  rf <- invoke_new(sc, model)
+  rf <- invoke_new(sc, envir$model)
 
   model <- rf %>%
     invoke("setFeaturesCol", envir$features) %>%

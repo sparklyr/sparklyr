@@ -19,7 +19,7 @@ ml_kmeans(x, centers, max.iter = 100, features = dplyr::tbl_vars(x), ...)
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Perform k-means clustering on a \code{spark_tbl}.
+Perform k-means clustering on a Spark DataFrame.
 }
 \seealso{
 For information on how Spark k-means clustering is implemented, please see

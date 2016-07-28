@@ -1,6 +1,6 @@
 #' Spark ML -- Logistic Regression
 #'
-#' Perform logistic regression on a \code{spark_tbl}.
+#' Perform logistic regression on a Spark DataFrame.
 #'
 #' @template roxlate-ml-x
 #' @template roxlate-ml-response
@@ -35,10 +35,8 @@ ml_logistic_regression <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  lr <- invoke_new(
-    sc,
-    "org.apache.spark.ml.classification.LogisticRegression"
-  )
+  envir$model <- "org.apache.spark.ml.classification.LogisticRegression"
+  lr <- invoke_new(sc, envir$model)
 
   model <- lr %>%
     invoke("setMaxIter", max.iter) %>%

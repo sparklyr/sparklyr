@@ -34,7 +34,7 @@ reproducible across repeated calls.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Creates and trains multilayer perceptron on a \code{spark_tbl}.
+Creates and trains multilayer perceptron on a Spark DataFrame.
 }
 \seealso{
 Other Spark ML routines: \code{\link{ml_decision_tree}},

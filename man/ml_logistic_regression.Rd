@@ -32,7 +32,7 @@ information.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Perform logistic regression on a \code{spark_tbl}.
+Perform logistic regression on a Spark DataFrame.
 }
 \details{
 Spark implements for both \eqn{L1} and \eqn{L2} regularization in linear

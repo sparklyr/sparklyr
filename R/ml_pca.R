@@ -1,6 +1,6 @@
 #' Spark ML -- Principal Components Analysis
 #'
-#' Perform principal components analysis on a \code{spark_tbl}.
+#' Perform principal components analysis on a Spark DataFrame.
 #'
 #' @template roxlate-ml-x
 #' @param features The columns to use in the principal components
@@ -24,10 +24,8 @@ ml_pca <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
-  pca <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.PCA"
-  )
+  envir$model <- "org.apache.spark.ml.feature.PCA"
+  pca <- invoke_new(sc, envir$model)
 
   model <- pca %>%
     invoke("setK", length(features)) %>%

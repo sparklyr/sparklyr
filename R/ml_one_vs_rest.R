@@ -23,10 +23,8 @@ ml_one_vs_rest <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  ovrc <- invoke_new(
-    sc,
-    "org.apache.spark.ml.classification.OneVsRest"
-  )
+  envir$model <- "org.apache.spark.ml.classification.OneVsRest"
+  ovrc <- invoke_new(sc, envir$model)
 
   fit <- ovrc %>%
     invoke("setClassifier", classifier) %>%

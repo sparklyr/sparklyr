@@ -41,7 +41,7 @@ ml_gradient_boosted_trees <- function(x,
   regressor  <- "org.apache.spark.ml.regression.GBTRegressor"
   classifier <- "org.apache.spark.ml.classification.GBTClassifier"
 
-  model <- if (identical(type, "regression"))
+  envir$model <- if (identical(type, "regression"))
     regressor
   else if (identical(type, "classification"))
     classifier
@@ -50,7 +50,7 @@ ml_gradient_boosted_trees <- function(x,
   else
     classifier
 
-  rf <- invoke_new(sc, model)
+  rf <- invoke_new(sc, envir$model)
 
   model <- rf %>%
     invoke("setFeaturesCol", envir$features) %>%

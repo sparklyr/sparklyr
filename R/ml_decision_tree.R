@@ -41,7 +41,7 @@ ml_decision_tree <- function(x,
   regressor  <- "org.apache.spark.ml.regression.DecisionTreeRegressor"
   classifier <- "org.apache.spark.ml.classification.DecisionTreeClassifier"
 
-  model <- if (identical(type, "regression"))
+  envir$model <- if (identical(type, "regression"))
     regressor
   else if (identical(type, "classification"))
     classifier
@@ -50,7 +50,7 @@ ml_decision_tree <- function(x,
   else
     classifier
 
-  rf <- invoke_new(sc, model)
+  rf <- invoke_new(sc, envir$model)
 
   model <- rf %>%
     invoke("setFeaturesCol", envir$features) %>%

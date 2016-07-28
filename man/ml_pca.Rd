@@ -16,7 +16,7 @@ analysis. Defaults to all columns in \code{x}.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Perform principal components analysis on a \code{spark_tbl}.
+Perform principal components analysis on a Spark DataFrame.
 }
 \seealso{
 Other Spark ML routines: \code{\link{ml_decision_tree}},

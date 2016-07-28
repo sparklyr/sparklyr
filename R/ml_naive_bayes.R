@@ -27,9 +27,8 @@ ml_naive_bayes <- function(x,
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
-  model <- "org.apache.spark.ml.classification.NaiveBayes"
-
-  rf <- invoke_new(sc, model)
+  envir$model <- "org.apache.spark.ml.classification.NaiveBayes"
+  rf <- invoke_new(sc, envir$model)
 
   model <- rf %>%
     invoke("setFeaturesCol", envir$features) %>%
