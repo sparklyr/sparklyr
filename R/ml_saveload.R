@@ -2,12 +2,17 @@
 #'
 #' Save / load a \code{ml_model} fit.
 #'
-#' These functions are currently experimental and not yet ready for production use.
+#' These functions are currently experimental and not yet ready for production
+#' use. Unfortunately, the training summary information for regression fits
+#' (linear, logistic, generalized) are currently not serialized as part of the
+#' model fit, and so model fits recovered through \code{ml_load} will not work
+#' with e.g. \code{fitted}, \code{residuals}, and so on. Such fits should still
+#' be suitable for generating predictions with new data, however.
 #'
 #' @param sc A \code{spark_connection}.
 #' @param model A \code{ml_model} fit.
-#' @param file  The filepath used for model save / load. Currently, only local filepaths
-#'   are supported.
+#' @param file  The filepath used for model save / load. Currently, only local
+#'   filepaths are supported.
 #'
 #' @rdname ml_saveload
 #' @export

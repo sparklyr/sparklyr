@@ -12,8 +12,8 @@ ml_save(model, file)
 \arguments{
 \item{sc}{A \code{spark_connection}.}
 
-\item{file}{The filepath used for model save / load. Currently, only local filepaths
-are supported.}
+\item{file}{The filepath used for model save / load. Currently, only local
+filepaths are supported.}
 
 \item{model}{A \code{ml_model} fit.}
 }
@@ -21,6 +21,11 @@ are supported.}
 Save / load a \code{ml_model} fit.
 }
 \details{
-These functions are currently experimental and not yet ready for production use.
+These functions are currently experimental and not yet ready for production
+use. Unfortunately, the training summary information for regression fits
+(linear, logistic, generalized) are currently not serialized as part of the
+model fit, and so model fits recovered through \code{ml_load} will not work
+with e.g. \code{fitted}, \code{residuals}, and so on. Such fits should still
+be suitable for generating predictions with new data, however.
 }
 
