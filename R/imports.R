@@ -2,5 +2,5 @@
 #' @import DBI
 #' @import utils
 #' @importFrom tibble data_frame
-#' @importFrom stats as.formula coefficients gaussian predict quantile
+#' @importFrom stats as.formula coefficients gaussian na.omit predict quantile
 NULL

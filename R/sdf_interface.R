@@ -475,3 +475,14 @@ ml_create_dummy_variables <- function(x, input, reference = NULL, labels = list(
   # return our new table
   sdf_register(mutated)
 }
+
+#' @export
+na.omit.tbl_spark <- function(object, columns = NULL, ...) {
+  sdf <- spark_dataframe(object)
+  na <- invoke(sdf, "na")
+  dropped <- if (is.null(columns))
+    invoke(na, "drop")
+  else
+    invoke(na, "drop", as.list(columns))
+  sdf_register(dropped)
+}
