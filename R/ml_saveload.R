@@ -1,18 +1,17 @@
-ml_save <- function(model, file) {
-  ensure_scalar_character(file)
-
-  # save the Spark bits
-  invoke(model$.model, "save", file)
-
-  # save the R bits
-  r <- model
-  r$.model <- NULL
-  saveRDS(r, file = file.path(file, "metadata.rds"))
-
-  file
-}
-
-ml_load <- function(file) {
+#' Save / Load a Spark ML Model Fit
+#'
+#' Save / load a \code{ml_model} fit.
+#'
+#' These functions are currently experimental and not yet ready for production use.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param model A \code{ml_model} fit.
+#' @param file  The filepath used for model save / load. Currently, only local filepaths
+#'   are supported.
+#'
+#' @rdname ml_saveload
+#' @export
+ml_load <- function(sc, file) {
 
   # read the R metadata
   r <- readRDS(file.path(file, "metadata.rds"))
@@ -26,4 +25,20 @@ ml_load <- function(file) {
 
   # return object
   r
+}
+
+#' @rdname ml_saveload
+#' @export
+ml_save <- function(model, file) {
+  ensure_scalar_character(file)
+
+  # save the Spark bits
+  invoke(model$.model, "save", file)
+
+  # save the R bits
+  r <- model
+  r$.model <- NULL
+  saveRDS(r, file = file.path(file, "metadata.rds"))
+
+  file
 }
