@@ -61,7 +61,9 @@ ml_als_factorization <- function(x,
       id,
       as.data.frame(transposed, stringsAsFactors = FALSE)
     )
-    df[order(df$id), , drop = FALSE]
+    result <- df[order(df$id), , drop = FALSE]
+    rownames(result) <- NULL
+    result
   }
 
   item.factors <- extract_factors(fit, "itemFactors")
