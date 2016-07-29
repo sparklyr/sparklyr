@@ -36,7 +36,8 @@ Perform survival regression on a Spark DataFrame, using an Accelerated
 failure time (AFT) model with potentially right-censored data.
 }
 \seealso{
-Other Spark ML routines: \code{\link{ml_decision_tree}},
+Other Spark ML routines: \code{\link{ml_als_factorization}},
+  \code{\link{ml_decision_tree}},
   \code{\link{ml_generalized_linear_regression}},
   \code{\link{ml_gradient_boosted_trees}},
   \code{\link{ml_kmeans}}, \code{\link{ml_lda}},

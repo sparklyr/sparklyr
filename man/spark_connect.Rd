@@ -13,7 +13,7 @@ spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
 instance of Spark installed via \code{\link{spark_install}}.}
 
 \item{spark_home}{Spark home directory (defaults to SPARK_HOME environment variable).
-If \code{SPARK_HOME} is defined it will be always used unless the \code{version}
+If \code{SPARK_HOME} is defined it will be always be used unless the \code{version}
 paramater is specified to force the use of a locally installed version.}
 
 \item{app_name}{Application name to be used while running in the Spark cluster}

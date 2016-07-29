@@ -41,7 +41,8 @@ fits returned by this routine are generally richer in regards to information
 provided for assessing the quality of fit.
 }
 \seealso{
-Other Spark ML routines: \code{\link{ml_decision_tree}},
+Other Spark ML routines: \code{\link{ml_als_factorization}},
+  \code{\link{ml_decision_tree}},
   \code{\link{ml_gradient_boosted_trees}},
   \code{\link{ml_kmeans}}, \code{\link{ml_lda}},
   \code{\link{ml_linear_regression}},
