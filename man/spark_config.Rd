@@ -9,7 +9,7 @@ spark_config(file = "config.yml", use_default = TRUE)
 \arguments{
 \item{file}{Name of the configuration file}
 
-\item{use_default}{TRUE to use the built-in detaults provided in this package}
+\item{use_default}{TRUE to use the built-in defaults provided in this package}
 }
 \value{
 Named list with configuration data
