@@ -40,7 +40,8 @@ then regression is used; classification otherwise.}
 Perform regression or classification using gradient-boosted trees.
 }
 \seealso{
-Other Spark ML routines: \code{\link{ml_decision_tree}},
+Other Spark ML routines: \code{\link{ml_als_factorization}},
+  \code{\link{ml_decision_tree}},
   \code{\link{ml_generalized_linear_regression}},
   \code{\link{ml_kmeans}}, \code{\link{ml_lda}},
   \code{\link{ml_linear_regression}},

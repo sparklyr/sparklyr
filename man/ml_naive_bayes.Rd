@@ -28,7 +28,8 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 Perform regression or classification using naive bayes.
 }
 \seealso{
-Other Spark ML routines: \code{\link{ml_decision_tree}},
+Other Spark ML routines: \code{\link{ml_als_factorization}},
+  \code{\link{ml_decision_tree}},
   \code{\link{ml_generalized_linear_regression}},
   \code{\link{ml_gradient_boosted_trees}},
   \code{\link{ml_kmeans}}, \code{\link{ml_lda}},
