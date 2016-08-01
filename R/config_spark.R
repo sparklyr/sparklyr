@@ -3,7 +3,7 @@
 #' @export
 #' @param file Name of the configuration file
 #' @param use_default TRUE to use the built-in defaults provided in this package for local deplyomnet - \href{https://github.com/rstudio/sparklyr/blob/master/inst/conf/config-template.yml}{see}
-#' @param yarn TRUE to use the built-in defaults provided in this package for yarn cluster deplyomnet - \href{https://github.com/rstudio/sparklyr/blob/master/inst/conf/config-template.yml}{see}
+#' @param yarn TRUE to use the built-in defaults provided in this package for yarn cluster deplyomnet - \href{https://github.com/rstudio/sparklyr/blob/master/inst/conf/yarn-config-template.yml}{see}
 #'
 #' @details
 #'
