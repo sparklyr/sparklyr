@@ -20,7 +20,8 @@ spark_config <- function(file = "config.yml", use_default = TRUE, yarn = FALSE) 
     localConfigFile <- system.file(file.path("conf", "config-template.yml"), package = "sparklyr")
     baseConfig <- config::get(file = localConfigFile)
   }
-
+  
+  yarnConfig <- list()
   if (yarn) {
     yarnConfigFile <- system.file(file.path("conf", "yarn-config-template.yml"), package = "sparklyr")
     yarnConfig <- config::get(file = yarnConfigFile)
