@@ -1,0 +1,9 @@
+default:
+  # spark properties
+  # yarn cluster deployment
+  # spark.master - specify in spark_connect(master = )
+  spark.submit.deployMode: client
+  spark.executor.instances: 5
+  spark.executor.memory: 2G
+  spark.executor.cores: 4
+  spark.driver.memory: 4G

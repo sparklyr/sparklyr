@@ -4,12 +4,14 @@
 \alias{spark_config}
 \title{Read Spark Configuration}
 \usage{
-spark_config(file = "config.yml", use_default = TRUE)
+spark_config(file = "config.yml", use_default = TRUE, yarn = FALSE)
 }
 \arguments{
 \item{file}{Name of the configuration file}
 
-\item{use_default}{TRUE to use the built-in defaults provided in this package - \href{https://github.com/rstudio/sparklyr/blob/master/inst/conf/config-template.yml}{see}}
+\item{use_default}{TRUE to use the built-in defaults provided in this package for local deplyomnet - \href{https://github.com/rstudio/sparklyr/blob/master/inst/conf/config-template.yml}{see}}
+
+\item{yarn}{TRUE to use the built-in defaults provided in this package for yarn cluster deplyomnet - \href{https://github.com/rstudio/sparklyr/blob/master/inst/conf/yarn-config-template.yml}{see}}
 }
 \value{
 Named list with configuration data
