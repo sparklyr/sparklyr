@@ -39,7 +39,7 @@ spark_default_jars <- function(version) {
 #' @param master Spark cluster url to connect to. Use \code{"local"} to connect to a local
 #'   instance of Spark installed via \code{\link{spark_install}}.
 #' @param spark_home Spark home directory (defaults to SPARK_HOME environment variable).
-#'   If \code{SPARK_HOME} is defined it will be always be used unless the \code{version}
+#'   If \code{SPARK_HOME} is defined it will be always used unless the \code{version}
 #'   paramater is specified to force the use of a locally installed version.
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of Spark (only applicable for local master)

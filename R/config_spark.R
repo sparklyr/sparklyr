@@ -2,14 +2,18 @@
 #'
 #' @export
 #' @param file Name of the configuration file
-#' @param use_default TRUE to use the built-in detaults provided in this package
+#' @param use_default TRUE to use the built-in defaults provided in this package for local deplyomnet - \href{https://github.com/rstudio/sparklyr/blob/master/inst/conf/config-template.yml}{see}
+#' @param yarn TRUE to use the built-in defaults provided in this package for yarn cluster deplyomnet - \href{https://github.com/rstudio/sparklyr/blob/master/inst/conf/config-template.yml}{see}
 #'
 #' @details
 #'
 #' Read Spark configuration using the \pkg{\link[config]{config}} package.
 #'
 #' @return Named list with configuration data
-spark_config <- function(file = "config.yml", use_default = TRUE) {
+spark_config <- function(file = "config.yml", use_default = TRUE, yarn = FALSE) {
+  stopifnot(is.logical(yarn), length(yarn) == 1)
+  stopifnot(is.logical(use_default), length(use_default) == 1)
+
   baseConfig <- list()
 
   if (use_default) {
@@ -17,9 +21,14 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
     baseConfig <- config::get(file = localConfigFile)
   }
 
+  if (yarn) {
+    yarnConfigFile <- system.file(file.path("conf", "yarn-config-template.yml"), package = "sparklyr")
+    yarnConfig <- config::get(file = yarnConfigFile)
+  }
+
   userConfig <- tryCatch(config::get(file = file), error = function(e) NULL)
 
-  mergedConfig <- merge_lists(baseConfig, userConfig)
+  mergedConfig <- merge_lists(baseConfig, yarnConfig, userConfig)
   mergedConfig
 }
 
