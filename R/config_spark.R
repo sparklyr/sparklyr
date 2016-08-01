@@ -11,8 +11,8 @@
 #'
 #' @return Named list with configuration data
 spark_config <- function(file = "config.yml", use_default = TRUE, yarn = FALSE) {
-  stopifnot(is.logical(yarn), length(yarn) == 1)
-  stopifnot(is.logical(use_default), length(use_default) == 1)
+  assert_that(is.logical(yarn), length(yarn) == 1)
+  assert_that(is.logical(use_default), length(use_default) == 1)
 
   baseConfig <- list()
 
