@@ -26,7 +26,16 @@ ml_random_forest <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- ml_prepare_response_features_intercept(df, response, features, NULL)
+  envir <- environment()
+  categorical.transformations <- new.env(parent = emptyenv())
+  df <- ml_prepare_response_features_intercept(
+    df,
+    response,
+    features,
+    NULL,
+    envir,
+    categorical.transformations
+  )
 
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
@@ -76,6 +85,7 @@ ml_random_forest <- function(x,
            num.trees = num.trees,
            feature.importances = featureImportances,
            trees = invoke(fit, "trees"),
+           categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )
 }

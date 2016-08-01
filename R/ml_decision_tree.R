@@ -24,7 +24,16 @@ ml_decision_tree <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- ml_prepare_response_features_intercept(df, response, features, NULL)
+  envir <- environment()
+  categorical.transformations <- new.env(parent = emptyenv())
+  df <- ml_prepare_response_features_intercept(
+    df,
+    response,
+    features,
+    NULL,
+    envir,
+    categorical.transformations
+  )
 
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
@@ -68,6 +77,7 @@ ml_decision_tree <- function(x,
            response = response,
            max.bins = max.bins,
            max.depth = max.depth,
+           categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )
 }

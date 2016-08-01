@@ -18,7 +18,16 @@ ml_one_vs_rest <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- ml_prepare_response_features_intercept(df, response, features, NULL)
+  envir <- environment()
+  categorical.transformations <- new.env(parent = emptyenv())
+  df <- ml_prepare_response_features_intercept(
+    df,
+    response,
+    features,
+    NULL,
+    envir,
+    categorical.transformations
+  )
 
   envir <- new.env(parent = emptyenv())
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
@@ -35,6 +44,7 @@ ml_one_vs_rest <- function(x,
   ml_model("one_vs_rest", fit,
            features = features,
            response = response,
+           categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )
 }

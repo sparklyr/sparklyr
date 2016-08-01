@@ -20,7 +20,16 @@ ml_naive_bayes <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- ml_prepare_response_features_intercept(df, response, features, NULL)
+  envir <- environment()
+  categorical.transformations <- new.env(parent = emptyenv())
+  df <- ml_prepare_response_features_intercept(
+    df,
+    response,
+    features,
+    NULL,
+    envir,
+    categorical.transformations
+  )
 
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
@@ -58,6 +67,7 @@ ml_naive_bayes <- function(x,
            theta = invoke(fit, "theta"),
            features = features,
            response = response,
+           categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )
 }

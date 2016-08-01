@@ -27,7 +27,16 @@ ml_multilayer_perceptron <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- ml_prepare_response_features_intercept(df, response, features, NULL)
+  envir <- environment()
+  categorical.transformations <- new.env(parent = emptyenv())
+  df <- ml_prepare_response_features_intercept(
+    df,
+    response,
+    features,
+    NULL,
+    envir,
+    categorical.transformations
+  )
 
   layers <- as.integer(layers)
   max.iter <- ensure_scalar_integer(max.iter)
@@ -57,6 +66,7 @@ ml_multilayer_perceptron <- function(x,
   ml_model("multilayer_perceptron", fit,
     features = features,
     response = response,
+    categorical.transformations = categorical.transformations,
     model.parameters = as.list(envir)
   )
 }

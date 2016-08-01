@@ -34,7 +34,16 @@ ml_generalized_linear_regression <-
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- ml_prepare_response_features_intercept(df, response, features, intercept)
+  envir <- environment()
+  categorical.transformations <- new.env(parent = emptyenv())
+  df <- ml_prepare_response_features_intercept(
+    df,
+    response,
+    features,
+    intercept,
+    envir,
+    categorical.transformations
+  )
 
   max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
@@ -133,6 +142,7 @@ ml_generalized_linear_regression <-
     residual.dof = residual.dof,
     residual.dof.null = residual.dof.null,
     aic = aic,
+    categorical.transformations = categorical.transformations,
     model.parameters = as.list(envir)
   )
 }
