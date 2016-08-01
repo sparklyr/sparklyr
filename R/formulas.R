@@ -74,8 +74,13 @@ validate_formula_operators <- function(object) {
 #' @template roxlate-ml-response
 #' @template roxlate-ml-features
 #' @template roxlate-ml-intercept
-#' @param envir The R environment in which the \code{response}, \code{features}
+#' @param envir The \R environment in which the \code{response}, \code{features}
 #'   and \code{intercept} bindings should be mutated. (Typically, the parent frame).
+#' @param categorical.transformations An \R environment used to record what
+#'   categorical variables were binarized in this procedure. Categorical
+#'   variables that included in the model formula will be transformed into
+#'   binary variables, and the generated mappings will be stored in this
+#'   environment.
 #'
 #' @rdname ml_prepare_inputs
 #' @rdname ml_prepare_inputs
@@ -92,7 +97,8 @@ ml_prepare_response_features_intercept <- function(x = NULL,
                                                    response,
                                                    features,
                                                    intercept,
-                                                   envir = parent.frame())
+                                                   envir = parent.frame(),
+                                                   categorical.transformations = new.env(parent = emptyenv()))
 {
   # construct dummy data.frame from Spark DataFrame schema
   df <- x
@@ -110,14 +116,17 @@ ml_prepare_response_features_intercept <- function(x = NULL,
 
   # for categorical features, split them into dummy variables
   # TODO: provide a mechanism for setting reference labels?
-  auxiliary <- new.env(parent = emptyenv())
   features <- unlist(lapply(features, function(feature) {
     entry <- schema[[feature]]
     if (entry$type != "StringType")
       return(feature)
 
     # update data set with dummy variable columns
+    auxiliary <- new.env(parent = emptyenv())
     df <<- ml_create_dummy_variables(df, feature, envir = auxiliary)
+
+    # record transformations in env
+    categorical.transformations[[feature]] <- auxiliary
 
     # drop one level (to avoid perfect multi-collinearity)
     tail(auxiliary$columns, n = -1)

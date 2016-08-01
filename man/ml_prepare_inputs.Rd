@@ -7,7 +7,8 @@
 \title{Pre-process the Inputs to a Spark ML Routine}
 \usage{
 ml_prepare_response_features_intercept(x = NULL, response, features,
-  intercept, envir = parent.frame())
+  intercept, envir = parent.frame(),
+  categorical.transformations = new.env(parent = emptyenv()))
 
 ml_prepare_features(x, features, envir = parent.frame())
 }
@@ -27,8 +28,14 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{intercept}{Boolean; should the model be fit with an intercept term?}
 
-\item{envir}{The R environment in which the \code{response}, \code{features}
+\item{envir}{The \R environment in which the \code{response}, \code{features}
 and \code{intercept} bindings should be mutated. (Typically, the parent frame).}
+
+\item{categorical.transformations}{An \R environment used to record what
+categorical variables were binarized in this procedure. Categorical
+variables that included in the model formula will be transformed into
+binary variables, and the generated mappings will be stored in this
+environment.}
 }
 \description{
 Pre-process / normalize the inputs typically passed to a

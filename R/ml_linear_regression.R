@@ -25,7 +25,16 @@ ml_linear_regression <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- ml_prepare_response_features_intercept(df, response, features, intercept)
+  envir <- environment()
+  categorical.transformations <- new.env(parent = emptyenv())
+  df <- ml_prepare_response_features_intercept(
+    df,
+    response,
+    features,
+    intercept,
+    envir,
+    categorical.transformations
+  )
 
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
@@ -96,6 +105,7 @@ ml_linear_regression <- function(x,
            mean.squared.error = invoke(summary, "meanSquaredError"),
            r.squared = invoke(summary, "r2"),
            root.mean.squared.error = invoke(summary, "rootMeanSquaredError"),
+           categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )
 }

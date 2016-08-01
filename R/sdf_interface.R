@@ -369,9 +369,24 @@ sdf_mutate_ <- function(.data, ..., .dots) {
 #'
 #' @export
 sdf_predict <- function(object, newdata, ...) {
+
+  # when newdata is not supplied, attempt to use original dataset
   if (missing(newdata) || is.null(newdata))
     newdata <- object$data
+
+  # convert to spark dataframe
   sdf <- spark_dataframe(newdata)
+
+  # construct dummy variables if required
+  ctfm <- object$categorical.transformations
+  if (is.environment(ctfm)) {
+    ctfm <- as.list(ctfm)
+    enumerate(ctfm, function(key, val) {
+      sdf <<- ml_create_dummy_variables(sdf, key, val$reference)
+    })
+  }
+
+  # assemble into feature vector, apply transformation and return predictions
   params <- object$model.parameters
   assembled <- spark_dataframe(ft_vector_assembler(sdf, object$features, params$features))
   transformed <- invoke(object$.model, "transform", assembled)
