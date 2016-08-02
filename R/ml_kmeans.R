@@ -23,13 +23,19 @@ ml_kmeans <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  ml_prepare_features(df, features)
+  df <- ml_prepare_features(df, features)
 
   centers <- ensure_scalar_integer(centers)
   max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
+
+  envir$id <- random_string("id_")
+  df <- df %>%
+    sdf_with_unique_id(envir$id) %>%
+    spark_dataframe()
+
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
   envir$model <- "org.apache.spark.ml.clustering.KMeans"

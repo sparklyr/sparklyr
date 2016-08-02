@@ -24,24 +24,29 @@ ml_gradient_boosted_trees <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  envir <- environment()
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
     df,
     response,
     features,
     NULL,
-    envir,
+    environment(),
     categorical.transformations
   )
 
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
+  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   type <- match.arg(type)
 
   envir <- new.env(parent = emptyenv())
+
+  envir$id <- random_string("id_")
+  df <- df %>%
+    sdf_with_unique_id(envir$id) %>%
+    spark_dataframe()
+
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   # choose classification vs. regression model based on column type
   schema <- sdf_schema(df)

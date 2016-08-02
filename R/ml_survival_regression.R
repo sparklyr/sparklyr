@@ -27,14 +27,13 @@ ml_survival_regression <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  envir <- environment()
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
     df,
     response,
     features,
     intercept,
-    envir,
+    environment(),
     categorical.transformations
   )
 
@@ -43,6 +42,12 @@ ml_survival_regression <- function(x,
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
+
+  envir$id <- random_string("id_")
+  df <- df %>%
+    sdf_with_unique_id(envir$id) %>%
+    spark_dataframe()
+
   tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
 
   envir$model <- "org.apache.spark.ml.regression.AFTSurvivalRegression"

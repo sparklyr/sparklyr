@@ -22,6 +22,12 @@ ml_pca <- function(x,
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
+
+  envir$id <- random_string("id_")
+  df <- df %>%
+    sdf_with_unique_id(envir$id) %>%
+    spark_dataframe()
+
   tdf <- ml_prepare_dataframe(df, features, envir = envir)
 
   envir$model <- "org.apache.spark.ml.feature.PCA"
