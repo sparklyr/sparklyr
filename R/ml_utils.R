@@ -117,9 +117,14 @@ predict.ml_model <- function(object, newdata, ...) {
 
 #' @export
 fitted.ml_model <- function(object, ...) {
-  object$.model %>%
+
+  predictions <- object$.model %>%
     invoke("summary") %>%
-    invoke("predictions") %>%
+    invoke("predictions")
+
+  id <- object$model.parameters$id
+  object$data %>%
+    invoke("join", predictions, as.list(id)) %>%
     sdf_read_column("prediction")
 }
 
