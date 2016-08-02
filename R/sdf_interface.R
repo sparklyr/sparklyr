@@ -528,3 +528,30 @@ na.replace.tbl_spark <- function(object, ...) {
   })
   sdf_register(sdf)
 }
+
+#' Add a Unique ID Column to a Spark DataFrame
+#'
+#' Add a unique ID column to a Spark DataFrame. The Spark
+#' \code{monotonicallyIncreasingId} function is used to produce these and is
+#' guaranteed to produce unique, monotonically increasing ids; however, there is
+#' no guarantee that these IDs will be sequential.
+#'
+#' @template roxlate-ml-x
+#' @param id The name of the column to host the generated IDs.
+#'
+#' @export
+sdf_with_unique_id <- function(x, id = "id") {
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+
+  ensure_scalar_character(id)
+
+  mii <- invoke_static(
+    sc,
+    "org.apache.spark.sql.functions",
+    "monotonicallyIncreasingId"
+  )
+
+  transformed <- invoke(sdf, "withColumn", id, mii)
+  sdf_register(transformed)
+}

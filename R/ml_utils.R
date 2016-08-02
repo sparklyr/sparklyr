@@ -91,11 +91,27 @@ try_null <- function(expr) {
 
 #' @export
 predict.ml_model <- function(object, newdata, ...) {
+  # 'sdf_predict()' does not necessarily return a data set with the same row
+  # order as the input data; generate a unique id and re-join the generated
+  # spark dataframe to ensure the row order is maintained
+  id <- random_string("id_")
+  sdf <- newdata %>%
+    sdf_with_unique_id(id) %>%
+    spark_dataframe()
+
+  # perform prediction
   params <- object$model.parameters
-  predicted <- sdf_predict(object, newdata, ...)
-  column <- sdf_read_column(predicted, "prediction")
+  predicted <- sdf_predict(object, sdf, ...)
+
+  # join prediction column on original data, then read prediction column
+  column <- sdf %>%
+    invoke("join", spark_dataframe(predicted), as.list(id)) %>%
+    sdf_read_column("prediction")
+
+  # re-order based on id
   if (is.character(params$labels) && is.numeric(column))
     column <- params$labels[column + 1]
+
   column
 }
 
