@@ -67,6 +67,7 @@ ml_naive_bayes <- function(x,
            theta = invoke(fit, "theta"),
            features = features,
            response = response,
+           data = df,
            categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )

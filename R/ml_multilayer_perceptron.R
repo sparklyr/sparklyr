@@ -66,6 +66,7 @@ ml_multilayer_perceptron <- function(x,
   ml_model("multilayer_perceptron", fit,
     features = features,
     response = response,
+    data = df,
     categorical.transformations = categorical.transformations,
     model.parameters = as.list(envir)
   )

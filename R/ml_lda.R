@@ -45,6 +45,7 @@ ml_lda <- function(x,
     features = features,
     topics.matrix = topics.matrix,
     estimated.doc.concentration = estimated.doc.concentration,
+    data = df,
     model.parameters = as.list(envir)
   )
 }

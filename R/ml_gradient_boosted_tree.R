@@ -78,6 +78,7 @@ ml_gradient_boosted_trees <- function(x,
     max.bins = max.bins,
     max.depth = max.depth,
     trees = invoke(fit, "trees"),
+    data = df,
     categorical.transformations = categorical.transformations,
     model.parameters = as.list(envir)
   )

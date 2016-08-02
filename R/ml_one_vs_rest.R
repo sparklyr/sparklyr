@@ -44,6 +44,7 @@ ml_one_vs_rest <- function(x,
   ml_model("one_vs_rest", fit,
            features = features,
            response = response,
+           data = df,
            categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )

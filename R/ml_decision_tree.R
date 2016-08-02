@@ -78,6 +78,7 @@ ml_decision_tree <- function(x,
            max.bins = max.bins,
            max.depth = max.depth,
            categorical.transformations = categorical.transformations,
+           data = df,
            model.parameters = as.list(envir)
   )
 }

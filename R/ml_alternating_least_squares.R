@@ -72,6 +72,7 @@ ml_als_factorization <- function(x,
   ml_model("als_factorization", fit,
     item.factors = item.factors,
     user.factors = user.factors,
+    data = df,
     model.parameters = as.list(envir)
   )
 }

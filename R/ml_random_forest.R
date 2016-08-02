@@ -85,6 +85,7 @@ ml_random_forest <- function(x,
            num.trees = num.trees,
            feature.importances = featureImportances,
            trees = invoke(fit, "trees"),
+           data = df,
            categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )
