@@ -1,8 +1,3 @@
-
-
-#' @import sparkapi
-NULL
-
 # register the spark_connection S3 class for use in setClass slots
 methods::setOldClass("spark_connection")
 methods::setOldClass("spark_jobj")
@@ -28,7 +23,7 @@ spark_default_jars <- function(version) {
     version <- "1.6.1"
   }
 
-  jarsOption <- getOption(
+  getOption(
     "spark.jars.default",
     sparkJarPathFromVersion(version)
   )
@@ -45,7 +40,7 @@ spark_default_jars <- function(version) {
 #' @param version Version of Spark (only applicable for local master)
 #' @param hadoop_version Version of Hadoop (only applicable for local master)
 #' @param extensions Extension packages to enable for this connection. By default will
-#'   enable all packages that previously called \code{sparkapi::register_extension}.
+#'   enable all packages that previously called \code{sparklyr::register_extension}.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
 #'
 #' @return Connection to Spark local instance or remote cluster
@@ -59,7 +54,7 @@ spark_connect <- function(master,
                           version = NULL,
                           hadoop_version = NULL,
                           config = spark_config(),
-                          extensions = sparkapi::registered_extensions()) {
+                          extensions = sparklyr::registered_extensions()) {
 
   # for local mode we support SPARK_HOME via locally installed versions
   if (spark_master_is_local(master)) {
@@ -121,15 +116,15 @@ spark_connect <- function(master,
     config_sc <- list(config = config, master = master)
     shell_args <- connection_config(config_sc, "sparklyr.shell.")
 
-    # flatten shell_args to make them compatible with sparkapi
+    # flatten shell_args to make them compatible with sparklyr
     shell_args <- unlist(lapply(names(shell_args), function(name) {
       list(paste0("--", name), shell_args[[name]])
     }))
 
-    versionSparkHome <- sparkapi::spark_version_from_home(spark_home, default = version)
+    versionSparkHome <- spark_version_from_home(spark_home, default = version)
 
     # start shell
-    scon <- sparkapi::start_shell(
+    scon <- start_shell(
       master = master,
       spark_home = spark_home,
       spark_version = version,
@@ -185,13 +180,6 @@ spark_connect <- function(master,
   scon
 }
 
-#' @docType NULL
-#' @name spark_log
-#' @rdname spark_log
-#'
-#' @export
-sparkapi::spark_log
-
 #' @export
 spark_log.spark_connection <- function(sc, n = 100, ...) {
   if (.Platform$OS.type == "windows") {
@@ -212,7 +200,7 @@ spark_log.spark_connection <- function(sc, n = 100, ...) {
   }
   else {
     class(sc) <- "spark_shell_connection"
-    sparkapi::spark_log(sc, n, ...)
+    spark_log(sc, n, ...)
   }
 }
 
@@ -221,14 +209,6 @@ print.sparklyr_log <- function(x, ...) {
   cat(x, sep = "\n")
   cat("\n")
 }
-
-#' @docType NULL
-#' @name spark_web
-#' @rdname spark_web
-#'
-#' @export
-sparkapi::spark_web
-
 
 #' Check if a Spark connection is open
 #'
@@ -240,7 +220,7 @@ sparkapi::spark_web
 #'
 #' @export
 spark_connection_is_open <- function(sc) {
-  sparkapi::connection_is_open(sc)
+  connection_is_open(sc)
 }
 
 #' Disconnect from Spark
@@ -258,7 +238,7 @@ spark_disconnect <- function(x, ...) {
 #' @export
 spark_disconnect.spark_connection <- function(x, ...) {
   tryCatch({
-    sparkapi::stop_shell(x)
+    stop_shell(x)
   }, error = function(err) {
   })
 
@@ -284,12 +264,6 @@ spark_disconnect.character <- function(x, ...) {
     spark_disconnect(sc)
   }))
 }
-
-# get the spark_web url (used by IDE)
-spark_web <- function(sc) {
-  sparkapi::spark_web(sc)
-}
-
 
 # Get the path to a temp file containing the current spark log (used by IDE)
 spark_log_file <- function(sc) {

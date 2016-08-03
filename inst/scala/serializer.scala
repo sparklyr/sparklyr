@@ -1,4 +1,4 @@
-package sparkapi
+package sparklyr
 
 import java.io.{DataInputStream, DataOutputStream}
 import java.nio.charset.StandardCharsets

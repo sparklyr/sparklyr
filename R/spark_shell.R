@@ -20,19 +20,19 @@
 start_shell <- function(master,
                         spark_home = Sys.getenv("SPARK_HOME"),
                         spark_version = NULL,
-                        app_name = "sparkapi",
+                        app_name = "sparklyr",
                         config = list(),
-                        extensions = sparkapi::registered_extensions(),
+                        extensions = sparklyr::registered_extensions(),
                         jars = NULL,
                         packages = NULL,
                         environment = NULL,
                         shell_args = NULL) {
   # read app jar through config, this allows "sparkr-shell" to test sparkr backend
-  app_jar <- spark_config_value(config, "sparkapi.app.jar", NULL)
+  app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
   if (is.null(app_jar)) {
-    app_jar <- shQuote(normalizePath(system.file(file.path("java", "sparkapi-1.6.1.jar"), package = "sparkapi"),
+    app_jar <- shQuote(normalizePath(system.file(file.path("java", "sparklyr-1.6.1.jar"), package = "sparklyr"),
                              mustWork = FALSE))
-    shell_args <- c(shell_args, "--class", "sparkapi.Backend")
+    shell_args <- c(shell_args, "--class", "sparklyr.Backend")
   }
 
   # validate and normalize spark_home
@@ -87,7 +87,7 @@ start_shell <- function(master,
 
   # create temporary file for shell ports output and add it to the args
   shell_output_path <- spark_config_value(config,
-                                          "sparkapi.ports.file",
+                                          "sparklyr.ports.file",
                                           normalizePath(tempfile(fileext = ".out"),
                                                         mustWork = FALSE))
 
@@ -122,7 +122,7 @@ start_shell <- function(master,
   })
 
   # wait for the shell output file
-  waitSeconds <- spark_config_value(config, "sparkapi.ports.wait.seconds", 100)
+  waitSeconds <- spark_config_value(config, "sparklyr.ports.wait.seconds", 100)
   if (!wait_file_exists(shell_output_path, waitSeconds)) {
     stop(paste(
       "Failed to launch Spark shell. Ports file does not exist.\n",

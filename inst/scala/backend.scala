@@ -1,4 +1,4 @@
-package sparkapi
+package sparklyr
 
 import java.io.{DataOutputStream, File, FileOutputStream, IOException}
 import java.net.{InetAddress, InetSocketAddress, ServerSocket}
@@ -14,7 +14,7 @@ import io.netty.handler.codec.bytes.{ByteArrayDecoder, ByteArrayEncoder}
 
 import org.apache.spark.SparkConf
 
-import sparkapi.Logging._
+import sparklyr.Logging._
 
 class Backend {
 
@@ -24,7 +24,7 @@ class Backend {
 
   def init(): Int = {
     val conf = new SparkConf()
-    bossGroup = new NioEventLoopGroup(conf.getInt("sparkapi.backend.threads", 2))
+    bossGroup = new NioEventLoopGroup(conf.getInt("sparklyr.backend.threads", 2))
     val workerGroup = bossGroup
     val handler = new Handler(this)
 

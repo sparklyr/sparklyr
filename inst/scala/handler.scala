@@ -1,4 +1,4 @@
-package sparkapi
+package sparklyr
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
 
@@ -8,8 +8,8 @@ import scala.language.existentials
 import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
 import io.netty.channel.ChannelHandler.Sharable
 
-import sparkapi.Logging._
-import sparkapi.Serializer._
+import sparklyr.Logging._
+import sparklyr.Serializer._
 
 @Sharable
 class Handler(server: Backend)

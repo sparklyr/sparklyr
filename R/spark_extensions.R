@@ -1,6 +1,6 @@
 
 
-#' Register a package that implements a sparkapi extension
+#' Register a package that implements a Spark extension
 #'
 #' Registering an extension package will result in the package being
 #' automatically scanned for spark dependencies when a connection

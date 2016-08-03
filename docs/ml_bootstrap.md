@@ -6,7 +6,6 @@ In this article, we demonstrate how you might use `sdf_sample`, alongside the `d
 First, we load the `diamonds` dataset, and copy it into Spark.
 
 ``` r
-library(sparkapi)
 library(sparklyr)
 library(dplyr)
 library(ggplot2)

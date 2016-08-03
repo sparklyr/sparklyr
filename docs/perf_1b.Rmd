@@ -15,7 +15,6 @@ sparklyr:::spark_install(version = "2.0.0-preview", reset = TRUE, logging = "WAR
 
 ```{r}
 library(sparklyr)
-library(sparkapi)
 library(dplyr)
 library(ggplot2)
 

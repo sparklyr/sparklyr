@@ -1,4 +1,4 @@
-package sparkapi
+package sparklyr
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
