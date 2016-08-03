@@ -1,6 +1,12 @@
 package sparklyr
 
+import java.io._
+import java.util.Arrays
+
+import scala.util.Try
+
 import org.apache.commons.lang.StringEscapeUtils
+import org.apache.spark.{SparkEnv, SparkException}
 import org.apache.spark.sql.types.DataTypes
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.Vector
@@ -8,9 +14,25 @@ import org.apache.spark.mllib.linalg.distributed.RowMatrix
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.SparkContext
-import scala.util.Try
 
 object Utils {
+
+  var rPackages: Option[String] = None
+
+  /**
+   * Return a nice string representation of the exception. It will call "printStackTrace" to
+   * recursively generate the stack trace including the exception and its causes.
+   */
+  def exceptionString(e: Throwable): String = {
+    if (e == null) {
+      ""
+    } else {
+      // Use e.printStackTrace here because e.getStackTrace doesn't include the cause
+      val stringWriter = new StringWriter()
+      e.printStackTrace(new PrintWriter(stringWriter))
+      stringWriter.toString
+    }
+  }
 
   def readColumnInt(rdd: RDD[Row]): Array[Int] = {
     rdd.map(row => row(0).asInstanceOf[Int]).collect()
