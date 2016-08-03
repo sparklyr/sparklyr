@@ -31,7 +31,8 @@ Imports:
     config,
     rappdirs,
     assertthat,
-    rprojroot
+    rprojroot,
+    withr
 Suggests:
     testthat,
     RCurl
