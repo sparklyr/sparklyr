@@ -63,7 +63,7 @@ spark_connect <- function(master,
 
   # for local mode we support SPARK_HOME via locally installed versions
   if (spark_master_is_local(master)) {
-    if (!nzchar(spark_home) && (!is.null(version) || !is.null(hadoop_version))) {
+    if (!nzchar(spark_home)) {
       installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
       spark_home <- installInfo$sparkVersionDir
     }
