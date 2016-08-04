@@ -160,6 +160,9 @@ ml_prepare_features <- function(x, features, envir = parent.frame()) {
 
   assign("features", features, envir = envir)
 
+  if (missing(x))
+    return(features)
+
   x
 }
 
