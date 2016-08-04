@@ -6,7 +6,7 @@ spark_version_numeric <- function(version) {
   gsub("[-_a-zA-Z]", "", version)
 }
 
-spark_default_jars <- function(version) {
+spark_default_app_jar <- function(version) {
   sparkJarPathFromVersion <- function(version) {
     system.file(
       file.path("java",
@@ -23,10 +23,7 @@ spark_default_jars <- function(version) {
     version <- "1.6.1"
   }
 
-  getOption(
-    "spark.jars.default",
-    sparkJarPathFromVersion(version)
-  )
+  sparkJarPathFromVersion(version)
 }
 
 #' Connect to Spark

@@ -30,8 +30,6 @@ shell_connection <- function(master, spark_home, app_name, version, hadoop_versi
   if (spark_master_is_local(master))
     environment$SPARK_LOCAL_IP = "127.0.0.1"
 
-  versionSparkHome <- spark_version_from_home(spark_home, default = version)
-
   # start shell
   start_shell(
     master = master,
@@ -39,7 +37,7 @@ shell_connection <- function(master, spark_home, app_name, version, hadoop_versi
     spark_version = version,
     app_name = app_name,
     config = config,
-    jars = spark_default_jars(versionSparkHome),
+    jars = getOption("spark.jars.default", list()),
     packages = config[["sparklyr.defaultPackages"]],
     extensions = extensions,
     environment = environment,
@@ -62,8 +60,9 @@ start_shell <- function(master,
   # read app jar through config, this allows "sparkr-shell" to test sparkr backend
   app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
   if (is.null(app_jar)) {
-    app_jar <- shQuote(normalizePath(system.file(file.path("java", "sparklyr-1.6.1.jar"), package = "sparklyr"),
-                             mustWork = FALSE))
+    versionSparkHome <- spark_version_from_home(spark_home, default = version)
+    app_jar <- spark_default_app_jar(versionSparkHome)
+    app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE))
     shell_args <- c(shell_args, "--class", "sparklyr.Backend")
   }
 
@@ -101,7 +100,8 @@ start_shell <- function(master,
   extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions)
 
   # combine passed jars and packages with extensions
-  jars <- normalizePath(unique(c(jars, extensions$jars)))
+  all_jars <- c(jars, extensions$jars)
+  jars <- if (length(all_jars) > 0) normalizePath(unique(all_jars)) else list()
   packages <- unique(c(packages, extensions$packages))
 
   # add jars to arguments
