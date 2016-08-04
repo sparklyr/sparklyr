@@ -1,22 +1,20 @@
-#' Start the Spark R Shell
-#'
-#' @param master Spark cluster url to connect to. Use \code{"local"} to connect to a local
-#'   instance of Spark
-#' @param spark_home Spark home directory (defaults to SPARK_HOME environment variable)
-#' @param spark_version Spark version, if not specified, version taken from SPARK_HOME
-#' @param app_name Application name to be used while running in the Spark cluster
-#' @param config Named character vector of spark.* options
-#' @param jars Paths to Jar files to include
-#' @param packages Spark packages to include
-#' @param extensions Extension packages to include dependencies for
-#'   (see \code{\link{spark_dependency}}).
-#' @param environment Environment variables to set
-#' @param shell_args Additional command line arguments for spark_shell
-#' @param sc \code{spark_connection}
-#'
-#' @return \code{spark_connection} object
-#'
-#' @export
+# Start the Spark R Shell
+#
+# @param master Spark cluster url to connect to. Use \code{"local"} to connect to a local
+#   instance of Spark
+# @param spark_home Spark home directory (defaults to SPARK_HOME environment variable)
+# @param spark_version Spark version, if not specified, version taken from SPARK_HOME
+# @param app_name Application name to be used while running in the Spark cluster
+# @param config Named character vector of spark.* options
+# @param jars Paths to Jar files to include
+# @param packages Spark packages to include
+# @param extensions Extension packages to include dependencies for
+#   (see \code{\link{spark_dependency}}).
+# @param environment Environment variables to set
+# @param shell_args Additional command line arguments for spark_shell
+# @param sc \code{spark_connection}
+#
+# @return \code{spark_connection} object
 start_shell <- function(master,
                         spark_home = Sys.getenv("SPARK_HOME"),
                         spark_version = NULL,
