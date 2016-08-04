@@ -1,20 +1,54 @@
+
+
+# create a shell connection
+shell_connection <- function(master, spark_home, app_name, version, hadoop_version,
+                             shell_args, config, extensions) {
+
+  # for local mode we support SPARK_HOME via locally installed versions
+  if (spark_master_is_local(master)) {
+    if (!nzchar(spark_home)) {
+      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
+      spark_home <- installInfo$sparkVersionDir
+    }
+  }
+
+  # prepare windows environment
+  prepare_windows_environment(spark_home)
+
+  # verify that java is available
+  if (!is_java_available()) {
+    stop("Java is required to connect to Spark. Please download and install Java from ",
+         java_install_url())
+  }
+
+  # error if there is no SPARK_HOME
+  if (!nzchar(spark_home))
+    stop("Failed to connect to Spark (SPARK_HOME is not set).")
+
+  # determine environment
+  environment <- list()
+  if (spark_master_is_local(master))
+    environment$SPARK_LOCAL_IP = "127.0.0.1"
+
+  versionSparkHome <- spark_version_from_home(spark_home, default = version)
+
+  # start shell
+  start_shell(
+    master = master,
+    spark_home = spark_home,
+    spark_version = version,
+    app_name = app_name,
+    config = config,
+    jars = spark_default_jars(versionSparkHome),
+    packages = config[["sparklyr.defaultPackages"]],
+    extensions = extensions,
+    environment = environment,
+    shell_args = shell_args
+  )
+}
+
+
 # Start the Spark R Shell
-#
-# @param master Spark cluster url to connect to. Use \code{"local"} to connect to a local
-#   instance of Spark
-# @param spark_home Spark home directory (defaults to SPARK_HOME environment variable)
-# @param spark_version Spark version, if not specified, version taken from SPARK_HOME
-# @param app_name Application name to be used while running in the Spark cluster
-# @param config Named character vector of spark.* options
-# @param jars Paths to Jar files to include
-# @param packages Spark packages to include
-# @param extensions Extension packages to include dependencies for
-#   (see \code{\link{spark_dependency}}).
-# @param environment Environment variables to set
-# @param shell_args Additional command line arguments for spark_shell
-# @param sc \code{spark_connection}
-#
-# @return \code{spark_connection} object
 start_shell <- function(master,
                         spark_home = Sys.getenv("SPARK_HOME"),
                         spark_version = NULL,
@@ -158,6 +192,7 @@ start_shell <- function(master,
     # spark_connection
     master = master,
     spark_home = spark_home,
+    method = "shell",
     app_name = app_name,
     config = config,
     # spark_shell_connection

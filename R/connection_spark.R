@@ -36,6 +36,8 @@ spark_default_jars <- function(version) {
 #' @param spark_home Spark home directory (defaults to SPARK_HOME environment variable).
 #'   If \code{SPARK_HOME} is defined it will be always be used unless the \code{version}
 #'   paramater is specified to force the use of a locally installed version.
+#' @param method of connecting to spark (currently only "shell" is supported, additional
+#'   methods may come later)
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of Spark (only applicable for local master)
 #' @param hadoop_version Version of Hadoop (only applicable for local master)
@@ -50,22 +52,15 @@ spark_default_jars <- function(version) {
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
+                          method = c("shell"),
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
                           config = spark_config(),
                           extensions = sparklyr::registered_extensions()) {
 
-  # for local mode we support SPARK_HOME via locally installed versions
-  if (spark_master_is_local(master)) {
-    if (!nzchar(spark_home)) {
-      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
-      spark_home <- installInfo$sparkVersionDir
-    }
-  }
-
-  # prepare windows environment
-  prepare_windows_environment(spark_home)
+  # validate method
+  method <- match.arg(method)
 
   # master can be missing if it's specified in the config file
   if (missing(master)) {
@@ -81,97 +76,83 @@ spark_connect <- function(master,
   if (master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
 
+  # look for existing connection with the same method, master, and app_name
   filter <- function(e) {
     connection_is_open(e) &&
-    identical(e$master, master) &&
-    identical(e$app_name, app_name)
+      identical(e$method, method) &&
+      identical(e$master, master) &&
+      identical(e$app_name, app_name)
   }
-
   sconFound <- spark_connection_find_scon(filter)
   if (length(sconFound) == 1) {
     message("Re-using existing Spark connection to ", passedMaster)
     return(sconFound[[1]])
   }
 
-  # verify that java is available
-  if (!is_java_available()) {
-    stop("Java is required to connect to Spark. Please download and install Java from ",
-         java_install_url())
+  # determine shell_args (use fake connection b/c we don't yet
+  # have a real connection)
+  config_sc <- list(config = config, master = master)
+  shell_args <- connection_config(config_sc, "sparklyr.shell.")
+
+  # flatten shell_args to make them compatible with sparklyr
+  shell_args <- unlist(lapply(names(shell_args), function(name) {
+    list(paste0("--", name), shell_args[[name]])
+  }))
+
+  # connect using the specified method
+
+  # spark-shell (local install of spark)
+  if (method == "shell") {
+    scon <- shell_connection(master = master,
+                             spark_home = spark_home,
+                             app_name = app_name,
+                             version = version,
+                             hadoop_version = hadoop_version,
+                             shell_args = shell_args,
+                             config = config,
+                             extensions = extensions)
+
+  # other methods
+  } else {
+
+    # e.g.
+    # scon <- livy_connection(master = master,
+    #                         app_name = app_name,
+    #                         shell_args = shell_args,
+    #                         config = config,
+    #                         extensions = extensions)
+
+    stop("Unsupported connection method '", method, "'")
   }
 
-  # error if there is no SPARK_HOME
-  if (!nzchar(spark_home))
-    stop("Failed to connect to Spark (SPARK_HOME is not set).")
+  # mark the connection as a DBIConnection class to allow DBI to use defaults
+  attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
 
-  scon <- NULL
-  tryCatch({
+  # update spark_context and hive_context connections with DBIConnection
+  scon$spark_context$connection <- scon
+  scon$hive_context$connection <- scon
 
-    # determine environment
-    environment <- list()
-    if (spark_master_is_local(master))
-      environment$SPARK_LOCAL_IP = "127.0.0.1"
+  # notify connection viewer of connection
+  libs <- c("sparklyr", extensions)
+  libs <- vapply(libs,
+                 function(lib) paste0("library(", lib, ")"),
+                 character("1"),
+                 USE.NAMES = FALSE)
+  libs <- paste(libs, collapse = "\n")
+  if ("package:dplyr" %in% search())
+    libs <- paste(libs, "library(dplyr)", sep = "\n")
+  parentCall <- match.call()
+  connectCall <- paste(libs,
+                       paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
+                       sep = "\n")
+  on_connection_opened(scon, connectCall)
 
-    # determine shell_args (use fake connection b/c we don't yet
-    # have a real connection)
-    config_sc <- list(config = config, master = master)
-    shell_args <- connection_config(config_sc, "sparklyr.shell.")
-
-    # flatten shell_args to make them compatible with sparklyr
-    shell_args <- unlist(lapply(names(shell_args), function(name) {
-      list(paste0("--", name), shell_args[[name]])
-    }))
-
-    versionSparkHome <- spark_version_from_home(spark_home, default = version)
-
-    # start shell
-    scon <- start_shell(
-      master = master,
-      spark_home = spark_home,
-      spark_version = version,
-      app_name = app_name,
-      config = config,
-      jars = spark_default_jars(versionSparkHome),
-      packages = config[["sparklyr.defaultPackages"]],
-      extensions = extensions,
-      environment = environment,
-      shell_args = shell_args
-    )
-
-    # mark the connection as a DBIConnection class to allow DBI to use defaults
-    attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
-
-    # update spark_context and hive_context connections with DBIConnection
-    scon$spark_context$connection <- scon
-    scon$hive_context$connection <- scon
-
-    # notify connection viewer of connection
-    libs <- c("sparklyr", extensions)
-    libs <- vapply(libs,
-                   function(lib) paste0("library(", lib, ")"),
-                   character("1"),
-                   USE.NAMES = FALSE)
-    libs <- paste(libs, collapse = "\n")
-    if ("package:dplyr" %in% search())
-      libs <- paste(libs, "library(dplyr)", sep = "\n")
-    parentCall <- match.call()
-    connectCall <- paste(libs,
-                         paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
-                         sep = "\n")
-    on_connection_opened(scon, connectCall)
-
-    # Register a finalizer to sleep on R exit to support older versions of the RStudio ide
-    reg.finalizer(as.environment("package:sparklyr"), function(x) {
-      if (connection_is_open(scon)) {
-        Sys.sleep(1)
-      }
-    }, onexit = TRUE)
-  }, error = function(err) {
-    tryCatch({
-      spark_log(scon)
-    }, error = function(e) {
-    })
-    stop(err)
-  })
+  # Register a finalizer to sleep on R exit to support older versions of the RStudio ide
+  reg.finalizer(as.environment("package:sparklyr"), function(x) {
+    if (connection_is_open(scon)) {
+      Sys.sleep(1)
+    }
+  }, onexit = TRUE)
 
   # add to our internal list
   spark_connections_add(scon)

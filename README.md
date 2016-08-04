@@ -307,16 +307,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/08/04 07:39:34 INFO ContextCleaner: Cleaned accumulator 249
-    ## 16/08/04 07:39:34 INFO ContextCleaner: Cleaned accumulator 248
-    ## 16/08/04 07:39:34 INFO BlockManagerInfo: Removed broadcast_75_piece0 on localhost:53548 in memory (size: 3.5 KB, free: 483.4 MB)
-    ## 16/08/04 07:39:34 INFO ContextCleaner: Cleaned accumulator 246
-    ## 16/08/04 07:39:34 INFO BlockManagerInfo: Removed broadcast_74_piece0 on localhost:53548 in memory (size: 19.3 KB, free: 483.5 MB)
-    ## 16/08/04 07:39:34 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
-    ## 16/08/04 07:39:34 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 109 ms on localhost (1/1)
-    ## 16/08/04 07:39:34 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/08/04 07:39:34 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.109 s
-    ## 16/08/04 07:39:34 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.112067 s
+    ## 16/08/04 11:45:13 INFO ContextCleaner: Cleaned accumulator 246
+    ## 16/08/04 11:45:13 INFO ContextCleaner: Cleaned accumulator 248
+    ## 16/08/04 11:45:13 INFO ContextCleaner: Cleaned accumulator 251
+    ## 16/08/04 11:45:13 INFO ContextCleaner: Cleaned shuffle 18
+    ## 16/08/04 11:45:13 INFO BlockManagerInfo: Removed broadcast_78_piece0 on localhost:62449 in memory (size: 4.6 KB, free: 483.5 MB)
+    ## 16/08/04 11:45:13 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
+    ## 16/08/04 11:45:13 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 112 ms on localhost (1/1)
+    ## 16/08/04 11:45:13 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/08/04 11:45:13 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.112 s
+    ## 16/08/04 11:45:13 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.115488 s
 
 Finally, we disconnect from Spark:
 
