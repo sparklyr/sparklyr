@@ -159,5 +159,7 @@ ml_prepare_features <- function(x, features, envir = parent.frame()) {
   features <- as.character(features)
 
   assign("features", features, envir = envir)
+
+  x
 }
 
