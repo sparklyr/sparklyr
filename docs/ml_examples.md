@@ -27,6 +27,12 @@ sc <- spark_connect("local", version = "1.6.1")
 iris_tbl <- copy_to(sc, iris, "iris", overwrite = TRUE)
 ```
 
+    ## The following columns have been renamed:
+    ## - 'Sepal.Length' => 'Sepal_Length' (#1)
+    ## - 'Sepal.Width'  => 'Sepal_Width'  (#2)
+    ## - 'Petal.Length' => 'Petal_Length' (#3)
+    ## - 'Petal.Width'  => 'Petal_Width'  (#4)
+
 KMeans in R
 -----------
 
@@ -48,10 +54,6 @@ iris %>%
 
 KMeans in Spark
 ---------------
-
-Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/latest/mllib-clustering.html#k-means)
-
-Note that the names of variables within the iris `tbl` have been transformed (replacing `.` with `_`) to work around an issue in the Spark 2.0.0-preview used in constructing this document -- we expect the issue to be resolved with the release of Spark 2.0.0.
 
 ``` r
 model <- iris_tbl %>%
@@ -197,6 +199,13 @@ Survival Regression in Spark
 
 ``` r
 ovarian_tbl <- copy_to(sc, ovarian, overwrite = TRUE)
+```
+
+    ## The following columns have been renamed:
+    ## - 'resid.ds' => 'resid_ds' (#4)
+    ## - 'ecog.ps'  => 'ecog_ps'  (#6)
+
+``` r
 fit <- ovarian_tbl %>%
   ml_survival_regression(
     response = "futime",
@@ -437,48 +446,6 @@ head(mPredict)
 
     ## [1] "setosa"     "setosa"     "setosa"     "setosa"     "setosa"    
     ## [6] "versicolor"
-
-One vs Rest in Spark
---------------------
-
-``` r
-beaver_tbl <- copy_to(sc, beaver, "beaver", overwrite = TRUE)
-
-classifier <- beaver_tbl %>%
-  mutate(response = as.numeric(activ == "Active")) %>%
-  ml_logistic_regression(response = "response", features = "temp", only_model = TRUE)
-
-model <- beaver_tbl %>%
-  mutate(response = as.numeric(activ == "Active")) %>%
-  ml_one_vs_rest(classifier = classifier, response = "response", features = "temp")
-
-print(model)
-```
-
-    ## $features
-    ## [1] "temp"
-    ## 
-    ## $response
-    ## [1] "response"
-    ## 
-    ## $model.parameters
-    ## $model.parameters$features
-    ## [1] "features13d5b17205ffb"
-    ## 
-    ## $model.parameters$labels
-    ## NULL
-    ## 
-    ## $model.parameters$response
-    ## [1] "response"
-    ## 
-    ## 
-    ## $.model
-    ## <jobj[1031]>
-    ##   class org.apache.spark.ml.classification.OneVsRestModel
-    ##   oneVsRest_ce3d1fa69a1d
-    ## 
-    ## attr(,"class")
-    ## [1] "ml_model_one_vs_rest" "ml_model"
 
 Cleanup
 -------

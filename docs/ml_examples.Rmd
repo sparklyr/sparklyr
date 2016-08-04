@@ -35,13 +35,6 @@ iris %>%
 
 ## KMeans in Spark
 
-Basing kmeans over Spark on [spark.mllib K-means](http://spark.apache.org/docs/latest/mllib-clustering.html#k-means)
-
-Note that the names of variables within the iris `tbl` have been transformed
-(replacing `.` with `_`) to work around an issue in the Spark 2.0.0-preview
-used in constructing this document -- we expect the issue to be resolved with
-the release of Spark 2.0.0.
-
 ```{r}
 model <- iris_tbl %>%
   select(Petal_Width, Petal_Length) %>%
@@ -295,22 +288,6 @@ mNaiveBayes <- iris_tbl %>%
   )
 mPredict <- predict(mNaiveBayes, iris_tbl)
 head(mPredict)
-```
-
-## One vs Rest in Spark
-
-```{r}
-beaver_tbl <- copy_to(sc, beaver, "beaver", overwrite = TRUE)
-
-classifier <- beaver_tbl %>%
-  mutate(response = as.numeric(activ == "Active")) %>%
-  ml_logistic_regression(response = "response", features = "temp", only_model = TRUE)
-
-model <- beaver_tbl %>%
-  mutate(response = as.numeric(activ == "Active")) %>%
-  ml_one_vs_rest(classifier = classifier, response = "response", features = "temp")
-
-print(model)
 ```
 
 ## Cleanup
