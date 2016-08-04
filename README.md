@@ -134,16 +134,16 @@ batting_tbl %>%
     ## 
     ##     playerID yearID teamID     G    AB     R     H
     ##        <chr>  <int>  <chr> <int> <int> <int> <int>
-    ## 1  anderal01   1941    PIT    70   223    32    48
-    ## 2  anderal01   1942    PIT    54   166    24    45
-    ## 3  balesco01   2008    WAS    15    15     1     3
-    ## 4  balesco01   2009    WAS     7     8     0     1
-    ## 5  bandoch01   1986    CLE    92   254    28    68
-    ## 6  bandoch01   1984    CLE    75   220    38    64
-    ## 7  bedelho01   1962    ML1    58   138    15    27
-    ## 8  bedelho01   1968    PHI     9     7     0     1
-    ## 9  biittla01   1977    CHN   138   493    74   147
-    ## 10 biittla01   1975    MON   121   346    34   109
+    ## 1  abbotpa01   2000    SEA    35     5     1     2
+    ## 2  abbotpa01   2004    PHI    10    11     1     2
+    ## 3  abnersh01   1992    CHA    97   208    21    58
+    ## 4  abnersh01   1990    SDN    91   184    17    45
+    ## 5  abreujo02   2014    CHA   145   556    80   176
+    ## 6  acevejo01   2001    CIN    18    34     1     4
+    ## 7  acevejo01   2004    CIN    39    43     0     2
+    ## 8  adamsbe01   1919    PHI    78   232    14    54
+    ## 9  adamsbe01   1918    PHI    84   227    10    40
+    ## 10 adamsbu01   1945    SLN   140   578    98   169
     ## # ... with more rows
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
@@ -194,8 +194,7 @@ fit <- partitions$training %>%
 fit
 ```
 
-    ## Call:
-    ## mpg ~ wt + cyl 
+    ## Call: ml_linear_regression(., response = "mpg", features = c("wt", "cyl"))
     ## 
     ## Coefficients:
     ## (Intercept)          wt         cyl 
@@ -207,8 +206,7 @@ For linear regression models produced by Spark, we can use `summary()` to learn 
 summary(fit)
 ```
 
-    ## Call:
-    ## mpg ~ wt + cyl 
+    ## Call: ml_linear_regression(., response = "mpg", features = c("wt", "cyl"))
     ## 
     ## Deviance Residuals::
     ##     Min      1Q  Median      3Q     Max 
@@ -255,20 +253,9 @@ src_tbls(sc)
 Extensions
 ----------
 
-The facilities used internally by sparklyr for its dplyr and machine learning interfaces are available to extension packages via the [sparkapi](https://github.com/rstudio/sparkapi) package. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).
+The facilities used internally by sparklyr for its dplyr and machine learning interfaces are available to extension packages. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).
 
 Here's a simple example that wraps a Spark text file line counting function with an R function:
-
-``` r
-library(sparkapi)
-```
-
-    ## 
-    ## Attaching package: 'sparkapi'
-
-    ## The following object is masked from 'package:sparklyr':
-    ## 
-    ##     spark_web
 
 ``` r
 # write a CSV 
@@ -320,16 +307,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/07/11 08:02:53 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 67 (/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T//RtmpxqBOpz/file74f16edc3460.csv MapPartitionsRDD[300] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/07/11 08:02:53 INFO TaskSchedulerImpl: Adding task set 67.0 with 1 tasks
-    ## 16/07/11 08:02:53 INFO TaskSetManager: Starting task 0.0 in stage 67.0 (TID 501, localhost, partition 0,PROCESS_LOCAL, 2473 bytes)
-    ## 16/07/11 08:02:53 INFO Executor: Running task 0.0 in stage 67.0 (TID 501)
-    ## 16/07/11 08:02:53 INFO HadoopRDD: Input split: file:/var/folders/st/b1kz7ydn54nfzfsrl7_hggyc0000gn/T/RtmpxqBOpz/file74f16edc3460.csv:0+33313106
-    ## 16/07/11 08:02:53 INFO Executor: Finished task 0.0 in stage 67.0 (TID 501). 2082 bytes result sent to driver
-    ## 16/07/11 08:02:53 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 501) in 103 ms on localhost (1/1)
-    ## 16/07/11 08:02:53 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/07/11 08:02:53 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.103 s
-    ## 16/07/11 08:02:53 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.107400 s
+    ## 16/08/04 07:39:34 INFO ContextCleaner: Cleaned accumulator 249
+    ## 16/08/04 07:39:34 INFO ContextCleaner: Cleaned accumulator 248
+    ## 16/08/04 07:39:34 INFO BlockManagerInfo: Removed broadcast_75_piece0 on localhost:53548 in memory (size: 3.5 KB, free: 483.4 MB)
+    ## 16/08/04 07:39:34 INFO ContextCleaner: Cleaned accumulator 246
+    ## 16/08/04 07:39:34 INFO BlockManagerInfo: Removed broadcast_74_piece0 on localhost:53548 in memory (size: 19.3 KB, free: 483.5 MB)
+    ## 16/08/04 07:39:34 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
+    ## 16/08/04 07:39:34 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 109 ms on localhost (1/1)
+    ## 16/08/04 07:39:34 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/08/04 07:39:34 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.109 s
+    ## 16/08/04 07:39:34 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.112067 s
 
 Finally, we disconnect from Spark:
 
