@@ -125,9 +125,6 @@ spark_connect <- function(master,
     stop("Unsupported connection method '", method, "'")
   }
 
-  # initialize the connection (create spark context, hive context, etc.)
-  scon <- initialize_connection(scon)
-
   # mark the connection as a DBIConnection class to allow DBI to use defaults
   attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
 

@@ -208,8 +208,8 @@ start_shell <- function(master,
     }
   }, onexit = TRUE)
 
-  # return the connection
-  sc
+  # initialize and return the connection
+  initialize_connection(sc)
 }
 
 
