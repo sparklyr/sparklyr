@@ -13,17 +13,6 @@ Initialization
 
 ``` r
 library(sparklyr)
-library(sparkapi)
-```
-
-    ## 
-    ## Attaching package: 'sparkapi'
-
-    ## The following object is masked from 'package:sparklyr':
-    ## 
-    ##     spark_web
-
-``` r
 library(dplyr)
 ```
 

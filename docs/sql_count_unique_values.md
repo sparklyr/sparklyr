@@ -6,7 +6,6 @@ This article shows how you might use the `dplyr` interface to Spark SQL to compu
 First, we read our data into Spark.
 
 ``` r
-library(sparkapi)
 library(sparklyr)
 library(dplyr)
 library(ggplot2)

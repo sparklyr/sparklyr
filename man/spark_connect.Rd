@@ -6,7 +6,7 @@
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
   app_name = "sparklyr", version = NULL, hadoop_version = NULL,
-  config = spark_config(), extensions = sparkapi::registered_extensions())
+  config = spark_config(), extensions = sparklyr::registered_extensions())
 }
 \arguments{
 \item{master}{Spark cluster url to connect to. Use \code{"local"} to connect to a local
@@ -25,7 +25,7 @@ paramater is specified to force the use of a locally installed version.}
 \item{config}{Configuration for connection (see \code{\link{spark_config} for details}).}
 
 \item{extensions}{Extension packages to enable for this connection. By default will
-enable all packages that previously called \code{sparkapi::register_extension}.}
+enable all packages that previously called \code{sparklyr::register_extension}.}
 }
 \value{
 Connection to Spark local instance or remote cluster

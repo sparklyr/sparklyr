@@ -17,5 +17,5 @@ spark_home_from_version <- function(spark_version, hadoop_version = "2.6") {
     spark_home
 }
 
-sparkapi::spark_compile("sparklyr", spark_home = spark_home_from_version("1.6.1"))
-sparkapi::spark_compile("sparklyr", spark_home = spark_home_from_version("2.0.0-preview"))
+sparklyr::spark_compile("sparklyr", spark_home = spark_home_from_version("1.6.1"))
+sparklyr::spark_compile("sparklyr", spark_home = spark_home_from_version("2.0.0"))
