@@ -2,6 +2,8 @@ sd_section("Connecting to Spark",
            "Functions for installing Spark components and managing connections to Spark.",
            c("spark_install",
              "spark_connect",
+             "spark_log",
+             "spark_web",
              "spark_disconnect",
              "spark_config")
 )
@@ -31,7 +33,8 @@ sd_section("Spark DataFrames",
              "sdf_sample",
              "sdf_sort",
              "sdf_predict",
-             "sdf_register")
+             "sdf_register",
+             "sdf_with_unique_id")
 )
 
 sd_section("Machine Learning Algorithms.",
@@ -48,7 +51,9 @@ sd_section("Machine Learning Algorithms.",
              "ml_naive_bayes",
              "ml_multilayer_perceptron",
              "ml_lda",
-             "ml_one_vs_rest")
+             "ml_one_vs_rest",
+             "ml_als_factorization",
+             "ml_saveload")
 )
 
 sd_section("Machine Learning Transformers",
@@ -74,6 +79,21 @@ sd_section("Machine Learning Utility Functions",
              "ml_prepare_response_features_intercept",
              "ml_create_dummy_variables"
            )
+)
+
+sd_section("Extensions API",
+           "Functions for creating extensions to the sparklyr package",
+           c("invoke",
+             "spark_connection",
+             "connection_config",
+             "spark_version",
+             "spark_jobj",
+             "spark_dataframe",
+             "spark_context",
+             "java_context",
+             "hive_context",
+             "register_extension",
+             "spark_dependency")
 )
 
 

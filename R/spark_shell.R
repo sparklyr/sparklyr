@@ -178,11 +178,11 @@ start_shell <- function(master,
 }
 
 
-#' Stop the Spark R Shell
-#'
-#' @rdname start_shell
-#'
-#' @export
+# Stop the Spark R Shell
+#
+# @rdname start_shell
+#
+# @export
 stop_shell <- function(sc) {
   invoke_method(sc,
                 FALSE,

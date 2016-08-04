@@ -15,6 +15,7 @@
 #'   filepaths are supported.
 #'
 #' @rdname ml_saveload
+#' @name   ml_saveload
 #' @export
 ml_load <- function(sc, file) {
 
