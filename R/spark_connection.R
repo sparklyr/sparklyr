@@ -40,6 +40,22 @@ hive_context <- function(sc) {
   sc$hive_context
 }
 
+#' Get the Spark Session associated with a connection
+#'
+#' Get the
+#' \href{http://spark.apache.org/docs/latest/api/scala/#org.apache.spark.sql.SparkSession}{Spark Session}
+#' associated with a \code{spark_connection}.
+#'
+#' This object is only available since Spark 2.0.0, and provides
+#' an interface that unifies the Spark SQL context + Hive context
+#' into a single object, and its use is recommended over the older
+#' APIs.
+#'
+#' @param sc A \code{spark_connection}.
+#' @export
+spark_session <- function(sc) {
+  sc$hive_context
+}
 
 #' Get the spark_connection associated with an object
 #'
