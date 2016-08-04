@@ -191,11 +191,11 @@ start_shell <- function(master,
   sc <- structure(class = c("spark_connection", "spark_shell_connection"), list(
     # spark_connection
     master = master,
-    spark_home = spark_home,
     method = "shell",
     app_name = app_name,
     config = config,
     # spark_shell_connection
+    spark_home = spark_home,
     backend = backend,
     monitor = monitor,
     output_file = output_file
