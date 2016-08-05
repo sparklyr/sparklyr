@@ -117,6 +117,10 @@ spark_compile <- function(name,
 #' @param spark_versions The Spark versions to build against. When \code{NULL},
 #'   builds against all Spark versions discovered with
 #'   \code{\link{spark_available_versions}}.
+#' @param scalac The path to the \code{scalac} compiler to be used. When unset,
+#'   \code{scalac} will be discovered on the PATH.
+#' @param jar The path to the \code{jar} Java archive tool to be used.
+#'   When unset, \code{jar} will be discovered on the PATH.
 #'
 #' @import rprojroot
 #' @import digest

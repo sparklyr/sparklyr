@@ -5,7 +5,7 @@
 \title{Compile Scala sources into a Java Archive (jar)}
 \usage{
 spark_compile_package_jars(package = rprojroot::find_package_root_file(),
-  spark_versions = NULL)
+  spark_versions = NULL, scalac = NULL, jar = NULL)
 }
 \arguments{
 \item{package}{The path to an \R package.}
@@ -13,6 +13,12 @@ spark_compile_package_jars(package = rprojroot::find_package_root_file(),
 \item{spark_versions}{The Spark versions to build against. When \code{NULL},
 builds against all Spark versions discovered with
 \code{\link{spark_available_versions}}.}
+
+\item{scalac}{The path to the \code{scalac} compiler to be used. When unset,
+\code{scalac} will be discovered on the PATH.}
+
+\item{jar}{The path to the \code{jar} Java archive tool to be used.
+When unset, \code{jar} will be discovered on the PATH.}
 }
 \description{
 Compile the \code{scala} source files contained within an \R package
