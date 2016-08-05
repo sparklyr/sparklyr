@@ -78,50 +78,6 @@ df_from_sql <- function(sc, sql) {
 }
 
 df_from_sdf <- function(sc, sdf, take = -1) {
-  schema <- sdf_sql_schema(sdf)
-  fields <- sdf_sql_schema_fields(schema)
-
-  if (take >= 0) {
-    sdf <- invoke(sdf, "limit", as.integer(take))
-  }
-
-  df <- invoke_static(
-    spark_connection(sdf),
-    "sparklyr.Translator",
-    "dfToCols",
-    sdf
-  )
-
-  dfNames <- lapply(fields, function(x) x$name)
-  rows <- if (length(df) > 0) length(df[[1]]) else 0
-
-  # If this is a resultset with no rows...
-  if (rows == 0) {
-    # Remove invalid fields that have zero length
-    fields <- Filter(function(e) nchar(e$name) > 0, fields)
-    dfNames <- Filter(function(e) nchar(e) > 0, dfNames)
-
-    dfEmpty <- lapply(fields, function(field) {
-      sdf_sql_default_type(field)
-    })
-    names(dfEmpty) <- dfNames
-
-    df <- data.frame(dfEmpty, stringsAsFactors = FALSE, check.names = FALSE)
-  } else {
-    stringData <- unlist(df)
-    df <- as.data.frame(seq_len(rows))
-
-    lapply(seq_along(fields), function(col) {
-      df[[dfNames[[col]]]] <<- sdf_sql_columns_typed(
-        col,
-        stringData,
-        fields,
-        rows)
-    })
-
-    df[[1]] <- NULL
-  }
-
-  df
+  sdf_collect(sdf)
 }
 
