@@ -209,7 +209,20 @@ start_shell <- function(master,
   }, onexit = TRUE)
 
   # initialize and return the connection
-  initialize_connection(sc)
+  tryCatch({
+    initialize_connection(sc)
+  }, error = function(e) {
+    try(silent = TRUE, {
+      log <- spark_log(sc);
+    })
+
+    stop(paste(
+      "Failed during initialize_connection() ",
+      e$message, "\n\n",
+      "Log: ", "\n",
+      log, "\n",
+      sep = ""), call. = FALSE)
+  })
 }
 
 
