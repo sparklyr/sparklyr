@@ -210,7 +210,7 @@ start_shell <- function(master,
 
   # initialize and return the connection
   tryCatch({
-    initialize_connection(sc)
+    sc <- initialize_connection(sc)
   }, error = function(e) {
     try(silent = TRUE, {
       log <- spark_log(sc);
@@ -223,6 +223,8 @@ start_shell <- function(master,
       log, "\n",
       sep = ""), call. = FALSE)
   })
+
+  sc
 }
 
 
