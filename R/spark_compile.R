@@ -1,59 +1,43 @@
-#' Compiles scala sources and packages into a jar file
+#' Compile Scala sources into a Java Archive (jar)
 #'
-#' @export
-#' @param name The name of the target jar
-#' @param spark_home Spark version
+#' Given a set of \code{scala} source files, compile them
+#' into a Java Archive (\code{jar}).
+#'
+#' @param name The name to assign to the target \code{jar}.
+#' @param spark_home The path to the Spark sources to be used
+#'   alongside compilation.
+#' @param scalac The path to the \code{scalac} program to be used, for
+#'   compilation of \code{scala} files.
+#' @param jar The path to the \code{jar} program to be used, for
+#'   generating of the resulting \code{jar}.
 #'
 #' @import rprojroot
 #' @import digest
 #'
 #' @keywords internal
-spark_compile <- function(name, spark_home) {
+#' @export
+spark_compile <- function(name,
+                          spark_home,
+                          scalac = NULL,
+                          jar = NULL)
+{
+  scalac <- scalac %||% path_program("scalac")
+  jar <- scalac %||% path_program("jar")
+
+  scalac_version <- get_scalac_version(scalac)
   spark_version <- spark_version_from_home(spark_home)
-  version_numeric <- gsub("[-_a-zA-Z]", "", spark_version)
-  version_sufix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
-  jar_name <- paste0(name, "-", version_numeric, ".jar")
+  spark_version_suffix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
+  jar_name <- sprintf("%s-spark%s-scala%s.jar", name, spark_version, scalac_version)
 
   root <- rprojroot::find_package_root_file()
 
-  jar_path <- file.path(root, "inst", "java", jar_name)
-  scala_files <- lapply(
-    Filter(
-      function(e) {
-        # if filename has version only include version being built
-        if (grepl(".*_\\d+\\.scala", e)) {
-          grepl(version_sufix, e)
-        }
-        else {
-          grepl(".*\\.scala$", e)
-        }
-      },
-      list.files(file.path(root, "inst", "scala"))
-    ),
-    function(e) file.path(root, "inst", "scala", e)
-  )
-  scala_files_digest <- file.path(root, paste0(
-    "inst/scala/sparklyr-", version_numeric, ".md5"
-  ))
+  java_path <- file.path(root, "inst/java")
+  jar_path <- file.path(java_path, jar_name)
 
-  scala_files_contents <- paste(lapply(scala_files, function(e) readLines(e)))
-  scala_files_contents_path <- tempfile()
-  scala_files_contents_file <- file(scala_files_contents_path, "w")
-  writeLines(scala_files_contents, scala_files_contents_file)
-  close(scala_files_contents_file)
-
-  # Bail if files havent changed
-  md5 <- tools::md5sum(scala_files_contents_path)
-  if (file.exists(scala_files_digest) && file.exists(jar_path)) {
-    contents <- readChar(scala_files_digest, file.info(scala_files_digest)$size, TRUE)
-    if (identical(contents, md5[[scala_files_contents_path]])) {
-      return()
-    }
-  }
+  scala_path <- file.path(root, "inst/scala")
+  scala_files <- list.files(scala_path, pattern = "scala$", full.names = TRUE)
 
   message("** building '", jar_name, "' ...")
-
-  cat(md5, file = scala_files_digest)
 
   execute <- function(...) {
     cmd <- paste(...)
@@ -61,19 +45,11 @@ spark_compile <- function(name, spark_home) {
     system(cmd)
   }
 
-  if (!nzchar(Sys.which("scalac")))
-    stop("failed to discover 'scalac' on the PATH")
-
-  if (!nzchar(Sys.which("jar")))
-    stop("failed to discover 'jar' on the PATH")
-
-  # Work in temporary directory (as temporary class files
-  # will be generated within there)
-  dir <- file.path(tempdir(), paste0(name, "-", version_sufix, "-scala-compile"))
-  if (!file.exists(dir))
-    if (!dir.create(dir))
-      stop("Failed to create '", dir, "'")
+  # work in temporary directory
+  dir <- tempfile(sprintf("%s-%s-scalac", name, spark_version_suffix))
+  ensure_directory(dir)
   owd <- setwd(dir)
+  on.exit(setwd(owd), add = TRUE)
 
   # list jars in the installation folder
   candidates <- c("jars", "lib")
@@ -97,15 +73,10 @@ spark_compile <- function(name, spark_home) {
 
   # ensure 'inst/java' exists
   inst_java_path <- file.path(root, "inst/java")
-  if (!file.exists(inst_java_path))
-    if (!dir.create(inst_java_path, recursive = TRUE))
-      stop("failed to create directory '", inst_java_path, "'")
+  ensure_directory(inst_java_path)
 
-  # call 'scalac' compiler
+  # call 'scalac' with CLASSPATH set
   classpath <- Sys.getenv("CLASSPATH")
-
-  # set CLASSPATH environment variable rather than passing
-  # in on command line (mostly aesthetic)
   Sys.setenv(CLASSPATH = CLASSPATH)
   execute("scalac", paste(shQuote(scala_files), collapse = " "))
   Sys.setenv(CLASSPATH = classpath)
@@ -122,4 +93,18 @@ spark_compile <- function(name, spark_home) {
   }
 
   setwd(owd)
+}
+
+spark_compile_package_jars <- function(package = ".",
+                                       spark_versions = c("1.6", "2.0"),
+                                       scalac = Sys.which("scalac"))
+{
+
+}
+
+get_scalac_version <- function(scalac = Sys.which("scalac")) {
+  cmd <- paste(shQuote(scalac), "-version 2>&1")
+  version_string <- system(cmd, intern = TRUE)
+  splat <- strsplit(version_string, "\\s+", perl = TRUE)[[1]]
+  splat[[4]]
 }

@@ -168,3 +168,11 @@ enumerate <- function(object, f, ...) {
   names(result) <- names(object)
   result
 }
+
+path_program <- function(program, fmt = NULL) {
+  fmt <- fmt %||% "program '%s' is required but not available on the path"
+  path <- Sys.which(program)
+  if (!nzchar(path))
+    stopf(fmt, program, call. = FALSE)
+  path
+}
