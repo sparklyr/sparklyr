@@ -26,7 +26,7 @@ spark_compile <- function(name,
                           jar = NULL)
 {
   scalac <- scalac %||% path_program("scalac")
-  jar <- scalac %||% path_program("jar")
+  jar    <- jar %||% path_program("jar")
 
   spark_version <- spark_version_from_home(spark_home)
   spark_version_suffix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
@@ -86,21 +86,23 @@ spark_compile <- function(name,
   # call 'scalac' with CLASSPATH set
   classpath <- Sys.getenv("CLASSPATH")
   Sys.setenv(CLASSPATH = CLASSPATH)
-  execute("scalac", paste(shQuote(scala_files), collapse = " "))
-  Sys.setenv(CLASSPATH = classpath)
+  on.exit(Sys.setenv(CLASSPATH = classpath), add = TRUE)
+  status <- execute("scalac", paste(shQuote(scala_files), collapse = " "))
+  if (status)
+    stop("==> failed to compile Scala source files")
 
   # call 'jar' to create our jar
   class_files <- file.path(name, list.files(name, pattern = "class$"))
-  execute("jar cf", jar_path, paste(shQuote(class_files), collapse = " "))
+  status <- execute("jar cf", jar_path, paste(shQuote(class_files), collapse = " "))
+  if (status)
+    stop("==> failed to build Java Archive")
 
   # double-check existence of jar
-  if (file.exists(jar_path)) {
-    message("==> ", basename(jar_path), " successfully created.\n")
-  } else {
+  if (!file.exists(jar_path))
     stop("==> failed to create ", jar_name)
-  }
 
-  setwd(owd)
+  message("==> ", basename(jar_path), " successfully created\n")
+  TRUE
 }
 
 #' Compile Scala sources into a Java Archive (jar)
