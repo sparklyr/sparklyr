@@ -6,6 +6,9 @@
 #' @param name The name to assign to the target \code{jar}.
 #' @param spark_home The path to the Spark sources to be used
 #'   alongside compilation.
+#' @param filter An optional function, used to filter out discovered \code{scala}
+#'   files during compilation. This can be used to ensure that e.g. certain files
+#'   are only compiled with certain versions of Spark, and so on.
 #' @param scalac The path to the \code{scalac} program to be used, for
 #'   compilation of \code{scala} files.
 #' @param jar The path to the \code{jar} program to be used, for
@@ -18,16 +21,18 @@
 #' @export
 spark_compile <- function(name,
                           spark_home,
+                          filter = function(files) files,
                           scalac = NULL,
                           jar = NULL)
 {
   scalac <- scalac %||% path_program("scalac")
   jar <- scalac %||% path_program("jar")
 
-  scalac_version <- get_scalac_version(scalac)
   spark_version <- spark_version_from_home(spark_home)
   spark_version_suffix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
-  jar_name <- sprintf("%s-spark%s-scala%s.jar", name, spark_version, scalac_version)
+  # scalac_version <- get_scalac_version(scalac)
+  # jar_name <- sprintf("%s-spark%s-scala%s.jar", name, spark_version, scalac_version)
+  jar_name <- sprintf("%s-%s.jar", name, spark_version)
 
   root <- rprojroot::find_package_root_file()
 
@@ -37,11 +42,14 @@ spark_compile <- function(name,
   scala_path <- file.path(root, "inst/scala")
   scala_files <- list.files(scala_path, pattern = "scala$", full.names = TRUE)
 
-  message("** building '", jar_name, "' ...")
+  # apply user filter to scala files
+  scala_files <- filter(scala_files)
+
+  message("==> building '", jar_name, "' ...")
 
   execute <- function(...) {
     cmd <- paste(...)
-    message("*** ", cmd)
+    message("==> ", cmd)
     system(cmd)
   }
 
@@ -87,22 +95,48 @@ spark_compile <- function(name,
 
   # double-check existence of jar
   if (file.exists(jar_path)) {
-    message("*** ", basename(jar_path), " successfully created.")
+    message("==> ", basename(jar_path), " successfully created.\n")
   } else {
-    stop("*** failed to create ", jar_name)
+    stop("==> failed to create ", jar_name)
   }
 
   setwd(owd)
 }
 
-spark_compile_package_jars <- function(package = ".",
-                                       spark_versions = c("1.6", "2.0"),
-                                       scalac = Sys.which("scalac"))
+#' Compile Scala sources into a Java Archive (jar)
+#'
+#' Compile the \code{scala} source files contained within an \R package
+#' into a Java Archive (\code{jar}) file that can be loaded and used within
+#' a Spark environment.
+#'
+#' @param package The path to an \R package.
+#' @param spark_versions The Spark versions to build against. When \code{NULL},
+#'   builds against all Spark versions discovered with
+#'   \code{\link{spark_available_versions}}.
+#'
+#' @import rprojroot
+#' @import digest
+#'
+#' @keywords internal
+#' @export
+spark_compile_package_jars <- function(package = rprojroot::find_package_root_file(),
+                                       spark_versions = NULL)
 {
+  if (is.null(spark_versions)) {
+    info <- spark_installed_versions()
+    spark_versions <- unique(info$spark)
+    spark_versions <- grep("-preview", spark_versions, value = TRUE, invert = TRUE)
+    spark_versions <- sort(spark_versions)
+  }
 
+  name <- basename(package)
+  for (spark_version in spark_versions) {
+    spark_compile(name, spark_home_dir(spark_version))
+  }
 }
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {
+  # TODO: shell redirection won't work on Windows unless we go through shell
   cmd <- paste(shQuote(scalac), "-version 2>&1")
   version_string <- system(cmd, intern = TRUE)
   splat <- strsplit(version_string, "\\s+", perl = TRUE)[[1]]
