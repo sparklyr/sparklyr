@@ -29,11 +29,9 @@ spark_compile <- function(name,
   jar    <- jar %||% path_program("jar")
 
   scalac_version <- get_scalac_version(scalac)
-  spark_version <- spark_version_from_home(spark_home)
-  spark_version_suffix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
-  # scalac_version <- get_scalac_version(scalac)
-  # jar_name <- sprintf("%s-spark%s-scala%s.jar", name, spark_version, scalac_version)
-  jar_name <- sprintf("%s-%s.jar", name, spark_version)
+  spark_version <- numeric_version(spark_version_from_home(spark_home))
+  spark_version_major_minor <- spark_version[1, 1:2]
+  jar_name <- sprintf("%s-%s.jar", name, spark_version_major_minor)
 
   root <- rprojroot::find_package_root_file()
 
@@ -47,6 +45,7 @@ spark_compile <- function(name,
   scala_files <- filter(scala_files)
 
   message("==> using scalac ", scalac_version)
+  message("==> building against Spark ", spark_version)
   message("==> building '", jar_name, "' ...")
 
   execute <- function(...) {
@@ -56,7 +55,7 @@ spark_compile <- function(name,
   }
 
   # work in temporary directory
-  dir <- tempfile(sprintf("%s-%s-scalac", name, spark_version_suffix))
+  dir <- tempfile(sprintf("scalac-%s", name))
   ensure_directory(dir)
   owd <- setwd(dir)
   on.exit(setwd(owd), add = TRUE)
