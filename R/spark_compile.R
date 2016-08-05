@@ -28,6 +28,7 @@ spark_compile <- function(name,
   scalac <- scalac %||% path_program("scalac")
   jar    <- jar %||% path_program("jar")
 
+  scalac_version <- get_scalac_version(scalac)
   spark_version <- spark_version_from_home(spark_home)
   spark_version_suffix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
   # scalac_version <- get_scalac_version(scalac)
@@ -45,6 +46,7 @@ spark_compile <- function(name,
   # apply user filter to scala files
   scala_files <- filter(scala_files)
 
+  message("==> using scalac ", scalac_version)
   message("==> building '", jar_name, "' ...")
 
   execute <- function(...) {
@@ -122,8 +124,13 @@ spark_compile <- function(name,
 #' @keywords internal
 #' @export
 spark_compile_package_jars <- function(package = rprojroot::find_package_root_file(),
-                                       spark_versions = NULL)
+                                       spark_versions = NULL,
+                                       scalac = NULL,
+                                       jar = NULL)
 {
+  scalac <- scalac %||% path_program("scalac")
+  jar    <- jar %||% path_program("jar")
+
   if (is.null(spark_versions)) {
     info <- spark_installed_versions()
     spark_versions <- unique(info$spark)
@@ -132,9 +139,16 @@ spark_compile_package_jars <- function(package = rprojroot::find_package_root_fi
   }
 
   name <- basename(package)
-  for (spark_version in spark_versions) {
-    spark_compile(name, spark_home_dir(spark_version))
-  }
+  status <- lapply(spark_versions, function(spark_version) {
+    spark_compile(
+      name = name,
+      spark_home = spark_home_dir(spark_version),
+      scalac = scalac,
+      jar = jar
+    )
+  })
+
+  invisible(status)
 }
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {

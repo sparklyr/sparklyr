@@ -91,3 +91,11 @@ spark_dependencies_from_extension <- function(spark_version, scala_version, exte
   dependency
 }
 
+# sparklyr's own declared dependencies
+spark_dependencies <- function(spark_version, scala_version) {
+  spark_dependency(
+    jars = c(
+      system.file(sprintf("java/sparklyr-%s.jar", spark_version), package = "sparklyr")
+    )
+  )
+}
