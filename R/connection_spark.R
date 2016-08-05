@@ -2,28 +2,15 @@
 methods::setOldClass("spark_connection")
 methods::setOldClass("spark_jobj")
 
+.spark_default_version <- numeric_version("1.6.2")
+
 spark_version_numeric <- function(version) {
-  gsub("[-_a-zA-Z]", "", version)
+  numeric_version(gsub("[-_a-zA-Z]", "", version))
 }
 
 spark_default_app_jar <- function(version) {
-  sparkJarPathFromVersion <- function(version) {
-    system.file(
-      file.path("java",
-              paste0("sparklyr-",
-                     spark_version_numeric(version),
-                     ".jar")
-      ),
-      package = "sparklyr")
-  }
-
-  if (is.null(version) ||
-      !file.exists(sparkJarPathFromVersion(version))) {
-    # use version 1.6.1 as the default
-    version <- "1.6.1"
-  }
-
-  sparkJarPathFromVersion(version)
+  version <- version %||% .spark_default_version
+  sparklyr_jar_path(spark_version_numeric(version))
 }
 
 #' Connect to Spark
