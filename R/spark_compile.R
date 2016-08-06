@@ -126,7 +126,7 @@ spark_compile <- function(name,
 #'
 #' @keywords internal
 #' @export
-spark_compile_package_jars <- function(package = rprojroot::find_package_root_file(),
+compile_package_jars <- function(package = rprojroot::find_package_root_file(),
                                        spark_versions = NULL,
                                        scalac = NULL,
                                        jar = NULL)
