@@ -159,15 +159,43 @@ default_compilation_spec <- function(pkg = infer_active_package_name()) {
   list(
     spark_compilation_spec(
       spark_version = "1.6.1",
-      scalac_path = "/usr/local/scala/scala-2.10.6/bin/scalac",
+      scalac_path = find_scalac("2.10"),
       jar_name = sprintf("%s-1.6.jar", pkg)
     ),
     spark_compilation_spec(
       spark_version = "2.0.0",
-      scalac_path = "/usr/local/scala/scala-2.11.8/bin/scalac",
+      scalac_path = find_scalac("2.11"),
       jar_name = sprintf("%s-2.0.jar", pkg)
     )
   )
+}
+
+find_scalac <- function(version) {
+
+  locations <- c(
+    "/opt/scala",
+    "/usr/local/scala"
+  )
+
+  re_version <- paste("^", version, sep = "")
+
+  for (location in locations) {
+    installs <- sort(list.files(location))
+    versions <- sub("^scala-?", "", installs)
+    matches  <- grep(re_version, versions)
+    if (!any(matches))
+      next
+
+    index <- tail(matches, n = 1)
+    install <- installs[index]
+    scalac_path <- file.path(location, install, "bin/scalac")
+    if (!file.exists(scalac_path))
+      next
+
+    return(scalac_path)
+  }
+
+  stopf("failed to discover 'scalac-%s' compiler", version)
 }
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {
