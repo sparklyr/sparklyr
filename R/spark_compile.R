@@ -113,26 +113,19 @@ spark_compile <- function(jar_name,
 #' a Spark environment.
 #'
 #' @param package The path to an \R package.
-#' @param spark_versions The Spark versions to build against. When \code{NULL},
-#'   builds against all Spark versions discovered with
-#'   \code{\link{spark_available_versions}}.
-#' @param scalac The path to the \code{scalac} compiler to be used. When unset,
-#'   \code{scalac} will be discovered on the PATH.
-#' @param jar The path to the \code{jar} Java archive tool to be used.
-#'   When unset, \code{jar} will be discovered on the PATH.
+#' @param spec A list of compilation specifications, defining how Spark
+#'   extensions should be compiled into their resulting Java archives. See
+#'   \code{\link{spark_compilation_spec}} for more information.
 #'
-#' @import rprojroot
-#' @import digest
-#'
-#' @keywords internal
 #' @export
 compile_package_jars <- function(package = rprojroot::find_package_root_file(),
-                                 compilation_spec = default_compilation_spec())
+                                 spec = default_compilation_spec())
 {
-  if (!is.list(compilation_spec))
-    compilation_spec <- list(compilation_spec)
+  package <- rprojroot::find_package_root_file()
+  if (!is.list(spec))
+    spec <- list(spec)
 
-  for (spec in compilation_spec) {
+  for (spec in spec) {
     spec <- as.list(spec)
     spark_compile(
       jar_name = spec$jar_name,

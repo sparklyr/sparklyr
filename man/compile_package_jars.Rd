@@ -5,25 +5,18 @@
 \title{Compile Scala sources into a Java Archive (jar)}
 \usage{
 compile_package_jars(package = rprojroot::find_package_root_file(),
-  compilation_spec = default_compilation_spec())
+  spec = default_compilation_spec())
 }
 \arguments{
 \item{package}{The path to an \R package.}
 
-\item{spark_versions}{The Spark versions to build against. When \code{NULL},
-builds against all Spark versions discovered with
-\code{\link{spark_available_versions}}.}
-
-\item{scalac}{The path to the \code{scalac} compiler to be used. When unset,
-\code{scalac} will be discovered on the PATH.}
-
-\item{jar}{The path to the \code{jar} Java archive tool to be used.
-When unset, \code{jar} will be discovered on the PATH.}
+\item{spec}{The compilation specification, defining how Spark extensions
+should be compiled into their resulting Java archives. See
+\code{\link{spark_compilation_spec}} for more information.}
 }
 \description{
 Compile the \code{scala} source files contained within an \R package
 into a Java Archive (\code{jar}) file that can be loaded and used within
 a Spark environment.
 }
-\keyword{internal}
 
