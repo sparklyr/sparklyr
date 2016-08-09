@@ -19,7 +19,7 @@
 #'
 #' @keywords internal
 #' @export
-spark_compile <- function(name,
+spark_compile <- function(jar_name,
                           spark_home,
                           filter = function(files) files,
                           scalac = NULL,
@@ -30,8 +30,6 @@ spark_compile <- function(name,
 
   scalac_version <- get_scalac_version(scalac)
   spark_version <- numeric_version(spark_version_from_home(spark_home))
-  spark_version_major_minor <- spark_version[1, 1:2]
-  jar_name <- sprintf("%s-%s.jar", name, spark_version_major_minor)
 
   root <- rprojroot::find_package_root_file()
 
@@ -55,7 +53,7 @@ spark_compile <- function(name,
   }
 
   # work in temporary directory
-  dir <- tempfile(sprintf("scalac-%s", name))
+  dir <- tempfile(sprintf("scalac-%s", jar_name))
   ensure_directory(dir)
   owd <- setwd(dir)
   on.exit(setwd(owd), add = TRUE)
@@ -93,7 +91,8 @@ spark_compile <- function(name,
     stop("==> failed to compile Scala source files")
 
   # call 'jar' to create our jar
-  class_files <- file.path(name, list.files(name, pattern = "class$"))
+  class_files <- list.files(pattern = "class$", recursive = TRUE, full.names = TRUE)
+  class_files <- sub("./", "", class_files)
   status <- execute("jar cf", jar_path, paste(shQuote(class_files), collapse = " "))
   if (status)
     stop("==> failed to build Java Archive")
@@ -127,31 +126,48 @@ spark_compile <- function(name,
 #' @keywords internal
 #' @export
 compile_package_jars <- function(package = rprojroot::find_package_root_file(),
-                                       spark_versions = NULL,
-                                       scalac = NULL,
-                                       jar = NULL)
+                                 compilation_spec = default_compilation_spec())
 {
-  scalac <- scalac %||% path_program("scalac")
-  jar    <- jar %||% path_program("jar")
+  if (!is.list(compilation_spec))
+    compilation_spec <- list(compilation_spec)
 
-  if (is.null(spark_versions)) {
-    info <- spark_installed_versions()
-    spark_versions <- unique(info$spark)
-    spark_versions <- grep("-preview", spark_versions, value = TRUE, invert = TRUE)
-    spark_versions <- sort(spark_versions)
-  }
-
-  name <- basename(package)
-  status <- lapply(spark_versions, function(spark_version) {
+  for (spec in compilation_spec) {
+    spec <- as.list(spec)
     spark_compile(
-      name = name,
-      spark_home = spark_home_dir(spark_version),
-      scalac = scalac,
-      jar = jar
+      jar_name = spec$jar_name,
+      spark_home = spec$spark_home,
+      scalac = spec$scalac_path
     )
-  })
+  }
+}
 
-  invisible(status)
+spark_compilation_spec <- function(spark_version = NULL,
+                                   spark_home = NULL,
+                                   scalac_path = NULL,
+                                   jar_name = NULL)
+{
+  spark_home    <- spark_home %||% spark_home_dir(spark_version)
+  spark_version <- spark_version %||% spark_version_from_home(spark_home)
+
+  c(spark_version = spark_version,
+    spark_home = spark_home,
+    scalac_path = scalac_path,
+    jar_name = jar_name)
+}
+
+default_compilation_spec <- function(pkg = infer_active_package_name()) {
+  list(
+    spark_compilation_spec(
+      spark_version = "1.6.1",
+      scalac_path = "/usr/local/scala/scala-2.10.6/bin/scalac",
+      jar_name = sprintf("%s-1.6.jar", pkg)
+    ),
+    spark_compilation_spec(
+      spark_version = "2.0.0",
+      scalac_path = "/usr/local/scala/scala-2.11.8/bin/scalac",
+      jar_name = sprintf("%s-2.0.jar", pkg)
+    )
+  )
 }
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {

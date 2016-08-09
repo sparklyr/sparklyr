@@ -176,3 +176,9 @@ path_program <- function(program, fmt = NULL) {
     stopf(fmt, program, call. = FALSE)
   path
 }
+
+infer_active_package_name <- function() {
+  root <- rprojroot::find_package_root_file()
+  dcf <- read.dcf(file.path(root, "DESCRIPTION"), all = TRUE)
+  dcf$Package
+}
