@@ -92,9 +92,7 @@ spark_compile <- function(jar_name,
     stop("==> failed to compile Scala source files")
 
   # call 'jar' to create our jar
-  class_files <- list.files(pattern = "class$", recursive = TRUE, full.names = TRUE)
-  class_files <- sub("./", "", class_files)
-  status <- execute("jar cf", jar_path, paste(shQuote(class_files), collapse = " "))
+  status <- execute("jar cf", jar_path, "-C . .")
   if (status)
     stop("==> failed to build Java Archive")
 
