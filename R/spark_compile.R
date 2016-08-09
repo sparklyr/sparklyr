@@ -1,79 +1,63 @@
-#' Compiles scala sources and packages into a jar file
+#' Compile Scala sources into a Java Archive (jar)
 #'
-#' @export
-#' @param name The name of the target jar
-#' @param spark_home Spark version
+#' Given a set of \code{scala} source files, compile them
+#' into a Java Archive (\code{jar}).
+#'
+#' @param name The name to assign to the target \code{jar}.
+#' @param spark_home The path to the Spark sources to be used
+#'   alongside compilation.
+#' @param filter An optional function, used to filter out discovered \code{scala}
+#'   files during compilation. This can be used to ensure that e.g. certain files
+#'   are only compiled with certain versions of Spark, and so on.
+#' @param scalac The path to the \code{scalac} program to be used, for
+#'   compilation of \code{scala} files.
+#' @param jar The path to the \code{jar} program to be used, for
+#'   generating of the resulting \code{jar}.
 #'
 #' @import rprojroot
 #' @import digest
 #'
 #' @keywords internal
-spark_compile <- function(name, spark_home) {
-  spark_version <- spark_version_from_home(spark_home)
-  version_numeric <- gsub("[-_a-zA-Z]", "", spark_version)
-  version_sufix <- gsub("\\.|[-_a-zA-Z]", "", spark_version)
-  jar_name <- paste0(name, "-", version_numeric, ".jar")
+#' @export
+spark_compile <- function(jar_name,
+                          spark_home,
+                          filter = NULL,
+                          scalac = NULL,
+                          jar = NULL)
+{
+  scalac <- scalac %||% path_program("scalac")
+  jar    <- jar %||% path_program("jar")
+
+  scalac_version <- get_scalac_version(scalac)
+  spark_version <- numeric_version(spark_version_from_home(spark_home))
 
   root <- rprojroot::find_package_root_file()
 
-  jar_path <- file.path(root, "inst", "java", jar_name)
-  scala_files <- lapply(
-    Filter(
-      function(e) {
-        # if filename has version only include version being built
-        if (grepl(".*_\\d+\\.scala", e)) {
-          grepl(version_sufix, e)
-        }
-        else {
-          grepl(".*\\.scala$", e)
-        }
-      },
-      list.files(file.path(root, "inst", "scala"))
-    ),
-    function(e) file.path(root, "inst", "scala", e)
-  )
-  scala_files_digest <- file.path(root, paste0(
-    "inst/scala/sparklyr-", version_numeric, ".md5"
-  ))
+  java_path <- file.path(root, "inst/java")
+  jar_path <- file.path(java_path, jar_name)
 
-  scala_files_contents <- paste(lapply(scala_files, function(e) readLines(e)))
-  scala_files_contents_path <- tempfile()
-  scala_files_contents_file <- file(scala_files_contents_path, "w")
-  writeLines(scala_files_contents, scala_files_contents_file)
-  close(scala_files_contents_file)
+  scala_path <- file.path(root, "inst/scala")
+  scala_files <- list.files(scala_path, pattern = "scala$", full.names = TRUE)
 
-  # Bail if files havent changed
-  md5 <- tools::md5sum(scala_files_contents_path)
-  if (file.exists(scala_files_digest) && file.exists(jar_path)) {
-    contents <- readChar(scala_files_digest, file.info(scala_files_digest)$size, TRUE)
-    if (identical(contents, md5[[scala_files_contents_path]])) {
-      return()
-    }
-  }
+  # apply user filter to scala files
+  if (is.function(filter))
+    scala_files <- filter(scala_files)
 
-  message("** building '", jar_name, "' ...")
-
-  cat(md5, file = scala_files_digest)
+  message("==> using scalac ", scalac_version)
+  message("==> building against Spark ", spark_version)
+  message("==> building '", jar_name, "' ...")
 
   execute <- function(...) {
     cmd <- paste(...)
-    message("*** ", cmd)
+    message("==> ", cmd)
     system(cmd)
   }
 
-  if (!nzchar(Sys.which("scalac")))
-    stop("failed to discover 'scalac' on the PATH")
-
-  if (!nzchar(Sys.which("jar")))
-    stop("failed to discover 'jar' on the PATH")
-
-  # Work in temporary directory (as temporary class files
-  # will be generated within there)
-  dir <- file.path(tempdir(), paste0(name, "-", version_sufix, "-scala-compile"))
-  if (!file.exists(dir))
-    if (!dir.create(dir))
-      stop("Failed to create '", dir, "'")
+  # work in temporary directory
+  dir <- tempfile(sprintf("scalac-%s-", sub("-.*", "", jar_name)))
+  ensure_directory(dir)
   owd <- setwd(dir)
+  on.exit(setwd(owd), add = TRUE)
 
   # list jars in the installation folder
   candidates <- c("jars", "lib")
@@ -97,29 +81,205 @@ spark_compile <- function(name, spark_home) {
 
   # ensure 'inst/java' exists
   inst_java_path <- file.path(root, "inst/java")
-  if (!file.exists(inst_java_path))
-    if (!dir.create(inst_java_path, recursive = TRUE))
-      stop("failed to create directory '", inst_java_path, "'")
+  ensure_directory(inst_java_path)
 
-  # call 'scalac' compiler
+  # call 'scalac' with CLASSPATH set
   classpath <- Sys.getenv("CLASSPATH")
-
-  # set CLASSPATH environment variable rather than passing
-  # in on command line (mostly aesthetic)
   Sys.setenv(CLASSPATH = CLASSPATH)
-  execute("scalac", paste(shQuote(scala_files), collapse = " "))
-  Sys.setenv(CLASSPATH = classpath)
+  on.exit(Sys.setenv(CLASSPATH = classpath), add = TRUE)
+  scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
+  status <- execute(shQuote(scalac), "-optimise", scala_files_quoted)
+  if (status)
+    stop("==> failed to compile Scala source files")
 
   # call 'jar' to create our jar
-  class_files <- file.path(name, list.files(name, pattern = "class$"))
-  execute("jar cf", jar_path, paste(shQuote(class_files), collapse = " "))
+  status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".")
+  if (status)
+    stop("==> failed to build Java Archive")
 
   # double-check existence of jar
-  if (file.exists(jar_path)) {
-    message("*** ", basename(jar_path), " successfully created.")
-  } else {
-    stop("*** failed to create ", jar_name)
+  if (!file.exists(jar_path))
+    stop("==> failed to create ", jar_name)
+
+  message("==> ", basename(jar_path), " successfully created\n")
+  TRUE
+}
+
+#' Compile Scala sources into a Java Archive (jar)
+#'
+#' Compile the \code{scala} source files contained within an \R package
+#' into a Java Archive (\code{jar}) file that can be loaded and used within
+#' a Spark environment.
+#'
+#' @param ... Optional compilation specifications, as generated by
+#'   \code{spark_compilation_spec}. When no arguments are passed,
+#'   \code{spark_default_compilation_spec} is used instead.
+#' @param spec An optional list of compilation specifications. When
+#'   set, this option takes precedence over arguments passed to
+#'   \code{...}.
+#'
+#' @export
+compile_package_jars <- function(..., spec = NULL) {
+
+  # unpack compilation specification
+  spec <- spec %||% list(...)
+  if (!length(spec))
+    spec <- spark_default_compilation_spec()
+
+  if (!is.list(spec[[1]]))
+    spec <- list(spec)
+
+  for (el in spec) {
+    el <- as.list(el)
+
+    spark_version <- el$spark_version
+    spark_home    <- el$spark_home
+    jar_name      <- el$jar_name
+    scalac_path   <- el$scalac_path
+    filter        <- el$scala_filter
+
+    # try to automatically download + install Spark
+    if (is.null(spark_home) && !is.null(spark_version)) {
+      message("==> downloading Spark ", spark_version)
+      spark_install(spark_version, verbose = TRUE)
+      spark_home <- spark_home_dir(spark_version)
+    }
+
+    spark_compile(
+      jar_name = jar_name,
+      spark_home = spark_home,
+      scalac = scalac_path,
+      filter = filter
+    )
+
+  }
+}
+
+#' Define a Spark Compilation Specification
+#'
+#' For use with \code{\link{compile_package_jars}}. The Spark compilation
+#' specification is used when compiling Spark extension Java Archives, and
+#' defines which versions of Spark, as well as which versions of Scala, should
+#' be used for compilation.
+#'
+#' Most Spark extensions won't need to define their own compilation specification,
+#' and can instead rely on the default behavior of \code{compile_package_jars}.
+#'
+#' @param spark_version The Spark version to build against. This can
+#'   be left unset if the path to a suitable Spark home is supplied.
+#' @param spark_home The path to a Spark home installation. This can
+#'   be left unset if \code{spark_version} is supplied; in such a case,
+#'   \code{sparklyr} will attempt to discover the associated Spark
+#'   installation using \code{\link{spark_home_dir}}.
+#' @param scalac_path The path to the \code{scalac} compiler to be used
+#'   during compilation of your Spark extension. Note that you should
+#'   ensure the version of \code{scalac} selected matches the version of
+#'   \code{scalac} used with the version of Spark you are compiling against.
+#' @param scala_filter An optional \R function that can be used to filter
+#'   which \code{scala} files are used during compilation. This can be
+#'   useful if you have auxiliary files that should only be included with
+#'   certain versions of Spark.
+#' @param jar_name The name to be assigned to the generated \code{jar}.
+#'
+#' @export
+spark_compilation_spec <- function(spark_version = NULL,
+                                   spark_home = NULL,
+                                   scalac_path = NULL,
+                                   scala_filter = NULL,
+                                   jar_name = NULL)
+{
+  spark_home    <- spark_home %||% spark_home_dir(spark_version)
+  spark_version <- spark_version %||% spark_version_from_home(spark_home)
+
+  list(spark_version = spark_version,
+       spark_home = spark_home,
+       scalac_path = scalac_path,
+       scala_filter = scala_filter,
+       jar_name = jar_name)
+}
+
+#' Default Compilation Specification for Spark Extensions
+#'
+#' This is the default compilation specification used for
+#' Spark extensions, when used with \code{\link{compile_package_jars}}.
+#'
+#' @param pkg The package containing Spark extensions to be compiled.
+#' @export
+spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
+  list(
+    spark_compilation_spec(
+      spark_version = "1.6.1",
+      scalac_path = find_scalac("2.10"),
+      jar_name = sprintf("%s-1.6.jar", pkg)
+    ),
+    spark_compilation_spec(
+      spark_version = "2.0.0",
+      scalac_path = find_scalac("2.11"),
+      jar_name = sprintf("%s-2.0.jar", pkg)
+    )
+  )
+}
+
+#' Discover the Scala Compiler
+#'
+#' Find the \code{scalac} compiler for a particular version of
+#' \code{scala}, by scanning some common directories containing
+#' \code{scala} installations.
+#'
+#' @param version The \code{scala} version to search for. Versions
+#'   of the form \code{major.minor} will be matched against the
+#'   \code{scalac} installation with version \code{major.minor.patch};
+#'   if multiple compilers are discovered the most recent one will be
+#'   used.
+#' @param locations Additional locations to scan. By default, the
+#'   directories \code{/opt/scala} and \code{/usr/local/scala} will
+#'   be scanned.
+#'
+#' @export
+find_scalac <- function(version, locations = NULL) {
+
+  locations <- locations %||% scalac_default_locations()
+  re_version <- paste("^", version, sep = "")
+
+  for (location in locations) {
+    installs <- sort(list.files(location))
+    versions <- sub("^scala-?", "", installs)
+    matches  <- grep(re_version, versions)
+    if (!any(matches))
+      next
+
+    index <- tail(matches, n = 1)
+    install <- installs[index]
+    scalac_path <- file.path(location, install, "bin/scalac")
+    if (!file.exists(scalac_path))
+      next
+
+    return(scalac_path)
   }
 
-  setwd(owd)
+  stopf("failed to discover 'scalac %s' compiler", version)
+}
+
+scalac_default_locations <- function() {
+  if (Sys.info()[["sysname"]] == "Windows") {
+    c(
+      path.expand("~/scala")
+    )
+  } else {
+    c(
+      "/opt/local/scala",
+      "/usr/local/scala",
+      "/opt/scala"
+    )
+  }
+}
+
+get_scalac_version <- function(scalac = Sys.which("scalac")) {
+  cmd <- paste(shQuote(scalac), "-version 2>&1")
+  version_string <- if (Sys.info()[["sysname"]] == "Windows")
+    shell(cmd, intern = TRUE)
+  else
+    system(cmd, intern = TRUE)
+  splat <- strsplit(version_string, "\\s+", perl = TRUE)[[1]]
+  splat[[4]]
 }

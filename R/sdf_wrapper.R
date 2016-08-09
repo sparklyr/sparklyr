@@ -51,17 +51,8 @@ sdf_read_column <- function(object, colName) {
   column <- invoke_static(sc, "sparklyr.Utils", method, rdd)
 
   if (colType == "StringType") {
-
-    df <- readr::read_csv(
-      column,
-      col_names = FALSE,
-      col_types = "c",
-      na = character(),
-      trim_ws = FALSE,
-      progress = FALSE
-    )
-
-    column <- df[[1]]
+    column <- strsplit(column, "\n", fixed = TRUE)[[1]]
+    column[column == "<NA>"] <- NA
     Encoding(column) <- "UTF-8"
   }
 
@@ -76,10 +67,8 @@ sdf_collect <- function(object) {
   colValues <- lapply(schema, function(colInfo) {
     sdf_read_column(jobj, colInfo$name)
   })
-
-  df <- lapply(colValues, unlist, recursive = FALSE)
-  names(df) <- colNames
-  dplyr::as_data_frame(df, stringsAsFactors = FALSE, optional = TRUE)
+  names(colValues) <- colNames
+  dplyr::as_data_frame(colValues, stringsAsFactors = FALSE, optional = TRUE)
 }
 
 # Split a Spark DataFrame

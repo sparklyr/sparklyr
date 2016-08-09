@@ -2,17 +2,30 @@
 % Please edit documentation in R/spark_compile.R
 \name{spark_compile}
 \alias{spark_compile}
-\title{Compiles scala sources and packages into a jar file}
+\title{Compile Scala sources into a Java Archive (jar)}
 \usage{
-spark_compile(name, spark_home)
+spark_compile(jar_name, spark_home, filter = NULL, scalac = NULL,
+  jar = NULL)
 }
 \arguments{
-\item{name}{The name of the target jar}
+\item{spark_home}{The path to the Spark sources to be used
+alongside compilation.}
 
-\item{spark_home}{Spark version}
+\item{filter}{An optional function, used to filter out discovered \code{scala}
+files during compilation. This can be used to ensure that e.g. certain files
+are only compiled with certain versions of Spark, and so on.}
+
+\item{scalac}{The path to the \code{scalac} program to be used, for
+compilation of \code{scala} files.}
+
+\item{jar}{The path to the \code{jar} program to be used, for
+generating of the resulting \code{jar}.}
+
+\item{name}{The name to assign to the target \code{jar}.}
 }
 \description{
-Compiles scala sources and packages into a jar file
+Given a set of \code{scala} source files, compile them
+into a Java Archive (\code{jar}).
 }
 \keyword{internal}
 

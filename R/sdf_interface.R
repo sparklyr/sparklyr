@@ -552,6 +552,8 @@ sdf_with_unique_id <- function(x, id = "id") {
     "monotonicallyIncreasingId"
   )
 
+  mii <- invoke(mii, "cast", "double")
+
   transformed <- invoke(sdf, "withColumn", id, mii)
   sdf_register(transformed)
 }
