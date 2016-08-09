@@ -70,7 +70,10 @@ setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, state
     warning("Pending rows", call. = FALSE)
   }
 
-  df
+  if (ncol(df) > 0)
+    df
+  else
+    invisible(df)
 })
 
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
