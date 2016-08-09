@@ -54,7 +54,7 @@ spark_compile <- function(jar_name,
   }
 
   # work in temporary directory
-  dir <- tempfile(sprintf("scalac-%s", jar_name))
+  dir <- tempfile(sprintf("scalac-%s-", sub("-.*", "", jar_name)))
   ensure_directory(dir)
   owd <- setwd(dir)
   on.exit(setwd(owd), add = TRUE)
@@ -87,12 +87,13 @@ spark_compile <- function(jar_name,
   classpath <- Sys.getenv("CLASSPATH")
   Sys.setenv(CLASSPATH = CLASSPATH)
   on.exit(Sys.setenv(CLASSPATH = classpath), add = TRUE)
-  status <- execute("scalac", paste(shQuote(scala_files), collapse = " "))
+  scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
+  status <- execute(shQuote(scalac), "-optimise", scala_files_quoted)
   if (status)
     stop("==> failed to compile Scala source files")
 
   # call 'jar' to create our jar
-  status <- execute("jar cf", jar_path, "-C . .")
+  status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".")
   if (status)
     stop("==> failed to build Java Archive")
 
