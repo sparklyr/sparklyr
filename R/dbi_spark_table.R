@@ -42,9 +42,8 @@ setMethod("dbRemoveTable", c("spark_connection", "character"),
   function(conn, name) {
     hive <- hive_context(conn)
     if (is_spark_v2(conn)) {
-      hive <- invoke(hive, "wrapped")
+      hive <- invoke(hive, "sqlContext")
     }
-
     invoke(hive, "dropTempTable", name)
     invisible(TRUE)
   }
