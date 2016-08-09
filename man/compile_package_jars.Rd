@@ -5,7 +5,7 @@
 \title{Compile Scala sources into a Java Archive (jar)}
 \usage{
 compile_package_jars(package = rprojroot::find_package_root_file(),
-  spark_versions = NULL, scalac = NULL, jar = NULL)
+  compilation_spec = default_compilation_spec())
 }
 \arguments{
 \item{package}{The path to an \R package.}

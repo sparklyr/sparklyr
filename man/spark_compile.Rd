@@ -4,12 +4,10 @@
 \alias{spark_compile}
 \title{Compile Scala sources into a Java Archive (jar)}
 \usage{
-spark_compile(name, spark_home, filter = function(files) files,
-  scalac = NULL, jar = NULL)
+spark_compile(jar_name, spark_home, filter = NULL, scalac = NULL,
+  jar = NULL)
 }
 \arguments{
-\item{name}{The name to assign to the target \code{jar}.}
-
 \item{spark_home}{The path to the Spark sources to be used
 alongside compilation.}
 
@@ -22,6 +20,8 @@ compilation of \code{scala} files.}
 
 \item{jar}{The path to the \code{jar} program to be used, for
 generating of the resulting \code{jar}.}
+
+\item{name}{The name to assign to the target \code{jar}.}
 }
 \description{
 Given a set of \code{scala} source files, compile them

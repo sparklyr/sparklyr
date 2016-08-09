@@ -21,7 +21,7 @@
 #' @export
 spark_compile <- function(jar_name,
                           spark_home,
-                          filter = function(files) files,
+                          filter = NULL,
                           scalac = NULL,
                           jar = NULL)
 {
@@ -40,7 +40,8 @@ spark_compile <- function(jar_name,
   scala_files <- list.files(scala_path, pattern = "scala$", full.names = TRUE)
 
   # apply user filter to scala files
-  scala_files <- filter(scala_files)
+  if (is.function(filter))
+    scala_files <- filter(scala_files)
 
   message("==> using scalac ", scalac_version)
   message("==> building against Spark ", spark_version)
@@ -136,14 +137,43 @@ compile_package_jars <- function(package = rprojroot::find_package_root_file(),
     spark_compile(
       jar_name = spec$jar_name,
       spark_home = spec$spark_home,
-      scalac = spec$scalac_path
+      scalac = spec$scalac_path,
+      filter = spec$scala_filter
     )
   }
 }
 
+#' Define a Spark Compilation Specification
+#'
+#' For use with \code{\link{compile_package_jars}}. The Spark compilation
+#' specification is used when compiling Spark extension Java Archives, and
+#' defines which versions of Spark, as well as which versions of Scala, should
+#' be used for compilation.
+#'
+#' Most Spark extensions won't need to define their own compilation specification,
+#' and can instead rely on the default behavior of \code{compile_package_jars}.
+#'
+#' @param spark_version The Spark version to build against. This can
+#'   be left unset if the path to a suitable Spark home is supplied.
+#' @param spark_home The path to a Spark home installation. This can
+#'   be left unset if \code{spark_version} is supplied; in such a case,
+#'   \code{sparklyr} will attempt to discover the associated Spark
+#'   installation using \code{\link{spark_home_dir}}.
+#' @param scalac_path The path to the \code{scalac} compiler to be used
+#'   during compilation of your Spark extension. Note that you should
+#'   ensure the version of \code{scalac} selected matches the version of
+#'   \code{scalac} used with the version of Spark you are compiling against.
+#' @param scala_filter An optional \R function that can be used to filter
+#'   which \code{scala} files are used during compilation. This can be
+#'   useful if you have auxiliary files that should only be included with
+#'   certain versions of Spark.
+#' @param jar_name The name to be assigned to the generated \code{jar}.
+#'
+#' @export
 spark_compilation_spec <- function(spark_version = NULL,
                                    spark_home = NULL,
                                    scalac_path = NULL,
+                                   scala_filter = NULL,
                                    jar_name = NULL)
 {
   spark_home    <- spark_home %||% spark_home_dir(spark_version)
@@ -152,6 +182,7 @@ spark_compilation_spec <- function(spark_version = NULL,
   c(spark_version = spark_version,
     spark_home = spark_home,
     scalac_path = scalac_path,
+    scala_filter = scala_filter,
     jar_name = jar_name)
 }
 
@@ -170,9 +201,25 @@ default_compilation_spec <- function(pkg = infer_active_package_name()) {
   )
 }
 
-find_scalac <- function(version) {
+#' Discover the Scala Compiler
+#'
+#' Find the \code{scalac} compiler for a particular version of
+#' \code{scala}, by scanning some common directories containing
+#' \code{scala} installations.
+#'
+#' @param version The \code{scala} version to search for. Versions
+#'   of the form \code{major.minor} will be matched against the
+#'   \code{scalac} installation with version \code{major.minor.patch};
+#'   if multiple compilers are discovered the most recent one will be
+#'   used.
+#' @param locations Additional locations to scan. By default, the
+#'   directories \code{/opt/scala} and \code{/usr/local/scala} will
+#'   be scanned.
+#'
+#' @export
+find_scalac <- function(version, locations = NULL) {
 
-  locations <- c(
+  locations <- locations %||% c(
     "/opt/scala",
     "/usr/local/scala"
   )
@@ -195,7 +242,7 @@ find_scalac <- function(version) {
     return(scalac_path)
   }
 
-  stopf("failed to discover 'scalac-%s' compiler", version)
+  stopf("failed to discover 'scalac %s' compiler", version)
 }
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {
