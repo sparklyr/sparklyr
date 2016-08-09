@@ -239,11 +239,7 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
 #' @export
 find_scalac <- function(version, locations = NULL) {
 
-  locations <- locations %||% c(
-    "/opt/scala",
-    "/usr/local/scala"
-  )
-
+  locations <- locations %||% scalac_default_locations()
   re_version <- paste("^", version, sep = "")
 
   for (location in locations) {
@@ -263,6 +259,20 @@ find_scalac <- function(version, locations = NULL) {
   }
 
   stopf("failed to discover 'scalac %s' compiler", version)
+}
+
+scalac_default_locations <- function() {
+  if (Sys.info()[["sysname"]] == "Windows") {
+    c(
+      path.expand("~/scala")
+    )
+  } else {
+    c(
+      "/opt/local/scala",
+      "/usr/local/scala",
+      "/opt/scala"
+    )
+  }
 }
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {
