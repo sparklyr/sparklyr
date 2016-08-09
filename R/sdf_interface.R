@@ -382,7 +382,13 @@ sdf_predict <- function(object, newdata, ...) {
   if (is.environment(ctfm)) {
     ctfm <- as.list(ctfm)
     enumerate(ctfm, function(key, val) {
-      sdf <<- ml_create_dummy_variables(sdf, key, val$reference)
+      sdf <<- ml_create_dummy_variables(
+        x = sdf,
+        input = key,
+        reference = val$reference,
+        levels = val$levels,
+        labels = val$labels
+      )
     })
   }
 
@@ -424,6 +430,9 @@ sdf_predict <- function(object, newdata, ...) {
 #'   generating dummy variables (to avoid perfect multi-collinearity if
 #'   all dummy variables were to be used in the model fit); to generate
 #'   dummy variables for all columns this can be explicitly set as \code{NULL}.
+#' @param levels The set of levels for which dummy variables should be generated.
+#'   By default, constructs one variable for each unique value occurring in
+#'   the column specified by \code{input}.
 #' @param labels An optional \R list, mapping values in the \code{input}
 #'   column to column names to be assigned to the associated dummy variable.
 #' @param envir An optional \R environment; when provided, it will be filled
@@ -431,8 +440,13 @@ sdf_predict <- function(object, newdata, ...) {
 #'   more information.
 #'
 #' @export
-ml_create_dummy_variables <- function(x, input, reference = NULL, labels = list(),
-                                       envir = new.env(parent = emptyenv())) {
+ml_create_dummy_variables <- function(x,
+                                      input,
+                                      reference = NULL,
+                                      levels = NULL,
+                                      labels = NULL,
+                                      envir = new.env(parent = emptyenv()))
+{
   sdf <- spark_dataframe(x)
 
   # validate inputs
@@ -448,7 +462,7 @@ ml_create_dummy_variables <- function(x, input, reference = NULL, labels = list(
     sdf_collect()
 
   # validate that 'reference' is a valid label for this column
-  levels <- sort(counts[[input]])
+  levels <- levels %||% sort(counts[[input]])
   if (!is.null(reference) && !reference %in% levels) {
     fmt <- "no label called '%s' in column '%s'; valid labels are:\n- %s\n"
     msg <- sprintf(fmt, reference, input, paste(shQuote(levels), collapse = ", "))
@@ -470,9 +484,14 @@ ml_create_dummy_variables <- function(x, input, reference = NULL, labels = list(
   })
 
   # generate appropriate names for the columns
-  dummyNames <- unlist(lapply(levels, function(level) {
-    labels[[level]] %||% paste(input, level, sep = "")
-  }))
+  if (is.null(labels)) {
+    labels <- lapply(levels, function(level) {
+      paste(input, level, sep = "_")
+    })
+    names(labels) <- levels
+  }
+
+  dummyNames <- unlist(unname(labels))
 
   # extract a new Spark DataFrame with these columns
   mutated <- sdf %>%
@@ -482,6 +501,7 @@ ml_create_dummy_variables <- function(x, input, reference = NULL, labels = list(
   # report useful information in output env
   if (is.environment(envir)) {
     envir$levels    <- levels
+    envir$labels    <- labels
     envir$reference <- reference
     envir$columns   <- dummyNames
     envir$counts    <- counts
