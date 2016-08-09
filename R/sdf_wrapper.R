@@ -67,10 +67,8 @@ sdf_collect <- function(object) {
   colValues <- lapply(schema, function(colInfo) {
     sdf_read_column(jobj, colInfo$name)
   })
-
-  df <- lapply(colValues, unlist, recursive = FALSE)
-  names(df) <- colNames
-  dplyr::as_data_frame(df, stringsAsFactors = FALSE, optional = TRUE)
+  names(colValues) <- colNames
+  dplyr::as_data_frame(colValues, stringsAsFactors = FALSE, optional = TRUE)
 }
 
 # Split a Spark DataFrame
