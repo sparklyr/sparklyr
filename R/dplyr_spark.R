@@ -110,6 +110,8 @@ tbl_cache <- function(sc, name, force = TRUE) {
   if (force) {
     dbGetQuery(sc, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = sc)))
   }
+
+  invisible(NULL)
 }
 
 #' Unload table from memory
@@ -122,6 +124,7 @@ tbl_cache <- function(sc, name, force = TRUE) {
 #' @export
 tbl_uncache <- function(sc, name) {
   dbGetQuery(sc, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = sc)))
+  invisible(NULL)
 }
 
 #' @export
