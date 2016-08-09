@@ -121,6 +121,8 @@ spark_compile <- function(jar_name,
 #'
 #' @export
 compile_package_jars <- function(..., spec = NULL) {
+
+  # unpack compilation specification
   spec <- spec %||% list(...)
   if (!length(spec))
     spec <- spark_default_compilation_spec()
@@ -128,14 +130,29 @@ compile_package_jars <- function(..., spec = NULL) {
   if (!is.list(spec[[1]]))
     spec <- list(spec)
 
-  for (spec in spec) {
-    spec <- as.list(spec)
+  for (el in spec) {
+    el <- as.list(el)
+
+    spark_version <- el$spark_version
+    spark_home    <- el$spark_home
+    jar_name      <- el$jar_name
+    scalac_path   <- el$scalac_path
+    filter        <- el$scala_filter
+
+    # try to automatically download + install Spark
+    if (is.null(spark_home) && !is.null(spark_version)) {
+      message("==> downloading Spark ", spark_version)
+      spark_install(spark_version, verbose = TRUE)
+      spark_home <- spark_home_dir(spark_version)
+    }
+
     spark_compile(
-      jar_name = spec$jar_name,
-      spark_home = spec$spark_home,
-      scalac = spec$scalac_path,
-      filter = spec$scala_filter
+      jar_name = jar_name,
+      spark_home = spark_home,
+      scalac = scalac_path,
+      filter = filter
     )
+
   }
 }
 
@@ -172,14 +189,6 @@ spark_compilation_spec <- function(spark_version = NULL,
                                    scala_filter = NULL,
                                    jar_name = NULL)
 {
-  if (!is.null(spark_version)) {
-    info <- spark_installed_versions()
-    if (!spark_version %in% info$spark) {
-      message("==> downloading Spark ", spark_version)
-      spark_install(spark_version, verbose = TRUE)
-    }
-  }
-
   spark_home    <- spark_home %||% spark_home_dir(spark_version)
   spark_version <- spark_version %||% spark_version_from_home(spark_home)
 
@@ -197,9 +206,6 @@ spark_compilation_spec <- function(spark_version = NULL,
 #'
 #' @param pkg The package containing Spark extensions to be compiled.
 #' @export
-#'
-#' @examples
-#' str(spark_default_compilation_spec("sparklyr"))
 spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
   list(
     spark_compilation_spec(
