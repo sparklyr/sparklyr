@@ -15,4 +15,4 @@ spark,hadoop,hadoop_label,download,default,hadoop_default
 "2.0.0","2.6",Hadoop 2.6,https://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-bin-hadoop2.6.tgz,FALSE,FALSE
 "2.0.0","2.4",Hadoop 2.4,https://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-bin-hadoop2.4.tgz,FALSE,FALSE
 "2.0.0","2.3",Hadoop 2.3,https://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-bin-hadoop2.3.tgz,FALSE,FALSE
-"2.0.0","cdh4",CDH 4,https://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-bin-cdh4.tgz,FALSE,FALSE
+
