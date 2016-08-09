@@ -266,9 +266,11 @@ find_scalac <- function(version, locations = NULL) {
 }
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {
-  # TODO: shell redirection won't work on Windows unless we go through shell
   cmd <- paste(shQuote(scalac), "-version 2>&1")
-  version_string <- system(cmd, intern = TRUE)
+  version_string <- if (Sys.info()[["sysname"]] == "Windows")
+    shell(cmd, intern = TRUE)
+  else
+    system(cmd, intern = TRUE)
   splat <- strsplit(version_string, "\\s+", perl = TRUE)[[1]]
   splat[[4]]
 }
