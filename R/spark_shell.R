@@ -96,7 +96,10 @@ start_shell <- function(master,
       gsub("[-_a-zA-Z]", "", spark_version)
     )
   )
-  scala_version <- numeric_version("2.10")
+  if (spark_version < "2.0")
+    scala_version <- numeric_version("2.10")
+  else
+    scala_version <- numeric_version("2.11")
   extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions)
 
   # combine passed jars and packages with extensions
