@@ -92,8 +92,15 @@ spark_dependencies_from_extension <- function(spark_version, scala_version, exte
 }
 
 sparklyr_jar_path <- function(spark_version) {
+  if (spark_version < "2.0")
+    scala_version <- "2.10"
+  else
+    scala_version <- "2.11"
   spark_major_minor <- spark_version[1, 1:2]
-  system.file(sprintf("java/sparklyr-%s.jar", spark_major_minor), package = "sparklyr")
+  system.file(
+    sprintf("java/sparklyr-%s-%s.jar", spark_major_minor, scala_version),
+    package = "sparklyr"
+  )
 }
 
 # sparklyr's own declared dependencies
