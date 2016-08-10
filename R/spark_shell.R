@@ -101,7 +101,7 @@ start_shell <- function(master,
 
   # combine passed jars and packages with extensions
   all_jars <- c(jars, extensions$jars)
-  jars <- if (length(all_jars) > 0) normalizePath(unique(all_jars)) else list()
+  jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
   packages <- unique(c(packages, extensions$packages))
 
   # add jars to arguments
