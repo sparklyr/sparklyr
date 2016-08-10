@@ -4,7 +4,7 @@
 \alias{spark_compile}
 \title{Compile Scala sources into a Java Archive (jar)}
 \usage{
-spark_compile(jar_name, spark_home, filter = NULL, scalac = NULL,
+spark_compile(jar_name, spark_home = NULL, filter = NULL, scalac = NULL,
   jar = NULL)
 }
 \arguments{
