@@ -73,8 +73,49 @@ object Utils {
     }
   }
 
+  def collectImplBoolean(local: Array[Row], idx: Integer) = {
+    local.map{row => row(idx).asInstanceOf[Boolean]}
+  }
+
+  def collectImplInteger(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Int]) el.asInstanceOf[Int] else scala.Int.MinValue
+    }}
+  }
+
+  def collectImplDouble(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Double]) el.asInstanceOf[Double] else scala.Double.NaN
+    }}
+  }
+
+  def collectImplString(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[String]) el.asInstanceOf[String] else "<NA>"
+    }}.mkString("\n")
+  }
+
+  def collectImplDefault(local: Array[Row], idx: Integer) = {
+    local.map(row => row(idx))
+  }
+
+  def collectImpl(local: Array[Row], idx: Integer, colType: String) = {
+    colType match {
+      case "BooleanType" => collectImplBoolean(local, idx)
+      case "IntegerType" => collectImplInteger(local, idx)
+      case "DoubleType"  => collectImplDouble(local, idx)
+      case "StringType"  => collectImplString(local, idx)
+      case _             => collectImplDefault(local, idx)
+    }
+  }
+
   def collect(df: DataFrame): Array[_] = {
-    df.dtypes.map{el => collectColumn(df, el._1, el._2)}
+    val local : Array[Row] = df.collect()
+    val dtypes = df.dtypes
+    (0 until dtypes.length).par.map{i => collectImpl(local, i, dtypes(i)._2)}.toArray
   }
 
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
