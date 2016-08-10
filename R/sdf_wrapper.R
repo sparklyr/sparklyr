@@ -51,7 +51,7 @@ sdf_read_column <- function(object, colName) {
   column <- invoke_static(sc, "sparklyr.Utils", method, rdd)
 
   if (colType == "StringType") {
-    column <- strsplit(column, "\n", fixed = TRUE)[[1]]
+    column <- strsplit(column[[1]], "\n", fixed = TRUE)[[1]]
     column[column == "<NA>"] <- NA
     Encoding(column) <- "UTF-8"
   }
@@ -61,14 +61,17 @@ sdf_read_column <- function(object, colName) {
 
 # Read a Spark Dataset into R.
 sdf_collect <- function(object) {
-  jobj <- spark_dataframe(object)
-  schema <- sdf_schema(jobj)
-  colNames <- as.character(invoke(jobj, "columns"))
-  colValues <- lapply(schema, function(colInfo) {
-    sdf_read_column(jobj, colInfo$name)
+  sdf <- spark_dataframe(object)
+  collected <- invoke_static(sc, "sparklyr.Utils", "collect", sdf)
+  transformed <- lapply(collected, function(el) {
+    if (is.character(el))
+      strsplit(el, "\n", fixed = TRUE)[[1]]
+    else
+      el
   })
-  names(colValues) <- colNames
-  dplyr::as_data_frame(colValues, stringsAsFactors = FALSE, optional = TRUE)
+  colNames <- invoke(sdf, "columns") %>% as.character()
+  names(transformed) <- colNames
+  dplyr::as_data_frame(transformed, stringsAsFactors = FALSE, optional = TRUE)
 }
 
 # Split a Spark DataFrame
