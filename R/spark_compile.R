@@ -25,7 +25,11 @@ spark_compile <- function(jar_name,
                           scalac = NULL,
                           jar = NULL)
 {
-  spark_home <- if (is.null(spark_home)) spark_install_find() else spark_home
+  default_install <- spark_install_find()
+  spark_home <- if (is.null(spark_home) && !is.null(default_install))
+    spark_install_find()$sparkVersionDir
+  else
+    spark_home
 
   scalac <- scalac %||% path_program("scalac")
   jar    <- jar %||% path_program("jar")
