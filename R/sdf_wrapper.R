@@ -27,7 +27,7 @@ sdf_schema <- function(object) {
   list
 }
 
-sdf_read_column <- function(object, colName, rdd = NULL) {
+sdf_read_column <- function(object, colName) {
   jobj <- spark_dataframe(object)
   schema <- sdf_schema(jobj)
   colType <- schema[[colName]]$type
@@ -44,7 +44,7 @@ sdf_read_column <- function(object, colName, rdd = NULL) {
     "readColumnDefault"
 
   sc <- spark_connection(jobj)
-  rdd <- rdd %||% jobj %>%
+  rdd <- jobj %>%
     invoke("select", colName, list()) %>%
     invoke("rdd")
 
@@ -62,13 +62,10 @@ sdf_read_column <- function(object, colName, rdd = NULL) {
 # Read a Spark Dataset into R.
 sdf_collect <- function(object) {
   jobj <- spark_dataframe(object)
-  rdd <- jobj %>%
-    invoke("rdd") %>%
-    invoke("cache")
   schema <- sdf_schema(jobj)
   colNames <- as.character(invoke(jobj, "columns"))
   colValues <- lapply(schema, function(colInfo) {
-    sdf_read_column(jobj, colInfo$name, rdd)
+    sdf_read_column(jobj, colInfo$name)
   })
   names(colValues) <- colNames
   dplyr::as_data_frame(colValues, stringsAsFactors = FALSE, optional = TRUE)
