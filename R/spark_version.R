@@ -88,5 +88,5 @@ spark_version_from_home <- function(spark_home, default = NULL) {
 
   stop(
     "Failed to detect version from SPARK_HOME or SPARK_HOME_VERSION. ",
-    "Try passing the spark_version explicitly.")
+    "Try passing the spark version explicitly.")
 }

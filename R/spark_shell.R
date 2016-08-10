@@ -60,7 +60,7 @@ start_shell <- function(master,
   # read app jar through config, this allows "sparkr-shell" to test sparkr backend
   app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
   if (is.null(app_jar)) {
-    versionSparkHome <- spark_version_from_home(spark_home, default = version)
+    versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
     app_jar <- spark_default_app_jar(versionSparkHome)
     app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE))
     shell_args <- c(shell_args, "--class", "sparklyr.Backend")
