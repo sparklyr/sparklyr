@@ -46,8 +46,7 @@ sdf_read_column <- function(object, colName) {
   sc <- spark_connection(jobj)
   rdd <- jobj %>%
     invoke("select", colName, list()) %>%
-    invoke("rdd") %>%
-    invoke("cache")
+    invoke("rdd")
 
   column <- invoke_static(sc, "sparklyr.Utils", method, rdd)
 
