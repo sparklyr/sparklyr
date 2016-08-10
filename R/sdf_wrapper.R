@@ -27,48 +27,37 @@ sdf_schema <- function(object) {
   list
 }
 
+sdf_deserialize_column <- function(column) {
+  if (is.character(column)) {
+    splat <- strsplit(column, "\n", fixed = TRUE)[[1]]
+    splat[splat == "<NA>"] <- NA
+    Encoding(splat) <- "UTF-8"
+    return(splat)
+  }
+
+  column
+}
+
 sdf_read_column <- function(object, colName) {
-  jobj <- spark_dataframe(object)
-  schema <- sdf_schema(jobj)
+  sdf <- spark_dataframe(object)
+  schema <- sdf_schema(sdf)
   colType <- schema[[colName]]$type
 
-  method <- if (colType == "DoubleType")
-    "readColumnDouble"
-  else if (colType == "IntegerType")
-    "readColumnInt"
-  else if (colType == "BooleanType")
-    "readColumnBoolean"
-  else if (colType == "StringType")
-    "readColumnString"
-  else
-    "readColumnDefault"
-
-  sc <- spark_connection(jobj)
-  rdd <- jobj %>%
-    invoke("select", colName, list()) %>%
-    invoke("rdd")
-
-  column <- invoke_static(sc, "sparklyr.Utils", method, rdd)
-
-  if (colType == "StringType") {
-    column <- strsplit(column, "\n", fixed = TRUE)[[1]]
-    column[column == "<NA>"] <- NA
-    Encoding(column) <- "UTF-8"
-  }
+  column <- sc %>%
+    invoke_static("sparklyr.Utils", "collectColumn", sdf, colName, colType) %>%
+    sdf_deserialize_column()
 
   column
 }
 
 # Read a Spark Dataset into R.
 sdf_collect <- function(object) {
-  jobj <- spark_dataframe(object)
-  schema <- sdf_schema(jobj)
-  colNames <- as.character(invoke(jobj, "columns"))
-  colValues <- lapply(schema, function(colInfo) {
-    sdf_read_column(jobj, colInfo$name)
-  })
-  names(colValues) <- colNames
-  dplyr::as_data_frame(colValues, stringsAsFactors = FALSE, optional = TRUE)
+  sdf <- spark_dataframe(object)
+  collected <- invoke_static(sc, "sparklyr.Utils", "collect", sdf)
+  transformed <- lapply(collected, sdf_deserialize_column)
+  colNames <- invoke(sdf, "columns")
+  names(transformed) <- as.character(colNames)
+  dplyr::as_data_frame(transformed, stringsAsFactors = FALSE, optional = TRUE)
 }
 
 # Split a Spark DataFrame

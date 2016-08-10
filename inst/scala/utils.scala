@@ -5,15 +5,11 @@ import java.util.Arrays
 
 import scala.util.Try
 
-import org.apache.commons.lang.StringEscapeUtils
-import org.apache.spark.{SparkEnv, SparkException}
-import org.apache.spark.sql.types.DataTypes
-import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.mllib.linalg.distributed.RowMatrix
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
-import org.apache.spark.SparkContext
+import org.apache.spark.sql.types.DataTypes
+import org.apache.spark.{SparkEnv, SparkException}
 
 object Utils {
 
@@ -34,35 +30,51 @@ object Utils {
     }
   }
 
-  def readColumnInt(rdd: RDD[Row]): Array[Int] = {
-    rdd.map(row => {
+  /**
+   * Utilities for collecting columns / Datasets back to R
+   */
+
+  def collectColumnBoolean(df: DataFrame, colName: String): Array[Boolean] = {
+    df.select(colName).rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
+  }
+
+  def collectColumnInteger(df: DataFrame, colName: String): Array[Int] = {
+    df.select(colName).rdd.map(row => {
        val element = row(0)
        if (element.isInstanceOf[Int]) element.asInstanceOf[Int] else scala.Int.MinValue
     }).collect()
   }
 
-  def readColumnDouble(rdd: RDD[Row]): Array[Double] = {
-    rdd.map(row => {
+  def collectColumnDouble(df: DataFrame, colName: String): Array[Double] = {
+    df.select(colName).rdd.map(row => {
        val element = row(0)
        if (element.isInstanceOf[Double]) element.asInstanceOf[Double] else scala.Double.NaN
     }).collect()
   }
 
-  def readColumnBoolean(rdd: RDD[Row]): Array[Boolean] = {
-    // TODO: Missing values aren't allowed in boolean columns
-    rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
-  }
-
-  def readColumnString(rdd: RDD[Row]): String = {
-    val column = rdd.map(row => {
+  def collectColumnString(df: DataFrame, colName: String): String = {
+    df.select(colName).rdd.map(row => {
       val element = row(0)
       if (element.isInstanceOf[String]) element.asInstanceOf[String] else "<NA>"
-    }).collect()
-    column.mkString("\n")
+    }).collect().mkString("\n")
   }
 
-  def readColumnDefault(rdd: RDD[Row]): Array[Any] = {
-    rdd.map(row => row(0)).collect()
+  def collectColumnDefault(df: DataFrame, colName: String): Array[Any] = {
+    df.select(colName).rdd.map(row => row(0)).collect()
+  }
+
+  def collectColumn(df: DataFrame, colName: String, colType: String) = {
+    colType match {
+      case "BooleanType" => collectColumnBoolean(df, colName)
+      case "IntegerType" => collectColumnInteger(df, colName)
+      case "DoubleType"  => collectColumnDouble(df, colName)
+      case "StringType"  => collectColumnString(df, colName)
+      case _             => collectColumnDefault(df, colName)
+    }
+  }
+
+  def collect(df: DataFrame): Array[_] = {
+    df.dtypes.map{el => collectColumn(df, el._1, el._2)}
   }
 
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
