@@ -20,11 +20,17 @@
 #' @keywords internal
 #' @export
 spark_compile <- function(jar_name,
-                          spark_home,
+                          spark_home = NULL,
                           filter = NULL,
                           scalac = NULL,
                           jar = NULL)
 {
+  default_install <- spark_install_find()
+  spark_home <- if (is.null(spark_home) && !is.null(default_install))
+    spark_install_find()$sparkVersionDir
+  else
+    spark_home
+
   scalac <- scalac %||% path_program("scalac")
   jar    <- jar %||% path_program("jar")
 

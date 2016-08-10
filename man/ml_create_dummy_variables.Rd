@@ -4,8 +4,8 @@
 \alias{ml_create_dummy_variables}
 \title{Create Dummy Variables}
 \usage{
-ml_create_dummy_variables(x, input, reference = NULL, labels = list(),
-  envir = new.env(parent = emptyenv()))
+ml_create_dummy_variables(x, input, reference = NULL, levels = NULL,
+  labels = NULL, envir = new.env(parent = emptyenv()))
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -17,6 +17,10 @@ ml_create_dummy_variables(x, input, reference = NULL, labels = list(),
 generating dummy variables (to avoid perfect multi-collinearity if
 all dummy variables were to be used in the model fit); to generate
 dummy variables for all columns this can be explicitly set as \code{NULL}.}
+
+\item{levels}{The set of levels for which dummy variables should be generated.
+By default, constructs one variable for each unique value occurring in
+the column specified by \code{input}.}
 
 \item{labels}{An optional \R list, mapping values in the \code{input}
 column to column names to be assigned to the associated dummy variable.}
