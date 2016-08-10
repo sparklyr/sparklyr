@@ -30,36 +30,9 @@ object Utils {
     }
   }
 
-  def readColumnInt(rdd: RDD[Row]): Array[Int] = {
-    rdd.map(row => {
-       val element = row(0)
-       if (element.isInstanceOf[Int]) element.asInstanceOf[Int] else scala.Int.MinValue
-    }).collect()
-  }
-
-  def readColumnDouble(rdd: RDD[Row]): Array[Double] = {
-    rdd.map(row => {
-       val element = row(0)
-       if (element.isInstanceOf[Double]) element.asInstanceOf[Double] else scala.Double.NaN
-    }).collect()
-  }
-
-  def readColumnBoolean(rdd: RDD[Row]): Array[Boolean] = {
-    // TODO: Missing values aren't allowed in boolean columns
-    rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
-  }
-
-  def readColumnString(rdd: RDD[Row]): String = {
-    val column = rdd.map(row => {
-      val element = row(0)
-      if (element.isInstanceOf[String]) element.asInstanceOf[String] else "<NA>"
-    }).collect()
-    column.mkString("\n")
-  }
-
-  def readColumnDefault(rdd: RDD[Row]): Array[Any] = {
-    rdd.map(row => row(0)).collect()
-  }
+  /**
+   * Utilities for collecting columns / Datasets back to R
+   */
 
   def collectColumnBoolean(df: DataFrame, colName: String): Array[Boolean] = {
     df.select(colName).rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
