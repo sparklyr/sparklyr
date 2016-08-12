@@ -9,7 +9,7 @@ spark_sql_count_rows <- function(op, con) {
   countSql <- sql_render(countQuery, con = con)
   countResult <- dbGetQuery(con, countSql)
 
-  countResult[[1]]
+  countResult[[1]][[1]]
 }
 
 #' @export
