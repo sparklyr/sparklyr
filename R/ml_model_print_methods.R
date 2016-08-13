@@ -83,3 +83,34 @@ ml_model_print_centers <- function(model) {
   print(model$centers)
 
 }
+
+
+#' Spark ML - Feature Importance for Tree Models
+#'
+#' @param sc An active spark context
+#' @param model An ml_model object of class decision trees (>1.5.0), random forest (>2.0.0), or GBT (>2.0.0)
+#'
+#' @return A sorted data frame with feature labels and their relative importance.
+#' @export
+
+
+ml_tree_feature_importance <- function(sc, model){
+  supported <- c("ml_model_gradient_boosted_trees",
+                 "ml_model_decision_tree",
+                 "ml_model_random_forest")
+
+  if ( !(class(model)[1] %in% supported)) {
+    stop("Supported models include: ", paste(supported, collapse = ", "))
+  }
+
+  if (class(model)[1] != "ml_model_decision_tree") spark_require_version(sc, "2.0.0")
+
+  importance <- invoke(model$.model,"featureImportances") %>%
+    invoke("toArray") %>%
+    cbind(model$features) %>%
+    as.data.frame()
+
+  colnames(importance) <- c("importance", "feature")
+
+  importance %>% dplyr::arrange(dplyr::desc(importance))
+}
