@@ -421,7 +421,7 @@ read_spark_log_error <- function(sc) {
   # all those with most recent timestamp
   msg <- "failed to invoke spark command (unknown reason)"
   try(silent = TRUE, {
-    log <- sc$output_file
+    log <- readr::read_lines(sc$output_file)
     splat <- strsplit(log, "\\s+", perl = TRUE)
     n <- length(splat)
     timestamp <- splat[[n]][[2]]
@@ -434,5 +434,5 @@ read_spark_log_error <- function(sc) {
 }
 
 spark_config_value <- function(config, name, default = NULL) {
-  if(is.null(config[[name]])) default else config[[name]]
+  if (is.null(config[[name]])) default else config[[name]]
 }
