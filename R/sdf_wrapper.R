@@ -39,6 +39,8 @@ sdf_deserialize_column <- function(column) {
 }
 
 sdf_read_column <- function(object, colName) {
+  sc <- spark_connection(object)
+
   sdf <- spark_dataframe(object)
   schema <- sdf_schema(sdf)
   colType <- schema[[colName]]$type
@@ -52,6 +54,8 @@ sdf_read_column <- function(object, colName) {
 
 # Read a Spark Dataset into R.
 sdf_collect <- function(object) {
+  sc <- spark_connection(object)
+
   sdf <- spark_dataframe(object)
   collected <- invoke_static(sc, "sparklyr.Utils", "collect", sdf)
   transformed <- lapply(collected, sdf_deserialize_column)
