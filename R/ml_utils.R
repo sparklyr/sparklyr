@@ -90,7 +90,10 @@ try_null <- function(expr) {
 }
 
 #' @export
-predict.ml_model <- function(object, newdata, ...) {
+predict.ml_model <- function(object,
+                             newdata = object$data,
+                             ...)
+{
   # 'sdf_predict()' does not necessarily return a data set with the same row
   # order as the input data; generate a unique id and re-join the generated
   # spark dataframe to ensure the row order is maintained
