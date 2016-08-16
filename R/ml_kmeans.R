@@ -7,6 +7,7 @@
 #' @template roxlate-ml-max-iter
 #' @template roxlate-ml-features
 #' @template roxlate-ml-dots
+#' @template roxlate-ml-compute-cost
 #'
 #' @seealso For information on how Spark k-means clustering is implemented, please see
 #'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
@@ -18,7 +19,8 @@ ml_kmeans <- function(x,
                       centers,
                       max.iter = 100,
                       features = dplyr::tbl_vars(x),
-                      ...) {
+                      ...,
+                      compute.cost = FALSE) {
 
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
@@ -31,7 +33,7 @@ ml_kmeans <- function(x,
 
   envir <- new.env(parent = emptyenv())
 
-  envir$id <- random_string("id_")
+  envir$id <- sparklyr:::random_string("id_")
   df <- df %>%
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
@@ -54,6 +56,10 @@ ml_kmeans <- function(x,
   # extract cluster centers
   kmmCenters <- invoke(fit, "clusterCenters")
 
+  # compute cost for k-means
+  if (compute.cost)
+    kmmCost <- invoke(fit, "computeCost", tdf)
+
   centersList <- transpose_list(lapply(kmmCenters, function(center) {
     as.numeric(invoke(center, "toArray"))
   }))
@@ -61,12 +67,22 @@ ml_kmeans <- function(x,
   names(centersList) <- features
   centers <- as.data.frame(centersList, stringsAsFactors = FALSE, optional = TRUE)
 
-  ml_model("kmeans", fit,
-           centers = centers,
-           features = features,
-           data = df,
-           model.parameters = as.list(envir)
-  )
+  if (compute.cost) {
+    ml_model("kmeans", fit,
+             centers = centers,
+             features = features,
+             data = df,
+             model.parameters = as.list(envir),
+             cost = kmmCost
+    )
+  } else {
+    ml_model("kmeans", fit,
+             centers = centers,
+             features = features,
+             data = df,
+             model.parameters = as.list(envir)
+    )
+  }
 }
 
 #' @export
@@ -81,6 +97,11 @@ print.ml_model_kmeans <- function(x, ...) {
   cat(preamble, sep = "\n")
   print_newline()
   ml_model_print_centers(x)
+
+  if ("cost" %in% names(x)) {
+    print_newline()
+    cat("Within Set Sum of Squared Errors = ", x$cost)
+  }
 
 }
 
