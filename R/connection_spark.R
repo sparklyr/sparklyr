@@ -80,7 +80,9 @@ spark_connect <- function(master,
 
   # flatten shell_args to make them compatible with sparklyr
   shell_args <- unlist(lapply(names(shell_args), function(name) {
-    list(paste0("--", name), shell_args[[name]])
+    lapply(shell_args[[name]], function(value) {
+      list(paste0("--", name), value)
+    })
   }))
 
   # connect using the specified method
