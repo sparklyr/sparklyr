@@ -14,13 +14,15 @@
 #'
 #' @family Spark ML routines
 #'
+#' @value \link{ml_model} object of class \code{kmeans} with overloaded \code{print}, \code{fitted} and \code{predict} functions.
+#'
 #' @export
 ml_kmeans <- function(x,
                       centers,
                       max.iter = 100,
                       features = dplyr::tbl_vars(x),
-                      ...,
-                      compute.cost = FALSE) {
+                      compute.cost = TRUE,
+                      ...) {
 
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
@@ -67,22 +69,13 @@ ml_kmeans <- function(x,
   names(centersList) <- features
   centers <- as.data.frame(centersList, stringsAsFactors = FALSE, optional = TRUE)
 
-  if (compute.cost) {
-    ml_model("kmeans", fit,
-             centers = centers,
-             features = features,
-             data = df,
-             model.parameters = as.list(envir),
-             cost = kmmCost
-    )
-  } else {
-    ml_model("kmeans", fit,
-             centers = centers,
-             features = features,
-             data = df,
-             model.parameters = as.list(envir)
-    )
-  }
+  ml_model("kmeans", fit,
+           centers = centers,
+           features = features,
+           data = df,
+           model.parameters = as.list(envir),
+           cost = ifelse(compute.cost, kmmCost, NULL)
+  )
 }
 
 #' @export
@@ -98,10 +91,10 @@ print.ml_model_kmeans <- function(x, ...) {
   print_newline()
   ml_model_print_centers(x)
 
-  if ("cost" %in% names(x)) {
-    print_newline()
-    cat("Within Set Sum of Squared Errors = ", x$cost)
-  }
+  print_newline()
+  cat("Within Set Sum of Squared Errors = ", 
+      if (is.null(x$cost)) "not computed." else x$cost
+  )
 
 }
 
