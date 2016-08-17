@@ -7,17 +7,21 @@
 #' @template roxlate-ml-max-iter
 #' @template roxlate-ml-features
 #' @template roxlate-ml-dots
+#' @template roxlate-ml-compute-cost
 #'
 #' @seealso For information on how Spark k-means clustering is implemented, please see
 #'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
 #'
 #' @family Spark ML routines
 #'
+#' @value \link{ml_model} object of class \code{kmeans} with overloaded \code{print}, \code{fitted} and \code{predict} functions.
+#'
 #' @export
 ml_kmeans <- function(x,
                       centers,
                       max.iter = 100,
                       features = dplyr::tbl_vars(x),
+                      compute.cost = TRUE,
                       ...) {
 
   df <- spark_dataframe(x)
@@ -31,7 +35,7 @@ ml_kmeans <- function(x,
 
   envir <- new.env(parent = emptyenv())
 
-  envir$id <- random_string("id_")
+  envir$id <- sparklyr:::random_string("id_")
   df <- df %>%
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
@@ -54,6 +58,10 @@ ml_kmeans <- function(x,
   # extract cluster centers
   kmmCenters <- invoke(fit, "clusterCenters")
 
+  # compute cost for k-means
+  if (compute.cost)
+    kmmCost <- invoke(fit, "computeCost", tdf)
+
   centersList <- transpose_list(lapply(kmmCenters, function(center) {
     as.numeric(invoke(center, "toArray"))
   }))
@@ -65,7 +73,8 @@ ml_kmeans <- function(x,
            centers = centers,
            features = features,
            data = df,
-           model.parameters = as.list(envir)
+           model.parameters = as.list(envir),
+           cost = ifelse(compute.cost, kmmCost, NULL)
   )
 }
 
@@ -81,6 +90,11 @@ print.ml_model_kmeans <- function(x, ...) {
   cat(preamble, sep = "\n")
   print_newline()
   ml_model_print_centers(x)
+
+  print_newline()
+  cat("Within Set Sum of Squared Errors = ", 
+      if (is.null(x$cost)) "not computed." else x$cost
+  )
 
 }
 

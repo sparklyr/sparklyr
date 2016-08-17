@@ -1,0 +1,1 @@
+#' @param compute.cost Whether to compute cost for \code{k-means} model using Spark's \href{https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/KMeansModel.scala#L84}{computeCost}.
