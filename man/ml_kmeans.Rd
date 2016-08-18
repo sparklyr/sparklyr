@@ -5,7 +5,7 @@
 \title{Spark ML -- K-Means Clustering}
 \usage{
 ml_kmeans(x, centers, max.iter = 100, features = dplyr::tbl_vars(x),
-  compute.cost = TRUE, ...)
+  compute.cost = TRUE, tolerance = 1e-04, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -20,9 +20,17 @@ ml_kmeans(x, centers, max.iter = 100, features = dplyr::tbl_vars(x),
 \item{compute.cost}{Whether to compute cost for \code{k-means} model using Spark's \href{https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/KMeansModel.scala#L84}{computeCost}.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{tol}{Param for the convergence tolerance for iterative algorithms..}
+}
+\value{
+\link{ml_model} object of class \code{kmeans} with overloaded \code{print}, \code{fitted} and \code{predict} functions.
 }
 \description{
 Perform k-means clustering on a Spark DataFrame.
+}
+\references{
+Bahmani et al., Scalable K-Means++, VLDB 2012
 }
 \seealso{
 For information on how Spark k-means clustering is implemented, please see
