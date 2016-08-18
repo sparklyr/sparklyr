@@ -40,7 +40,7 @@ ml_kmeans <- function(x,
 
   envir <- new.env(parent = emptyenv())
 
-  envir$id <- sparklyr:::random_string("id_")
+  envir$id <- random_string("id_")
   df <- df %>%
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
