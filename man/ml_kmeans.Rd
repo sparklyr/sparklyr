@@ -19,9 +19,9 @@ ml_kmeans(x, centers, max.iter = 100, features = dplyr::tbl_vars(x),
 
 \item{compute.cost}{Whether to compute cost for \code{k-means} model using Spark's \href{https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/KMeansModel.scala#L84}{computeCost}.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{tolerance}{Param for the convergence tolerance for iterative algorithms..}
 
-\item{tol}{Param for the convergence tolerance for iterative algorithms..}
+\item{...}{Optional arguments; currently unused.}
 }
 \value{
 \link{ml_model} object of class \code{kmeans} with overloaded \code{print}, \code{fitted} and \code{predict} functions.
