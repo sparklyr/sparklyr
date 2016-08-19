@@ -263,9 +263,10 @@ find_scalac <- function(version, locations = NULL) {
     return(scalac_path)
   }
 
-  stopf("failed to discover 'scalac %s' compiler under: %s.",
+  stopf("failed to discover scala-%s compiler -- search paths were:\n%s",
         version,
-        paste(scalac_default_locations(), collapse = ", "))
+        paste("-", shQuote(locations), collapse = "\n"),
+        call. = FALSE)
 }
 
 scalac_default_locations <- function() {
