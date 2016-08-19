@@ -4,8 +4,8 @@
 \alias{ml_prepare_dataframe}
 \title{Prepare a Spark DataFrame for Spark ML Routines}
 \usage{
-ml_prepare_dataframe(x, features, response = NULL, ..., ml.options = NULL,
-  envir = new.env(parent = emptyenv()))
+ml_prepare_dataframe(x, features, response = NULL, ...,
+  ml.options = ml_options(), envir = new.env(parent = emptyenv()))
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

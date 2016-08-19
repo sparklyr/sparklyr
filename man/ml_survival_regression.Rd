@@ -5,7 +5,7 @@
 \title{Spark ML -- Survival Regression}
 \usage{
 ml_survival_regression(x, response, features, intercept = TRUE,
-  censor = "censor", iter.max = 100L, ml.options = NULL, ...)
+  censor = "censor", iter.max = 100L, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

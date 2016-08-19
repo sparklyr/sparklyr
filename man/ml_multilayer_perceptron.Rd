@@ -5,7 +5,7 @@
 \title{Spark ML -- Multilayer Perceptron}
 \usage{
 ml_multilayer_perceptron(x, response, features, layers, iter.max = 100,
-  seed = sample(.Machine$integer.max, 1), ml.options = NULL, ...)
+  seed = sample(.Machine$integer.max, 1), ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

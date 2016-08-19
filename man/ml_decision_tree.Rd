@@ -5,7 +5,8 @@
 \title{Spark ML -- Decision Trees}
 \usage{
 ml_decision_tree(x, response, features, max.bins = 32L, max.depth = 5L,
-  type = c("auto", "regression", "classification"), ml.options = NULL, ...)
+  type = c("auto", "regression", "classification"),
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

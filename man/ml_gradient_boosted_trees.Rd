@@ -6,7 +6,7 @@
 \usage{
 ml_gradient_boosted_trees(x, response, features, max.bins = 32L,
   max.depth = 5L, type = c("auto", "regression", "classification"),
-  ml.options = NULL, ...)
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

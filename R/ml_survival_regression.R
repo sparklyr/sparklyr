@@ -91,6 +91,8 @@ ml_survival_regression <- function(x,
     coefficients = coefficients,
     intercept = intercept,
     scale = scale,
+    data = df,
+    ml.options = ml.options,
     categorical.transformations = categorical.transformations,
     model.parameters = as.list(envir)
   )

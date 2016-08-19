@@ -5,7 +5,7 @@
 \title{Spark ML -- Latent Dirichlet Allocation}
 \usage{
 ml_lda(x, features = dplyr::tbl_vars(x), k = length(features),
-  ml.options = NULL, ...)
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

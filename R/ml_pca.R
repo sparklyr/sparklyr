@@ -72,8 +72,9 @@ ml_pca <- function(x,
 
   ml_model("pca", fit,
            components = components,
-           data = df,
            explained.variance = explainedVariance,
+           data = df,
+           ml.options = ml.options,
            model.parameters = as.list(envir)
   )
 }

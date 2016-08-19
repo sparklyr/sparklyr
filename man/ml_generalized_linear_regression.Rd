@@ -6,7 +6,7 @@
 \usage{
 ml_generalized_linear_regression(x, response, features, intercept = TRUE,
   family = gaussian(link = "identity"), iter.max = 100L,
-  ml.options = NULL, ...)
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

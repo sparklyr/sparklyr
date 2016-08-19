@@ -6,7 +6,7 @@
 \usage{
 ml_als_factorization(x, rating.column = "rating", user.column = "user",
   item.column = "item", rank = 10L, regularization.parameter = 0.1,
-  iter.max = 10L, ml.options = NULL, ...)
+  iter.max = 10L, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

@@ -4,7 +4,8 @@
 \alias{ml_naive_bayes}
 \title{Spark ML -- Naive-Bayes}
 \usage{
-ml_naive_bayes(x, response, features, lambda = 0, ml.options = NULL, ...)
+ml_naive_bayes(x, response, features, lambda = 0, ml.options = ml_options(),
+  ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

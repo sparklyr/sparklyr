@@ -84,6 +84,7 @@ ml_kmeans <- function(x,
            centers = centers,
            features = features,
            data = df,
+           ml.options = ml.options,
            model.parameters = as.list(envir),
            cost = ifelse(compute.cost, kmmCost, NULL)
   )

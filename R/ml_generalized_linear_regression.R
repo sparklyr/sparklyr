@@ -152,6 +152,7 @@ ml_generalized_linear_regression <-
     residual.dof.null = residual.dof.null,
     aic = aic,
     data = df,
+    ml.options = ml.options,
     categorical.transformations = categorical.transformations,
     model.parameters = as.list(envir)
   )

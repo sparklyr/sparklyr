@@ -6,7 +6,7 @@
 \usage{
 ml_random_forest(x, response, features, max.bins = 32L, max.depth = 5L,
   num.trees = 20L, type = c("auto", "regression", "classification"),
-  ml.options = NULL, ...)
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

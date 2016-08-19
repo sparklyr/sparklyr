@@ -4,7 +4,8 @@
 \alias{ml_one_vs_rest}
 \title{Spark ML -- One vs Rest}
 \usage{
-ml_one_vs_rest(x, classifier, response, features, ml.options = NULL, ...)
+ml_one_vs_rest(x, classifier, response, features, ml.options = ml_options(),
+  ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a

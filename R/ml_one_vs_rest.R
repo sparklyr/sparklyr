@@ -54,6 +54,7 @@ ml_one_vs_rest <- function(x,
            features = features,
            response = response,
            data = df,
+           ml.options = ml.options,
            categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )

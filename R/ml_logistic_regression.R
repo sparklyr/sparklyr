@@ -95,6 +95,7 @@ ml_logistic_regression <- function(x,
            roc = roc,
            area.under.roc = areaUnderROC,
            data = df,
+           ml.options = ml.options,
            categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )

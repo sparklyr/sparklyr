@@ -115,6 +115,7 @@ ml_linear_regression <- function(x,
            r.squared = invoke(summary, "r2"),
            root.mean.squared.error = invoke(summary, "rootMeanSquaredError"),
            data = df,
+           ml.options = ml.options,
            categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
   )
