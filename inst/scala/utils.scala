@@ -53,10 +53,12 @@ object Utils {
   }
 
   def collectColumnString(df: DataFrame, colName: String): String = {
-    df.select(colName).rdd.map(row => {
+    val text = df.select(colName).rdd.map(row => {
       val element = row(0)
       if (element.isInstanceOf[String]) element.asInstanceOf[String] else "<NA>"
-    }).collect().mkString("\n") + "\n"
+    }).collect().mkString("\n")
+
+    if (text.length() > 0) text + "\n" else text
   }
 
   def collectColumnDefault(df: DataFrame, colName: String): Array[Any] = {
@@ -92,10 +94,12 @@ object Utils {
   }
 
   def collectImplString(local: Array[Row], idx: Integer) = {
-    local.map{row => {
+    var text = local.map{row => {
       val el = row(idx)
       if (el.isInstanceOf[String]) el.asInstanceOf[String] else "<NA>"
-    }}.mkString("\n") + "\n"
+    }}.mkString("\n")
+
+    if (text.length() > 0) text + "\n" else text
   }
 
   def collectImplDefault(local: Array[Row], idx: Integer) = {
