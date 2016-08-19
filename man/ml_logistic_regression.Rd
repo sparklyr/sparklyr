@@ -5,7 +5,7 @@
 \title{Spark ML -- Logistic Regression}
 \usage{
 ml_logistic_regression(x, response, features, intercept = TRUE, alpha = 0,
-  lambda = 0, max.iter = 100L, ...)
+  lambda = 0, iter.max = 100L, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -27,7 +27,7 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 lasso, elastic net, and ridge regression). See \strong{Details} for more
 information.}
 
-\item{max.iter}{The maximum number of iterations to use.}
+\item{iter.max}{The maximum number of iterations to use.}
 
 \item{...}{Optional arguments; currently unused.}
 }

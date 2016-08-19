@@ -14,7 +14,7 @@
 #' @template roxlate-ml-intercept
 #' @param family The family / link function to use; analogous to those normally
 #'   passed in to calls to \R's own \code{\link{glm}}.
-#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-iter-max
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -26,13 +26,18 @@ ml_generalized_linear_regression <-
            features,
            intercept = TRUE,
            family = gaussian(link = "identity"),
-           max.iter = 100L,
+           iter.max = 100L,
            ...)
 {
   spark_require_version(sc, "2.0.0")
 
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
+
+  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
+  dots <- list(...)
+  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
+    iter.max <- dots[["max.iter"]]
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
@@ -44,7 +49,7 @@ ml_generalized_linear_regression <-
     categorical.transformations
   )
 
-  max.iter <- ensure_scalar_integer(max.iter)
+  iter.max <- ensure_scalar_integer(iter.max)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   # parse 'family' argument in similar way to R's glm
@@ -76,7 +81,7 @@ ml_generalized_linear_regression <-
   glr <- invoke_new(sc, envir$model)
 
   model <- glr %>%
-    invoke("setMaxIter", max.iter) %>%
+    invoke("setMaxIter", iter.max) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", intercept) %>%

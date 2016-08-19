@@ -9,7 +9,7 @@
 #'   gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three layers,
 #'   with an input (feature) layer of size 4, an intermediate layer of size 5, and an
 #'   output (class) layer of size 2.
-#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-iter-max
 #' @template roxlate-ml-seed
 #' @template roxlate-ml-dots
 #'
@@ -20,12 +20,17 @@ ml_multilayer_perceptron <- function(x,
                                      response,
                                      features,
                                      layers,
-                                     max.iter = 100,
+                                     iter.max = 100,
                                      seed = sample(.Machine$integer.max, 1),
                                      ...)
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
+
+  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
+  dots <- list(...)
+  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
+    iter.max <- dots[["max.iter"]]
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
@@ -38,7 +43,7 @@ ml_multilayer_perceptron <- function(x,
   )
 
   layers <- as.integer(layers)
-  max.iter <- ensure_scalar_integer(max.iter)
+  iter.max <- ensure_scalar_integer(iter.max)
   seed <- ensure_scalar_integer(seed)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
@@ -61,7 +66,7 @@ ml_multilayer_perceptron <- function(x,
     invoke("setLabelCol", envir$response) %>%
     invoke("setLayers", as.list(layers)) %>%
     invoke("setSeed", seed) %>%
-    invoke("setMaxIter", max.iter)
+    invoke("setMaxIter", iter.max)
 
   if (only_model) return(model)
 

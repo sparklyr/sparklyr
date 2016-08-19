@@ -4,7 +4,7 @@
 \alias{ml_multilayer_perceptron}
 \title{Spark ML -- Multilayer Perceptron}
 \usage{
-ml_multilayer_perceptron(x, response, features, layers, max.iter = 100,
+ml_multilayer_perceptron(x, response, features, layers, iter.max = 100,
   seed = sample(.Machine$integer.max, 1), ...)
 }
 \arguments{
@@ -26,7 +26,7 @@ gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three laye
 with an input (feature) layer of size 4, an intermediate layer of size 5, and an
 output (class) layer of size 2.}
 
-\item{max.iter}{The maximum number of iterations to use.}
+\item{iter.max}{The maximum number of iterations to use.}
 
 \item{seed}{A random seed. Set this value if you need your results to be
 reproducible across repeated calls.}

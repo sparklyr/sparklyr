@@ -8,7 +8,7 @@
 #' @param item.column The name of the column containing item IDs.
 #' @param rank Rank of the factorization.
 #' @param regularization.parameter The regularization parameter.
-#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-iter-max
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -20,18 +20,23 @@ ml_als_factorization <- function(x,
                                  item.column = "item",
                                  rank = 10L,
                                  regularization.parameter = 0.1,
-                                 max.iter = 10L,
+                                 iter.max = 10L,
                                  ...)
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
+
+  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
+  dots <- list(...)
+  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
+    iter.max <- dots[["max.iter"]]
 
   rating.column <- ensure_scalar_character(rating.column)
   user.column <- ensure_scalar_character(user.column)
   item.column <- ensure_scalar_character(item.column)
   rank <- ensure_scalar_integer(rank)
   regularization.parameter <- ensure_scalar_double(regularization.parameter)
-  max.iter <- ensure_scalar_integer(max.iter)
+  iter.max <- ensure_scalar_integer(iter.max)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
@@ -50,7 +55,7 @@ ml_als_factorization <- function(x,
     invoke("setItemCol", item.column) %>%
     invoke("setRank", rank) %>%
     invoke("setRegParam", regularization.parameter) %>%
-    invoke("setMaxIter", max.iter)
+    invoke("setMaxIter", iter.max)
 
   if (only_model)
     return(model)

@@ -10,7 +10,7 @@
 #' @param censor The name of the vector that provides censoring information.
 #'   This should be a numeric vector, with 0 marking uncensored data, and
 #'   1 marking right-censored data.
-#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-iter-max
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -21,11 +21,16 @@ ml_survival_regression <- function(x,
                                    features,
                                    intercept = TRUE,
                                    censor = "censor",
-                                   max.iter = 100L,
+                                   iter.max = 100L,
                                    ...)
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
+
+  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
+  dots <- list(...)
+  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
+    iter.max <- dots[["max.iter"]]
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
@@ -38,7 +43,7 @@ ml_survival_regression <- function(x,
   )
 
   censor <- ensure_scalar_character(censor)
-  max.iter <- ensure_scalar_integer(max.iter)
+  iter.max <- ensure_scalar_integer(iter.max)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
@@ -54,7 +59,7 @@ ml_survival_regression <- function(x,
   rf <- invoke_new(sc, envir$model)
 
   model <- rf %>%
-    invoke("setMaxIter", max.iter) %>%
+    invoke("setMaxIter", iter.max) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", as.logical(intercept)) %>%

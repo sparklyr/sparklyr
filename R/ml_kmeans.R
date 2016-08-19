@@ -26,8 +26,8 @@ ml_kmeans <- function(x,
                       features = dplyr::tbl_vars(x),
                       compute.cost = TRUE,
                       tolerance = 0.0001,
-                      ...) {
-
+                      ...)
+{
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 

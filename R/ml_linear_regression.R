@@ -7,7 +7,7 @@
 #' @template roxlate-ml-features
 #' @template roxlate-ml-intercept
 #' @template roxlate-ml-regression-penalty
-#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-iter-max
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -19,11 +19,16 @@ ml_linear_regression <- function(x,
                                  intercept = TRUE,
                                  alpha = 0,
                                  lambda = 0,
-                                 max.iter = 100L,
+                                 iter.max = 100L,
                                  ...)
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
+
+  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
+  dots <- list(...)
+  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
+    iter.max <- dots[["max.iter"]]
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
@@ -37,7 +42,7 @@ ml_linear_regression <- function(x,
 
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
-  max.iter <- ensure_scalar_integer(max.iter)
+  iter.max <- ensure_scalar_integer(iter.max)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
@@ -53,7 +58,7 @@ ml_linear_regression <- function(x,
   lr <- invoke_new(sc, envir$model)
 
   model <- lr %>%
-    invoke("setMaxIter", max.iter) %>%
+    invoke("setMaxIter", iter.max) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setFitIntercept", as.logical(intercept)) %>%
