@@ -40,7 +40,7 @@ ml_als_factorization <- function(x,
 
   envir <- new.env(parent = emptyenv())
 
-  envir$id <- ml.options$id
+  envir$id <- ml.options$id.column
   df <- df %>%
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()

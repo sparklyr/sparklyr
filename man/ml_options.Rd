@@ -4,12 +4,12 @@
 \alias{ml_options}
 \title{Provide Options for Spark.ML Routines}
 \usage{
-ml_options(id = random_string("id"),
+ml_options(id.column = random_string("id"),
   response.column = random_string("response"),
   features.column = random_string("features"), only.model = FALSE, ...)
 }
 \arguments{
-\item{id}{The name to assign to the id column.}
+\item{id.column}{The name to assign to the generated id column.}
 
 \item{response.column}{The name to assign to the generated response column.}
 
