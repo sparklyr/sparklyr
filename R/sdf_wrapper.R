@@ -29,6 +29,9 @@ sdf_schema <- function(object) {
 
 sdf_deserialize_column <- function(column) {
   if (is.character(column)) {
+    # strsplit splits "\n\n" as ["", ""] fix by always adding trailing separator
+    column <- if (nchar(column) > 0) paste(column, "\n", sep = "") else column
+
     splat <- strsplit(column, "\n", fixed = TRUE)[[1]]
     splat[splat == "<NA>"] <- NA
     Encoding(splat) <- "UTF-8"
