@@ -4,10 +4,16 @@
 \alias{ml_options}
 \title{Provide Options for Spark.ML Routines}
 \usage{
-ml_options(feature.col = NULL, only.model = NULL, ...)
+ml_options(id = random_string("id"),
+  response.column = random_string("response"),
+  features.column = random_string("features"), only.model = FALSE, ...)
 }
 \arguments{
-\item{feature.col}{The name to assign to the feature column.}
+\item{id}{The name to assign to the id column.}
+
+\item{response.column}{The name to assign to the generated response column.}
+
+\item{features.column}{The name to assign to the generated features column.}
 
 \item{only.model}{Boolean; should the Spark model object itself be returned
 without fitting the actual model? Useful for \code{\link{ml_one_vs_rest}}.}

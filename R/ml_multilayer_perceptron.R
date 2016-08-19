@@ -48,7 +48,7 @@ ml_multilayer_perceptron <- function(x,
 
   envir <- new.env(parent = emptyenv())
 
-  envir$id <- random_string("id_")
+  envir$id <- ml.options$id
   df <- df %>%
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()

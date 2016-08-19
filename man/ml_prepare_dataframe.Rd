@@ -4,7 +4,7 @@
 \alias{ml_prepare_dataframe}
 \title{Prepare a Spark DataFrame for Spark ML Routines}
 \usage{
-ml_prepare_dataframe(x, features, response = NULL, ...,
+ml_prepare_dataframe(x, features, response = NULL, ..., ml.options = NULL,
   envir = new.env(parent = emptyenv()))
 }
 \arguments{
@@ -22,6 +22,9 @@ existing parameters is supposed; e.g. \code{response ~ feature1 + feature2 + ...
 The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 
 \item{envir}{An \R environment -- when supplied, it will be filled
 with metadata describing the transformations that have taken place.}

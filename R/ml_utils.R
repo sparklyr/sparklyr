@@ -30,6 +30,7 @@
 #' @template roxlate-ml-features
 #' @template roxlate-ml-response
 #' @template roxlate-ml-dots
+#' @template roxlate-ml-options
 #' @param envir An \R environment -- when supplied, it will be filled
 #'   with metadata describing the transformations that have taken place.
 #'
@@ -51,14 +52,18 @@
 #'   invoke("setFeaturesCol", envir$features) %>%
 #'   invoke("setLabelCol", envir$response)
 #' }
-ml_prepare_dataframe <- function(x, features, response = NULL, ...,
+ml_prepare_dataframe <- function(x,
+                                 features,
+                                 response = NULL,
+                                 ...,
+                                 ml.options = NULL,
                                  envir = new.env(parent = emptyenv()))
 {
   df <- spark_dataframe(x)
   schema <- sdf_schema(df)
 
   # default report for feature, response variable names
-  envir$features <- random_string("features")
+  envir$features <- ml.options$features.column
   envir$response <- response
   envir$labels <- NULL
 
@@ -66,10 +71,10 @@ ml_prepare_dataframe <- function(x, features, response = NULL, ...,
   if (!is.null(response)) {
     responseType <- schema[[response]]$type
     if (responseType == "StringType") {
-      envir$response <- random_string("response")
+      envir$response <- ml.options$response.column
       df <- ft_string_indexer(df, response, envir$response, envir)
     } else if (responseType != "DoubleType") {
-      envir$response <- random_string("response")
+      envir$response <- ml.options$response.column
       castedColumn <- df %>%
         invoke("col", response) %>%
         invoke("cast", "double")
