@@ -6,9 +6,10 @@
 #' @param centers The number of cluster centers to compute.
 #' @template roxlate-ml-iter-max
 #' @template roxlate-ml-features
-#' @template roxlate-ml-dots
 #' @template roxlate-ml-compute-cost
 #' @template roxlate-ml-tol
+#' @template roxlate-ml-options
+#' @template roxlate-ml-dots
 #'
 #' @seealso For information on how Spark k-means clustering is implemented, please see
 #'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
@@ -26,6 +27,7 @@ ml_kmeans <- function(x,
                       features = dplyr::tbl_vars(x),
                       compute.cost = TRUE,
                       tolerance = 0.0001,
+                      ml.options = NULL,
                       ...)
 {
   df <- spark_dataframe(x)

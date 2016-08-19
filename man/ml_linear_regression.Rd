@@ -5,7 +5,7 @@
 \title{Spark ML -- Linear Regression}
 \usage{
 ml_linear_regression(x, response, features, intercept = TRUE, alpha = 0,
-  lambda = 0, iter.max = 100L, ...)
+  lambda = 0, iter.max = 100L, ml.options = NULL, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -28,6 +28,9 @@ lasso, elastic net, and ridge regression). See \strong{Details} for more
 information.}
 
 \item{iter.max}{The maximum number of iterations to use.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 
 \item{...}{Optional arguments; currently unused.}
 }

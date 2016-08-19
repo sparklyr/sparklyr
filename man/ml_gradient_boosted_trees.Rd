@@ -5,7 +5,8 @@
 \title{Spark ML -- Gradient-Boosted Tree}
 \usage{
 ml_gradient_boosted_trees(x, response, features, max.bins = 32L,
-  max.depth = 5L, type = c("auto", "regression", "classification"), ...)
+  max.depth = 5L, type = c("auto", "regression", "classification"),
+  ml.options = NULL, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -33,6 +34,9 @@ as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 
 \item{...}{Optional arguments; currently unused.}
 }

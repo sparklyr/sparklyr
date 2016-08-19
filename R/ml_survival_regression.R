@@ -11,6 +11,7 @@
 #'   This should be a numeric vector, with 0 marking uncensored data, and
 #'   1 marking right-censored data.
 #' @template roxlate-ml-iter-max
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -22,6 +23,7 @@ ml_survival_regression <- function(x,
                                    intercept = TRUE,
                                    censor = "censor",
                                    iter.max = 100L,
+                                   ml.options = NULL,
                                    ...)
 {
   df <- spark_dataframe(x)

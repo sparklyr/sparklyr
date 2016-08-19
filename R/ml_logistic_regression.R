@@ -8,6 +8,7 @@
 #' @template roxlate-ml-intercept
 #' @template roxlate-ml-regression-penalty
 #' @template roxlate-ml-iter-max
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -20,6 +21,7 @@ ml_logistic_regression <- function(x,
                                    alpha = 0,
                                    lambda = 0,
                                    iter.max = 100L,
+                                   ml.options = NULL,
                                    ...)
 {
   df <- spark_dataframe(x)

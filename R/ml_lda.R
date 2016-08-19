@@ -5,6 +5,7 @@
 #' @template roxlate-ml-x
 #' @template roxlate-ml-features
 #' @param k The number of topics to estimate.
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -13,8 +14,9 @@
 ml_lda <- function(x,
                    features = dplyr::tbl_vars(x),
                    k = length(features),
-                   ...) {
-
+                   ml.options = NULL,
+                   ...)
+{
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 

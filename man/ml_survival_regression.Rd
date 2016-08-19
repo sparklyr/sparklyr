@@ -5,7 +5,7 @@
 \title{Spark ML -- Survival Regression}
 \usage{
 ml_survival_regression(x, response, features, intercept = TRUE,
-  censor = "censor", iter.max = 100L, ...)
+  censor = "censor", iter.max = 100L, ml.options = NULL, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -28,6 +28,9 @@ This should be a numeric vector, with 0 marking uncensored data, and
 1 marking right-censored data.}
 
 \item{iter.max}{The maximum number of iterations to use.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 
 \item{...}{Optional arguments; currently unused.}
 }

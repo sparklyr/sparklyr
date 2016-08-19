@@ -6,6 +6,8 @@
 #' @param classifier The classifier model. Can be obtained using the \code{only_model} parameter.
 #' @template roxlate-ml-response
 #' @template roxlate-ml-features
+#' @template roxlate-ml-options
+#' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
 #'
@@ -13,7 +15,9 @@
 ml_one_vs_rest <- function(x,
                            classifier,
                            response,
-                           features)
+                           features,
+                           ml.options = NULL,
+                           ...)
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)

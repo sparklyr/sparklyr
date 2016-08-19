@@ -6,6 +6,7 @@
 #' @template roxlate-ml-response
 #' @template roxlate-ml-features
 #' @param lambda The (Laplace) smoothing parameter. Defaults to zero.
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -15,6 +16,7 @@ ml_naive_bayes <- function(x,
                            response,
                            features,
                            lambda = 0,
+                           ml.options = NULL,
                            ...)
 {
   df <- spark_dataframe(x)

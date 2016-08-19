@@ -4,7 +4,7 @@
 \alias{ml_one_vs_rest}
 \title{Spark ML -- One vs Rest}
 \usage{
-ml_one_vs_rest(x, classifier, response, features)
+ml_one_vs_rest(x, classifier, response, features, ml.options = NULL, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -21,6 +21,11 @@ existing parameters is supposed; e.g. \code{response ~ feature1 + feature2 + ...
 The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{features}{The name of features (terms) to use for the model fit.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Perform regression or classification using one vs rest.

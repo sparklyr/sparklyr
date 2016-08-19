@@ -15,6 +15,7 @@
 #' @param family The family / link function to use; analogous to those normally
 #'   passed in to calls to \R's own \code{\link{glm}}.
 #' @template roxlate-ml-iter-max
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -27,6 +28,7 @@ ml_generalized_linear_regression <-
            intercept = TRUE,
            family = gaussian(link = "identity"),
            iter.max = 100L,
+           ml.options = NULL,
            ...)
 {
   spark_require_version(sc, "2.0.0")

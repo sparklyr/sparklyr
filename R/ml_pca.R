@@ -5,6 +5,7 @@
 #' @template roxlate-ml-x
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -12,8 +13,9 @@
 #' @export
 ml_pca <- function(x,
                    features = dplyr::tbl_vars(x),
-                   ...) {
-
+                   ml.options = NULL,
+                   ...)
+{
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 

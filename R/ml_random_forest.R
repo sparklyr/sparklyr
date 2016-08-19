@@ -9,6 +9,7 @@
 #' @template roxlate-ml-decision-trees-max-depth
 #' @template roxlate-ml-decision-trees-num-trees
 #' @template roxlate-ml-decision-trees-type
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -21,6 +22,7 @@ ml_random_forest <- function(x,
                              max.depth = 5L,
                              num.trees = 20L,
                              type = c("auto", "regression", "classification"),
+                             ml.options = NULL,
                              ...)
 {
   df <- spark_dataframe(x)

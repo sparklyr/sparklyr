@@ -4,7 +4,7 @@
 \alias{ml_naive_bayes}
 \title{Spark ML -- Naive-Bayes}
 \usage{
-ml_naive_bayes(x, response, features, lambda = 0, ...)
+ml_naive_bayes(x, response, features, lambda = 0, ml.options = NULL, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -21,6 +21,9 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 \item{features}{The name of features (terms) to use for the model fit.}
 
 \item{lambda}{The (Laplace) smoothing parameter. Defaults to zero.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 
 \item{...}{Optional arguments; currently unused.}
 }

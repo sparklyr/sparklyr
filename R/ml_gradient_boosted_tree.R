@@ -8,6 +8,7 @@
 #' @template roxlate-ml-decision-trees-max-bins
 #' @template roxlate-ml-decision-trees-max-depth
 #' @template roxlate-ml-decision-trees-type
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -19,6 +20,7 @@ ml_gradient_boosted_trees <- function(x,
                                       max.bins = 32L,
                                       max.depth = 5L,
                                       type = c("auto", "regression", "classification"),
+                                      ml.options = NULL,
                                       ...)
 {
   df <- spark_dataframe(x)

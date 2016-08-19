@@ -5,7 +5,7 @@
 \title{Spark ML -- Multilayer Perceptron}
 \usage{
 ml_multilayer_perceptron(x, response, features, layers, iter.max = 100,
-  seed = sample(.Machine$integer.max, 1), ...)
+  seed = sample(.Machine$integer.max, 1), ml.options = NULL, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -30,6 +30,9 @@ output (class) layer of size 2.}
 
 \item{seed}{A random seed. Set this value if you need your results to be
 reproducible across repeated calls.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 
 \item{...}{Optional arguments; currently unused.}
 }

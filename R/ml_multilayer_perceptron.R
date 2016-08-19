@@ -11,6 +11,7 @@
 #'   output (class) layer of size 2.
 #' @template roxlate-ml-iter-max
 #' @template roxlate-ml-seed
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -22,6 +23,7 @@ ml_multilayer_perceptron <- function(x,
                                      layers,
                                      iter.max = 100,
                                      seed = sample(.Machine$integer.max, 1),
+                                     ml.options = NULL,
                                      ...)
 {
   df <- spark_dataframe(x)
