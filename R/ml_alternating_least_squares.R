@@ -22,7 +22,7 @@ ml_als_factorization <- function(x,
                                  rank = 10L,
                                  regularization.parameter = 0.1,
                                  iter.max = 10L,
-                                 ml.options = NULL,
+                                 ml.options = ml_options(),
                                  ...)
 {
   df <- spark_dataframe(x)

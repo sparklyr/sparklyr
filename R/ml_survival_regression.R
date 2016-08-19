@@ -23,7 +23,7 @@ ml_survival_regression <- function(x,
                                    intercept = TRUE,
                                    censor = "censor",
                                    iter.max = 100L,
-                                   ml.options = NULL,
+                                   ml.options = ml_options(),
                                    ...)
 {
   df <- spark_dataframe(x)

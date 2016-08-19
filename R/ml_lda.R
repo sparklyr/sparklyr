@@ -14,7 +14,7 @@
 ml_lda <- function(x,
                    features = dplyr::tbl_vars(x),
                    k = length(features),
-                   ml.options = NULL,
+                   ml.options = ml_options(),
                    ...)
 {
   df <- spark_dataframe(x)

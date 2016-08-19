@@ -23,7 +23,7 @@ ml_multilayer_perceptron <- function(x,
                                      layers,
                                      iter.max = 100,
                                      seed = sample(.Machine$integer.max, 1),
-                                     ml.options = NULL,
+                                     ml.options = ml_options(),
                                      ...)
 {
   df <- spark_dataframe(x)

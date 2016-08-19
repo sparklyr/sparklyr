@@ -16,7 +16,7 @@ ml_one_vs_rest <- function(x,
                            classifier,
                            response,
                            features,
-                           ml.options = NULL,
+                           ml.options = ml_options(),
                            ...)
 {
   df <- spark_dataframe(x)

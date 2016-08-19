@@ -20,7 +20,7 @@ ml_decision_tree <- function(x,
                              max.bins = 32L,
                              max.depth = 5L,
                              type = c("auto", "regression", "classification"),
-                             ml.options = NULL,
+                             ml.options = ml_options(),
                              ...)
 {
   df <- spark_dataframe(x)

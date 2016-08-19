@@ -22,7 +22,7 @@ ml_random_forest <- function(x,
                              max.depth = 5L,
                              num.trees = 20L,
                              type = c("auto", "regression", "classification"),
-                             ml.options = NULL,
+                             ml.options = ml_options(),
                              ...)
 {
   df <- spark_dataframe(x)

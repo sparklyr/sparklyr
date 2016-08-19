@@ -56,7 +56,7 @@ ml_prepare_dataframe <- function(x,
                                  features,
                                  response = NULL,
                                  ...,
-                                 ml.options = NULL,
+                                 ml.options = ml_options(),
                                  envir = new.env(parent = emptyenv()))
 {
   df <- spark_dataframe(x)

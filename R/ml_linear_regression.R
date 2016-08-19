@@ -21,7 +21,7 @@ ml_linear_regression <- function(x,
                                  alpha = 0,
                                  lambda = 0,
                                  iter.max = 100L,
-                                 ml.options = NULL,
+                                 ml.options = ml_options(),
                                  ...)
 {
   df <- spark_dataframe(x)

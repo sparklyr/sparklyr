@@ -16,7 +16,7 @@ ml_naive_bayes <- function(x,
                            response,
                            features,
                            lambda = 0,
-                           ml.options = NULL,
+                           ml.options = ml_options(),
                            ...)
 {
   df <- spark_dataframe(x)

@@ -13,7 +13,7 @@
 #' @export
 ml_pca <- function(x,
                    features = dplyr::tbl_vars(x),
-                   ml.options = NULL,
+                   ml.options = ml_options(),
                    ...)
 {
   df <- spark_dataframe(x)
