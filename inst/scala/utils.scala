@@ -56,7 +56,7 @@ object Utils {
     df.select(colName).rdd.map(row => {
       val element = row(0)
       if (element.isInstanceOf[String]) element.asInstanceOf[String] else "<NA>"
-    }).collect().mkString("\n")
+    }).collect().mkString("\n") + "\n"
   }
 
   def collectColumnDefault(df: DataFrame, colName: String): Array[Any] = {
@@ -95,7 +95,7 @@ object Utils {
     local.map{row => {
       val el = row(idx)
       if (el.isInstanceOf[String]) el.asInstanceOf[String] else "<NA>"
-    }}.mkString("\n")
+    }}.mkString("\n") + "\n"
   }
 
   def collectImplDefault(local: Array[Row], idx: Integer) = {
