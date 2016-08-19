@@ -48,7 +48,7 @@ ml_decision_tree <- function(x,
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
 
-  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
+  tdf <- ml_prepare_dataframe(df, features, response, ml.options = ml.options, envir = envir)
 
   # choose classification vs. regression model based on column type
   schema <- sdf_schema(df)

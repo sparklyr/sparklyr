@@ -52,7 +52,7 @@ ml_survival_regression <- function(x,
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
 
-  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
+  tdf <- ml_prepare_dataframe(df, features, response, ml.options = ml.options, envir = envir)
 
   envir$model <- "org.apache.spark.ml.regression.AFTSurvivalRegression"
   rf <- invoke_new(sc, envir$model)

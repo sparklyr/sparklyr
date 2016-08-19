@@ -53,7 +53,7 @@ ml_multilayer_perceptron <- function(x,
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
 
-  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
+  tdf <- ml_prepare_dataframe(df, features, response, ml.options = ml.options, envir = envir)
 
   ml_multilayer_perceptron_validate_layers(x, response, features, layers)
 

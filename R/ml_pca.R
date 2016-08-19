@@ -30,7 +30,7 @@ ml_pca <- function(x,
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
 
-  tdf <- ml_prepare_dataframe(df, features, envir = envir)
+  tdf <- ml_prepare_dataframe(df, features, ml.options = ml.options, envir = envir)
 
   envir$model <- "org.apache.spark.ml.feature.PCA"
   pca <- invoke_new(sc, envir$model)

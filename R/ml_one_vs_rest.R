@@ -39,7 +39,7 @@ ml_one_vs_rest <- function(x,
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
 
-  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
+  tdf <- ml_prepare_dataframe(df, features, response, ml.options = ml.options, envir = envir)
 
   envir$model <- "org.apache.spark.ml.classification.OneVsRest"
   ovrc <- invoke_new(sc, envir$model)

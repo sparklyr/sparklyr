@@ -28,7 +28,7 @@ ml_generalized_linear_regression <-
            intercept = TRUE,
            family = gaussian(link = "identity"),
            iter.max = 100L,
-           ml.options = NULL,
+           ml.options = ml_options(),
            ...)
 {
   spark_require_version(sc, "2.0.0")
@@ -74,7 +74,7 @@ ml_generalized_linear_regression <-
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
 
-  tdf <- ml_prepare_dataframe(df, features, response, envir = envir)
+  tdf <- ml_prepare_dataframe(df, features, response, ml.options = ml.options, envir = envir)
 
   envir$model <- "org.apache.spark.ml.regression.GeneralizedLinearRegression"
   glr <- invoke_new(sc, envir$model)
