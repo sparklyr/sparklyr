@@ -6,14 +6,30 @@
 #' @template roxlate-ml-features
 #' @param k The number of topics to estimate.
 #' @template roxlate-ml-dots
+#' @param alpha Concentration parameter for the prior placed on documents' distributions over topics. This is a singleton which is replicated to a vector of length \code{k} in fitting (as currently EM optimizer only supports symmetric distributions, so all values in the vector should be the same). For Expectation-Maximization optimizer values should be > 1.0.
+#' By default \code{alpha = (50 / k) + 1}, where \code{50/k} is common in LDA libraries and +1 follows from Asuncion et al. (2009), who recommend a +1 adjustment for EM.
+#' @param beta Concentration parameter for the prior placed on topics' distributions over terms. For Expectation-Maximization optimizer value should be > 1.0 and by default \code{beta = 0.1 + 1}, where 0.1 gives a small amount of smoothing and +1 follows Asuncion et al. (2009), who recommend a +1 adjustment for EM.
+#'
+#' @references
+#' Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Allocation." JMLR, 2003.
+#'
+#' Asuncion et al. (2009)
 #'
 #' @family Spark ML routines
+#'
+#' @note
+#' The topics' distributions over terms are called "beta" in the original LDA paper by Blei et al., but are called "phi" in many later papers such as Asuncion et al., 2009.
+#'
+#' For terminology used in LDA model see \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.clustering.LDA}{Spark LDA documentation}.
 #'
 #' @export
 ml_lda <- function(x,
                    features = dplyr::tbl_vars(x),
                    k = length(features),
+                   alpha = (50 / k) + 1,
+                   beta = 0.1 + 1,
                    ...) {
+  assert_that(alpha > 1)
 
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
@@ -37,7 +53,9 @@ ml_lda <- function(x,
 
   model <- lda %>%
     invoke("setK", k) %>%
-    invoke("setFeaturesCol", envir$features)
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setTopicConcentration", beta) %>%
+    invoke("setDocConcentration", alpha)
 
   if (only_model) return(model)
 
