@@ -8,13 +8,16 @@
 #' @template roxlate-ml-features
 #' @template roxlate-ml-dots
 #' @template roxlate-ml-compute-cost
+#' @template roxlate-ml-tol
 #'
 #' @seealso For information on how Spark k-means clustering is implemented, please see
 #'   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
 #'
 #' @family Spark ML routines
 #'
-#' @value \link{ml_model} object of class \code{kmeans} with overloaded \code{print}, \code{fitted} and \code{predict} functions.
+#' @references Bahmani et al., Scalable K-Means++, VLDB 2012
+#'
+#' @return \link{ml_model} object of class \code{kmeans} with overloaded \code{print}, \code{fitted} and \code{predict} functions.
 #'
 #' @export
 ml_kmeans <- function(x,
@@ -22,6 +25,7 @@ ml_kmeans <- function(x,
                       max.iter = 100,
                       features = dplyr::tbl_vars(x),
                       compute.cost = TRUE,
+                      tolerance = 0.0001,
                       ...) {
 
   df <- spark_dataframe(x)
@@ -32,10 +36,11 @@ ml_kmeans <- function(x,
   centers <- ensure_scalar_integer(centers)
   max.iter <- ensure_scalar_integer(max.iter)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  tolerance <- ensure_scalar_double(tolerance)
 
   envir <- new.env(parent = emptyenv())
 
-  envir$id <- sparklyr:::random_string("id_")
+  envir$id <- random_string("id_")
   df <- df %>%
     sdf_with_unique_id(envir$id) %>%
     spark_dataframe()
@@ -48,7 +53,9 @@ ml_kmeans <- function(x,
   model <- kmeans %>%
     invoke("setK", centers) %>%
     invoke("setMaxIter", max.iter) %>%
+    invoke("setTol", tolerance) %>%
     invoke("setFeaturesCol", envir$features)
+
 
   if (only_model) return(model)
 
@@ -92,7 +99,7 @@ print.ml_model_kmeans <- function(x, ...) {
   ml_model_print_centers(x)
 
   print_newline()
-  cat("Within Set Sum of Squared Errors = ", 
+  cat("Within Set Sum of Squared Errors = ",
       if (is.null(x$cost)) "not computed." else x$cost
   )
 

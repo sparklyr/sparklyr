@@ -20,7 +20,7 @@ ml_binary_classification_eval <- function(predicted_tbl_spark, label, score, met
   envir <- new.env(parent = emptyenv())
 
   tdf <- df %>%
-    ml_prepare_dataframe(response = label, feature = c(score, score), envir = envir)
+    ml_prepare_dataframe(response = label, features = c(score, score), envir = envir)
 
   auc <- invoke_new(sc, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator") %>%
     invoke("setLabelCol", envir$response) %>%
