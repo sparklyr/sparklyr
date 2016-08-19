@@ -4,12 +4,15 @@
 \alias{ml_options}
 \title{Provide Options for Spark.ML Routines}
 \usage{
-ml_options(feature.col, ...)
+ml_options(feature.col = NULL, only.model = NULL, ...)
 }
 \arguments{
 \item{feature.col}{The name to assign to the feature column.}
 
-\item{Optional}{arguments, reserved for future expansion.}
+\item{only.model}{Boolean; should the Spark model object itself be returned
+without fitting the actual model? Useful for \code{\link{ml_one_vs_rest}}.}
+
+\item{...}{Optional arguments, reserved for future expansion.}
 }
 \description{
 Provide Options for Spark.ML Routines

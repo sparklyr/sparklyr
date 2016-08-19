@@ -27,10 +27,7 @@ ml_multilayer_perceptron <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
-  dots <- list(...)
-  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
-    iter.max <- dots[["max.iter"]]
+  ml_backwards_compatibility_api()
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(

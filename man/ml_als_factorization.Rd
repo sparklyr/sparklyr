@@ -6,7 +6,7 @@
 \usage{
 ml_als_factorization(x, rating.column = "rating", user.column = "user",
   item.column = "item", rank = 10L, regularization.parameter = 0.1,
-  iter.max = 10L, ...)
+  iter.max = 10L, ml.options = NULL, ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -23,6 +23,9 @@ ml_als_factorization(x, rating.column = "rating", user.column = "user",
 \item{regularization.parameter}{The regularization parameter.}
 
 \item{iter.max}{The maximum number of iterations to use.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 
 \item{...}{Optional arguments; currently unused.}
 }

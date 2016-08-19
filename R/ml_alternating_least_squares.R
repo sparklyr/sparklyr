@@ -9,6 +9,7 @@
 #' @param rank Rank of the factorization.
 #' @param regularization.parameter The regularization parameter.
 #' @template roxlate-ml-iter-max
+#' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
 #' @family Spark ML routines
@@ -21,15 +22,13 @@ ml_als_factorization <- function(x,
                                  rank = 10L,
                                  regularization.parameter = 0.1,
                                  iter.max = 10L,
+                                 ml.options = NULL,
                                  ...)
 {
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
-  dots <- list(...)
-  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
-    iter.max <- dots[["max.iter"]]
+  ml_backwards_compatibility_api()
 
   rating.column <- ensure_scalar_character(rating.column)
   user.column <- ensure_scalar_character(user.column)
@@ -37,7 +36,7 @@ ml_als_factorization <- function(x,
   rank <- ensure_scalar_integer(rank)
   regularization.parameter <- ensure_scalar_double(regularization.parameter)
   iter.max <- ensure_scalar_integer(iter.max)
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  only.model <- ensure_scalar_boolean(ml.options$only.model, default = FALSE)
 
   envir <- new.env(parent = emptyenv())
 
@@ -57,7 +56,7 @@ ml_als_factorization <- function(x,
     invoke("setRegParam", regularization.parameter) %>%
     invoke("setMaxIter", iter.max)
 
-  if (only_model)
+  if (only.model)
     return(model)
 
   fit <- invoke(model, "fit", df)

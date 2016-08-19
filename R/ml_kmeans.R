@@ -33,10 +33,7 @@ ml_kmeans <- function(x,
 
   df <- ml_prepare_features(df, features)
 
-  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
-  dots <- list(...)
-  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
-    iter.max <- dots[["max.iter"]]
+  ml_backwards_compatibility_api()
 
   centers <- ensure_scalar_integer(centers)
   iter.max <- ensure_scalar_integer(iter.max)
