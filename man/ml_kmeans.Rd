@@ -4,7 +4,7 @@
 \alias{ml_kmeans}
 \title{Spark ML -- K-Means Clustering}
 \usage{
-ml_kmeans(x, centers, max.iter = 100, features = dplyr::tbl_vars(x),
+ml_kmeans(x, centers, iter.max = 100, features = dplyr::tbl_vars(x),
   compute.cost = TRUE, tolerance = 1e-04, ...)
 }
 \arguments{
@@ -13,13 +13,13 @@ ml_kmeans(x, centers, max.iter = 100, features = dplyr::tbl_vars(x),
 
 \item{centers}{The number of cluster centers to compute.}
 
-\item{max.iter}{The maximum number of iterations to use.}
+\item{iter.max}{The maximum number of iterations to use.}
 
 \item{features}{The name of features (terms) to use for the model fit.}
 
 \item{compute.cost}{Whether to compute cost for \code{k-means} model using Spark's \href{https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/KMeansModel.scala#L84}{computeCost}.}
 
-\item{tolerance}{Param for the convergence tolerance for iterative algorithms..}
+\item{tolerance}{Param for the convergence tolerance for iterative algorithms.}
 
 \item{...}{Optional arguments; currently unused.}
 }

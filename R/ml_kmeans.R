@@ -4,7 +4,7 @@
 #'
 #' @template roxlate-ml-x
 #' @param centers The number of cluster centers to compute.
-#' @template roxlate-ml-max-iter
+#' @template roxlate-ml-iter-max
 #' @template roxlate-ml-features
 #' @template roxlate-ml-dots
 #' @template roxlate-ml-compute-cost
@@ -22,7 +22,7 @@
 #' @export
 ml_kmeans <- function(x,
                       centers,
-                      max.iter = 100,
+                      iter.max = 100,
                       features = dplyr::tbl_vars(x),
                       compute.cost = TRUE,
                       tolerance = 0.0001,
@@ -33,8 +33,13 @@ ml_kmeans <- function(x,
 
   df <- ml_prepare_features(df, features)
 
+  # allow 'max.iter' as a backwards compatible alias for 'iter.max'
+  dots <- list(...)
+  if (missing(iter.max) && !is.null(dots[["max.iter"]]))
+    iter.max <- dots[["max.iter"]]
+
   centers <- ensure_scalar_integer(centers)
-  max.iter <- ensure_scalar_integer(max.iter)
+  iter.max <- ensure_scalar_integer(iter.max)
   only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
   tolerance <- ensure_scalar_double(tolerance)
 
@@ -52,7 +57,7 @@ ml_kmeans <- function(x,
 
   model <- kmeans %>%
     invoke("setK", centers) %>%
-    invoke("setMaxIter", max.iter) %>%
+    invoke("setMaxIter", iter.max) %>%
     invoke("setTol", tolerance) %>%
     invoke("setFeaturesCol", envir$features)
 
