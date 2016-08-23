@@ -132,7 +132,7 @@ object Utils {
   def collect(df: DataFrame): Array[_] = {
     val local : Array[Row] = df.collect()
     val dtypes = df.dtypes
-    (0 until dtypes.length).par.map{i => collectImpl(local, i, dtypes(i)._2)}.toArray
+    (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2)}.toArray
   }
 
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
