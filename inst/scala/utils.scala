@@ -93,6 +93,13 @@ object Utils {
     }}
   }
 
+  def collectImplLong(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Long]) el.asInstanceOf[Long] else scala.Long.MinValue
+    }}
+  }
+
   def collectImplString(local: Array[Row], idx: Integer) = {
     var text = local.map{row => {
       val el = row(idx)
@@ -124,6 +131,7 @@ object Utils {
       case "IntegerType"   => collectImplInteger(local, idx)
       case "DoubleType"    => collectImplDouble(local, idx)
       case "StringType"    => collectImplString(local, idx)
+      case "LongType"      => collectImplLong(local, idx)
       case decimalType(_)  => collectImplDecimal(local, idx)
       case _               => collectImplDefault(local, idx)
     }
