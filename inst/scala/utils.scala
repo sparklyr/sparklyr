@@ -102,17 +102,30 @@ object Utils {
     if (text.length() > 0) text + "\n" else text
   }
 
+  def collectImplDecimal(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[java.math.BigDecimal])
+        el.asInstanceOf[java.math.BigDecimal].doubleValue
+      else
+        scala.Double.NaN
+    }}
+  }
+
   def collectImplDefault(local: Array[Row], idx: Integer) = {
     local.map(row => row(idx))
   }
 
   def collectImpl(local: Array[Row], idx: Integer, colType: String) = {
+    val decimalType = "(DecimalType.*)".r
+
     colType match {
-      case "BooleanType" => collectImplBoolean(local, idx)
-      case "IntegerType" => collectImplInteger(local, idx)
-      case "DoubleType"  => collectImplDouble(local, idx)
-      case "StringType"  => collectImplString(local, idx)
-      case _             => collectImplDefault(local, idx)
+      case "BooleanType"   => collectImplBoolean(local, idx)
+      case "IntegerType"   => collectImplInteger(local, idx)
+      case "DoubleType"    => collectImplDouble(local, idx)
+      case "StringType"    => collectImplString(local, idx)
+      case decimalType(_)  => collectImplDecimal(local, idx)
+      case _               => collectImplDefault(local, idx)
     }
   }
 
