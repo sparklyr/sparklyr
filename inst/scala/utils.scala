@@ -100,6 +100,36 @@ object Utils {
     }}
   }
 
+  def collectImplByte(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Byte]) el.asInstanceOf[Byte] else scala.Byte.MinValue
+    }}
+  }
+
+  def collectImplFloat(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Float]) el.asInstanceOf[Float] else scala.Float.MinValue
+    }}
+  }
+
+  def collectImplShort(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Short]) el.asInstanceOf[Short] else scala.Short.MinValue
+    }}
+  }
+
+  def collectImplForceString(local: Array[Row], idx: Integer) = {
+    var text = local.map{row => {
+      val el = row(idx)
+      el.toString()
+    }}.mkString("\n")
+
+    if (text.length() > 0) text + "\n" else text
+  }
+
   def collectImplString(local: Array[Row], idx: Integer) = {
     var text = local.map{row => {
       val el = row(idx)
@@ -127,11 +157,21 @@ object Utils {
     val decimalType = "(DecimalType.*)".r
 
     colType match {
-      case "BooleanType"   => collectImplBoolean(local, idx)
-      case "IntegerType"   => collectImplInteger(local, idx)
-      case "DoubleType"    => collectImplDouble(local, idx)
-      case "StringType"    => collectImplString(local, idx)
-      case "LongType"      => collectImplLong(local, idx)
+      case "BooleanType"          => collectImplBoolean(local, idx)
+      case "IntegerType"          => collectImplInteger(local, idx)
+      case "DoubleType"           => collectImplDouble(local, idx)
+      case "StringType"           => collectImplString(local, idx)
+      case "LongType"             => collectImplLong(local, idx)
+
+      case "ByteType"             => collectImplByte(local, idx)
+      case "FloatType"            => collectImplFloat(local, idx)
+      case "ShortType"            => collectImplShort(local, idx)
+      case "Decimal"              => collectImplForceString(local, idx)
+
+      case "TimestampType"        => collectImplForceString(local, idx)
+      case "CalendarIntervalType" => collectImplForceString(local, idx)
+      case "DateType"             => collectImplForceString(local, idx)
+
       case decimalType(_)  => collectImplDecimal(local, idx)
       case _               => collectImplDefault(local, idx)
     }
