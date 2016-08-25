@@ -9,7 +9,7 @@
 #' Read Spark configuration using the \pkg{\link[config]{config}} package.
 #'
 #' @return Named list with configuration data
-spark_config <- function(file = "config.yml", use_default = TRUE) {
+spark_config <- function(file = "config.yml", use_default = TRUE, extraConfig = NULL) {
   baseConfig <- list()
 
   if (use_default) {
@@ -17,7 +17,8 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
     baseConfig <- config::get(file = localConfigFile)
   }
 
-  userConfig <- tryCatch(config::get(file = file), error = function(e) NULL)
+  userConfig <- merge_lists(tryCatch(config::get(file = file), error = function(e) NULL),
+                            extraConfig)
 
   mergedConfig <- merge_lists(baseConfig, userConfig)
   mergedConfig
