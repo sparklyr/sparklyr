@@ -4,12 +4,14 @@
 \alias{spark_config}
 \title{Read Spark Configuration}
 \usage{
-spark_config(file = "config.yml", use_default = TRUE)
+spark_config(file = "config.yml", use_default = TRUE, extraConfig = NULL)
 }
 \arguments{
 \item{file}{Name of the configuration file}
 
 \item{use_default}{TRUE to use the built-in detaults provided in this package}
+
+\item{extraConfig}{List of configuration parameters provided by the user}
 }
 \value{
 Named list with configuration data

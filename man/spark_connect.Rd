@@ -6,7 +6,7 @@
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
   method = c("shell"), app_name = "sparklyr", version = NULL,
-  hadoop_version = NULL, config = spark_config(),
+  hadoop_version = NULL, config = NULL,
   extensions = sparklyr::registered_extensions())
 }
 \arguments{

@@ -3,6 +3,7 @@
 #' @export
 #' @param file Name of the configuration file
 #' @param use_default TRUE to use the built-in detaults provided in this package
+#' @param extraConfig List of configuration parameters provided by the user
 #'
 #' @details
 #'
