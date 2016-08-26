@@ -124,7 +124,7 @@ object Utils {
   def collectImplForceString(local: Array[Row], idx: Integer) = {
     var text = local.map{row => {
       val el = row(idx)
-      el.toString()
+      if (el != null) el.toString() else "<NA>"
     }}.mkString("\n")
 
     if (text.length() > 0) text + "\n" else text
