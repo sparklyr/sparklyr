@@ -16,12 +16,15 @@ ensure_round_trip <- function(sc, data) {
 }
 
 test_that("objects survive Spark roundtrips", {
+  skip_on_cran()
+
   datasets <- list(mtcars = mtcars)
   for (dataset in datasets)
     ensure_round_trip(sc, dataset)
 })
 
 test_that("primitive values survive Spark roundtrips", {
+  skip_on_cran()
 
   n <- 10
   df <- data.frame(
@@ -37,6 +40,7 @@ test_that("primitive values survive Spark roundtrips", {
 })
 
 test_that("NA values survive Spark roundtrips", {
+  skip_on_cran()
 
   n <- 10
   df <- data.frame(

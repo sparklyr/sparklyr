@@ -3,6 +3,7 @@ sc <- testthat_spark_connection()
 
 test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits", {
   skip_on_cran()
+
   if (spark_version(sc) < "2.0.0")
     skip("requires Spark 2.0.0")
 
