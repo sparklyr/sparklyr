@@ -18,12 +18,21 @@
 #' @name   ml_saveload
 #' @export
 ml_load <- function(sc, file) {
+  ensure_scalar_character(file)
+  file <- path.expand(file)
 
   # read the R metadata
   r <- readRDS(file.path(file, "metadata.rds"))
 
+  # determine Model class name from fit object name
+  rModelName <- regex_replace(
+    r$model.parameters$model,
+    "Classifier$" = "Classification",
+    "Regressor$"  = "Regression"
+  )
+
   # read the Spark model
-  modelName <- paste(r$model.parameters$model, "Model", sep = "")
+  modelName <- paste0(rModelName, "Model")
   model <- invoke_static(sc, modelName, "load", file)
 
   # attach back to R object
@@ -37,6 +46,7 @@ ml_load <- function(sc, file) {
 #' @export
 ml_save <- function(model, file) {
   ensure_scalar_character(file)
+  file <- path.expand(file)
 
   # save the Spark bits
   invoke(model$.model, "save", file)
@@ -48,3 +58,4 @@ ml_save <- function(model, file) {
 
   file
 }
+
