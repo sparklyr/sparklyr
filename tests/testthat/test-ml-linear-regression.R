@@ -1,4 +1,5 @@
-context("LM")
+context("lm")
+sc <- testthat_spark_connection()
 
 expect_coef_equal <- function(lhs, rhs) {
   nm <- names(lhs)
@@ -12,10 +13,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   skip_on_cran()
   skip_if_not_installed("glmnet")
 
-  sc <- spark_connect("local", version = "2.0.0-preview")
-  on.exit(spark_disconnect(sc))
-
-  copy_to(sc, mtcars, "mtcars")
+  copy_to(sc, mtcars, overwrite = TRUE)
   mtcars_tbl <- tbl(sc, "mtcars")
 
   values <- seq(0, 0.5, by = 0.1)

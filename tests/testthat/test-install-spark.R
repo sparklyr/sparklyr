@@ -1,6 +1,6 @@
 library(testthat)
 
-context("Install")
+context("install")
 
 test_that_spark_download <- function() {
   versions <- spark_versions(latest = FALSE)

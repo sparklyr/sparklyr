@@ -1,4 +1,5 @@
-context("Serialization")
+context("serialization")
+sc <- testthat_spark_connection()
 
 ensure_round_trip <- function(sc, data) {
   # round-trip data through Spark
@@ -15,13 +16,9 @@ ensure_round_trip <- function(sc, data) {
 }
 
 test_that("objects survive Spark roundtrips", {
-  sc <- spark_connect(master = "local[*]", version = "1.6.1")
-
   datasets <- list(mtcars = mtcars)
-
   for (dataset in datasets)
     ensure_round_trip(sc, dataset)
-
 })
 
 test_that("primitive values survive Spark roundtrips", {
@@ -35,7 +32,6 @@ test_that("primitive values survive Spark roundtrips", {
     stringsAsFactors = FALSE
   )
 
-  sc <- spark_connect(master = "local[*]", version = "1.6.1")
   ensure_round_trip(sc, df)
 
 })
@@ -53,6 +49,5 @@ test_that("NA values survive Spark roundtrips", {
 
   df[n / 2, ] <- NA
 
-  sc <- spark_connect(master = "local[*]", version = "1.6.1")
   ensure_round_trip(sc, df)
 })

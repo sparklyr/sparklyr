@@ -1,4 +1,5 @@
-context("Clustering")
+context("clustering")
+sc <- testthat_spark_connection()
 
 expect_centers_equal <- function(lhs, rhs, ...) {
   nm <- colnames(lhs)
@@ -11,14 +12,10 @@ expect_centers_equal <- function(lhs, rhs, ...) {
 
 test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
   skip_on_cran()
-  skip_if_not_installed("dplyr");library(dplyr)
+  skip_if_not_installed("dplyr")
 
-  sc <- tryCatch(
-    spark_connect("local", version = "2.0.0"),
-    error = function(e) skip("requires Spark 2.0.0")
-  )
-
-  on.exit(spark_disconnect(sc))
+  library(dplyr)
+  data(iris)
 
   iris_tbl <- dplyr::copy_to(sc, iris, "iris", overwrite = TRUE)
 
