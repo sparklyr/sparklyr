@@ -15,6 +15,7 @@ sql_translate_env.spark_connection <- function(con) {
       as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
       as.character  = function(x) build_sql("CAST(", x, " AS STRING)"),
       as.date  = function(x) build_sql("CAST(", x, " AS DATE)"),
+      as.Date  = function(x) build_sql("CAST(", x, " AS DATE)"),
       paste = function(...) build_sql("CONCAT", list(...)),
       xor = function(x, y) build_sql(x, " ^ ", y),
       or = function(x, y) build_sql(x, " or ", y),
