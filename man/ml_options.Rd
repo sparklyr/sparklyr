@@ -6,7 +6,8 @@
 \usage{
 ml_options(id.column = random_string("id"),
   response.column = random_string("response"),
-  features.column = random_string("features"), only.model = FALSE, ...)
+  features.column = random_string("features"), model.transform = NULL,
+  only.model = FALSE, ...)
 }
 \arguments{
 \item{id.column}{The name to assign to the generated id column.}
@@ -14,6 +15,10 @@ ml_options(id.column = random_string("id"),
 \item{response.column}{The name to assign to the generated response column.}
 
 \item{features.column}{The name to assign to the generated features column.}
+
+\item{model.transform}{An optional \R function that accepts a Spark model
+and returns a Spark model. This can be used to supply optional Spark model
+fitting parameters not made available in the \code{sparklyr} APIs.}
 
 \item{only.model}{Boolean; should the Spark model object itself be returned
 without fitting the actual model? Useful for \code{\link{ml_one_vs_rest}}.}

@@ -42,7 +42,7 @@ ml_logistic_regression <- function(x,
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
   iter.max <- ensure_scalar_integer(iter.max)
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   envir <- new.env(parent = emptyenv())
 
@@ -64,7 +64,7 @@ ml_logistic_regression <- function(x,
     invoke("setElasticNetParam", as.double(alpha)) %>%
     invoke("setRegParam", as.double(lambda))
 
-  if (only_model) return(model)
+  if (only.model) return(model)
 
   fit <- model %>%
     invoke("fit", tdf)

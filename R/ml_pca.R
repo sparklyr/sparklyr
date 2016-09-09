@@ -21,7 +21,7 @@ ml_pca <- function(x,
 
   ml_prepare_features(df, features)
 
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   envir <- new.env(parent = emptyenv())
 
@@ -39,7 +39,11 @@ ml_pca <- function(x,
     invoke("setK", length(features)) %>%
     invoke("setInputCol", envir$features)
 
-  if (only_model) return(model)
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
+
+  if (only.model)
+    return(model)
 
   fit <- model %>%
     invoke("fit", tdf)

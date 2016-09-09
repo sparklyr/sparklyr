@@ -3,7 +3,8 @@
 #' Perform regression or classification using one vs rest.
 #'
 #' @template roxlate-ml-x
-#' @param classifier The classifier model. Can be obtained using the \code{only_model} parameter.
+#' @param classifier The classifier model. These model objects can be obtained through
+#'   the use of the \code{only.model} parameter supplied with \code{\link{ml_options}}.
 #' @template roxlate-ml-response
 #' @template roxlate-ml-features
 #' @template roxlate-ml-options
@@ -44,10 +45,15 @@ ml_one_vs_rest <- function(x,
   envir$model <- "org.apache.spark.ml.classification.OneVsRest"
   ovrc <- invoke_new(sc, envir$model)
 
-  fit <- ovrc %>%
+  model <- ovrc %>%
     invoke("setClassifier", classifier) %>%
     invoke("setFeaturesCol", envir$features) %>%
-    invoke("setLabelCol", envir$response) %>%
+    invoke("setLabelCol", envir$response)
+
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
+
+  fit <- model %>%
     invoke("fit", tdf)
 
   ml_model("one_vs_rest", fit,

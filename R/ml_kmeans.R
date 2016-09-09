@@ -39,7 +39,7 @@ ml_kmeans <- function(x,
 
   centers <- ensure_scalar_integer(centers)
   iter.max <- ensure_scalar_integer(iter.max)
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  only.model <- ensure_scalar_boolean(ml.options$only.model)
   tolerance <- ensure_scalar_double(tolerance)
 
   envir <- new.env(parent = emptyenv())
@@ -60,8 +60,11 @@ ml_kmeans <- function(x,
     invoke("setTol", tolerance) %>%
     invoke("setFeaturesCol", envir$features)
 
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
 
-  if (only_model) return(model)
+  if (only.model)
+    return(model)
 
   fit <- model %>%
     invoke("fit", tdf)

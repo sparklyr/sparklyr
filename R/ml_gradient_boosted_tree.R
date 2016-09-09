@@ -38,7 +38,7 @@ ml_gradient_boosted_trees <- function(x,
 
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  only.model <- ensure_scalar_boolean(ml.options$only.model)
   type <- match.arg(type)
 
   envir <- new.env(parent = emptyenv())
@@ -74,7 +74,11 @@ ml_gradient_boosted_trees <- function(x,
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth)
 
-  if (only_model) return(model)
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
+
+  if (only.model)
+    return(model)
 
   fit <- model %>%
     invoke("fit", tdf)

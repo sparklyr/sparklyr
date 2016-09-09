@@ -11,7 +11,8 @@ ml_one_vs_rest(x, classifier, response, features, ml.options = ml_options(),
 \item{x}{An object coercable to a Spark DataFrame (typically, a
 \code{tbl_spark}).}
 
-\item{classifier}{The classifier model. Can be obtained using the \code{only_model} parameter.}
+\item{classifier}{The classifier model. These model objects can be obtained through
+the use of the \code{only.model} parameter supplied with \code{\link{ml_options}}.}
 
 \item{response}{The name of the response vector (as a length-one character
 vector), or a formula, giving a symbolic description of the model to be

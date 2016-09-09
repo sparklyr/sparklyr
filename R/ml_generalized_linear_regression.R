@@ -48,7 +48,7 @@ ml_generalized_linear_regression <-
   )
 
   iter.max <- ensure_scalar_integer(iter.max)
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   # parse 'family' argument in similar way to R's glm
   if (is.character(family))
@@ -86,7 +86,11 @@ ml_generalized_linear_regression <-
     invoke("setFamily", family) %>%
     invoke("setLink", link)
 
-  if (only_model) return(model)
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
+
+  if (only.model)
+    return(model)
 
   fit <- model %>%
     invoke("fit", tdf)

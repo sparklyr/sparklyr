@@ -32,7 +32,7 @@ ml_naive_bayes <- function(x,
     categorical.transformations
   )
 
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   envir <- new.env(parent = emptyenv())
 
@@ -51,7 +51,11 @@ ml_naive_bayes <- function(x,
     invoke("setLabelCol", envir$response) %>%
     invoke("setSmoothing", lambda)
 
-  if (only_model) return(model)
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
+
+  if (only.model)
+    return(model)
 
   fit <- model %>%
     invoke("fit", tdf)

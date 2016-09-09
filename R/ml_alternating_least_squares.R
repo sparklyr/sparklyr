@@ -56,6 +56,9 @@ ml_als_factorization <- function(x,
     invoke("setRegParam", regularization.parameter) %>%
     invoke("setMaxIter", iter.max)
 
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
+
   if (only.model)
     return(model)
 

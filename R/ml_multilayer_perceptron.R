@@ -44,7 +44,7 @@ ml_multilayer_perceptron <- function(x,
   layers <- as.integer(layers)
   iter.max <- ensure_scalar_integer(iter.max)
   seed <- ensure_scalar_integer(seed)
-  only_model <- ensure_scalar_boolean(list(...)$only_model, default = FALSE)
+  only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   envir <- new.env(parent = emptyenv())
 
@@ -67,7 +67,11 @@ ml_multilayer_perceptron <- function(x,
     invoke("setSeed", seed) %>%
     invoke("setMaxIter", iter.max)
 
-  if (only_model) return(model)
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
+
+  if (only.model)
+    return(model)
 
   fit <- model %>%
     invoke("fit", tdf)
