@@ -187,7 +187,12 @@ print.spark_log <- function(x, ...) {
 #'
 #' @export
 spark_web <- function(sc, ...) {
-  UseMethod("spark_web")
+  if (!is.null(sc$config$sparklyr.sparkui.url)) {
+    structure(sc$config$sparklyr.sparkui.url, class = "spark_web_url")
+  }
+  else {
+    UseMethod("spark_web")
+  }
 }
 
 #' @export
