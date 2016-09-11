@@ -31,7 +31,7 @@ ml_lda <- function(x,
                    k = length(features),
                    alpha = (50 / k) + 1,
                    beta = 0.1 + 1,
-                   ml.options = NULL,
+                   ml.options = ml_options(),
                    ...) {
    assert_that(alpha > 1)
 
