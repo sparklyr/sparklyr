@@ -47,7 +47,7 @@ sc <- spark_connect(master = "local")
 
 The returned Spark connection (`sc`) provides a remote dplyr data source to the Spark cluster.
 
-For more information on connecting to remote Spark clusters see the [Deployment](http://spark.rstudio.com/deployment.html) section.of the sparklyr website.
+For more information on connecting to remote Spark clusters see the [Deployment](http://spark.rstudio.com/deployment.html) section of the sparklyr website.
 
 Using dplyr
 -----------
