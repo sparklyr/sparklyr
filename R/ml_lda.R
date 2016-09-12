@@ -32,16 +32,18 @@ ml_lda <- function(x,
                    alpha = (50 / k) + 1,
                    beta = 0.1 + 1,
                    ml.options = ml_options(),
-                   ...) {
-   assert_that(alpha > 1)
-
+                   ...)
+{
+  stopifnot(alpha > 1)
 
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
   ml_prepare_features(df, features)
 
-  k <- ensure_scalar_integer(k)
+  alpha      <- ensure_scalar_double(alpha)
+  beta       <- ensure_scalar_double(beta)
+  k          <- ensure_scalar_integer(k)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   envir <- new.env(parent = emptyenv())
@@ -56,11 +58,11 @@ ml_lda <- function(x,
   envir$model <- "org.apache.spark.ml.clustering.LDA"
   lda <- invoke_new(sc, envir$model)
 
-   model <- lda %>%
-     invoke("setK", k) %>%
-     invoke("setFeaturesCol", envir$features) %>%
-     invoke("setTopicConcentration", beta) %>%
-     invoke("setDocConcentration", alpha)
+  model <- lda %>%
+    invoke("setK", k) %>%
+    invoke("setFeaturesCol", envir$features) %>%
+    invoke("setTopicConcentration", as.double(beta)) %>%
+    invoke("setDocConcentration", as.double(alpha))
 
   if (is.function(ml.options$model.transform))
     model <- ml.options$model.transform(model)
