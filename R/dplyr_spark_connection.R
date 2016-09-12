@@ -3,6 +3,43 @@ sql_escape_ident.spark_connection <- function(con, x) {
   sql_quote(x, '`')
 }
 
+build_sql_if_compare <- function(..., con, compare) {
+  args <- list(...)
+
+  build_sql_if_parts <- function(ifParts, ifValues) {
+    if(length(ifParts) == 1) return(ifParts[[1]])
+
+    current <- ifParts[[1]]
+    currentName <- ifValues[[1]]
+    build_sql(
+      "if(",
+      current,
+      ", ",
+      currentName,
+      ", ",
+      build_sql_if_parts(ifParts[-1], ifValues[-1]),
+      ")"
+    )
+  }
+
+  thisIdx <- 0
+  conditions <- lapply(seq_along(args), function(idx) {
+    thisIdx <<- thisIdx + 1
+    e <- args[[idx]]
+
+    if (thisIdx == length(args)) {
+      e
+    } else {
+      indexes <- Filter(function(innerIdx) innerIdx > thisIdx, seq_along(args))
+      ifValues <- lapply(indexes, function(e) args[[e]])
+
+      sql(paste(e, compare, ifValues, collapse = " and "))
+    }
+  })
+
+  build_sql_if_parts(conditions, args)
+}
+
 #' @export
 sql_translate_env.spark_connection <- function(con) {
   dplyr::sql_variant(
@@ -20,7 +57,9 @@ sql_translate_env.spark_connection <- function(con) {
       paste0 = function(...) build_sql("CONCAT", list(...)),
       xor = function(x, y) build_sql(x, " ^ ", y),
       or = function(x, y) build_sql(x, " or ", y),
-      and = function(x, y) build_sql(x, " and ", y)
+      and = function(x, y) build_sql(x, " and ", y),
+      pmin = function(...) build_sql_if_compare(..., con = con, compare = " <= "),
+      pmax = function(...) build_sql_if_compare(..., con = con, compare = " >= ")
     ),
 
     aggregate = dplyr::sql_translator(
