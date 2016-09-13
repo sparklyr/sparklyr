@@ -58,8 +58,8 @@ sql_translate_env.spark_connection <- function(con) {
       xor = function(x, y) build_sql(x, " ^ ", y),
       or = function(x, y) build_sql(x, " or ", y),
       and = function(x, y) build_sql(x, " and ", y),
-      pmin = function(...) build_sql_if_compare(..., con = con, compare = " <= "),
-      pmax = function(...) build_sql_if_compare(..., con = con, compare = " >= ")
+      pmin = function(...) build_sql_if_compare(..., con = con, compare = "<="),
+      pmax = function(...) build_sql_if_compare(..., con = con, compare = ">=")
     ),
 
     aggregate = dplyr::sql_translator(
