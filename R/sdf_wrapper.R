@@ -38,15 +38,23 @@ sdf_deserialize_column <- function(column) {
   column
 }
 
-sdf_read_column <- function(object, colName) {
-  sc <- spark_connection(object)
+#' Read a Column from a Spark DataFrame
+#'
+#' Read a single column from a Spark DataFrame, and return
+#' the contents of that column back to \R.
+#'
+#' @template roxlate-ml-x
+#' @param column The name of a column within \code{x}.
+#' @export
+sdf_read_column <- function(x, column) {
+  sc <- spark_connection(x)
+  sdf <- spark_dataframe(x)
 
-  sdf <- spark_dataframe(object)
   schema <- sdf_schema(sdf)
-  colType <- schema[[colName]]$type
+  colType <- schema[[column]]$type
 
   column <- sc %>%
-    invoke_static("sparklyr.Utils", "collectColumn", sdf, colName, colType) %>%
+    invoke_static("sparklyr.Utils", "collectColumn", sdf, column, colType) %>%
     sdf_deserialize_column()
 
   column
