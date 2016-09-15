@@ -22,7 +22,8 @@ sd_section(
     "spark_read_parquet",
     "spark_write_csv",
     "spark_write_json",
-    "spark_write_parquet"
+    "spark_write_parquet",
+    "sdf-saveload"
   )
 )
 
@@ -40,6 +41,7 @@ sd_section(
   "Spark DataFrames",
   "Functions for maniplulating Spark DataFrames",
   c(
+    "na.replace",
     "sdf_copy_to",
     "sdf_mutate",
     "sdf_partition",
@@ -74,16 +76,6 @@ sd_section(
 )
 
 sd_section(
-  "Machine Learning Utilities",
-  "Functions for interacting with Spark ML model fits",
-  c(
-    "ml_binary_classification_eval",
-    "ml_classification_eval",
-    "ml_tree_feature_importance"
-  )
-)
-
-sd_section(
   "Machine Learning Transformers",
   "Functions for transforming features in Spark DataFrames",
   c(
@@ -101,7 +93,18 @@ sd_section(
 )
 
 sd_section(
-  "Machine Learning Utility Functions",
+  "Machine Learning Utilities",
+  "Functions for interacting with Spark ML model fits",
+  c(
+    "ml_binary_classification_eval",
+    "ml_classification_eval",
+    "ml_tree_feature_importance",
+    "ml_saveload"
+  )
+)
+
+sd_section(
+  "Machine Learning Extensions",
   "Functions for creating custom wrappers to other Spark ML algorithms",
   c(
     "ensure",
