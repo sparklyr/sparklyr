@@ -118,7 +118,7 @@ sd_section(
 
 sd_section(
   "Extensions API",
-  "Functions for creating extensions to the sparklyr package",
+  "Functions for creating extensions to the sparklyr package.",
   c(
     "compile_package_jars",
     "connection_config",
