@@ -41,7 +41,6 @@ sd_section(
   "Functions for maniplulating Spark DataFrames",
   c(
     "sdf_copy_to",
-    "sdf_import",
     "sdf_mutate",
     "sdf_partition",
     "sdf_predict",
@@ -105,10 +104,7 @@ sd_section(
   "Machine Learning Utility Functions",
   "Functions for creating custom wrappers to other Spark ML algorithms",
   c(
-    "ensure_scalar_boolean",
-    "ensure_scalar_character",
-    "ensure_scalar_double",
-    "ensure_scalar_integer",
+    "ensure",
     "ml_create_dummy_variables",
     "ml_model",
     "ml_options",
@@ -126,8 +122,6 @@ sd_section(
     "find_scalac",
     "hive_context",
     "invoke",
-    "invoke_new",
-    "invoke_static",
     "java_context",
     "register_extension",
     "spark_compilation_spec",
