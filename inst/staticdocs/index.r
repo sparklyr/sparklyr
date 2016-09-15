@@ -2,7 +2,7 @@ library(staticdocs)
 
 sd_section(
   "Connecting to Spark",
-  "Functions for installing Spark components and managing connections to Spark",
+  "Functions for installing Spark components and managing connections to Spark.",
   c(
     "spark_config",
     "spark_connect",
@@ -15,7 +15,7 @@ sd_section(
 
 sd_section(
   "Reading and Writing Data",
-  "Functions for reading and writing Spark DataFrames",
+  "Functions for reading and writing Spark DataFrames.",
   c(
     "spark_read_csv",
     "spark_read_json",
@@ -29,7 +29,7 @@ sd_section(
 
 sd_section(
   "dplyr Interface",
-  "Functions implementing a dplyr backend for Spark DataFrames",
+  "Functions implementing a dplyr backend for Spark DataFrames.",
   c(
     "copy_to",
     "tbl_cache",
@@ -39,7 +39,7 @@ sd_section(
 
 sd_section(
   "Spark DataFrames",
-  "Functions for maniplulating Spark DataFrames",
+  "Functions for maniplulating Spark DataFrames.",
   c(
     "na.replace",
     "sdf_copy_to",
@@ -56,7 +56,7 @@ sd_section(
 
 sd_section(
   "Machine Learning Algorithms",
-  "Functions for invoking machine learning algorithms",
+  "Functions for invoking machine learning algorithms.",
   c(
     "ml_als_factorization",
     "ml_decision_tree",
@@ -77,7 +77,7 @@ sd_section(
 
 sd_section(
   "Machine Learning Transformers",
-  "Functions for transforming features in Spark DataFrames",
+  "Functions for transforming features in Spark DataFrames.",
   c(
     "ft_binarizer",
     "ft_bucketizer",
@@ -94,7 +94,7 @@ sd_section(
 
 sd_section(
   "Machine Learning Utilities",
-  "Functions for interacting with Spark ML model fits",
+  "Functions for interacting with Spark ML model fits.",
   c(
     "ml_binary_classification_eval",
     "ml_classification_eval",
@@ -105,7 +105,7 @@ sd_section(
 
 sd_section(
   "Machine Learning Extensions",
-  "Functions for creating custom wrappers to other Spark ML algorithms",
+  "Functions for creating custom wrappers to other Spark ML algorithms.",
   c(
     "ensure",
     "ml_create_dummy_variables",
