@@ -77,6 +77,17 @@ object Backend {
     }
 
     val backend = new Backend()
+    var service = new Service()
+
+    try {
+      service.run()
+    } catch {
+      case e: IOException =>
+        logError("Service shutting down: failed with exception ", e)
+        service.stop()
+        System.exit(1)
+    }
+
     try {
       // bind to random port
       val boundPort = backend.init()
@@ -108,6 +119,8 @@ object Backend {
             inSocket.getInputStream().read(buf)
           } finally {
             backend.close()
+            service.stop()
+
             System.exit(0)
           }
         }
@@ -118,6 +131,8 @@ object Backend {
       case e: IOException =>
         logError("Server shutting down: failed with exception ", e)
         backend.close()
+        service.stop()
+
         System.exit(1)
     }
     System.exit(0)
