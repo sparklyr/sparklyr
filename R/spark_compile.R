@@ -143,6 +143,7 @@ compile_package_jars <- function(..., spec = NULL) {
     jar_name      <- el$jar_name
     scalac_path   <- el$scalac_path
     filter        <- el$scala_filter
+    web_jars      <- el$web_jars
 
     # try to automatically download + install Spark
     if (is.null(spark_home) && !is.null(spark_version)) {
@@ -150,6 +151,32 @@ compile_package_jars <- function(..., spec = NULL) {
       spark_install(spark_version, verbose = TRUE)
       spark_home <- spark_home_dir(spark_version)
     }
+
+    lapply(names(web_jars), function(web_jar_name) {
+      web_jar <- web_jars[[web_jar_name]]
+      message("==> downloading web jar ", web_jar_name)
+
+      dest_jar_dir <- file.path(getwd(), "inst", "jars", web_jar_name)
+      if (!file.exists(dest_jar_dir)) {
+        dir.create(dest_jar_dir, recursive = TRUE)
+
+        downloaded_jar <- tempfile()
+        download.file(
+          web_jar,
+          destfile = downloaded_jar
+        )
+
+        jars_dir <- tempdir()
+        unzip(downloaded_jar, exdir = jars_dir)
+
+        jars_list <- list.files(jars_dir, recursive = TRUE, pattern = "*.jar")
+
+        message("==> extracting ", length(jars_list), " jars to ", dest_jar_dir)
+        lapply(jars_list, function(jar) {
+          file.copy(from = file.path(jars_dir, jar), to = dest_jar_dir)
+        })
+      }
+    })
 
     spark_compile(
       jar_name = jar_name,
@@ -186,13 +213,15 @@ compile_package_jars <- function(..., spec = NULL) {
 #'   useful if you have auxiliary files that should only be included with
 #'   certain versions of Spark.
 #' @param jar_name The name to be assigned to the generated \code{jar}.
+#' @param web_jars A list of named urls poining to zip files containing \code{jar} files.
 #'
 #' @export
 spark_compilation_spec <- function(spark_version = NULL,
                                    spark_home = NULL,
                                    scalac_path = NULL,
                                    scala_filter = NULL,
-                                   jar_name = NULL)
+                                   jar_name = NULL,
+                                   web_jars = NULL)
 {
   spark_home    <- spark_home %||% spark_home_dir(spark_version)
   spark_version <- spark_version %||% spark_version_from_home(spark_home)
@@ -201,7 +230,8 @@ spark_compilation_spec <- function(spark_version = NULL,
        spark_home = spark_home,
        scalac_path = scalac_path,
        scala_filter = scala_filter,
-       jar_name = jar_name)
+       jar_name = jar_name,
+       web_jars = web_jars)
 }
 
 #' Default Compilation Specification for Spark Extensions
@@ -213,15 +243,22 @@ spark_compilation_spec <- function(spark_version = NULL,
 #' @export
 spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
   list(
-    spark_compilation_spec(
-      spark_version = "1.6.1",
-      scalac_path = find_scalac("2.10"),
-      jar_name = sprintf("%s-1.6-2.10.jar", pkg)
-    ),
+    #spark_compilation_spec(
+    #  spark_version = "1.6.1",
+    #  scalac_path = find_scalac("2.10"),
+    #  jar_name = sprintf("%s-1.6-2.10.jar", pkg)
+    #),
     spark_compilation_spec(
       spark_version = "2.0.0",
       scalac_path = find_scalac("2.11"),
-      jar_name = sprintf("%s-2.0-2.11.jar", pkg)
+      jar_name = sprintf("%s-2.0-2.11.jar", pkg),
+      web_jars = list(
+        jetty = paste0(
+          "http://repo1.maven.org/maven2/org/eclipse/",
+          "jetty/jetty-distribution/9.2.18.v20160721/",
+          "jetty-distribution-9.2.18.v20160721.zip"
+        )
+      )
     )
   )
 }
