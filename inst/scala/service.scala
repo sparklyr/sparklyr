@@ -9,12 +9,12 @@ import org.mortbay.jetty.Server
 import org.mortbay.jetty.handler.AbstractHandler
 
 class ServiceHandler extends AbstractHandler {
-  var html = <h1>Hello World</h1>
-
   def handle(target: String, request: HttpServletRequest, response: HttpServletResponse, i: Int) = {
+    var html = "sparklyr: " + java.util.Calendar.getInstance.getTime.toString
+
     response.setContentType("text/html")
     response.setStatus(HttpServletResponse.SC_OK)
-    response.getWriter().println(html.toString())
+    response.getWriter().println(html)
     (request.asInstanceOf[Request]).setHandled(true)
   }
 }
@@ -25,7 +25,6 @@ class Service {
   def run(): Unit = {
     server_.setHandler(new ServiceHandler())
     server_.start()
-    server_.join()
   }
 
   def stop(): Unit = {
