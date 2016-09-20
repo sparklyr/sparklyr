@@ -159,14 +159,19 @@ start_shell <- function(master,
   # wait for the shell output file
   waitSeconds <- spark_config_value(config, "sparklyr.ports.wait.seconds", 100)
   if (!wait_file_exists(shell_output_path, waitSeconds)) {
-    stop(paste(
-      "Failed to launch Spark shell. Ports file does not exist.\n",
-      "    Path: ", spark_submit_path, "\n",
-      "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
-      "    \n",
-      paste(readLines(output_file), collapse = "\n"),
-      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
-      sep = ""))
+    withr::with_options(list(
+      warning.length = 5000
+    ), {
+      stop(paste(
+        "Failed to launch Spark shell. Ports file does not exist.\n",
+        "    Path: ", spark_submit_path, "\n",
+        "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
+        "    \n",
+        paste(readLines(output_file), collapse = "\n"),
+        if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
+        sep = ""))
+    }
+    )
   }
 
   # read the shell output file
