@@ -36,3 +36,6 @@ log4j.spark*
 /bin/
 # Build jars
 inst/jars/*
+# Eclipse files
+.cache-main
+.settings/*
