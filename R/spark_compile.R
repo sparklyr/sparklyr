@@ -59,31 +59,49 @@ spark_compile <- function(jar_name,
     system(cmd)
   }
 
+  # retrieve jar depednencies directory
+  jars_dir <- spark_compile_jars_dir(spark_version)
+
+  # copy jars in the installation folder to jar dependencies
+  spark_jars_dir <- file.path(jars_dir, "spark")
+  if (!dir.exists(spark_jars_dir)) {
+    dir.create(spark_jars_dir, recursive = TRUE)
+
+    candidates <- c("jars", "lib")
+    spark_jars <- NULL
+    for (candidate in candidates) {
+      spark_jars <- list.files(
+        file.path(spark_home, candidate),
+        full.names = TRUE,
+        pattern = "jar$"
+      )
+
+      lapply(spark_jars, function(jar) {
+        file.copy(jar, spark_jars_dir)
+      })
+
+      if (length(spark_jars))
+        break
+    }
+  }
+
+  spark_jars <- list.files(spark_jars_dir, recursive = TRUE, pattern = "jar$")
+  if (!length(spark_jars)) {
+    unlink(spark_jars_dir, recursive = TRUE)
+    stop("failed to discover Spark jars")
+  }
+
   # work in temporary directory
   dir <- tempfile(sprintf("scalac-%s-", sub("-.*", "", jar_name)))
   ensure_directory(dir)
   owd <- setwd(dir)
   on.exit(setwd(owd), add = TRUE)
 
-  # list jars in the installation folder
-  candidates <- c("jars", "lib")
-  jars <- NULL
-  for (candidate in candidates) {
-    jars <- list.files(
-      file.path(spark_home, candidate),
-      full.names = TRUE,
-      pattern = "jar$"
-    )
-
-    if (length(jars))
-      break
-  }
-
-  if (!length(jars))
-    stop("failed to discover Spark jars")
+  # list jars in the jar dependencies folder
+  jars <- list.files(jars_dir, recursive = TRUE, pattern = "jar$")
 
   # construct classpath
-  CLASSPATH <- paste(jars, collapse = .Platform$path.sep)
+  CLASSPATH <- paste(file.path(jars_dir, jars), collapse = .Platform$path.sep)
 
   # ensure 'inst/java' exists
   inst_java_path <- file.path(root, "inst/java")
@@ -109,6 +127,10 @@ spark_compile <- function(jar_name,
 
   message("==> ", basename(jar_path), " successfully created\n")
   TRUE
+}
+
+spark_compile_jars_dir <- function(spark_version) {
+  file.path(getwd(), "inst", "jars", spark_version)
 }
 
 #' Compile Scala sources into a Java Archive (jar)
@@ -156,7 +178,7 @@ compile_package_jars <- function(..., spec = NULL) {
       web_jar <- web_jars[[web_jar_name]]
       message("==> downloading web jar ", web_jar_name)
 
-      dest_jar_dir <- file.path(getwd(), "inst", "jars", web_jar_name)
+      dest_jar_dir <- file.path(spark_compile_jars_dir(spark_version), web_jar_name)
       if (!file.exists(dest_jar_dir)) {
         dir.create(dest_jar_dir, recursive = TRUE)
 
@@ -169,7 +191,7 @@ compile_package_jars <- function(..., spec = NULL) {
         jars_dir <- tempdir()
         unzip(downloaded_jar, exdir = jars_dir)
 
-        jars_list <- list.files(jars_dir, recursive = TRUE, pattern = "*.jar")
+        jars_list <- list.files(jars_dir, recursive = TRUE, pattern = "jar$")
 
         message("==> extracting ", length(jars_list), " jars to ", dest_jar_dir)
         lapply(jars_list, function(jar) {
@@ -242,23 +264,26 @@ spark_compilation_spec <- function(spark_version = NULL,
 #' @param pkg The package containing Spark extensions to be compiled.
 #' @export
 spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
+  web_jars <- list(
+    jetty = paste0(
+      "http://repo1.maven.org/maven2/org/eclipse/",
+      "jetty/jetty-distribution/9.2.18.v20160721/",
+      "jetty-distribution-9.2.18.v20160721.zip"
+    )
+  )
+
   list(
-    #spark_compilation_spec(
-    #  spark_version = "1.6.1",
-    #  scalac_path = find_scalac("2.10"),
-    #  jar_name = sprintf("%s-1.6-2.10.jar", pkg)
-    #),
+    spark_compilation_spec(
+      spark_version = "1.6.1",
+      scalac_path = find_scalac("2.10"),
+      jar_name = sprintf("%s-1.6-2.10.jar", pkg),
+      web_jars = web_jars
+    ),
     spark_compilation_spec(
       spark_version = "2.0.0",
       scalac_path = find_scalac("2.11"),
       jar_name = sprintf("%s-2.0-2.11.jar", pkg),
-      web_jars = list(
-        jetty = paste0(
-          "http://repo1.maven.org/maven2/org/eclipse/",
-          "jetty/jetty-distribution/9.2.18.v20160721/",
-          "jetty-distribution-9.2.18.v20160721.zip"
-        )
-      )
+      web_jars = web_jars
     )
   )
 }
