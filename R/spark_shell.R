@@ -279,7 +279,7 @@ spark_web.spark_shell_connection <- function(sc, ...) {
 
   uiLine <- grep("Started SparkUI at ", lines, perl=TRUE, value=TRUE)
   if (length(uiLine) > 0) {
-    matches <- regexpr("http://.*", uiLine, perl=TRUE)
+    matches <- regexpr("http://.*", uiLine)
     match <-regmatches(uiLine, matches)
     if (length(match) > 0) {
       return(structure(match, class = "spark_web_url"))
@@ -288,7 +288,7 @@ spark_web.spark_shell_connection <- function(sc, ...) {
 
   uiLine <- grep(".*Bound SparkUI to.*", lines, perl=TRUE, value=TRUE)
   if (length(uiLine) > 0) {
-    matches <- regexec(".*Bound SparkUI to.*and started at (http.*)", uiLine, perl=TRUE)
+    matches <- regexec(".*Bound SparkUI to.*and started at (http.*)", uiLine)
     match <- regmatches(uiLine, matches)
     if (length(match) > 0 && length(match[[1]]) > 1) {
       return(structure(match[[1]][[2]], class = "spark_web_url"))
