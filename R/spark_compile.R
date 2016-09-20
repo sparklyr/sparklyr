@@ -269,6 +269,10 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
       "http://repo1.maven.org/maven2/org/eclipse/",
       "jetty/jetty-distribution/9.2.18.v20160721/",
       "jetty-distribution-9.2.18.v20160721.zip"
+    ),
+    jersey = paste0(
+      "http://repo1.maven.org/maven2/org/glassfish/",
+      "jersey/bundles/jaxrs-ri/2.22.2/jaxrs-ri-2.22.2.zip"
     )
   )
 

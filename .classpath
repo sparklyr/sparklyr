@@ -77,5 +77,27 @@
 	<classpathentry kind="lib" path="inst/jars/1.6.1/spark/spark-1.6.1-yarn-shuffle.jar"/>
 	<classpathentry kind="lib" path="inst/jars/1.6.1/spark/spark-assembly-1.6.1-hadoop2.6.0.jar"/>
 	<classpathentry kind="lib" path="inst/jars/1.6.1/spark/spark-examples-1.6.1-hadoop2.6.0.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/aopalliance-repackaged-2.4.0-b34.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/asm-debug-all-5.0.4.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/hk2-api-2.4.0-b34.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/hk2-locator-2.4.0-b34.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/hk2-utils-2.4.0-b34.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/javassist-3.18.1-GA.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/javax.annotation-api-1.2.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/javax.inject-2.4.0-b34.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/javax.servlet-api-3.0.1.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/javax.ws.rs-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/jaxb-api-2.2.7.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/jersey-client.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/jersey-common.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/jersey-container-servlet-core.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/jersey-container-servlet.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/jersey-guava-2.22.2.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/jersey-media-jaxb.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/jersey-server.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/org.osgi.core-4.2.0.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/osgi-resource-locator-1.0.1.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/persistence-api-1.0.jar"/>
+	<classpathentry kind="lib" path="inst/jars/2.0.0/jersey/validation-api-1.1.0.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
