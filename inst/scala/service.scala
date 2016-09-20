@@ -4,26 +4,44 @@ import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-import org.mortbay.jetty.Request
-import org.mortbay.jetty.Server
-import org.mortbay.jetty.handler.AbstractHandler
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MediaType
 
-class ServiceHandler extends AbstractHandler {
-  def handle(target: String, request: HttpServletRequest, response: HttpServletResponse, i: Int) = {
-    var html = "sparklyr: " + java.util.Calendar.getInstance.getTime.toString
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.servlet.ServletContextHandler
+import org.eclipse.jetty.servlet.ServletHolder
 
-    response.setContentType("text/html")
-    response.setStatus(HttpServletResponse.SC_OK)
-    response.getWriter().println(html)
-    (request.asInstanceOf[Request]).setHandled(true)
-  }
+import org.glassfish.jersey.servlet.ServletContainer
+
+@Path("/entry-point")
+class EntryPoint {
+    @GET
+    @Path("test")
+    @Produces(Array(MediaType.TEXT_PLAIN))
+    def test(): String = {
+        return "Test";
+    }
 }
 
 class Service {
   var server_ = new Server(8097)
 
   def run(): Unit = {
-    server_.setHandler(new ServiceHandler())
+    var context: ServletContextHandler = new ServletContextHandler(
+      ServletContextHandler.SESSIONS)
+    
+    context.setContextPath("/")
+    server_.setHandler(context)
+    
+    var serverlet = context.addServlet(classOf[ServletContainer], "/*");
+    serverlet.setInitOrder(0)
+    
+    serverlet.setInitParameter(
+      "jersey.config.server.provider.classnames",
+      classOf[EntryPoint].getCanonicalName())
+        
     server_.start()
   }
 
