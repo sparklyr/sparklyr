@@ -1,7 +1,7 @@
 Package: sparklyr
 Type: Package
 Title: R Interface to Apache Spark
-Version: 0.3.15
+Version: 0.4
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
@@ -15,6 +15,7 @@ Description: Provision, connect and interface to Apache Spark from within R.
     provides a dplyr-compatible back-end, and provides an interface to Spark's
     built-in machine learning algorithms.
 License: file LICENSE
+BugReports: https://github.com/rstudio/sparklyr/issues
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Depends:
