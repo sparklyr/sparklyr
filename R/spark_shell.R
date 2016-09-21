@@ -66,6 +66,11 @@ start_shell <- function(master,
     shell_args <- c(shell_args, "--class", "sparklyr.Backend")
   }
 
+  # add sparklyr jar dependencies
+  jars <- c(jars, list(
+    system.file(file.path("java", spark_jar_dependencies()), package = "sparklyr")
+  ))
+
   # validate and normalize spark_home
   if (!nzchar(spark_home))
     stop("No spark_home specified (defaults to SPARK_HOME environment varirable).")
