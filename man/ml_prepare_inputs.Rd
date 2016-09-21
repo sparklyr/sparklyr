@@ -58,11 +58,13 @@ Please take heed of the last point, as while this is useful in practice,
 the behavior will be very surprising if you are not expecting it.
 }
 \examples{
+\dontrun{
 # note that ml_prepare_features, by default, mutates the 'features'
 # binding in the same environment in which the function was called
 local({
    ml_prepare_features(features = ~ x1 + x2 + x3)
    print(features) # c("x1", "x2", "x3")
 })
+}
 }
 
