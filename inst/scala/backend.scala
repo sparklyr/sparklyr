@@ -79,6 +79,9 @@ object Backend {
     val backend = new Backend()
     var service = new Service()
 
+    var jhades = new org.jhades.JHades()
+    jhades.overlappingJarsReport()
+
     try {
       service.run()
 

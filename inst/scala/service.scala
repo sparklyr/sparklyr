@@ -13,35 +13,36 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
 
-import org.glassfish.jersey.servlet.ServletContainer
+import com.sun.jersey.spi.container.servlet.ServletContainer
 
-@Path("/entry-point")
+import org.eclipse.jetty.servlet
+
+@Path("/")
 class EntryPoint {
-    @GET
-    @Path("test")
-    @Produces(Array(MediaType.TEXT_PLAIN))
-    def test(): String = {
-        return "Test";
-    }
+  @GET
+  @Path("hello")
+  @Produces(Array(MediaType.TEXT_PLAIN))
+  def test(): String = {
+    return "Hello Wold!";
+  }
 }
 
 class Service {
   var server_ = new Server(8097)
 
   def run(): Unit = {
-    var context: ServletContextHandler = new ServletContextHandler(
+    var handler: ServletContextHandler = new ServletContextHandler(
+      server_,
+      "/",
       ServletContextHandler.SESSIONS)
     
-    context.setContextPath("/")
-    server_.setHandler(context)
+    val holder:ServletHolder = new ServletHolder(classOf[ServletContainer])
     
-    var serverlet = context.addServlet(classOf[ServletContainer], "/*");
-    serverlet.setInitOrder(0)
+    holder.setInitParameter("com.sun.jersey.config.property.packages",
+                            "sparklyr")
+                            
+    handler.addServlet(holder, "/*");
     
-    serverlet.setInitParameter(
-      "jersey.config.server.provider.classnames",
-      classOf[EntryPoint].getCanonicalName())
-        
     server_.start()
   }
 

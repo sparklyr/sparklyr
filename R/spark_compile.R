@@ -60,7 +60,7 @@ spark_compile <- function(jar_name,
   }
 
   # retrieve jar depednencies directory
-  jars_dir <- spark_compile_jars_dir(spark_version)
+  jars_dir <- spark_compile_jars_dir()
 
   # copy jars in the installation folder to jar dependencies
   spark_jars_dir <- file.path(jars_dir, "spark")
@@ -129,8 +129,12 @@ spark_compile <- function(jar_name,
   TRUE
 }
 
-spark_compile_jars_dir <- function(spark_version) {
-  file.path(getwd(), "inst", "jars", spark_version)
+spark_compile_jars_dir <- function() {
+  file.path(getwd(), "inst", "jars")
+}
+
+spark_compile_java_dir <- function() {
+  file.path(getwd(), "inst", "java")
 }
 
 #' Compile Scala sources into a Java Archive (jar)
@@ -178,26 +182,45 @@ compile_package_jars <- function(..., spec = NULL) {
       web_jar <- web_jars[[web_jar_name]]
       message("==> downloading web jar ", web_jar_name)
 
-      dest_jar_dir <- file.path(spark_compile_jars_dir(spark_version), web_jar_name)
+      dest_jar_dir <- file.path(spark_compile_jars_dir(), web_jar_name)
+      dest_java_dir <- spark_compile_java_dir()
+
       if (!file.exists(dest_jar_dir)) {
         dir.create(dest_jar_dir, recursive = TRUE)
 
-        downloaded_jar <- tempfile()
+        downloaded_jar <- file.path(tempdir(), tail(strsplit(web_jar$url, "/")[[1]], n = 1))
         download.file(
-          web_jar,
+          web_jar$url,
           destfile = downloaded_jar
         )
 
-        jars_dir <- tempdir()
-        unzip(downloaded_jar, exdir = jars_dir)
+        jars_dir <- file.path(tempdir(), web_jar_name)
+        downloaded_jar_ext <- tools::file_ext(web_jar$url)
+        if (downloaded_jar_ext == "zip") {
+          unzip(downloaded_jar, exdir = jars_dir)
 
-        jars_list <- list.files(jars_dir, recursive = TRUE, pattern = "jar$")
+          jars_list <- list.files(jars_dir, recursive = TRUE, pattern = "jar$")
 
-        message("==> extracting ", length(jars_list), " jars to ", dest_jar_dir)
-        lapply(jars_list, function(jar) {
-          file.copy(from = file.path(jars_dir, jar), to = dest_jar_dir)
-        })
+          message("==> extracting ", length(jars_list), " jars to ", dest_jar_dir)
+          lapply(jars_list, function(jar) {
+            file.copy(from = file.path(jars_dir, jar), to = dest_jar_dir)
+          })
+        }
+        else if (downloaded_jar_ext == "jar") {
+          file.copy(from = downloaded_jar, to = dest_jar_dir)
+        }
+        else {
+          stop("Unknown extension: ", downloaded_jar_ext)
+        }
       }
+
+      jars_list <- list.files(dest_jar_dir, recursive = TRUE, pattern = "jar$")
+      lapply(jars_list, function(jar) {
+        if (basename(jar) %in% web_jar$jars) {
+          message("==> copying dep jar ", jar)
+          file.copy(from = file.path(dest_jar_dir, jar), to = dest_java_dir)
+        }
+      })
     })
 
     spark_compile(
@@ -235,7 +258,9 @@ compile_package_jars <- function(..., spec = NULL) {
 #'   useful if you have auxiliary files that should only be included with
 #'   certain versions of Spark.
 #' @param jar_name The name to be assigned to the generated \code{jar}.
-#' @param web_jars A list of named urls poining to zip files containing \code{jar} files.
+#' @param web_jars A list of named lists with a \code{url} element poining
+#'   to a zip file containing \code{jar} files and a \code{jars} element
+#'   as a list of jars to include.
 #'
 #' @export
 spark_compilation_spec <- function(spark_version = NULL,
@@ -256,6 +281,30 @@ spark_compilation_spec <- function(spark_version = NULL,
        web_jars = web_jars)
 }
 
+spark_jar_dependencies <- function() {
+  list(
+    # jetty
+    "jetty-server-8.1.21.v20160908.jar",
+    "jetty-util-8.1.21.v20160908.jar",
+    "jetty-http-8.1.21.v20160908.jar",
+    "jetty-io-8.1.21.v20160908.jar",
+    "jetty-servlet-8.1.21.v20160908.jar",
+    "jetty-servlets-8.1.21.v20160908.jar",
+    "jetty-security-8.1.21.v20160908.jar",
+    "javax.servlet.jsp-2.2.0.v201112011158",
+    "servlet-api-3.0.jar",
+    "jetty-continuation-8.1.21.v20160908.jar",
+    "org.objectweb.asm-3.1.0.v200803061910.jar",
+
+    # jersey
+    "jersey-core-1.9.1.jar",
+    "jersey-server-1.9.1.jar",
+
+    # hades
+    "jhades-1.0.4.jar"
+  )
+}
+
 #' Default Compilation Specification for Spark Extensions
 #'
 #' This is the default compilation specification used for
@@ -265,14 +314,24 @@ spark_compilation_spec <- function(spark_version = NULL,
 #' @export
 spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
   web_jars <- list(
-    jetty = paste0(
-      "http://repo1.maven.org/maven2/org/eclipse/",
-      "jetty/jetty-distribution/9.2.18.v20160721/",
-      "jetty-distribution-9.2.18.v20160721.zip"
+    jetty = list(
+      url = paste0(
+        "http://repo1.maven.org/maven2/org/eclipse/",
+        "jetty/jetty-distribution/8.1.21.v20160908/",
+        "jetty-distribution-8.1.21.v20160908.zip"
+      ),
+      jars = spark_jar_dependencies()
     ),
-    jersey = paste0(
-      "http://repo1.maven.org/maven2/org/glassfish/",
-      "jersey/bundles/jaxrs-ri/2.22.2/jaxrs-ri-2.22.2.zip"
+    jersey = list(
+      url = paste0(
+        "http://repo1.maven.org/maven2/com/sun/jersey/",
+        "jersey-archive/1.9.1/jersey-archive-1.9.1.zip"
+      ),
+      jars = spark_jar_dependencies()
+    ),
+    jhades = list(
+      url = "http://d2huq83j2o5dyd.cloudfront.net/jhades-jars/jhades-1.0.4.jar",
+      jars = spark_jar_dependencies()
     )
   )
 
