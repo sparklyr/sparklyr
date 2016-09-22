@@ -70,56 +70,67 @@ class Backend {
 }
 
 object Backend {
+  private[this] var isService: Boolean = false
+  
   def main(args: Array[String]): Unit = {
-    if (args.length < 1) {
-      System.err.println("Usage: Backend <ports-file-output>")
+    if (args.length > 1) {
+      System.err.println("Usage: Backend [--service]")
       System.exit(-1)
     }
+    
+    isService = args.length > 0 && args(0) == "--service"
 
     val backend = new Backend()
     try {
-      // bind to random port
-      val boundPort = backend.init()
-      val serverSocket = new ServerSocket(0, 1, InetAddress.getByName("localhost"))
-      val listenPort = serverSocket.getLocalPort()
-
-      // tell the R process via temporary file
-      val path = args(0)
-      val f = new File(path + ".tmp")
-      val dos = new DataOutputStream(new FileOutputStream(f))
-      dos.writeInt(boundPort)
-      dos.writeInt(listenPort)
-      Serializer.writeString(dos, Utils.rPackages.getOrElse(""))
-      dos.close()
-      f.renameTo(new File(path))
-
-      // wait for the end of stdin, then exit
-      new Thread("wait for socket to close") {
-        setDaemon(true)
-        override def run(): Unit = {
-          // any un-catched exception will also shutdown JVM
-          val buf = new Array[Byte](1024)
-          // shutdown JVM if R does not connect back in 10 seconds
-          serverSocket.setSoTimeout(10000)
-          try {
-            val inSocket = serverSocket.accept()
-            serverSocket.close()
-            // wait for the end of socket, closed if R process die
-            inSocket.getInputStream().read(buf)
-          } finally {
-            backend.close()
-            System.exit(0)
-          }
+      while(true) {
+        try {
+          bind()
+        } finally {
         }
-      }.start()
-
-      backend.run()
+      }
     } catch {
       case e: IOException =>
         logError("Server shutting down: failed with exception ", e)
         backend.close()
+        
         System.exit(1)
     }
+    
     System.exit(0)
+  }
+  
+  def bind(): Unit = {
+    val gatewayServerSocket = new ServerSocket(8880, 1, InetAddress.getByName("localhost"))
+
+    // shutdown JVM if R does not connect back in 10 seconds
+    gatewayServerSocket.setSoTimeout(10000)
+    val gatewaySocket = gatewayServerSocket.accept()
+
+    // wait for the end of stdin, then exit
+    new Thread("wait for socket to close") {
+      setDaemon(true)
+      override def run(): Unit = {
+        val buf = new Array[Byte](1024)
+        
+        val backend = new Backend()
+        val backendPort: Int = backend.init()
+        backend.run()
+        
+        try {
+          val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+          dos.writeInt(backendPort)
+          dos.close()
+          
+          gatewaySocket.close()
+          
+          // wait for the end of socket, closed if R process die
+          gatewaySocket.getInputStream().read(buf)
+        } finally {
+          backend.close()
+          
+          if (!isService) System.exit(0)
+        }
+      }
+    }.start() 
   }
 }
