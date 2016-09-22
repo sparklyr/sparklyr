@@ -22,7 +22,7 @@ knitr::opts_chunk$set(eval = TRUE)
 
 ## Installation
 
-You can install the development version of the **sparklyr** package using [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html) as follows:
+You can install the development version of the **sparklyr** package using [**devtools**](https://CRAN.R-project.org/package=devtools) as follows:
 
 ```{r, eval=FALSE}
 install.packages("devtools")
@@ -82,7 +82,7 @@ To start with here's a simple filtering example:
 flights_tbl %>% filter(dep_delay == 2)
 ```
 
-[Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
+[Introduction to dplyr](https://CRAN.R-project.org/package=dplyr) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r ggplot2}
 delay <- flights_tbl %>% 
@@ -102,7 +102,7 @@ ggplot(delay, aes(dist, delay)) +
 
 ### Window Functions
 
-dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
+dplyr [window functions](https://CRAN.R-project.org/package=dplyr) are also supported, for example:
 
 ```{r}
 batting_tbl %>%

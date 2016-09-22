@@ -13,7 +13,7 @@ sparklyr: R interface for Apache Spark
 Installation
 ------------
 
-You can install the development version of the **sparklyr** package using [**devtools**](https://cran.r-project.org/web/packages/devtools/index.html) as follows:
+You can install the development version of the **sparklyr** package using [**devtools**](https://CRAN.R-project.org/package=devtools) as follows:
 
 ``` r
 install.packages("devtools")
@@ -42,6 +42,15 @@ You can connect to both local instances of Spark as well as remote Spark cluster
 
 ``` r
 library(sparklyr)
+```
+
+    ## Warning: replacing previous import by 'magrittr::%>%' when loading
+    ## 'sparklyr'
+
+    ## Warning: replacing previous import by 'tibble::data_frame' when loading
+    ## 'sparklyr'
+
+``` r
 sc <- spark_connect(master = "local")
 ```
 
@@ -62,6 +71,11 @@ install.packages(c("nycflights13", "Lahman"))
 
 ``` r
 library(dplyr)
+```
+
+    ## Warning: package 'dplyr' was built under R version 3.2.3
+
+``` r
 iris_tbl <- copy_to(sc, iris)
 flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
 batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
@@ -97,7 +111,7 @@ flights_tbl %>% filter(dep_delay == 2)
     ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
     ## #   minute <dbl>, time_hour <dbl>
 
-[Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
+[Introduction to dplyr](https://CRAN.R-project.org/package=dplyr) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ``` r
 delay <- flights_tbl %>% 
@@ -108,6 +122,11 @@ delay <- flights_tbl %>%
 
 # plot delays
 library(ggplot2)
+```
+
+    ## Warning: package 'ggplot2' was built under R version 3.2.4
+
+``` r
 ggplot(delay, aes(dist, delay)) +
   geom_point(aes(size = count), alpha = 1/2) +
   geom_smooth() +
@@ -118,7 +137,7 @@ ggplot(delay, aes(dist, delay)) +
 
 ### Window Functions
 
-dplyr [window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html) are also supported, for example:
+dplyr [window functions](https://CRAN.R-project.org/package=dplyr) are also supported, for example:
 
 ``` r
 batting_tbl %>%
@@ -155,6 +174,11 @@ It's also possible to execute SQL queries directly against tables within a Spark
 
 ``` r
 library(DBI)
+```
+
+    ## Warning: package 'DBI' was built under R version 3.2.5
+
+``` r
 iris_preview <- dbGetQuery(sc, "SELECT * FROM iris LIMIT 10")
 iris_preview
 ```
@@ -307,16 +331,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/08/04 11:45:13 INFO ContextCleaner: Cleaned accumulator 246
-    ## 16/08/04 11:45:13 INFO ContextCleaner: Cleaned accumulator 248
-    ## 16/08/04 11:45:13 INFO ContextCleaner: Cleaned accumulator 251
-    ## 16/08/04 11:45:13 INFO ContextCleaner: Cleaned shuffle 18
-    ## 16/08/04 11:45:13 INFO BlockManagerInfo: Removed broadcast_78_piece0 on localhost:62449 in memory (size: 4.6 KB, free: 483.5 MB)
-    ## 16/08/04 11:45:13 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
-    ## 16/08/04 11:45:13 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 112 ms on localhost (1/1)
-    ## 16/08/04 11:45:13 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/08/04 11:45:13 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.112 s
-    ## 16/08/04 11:45:13 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.115488 s
+    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 226
+    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 225
+    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 224
+    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 223
+    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 222
+    ## 16/09/22 09:20:56 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
+    ## 16/09/22 09:20:56 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 113 ms on localhost (1/1)
+    ## 16/09/22 09:20:56 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/09/22 09:20:56 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.113 s
+    ## 16/09/22 09:20:56 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.116037 s
 
 Finally, we disconnect from Spark:
 
