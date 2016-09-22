@@ -42,15 +42,6 @@ You can connect to both local instances of Spark as well as remote Spark cluster
 
 ``` r
 library(sparklyr)
-```
-
-    ## Warning: replacing previous import by 'magrittr::%>%' when loading
-    ## 'sparklyr'
-
-    ## Warning: replacing previous import by 'tibble::data_frame' when loading
-    ## 'sparklyr'
-
-``` r
 sc <- spark_connect(master = "local")
 ```
 
@@ -71,11 +62,6 @@ install.packages(c("nycflights13", "Lahman"))
 
 ``` r
 library(dplyr)
-```
-
-    ## Warning: package 'dplyr' was built under R version 3.2.3
-
-``` r
 iris_tbl <- copy_to(sc, iris)
 flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
 batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
@@ -122,11 +108,6 @@ delay <- flights_tbl %>%
 
 # plot delays
 library(ggplot2)
-```
-
-    ## Warning: package 'ggplot2' was built under R version 3.2.4
-
-``` r
 ggplot(delay, aes(dist, delay)) +
   geom_point(aes(size = count), alpha = 1/2) +
   geom_smooth() +
@@ -174,11 +155,6 @@ It's also possible to execute SQL queries directly against tables within a Spark
 
 ``` r
 library(DBI)
-```
-
-    ## Warning: package 'DBI' was built under R version 3.2.5
-
-``` r
 iris_preview <- dbGetQuery(sc, "SELECT * FROM iris LIMIT 10")
 iris_preview
 ```
@@ -331,16 +307,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 226
-    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 225
-    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 224
-    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 223
-    ## 16/09/22 09:20:56 INFO ContextCleaner: Cleaned accumulator 222
-    ## 16/09/22 09:20:56 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
-    ## 16/09/22 09:20:56 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 113 ms on localhost (1/1)
-    ## 16/09/22 09:20:56 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/09/22 09:20:56 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.113 s
-    ## 16/09/22 09:20:56 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.116037 s
+    ## 16/09/22 10:04:39 INFO ContextCleaner: Cleaned accumulator 224
+    ## 16/09/22 10:04:39 INFO ContextCleaner: Cleaned accumulator 223
+    ## 16/09/22 10:04:39 INFO ContextCleaner: Cleaned accumulator 222
+    ## 16/09/22 10:04:39 INFO BlockManagerInfo: Removed broadcast_64_piece0 on localhost:52094 in memory (size: 20.6 KB, free: 483.1 MB)
+    ## 16/09/22 10:04:39 INFO ContextCleaner: Cleaned accumulator 220
+    ## 16/09/22 10:04:39 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
+    ## 16/09/22 10:04:39 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 115 ms on localhost (1/1)
+    ## 16/09/22 10:04:39 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/09/22 10:04:39 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.115 s
+    ## 16/09/22 10:04:39 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.117569 s
 
 Finally, we disconnect from Spark:
 
