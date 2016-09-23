@@ -156,11 +156,12 @@ start_shell <- function(master,
     }
   })
 
-  # wait for the shell output file
-  waitSeconds <- spark_config_value(config, "sparklyr.ports.wait.seconds", 100)
-  if (!wait_file_exists(shell_output_path, waitSeconds)) {
+  # wait for the service to start
+  waitSeconds <- spark_config_value(config, "sparklyr.gateway.wait.seconds", 10)
+  gatewaySocket <- wait_connect_gateway(8880, waitSeconds)
+  if (is.null(gatewaySocket)) {
     stop(paste(
-      "Failed to launch Spark shell. Ports file does not exist.\n",
+      "Failed while launching sparklyr.\n",
       "    Path: ", spark_submit_path, "\n",
       "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
       "    \n",
@@ -169,25 +170,25 @@ start_shell <- function(master,
       sep = ""))
   }
 
-  # read the shell output file
-  shell_file <- read_shell_file(shell_output_path)
-
-  # bind to the monitor and backend ports
   tryCatch({
-    monitor <- socketConnection(port = shell_file$monitorPort)
-  }, error = function(err) {
-    stop("Failed to open connection to monitor")
-  })
+    readInt <- function(con, n = 1) {
+      readBin(con, integer(), n = n, endian = "big")
+    }
 
-  tryCatch({
+    backendPort <- readInt(gatewaySocket)
+
     backend <- socketConnection(host = "localhost",
-                                port = shell_file$backendPort,
+                                port = backendPort,
                                 server = FALSE,
                                 blocking = TRUE,
                                 open = "wb",
                                 timeout = 6000)
   }, error = function(err) {
-    stop("Failed to open connection to backend")
+    stop(paste(
+      "Failed to open connection to backend",
+      paste(readLines(output_file), collapse = "\n"),
+      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
+      sep = ""))
   })
 
   # create the shell connection
@@ -381,38 +382,26 @@ attach_connection <- function(jobj, connection) {
   jobj
 }
 
-
-read_shell_file <- function(shell_file) {
-
-  shellOutputFile <- file(shell_file, open = "rb")
-  backendPort <- readInt(shellOutputFile)
-  monitorPort <- readInt(shellOutputFile)
-  rLibraryPath <- readString(shellOutputFile)
-  close(shellOutputFile)
-
-  success <- length(backendPort) > 0 && backendPort > 0 &&
-    length(monitorPort) > 0 && monitorPort > 0 &&
-    length(rLibraryPath) == 1
-
-  if (!success)
-    stop("Invalid values found in shell output")
-
-  list(
-    backendPort = backendPort,
-    monitorPort = monitorPort,
-    rLibraryPath = rLibraryPath
-  )
-}
-
-
-wait_file_exists <- function(filename, seconds) {
+wait_connect_gateway <- function(gatewayPort, seconds) {
   retries <- seconds * 10
-  while(!file.exists(filename) && retries >= 0) {
+  monitor <- NULL
+
+  while(is.null(monitor) && retries >= 0) {
+    tryCatch({
+      monitor <- socketConnection(host = "localhost",
+        port = gatewayPort,
+        server = FALSE,
+        blocking = TRUE,
+        open = "rb",
+        timeout = 6000)
+    }, error = function(err) {
+    })
+
     retries <- retries  - 1;
     Sys.sleep(0.1)
   }
 
-  file.exists(filename)
+  monitor
 }
 
 read_spark_log_error <- function(sc) {

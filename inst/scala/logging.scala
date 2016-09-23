@@ -10,6 +10,10 @@ object Logging {
     val logFormat = new SimpleDateFormat("yy/MM/dd HH:mm:ss")
     return logFormat.format(now)
   }
+  
+  def log(message: String) = {
+    System.out.println(getDate() + " INFO " + message)
+  }
 
   def logError(message: String) = {
     System.err.println(getDate() + " ERROR " + message)

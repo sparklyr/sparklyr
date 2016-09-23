@@ -71,6 +71,7 @@ class Backend {
 
 object Backend {
   private[this] var isService: Boolean = false
+  private[this] var gatewayServerSocket: ServerSocket = null
   
   def main(args: Array[String]): Unit = {
     if (args.length > 1) {
@@ -79,20 +80,19 @@ object Backend {
     }
     
     isService = args.length > 0 && args(0) == "--service"
-
-    val backend = new Backend()
+    
     try {
+      gatewayServerSocket = new ServerSocket(8880, 1, InetAddress.getByName("localhost"))
+      gatewayServerSocket.setSoTimeout(0)
+      
+      log("sparklyr listening in port 8880")
+    
       while(true) {
-        try {
-          bind()
-        } finally {
-        }
+        bind()
       }
     } catch {
       case e: IOException =>
         logError("Server shutting down: failed with exception ", e)
-        backend.close()
-        
         System.exit(1)
     }
     
@@ -100,35 +100,46 @@ object Backend {
   }
   
   def bind(): Unit = {
-    val gatewayServerSocket = new ServerSocket(8880, 1, InetAddress.getByName("localhost"))
-
-    // shutdown JVM if R does not connect back in 10 seconds
-    gatewayServerSocket.setSoTimeout(10000)
+    
     val gatewaySocket = gatewayServerSocket.accept()
+    
+    log("sparklyr accepted new connection")
 
     // wait for the end of stdin, then exit
     new Thread("wait for socket to close") {
       setDaemon(true)
       override def run(): Unit = {
-        val buf = new Array[Byte](1024)
-        
-        val backend = new Backend()
-        val backendPort: Int = backend.init()
-        backend.run()
-        
         try {
-          val dos = new DataOutputStream(gatewaySocket.getOutputStream())
-          dos.writeInt(backendPort)
-          dos.close()
+          val buf = new Array[Byte](1024)
           
-          gatewaySocket.close()
+          log("sparklyr creating backend")
           
-          // wait for the end of socket, closed if R process die
-          gatewaySocket.getInputStream().read(buf)
-        } finally {
-          backend.close()
+          val backend = new Backend()
+          val backendPort: Int = backend.init()
+          backend.run()
           
-          if (!isService) System.exit(0)
+          log("sparklyr backend created listening on port " + backendPort)
+          
+          try {
+            val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+            dos.writeInt(backendPort)
+            dos.close()
+            
+            gatewaySocket.close()
+            
+            // wait for the end of socket, closed if R process die
+            gatewaySocket.getInputStream().read(buf)
+          } finally {
+            backend.close()
+            log("sparklyr backend closed for connection")
+            
+            if (!isService) System.exit(0)
+          }
+        } catch {
+          case e: IOException =>
+            logError("Backend failed with exception ", e)
+            
+            if (!isService) System.exit(1)
         }
       }
     }.start() 
