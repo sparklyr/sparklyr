@@ -120,14 +120,8 @@ start_shell <- function(master,
   # add sparkr-shell to args
   shell_args <- c(shell_args, app_jar)
 
-  # create temporary file for shell ports output and add it to the args
-  shell_output_path <- spark_config_value(config,
-                                          "sparklyr.ports.file",
-                                          normalizePath(tempfile(fileext = ".out"),
-                                                        mustWork = FALSE))
-
   on.exit(unlink(shell_output_path))
-  shell_args <- c(shell_args, shell_output_path)
+  shell_args <- c(shell_args, "8700")
 
   # create temp file for stdout and stderr
   output_file <- tempfile(fileext = "_spark.log")

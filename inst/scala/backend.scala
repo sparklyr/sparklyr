@@ -72,17 +72,19 @@ class Backend {
 object Backend {
   private[this] var isService: Boolean = false
   private[this] var gatewayServerSocket: ServerSocket = null
+  private[this] var port: Int = 0
   
   def main(args: Array[String]): Unit = {
-    if (args.length > 1) {
-      System.err.println("Usage: Backend [--service]")
+    if (args.length > 2 || args.length < 1) {
+      System.err.println("Usage: Backend port [--service]")
       System.exit(-1)
     }
     
-    isService = args.length > 0 && args(0) == "--service"
+    port = args(0).toInt
+    isService = args.length > 1 && args(1) == "--service"
     
     try {
-      gatewayServerSocket = new ServerSocket(8880, 1, InetAddress.getByName("localhost"))
+      gatewayServerSocket = new ServerSocket(port, 1, InetAddress.getByName("localhost"))
       gatewayServerSocket.setSoTimeout(0)
     
       while(true) {
