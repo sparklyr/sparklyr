@@ -158,8 +158,8 @@ start_shell <- function(master,
 
   # wait for the service to start
   waitSeconds <- spark_config_value(config, "sparklyr.gateway.wait.seconds", 10)
-  gatewaySocket <- wait_connect_gateway(8880, waitSeconds)
-  if (is.null(gatewaySocket)) {
+  gateway <- wait_connect_gateway(8880, waitSeconds)
+  if (is.null(gateway)) {
     stop(paste(
       "Failed while launching sparklyr.\n",
       "    Path: ", spark_submit_path, "\n",
@@ -175,7 +175,7 @@ start_shell <- function(master,
       readBin(con, integer(), n = n, endian = "big")
     }
 
-    backendPort <- readInt(gatewaySocket)
+    backendPort <- readInt(gateway)
 
     backend <- socketConnection(host = "localhost",
                                 port = backendPort,
@@ -201,7 +201,7 @@ start_shell <- function(master,
     # spark_shell_connection
     spark_home = spark_home,
     backend = backend,
-    monitor = monitor,
+    monitor = gateway,
     output_file = output_file
   ))
 

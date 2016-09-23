@@ -84,8 +84,6 @@ object Backend {
     try {
       gatewayServerSocket = new ServerSocket(8880, 1, InetAddress.getByName("localhost"))
       gatewayServerSocket.setSoTimeout(0)
-      
-      log("sparklyr listening in port 8880")
     
       while(true) {
         bind()
@@ -100,48 +98,53 @@ object Backend {
   }
   
   def bind(): Unit = {
-    
     val gatewaySocket = gatewayServerSocket.accept()
-    
-    log("sparklyr accepted new connection")
 
+    val buf = new Array[Byte](1024)
+    
+    val backend = new Backend()
+    val backendPort: Int = backend.init()
+          
     // wait for the end of stdin, then exit
-    new Thread("wait for socket to close") {
+    new Thread("wait for monitor to close") {
       setDaemon(true)
       override def run(): Unit = {
         try {
-          val buf = new Array[Byte](1024)
+          val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+          dos.writeInt(backendPort)
           
-          log("sparklyr creating backend")
-          
-          val backend = new Backend()
-          val backendPort: Int = backend.init()
-          backend.run()
-          
-          log("sparklyr backend created listening on port " + backendPort)
-          
-          try {
-            val dos = new DataOutputStream(gatewaySocket.getOutputStream())
-            dos.writeInt(backendPort)
-            dos.close()
-            
-            gatewaySocket.close()
-            
-            // wait for the end of socket, closed if R process die
-            gatewaySocket.getInputStream().read(buf)
-          } finally {
-            backend.close()
-            log("sparklyr backend closed for connection")
-            
-            if (!isService) System.exit(0)
-          }
+          // wait for the end of socket, closed if R process die
+          gatewaySocket.getInputStream().read(buf)          
+
+          dos.close()
+          gatewaySocket.close()
         } catch {
           case e: IOException =>
             logError("Backend failed with exception ", e)
             
-            if (!isService) System.exit(1)
+          if (!isService) System.exit(1)
+        } finally {
+          backend.close()
+          
+          if (!isService) System.exit(0)
         }
       }
     }.start() 
+    
+    // wait for the end of stdin, then exit
+    new Thread("run backend") {
+      setDaemon(true)
+      override def run(): Unit = {
+        try {
+          backend.run()
+        }
+        catch {
+          case e: IOException =>
+            logError("Backend failed with exception ", e)
+            
+          if (!isService) System.exit(1)
+        }
+      }
+    }.start()
   }
 }
