@@ -13,11 +13,10 @@ sparklyr: R interface for Apache Spark
 Installation
 ------------
 
-You can install the development version of the **sparklyr** package using [**devtools**](https://CRAN.R-project.org/package=devtools) as follows:
+You can install the **sparklyr** package from CRAN as follows:
 
 ``` r
-install.packages("devtools")
-devtools::install_github("rstudio/sparklyr")
+install.packages("sparklyr")
 ```
 
 You should also install a local version of Spark for development purposes:
