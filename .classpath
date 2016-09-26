@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="inst/scala"/>
+	<classpathentry kind="src" path="java"/>
 	<classpathentry kind="lib" path="inst/java/sparklyr-1.6-2.10.jar"/>
 	<classpathentry kind="lib" path="inst/java/sparklyr-2.0-2.11.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
