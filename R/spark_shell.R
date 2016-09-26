@@ -123,49 +123,60 @@ start_shell <- function(master,
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   isService <- as.logical(spark_config_value(config, "sparklyr.service", "FALSE"))
   shell_args <- c(shell_args, as.character(gatewayPort))
+  gateway <- NULL
   if (isService) {
     shell_args <- c(shell_args, "--service")
+
+    # try connecting to an existing instance of sparklyr running in service mode
+    gateway <- wait_connect_gateway(gatewayPort, 1)
   }
 
-  # create temp file for stdout and stderr
-  output_file <- tempfile(fileext = "_spark.log")
-  error_file <- tempfile(fileext = "_spark.err")
+  output_file <- NULL
+  error_file <- NULL
 
-  # start the shell (w/ specified additional environment variables)
-  env <- unlist(environment)
-  withr::with_envvar(env, {
-    if (.Platform$OS.type == "windows") {
-      shell(paste(
-        spark_submit_path,
-        paste(shell_args, collapse = " "),
-        ">",
-        output_file,
-        "2>",
-        error_file
-      ),
-      wait = FALSE)
-    }
-    else {
-      system2(spark_submit_path,
-              args = shell_args,
-              stdout = output_file,
-              stderr = output_file,
-              wait = FALSE)
-    }
-  })
+  if (is.null(gateway))
+  {
+    # create temp file for stdout and stderr
+    output_file <- tempfile(fileext = "_spark.log")
+    error_file <- tempfile(fileext = "_spark.err")
 
-  # wait for the service to start
-  waitSeconds <- spark_config_value(config, "sparklyr.gateway.wait.seconds", 10)
-  gateway <- wait_connect_gateway(gatewayPort, waitSeconds)
-  if (is.null(gateway)) {
-    stop(paste(
-      "Failed while launching sparklyr.\n",
-      "    Path: ", spark_submit_path, "\n",
-      "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
-      "    \n",
-      paste(readLines(output_file), collapse = "\n"),
-      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
-      sep = ""))
+    # start the shell (w/ specified additional environment variables)
+    env <- unlist(environment)
+    withr::with_envvar(env, {
+      if (.Platform$OS.type == "windows") {
+        shell(paste(
+          spark_submit_path,
+          paste(shell_args, collapse = " "),
+          ">",
+          output_file,
+          "2>",
+          error_file
+        ),
+        wait = FALSE)
+      }
+      else {
+        system2(spark_submit_path,
+                args = shell_args,
+                stdout = output_file,
+                stderr = output_file,
+                wait = FALSE)
+      }
+    })
+
+    # wait for the service to start
+    waitSeconds <- spark_config_value(config, "sparklyr.gateway.wait.seconds", 10)
+    gateway <- wait_connect_gateway(gatewayPort, waitSeconds)
+
+    if (is.null(gateway)) {
+      stop(paste(
+        "Failed while launching sparklyr.\n",
+        "    Path: ", spark_submit_path, "\n",
+        "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
+        "    \n",
+        paste(readLines(output_file), collapse = "\n"),
+        if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
+        sep = ""))
+    }
   }
 
   tryCatch({
@@ -189,7 +200,7 @@ start_shell <- function(master,
   }, error = function(err) {
     stop(paste(
       "Failed to open connection to backend",
-      paste(readLines(output_file), collapse = "\n"),
+      if (file.exists(output_file)) paste(readLines(output_file), collapse = "\n") else "",
       if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
       sep = ""))
   })
@@ -219,6 +230,7 @@ start_shell <- function(master,
   tryCatch({
     sc <- initialize_connection(sc)
   }, error = function(e) {
+    browser()
     try(silent = TRUE, {
       log <- spark_log(sc);
     })
@@ -264,16 +276,21 @@ connection_is_open.spark_shell_connection <- function(sc) {
 
 #' @export
 spark_log.spark_shell_connection <- function(sc, n = 100, ...) {
-  log <- file(sc$output_file)
-  lines <- readLines(log)
-  close(log)
+  if (!is.null(sc$output_file) && file.exists(sc$output_file)) {
+    log <- file(sc$output_file)
+    lines <- readLines(log)
+    close(log)
 
-  if (!is.null(n))
-    linesLog <- utils::tail(lines, n = n)
-  else
-    linesLog <- lines
+    if (!is.null(n))
+      linesLog <- utils::tail(lines, n = n)
+    else
+      linesLog <- lines
+  }
+  else {
+    linesLog <- "spark log is not available"
+  }
+
   attr(linesLog, "class") <- "spark_log"
-
   linesLog
 }
 
@@ -391,12 +408,14 @@ wait_connect_gateway <- function(gatewayPort, seconds) {
 
   while(is.null(monitor) && retries >= 0) {
     tryCatch({
-      monitor <- socketConnection(host = "localhost",
-        port = gatewayPort,
-        server = FALSE,
-        blocking = TRUE,
-        open = "rb",
-        timeout = 6000)
+      suppressWarnings(
+        monitor <- socketConnection(host = "localhost",
+          port = gatewayPort,
+          server = FALSE,
+          blocking = TRUE,
+          open = "rb",
+          timeout = 6000)
+      )
     }, error = function(err) {
     })
 
