@@ -45,6 +45,20 @@ shell_connection <- function(master, spark_home, app_name, version, hadoop_versi
   )
 }
 
+abort_shell <- function(message, spark_submit_path, shell_args, output_file, error_file) {
+  withr::with_options(list(
+    warning.length = 5000
+  ), {
+    stop(paste(
+      message, ".\n",
+      "    Path: ", spark_submit_path, "\n",
+      "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
+      "    \n",
+      paste(readLines(output_file), collapse = "\n"),
+      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
+      sep = ""))
+  })
+}
 
 # Start the Spark R Shell
 start_shell <- function(master,
@@ -156,10 +170,10 @@ start_shell <- function(master,
       }
       else {
         system2(spark_submit_path,
-                args = shell_args,
-                stdout = output_file,
-                stderr = output_file,
-                wait = FALSE)
+          args = shell_args,
+          stdout = output_file,
+          stderr = output_file,
+          wait = FALSE)
       }
     })
 
@@ -168,14 +182,13 @@ start_shell <- function(master,
     gateway <- wait_connect_gateway(gatewayPort, waitSeconds)
 
     if (is.null(gateway)) {
-      stop(paste(
-        "Failed while launching sparklyr.\n",
-        "    Path: ", spark_submit_path, "\n",
-        "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
-        "    \n",
-        paste(readLines(output_file), collapse = "\n"),
-        if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
-        sep = ""))
+      abort_shell(
+        "Failed while connecting to sparklyr",
+        spark_submit_path,
+        shell_args,
+        output_file,
+        error_file
+      )
     }
   }
 
