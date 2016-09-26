@@ -169,11 +169,14 @@ spark_install <- function(version = NULL,
       message(msg)
     }
 
-    download.file(
+    status <- suppressWarnings(download.file(
       installInfo$packageRemotePath,
       destfile = installInfo$packageLocalPath,
       quiet = !verbose
-    )
+    ))
+
+    if (status)
+      stopf("Failed to download Spark: download exited with status %s", status)
 
     untar(tarfile = installInfo$packageLocalPath, exdir = installInfo$sparkDir)
     unlink(installInfo$packageLocalPath)

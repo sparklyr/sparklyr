@@ -13,11 +13,10 @@ sparklyr: R interface for Apache Spark
 Installation
 ------------
 
-You can install the development version of the **sparklyr** package using [**devtools**](https://CRAN.R-project.org/package=devtools) as follows:
+You can install the **sparklyr** package from CRAN as follows:
 
 ``` r
-install.packages("devtools")
-devtools::install_github("rstudio/sparklyr")
+install.packages("sparklyr")
 ```
 
 You should also install a local version of Spark for development purposes:
@@ -307,16 +306,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/09/22 10:04:39 INFO ContextCleaner: Cleaned accumulator 224
-    ## 16/09/22 10:04:39 INFO ContextCleaner: Cleaned accumulator 223
-    ## 16/09/22 10:04:39 INFO ContextCleaner: Cleaned accumulator 222
-    ## 16/09/22 10:04:39 INFO BlockManagerInfo: Removed broadcast_64_piece0 on localhost:52094 in memory (size: 20.6 KB, free: 483.1 MB)
-    ## 16/09/22 10:04:39 INFO ContextCleaner: Cleaned accumulator 220
-    ## 16/09/22 10:04:39 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
-    ## 16/09/22 10:04:39 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 115 ms on localhost (1/1)
-    ## 16/09/22 10:04:39 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/09/22 10:04:39 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.115 s
-    ## 16/09/22 10:04:39 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.117569 s
+    ## 16/09/24 07:50:59 INFO ContextCleaner: Cleaned accumulator 224
+    ## 16/09/24 07:50:59 INFO ContextCleaner: Cleaned accumulator 223
+    ## 16/09/24 07:50:59 INFO ContextCleaner: Cleaned accumulator 222
+    ## 16/09/24 07:50:59 INFO BlockManagerInfo: Removed broadcast_64_piece0 on localhost:56324 in memory (size: 20.6 KB, free: 483.0 MB)
+    ## 16/09/24 07:50:59 INFO ContextCleaner: Cleaned accumulator 220
+    ## 16/09/24 07:50:59 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
+    ## 16/09/24 07:50:59 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 122 ms on localhost (1/1)
+    ## 16/09/24 07:50:59 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.122 s
+    ## 16/09/24 07:50:59 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+    ## 16/09/24 07:50:59 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.125238 s
 
 Finally, we disconnect from Spark:
 
