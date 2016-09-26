@@ -95,6 +95,11 @@ copy_to.spark_connection <- function(dest, df, name = deparse(substitute(df)),
   tbl(dest, name)
 }
 
+#' @export
+copy_to.src_spark <- function(dest, df, name, ...) {
+  copy_to(spark_connection(dest), df, name, ...)
+}
+
 #' Load a table into memory
 #'
 #' @param sc Spark connection
