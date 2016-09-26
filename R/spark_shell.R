@@ -57,14 +57,10 @@ start_shell <- function(master,
                         packages = NULL,
                         environment = NULL,
                         shell_args = NULL) {
-  # read app jar through config, this allows "sparkr-shell" to test sparkr backend
-  app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
-  if (is.null(app_jar)) {
-    versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
-    app_jar <- spark_default_app_jar(versionSparkHome)
-    app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE))
-    shell_args <- c(shell_args, "--class", "sparklyr.Backend")
-  }
+
+  # create temp file for stdout and stderr
+  output_file <- tempfile(fileext = "_spark.log")
+  error_file <- tempfile(fileext = "_spark.err")
 
   # validate and normalize spark_home
   if (!nzchar(spark_home))
@@ -73,122 +69,143 @@ start_shell <- function(master,
     stop("SPARK_HOME directory '", spark_home ,"' not found")
   spark_home <- normalizePath(spark_home)
 
-  # set SPARK_HOME into child process environment
-  if (is.null(environment()))
-    environment <- list()
-  environment$SPARK_HOME <- spark_home
+  if (is.null(config[["backend.port"]])) {
+    # read app jar through config, this allows "sparkr-shell" to test sparkr backend
+    app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
+    if (is.null(app_jar)) {
+      versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
+      app_jar <- spark_default_app_jar(versionSparkHome)
+      app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE))
+      shell_args <- c(shell_args, "--class", "sparklyr.Backend")
+    }
 
-  # provide empty config if necessary
-  if (is.null(config))
-    config <- list()
+    # set SPARK_HOME into child process environment
+    if (is.null(environment()))
+      environment <- list()
+    environment$SPARK_HOME <- spark_home
 
-  # determine path to spark_submit
-  spark_submit <- switch(.Platform$OS.type,
-    unix = "spark-submit",
-    windows = "spark-submit.cmd"
-  )
-  spark_submit_path <- normalizePath(file.path(spark_home, "bin", spark_submit))
+    # provide empty config if necessary
+    if (is.null(config))
+      config <- list()
 
-  # resolve extensions
-  spark_version <- numeric_version(
-    ifelse(is.null(spark_version),
-      spark_version_from_home(spark_home),
-      gsub("[-_a-zA-Z]", "", spark_version)
+    # determine path to spark_submit
+    spark_submit <- switch(.Platform$OS.type,
+                           unix = "spark-submit",
+                           windows = "spark-submit.cmd"
     )
-  )
-  if (spark_version < "2.0")
-    scala_version <- numeric_version("2.10")
-  else
-    scala_version <- numeric_version("2.11")
-  extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions)
+    spark_submit_path <- normalizePath(file.path(spark_home, "bin", spark_submit))
 
-  # combine passed jars and packages with extensions
-  all_jars <- c(jars, extensions$jars)
-  jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
-  packages <- unique(c(packages, extensions$packages))
+    # resolve extensions
+    spark_version <- numeric_version(
+      ifelse(is.null(spark_version),
+             spark_version_from_home(spark_home),
+             gsub("[-_a-zA-Z]", "", spark_version)
+      )
+    )
+    if (spark_version < "2.0")
+      scala_version <- numeric_version("2.10")
+    else
+      scala_version <- numeric_version("2.11")
+    extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions)
 
-  # add jars to arguments
-  if (length(jars) > 0) {
-    shell_args <- c(shell_args, "--jars", paste(shQuote(jars), collapse=","))
-  }
+    # combine passed jars and packages with extensions
+    all_jars <- c(jars, extensions$jars)
+    jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
+    packages <- unique(c(packages, extensions$packages))
 
-  # add packages to arguments
-  if (length(packages) > 0) {
-    shell_args <- c(shell_args, "--packages", paste(shQuote(packages), collapse=","))
-  }
-
-  # add sparkr-shell to args
-  shell_args <- c(shell_args, app_jar)
-
-  # create temporary file for shell ports output and add it to the args
-  shell_output_path <- spark_config_value(config,
-                                          "sparklyr.ports.file",
-                                          normalizePath(tempfile(fileext = ".out"),
-                                                        mustWork = FALSE))
-
-  on.exit(unlink(shell_output_path))
-  shell_args <- c(shell_args, shell_output_path)
-
-  # create temp file for stdout and stderr
-  output_file <- tempfile(fileext = "_spark.log")
-  error_file <- tempfile(fileext = "_spark.err")
-
-  # start the shell (w/ specified additional environment variables)
-  env <- unlist(environment)
-  withr::with_envvar(env, {
-    if (.Platform$OS.type == "windows") {
-      shell(paste(
-        spark_submit_path,
-        paste(shell_args, collapse = " "),
-        ">",
-        output_file,
-        "2>",
-        error_file
-      ),
-      wait = FALSE)
+    # add jars to arguments
+    if (length(jars) > 0) {
+      shell_args <- c(shell_args, "--jars", paste(shQuote(jars), collapse=","))
     }
-    else {
-      system2(spark_submit_path,
-              args = shell_args,
-              stdout = output_file,
-              stderr = output_file,
-              wait = FALSE)
+
+    # add packages to arguments
+    if (length(packages) > 0) {
+      shell_args <- c(shell_args, "--packages", paste(shQuote(packages), collapse=","))
     }
-  })
 
-  # wait for the shell output file
-  waitSeconds <- spark_config_value(config, "sparklyr.ports.wait.seconds", 100)
-  if (!wait_file_exists(shell_output_path, waitSeconds)) {
-    stop(paste(
-      "Failed to launch Spark shell. Ports file does not exist.\n",
-      "    Path: ", spark_submit_path, "\n",
-      "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
-      "    \n",
-      paste(readLines(output_file), collapse = "\n"),
-      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
-      sep = ""))
+    # add sparkr-shell to args
+    shell_args <- c(shell_args, app_jar)
+
+    # create temporary file for shell ports output and add it to the args
+    shell_output_path <- spark_config_value(config,
+                                            "sparklyr.ports.file",
+                                            normalizePath(tempfile(fileext = ".out"),
+                                                          mustWork = FALSE))
+
+    on.exit(unlink(shell_output_path))
+    shell_args <- c(shell_args, shell_output_path)
+
+    # start the shell (w/ specified additional environment variables)
+    env <- unlist(environment)
+    withr::with_envvar(env, {
+      if (.Platform$OS.type == "windows") {
+        shell(paste(
+          spark_submit_path,
+          paste(shell_args, collapse = " "),
+          ">",
+          output_file,
+          "2>",
+          error_file
+        ),
+        wait = FALSE)
+      }
+      else {
+        system2(spark_submit_path,
+                args = shell_args,
+                stdout = output_file,
+                stderr = output_file,
+                wait = FALSE)
+      }
+    })
+
+    # wait for the shell output file
+    waitSeconds <- spark_config_value(config, "sparklyr.ports.wait.seconds", 100)
+    if (!wait_file_exists(shell_output_path, waitSeconds)) {
+      stop(paste(
+        "Failed to launch Spark shell. Ports file does not exist.\n",
+        "    Path: ", spark_submit_path, "\n",
+        "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
+        "    \n",
+        paste(readLines(output_file), collapse = "\n"),
+        if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
+        sep = ""))
+    }
+
+    # read the shell output file
+    shell_file <- read_shell_file(shell_output_path)
+
+    # bind to the monitor and backend ports
+    tryCatch({
+      monitor <- socketConnection(port = shell_file$monitorPort)
+    }, error = function(err) {
+      stop("Failed to open connection to monitor")
+    })
+
+    tryCatch({
+      backend <- socketConnection(host = "localhost",
+                                  port = shell_file$backendPort,
+                                  server = FALSE,
+                                  blocking = TRUE,
+                                  open = "wb",
+                                  timeout = 6000)
+    }, error = function(err) {
+      stop("Failed to open connection to backend")
+    })
+
+  } else {
+    tryCatch({
+      backend <- socketConnection(host = "localhost",
+                                  port = config[["backend.port"]],
+                                  server = FALSE,
+                                  blocking = TRUE,
+                                  open = "wb",
+                                  timeout = 6000)
+    }, error = function(err) {
+      stop(paste("Failed to connect to an existing backend with provided port",
+                 config[["backend.port"]]))
+    })
+    monitor = backend
   }
-
-  # read the shell output file
-  shell_file <- read_shell_file(shell_output_path)
-
-  # bind to the monitor and backend ports
-  tryCatch({
-    monitor <- socketConnection(port = shell_file$monitorPort)
-  }, error = function(err) {
-    stop("Failed to open connection to monitor")
-  })
-
-  tryCatch({
-    backend <- socketConnection(host = "localhost",
-                                port = shell_file$backendPort,
-                                server = FALSE,
-                                blocking = TRUE,
-                                open = "wb",
-                                timeout = 6000)
-  }, error = function(err) {
-    stop("Failed to open connection to backend")
-  })
 
   # create the shell connection
   sc <- structure(class = c("spark_connection", "spark_shell_connection"), list(
@@ -242,8 +259,8 @@ stop_shell <- function(sc) {
                 "Handler",
                 "stopBackend")
 
-  close(sc$backend)
-  close(sc$monitor)
+  if (isOpen(sc$backend)) close(sc$backend)
+  if (isOpen(sc$monitor)) close(sc$monitor)
 }
 
 #' @export

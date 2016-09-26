@@ -218,9 +218,10 @@ initialize_connection <- function(sc) {
   apply_config(context_config, conf, "set", "spark.")
 
   # create the spark context and assign the connection to it
-  sc$spark_context <- invoke_new(
+  sc$spark_context <- invoke_static(
     sc,
     "org.apache.spark.SparkContext",
+    "getOrCreate",
     conf
   )
   sc$spark_context$connection <- sc

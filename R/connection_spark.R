@@ -40,11 +40,14 @@ spark_connect <- function(master,
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
-                          config = spark_config(),
+                          config = NULL,
                           extensions = sparklyr::registered_extensions()) {
 
   # validate method
   method <- match.arg(method)
+
+  # merge user-provided config list
+  config <- spark_config(extraConfig = config)
 
   # master can be missing if it's specified in the config file
   if (missing(master)) {
