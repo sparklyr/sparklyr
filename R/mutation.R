@@ -9,8 +9,16 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
     return(self)
 
   sdf <- spark_dataframe(self)
+
+  # NOTE: 'unionAll' was deprecated in Spark 2.0.0, but 'unionAll'
+  # is not available for DataFrames in older versions of Spark, so
+  # provide a bit of indirection based on Spark version
+  sc <- spark_connection(sdf)
+  version <- spark_version(sc)
+  method <- if (version < "2.0.0") "unionAll" else "union"
+
   for (i in 2:n)
-    sdf <- invoke(sdf, "unionAll", spark_dataframe(dots[[i]]))
+    sdf <- invoke(sdf, method, spark_dataframe(dots[[i]]))
 
   sdf_register(sdf, name = name)
 }
