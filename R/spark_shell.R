@@ -120,8 +120,12 @@ start_shell <- function(master,
   # add sparkr-shell to args
   shell_args <- c(shell_args, app_jar)
 
-  on.exit(unlink(shell_output_path))
-  shell_args <- c(shell_args, "8700")
+  gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
+  isService <- as.logical(spark_config_value(config, "sparklyr.service", "FALSE"))
+  shell_args <- c(shell_args, as.character(gatewayPort))
+  if (isService) {
+    shell_args <- c(shell_args, "--service")
+  }
 
   # create temp file for stdout and stderr
   output_file <- tempfile(fileext = "_spark.log")
@@ -151,7 +155,6 @@ start_shell <- function(master,
   })
 
   # wait for the service to start
-  gatewayPort <- spark_config_value(config, "sparklyr.gateway.port", 8880)
   waitSeconds <- spark_config_value(config, "sparklyr.gateway.wait.seconds", 10)
   gateway <- wait_connect_gateway(gatewayPort, waitSeconds)
   if (is.null(gateway)) {
