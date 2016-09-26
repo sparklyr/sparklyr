@@ -211,11 +211,13 @@ start_shell <- function(master,
                                 open = "wb",
                                 timeout = 6000)
   }, error = function(err) {
-    stop(paste(
+    abort_shell(
       "Failed to open connection to backend",
-      if (file.exists(output_file)) paste(readLines(output_file), collapse = "\n") else "",
-      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
-      sep = ""))
+      spark_submit_path,
+      shell_args,
+      output_file,
+      error_file
+    )
   })
 
   # create the shell connection
@@ -243,12 +245,13 @@ start_shell <- function(master,
   tryCatch({
     sc <- initialize_connection(sc)
   }, error = function(e) {
-    stop(paste(
-      "Failed during initialize_connection() ",
-      e$message, "\n\n",
-      if (file.exists(output_file)) paste(readLines(output_file), collapse = "\n") else "",
-      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
-      sep = ""), call. = FALSE)
+    abort_shell(
+      "Failed during initialize_connection",
+      spark_submit_path,
+      shell_args,
+      output_file,
+      error_file
+    )
   })
 
   sc
