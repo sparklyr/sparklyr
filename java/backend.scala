@@ -75,6 +75,7 @@ object Backend {
   private[this] var isService: Boolean = false
   private[this] var gatewayServerSocket: ServerSocket = null
   private[this] var port: Int = 0
+  private[this] var sessionId: Int = 0
   
   private var hc: HiveContext = null
   
@@ -87,13 +88,21 @@ object Backend {
   }
   
   def main(args: Array[String]): Unit = {
-    if (args.length > 2 || args.length < 1) {
-      System.err.println("Usage: Backend port [--service]")
+    if (args.length > 3 || args.length < 2) {
+      System.err.println(
+        "Usage: Backend port id [--service]\n" +
+        "\n" +
+        "  port:      port the gateway will listen to\n" +
+        "  id:        arbitrary numeric identifier for this backend session\n" +
+        "  --service: prevents closing the connection from closing the backend"
+      )
+      
       System.exit(-1)
     }
     
     port = args(0).toInt
-    isService = args.length > 1 && args(1) == "--service"
+    sessionId = args(1).toInt
+    isService = args.length > 2 && args(2) == "--service"
     
     try {
       gatewayServerSocket = new ServerSocket(port, 1, InetAddress.getByName("localhost"))
@@ -125,6 +134,7 @@ object Backend {
       override def run(): Unit = {
         try {
           val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+          dos.writeInt(sessionId)
           dos.writeInt(gatewaySocket.getLocalPort())
           dos.writeInt(backendPort)
           

@@ -136,7 +136,8 @@ start_shell <- function(master,
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   isService <- as.logical(spark_config_value(config, "sparklyr.service", "FALSE"))
-  shell_args <- c(shell_args, as.character(gatewayPort))
+  sessionId <- floor(runif(1, min=0, max=10000))
+  shell_args <- c(shell_args, as.character(gatewayPort), sessionId)
   gateway <- NULL
   if (isService) {
     shell_args <- c(shell_args, "--service")
@@ -197,8 +198,13 @@ start_shell <- function(master,
       readBin(con, integer(), n = n, endian = "big")
     }
 
+    backendSessionId <- readInt(gateway)
     monitorPort <- readInt(gateway)
     backendPort <- readInt(gateway)
+
+    if (!isService && monitorPort == gatewayPort && backendSessionId != sessionId) {
+      stop("Unrecognized backend session identifier.")
+    }
 
     if (monitorPort != gatewayPort) {
       stop("Currently, sparklyr gateway does not support routing")
