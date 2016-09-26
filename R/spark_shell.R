@@ -220,15 +220,11 @@ start_shell <- function(master,
   tryCatch({
     sc <- initialize_connection(sc)
   }, error = function(e) {
-    try(silent = TRUE, {
-      log <- spark_log(sc);
-    })
-
     stop(paste(
       "Failed during initialize_connection() ",
       e$message, "\n\n",
-      "Log: ", "\n",
-      log, "\n",
+      if (file.exists(output_file)) paste(readLines(output_file), collapse = "\n") else "",
+      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
       sep = ""), call. = FALSE)
   })
 
