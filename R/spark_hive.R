@@ -50,6 +50,7 @@ create_hive_context_v1 <- function(sc) {
       ctx
     )},
     error = function(e) {
+      warning(e$message)
       NULL
     }
   )

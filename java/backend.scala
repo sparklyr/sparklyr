@@ -13,6 +13,8 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder
 import io.netty.handler.codec.bytes.{ByteArrayDecoder, ByteArrayEncoder}
 
 import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.hive.HiveContext
 
 import sparklyr.Logging._
 
@@ -73,6 +75,16 @@ object Backend {
   private[this] var isService: Boolean = false
   private[this] var gatewayServerSocket: ServerSocket = null
   private[this] var port: Int = 0
+  
+  private var hc: HiveContext = null
+  
+  def getOrCreateHiveContext(sc: SparkContext): HiveContext = {
+    if (hc == null) {
+      hc = new HiveContext(sc)
+    }
+    
+    hc
+  }
   
   def main(args: Array[String]): Unit = {
     if (args.length > 2 || args.length < 1) {
