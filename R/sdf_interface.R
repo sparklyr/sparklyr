@@ -577,3 +577,38 @@ sdf_with_unique_id <- function(x, id = "id") {
   transformed <- invoke(sdf, "withColumn", id, mii)
   sdf_register(transformed)
 }
+
+#' Compute (Approximate) Quantiles with a Spark DataFrame
+#'
+#' Given a numeric column within a Spark DataFrame, compute
+#' approximate quantiles (to some relative error).
+#'
+#' @template roxlate-ml-x
+#' @param column The column for which quantiles should be computed.
+#' @param probabilities A numeric vector of probabilities, for
+#'   which quantiles should be computed.
+#' @param relative.error The relative error -- lower values imply more
+#'   precision in the computed quantiles.
+#'
+#' @export
+sdf_quantile <- function(x,
+                         column,
+                         probabilities = c(0.00, 0.25, 0.50, 0.75, 1.00),
+                         relative.error = 1E-5)
+{
+  sdf <- spark_dataframe(x)
+
+  nm <-
+    names(probabilities) %||%
+    paste(signif(probabilities * 100, 3), "%", sep = "")
+
+  column <- ensure_scalar_character(column)
+  probabilities <- as.list(as.numeric(probabilities))
+  relative.error <- ensure_scalar_double(relative.error)
+
+  stat <- invoke(sdf, "stat")
+  quantiles <- invoke(stat, "approxQuantile", column, probabilities, relative.error)
+  names(quantiles) <- nm
+
+  quantiles
+}
