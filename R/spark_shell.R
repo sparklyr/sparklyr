@@ -151,8 +151,9 @@ start_shell <- function(master,
   })
 
   # wait for the service to start
+  gatewayPort <- spark_config_value(config, "sparklyr.gateway.port", 8880)
   waitSeconds <- spark_config_value(config, "sparklyr.gateway.wait.seconds", 10)
-  gateway <- wait_connect_gateway(8880, waitSeconds)
+  gateway <- wait_connect_gateway(gatewayPort, waitSeconds)
   if (is.null(gateway)) {
     stop(paste(
       "Failed while launching sparklyr.\n",
@@ -169,7 +170,12 @@ start_shell <- function(master,
       readBin(con, integer(), n = n, endian = "big")
     }
 
+    monitorPort <- readInt(gateway)
     backendPort <- readInt(gateway)
+
+    if (monitorPort != gatewayPort) {
+      stop("Currently, sparklyr gateway does not support routing")
+    }
 
     backend <- socketConnection(host = "localhost",
                                 port = backendPort,

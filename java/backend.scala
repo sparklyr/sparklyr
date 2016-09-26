@@ -113,6 +113,7 @@ object Backend {
       override def run(): Unit = {
         try {
           val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+          dos.writeInt(gatewaySocket.getLocalPort())
           dos.writeInt(backendPort)
           
           // wait for the end of socket, closed if R process die
