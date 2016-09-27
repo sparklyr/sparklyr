@@ -203,10 +203,11 @@ start_shell <- function(master,
     }
 
     gatewayCommands <- list(
-      "sessionPorts" = 0
+      "GetPorts" = 0,
+      "RegisterInstance" = 1
     )
 
-    writeInt(gateway, gatewayCommands$sessionPorts)
+    writeInt(gateway, gatewayCommands[["GetPorts"]])
 
     backendSessionId <- readInt(gateway)
     monitorPort <- readInt(gateway)
@@ -217,7 +218,8 @@ start_shell <- function(master,
     }
 
     if (monitorPort != gatewayPort) {
-      stop("Currently, sparklyr gateway does not support routing")
+      close(gateway)
+      gateway <- wait_connect_gateway(monitorPort, 1)
     }
 
     backend <- socketConnection(host = "localhost",
@@ -227,6 +229,8 @@ start_shell <- function(master,
                                 open = "wb",
                                 timeout = 6000)
   }, error = function(err) {
+    close(gateway)
+
     abort_shell(
       paste("Failed to open connection to backend:", err$message),
       spark_submit_path,

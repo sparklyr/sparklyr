@@ -35,3 +35,4 @@ log4j.spark*
 /configure
 /bin/
 .cache-main
+.settings

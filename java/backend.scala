@@ -1,7 +1,8 @@
 package sparklyr
 
-import java.io.{DataOutputStream, File, FileOutputStream, IOException}
-import java.net.{InetAddress, InetSocketAddress, ServerSocket}
+import java.io.{DataInputStream, DataOutputStream}
+import java.io.{File, FileOutputStream, IOException}
+import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
 import java.util.concurrent.TimeUnit
 
 import io.netty.bootstrap.ServerBootstrap
@@ -16,8 +17,9 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.hive.HiveContext
 
+import scala.util.Try
+
 import sparklyr.Logging._
-import java.io.DataInputStream
 
 class Backend {
 
@@ -78,7 +80,13 @@ object Backend {
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
   
-  private var hc: HiveContext = null
+  private[this] var hc: HiveContext = null
+  
+  private[this] var sessionsMap:Map[Int, Int] = Map()
+  
+  object GatewayOperattions extends Enumeration {
+    val GetPorts, RegisterInstance = Value
+  }
   
   def getOrCreateHiveContext(sc: SparkContext): HiveContext = {
     if (hc == null) {
@@ -86,6 +94,24 @@ object Backend {
     }
     
     hc
+  }
+  
+  def portIsAvailable(port: Int) = {
+    var ss: ServerSocket = null
+    var available = false
+    
+    Try {
+        ss = new ServerSocket(port, 1, InetAddress.getByName("localhost"))
+        available = true
+    }
+    
+    if (ss != null) {
+        Try {
+            ss.close();
+        }
+    }
+
+    available
   }
   
   def main(args: Array[String]): Unit = {
@@ -108,7 +134,23 @@ object Backend {
     log("sparklyr session " + sessionId + " ready on port " + port)
     
     try {
-      gatewayServerSocket = new ServerSocket(port, 1, InetAddress.getByName("localhost"))
+      if (portIsAvailable(port))
+      {
+        gatewayServerSocket = new ServerSocket(port, 1, InetAddress.getByName("localhost"))
+      }
+      else
+      {
+        gatewayServerSocket = new ServerSocket(0, 1, InetAddress.getByName("localhost"))
+        val gatewayPort = port
+        port = gatewayServerSocket.getLocalPort()
+        
+        val success = register(gatewayPort, sessionId, port)
+        if (!success) {
+          logError("Failed to register sparklyr session (" + sessionId + ") to gateway port (" + gatewayPort + ")")
+          System.exit(1)
+        }
+      }
+      
       gatewayServerSocket.setSoTimeout(0)
     
       while(true) {
@@ -141,21 +183,59 @@ object Backend {
           
           log("sparklyr gateway received command identifier (" + commandId + ")")
           
-          commandId match {
-            case 0 => {
-              val dos = new DataOutputStream(gatewaySocket.getOutputStream())
-              dos.writeInt(sessionId)
-              dos.writeInt(gatewaySocket.getLocalPort())
-              dos.writeInt(backendPort)
+          GatewayOperattions(commandId) match {
+            case GatewayOperattions.GetPorts => {
+              val requestedSessionId = dis.readInt()
               
-              // wait for the end of socket, closed if R process die
-              gatewaySocket.getInputStream().read(buf)
+              val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+              
+              if (requestedSessionId == sessionId)
+              {
+                dos.writeInt(sessionId)
+                dos.writeInt(gatewaySocket.getLocalPort())
+                dos.writeInt(backendPort)
+                
+                // wait for the end of socket, closed if R process die
+                gatewaySocket.getInputStream().read(buf)
+              }
+              else
+              {
+                var portForSession = sessionsMap.get(requestedSessionId)
+                
+                var sessionMapRetries: Int = 100
+                while (!portForSession.isDefined && sessionMapRetries > 0)
+                {
+                  portForSession = sessionsMap.get(requestedSessionId)
+                  
+                  Thread.sleep(10)
+                  sessionMapRetries = sessionMapRetries - 1
+                }
+                
+                if (portForSession.isDefined)
+                {
+                    dos.writeInt(requestedSessionId)
+                    dos.writeInt(portForSession.get)
+                    dos.writeInt(0)
+                }
+                else
+                {
+                  logError("Session id (" + requestedSessionId + ") is not registered in this gateway")
+              
+                  if (!isService) System.exit(1)
+                }
+              }
               
               dos.close()
             }
-            case other => {
-              log("sparklyr gateway received invalid command identifier (" + commandId + ")")
-              if (!isService) System.exit(1)
+            case GatewayOperattions.RegisterInstance => {
+              val registerSessionId = dis.readInt()
+              val registerGatewayPort = dis.readInt()
+              
+              val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+              dos.writeInt(0)
+              dos.close()
+              
+              sessionsMap += (registerSessionId -> registerGatewayPort)
             }
           }
           
@@ -188,5 +268,21 @@ object Backend {
         }
       }
     }.start()
+  }
+  
+  def register(gatewayPort: Int, sessionId: Int, port: Int): Boolean = {
+    log("sparklyr registering session (" + sessionId + ") into gateway port (" + gatewayPort +  ")")
+    
+    val s = new Socket(InetAddress.getByName("localhost"), gatewayPort)
+    
+    val dos = new DataOutputStream(s.getOutputStream())
+    dos.writeInt(sessionId)
+    dos.writeInt(port)
+    
+    val dis = new DataInputStream(s.getInputStream())
+    val status = dis.readInt()
+
+    s.close()
+    status != 0
   }
 }
