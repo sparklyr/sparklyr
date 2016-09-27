@@ -23,6 +23,10 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   mergedConfig
 }
 
+spark_config_value <- function(config, name, default = NULL) {
+  if (is.null(config[[name]])) default else config[[name]]
+}
+
 
 # recursively merge two lists (extracted from code used by rmarkdown
 # package to merge _output.yml, _site.yml, front matter, etc.:

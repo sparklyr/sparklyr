@@ -37,8 +37,8 @@ shell_connection <- function(master, spark_home, app_name, version, hadoop_versi
     spark_version = version,
     app_name = app_name,
     config = config,
-    jars = getOption("spark.jars.default", list()),
-    packages = config[["sparklyr.defaultPackages"]],
+    jars = spark_config_value(config, "spark.jars.default", list()),
+    packages = spark_config_value(config, "sparklyr.defaultPackages"),
     extensions = extensions,
     environment = environment,
     shell_args = shell_args

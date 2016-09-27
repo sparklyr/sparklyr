@@ -56,7 +56,7 @@ spark_connect <- function(master,
 
   # determine whether we need cores in master
   passedMaster <- master
-  cores <- config[["sparklyr.cores.local"]]
+  cores <- spark_config_value(config, "sparklyr.cores.local")
   if (master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
 
@@ -257,7 +257,7 @@ spark_master_is_local <- function(master) {
 
 # Number of cores available in the local install
 spark_connection_local_cores <- function(sc) {
-  sc$config[["sparklyr.cores"]]
+  spark_config_value(sc$config, "sparklyr.cores")
 }
 
 #' Close all existing connections
