@@ -50,7 +50,7 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
     warning.length = 5000
   ), {
     stop(paste(
-      message, ".\n",
+      message, "\n",
       "    Path: ", spark_submit_path, "\n",
       "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
       "    \n",
@@ -218,7 +218,7 @@ start_shell <- function(master,
                                 timeout = 6000)
   }, error = function(err) {
     abort_shell(
-      "Failed to open connection to backend",
+      paste("Failed to open connection to backend:", err$message),
       spark_submit_path,
       shell_args,
       output_file,
@@ -252,7 +252,7 @@ start_shell <- function(master,
     sc <- initialize_connection(sc)
   }, error = function(e) {
     abort_shell(
-      "Failed during initialize_connection",
+      paste("Failed during initialize_connection:", e$message),
       spark_submit_path,
       shell_args,
       output_file,

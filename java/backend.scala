@@ -104,6 +104,8 @@ object Backend {
     sessionId = args(1).toInt
     isService = args.length > 2 && args(2) == "--service"
     
+    log("sparklyr session " + sessionId + " ready on port " + port)
+    
     try {
       gatewayServerSocket = new ServerSocket(port, 1, InetAddress.getByName("localhost"))
       gatewayServerSocket.setSoTimeout(0)
