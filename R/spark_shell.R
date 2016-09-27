@@ -198,6 +198,16 @@ start_shell <- function(master,
       readBin(con, integer(), n = n, endian = "big")
     }
 
+    writeInt <- function(con, value) {
+      writeBin(as.integer(value), con, endian = "big")
+    }
+
+    gatewayCommands <- list(
+      "sessionPorts" = 0
+    )
+
+    writeInt(gateway, gatewayCommands$sessionPorts)
+
     backendSessionId <- readInt(gateway)
     monitorPort <- readInt(gateway)
     backendPort <- readInt(gateway)

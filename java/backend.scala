@@ -17,6 +17,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.sql.hive.HiveContext
 
 import sparklyr.Logging._
+import java.io.DataInputStream
 
 class Backend {
 
@@ -135,15 +136,29 @@ object Backend {
       setDaemon(true)
       override def run(): Unit = {
         try {
-          val dos = new DataOutputStream(gatewaySocket.getOutputStream())
-          dos.writeInt(sessionId)
-          dos.writeInt(gatewaySocket.getLocalPort())
-          dos.writeInt(backendPort)
+          val dis = new DataInputStream(gatewaySocket.getInputStream())
+          val commandId = dis.readInt()
           
-          // wait for the end of socket, closed if R process die
-          gatewaySocket.getInputStream().read(buf)          
-
-          dos.close()
+          log("sparklyr gateway received command identifier (" + commandId + ")")
+          
+          commandId match {
+            case 0 => {
+              val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+              dos.writeInt(sessionId)
+              dos.writeInt(gatewaySocket.getLocalPort())
+              dos.writeInt(backendPort)
+              
+              // wait for the end of socket, closed if R process die
+              gatewaySocket.getInputStream().read(buf)
+              
+              dos.close()
+            }
+            case other => {
+              log("sparklyr gateway received invalid command identifier (" + commandId + ")")
+              if (!isService) System.exit(1)
+            }
+          }
+          
           gatewaySocket.close()
         } catch {
           case e: IOException =>
