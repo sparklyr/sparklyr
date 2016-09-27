@@ -53,7 +53,7 @@ sql_translate_env.spark_connection <- function(con) {
       as.character  = function(x) build_sql("CAST(", x, " AS STRING)"),
       as.date  = function(x) build_sql("CAST(", x, " AS DATE)"),
       as.Date  = function(x) build_sql("CAST(", x, " AS DATE)"),
-      unixtime = function(x, format) build_sql("from_unixtime(", x, ", ", format, ")"),
+      from_unixtime = function(x, format) build_sql("from_unixtime(", x, ", ", format, ")"),
       year = function(x) build_sql("year(",x, ")" ),
       quarter = function(x) build_sql("quarter(",x, ")" ),
       month = function(x) build_sql("month(",x, ")" ),
