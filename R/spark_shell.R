@@ -442,7 +442,6 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, seconds) {
   while(is.null(monitor) && retries >= 0) {
     tryCatch({
       suppressWarnings(
-        gatewayAddress <- spark_config_value(config, )
         monitor <- socketConnection(host = gatewayAddress,
           port = gatewayPort,
           server = FALSE,
