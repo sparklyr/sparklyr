@@ -179,18 +179,23 @@ start_shell <- function(master,
 
   # bind to the monitor and backend ports
   tryCatch({
-    monitor <- socketConnection(port = shell_file$monitorPort)
+    timeout <- spark_config_value(config, "sparklyr.monitor.timeout", NULL)
+    monitor <- socketConnection(
+      port = shell_file$monitorPort,
+      timeout = timeout)
   }, error = function(err) {
     stop("Failed to open connection to monitor")
   })
 
   tryCatch({
+    # set timeout for socket connection
+    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
     backend <- socketConnection(host = "localhost",
                                 port = shell_file$backendPort,
                                 server = FALSE,
                                 blocking = TRUE,
                                 open = "wb",
-                                timeout = 6000)
+                                timeout = timeout)
   }, error = function(err) {
     stop("Failed to open connection to backend")
   })
