@@ -135,6 +135,8 @@ start_shell <- function(master,
   shell_args <- c(shell_args, app_jar)
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
+  gatewayAddress <- as.integer(spark_config_value(config, "sparklyr.gateway.address", "localhost"))
+
   isService <- as.logical(spark_config_value(config, "sparklyr.service", "FALSE"))
   sessionId <- floor(runif(1, min=0, max=10000))
   shell_args <- c(shell_args, as.character(gatewayPort), sessionId)
@@ -143,7 +145,7 @@ start_shell <- function(master,
     shell_args <- c(shell_args, "--service")
 
     # try connecting to an existing instance of sparklyr running in service mode
-    gateway <- wait_connect_gateway(gatewayPort, 1)
+    gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, 1)
   }
 
   output_file <- NULL
@@ -180,7 +182,7 @@ start_shell <- function(master,
 
     # wait for the service to start
     waitSeconds <- spark_config_value(config, "sparklyr.gateway.wait.seconds", 10)
-    gateway <- wait_connect_gateway(gatewayPort, waitSeconds)
+    gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, waitSeconds)
 
     if (is.null(gateway)) {
       abort_shell(
@@ -219,7 +221,7 @@ start_shell <- function(master,
 
     if (monitorPort != gatewayPort) {
       close(gateway)
-      gateway <- wait_connect_gateway(monitorPort, 1)
+      gateway <- wait_connect_gateway(gatewayAddress, monitorPort, 1)
     }
 
     backend <- socketConnection(host = "localhost",
@@ -433,14 +435,15 @@ attach_connection <- function(jobj, connection) {
   jobj
 }
 
-wait_connect_gateway <- function(gatewayPort, seconds) {
+wait_connect_gateway <- function(gatewayAddress, gatewayPort, seconds) {
   retries <- seconds * 10
   monitor <- NULL
 
   while(is.null(monitor) && retries >= 0) {
     tryCatch({
       suppressWarnings(
-        monitor <- socketConnection(host = "localhost",
+        gatewayAddress <- spark_config_value(config, )
+        monitor <- socketConnection(host = gatewayAddress,
           port = gatewayPort,
           server = FALSE,
           blocking = TRUE,
