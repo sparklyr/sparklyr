@@ -225,12 +225,14 @@ start_shell <- function(master,
       gateway <- wait_connect_gateway(gatewayAddress, monitorPort, 1)
     }
 
+    # set timeout for socket connection
+    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
     backend <- socketConnection(host = "localhost",
                                 port = backendPort,
                                 server = FALSE,
                                 blocking = TRUE,
                                 open = "wb",
-                                timeout = 6000)
+                                timeout = timeout)
   }, error = function(err) {
     close(gateway)
 
