@@ -210,6 +210,7 @@ start_shell <- function(master,
     )
 
     writeInt(gateway, gatewayCommands[["GetPorts"]])
+    writeInt(gateway, sessionId)
 
     backendSessionId <- readInt(gateway)
     monitorPort <- readInt(gateway)
