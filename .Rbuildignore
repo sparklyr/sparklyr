@@ -8,6 +8,7 @@
 ^configure\.win$
 ^configure\.R$
 ^examples/
+^demo\.R$
 ^docs/
 ^internal/
 ^man-roxygen/
@@ -17,5 +18,5 @@
 ^metastore_db$
 ^spark-warehouse$
 ^log4j\..*$
-demo.R
+^run-tests$
 
