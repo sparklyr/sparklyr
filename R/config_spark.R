@@ -52,5 +52,3 @@ merge_lists <- function (base_list, overlay_list, recursive = TRUE) {
     merged_list
   }
 }
-
-

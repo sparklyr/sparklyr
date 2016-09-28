@@ -1,6 +1,9 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
-- Moved spark.jars.default setting from options to spark config
+- Moved `spark.jars.default` setting from options to spark config.
+
+- `sparklyr` now properly respects the Hive metastore directory with the
+  `sdf_save_table()` and `sdf_load_table()` APIs for Spark < 2.0.0.
 
 - Added `sdf_quantile()` as a means of computing (approximate) quantiles
   for a column of a Spark DataFrame.

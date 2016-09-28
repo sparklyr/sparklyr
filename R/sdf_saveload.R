@@ -19,11 +19,21 @@ sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
   sdf <- spark_dataframe(x)
   name <- ensure_scalar_character(name)
 
-  write <- invoke(sdf, "write")
-  if (overwrite) write <- invoke(write, "mode", "overwrite")
-  if (append)    write <- invoke(write, "mode", "append")
+  writer <- invoke(sdf, "write")
+  if (overwrite) writer <- invoke(writer, "mode", "overwrite")
+  if (append)    writer <- invoke(writer, "mode", "append")
 
-  invoke(write, "saveAsTable", name)
+  # Spark < 2.0.0 doesn't respect the metastore directory when
+  # using the 'saveAsTable' API, so we directly call 'save'.
+  sc <- spark_connection(sdf)
+  if (spark_version(sc) < "2.0.0") {
+    hc <- hive_context(sc)
+    metastore <- invoke(hc, "getConf", "hive.metastore.warehouse.dir")
+    path <- path.expand(file.path(metastore, name))
+    invoke(writer, "save", path)
+  } else {
+    invoke(writer, "saveAsTable", name)
+  }
 }
 
 #' @rdname sdf-saveload
@@ -32,9 +42,17 @@ sdf_load_table <- function(sc, name) {
   session <- spark_session(sc)
   name <- ensure_scalar_character(name)
 
-  sdf <- session %>%
-    invoke("read") %>%
-    invoke("table", name)
+  # NOTE: need to explicitly provide path to metastore for
+  # Spark < 2.0.0
+  reader <- invoke(session, "read")
+  sdf <- if (spark_version(sc) < "2.0.0") {
+    hc <- hive_context(sc)
+    metastore <- invoke(hc, "getConf", "hive.metastore.warehouse.dir")
+    path <- file.path(metastore, name)
+    invoke(reader, "load", path)
+  } else {
+    invoke(reader, "table", name)
+  }
 
   sdf_register(sdf)
 }

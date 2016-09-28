@@ -13,6 +13,8 @@ expect_centers_equal <- function(lhs, rhs, ...) {
 test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
   skip_on_cran()
   skip_if_not_installed("dplyr")
+  if (spark_version(sc) < "2.0.0")
+    skip("requires Spark 2.0.0")
 
   library(dplyr)
   data(iris)
