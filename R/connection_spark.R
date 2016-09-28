@@ -25,6 +25,8 @@ spark_default_app_jar <- function(version) {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of Spark (only applicable for local master)
 #' @param hadoop_version Version of Hadoop (only applicable for local master)
+#' @param service Enables the sparklyr backend to run as a service by keeping the Spark
+#'   application running even when the connection is lost.
 #' @param extensions Extension packages to enable for this connection. By default will
 #'   enable all packages that previously called \code{sparklyr::register_extension}.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
@@ -41,6 +43,7 @@ spark_connect <- function(master,
                           version = NULL,
                           hadoop_version = NULL,
                           config = spark_config(),
+                          service = FALSE,
                           extensions = sparklyr::registered_extensions()) {
 
   # validate method
@@ -96,6 +99,7 @@ spark_connect <- function(master,
                              hadoop_version = hadoop_version,
                              shell_args = shell_args,
                              config = config,
+                             service = service,
                              extensions = extensions)
 
   # other methods

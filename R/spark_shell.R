@@ -1,8 +1,15 @@
 
 
 # create a shell connection
-shell_connection <- function(master, spark_home, app_name, version, hadoop_version,
-                             shell_args, config, extensions) {
+shell_connection <- function(master,
+                             spark_home,
+                             app_name,
+                             version,
+                             hadoop_version,
+                             shell_args,
+                             config,
+                             service,
+                             extensions) {
 
   # for local mode we support SPARK_HOME via locally installed versions
   if (spark_master_is_local(master)) {
@@ -41,7 +48,8 @@ shell_connection <- function(master, spark_home, app_name, version, hadoop_versi
     packages = spark_config_value(config, "sparklyr.defaultPackages"),
     extensions = extensions,
     environment = environment,
-    shell_args = shell_args
+    shell_args = shell_args,
+    service = service
   )
 }
 
@@ -70,7 +78,8 @@ start_shell <- function(master,
                         jars = NULL,
                         packages = NULL,
                         environment = NULL,
-                        shell_args = NULL) {
+                        shell_args = NULL,
+                        service = FALSE) {
   # read app jar through config, this allows "sparkr-shell" to test sparkr backend
   app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
   if (is.null(app_jar)) {
@@ -137,8 +146,8 @@ start_shell <- function(master,
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
 
-  isService <- as.logical(spark_config_value(config, "sparklyr.service", "FALSE"))
-  sessionId <- floor(runif(1, min=0, max=10000))
+  isService <- as.logical(spark_config_value(config, "sparklyr.service", service))
+  sessionId <- floor(runif(1, min = 0, max = 10000))
   shell_args <- c(shell_args, as.character(gatewayPort), sessionId)
   gateway <- NULL
   if (isService) {
