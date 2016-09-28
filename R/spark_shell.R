@@ -135,7 +135,7 @@ start_shell <- function(master,
   shell_args <- c(shell_args, app_jar)
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
-  gatewayAddress <- as.integer(spark_config_value(config, "sparklyr.gateway.address", "localhost"))
+  gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
 
   isService <- as.logical(spark_config_value(config, "sparklyr.service", "FALSE"))
   sessionId <- floor(runif(1, min=0, max=10000))
