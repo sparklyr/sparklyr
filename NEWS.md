@@ -1,5 +1,10 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Added support to parameterize network timeouts using the
+  sparklyr.monitor.timeout and sparklyr.backend.timeout config settings.
+
+- Increased network timeout for sparklyr.backend.timeout.
+
 - Moved `spark.jars.default` setting from options to spark config.
 
 - `sparklyr` now properly respects the Hive metastore directory with the
