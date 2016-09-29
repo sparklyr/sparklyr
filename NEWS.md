@@ -1,7 +1,7 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
-- Added terminate parameter to spark_disconnect to terminate sparklyr service 
-  mode.
+- Added terminate parameter to spark_disconnect and spark_disconnect_all
+  to terminate sparklyr service mode.
 
 - Improved logging while establishing connections to sparklyr.
 

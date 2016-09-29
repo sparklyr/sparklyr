@@ -273,11 +273,14 @@ spark_connection_local_cores <- function(sc) {
 
 #' Close all existing connections
 #'
+#' @param terminate \code{TRUE} to terminate \code{\link{spark_connect}}
+#'   launched in \code{service = TRUE} mode.
+#'
 #' @family Spark connections
 #'
 #' @rdname spark_disconnect
 #' @export
-spark_disconnect_all <- function() {
+spark_disconnect_all <- function(termiante = FALSE) {
   scons <- spark_connection_find_scon(function(e) {
     connection_is_open(e)
   })
