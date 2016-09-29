@@ -53,14 +53,14 @@ shell_connection <- function(master,
   )
 }
 
-spark_session_id <- function(app_name) {
+spark_session_id <- function(app_name, master) {
   hex_to_int <- function(h) {
     xx = strsplit(tolower(h), "")[[1L]]
     pos = match(xx, c(0L:9L, letters[1L:6L]))
     sum((pos - 1L) * 16^(rev(seq_along(xx) - 1)))
   }
 
-  hashed <- digest(object = "master-yarn", algo = "crc32")
+  hashed <- digest(object = paste(app_name, master, sep = ""), algo = "crc32")
   hex_to_int(hashed) %% .Machine$integer.max
 }
 
