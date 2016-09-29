@@ -158,7 +158,7 @@ start_shell <- function(master,
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
 
   isService <- as.logical(spark_config_value(config, "sparklyr.service", service))
-  sessionId <- if (service) spark_session_id(app_name, master) else floor(runif(1, min = 0, max = 10000))
+  sessionId <- if (isService == TRUE) spark_session_id(app_name, master) else floor(runif(1, min = 0, max = 10000))
   shell_args <- c(shell_args, as.character(gatewayPort), sessionId)
   gateway <- NULL
   if (isService) {
