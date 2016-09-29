@@ -53,6 +53,17 @@ shell_connection <- function(master,
   )
 }
 
+spark_session_id <- function(app_name) {
+  hex_to_int <- function(h) {
+    xx = strsplit(tolower(h), "")[[1L]]
+    pos = match(xx, c(0L:9L, letters[1L:6L]))
+    sum((pos - 1L) * 16^(rev(seq_along(xx) - 1)))
+  }
+
+  hashed <- digest(object = "master-yarn", algo = "crc32")
+  hex_to_int(hashed) %% .Machine$integer.max
+}
+
 abort_shell <- function(message, spark_submit_path, shell_args, output_file, error_file) {
   withr::with_options(list(
     warning.length = 5000
@@ -147,7 +158,7 @@ start_shell <- function(master,
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
 
   isService <- as.logical(spark_config_value(config, "sparklyr.service", service))
-  sessionId <- if (service) 0 else floor(runif(1, min = 0, max = 10000))
+  sessionId <- if (service) spark_session_id(app_name) else floor(runif(1, min = 0, max = 10000))
   shell_args <- c(shell_args, as.character(gatewayPort), sessionId)
   gateway <- NULL
   if (isService) {
