@@ -19,4 +19,5 @@
 ^spark-warehouse$
 ^log4j\..*$
 ^run-tests$
+^.classpath$
 
