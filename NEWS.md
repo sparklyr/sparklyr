@@ -1,5 +1,20 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Improved logging while establishing connections to sparklyr.
+
+- Added sparklyr.gateway.port, sparklyr.gateway.address and sparklyr.service as
+  config settings.
+
+- Added eclipse project to ease development of the scala codebase within 
+  sparklyr.
+
+- Added filter parameter to spark_log to fitler with ease entries by a character
+  string.
+
+- Added support for spark_connect(service = TRUE) to run sparklyr backend
+  as a long running service that supports reconnection, multiple clients
+  and remote access.
+
 - Added support to parameterize network timeouts using the
   sparklyr.monitor.timeout and sparklyr.backend.timeout config settings.
 
