@@ -152,7 +152,7 @@ spark_connect <- function(master,
 }
 
 #' @export
-spark_log.spark_connection <- function(sc, n = 100, ...) {
+spark_log.spark_connection <- function(sc, n = 100, filter = NULL, ...) {
   if (.Platform$OS.type == "windows") {
     log <- file("log4j.spark.log")
     lines <- readr::read_lines(log)
@@ -161,17 +161,22 @@ spark_log.spark_connection <- function(sc, n = 100, ...) {
       close(log)
     })
 
+    if (!is.null(filter)) {
+      lines <- lines[grepl(filter, lines)]
+    }
+
     if (!is.null(n))
       linesLog <- utils::tail(lines, n = n)
     else
       linesLog <- lines
+
     attr(linesLog, "class") <- "sparklyr_log"
 
     linesLog
   }
   else {
     class(sc) <- "spark_shell_connection"
-    spark_log(sc, n, ...)
+    spark_log(sc, n, filter, ...)
   }
 }
 
@@ -197,17 +202,19 @@ spark_connection_is_open <- function(sc) {
 #' Disconnect from Spark
 #'
 #' @param x A \code{\link{spark_connect}} connection or the Spark master
+#' @param terminate \code{TRUE} to terminate \code{\link{spark_connect}}
+#'   launched in \code{service = TRUE} mode.
 #' @param ... Additional arguments
 #'
 #' @family Spark connections
 #'
 #' @export
-spark_disconnect <- function(x, ...) {
+spark_disconnect <- function(x, terminate = FALSE, ...) {
   UseMethod("spark_disconnect")
 }
 
 #' @export
-spark_disconnect.spark_connection <- function(x, ...) {
+spark_disconnect.spark_connection <- function(x, terminate, ...) {
   tryCatch({
     stop_shell(x)
   }, error = function(err) {
@@ -219,7 +226,7 @@ spark_disconnect.spark_connection <- function(x, ...) {
 }
 
 #' @export
-spark_disconnect.character <- function(x, ...) {
+spark_disconnect.character <- function(x, terminate, ...) {
   args <- list(...)
   master <- if (!is.null(args$master)) args$master else x
   app_name <- args$app_name
@@ -232,7 +239,7 @@ spark_disconnect.character <- function(x, ...) {
   })
 
   length(lapply(connections, function(sc) {
-    spark_disconnect(sc)
+    spark_disconnect(sc, terminate)
   }))
 }
 

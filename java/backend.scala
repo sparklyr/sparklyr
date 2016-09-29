@@ -191,6 +191,8 @@ object Backend {
               
               if (requestedSessionId == sessionId)
               {
+                log("sparklyr gateway found current session id (" + sessionId + ")")
+                
                 dos.writeInt(sessionId)
                 dos.writeInt(gatewaySocket.getLocalPort())
                 dos.writeInt(backendPort)
@@ -200,6 +202,8 @@ object Backend {
               }
               else
               {
+                log("sparklyr gateway searching for session id (" + requestedSessionId + ")")
+                
                 var portForSession = sessionsMap.get(requestedSessionId)
                 
                 var sessionMapRetries: Int = 100
@@ -213,9 +217,11 @@ object Backend {
                 
                 if (portForSession.isDefined)
                 {
-                    dos.writeInt(requestedSessionId)
-                    dos.writeInt(portForSession.get)
-                    dos.writeInt(0)
+                  log("sparklyr gateway found mapping for session id (" + requestedSessionId + ")")
+                  
+                  dos.writeInt(requestedSessionId)
+                  dos.writeInt(portForSession.get)
+                  dos.writeInt(0)
                 }
                 else
                 {

@@ -236,8 +236,12 @@ start_shell <- function(master,
     monitorPort <- readInt(gateway)
     backendPort <- readInt(gateway)
 
+    if (length(backendSessionId) == 0 || length(monitorPort) == 0 || length(backendPort) == 0) {
+      stop("Sparklyr gateway did not respond while retrieving ports information")
+    }
+
     if (!isService && monitorPort == gatewayPort && backendSessionId != sessionId) {
-      stop("Unrecognized backend session identifier.")
+      stop("Unrecognized sparklyr backend session identifier.")
     }
 
     if (monitorPort != gatewayPort) {
@@ -331,11 +335,15 @@ connection_is_open.spark_shell_connection <- function(sc) {
 }
 
 #' @export
-spark_log.spark_shell_connection <- function(sc, n = 100, ...) {
+spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
   if (!is.null(sc$output_file) && file.exists(sc$output_file)) {
     log <- file(sc$output_file)
     lines <- readLines(log)
     close(log)
+
+    if (!is.null(filter)) {
+      lines <- lines[grepl(filter, lines)]
+    }
 
     if (!is.null(n))
       linesLog <- utils::tail(lines, n = n)

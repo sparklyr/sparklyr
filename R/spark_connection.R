@@ -160,13 +160,14 @@ spark_master_is_local <- function(master) {
 #' @param sc \code{spark_connection}
 #' @param n Max number of log entries to retrieve (pass NULL to retrieve
 #'   all lines of the log)
+#' @param filter Character string to filter log entries.
 #' @param ... Unused (reserved for future use)
 #'
 #' @return Character vector with last \code{n} lines of the Spark log
 #'   or for \code{spark_log_file} the full path to the log file.
 #'
 #' @export
-spark_log <- function(sc, n = 100, ...) {
+spark_log <- function(sc, n = 100, filter = NULL, ...) {
   UseMethod("spark_log")
 }
 
@@ -178,7 +179,6 @@ spark_log.default <- function(sc, n = 100, ...) {
 #' @export
 print.spark_log <- function(x, ...) {
   cat(x, sep = "\n")
-  cat("\n")
 }
 
 #' Open the Spark web interface
