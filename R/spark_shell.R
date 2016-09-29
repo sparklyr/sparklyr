@@ -216,14 +216,6 @@ start_shell <- function(master,
   }
 
   tryCatch({
-    readInt <- function(con, n = 1) {
-      readBin(con, integer(), n = n, endian = "big")
-    }
-
-    writeInt <- function(con, value) {
-      writeBin(as.integer(value), con, endian = "big")
-    }
-
     gatewayCommands <- list(
       "GetPorts" = 0,
       "RegisterInstance" = 1
@@ -286,7 +278,7 @@ start_shell <- function(master,
   # stop shell on R exit
   reg.finalizer(baseenv(), function(x) {
     if (connection_is_open(sc)) {
-      stop_shell(sc)
+      stop_shell(sc, FALSE)
     }
   }, onexit = TRUE)
 
@@ -312,11 +304,12 @@ start_shell <- function(master,
 # @rdname start_shell
 #
 # @export
-stop_shell <- function(sc) {
+stop_shell <- function(sc, terminate) {
+  terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
   invoke_method(sc,
                 FALSE,
                 "Handler",
-                "stopBackend")
+                terminationMode)
 
   close(sc$backend)
   close(sc$monitor)

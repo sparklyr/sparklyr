@@ -216,7 +216,7 @@ spark_disconnect <- function(x, terminate = FALSE, ...) {
 #' @export
 spark_disconnect.spark_connection <- function(x, terminate, ...) {
   tryCatch({
-    stop_shell(x)
+    stop_shell(x, terminate)
   }, error = function(err) {
   })
 
