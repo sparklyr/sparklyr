@@ -73,8 +73,8 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
       "    Path: ", spark_submit_path, "\n",
       "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
       "    \n",
-      paste(readLines(output_file), collapse = "\n"),
-      if (file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
+      if (!is.null(output_file) && file.exists(output_file)) paste(readLines(output_file), collapse = "\n"),
+      if (!is.null(error_file) && file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
       sep = ""))
   })
 }
