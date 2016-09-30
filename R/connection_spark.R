@@ -38,7 +38,7 @@ spark_default_app_jar <- function(version) {
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell"),
+                          method = c("shell", "gateway"),
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
@@ -47,6 +47,7 @@ spark_connect <- function(master,
                           extensions = sparklyr::registered_extensions()) {
 
   # validate method
+  defaultMethod <- length(method) > 1
   method <- match.arg(method)
 
   # master can be missing if it's specified in the config file
@@ -88,6 +89,11 @@ spark_connect <- function(master,
     })
   }))
 
+  # map known protocols to methods
+  if (master_is_gateway(master) && defaultMethod) {
+    method <- "gateway"
+  }
+
   # connect using the specified method
 
   # spark-shell (local install of spark)
@@ -102,7 +108,8 @@ spark_connect <- function(master,
                              service = service,
                              extensions = extensions)
   } else if (method == "gateway") {
-    scon <- gateway_connection(master = master)
+    scon <- gateway_connection(master = master,
+                               config = config)
   } else {
     # other methods
 
