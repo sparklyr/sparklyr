@@ -189,7 +189,12 @@ object Backend {
     try {
       if (portIsAvailable(port))
       {
-        gatewayServerSocket = new ServerSocket(port, 1, InetAddress.getByName("localhost"))
+        val ipAddress = Array[Byte](0, 0, 0, 0)
+        gatewayServerSocket = new ServerSocket(
+          port,
+          1,
+          InetAddress.getByAddress(ipAddress)
+        )
       }
       else
       {
