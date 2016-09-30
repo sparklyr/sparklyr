@@ -70,7 +70,8 @@ sdf_collect <- function(object) {
   # having more than 50 columns seems to trigger the buggy behavior
   # collect the data set in chunks, and then join those chunks
   columns <- invoke(sdf, "columns") %>% as.character()
-  chunks <- split_chunks(columns, 50L)
+  chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
+  chunks <- split_chunks(columns, as.integer(chunk_size))
   pieces <- lapply(chunks, function(chunk) {
     subset <- sdf %>% invoke("selectExpr", as.list(chunk))
     invoke_static(sc, "sparklyr.Utils", "collect", subset)
