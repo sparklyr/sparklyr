@@ -294,7 +294,7 @@ spark_disconnect_all <- function(termiante = FALSE) {
   })
 
   length(lapply(scons, function(e) {
-    spark_disconnect(e)
+    spark_disconnect(e, termiante)
   }))
 }
 
