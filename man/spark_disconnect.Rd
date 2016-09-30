@@ -16,9 +16,6 @@ spark_disconnect_all(termiante = FALSE)
 launched in \code{service = TRUE} mode.}
 
 \item{...}{Additional arguments}
-
-\item{terminate}{\code{TRUE} to terminate \code{\link{spark_connect}}
-launched in \code{service = TRUE} mode.}
 }
 \description{
 Disconnect from Spark

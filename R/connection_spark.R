@@ -210,8 +210,6 @@ spark_connection_is_open <- function(sc) {
 #' Disconnect from Spark
 #'
 #' @param x A \code{\link{spark_connect}} connection or the Spark master
-#' @param terminate \code{TRUE} to terminate \code{\link{spark_connect}}
-#'   launched in \code{service = TRUE} mode.
 #' @param ... Additional arguments
 #'
 #' @family Spark connections
