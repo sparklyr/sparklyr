@@ -36,3 +36,4 @@ log4j.spark*
 /bin/
 .cache-main
 .settings
+.classpath
