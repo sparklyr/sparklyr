@@ -62,14 +62,24 @@ spark_connect_gateway <- function(gatewayAddress, gatewayPort, sessionId, waitSe
   }
 }
 
+master_is_gateway <- function(master) {
+  length(grep("^(sparklyr://)?[^:]+:[0-9]+$", master)) > 0
+}
+
 gateway_connection <- function(master, config) {
-  gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
-  gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", master)
+  if (!master_is_gateway(master)) {
+    stop("sparklyr gateway master expected to be formatted as sparklyr://address:port")
+  }
+
+  protocol <- strsplit(master, "//")[[1]]
+  components <- strsplit(protocol[[2]], ":")[[1]]
+  gatewayAddress <- components[[1]]
+  gatewayPort <- as.integer(components[[2]])
   sessionId <- 0
 
   timeout <- spark_config_value(config, "sparklyr.gateway.remote.timeout", 3)
-  gatewayInfo <- spark_connect_gateway(address = gatewayAddress,
-                                       port = gatewayPort,
+  gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
+                                       gatewayPort = gatewayPort,
                                        sessionId = sessionId,
                                        waitSeconds = timeout)
 
@@ -77,7 +87,7 @@ gateway_connection <- function(master, config) {
     stop("Failed to connect to gateway: ", master)
   }
 
-  sc <- spark_gateway_connection(config, gatewayInfo)
+  sc <- spark_gateway_connection(master, config, gatewayInfo)
 
   if (is.null(gatewayInfo)) {
     stop("Failed to open connection from gateway: ", master)
@@ -86,7 +96,7 @@ gateway_connection <- function(master, config) {
   sc
 }
 
-spark_gateway_connection <- function(config, gatewayInfo) {
+spark_gateway_connection <- function(master, config, gatewayInfo) {
   tryCatch({
     # set timeout for socket connection
     timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
@@ -106,10 +116,13 @@ spark_gateway_connection <- function(config, gatewayInfo) {
     # spark_connection
     master = master,
     method = "gateway",
-    app_name = "?",
+    app_name = "",
     config = config,
-    # spark_gateway_connection
-    gatewayInfo = gatewayInfo
+    # spark_gateway_connection : spark_shell_connection
+    spark_home = NULL,
+    backend = backend,
+    monitor = gatewayInfo$gateway,
+    output_file = NULL
   ))
 
   # stop shell on R exit
@@ -127,4 +140,32 @@ spark_gateway_connection <- function(config, gatewayInfo) {
   })
 
   sc
+}
+
+#' @export
+connection_is_open.spark_gateway_connection <- function(sc) {
+  class(sc) <- "spark_shell_connection"
+  connection_is_open(sc)
+}
+
+#' @export
+spark_log.spark_gateway_connection <- function(sc, n = 100, filter = NULL, ...) {
+  stop("spark_log is not available while connecting thorugh an sparklyr gateway")
+}
+
+#' @export
+spark_web.spark_gateway_connection <- function(sc, ...) {
+  stop("spark_web is not available while connecting thorugh an sparklyr gateway")
+}
+
+#' @export
+invoke_method.spark_gateway_connection <- function(sc, static, object, method, ...) {
+  class(sc) <- "spark_shell_connection"
+  invoke_method(sc, static, object, method, ...)
+}
+
+#' @export
+print_jobj.spark_gateway_connection <- function(sc, jobj, ...) {
+  class(sc) <- "spark_shell_connection"
+  print_jobj(sc, jobj, ...)
 }
