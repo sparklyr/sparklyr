@@ -189,7 +189,7 @@ object Backend {
               
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
               
-              if (requestedSessionId == sessionId)
+              if (requestedSessionId == sessionId || requestedSessionId == 0)
               {
                 log("sparklyr gateway found current session id (" + sessionId + ")")
                 
@@ -197,8 +197,16 @@ object Backend {
                 dos.writeInt(gatewaySocket.getLocalPort())
                 dos.writeInt(backendPort)
                 
+                // even if this backend instance did not start as a service
+                // it will be considered one since other instances might use
+                // this instance to map ports while this instance in running
+                val wasService = isService
+                isService = true
+                
                 // wait for the end of socket, closed if R process die
                 gatewaySocket.getInputStream().read(buf)
+                
+                isService = wasService
               }
               else
               {
@@ -225,8 +233,12 @@ object Backend {
                 }
                 else
                 {
-                  logError("Session id (" + requestedSessionId + ") is not registered in this gateway")
+                  log("sparklyr gateway found no mapping for session id (" + requestedSessionId + ")")
               
+                  dos.writeInt(requestedSessionId)
+                  dos.writeInt(0)
+                  dos.writeInt(0)
+                  
                   if (!isService) System.exit(1)
                 }
               }
@@ -237,8 +249,11 @@ object Backend {
               val registerSessionId = dis.readInt()
               val registerGatewayPort = dis.readInt()
               
+              log("sparklyr gateway registering session id (" + registerSessionId + ") for port (" + registerGatewayPort + ")")
+              
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
               dos.writeInt(0)
+              dos.flush()
               dos.close()
               
               sessionsMap += (registerSessionId -> registerGatewayPort)
@@ -282,13 +297,18 @@ object Backend {
     val s = new Socket(InetAddress.getByName("localhost"), gatewayPort)
     
     val dos = new DataOutputStream(s.getOutputStream())
+    dos.writeInt(GatewayOperattions.RegisterInstance.id)
     dos.writeInt(sessionId)
     dos.writeInt(port)
     
+    log("sparklyr waiting for registration of (" + sessionId + ") into gateway port (" + gatewayPort +  ")")
+    
     val dis = new DataInputStream(s.getInputStream())
     val status = dis.readInt()
-
+    
+    log("sparklyr fnished registration of session (" + sessionId + ") into gateway port (" + gatewayPort +  ")")
+    
     s.close()
-    status != 0
+    status == 0
   }
 }
