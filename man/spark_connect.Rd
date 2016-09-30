@@ -5,7 +5,7 @@
 \title{Connect to Spark}
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
-  method = c("shell"), app_name = "sparklyr", version = NULL,
+  method = c("shell", "gateway"), app_name = "sparklyr", version = NULL,
   hadoop_version = NULL, config = spark_config(), service = FALSE,
   extensions = sparklyr::registered_extensions())
 }

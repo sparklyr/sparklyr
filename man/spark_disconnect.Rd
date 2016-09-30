@@ -7,7 +7,7 @@
 \usage{
 spark_disconnect(x, terminate = FALSE, ...)
 
-spark_disconnect_all()
+spark_disconnect_all(termiante = FALSE)
 }
 \arguments{
 \item{x}{A \code{\link{spark_connect}} connection or the Spark master}
@@ -16,6 +16,9 @@ spark_disconnect_all()
 launched in \code{service = TRUE} mode.}
 
 \item{...}{Additional arguments}
+
+\item{terminate}{\code{TRUE} to terminate \code{\link{spark_connect}}
+launched in \code{service = TRUE} mode.}
 }
 \description{
 Disconnect from Spark
