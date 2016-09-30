@@ -197,6 +197,22 @@ object Backend {
                 dos.writeInt(gatewaySocket.getLocalPort())
                 dos.writeInt(backendPort)
                 
+                // wait for the end of stdin, then exit
+                new Thread("run backend") {
+                  setDaemon(true)
+                  override def run(): Unit = {
+                    try {
+                      backend.run()
+                    }
+                    catch {
+                      case e: IOException =>
+                        logError("Backend failed with exception ", e)
+                        
+                      if (!isService) System.exit(1)
+                    }
+                  }
+                }.start()
+                
                 // even if this backend instance did not start as a service
                 // it will be considered one since other instances might use
                 // this instance to map ports while this instance in running
@@ -273,22 +289,6 @@ object Backend {
         }
       }
     }.start() 
-    
-    // wait for the end of stdin, then exit
-    new Thread("run backend") {
-      setDaemon(true)
-      override def run(): Unit = {
-        try {
-          backend.run()
-        }
-        catch {
-          case e: IOException =>
-            logError("Backend failed with exception ", e)
-            
-          if (!isService) System.exit(1)
-        }
-      }
-    }.start()
   }
   
   def register(gatewayPort: Int, sessionId: Int, port: Int): Boolean = {
@@ -306,7 +306,7 @@ object Backend {
     val dis = new DataInputStream(s.getInputStream())
     val status = dis.readInt()
     
-    log("sparklyr fnished registration of session (" + sessionId + ") into gateway port (" + gatewayPort +  ")")
+    log("sparklyr fnished registration of session (" + sessionId + ") into gateway port (" + gatewayPort +  ") with status (" + status + ")")
     
     s.close()
     status == 0
