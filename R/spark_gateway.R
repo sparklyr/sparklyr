@@ -50,13 +50,15 @@ spark_connect_gateway <- function(gatewayAddress, gatewayPort, sessionId, waitSe
 
     if (redirectGatewayPort != gatewayPort) {
       close(gateway)
-      gateway <- wait_connect_gateway(gatewayAddress, redirectGatewayPort, 1)
-    }
 
-    list(
-      gateway = gateway,
-      backendPort = backendPort
-    )
+      spark_connect_gateway(gatewayAddress, redirectGatewayPort, sessionId, waitSeconds)
+    }
+    else {
+      list(
+        gateway = gateway,
+        backendPort = backendPort
+      )
+    }
   }
 }
 
