@@ -80,6 +80,7 @@ object Backend {
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
   
+  private[this] var sc: SparkContext = null
   private[this] var hc: HiveContext = null
   
   private[this] var sessionsMap:Map[Int, Int] = Map()
@@ -94,6 +95,14 @@ object Backend {
     }
     
     hc
+  }
+  
+  def getSparkContext(): SparkContext = {
+    sc
+  }
+  
+  def setSparkContext(nsc: SparkContext): Unit = {
+    sc = nsc
   }
   
   def portIsAvailable(port: Int) = {
