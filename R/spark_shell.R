@@ -91,88 +91,96 @@ start_shell <- function(master,
                         environment = NULL,
                         shell_args = NULL,
                         service = FALSE) {
-  # read app jar through config, this allows "sparkr-shell" to test sparkr backend
-  app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
-  if (is.null(app_jar)) {
-    versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
-    app_jar <- spark_default_app_jar(versionSparkHome)
-    app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE))
-    shell_args <- c(shell_args, "--class", "sparklyr.Backend")
-  }
-
-  # validate and normalize spark_home
-  if (!nzchar(spark_home))
-    stop("No spark_home specified (defaults to SPARK_HOME environment varirable).")
-  if (!dir.exists(spark_home))
-    stop("SPARK_HOME directory '", spark_home ,"' not found")
-  spark_home <- normalizePath(spark_home)
-
-  # set SPARK_HOME into child process environment
-  if (is.null(environment()))
-    environment <- list()
-  environment$SPARK_HOME <- spark_home
-
-  # provide empty config if necessary
-  if (is.null(config))
-    config <- list()
-
-  # determine path to spark_submit
-  spark_submit <- switch(.Platform$OS.type,
-    unix = "spark-submit",
-    windows = "spark-submit.cmd"
-  )
-  spark_submit_path <- normalizePath(file.path(spark_home, "bin", spark_submit))
-
-  # resolve extensions
-  spark_version <- numeric_version(
-    ifelse(is.null(spark_version),
-      spark_version_from_home(spark_home),
-      gsub("[-_a-zA-Z]", "", spark_version)
-    )
-  )
-  if (spark_version < "2.0")
-    scala_version <- numeric_version("2.10")
-  else
-    scala_version <- numeric_version("2.11")
-  extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions)
-
-  # combine passed jars and packages with extensions
-  all_jars <- c(jars, extensions$jars)
-  jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
-  packages <- unique(c(packages, extensions$packages))
-
-  # add jars to arguments
-  if (length(jars) > 0) {
-    shell_args <- c(shell_args, "--jars", paste(shQuote(jars), collapse=","))
-  }
-
-  # add packages to arguments
-  if (length(packages) > 0) {
-    shell_args <- c(shell_args, "--packages", paste(shQuote(packages), collapse=","))
-  }
-
-  # add sparkr-shell to args
-  shell_args <- c(shell_args, app_jar)
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
-
   isService <- as.logical(spark_config_value(config, "sparklyr.service", service))
   sessionId <- if (isService == TRUE) spark_session_id(app_name, master) else floor(runif(1, min = 0, max = 10000))
-  shell_args <- c(shell_args, as.character(gatewayPort), sessionId)
-  gateway <- NULL
-  if (isService) {
-    shell_args <- c(shell_args, "--service")
 
-    # try connecting to an existing instance of sparklyr running in service mode
-    gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, 1)
-  }
+  # attempt to connect into an existing gateway
+  timeout <- spark_config_value(config, "sparklyr.gateway.local.timeout", 1)
+  gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
+                                       gatewayPort = gatewayPort,
+                                       sessionId = sessionId,
+                                       waitSeconds = timeout)
 
   output_file <- NULL
   error_file <- NULL
+  spark_submit_path <- NULL
+  shell_args <- NULL
 
-  if (is.null(gateway))
+  if (is.null(gatewayInfo) || gatewayInfo$backendPort == 0)
   {
+    # read app jar through config, this allows "sparkr-shell" to test sparkr backend
+    app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
+    if (is.null(app_jar)) {
+      versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
+      app_jar <- spark_default_app_jar(versionSparkHome)
+      app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE))
+      shell_args <- c(shell_args, "--class", "sparklyr.Backend")
+    }
+
+    # validate and normalize spark_home
+    if (!nzchar(spark_home))
+      stop("No spark_home specified (defaults to SPARK_HOME environment varirable).")
+    if (!dir.exists(spark_home))
+      stop("SPARK_HOME directory '", spark_home ,"' not found")
+    spark_home <- normalizePath(spark_home)
+
+    # set SPARK_HOME into child process environment
+    if (is.null(environment()))
+      environment <- list()
+    environment$SPARK_HOME <- spark_home
+
+    # provide empty config if necessary
+    if (is.null(config))
+      config <- list()
+
+    # determine path to spark_submit
+    spark_submit <- switch(.Platform$OS.type,
+                           unix = "spark-submit",
+                           windows = "spark-submit.cmd"
+    )
+    spark_submit_path <- normalizePath(file.path(spark_home, "bin", spark_submit))
+
+    # resolve extensions
+    spark_version <- numeric_version(
+      ifelse(is.null(spark_version),
+             spark_version_from_home(spark_home),
+             gsub("[-_a-zA-Z]", "", spark_version)
+      )
+    )
+    if (spark_version < "2.0")
+      scala_version <- numeric_version("2.10")
+    else
+      scala_version <- numeric_version("2.11")
+    extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions)
+
+    # combine passed jars and packages with extensions
+    all_jars <- c(jars, extensions$jars)
+    jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
+    packages <- unique(c(packages, extensions$packages))
+
+    # add jars to arguments
+    if (length(jars) > 0) {
+      shell_args <- c(shell_args, "--jars", paste(shQuote(jars), collapse=","))
+    }
+
+    # add packages to arguments
+    if (length(packages) > 0) {
+      shell_args <- c(shell_args, "--packages", paste(shQuote(packages), collapse=","))
+    }
+
+    # add app_jar to args
+    shell_args <- c(shell_args, app_jar)
+
+    # prepare spark-submit shell arguments
+    shell_args <- c(shell_args, as.character(gatewayPort), sessionId)
+
+    if (isService) {
+      shell_args <- c(shell_args, "--service")
+    }
+
     # create temp file for stdout and stderr
     output_file <- tempfile(fileext = "_spark.log")
     error_file <- tempfile(fileext = "_spark.err")
@@ -200,11 +208,14 @@ start_shell <- function(master,
       }
     })
 
-    # wait for the service to start
-    waitSeconds <- spark_config_value(config, "sparklyr.gateway.wait.seconds", 10)
-    gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, waitSeconds)
+    # connect and wait for the service to start
+    timeout <- spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+    gatewayInfo <- spark_connect_gateway(gatewayAddress,
+                                         gatewayPort,
+                                         sessionId,
+                                         waitSeconds = timeout)
 
-    if (is.null(gateway)) {
+    if (is.null(gatewayInfo)) {
       abort_shell(
         "Failed while connecting to sparklyr",
         spark_submit_path,
@@ -216,41 +227,16 @@ start_shell <- function(master,
   }
 
   tryCatch({
-    gatewayCommands <- list(
-      "GetPorts" = 0,
-      "RegisterInstance" = 1
-    )
-
-    writeInt(gateway, gatewayCommands[["GetPorts"]])
-    writeInt(gateway, sessionId)
-
-    backendSessionId <- readInt(gateway)
-    monitorPort <- readInt(gateway)
-    backendPort <- readInt(gateway)
-
-    if (length(backendSessionId) == 0 || length(monitorPort) == 0 || length(backendPort) == 0) {
-      stop("Sparklyr gateway did not respond while retrieving ports information")
-    }
-
-    if (!isService && monitorPort == gatewayPort && backendSessionId != sessionId) {
-      stop("Unrecognized sparklyr backend session identifier.")
-    }
-
-    if (monitorPort != gatewayPort) {
-      close(gateway)
-      gateway <- wait_connect_gateway(gatewayAddress, monitorPort, 1)
-    }
-
     # set timeout for socket connection
     timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
     backend <- socketConnection(host = "localhost",
-                                port = backendPort,
+                                port = gatewayInfo$backendPort,
                                 server = FALSE,
                                 blocking = TRUE,
                                 open = "wb",
                                 timeout = timeout)
   }, error = function(err) {
-    close(gateway)
+    close(gatewayInfo$gateway)
 
     abort_shell(
       paste("Failed to open connection to backend:", err$message),
@@ -271,7 +257,7 @@ start_shell <- function(master,
     # spark_shell_connection
     spark_home = spark_home,
     backend = backend,
-    monitor = gateway,
+    monitor = gatewayInfo$gateway,
     output_file = output_file
   ))
 
@@ -457,30 +443,6 @@ attach_connection <- function(jobj, connection) {
   }
 
   jobj
-}
-
-wait_connect_gateway <- function(gatewayAddress, gatewayPort, seconds) {
-  retries <- seconds * 10
-  monitor <- NULL
-
-  while(is.null(monitor) && retries >= 0) {
-    tryCatch({
-      suppressWarnings(
-        monitor <- socketConnection(host = gatewayAddress,
-          port = gatewayPort,
-          server = FALSE,
-          blocking = TRUE,
-          open = "rb",
-          timeout = 6000)
-      )
-    }, error = function(err) {
-    })
-
-    retries <- retries  - 1;
-    Sys.sleep(0.1)
-  }
-
-  monitor
 }
 
 read_spark_log_error <- function(sc) {

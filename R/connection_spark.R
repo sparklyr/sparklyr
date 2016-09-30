@@ -101,9 +101,10 @@ spark_connect <- function(master,
                              config = config,
                              service = service,
                              extensions = extensions)
-
-  # other methods
+  } else if (method == "gateway") {
+    scon <- gateway_connection(master = master)
   } else {
+    # other methods
 
     # e.g.
     # scon <- livy_connection(master = master,
@@ -214,7 +215,7 @@ spark_disconnect <- function(x, terminate = FALSE, ...) {
 }
 
 #' @export
-spark_disconnect.spark_connection <- function(x, terminate, ...) {
+spark_disconnect.spark_connection <- function(x, terminate = FALSE, ...) {
   tryCatch({
     stop_shell(x, terminate)
   }, error = function(err) {
@@ -226,7 +227,7 @@ spark_disconnect.spark_connection <- function(x, terminate, ...) {
 }
 
 #' @export
-spark_disconnect.character <- function(x, terminate, ...) {
+spark_disconnect.character <- function(x, terminate = FALSE, ...) {
   args <- list(...)
   master <- if (!is.null(args$master)) args$master else x
   app_name <- args$app_name
