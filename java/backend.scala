@@ -21,6 +21,50 @@ import scala.util.Try
 
 import sparklyr.Logging._
 
+/*
+ * Backend is the main class for the sparklyr backend.
+ * 
+ * The Backend class is launched from Spark through spark-submit with the following
+ * paramters: port, session and service.
+ * 
+ *   port: Defined the port the gateway should listen to.
+ *   sessionid: An identifier to track each session and reuse sessions if needed.
+ *   service: A flag to keep this service running until the client forces it to
+ *            shut down by calling "terminateBackend" through the invoke interface.
+ * 
+ * On launch, the Backend will open the gateway socket on the port specified by
+ * the shell parameter on launch.
+ * 
+ * If the port is already in use, the Backend will attempt to use the existing
+ * service running in this port as a sparklyr gateway and register itself. Therefore,
+ * the gateway socket serves not only as an interface to connect to the current
+ * instance, but also as bridge to other sparklyr backend instances running in this
+ * machine. This mechanism is the replacement of the ports file which used to
+ * communicate ports information back to the sparklyr client, in this model, one
+ * and only one gateway runs and provides the mapping between sessionids and ports.
+ *          
+ * While running, the Backend loops under a while(true) loop and blocks under the
+ * gateway socket accept() method waiting for clients to connect. Once a client
+ * connects, it launches a thread to process the client requests and blocks again.
+ * 
+ * In the gateway socket, the thread listens for two commands: GetPorts or
+ * RegisterInstance.
+ * 
+ * GetPorts provides a mapping to the gateway/backend ports. In a single-client/
+ * single-backend scenario, the sessionid from the current instance and the
+ * requested instance will match, a backend gets created and the backend port
+ * communicated back to the client. In a multiple-backend scenario, GetPort
+ * will look at the sessionid mapping table and return a redirect port if needed,
+ * this enables the system to run multiple backends all using the same gateway
+ * port but still support redirection to the correct sessionid backend. Finally,
+ * if the sessionis is not found, a delay is introduced in case an existing
+ * backend is launching an about to register.
+ * 
+ * RegiterInstance provides a way to map sessionids to ports to other instances
+ * of sparklyr running in this machines. During launch, if the gateway port is
+ * already in use, the instance being launched will use this api to communicate
+ * to the main gateway the port in which this instance will listen to.
+ */
 class Backend {
 
   private[this] var channelFuture: ChannelFuture = null
@@ -161,7 +205,7 @@ object Backend {
       }
       
       gatewayServerSocket.setSoTimeout(0)
-    
+      
       while(true) {
         bind()
       }
