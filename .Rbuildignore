@@ -20,4 +20,4 @@
 ^log4j\..*$
 ^run-tests$
 ^.classpath$
-
+^.project$
