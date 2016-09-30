@@ -31,6 +31,7 @@ import sparklyr.Logging._
  *   sessionid: An identifier to track each session and reuse sessions if needed.
  *   service: A flag to keep this service running until the client forces it to
  *            shut down by calling "terminateBackend" through the invoke interface.
+ *   remote: A flag to enable the gateway and backend to accept remote connections.
  * 
  * On launch, the Backend will open the gateway socket on the port specified by
  * the shell parameter on launch.
@@ -70,8 +71,16 @@ class Backend {
   private[this] var channelFuture: ChannelFuture = null
   private[this] var bootstrap: ServerBootstrap = null
   private[this] var bossGroup: EventLoopGroup = null
+  private[this] var inetAddress: InetSocketAddress = new InetSocketAddress("localhost", 0)
 
-  def init(): Int = {
+  def init(remote: Boolean): Int = {
+    if (remote) {
+      val anyIpAddress = Array[Byte](0, 0, 0, 0)
+      val anyInetAddress = InetAddress.getByAddress(anyIpAddress)
+      
+      inetAddress = new InetSocketAddress(anyInetAddress, 0)
+    }
+    
     val conf = new SparkConf()
     bossGroup = new NioEventLoopGroup(conf.getInt("sparklyr.backend.threads", 2))
     val workerGroup = bossGroup
@@ -92,7 +101,7 @@ class Backend {
       }
     })
 
-    channelFuture = bootstrap.bind(new InetSocketAddress("localhost", 0))
+    channelFuture = bootstrap.bind(inetAddress)
     channelFuture.syncUninterruptibly()
     channelFuture.channel().localAddress().asInstanceOf[InetSocketAddress].getPort()
   }
@@ -120,6 +129,8 @@ class Backend {
 
 object Backend {
   private[this] var isService: Boolean = false
+  private[this] var isRemote: Boolean = false
+  
   private[this] var gatewayServerSocket: ServerSocket = null
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
@@ -128,6 +139,8 @@ object Backend {
   private[this] var hc: HiveContext = null
   
   private[this] var sessionsMap:Map[Int, Int] = Map()
+  
+  private[this] var inetAddress: InetAddress = InetAddress.getByName("localhost")
   
   object GatewayOperattions extends Enumeration {
     val GetPorts, RegisterInstance = Value
@@ -168,13 +181,14 @@ object Backend {
   }
   
   def main(args: Array[String]): Unit = {
-    if (args.length > 3 || args.length < 2) {
+    if (args.length > 4 || args.length < 2) {
       System.err.println(
-        "Usage: Backend port id [--service]\n" +
+        "Usage: Backend port id [--service] [--remote]\n" +
         "\n" +
         "  port:      port the gateway will listen to\n" +
         "  id:        arbitrary numeric identifier for this backend session\n" +
-        "  --service: prevents closing the connection from closing the backend"
+        "  --service: prevents closing the connection from closing the backen\n" +
+        "  --remote:  allows the gateway running as service to accept remote connections"
       )
       
       System.exit(-1)
@@ -183,22 +197,23 @@ object Backend {
     port = args(0).toInt
     sessionId = args(1).toInt
     isService = args.length > 2 && args(2) == "--service"
+    isRemote = args.length > 3 && args(3) == "--remote"
+    
+    if (isRemote) {
+      val anyIpAddress = Array[Byte](0, 0, 0, 0)
+      inetAddress = InetAddress.getByAddress(anyIpAddress)
+    }
     
     log("sparklyr session " + sessionId + " ready on port " + port)
     
     try {
       if (portIsAvailable(port))
       {
-        val ipAddress = Array[Byte](0, 0, 0, 0)
-        gatewayServerSocket = new ServerSocket(
-          port,
-          1,
-          InetAddress.getByAddress(ipAddress)
-        )
+        gatewayServerSocket = new ServerSocket(port, 1, inetAddress)
       }
       else
       {
-        gatewayServerSocket = new ServerSocket(0, 1, InetAddress.getByName("localhost"))
+        gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
         val gatewayPort = port
         port = gatewayServerSocket.getLocalPort()
         
@@ -229,7 +244,7 @@ object Backend {
     val buf = new Array[Byte](1024)
     
     val backend = new Backend()
-    val backendPort: Int = backend.init()
+    val backendPort: Int = backend.init(isRemote)
           
     // wait for the end of stdin, then exit
     new Thread("wait for monitor to close") {

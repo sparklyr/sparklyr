@@ -181,6 +181,11 @@ start_shell <- function(master,
       shell_args <- c(shell_args, "--service")
     }
 
+    isRemote <- as.logical(spark_config_value(config, "sparklyr.service.remote", "FALSE"))
+    if (isService && isRemote) {
+      shell_args <- c(shell_args, "--remote")
+    }
+
     # create temp file for stdout and stderr
     output_file <- tempfile(fileext = "_spark.log")
     error_file <- tempfile(fileext = "_spark.err")

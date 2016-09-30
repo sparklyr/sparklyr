@@ -1,5 +1,12 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Added support to `spark_connect` remotely using `master = "sparklyr://address:port"`
+  for `sparklyr` backends launched in service mode and with the config
+  `sparklyr.service.remote` set to `TRUE`
+  
+- Added `sparklyr.service.remote` config to allow remote connections into the
+  sparklyr gateway, disabled by default.
+
 - Added support to parameterize network timeouts using the
   `sparklyr.backend.timeout`, `sparklyr.gateway.start.timeout`,
   `sparklyr.gateway.local.timeout` and `sparklyr.gateway.remote.timeout`
