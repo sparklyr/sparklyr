@@ -87,7 +87,7 @@ gateway_connection <- function(master, config) {
     stop("Failed to connect to gateway: ", master)
   }
 
-  sc <- spark_gateway_connection(master, config, gatewayInfo)
+  sc <- spark_gateway_connection(master, config, gatewayInfo, gatewayAddress)
 
   if (is.null(gatewayInfo)) {
     stop("Failed to open connection from gateway: ", master)
@@ -96,11 +96,11 @@ gateway_connection <- function(master, config) {
   sc
 }
 
-spark_gateway_connection <- function(master, config, gatewayInfo) {
+spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
   tryCatch({
     # set timeout for socket connection
     timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
-    backend <- socketConnection(host = "localhost",
+    backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
                                 blocking = TRUE,
