@@ -1,25 +1,30 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
-- Added terminate parameter to spark_disconnect and spark_disconnect_all
-  to terminate sparklyr service mode.
-
-- Improved logging while establishing connections to sparklyr.
-
-- Added sparklyr.gateway.port, sparklyr.gateway.address and sparklyr.service as
+- Added support to parameterize network timeouts using the
+  `sparklyr.backend.timeout`, `sparklyr.gateway.start.timeout`,
+  `sparklyr.gateway.local.timeout` and `sparklyr.gateway.remote.timeout`
   config settings.
 
-- Added eclipse project to ease development of the scala codebase within 
-  sparklyr.
+- Added support in `spark_connect` with `mode="gateway"` to access a remote
+  `sparklyr` backend.
 
-- Added filter parameter to spark_log to fitler with ease entries by a character
+- Added terminate parameter to `spark_disconnect` and `spark_disconnect_all`
+  to terminate `sparklyr` service mode.
+
+- Improved logging while establishing connections to `sparklyr`.
+
+- Added `sparklyr.gateway.port`, `sparklyr.gateway.address` and `sparklyr.service`
+  as config settings.
+
+- Added eclipse project to ease development of the scala codebase within 
+  `sparklyr`.
+
+- Added `filter` parameter to `spark_log` to fitler with ease entries by a character
   string.
 
-- Added support for spark_connect(service = TRUE) to run sparklyr backend
+- Added support for `spark_connect(service = TRUE)` to run `sparklyr` backend
   as a long running service that supports reconnection, multiple clients
   and remote access.
-
-- Added support to parameterize network timeouts using the
-  sparklyr.monitor.timeout and sparklyr.backend.timeout config settings.
 
 - Increased network timeout for sparklyr.backend.timeout.
 
