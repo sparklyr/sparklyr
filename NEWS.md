@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Resolved an issue where attempting to call `collect()` on a Spark DataFrame
+  containing many columns could produce the wrong result. (#242)
+
 - Added support to parameterize network timeouts using the
   sparklyr.monitor.timeout and sparklyr.backend.timeout config settings.
 

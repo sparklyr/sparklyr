@@ -59,12 +59,21 @@ test_that("NA values survive Spark roundtrips", {
 test_that("data.frames with '|' can be copied", {
   skip_on_cran()
 
-  pipes <- data_frame(
+  pipes <- data.frame(
     x = c("|||", "|||", "|||"),
     y = c(1, 2, 3),
     stringsAsFactors = FALSE
   )
 
-  spark_data_copy(sc, pipes, name = "pipes", repartition = 1L, serializer = "csv_string")
-  expect_identical(collect(tbl(sc, "pipes")), pipes)
+  ensure_round_trip(sc, pipes)
+})
+
+test_that("data.frames with many columns survive roundtrip", {
+  skip_on_cran()
+
+  n <- 1E3
+  data <- as.data.frame(replicate(n, 1L, simplify = FALSE))
+  names(data) <- paste("X", 1:n, sep = "")
+
+  ensure_round_trip(sc, data)
 })

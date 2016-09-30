@@ -63,9 +63,20 @@ sdf_read_column <- function(x, column) {
 # Read a Spark Dataset into R.
 sdf_collect <- function(object) {
   sc <- spark_connection(object)
-
   sdf <- spark_dataframe(object)
-  collected <- invoke_static(sc, "sparklyr.Utils", "collect", sdf)
+
+  # for some reason, we appear to receive invalid results when
+  # collecting Spark DataFrames with many columns -- empirically,
+  # having more than 50 columns seems to trigger the buggy behavior
+  # collect the data set in chunks, and then join those chunks
+  columns <- invoke(sdf, "columns") %>% as.character()
+  chunks <- split_chunks(columns, 50L)
+  pieces <- lapply(chunks, function(chunk) {
+    subset <- sdf %>% invoke("selectExpr", as.list(chunk))
+    invoke_static(sc, "sparklyr.Utils", "collect", subset)
+  })
+
+  collected <- do.call(c, pieces)
   transformed <- lapply(collected, sdf_deserialize_column)
   colNames <- invoke(sdf, "columns")
   names(transformed) <- as.character(colNames)
