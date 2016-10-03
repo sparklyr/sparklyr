@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Resolved an issue where attempting to call `copy_to()` with an R `data.frame`
+  containing many columns could fail with a Java StackOverflow. (#244)
+
 - Resolved an issue where attempting to call `collect()` on a Spark DataFrame
   containing many columns could produce the wrong result. (#242)
 

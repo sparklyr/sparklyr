@@ -100,21 +100,28 @@ copy_to.src_spark <- function(dest, df, name, ...) {
   copy_to(spark_connection(dest), df, name, ...)
 }
 
-#' Load a table into memory
+#' Cache a Spark Table
 #'
-#' @param sc Spark connection
-#' @param name Name of the destination table
-#' @param force Forces data to be loaded in memory by executing a count(*) over the table
+#' Force a Spark table with name \code{name} to be loaded into memory.
+#' Operations on cached tables should normally (although not always)
+#' be more performant than the same operation performed on an uncached
+#' table.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param name The table name.
+#' @param force Force the data to be loaded into memory? This is accomplished
+#'   by calling the \code{count} API on the associated Spark DataFrame.
 #'
 #' @family dplyr
 #'
 #' @export
 tbl_cache <- function(sc, name, force = TRUE) {
-  dbGetQuery(sc, paste("CACHE TABLE", dplyr::escape(ident(name), con = sc)))
+  tbl <- tbl(sc, name)
+  sdf <- spark_dataframe(tbl)
 
-  if (force) {
-    dbGetQuery(sc, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = sc)))
-  }
+  invoke(sdf, "cache")
+  if (force)
+    invoke(sdf, "count")
 
   invisible(NULL)
 }
