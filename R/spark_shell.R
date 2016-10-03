@@ -296,8 +296,7 @@ start_shell <- function(master,
 # @rdname start_shell
 #
 # @export
-stop_shell <- function(sc, terminate = TRUE) {
-  terminate <- TRUE
+stop_shell <- function(sc, terminate = FALSE) {
   terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
   invoke_method(sc,
                 FALSE,
