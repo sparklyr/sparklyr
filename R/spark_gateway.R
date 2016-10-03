@@ -128,7 +128,7 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
   # stop shell on R exit
   reg.finalizer(baseenv(), function(x) {
     if (connection_is_open(sc)) {
-      stop_shell(sc, FALSE)
+      stop_shell(sc)
     }
   }, onexit = TRUE)
 

@@ -94,7 +94,8 @@ start_shell <- function(master,
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
-  isService <- as.logical(spark_config_value(config, "sparklyr.service", service))
+  isService <- FALSE
+
   sessionId <- if (isService == TRUE) spark_session_id(app_name, master) else floor(runif(1, min = 0, max = 10000))
 
   # attempt to connect into an existing gateway
@@ -181,7 +182,7 @@ start_shell <- function(master,
       shell_args <- c(shell_args, "--service")
     }
 
-    isRemote <- as.logical(spark_config_value(config, "sparklyr.service.remote", "FALSE"))
+    isRemote <- FALSE
     if (isService && isRemote) {
       shell_args <- c(shell_args, "--remote")
     }
@@ -269,7 +270,7 @@ start_shell <- function(master,
   # stop shell on R exit
   reg.finalizer(baseenv(), function(x) {
     if (connection_is_open(sc)) {
-      stop_shell(sc, FALSE)
+      stop_shell(sc)
     }
   }, onexit = TRUE)
 
@@ -295,7 +296,8 @@ start_shell <- function(master,
 # @rdname start_shell
 #
 # @export
-stop_shell <- function(sc, terminate) {
+stop_shell <- function(sc, terminate = TRUE) {
+  terminate <- TRUE
   terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
   invoke_method(sc,
                 FALSE,

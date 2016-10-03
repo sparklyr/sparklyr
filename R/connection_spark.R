@@ -25,8 +25,6 @@ spark_default_app_jar <- function(version) {
 #' @param app_name Application name to be used while running in the Spark cluster
 #' @param version Version of Spark (only applicable for local master)
 #' @param hadoop_version Version of Hadoop (only applicable for local master)
-#' @param service Enables the sparklyr backend to run as a service by keeping the Spark
-#'   application running even when the connection is lost.
 #' @param extensions Extension packages to enable for this connection. By default will
 #'   enable all packages that previously called \code{sparklyr::register_extension}.
 #' @param config Configuration for connection (see \code{\link{spark_config} for details}).
@@ -38,12 +36,11 @@ spark_default_app_jar <- function(version) {
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell", "gateway"),
+                          method = c("shell"),
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
                           config = spark_config(),
-                          service = FALSE,
                           extensions = sparklyr::registered_extensions()) {
 
   # validate method
@@ -89,11 +86,6 @@ spark_connect <- function(master,
     })
   }))
 
-  # map known protocols to methods
-  if (master_is_gateway(master) && defaultMethod) {
-    method <- "gateway"
-  }
-
   # connect using the specified method
 
   # spark-shell (local install of spark)
@@ -105,11 +97,8 @@ spark_connect <- function(master,
                              hadoop_version = hadoop_version,
                              shell_args = shell_args,
                              config = config,
-                             service = service,
+                             service = FALSE,
                              extensions = extensions)
-  } else if (method == "gateway") {
-    scon <- gateway_connection(master = master,
-                               config = config)
   } else {
     # other methods
 
@@ -215,14 +204,14 @@ spark_connection_is_open <- function(sc) {
 #' @family Spark connections
 #'
 #' @export
-spark_disconnect <- function(x, terminate = FALSE, ...) {
+spark_disconnect <- function(x, ...) {
   UseMethod("spark_disconnect")
 }
 
 #' @export
-spark_disconnect.spark_connection <- function(x, terminate = FALSE, ...) {
+spark_disconnect.spark_connection <- function(x, ...) {
   tryCatch({
-    stop_shell(x, terminate)
+    stop_shell(x)
   }, error = function(err) {
   })
 
@@ -232,7 +221,7 @@ spark_disconnect.spark_connection <- function(x, terminate = FALSE, ...) {
 }
 
 #' @export
-spark_disconnect.character <- function(x, terminate = FALSE, ...) {
+spark_disconnect.character <- function(x, ...) {
   args <- list(...)
   master <- if (!is.null(args$master)) args$master else x
   app_name <- args$app_name
@@ -245,7 +234,7 @@ spark_disconnect.character <- function(x, terminate = FALSE, ...) {
   })
 
   length(lapply(connections, function(sc) {
-    spark_disconnect(sc, terminate)
+    spark_disconnect(sc)
   }))
 }
 
@@ -278,9 +267,6 @@ spark_connection_local_cores <- function(sc) {
 }
 
 #' Close all existing connections
-#'
-#' @param terminate \code{TRUE} to terminate \code{\link{spark_connect}}
-#'   launched in \code{service = TRUE} mode.
 #'
 #' @family Spark connections
 #'
