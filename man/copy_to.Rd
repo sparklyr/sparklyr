@@ -3,31 +3,35 @@
 \name{copy_to}
 \alias{copy_to}
 \alias{copy_to.spark_connection}
-\title{Copy a local R data frame to Spark}
+\title{Copy a local R data.frame to Spark}
 \usage{
 \method{copy_to}{spark_connection}(dest, df, name = deparse(substitute(df)),
-  memory = TRUE, repartition = 0, overwrite = FALSE, ...)
+  memory = TRUE, repartition = 0L, overwrite = FALSE, ...)
 }
 \arguments{
-\item{dest}{A Spark connection}
+\item{dest}{A \code{spark_connection}.}
 
-\item{df}{Local data frame to copy}
+\item{df}{An \R \code{data.frame}.}
 
-\item{name}{Name of the destination table}
+\item{name}{The name to assign to the copied table in Spark.}
 
-\item{memory}{Cache table into memory}
+\item{memory}{Boolean; should the table be cached into memory?}
 
-\item{repartition}{Partitions used to distribute table or 0 (default) to avoid partitioning}
+\item{repartition}{The number of partitions to use when distributing the
+table across the Spark cluster. The default (0) can be used to avoid
+partitioning.}
 
-\item{overwrite}{When TRUE, overwrites table with existing name}
+\item{overwrite}{Boolean; overwrite a pre-existing table with the name \code{name}
+if one already exists?}
 
-\item{...}{Unused}
+\item{...}{Optional arguments; currently unused.}
 }
 \value{
-dplyr compatible reference to table
+A \code{tbl_spark}, representing a \code{dplyr}-compatible interface
+  to a Spark DataFrame.
 }
 \description{
-Copy a local R data frame to Spark
+Copy a local R data.frame to Spark
 }
 \seealso{
 Other dplyr: \code{\link{tbl_cache}},

@@ -2,19 +2,23 @@
 % Please edit documentation in R/dplyr_spark.R
 \name{tbl_cache}
 \alias{tbl_cache}
-\title{Load a table into memory}
+\title{Cache a Spark Table}
 \usage{
 tbl_cache(sc, name, force = TRUE)
 }
 \arguments{
-\item{sc}{Spark connection}
+\item{sc}{A \code{spark_connection}.}
 
-\item{name}{Name of the destination table}
+\item{name}{The table name.}
 
-\item{force}{Forces data to be loaded in memory by executing a count(*) over the table}
+\item{force}{Force the data to be loaded into memory? This is accomplished
+by calling the \code{count} API on the associated Spark DataFrame.}
 }
 \description{
-Load a table into memory
+Force a Spark table with name \code{name} to be loaded into memory.
+Operations on cached tables should normally (although not always)
+be more performant than the same operation performed on an uncached
+table.
 }
 \seealso{
 Other dplyr: \code{\link{copy_to}},
