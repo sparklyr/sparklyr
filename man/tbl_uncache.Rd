@@ -14,7 +14,4 @@ tbl_uncache(sc, name)
 \description{
 Force a Spark table with name \code{name} to be unloaded from memory.
 }
-\seealso{
-Other dplyr: \code{\link{copy_to}}, \code{\link{tbl_cache}}
-}
 

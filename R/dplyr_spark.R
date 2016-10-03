@@ -55,7 +55,11 @@ db_data_type.src_spark <- function(...) {
 }
 
 
-#' Copy a local R data.frame to Spark
+#' Copy an R Data Frame to Spark
+#'
+#' Copy an R \code{data.frame} to Spark, and return a reference to the
+#' generated Spark DataFrame as a \code{tbl_spark}. The returned object will
+#' act as a \code{dplyr}-compatible interface to the underlying Spark table.
 #'
 #' @param dest A \code{spark_connection}.
 #' @param df An \R \code{data.frame}.
@@ -72,8 +76,6 @@ db_data_type.src_spark <- function(...) {
 #'   to a Spark DataFrame.
 #'
 #' @name copy_to
-#'
-#' @family dplyr
 #'
 #' @export
 copy_to.spark_connection <- function(dest,
@@ -121,8 +123,6 @@ copy_to.src_spark <- function(dest, df, name, ...) {
 #' @param force Force the data to be loaded into memory? This is accomplished
 #'   by calling the \code{count} API on the associated Spark DataFrame.
 #'
-#' @family dplyr
-#'
 #' @export
 tbl_cache <- function(sc, name, force = TRUE) {
   tbl <- tbl(sc, name)
@@ -141,8 +141,6 @@ tbl_cache <- function(sc, name, force = TRUE) {
 #'
 #' @param sc A \code{spark_connection}.
 #' @param name The table name.
-#'
-#' @family dplyr
 #'
 #' @export
 tbl_uncache <- function(sc, name) {

@@ -3,7 +3,7 @@
 \name{copy_to}
 \alias{copy_to}
 \alias{copy_to.spark_connection}
-\title{Copy a local R data.frame to Spark}
+\title{Copy an R Data Frame to Spark}
 \usage{
 \method{copy_to}{spark_connection}(dest, df, name = deparse(substitute(df)),
   memory = TRUE, repartition = 0L, overwrite = FALSE, ...)
@@ -31,10 +31,8 @@ A \code{tbl_spark}, representing a \code{dplyr}-compatible interface
   to a Spark DataFrame.
 }
 \description{
-Copy a local R data.frame to Spark
-}
-\seealso{
-Other dplyr: \code{\link{tbl_cache}},
-  \code{\link{tbl_uncache}}
+Copy an R \code{data.frame} to Spark, and return a reference to the
+generated Spark DataFrame as a \code{tbl_spark}. The returned object will
+act as a \code{dplyr}-compatible interface to the underlying Spark table.
 }
 
