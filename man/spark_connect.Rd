@@ -5,8 +5,8 @@
 \title{Connect to Spark}
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
-  method = c("shell", "gateway"), app_name = "sparklyr", version = NULL,
-  hadoop_version = NULL, config = spark_config(), service = FALSE,
+  method = c("shell"), app_name = "sparklyr", version = NULL,
+  hadoop_version = NULL, config = spark_config(),
   extensions = sparklyr::registered_extensions())
 }
 \arguments{
@@ -27,9 +27,6 @@ methods may come later)}
 \item{hadoop_version}{Version of Hadoop (only applicable for local master)}
 
 \item{config}{Configuration for connection (see \code{\link{spark_config} for details}).}
-
-\item{service}{Enables the sparklyr backend to run as a service by keeping the Spark
-application running even when the connection is lost.}
 
 \item{extensions}{Extension packages to enable for this connection. By default will
 enable all packages that previously called \code{sparklyr::register_extension}.}
