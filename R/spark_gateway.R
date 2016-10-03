@@ -1,8 +1,11 @@
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, seconds) {
-  retries <- seconds * 10
+  retries <- seconds
   gateway <- NULL
+  commandStart <- NULL
 
   while(is.null(gateway) && retries >= 0) {
+    commandStart <- Sys.time()
+
     tryCatch({
       suppressWarnings(
         gateway <- socketConnection(host = gatewayAddress,
@@ -10,13 +13,17 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, seconds) {
                                     server = FALSE,
                                     blocking = TRUE,
                                     open = "rb",
-                                    timeout = 6000)
+                                    timeout = 1)
       )
     }, error = function(err) {
     })
 
     retries <- retries  - 1;
-    Sys.sleep(0.1)
+
+    # wait for one second without depending on the behavior of socketConnection timeout
+    while (commandStart + 1 > Sys.time()) {
+      Sys.sleep(0.1)
+    }
   }
 
   gateway
