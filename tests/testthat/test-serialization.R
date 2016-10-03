@@ -55,3 +55,36 @@ test_that("NA values survive Spark roundtrips", {
 
   ensure_round_trip(sc, df)
 })
+
+test_that("data.frames with '|' can be copied", {
+  skip_on_cran()
+
+  pipes <- data.frame(
+    x = c("|||", "|||", "|||"),
+    y = c(1, 2, 3),
+    stringsAsFactors = FALSE
+  )
+
+  ensure_round_trip(sc, pipes)
+})
+
+test_that("data.frames with many columns survive roundtrip", {
+  skip_on_cran()
+
+  n <- 1E3
+  data <- as.data.frame(replicate(n, 1L, simplify = FALSE))
+  names(data) <- paste("X", 1:n, sep = "")
+
+  ensure_round_trip(sc, data)
+})
+
+test_that("data.frames with many columns don't cause Java StackOverflows", {
+  skip_on_cran() && skip_unless_verbose("Skipping slow serialization test")
+
+  n <- 5000
+  df <- matrix(0, ncol = 5000, nrow = 2) %>% as_data_frame()
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  # the above failed with a Java StackOverflow with older versions of sparklyr
+  expect_true(TRUE, info = "no Java StackOverflow on copy of large dataset")
+})

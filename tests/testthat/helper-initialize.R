@@ -9,4 +9,11 @@ testthat_spark_connection <- function() {
   get(".testthat_spark_connection", envir = .GlobalEnv)
 }
 
+skip_unless_verbose <- function(message = NULL) {
+  message <- message %||% "Verbose test skipped"
+  verbose <- Sys.getenv("SPARKLYR_TESTS_VERBOSE", unset = NA)
+  if (is.na(verbose)) skip(message)
+  TRUE
+}
+
 testthat_spark_connect()

@@ -199,7 +199,7 @@ object Utils {
     partitions: Int): RDD[Row] = {
 
     var data = rows.map(o => {
-      val r = o.split('|')
+      val r = o.split('\31')
       var typed = (Array.range(0, r.length)).map(idx => {
         val column = columns(idx)
         val value = r(idx)

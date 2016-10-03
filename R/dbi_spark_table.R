@@ -2,7 +2,7 @@
 setMethod("dbWriteTable", "spark_connection",
   function(conn, name, value, temporary = TRUE, repartition = 0, serializer = NULL) {
     if (!temporary) {
-      stop("Writting to non-temporary tables is not supported yet")
+      stop("Writing to non-temporary tables is not supported yet")
     }
 
     found <- dbExistsTable(conn, name)
