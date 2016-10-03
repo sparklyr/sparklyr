@@ -135,16 +135,20 @@ tbl_cache <- function(sc, name, force = TRUE) {
   invisible(NULL)
 }
 
-#' Unload table from memory
+#' Uncache a Spark Table
 #'
-#' @param sc Spark connection
-#' @param name Name of the destination table
+#' Force a Spark table with name \code{name} to be unloaded from memory.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param name The table name.
 #'
 #' @family dplyr
 #'
 #' @export
 tbl_uncache <- function(sc, name) {
-  dbGetQuery(sc, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = sc)))
+  tbl <- tbl(sc, name)
+  sdf <- spark_dataframe(tbl)
+  invoke(sdf, "unpersist")
   invisible(NULL)
 }
 

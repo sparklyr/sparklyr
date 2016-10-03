@@ -28,9 +28,9 @@ spark_config_value <- function(config, name, default = NULL) {
 }
 
 
-# recursively merge two lists (extracted from code used by rmarkdown
+# recursively merge two lists -- extracted from code used by rmarkdown
 # package to merge _output.yml, _site.yml, front matter, etc.:
-# https://github.com/rstudio/rmarkdown/blob/master/R/util.R#L174)
+# https://github.com/rstudio/rmarkdown/blob/master/R/util.R#L174
 merge_lists <- function (base_list, overlay_list, recursive = TRUE) {
   if (length(base_list) == 0)
     overlay_list
