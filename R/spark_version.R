@@ -10,14 +10,22 @@ spark_version_clean <- function(version) {
 #'
 #' @export
 spark_version <- function(sc) {
+
+  # use cached value if available
+  if (!is.null(sc$spark_version))
+    return(sc$spark_version)
+
   # get the version
   version <- invoke(spark_context(sc), "version")
 
   # Get rid of -preview and other suffix variations
   version <- spark_version_clean(version)
 
-  # return numeric version
-  numeric_version(version)
+  # cache as numeric version
+  sc$spark_version <- numeric_version(version)
+
+  # return to caller
+  sc$spark_version
 }
 
 spark_version_from_home_version <- function() {
