@@ -7,7 +7,7 @@
 \usage{
 spark_disconnect(x, ...)
 
-spark_disconnect_all(termiante = FALSE)
+spark_disconnect_all()
 }
 \arguments{
 \item{x}{A \code{\link{spark_connect}} connection or the Spark master}

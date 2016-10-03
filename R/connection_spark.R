@@ -272,13 +272,13 @@ spark_connection_local_cores <- function(sc) {
 #'
 #' @rdname spark_disconnect
 #' @export
-spark_disconnect_all <- function(termiante = FALSE) {
+spark_disconnect_all <- function() {
   scons <- spark_connection_find_scon(function(e) {
     connection_is_open(e)
   })
 
   length(lapply(scons, function(e) {
-    spark_disconnect(e, termiante)
+    spark_disconnect(e)
   }))
 }
 
