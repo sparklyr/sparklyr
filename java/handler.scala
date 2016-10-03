@@ -42,6 +42,10 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
           writeType(dos, "void")
           server.close()
         case "terminateBackend" =>
+          writeInt(dos, 0)
+          writeType(dos, "void")
+          server.close()
+          
           System.exit(0)
         case "rm" =>
           try {
