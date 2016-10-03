@@ -318,8 +318,6 @@ object Backend {
                   dos.writeInt(requestedSessionId)
                   dos.writeInt(0)
                   dos.writeInt(0)
-                  
-                  if (!isService) System.exit(1)
                 }
               }
               
