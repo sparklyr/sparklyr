@@ -303,15 +303,6 @@ object Backend {
                 
                 var portForSession = sessionsMap.get(requestedSessionId)
                 
-                var sessionMapRetries: Int = 100
-                while (!portForSession.isDefined && sessionMapRetries > 0)
-                {
-                  portForSession = sessionsMap.get(requestedSessionId)
-                  
-                  Thread.sleep(10)
-                  sessionMapRetries = sessionMapRetries - 1
-                }
-                
                 if (portForSession.isDefined)
                 {
                   log("sparklyr gateway found mapping for session id (" + requestedSessionId + ")")
