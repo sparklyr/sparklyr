@@ -7,5 +7,3 @@
 #'   columns in Spark.
 #'
 #' @family feature transformation routines
-#'
-#' @export
