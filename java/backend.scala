@@ -290,6 +290,8 @@ object Backend {
                 
                 mainSession = true
                 
+                log("sparklyr gateway waiting for r process to end in session (" + requestedSessionId + ")")
+                
                 // wait for the end of socket, closed if R process die
                 gatewaySocket.getInputStream().read(buf)
               }
@@ -352,7 +354,10 @@ object Backend {
         } finally {
           backend.close()
           
-          if (!isService && mainSession) System.exit(0)
+          if (!isService && mainSession) {
+            log("terminating sparklyr backend")
+            System.exit(0)
+          }
         }
       }
     }.start() 
