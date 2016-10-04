@@ -6,7 +6,7 @@ test_that("we can save + load a RandomForest regression model", {
   if (spark_version(sc) < "2.0.0")
     skip("requires Spark 2.0.0")
 
-  mtcars_tbl <- copy_to(sc, mtcars, overwrite = TRUE)
+  mtcars_tbl <- testthat_tbl("mtcars")
   model <- mtcars_tbl %>%
     ml_random_forest(mpg ~ cyl)
 
@@ -22,7 +22,7 @@ test_that("we can save + load a RandomForest regression model", {
 
 test_that("we can save + load tables using the various save/load APIs", {
   skip_on_cran()
-  mtcars_tbl <- copy_to(sc, mtcars, overwrite = TRUE)
+  mtcars_tbl <- testthat_tbl("mtcars")
 
   # pairs of read / write routines that should work together
   routines <- list(

@@ -16,7 +16,7 @@ ft_vector_assembler <- function(x,
   ml_backwards_compatibility_api()
   class <- "org.apache.spark.ml.feature.VectorAssembler"
   invoke_simple_transformer(x, class, list(
-    setInputCol  = ensure_scalar_character(input.col),
+    setInputCols = as.list(as.character(input.col)),
     setOutputCol = ensure_scalar_character(output.col)
   ))
 }

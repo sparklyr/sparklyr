@@ -20,13 +20,13 @@ testthat_spark_connection <- function(version = NULL) {
 
 testthat_tbl <- function(name) {
   sc <- testthat_spark_connection()
-  tryCatch(
-    expr  = dplyr::tbl(sc, name),
-    error = function(e) {
-      data <- eval(as.name(name), envir = .GlobalEnv)
-      dplyr::copy_to(sc, data, name = name)
-    }
-  )
+  tbl <- tryCatch(dplyr::tbl(sc, name), error = identity)
+  if (inherits(tbl, "error")) {
+    data <- eval(as.name(name), envir = .GlobalEnv)
+    tbl <- dplyr::copy_to(sc, data, name = name)
+  }
+
+  tbl
 }
 
 skip_unless_verbose <- function(message = NULL) {

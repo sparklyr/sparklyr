@@ -21,4 +21,3 @@ test_that("spark_versions downloads use https", {
     expect_true(length(grep("^https", version$download)) == 1, label = paste(version$spark, version$hadoop), info = version$download)
   }
 })
-
