@@ -268,15 +268,15 @@ object Backend {
               {
                 log("sparklyr gateway found current session (" + sessionId + ")")
                 
-                dos.writeInt(sessionId)
-                dos.writeInt(gatewaySocket.getLocalPort())
-                dos.writeInt(backendPort)
-                
                 // wait for the end of stdin, then exit
                 new Thread("run backend") {
                   setDaemon(true)
                   override def run(): Unit = {
                     try {
+                      dos.writeInt(sessionId)
+                      dos.writeInt(gatewaySocket.getLocalPort())
+                      dos.writeInt(backendPort)
+                      
                       backend.run()
                     }
                     catch {
