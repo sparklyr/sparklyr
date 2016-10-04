@@ -204,7 +204,7 @@ object Backend {
       inetAddress = InetAddress.getByAddress(anyIpAddress)
     }
     
-    log("sparklyr session " + sessionId + " ready on port " + port)
+    log("sparklyr session (" + sessionId + ") starting")
     
     try {
       if (portIsAvailable(port))
@@ -264,7 +264,7 @@ object Backend {
               
               if (requestedSessionId == sessionId || requestedSessionId == 0)
               {
-                log("sparklyr gateway found current session id (" + sessionId + ")")
+                log("sparklyr gateway found current session (" + sessionId + ")")
                 
                 dos.writeInt(sessionId)
                 dos.writeInt(gatewaySocket.getLocalPort())
@@ -299,13 +299,13 @@ object Backend {
               }
               else
               {
-                log("sparklyr gateway searching for session id (" + requestedSessionId + ")")
+                log("sparklyr gateway searching for session (" + requestedSessionId + ")")
                 
                 var portForSession = sessionsMap.get(requestedSessionId)
                 
                 if (portForSession.isDefined)
                 {
-                  log("sparklyr gateway found mapping for session id (" + requestedSessionId + ")")
+                  log("sparklyr gateway found mapping for session (" + requestedSessionId + ")")
                   
                   dos.writeInt(requestedSessionId)
                   dos.writeInt(portForSession.get)
@@ -313,7 +313,7 @@ object Backend {
                 }
                 else
                 {
-                  log("sparklyr gateway found no mapping for session id (" + requestedSessionId + ")")
+                  log("sparklyr gateway found no mapping for session (" + requestedSessionId + ")")
               
                   dos.writeInt(requestedSessionId)
                   dos.writeInt(0)
@@ -327,7 +327,7 @@ object Backend {
               val registerSessionId = dis.readInt()
               val registerGatewayPort = dis.readInt()
               
-              log("sparklyr gateway registering session id (" + registerSessionId + ") for port (" + registerGatewayPort + ")")
+              log("sparklyr gateway registering session (" + registerSessionId + ") for port (" + registerGatewayPort + ")")
               
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
               dos.writeInt(0)
@@ -368,7 +368,7 @@ object Backend {
     val dis = new DataInputStream(s.getInputStream())
     val status = dis.readInt()
     
-    log("sparklyr fnished registration of session (" + sessionId + ") into gateway port (" + gatewayPort +  ") with status (" + status + ")")
+    log("sparklyr finished registration of session (" + sessionId + ") into gateway port (" + gatewayPort +  ") with status (" + status + ")")
     
     s.close()
     status == 0

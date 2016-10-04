@@ -73,8 +73,8 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
       "    Path: ", spark_submit_path, "\n",
       "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
       "    \n",
-      if (!is.null(output_file) && file.exists(output_file)) paste(readLines(output_file), collapse = "\n"),
-      if (!is.null(error_file) && file.exists(error_file)) paste(readLines(error_file), collapse = "\n") else "",
+      if (!is.null(output_file) && file.exists(output_file)) paste(readLines(output_file), collapse = "\n") else "",
+      if (!is.null(error_file) && file.exists(error_file)) paste("\n", readLines(error_file), collapse = "\n") else "",
       sep = ""))
   })
 }
@@ -219,11 +219,12 @@ start_shell <- function(master,
     gatewayInfo <- spark_connect_gateway(gatewayAddress,
                                          gatewayPort,
                                          sessionId,
-                                         waitSeconds = timeout)
+                                         waitSeconds = timeout,
+                                         canConnect = TRUE)
 
     if (is.null(gatewayInfo)) {
       abort_shell(
-        "Failed while connecting to sparklyr",
+        paste("Failed while connecting to sparklyr to port (", gatewayPort, ") for sessionid (", sessionId, ")"),
         spark_submit_path,
         shell_args,
         output_file,
@@ -320,7 +321,7 @@ connection_is_open.spark_shell_connection <- function(sc) {
 }
 
 #' @export
-spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
+sspark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
   if (!is.null(sc$output_file) && file.exists(sc$output_file)) {
     log <- file(sc$output_file)
     lines <- readLines(log)

@@ -36,11 +36,20 @@ spark_gateway_commands <- function() {
   )
 }
 
-spark_connect_gateway <- function(gatewayAddress, gatewayPort, sessionId, waitSeconds) {
+spark_connect_gateway <- function(
+  gatewayAddress,
+  gatewayPort,
+  sessionId,
+  waitSeconds,
+  canConnect = FALSE) {
+
   # try connecting to existing gateway
   gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, waitSeconds)
 
   if (is.null(gateway)) {
+    if (canConnect)
+      stop("Gateway in port (", gatewayPort, ") did not respond after (", waitSeconds, ") seconds")
+
     NULL
   }
   else {
@@ -65,6 +74,9 @@ spark_connect_gateway <- function(gatewayAddress, gatewayPort, sessionId, waitSe
 
     if (redirectGatewayPort == 0) {
       close(gateway)
+
+      if (canConnect)
+        stop("Gateway in port (", gatewayPort, ") does not have the requested session registered")
 
       NULL
     } else if(redirectGatewayPort != gatewayPort) {
