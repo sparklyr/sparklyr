@@ -36,6 +36,34 @@ spark_gateway_commands <- function() {
   )
 }
 
+query_gateway_for_port <- function(gateway, sessionId, waitSeconds) {
+  writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
+  writeInt(gateway, sessionId)
+  writeInt(gateway, waitSeconds)
+
+  backendSessionId <- NULL
+  redirectGatewayPort <- NULL
+
+  commandStart <- Sys.time()
+  while(length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()) {
+    backendSessionId <- readInt(gateway)
+    Sys.sleep(0.1)
+  }
+
+  redirectGatewayPort <- readInt(gateway)
+  backendPort <- readInt(gateway)
+
+  if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
+    stop("Sparklyr gateway did not respond while retrieving ports information")
+  }
+
+  list(
+    gateway = gateway,
+    backendPort = backendPort,
+    redirectGatewayPort = redirectGatewayPort
+  )
+}
+
 spark_connect_gateway <- function(
   gatewayAddress,
   gatewayPort,
@@ -53,24 +81,9 @@ spark_connect_gateway <- function(
     NULL
   }
   else {
-    writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
-    writeInt(gateway, sessionId)
-
-    backendSessionId <- readInt(gateway)
-
-    readResultStart <- Sys.time()
-    while (length(backendSessionId) == 0 && readResultStart + waitSeconds > Sys.time()) {
-      Sys.sleep(0.1)
-
-      backendSessionId <- readInt(gateway)
-    }
-
-    redirectGatewayPort <- readInt(gateway)
-    backendPort <- readInt(gateway)
-
-    if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
-      stop("Sparklyr gateway did not respond while retrieving ports information")
-    }
+    gatewayPortsQuery <- query_gateway_for_port(gateway, sessionId, waitSeconds)
+    redirectGatewayPort <- gatewayPortsQuery$redirectGatewayPort
+    backendPort <- gatewayPortsQuery$backendPort
 
     if (redirectGatewayPort == 0) {
       close(gateway)

@@ -249,6 +249,8 @@ object Backend {
     new Thread("wait for monitor to close") {
       setDaemon(true)
       override def run(): Unit = {
+        var mainSession: Boolean = false
+        
         try {
           val dis = new DataInputStream(gatewaySocket.getInputStream())
           val commandId = dis.readInt()
@@ -258,6 +260,7 @@ object Backend {
           GatewayOperattions(commandId) match {
             case GatewayOperattions.GetPorts => {
               val requestedSessionId = dis.readInt()
+              val startupTimeout = dis.readInt()
               
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
               
@@ -285,22 +288,25 @@ object Backend {
                   }
                 }.start()
                 
-                // even if this backend instance did not start as a service
-                // it will be considered one since other instances might use
-                // this instance to map ports while this instance in running
-                val wasService = isService
-                isService = true
+                mainSession = true
                 
                 // wait for the end of socket, closed if R process die
                 gatewaySocket.getInputStream().read(buf)
-                
-                isService = wasService
               }
               else
               {
                 log("sparklyr gateway searching for session (" + requestedSessionId + ")")
                 
                 var portForSession = sessionsMap.get(requestedSessionId)
+                
+                var sessionMapRetries: Int = startupTimeout * 10
+                while (!portForSession.isDefined && sessionMapRetries > 0)
+                {
+                  portForSession = sessionsMap.get(requestedSessionId)
+                  
+                  Thread.sleep(100)
+                  sessionMapRetries = sessionMapRetries - 1
+                }
                 
                 if (portForSession.isDefined)
                 {
@@ -346,7 +352,7 @@ object Backend {
         } finally {
           backend.close()
           
-          if (!isService) System.exit(0)
+          if (!isService && mainSession) System.exit(0)
         }
       }
     }.start() 

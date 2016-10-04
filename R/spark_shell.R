@@ -214,23 +214,31 @@ start_shell <- function(master,
       }
     })
 
-    # connect and wait for the service to start
-    timeout <- spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
-    gatewayInfo <- spark_connect_gateway(gatewayAddress,
-                                         gatewayPort,
-                                         sessionId,
-                                         waitSeconds = timeout,
-                                         canConnect = TRUE)
-
-    if (is.null(gatewayInfo)) {
+    tryCatch({
+      # connect and wait for the service to start
+      timeout <- spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+      gatewayInfo <- spark_connect_gateway(gatewayAddress,
+                                           gatewayPort,
+                                           sessionId,
+                                           waitSeconds = timeout,
+                                           canConnect = TRUE)
+    }, error = function(e) {
       abort_shell(
-        paste("Failed while connecting to sparklyr to port (", gatewayPort, ") for sessionid (", sessionId, ")"),
+        paste(
+          "Failed while connecting to sparklyr to port (",
+          gatewayPort,
+          ") for sessionid (",
+          sessionId,
+          "): ",
+          e$message,
+          sep = ""
+        ),
         spark_submit_path,
         shell_args,
         output_file,
         error_file
       )
-    }
+    })
   }
 
   tryCatch({
