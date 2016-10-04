@@ -9,17 +9,19 @@ spark_write_json(x, path, mode = NULL, options = list())
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
-\item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
+\item{path}{The path to the file. Needs to be accessible from the cluster.
+Supports the "hdfs://", "s3n://" and "file://" protocols.}
 
 \item{mode}{Specifies the behavior when data or table already exists.}
 
 \item{options}{A list of strings with additional options.}
 }
 \description{
-Write a Spark DataFrame to a JSON file
+Serialize a Spark DataFrame to the \href{http://www.json.org/}{JavaScript
+Object Notation} format.
 }
 \seealso{
-Other reading and writing data: \code{\link{spark_read_csv}},
+Other Spark serialization routines: \code{\link{spark_read_csv}},
   \code{\link{spark_read_json}},
   \code{\link{spark_read_parquet}},
   \code{\link{spark_write_csv}},

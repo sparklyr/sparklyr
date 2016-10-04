@@ -66,18 +66,23 @@ sdf_collect <- function(object) {
   sdf <- spark_dataframe(object)
 
   # for some reason, we appear to receive invalid results when
-  # collecting Spark DataFrames with many columns -- empirically,
+  # collecting Spark DataFrames with many columns. empirically,
   # having more than 50 columns seems to trigger the buggy behavior
-  # collect the data set in chunks, and then join those chunks
-  columns <- invoke(sdf, "columns") %>% as.character()
-  chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
-  chunks <- split_chunks(columns, as.integer(chunk_size))
-  pieces <- lapply(chunks, function(chunk) {
-    subset <- sdf %>% invoke("selectExpr", as.list(chunk))
-    invoke_static(sc, "sparklyr.Utils", "collect", subset)
-  })
+  # collect the data set in chunks, and then join those chunks.
+  # note that this issue should be resolved with Spark >2.0.0
+  collected <- if (spark_version(sc) > "2.0.0") {
+    invoke_static(sc, "sparklyr.Utils", "collect", sdf)
+  } else {
+    columns <- invoke(sdf, "columns") %>% as.character()
+    chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
+    chunks <- split_chunks(columns, as.integer(chunk_size))
+    pieces <- lapply(chunks, function(chunk) {
+      subset <- sdf %>% invoke("selectExpr", as.list(chunk))
+      invoke_static(sc, "sparklyr.Utils", "collect", subset)
+    })
+    do.call(c, pieces)
+  }
 
-  collected <- do.call(c, pieces)
   transformed <- lapply(collected, sdf_deserialize_column)
   colNames <- invoke(sdf, "columns")
   names(transformed) <- as.character(colNames)

@@ -2,35 +2,51 @@ spark_version_clean <- function(version) {
   gsub("([0-9]+\\.?)[^0-9\\.](.*)","\\1", version)
 }
 
-#' Version of Spark for a connection
+#' Get the Spark Version Associated with a Spark Connection
 #'
-#' @param sc \code{spark_connection}
+#' Retrieve the version of Spark associated with a Spark connection.
 #'
-#' @return A \code{\link{numeric_version}} object
+#' Suffixes for e.g. preview versions, or snapshotted versions,
+#' are trimmed -- if you require the full Spark version, you can
+#' retrieve it with \code{invoke(spark_context(sc), "version")}.
+#'
+#' @param sc A \code{spark_connection}.
+#'
+#' @return The Spark version as a \code{\link{numeric_version}}.
 #'
 #' @export
 spark_version <- function(sc) {
+
+  # use cached value if available
+  if (!is.null(sc$spark_version))
+    return(sc$spark_version)
+
   # get the version
   version <- invoke(spark_context(sc), "version")
 
   # Get rid of -preview and other suffix variations
   version <- spark_version_clean(version)
 
-  # return numeric version
-  numeric_version(version)
+  # cache as numeric version
+  sc$spark_version <- numeric_version(version)
+
+  # return to caller
+  sc$spark_version
 }
 
 spark_version_from_home_version <- function() {
   version <- Sys.getenv("SPARK_HOME_VERSION")
-  if (nchar(version) <= 0) NULL else version
+  if (nzchar(version)) version else NULL
 }
 
-#' Version of Spark for a SPARK_HOME directory
+#' Get the Spark Version Associated with a Spark Installation
 #'
-#' @param spark_home Path to SPARK_HOME
-#' @param default The version to use as default
+#' Retrieve the version of Spark associated with a Spark installation.
 #'
-#' @rdname spark_version
+#' @param spark_home The path to a Spark installation.
+#' @param default The default version to be inferred, in case
+#'   version lookup failed, e.g. no Spark installation was found
+#'   at \code{spark_home}.
 #'
 #' @export
 spark_version_from_home <- function(spark_home, default = NULL) {

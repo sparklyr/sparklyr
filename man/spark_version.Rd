@@ -2,26 +2,22 @@
 % Please edit documentation in R/spark_version.R
 \name{spark_version}
 \alias{spark_version}
-\alias{spark_version_from_home}
-\title{Version of Spark for a connection}
+\title{Get the Spark Version Associated with a Spark Connection}
 \usage{
 spark_version(sc)
-
-spark_version_from_home(spark_home, default = NULL)
 }
 \arguments{
-\item{sc}{\code{spark_connection}}
-
-\item{spark_home}{Path to SPARK_HOME}
-
-\item{default}{The version to use as default}
+\item{sc}{A \code{spark_connection}.}
 }
 \value{
-A \code{\link{numeric_version}} object
+The Spark version as a \code{\link{numeric_version}}.
 }
 \description{
-Version of Spark for a connection
-
-Version of Spark for a SPARK_HOME directory
+Retrieve the version of Spark associated with a Spark connection.
+}
+\details{
+Suffixes for e.g. preview versions, or snapshotted versions,
+are trimmed -- if you require the full Spark version, you can
+retrieve it with \code{invoke(spark_context(sc), "version")}.
 }
 

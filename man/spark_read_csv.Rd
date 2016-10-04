@@ -9,50 +9,53 @@ spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
   options = list(), repartition = 0, memory = TRUE, overwrite = TRUE)
 }
 \arguments{
-\item{sc}{The Spark connection}
+\item{sc}{A \code{spark_connection}.}
 
-\item{name}{Name of table}
+\item{name}{The name to assign to the newly generated table.}
 
-\item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
+\item{path}{The path to the file. Needs to be accessible from the cluster.
+Supports the "hdfs://", "s3n://" and "file://" protocols.}
 
-\item{header}{Should the first row of data be used as a header? Defaults to \code{TRUE}.}
+\item{header}{Boolean; should the first row of data be used as a header?
+Defaults to \code{TRUE}.}
 
-\item{delimiter}{The character used to delimit each column, defaults to \code{,}.}
+\item{delimiter}{The character used to delimit each column. Defaults to \code{,}.}
 
-\item{quote}{The character used as a quote, defaults to \code{"hdfs://"}.}
+\item{quote}{The character used as a quote. Defaults to \code{"hdfs://"}.}
 
-\item{escape}{The chatacter used to escape other characters, defaults to \code{\\}.}
+\item{escape}{The chatacter used to escape other characters. Defaults to \code{\\}.}
 
-\item{charset}{The character set, defaults to \code{"UTF-8"}.}
+\item{charset}{The character set. Defaults to \code{"UTF-8"}.}
 
-\item{null_value}{The character to use for default values, defaults to \code{NULL}.}
+\item{null_value}{The character to use for null, or missing, values. Defaults to \code{NULL}.}
 
 \item{options}{A list of strings with additional options.}
 
-\item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
+\item{repartition}{The number of partitions used to distribute the
+generated table. Use 0 (the default) to avoid partitioning.}
 
-\item{memory}{Load data eagerly into memory}
+\item{memory}{Boolean; should the data be loaded eagerly into memory? (That
+is, should the table be cached?)}
 
-\item{overwrite}{Overwrite the table with the given name if it already exists}
-}
-\value{
-Reference to a Spark DataFrame / dplyr tbl
+\item{overwrite}{Boolean; overwrite the table with the given name if it
+already exists?}
 }
 \description{
-Read a CSV file into a Spark DataFrame
+Read a tabular data file into a Spark DataFrame.
 }
 \details{
-You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
-  the local file system (\code{file://}).
+You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}),
+  as well as the local file system (\code{file://}).
 
-If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and
-  \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
+If you are reading from a secure S3 bucket be sure that the
+\code{AWS_ACCESS_KEY_ID} and \code{AWS_SECRET_ACCESS_KEY} environment
+variables are both defined.
 
-When \code{header} is \code{FALSE}, the column names are generated with a \code{V} prefix;
-  e.g. \code{V1, V2, ...}.
+When \code{header} is \code{FALSE}, the column names are generated with a
+\code{V} prefix; e.g. \code{V1, V2, ...}.
 }
 \seealso{
-Other reading and writing data: \code{\link{spark_read_json}},
+Other Spark serialization routines: \code{\link{spark_read_json}},
   \code{\link{spark_read_parquet}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_json}},

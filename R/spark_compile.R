@@ -1,4 +1,4 @@
-#' Compile Scala sources into a Java Archive (jar)
+#' Compile Scala sources into a Java Archive
 #'
 #' Given a set of \code{scala} source files, compile them
 #' into a Java Archive (\code{jar}).

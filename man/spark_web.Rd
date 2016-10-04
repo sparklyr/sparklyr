@@ -7,9 +7,9 @@
 spark_web(sc, ...)
 }
 \arguments{
-\item{sc}{\code{spark_connection}}
+\item{sc}{A \code{spark_connection}.}
 
-\item{...}{Unused (reserved for future use)}
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Open the Spark web interface

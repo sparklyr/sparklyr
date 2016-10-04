@@ -1,6 +1,6 @@
 #' Save / Load a Spark DataFrame
 #'
-#' Save / load a Spark DataFrame.
+#' Routines for saving and loading Spark DataFrames.
 #'
 #' @param sc A \code{spark_connection} object.
 #' @template roxlate-ml-x

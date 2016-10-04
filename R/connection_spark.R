@@ -13,26 +13,38 @@ spark_default_app_jar <- function(version) {
   sparklyr_jar_path(spark_version_numeric(version))
 }
 
-#' Connect to Spark
+#' Manage Spark Connections
 #'
-#' @param master Spark cluster url to connect to. Use \code{"local"} to connect to a local
-#'   instance of Spark installed via \code{\link{spark_install}}.
-#' @param spark_home Spark home directory (defaults to SPARK_HOME environment variable).
-#'   If \code{SPARK_HOME} is defined it will be always be used unless the \code{version}
-#'   paramater is specified to force the use of a locally installed version.
-#' @param method of connecting to spark (currently only "shell" is supported, additional
-#'   methods may come later)
-#' @param app_name Application name to be used while running in the Spark cluster
-#' @param version Version of Spark (only applicable for local master)
-#' @param hadoop_version Version of Hadoop (only applicable for local master)
-#' @param extensions Extension packages to enable for this connection. By default will
-#'   enable all packages that previously called \code{sparklyr::register_extension}.
-#' @param config Configuration for connection (see \code{\link{spark_config} for details}).
+#' These routines allow you to manage your connections to Spark.
 #'
-#' @return Connection to Spark local instance or remote cluster
+#' @param sc A \code{spark_connection}.
+#' @param master Spark cluster url to connect to. Use \code{"local"} to
+#'   connect to a local instance of Spark installed via
+#'   \code{\link{spark_install}}.
+#' @param spark_home The path to a Spark installation. Defaults to the path
+#'   provided by the \code{SPARK_HOME} environment variable. If
+#'   \code{SPARK_HOME} is defined, it will be always be used unless the
+#'   \code{version} parameter is specified to force the use of a locally
+#'   installed version.
+#' @param method The method used to connect to Spark. Currently, only
+#'   \code{"shell"} is supported.
+#' @param app_name The application name to be used while running in the Spark
+#'   cluster.
+#' @param version The version of Spark to use. Only applicable to
+#'   \code{"local"} Spark connections.
+#' @param hadoop_version The version of Hadoop to use. Only applicable to
+#'   \code{"local"} Spark connections.
+#' @param extensions Extension packages to enable for this connection. By
+#'   default, all packages enabled through the use of
+#'   \code{\link[=register_extension]{sparklyr::register_extension}} will be passed here.
+#' @param config Custom configuration for the generated Spark connection. See
+#'   \code{\link{spark_config}} for details.
+#' @param ... Optional arguments; currently unused.
 #'
-#' @family Spark connections
-#'
+#' @name spark-connections
+NULL
+
+#' @name spark-connections
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
@@ -41,8 +53,8 @@ spark_connect <- function(master,
                           version = NULL,
                           hadoop_version = NULL,
                           config = spark_config(),
-                          extensions = sparklyr::registered_extensions()) {
-
+                          extensions = sparklyr::registered_extensions())
+{
   # validate method
   defaultMethod <- length(method) > 1
   method <- match.arg(method)
@@ -180,8 +192,7 @@ spark_log.spark_connection <- function(sc, n = 100, filter = NULL, ...) {
     linesLog
   }
   else {
-    class(sc) <- "spark_shell_connection"
-    spark_log(sc, n, filter, ...)
+    spark_log.spark_shell_connection(sc, n = n, filter, ...)
   }
 }
 
@@ -191,47 +202,34 @@ print.sparklyr_log <- function(x, ...) {
   cat("\n")
 }
 
-#' Check if a Spark connection is open
-#'
-#' @param sc \code{spark_connection}
-#'
-#' @rdname spark_connection_is_open
-#'
-#' @keywords internal
-#'
+#' @name spark-connections
 #' @export
 spark_connection_is_open <- function(sc) {
   connection_is_open(sc)
 }
 
-#' Disconnect from Spark
-#'
-#' @param x A \code{\link{spark_connect}} connection or the Spark master
-#' @param ... Additional arguments
-#'
-#' @family Spark connections
-#'
+#' @name spark-connections
 #' @export
-spark_disconnect <- function(x, ...) {
+spark_disconnect <- function(sc, ...) {
   UseMethod("spark_disconnect")
 }
 
 #' @export
-spark_disconnect.spark_connection <- function(x, ...) {
+spark_disconnect.spark_connection <- function(sc, ...) {
   tryCatch({
-    stop_shell(x)
+    stop_shell(sc)
   }, error = function(err) {
   })
 
-  spark_connections_remove(x)
+  spark_connections_remove(sc)
 
-  on_connection_closed(x)
+  on_connection_closed(sc)
 }
 
 #' @export
-spark_disconnect.character <- function(x, ...) {
+spark_disconnect.character <- function(sc, ...) {
   args <- list(...)
-  master <- if (!is.null(args$master)) args$master else x
+  master <- if (!is.null(args$master)) args$master else sc
   app_name <- args$app_name
 
   connections <- spark_connection_find_scon(function(e) {
@@ -274,11 +272,7 @@ spark_connection_local_cores <- function(sc) {
   spark_config_value(sc$config, "sparklyr.cores")
 }
 
-#' Close all existing connections
-#'
-#' @family Spark connections
-#'
-#' @rdname spark_disconnect
+#' @name spark-connections
 #' @export
 spark_disconnect_all <- function() {
   scons <- spark_connection_find_scon(function(e) {

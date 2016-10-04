@@ -3,25 +3,23 @@
 \name{register_extension}
 \alias{register_extension}
 \alias{registered_extensions}
-\title{Register a package that implements a Spark extension}
+\title{Register a Package that Implements a Spark Extension}
 \usage{
 register_extension(package)
 
 registered_extensions()
 }
 \arguments{
-\item{package}{Name of package to register}
+\item{package}{The package(s) to register.}
 }
 \description{
 Registering an extension package will result in the package being
-automatically scanned for spark dependencies when a connection
-to Spark is initiated (e.g. via \code{start_shell}).
-
-Enumerate all registered extension packages
+automatically scanned for spark dependencies when a connection to Spark is
+created.
 }
 \note{
-Extensions are typically registered when packages are
-  loaded onto the search path (i.e. in the \code{.onLoad}
-  function).
+Packages should typically register their extensions in their
+  \code{.onLoad} hook -- this ensures that their extensions are registered
+  when their namespaces are loaded.
 }
 

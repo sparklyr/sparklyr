@@ -20,8 +20,4 @@ Operations on cached tables should normally (although not always)
 be more performant than the same operation performed on an uncached
 table.
 }
-\seealso{
-Other dplyr: \code{\link{copy_to}},
-  \code{\link{tbl_uncache}}
-}
 

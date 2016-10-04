@@ -2,7 +2,7 @@
 % Please edit documentation in R/spark_compile.R
 \name{spark_compile}
 \alias{spark_compile}
-\title{Compile Scala sources into a Java Archive (jar)}
+\title{Compile Scala sources into a Java Archive}
 \usage{
 spark_compile(jar_name, spark_home = NULL, filter = NULL, scalac = NULL,
   jar = NULL)

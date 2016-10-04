@@ -4,7 +4,7 @@
 \alias{invoke}
 \alias{invoke_new}
 \alias{invoke_static}
-\title{Execute a method on a remote Java object}
+\title{Invoke a Method on a JVM Object}
 \usage{
 invoke(jobj, method, ...)
 
@@ -13,17 +13,27 @@ invoke_static(sc, class, method, ...)
 invoke_new(sc, class, ...)
 }
 \arguments{
-\item{jobj}{Java object to execute method on.}
+\item{jobj}{An \R object acting as a Java object reference (typically, a \code{spark_jobj}).}
 
-\item{method}{Name of method to execute.}
+\item{method}{The name of the method to be invoked.}
 
-\item{...}{Unused (future expansion)}
+\item{...}{Optional arguments, currently unused.}
 
-\item{sc}{\code{spark_connection} to execute on.}
+\item{sc}{A \code{spark_connection}.}
 
-\item{class}{Class to execute static method on.}
+\item{class}{The name of the Java class whose methods should be invoked.}
 }
 \description{
-Execute a method on a remote Java object
+Invoke methods on Java object references. These functions provide a
+mechanism for invoking various Java object methods directly from \R.
+}
+\details{
+Use each of these functions in the following scenarios:
+
+\tabular{lll}{
+\code{invoke} \tab Execute a method on a Java object reference (typically, a \code{spark_jobj}). \cr
+\code{invoke_static} \tab Execute a static method associated with a Java class. \cr
+\code{invoke_new} \tab Invoke a constructor associated with a Java class. \cr
+}
 }
 

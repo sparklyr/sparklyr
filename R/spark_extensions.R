@@ -1,23 +1,21 @@
 
 
-#' Register a package that implements a Spark extension
+#' Register a Package that Implements a Spark Extension
 #'
 #' Registering an extension package will result in the package being
-#' automatically scanned for spark dependencies when a connection
-#' to Spark is initiated (e.g. via \code{start_shell}).
+#' automatically scanned for spark dependencies when a connection to Spark is
+#' created.
 #'
-#' @param package Name of package to register
+#' @param package The package(s) to register.
 #'
-#' @note Extensions are typically registered when packages are
-#'   loaded onto the search path (i.e. in the \code{.onLoad}
-#'   function).
+#' @note Packages should typically register their extensions in their
+#'   \code{.onLoad} hook -- this ensures that their extensions are registered
+#'   when their namespaces are loaded.
 #'
 #' @export
 register_extension <- function(package) {
   .globals$extension_packages <- c(.globals$extension_packages, package)
 }
-
-#' Enumerate all registered extension packages
 
 #' @rdname register_extension
 #' @export

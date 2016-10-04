@@ -2,24 +2,22 @@
 % Please edit documentation in R/spark_jobj.R
 \name{spark_jobj}
 \alias{spark_jobj}
-\title{Get the spark_jobj associated with an object}
+\title{Retrieve a Spark JVM Object Reference}
 \usage{
 spark_jobj(x, ...)
 }
 \arguments{
-\item{x}{Object to extract jobj from}
+\item{x}{An \R object containing, or wrapping, a \code{spark_jobj}.}
 
-\item{...}{Reserved for future use}
-}
-\value{
-A \code{spark_jobj} object that can be passed to
-  \code{\link{invoke}}.
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
-S3 method to get the spark_jobj associated with objects of
-various types.
+This S3 generic is used for accessing the underlying Java Virtual Machine
+(JVM) Spark objects associated with \R objects. These objects act as
+references to Spark objects living in the JVM. Methods on these objects
+can be called with the \code{\link{invoke}} family of functions.
 }
 \seealso{
-\code{\link{invoke}}
+\code{\link{invoke}}, for calling methods on Java object references.
 }
 

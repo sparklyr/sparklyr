@@ -20,32 +20,38 @@ spark_csv_options <- function(header,
 
 #' Read a CSV file into a Spark DataFrame
 #'
-#' @param sc The Spark connection
-#' @param name Name of table
-#' @param path The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"
-#' @param memory Load data eagerly into memory
-#' @param header Should the first row of data be used as a header? Defaults to \code{TRUE}.
-#' @param delimiter The character used to delimit each column, defaults to \code{,}.
-#' @param quote The character used as a quote, defaults to \code{"hdfs://"}.
-#' @param escape The chatacter used to escape other characters, defaults to \code{\\}.
-#' @param charset The character set, defaults to \code{"UTF-8"}.
-#' @param null_value The character to use for default values, defaults to \code{NULL}.
+#' Read a tabular data file into a Spark DataFrame.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param name The name to assign to the newly generated table.
+#' @param path The path to the file. Needs to be accessible from the cluster.
+#'   Supports the "hdfs://", "s3n://" and "file://" protocols.
+#' @param memory Boolean; should the data be loaded eagerly into memory? (That
+#'   is, should the table be cached?)
+#' @param header Boolean; should the first row of data be used as a header?
+#'   Defaults to \code{TRUE}.
+#' @param delimiter The character used to delimit each column. Defaults to \code{,}.
+#' @param quote The character used as a quote. Defaults to \code{"hdfs://"}.
+#' @param escape The chatacter used to escape other characters. Defaults to \code{\\}.
+#' @param charset The character set. Defaults to \code{"UTF-8"}.
+#' @param null_value The character to use for null, or missing, values. Defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
-#' @param repartition Total of partitions used to distribute table or 0 (default) to avoid partitioning
-#' @param overwrite Overwrite the table with the given name if it already exists
+#' @param repartition The number of partitions used to distribute the
+#'   generated table. Use 0 (the default) to avoid partitioning.
+#' @param overwrite Boolean; overwrite the table with the given name if it
+#'   already exists?
 #'
-#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
-#'   the local file system (\code{file://}).
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}),
+#'   as well as the local file system (\code{file://}).
 #'
-#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and
-#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
+#' If you are reading from a secure S3 bucket be sure that the
+#' \code{AWS_ACCESS_KEY_ID} and \code{AWS_SECRET_ACCESS_KEY} environment
+#' variables are both defined.
 #'
-#' When \code{header} is \code{FALSE}, the column names are generated with a \code{V} prefix;
-#'   e.g. \code{V1, V2, ...}.
+#' When \code{header} is \code{FALSE}, the column names are generated with a
+#' \code{V} prefix; e.g. \code{V1, V2, ...}.
 #'
-#' @return Reference to a Spark DataFrame / dplyr tbl
-#'
-#' @family reading and writing data
+#' @family Spark serialization routines
 #'
 #' @export
 spark_read_csv <- function(sc,
@@ -86,6 +92,8 @@ spark_read_csv <- function(sc,
 
 #' Write a Spark DataFrame to a CSV
 #'
+#' Write a Spark DataFrame to a tabular (typically, comma-separated) file.
+#'
 #' @inheritParams spark_read_csv
 #' @param x A Spark DataFrame or dplyr operation
 #' @param header Should the first row of data be used as a header? Defaults to \code{TRUE}.
@@ -96,7 +104,7 @@ spark_read_csv <- function(sc,
 #' @param null_value The character to use for default values, defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
 #'
-#' @family reading and writing data
+#' @family Spark serialization routines
 #'
 #' @export
 spark_write_csv <- function(x, path,
@@ -144,6 +152,9 @@ spark_write_csv.spark_jobj <- function(x,
 
 #' Read a Parquet file into a Spark DataFrame
 #'
+#' Read a \href{https://parquet.apache.org/}{Parquet} file into a Spark
+#' DataFrame.
+#'
 #' @inheritParams spark_read_csv
 #' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #'
@@ -154,7 +165,7 @@ spark_write_csv.spark_jobj <- function(x,
 #'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
 #'
 #'
-#' @family reading and writing data
+#' @family Spark serialization routines
 #'
 #' @export
 spark_read_parquet <- function(sc,
@@ -173,11 +184,14 @@ spark_read_parquet <- function(sc,
 
 #' Write a Spark DataFrame to a Parquet file
 #'
+#' Serialize a Spark DataFrame to the
+#' \href{https://parquet.apache.org/}{Parquet} format.
+#'
 #' @inheritParams spark_write_csv
 #' @param mode Specifies the behavior when data or table already exists.
 #' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #'
-#' @family reading and writing data
+#' @family Spark serialization routines
 #'
 #' @export
 spark_write_parquet <- function(x, path, mode = NULL, options = list()) {
@@ -198,6 +212,9 @@ spark_write_parquet.spark_jobj <- function(x, path, mode = NULL, options = list(
 
 #' Read a JSON file into a Spark DataFrame
 #'
+#' Read a table serialized in the \href{http://www.json.org/}{JavaScript
+#' Object Notation} format into a Spark DataFrame.
+#'
 #' @inheritParams spark_read_csv
 #'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
@@ -207,7 +224,7 @@ spark_write_parquet.spark_jobj <- function(x, path, mode = NULL, options = list(
 #'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
 #'
 #'
-#' @family reading and writing data
+#' @family Spark serialization routines
 #'
 #' @export
 spark_read_json <- function(sc,
@@ -226,10 +243,13 @@ spark_read_json <- function(sc,
 
 #' Write a Spark DataFrame to a JSON file
 #'
+#' Serialize a Spark DataFrame to the \href{http://www.json.org/}{JavaScript
+#' Object Notation} format.
+#'
 #' @inheritParams spark_write_csv
 #' @param mode Specifies the behavior when data or table already exists.
 #'
-#' @family reading and writing data
+#' @family Spark serialization routines
 #'
 #' @export
 spark_write_json <- function(x, path, mode = NULL, options = list()) {

@@ -55,7 +55,11 @@ db_data_type.src_spark <- function(...) {
 }
 
 
-#' Copy a local R data.frame to Spark
+#' Copy an R Data Frame to Spark
+#'
+#' Copy an R \code{data.frame} to Spark, and return a reference to the
+#' generated Spark DataFrame as a \code{tbl_spark}. The returned object will
+#' act as a \code{dplyr}-compatible interface to the underlying Spark table.
 #'
 #' @param dest A \code{spark_connection}.
 #' @param df An \R \code{data.frame}.
@@ -72,8 +76,6 @@ db_data_type.src_spark <- function(...) {
 #'   to a Spark DataFrame.
 #'
 #' @name copy_to
-#'
-#' @family dplyr
 #'
 #' @export
 copy_to.spark_connection <- function(dest,
@@ -121,8 +123,6 @@ copy_to.src_spark <- function(dest, df, name, ...) {
 #' @param force Force the data to be loaded into memory? This is accomplished
 #'   by calling the \code{count} API on the associated Spark DataFrame.
 #'
-#' @family dplyr
-#'
 #' @export
 tbl_cache <- function(sc, name, force = TRUE) {
   tbl <- tbl(sc, name)
@@ -135,16 +135,18 @@ tbl_cache <- function(sc, name, force = TRUE) {
   invisible(NULL)
 }
 
-#' Unload table from memory
+#' Uncache a Spark Table
 #'
-#' @param sc Spark connection
-#' @param name Name of the destination table
+#' Force a Spark table with name \code{name} to be unloaded from memory.
 #'
-#' @family dplyr
+#' @param sc A \code{spark_connection}.
+#' @param name The table name.
 #'
 #' @export
 tbl_uncache <- function(sc, name) {
-  dbGetQuery(sc, paste("UNCACHE TABLE", dplyr::escape(ident(name), con = sc)))
+  tbl <- tbl(sc, name)
+  sdf <- spark_dataframe(tbl)
+  invoke(sdf, "unpersist")
   invisible(NULL)
 }
 
@@ -157,7 +159,7 @@ print.src_spark <- function(x, ...) {
 }
 
 #' @export
-db_save_query.spark_connection <- function (con, sql, name, temporary = TRUE, ...)
+db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...)
 {
   df <- spark_dataframe(con, sql)
   invoke(df, "registerTempTable", name)

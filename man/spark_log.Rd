@@ -2,25 +2,23 @@
 % Please edit documentation in R/spark_connection.R
 \name{spark_log}
 \alias{spark_log}
-\title{Retrieves entries from the Spark log}
+\title{View Entries in the Spark Log}
 \usage{
 spark_log(sc, n = 100, filter = NULL, ...)
 }
 \arguments{
-\item{sc}{\code{spark_connection}}
+\item{sc}{A \code{spark_connection}.}
 
-\item{n}{Max number of log entries to retrieve (pass NULL to retrieve
-all lines of the log)}
+\item{n}{The max number of log entries to retrieve. Use \code{NULL} to
+retrieve all entries within the log.}
 
 \item{filter}{Character string to filter log entries.}
 
-\item{...}{Unused (reserved for future use)}
-}
-\value{
-Character vector with last \code{n} lines of the Spark log
-  or for \code{spark_log_file} the full path to the log file.
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
-Retrieves entries from the Spark log
+View the most recent entries in the Spark log. This can be useful when
+inspecting output / errors produced by Spark during the invocation of
+various commands.
 }
 

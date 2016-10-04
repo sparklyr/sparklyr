@@ -1,71 +1,76 @@
-
-
-
-#' Get the SparkContext associated with a connection
+#' Access the Spark API
 #'
-#' Get the SparkContext \code{spark_jobj} associated with a
-#' \code{spark_connection}
+#' Access the commonly-used Spark objects associated with a Spark instance.
+#' These objects provide access to different facets of the Spark API.
 #'
-#' @param sc Connection to get SparkContext from
+#' The \href{http://spark.apache.org/docs/latest/api/scala/#package}{Scala API documentation}
+#' is useful for discovering what methods are available for each of these
+#' objects. Use \code{\link{invoke}} to call methods on these objects.
 #'
-#' @return Reference to SparkContext
+#' @section Spark Context:
+#'
+#' The main entry point for Spark functionality. The \strong{Spark Context}
+#' represents the connection to a Spark cluster, and can be used to create
+#' \code{RDD}s, accumulators and broadcast variables on that cluster.
+#'
+#' @section Java Spark Context:
+#'
+#' A Java-friendly version of the aforementioned \strong{Spark Context}.
+#'
+#' @section Hive Context:
+#'
+#' An instance of the Spark SQL execution engine that integrates with data
+#' stored in Hive. Configuration for Hive is read from \code{hive-site.xml} on
+#' the classpath.
+#'
+#' Starting with Spark >= 2.0.0, the \strong{Hive Context} class has been
+#' deprecated -- it is superceded by the \strong{Spark Session} class, and
+#' \code{hive_context} will return a \strong{Spark Session} object instead.
+#' Note that both classes share a SQL interface, and therefore one can invoke
+#' SQL through these objects.
+#'
+#' @section Spark Session:
+#'
+#' Available since Spark 2.0.0, the \strong{Spark Session} unifies the
+#' \strong{Spark Context} and \strong{Hive Context} classes into a single
+#' interface. Its use is recommended over the older APIs for code
+#' targeting Spark 2.0.0 and above.
+#'
+#' @param sc A \code{spark_connection}.
+#'
+#' @name spark-api
+NULL
+
+#' @name spark-api
 #' @export
 spark_context <- function(sc) {
   sc$spark_context
 }
 
-#' Get the JavaSparkContext associated with a connection
-#'
-#' Get the JavaSparkContext \code{spark_jobj} associated with a
-#' \code{spark_connection}
-#'
-#' @param sc Connection to get SparkContext from
-#'
-#' @return Reference to SparkContext
+#' @name spark-api
 #' @export
 java_context <- function(sc) {
   sc$java_context
 }
 
-#' Get the HiveContext associated with a connection
-#'
-#' Get the HiveContext \code{spark_jobj} associated with a
-#' \code{spark_connection}
-#'
-#' @param sc Connection to get HiveContext from
-#'
-#' @return Reference to HiveContext
+#' @name spark-api
 #' @export
 hive_context <- function(sc) {
   sc$hive_context
 }
 
-#' Get the Spark Session associated with a connection
-#'
-#' Get the
-#' \href{http://spark.apache.org/docs/latest/api/scala/#org.apache.spark.sql.SparkSession}{Spark Session}
-#' associated with a \code{spark_connection}.
-#'
-#' This object is only available since Spark 2.0.0, and provides
-#' an interface that unifies the Spark SQL context + Hive context
-#' into a single object, and its use is recommended over the older
-#' APIs.
-#'
-#' @param sc A \code{spark_connection}.
+#' @name spark-api
 #' @export
 spark_session <- function(sc) {
   sc$hive_context
 }
 
-#' Get the spark_connection associated with an object
+#' Retrieve the Spark Connection Associated with an R Object
 #'
-#' S3 method to get the spark_connection associated with objects of
-#' various types.
+#' Retrieve the \code{spark_connection} associated with an \R object.
 #'
-#' @param x Object to extract connection from
-#' @param ... Reserved for future use
-#' @return A \code{spark_connection} object that can be passed to
-#'   \code{\link{invoke_new}} and \code{\link{invoke_static}}.
+#' @param x An \R object from which a \code{spark_connection} can be obtained.
+#' @param ... Optional arguments; currently unused.
 #'
 #' @export
 spark_connection <- function(x, ...) {
@@ -155,16 +160,17 @@ spark_master_is_local <- function(master) {
 }
 
 
-#' Retrieves entries from the Spark log
+#' View Entries in the Spark Log
 #'
-#' @param sc \code{spark_connection}
-#' @param n Max number of log entries to retrieve (pass NULL to retrieve
-#'   all lines of the log)
+#' View the most recent entries in the Spark log. This can be useful when
+#' inspecting output / errors produced by Spark during the invocation of
+#' various commands.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param n The max number of log entries to retrieve. Use \code{NULL} to
+#'   retrieve all entries within the log.
 #' @param filter Character string to filter log entries.
-#' @param ... Unused (reserved for future use)
-#'
-#' @return Character vector with last \code{n} lines of the Spark log
-#'   or for \code{spark_log_file} the full path to the log file.
+#' @param ... Optional arguments; currently unused.
 #'
 #' @export
 spark_log <- function(sc, n = 100, filter = NULL, ...) {

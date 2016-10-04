@@ -8,22 +8,27 @@ spark_read_json(sc, name, path, options = list(), repartition = 0,
   memory = TRUE, overwrite = TRUE)
 }
 \arguments{
-\item{sc}{The Spark connection}
+\item{sc}{A \code{spark_connection}.}
 
-\item{name}{Name of table}
+\item{name}{The name to assign to the newly generated table.}
 
-\item{path}{The path to the file. Needs to be accessible from the cluster. Supports: "hdfs://" or "s3n://"}
+\item{path}{The path to the file. Needs to be accessible from the cluster.
+Supports the "hdfs://", "s3n://" and "file://" protocols.}
 
 \item{options}{A list of strings with additional options.}
 
-\item{repartition}{Total of partitions used to distribute table or 0 (default) to avoid partitioning}
+\item{repartition}{The number of partitions used to distribute the
+generated table. Use 0 (the default) to avoid partitioning.}
 
-\item{memory}{Load data eagerly into memory}
+\item{memory}{Boolean; should the data be loaded eagerly into memory? (That
+is, should the table be cached?)}
 
-\item{overwrite}{Overwrite the table with the given name if it already exists}
+\item{overwrite}{Boolean; overwrite the table with the given name if it
+already exists?}
 }
 \description{
-Read a JSON file into a Spark DataFrame
+Read a table serialized in the \href{http://www.json.org/}{JavaScript
+Object Notation} format into a Spark DataFrame.
 }
 \details{
 You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
@@ -33,7 +38,7 @@ If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY
   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
 }
 \seealso{
-Other reading and writing data: \code{\link{spark_read_csv}},
+Other Spark serialization routines: \code{\link{spark_read_csv}},
   \code{\link{spark_read_parquet}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_json}},
