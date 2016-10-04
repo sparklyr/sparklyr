@@ -21,7 +21,7 @@ Defaults to \code{TRUE}.}
 
 \item{delimiter}{The character used to delimit each column. Defaults to \code{,}.}
 
-\item{quote}{The character used as a quote. Defaults to \code{"hdfs://"}.}
+\item{quote}{The character used as a quote. Defaults to \code{\"}.}
 
 \item{escape}{The chatacter used to escape other characters. Defaults to \code{\\}.}
 
