@@ -213,24 +213,11 @@ start_shell <- function(master,
     # start the shell (w/ specified additional environment variables)
     env <- unlist(environment)
     withr::with_envvar(env, {
-      if (.Platform$OS.type == "windows") {
-        shell(paste(
-          spark_submit_path,
-          paste(shell_args, collapse = " "),
-          ">",
-          output_file,
-          "2>",
-          error_file
-        ),
+      system2(spark_submit_path,
+        args = shell_args,
+        stdout = output_file,
+        stderr = output_file,
         wait = FALSE)
-      }
-      else {
-        system2(spark_submit_path,
-          args = shell_args,
-          stdout = output_file,
-          stderr = output_file,
-          wait = FALSE)
-      }
     })
 
     tryCatch({
