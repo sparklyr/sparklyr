@@ -30,6 +30,7 @@ test_that("ft_bucketizer() works as expected", {
 })
 
 test_that("ft_tokenizer() works as expected", {
+  skip_if_not_installed("janeaustenr")
 
   # NOTE: to my surprise, the ft_tokenizer does not
   # split on '\\s+', rather, just plain old '\\s'
@@ -52,6 +53,7 @@ test_that("ft_tokenizer() works as expected", {
 })
 
 test_that("ft_regex_tokenizer() works as expected", {
+  skip_if_not_installed("janeaustenr")
 
   spark_tokens <- austen_tbl %>%
     na.omit() %>%
