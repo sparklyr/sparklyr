@@ -89,7 +89,7 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
         "\n\n",
         "---- Output Log ----\n",
         logLines,
-        if (nchar(errorLines) > 0) "\n\n" else "",
+        "\n\n",
         "---- Error Log ----\n",
         errorLines,
         sep = ""
@@ -128,6 +128,7 @@ start_shell <- function(master,
   error_file <- NULL
   spark_submit_path <- NULL
   shell_args <- NULL
+  shQuoteType <- if (.Platform$OS.type == "windows") "cmd2" else NULL
 
   if (is.null(gatewayInfo) || gatewayInfo$backendPort == 0)
   {
@@ -136,7 +137,7 @@ start_shell <- function(master,
     if (is.null(app_jar)) {
       versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
       app_jar <- spark_default_app_jar(versionSparkHome)
-      app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE))
+      app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE), type = shQuoteType)
       shell_args <- c(shell_args, "--class", "sparklyr.Backend")
     }
 
@@ -183,12 +184,12 @@ start_shell <- function(master,
 
     # add jars to arguments
     if (length(jars) > 0) {
-      shell_args <- c(shell_args, "--jars", paste(shQuote(jars), collapse=","))
+      shell_args <- c(shell_args, "--jars", paste(shQuote(jars, type = shQuoteType), collapse=","))
     }
 
     # add packages to arguments
     if (length(packages) > 0) {
-      shell_args <- c(shell_args, "--packages", paste(shQuote(packages), collapse=","))
+      shell_args <- c(shell_args, "--packages", paste(shQuote(packages, type = shQuoteType), collapse=","))
     }
 
     # add app_jar to args
@@ -222,7 +223,7 @@ start_shell <- function(master,
 
     tryCatch({
       # connect and wait for the service to start
-      timeout <- spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+      timeout <- spark_config_value(config, "sparklyr.gateway.start.timeout", 20)
       gatewayInfo <- spark_connect_gateway(gatewayAddress,
                                            gatewayPort,
                                            sessionId,
