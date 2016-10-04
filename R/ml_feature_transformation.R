@@ -364,29 +364,30 @@ ft_regex_tokenizer <- function(x,
 }
 
 
-#' Feature Transformations -- HashingTF
-#'
-#' Maps a sequence of terms to their term frequencies.
-#'
-#' @template roxlate-ml-transformation
-#'
-#' @param n_features Number of features.
-#' @param binary Boolean; binary?
-#'
-#' @export
-ft_hashing_tf <- function(x,
-                          input.col = NULL,
-                          output.col = NULL,
-                          n.features = NULL,
-                          binary = FALSE,
-                          ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.HashingTF"
-  invoke_simple_transformer(x, class, list(
-    setInputCol    = ensure_scalar_character(input.col),
-    setOutputCol   = ensure_scalar_character(output.col),
-    setNumFeatures = ensure_scalar_integer(n.features),
-    setBinary      = ensure_scalar_boolean(binary)
-  ))
-}
+# TODO
+# #' Feature Transformations -- HashingTF
+# #'
+# #' Maps a sequence of terms to their term frequencies.
+# #'
+# #' @template roxlate-ml-transformation
+# #'
+# #' @param n_features Number of features.
+# #' @param binary Boolean; binary?
+# #'
+# #' @export
+# ft_hashing_tf <- function(x,
+#                           input.col = NULL,
+#                           output.col = NULL,
+#                           n.features = NULL,
+#                           binary = FALSE,
+#                           ...)
+# {
+#   ml_backwards_compatibility_api()
+#   class <- "org.apache.spark.ml.feature.HashingTF"
+#   invoke_simple_transformer(x, class, list(
+#     setInputCol    = ensure_scalar_character(input.col),
+#     setOutputCol   = ensure_scalar_character(output.col),
+#     setNumFeatures = ensure_scalar_integer(n.features),
+#     setBinary      = ensure_scalar_boolean(binary)
+#   ))
+# }
