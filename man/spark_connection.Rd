@@ -2,21 +2,16 @@
 % Please edit documentation in R/spark_connection.R
 \name{spark_connection}
 \alias{spark_connection}
-\title{Get the spark_connection associated with an object}
+\title{Retrieve the Spark Connection Associated with an R Object}
 \usage{
 spark_connection(x, ...)
 }
 \arguments{
-\item{x}{Object to extract connection from}
+\item{x}{An \R object from which a \code{spark_connection} can be obtained.}
 
-\item{...}{Reserved for future use}
-}
-\value{
-A \code{spark_connection} object that can be passed to
-  \code{\link{invoke_new}} and \code{\link{invoke_static}}.
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
-S3 method to get the spark_connection associated with objects of
-various types.
+Retrieve the \code{spark_connection} associated with an \R object.
 }
 

@@ -159,7 +159,7 @@ print.src_spark <- function(x, ...) {
 }
 
 #' @export
-db_save_query.spark_connection <- function (con, sql, name, temporary = TRUE, ...)
+db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...)
 {
   df <- spark_dataframe(con, sql)
   invoke(df, "registerTempTable", name)
