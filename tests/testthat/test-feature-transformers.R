@@ -70,3 +70,16 @@ test_that("ft_regex_tokenizer() works as expected", {
   expect_identical(spark_tokens, r_tokens)
 
 })
+
+test_that("the feature transforming family of functions has consistent API", {
+
+  ns <- asNamespace("sparklyr")
+  exports <- getNamespaceExports(ns)
+  fts <- grep("^ft_", exports, value = TRUE)
+
+  for (ft in fts) {
+    transformer <- get(ft, envir = ns, mode = "function")
+    fmls <- names(formals(transformer))
+    expect_true(all(c("input.col", "output.col", "...") %in% fmls))
+  }
+})
