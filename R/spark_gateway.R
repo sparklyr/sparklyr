@@ -8,12 +8,13 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, seconds) {
 
     tryCatch({
       suppressWarnings(
+        timeout <- spark_config_value(config, "sparklyr.monitor.timeout", 1)
         gateway <- socketConnection(host = gatewayAddress,
                                     port = gatewayPort,
                                     server = FALSE,
                                     blocking = TRUE,
                                     open = "rb",
-                                    timeout = 1)
+                                    timeout = timeout)
       )
     }, error = function(err) {
     })
