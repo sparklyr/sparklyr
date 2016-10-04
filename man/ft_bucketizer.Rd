@@ -4,17 +4,19 @@
 \alias{ft_bucketizer}
 \title{Feature Transformation -- Bucketizer}
 \usage{
-ft_bucketizer(x, input_col = NULL, output_col = NULL, splits)
+ft_bucketizer(x, input.col = NULL, output.col = NULL, splits, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input_col}{The name of the input column(s).}
+\item{input.col}{The name of the input column(s).}
 
-\item{output_col}{The name of the output column.}
+\item{output.col}{The name of the output column.}
 
 \item{splits}{A numeric vector of cutpoints, indicating the bucket
 boundaries.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Similar to \R's \code{\link{cut}} function, this transforms a numeric column
@@ -29,11 +31,14 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
 Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
+  \code{\link{ft_hashing_tf}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_quantile_discretizer}},
+  \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_string_indexer}},
+  \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }

@@ -4,16 +4,18 @@
 \alias{ft_binarizer}
 \title{Feature Transformation -- Binarizer}
 \usage{
-ft_binarizer(x, input_col = NULL, output_col = NULL, threshold = 0.5)
+ft_binarizer(x, input.col = NULL, output.col = NULL, threshold = 0.5, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input_col}{The name of the input column(s).}
+\item{input.col}{The name of the input column(s).}
 
-\item{output_col}{The name of the output column.}
+\item{output.col}{The name of the output column.}
 
 \item{threshold}{The numeric threshold.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Apply thresholding to a column, such that values less than or equal to the
@@ -28,22 +30,14 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
 Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
+  \code{\link{ft_hashing_tf}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_quantile_discretizer}},
+  \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_string_indexer}},
-  \code{\link{ft_vector_assembler}},
-  \code{\link{sdf_mutate}}
-
-Other feature transformation routines: \code{\link{ft_bucketizer}},
-  \code{\link{ft_discrete_cosine_transform}},
-  \code{\link{ft_elementwise_product}},
-  \code{\link{ft_index_to_string}},
-  \code{\link{ft_one_hot_encoder}},
-  \code{\link{ft_quantile_discretizer}},
-  \code{\link{ft_sql_transformer}},
-  \code{\link{ft_string_indexer}},
+  \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }

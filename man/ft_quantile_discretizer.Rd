@@ -4,17 +4,19 @@
 \alias{ft_quantile_discretizer}
 \title{Feature Transformation -- QuantileDiscretizer}
 \usage{
-ft_quantile_discretizer(x, input_col = NULL, output_col = NULL,
-  n_buckets = 5)
+ft_quantile_discretizer(x, input.col = NULL, output.col = NULL,
+  n.buckets = 5, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input_col}{The name of the input column(s).}
+\item{input.col}{The name of the input column(s).}
 
-\item{output_col}{The name of the output column.}
+\item{output.col}{The name of the output column.}
 
-\item{n_buckets}{The number of buckets to use.}
+\item{n.buckets}{The number of buckets to use.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Takes a column with continuous features and outputs a column with binned
@@ -37,10 +39,13 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_bucketizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
+  \code{\link{ft_hashing_tf}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_one_hot_encoder}},
+  \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_string_indexer}},
+  \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }
