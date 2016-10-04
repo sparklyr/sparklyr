@@ -1,7 +1,13 @@
 testthat_spark_connection <- function(version = NULL) {
 
   # generate connection if none yet exists
-  if (!exists(".testthat_spark_connection", envir = .GlobalEnv)) {
+  connected <- FALSE
+  if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
+    sc <- get(".testthat_spark_connection", envir = .GlobalEnv)
+    connected <- sparklyr::connection_is_open(sc)
+  }
+
+  if (!connected) {
     version <- version %||% Sys.getenv("SPARK_VERSION", unset = "2.0.0")
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version)
@@ -29,3 +35,6 @@ skip_unless_verbose <- function(message = NULL) {
   if (is.na(verbose)) skip(message)
   TRUE
 }
+
+if (require("janeaustenr", quietly = TRUE))
+  assign("austen", janeaustenr::austen_books(), envir = .GlobalEnv)
