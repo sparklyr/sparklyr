@@ -5,6 +5,7 @@ mtcars_tbl <- testthat_tbl("mtcars")
 austen_tbl <- testthat_tbl("austen")
 
 test_that("ft_binarizer() works as expected", {
+  skip_on_cran()
 
   threshold <- 3.5
   mutated <- mtcars_tbl %>%
@@ -18,6 +19,7 @@ test_that("ft_binarizer() works as expected", {
 })
 
 test_that("ft_bucketizer() works as expected", {
+  skip_on_cran()
 
   splits <- c(-Inf, 2, 4, Inf)
   mutated <- mtcars_tbl %>%
@@ -30,6 +32,7 @@ test_that("ft_bucketizer() works as expected", {
 })
 
 test_that("ft_tokenizer() works as expected", {
+  skip_on_cran()
   skip_if_not_installed("janeaustenr")
 
   # NOTE: to my surprise, the ft_tokenizer does not
@@ -53,6 +56,7 @@ test_that("ft_tokenizer() works as expected", {
 })
 
 test_that("ft_regex_tokenizer() works as expected", {
+  skip_on_cran()
   skip_if_not_installed("janeaustenr")
 
   spark_tokens <- austen_tbl %>%
@@ -74,6 +78,7 @@ test_that("ft_regex_tokenizer() works as expected", {
 })
 
 test_that("the feature transforming family of functions has consistent API", {
+  skip_on_cran()
 
   ns <- asNamespace("sparklyr")
   exports <- getNamespaceExports(ns)
