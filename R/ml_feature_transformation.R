@@ -377,7 +377,7 @@ ft_regex_tokenizer <- function(x,
 ft_hashing_tf <- function(x,
                           input.col = NULL,
                           output.col = NULL,
-                          n_features = NULL,
+                          n.features = NULL,
                           binary = FALSE,
                           ...)
 {
@@ -386,7 +386,7 @@ ft_hashing_tf <- function(x,
   invoke_simple_transformer(x, class, list(
     setInputCol    = ensure_scalar_character(input.col),
     setOutputCol   = ensure_scalar_character(output.col),
-    setNumFeatures = ensure_scalar_double(n_features),
+    setNumFeatures = ensure_scalar_integer(n.features),
     setBinary      = ensure_scalar_boolean(binary)
   ))
 }
