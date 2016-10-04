@@ -30,10 +30,8 @@
 #'
 #' @param x An \R object containing, or wrapping, a \code{spark_jobj}.
 #' @param ... Optional arguments; currently unused.
-#' @return A \code{spark_jobj} object that can be passed to
-#'   \code{\link{invoke}}.
 #'
-#' @seealso \code{\link{invoke}}
+#' @seealso \code{\link{invoke}}, for calling methods on Java object references.
 #'
 #' @export
 spark_jobj <- function(x, ...) {

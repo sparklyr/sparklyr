@@ -2,20 +2,21 @@
 % Please edit documentation in R/spark_dataframe.R
 \name{spark_dataframe}
 \alias{spark_dataframe}
-\title{Get the Spark DataFrame associated with an object}
+\title{Retrieve a Spark DataFrame}
 \usage{
 spark_dataframe(x, ...)
 }
 \arguments{
-\item{x}{Object to get DataFrame from}
+\item{x}{An \R object wrapping, or containing, a Spark DataFrame.}
 
-\item{...}{Reserved for future use}
+\item{...}{Optional arguments; currently unused.}
 }
 \value{
-Reference to DataFrame
+A \code{\link{spark_jobj}} representing a Java object reference
+  to a Spark DataFrame.
 }
 \description{
-S3 method to get the Spark DataFrame associated with objects of
-various types.
+This S3 generic is used to access a Spark DataFrame object (as a Java
+object reference) from an \R object.
 }
 

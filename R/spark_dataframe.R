@@ -1,11 +1,12 @@
-#' Get the Spark DataFrame associated with an object
+#' Retrieve a Spark DataFrame
 #'
-#' S3 method to get the Spark DataFrame associated with objects of
-#' various types.
+#' This S3 generic is used to access a Spark DataFrame object (as a Java
+#' object reference) from an \R object.
 #'
-#' @param x Object to get DataFrame from
-#' @param ... Reserved for future use
-#' @return Reference to DataFrame
+#' @param x An \R object wrapping, or containing, a Spark DataFrame.
+#' @param ... Optional arguments; currently unused.
+#' @return A \code{\link{spark_jobj}} representing a Java object reference
+#'   to a Spark DataFrame.
 #'
 #' @export
 spark_dataframe <- function(x, ...) {

@@ -11,10 +11,6 @@ spark_jobj(x, ...)
 
 \item{...}{Optional arguments; currently unused.}
 }
-\value{
-A \code{spark_jobj} object that can be passed to
-  \code{\link{invoke}}.
-}
 \description{
 This S3 generic is used for accessing the underlying Java Virtual Machine
 (JVM) Spark objects associated with \R objects. These objects act as
@@ -22,6 +18,6 @@ references to Spark objects living in the JVM. Methods on these objects
 can be called with the \code{\link{invoke}} family of functions.
 }
 \seealso{
-\code{\link{invoke}}
+\code{\link{invoke}}, for calling methods on Java object references.
 }
 
