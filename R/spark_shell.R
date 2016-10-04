@@ -122,7 +122,8 @@ start_shell <- function(master,
   gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
                                        gatewayPort = gatewayPort,
                                        sessionId = sessionId,
-                                       waitSeconds = timeout)
+                                       waitSeconds = timeout,
+                                       config = config)
 
   output_file <- NULL
   error_file <- NULL
@@ -228,6 +229,7 @@ start_shell <- function(master,
                                            gatewayPort,
                                            sessionId,
                                            waitSeconds = timeout,
+                                           config = config,
                                            canConnect = TRUE)
     }, error = function(e) {
       abort_shell(

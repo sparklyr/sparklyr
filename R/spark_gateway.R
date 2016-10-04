@@ -1,4 +1,4 @@
-wait_connect_gateway <- function(gatewayAddress, gatewayPort, seconds) {
+wait_connect_gateway <- function(gatewayAddress, gatewayPort, seconds, config) {
   retries <- seconds
   gateway <- NULL
   commandStart <- NULL
@@ -70,10 +70,11 @@ spark_connect_gateway <- function(
   gatewayPort,
   sessionId,
   waitSeconds,
+  config,
   canConnect = FALSE) {
 
   # try connecting to existing gateway
-  gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, waitSeconds)
+  gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, waitSeconds, config)
 
   if (is.null(gateway)) {
     if (canConnect)
@@ -97,7 +98,7 @@ spark_connect_gateway <- function(
     } else if(redirectGatewayPort != gatewayPort) {
       close(gateway)
 
-      spark_connect_gateway(gatewayAddress, redirectGatewayPort, sessionId, waitSeconds)
+      spark_connect_gateway(gatewayAddress, redirectGatewayPort, sessionId, waitSeconds, config)
     }
     else {
       list(
@@ -127,7 +128,8 @@ gateway_connection <- function(master, config) {
   gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
                                        gatewayPort = gatewayPort,
                                        sessionId = sessionId,
-                                       waitSeconds = timeout)
+                                       waitSeconds = timeout,
+                                       config = config)
 
   if (is.null(gatewayInfo)) {
     stop("Failed to connect to gateway: ", master)
