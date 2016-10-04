@@ -76,7 +76,9 @@ spark_connect_gateway <- function(
 
   if (is.null(gateway)) {
     if (canConnect)
-      stop("Gateway in port (", gatewayPort, ") did not respond after (", waitSeconds, ") seconds")
+      stop(
+        "Gateway in port (",gatewayPort, ") did not respond after (", waitSeconds, ") seconds. ",
+        "If there are no visible errors try increasing the 'sparklyr.backend.timeout' config value.")
 
     NULL
   }
@@ -143,7 +145,7 @@ gateway_connection <- function(master, config) {
 spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
   tryCatch({
     # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 20)
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,

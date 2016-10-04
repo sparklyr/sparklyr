@@ -66,16 +66,35 @@ spark_session_id <- function(app_name, master) {
 
 abort_shell <- function(message, spark_submit_path, shell_args, output_file, error_file) {
   withr::with_options(list(
-    warning.length = 5000
+    warning.length = 8000
   ), {
-    stop(paste(
-      message, "\n",
-      "    Path: ", spark_submit_path, "\n",
-      "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
-      "    \n",
-      if (!is.null(output_file) && file.exists(output_file)) paste(readLines(output_file), collapse = "\n") else "",
-      if (!is.null(error_file) && file.exists(error_file)) paste("\n", readLines(error_file), collapse = "\n") else "",
-      sep = ""))
+    maxRows <- 50
+
+    logLines <- if (!is.null(output_file) && file.exists(output_file))
+      paste(tail(readLines(output_file), n = maxRows), collapse = "\n")
+    else""
+
+    errorLines <- if (!is.null(error_file) && file.exists(error_file))
+      paste(tail(readLines(error_file), n = maxRows), collapse = "\n")
+    else ""
+
+    stop(
+      paste(
+        message, "\n",
+        "    Path: ", spark_submit_path, "\n",
+        "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
+        "    Traceback:\n",
+        "      ",
+        paste(tail(sys.calls(), n = 5), collapse = "\n      "),
+        "\n\n",
+        "---- Output Log ----\n",
+        logLines,
+        if (nchar(errorLines) > 0) "\n\n" else "",
+        "---- Error Log ----\n",
+        errorLines,
+        sep = ""
+      )
+    )
   })
 }
 
@@ -243,7 +262,7 @@ start_shell <- function(master,
 
   tryCatch({
     # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 60)
+    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 20)
     backend <- socketConnection(host = "localhost",
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
