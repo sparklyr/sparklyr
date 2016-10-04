@@ -144,7 +144,7 @@ gateway_connection <- function(master, config) {
 spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
   tryCatch({
     # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 20)
+    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 60)
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,

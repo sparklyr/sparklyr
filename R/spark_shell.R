@@ -223,7 +223,7 @@ start_shell <- function(master,
 
     tryCatch({
       # connect and wait for the service to start
-      timeout <- spark_config_value(config, "sparklyr.gateway.start.timeout", 20)
+      timeout <- spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
       gatewayInfo <- spark_connect_gateway(gatewayAddress,
                                            gatewayPort,
                                            sessionId,
@@ -250,7 +250,7 @@ start_shell <- function(master,
 
   tryCatch({
     # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 20)
+    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 60)
     backend <- socketConnection(host = "localhost",
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,

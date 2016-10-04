@@ -56,7 +56,6 @@ spark_connect <- function(master,
                           extensions = sparklyr::registered_extensions())
 {
   # validate method
-  defaultMethod <- length(method) > 1
   method <- match.arg(method)
 
   # master can be missing if it's specified in the config file
