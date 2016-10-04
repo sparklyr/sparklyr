@@ -355,7 +355,7 @@ ft_regex_tokenizer <- function(x,
                                ...)
 {
   ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.Tokenizer"
+  class <- "org.apache.spark.ml.feature.RegexTokenizer"
   invoke_simple_transformer(x, class, list(
     setInputCol  = ensure_scalar_character(input.col),
     setOutputCol = ensure_scalar_character(output.col),

@@ -51,3 +51,22 @@ test_that("ft_tokenizer() works as expected", {
 
 })
 
+test_that("ft_regex_tokenizer() works as expected", {
+
+  spark_tokens <- austen_tbl %>%
+    na.omit() %>%
+    head(10) %>%
+    sdf_mutate(tokens = ft_regex_tokenizer(text, pattern = "\\s+")) %>%
+    sdf_read_column("tokens") %>%
+    lapply(unlist)
+
+  r_tokens <- austen %>%
+    filter(nzchar(text)) %>%
+    head(10) %>%
+    `$`("text") %>%
+    tolower() %>%
+    strsplit("\\s+")
+
+  expect_identical(spark_tokens, r_tokens)
+
+})
