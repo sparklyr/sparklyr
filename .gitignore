@@ -33,3 +33,7 @@ demo.R
 # Spark log
 log4j.spark*
 /configure
+/bin/
+.cache-main
+.settings
+.classpath

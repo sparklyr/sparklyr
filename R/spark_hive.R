@@ -44,12 +44,14 @@ create_hive_context_v1 <- function(sc) {
 
   # attempt to create hive_context
   hive_context <- tryCatch({
-    invoke_new(
+    invoke_static(
       sc,
-      "org.apache.spark.sql.hive.HiveContext",
+      "sparklyr.Backend",
+      "getOrCreateHiveContext",
       ctx
     )},
     error = function(e) {
+      warning(e$message)
       NULL
     }
   )

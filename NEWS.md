@@ -7,7 +7,19 @@
   containing many columns could produce the wrong result. (#242)
 
 - Added support to parameterize network timeouts using the
-  sparklyr.monitor.timeout and sparklyr.backend.timeout config settings.
+  `sparklyr.backend.timeout`, `sparklyr.gateway.start.timeout`,
+  `sparklyr.gateway.local.timeout` and `sparklyr.gateway.remote.timeout`
+  config settings.
+
+- Improved logging while establishing connections to `sparklyr`.
+
+- Added `sparklyr.gateway.port` and `sparklyr.gateway.address` as config settings.
+
+- Added eclipse project to ease development of the scala codebase within 
+  `sparklyr`.
+
+- Added `filter` parameter to `spark_log` to fitler with ease entries by a character
+  string.
 
 - Increased network timeout for sparklyr.backend.timeout.
 

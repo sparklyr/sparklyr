@@ -4,13 +4,15 @@
 \alias{spark_log}
 \title{View Entries in the Spark Log}
 \usage{
-spark_log(sc, n = 100, ...)
+spark_log(sc, n = 100, filter = NULL, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
 
 \item{n}{The max number of log entries to retrieve. Use \code{NULL} to
 retrieve all entries within the log.}
+
+\item{filter}{Character string to filter log entries.}
 
 \item{...}{Optional arguments; currently unused.}
 }

@@ -56,6 +56,7 @@ spark_connect <- function(master,
                           extensions = sparklyr::registered_extensions())
 {
   # validate method
+  defaultMethod <- length(method) > 1
   method <- match.arg(method)
 
   # master can be missing if it's specified in the config file
@@ -108,10 +109,10 @@ spark_connect <- function(master,
                              hadoop_version = hadoop_version,
                              shell_args = shell_args,
                              config = config,
+                             service = FALSE,
                              extensions = extensions)
-
-  # other methods
   } else {
+    # other methods
 
     # e.g.
     # scon <- livy_connection(master = master,
@@ -160,15 +161,30 @@ spark_connect <- function(master,
 }
 
 #' @export
-spark_log.spark_connection <- function(sc, n = 100, ...) {
+spark_log.spark_connection <- function(sc, n = 100, filter = NULL, ...) {
   if (.Platform$OS.type == "windows") {
-    lines <- readr::read_lines("log4j.spark.log")
-    if (is.numeric(n))
-      lines <- utils::tail(lines, n = n)
-    class(lines) <- "sparklyr_log"
-    lines
-  } else {
-    spark_log.spark_shell_connection(sc, n = n, ...)
+    log <- file("log4j.spark.log")
+    lines <- readr::read_lines(log)
+
+    tryCatch(function() {
+      close(log)
+    })
+
+    if (!is.null(filter)) {
+      lines <- lines[grepl(filter, lines)]
+    }
+
+    if (!is.null(n))
+      linesLog <- utils::tail(lines, n = n)
+    else
+      linesLog <- lines
+
+    attr(linesLog, "class") <- "sparklyr_log"
+
+    linesLog
+  }
+  else {
+    spark_log.spark_shell_connection(sc, n = n, filter, ...)
   }
 }
 

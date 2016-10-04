@@ -39,8 +39,14 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
         writeObject(dos, args(0))
         case "stopBackend" =>
           writeInt(dos, 0)
-        writeType(dos, "void")
-        server.close()
+          writeType(dos, "void")
+          server.close()
+        case "terminateBackend" =>
+          writeInt(dos, 0)
+          writeType(dos, "void")
+          server.close()
+          
+          System.exit(0)
         case "rm" =>
           try {
             val t = readObjectType(dis)

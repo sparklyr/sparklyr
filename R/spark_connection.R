@@ -169,10 +169,11 @@ spark_master_is_local <- function(master) {
 #' @param sc A \code{spark_connection}.
 #' @param n The max number of log entries to retrieve. Use \code{NULL} to
 #'   retrieve all entries within the log.
+#' @param filter Character string to filter log entries.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
-spark_log <- function(sc, n = 100, ...) {
+spark_log <- function(sc, n = 100, filter = NULL, ...) {
   UseMethod("spark_log")
 }
 
@@ -184,7 +185,6 @@ spark_log.default <- function(sc, n = 100, ...) {
 #' @export
 print.spark_log <- function(x, ...) {
   cat(x, sep = "\n")
-  cat("\n")
 }
 
 #' Open the Spark web interface
@@ -213,28 +213,36 @@ print.spark_web_url <- function(x, ...) {
 }
 
 initialize_connection <- function(sc) {
+  sc$spark_context <- invoke_static(sc, "sparklyr.Backend", "getSparkContext")
 
-  # create the spark config
-  conf <- invoke_new(sc, "org.apache.spark.SparkConf")
-  conf <- invoke(conf, "setAppName", sc$app_name)
-  conf <- invoke(conf, "setMaster", sc$master)
-  conf <- invoke(conf, "setSparkHome", sc$spark_home)
+  if (is.null(sc$spark_context)) {
+    # create the spark config
+    conf <- invoke_new(sc, "org.apache.spark.SparkConf")
+    conf <- invoke(conf, "setAppName", sc$app_name)
+    conf <- invoke(conf, "setMaster", sc$master)
+    conf <- invoke(conf, "setSparkHome", sc$spark_home)
 
-  context_config <- connection_config(sc, "spark.", c("spark.sql."))
-  apply_config(context_config, conf, "set", "spark.")
+    context_config <- connection_config(sc, "spark.", c("spark.sql."))
+    apply_config(context_config, conf, "set", "spark.")
 
-  # create the spark context and assign the connection to it
-  sc$spark_context <- invoke_new(
-    sc,
-    "org.apache.spark.SparkContext",
-    conf
-  )
+    # create the spark context and assign the connection to it
+    sc$spark_context <- invoke_static(
+      sc,
+      "org.apache.spark.SparkContext",
+      "getOrCreate",
+      conf
+    )
+
+    invoke_static(sc, "sparklyr.Backend", "setSparkContext", sc$spark_context)
+  }
+
   sc$spark_context$connection <- sc
 
   # create the java spark context and assign the connection to it
-  sc$java_context <- invoke_new(
+  sc$java_context <- invoke_static(
     sc,
     "org.apache.spark.api.java.JavaSparkContext",
+    "fromSparkContext",
     sc$spark_context
   )
   sc$java_context$connection <- sc
