@@ -31,6 +31,6 @@ sdf_load_parquet(sc, path)
 \item{path}{The path where the Spark DataFrame should be saved.}
 }
 \description{
-Save / load a Spark DataFrame.
+Routines for saving and loading Spark DataFrames.
 }
 

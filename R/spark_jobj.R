@@ -21,13 +21,15 @@
 # are maintained using the jobj.
 
 
-#' Get the spark_jobj associated with an object
+#' Retrieve a Spark JVM Object Reference
 #'
-#' S3 method to get the spark_jobj associated with objects of
-#' various types.
+#' This S3 generic is used for accessing the underlying Java Virtual Machine
+#' (JVM) Spark objects associated with \R objects. These objects act as
+#' references to Spark objects living in the JVM. Methods on these objects
+#' can be called with the \code{\link{invoke}} family of functions.
 #'
-#' @param x Object to extract jobj from
-#' @param ... Reserved for future use
+#' @param x An \R object containing, or wrapping, a \code{spark_jobj}.
+#' @param ... Optional arguments; currently unused.
 #' @return A \code{spark_jobj} object that can be passed to
 #'   \code{\link{invoke}}.
 #'
