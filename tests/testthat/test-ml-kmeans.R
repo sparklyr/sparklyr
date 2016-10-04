@@ -19,7 +19,7 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
   library(dplyr)
   data(iris)
 
-  iris_tbl <- dplyr::copy_to(sc, iris, "iris", overwrite = TRUE)
+  iris_tbl <- testthat_tbl("iris")
 
   set.seed(123)
   iris <- iris %>%

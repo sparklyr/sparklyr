@@ -4,14 +4,16 @@
 \alias{ft_one_hot_encoder}
 \title{Feature Transformation -- OneHotEncoder}
 \usage{
-ft_one_hot_encoder(x, input_col = NULL, output_col = NULL)
+ft_one_hot_encoder(x, input.col = NULL, output.col = NULL, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input_col}{The name of the input column(s).}
+\item{input.col}{The name of the input column(s).}
 
-\item{output_col}{The name of the output column.}
+\item{output.col}{The name of the output column.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 One-hot encoding maps a column of label indices to a column of binary
@@ -30,8 +32,10 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_quantile_discretizer}},
+  \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_string_indexer}},
+  \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }

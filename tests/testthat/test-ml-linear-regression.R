@@ -13,8 +13,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   skip_on_cran()
   skip_if_not_installed("glmnet")
 
-  copy_to(sc, mtcars, overwrite = TRUE)
-  mtcars_tbl <- tbl(sc, "mtcars")
+  mtcars_tbl <- testthat_tbl("mtcars")
 
   values <- seq(0, 0.5, by = 0.1)
   parMatrix <- expand.grid(values, values, KEEP.OUT.ATTRS = FALSE)

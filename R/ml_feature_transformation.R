@@ -9,23 +9,16 @@
 #'
 #' @export
 ft_vector_assembler <- function(x,
-                                input_col = NULL,
-                                output_col = NULL)
+                                input.col = NULL,
+                                output.col = NULL,
+                                ...)
 {
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  assembler <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.VectorAssembler"
-  )
-
-  transformed <- assembler %>%
-    invoke("setInputCols", as.list(input_col)) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.VectorAssembler"
+  invoke_simple_transformer(x, class, list(
+    setInputCols = as.list(as.character(input.col)),
+    setOutputCol = ensure_scalar_character(output.col)
+  ))
 }
 
 #' Feature Transformation -- StringIndexer
@@ -44,10 +37,12 @@ ft_vector_assembler <- function(x,
 #'
 #' @export
 ft_string_indexer <- function(x,
-                              input_col = NULL,
-                              output_col = NULL,
-                              params = NULL)
+                              input.col = NULL,
+                              output.col = NULL,
+                              params = NULL,
+                              ...)
 {
+  ml_backwards_compatibility_api()
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
@@ -57,8 +52,8 @@ ft_string_indexer <- function(x,
   )
 
   sim <- indexer %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col) %>%
+    invoke("setInputCol", input.col) %>%
+    invoke("setOutputCol", output.col) %>%
     invoke("fit", df)
 
   # Report labels to caller if requested -- these map
@@ -80,31 +75,22 @@ ft_string_indexer <- function(x,
 #'
 #' @template roxlate-ml-transformation
 #'
-#' @family feature transformation routines
-#'
 #' @param threshold The numeric threshold.
 #'
 #' @export
 ft_binarizer <- function(x,
-                         input_col = NULL,
-                         output_col = NULL,
-                         threshold = 0.5)
+                         input.col = NULL,
+                         output.col = NULL,
+                         threshold = 0.5,
+                         ...)
 {
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  binarizer <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.Binarizer"
-  )
-
-  transformed <- binarizer %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("setThreshold", as.double(threshold)) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.Binarizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col),
+    setThreshold = ensure_scalar_double(threshold)
+  ))
 }
 
 #' Feature Transformation -- Discrete Cosine Transform (DCT)
@@ -118,25 +104,18 @@ ft_binarizer <- function(x,
 #'
 #' @export
 ft_discrete_cosine_transform <- function(x,
-                                         input_col = NULL,
-                                         output_col = NULL,
-                                         inverse = FALSE)
+                                         input.col = NULL,
+                                         output.col = NULL,
+                                         inverse = FALSE,
+                                         ...)
 {
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  dct <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.DCT"
-  )
-
-  transformed <- dct %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("setInverse", as.logical(inverse)) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.DCT"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col),
+    setInverse   = ensure_scalar_boolean(inverse)
+  ))
 }
 
 #' Feature Transformation -- IndexToString
@@ -149,29 +128,22 @@ ft_discrete_cosine_transform <- function(x,
 #'
 #' @export
 ft_index_to_string <- function(x,
-                               input_col = NULL,
-                               output_col = NULL)
+                               input.col = NULL,
+                               output.col = NULL,
+                               ...)
 {
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  converter <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.IndexToString"
-  )
-
-  transformed <- converter %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.IndexToString"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col)
+  ))
 }
 
 ## TODO: These routines with so-called 'row vector' features by
 ## default, but it would be much nicer to implement routines to
 ## scale whole columns instead.
-# ft_standard_scaler <- function(df, input_col, output_col,
+# ft_standard_scaler <- function(df, input.col, output.col,
 #                                      with.mean, with.std)
 # {
 #   sc <- spark_connection(df)
@@ -182,14 +154,14 @@ ft_index_to_string <- function(x,
 #   )
 #
 #   scaler %>%
-#     invoke("setInputCol", input_col) %>%
-#     invoke("setOutputCol", output_col) %>%
+#     invoke("setInputCol", input.col) %>%
+#     invoke("setOutputCol", output.col) %>%
 #     invoke("setWithMean", as.logical(with.mean)) %>%
 #     invoke("setWithStd", as.logical(with.std)) %>%
 #     invoke("transform", df)
 # }
 #
-# ft_min_max_scaler <- function(df, input_col, output_col,
+# ft_min_max_scaler <- function(df, input.col, output.col,
 #                                     min = 0, max = 1)
 # {
 #   sc <- spark_connection(df)
@@ -200,8 +172,8 @@ ft_index_to_string <- function(x,
 #   )
 #
 #   scaler %>%
-#     invoke("setInputCol", input_col) %>%
-#     invoke("setOutputCol", output_col) %>%
+#     invoke("setInputCol", input.col) %>%
+#     invoke("setOutputCol", output.col) %>%
 #     invoke("setMin", as.numeric(min)) %>%
 #     invoke("setMax", as.numeric(max)) %>%
 #     invoke("transform", df)
@@ -220,25 +192,18 @@ ft_index_to_string <- function(x,
 #'
 #' @export
 ft_bucketizer <- function(x,
-                          input_col = NULL,
-                          output_col = NULL,
-                          splits)
+                          input.col = NULL,
+                          output.col = NULL,
+                          splits,
+                          ...)
 {
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  bucketizer <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.Bucketizer"
-  )
-
-  transformed <- bucketizer %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("setSplits", as.list(splits)) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.Bucketizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col),
+    setSplits    = as.list(as.numeric(splits))
+  ))
 }
 
 #' Feature Transformation -- ElementwiseProduct
@@ -250,29 +215,22 @@ ft_bucketizer <- function(x,
 #'
 #' @template roxlate-ml-transformation
 #'
-#' @param scaling_col The column used to scale \code{input_col}.
+#' @param scaling.col The column used to scale \code{input.col}.
 #'
 #' @export
 ft_elementwise_product <- function(x,
-                                   input_col = NULL,
-                                   output_col = NULL,
-                                   scaling_col)
+                                   input.col = NULL,
+                                   output.col = NULL,
+                                   scaling.col,
+                                   ...)
 {
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  transformer <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.ElementwiseProduct"
-  )
-
-  transformed <- transformer %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("setScalingVec", scaling_col) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.ElementwiseProduct"
+  invoke_simple_transformer(x, class, list(
+    setInputCol   = ensure_scalar_character(input.col),
+    setOutputCol  = ensure_scalar_character(output.col),
+    setScalingVec = ensure_scalar_character(scaling.col)
+  ))
 }
 
 #' Feature Transformation -- SQLTransformer
@@ -280,29 +238,26 @@ ft_elementwise_product <- function(x,
 #' Transform a data set using SQL. Use the \code{__THIS__}
 #' placeholder as a proxy for the active table.
 #'
+#' Although this function accepts the \code{input.col} and \code{output.col}
+#' arguments, they are ignored -- this interface is done purely for
+#' compatibility with \code{\link{sdf_mutate}}.
+#'
 #' @template roxlate-ml-transformation
 #'
 #' @param sql A SQL statement.
 #'
 #' @export
 ft_sql_transformer <- function(x,
-                               input_col = NULL,
-                               output_col = NULL,
-                               sql)
+                               input.col = NULL,
+                               output.col = NULL,
+                               sql,
+                               ...)
 {
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  transformer <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.SQLTransformer"
-  )
-
-  transformed <- transformer %>%
-    invoke("setStatement", paste(sql, collapse = "\n")) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.SQLTransformer"
+  invoke_simple_transformer(x, class, list(
+    setStatement = paste(sql, collapse = "\n")
+  ))
 }
 
 #' Feature Transformation -- QuantileDiscretizer
@@ -319,30 +274,23 @@ ft_sql_transformer <- function(x,
 #'
 #' @template roxlate-ml-transformation
 #'
-#' @param n_buckets The number of buckets to use.
+#' @param n.buckets The number of buckets to use.
 #'
 #' @export
 ft_quantile_discretizer <- function(x,
-                                    input_col = NULL,
-                                    output_col = NULL,
-                                    n_buckets = 5)
+                                    input.col = NULL,
+                                    output.col = NULL,
+                                    n.buckets = 5,
+                                    ...)
 {
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  discretizer <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.QuantileDiscretizer"
-  )
-
-  transformed <- discretizer %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("setNumBuckets", as.numeric(n_buckets)) %>%
-    invoke("fit", df) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.QuantileDiscretizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol   = ensure_scalar_character(input.col),
+    setOutputCol  = ensure_scalar_character(output.col),
+    setNumBuckets = ensure_scalar_double(n.buckets),
+    function(transformer, sdf) invoke(transformer, "fit", sdf)
+  ))
 }
 
 #' Feature Transformation -- OneHotEncoder
@@ -355,20 +303,91 @@ ft_quantile_discretizer <- function(x,
 #' @template roxlate-ml-transformation
 #'
 #' @export
-ft_one_hot_encoder <- function(x, input_col = NULL, output_col = NULL) {
-
-  df <- spark_dataframe(x)
-  sc <- spark_connection(df)
-
-  discretizer <- invoke_new(
-    sc,
-    "org.apache.spark.ml.feature.OneHotEncoder"
-  )
-
-  transformed <- discretizer %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("transform", df)
-
-  sdf_register(transformed)
+ft_one_hot_encoder <- function(x,
+                               input.col = NULL,
+                               output.col = NULL,
+                               ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.OneHotEncoder"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col)
+  ))
 }
+
+#' Feature Tranformation -- Tokenizer
+#'
+#' A tokenizer that converts the input string to lowercase and then splits it
+#' by white spaces.
+#'
+#' @template roxlate-ml-transformation
+#'
+#' @export
+ft_tokenizer <- function(x,
+                         input.col = NULL,
+                         output.col = NULL,
+                         ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.Tokenizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col)
+  ))
+}
+
+#' Feature Tranformation -- RegexTokenizer
+#'
+#' A regex based tokenizer that extracts tokens either by using the provided
+#' regex pattern to split the text (default) or repeatedly matching the regex
+#' (if gaps is false). Optional parameters also allow filtering tokens using a
+#' minimal length. It returns an array of strings that can be empty.
+#'
+#' @template roxlate-ml-transformation
+#' @param pattern The regular expression pattern to be used.
+#'
+#' @export
+ft_regex_tokenizer <- function(x,
+                               input.col = NULL,
+                               output.col = NULL,
+                               pattern,
+                               ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.RegexTokenizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col),
+    setPattern   = ensure_scalar_character(pattern)
+  ))
+}
+
+
+# TODO
+# #' Feature Transformations -- HashingTF
+# #'
+# #' Maps a sequence of terms to their term frequencies.
+# #'
+# #' @template roxlate-ml-transformation
+# #'
+# #' @param n_features Number of features.
+# #' @param binary Boolean; binary?
+# #'
+# #' @export
+# ft_hashing_tf <- function(x,
+#                           input.col = NULL,
+#                           output.col = NULL,
+#                           n.features = NULL,
+#                           binary = FALSE,
+#                           ...)
+# {
+#   ml_backwards_compatibility_api()
+#   class <- "org.apache.spark.ml.feature.HashingTF"
+#   invoke_simple_transformer(x, class, list(
+#     setInputCol    = ensure_scalar_character(input.col),
+#     setOutputCol   = ensure_scalar_character(output.col),
+#     setNumFeatures = ensure_scalar_integer(n.features),
+#     setBinary      = ensure_scalar_boolean(binary)
+#   ))
+# }

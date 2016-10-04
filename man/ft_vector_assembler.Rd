@@ -4,14 +4,16 @@
 \alias{ft_vector_assembler}
 \title{Feature Transformation -- VectorAssembler}
 \usage{
-ft_vector_assembler(x, input_col = NULL, output_col = NULL)
+ft_vector_assembler(x, input.col = NULL, output.col = NULL, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input_col}{The name of the input column(s).}
+\item{input.col}{The name of the input column(s).}
 
-\item{output_col}{The name of the output column.}
+\item{output.col}{The name of the output column.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Combine multiple vectors into a single row-vector; that is,
@@ -31,7 +33,9 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_quantile_discretizer}},
+  \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_sql_transformer}},
-  \code{\link{ft_string_indexer}}, \code{\link{sdf_mutate}}
+  \code{\link{ft_string_indexer}},
+  \code{\link{ft_tokenizer}}, \code{\link{sdf_mutate}}
 }
 

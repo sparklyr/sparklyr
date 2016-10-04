@@ -37,4 +37,5 @@ Imports:
     withr
 Suggests:
     testthat,
-    RCurl
+    RCurl,
+    janeaustenr

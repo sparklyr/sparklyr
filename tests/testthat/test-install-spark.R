@@ -2,6 +2,7 @@ context("install")
 
 test_that("supported spark_versions can be downloaded", {
   skip_on_cran()
+  skip_if_not_installed("RCurl")
 
   versions <- spark_versions(latest = FALSE)
   versions <- versions[versions$download != "", ]
@@ -21,4 +22,3 @@ test_that("spark_versions downloads use https", {
     expect_true(length(grep("^https", version$download)) == 1, label = paste(version$spark, version$hadoop), info = version$download)
   }
 })
-

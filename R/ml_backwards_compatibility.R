@@ -1,6 +1,6 @@
 ml_backwards_compatibility_api <- function(envir = parent.frame()) {
   # retrieve dot arguments from envir
-  dots <- eval(parse(text = "list(...)"), envir = envir)
+  dots <- eval(quote(list(...)), envir = envir)
 
   # allow 'max.iter' as a backwards compatible alias for 'iter.max'
   if (is.null(envir$iter.max) && !is.null(dots$max.iter))
@@ -12,4 +12,12 @@ ml_backwards_compatibility_api <- function(envir = parent.frame()) {
     ml.options$only.model <- dots$only_model
     assign("ml.options", ml.options, envir = envir)
   }
+
+  # allow 'input_col' as alias for input.col
+  if (is.null(envir$input.col) && !is.null(dots$input_col))
+    assign("input.col", dots$input_col, envir = envir)
+
+  # allow 'output_col' as alias for output.col
+  if (is.null(envir$output.col) && !is.null(dots$output_col))
+    assign("output.col", dots$output_col, envir = envir)
 }
