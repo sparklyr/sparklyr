@@ -4,23 +4,37 @@
 #' These objects provide access to different facets of the Spark API.
 #'
 #' The \href{http://spark.apache.org/docs/latest/api/scala/#package}{Scala API documentation}
-#' is useful for discovering what methods are available for each of the Spark
-#' APIs.
+#' is useful for discovering what methods are available for each of these
+#' objects. Use \code{\link{invoke}} to call methods on these objects.
+#'
+#' @section Spark Context:
+#'
+#' The main entry point for Spark functionality. The \strong{Spark Context}
+#' represents the connection to a Spark cluster, and can be used to create
+#' \code{RDD}s, accumulators and broadcast variables on that cluster.
+#'
+#' @section Java Spark Context:
+#'
+#' A Java-friendly version of the aforementioned \strong{Spark Context}.
 #'
 #' @section Hive Context:
 #'
-#' With Spark >= 2.0.0, the \code{HiveContext} class has been effectively
-#' superceded by the \code{SparkSession} class, and so \code{hive_context}
-#' will return a \code{SparkSession} object instead. (Note that the
-#' \code{SparkSession} will have been constructed with Hive support when
-#' available.)
+#' An instance of the Spark SQL execution engine that integrates with data
+#' stored in Hive. Configuration for Hive is read from \code{hive-site.xml} on
+#' the classpath.
+#'
+#' Starting with Spark >= 2.0.0, the \strong{Hive Context} class has been
+#' deprecated -- it is superceded by the \strong{Spark Session} class, and
+#' \code{hive_context} will return a \strong{Spark Session} object instead.
+#' Note that both classes share a SQL interface, and therefore one can invoke
+#' SQL through these objects.
 #'
 #' @section Spark Session:
 #'
-#' This object is only available since Spark 2.0.0, and provides an interface
-#' that unifies the Spark SQL context + Hive context into a single object, and
-#' its use is recommended over the older APIs for code targetting Spark 2.0.0
-#' and above.
+#' Available since Spark 2.0.0, the \strong{Spark Session} unifies the
+#' \strong{Spark Context} and \strong{Hive Context} classes into a single
+#' interface. Its use is recommended over the older APIs for code
+#' targeting Spark 2.0.0 and above.
 #'
 #' @param sc A \code{spark_connection}.
 #'
