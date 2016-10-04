@@ -179,14 +179,6 @@ spark_log.spark_connection <- function(sc, n = 100, filter = NULL, ...) {
     else
       linesLog <- lines
 
-    logFromFile <- list()
-    tryCatch({
-      logFromFile <- spark_log.spark_shell_connection(sc, n, filter, ...)
-    }, error = function(e) {
-    })
-
-    linesLog <- c(linesLog, "", logFromFile)
-
     attr(linesLog, "class") <- "sparklyr_log"
 
     linesLog
