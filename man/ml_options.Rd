@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_options.R
 \name{ml_options}
 \alias{ml_options}
-\title{Provide Options for Spark.ML Routines}
+\title{Options for Spark ML Routines}
 \usage{
 ml_options(id.column = random_string("id"),
   response.column = random_string("response"),
@@ -26,6 +26,7 @@ without fitting the actual model? Useful for \code{\link{ml_one_vs_rest}}.}
 \item{...}{Optional arguments, reserved for future expansion.}
 }
 \description{
-Provide Options for Spark.ML Routines
+Provide this object to the various Spark ML methods, to control certain
+facets of the model outputs produced.
 }
 

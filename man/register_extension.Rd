@@ -15,11 +15,11 @@ registered_extensions()
 \description{
 Registering an extension package will result in the package being
 automatically scanned for spark dependencies when a connection to Spark is
-initiated (e.g. via \code{\link{start_shell}}).
+created.
 }
 \note{
-Extensions are typically registered when packages are
-  loaded onto the search path (i.e. in the \code{.onLoad}
-  function).
+Packages should typically register their extensions in their
+  \code{.onLoad} hook -- this ensures that their extensions are registered
+  when their namespaces are loaded.
 }
 

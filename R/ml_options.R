@@ -1,4 +1,7 @@
-#' Provide Options for Spark.ML Routines
+#' Options for Spark ML Routines
+#'
+#' Provide this object to the various Spark ML methods, to control certain
+#' facets of the model outputs produced.
 #'
 #' @param id.column The name to assign to the generated id column.
 #' @param response.column The name to assign to the generated response column.
