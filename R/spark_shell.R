@@ -321,7 +321,7 @@ connection_is_open.spark_shell_connection <- function(sc) {
 }
 
 #' @export
-sspark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
+spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
   if (!is.null(sc$output_file) && file.exists(sc$output_file)) {
     log <- file(sc$output_file)
     lines <- readLines(log)

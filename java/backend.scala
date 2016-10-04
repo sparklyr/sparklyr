@@ -184,7 +184,6 @@ object Backend {
     if (args.length > 4 || args.length < 2) {
       System.err.println(
         "Usage: Backend port id [--service] [--remote]\n" +
-        "\n" +
         "  port:      port the gateway will listen to\n" +
         "  id:        arbitrary numeric identifier for this backend session\n" +
         "  --service: prevents closing the connection from closing the backen\n" +

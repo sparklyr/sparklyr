@@ -169,8 +169,7 @@ spark_log.spark_connection <- function(sc, n = 100, filter = NULL, ...) {
 
     logFromFile <- list()
     tryCatch({
-      class(sc) <- "spark_shell_connection"
-      logFromFile <- spark_log(sc, n, filter, ...)
+      logFromFile <- spark_log.spark_shell_connection(sc, n, filter, ...)
     }, error = function(e) {
     })
 
