@@ -1,5 +1,7 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- The `lag()` window function now accepts numeric values for `n`. (#249)
+
 - Added support to configure spark environment variables using `spark.env.*` config.
 
 - Added support for the `Tokenizer` and `RegexTokenizer` feature transformers.

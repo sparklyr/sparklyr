@@ -74,7 +74,15 @@ sql_translate_env.spark_connection <- function(con) {
     ),
 
     window = dplyr::sql_translator(
-      .parent = dplyr::base_win
+      .parent = dplyr::base_win,
+      lag = function(x, n = 1L, default = NA, order = NULL) {
+        dplyr::base_win$lag(
+          x = x,
+          n = as.integer(n),
+          default = default,
+          order = order
+        )
+      }
     )
 
   )
