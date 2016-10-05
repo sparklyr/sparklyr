@@ -129,7 +129,7 @@ start_shell <- function(master,
   error_file <- NULL
   spark_submit_path <- NULL
   shell_args <- NULL
-  shQuoteType <- if (.Platform$OS.type == "windows") "cmd2" else NULL
+  shQuoteType <- if (.Platform$OS.type == "windows") "cmd" else NULL
 
   if (is.null(gatewayInfo) || gatewayInfo$backendPort == 0)
   {
