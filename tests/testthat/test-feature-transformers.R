@@ -39,6 +39,7 @@ test_that("ft_tokenizer() works as expected", {
   # split on '\\s+', rather, just plain old '\\s'
   spark_tokens <- austen_tbl %>%
     na.omit() %>%
+    filter(length(text) > 0) %>%
     head(10) %>%
     sdf_mutate(tokens = ft_tokenizer(text)) %>%
     sdf_read_column("tokens") %>%
@@ -61,6 +62,7 @@ test_that("ft_regex_tokenizer() works as expected", {
 
   spark_tokens <- austen_tbl %>%
     na.omit() %>%
+    filter(length(text) > 0) %>%
     head(10) %>%
     sdf_mutate(tokens = ft_regex_tokenizer(text, pattern = "\\s+")) %>%
     sdf_read_column("tokens") %>%
