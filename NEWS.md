@@ -12,9 +12,8 @@
   containing many columns could produce the wrong result. (#242)
 
 - Added support to parameterize network timeouts using the
-  `sparklyr.backend.timeout`, `sparklyr.gateway.start.timeout`,
-  `sparklyr.gateway.local.timeout` and `sparklyr.gateway.remote.timeout`
-  config settings.
+  `sparklyr.backend.timeout`, `sparklyr.gateway.start.timeout` and
+  `sparklyr.gateway.connect.timeout` config settings.
 
 - Improved logging while establishing connections to `sparklyr`.
 

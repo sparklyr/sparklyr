@@ -87,7 +87,7 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
         "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
         "    Traceback:\n",
         "      ",
-        paste(tail(sys.calls(), n = 5), collapse = "\n      "),
+        paste(tail(sys.calls(), n = 7), collapse = "\n      "),
         "\n\n",
         "---- Output Log ----\n",
         logLines,
@@ -120,11 +120,9 @@ start_shell <- function(master,
   sessionId <- if (isService == TRUE) spark_session_id(app_name, master) else floor(runif(1, min = 0, max = 10000))
 
   # attempt to connect into an existing gateway
-  timeout <- spark_config_value(config, "sparklyr.gateway.local.timeout", 1)
   gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
                                        gatewayPort = gatewayPort,
                                        sessionId = sessionId,
-                                       waitSeconds = timeout,
                                        config = config)
 
   output_file <- NULL
@@ -226,13 +224,11 @@ start_shell <- function(master,
 
     tryCatch({
       # connect and wait for the service to start
-      timeout <- spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
       gatewayInfo <- spark_connect_gateway(gatewayAddress,
                                            gatewayPort,
                                            sessionId,
-                                           waitSeconds = timeout,
                                            config = config,
-                                           canConnect = TRUE)
+                                           isStarting = TRUE)
     }, error = function(e) {
       abort_shell(
         paste(
