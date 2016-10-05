@@ -241,16 +241,11 @@ object Backend {
     val gatewaySocket = gatewayServerSocket.accept()
 
     val buf = new Array[Byte](1024)
-    
-    val backend = new Backend()
-    val backendPort: Int = backend.init(isRemote)
           
     // wait for the end of stdin, then exit
     new Thread("wait for monitor to close") {
       setDaemon(true)
       override def run(): Unit = {
-        var mainSession: Boolean = false
-        
         try {
           val dis = new DataInputStream(gatewaySocket.getInputStream())
           val commandId = dis.readInt()
@@ -268,32 +263,45 @@ object Backend {
               {
                 log("sparklyr gateway found current session (" + sessionId + ")")
                 
-                // wait for the end of stdin, then exit
-                new Thread("run backend") {
-                  setDaemon(true)
-                  override def run(): Unit = {
-                    try {
-                      dos.writeInt(sessionId)
-                      dos.writeInt(gatewaySocket.getLocalPort())
-                      dos.writeInt(backendPort)
-                      
-                      backend.run()
-                    }
-                    catch {
-                      case e: IOException =>
-                        logError("Backend failed with exception ", e)
+                val backend = new Backend()
+                val backendPort: Int = backend.init(isRemote)
+                
+                log("sparklyr gateway created backend for session (" + sessionId + ")")
+                  
+                try {
+                  // wait for the end of stdin, then exit
+                  new Thread("run backend") {
+                    setDaemon(true)
+                    override def run(): Unit = {
+                      try {
+                        dos.writeInt(sessionId)
+                        dos.writeInt(gatewaySocket.getLocalPort())
+                        dos.writeInt(backendPort)
                         
-                      if (!isService) System.exit(1)
+                        backend.run()
+                      }
+                      catch {
+                        case e: IOException =>
+                          logError("Backend failed with exception ", e)
+                          
+                        if (!isService) System.exit(1)
+                      }
                     }
+                  }.start()
+                  
+                  log("sparklyr gateway waiting for r process to end in session (" + requestedSessionId + ")")
+                  
+                  // wait for the end of socket, closed if R process die
+                  gatewaySocket.getInputStream().read(buf)
+                }
+                finally {
+                  backend.close()
+                  
+                  if (!isService) {
+                    log("terminating sparklyr backend")
+                    System.exit(0)
                   }
-                }.start()
-                
-                mainSession = true
-                
-                log("sparklyr gateway waiting for r process to end in session (" + requestedSessionId + ")")
-                
-                // wait for the end of socket, closed if R process die
-                gatewaySocket.getInputStream().read(buf)
+                }
               }
               else
               {
@@ -351,13 +359,6 @@ object Backend {
             logError("Backend failed with exception ", e)
             
           if (!isService) System.exit(1)
-        } finally {
-          backend.close()
-          
-          if (!isService && mainSession) {
-            log("terminating sparklyr backend")
-            System.exit(0)
-          }
         }
       }
     }.start() 
