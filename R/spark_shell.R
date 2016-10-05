@@ -32,10 +32,12 @@ shell_connection <- function(master,
   if (!nzchar(spark_home))
     stop("Failed to connect to Spark (SPARK_HOME is not set).")
 
-  # determine environment
+  # apply environment variables
   environment <- list()
-  if (spark_master_is_local(master))
-    environment$SPARK_LOCAL_IP = "127.0.0.1"
+  sparkEnvironmentVars <- connection_config(list(config = config, master = master), "spark.env.")
+  lapply(names(sparkEnvironmentVars), function(varName) {
+    environment[[varName]] <<- sparkEnvironmentVars[[varName]]
+  })
 
   # start shell
   start_shell(

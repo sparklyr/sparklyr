@@ -2,6 +2,7 @@ default:
   # local-only configuration
   sparklyr.cores.local: !expr parallel::detectCores()
   spark.sql.shuffle.partitions.local: !expr parallel::detectCores()
+  spark.env.SPARK_LOCAL_IP.local: 127.0.0.1
 
   # default spark packages to load
   sparklyr.defaultPackages:

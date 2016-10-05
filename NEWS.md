@@ -1,5 +1,7 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Added support to configure spark environment variables using `spark.env.*` config.
+
 - Added support for the `Tokenizer` and `RegexTokenizer` feature transformers.
   These are exported as the `ft_tokenizer()` and `ft_regex_tokenizer()` functions.
 
