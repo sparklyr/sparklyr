@@ -564,16 +564,20 @@ na.replace <- function(object, ...) {
 
 #' @export
 na.replace.tbl_spark <- function(object, ...) {
-  sdf <- spark_dataframe(object)
+  na.replace(spark_dataframe(object), ...)
+}
+
+#' @export
+na.replace.spark_jobj <- function(object, ...) {
   dots <- list(...)
   enumerate(dots, function(key, val) {
-    na <- invoke(sdf, "na")
-    sdf <<- if (is.null(key))
+    na <- invoke(object, "na")
+    object <<- if (is.null(key))
       invoke(na, "fill", val)
     else
       invoke(na, "fill", val, as.list(key))
   })
-  sdf_register(sdf)
+  sdf_register(object)
 }
 
 #' Add a Unique ID Column to a Spark DataFrame
