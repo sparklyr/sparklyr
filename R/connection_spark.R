@@ -48,7 +48,7 @@ NULL
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell"),
+                          method = c("shell", "livy"),
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
@@ -110,6 +110,8 @@ spark_connect <- function(master,
                              config = config,
                              service = FALSE,
                              extensions = extensions)
+  } else if (method == "livy") {
+    scon <- livy_connection(master = master)
   } else {
     # other methods
 
