@@ -1,7 +1,11 @@
 context("feature transformers")
 
+test_requires("janeaustenr")
+
 sc <- testthat_spark_connection()
 mtcars_tbl <- testthat_tbl("mtcars")
+
+austen     <- austen_books()
 austen_tbl <- testthat_tbl("austen")
 
 test_that("ft_binarizer() works as expected", {
@@ -33,8 +37,6 @@ test_that("ft_bucketizer() works as expected", {
 
 test_that("ft_tokenizer() works as expected", {
   skip_on_cran()
-  test_requires("janeaustenr")
-  austen <- austen_books()
 
   # NOTE: to my surprise, the ft_tokenizer does not
   # split on '\\s+', rather, just plain old '\\s'
@@ -59,8 +61,6 @@ test_that("ft_tokenizer() works as expected", {
 
 test_that("ft_regex_tokenizer() works as expected", {
   skip_on_cran()
-  test_requires("janeaustenr")
-  austen <- austen_books()
 
   spark_tokens <- austen_tbl %>%
     na.omit() %>%

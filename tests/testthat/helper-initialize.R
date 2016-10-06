@@ -22,10 +22,9 @@ testthat_tbl <- function(name) {
   sc <- testthat_spark_connection()
   tbl <- tryCatch(dplyr::tbl(sc, name), error = identity)
   if (inherits(tbl, "error")) {
-    data <- eval(as.name(name), envir = .GlobalEnv)
+    data <- eval(as.name(name), envir = parent.frame())
     tbl <- dplyr::copy_to(sc, data, name = name)
   }
-
   tbl
 }
 
