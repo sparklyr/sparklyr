@@ -30,10 +30,10 @@ spark_csv_options <- function(header,
 #'   is, should the table be cached?)
 #' @param header Boolean; should the first row of data be used as a header?
 #'   Defaults to \code{TRUE}.
-#' @param delimiter The character used to delimit each column. Defaults to \code{,}.
-#' @param quote The character used as a quote. Defaults to \code{"hdfs://"}.
-#' @param escape The chatacter used to escape other characters. Defaults to \code{\\}.
-#' @param charset The character set. Defaults to \code{"UTF-8"}.
+#' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
+#' @param quote The character used as a quote. Defaults to \samp{'"'}.
+#' @param escape The character used to escape other characters. Defaults to \samp{'\'}.
+#' @param charset The character set. Defaults to \verb{"UTF-8"}.
 #' @param null_value The character to use for null, or missing, values. Defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
 #' @param repartition The number of partitions used to distribute the

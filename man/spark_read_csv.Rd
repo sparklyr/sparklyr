@@ -19,13 +19,13 @@ Supports the "hdfs://", "s3n://" and "file://" protocols.}
 \item{header}{Boolean; should the first row of data be used as a header?
 Defaults to \code{TRUE}.}
 
-\item{delimiter}{The character used to delimit each column. Defaults to \code{,}.}
+\item{delimiter}{The character used to delimit each column. Defaults to \samp{','}.}
 
-\item{quote}{The character used as a quote. Defaults to \code{\"}.}
+\item{quote}{The character used as a quote. Defaults to \samp{'"'}.}
 
-\item{escape}{The chatacter used to escape other characters. Defaults to \code{\\}.}
+\item{escape}{The character used to escape other characters. Defaults to \samp{'\'}.}
 
-\item{charset}{The character set. Defaults to \code{"UTF-8"}.}
+\item{charset}{The character set. Defaults to \verb{"UTF-8"}.}
 
 \item{null_value}{The character to use for null, or missing, values. Defaults to \code{NULL}.}
 
