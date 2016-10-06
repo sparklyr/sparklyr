@@ -92,11 +92,11 @@ print.ml_model_naive_bayes <- function(x, ...) {
   print_newline()
 
   printf("A-priority probabilities:\n")
-  print(x$pi)
+  print(exp(x$pi))
   print_newline()
 
   printf("Conditional probabilities:\n")
-  print(x$theta)
+  print(exp(x$theta))
   print_newline()
 
   x
