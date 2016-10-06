@@ -14,7 +14,7 @@ spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
 \item{name}{The name to assign to the newly generated table.}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the "hdfs://", "s3n://" and "file://" protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{header}{Boolean; should the first row of data be used as a header?
 Defaults to \code{TRUE}.}

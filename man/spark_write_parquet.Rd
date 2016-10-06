@@ -10,7 +10,7 @@ spark_write_parquet(x, path, mode = NULL, options = list())
 \item{x}{A Spark DataFrame or dplyr operation}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the "hdfs://", "s3n://" and "file://" protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{mode}{Specifies the behavior when data or table already exists.}
 
