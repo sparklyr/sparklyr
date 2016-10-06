@@ -18,7 +18,7 @@ License: Apache License 2.0 | file LICENSE
 URL: http://spark.rstudio.com
 BugReports: https://github.com/rstudio/sparklyr/issues
 LazyData: TRUE
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 5.0.1
 Depends:
     R (>= 3.1.2)
 Imports:
