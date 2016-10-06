@@ -113,7 +113,12 @@ spark_sanitize_names <- function(names) {
   newNames <- make.unique(newNames, sep = "_")
 
   # report translations
-  if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
+  verbose <- sparklyr_boolean_option(
+    "sparklyr.sanitize.column.names.verbose",
+    "sparklyr.verbose"
+  )
+
+  if (verbose) {
 
     changedIdx <- which(oldNames != newNames)
     if (length(changedIdx)) {
@@ -198,4 +203,15 @@ split_chunks <- function(x, chunk_size) {
   mapply(function(start, end) {
     x[start:end]
   }, starts, ends, SIMPLIFY = FALSE, USE.NAMES = FALSE)
+}
+
+sparklyr_boolean_option <- function(...) {
+
+  for (name in list(...)) {
+    value <- getOption(name) %||% FALSE
+    if (length(value) == 1 && isTRUE(as.logical(value)))
+      return(TRUE)
+  }
+
+  FALSE
 }

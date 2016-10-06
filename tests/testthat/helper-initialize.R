@@ -22,10 +22,9 @@ testthat_tbl <- function(name) {
   sc <- testthat_spark_connection()
   tbl <- tryCatch(dplyr::tbl(sc, name), error = identity)
   if (inherits(tbl, "error")) {
-    data <- eval(as.name(name), envir = .GlobalEnv)
+    data <- eval(as.name(name), envir = parent.frame())
     tbl <- dplyr::copy_to(sc, data, name = name)
   }
-
   tbl
 }
 
@@ -33,8 +32,17 @@ skip_unless_verbose <- function(message = NULL) {
   message <- message %||% "Verbose test skipped"
   verbose <- Sys.getenv("SPARKLYR_TESTS_VERBOSE", unset = NA)
   if (is.na(verbose)) skip(message)
-  TRUE
+  invisible(TRUE)
 }
 
-if (require("janeaustenr", quietly = TRUE))
-  assign("austen", janeaustenr::austen_books(), envir = .GlobalEnv)
+test_requires <- function(...) {
+
+  for (pkg in list(...)) {
+    if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
+      fmt <- "test requires '%s' but '%s' is not installed"
+      skip(sprintf(fmt, pkg, pkg))
+    }
+  }
+
+  invisible(TRUE)
+}

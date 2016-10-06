@@ -11,7 +11,7 @@ expect_coef_equal <- function(lhs, rhs) {
 
 test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   skip_on_cran()
-  skip_if_not_installed("glmnet")
+  test_requires("glmnet")
 
   mtcars_tbl <- testthat_tbl("mtcars")
 

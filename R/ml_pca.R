@@ -19,7 +19,14 @@ ml_pca <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  ml_prepare_features(df, features)
+  ml_backwards_compatibility_api()
+
+  df <- ml_prepare_features(
+    x = df,
+    features = features,
+    envir = environment(),
+    ml.options = ml.options
+  )
 
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 

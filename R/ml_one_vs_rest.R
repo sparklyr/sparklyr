@@ -23,14 +23,17 @@ ml_one_vs_rest <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
+  ml_backwards_compatibility_api()
+
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
-    df,
-    response,
-    features,
-    NULL,
-    environment(),
-    categorical.transformations
+    x = df,
+    response = response,
+    features = features,
+    intercept = NULL,
+    envir = environment(),
+    categorical.transformations = categorical.transformations,
+    ml.options = ml.options
   )
 
   envir <- new.env(parent = emptyenv())

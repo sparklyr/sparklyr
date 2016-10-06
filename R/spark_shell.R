@@ -117,7 +117,10 @@ start_shell <- function(master,
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
   isService <- FALSE
 
-  sessionId <- if (isService == TRUE) spark_session_id(app_name, master) else floor(runif(1, min = 0, max = 10000))
+  sessionId <- if (isService)
+      spark_session_id(app_name, master)
+  else
+    floor(stats::runif(1, min = 0, max = 10000))
 
   # attempt to connect into an existing gateway
   gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
