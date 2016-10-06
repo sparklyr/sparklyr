@@ -539,8 +539,8 @@ na.omit.spark_jobj <- function(object, columns = NULL, ...) {
   if (verbose) {
     n_diff <- n_before - n_after
     if (n_diff > 0) {
-      fmt <- "* Dropped '%s' rows with 'na.omit' (%s => %s)"
-      message(sprintf(fmt, (n_after - n_before), n_before, n_after))
+      fmt <- "* Dropped %s rows with 'na.omit' (%s => %s)"
+      message(sprintf(fmt, n_diff, n_before, n_after))
     } else {
       message("* No rows dropped by 'na.omit' call")
     }
