@@ -25,7 +25,7 @@ Defaults to \code{TRUE}.}
 
 \item{escape}{The character used to escape other characters. Defaults to \samp{'\'}.}
 
-\item{charset}{The character set. Defaults to \verb{"UTF-8"}.}
+\item{charset}{The character set. Defaults to \samp{"UTF-8"}.}
 
 \item{null_value}{The character to use for null, or missing, values. Defaults to \code{NULL}.}
 

@@ -513,8 +513,12 @@ ml_create_dummy_variables <- function(x,
 
 #' @export
 na.omit.tbl_spark <- function(object, columns = NULL, ...) {
-  sdf <- spark_dataframe(object)
-  na <- invoke(sdf, "na")
+  na.omit(spark_dataframe(object), columns = NULL, ...)
+}
+
+#' @export
+na.omit.spark_jobj <- function(object, columns = NULL, ...) {
+  na <- invoke(object, "na")
   dropped <- if (is.null(columns))
     invoke(na, "drop")
   else
