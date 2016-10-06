@@ -161,7 +161,7 @@ start_shell <- function(master,
     # determine path to spark_submit
     spark_submit <- switch(.Platform$OS.type,
                            unix = "spark-submit",
-                           windows = "spark-submit.cmd"
+                           windows = "spark-submit2.cmd"
     )
     spark_submit_path <- normalizePath(file.path(spark_home, "bin", spark_submit))
 
