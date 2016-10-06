@@ -33,11 +33,8 @@ skip_unless_verbose <- function(message = NULL) {
   message <- message %||% "Verbose test skipped"
   verbose <- Sys.getenv("SPARKLYR_TESTS_VERBOSE", unset = NA)
   if (is.na(verbose)) skip(message)
-  TRUE
+  invisible(TRUE)
 }
-
-if (require("janeaustenr", quietly = TRUE))
-  assign("austen", janeaustenr::austen_books(), envir = .GlobalEnv)
 
 test_requires <- function(...) {
 
@@ -48,5 +45,5 @@ test_requires <- function(...) {
     }
   }
 
-  TRUE
+  invisible(TRUE)
 }

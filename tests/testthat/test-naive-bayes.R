@@ -9,15 +9,16 @@ test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
   data("HouseVotes84", package = "mlbench")
 
   # transform factors to integer vectors
-  HouseVotes84$Class <- as.character(HouseVotes84$Class)
-  HouseVotes84[-1L] <- lapply(HouseVotes84[-1L], function(x) {
+  data <- HouseVotes84
+  data$Class <- as.character(data$Class)
+  data[-1L] <- lapply(data[-1L], function(x) {
     as.integer(x) - 1
   })
 
   # compute R-side naive bayes model
-  R <- naiveBayes(Class ~ ., data = HouseVotes84, na.action = na.omit)
+  R <- naiveBayes(Class ~ ., data = data, na.action = na.omit)
 
-  tbl <- testthat_tbl("HouseVotes84")
+  tbl <- dplyr::copy_to(sc, data, "HouseVotes84")
 
   # compute Spark-side naive bayes model
   model <- S <- tbl %>%

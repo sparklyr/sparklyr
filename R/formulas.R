@@ -81,6 +81,7 @@ validate_formula_operators <- function(object) {
 #'   variables that included in the model formula will be transformed into
 #'   binary variables, and the generated mappings will be stored in this
 #'   environment.
+#' @template roxlate-ml-options
 #'
 #' @rdname ml_prepare_inputs
 #' @rdname ml_prepare_inputs

@@ -38,6 +38,9 @@ categorical variables were binarized in this procedure. Categorical
 variables that included in the model formula will be transformed into
 binary variables, and the generated mappings will be stored in this
 environment.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 }
 \description{
 Pre-process / normalize the inputs typically passed to a
