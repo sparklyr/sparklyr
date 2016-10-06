@@ -38,3 +38,15 @@ skip_unless_verbose <- function(message = NULL) {
 
 if (require("janeaustenr", quietly = TRUE))
   assign("austen", janeaustenr::austen_books(), envir = .GlobalEnv)
+
+test_requires <- function(...) {
+
+  for (pkg in list(...)) {
+    if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
+      fmt <- "test requires '%s' but '%s' is not installed"
+      skip(sprintf(fmt, pkg, pkg))
+    }
+  }
+
+  TRUE
+}

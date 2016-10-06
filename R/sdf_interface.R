@@ -518,11 +518,34 @@ na.omit.tbl_spark <- function(object, columns = NULL, ...) {
 
 #' @export
 na.omit.spark_jobj <- function(object, columns = NULL, ...) {
+
+  # report number of rows dropped if requested
+  verbose <- sparklyr_boolean_option(
+    "sparklyr.na.omit.verbose",
+    "sparklyr.na.action.verbose",
+    "sparklyr.verbose"
+  )
+
+  n_before <- if (verbose) invoke(object, "count")
+
   na <- invoke(object, "na")
   dropped <- if (is.null(columns))
     invoke(na, "drop")
   else
     invoke(na, "drop", as.list(columns))
+
+  n_after <- if (verbose) invoke(dropped, "count")
+
+  if (verbose) {
+    n_diff <- n_before - n_after
+    if (n_diff > 0) {
+      fmt <- "* Dropped '%s' rows with 'na.omit' (%s => %s)"
+      message(sprintf(fmt, (n_after - n_before), n_before, n_after))
+    } else {
+      message("* No rows dropped by 'na.omit' call")
+    }
+  }
+
   sdf_register(dropped)
 }
 
