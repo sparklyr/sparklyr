@@ -74,8 +74,8 @@ ml_naive_bayes <- function(x,
   colnames(theta) <- features
 
   ml_model("naive_bayes", fit,
-           pi = invoke(fit, "pi"),
-           theta = invoke(fit, "theta"),
+           pi = pi,
+           theta = t(theta),
            features = features,
            response = response,
            data = df,
@@ -87,7 +87,23 @@ ml_naive_bayes <- function(x,
 
 #' @export
 print.ml_model_naive_bayes <- function(x, ...) {
-  formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
-  cat("Call: ", formula, "\n\n", sep = "")
-  cat(invoke(x$.model, "toString"), sep = "\n")
+
+  ml_model_print_call(x)
+  print_newline()
+
+  printf("A-priority probabilities:\n")
+  print(x$pi)
+  print_newline()
+
+  printf("Conditional probabilities:\n")
+  print(x$theta)
+  print_newline()
+
+  x
+}
+
+#' @export
+summary.ml_model_naive_bayes <- function(object, ...) {
+  print(object, ...)
+  object
 }
