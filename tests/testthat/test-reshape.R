@@ -3,6 +3,9 @@ context("reshape")
 sc <- testthat_spark_connection()
 
 test_that("'gather()' works on tbl_sparks", {
+  skip_on_cran()
+  skip_if_not_installed("tidyr")
+  library(tidyr)
 
   stocks <- data_frame(
     id   = letters[1:10],
@@ -23,6 +26,8 @@ test_that("'gather()' works on tbl_sparks", {
     collect() %>%
     arrange(id, stock)
 
+  # NOTE: all.equal seems to demand equivalece
+  # for numeric columns here?
   invisible(lapply(seq_along(R), function(i) {
     expect_equivalent(R[[i]], S[[i]])
   }))
