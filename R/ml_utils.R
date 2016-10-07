@@ -90,30 +90,6 @@ ml_prepare_dataframe <- function(x,
   spark_dataframe(transformed)
 }
 
-apply_na_action <- function(x, response = NULL, features = NULL, na.action) {
-
-  # early exit for NULL, NA na.action
-  if (is.null(na.action))
-    return(x)
-
-  # attempt to resolve character na.action
-  if (is.character(na.action)) {
-    if (!exists(na.action, envir = parent.frame(), mode = "function"))
-      stop("no function with name '", na.action, "' found")
-
-    na.action <- get(na.action, envir = parent.frame(), mode = "function")
-  }
-
-  if (!is.function(na.action))
-    stop("'na.action' is not a function")
-
-  # attempt to apply 'na.action'
-  na.action(x,
-            response = response,
-            features = features,
-            columns = c(response, features))
-}
-
 try_null <- function(expr) {
   tryCatch(expr, error = function(e) NULL)
 }
