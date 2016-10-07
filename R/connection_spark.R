@@ -111,7 +111,8 @@ spark_connect <- function(master,
                              service = FALSE,
                              extensions = extensions)
   } else if (method == "livy") {
-    scon <- livy_connection(master = master)
+    scon <- livy_connection(master = master,
+                            config = config)
   } else {
     # other methods
 

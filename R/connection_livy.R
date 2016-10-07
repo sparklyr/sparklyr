@@ -27,7 +27,22 @@ livy_create_session <- function(master) {
     stop("Failed to create livy session: ", content(req))
   }
 
-  content(req)
+  content <- content(req)
+
+  assert_that(!is.null(content$id))
+  assert_that(!is.null(content$state))
+  assert_that(session$kind == "spark")
+
+  content
+}
+
+livy_get_session <- function(master, sessionId) {
+  session <- fromJSON(paste(master, "sessions", sessionId, sep = "/"))
+
+  assert_that(!is.null(session$state))
+  assert_that(session$id == sessionId)
+
+  session
 }
 
 livy_validate_master <- function(master) {
@@ -41,15 +56,33 @@ livy_validate_master <- function(master) {
 }
 
 #' @import jsonlite
-livy_connection <- function(master) {
+livy_connection <- function(master, config) {
   livy_validate_master(master)
 
   session <- livy_create_session(master)
+  sessionId <- session$id
 
-  assert_that(session$kind == "spark")
+  waitStartTimeout <- spark_config_value(config, "livy.session.start.timeout", 60)
+  waitStartReties <- waitStartTimeout * 10
+  while (session$state == "starting" &&
+         session$state != "dead" &&
+         waitStartReties > 0) {
+    session <- livy_get_session(master, sessionId)
+
+    Sys.sleep(0.1)
+    waitStartReties <- waitStartReties - 1
+  }
+
+  if (session$state == "starting") {
+    stop("Failed to launch livy session, session status is still starting after waiting for ", waitStartTimeout, " seconds")
+  }
+
+  if (session$state == "dead") {
+    stop("Failed to launch livy session, session status is ", session$state)
+  }
 
   list(
     master = master,
-    session = session
+    sessionId = sessionId
   )
 }
