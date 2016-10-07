@@ -9,5 +9,8 @@ run-tests () {
     done
 }
 
-run-tests 2.0.1 2.0.0 1.6.2 1.6.1
-
+if [ "$#" -eq "0" ]; then
+    run-tests 2.0.1 2.0.0 1.6.2 1.6.1
+else
+    run-tests "$@"
+fi

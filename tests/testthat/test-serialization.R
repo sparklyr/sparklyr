@@ -1,6 +1,9 @@
 context("serialization")
 sc <- testthat_spark_connection()
 
+test_requires("nycflights13")
+flights_tbl <- testthat_tbl("flights")
+
 ensure_round_trip <- function(sc, data) {
   # round-trip data through Spark
   copied <- copy_to(sc, data, overwrite = TRUE)
@@ -87,4 +90,16 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
 
   # the above failed with a Java StackOverflow with older versions of sparklyr
   expect_true(TRUE, info = "no Java StackOverflow on copy of large dataset")
+})
+
+test_that("'sdf_predict()', 'predict()' return equal number of results", {
+
+  model <- flights_tbl %>%
+    ml_decision_tree(sched_dep_time ~ dep_time)
+
+  predictions <- sdf_predict(model)
+  n1 <- spark_dataframe(predictions) %>% invoke("count")
+  n2 <- length(predict(model))
+  expect_equal(n1, n2)
+
 })
