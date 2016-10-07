@@ -515,8 +515,10 @@ ml_create_dummy_variables <- function(x,
 #'
 #' Add a unique ID column to a Spark DataFrame. The Spark
 #' \code{monotonicallyIncreasingId} function is used to produce these and is
-#' guaranteed to produce unique, monotonically increasing ids; however, there is
-#' no guarantee that these IDs will be sequential.
+#' guaranteed to produce unique, monotonically increasing ids; however, there
+#' is no guarantee that these IDs will be sequential. The table is persisted
+#' immediately after the column is generated, to ensure that the column is
+#' stable -- otherwise, it can differ across new computations.
 #'
 #' @template roxlate-ml-x
 #' @param id The name of the column to host the generated IDs.
@@ -536,7 +538,10 @@ sdf_with_unique_id <- function(x, id = "id") {
 
   mii <- invoke(mii, "cast", "double")
 
-  transformed <- invoke(sdf, "withColumn", id, mii)
+  transformed <- sdf %>%
+    invoke("withColumn", id, mii) %>%
+    invoke("cache")
+
   sdf_register(transformed)
 }
 
