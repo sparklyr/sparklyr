@@ -36,11 +36,20 @@ livy_create_session <- function(master) {
   content
 }
 
-livy_get_session <- function(master, sessionId) {
-  session <- fromJSON(paste(master, "sessions", sessionId, sep = "/"))
+livy_get_session <- function(sc) {
+  session <- fromJSON(paste(sc$master, "sessions", sc$sessionId, sep = "/"))
 
   assert_that(!is.null(session$state))
-  assert_that(session$id == sessionId)
+  assert_that(session$id == sc$sessionId)
+
+  session
+}
+
+livy_try_get_session <- function(sc) {
+  session <- NULL
+  tryCatch({
+    session <- livy_get_session(sc)
+  }, error = function(e) {})
 
   session
 }
@@ -60,14 +69,18 @@ livy_connection <- function(master, config) {
   livy_validate_master(master)
 
   session <- livy_create_session(master)
-  sessionId <- session$id
+
+  sc <- structure(class = c("spark_connection", "livy_connection"), list(
+    master = master,
+    sessionId = session$id
+  ))
 
   waitStartTimeout <- spark_config_value(config, "livy.session.start.timeout", 60)
   waitStartReties <- waitStartTimeout * 10
   while (session$state == "starting" &&
          session$state != "dead" &&
          waitStartReties > 0) {
-    session <- livy_get_session(master, sessionId)
+    session <- livy_get_session(sc)
 
     Sys.sleep(0.1)
     waitStartReties <- waitStartReties - 1
@@ -77,14 +90,26 @@ livy_connection <- function(master, config) {
     stop("Failed to launch livy session, session status is still starting after waiting for ", waitStartTimeout, " seconds")
   }
 
-  if (session$state == "idle") {
+  if (session$state != "idle") {
     stop("Failed to launch livy session, session status is ", session$state)
   }
 
-  structure(class = c("spark_connection", "livy_connection"), list(
-    master = master,
-    sessionId = sessionId
-  ))
+  sc
+}
+
+livy_states_info <- function() {
+  list(
+    "not_started"   = list(connected = FALSE),
+    "starting"      = list(connected = TRUE),
+    "recovering"    = list(connected = TRUE),
+    "idle"          = list(connected = TRUE),
+    "running"       = list(connected = TRUE),
+    "busy"          = list(connected = TRUE),
+    "shutting_down" = list(connected = TRUE),
+    "error"         = list(connected = TRUE),
+    "dead"          = list(connected = FALSE),
+    "success"       = list(connected = TRUE)
+  )
 }
 
 #' @export
@@ -95,4 +120,19 @@ spark_log.livy_connection <- function(sc, n = 100, filter = NULL, ...) {
 #' @export
 spark_web.livy_connection <- function(sc, ...) {
   stop("Unsupported operation for livy connections")
+}
+
+#' @export
+connection_is_open.livy_connection <- function(sc) {
+  session <- livy_try_get_session(sc)
+  if (is.null(session)) {
+    FALSE
+  }
+  else {
+    stateInfo <- livy_states_info()[[session$state]]
+
+    assert_that(!is.null(stateInfo))
+
+    stateInfo$connected
+  }
 }
