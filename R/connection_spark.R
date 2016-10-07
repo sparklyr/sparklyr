@@ -211,7 +211,8 @@ spark_disconnect <- function(sc, ...) {
 #' @export
 spark_disconnect.spark_connection <- function(sc, ...) {
   tryCatch({
-    stop_shell(sc)
+    subclass <- remove_class(sc, "spark_connection")
+    spark_disconnect(subclass, ...)
   }, error = function(err) {
   })
 

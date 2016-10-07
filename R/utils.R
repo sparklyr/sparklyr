@@ -199,3 +199,11 @@ split_chunks <- function(x, chunk_size) {
     x[start:end]
   }, starts, ends, SIMPLIFY = FALSE, USE.NAMES = FALSE)
 }
+
+remove_class <- function(object, class) {
+  classes <- attr(object, "class")
+  newClasses <- classes[!classes %in% c(class)]
+
+  attr(object, "class") <- newClasses
+  object
+}

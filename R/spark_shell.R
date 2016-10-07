@@ -306,12 +306,12 @@ start_shell <- function(master,
   sc
 }
 
+#' @export
+spark_disconnect.spark_shell_connection <- function(sc, terminate = FALSE) {
+  stop_shell(sc, terminate = terminate)
+}
 
 # Stop the Spark R Shell
-#
-# @rdname start_shell
-#
-# @export
 stop_shell <- function(sc, terminate = FALSE) {
   terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
   invoke_method(sc,
