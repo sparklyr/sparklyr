@@ -36,6 +36,24 @@ livy_create_session <- function(master) {
   content
 }
 
+livy_destroy_session <- function(sc) {
+  req <- DELETE(paste(sc$master, "sessions", sc$sessionId, sep = "/"),
+    add_headers(
+      "Content-Type" = "application/json"
+    ),
+    body = NULL
+  )
+
+  if (httr::http_error(req)) {
+    stop("Failed to destroy livy session: ", content(req))
+  }
+
+  content <- content(req)
+  assert_that(content$msg == "deleted")
+
+  NULL
+}
+
 livy_get_session <- function(sc) {
   session <- fromJSON(paste(sc$master, "sessions", sc$sessionId, sep = "/"))
 
@@ -94,6 +112,13 @@ livy_connection <- function(master, config) {
     stop("Failed to launch livy session, session status is ", session$state)
   }
 
+  # stop connection on R exit
+  reg.finalizer(baseenv(), function(x) {
+    if (connection_is_open(sc)) {
+      spark_disconnect(sc, terminate = TRUE)
+    }
+  }, onexit = TRUE)
+
   sc
 }
 
@@ -134,5 +159,12 @@ connection_is_open.livy_connection <- function(sc) {
     assert_that(!is.null(stateInfo))
 
     stateInfo$connected
+  }
+}
+
+#' @export
+spark_disconnect.livy_connection <- function(sc, terminate = TRUE) {
+  if (terminate) {
+    livy_destroy_session(sc)
   }
 }
