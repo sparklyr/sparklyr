@@ -165,6 +165,10 @@ stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
   ))
 }
 
+warnf <- function(fmt, ..., call. = TRUE, immediate. = FALSE) {
+  warning(sprintf(fmt, ...), call. = call., immediate. = immediate.)
+}
+
 enumerate <- function(object, f, ...) {
   nm <- names(object)
   result <- lapply(seq_along(object), function(i) {

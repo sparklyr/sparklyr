@@ -17,16 +17,32 @@ livy_install <- function(version       = "0.2.0",
                          spark_home    = NULL,
                          spark_version = NULL)
 {
+  version <- ensure_scalar_character(version)
+
   # determine an appropriate spark version
   if (is.null(spark_version)) {
-    spark_version <- switch(
-      version,
-      "0.2.0" = "1.6.2",
-      "0.3.0" = "2.0.1"
-    )
+
+    # if spark_home is set, then infer spark version based on that
+    if (!is.null(spark_home)) {
+      spark_version <- spark_version_from_home(spark_home)
+    } else {
+      spark_version <- switch(
+        version,
+        "0.2.0" = "1.6.2",
+        "0.3.0" = "2.0.1"
+      )
+    }
 
     if (interactive())
       message("* Using Spark: ", spark_version)
+  }
+
+  # warn if the user attempts to use livy 0.2.0 with Spark >= 2.0.0
+  spark_version <- ensure_scalar_character(spark_version)
+  if (version == "0.2.0" &&
+      numeric_version(spark_version) >= "2.0.0")
+  {
+    stopf("livy %s is not compatible with Spark (>= %s)", version, "2.0.0")
   }
 
   # determine spark home (auto-install as needed)
