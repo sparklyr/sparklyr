@@ -101,7 +101,6 @@ predict.ml_model <- function(object,
 {
   # 'sdf_predict()' does not necessarily return a data set with the same row
   # order as the input data; generate a unique id and re-order based on this
-  # id post-join
   id <- random_string("id_")
   sdf <- newdata %>%
     sdf_with_unique_id(id) %>%
