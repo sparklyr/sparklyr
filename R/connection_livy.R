@@ -1,5 +1,33 @@
+#' @import assertthat
 livy_get_sessions <- function(master) {
-  fromJSON(paste(master, "sessions", sep = "/"))
+  sessions <- fromJSON(paste(master, "sessions", sep = "/"))
+
+  assert_that(!is.null(sessions$sessions))
+  assert_that(!is.null(sessions$total))
+
+  sessions
+}
+
+#' @import httr
+livy_create_session <- function(master) {
+  data <- list(kind = "spark")
+
+  req <- POST(paste(master, "sessions", sep = "/"),
+    add_headers(
+      "Content-Type" = "application/json"
+    ),
+    body = toJSON(
+      list(
+        kind = unbox("spark")
+      )
+    )
+  )
+
+  if (httr::http_error(req)) {
+    stop("Failed to create livy session: ", content(req))
+  }
+
+  content(req)
 }
 
 livy_validate_master <- function(master) {
@@ -16,7 +44,12 @@ livy_validate_master <- function(master) {
 livy_connection <- function(master) {
   livy_validate_master(master)
 
+  session <- livy_create_session(master)
+
+  assert_that(session$kind == "spark")
+
   list(
-    master = master
+    master = master,
+    session = session
   )
 }
