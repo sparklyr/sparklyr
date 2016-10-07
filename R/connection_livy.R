@@ -77,12 +77,22 @@ livy_connection <- function(master, config) {
     stop("Failed to launch livy session, session status is still starting after waiting for ", waitStartTimeout, " seconds")
   }
 
-  if (session$state == "dead") {
+  if (session$state == "idle") {
     stop("Failed to launch livy session, session status is ", session$state)
   }
 
-  list(
+  structure(class = c("spark_connection", "livy_connection"), list(
     master = master,
     sessionId = sessionId
-  )
+  ))
+}
+
+#' @export
+spark_log.livy_connection <- function(sc, n = 100, filter = NULL, ...) {
+  stop("Unsupported operation for livy connections")
+}
+
+#' @export
+spark_web.livy_connection <- function(sc, ...) {
+  stop("Unsupported operation for livy connections")
 }
