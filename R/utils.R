@@ -215,3 +215,7 @@ sparklyr_boolean_option <- function(...) {
 
   FALSE
 }
+
+sparklyr_verbose <- function(...) {
+  sparklyr_boolean_option(..., "sparklyr.verbose")
+}
