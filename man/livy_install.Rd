@@ -4,18 +4,21 @@
 \alias{livy_install}
 \title{Install Livy}
 \usage{
-livy_install(spark_home = Sys.getenv("SPARK_HOME"), livy_version = "0.2.0",
-  hadoop_conf_dir = NULL)
+livy_install(spark_home = NULL, spark_version = NULL,
+  livy_version = "0.2.0")
 }
 \arguments{
 \item{spark_home}{The path to a Spark installation. The downloaded and
 installed version of \samp{livy} will then be associated with this Spark
-installation.}
+installation. When unset (\samp{NULL}), the value is inferred based on
+the value of \samp{spark_version} supplied.}
 
-\item{livy_version}{The version of \samp{livy} to be installed. Currently,
-only the beta version, 0.2.0, is available.}
+\item{spark_version}{The version of Spark to use. When unset (\samp{NULL}),
+the value is inferred based on the value of \samp{livy_version} supplied.
+A version of Spark known to be compatible with the requested version of
+\samp{livy} is chosen when possible.}
 
-\item{hadoop_conf_dir}{Optional; the path to a Hadoop configuration directory.}
+\item{livy_version}{The version of \samp{livy} to be installed.}
 }
 \description{
 Automatically download and install \href{http://livy.io/}{\samp{livy}}.

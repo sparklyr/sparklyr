@@ -5,20 +5,43 @@
 #'
 #' @param spark_home The path to a Spark installation. The downloaded and
 #'   installed version of \samp{livy} will then be associated with this Spark
-#'   installation.
-#' @param livy_version The version of \samp{livy} to be installed. Currently,
-#'   only the beta version, 0.2.0, is available.
-#' @param hadoop_conf_dir Optional; the path to a Hadoop configuration directory.
+#'   installation. When unset (\samp{NULL}), the value is inferred based on
+#'   the value of \samp{spark_version} supplied.
+#' @param spark_version The version of Spark to use. When unset (\samp{NULL}),
+#'   the value is inferred based on the value of \samp{livy_version} supplied.
+#'   A version of Spark known to be compatible with the requested version of
+#'   \samp{livy} is chosen when possible.
+#' @param livy_version The version of \samp{livy} to be installed.
 #' @export
-livy_install <- function(spark_home = Sys.getenv("SPARK_HOME"),
-                         livy_version = "0.2.0",
-                         hadoop_conf_dir = NULL)
+livy_install <- function(spark_home    = NULL,
+                         spark_version = NULL,
+                         livy_version  = "0.2.0")
 {
-  hadoop_conf_dir <- ensure_scalar_character(hadoop_conf_dir, default = "")
+  # determine an appropriate spark version
+  spark_version <- spark_version %||% switch(
+    livy_version,
+    "0.2.0" = "1.6.2",
+    "0.3.0" = "2.0.1"
+  )
+
+  # determine spark home
+  spark_home <- spark_home %||% spark_home_dir(version = spark_version)
 
   # ensure that spark home exists
-  if (!file.exists(spark_home))
-    stopf("No Spark installation found at '%s'", spark_home)
+  if (!file.exists(spark_home)) {
+
+    if (!interactive())
+      stopf("No Spark installation found at '%s'", spark_home)
+
+    prompt <- sprintf(
+      "Spark %s is not installed. Download and install? [Y/n]: ",
+      spark_version
+    )
+
+    response <- readline(prompt = prompt)
+    if (!identical(tolower(response[1]), "y"))
+      stop("Installation aborted by user.")
+  }
 
   # use the directory path as the version
   spark_version <- basename(spark_home)
