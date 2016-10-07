@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Resolved an issue where `predict()` could produce results in the wrong
+  order for large Spark DataFrames.
+
 - Implemented support for `na.action` with the various Spark.ML routines,
   and set the default as `na.omit`. Users can customize the `na.action`
   argument through the `ml.options` object accepted by all ML routines.
