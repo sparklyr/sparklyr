@@ -83,7 +83,7 @@ livy_install <- function(version       = "0.2.0",
   if (interactive()) {
     message("* Installing livy ", version)
     message("* Downloading from:\n- ", shQuote(url))
-    message("* Installing to:\n- ", shQuote(livy_path))
+    message("* Installing to:\n- ", shQuote(aliased_path(livy_path)))
   }
 
   download.file(url, destfile = destfile)
