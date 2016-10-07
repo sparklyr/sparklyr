@@ -31,7 +31,7 @@ livy_create_session <- function(master) {
 
   assert_that(!is.null(content$id))
   assert_that(!is.null(content$state))
-  assert_that(session$kind == "spark")
+  assert_that(content$kind == "spark")
 
   content
 }

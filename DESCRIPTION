@@ -34,7 +34,9 @@ Imports:
     rappdirs,
     assertthat,
     rprojroot,
-    withr
+    withr,
+    httr,
+    jsonlite
 Suggests:
     testthat,
     RCurl,
