@@ -92,14 +92,25 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
   expect_true(TRUE, info = "no Java StackOverflow on copy of large dataset")
 })
 
-test_that("'sdf_predict()', 'predict()' return equal number of results", {
+test_that("'sdf_predict()', 'predict()' return same results", {
 
   model <- flights_tbl %>%
     ml_decision_tree(sched_dep_time ~ dep_time)
 
+  id <- model$model.parameters$id
+
   predictions <- sdf_predict(model)
   n1 <- spark_dataframe(predictions) %>% invoke("count")
   n2 <- length(predict(model))
+
   expect_equal(n1, n2)
+
+  lhs <- predictions %>%
+    arrange_(.dots = list(model$model.parameters$id)) %>%
+    sdf_read_column("prediction")
+
+  rhs <- predict(model)
+
+  expect_identical(lhs, rhs)
 
 })

@@ -1,11 +1,14 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Added `sdf_persist()`, as a wrapper to the Spark DataFrame `persist()` API.
+
 - Resolved an issue where `predict()` could produce results in the wrong
   order for large Spark DataFrames.
 
-- Implemented support for `na.action` with the various Spark.ML routines,
-  and set the default as `na.omit`. Users can customize the `na.action`
-  argument through the `ml.options` object accepted by all ML routines.
+- Implemented support for `na.action` with the various Spark ML routines. The
+  value of `getOption("na.action")` is used by default. Users can customize the
+  `na.action` argument through the `ml.options` object accepted by all ML
+  routines.
 
 - Fixed windows `spark_connect` with long paths and spaces.
 

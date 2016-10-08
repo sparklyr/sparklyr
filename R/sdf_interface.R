@@ -540,7 +540,7 @@ sdf_with_unique_id <- function(x, id = "id") {
 
   transformed <- sdf %>%
     invoke("withColumn", id, mii) %>%
-    invoke("cache")
+    sdf_persist(storage.level = "MEMORY_ONLY")
 
   sdf_register(transformed)
 }
@@ -578,4 +578,37 @@ sdf_quantile <- function(x,
   names(quantiles) <- nm
 
   quantiles
+}
+
+#' Persist a Spark DataFrame
+#'
+#' Persist a Spark DataFrame, forcing any pending computations and (optionally)
+#' serializing the results to disk.
+#'
+#' Spark DataFrames invoke their operations lazily -- pending operations are
+#' deferred until their results are actually needed. Persisting a Spark
+#' DataFrame effectively 'forces' any pending computations, and then persists
+#' the generated Spark DataFrame as requested (to memory, to disk, or
+#' otherwise).
+#'
+#' @template roxlate-ml-x
+#' @param storage.level The storage level to be used. You can view the
+#'   \href{http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}
+#'   for some more information.
+#' @export
+sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+
+  storage.level <- ensure_scalar_character(storage.level)
+
+  sl <- invoke_static(
+    sc,
+    "org.apache.spark.storage.StorageLevel",
+    storage.level
+  )
+
+  sdf %>%
+    invoke("persist", sl) %>%
+    sdf_register()
 }
