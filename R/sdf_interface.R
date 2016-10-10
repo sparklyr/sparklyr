@@ -591,10 +591,15 @@ sdf_quantile <- function(x,
 #' the generated Spark DataFrame as requested (to memory, to disk, or
 #' otherwise).
 #'
+#' Users of Spark should be careful to persist the results of any computations
+#' which are non-deterministic -- otherwise, one might see that the values
+#' within a column seem to 'change' as new operations are performed on that
+#' data set.
+#'
 #' @template roxlate-ml-x
-#' @param storage.level The storage level to be used. You can view the
+#' @param storage.level The storage level to be used. Please view the
 #'   \href{http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}
-#'   for some more information.
+#'   for information on what storage levels are accepted.
 #' @export
 sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
   sdf <- spark_dataframe(x)
