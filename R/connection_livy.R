@@ -9,6 +9,7 @@ livy_get_sessions <- function(master) {
 }
 
 #' @import httr
+#' @import jsonlite
 livy_create_session <- function(master) {
   data <- list(kind = "spark")
 
@@ -63,6 +64,59 @@ livy_get_session <- function(sc) {
   session
 }
 
+livy_quote_parameters <- function(parameters) {
+  paste("\"", parameters, "\"", sep = "")
+}
+
+livy_compose_code <- function(sc, method, parameters) {
+  paste(
+    method,
+    "(",
+    paste(
+      livy_quote_parameters(parameters),
+      sep = ","
+    ),
+    ")",
+    sep = ""
+  )
+}
+
+livy_invoke_method <- function(sc, method, parameters) {
+  req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
+    add_headers(
+      "Content-Type" = "application/json"
+    ),
+    body = toJSON(
+      list(
+        code = unbox(livy_compose_code(sc, method, parameters))
+      )
+    )
+  )
+
+  if (httr::http_error(req)) {
+    stop("Failed to invoke livy statement: ", content(req))
+  }
+
+  statement <- content(req)
+  assert_that(!is.null(statement$id))
+
+  waitTimeout <- spark_config_value(sc$config, "livy.session.command.timeout", 60)
+  waitTimeout <- waitStartTimeout * 10
+  while (statement$state == "running" &&
+         waitTimeout > 0) {
+    session <- livy_get_statement(sc, statement$id)
+
+    Sys.sleep(0.1)
+    waitTimeout <- waitTimeout - 1
+  }
+
+  if (statement$state != available) {
+    stop("Failed to execute Livy statement with state ", statement$state)
+  }
+
+  statement$output
+}
+
 livy_try_get_session <- function(sc) {
   session <- NULL
   tryCatch({
@@ -90,7 +144,8 @@ livy_connection <- function(master, config) {
 
   sc <- structure(class = c("spark_connection", "livy_connection"), list(
     master = master,
-    sessionId = session$id
+    sessionId = session$id,
+    config = config
   ))
 
   waitStartTimeout <- spark_config_value(config, "livy.session.start.timeout", 60)
@@ -167,4 +222,9 @@ spark_disconnect.livy_connection <- function(sc, terminate = TRUE) {
   if (terminate) {
     livy_destroy_session(sc)
   }
+}
+
+#' @export
+invoke_method.livy_connection <- function(sc, static, object, method, ...) {
+
 }
