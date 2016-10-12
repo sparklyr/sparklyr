@@ -307,7 +307,8 @@ start_shell <- function(master,
 }
 
 #' @export
-spark_disconnect.spark_shell_connection <- function(sc, terminate = FALSE) {
+spark_disconnect.spark_shell_connection <- function(sc, ...) {
+  terminate <- list(...)$terminate
   stop_shell(sc, terminate = terminate)
 }
 

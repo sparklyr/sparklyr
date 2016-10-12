@@ -81,6 +81,15 @@ livy_compose_code <- function(sc, method, parameters) {
   )
 }
 
+livy_get_statement <- function(sc, statementId) {
+  statement <- fromJSON(paste(sc$master, "sessions", sc$sessionId, "statements", statementId, sep = "/"))
+
+  assert_that(!is.null(statement$state))
+  assert_that(statement$id == statementId)
+
+  statement
+}
+
 livy_invoke_method <- function(sc, method, parameters) {
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
     add_headers(
@@ -101,20 +110,27 @@ livy_invoke_method <- function(sc, method, parameters) {
   assert_that(!is.null(statement$id))
 
   waitTimeout <- spark_config_value(sc$config, "livy.session.command.timeout", 60)
-  waitTimeout <- waitStartTimeout * 10
+  waitTimeout <- waitTimeout * 10
   while (statement$state == "running" &&
          waitTimeout > 0) {
-    session <- livy_get_statement(sc, statement$id)
+    statement <- livy_get_statement(sc, statement$id)
 
     Sys.sleep(0.1)
     waitTimeout <- waitTimeout - 1
   }
 
-  if (statement$state != available) {
+  if (statement$state != "available") {
     stop("Failed to execute Livy statement with state ", statement$state)
   }
 
-  statement$output
+  assert_that(!is.null(statement$output))
+  assert_that(!is.null(statement$output$data))
+
+  if (!"text/plain" %in% names(statement$output$data)) {
+    stop("Livy statement with output type", statement$output$data[[1]], "is unsupported")
+  }
+
+  statement$output$data$`text/plain`
 }
 
 livy_try_get_session <- function(sc) {
@@ -218,7 +234,8 @@ connection_is_open.livy_connection <- function(sc) {
 }
 
 #' @export
-spark_disconnect.livy_connection <- function(sc, terminate = TRUE) {
+spark_disconnect.livy_connection <- function(sc, ...) {
+  terminate <- list(...)$terminate
   if (terminate) {
     livy_destroy_session(sc)
   }
