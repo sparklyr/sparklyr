@@ -243,5 +243,10 @@ spark_disconnect.livy_connection <- function(sc, ...) {
 
 #' @export
 invoke_method.livy_connection <- function(sc, static, object, method, ...) {
-
+  if (static) {
+    livy_invoke_method(sc, method, ...)
+  }
+  else {
+    stop("NYI")
+  }
 }
