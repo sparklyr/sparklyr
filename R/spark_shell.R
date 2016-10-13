@@ -290,19 +290,6 @@ start_shell <- function(master,
     }
   }, onexit = TRUE)
 
-  # initialize and return the connection
-  tryCatch({
-    sc <- initialize_connection(sc)
-  }, error = function(e) {
-    abort_shell(
-      paste("Failed during initialize_connection:", e$message),
-      spark_submit_path,
-      shell_args,
-      output_file,
-      error_file
-    )
-  })
-
   sc
 }
 
@@ -492,46 +479,57 @@ spark_config_value <- function(config, name, default = NULL) {
 
 #' @export
 initialize_connection.spark_shell_connection <- function(sc) {
-  sc$spark_context <- invoke_static(sc, "sparklyr.Backend", "getSparkContext")
+  # initialize and return the connection
+  tryCatch({
+    sc$spark_context <- invoke_static(sc, "sparklyr.Backend", "getSparkContext")
 
-  if (is.null(sc$spark_context)) {
-    # create the spark config
-    conf <- invoke_new(sc, "org.apache.spark.SparkConf")
-    conf <- invoke(conf, "setAppName", sc$app_name)
-    conf <- invoke(conf, "setMaster", sc$master)
-    conf <- invoke(conf, "setSparkHome", sc$spark_home)
+    if (is.null(sc$spark_context)) {
+      # create the spark config
+      conf <- invoke_new(sc, "org.apache.spark.SparkConf")
+      conf <- invoke(conf, "setAppName", sc$app_name)
+      conf <- invoke(conf, "setMaster", sc$master)
+      conf <- invoke(conf, "setSparkHome", sc$spark_home)
 
-    context_config <- connection_config(sc, "spark.", c("spark.sql."))
-    apply_config(context_config, conf, "set", "spark.")
+      context_config <- connection_config(sc, "spark.", c("spark.sql."))
+      apply_config(context_config, conf, "set", "spark.")
 
-    # create the spark context and assign the connection to it
-    sc$spark_context <- invoke_static(
+      # create the spark context and assign the connection to it
+      sc$spark_context <- invoke_static(
+        sc,
+        "org.apache.spark.SparkContext",
+        "getOrCreate",
+        conf
+      )
+
+      invoke_static(sc, "sparklyr.Backend", "setSparkContext", sc$spark_context)
+    }
+
+    sc$spark_context$connection <- sc
+
+    # create the java spark context and assign the connection to it
+    sc$java_context <- invoke_static(
       sc,
-      "org.apache.spark.SparkContext",
-      "getOrCreate",
-      conf
+      "org.apache.spark.api.java.JavaSparkContext",
+      "fromSparkContext",
+      sc$spark_context
     )
+    sc$java_context$connection <- sc
 
-    invoke_static(sc, "sparklyr.Backend", "setSparkContext", sc$spark_context)
-  }
+    # create the hive context and assign the connection to it
+    sc$hive_context <- create_hive_context(sc)
+    sc$hive_context$connection <- sc
 
-  sc$spark_context$connection <- sc
-
-  # create the java spark context and assign the connection to it
-  sc$java_context <- invoke_static(
-    sc,
-    "org.apache.spark.api.java.JavaSparkContext",
-    "fromSparkContext",
-    sc$spark_context
-  )
-  sc$java_context$connection <- sc
-
-  # create the hive context and assign the connection to it
-  sc$hive_context <- create_hive_context(sc)
-  sc$hive_context$connection <- sc
-
-  # return the modified connection
-  sc
+    # return the modified connection
+    sc
+  }, error = function(e) {
+    abort_shell(
+      paste("Failed during initialize_connection:", e$message),
+      spark_submit_path,
+      shell_args,
+      output_file,
+      error_file
+    )
+  })
 }
 
 #' @export

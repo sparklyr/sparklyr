@@ -64,22 +64,40 @@ livy_get_session <- function(sc) {
   session
 }
 
-livy_quote_parameters <- function(parameters) {
+livy_code_quote_parameters <- function(parameters) {
   paste("\"", parameters, "\"", sep = "")
 }
 
-livy_compose_static <- function(sc, class, method, parameters) {
+livy_code_new_return_var <- function(sc) {
+  totalReturnVars <- sc$code$totalReturnVars
+  name <- paste("sparklyrRetVar", totalReturnVars, sep = "_")
+  sc$code$totalReturnVars <- totalReturnVars + 1
+
+  name
+}
+
+livy_code_compose_static <- function(sc, class, method, parameters) {
+  varName <- livy_code_new_return_var(sc)
+
   paste(
+    "var",
+    " ",
+    varName,
+    " = ",
     class,
     if (is.null(class)) "" else class,
     method,
     "(",
     paste(
-      livy_quote_parameters(parameters),
+      livy_code_quote_parameters(parameters),
       sep = ","
     ),
-    ")",
+    ");",
     sep = ""
+  )
+
+  list(
+    varName = varName
   )
 }
 
@@ -163,8 +181,11 @@ livy_connection <- function(master, config) {
   sc <- structure(class = c("spark_connection", "livy_connection"), list(
     master = master,
     sessionId = session$id,
-    config = config
+    config = config,
+    code = new.env()
   ))
+
+  sc$code$totalReturnVars <- 0
 
   waitStartTimeout <- spark_config_value(config, "livy.session.start.timeout", 60)
   waitStartReties <- waitStartTimeout * 10
@@ -243,45 +264,37 @@ spark_disconnect.livy_connection <- function(sc, ...) {
   }
 }
 
-#' @name invoke
 #' @export
-invoke <- function(jobj, method, ...) {
-  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
-}
-
-#' @name invoke
-#' @export
-invoke_static <- function(sc, class, method, ...) {
-  invoke_method(sc, TRUE, class, method, ...)
-}
-
-#' @name invoke
-#' @export
-invoke_new <- function(sc, class, ...) {
-  invoke_method(sc, TRUE, class, "<init>", ...)
-}
-
-#' @export
-invoke.spark_shell_connection <- function(jobj, method, ...) {
-  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
-}
-
-#' @export
-invoke_static.spark_shell_connection <- function(sc, class, method, ...) {
+invoke.livy_connection <- function(jobj, method, ...) {
   stop("NYI")
 }
 
 #' @export
-invoke_new.spark_shell_connection <- function(sc, class, ...) {
+invoke_static.livy_connection <- function(sc, class, method, ...) {
+  statement <- livy_code_compose_static(sc, class, method, ...)
+  livy_invoke_code(sc, statement)
+}
+
+#' @export
+invoke_new.livy_connection <- function(sc, class, ...) {
   stop("NYI")
 }
 
 #' @export
 initialize_connection.livy_connection <- function(sc) {
-  sc$spark_context <- sc$spark_context <- invoke_static(
-    sc,
-    "org.apache.spark.SparkContext",
-    "getOrCreate",
-    conf
-  )
+  tryCatch({
+    conf <- invoke_new(sc, "org.apache.spark.SparkConf")
+    conf <- invoke(conf, "setAppName", sc$app_name)
+    conf <- invoke(conf, "setMaster", sc$master)
+    conf <- invoke(conf, "setSparkHome", sc$spark_home)
+
+    sc$spark_context <- sc$spark_context <- invoke_static(
+      sc,
+      "org.apache.spark.SparkContext",
+      "getOrCreate",
+      conf
+    )
+  }, error = function(err) {
+    stop("Failed to initialize livy connection: ", err$message)
+  })
 }

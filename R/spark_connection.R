@@ -213,7 +213,7 @@ print.spark_web_url <- function(x, ...) {
 }
 
 initialize_connection <- function(sc) {
-  UseMethod("spark_connection")
+  UseMethod("initialize_connection")
 }
 
 
