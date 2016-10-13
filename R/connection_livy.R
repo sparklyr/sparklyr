@@ -65,7 +65,7 @@ livy_get_session <- function(sc) {
 }
 
 livy_code_quote_parameters <- function(parameters) {
-  paste("\"", parameters, "\"", sep = "")
+  if (length(parameters) > 0) paste("\"", parameters, "\"", sep = "") else ""
 }
 
 livy_code_new_return_var <- function(sc) {
@@ -76,70 +76,74 @@ livy_code_new_return_var <- function(sc) {
   name
 }
 
-livy_code_compose_static <- function(sc, class, method, parameters) {
+livy_lobj_create <- function(sc, varName) {
+  structure(
+    list(
+      sc = sc,
+      varName = varName,
+      response = NULL
+    ),
+    class = "spark_lobj"
+  )
+}
+
+livy_statement_compose_static <- function(sc, class, method, ...) {
+  parameters <- list(...)
   varName <- livy_code_new_return_var(sc)
 
   paste(
     "var ", varName, " = ",
-    class,
     if (is.null(class)) "" else paste(class, ".", sep = ""),
     method,
     "(",
-    paste(
-      livy_code_quote_parameters(parameters),
-      sep = ","
-    ),
+    livy_code_quote_parameters(parameters),
     ")",
     sep = ""
   )
 
   list(
-    varName = varName
+    code = code,
+    lobj = livy_lobj_create(sc, varName)
   )
 }
 
-livy_code_compose_method <- function(jobj, method, parameters) {
-  varName <- livy_code_get_return_var(sc)
+livy_statement_compose_method <- function(lobj, method, ...) {
+  parameters <- list(...)
+  varName <- livy_code_get_return_var(lobj$sc)
 
   paste(
     "var ", varName, " = ",
-    class,
-    jobj$varName,
+    lobj$varName,
     ".",
     method,
     "(",
-    paste(
-      livy_code_quote_parameters(parameters),
-      sep = ","
-    ),
+    livy_code_quote_parameters(parameters),
     ")",
     sep = ""
   )
 
   list(
-    varName = varName
+    code = code,
+    lobj = livy_lobj_create(lobj$sc, varName)
   )
 }
 
-livy_code_compose_new <- function(sc, class, parameters) {
+livy_statement_compose_new <- function(sc, class, ...) {
+  parameters <- list(...)
   varName <- livy_code_new_return_var(sc)
 
-  paste(
+  code <- paste(
     "var ", varName, " = new ",
     class,
-    if (is.null(class)) "" else class,
-    method,
     "(",
-    paste(
-      livy_code_quote_parameters(parameters),
-      sep = ","
-    ),
+    livy_code_quote_parameters(parameters),
     ")",
     sep = ""
   )
 
   list(
-    varName = varName
+    code = code,
+    lobj = livy_lobj_create(sc, varName)
   )
 }
 
@@ -152,14 +156,14 @@ livy_get_statement <- function(sc, statementId) {
   statement
 }
 
-livy_invoke_code <- function(sc, scala) {
+livy_invoke_statement <- function(sc, statement) {
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
     add_headers(
       "Content-Type" = "application/json"
     ),
     body = toJSON(
       list(
-        code = unbox(scala)
+        code = unbox(statement$code)
       )
     )
   )
@@ -168,31 +172,38 @@ livy_invoke_code <- function(sc, scala) {
     stop("Failed to invoke livy statement: ", content(req))
   }
 
-  statement <- content(req)
-  assert_that(!is.null(statement$id))
+  statementReponse <- content(req)
+  assert_that(!is.null(statementReponse$id))
 
   waitTimeout <- spark_config_value(sc$config, "livy.session.command.timeout", 60)
   waitTimeout <- waitTimeout * 10
-  while (statement$state == "running" &&
+  while (statementReponse$state == "running" &&
          waitTimeout > 0) {
-    statement <- livy_get_statement(sc, statement$id)
+    statementReponse <- livy_get_statement(sc, statementReponse$id)
 
     Sys.sleep(0.1)
     waitTimeout <- waitTimeout - 1
   }
 
-  if (statement$state != "available") {
-    stop("Failed to execute Livy statement with state ", statement$state)
+  if (statementReponse$state != "available") {
+    stop("Failed to execute Livy statement with state ", statementReponse$state)
   }
 
-  assert_that(!is.null(statement$output))
-  assert_that(!is.null(statement$output$data))
+  assert_that(!is.null(statementReponse$output))
 
-  if (!"text/plain" %in% names(statement$output$data)) {
-    stop("Livy statement with output type", statement$output$data[[1]], "is unsupported")
+  if (statementReponse$output$status == "error") {
+    stop("Failed to execute Livy statement with error: ", statementReponse$output$evalue)
   }
 
-  statement$output$data$`text/plain`
+  assert_that(!is.null(statementReponse$output$data))
+
+  if (!"text/plain" %in% names(statementReponse$output$data)) {
+    stop("Livy statement with output type", statementReponse$output$data[[1]], "is unsupported")
+  }
+
+  statement$lobj$response <- statement$output$data$`text/plain`
+
+  statement$lobj
 }
 
 livy_try_get_session <- function(sc) {
@@ -307,21 +318,21 @@ spark_disconnect.livy_connection <- function(sc, ...) {
 }
 
 #' @export
-invoke.livy_connection <- function(jobj, method, ...) {
-  statement <- livy_code_compose_method(sc, class, method, ...)
-  livy_invoke_code(sc, statement)
+invoke.spark_lobj <- function(lobj, method, ...) {
+  statement <- livy_statement_compose_method(lobj, method, ...)
+  livy_invoke_statement(sc, statement)
 }
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
-  statement <- livy_code_compose_static(sc, class, method, ...)
-  livy_invoke_code(sc, statement)
+  statement <- livy_statement_compose_static(sc, class, method, ...)
+  livy_invoke_statement(sc, statement)
 }
 
 #' @export
 invoke_new.livy_connection <- function(sc, class, ...) {
-  statement <- livy_code_compose_new(sc, class, ...)
-  livy_invoke_code(sc, statement)
+  statement <- livy_statement_compose_new(sc, class, ...)
+  livy_invoke_statement(sc, statement)
 }
 
 #' @export

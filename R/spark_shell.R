@@ -533,7 +533,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
 }
 
 #' @export
-invoke.spark_shell_connection <- function(jobj, method, ...) {
+invoke.spark_jobj <- function(jobj, method, ...) {
   invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
 }
 

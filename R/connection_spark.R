@@ -126,7 +126,7 @@ spark_connect <- function(master,
     stop("Unsupported connection method '", method, "'")
   }
 
-  sc <- initialize_connection(sc)
+  scon <- initialize_connection(scon)
 
   # mark the connection as a DBIConnection class to allow DBI to use defaults
   attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
