@@ -91,7 +91,7 @@ livy_statement_compose_static <- function(sc, class, method, ...) {
   parameters <- list(...)
   varName <- livy_code_new_return_var(sc)
 
-  paste(
+  code <- paste(
     "var ", varName, " = ",
     if (is.null(class)) "" else paste(class, ".", sep = ""),
     method,
@@ -109,9 +109,9 @@ livy_statement_compose_static <- function(sc, class, method, ...) {
 
 livy_statement_compose_method <- function(lobj, method, ...) {
   parameters <- list(...)
-  varName <- livy_code_get_return_var(lobj$sc)
+  varName <- livy_code_new_return_var(lobj$sc)
 
-  paste(
+  code <- paste(
     "var ", varName, " = ",
     lobj$varName,
     ".",
@@ -201,7 +201,7 @@ livy_invoke_statement <- function(sc, statement) {
     stop("Livy statement with output type", statementReponse$output$data[[1]], "is unsupported")
   }
 
-  statement$lobj$response <- statement$output$data$`text/plain`
+  statement$lobj$response <- statementReponse$output$data$`text/plain`
 
   statement$lobj
 }
@@ -338,17 +338,13 @@ invoke_new.livy_connection <- function(sc, class, ...) {
 #' @export
 initialize_connection.livy_connection <- function(sc) {
   tryCatch({
-    conf <- invoke_new(sc, "org.apache.spark.SparkConf")
-    conf <- invoke(conf, "setAppName", sc$app_name)
-    conf <- invoke(conf, "setMaster", sc$master)
-    conf <- invoke(conf, "setSparkHome", sc$spark_home)
-
-    sc$spark_context <- sc$spark_context <- invoke_static(
+    sc$spark_context <- invoke_static(
       sc,
       "org.apache.spark.SparkContext",
-      "getOrCreate",
-      conf
+      "getOrCreate"
     )
+
+    sc
   }, error = function(err) {
     stop("Failed to initialize livy connection: ", err$message)
   })
