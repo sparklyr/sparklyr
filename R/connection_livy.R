@@ -107,6 +107,24 @@ livy_lobj_create <- function(sc, varName) {
   )
 }
 
+livy_code_method_parameters <- function(parameters) {
+  scalaParams <- livy_code_quote_parameters(parameters)
+
+  if (nchar(scalaParams) > 0) {
+    paste(
+      "(",
+      scalaParams,
+      ")", sep = ""
+    )
+  } else {
+    # scala method calls do not require () which we need to omit
+    # to be compatible with the shell_connection/invoke api which
+    # does not make a distinction between calling properties and
+    # rity-0 function calls.
+    ""
+  }
+}
+
 livy_statement_compose_static <- function(sc, class, method, ...) {
   parameters <- list(...)
   varName <- livy_code_new_return_var(sc)
@@ -115,9 +133,7 @@ livy_statement_compose_static <- function(sc, class, method, ...) {
     "var ", varName, " = ",
     if (is.null(class)) "" else paste(class, ".", sep = ""),
     method,
-    "(",
-    livy_code_quote_parameters(parameters),
-    ")",
+    livy_code_method_parameters(parameters),
     sep = ""
   )
 
@@ -136,9 +152,7 @@ livy_statement_compose_method <- function(lobj, method, ...) {
     lobj$varName,
     ".",
     method,
-    "(",
-    livy_code_quote_parameters(parameters),
-    ")",
+    livy_code_method_parameters(parameters),
     sep = ""
   )
 
@@ -155,9 +169,7 @@ livy_statement_compose_new <- function(sc, class, ...) {
   code <- paste(
     "var ", varName, " = new ",
     class,
-    "(",
-    livy_code_quote_parameters(parameters),
-    ")",
+    livy_code_method_parameters(parameters),
     sep = ""
   )
 
