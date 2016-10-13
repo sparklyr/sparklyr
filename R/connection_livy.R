@@ -80,10 +80,52 @@ livy_code_compose_static <- function(sc, class, method, parameters) {
   varName <- livy_code_new_return_var(sc)
 
   paste(
-    "var",
-    " ",
-    varName,
-    " = ",
+    "var ", varName, " = ",
+    class,
+    if (is.null(class)) "" else paste(class, ".", sep = ""),
+    method,
+    "(",
+    paste(
+      livy_code_quote_parameters(parameters),
+      sep = ","
+    ),
+    ")",
+    sep = ""
+  )
+
+  list(
+    varName = varName
+  )
+}
+
+livy_code_compose_method <- function(jobj, method, parameters) {
+  varName <- livy_code_get_return_var(sc)
+
+  paste(
+    "var ", varName, " = ",
+    class,
+    jobj$varName,
+    ".",
+    method,
+    "(",
+    paste(
+      livy_code_quote_parameters(parameters),
+      sep = ","
+    ),
+    ")",
+    sep = ""
+  )
+
+  list(
+    varName = varName
+  )
+}
+
+livy_code_compose_new <- function(sc, class, parameters) {
+  varName <- livy_code_new_return_var(sc)
+
+  paste(
+    "var ", varName, " = new ",
     class,
     if (is.null(class)) "" else class,
     method,
@@ -92,7 +134,7 @@ livy_code_compose_static <- function(sc, class, method, parameters) {
       livy_code_quote_parameters(parameters),
       sep = ","
     ),
-    ");",
+    ")",
     sep = ""
   )
 
@@ -266,7 +308,8 @@ spark_disconnect.livy_connection <- function(sc, ...) {
 
 #' @export
 invoke.livy_connection <- function(jobj, method, ...) {
-  stop("NYI")
+  statement <- livy_code_compose_method(sc, class, method, ...)
+  livy_invoke_code(sc, statement)
 }
 
 #' @export
@@ -277,7 +320,8 @@ invoke_static.livy_connection <- function(sc, class, method, ...) {
 
 #' @export
 invoke_new.livy_connection <- function(sc, class, ...) {
-  stop("NYI")
+  statement <- livy_code_compose_new(sc, class, ...)
+  livy_invoke_code(sc, statement)
 }
 
 #' @export
