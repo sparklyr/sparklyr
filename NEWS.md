@@ -1,5 +1,9 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Resolved an issue where `copy_to()` and other R => Spark data transfer
+  functions could fail when the last column containing missing / empty values.
+  (#265)
+
 - Added `sdf_persist()`, as a wrapper to the Spark DataFrame `persist()` API.
 
 - Resolved an issue where `predict()` could produce results in the wrong

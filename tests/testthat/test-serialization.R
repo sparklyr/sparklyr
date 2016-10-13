@@ -114,3 +114,15 @@ test_that("'sdf_predict()', 'predict()' return same results", {
   expect_identical(lhs, rhs)
 
 })
+
+test_that("copy_to() succeeds when last column contains missing / empty values", {
+
+  df <- data.frame(
+    x = c(1, 2),
+    z = c(NA, ""),
+    stringsAsFactors = FALSE
+  )
+
+  copy_to(sc, df, serializer = "csv_string", overwrite = TRUE)
+
+})
