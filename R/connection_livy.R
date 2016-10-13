@@ -68,8 +68,10 @@ livy_quote_parameters <- function(parameters) {
   paste("\"", parameters, "\"", sep = "")
 }
 
-livy_compose_code <- function(sc, method, parameters) {
+livy_compose_static <- function(sc, class, method, parameters) {
   paste(
+    class,
+    if (is.null(class)) "" else class,
     method,
     "(",
     paste(
@@ -90,14 +92,14 @@ livy_get_statement <- function(sc, statementId) {
   statement
 }
 
-livy_invoke_method <- function(sc, method, parameters) {
+livy_invoke_code <- function(sc, scala) {
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
     add_headers(
       "Content-Type" = "application/json"
     ),
     body = toJSON(
       list(
-        code = unbox(livy_compose_code(sc, method, parameters))
+        code = unbox(scala)
       )
     )
   )
@@ -241,12 +243,45 @@ spark_disconnect.livy_connection <- function(sc, ...) {
   }
 }
 
+#' @name invoke
 #' @export
-invoke_method.livy_connection <- function(sc, static, object, method, ...) {
-  if (static) {
-    livy_invoke_method(sc, method, ...)
-  }
-  else {
-    stop("NYI")
-  }
+invoke <- function(jobj, method, ...) {
+  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
+}
+
+#' @name invoke
+#' @export
+invoke_static <- function(sc, class, method, ...) {
+  invoke_method(sc, TRUE, class, method, ...)
+}
+
+#' @name invoke
+#' @export
+invoke_new <- function(sc, class, ...) {
+  invoke_method(sc, TRUE, class, "<init>", ...)
+}
+
+#' @export
+invoke.spark_shell_connection <- function(jobj, method, ...) {
+  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
+}
+
+#' @export
+invoke_static.spark_shell_connection <- function(sc, class, method, ...) {
+  stop("NYI")
+}
+
+#' @export
+invoke_new.spark_shell_connection <- function(sc, class, ...) {
+  stop("NYI")
+}
+
+#' @export
+initialize_connection.livy_connection <- function(sc) {
+  sc$spark_context <- sc$spark_context <- invoke_static(
+    sc,
+    "org.apache.spark.SparkContext",
+    "getOrCreate",
+    conf
+  )
 }
