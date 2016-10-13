@@ -64,8 +64,28 @@ livy_get_session <- function(sc) {
   session
 }
 
-livy_code_quote_parameters <- function(parameters) {
-  if (length(parameters) > 0) paste("\"", parameters, "\"", sep = "") else ""
+livy_code_quote_parameters <- function(params) {
+  if (length(params) == 0) {
+    ""
+  } else {
+    params <- lapply(params, function(param) {
+      paramClass <- class(param)
+      if (paramClass == "character") {
+        paste("\"", param, "\"", sep = "")
+      }
+      else if (paramClass == "spark_lobj") {
+        param$varName
+      }
+      else if (is.numeric(param)) {
+        param
+      }
+      else {
+        stop("Unsupported parameter ", param, " of class ", paramClass, " detected")
+      }
+    })
+
+    paste(params, collapse = ",")
+  }
 }
 
 livy_code_new_return_var <- function(sc) {
@@ -342,6 +362,13 @@ initialize_connection.livy_connection <- function(sc) {
       sc,
       "org.apache.spark.SparkContext",
       "getOrCreate"
+    )
+
+    sc$java_context <- invoke_static(
+      sc,
+      "org.apache.spark.api.java.JavaSparkContext",
+      "fromSparkContext",
+      sc$spark_context
     )
 
     sc
