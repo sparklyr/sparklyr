@@ -1,5 +1,5 @@
 spark_version_clean <- function(version) {
-  gsub("([0-9]+\\.?)[^0-9\\.](.*)","\\1", version)
+  gsub("\\.$","", gsub("([0-9]+\\.?)[^0-9\\.](.*)","\\1", version))
 }
 
 #' Get the Spark Version Associated with a Spark Connection
@@ -51,6 +51,9 @@ spark_version_from_home_version <- function() {
 #' @export
 spark_version_from_home <- function(spark_home, default = NULL) {
   versionAttempts <- list(
+    useEnvironmentVariable = function() {
+      spark_version_from_home_version()
+    },
     useReleaseFile = function() {
       versionedFile <- file.path(spark_home, "RELEASE")
       if (file.exists(versionedFile)) {
@@ -87,9 +90,6 @@ spark_version_from_home <- function(spark_home, default = NULL) {
           return(match[[1]][[2]])
         }
       }
-    },
-    useEnvironmentVariable = function() {
-      spark_version_from_home_version()
     },
     useDefault = function() {
       default
