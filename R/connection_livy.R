@@ -179,7 +179,9 @@ livy_statement_compose_new <- function(sc, class, ...) {
   )
 }
 
-livy_statement_parse_response <- function(lobj, text) {
+livy_statement_parse_response <- function(lobj) {
+  text <- lobj$response
+
   parsed <- regmatches(text, regexec("([^:]+): ([a-zA-Z0-9.]+) = (.*)", text))
   if (length(parsed) != 1) {
     stop("Failed to parse stastement reponse: ", text)
@@ -272,9 +274,10 @@ livy_invoke_statement <- function(sc, statement) {
     stop("Livy statement with output type", statementReponse$output$data[[1]], "is unsupported")
   }
 
-  response <- livy_statement_parse_response(statement$lobj, statementReponse$output$data$`text/plain`)
+  statement$lobj$response <- statementReponse$output$data$`text/plain`
+  result <- livy_statement_parse_response(statement$lobj)
 
-  response
+  result
 }
 
 livy_try_get_session <- function(sc) {
@@ -421,6 +424,21 @@ initialize_connection.livy_connection <- function(sc) {
       "fromSparkContext",
       sc$spark_context
     )
+
+    if (spark_version(sc) >= "2.0.0") {
+      sc$hive_context <- create_hive_context_v2(sc)
+    }
+    else {
+      sc$hive_context <- invoke_new(
+        sc,
+        "org.apache.spark.sql.hive.HiveContext",
+        sc$spark_context
+      )
+
+      # apply configuration
+      params <- connection_config(sc, "spark.sql.")
+      apply_config(params, hive_context, "setConf", "spark.sql.")
+    }
 
     sc
   }, error = function(err) {
