@@ -445,3 +445,8 @@ initialize_connection.livy_connection <- function(sc) {
     stop("Failed to initialize livy connection: ", err$message)
   })
 }
+
+#' @export
+spark_connection.spark_lobj <- function(x, ...) {
+  x$sc
+}
