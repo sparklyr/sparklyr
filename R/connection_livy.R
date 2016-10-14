@@ -391,7 +391,7 @@ spark_disconnect.livy_connection <- function(sc, ...) {
 #' @export
 invoke.spark_lobj <- function(jobj, method, ...) {
   statement <- livy_statement_compose_method(jobj, method, ...)
-  livy_invoke_statement(sc, statement)
+  livy_invoke_statement(jobj$sc, statement)
 }
 
 #' @export
