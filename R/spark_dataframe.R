@@ -24,3 +24,8 @@ spark_dataframe.spark_jobj <- function(x, ...) {
   x
 }
 
+#' @export
+spark_dataframe.spark_lobj <- function(x, ...) {
+  x
+}
+
