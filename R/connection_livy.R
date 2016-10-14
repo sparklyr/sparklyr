@@ -117,12 +117,19 @@ livy_code_method_parameters <- function(parameters) {
       ")", sep = ""
     )
   } else {
-    # scala method calls do not require () which we need to omit
+    # scala method calls do not require () which sparklyrwe need to omit
     # to be compatible with the shell_connection/invoke api which
     # does not make a distinction between calling properties and
     # rity-0 function calls.
     ""
   }
+}
+
+livy_statement_compose <- function(code, lobj) {
+  list(
+    code = code,
+    lobj = lobj
+  )
 }
 
 livy_statement_compose_static <- function(sc, class, method, ...) {
@@ -137,7 +144,7 @@ livy_statement_compose_static <- function(sc, class, method, ...) {
     sep = ""
   )
 
-  list(
+  livy_statement_compose(
     code = code,
     lobj = livy_lobj_create(sc, varName)
   )
@@ -156,9 +163,24 @@ livy_statement_compose_method <- function(lobj, method, ...) {
     sep = ""
   )
 
-  list(
+  livy_statement_compose(
     code = code,
     lobj = livy_lobj_create(lobj$sc, varName)
+  )
+}
+
+livy_statement_compose_magic <- function(lobj, magic) {
+  code <- paste(
+    "%",
+    magic,
+    " ",
+    lobj$varName,
+    sep = ""
+  )
+
+  livy_statement_compose(
+    code = code,
+    lobj = NULL
   )
 }
 
@@ -173,40 +195,42 @@ livy_statement_compose_new <- function(sc, class, ...) {
     sep = ""
   )
 
-  list(
+  livy_statement_compose(
     code = code,
     lobj = livy_lobj_create(sc, varName)
   )
 }
 
-livy_statement_parse_response <- function(lobj) {
-  text <- lobj$response
-
-  parsed <- regmatches(text, regexec("([^:]+): ([^ ]+) = (.*)", text))
+livy_statement_parse_response <- function(text, lobj) {
+  parsed <- regmatches(text, regexec("([^:]+): (Array)?\\[?([a-zA-Z0-9.]+)\\]? = (.*)", text))
   if (length(parsed) != 1) {
-    stop("Failed to parse stastement reponse: ", text)
+    stop("Failed to parse statement reponse: ", text)
   }
 
   parsed <- parsed[[1]]
-  if (length(parsed) != 4) {
-    stop("Failed to parse stastement reponse: ", text)
+  if (length(parsed) != 5) {
+    stop("Failed to parse statement reponse: ", text)
   }
 
-  assert_that(parsed[[2]] == lobj$varName)
+  varName <- parsed[[2]]
+  collectionType <- parsed[[3]]
+  scalaType <- parsed[[4]]
+  scalaValue <- parsed[[5]]
+
+  if (nchar(collectionType) > 0 && collectionType != "Array") {
+    stop("Failed to parse statement, unrecognized collection type: ", text)
+  }
 
   livyToRTypeMap <- list(
     "String" = list(
       type = "character",
       parse = function(e) e
     ),
-    "Integer" = list(
+    "Int" = list(
       type = "integer",
       parse = function(e) as.integer(e)
     )
   )
-
-  scalaType <- parsed[[3]]
-  scalaValue <- parsed[[4]]
 
   type <- "object"
   value <- scalaValue
@@ -215,6 +239,13 @@ livy_statement_parse_response <- function(lobj) {
     livyToRTypeMapInst <- livyToRTypeMap[[scalaType]]
     type <- livyToRTypeMapInst$type
     value <- livyToRTypeMapInst$parse(scalaValue)
+  }
+
+  if (collectionType == "Array") {
+    lobj$collection = list(
+      type = "array",
+      entries = type
+    )
   }
 
   if (type == "object") lobj else value
@@ -227,6 +258,10 @@ livy_get_statement <- function(sc, statementId) {
   assert_that(statement$id == statementId)
 
   statement
+}
+
+livy_inspect <- function(lobj) {
+
 }
 
 livy_invoke_statement <- function(sc, statement) {
@@ -270,14 +305,54 @@ livy_invoke_statement <- function(sc, statement) {
 
   assert_that(!is.null(statementReponse$output$data))
 
-  if (!"text/plain" %in% names(statementReponse$output$data)) {
-    stop("Livy statement with output type", statementReponse$output$data[[1]], "is unsupported")
+  supportedDataTypes <- list(
+    "text/plain" = list(
+      dataToResult = function(data) {
+        livy_statement_parse_response(data, statement$lobj)
+      }
+    ),
+    "application/json" = list(
+      dataToResult = function(data) {
+        data
+      }
+    )
+  )
+
+  data <- statementReponse$output$data
+  assert_that(length(data) == 1)
+  dataType <- names(data)[[1]]
+  data <- data[[1]]
+
+  if (!dataType %in% names(supportedDataTypes)) {
+    stop("Livy statement with output type ", dataType, " is unsupported")
   }
 
-  statement$lobj$response <- statementReponse$output$data$`text/plain`
-  result <- livy_statement_parse_response(statement$lobj)
-
+  result <- supportedDataTypes[[dataType]]$dataToResult(data)
   result
+}
+
+livy_invoke_statement_fetch <- function(sc, statement) {
+  result <- livy_invoke_statement(sc, statement)
+
+  if (class(result) == "spark_lobj" && !is.null(result$collection)) {
+    if (result$collection$entries == "object") {
+      lengthStatement <- livy_statement_compose(
+        code = paste(result$varName, ".length", sep = ""),
+        lobj = NULL)
+      lengthResult <- livy_invoke_statement(sc, lengthStatement)
+
+      lapply(seq_len(lengthResult), function(idx) {
+        livy_lobj_create(sc, paste(result$varName, "(", (idx - 1), ")", sep = ""))
+      })
+    }
+    else {
+      jsonStatement <- livy_statement_compose_magic(result, "json")
+      livy_invoke_statement(sc, jsonStatement)
+    }
+  }
+  else {
+    result
+  }
 }
 
 livy_try_get_session <- function(sc) {
@@ -394,19 +469,19 @@ spark_disconnect.livy_connection <- function(sc, ...) {
 #' @export
 invoke.spark_lobj <- function(jobj, method, ...) {
   statement <- livy_statement_compose_method(jobj, method, ...)
-  livy_invoke_statement(jobj$sc, statement)
+  livy_invoke_statement_fetch(jobj$sc, statement)
 }
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
   statement <- livy_statement_compose_static(sc, class, method, ...)
-  livy_invoke_statement(sc, statement)
+  livy_invoke_statement_fetch(sc, statement)
 }
 
 #' @export
 invoke_new.livy_connection <- function(sc, class, ...) {
   statement <- livy_statement_compose_new(sc, class, ...)
-  livy_invoke_statement(sc, statement)
+  livy_invoke_statement_fetch(sc, statement)
 }
 
 #' @export
