@@ -182,7 +182,7 @@ livy_statement_compose_new <- function(sc, class, ...) {
 livy_statement_parse_response <- function(lobj) {
   text <- lobj$response
 
-  parsed <- regmatches(text, regexec("([^:]+): ([a-zA-Z0-9.]+) = (.*)", text))
+  parsed <- regmatches(text, regexec("([^:]+): ([^ ]+) = (.*)", text))
   if (length(parsed) != 1) {
     stop("Failed to parse stastement reponse: ", text)
   }
