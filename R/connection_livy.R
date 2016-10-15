@@ -117,7 +117,7 @@ livy_code_method_parameters <- function(parameters) {
       ")", sep = ""
     )
   } else {
-    # scala method calls do not require () which sparklyrwe need to omit
+    # scala method calls do not require () which we need to omit
     # to be compatible with the shell_connection/invoke api which
     # does not make a distinction between calling properties and
     # rity-0 function calls.
@@ -202,6 +202,14 @@ livy_statement_compose_new <- function(sc, class, ...) {
 }
 
 livy_statement_parse_response <- function(text, lobj) {
+  nullResponses <- list(
+    "defined module.*"
+  )
+
+  if (regexec(paste(nullResponses, collapse = "|"), text)[[1]][[1]] > 0) {
+    return(NULL)
+  }
+
   parsed <- regmatches(text, regexec("([^:]+): (Array)?\\[?([a-zA-Z0-9.]+)\\]? = (.*)", text))
   if (length(parsed) != 1) {
     stop("Failed to parse statement reponse: ", text)
@@ -221,10 +229,16 @@ livy_statement_parse_response <- function(text, lobj) {
     stop("Failed to parse statement, unrecognized collection type: ", text)
   }
 
+  removeQuotes <- function(e) gsub("^\"|\"$", "", e)
+
   livyToRTypeMap <- list(
     "String" = list(
       type = "character",
-      parse = function(e) e
+      parse = function(e) removeQuotes(e)
+    ),
+    "java.io.Serializable" = list(
+      type = "character",
+      parse = function(e) removeQuotes(e)
     ),
     "Int" = list(
       type = "integer",
@@ -264,14 +278,14 @@ livy_inspect <- function(lobj) {
 
 }
 
-livy_invoke_statement <- function(sc, statement) {
+livy_post_statement <- function(sc, code) {
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
     add_headers(
       "Content-Type" = "application/json"
     ),
     body = toJSON(
       list(
-        code = unbox(statement$code)
+        code = unbox(code)
       )
     )
   )
@@ -303,7 +317,12 @@ livy_invoke_statement <- function(sc, statement) {
     stop("Failed to execute Livy statement with error: ", statementReponse$output$evalue)
   }
 
-  assert_that(!is.null(statementReponse$output$data))
+  statementReponse$output$data
+}
+
+livy_invoke_statement <- function(sc, statement) {
+  data <- livy_post_statement(sc, statement$code)
+  assert_that(!is.null(data))
 
   supportedDataTypes <- list(
     "text/plain" = list(
@@ -318,7 +337,6 @@ livy_invoke_statement <- function(sc, statement) {
     )
   )
 
-  data <- statementReponse$output$data
   assert_that(length(data) == 1)
   dataType <- names(data)[[1]]
   data <- data[[1]]
@@ -466,6 +484,10 @@ spark_disconnect.livy_connection <- function(sc, ...) {
   }
 }
 
+livy_map_class <- function(class) {
+  gsub("sparklyr.", "", class)
+}
+
 #' @export
 invoke.spark_lobj <- function(jobj, method, ...) {
   statement <- livy_statement_compose_method(jobj, method, ...)
@@ -474,19 +496,33 @@ invoke.spark_lobj <- function(jobj, method, ...) {
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
+  class <- livy_map_class(class)
+
   statement <- livy_statement_compose_static(sc, class, method, ...)
   livy_invoke_statement_fetch(sc, statement)
 }
 
 #' @export
 invoke_new.livy_connection <- function(sc, class, ...) {
+  class <- livy_map_class(class)
+
   statement <- livy_statement_compose_new(sc, class, ...)
   livy_invoke_statement_fetch(sc, statement)
+}
+
+livy_load_scala_sources <- function(sc) {
+  sourcesFile <- system.file(file.path("livy", "livy.scala"), package = "sparklyr")
+  sources <- paste(readLines(sourcesFile), collapse = "\n")
+
+  statement <- livy_statement_compose(sources, NULL)
+  livy_invoke_statement(sc, statement)
 }
 
 #' @export
 initialize_connection.livy_connection <- function(sc) {
   tryCatch({
+    livy_load_scala_sources(sc)
+
     sc$spark_context <- invoke_static(
       sc,
       "org.apache.spark.SparkContext",
