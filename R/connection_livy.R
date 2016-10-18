@@ -79,6 +79,9 @@ livy_code_quote_parameters <- function(params) {
       else if (is.numeric(param)) {
         param
       }
+      else if (is.logical(param)) {
+        if (isTRUE(param)) "true" else "false"
+      }
       else {
         stop("Unsupported parameter ", param, " of class ", paramClass, " detected")
       }
