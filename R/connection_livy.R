@@ -83,16 +83,9 @@ livy_code_quote_parameters <- function(params) {
         if (isTRUE(param)) "true" else "false"
       }
       else if (is.list(param)) {
-        namesOrValues <- lapply(param, function(elem) {
-          if (class(elem) == "spark_lobj")
-            elem$varName
-          else
-            stop("Unsupported element ", elem, " of type ", typeof(elem), " in parameter list")
-        })
-
         paste(
           "Array(",
-          paste(namesOrValues, collapse = ", "),
+          livy_code_quote_parameters(param),
           ")",
           sep = ""
         )
