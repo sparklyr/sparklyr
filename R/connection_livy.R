@@ -514,11 +514,17 @@ invoke_new.livy_connection <- function(sc, class, ...) {
 }
 
 livy_load_scala_sources <- function(sc) {
-  sourcesFile <- system.file(file.path("livy", "livy.scala"), package = "sparklyr")
+  livySources <- c(
+    "utils.scala", "sqlutils.scala"
+  )
+
+  lapply(livySources, function(sourceName) {
+    sourcesFile <- system.file(file.path("livy", sourceName), package = "sparklyr")
   sources <- paste(readLines(sourcesFile), collapse = "\n")
 
   statement <- livy_statement_compose(sources, NULL)
   livy_invoke_statement(sc, statement)
+  })
 }
 
 #' @export
