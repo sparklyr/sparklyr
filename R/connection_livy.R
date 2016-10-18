@@ -82,6 +82,21 @@ livy_code_quote_parameters <- function(params) {
       else if (is.logical(param)) {
         if (isTRUE(param)) "true" else "false"
       }
+      else if (is.list(param)) {
+        namesOrValues <- lapply(param, function(elem) {
+          if (class(elem) == "spark_lobj")
+            elem$varName
+          else
+            stop("Unsupported element ", elem, " of type ", typeof(elem), " in parameter list")
+        })
+
+        paste(
+          "Array(",
+          paste(namesOrValues, collapse = ", "),
+          ")",
+          sep = ""
+        )
+      }
       else {
         stop("Unsupported parameter ", param, " of class ", paramClass, " detected")
       }
