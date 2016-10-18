@@ -215,6 +215,7 @@ remove_class <- function(object, class) {
 
   attr(object, "class") <- newClasses
   object
+}
 
 sparklyr_boolean_option <- function(...) {
 
