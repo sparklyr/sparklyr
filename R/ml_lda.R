@@ -39,7 +39,14 @@ ml_lda <- function(x,
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  ml_prepare_features(df, features)
+  ml_backwards_compatibility_api()
+
+  df <- ml_prepare_features(
+    x = df,
+    features = features,
+    envir = environment(),
+    ml.options = ml.options
+  )
 
   alpha      <- ensure_scalar_double(alpha)
   beta       <- ensure_scalar_double(beta)

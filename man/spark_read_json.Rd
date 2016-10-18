@@ -13,7 +13,7 @@ spark_read_json(sc, name, path, options = list(), repartition = 0,
 \item{name}{The name to assign to the newly generated table.}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the "hdfs://", "s3n://" and "file://" protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{options}{A list of strings with additional options.}
 

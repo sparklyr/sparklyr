@@ -113,7 +113,12 @@ spark_sanitize_names <- function(names) {
   newNames <- make.unique(newNames, sep = "_")
 
   # report translations
-  if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
+  verbose <- sparklyr_boolean_option(
+    "sparklyr.sanitize.column.names.verbose",
+    "sparklyr.verbose"
+  )
+
+  if (verbose) {
 
     changedIdx <- which(oldNames != newNames)
     if (length(changedIdx)) {
@@ -158,6 +163,10 @@ stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
     sprintf(fmt, ...),
     if (call.) sys.call(sys.parent())
   ))
+}
+
+warnf <- function(fmt, ..., call. = TRUE, immediate. = FALSE) {
+  warning(sprintf(fmt, ...), call. = call., immediate. = immediate.)
 }
 
 enumerate <- function(object, f, ...) {
@@ -206,4 +215,18 @@ remove_class <- function(object, class) {
 
   attr(object, "class") <- newClasses
   object
+
+sparklyr_boolean_option <- function(...) {
+
+  for (name in list(...)) {
+    value <- getOption(name) %||% FALSE
+    if (length(value) == 1 && isTRUE(as.logical(value)))
+      return(TRUE)
+  }
+
+  FALSE
+}
+
+sparklyr_verbose <- function(...) {
+  sparklyr_boolean_option(..., "sparklyr.verbose")
 }

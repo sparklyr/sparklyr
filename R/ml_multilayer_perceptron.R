@@ -33,12 +33,13 @@ ml_multilayer_perceptron <- function(x,
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
-    df,
-    response,
-    features,
-    NULL,
-    environment(),
-    categorical.transformations
+    x = df,
+    response = response,
+    features = features,
+    intercept = NULL,
+    envir = environment(),
+    categorical.transformations = categorical.transformations,
+    ml.options = ml.options
   )
 
   layers <- as.integer(layers)
