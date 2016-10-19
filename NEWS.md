@@ -1,6 +1,10 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
-- Fixed windows spark_connect with long paths and spaces.
+- Implemented support for `na.action` with the various Spark.ML routines,
+  and set the default as `na.omit`. Users can customize the `na.action`
+  argument through the `ml.options` object accepted by all ML routines.
+
+- Fixed windows `spark_connect` with long paths and spaces.
 
 - The `lag()` window function now accepts numeric values for `n`. (#249)
 

@@ -81,6 +81,7 @@ validate_formula_operators <- function(object) {
 #'   variables that included in the model formula will be transformed into
 #'   binary variables, and the generated mappings will be stored in this
 #'   environment.
+#' @template roxlate-ml-options
 #'
 #' @rdname ml_prepare_inputs
 #' @rdname ml_prepare_inputs
@@ -100,7 +101,8 @@ ml_prepare_response_features_intercept <- function(x = NULL,
                                                    features,
                                                    intercept,
                                                    envir = parent.frame(),
-                                                   categorical.transformations = new.env(parent = emptyenv()))
+                                                   categorical.transformations = new.env(parent = emptyenv()),
+                                                   ml.options = ml_options())
 {
   # construct dummy data.frame from Spark DataFrame schema
   df <- x
@@ -144,6 +146,14 @@ ml_prepare_response_features_intercept <- function(x = NULL,
   assign("features", features, envir = envir)
   assign("intercept", intercept, envir = envir)
 
+  # apply na.action
+  df <- apply_na_action(
+    x         = df,
+    response  = response,
+    features  = features,
+    na.action = ml.options$na.action
+  )
+
   # return mutated dataset
   df
 }
@@ -151,8 +161,11 @@ ml_prepare_response_features_intercept <- function(x = NULL,
 #' @rdname ml_prepare_inputs
 #' @name   ml_prepare_inputs
 #' @export
-ml_prepare_features <- function(x, features, envir = parent.frame()) {
-
+ml_prepare_features <- function(x,
+                                features,
+                                envir = parent.frame(),
+                                ml.options = ml_options())
+{
   if (is.formula(features)) {
     parsed <- parse_formula(features)
     features <- parsed$features
@@ -165,6 +178,15 @@ ml_prepare_features <- function(x, features, envir = parent.frame()) {
   if (missing(x))
     return(features)
 
-  x
+  # apply na.action
+  df <- apply_na_action(
+    x = x,
+    response = NULL,
+    features = features,
+    na.action = ml.options$na.action
+  )
+
+  # return mutated dataset
+  df
 }
 

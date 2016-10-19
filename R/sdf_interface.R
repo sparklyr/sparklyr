@@ -513,12 +513,39 @@ ml_create_dummy_variables <- function(x,
 
 #' @export
 na.omit.tbl_spark <- function(object, columns = NULL, ...) {
-  sdf <- spark_dataframe(object)
-  na <- invoke(sdf, "na")
+  na.omit(spark_dataframe(object), columns = NULL, ...)
+}
+
+#' @export
+na.omit.spark_jobj <- function(object, columns = NULL, ...) {
+
+  # report number of rows dropped if requested
+  verbose <- sparklyr_boolean_option(
+    "sparklyr.na.omit.verbose",
+    "sparklyr.na.action.verbose",
+    "sparklyr.verbose"
+  )
+
+  n_before <- if (verbose) invoke(object, "count")
+
+  na <- invoke(object, "na")
   dropped <- if (is.null(columns))
     invoke(na, "drop")
   else
     invoke(na, "drop", as.list(columns))
+
+  n_after <- if (verbose) invoke(dropped, "count")
+
+  if (verbose) {
+    n_diff <- n_before - n_after
+    if (n_diff > 0) {
+      fmt <- "* Dropped %s rows with 'na.omit' (%s => %s)"
+      message(sprintf(fmt, n_diff, n_before, n_after))
+    } else {
+      message("* No rows dropped by 'na.omit' call")
+    }
+  }
+
   sdf_register(dropped)
 }
 
@@ -537,16 +564,20 @@ na.replace <- function(object, ...) {
 
 #' @export
 na.replace.tbl_spark <- function(object, ...) {
-  sdf <- spark_dataframe(object)
+  na.replace(spark_dataframe(object), ...)
+}
+
+#' @export
+na.replace.spark_jobj <- function(object, ...) {
   dots <- list(...)
   enumerate(dots, function(key, val) {
-    na <- invoke(sdf, "na")
-    sdf <<- if (is.null(key))
+    na <- invoke(object, "na")
+    object <<- if (is.null(key))
       invoke(na, "fill", val)
     else
       invoke(na, "fill", val, as.list(key))
   })
-  sdf_register(sdf)
+  sdf_register(object)
 }
 
 #' Add a Unique ID Column to a Spark DataFrame

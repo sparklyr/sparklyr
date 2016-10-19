@@ -25,7 +25,7 @@ spark_csv_options <- function(header,
 #' @param sc A \code{spark_connection}.
 #' @param name The name to assign to the newly generated table.
 #' @param path The path to the file. Needs to be accessible from the cluster.
-#'   Supports the "hdfs://", "s3n://" and "file://" protocols.
+#'   Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.
 #' @param memory Boolean; should the data be loaded eagerly into memory? (That
 #'   is, should the table be cached?)
 #' @param header Boolean; should the first row of data be used as a header?
@@ -33,7 +33,7 @@ spark_csv_options <- function(header,
 #' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
 #' @param quote The character used as a quote. Defaults to \samp{'"'}.
 #' @param escape The character used to escape other characters. Defaults to \samp{'\'}.
-#' @param charset The character set. Defaults to \verb{"UTF-8"}.
+#' @param charset The character set. Defaults to \samp{"UTF-8"}.
 #' @param null_value The character to use for null, or missing, values. Defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
 #' @param repartition The number of partitions used to distribute the

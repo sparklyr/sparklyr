@@ -12,7 +12,7 @@ spark_write_csv(x, path, header = TRUE, delimiter = ",", quote = "\\"",
 \item{x}{A Spark DataFrame or dplyr operation}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the "hdfs://", "s3n://" and "file://" protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{header}{Should the first row of data be used as a header? Defaults to \code{TRUE}.}
 

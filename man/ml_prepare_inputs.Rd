@@ -8,9 +8,11 @@
 \usage{
 ml_prepare_response_features_intercept(x = NULL, response, features,
   intercept, envir = parent.frame(),
-  categorical.transformations = new.env(parent = emptyenv()))
+  categorical.transformations = new.env(parent = emptyenv()),
+  ml.options = ml_options())
 
-ml_prepare_features(x, features, envir = parent.frame())
+ml_prepare_features(x, features, envir = parent.frame(),
+  ml.options = ml_options())
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -36,6 +38,9 @@ categorical variables were binarized in this procedure. Categorical
 variables that included in the model formula will be transformed into
 binary variables, and the generated mappings will be stored in this
 environment.}
+
+\item{ml.options}{Optional arguments, used to affect the model generated. See
+\code{\link{ml_options}} for more details.}
 }
 \description{
 Pre-process / normalize the inputs typically passed to a
