@@ -23,9 +23,7 @@ Depends:
     R (>= 3.1.2)
 Imports:
     methods,
-    magrittr,
     lazyeval (>= 0.2.0),
-    tibble (>= 1.1),
     dplyr (>= 0.5.0),
     DBI (>= 0.4.1),
     readr (>= 0.2.0),
