@@ -1,5 +1,10 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- `sparklyr` now defaults to `tar = "internal"` in its calls to `untar()`.
+  This should help resolve issues some Windows users have seen related to
+  an inability to connect to Spark, which ultimately were caused by a lack
+  of permissions on the Spark installation.
+
 - Resolved an issue where `copy_to()` and other R => Spark data transfer
   functions could fail when the last column contained missing / empty values.
   (#265)
