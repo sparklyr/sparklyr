@@ -7,7 +7,7 @@
 #' @rdname pipe
 #' @keywords internal
 #' @export
-#' @impor dplyr
+#' @import dplyr
 #' @usage lhs \%>\% rhs
 NULL
 
