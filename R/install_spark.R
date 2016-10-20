@@ -178,7 +178,10 @@ spark_install <- function(version = NULL,
     if (status)
       stopf("Failed to download Spark: download exited with status %s", status)
 
-    untar(tarfile = installInfo$packageLocalPath, exdir = installInfo$sparkDir)
+    untar(tarfile = installInfo$packageLocalPath,
+          exdir = installInfo$sparkDir,
+          tar = "internal")
+
     unlink(installInfo$packageLocalPath)
 
     if (verbose)
@@ -273,7 +276,9 @@ spark_install_tar <- function(tarfile) {
       "The given file does not conform with the following pattern: ", filePattern))
   }
 
-  untar(tarfile = tarfile, exdir = spark_install_dir())
+  untar(tarfile = tarfile,
+        exdir = spark_install_dir(),
+        tar = "internal")
 }
 
 spark_conf_file_set_value <- function(installInfo, properties, reset) {
