@@ -34,7 +34,7 @@ spark_csv_options <- function(header,
 #'   Defaults to \code{TRUE}.
 #' @param columns A named vector specifying column types.
 #' @param infer_schema Boolean; should column types be automatically inferred?
-#'   Requires one extra pass over the data. Defaults to \code{FALSE}.
+#'   Requires one extra pass over the data. Defaults to \code{TRUE}.
 #' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
 #' @param quote The character used as a quote. Defaults to \samp{'"'}.
 #' @param escape The character used to escape other characters. Defaults to \samp{'\'}.
@@ -64,7 +64,7 @@ spark_read_csv <- function(sc,
                            path,
                            header = TRUE,
                            columns = NULL,
-                           infer_schema = FALSE,
+                           infer_schema = TRUE,
                            delimiter = ",",
                            quote = "\"",
                            escape = "\\",
@@ -140,7 +140,7 @@ spark_write_csv.tbl_spark <- function(x,
                                       null_value = NULL,
                                       options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
+  options <- spark_csv_options(header, TRUE, delimiter, quote, escape, charset, null_value, options)
 
   spark_csv_write(sqlResult, spark_normalize_path(path), options)
 }
@@ -156,7 +156,7 @@ spark_write_csv.spark_jobj <- function(x,
                                        null_value = NULL,
                                        options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
+  options <- spark_csv_options(header, TRUE, delimiter, quote, escape, charset, null_value, options)
 
   spark_csv_write(x, spark_normalize_path(path), options)
 }
