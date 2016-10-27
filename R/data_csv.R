@@ -5,6 +5,17 @@ spark_csv_read <- function(sc,
   read <- invoke(hive_context(sc), "read")
   options <- invoke(read, "format", "com.databricks.spark.csv")
 
+  if (!identical(columns, NULL)) {
+    ncol_ds <- options %>%
+      invoke("load", path) %>%
+      invoke("schema") %>%
+      invoke("length")
+
+    if (ncol_ds != length(columns)) {
+      warning("Dataset has ", ncol_ds, " columns but 'columns' has length ", length(columns))
+    }
+  }
+
   lapply(names(csvOptions), function(csvOptionName) {
     options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
   })
