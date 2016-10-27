@@ -4,9 +4,10 @@
 \alias{spark_read_csv}
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
-spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
-  quote = "\\"", escape = "\\\\", charset = "UTF-8", null_value = NULL,
-  options = list(), repartition = 0, memory = TRUE, overwrite = TRUE)
+spark_read_csv(sc, name, path, header = TRUE, columns = NULL,
+  infer_schema = FALSE, delimiter = ",", quote = "\\"", escape = "\\\\",
+  charset = "UTF-8", null_value = NULL, options = list(),
+  repartition = 0, memory = TRUE, overwrite = TRUE)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -18,6 +19,11 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{header}{Boolean; should the first row of data be used as a header?
 Defaults to \code{TRUE}.}
+
+\item{columns}{A named vector specifying column types.}
+
+\item{infer_schema}{Boolean; should column types be automatically inferred?
+Requires one extra pass over the data. Defaults to \code{FALSE}.}
 
 \item{delimiter}{The character used to delimit each column. Defaults to \samp{','}.}
 

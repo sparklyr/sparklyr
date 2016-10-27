@@ -10,7 +10,7 @@ spark_csv_read <- function(sc,
   })
 
   if (identical(columns, NULL)) {
-    optionSchema <- invoke(options, "option", "inferSchema", "true")
+    optionSchema <- options
   }
   else {
     columnDefs <- spark_data_build_types(sc, columns)

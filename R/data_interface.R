@@ -1,4 +1,5 @@
 spark_csv_options <- function(header,
+                              inferSchema,
                               delimiter,
                               quote,
                               escape,
@@ -9,6 +10,7 @@ spark_csv_options <- function(header,
     options,
     list(
       header = ifelse(header, "true", "false"),
+      inferSchema = ifelse(inferSchema, "true", "false"),
       delimiter = toString(delimiter),
       quote = toString(quote),
       escape = toString(escape),
@@ -30,6 +32,9 @@ spark_csv_options <- function(header,
 #'   is, should the table be cached?)
 #' @param header Boolean; should the first row of data be used as a header?
 #'   Defaults to \code{TRUE}.
+#' @param columns A named vector specifying column types.
+#' @param infer_schema Boolean; should column types be automatically inferred?
+#'   Requires one extra pass over the data. Defaults to \code{FALSE}.
 #' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
 #' @param quote The character used as a quote. Defaults to \samp{'"'}.
 #' @param escape The character used to escape other characters. Defaults to \samp{'\'}.
@@ -58,6 +63,8 @@ spark_read_csv <- function(sc,
                            name,
                            path,
                            header = TRUE,
+                           columns = NULL,
+                           infer_schema = FALSE,
                            delimiter = ",",
                            quote = "\"",
                            escape = "\\",
@@ -68,10 +75,14 @@ spark_read_csv <- function(sc,
                            memory = TRUE,
                            overwrite = TRUE) {
 
+  if (!identical(columns, NULL) & isTRUE(infer_schema)) {
+    stop("'infer_schema' must be set to FALSE when 'columns' is specified")
+  }
+
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
-  df <- spark_csv_read(sc, spark_normalize_path(path), options)
+  options <- spark_csv_options(header, infer_schema, delimiter, quote, escape, charset, null_value, options)
+  df <- spark_csv_read(sc, spark_normalize_path(path), options, columns)
 
   if (identical(header, FALSE)) {
     # normalize column names when header = FALSE
