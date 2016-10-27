@@ -14,8 +14,24 @@ spark_dataframe.spark_connection <- function(x, sql = NULL, ...) {
   invoke(hive_context(x), "sql", as.character(sql))
 }
 
-sdf_schema <- function(object) {
-  jobj <- spark_dataframe(object)
+#' Read the Schema of a Spark DataFrame
+#'
+#' Read the schema of a Spark DataFrame.
+#'
+#' The \code{type} column returned gives the string representation of the
+#' underlying Spark  type for that column; for example, a vector of numeric
+#' values would be returned with the type \code{"DoubleType"}. Please see the
+#' \href{http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.types.package}{Spark Scala API Documentation}
+#' for information on what types are available and exposed by Spark.
+#'
+#' @return An \R \code{list}, with each \code{list} element describing the
+#'   \code{name} and \code{type} of a column.
+#'
+#' @template roxlate-ml-x
+#'
+#' @export
+sdf_schema <- function(x) {
+  jobj <- spark_dataframe(x)
   schema <- invoke(jobj, "schema")
   fields <- invoke(schema, "fields")
   list <- lapply(fields, function(field) {

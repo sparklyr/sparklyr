@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Added `sdf_schema()` -- this function allows you to determine the underlying
+  schema used by a Spark DataFrame.
+
 - `sparklyr` now defaults to `tar = "internal"` in its calls to `untar()`.
   This should help resolve issues some Windows users have seen related to
   an inability to connect to Spark, which ultimately were caused by a lack
