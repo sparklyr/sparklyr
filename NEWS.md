@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Added support for infer_schema parameter in spark_read_csv to avoid inferring 
+  columns schema which improves performance in some cases.
+
 - Improved errors, warnings and fallbacks for unsupported Spark versions.
 
 - `sparklyr` now defaults to `tar = "internal"` in its calls to `untar()`.
