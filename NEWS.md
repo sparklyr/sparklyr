@@ -3,6 +3,14 @@
 - Added support for infer_schema parameter in spark_read_csv to avoid inferring 
   columns schema which improves performance in some cases.
 
+- Added a `do_.tbl_spark` implementation, allowing for the execution of
+  `dplyr::do` statements on Spark DataFrames. Currently, the computation is
+  performed in serial across the different groups specified on the Spark
+  DataFrame; in the future we hope to explore a parallel implementation.
+  Note that `do_` always returns a `tbl_df` rather than a `tbl_spark`, as
+  the objects produced within a `do_` query may not necessarily be Spark
+  objects.
+
 - Added `sdf_schema()` -- this function allows you to determine the underlying
   schema used by a Spark DataFrame.
 
