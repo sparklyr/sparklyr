@@ -1,7 +1,9 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
-- Added support for infer_schema parameter in spark_read_csv to avoid inferring 
-  columns schema which improves performance in some cases.
+- The `spark_read_csv()` function now accepts the `infer_schema` parameter,
+  controlling whether the columns schema should be inferred from the underlying
+  file itself. Disabling this should improve performance when the schema is
+  known beforehand.
 
 - Added a `do_.tbl_spark` implementation, allowing for the execution of
   `dplyr::do` statements on Spark DataFrames. Currently, the computation is
