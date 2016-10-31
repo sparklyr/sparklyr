@@ -6,13 +6,15 @@ diamonds_tbl <- testthat_tbl("diamonds")
 
 test_that("the (serial) implementation of 'do' functions as expected", {
 
+  test_requires("dplyr")
+
   R <- diamonds %>%
     group_by(color, clarity) %>%
     do(model = lm(price ~ x + y + z, data = .))
 
   S <- diamonds_tbl %>%
     group_by(color, clarity) %>%
-    do(model = ml_linear_regression(x = ., price ~ x + y + z))
+    do(model = ml_linear_regression(price ~ x + y + z))
 
   R <- arrange(R, as.character(color), as.character(clarity))
   S <- arrange(S, as.character(color), as.character(clarity))
