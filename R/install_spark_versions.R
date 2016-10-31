@@ -56,7 +56,7 @@ spark_installed_versions <- function() {
 #' @export
 spark_available_versions <- function() {
   versions <- read_spark_versions_csv()
-  versions <- versions[versions$supported == TRUE, 1:2]
+  versions <- versions[,1:2]
   versions$install <- paste0("spark_install(version = \"",
                              versions$spark, "\", ",
                              "hadoop_version = \"", versions$hadoop,
@@ -113,7 +113,6 @@ spark_versions <- function(latest = TRUE) {
       newRow$download <- if (NROW(currentRow) > 0) currentRow$download else ""
       newRow$hadoop_label <- if (NROW(currentRow) > 0) currentRow$hadoop_label else paste("Hadoop", row$hadoop)
       newRow$hadoop_default <- if (NROW(currentRow) > 0) currentRow$hadoop_default else FALSE
-      newRow$supported <- if (NROW(currentRow) > 0) currentRow$supported else FALSE
 
       mergedData <<- rbind(notCurrentRow, newRow)
     }

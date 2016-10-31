@@ -3,7 +3,8 @@
 - Added support for infer_schema parameter in spark_read_csv to avoid inferring 
   columns schema which improves performance in some cases.
 
-- Improved errors, warnings and fallbacks for unsupported Spark versions.
+- Added `sdf_schema()` -- this function allows you to determine the underlying
+  schema used by a Spark DataFrame.
 
 - `sparklyr` now defaults to `tar = "internal"` in its calls to `untar()`.
   This should help resolve issues some Windows users have seen related to
