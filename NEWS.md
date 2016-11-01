@@ -13,8 +13,7 @@
   the objects produced within a `do_` query may not necessarily be Spark
   objects.
 
-- Added `sdf_schema()` -- this function allows you to determine the underlying
-  schema used by a Spark DataFrame.
+- Improved errors, warnings and fallbacks for unsupported Spark versions.
 
 - `sparklyr` now defaults to `tar = "internal"` in its calls to `untar()`.
   This should help resolve issues some Windows users have seen related to
