@@ -2,13 +2,42 @@ is.installed <- function(package) {
   is.element(package, installed.packages()[,1])
 }
 
-is_java_available <- function() {
+get_java <- function() {
   java_home <- Sys.getenv("JAVA_HOME", unset = NA)
   if (!is.na(java_home))
     java <- file.path(java_home, "bin", "java")
   else
     java <- Sys.which("java")
-  nzchar(java)
+  java
+}
+
+is_java_available <- function() {
+  nzchar(get_java())
+}
+
+validate_java_version <- function() {
+  java <- get_java()
+  if (!nzchar(get_java()))
+    stop("Java is required to connect to Spark. Please download and install Java from ",
+         java_install_url())
+
+  version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
+
+  if (length(version) < 1)
+    stop("Java version not detected. Please download and install Java from ",
+         java_install_url())
+
+  result <- regexec("java version \"([0-9])\\.([0-9]).*", version)
+  matches <- regmatches(version, result)[[1]]
+  if (length(matches) < 3)
+    stop("Java version not detected. Please download and install Java from ",
+         java_install_url())
+
+  parsedVersion <- paste(matches[[2]], matches[[3]], sep = ".")
+
+  if (compareVersion(parsedVersion, "1.7") < 0)
+    stop("Java version", parsedVersion, " detected but 1.7+ is required. Please download and install Java from ",
+         java_install_url())
 }
 
 java_install_url <- function() {

@@ -1,5 +1,7 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Improved validation of supported java versions.
+
 - The `spark_read_csv()` function now accepts the `infer_schema` parameter,
   controlling whether the columns schema should be inferred from the underlying
   file itself. Disabling this should improve performance when the schema is

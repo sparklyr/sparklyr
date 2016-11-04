@@ -23,10 +23,7 @@ shell_connection <- function(master,
   prepare_windows_environment(spark_home)
 
   # verify that java is available
-  if (!is_java_available()) {
-    stop("Java is required to connect to Spark. Please download and install Java from ",
-         java_install_url())
-  }
+  validate_java_version()
 
   # error if there is no SPARK_HOME
   if (!nzchar(spark_home))
