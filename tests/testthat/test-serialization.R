@@ -126,3 +126,4 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
   copy_to(sc, df, serializer = "csv_string", overwrite = TRUE)
 
 })
+
