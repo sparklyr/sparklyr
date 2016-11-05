@@ -16,28 +16,33 @@ is_java_available <- function() {
 }
 
 validate_java_version <- function() {
+
+  # find the active java executable
   java <- get_java()
   if (!nzchar(get_java()))
     stop("Java is required to connect to Spark. Please download and install Java from ",
          java_install_url())
 
+  # query its version
   version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
-
   if (length(version) < 1)
     stop("Java version not detected. Please download and install Java from ",
          java_install_url())
 
-  result <- regexec("java version \"([0-9])\\.([0-9]).*", version)
-  matches <- regmatches(version, result)[[1]]
-  if (length(matches) < 3)
-    stop("Java version not detected. Please download and install Java from ",
-         java_install_url())
+  # transform to usable R version string
+  splat <- strsplit(version[[1]], "\\s+", perl = TRUE)[[1]]
+  parsedVersion <- regex_replace(
+    splat[[length(splat)]],
+    "^\"|\"$" = "",
+    "_" = "."
+  )
 
-  parsedVersion <- paste(matches[[2]], matches[[3]], sep = ".")
-
+  # ensure Java 1.7 or higher
   if (compareVersion(parsedVersion, "1.7") < 0)
     stop("Java version", parsedVersion, " detected but 1.7+ is required. Please download and install Java from ",
          java_install_url())
+
+  TRUE
 }
 
 java_install_url <- function() {
