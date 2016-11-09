@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Embedded Apache Spark package dependencies to avoid requiring internet 
+  connectivity while connecting for the first thhrough `spark_connect`.
+
 - Increased exception callstack and message length  to include full 
   error details when an exception is thrown in Spark.
 
