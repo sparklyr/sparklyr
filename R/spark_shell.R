@@ -1,4 +1,11 @@
+shell_connection_validate_config <- function(config) {
+  if ("spark.jars.default" %in% config) {
+    warning("The spark.jars.default config parameter is deprecated, please use sparklyr.jars.default")
+    config[["sparklyr.jars.default"]] <- config[["spark.jars.default"]]
+  }
 
+  config
+}
 
 # create a shell connection
 shell_connection <- function(master,
@@ -10,6 +17,9 @@ shell_connection <- function(master,
                              config,
                              service,
                              extensions) {
+
+  # trigger deprecated warnings
+  config <- shell_connection_validate_config(config)
 
   # for local mode we support SPARK_HOME via locally installed versions
   if (spark_master_is_local(master)) {
@@ -43,7 +53,7 @@ shell_connection <- function(master,
     spark_version = version,
     app_name = app_name,
     config = config,
-    jars = spark_config_value(config, "spark.jars.default", list()),
+    jars = spark_config_value(config, "sparklyr.jars.default", list()),
     packages = spark_config_value(config, "sparklyr.defaultPackages"),
     extensions = extensions,
     environment = environment,

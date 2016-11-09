@@ -222,8 +222,8 @@ initialize_connection <- function(sc) {
     conf <- invoke(conf, "setMaster", sc$master)
     conf <- invoke(conf, "setSparkHome", sc$spark_home)
 
-    context_config <- connection_config(sc, "spark.", c("spark.sql."))
-    apply_config(context_config, conf, "set", "spark.")
+    # context_config <- connection_config(sc, "spark.", c("spark.sql."))
+    # apply_config(context_config, conf, "set", "spark.")
 
     # create the spark context and assign the connection to it
     sc$spark_context <- invoke_static(
