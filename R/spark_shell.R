@@ -1,5 +1,5 @@
 shell_connection_validate_config <- function(config) {
-  if ("spark.jars.default" %in% config) {
+  if ("spark.jars.default" %in% names(config)) {
     warning("The spark.jars.default config parameter is deprecated, please use sparklyr.jars.default")
     config[["sparklyr.jars.default"]] <- config[["spark.jars.default"]]
   }
