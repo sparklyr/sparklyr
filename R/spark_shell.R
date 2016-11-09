@@ -431,13 +431,17 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
   if (returnStatus != 0) {
     # get error message from backend and report to R
     msg <- readString(backend)
-    if (nzchar(msg))
-      stop(msg, call. = FALSE)
-    else {
-      # read the spark log
-      msg <- read_spark_log_error(sc)
-      stop(msg, call. = FALSE)
-    }
+    withr::with_options(list(
+      warning.length = 8000
+    ), {
+      if (nzchar(msg))
+        stop(msg, call. = FALSE)
+      else {
+        # read the spark log
+        msg <- read_spark_log_error(sc)
+        stop(msg, call. = FALSE)
+      }
+    })
   }
 
   object <- readObject(backend)

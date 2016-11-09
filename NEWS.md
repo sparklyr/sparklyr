@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Increased exception callstack and message length  to include full 
+  error details when an exception is thrown in Spark.
+
 - Improved validation of supported java versions.
 
 - The `spark_read_csv()` function now accepts the `infer_schema` parameter,
