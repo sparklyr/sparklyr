@@ -4,9 +4,14 @@ default:
   spark.sql.shuffle.partitions.local: !expr parallel::detectCores()
   spark.env.SPARK_LOCAL_IP.local: 127.0.0.1
 
+  # default embedded packages to load
+  spark.jars.default:
+    - !expr system.file(file.path("java", "spark-csv_2.11-1.3.0.jar"), package = "sparklyr")
+    - !expr system.file(file.path("java", "commons-csv-1.1.jar"), package = "sparklyr")
+
   # default spark packages to load
-  sparklyr.defaultPackages:
-    - com.databricks:spark-csv_2.11:1.3.0
+  # sparklyr.defaultPackages:
+  #  - com.databricks:spark-csv_2.11:1.3.0
 
   # command line arguments to spark-shell
   # sparklyr.shell.*
