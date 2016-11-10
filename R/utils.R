@@ -15,7 +15,11 @@ is_java_available <- function() {
   nzchar(get_java())
 }
 
-validate_java_version <- function() {
+validate_java_version <- function(spark_home) {
+  # if somene sets SPARK_HOME, assume Java is available since some systems
+  # (e.g. CDH) use versions of java not discoverable through JAVA_HOME.
+  if (!is.null(spark_home) && nchar(spark_home) > 0)
+    return(TRUE)
 
   # find the active java executable
   java <- get_java()
