@@ -17,7 +17,6 @@ shell_connection <- function(master,
                              config,
                              service,
                              extensions) {
-
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
@@ -198,6 +197,16 @@ start_shell <- function(master,
     all_jars <- c(jars, extensions$jars)
     jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
     packages <- unique(c(packages, extensions$packages))
+
+    # include embedded jars, if needed
+    if (spark_version < "2.0" && identical(config[["sparklyr.csv.embedded"]], TRUE)) {
+      jars <- c(
+        jars,
+        system.file(file.path("java", "spark-csv_2.11-1.3.0.jar"), package = "sparklyr"),
+        system.file(file.path("java", "commons-csv-1.1.jar"), package = "sparklyr"),
+        system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr")
+      )
+    }
 
     # add jars to arguments
     if (length(jars) > 0) {

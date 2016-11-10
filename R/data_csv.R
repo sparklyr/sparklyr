@@ -1,13 +1,39 @@
+spark_csv_namespace <- function(sc) {
+  if (spark_version(sc) >= "2.0.0")
+    "org.apache.spark.sql.execution.datasources.csv"
+  else
+    "com.databricks.spark.csv"
+}
+
+spark_csv_class <- function(sc) {
+  paste(spark_csv_namespace(sc), "CsvReader", sep = ".")
+}
+
+spark_csv_format_if_needed <- function(source, sc) {
+  if (spark_version(sc) >= "2.0.0")
+    source
+  else
+    invoke(source, "format", spark_csv_namespace(sc))
+}
+
+spark_csv_load_name <- function(sc) {
+  if (spark_version(sc) >= "2.0.0")
+    "csv"
+  else
+    "load"
+}
+
 spark_csv_read <- function(sc,
                            path,
                            csvOptions = list(),
                            columns = NULL) {
   read <- invoke(hive_context(sc), "read")
-  options <- invoke(read, "format", "com.databricks.spark.csv")
+
+  options <- spark_csv_format_if_needed(read, sc)
 
   if (!identical(columns, NULL)) {
     ncol_ds <- options %>%
-      invoke("load", path) %>%
+      invoke(spark_csv_load_name(sc), path) %>%
       invoke("schema") %>%
       invoke("length")
 
@@ -28,12 +54,15 @@ spark_csv_read <- function(sc,
     optionSchema <- invoke(options, "schema", columnDefs)
   }
 
-  invoke(optionSchema, "load", path)
+  invoke(
+    optionSchema,
+    if (spark_version(sc) >= "2.0.0") "csv" else "load",
+    path)
 }
 
 spark_csv_write <- function(df, path, csvOptions) {
   write <- invoke(df, "write")
-  options <- invoke(write, "format", "com.databricks.spark.csv")
+  options <- spark_csv_format_if_needed(write, sc)
 
   lapply(names(csvOptions), function(csvOptionName) {
     options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
