@@ -107,7 +107,7 @@ sdf_import.default <- function(x, sc, ...,
     spark_csv_format_if_needed(sc) %>%
     invoke("option", "header", "true") %>%
     invoke("schema", schema) %>%
-    invoke(spark_csv_load_name(), path)
+    invoke(spark_csv_load_name(sc), path)
 
   if (cache)
     sdf <- invoke(sdf, "cache")

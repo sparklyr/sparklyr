@@ -245,8 +245,8 @@ iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
 spark_write_parquet(iris_tbl, temp_parquet)
 iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
 
-spark_write_csv(iris_tbl, temp_json)
-iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
+spark_write_json(iris_tbl, temp_json)
+iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 
 src_tbls(sc)
 ```
@@ -311,16 +311,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/10/27 11:57:52 INFO ContextCleaner: Cleaned accumulator 226
-    ## 16/10/27 11:57:52 INFO ContextCleaner: Cleaned accumulator 225
-    ## 16/10/27 11:57:52 INFO BlockManagerInfo: Removed broadcast_94_piece0 on localhost:62779 in memory (size: 3.0 KB, free: 482.9 MB)
-    ## 16/10/27 11:57:52 INFO ContextCleaner: Cleaned accumulator 247
-    ## 16/10/27 11:57:52 INFO ContextCleaner: Cleaned accumulator 246
-    ## 16/10/27 11:57:52 INFO Executor: Finished task 0.0 in stage 70.0 (TID 118). 2082 bytes result sent to driver
-    ## 16/10/27 11:57:52 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 118) in 112 ms on localhost (1/1)
-    ## 16/10/27 11:57:52 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool 
-    ## 16/10/27 11:57:52 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:-2) finished in 0.113 s
-    ## 16/10/27 11:57:52 INFO DAGScheduler: Job 52 finished: count at NativeMethodAccessorImpl.java:-2, took 0.115542 s
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 228
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 227
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 226
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 225
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 224
+    ## 16/11/09 23:26:41 INFO Executor: Finished task 0.0 in stage 69.0 (TID 117). 2082 bytes result sent to driver
+    ## 16/11/09 23:26:41 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 117) in 117 ms on localhost (1/1)
+    ## 16/11/09 23:26:41 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
+    ## 16/11/09 23:26:41 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:-2) finished in 0.117 s
+    ## 16/11/09 23:26:41 INFO DAGScheduler: Job 51 finished: count at NativeMethodAccessorImpl.java:-2, took 0.120238 s
 
 Finally, we disconnect from Spark:
 

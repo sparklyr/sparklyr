@@ -170,8 +170,8 @@ iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
 spark_write_parquet(iris_tbl, temp_parquet)
 iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
 
-spark_write_csv(iris_tbl, temp_json)
-iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
+spark_write_json(iris_tbl, temp_json)
+iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 
 src_tbls(sc)
 ```

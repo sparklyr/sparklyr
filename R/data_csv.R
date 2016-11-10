@@ -1,26 +1,37 @@
-spark_csv_namespace <- function(sc) {
-  if (spark_version(sc) >= "2.0.0")
-    "org.apache.spark.sql.execution.datasources.csv"
-  else
-    "com.databricks.spark.csv"
+spark_csv_embedded_namespace <- function() {
+  "com.databricks.spark.csv"
 }
 
-spark_csv_class <- function(sc) {
-  paste(spark_csv_namespace(sc), "CsvReader", sep = ".")
+spark_csv_is_embedded <- function(sc) {
+  invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "classExists",
+    paste(spark_csv_embedded_namespace(), "CsvParser", sep = ".")
+  )
+}
+
+spark_csv_is_loaded <- function(sc) {
+  if (spark_version(sc) >= "2.0.0")
+    TRUE
+  else {
+    spark_csv_is_embedded(sc)
+  }
 }
 
 spark_csv_format_if_needed <- function(source, sc) {
-  if (spark_version(sc) >= "2.0.0")
-    source
+  if (spark_csv_is_embedded(sc))
+    invoke(source, "format", spark_csv_embedded_namespace())
   else
-    invoke(source, "format", spark_csv_namespace(sc))
+    source
 }
 
 spark_csv_load_name <- function(sc) {
-  if (spark_version(sc) >= "2.0.0")
-    "csv"
-  else
-    "load"
+  if (spark_csv_is_embedded(sc)) "load" else "csv"
+}
+
+spark_csv_save_name <- function(sc) {
+  if (spark_csv_is_embedded(sc)) "save" else "csv"
 }
 
 spark_csv_read <- function(sc,
@@ -56,7 +67,7 @@ spark_csv_read <- function(sc,
 
   invoke(
     optionSchema,
-    if (spark_version(sc) >= "2.0.0") "csv" else "load",
+    spark_csv_load_name(sc),
     path)
 }
 
@@ -68,7 +79,10 @@ spark_csv_write <- function(df, path, csvOptions) {
     options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
   })
 
-  invoke(options, "save", path)
+  invoke(
+    options,
+    spark_csv_save_name(sc),
+    path)
 
   invisible(TRUE)
 }

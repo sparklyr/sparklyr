@@ -199,7 +199,8 @@ start_shell <- function(master,
     packages <- unique(c(packages, extensions$packages))
 
     # include embedded jars, if needed
-    if (spark_version < "2.0" && identical(config[["sparklyr.csv.embedded"]], TRUE)) {
+    if (!is.null(config[["sparklyr.csv.embedded"]]) &&
+        length(grep(config[["sparklyr.csv.embedded"]], spark_version)) > 0) {
       jars <- c(
         jars,
         system.file(file.path("java", "spark-csv_2.11-1.3.0.jar"), package = "sparklyr"),
