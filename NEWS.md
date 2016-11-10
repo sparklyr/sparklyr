@@ -1,5 +1,10 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Embedded Apache Spark package dependencies to avoid requiring internet 
+  connectivity while connecting for the first thhrough `spark_connect`. The
+  `sparklyr.csv.embedded` config setting was added to configure a regular
+  expression to match Spark versions where the embedded package is deployed.
+
 - Increased exception callstack and message length  to include full 
   error details when an exception is thrown in Spark.
 

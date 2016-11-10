@@ -1,4 +1,11 @@
+shell_connection_validate_config <- function(config) {
+  if ("spark.jars.default" %in% names(config)) {
+    warning("The spark.jars.default config parameter is deprecated, please use sparklyr.jars.default")
+    config[["sparklyr.jars.default"]] <- config[["spark.jars.default"]]
+  }
 
+  config
+}
 
 # create a shell connection
 shell_connection <- function(master,
@@ -10,6 +17,8 @@ shell_connection <- function(master,
                              config,
                              service,
                              extensions) {
+  # trigger deprecated warnings
+  config <- shell_connection_validate_config(config)
 
   # for local mode we support SPARK_HOME via locally installed versions
   if (spark_master_is_local(master)) {
@@ -43,7 +52,7 @@ shell_connection <- function(master,
     spark_version = version,
     app_name = app_name,
     config = config,
-    jars = spark_config_value(config, "spark.jars.default", list()),
+    jars = spark_config_value(config, "sparklyr.jars.default", list()),
     packages = spark_config_value(config, "sparklyr.defaultPackages"),
     extensions = extensions,
     environment = environment,
@@ -188,6 +197,17 @@ start_shell <- function(master,
     all_jars <- c(jars, extensions$jars)
     jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
     packages <- unique(c(packages, extensions$packages))
+
+    # include embedded jars, if needed
+    if (!is.null(config[["sparklyr.csv.embedded"]]) &&
+        length(grep(config[["sparklyr.csv.embedded"]], spark_version)) > 0) {
+      jars <- c(
+        jars,
+        system.file(file.path("java", "spark-csv_2.11-1.3.0.jar"), package = "sparklyr"),
+        system.file(file.path("java", "commons-csv-1.1.jar"), package = "sparklyr"),
+        system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr")
+      )
+    }
 
     # add jars to arguments
     if (length(jars) > 0) {
