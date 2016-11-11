@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Improved Spark 2.0 installation in Windows by creating spark-defaults.conf
+  and configuring spark.sql.warehouse.dir.
+
 - Embedded Apache Spark package dependencies to avoid requiring internet 
   connectivity while connecting for the first thhrough `spark_connect`. The
   `sparklyr.csv.embedded` config setting was added to configure a regular
