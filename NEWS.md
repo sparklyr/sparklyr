@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Implemented `dim.tbl_spark()`. This should ensure that `dim()`, `nrow()`
+  and `ncol()` all produce the expected result with `tbl_spark`s.
+
 - Improved Spark 2.0 installation in Windows by creating spark-defaults.conf
   and configuring spark.sql.warehouse.dir.
 

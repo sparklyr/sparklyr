@@ -5,6 +5,7 @@
 \alias{copy_to}
 \alias{reexports}
 \title{Objects exported from other packages}
+\keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links
 below to see their documentation.
@@ -12,5 +13,4 @@ below to see their documentation.
 \describe{
   \item{dplyr}{\code{\link[dplyr]{copy_to}}}
 }}
-\keyword{internal}
 
