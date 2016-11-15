@@ -84,6 +84,10 @@ copy_to.spark_connection <- function(dest,
                                      overwrite = FALSE,
                                      ...)
 {
+  if (!is.data.frame(df)) {
+    stop("copy_to expects a local data frame")
+  }
+
   sc <- dest
 
   if (overwrite)
