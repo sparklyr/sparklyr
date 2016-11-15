@@ -244,7 +244,8 @@ spark_install <- function(version = NULL,
         installInfo,
         list(
           "spark.sql.warehouse.dir" = paste0("spark.sql.warehouse.dir          ", hivePath)
-        )
+        ),
+        reset
       )
     }, error = function(e) {
       warning("Failed to set spark-defaults.conf settings")
