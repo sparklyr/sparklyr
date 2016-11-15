@@ -1,5 +1,10 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Spark `DenseVector` and `SparseVector` objects are now deserialized as
+  R numeric vectors, rather than Spark objects. This should make it easier
+  to work with the output produced by `sdf_predict()` with Random Forest
+  models, for example.
+
 - Implemented `dim.tbl_spark()`. This should ensure that `dim()`, `nrow()`
   and `ncol()` all produce the expected result with `tbl_spark`s.
 
