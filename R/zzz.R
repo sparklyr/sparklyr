@@ -7,6 +7,7 @@ set_option_default <- function(...) {
 }
 
 .onLoad <- function(...) {
-  set_option_default(sparklyr.na.action.verbose = TRUE,
-                     sparklyr.do.implicit.dot   = TRUE)
+  set_option_default(
+    sparklyr.na.action.verbose = TRUE
+  )
 }

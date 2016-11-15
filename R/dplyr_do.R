@@ -40,20 +40,6 @@ do_.tbl_spark <- function(.data, ..., .dots) {
       # override '.' in envir
       assign(".", filtered, envir = lazy$env)
 
-      # munge call (add '.' as the first argument if not specified)
-      if (sparklyr_boolean_option("sparklyr.do.implicit.dot")) {
-        dot <- as.name(".")
-        found <- Find(function(x) identical(x, dot), lazy$expr)
-        if (is.null(found)) {
-          replacement <- vector("list", length(lazy$expr) + 1)
-          replacement[[1]] <- lazy$expr[[1]]
-          replacement[[2]] <- dot
-          for (i in seq_len(length(lazy$expr) - 1))
-            replacement[[i + 2]] <- lazy$expr[[i + 1]]
-          lazy$expr <- as.call(replacement)
-        }
-      }
-
       # evaluate in environment
       tryCatch(
         eval(lazy$expr, envir = lazy$env),
