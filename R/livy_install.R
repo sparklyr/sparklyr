@@ -73,7 +73,7 @@ livy_install <- function(version       = "0.2.0",
     stopf("No Spark installation found at '%s'", spark_home)
 
   # construct path where livy will be unpacked
-  livy_cache <- rappdirs::app_dir("livy", "rstudio")$cache()
+  livy_cache <- livy_install_dir()
   livy_path <- file.path(
     livy_cache,
     sprintf("livy-%s-%s", version, basename(spark_home))
