@@ -1,8 +1,59 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
-- Implemented support for `na.action` with the various Spark.ML routines,
-  and set the default as `na.omit`. Users can customize the `na.action`
-  argument through the `ml.options` object accepted by all ML routines.
+- Spark `DenseVector` and `SparseVector` objects are now deserialized as
+  R numeric vectors, rather than Spark objects. This should make it easier
+  to work with the output produced by `sdf_predict()` with Random Forest
+  models, for example.
+
+- Implemented `dim.tbl_spark()`. This should ensure that `dim()`, `nrow()`
+  and `ncol()` all produce the expected result with `tbl_spark`s.
+
+- Improved Spark 2.0 installation in Windows by creating spark-defaults.conf
+  and configuring spark.sql.warehouse.dir.
+
+- Embedded Apache Spark package dependencies to avoid requiring internet 
+  connectivity while connecting for the first thhrough `spark_connect`. The
+  `sparklyr.csv.embedded` config setting was added to configure a regular
+  expression to match Spark versions where the embedded package is deployed.
+
+- Increased exception callstack and message length  to include full 
+  error details when an exception is thrown in Spark.
+
+- Improved validation of supported java versions.
+
+- The `spark_read_csv()` function now accepts the `infer_schema` parameter,
+  controlling whether the columns schema should be inferred from the underlying
+  file itself. Disabling this should improve performance when the schema is
+  known beforehand.
+
+- Added a `do_.tbl_spark` implementation, allowing for the execution of
+  `dplyr::do` statements on Spark DataFrames. Currently, the computation is
+  performed in serial across the different groups specified on the Spark
+  DataFrame; in the future we hope to explore a parallel implementation.
+  Note that `do_` always returns a `tbl_df` rather than a `tbl_spark`, as
+  the objects produced within a `do_` query may not necessarily be Spark
+  objects.
+
+- Improved errors, warnings and fallbacks for unsupported Spark versions.
+
+- `sparklyr` now defaults to `tar = "internal"` in its calls to `untar()`.
+  This should help resolve issues some Windows users have seen related to
+  an inability to connect to Spark, which ultimately were caused by a lack
+  of permissions on the Spark installation.
+
+- Resolved an issue where `copy_to()` and other R => Spark data transfer
+  functions could fail when the last column contained missing / empty values.
+  (#265)
+
+- Added `sdf_persist()`, as a wrapper to the Spark DataFrame `persist()` API.
+
+- Resolved an issue where `predict()` could produce results in the wrong
+  order for large Spark DataFrames.
+
+- Implemented support for `na.action` with the various Spark ML routines. The
+  value of `getOption("na.action")` is used by default. Users can customize the
+  `na.action` argument through the `ml.options` object accepted by all ML
+  routines.
 
 - Fixed windows `spark_connect` with long paths and spaces.
 

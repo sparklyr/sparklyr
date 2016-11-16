@@ -137,12 +137,12 @@ batting_tbl %>%
     ## 2  abbotpa01   2004    PHI    10    11     1     2
     ## 3  abnersh01   1992    CHA    97   208    21    58
     ## 4  abnersh01   1990    SDN    91   184    17    45
-    ## 5  abreujo02   2014    CHA   145   556    80   176
-    ## 6  acevejo01   2001    CIN    18    34     1     4
-    ## 7  acevejo01   2004    CIN    39    43     0     2
-    ## 8  adamsbe01   1919    PHI    78   232    14    54
-    ## 9  adamsbe01   1918    PHI    84   227    10    40
-    ## 10 adamsbu01   1945    SLN   140   578    98   169
+    ## 5  abreujo02   2015    CHA   154   613    88   178
+    ## 6  abreujo02   2014    CHA   145   556    80   176
+    ## 7  acevejo01   2001    CIN    18    34     1     4
+    ## 8  acevejo01   2004    CIN    39    43     0     2
+    ## 9  adamsbe01   1919    PHI    78   232    14    54
+    ## 10 adamsbe01   1918    PHI    84   227    10    40
     ## # ... with more rows
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
@@ -190,6 +190,11 @@ partitions <- mtcars_tbl %>%
 # fit a linear model to the training dataset
 fit <- partitions$training %>%
   ml_linear_regression(response = "mpg", features = c("wt", "cyl"))
+```
+
+    ## * No rows dropped by 'na.omit' call
+
+``` r
 fit
 ```
 
@@ -240,8 +245,8 @@ iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
 spark_write_parquet(iris_tbl, temp_parquet)
 iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
 
-spark_write_csv(iris_tbl, temp_json)
-iris_json_tbl <- spark_read_csv(sc, "iris_json", temp_json)
+spark_write_json(iris_tbl, temp_json)
+iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 
 src_tbls(sc)
 ```
@@ -306,16 +311,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/09/24 07:50:59 INFO ContextCleaner: Cleaned accumulator 224
-    ## 16/09/24 07:50:59 INFO ContextCleaner: Cleaned accumulator 223
-    ## 16/09/24 07:50:59 INFO ContextCleaner: Cleaned accumulator 222
-    ## 16/09/24 07:50:59 INFO BlockManagerInfo: Removed broadcast_64_piece0 on localhost:56324 in memory (size: 20.6 KB, free: 483.0 MB)
-    ## 16/09/24 07:50:59 INFO ContextCleaner: Cleaned accumulator 220
-    ## 16/09/24 07:50:59 INFO Executor: Finished task 0.0 in stage 67.0 (TID 117). 2082 bytes result sent to driver
-    ## 16/09/24 07:50:59 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 117) in 122 ms on localhost (1/1)
-    ## 16/09/24 07:50:59 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:-2) finished in 0.122 s
-    ## 16/09/24 07:50:59 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-    ## 16/09/24 07:50:59 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:-2, took 0.125238 s
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 228
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 227
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 226
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 225
+    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 224
+    ## 16/11/09 23:26:41 INFO Executor: Finished task 0.0 in stage 69.0 (TID 117). 2082 bytes result sent to driver
+    ## 16/11/09 23:26:41 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 117) in 117 ms on localhost (1/1)
+    ## 16/11/09 23:26:41 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
+    ## 16/11/09 23:26:41 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:-2) finished in 0.117 s
+    ## 16/11/09 23:26:41 INFO DAGScheduler: Job 51 finished: count at NativeMethodAccessorImpl.java:-2, took 0.120238 s
 
 Finally, we disconnect from Spark:
 

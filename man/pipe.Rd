@@ -9,9 +9,9 @@ lhs \%>\% rhs
 lhs \%>\% rhs
 }
 \description{
-See \code{\link[magrittr]{\%>\%}} for more details.
+See \code{\link[dplyr]{\%>\%}} for more details.
 
-See \code{\link[magrittr]{\%>\%}} for more details.
+See \code{\link[dplyr]{\%>\%}} for more details.
 }
 \keyword{internal}
 

@@ -90,30 +90,6 @@ ml_prepare_dataframe <- function(x,
   spark_dataframe(transformed)
 }
 
-apply_na_action <- function(x, response = NULL, features = NULL, na.action) {
-
-  # early exit for NULL, NA na.action
-  if (is.null(na.action))
-    return(x)
-
-  # attempt to resolve character na.action
-  if (is.character(na.action)) {
-    if (!exists(na.action, envir = parent.frame(), mode = "function"))
-      stop("no function with name '", na.action, "' found")
-
-    na.action <- get(na.action, envir = parent.frame(), mode = "function")
-  }
-
-  if (!is.function(na.action))
-    stop("'na.action' is not a function")
-
-  # attempt to apply 'na.action'
-  na.action(x,
-            response = response,
-            features = features,
-            columns = c(response, features))
-}
-
 try_null <- function(expr) {
   tryCatch(expr, error = function(e) NULL)
 }
@@ -124,8 +100,7 @@ predict.ml_model <- function(object,
                              ...)
 {
   # 'sdf_predict()' does not necessarily return a data set with the same row
-  # order as the input data; generate a unique id and re-join the generated
-  # spark dataframe to ensure the row order is maintained
+  # order as the input data; generate a unique id and re-order based on this
   id <- random_string("id_")
   sdf <- newdata %>%
     sdf_with_unique_id(id) %>%
@@ -135,12 +110,13 @@ predict.ml_model <- function(object,
   params <- object$model.parameters
   predicted <- sdf_predict(object, sdf, ...)
 
-  # join prediction column on original data, then read prediction column
-  column <- sdf %>%
-    invoke("join", spark_dataframe(predicted), as.list(id)) %>%
-    sdf_read_column("prediction")
+  # re-order based on id column
+  arranged <- arrange_(predicted, .dots = as.list(id))
 
-  # re-order based on id
+  # read column
+  column <- sdf_read_column(arranged, "prediction")
+
+  # re-map label ids back to actual labels
   if (is.character(params$labels) && is.numeric(column))
     column <- params$labels[column + 1]
 

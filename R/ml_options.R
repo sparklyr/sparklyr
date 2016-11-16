@@ -21,7 +21,7 @@ ml_options <- function(id.column       = random_string("id"),
                        features.column = random_string("features"),
                        model.transform = NULL,
                        only.model      = FALSE,
-                       na.action       = stats::na.omit,
+                       na.action       = getOption("na.action", "na.omit"),
                        ...)
 {
   options <- list(

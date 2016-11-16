@@ -178,7 +178,10 @@ spark_install <- function(version = NULL,
     if (status)
       stopf("Failed to download Spark: download exited with status %s", status)
 
-    untar(tarfile = installInfo$packageLocalPath, exdir = installInfo$sparkDir)
+    untar(tarfile = installInfo$packageLocalPath,
+          exdir = installInfo$sparkDir,
+          tar = "internal")
+
     unlink(installInfo$packageLocalPath)
 
     if (verbose)
@@ -196,7 +199,7 @@ spark_install <- function(version = NULL,
 
   if (!identical(logging, NULL)) {
     tryCatch({
-      spark_conf_file_set_value(
+      spark_conf_log4j_set_value(
         installInfo,
         list(
           "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
@@ -211,6 +214,7 @@ spark_install <- function(version = NULL,
   }
 
   hiveSitePath <- file.path(installInfo$sparkConfDir, "hive-site.xml")
+  hivePath <- NULL
   if (!file.exists(hiveSitePath) || reset) {
     tryCatch({
       hiveProperties <- list(
@@ -231,6 +235,20 @@ spark_install <- function(version = NULL,
       spark_hive_file_set_value(hiveSitePath, hiveProperties)
     }, error = function(e) {
       warning("Failed to apply custom hive-site.xml configuration")
+    })
+  }
+
+  if (!is.null(hivePath)) {
+    tryCatch({
+      spark_conf_file_set_value(
+        installInfo,
+        list(
+          "spark.sql.warehouse.dir" = paste0("spark.sql.warehouse.dir          ", hivePath)
+        ),
+        reset
+      )
+    }, error = function(e) {
+      warning("Failed to set spark-defaults.conf settings")
     })
   }
 
@@ -273,10 +291,12 @@ spark_install_tar <- function(tarfile) {
       "The given file does not conform with the following pattern: ", filePattern))
   }
 
-  untar(tarfile = tarfile, exdir = spark_install_dir())
+  untar(tarfile = tarfile,
+        exdir = spark_install_dir(),
+        tar = "internal")
 }
 
-spark_conf_file_set_value <- function(installInfo, properties, reset) {
+spark_conf_log4j_set_value <- function(installInfo, properties, reset) {
   log4jPropertiesPath <- file.path(installInfo$sparkConfDir, "log4j.properties")
   if (!file.exists(log4jPropertiesPath) || reset) {
     log4jTemplatePath <- file.path(installInfo$sparkConfDir, "log4j.properties.template")
@@ -287,7 +307,6 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
   lines <- readLines(log4jPropertiesFile)
 
   lines[[length(lines) + 1]] <- ""
-  lines[[length(lines) + 1]] <- "# Other settings"
 
   lapply(names(properties), function(property) {
     value <- properties[[property]]
@@ -323,4 +342,32 @@ spark_hive_file_set_value <- function(hivePath, properties) {
   hiveFile <- file(hivePath)
   writeLines(unlist(lines), hiveFile)
   close(hiveFile)
+}
+
+spark_conf_file_set_value <- function(installInfo, properties, reset) {
+  confPropertiesPath <- file.path(installInfo$sparkConfDir, "spark-defaults.conf")
+  if (!file.exists(confPropertiesPath) || reset) {
+    confTemplatePath <- file.path(installInfo$sparkConfDir, "spark-defaults.conf.template")
+    file.copy(confTemplatePath, confPropertiesPath, overwrite = TRUE)
+  }
+
+  confPropertiesFile <- file(confPropertiesPath)
+  lines <- readLines(confPropertiesFile)
+
+  lines[[length(lines) + 1]] <- ""
+
+  lapply(names(properties), function(property) {
+    value <- properties[[property]]
+    pattern <- paste(property, ".*", sep = "")
+
+    if (length(grep(pattern, lines)) > 0) {
+      lines <<- gsub(pattern, value, lines, perl = TRUE)
+    }
+    else {
+      lines[[length(lines) + 1]] <<- value
+    }
+  })
+
+  writeLines(lines, confPropertiesFile)
+  close(confPropertiesFile)
 }

@@ -214,6 +214,11 @@ spark_compilation_spec <- function(spark_version = NULL,
 spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
   list(
     spark_compilation_spec(
+      spark_version = "1.5.2",
+      scalac_path = find_scalac("2.10"),
+      jar_name = sprintf("%s-1.5-2.10.jar", pkg)
+    ),
+    spark_compilation_spec(
       spark_version = "1.6.1",
       scalac_path = find_scalac("2.10"),
       jar_name = sprintf("%s-1.6-2.10.jar", pkg)

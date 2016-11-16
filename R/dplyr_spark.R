@@ -75,8 +75,6 @@ db_data_type.src_spark <- function(...) {
 #' @return A \code{tbl_spark}, representing a \code{dplyr}-compatible interface
 #'   to a Spark DataFrame.
 #'
-#' @name copy_to
-#'
 #' @export
 copy_to.spark_connection <- function(dest,
                                      df,
@@ -86,6 +84,10 @@ copy_to.spark_connection <- function(dest,
                                      overwrite = FALSE,
                                      ...)
 {
+  if (!is.data.frame(df)) {
+    stop("copy_to expects a local data frame")
+  }
+
   sc <- dest
 
   if (overwrite)

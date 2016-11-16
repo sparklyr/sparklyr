@@ -104,10 +104,10 @@ sdf_import.default <- function(x, sc, ...,
 
   # invoke CSV reader with our schema
   sdf <- reader %>%
-    invoke("format", "com.databricks.spark.csv") %>%
+    spark_csv_format_if_needed(sc) %>%
     invoke("option", "header", "true") %>%
     invoke("schema", schema) %>%
-    invoke("load", path)
+    invoke(spark_csv_load_name(sc), path)
 
   if (cache)
     sdf <- invoke(sdf, "cache")
@@ -511,81 +511,14 @@ ml_create_dummy_variables <- function(x,
   sdf_register(mutated)
 }
 
-#' @export
-na.omit.tbl_spark <- function(object, columns = NULL, ...) {
-  na.omit(spark_dataframe(object), columns = NULL, ...)
-}
-
-#' @export
-na.omit.spark_jobj <- function(object, columns = NULL, ...) {
-
-  # report number of rows dropped if requested
-  verbose <- sparklyr_boolean_option(
-    "sparklyr.na.omit.verbose",
-    "sparklyr.na.action.verbose",
-    "sparklyr.verbose"
-  )
-
-  n_before <- if (verbose) invoke(object, "count")
-
-  na <- invoke(object, "na")
-  dropped <- if (is.null(columns))
-    invoke(na, "drop")
-  else
-    invoke(na, "drop", as.list(columns))
-
-  n_after <- if (verbose) invoke(dropped, "count")
-
-  if (verbose) {
-    n_diff <- n_before - n_after
-    if (n_diff > 0) {
-      fmt <- "* Dropped %s rows with 'na.omit' (%s => %s)"
-      message(sprintf(fmt, n_diff, n_before, n_after))
-    } else {
-      message("* No rows dropped by 'na.omit' call")
-    }
-  }
-
-  sdf_register(dropped)
-}
-
-#' Replace Missing Values in Objects
-#'
-#' This S3 generic provides an interface for replacing
-#' \code{\link{NA}} values within an object.
-#'
-#' @param object An \R object.
-#' @param ... Arguments passed along to implementing methods.
-#'
-#' @export
-na.replace <- function(object, ...) {
-  UseMethod("na.replace")
-}
-
-#' @export
-na.replace.tbl_spark <- function(object, ...) {
-  na.replace(spark_dataframe(object), ...)
-}
-
-#' @export
-na.replace.spark_jobj <- function(object, ...) {
-  dots <- list(...)
-  enumerate(dots, function(key, val) {
-    na <- invoke(object, "na")
-    object <<- if (is.null(key))
-      invoke(na, "fill", val)
-    else
-      invoke(na, "fill", val, as.list(key))
-  })
-  sdf_register(object)
-}
-
 #' Add a Unique ID Column to a Spark DataFrame
 #'
 #' Add a unique ID column to a Spark DataFrame. The Spark
 #' \code{monotonicallyIncreasingId} function is used to produce these and is
-#' guaranteed to produce unique, monotonically increasing ids; however, there is
-#' no guarantee that these IDs will be sequential.
+#' guaranteed to produce unique, monotonically increasing ids; however, there
+#' is no guarantee that these IDs will be sequential. The table is persisted
+#' immediately after the column is generated, to ensure that the column is
+#' stable -- otherwise, it can differ across new computations.
 #'
 #' @template roxlate-ml-x
 #' @param id The name of the column to host the generated IDs.
@@ -605,7 +538,10 @@ sdf_with_unique_id <- function(x, id = "id") {
 
   mii <- invoke(mii, "cast", "double")
 
-  transformed <- invoke(sdf, "withColumn", id, mii)
+  transformed <- sdf %>%
+    invoke("withColumn", id, mii) %>%
+    sdf_persist(storage.level = "MEMORY_ONLY")
+
   sdf_register(transformed)
 }
 
@@ -642,4 +578,42 @@ sdf_quantile <- function(x,
   names(quantiles) <- nm
 
   quantiles
+}
+
+#' Persist a Spark DataFrame
+#'
+#' Persist a Spark DataFrame, forcing any pending computations and (optionally)
+#' serializing the results to disk.
+#'
+#' Spark DataFrames invoke their operations lazily -- pending operations are
+#' deferred until their results are actually needed. Persisting a Spark
+#' DataFrame effectively 'forces' any pending computations, and then persists
+#' the generated Spark DataFrame as requested (to memory, to disk, or
+#' otherwise).
+#'
+#' Users of Spark should be careful to persist the results of any computations
+#' which are non-deterministic -- otherwise, one might see that the values
+#' within a column seem to 'change' as new operations are performed on that
+#' data set.
+#'
+#' @template roxlate-ml-x
+#' @param storage.level The storage level to be used. Please view the
+#'   \href{http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}
+#'   for information on what storage levels are accepted.
+#' @export
+sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+
+  storage.level <- ensure_scalar_character(storage.level)
+
+  sl <- invoke_static(
+    sc,
+    "org.apache.spark.storage.StorageLevel",
+    storage.level
+  )
+
+  sdf %>%
+    invoke("persist", sl) %>%
+    sdf_register()
 }
