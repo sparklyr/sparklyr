@@ -113,6 +113,22 @@ copy_to.src_spark <- function(dest, df, name, ...) {
   copy_to(spark_connection(dest), df, name, ...)
 }
 
+tbl_cache_sdf <- function(sc, name, force) {
+  tbl <- tbl(sc, name)
+  sdf <- spark_dataframe(tbl)
+
+  invoke(sdf, "cache")
+  if (force)
+    invoke(sdf, "count")
+}
+
+tbl_cache_sql <- function(sc, name, force) {
+  dbGetQuery(sc, paste("CACHE TABLE", dplyr::escape(ident(name), con = sc)))
+
+  if (force)
+    dbGetQuery(sc, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = sc)))
+}
+
 #' Cache a Spark Table
 #'
 #' Force a Spark table with name \code{name} to be loaded into memory.
@@ -127,12 +143,22 @@ copy_to.src_spark <- function(dest, df, name, ...) {
 #'
 #' @export
 tbl_cache <- function(sc, name, force = TRUE) {
-  tbl <- tbl(sc, name)
-  sdf <- spark_dataframe(tbl)
+  countColumns <- function(sc, name) {
+    tbl <- tbl(sc, name)
+    sdf <- spark_dataframe(tbl)
 
-  invoke(sdf, "cache")
-  if (force)
-    invoke(sdf, "count")
+    length(invoke(sdf, "columns"))
+  }
+
+  # We preffer to cache tables using SQL syntax since this would track the
+  # table names in logs and ui with a friendly name, say "In-memory table df".
+  # Using tbl_cache_sdf is supported for high-number of columns; however, it
+  # displays a non-friendly name that we try to avoid.
+
+  if (spark_version(sc) < "2.0.0" && countColumns(sc, name) >= 1000)
+    tbl_cache_sdf(sc, name, force)
+  else
+    tbl_cache_sql(sc, name, force)
 
   invisible(NULL)
 }
