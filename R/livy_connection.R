@@ -71,6 +71,9 @@ livy_code_quote_parameters <- function(params) {
     params <- lapply(params, function(param) {
       paramClass <- class(param)
       if (paramClass == "character") {
+        # substiture illegal characters
+        param <- gsub("\n", "\\n", param)
+
         paste("\"", param, "\"", sep = "")
       }
       else if (paramClass == "spark_lobj") {
