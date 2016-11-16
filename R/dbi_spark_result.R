@@ -15,7 +15,7 @@ setClass("DBISparkResult",
          contains = "DBIResult",
          slots = list(
            sql = "character",
-           sdf = "spark_jobj",
+           sdf = "jobj",
            conn = "spark_connection",
            state = "environment"
          )

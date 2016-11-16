@@ -70,13 +70,13 @@ livy_code_quote_parameters <- function(params) {
   } else {
     params <- lapply(params, function(param) {
       paramClass <- class(param)
-      if (paramClass == "character") {
+      if (is.character(param)) {
         # substiture illegal characters
         param <- gsub("\n", "\" + sys.props(\"line.separator\") + \"", param)
 
         paste("\"", param, "\"", sep = "")
       }
-      else if (paramClass == "spark_lobj") {
+      else if ("spark_lobj" %in% paramClass) {
         param$varName
       }
       else if (is.numeric(param)) {
@@ -94,7 +94,7 @@ livy_code_quote_parameters <- function(params) {
         )
       }
       else {
-        stop("Unsupported parameter ", param, " of class ", paramClass, " detected")
+        stop("Unsupported parameter ", param, " of class ", paste(paramClass, collapse = ", "), " detected")
       }
     })
 
@@ -117,7 +117,7 @@ livy_lobj_create <- function(sc, varName) {
       varName = varName,
       response = NULL
     ),
-    class = "spark_lobj"
+    class = c("jobj", "spark_lobj")
   )
 }
 
@@ -224,7 +224,7 @@ livy_statement_parse_response <- function(text, lobj) {
     return(NULL)
   }
 
-  parsedRegExp <- regexec("([^:]+): ([\\[\\]a-zA-Z0-9.]+) = (.*)", text, perl = TRUE)
+  parsedRegExp <- regexec("([^:]+): ([\\[\\]a-zA-Z0-9._]+) = (.*)", text, perl = TRUE)
   parsed <- regmatches(text, parsedRegExp)
   if (length(parsed) != 1) {
     stop("Failed to parse statement reponse: ", text)
@@ -236,7 +236,7 @@ livy_statement_parse_response <- function(text, lobj) {
   }
 
   varName <- parsed[[2]]
-  scalaType <- parsed[[3]]
+  scalaTypeRaw <- parsed[[3]]
   scalaValue <- parsed[[4]]
 
   removeQuotes <- function(e) gsub("^\"|\"$", "", e)
@@ -257,7 +257,15 @@ livy_statement_parse_response <- function(text, lobj) {
   )
 
   type <- "object"
-  value <- scalaValue
+  value <- lobj
+
+  scalaTypeIsArray <- function(scalaType) grepl("Array\\[[^\\]]+\\]", scalaType, perl = TRUE)
+  scalaTypeOfArray <- function(scalaType) {
+    parsed <- regmatches(scalaType, regexec("Array\\[([^\\]]+)\\]", scalaType, perl = TRUE))
+    parsed[[1]][[2]]
+  }
+
+  scalaType <- if (scalaTypeIsArray(scalaTypeRaw)) scalaTypeOfArray(scalaTypeRaw) else scalaTypeRaw
 
   if (scalaType %in% names(livyToRTypeMap)) {
     livyToRTypeMapInst <- livyToRTypeMap[[scalaType]]
@@ -265,16 +273,16 @@ livy_statement_parse_response <- function(text, lobj) {
     value <- livyToRTypeMapInst$parse(scalaValue)
   }
 
-  scalaTypeIsArray <- function(scalaType) grepl("Array\\[", scalaType)
-
-  if (scalaTypeIsArray(scalaType)) {
+  if (scalaTypeIsArray(scalaTypeRaw)) {
     lobj$collection = list(
       type = "array",
       entries = type
     )
+    lobj
   }
-
-  if (type == "object") lobj else value
+  else {
+    value
+  }
 }
 
 livy_get_statement <- function(sc, statementId) {
@@ -367,7 +375,7 @@ livy_invoke_statement <- function(sc, statement) {
 livy_invoke_statement_fetch <- function(sc, statement) {
   result <- livy_invoke_statement(sc, statement)
 
-  if (class(result) == "spark_lobj" && !is.null(result$collection)) {
+  if ("spark_lobj" %in% class(result) && !is.null(result$collection)) {
     if (result$collection$entries == "object") {
       lengthStatement <- livy_statement_compose(
         code = paste(result$varName, ".length", sep = ""),
