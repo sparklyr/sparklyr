@@ -193,6 +193,7 @@ livy_install_find <- function(livyVersion = NULL) {
 #'
 #' @keywords internal
 #'
+#' @rdname livy_install
 #' @export
 livy_home_dir <- function(version = NULL) {
   tryCatch({
