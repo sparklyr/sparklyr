@@ -221,24 +221,20 @@ livy_statement_parse_response <- function(text, lobj) {
     return(NULL)
   }
 
-  parsed <- regmatches(text, regexec("([^:]+): (Array)?\\[?([a-zA-Z0-9.]+)\\]? = (.*)", text))
+  parsedRegExp <- regexec("([^:]+): ([\\[\\]a-zA-Z0-9.]+) = (.*)", text, perl = TRUE)
+  parsed <- regmatches(text, parsedRegExp)
   if (length(parsed) != 1) {
     stop("Failed to parse statement reponse: ", text)
   }
 
   parsed <- parsed[[1]]
-  if (length(parsed) != 5) {
+  if (length(parsed) != 4) {
     stop("Failed to parse statement reponse: ", text)
   }
 
   varName <- parsed[[2]]
-  collectionType <- parsed[[3]]
-  scalaType <- parsed[[4]]
-  scalaValue <- parsed[[5]]
-
-  if (nchar(collectionType) > 0 && collectionType != "Array") {
-    stop("Failed to parse statement, unrecognized collection type: ", text)
-  }
+  scalaType <- parsed[[3]]
+  scalaValue <- parsed[[4]]
 
   removeQuotes <- function(e) gsub("^\"|\"$", "", e)
 
@@ -266,7 +262,9 @@ livy_statement_parse_response <- function(text, lobj) {
     value <- livyToRTypeMapInst$parse(scalaValue)
   }
 
-  if (collectionType == "Array") {
+  scalaTypeIsArray <- function(scalaType) grepl("Array\\[", scalaType)
+
+  if (scalaTypeIsArray(scalaType)) {
     lobj$collection = list(
       type = "array",
       entries = type
