@@ -20,4 +20,10 @@ ml_backwards_compatibility_api <- function(envir = parent.frame()) {
   # allow 'output_col' as alias for output.col
   if (is.null(envir$output.col) && !is.null(dots$output_col))
     assign("output.col", dots$output_col, envir = envir)
+
+  # allow 'data' as an optional parameter
+  if (!is.null(dots$data) && is.formula(envir$x)) {
+    assign("response", envir$x, envir = envir)
+    assign("x", dots$data, envir = envir)
+  }
 }

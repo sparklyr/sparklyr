@@ -24,10 +24,10 @@ ml_logistic_regression <- function(x,
                                    ml.options = ml_options(),
                                    ...)
 {
+  ml_backwards_compatibility_api()
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-
-  ml_backwards_compatibility_api()
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
