@@ -127,3 +127,79 @@ livy_install <- function(version       = "0.2.0",
 
   invisible(livy_path)
 }
+
+livy_versions_file_pattern <- function() {
+  "livy-(.*)-spark-(.*)"
+}
+
+#' @rdname livy_install
+#' @export
+livy_install_dir <- function() {
+  getOption("livy.install.dir", rappdirs::app_dir("livy", "rstudio")$cache())
+}
+
+#' @rdname livy_install
+#' @export
+livy_installed_versions <- function() {
+
+  livyDir <- livy_install_dir()
+
+  livy <- character()
+  dir <- character()
+  livyVersionDir <- character()
+
+  lapply(dir(livy_install_dir(), full.names = TRUE), function(maybeDir) {
+    if (dir.exists(maybeDir)) {
+      fileName <- basename(maybeDir)
+      m <- regmatches(fileName, regexec(livy_versions_file_pattern(), fileName))[[1]]
+      if (length(m) > 1) {
+        livy <<- c(livy, m[[2]])
+        dir <<- c(dir, basename(maybeDir))
+        livyVersionDir <<- file.path(livyDir, maybeDir)
+      }
+    }
+  })
+
+  versions <- data.frame(livy = livy,
+                         livyVersionDir = livyVersionDir,
+                         stringsAsFactors = FALSE)
+
+  versions
+}
+
+livy_install_find <- function(livyVersion = NULL) {
+  versions <- livy_installed_versions()
+  versions <- if (is.null(livyVersion)) versions else versions[versions$livy == livyVersion, ]
+
+  if(NROW(versions) == 0) {
+    livyInstall <- quote(livy_install(version = ""))
+    livyInstall$version <- livyVersion
+
+    stop(paste("Livy version not installed. To install, use", deparse(livyInstall)))
+  }
+
+  versions[1,]
+}
+
+#' Find the LIVY_HOME directory for a version of Livy
+#'
+#' Find the LIVY_HOME directory for a given version of Livy that
+#' was previously installed using \code{\link{livy_install}}.
+#'
+#' @param version Version of Livy
+#'
+#' @return Path to LIVY_HOME (or \code{NULL} if the specified version
+#'   was not found).
+#'
+#' @keywords internal
+#'
+#' @export
+livy_home_dir <- function(version = NULL) {
+  tryCatch({
+    installInfo <- livy_install_find(livyVersion = version)
+    installInfo$livyVersionDir
+  },
+  error = function(e) {
+    NULL
+  })
+}
