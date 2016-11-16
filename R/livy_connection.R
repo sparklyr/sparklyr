@@ -72,7 +72,7 @@ livy_code_quote_parameters <- function(params) {
       paramClass <- class(param)
       if (paramClass == "character") {
         # substiture illegal characters
-        param <- gsub("\n", "\\n", param)
+        param <- gsub("\n", "\" + sys.props(\"line.separator\") + \"", param)
 
         paste("\"", param, "\"", sep = "")
       }
