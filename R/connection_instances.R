@@ -16,11 +16,13 @@ spark_connections_add <- function(sc) {
 
 spark_connections_remove <- function(sc) {
   instances <- spark_connection_instances()
-  for (i in 1:length(instances)) {
-    if (sc$master == instances[[i]]$master) {
-      instances[[i]] <- NULL
-      sparkConnectionsEnv$instances <- instances
-      break
+  if (length(instances) > 0) {
+    for (i in 1:length(instances)) {
+      if (sc$master == instances[[i]]$master) {
+        instances[[i]] <- NULL
+        sparkConnectionsEnv$instances <- instances
+        break
+      }
     }
   }
 }
