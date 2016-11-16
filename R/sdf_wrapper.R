@@ -93,7 +93,7 @@ sdf_collect <- function(object) {
     chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
     chunks <- split_chunks(columns, as.integer(chunk_size))
     pieces <- lapply(chunks, function(chunk) {
-      subset <- sdf %>% invoke("selectExpr", as.list(chunk))
+      subset <- do.call(invoke, c(list(sdf, "selectExpr"), as.list(chunk)))
       invoke_static(sc, "sparklyr.Utils", "collect", subset)
     })
     do.call(c, pieces)
