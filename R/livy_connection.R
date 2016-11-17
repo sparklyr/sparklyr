@@ -337,7 +337,11 @@ livy_post_statement <- function(sc, code) {
   assert_that(!is.null(statementReponse$output))
 
   if (statementReponse$output$status == "error") {
-    stop("Failed to execute Livy statement with error: ", statementReponse$output$evalue)
+    withr::with_options(list(
+      warning.length = 8000
+    ), {
+      stop("Failed to execute Livy statement with error: ", statementReponse$output$evalue)
+    })
   }
 
   statementReponse$output$data
