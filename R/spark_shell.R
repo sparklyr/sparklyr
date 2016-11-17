@@ -80,7 +80,7 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
 
     logLines <- if (!is.null(output_file) && file.exists(output_file))
       paste(tail(readLines(output_file), n = maxRows), collapse = "\n")
-    else""
+    else ""
 
     errorLines <- if (!is.null(error_file) && file.exists(error_file))
       paste(tail(readLines(error_file), n = maxRows), collapse = "\n")
@@ -89,13 +89,15 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
     stop(
       paste(
         message, "\n",
-        "    Path: ", spark_submit_path, "\n",
-        "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
+        if (!is.null(spark_submit_path))
+          paste("    Path: ", spark_submit_path, "\n", sep = "") else "",
+        if (!is.null(shell_args))
+          paste("    Parameters: ", paste(shell_args, collapse = ", "), "\n", sep = "") else  "",
         "\n\n",
-        "---- Output Log ----\n",
+        if (!is.null(output_file)) "---- Output Log ----\n" else "",
         logLines,
         "\n\n",
-        "---- Error Log ----\n",
+        if (!is.null(error_file)) "---- Error Log ----\n" else "",
         errorLines,
         sep = ""
       )
@@ -554,10 +556,10 @@ initialize_connection.spark_shell_connection <- function(sc) {
   }, error = function(e) {
     abort_shell(
       paste("Failed during initialize_connection:", e$message),
-      spark_submit_path,
-      shell_args,
-      output_file,
-      error_file
+      spark_submit_path = NULL,
+      shell_args = NULL,
+      output_file = sc$output_file,
+      error_file = NULL
     )
   })
 }
