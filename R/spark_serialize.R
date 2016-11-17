@@ -35,6 +35,10 @@
 
 getSerdeType <- function(object) {
   type <- class(object)[[1]]
+  if (inherits(object, "spark_jobj")) {
+    type <- "spark_jobj"
+  }
+
   if (type != "list") {
     type
   } else {
