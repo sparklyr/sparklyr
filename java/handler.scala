@@ -104,51 +104,10 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
         }
 
         val args = readArgs(numArgs, dis)
+        val res = InvokeUtils.invoke(cls, methodName, args)
 
-        val methods = cls.getMethods
-        val selectedMethods = methods.filter(m => m.getName == methodName)
-        if (selectedMethods.length > 0) {
-          val index = InvokeUtils.findMatchedSignature(
-            selectedMethods.map(_.getParameterTypes),
-            args)
-
-          if (index.isEmpty) {
-            logWarning(s"cannot find matching method ${cls}.$methodName. "
-                       + s"Candidates are:")
-            selectedMethods.foreach { method =>
-              logWarning(s"$methodName(${method.getParameterTypes.mkString(",")})")
-            }
-            throw new Exception(s"No matched method found for $cls.$methodName")
-          }
-
-          val ret = selectedMethods(index.get).invoke(obj, args : _*)
-
-          // Write status bit
-          writeInt(dos, 0)
-          writeObject(dos, ret.asInstanceOf[AnyRef])
-        } else if (methodName == "<init>") {
-          // methodName should be "<init>" for constructor
-          val ctors = cls.getConstructors
-          val index = InvokeUtils.findMatchedSignature(
-            ctors.map(_.getParameterTypes),
-            args)
-
-          if (index.isEmpty) {
-            logWarning(s"cannot find matching constructor for ${cls}. "
-                       + s"Candidates are:")
-            ctors.foreach { ctor =>
-              logWarning(s"$cls(${ctor.getParameterTypes.mkString(",")})")
-            }
-            throw new Exception(s"No matched constructor found for $cls")
-          }
-
-          val obj = ctors(index.get).newInstance(args : _*)
-
-          writeInt(dos, 0)
-          writeObject(dos, obj.asInstanceOf[AnyRef])
-        } else {
-          throw new IllegalArgumentException("invalid method " + methodName + " for object " + objId)
-        }
+        writeInt(dos, 0)
+        writeObject(dos, res.asInstanceOf[AnyRef])
       } catch {
         case e: Exception =>
           logError(s"$methodName on $objId failed")
