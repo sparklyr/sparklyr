@@ -45,7 +45,7 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
           writeInt(dos, 0)
           writeType(dos, "void")
           server.close()
-          
+
           System.exit(0)
         case "rm" =>
           try {
@@ -108,7 +108,7 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
         val methods = cls.getMethods
         val selectedMethods = methods.filter(m => m.getName == methodName)
         if (selectedMethods.length > 0) {
-          val index = findMatchedSignature(
+          val index = InvokeUtils.findMatchedSignature(
             selectedMethods.map(_.getParameterTypes),
             args)
 
@@ -129,7 +129,7 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
         } else if (methodName == "<init>") {
           // methodName should be "<init>" for constructor
           val ctors = cls.getConstructors
-          val index = findMatchedSignature(
+          val index = InvokeUtils.findMatchedSignature(
             ctors.map(_.getParameterTypes),
             args)
 
@@ -165,74 +165,6 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
       readObject(dis)
     }.toArray
   }
-
-  // Find a matching method signature in an array of signatures of constructors
-  // or methods of the same name according to the passed arguments. Arguments
-  // may be converted in order to match a signature.
-  //
-  // Note that in Java reflection, constructors and normal methods are of different
-  // classes, and share no parent class that provides methods for reflection uses.
-  // There is no unified way to handle them in this function. So an array of signatures
-  // is passed in instead of an array of candidate constructors or methods.
-  //
-  // Returns an Option[Int] which is the index of the matched signature in the array.
-  def findMatchedSignature(
-    parameterTypesOfMethods: Array[Array[Class[_]]],
-    args: Array[Object]): Option[Int] = {
-      val numArgs = args.length
-
-      for (index <- 0 until parameterTypesOfMethods.length) {
-        val parameterTypes = parameterTypesOfMethods(index)
-
-        if (parameterTypes.length == numArgs) {
-          var argMatched = true
-          var i = 0
-          while (i < numArgs && argMatched) {
-            val parameterType = parameterTypes(i)
-
-            if (parameterType == classOf[Seq[Any]] && args(i).getClass.isArray) {
-              // The case that the parameter type is a Scala Seq and the argument
-              // is a Java array is considered matching. The array will be converted
-              // to a Seq later if this method is matched.
-            } else {
-              var parameterWrapperType = parameterType
-
-              // Convert native parameters to Object types as args is Array[Object] here
-              if (parameterType.isPrimitive) {
-                parameterWrapperType = parameterType match {
-                  case java.lang.Integer.TYPE => classOf[java.lang.Integer]
-                  case java.lang.Long.TYPE => classOf[java.lang.Integer]
-                  case java.lang.Double.TYPE => classOf[java.lang.Double]
-                  case java.lang.Boolean.TYPE => classOf[java.lang.Boolean]
-                  case _ => parameterType
-                }
-              }
-              if ((parameterType.isPrimitive || args(i) != null) &&
-                  !parameterWrapperType.isInstance(args(i))) {
-                argMatched = false
-              }
-            }
-
-            i = i + 1
-          }
-
-          if (argMatched) {
-            // Convert args if needed
-            val parameterTypes = parameterTypesOfMethods(index)
-
-            (0 until numArgs).map { i =>
-              if (parameterTypes(i) == classOf[Seq[Any]] && args(i).getClass.isArray) {
-                // Convert a Java array to scala Seq
-                args(i) = args(i).asInstanceOf[Array[_]].toSeq
-              }
-            }
-
-            return Some(index)
-          }
-        }
-      }
-      None
-    }
 }
 
 /**
