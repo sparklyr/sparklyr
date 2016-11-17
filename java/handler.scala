@@ -104,7 +104,7 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
         }
 
         val args = readArgs(numArgs, dis)
-        val res = InvokeUtils.invoke(cls, methodName, args)
+        val res = InvokeUtils.invoke(cls, objId, obj, methodName, args)
 
         writeInt(dos, 0)
         writeObject(dos, res.asInstanceOf[AnyRef])
