@@ -16,10 +16,10 @@ ml_pca <- function(x,
                    ml.options = ml_options(),
                    ...)
 {
+  ml_backwards_compatibility_api()
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-
-  ml_backwards_compatibility_api()
 
   df <- ml_prepare_features(
     x = df,

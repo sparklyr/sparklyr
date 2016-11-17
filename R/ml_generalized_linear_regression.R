@@ -31,11 +31,12 @@ ml_generalized_linear_regression <-
            ml.options = ml_options(),
            ...)
 {
+  ml_backwards_compatibility_api()
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-  spark_require_version(sc, "2.0.0")
 
-  ml_backwards_compatibility_api()
+  spark_require_version(sc, "2.0.0")
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
