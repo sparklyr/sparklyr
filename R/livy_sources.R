@@ -28,7 +28,7 @@ livy_sources_refresh <- function() {
     write("//", file = destinationPath, append = TRUE)
 
     # remove unsupported commands from file
-    lines <- lines[!grepl("package sparklyr", lines)]
+    lines <- lines[!grepl("package sparklyr|import sparklyr\\.", lines)]
 
     lapply(lines, function(line) {
       write(line, file = destinationPath, append = TRUE)
