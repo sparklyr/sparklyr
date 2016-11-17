@@ -14,7 +14,7 @@ livy_sources_refresh <- function() {
   scalaFiles <- list.files(scalaPath, pattern = "scala$", full.names = TRUE)
 
   includedPatterns <- livy_sources_included()
-  includedFiles <- scala_files[grepl(paste(includedPatterns, collapse = "|"), scalaFiles)]
+  includedFiles <- scalaFiles[grepl(paste(includedPatterns, collapse = "|"), scalaFiles)]
 
   lapply(includedFiles, function(sourcePath) {
     destinationPath <- file.path(livyPath, basename(sourcePath))
@@ -33,4 +33,6 @@ livy_sources_refresh <- function() {
       write(line, file = destinationPath, append = TRUE)
     })
   })
+
+  invisible(NULL)
 }
