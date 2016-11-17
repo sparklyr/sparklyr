@@ -1,3 +1,8 @@
+//
+// This file was automatically generated using livy_sources_refresh()
+// Changes to this file will be reverted.
+//
+
 import java.io._
 import java.util.Arrays
 
@@ -147,12 +152,24 @@ object Utils {
     }}
   }
 
+  def collectImplVector(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      el match {
+        case null => Array.empty
+        case _    => el.getClass.getDeclaredMethod("toArray").invoke(el)
+      }
+    }}
+  }
+
   def collectImplDefault(local: Array[Row], idx: Integer) = {
     local.map(row => row(idx))
   }
 
   def collectImpl(local: Array[Row], idx: Integer, colType: String) = {
-    val decimalType = "(DecimalType.*)".r
+
+    val ReDecimalType = "(DecimalType.*)".r
+    val ReVectorType  = "(.*VectorUDT.*)".r
 
     colType match {
       case "BooleanType"          => collectImplBoolean(local, idx)
@@ -170,8 +187,10 @@ object Utils {
       case "CalendarIntervalType" => collectImplForceString(local, idx)
       case "DateType"             => collectImplForceString(local, idx)
 
-      case decimalType(_)  => collectImplDecimal(local, idx)
-      case _               => collectImplDefault(local, idx)
+      case ReDecimalType(_)       => collectImplDecimal(local, idx)
+      case ReVectorType(_)        => collectImplVector(local, idx)
+
+      case _                      => collectImplDefault(local, idx)
     }
   }
 
@@ -197,7 +216,7 @@ object Utils {
     partitions: Int): RDD[Row] = {
 
     var data = rows.map(o => {
-      val r = o.split('\31')
+      val r = o.split('\\|~\\|')
       var typed = (Array.range(0, r.length)).map(idx => {
         val column = columns(idx)
         val value = r(idx)

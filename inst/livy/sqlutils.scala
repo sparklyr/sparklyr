@@ -1,3 +1,8 @@
+//
+// This file was automatically generated using livy_sources_refresh()
+// Changes to this file will be reverted.
+//
+
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
 
 import org.apache.spark.api.java.{JavaRDD, JavaSparkContext}
