@@ -299,6 +299,8 @@ livy_inspect <- function(lobj) {
 }
 
 livy_post_statement <- function(sc, code) {
+  write(code, file = sc$log, append = TRUE)
+
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
     add_headers(
       "Content-Type" = "application/json"
@@ -429,7 +431,8 @@ livy_connection <- function(master, config) {
     master = master,
     sessionId = session$id,
     config = config,
-    code = new.env()
+    code = new.env(),
+    log = tempfile(fileext = ".log")
   ))
 
   sc$code$totalReturnVars <- 0
