@@ -114,10 +114,26 @@ object InvokeUtils {
     }
   }
 
-  def invoke(obj: Object, method: String, args: Array[Object]): Any = {
+  def invokeEx(obj: Object, method: String, args: Array[Object]): Any = {
     val cls = obj.getClass
-    val objId = cls.getName
+    val classId = cls.getName
 
-    invoke(cls, objId, obj, method, args)
+    val res = invoke(cls, classId, obj, method, args)
+
+    (res, res.getClass.getName)
+  }
+
+  def invokeStaticEx(classId: String, method: String, args: Array[Object]): Any = {
+    val cls = Class.forName(classId)
+    val res = invoke(cls, classId, null, method, args)
+
+    (res, res.getClass.getName)
+  }
+
+  def invokeNewEx(classId: String, args: Array[Object]): Any = {
+    val cls = Class.forName(classId)
+    val res = invoke(cls, classId, null, "<init>", args)
+
+    (res, res.getClass.getName)
   }
 }

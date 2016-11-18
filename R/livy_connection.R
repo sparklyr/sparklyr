@@ -134,11 +134,13 @@ livy_statement_compose_static <- function(sc, class, method, ...) {
 
   code <- paste(
     "var ", varName, " = ",
-    if (is.null(class)) "" else paste(class, ".", sep = ""),
+    "InvokeUtils.invokeStaticEx(\"",
+    class,
+    "\", \"",
     method,
-    "(",
+    "\", Array(",
     livy_code_quote_parameters(parameters),
-    ")",
+    "))",
     sep = ""
   )
 
@@ -154,7 +156,7 @@ livy_statement_compose_method <- function(lobj, method, ...) {
 
   code <- paste(
     "var ", varName, " = ",
-    "InvokeUtils.invoke(",
+    "InvokeUtils.invokeEx(",
     lobj$varName,
     ", \"",
     method,
@@ -190,11 +192,12 @@ livy_statement_compose_new <- function(sc, class, ...) {
   varName <- livy_code_new_return_var(sc)
 
   code <- paste(
-    "var ", varName, " = new ",
+    "var ", varName, " = ",
+    "InvokeUtils.invokeStaticEx(\"",
     class,
-    "(",
+    "\", Array(",
     livy_code_quote_parameters(parameters),
-    ")",
+    "))",
     sep = ""
   )
 
@@ -231,7 +234,7 @@ livy_statement_parse_response <- function(text, lobj) {
   removeQuotes <- function(e) gsub("^\"|\"$", "", e)
 
   livyToRTypeMap <- list(
-    "String" = list(
+    "java.lang.String" = list(
       type = "character",
       parse = function(e) removeQuotes(e)
     ),
@@ -239,7 +242,7 @@ livy_statement_parse_response <- function(text, lobj) {
       type = "character",
       parse = function(e) removeQuotes(e)
     ),
-    "Int" = list(
+    "int" = list(
       type = "integer",
       parse = function(e) as.integer(e)
     )
@@ -531,15 +534,22 @@ invoke_new.livy_connection <- function(sc, class, ...) {
 
 livy_load_scala_sources <- function(sc) {
   livySources <- c(
-    "utils.scala", "sqlutils.scala"
+    "utils.scala",
+    "sqlutils.scala",
+    "logging.scala",
+    "invokeutils.scala"
   )
 
   lapply(livySources, function(sourceName) {
-    sourcesFile <- system.file(file.path("livy", sourceName), package = "sparklyr")
-  sources <- paste(readLines(sourcesFile), collapse = "\n")
+    tryCatch({
+      sourcesFile <- system.file(file.path("livy", sourceName), package = "sparklyr")
+      sources <- paste(readLines(sourcesFile), collapse = "\n")
 
-  statement <- livy_statement_compose(sources, NULL)
-  livy_invoke_statement(sc, statement)
+      statement <- livy_statement_compose(sources, NULL)
+      livy_invoke_statement(sc, statement)
+    }, error = function(e) {
+      stop("Failed to load ", sourceName, ": ", e$message)
+    })
   })
 }
 
