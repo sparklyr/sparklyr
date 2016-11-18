@@ -1,4 +1,4 @@
 #!/usr/bin/env Rscript
 library(sparklyr)
-sparklyr::compile_package_jars()
 sparklyr:::livy_sources_refresh()
+sparklyr::compile_package_jars()
