@@ -77,7 +77,7 @@ livy_code_quote_parameters <- function(params) {
         paste("\"", param, "\"", sep = "")
       }
       else if ("spark_lobj" %in% paramClass) {
-        paste(param$varName, "._1", sep = "")
+        paste(param$varName, "._2", sep = "")
       }
       else if (is.numeric(param)) {
         paste(
@@ -169,7 +169,7 @@ livy_statement_compose_method <- function(lobj, method, ...) {
     "var ", varName, " = ",
     "InvokeUtils.invokeEx(",
     lobj$varName,
-    if (!is.null(lobj$varType)) "._1" else "",
+    if (!is.null(lobj$varType)) "._2" else "",
     ", \"",
     method,
     "\", Array(",
@@ -230,7 +230,7 @@ livy_statement_parse_response <- function(text, lobj) {
 
   text <- gsub("\n", "", text)
 
-  parsedRegExp <- regexec("([^:]+): \\([^,]+, String\\) = \\((.+),([^)]+)\\).*", text, perl = TRUE)
+  parsedRegExp <- regexec("([^:]+): \\(String, [^,]+\\) = \\(([^,]+),(.+)\\).*", text, perl = TRUE)
   parsed <- regmatches(text, parsedRegExp)
   if (length(parsed) != 1) {
     stop("Failed to parse statement reponse: ", text)
@@ -242,8 +242,8 @@ livy_statement_parse_response <- function(text, lobj) {
   }
 
   varName <- parsed[[2]]
-  scalaValue <- parsed[[3]]
-  scalaTypeRaw <- parsed[[4]]
+  scalaTypeRaw <- parsed[[3]]
+  scalaValue <- parsed[[4]]
 
   removeQuotes <- function(e) gsub("^\"|\"$", "", e)
 
@@ -409,7 +409,7 @@ livy_invoke_statement_fetch <- function(sc, statement) {
       varName <- livy_code_new_return_var(sc)
       lengthStatement <- livy_statement_compose(
         code = paste(
-          "val ", varName, " = InvokeUtils.invokeLengthEx(", result$varName, "._1)", sep = ""
+          "val ", varName, " = InvokeUtils.invokeLengthEx(", result$varName, "._2)", sep = ""
         ),
         lobj = livy_lobj_create(sc, varName))
       lengthResult <- livy_invoke_statement(sc, lengthStatement)
@@ -418,7 +418,7 @@ livy_invoke_statement_fetch <- function(sc, statement) {
         livy_lobj_create(
           sc,
           paste(
-            "InvokeUtils.invokeElemEx(", result$varName, "._1, ", (idx - 1), ")._1", sep = ""
+            "InvokeUtils.invokeElemEx(", result$varName, "._2, ", (idx - 1), ")._2", sep = ""
           )
         )
       })
@@ -427,7 +427,7 @@ livy_invoke_statement_fetch <- function(sc, statement) {
       jsonStatement <- livy_statement_compose_magic(result, "json")
       jsonResult <- livy_invoke_statement(sc, jsonStatement)
 
-      if (!is.null(result$varType)) jsonResult[["_1"]] else jsonResult
+      jsonResult[[1]]
     }
   }
   else {

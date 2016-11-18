@@ -117,38 +117,38 @@ object InvokeUtils {
     }
   }
 
-  def invokeEx(obj: Object, method: String, args: Array[Object]): (Object, String) = {
+  def invokeEx(obj: Object, method: String, args: Array[Object]): (String, Object) = {
     val cls = obj.getClass
     val classId = cls.getName
 
     val res = invoke(cls, classId, obj, method, args)
 
-    (res, if (res != null) res.getClass.getName else null)
+    (if (res != null) res.getClass.getName else null, res)
   }
 
-  def invokeStaticEx(classId: String, method: String, args: Array[Object]): (Object, String) = {
+  def invokeStaticEx(classId: String, method: String, args: Array[Object]): (String, Object) = {
     val cls = Class.forName(classId)
     val res = invoke(cls, classId, null, method, args)
 
-    (res, res.getClass.getName)
+    (res.getClass.getName, res)
   }
 
-  def invokeNewEx(classId: String, args: Array[Object]): (Object, String) = {
+  def invokeNewEx(classId: String, args: Array[Object]): (String, Object) = {
     val cls = Class.forName(classId)
     val res = invoke(cls, classId, null, "<init>", args)
 
-    (res, res.getClass.getName)
+    (res.getClass.getName, res)
   }
 
-  def invokeElemEx(obj: Object, index: Int): (Object, String) = {
+  def invokeElemEx(obj: Object, index: Int): (String, Object) = {
     val res = obj.asInstanceOf[Array[Object]](index)
 
-    (res, res.getClass.getName)
+    (res.getClass.getName, res)
   }
 
-  def invokeLengthEx(obj: Object) : (Object, String) = {
+  def invokeLengthEx(obj: Object) : (String, Object) = {
     val res: java.lang.Integer = obj.asInstanceOf[Array[Object]].length
 
-    (res, res.getClass.getName)
+    (res.getClass.getName, res)
   }
 }
