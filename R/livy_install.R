@@ -87,7 +87,7 @@ livy_install <- function(version       = "0.3.0",
 
   # construct path to livy download
   url <- sprintf(
-    "https://rstudio-sparklyr.s3-website-us-west-2.amazonaws.com/livy/livy-server-%s.zip",
+    "https://s3-us-west-2.amazonaws.com/rstudio-sparklyr/livy/livy-server-%s.zip",
     version
   )
 
