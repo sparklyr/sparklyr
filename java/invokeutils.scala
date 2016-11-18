@@ -74,7 +74,7 @@ object InvokeUtils {
       None
     }
 
-  def invoke(cls: Class[_], objId: String, obj: Object, methodName: String, args: Array[Object]): Any = {
+  def invoke(cls: Class[_], objId: String, obj: Object, methodName: String, args: Array[Object]): Object = {
     val methods = cls.getMethods
     val selectedMethods = methods.filter(m => m.getName == methodName)
     if (selectedMethods.length > 0) {
@@ -108,13 +108,13 @@ object InvokeUtils {
         throw new Exception(s"No matched constructor found for $cls")
       }
 
-      return ctors(index.get).newInstance(args : _*)
+      return ctors(index.get).newInstance(args : _*).asInstanceOf[Object]
     } else {
       throw new IllegalArgumentException("invalid method " + methodName + " for object " + objId)
     }
   }
 
-  def invokeEx(obj: Object, method: String, args: Array[Object]): Any = {
+  def invokeEx(obj: Object, method: String, args: Array[Object]): Object = {
     val cls = obj.getClass
     val classId = cls.getName
 
@@ -123,14 +123,14 @@ object InvokeUtils {
     (res, res.getClass.getName)
   }
 
-  def invokeStaticEx(classId: String, method: String, args: Array[Object]): Any = {
+  def invokeStaticEx(classId: String, method: String, args: Array[Object]): Object = {
     val cls = Class.forName(classId)
     val res = invoke(cls, classId, null, method, args)
 
     (res, res.getClass.getName)
   }
 
-  def invokeNewEx(classId: String, args: Array[Object]): Any = {
+  def invokeNewEx(classId: String, args: Array[Object]): Object = {
     val cls = Class.forName(classId)
     val res = invoke(cls, classId, null, "<init>", args)
 
