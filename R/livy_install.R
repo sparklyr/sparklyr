@@ -13,7 +13,7 @@
 #'   A version of Spark known to be compatible with the requested version of
 #'   \samp{livy} is chosen when possible.
 #' @export
-livy_install <- function(version       = "0.2.0",
+livy_install <- function(version       = "0.3.0",
                          spark_home    = NULL,
                          spark_version = NULL)
 {
@@ -87,7 +87,7 @@ livy_install <- function(version       = "0.2.0",
 
   # construct path to livy download
   url <- sprintf(
-    "http://archive.cloudera.com/beta/livy/livy-server-%s.zip",
+    "rstudio-sparklyr.s3-website-us-west-2.amazonaws.com/livy/livy-server-%s.zip",
     version
   )
 
