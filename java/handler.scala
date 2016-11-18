@@ -99,7 +99,7 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
             case None => throw new IllegalArgumentException("Object not found " + objId)
             case Some(o) =>
               obj = o
-            o.getClass
+              o.getClass
           }
         }
 

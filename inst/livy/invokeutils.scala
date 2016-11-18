@@ -6,6 +6,7 @@
 import scala.collection.mutable.HashMap
 import scala.language.existentials
 
+import Logging._
 
 object InvokeUtils {
   // Find a matching method signature in an array of signatures of constructors
@@ -117,7 +118,7 @@ object InvokeUtils {
   }
 
   def invoke(obj: Object, method: String, args: Array[Object]): Any = {
-    val cls = o.getClass
+    val cls = obj.getClass
     val objId = cls.getName
 
     invoke(cls, objId, obj, method, args)

@@ -115,7 +115,7 @@ object InvokeUtils {
   }
 
   def invoke(obj: Object, method: String, args: Array[Object]): Any = {
-    val cls = o.getClass
+    val cls = obj.getClass
     val objId = cls.getName
 
     invoke(cls, objId, obj, method, args)
