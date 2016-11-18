@@ -120,7 +120,7 @@ object InvokeUtils {
 
     val res = invoke(cls, classId, obj, method, args)
 
-    (res, res.getClass.getName)
+    (res, if (res != null) res.getClass.getName else null)
   }
 
   def invokeStaticEx(classId: String, method: String, args: Array[Object]): (Object, String) = {
@@ -133,6 +133,18 @@ object InvokeUtils {
   def invokeNewEx(classId: String, args: Array[Object]): (Object, String) = {
     val cls = Class.forName(classId)
     val res = invoke(cls, classId, null, "<init>", args)
+
+    (res, res.getClass.getName)
+  }
+
+  def invokeElemEx(obj: Object, index: Int): (Object, String) = {
+    val res = obj.asInstanceOf[Array[Object]](index)
+
+    (res, res.getClass.getName)
+  }
+
+  def invokeLengthEx(obj: Object) : (Object, String) = {
+    val res: java.lang.Integer = obj.asInstanceOf[Array[Object]].length
 
     (res, res.getClass.getName)
   }
