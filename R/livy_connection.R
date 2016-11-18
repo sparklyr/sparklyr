@@ -71,13 +71,13 @@ livy_code_quote_parameters <- function(params) {
     params <- lapply(params, function(param) {
       paramClass <- class(param)
       if (is.character(param)) {
-        # substiture illegal characters
+        # substitute illegal characters
         param <- gsub("\n", "\" + sys.props(\"line.separator\") + \"", param)
 
         paste("\"", param, "\"", sep = "")
       }
       else if ("spark_lobj" %in% paramClass) {
-        paste(param$varName, "._1.asInstanceOf[", param$varType, "]", sep = "")
+        paste(param$varName, "._1", sep = "")
       }
       else if (is.numeric(param)) {
         paste(
@@ -190,7 +190,6 @@ livy_statement_compose_magic <- function(lobj, magic) {
     magic,
     " ",
     lobj$varName,
-    if (!is.null(lobj$varType)) "._1" else "",
     sep = ""
   )
 
@@ -229,6 +228,8 @@ livy_statement_parse_response <- function(text, lobj) {
     return(NULL)
   }
 
+  text <- gsub("\n", "", text)
+
   parsedRegExp <- regexec("([^:]+): \\([^,]+, String\\) = \\((.+),([^)]+)\\).*", text, perl = TRUE)
   parsed <- regmatches(text, parsedRegExp)
   if (length(parsed) != 1) {
@@ -258,6 +259,14 @@ livy_statement_parse_response <- function(text, lobj) {
     "int" = list(
       type = "integer",
       parse = function(e) as.integer(e)
+    ),
+    "java.lang.Integer" = list(
+      type = "integer",
+      parse = function(e) as.integer(e)
+    ),
+    "null" = list(
+      type = "NULL",
+      parse = function(e) NULL
     )
   )
 
@@ -352,7 +361,15 @@ livy_post_statement <- function(sc, code) {
     })
   }
 
-  statementReponse$output$data
+  data <- statementReponse$output$data
+
+  if ("text/plain" == names(data)[[1]]) {
+    write("\n", file = sc$log, append = TRUE)
+    write(data[[1]], file = sc$log, append = TRUE)
+    write("\n", file = sc$log, append = TRUE)
+  }
+
+  data
 }
 
 livy_invoke_statement <- function(sc, statement) {
@@ -389,25 +406,28 @@ livy_invoke_statement_fetch <- function(sc, statement) {
 
   if ("spark_lobj" %in% class(result) && !is.null(result$collection)) {
     if (result$collection$entries == "object") {
+      varName <- livy_code_new_return_var(sc)
       lengthStatement <- livy_statement_compose(
         code = paste(
-          "(", result$varName, "._1.asInstanceOf[Array[Object]].length", ", 0.getClass.getSimpleName)", sep = ""
+          "val ", varName, " = InvokeUtils.invokeLengthEx(", result$varName, "._1)", sep = ""
         ),
-        lobj = NULL)
+        lobj = livy_lobj_create(sc, varName))
       lengthResult <- livy_invoke_statement(sc, lengthStatement)
 
       lapply(seq_len(lengthResult), function(idx) {
         livy_lobj_create(
           sc,
           paste(
-            result$varName, "._1.asInstanceOf[Array[Object]](", (idx - 1), ")", sep = ""
+            "InvokeUtils.invokeElemEx(", result$varName, "._1, ", (idx - 1), ")._1", sep = ""
           )
         )
       })
     }
     else {
       jsonStatement <- livy_statement_compose_magic(result, "json")
-      livy_invoke_statement(sc, jsonStatement)
+      jsonResult <- livy_invoke_statement(sc, jsonStatement)
+
+      if (!is.null(result$varType)) jsonResult[["_1"]] else jsonResult
     }
   }
   else {
@@ -559,6 +579,10 @@ invoke_new.livy_connection <- function(sc, class, ...) {
 
   statement <- livy_statement_compose_new(sc, class, ...)
   livy_invoke_statement_fetch(sc, statement)
+}
+
+invokeRaw <- function(sc, code, ...) {
+  sparklyr:::livy_post_statement(sc, code)
 }
 
 livy_load_scala_sources <- function(sc) {
