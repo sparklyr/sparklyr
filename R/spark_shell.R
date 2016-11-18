@@ -413,8 +413,8 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
     object <- object$id
 
   rc <- rawConnection(raw(), "r+")
-  writeBoolean(rc, static)
   writeString(rc, object)
+  writeBoolean(rc, static)
   writeString(rc, method)
 
   args <- list(...)

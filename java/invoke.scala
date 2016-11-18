@@ -5,7 +5,7 @@ import scala.language.existentials
 
 import sparklyr.Logging._
 
-object InvokeUtils {
+object Invoke {
   // Find a matching method signature in an array of signatures of constructors
   // or methods of the same name according to the passed arguments. Arguments
   // may be converted in order to match a signature.
@@ -112,40 +112,5 @@ object InvokeUtils {
     } else {
       throw new IllegalArgumentException("invalid method " + methodName + " for object " + objId)
     }
-  }
-
-  def invokeEx(obj: Object, method: String, args: Array[Object]): (String, Object) = {
-    val cls = obj.getClass
-    val classId = cls.getName
-
-    val res = invoke(cls, classId, obj, method, args)
-
-    (if (res != null) res.getClass.getName else null, res)
-  }
-
-  def invokeStaticEx(classId: String, method: String, args: Array[Object]): (String, Object) = {
-    val cls = Class.forName(classId)
-    val res = invoke(cls, classId, null, method, args)
-
-    (res.getClass.getName, res)
-  }
-
-  def invokeNewEx(classId: String, args: Array[Object]): (String, Object) = {
-    val cls = Class.forName(classId)
-    val res = invoke(cls, classId, null, "<init>", args)
-
-    (res.getClass.getName, res)
-  }
-
-  def invokeElemEx(obj: Object, index: Int): (String, Object) = {
-    val res = obj.asInstanceOf[Array[Object]](index)
-
-    (res.getClass.getName, res)
-  }
-
-  def invokeLengthEx(obj: Object) : (String, Object) = {
-    val res: java.lang.Integer = obj.asInstanceOf[Array[Object]].length
-
-    (res.getClass.getName, res)
   }
 }
