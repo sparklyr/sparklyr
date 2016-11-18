@@ -6,6 +6,7 @@
 import scala.collection.mutable.HashMap
 import scala.language.existentials
 
+
 object InvokeUtils {
   // Find a matching method signature in an array of signatures of constructors
   // or methods of the same name according to the passed arguments. Arguments
@@ -75,7 +76,7 @@ object InvokeUtils {
       None
     }
 
-  def invoke(cls: Class, methodName: String, args: Array[Object]): Any = {
+  def invoke(cls: Class[_], objId: String, obj: Object, methodName: String, args: Array[Object]): Any = {
     val methods = cls.getMethods
     val selectedMethods = methods.filter(m => m.getName == methodName)
     if (selectedMethods.length > 0) {
@@ -113,5 +114,12 @@ object InvokeUtils {
     } else {
       throw new IllegalArgumentException("invalid method " + methodName + " for object " + objId)
     }
+  }
+
+  def invoke(obj: Object, method: String, args: Array[Object]): Any = {
+    val cls = o.getClass
+    val objId = cls.getName
+
+    invoke(cls, objId, obj, method, args)
   }
 }
