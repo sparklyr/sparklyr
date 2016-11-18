@@ -137,7 +137,7 @@ livy_statement_compose_static <- function(sc, class, method, ...) {
     if (is.null(class)) "" else paste(class, ".", sep = ""),
     method,
     "(",
-    livy_code_method_parameters(parameters),
+    livy_code_quote_parameters(parameters),
     ")",
     sep = ""
   )
@@ -158,9 +158,9 @@ livy_statement_compose_method <- function(lobj, method, ...) {
     lobj$varName,
     ", \"",
     method,
-    "\", ",
+    "\", Array(",
     livy_code_quote_parameters(parameters),
-    ")",
+    "))",
     sep = ""
   )
 
@@ -193,7 +193,7 @@ livy_statement_compose_new <- function(sc, class, ...) {
     "var ", varName, " = new ",
     class,
     "(",
-    livy_code_method_parameters(parameters),
+    livy_code_quote_parameters(parameters),
     ")",
     sep = ""
   )
