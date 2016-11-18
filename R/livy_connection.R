@@ -77,7 +77,7 @@ livy_code_quote_parameters <- function(params) {
         paste("\"", param, "\"", sep = "")
       }
       else if ("spark_lobj" %in% paramClass) {
-        param$varName
+        paste(param$varName, "._1.asInstanceOf[", param$varType, "]", sep = "")
       }
       else if (is.numeric(param)) {
         param
@@ -115,6 +115,7 @@ livy_lobj_create <- function(sc, varName) {
     list(
       sc = sc,
       varName = varName,
+      varType = NULL,
       response = NULL
     ),
     class = c("jobj", "spark_lobj")
@@ -158,7 +159,7 @@ livy_statement_compose_method <- function(lobj, method, ...) {
     "var ", varName, " = ",
     "InvokeUtils.invokeEx(",
     lobj$varName,
-    ", \"",
+    "._1, \"",
     method,
     "\", Array(",
     livy_code_quote_parameters(parameters),
@@ -178,6 +179,7 @@ livy_statement_compose_magic <- function(lobj, magic) {
     magic,
     " ",
     lobj$varName,
+    "._1",
     sep = ""
   )
 
@@ -193,7 +195,7 @@ livy_statement_compose_new <- function(sc, class, ...) {
 
   code <- paste(
     "var ", varName, " = ",
-    "InvokeUtils.invokeStaticEx(\"",
+    "InvokeUtils.invokeNewEx(\"",
     class,
     "\", Array(",
     livy_code_quote_parameters(parameters),
@@ -216,7 +218,7 @@ livy_statement_parse_response <- function(text, lobj) {
     return(NULL)
   }
 
-  parsedRegExp <- regexec("([^:]+): ([\\[\\]a-zA-Z0-9._]+) = (.*)", text, perl = TRUE)
+  parsedRegExp <- regexec("([^:]+): \\(Object, String\\) = \\((.*),(.*)\\).*", text, perl = TRUE)
   parsed <- regmatches(text, parsedRegExp)
   if (length(parsed) != 1) {
     stop("Failed to parse statement reponse: ", text)
@@ -228,8 +230,8 @@ livy_statement_parse_response <- function(text, lobj) {
   }
 
   varName <- parsed[[2]]
-  scalaTypeRaw <- parsed[[3]]
-  scalaValue <- parsed[[4]]
+  scalaValue <- parsed[[3]]
+  scalaTypeRaw <- parsed[[4]]
 
   removeQuotes <- function(e) gsub("^\"|\"$", "", e)
 
@@ -249,6 +251,8 @@ livy_statement_parse_response <- function(text, lobj) {
   )
 
   type <- "object"
+
+  lobj$varType <- scalaTypeRaw
   value <- lobj
 
   scalaTypeIsArray <- function(scalaType) grepl("Array\\[[^\\]]+\\]", scalaType, perl = TRUE)
@@ -376,12 +380,12 @@ livy_invoke_statement_fetch <- function(sc, statement) {
   if ("spark_lobj" %in% class(result) && !is.null(result$collection)) {
     if (result$collection$entries == "object") {
       lengthStatement <- livy_statement_compose(
-        code = paste(result$varName, ".length", sep = ""),
+        code = paste(result$varName, "._1.length", sep = ""),
         lobj = NULL)
       lengthResult <- livy_invoke_statement(sc, lengthStatement)
 
       lapply(seq_len(lengthResult), function(idx) {
-        livy_lobj_create(sc, paste(result$varName, "(", (idx - 1), ")", sep = ""))
+        livy_lobj_create(sc, paste(result$varName, "._1.(", (idx - 1), ")", sep = ""))
       })
     }
     else {
@@ -441,7 +445,9 @@ livy_connection <- function(master, config) {
   }
 
   if (session$state == "starting") {
-    stop("Failed to launch livy session, session status is still starting after waiting for ", waitStartTimeout, " seconds")
+    stop(
+      "Failed to launch livy session, session status is",
+      " still starting after waiting for ", waitStartTimeout, " seconds")
   }
 
   if (session$state != "idle") {

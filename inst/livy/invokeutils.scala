@@ -117,7 +117,7 @@ object InvokeUtils {
     }
   }
 
-  def invokeEx(obj: Object, method: String, args: Array[Object]): Object = {
+  def invokeEx(obj: Object, method: String, args: Array[Object]): (Object, String) = {
     val cls = obj.getClass
     val classId = cls.getName
 
@@ -126,14 +126,14 @@ object InvokeUtils {
     (res, res.getClass.getName)
   }
 
-  def invokeStaticEx(classId: String, method: String, args: Array[Object]): Object = {
+  def invokeStaticEx(classId: String, method: String, args: Array[Object]): (Object, String) = {
     val cls = Class.forName(classId)
     val res = invoke(cls, classId, null, method, args)
 
     (res, res.getClass.getName)
   }
 
-  def invokeNewEx(classId: String, args: Array[Object]): Object = {
+  def invokeNewEx(classId: String, args: Array[Object]): (Object, String) = {
     val cls = Class.forName(classId)
     val res = invoke(cls, classId, null, "<init>", args)
 
