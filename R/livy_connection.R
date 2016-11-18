@@ -80,10 +80,20 @@ livy_code_quote_parameters <- function(params) {
         paste(param$varName, "._1.asInstanceOf[", param$varType, "]", sep = "")
       }
       else if (is.numeric(param)) {
-        param
+        paste(
+          "new java.lang.Integer(",
+          param,
+          ")",
+          sep = ""
+        )
       }
       else if (is.logical(param)) {
-        if (isTRUE(param)) "true" else "false"
+        paste(
+          "new java.lang.Boolean(",
+          if (isTRUE(param)) "true" else "false",
+          ")",
+          sep = ""
+        )
       }
       else if (is.list(param)) {
         paste(
@@ -159,7 +169,8 @@ livy_statement_compose_method <- function(lobj, method, ...) {
     "var ", varName, " = ",
     "InvokeUtils.invokeEx(",
     lobj$varName,
-    "._1, \"",
+    if (!is.null(lobj$varType)) "._1" else "",
+    ", \"",
     method,
     "\", Array(",
     livy_code_quote_parameters(parameters),
@@ -179,7 +190,7 @@ livy_statement_compose_magic <- function(lobj, magic) {
     magic,
     " ",
     lobj$varName,
-    "._1",
+    if (!is.null(lobj$varType)) "._1" else "",
     sep = ""
   )
 
@@ -218,7 +229,7 @@ livy_statement_parse_response <- function(text, lobj) {
     return(NULL)
   }
 
-  parsedRegExp <- regexec("([^:]+): \\(Object, String\\) = \\((.*),(.*)\\).*", text, perl = TRUE)
+  parsedRegExp <- regexec("([^:]+): \\([^,]+, String\\) = \\((.+),([^)]+)\\).*", text, perl = TRUE)
   parsed <- regmatches(text, parsedRegExp)
   if (length(parsed) != 1) {
     stop("Failed to parse statement reponse: ", text)
@@ -250,18 +261,17 @@ livy_statement_parse_response <- function(text, lobj) {
     )
   )
 
-  type <- "object"
-
-  lobj$varType <- scalaTypeRaw
-  value <- lobj
-
-  scalaTypeIsArray <- function(scalaType) grepl("Array\\[[^\\]]+\\]", scalaType, perl = TRUE)
+  scalaTypeIsArray <- function(scalaType) grepl("^\\[.*", scalaType, perl = TRUE)
   scalaTypeOfArray <- function(scalaType) {
-    parsed <- regmatches(scalaType, regexec("Array\\[([^\\]]+)\\]", scalaType, perl = TRUE))
+    parsed <- regmatches(scalaType, regexec("^\\[L(.*);", scalaType, perl = TRUE))
     parsed[[1]][[2]]
   }
 
   scalaType <- if (scalaTypeIsArray(scalaTypeRaw)) scalaTypeOfArray(scalaTypeRaw) else scalaTypeRaw
+
+  type <- "object"
+  lobj$varType <- scalaType
+  value <- lobj
 
   if (scalaType %in% names(livyToRTypeMap)) {
     livyToRTypeMapInst <- livyToRTypeMap[[scalaType]]
@@ -380,12 +390,19 @@ livy_invoke_statement_fetch <- function(sc, statement) {
   if ("spark_lobj" %in% class(result) && !is.null(result$collection)) {
     if (result$collection$entries == "object") {
       lengthStatement <- livy_statement_compose(
-        code = paste(result$varName, "._1.length", sep = ""),
+        code = paste(
+          "(", result$varName, "._1.asInstanceOf[Array[Object]].length", ", 0.getClass.getSimpleName)", sep = ""
+        ),
         lobj = NULL)
       lengthResult <- livy_invoke_statement(sc, lengthStatement)
 
       lapply(seq_len(lengthResult), function(idx) {
-        livy_lobj_create(sc, paste(result$varName, "._1.(", (idx - 1), ")", sep = ""))
+        livy_lobj_create(
+          sc,
+          paste(
+            result$varName, "._1.asInstanceOf[Array[Object]](", (idx - 1), ")", sep = ""
+          )
+        )
       })
     }
     else {
@@ -524,9 +541,15 @@ invoke.spark_lobj <- function(jobj, method, ...) {
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
-  class <- livy_map_class(class)
+  classMapped <- livy_map_class(class)
 
-  statement <- livy_statement_compose_static(sc, class, method, ...)
+  statement <- if (grepl("^sparklyr\\.", class)) {
+    lobjInternal <- livy_lobj_create(sc, classMapped)
+    livy_statement_compose_method(lobjInternal, method, ...)
+  } else {
+    livy_statement_compose_static(sc, classMapped, method, ...)
+  }
+
   livy_invoke_statement_fetch(sc, statement)
 }
 
