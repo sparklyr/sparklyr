@@ -10,9 +10,8 @@ import io.netty.channel.ChannelHandler.Sharable
 
 import sparklyr.Logging._
 import sparklyr.Serializer._
-import sparklyr.JVMObjectTracker
 
-object StreamHandler(server: Backend) {
+object StreamHandler {
 
   def read(msg: Array[Byte]): Array[Byte] = {
     val bis = new ByteArrayInputStream(msg)
@@ -80,7 +79,7 @@ object StreamHandler(server: Backend) {
         }
 
         val args = readArgs(numArgs, dis)
-        val res = InvokeUtils.invoke(cls, objId, obj, methodName, args)
+        val res = Invoke.invoke(cls, objId, obj, methodName, args)
 
         writeInt(dos, 0)
         writeObject(dos, res.asInstanceOf[AnyRef])

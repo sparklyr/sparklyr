@@ -8,6 +8,7 @@ import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
 import io.netty.channel.ChannelHandler.Sharable
 
 import sparklyr.Serializer._
+import sparklyr.StreamHandler._
 
 @Sharable
 class BackendHandler(server: Backend)
@@ -20,8 +21,12 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
     val bos = new ByteArrayOutputStream()
     val dos = new DataOutputStream(bos)
 
+    val isStatic = readBoolean(dis)
     val objId = readString(dis)
-    var reply = Array();
+    val methodName = readString(dis)
+    val numArgs = readInt(dis)
+
+    var reply: Array[Byte] = null
 
     if (objId == "Handler") {
       methodName match {
@@ -38,10 +43,10 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
 
           System.exit(0)
         case _ =>
-          reply = StreamHandler.read()
+          reply = StreamHandler.read(msg)
       }
     } else {
-      reply = StreamHandler.read()
+      reply = StreamHandler.read(msg)
     }
 
     ctx.write(reply)

@@ -84,7 +84,7 @@ class Backend {
     val conf = new SparkConf()
     bossGroup = new NioEventLoopGroup(conf.getInt("sparklyr.backend.threads", 2))
     val workerGroup = bossGroup
-    val handler = new Handler(this)
+    val handler = new BackendHandler(this)
 
     bootstrap = new ServerBootstrap()
       .group(bossGroup, workerGroup)

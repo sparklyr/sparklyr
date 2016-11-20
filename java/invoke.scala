@@ -78,7 +78,7 @@ object Invoke {
     val methods = cls.getMethods
     val selectedMethods = methods.filter(m => m.getName == methodName)
     if (selectedMethods.length > 0) {
-      val index = InvokeUtils.findMatchedSignature(
+      val index = findMatchedSignature(
         selectedMethods.map(_.getParameterTypes),
         args)
 
@@ -95,7 +95,7 @@ object Invoke {
     } else if (methodName == "<init>") {
       // methodName should be "<init>" for constructor
       val ctors = cls.getConstructors
-      val index = InvokeUtils.findMatchedSignature(
+      val index = findMatchedSignature(
         ctors.map(_.getParameterTypes),
         args)
 
