@@ -1,6 +1,9 @@
 livy_sources_included <- function() {
   c(
-    "/invokeutils\\.scala",
+    "/invoke\\.scala",
+    "/tracker\\.scala",
+    "/serializer\\.scala",
+    "/stream\\.scala",
     "/sqlutils\\.scala",
     "/utils\\.scala"
   )
