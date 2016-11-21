@@ -90,7 +90,9 @@ object StreamHandler {
         case e: Exception =>
           logError(s"$methodName on $objId failed")
           writeInt(dos, -1)
-          writeString(dos, Utils.exceptionString(e.getCause))
+          writeString(dos, Utils.exceptionString(
+            if (e.getCause == null) e else e.getCause
+          ))
       }
     }
 
