@@ -590,7 +590,10 @@ livy_load_scala_sources <- function(sc) {
     "utils.scala",
     "sqlutils.scala",
     "logging.scala",
-    "invokeutils.scala"
+    "invoke.scala",
+    "tracker.scala",
+    "serializer.scala",
+    "stream.scala"
   )
 
   lapply(livySources, function(sourceName) {
