@@ -20,8 +20,8 @@ object StreamHandler {
     val bos = new ByteArrayOutputStream()
     val dos = new DataOutputStream(bos)
 
-    val isStatic = readBoolean(dis)
     val objId = readString(dis)
+    val isStatic = readBoolean(dis)
     val methodName = readString(dis)
     val numArgs = readInt(dis)
 
