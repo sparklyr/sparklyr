@@ -7,7 +7,7 @@
 \alias{livy_installed_versions}
 \title{Install Livy}
 \usage{
-livy_install(version = "0.2.0", spark_home = NULL, spark_version = NULL)
+livy_install(version = "0.3.0", spark_home = NULL, spark_version = NULL)
 
 livy_install_dir()
 
