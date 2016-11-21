@@ -19,13 +19,7 @@ livy_invoke_serialize <- function(sc, static, object, method, ...)
   bytes <- rawConnectionValue(rc)
   close(rc)
 
-  rc <- rawConnection(raw(0), "r+")
-  writeInt(rc, length(bytes))
-  writeBin(bytes, rc)
-  rv <- rawConnectionValue(rc)
-  close(rc)
-
-  base64 <- base64encode(rv)
+  base64 <- base64encode(bytes)
   base64
 }
 

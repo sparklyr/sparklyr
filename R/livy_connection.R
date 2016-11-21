@@ -184,7 +184,7 @@ livy_statement_parse_response <- function(text, lobj) {
 
   text <- gsub("\n", "", text)
 
-  parsedRegExp <- regexec("([^:]+): \\(String, [^,]+\\) = \\(([^,]+),(.+)\\).*", text, perl = TRUE)
+  parsedRegExp <- regexec("([^:]+): (.*) = (.*)", text, perl = TRUE)
   parsed <- regmatches(text, parsedRegExp)
   if (length(parsed) != 1) {
     stop("Failed to parse statement reponse: ", text)
@@ -202,6 +202,10 @@ livy_statement_parse_response <- function(text, lobj) {
   removeQuotes <- function(e) gsub("^\"|\"$", "", e)
 
   livyToRTypeMap <- list(
+    "String" = list(
+      type = "character",
+      parse = function(e) removeQuotes(e)
+    ),
     "java.lang.String" = list(
       type = "character",
       parse = function(e) removeQuotes(e)
@@ -358,7 +362,12 @@ livy_invoke_statement <- function(sc, statement) {
 livy_invoke_statement_fetch <- function(sc, statement) {
   result <- livy_invoke_statement(sc, statement)
 
-  result
+  if (!is.character(result)) {
+    stop("Failed to execute statement, character result expected but ", typeof(result), " was received.")
+  }
+
+  lobj <- livy_invoke_deserialize(sc, result)
+  lobj
 }
 
 livy_try_get_session <- function(sc) {
