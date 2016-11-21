@@ -1,0 +1,75 @@
+#' @import base64enc
+livy_invoke_serialize <- function(sc, static, object, method, ...)
+{
+  if (is.null(sc)) {
+    stop("The connection is no longer valid.")
+  }
+
+  if (inherits(object, "spark_lobj"))
+    object <- object$id
+
+  rc <- rawConnection(raw(), "r+")
+  writeString(rc, object)
+  writeBoolean(rc, static)
+  writeString(rc, method)
+
+  args <- list(...)
+  writeInt(rc, length(args))
+  writeArgs(rc, args)
+  bytes <- rawConnectionValue(rc)
+  close(rc)
+
+  rc <- rawConnection(raw(0), "r+")
+  writeInt(rc, length(bytes))
+  writeBin(bytes, rc)
+  con <- rawConnectionValue(rc)
+  close(rc)
+
+  rv <- rawConnectionValue(rc)
+  base64 <- base64encode(rv)
+
+  base64
+}
+
+livy_invoke_deserialize <- function(sc, base64) {
+  rv <- base64decode(base64)
+
+  rc <- rawConnection(rv, "r+")
+
+  returnStatus <- readInt(rc)
+  if (length(returnStatus) == 0)
+    stop("No status is returned. Livy backend might have failed.")
+  if (returnStatus != 0) {
+    msg <- readString(rc)
+    withr::with_options(list(
+      warning.length = 8000
+    ), {
+      close(rc)
+      stop(msg, call. = FALSE)
+    })
+  }
+
+  object <- readObject(rc)
+  close(rc)
+
+  livy_attach_connection(object, sc)
+}
+
+livy_attach_connection <- function(jobj, connection) {
+
+  if (inherits(jobj, "spark_lobj")) {
+    jobj$connection <- connection
+  }
+  else if (is.list(jobj) || inherits(jobj, "struct")) {
+    jobj <- lapply(jobj, function(e) {
+      livy_attach_connection(e, connection)
+    })
+  }
+  else if (is.environment(jobj)) {
+    jobj <- eapply(jobj, function(e) {
+      livy_attach_connection(e, connection)
+    })
+  }
+
+  jobj
+}

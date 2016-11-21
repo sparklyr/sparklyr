@@ -452,7 +452,7 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
   }
 
   object <- readObject(backend)
-  attach_connection(object, sc)
+  spark_attach_connection(object, sc)
 }
 
 #' @export
@@ -468,19 +468,19 @@ print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
 }
 
 
-attach_connection <- function(jobj, connection) {
+spark_attach_connection <- function(jobj, connection) {
 
   if (inherits(jobj, "spark_jobj")) {
     jobj$connection <- connection
   }
   else if (is.list(jobj) || inherits(jobj, "struct")) {
     jobj <- lapply(jobj, function(e) {
-      attach_connection(e, connection)
+      spark_attach_connection(e, connection)
     })
   }
   else if (is.environment(jobj)) {
     jobj <- eapply(jobj, function(e) {
-      attach_connection(e, connection)
+      spark_attach_connection(e, connection)
     })
   }
 
