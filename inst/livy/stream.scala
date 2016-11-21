@@ -90,8 +90,6 @@ object StreamHandler {
         case e: Exception =>
           logError(s"$methodName on $objId failed")
           writeInt(dos, -1)
-          // Writing the error message of the cause for the exception. This will be returned
-          // to user in the R process.
           writeString(dos, Utils.exceptionString(e.getCause))
       }
     }

@@ -491,20 +491,14 @@ livy_map_class <- function(class) {
 #' @export
 invoke.livy_jobj <- function(jobj, method, ...) {
   statement <- livy_statement_compose(spark_connection(jobj), FALSE, jobj, method, ...)
-  livy_invoke_statement_fetch(jobj$sc, statement)
+  livy_invoke_statement_fetch(spark_connection(jobj), statement)
 }
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
   classMapped <- livy_map_class(class)
 
-  statement <- if (grepl("^sparklyr\\.", class)) {
-    lobjInternal <- livy_lobj_create(sc, classMapped)
-    livy_statement_compose(lobjInternal, FALSE, method, ...)
-  } else {
-    livy_statement_compose(sc, TRUE, classMapped, method, ...)
-  }
-
+  statement <- livy_statement_compose(sc, TRUE, classMapped, method, ...)
   livy_invoke_statement_fetch(sc, statement)
 }
 
@@ -512,7 +506,7 @@ invoke_static.livy_connection <- function(sc, class, method, ...) {
 invoke_new.livy_connection <- function(sc, class, ...) {
   class <- livy_map_class(class)
 
-  statement <- livy_statement_compose_new(sc, class, ...)
+  statement <- livy_statement_compose(sc, TRUE, class, "<init>", ...)
   livy_invoke_statement_fetch(sc, statement)
 }
 
