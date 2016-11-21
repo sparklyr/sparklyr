@@ -146,9 +146,9 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
 
   code <- paste(
     "var ", varName, " = ",
-    "StreamHandler.read(\"",
+    "LivyUtils.invokeFromBase64(\"",
     serialized,
-    "\"",
+    "\")",
     sep = ""
   )
 
@@ -519,7 +519,8 @@ livy_load_scala_sources <- function(sc) {
     "invoke.scala",
     "tracker.scala",
     "serializer.scala",
-    "stream.scala"
+    "stream.scala",
+    "livyutils.scala"
   )
 
   lapply(livySources, function(sourceName) {
@@ -527,11 +528,11 @@ livy_load_scala_sources <- function(sc) {
       sourcesFile <- system.file(file.path("livy", sourceName), package = "sparklyr")
       sources <- paste(readLines(sourcesFile), collapse = "\n")
 
-      statement <- livy_statement_new(sources, NULL)
-      livy_invoke_statement(sc, statement)
-    }, error = function(e) {
-      stop("Failed to load ", sourceName, ": ", e$message)
-    })
+    statement <- livy_statement_new(sources, NULL)
+    livy_invoke_statement(sc, statement)
+  }, error = function(e) {
+    stop("Failed to load ", sourceName, ": ", e$message)
+  })
   })
 }
 
