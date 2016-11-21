@@ -132,55 +132,29 @@ livy_lobj_create <- function(sc, varName) {
   )
 }
 
-livy_statement_compose <- function(code, lobj) {
+livy_statement_new <- function(code, lobj) {
   list(
     code = code,
     lobj = lobj
   )
 }
 
-livy_statement_compose_static <- function(sc, class, method, ...) {
-  parameters <- list(...)
+livy_statement_compose <- function(sc, static, class, method, ...) {
+  serialized <- livy_invoke_serialize(sc = sc, static = static, object = class, method = method, ...)
+
   varName <- livy_code_new_return_var(sc)
 
   code <- paste(
     "var ", varName, " = ",
-    "InvokeUtils.invokeStaticEx(\"",
-    class,
-    "\", \"",
-    method,
-    "\", Array(",
-    livy_code_quote_parameters(parameters),
-    "))",
+    "StreamHandler.read(\"",
+    serialized,
+    "\"",
     sep = ""
   )
 
-  livy_statement_compose(
+  livy_statement_new(
     code = code,
     lobj = livy_lobj_create(sc, varName)
-  )
-}
-
-livy_statement_compose_method <- function(lobj, method, ...) {
-  parameters <- list(...)
-  varName <- livy_code_new_return_var(lobj$sc)
-
-  code <- paste(
-    "var ", varName, " = ",
-    "InvokeUtils.invokeEx(",
-    lobj$varName,
-    if (!is.null(lobj$varType)) "._2" else "",
-    ", \"",
-    method,
-    "\", Array(",
-    livy_code_quote_parameters(parameters),
-    "))",
-    sep = ""
-  )
-
-  livy_statement_compose(
-    code = code,
-    lobj = livy_lobj_create(lobj$sc, varName)
   )
 }
 
@@ -193,29 +167,9 @@ livy_statement_compose_magic <- function(lobj, magic) {
     sep = ""
   )
 
-  livy_statement_compose(
+  livy_statement_new(
     code = code,
     lobj = NULL
-  )
-}
-
-livy_statement_compose_new <- function(sc, class, ...) {
-  parameters <- list(...)
-  varName <- livy_code_new_return_var(sc)
-
-  code <- paste(
-    "var ", varName, " = ",
-    "InvokeUtils.invokeNewEx(\"",
-    class,
-    "\", Array(",
-    livy_code_quote_parameters(parameters),
-    "))",
-    sep = ""
-  )
-
-  livy_statement_compose(
-    code = code,
-    lobj = livy_lobj_create(sc, varName)
   )
 }
 
@@ -404,35 +358,7 @@ livy_invoke_statement <- function(sc, statement) {
 livy_invoke_statement_fetch <- function(sc, statement) {
   result <- livy_invoke_statement(sc, statement)
 
-  if ("spark_lobj" %in% class(result) && !is.null(result$collection)) {
-    if (result$collection$entries == "object") {
-      varName <- livy_code_new_return_var(sc)
-      lengthStatement <- livy_statement_compose(
-        code = paste(
-          "val ", varName, " = InvokeUtils.invokeLengthEx(", result$varName, "._2)", sep = ""
-        ),
-        lobj = livy_lobj_create(sc, varName))
-      lengthResult <- livy_invoke_statement(sc, lengthStatement)
-
-      lapply(seq_len(lengthResult), function(idx) {
-        livy_lobj_create(
-          sc,
-          paste(
-            "InvokeUtils.invokeElemEx(", result$varName, "._2, ", (idx - 1), ")._2", sep = ""
-          )
-        )
-      })
-    }
-    else {
-      jsonStatement <- livy_statement_compose_magic(result, "json")
-      jsonResult <- livy_invoke_statement(sc, jsonStatement)
-
-      jsonResult[[1]]
-    }
-  }
-  else {
-    result
-  }
+  result
 }
 
 livy_try_get_session <- function(sc) {
@@ -555,7 +481,7 @@ livy_map_class <- function(class) {
 
 #' @export
 invoke.spark_lobj <- function(jobj, method, ...) {
-  statement <- livy_statement_compose_method(jobj, method, ...)
+  statement <- livy_statement_compose(jobj, FALSE, method, ...)
   livy_invoke_statement_fetch(jobj$sc, statement)
 }
 
@@ -565,9 +491,9 @@ invoke_static.livy_connection <- function(sc, class, method, ...) {
 
   statement <- if (grepl("^sparklyr\\.", class)) {
     lobjInternal <- livy_lobj_create(sc, classMapped)
-    livy_statement_compose_method(lobjInternal, method, ...)
+    livy_statement_compose(lobjInternal, FALSE, method, ...)
   } else {
-    livy_statement_compose_static(sc, classMapped, method, ...)
+    livy_statement_compose(sc, TRUE, classMapped, method, ...)
   }
 
   livy_invoke_statement_fetch(sc, statement)
@@ -601,7 +527,7 @@ livy_load_scala_sources <- function(sc) {
       sourcesFile <- system.file(file.path("livy", sourceName), package = "sparklyr")
       sources <- paste(readLines(sourcesFile), collapse = "\n")
 
-      statement <- livy_statement_compose(sources, NULL)
+      statement <- livy_statement_new(sources, NULL)
       livy_invoke_statement(sc, statement)
     }, error = function(e) {
       stop("Failed to load ", sourceName, ": ", e$message)
