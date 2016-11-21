@@ -128,7 +128,7 @@ livy_lobj_create <- function(sc, varName) {
       varType = NULL,
       response = NULL
     ),
-    class = c("jobj", "spark_lobj")
+    class = c("spark_jobj", "spark_lobj")
   )
 }
 

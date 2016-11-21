@@ -41,10 +41,16 @@ livy_invoke_deserialize <- function(sc, base64) {
     })
   }
 
+  class(rc) <- "livy_backend"
+
   object <- readObject(rc)
   close(rc)
 
   livy_attach_connection(object, sc)
+}
+
+jobj_subclass.livy_backend <- function(con) {
+  "spark_lobj"
 }
 
 livy_attach_connection <- function(jobj, connection) {

@@ -451,8 +451,14 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
     })
   }
 
+  class(backend) <- "shell_backend"
+
   object <- readObject(backend)
   spark_attach_connection(object, sc)
+}
+
+jobj_subclass.shell_backend <- function(con) {
+  "shell_jobj"
 }
 
 #' @export
@@ -565,7 +571,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
 }
 
 #' @export
-invoke.spark_jobj <- function(jobj, method, ...) {
+invoke.shell_jobj <- function(jobj, method, ...) {
   invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
 }
 
@@ -580,6 +586,6 @@ invoke_new.spark_shell_connection <- function(sc, class, ...) {
 }
 
 #' @export
-spark_connection.spark_jobj <- function(x, ...) {
+spark_connection.shell_jobj <- function(x, ...) {
   x$connection
 }

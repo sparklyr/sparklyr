@@ -77,8 +77,8 @@ isValidJobj <- function(jobj) {
   TRUE
 }
 
-getJobj <- function(objId) {
-  newObj <- jobj_create(objId)
+getJobj <- function(con, objId) {
+  newObj <- jobj_create(con, objId)
   if (exists(objId, .validJobjs)) {
     .validJobjs[[objId]] <- .validJobjs[[objId]] + 1
   } else {
@@ -87,14 +87,18 @@ getJobj <- function(objId) {
   newObj
 }
 
+jobj_subclass <- function(con) {
+  UseMethod("jobj_subclass")
+}
+
 # Handler for a java object that exists on the backend.
-jobj_create <- function(objId) {
+jobj_create <- function(con, objId) {
   if (!is.character(objId)) {
     stop("object id must be a character")
   }
   # NOTE: We need a new env for a jobj as we can only register
   # finalizers for environments or external references pointers.
-  obj <- structure(new.env(parent = emptyenv()), class = c("jobj", "spark_jobj"))
+  obj <- structure(new.env(parent = emptyenv()), class = c("spark_jobj", jobj_subclass(con)))
   obj$id <- objId
 
   # Register a finalizer to remove the Java object when this reference
