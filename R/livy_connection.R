@@ -490,7 +490,7 @@ livy_map_class <- function(class) {
 
 #' @export
 invoke.livy_jobj <- function(jobj, method, ...) {
-  statement <- livy_statement_compose(jobj, FALSE, method, ...)
+  statement <- livy_statement_compose(spark_connection(jobj), FALSE, jobj, method, ...)
   livy_invoke_statement_fetch(jobj$sc, statement)
 }
 
@@ -584,7 +584,3 @@ initialize_connection.livy_connection <- function(sc) {
   })
 }
 
-#' @export
-spark_connection.livy_jobj <- function(x, ...) {
-  x$sc
-}

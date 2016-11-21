@@ -211,9 +211,7 @@ initialize_connection <- function(sc) {
   UseMethod("initialize_connection")
 }
 
-
-
-
-
-
-
+#' @export
+spark_connection.spark_jobj <- function(x, ...) {
+  x$connection
+}

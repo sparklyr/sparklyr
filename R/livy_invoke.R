@@ -41,7 +41,7 @@ livy_invoke_deserialize <- function(sc, base64) {
     })
   }
 
-  class(rc) <- "livy_backend"
+  class(rc) <- c(class(rc), "livy_backend")
 
   object <- readObject(rc)
   close(rc)
