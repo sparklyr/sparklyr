@@ -34,7 +34,8 @@ Imports:
     rprojroot,
     withr,
     httr,
-    jsonlite
+    jsonlite,
+    base64enc
 Suggests:
     testthat,
     RCurl,
