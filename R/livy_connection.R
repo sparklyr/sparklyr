@@ -76,7 +76,7 @@ livy_code_quote_parameters <- function(params) {
 
         paste("\"", param, "\"", sep = "")
       }
-      else if ("spark_lobj" %in% paramClass) {
+      else if ("livy_jobj" %in% paramClass) {
         paste(param$varName, "._2", sep = "")
       }
       else if (is.numeric(param)) {
@@ -128,7 +128,7 @@ livy_lobj_create <- function(sc, varName) {
       varType = NULL,
       response = NULL
     ),
-    class = c("spark_jobj", "spark_lobj")
+    class = c("spark_jobj", "livy_jobj")
   )
 }
 
@@ -489,7 +489,7 @@ livy_map_class <- function(class) {
 }
 
 #' @export
-invoke.spark_lobj <- function(jobj, method, ...) {
+invoke.livy_jobj <- function(jobj, method, ...) {
   statement <- livy_statement_compose(jobj, FALSE, method, ...)
   livy_invoke_statement_fetch(jobj$sc, statement)
 }
@@ -585,6 +585,6 @@ initialize_connection.livy_connection <- function(sc) {
 }
 
 #' @export
-spark_connection.spark_lobj <- function(x, ...) {
+spark_connection.livy_jobj <- function(x, ...) {
   x$sc
 }
