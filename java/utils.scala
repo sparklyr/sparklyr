@@ -21,7 +21,7 @@ object Utils {
    */
   def exceptionString(e: Throwable): String = {
     if (e == null) {
-      ""
+      "No exception information provided."
     } else {
       // Use e.printStackTrace here because e.getStackTrace doesn't include the cause
       val stringWriter = new StringWriter()
