@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Implemented experimental support for Livy through: `livy_install`, 
+  `livy_service_start`, `livy_service_stop` and  `spark_connect(method = "livy")`
+
 - Spark `DenseVector` and `SparseVector` objects are now deserialized as
   R numeric vectors, rather than Spark objects. This should make it easier
   to work with the output produced by `sdf_predict()` with Random Forest
