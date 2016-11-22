@@ -13,7 +13,7 @@ import sparklyr.Serializer._
 
 object StreamHandler {
 
-  def read(msg: Array[Byte], classMap: Map[String,Object]): Array[Byte] = {
+  def read(msg: Array[Byte], classMap: Map[String, Object]): Array[Byte] = {
     val bis = new ByteArrayInputStream(msg)
     val dis = new DataInputStream(bis)
 
@@ -65,12 +65,13 @@ object StreamHandler {
     numArgs: Int,
     dis: DataInputStream,
     dos: DataOutputStream,
-    classMap: Map[String,Object]): Unit = {
+    classMap: Map[String, Object]): Unit = {
       var obj: Object = null
       try {
         val cls = if (isStatic) {
           if (classMap != null && classMap.contains(objId)) {
-            classMap(objId).asInstanceOf[Class[_]]
+            obj = classMap(objId)
+            classMap(objId).getClass.asInstanceOf[Class[_]]
           }
           else {
             Class.forName(objId)
