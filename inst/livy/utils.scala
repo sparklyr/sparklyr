@@ -213,10 +213,11 @@ object Utils {
     sc: SparkContext,
     rows: Array[String],
     columns: Array[String],
-    partitions: Int): RDD[Row] = {
+    partitions: Int,
+    separator: String): RDD[Row] = {
 
     var data = rows.map(o => {
-      val r = o.split("\\|~\\|")
+      val r = o.split(separator, -1)
       var typed = (Array.range(0, r.length)).map(idx => {
         val column = columns(idx)
         val value = r(idx)
