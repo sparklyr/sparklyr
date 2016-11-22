@@ -359,11 +359,19 @@ livy_invoke_statement <- function(sc, statement) {
   result
 }
 
-livy_invoke_statement_fetch <- function(sc, statement) {
+livy_invoke_statement_fetch <- function(sc, static, jobj, method, ...) {
+  statement <- livy_statement_compose(sc, static, jobj, method, ...)
+
   result <- livy_invoke_statement(sc, statement)
 
   if (!is.character(result)) {
     stop("Failed to execute statement, character result expected but ", typeof(result), " was received.")
+  }
+
+  # If result is too long that was truncated, retry with livy magic instead
+  if (grepl("\\.\\.\\.$", result)) {
+    statement <- livy_statement_compose_magic(statement$lobj, "json")
+    result <- livy_invoke_statement(sc, statement)
   }
 
   lobj <- livy_invoke_deserialize(sc, result)
@@ -490,24 +498,21 @@ livy_map_class <- function(class) {
 
 #' @export
 invoke.livy_jobj <- function(jobj, method, ...) {
-  statement <- livy_statement_compose(spark_connection(jobj), FALSE, jobj, method, ...)
-  livy_invoke_statement_fetch(spark_connection(jobj), statement)
+  livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, ...)
 }
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
   classMapped <- livy_map_class(class)
 
-  statement <- livy_statement_compose(sc, TRUE, classMapped, method, ...)
-  livy_invoke_statement_fetch(sc, statement)
+  livy_invoke_statement_fetch(sc, TRUE, classMapped, method, ...)
 }
 
 #' @export
 invoke_new.livy_connection <- function(sc, class, ...) {
   class <- livy_map_class(class)
 
-  statement <- livy_statement_compose(sc, TRUE, class, "<init>", ...)
-  livy_invoke_statement_fetch(sc, statement)
+  livy_invoke_statement_fetch(sc, TRUE, class, "<init>", ...)
 }
 
 invokeRaw <- function(sc, code, ...) {
