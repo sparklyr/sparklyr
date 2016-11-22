@@ -519,8 +519,8 @@ invoke_new.livy_connection <- function(sc, class, ...) {
   livy_invoke_statement_fetch(sc, TRUE, class, "<init>", ...)
 }
 
-invokeRaw <- function(sc, code, ...) {
-  sparklyr:::livy_post_statement(sc, code)
+invoke_raw <- function(sc, code, ...) {
+  livy_post_statement(sc, code)
 }
 
 livy_load_scala_sources <- function(sc) {
