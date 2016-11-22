@@ -43,10 +43,10 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
 
           System.exit(0)
         case _ =>
-          reply = StreamHandler.read(msg)
+          reply = StreamHandler.read(msg, null)
       }
     } else {
-      reply = StreamHandler.read(msg)
+      reply = StreamHandler.read(msg, null)
     }
 
     ctx.write(reply)

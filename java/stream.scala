@@ -13,7 +13,7 @@ import sparklyr.Serializer._
 
 object StreamHandler {
 
-  def read(msg: Array[Byte]): Array[Byte] = {
+  def read(msg: Array[Byte], classMap: Map[String,Object]): Array[Byte] = {
     val bis = new ByteArrayInputStream(msg)
     val dis = new DataInputStream(bis)
 
@@ -52,7 +52,7 @@ object StreamHandler {
         writeString(dos, s"Error: unknown method $methodName")
       }
     } else {
-      handleMethodCall(isStatic, objId, methodName, numArgs, dis, dos)
+      handleMethodCall(isStatic, objId, methodName, numArgs, dis, dos, classMap)
     }
 
     bos.toByteArray
@@ -64,11 +64,17 @@ object StreamHandler {
     methodName: String,
     numArgs: Int,
     dis: DataInputStream,
-    dos: DataOutputStream): Unit = {
+    dos: DataOutputStream,
+    classMap: Map[String,Object]): Unit = {
       var obj: Object = null
       try {
         val cls = if (isStatic) {
-          Class.forName(objId)
+          if (classMap != null && classMap.contains(objId)) {
+            classMap(objId).asInstanceOf[Class[_]]
+          }
+          else {
+            Class.forName(objId)
+          }
         } else {
           JVMObjectTracker.get(objId) match {
             case None => throw new IllegalArgumentException("Object not found " + objId)
