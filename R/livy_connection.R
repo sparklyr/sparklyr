@@ -399,6 +399,10 @@ livy_validate_master <- function(master) {
 
 #' @import jsonlite
 livy_connection <- function(master, config) {
+  if (grepl("^local(\\[[0-9]*\\])?$", "local")) {
+    master <- "http://localhost:8998"
+  }
+
   livy_validate_master(master)
 
   session <- livy_create_session(master)
