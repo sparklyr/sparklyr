@@ -120,7 +120,7 @@ livy_code_new_return_var <- function(sc) {
   name
 }
 
-livy_lobj_create <- function(sc, varName) {
+livy_jobj_create <- function(sc, varName) {
   structure(
     list(
       sc = sc,
@@ -154,7 +154,7 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
 
   livy_statement_new(
     code = code,
-    lobj = livy_lobj_create(sc, varName)
+    lobj = livy_jobj_create(sc, varName)
   )
 }
 

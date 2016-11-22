@@ -46,28 +46,10 @@ livy_invoke_deserialize <- function(sc, base64) {
   object <- readObject(rc)
   close(rc)
 
-  livy_attach_connection(object, sc)
+  attach_connection(object, sc)
 }
 
 jobj_subclass.livy_backend <- function(con) {
   "livy_jobj"
 }
 
-livy_attach_connection <- function(jobj, connection) {
-
-  if (inherits(jobj, "livy_jobj")) {
-    jobj$connection <- connection
-  }
-  else if (is.list(jobj) || inherits(jobj, "struct")) {
-    jobj <- lapply(jobj, function(e) {
-      livy_attach_connection(e, connection)
-    })
-  }
-  else if (is.environment(jobj)) {
-    jobj <- eapply(jobj, function(e) {
-      livy_attach_connection(e, connection)
-    })
-  }
-
-  jobj
-}

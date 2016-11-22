@@ -454,7 +454,7 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
   class(backend) <- c(class(backend), "shell_backend")
 
   object <- readObject(backend)
-  spark_attach_connection(object, sc)
+  attach_connection(object, sc)
 }
 
 jobj_subclass.shell_backend <- function(con) {
@@ -471,26 +471,6 @@ print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
     fmt <- "<jobj[%s]>\n  <detached>"
     cat(sprintf(fmt, jobj$id))
   }
-}
-
-
-spark_attach_connection <- function(jobj, connection) {
-
-  if (inherits(jobj, "spark_jobj")) {
-    jobj$connection <- connection
-  }
-  else if (is.list(jobj) || inherits(jobj, "struct")) {
-    jobj <- lapply(jobj, function(e) {
-      spark_attach_connection(e, connection)
-    })
-  }
-  else if (is.environment(jobj)) {
-    jobj <- eapply(jobj, function(e) {
-      spark_attach_connection(e, connection)
-    })
-  }
-
-  jobj
 }
 
 read_spark_log_error <- function(sc) {

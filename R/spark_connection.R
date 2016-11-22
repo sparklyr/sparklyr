@@ -88,6 +88,11 @@ spark_connection.spark_connection <- function(x, ...) {
   x
 }
 
+#' @export
+spark_connection.spark_jobj <- function(x, ...) {
+  x$connection
+}
+
 #' Check whether the connection is open
 #'
 #' @param sc \code{spark_connection}
@@ -211,7 +216,3 @@ initialize_connection <- function(sc) {
   UseMethod("initialize_connection")
 }
 
-#' @export
-spark_connection.spark_jobj <- function(x, ...) {
-  x$connection
-}
