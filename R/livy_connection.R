@@ -388,11 +388,24 @@ livy_try_get_session <- function(sc) {
 }
 
 livy_validate_master <- function(master) {
-  tryCatch({
-    livy_get_sessions(master)
-  }, error = function(err) {
-    stop("Failed to connect to Livy service at ", master, ". ", err$message)
-  })
+  retries <- 5
+  retriesErr <- NULL
+  while (retries >= 0) {
+    commandStart <- Sys.time()
+
+    tryCatch({
+      livy_get_sessions(master)
+    }, error = function(err) {
+      retriesErr <- err
+    })
+
+    retries <- retries- 1;
+    Sys.sleep(1)
+  }
+
+  if (!is.null(retriesErr)) {
+    stop("Failed to connect to Livy service at ", master, ". ", retriesErr$message)
+  }
 
   NULL
 }
