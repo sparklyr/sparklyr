@@ -32,7 +32,10 @@ passed in to calls to \R's own \code{\link{glm}}.}
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Optional arguments. The \code{data} argument can be used to
+specify the data to be used when \code{x} is a formula; this allows calls
+of the form \code{ml_linear_regression(y ~ x, data = tbl)}, and is
+especially useful in conjunction with \code{\link{do}}.}
 }
 \description{
 Perform generalized linear regression on a Spark DataFrame.

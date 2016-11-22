@@ -21,7 +21,10 @@ parameters (if available). Currently, only simple linear combinations of
 existing parameters is supposed; e.g. \code{response ~ feature1 + feature2 + ...}.
 The intercept term can be omitted by using \code{- 1} in the model fit.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Optional arguments. The \code{data} argument can be used to
+specify the data to be used when \code{x} is a formula; this allows calls
+of the form \code{ml_linear_regression(y ~ x, data = tbl)}, and is
+especially useful in conjunction with \code{\link{do}}.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}

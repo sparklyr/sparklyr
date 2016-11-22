@@ -27,7 +27,10 @@ ml_als_factorization(x, rating.column = "rating", user.column = "user",
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Optional arguments. The \code{data} argument can be used to
+specify the data to be used when \code{x} is a formula; this allows calls
+of the form \code{ml_linear_regression(y ~ x, data = tbl)}, and is
+especially useful in conjunction with \code{\link{do}}.}
 }
 \description{
 Perform alternating least squares matrix factorization on a Spark DataFrame.

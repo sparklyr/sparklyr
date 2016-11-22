@@ -25,10 +25,10 @@ ml_als_factorization <- function(x,
                                  ml.options = ml_options(),
                                  ...)
 {
+  ml_backwards_compatibility_api()
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
-
-  ml_backwards_compatibility_api()
 
   rating.column <- ensure_scalar_character(rating.column)
   user.column <- ensure_scalar_character(user.column)

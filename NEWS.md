@@ -3,6 +3,10 @@
 - Implemented experimental support for Livy through: `livy_install`, 
   `livy_service_start`, `livy_service_stop` and  `spark_connect(method = "livy")`
 
+- The `ml` routines now accept `data` as an optional argument, to support
+  calls of the form e.g. `ml_linear_regression(y ~ x, data = data)`. This
+  should be especially helpful in conjunction with `do`.
+
 - Spark `DenseVector` and `SparseVector` objects are now deserialized as
   R numeric vectors, rather than Spark objects. This should make it easier
   to work with the output produced by `sdf_predict()` with Random Forest
