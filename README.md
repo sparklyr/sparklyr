@@ -76,7 +76,7 @@ To start with here's a simple filtering example:
 flights_tbl %>% filter(dep_delay == 2)
 ```
 
-    ## Source:   query [?? x 19]
+    ## Source:   query [6,233 x 19]
     ## Database: spark connection master=local[8] app=sparklyr local=TRUE
     ## 
     ##     year month   day dep_time sched_dep_time dep_delay arr_time
@@ -91,7 +91,7 @@ flights_tbl %>% filter(dep_delay == 2)
     ## 8   2013     1     1     1028           1026         2     1350
     ## 9   2013     1     1     1042           1040         2     1325
     ## 10  2013     1     1     1231           1229         2     1523
-    ## # ... with more rows, and 12 more variables: sched_arr_time <int>,
+    ## # ... with 6,223 more rows, and 12 more variables: sched_arr_time <int>,
     ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
     ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
     ## #   minute <dbl>, time_hour <dbl>
@@ -127,7 +127,7 @@ batting_tbl %>%
   filter(min_rank(desc(H)) <= 2 & H > 0)
 ```
 
-    ## Source:   query [?? x 7]
+    ## Source:   query [2.562e+04 x 7]
     ## Database: spark connection master=local[8] app=sparklyr local=TRUE
     ## Groups: playerID
     ## 
@@ -143,7 +143,7 @@ batting_tbl %>%
     ## 8  acevejo01   2004    CIN    39    43     0     2
     ## 9  adamsbe01   1919    PHI    78   232    14    54
     ## 10 adamsbe01   1918    PHI    84   227    10    40
-    ## # ... with more rows
+    ## # ... with 2.561e+04 more rows
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
 
@@ -311,16 +311,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 228
-    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 227
-    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 226
-    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 225
-    ## 16/11/09 23:26:41 INFO ContextCleaner: Cleaned accumulator 224
-    ## 16/11/09 23:26:41 INFO Executor: Finished task 0.0 in stage 69.0 (TID 117). 2082 bytes result sent to driver
-    ## 16/11/09 23:26:41 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 117) in 117 ms on localhost (1/1)
-    ## 16/11/09 23:26:41 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
-    ## 16/11/09 23:26:41 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:-2) finished in 0.117 s
-    ## 16/11/09 23:26:41 INFO DAGScheduler: Job 51 finished: count at NativeMethodAccessorImpl.java:-2, took 0.120238 s
+    ## 16/11/22 15:57:57 INFO ContextCleaner: Cleaned accumulator 314
+    ## 16/11/22 15:57:57 INFO ContextCleaner: Cleaned accumulator 313
+    ## 16/11/22 15:57:57 INFO BlockManagerInfo: Removed broadcast_110_piece0 on localhost:49659 in memory (size: 4.6 KB, free: 482.8 MB)
+    ## 16/11/22 15:57:57 INFO ContextCleaner: Cleaned accumulator 261
+    ## 16/11/22 15:57:57 INFO ContextCleaner: Cleaned shuffle 23
+    ## 16/11/22 15:57:57 INFO Executor: Finished task 0.0 in stage 83.0 (TID 165). 2082 bytes result sent to driver
+    ## 16/11/22 15:57:57 INFO TaskSetManager: Finished task 0.0 in stage 83.0 (TID 165) in 120 ms on localhost (1/1)
+    ## 16/11/22 15:57:57 INFO TaskSchedulerImpl: Removed TaskSet 83.0, whose tasks have all completed, from pool 
+    ## 16/11/22 15:57:57 INFO DAGScheduler: ResultStage 83 (count at NativeMethodAccessorImpl.java:-2) finished in 0.120 s
+    ## 16/11/22 15:57:57 INFO DAGScheduler: Job 57 finished: count at NativeMethodAccessorImpl.java:-2, took 0.122621 s
 
 Finally, we disconnect from Spark:
 
@@ -350,3 +350,52 @@ The Spark DataFrame preview uses the standard RStudio data viewer:
 <img src="README_files/images/spark-dataview.png" class="screenshot" width=639 height=446/>
 
 The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
+
+Connecting through Livy
+-----------------------
+
+[Livy](https://github.com/cloudera/livy) enables remote connections to Apache Spark clusters. Connecting to Spark clusters through Livy is **under experimental development** in `sparklyr`. Please post any feedback or questions as a GitHub issue as needed.
+
+Before connecting to Livy, you will need the connection information to an existing service running Livy. Otherwise, to test `livy` in your local environment, you can install it and run it locally as follows:
+
+``` r
+livy_install()
+```
+
+``` r
+livy_service_start()
+```
+
+To connect, use the Livy service address as `master` and `method = "livy"` in `spark_connect`. Once connection completes, use `sparklyr` as usual, for instance:
+
+``` r
+sc <- spark_connect(master = "local", method = "livy")
+copy_to(sc, iris)
+```
+
+    ## Source:   query [150 x 5]
+    ## Database: spark connection master=http://localhost:8998 app= local=FALSE
+    ## 
+    ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
+    ##           <dbl>       <dbl>        <dbl>       <dbl>   <chr>
+    ## 1           5.1         3.5          1.4         0.2  setosa
+    ## 2           4.9         3.0          1.4         0.2  setosa
+    ## 3           4.7         3.2          1.3         0.2  setosa
+    ## 4           4.6         3.1          1.5         0.2  setosa
+    ## 5           5.0         3.6          1.4         0.2  setosa
+    ## 6           5.4         3.9          1.7         0.4  setosa
+    ## 7           4.6         3.4          1.4         0.3  setosa
+    ## 8           5.0         3.4          1.5         0.2  setosa
+    ## 9           4.4         2.9          1.4         0.2  setosa
+    ## 10          4.9         3.1          1.5         0.1  setosa
+    ## # ... with 140 more rows
+
+``` r
+spark_disconnect(sc)
+```
+
+Once you are done using `livy` locally, you should stop this service with:
+
+``` r
+livy_service_stop()
+```
