@@ -5,14 +5,27 @@
 \alias{sdf_import}
 \title{Copy an Object into Spark}
 \usage{
-sdf_copy_to(sc, x, ...)
+sdf_copy_to(sc, x, name = deparse(substitute(x)), memory = TRUE,
+  repartition = 0L, overwrite = FALSE, ...)
 
-sdf_import(x, sc, ...)
+sdf_import(x, sc, name = random_string("sparklyr_tmp_"), memory = TRUE,
+  repartition = 0L, overwrite = FALSE, ...)
 }
 \arguments{
 \item{sc}{The associated Spark connection.}
 
 \item{x}{An \R object from which a Spark DataFrame can be generated.}
+
+\item{name}{The name to assign to the copied table in Spark.}
+
+\item{memory}{Boolean; should the table be cached into memory?}
+
+\item{repartition}{The number of partitions to use when distributing the
+table across the Spark cluster. The default (0) can be used to avoid
+partitioning.}
+
+\item{overwrite}{Boolean; overwrite a pre-existing table with the name \code{name}
+if one already exists?}
 
 \item{...}{Optional arguments, passed to implementing methods.}
 }
