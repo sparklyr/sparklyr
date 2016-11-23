@@ -1,6 +1,6 @@
 tbl_quote_name <- function(name) {
-  x <- gsub("'", "''", name, fixed = TRUE)
-  paste("'", name, "'", sep = "")
+  x <- gsub("`", "``", name, fixed = TRUE)
+  paste("`", name, "`", sep = "")
 }
 
 tbl_cache_sdf <- function(sc, name, force) {
