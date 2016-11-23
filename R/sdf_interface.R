@@ -27,10 +27,10 @@
 #' @export
 sdf_copy_to <- function(sc,
                         x,
-                        name = deparse(substitute(x)),
-                        memory = TRUE,
-                        repartition = 0L,
-                        overwrite = FALSE,
+                        name,
+                        memory,
+                        repartition,
+                        overwrite,
                         ...) {
   UseMethod("sdf_copy_to")
 }
@@ -38,12 +38,12 @@ sdf_copy_to <- function(sc,
 #' @export
 sdf_copy_to.default <- function(sc,
                                 x,
-                                name,
-                                memory,
-                                repartition,
-                                overwrite,
+                                name = deparse(substitute(x)),
+                                memory = TRUE,
+                                repartition = 0L,
+                                overwrite = FALSE,
                                 ...
-                                ) {
+) {
   sdf_import(x, sc, name, memory, repartition, overwrite)
 }
 
@@ -51,10 +51,10 @@ sdf_copy_to.default <- function(sc,
 #' @export
 sdf_import <- function(x,
                        sc,
-                       name = random_string("sparklyr_tmp_"),
-                       memory = TRUE,
-                       repartition = 0L,
-                       overwrite = FALSE,
+                       name,
+                       memory,
+                       repartition,
+                       overwrite,
                        ...) {
   UseMethod("sdf_import")
 }
@@ -62,10 +62,10 @@ sdf_import <- function(x,
 #' @export
 sdf_import.default <- function(x,
                                sc,
-                               name,
-                               memory,
-                               repartition,
-                               overwrite,
+                               name = random_string("sparklyr_tmp_"),
+                               memory = TRUE,
+                               repartition = 0L,
+                               overwrite = FALSE,
                                ...)
 {
   # ensure data.frame
