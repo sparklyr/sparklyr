@@ -12,31 +12,61 @@
 #'
 #' @param sc The associated Spark connection.
 #' @param x An \R object from which a Spark DataFrame can be generated.
+#' @param name The name to assign to the copied table in Spark.
+#' @param memory Boolean; should the table be cached into memory?
+#' @param repartition The number of partitions to use when distributing the
+#'   table across the Spark cluster. The default (0) can be used to avoid
+#'   partitioning.
+#' @param overwrite Boolean; overwrite a pre-existing table with the name \code{name}
+#'   if one already exists?
 #' @param ... Optional arguments, passed to implementing methods.
 #'
 #' @family Spark data frames
 #'
 #' @name sdf_copy_to
 #' @export
-sdf_copy_to <- function(sc, x, ...) {
+sdf_copy_to <- function(sc,
+                        x,
+                        name,
+                        memory,
+                        repartition,
+                        overwrite,
+                        ...) {
   UseMethod("sdf_copy_to")
 }
 
 #' @export
-sdf_copy_to.default <- function(sc, x, ...) {
-  sdf_import(x, sc)
+sdf_copy_to.default <- function(sc,
+                                x,
+                                name = deparse(substitute(x)),
+                                memory = TRUE,
+                                repartition = 0L,
+                                overwrite = FALSE,
+                                ...
+) {
+  sdf_import(x, sc, name, memory, repartition, overwrite)
 }
 
 #' @name sdf_copy_to
 #' @export
-sdf_import <- function(x, sc, ...) {
+sdf_import <- function(x,
+                       sc,
+                       name,
+                       memory,
+                       repartition,
+                       overwrite,
+                       ...) {
   UseMethod("sdf_import")
 }
 
 #' @export
-sdf_import.default <- function(x, sc, ...,
+sdf_import.default <- function(x,
+                               sc,
                                name = random_string("sparklyr_tmp_"),
-                               cache = TRUE)
+                               memory = TRUE,
+                               repartition = 0L,
+                               overwrite = FALSE,
+                               ...)
 {
   # ensure data.frame
   if (!is.data.frame(x)) {
@@ -48,71 +78,21 @@ sdf_import.default <- function(x, sc, ...,
     )
   }
 
-  # generate a CSV file from the associated data frame
-  # note that these files need to live for the R session
-  # duration so we don't clean these up eagerly
-  # write file based on hash to avoid writing too many files
-  # on repeated import calls
-  hash <- digest::digest(x, algo = "sha256")
-  filename <- paste("spark_csv_", hash, ".csv", sep = "")
-  tempfile <- file.path(tempdir(), filename)
+  if (overwrite)
+    spark_remove_table_if_exists(sc, name)
+  else if (name %in% src_tbls(sc))
+    stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  if (!file.exists(tempfile)) {
-    readr::write_csv(
-      x,
-      path = tempfile,
-      col_names = TRUE
-    )
-  }
+  dots <- list(...)
+  serializer <- dots$serializer
+  spark_data_copy(sc, x, name = name, repartition = repartition, serializer = serializer)
 
-  # generate path that Spark can use
-  path <- normalizePath(tempfile, winslash = "/", mustWork = TRUE)
+  if (memory)
+    tbl_cache(sc, name)
 
-  # generate the Spark CSV reader
-  ctx <- hive_context(sc)
-  reader <- invoke(ctx, "read")
+  on_connection_updated(sc, name)
 
-  # construct schema
-  # TODO: move to separate function?
-  fields <- lapply(names(x), function(name) {
-
-    # infer the type
-    value <- x[[name]]
-    type <- if (is.factor(value))
-      "character"
-    else
-      typeof(value)
-
-    # create struct field
-    invoke_static(
-      sc,
-      "sparklyr.SQLUtils",
-      "createStructField",
-      name,
-      type,
-      TRUE
-
-    )
-  })
-
-  schema <- invoke_static(
-    sc,
-    "sparklyr.SQLUtils",
-    "createStructType",
-    fields
-  )
-
-  # invoke CSV reader with our schema
-  sdf <- reader %>%
-    spark_csv_format_if_needed(sc) %>%
-    invoke("option", "header", "true") %>%
-    invoke("schema", schema) %>%
-    invoke(spark_csv_load_name(sc), path)
-
-  if (cache)
-    sdf <- invoke(sdf, "cache")
-
-  sdf_register(sdf, name)
+  tbl(sc, name)
 }
 
 #' Register a Spark DataFrame

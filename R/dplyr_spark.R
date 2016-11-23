@@ -84,28 +84,7 @@ copy_to.spark_connection <- function(dest,
                                      overwrite = FALSE,
                                      ...)
 {
-  if (!is.data.frame(df)) {
-    stop("copy_to expects a local data frame")
-  }
-
-  sc <- dest
-
-  if (overwrite)
-    spark_remove_table_if_exists(sc, name)
-
-  if (name %in% src_tbls(sc))
-    stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
-
-  dots <- list(...)
-  serializer <- dots$serializer
-  spark_data_copy(sc, df, name = name, repartition = repartition, serializer = serializer)
-
-  if (memory)
-    tbl_cache(sc, name)
-
-  on_connection_updated(sc, name)
-
-  tbl(sc, name)
+  sdf_copy_to(dest, df, name, memory, repartition, overwrite)
 }
 
 #' @export
