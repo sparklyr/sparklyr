@@ -167,7 +167,7 @@ livy_installed_versions <- function() {
       if (length(m) > 1) {
         livy <<- c(livy, m[[2]])
         dir <<- c(dir, basename(maybeDir))
-        livyVersionDir <<- maybeDir
+        livyVersionDir <<- c(livyVersionDir, maybeDir)
       }
     }
   })
