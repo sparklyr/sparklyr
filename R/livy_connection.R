@@ -288,8 +288,12 @@ livy_inspect <- function(lobj) {
 
 }
 
+livy_log_operation <- function(sc, text) {
+  write(strtrim(text, 200), file = sc$log, append = TRUE)
+}
+
 livy_post_statement <- function(sc, code) {
-  write(code, file = sc$log, append = TRUE)
+  livy_log_operation(sc, code)
 
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
     add_headers(
@@ -339,9 +343,9 @@ livy_post_statement <- function(sc, code) {
   data <- statementReponse$output$data
 
   if ("text/plain" == names(data)[[1]]) {
-    write("\n", file = sc$log, append = TRUE)
-    write(data[[1]], file = sc$log, append = TRUE)
-    write("\n", file = sc$log, append = TRUE)
+    livy_log_operation(sc, "\n")
+    livy_log_operation(sc, data[[1]])
+    livy_log_operation(sc, "\n")
   }
 
   data
