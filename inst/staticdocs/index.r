@@ -28,10 +28,9 @@ sd_section(
 )
 
 sd_section(
-  "dplyr Interface",
-  "Functions implementing a dplyr backend for Spark DataFrames.",
+  "Spark Tables",
+  "Functions for manipulating Spark Tables.",
   c(
-    "copy_to",
     "tbl_cache",
     "tbl_uncache"
   )
