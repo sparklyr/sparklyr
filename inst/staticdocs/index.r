@@ -106,7 +106,6 @@ sd_section(
   "Machine Learning Extensions",
   "Functions for creating custom wrappers to other Spark ML algorithms.",
   c(
-    "ensure",
     "ml_create_dummy_variables",
     "ml_model",
     "ml_options",
