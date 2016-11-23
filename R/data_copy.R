@@ -9,8 +9,20 @@ spark_data_build_types <- function(sc, columns) {
 }
 
 spark_serialize_csv_file <- function(sc, df, columns, repartition) {
-  tempfile <- tempfile(fileext = ".csv")
-  write.csv(df, tempfile, row.names = FALSE, na = "")
+
+  # generate a CSV file from the associated data frame
+  # note that these files need to live for the R session
+  # duration so we don't clean these up eagerly
+  # write file based on hash to avoid writing too many files
+  # on repeated import calls
+  hash <- digest::digest(df, algo = "sha256")
+  filename <- paste("spark_serialize_", hash, ".csv", sep = "")
+  tempfile <- file.path(tempdir(), filename)
+
+  if (!file.exists(tempfile)) {
+    write.csv(df, tempfile, row.names = FALSE, na = "")
+  }
+
   df <- spark_csv_read(sc, tempfile, csvOptions = list(
     header = "true"
   ), columns = columns)

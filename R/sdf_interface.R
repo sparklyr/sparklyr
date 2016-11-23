@@ -78,23 +78,6 @@ sdf_import.default <- function(x,
     )
   }
 
-  # generate a CSV file from the associated data frame
-  # note that these files need to live for the R session
-  # duration so we don't clean these up eagerly
-  # write file based on hash to avoid writing too many files
-  # on repeated import calls
-  hash <- digest::digest(x, algo = "sha256")
-  filename <- paste("spark_csv_", hash, ".csv", sep = "")
-  tempfile <- file.path(tempdir(), filename)
-
-  if (!file.exists(tempfile)) {
-    readr::write_csv(
-      x,
-      path = tempfile,
-      col_names = TRUE
-    )
-  }
-
   if (overwrite)
     spark_remove_table_if_exists(sc, name)
   else if (name %in% src_tbls(sc))
