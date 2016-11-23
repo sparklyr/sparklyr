@@ -5,11 +5,9 @@
 \alias{sdf_import}
 \title{Copy an Object into Spark}
 \usage{
-sdf_copy_to(sc, x, name = deparse(substitute(x)), memory = TRUE,
-  repartition = 0L, overwrite = FALSE, ...)
+sdf_copy_to(sc, x, name, memory, repartition, overwrite, ...)
 
-sdf_import(x, sc, name = random_string("sparklyr_tmp_"), memory = TRUE,
-  repartition = 0L, overwrite = FALSE, ...)
+sdf_import(x, sc, name, memory, repartition, overwrite, ...)
 }
 \arguments{
 \item{sc}{The associated Spark connection.}
