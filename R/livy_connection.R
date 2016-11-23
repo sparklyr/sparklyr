@@ -9,19 +9,29 @@ livy_get_sessions <- function(master) {
 }
 
 #' @import jsonlite
-livy_config_get <- function(master, config) {
+livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
   params <- connection_config(list(
     master = master,
     config = config
-  ), "livy.")
+  ), prefix, not_prefix)
 
   params <- lapply(params, function(param) {
     unbox(param)
   })
 
-  names(params) <- paste("livy.", names(params), sep = "")
+  if (length(params) == 0) {
+    NULL
+  } else {
+    names(params) <- paste(prefix, names(params), sep = "")
+    params
+  }
+}
 
-  if (length(params) == 0) NULL else params
+livy_config_get <- function(master, config) {
+  livyConfig <- livy_config_get_prefix(master, config, "livy.", NULL)
+  sparkConfig <- livy_config_get_prefix(master, config, "spark.", c("spark.sql."))
+
+  c(livyConfig, sparkConfig)
 }
 
 #' @import httr
