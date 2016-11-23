@@ -8,19 +8,36 @@ livy_get_sessions <- function(master) {
   sessions
 }
 
+#' @import jsonlite
+livy_config_get <- function(master, config) {
+  params <- connection_config(list(
+    master = master,
+    config = config
+  ), "livy.")
+
+  params <- lapply(params, function(param) {
+    unbox(param)
+  })
+
+  names(params) <- paste("livy.", names(params), sep = "")
+
+  if (length(params) == 0) NULL else params
+}
+
 #' @import httr
 #' @import jsonlite
-livy_create_session <- function(master) {
-  data <- list(kind = "spark")
+livy_create_session <- function(master, config) {
+  data <- list(
+    kind = unbox("spark"),
+    conf = livy_config_get(master, config)
+  )
 
   req <- POST(paste(master, "sessions", sep = "/"),
     add_headers(
       "Content-Type" = "application/json"
     ),
     body = toJSON(
-      list(
-        kind = unbox("spark")
-      )
+      data
     )
   )
 
@@ -418,7 +435,7 @@ livy_connection <- function(master, config) {
 
   livy_validate_master(master)
 
-  session <- livy_create_session(master)
+  session <- livy_create_session(master, config)
 
   sc <- structure(class = c("spark_connection", "livy_connection"), list(
     master = master,

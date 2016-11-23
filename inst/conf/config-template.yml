@@ -13,3 +13,5 @@ default:
   # command line arguments to spark-shell
   # sparklyr.shell.*
 
+  # livy configuration
+  livy.rsc.rpc.max.size: 104857600
