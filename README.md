@@ -311,16 +311,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/11/22 15:57:57 INFO ContextCleaner: Cleaned accumulator 314
-    ## 16/11/22 15:57:57 INFO ContextCleaner: Cleaned accumulator 313
-    ## 16/11/22 15:57:57 INFO BlockManagerInfo: Removed broadcast_110_piece0 on localhost:49659 in memory (size: 4.6 KB, free: 482.8 MB)
-    ## 16/11/22 15:57:57 INFO ContextCleaner: Cleaned accumulator 261
-    ## 16/11/22 15:57:57 INFO ContextCleaner: Cleaned shuffle 23
-    ## 16/11/22 15:57:57 INFO Executor: Finished task 0.0 in stage 83.0 (TID 165). 2082 bytes result sent to driver
-    ## 16/11/22 15:57:57 INFO TaskSetManager: Finished task 0.0 in stage 83.0 (TID 165) in 120 ms on localhost (1/1)
-    ## 16/11/22 15:57:57 INFO TaskSchedulerImpl: Removed TaskSet 83.0, whose tasks have all completed, from pool 
-    ## 16/11/22 15:57:57 INFO DAGScheduler: ResultStage 83 (count at NativeMethodAccessorImpl.java:-2) finished in 0.120 s
-    ## 16/11/22 15:57:57 INFO DAGScheduler: Job 57 finished: count at NativeMethodAccessorImpl.java:-2, took 0.122621 s
+    ## 16/11/22 16:02:15 INFO ContextCleaner: Cleaned accumulator 314
+    ## 16/11/22 16:02:15 INFO ContextCleaner: Cleaned accumulator 313
+    ## 16/11/22 16:02:15 INFO BlockManagerInfo: Removed broadcast_110_piece0 on localhost:50081 in memory (size: 4.6 KB, free: 482.8 MB)
+    ## 16/11/22 16:02:15 INFO ContextCleaner: Cleaned accumulator 312
+    ## 16/11/22 16:02:15 INFO BlockManagerInfo: Removed broadcast_109_piece0 on localhost:50081 in memory (size: 6.9 KB, free: 482.8 MB)
+    ## 16/11/22 16:02:15 INFO ContextCleaner: Cleaned accumulator 311
+    ## 16/11/22 16:02:15 INFO ContextCleaner: Cleaned shuffle 25
+    ## 16/11/22 16:02:15 INFO BlockManagerInfo: Removed broadcast_108_piece0 on localhost:50081 in memory (size: 1224.0 B, free: 482.8 MB)
+    ## 16/11/22 16:02:15 INFO ContextCleaner: Cleaned accumulator 302
+    ## 16/11/22 16:02:15 INFO BlockManagerInfo: Removed broadcast_107_piece0 on localhost:50081 in memory (size: 4.6 KB, free: 482.8 MB)
 
 Finally, we disconnect from Spark:
 
@@ -369,7 +369,7 @@ livy_service_start()
 To connect, use the Livy service address as `master` and `method = "livy"` in `spark_connect`. Once connection completes, use `sparklyr` as usual, for instance:
 
 ``` r
-sc <- spark_connect(master = "local", method = "livy")
+sc <- spark_connect(master = "http://localhost:8998", method = "livy")
 copy_to(sc, iris)
 ```
 

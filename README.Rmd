@@ -278,7 +278,7 @@ livy_service_start()
 To connect, use the Livy service address as `master` and `method = "livy"` in `spark_connect`. Once connection completes, use `sparklyr` as usual, for instance:
 
 ```{r}
-sc <- spark_connect(master = "local", method = "livy")
+sc <- spark_connect(master = "http://localhost:8998", method = "livy")
 copy_to(sc, iris)
 
 spark_disconnect(sc)
