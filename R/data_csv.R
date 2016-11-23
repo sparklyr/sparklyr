@@ -72,6 +72,8 @@ spark_csv_read <- function(sc,
 }
 
 spark_csv_write <- function(df, path, csvOptions) {
+  sc <- spark_connection(df)
+
   write <- invoke(df, "write")
   options <- spark_csv_format_if_needed(write, sc)
 

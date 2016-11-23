@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Implemented experimental support for Livy through: `livy_install`, 
+  `livy_service_start`, `livy_service_stop` and  `spark_connect(method = "livy")`
+
 - The `ml` routines now accept `data` as an optional argument, to support
   calls of the form e.g. `ml_linear_regression(y ~ x, data = data)`. This
   should be especially helpful in conjunction with `do`.

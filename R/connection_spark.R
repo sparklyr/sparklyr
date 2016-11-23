@@ -48,7 +48,7 @@ NULL
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell"),
+                          method = c("shell", "livy"),
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
@@ -110,6 +110,9 @@ spark_connect <- function(master,
                              config = config,
                              service = FALSE,
                              extensions = extensions)
+  } else if (method == "livy") {
+    scon <- livy_connection(master = master,
+                            config = config)
   } else {
     # other methods
 
@@ -122,6 +125,8 @@ spark_connect <- function(master,
 
     stop("Unsupported connection method '", method, "'")
   }
+
+  scon <- initialize_connection(scon)
 
   # mark the connection as a DBIConnection class to allow DBI to use defaults
   attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
@@ -208,7 +213,8 @@ spark_disconnect <- function(sc, ...) {
 #' @export
 spark_disconnect.spark_connection <- function(sc, ...) {
   tryCatch({
-    stop_shell(sc)
+    subclass <- remove_class(sc, "spark_connection")
+    spark_disconnect(subclass, ...)
   }, error = function(err) {
   })
 

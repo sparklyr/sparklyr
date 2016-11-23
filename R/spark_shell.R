@@ -80,7 +80,7 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
 
     logLines <- if (!is.null(output_file) && file.exists(output_file))
       paste(tail(readLines(output_file), n = maxRows), collapse = "\n")
-    else""
+    else ""
 
     errorLines <- if (!is.null(error_file) && file.exists(error_file))
       paste(tail(readLines(error_file), n = maxRows), collapse = "\n")
@@ -89,13 +89,15 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
     stop(
       paste(
         message, "\n",
-        "    Path: ", spark_submit_path, "\n",
-        "    Parameters: ", paste(shell_args, collapse = ", "), "\n",
+        if (!is.null(spark_submit_path))
+          paste("    Path: ", spark_submit_path, "\n", sep = "") else "",
+        if (!is.null(shell_args))
+          paste("    Parameters: ", paste(shell_args, collapse = ", "), "\n", sep = "") else  "",
         "\n\n",
-        "---- Output Log ----\n",
+        if (!is.null(output_file)) "---- Output Log ----\n" else "",
         logLines,
         "\n\n",
-        "---- Error Log ----\n",
+        if (!is.null(error_file)) "---- Error Log ----\n" else "",
         errorLines,
         sep = ""
       )
@@ -316,28 +318,16 @@ start_shell <- function(master,
     }
   }, onexit = TRUE)
 
-  # initialize and return the connection
-  tryCatch({
-    sc <- initialize_connection(sc)
-  }, error = function(e) {
-    abort_shell(
-      paste("Failed during initialize_connection:", e$message),
-      spark_submit_path,
-      shell_args,
-      output_file,
-      error_file
-    )
-  })
-
   sc
 }
 
+#' @export
+spark_disconnect.spark_shell_connection <- function(sc, ...) {
+  terminate <- list(...)$terminate
+  stop_shell(sc, terminate = terminate)
+}
 
 # Stop the Spark R Shell
-#
-# @rdname start_shell
-#
-# @export
 stop_shell <- function(sc, terminate = FALSE) {
   terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
   invoke_method(sc,
@@ -423,8 +413,8 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
     object <- object$id
 
   rc <- rawConnection(raw(), "r+")
-  writeBoolean(rc, static)
   writeString(rc, object)
+  writeBoolean(rc, static)
   writeString(rc, method)
 
   args <- list(...)
@@ -461,8 +451,14 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
     })
   }
 
+  class(backend) <- c(class(backend), "shell_backend")
+
   object <- readObject(backend)
   attach_connection(object, sc)
+}
+
+jobj_subclass.shell_backend <- function(con) {
+  "shell_jobj"
 }
 
 #' @export
@@ -475,26 +471,6 @@ print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
     fmt <- "<jobj[%s]>\n  <detached>"
     cat(sprintf(fmt, jobj$id))
   }
-}
-
-
-attach_connection <- function(jobj, connection) {
-
-  if (inherits(jobj, "spark_jobj")) {
-    jobj$connection <- connection
-  }
-  else if (is.list(jobj) || inherits(jobj, "struct")) {
-    jobj <- lapply(jobj, function(e) {
-      attach_connection(e, connection)
-    })
-  }
-  else if (is.environment(jobj)) {
-    jobj <- eapply(jobj, function(e) {
-      attach_connection(e, connection)
-    })
-  }
-
-  jobj
 }
 
 read_spark_log_error <- function(sc) {
@@ -518,3 +494,74 @@ read_spark_log_error <- function(sc) {
 spark_config_value <- function(config, name, default = NULL) {
   if (is.null(config[[name]])) default else config[[name]]
 }
+
+#' @export
+initialize_connection.spark_shell_connection <- function(sc) {
+  # initialize and return the connection
+  tryCatch({
+    sc$spark_context <- invoke_static(sc, "sparklyr.Backend", "getSparkContext")
+
+    if (is.null(sc$spark_context)) {
+      # create the spark config
+      conf <- invoke_new(sc, "org.apache.spark.SparkConf")
+      conf <- invoke(conf, "setAppName", sc$app_name)
+      conf <- invoke(conf, "setMaster", sc$master)
+      conf <- invoke(conf, "setSparkHome", sc$spark_home)
+
+      # context_config <- connection_config(sc, "spark.", c("spark.sql."))
+      # apply_config(context_config, conf, "set", "spark.")
+
+      # create the spark context and assign the connection to it
+      sc$spark_context <- invoke_static(
+        sc,
+        "org.apache.spark.SparkContext",
+        "getOrCreate",
+        conf
+      )
+
+      invoke_static(sc, "sparklyr.Backend", "setSparkContext", sc$spark_context)
+    }
+
+    sc$spark_context$connection <- sc
+
+    # create the java spark context and assign the connection to it
+    sc$java_context <- invoke_static(
+      sc,
+      "org.apache.spark.api.java.JavaSparkContext",
+      "fromSparkContext",
+      sc$spark_context
+    )
+    sc$java_context$connection <- sc
+
+    # create the hive context and assign the connection to it
+    sc$hive_context <- create_hive_context(sc)
+    sc$hive_context$connection <- sc
+
+    # return the modified connection
+    sc
+  }, error = function(e) {
+    abort_shell(
+      paste("Failed during initialize_connection:", e$message),
+      spark_submit_path = NULL,
+      shell_args = NULL,
+      output_file = sc$output_file,
+      error_file = NULL
+    )
+  })
+}
+
+#' @export
+invoke.shell_jobj <- function(jobj, method, ...) {
+  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
+}
+
+#' @export
+invoke_static.spark_shell_connection <- function(sc, class, method, ...) {
+  invoke_method(sc, TRUE, class, method, ...)
+}
+
+#' @export
+invoke_new.spark_shell_connection <- function(sc, class, ...) {
+  invoke_method(sc, TRUE, class, "<init>", ...)
+}
+

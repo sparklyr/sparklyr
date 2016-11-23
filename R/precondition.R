@@ -132,7 +132,7 @@ require_directory_exists <- function(path, fmt = NULL) {
   path
 }
 
-ensure_directory <- function(path, ...) {
+ensure_directory <- function(path) {
 
   if (file.exists(path)) {
     info <- file.info(path)
@@ -140,8 +140,9 @@ ensure_directory <- function(path, ...) {
     stopf("path '%s' exists but is not a directory", path)
   }
 
-  if (!dir.create(path, ...))
+  if (!dir.create(path, recursive = TRUE))
     stopf("failed to create directory at path '%s'", path)
 
-  path
+  invisible(path)
+
 }

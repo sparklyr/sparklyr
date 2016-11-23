@@ -64,8 +64,13 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
       e
   }), optional = TRUE)
 
+  splitSeparator <- if (inherits(sc, "livy_connection"))
+    list(scala = "\\|~\\|", r = "|~|")
+  else
+    list(scala = "\31", r = "\31")
+
   tempFile <- tempfile(fileext = ".csv")
-  write.table(df, tempFile, sep = "\31", col.names = FALSE, row.names = FALSE, quote = FALSE)
+  write.table(df, tempFile, sep = splitSeparator$r, col.names = FALSE, row.names = FALSE, quote = FALSE)
   textData <- as.list(readr::read_lines(tempFile))
 
   rdd <- invoke_static(
@@ -75,7 +80,8 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
     spark_context(sc),
     textData,
     columns,
-    as.integer(if (repartition <= 0) 1 else repartition)
+    as.integer(if (repartition <= 0) 1 else repartition),
+    splitSeparator$scala
   )
 
   invoke(hive_context(sc), "createDataFrame", rdd, structType)
