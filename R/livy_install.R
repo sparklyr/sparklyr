@@ -128,6 +128,18 @@ livy_install <- function(version       = "0.3.0",
   invisible(livy_path)
 }
 
+#' @rdname livy_install
+#' @export
+livy_available_versions <- function() {
+  versions <- data.frame(livy = c("0.2.0", "0.3.0"))
+
+  versions$install <- paste0("livy_install(version = \"",
+                             versions$livy,
+                             "\")")
+
+  versions
+}
+
 livy_versions_file_pattern <- function() {
   "livy-(.*)-spark-(.*)"
 }
