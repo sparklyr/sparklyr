@@ -1,5 +1,7 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Support to configure Livy using the `livy.` prefix in the `config.yml` file.
+
 - Implemented experimental support for Livy through: `livy_install`, 
   `livy_service_start`, `livy_service_stop` and  `spark_connect(method = "livy")`
 
