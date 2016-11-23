@@ -41,7 +41,6 @@ sd_section(
   "Spark DataFrames",
   "Functions for maniplulating Spark DataFrames.",
   c(
-    "na.replace",
     "sdf_copy_to",
     "sdf_mutate",
     "sdf_partition",
