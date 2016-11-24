@@ -190,7 +190,7 @@ livy_install_find <- function(livyVersion = NULL) {
     stop(paste("Livy version not installed. To install, use", deparse(livyInstall)))
   }
 
-  versions[1,]
+  tail(versions, n = 1)
 }
 
 #' Find the LIVY_HOME directory for a version of Livy
