@@ -84,7 +84,7 @@ spark_read_csv <- function(sc,
   options <- spark_csv_options(header, infer_schema, delimiter, quote, escape, charset, null_value, options)
   df <- spark_csv_read(sc, spark_normalize_path(path), options, columns)
 
-  if (identical(header, FALSE) & (identical(columns, NULL))) {
+  if (identical(header, FALSE) & identical(columns, NULL)) {
     # create normalized column names when header = FALSE and a columns specification is not supplied
     columns <- invoke(df, "columns")
     n <- length(columns)
