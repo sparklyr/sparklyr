@@ -106,6 +106,11 @@ ml_prepare_response_features_intercept <- function(x = NULL,
 {
   # construct dummy data.frame from Spark DataFrame schema
   df <- x
+
+  # register df to improve performance, this is specially critical when
+  # a complex dplyr chain is piped directly into an ml function, see #308.
+  df <- sdf_register(df)
+
   schema <- sdf_schema(df)
   names <- lapply(schema, `[[`, "name")
   rdf <- as.data.frame(names, stringsAsFactors = FALSE, optional = TRUE)
