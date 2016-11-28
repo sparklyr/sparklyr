@@ -4,6 +4,7 @@ test_requires("janeaustenr")
 
 sc <- testthat_spark_connection()
 mtcars_tbl <- testthat_tbl("mtcars")
+iris_tbl   <- testthat_tbl("iris")
 
 austen     <- austen_books()
 austen_tbl <- testthat_tbl("austen")
@@ -93,4 +94,15 @@ test_that("the feature transforming family of functions has consistent API", {
     fmls <- names(formals(transformer))
     expect_true(all(c("input.col", "output.col", "...") %in% fmls))
   }
+})
+
+test_that("ft_quantile_discretizer() works with basic input", {
+  skip_on_cran()
+
+  # https://github.com/rstudio/sparklyr/issues/341
+  # previously failed due to incorrect assertion on 'n.buckets' type
+  iris_tbl %>%
+    ft_quantile_discretizer(input.col = "Sepal_Length",
+                            output.col = "Group",
+                            n.buckets = 2)
 })

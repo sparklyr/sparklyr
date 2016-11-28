@@ -280,7 +280,7 @@ ft_sql_transformer <- function(x,
 ft_quantile_discretizer <- function(x,
                                     input.col = NULL,
                                     output.col = NULL,
-                                    n.buckets = 5,
+                                    n.buckets = 5L,
                                     ...)
 {
   ml_backwards_compatibility_api()
@@ -288,7 +288,7 @@ ft_quantile_discretizer <- function(x,
   invoke_simple_transformer(x, class, list(
     setInputCol   = ensure_scalar_character(input.col),
     setOutputCol  = ensure_scalar_character(output.col),
-    setNumBuckets = ensure_scalar_double(n.buckets),
+    setNumBuckets = ensure_scalar_integer(n.buckets),
     function(transformer, sdf) invoke(transformer, "fit", sdf)
   ))
 }
