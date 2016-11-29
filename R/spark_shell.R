@@ -323,8 +323,7 @@ start_shell <- function(master,
 
 #' @export
 spark_disconnect.spark_shell_connection <- function(sc, ...) {
-  terminate <- list(...)$terminate
-  stop_shell(sc, terminate = terminate)
+  stop_shell(sc, ...)
 }
 
 # Stop the Spark R Shell
