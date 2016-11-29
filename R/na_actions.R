@@ -58,7 +58,10 @@ na.omit.spark_jobj <- function(object, columns = NULL, ...) {
     }
   }
 
-  sdf_register(dropped)
+  if (identical(n_before, n_after))
+    object
+  else
+    sdf_register(dropped)
 }
 
 #' @export
