@@ -16,6 +16,8 @@ NULL
 #' @rdname sdf-saveload
 #' @export
 sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
+  warning("sdf_save_table is deprecated, use spark_write_table instead.")
+
   sdf <- spark_dataframe(x)
   name <- ensure_scalar_character(name)
 
@@ -39,6 +41,8 @@ sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
 #' @rdname sdf-saveload
 #' @export
 sdf_load_table <- function(sc, name) {
+  warning("sdf_load_table is deprecated, use spark_read_table instead.")
+
   session <- spark_session(sc)
   name <- ensure_scalar_character(name)
 
@@ -60,6 +64,8 @@ sdf_load_table <- function(sc, name) {
 #' @rdname sdf-saveload
 #' @export
 sdf_save_parquet <- function(x, path, overwrite = FALSE, append = FALSE) {
+  warning("sdf_save_parquet is deprecated, use spark_write_parquet instead.")
+
   sdf <- spark_dataframe(x)
   path <- ensure_scalar_character(path)
 
@@ -73,6 +79,8 @@ sdf_save_parquet <- function(x, path, overwrite = FALSE, append = FALSE) {
 #' @rdname sdf-saveload
 #' @export
 sdf_load_parquet <- function(sc, path) {
+  warning("sdf_load_parquet is deprecated, use spark_read_parquet instead.")
+
   session <- spark_session(sc)
   path <- as.character(path)
 

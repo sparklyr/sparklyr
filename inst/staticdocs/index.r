@@ -20,18 +20,18 @@ sd_section(
     "spark_read_csv",
     "spark_read_json",
     "spark_read_parquet",
+    "spark_read_table",
     "spark_write_csv",
     "spark_write_json",
     "spark_write_parquet",
-    "sdf-saveload"
+    "spark_write_table"
   )
 )
 
 sd_section(
-  "dplyr Interface",
-  "Functions implementing a dplyr backend for Spark DataFrames.",
+  "Spark Tables",
+  "Functions for manipulating Spark Tables.",
   c(
-    "copy_to",
     "tbl_cache",
     "tbl_uncache"
   )
@@ -41,7 +41,6 @@ sd_section(
   "Spark DataFrames",
   "Functions for maniplulating Spark DataFrames.",
   c(
-    "na.replace",
     "sdf_copy_to",
     "sdf_mutate",
     "sdf_partition",
@@ -107,7 +106,6 @@ sd_section(
   "Machine Learning Extensions",
   "Functions for creating custom wrappers to other Spark ML algorithms.",
   c(
-    "ensure",
     "ml_create_dummy_variables",
     "ml_model",
     "ml_options",

@@ -307,7 +307,17 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
   options <- invoke(df, "write")
 
   if (!is.null(mode)) {
-    options <- invoke(options, "mode", mode)
+    if (is.list(mode)) {
+      lapply(mode, function(m) {
+        options <<- invoke(options, "mode", m)
+      })
+    }
+    else if (is.character(mode)) {
+      options <- invoke(options, "mode", mode)
+    }
+    else {
+      stop("Unsupported type ", typeof(mode), " for mode parameter.")
+    }
   }
 
   lapply(names(csvOptions), function(csvOptionName) {
@@ -316,4 +326,53 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
 
   invoke(options, fileMethod, path)
   invisible(TRUE)
+}
+
+#' Load a Spark Table into a Spark DataFrame.
+#'
+#' Load a Spark Table into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_load_table <- function(sc,
+                             name,
+                             options = list(),
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE) {
+
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+
+  df <- spark_data_read_generic(sc, name, "table", options)
+  spark_partition_register_df(sc, df, name, repartition, memory)
+}
+
+#' Saves a Spark DataFrame as a Spark table
+#'
+#' Saves a Spark DataFrame and as a Spark table.
+#'
+#' @inheritParams spark_write_csv
+#' @param mode Specifies the behavior when data or table already exists.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_save_table <- function(x, path, mode = NULL) {
+  UseMethod("spark_write_parquet")
+}
+
+#' @export
+spark_save_table.tbl_spark <- function(x, path, mode = NULL, options = list()) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  spark_data_write_generic(sqlResult, spark_normalize_path(path), "saveAsTable", mode, options)
+}
+
+#' @export
+spark_save_table.spark_jobj <- function(x, path, mode = NULL, options = list()) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  spark_data_write_generic(x, normalizePath(path), "saveAsTable", mode, options)
 }

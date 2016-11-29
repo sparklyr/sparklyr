@@ -202,7 +202,7 @@ count_lines(sc, tempfile)
 To learn more about creating extensions see the [Extensions](http://spark.rstudio.com/extensions.html) section of the sparklyr website.
 
 
-## dplyr Utilities
+## Table Utilities
 
 You can cache a table into memory with:
 
