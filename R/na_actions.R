@@ -44,9 +44,9 @@ na.omit.spark_jobj <- function(object, columns = NULL, ...) {
     "sparklyr.verbose"
   )
 
-  n_before <- if (verbose) invoke(object, "count")
+  n_before <- invoke(object, "count")
   dropped  <- sdf_na_omit(object, columns)
-  n_after  <- if (verbose) invoke(dropped, "count")
+  n_after  <- invoke(dropped, "count")
 
   if (verbose) {
     n_diff <- n_before - n_after
@@ -58,7 +58,15 @@ na.omit.spark_jobj <- function(object, columns = NULL, ...) {
     }
   }
 
-  sdf_register(dropped)
+  # using a df created from drop actions reduces performance, see #308.
+  if (identical(n_before, n_after)) {
+    object
+  } else {
+    result <- sdf_register(dropped)
+    invoke(spark_dataframe(result), "cache")
+
+    result
+  }
 }
 
 #' @export

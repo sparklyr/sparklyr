@@ -1,5 +1,8 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Fixed issue in spark_read_csv when headers=FALSE but columns are provided
+  where columns would still get normalized.
+
 - Support to configure Livy using the `livy.` prefix in the `config.yml` file.
 
 - Implemented experimental support for Livy through: `livy_install`, 
