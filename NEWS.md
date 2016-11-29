@@ -1,8 +1,5 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
-- Improved performance when a complex dplyr chain is piped directly into
-  ml routines.
-
 - Fixed issue in spark_read_csv when headers=FALSE but columns are provided
   where columns would still get normalized.
 
