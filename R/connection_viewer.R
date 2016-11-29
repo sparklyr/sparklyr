@@ -14,14 +14,9 @@ on_connection_opened <- function(scon, connectCall) {
 
       # finder function
       finder = function(env, host) {
-        # we duplicate the to_host function here b/c R CMD check
-        # doesn't like our using ::: to access to_host in the
+        # R CMD check doesn't like our using ::: to access to_host in the
         # finder function
-        to_host <- function(sc) {
-          paste0(gsub("local\\[(\\d+|\\*)\\]", "local", sc$master),
-                 " - ",
-                 sc$app_name)
-        }
+        to_host <- get("to_host", asNamespace("sparklyr"))
         objs <- ls(env)
         for (name in objs) {
           x <- base::get(name, envir = env)
