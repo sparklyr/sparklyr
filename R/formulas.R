@@ -110,6 +110,7 @@ ml_prepare_response_features_intercept <- function(x = NULL,
   # register df to improve performance, this is specially critical when
   # a complex dplyr chain is piped directly into an ml function, see #308.
   df <- sdf_register(df)
+  invoke(spark_dataframe(df), "cache")
 
   schema <- sdf_schema(df)
   names <- lapply(schema, `[[`, "name")
