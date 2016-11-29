@@ -44,9 +44,9 @@ na.omit.spark_jobj <- function(object, columns = NULL, ...) {
     "sparklyr.verbose"
   )
 
-  n_before <- if (verbose) invoke(object, "count")
+  n_before <- invoke(object, "count")
   dropped  <- sdf_na_omit(object, columns)
-  n_after  <- if (verbose) invoke(dropped, "count")
+  n_after  <- invoke(dropped, "count")
 
   if (verbose) {
     n_diff <- n_before - n_after
