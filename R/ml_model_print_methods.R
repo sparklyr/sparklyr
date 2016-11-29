@@ -99,7 +99,7 @@ ml_tree_feature_importance <- function(sc, model)
                  "ml_model_random_forest")
 
   if (!inherits(model, supported)) {
-    fmt <- "cannot call 'ml_tree_feature_importance' on object of class '%s'"
+    fmt <- "cannot call 'ml_tree_feature_importance' on object of class %s"
     deparsed <- paste(deparse(class(model), width.cutoff = 500), collapse = " ")
     stop(sprintf(fmt, deparsed))
   }
