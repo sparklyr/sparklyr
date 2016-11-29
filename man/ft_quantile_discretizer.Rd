@@ -5,7 +5,7 @@
 \title{Feature Transformation -- QuantileDiscretizer}
 \usage{
 ft_quantile_discretizer(x, input.col = NULL, output.col = NULL,
-  n.buckets = 5, ...)
+  n.buckets = 5L, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

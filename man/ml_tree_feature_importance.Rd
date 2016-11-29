@@ -7,9 +7,9 @@
 ml_tree_feature_importance(sc, model)
 }
 \arguments{
-\item{sc}{An active spark context}
+\item{sc}{A \code{spark_connection}.}
 
-\item{model}{An ml_model object of class decision trees (>1.5.0), random forest (>2.0.0), or GBT (>2.0.0)}
+\item{model}{An \code{ml_model} encapsulating the output from a decision tree.}
 }
 \value{
 A sorted data frame with feature labels and their relative importance.
