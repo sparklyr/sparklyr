@@ -106,7 +106,6 @@ ml_prepare_response_features_intercept <- function(x = NULL,
 {
   # construct dummy data.frame from Spark DataFrame schema
   df <- x
-
   schema <- sdf_schema(df)
   names <- lapply(schema, `[[`, "name")
   rdf <- as.data.frame(names, stringsAsFactors = FALSE, optional = TRUE)
