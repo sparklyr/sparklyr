@@ -44,7 +44,7 @@ sdf_copy_to.default <- function(sc,
                                 overwrite = FALSE,
                                 ...
 ) {
-  sdf_import(x, sc, name, memory, repartition, overwrite)
+  sdf_import(x, sc, name, memory, repartition, overwrite, ...)
 }
 
 #' @name sdf_copy_to

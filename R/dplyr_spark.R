@@ -84,7 +84,7 @@ copy_to.spark_connection <- function(dest,
                                      overwrite = FALSE,
                                      ...)
 {
-  sdf_copy_to(dest, df, name, memory, repartition, overwrite)
+  sdf_copy_to(dest, df, name, memory, repartition, overwrite, ...)
 }
 
 #' @export
