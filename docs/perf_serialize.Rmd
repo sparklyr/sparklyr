@@ -8,7 +8,7 @@ output:
 
 ## Setup
 ```{r}
-sparklyr:::spark_install(version = "2.0.0-preview", reset = TRUE)
+sparklyr:::spark_install(version = "2.0.0", reset = TRUE)
 ```
 
 ## Initialization
@@ -50,7 +50,7 @@ logResults <- function(label, test) {
 
 ```{r allRuns}
 sc <- spark_connect(master = "local",
-                    version = "2.0.0-preview",
+                    version = "2.0.0",
                     config = config)
 
 serializers <- list(
