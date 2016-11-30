@@ -1,37 +1,56 @@
 #' @import httr
 #' @import jsonlite
 livy_validate_http_response <- function(message, req) {
-  if (httr::http_error(req)) {
-    if (httr::status_code(req)) {
-      stop("Livy operation is unauthorized.")
+  if (http_error(req)) {
+    if (status_code(req)) {
+      stop("Livy operation is unauthorized. Try spark_connect with config = livy_config_authorize()")
     }
     else {
-      httpStatus <- httr::http_status(req)
-      httpContent <- httr::text_content(req)
+      httpStatus <- http_status(req)
+      httpContent <- text_content(req)
       stop(message, " (", httpStatus$message, "): ", httpContent)
     }
   }
 }
 
-livy_get_json <- function(url) {
-  headers <- list(
-    "Content-Type" = "application/json"
+livy_config_authorize <- function(user, password, config = spark_config()) {
+  secret <- base64_enc(paste(user, password, sep = ":"))
+
+  config[["sparklyr.livy.headers"]] <- c(
+    config[["sparklyr.livy.headers"]], list(
+      Authorization = paste(
+        "Basic",
+        base64_enc(paste(user, password, sep = ":"))
+      )
+    )
   )
 
-  httrHeaders <- do.call(httr::add_headers, headers)
+  config
+}
 
-  req <- httr::GET(url,
-    httrHeaders
+livy_get_httr_headers <- function(config, headers) {
+  headers <- c(headers, config[["sparklyr.livy.headers"]])
+  if (length(headers) > 0)
+    do.call(add_headers, config[["sparklyr.livy.headers"]])
+  else
+    NULL
+}
+
+livy_get_json <- function(url, config) {
+  req <- GET(url,
+   livy_get_httr_headers(config, list(
+     "Content-Type" = "application/json"
+   ))
   )
 
   livy_validate_http_response("Failed to retrieve livy session", req)
 
-  httr::content(req)
+  content(req)
 }
 
 #' @import assertthat
-livy_get_sessions <- function(master) {
-  sessions <- livy_get_json(paste(master, "sessions", sep = "/"))
+livy_get_sessions <- function(master, config) {
+  sessions <- livy_get_json(paste(master, "sessions", sep = "/"), config)
 
   assert_that(!is.null(sessions$sessions))
   assert_that(!is.null(sessions$total))
@@ -72,9 +91,9 @@ livy_create_session <- function(master, config) {
   )
 
   req <- POST(paste(master, "sessions", sep = "/"),
-    add_headers(
+    livy_get_httr_headers(config, list(
       "Content-Type" = "application/json"
-    ),
+    )),
     body = toJSON(
       data
     )
@@ -93,9 +112,9 @@ livy_create_session <- function(master, config) {
 
 livy_destroy_session <- function(sc) {
   req <- DELETE(paste(sc$master, "sessions", sc$sessionId, sep = "/"),
-    add_headers(
+    livy_get_httr_headers(sc$config, list(
       "Content-Type" = "application/json"
-    ),
+    )),
     body = NULL
   )
 
@@ -108,7 +127,7 @@ livy_destroy_session <- function(sc) {
 }
 
 livy_get_session <- function(sc) {
-  session <- livy_get_json(paste(sc$master, "sessions", sc$sessionId, sep = "/"))
+  session <- livy_get_json(paste(sc$master, "sessions", sc$sessionId, sep = "/"), sc$config)
 
   assert_that(!is.null(session$state))
   assert_that(session$id == sc$sessionId)
@@ -311,7 +330,9 @@ livy_statement_parse_response <- function(text, lobj) {
 }
 
 livy_get_statement <- function(sc, statementId) {
-  statement <- livy_get_json(paste(sc$master, "sessions", sc$sessionId, "statements", statementId, sep = "/"))
+  statement <- livy_get_json(
+    paste(sc$master, "sessions", sc$sessionId, "statements", statementId, sep = "/"),
+    sc$config)
 
   assert_that(!is.null(statement$state))
   assert_that(statement$id == statementId)
@@ -331,9 +352,9 @@ livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
-    add_headers(
+    livy_get_httr_headers(sc$config, list(
       "Content-Type" = "application/json"
-    ),
+    )),
     body = toJSON(
       list(
         code = unbox(code)
@@ -441,14 +462,14 @@ livy_try_get_session <- function(sc) {
   session
 }
 
-livy_validate_master <- function(master) {
+livy_validate_master <- function(master, config) {
   retries <- 5
   retriesErr <- NULL
   while (retries >= 0) {
     commandStart <- Sys.time()
 
     tryCatch({
-      livy_get_sessions(master)
+      livy_get_sessions(master, config)
     }, error = function(err) {
       retriesErr <- err
     })
@@ -466,11 +487,11 @@ livy_validate_master <- function(master) {
 
 #' @import jsonlite
 livy_connection <- function(master, config) {
-  if (grepl("^local(\\[[0-9]*\\])?$", "local")) {
+  if (grepl("^local(\\[[0-9]*\\])?$", master)) {
     master <- "http://localhost:8998"
   }
 
-  livy_validate_master(master)
+  livy_validate_master(master, config)
 
   session <- livy_create_session(master, config)
 
