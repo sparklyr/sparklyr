@@ -31,7 +31,7 @@ livy_config_authorize <- function(user, password, config = spark_config()) {
 livy_get_httr_headers <- function(config, headers) {
   headers <- c(headers, config[["sparklyr.livy.headers"]])
   if (length(headers) > 0)
-    do.call(add_headers, config[["sparklyr.livy.headers"]])
+    do.call(add_headers, headers)
   else
     NULL
 }
