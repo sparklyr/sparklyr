@@ -1,5 +1,7 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
+- Implemented basic authorization for livy connections using livy_config_auth().
+
 - Renamed sdf_load and sdf_save to spark_read and spark_write for consistency.
 
 - Support to use tbl_cache and tbl_uncache when dplyr is not imported.

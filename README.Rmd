@@ -290,3 +290,10 @@ Once you are done using `livy` locally, you should stop this service with:
 livy_service_stop()
 ```
 
+To connect to remote `livy` clusters that support basic authentication connect as:
+
+```{r eval=FALSE}
+config <- livy_config_auth("<username>", "<password">)
+sc <- spark_connect(master = "<address>", method = "livy", config = config)
+spark_disconnect(sc)
+```
