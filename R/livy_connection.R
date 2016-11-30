@@ -1,6 +1,37 @@
+#' @import httr
+#' @import jsonlite
+livy_validate_http_response <- function(message, req) {
+  if (httr::http_error(req)) {
+    if (httr::status_code(req)) {
+      stop("Livy operation is unauthorized.")
+    }
+    else {
+      httpStatus <- httr::http_status(req)
+      httpContent <- httr::text_content(req)
+      stop(message, " (", httpStatus$message, "): ", httpContent)
+    }
+  }
+}
+
+livy_get_json <- function(url) {
+  headers <- list(
+    "Content-Type" = "application/json"
+  )
+
+  httrHeaders <- do.call(httr::add_headers, headers)
+
+  req <- httr::GET(url,
+    httrHeaders
+  )
+
+  livy_validate_http_response("Failed to retrieve livy session", req)
+
+  httr::content(req)
+}
+
 #' @import assertthat
 livy_get_sessions <- function(master) {
-  sessions <- fromJSON(paste(master, "sessions", sep = "/"))
+  sessions <- livy_get_json(paste(master, "sessions", sep = "/"))
 
   assert_that(!is.null(sessions$sessions))
   assert_that(!is.null(sessions$total))
@@ -34,8 +65,6 @@ livy_config_get <- function(master, config) {
   c(livyConfig, sparkConfig)
 }
 
-#' @import httr
-#' @import jsonlite
 livy_create_session <- function(master, config) {
   data <- list(
     kind = unbox("spark"),
@@ -51,9 +80,7 @@ livy_create_session <- function(master, config) {
     )
   )
 
-  if (httr::http_error(req)) {
-    stop("Failed to create livy session: ", content(req))
-  }
+  livy_validate_http_response("Failed to create livy session", req)
 
   content <- content(req)
 
@@ -72,9 +99,7 @@ livy_destroy_session <- function(sc) {
     body = NULL
   )
 
-  if (httr::http_error(req)) {
-    stop("Failed to destroy livy session: ", content(req))
-  }
+  livy_validate_http_response("Failed to destroy livy statement", req)
 
   content <- content(req)
   assert_that(content$msg == "deleted")
@@ -83,7 +108,7 @@ livy_destroy_session <- function(sc) {
 }
 
 livy_get_session <- function(sc) {
-  session <- fromJSON(paste(sc$master, "sessions", sc$sessionId, sep = "/"))
+  session <- livy_get_json(paste(sc$master, "sessions", sc$sessionId, sep = "/"))
 
   assert_that(!is.null(session$state))
   assert_that(session$id == sc$sessionId)
@@ -286,7 +311,7 @@ livy_statement_parse_response <- function(text, lobj) {
 }
 
 livy_get_statement <- function(sc, statementId) {
-  statement <- fromJSON(paste(sc$master, "sessions", sc$sessionId, "statements", statementId, sep = "/"))
+  statement <- livy_get_json(paste(sc$master, "sessions", sc$sessionId, "statements", statementId, sep = "/"))
 
   assert_that(!is.null(statement$state))
   assert_that(statement$id == statementId)
@@ -316,9 +341,7 @@ livy_post_statement <- function(sc, code) {
     )
   )
 
-  if (httr::http_error(req)) {
-    stop("Failed to invoke livy statement: ", content(req))
-  }
+  livy_validate_http_response("Failed to invoke livy statement", req)
 
   statementReponse <- content(req)
   assert_that(!is.null(statementReponse$id))
