@@ -336,6 +336,9 @@ stop_shell <- function(sc, terminate = FALSE) {
 
   close(sc$backend)
   close(sc$monitor)
+
+  # allow time to clean resources for multiple spark_connect/spark_disconnect calls
+  Sys.sleep(1)
 }
 
 #' @export
