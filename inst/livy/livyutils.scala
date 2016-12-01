@@ -1,5 +1,4 @@
-// Base64 requires Java 8
-import java.util.Base64
+import javax.xml.bind.DatatypeConverter
 
 object LivyUtils {
   // A global class map is needed in Livy since classes defined from
@@ -16,9 +15,9 @@ object LivyUtils {
 
   def invokeFromBase64(msg: String): String = {
 
-    val decoded: Array[Byte] = Base64.getDecoder().decode(msg)
+    val decoded: Array[Byte] = DatatypeConverter.parseBase64Binary(msg)
     val result = StreamHandler.read(decoded, globalClassMap)
 
-    Base64.getEncoder().encodeToString(result);
+    DatatypeConverter.printBase64Binary(result);
   }
 }

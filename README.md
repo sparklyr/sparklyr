@@ -311,16 +311,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/11/23 14:12:24 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//Rtmppa4IXd/file145d876c568bd.csv MapPartitionsRDD[365] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/11/23 14:12:24 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
-    ## 16/11/23 14:12:24 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2431 bytes)
-    ## 16/11/23 14:12:24 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
-    ## 16/11/23 14:12:24 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/Rtmppa4IXd/file145d876c568bd.csv:0+33313106
-    ## 16/11/23 14:12:24 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
-    ## 16/11/23 14:12:24 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 124 ms on localhost (1/1)
-    ## 16/11/23 14:12:24 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
-    ## 16/11/23 14:12:24 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.124 s
-    ## 16/11/23 14:12:24 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.126803 s
+    ## 16/11/30 15:15:39 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpAdeu4s/file29296ccf83b2.csv MapPartitionsRDD[363] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/11/30 15:15:39 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
+    ## 16/11/30 15:15:39 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
+    ## 16/11/30 15:15:39 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
+    ## 16/11/30 15:15:39 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpAdeu4s/file29296ccf83b2.csv:0+33313106
+    ## 16/11/30 15:15:39 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
+    ## 16/11/30 15:15:39 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 102 ms on localhost (1/1)
+    ## 16/11/30 15:15:39 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
+    ## 16/11/30 15:15:39 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.102 s
+    ## 16/11/30 15:15:39 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.105536 s
 
 Finally, we disconnect from Spark:
 
@@ -398,4 +398,12 @@ Once you are done using `livy` locally, you should stop this service with:
 
 ``` r
 livy_service_stop()
+```
+
+To connect to remote `livy` clusters that support basic authentication connect as:
+
+``` r
+config <- livy_config_auth("<username>", "<password">)
+sc <- spark_connect(master = "<address>", method = "livy", config = config)
+spark_disconnect(sc)
 ```
