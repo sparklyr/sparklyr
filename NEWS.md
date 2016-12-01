@@ -2,6 +2,9 @@
 
 - Implemented basic authorization for livy connections using livy_config_auth().
 
+- Added support to sepcify additional spark-submit parameters using the
+  sparklyr.shell.args environment variable.
+
 - Renamed sdf_load and sdf_save to spark_read and spark_write for consistency.
 
 - Support to use tbl_cache and tbl_uncache when dplyr is not imported.
