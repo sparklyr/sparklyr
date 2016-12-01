@@ -2,7 +2,7 @@
 #' @import jsonlite
 livy_validate_http_response <- function(message, req) {
   if (http_error(req)) {
-    if (status_code(req)) {
+    if (identical(status_code(req), 401)) {
       stop("Livy operation is unauthorized. Try spark_connect with config = livy_config_auth()")
     }
     else {
