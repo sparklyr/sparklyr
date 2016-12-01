@@ -27,7 +27,7 @@ livy_validate_http_response <- function(message, req) {
 #'
 #' @return Named list with configuration data
 livy_config_auth <- function(username, password, config = spark_config()) {
-  secret <- base64_enc(paste(user, password, sep = ":"))
+  secret <- base64_enc(paste(username, password, sep = ":"))
 
   config[["sparklyr.livy.headers"]] <- c(
     config[["sparklyr.livy.headers"]], list(
