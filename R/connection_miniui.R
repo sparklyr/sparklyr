@@ -66,3 +66,6 @@ connection_spark_server <- function(input, output, session) {
     sep = ""
   ))
 }
+
+# test code:
+# runGadget(shinyApp(connection_spark_ui, connection_spark_server), viewer = paneViewer())
