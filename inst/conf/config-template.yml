@@ -12,4 +12,4 @@ default:
 
   # command line arguments to spark-shell
   # sparklyr.shell.*
-
+  sparklyr.shell.driver-class-path: !Sys.getenv("SPARK_DRIVER_CLASSPATH")
