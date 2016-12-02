@@ -131,6 +131,9 @@ connection_config <- function(sc, prefix, not_prefix = list()) {
     if (grepl("\\.remote$", e) && isLocal)
       found <- FALSE
 
+    if (nchar(config[[e]]) == 0)
+      found <- FALSE
+
     found
   }, names(config))
 
