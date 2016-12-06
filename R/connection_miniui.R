@@ -87,7 +87,9 @@ connection_spark_server <- function(input, output, session) {
   })
 
   observe({
-    .rs.updateNewConnectionDialog(codeReactive())
+    if (exists(".rs.updateNewConnectionDialog")) {
+      .rs.updateNewConnectionDialog(codeReactive())
+    }
   })
 }
 
