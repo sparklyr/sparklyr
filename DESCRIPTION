@@ -39,4 +39,6 @@ Imports:
 Suggests:
     testthat,
     RCurl,
-    janeaustenr
+    janeaustenr,
+    miniUI,
+    shiny
