@@ -268,7 +268,7 @@ livy_statement_parse_response <- function(text, lobj) {
 
   text <- gsub("\n", "", text)
 
-  parsedRegExp <- regexec("([^:]+): (.*) = (.*)", text, perl = TRUE)
+  parsedRegExp <- regexec("([^:]+): (.*) = (.*)", text)
   parsed <- regmatches(text, parsedRegExp)
   if (length(parsed) != 1) {
     stop("Failed to parse statement reponse: ", text)
