@@ -148,7 +148,10 @@ spark_connect <- function(master,
   connectCall <- paste(libs,
                        paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
                        sep = "\n")
-  on_connection_opened(scon, connectCall)
+
+  # let viewer know that we've opened a connection; guess that the result will
+  # be assigned into the global environment
+  on_connection_opened(scon, globalenv(), connectCall)
 
   # Register a finalizer to sleep on R exit to support older versions of the RStudio IDE
   reg.finalizer(asNamespace("sparklyr"), function(x) {
