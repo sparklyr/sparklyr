@@ -133,6 +133,6 @@ connection_spark_server <- function(input, output, session) {
 
 #' @export
 #' @keywords internal
-connections_spark_shinyapp <- function() {
+connection_spark_shinyapp <- function() {
   shiny::shinyApp(connection_spark_ui, connection_spark_server)
 }
