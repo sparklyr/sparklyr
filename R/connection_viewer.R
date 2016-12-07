@@ -1,7 +1,94 @@
 
+# given an environment and a host, return the name of an open Spark connection
+# object to the host, if any
+find_object <- function(env, host) {
+  objs <- ls(env)
+  for (name in objs) {
+    x <- base::get(name, envir = env)
+    if (inherits(x, "spark_connection") &&
+        identical(to_host(x), host) &&
+        connection_is_open(x)) {
+      return(name)
+    }
+  }
+}
 
-on_connection_opened <- function(scon, connectCall) {
+# connection-specific actions possible with Spark connections
+spark_actions <- function(scon) {
+  list(
+    new("rstudioConnectionAction",
+        name = "SparkUI",
+        icon = "",
+        callback = function() {
+          spark_web(scon)
+        }
+    ),
+    new("rstudioConnectionAction",
+        name = "Log",
+        icon = "",
+        callback = function() {
+          spark_log_file(scon)
+        }
+    ),
+    new("rstudioConnectionAction",
+        name = "Help",
+        icon = "",
+        callback = function() {
+          utils::browseURL("http://spark.rstudio.com")
+        }
+    )
+  )
+}
 
+on_connection_opened <- function(scon, env, connectCall) {
+
+  # RStudio v1.1 generic connection interface --------------------------------
+  observer <- getOption("connectionObserver")
+  if (!is.null(observer) && isClass("rstudioConnection")) {
+    host <- to_host(scon)
+    con <- new("rstudioConnection",
+
+      # connection type
+      type = "Spark",
+
+      # name displayed in connection pane
+      displayName = to_host_display(scon),
+
+      # host key
+      host = host,
+
+      # connection code
+      connectCode = connectCall,
+
+      # disconnection code
+      disconnectCode = function() {
+        paste0("spark_disconnect(", find_object(env, host), ")")
+      },
+
+      # table enumeration code
+      listTables = function() {
+        connection_list_tables(scon)
+      },
+
+      # column enumeration code
+      listColumns = function(table) {
+        connection_list_columns(scon, table)
+      },
+
+      # table preview code
+      previewTable = function(table, rowLimit) {
+        connection_preview_table(scon, table, rowLimit)
+      },
+
+      # other actions that can be executed on this connection
+      actions = spark_actions(scon)
+    )
+
+    # pass the object to the viewer
+    observer$connectionOpened(con)
+  }
+
+  # RStudio v1.0 Spark-style connection interface ----------------------------
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer)) {
 
@@ -47,14 +134,23 @@ on_connection_opened <- function(scon, connectCall) {
   }
 }
 
+# return the external connection viewer (or NULL if none active)
+external_viewer <- function() {
+  viewer <- getOption("connectionObserver")
+  if (is.null(viewer))
+    getOption("connectionViewer")
+  else
+    viewer
+}
+
 on_connection_closed <- function(scon) {
-  viewer <- getOption("connectionViewer")
+  viewer <- external_viewer()
   if (!is.null(viewer))
     viewer$connectionClosed(type = "Spark", host = to_host(scon))
 }
 
 on_connection_updated <- function(scon, hint) {
-  viewer <- getOption("connectionViewer")
+  viewer <- external_viewer()
   if (!is.null(viewer))
     viewer$connectionUpdated(type = "Spark", host = to_host(scon), hint = hint)
 }
@@ -96,12 +192,13 @@ connection_preview_table <- function(sc, table, limit) {
     NULL
   }
 }
-# function to convert master to host
-to_host <- function(sc) {
-  paste0(gsub("local\\[(\\d+|\\*)\\]", "local", sc$master),
-         " - ",
-         sc$app_name)
+
+# function to generate host display name
+to_host_display <- function(sc) {
+  gsub("local\\[(\\d+|\\*)\\]", "local", sc$master)
 }
 
-
-
+# function to convert master to host
+to_host <- function(sc) {
+  paste0(to_host_display(sc), " - ", sc$app_name)
+}
