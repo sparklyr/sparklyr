@@ -1,5 +1,7 @@
-#" @import shiny
-#" @import miniUI
+#' @import shiny
+setGeneric("test", function(test) {
+  standardGeneric("test")
+})
 connection_spark_ui <- function() {
   componentVersionSelectChoices <- function(name) {
     selected <- spark_default_version()[[name]]
@@ -15,48 +17,84 @@ connection_spark_ui <- function() {
     choiceValues
   }
 
-  miniUI::miniPage(
-    miniUI::miniContentPanel(
-      selectInput(
-        "master",
-        "Master:",
-        choices = c(
-          "local" = "local",
-          "Cluster..." = "cluster"
-          # TODO: If Spark not installed, prompt install
-          # TODO: If running as desktop: Error
-          # TODO: If java not installed: ComponentsNotInstalledDialogs.showJavaNotInstalled(context.getJavaInstallUrl());
-          # TODO: If running as server and no SPARK_HOME: Error ComponentsNotInstalledDialogs.showSparkHomeNotDefined()
-          # TODO: Selection opens "Connect to Cluster", "Spark master: ". "spark://local:7077"
-          # TODO: Support rstudio.spark.connections option
-          # TODO: Provide UI to choose master connection
-          # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
-        ),
-        selectize = FALSE
-      ),
-      selectInput(
-        "dbinterface",
-        "DB Interface:",
-        choices = c(
-          "dplyr" = "dplyr",
-          "(None)" = "none"
-        ),
-        selectize = FALSE
-      ),
-      selectInput(
-        "sparkversion",
-        "Spark version:",
-        choices = componentVersionSelectChoices("spark"),
-        selected = spark_default_version()$spark,
-        selectize = FALSE
-      ),
-      selectInput(
-        "hadoopversion",
-        "Hadoop version:",
-        choices = componentVersionSelectChoices("hadoop"),
-        selected = spark_default_version()$hadoop,
-        selectize = FALSE
+  tags$div(
+    tags$head(
+      tags$style(
+        HTML("
+          body {
+            background: none;
+
+            font-family : \"Lucida Sans\", \"DejaVu Sans\", \"Lucida Grande\", \"Segoe UI\", Verdana, Helvetica, sans-serif;
+            font-size : 12px;
+            -ms-user-select : none;
+            -moz-user-select : none;
+            -webkit-user-select : none;
+            user-select : none;
+
+            margin: 0;
+            margin-top: 5px;
+          }
+
+          .shiny-input-container {
+            min-width: 100%;
+            margin-bottom: 7px;
+          }
+
+          .shiny-input-container > .control-label {
+            display: inline-block;
+            width: 145px;
+          }
+
+          .shiny-input-container > div {
+            display: inline-block;
+            width: 300px;
+          }
+        ")
       )
+    ),
+    selectInput(
+      "master",
+      "Master:",
+      choices = c(
+        "local" = "local",
+        "Cluster..." = "cluster"
+        # TODO: Changing spark versions filters the right hadoop version
+        # TODO: If Spark not installed, prompt install
+        # TODO: If running as desktop: Error
+        # TODO: If java not installed: ComponentsNotInstalledDialogs.showJavaNotInstalled(context.getJavaInstallUrl());
+        # TODO: If running as server and no SPARK_HOME: Error ComponentsNotInstalledDialogs.showSparkHomeNotDefined()
+        # TODO: Selection opens "Connect to Cluster", "Spark master: ". "spark://local:7077"
+        # TODO: Support rstudio.spark.connections option
+        # TODO: Provide UI to choose master connection
+        # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
+      ),
+      selectize = FALSE
+    ),
+    selectInput(
+      "dbinterface",
+      "DB Interface:",
+      choices = c(
+        "dplyr" = "dplyr",
+        "(None)" = "none"
+      ),
+      selectize = FALSE
+    ),
+    div(
+      style = "height: 10px"
+    ),
+    selectInput(
+      "sparkversion",
+      "Spark version:",
+      choices = componentVersionSelectChoices("spark"),
+      selected = spark_default_version()$spark,
+      selectize = FALSE
+    ),
+    selectInput(
+      "hadoopversion",
+      "Hadoop version:",
+      choices = componentVersionSelectChoices("hadoop"),
+      selected = spark_default_version()$hadoop,
+      selectize = FALSE
     )
   )
 }
