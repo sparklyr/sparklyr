@@ -504,6 +504,9 @@ livy_connection <- function(master, config) {
     master <- "http://localhost:8998"
   }
 
+  # normalize url by remove trailing /
+  master <- gsub("[/]$", "", master)
+
   livy_validate_master(master, config)
 
   session <- livy_create_session(master, config)
