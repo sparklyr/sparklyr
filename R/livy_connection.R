@@ -592,7 +592,7 @@ connection_is_open.livy_connection <- function(sc) {
 #' @export
 spark_disconnect.livy_connection <- function(sc, ...) {
   terminate <- list(...)$terminate
-  if (terminate) {
+  if (!identical(terminate, FALSE)) {
     livy_destroy_session(sc)
   }
 }
