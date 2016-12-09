@@ -76,7 +76,7 @@ livy_install <- function(version       = "0.3.0",
   livy_cache <- livy_install_dir()
   livy_path <- file.path(
     livy_cache,
-    sprintf("livy-%s-%s", version, basename(spark_home))
+    sprintf("livy-%s", version, basename(spark_home))
   )
 
   # if livy is already installed, bail
@@ -141,7 +141,7 @@ livy_available_versions <- function() {
 }
 
 livy_versions_file_pattern <- function() {
-  "livy-(.*)-spark-(.*)"
+  "livy-(.*)"
 }
 
 #' @rdname livy_install
