@@ -112,16 +112,13 @@ spark_connect <- function(master,
                              extensions = extensions)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
-                            config = config)
+                            config = config,
+                            app_name,
+                            version,
+                            hadoop_version ,
+                            extensions)
   } else {
     # other methods
-
-    # e.g.
-    # scon <- livy_connection(master = master,
-    #                         app_name = app_name,
-    #                         shell_args = shell_args,
-    #                         config = config,
-    #                         extensions = extensions)
 
     stop("Unsupported connection method '", method, "'")
   }
