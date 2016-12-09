@@ -515,7 +515,7 @@ livy_connection <- function(master,
   livy_connection_not_used_warn(app_name, "sparklyr")
   livy_connection_not_used_warn(version)
   livy_connection_not_used_warn(hadoop_version)
-  livy_connection_not_used_warn(extensions, sparklyr:::registered_extensions())
+  livy_connection_not_used_warn(extensions, registered_extensions())
 
   if (grepl("^local(\\[[0-9]*\\])?$", master)) {
     master <- "http://localhost:8998"
