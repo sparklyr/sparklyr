@@ -96,7 +96,7 @@ ml_multilayer_perceptron_validate_layers <- function(x,
     stop("'layers' should be a numeric vector of length >= 2")
 
   if (length(features) != layers[[1]])
-    stop("the first element of 'layers' should be the same length as the 'features' vector")
+    stop("the first element of 'layers' should be set to ", length(features) ," (the same length as the 'features' vector).")
 
   # TODO: validate length of last layer?
   TRUE
