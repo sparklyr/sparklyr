@@ -498,11 +498,31 @@ livy_validate_master <- function(master, config) {
   NULL
 }
 
+livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(substitute(value))) {
+  if (!identical(value, default)) {
+    warning("Livy connections do not support ", name, " parameter")
+  }
+}
+
 #' @import jsonlite
-livy_connection <- function(master, config) {
+livy_connection <- function(master,
+                            config,
+                            app_name,
+                            version,
+                            hadoop_version,
+                            extensions) {
+
+  livy_connection_not_used_warn(app_name, "sparklyr")
+  livy_connection_not_used_warn(version)
+  livy_connection_not_used_warn(hadoop_version)
+  livy_connection_not_used_warn(extensions, registered_extensions())
+
   if (grepl("^local(\\[[0-9]*\\])?$", master)) {
     master <- "http://localhost:8998"
   }
+
+  # normalize url by remove trailing /
+  master <- gsub("[/]$", "", master)
 
   livy_validate_master(master, config)
 
@@ -592,7 +612,7 @@ connection_is_open.livy_connection <- function(sc) {
 #' @export
 spark_disconnect.livy_connection <- function(sc, ...) {
   terminate <- list(...)$terminate
-  if (terminate) {
+  if (!identical(terminate, FALSE)) {
     livy_destroy_session(sc)
   }
 }
