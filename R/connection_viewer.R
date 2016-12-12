@@ -16,22 +16,19 @@ find_object <- function(env, host) {
 # connection-specific actions possible with Spark connections
 spark_actions <- function(scon) {
   list(
-    new("rstudioConnectionAction",
-        name = "SparkUI",
+    SparkUI = list(
         icon = "",
         callback = function() {
-          spark_web(scon)
+          utils::browseURL(spark_web(scon))
         }
     ),
-    new("rstudioConnectionAction",
-        name = "Log",
+    Log = list(
         icon = "",
         callback = function() {
-          spark_log_file(scon)
+          file.edit(spark_log_file(scon))
         }
     ),
-    new("rstudioConnectionAction",
-        name = "Help",
+    Help = list(
         icon = "",
         callback = function() {
           utils::browseURL("http://spark.rstudio.com")
@@ -44,10 +41,9 @@ on_connection_opened <- function(scon, env, connectCall) {
 
   # RStudio v1.1 generic connection interface --------------------------------
   observer <- getOption("connectionObserver")
-  if (!is.null(observer) && isClass("rstudioConnection")) {
+  if (!is.null(observer)) {
     host <- to_host(scon)
-    con <- new("rstudioConnection",
-
+    observer$connectionOpened(
       # connection type
       type = "Spark",
 
@@ -83,9 +79,6 @@ on_connection_opened <- function(scon, env, connectCall) {
       # other actions that can be executed on this connection
       actions = spark_actions(scon)
     )
-
-    # pass the object to the viewer
-    observer$connectionOpened(con)
   }
 
   # RStudio v1.0 Spark-style connection interface ----------------------------
