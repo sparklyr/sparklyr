@@ -1,25 +1,30 @@
 # Sparklyr 0.5.0 (UNRELEASED)
 
-- Implemented basic authorization for livy connections using livy_config_auth().
+- Implemented basic authorization for Livy connections using
+  `livy_config_auth()`.
 
-- Added support to sepcify additional spark-submit parameters using the
-  sparklyr.shell.args environment variable.
+- Added support to specify additional `spark-submit` parameters using the
+  `sparklyr.shell.args` environment variable.
 
-- Renamed sdf_load and sdf_save to spark_read and spark_write for consistency.
+- Renamed `sdf_load()` and `sdf_save()` to `spark_read()` and `spark_write()`
+  for consistency.
 
-- Support to use tbl_cache and tbl_uncache when dplyr is not imported.
+- The functions `tbl_cache()` and `tbl_uncache()` can now be using without
+  requiring the `dplyr` namespace to be loaded.
 
-- Fixed issue in spark_read_csv when headers=FALSE but columns are provided
-  where columns would still get normalized.
+- `spark_read_csv(..., columns = <...>, header = FALSE)` should now work as
+  expected -- previously, `sparklyr` would still attempt to normalize the
+  column names provided.
 
 - Support to configure Livy using the `livy.` prefix in the `config.yml` file.
 
-- Implemented experimental support for Livy through: `livy_install`, 
-  `livy_service_start`, `livy_service_stop` and  `spark_connect(method = "livy")`
+- Implemented experimental support for Livy through: `livy_install()`,
+  `livy_service_start()`, `livy_service_stop()` and
+  `spark_connect(method = "livy")`.
 
 - The `ml` routines now accept `data` as an optional argument, to support
   calls of the form e.g. `ml_linear_regression(y ~ x, data = data)`. This
-  should be especially helpful in conjunction with `do`.
+  should be especially helpful in conjunction with `dplyr::do()`.
 
 - Spark `DenseVector` and `SparseVector` objects are now deserialized as
   R numeric vectors, rather than Spark objects. This should make it easier
@@ -29,18 +34,18 @@
 - Implemented `dim.tbl_spark()`. This should ensure that `dim()`, `nrow()`
   and `ncol()` all produce the expected result with `tbl_spark`s.
 
-- Improved Spark 2.0 installation in Windows by creating spark-defaults.conf
-  and configuring spark.sql.warehouse.dir.
+- Improved Spark 2.0 installation in Windows by creating `spark-defaults.conf`
+  and configuring `spark.sql.warehouse.dir`.
 
 - Embedded Apache Spark package dependencies to avoid requiring internet 
-  connectivity while connecting for the first thhrough `spark_connect`. The
+  connectivity while connecting for the first through `spark_connect`. The
   `sparklyr.csv.embedded` config setting was added to configure a regular
   expression to match Spark versions where the embedded package is deployed.
 
-- Increased exception callstack and message length  to include full 
+- Increased exception callstack and message length to include full 
   error details when an exception is thrown in Spark.
 
-- Improved validation of supported java versions.
+- Improved validation of supported Java versions.
 
 - The `spark_read_csv()` function now accepts the `infer_schema` parameter,
   controlling whether the columns schema should be inferred from the underlying
@@ -66,7 +71,7 @@
   functions could fail when the last column contained missing / empty values.
   (#265)
 
-- Added `sdf_persist()`, as a wrapper to the Spark DataFrame `persist()` API.
+- Added `sdf_persist()` as a wrapper to the Spark DataFrame `persist()` API.
 
 - Resolved an issue where `predict()` could produce results in the wrong
   order for large Spark DataFrames.
@@ -76,11 +81,13 @@
   `na.action` argument through the `ml.options` object accepted by all ML
   routines.
 
-- Fixed windows `spark_connect` with long paths and spaces.
+- On Windows, long paths, and paths containing spaces, are now supported within
+  calls to `spark_connect()`.
 
-- The `lag()` window function now accepts numeric values for `n`. (#249)
+- The `lag()` window function now accepts numeric values for `n`. Previously,
+  only integer values were accepted. (#249)
 
-- Added support to configure spark environment variables using `spark.env.*` config.
+- Added support to configure Ppark environment variables using `spark.env.*` config.
 
 - Added support for the `Tokenizer` and `RegexTokenizer` feature transformers.
   These are exported as the `ft_tokenizer()` and `ft_regex_tokenizer()` functions.
@@ -99,15 +106,12 @@
 
 - Added `sparklyr.gateway.port` and `sparklyr.gateway.address` as config settings.
 
-- Added eclipse project to ease development of the scala codebase within 
-  `sparklyr`.
+- The `spark_log()` function now accepts the `filter` parameter. This can be used
+  to filter entries within the Spark log.
 
-- Added `filter` parameter to `spark_log` to fitler with ease entries by a character
-  string.
+- Increased network timeout for `sparklyr.backend.timeout`.
 
-- Increased network timeout for sparklyr.backend.timeout.
-
-- Moved `spark.jars.default` setting from options to spark config.
+- Moved `spark.jars.default` setting from options to Spark config.
 
 - `sparklyr` now properly respects the Hive metastore directory with the
   `sdf_save_table()` and `sdf_load_table()` APIs for Spark < 2.0.0.
@@ -115,8 +119,8 @@
 - Added `sdf_quantile()` as a means of computing (approximate) quantiles
   for a column of a Spark DataFrame.
 
-- Added support for `n_distinct(...)`, based on call to Hive function
-  `count(DISTINCT ...)`. (#220)
+- Added support for `n_distinct(...)` within the `dplyr` interface, based on
+  call to Hive function `count(DISTINCT ...)`. (#220)
 
 # Sparklyr 0.4.0
 
