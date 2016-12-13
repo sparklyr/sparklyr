@@ -15,21 +15,22 @@ find_object <- function(env, host) {
 
 # connection-specific actions possible with Spark connections
 spark_actions <- function(scon) {
+  icons <- system.file(file.path("icons"), package = "sparklyr")
   list(
     SparkUI = list(
-        icon = "",
+        icon = file.path(icons, "spark-ui.png"),
         callback = function() {
           utils::browseURL(spark_web(scon))
         }
     ),
     Log = list(
-        icon = "",
+        icon = file.path(icons, "spark-log.png"),
         callback = function() {
           file.edit(spark_log_file(scon))
         }
     ),
     Help = list(
-        icon = "",
+        icon = file.path(icons, "help.png"),
         callback = function() {
           utils::browseURL("http://spark.rstudio.com")
         }
