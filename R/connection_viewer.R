@@ -53,6 +53,9 @@ on_connection_opened <- function(scon, env, connectCall) {
       # host key
       host = host,
 
+      # icon for connection
+      icon = system.file(file.path("icons", "spark.png"), package = "sparklyr"),
+
       # connection code
       connectCode = connectCall,
 
