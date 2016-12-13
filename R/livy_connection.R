@@ -3,7 +3,7 @@
 livy_validate_http_response <- function(message, req) {
   if (http_error(req)) {
     if (identical(status_code(req), 401)) {
-      stop("Livy operation is unauthorized. Try spark_connect with config = livy_config_auth()")
+      stop("Livy operation is unauthorized. Try spark_connect with config = livy_config()")
     }
     else {
       httpStatus <- http_status(req)
@@ -13,20 +13,21 @@ livy_validate_http_response <- function(message, req) {
   }
 }
 
-#' Create Spark Configuration with Basic Authentication
+#' Create a Spark Configuration for Livy
 #'
 #' @export
+#' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
 #' @param password The password to use in the Authorization header
-#' @param config Optional base configuration
 #'
 #' @details
 #'
-#' Extends a Spark \code{"spark_config"} configuration with
-#' basic authentication for a Livy session.
+#' Extends a Spark \code{"spark_config"} configuration with settings
+#' for Livy. For instance, \code{"username"} and \code{"password"}
+#' define the basic authentication settings for a Livy session.
 #'
 #' @return Named list with configuration data
-livy_config_auth <- function(username, password, config = spark_config()) {
+livy_config <- function(config = spark_config(), username, password) {
   secret <- base64_enc(paste(username, password, sep = ":"))
 
   config[["sparklyr.livy.headers"]] <- c(
