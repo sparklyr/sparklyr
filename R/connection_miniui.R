@@ -42,12 +42,16 @@ connection_spark_ui <- function() {
 
           .shiny-input-container > .control-label {
             display: inline-block;
-            width: 145px;
+            width: 195px;
           }
 
           .shiny-input-container > div {
             display: inline-block;
             width: 300px;
+          }
+
+          #shiny-disconnected-overlay {
+            display: none;
           }
         ")
       )
