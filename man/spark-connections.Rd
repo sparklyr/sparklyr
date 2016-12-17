@@ -62,7 +62,6 @@ sc <- spark_connect(master = "spark://HOST:PORT")
 connection_is_open(sc)
 
 spark_disconnect(sc)
-connection_is_open(sc)
 
 }
 
