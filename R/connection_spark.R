@@ -45,10 +45,19 @@ spark_default_app_jar <- function(version) {
 NULL
 
 #' @name spark-connections
+#'
+#' @examples
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' connection_is_open(sc)
+#'
+#' spark_disconnect(sc)
+#' connection_is_open(sc)
+#'
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell", "livy"),
+                          method = c("shell", "livy", "test"),
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
@@ -99,6 +108,10 @@ spark_connect <- function(master,
 
   # connect using the specified method
 
+  # if master is an example code, run in test mode
+  if (master == "spark://HOST:PORT")
+    method <- "test"
+
   # spark-shell (local install of spark)
   if (method == "shell") {
     scon <- shell_connection(master = master,
@@ -112,6 +125,13 @@ spark_connect <- function(master,
                              extensions = extensions)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
+                            config = config,
+                            app_name,
+                            version,
+                            hadoop_version ,
+                            extensions)
+  } else if (method == "test") {
+    scon <- test_connection(master = master,
                             config = config,
                             app_name,
                             version,

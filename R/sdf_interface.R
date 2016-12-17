@@ -23,6 +23,11 @@
 #'
 #' @family Spark data frames
 #'
+#' @examples
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' sdf_copy_to(sc, iris)
+#'
 #' @name sdf_copy_to
 #' @export
 sdf_copy_to <- function(sc,

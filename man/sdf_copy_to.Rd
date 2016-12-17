@@ -39,6 +39,12 @@ copied object (typically, a Spark DataFrame).
 \code{sdf_copy_to} for a custom object type can accomplish this by
 implementing the associated method on \code{sdf_import}.
 }
+\examples{
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+sdf_copy_to(sc, iris)
+
+}
 \seealso{
 Other Spark data frames: \code{\link{sdf_partition}},
   \code{\link{sdf_predict}}, \code{\link{sdf_register}},
