@@ -1,4 +1,4 @@
-# Sparklyr 0.5.0 (UNRELEASED)
+# Sparklyr 0.5.0
 
 - Implemented basic authorization for Livy connections using
   `livy_config_auth()`.

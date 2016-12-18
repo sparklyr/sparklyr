@@ -21,6 +21,13 @@
 NULL
 
 #' @name invoke
+#' @examples
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' spark_context(sc) %>%
+#'   invoke("textFile", "file.csv", 1L) %>%
+#'     invoke("count")
+#'
 #' @export
 invoke <- function(jobj, method, ...) {
   UseMethod("invoke")
