@@ -1,5 +1,7 @@
 #' @import httr
-#' @import jsonlite
+#' @importFrom httr http_error
+#' @importFrom httr http_status
+#' @importFrom httr text_content
 livy_validate_http_response <- function(message, req) {
   if (http_error(req)) {
     if (identical(status_code(req), 401)) {
@@ -16,6 +18,9 @@ livy_validate_http_response <- function(message, req) {
 #' Create a Spark Configuration for Livy
 #'
 #' @export
+#'
+#' @importFrom jsonlite base64_enc
+#'
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
 #' @param password The password to use in the Authorization header
@@ -50,6 +55,7 @@ livy_get_httr_headers <- function(config, headers) {
     NULL
 }
 
+#' @importFrom httr GET
 livy_get_json <- function(url, config) {
   req <- GET(url,
    livy_get_httr_headers(config, list(
@@ -72,7 +78,7 @@ livy_get_sessions <- function(master, config) {
   sessions
 }
 
-#' @import jsonlite
+#' @importFrom jsonlite unbox
 livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
   params <- connection_config(list(
     master = master,
@@ -91,6 +97,7 @@ livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
   }
 }
 
+#' @importFrom jsonlite toJSON
 livy_config_get <- function(master, config) {
   livyConfig <- livy_config_get_prefix(master, config, "livy.", NULL)
   sparkConfig <- livy_config_get_prefix(master, config, "spark.", c("spark.sql."))
@@ -98,6 +105,8 @@ livy_config_get <- function(master, config) {
   c(livyConfig, sparkConfig)
 }
 
+#' @importFrom httr POST
+#' @importFrom jsonlite unbox
 livy_create_session <- function(master, config) {
   data <- list(
     kind = unbox("spark"),
@@ -362,6 +371,9 @@ livy_log_operation <- function(sc, text) {
   write(strtrim(text, 200), file = sc$log, append = TRUE)
 }
 
+#' @importFrom httr POST
+#' @importFrom jsonlite toJSON
+#' @importFrom jsonlite unbox
 livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
@@ -505,7 +517,6 @@ livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(
   }
 }
 
-#' @import jsonlite
 livy_connection <- function(master,
                             config,
                             app_name,

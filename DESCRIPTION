@@ -35,7 +35,8 @@ Imports:
     withr,
     httr,
     jsonlite,
-    base64enc
+    base64enc,
+    shiny
 Suggests:
     testthat,
     RCurl,
