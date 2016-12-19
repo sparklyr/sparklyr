@@ -6,7 +6,7 @@ output:
     fig_height: 5
 ---
 
-[![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr)
+[![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(eval = TRUE)
