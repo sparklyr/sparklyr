@@ -2,14 +2,12 @@
 methods::setOldClass("spark_connection")
 methods::setOldClass("spark_jobj")
 
-.spark_default_version <- numeric_version("1.6.2")
-
 spark_version_numeric <- function(version) {
   numeric_version(gsub("[-_a-zA-Z]", "", version))
 }
 
 spark_default_app_jar <- function(version) {
-  version <- version %||% .spark_default_version
+  version <- version %||% numeric_version("1.6.2")
   sparklyr_jar_path(spark_version_numeric(version))
 }
 
