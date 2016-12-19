@@ -40,5 +40,4 @@ Suggests:
     testthat,
     RCurl,
     janeaustenr,
-    miniUI,
     shiny
