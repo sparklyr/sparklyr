@@ -75,6 +75,6 @@ print_jobj.test_connection <- function(sc, jobj, ...) {
 }
 
 #' @export
-sdf_import.default <- function(x, sc, ...) {
+sdf_import.test_connection <- function(x, sc, ...) {
   x
 }
