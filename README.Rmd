@@ -17,7 +17,7 @@ knitr::opts_chunk$set(warning = FALSE)
 <img src="README_files/images/sparklyr-illustration.png" width=364 height=197 align="right"/>
 
 - Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
-- Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
+- Filter and aggregate Spark datasets then bring them into R for <br/> analysis and visualization.
 - Use Spark's distributed [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) library from R.
 - Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide <br/> interfaces to Spark packages. 
 

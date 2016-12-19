@@ -6,7 +6,7 @@ sparklyr: R interface for Apache Spark
 <img src="README_files/images/sparklyr-illustration.png" width=364 height=197 align="right"/>
 
 -   Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
--   Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
+-   Filter and aggregate Spark datasets then bring them into R for <br/> analysis and visualization.
 -   Use Spark's distributed [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) library from R.
 -   Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide <br/> interfaces to Spark packages.
 
@@ -313,16 +313,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/12/19 09:46:49 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpRAnI6X/fileb3a772c0fc32.csv MapPartitionsRDD[363] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/12/19 09:46:49 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
-    ## 16/12/19 09:46:49 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
-    ## 16/12/19 09:46:49 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
-    ## 16/12/19 09:46:49 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpRAnI6X/fileb3a772c0fc32.csv:0+33313106
-    ## 16/12/19 09:46:49 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
-    ## 16/12/19 09:46:49 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 103 ms on localhost (1/1)
-    ## 16/12/19 09:46:49 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
-    ## 16/12/19 09:46:49 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.104 s
-    ## 16/12/19 09:46:49 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.106214 s
+    ## 16/12/19 13:43:42 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpcsSFgF/file82259906243.csv MapPartitionsRDD[363] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 16/12/19 13:43:42 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
+    ## 16/12/19 13:43:42 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2429 bytes)
+    ## 16/12/19 13:43:42 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
+    ## 16/12/19 13:43:42 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpcsSFgF/file82259906243.csv:0+33313106
+    ## 16/12/19 13:43:42 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
+    ## 16/12/19 13:43:42 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 119 ms on localhost (1/1)
+    ## 16/12/19 13:43:42 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.119 s
+    ## 16/12/19 13:43:42 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
+    ## 16/12/19 13:43:42 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.121816 s
 
 Finally, we disconnect from Spark:
 
