@@ -16,6 +16,9 @@ livy_validate_http_response <- function(message, req) {
 #' Create a Spark Configuration for Livy
 #'
 #' @export
+#'
+#' @importFrom jsonlite base64_enc
+#'
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
 #' @param password The password to use in the Authorization header
@@ -72,7 +75,7 @@ livy_get_sessions <- function(master, config) {
   sessions
 }
 
-#' @import jsonlite
+#' @importFrom jsonlite unbox
 livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
   params <- connection_config(list(
     master = master,
@@ -98,6 +101,11 @@ livy_config_get <- function(master, config) {
   c(livyConfig, sparkConfig)
 }
 
+<<<<<<< HEAD
+=======
+#' @importFrom httr POST
+#' @importFrom jsonlite unbox
+>>>>>>> 025be09... additional importfrom statements and rebuild docs
 livy_create_session <- function(master, config) {
   data <- list(
     kind = unbox("spark"),
@@ -362,6 +370,12 @@ livy_log_operation <- function(sc, text) {
   write(strtrim(text, 200), file = sc$log, append = TRUE)
 }
 
+<<<<<<< HEAD
+=======
+#' @importFrom httr POST
+#' @importFrom jsonlite toJSON
+#' @importFrom jsonlite unbox
+>>>>>>> 025be09... additional importfrom statements and rebuild docs
 livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
