@@ -70,7 +70,7 @@ spark_install_find <- function(sparkVersion = NULL,
   spark_install_info(as.character(versions[1,]$spark), as.character(versions[1,]$hadoop))
 }
 
-# determine the version that will be used by default if version is NULL
+#' determine the version that will be used by default if version is NULL
 #' @export
 #' @keywords internal
 spark_default_version <- function() {
