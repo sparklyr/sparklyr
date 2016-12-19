@@ -1,7 +1,4 @@
 #' @import shiny
-setGeneric("test", function(test) {
-  standardGeneric("test")
-})
 connection_spark_ui <- function() {
   componentVersionSelectChoices <- function(name) {
     selected <- spark_default_version()[[name]]
@@ -130,13 +127,19 @@ connection_spark_server <- function(input, output, session) {
 
   observe({
     if (exists(".rs.updateNewConnectionDialog")) {
-      .rs.updateNewConnectionDialog(codeReactive())
+      update <- get(".rs.updateNewConnectionDialog")
+      update(codeReactive())
     }
   })
 }
 
+#' A Shiny app that can be used to construct a \code{spark_connect} statement
+#'
 #' @export
+#'
+#' @import shiny
+#'
 #' @keywords internal
 connection_spark_shinyapp <- function() {
-  shiny::shinyApp(connection_spark_ui, connection_spark_server)
+  shinyApp(connection_spark_ui, connection_spark_server)
 }
