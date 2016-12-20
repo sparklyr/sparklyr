@@ -16,7 +16,7 @@ NULL
 #' @rdname sdf-saveload
 #' @export
 sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
-  warning("sdf_save_table is deprecated, use spark_write_table instead.")
+  warning("sdf_save_table is deprecated, use spark_save_table instead.")
 
   sdf <- spark_dataframe(x)
   name <- ensure_scalar_character(name)
@@ -41,7 +41,7 @@ sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
 #' @rdname sdf-saveload
 #' @export
 sdf_load_table <- function(sc, name) {
-  warning("sdf_load_table is deprecated, use spark_read_table instead.")
+  warning("sdf_load_table is deprecated, use spark_load_table instead.")
 
   session <- spark_session(sc)
   name <- ensure_scalar_character(name)
