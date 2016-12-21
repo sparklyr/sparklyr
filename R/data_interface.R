@@ -363,7 +363,7 @@ spark_load_table <- function(sc,
 #' @family Spark serialization routines
 #'
 #' @export
-spark_save_table <- function(x, path, mode = NULL) {
+spark_save_table <- function(x, path, mode = NULL, options = list()) {
   UseMethod("spark_save_table")
 }
 

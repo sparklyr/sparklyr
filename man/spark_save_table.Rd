@@ -4,7 +4,7 @@
 \alias{spark_save_table}
 \title{Saves a Spark DataFrame as a Spark table}
 \usage{
-spark_save_table(x, path, mode = NULL)
+spark_save_table(x, path, mode = NULL, options = list())
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -13,6 +13,8 @@ spark_save_table(x, path, mode = NULL)
 Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{mode}{Specifies the behavior when data or table already exists.}
+
+\item{options}{A list of strings with additional options.}
 }
 \description{
 Saves a Spark DataFrame and as a Spark table.
