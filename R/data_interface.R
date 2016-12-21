@@ -340,6 +340,7 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
 #' @export
 spark_load_table <- function(sc,
                              name,
+                             path,
                              options = list(),
                              repartition = 0,
                              memory = TRUE,
@@ -347,7 +348,8 @@ spark_load_table <- function(sc,
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, name, "table", options)
+  operation <- if (spark_version(sc) < "2.0.0") "load" else "table"
+  df <- spark_data_read_generic(sc, path, operation, options)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -362,17 +364,21 @@ spark_load_table <- function(sc,
 #'
 #' @export
 spark_save_table <- function(x, path, mode = NULL) {
-  UseMethod("spark_write_parquet")
+  UseMethod("spark_save_table")
 }
 
 #' @export
 spark_save_table.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, spark_normalize_path(path), "saveAsTable", mode, options)
+
+  operation <- if (spark_version(sc) < "2.0.0") "save" else "saveAsTable"
+  spark_data_write_generic(sqlResult, spark_normalize_path(path), operation, mode, options)
 }
 
 #' @export
 spark_save_table.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, normalizePath(path), "saveAsTable", mode, options)
+
+  operation <- if (spark_version(sc) < "2.0.0") "save" else "saveAsTable"
+  spark_data_write_generic(x, spark_normalize_path(path), operation, mode, options)
 }
