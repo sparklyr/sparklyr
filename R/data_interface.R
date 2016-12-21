@@ -370,6 +370,7 @@ spark_save_table <- function(x, path, mode = NULL) {
 #' @export
 spark_save_table.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
+  sc <- spark_connection(x)
 
   operation <- if (spark_version(sc) < "2.0.0") "save" else "saveAsTable"
   spark_data_write_generic(sqlResult, spark_normalize_path(path), operation, mode, options)
@@ -378,6 +379,7 @@ spark_save_table.tbl_spark <- function(x, path, mode = NULL, options = list()) {
 #' @export
 spark_save_table.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  sc <- spark_connection(x)
 
   operation <- if (spark_version(sc) < "2.0.0") "save" else "saveAsTable"
   spark_data_write_generic(x, spark_normalize_path(path), operation, mode, options)

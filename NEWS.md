@@ -1,3 +1,8 @@
+# Sparklyr 0.6.0 (UNRELEASED)
+
+- Resolved issue in spark_save/load_table to support saving/loading data and
+  added path parameter in spark_load_table for consistency with other functions.
+
 # Sparklyr 0.5.0
 
 - Implemented basic authorization for Livy connections using
