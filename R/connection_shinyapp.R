@@ -83,7 +83,6 @@ connection_spark_ui <- function() {
         # TODO: Changing spark versions filters the right hadoop version
         # TODO: If Spark not installed, prompt install
         # TODO: If java not installed: ComponentsNotInstalledDialogs.showJavaNotInstalled(context.getJavaInstallUrl());
-        # TODO: Selection opens "Connect to Cluster", "Spark master: ". "spark://local:7077"
         # TODO: Support rstudio.spark.connections option
         # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
       ),
@@ -195,7 +194,7 @@ connection_spark_server <- function(input, output, session) {
         master <- rsApiShowPrompt(
           "Connect to Cluster",
           "Spark master:",
-          "yarn-client"
+          "spark://local:7077"
         )
 
         updateSelectInput(
