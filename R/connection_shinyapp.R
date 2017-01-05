@@ -20,6 +20,7 @@ rsApiShowPrompt <- function(title, message, default) {
 }
 
 #' @import shiny
+#' @import rstudioapi
 connection_spark_ui <- function() {
   componentVersionSelectChoices <- function(name) {
     selected <- spark_default_version()[[name]]
@@ -148,7 +149,7 @@ connection_spark_server <- function(input, output, session) {
 
   observe({
     if (identical(input$master, "cluster")) {
-      if (identical(rstudioapi::versionInfo()$mode, "desktop")) {
+      if (identical(versionInfo()$mode, "desktop")) {
         rsApiShowDialog(
           "Connect to Spark",
           paste(
