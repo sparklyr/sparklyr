@@ -1,3 +1,24 @@
+rsApiUpdateDialog <- function(code) {
+  if (exists(".rs.updateNewConnectionDialog")) {
+    updateDialog <- get(".rs.updateNewConnectionDialog")
+    updateDialog(code)
+  }
+}
+
+rsApiShowDialog <- function(title, message) {
+  if (exists(".rs.showDialog")) {
+    showDialog <- get(".rs.showDialog")
+    showDialog(title, message)
+  }
+}
+
+rsApiShowPrompt <- function(title, message, default) {
+  if (exists(".rs.showPrompt")) {
+    showPrompt <- get(".rs.showPrompt")
+    showPrompt(title, message, default)
+  }
+}
+
 #' @import shiny
 connection_spark_ui <- function() {
   componentVersionSelectChoices <- function(name) {
@@ -61,12 +82,9 @@ connection_spark_ui <- function() {
         "Cluster..." = "cluster"
         # TODO: Changing spark versions filters the right hadoop version
         # TODO: If Spark not installed, prompt install
-        # TODO: If running as desktop: Error
         # TODO: If java not installed: ComponentsNotInstalledDialogs.showJavaNotInstalled(context.getJavaInstallUrl());
-        # TODO: If running as server and no SPARK_HOME: Error ComponentsNotInstalledDialogs.showSparkHomeNotDefined()
         # TODO: Selection opens "Connect to Cluster", "Spark master: ". "spark://local:7077"
         # TODO: Support rstudio.spark.connections option
-        # TODO: Provide UI to choose master connection
         # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
       ),
       selectize = FALSE
@@ -126,9 +144,67 @@ connection_spark_server <- function(input, output, session) {
   })
 
   observe({
-    if (exists(".rs.updateNewConnectionDialog")) {
-      update <- get(".rs.updateNewConnectionDialog")
-      update(codeReactive())
+    rsApiUpdateDialog(codeReactive())
+  })
+
+  observe({
+    if (identical(input$master, "cluster")) {
+      if (identical(rstudioapi::versionInfo()$mode, "desktop")) {
+        rsApiShowDialog(
+          "Connect to Spark",
+          paste(
+            "Connecting with a remote Spark cluster requires ",
+            "an RStudio Server instance that is either within the cluster ",
+            "or has a high bandwidth connection to the cluster.</p>",
+            "<p>Please see the <strong>Using Spark with RStudio</strong> help ",
+            "link below for additional details.</p>",
+            sep = ""
+          )
+        )
+
+        updateSelectInput(
+          session,
+          "master",
+          selected = "local"
+        )
+      }
+      else if (identical(spark_home(), NULL)) {
+        rsApiShowDialog(
+          "Connect to Spark",
+          paste(
+            "<p>Connecting with a Spark cluster requires that you are on a system ",
+            "able to communicate with the cluster in both directions, and ",
+            "requires that the SPARK_HOME environment variable refers to a  ",
+            "locally installed version of Spark that is configured to ",
+            "communicate with the cluster.</p>",
+            "<p>Your system doesn't currently have the SPARK_HOME environment ",
+            "variable defined. Please contact your system administrator to ",
+            "ensure that the server is properly configured to connect with ",
+            "the cluster.<p>",
+            sep = ""
+          )
+        )
+
+        updateSelectInput(
+          session,
+          "master",
+          selected = "local"
+        )
+      }
+      else {
+        master <- rsApiShowPrompt(
+          "Connect to Cluster",
+          "Spark master:",
+          "yarn-client"
+        )
+
+        updateSelectInput(
+          session,
+          "master",
+          choices = list(master = "master", master, "Cluster..." = "cluster"),
+          selected = master
+        )
+      }
     }
   })
 }
