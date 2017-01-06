@@ -36,7 +36,8 @@ Imports:
     httr,
     jsonlite,
     base64enc,
-    shiny
+    shiny,
+    rstudioapi
 Suggests:
     testthat,
     RCurl,
