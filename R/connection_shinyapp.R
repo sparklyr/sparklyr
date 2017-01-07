@@ -26,23 +26,55 @@ rsApiShowQuestion <- function(title, message, ok, cancel) {
   }
 }
 
+spark_ui_avaliable_versions <- function() {
+  tryCatch({
+    spark_available_versions()[,c("spark","hadoop")]
+  }, error = function(e) {
+    warning(e)
+    spark_installed_versions()[,c("spark","hadoop")]
+  })
+}
+
+spark_ui_spark_choices <- function() {
+  availableVersions <- spark_ui_avaliable_versions()
+  selected <- spark_default_version()[["spark"]]
+  choiceValues <- unique(avaliableVersions[["spark"]])
+
+  choiceNames <- choiceValues
+  choiceNames <- lapply(
+    choiceNames,
+    function(e) if (e == selected) paste(e, "(Default)") else e
+  )
+
+  names(choiceValues) <- choiceNames
+
+  choiceValues
+}
+
+spark_ui_hadoop_choices <- function(sparkVersion) {
+  availableVersions <- spark_ui_avaliable_versions()
+
+  selected <- tryCatch({
+    spark_install_find(sparkVersion = sparkVersion)$hadoopVersion
+  }, error = function(e) {
+    NULL
+  })
+
+  choiceValues <- unique(avaliableVersions[avaliableVersions$spark == sparkVersion,][["hadoop"]])
+  choiceNames <- choiceValues
+  choiceNames <- lapply(
+    choiceNames,
+    function(e) if (e == selected) paste(e, "(Default)") else e
+  )
+
+  names(choiceValues) <- choiceNames
+
+  choiceValues
+}
+
 #' @import shiny
 #' @import rstudioapi
 connection_spark_ui <- function() {
-  componentVersionSelectChoices <- function(name) {
-    selected <- spark_default_version()[[name]]
-    choiceValues <- unique(spark_installed_versions()[[name]])
-    choiceNames <- choiceValues
-    choiceNames <- lapply(
-      choiceNames,
-      function(e) if (e == selected) paste(e, "(Default)") else e
-    )
-
-    names(choiceValues) <- choiceNames
-
-    choiceValues
-  }
-
   tags$div(
     tags$head(
       tags$style(
@@ -88,7 +120,6 @@ connection_spark_ui <- function() {
       choices = c(
         "local" = "local",
         "Cluster..." = "cluster"
-        # TODO: Changing spark versions filters the right hadoop version
         # TODO: Support rstudio.spark.connections option
         # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
       ),
@@ -109,15 +140,15 @@ connection_spark_ui <- function() {
     selectInput(
       "sparkversion",
       "Spark version:",
-      choices = componentVersionSelectChoices("spark"),
+      choices = spark_ui_spark_choices(),
       selected = spark_default_version()$spark,
       selectize = FALSE
     ),
     selectInput(
       "hadoopversion",
       "Hadoop version:",
-      choices = componentVersionSelectChoices("hadoop"),
-      selected = spark_default_version()$hadoop,
+      choices = spark_ui_hadoop_choices(spark_default_version()$spark),
+      # selected = spark_default_version()$hadoop,
       selectize = FALSE
     )
   )
@@ -307,6 +338,16 @@ connection_spark_server <- function(input, output, session) {
         url
       )
     }
+  })
+
+  observe({
+    sparkVersion <- input$sparkversion
+    updateSelectInput(
+      session,
+      "hadoopversion",
+      choices = spark_ui_hadoop_choices(sparkVersion)
+      #selected = master
+    )
   })
 }
 
