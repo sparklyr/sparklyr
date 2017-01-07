@@ -5,7 +5,7 @@ rsApiUpdateDialog <- function(code) {
   }
 }
 
-rsApiShowDialog <- function(title, message, url) {
+rsApiShowDialog <- function(title, message, url = "") {
   if (exists(".rs.showDialog")) {
     showDialog <- get(".rs.showDialog")
     showDialog(title, message, url)
@@ -89,7 +89,6 @@ connection_spark_ui <- function() {
         "local" = "local",
         "Cluster..." = "cluster"
         # TODO: Changing spark versions filters the right hadoop version
-        # TODO: If Spark not installed, prompt install
         # TODO: Support rstudio.spark.connections option
         # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
       ),
@@ -133,17 +132,78 @@ connection_spark_server <- function(input, output, session) {
     input$hadoopversion == spark_default_version()$hadoop
   })
 
+  installSparkReactive <- reactive({
+    sparkSelection <- input$sparkversion
+    hadoopSelection <- input$hadoopversion
+
+    if (identical(input$master, "local") &&
+        identical(versionInfo()$mode, "desktop") &&
+        identical(spark_home(), NULL)) {
+
+      installed <- spark_installed_versions()
+      isInstalled <- nrow(installed[installed$spark == sparkSelection & installed$hadoop == hadoopSelection, ])
+
+      if (!isInstalled) {
+        rsApiShowQuestion(
+          "Install Spark Components",
+          paste(
+            "Spark ",
+            sparkSelection,
+            " for Hadoop ",
+            hadoopSelection,
+            " is not currently installed.",
+            "\n\n",
+            "Do you want to install this version of Spark?",
+            sep = ""
+          ),
+          ok = "Install",
+          cancel = "Cancel"
+        )
+      }
+      else {
+        FALSE
+      }
+    }
+    else {
+      FALSE
+    }
+  })
+
   codeReactive <- reactive({
     paste(
       "library(sparklyr)\n",
       if(input$dbinterface == "dplyr") "library(dplyr)\n" else "",
+      if(installSparkReactive())
+        paste(
+          "spark_install(version = \"",
+          input$sparkversion,
+          "\", hadoop_version = \"",
+          input$hadoopversion,
+          "\")\n",
+          sep = ""
+      )
+      else "",
       "sc ",
       "<- ",
       "spark_connect(master = \"",
       input$master,
       "\"",
-      if (!hasDefaultSparkVersion()) paste(", version = \"", input$sparkversion, "\"", sep = "") else "",
-      if (!hasDefaultHadoopVersion()) paste(", hadoop_version = \"", input$hadoopversion, "\"", sep = "") else "",
+      if (!hasDefaultSparkVersion())
+        paste(
+          ", version = \"",
+          input$sparkversion,
+          "\"",
+          sep = ""
+        )
+      else "",
+      if (!hasDefaultHadoopVersion())
+        paste(
+          ", hadoop_version = \"",
+          input$hadoopversion,
+          "\"",
+          sep = ""
+        )
+      else "",
       ")",
       sep = ""
     )
