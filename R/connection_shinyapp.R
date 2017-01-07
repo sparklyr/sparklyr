@@ -5,10 +5,10 @@ rsApiUpdateDialog <- function(code) {
   }
 }
 
-rsApiShowDialog <- function(title, message) {
+rsApiShowDialog <- function(title, message, url) {
   if (exists(".rs.showDialog")) {
     showDialog <- get(".rs.showDialog")
-    showDialog(title, message)
+    showDialog(title, message, url)
   }
 }
 
@@ -16,6 +16,13 @@ rsApiShowPrompt <- function(title, message, default) {
   if (exists(".rs.showPrompt")) {
     showPrompt <- get(".rs.showPrompt")
     showPrompt(title, message, default)
+  }
+}
+
+rsApiShowQuestion <- function(title, message, ok, cancel) {
+  if (exists(".rs.showQuestion")) {
+    showPrompt <- get(".rs.showQuestion")
+    showPrompt(title, message, ok, cancel)
   }
 }
 
@@ -83,7 +90,6 @@ connection_spark_ui <- function() {
         "Cluster..." = "cluster"
         # TODO: Changing spark versions filters the right hadoop version
         # TODO: If Spark not installed, prompt install
-        # TODO: If java not installed: ComponentsNotInstalledDialogs.showJavaNotInstalled(context.getJavaInstallUrl());
         # TODO: Support rstudio.spark.connections option
         # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
       ),
@@ -172,11 +178,11 @@ connection_spark_server <- function(input, output, session) {
         rsApiShowDialog(
           "Connect to Spark",
           paste(
-            "<p>Connecting with a Spark cluster requires that you are on a system ",
+            "Connecting with a Spark cluster requires that you are on a system ",
             "able to communicate with the cluster in both directions, and ",
             "requires that the SPARK_HOME environment variable refers to a  ",
             "locally installed version of Spark that is configured to ",
-            "communicate with the cluster.</p>",
+            "communicate with the cluster.",
             "<p>Your system doesn't currently have the SPARK_HOME environment ",
             "variable defined. Please contact your system administrator to ",
             "ensure that the server is properly configured to connect with ",
@@ -205,6 +211,41 @@ connection_spark_server <- function(input, output, session) {
           selected = master
         )
       }
+    }
+  })
+
+  session$onFlushed(function() {
+    if (!is_java_available()) {
+      url <- ""
+
+      message <- paste(
+        "In order to connect to Spark ",
+        "your system needs to have Java installed (",
+        "no version of Java was detected).",
+        sep = ""
+      )
+
+      if (identical(versionInfo()$mode, "desktop")) {
+        message <- paste(
+          message,
+          "<p>Please contact your server administrator to request the ",
+          "installation of Java on this system.</p>",
+          sep = "")
+
+        url <- java_install_url()
+      } else {
+        message <- paste(
+          message,
+          "<p>Please contact your server administrator to request the ",
+            "installation of Java on this system.</p>",
+          sep = "")
+      }
+
+      rsApiShowDialog(
+        "Java Required for Spark Connections",
+        message,
+        url
+      )
     }
   })
 }
