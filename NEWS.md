@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Improved performance of sample_n and sample_frac by using TABLESAMPLE query.
+
 - Resolved issue in spark_save/load_table to support saving/loading data and
   added path parameter in spark_load_table for consistency with other functions.
 
