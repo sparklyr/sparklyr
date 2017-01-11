@@ -7,6 +7,16 @@ spark_connection.tbl_spark <- function(x, ...) {
 
 #' @export
 spark_connection.src_spark <- function(x, ...) {
+
+  # for development version of dplyr (>= 0.5.0.9000)
+  if ("dplyr" %in% loadedNamespaces() &&
+      exists("con_acquire", envir = asNamespace("dplyr")))
+  {
+    acquire <- get("con_acquire", envir = asNamespace("dplyr"))
+    return(acquire(x))
+  }
+
+  # older versions of dplyr (0.5.0 and below)
   x$con
 }
 
