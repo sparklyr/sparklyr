@@ -384,7 +384,7 @@ livy_post_statement <- function(sc, code) {
   waitTimeout <- spark_config_value(sc$config, "livy.session.command.timeout", 60)
   waitTimeout <- waitTimeout * 10
   sleepTime <- 0.001
-  while (statementReponse$state == "running" &&
+  while ((statementReponse$state == "running"||statementReponse$state == "waiting" )&&
          waitTimeout > 0) {
     statementReponse <- livy_get_statement(sc, statementReponse$id)
 
