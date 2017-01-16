@@ -80,6 +80,13 @@ spark_ui_hadoop_choices <- function(sparkVersion) {
   choiceValues
 }
 
+spark_ui_default_connections <- function() {
+  getOption(
+    "sparklyr.ui.connections",
+    getOption("rstudio.spark.connections")
+  )
+}
+
 #' @import shiny
 #' @import rstudioapi
 connection_spark_ui <- function() {
@@ -127,7 +134,7 @@ connection_spark_ui <- function() {
       "Master:",
       choices = c(
         list("local" = "local"),
-        getOption("rstudio.spark.connections", NULL),
+        spark_ui_default_connections(),
         list("Cluster..." = "cluster")
       ),
       selectize = FALSE
@@ -339,7 +346,7 @@ connection_spark_server <- function(input, output, session) {
           selected = c(
             list(master = "master"),
             master,
-            getOption("rstudio.spark.connections", NULL),
+            spark_ui_default_connections(),
             list("Cluster..." = "cluster")
           )
         )

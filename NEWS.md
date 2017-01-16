@@ -1,5 +1,9 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added support for the sparklyr.ui.connections option which adds additional
+  connection options into the new connections dialog. The
+  rstudio.spark.connections option is now deprecated.
+
 - Implemented the "new connection dialog" as a shiny app to be able to
   support newer versions of RStudio that deprecate current connections ui.
 
