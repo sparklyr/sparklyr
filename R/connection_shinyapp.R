@@ -114,9 +114,9 @@ connection_spark_ui <- function() {
       "master",
       "Master:",
       choices = c(
-        "local" = "local",
-        "Cluster..." = "cluster"
-        # TODO: Support rstudio.spark.connections option
+        list("local" = "local"),
+        getOption("rstudio.spark.connections", NULL),
+        list("Cluster..." = "cluster")
         # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
       ),
       selectize = FALSE
@@ -323,8 +323,13 @@ connection_spark_server <- function(input, output, session) {
         updateSelectInput(
           session,
           "master",
-          choices = list(master = "master", master, "Cluster..." = "cluster"),
-          selected = master
+          choices = masterChoices,
+          selected = c(
+            list(master = "master"),
+            master,
+            getOption("rstudio.spark.connections", NULL),
+            list("Cluster..." = "cluster")
+          )
         )
       }
     }
