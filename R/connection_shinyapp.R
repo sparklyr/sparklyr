@@ -163,6 +163,8 @@ connection_spark_server <- function(input, output, session) {
     input$hadoopversion == spark_default_version()$hadoop
   })
 
+  userInstallPreference <- NULL
+
   installSparkReactive <- reactive({
     sparkSelection <- input$sparkversion
     hadoopSelection <- input$hadoopversion
@@ -175,21 +177,25 @@ connection_spark_server <- function(input, output, session) {
       isInstalled <- nrow(installed[installed$spark == sparkSelection & installed$hadoop == hadoopSelection, ])
 
       if (!isInstalled) {
-        rsApiShowQuestion(
-          "Install Spark Components",
-          paste(
-            "Spark ",
-            sparkSelection,
-            " for Hadoop ",
-            hadoopSelection,
-            " is not currently installed.",
-            "\n\n",
-            "Do you want to install this version of Spark?",
-            sep = ""
-          ),
-          ok = "Install",
-          cancel = "Cancel"
-        )
+        if (identical(userInstallPreference, NULL)) {
+          userInstallPreference <<- rsApiShowQuestion(
+            "Install Spark Components",
+            paste(
+              "Spark ",
+              sparkSelection,
+              " for Hadoop ",
+              hadoopSelection,
+              " is not currently installed.",
+              "\n\n",
+              "Do you want to install this version of Spark?",
+              sep = ""
+            ),
+            ok = "Install",
+            cancel = "Cancel"
+          )
+        }
+
+        userInstallPreference
       }
       else {
         FALSE
