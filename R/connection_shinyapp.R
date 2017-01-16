@@ -55,7 +55,7 @@ spark_ui_hadoop_choices <- function(sparkVersion) {
   availableVersions <- spark_ui_avaliable_versions()
 
   selected <- tryCatch({
-    spark_install_find(sparkVersion = sparkVersion)$hadoopVersion
+    spark_install_find(sparkVersion = sparkVersion, installedOnly = FALSE)$hadoopVersion
   }, error = function(e) {
     NULL
   })
