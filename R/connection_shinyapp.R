@@ -26,6 +26,18 @@ rsApiShowQuestion <- function(title, message, ok, cancel) {
   }
 }
 
+rsApiReadPreference <- function(name, default) {
+  value <- .rs.readUiPref(name)
+  if (is.null(value)) default else value
+}
+
+rsApiWritePreference <- function(name, value) {
+  if (!is.character(value)) {
+    stop("Only character preferences are supported")
+  }
+  .rs.writeUiPref(name, value)
+}
+
 spark_ui_avaliable_versions <- function() {
   tryCatch({
     spark_available_versions()[,c("spark","hadoop")]
@@ -117,7 +129,6 @@ connection_spark_ui <- function() {
         list("local" = "local"),
         getOption("rstudio.spark.connections", NULL),
         list("Cluster..." = "cluster")
-        # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
       ),
       selectize = FALSE
     ),
@@ -128,7 +139,8 @@ connection_spark_ui <- function() {
         "dplyr" = "dplyr",
         "(None)" = "none"
       ),
-      selectize = FALSE
+      selectize = FALSE,
+      selected = rsApiReadPreference("sparklyr_dbinterface", "dplyr")
     ),
     div(
       style = "height: 10px"
@@ -414,6 +426,10 @@ connection_spark_server <- function(input, output, session) {
         stateValuesReactive$codeInvalidated + 1
       })
     }
+  })
+
+  observe({
+    rsApiWritePreference("sparklyr_dbinterface", input$dbinterface)
   })
 }
 
