@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Implemented the "new connection dialog" as a shiny app to be able to
+  support newer versions of RStudio that deprecate current connections ui.
+
 - Improved performance of sample_n and sample_frac by using TABLESAMPLE query.
 
 - Resolved issue in spark_save/load_table to support saving/loading data and
