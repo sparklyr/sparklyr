@@ -64,7 +64,7 @@ spark_ui_hadoop_choices <- function(sparkVersion) {
   choiceNames <- choiceValues
   choiceNames <- lapply(
     choiceNames,
-    function(e) if (e == selected) paste(e, "(Default)") else e
+    function(e) if (length(selected) > 0 && e == selected) paste(e, "(Default)") else e
   )
 
   names(choiceValues) <- choiceNames
