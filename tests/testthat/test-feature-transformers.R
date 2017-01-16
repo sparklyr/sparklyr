@@ -1,5 +1,6 @@
 context("feature transformers")
 
+test_requires("dplyr")
 test_requires("janeaustenr")
 
 sc <- testthat_spark_connection()

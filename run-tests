@@ -10,7 +10,7 @@ run-tests () {
 }
 
 if [ "$#" -eq "0" ]; then
-    run-tests 2.0.1 2.0.0 1.6.2 1.6.1
+    run-tests 2.1.0 2.0.2 2.0.1 2.0.0 1.6.2 1.6.1
 else
     run-tests "$@"
 fi
