@@ -38,7 +38,7 @@ spark_ui_avaliable_versions <- function() {
 spark_ui_spark_choices <- function() {
   availableVersions <- spark_ui_avaliable_versions()
   selected <- spark_default_version()[["spark"]]
-  choiceValues <- unique(avaliableVersions[["spark"]])
+  choiceValues <- unique(availableVersions[["spark"]])
 
   choiceNames <- choiceValues
   choiceNames <- lapply(
@@ -60,7 +60,7 @@ spark_ui_hadoop_choices <- function(sparkVersion) {
     NULL
   })
 
-  choiceValues <- unique(avaliableVersions[avaliableVersions$spark == sparkVersion,][["hadoop"]])
+  choiceValues <- unique(availableVersions[availableVersions$spark == sparkVersion,][["hadoop"]])
   choiceNames <- choiceValues
   choiceNames <- lapply(
     choiceNames,
