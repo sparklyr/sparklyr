@@ -90,10 +90,12 @@ spark_ui_default_connections <- function() {
 #' @import shiny
 #' @import rstudioapi
 connection_spark_ui <- function() {
+  elementSpacing <- if (.Platform$OS.type == "windows") 2 else 7
+
   tags$div(
     tags$head(
       tags$style(
-        HTML("
+        HTML(paste("
           body {
             background: none;
 
@@ -105,66 +107,70 @@ connection_spark_ui <- function() {
             user-select : none;
 
             margin: 0;
-            margin-top: 5px;
+            margin-top: 7px;
           }
 
           .shiny-input-container {
             min-width: 100%;
-            margin-bottom: 7px;
+            margin-bottom: ", elementSpacing, "px;
           }
 
           .shiny-input-container > .control-label {
-            display: inline-block;
+            display: table-cell;
             width: 195px;
           }
 
           .shiny-input-container > div {
-            display: inline-block;
+            display: table-cell;
             width: 300px;
           }
 
           #shiny-disconnected-overlay {
             display: none;
           }
-        ")
+        ", sep = ""))
       )
     ),
-    selectInput(
-      "master",
-      "Master:",
-      choices = c(
-        list("local" = "local"),
-        spark_ui_default_connections(),
-        list("Cluster..." = "cluster")
+    div(style = "table-row",
+      selectInput(
+        "master",
+        "Master:",
+        choices = c(
+          list("local" = "local"),
+          spark_ui_default_connections(),
+          list("Cluster..." = "cluster")
+        ),
+        selectize = FALSE
       ),
-      selectize = FALSE
-    ),
-    selectInput(
-      "dbinterface",
-      "DB Interface:",
-      choices = c(
-        "dplyr" = "dplyr",
-        "(None)" = "none"
-      ),
-      selectize = FALSE,
-      selected = rsApiReadPreference("sparklyr_dbinterface", "dplyr")
+      selectInput(
+        "dbinterface",
+        "DB Interface:",
+        choices = c(
+          "dplyr" = "dplyr",
+          "(None)" = "none"
+        ),
+        selectize = FALSE,
+        selected = rsApiReadPreference("sparklyr_dbinterface", "dplyr")
+      )
     ),
     div(
-      style = "height: 10px"
+      style = paste("display: table-row; height: 10px")
     ),
-    selectInput(
-      "sparkversion",
-      "Spark version:",
-      choices = spark_ui_spark_choices(),
-      selected = spark_default_version()$spark,
-      selectize = FALSE
-    ),
-    selectInput(
-      "hadoopversion",
-      "Hadoop version:",
-      choices = spark_ui_hadoop_choices(spark_default_version()$spark),
-      selected = spark_default_version()$hadoop,
-      selectize = FALSE
+    div(style = "table-row",
+      selectInput(
+        "sparkversion",
+        "Spark version:",
+        choices = spark_ui_spark_choices(),
+        selected = spark_default_version()$spark,
+        selectize = FALSE
+      ),
+      selectInput(
+        "hadoopversion",
+        "Hadoop version:",
+        choices = spark_ui_hadoop_choices(spark_default_version()$spark),
+        selected = spark_default_version()$hadoop,
+        selectize = FALSE
+      )
     )
   )
 }
