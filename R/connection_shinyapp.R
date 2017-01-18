@@ -26,6 +26,18 @@ rsApiShowQuestion <- function(title, message, ok, cancel) {
   }
 }
 
+rsApiReadPreference <- function(name, default) {
+  value <- .rs.readUiPref(name)
+  if (is.null(value)) default else value
+}
+
+rsApiWritePreference <- function(name, value) {
+  if (!is.character(value)) {
+    stop("Only character preferences are supported")
+  }
+  .rs.writeUiPref(name, value)
+}
+
 spark_ui_avaliable_versions <- function() {
   tryCatch({
     spark_available_versions()[,c("spark","hadoop")]
@@ -66,6 +78,13 @@ spark_ui_hadoop_choices <- function(sparkVersion) {
   names(choiceValues) <- choiceNames
 
   choiceValues
+}
+
+spark_ui_default_connections <- function() {
+  getOption(
+    "sparklyr.ui.connections",
+    getOption("rstudio.spark.connections")
+  )
 }
 
 #' @import shiny
@@ -114,10 +133,9 @@ connection_spark_ui <- function() {
       "master",
       "Master:",
       choices = c(
-        "local" = "local",
-        "Cluster..." = "cluster"
-        # TODO: Support rstudio.spark.connections option
-        # TODO: Need to store dialog preferences somwhere (say, selecting dplyr) (see connectionsDbInterface)
+        list("local" = "local"),
+        spark_ui_default_connections(),
+        list("Cluster..." = "cluster")
       ),
       selectize = FALSE
     ),
@@ -128,7 +146,8 @@ connection_spark_ui <- function() {
         "dplyr" = "dplyr",
         "(None)" = "none"
       ),
-      selectize = FALSE
+      selectize = FALSE,
+      selected = rsApiReadPreference("sparklyr_dbinterface", "dplyr")
     ),
     div(
       style = "height: 10px"
@@ -323,8 +342,13 @@ connection_spark_server <- function(input, output, session) {
         updateSelectInput(
           session,
           "master",
-          choices = list(master = "master", master, "Cluster..." = "cluster"),
-          selected = master
+          choices = masterChoices,
+          selected = c(
+            list(master = "master"),
+            master,
+            spark_ui_default_connections(),
+            list("Cluster..." = "cluster")
+          )
         )
       }
     }
@@ -409,6 +433,10 @@ connection_spark_server <- function(input, output, session) {
         stateValuesReactive$codeInvalidated + 1
       })
     }
+  })
+
+  observe({
+    rsApiWritePreference("sparklyr_dbinterface", input$dbinterface)
   })
 }
 

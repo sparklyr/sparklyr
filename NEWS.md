@@ -1,5 +1,12 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added support for the sparklyr.ui.connections option which adds additional
+  connection options into the new connections dialog. The
+  rstudio.spark.connections option is now deprecated.
+
+- Implemented the "new connection dialog" as a shiny app to be able to
+  support newer versions of RStudio that deprecate current connections ui.
+
 - Improved performance of sample_n and sample_frac by using TABLESAMPLE query.
 
 - Resolved issue in spark_save/load_table to support saving/loading data and
