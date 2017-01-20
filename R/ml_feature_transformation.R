@@ -391,3 +391,30 @@ ft_regex_tokenizer <- function(x,
 #     setBinary      = ensure_scalar_boolean(binary)
 #   ))
 # }
+
+#' Feature Tranformation -- CountVectorizer
+#'
+#' Extracts a vocabulary from document collections.
+#'
+#' @template roxlate-ml-transformation
+#'
+#' @export
+ft_count_vectorizer <- function(x,
+                                input.col = NULL,
+                                output.col = NULL,
+                                min_df = NULL,
+                                min_tf = NULL,
+                                vocab_size = NULL,
+                                ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.CountVectorizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol   = ensure_scalar_character(input.col),
+    setOutputCol  = ensure_scalar_character(output.col),
+    setMinDF      = min_df,
+    setMinTF      = min_tf,
+    setVocabSize  = vocab_size,
+    fit           = spark_dataframe(x)
+  ))
+}
