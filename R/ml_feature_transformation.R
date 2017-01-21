@@ -398,13 +398,27 @@ ft_regex_tokenizer <- function(x,
 #'
 #' @template roxlate-ml-transformation
 #'
+#' @param min.df Specifies the minimum number of different documents a
+#' term must appear in to be included in the vocabulary. If this is an
+#' integer greater than or equal to 1, this specifies the number of
+#' documents the term must appear in; if this is a double in [0,1), then
+#' this specifies the fraction of documents
+#' @param min.tf Filter to ignore rare words in a document. For each
+#' document, terms with frequency/count less than the given threshold
+#' are ignored. If this is an integer greater than or equal to 1, then
+#' this specifies a count (of times the term must appear in the document);
+#' if this is a double in [0,1), then this specifies a fraction (out of
+#' the document's token count).
+#' @param vocab.size Build a vocabulary that only considers the top
+#' vocab.size terms ordered by term frequency across the corpus.
+#'
 #' @export
 ft_count_vectorizer <- function(x,
                                 input.col = NULL,
                                 output.col = NULL,
-                                min_df = NULL,
-                                min_tf = NULL,
-                                vocab_size = NULL,
+                                min.df = NULL,
+                                min.tf = NULL,
+                                vocab.size = NULL,
                                 ...)
 {
   ml_backwards_compatibility_api()
@@ -412,9 +426,9 @@ ft_count_vectorizer <- function(x,
   invoke_simple_transformer(x, class, list(
     setInputCol   = ensure_scalar_character(input.col),
     setOutputCol  = ensure_scalar_character(output.col),
-    setMinDF      = min_df,
-    setMinTF      = min_tf,
-    setVocabSize  = vocab_size,
+    setMinDF      = min.df,
+    setMinTF      = min.tf,
+    setVocabSize  = vocab.size,
     fit           = spark_dataframe(x)
   ))
 }

@@ -87,7 +87,10 @@ sd_section(
     "ft_quantile_discretizer",
     "ft_sql_transformer",
     "ft_string_indexer",
-    "ft_vector_assembler"
+    "ft_vector_assembler",
+    "ft_tokenizer",
+    "ft_regex_tokenizer",
+    "ft_count_vectorizer"
   )
 )
 
