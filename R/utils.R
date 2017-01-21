@@ -193,7 +193,11 @@ spark_sanitize_names <- function(names) {
 # relative paths to absolute (necessary since the path will be read by
 # another process that has a different current working directory)
 spark_normalize_path <- function(path) {
-  normalizePath(path, mustWork = FALSE)
+  # only normalize paths in OS that behave correctly for custom
+  # protocols, in windows, this is not the case. See #432
+  if (normalizePath("s3n://", mustWork = FALSE) == "s3n://") {
+    normalizePath(path, mustWork = FALSE)
+  }
 }
 
 stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {

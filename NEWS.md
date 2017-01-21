@@ -1,5 +1,9 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Fixed issue in spark_read_parquet and other read methods in which
+  spark_normalize_path would not work in some platforms while loading
+  data using custom protocols like s3n:// for Amazon S3.
+
 - Implemented ft_count_vectorizer to be able to use ml_lda with ease.
 
 - Added support for the sparklyr.ui.connections option which adds additional
