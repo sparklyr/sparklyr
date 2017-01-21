@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Implemented ft_count_vectorizer to be able to use ml_lda with ease.
+
 - Added support for the sparklyr.ui.connections option which adds additional
   connection options into the new connections dialog. The
   rstudio.spark.connections option is now deprecated.

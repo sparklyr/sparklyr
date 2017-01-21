@@ -9,7 +9,7 @@ invoke_simple_transformer <- function(x, class, arguments) {
   enumerate(arguments, function(key, val) {
     if (is.function(val))
       transformer <<- val(transformer, sdf)
-    else
+    else if (!identical(val, NULL))
       transformer <<- invoke(transformer, key, val)
   })
 
