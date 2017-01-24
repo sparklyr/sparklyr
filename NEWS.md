@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Fixed warning while connecting with livy and improved 401 message.
+
 - Fixed issue in spark_read_parquet and other read methods in which
   spark_normalize_path would not work in some platforms while loading
   data using custom protocols like s3n:// for Amazon S3.
