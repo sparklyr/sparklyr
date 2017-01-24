@@ -4,12 +4,12 @@
 #' @importFrom httr text_content
 livy_validate_http_response <- function(message, req) {
   if (http_error(req)) {
-    if (identical(status_code(req), 401)) {
+    if (all.equal(status_code(req), 401)) {
       stop("Livy operation is unauthorized. Try spark_connect with config = livy_config()")
     }
     else {
       httpStatus <- http_status(req)
-      httpContent <- text_content(req)
+      httpContent <- content(req, as = 'text', encoding = "UTF-8")
       stop(message, " (", httpStatus$message, "): ", httpContent)
     }
   }
