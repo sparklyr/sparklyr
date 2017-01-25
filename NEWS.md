@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Support collecting NullType as NA instead of list of NAs columns.
+
 - Fixed warning while connecting with livy and improved 401 message.
 
 - Fixed issue in spark_read_parquet and other read methods in which
