@@ -190,6 +190,8 @@ object Utils {
       case ReDecimalType(_)       => collectImplDecimal(local, idx)
       case ReVectorType(_)        => collectImplVector(local, idx)
 
+      case "NullType"             => collectImplForceString(local, idx)
+
       case _                      => collectImplDefault(local, idx)
     }
   }
