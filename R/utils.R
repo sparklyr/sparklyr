@@ -198,6 +198,9 @@ spark_normalize_path <- function(path) {
   if (normalizePath("s3n://", mustWork = FALSE) == "s3n://") {
     normalizePath(path, mustWork = FALSE)
   }
+  else {
+    path
+  }
 }
 
 stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
