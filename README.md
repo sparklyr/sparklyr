@@ -313,16 +313,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/12/19 13:43:42 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpcsSFgF/file82259906243.csv MapPartitionsRDD[363] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/12/19 13:43:42 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
-    ## 16/12/19 13:43:42 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2429 bytes)
-    ## 16/12/19 13:43:42 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
-    ## 16/12/19 13:43:42 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpcsSFgF/file82259906243.csv:0+33313106
-    ## 16/12/19 13:43:42 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
-    ## 16/12/19 13:43:42 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 119 ms on localhost (1/1)
-    ## 16/12/19 13:43:42 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.119 s
-    ## 16/12/19 13:43:42 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
-    ## 16/12/19 13:43:42 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.121816 s
+    ## 17/01/25 20:48:03 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpthEPts/file6f164cd21142.csv MapPartitionsRDD[363] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 17/01/25 20:48:03 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
+    ## 17/01/25 20:48:03 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
+    ## 17/01/25 20:48:03 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
+    ## 17/01/25 20:48:03 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpthEPts/file6f164cd21142.csv:0+33313106
+    ## 17/01/25 20:48:03 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
+    ## 17/01/25 20:48:03 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 109 ms on localhost (1/1)
+    ## 17/01/25 20:48:03 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
+    ## 17/01/25 20:48:03 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.109 s
+    ## 17/01/25 20:48:03 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.111736 s
 
 Finally, we disconnect from Spark:
 
