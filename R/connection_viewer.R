@@ -62,7 +62,11 @@ on_connection_opened <- function(scon, env, connectCall) {
 
       # disconnection code
       disconnectCode = function() {
-        paste0("spark_disconnect(", find_object(env, host), ")")
+        name <- find_object(env, host)
+        if (!is.null(name))
+          paste0("spark_disconnect(", find_object(env, host), ")")
+        else
+          ""
       },
 
       # table enumeration code
@@ -153,18 +157,16 @@ on_connection_updated <- function(scon, hint) {
 }
 
 connection_list_tables <- function(sc) {
-  dbi <- sc
-  if (!is.null(dbi))
-    sort(dbListTables(dbi))
+  if (!is.null(sc) && connection_is_open(sc))
+    sort(dbListTables(sc))
   else
     character()
 }
 
 connection_list_columns <- function(sc, table) {
-  dbi <- sc
-  if (!is.null(dbi)) {
+  if (!is.null(sc) && connection_is_open(sc)) {
     sql <- paste("SELECT * FROM", table, "LIMIT 5")
-    df <- dbGetQuery(dbi, sql)
+    df <- dbGetQuery(sc, sql)
     data.frame(
       name = names(df),
       type = as.character(lapply(names(df), function(f) {
@@ -181,10 +183,9 @@ connection_list_columns <- function(sc, table) {
 }
 
 connection_preview_table <- function(sc, table, limit) {
-  dbi <- sc
-  if (!is.null(dbi)) {
+  if (!is.null(sc) && connection_is_open(sc)) {
     sql <- paste("SELECT * FROM", table, "LIMIT", limit)
-    dbGetQuery(dbi, sql)
+    dbGetQuery(sc, sql)
   } else {
     NULL
   }
