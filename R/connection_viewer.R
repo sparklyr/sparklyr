@@ -62,7 +62,11 @@ on_connection_opened <- function(scon, env, connectCall) {
 
       # disconnection code
       disconnectCode = function() {
-        paste0("spark_disconnect(", find_object(env, host), ")")
+        name <- find_object(env, host)
+        if (!is.null(name))
+          paste0("spark_disconnect(", find_object(env, host), ")")
+        else
+          ""
       },
 
       # table enumeration code
