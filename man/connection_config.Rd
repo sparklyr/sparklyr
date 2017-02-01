@@ -21,4 +21,3 @@ Named list of config parameters (note that if a prefix was
 \description{
 Read configuration values for a connection
 }
-

@@ -20,4 +20,3 @@ can be called with the \code{\link{invoke}} family of functions.
 \seealso{
 \code{\link{invoke}}, for calling methods on Java object references.
 }
-

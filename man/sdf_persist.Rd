@@ -30,4 +30,3 @@ which are non-deterministic -- otherwise, one might see that the values
 within a column seem to 'change' as new operations are performed on that
 data set.
 }
-

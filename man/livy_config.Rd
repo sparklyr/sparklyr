@@ -24,4 +24,3 @@ Extends a Spark \code{"spark_config"} configuration with settings
 for Livy. For instance, \code{"username"} and \code{"password"}
 define the basic authentication settings for a Livy session.
 }
-

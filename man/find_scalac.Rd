@@ -22,4 +22,3 @@ Find the \code{scalac} compiler for a particular version of
 \code{scala}, by scanning some common directories containing
 \code{scala} installations.
 }
-

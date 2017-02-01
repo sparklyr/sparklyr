@@ -2,6 +2,7 @@
 % Please edit documentation in R/sdf_interface.R
 \name{sdf_copy_to}
 \alias{sdf_copy_to}
+\alias{sdf_copy_to}
 \alias{sdf_import}
 \title{Copy an Object into Spark}
 \usage{
@@ -39,6 +40,7 @@ copied object (typically, a Spark DataFrame).
 \code{sdf_copy_to} for a custom object type can accomplish this by
 implementing the associated method on \code{sdf_import}.
 }
+
 \examples{
 
 sc <- spark_connect(master = "spark://HOST:PORT")
@@ -50,4 +52,3 @@ Other Spark data frames: \code{\link{sdf_partition}},
   \code{\link{sdf_predict}}, \code{\link{sdf_register}},
   \code{\link{sdf_sample}}, \code{\link{sdf_sort}}
 }
-

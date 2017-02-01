@@ -4,7 +4,8 @@
 \alias{ft_one_hot_encoder}
 \title{Feature Transformation -- OneHotEncoder}
 \usage{
-ft_one_hot_encoder(x, input.col = NULL, output.col = NULL, ...)
+ft_one_hot_encoder(x, input.col = NULL, output.col = NULL,
+  drop.last = TRUE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -12,6 +13,8 @@ ft_one_hot_encoder(x, input.col = NULL, output.col = NULL, ...)
 \item{input.col}{The name of the input column(s).}
 
 \item{output.col}{The name of the output column.}
+
+\item{drop.last}{Boolean; drop the last category?}
 
 \item{...}{Optional arguments; currently unused.}
 }
@@ -40,4 +43,3 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }
-

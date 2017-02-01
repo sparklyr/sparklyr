@@ -23,4 +23,3 @@ precision in the computed quantiles.}
 Given a numeric column within a Spark DataFrame, compute
 approximate quantiles (to some relative error).
 }
-

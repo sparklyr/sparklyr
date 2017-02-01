@@ -20,4 +20,3 @@ Read Spark Configuration
 \details{
 Read Spark configuration using the \pkg{\link[config]{config}} package.
 }
-

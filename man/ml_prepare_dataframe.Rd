@@ -78,4 +78,3 @@ model <- lr \%>\%
   invoke("setLabelCol", envir$response)
 }
 }
-

@@ -64,4 +64,3 @@ Other Spark ML routines: \code{\link{ml_als_factorization}},
   \code{\link{ml_random_forest}},
   \code{\link{ml_survival_regression}}
 }
-

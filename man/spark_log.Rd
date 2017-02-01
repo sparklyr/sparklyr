@@ -21,4 +21,3 @@ View the most recent entries in the Spark log. This can be useful when
 inspecting output / errors produced by Spark during the invocation of
 various commands.
 }
-

@@ -38,4 +38,3 @@ be used for compilation.
 Most Spark extensions won't need to define their own compilation specification,
 and can instead rely on the default behavior of \code{compile_package_jars}.
 }
-

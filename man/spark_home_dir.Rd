@@ -20,4 +20,3 @@ Find the SPARK_HOME directory for a given version of Spark that
 was previously installed using \code{\link{spark_install}}.
 }
 \keyword{internal}
-

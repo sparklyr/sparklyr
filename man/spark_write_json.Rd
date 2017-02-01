@@ -29,4 +29,3 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_parquet}}
 }
-

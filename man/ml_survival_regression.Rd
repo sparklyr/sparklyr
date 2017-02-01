@@ -54,4 +54,3 @@ Other Spark ML routines: \code{\link{ml_als_factorization}},
   \code{\link{ml_one_vs_rest}}, \code{\link{ml_pca}},
   \code{\link{ml_random_forest}}
 }
-
