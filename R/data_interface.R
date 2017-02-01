@@ -303,11 +303,11 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
   }
 }
 
-spark_data_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
+spark_data_read_generic <- function(sc, path, fileMethod, readOptions = list()) {
   options <- invoke(hive_context(sc), "read")
 
-  lapply(names(csvOptions), function(csvOptionName) {
-    options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+  lapply(names(readOptions), function(optionName) {
+    options <<- invoke(options, "option", optionName, readOptions[[optionName]])
   })
 
   invoke(options, fileMethod, path)
@@ -338,9 +338,9 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
   invisible(TRUE)
 }
 
-#' Load a Spark Table into a Spark DataFrame.
+#' Reads from a Spark Table into a Spark DataFrame.
 #'
-#' Load a Spark Table into a Spark DataFrame.
+#' Reads from a Spark Table into a Spark DataFrame.
 #'
 #' @inheritParams spark_read_csv
 #' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
@@ -348,7 +348,7 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
 #' @family Spark serialization routines
 #'
 #' @export
-spark_load_table <- function(sc,
+spark_read_table <- function(sc,
                              name,
                              path,
                              options = list(),
@@ -363,6 +363,49 @@ spark_load_table <- function(sc,
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
+#' Reads from a Spark Table into a Spark DataFrame.
+#'
+#' Reads from a Spark Table into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_load_table <- function(sc,
+                             name,
+                             path,
+                             options = list(),
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE) {
+  .Deprecated("spark_read_table")
+  spark_read_table(
+    sc,
+    name,
+    path,
+    options,
+    repartition,
+    memory,
+    overwrite
+  )
+}
+
+#' Writes a Spark DataFrame into a Spark table
+#'
+#' Writes a Spark DataFrame into a Spark table.
+#'
+#' @inheritParams spark_write_csv
+#' @param mode Specifies the behavior when data or table already exists.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_write_table <- function(x, path, mode = NULL, options = list()) {
+  UseMethod("spark_write_table")
+}
+
 #' Saves a Spark DataFrame as a Spark table
 #'
 #' Saves a Spark DataFrame and as a Spark table.
@@ -374,11 +417,12 @@ spark_load_table <- function(sc,
 #'
 #' @export
 spark_save_table <- function(x, path, mode = NULL, options = list()) {
-  UseMethod("spark_save_table")
+  .Deprecated("spark_write_table")
+  spark_write_table(x, path, mode, options)
 }
 
 #' @export
-spark_save_table.tbl_spark <- function(x, path, mode = NULL, options = list()) {
+spark_write_table.tbl_spark <- function(x, path, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   sc <- spark_connection(x)
 
@@ -387,10 +431,33 @@ spark_save_table.tbl_spark <- function(x, path, mode = NULL, options = list()) {
 }
 
 #' @export
-spark_save_table.spark_jobj <- function(x, path, mode = NULL, options = list()) {
+spark_write_table.spark_jobj <- function(x, path, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   sc <- spark_connection(x)
 
   operation <- if (spark_version(sc) < "2.0.0") "save" else "saveAsTable"
   spark_data_write_generic(x, spark_normalize_path(path), operation, mode, options)
+}
+
+#' Read from JDBC connection into a Spark DataFrame.
+#'
+#' Read from JDBC connection into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_jdbc <- function(sc,
+                             name,
+                             options = list(),
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE) {
+
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+
+  df <- spark_data_read_generic(sc, "jdbc", "format", options) %>% invoke("load")
+  spark_partition_register_df(sc, df, name, repartition, memory)
 }

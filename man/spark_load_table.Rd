@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_interface.R
 \name{spark_load_table}
 \alias{spark_load_table}
-\title{Load a Spark Table into a Spark DataFrame.}
+\title{Reads from a Spark Table into a Spark DataFrame.}
 \usage{
 spark_load_table(sc, name, path, options = list(), repartition = 0,
   memory = TRUE, overwrite = TRUE)
@@ -27,14 +27,17 @@ is, should the table be cached?)}
 already exists?}
 }
 \description{
-Load a Spark Table into a Spark DataFrame.
+Reads from a Spark Table into a Spark DataFrame.
 }
 \seealso{
 Other Spark serialization routines: \code{\link{spark_read_csv}},
+  \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_json}},
   \code{\link{spark_read_parquet}},
+  \code{\link{spark_read_table}},
   \code{\link{spark_save_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_json}},
-  \code{\link{spark_write_parquet}}
+  \code{\link{spark_write_parquet}},
+  \code{\link{spark_write_table}}
 }
