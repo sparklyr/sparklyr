@@ -1,41 +1,48 @@
 rsApiUpdateDialog <- function(code) {
-  if (exists(".rs.updateNewConnectionDialog")) {
-    updateDialog <- get(".rs.updateNewConnectionDialog")
-    updateDialog(code)
+  if (exists(".rs.api.updateDialog")) {
+    updateDialog <- get(".rs.api.updateDialog")
+    updateDialog(code = code)
   }
 }
 
 rsApiShowDialog <- function(title, message, url = "") {
-  if (exists(".rs.showDialog")) {
-    showDialog <- get(".rs.showDialog")
+  if (exists(".rs.api.showDialog")) {
+    showDialog <- get(".rs.api.showDialog")
     showDialog(title, message, url)
   }
 }
 
 rsApiShowPrompt <- function(title, message, default) {
-  if (exists(".rs.showPrompt")) {
-    showPrompt <- get(".rs.showPrompt")
+  if (exists(".rs.api.showPrompt")) {
+    showPrompt <- get(".rs.api.showPrompt")
     showPrompt(title, message, default)
   }
 }
 
 rsApiShowQuestion <- function(title, message, ok, cancel) {
-  if (exists(".rs.showQuestion")) {
-    showPrompt <- get(".rs.showQuestion")
+  if (exists(".rs.api.showQuestion")) {
+    showPrompt <- get(".rs.api.showQuestion")
     showPrompt(title, message, ok, cancel)
   }
 }
 
 rsApiReadPreference <- function(name, default) {
-  value <- .rs.readUiPref(name)
-  if (is.null(value)) default else value
+  if (exists(".rs.api.readPreference")) {
+    readPreference <- get(".rs.api.readPreference")
+    value <- readPreference(name)
+    if (is.null(value)) default else value
+  }
 }
 
 rsApiWritePreference <- function(name, value) {
   if (!is.character(value)) {
     stop("Only character preferences are supported")
   }
-  .rs.writeUiPref(name, value)
+
+  if (exists(".rs.api.writePreference")) {
+    writePreference <- get(".rs.api.writePreference")
+    writePreference(name, value)
+  }
 }
 
 spark_ui_avaliable_versions <- function() {
