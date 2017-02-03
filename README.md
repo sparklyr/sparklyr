@@ -313,16 +313,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/01/25 20:48:03 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpthEPts/file6f164cd21142.csv MapPartitionsRDD[363] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 17/01/25 20:48:03 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
-    ## 17/01/25 20:48:03 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
-    ## 17/01/25 20:48:03 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
-    ## 17/01/25 20:48:03 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpthEPts/file6f164cd21142.csv:0+33313106
-    ## 17/01/25 20:48:03 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
-    ## 17/01/25 20:48:03 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 109 ms on localhost (1/1)
-    ## 17/01/25 20:48:03 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
-    ## 17/01/25 20:48:03 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.109 s
-    ## 17/01/25 20:48:03 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.111736 s
+    ## 17/02/03 15:34:17 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpZqMbDE/file8f2b280ac4e5.csv MapPartitionsRDD[363] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 17/02/03 15:34:17 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
+    ## 17/02/03 15:34:17 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
+    ## 17/02/03 15:34:17 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
+    ## 17/02/03 15:34:17 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpZqMbDE/file8f2b280ac4e5.csv:0+33313106
+    ## 17/02/03 15:34:17 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
+    ## 17/02/03 15:34:17 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 116 ms on localhost (1/1)
+    ## 17/02/03 15:34:17 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.117 s
+    ## 17/02/03 15:34:17 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
+    ## 17/02/03 15:34:17 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.119612 s
 
 Finally, we disconnect from Spark:
 
@@ -352,6 +352,74 @@ The Spark DataFrame preview uses the standard RStudio data viewer:
 <img src="README_files/images/spark-dataview.png" class="screenshot" width=639 height=446/>
 
 The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
+
+Using H2O
+---------
+
+[rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN package from [H2O](http://h2o.ai) that extends [sparklyr](http://spark.rstudio.com) to provide an interface into [Sparkling Water](https://github.com/h2oai/sparkling-water). For instance, the following example installs, configures and runs [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
+
+``` r
+options(rsparkling.sparklingwater.version = "1.6.8")
+
+library(rsparkling)
+library(sparklyr)
+library(dplyr)
+library(h2o)
+
+sc <- spark_connect(master = "local", version = "1.6.2")
+mtcars_tbl <- copy_to(sc, mtcars, "mtcars")
+
+mtcars_h2o <- as_h2o_frame(sc, mtcars_tbl, strict_version_check = FALSE)
+
+mtcars_glm <- h2o.glm(x = c("wt", "cyl"), 
+                      y = "mpg",
+                      training_frame = mtcars_h2o,
+                      lambda_search = TRUE)
+```
+
+``` r
+mtcars_glm
+```
+
+    ## Model Details:
+    ## ==============
+    ## 
+    ## H2ORegressionModel: glm
+    ## Model ID:  GLM_model_R_1486164877174_1 
+    ## GLM Model: summary
+    ##     family     link                              regularization
+    ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
+    ##                                                                lambda_search
+    ## 1 nlambda = 100, lambda.max = 10.132, lambda.min = 0.1013, lambda.1se = -1.0
+    ##   number_of_predictors_total number_of_active_predictors
+    ## 1                          2                           2
+    ##   number_of_iterations training_frame
+    ## 1                    0   frame_rdd_33
+    ## 
+    ## Coefficients: glm coefficients
+    ##       names coefficients standardized_coefficients
+    ## 1 Intercept    38.941654                 20.090625
+    ## 2       cyl    -1.468783                 -2.623132
+    ## 3        wt    -3.034558                 -2.969186
+    ## 
+    ## H2ORegressionMetrics: glm
+    ## ** Reported on training data. **
+    ## 
+    ## MSE:  6.017684
+    ## RMSE:  2.453097
+    ## MAE:  1.940985
+    ## RMSLE:  0.1114801
+    ## Mean Residual Deviance :  6.017684
+    ## R^2 :  0.8289895
+    ## Null Deviance :1126.047
+    ## Null D.o.F. :31
+    ## Residual Deviance :192.5659
+    ## Residual D.o.F. :29
+    ## AIC :156.2425
+
+``` r
+spark_disconnect(sc)
+```
 
 Connecting through Livy
 -----------------------
