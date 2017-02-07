@@ -73,3 +73,16 @@ tbl_uncache <- function(sc, name) {
 
   invisible(NULL)
 }
+
+#' Use specific database
+#'
+#' @param sc A \code{spark_connection}.
+#' @param name The database name.
+#'
+#' @export
+use_db <- function(sc, name) {
+  sql <- paste("USE ", tbl_quote_name(name))
+  invoke(hive_context(sc), "sql", sql)
+
+  invisible(NULL)
+}
