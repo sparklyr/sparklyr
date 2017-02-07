@@ -1,5 +1,7 @@
 tbl_quote_name <- function(name) {
-  x <- gsub("`", "``", name, fixed = TRUE)
+  name <- gsub("`", "``", name, fixed = TRUE)
+  splitted_name <- strsplit(name, "\\.")[[1]]
+  name <- paste(splitted_name, collapse = "`.`")
   paste("`", name, "`", sep = "")
 }
 
