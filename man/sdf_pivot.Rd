@@ -15,9 +15,10 @@ The left-hand side of the formula indicates which variables are used for groupin
 and the right-hand side indicates which variable is used for pivoting. Currently,
 only a single pivot column is supported.}
 
-\item{fun.aggregate}{How should the grouped dataset be aggregated? Can be either
+\item{fun.aggregate}{How should the grouped dataset be aggregated? Can be
 a length-one character vector, giving the name of a Spark aggregation function
-to be called, or an \R function that is invoked on the grouped dataset.}
+to be called; a named \R list mapping column names to an aggregation method,
+or an \R function that is invoked on the grouped dataset.}
 }
 \description{
 Construct a pivot table over a Spark Dataframe, using a syntax similar to

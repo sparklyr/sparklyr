@@ -50,3 +50,21 @@ test_that("we can pivot with an R function for aggregation", {
   expect_equal(unname(s), unname(r))
 
 })
+
+test_that("we can pivot with an R list", {
+  test_requires("dplyr")
+
+  s <- mtcars_tbl %>%
+    sdf_pivot(cyl ~ am, list(mpg = "avg")) %>%
+    arrange(cyl) %>%
+    collect() %>%
+    as.list()
+
+  r <- mtcars %>%
+    reshape2::dcast(cyl ~ am, mean, value.var = "mpg") %>%
+    arrange(cyl) %>%
+    as.list()
+
+  expect_equal(unname(s), unname(r))
+
+})
