@@ -121,6 +121,17 @@ livy_install <- function(version       = "0.3.0",
   if (!file.exists(livy_path))
     stopf("failed to move '%s' to '%s'", folder_name, basename(livy_path))
 
+  livyStart <- file.path(livy_path, "bin/livy-server")
+  livyLogs <- file.path(livy_path, "logs")
+
+  if (!dir.exists(livyLogs)) {
+    dir.create(livyLogs)
+  }
+
+  if (.Platform$OS.type == "unix") {
+    system2("chmod", c("744", livyStart))
+  }
+
   # return installation path on success
   if (interactive())
     message("* livy ", version, " installed successfully!")
