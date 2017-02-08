@@ -463,6 +463,12 @@ livy_invoke_statement <- function(sc, statement) {
 livy_invoke_statement_fetch <- function(sc, static, jobj, method, ...) {
   statement <- livy_statement_compose(sc, static, jobj, method, ...)
 
+  # Note: Spark 2.0 requires magic to be present in the statement with the definition.
+  statement$code <- paste(
+    statement$code,
+    livy_statement_compose_magic(statement$lobj, "json")$code,
+    sep = "\n")
+
   result <- livy_invoke_statement(sc, statement)
 
   if (!is.character(result)) {
