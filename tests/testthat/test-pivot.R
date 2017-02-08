@@ -1,20 +1,22 @@
 context("pivot")
 
+test_requires("dplyr", "ggplot2")
+
 sc <- testthat_spark_connection()
-mtcars_tbl <- testthat_tbl("mtcars")
+diamonds_tbl <- testthat_tbl("diamonds")
 
 test_that("we can construct a simple pivot table", {
-  test_requires("dplyr")
 
-  s <- mtcars_tbl %>%
-    sdf_pivot(cyl ~ am) %>%
-    arrange(cyl) %>%
+  s <- diamonds_tbl %>%
+    sdf_pivot(cut ~ color) %>%
+    arrange(cut) %>%
     collect() %>%
     as.list()
 
-  r <- mtcars %>%
-    reshape2::dcast(cyl ~ am) %>%
-    arrange(cyl) %>%
+  r <- diamonds %>%
+    mutate(cut = as.character(cut), color = as.character(color)) %>%
+    reshape2::dcast(cut ~ color) %>%
+    arrange(cut) %>%
     as.list()
 
   expect_equal(unname(s), unname(r))
@@ -30,21 +32,22 @@ test_that("we can pivot with an R function for aggregation", {
       sc,
       "org.apache.spark.sql.functions",
       "expr",
-      "avg(mpg)"
+      "avg(depth)"
     )
 
     gdf %>% invoke("agg", expr, list())
   }
 
-  s <- mtcars_tbl %>%
-    sdf_pivot(cyl ~ am, fun.aggregate = fun.aggregate) %>%
-    arrange(cyl) %>%
+  s <- diamonds_tbl %>%
+    sdf_pivot(cut ~ color, fun.aggregate = fun.aggregate) %>%
+    arrange(cut) %>%
     collect() %>%
     as.list()
 
-  r <- mtcars %>%
-    reshape2::dcast(cyl ~ am, fun.aggregate = mean, value.var = "mpg") %>%
-    arrange(cyl) %>%
+  r <- diamonds %>%
+    mutate(cut = as.character(cut), color = as.character(color)) %>%
+    reshape2::dcast(cut ~ color, fun.aggregate = mean, value.var = "depth") %>%
+    arrange(cut) %>%
     as.list()
 
   expect_equal(unname(s), unname(r))
@@ -54,15 +57,16 @@ test_that("we can pivot with an R function for aggregation", {
 test_that("we can pivot with an R list", {
   test_requires("dplyr")
 
-  s <- mtcars_tbl %>%
-    sdf_pivot(cyl ~ am, list(mpg = "avg")) %>%
-    arrange(cyl) %>%
+  s <- diamonds_tbl %>%
+    sdf_pivot(cut ~ color, list(depth = "avg")) %>%
+    arrange(cut) %>%
     collect() %>%
     as.list()
 
-  r <- mtcars %>%
-    reshape2::dcast(cyl ~ am, mean, value.var = "mpg") %>%
-    arrange(cyl) %>%
+  r <- diamonds %>%
+    mutate(cut = as.character(cut), color = as.character(color)) %>%
+    reshape2::dcast(cut ~ color, mean, value.var = "depth") %>%
+    arrange(cut) %>%
     as.list()
 
   expect_equal(unname(s), unname(r))
