@@ -275,3 +275,7 @@ sparklyr_boolean_option <- function(...) {
 sparklyr_verbose <- function(...) {
   sparklyr_boolean_option(..., "sparklyr.verbose")
 }
+
+trim_whitespace <- function(strings) {
+  gsub("^[[:space:]]*|[[:space:]]*$", "", strings)
+}

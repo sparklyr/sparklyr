@@ -114,3 +114,63 @@ sdf_split <- function(object,
   invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
 }
 
+#' Pivot a Spark DataFrame
+#'
+#' Construct a pivot table over a Spark Dataframe, using a syntax similar to
+#' that from \code{reshape2::dcast}.
+#'
+#' @template roxlate-ml-x
+#' @param formula A two-sided \R formula of the form \code{x_1 + x_2 + ... ~ y_1}.
+#'   The left-hand side of the formula indicates which variables are used for grouping,
+#'   and the right-hand side indicates which variable is used for pivoting. Currently,
+#'   only a single pivot column is supported.
+#' @param fun.aggregate How should the grouped dataset be aggregated? Can be either
+#'   a length-one character vector, giving the name of a Spark aggregation function
+#'   to be called, or an \R function that is invoked on the grouped dataset.
+#' @export
+sdf_pivot <- function(x, formula, fun.aggregate = "count") {
+  sdf <- spark_dataframe(x)
+
+  # parse formulas of form "abc + def ~ ghi + jkl"
+  deparsed <- paste(deparse(formula), collapse = " ")
+  splat <- strsplit(deparsed, "~", fixed = TRUE)[[1]]
+  if (length(splat) != 2)
+    stop("expected a two-sided formula; got '", deparsed, "'")
+
+  grouped_cols <- trim_whitespace(strsplit(splat[[1]], "[+*]")[[1]])
+  pivot_cols <- trim_whitespace(strsplit(splat[[2]], "[+*]", fixed = TRUE)[[1]])
+
+  # ensure no duplication of variables on each side
+  intersection <- intersect(grouped_cols, pivot_cols)
+  if (length(intersection))
+    stop("variables on both sides of forumla: ", paste(deparse(intersection), collapse = " "))
+
+  # ensure variables exist in dataset
+  nm <- as.character(invoke(sdf, "columns"))
+  all_cols <- c(grouped_cols, pivot_cols)
+  missing_cols <- setdiff(all_cols, nm)
+  if (length(missing_cols))
+    stop("missing variables in dataset: ", paste(deparse(missing_cols), collapse = " "))
+
+  # ensure pivot is length one (for now)
+  if (length(pivot_cols) != 1)
+    stop("pivot column is not length one")
+
+  # generate pivoted dataset
+  grouped <- sdf %>%
+    invoke("groupBy", grouped_cols[[1]], as.list(grouped_cols[-1])) %>%
+    invoke("pivot", pivot_cols[[1]])
+
+  # perform aggregation
+  fun.aggregate <- fun.aggregate %||% "count"
+  result <- if (is.function(fun.aggregate)) {
+    fun.aggregate(grouped)
+  } else if (is.character(fun.aggregate)) {
+    if (length(fun.aggregate) == 1)
+      invoke(grouped, fun.aggregate[[1]])
+    else
+      invoke(grouped, fun.aggregate[[1]], as.list(fun.aggregate[-1]))
+  }
+
+  sdf_register(result)
+}

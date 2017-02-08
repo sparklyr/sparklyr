@@ -1,26 +1,35 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
-- Support collecting NullType as NA instead of list of NAs columns.
+- Added `sdf_pivot()`. This function provides a mechanism for constructing
+  pivot tables, using Spark's 'groupBy' + 'pivot' functionality, with a
+  formula interface similar to that of `reshape2::dcast()`.
+
+- Spark Null objects (objects of class NullType) discovered within numeric
+  vectors are now collected as NAs, rather than lists of NAs.
 
 - Fixed warning while connecting with livy and improved 401 message.
 
-- Fixed issue in spark_read_parquet and other read methods in which
-  spark_normalize_path would not work in some platforms while loading
+- Fixed issue in `spark_read_parquet()` and other read methods in which
+  `spark_normalize_path()` would not work in some platforms while loading
   data using custom protocols like s3n:// for Amazon S3.
 
-- Implemented ft_count_vectorizer to be able to use ml_lda with ease.
+- Added `ft_count_vectorizer()` -- this function can be used to transform
+  columns of a Spark DataFrame so that they might be used as input to `ml_lda()`.
+  This should make it easier to invoke `ml_lda()` on Spark data sets.
 
-- Added support for the sparklyr.ui.connections option which adds additional
+- Added support for the `sparklyr.ui.connections` option, which adds additional
   connection options into the new connections dialog. The
-  rstudio.spark.connections option is now deprecated.
+  `rstudio.spark.connections` option is now deprecated.
 
-- Implemented the "new connection dialog" as a shiny app to be able to
+- Implemented the "new connection dialog" as a Shiny application to be able to
   support newer versions of RStudio that deprecate current connections ui.
 
-- Improved performance of sample_n and sample_frac by using TABLESAMPLE query.
+- Improved performance of `sample_n()` and `sample_frac()` by using TABLESAMPLE
+  query.
 
-- Resolved issue in spark_save/load_table to support saving/loading data and
-  added path parameter in spark_load_table for consistency with other functions.
+- Resolved issue in `spark_save()` / `load_table()` to support saving / loading
+  data and added path parameter in `spark_load_table()` for consistency with
+  other functions.
 
 # Sparklyr 0.5.0
 
