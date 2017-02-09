@@ -1,5 +1,7 @@
 tbl_quote_name <- function(name) {
-  x <- gsub("`", "``", name, fixed = TRUE)
+  name <- gsub("`", "``", name, fixed = TRUE)
+  splitted_name <- strsplit(name, "\\.")[[1]]
+  name <- paste(splitted_name, collapse = "`.`")
   paste("`", name, "`", sep = "")
 }
 
@@ -67,6 +69,19 @@ tbl_cache <- function(sc, name, force = TRUE) {
 #' @export
 tbl_uncache <- function(sc, name) {
   sql <- paste("UNCACHE TABLE", tbl_quote_name(name))
+  invoke(hive_context(sc), "sql", sql)
+
+  invisible(NULL)
+}
+
+#' Use specific database
+#'
+#' @param sc A \code{spark_connection}.
+#' @param name The database name.
+#'
+#' @export
+tbl_change_db <- function(sc, name) {
+  sql <- paste("USE ", tbl_quote_name(name))
   invoke(hive_context(sc), "sql", sql)
 
   invisible(NULL)
