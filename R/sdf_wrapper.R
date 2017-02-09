@@ -44,6 +44,7 @@ sdf_schema <- function(x) {
 }
 
 sdf_deserialize_column <- function(column) {
+
   if (is.character(column)) {
     splat <- strsplit(column, "\n", fixed = TRUE)[[1]]
     splat[splat == "<NA>"] <- NA
@@ -99,10 +100,33 @@ sdf_collect <- function(object) {
     do.call(c, pieces)
   }
 
+  # deserialize columns as needed (string columns will enter as
+  # a single newline-delimited string)
   transformed <- lapply(collected, sdf_deserialize_column)
+
+  # fix an issue where sometimes columns in a Spark DataFrame are empty
+  # in such a case, we fill those with NAs of the same type (#477)
+  n <- vapply(transformed, length, numeric(1))
+  rows <- max(n)
+  fixed <- lapply(transformed, function(column) {
+    if (length(column) == 0) {
+      converter <- switch(
+        typeof(column),
+        character = as.character,
+        logical   = as.logical,
+        integer   = as.integer,
+        double    = as.double,
+        identity
+      )
+      return(converter(rep(NA, rows)))
+    }
+    column
+  })
+
+  # set column names and return dataframe
   colNames <- invoke(sdf, "columns")
-  names(transformed) <- as.character(colNames)
-  dplyr::as_data_frame(transformed, stringsAsFactors = FALSE, optional = TRUE)
+  names(fixed) <- as.character(colNames)
+  dplyr::as_data_frame(fixed, stringsAsFactors = FALSE, optional = TRUE)
 }
 
 # Split a Spark DataFrame
