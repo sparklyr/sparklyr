@@ -80,7 +80,7 @@ tbl_uncache <- function(sc, name) {
 #' @param name The database name.
 #'
 #' @export
-use_db <- function(sc, name) {
+tbl_change_db <- function(sc, name) {
   sql <- paste("USE ", tbl_quote_name(name))
   invoke(hive_context(sc), "sql", sql)
 
