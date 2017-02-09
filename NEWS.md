@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added `tbl_change_tb()`. This function changes current database.
+
 - Added `sdf_pivot()`. This function provides a mechanism for constructing
   pivot tables, using Spark's 'groupBy' + 'pivot' functionality, with a
   formula interface similar to that of `reshape2::dcast()`.
@@ -13,7 +15,7 @@
   `spark_normalize_path()` would not work in some platforms while loading
   data using custom protocols like s3n:// for Amazon S3.
 
-- Added `ft_count_vectorizer()` -- this function can be used to transform
+- Added `ft_count_vectorizer()`. This function can be used to transform
   columns of a Spark DataFrame so that they might be used as input to `ml_lda()`.
   This should make it easier to invoke `ml_lda()` on Spark data sets.
 
