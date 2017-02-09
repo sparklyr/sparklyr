@@ -32,17 +32,19 @@ livy_validate_http_response <- function(message, req) {
 #' define the basic authentication settings for a Livy session.
 #'
 #' @return Named list with configuration data
-livy_config <- function(config = spark_config(), username, password) {
-  secret <- base64_enc(paste(username, password, sep = ":"))
+livy_config <- function(config = spark_config(), username = NULL, password = NULL) {
+  if (!is.null(username) || !is.null(password)) {
+    secret <- base64_enc(paste(username, password, sep = ":"))
 
-  config[["sparklyr.livy.headers"]] <- c(
-    config[["sparklyr.livy.headers"]], list(
-      Authorization = paste(
-        "Basic",
-        base64_enc(paste(username, password, sep = ":"))
+    config[["sparklyr.livy.headers"]] <- c(
+      config[["sparklyr.livy.headers"]], list(
+        Authorization = paste(
+          "Basic",
+          base64_enc(paste(username, password, sep = ":"))
+        )
       )
     )
-  )
+  }
 
   config
 }
