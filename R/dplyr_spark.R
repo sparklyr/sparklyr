@@ -60,19 +60,6 @@ src_tbls.spark_connection <- function(x, ...) {
   sort(filtered)
 }
 
-#' Show database list
-#'
-#' @param x A \code{spark_connection}.
-#' @param ... Optional arguments; currently unused.
-#'
-#' @export
-src_databases.spark_connection <- function(x, ...) {
-  sql <- hive_context(x)
-  dbs <- invoke(sql, "sql", "SHOW DATABASES")
-  databaseNames <- sdf_read_column(dbs, "databaseName")
-  sort(databaseNames)
-}
-
 #' @export
 db_data_type.src_spark <- function(...) {
 }
