@@ -234,7 +234,7 @@ Spark machine learning supports a wide array of algorithms and feature transform
 Reading and Writing Data
 ------------------------
 
-You can read and write data in CSV, JSON, and Parquet formats. Data can be stored in HDFS, S3, or on the lcoal filesystem of cluster nodes.
+You can read and write data in CSV, JSON, and Parquet formats. Data can be stored in HDFS, S3, or on the local filesystem of cluster nodes.
 
 ``` r
 temp_csv <- tempfile(fileext = ".csv")
