@@ -355,13 +355,13 @@ connection_spark_server <- function(input, output, session) {
         updateSelectInput(
           session,
           "master",
-          choices = masterChoices,
-          selected = c(
+          choices = c(
             list(master = "master"),
             master,
             spark_ui_default_connections(),
             list("Cluster..." = "cluster")
-          )
+          ),
+          selected = master
         )
       }
     }
