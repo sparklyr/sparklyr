@@ -4,7 +4,7 @@
 \alias{livy_config}
 \title{Create a Spark Configuration for Livy}
 \usage{
-livy_config(config = spark_config(), username, password)
+livy_config(config = spark_config(), username = NULL, password = NULL)
 }
 \arguments{
 \item{config}{Optional base configuration}
