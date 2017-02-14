@@ -238,4 +238,34 @@ object Utils {
   def classExists(name: String): Boolean = {
     scala.util.Try(Class.forName(name)).isSuccess
   }
+
+  def createDataFrameFromCsv(
+    sc: SparkContext,
+    path: String,
+    columns: Array[String],
+    partitions: Int,
+    separator: String): RDD[Row] = {
+
+    val lines = scala.io.Source.fromFile(path).getLines.toIndexedSeq
+    val rddRows: RDD[String] = sc.parallelize(lines, partitions);
+
+    val data: RDD[Row] = rddRows.map(o => {
+      val r = o.split(separator, -1)
+      var typed = (Array.range(0, r.length)).map(idx => {
+        val column = columns(idx)
+        val value = r(idx)
+
+        column match {
+          case "integer"  => if (Try(value.toInt).isSuccess) value.toInt else null.asInstanceOf[Int]
+          case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
+          case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
+          case _ => value
+        }
+      })
+
+      org.apache.spark.sql.Row.fromSeq(typed)
+    })
+
+    data
+  }
 }

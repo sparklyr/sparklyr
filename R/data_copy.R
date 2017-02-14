@@ -99,6 +99,52 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
   invoke(hive_context(sc), "createDataFrame", rdd, structType)
 }
 
+spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
+  structType <- spark_data_build_types(sc, columns)
+
+  # Map date and time columns as standard doubles
+  df <- as.data.frame(lapply(df, function(e) {
+    if (inherits(e, "POSIXt") || inherits(e, "Date"))
+      sapply(e, function(t) {
+        class(t) <- NULL
+        t
+      })
+    else
+      e
+  }), optional = TRUE)
+
+  splitSeparator <- if (inherits(sc, "livy_connection"))
+    list(scala = "\\|~\\|", r = "|~|")
+  else
+    list(scala = "\31", r = "\31")
+
+  # generate a CSV file from the associated data frame
+  # note that these files need to live for the R session
+  # duration so we don't clean these up eagerly
+  # write file based on hash to avoid writing too many files
+  # on repeated import calls
+  hash <- digest::digest(df, algo = "sha256")
+  filename <- paste("spark_serialize_", hash, ".csv", sep = "")
+  tempfile <- file.path(tempdir(), filename)
+
+  if (!file.exists(tempfile)) {
+    write.table(df, tempfile, sep = splitSeparator$r, col.names = FALSE, row.names = FALSE, quote = FALSE)
+  }
+
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "createDataFrameFromCsv",
+    spark_context(sc),
+    tempfile,
+    columns,
+    as.integer(if (repartition <= 0) 1 else repartition),
+    splitSeparator$scala
+  )
+
+  invoke(hive_context(sc), "createDataFrame", rdd, structType)
+}
+
 spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
@@ -112,7 +158,9 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
   serializer <- ifelse(is.null(serializer),
                        ifelse(spark_connection_is_local(sc) && csv_exists,
                               "csv_file",
-                              "csv_string"),
+                              ifelse(spark_connection_is_yarn_client(sc),
+                                     "csv_file_scala",
+                                     "csv_string")),
                        serializer)
 
   # Spark unfortunately has a number of issues with '.'s in column names, e.g.
@@ -135,7 +183,8 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
   serializers <- list(
     "csv_file" = spark_serialize_csv_file,
     "typed_list" = spark_serialize_typed_list,
-    "csv_string" = spark_serialize_csv_string
+    "csv_string" = spark_serialize_csv_string,
+    "csv_file_scala" = spark_serialize_csv_scala
   )
 
   df <- serializers[[serializer]](sc, df, columns, repartition)

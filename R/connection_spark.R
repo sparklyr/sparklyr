@@ -283,6 +283,14 @@ spark_master_is_local <- function(master) {
   grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
 }
 
+spark_connection_is_yarn_client <- function(sc) {
+  spark_master_is_yarn_client(sc$master)
+}
+
+spark_master_is_yarn_client <- function(master) {
+  grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE)
+}
+
 # Number of cores available in the local install
 spark_connection_local_cores <- function(sc) {
   spark_config_value(sc$config, "sparklyr.cores")

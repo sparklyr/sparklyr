@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Improved `copy_to`, `sdf_copy_to` and `dbWriteTable` performance under
+  `yarn-client` mode.
+
 - Added `tbl_change_tb()`. This function changes current database.
 
 - Added `sdf_pivot()`. This function provides a mechanism for constructing
