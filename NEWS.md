@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added support to specify a vector of column names in `spark_read_csv` to
+  specify column names without having to set the type of each column.
+
 - Improved `copy_to`, `sdf_copy_to` and `dbWriteTable` performance under
   `yarn-client` mode.
 

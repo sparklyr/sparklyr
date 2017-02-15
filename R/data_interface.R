@@ -32,7 +32,7 @@ spark_csv_options <- function(header,
 #'   is, should the table be cached?)
 #' @param header Boolean; should the first row of data be used as a header?
 #'   Defaults to \code{TRUE}.
-#' @param columns A named vector specifying column types.
+#' @param columns A vector of column names or a named vector of column types.
 #' @param infer_schema Boolean; should column types be automatically inferred?
 #'   Requires one extra pass over the data. Defaults to \code{TRUE}.
 #' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
@@ -74,21 +74,31 @@ spark_read_csv <- function(sc,
                            repartition = 0,
                            memory = TRUE,
                            overwrite = TRUE) {
-
-  if (!identical(columns, NULL) & isTRUE(infer_schema)) {
-    stop("'infer_schema' must be set to FALSE when 'columns' is specified")
+  columnsHaveTypes <- length(names(columns)) > 0
+  if (!identical(columns, NULL) & isTRUE(infer_schema) & columnsHaveTypes) {
+    stop("'infer_schema' must be set to FALSE when 'columns' specifies column types")
   }
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   options <- spark_csv_options(header, infer_schema, delimiter, quote, escape, charset, null_value, options)
-  df <- spark_csv_read(sc, spark_normalize_path(path), options, columns)
+  df <- spark_csv_read(
+    sc,
+    spark_normalize_path(path),
+    options,
+    if (columnsHaveTypes) columns else NULL)
 
-  if (identical(header, FALSE) & identical(columns, NULL)) {
-    # create normalized column names when header = FALSE and a columns specification is not supplied
-    columns <- invoke(df, "columns")
-    n <- length(columns)
-    newNames <- sprintf("V%s", seq_len(n))
+  if ((identical(columns, NULL) & identical(header, FALSE)) |
+      (!identical(columns, NULL) & !columnsHaveTypes)) {
+    newNames <- if (!identical(columns, NULL)) {
+      columns
+    }
+    else {
+      # create normalized column names when header = FALSE and a columns specification is not supplied
+      columns <- invoke(df, "columns")
+      n <- length(columns)
+      sprintf("V%s", seq_len(n))
+    }
     df <- invoke(df, "toDF", as.list(newNames))
   } else {
     # sanitize column names
