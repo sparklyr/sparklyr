@@ -1,5 +1,11 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Implemented new configuration checks to proactively report connection errors
+  in Windows.
+
+- While connecting to spark from Windows,  setting the `sparklyr.verbose` option
+  to `TRUE` prints detailed configuration steps.
+
 - Added support to specify a vector of column names in `spark_read_csv` to
   specify column names without having to set the type of each column.
 
