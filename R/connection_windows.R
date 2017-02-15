@@ -117,14 +117,16 @@ prepare_windows_environment <- function(sparkHome) {
 
   verboseMessage("WINUTIL for CHMOD outputs ", output)
 
-  if (verbose) {
-    output <- system2(
-      winutils,
-      c("ls", shQuote(hivePath)),
-      stdout = TRUE)
+  output <- system2(
+    winutils,
+    c("ls", shQuote(hivePath)),
+    stdout = TRUE)
 
-    verboseMessage("WINUTIL for ls outputs ", output)
+  if (!is.null(output) && grepl("error", output)) {
+    stop(output)
   }
+
+  verboseMessage("WINUTIL for ls outputs ", output)
 }
 
 
