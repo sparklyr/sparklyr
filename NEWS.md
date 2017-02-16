@@ -1,5 +1,9 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added `src_databases`. This function list all the available databases.
+
+- Improved support in dplyr commands to handle multiple databases.
+
 - Implemented new configuration checks to proactively report connection errors
   in Windows.
 
