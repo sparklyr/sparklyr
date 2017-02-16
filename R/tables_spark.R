@@ -86,3 +86,16 @@ tbl_change_db <- function(sc, name) {
 
   invisible(NULL)
 }
+
+#' Show database list
+#'
+#' @param sc A \code{spark_connection}.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @export
+src_databases <- function(sc, ...) {
+  sql <- hive_context(sc)
+  dbs <- invoke(sql, "sql", "SHOW DATABASES")
+  databaseNames <- sdf_read_column(dbs, "databaseName")
+  sort(databaseNames)
+}
