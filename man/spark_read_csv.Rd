@@ -20,7 +20,7 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 \item{header}{Boolean; should the first row of data be used as a header?
 Defaults to \code{TRUE}.}
 
-\item{columns}{A named vector specifying column types.}
+\item{columns}{A vector of column names or a named vector of column types.}
 
 \item{infer_schema}{Boolean; should column types be automatically inferred?
 Requires one extra pass over the data. Defaults to \code{TRUE}.}
