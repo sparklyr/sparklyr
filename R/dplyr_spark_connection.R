@@ -1,6 +1,6 @@
 #' @export
 sql_escape_ident.spark_connection <- function(con, x) {
-  tbl_quote_name(x)
+  sql_quote(x, '`')
 }
 
 build_sql_if_compare <- function(..., con, compare) {
