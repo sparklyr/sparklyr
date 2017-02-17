@@ -9,14 +9,7 @@ spark_data_build_types <- function(sc, columns) {
 }
 
 spark_serialize_csv_file <- function(sc, df, columns, repartition) {
-
-  # generate a CSV file from the associated data frame
-  # note that these files need to live for the R session
-  # duration so we don't clean these up eagerly
-  # write file based on hash to avoid writing too many files
-  # on repeated import calls
-  hash <- digest::digest(df, algo = "sha256")
-  filename <- paste("spark_serialize_", hash, ".csv", sep = "")
+  filename <- paste("spark_serialize_", basename(tempfile()), ".csv", sep = "")
   tempfile <- file.path(tempdir(), filename)
 
   if (!file.exists(tempfile)) {
@@ -26,6 +19,10 @@ spark_serialize_csv_file <- function(sc, df, columns, repartition) {
   df <- spark_csv_read(sc, tempfile, csvOptions = list(
     header = "true"
   ), columns = columns)
+
+  if (file.exists(tempfile)) {
+    unlink(tempfile)
+  }
 
   if (repartition > 0) {
     df <- invoke(df, "repartition", as.integer(repartition))
@@ -118,17 +115,15 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
   else
     list(scala = "\31", r = "\31")
 
-  # generate a CSV file from the associated data frame
-  # note that these files need to live for the R session
-  # duration so we don't clean these up eagerly
-  # write file based on hash to avoid writing too many files
-  # on repeated import calls
-  hash <- digest::digest(df, algo = "sha256")
-  filename <- paste("spark_serialize_", hash, ".csv", sep = "")
+  filename <- paste("spark_serialize_", basename(tempfile()), ".csv", sep = "")
   tempfile <- file.path(tempdir(), filename)
 
   if (!file.exists(tempfile)) {
     write.table(df, tempfile, sep = splitSeparator$r, col.names = FALSE, row.names = FALSE, quote = FALSE)
+  }
+
+  if (file.exists(tempfile)) {
+    unlink(tempfile)
   }
 
   rdd <- invoke_static(
