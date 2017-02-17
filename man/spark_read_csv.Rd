@@ -20,7 +20,7 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 \item{header}{Boolean; should the first row of data be used as a header?
 Defaults to \code{TRUE}.}
 
-\item{columns}{A named vector specifying column types.}
+\item{columns}{A vector of column names or a named vector of column types.}
 
 \item{infer_schema}{Boolean; should column types be automatically inferred?
 Requires one extra pass over the data. Defaults to \code{TRUE}.}
@@ -62,10 +62,13 @@ When \code{header} is \code{FALSE}, the column names are generated with a
 }
 \seealso{
 Other Spark serialization routines: \code{\link{spark_load_table}},
+  \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_json}},
   \code{\link{spark_read_parquet}},
+  \code{\link{spark_read_table}},
   \code{\link{spark_save_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_json}},
-  \code{\link{spark_write_parquet}}
+  \code{\link{spark_write_parquet}},
+  \code{\link{spark_write_table}}
 }

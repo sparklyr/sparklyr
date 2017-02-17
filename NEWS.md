@@ -1,5 +1,12 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added `spark_read_jdbc`. This function reads from a JDBC connection
+  into a Spark DataFrame.
+
+- Renamed `spark_load_table` and `spark_save_table` into `spark_read_table`
+  and `spark_write_table` for consistency with existing `spark_read_*` and
+  `spark_write_*` functions.
+
 - Added `src_databases`. This function list all the available databases.
 
 - Improved support in dplyr commands to handle multiple databases.

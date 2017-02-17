@@ -22,9 +22,12 @@ Saves a Spark DataFrame and as a Spark table.
 \seealso{
 Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_read_csv}},
+  \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_json}},
   \code{\link{spark_read_parquet}},
+  \code{\link{spark_read_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_json}},
-  \code{\link{spark_write_parquet}}
+  \code{\link{spark_write_parquet}},
+  \code{\link{spark_write_table}}
 }
