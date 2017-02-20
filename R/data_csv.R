@@ -42,7 +42,7 @@ spark_csv_read <- function(sc,
 
   options <- spark_csv_format_if_needed(read, sc)
 
-  if (!identical(columns, NULL)) {
+  if (sparklyr_boolean_option("sparklyr.verbose") && !identical(columns, NULL)) {
     ncol_ds <- options %>%
       invoke(spark_csv_load_name(sc), path) %>%
       invoke("schema") %>%
