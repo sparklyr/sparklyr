@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Improved performance of `spark_read_csv` reading remote data when
+  `infer_schema = FALSE`.
+
 - Added `spark_read_jdbc`. This function reads from a JDBC connection
   into a Spark DataFrame.
 
