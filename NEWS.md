@@ -1,5 +1,10 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Improved performance of `spark_read_csv` when `infer_schema = FALSE` to
+  avoid checking for column lengths which might force a read over remote
+  data. This warning is still available using the `sparklyr.versbose`
+  option.
+
 - Added `spark_read_jdbc`. This function reads from a JDBC connection
   into a Spark DataFrame.
 
