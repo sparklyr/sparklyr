@@ -1,6 +1,10 @@
 #' @export
 sql_escape_ident.spark_connection <- function(con, x) {
-  sql_quote(x, '`')
+  # Assuming it might include database name like: `dbname.tableName`
+  if (length(x) == 1)
+    tbl_quote_name(x)
+  else
+    sql_quote(x, '`')
 }
 
 build_sql_if_compare <- function(..., con, compare) {

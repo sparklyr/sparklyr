@@ -1,8 +1,12 @@
 tbl_quote_name <- function(name) {
-  name <- gsub("`", "``", name, fixed = TRUE)
-  splitted_name <- strsplit(name, "\\.")[[1]]
-  name <- paste(splitted_name, collapse = "`.`")
-  paste("`", name, "`", sep = "")
+  y <- gsub("`", "``", name, fixed = TRUE)
+  y <- strsplit(y, "\\.")[[1]]
+  y <- paste(y, collapse = "`.`")
+  y <- paste("`", y, "`", sep = "")
+  y[is.na(name)] <- "NULL"
+  names(y) <- names(name)
+
+  y
 }
 
 tbl_cache_sdf <- function(sc, name, force) {
