@@ -1,0 +1,12 @@
+Package: sparkworker
+Type: Package
+Title: R Worker for Apache Spark
+Version: 0.1.0
+Author: Javier Luraschi
+Maintainer: Javier Luraschi <javier@rstudio.com>
+Description: R worker for Apache Spark using 'sparklyr', an R interface 
+    for Apache Spark, see <http://spark.rstudio.com>.
+License: Apache License 2.0
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.0

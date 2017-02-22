@@ -1,0 +1,17 @@
+---
+title: "sparkworker: R Worker for Apache Spark"
+output:
+  github_document:
+    fig_width: 9
+    fig_height: 5
+---
+
+```{r}
+library(sparkworker)
+library(sparklyr)
+
+sc <- spark_connect(master = "local", version = "2.0.1")
+spark_run(sc)
+
+spark_disconnect(sc)
+```
