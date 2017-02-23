@@ -42,7 +42,7 @@ spark_compile <- function(jar_name,
   java_path <- file.path(root, "inst/java")
   jar_path <- file.path(java_path, jar_name)
 
-  scala_path <- file.path(root, "java")
+  scala_path <- file.path(root, "inst/scala")
   scala_files <- list.files(scala_path, pattern = "scala$", full.names = TRUE)
 
   # apply user filter to scala files
