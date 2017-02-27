@@ -29,3 +29,18 @@ select_spark_query <- function(from,
     class = c("select_query", "query")
   )
 }
+
+#' @export
+mutate_.tbl_spark <- function(.data, ..., .dots) {
+  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
+
+  if (packageVersion("dplyr") > "0.5.0")
+    dots <- partial_eval(dots, op_vars(.data))
+
+  data <- .data
+  lapply(seq_along(dots), function(i) {
+    data <<- dplyr::add_op_single("mutate", data, dots = dots[i])
+  })
+
+  data
+}
