@@ -4,12 +4,6 @@ collect.spark_jobj <- function(x, ...) {
 }
 
 #' @export
-sql_build.tbl_spark <- function(op, con, ...) {
-  sql_build(op$ops, con, ...)
-}
-
-
-#' @export
 sample_n.tbl_spark <- function(tbl,
                                size,
                                replace = FALSE,
