@@ -3,11 +3,76 @@ sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
 
+df1 <- data_frame(a = 1:3, b = letters[1:3])
+df2 <- data_frame(b = letters[1:3], c = letters[24:26])
+
+df1_tbl <- testthat_tbl("df1")
+df2_tbl <- testthat_tbl("df2")
+
 test_that("the implementation of 'mutate' functions as expected", {
   test_requires("dplyr")
 
   expect_equal(
     iris %>% mutate(x = Species) %>% tbl_vars() %>% length(),
     iris_tbl %>% mutate(x = Species) %>% collect() %>% tbl_vars() %>% length()
+  )
+})
+
+test_that("the implementation of 'filter' functions as expected", {
+  test_requires("dplyr")
+
+  expect_equal(
+    iris %>%
+      filter(`Sepal.Length` == 5.1) %>%
+      filter(`Sepal.Width` == 3.5) %>%
+      filter(`Petal.Length` == 1.4) %>%
+      filter(`Petal.Width` == 0.2) %>%
+      select(`Species`),
+    iris %>%
+      filter(`Sepal.Length` == 5.1) %>%
+      filter(`Sepal.Width` == 3.5) %>%
+      filter(`Petal.Length` == 1.4) %>%
+      filter(`Petal.Width` == 0.2) %>%
+      select(`Species`)
+  )
+})
+
+test_that("'head' uses 'limit' clause", {
+  test_requires("dplyr")
+
+  expect_true(
+    grepl(
+      "LIMIT",
+      sql_render(head(iris_tbl))
+    )
+  )
+})
+
+test_that("'left_join' does not use 'using' clause", {
+  test_requires("dplyr")
+
+  expect_false(
+    grepl(
+      "USING",
+      sql_render(left_join(df1_tbl, df2_tbl))
+    )
+  )
+})
+
+test_that("the implementation of 'sample_n' functions as expected", {
+  test_requires("dplyr")
+
+  expect_gte(
+    iris_tbl %>% sample_n(3) %>% collect() %>% nrow(),
+    3
+  )
+})
+
+test_that("the implementation of 'sample_fraq' functions as expected", {
+  test_requires("dplyr")
+
+  expect_gte(
+    iris_tbl %>% sample_frac(0.2) %>% collect() %>% nrow(),
+    0.2 * nrow(iris)
   )
 })
