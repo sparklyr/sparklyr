@@ -22,12 +22,12 @@ setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
 
 setMethod("sqlParseVariables", "spark_connection", function(conn, sql, ...) {
   method <- getMethod("sqlParseVariables", "DBIConnection")
-  method(con, sql, ...)
+  method(conn, sql, ...)
 })
 
-setMethod("sqlInterpolate", "spark_connection", function(`conn`, `sql`, ..., .dots = list()) {
+setMethod("sqlInterpolate", "spark_connection", function(conn, sql, ..., .dots = list()) {
   method <- getMethod("sqlInterpolate", "DBIConnection")
-  method(`_con`, `_sql`, ...)
+  method(conn, sql, ..., .dots)
 })
 
 get_data_type <- function(obj) {
