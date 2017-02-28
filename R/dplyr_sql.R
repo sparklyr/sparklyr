@@ -2,7 +2,7 @@
 
 #' @export
 sql_build.op_sample_n <- function(op, con, ...) {
-  select_spark_query(
+  select_query(
     from = sql(paste(
       sql_build(op$x, con = con),
       " TABLESAMPLE (",
@@ -14,7 +14,7 @@ sql_build.op_sample_n <- function(op, con, ...) {
 
 #' @export
 sql_build.op_sample_frac <- function(op, con, ...) {
-  select_spark_query(
+  select_query(
     from = sql(paste(
       sql_build(op$x, con = con),
       " TABLESAMPLE (",
