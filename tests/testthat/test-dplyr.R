@@ -51,10 +51,22 @@ test_that("'head' uses 'limit' clause", {
 test_that("'left_join' does not use 'using' clause", {
   test_requires("dplyr")
 
-  expect_false(
+  expect_equal(
+    spark_version(sc) >= "2.0.0" && packageVersion("dplyr") < "0.6.0",
     grepl(
       "USING",
       sql_render(left_join(df1_tbl, df2_tbl))
+    )
+  )
+})
+
+test_that("the implementation of 'left_join' functions as expected", {
+  test_requires("dplyr")
+
+  expect_true(
+    all.equal(
+      left_join(df1, df2),
+      left_join(df1_tbl, df2_tbl) %>% collect()
     )
   )
 })
