@@ -20,15 +20,27 @@ setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
   get_data_type(obj)
 })
 
-setMethod("sqlParseVariables", "spark_connection", function(con, sql, ...) {
-  method <- getMethod("sqlParseVariables", "DBIConnection")
-  method(con, sql, ...)
-})
+if (packageVersion("DBI") < "0.5.13") {
+  setMethod("sqlParseVariables", "spark_connection", function(con, sql, ...) {
+    method <- getMethod("sqlParseVariables", "DBIConnection")
+    method(con, sql, ...)
+  })
 
-setMethod("sqlInterpolate", "spark_connection", function(`_con`, `_sql`, ...) {
-  method <- getMethod("sqlInterpolate", "DBIConnection")
-  method(`_con`, `_sql`, ...)
-})
+  setMethod("sqlInterpolate", "spark_connection", function(`_con`, `_sql`, ...) {
+    method <- getMethod("sqlInterpolate", "DBIConnection")
+    method(`_con`, `_sql`, ...)
+  })
+} else {
+  setMethod("sqlParseVariables", "spark_connection", function(conn, sql, ...) {
+    method <- getMethod("sqlParseVariables", "DBIConnection")
+    method(conn, sql, ...)
+  })
+
+  setMethod("sqlInterpolate", "spark_connection", function(conn, sql, ..., .dots = list()) {
+    method <- getMethod("sqlInterpolate", "DBIConnection")
+    method(conn, sql, ..., .dots)
+  })
+}
 
 get_data_type <- function(obj) {
   if (is.factor(obj)) return("TEXT")
