@@ -30,7 +30,7 @@ sql_build.op_sample_frac <- function(op, con, ...) {
     from = sql(paste(
       sql_build(op$x, con = con),
       " TABLESAMPLE (",
-      op$args$size,
+      op$args$size * 100,
       " PERCENT)", sep = "")),
     select = build_sql("*")
   )
