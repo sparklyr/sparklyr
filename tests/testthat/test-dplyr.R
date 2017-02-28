@@ -52,7 +52,7 @@ test_that("'left_join' does not use 'using' clause", {
   test_requires("dplyr")
 
   expect_equal(
-    spark_version(sc) >= "2.0.0" && packageVersion("dplyr") < "0.6.0",
+    spark_version(sc) >= "2.0.0" && packageVersion("dplyr") < "0.5.0.90",
     grepl(
       "USING",
       sql_render(left_join(df1_tbl, df2_tbl))
@@ -80,7 +80,7 @@ test_that("the implementation of 'sample_n' functions as expected", {
   )
 })
 
-test_that("the implementation of 'sample_fraq' functions as expected", {
+test_that("the implementation of 'sample_frac' functions as expected", {
   test_requires("dplyr")
 
   expect_gte(
