@@ -25,7 +25,7 @@ Depends:
 Imports:
     methods,
     lazyeval (>= 0.2.0),
-    dplyr (>= 0.5.0),
+    dplyr (>= 0.5.0.9000),
     DBI (>= 0.6),
     readr (>= 0.2.0),
     digest,
