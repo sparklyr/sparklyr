@@ -74,17 +74,19 @@ test_that("the implementation of 'left_join' functions as expected", {
 test_that("the implementation of 'sample_n' functions as expected", {
   test_requires("dplyr")
 
-  expect_gte(
-    iris_tbl %>% sample_n(3) %>% collect() %>% nrow(),
-    3
+  # As of Spark 2.1.0, sampling functions are not exact.
+  expect_lt(
+    iris_tbl %>% sample_n(10) %>% collect() %>% nrow(),
+    nrow(iris)
   )
 })
 
-test_that("the implementation of 'sample_frac' functions as expected", {
+test_that("the implementation of 'sample_frac' functions returns a sample", {
   test_requires("dplyr")
 
-  expect_gte(
+  # As of Spark 2.1.0, sampling functions are not exact.
+  expect_lt(
     iris_tbl %>% sample_frac(0.2) %>% collect() %>% nrow(),
-    0.2 * nrow(iris)
+    nrow(iris)
   )
 })
