@@ -25,8 +25,12 @@ Depends:
 Imports:
     methods,
     lazyeval (>= 0.2.0),
+<<<<<<< eda2e3a3cb0411f6e3c528a532faaf9380fd21f1
     dplyr (>= 0.5.0.9000),
     DBI (>= 0.6),
+=======
+    DBI (>= 0.4.1),
+>>>>>>> add remotes from kevins suggestion
     readr (>= 0.2.0),
     digest,
     config,
@@ -39,6 +43,8 @@ Imports:
     base64enc,
     shiny,
     rstudioapi
+Remotes:
+    dplyr (>= 0.5.0.9000)
 Suggests:
     testthat,
     RCurl,
