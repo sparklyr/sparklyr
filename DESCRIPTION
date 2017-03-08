@@ -35,7 +35,7 @@ Imports:
     rprojroot,
     withr,
     httr,
-    jsonlite,
+    jsonlite (>= 1.0),
     base64enc,
     shiny,
     rstudioapi
