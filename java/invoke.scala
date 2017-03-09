@@ -30,7 +30,8 @@ object Invoke {
           while (i < numArgs && argMatched) {
             val parameterType = parameterTypes(i)
 
-            if (parameterType == classOf[Seq[Any]] && args(i).getClass.isArray) {
+            if (parameterType == classOf[Seq[Any]] &&
+                args(i) != null && args(i).getClass.isArray) {
               // The case that the parameter type is a Scala Seq and the argument
               // is a Java array is considered matching. The array will be converted
               // to a Seq later if this method is matched.
@@ -61,7 +62,8 @@ object Invoke {
             val parameterTypes = parameterTypesOfMethods(index)
 
             (0 until numArgs).map { i =>
-              if (parameterTypes(i) == classOf[Seq[Any]] && args(i).getClass.isArray) {
+              if (parameterTypes(i) == classOf[Seq[Any]] &&
+                  args(i) != null && args(i).getClass.isArray) {
                 // Convert a Java array to scala Seq
                 args(i) = args(i).asInstanceOf[Array[_]].toSeq
               }
