@@ -34,7 +34,7 @@ Imports:
     assertthat,
     rprojroot,
     withr,
-    httr,
+    httr (>= 1.1),
     jsonlite (>= 1.0),
     base64enc,
     shiny,
