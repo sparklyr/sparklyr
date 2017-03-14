@@ -1,6 +1,8 @@
 #' @import sparklyr
 #' @export
-spark_lapply <- function(sc) {
-  rdd <- invoke_new(sc, "SparkWorker.WorkerRDD")
-  spark_invoke_static(sc, "SparkWorker.Utils", "rddToDF", rdd)
+sdf_lapply <- function(sc, sdf) {
+  parent <- invoke(sdf, "rdd")
+  schema <- invoke(sdf, "schema")
+  rdd <- invoke_new(sc, "SparkWorker.WorkerRDD", parent)
+  invoke(hive_context(sc), "createDataFrame", rdd, schema)
 }
