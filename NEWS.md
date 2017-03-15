@@ -28,7 +28,7 @@
 - Improved `copy_to`, `sdf_copy_to` and `dbWriteTable` performance under
   `yarn-client` mode.
 
-- Added `tbl_change_tb()`. This function changes current database.
+- Added `tbl_change_db()`. This function changes current database.
 
 - Added `sdf_pivot()`. This function provides a mechanism for constructing
   pivot tables, using Spark's 'groupBy' + 'pivot' functionality, with a
