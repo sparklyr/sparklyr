@@ -149,7 +149,6 @@ spark_connect <- function(master,
 
   # update spark_context and hive_context connections with DBIConnection
   scon$spark_context$connection <- scon
-  scon$hive_context$connection <- scon
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)

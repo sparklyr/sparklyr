@@ -25,10 +25,8 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
 
     retries <- retries  - 1;
 
-    # wait for one second without depending on the behavior of socketConnection timeout
-    while (commandStart + 1 > Sys.time()) {
-      Sys.sleep(0.1)
-    }
+    startWait <- spark_config_value(config, "sparklyr.gateway.start.wait", 50)
+    Sys.sleep(startWait / 1000)
   }
 
   gateway
