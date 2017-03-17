@@ -11,9 +11,9 @@ library(sparkworker)
 library(sparklyr)
 
 sc <- spark_connect(master = "local", version = "2.0.1")
-iris_sdf <- spark_dataframe(sdf_copy_to(sc, iris))
+iris_tbl <- copy_to(sc, iris)
 
-sdf_lapply(sc, iris_sdf, funtion(rows) {
+spark_lapply(iris_tbl, function(rows) {
   rows$Petal_Width <- rows$Petal_Width + 1
   rows
 })
