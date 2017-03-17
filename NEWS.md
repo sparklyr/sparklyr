@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Improved `spark_connect` performance.
+
 - `sample_frac` takes a fraction instead of a percent to match `dplyr`.
 
 - Improved performance of `spark_read_csv` reading remote data when
