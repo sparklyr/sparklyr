@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- `ml_als_factorization` now supports the implicit matrix factorization
+   and nonnegative least square options.
+
 - Support for `dplyr 0.6` which among many improvements, increases
   performance in some queries by making use of a new query optimizer.
   
