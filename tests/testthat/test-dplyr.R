@@ -52,7 +52,7 @@ test_that("'left_join' does not use 'using' clause", {
   test_requires("dplyr")
 
   expect_equal(
-    spark_version(sc) >= "2.0.0" && packageVersion("dplyr") < "0.6.0",
+    spark_version(sc) >= "2.0.0" && packageVersion("dplyr") < "0.5.0.90",
     grepl(
       "USING",
       sql_render(left_join(df1_tbl, df2_tbl))
@@ -74,17 +74,19 @@ test_that("the implementation of 'left_join' functions as expected", {
 test_that("the implementation of 'sample_n' functions as expected", {
   test_requires("dplyr")
 
-  expect_gte(
-    iris_tbl %>% sample_n(3) %>% collect() %>% nrow(),
-    3
+  # As of Spark 2.1.0, sampling functions are not exact.
+  expect_lt(
+    iris_tbl %>% sample_n(10) %>% collect() %>% nrow(),
+    nrow(iris)
   )
 })
 
-test_that("the implementation of 'sample_fraq' functions as expected", {
+test_that("the implementation of 'sample_frac' functions returns a sample", {
   test_requires("dplyr")
 
-  expect_gte(
+  # As of Spark 2.1.0, sampling functions are not exact.
+  expect_lt(
     iris_tbl %>% sample_frac(0.2) %>% collect() %>% nrow(),
-    0.2 * nrow(iris)
+    nrow(iris)
   )
 })

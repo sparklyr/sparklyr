@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Support for `dplyr 0.6` which among many improvements, increases
+  performance in some queries by making use of a new query optimizer.
+  
 - `spark_write_table` now supports saving to default Hive path.
 
 - Improved `spark_connect` performance.
