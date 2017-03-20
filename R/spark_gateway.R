@@ -43,7 +43,7 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   waitSeconds <- if (isStarting)
     spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
   else
-    spark_config_value(config, "sparklyr.gateway.connect.timeout", 0)
+    spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
 
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
