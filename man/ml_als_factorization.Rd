@@ -6,6 +6,7 @@
 \usage{
 ml_als_factorization(x, rating.column = "rating", user.column = "user",
   item.column = "item", rank = 10L, regularization.parameter = 0.1,
+  implicit.preferences = FALSE, alpha = 1, nonnegative = FALSE,
   iter.max = 10L, ml.options = ml_options(), ...)
 }
 \arguments{
@@ -21,6 +22,12 @@ ml_als_factorization(x, rating.column = "rating", user.column = "user",
 \item{rank}{Rank of the factorization.}
 
 \item{regularization.parameter}{The regularization parameter.}
+
+\item{implicit.preferences}{Use implicit preference.}
+
+\item{alpha}{The parameter in the implicit preference formulation.}
+
+\item{nonnegative}{Use nonnegative constraints for least squares.}
 
 \item{iter.max}{The maximum number of iterations to use.}
 

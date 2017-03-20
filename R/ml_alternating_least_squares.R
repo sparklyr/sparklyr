@@ -8,6 +8,9 @@
 #' @param item.column The name of the column containing item IDs.
 #' @param rank Rank of the factorization.
 #' @param regularization.parameter The regularization parameter.
+#' @param implicit.preferences Use implicit preference.
+#' @param alpha The parameter in the implicit preference formulation.
+#' @param nonnegative Use nonnegative constraints for least squares.
 #' @template roxlate-ml-iter-max
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
@@ -21,6 +24,9 @@ ml_als_factorization <- function(x,
                                  item.column = "item",
                                  rank = 10L,
                                  regularization.parameter = 0.1,
+                                 implicit.preferences = FALSE,
+                                 alpha = 1.0,
+                                 nonnegative = FALSE,
                                  iter.max = 10L,
                                  ml.options = ml_options(),
                                  ...)
@@ -35,6 +41,9 @@ ml_als_factorization <- function(x,
   item.column <- ensure_scalar_character(item.column)
   rank <- ensure_scalar_integer(rank)
   regularization.parameter <- ensure_scalar_double(regularization.parameter)
+  implicit.preferences <- ensure_scalar_boolean(implicit.preferences, default = FALSE)
+  alpha <- ensure_scalar_double(alpha)
+  nonnegative <- ensure_scalar_boolean(nonnegative, default = FALSE)
   iter.max <- ensure_scalar_integer(iter.max)
   only.model <- ensure_scalar_boolean(ml.options$only.model, default = FALSE)
 
@@ -54,6 +63,9 @@ ml_als_factorization <- function(x,
     invoke("setItemCol", item.column) %>%
     invoke("setRank", rank) %>%
     invoke("setRegParam", regularization.parameter) %>%
+    invoke("setImplicitPrefs", implicit.preferences) %>%
+    invoke("setAlpha", alpha) %>%
+    invoke("setNonnegative", nonnegative) %>%
     invoke("setMaxIter", iter.max)
 
   if (is.function(ml.options$model.transform))
