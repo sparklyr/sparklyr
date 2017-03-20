@@ -426,7 +426,7 @@ spark_write_table.tbl_spark <- function(x, name, mode = NULL, options = list()) 
 
   if (spark_version(sc) < "2.0.0" && spark_master_is_local(sc$master)) {
     stop(
-      "spark_write_table is not supported in local clusters for ",
+      "spark_write_table is not supported in local clusters for Spark ",
       spark_version(sc), ". ",
       "Upgrade to Spark 2.X or use this function in a non-local Spark cluster.")
   }
