@@ -350,7 +350,6 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
 #' @export
 spark_read_table <- function(sc,
                              name,
-                             path,
                              options = list(),
                              repartition = 0,
                              memory = TRUE,
@@ -358,8 +357,7 @@ spark_read_table <- function(sc,
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  operation <- if (spark_version(sc) < "2.0.0") "load" else "table"
-  df <- spark_data_read_generic(sc, path, operation, options)
+  df <- spark_data_read_generic(sc, name, "table", options)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -384,7 +382,6 @@ spark_load_table <- function(sc,
   spark_read_table(
     sc,
     name,
-    path,
     options,
     repartition,
     memory,
@@ -397,12 +394,13 @@ spark_load_table <- function(sc,
 #' Writes a Spark DataFrame into a Spark table.
 #'
 #' @inheritParams spark_write_csv
+#' @param name The name to assign to the newly generated table.
 #' @param mode Specifies the behavior when data or table already exists.
 #'
 #' @family Spark serialization routines
 #'
 #' @export
-spark_write_table <- function(x, path, mode = NULL, options = list()) {
+spark_write_table <- function(x, name, mode = NULL, options = list()) {
   UseMethod("spark_write_table")
 }
 
@@ -422,21 +420,26 @@ spark_save_table <- function(x, path, mode = NULL, options = list()) {
 }
 
 #' @export
-spark_write_table.tbl_spark <- function(x, path, mode = NULL, options = list()) {
+spark_write_table.tbl_spark <- function(x, name, mode = NULL, options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   sc <- spark_connection(x)
 
-  operation <- if (spark_version(sc) < "2.0.0") "save" else "saveAsTable"
-  spark_data_write_generic(sqlResult, spark_normalize_path(path), operation, mode, options)
+  if (spark_version(sc) < "2.0.0" && spark_master_is_local(sc$master)) {
+    stop(
+      "spark_write_table is not supported in local clusters for Spark ",
+      spark_version(sc), ". ",
+      "Upgrade to Spark 2.X or use this function in a non-local Spark cluster.")
+  }
+
+  spark_data_write_generic(sqlResult, name, "saveAsTable", mode, options)
 }
 
 #' @export
-spark_write_table.spark_jobj <- function(x, path, mode = NULL, options = list()) {
+spark_write_table.spark_jobj <- function(x, name, mode = NULL, options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   sc <- spark_connection(x)
 
-  operation <- if (spark_version(sc) < "2.0.0") "save" else "saveAsTable"
-  spark_data_write_generic(x, spark_normalize_path(path), operation, mode, options)
+  spark_data_write_generic(x, name, "saveAsTable", mode, options)
 }
 
 #' Read from JDBC connection into a Spark DataFrame.

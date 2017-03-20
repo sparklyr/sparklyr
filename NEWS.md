@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- `spark_write_table` now supports saving to default Hive path.
+
 - Improved `spark_connect` performance.
 
 - `sample_frac` takes a fraction instead of a percent to match `dplyr`.
