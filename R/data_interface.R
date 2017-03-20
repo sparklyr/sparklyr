@@ -394,12 +394,13 @@ spark_load_table <- function(sc,
 #' Writes a Spark DataFrame into a Spark table.
 #'
 #' @inheritParams spark_write_csv
+#' @param name The name to assign to the newly generated table.
 #' @param mode Specifies the behavior when data or table already exists.
 #'
 #' @family Spark serialization routines
 #'
 #' @export
-spark_write_table <- function(x, name = NULL, mode = NULL, options = list()) {
+spark_write_table <- function(x, name, mode = NULL, options = list()) {
   UseMethod("spark_write_table")
 }
 

@@ -4,10 +4,12 @@
 \alias{spark_write_table}
 \title{Writes a Spark DataFrame into a Spark table}
 \usage{
-spark_write_table(x, name = NULL, mode = NULL, options = list())
+spark_write_table(x, name, mode = NULL, options = list())
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
+
+\item{name}{The name to assign to the newly generated table.}
 
 \item{mode}{Specifies the behavior when data or table already exists.}
 
