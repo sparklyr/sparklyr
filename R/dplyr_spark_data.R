@@ -5,7 +5,9 @@ spark_partition_register_df <- function(sc, df, name, repartition, memory) {
     df <- invoke(df, "repartition", as.integer(repartition))
   }
 
-  invoke(df, "registerTempTable", name)
+  if (!name %in% DBI::dbListTables(sc)) {
+    invoke(df, "registerTempTable", name)
+  }
 
   if (memory) {
     dbSendQuery(sc, paste("CACHE TABLE", dplyr::escape(ident(name), con = sc)))
