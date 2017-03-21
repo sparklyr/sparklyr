@@ -313,7 +313,6 @@ find_scalac <- function(version, locations = NULL) {
   for (location in locations) {
     installs <- sort(list.files(location))
 
-    # In windows the installer does not version scala so we pick default
     versions <- sub("^scala-?", "", installs)
     matches  <- grep(re_version, versions)
     if (!any(matches))
@@ -321,7 +320,6 @@ find_scalac <- function(version, locations = NULL) {
 
     index <- tail(matches, n = 1)
     install <- installs[index]
-
     scalac_path <- file.path(location, install, "bin/scalac")
     if (!file.exists(scalac_path))
       next
