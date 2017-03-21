@@ -282,6 +282,9 @@ find_scalac <- function(version, locations = NULL) {
 scalac_default_locations <- function() {
   if (Sys.info()[["sysname"]] == "Windows") {
     c(
+      Sys.getenv("SCALA_HOME"),
+      normalizePath(file.path(Sys.getenv("PROGRAMFILES"), "scala")),
+      normalizePath(file.path(Sys.getenv("PROGRAMFILES(86)"), "scala")),
       path.expand("~/scala")
     )
   } else {
