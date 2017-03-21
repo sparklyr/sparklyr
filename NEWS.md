@@ -1,7 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
-- In Windows, `spark_compile_jars` searches for more paths using the
-  `SCALA_HOME` and `PROGRAMFILES` environment variables.
+- Added `download_scalac()` to assist downloading all the Scala compilers
+  required to build using `compile_package_jars` and provided support for
+  using any `scalac` minor versions while looking for the right compiler.
 
 - `ml_als_factorization` now supports the implicit matrix factorization
    and nonnegative least square options.
