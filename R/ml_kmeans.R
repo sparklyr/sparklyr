@@ -78,8 +78,12 @@ ml_kmeans <- function(x,
   kmmCenters <- invoke(fit, "clusterCenters")
 
   # compute cost for k-means
-  if (compute.cost)
-    kmmCost <- invoke(fit, "computeCost", tdf)
+  if (compute.cost) {
+    kmmCost <- tryCatch(
+      invoke(fit, "computeCost", tdf),
+      error = function(e) NULL
+    )
+  }
 
   centersList <- transpose_list(lapply(kmmCenters, function(center) {
     as.numeric(invoke(center, "toArray"))
