@@ -439,7 +439,7 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
 
   returnStatus <- readInt(backend)
   if (length(returnStatus) == 0)
-    stop("No status is returned. Spark R backend might have failed.")
+    stop("No status is returned. The sparklyr backend might have failed.")
   if (returnStatus != 0) {
     # get error message from backend and report to R
     msg <- readString(backend)
