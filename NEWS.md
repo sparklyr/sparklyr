@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added `spark_home_set` to set with ease `SPARK_HOME`, specially
+  useful while teaching the basics of Spark and `sparklyr.
+
 - Fixed issue collecting data frames containing `\n`.
 
 - Added `download_scalac()` to assist downloading all the Scala compilers
