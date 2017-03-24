@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Fixed issue collecting data frames containing `\n`.
+
 - Added `download_scalac()` to assist downloading all the Scala compilers
   required to build using `compile_package_jars` and provided support for
   using any `scalac` minor versions while looking for the right compiler.

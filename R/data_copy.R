@@ -76,10 +76,7 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
       e
   }), optional = TRUE)
 
-  splitSeparator <- if (inherits(sc, "livy_connection"))
-    list(scala = "\\|~\\|", r = "|~|")
-  else
-    list(scala = "\31", r = "\31")
+  splitSeparator <- split_separator(sc)
 
   tempFile <- tempfile(fileext = ".csv")
   write.table(df, tempFile, sep = splitSeparator$r, col.names = FALSE, row.names = FALSE, quote = FALSE)
@@ -113,10 +110,7 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
       e
   }), optional = TRUE)
 
-  splitSeparator <- if (inherits(sc, "livy_connection"))
-    list(scala = "\\|~\\|", r = "|~|")
-  else
-    list(scala = "\31", r = "\31")
+  splitSeparator <- split_separator(sc)
 
   # generate a CSV file from the associated data frame
   # note that these files need to live for the R session
