@@ -43,10 +43,11 @@ sdf_schema <- function(x) {
   list
 }
 
-sdf_deserialize_column <- function(column) {
+sdf_deserialize_column <- function(column, sc) {
+  separator <- split_separator(sc)
 
   if (is.character(column)) {
-    splat <- strsplit(column, "\n", fixed = TRUE)[[1]]
+    splat <- strsplit(column, separator$r, fixed = TRUE)[[1]]
     splat[splat == "<NA>"] <- NA
     Encoding(splat) <- "UTF-8"
     return(splat)
@@ -70,9 +71,11 @@ sdf_read_column <- function(x, column) {
   schema <- sdf_schema(sdf)
   colType <- schema[[column]]$type
 
+  separator <- split_separator(sc)
+
   column <- sc %>%
-    invoke_static("sparklyr.Utils", "collectColumn", sdf, column, colType) %>%
-    sdf_deserialize_column()
+    invoke_static("sparklyr.Utils", "collectColumn", sdf, column, colType, separator$scala) %>%
+    sdf_deserialize_column(sc)
 
   column
 }
@@ -82,27 +85,31 @@ sdf_collect <- function(object) {
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
 
+  separator <- split_separator(sc)
+
   # for some reason, we appear to receive invalid results when
   # collecting Spark DataFrames with many columns. empirically,
   # having more than 50 columns seems to trigger the buggy behavior
   # collect the data set in chunks, and then join those chunks.
   # note that this issue should be resolved with Spark >2.0.0
   collected <- if (spark_version(sc) > "2.0.0") {
-    invoke_static(sc, "sparklyr.Utils", "collect", sdf)
+    invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$scala)
   } else {
     columns <- invoke(sdf, "columns") %>% as.character()
     chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
     chunks <- split_chunks(columns, as.integer(chunk_size))
     pieces <- lapply(chunks, function(chunk) {
       subset <- sdf %>% invoke("selectExpr", as.list(chunk))
-      invoke_static(sc, "sparklyr.Utils", "collect", subset)
+      invoke_static(sc, "sparklyr.Utils", "collect", subset, separator$scala)
     })
     do.call(c, pieces)
   }
 
   # deserialize columns as needed (string columns will enter as
   # a single newline-delimited string)
-  transformed <- lapply(collected, sdf_deserialize_column)
+  transformed <- lapply(collected, function(e) {
+    sdf_deserialize_column(e, sc)
+  })
 
   # fix an issue where sometimes columns in a Spark DataFrame are empty
   # in such a case, we fill those with NAs of the same type (#477)

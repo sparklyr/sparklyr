@@ -279,3 +279,11 @@ sparklyr_verbose <- function(...) {
 trim_whitespace <- function(strings) {
   gsub("^[[:space:]]*|[[:space:]]*$", "", strings)
 }
+
+
+split_separator <- function(sc) {
+  if (inherits(sc, "livy_connection"))
+    list(scala = "\\|~\\|", r = "|~|")
+  else
+    list(scala = "\31", r = "\31")
+}
