@@ -12,10 +12,10 @@
 #' @examples
 #' \dontrun{
 #' # Not run due to side-effects
-#' set_spark_home_env_var()
+#' spark_home_set()
 #' }
 #' @export
-set_spark_home_env_var <- function(path = NULL, verbose = is.null(path)) {
+spark_home_set <- function(path = NULL, verbose = is.null(path)) {
   force(verbose)
   if(is.null(path)) {
     path <- spark_install_find()$sparkVersionDir
