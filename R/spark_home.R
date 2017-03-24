@@ -8,7 +8,7 @@
 #' @param verbose Logical. Should the function explain what is it doing?
 #' @return The function is mostly invoked for the side-effect of setting the 
 #' \code{SPARK_HOME} environment variable. It also returns \code{TRUE} if the 
-#' environment was successfully set, nad \code{FALSE} otherwise.
+#' environment was successfully set, and \code{FALSE} otherwise.
 #' @examples
 #' \dontrun{
 #' # Not run due to side-effects
