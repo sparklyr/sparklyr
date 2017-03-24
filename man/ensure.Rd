@@ -2,10 +2,14 @@
 % Please edit documentation in R/precondition.R
 \name{ensure}
 \alias{ensure}
-\alias{ensure_scalar_boolean}
-\alias{ensure_scalar_character}
-\alias{ensure_scalar_double}
+\alias{ensure}
 \alias{ensure_scalar_integer}
+\alias{ensure}
+\alias{ensure_scalar_double}
+\alias{ensure}
+\alias{ensure_scalar_boolean}
+\alias{ensure}
+\alias{ensure_scalar_character}
 \title{Enforce Specific Structure for R Objects}
 \usage{
 ensure_scalar_integer(object, allow.na = FALSE, allow.null = FALSE,
@@ -36,4 +40,3 @@ These routines are useful when preparing to pass objects to
 a Spark routine, as it is often necessary to ensure certain
 parameters are scalar integers, or scalar doubles, and so on.
 }
-

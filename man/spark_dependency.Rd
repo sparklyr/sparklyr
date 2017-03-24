@@ -17,4 +17,3 @@ An object of type `spark_dependency`
 \description{
 Define a Spark dependency consisting of a set of custom JARs and Spark packages.
 }
-

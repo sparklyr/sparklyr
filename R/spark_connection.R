@@ -56,13 +56,19 @@ java_context <- function(sc) {
 #' @name spark-api
 #' @export
 hive_context <- function(sc) {
-  sc$hive_context
+  if (!is.null(sc$hive_context))
+    sc$hive_context
+  else
+    create_hive_context(sc)
 }
 
 #' @name spark-api
 #' @export
 spark_session <- function(sc) {
-  sc$hive_context
+  if (!is.null(sc$hive_context))
+    sc$hive_context
+  else
+    create_hive_context(sc)
 }
 
 #' Retrieve the Spark Connection Associated with an R Object

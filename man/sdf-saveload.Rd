@@ -2,10 +2,10 @@
 % Please edit documentation in R/sdf_saveload.R
 \name{sdf-saveload}
 \alias{sdf-saveload}
-\alias{sdf_load_parquet}
+\alias{sdf_save_table}
 \alias{sdf_load_table}
 \alias{sdf_save_parquet}
-\alias{sdf_save_table}
+\alias{sdf_load_parquet}
 \title{Save / Load a Spark DataFrame}
 \usage{
 sdf_save_table(x, name, overwrite = FALSE, append = FALSE)
@@ -33,4 +33,3 @@ sdf_load_parquet(sc, path)
 \description{
 Routines for saving and loading Spark DataFrames.
 }
-

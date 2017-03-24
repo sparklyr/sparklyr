@@ -18,13 +18,14 @@ sd_section(
   "Functions for reading and writing Spark DataFrames.",
   c(
     "spark_read_csv",
+    "spark_read_jdbc",
     "spark_read_json",
     "spark_read_parquet",
-    "spark_load_table",
+    "spark_read_table",
     "spark_write_csv",
     "spark_write_json",
     "spark_write_parquet",
-    "spark_save_table"
+    "spark_write_table"
   )
 )
 
@@ -123,6 +124,7 @@ sd_section(
   c(
     "compile_package_jars",
     "connection_config",
+    "download_scalac",
     "find_scalac",
     "hive_context",
     "invoke",

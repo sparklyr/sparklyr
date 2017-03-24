@@ -1,22 +1,81 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
-- Fixed issue in spark_read_parquet and other read methods in which
-  spark_normalize_path would not work in some platforms while loading
+- Fixed issue collecting data frames containing `\n`.
+
+- Added `download_scalac()` to assist downloading all the Scala compilers
+  required to build using `compile_package_jars` and provided support for
+  using any `scalac` minor versions while looking for the right compiler.
+
+- `ml_als_factorization` now supports the implicit matrix factorization
+   and nonnegative least square options.
+
+- Support for `dplyr 0.6` which among many improvements, increases
+  performance in some queries by making use of a new query optimizer.
+  
+- `spark_write_table` now supports saving to default Hive path.
+
+- Improved `spark_connect` performance.
+
+- `sample_frac` takes a fraction instead of a percent to match `dplyr`.
+
+- Improved performance of `spark_read_csv` reading remote data when
+  `infer_schema = FALSE`.
+
+- Added `spark_read_jdbc`. This function reads from a JDBC connection
+  into a Spark DataFrame.
+
+- Renamed `spark_load_table` and `spark_save_table` into `spark_read_table`
+  and `spark_write_table` for consistency with existing `spark_read_*` and
+  `spark_write_*` functions.
+
+- Added `src_databases`. This function list all the available databases.
+
+- Improved support in dplyr commands to handle multiple databases.
+
+- Implemented new configuration checks to proactively report connection errors
+  in Windows.
+
+- While connecting to spark from Windows,  setting the `sparklyr.verbose` option
+  to `TRUE` prints detailed configuration steps.
+
+- Added support to specify a vector of column names in `spark_read_csv` to
+  specify column names without having to set the type of each column.
+
+- Improved `copy_to`, `sdf_copy_to` and `dbWriteTable` performance under
+  `yarn-client` mode.
+
+- Added `tbl_change_db()`. This function changes current database.
+
+- Added `sdf_pivot()`. This function provides a mechanism for constructing
+  pivot tables, using Spark's 'groupBy' + 'pivot' functionality, with a
+  formula interface similar to that of `reshape2::dcast()`.
+
+- Spark Null objects (objects of class NullType) discovered within numeric
+  vectors are now collected as NAs, rather than lists of NAs.
+
+- Fixed warning while connecting with livy and improved 401 message.
+
+- Fixed issue in `spark_read_parquet()` and other read methods in which
+  `spark_normalize_path()` would not work in some platforms while loading
   data using custom protocols like s3n:// for Amazon S3.
 
-- Implemented ft_count_vectorizer to be able to use ml_lda with ease.
+- Added `ft_count_vectorizer()`. This function can be used to transform
+  columns of a Spark DataFrame so that they might be used as input to `ml_lda()`.
+  This should make it easier to invoke `ml_lda()` on Spark data sets.
 
-- Added support for the sparklyr.ui.connections option which adds additional
+- Added support for the `sparklyr.ui.connections` option, which adds additional
   connection options into the new connections dialog. The
-  rstudio.spark.connections option is now deprecated.
+  `rstudio.spark.connections` option is now deprecated.
 
-- Implemented the "new connection dialog" as a shiny app to be able to
+- Implemented the "new connection dialog" as a Shiny application to be able to
   support newer versions of RStudio that deprecate current connections ui.
 
-- Improved performance of sample_n and sample_frac by using TABLESAMPLE query.
+- Improved performance of `sample_n()` and `sample_frac()` by using TABLESAMPLE
+  query.
 
-- Resolved issue in spark_save/load_table to support saving/loading data and
-  added path parameter in spark_load_table for consistency with other functions.
+- Resolved issue in `spark_save()` / `load_table()` to support saving / loading
+  data and added path parameter in `spark_load_table()` for consistency with
+  other functions.
 
 # Sparklyr 0.5.0
 

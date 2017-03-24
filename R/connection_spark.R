@@ -149,7 +149,6 @@ spark_connect <- function(master,
 
   # update spark_context and hive_context connections with DBIConnection
   scon$spark_context$connection <- scon
-  scon$hive_context$connection <- scon
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
@@ -281,6 +280,14 @@ spark_connection_is_local <- function(sc) {
 
 spark_master_is_local <- function(master) {
   grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
+}
+
+spark_connection_is_yarn_client <- function(sc) {
+  spark_master_is_yarn_client(sc$master)
+}
+
+spark_master_is_yarn_client <- function(master) {
+  grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE)
 }
 
 # Number of cores available in the local install

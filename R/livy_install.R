@@ -87,7 +87,7 @@ livy_install <- function(version       = "0.3.0",
 
   # construct path to livy download
   url <- sprintf(
-    "https://s3-us-west-2.amazonaws.com/rstudio-sparklyr/livy/livy-server-%s.zip",
+    "http://archive.cloudera.com/beta/livy/livy-server-%s.zip",
     version
   )
 
@@ -120,6 +120,17 @@ livy_install <- function(version       = "0.3.0",
   file.rename(file.path(livy_cache, folder_name), livy_path)
   if (!file.exists(livy_path))
     stopf("failed to move '%s' to '%s'", folder_name, basename(livy_path))
+
+  livyStart <- file.path(livy_path, "bin/livy-server")
+  livyLogs <- file.path(livy_path, "logs")
+
+  if (!dir.exists(livyLogs)) {
+    dir.create(livyLogs)
+  }
+
+  if (.Platform$OS.type == "unix") {
+    system2("chmod", c("744", livyStart))
+  }
 
   # return installation path on success
   if (interactive())

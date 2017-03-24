@@ -14,4 +14,3 @@ spark_connection(x, ...)
 \description{
 Retrieve the \code{spark_connection} associated with an \R object.
 }
-

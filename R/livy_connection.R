@@ -4,12 +4,12 @@
 #' @importFrom httr text_content
 livy_validate_http_response <- function(message, req) {
   if (http_error(req)) {
-    if (identical(status_code(req), 401)) {
+    if (isTRUE(all.equal(status_code(req), 401))) {
       stop("Livy operation is unauthorized. Try spark_connect with config = livy_config()")
     }
     else {
       httpStatus <- http_status(req)
-      httpContent <- text_content(req)
+      httpContent <- content(req, as = 'text', encoding = "UTF-8")
       stop(message, " (", httpStatus$message, "): ", httpContent)
     }
   }
@@ -32,17 +32,19 @@ livy_validate_http_response <- function(message, req) {
 #' define the basic authentication settings for a Livy session.
 #'
 #' @return Named list with configuration data
-livy_config <- function(config = spark_config(), username, password) {
-  secret <- base64_enc(paste(username, password, sep = ":"))
+livy_config <- function(config = spark_config(), username = NULL, password = NULL) {
+  if (!is.null(username) || !is.null(password)) {
+    secret <- base64_enc(paste(username, password, sep = ":"))
 
-  config[["sparklyr.livy.headers"]] <- c(
-    config[["sparklyr.livy.headers"]], list(
-      Authorization = paste(
-        "Basic",
-        base64_enc(paste(username, password, sep = ":"))
+    config[["sparklyr.livy.headers"]] <- c(
+      config[["sparklyr.livy.headers"]], list(
+        Authorization = paste(
+          "Basic",
+          base64_enc(paste(username, password, sep = ":"))
+        )
       )
     )
-  )
+  }
 
   config
 }
@@ -462,6 +464,12 @@ livy_invoke_statement <- function(sc, statement) {
 
 livy_invoke_statement_fetch <- function(sc, static, jobj, method, ...) {
   statement <- livy_statement_compose(sc, static, jobj, method, ...)
+
+  # Note: Spark 2.0 requires magic to be present in the statement with the definition.
+  statement$code <- paste(
+    statement$code,
+    livy_statement_compose_magic(statement$lobj, "json")$code,
+    sep = "\n")
 
   result <- livy_invoke_statement(sc, statement)
 

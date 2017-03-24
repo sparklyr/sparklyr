@@ -23,4 +23,3 @@ it should be a spark_jobj instance).}
 Generic call interface for spark shell
 }
 \keyword{internal}
-

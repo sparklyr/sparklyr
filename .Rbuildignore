@@ -21,3 +21,4 @@
 ^run-tests$
 ^.classpath$
 ^.project$
+^h2ologs$

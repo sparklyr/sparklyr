@@ -16,7 +16,7 @@ NULL
 #' @rdname sdf-saveload
 #' @export
 sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
-  .Deprecated("spark_save_table")
+  .Deprecated("spark_write_table")
 
   sdf <- spark_dataframe(x)
   name <- ensure_scalar_character(name)
@@ -41,7 +41,7 @@ sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
 #' @rdname sdf-saveload
 #' @export
 sdf_load_table <- function(sc, name) {
-  .Deprecated("spark_load_table")
+  .Deprecated("spark_read_table")
 
   session <- spark_session(sc)
   name <- ensure_scalar_character(name)

@@ -205,9 +205,9 @@ start_shell <- function(master,
         length(grep(config[["sparklyr.csv.embedded"]], spark_version)) > 0) {
       jars <- c(
         jars,
-        system.file(file.path("java", "spark-csv_2.11-1.3.0.jar"), package = "sparklyr"),
-        system.file(file.path("java", "commons-csv-1.1.jar"), package = "sparklyr"),
-        system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr")
+        normalizePath(system.file(file.path("java", "spark-csv_2.11-1.3.0.jar"), package = "sparklyr")),
+        normalizePath(system.file(file.path("java", "commons-csv-1.1.jar"), package = "sparklyr")),
+        normalizePath(system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr"))
       )
     }
 
@@ -342,9 +342,6 @@ stop_shell <- function(sc, terminate = FALSE) {
 
   close(sc$backend)
   close(sc$monitor)
-
-  # allow time to clean resources for multiple spark_connect/spark_disconnect calls
-  Sys.sleep(1)
 }
 
 #' @export
@@ -442,7 +439,7 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
 
   returnStatus <- readInt(backend)
   if (length(returnStatus) == 0)
-    stop("No status is returned. Spark R backend might have failed.")
+    stop("No status is returned. The sparklyr backend might have failed.")
   if (returnStatus != 0) {
     # get error message from backend and report to R
     msg <- readString(backend)
@@ -540,10 +537,6 @@ initialize_connection.spark_shell_connection <- function(sc) {
       sc$spark_context
     )
     sc$java_context$connection <- sc
-
-    # create the hive context and assign the connection to it
-    sc$hive_context <- create_hive_context(sc)
-    sc$hive_context$connection <- sc
 
     # return the modified connection
     sc

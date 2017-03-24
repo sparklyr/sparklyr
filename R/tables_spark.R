@@ -1,6 +1,12 @@
 tbl_quote_name <- function(name) {
-  x <- gsub("`", "``", name, fixed = TRUE)
-  paste("`", name, "`", sep = "")
+  y <- gsub("`", "``", name, fixed = TRUE)
+  y <- strsplit(y, "\\.")[[1]]
+  y <- paste(y, collapse = "`.`")
+  y <- paste("`", y, "`", sep = "")
+  y[is.na(name)] <- "NULL"
+  names(y) <- names(name)
+
+  y
 }
 
 tbl_cache_sdf <- function(sc, name, force) {
@@ -70,4 +76,30 @@ tbl_uncache <- function(sc, name) {
   invoke(hive_context(sc), "sql", sql)
 
   invisible(NULL)
+}
+
+#' Use specific database
+#'
+#' @param sc A \code{spark_connection}.
+#' @param name The database name.
+#'
+#' @export
+tbl_change_db <- function(sc, name) {
+  sql <- paste("USE ", tbl_quote_name(name))
+  invoke(hive_context(sc), "sql", sql)
+
+  invisible(NULL)
+}
+
+#' Show database list
+#'
+#' @param sc A \code{spark_connection}.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @export
+src_databases <- function(sc, ...) {
+  sql <- hive_context(sc)
+  dbs <- invoke(sql, "sql", "SHOW DATABASES")
+  databaseNames <- sdf_read_column(dbs, "databaseName")
+  sort(databaseNames)
 }

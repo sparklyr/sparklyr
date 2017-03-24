@@ -17,4 +17,3 @@ A sorted data frame with feature labels and their relative importance.
 \description{
 Spark ML - Feature Importance for Tree Models
 }
-

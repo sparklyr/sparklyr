@@ -29,6 +29,10 @@ verify_msvcr100 <- function() {
 }
 
 prepare_windows_environment <- function(sparkHome) {
+  verbose <- sparklyr_boolean_option("sparklyr.verbose")
+  verboseMessage <- function(...) {
+    if (verbose) message(...)
+  }
 
   # don't do anything if aren't on windows
   if (.Platform$OS.type != "windows")
@@ -36,20 +40,42 @@ prepare_windows_environment <- function(sparkHome) {
 
   # verify we have msvcr100
   verify_msvcr100()
+  verboseMessage("Confirmed that msvcr100 is installed")
 
   # set HADOOP_HOME
   hivePath <- normalizePath(file.path(sparkHome, "tmp", "hive"), mustWork = FALSE)
-  if (!dir.exists(hivePath))
+  verboseMessage("HIVE_PATH set to ", hivePath)
+
+  if (!dir.exists(hivePath)) {
+    verboseMessage("HIVE_PATH does not exist")
     dir.create(hivePath, recursive = TRUE)
+  }
+
   hadoopPath <- normalizePath(file.path(sparkHome, "tmp", "hadoop"), mustWork = FALSE)
   hadoopBinPath <- normalizePath(file.path(hadoopPath, "bin"), mustWork = FALSE)
   if (!dir.exists(hadoopPath)) {
-    dir.create(hadoopBinPath, recursive = TRUE)
-    message(paste("Created default hadoop bin directory under:", hadoopPath))
-  }
+    verboseMessage("HADOOP_HOME does not exist")
 
-  if (nchar(Sys.getenv("HADOOP_HOME")) == 0) {
-    system2("SETX", c("HADOOP_HOME", shQuote(hadoopPath)), stdout = NULL)
+    dir.create(hadoopBinPath, recursive = TRUE)
+  }
+  verboseMessage("HADOOP_HOME exists under ", hadoopPath)
+
+  if (nchar(Sys.getenv("HADOOP_HOME")) == 0 ||
+      Sys.getenv("HADOOP_HOME") != hadoopPath) {
+
+    if (Sys.getenv("HADOOP_HOME") != hadoopPath) {
+      warning("HADOOP_HOME was already but does not match current Spark installation")
+    } else {
+      verboseMessage("HADOOP_HOME environment variable not set")
+    }
+
+    output <- system2(
+      "SETX", c("HADOOP_HOME", shQuote(hadoopPath)),
+      stdout = if(verbose) TRUE else NULL)
+
+    verboseMessage("HADOOP_HOME environment set with output ", output)
+  } else {
+    verboseMessage("HADOOP_HOME environment was already set to ", Sys.getenv("HADOOP_HOME"))
   }
 
   # pre-create the hive temp folder to manage permissions issues
@@ -59,10 +85,13 @@ prepare_windows_environment <- function(sparkHome) {
   )
 
   if (!dir.exists(appUserTempDir)) {
+    verboseMessage("HIVE_TEMP does not exist")
+
     # create directory from using current user which will assign the right
     # permissions to execute in non-admin mode
     dir.create(appUserTempDir, recursive = TRUE)
   }
+  verboseMessage("HIVE_TEMP exists under ", appUserTempDir)
 
   # form path to winutils.exe
   winutils <- normalizePath(file.path(hadoopBinPath, "winutils.exe"),
@@ -70,15 +99,34 @@ prepare_windows_environment <- function(sparkHome) {
 
   # get a copy of winutils if we don't already have it
   if (!file.exists(winutils)) {
+    verboseMessage("WINUTIL does not exist")
+
     winutilsSrc <- winutils_source_path()
     if (nzchar(winutilsSrc))
       file.copy(winutilsSrc, winutils)
     else
       stop_with_winutils_error(hadoopBinPath)
   }
+  verboseMessage("WINUTIL exists under ", winutils)
 
   # ensure correct permissions on hive path
-  system2(winutils, c("chmod", "777", shQuote(hivePath)))
+  output <- system2(
+    winutils,
+    c("chmod", "777", shQuote(hivePath)),
+    stdout = if (verbose) TRUE else NULL)
+
+  verboseMessage("WINUTIL for CHMOD outputs ", output)
+
+  output <- system2(
+    winutils,
+    c("ls", shQuote(hivePath)),
+    stdout = TRUE)
+
+  if (!is.null(output) && grepl("error", output)) {
+    stop(output)
+  }
+
+  verboseMessage("WINUTIL for ls outputs ", output)
 }
 
 

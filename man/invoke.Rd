@@ -2,8 +2,11 @@
 % Please edit documentation in R/spark_invoke.R
 \name{invoke}
 \alias{invoke}
-\alias{invoke_new}
+\alias{invoke}
+\alias{invoke}
 \alias{invoke_static}
+\alias{invoke}
+\alias{invoke_new}
 \title{Invoke a Method on a JVM Object}
 \usage{
 invoke(jobj, method, ...)
@@ -44,4 +47,3 @@ spark_context(sc) \%>\%
     invoke("count")
 
 }
-

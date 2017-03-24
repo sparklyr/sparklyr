@@ -14,4 +14,3 @@ spark_web(sc, ...)
 \description{
 Open the Spark web interface
 }
-

@@ -10,4 +10,3 @@ connection_spark_shinyapp()
 A Shiny app that can be used to construct a \code{spark_connect} statement
 }
 \keyword{internal}
-

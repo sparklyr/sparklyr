@@ -55,25 +55,25 @@ object Utils {
     }).collect()
   }
 
-  def collectColumnString(df: DataFrame, colName: String): String = {
+  def collectColumnString(df: DataFrame, colName: String, separator: String): String = {
     val text = df.select(colName).rdd.map(row => {
       val element = row(0)
       if (element.isInstanceOf[String]) element.asInstanceOf[String] else "<NA>"
-    }).collect().mkString("\n")
+    }).collect().mkString(separator)
 
-    if (text.length() > 0) text + "\n" else text
+    if (text.length() > 0) text + separator else text
   }
 
   def collectColumnDefault(df: DataFrame, colName: String): Array[Any] = {
     df.select(colName).rdd.map(row => row(0)).collect()
   }
 
-  def collectColumn(df: DataFrame, colName: String, colType: String) = {
+  def collectColumn(df: DataFrame, colName: String, colType: String, separator: String) = {
     colType match {
       case "BooleanType" => collectColumnBoolean(df, colName)
       case "IntegerType" => collectColumnInteger(df, colName)
       case "DoubleType"  => collectColumnDouble(df, colName)
-      case "StringType"  => collectColumnString(df, colName)
+      case "StringType"  => collectColumnString(df, colName, separator)
       case _             => collectColumnDefault(df, colName)
     }
   }
@@ -124,22 +124,22 @@ object Utils {
     }}
   }
 
-  def collectImplForceString(local: Array[Row], idx: Integer) = {
+  def collectImplForceString(local: Array[Row], idx: Integer, separator: String) = {
     var text = local.map{row => {
       val el = row(idx)
       if (el != null) el.toString() else "<NA>"
-    }}.mkString("\n")
+    }}.mkString(separator)
 
-    if (text.length() > 0) text + "\n" else text
+    if (text.length() > 0) text + separator else text
   }
 
-  def collectImplString(local: Array[Row], idx: Integer) = {
+  def collectImplString(local: Array[Row], idx: Integer, separator: String) = {
     var text = local.map{row => {
       val el = row(idx)
       if (el.isInstanceOf[String]) el.asInstanceOf[String] else "<NA>"
-    }}.mkString("\n")
+    }}.mkString(separator)
 
-    if (text.length() > 0) text + "\n" else text
+    if (text.length() > 0) text + separator else text
   }
 
   def collectImplDecimal(local: Array[Row], idx: Integer) = {
@@ -166,7 +166,7 @@ object Utils {
     local.map(row => row(idx))
   }
 
-  def collectImpl(local: Array[Row], idx: Integer, colType: String) = {
+  def collectImpl(local: Array[Row], idx: Integer, colType: String, separator: String) = {
 
     val ReDecimalType = "(DecimalType.*)".r
     val ReVectorType  = "(.*VectorUDT.*)".r
@@ -175,29 +175,31 @@ object Utils {
       case "BooleanType"          => collectImplBoolean(local, idx)
       case "IntegerType"          => collectImplInteger(local, idx)
       case "DoubleType"           => collectImplDouble(local, idx)
-      case "StringType"           => collectImplString(local, idx)
+      case "StringType"           => collectImplString(local, idx, separator)
       case "LongType"             => collectImplLong(local, idx)
 
       case "ByteType"             => collectImplByte(local, idx)
       case "FloatType"            => collectImplFloat(local, idx)
       case "ShortType"            => collectImplShort(local, idx)
-      case "Decimal"              => collectImplForceString(local, idx)
+      case "Decimal"              => collectImplForceString(local, idx, separator)
 
-      case "TimestampType"        => collectImplForceString(local, idx)
-      case "CalendarIntervalType" => collectImplForceString(local, idx)
-      case "DateType"             => collectImplForceString(local, idx)
+      case "TimestampType"        => collectImplForceString(local, idx, separator)
+      case "CalendarIntervalType" => collectImplForceString(local, idx, separator)
+      case "DateType"             => collectImplForceString(local, idx, separator)
 
       case ReDecimalType(_)       => collectImplDecimal(local, idx)
       case ReVectorType(_)        => collectImplVector(local, idx)
+
+      case "NullType"             => collectImplForceString(local, idx, separator)
 
       case _                      => collectImplDefault(local, idx)
     }
   }
 
-  def collect(df: DataFrame): Array[_] = {
+  def collect(df: DataFrame, separator: String): Array[_] = {
     val local : Array[Row] = df.collect()
     val dtypes = df.dtypes
-    (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2)}.toArray
+    (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
   }
 
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
@@ -238,5 +240,35 @@ object Utils {
 
   def classExists(name: String): Boolean = {
     scala.util.Try(Class.forName(name)).isSuccess
+  }
+
+  def createDataFrameFromCsv(
+    sc: SparkContext,
+    path: String,
+    columns: Array[String],
+    partitions: Int,
+    separator: String): RDD[Row] = {
+
+    val lines = scala.io.Source.fromFile(path).getLines.toIndexedSeq
+    val rddRows: RDD[String] = sc.parallelize(lines, partitions);
+
+    val data: RDD[Row] = rddRows.map(o => {
+      val r = o.split(separator, -1)
+      var typed = (Array.range(0, r.length)).map(idx => {
+        val column = columns(idx)
+        val value = r(idx)
+
+        column match {
+          case "integer"  => if (Try(value.toInt).isSuccess) value.toInt else null.asInstanceOf[Int]
+          case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
+          case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
+          case _ => value
+        }
+      })
+
+      org.apache.spark.sql.Row.fromSeq(typed)
+    })
+
+    data
   }
 }

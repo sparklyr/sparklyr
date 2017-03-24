@@ -89,16 +89,16 @@ db_data_type.src_spark <- function(...) {
 copy_to.spark_connection <- function(dest,
                                      df,
                                      name = deparse(substitute(df)),
+                                     overwrite = FALSE,
                                      memory = TRUE,
                                      repartition = 0L,
-                                     overwrite = FALSE,
                                      ...)
 {
   sdf_copy_to(dest, df, name, memory, repartition, overwrite, ...)
 }
 
 #' @export
-copy_to.src_spark <- function(dest, df, name, ...) {
+copy_to.src_spark <- function(dest, df, name, overwrite, ...) {
   copy_to(spark_connection(dest), df, name, ...)
 }
 

@@ -2,9 +2,10 @@
 % Please edit documentation in R/imports.R
 \docType{import}
 \name{reexports}
-\alias{copy_to}
 \alias{reexports}
+\alias{copy_to}
 \title{Objects exported from other packages}
+\keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links
 below to see their documentation.
@@ -12,5 +13,4 @@ below to see their documentation.
 \describe{
   \item{dplyr}{\code{\link[dplyr]{copy_to}}}
 }}
-\keyword{internal}
 

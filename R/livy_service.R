@@ -23,10 +23,6 @@ livy_service_start <- function(version = NULL, spark_version = NULL) {
 
   livyStart <- file.path(livy_home_dir(version = version), "bin/livy-server")
 
-  if (.Platform$OS.type == "unix") {
-    system2("chmod", c("744", livyStart))
-  }
-
   withr::with_envvar(env, {
     system2(
       livyStart,

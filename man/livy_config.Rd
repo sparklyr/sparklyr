@@ -4,7 +4,7 @@
 \alias{livy_config}
 \title{Create a Spark Configuration for Livy}
 \usage{
-livy_config(config = spark_config(), username, password)
+livy_config(config = spark_config(), username = NULL, password = NULL)
 }
 \arguments{
 \item{config}{Optional base configuration}
@@ -24,4 +24,3 @@ Extends a Spark \code{"spark_config"} configuration with settings
 for Livy. For instance, \code{"username"} and \code{"password"}
 define the basic authentication settings for a Livy session.
 }
-

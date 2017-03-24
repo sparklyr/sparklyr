@@ -5,7 +5,7 @@
 \title{Copy an R Data Frame to Spark}
 \usage{
 \method{copy_to}{spark_connection}(dest, df, name = deparse(substitute(df)),
-  memory = TRUE, repartition = 0L, overwrite = FALSE, ...)
+  overwrite = FALSE, memory = TRUE, repartition = 0L, ...)
 }
 \arguments{
 \item{dest}{A \code{spark_connection}.}
@@ -14,14 +14,14 @@
 
 \item{name}{The name to assign to the copied table in Spark.}
 
+\item{overwrite}{Boolean; overwrite a pre-existing table with the name \code{name}
+if one already exists?}
+
 \item{memory}{Boolean; should the table be cached into memory?}
 
 \item{repartition}{The number of partitions to use when distributing the
 table across the Spark cluster. The default (0) can be used to avoid
 partitioning.}
-
-\item{overwrite}{Boolean; overwrite a pre-existing table with the name \code{name}
-if one already exists?}
 
 \item{...}{Optional arguments; currently unused.}
 }
@@ -34,4 +34,3 @@ Copy an R \code{data.frame} to Spark, and return a reference to the
 generated Spark DataFrame as a \code{tbl_spark}. The returned object will
 act as a \code{dplyr}-compatible interface to the underlying Spark table.
 }
-

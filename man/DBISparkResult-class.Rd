@@ -18,5 +18,5 @@ DBI Spark Result.
 
 \item{\code{state}}{environment.}
 }}
-\keyword{internal}
 
+\keyword{internal}

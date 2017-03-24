@@ -1,3 +1,6 @@
 Name: Spark
 ShinyApp: connection_spark_shinyapp
 HelpUrl: http://spark.rstudio.com
+
+Name: Livy
+HelpUrl: http://spark.rstudio.com/deployment.html#livy_connections

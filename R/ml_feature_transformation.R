@@ -301,18 +301,21 @@ ft_quantile_discretizer <- function(x,
 #' categorical features.
 #'
 #' @template roxlate-ml-transformation
+#' @param drop.last Boolean; drop the last category?
 #'
 #' @export
 ft_one_hot_encoder <- function(x,
                                input.col = NULL,
                                output.col = NULL,
+                               drop.last = TRUE,
                                ...)
 {
   ml_backwards_compatibility_api()
   class <- "org.apache.spark.ml.feature.OneHotEncoder"
   invoke_simple_transformer(x, class, list(
     setInputCol  = ensure_scalar_character(input.col),
-    setOutputCol = ensure_scalar_character(output.col)
+    setOutputCol = ensure_scalar_character(output.col),
+    setDropLast  = ensure_scalar_boolean(drop.last)
   ))
 }
 

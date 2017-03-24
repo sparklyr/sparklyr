@@ -17,8 +17,19 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
   version <- spark_version(sc)
   method <- if (version < "2.0.0") "unionAll" else "union"
 
+  columns <- sdf %>%
+    invoke("columns") %>%
+    unlist
+
+  reorder_columns <- function(sdf) {
+    cols <- columns %>%
+      lapply(function(column) invoke(sdf, "col", column))
+    sdf %>%
+      invoke("select", cols)
+  }
+
   for (i in 2:n)
-    sdf <- invoke(sdf, method, spark_dataframe(dots[[i]]))
+    sdf <- invoke(sdf, method, reorder_columns(spark_dataframe(dots[[i]])))
 
   sdf_register(sdf, name = name)
 }

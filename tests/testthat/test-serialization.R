@@ -127,3 +127,15 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
 
 })
 
+test_that("newlines are properly serialized / deserialized", {
+  skip("NYI")
+
+  df <- data.frame(
+    x = 1:3,
+    y = c("a\nb", "b", "c"),
+    stringsAsFactors = FALSE
+  )
+
+  ensure_round_trip(sc, df)
+
+})

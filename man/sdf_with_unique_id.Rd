@@ -20,4 +20,3 @@ is no guarantee that these IDs will be sequential. The table is persisted
 immediately after the column is generated, to ensure that the column is
 stable -- otherwise, it can differ across new computations.
 }
-

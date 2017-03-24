@@ -187,15 +187,17 @@ spark_sanitize_names <- function(names) {
   newNames
 }
 
-# normalize a path we are going to send to spark (pass mustWork = FALSE
-# so that e.g. hdfs:// and s3n:// paths don't produce a warning). note
+# normalizes a path that we are going to send to spark but avoids
+# normalizing remote identifiers like hdfs:// or s3n://. note
 # that this will take care of path.expand ("~") as well as converting
 # relative paths to absolute (necessary since the path will be read by
 # another process that has a different current working directory)
 spark_normalize_path <- function(path) {
-  # only normalize paths in OS that behave correctly for custom
-  # protocols, in windows, this is not the case. See #432
-  if (normalizePath("s3n://", mustWork = FALSE) == "s3n://") {
+  # don't normalize paths that are urls
+  if (grepl("[a-zA-Z]+://", path)) {
+    path
+  }
+  else {
     normalizePath(path, mustWork = FALSE)
   }
 }
@@ -272,4 +274,16 @@ sparklyr_boolean_option <- function(...) {
 
 sparklyr_verbose <- function(...) {
   sparklyr_boolean_option(..., "sparklyr.verbose")
+}
+
+trim_whitespace <- function(strings) {
+  gsub("^[[:space:]]*|[[:space:]]*$", "", strings)
+}
+
+
+split_separator <- function(sc) {
+  if (inherits(sc, "livy_connection"))
+    list(scala = "\\|~\\|", r = "|~|")
+  else
+    list(scala = "\31", r = "\31")
 }

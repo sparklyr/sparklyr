@@ -19,4 +19,3 @@ Starts the livy service.
 
 Stops the running instances of the livy service.
 }
-
