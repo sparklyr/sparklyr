@@ -21,21 +21,28 @@
 NULL
 
 #' @name invoke
+#' @examples
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' spark_context(sc) %>%
+#'   invoke("textFile", "file.csv", 1L) %>%
+#'     invoke("count")
+#'
 #' @export
 invoke <- function(jobj, method, ...) {
-  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
+  UseMethod("invoke")
 }
 
 #' @name invoke
 #' @export
 invoke_static <- function(sc, class, method, ...) {
-  invoke_method(sc, TRUE, class, method, ...)
+  UseMethod("invoke_static")
 }
 
 #' @name invoke
 #' @export
 invoke_new <- function(sc, class, ...) {
-  invoke_method(sc, TRUE, class, "<init>", ...)
+  UseMethod("invoke_new")
 }
 
 #' Generic call interface for spark shell

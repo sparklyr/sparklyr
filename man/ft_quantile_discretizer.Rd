@@ -5,7 +5,7 @@
 \title{Feature Transformation -- QuantileDiscretizer}
 \usage{
 ft_quantile_discretizer(x, input.col = NULL, output.col = NULL,
-  n.buckets = 5, ...)
+  n.buckets = 5L, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -37,6 +37,7 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
 
 Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_bucketizer}},
+  \code{\link{ft_count_vectorizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
@@ -48,4 +49,3 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }
-

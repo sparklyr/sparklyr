@@ -30,12 +30,17 @@ ml_kmeans <- function(x,
                       ml.options = ml_options(),
                       ...)
 {
+  ml_backwards_compatibility_api()
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  df <- ml_prepare_features(df, features)
-
-  ml_backwards_compatibility_api()
+  df <- ml_prepare_features(
+    x = df,
+    features = features,
+    envir = environment(),
+    ml.options = ml.options
+  )
 
   centers <- ensure_scalar_integer(centers)
   iter.max <- ensure_scalar_integer(iter.max)
@@ -73,8 +78,12 @@ ml_kmeans <- function(x,
   kmmCenters <- invoke(fit, "clusterCenters")
 
   # compute cost for k-means
-  if (compute.cost)
-    kmmCost <- invoke(fit, "computeCost", tdf)
+  if (compute.cost) {
+    kmmCost <- tryCatch(
+      invoke(fit, "computeCost", tdf),
+      error = function(e) NULL
+    )
+  }
 
   centersList <- transpose_list(lapply(kmmCenters, function(center) {
     as.numeric(invoke(center, "toArray"))

@@ -22,4 +22,3 @@ Packages should typically register their extensions in their
   \code{.onLoad} hook -- this ensures that their extensions are registered
   when their namespaces are loaded.
 }
-

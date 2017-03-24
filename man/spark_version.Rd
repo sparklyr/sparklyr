@@ -20,4 +20,3 @@ Suffixes for e.g. preview versions, or snapshotted versions,
 are trimmed -- if you require the full Spark version, you can
 retrieve it with \code{invoke(spark_context(sc), "version")}.
 }
-

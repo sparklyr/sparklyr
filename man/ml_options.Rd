@@ -7,7 +7,7 @@
 ml_options(id.column = random_string("id"),
   response.column = random_string("response"),
   features.column = random_string("features"), model.transform = NULL,
-  only.model = FALSE, ...)
+  only.model = FALSE, na.action = getOption("na.action", "na.omit"), ...)
 }
 \arguments{
 \item{id.column}{The name to assign to the generated id column.}
@@ -23,10 +23,12 @@ fitting parameters not made available in the \code{sparklyr} APIs.}
 \item{only.model}{Boolean; should the Spark model object itself be returned
 without fitting the actual model? Useful for \code{\link{ml_one_vs_rest}}.}
 
+\item{na.action}{An \R function, or the name of an \R function, indicating
+how missing values should be handled.}
+
 \item{...}{Optional arguments, reserved for future expansion.}
 }
 \description{
 Provide this object to the various Spark ML methods, to control certain
 facets of the model outputs produced.
 }
-

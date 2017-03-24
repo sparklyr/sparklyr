@@ -171,20 +171,17 @@ runResults <- list()
 
 runResults <- spark_perf_single_test(runResults, "local", NA, "1.6.0", "INFO", FALSE, 0, FALSE, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", NA, "1.6.0", "INFO", TRUE, 0, FALSE, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NA, "2.0.0-preview", "INFO", FALSE, 0, FALSE, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NA, "2.0.0-preview", "INFO", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NA, "2.0.0", "INFO", FALSE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NA, "2.0.0", "INFO", TRUE, 0, FALSE, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "INFO", FALSE, 0, FALSE, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "WARN", FALSE, 0, FALSE, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "WARN", TRUE, 0, FALSE, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "WARN", TRUE, 8, FALSE, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "WARN", TRUE, 8, FALSE, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "WARN", TRUE, 0, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "WARN", TRUE, 8, FALSE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "WARN", TRUE, 0, FALSE, FALSE)
 runResults <- spark_perf_single_test(runResults, "local", NULL, "1.6.0", "WARN", TRUE, 0, TRUE, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "WARN", TRUE, 0, TRUE, FALSE)
-runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0-preview", "WARN", TRUE, 0, TRUE, TRUE)
-
-# default configuration
-runResults <- spark_perf_single_test(runResults, "local", NULL, NULL, "INFO", TRUE, 0, NULL, NULL)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "WARN", TRUE, 0, TRUE, FALSE)
+runResults <- spark_perf_single_test(runResults, "local", NULL, "2.0.0", "WARN", TRUE, 0, TRUE, TRUE)
 
 results <- do.call("rbind", runResults)
 

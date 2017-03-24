@@ -1,4 +1,5 @@
 spark_csv_options <- function(header,
+                              inferSchema,
                               delimiter,
                               quote,
                               escape,
@@ -9,6 +10,7 @@ spark_csv_options <- function(header,
     options,
     list(
       header = ifelse(header, "true", "false"),
+      inferSchema = ifelse(inferSchema, "true", "false"),
       delimiter = toString(delimiter),
       quote = toString(quote),
       escape = toString(escape),
@@ -25,15 +27,18 @@ spark_csv_options <- function(header,
 #' @param sc A \code{spark_connection}.
 #' @param name The name to assign to the newly generated table.
 #' @param path The path to the file. Needs to be accessible from the cluster.
-#'   Supports the "hdfs://", "s3n://" and "file://" protocols.
+#'   Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.
 #' @param memory Boolean; should the data be loaded eagerly into memory? (That
 #'   is, should the table be cached?)
 #' @param header Boolean; should the first row of data be used as a header?
 #'   Defaults to \code{TRUE}.
-#' @param delimiter The character used to delimit each column. Defaults to \code{,}.
-#' @param quote The character used as a quote. Defaults to \code{"hdfs://"}.
-#' @param escape The chatacter used to escape other characters. Defaults to \code{\\}.
-#' @param charset The character set. Defaults to \code{"UTF-8"}.
+#' @param columns A vector of column names or a named vector of column types.
+#' @param infer_schema Boolean; should column types be automatically inferred?
+#'   Requires one extra pass over the data. Defaults to \code{TRUE}.
+#' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
+#' @param quote The character used as a quote. Defaults to \samp{'"'}.
+#' @param escape The character used to escape other characters. Defaults to \samp{'\'}.
+#' @param charset The character set. Defaults to \samp{"UTF-8"}.
 #' @param null_value The character to use for null, or missing, values. Defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
 #' @param repartition The number of partitions used to distribute the
@@ -58,6 +63,8 @@ spark_read_csv <- function(sc,
                            name,
                            path,
                            header = TRUE,
+                           columns = NULL,
+                           infer_schema = TRUE,
                            delimiter = ",",
                            quote = "\"",
                            escape = "\\",
@@ -67,17 +74,31 @@ spark_read_csv <- function(sc,
                            repartition = 0,
                            memory = TRUE,
                            overwrite = TRUE) {
+  columnsHaveTypes <- length(names(columns)) > 0
+  if (!identical(columns, NULL) & isTRUE(infer_schema) & columnsHaveTypes) {
+    stop("'infer_schema' must be set to FALSE when 'columns' specifies column types")
+  }
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
-  df <- spark_csv_read(sc, spark_normalize_path(path), options)
+  options <- spark_csv_options(header, infer_schema, delimiter, quote, escape, charset, null_value, options)
+  df <- spark_csv_read(
+    sc,
+    spark_normalize_path(path),
+    options,
+    if (columnsHaveTypes) columns else NULL)
 
-  if (identical(header, FALSE)) {
-    # normalize column names when header = FALSE
-    columns <- invoke(df, "columns")
-    n <- length(columns)
-    newNames <- sprintf("V%s", seq_len(n))
+  if ((identical(columns, NULL) & identical(header, FALSE)) |
+      (!identical(columns, NULL) & !columnsHaveTypes)) {
+    newNames <- if (!identical(columns, NULL)) {
+      columns
+    }
+    else {
+      # create normalized column names when header = FALSE and a columns specification is not supplied
+      columns <- invoke(df, "columns")
+      n <- length(columns)
+      sprintf("V%s", seq_len(n))
+    }
     df <- invoke(df, "toDF", as.list(newNames))
   } else {
     # sanitize column names
@@ -129,7 +150,7 @@ spark_write_csv.tbl_spark <- function(x,
                                       null_value = NULL,
                                       options = list()) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
+  options <- spark_csv_options(header, TRUE, delimiter, quote, escape, charset, null_value, options)
 
   spark_csv_write(sqlResult, spark_normalize_path(path), options)
 }
@@ -145,7 +166,7 @@ spark_write_csv.spark_jobj <- function(x,
                                        null_value = NULL,
                                        options = list()) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  options <- spark_csv_options(header, delimiter, quote, escape, charset, null_value, options)
+  options <- spark_csv_options(header, TRUE, delimiter, quote, escape, charset, null_value, options)
 
   spark_csv_write(x, spark_normalize_path(path), options)
 }
@@ -282,11 +303,11 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
   }
 }
 
-spark_data_read_generic <- function(sc, path, fileMethod, csvOptions = list()) {
+spark_data_read_generic <- function(sc, path, fileMethod, readOptions = list()) {
   options <- invoke(hive_context(sc), "read")
 
-  lapply(names(csvOptions), function(csvOptionName) {
-    options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+  lapply(names(readOptions), function(optionName) {
+    options <<- invoke(options, "option", optionName, readOptions[[optionName]])
   })
 
   invoke(options, fileMethod, path)
@@ -296,7 +317,17 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
   options <- invoke(df, "write")
 
   if (!is.null(mode)) {
-    options <- invoke(options, "mode", mode)
+    if (is.list(mode)) {
+      lapply(mode, function(m) {
+        options <<- invoke(options, "mode", m)
+      })
+    }
+    else if (is.character(mode)) {
+      options <- invoke(options, "mode", mode)
+    }
+    else {
+      stop("Unsupported type ", typeof(mode), " for mode parameter.")
+    }
   }
 
   lapply(names(csvOptions), function(csvOptionName) {
@@ -305,4 +336,131 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
 
   invoke(options, fileMethod, path)
   invisible(TRUE)
+}
+
+#' Reads from a Spark Table into a Spark DataFrame.
+#'
+#' Reads from a Spark Table into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_table <- function(sc,
+                             name,
+                             options = list(),
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE) {
+
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+
+  df <- spark_data_read_generic(sc, name, "table", options)
+  spark_partition_register_df(sc, df, name, repartition, memory)
+}
+
+#' Reads from a Spark Table into a Spark DataFrame.
+#'
+#' Reads from a Spark Table into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_load_table <- function(sc,
+                             name,
+                             path,
+                             options = list(),
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE) {
+  .Deprecated("spark_read_table")
+  spark_read_table(
+    sc,
+    name,
+    options,
+    repartition,
+    memory,
+    overwrite
+  )
+}
+
+#' Writes a Spark DataFrame into a Spark table
+#'
+#' Writes a Spark DataFrame into a Spark table.
+#'
+#' @inheritParams spark_write_csv
+#' @param name The name to assign to the newly generated table.
+#' @param mode Specifies the behavior when data or table already exists.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_write_table <- function(x, name, mode = NULL, options = list()) {
+  UseMethod("spark_write_table")
+}
+
+#' Saves a Spark DataFrame as a Spark table
+#'
+#' Saves a Spark DataFrame and as a Spark table.
+#'
+#' @inheritParams spark_write_csv
+#' @param mode Specifies the behavior when data or table already exists.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_save_table <- function(x, path, mode = NULL, options = list()) {
+  .Deprecated("spark_write_table")
+  spark_write_table(x, path, mode, options)
+}
+
+#' @export
+spark_write_table.tbl_spark <- function(x, name, mode = NULL, options = list()) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  sc <- spark_connection(x)
+
+  if (spark_version(sc) < "2.0.0" && spark_master_is_local(sc$master)) {
+    stop(
+      "spark_write_table is not supported in local clusters for Spark ",
+      spark_version(sc), ". ",
+      "Upgrade to Spark 2.X or use this function in a non-local Spark cluster.")
+  }
+
+  spark_data_write_generic(sqlResult, name, "saveAsTable", mode, options)
+}
+
+#' @export
+spark_write_table.spark_jobj <- function(x, name, mode = NULL, options = list()) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  sc <- spark_connection(x)
+
+  spark_data_write_generic(x, name, "saveAsTable", mode, options)
+}
+
+#' Read from JDBC connection into a Spark DataFrame.
+#'
+#' Read from JDBC connection into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_jdbc <- function(sc,
+                             name,
+                             options = list(),
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE) {
+
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+
+  df <- spark_data_read_generic(sc, "jdbc", "format", options) %>% invoke("load")
+  spark_partition_register_df(sc, df, name, repartition, memory)
 }

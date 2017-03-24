@@ -2,13 +2,51 @@ is.installed <- function(package) {
   is.element(package, installed.packages()[,1])
 }
 
-is_java_available <- function() {
+get_java <- function() {
   java_home <- Sys.getenv("JAVA_HOME", unset = NA)
   if (!is.na(java_home))
     java <- file.path(java_home, "bin", "java")
   else
     java <- Sys.which("java")
-  nzchar(java)
+  java
+}
+
+is_java_available <- function() {
+  nzchar(get_java())
+}
+
+validate_java_version <- function(spark_home) {
+  # if somene sets SPARK_HOME, assume Java is available since some systems
+  # (e.g. CDH) use versions of java not discoverable through JAVA_HOME.
+  if (!is.null(spark_home) && nchar(spark_home) > 0)
+    return(TRUE)
+
+  # find the active java executable
+  java <- get_java()
+  if (!nzchar(get_java()))
+    stop("Java is required to connect to Spark. Please download and install Java from ",
+         java_install_url())
+
+  # query its version
+  version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
+  if (length(version) < 1)
+    stop("Java version not detected. Please download and install Java from ",
+         java_install_url())
+
+  # transform to usable R version string
+  splat <- strsplit(version[[1]], "\\s+", perl = TRUE)[[1]]
+  parsedVersion <- regex_replace(
+    splat[[length(splat)]],
+    "^\"|\"$" = "",
+    "_" = "."
+  )
+
+  # ensure Java 1.7 or higher
+  if (compareVersion(parsedVersion, "1.7") < 0)
+    stop("Java version", parsedVersion, " detected but 1.7+ is required. Please download and install Java from ",
+         java_install_url())
+
+  TRUE
 }
 
 java_install_url <- function() {
@@ -113,7 +151,12 @@ spark_sanitize_names <- function(names) {
   newNames <- make.unique(newNames, sep = "_")
 
   # report translations
-  if (isTRUE(getOption("sparklyr.verbose", TRUE))) {
+  verbose <- sparklyr_boolean_option(
+    "sparklyr.sanitize.column.names.verbose",
+    "sparklyr.verbose"
+  )
+
+  if (verbose) {
 
     changedIdx <- which(oldNames != newNames)
     if (length(changedIdx)) {
@@ -144,13 +187,19 @@ spark_sanitize_names <- function(names) {
   newNames
 }
 
-# normalize a path we are going to send to spark (pass mustWork = FALSE
-# so that e.g. hdfs:// and s3n:// paths don't produce a warning). note
+# normalizes a path that we are going to send to spark but avoids
+# normalizing remote identifiers like hdfs:// or s3n://. note
 # that this will take care of path.expand ("~") as well as converting
 # relative paths to absolute (necessary since the path will be read by
 # another process that has a different current working directory)
 spark_normalize_path <- function(path) {
-  normalizePath(path, mustWork = FALSE)
+  # don't normalize paths that are urls
+  if (grepl("[a-zA-Z]+://", path)) {
+    path
+  }
+  else {
+    normalizePath(path, mustWork = FALSE)
+  }
 }
 
 stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
@@ -158,6 +207,10 @@ stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
     sprintf(fmt, ...),
     if (call.) sys.call(sys.parent())
   ))
+}
+
+warnf <- function(fmt, ..., call. = TRUE, immediate. = FALSE) {
+  warning(sprintf(fmt, ...), call. = call., immediate. = immediate.)
 }
 
 enumerate <- function(object, f, ...) {
@@ -198,4 +251,39 @@ split_chunks <- function(x, chunk_size) {
   mapply(function(start, end) {
     x[start:end]
   }, starts, ends, SIMPLIFY = FALSE, USE.NAMES = FALSE)
+}
+
+remove_class <- function(object, class) {
+  classes <- attr(object, "class")
+  newClasses <- classes[!classes %in% c(class)]
+
+  attr(object, "class") <- newClasses
+  object
+}
+
+sparklyr_boolean_option <- function(...) {
+
+  for (name in list(...)) {
+    value <- getOption(name) %||% FALSE
+    if (length(value) == 1 && isTRUE(as.logical(value)))
+      return(TRUE)
+  }
+
+  FALSE
+}
+
+sparklyr_verbose <- function(...) {
+  sparklyr_boolean_option(..., "sparklyr.verbose")
+}
+
+trim_whitespace <- function(strings) {
+  gsub("^[[:space:]]*|[[:space:]]*$", "", strings)
+}
+
+
+split_separator <- function(sc) {
+  if (inherits(sc, "livy_connection"))
+    list(scala = "\\|~\\|", r = "|~|")
+  else
+    list(scala = "\31", r = "\31")
 }

@@ -5,7 +5,7 @@ Setup
 -----
 
 ``` r
-sparklyr:::spark_install(version = "2.0.0-preview", reset = TRUE)
+sparklyr:::spark_install(version = "2.0.0", reset = TRUE)
 ```
 
 Initialization
@@ -62,7 +62,7 @@ Results
 
 ``` r
 sc <- spark_connect(master = "local",
-                    version = "2.0.0-preview",
+                    version = "2.0.0",
                     config = config)
 
 serializers <- list(
@@ -114,6 +114,6 @@ results
 ```
 
     ##        label   min   max      mean
-    ## 1   csv_file 0.600 0.722 0.6466667
-    ## 2 typed_list 8.928 9.493 9.1686667
-    ## 3 csv_string 1.061 1.218 1.1170000
+    ## 1   csv_file 0.407 0.563 0.4920000
+    ## 2 typed_list 8.588 8.930 8.7050000
+    ## 3 csv_string 0.903 1.022 0.9626667

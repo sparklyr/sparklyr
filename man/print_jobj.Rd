@@ -15,4 +15,3 @@ print_jobj(sc, jobj, ...)
 Generic method for print jobj for a connection type
 }
 \keyword{internal}
-

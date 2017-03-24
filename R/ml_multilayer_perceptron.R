@@ -26,19 +26,20 @@ ml_multilayer_perceptron <- function(x,
                                      ml.options = ml_options(),
                                      ...)
 {
+  ml_backwards_compatibility_api()
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  ml_backwards_compatibility_api()
-
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
-    df,
-    response,
-    features,
-    NULL,
-    environment(),
-    categorical.transformations
+    x = df,
+    response = response,
+    features = features,
+    intercept = NULL,
+    envir = environment(),
+    categorical.transformations = categorical.transformations,
+    ml.options = ml.options
   )
 
   layers <- as.integer(layers)
@@ -95,7 +96,7 @@ ml_multilayer_perceptron_validate_layers <- function(x,
     stop("'layers' should be a numeric vector of length >= 2")
 
   if (length(features) != layers[[1]])
-    stop("the first element of 'layers' should be the same length as the 'features' vector")
+    stop("the first element of 'layers' should be set to ", length(features) ," (the same length as the 'features' vector).")
 
   # TODO: validate length of last layer?
   TRUE

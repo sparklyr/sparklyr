@@ -25,10 +25,8 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
 
     retries <- retries  - 1;
 
-    # wait for one second without depending on the behavior of socketConnection timeout
-    while (commandStart + 1 > Sys.time()) {
-      Sys.sleep(0.1)
-    }
+    startWait <- spark_config_value(config, "sparklyr.gateway.start.wait", 50)
+    Sys.sleep(startWait / 1000)
   }
 
   gateway
@@ -64,7 +62,10 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   backendPort <- readInt(gateway)
 
   if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
-    stop("Sparklyr gateway did not respond while retrieving ports information after ", waitSeconds, " seconds")
+    if (isStarting)
+      stop("Sparklyr gateway did not respond while retrieving ports information after ", waitSeconds, " seconds")
+    else
+      return(NULL)
   }
 
   list(
@@ -93,6 +94,11 @@ spark_connect_gateway <- function(
   }
   else {
     gatewayPortsQuery <- query_gateway_for_port(gateway, sessionId, config, isStarting)
+    if (is.null(gatewayPortsQuery) && !isStarting) {
+      close(gateway)
+      return(NULL)
+    }
+
     redirectGatewayPort <- gatewayPortsQuery$redirectGatewayPort
     backendPort <- gatewayPortsQuery$backendPort
 

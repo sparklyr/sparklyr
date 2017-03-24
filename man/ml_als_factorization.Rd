@@ -6,6 +6,7 @@
 \usage{
 ml_als_factorization(x, rating.column = "rating", user.column = "user",
   item.column = "item", rank = 10L, regularization.parameter = 0.1,
+  implicit.preferences = FALSE, alpha = 1, nonnegative = FALSE,
   iter.max = 10L, ml.options = ml_options(), ...)
 }
 \arguments{
@@ -22,12 +23,21 @@ ml_als_factorization(x, rating.column = "rating", user.column = "user",
 
 \item{regularization.parameter}{The regularization parameter.}
 
+\item{implicit.preferences}{Use implicit preference.}
+
+\item{alpha}{The parameter in the implicit preference formulation.}
+
+\item{nonnegative}{Use nonnegative constraints for least squares.}
+
 \item{iter.max}{The maximum number of iterations to use.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Optional arguments. The \code{data} argument can be used to
+specify the data to be used when \code{x} is a formula; this allows calls
+of the form \code{ml_linear_regression(y ~ x, data = tbl)}, and is
+especially useful in conjunction with \code{\link{do}}.}
 }
 \description{
 Perform alternating least squares matrix factorization on a Spark DataFrame.
@@ -45,4 +55,3 @@ Other Spark ML routines: \code{\link{ml_decision_tree}},
   \code{\link{ml_random_forest}},
   \code{\link{ml_survival_regression}}
 }
-

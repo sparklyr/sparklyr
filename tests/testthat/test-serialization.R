@@ -1,6 +1,9 @@
 context("serialization")
 sc <- testthat_spark_connection()
 
+test_requires("nycflights13")
+flights_tbl <- testthat_tbl("flights")
+
 ensure_round_trip <- function(sc, data) {
   # round-trip data through Spark
   copied <- copy_to(sc, data, overwrite = TRUE)
@@ -87,4 +90,52 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
 
   # the above failed with a Java StackOverflow with older versions of sparklyr
   expect_true(TRUE, info = "no Java StackOverflow on copy of large dataset")
+})
+
+test_that("'sdf_predict()', 'predict()' return same results", {
+
+  model <- flights_tbl %>%
+    ml_decision_tree(sched_dep_time ~ dep_time)
+
+  id <- model$model.parameters$id
+
+  predictions <- sdf_predict(model)
+  n1 <- spark_dataframe(predictions) %>% invoke("count")
+  n2 <- length(predict(model))
+
+  expect_equal(n1, n2)
+
+  lhs <- predictions %>%
+    arrange_(.dots = list(model$model.parameters$id)) %>%
+    sdf_read_column("prediction")
+
+  rhs <- predict(model)
+
+  expect_identical(lhs, rhs)
+
+})
+
+test_that("copy_to() succeeds when last column contains missing / empty values", {
+
+  df <- data.frame(
+    x = c(1, 2),
+    z = c(NA, ""),
+    stringsAsFactors = FALSE
+  )
+
+  copy_to(sc, df, serializer = "csv_string", overwrite = TRUE)
+
+})
+
+test_that("newlines are properly serialized / deserialized", {
+  skip("NYI")
+
+  df <- data.frame(
+    x = 1:3,
+    y = c("a\nb", "b", "c"),
+    stringsAsFactors = FALSE
+  )
+
+  ensure_round_trip(sc, df)
+
 })

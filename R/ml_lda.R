@@ -10,7 +10,23 @@
 #' @param alpha Concentration parameter for the prior placed on documents' distributions over topics. This is a singleton which is replicated to a vector of length \code{k} in fitting (as currently EM optimizer only supports symmetric distributions, so all values in the vector should be the same). For Expectation-Maximization optimizer values should be > 1.0.
 #' By default \code{alpha = (50 / k) + 1}, where \code{50/k} is common in LDA libraries and +1 follows from Asuncion et al. (2009), who recommend a +1 adjustment for EM.
 #' @param beta Concentration parameter for the prior placed on topics' distributions over terms. For Expectation-Maximization optimizer value should be > 1.0 and by default \code{beta = 0.1 + 1}, where 0.1 gives a small amount of smoothing and +1 follows Asuncion et al. (2009), who recommend a +1 adjustment for EM.
+#' @examples
+#' \dontrun{
+#' library(janeaustenr)
+#' library(sparklyr)
+#' library(dplyr)
 #'
+#' sc <- spark_connect(master = "local")
+#'
+#' austen_books <- austen_books()
+#' books_tbl <- sdf_copy_to(sc, austen_books, overwrite = TRUE)
+#' first_tbl <- books_tbl %>% filter(nchar(text) > 0) %>% head(100)
+#'
+#' first_tbl %>%
+#'   ft_tokenizer("text", "tokens") %>%
+#'   ft_count_vectorizer("tokens", "features") %>%
+#'   ml_lda("features", k = 4)
+#' }
 #' @references
 #' Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Allocation." JMLR, 2003.
 #'
@@ -34,17 +50,24 @@ ml_lda <- function(x,
                    ml.options = ml_options(),
                    ...)
 {
-  stopifnot(alpha > 1)
+  ml_backwards_compatibility_api()
 
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  ml_prepare_features(df, features)
+  df <- ml_prepare_features(
+    x = df,
+    features = features,
+    envir = environment(),
+    ml.options = ml.options
+  )
 
   alpha      <- ensure_scalar_double(alpha)
   beta       <- ensure_scalar_double(beta)
   k          <- ensure_scalar_integer(k)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
+
+  stopifnot(alpha > 1)
 
   envir <- new.env(parent = emptyenv())
 

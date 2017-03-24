@@ -12,31 +12,66 @@
 #'
 #' @param sc The associated Spark connection.
 #' @param x An \R object from which a Spark DataFrame can be generated.
+#' @param name The name to assign to the copied table in Spark.
+#' @param memory Boolean; should the table be cached into memory?
+#' @param repartition The number of partitions to use when distributing the
+#'   table across the Spark cluster. The default (0) can be used to avoid
+#'   partitioning.
+#' @param overwrite Boolean; overwrite a pre-existing table with the name \code{name}
+#'   if one already exists?
 #' @param ... Optional arguments, passed to implementing methods.
 #'
 #' @family Spark data frames
 #'
+#' @examples
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' sdf_copy_to(sc, iris)
+#'
 #' @name sdf_copy_to
 #' @export
-sdf_copy_to <- function(sc, x, ...) {
+sdf_copy_to <- function(sc,
+                        x,
+                        name,
+                        memory,
+                        repartition,
+                        overwrite,
+                        ...) {
   UseMethod("sdf_copy_to")
 }
 
 #' @export
-sdf_copy_to.default <- function(sc, x, ...) {
-  sdf_import(x, sc)
+sdf_copy_to.default <- function(sc,
+                                x,
+                                name = deparse(substitute(x)),
+                                memory = TRUE,
+                                repartition = 0L,
+                                overwrite = FALSE,
+                                ...
+) {
+  sdf_import(x, sc, name, memory, repartition, overwrite, ...)
 }
 
 #' @name sdf_copy_to
 #' @export
-sdf_import <- function(x, sc, ...) {
+sdf_import <- function(x,
+                       sc,
+                       name,
+                       memory,
+                       repartition,
+                       overwrite,
+                       ...) {
   UseMethod("sdf_import")
 }
 
 #' @export
-sdf_import.default <- function(x, sc, ...,
+sdf_import.default <- function(x,
+                               sc,
                                name = random_string("sparklyr_tmp_"),
-                               cache = TRUE)
+                               memory = TRUE,
+                               repartition = 0L,
+                               overwrite = FALSE,
+                               ...)
 {
   # ensure data.frame
   if (!is.data.frame(x)) {
@@ -48,71 +83,21 @@ sdf_import.default <- function(x, sc, ...,
     )
   }
 
-  # generate a CSV file from the associated data frame
-  # note that these files need to live for the R session
-  # duration so we don't clean these up eagerly
-  # write file based on hash to avoid writing too many files
-  # on repeated import calls
-  hash <- digest::digest(x, algo = "sha256")
-  filename <- paste("spark_csv_", hash, ".csv", sep = "")
-  tempfile <- file.path(tempdir(), filename)
+  if (overwrite)
+    spark_remove_table_if_exists(sc, name)
+  else if (name %in% src_tbls(sc))
+    stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
 
-  if (!file.exists(tempfile)) {
-    readr::write_csv(
-      x,
-      path = tempfile,
-      col_names = TRUE
-    )
-  }
+  dots <- list(...)
+  serializer <- dots$serializer
+  spark_data_copy(sc, x, name = name, repartition = repartition, serializer = serializer)
 
-  # generate path that Spark can use
-  path <- normalizePath(tempfile, winslash = "/", mustWork = TRUE)
+  if (memory)
+    tbl_cache(sc, name)
 
-  # generate the Spark CSV reader
-  ctx <- hive_context(sc)
-  reader <- invoke(ctx, "read")
+  on_connection_updated(sc, name)
 
-  # construct schema
-  # TODO: move to separate function?
-  fields <- lapply(names(x), function(name) {
-
-    # infer the type
-    value <- x[[name]]
-    type <- if (is.factor(value))
-      "character"
-    else
-      typeof(value)
-
-    # create struct field
-    invoke_static(
-      sc,
-      "sparklyr.SQLUtils",
-      "createStructField",
-      name,
-      type,
-      TRUE
-
-    )
-  })
-
-  schema <- invoke_static(
-    sc,
-    "sparklyr.SQLUtils",
-    "createStructType",
-    fields
-  )
-
-  # invoke CSV reader with our schema
-  sdf <- reader %>%
-    invoke("format", "com.databricks.spark.csv") %>%
-    invoke("option", "header", "true") %>%
-    invoke("schema", schema) %>%
-    invoke("load", path)
-
-  if (cache)
-    sdf <- invoke(sdf, "cache")
-
-  sdf_register(sdf, name)
+  tbl(sc, name)
 }
 
 #' Register a Spark DataFrame
@@ -511,50 +496,14 @@ ml_create_dummy_variables <- function(x,
   sdf_register(mutated)
 }
 
-#' @export
-na.omit.tbl_spark <- function(object, columns = NULL, ...) {
-  sdf <- spark_dataframe(object)
-  na <- invoke(sdf, "na")
-  dropped <- if (is.null(columns))
-    invoke(na, "drop")
-  else
-    invoke(na, "drop", as.list(columns))
-  sdf_register(dropped)
-}
-
-#' Replace Missing Values in Objects
-#'
-#' This S3 generic provides an interface for replacing
-#' \code{\link{NA}} values within an object.
-#'
-#' @param object An \R object.
-#' @param ... Arguments passed along to implementing methods.
-#'
-#' @export
-na.replace <- function(object, ...) {
-  UseMethod("na.replace")
-}
-
-#' @export
-na.replace.tbl_spark <- function(object, ...) {
-  sdf <- spark_dataframe(object)
-  dots <- list(...)
-  enumerate(dots, function(key, val) {
-    na <- invoke(sdf, "na")
-    sdf <<- if (is.null(key))
-      invoke(na, "fill", val)
-    else
-      invoke(na, "fill", val, as.list(key))
-  })
-  sdf_register(sdf)
-}
-
 #' Add a Unique ID Column to a Spark DataFrame
 #'
 #' Add a unique ID column to a Spark DataFrame. The Spark
 #' \code{monotonicallyIncreasingId} function is used to produce these and is
-#' guaranteed to produce unique, monotonically increasing ids; however, there is
-#' no guarantee that these IDs will be sequential.
+#' guaranteed to produce unique, monotonically increasing ids; however, there
+#' is no guarantee that these IDs will be sequential. The table is persisted
+#' immediately after the column is generated, to ensure that the column is
+#' stable -- otherwise, it can differ across new computations.
 #'
 #' @template roxlate-ml-x
 #' @param id The name of the column to host the generated IDs.
@@ -574,7 +523,10 @@ sdf_with_unique_id <- function(x, id = "id") {
 
   mii <- invoke(mii, "cast", "double")
 
-  transformed <- invoke(sdf, "withColumn", id, mii)
+  transformed <- sdf %>%
+    invoke("withColumn", id, mii) %>%
+    sdf_persist(storage.level = "MEMORY_ONLY")
+
   sdf_register(transformed)
 }
 
@@ -611,4 +563,42 @@ sdf_quantile <- function(x,
   names(quantiles) <- nm
 
   quantiles
+}
+
+#' Persist a Spark DataFrame
+#'
+#' Persist a Spark DataFrame, forcing any pending computations and (optionally)
+#' serializing the results to disk.
+#'
+#' Spark DataFrames invoke their operations lazily -- pending operations are
+#' deferred until their results are actually needed. Persisting a Spark
+#' DataFrame effectively 'forces' any pending computations, and then persists
+#' the generated Spark DataFrame as requested (to memory, to disk, or
+#' otherwise).
+#'
+#' Users of Spark should be careful to persist the results of any computations
+#' which are non-deterministic -- otherwise, one might see that the values
+#' within a column seem to 'change' as new operations are performed on that
+#' data set.
+#'
+#' @template roxlate-ml-x
+#' @param storage.level The storage level to be used. Please view the
+#'   \href{http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}
+#'   for information on what storage levels are accepted.
+#' @export
+sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+
+  storage.level <- ensure_scalar_character(storage.level)
+
+  sl <- invoke_static(
+    sc,
+    "org.apache.spark.storage.StorageLevel",
+    storage.level
+  )
+
+  sdf %>%
+    invoke("persist", sl) %>%
+    sdf_register()
 }

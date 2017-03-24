@@ -7,6 +7,16 @@ spark_connection.tbl_spark <- function(x, ...) {
 
 #' @export
 spark_connection.src_spark <- function(x, ...) {
+
+  # for development version of dplyr (>= 0.5.0.9000)
+  if ("dplyr" %in% loadedNamespaces() &&
+      exists("con_acquire", envir = asNamespace("dplyr")))
+  {
+    acquire <- get("con_acquire", envir = asNamespace("dplyr"))
+    return(acquire(x))
+  }
+
+  # older versions of dplyr (0.5.0 and below)
   x$con
 }
 
@@ -75,79 +85,21 @@ db_data_type.src_spark <- function(...) {
 #' @return A \code{tbl_spark}, representing a \code{dplyr}-compatible interface
 #'   to a Spark DataFrame.
 #'
-#' @name copy_to
-#'
 #' @export
 copy_to.spark_connection <- function(dest,
                                      df,
                                      name = deparse(substitute(df)),
+                                     overwrite = FALSE,
                                      memory = TRUE,
                                      repartition = 0L,
-                                     overwrite = FALSE,
                                      ...)
 {
-  sc <- dest
-
-  if (overwrite)
-    spark_remove_table_if_exists(sc, name)
-
-  if (name %in% src_tbls(sc))
-    stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
-
-  dots <- list(...)
-  serializer <- dots$serializer
-  spark_data_copy(sc, df, name = name, repartition = repartition, serializer = serializer)
-
-  if (memory)
-    tbl_cache(sc, name)
-
-  on_connection_updated(sc, name)
-
-  tbl(sc, name)
+  sdf_copy_to(dest, df, name, memory, repartition, overwrite, ...)
 }
 
 #' @export
-copy_to.src_spark <- function(dest, df, name, ...) {
+copy_to.src_spark <- function(dest, df, name, overwrite, ...) {
   copy_to(spark_connection(dest), df, name, ...)
-}
-
-#' Cache a Spark Table
-#'
-#' Force a Spark table with name \code{name} to be loaded into memory.
-#' Operations on cached tables should normally (although not always)
-#' be more performant than the same operation performed on an uncached
-#' table.
-#'
-#' @param sc A \code{spark_connection}.
-#' @param name The table name.
-#' @param force Force the data to be loaded into memory? This is accomplished
-#'   by calling the \code{count} API on the associated Spark DataFrame.
-#'
-#' @export
-tbl_cache <- function(sc, name, force = TRUE) {
-  tbl <- tbl(sc, name)
-  sdf <- spark_dataframe(tbl)
-
-  invoke(sdf, "cache")
-  if (force)
-    invoke(sdf, "count")
-
-  invisible(NULL)
-}
-
-#' Uncache a Spark Table
-#'
-#' Force a Spark table with name \code{name} to be unloaded from memory.
-#'
-#' @param sc A \code{spark_connection}.
-#' @param name The table name.
-#'
-#' @export
-tbl_uncache <- function(sc, name) {
-  tbl <- tbl(sc, name)
-  sdf <- spark_dataframe(tbl)
-  invoke(sdf, "unpersist")
-  invisible(NULL)
 }
 
 #' @export

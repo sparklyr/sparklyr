@@ -13,7 +13,7 @@ spark_read_json(sc, name, path, options = list(), repartition = 0,
 \item{name}{The name to assign to the newly generated table.}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the "hdfs://", "s3n://" and "file://" protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{options}{A list of strings with additional options.}
 
@@ -38,10 +38,14 @@ If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY
   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_read_csv}},
+Other Spark serialization routines: \code{\link{spark_load_table}},
+  \code{\link{spark_read_csv}},
+  \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_parquet}},
+  \code{\link{spark_read_table}},
+  \code{\link{spark_save_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_json}},
-  \code{\link{spark_write_parquet}}
+  \code{\link{spark_write_parquet}},
+  \code{\link{spark_write_table}}
 }
-

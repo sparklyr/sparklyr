@@ -49,15 +49,3 @@ setMethod("dbRemoveTable", c("spark_connection", "character"),
   }
 )
 
-
-#' @export
-mutate_.tbl_spark <- function(.data, ..., .dots) {
-  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
-
-  data <- .data
-  lapply(seq_along(dots), function(i) {
-    data <<- dplyr::add_op_single("mutate", data, dots = dots[i])
-  })
-
-  data
-}

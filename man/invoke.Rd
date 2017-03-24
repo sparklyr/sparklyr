@@ -2,8 +2,11 @@
 % Please edit documentation in R/spark_invoke.R
 \name{invoke}
 \alias{invoke}
-\alias{invoke_new}
+\alias{invoke}
+\alias{invoke}
 \alias{invoke_static}
+\alias{invoke}
+\alias{invoke_new}
 \title{Invoke a Method on a JVM Object}
 \usage{
 invoke(jobj, method, ...)
@@ -36,4 +39,11 @@ Use each of these functions in the following scenarios:
 \code{invoke_new} \tab Invoke a constructor associated with a Java class. \cr
 }
 }
+\examples{
 
+sc <- spark_connect(master = "spark://HOST:PORT")
+spark_context(sc) \%>\%
+  invoke("textFile", "file.csv", 1L) \%>\%
+    invoke("count")
+
+}

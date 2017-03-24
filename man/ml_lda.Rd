@@ -23,7 +23,10 @@ By default \code{alpha = (50 / k) + 1}, where \code{50/k} is common in LDA libra
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Optional arguments. The \code{data} argument can be used to
+specify the data to be used when \code{x} is a formula; this allows calls
+of the form \code{ml_linear_regression(y ~ x, data = tbl)}, and is
+especially useful in conjunction with \code{\link{do}}.}
 }
 \description{
 Fit a Latent Dirichlet Allocation (LDA) model to a Spark DataFrame.
@@ -32,6 +35,24 @@ Fit a Latent Dirichlet Allocation (LDA) model to a Spark DataFrame.
 The topics' distributions over terms are called "beta" in the original LDA paper by Blei et al., but are called "phi" in many later papers such as Asuncion et al., 2009.
 
 For terminology used in LDA model see \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.clustering.LDA}{Spark LDA documentation}.
+}
+\examples{
+\dontrun{
+library(janeaustenr)
+library(sparklyr)
+library(dplyr)
+
+sc <- spark_connect(master = "local")
+
+austen_books <- austen_books()
+books_tbl <- sdf_copy_to(sc, austen_books, overwrite = TRUE)
+first_tbl <- books_tbl \%>\% filter(nchar(text) > 0) \%>\% head(100)
+
+first_tbl \%>\%
+  ft_tokenizer("text", "tokens") \%>\%
+  ft_count_vectorizer("tokens", "features") \%>\%
+  ml_lda("features", k = 4)
+}
 }
 \references{
 Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Allocation." JMLR, 2003.
@@ -52,4 +73,3 @@ Other Spark ML routines: \code{\link{ml_als_factorization}},
   \code{\link{ml_random_forest}},
   \code{\link{ml_survival_regression}}
 }
-

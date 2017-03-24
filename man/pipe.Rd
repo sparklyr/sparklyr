@@ -2,6 +2,7 @@
 % Please edit documentation in R/reexports.R, R/spark_magrittr.R
 \name{\%>\%}
 \alias{\%>\%}
+\alias{\%>\%}
 \title{Pipe operator}
 \usage{
 lhs \%>\% rhs
@@ -9,9 +10,8 @@ lhs \%>\% rhs
 lhs \%>\% rhs
 }
 \description{
-See \code{\link[magrittr]{\%>\%}} for more details.
+See \code{\link[dplyr]{\%>\%}} for more details.
 
-See \code{\link[magrittr]{\%>\%}} for more details.
+See \code{\link[dplyr]{\%>\%}} for more details.
 }
 \keyword{internal}
-

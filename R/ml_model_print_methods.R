@@ -87,25 +87,33 @@ ml_model_print_centers <- function(model) {
 
 #' Spark ML - Feature Importance for Tree Models
 #'
-#' @param sc An active spark context
-#' @param model An ml_model object of class decision trees (>1.5.0), random forest (>2.0.0), or GBT (>2.0.0)
+#' @param sc A \code{spark_connection}.
+#' @param model An \code{ml_model} encapsulating the output from a decision tree.
 #'
 #' @return A sorted data frame with feature labels and their relative importance.
 #' @export
-
-
-ml_tree_feature_importance <- function(sc, model){
+ml_tree_feature_importance <- function(sc, model)
+{
   supported <- c("ml_model_gradient_boosted_trees",
                  "ml_model_decision_tree",
                  "ml_model_random_forest")
 
-  if ( !(class(model)[1] %in% supported)) {
-    stop("Supported models include: ", paste(supported, collapse = ", "))
+  if (!inherits(model, supported)) {
+    fmt <- "cannot call 'ml_tree_feature_importance' on object of class %s"
+    deparsed <- paste(deparse(class(model), width.cutoff = 500), collapse = " ")
+    stop(sprintf(fmt, deparsed))
   }
 
-  if (class(model)[1] != "ml_model_decision_tree") spark_require_version(sc, "2.0.0")
+  # enforce Spark 2.0.0 for certain models
+  requires_spark_2 <- c(
+    "ml_model_decision_tree",
+    "ml_model_gradient_boosted_trees"
+  )
 
-  importance <- invoke(model$.model,"featureImportances") %>%
+  if (inherits(model, requires_spark_2))
+    spark_require_version(sc, "2.0.0")
+
+  importance <- invoke(model$.model, "featureImportances") %>%
     invoke("toArray") %>%
     cbind(model$features) %>%
     as.data.frame()

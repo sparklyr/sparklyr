@@ -22,4 +22,3 @@ area under the specified curve
 \description{
 See the Spark ML Documentation \href{https://spark.apache.org/docs/1.6.1/api/scala/index.html#org.apache.spark.ml.evaluation.BinaryClassificationEvaluator}{BinaryClassificationEvaluator}
 }
-

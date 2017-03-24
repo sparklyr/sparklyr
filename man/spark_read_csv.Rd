@@ -4,9 +4,10 @@
 \alias{spark_read_csv}
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
-spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
-  quote = "\\"", escape = "\\\\", charset = "UTF-8", null_value = NULL,
-  options = list(), repartition = 0, memory = TRUE, overwrite = TRUE)
+spark_read_csv(sc, name, path, header = TRUE, columns = NULL,
+  infer_schema = TRUE, delimiter = ",", quote = "\\"", escape = "\\\\",
+  charset = "UTF-8", null_value = NULL, options = list(),
+  repartition = 0, memory = TRUE, overwrite = TRUE)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -14,18 +15,23 @@ spark_read_csv(sc, name, path, header = TRUE, delimiter = ",",
 \item{name}{The name to assign to the newly generated table.}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the "hdfs://", "s3n://" and "file://" protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{header}{Boolean; should the first row of data be used as a header?
 Defaults to \code{TRUE}.}
 
-\item{delimiter}{The character used to delimit each column. Defaults to \code{,}.}
+\item{columns}{A vector of column names or a named vector of column types.}
 
-\item{quote}{The character used as a quote. Defaults to \code{\"}.}
+\item{infer_schema}{Boolean; should column types be automatically inferred?
+Requires one extra pass over the data. Defaults to \code{TRUE}.}
 
-\item{escape}{The chatacter used to escape other characters. Defaults to \code{\\}.}
+\item{delimiter}{The character used to delimit each column. Defaults to \samp{','}.}
 
-\item{charset}{The character set. Defaults to \code{"UTF-8"}.}
+\item{quote}{The character used as a quote. Defaults to \samp{'"'}.}
+
+\item{escape}{The character used to escape other characters. Defaults to \samp{'\'}.}
+
+\item{charset}{The character set. Defaults to \samp{"UTF-8"}.}
 
 \item{null_value}{The character to use for null, or missing, values. Defaults to \code{NULL}.}
 
@@ -55,10 +61,14 @@ When \code{header} is \code{FALSE}, the column names are generated with a
 \code{V} prefix; e.g. \code{V1, V2, ...}.
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_read_json}},
+Other Spark serialization routines: \code{\link{spark_load_table}},
+  \code{\link{spark_read_jdbc}},
+  \code{\link{spark_read_json}},
   \code{\link{spark_read_parquet}},
+  \code{\link{spark_read_table}},
+  \code{\link{spark_save_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_json}},
-  \code{\link{spark_write_parquet}}
+  \code{\link{spark_write_parquet}},
+  \code{\link{spark_write_table}}
 }
-

@@ -18,20 +18,21 @@ sd_section(
   "Functions for reading and writing Spark DataFrames.",
   c(
     "spark_read_csv",
+    "spark_read_jdbc",
     "spark_read_json",
     "spark_read_parquet",
+    "spark_read_table",
     "spark_write_csv",
     "spark_write_json",
     "spark_write_parquet",
-    "sdf-saveload"
+    "spark_write_table"
   )
 )
 
 sd_section(
-  "dplyr Interface",
-  "Functions implementing a dplyr backend for Spark DataFrames.",
+  "Spark Tables",
+  "Functions for manipulating Spark Tables.",
   c(
-    "copy_to",
     "tbl_cache",
     "tbl_uncache"
   )
@@ -41,7 +42,6 @@ sd_section(
   "Spark DataFrames",
   "Functions for maniplulating Spark DataFrames.",
   c(
-    "na.replace",
     "sdf_copy_to",
     "sdf_mutate",
     "sdf_partition",
@@ -88,7 +88,10 @@ sd_section(
     "ft_quantile_discretizer",
     "ft_sql_transformer",
     "ft_string_indexer",
-    "ft_vector_assembler"
+    "ft_vector_assembler",
+    "ft_tokenizer",
+    "ft_regex_tokenizer",
+    "ft_count_vectorizer"
   )
 )
 
@@ -107,7 +110,6 @@ sd_section(
   "Machine Learning Extensions",
   "Functions for creating custom wrappers to other Spark ML algorithms.",
   c(
-    "ensure",
     "ml_create_dummy_variables",
     "ml_model",
     "ml_options",
@@ -122,6 +124,7 @@ sd_section(
   c(
     "compile_package_jars",
     "connection_config",
+    "download_scalac",
     "find_scalac",
     "hive_context",
     "invoke",

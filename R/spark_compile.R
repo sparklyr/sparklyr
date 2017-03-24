@@ -143,6 +143,7 @@ compile_package_jars <- function(..., spec = NULL) {
     jar_name      <- el$jar_name
     scalac_path   <- el$scalac_path
     filter        <- el$scala_filter
+    jar_path      <- el$jar_path
 
     # try to automatically download + install Spark
     if (is.null(spark_home) && !is.null(spark_version)) {
@@ -154,8 +155,9 @@ compile_package_jars <- function(..., spec = NULL) {
     spark_compile(
       jar_name = jar_name,
       spark_home = spark_home,
+      filter = filter,
       scalac = scalac_path,
-      filter = filter
+      jar = jar_path
     )
 
   }
@@ -186,13 +188,16 @@ compile_package_jars <- function(..., spec = NULL) {
 #'   useful if you have auxiliary files that should only be included with
 #'   certain versions of Spark.
 #' @param jar_name The name to be assigned to the generated \code{jar}.
+#' @param jar_path The path to the \code{jar} tool to be used
+#'   during compilation of your Spark extension.
 #'
 #' @export
 spark_compilation_spec <- function(spark_version = NULL,
                                    spark_home = NULL,
                                    scalac_path = NULL,
                                    scala_filter = NULL,
-                                   jar_name = NULL)
+                                   jar_name = NULL,
+                                   jar_path = NULL)
 {
   spark_home    <- spark_home %||% spark_home_dir(spark_version)
   spark_version <- spark_version %||% spark_version_from_home(spark_home)
@@ -201,7 +206,15 @@ spark_compilation_spec <- function(spark_version = NULL,
        spark_home = spark_home,
        scalac_path = scalac_path,
        scala_filter = scala_filter,
-       jar_name = jar_name)
+       jar_name = jar_name,
+       jar_path = jar_path)
+}
+
+find_jar <- function() {
+  if (nchar(Sys.getenv("JAVA_HOME")) > 0)
+    normalizePath(file.path(Sys.getenv("JAVA_HOME"), "bin", "jar"), mustWork = FALSE)
+  else
+    NULL
 }
 
 #' Default Compilation Specification for Spark Extensions
@@ -214,16 +227,66 @@ spark_compilation_spec <- function(spark_version = NULL,
 spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
   list(
     spark_compilation_spec(
+      spark_version = "1.5.2",
+      scalac_path = find_scalac("2.10"),
+      jar_name = sprintf("%s-1.5-2.10.jar", pkg),
+      jar_path = find_jar()
+    ),
+    spark_compilation_spec(
       spark_version = "1.6.1",
       scalac_path = find_scalac("2.10"),
-      jar_name = sprintf("%s-1.6-2.10.jar", pkg)
+      jar_name = sprintf("%s-1.6-2.10.jar", pkg),
+      jar_path = find_jar()
     ),
     spark_compilation_spec(
       spark_version = "2.0.0",
       scalac_path = find_scalac("2.11"),
-      jar_name = sprintf("%s-2.0-2.11.jar", pkg)
+      jar_name = sprintf("%s-2.0-2.11.jar", pkg),
+      jar_path = find_jar()
+    ),
+    spark_compilation_spec(
+      spark_version = "2.1.0",
+      scalac_path = find_scalac("2.11"),
+      jar_name = sprintf("%s-2.1-2.11.jar", pkg),
+      jar_path = find_jar()
     )
   )
+}
+
+#' Downloads default Scala Compilers
+#'
+#' \code{compile_package_jars} requires several versions of the
+#' scala compiler to work, this is to match Spark scala versions.
+#' To help setup your environment, this function will download the
+#' required compilers under the default search path.
+#'
+#' See \code{find_scalac} for a list of paths searched and used by
+#' this function to install the required compilers.
+#'
+#' @export
+download_scalac <- function() {
+  dest_path <- scalac_default_locations()[[1]]
+
+  if (!dir.exists(dest_path)) {
+    dir.create(dest_path, recursive = TRUE)
+  }
+
+  ext <- if (.Platform$OS.type == "windows") "zip" else "tgz"
+
+  download_urls <- c(
+    paste0("http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8.", ext),
+    paste0("http://downloads.lightbend.com/scala/2.10.6/scala-2.10.6.", ext)
+  )
+
+  lapply(download_urls, function(download_url) {
+    dest_file <- file.path(dest_path, basename(download_url))
+    download.file(download_url, destfile = dest_file)
+
+    if (ext == "zip")
+      unzip(dest_file, exdir = dest_path)
+    else
+      untar(dest_file, exdir = dest_path)
+  })
 }
 
 #' Discover the Scala Compiler
@@ -245,10 +308,11 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
 find_scalac <- function(version, locations = NULL) {
 
   locations <- locations %||% scalac_default_locations()
-  re_version <- paste("^", version, sep = "")
+  re_version <- paste("^", version, "(\\.[0-9]+)?$", sep = "")
 
   for (location in locations) {
     installs <- sort(list.files(location))
+
     versions <- sub("^scala-?", "", installs)
     matches  <- grep(re_version, versions)
     if (!any(matches))

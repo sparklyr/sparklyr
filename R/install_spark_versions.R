@@ -56,7 +56,7 @@ spark_installed_versions <- function() {
 #' @export
 spark_available_versions <- function() {
   versions <- read_spark_versions_csv()
-  versions <- versions[,1:2]
+  versions <- versions[versions$spark >= "1.6.0", 1:2]
   versions$install <- paste0("spark_install(version = \"",
                              versions$spark, "\", ",
                              "hadoop_version = \"", versions$hadoop,

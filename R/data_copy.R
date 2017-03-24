@@ -9,8 +9,20 @@ spark_data_build_types <- function(sc, columns) {
 }
 
 spark_serialize_csv_file <- function(sc, df, columns, repartition) {
-  tempfile <- tempfile(fileext = ".csv")
-  write.csv(df, tempfile, row.names = FALSE, na = "")
+
+  # generate a CSV file from the associated data frame
+  # note that these files need to live for the R session
+  # duration so we don't clean these up eagerly
+  # write file based on hash to avoid writing too many files
+  # on repeated import calls
+  hash <- digest::digest(df, algo = "sha256")
+  filename <- paste("spark_serialize_", hash, ".csv", sep = "")
+  tempfile <- file.path(tempdir(), filename)
+
+  if (!file.exists(tempfile)) {
+    write.csv(df, tempfile, row.names = FALSE, na = "")
+  }
+
   df <- spark_csv_read(sc, tempfile, csvOptions = list(
     header = "true"
   ), columns = columns)
@@ -64,8 +76,10 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
       e
   }), optional = TRUE)
 
+  splitSeparator <- split_separator(sc)
+
   tempFile <- tempfile(fileext = ".csv")
-  write.table(df, tempFile, sep = "\31", col.names = FALSE, row.names = FALSE, quote = FALSE)
+  write.table(df, tempFile, sep = splitSeparator$r, col.names = FALSE, row.names = FALSE, quote = FALSE)
   textData <- as.list(readr::read_lines(tempFile))
 
   rdd <- invoke_static(
@@ -75,7 +89,51 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
     spark_context(sc),
     textData,
     columns,
-    as.integer(if (repartition <= 0) 1 else repartition)
+    as.integer(if (repartition <= 0) 1 else repartition),
+    splitSeparator$scala
+  )
+
+  invoke(hive_context(sc), "createDataFrame", rdd, structType)
+}
+
+spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
+  structType <- spark_data_build_types(sc, columns)
+
+  # Map date and time columns as standard doubles
+  df <- as.data.frame(lapply(df, function(e) {
+    if (inherits(e, "POSIXt") || inherits(e, "Date"))
+      sapply(e, function(t) {
+        class(t) <- NULL
+        t
+      })
+    else
+      e
+  }), optional = TRUE)
+
+  splitSeparator <- split_separator(sc)
+
+  # generate a CSV file from the associated data frame
+  # note that these files need to live for the R session
+  # duration so we don't clean these up eagerly
+  # write file based on hash to avoid writing too many files
+  # on repeated import calls
+  hash <- digest::digest(df, algo = "sha256")
+  filename <- paste("spark_serialize_", hash, ".csv", sep = "")
+  tempfile <- file.path(tempdir(), filename)
+
+  if (!file.exists(tempfile)) {
+    write.table(df, tempfile, sep = splitSeparator$r, col.names = FALSE, row.names = FALSE, quote = FALSE)
+  }
+
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "createDataFrameFromCsv",
+    spark_context(sc),
+    tempfile,
+    columns,
+    as.integer(if (repartition <= 0) 1 else repartition),
+    splitSeparator$scala
   )
 
   invoke(hive_context(sc), "createDataFrame", rdd, structType)
@@ -90,15 +148,13 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
     stop("Using a local file to copy data is not supported for remote clusters")
   }
 
-  csv_exists <- invoke_static(sc,
-                              "sparklyr.Utils",
-                              "classExists",
-                              "com.databricks.spark.csv.CsvParser")
-
+  csv_exists <- spark_csv_is_loaded(sc)
   serializer <- ifelse(is.null(serializer),
                        ifelse(spark_connection_is_local(sc) && csv_exists,
                               "csv_file",
-                              "csv_string"),
+                              ifelse(spark_connection_is_yarn_client(sc),
+                                     "csv_file_scala",
+                                     "csv_string")),
                        serializer)
 
   # Spark unfortunately has a number of issues with '.'s in column names, e.g.
@@ -121,7 +177,8 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
   serializers <- list(
     "csv_file" = spark_serialize_csv_file,
     "typed_list" = spark_serialize_typed_list,
-    "csv_string" = spark_serialize_csv_string
+    "csv_string" = spark_serialize_csv_string,
+    "csv_file_scala" = spark_serialize_csv_scala
   )
 
   df <- serializers[[serializer]](sc, df, columns, repartition)

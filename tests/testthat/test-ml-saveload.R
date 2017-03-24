@@ -26,8 +26,8 @@ test_that("we can save + load tables using the various save/load APIs", {
 
   # pairs of read / write routines that should work together
   routines <- list(
-    c(sdf_save_table,   sdf_load_table),
-    c(sdf_save_parquet, sdf_load_parquet)
+    c(spark_save_table,    spark_load_table),
+    c(spark_write_parquet, spark_read_parquet)
   )
 
   for (pair in routines) {
@@ -35,8 +35,12 @@ test_that("we can save + load tables using the various save/load APIs", {
     reader <- pair[[2]]
 
     name <- sparklyr:::random_string("")
-    writer(mtcars_tbl, name)
-    loaded_tbl <- reader(sc, name)
+    nameCopy <- sparklyr:::random_string("")
+
+    path <- name
+
+    writer(mtcars_tbl, path)
+    loaded_tbl <- reader(sc, nameCopy, path)
 
     expect_identical(collect(mtcars_tbl), collect(loaded_tbl))
   }

@@ -1,6 +1,8 @@
 #' @import methods
 #' @import DBI
 #' @import utils
-#' @importFrom tibble data_frame
-#' @importFrom stats as.formula coefficients gaussian na.omit predict quantile
+#' @importFrom stats as.formula coefficients gaussian na.fail na.omit predict quantile
 NULL
+
+#' @export
+dplyr::copy_to

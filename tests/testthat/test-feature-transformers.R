@@ -1,7 +1,13 @@
 context("feature transformers")
 
+test_requires("dplyr")
+test_requires("janeaustenr")
+
 sc <- testthat_spark_connection()
 mtcars_tbl <- testthat_tbl("mtcars")
+iris_tbl   <- testthat_tbl("iris")
+
+austen     <- austen_books()
 austen_tbl <- testthat_tbl("austen")
 
 test_that("ft_binarizer() works as expected", {
@@ -33,7 +39,6 @@ test_that("ft_bucketizer() works as expected", {
 
 test_that("ft_tokenizer() works as expected", {
   skip_on_cran()
-  skip_if_not_installed("janeaustenr")
 
   # NOTE: to my surprise, the ft_tokenizer does not
   # split on '\\s+', rather, just plain old '\\s'
@@ -58,7 +63,6 @@ test_that("ft_tokenizer() works as expected", {
 
 test_that("ft_regex_tokenizer() works as expected", {
   skip_on_cran()
-  skip_if_not_installed("janeaustenr")
 
   spark_tokens <- austen_tbl %>%
     na.omit() %>%
@@ -91,4 +95,15 @@ test_that("the feature transforming family of functions has consistent API", {
     fmls <- names(formals(transformer))
     expect_true(all(c("input.col", "output.col", "...") %in% fmls))
   }
+})
+
+test_that("ft_quantile_discretizer() works with basic input", {
+  skip_on_cran()
+
+  # https://github.com/rstudio/sparklyr/issues/341
+  # previously failed due to incorrect assertion on 'n.buckets' type
+  iris_tbl %>%
+    ft_quantile_discretizer(input.col = "Sepal_Length",
+                            output.col = "Group",
+                            n.buckets = 2)
 })

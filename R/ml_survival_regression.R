@@ -26,19 +26,20 @@ ml_survival_regression <- function(x,
                                    ml.options = ml_options(),
                                    ...)
 {
+  ml_backwards_compatibility_api()
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
-  ml_backwards_compatibility_api()
-
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
-    df,
-    response,
-    features,
-    intercept,
-    environment(),
-    categorical.transformations
+    x = df,
+    response = response,
+    features = features,
+    intercept = intercept,
+    envir = environment(),
+    categorical.transformations = categorical.transformations,
+    ml.options = ml.options
   )
 
   censor <- ensure_scalar_character(censor)

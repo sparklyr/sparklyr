@@ -19,17 +19,20 @@ ml_naive_bayes <- function(x,
                            ml.options = ml_options(),
                            ...)
 {
+  ml_backwards_compatibility_api()
+
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
 
   categorical.transformations <- new.env(parent = emptyenv())
   df <- ml_prepare_response_features_intercept(
-    df,
-    response,
-    features,
-    NULL,
-    environment(),
-    categorical.transformations
+    x = df,
+    response = response,
+    features = features,
+    intercept = NULL,
+    envir = environment(),
+    categorical.transformations = categorical.transformations,
+    ml.options = ml.options
   )
 
   only.model <- ensure_scalar_boolean(ml.options$only.model)
@@ -74,8 +77,8 @@ ml_naive_bayes <- function(x,
   colnames(theta) <- features
 
   ml_model("naive_bayes", fit,
-           pi = invoke(fit, "pi"),
-           theta = invoke(fit, "theta"),
+           pi = pi,
+           theta = t(theta),
            features = features,
            response = response,
            data = df,
@@ -87,7 +90,23 @@ ml_naive_bayes <- function(x,
 
 #' @export
 print.ml_model_naive_bayes <- function(x, ...) {
-  formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
-  cat("Call: ", formula, "\n\n", sep = "")
-  cat(invoke(x$.model, "toString"), sep = "\n")
+
+  ml_model_print_call(x)
+  print_newline()
+
+  printf("A-priority probabilities:\n")
+  print(exp(x$pi))
+  print_newline()
+
+  printf("Conditional probabilities:\n")
+  print(exp(x$theta))
+  print_newline()
+
+  x
+}
+
+#' @export
+summary.ml_model_naive_bayes <- function(object, ...) {
+  print(object, ...)
+  object
 }

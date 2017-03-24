@@ -56,13 +56,19 @@ java_context <- function(sc) {
 #' @name spark-api
 #' @export
 hive_context <- function(sc) {
-  sc$hive_context
+  if (!is.null(sc$hive_context))
+    sc$hive_context
+  else
+    create_hive_context(sc)
 }
 
 #' @name spark-api
 #' @export
 spark_session <- function(sc) {
-  sc$hive_context
+  if (!is.null(sc$hive_context))
+    sc$hive_context
+  else
+    create_hive_context(sc)
 }
 
 #' Retrieve the Spark Connection Associated with an R Object
@@ -129,6 +135,9 @@ connection_config <- function(sc, prefix, not_prefix = list()) {
       found <- FALSE
 
     if (grepl("\\.remote$", e) && isLocal)
+      found <- FALSE
+
+    if (nchar(config[[e]]) == 0)
       found <- FALSE
 
     found
@@ -213,51 +222,6 @@ print.spark_web_url <- function(x, ...) {
 }
 
 initialize_connection <- function(sc) {
-  sc$spark_context <- invoke_static(sc, "sparklyr.Backend", "getSparkContext")
-
-  if (is.null(sc$spark_context)) {
-    # create the spark config
-    conf <- invoke_new(sc, "org.apache.spark.SparkConf")
-    conf <- invoke(conf, "setAppName", sc$app_name)
-    conf <- invoke(conf, "setMaster", sc$master)
-    conf <- invoke(conf, "setSparkHome", sc$spark_home)
-
-    context_config <- connection_config(sc, "spark.", c("spark.sql."))
-    apply_config(context_config, conf, "set", "spark.")
-
-    # create the spark context and assign the connection to it
-    sc$spark_context <- invoke_static(
-      sc,
-      "org.apache.spark.SparkContext",
-      "getOrCreate",
-      conf
-    )
-
-    invoke_static(sc, "sparklyr.Backend", "setSparkContext", sc$spark_context)
-  }
-
-  sc$spark_context$connection <- sc
-
-  # create the java spark context and assign the connection to it
-  sc$java_context <- invoke_static(
-    sc,
-    "org.apache.spark.api.java.JavaSparkContext",
-    "fromSparkContext",
-    sc$spark_context
-  )
-  sc$java_context$connection <- sc
-
-  # create the hive context and assign the connection to it
-  sc$hive_context <- create_hive_context(sc)
-  sc$hive_context$connection <- sc
-
-  # return the modified connection
-  sc
+  UseMethod("initialize_connection")
 }
-
-
-
-
-
-
 

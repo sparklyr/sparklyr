@@ -45,10 +45,18 @@ spark_default_app_jar <- function(version) {
 NULL
 
 #' @name spark-connections
+#'
+#' @examples
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' connection_is_open(sc)
+#'
+#' spark_disconnect(sc)
+#'
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell"),
+                          method = c("shell", "livy", "test"),
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
@@ -99,6 +107,10 @@ spark_connect <- function(master,
 
   # connect using the specified method
 
+  # if master is an example code, run in test mode
+  if (master == "spark://HOST:PORT")
+    method <- "test"
+
   # spark-shell (local install of spark)
   if (method == "shell") {
     scon <- shell_connection(master = master,
@@ -110,25 +122,33 @@ spark_connect <- function(master,
                              config = config,
                              service = FALSE,
                              extensions = extensions)
+  } else if (method == "livy") {
+    scon <- livy_connection(master = master,
+                            config = config,
+                            app_name,
+                            version,
+                            hadoop_version ,
+                            extensions)
+  } else if (method == "test") {
+    scon <- test_connection(master = master,
+                            config = config,
+                            app_name,
+                            version,
+                            hadoop_version ,
+                            extensions)
   } else {
     # other methods
 
-    # e.g.
-    # scon <- livy_connection(master = master,
-    #                         app_name = app_name,
-    #                         shell_args = shell_args,
-    #                         config = config,
-    #                         extensions = extensions)
-
     stop("Unsupported connection method '", method, "'")
   }
+
+  scon <- initialize_connection(scon)
 
   # mark the connection as a DBIConnection class to allow DBI to use defaults
   attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
 
   # update spark_context and hive_context connections with DBIConnection
   scon$spark_context$connection <- scon
-  scon$hive_context$connection <- scon
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
@@ -143,10 +163,13 @@ spark_connect <- function(master,
   connectCall <- paste(libs,
                        paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
                        sep = "\n")
-  on_connection_opened(scon, connectCall)
 
-  # Register a finalizer to sleep on R exit to support older versions of the RStudio ide
-  reg.finalizer(as.environment("package:sparklyr"), function(x) {
+  # let viewer know that we've opened a connection; guess that the result will
+  # be assigned into the global environment
+  on_connection_opened(scon, globalenv(), connectCall)
+
+  # Register a finalizer to sleep on R exit to support older versions of the RStudio IDE
+  reg.finalizer(asNamespace("sparklyr"), function(x) {
     if (connection_is_open(scon)) {
       Sys.sleep(1)
     }
@@ -208,7 +231,8 @@ spark_disconnect <- function(sc, ...) {
 #' @export
 spark_disconnect.spark_connection <- function(sc, ...) {
   tryCatch({
-    stop_shell(sc)
+    subclass <- remove_class(sc, "spark_connection")
+    spark_disconnect(subclass, ...)
   }, error = function(err) {
   })
 
@@ -256,6 +280,14 @@ spark_connection_is_local <- function(sc) {
 
 spark_master_is_local <- function(master) {
   grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
+}
+
+spark_connection_is_yarn_client <- function(sc) {
+  spark_master_is_yarn_client(sc$master)
+}
+
+spark_master_is_yarn_client <- function(master) {
+  grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE)
 }
 
 # Number of cores available in the local install

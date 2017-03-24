@@ -2,15 +2,19 @@
 % Please edit documentation in R/connection_spark.R
 \name{spark-connections}
 \alias{spark-connections}
+\alias{spark-connections}
 \alias{spark_connect}
+\alias{spark-connections}
 \alias{spark_connection_is_open}
+\alias{spark-connections}
 \alias{spark_disconnect}
+\alias{spark-connections}
 \alias{spark_disconnect_all}
 \title{Manage Spark Connections}
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
-  method = c("shell"), app_name = "sparklyr", version = NULL,
-  hadoop_version = NULL, config = spark_config(),
+  method = c("shell", "livy", "test"), app_name = "sparklyr",
+  version = NULL, hadoop_version = NULL, config = spark_config(),
   extensions = sparklyr::registered_extensions())
 
 spark_connection_is_open(sc)
@@ -56,4 +60,11 @@ default, all packages enabled through the use of
 \description{
 These routines allow you to manage your connections to Spark.
 }
+\examples{
 
+sc <- spark_connect(master = "spark://HOST:PORT")
+connection_is_open(sc)
+
+spark_disconnect(sc)
+
+}

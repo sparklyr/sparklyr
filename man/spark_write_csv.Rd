@@ -12,7 +12,7 @@ spark_write_csv(x, path, header = TRUE, delimiter = ",", quote = "\\"",
 \item{x}{A Spark DataFrame or dplyr operation}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the "hdfs://", "s3n://" and "file://" protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{header}{Should the first row of data be used as a header? Defaults to \code{TRUE}.}
 
@@ -32,10 +32,14 @@ Supports the "hdfs://", "s3n://" and "file://" protocols.}
 Write a Spark DataFrame to a tabular (typically, comma-separated) file.
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_read_csv}},
+Other Spark serialization routines: \code{\link{spark_load_table}},
+  \code{\link{spark_read_csv}},
+  \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_json}},
   \code{\link{spark_read_parquet}},
+  \code{\link{spark_read_table}},
+  \code{\link{spark_save_table}},
   \code{\link{spark_write_json}},
-  \code{\link{spark_write_parquet}}
+  \code{\link{spark_write_parquet}},
+  \code{\link{spark_write_table}}
 }
-

@@ -5,7 +5,8 @@
 \title{Define a Spark Compilation Specification}
 \usage{
 spark_compilation_spec(spark_version = NULL, spark_home = NULL,
-  scalac_path = NULL, scala_filter = NULL, jar_name = NULL)
+  scalac_path = NULL, scala_filter = NULL, jar_name = NULL,
+  jar_path = NULL)
 }
 \arguments{
 \item{spark_version}{The Spark version to build against. This can
@@ -27,6 +28,9 @@ useful if you have auxiliary files that should only be included with
 certain versions of Spark.}
 
 \item{jar_name}{The name to be assigned to the generated \code{jar}.}
+
+\item{jar_path}{The path to the \code{jar} tool to be used
+during compilation of your Spark extension.}
 }
 \description{
 For use with \code{\link{compile_package_jars}}. The Spark compilation
@@ -38,4 +42,3 @@ be used for compilation.
 Most Spark extensions won't need to define their own compilation specification,
 and can instead rely on the default behavior of \code{compile_package_jars}.
 }
-
