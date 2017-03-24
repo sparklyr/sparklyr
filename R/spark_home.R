@@ -15,7 +15,7 @@
 #' spark_home_set()
 #' }
 #' @export
-spark_home_set <- function(path = NULL, verbose = is.null(path)) {
+spark_home_set <- function(path = NULL, verbose = getOption("sparklyr.verbose", is.null(path))) {
   force(verbose)
   if(is.null(path)) {
     path <- spark_install_find()$sparkVersionDir
