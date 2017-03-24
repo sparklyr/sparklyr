@@ -1,3 +1,29 @@
+#' Find the SPARK_HOME directory for a version of Spark
+#'
+#' Find the SPARK_HOME directory for a given version of Spark that
+#' was previously installed using \code{\link{spark_install}}.
+#'
+#' @param version Version of Spark
+#' @param hadoop_version Version of Hadoop
+#'
+#' @return Path to SPARK_HOME (or \code{NULL} if the specified version
+#'   was not found).
+#'
+#' @keywords internal
+#'
+#' @export
+spark_home_dir <- function(version = NULL, hadoop_version = NULL) {
+  tryCatch({
+    installInfo <- spark_install_find(sparkVersion = version,
+      hadoopVersion = hadoop_version)
+    installInfo$sparkVersionDir
+  },
+    error = function(e) {
+      NULL
+    })
+}
+
+
 #' Set the SPARK_HOME environment variable
 #' 
 #' Set the \code{SPARK_HOME} environment variable. This slightly speeds up some 
