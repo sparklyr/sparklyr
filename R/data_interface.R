@@ -124,6 +124,7 @@ spark_read_csv <- function(sc,
 #' @param charset The character set, defaults to \code{"UTF-8"}.
 #' @param null_value The character to use for default values, defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
+#' @param mode Specifies the behavior when data or table already exists.
 #'
 #' @family Spark serialization routines
 #'
@@ -135,7 +136,8 @@ spark_write_csv <- function(x, path,
                             escape = "\\",
                             charset = "UTF-8",
                             null_value = NULL,
-                            options = list()) {
+                            options = list(),
+                            mode = NULL) {
   UseMethod("spark_write_csv")
 }
 
@@ -148,11 +150,12 @@ spark_write_csv.tbl_spark <- function(x,
                                       escape = "\\",
                                       charset = "UTF-8",
                                       null_value = NULL,
-                                      options = list()) {
+                                      options = list(),
+                                      mode = NULL) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
   options <- spark_csv_options(header, TRUE, delimiter, quote, escape, charset, null_value, options)
 
-  spark_csv_write(sqlResult, spark_normalize_path(path), options)
+  spark_csv_write(sqlResult, spark_normalize_path(path), options, mode)
 }
 
 #' @export
@@ -164,11 +167,12 @@ spark_write_csv.spark_jobj <- function(x,
                                        escape = "\\",
                                        charset = "UTF-8",
                                        null_value = NULL,
-                                       options = list()) {
+                                       options = list(),
+                                       mode = NULL) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   options <- spark_csv_options(header, TRUE, delimiter, quote, escape, charset, null_value, options)
 
-  spark_csv_write(x, spark_normalize_path(path), options)
+  spark_csv_write(x, spark_normalize_path(path), options, mode)
 }
 
 #' Read a Parquet file into a Spark DataFrame
@@ -313,9 +317,7 @@ spark_data_read_generic <- function(sc, path, fileMethod, readOptions = list()) 
   invoke(options, fileMethod, path)
 }
 
-spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptions = list()) {
-  options <- invoke(df, "write")
-
+spark_data_apply_mode <- function(options, mode) {
   if (!is.null(mode)) {
     if (is.list(mode)) {
       lapply(mode, function(m) {
@@ -329,6 +331,14 @@ spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptio
       stop("Unsupported type ", typeof(mode), " for mode parameter.")
     }
   }
+
+  options
+}
+
+spark_data_write_generic <- function(df, path, fileMethod, mode = NULL, csvOptions = list()) {
+  options <- invoke(df, "write")
+
+  options <- spark_data_apply_mode(options, mode)
 
   lapply(names(csvOptions), function(csvOptionName) {
     options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
