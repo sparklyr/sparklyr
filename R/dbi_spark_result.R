@@ -110,3 +110,13 @@ setMethod("dbHasCompleted", "DBISparkResult", function(res, ...) {
 setMethod("dbClearResult", "DBISparkResult", function(res, ...) {
   TRUE
 })
+
+setMethod("dbSendStatement", "spark_connection", function(conn, statement, ...) {
+  dbSendQuery(conn, statement, ...)
+})
+
+setMethod("dbExecute", "spark_connection", function(conn, statement, ...) {
+  rs <- dbSendStatement(conn, statement, ...)
+  on.exit(dbClearResult(rs))
+  dbGetRowsAffected(rs)
+})
