@@ -146,10 +146,15 @@ on_connection_updated <- function(scon, hint) {
 }
 
 connection_list_tables <- function(sc) {
-  if (!is.null(sc) && connection_is_open(sc))
+  tables <- if (!is.null(sc) && connection_is_open(sc))
     sort(dbListTables(sc))
   else
     character()
+  data.frame(
+    name = tables,
+    type = rep_len("table", length(tables)),
+    stringsAsFactors = FALSE
+  )
 }
 
 connection_list_columns <- function(sc, table) {
