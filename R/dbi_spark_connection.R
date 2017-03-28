@@ -65,3 +65,4 @@ setMethod("dbSetProperty", c("spark_connection", "character", "character"), func
     )
   )
 })
+
