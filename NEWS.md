@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added support for `mode = "overwrite"` and `mode = "append"` to
+  `spark_write_csv`.
+
 - Added `spark_home_set` to set with ease `SPARK_HOME`, specially
   useful while teaching the basics of Spark and `sparklyr.
 
