@@ -124,6 +124,7 @@ sd_section(
   c(
     "compile_package_jars",
     "connection_config",
+    "download_scalac",
     "find_scalac",
     "hive_context",
     "invoke",

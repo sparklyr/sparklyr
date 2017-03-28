@@ -71,7 +71,7 @@ spark_csv_read <- function(sc,
     path)
 }
 
-spark_csv_write <- function(df, path, csvOptions) {
+spark_csv_write <- function(df, path, csvOptions, mode) {
   sc <- spark_connection(df)
 
   write <- invoke(df, "write")
@@ -80,6 +80,8 @@ spark_csv_write <- function(df, path, csvOptions) {
   lapply(names(csvOptions), function(csvOptionName) {
     options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
   })
+
+  options <- spark_data_apply_mode(options, mode)
 
   invoke(
     options,

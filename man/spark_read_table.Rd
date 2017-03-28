@@ -4,16 +4,13 @@
 \alias{spark_read_table}
 \title{Reads from a Spark Table into a Spark DataFrame.}
 \usage{
-spark_read_table(sc, name, path, options = list(), repartition = 0,
+spark_read_table(sc, name, options = list(), repartition = 0,
   memory = TRUE, overwrite = TRUE)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
 
 \item{name}{The name to assign to the newly generated table.}
-
-\item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{options}{A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.}
 

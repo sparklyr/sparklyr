@@ -342,9 +342,6 @@ stop_shell <- function(sc, terminate = FALSE) {
 
   close(sc$backend)
   close(sc$monitor)
-
-  # allow time to clean resources for multiple spark_connect/spark_disconnect calls
-  Sys.sleep(1)
 }
 
 #' @export
@@ -442,7 +439,7 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
 
   returnStatus <- readInt(backend)
   if (length(returnStatus) == 0)
-    stop("No status is returned. Spark R backend might have failed.")
+    stop("No status is returned. The sparklyr backend might have failed.")
   if (returnStatus != 0) {
     # get error message from backend and report to R
     msg <- readString(backend)
@@ -540,10 +537,6 @@ initialize_connection.spark_shell_connection <- function(sc) {
       sc$spark_context
     )
     sc$java_context$connection <- sc
-
-    # create the hive context and assign the connection to it
-    sc$hive_context <- create_hive_context(sc)
-    sc$hive_context$connection <- sc
 
     # return the modified connection
     sc

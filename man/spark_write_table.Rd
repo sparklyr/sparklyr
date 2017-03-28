@@ -4,13 +4,12 @@
 \alias{spark_write_table}
 \title{Writes a Spark DataFrame into a Spark table}
 \usage{
-spark_write_table(x, path, mode = NULL, options = list())
+spark_write_table(x, name, mode = NULL, options = list())
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
-\item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
+\item{name}{The name to assign to the newly generated table.}
 
 \item{mode}{Specifies the behavior when data or table already exists.}
 

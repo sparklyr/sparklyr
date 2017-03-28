@@ -4,7 +4,7 @@
 #' @importFrom httr text_content
 livy_validate_http_response <- function(message, req) {
   if (http_error(req)) {
-    if (all.equal(status_code(req), 401)) {
+    if (isTRUE(all.equal(status_code(req), 401))) {
       stop("Livy operation is unauthorized. Try spark_connect with config = livy_config()")
     }
     else {

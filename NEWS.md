@@ -1,5 +1,27 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added support for `mode = "overwrite"` and `mode = "append"` to
+  `spark_write_csv`.
+
+- Added `spark_home_set` to set with ease `SPARK_HOME`, specially
+  useful while teaching the basics of Spark and `sparklyr.
+
+- Fixed issue collecting data frames containing `\n`.
+
+- Added `download_scalac()` to assist downloading all the Scala compilers
+  required to build using `compile_package_jars` and provided support for
+  using any `scalac` minor versions while looking for the right compiler.
+
+- `ml_als_factorization` now supports the implicit matrix factorization
+   and nonnegative least square options.
+
+- Support for `dplyr 0.6` which among many improvements, increases
+  performance in some queries by making use of a new query optimizer.
+  
+- `spark_write_table` now supports saving to default Hive path.
+
+- Improved `spark_connect` performance.
+
 - `sample_frac` takes a fraction instead of a percent to match `dplyr`.
 
 - Improved performance of `spark_read_csv` reading remote data when
@@ -28,7 +50,7 @@
 - Improved `copy_to`, `sdf_copy_to` and `dbWriteTable` performance under
   `yarn-client` mode.
 
-- Added `tbl_change_tb()`. This function changes current database.
+- Added `tbl_change_db()`. This function changes current database.
 
 - Added `sdf_pivot()`. This function provides a mechanism for constructing
   pivot tables, using Spark's 'groupBy' + 'pivot' functionality, with a

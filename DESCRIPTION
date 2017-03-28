@@ -1,7 +1,7 @@
 Package: sparklyr
 Type: Package
 Title: R Interface to Apache Spark
-Version: 0.5.3-9002
+Version: 0.5.3-9003
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
@@ -25,8 +25,8 @@ Depends:
 Imports:
     methods,
     lazyeval (>= 0.2.0),
-    dplyr (>= 0.5.0),
-    DBI (>= 0.4.1),
+    dplyr (>= 0.5.0.9000),
+    DBI (>= 0.6),
     readr (>= 0.2.0),
     digest,
     config,
@@ -34,11 +34,13 @@ Imports:
     assertthat,
     rprojroot,
     withr,
-    httr,
-    jsonlite,
+    httr (>= 1.1),
+    jsonlite (>= 1.0),
     base64enc,
     shiny,
     rstudioapi
+Remotes:
+    hadley/dplyr
 Suggests:
     testthat,
     RCurl,
