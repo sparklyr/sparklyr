@@ -1,18 +1,3 @@
-
-# given an environment and a host, return the name of an open Spark connection
-# object to the host, if any
-find_object <- function(env, host) {
-  objs <- ls(env)
-  for (name in objs) {
-    x <- base::get(name, envir = env)
-    if (inherits(x, "spark_connection") &&
-        identical(to_host(x), host) &&
-        connection_is_open(x)) {
-      return(name)
-    }
-  }
-}
-
 # connection-specific actions possible with Spark connections
 spark_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
@@ -61,16 +46,17 @@ on_connection_opened <- function(scon, env, connectCall) {
       connectCode = connectCall,
 
       # disconnection code
-      disconnectCode = function() {
-        name <- find_object(env, host)
-        if (!is.null(name))
-          paste0("spark_disconnect(", find_object(env, host), ")")
-        else
-          ""
+      disconnect = function() {
+        spark_disconnect(scon)
+      },
+
+      listObjectTypes = function () {
+        return(list(
+          table = list(contains = "data")))
       },
 
       # table enumeration code
-      listTables = function() {
+      listObjects = function(type = "table") {
         connection_list_tables(scon)
       },
 
@@ -80,12 +66,15 @@ on_connection_opened <- function(scon, env, connectCall) {
       },
 
       # table preview code
-      previewTable = function(table, rowLimit) {
+      previewObject = function(rowLimit, table) {
         connection_preview_table(scon, table, rowLimit)
       },
 
       # other actions that can be executed on this connection
-      actions = spark_actions(scon)
+      actions = spark_actions(scon),
+
+      # raw connection object
+      connectionObject = scon
     )
   }
 
@@ -157,10 +146,15 @@ on_connection_updated <- function(scon, hint) {
 }
 
 connection_list_tables <- function(sc) {
-  if (!is.null(sc) && connection_is_open(sc))
+  tables <- if (!is.null(sc) && connection_is_open(sc))
     sort(dbListTables(sc))
   else
     character()
+  data.frame(
+    name = tables,
+    type = rep_len("table", length(tables)),
+    stringsAsFactors = FALSE
+  )
 }
 
 connection_list_columns <- function(sc, table) {
