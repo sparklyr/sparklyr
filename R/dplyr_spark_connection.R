@@ -1,5 +1,5 @@
 #' @export
-#' @importFrom dbplyr sql_escape_ident
+#' @importFrom dplyr sql_escape_ident
 #' @importFrom dbplyr sql_quote
 sql_escape_ident.spark_connection <- function(con, x) {
   # Assuming it might include database name like: `dbname.tableName`
@@ -48,7 +48,7 @@ build_sql_if_compare <- function(..., con, compare) {
 }
 
 #' @export
-#' @importFrom dbplyr sql_translate_env
+#' @importFrom dplyr sql_translate_env
 #' @importFrom dbplyr build_sql
 sql_translate_env.spark_connection <- function(con) {
   dbplyr::sql_variant(

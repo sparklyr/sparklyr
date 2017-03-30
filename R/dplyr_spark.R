@@ -19,8 +19,8 @@ spark_connection.src_spark <- function(x, ...) {
 }
 
 #' @export
-#' @importFrom dbplyr src_desc
-src_desc.src_spark <- function(x) {
+#' @importFrom dplyr db_desc
+db_desc.src_spark <- function(x) {
   sc <- spark_connection(x)
   paste("spark connection",
         paste("master", sc$master, sep = "="),
@@ -112,8 +112,9 @@ copy_to.src_spark <- function(dest, df, name, overwrite, ...) {
 }
 
 #' @export
+#' @import dplyr db_desc
 print.src_spark <- function(x, ...) {
-  cat(src_desc(x))
+  cat(db_desc(x))
   cat("\n\n")
 
   spark_log(spark_connection(x))
