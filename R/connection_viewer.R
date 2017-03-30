@@ -28,54 +28,56 @@ on_connection_opened <- function(scon, env, connectCall) {
   # RStudio v1.1 generic connection interface --------------------------------
   observer <- getOption("connectionObserver")
   if (!is.null(observer)) {
-    host <- to_host(scon)
-    observer$connectionOpened(
-      # connection type
-      type = "Spark",
+    tryCatch({
+      host <- to_host(scon)
+      observer$connectionOpened(
+        # connection type
+        type = "Spark",
 
-      # name displayed in connection pane
-      displayName = to_host_display(scon),
+        # name displayed in connection pane
+        displayName = to_host_display(scon),
 
-      # host key
-      host = host,
+        # host key
+        host = host,
 
-      # icon for connection
-      icon = system.file(file.path("icons", "spark.png"), package = "sparklyr"),
+        # icon for connection
+        icon = system.file(file.path("icons", "spark.png"), package = "sparklyr"),
 
-      # connection code
-      connectCode = connectCall,
+        # connection code
+        connectCode = connectCall,
 
-      # disconnection code
-      disconnect = function() {
-        spark_disconnect(scon)
-      },
+        # disconnection code
+        disconnect = function() {
+          spark_disconnect(scon)
+        },
 
-      listObjectTypes = function () {
-        return(list(
-          table = list(contains = "data")))
-      },
+        listObjectTypes = function () {
+          return(list(
+            table = list(contains = "data")))
+        },
 
-      # table enumeration code
-      listObjects = function(type = "table") {
-        connection_list_tables(scon)
-      },
+        # table enumeration code
+        listObjects = function(type = "table") {
+          connection_list_tables(scon)
+        },
 
-      # column enumeration code
-      listColumns = function(table) {
-        connection_list_columns(scon, table)
-      },
+        # column enumeration code
+        listColumns = function(table) {
+          connection_list_columns(scon, table)
+        },
 
-      # table preview code
-      previewObject = function(rowLimit, table) {
-        connection_preview_table(scon, table, rowLimit)
-      },
+        # table preview code
+        previewObject = function(rowLimit, table) {
+          connection_preview_table(scon, table, rowLimit)
+        },
 
-      # other actions that can be executed on this connection
-      actions = spark_actions(scon),
+        # other actions that can be executed on this connection
+        actions = spark_actions(scon),
 
-      # raw connection object
-      connectionObject = scon
-    )
+        # raw connection object
+        connectionObject = scon
+      )
+    }, error = function(e) NULL)
   }
 
   # RStudio v1.0 Spark-style connection interface ----------------------------
