@@ -41,7 +41,7 @@ Imports:
     shiny,
     rstudioapi
 Remotes:
-    hadley/dplyr
+    hadley/dplyr,
     hadley/dbplyr
 Suggests:
     testthat,
