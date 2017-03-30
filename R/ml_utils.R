@@ -95,6 +95,8 @@ try_null <- function(expr) {
 }
 
 #' @export
+#' @importFrom dplyr arrange
+#' @importFrom lazyeval interp
 predict.ml_model <- function(object,
                              newdata = object$data,
                              ...)
@@ -111,7 +113,7 @@ predict.ml_model <- function(object,
   predicted <- sdf_predict(object, sdf, ...)
 
   # re-order based on id column
-  arranged <- arrange_(predicted, .dots = as.list(id))
+  arranged <- arrange(predicted, id)
 
   # read column
   column <- sdf_read_column(arranged, "prediction")
