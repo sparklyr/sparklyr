@@ -13,9 +13,6 @@ sql_build.op_sample_n <- function(op, con, ...) {
 }
 
 #' @export
-sql_build <- sql_build.op_sample_n
-
-#' @export
 sql_build.op_sample_frac <- function(op, con, ...) {
   select_query(
     from = sql(paste(

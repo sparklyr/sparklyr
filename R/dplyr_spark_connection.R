@@ -7,9 +7,6 @@ sql_escape_ident.spark_connection <- function(con, x) {
     sql_quote(x, '`')
 }
 
-#' @export
-sql_escape_ident <- sql_escape_ident.spark_connection
-
 build_sql_if_compare <- function(..., con, compare) {
   args <- list(...)
 
@@ -94,6 +91,3 @@ sql_translate_env.spark_connection <- function(con) {
 
   )
 }
-
-#' @export
-sql_translate_env <- sql_translate_env.spark_connection

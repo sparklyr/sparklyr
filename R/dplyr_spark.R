@@ -30,14 +30,9 @@ src_desc.src_spark <- function(x) {
 }
 
 #' @export
-src_desc <- src_desc.src_spark
-
-#' @export
 db_explain.src_spark <- function(con, sql, ...) {
   ""
 }
-#' @export
-db_explain <- db_explain.src_spark
 
 #' @export
 tbl_vars.spark_jobj <- function(x) {
@@ -68,9 +63,6 @@ src_tbls.spark_connection <- function(x, ...) {
 #' @export
 db_data_type.src_spark <- function(...) {
 }
-
-#' @export
-db_data_type <- db_data_type.src_spark
 
 
 #' Copy an R Data Frame to Spark
@@ -124,6 +116,3 @@ db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...
   df <- spark_dataframe(con, sql)
   invoke(df, "registerTempTable", name)
 }
-
-#' @export
-db_save_query <- db_save_query.spark_connection
