@@ -65,6 +65,7 @@ sdf_import <- function(x,
 }
 
 #' @export
+#' @importFrom dplyr tbl
 sdf_import.default <- function(x,
                                sc,
                                name = random_string("sparklyr_tmp_"),
@@ -131,6 +132,7 @@ sdf_register.list <- function(x, name = NULL) {
 }
 
 #' @export
+#' @importFrom dplyr tbl
 sdf_register.spark_jobj <- function(x, name = NULL) {
   name <- name %||% random_string("sparklyr_tmp_")
   invoke(x, "registerTempTable", name)

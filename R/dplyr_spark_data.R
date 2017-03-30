@@ -1,6 +1,7 @@
 
 #' @importFrom dbplyr escape
 #' @importFrom dbplyr ident
+#' @importFrom dplyr tbl
 #' @importFrom DBI dbListTables
 #' @importFrom DBI dbSendQuery
 #' @importFrom DBI dbGetQuery

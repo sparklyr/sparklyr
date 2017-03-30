@@ -1,6 +1,8 @@
 #' @export
 #' @importFrom dplyr do_
 #' @importFrom dplyr groups
+#' @importFrom dplyr select
+#' @importFrom dplyr count
 do_.tbl_spark <- function(.data, ..., .dots) {
   sdf <- spark_dataframe(.data)
 

@@ -9,6 +9,7 @@ sql_escape_ident.spark_connection <- function(con, x) {
     dbplyr::sql_quote(x, '`')
 }
 
+#' @importFrom dbplyr sql
 build_sql_if_compare <- function(..., con, compare) {
   args <- list(...)
 
@@ -39,7 +40,7 @@ build_sql_if_compare <- function(..., con, compare) {
       indexes <- Filter(function(innerIdx) innerIdx > thisIdx, seq_along(args))
       ifValues <- lapply(indexes, function(e) args[[e]])
 
-      sql(paste(e, compare, ifValues, collapse = " and "))
+      dbplyr::sql(paste(e, compare, ifValues, collapse = " and "))
     }
   })
 
@@ -48,23 +49,24 @@ build_sql_if_compare <- function(..., con, compare) {
 
 #' @export
 #' @importFrom dbplyr sql_translate_env
+#' @importFrom dbplyr build_sql
 sql_translate_env.spark_connection <- function(con) {
   dbplyr::sql_variant(
 
     scalar = dbplyr::sql_translator(
       .parent = dbplyr::base_scalar,
-      as.numeric = function(x) build_sql("CAST(", x, " AS DOUBLE)"),
-      as.double  = function(x) build_sql("CAST(", x, " AS DOUBLE)"),
-      as.integer  = function(x) build_sql("CAST(", x, " AS INT)"),
-      as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
-      as.character  = function(x) build_sql("CAST(", x, " AS STRING)"),
-      as.date  = function(x) build_sql("CAST(", x, " AS DATE)"),
-      as.Date  = function(x) build_sql("CAST(", x, " AS DATE)"),
-      paste = function(..., sep = " ") build_sql("CONCAT_WS", list(sep, ...)),
-      paste0 = function(...) build_sql("CONCAT", list(...)),
-      xor = function(x, y) build_sql(x, " ^ ", y),
-      or = function(x, y) build_sql(x, " or ", y),
-      and = function(x, y) build_sql(x, " and ", y),
+      as.numeric = function(x) dbplyr::build_sql("CAST(", x, " AS DOUBLE)"),
+      as.double  = function(x) dbplyr::build_sql("CAST(", x, " AS DOUBLE)"),
+      as.integer  = function(x) dbplyr::build_sql("CAST(", x, " AS INT)"),
+      as.logical = function(x) dbplyr::build_sql("CAST(", x, " AS BOOLEAN)"),
+      as.character  = function(x) dbplyr::build_sql("CAST(", x, " AS STRING)"),
+      as.date  = function(x) dbplyr::build_sql("CAST(", x, " AS DATE)"),
+      as.Date  = function(x) dbplyr::build_sql("CAST(", x, " AS DATE)"),
+      paste = function(..., sep = " ") dbplyr::build_sql("CONCAT_WS", list(sep, ...)),
+      paste0 = function(...) dbplyr::build_sql("CONCAT", list(...)),
+      xor = function(x, y) dbplyr::build_sql(x, " ^ ", y),
+      or = function(x, y) dbplyr::build_sql(x, " or ", y),
+      and = function(x, y) dbplyr::build_sql(x, " and ", y),
       pmin = function(...) build_sql_if_compare(..., con = con, compare = "<="),
       pmax = function(...) build_sql_if_compare(..., con = con, compare = ">=")
     ),
