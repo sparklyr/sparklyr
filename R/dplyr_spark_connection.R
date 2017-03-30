@@ -1,10 +1,12 @@
 #' @export
+#' @importFrom dbplyr sql_escape_ident
+#' @importFrom dbplyr sql_quote
 sql_escape_ident.spark_connection <- function(con, x) {
   # Assuming it might include database name like: `dbname.tableName`
   if (length(x) == 1)
     tbl_quote_name(x)
   else
-    sql_quote(x, '`')
+    dbplyr::sql_quote(x, '`')
 }
 
 build_sql_if_compare <- function(..., con, compare) {
@@ -45,11 +47,12 @@ build_sql_if_compare <- function(..., con, compare) {
 }
 
 #' @export
+#' @importFrom dbplyr sql_translate_env
 sql_translate_env.spark_connection <- function(con) {
-  dplyr::sql_variant(
+  dbplyr::sql_variant(
 
-    scalar = dplyr::sql_translator(
-      .parent = dplyr::base_scalar,
+    scalar = dbplyr::sql_translator(
+      .parent = dbplyr::base_scalar,
       as.numeric = function(x) build_sql("CAST(", x, " AS DOUBLE)"),
       as.double  = function(x) build_sql("CAST(", x, " AS DOUBLE)"),
       as.integer  = function(x) build_sql("CAST(", x, " AS INT)"),
@@ -66,21 +69,21 @@ sql_translate_env.spark_connection <- function(con) {
       pmax = function(...) build_sql_if_compare(..., con = con, compare = ">=")
     ),
 
-    aggregate = dplyr::sql_translator(
-      .parent = dplyr::base_agg,
-      n = function() dplyr::sql("count(*)"),
-      count = function() dplyr::sql("count(*)"),
-      n_distinct = function(...) dplyr::build_sql("count(DISTINCT", list(...), ")"),
-      cor = function(...) dplyr::build_sql("corr(", list(...), ")"),
-      cov = function(...) dplyr::build_sql("covar_samp(", list(...), ")"),
-      sd =  function(...) dplyr::build_sql("stddev_samp(", list(...), ")"),
-      var = function(...) dplyr::build_sql("var_samp(", list(...), ")")
+    aggregate = dbplyr::sql_translator(
+      .parent = dbplyr::base_agg,
+      n = function() dbplyr::sql("count(*)"),
+      count = function() dbplyr::sql("count(*)"),
+      n_distinct = function(...) dbplyr::build_sql("count(DISTINCT", list(...), ")"),
+      cor = function(...) dbplyr::build_sql("corr(", list(...), ")"),
+      cov = function(...) dbplyr::build_sql("covar_samp(", list(...), ")"),
+      sd =  function(...) dbplyr::build_sql("stddev_samp(", list(...), ")"),
+      var = function(...) dbplyr::build_sql("var_samp(", list(...), ")")
     ),
 
-    window = dplyr::sql_translator(
-      .parent = dplyr::base_win,
+    window = dbplyr::sql_translator(
+      .parent = dbplyr::base_win,
       lag = function(x, n = 1L, default = NA, order = NULL) {
-        dplyr::base_win$lag(
+        dbplyr::base_win$lag(
           x = x,
           n = as.integer(n),
           default = default,

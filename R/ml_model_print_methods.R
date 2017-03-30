@@ -92,6 +92,8 @@ ml_model_print_centers <- function(model) {
 #'
 #' @return A sorted data frame with feature labels and their relative importance.
 #' @export
+#' @importFrom dplyr arrange
+#' @importFrom dplyr desc
 ml_tree_feature_importance <- function(sc, model)
 {
   supported <- c("ml_model_gradient_boosted_trees",
@@ -120,5 +122,5 @@ ml_tree_feature_importance <- function(sc, model)
 
   colnames(importance) <- c("importance", "feature")
 
-  importance %>% dplyr::arrange(dplyr::desc(importance))
+  importance %>% arrange(desc(importance))
 }

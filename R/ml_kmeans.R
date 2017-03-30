@@ -21,10 +21,11 @@
 #' @return \link{ml_model} object of class \code{kmeans} with overloaded \code{print}, \code{fitted} and \code{predict} functions.
 #'
 #' @export
+#' @importFrom dplyr tbl_vars
 ml_kmeans <- function(x,
                       centers,
                       iter.max = 100,
-                      features = dplyr::tbl_vars(x),
+                      features = tbl_vars(x),
                       compute.cost = TRUE,
                       tolerance = 0.0001,
                       ml.options = ml_options(),

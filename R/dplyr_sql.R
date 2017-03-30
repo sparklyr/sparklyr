@@ -1,6 +1,7 @@
 # Helper functions to support dplyr sql operations
 
 #' @export
+#' @importFrom dbplyr sql_build
 sql_build.op_sample_n <- function(op, con, ...) {
   select_query(
     from = sql(paste(
@@ -13,6 +14,7 @@ sql_build.op_sample_n <- function(op, con, ...) {
 }
 
 #' @export
+#' @importFrom dbplyr sql_build
 sql_build.op_sample_frac <- function(op, con, ...) {
   select_query(
     from = sql(paste(

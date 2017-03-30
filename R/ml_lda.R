@@ -42,8 +42,9 @@
 #' For terminology used in LDA model see \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.clustering.LDA}{Spark LDA documentation}.
 #'
 #' @export
+#' @importFrom dplyr tbl_vars
 ml_lda <- function(x,
-                   features = dplyr::tbl_vars(x),
+                   features = tbl_vars(x),
                    k = length(features),
                    alpha = (50 / k) + 1,
                    beta = 0.1 + 1,
