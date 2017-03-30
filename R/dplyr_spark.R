@@ -112,7 +112,7 @@ copy_to.src_spark <- function(dest, df, name, overwrite, ...) {
 }
 
 #' @export
-#' @import dplyr db_desc
+#' @importFrom dplyr db_desc
 print.src_spark <- function(x, ...) {
   cat(db_desc(x))
   cat("\n\n")
