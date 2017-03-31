@@ -93,6 +93,7 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
 })
 
 test_that("'sdf_predict()', 'predict()' return same results", {
+  test_requires("dplyr")
 
   model <- flights_tbl %>%
     ml_decision_tree(sched_dep_time ~ dep_time)
@@ -106,7 +107,7 @@ test_that("'sdf_predict()', 'predict()' return same results", {
   expect_equal(n1, n2)
 
   lhs <- predictions %>%
-    arrange_(.dots = list(model$model.parameters$id)) %>%
+    arrange(!!model$model.parameters$id) %>%
     sdf_read_column("prediction")
 
   rhs <- predict(model)
