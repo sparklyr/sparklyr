@@ -29,6 +29,7 @@ Imports:
     dbplyr (>= 0.0.0.9000),
     DBI (>= 0.6),
     readr (>= 0.2.0),
+    rlang,
     digest,
     config,
     rappdirs,
@@ -42,7 +43,8 @@ Imports:
     rstudioapi
 Remotes:
     hadley/dplyr,
-    hadley/dbplyr
+    hadley/dbplyr,
+    hadley/rlang
 Suggests:
     testthat,
     RCurl,
