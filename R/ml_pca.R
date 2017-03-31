@@ -11,8 +11,9 @@
 #' @family Spark ML routines
 #'
 #' @export
+#' @importFrom dplyr tbl_vars
 ml_pca <- function(x,
-                   features = dplyr::tbl_vars(x),
+                   features = tbl_vars(x),
                    ml.options = ml_options(),
                    ...)
 {

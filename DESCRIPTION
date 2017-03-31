@@ -26,6 +26,7 @@ Imports:
     methods,
     lazyeval (>= 0.2.0),
     dplyr (>= 0.5.0.9000),
+    dbplyr (>= 0.0.0.9000),
     DBI (>= 0.6),
     readr (>= 0.2.0),
     digest,
@@ -40,7 +41,8 @@ Imports:
     shiny,
     rstudioapi
 Remotes:
-    hadley/dplyr
+    hadley/dplyr,
+    hadley/dbplyr
 Suggests:
     testthat,
     RCurl,

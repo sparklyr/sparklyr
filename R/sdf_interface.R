@@ -65,6 +65,7 @@ sdf_import <- function(x,
 }
 
 #' @export
+#' @importFrom dplyr tbl
 sdf_import.default <- function(x,
                                sc,
                                name = random_string("sparklyr_tmp_"),
@@ -131,6 +132,7 @@ sdf_register.list <- function(x, name = NULL) {
 }
 
 #' @export
+#' @importFrom dplyr tbl
 sdf_register.spark_jobj <- function(x, name = NULL) {
   name <- name %||% random_string("sparklyr_tmp_")
   invoke(x, "registerTempTable", name)
@@ -293,14 +295,16 @@ sdf_sort <- function(x, columns) {
 #' # note that we have two separate tbls registered
 #' dplyr::src_tbls(sc)
 #' }
+#' @importFrom lazyeval lazy_dots
 sdf_mutate <- function(.data, ...) {
-  sdf_mutate_(.data, .dots = lazyeval::lazy_dots(...))
+  sdf_mutate_(.data, .dots = lazy_dots(...))
 }
 
 #' @name sdf_mutate
 #' @export
+#' @importFrom lazyeval all_dots
 sdf_mutate_ <- function(.data, ..., .dots) {
-  dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
+  dots <- all_dots(.dots, ..., all_named = TRUE)
   data <- .data
 
   for (i in seq_along(dots)) {

@@ -1,9 +1,13 @@
 #' @export
+#' @importFrom dplyr do_
+#' @importFrom dplyr groups
+#' @importFrom dplyr select
+#' @importFrom dplyr count
 do_.tbl_spark <- function(.data, ..., .dots) {
   sdf <- spark_dataframe(.data)
 
   # get column references to grouped variables
-  groups <- as.character(as.list(dplyr::groups(.data)))
+  groups <- as.character(as.list(groups(.data)))
   columns <- lapply(groups, function(group) {
     invoke(sdf, "col", group)
   })

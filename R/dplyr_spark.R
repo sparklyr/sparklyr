@@ -1,5 +1,3 @@
-#' @import dplyr
-
 #' @export
 spark_connection.tbl_spark <- function(x, ...) {
   spark_connection(x$src)
@@ -21,7 +19,8 @@ spark_connection.src_spark <- function(x, ...) {
 }
 
 #' @export
-src_desc.src_spark <- function(x) {
+#' @importFrom dplyr db_desc
+db_desc.src_spark <- function(x) {
   sc <- spark_connection(x)
   paste("spark connection",
         paste("master", sc$master, sep = "="),
@@ -30,32 +29,34 @@ src_desc.src_spark <- function(x) {
 }
 
 #' @export
-src_desc <- src_desc.src_spark
-
-#' @export
-db_explain.src_spark <- function(con, sql, ...) {
+#' @importFrom dplyr db_explain
+db_explain.spark_connection <- function(con, sql, ...) {
   ""
 }
-#' @export
-db_explain <- db_explain.src_spark
 
 #' @export
+#' @importFrom dplyr tbl_vars
 tbl_vars.spark_jobj <- function(x) {
   as.character(invoke(x, "columns"))
 }
 
 #' @export
+#' @importFrom dbplyr tbl_sql
 tbl.src_spark <- function(src, from, ...) {
   tbl_sql("spark", src = src, from = from, ...)
 }
 
 #' @export
+#' @importFrom dbplyr src_sql
+#' @importFrom dbplyr tbl_sql
 tbl.spark_connection <- function(src, from, ...) {
   src <- src_sql("spark", src)
   tbl_sql("spark", src = src, from = from, ...)
 }
 
+
 #' @export
+#' @importFrom dplyr src_tbls
 src_tbls.spark_connection <- function(x, ...) {
   sql <- hive_context(x)
   tbls <- invoke(sql, "sql", "SHOW TABLES")
@@ -66,11 +67,9 @@ src_tbls.spark_connection <- function(x, ...) {
 }
 
 #' @export
-db_data_type.src_spark <- function(...) {
+#' @importFrom dplyr db_data_type
+db_data_type.spark_connection <- function(...) {
 }
-
-#' @export
-db_data_type <- db_data_type.src_spark
 
 
 #' Copy an R Data Frame to Spark
@@ -94,6 +93,7 @@ db_data_type <- db_data_type.src_spark
 #'   to a Spark DataFrame.
 #'
 #' @export
+#' @importFrom dplyr copy_to
 copy_to.spark_connection <- function(dest,
                                      df,
                                      name = deparse(substitute(df)),
@@ -106,24 +106,24 @@ copy_to.spark_connection <- function(dest,
 }
 
 #' @export
+#' @importFrom dplyr copy_to
 copy_to.src_spark <- function(dest, df, name, overwrite, ...) {
   copy_to(spark_connection(dest), df, name, ...)
 }
 
 #' @export
+#' @importFrom dplyr db_desc
 print.src_spark <- function(x, ...) {
-  cat(src_desc(x))
+  cat(db_desc(x))
   cat("\n\n")
 
   spark_log(spark_connection(x))
 }
 
 #' @export
+#' @importFrom dplyr db_save_query
 db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...)
 {
   df <- spark_dataframe(con, sql)
   invoke(df, "registerTempTable", name)
 }
-
-#' @export
-db_save_query <- db_save_query.spark_connection

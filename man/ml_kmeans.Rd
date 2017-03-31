@@ -4,7 +4,7 @@
 \alias{ml_kmeans}
 \title{Spark ML -- K-Means Clustering}
 \usage{
-ml_kmeans(x, centers, iter.max = 100, features = dplyr::tbl_vars(x),
+ml_kmeans(x, centers, iter.max = 100, features = tbl_vars(x),
   compute.cost = TRUE, tolerance = 1e-04, ml.options = ml_options(), ...)
 }
 \arguments{

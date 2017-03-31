@@ -1,6 +1,8 @@
 
 
 #' @export
+#' @importFrom dbplyr sql_render
+#' @importFrom dbplyr sql_build
 spark_dataframe.tbl_spark <- function(x, ...) {
   sc <- spark_connection(x)
 
@@ -81,6 +83,7 @@ sdf_read_column <- function(x, column) {
 }
 
 # Read a Spark Dataset into R.
+#' @importFrom dplyr as_data_frame
 sdf_collect <- function(object) {
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
@@ -133,7 +136,7 @@ sdf_collect <- function(object) {
   # set column names and return dataframe
   colNames <- invoke(sdf, "columns")
   names(fixed) <- as.character(colNames)
-  dplyr::as_data_frame(fixed, stringsAsFactors = FALSE, optional = TRUE)
+  as_data_frame(fixed, stringsAsFactors = FALSE, optional = TRUE)
 }
 
 # Split a Spark DataFrame

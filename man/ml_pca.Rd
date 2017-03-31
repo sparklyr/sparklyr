@@ -4,7 +4,7 @@
 \alias{ml_pca}
 \title{Spark ML -- Principal Components Analysis}
 \usage{
-ml_pca(x, features = dplyr::tbl_vars(x), ml.options = ml_options(), ...)
+ml_pca(x, features = tbl_vars(x), ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
