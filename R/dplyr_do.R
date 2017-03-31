@@ -3,8 +3,9 @@
 #' @importFrom dplyr groups
 #' @importFrom dplyr select
 #' @importFrom dplyr count
-do_.tbl_spark <- function(.data, ..., .dots) {
+do.tbl_spark <- function(.data, ...) {
   sdf <- spark_dataframe(.data)
+  quosures <- rlang::quos(...)
 
   # get column references to grouped variables
   groups <- as.character(as.list(groups(.data)))
@@ -39,14 +40,14 @@ do_.tbl_spark <- function(.data, ..., .dots) {
       filtered <- invoke(filtered, "filter", filter)
 
     # apply functions with this data
-    fits <- enumerate(.dots, function(name, lazy) {
+    fits <- enumerate(quosures, function(name, quosure) {
 
       # override '.' in envir
-      assign(".", filtered, envir = lazy$env)
+      assign(".", filtered, envir = environment(quosure))
 
       # evaluate in environment
       tryCatch(
-        eval(lazy$expr, envir = lazy$env),
+        rlang::eval_tidy(quosure),
         error = identity
       )
 
@@ -59,12 +60,12 @@ do_.tbl_spark <- function(.data, ..., .dots) {
 
   # produce 'result' dataset by adding outputs to 'combos'
   result <- combos
-  columns <- lapply(names(.dots), function(name) {
+  columns <- lapply(names(quosures), function(name) {
     lapply(outputs, `[[`, name)
   })
 
-  for (i in seq_along(.dots)) {
-    key <- names(.dots)[[i]]
+  for (i in seq_along(quosures)) {
+    key <- names(quosures)[[i]]
     val <- lapply(outputs, `[[`, key)
     result[[key]] <- val
   }
