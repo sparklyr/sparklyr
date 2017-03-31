@@ -12,8 +12,8 @@
 \alias{spark_disconnect_all}
 \title{Manage Spark Connections}
 \usage{
-spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
-  method = c("shell", "livy", "test"), app_name = "sparklyr",
+spark_connect(master = "local", spark_home = Sys.getenv("SPARK_HOME"),
+  method = c("shell", "livy", "databricks", "test"), app_name = "sparklyr",
   version = NULL, hadoop_version = NULL, config = spark_config(),
   extensions = sparklyr::registered_extensions())
 
@@ -34,8 +34,8 @@ provided by the \code{SPARK_HOME} environment variable. If
 \code{version} parameter is specified to force the use of a locally
 installed version.}
 
-\item{method}{The method used to connect to Spark. Currently, only
-\code{"shell"} is supported.}
+\item{method}{The method used to connect to Spark. Inside Databricks notebooks and jobs use
+\code{"databricks"}. In other environments use \code{"shell"} as method.}
 
 \item{app_name}{The application name to be used while running in the Spark
 cluster.}
