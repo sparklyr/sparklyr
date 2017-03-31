@@ -1,5 +1,5 @@
 #' @export
-#' @importFrom dplyr do_
+#' @importFrom dplyr do
 #' @importFrom dplyr groups
 #' @importFrom dplyr select
 #' @importFrom dplyr count
