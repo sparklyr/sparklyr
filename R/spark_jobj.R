@@ -18,7 +18,7 @@ spark_jobj <- function(x, ...) {
 
 #' @export
 spark_jobj.default <- function(x, ...) {
-  stop("Unable to retreive a spark_jobj from object of class ",
+  stop("Unable to retrieve a spark_jobj from object of class ",
        paste(class(x), collapse = " "), call. = FALSE)
 }
 

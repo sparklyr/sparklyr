@@ -15,7 +15,7 @@ spark_dataframe <- function(x, ...) {
 
 #' @export
 spark_dataframe.default <- function(x, ...) {
-  stop("Unable to retreive a Spark DataFrame from object of class ",
+  stop("Unable to retrieve a Spark DataFrame from object of class ",
        paste(class(x), collapse = " "), call. = FALSE)
 }
 
