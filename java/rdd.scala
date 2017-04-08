@@ -4,7 +4,9 @@ import org.apache.spark._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 
-class WorkerRDD[T: ClassManifest](parent: RDD[T])
+import scala.reflect.ClassTag
+
+class WorkerRDD[T: ClassTag](parent: RDD[T])
   extends RDD[Row](parent) {
 
   override def getPartitions = parent.partitions
