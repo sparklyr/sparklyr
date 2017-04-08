@@ -13,16 +13,16 @@ import Logging._
 object Process {
   def workerSourceFile(): String = {
     val source = "" +
-      "log_file <-  file.path(\"~\", \"spark\", basename(tempfile(fileext = \".log\")))" +
+      "log_file <-  file.path(\"~\", \"spark\", basename(tempfile(fileext = \".log\")))\n" +
       "log <- function(message) {\n" +
-      "   write(message, file = log_file)\n" +
-      "   cat(\"sparkrworker:\", message)" +
+      "   write(paste0(message, \"\\n\"), file = log_file)\n" +
+      "   cat(\"sparkworker:\", message, \"\\n\")\n" +
       "}\n" +
       "\n" +
       "log(\"sparklyr worker starting\")\n" +
       "log(\"sparklyr worker finished\")\n"
 
-    val tempFile: File = File.createTempFile("sparkrworker.R", "", createTempDir)
+    val tempFile: File = new File(createTempDir + File.separator + "sparkrworker.R")
     val outStream: FileWriter = new FileWriter(tempFile)
     outStream.write(source)
     outStream.flush()
