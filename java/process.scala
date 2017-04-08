@@ -7,6 +7,7 @@ import org.apache.spark._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 
+import ClassUtils._
 import FileUtils._
 import Logging._
 
@@ -42,6 +43,10 @@ object Process {
       "--vanilla",
       sourceFilePath
     ))
+
+    if (classExists("sparklyr.Backend")) {
+      log("sparklyr.Backend exists")
+    }
 
     log("R process starting")
     processBuilder.start()
