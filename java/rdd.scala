@@ -10,6 +10,8 @@ class WorkerRDD[T: ClassManifest](parent: RDD[T])
   override def getPartitions = parent.partitions
 
   override def compute(split: Partition, context: TaskContext): Iterator[Row] = {
+    Process.start()
+
     return new Iterator[Row] {
       def next(): Row = org.apache.spark.sql.Row.fromSeq(Array[String]())
       def hasNext = false

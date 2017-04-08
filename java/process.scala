@@ -12,7 +12,7 @@ object Process {
     val command = sparkConf.get("spark.r.command")
 
     val script = "" +
-      "log_file <-  file.path(\"~/spark/\", basename(tempfile(fileext = \".log\")))" +
+      "log_file <-  file.path(\"~\", \"spark\", basename(tempfile(fileext = \".log\")))" +
       "log <- function(message) {\n" +
       "   write(log_file, message)\n" +
       "}\n" +
@@ -25,6 +25,8 @@ object Process {
       "--vanilla",
       script
     ))
+
+    processBuilder.start()
   }
 }
 
