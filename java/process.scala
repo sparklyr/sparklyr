@@ -11,7 +11,7 @@ import Logging._
 object Process {
   def start() = {
     val sparkConf = SparkEnv.get.conf
-    val command = sparkConf.get("spark.r.command")
+    val command = sparkConf.get("spark.r.command", "Rscript")
 
     val script = "" +
       "log_file <-  file.path(\"~\", \"spark\", basename(tempfile(fileext = \".log\")))" +
