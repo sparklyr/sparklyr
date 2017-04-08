@@ -6,6 +6,8 @@ import org.apache.spark._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 
+import Logging._
+
 object Process {
   def start() = {
     val sparkConf = SparkEnv.get.conf
@@ -26,6 +28,7 @@ object Process {
       script
     ))
 
+    log("R process starting")
     processBuilder.start()
   }
 }
