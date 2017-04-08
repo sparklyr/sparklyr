@@ -6,6 +6,8 @@ import org.apache.spark.sql._
 
 import scala.reflect.ClassTag
 
+import Logging._
+
 class WorkerRDD[T: ClassTag](parent: RDD[T])
   extends RDD[Row](parent) {
 
@@ -23,6 +25,8 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
 
 object WorkerHelper {
   def computeRdd(df: DataFrame): RDD[Row] = {
+    log("RDD compute starting")
+
     val parent: RDD[Row] = df.rdd
     val computed: RDD[Row] = new WorkerRDD[Row](parent)
 
