@@ -58,7 +58,7 @@ on_connection_opened <- function(scon, env, connectCall) {
 
         # table enumeration code
         listObjects = function(type = "table") {
-          connection_list_tables(scon)
+          connection_list_tables(scon, includeType = TRUE)
         },
 
         # column enumeration code
@@ -115,7 +115,7 @@ on_connection_opened <- function(scon, env, connectCall) {
       disconnectCode = "spark_disconnect(%s)",
 
       # table enumeration code
-      listTablesCode =  "sparklyr:::connection_list_tables(%s)",
+      listTablesCode =  "sparklyr:::connection_list_tables(%s, includeType = FALSE)",
 
       # column enumeration code
       listColumnsCode = "sparklyr:::connection_list_columns(%s, '%s')",
@@ -147,16 +147,23 @@ on_connection_updated <- function(scon, hint) {
     viewer$connectionUpdated(type = "Spark", host = to_host(scon), hint = hint)
 }
 
-connection_list_tables <- function(sc) {
+connection_list_tables <- function(sc, includeType = FALSE) {
+  # extract a list of Spark tables
   tables <- if (!is.null(sc) && connection_is_open(sc))
     sort(dbListTables(sc))
   else
     character()
-  data.frame(
-    name = tables,
-    type = rep_len("table", length(tables)),
-    stringsAsFactors = FALSE
-  )
+
+  # return the raw list of tables, or a data frame with object names and types
+  if (includeType) {
+    data.frame(
+      name = tables,
+      type = rep_len("table", length(tables)),
+      stringsAsFactors = FALSE
+    )
+  } else {
+    tables
+  }
 }
 
 connection_list_columns <- function(sc, table) {
