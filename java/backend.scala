@@ -193,10 +193,23 @@ object Backend {
       System.exit(-1)
     }
 
-    port = args(0).toInt
-    sessionId = args(1).toInt
-    isService = args.length > 2 && args(2) == "--service"
-    isRemote = args.length > 3 && args(3) == "--remote"
+    val port = args(0).toInt
+    val sessionId = args(1).toInt
+    val isService = args.length > 2 && args(2) == "--service"
+    val isRemote = args.length > 3 && args(3) == "--remote"
+
+    init(port, sessionId, isService, isRemote)
+  }
+
+  def init(portParam: Int,
+           sessionIdParam: Int,
+           isServiceParam: Boolean,
+           isRemoteParam :Boolean): Unit = {
+
+    port = portParam
+    sessionId = sessionIdParam
+    isService = isServiceParam
+    isRemote = isRemoteParam
 
     if (isRemote) {
       val anyIpAddress = Array[Byte](0, 0, 0, 0)
