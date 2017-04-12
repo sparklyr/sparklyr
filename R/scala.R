@@ -1,0 +1,15 @@
+#' @export
+update_sources_class <- function() {
+  rlines <- readLines("R/sources.R")
+  rlines <- gsub("\\\"", "\\\\\"", rlines)
+  rlines <- gsub("\n", "\\n", rlines)
+
+  lines <- c(
+    "object Embedded {",
+    "  def sources: String = \"\" +",
+    paste("    \"", rlines, "\\n\" +", sep = ""),
+    "}"
+  )
+
+  writeLines(lines, file.path("java", "sources.scala"))
+}

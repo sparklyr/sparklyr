@@ -14,7 +14,7 @@ object FileUtils {
   }
 
   def createTempDir: File = {
-    val workerFolderName: String = "sparkrworker"
+    val workerFolderName: String = "sparkworker"
     val root: String = System.getProperty("java.io.tmpdir")
 
     ensureDir(root, workerFolderName)
