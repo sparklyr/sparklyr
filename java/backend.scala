@@ -234,7 +234,7 @@ object Backend {
         System.exit(1)
     }
 
-    System.exit(0)
+    if (!isService) System.exit(0)
   }
 
   def bind(): Unit = {
