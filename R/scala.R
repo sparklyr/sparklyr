@@ -2,12 +2,15 @@
 update_sources_class <- function() {
   rlines <- readLines("R/sources.R")
   rlines <- gsub("\\\"", "\\\\\"", rlines)
-  rlines <- gsub("\n", "\\n", rlines)
+  rlines <- gsub("\\\\n", "\\\\\\\\n", rlines)
 
   lines <- c(
+    "package SparkWorker",
+    "",
     "object Embedded {",
     "  def sources: String = \"\" +",
     paste("    \"", rlines, "\\n\" +", sep = ""),
+    "    \"\"",
     "}"
   )
 
