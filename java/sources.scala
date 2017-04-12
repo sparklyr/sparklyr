@@ -5,7 +5,7 @@ object Embedded {
     "log_file <- file.path(\"~\", \"spark\", basename(tempfile(fileext = \".log\")))\n" +
     "\n" +
     "log <- function(message) {\n" +
-    "  write(paste0(message, \"\\n\"), file = log_file)\n" +
+    "  write(paste0(message, \"\\n\"), file = log_file, append = TRUE)\n" +
     "  cat(\"sparkworker:\", message, \"\\n\")\n" +
     "}\n" +
     "\n" +
