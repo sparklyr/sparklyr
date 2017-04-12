@@ -53,7 +53,7 @@ setMethod("dbQuoteIdentifier", c("spark_connection", "character"), function(conn
 })
 
 setMethod("dbQuoteString", c("spark_connection", "character"), function(conn, x, ...) {
-  SQL(paste('"', gsub('"', '\\\\"', x), '"'))
+  SQL(paste('"', gsub('"', '\\\\"', x), '"', sep = ""))
 })
 
 # Sets a property for the connection
