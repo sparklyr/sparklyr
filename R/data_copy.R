@@ -76,10 +76,10 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
       e
   }), optional = TRUE)
 
-  splitSeparator <- split_separator(sc)
+  separator <- split_separator(sc)
 
   tempFile <- tempfile(fileext = ".csv")
-  write.table(df, tempFile, sep = splitSeparator$r, col.names = FALSE, row.names = FALSE, quote = FALSE)
+  write.table(df, tempFile, sep = separator$plain, col.names = FALSE, row.names = FALSE, quote = FALSE)
   textData <- as.list(readr::read_lines(tempFile))
 
   rdd <- invoke_static(
@@ -90,7 +90,7 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
     textData,
     columns,
     as.integer(if (repartition <= 0) 1 else repartition),
-    splitSeparator$scala
+    separator$regexp
   )
 
   invoke(hive_context(sc), "createDataFrame", rdd, structType)
@@ -110,7 +110,7 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
       e
   }), optional = TRUE)
 
-  splitSeparator <- split_separator(sc)
+  separator <- split_separator(sc)
 
   # generate a CSV file from the associated data frame
   # note that these files need to live for the R session
@@ -122,7 +122,7 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
   tempfile <- file.path(tempdir(), filename)
 
   if (!file.exists(tempfile)) {
-    write.table(df, tempfile, sep = splitSeparator$r, col.names = FALSE, row.names = FALSE, quote = FALSE)
+    write.table(df, tempfile, sep = separator$plain, col.names = FALSE, row.names = FALSE, quote = FALSE)
   }
 
   rdd <- invoke_static(
@@ -133,7 +133,7 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
     tempfile,
     columns,
     as.integer(if (repartition <= 0) 1 else repartition),
-    splitSeparator$scala
+    separator$regexp
   )
 
   invoke(hive_context(sc), "createDataFrame", rdd, structType)

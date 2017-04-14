@@ -283,7 +283,7 @@ trim_whitespace <- function(strings) {
 
 split_separator <- function(sc) {
   if (inherits(sc, "livy_connection"))
-    list(scala = "\\|~\\|", r = "|~|", r_deser = "\\|~\\|")
+    list(regexp = "\\|~\\|", plain = "|~|")
   else
-    list(scala = "\31", r = "\31", r_deser = "\31")
+    list(regexp = "\31", plain = "\31")
 }

@@ -49,7 +49,7 @@ sdf_deserialize_column <- function(column, sc) {
   separator <- split_separator(sc)
 
   if (is.character(column)) {
-    splat <- strsplit(column, separator$r_deser, fixed = TRUE)[[1]]
+    splat <- strsplit(column, separator$regexp, fixed = TRUE)[[1]]
     splat[splat == "<NA>"] <- NA
     Encoding(splat) <- "UTF-8"
     return(splat)
@@ -76,7 +76,7 @@ sdf_read_column <- function(x, column) {
   separator <- split_separator(sc)
 
   column <- sc %>%
-    invoke_static("sparklyr.Utils", "collectColumn", sdf, column, colType, separator$scala) %>%
+    invoke_static("sparklyr.Utils", "collectColumn", sdf, column, colType, separator$regexp) %>%
     sdf_deserialize_column(sc)
 
   column
@@ -96,14 +96,14 @@ sdf_collect <- function(object) {
   # collect the data set in chunks, and then join those chunks.
   # note that this issue should be resolved with Spark >2.0.0
   collected <- if (spark_version(sc) > "2.0.0") {
-    invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$scala)
+    invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
   } else {
     columns <- invoke(sdf, "columns") %>% as.character()
     chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
     chunks <- split_chunks(columns, as.integer(chunk_size))
     pieces <- lapply(chunks, function(chunk) {
       subset <- sdf %>% invoke("selectExpr", as.list(chunk))
-      invoke_static(sc, "sparklyr.Utils", "collect", subset, separator$scala)
+      invoke_static(sc, "sparklyr.Utils", "collect", subset, separator$regexp)
     })
     do.call(c, pieces)
   }
