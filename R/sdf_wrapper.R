@@ -49,7 +49,7 @@ sdf_deserialize_column <- function(column, sc) {
   separator <- split_separator(sc)
 
   if (is.character(column)) {
-    splat <- strsplit(column, separator$r, fixed = TRUE)[[1]]
+    splat <- strsplit(column, separator$r_deser, fixed = TRUE)[[1]]
     splat[splat == "<NA>"] <- NA
     Encoding(splat) <- "UTF-8"
     return(splat)
