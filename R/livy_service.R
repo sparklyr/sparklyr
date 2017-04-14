@@ -12,11 +12,6 @@ livy_service_start <- function(version = NULL, spark_version = NULL) {
     "SPARK_HOME" = spark_home_dir(version = spark_version)
   ))
 
-  if (identical(version, NULL)) {
-    version <- livy_install_find() %>%
-      .[["livy"]]
-  }
-
   # warn if the user attempts to use livy 0.2.0 with Spark >= 2.0.0
   if (!identical(spark_version, NULL)) {
     spark_version <- ensure_scalar_character(spark_version)
