@@ -307,14 +307,14 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
   }
 }
 
-spark_data_read_generic <- function(sc, path, fileMethod, readOptions = list()) {
+spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list()) {
   options <- invoke(hive_context(sc), "read")
 
   lapply(names(readOptions), function(optionName) {
     options <<- invoke(options, "option", optionName, readOptions[[optionName]])
   })
 
-  invoke(options, fileMethod, path)
+  invoke(options, fileMethod, source)
 }
 
 spark_data_apply_mode <- function(options, mode) {
@@ -472,5 +472,30 @@ spark_read_jdbc <- function(sc,
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, "jdbc", "format", options) %>% invoke("load")
+  spark_partition_register_df(sc, df, name, repartition, memory)
+}
+
+#' Read from a generic source into a Spark DataFrame.
+#'
+#' Read from a generic source into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param source A data source capable of reading data.
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_source <- function(sc,
+                            name,
+                            source,
+                            options = list(),
+                            repartition = 0,
+                            memory = TRUE,
+                            overwrite = TRUE) {
+
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+
+  df <- spark_data_read_generic(sc, source, "format", options) %>% invoke("load")
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
