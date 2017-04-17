@@ -34,8 +34,8 @@ provided by the \code{SPARK_HOME} environment variable. If
 \code{version} parameter is specified to force the use of a locally
 installed version.}
 
-\item{method}{The method used to connect to Spark. Inside Databricks notebooks and jobs use
-\code{"databricks"}. In other environments use \code{"shell"} as method.}
+\item{method}{The method used to connect to Spark. Currently, only
+\code{"shell"} is supported.}
 
 \item{app_name}{The application name to be used while running in the Spark
 cluster.}

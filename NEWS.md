@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added `spark_read_source()`. This function reads data from a
+  Spark data source which can be loaded through an Spark package.
+
 - Added support for `mode = "overwrite"` and `mode = "append"` to
   `spark_write_csv`.
 
