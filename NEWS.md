@@ -1,5 +1,10 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added support for `jar_dep` in the compilation specification to
+  support additional `jars` through `spark_compile`.
+  
+- `spark_compile` now prints deprecation warnings.
+
 - Added `spark_read_source()`. This function reads data from a
   Spark data source which can be loaded through an Spark package.
 

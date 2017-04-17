@@ -6,7 +6,7 @@
 \usage{
 spark_compilation_spec(spark_version = NULL, spark_home = NULL,
   scalac_path = NULL, scala_filter = NULL, jar_name = NULL,
-  jar_path = NULL)
+  jar_path = NULL, jar_dep = NULL)
 }
 \arguments{
 \item{spark_version}{The Spark version to build against. This can
@@ -31,6 +31,8 @@ certain versions of Spark.}
 
 \item{jar_path}{The path to the \code{jar} tool to be used
 during compilation of your Spark extension.}
+
+\item{jar_dep}{An optional list of additional \code{jar} dependencies.}
 }
 \description{
 For use with \code{\link{compile_package_jars}}. The Spark compilation

@@ -13,6 +13,7 @@
 #'   compilation of \code{scala} files.
 #' @param jar The path to the \code{jar} program to be used, for
 #'   generating of the resulting \code{jar}.
+#' @param jar_dep An optional list of additional \code{jar} dependencies.
 #'
 #' @import rprojroot
 #' @import digest
@@ -23,7 +24,8 @@ spark_compile <- function(jar_name,
                           spark_home = NULL,
                           filter = NULL,
                           scalac = NULL,
-                          jar = NULL)
+                          jar = NULL,
+                          jar_dep = NULL)
 {
   default_install <- spark_install_find()
   spark_home <- if (is.null(spark_home) && !is.null(default_install))
@@ -79,6 +81,8 @@ spark_compile <- function(jar_name,
       break
   }
 
+  jars <- c(jars, jar_dep)
+
   if (!length(jars))
     stop("failed to discover Spark jars")
 
@@ -94,7 +98,7 @@ spark_compile <- function(jar_name,
   Sys.setenv(CLASSPATH = CLASSPATH)
   on.exit(Sys.setenv(CLASSPATH = classpath), add = TRUE)
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
-  status <- execute(shQuote(scalac), "-optimise", scala_files_quoted)
+  status <- execute(shQuote(scalac), "-optimise", "-deprecation", scala_files_quoted)
   if (status)
     stop("==> failed to compile Scala source files")
 
@@ -144,6 +148,7 @@ compile_package_jars <- function(..., spec = NULL) {
     scalac_path   <- el$scalac_path
     filter        <- el$scala_filter
     jar_path      <- el$jar_path
+    jar_dep       <- el$jar_dep
 
     # try to automatically download + install Spark
     if (is.null(spark_home) && !is.null(spark_version)) {
@@ -157,7 +162,8 @@ compile_package_jars <- function(..., spec = NULL) {
       spark_home = spark_home,
       filter = filter,
       scalac = scalac_path,
-      jar = jar_path
+      jar = jar_path,
+      jar_dep = jar_dep
     )
 
   }
@@ -190,6 +196,7 @@ compile_package_jars <- function(..., spec = NULL) {
 #' @param jar_name The name to be assigned to the generated \code{jar}.
 #' @param jar_path The path to the \code{jar} tool to be used
 #'   during compilation of your Spark extension.
+#' @param jar_dep An optional list of additional \code{jar} dependencies.
 #'
 #' @export
 spark_compilation_spec <- function(spark_version = NULL,
@@ -197,7 +204,8 @@ spark_compilation_spec <- function(spark_version = NULL,
                                    scalac_path = NULL,
                                    scala_filter = NULL,
                                    jar_name = NULL,
-                                   jar_path = NULL)
+                                   jar_path = NULL,
+                                   jar_dep = NULL)
 {
   spark_home    <- spark_home %||% spark_home_dir(spark_version)
   spark_version <- spark_version %||% spark_version_from_home(spark_home)
@@ -207,7 +215,8 @@ spark_compilation_spec <- function(spark_version = NULL,
        scalac_path = scalac_path,
        scala_filter = scala_filter,
        jar_name = jar_name,
-       jar_path = jar_path)
+       jar_path = jar_path,
+       jar_dep = jar_dep)
 }
 
 find_jar <- function() {
