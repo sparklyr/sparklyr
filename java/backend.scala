@@ -231,10 +231,10 @@ object Backend {
     } catch {
       case e: IOException =>
         logError("Server shutting down: failed with exception ", e)
-        System.exit(1)
+        if (!isService) System.exit(1)
     }
 
-    System.exit(0)
+    if (!isService) System.exit(0)
   }
 
   def bind(): Unit = {
