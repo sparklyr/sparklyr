@@ -27,4 +27,3 @@ Create an ML model object, wrapping the result of a Spark ML routine call.
 The generated object will be an \R list with S3 classes
 \code{c("ml_model_<class>", "ml_model")}.
 }
-

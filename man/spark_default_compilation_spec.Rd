@@ -13,4 +13,3 @@ spark_default_compilation_spec(pkg = infer_active_package_name())
 This is the default compilation specification used for
 Spark extensions, when used with \code{\link{compile_package_jars}}.
 }
-

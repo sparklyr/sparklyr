@@ -14,4 +14,3 @@ tbl_uncache(sc, name)
 \description{
 Force a Spark table with name \code{name} to be unloaded from memory.
 }
-

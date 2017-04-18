@@ -20,4 +20,3 @@ Compile the \code{scala} source files contained within an \R package
 into a Java Archive (\code{jar}) file that can be loaded and used within
 a Spark environment.
 }
-

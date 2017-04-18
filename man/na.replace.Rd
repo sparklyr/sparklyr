@@ -15,4 +15,3 @@ na.replace(object, ...)
 This S3 generic provides an interface for replacing
 \code{\link{NA}} values within an object.
 }
-

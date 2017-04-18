@@ -49,6 +49,7 @@ that even though the pending set of operations (currently) are not exposed at
 the \R level, these operations will only be executed when you explicitly
 \code{collect()} the table.
 }
+
 \examples{
 \dontrun{
 # randomly partition data into a 'training' and 'test'
@@ -70,4 +71,3 @@ Other Spark data frames: \code{\link{sdf_copy_to}},
   \code{\link{sdf_predict}}, \code{\link{sdf_register}},
   \code{\link{sdf_sample}}, \code{\link{sdf_sort}}
 }
-

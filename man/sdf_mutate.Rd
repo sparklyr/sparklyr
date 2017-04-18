@@ -2,6 +2,7 @@
 % Please edit documentation in R/sdf_interface.R
 \name{sdf_mutate}
 \alias{sdf_mutate}
+\alias{sdf_mutate}
 \alias{sdf_mutate_}
 \title{Mutate a Spark DataFrame}
 \usage{
@@ -34,6 +35,7 @@ that even though the pending set of operations (currently) are not exposed at
 the \R level, these operations will only be executed when you explicitly
 \code{collect()} the table.
 }
+
 \examples{
 \dontrun{
 # using the 'beaver1' dataset, binarize the 'temp' column
@@ -65,4 +67,3 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}}
 }
-

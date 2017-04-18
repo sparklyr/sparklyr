@@ -46,4 +46,3 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_json}},
   \code{\link{spark_write_parquet}}
 }
-

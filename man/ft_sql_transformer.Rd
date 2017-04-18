@@ -44,4 +44,3 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }
-

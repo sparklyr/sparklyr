@@ -38,4 +38,3 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_string_indexer}},
   \code{\link{ft_tokenizer}}, \code{\link{sdf_mutate}}
 }
-

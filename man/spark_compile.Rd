@@ -28,4 +28,3 @@ Given a set of \code{scala} source files, compile them
 into a Java Archive (\code{jar}).
 }
 \keyword{internal}
-

@@ -34,4 +34,3 @@ Copy an R \code{data.frame} to Spark, and return a reference to the
 generated Spark DataFrame as a \code{tbl_spark}. The returned object will
 act as a \code{dplyr}-compatible interface to the underlying Spark table.
 }
-

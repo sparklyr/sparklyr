@@ -13,4 +13,3 @@ connection_is_open(sc)
 Check whether the connection is open
 }
 \keyword{internal}
-

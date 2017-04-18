@@ -16,4 +16,3 @@ at \code{spark_home}.}
 \description{
 Retrieve the version of Spark associated with a Spark installation.
 }
-
