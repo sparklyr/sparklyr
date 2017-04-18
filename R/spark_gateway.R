@@ -8,8 +8,6 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
   commandStart <- Sys.time()
 
   while (is.null(gateway) && Sys.time() < commandStart + waitSeconds) {
-    commandStart <- Sys.time()
-
     tryCatch({
       suppressWarnings({
         timeout <- spark_config_value(config, "sparklyr.monitor.timeout", 1)
