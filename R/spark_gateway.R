@@ -1,13 +1,13 @@
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
-  retries <- if (isStarting)
+  waitSeconds <- if (isStarting)
     spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
   else
     spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
 
   gateway <- NULL
-  commandStart <- NULL
+  commandStart <- Sys.time()
 
-  while (is.null(gateway) && retries >= 0) {
+  while (is.null(gateway) && Sys.time() < commandStart + waitSeconds) {
     commandStart <- Sys.time()
 
     tryCatch({
@@ -23,10 +23,8 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
     }, error = function(err) {
     })
 
-    retries <- retries  - 1;
-
-    startWait <- spark_config_value(config, "sparklyr.gateway.start.wait", 50)
-    Sys.sleep(startWait / 1000)
+    startWait <- spark_config_value(config, "sparklyr.gateway.start.wait", 50 / 1000)
+    Sys.sleep(startWait)
   }
 
   gateway

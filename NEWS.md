@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Improved logging while establishing connections to `sparklyr`.
+
 - Added support for `jar_dep` in the compilation specification to
   support additional `jars` through `spark_compile`.
   

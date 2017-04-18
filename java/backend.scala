@@ -251,6 +251,7 @@ object Backend {
   }
 
   def bind(): Unit = {
+    log("Waiting for sparklyr client to connect to port (" + port + ")")
     val gatewaySocket = gatewayServerSocket.accept()
 
     val buf = new Array[Byte](1024)
@@ -275,6 +276,9 @@ object Backend {
               if (requestedSessionId == sessionId || requestedSessionId == 0)
               {
                 log("Gateway found current session (" + sessionId + ")")
+
+                log("Creating backend for session (" + sessionId + ")")
+                log("Backend creation requires sufficient system resources.")
 
                 val backend = new Backend()
                 val backendPort: Int = backend.init(isRemote)
