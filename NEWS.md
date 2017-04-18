@@ -1,5 +1,11 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- The `ml_save()` and `ml_load()` functions gain a `meta`
+  argument, allowing users to specify where R-level model
+  metadata should be saved independently of the Spark model
+  itself. This should help facilitate the saving and loading
+  of Spark models used in non-local connection scenarios.
+
 - Improved logging while establishing connections to `sparklyr`.
 
 - Added support for `jar_dep` in the compilation specification to

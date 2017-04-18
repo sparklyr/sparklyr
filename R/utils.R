@@ -287,3 +287,7 @@ split_separator <- function(sc) {
   else
     list(regexp = "\31", plain = "\31")
 }
+
+resolve_fn <- function(fn, ...) {
+  if (is.function(fn)) fn(...) else fn
+}
