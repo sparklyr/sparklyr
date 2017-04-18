@@ -52,7 +52,7 @@ sample_n.tbl_spark <- function(tbl,
                                replace = FALSE,
                                weight = NULL,
                                .env = parent.frame()) {
-  dplyr::add_op_single("sample_n", .data = tbl, args = list(
+  add_op_single("sample_n", .data = tbl, args = list(
     size = size,
     replace = replace,
     weight = weight,
@@ -66,7 +66,7 @@ sample_frac.tbl_spark <- function(tbl,
                                   replace = FALSE,
                                   weight = NULL,
                                   .env = parent.frame()) {
-  dplyr::add_op_single("sample_frac", .data = tbl, args = list(
+  add_op_single("sample_frac", .data = tbl, args = list(
     size = size,
     replace = replace,
     weight = weight,

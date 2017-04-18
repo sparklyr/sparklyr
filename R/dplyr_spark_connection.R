@@ -42,10 +42,10 @@ build_sql_if_compare <- function(..., con, compare) {
 
 #' @export
 sql_translate_env.spark_connection <- function(con) {
-  dplyr::sql_variant(
+  sql_variant(
 
-    scalar = dplyr::sql_translator(
-      .parent = dplyr::base_scalar,
+    scalar = sql_translator(
+      .parent = base_scalar,
       as.numeric = function(x) build_sql("CAST(", x, " AS DOUBLE)"),
       as.double  = function(x) build_sql("CAST(", x, " AS DOUBLE)"),
       as.integer  = function(x) build_sql("CAST(", x, " AS INT)"),
@@ -62,21 +62,21 @@ sql_translate_env.spark_connection <- function(con) {
       pmax = function(...) build_sql_if_compare(..., con = con, compare = ">=")
     ),
 
-    aggregate = dplyr::sql_translator(
-      .parent = dplyr::base_agg,
-      n = function() dplyr::sql("count(*)"),
-      n_distinct = function(...) dplyr::build_sql("count(DISTINCT", list(...), ")"),
-      count = function() dplyr::sql("count(*)"),
+    aggregate = sql_translator(
+      .parent = base_agg,
+      n = function() sql("count(*)"),
+      n_distinct = function(...) build_sql("count(DISTINCT", list(...), ")"),
+      count = function() sql("count(*)"),
       cor = sql_prefix("corr"),
       cov = sql_prefix("covar_samp"),
       sd =  sql_prefix("stddev_samp"),
       var = sql_prefix("var_samp")
     ),
 
-    window = dplyr::sql_translator(
-      .parent = dplyr::base_win,
+    window = sql_translator(
+      .parent = base_win,
       lag = function(x, n = 1L, default = NA, order = NULL) {
-        dplyr::base_win$lag(
+        base_win$lag(
           x = x,
           n = as.integer(n),
           default = default,
@@ -111,7 +111,7 @@ sql_select.spark_connection <- function(con, select, from, where = NULL,
     assert_that(is.character(where))
 
     where_paren <- escape(where, parens = TRUE, con = con)
-    out$where <- build_sql("WHERE ", dplyr::sql_vector(where_paren, collapse = " AND "))
+    out$where <- build_sql("WHERE ", sql_vector(where_paren, collapse = " AND "))
   }
 
   if (length(group_by) > 0L) {

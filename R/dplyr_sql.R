@@ -16,7 +16,7 @@ spark_sql_count_rows <- function(op, con) {
 sql_build.op_sample_n <- function(op, con, ...) {
   countTotal <- spark_sql_count_rows(op, con)
 
-  firstColumn <- sql(sql_escape_ident(dplyr::op_vars(op)[[1]], con = con))
+  firstColumn <- sql(sql_escape_ident(op_vars(op)[[1]], con = con))
   query <- select_spark_query(
     from = sql_build(op$x, con = con),
     select = build_sql(
@@ -41,7 +41,7 @@ sql_build.op_sample_n <- function(op, con, ...) {
 sql_build.op_sample_frac <- function(op, con, ...) {
   countTotal <- spark_sql_count_rows(op, con)
 
-  firstColumn <- sql(sql_escape_ident(dplyr::op_vars(op)[[1]], con = con))
+  firstColumn <- sql(sql_escape_ident(op_vars(op)[[1]], con = con))
   query <- select_spark_query(
     from = sql_build(op$x, con = con),
     select = build_sql(

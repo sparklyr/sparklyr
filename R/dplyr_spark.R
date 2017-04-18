@@ -1,4 +1,46 @@
 #' @import dplyr
+#' @rawNamespace
+#' if (utils::packageVersion("dplyr") > "0.5.0") {
+#'   importFrom("dplyr", "db_desc")
+#'   importFrom("dbplyr", "add_op_single")
+#'   importFrom("dbplyr", "build_sql")
+#'   importFrom("dbplyr", "escape")
+#'   importFrom("dbplyr", "select_query")
+#'   importFrom("dbplyr", "sql_build")
+#'   importFrom("dbplyr", "sql_quote")
+#'   importFrom("dbplyr", "sql_render")
+#'   importFrom("dbplyr", "src_sql")
+#'   importFrom("dbplyr", "tbl_sql")
+#'   importFrom("dbplyr", "sql_vector")
+#'   importFrom("dbplyr", "sql_translator")
+#'   importFrom("dbplyr", "base_agg")
+#'   importFrom("dbplyr", "base_win")
+#'   importFrom("dbplyr", "named_commas")
+#'   importFrom("dbplyr", "base_scalar")
+#'   importFrom("dbplyr", "op_vars")
+#'   importFrom("dbplyr", "sql_variant")
+#'   importFrom("dbplyr", "sql_prefix")
+#' } else {
+#'   importFrom("dplyr", "src_desc")
+#'   importFrom("dplyr", "add_op_single")
+#'   importFrom("dplyr", "build_sql")
+#'   importFrom("dplyr", "escape")
+#'   importFrom("dplyr", "select_query")
+#'   importFrom("dplyr", "sql_build")
+#'   importFrom("dplyr", "sql_quote")
+#'   importFrom("dplyr", "sql_render")
+#'   importFrom("dplyr", "src_sql")
+#'   importFrom("dplyr", "tbl_sql")
+#'   importFrom("dplyr", "sql_vector")
+#'   importFrom("dplyr", "sql_translator")
+#'   importFrom("dplyr", "base_agg")
+#'   importFrom("dplyr", "base_win")
+#'   importFrom("dplyr", "named_commas")
+#'   importFrom("dplyr", "base_scalar")
+#'   importFrom("dplyr", "op_vars")
+#'   importFrom("dplyr", "sql_variant")
+#'   importFrom("dplyr", "sql_prefix")
+#' }
 
 #' @export
 spark_connection.tbl_spark <- function(x, ...) {

@@ -8,8 +8,8 @@ spark_partition_register_df <- function(sc, df, name, repartition, memory) {
   invoke(df, "registerTempTable", name)
 
   if (memory) {
-    dbGetQuery(sc, paste("CACHE TABLE", dplyr::escape(ident(name), con = sc)))
-    dbGetQuery(sc, paste("SELECT count(*) FROM", dplyr::escape(ident(name), con = sc)))
+    dbGetQuery(sc, paste("CACHE TABLE", escape(ident(name), con = sc)))
+    dbGetQuery(sc, paste("SELECT count(*) FROM", escape(ident(name), con = sc)))
   }
 
   on_connection_updated(sc, name)
@@ -37,6 +37,6 @@ spark_sqlresult_from_dplyr <- function(x) {
   sparkSource <- spark_source_from_ops(x)
   sc <- spark_connection(sparkSource)
 
-  sql <- dplyr::sql_render(x)
+  sql <- sql_render(x)
   sqlResult <- invoke(hive_context(sc), "sql", as.character(sql))
 }
