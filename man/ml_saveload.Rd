@@ -8,7 +8,7 @@
 \usage{
 ml_load(sc, file, meta = ml_load_meta(file))
 
-ml_save(model, file, meta = NULL)
+ml_save(model, file, meta = ml_save_meta(model, file))
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
