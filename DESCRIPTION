@@ -35,8 +35,7 @@ Imports:
     withr,
     httr,
     jsonlite,
-    base64enc,
-    dbplyr
+    base64enc
 Suggests:
     testthat,
     RCurl,

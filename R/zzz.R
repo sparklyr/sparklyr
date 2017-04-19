@@ -7,6 +7,8 @@ set_option_default <- function(...) {
 }
 
 .onLoad <- function(...) {
+  register_dplyr_all()
+
   set_option_default(
     sparklyr.na.action.verbose = TRUE
   )

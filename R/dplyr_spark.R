@@ -2,24 +2,6 @@
 #' @rawNamespace
 #' if (utils::packageVersion("dplyr") > "0.5.0") {
 #'   importFrom("dplyr", "db_desc")
-#'   importFrom("dbplyr", "add_op_single")
-#'   importFrom("dbplyr", "build_sql")
-#'   importFrom("dbplyr", "escape")
-#'   importFrom("dbplyr", "select_query")
-#'   importFrom("dbplyr", "sql_build")
-#'   importFrom("dbplyr", "sql_quote")
-#'   importFrom("dbplyr", "sql_render")
-#'   importFrom("dbplyr", "src_sql")
-#'   importFrom("dbplyr", "tbl_sql")
-#'   importFrom("dbplyr", "sql_vector")
-#'   importFrom("dbplyr", "sql_translator")
-#'   importFrom("dbplyr", "base_agg")
-#'   importFrom("dbplyr", "base_win")
-#'   importFrom("dbplyr", "named_commas")
-#'   importFrom("dbplyr", "base_scalar")
-#'   importFrom("dbplyr", "op_vars")
-#'   importFrom("dbplyr", "sql_variant")
-#'   importFrom("dbplyr", "sql_prefix")
 #' } else {
 #'   importFrom("dplyr", "src_desc")
 #'   importFrom("dplyr", "add_op_single")
@@ -50,6 +32,15 @@ spark_connection.tbl_spark <- function(x, ...) {
 #' @export
 spark_connection.src_spark <- function(x, ...) {
   x$con
+}
+
+# dplyr_s3 @export
+src_desc.src_spark <- function(x) {
+  sc <- spark_connection(x)
+  paste("spark connection",
+        paste("master", sc$master, sep = "="),
+        paste("app", sc$app_name, sep = "="),
+        paste("local", spark_connection_is_local(sc), sep = "="))
 }
 
 #' @export
@@ -127,19 +118,9 @@ copy_to.src_spark <- function(dest, df, name, ...) {
 
 #' @export
 print.src_spark <- function(x, ...) {
-  sc <- spark_connection(x)
-
-  cat(
-    paste("spark connection",
-     paste("master", sc$master, sep = "="),
-      paste("app", sc$app_name, sep = "="),
-      paste("local", spark_connection_is_local(sc), sep = "=")
-    )
-  )
-
+  cat(src_desc.src_spark(x))
   cat("\n\n")
-
-  spark_log(sc)
+  spark_log(spark_connection(x))
 }
 
 #' @export

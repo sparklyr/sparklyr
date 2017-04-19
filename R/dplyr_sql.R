@@ -12,7 +12,7 @@ spark_sql_count_rows <- function(op, con) {
   countResult[[1]][[1]]
 }
 
-#' @export
+# dplyr_s3 @export
 sql_build.op_sample_n <- function(op, con, ...) {
   countTotal <- spark_sql_count_rows(op, con)
 
@@ -37,7 +37,7 @@ sql_build.op_sample_n <- function(op, con, ...) {
   query
 }
 
-#' @export
+# dplyr_s3 @export
 sql_build.op_sample_frac <- function(op, con, ...) {
   countTotal <- spark_sql_count_rows(op, con)
 

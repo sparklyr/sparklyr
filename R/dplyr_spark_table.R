@@ -40,11 +40,10 @@ collect.spark_jobj <- function(x, ...) {
   sdf_collect(x)
 }
 
-#' @export
+# dplyr_s3 @export
 sql_build.tbl_spark <- function(op, con, ...) {
   sql_build(op$ops, con, ...)
 }
-
 
 #' @export
 sample_n.tbl_spark <- function(tbl,

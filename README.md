@@ -76,8 +76,8 @@ To start with here's a simple filtering example:
 flights_tbl %>% filter(dep_delay == 2)
 ```
 
-    ## Source:   query [6,233 x 19]
-    ## Database: spark connection master=local[8] app=sparklyr local=TRUE
+    ## Source:     lazy query [?? x 19]
+    ## Database:   spark_connection
     ## 
     ##     year month   day dep_time sched_dep_time dep_delay arr_time
     ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
@@ -129,9 +129,10 @@ batting_tbl %>%
   filter(min_rank(desc(H)) <= 2 & H > 0)
 ```
 
-    ## Source:   query [2.562e+04 x 7]
-    ## Database: spark connection master=local[8] app=sparklyr local=TRUE
-    ## Groups: playerID
+    ## Source:     lazy query [?? x 7]
+    ## Database:   spark_connection
+    ## Grouped by: playerID
+    ## Ordered by: playerID, yearID, teamID
     ## 
     ##     playerID yearID teamID     G    AB     R     H
     ##        <chr>  <int>  <chr> <int> <int> <int> <int>
@@ -313,16 +314,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 16/12/19 09:46:49 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 91 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpRAnI6X/fileb3a772c0fc32.csv MapPartitionsRDD[363] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 16/12/19 09:46:49 INFO TaskSchedulerImpl: Adding task set 91.0 with 1 tasks
-    ## 16/12/19 09:46:49 INFO TaskSetManager: Starting task 0.0 in stage 91.0 (TID 177, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
-    ## 16/12/19 09:46:49 INFO Executor: Running task 0.0 in stage 91.0 (TID 177)
-    ## 16/12/19 09:46:49 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpRAnI6X/fileb3a772c0fc32.csv:0+33313106
-    ## 16/12/19 09:46:49 INFO Executor: Finished task 0.0 in stage 91.0 (TID 177). 2082 bytes result sent to driver
-    ## 16/12/19 09:46:49 INFO TaskSetManager: Finished task 0.0 in stage 91.0 (TID 177) in 103 ms on localhost (1/1)
-    ## 16/12/19 09:46:49 INFO TaskSchedulerImpl: Removed TaskSet 91.0, whose tasks have all completed, from pool 
-    ## 16/12/19 09:46:49 INFO DAGScheduler: ResultStage 91 (count at NativeMethodAccessorImpl.java:-2) finished in 0.104 s
-    ## 16/12/19 09:46:49 INFO DAGScheduler: Job 61 finished: count at NativeMethodAccessorImpl.java:-2, took 0.106214 s
+    ## 17/04/19 12:41:02 INFO BlockManagerInfo: Removed broadcast_84_piece0 on localhost:55239 in memory (size: 20.6 KB, free: 483.0 MB)
+    ## 17/04/19 12:41:02 INFO ContextCleaner: Cleaned accumulator 267
+    ## 17/04/19 12:41:02 INFO BlockManagerInfo: Removed broadcast_83_piece0 on localhost:55239 in memory (size: 3.0 KB, free: 483.0 MB)
+    ## 17/04/19 12:41:02 INFO ContextCleaner: Cleaned accumulator 266
+    ## 17/04/19 12:41:02 INFO ContextCleaner: Cleaned accumulator 265
+    ## 17/04/19 12:41:02 INFO Executor: Finished task 0.0 in stage 84.0 (TID 153). 2082 bytes result sent to driver
+    ## 17/04/19 12:41:02 INFO TaskSetManager: Finished task 0.0 in stage 84.0 (TID 153) in 122 ms on localhost (1/1)
+    ## 17/04/19 12:41:02 INFO DAGScheduler: ResultStage 84 (count at NativeMethodAccessorImpl.java:-2) finished in 0.122 s
+    ## 17/04/19 12:41:02 INFO TaskSchedulerImpl: Removed TaskSet 84.0, whose tasks have all completed, from pool 
+    ## 17/04/19 12:41:02 INFO DAGScheduler: Job 58 finished: count at NativeMethodAccessorImpl.java:-2, took 0.124556 s
 
 Finally, we disconnect from Spark:
 
@@ -375,8 +376,8 @@ sc <- spark_connect(master = "http://localhost:8998", method = "livy")
 copy_to(sc, iris)
 ```
 
-    ## Source:   query [150 x 5]
-    ## Database: spark connection master=http://localhost:8998 app= local=FALSE
+    ## Source:     table<iris> [?? x 5]
+    ## Database:   spark_connection
     ## 
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
     ##           <dbl>       <dbl>        <dbl>       <dbl>   <chr>
