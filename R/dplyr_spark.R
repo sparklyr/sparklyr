@@ -53,15 +53,6 @@ spark_connection.src_spark <- function(x, ...) {
 }
 
 #' @export
-src_desc.src_spark <- function(x) {
-  sc <- spark_connection(x)
-  paste("spark connection",
-        paste("master", sc$master, sep = "="),
-        paste("app", sc$app_name, sep = "="),
-        paste("local", spark_connection_is_local(sc), sep = "="))
-}
-
-#' @export
 db_explain.src_spark <- function(con, sql, ...) {
   ""
 }
@@ -121,9 +112,9 @@ db_data_type.src_spark <- function(...) {
 copy_to.spark_connection <- function(dest,
                                      df,
                                      name = deparse(substitute(df)),
+                                     overwrite = FALSE,
                                      memory = TRUE,
                                      repartition = 0L,
-                                     overwrite = FALSE,
                                      ...)
 {
   sdf_copy_to(dest, df, name, memory, repartition, overwrite, ...)
@@ -136,10 +127,19 @@ copy_to.src_spark <- function(dest, df, name, ...) {
 
 #' @export
 print.src_spark <- function(x, ...) {
-  cat(src_desc(x))
+  sc <- spark_connection(x)
+
+  cat(
+    paste("spark connection",
+     paste("master", sc$master, sep = "="),
+      paste("app", sc$app_name, sep = "="),
+      paste("local", spark_connection_is_local(sc), sep = "=")
+    )
+  )
+
   cat("\n\n")
 
-  spark_log(spark_connection(x))
+  spark_log(sc)
 }
 
 #' @export
