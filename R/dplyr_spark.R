@@ -1,28 +1,4 @@
 #' @import dplyr
-#' @rawNamespace
-#' if (utils::packageVersion("dplyr") > "0.5.0") {
-#'   importFrom("dplyr", "db_desc")
-#' } else {
-#'   importFrom("dplyr", "src_desc")
-#'   importFrom("dplyr", "add_op_single")
-#'   importFrom("dplyr", "build_sql")
-#'   importFrom("dplyr", "escape")
-#'   importFrom("dplyr", "select_query")
-#'   importFrom("dplyr", "sql_build")
-#'   importFrom("dplyr", "sql_quote")
-#'   importFrom("dplyr", "sql_render")
-#'   importFrom("dplyr", "src_sql")
-#'   importFrom("dplyr", "tbl_sql")
-#'   importFrom("dplyr", "sql_vector")
-#'   importFrom("dplyr", "sql_translator")
-#'   importFrom("dplyr", "base_agg")
-#'   importFrom("dplyr", "base_win")
-#'   importFrom("dplyr", "named_commas")
-#'   importFrom("dplyr", "base_scalar")
-#'   importFrom("dplyr", "op_vars")
-#'   importFrom("dplyr", "sql_variant")
-#'   importFrom("dplyr", "sql_prefix")
-#' }
 
 #' @export
 spark_connection.tbl_spark <- function(x, ...) {

@@ -23,8 +23,8 @@ register_s3_method <- function(pkg, generic, class, fun = NULL) {
   )
 }
 
-register_dbplyr_method <- function(name, ...) {
-  functionRef <- get(name, envir = asNamespace("dbplyr"))
+register_dplyr_method <- function(package, name, ...) {
+  functionRef <- get(name, envir = asNamespace(package))
   assign(name, functionRef, envir = asNamespace("sparklyr"))
 }
 
@@ -32,26 +32,47 @@ register_dplyr_all <- function() {
   dbplyrPackage <- if (utils::packageVersion("dplyr") > "0.5.0") "dbplyr" else "dplyr"
 
   if (utils::packageVersion("dplyr") > "0.5.0") {
-    register_dbplyr_method("add_op_single")
-    register_dbplyr_method("build_sql")
-    register_dbplyr_method("escape")
-    register_dbplyr_method("select_query")
-    register_dbplyr_method("sql_build")
-    register_dbplyr_method("sql_quote")
-    register_dbplyr_method("sql_render")
-    register_dbplyr_method("src_sql")
-    register_dbplyr_method("tbl_sql")
-    register_dbplyr_method("sql_vector")
-    register_dbplyr_method("sql_translator")
-    register_dbplyr_method("base_agg")
-    register_dbplyr_method("base_win")
-    register_dbplyr_method("named_commas")
-    register_dbplyr_method("base_scalar")
-    register_dbplyr_method("op_vars")
-    register_dbplyr_method("sql_variant")
-    register_dbplyr_method("sql_prefix")
+    register_dplyr_method("dbplyr", "add_op_single")
+    register_dplyr_method("dbplyr", "build_sql")
+    register_dplyr_method("dbplyr", "escape")
+    register_dplyr_method("dbplyr", "select_query")
+    register_dplyr_method("dbplyr", "sql_build")
+    register_dplyr_method("dbplyr", "sql_quote")
+    register_dplyr_method("dbplyr", "sql_render")
+    register_dplyr_method("dbplyr", "src_sql")
+    register_dplyr_method("dbplyr", "tbl_sql")
+    register_dplyr_method("dbplyr", "sql_vector")
+    register_dplyr_method("dbplyr", "sql_translator")
+    register_dplyr_method("dbplyr", "base_agg")
+    register_dplyr_method("dbplyr", "base_win")
+    register_dplyr_method("dbplyr", "named_commas")
+    register_dplyr_method("dbplyr", "base_scalar")
+    register_dplyr_method("dbplyr", "op_vars")
+    register_dplyr_method("dbplyr", "sql_variant")
+    register_dplyr_method("dbplyr", "sql_prefix")
+
+    register_dplyr_method("dplyr", "db_desc")
   }
   else {
+    register_dplyr_method("dplyr", "add_op_single")
+    register_dplyr_method("dplyr", "build_sql")
+    register_dplyr_method("dplyr", "escape")
+    register_dplyr_method("dplyr", "select_query")
+    register_dplyr_method("dplyr", "sql_build")
+    register_dplyr_method("dplyr", "sql_quote")
+    register_dplyr_method("dplyr", "sql_render")
+    register_dplyr_method("dplyr", "src_sql")
+    register_dplyr_method("dplyr", "tbl_sql")
+    register_dplyr_method("dplyr", "sql_vector")
+    register_dplyr_method("dplyr", "sql_translator")
+    register_dplyr_method("dplyr", "base_agg")
+    register_dplyr_method("dplyr", "base_win")
+    register_dplyr_method("dplyr", "named_commas")
+    register_dplyr_method("dplyr", "base_scalar")
+    register_dplyr_method("dplyr", "op_vars")
+    register_dplyr_method("dplyr", "sql_variant")
+    register_dplyr_method("dplyr", "sql_prefix")
+
     register_s3_method(dbplyrPackage, "src_desc", "src_spark", fun = src_desc.src_spark)
   }
 
