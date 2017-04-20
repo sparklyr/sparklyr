@@ -3,6 +3,3 @@
 language: r
 sudo: false
 cache: packages
-
-r_github_packages:
-  - hadley/devtools
