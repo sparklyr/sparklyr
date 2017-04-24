@@ -59,7 +59,7 @@ For more information on connecting to remote Spark clusters see the [Deployment]
 
 ## Using dplyr
 
-We can new use all of the available dplyr verbs against the tables within the cluster.
+We can now use all of the available dplyr verbs against the tables within the cluster.
 
 We'll start by copying some datasets from R into the Spark cluster (note that you may need to install the nycflights13 and Lahman packages in order to execute this code):
 
