@@ -34,6 +34,44 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
   sdf_register(sdf, name = name)
 }
 
+#' @rawNamespace S3method(cbind,tbl_spark)
+cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparklyr_tmp_")) {
+  dots <- list(...)
+  n <- length(dots)
+  self <- dots[[1]]
+
+  if (n == 1)
+    return(self)
+
+  id <- random_string("id_")
+
+  dots_with_ids <- dots %>%
+    lapply(function(x) sdf_with_sequential_id(x, id = id))
+
+  dots_num_rows <- dots_with_ids %>%
+    lapply(function(x) sdf_last_index(x, id = id)) %>%
+    unlist %>%
+    (function(x) x + 1)
+
+  if (length(unique(dots_num_rows)) > 1) {
+    names_tbls <- substitute(list(...))[-1] %>%
+      sapply(deparse)
+    output_table <- data_frame(tbl = names_tbls,
+                               nrow = dots_num_rows) %>%
+      group_by(nrow) %>%
+      slice(1) %>%
+      as.data.frame()
+    output_table <- paste(capture.output(print(output_table)), collapse = "\n")
+
+    stop("Not all inputs have the same number of rows, for example:\n",
+         output_table)
+  }
+
+  dots_with_ids %>%
+    Reduce(function(x, y) inner_join(x, y, by = id), .) %>%
+    select(- !!! rlang::sym(id))
+}
+
 mutate_names <- function(x, value) {
   sdf <- spark_dataframe(x)
   renamed <- invoke(sdf, "toDF", as.list(value))
