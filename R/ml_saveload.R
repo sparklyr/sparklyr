@@ -11,18 +11,20 @@
 #'
 #' @param sc A \code{spark_connection}.
 #' @param model A \code{ml_model} fit.
-#' @param file  The filepath used for model save / load. Currently, only local
-#'   filepaths are supported.
+#' @param file The path where the Spark model should be serialized / deserialized.
+#' @param meta The path where the \R metadata should be serialized / deserialized.
+#'   Currently, this must be a local filesystem path. Alternatively, this can be
+#'   an \R function that saves / loads the metadata object.
 #'
 #' @rdname ml_saveload
 #' @name   ml_saveload
 #' @export
-ml_load <- function(sc, file) {
+ml_load <- function(sc, file, meta = ml_load_meta(file)) {
   ensure_scalar_character(file)
   file <- path.expand(file)
 
   # read the R metadata
-  r <- readRDS(file.path(file, "metadata.rds"))
+  r <- resolve_fn(meta, file)
 
   # determine Model class name from fit object name
   rModelName <- regex_replace(
@@ -44,7 +46,7 @@ ml_load <- function(sc, file) {
 
 #' @rdname ml_saveload
 #' @export
-ml_save <- function(model, file) {
+ml_save <- function(model, file, meta = ml_save_meta(model, file)) {
   ensure_scalar_character(file)
   file <- path.expand(file)
 
@@ -54,8 +56,23 @@ ml_save <- function(model, file) {
   # save the R bits
   r <- model
   r$.model <- NULL
-  saveRDS(r, file = file.path(file, "metadata.rds"))
+  resolve_fn(meta, r, file)
 
   file
 }
 
+ml_save_meta <- function(model, file) {
+  fn <- getOption("sparklyr.ml.save")
+  if (is.function(fn))
+    return(fn(model, file))
+
+  saveRDS(model, file = file.path(file, "metadata.rds"))
+}
+
+ml_load_meta <- function(file) {
+  fn <- getOption("sparklyr.ml.load")
+  if (is.function(fn))
+    return(fn(file))
+
+  readRDS(file.path(file, "metadata.rds"))
+}
