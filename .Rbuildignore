@@ -13,7 +13,6 @@
 ^internal/
 ^man-roxygen/
 ^res/
-^tools/
 ^derby\.log$
 ^metastore_db$
 ^spark-warehouse$

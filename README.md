@@ -3,7 +3,7 @@ sparklyr: R interface for Apache Spark
 
 [![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
 
-<img src="README_files/images/sparklyr-illustration.png" width=364 height=197 align="right"/>
+<img src="tools/readme/sparklyr-illustration.png" width=364 height=197 align="right"/>
 
 -   Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
 -   Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
@@ -115,7 +115,7 @@ ggplot(delay, aes(dist, delay)) +
 
     ## `geom_smooth()` using method = 'gam'
 
-![](README_files/figure-markdown_github/ggplot2-1.png)
+![](tools/readme/ggplot2-1.png)
 
 ### Window Functions
 
@@ -314,16 +314,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/04/19 12:41:02 INFO BlockManagerInfo: Removed broadcast_84_piece0 on localhost:55239 in memory (size: 20.6 KB, free: 483.0 MB)
-    ## 17/04/19 12:41:02 INFO ContextCleaner: Cleaned accumulator 267
-    ## 17/04/19 12:41:02 INFO BlockManagerInfo: Removed broadcast_83_piece0 on localhost:55239 in memory (size: 3.0 KB, free: 483.0 MB)
-    ## 17/04/19 12:41:02 INFO ContextCleaner: Cleaned accumulator 266
-    ## 17/04/19 12:41:02 INFO ContextCleaner: Cleaned accumulator 265
-    ## 17/04/19 12:41:02 INFO Executor: Finished task 0.0 in stage 84.0 (TID 153). 2082 bytes result sent to driver
-    ## 17/04/19 12:41:02 INFO TaskSetManager: Finished task 0.0 in stage 84.0 (TID 153) in 122 ms on localhost (1/1)
-    ## 17/04/19 12:41:02 INFO DAGScheduler: ResultStage 84 (count at NativeMethodAccessorImpl.java:-2) finished in 0.122 s
-    ## 17/04/19 12:41:02 INFO TaskSchedulerImpl: Removed TaskSet 84.0, whose tasks have all completed, from pool 
-    ## 17/04/19 12:41:02 INFO DAGScheduler: Job 58 finished: count at NativeMethodAccessorImpl.java:-2, took 0.124556 s
+    ## 17/04/24 23:36:31 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 84 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpafGqjy/file81c4784fd7bf.csv MapPartitionsRDD[334] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 17/04/24 23:36:31 INFO TaskSchedulerImpl: Adding task set 84.0 with 1 tasks
+    ## 17/04/24 23:36:31 INFO TaskSetManager: Starting task 0.0 in stage 84.0 (TID 153, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
+    ## 17/04/24 23:36:31 INFO Executor: Running task 0.0 in stage 84.0 (TID 153)
+    ## 17/04/24 23:36:31 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpafGqjy/file81c4784fd7bf.csv:0+33313106
+    ## 17/04/24 23:36:31 INFO Executor: Finished task 0.0 in stage 84.0 (TID 153). 2082 bytes result sent to driver
+    ## 17/04/24 23:36:31 INFO TaskSetManager: Finished task 0.0 in stage 84.0 (TID 153) in 123 ms on localhost (1/1)
+    ## 17/04/24 23:36:31 INFO TaskSchedulerImpl: Removed TaskSet 84.0, whose tasks have all completed, from pool 
+    ## 17/04/24 23:36:31 INFO DAGScheduler: ResultStage 84 (count at NativeMethodAccessorImpl.java:-2) finished in 0.123 s
+    ## 17/04/24 23:36:31 INFO DAGScheduler: Job 58 finished: count at NativeMethodAccessorImpl.java:-2, took 0.126273 s
 
 Finally, we disconnect from Spark:
 
@@ -342,15 +342,15 @@ The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/do
 
 Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
 
-<img src="README_files/images/spark-connect.png" class="screenshot" width=639 height=447/>
+<img src="tools/readme/spark-connect.png" class="screenshot" width=639 height=447/>
 
 Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster:
 
-<img src="README_files/images/spark-tab.png" class="screenshot" width=639 height=393/>
+<img src="tools/readme/spark-tab.png" class="screenshot" width=639 height=393/>
 
 The Spark DataFrame preview uses the standard RStudio data viewer:
 
-<img src="README_files/images/spark-dataview.png" class="screenshot" width=639 height=446/>
+<img src="tools/readme/spark-dataview.png" class="screenshot" width=639 height=446/>
 
 The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
