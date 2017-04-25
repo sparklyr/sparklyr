@@ -1,5 +1,10 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Implemented `cbind.tbl_spark()`. This method works by first generating
+  index columns using `sdf_with_sequential_id()` then performing `inner_join()`.
+  Note that dplyr `_join()` functions should still be used for DataFrames 
+  with common keys since they are less expensive.
+
 - Improved logging while establishing connections to `sparklyr`.
 
 - Added support for `jar_dep` in the compilation specification to

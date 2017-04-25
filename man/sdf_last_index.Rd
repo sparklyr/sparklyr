@@ -10,8 +10,10 @@ sdf_last_index(x, id = "id")
 \item{x}{An object coercable to a Spark DataFrame (typically, a
 \code{tbl_spark}).}
 
-\item{id}{The name of the column to host the generated IDs.}
+\item{id}{The name of the index column.}
 }
 \description{
-Returns the last index of a Spark DataFrame
+Returns the last index of a Spark DataFrame. The Spark
+\code{mapPartitionsWithIndex} function is used to iterate
+through the last partition of the RDD to find the last record.
 }

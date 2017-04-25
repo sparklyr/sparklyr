@@ -563,9 +563,12 @@ sdf_with_sequential_id <- function(x, id = "id") {
 
 #' Returns the last index of a Spark DataFrame
 #'
+#' Returns the last index of a Spark DataFrame. The Spark
+#' \code{mapPartitionsWithIndex} function is used to iterate
+#' through the last partition of the RDD to find the last record.
 #'
 #' @template roxlate-ml-x
-#' @param id The name of the column to host the generated IDs.
+#' @param id The name of the index column.
 #'
 #' @export
 sdf_last_index <- function(x, id = "id") {
