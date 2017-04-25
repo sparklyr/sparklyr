@@ -280,7 +280,7 @@ object Utils {
       val sqlContext = new org.apache.spark.sql.SQLContext(sc)
       sqlContext.createDataFrame(
         df.rdd.zipWithIndex.map {
-            case (row: Row, i: Long) => Row.fromSeq(row.toSeq :+ i.toDouble)
+          case (row: Row, i: Long) => Row.fromSeq(row.toSeq :+ i.toDouble)
         },
       df.schema.add(id, "double")
       )
@@ -293,10 +293,10 @@ object Utils {
       (i, iter) => if (i != numPartitions - 1 || iter.isEmpty) {
         iter
       } else {
-      Iterator
-      .continually((iter.next(), iter.hasNext))
-      .collect { case (value, false) => value }
-      .take(1)
+        Iterator
+        .continually((iter.next(), iter.hasNext))
+        .collect { case (value, false) => value }
+        .take(1)
       }
     }.collect().last.getDouble(0)
   }
