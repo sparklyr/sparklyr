@@ -15,5 +15,5 @@ sdf_last_index(x, id = "id")
 \description{
 Returns the last index of a Spark DataFrame. The Spark
 \code{mapPartitionsWithIndex} function is used to iterate
-through the last partition of the RDD to find the last record.
+through the last nonempty partition of the RDD to find the last record.
 }
