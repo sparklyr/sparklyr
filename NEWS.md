@@ -99,6 +99,20 @@
   data and added path parameter in `spark_load_table()` for consistency with
   other functions.
 
+# Sparklyr 0.5.4
+
+- Implemented support for `dplyr 0.6` and Spark 2.1.x.
+  
+# Sparklyr 0.5.3
+
+- Implemented support for `DBI 0.6`.
+
+# Sparklyr 0.5.2
+
+- Fix to `spark_connect` affecting Windows users and Spark 1.6.x.
+
+- Fix to Livy connections which would cause connections to fail while connection is on 'waiting' state.
+
 # Sparklyr 0.5.0
 
 - Implemented basic authorization for Livy connections using
