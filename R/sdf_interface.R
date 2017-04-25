@@ -565,6 +565,7 @@ sdf_with_sequential_id <- function(x, id = "id") {
 #'
 #'
 #' @template roxlate-ml-x
+#' @param id The name of the column to host the generated IDs.
 #'
 #' @export
 sdf_last_index <- function(x, id = "id") {

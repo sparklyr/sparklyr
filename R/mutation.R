@@ -56,10 +56,10 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
   if (length(unique(dots_num_rows)) > 1) {
     names_tbls <- substitute(list(...))[-1] %>%
       sapply(deparse)
-    output_table <- data_frame(tbl = names_tbls,
+    output_table <- dplyr::data_frame(tbl = names_tbls,
                                nrow = dots_num_rows) %>%
-      group_by(nrow) %>%
-      slice(1) %>%
+      dplyr::group_by(nrow) %>%
+      dplyr::slice(1) %>%
       as.data.frame()
     output_table <- paste(capture.output(print(output_table)), collapse = "\n")
 
@@ -68,7 +68,7 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
   }
 
   dots_with_ids %>%
-    Reduce(function(x, y) inner_join(x, y, by = id), .) %>%
+    Reduce(function(x, y) dplyr::inner_join(x, y, by = id), .) %>%
     select(- !!! rlang::sym(id))
 }
 

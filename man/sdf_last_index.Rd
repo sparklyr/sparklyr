@@ -9,6 +9,8 @@ sdf_last_index(x, id = "id")
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
 \code{tbl_spark}).}
+
+\item{id}{The name of the column to host the generated IDs.}
 }
 \description{
 Returns the last index of a Spark DataFrame
