@@ -5,6 +5,12 @@
   Note that dplyr `_join()` functions should still be used for DataFrames 
   with common keys since they are less expensive.
 
+- The `ml_save()` and `ml_load()` functions gain a `meta`
+  argument, allowing users to specify where R-level model
+  metadata should be saved independently of the Spark model
+  itself. This should help facilitate the saving and loading
+  of Spark models used in non-local connection scenarios.
+
 - Improved logging while establishing connections to `sparklyr`.
 
 - Added support for `jar_dep` in the compilation specification to
@@ -97,6 +103,20 @@
 - Resolved issue in `spark_save()` / `load_table()` to support saving / loading
   data and added path parameter in `spark_load_table()` for consistency with
   other functions.
+
+# Sparklyr 0.5.4
+
+- Implemented support for `dplyr 0.6` and Spark 2.1.x.
+  
+# Sparklyr 0.5.3
+
+- Implemented support for `DBI 0.6`.
+
+# Sparklyr 0.5.2
+
+- Fix to `spark_connect` affecting Windows users and Spark 1.6.x.
+
+- Fix to Livy connections which would cause connections to fail while connection is on 'waiting' state.
 
 # Sparklyr 0.5.0
 

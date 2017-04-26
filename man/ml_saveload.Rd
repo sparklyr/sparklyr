@@ -6,15 +6,18 @@
 \alias{ml_save}
 \title{Save / Load a Spark ML Model Fit}
 \usage{
-ml_load(sc, file)
+ml_load(sc, file, meta = ml_load_meta(file))
 
-ml_save(model, file)
+ml_save(model, file, meta = ml_save_meta(model, file))
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
 
-\item{file}{The filepath used for model save / load. Currently, only local
-filepaths are supported.}
+\item{file}{The path where the Spark model should be serialized / deserialized.}
+
+\item{meta}{The path where the \R metadata should be serialized / deserialized.
+Currently, this must be a local filesystem path. Alternatively, this can be
+an \R function that saves / loads the metadata object.}
 
 \item{model}{A \code{ml_model} fit.}
 }
