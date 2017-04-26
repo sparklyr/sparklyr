@@ -14,7 +14,7 @@ livy_service_start <- function(version = NULL, spark_version = NULL) {
 
   if (identical(version, NULL)) {
     version <- livy_install_find() %>%
-      .[["livy"]]
+      `[[`("livy")
   }
 
   # warn if the user attempts to use livy 0.2.0 with Spark >= 2.0.0

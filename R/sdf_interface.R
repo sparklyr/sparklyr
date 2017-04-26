@@ -571,10 +571,12 @@ sdf_with_sequential_id <- function(x, id = "id") {
 #' @param id The name of the index column.
 #'
 #' @export
+#' @importFrom rlang sym
+#' @importFrom rlang :=
 sdf_last_index <- function(x, id = "id") {
 
   sdf <- x %>%
-    mutate(!!! rlang::sym(id) := as.numeric(!!! rlang::sym(id))) %>%
+    dplyr::transmute(!!! sym(id) := as.numeric(!!! sym(id))) %>%
     spark_dataframe()
   sc <- spark_connection(sdf)
   ensure_scalar_character(id)
