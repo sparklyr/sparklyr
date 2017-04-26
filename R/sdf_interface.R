@@ -534,6 +534,60 @@ sdf_with_unique_id <- function(x, id = "id") {
   sdf_register(transformed)
 }
 
+#' Add a Sequential ID Column to a Spark DataFrame
+#'
+#' Add a sequential ID column to a Spark DataFrame. The Spark
+#' \code{zipWithIndex} function is used to produce these. This differs from
+#' \code{sdf_with_unique_id} in that the IDs generated are independent of
+#' partitioning.
+#'
+#' @template roxlate-ml-x
+#' @param id The name of the column to host the generated IDs.
+#'
+#' @export
+sdf_with_sequential_id <- function(x, id = "id") {
+
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+  ensure_scalar_character(id)
+
+  transformed <- invoke_static(sc,
+                      "sparklyr.Utils",
+                      "addSequentialIndex",
+                      spark_context(sc),
+                      sdf,
+                      id)
+
+  sdf_register(transformed)
+}
+
+#' Returns the last index of a Spark DataFrame
+#'
+#' Returns the last index of a Spark DataFrame. The Spark
+#' \code{mapPartitionsWithIndex} function is used to iterate
+#' through the last nonempty partition of the RDD to find the last record.
+#'
+#' @template roxlate-ml-x
+#' @param id The name of the index column.
+#'
+#' @export
+#' @importFrom rlang sym
+#' @importFrom rlang :=
+sdf_last_index <- function(x, id = "id") {
+
+  sdf <- x %>%
+    dplyr::transmute(!!! sym(id) := as.numeric(!!! sym(id))) %>%
+    spark_dataframe()
+  sc <- spark_connection(sdf)
+  ensure_scalar_character(id)
+
+  invoke_static(sc,
+                "sparklyr.Utils",
+                "getLastIndex",
+                sdf,
+                id)
+}
+
 #' Compute (Approximate) Quantiles with a Spark DataFrame
 #'
 #' Given a numeric column within a Spark DataFrame, compute
