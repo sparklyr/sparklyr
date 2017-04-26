@@ -328,5 +328,5 @@ To connect to remote `livy` clusters that support basic authentication connect a
 ```{r eval=FALSE}
 config <- livy_config_auth("<username>", "<password">)
 sc <- spark_connect(master = "<address>", method = "livy", config = config)
-spark_disconnect(sc)
+spark_connect(sc)
 ```
