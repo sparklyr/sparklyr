@@ -13,10 +13,20 @@ import Logging._
 class WorkerRDD[T: ClassTag](parent: RDD[T])
   extends RDD[Row](parent) {
 
+  private[this] var port: Int = 8880
+  private[this] var sessionId: Int = scala.util.Random.nextInt(100)
+
   override def getPartitions = parent.partitions
 
   override def compute(split: Partition, context: TaskContext): Iterator[Row] = {
-    Process.start()
+
+    new Thread("start sparklyr backend thread") {
+      override def run(): Unit = {
+        Backend.init(port, sessionId, false, false)
+      }
+    }.start()
+
+    Process.init()
 
     return new Iterator[Row] {
       def next(): Row = org.apache.spark.sql.Row.fromSeq(Array[String]())

@@ -23,7 +23,7 @@ object Process {
     tempFile.getAbsolutePath()
   }
 
-  def start() = {
+  def init() = {
     val sparkConf = SparkEnv.get.conf
     val command: String = sparkConf.get("spark.r.command", "Rscript")
 
