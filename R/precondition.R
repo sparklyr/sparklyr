@@ -54,6 +54,8 @@ make_ensure_scalar_impl <- function(checker,
   {
     object <- object %||% default
 
+    if (allow.null && is.null(object)) return(object)
+
     if (!checker(object))
       stopf("'%s' is not %s", deparse(substitute(object)), message)
 
