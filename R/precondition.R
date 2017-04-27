@@ -61,6 +61,7 @@ make_ensure_scalar_impl <- function(checker,
 
     if (is.na(object)) object <- NA_integer_
     if (!allow.na)     ensure_not_na(object)
+    if (!allow.null)   ensure_not_null(object)
 
     converter(object)
   }
