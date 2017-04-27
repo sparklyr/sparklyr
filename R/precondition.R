@@ -54,12 +54,13 @@ make_ensure_scalar_impl <- function(checker,
   {
     object <- object %||% default
 
+    if (allow.null && is.null(object)) return(object)
+
     if (!checker(object))
       stopf("'%s' is not %s", deparse(substitute(object)), message)
 
     if (is.na(object)) object <- NA_integer_
     if (!allow.na)     ensure_not_na(object)
-    if (!allow.null)   ensure_not_null(object)
 
     converter(object)
   }
