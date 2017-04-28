@@ -1,6 +1,6 @@
 #' @export
 update_sources_class <- function() {
-  rlines <- readLines("R/sources.R")
+  rlines <- readLines("R/worker_main.R")
   rlines <- gsub("\\\"", "\\\\\"", rlines)
   rlines <- gsub("\\\\n", "\\\\\\\\n", rlines)
 
