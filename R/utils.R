@@ -291,3 +291,7 @@ split_separator <- function(sc) {
 resolve_fn <- function(fn, ...) {
   if (is.function(fn)) fn(...) else fn
 }
+
+is.tbl_spark <- function(x) {
+  inherits(x, "tbl_spark")
+}
