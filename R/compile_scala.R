@@ -4,7 +4,7 @@ update_sources_class <- function() {
   rlines <- unlist(lapply(worker_files, function(e) readLines(e)))
   rlines <- gsub("\\\"", "\\\\\"", rlines)
   rlines <- gsub("\\\\n", "\\\\\\\\n", rlines)
-  rlines <- c(rlines, "spark_worker_main()")
+  rlines <- c(rlines, "spark_worker_main(commandArgs(trailingOnly = TRUE)[2])")
 
   lines <- c(
     "package SparkWorker",

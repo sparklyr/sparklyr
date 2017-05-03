@@ -26,7 +26,7 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
       }
     }.start()
 
-    Process.init()
+    Process.init(sessionId)
 
     return new Iterator[Row] {
       def next(): Row = org.apache.spark.sql.Row.fromSeq(Array[String]())

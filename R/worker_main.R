@@ -1,4 +1,4 @@
-spark_worker_main <- function() {
+spark_worker_main <- function(sessionId) {
   log_file <- file.path("~", "spark", basename(tempfile(fileext = ".log")))
 
   log <- function(message) {

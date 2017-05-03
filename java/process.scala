@@ -23,7 +23,7 @@ object Process {
     tempFile.getAbsolutePath()
   }
 
-  def init() = {
+  def init(sessionId: Int) = {
     val sparkConf = SparkEnv.get.conf
     val command: String = sparkConf.get("spark.r.command", "Rscript")
 
@@ -33,7 +33,8 @@ object Process {
     val processBuilder = new ProcessBuilder(Arrays.asList(
       command,
       "--vanilla",
-      sourceFilePath
+      sourceFilePath,
+      sessionId
     ))
 
     if (classExists("sparklyr.Backend")) {
