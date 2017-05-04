@@ -41,21 +41,21 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   else
     spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
 
-  writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
-  writeInt(gateway, sessionId)
-  writeInt(gateway, if (isStarting) waitSeconds else 0)
+  sparklyr:::writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
+  sparklyr:::writeInt(gateway, sessionId)
+  sparklyr:::writeInt(gateway, if (isStarting) waitSeconds else 0)
 
   backendSessionId <- NULL
   redirectGatewayPort <- NULL
 
   commandStart <- Sys.time()
   while(length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()) {
-    backendSessionId <- readInt(gateway)
+    backendSessionId <- sparklyr:::readInt(gateway)
     Sys.sleep(0.1)
   }
 
-  redirectGatewayPort <- readInt(gateway)
-  backendPort <- readInt(gateway)
+  redirectGatewayPort <- sparklyr:::readInt(gateway)
+  backendPort <- sparklyr:::readInt(gateway)
 
   if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
     if (isStarting)
