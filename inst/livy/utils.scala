@@ -203,26 +203,38 @@ object Utils {
     (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
   }
 
-  def splitVectorColumn(df: DataFrame, column: String, names: Array[String]) = {
+  // A helper function for extracting elements from a VectorUDT.
+  // We do this craziness around the 'Any' type just to
+  // ensure that this compiles cleanly regardless of
+  // the version of Spark.
+  val getVectorElement = (x: Any, i: Int) => {
+    val el = x.getClass.getDeclaredMethod("toArray").invoke(x)
+    val array = el.asInstanceOf[Array[Double]]
+    array(i)
+  }
 
-    // extract the column of interest
+  def extractVectorColumn(df: DataFrame,
+                          column: String,
+                          names: Array[String],
+                          indices: Array[Int]) =
+  {
+    // extract column of interest
     val col = df.apply(column)
-
-    // helper UDF for extracting element from VectorUDT
-    val getVectorElement = udf((x: Any, i: Int) => {
-      val el = x.getClass.getDeclaredMethod("toArray").invoke(x)
-      val array = el.asInstanceOf[Array[Double]]
-      array(i)
-    })
+    val extractor = udf(getVectorElement)
 
     // loop over names and extract from column
-    var expanded = df
+    // TODO: should we instead generate column expressions
+    // and evaluate that all at once to generate a new Spark
+    // dataset, rather than use 'withColumn()' iteratively?
+    var sdf = df
     (0 until names.length).map{i => {
-      expanded = expanded.withColumn(names(i), getVectorElement(col, lit(i)))
+      val name = names(i)
+      val index = indices(i)
+      sdf = sdf.withColumn(name, extractor(col, lit(index)))
     }}
 
     // return expanded dataset
-    expanded
+    sdf
   }
 
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {

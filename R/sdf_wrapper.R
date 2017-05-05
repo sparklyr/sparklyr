@@ -216,7 +216,7 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
 
 #' Split a Vector Column into Scalar Columns
 #'
-#' Given a 'vector' column in a Spark DataFrame,
+#' Given a vector column in a Spark DataFrame,
 #' split that into \code{n} separate columns, each
 #' column made up of the different elements in the
 #' column \code{column}.
@@ -228,8 +228,80 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
 #' @export
 sdf_split_column <- function(x, column, names = NULL) {
 
+  column <- ensure_scalar_character(column)
+
+  # extract spark dataframe reference, connection
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(x)
+
+  # determine length of vector elements
+  # TODO: is there a better way of extracting this?
+  # TODO: should we handle arrays as well?
+  first <- invoke(sdf, "first")
+  index <- invoke(first, "fieldIndex", column)
+  vector <- invoke(first, "get", as.integer(index))
+  n <- invoke(vector, "size")
+
+  # generate indices
+  indices <- seq_len(n) - 1L
+
   # generate names when not provided
   if (is.null(names))
-    names <- sprintf("%s_%i", column, seq_along(names))
+    names <- sprintf("%s_%i", column, indices + 1L)
 
+  # call split routine
+  splat <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "extractVectorColumn",
+    sdf,
+    column,
+    as.list(names),
+    as.list(indices)
+  )
+
+  # and give it back
+  sdf_register(splat)
+}
+
+#' Extract Elements from a Vector Column
+#'
+#' @template roxlate-ml-x
+#' @param column The column from which elements should
+#'   be extracted.
+#' @param ... Optional arguments, mapping column names
+#'   to the index at which the associated column element
+#'   can be extracted.
+#' @export
+sdf_extract_column <- function(x, column, ...) {
+
+  # validate arguments
+  column <- ensure_scalar_character(column)
+  dots <- list(...)
+  enumerate(dots, function(key, val) {
+    ensure_scalar_character(key)
+    ensure_scalar_double(val)
+  })
+
+  # extract Spark Dataset, connection
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(x)
+
+  # split dots into separate vectors (easier
+  # to handle on the Spark side)
+  keys <- names(dots)
+  vals <- as.integer(dots)
+
+  # invoke Spark routine
+  extracted <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "extractVectorColumn",
+    sdf,
+    column,
+    as.list(keys),
+    as.list(vals)
+  )
+
+  sdf_register(extracted)
 }
