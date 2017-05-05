@@ -11,6 +11,7 @@ import scala.util.Try
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DataTypes
 import org.apache.spark.{SparkEnv, SparkException}
 
@@ -202,6 +203,28 @@ object Utils {
     (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
   }
 
+  def splitVectorColumn(df: DataFrame, column: String, names: Array[String]) = {
+
+    // extract the column of interest
+    val col = df.apply(column)
+
+    // helper UDF for extracting element from VectorUDT
+    val getVectorElement = udf((x: Any, i: Int) => {
+      val el = x.getClass.getDeclaredMethod("toArray").invoke(x)
+      val array = el.asInstanceOf[Array[Double]]
+      array(i)
+    })
+
+    // loop over names and extract from column
+    var expanded = df
+    (0 until names.length).map{i => {
+      expanded = expanded.withColumn(names(i), getVectorElement(col, lit(i)))
+    }}
+
+    // return expanded dataset
+    expanded
+  }
+
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
     var data = rows.map(o => {
       val r = o.asInstanceOf[Array[_]]
@@ -271,4 +294,39 @@ object Utils {
 
     data
   }
+
+  /**
+   * Utilities for performing mutations
+   */
+
+  def addSequentialIndex(
+    sc: SparkContext,
+    df: DataFrame,
+    id: String) : DataFrame = {
+      val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+      sqlContext.createDataFrame(
+        df.rdd.zipWithIndex.map {
+          case (row: Row, i: Long) => Row.fromSeq(row.toSeq :+ i.toDouble)
+        },
+      df.schema.add(id, "double")
+      )
+  }
+
+
+  def getLastIndex(df: DataFrame, id: String) : Double = {
+    val numPartitions = df.rdd.partitions.length
+    df.select(id).rdd.mapPartitionsWithIndex{
+      (i, iter) => if (i != numPartitions - 1 || iter.isEmpty) {
+        iter
+      } else {
+        Iterator
+        .continually((iter.next(), iter.hasNext))
+        .collect { case (value, false) => value }
+        .take(1)
+      }
+    }.collect().last.getDouble(0)
+  }
 }
+
+
+

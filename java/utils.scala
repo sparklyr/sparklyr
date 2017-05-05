@@ -8,6 +8,7 @@ import scala.util.Try
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DataTypes
 import org.apache.spark.{SparkEnv, SparkException}
 
@@ -197,6 +198,30 @@ object Utils {
     val local : Array[Row] = df.collect()
     val dtypes = df.dtypes
     (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
+  }
+
+  def splitVectorColumn(df: DataFrame, column: String, names: Array[String]) = {
+
+    // extract the column of interest
+    val col = df.apply(column)
+
+    // helper UDF for extracting element from VectorUDT
+    // TODO: accept arbitrary arrays here and return element of
+    // correct type as well?
+    val getVectorElement = udf((x: Any, i: Int) => {
+      val el = x.getClass.getDeclaredMethod("toArray").invoke(x)
+      val array = el.asInstanceOf[Array[Double]]
+      array(i)
+    })
+
+    // loop over names and extract from column
+    var expanded = df
+    (0 until names.length).map{i => {
+      expanded = expanded.withColumn(names(i), getVectorElement(col, lit(i)))
+    }}
+
+    // return expanded dataset
+    expanded
   }
 
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {

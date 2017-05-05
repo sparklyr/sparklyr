@@ -213,3 +213,23 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
 
   sdf_register(result)
 }
+
+#' Split a Vector Column into Scalar Columns
+#'
+#' Given a 'vector' column in a Spark DataFrame,
+#' split that into \code{n} separate columns, each
+#' column made up of the different elements in the
+#' column \code{column}.
+#'
+#' @template roxlate-ml-x
+#' @param column The name of a (vector-typed) column.
+#' @param names The names to be assigned to the generated columns.
+#'
+#' @export
+sdf_split_column <- function(x, column, names = NULL) {
+
+  # generate names when not provided
+  if (is.null(names))
+    names <- sprintf("%s_%i", column, seq_along(names))
+
+}
