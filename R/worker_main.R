@@ -39,5 +39,26 @@ spark_worker_main <- function(sessionId) {
     )
   })
 
+  log("sparklyr worker connected to backend")
+
+  sc <- structure(class = c("spark_worker_connection"), list(
+    # spark_connection
+    master = master,
+    method = "shell",
+    app_name = NULL,
+    config = NULL,
+    # spark_shell_connection
+    spark_home = NULL,
+    backend = backend,
+    monitor = gatewayInfo$gateway,
+    output_file = NULL
+  ))
+
+  log("sparklyr worker created connection")
+
+  spark_context <- invoke_static(sc, "sparklyr.Backend", "getSparkContext")
+
+  log("sparklyr worker retrieved context")
+
   log("sparklyr worker finished")
 }
