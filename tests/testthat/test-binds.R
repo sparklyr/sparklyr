@@ -17,18 +17,25 @@ test_that("'sdf_with_sequential_id' works independent of number of partitions", 
 
   expect_equal(
     df1a_tbl %>% sdf_with_sequential_id() %>% collect(),
-    df1a %>% mutate(id = row_number() - 1.0)
+    df1a %>% mutate(id = row_number() %>% as.numeric())
   )
 
   expect_equal(
     df1a_1part_tbl %>% sdf_with_sequential_id() %>% collect(),
-    df1a %>% mutate(id = row_number() - 1.0)
+    df1a %>% mutate(id = row_number() %>% as.numeric())
   )
 
   expect_equal(
     df1a_10part_tbl %>% sdf_with_sequential_id() %>% collect(),
-    df1a %>% mutate(id = row_number() - 1.0)
+    df1a %>% mutate(id = row_number() %>% as.numeric())
   )
+})
+
+test_that("'sdf_with_sequential_id' -- 'from' argument works as expected", {
+  expect_equal(df1a_tbl %>% sdf_with_sequential_id(from = 0L) %>% collect(),
+               df1a %>% mutate(id = row_number() - 1.0))
+  expect_equal(df1a_tbl %>% sdf_with_sequential_id(from = -1L) %>% collect(),
+               df1a %>% mutate(id = row_number() - 2.0))
 })
 
 test_that("'sdf_last_index' works independent of number of partitions", {

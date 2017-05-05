@@ -4,13 +4,15 @@
 \alias{sdf_with_sequential_id}
 \title{Add a Sequential ID Column to a Spark DataFrame}
 \usage{
-sdf_with_sequential_id(x, id = "id")
+sdf_with_sequential_id(x, id = "id", from = 1L)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
 \code{tbl_spark}).}
 
 \item{id}{The name of the column to host the generated IDs.}
+
+\item{from}{The starting value of the id column}
 }
 \description{
 Add a sequential ID column to a Spark DataFrame. The Spark
