@@ -221,20 +221,19 @@ object Utils {
     // extract column of interest
     val col = df.apply(column)
     val extractor = udf(getVectorElement)
+    
+    // extract column expressions
+    var colexprs = df.columns.map(df.apply(_))
 
-    // loop over names and extract from column
-    // TODO: should we instead generate column expressions
-    // and evaluate that all at once to generate a new Spark
-    // dataset, rather than use 'withColumn()' iteratively?
-    var sdf = df
+    // add new column expressions to our columns list
     (0 until names.length).map{i => {
       val name = names(i)
       val index = indices(i)
-      sdf = sdf.withColumn(name, extractor(col, lit(index)))
+      colexprs :+= extractor(col, lit(index)).as(name)
     }}
-
-    // return expanded dataset
-    sdf
+    
+    // evaluate these column expressions and return
+    df.select(colexprs: _*)
   }
 
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {

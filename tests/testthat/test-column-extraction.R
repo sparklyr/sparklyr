@@ -1,4 +1,4 @@
-context("Column Extraction")
+context("Column Separation")
 
 sc <- testthat_spark_connection()
 mtcars_tbl <- testthat_tbl("mtcars")
@@ -16,10 +16,12 @@ test_that("we can interact with vector columns", {
   fitted <- sdf_predict(model)
 
   # extract first element from 'probability' vector
-  extracted <- sdf_extract_column(
+  extracted <- sdf_separate_column(
     fitted,
     "probability",
-    "P(x)" = 0L
+    list(
+      "P(x)" = 1
+    )
   )
 
   # retrieve the columns
@@ -37,14 +39,14 @@ test_that("we can interact with vector columns", {
   expect_equal(first, sdf_read_column(extracted, "P(x)"))
 
   # now, try generating for each element
-  splat <- sdf_split_column(
+  splat <- sdf_separate_column(
     fitted,
     "probability",
-    c("P(X)", "1-P(X)")
+    c("P(X)", "1 - P(X)")
   )
 
   # verify they're equal
   expect_equal(first, sdf_read_column(splat, "P(X)"))
-  expect_equal(second, sdf_read_column(splat, "1-P(X)"))
+  expect_equal(second, sdf_read_column(splat, "1 - P(X)"))
 
 })
