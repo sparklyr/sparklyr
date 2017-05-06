@@ -42,9 +42,9 @@ Imports:
     shiny (>= 1.0.1),
     withr
 Remotes:
-    hadley/dplyr,
-    hadley/dbplyr,
-    hadley/rlang
+    tidyverse/dplyr,
+    tidyverse/dbplyr,
+    tidyverse/rlang
 Suggests:
     testthat,
     RCurl,
