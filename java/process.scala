@@ -34,7 +34,7 @@ object Process {
       command,
       "--vanilla",
       sourceFilePath,
-      sessionId
+      sessionId.toString
     ))
 
     if (classExists("sparklyr.Backend")) {
