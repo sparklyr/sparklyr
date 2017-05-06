@@ -562,6 +562,24 @@ object Embedded {
     "\n" +
     "  log(\"sparklyr worker connected to backend\")\n" +
     "\n" +
+    "  sc <- structure(class = c(\"spark_worker_connection\"), list(\n" +
+    "    # spark_connection\n" +
+    "    master = master,\n" +
+    "    method = \"shell\",\n" +
+    "    app_name = NULL,\n" +
+    "    config = NULL,\n" +
+    "    # spark_shell_connection\n" +
+    "    spark_home = NULL,\n" +
+    "    backend = backend,\n" +
+    "    monitor = gatewayInfo$gateway,\n" +
+    "    output_file = NULL\n" +
+    "  ))\n" +
+    "\n" +
+    "  log(\"sparklyr worker created connection\")\n" +
+    "\n" +
+    "  spark_context <- invoke_static(sc, \"sparklyr.Backend\", \"getSparkContext\")\n" +
+    "\n" +
+    "  log(\"sparklyr worker retrieved context\")\n" +
     "\n" +
     "  log(\"sparklyr worker finished\")\n" +
     "}\n" +
