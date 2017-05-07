@@ -11,7 +11,8 @@ import scala.util.Try
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
-import org.apache.spark.sql.types.DataTypes
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
 import org.apache.spark.{SparkEnv, SparkException}
 
 object Utils {
@@ -202,6 +203,81 @@ object Utils {
     (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
   }
 
+  def separateColumnArray(df: DataFrame,
+                          column: String,
+                          names: Array[String],
+                          indices: Array[Int]) =
+  {
+    // extract columns of interest
+    var col = df.apply(column)
+    var colexprs = df.columns.map(df.apply(_))
+    
+    // append column expressions that separate from
+    // desired column
+    (0 until names.length).map{i => {
+      val name = names(i)
+      val index = indices(i)
+      colexprs :+= col.getItem(index).as(name)
+    }}
+    
+    // select with these column expressions
+    df.select(colexprs: _*)
+  }
+    
+  def separateColumnVector(df: DataFrame,
+                           column: String,
+                           names: Array[String],
+                           indices: Array[Int]) =
+  {
+    // extract columns of interest
+    var col = df.apply(column)
+    var colexprs = df.columns.map(df.apply(_))
+    
+    // define a udf for extracting vector elements
+    // note that we use 'Any' type here just to ensure
+    // this compiles cleanly with different Spark versions
+    val extractor = udf {
+      (x: Any, i: Int) => {
+         val el = x.getClass.getDeclaredMethod("toArray").invoke(x)
+         val array = el.asInstanceOf[Array[Double]]
+         array(i)
+      }
+    }
+    
+    // append column expressions that separate from
+    // desired column
+    (0 until names.length).map{i => {
+      val name = names(i)
+      val index = indices(i)
+      colexprs :+= extractor(col, lit(index)).as(name)
+    }}
+    
+    // select with these column expressions
+    df.select(colexprs: _*)
+  }
+  
+  def separateColumn(df: DataFrame,
+                     column: String,
+                     names: Array[String],
+                     indices: Array[Int]) =
+  {
+    // extract column of interest
+    val col = df.apply(column)
+    
+    // figure out the type name for this column
+    val schema = df.schema
+    val typeName = schema.apply(schema.fieldIndex(column)).dataType.typeName
+    
+    // delegate to appropriate separator
+    typeName match {
+      case "array"  => separateColumnArray(df, column, names, indices)
+      case "vector" => separateColumnVector(df, column, names, indices)
+      case _        => {
+        throw new IllegalArgumentException("unhandled type '" + typeName + "'")
+      }
+    }
+  }
+
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
     var data = rows.map(o => {
       val r = o.asInstanceOf[Array[_]]
@@ -271,4 +347,40 @@ object Utils {
 
     data
   }
+
+  /**
+   * Utilities for performing mutations
+   */
+
+  def addSequentialIndex(
+    sc: SparkContext,
+    df: DataFrame,
+    from: Int,
+    id: String) : DataFrame = {
+      val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+      sqlContext.createDataFrame(
+        df.rdd.zipWithIndex.map {
+          case (row: Row, i: Long) => Row.fromSeq(row.toSeq :+ (i.toDouble + from.toDouble))
+        },
+      df.schema.add(id, "double")
+      )
+  }
+
+
+  def getLastIndex(df: DataFrame, id: String) : Double = {
+    val numPartitions = df.rdd.partitions.length
+    df.select(id).rdd.mapPartitionsWithIndex{
+      (i, iter) => if (i != numPartitions - 1 || iter.isEmpty) {
+        iter
+      } else {
+        Iterator
+        .continually((iter.next(), iter.hasNext))
+        .collect { case (value, false) => value }
+        .take(1)
+      }
+    }.collect().last.getDouble(0)
+  }
 }
+
+
+

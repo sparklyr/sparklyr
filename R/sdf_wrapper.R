@@ -213,3 +213,77 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
 
   sdf_register(result)
 }
+
+#' Separate a Vector Column into Scalar Columns
+#'
+#' Given a vector column in a Spark DataFrame, split that
+#' into \code{n} separate columns, each column made up of
+#' the different elements in the column \code{column}.
+#'
+#' @template roxlate-ml-x
+#' @param column The name of a (vector-typed) column.
+#' @param into A specification of the columns that should be
+#'   generated from \code{column}. This can either be a
+#'   vector of column names, or an \R list mapping column
+#'   names to the (1-based) index at which a particular
+#'   vector element should be extracted.
+#' @export
+sdf_separate_column <- function(x,
+                                column,
+                                into = NULL)
+{
+  column <- ensure_scalar_character(column)
+
+  # extract spark dataframe reference, connection
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(x)
+
+  # when 'into' is NULL, we auto-generate a names -> index map
+  if (is.null(into)) {
+
+    # determine the length of vector elements (assume all
+    # elements have the same length as the first)
+    first <- invoke(sdf, "first")
+    index <- invoke(first, "fieldIndex", column)
+    vector <- invoke(first, "get", as.integer(index))
+    n <- invoke(vector, "size")
+
+    # generate indices
+    indices <- seq_len(n)
+
+    # generate names when not provided
+    if (is.null(names))
+      names <- sprintf("%s_%i", column, indices)
+
+    # construct our into map
+    into <- as.list(indices)
+    names(into) <- names
+  }
+
+  # when 'into' is a character vector, generate a default
+  # names -> index map
+  if (is.character(into)) {
+    indices <- seq_along(into)
+    names <- into
+    into <- as.list(indices)
+    names(into) <- names
+  }
+
+  # extract names, indices from map
+  names <- names(into)
+  indices <- as.integer(unlist(into, use.names = FALSE)) - 1L
+
+  # call split routine
+  splat <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "separateColumn",
+    sdf,
+    column,
+    as.list(names),
+    as.list(indices)
+  )
+
+  # and give it back
+  sdf_register(splat)
+}
