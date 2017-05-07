@@ -1,4 +1,4 @@
-context("Column Separation")
+context("column separation")
 
 test_requires("dplyr")
 test_requires("janeaustenr")
@@ -26,9 +26,7 @@ test_that("we can interact with vector columns", {
   extracted <- sdf_separate_column(
     fitted,
     "probability",
-    list(
-      "P(x)" = 1
-    )
+    list("on" = 1)
   )
 
   # retrieve the columns
@@ -43,18 +41,18 @@ test_that("we can interact with vector columns", {
   second <- as.numeric(lapply(probability, `[[`, 2L))
 
   # verify we have the expected result
-  expect_equal(first, sdf_read_column(extracted, "P(x)"))
+  expect_equal(first, sdf_read_column(extracted, "on"))
 
   # now, try generating for each element
   splat <- sdf_separate_column(
     fitted,
     "probability",
-    c("P(X)", "1 - P(X)")
+    c("on", "off")
   )
 
   # verify they're equal
-  expect_equal(first, sdf_read_column(splat, "P(X)"))
-  expect_equal(second, sdf_read_column(splat, "1 - P(X)"))
+  expect_equal(first, sdf_read_column(splat, "on"))
+  expect_equal(second, sdf_read_column(splat, "off"))
 
 })
 
