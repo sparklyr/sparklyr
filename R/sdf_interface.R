@@ -543,19 +543,22 @@ sdf_with_unique_id <- function(x, id = "id") {
 #'
 #' @template roxlate-ml-x
 #' @param id The name of the column to host the generated IDs.
+#' @param from The starting value of the id column
 #'
 #' @export
-sdf_with_sequential_id <- function(x, id = "id") {
+sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
 
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
   ensure_scalar_character(id)
+  ensure_scalar_integer(from)
 
   transformed <- invoke_static(sc,
                       "sparklyr.Utils",
                       "addSequentialIndex",
                       spark_context(sc),
                       sdf,
+                      from,
                       id)
 
   sdf_register(transformed)

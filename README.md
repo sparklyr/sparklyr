@@ -1,7 +1,7 @@
 sparklyr: R interface for Apache Spark
 ================
 
-[![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
+[![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) [![Join the chat at https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img src="tools/readme/sparklyr-illustration.png" width=364 height=197 align="right"/>
 
@@ -77,7 +77,7 @@ flights_tbl %>% filter(dep_delay == 2)
 ```
 
     ## Source:     lazy query [?? x 19]
-    ## Database:   spark connection master=local[8] app=sparklyr local=TRUE
+    ## Database:   spark_connection
     ## 
     ##     year month   day dep_time sched_dep_time dep_delay arr_time
     ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
@@ -130,7 +130,7 @@ batting_tbl %>%
 ```
 
     ## Source:     lazy query [?? x 7]
-    ## Database:   spark connection master=local[8] app=sparklyr local=TRUE
+    ## Database:   spark_connection
     ## Grouped by: playerID
     ## Ordered by: playerID, yearID, teamID
     ## 
@@ -314,16 +314,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/03/30 13:26:25 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 80 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//Rtmp1O47i8/file9b768ebe507.csv MapPartitionsRDD[329] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 17/03/30 13:26:25 INFO TaskSchedulerImpl: Adding task set 80.0 with 1 tasks
-    ## 17/03/30 13:26:25 INFO TaskSetManager: Starting task 0.0 in stage 80.0 (TID 149, localhost, partition 0,PROCESS_LOCAL, 2429 bytes)
-    ## 17/03/30 13:26:25 INFO Executor: Running task 0.0 in stage 80.0 (TID 149)
-    ## 17/03/30 13:26:25 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/Rtmp1O47i8/file9b768ebe507.csv:0+33313106
-    ## 17/03/30 13:26:25 INFO Executor: Finished task 0.0 in stage 80.0 (TID 149). 2082 bytes result sent to driver
-    ## 17/03/30 13:26:25 INFO TaskSetManager: Finished task 0.0 in stage 80.0 (TID 149) in 105 ms on localhost (1/1)
-    ## 17/03/30 13:26:25 INFO TaskSchedulerImpl: Removed TaskSet 80.0, whose tasks have all completed, from pool 
-    ## 17/03/30 13:26:25 INFO DAGScheduler: ResultStage 80 (count at NativeMethodAccessorImpl.java:-2) finished in 0.105 s
-    ## 17/03/30 13:26:25 INFO DAGScheduler: Job 54 finished: count at NativeMethodAccessorImpl.java:-2, took 0.107210 s
+    ## 17/05/05 10:14:55 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 80 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//Rtmpi098Pf/file1d572d88f04.csv MapPartitionsRDD[329] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 17/05/05 10:14:55 INFO TaskSchedulerImpl: Adding task set 80.0 with 1 tasks
+    ## 17/05/05 10:14:55 INFO TaskSetManager: Starting task 0.0 in stage 80.0 (TID 149, localhost, partition 0,PROCESS_LOCAL, 2429 bytes)
+    ## 17/05/05 10:14:55 INFO Executor: Running task 0.0 in stage 80.0 (TID 149)
+    ## 17/05/05 10:14:55 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/Rtmpi098Pf/file1d572d88f04.csv:0+33313106
+    ## 17/05/05 10:14:56 INFO Executor: Finished task 0.0 in stage 80.0 (TID 149). 2082 bytes result sent to driver
+    ## 17/05/05 10:14:56 INFO TaskSetManager: Finished task 0.0 in stage 80.0 (TID 149) in 99 ms on localhost (1/1)
+    ## 17/05/05 10:14:56 INFO DAGScheduler: ResultStage 80 (count at NativeMethodAccessorImpl.java:-2) finished in 0.100 s
+    ## 17/05/05 10:14:56 INFO TaskSchedulerImpl: Removed TaskSet 80.0, whose tasks have all completed, from pool 
+    ## 17/05/05 10:14:56 INFO DAGScheduler: Job 54 finished: count at NativeMethodAccessorImpl.java:-2, took 0.102325 s
 
 Finally, we disconnect from Spark:
 
@@ -386,7 +386,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1490905602365_1 
+    ## Model ID:  GLM_model_R_1494004511649_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -445,21 +445,21 @@ copy_to(sc, iris)
 ```
 
     ## Source:     table<iris> [?? x 5]
-    ## Database:   spark connection master=http://localhost:8998 app= local=FALSE
+    ## Database:   spark_connection
     ## 
-    ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
-    ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ## 1           5.1         3.5          1.4         0.2
-    ## 2           4.9         3.0          1.4         0.2
-    ## 3           4.7         3.2          1.3         0.2
-    ## 4           4.6         3.1          1.5         0.2
-    ## 5           5.0         3.6          1.4         0.2
-    ## 6           5.4         3.9          1.7         0.4
-    ## 7           4.6         3.4          1.4         0.3
-    ## 8           5.0         3.4          1.5         0.2
-    ## 9           4.4         2.9          1.4         0.2
-    ## 10          4.9         3.1          1.5         0.1
-    ## # ... with 140 more rows, and 1 more variables: Species <chr>
+    ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
+    ##           <dbl>       <dbl>        <dbl>       <dbl>   <chr>
+    ## 1           5.1         3.5          1.4         0.2  setosa
+    ## 2           4.9         3.0          1.4         0.2  setosa
+    ## 3           4.7         3.2          1.3         0.2  setosa
+    ## 4           4.6         3.1          1.5         0.2  setosa
+    ## 5           5.0         3.6          1.4         0.2  setosa
+    ## 6           5.4         3.9          1.7         0.4  setosa
+    ## 7           4.6         3.4          1.4         0.3  setosa
+    ## 8           5.0         3.4          1.5         0.2  setosa
+    ## 9           4.4         2.9          1.4         0.2  setosa
+    ## 10          4.9         3.1          1.5         0.1  setosa
+    ## # ... with 140 more rows
 
 ``` r
 spark_disconnect(sc)

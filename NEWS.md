@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- `sdf_with_sequential_id` now supports `from` parameter to choose the
+  starting value of the id column.
+
 - Implemented `cbind.tbl_spark()`. This method works by first generating
   index columns using `sdf_with_sequential_id()` then performing `inner_join()`.
   Note that dplyr `_join()` functions should still be used for DataFrames 
