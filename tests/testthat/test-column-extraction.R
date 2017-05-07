@@ -1,7 +1,14 @@
 context("Column Separation")
 
+test_requires("dplyr")
+test_requires("janeaustenr")
+
 sc <- testthat_spark_connection()
+
 mtcars_tbl <- testthat_tbl("mtcars")
+
+austen     <- austen_books()
+austen_tbl <- testthat_tbl("austen")
 
 test_that("we can interact with vector columns", {
 
@@ -48,5 +55,26 @@ test_that("we can interact with vector columns", {
   # verify they're equal
   expect_equal(first, sdf_read_column(splat, "P(X)"))
   expect_equal(second, sdf_read_column(splat, "1 - P(X)"))
+
+})
+
+test_that("we can separate array<string> columns", {
+
+  tokens <- austen_tbl %>%
+    na.omit() %>%
+    filter(length(text) > 0) %>%
+    head(5) %>%
+    sdf_mutate(tokens = ft_regex_tokenizer(text, pattern = "\\s+"))
+
+  separated <- sdf_separate_column(
+    tokens,
+    "tokens",
+    list(first = 1L)
+  )
+
+  all <- sdf_read_column(separated, "tokens")
+  first <- sdf_read_column(separated, "first")
+
+  expect_equal(as.list(first), lapply(all, `[[`, 1))
 
 })

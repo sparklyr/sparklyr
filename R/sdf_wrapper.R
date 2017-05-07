@@ -277,7 +277,7 @@ sdf_separate_column <- function(x,
   splat <- invoke_static(
     sc,
     "sparklyr.Utils",
-    "extractVectorColumn",
+    "separateColumn",
     sdf,
     column,
     as.list(names),
