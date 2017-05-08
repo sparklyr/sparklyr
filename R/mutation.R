@@ -162,6 +162,8 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
   if (length(unique(dots_num_rows)) > 1) {
     names_tbls <- substitute(list(...))[-1] %>%
       sapply(deparse)
+    names_tbls <- gsub("~", "", names_tbls)
+
     output_table <- dplyr::data_frame(tbl = names_tbls,
                                nrow = dots_num_rows) %>%
       dplyr::group_by(nrow) %>%
@@ -185,12 +187,19 @@ sdf_bind_cols <- function(...) {
   if (! all(sapply(dots, is.tbl_spark)))
     stop("all inputs must be tbl_spark")
 
-  # exprs <- rlang::dots_exprs(...)
-  # nonempty <- rlang::dots_splice(...) %>%
-  #   sapply(Negate(rlang::is_empty)) %>%
-  #   which()
+  nonempty <- rlang::dots_splice(...) %>%
+    sapply(Negate(rlang::is_empty)) %>%
+    which()
 
-  rlang::invoke("cbind", dots)
+  envir <- rlang::caller_env()
+  filtered_exprs <- rlang::dots_exprs(...) %>%
+    lapply(function(x) if (rlang::is_lang(x)) rlang::lang_tail(x) else x) %>%
+    unlist() %>%
+    lapply(rlang::new_quosure, env = envir) %>%
+    `[`(nonempty)
+
+  rlang::lang("cbind", !!! filtered_exprs)  %>%
+    rlang::eval_tidy()
 }
 
 mutate_names <- function(x, value) {

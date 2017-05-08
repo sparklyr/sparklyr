@@ -17,8 +17,6 @@ df4a_tbl <- testthat_tbl("df4a")
 # sdf helper functions -------------------------------------------------------
 
 test_that("'sdf_with_sequential_id' works independent of number of partitions", {
-  test_requires("dplyr")
-
   expect_equal(
     df1a_tbl %>% sdf_with_sequential_id() %>% collect(),
     df1a %>% mutate(id = row_number() %>% as.numeric())
@@ -43,8 +41,6 @@ test_that("'sdf_with_sequential_id' -- 'from' argument works as expected", {
 })
 
 test_that("'sdf_last_index' works independent of number of partitions", {
-  test_requires("dplyr")
-
   expect_equal(df1a_tbl %>% sdf_last_index("a"), 3)
   expect_equal(df1a_1part_tbl %>% sdf_last_index("a"), 3)
   expect_equal(df1a_10part_tbl %>% sdf_last_index("a"), 3)
@@ -73,11 +69,21 @@ test_that("'sdf_bind_cols' agrees with 'cbind'", {
 test_that("'sdf_bind_cols' handles lists", {
   expect_equal(sdf_bind_cols(list(df1a_tbl, df2a_tbl)) %>% collect(),
                sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect())
+  expect_equal(sdf_bind_cols(df1a_tbl, list(df2a_tbl)) %>% collect(),
+               sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect())
 })
 
 test_that("'sdf_bind_cols' ignores NULL", {
   expect_equal(sdf_bind_cols(df1a_tbl, df2a_tbl, NULL) %>% collect(),
                sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect())
+})
+
+test_that("'sdf_bind_cols' supports programming", {
+  fn <- function(...) sdf_bind_cols(...)
+  expect_equal(sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect(),
+               fn(df1a_tbl, df2a_tbl) %>% collect())
+  expect_error(fn(df1a_tbl, df3a_tbl),
+               "Not all inputs have the same number of rows, for example:\\n       tbl nrow\\n1 df3a_tbl    2\\n2 df1a_tbl    3")
 })
 
 # rows -------------------------------------------------------
