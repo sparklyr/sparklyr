@@ -192,13 +192,15 @@ sdf_bind_cols <- function(...) {
     which()
 
   envir <- rlang::caller_env()
-  filtered_exprs <- rlang::dots_exprs(...) %>%
-    lapply(function(x) if (rlang::is_lang(x)) rlang::lang_tail(x) else x) %>%
+  quosures <- rlang::dots_exprs(...) %>%
+    # if 'list(sdf)' is one of the args we want 'sdf'
+    lapply(function(x) if (rlang::is_lang(x))
+      rlang::lang_tail(x) else x) %>%
     unlist() %>%
     lapply(rlang::new_quosure, env = envir) %>%
     `[`(nonempty)
 
-  rlang::lang("cbind", !!! filtered_exprs)  %>%
+  rlang::lang("cbind", !!! quosures)  %>%
     rlang::eval_tidy()
 }
 
