@@ -1,6 +1,10 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
-- `sdf_with_sequential_id` now supports `from` parameter to choose the
+- Added `sdf_separate_column()` -- this function allows one to separate
+  components of an array / vector column into separate scalar-valued
+  columns.
+
+- `sdf_with_sequential_id()` now supports `from` parameter to choose the
   starting value of the id column.
 
 - Implemented `cbind.tbl_spark()`. This method works by first generating
