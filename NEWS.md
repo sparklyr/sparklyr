@@ -1,5 +1,9 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added `sdf_bind_rows()` and `sdf_bind_cols()` -- these functions
+  are the `sparklyr` equivalent of `dplyr::bind_rows()` and 
+  `dplyr::bind_cols()`.
+
 - Added `sdf_separate_column()` -- this function allows one to separate
   components of an array / vector column into separate scalar-valued
   columns.
