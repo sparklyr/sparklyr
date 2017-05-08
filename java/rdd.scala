@@ -10,6 +10,13 @@ import sparklyr.Backend
 
 import Logging._
 
+object WorkerRDD {
+  private var split: Option[Partition] = None;
+
+  def hasSplit: Boolean = !split.isEmpty;
+  def getSplit: Partition = split.get;
+}
+
 class WorkerRDD[T: ClassTag](parent: RDD[T])
   extends RDD[Row](parent) {
 
@@ -19,6 +26,8 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
   override def getPartitions = parent.partitions
 
   override def compute(split: Partition, context: TaskContext): Iterator[Row] = {
+
+    WorkerRDD.split = Some(split);
 
     new Thread("start sparklyr backend thread") {
       override def run(): Unit = {
