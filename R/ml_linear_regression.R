@@ -147,3 +147,29 @@ summary.ml_model_linear_regression <- function(object, ...) {
   cat(paste("R-Squared:", signif(object$r.squared, 4)), sep = "\n")
   cat(paste("Root Mean Squared Error:", signif(object$root.mean.squared.error, 4)), sep = "\n")
 }
+
+#' @export
+residuals.ml_model_linear_regression <- function(object, ...) {
+
+  residuals <- object$.model %>%
+    invoke("summary") %>%
+    invoke("residuals")
+
+  sdf_read_column(residuals, "residuals")
+
+}
+
+#' @export
+#' @rdname sdf_residuals
+sdf_residuals.ml_model_linear_regression <- function(
+  object, ...) {
+
+  residuals <- object$.model %>%
+    invoke("summary") %>%
+    invoke("residuals") %>%
+    sdf_register()
+
+  ml_model_data(object) %>%
+    select(- !!! rlang::sym(object$model.parameters$id)) %>%
+    sdf_fast_bind_cols(residuals)
+}
