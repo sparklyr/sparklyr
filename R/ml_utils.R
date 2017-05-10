@@ -90,6 +90,16 @@ ml_prepare_dataframe <- function(x,
   spark_dataframe(transformed)
 }
 
+#' Extracts data associated with a Spark ML model
+#'
+#' @param object a Spark ML model
+#' @return A tbl_spark
+#' @export
+ml_model_data <- function(object) {
+  sdf_register(object$data)
+}
+
+
 try_null <- function(expr) {
   tryCatch(expr, error = function(e) NULL)
 }
