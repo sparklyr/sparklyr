@@ -156,8 +156,7 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 
   dots_num_rows <- dots_with_ids %>%
     lapply(function(x) sdf_last_index(x, id = id)) %>%
-    unlist %>%
-    (function(x) x + 1)
+    unlist
 
   if (length(unique(dots_num_rows)) > 1) {
     names_tbls <- substitute(list(...))[-1] %>%
