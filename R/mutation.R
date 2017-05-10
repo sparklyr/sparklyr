@@ -191,7 +191,7 @@ sdf_bind_cols <- function(...) {
     which()
 
   envir <- rlang::caller_env()
-  quosures <- rlang::dots_exprs(...) %>%
+  quosures <- rlang::exprs(...) %>%
     # if 'list(sdf)' is one of the args we want 'sdf'
     lapply(function(x) if (rlang::is_lang(x))
       rlang::lang_tail(x) else x) %>%
