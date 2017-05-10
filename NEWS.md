@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added `ml_model_data()`, used for extracting data associated with
+  Spark ML models.
+
 - Added `sdf_bind_rows()` and `sdf_bind_cols()` -- these functions
   are the `sparklyr` equivalent of `dplyr::bind_rows()` and 
   `dplyr::bind_cols()`.
