@@ -210,3 +210,23 @@ summary.ml_model_generalized_linear_regression <-
 
   invisible(object)
 }
+
+#' @export
+residuals.ml_model_generalized_linear_regression <- function(
+  object,
+  type = c("deviance", "pearson", "working", "response"),
+  collect = TRUE, ...) {
+
+  type <- rlang::arg_match(type)
+  ensure_scalar_character(type)
+  stopifnot(is.logical(collect))
+
+  residuals <- object$.model %>%
+    invoke("summary") %>%
+    invoke("residuals", type)
+
+  if (collect == TRUE)
+    return(sdf_read_column(residuals, paste0(type, "Residuals")))
+
+  sdf_register(residuals)
+}
