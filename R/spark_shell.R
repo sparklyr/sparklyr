@@ -507,10 +507,6 @@ read_spark_log_error <- function(sc) {
   msg
 }
 
-spark_config_value <- function(config, name, default = NULL) {
-  if (is.null(config[[name]])) default else config[[name]]
-}
-
 #' @export
 initialize_connection.spark_shell_connection <- function(sc) {
   # initialize and return the connection
