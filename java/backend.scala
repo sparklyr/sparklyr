@@ -71,7 +71,7 @@ class Backend {
   private[this] var channelFuture: ChannelFuture = null
   private[this] var bootstrap: ServerBootstrap = null
   private[this] var bossGroup: EventLoopGroup = null
-  private[this] var inetAddress: InetSocketAddress = new InetSocketAddress("localhost", 0)
+  private[this] var inetAddress: InetSocketAddress = null
 
   def init(remote: Boolean): Int = {
     if (remote) {
@@ -79,6 +79,9 @@ class Backend {
       val anyInetAddress = InetAddress.getByAddress(anyIpAddress)
 
       inetAddress = new InetSocketAddress(anyInetAddress, 0)
+    }
+    else {
+      inetAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 0)
     }
 
     val conf = new SparkConf()
@@ -140,7 +143,7 @@ object Backend {
 
   private[this] var sessionsMap:Map[Int, Int] = Map()
 
-  private[this] var inetAddress: InetAddress = InetAddress.getByName("localhost")
+  private[this] var inetAddress: InetAddress = InetAddress.getLoopbackAddress()
 
   object GatewayOperattions extends Enumeration {
     val GetPorts, RegisterInstance = Value
@@ -167,7 +170,7 @@ object Backend {
     var available = false
 
     Try {
-        ss = new ServerSocket(port, 1, InetAddress.getByName("localhost"))
+        ss = new ServerSocket(port, 1, InetAddress.getLoopbackAddress())
         available = true
     }
 
@@ -187,7 +190,7 @@ object Backend {
         "  port:      port the gateway will listen to\n" +
         "  id:        arbitrary numeric identifier for this backend session\n" +
         "  --service: prevents closing the connection from closing the backen\n" +
-        "  --remote:  allows the gateway running as service to accept remote connections"
+        "  --remote:  allows the gateway to accept remote connections\n"
       )
 
       System.exit(-1)
@@ -195,8 +198,8 @@ object Backend {
 
     val port = args(0).toInt
     val sessionId = args(1).toInt
-    val isService = args.length > 2 && args(2) == "--service"
-    val isRemote = args.length > 3 && args(3) == "--remote"
+    val isService = args.contains("--service")
+    val isRemote = args.contains("--remote")
 
     init(port, sessionId, isService, isRemote)
   }
@@ -204,27 +207,36 @@ object Backend {
   def init(portParam: Int,
            sessionIdParam: Int,
            isServiceParam: Boolean,
-           isRemoteParam :Boolean): Unit = {
+           isRemoteParam: Boolean): Unit = {
 
     port = portParam
     sessionId = sessionIdParam
     isService = isServiceParam
     isRemote = isRemoteParam
 
+    log("Session (" + sessionId + ") starting")
+    log("Session (" + sessionId + ") binding under: " +
+        InetAddress.getLocalHost.getHostAddress + "/" +
+        InetAddress.getLoopbackAddress().getHostAddress)
+
     if (isRemote) {
+      log("Configuring session (" + sessionId + ") for remote connections")
+
       val anyIpAddress = Array[Byte](0, 0, 0, 0)
       inetAddress = InetAddress.getByAddress(anyIpAddress)
     }
 
-    log("Session (" + sessionId + ") starting")
-
     try {
       if (portIsAvailable(port))
       {
+        log("Port " + port + " available for session (" + sessionId + ")")
+
         gatewayServerSocket = new ServerSocket(port, 1, inetAddress)
       }
       else
       {
+        log("Port " + port + " not available for session (" + sessionId + ")")
+
         gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
         val gatewayPort = port
         port = gatewayServerSocket.getLocalPort()
@@ -236,6 +248,7 @@ object Backend {
         }
       }
 
+      log("Setting socket timeout for session (" + sessionId + ")")
       gatewayServerSocket.setSoTimeout(0)
 
       while(true) {
@@ -254,6 +267,7 @@ object Backend {
     log("Waiting for sparklyr client to connect to port (" + port + ")")
     val gatewaySocket = gatewayServerSocket.accept()
 
+    log("Socket connection accepted for session (" + sessionId + ")")
     val buf = new Array[Byte](1024)
 
     // wait for the end of stdin, then exit
@@ -384,7 +398,7 @@ object Backend {
   def register(gatewayPort: Int, sessionId: Int, port: Int): Boolean = {
     log("Registering session (" + sessionId + ") into gateway port (" + gatewayPort +  ")")
 
-    val s = new Socket(InetAddress.getByName("localhost"), gatewayPort)
+    val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
     val dos = new DataOutputStream(s.getOutputStream())
     dos.writeInt(GatewayOperattions.RegisterInstance.id)

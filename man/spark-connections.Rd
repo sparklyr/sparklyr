@@ -15,7 +15,7 @@
 spark_connect(master = "local", spark_home = Sys.getenv("SPARK_HOME"),
   method = c("shell", "livy", "databricks", "test"), app_name = "sparklyr",
   version = NULL, hadoop_version = NULL, config = spark_config(),
-  extensions = sparklyr::registered_extensions())
+  extensions = sparklyr::registered_extensions(), ...)
 
 spark_connection_is_open(sc)
 
@@ -53,9 +53,9 @@ cluster.}
 default, all packages enabled through the use of
 \code{\link[=register_extension]{sparklyr::register_extension}} will be passed here.}
 
-\item{sc}{A \code{spark_connection}.}
-
 \item{...}{Optional arguments; currently unused.}
+
+\item{sc}{A \code{spark_connection}.}
 }
 \description{
 These routines allow you to manage your connections to Spark.

@@ -61,7 +61,8 @@ spark_connect <- function(master = "local",
                           version = NULL,
                           hadoop_version = NULL,
                           config = spark_config(),
-                          extensions = sparklyr::registered_extensions())
+                          extensions = sparklyr::registered_extensions(),
+                          ...)
 {
   # validate method
   method <- match.arg(method)

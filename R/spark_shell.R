@@ -227,6 +227,7 @@ start_shell <- function(master,
     }
 
     # add environment parameters to arguments
+    shell_args <- c(shell_args, config[["sparklyr.shell.args"]])
     shell_env_args <- Sys.getenv("sparklyr.shell.args")
     if (nchar(shell_env_args) > 0) {
       shell_args <- c(shell_args, strsplit(shell_env_args, " ")[[1]])
@@ -237,6 +238,9 @@ start_shell <- function(master,
 
     # prepare spark-submit shell arguments
     shell_args <- c(shell_args, as.character(gatewayPort), sessionId)
+
+    # add custom backend args
+    shell_args <- c(shell_args, paste(config[["sparklyr.backend.args"]]))
 
     if (isService) {
       shell_args <- c(shell_args, "--service")
@@ -251,13 +255,15 @@ start_shell <- function(master,
     output_file <- tempfile(fileext = "_spark.log")
     error_file <- tempfile(fileext = "_spark.err")
 
+    console_log <- spark_config_exists(config, "sparklyr.log.console", FALSE)
+
     # start the shell (w/ specified additional environment variables)
     env <- unlist(environment)
     withr::with_envvar(env, {
       system2(spark_submit_path,
         args = shell_args,
-        stdout = output_file,
-        stderr = output_file,
+        stdout = if (console_log) "" else output_file,
+        stderr = if (console_log) "" else output_file,
         wait = FALSE)
     })
 
@@ -499,10 +505,6 @@ read_spark_log_error <- function(sc) {
     msg <- paste("failed to invoke spark command", pasted, sep = "\n")
   })
   msg
-}
-
-spark_config_value <- function(config, name, default = NULL) {
-  if (is.null(config[[name]])) default else config[[name]]
 }
 
 #' @export
