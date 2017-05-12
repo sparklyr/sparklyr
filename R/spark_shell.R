@@ -255,7 +255,7 @@ start_shell <- function(master,
     output_file <- tempfile(fileext = "_spark.log")
     error_file <- tempfile(fileext = "_spark.err")
 
-    console_log <- spark_config_value(config, "sparklyr.log.console", FALSE)
+    console_log <- spark_config_exists(config, "sparklyr.log.console", FALSE)
 
     # start the shell (w/ specified additional environment variables)
     env <- unlist(environment)
