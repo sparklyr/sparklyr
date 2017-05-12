@@ -204,27 +204,36 @@ object Backend {
   def init(portParam: Int,
            sessionIdParam: Int,
            isServiceParam: Boolean,
-           isRemoteParam :Boolean): Unit = {
+           isRemoteParam: Boolean): Unit = {
 
     port = portParam
     sessionId = sessionIdParam
     isService = isServiceParam
     isRemote = isRemoteParam
 
+    log("Session (" + sessionId + ") starting")
+    log("Session (" + sessionId + ") binding under: " +
+        InetAddress.getLocalHost.getHostAddress + "/" +
+        InetAddress.getLoopbackAddress().getHostAddress)
+
     if (isRemote) {
+      log("Configuring session (" + sessionId + ") for remote connections")
+
       val anyIpAddress = Array[Byte](0, 0, 0, 0)
       inetAddress = InetAddress.getByAddress(anyIpAddress)
     }
 
-    log("Session (" + sessionId + ") starting")
-
     try {
       if (portIsAvailable(port))
       {
+        log("Port " + port + " available for session (" + sessionId + ")")
+
         gatewayServerSocket = new ServerSocket(port, 1, inetAddress)
       }
       else
       {
+        log("Port " + port + " not available for session (" + sessionId + ")")
+
         gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
         val gatewayPort = port
         port = gatewayServerSocket.getLocalPort()
@@ -236,6 +245,7 @@ object Backend {
         }
       }
 
+      log("Setting socket timeout for session (" + sessionId + ")")
       gatewayServerSocket.setSoTimeout(0)
 
       while(true) {
@@ -254,6 +264,7 @@ object Backend {
     log("Waiting for sparklyr client to connect to port (" + port + ")")
     val gatewaySocket = gatewayServerSocket.accept()
 
+    log("Socket connection accepted for session (" + sessionId + ")")
     val buf = new Array[Byte](1024)
 
     // wait for the end of stdin, then exit
