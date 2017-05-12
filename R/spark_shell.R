@@ -255,13 +255,15 @@ start_shell <- function(master,
     output_file <- tempfile(fileext = "_spark.log")
     error_file <- tempfile(fileext = "_spark.err")
 
+    console_log <- spark_config_value(config, "sparklyr.log.console", FALSE)
+
     # start the shell (w/ specified additional environment variables)
     env <- unlist(environment)
     withr::with_envvar(env, {
       system2(spark_submit_path,
         args = shell_args,
-        stdout = output_file,
-        stderr = output_file,
+        stdout = if (console_log) "" else output_file,
+        stderr = if (console_log) "" else output_file,
         wait = FALSE)
     })
 
