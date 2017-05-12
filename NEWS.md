@@ -1,5 +1,14 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Fixed backend issue that affects systems where `localhost` does
+  not resolve properly to the loopback address.
+
+- Added `sparklyr.log.console` to redirect logs to console, useful
+  to troubleshooting `spark_connect`.
+
+- Added `sparklyr.backend.args` as config option to enable passing
+  parameters to the `sparklyr` backend.
+
 - Added `sdf_bind_rows()` and `sdf_bind_cols()` -- these functions
   are the `sparklyr` equivalent of `dplyr::bind_rows()` and 
   `dplyr::bind_cols()`.
