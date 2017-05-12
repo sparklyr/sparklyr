@@ -9,6 +9,9 @@
 - Added `sparklyr.backend.args` as config option to enable passing
   parameters to the `sparklyr` backend.
 
+- Added `ml_model_data()`, used for extracting data associated with
+  Spark ML models.
+
 - Added `sdf_bind_rows()` and `sdf_bind_cols()` -- these functions
   are the `sparklyr` equivalent of `dplyr::bind_rows()` and 
   `dplyr::bind_cols()`.
