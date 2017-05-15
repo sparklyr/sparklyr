@@ -24,11 +24,11 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
 }
 
 spark_config_value <- function(config, name, default = NULL) {
-  if (!name %in% config) default else config[[name]]
+  if (!name %in% names(config)) default else config[[name]]
 }
 
 spark_config_exists <- function(config, name, default = NULL) {
-  if (!name %in% name) default else !identical(config[[name]], FALSE)
+  if (!name %in% names(config)) default else !identical(config[[name]], FALSE)
 }
 
 # recursively merge two lists -- extracted from code used by rmarkdown
