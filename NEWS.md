@@ -1,5 +1,10 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Implemented `residuals()` and `sdf_residuals()` for Spark linear 
+  regression and GLM models. The former returns a R vector while 
+  the latter returns a `tbl_spark` of training data with a `residuals`
+  column added.
+  
 - Fixed backend issue that affects systems where `localhost` does
   not resolve properly to the loopback address.
 
