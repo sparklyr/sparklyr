@@ -214,7 +214,8 @@ summary.ml_model_generalized_linear_regression <-
 #' @export
 residuals.ml_model_generalized_linear_regression <- function(
   object,
-  type = c("deviance", "pearson", "working", "response")) {
+  type = c("deviance", "pearson", "working", "response"),
+  ...) {
 
   type <- rlang::arg_match(type)
   ensure_scalar_character(type)
@@ -241,7 +242,7 @@ sdf_residuals.ml_model_generalized_linear_regression <- function(
     invoke("summary") %>%
     invoke("residuals", type) %>%
     sdf_register() %>%
-    rename(residuals = !!! rlang::sym(paste0(type, "Residuals")))
+    dplyr::rename(residuals = !!! rlang::sym(paste0(type, "Residuals")))
 
   ml_model_data(object) %>%
     select(- !!! rlang::sym(object$model.parameters$id)) %>%
