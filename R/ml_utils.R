@@ -150,10 +150,9 @@ fitted.ml_model <- function(object, ...) {
 
 #' @export
 residuals.ml_model <- function(object, ...) {
-  object$.model %>%
-    invoke("summary") %>%
-    invoke("residuals") %>%
-    sdf_read_column("residuals")
+  stop(paste0("'residuals()' not yet supported for ",
+              setdiff(class(object), "ml_model"))
+       )
 }
 
 reorder_first <- function(vector, name) {
