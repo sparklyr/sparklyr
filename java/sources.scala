@@ -2,6 +2,65 @@ package SparkWorker
 
 object Embedded {
   def sources: String = "" +
+    "spark_worker_apply <- function(sc) {\n" +
+    "  spark_context <- invoke_static(sc, \"sparklyr.Backend\", \"getSparkContext\")\n" +
+    "  log(\"sparklyr worker retrieved context\")\n" +
+    "\n" +
+    "  spark_split <- invoke_static(sc, \"sparklyr.WorkerRDD\", \"getSplit\")\n" +
+    "  log(\"sparklyr worker retrieved split\")\n" +
+    "}\n" +
+    "spark_worker_connect <- function(sessionId) {\n" +
+    "  log(\"sparklyr connecting to backend\")\n" +
+    "\n" +
+    "  gatewayPort <- \"8880\"\n" +
+    "  gatewayAddress <- \"localhost\"\n" +
+    "\n" +
+    "  gatewayInfo <- spark_connect_gateway(gatewayAddress,\n" +
+    "                                       gatewayPort,\n" +
+    "                                       sessionId,\n" +
+    "                                       config = config,\n" +
+    "                                       isStarting = TRUE)\n" +
+    "\n" +
+    "  tryCatch({\n" +
+    "    # set timeout for socket connection\n" +
+    "    timeout <- spark_config_value(config, \"sparklyr.backend.timeout\", 30 * 24 * 60 * 60)\n" +
+    "    backend <- socketConnection(host = \"localhost\",\n" +
+    "                                port = gatewayInfo$backendPort,\n" +
+    "                                server = FALSE,\n" +
+    "                                blocking = TRUE,\n" +
+    "                                open = \"wb\",\n" +
+    "                                timeout = timeout)\n" +
+    "  }, error = function(err) {\n" +
+    "    close(gatewayInfo$gateway)\n" +
+    "\n" +
+    "    abort_shell(\n" +
+    "      paste(\"Failed to open connection to backend:\", err$message),\n" +
+    "      spark_submit_path,\n" +
+    "      shell_args,\n" +
+    "      output_file,\n" +
+    "      error_file\n" +
+    "    )\n" +
+    "  })\n" +
+    "\n" +
+    "  log(\"sparklyr worker connected to backend\")\n" +
+    "\n" +
+    "  sc <- structure(class = c(\"spark_worker_connection\"), list(\n" +
+    "    # spark_connection\n" +
+    "    master = master,\n" +
+    "    method = \"shell\",\n" +
+    "    app_name = NULL,\n" +
+    "    config = NULL,\n" +
+    "    # spark_shell_connection\n" +
+    "    spark_home = NULL,\n" +
+    "    backend = backend,\n" +
+    "    monitor = gatewayInfo$gateway,\n" +
+    "    output_file = NULL\n" +
+    "  ))\n" +
+    "\n" +
+    "  log(\"sparklyr worker created connection\")\n" +
+    "\n" +
+    "  sc\n" +
+    "}\n" +
     "connection_is_open <- function(sc) {\n" +
     "  bothOpen <- FALSE\n" +
     "  if (!identical(sc, NULL)) {\n" +
@@ -528,58 +587,12 @@ object Embedded {
     "  }\n" +
     "\n" +
     "  log(\"sparklyr worker starting\")\n" +
-    "  log(\"sparklyr connecting to backend\")\n" +
     "\n" +
-    "  gatewayPort <- \"8880\"\n" +
-    "  gatewayAddress <- \"localhost\"\n" +
+    "  sc <- spark_worker_connect(sessionId)\n" +
     "\n" +
-    "  gatewayInfo <- spark_connect_gateway(gatewayAddress,\n" +
-    "                                       gatewayPort,\n" +
-    "                                       sessionId,\n" +
-    "                                       config = config,\n" +
-    "                                       isStarting = TRUE)\n" +
+    "  log(\"sparklyr worker connected\")\n" +
     "\n" +
-    "  tryCatch({\n" +
-    "    # set timeout for socket connection\n" +
-    "    timeout <- spark_config_value(config, \"sparklyr.backend.timeout\", 30 * 24 * 60 * 60)\n" +
-    "    backend <- socketConnection(host = \"localhost\",\n" +
-    "                                port = gatewayInfo$backendPort,\n" +
-    "                                server = FALSE,\n" +
-    "                                blocking = TRUE,\n" +
-    "                                open = \"wb\",\n" +
-    "                                timeout = timeout)\n" +
-    "  }, error = function(err) {\n" +
-    "    close(gatewayInfo$gateway)\n" +
-    "\n" +
-    "    abort_shell(\n" +
-    "      paste(\"Failed to open connection to backend:\", err$message),\n" +
-    "      spark_submit_path,\n" +
-    "      shell_args,\n" +
-    "      output_file,\n" +
-    "      error_file\n" +
-    "    )\n" +
-    "  })\n" +
-    "\n" +
-    "  log(\"sparklyr worker connected to backend\")\n" +
-    "\n" +
-    "  sc <- structure(class = c(\"spark_worker_connection\"), list(\n" +
-    "    # spark_connection\n" +
-    "    master = master,\n" +
-    "    method = \"shell\",\n" +
-    "    app_name = NULL,\n" +
-    "    config = NULL,\n" +
-    "    # spark_shell_connection\n" +
-    "    spark_home = NULL,\n" +
-    "    backend = backend,\n" +
-    "    monitor = gatewayInfo$gateway,\n" +
-    "    output_file = NULL\n" +
-    "  ))\n" +
-    "\n" +
-    "  log(\"sparklyr worker created connection\")\n" +
-    "\n" +
-    "  spark_context <- invoke_static(sc, \"sparklyr.Backend\", \"getSparkContext\")\n" +
-    "\n" +
-    "  log(\"sparklyr worker retrieved context\")\n" +
+    "  spark_worker_apply(sc)\n" +
     "\n" +
     "  log(\"sparklyr worker finished\")\n" +
     "}\n" +
