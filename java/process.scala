@@ -30,19 +30,17 @@ object Process {
     val sourceFilePath: String = workerSourceFile()
     log("Path to source file " + sourceFilePath)
 
-    val processBuilder = new ProcessBuilder(Arrays.asList(
+    val processBuilder: ProcessBuilder = new ProcessBuilder(Arrays.asList(
       command,
       "--vanilla",
       sourceFilePath,
       sessionId.toString
     ))
 
-    if (classExists("sparklyr.Backend")) {
-      log("sparklyr.Backend exists")
-    }
-
     log("R process starting")
-    processBuilder.start()
+    val process: Process = processBuilder.start()
+    process.waitFor()
+    log("R process completed")
   }
 }
 
