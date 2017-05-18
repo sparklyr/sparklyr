@@ -31,7 +31,13 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
 
     new Thread("start sparklyr backend thread") {
       override def run(): Unit = {
-        Backend.init(port, sessionId, false, false)
+        try {
+          Logging.log("Backend starting")
+          Backend.init(port, sessionId, false, false)
+        } catch {
+          case e: Exception =>
+            Logging.logError("Failed to start backend: ", e)
+        }
       }
     }.start()
 
