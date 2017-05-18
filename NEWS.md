@@ -5,6 +5,10 @@
   the latter returns a `tbl_spark` of training data with a `residuals`
   column added.
   
+- Added `sdf_broadcast()` which can be used to hint the query
+  optimizer to perform a broadcast join in cases where a shuffle
+  hash join is planned but not optimal.
+  
 - Fixed backend issue that affects systems where `localhost` does
   not resolve properly to the loopback address.
 

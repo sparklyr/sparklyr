@@ -227,7 +227,6 @@ start_shell <- function(master,
     }
 
     # add environment parameters to arguments
-    shell_args <- c(shell_args, config[["sparklyr.shell.args"]])
     shell_env_args <- Sys.getenv("sparklyr.shell.args")
     if (nchar(shell_env_args) > 0) {
       shell_args <- c(shell_args, strsplit(shell_env_args, " ")[[1]])

@@ -663,3 +663,20 @@ sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
     invoke("persist", sl) %>%
     sdf_register()
 }
+
+#' Broadcast hint
+#'
+#' Used to force broadcast hash joins.
+#'
+#' @template roxlate-ml-x
+#'
+#' @export
+sdf_broadcast <- function(x) {
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+
+  invoke_static(sc,
+                "org.apache.spark.sql.functions",
+                "broadcast", sdf) %>%
+    sdf_register()
+}

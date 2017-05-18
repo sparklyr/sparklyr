@@ -90,3 +90,14 @@ test_that("the implementation of 'sample_frac' functions returns a sample", {
     nrow(iris)
   )
 })
+
+test_that("'sdf_broadcast' forces broadcast hash join", {
+  query_plan <- df1_tbl %>%
+    sdf_broadcast() %>%
+    left_join(df2_tbl, by = "b") %>%
+    spark_dataframe() %>%
+    invoke("queryExecution") %>%
+    invoke("optimizedPlan") %>%
+    invoke("toString")
+  expect_match(query_plan, "BroadcastHint")
+})
