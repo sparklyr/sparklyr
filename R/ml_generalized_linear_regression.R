@@ -210,3 +210,41 @@ summary.ml_model_generalized_linear_regression <-
 
   invisible(object)
 }
+
+#' @export
+residuals.ml_model_generalized_linear_regression <- function(
+  object,
+  type = c("deviance", "pearson", "working", "response"),
+  ...) {
+
+  type <- rlang::arg_match(type)
+  ensure_scalar_character(type)
+
+  residuals <- object$.model %>%
+    invoke("summary") %>%
+    invoke("residuals", type)
+
+  sdf_read_column(residuals, paste0(type, "Residuals"))
+}
+
+#' @rdname sdf_residuals
+#' @param type type of residuals which should be returned.
+#' @export
+sdf_residuals.ml_model_generalized_linear_regression <- function(
+  object,
+  type = c("deviance", "pearson", "working", "response"),
+  ...) {
+
+  type <- rlang::arg_match(type)
+  ensure_scalar_character(type)
+
+  residuals <- object$.model %>%
+    invoke("summary") %>%
+    invoke("residuals", type) %>%
+    sdf_register() %>%
+    dplyr::rename(residuals = !!! rlang::sym(paste0(type, "Residuals")))
+
+  ml_model_data(object) %>%
+    select(- !!! rlang::sym(object$model.parameters$id)) %>%
+    sdf_fast_bind_cols(residuals)
+}

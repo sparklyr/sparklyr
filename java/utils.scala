@@ -208,7 +208,7 @@ object Utils {
     // extract columns of interest
     var col = df.apply(column)
     var colexprs = df.columns.map(df.apply(_))
-    
+
     // append column expressions that separate from
     // desired column
     (0 until names.length).map{i => {
@@ -216,11 +216,11 @@ object Utils {
       val index = indices(i)
       colexprs :+= col.getItem(index).as(name)
     }}
-    
+
     // select with these column expressions
     df.select(colexprs: _*)
   }
-    
+
   def separateColumnVector(df: DataFrame,
                            column: String,
                            names: Array[String],
@@ -229,7 +229,7 @@ object Utils {
     // extract columns of interest
     var col = df.apply(column)
     var colexprs = df.columns.map(df.apply(_))
-    
+
     // define a udf for extracting vector elements
     // note that we use 'Any' type here just to ensure
     // this compiles cleanly with different Spark versions
@@ -240,7 +240,7 @@ object Utils {
          array(i)
       }
     }
-    
+
     // append column expressions that separate from
     // desired column
     (0 until names.length).map{i => {
@@ -248,11 +248,11 @@ object Utils {
       val index = indices(i)
       colexprs :+= extractor(col, lit(index)).as(name)
     }}
-    
+
     // select with these column expressions
     df.select(colexprs: _*)
   }
-  
+
   def separateColumn(df: DataFrame,
                      column: String,
                      names: Array[String],
@@ -260,11 +260,11 @@ object Utils {
   {
     // extract column of interest
     val col = df.apply(column)
-    
+
     // figure out the type name for this column
     val schema = df.schema
     val typeName = schema.apply(schema.fieldIndex(column)).dataType.typeName
-    
+
     // delegate to appropriate separator
     typeName match {
       case "array"  => separateColumnArray(df, column, names, indices)
@@ -376,6 +376,13 @@ object Utils {
         .take(1)
       }
     }.collect().last.getDouble(0)
+  }
+
+  def zipDataFrames(sc: SparkContext, df1: DataFrame, df2: DataFrame) : DataFrame = {
+      val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+      sqlContext.createDataFrame(
+        df1.rdd.zip(df2.rdd).map { case (r1, r2) => Row.merge(r1, r2) },
+        StructType(df1.schema ++ df2.schema))
   }
 }
 
