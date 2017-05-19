@@ -2,4 +2,5 @@
 #' @import DBI
 #' @import utils
 #' @importFrom stats as.formula coefficients gaussian na.fail na.omit predict quantile
+#' @importFrom tibble type_sum
 NULL
