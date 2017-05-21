@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Implemented `type_sum.jobj` (from tibble) to enable better printing of jobj
+  embedded in data frames.
+
 - Implemented `residuals()` and `sdf_residuals()` for Spark linear 
   regression and GLM models. The former returns a R vector while 
   the latter returns a `tbl_spark` of training data with a `residuals`
