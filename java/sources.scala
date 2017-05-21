@@ -21,6 +21,9 @@ object Embedded {
     "                                       config = config,\n" +
     "                                       isStarting = TRUE)\n" +
     "\n" +
+    "  log(\"sparklyr connected to backend\")\n" +
+    "  log(\"sparklyr connecting to backend session (\", sessionId, \")\")\n" +
+    "\n" +
     "  tryCatch({\n" +
     "    # set timeout for socket connection\n" +
     "    timeout <- spark_config_value(config, \"sparklyr.backend.timeout\", 30 * 24 * 60 * 60)\n" +
@@ -42,7 +45,7 @@ object Embedded {
     "    )\n" +
     "  })\n" +
     "\n" +
-    "  log(\"sparklyr worker connected to backend\")\n" +
+    "  log(\"sparklyr connected to backend session (\", sessionId, \")\")\n" +
     "\n" +
     "  sc <- structure(class = c(\"spark_worker_connection\"), list(\n" +
     "    # spark_connection\n" +
@@ -262,7 +265,7 @@ object Embedded {
     "}\n" +
     "wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {\n" +
     "  waitSeconds <- if (isStarting)\n" +
-    "    spark_config_value(config, \"sparklyr.gateway.start.timeout\", 60)\n" +
+    "    spark_config_value(config, \"sparklyr.worker.start.timeout\", 5)\n" +
     "  else\n" +
     "    spark_config_value(config, \"sparklyr.gateway.connect.timeout\", 1)\n" +
     "\n" +
@@ -578,14 +581,36 @@ object Embedded {
     "\n" +
     "  jobj\n" +
     "}\n" +
+    "log_format <- function(message, level = \"INFO\") {\n" +
+    "  paste(format(Sys.time(), \"%y/%m/%d %H:%M:%S\"), level, \"sparklyr-rworker:\", message)\n" +
+    "}\n" +
+    "\n" +
+    "log_level <- function(..., level) {\n" +
+    "  args = list(...)\n" +
+    "  message <- paste(args, sep = \"\", collapse = \"\")\n" +
+    "  formatted <- log_format(message, level)\n" +
+    "  cat(formatted, \"\\n\")\n" +
+    "}\n" +
+    "\n" +
+    "log <- function(...) {\n" +
+    "  log_level(..., level = \"INFO\")\n" +
+    "}\n" +
+    "\n" +
+    "log_warning<- function(...) {\n" +
+    "  log_level(..., level = \"WARN\")\n" +
+    "}\n" +
+    "\n" +
+    "log_error <- function(...) {\n" +
+    "  log_level(..., level = \"ERROR\")\n" +
+    "}\n" +
+    "\n" +
+    "unlockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
+    "assign(\"stop\", function(...) {\n" +
+    "  log_error(...)\n" +
+    "  quit()\n" +
+    "}, as.environment(\"package:base\"))\n" +
+    "lockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
     "spark_worker_main <- function(sessionId) {\n" +
-    "  log_file <- file.path(\"~\", \"spark\", basename(tempfile(fileext = \".log\")))\n" +
-    "\n" +
-    "  log <- function(message) {\n" +
-    "    write(paste0(message, \"\\n\"), file = log_file, append = TRUE)\n" +
-    "    cat(\"sparkworker:\", message, \"\\n\")\n" +
-    "  }\n" +
-    "\n" +
     "  log(\"sparklyr worker starting\")\n" +
     "\n" +
     "  sc <- spark_worker_connect(sessionId)\n" +
