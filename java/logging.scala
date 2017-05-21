@@ -12,18 +12,18 @@ object Logging {
   }
 
   def log(message: String) = {
-    System.out.println(getDate() + " INFO sparkworker: " + message)
+    System.out.println(getDate() + " INFO sparklyr-worker: " + message)
   }
 
   def logError(message: String) = {
-    System.err.println(getDate() + " ERROR sparkworker: " + message)
+    System.err.println(getDate() + " ERROR sparklyr-worker: " + message)
   }
 
   def logError(message: String, e: Exception) = {
-    System.err.println(getDate() + " ERROR sparkworker: " + message, e.toString)
+    System.err.println(getDate() + " ERROR sparklyr-worker: " + message, e.toString)
   }
 
   def logWarning(message: String) = {
-    System.err.println(getDate() + " WARN sparkworker: " + message)
+    System.err.println(getDate() + " WARN sparklyr-worker: " + message)
   }
 }
