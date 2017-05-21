@@ -10,6 +10,9 @@ spark_worker_connect <- function(sessionId) {
                                        config = config,
                                        isStarting = TRUE)
 
+  log("sparklyr connected to backend")
+  log("sparklyr connecting to backend session (", sessionId, ")")
+
   tryCatch({
     # set timeout for socket connection
     timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
@@ -31,7 +34,7 @@ spark_worker_connect <- function(sessionId) {
     )
   })
 
-  log("sparklyr worker connected to backend")
+  log("sparklyr connected to backend session (", sessionId, ")")
 
   sc <- structure(class = c("spark_worker_connection"), list(
     # spark_connection
