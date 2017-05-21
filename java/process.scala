@@ -37,6 +37,9 @@ object Process {
       sessionId.toString
     ))
 
+    processBuilder.redirectErrorStream(true);
+    processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+
     log("R process starting")
     val process: Process = processBuilder.start()
     process.waitFor()
