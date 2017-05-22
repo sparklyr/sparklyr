@@ -1,5 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Improved backend logging by adding type and session id prefix.
+  
 - Implemented `type_sum.jobj` (from tibble) to enable better printing of jobj
   embedded in data frames.
 
