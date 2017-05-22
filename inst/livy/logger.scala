@@ -1,4 +1,4 @@
-object Logging {
+object Logger(role: String, id: Int) {
   def log(message: String) = {
   }
 

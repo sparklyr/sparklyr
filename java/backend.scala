@@ -19,8 +19,6 @@ import org.apache.spark.sql.hive.HiveContext
 
 import scala.util.Try
 
-import sparklyr.Logging._
-
 /*
  * Backend is the main class for the sparklyr backend.
  *
@@ -66,12 +64,14 @@ import sparklyr.Logging._
  * already in use, the instance being launched will use this api to communicate
  * to the main gateway the port in which this instance will listen to.
  */
-class Backend {
+class Backend(loggerParam: Logger) {
 
   private[this] var channelFuture: ChannelFuture = null
   private[this] var bootstrap: ServerBootstrap = null
   private[this] var bossGroup: EventLoopGroup = null
   private[this] var inetAddress: InetSocketAddress = null
+
+  var logger = loggerParam
 
   def init(remote: Boolean): Int = {
     if (remote) {
@@ -133,6 +133,7 @@ class Backend {
 object Backend {
   private[this] var isService: Boolean = false
   private[this] var isRemote: Boolean = false
+  private[this] var isWorker: Boolean = false
 
   private[this] var gatewayServerSocket: ServerSocket = null
   private[this] var port: Int = 0
@@ -141,9 +142,11 @@ object Backend {
   private[this] var sc: SparkContext = null
   private[this] var hc: HiveContext = null
 
-  private[this] var sessionsMap:Map[Int, Int] = Map()
+  private[this] var sessionsMap: Map[Int, Int] = Map()
 
   private[this] var inetAddress: InetAddress = InetAddress.getLoopbackAddress()
+
+  private[this] var logger: Logger = new Logger("Session", 0);
 
   object GatewayOperattions extends Enumeration {
     val GetPorts, RegisterInstance = Value
@@ -201,26 +204,31 @@ object Backend {
     val isService = args.contains("--service")
     val isRemote = args.contains("--remote")
 
-    init(port, sessionId, isService, isRemote)
+    init(port, sessionId, isService, isRemote, false)
   }
 
   def init(portParam: Int,
            sessionIdParam: Int,
            isServiceParam: Boolean,
-           isRemoteParam: Boolean): Unit = {
+           isRemoteParam: Boolean,
+           isWorkerParam: Boolean): Unit = {
 
     port = portParam
     sessionId = sessionIdParam
     isService = isServiceParam
     isRemote = isRemoteParam
+    isWorker = isWorkerParam
 
-    log("Session (" + sessionId + ") starting")
-    log("Session (" + sessionId + ") binding under: " +
+    logger = new Logger("Session", sessionId)
+    if (isWorker) logger = new Logger("BWorker", sessionId)
+
+    logger.log("is starting")
+    logger.log("is binding under: " +
         InetAddress.getLocalHost.getHostAddress + "/" +
         InetAddress.getLoopbackAddress().getHostAddress)
 
     if (isRemote) {
-      log("Configuring session (" + sessionId + ") for remote connections")
+      logger.log("is configuring for remote connections")
 
       val anyIpAddress = Array[Byte](0, 0, 0, 0)
       inetAddress = InetAddress.getByAddress(anyIpAddress)
@@ -229,13 +237,15 @@ object Backend {
     try {
       if (portIsAvailable(port))
       {
-        log("Port " + port + " available for session (" + sessionId + ")")
+        logger.log("found port " + port + " is available")
+        logger = new Logger("Gateway", sessionId)
 
         gatewayServerSocket = new ServerSocket(port, 1, inetAddress)
       }
       else
       {
-        log("Port " + port + " not available for session (" + sessionId + ")")
+        logger.log("found port " + port + " not available")
+        logger = new Logger("Backend", sessionId)
 
         gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
         val gatewayPort = port
@@ -243,12 +253,11 @@ object Backend {
 
         val success = register(gatewayPort, sessionId, port)
         if (!success) {
-          logError("Failed to register sparklyr session (" + sessionId + ") to gateway port (" + gatewayPort + ")")
+          logger.logError("failed to register on gateway port " + gatewayPort)
           System.exit(1)
         }
       }
 
-      log("Setting socket timeout for session (" + sessionId + ")")
       gatewayServerSocket.setSoTimeout(0)
 
       while(true) {
@@ -256,7 +265,7 @@ object Backend {
       }
     } catch {
       case e: IOException =>
-        logError("Server shutting down: failed with exception ", e)
+        logger.logError("is shutting down with exception ", e)
         if (!isService) System.exit(1)
     }
 
@@ -264,10 +273,10 @@ object Backend {
   }
 
   def bind(): Unit = {
-    log("Waiting for sparklyr client to connect to port (" + port + ")")
+    logger.log("is waiting for sparklyr client to connect to port " + port)
     val gatewaySocket = gatewayServerSocket.accept()
 
-    log("Socket connection accepted for session (" + sessionId + ")")
+    logger.log("accepted connection")
     val buf = new Array[Byte](1024)
 
     // wait for the end of stdin, then exit
@@ -278,7 +287,7 @@ object Backend {
           val dis = new DataInputStream(gatewaySocket.getInputStream())
           val commandId = dis.readInt()
 
-          log("Gateway received command identifier (" + commandId + ")")
+          logger.log("received command " + commandId)
 
           GatewayOperattions(commandId) match {
             case GatewayOperattions.GetPorts => {
@@ -289,15 +298,13 @@ object Backend {
 
               if (requestedSessionId == sessionId || requestedSessionId == 0)
               {
-                log("Gateway found current session (" + sessionId + ")")
+                logger.log("found requested session matches current session")
+                logger.log("is creating backend and allocating system resources")
 
-                log("Creating backend for session (" + sessionId + ")")
-                log("Backend creation requires sufficient system resources.")
-
-                val backend = new Backend()
+                val backend = new Backend(logger)
                 val backendPort: Int = backend.init(isRemote)
 
-                log("Gateway created backend for session (" + sessionId + ")")
+                logger.log("created the backend")
 
                 try {
                   // wait for the end of stdin, then exit
@@ -313,14 +320,14 @@ object Backend {
                       }
                       catch {
                         case e: IOException =>
-                          logError("Backend failed with exception ", e)
+                          logger.logError("failed with exception ", e)
 
                         if (!isService) System.exit(1)
                       }
                     }
                   }.start()
 
-                  log("Gateway waiting for r process to end in session (" + requestedSessionId + ")")
+                  logger.log("is waiting for r process to end")
 
                   // wait for the end of socket, closed if R process die
                   gatewaySocket.getInputStream().read(buf)
@@ -329,14 +336,14 @@ object Backend {
                   backend.close()
 
                   if (!isService) {
-                    log("Terminating sparklyr backend")
+                    logger.log("is terminating")
                     System.exit(0)
                   }
                 }
               }
               else
               {
-                log("Gateway searching for session (" + requestedSessionId + ")")
+                logger.log("is searching for session " + requestedSessionId)
 
                 var portForSession = sessionsMap.get(requestedSessionId)
 
@@ -351,7 +358,7 @@ object Backend {
 
                 if (portForSession.isDefined)
                 {
-                  log("Gateway found mapping for session (" + requestedSessionId + ")")
+                  logger.log("found mapping for session " + requestedSessionId)
 
                   dos.writeInt(requestedSessionId)
                   dos.writeInt(portForSession.get)
@@ -359,7 +366,7 @@ object Backend {
                 }
                 else
                 {
-                  log("Gateway found no mapping for session (" + requestedSessionId + ")")
+                  logger.log("found no mapping for session " + requestedSessionId)
 
                   dos.writeInt(requestedSessionId)
                   dos.writeInt(0)
@@ -373,7 +380,7 @@ object Backend {
               val registerSessionId = dis.readInt()
               val registerGatewayPort = dis.readInt()
 
-              log("Gateway registering session (" + registerSessionId + ") for port (" + registerGatewayPort + ")")
+              logger.log("is registering session " + registerSessionId + " under port " + registerGatewayPort)
 
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
               dos.writeInt(0)
@@ -387,7 +394,7 @@ object Backend {
           gatewaySocket.close()
         } catch {
           case e: IOException =>
-            logError("Backend failed with exception ", e)
+            logger.logError("failed with exception ", e)
 
           if (!isService) System.exit(1)
         }
@@ -396,7 +403,7 @@ object Backend {
   }
 
   def register(gatewayPort: Int, sessionId: Int, port: Int): Boolean = {
-    log("Registering session (" + sessionId + ") into gateway port (" + gatewayPort +  ")")
+    logger.log("is registering session " + sessionId + " into gateway port " + gatewayPort)
 
     val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
@@ -405,12 +412,12 @@ object Backend {
     dos.writeInt(sessionId)
     dos.writeInt(port)
 
-    log("Waiting for registration of (" + sessionId + ") into gateway port (" + gatewayPort +  ")")
+    logger.log("is waiting for registration of " + sessionId + " into gateway port " + gatewayPort)
 
     val dis = new DataInputStream(s.getInputStream())
     val status = dis.readInt()
 
-    log("Finished registration of session (" + sessionId + ") into gateway port (" + gatewayPort +  ") with status (" + status + ")")
+    logger.log("finished registration of session " + sessionId + " into gateway port " + gatewayPort + " with status " + status)
 
     s.close()
     status == 0

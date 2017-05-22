@@ -3,8 +3,6 @@ package sparklyr
 import scala.collection.mutable.HashMap
 import scala.language.existentials
 
-import sparklyr.Logging._
-
 object Invoke {
   // Find a matching method signature in an array of signatures of constructors
   // or methods of the same name according to the passed arguments. Arguments
@@ -76,7 +74,14 @@ object Invoke {
       None
     }
 
-  def invoke(cls: Class[_], objId: String, obj: Object, methodName: String, args: Array[Object]): Object = {
+  def invoke(
+    cls: Class[_],
+    objId: String,
+    obj: Object,
+    methodName: String,
+    args: Array[Object],
+    logger: Logger): Object = {
+
     val methods = cls.getMethods
     val selectedMethods = methods.filter(m => m.getName == methodName)
     if (selectedMethods.length > 0) {
@@ -85,10 +90,11 @@ object Invoke {
         args)
 
       if (index.isEmpty) {
-        logWarning(s"cannot find matching method ${cls}.$methodName. "
-                   + s"Candidates are:")
+        logger.logWarning(
+          s"cannot find matching method ${cls}.$methodName. " +
+          s"Candidates are:")
         selectedMethods.foreach { method =>
-          logWarning(s"$methodName(${method.getParameterTypes.mkString(",")})")
+          logger.logWarning(s"$methodName(${method.getParameterTypes.mkString(",")})")
         }
         throw new Exception(s"No matched method found for $cls.$methodName")
       }
@@ -102,10 +108,11 @@ object Invoke {
         args)
 
       if (index.isEmpty) {
-        logWarning(s"cannot find matching constructor for ${cls}. "
-                   + s"Candidates are:")
+        logger.logWarning(
+          s"cannot find matching constructor for ${cls}. " +
+          s"Candidates are:")
         ctors.foreach { ctor =>
-          logWarning(s"$cls(${ctor.getParameterTypes.mkString(",")})")
+          logger.logWarning(s"$cls(${ctor.getParameterTypes.mkString(",")})")
         }
         throw new Exception(s"No matched constructor found for $cls")
       }
