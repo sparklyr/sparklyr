@@ -11,12 +11,11 @@ import scala.language.existentials
 import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
 import io.netty.channel.ChannelHandler.Sharable
 
-import Logging._
 import Serializer._
 
 object StreamHandler {
 
-  def read(msg: Array[Byte], classMap: Map[String, Object]): Array[Byte] = {
+  def read(msg: Array[Byte], classMap: Map[String, Object], logger: Logger): Array[Byte] = {
     val bis = new ByteArrayInputStream(msg)
     val dis = new DataInputStream(bis)
 
@@ -46,7 +45,7 @@ object StreamHandler {
             writeObject(dos, null)
           } catch {
             case e: Exception =>
-              logError(s"Removing $objId failed", e)
+              logger.logError(s"failed to remove $objId", e)
               writeInt(dos, -1)
               writeString(dos, s"Removing $objId failed: ${e.getMessage}")
           }
@@ -55,7 +54,7 @@ object StreamHandler {
         writeString(dos, s"Error: unknown method $methodName")
       }
     } else {
-      handleMethodCall(isStatic, objId, methodName, numArgs, dis, dos, classMap)
+      handleMethodCall(isStatic, objId, methodName, numArgs, dis, dos, classMap, logger)
     }
 
     bos.toByteArray
@@ -68,7 +67,8 @@ object StreamHandler {
     numArgs: Int,
     dis: DataInputStream,
     dos: DataOutputStream,
-    classMap: Map[String, Object]): Unit = {
+    classMap: Map[String, Object],
+    logger: Logger): Unit = {
       var obj: Object = null
       try {
         val cls = if (isStatic) {
@@ -89,13 +89,13 @@ object StreamHandler {
         }
 
         val args = readArgs(numArgs, dis)
-        val res = Invoke.invoke(cls, objId, obj, methodName, args)
+        val res = Invoke.invoke(cls, objId, obj, methodName, args, logger)
 
         writeInt(dos, 0)
         writeObject(dos, res.asInstanceOf[AnyRef])
       } catch {
         case e: Exception =>
-          logError(s"$methodName on $objId failed")
+          logger.logError(s"failed calling $methodName on $objId")
           writeInt(dos, -1)
           writeString(dos, Utils.exceptionString(
             if (e.getCause == null) e else e.getCause
