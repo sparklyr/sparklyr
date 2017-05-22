@@ -10,10 +10,10 @@ object Embedded {
     "  log(\"sparklyr worker retrieved split\")\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId) {\n" +
-    "  log(\"sparklyr connecting to backend\")\n" +
-    "\n" +
     "  gatewayPort <- \"8880\"\n" +
     "  gatewayAddress <- \"localhost\"\n" +
+    "\n" +
+    "  log(\"sparklyr connecting to backend session (\", sessionId, \") on port (\", gatewayPort, \")\")\n" +
     "\n" +
     "  gatewayInfo <- spark_connect_gateway(gatewayAddress,\n" +
     "                                       gatewayPort,\n" +
@@ -265,7 +265,7 @@ object Embedded {
     "}\n" +
     "wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {\n" +
     "  waitSeconds <- if (isStarting)\n" +
-    "    spark_config_value(config, \"sparklyr.worker.start.timeout\", 5)\n" +
+    "    spark_config_value(config, \"sparklyr.gateway.start.timeout\", 60)\n" +
     "  else\n" +
     "    spark_config_value(config, \"sparklyr.gateway.connect.timeout\", 1)\n" +
     "\n" +
@@ -613,11 +613,16 @@ object Embedded {
     "spark_worker_main <- function(sessionId) {\n" +
     "  log(\"sparklyr worker starting\")\n" +
     "\n" +
-    "  sc <- spark_worker_connect(sessionId)\n" +
+    "  tryCatch({\n" +
     "\n" +
-    "  log(\"sparklyr worker connected\")\n" +
+    "    sc <- spark_worker_connect(sessionId)\n" +
+    "    log(\"sparklyr worker connected\")\n" +
     "\n" +
-    "  spark_worker_apply(sc)\n" +
+    "    spark_worker_apply(sc)\n" +
+    "\n" +
+    "  }, error = function(e) {\n" +
+    "      stop(\"Worker terminated unexpectedly: \" + e)\n" +
+    "  })\n" +
     "\n" +
     "  log(\"sparklyr worker finished\")\n" +
     "}\n" +
@@ -816,6 +821,6 @@ object Embedded {
     "    }\n" +
     "  }\n" +
     "}\n" +
-    "spark_worker_main(commandArgs(trailingOnly = TRUE)[2])\n" +
+    "spark_worker_main(commandArgs(trailingOnly = TRUE)[1])\n" +
     ""
 }
