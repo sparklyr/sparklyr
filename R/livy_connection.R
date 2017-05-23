@@ -271,7 +271,7 @@ livy_statement_compose_magic <- function(lobj, magic) {
 
 livy_statement_parse_response <- function(text, lobj) {
   nullResponses <- list(
-    "defined (module|object).*"
+    "defined (module|object|class).*"
   )
 
   if (regexec(paste(nullResponses, collapse = "|"), text)[[1]][[1]] > 0) {
@@ -680,7 +680,7 @@ livy_load_scala_sources <- function(sc) {
   livySources <- c(
     "utils.scala",
     "sqlutils.scala",
-    "logging.scala",
+    "logger.scala",
     "invoke.scala",
     "tracker.scala",
     "serializer.scala",

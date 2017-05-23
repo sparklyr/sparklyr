@@ -5,7 +5,7 @@ object LivyUtils {
   // the livy-repl become assigned to a generic package that can't be
   // accessed through reflection.
   val globalClassMap = Map(
-    "Logging" -> Logging,
+    "Logger" -> new Logger("", 0),
     "Serializer" -> Serializer,
     "SQLUtils" -> SQLUtils,
     "StreamHandler" -> StreamHandler,
@@ -16,7 +16,7 @@ object LivyUtils {
   def invokeFromBase64(msg: String): String = {
 
     val decoded: Array[Byte] = DatatypeConverter.parseBase64Binary(msg)
-    val result = StreamHandler.read(decoded, globalClassMap)
+    val result = StreamHandler.read(decoded, globalClassMap, new Logger("", 0))
 
     DatatypeConverter.printBase64Binary(result);
   }

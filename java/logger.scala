@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 
-object Logging {
+class Logger(role: String, id: Int)  {
   def getDate() : String = {
     val now = Calendar.getInstance().getTime()
     val logFormat = new SimpleDateFormat("yy/MM/dd HH:mm:ss")
@@ -12,18 +12,18 @@ object Logging {
   }
 
   def log(message: String) = {
-    System.out.println(getDate() + " INFO sparklyr: " + message)
+    System.out.println(getDate() + " INFO sparklyr: " + role + " (" + id + ") " + message)
   }
 
   def logError(message: String) = {
-    System.err.println(getDate() + " ERROR sparklyr: " + message)
+    System.err.println(getDate() + " ERROR sparklyr: " + role + " (" + id + ") " + message)
   }
 
   def logError(message: String, e: Exception) = {
-    System.err.println(getDate() + " ERROR sparklyr: " + message, e.toString)
+    System.err.println(getDate() + " ERROR sparklyr: " + role + " (" + id + ") " + message, e.toString)
   }
 
   def logWarning(message: String) = {
-    System.err.println(getDate() + " WARN sparklyr: " + message)
+    System.err.println(getDate() + " WARN sparklyr: " + role + " (" + id + ") " + message)
   }
 }
