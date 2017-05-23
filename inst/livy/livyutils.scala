@@ -16,7 +16,7 @@ object LivyUtils {
   def invokeFromBase64(msg: String): String = {
 
     val decoded: Array[Byte] = DatatypeConverter.parseBase64Binary(msg)
-    val result = StreamHandler.read(decoded, globalClassMap)
+    val result = StreamHandler.read(decoded, globalClassMap, new Logger("", 0))
 
     DatatypeConverter.printBase64Binary(result);
   }
