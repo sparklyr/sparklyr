@@ -4,16 +4,16 @@ object Embedded {
   def sources: String = "" +
     "spark_worker_apply <- function(sc) {\n" +
     "  spark_context <- invoke_static(sc, \"sparklyr.Backend\", \"getSparkContext\")\n" +
-    "  log(\"sparklyr worker retrieved context\")\n" +
+    "  log(\"retrieved context\")\n" +
     "\n" +
     "  spark_split <- invoke_static(sc, \"sparklyr.WorkerRDD\", \"getSplit\")\n" +
-    "  log(\"sparklyr worker retrieved split\")\n" +
+    "  log(\"retrieved split\")\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId) {\n" +
     "  gatewayPort <- \"8880\"\n" +
     "  gatewayAddress <- \"localhost\"\n" +
     "\n" +
-    "  log(\"sparklyr connecting to backend session (\", sessionId, \") on port (\", gatewayPort, \")\")\n" +
+    "  log(\"is connecting to backend using port \", gatewayPort)\n" +
     "\n" +
     "  gatewayInfo <- spark_connect_gateway(gatewayAddress,\n" +
     "                                       gatewayPort,\n" +
@@ -21,8 +21,8 @@ object Embedded {
     "                                       config = config,\n" +
     "                                       isStarting = TRUE)\n" +
     "\n" +
-    "  log(\"sparklyr connected to backend\")\n" +
-    "  log(\"sparklyr connecting to backend session (\", sessionId, \")\")\n" +
+    "  log(\"is connected to backend\")\n" +
+    "  log(\"is connecting to backend session\")\n" +
     "\n" +
     "  tryCatch({\n" +
     "    # set timeout for socket connection\n" +
@@ -45,7 +45,7 @@ object Embedded {
     "    )\n" +
     "  })\n" +
     "\n" +
-    "  log(\"sparklyr connected to backend session (\", sessionId, \")\")\n" +
+    "  log(\"is connected to backend session\")\n" +
     "\n" +
     "  sc <- structure(class = c(\"spark_worker_connection\"), list(\n" +
     "    # spark_connection\n" +
@@ -60,7 +60,7 @@ object Embedded {
     "    output_file = NULL\n" +
     "  ))\n" +
     "\n" +
-    "  log(\"sparklyr worker created connection\")\n" +
+    "  log(\"created connection\")\n" +
     "\n" +
     "  sc\n" +
     "}\n" +
@@ -324,7 +324,7 @@ object Embedded {
     "\n" +
     "  if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {\n" +
     "    if (isStarting)\n" +
-    "      stop(\"Sparklyr gateway did not respond while retrieving ports information after \", waitSeconds, \" seconds\")\n" +
+    "      stop(\"sparklyr gateway did not respond while retrieving ports information after \", waitSeconds, \" seconds\")\n" +
     "    else\n" +
     "      return(NULL)\n" +
     "  }\n" +
@@ -581,8 +581,22 @@ object Embedded {
     "\n" +
     "  jobj\n" +
     "}\n" +
+    "log_env <- new.env()\n" +
+    "\n" +
+    "log_session <- function(sessionId) {\n" +
+    "  assign('sessionId', sessionId, envir = log_env)\n" +
+    "}\n" +
+    "\n" +
     "log_format <- function(message, level = \"INFO\") {\n" +
-    "  paste(format(Sys.time(), \"%y/%m/%d %H:%M:%S\"), level, \"sparklyr-rworker:\", message)\n" +
+    "  paste(\n" +
+    "    format(Sys.time(), \"%y/%m/%d %H:%M:%S\"),\n" +
+    "    \" \",\n" +
+    "    level,\n" +
+    "    \" sparklyr: RWorker (\",\n" +
+    "    log_env$sessionId,\n" +
+    "    \") \",\n" +
+    "    message,\n" +
+    "    sep = \"\")\n" +
     "}\n" +
     "\n" +
     "log_level <- function(..., level) {\n" +
@@ -611,20 +625,21 @@ object Embedded {
     "}, as.environment(\"package:base\"))\n" +
     "lockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
     "spark_worker_main <- function(sessionId) {\n" +
-    "  log(\"sparklyr worker starting\")\n" +
+    "  log_session(sessionId)\n" +
+    "  log(\"is starting\")\n" +
     "\n" +
     "  tryCatch({\n" +
     "\n" +
     "    sc <- spark_worker_connect(sessionId)\n" +
-    "    log(\"sparklyr worker connected\")\n" +
+    "    log(\"is connected\")\n" +
     "\n" +
     "    spark_worker_apply(sc)\n" +
     "\n" +
     "  }, error = function(e) {\n" +
-    "      stop(\"Worker terminated unexpectedly: \" + e)\n" +
+    "      stop(\"terminated unexpectedly: \" + e)\n" +
     "  })\n" +
     "\n" +
-    "  log(\"sparklyr worker finished\")\n" +
+    "  log(\"finished\")\n" +
     "}\n" +
     "spark_config_value <- function(config, property, value) {\n" +
     "  value\n" +
