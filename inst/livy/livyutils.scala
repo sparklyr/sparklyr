@@ -5,7 +5,7 @@ object LivyUtils {
   // the livy-repl become assigned to a generic package that can't be
   // accessed through reflection.
   val globalClassMap = Map(
-    "Logging" -> Logging,
+    "Logger" -> new Logger("", 0),
     "Serializer" -> Serializer,
     "SQLUtils" -> SQLUtils,
     "StreamHandler" -> StreamHandler,
