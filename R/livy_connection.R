@@ -271,7 +271,7 @@ livy_statement_compose_magic <- function(lobj, magic) {
 
 livy_statement_parse_response <- function(text, lobj) {
   nullResponses <- list(
-    "defined (module|object).*"
+    "defined (module|object|class).*"
   )
 
   if (regexec(paste(nullResponses, collapse = "|"), text)[[1]][[1]] > 0) {
