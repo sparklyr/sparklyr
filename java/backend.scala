@@ -220,12 +220,11 @@ object Backend {
     isWorker = isWorkerParam
 
     logger = new Logger("Session", sessionId)
-    if (isWorker) logger = new Logger("BWorker", sessionId)
 
-    logger.log("is starting")
-    logger.log("is binding under: " +
+    logger.log("is starting under " +
         InetAddress.getLocalHost.getHostAddress + "/" +
-        InetAddress.getLoopbackAddress().getHostAddress)
+        InetAddress.getLoopbackAddress().getHostAddress +
+        " port " + port)
 
     if (isRemote) {
       logger.log("is configuring for remote connections")
@@ -244,8 +243,9 @@ object Backend {
       }
       else
       {
-        logger.log("found port " + port + " not available")
+        logger.log("found port " + port + " is not available")
         logger = new Logger("Backend", sessionId)
+        if (isWorker) logger = new Logger("Worker", sessionId)
 
         gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
         val gatewayPort = port
@@ -380,7 +380,7 @@ object Backend {
               val registerSessionId = dis.readInt()
               val registerGatewayPort = dis.readInt()
 
-              logger.log("is registering session " + registerSessionId + " under port " + registerGatewayPort)
+              logger.log("received session " + registerSessionId + " registration request")
 
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
               dos.writeInt(0)
@@ -403,7 +403,7 @@ object Backend {
   }
 
   def register(gatewayPort: Int, sessionId: Int, port: Int): Boolean = {
-    logger.log("is registering session " + sessionId + " into gateway port " + gatewayPort)
+    logger.log("is registering session in gateway")
 
     val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
@@ -412,12 +412,12 @@ object Backend {
     dos.writeInt(sessionId)
     dos.writeInt(port)
 
-    logger.log("is waiting for registration of " + sessionId + " into gateway port " + gatewayPort)
+    logger.log("is waiting for registration in gateway")
 
     val dis = new DataInputStream(s.getInputStream())
     val status = dis.readInt()
 
-    logger.log("finished registration of session " + sessionId + " into gateway port " + gatewayPort + " with status " + status)
+    logger.log("finished registration in gateway with status " + status)
 
     s.close()
     status == 0
