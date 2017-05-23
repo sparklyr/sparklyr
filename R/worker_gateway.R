@@ -59,7 +59,7 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
 
   if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
     if (isStarting)
-      stop("Sparklyr gateway did not respond while retrieving ports information after ", waitSeconds, " seconds")
+      stop("sparklyr gateway did not respond while retrieving ports information after ", waitSeconds, " seconds")
     else
       return(NULL)
   }

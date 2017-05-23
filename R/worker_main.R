@@ -1,16 +1,17 @@
 spark_worker_main <- function(sessionId) {
-  log("sparklyr worker starting")
+  log_session(sessionId)
+  log("is starting")
 
   tryCatch({
 
     sc <- spark_worker_connect(sessionId)
-    log("sparklyr worker connected")
+    log("is connected")
 
     spark_worker_apply(sc)
 
   }, error = function(e) {
-      stop("Worker terminated unexpectedly: " + e)
+      stop("terminated unexpectedly: " + e)
   })
 
-  log("sparklyr worker finished")
+  log("finished")
 }

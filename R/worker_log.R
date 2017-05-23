@@ -1,5 +1,19 @@
+log_env <- new.env()
+
+log_session <- function(sessionId) {
+  assign('sessionId', sessionId, envir = log_env)
+}
+
 log_format <- function(message, level = "INFO") {
-  paste(format(Sys.time(), "%y/%m/%d %H:%M:%S"), level, "sparklyr-rworker:", message)
+  paste(
+    format(Sys.time(), "%y/%m/%d %H:%M:%S"),
+    " ",
+    level,
+    " sparklyr: RWorker (",
+    log_env$sessionId,
+    ") ",
+    message,
+    sep = "")
 }
 
 log_level <- function(..., level) {

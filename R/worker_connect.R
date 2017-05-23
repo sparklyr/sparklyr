@@ -2,7 +2,7 @@ spark_worker_connect <- function(sessionId) {
   gatewayPort <- "8880"
   gatewayAddress <- "localhost"
 
-  log("sparklyr connecting to backend session (", sessionId, ") on port (", gatewayPort, ")")
+  log("is connecting to backend using port ", gatewayPort)
 
   gatewayInfo <- spark_connect_gateway(gatewayAddress,
                                        gatewayPort,
@@ -10,8 +10,8 @@ spark_worker_connect <- function(sessionId) {
                                        config = config,
                                        isStarting = TRUE)
 
-  log("sparklyr connected to backend")
-  log("sparklyr connecting to backend session (", sessionId, ")")
+  log("is connected to backend")
+  log("is connecting to backend session")
 
   tryCatch({
     # set timeout for socket connection
@@ -34,7 +34,7 @@ spark_worker_connect <- function(sessionId) {
     )
   })
 
-  log("sparklyr connected to backend session (", sessionId, ")")
+  log("is connected to backend session")
 
   sc <- structure(class = c("spark_worker_connection"), list(
     # spark_connection
@@ -49,7 +49,7 @@ spark_worker_connect <- function(sessionId) {
     output_file = NULL
   ))
 
-  log("sparklyr worker created connection")
+  log("created connection")
 
   sc
 }
