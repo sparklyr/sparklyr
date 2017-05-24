@@ -161,7 +161,7 @@ start_shell <- function(master,
       }
 
       app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE), type = shQuoteType)
-      shell_args <- c(shell_args, "--class", "sparklyr.Backend")
+      shell_args <- c(shell_args, "--class", "sparklyr.Shell")
     }
 
     # validate and normalize spark_home
@@ -510,7 +510,8 @@ read_spark_log_error <- function(sc) {
 initialize_connection.spark_shell_connection <- function(sc) {
   # initialize and return the connection
   tryCatch({
-    sc$spark_context <- invoke_static(sc, "sparklyr.Backend", "getSparkContext")
+    backend <- invoke_static(sc, "sparklyr.Shell", "getBackend")
+    sc$spark_context <- invoke(backend, "getSparkContext")
 
     if (is.null(sc$spark_context)) {
       # create the spark config
@@ -530,7 +531,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
         conf
       )
 
-      invoke_static(sc, "sparklyr.Backend", "setSparkContext", sc$spark_context)
+      invoke(backend, "setSparkContext", sc$spark_context)
     }
 
     sc$spark_context$connection <- sc
