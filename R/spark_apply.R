@@ -1,6 +1,6 @@
 #' @import sparklyr
 #' @export
-spark_lapply <- function(x, f) {
+spark_apply <- function(x, f) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
 

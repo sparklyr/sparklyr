@@ -2,6 +2,6 @@
 
 export(compile_sparkworker_jars)
 export(debug_backend)
-export(spark_lapply)
+export(spark_apply)
 export(update_sources_class)
 import(sparklyr)
