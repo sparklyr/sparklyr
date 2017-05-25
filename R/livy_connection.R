@@ -1,5 +1,7 @@
 #' @import httr
-#' @import jsonlite
+#' @importFrom httr http_error
+#' @importFrom httr http_status
+#' @importFrom httr text_content
 livy_validate_http_response <- function(message, req) {
   if (http_error(req)) {
     if (identical(status_code(req), 401)) {
@@ -101,11 +103,8 @@ livy_config_get <- function(master, config) {
   c(livyConfig, sparkConfig)
 }
 
-<<<<<<< HEAD
-=======
 #' @importFrom httr POST
 #' @importFrom jsonlite unbox
->>>>>>> 025be09... additional importfrom statements and rebuild docs
 livy_create_session <- function(master, config) {
   data <- list(
     kind = unbox("spark"),
@@ -370,12 +369,9 @@ livy_log_operation <- function(sc, text) {
   write(strtrim(text, 200), file = sc$log, append = TRUE)
 }
 
-<<<<<<< HEAD
-=======
 #' @importFrom httr POST
 #' @importFrom jsonlite toJSON
 #' @importFrom jsonlite unbox
->>>>>>> 025be09... additional importfrom statements and rebuild docs
 livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
@@ -519,7 +515,6 @@ livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(
   }
 }
 
-#' @import jsonlite
 livy_connection <- function(master,
                             config,
                             app_name,
