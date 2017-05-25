@@ -42,8 +42,14 @@ object Process {
 
     log("R process starting")
     val process: Process = processBuilder.start()
-    process.waitFor()
-    log("R process completed")
+    val status: Int = process.waitFor()
+
+    if (status == 0) {
+      log("R process completed")
+    } else {
+      logError("R process failed")
+      throw new Exception(s"sparklyr worker rscript failure, check worker logs for details.")
+    }
   }
 }
 
