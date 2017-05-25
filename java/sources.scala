@@ -3,10 +3,7 @@ package SparkWorker
 object Embedded {
   def sources: String = "" +
     "spark_worker_apply <- function(sc) {\n" +
-    "  spark_context <- invoke_static(sc, \"sparklyr.Backend\", \"getSparkContext\")\n" +
-    "  log(\"retrieved context\")\n" +
-    "\n" +
-    "  spark_split <- invoke_static(sc, \"sparklyr.WorkerRDD\", \"getSplit\")\n" +
+    "  spark_split <- worker_invoke_static(sc, \"SparkWorker.WorkerRDD\", \"getSplit\")\n" +
     "  log(\"retrieved split\")\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId) {\n" +
@@ -49,7 +46,7 @@ object Embedded {
     "\n" +
     "  sc <- structure(class = c(\"spark_worker_connection\"), list(\n" +
     "    # spark_connection\n" +
-    "    master = master,\n" +
+    "    master = \"\",\n" +
     "    method = \"shell\",\n" +
     "    app_name = NULL,\n" +
     "    config = NULL,\n" +
@@ -63,6 +60,10 @@ object Embedded {
     "  log(\"created connection\")\n" +
     "\n" +
     "  sc\n" +
+    "}\n" +
+    "\n" +
+    "jobj_subclass.shell_backend <- function(con) {\n" +
+    "  \"worker_jobj\"\n" +
     "}\n" +
     "connection_is_open <- function(sc) {\n" +
     "  bothOpen <- FALSE\n" +
@@ -384,7 +385,7 @@ object Embedded {
     "  }\n" +
     "}\n" +
     "\n" +
-    "invoke_method.spark_shell_connection <- function(sc, static, object, method, ...)\n" +
+    "invoke_method <- function(sc, static, object, method, ...)\n" +
     "{\n" +
     "  if (is.null(sc)) {\n" +
     "    stop(\"The connection is no longer valid.\")\n" +
@@ -437,6 +438,22 @@ object Embedded {
     "\n" +
     "  object <- readObject(backend)\n" +
     "  attach_connection(object, sc)\n" +
+    "}\n" +
+    "\n" +
+    "worker_invoke <- function(jobj, method, ...) {\n" +
+    "  UseMethod(\"worker_invoke\")\n" +
+    "}\n" +
+    "\n" +
+    "worker_invoke.worker_jobj <- function(jobj, method, ...) {\n" +
+    "  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)\n" +
+    "}\n" +
+    "\n" +
+    "worker_invoke_static <- function(sc, class, method, ...) {\n" +
+    "  invoke_method(sc, TRUE, class, method, ...)\n" +
+    "}\n" +
+    "\n" +
+    "worker_invoke_new <- function(sc, class, ...) {\n" +
+    "  invoke_method(sc, TRUE, class, \"<init>\", ...)\n" +
     "}\n" +
     "spark_jobj <- function(x, ...) {\n" +
     "  UseMethod(\"spark_jobj\")\n" +
@@ -504,13 +521,13 @@ object Embedded {
     "  repr <- NULL\n" +
     "\n" +
     "  tryCatch({\n" +
-    "    class <- invoke(jobj, \"getClass\")\n" +
+    "    class <- worker_invoke(jobj, \"getClass\")\n" +
     "    if (inherits(class, \"spark_jobj\"))\n" +
-    "      class <- invoke(class, \"toString\")\n" +
+    "      class <- worker_invoke(class, \"toString\")\n" +
     "  }, error = function(e) {\n" +
     "  })\n" +
     "  tryCatch({\n" +
-    "    repr <- invoke(jobj, \"toString\")\n" +
+    "    repr <- worker_invoke(jobj, \"toString\")\n" +
     "  }, error = function(e) {\n" +
     "  })\n" +
     "  list(\n" +
@@ -524,14 +541,14 @@ object Embedded {
     "  if (!connection_is_open(spark_connection(jobj)))\n" +
     "    return(jobj)\n" +
     "\n" +
-    "  class <- invoke(jobj, \"getClass\")\n" +
+    "  class <- worker_invoke(jobj, \"getClass\")\n" +
     "\n" +
     "  cat(\"Fields:\\n\")\n" +
-    "  fields <- invoke(class, \"getDeclaredFields\")\n" +
+    "  fields <- worker_invoke(class, \"getDeclaredFields\")\n" +
     "  lapply(fields, function(field) { print(field) })\n" +
     "\n" +
     "  cat(\"Methods:\\n\")\n" +
-    "  methods <- invoke(class, \"getDeclaredMethods\")\n" +
+    "  methods <- worker_invoke(class, \"getDeclaredMethods\")\n" +
     "  lapply(methods, function(method) { print(method) })\n" +
     "\n" +
     "  jobj\n" +
@@ -592,7 +609,7 @@ object Embedded {
     "    format(Sys.time(), \"%y/%m/%d %H:%M:%S\"),\n" +
     "    \" \",\n" +
     "    level,\n" +
-    "    \" sparklyr: RWorker (\",\n" +
+    "    \" sparklyr: RScript (\",\n" +
     "    log_env$sessionId,\n" +
     "    \") \",\n" +
     "    message,\n" +
@@ -621,7 +638,7 @@ object Embedded {
     "unlockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
     "assign(\"stop\", function(...) {\n" +
     "  log_error(...)\n" +
-    "  quit()\n" +
+    "  quit(status = -1)\n" +
     "}, as.environment(\"package:base\"))\n" +
     "lockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
     "spark_worker_main <- function(sessionId) {\n" +
@@ -636,7 +653,7 @@ object Embedded {
     "    spark_worker_apply(sc)\n" +
     "\n" +
     "  }, error = function(e) {\n" +
-    "      stop(\"terminated unexpectedly: \" + e)\n" +
+    "      stop(\"terminated unexpectedly: \", e)\n" +
     "  })\n" +
     "\n" +
     "  log(\"finished\")\n" +
