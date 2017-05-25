@@ -9,7 +9,7 @@ log_format <- function(message, level = "INFO") {
     format(Sys.time(), "%y/%m/%d %H:%M:%S"),
     " ",
     level,
-    " sparklyr: RWorker (",
+    " sparklyr: RScript (",
     log_env$sessionId,
     ") ",
     message,
@@ -38,6 +38,6 @@ log_error <- function(...) {
 unlockBinding("stop",  as.environment("package:base"))
 assign("stop", function(...) {
   log_error(...)
-  quit()
+  quit(status = -1)
 }, as.environment("package:base"))
 lockBinding("stop",  as.environment("package:base"))
