@@ -1,4 +1,4 @@
-invoke_method.spark_shell_connection <- function(sc, static, object, method, ...)
+invoke_method <- function(sc, static, object, method, ...)
 {
   if (is.null(sc)) {
     stop("The connection is no longer valid.")
@@ -51,4 +51,20 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
 
   object <- readObject(backend)
   attach_connection(object, sc)
+}
+
+worker_invoke <- function(jobj, method, ...) {
+  UseMethod("worker_invoke")
+}
+
+worker_invoke.worker_jobj <- function(jobj, method, ...) {
+  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
+}
+
+worker_invoke_static <- function(sc, class, method, ...) {
+  invoke_method(sc, TRUE, class, method, ...)
+}
+
+worker_invoke_new <- function(sc, class, ...) {
+  invoke_method(sc, TRUE, class, "<init>", ...)
 }

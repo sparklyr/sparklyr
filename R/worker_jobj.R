@@ -64,13 +64,13 @@ jobj_info <- function(jobj) {
   repr <- NULL
 
   tryCatch({
-    class <- invoke(jobj, "getClass")
+    class <- worker_invoke(jobj, "getClass")
     if (inherits(class, "spark_jobj"))
-      class <- invoke(class, "toString")
+      class <- worker_invoke(class, "toString")
   }, error = function(e) {
   })
   tryCatch({
-    repr <- invoke(jobj, "toString")
+    repr <- worker_invoke(jobj, "toString")
   }, error = function(e) {
   })
   list(
@@ -84,14 +84,14 @@ jobj_inspect <- function(jobj) {
   if (!connection_is_open(spark_connection(jobj)))
     return(jobj)
 
-  class <- invoke(jobj, "getClass")
+  class <- worker_invoke(jobj, "getClass")
 
   cat("Fields:\n")
-  fields <- invoke(class, "getDeclaredFields")
+  fields <- worker_invoke(class, "getDeclaredFields")
   lapply(fields, function(field) { print(field) })
 
   cat("Methods:\n")
-  methods <- invoke(class, "getDeclaredMethods")
+  methods <- worker_invoke(class, "getDeclaredMethods")
   lapply(methods, function(method) { print(method) })
 
   jobj
