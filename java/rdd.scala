@@ -33,7 +33,8 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
       override def run(): Unit = {
         try {
           Logging.log("Backend starting")
-          Backend.init(port, sessionId, false, false, true)
+          val backend: Backend = new Backend()
+          backend.init(port, sessionId, false, false, true)
         } catch {
           case e: Exception =>
             Logging.logError("Failed to start backend: ", e)
