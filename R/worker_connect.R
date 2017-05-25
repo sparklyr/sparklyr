@@ -38,7 +38,7 @@ spark_worker_connect <- function(sessionId) {
 
   sc <- structure(class = c("spark_worker_connection"), list(
     # spark_connection
-    master = master,
+    master = "",
     method = "shell",
     app_name = NULL,
     config = NULL,
@@ -52,4 +52,8 @@ spark_worker_connect <- function(sessionId) {
   log("created connection")
 
   sc
+}
+
+jobj_subclass.shell_backend <- function(con) {
+  "worker_jobj"
 }
