@@ -221,8 +221,14 @@ object Backend {
 
     logger = new Logger("Session", sessionId)
 
+    val hostAddress: String = try {
+      InetAddress.getLocalHost.getHostAddress.toString
+    } catch {
+      case e: java.net.UnknownHostException => "Unknown Host"
+    }
+
     logger.log("is starting under " +
-        InetAddress.getLocalHost.getHostAddress + "/" +
+        hostAddress + "/" +
         InetAddress.getLoopbackAddress().getHostAddress +
         " port " + port)
 
