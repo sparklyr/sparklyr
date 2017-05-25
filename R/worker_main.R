@@ -10,7 +10,7 @@ spark_worker_main <- function(sessionId) {
     spark_worker_apply(sc)
 
   }, error = function(e) {
-      stop("terminated unexpectedly: " + e)
+      stop("terminated unexpectedly: ", e)
   })
 
   log("finished")
