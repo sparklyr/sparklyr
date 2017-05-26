@@ -664,6 +664,20 @@ sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
     sdf_register()
 }
 
+#' Checkpoint a Spark DataFrame
+#'
+#' @param x an object coercible to a Spark DataFrame
+#' @param eager whether to truncate the lineage of the DataFrame
+#' @export
+sdf_checkpoint <- function(x, eager = TRUE) {
+  ensure_scalar_boolean(eager)
+
+  x %>%
+    spark_dataframe() %>%
+    invoke("checkpoint", eager) %>%
+    sdf_register()
+}
+
 #' Broadcast hint
 #'
 #' Used to force broadcast hash joins.
