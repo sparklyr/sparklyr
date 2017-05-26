@@ -43,6 +43,7 @@ Imports:
     shiny (>= 1.0.1),
     withr
 Remotes:
+    tidyverse/broom,
     tidyverse/dplyr,
     tidyverse/dbplyr,
     tidyverse/rlang
