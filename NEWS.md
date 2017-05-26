@@ -1,5 +1,8 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
+- Added `spark_set_checkpoint_dir()`, `spark_get_checkpoint_dir()`, and 
+  `sdf_checkpoint()` to enable checkpointing.
+
 - Improved backend logging by adding type and session id prefix.
   
 - Implemented `type_sum.jobj` (from tibble) to enable better printing of jobj
