@@ -387,6 +387,11 @@ object Utils {
         df1.rdd.zip(df2.rdd).map { case (r1, r2) => Row.merge(r1, r2) },
         StructType(df1.schema ++ df2.schema))
   }
+
+  def unboxString(x: Option[String]) = x match {
+    case Some(s) => s
+    case None => ""
+  }
 }
 
 
