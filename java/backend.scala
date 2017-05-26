@@ -20,8 +20,6 @@ import org.apache.spark.sql.hive.HiveContext
 import scala.util.Try
 
 /*
- * Backend is the main class for the sparklyr backend.
- *
  * The Backend class is launched from Spark through spark-submit with the following
  * paramters: port, session and service.
  *
@@ -64,73 +62,8 @@ import scala.util.Try
  * already in use, the instance being launched will use this api to communicate
  * to the main gateway the port in which this instance will listen to.
  */
-class Backend(loggerParam: Logger) {
 
-  private[this] var channelFuture: ChannelFuture = null
-  private[this] var bootstrap: ServerBootstrap = null
-  private[this] var bossGroup: EventLoopGroup = null
-  private[this] var inetAddress: InetSocketAddress = null
-
-  var logger = loggerParam
-
-  def init(remote: Boolean): Int = {
-    if (remote) {
-      val anyIpAddress = Array[Byte](0, 0, 0, 0)
-      val anyInetAddress = InetAddress.getByAddress(anyIpAddress)
-
-      inetAddress = new InetSocketAddress(anyInetAddress, 0)
-    }
-    else {
-      inetAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 0)
-    }
-
-    val conf = new SparkConf()
-    bossGroup = new NioEventLoopGroup(conf.getInt("sparklyr.backend.threads", 2))
-    val workerGroup = bossGroup
-    val handler = new BackendHandler(this)
-
-    bootstrap = new ServerBootstrap()
-      .group(bossGroup, workerGroup)
-      .channel(classOf[NioServerSocketChannel])
-
-    bootstrap.childHandler(new ChannelInitializer[SocketChannel]() {
-      def initChannel(ch: SocketChannel): Unit = {
-        ch.pipeline()
-          .addLast("encoder", new ByteArrayEncoder())
-          .addLast("frameDecoder",
-            new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
-          .addLast("decoder", new ByteArrayDecoder())
-          .addLast("handler", handler)
-      }
-    })
-
-    channelFuture = bootstrap.bind(inetAddress)
-    channelFuture.syncUninterruptibly()
-    channelFuture.channel().localAddress().asInstanceOf[InetSocketAddress].getPort()
-  }
-
-  def run(): Unit = {
-    channelFuture.channel.closeFuture().syncUninterruptibly()
-  }
-
-  def close(): Unit = {
-    if (channelFuture != null) {
-      // close is a local operation and should finish within milliseconds; timeout just to be safe
-      channelFuture.channel().close().awaitUninterruptibly(10, TimeUnit.SECONDS)
-      channelFuture = null
-    }
-    if (bootstrap != null && bootstrap.group() != null) {
-      bootstrap.group().shutdownGracefully()
-    }
-    if (bootstrap != null && bootstrap.childGroup() != null) {
-      bootstrap.childGroup().shutdownGracefully()
-    }
-    bootstrap = null
-  }
-
-}
-
-object Backend {
+class Backend {
   private[this] var isService: Boolean = false
   private[this] var isRemote: Boolean = false
   private[this] var isWorker: Boolean = false
@@ -184,27 +117,6 @@ object Backend {
     }
 
     available
-  }
-
-  def main(args: Array[String]): Unit = {
-    if (args.length > 4 || args.length < 2) {
-      System.err.println(
-        "Usage: Backend port id [--service] [--remote]\n" +
-        "  port:      port the gateway will listen to\n" +
-        "  id:        arbitrary numeric identifier for this backend session\n" +
-        "  --service: prevents closing the connection from closing the backen\n" +
-        "  --remote:  allows the gateway to accept remote connections\n"
-      )
-
-      System.exit(-1)
-    }
-
-    val port = args(0).toInt
-    val sessionId = args(1).toInt
-    val isService = args.contains("--service")
-    val isRemote = args.contains("--remote")
-
-    init(port, sessionId, isService, isRemote, false)
   }
 
   def init(portParam: Int,
@@ -307,8 +219,8 @@ object Backend {
                 logger.log("found requested session matches current session")
                 logger.log("is creating backend and allocating system resources")
 
-                val backend = new Backend(logger)
-                val backendPort: Int = backend.init(isRemote)
+                val backendChannel = new BackendChannel(logger)
+                val backendPort: Int = backendChannel.init(isRemote)
 
                 logger.log("created the backend")
 
@@ -322,7 +234,7 @@ object Backend {
                         dos.writeInt(gatewaySocket.getLocalPort())
                         dos.writeInt(backendPort)
 
-                        backend.run()
+                        backendChannel.run()
                       }
                       catch {
                         case e: IOException =>
@@ -339,7 +251,7 @@ object Backend {
                   gatewaySocket.getInputStream().read(buf)
                 }
                 finally {
-                  backend.close()
+                  backendChannel.close()
 
                   if (!isService) {
                     logger.log("is terminating")
