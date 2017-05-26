@@ -144,6 +144,11 @@
   data and added path parameter in `spark_load_table()` for consistency with
   other functions.
 
+# Sparklyr 0.5.5
+
+- Implemented support for `connectionViewer` interface required in RStudio 1.1
+  and `spark_connect` with `mode="databricks"`.
+
 # Sparklyr 0.5.4
 
 - Implemented support for `dplyr 0.6` and Spark 2.1.x.
