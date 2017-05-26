@@ -2,6 +2,10 @@
 
 - Added `spark_set_checkpoint_dir()`, `spark_get_checkpoint_dir()`, and 
   `sdf_checkpoint()` to enable checkpointing.
+  
+- Implemented `tidy`, `augment`, and `glance` from tidyverse/broom for
+  `ml_model_generalized_linear_regression` and `ml_model_linear_regression`
+  models.
 
 - Improved backend logging by adding type and session id prefix.
   
