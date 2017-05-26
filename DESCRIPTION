@@ -40,9 +40,9 @@ Imports:
     rprojroot,
     rstudioapi,
     shiny (>= 1.0.1),
-    withr,
-    broom
+    withr
 Remotes:
+    tidyverse/broom,
     tidyverse/dplyr,
     tidyverse/dbplyr,
     tidyverse/rlang
