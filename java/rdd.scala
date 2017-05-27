@@ -7,8 +7,7 @@ import org.apache.spark.sql._
 import scala.reflect.ClassTag
 
 import sparklyr.Backend
-
-import Logging._
+import sparklyr.Logger
 
 object WorkerRDD {
   private var split: Option[Partition] = None
@@ -33,16 +32,16 @@ object WorkerRDD {
   }
 }
 
-class WorkerRDD[T: ClassTag](parent: RDD[T])
+class WorkerRDD[T: ClassTag](parent: RDD[T], sessionId: Int)
   extends RDD[Row](parent) {
 
   private[this] var port: Int = 8880
-  private[this] var sessionId: Int = scala.util.Random.nextInt(100)
 
   override def getPartitions = parent.partitions
 
   override def compute(split: Partition, context: TaskContext): Iterator[Row] = {
 
+    val logger = new Logger("Worker", sessionId)
     val lock: AnyRef = new Object()
 
     WorkerRDD.setSplit(split)
@@ -51,12 +50,12 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
     new Thread("starting backend thread") {
       override def run(): Unit = {
         try {
-          Logging.log("Backend starting")
+          logger.log("Backend starting")
           val backend: Backend = new Backend()
           backend.init(port, sessionId, false, false, true)
         } catch {
           case e: Exception =>
-            Logging.logError("Failed to start backend: ", e)
+            logger.logError("Failed to start backend: ", e)
         }
       }
     }.start()
@@ -64,11 +63,13 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
     new Thread("starting rscript thread") {
       override def run(): Unit = {
         try {
-          Logging.log("RScript starting")
-          Process.init(sessionId)
+          logger.log("RScript starting")
+
+          val rscript = new Rscript(logger)
+          rscript.init(sessionId)
         } catch {
           case e: Exception =>
-            Logging.logError("Failed to start rscript: ", e)
+            logger.logError("Failed to start rscript: ", e)
         }
       }
     }.start()
@@ -87,10 +88,13 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
 
 object WorkerHelper {
   def computeRdd(df: DataFrame): RDD[Row] = {
-    log("RDD compute starting")
+
+    val sessionId = scala.util.Random.nextInt(10000)
+    val logger = new Logger("Worker", sessionId)
+    logger.log("RDD compute starting")
 
     val parent: RDD[Row] = df.rdd
-    val computed: RDD[Row] = new WorkerRDD[Row](parent)
+    val computed: RDD[Row] = new WorkerRDD[Row](parent, sessionId)
 
     computed
   }

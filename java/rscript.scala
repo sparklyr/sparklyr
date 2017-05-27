@@ -9,9 +9,10 @@ import org.apache.spark.sql._
 
 import ClassUtils._
 import FileUtils._
-import Logging._
 
-object Process {
+import sparklyr.Logger
+
+class Rscript(logger: Logger) {
   def workerSourceFile(): String = {
     val source = Embedded.sources
 
@@ -28,7 +29,7 @@ object Process {
     val command: String = sparkConf.get("spark.r.command", "Rscript")
 
     val sourceFilePath: String = workerSourceFile()
-    log("Path to source file " + sourceFilePath)
+    logger.log("Path to source file " + sourceFilePath)
 
     val processBuilder: ProcessBuilder = new ProcessBuilder(Arrays.asList(
       command,
@@ -40,14 +41,14 @@ object Process {
     processBuilder.redirectErrorStream(true);
     processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 
-    log("R process starting")
+    logger.log("R process starting")
     val process: Process = processBuilder.start()
     val status: Int = process.waitFor()
 
     if (status == 0) {
-      log("R process completed")
+      logger.log("R process completed")
     } else {
-      logError("R process failed")
+      logger.logError("R process failed")
       throw new Exception(s"sparklyr worker rscript failure, check worker logs for details.")
     }
   }
