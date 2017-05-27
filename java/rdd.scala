@@ -11,10 +11,26 @@ import sparklyr.Backend
 import Logging._
 
 object WorkerRDD {
-  private var split: Option[Partition] = None;
+  private var split: Option[Partition] = None
+  private var lock: Option[AnyRef] = None
 
-  def hasSplit: Boolean = !split.isEmpty;
-  def getSplit: Partition = split.get;
+  def setSplit(splitParam: Partition) = {
+    split = Some(splitParam)
+  }
+
+  def getSplit(): Partition = {
+    split.get
+  }
+
+  def setLock(lockParam: AnyRef) = {
+    lock = Some(lockParam)
+  }
+
+  def finish(): Unit = {
+    lock.get.synchronized {
+      lock.get.notify()
+    }
+  }
 }
 
 class WorkerRDD[T: ClassTag](parent: RDD[T])
@@ -27,9 +43,14 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
 
   override def compute(split: Partition, context: TaskContext): Iterator[Row] = {
 
-    WorkerRDD.split = Some(split);
+    val lock: AnyRef = new Object()
 
-    new Thread("start sparklyr backend thread") {
+    val logger: Logger = new Logger("Gateway", sessionId)
+
+    WorkerRDD.setSplit(split)
+    WorkerRDD.setLock(lock)
+
+    new Thread("starting backend thread") {
       override def run(): Unit = {
         try {
           Logging.log("Backend starting")
@@ -42,11 +63,26 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
       }
     }.start()
 
-    Process.init(sessionId)
+    new Thread("starting rscript thread") {
+      override def run(): Unit = {
+        try {
+          Logging.log("RScript starting")
+          Process.init(sessionId)
+        } catch {
+          case e: Exception =>
+            Logging.logError("Failed to start rscript: ", e)
+        }
+      }
+    }.start()
 
     return new Iterator[Row] {
       def next(): Row = org.apache.spark.sql.Row.fromSeq(Array[String]())
-      def hasNext = false
+      def hasNext = {
+        lock.synchronized {
+          lock.wait()
+          false
+        }
+      }
     }
   }
 }
