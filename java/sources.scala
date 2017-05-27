@@ -5,6 +5,9 @@ object Embedded {
     "spark_worker_apply <- function(sc) {\n" +
     "  spark_split <- worker_invoke_static(sc, \"SparkWorker.WorkerRDD\", \"getSplit\")\n" +
     "  log(\"retrieved split\")\n" +
+    "\n" +
+    "  spark_split <- worker_invoke_static(sc, \"SparkWorker.WorkerRDD\", \"finish\")\n" +
+    "  log(\"finished apply\")\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId) {\n" +
     "  gatewayPort <- \"8880\"\n" +
