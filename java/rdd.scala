@@ -45,8 +45,6 @@ class WorkerRDD[T: ClassTag](parent: RDD[T])
 
     val lock: AnyRef = new Object()
 
-    val logger: Logger = new Logger("Gateway", sessionId)
-
     WorkerRDD.setSplit(split)
     WorkerRDD.setLock(lock)
 
