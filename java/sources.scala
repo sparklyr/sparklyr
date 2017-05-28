@@ -3,11 +3,28 @@ package SparkWorker
 object Embedded {
   def sources: String = "" +
     "spark_worker_apply <- function(sc) {\n" +
-    "  spark_split <- worker_invoke_static(sc, \"SparkWorker.WorkerRDD\", \"getSplit\")\n" +
-    "  log(\"retrieved split\")\n" +
+    "  context <- worker_invoke_static(sc, \"SparkWorker.WorkerRDD\", \"getContext\")\n" +
+    "  log(\"retrieved worker context\")\n" +
     "\n" +
-    "  spark_split <- worker_invoke_static(sc, \"SparkWorker.WorkerRDD\", \"finish\")\n" +
+    "  data <- worker_invoke(context, \"getSourceArrayLength\")\n" +
+    "  log(\"context has \", nrow(data), \" rows\")\n" +
+    "\n" +
+    "  data <- worker_invoke(context, \"getSourceArraySeq\")\n" +
+    "  log(\"retrieved \", nrow(data), \" rows\")\n" +
+    "\n" +
+    "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
+    "  log(\"updated \", nrow(data), \" rows\")\n" +
+    "\n" +
+    "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  log(\"finished apply\")\n" +
+    "}\n" +
+    "\n" +
+    "spark_worker_collect <- function(sc) {\n" +
+    "  collected <- invoke_static(sc, \"sparklyr.Utils\", \"collect\", sdf, separator$regexp)\n" +
+    "\n" +
+    "  transformed <- lapply(collected, function(e) {\n" +
+    "    sdf_deserialize_column(e, sc)\n" +
+    "  })\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId) {\n" +
     "  gatewayPort <- \"8880\"\n" +
@@ -77,6 +94,14 @@ object Embedded {
     "    })\n" +
     "  }\n" +
     "  bothOpen\n" +
+    "}\n" +
+    "\n" +
+    "worker_connection <- function(x, ...) {\n" +
+    "  UseMethod(\"worker_connection\")\n" +
+    "}\n" +
+    "\n" +
+    "worker_connection.spark_jobj <- function(x, ...) {\n" +
+    "  x$connection\n" +
     "}\n" +
     "readObject <- function(con) {\n" +
     "  # Read type first\n" +
@@ -448,7 +473,7 @@ object Embedded {
     "}\n" +
     "\n" +
     "worker_invoke.worker_jobj <- function(jobj, method, ...) {\n" +
-    "  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)\n" +
+    "  invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)\n" +
     "}\n" +
     "\n" +
     "worker_invoke_static <- function(sc, class, method, ...) {\n" +
@@ -472,7 +497,7 @@ object Embedded {
     "}\n" +
     "\n" +
     "print.spark_jobj <- function(x, ...) {\n" +
-    "  print_jobj(spark_connection(x), x, ...)\n" +
+    "  print_jobj(worker_connection(x), x, ...)\n" +
     "}\n" +
     "\n" +
     "print_jobj <- function(sc, jobj, ...) {\n" +
@@ -541,7 +566,7 @@ object Embedded {
     "\n" +
     "jobj_inspect <- function(jobj) {\n" +
     "  print(jobj)\n" +
-    "  if (!connection_is_open(spark_connection(jobj)))\n" +
+    "  if (!connection_is_open(worker_connection(jobj)))\n" +
     "    return(jobj)\n" +
     "\n" +
     "  class <- worker_invoke(jobj, \"getClass\")\n" +
