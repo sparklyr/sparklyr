@@ -9,43 +9,81 @@ import scala.reflect.ClassTag
 import sparklyr.Backend
 import sparklyr.Logger
 
-object WorkerRDD {
-  private var split: Option[Partition] = None
-  private var lock: Option[AnyRef] = None
+class WorkerContext[T: ClassTag](
+  rdd: RDD[T],
+  split: Partition,
+  task: TaskContext,
+  lock: AnyRef) {
 
-  def setSplit(splitParam: Partition) = {
-    split = Some(splitParam)
+  private var result: Array[T] = Array[T]()
+
+  def getSourceIterator(): Iterator[T] = {
+    rdd.iterator(split, task)
   }
 
-  def getSplit(): Partition = {
-    split.get
+  def getSourceArray(): Array[T] = {
+    getSourceIterator.toArray
   }
 
-  def setLock(lockParam: AnyRef) = {
-    lock = Some(lockParam)
+  def getSourceArrayLength(): Int = {
+    getSourceIterator.toArray.length
+  }
+
+  def getSourceArraySeq(): Array[Seq[Any]] = {
+    getSourceArray.map(x => x.asInstanceOf[Row].toSeq)
+  }
+
+  def setResultArray(resultParam: Array[T]) = {
+    result = resultParam
+  }
+
+  def setResultArraySeq(resultParam: Array[Seq[Any]]) = {
+    result = resultParam.map(x => Row.fromSeq(x).asInstanceOf[T])
+  }
+
+  def getResultArray(): Array[T] = {
+    result
   }
 
   def finish(): Unit = {
-    lock.get.synchronized {
-      lock.get.notify()
+    lock.synchronized {
+      lock.notify
     }
   }
 }
 
+object WorkerRDD {
+  private var context: Option[AnyRef] = None
+
+  def setContext(contextParam: AnyRef) = {
+    context = Some(contextParam)
+  }
+
+  def getContext(): AnyRef = {
+    context.get
+  }
+}
+
 class WorkerRDD[T: ClassTag](parent: RDD[T], sessionId: Int)
-  extends RDD[Row](parent) {
+  extends RDD[T](parent) {
 
   private[this] var port: Int = 8880
 
   override def getPartitions = parent.partitions
 
-  override def compute(split: Partition, context: TaskContext): Iterator[Row] = {
+  override def compute(split: Partition, task: TaskContext): Iterator[T] = {
 
     val logger = new Logger("Worker", sessionId)
     val lock: AnyRef = new Object()
 
-    WorkerRDD.setSplit(split)
-    WorkerRDD.setLock(lock)
+    val workerContext = new WorkerContext[T](
+      parent,
+      split,
+      task,
+      lock
+    )
+
+    WorkerRDD.setContext(workerContext)
 
     new Thread("starting backend thread") {
       override def run(): Unit = {
@@ -74,15 +112,11 @@ class WorkerRDD[T: ClassTag](parent: RDD[T], sessionId: Int)
       }
     }.start()
 
-    return new Iterator[Row] {
-      def next(): Row = org.apache.spark.sql.Row.fromSeq(Array[String]())
-      def hasNext = {
-        lock.synchronized {
-          lock.wait()
-          false
-        }
-      }
+    lock.synchronized {
+      lock.wait()
     }
+
+    return workerContext.getResultArray().iterator
   }
 }
 
