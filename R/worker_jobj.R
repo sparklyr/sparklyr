@@ -12,7 +12,7 @@ spark_jobj.spark_jobj <- function(x, ...) {
 }
 
 print.spark_jobj <- function(x, ...) {
-  print_jobj(spark_connection(x), x, ...)
+  print_jobj(worker_connection(x), x, ...)
 }
 
 print_jobj <- function(sc, jobj, ...) {
@@ -81,7 +81,7 @@ jobj_info <- function(jobj) {
 
 jobj_inspect <- function(jobj) {
   print(jobj)
-  if (!connection_is_open(spark_connection(jobj)))
+  if (!connection_is_open(worker_connection(jobj)))
     return(jobj)
 
   class <- worker_invoke(jobj, "getClass")

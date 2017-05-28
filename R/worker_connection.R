@@ -8,3 +8,11 @@ connection_is_open <- function(sc) {
   }
   bothOpen
 }
+
+worker_connection <- function(x, ...) {
+  UseMethod("worker_connection")
+}
+
+worker_connection.spark_jobj <- function(x, ...) {
+  x$connection
+}

@@ -58,7 +58,7 @@ worker_invoke <- function(jobj, method, ...) {
 }
 
 worker_invoke.worker_jobj <- function(jobj, method, ...) {
-  invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
+  invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)
 }
 
 worker_invoke_static <- function(sc, class, method, ...) {
