@@ -1,7 +1,24 @@
 spark_worker_apply <- function(sc) {
-  spark_split <- worker_invoke_static(sc, "SparkWorker.WorkerRDD", "getSplit")
-  log("retrieved split")
+  context <- worker_invoke_static(sc, "SparkWorker.WorkerRDD", "getContext")
+  log("retrieved worker context")
 
-  spark_split <- worker_invoke_static(sc, "SparkWorker.WorkerRDD", "finish")
+  length <- worker_invoke(context, "getSourceArrayLength")
+  log("context has ", length, " rows")
+
+  data <- worker_invoke(context, "getSourceArraySeq")
+  log("retrieved ", nrow(data), " rows")
+
+  worker_invoke(context, "setResultArraySeq", data)
+  log("updated ", nrow(data), " rows")
+
+  spark_split <- worker_invoke(context, "finish")
   log("finished apply")
+}
+
+spark_worker_collect <- function(sc) {
+  collected <- invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
+
+  transformed <- lapply(collected, function(e) {
+    sdf_deserialize_column(e, sc)
+  })
 }
