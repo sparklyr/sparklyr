@@ -6,11 +6,11 @@ object Embedded {
     "  context <- worker_invoke_static(sc, \"SparkWorker.WorkerRDD\", \"getContext\")\n" +
     "  log(\"retrieved worker context\")\n" +
     "\n" +
-    "  data <- worker_invoke(context, \"getSourceArrayLength\")\n" +
-    "  log(\"context has \", nrow(data), \" rows\")\n" +
+    "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
+    "  log(\"context has \", length, \" rows\")\n" +
     "\n" +
     "  data <- worker_invoke(context, \"getSourceArraySeq\")\n" +
-    "  log(\"retrieved \", nrow(data), \" rows\")\n" +
+    "  log(\"retrieved \", length(data), \" rows\")\n" +
     "\n" +
     "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
     "  log(\"updated \", nrow(data), \" rows\")\n" +
