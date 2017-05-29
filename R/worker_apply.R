@@ -9,7 +9,7 @@ spark_worker_apply <- function(sc) {
   log("retrieved ", length(data), " rows")
 
   worker_invoke(context, "setResultArraySeq", data)
-  log("updated ", nrow(data), " rows")
+  log("updated ", length(data), " rows")
 
   spark_split <- worker_invoke(context, "finish")
   log("finished apply")

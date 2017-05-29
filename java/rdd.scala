@@ -37,8 +37,8 @@ class WorkerContext[T: ClassTag](
     result = resultParam
   }
 
-  def setResultArraySeq(resultParam: Array[Seq[Any]]) = {
-    result = resultParam.map(x => Row.fromSeq(x).asInstanceOf[T])
+  def setResultArraySeq(resultParam: Array[Any]) = {
+    result = resultParam.map(x => Row.fromSeq(x.asInstanceOf[Array[Any]].toSeq).asInstanceOf[T])
   }
 
   def getResultArray(): Array[T] = {
