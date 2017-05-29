@@ -13,7 +13,7 @@ object Embedded {
     "  log(\"retrieved \", length(data), \" rows\")\n" +
     "\n" +
     "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
-    "  log(\"updated \", nrow(data), \" rows\")\n" +
+    "  log(\"updated \", length(data), \" rows\")\n" +
     "\n" +
     "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  log(\"finished apply\")\n" +
