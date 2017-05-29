@@ -30,11 +30,12 @@ spark_apply(iris_tbl, function(rows) {
 **Note:** Applying function closures is NYI.
 
 Notice that `spark_log` shows `sparklyr` performing the following operations:
-1. The `Gateway` receives a request to execute custom `RDD` of type `WorkerRDD`.
-2. The `WorkerRDD` is evaluated on the worker node which initializes a new
-  `sparklyr` backend tracked as `Worker` in the logs.
-3. The backend initializes an `RScript` process that connects back to the
-   backend, retrieves data, performs the clossure and updates the result.
+
+ 1. The `Gateway` receives a request to execute custom `RDD` of type `WorkerRDD`.
+ 2. The `WorkerRDD` is evaluated on the worker node which initializes a new
+    `sparklyr` backend tracked as `Worker` in the logs.
+ 3. The backend initializes an `RScript` process that connects back to the
+    backend, retrieves data, performs the clossure and updates the result.
 
 ```{r}
 spark_log(sc, filter = "sparklyr:")
