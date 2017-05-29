@@ -6,7 +6,7 @@ spark_worker_apply <- function(sc) {
   log("context has ", length, " rows")
 
   data <- worker_invoke(context, "getSourceArraySeq")
-  log("retrieved ", nrow(data), " rows")
+  log("retrieved ", length(data), " rows")
 
   worker_invoke(context, "setResultArraySeq", data)
   log("updated ", nrow(data), " rows")
