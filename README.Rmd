@@ -18,7 +18,7 @@ sc <- spark_connect(master = "local", version = "2.1.0")
 iris_tbl <- sdf_copy_to(sc, iris)
 ```
 
-To execute arbitrary functions use `spark_lapply` as follows:
+To execute arbitrary functions use `spark_apply` as follows:
 
 ```{r}
 spark_apply(iris_tbl, function(rows) {
