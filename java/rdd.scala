@@ -90,7 +90,18 @@ class WorkerRDD[T: ClassTag](parent: RDD[T], sessionId: Int)
         try {
           logger.log("Backend starting")
           val backend: Backend = new Backend()
-          backend.init(port, sessionId, false, false, true)
+
+          /*
+           * initialize backend as worker and service, since exceptions and
+           * closing terminating the r session should not shutdown the process
+           */
+          backend.init(
+            port,
+            sessionId,
+            true,   /* isService */
+            false,  /* isRemote */
+            true    /* isWorker */
+          )
         } catch {
           case e: Exception =>
             logger.logError("Failed to start backend: ", e)
