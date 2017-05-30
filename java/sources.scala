@@ -15,7 +15,16 @@ object Embedded {
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
     "  closure <- unserialize(closureRaw)\n" +
     "\n" +
+    "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
+    "  log(\"retrieved \", length(columnNames), \" column names\")\n" +
+    "\n" +
+    "  data <- lapply(data, function(e) {\n" +
+    "    names(e) <- columnNames\n" +
+    "    e\n" +
+    "  })\n" +
+    "\n" +
     "  data <- lapply(data, closure)\n" +
+    "  log(\"applied clossure to \", length(data), \" rows\")\n" +
     "\n" +
     "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
     "  log(\"updated \", length(data), \" rows\")\n" +
