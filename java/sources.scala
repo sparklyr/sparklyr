@@ -7,10 +7,15 @@ object Embedded {
     "  log(\"retrieved worker context\")\n" +
     "\n" +
     "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
-    "  log(\"context has \", length, \" rows\")\n" +
+    "  log(\"found \", length, \" rows\")\n" +
     "\n" +
     "  data <- worker_invoke(context, \"getSourceArraySeq\")\n" +
     "  log(\"retrieved \", length(data), \" rows\")\n" +
+    "\n" +
+    "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
+    "  closure <- unserialize(closureRaw)\n" +
+    "\n" +
+    "  data <- lapply(data, closure)\n" +
     "\n" +
     "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
     "  log(\"updated \", length(data), \" rows\")\n" +
