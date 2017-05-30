@@ -3,10 +3,15 @@ spark_worker_apply <- function(sc) {
   log("retrieved worker context")
 
   length <- worker_invoke(context, "getSourceArrayLength")
-  log("context has ", length, " rows")
+  log("found ", length, " rows")
 
   data <- worker_invoke(context, "getSourceArraySeq")
   log("retrieved ", length(data), " rows")
+
+  closureRaw <- worker_invoke(context, "getClosure")
+  closure <- unserialize(closureRaw)
+
+  data <- lapply(data, closure)
 
   worker_invoke(context, "setResultArraySeq", data)
   log("updated ", length(data), " rows")
