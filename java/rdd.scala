@@ -115,7 +115,7 @@ class WorkerRDD[T: ClassTag](parent: RDD[T], sessionId: Int)
           logger.log("RScript starting")
 
           val rscript = new Rscript(logger)
-          rscript.init(sessionId)
+          rscript.init(sessionId, lock)
         } catch {
           case e: Exception =>
             logger.logError("Failed to start rscript: ", e)
