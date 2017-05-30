@@ -21,13 +21,11 @@ iris_tbl <- sdf_copy_to(sc, iris)
 To execute arbitrary functions use `spark_apply` as follows:
 
 ```{r}
-spark_apply(iris_tbl, function(rows) {
-  rows$Petal_Width <- rows$Petal_Width + 1
-  rows
+spark_apply(iris_tbl, function(row) {
+  row$Petal_Width <- row$Petal_Width + rgamma(1, 2)
+  row
 })
 ```
-
-**Note:** Applying function closures is NYI.
 
 Notice that `spark_log` shows `sparklyr` performing the following operations:
 
