@@ -11,6 +11,13 @@ spark_worker_apply <- function(sc) {
   closureRaw <- worker_invoke(context, "getClosure")
   closure <- unserialize(closureRaw)
 
+  columnNames <- worker_invoke(context, "getColumns")
+
+  data <- lapply(data, function(e) {
+    names(e) <- columnNames
+    e
+  })
+
   data <- lapply(data, closure)
 
   worker_invoke(context, "setResultArraySeq", data)

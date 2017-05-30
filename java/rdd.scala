@@ -14,12 +14,17 @@ class WorkerContext[T: ClassTag](
   split: Partition,
   task: TaskContext,
   lock: AnyRef,
-  closure: Array[Byte]) {
+  closure: Array[Byte],
+  columns: Array[String]) {
 
   private var result: Array[T] = Array[T]()
 
   def getClosure(): Array[Byte] = {
     closure
+  }
+
+  def getColumns(): Array[String] = {
+    columns
   }
 
   def getSourceIterator(): Iterator[T] = {
@@ -69,8 +74,12 @@ object WorkerRDD {
   }
 }
 
-class WorkerRDD[T: ClassTag](parent: RDD[T], sessionId: Int, closure: Array[Byte])
-  extends RDD[T](parent) {
+class WorkerRDD[T: ClassTag](
+  parent: RDD[T],
+  sessionId: Int,
+  closure: Array[Byte],
+  columns: Array[String]
+  ) extends RDD[T](parent) {
 
   private[this] var port: Int = 8880
 
@@ -86,7 +95,8 @@ class WorkerRDD[T: ClassTag](parent: RDD[T], sessionId: Int, closure: Array[Byte
       split,
       task,
       lock,
-      closure
+      closure,
+      columns
     )
 
     WorkerRDD.setContext(workerContext)
@@ -145,7 +155,11 @@ object WorkerHelper {
     logger.log("RDD compute starting")
 
     val parent: RDD[Row] = df.rdd
-    val computed: RDD[Row] = new WorkerRDD[Row](parent, sessionId, closure)
+    val computed: RDD[Row] = new WorkerRDD[Row](
+      parent,
+      sessionId,
+      closure,
+      df.columns)
 
     computed
   }
