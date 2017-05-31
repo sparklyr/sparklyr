@@ -554,12 +554,12 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
   ensure_scalar_integer(from)
 
   transformed <- invoke_static(sc,
-                      "sparklyr.Utils",
-                      "addSequentialIndex",
-                      spark_context(sc),
-                      sdf,
-                      from,
-                      id)
+                               "sparklyr.Utils",
+                               "addSequentialIndex",
+                               spark_context(sc),
+                               sdf,
+                               from,
+                               id)
 
   sdf_register(transformed)
 }
@@ -694,3 +694,36 @@ sdf_broadcast <- function(x) {
                 "broadcast", sdf) %>%
     sdf_register()
 }
+
+#' Repartition a Spark DataFrame
+#'
+#' @template roxlate-ml-x
+#'
+#' @param partitions number of partitions
+#' @param columns vector of column names used for partitioning, only supported for Spark 2.0+
+#'
+#' @export
+sdf_repartition <- function(x, partitions = NULL, columns = NULL) {
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+
+  partitions <- partitions %||% 0L
+  ensure_scalar_integer(partitions, allow.null = TRUE)
+
+  if (spark_version(sc) >= "2.0.0") {
+    columns <- as.list(columns) %>%
+      lapply(ensure_scalar_character)
+
+    return(
+      invoke_static(sc, "sparklyr.Utils200", "repartition", sdf, partitions, columns) %>%
+        sdf_register()
+    )
+  } else {
+    if (!is.null(columns))
+      stop("partitioning by columns only supported for Spark 2.0.0 and later")
+
+    invoke(sdf, "repartition", partitions) %>%
+      sdf_register()
+  }
+}
+

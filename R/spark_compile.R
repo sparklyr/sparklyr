@@ -45,11 +45,13 @@ spark_compile <- function(jar_name,
   jar_path <- file.path(java_path, jar_name)
 
   scala_path <- file.path(root, "java")
-  scala_files <- list.files(scala_path, pattern = "scala$", full.names = TRUE)
+  scala_files <- list.files(scala_path, pattern = "scala$",
+                            full.names = TRUE,
+                            recursive = TRUE)
 
   # apply user filter to scala files
   if (is.function(filter))
-    scala_files <- filter(scala_files)
+    scala_files <- Filter(filter, scala_files)
 
   message("==> using scalac ", scalac_version)
   message("==> building against Spark ", spark_version)
@@ -239,25 +241,29 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
       spark_version = "1.5.2",
       scalac_path = find_scalac("2.10"),
       jar_name = sprintf("%s-1.5-2.10.jar", pkg),
-      jar_path = find_jar()
+      jar_path = find_jar(),
+      scala_filter = make_version_filter("1.5.2")
     ),
     spark_compilation_spec(
       spark_version = "1.6.1",
       scalac_path = find_scalac("2.10"),
       jar_name = sprintf("%s-1.6-2.10.jar", pkg),
-      jar_path = find_jar()
+      jar_path = find_jar(),
+      scala_filter = make_version_filter("1.6.1")
     ),
     spark_compilation_spec(
       spark_version = "2.0.0",
       scalac_path = find_scalac("2.11"),
       jar_name = sprintf("%s-2.0-2.11.jar", pkg),
-      jar_path = find_jar()
+      jar_path = find_jar(),
+      scala_filter = make_version_filter("2.0.0")
     ),
     spark_compilation_spec(
       spark_version = "2.1.0",
       scalac_path = find_scalac("2.11"),
       jar_name = sprintf("%s-2.1-2.11.jar", pkg),
-      jar_path = find_jar()
+      jar_path = find_jar(),
+      scala_filter = make_version_filter("2.1.0")
     )
   )
 }
@@ -366,4 +372,18 @@ get_scalac_version <- function(scalac = Sys.which("scalac")) {
     system(cmd, intern = TRUE)
   splat <- strsplit(version_string, "\\s+", perl = TRUE)[[1]]
   splat[[4]]
+}
+
+make_version_filter <- function(version_upper) {
+  function(x) {
+    version <- x %>%
+      dirname() %>%
+      basename() %>%
+      strsplit("-") %>%
+      unlist() %>%
+      dplyr::last() %>%
+      numeric_version()
+
+    version <= numeric_version(version_upper)
+  }
 }

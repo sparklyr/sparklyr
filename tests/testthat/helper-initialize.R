@@ -68,3 +68,13 @@ check_tidy <- function(o, exp.row = NULL, exp.col = NULL, exp.names = NULL) {
     expect_true(all(exp.names %in% colnames(o)))
   }
 }
+
+sdf_query_plan <- function(x) {
+  x %>%
+    spark_dataframe() %>%
+    invoke("queryExecution") %>%
+    invoke("optimizedPlan") %>%
+    invoke("toString") %>%
+    strsplit("\n") %>%
+    unlist()
+}
