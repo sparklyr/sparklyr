@@ -51,7 +51,7 @@ spark_compile <- function(jar_name,
 
   # apply user filter to scala files
   if (is.function(filter))
-    scala_files <- Filter(filter, scala_files)
+    scala_files <- filter(scala_files)
 
   message("==> using scalac ", scalac_version)
   message("==> building against Spark ", spark_version)
@@ -375,15 +375,19 @@ get_scalac_version <- function(scalac = Sys.which("scalac")) {
 }
 
 make_version_filter <- function(version_upper) {
-  function(x) {
-    version <- x %>%
-      dirname() %>%
-      basename() %>%
-      strsplit("-") %>%
-      unlist() %>%
-      dplyr::last() %>%
-      numeric_version()
+  force(version_upper)
 
-    version <= numeric_version(version_upper)
+  function(files) {
+    Filter(function(file) {
+      version <- file %>%
+        dirname() %>%
+        basename() %>%
+        strsplit("-") %>%
+        unlist() %>%
+        dplyr::last() %>%
+        numeric_version()
+
+      version <= numeric_version(version_upper)
+    }, files)
   }
 }
