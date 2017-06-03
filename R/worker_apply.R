@@ -25,6 +25,10 @@ spark_worker_apply <- function(sc) {
       closure()
     })
 
+  if (!identical(typeof(data[[1]]), "list")) {
+    data <- lapply(data, function(e) list(e))
+  }
+
   worker_invoke(context, "setResultArraySeq", data)
   log("updated ", length(data), " rows")
 
