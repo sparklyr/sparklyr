@@ -4,3 +4,4 @@
 .Ruserdata
 log4j.*
 derby.log
+spark-warehouse/
