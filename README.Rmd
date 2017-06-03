@@ -10,6 +10,12 @@ output:
 other `sparklyr` extension, load `sparkworker`, `sparklyr` and connecto to
 Apache Spark:
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(fig.path = "tools/readme/", dev = "png")
+```
+
 ```{r}
 library(sparkworker)
 library(sparklyr)
@@ -27,6 +33,16 @@ spark_apply(iris_tbl, function(row) {
 })
 ```
 
+We can calculate $pi$ using `dplyr` and `spark_apply` as follows:
+
+```{r}
+library(dplyr)
+
+sdf_len(sc, 10000) %>%
+  spark_apply(function() sum(runif(2, min = -1, max = 1) ^ 2) < 1) %>%
+  filter(id) %>% count() %>% collect() * 4 / 10000
+```
+
 Notice that `spark_log` shows `sparklyr` performing the following operations:
 
  1. The `Gateway` receives a request to execute custom `RDD` of type `WorkerRDD`.
@@ -36,7 +52,7 @@ Notice that `spark_log` shows `sparklyr` performing the following operations:
     backend, retrieves data, performs the clossure and updates the result.
 
 ```{r}
-spark_log(sc, filter = "sparklyr:")
+spark_log(sc, filter = "sparklyr:", n = 30)
 ```
 
 Finally, we disconnect:
