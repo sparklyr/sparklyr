@@ -2,6 +2,9 @@
 
 export(compile_sparkworker_jars)
 export(debug_backend)
+export(sdf_along)
+export(sdf_len)
+export(sdf_seq)
 export(spark_apply)
 export(update_sources_class)
 import(sparklyr)
