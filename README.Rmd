@@ -10,12 +10,6 @@ output:
 other `sparklyr` extension, load `sparkworker`, `sparklyr` and connecto to
 Apache Spark:
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = TRUE)
-knitr::opts_chunk$set(warning = FALSE)
-knitr::opts_chunk$set(fig.path = "tools/readme/", dev = "png")
-```
-
 ```{r}
 library(sparkworker)
 library(sparklyr)
@@ -33,9 +27,9 @@ spark_apply(iris_tbl, function(row) {
 })
 ```
 
-We can calculate $pi$ using `dplyr` and `spark_apply` as follows:
+We can calculate π using `dplyr` and `spark_apply` as follows:
 
-```{r}
+```{r message=FALSE}
 library(dplyr)
 
 sdf_len(sc, 10000) %>%
