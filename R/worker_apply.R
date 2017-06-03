@@ -18,7 +18,12 @@ spark_worker_apply <- function(sc) {
     e
   })
 
-  data <- lapply(data, closure)
+  data <- if (length(formals(closure)) > 0)
+    lapply(data, closure)
+  else
+    lapply(data, function(e) {
+      closure()
+    })
 
   worker_invoke(context, "setResultArraySeq", data)
   log("updated ", length(data), " rows")
