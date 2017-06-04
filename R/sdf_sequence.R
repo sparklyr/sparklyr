@@ -8,7 +8,7 @@
 #'   data across the Spark cluster.
 #'
 #' @export
-sdf_len <- function(sc, length, repartition = 1L) {
+sdf_len <- function(sc, length, repartition = NULL) {
   sdf_seq(sc, 1, length, repartition = repartition)
 }
 
@@ -22,7 +22,7 @@ sdf_len <- function(sc, length, repartition = 1L) {
 #'   data across the Spark cluster.
 #'
 #' @export
-sdf_seq <- function(sc, from = 1L, to = 1L, by = 1L, repartition = 1L) {
+sdf_seq <- function(sc, from = 1L, to = 1L, by = 1L, repartition = NULL) {
   from <- ensure_scalar_integer(from)
   to <- ensure_scalar_integer(to + 1)
   by <- ensure_scalar_integer(by)
@@ -49,6 +49,6 @@ sdf_seq <- function(sc, from = 1L, to = 1L, by = 1L, repartition = 1L) {
 #'   data across the Spark cluster.
 #'
 #' @export
-sdf_along <- function(sc, along, repartition = 1L) {
+sdf_along <- function(sc, along, repartition = NULL) {
   sdf_len(sc, length(along), repartition = repartition)
 }
