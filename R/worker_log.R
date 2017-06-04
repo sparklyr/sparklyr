@@ -19,25 +19,18 @@ worker_log_format <- function(message, level = "INFO") {
 worker_log_level <- function(..., level) {
   args = list(...)
   message <- paste(args, sep = "", collapse = "")
-  formatted <- log_format(message, level)
+  formatted <- worker_log_format(message, level)
   cat(formatted, "\n")
 }
 
 worker_log <- function(...) {
-  log_level(..., level = "INFO")
+  worker_log_level(..., level = "INFO")
 }
 
 worker_log_warning<- function(...) {
-  log_level(..., level = "WARN")
+  worker_log_level(..., level = "WARN")
 }
 
 worker_log_error <- function(...) {
-  log_level(..., level = "ERROR")
+  worker_log_level(..., level = "ERROR")
 }
-
-unlockBinding("stop",  as.environment("package:base"))
-assign("stop", function(...) {
-  log_error(...)
-  quit(status = -1)
-}, as.environment("package:base"))
-lockBinding("stop",  as.environment("package:base"))

@@ -1,4 +1,6 @@
 spark_worker_main <- function(sessionId) {
+  spark_worker_hooks()
+
   log_session(sessionId)
   worker_log("is starting")
 
@@ -14,4 +16,13 @@ spark_worker_main <- function(sessionId) {
   })
 
   worker_log("finished")
+}
+
+spark_worker_hooks <- function() {
+  unlockBinding("stop",  as.environment("package:base"))
+  assign("stop", function(...) {
+    worker_log_error(...)
+    quit(status = -1)
+  }, as.environment("package:base"))
+  lockBinding("stop",  as.environment("package:base"))
 }
