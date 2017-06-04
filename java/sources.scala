@@ -3,7 +3,17 @@ package SparkWorker
 object Embedded {
   def sources: String = "" +
     "spark_worker_apply <- function(sc) {\n" +
-    "  context <- worker_invoke_static(sc, \"SparkWorker.WorkerRDD\", \"getContext\")\n" +
+    "  hostContextId <- invoke_method(sc, FALSE, \"Handler\", \"getHostContext\")\n" +
+    "  log(\"retrieved worker context id \", hostContextId)\n" +
+    "\n" +
+    "  context <- structure(\n" +
+    "    class = c(\"spark_jobj\", \"worker_jobj\"),\n" +
+    "    list(\n" +
+    "      id = hostContextId,\n" +
+    "      connection = sc\n" +
+    "    )\n" +
+    "  )\n" +
+    "\n" +
     "  log(\"retrieved worker context\")\n" +
     "\n" +
     "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
@@ -702,7 +712,7 @@ object Embedded {
     "    spark_worker_apply(sc)\n" +
     "\n" +
     "  }, error = function(e) {\n" +
-    "      stop(\"terminated unexpectedly: \", e)\n" +
+    "    stop(\"terminated unexpectedly: \", e)\n" +
     "  })\n" +
     "\n" +
     "  log(\"finished\")\n" +

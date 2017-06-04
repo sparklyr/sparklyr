@@ -20,20 +20,20 @@ spark_apply(iris_tbl, function(row) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_1237f2ce5d260> [?? x 5]
+    ## # Source:   table<sparklyr_tmp_10e78179546a1> [?? x 5]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
     ##           <dbl>       <dbl>        <dbl>       <dbl>   <chr>
-    ##  1          5.1         3.5          1.4   1.7039286  setosa
-    ##  2          4.9         3.0          1.4   1.3998011  setosa
-    ##  3          4.7         3.2          1.3   0.9800857  setosa
-    ##  4          4.6         3.1          1.5   2.5242787  setosa
-    ##  5          5.0         3.6          1.4   0.2391819  setosa
-    ##  6          5.4         3.9          1.7   2.7948977  setosa
-    ##  7          4.6         3.4          1.4   2.5383136  setosa
-    ##  8          5.0         3.4          1.5   0.8165440  setosa
-    ##  9          4.4         2.9          1.4   5.0286428  setosa
-    ## 10          4.9         3.1          1.5   4.1336981  setosa
+    ##  1          5.1         3.5          1.4   4.0620505  setosa
+    ##  2          4.9         3.0          1.4   1.0869843  setosa
+    ##  3          4.7         3.2          1.3   2.9272488  setosa
+    ##  4          4.6         3.1          1.5   1.8834738  setosa
+    ##  5          5.0         3.6          1.4   2.0481534  setosa
+    ##  6          5.4         3.9          1.7   3.1012484  setosa
+    ##  7          4.6         3.4          1.4   0.6176524  setosa
+    ##  8          5.0         3.4          1.5   0.9280065  setosa
+    ##  9          4.4         2.9          1.4   1.6219857  setosa
+    ## 10          4.9         3.1          1.5   1.2929423  setosa
     ## # ... with 140 more rows
 
 We can calculate π using `dplyr` and `spark_apply` as follows:
@@ -47,7 +47,7 @@ sdf_len(sc, 10000) %>%
 ```
 
     ##        n
-    ## 1 3.1268
+    ## 1 3.1628
 
 Notice that `spark_log` shows `sparklyr` performing the following operations:
 
@@ -59,36 +59,36 @@ Notice that `spark_log` shows `sparklyr` performing the following operations:
 spark_log(sc, filter = "sparklyr:", n = 30)
 ```
 
-    ## 17/06/02 22:57:36 INFO sparklyr: RScript (6620) retrieved 10000 rows 
-    ## 17/06/02 22:57:37 INFO sparklyr: RScript (6620) updated 10000 rows 
-    ## 17/06/02 22:57:37 INFO sparklyr: RScript (6620) finished apply 
-    ## 17/06/02 22:57:37 INFO sparklyr: RScript (6620) finished 
-    ## 17/06/02 22:57:37 INFO sparklyr: Worker (6620) R process completed
-    ## 17/06/02 22:57:37 INFO sparklyr: Worker (6620) Backend starting
-    ## 17/06/02 22:57:37 INFO sparklyr: Worker (6620) RScript starting
-    ## 17/06/02 22:57:37 INFO sparklyr: Worker (6620) Path to source file /var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/sparkworker/219a155c-4243-4c17-9838-9f01e304ab89/sparkworker.R
-    ## 17/06/02 22:57:37 INFO sparklyr: Worker (6620) R process starting
-    ## 17/06/02 22:57:37 INFO sparklyr: RScript (6620) is starting 
-    ## 17/06/02 22:57:37 INFO sparklyr: RScript (6620) is connecting to backend using port 8880 
-    ## 17/06/02 22:57:38 INFO sparklyr: Worker (6620) accepted connection
-    ## 17/06/02 22:57:38 INFO sparklyr: Worker (6620) is waiting for sparklyr client to connect to port 51291
-    ## 17/06/02 22:57:38 INFO sparklyr: Worker (6620) received command 0
-    ## 17/06/02 22:57:38 INFO sparklyr: Worker (6620) found requested session matches current session
-    ## 17/06/02 22:57:38 INFO sparklyr: Worker (6620) is creating backend and allocating system resources
-    ## 17/06/02 22:57:38 INFO sparklyr: Worker (6620) created the backend
-    ## 17/06/02 22:57:38 INFO sparklyr: Worker (6620) is waiting for r process to end
-    ## 17/06/02 22:57:38 INFO sparklyr: RScript (6620) is connected to backend 
-    ## 17/06/02 22:57:38 INFO sparklyr: RScript (6620) is connecting to backend session 
-    ## 17/06/02 22:57:38 INFO sparklyr: RScript (6620) is connected to backend session 
-    ## 17/06/02 22:57:38 INFO sparklyr: RScript (6620) created connection 
-    ## 17/06/02 22:57:38 INFO sparklyr: RScript (6620) is connected 
-    ## 17/06/02 22:57:38 INFO sparklyr: RScript (6620) retrieved worker context 
-    ## 17/06/02 22:57:38 INFO sparklyr: RScript (6620) found 10000 rows 
-    ## 17/06/02 22:57:39 INFO sparklyr: RScript (6620) retrieved 10000 rows 
-    ## 17/06/02 22:57:40 INFO sparklyr: RScript (6620) updated 10000 rows 
-    ## 17/06/02 22:57:40 INFO sparklyr: RScript (6620) finished apply 
-    ## 17/06/02 22:57:40 INFO sparklyr: RScript (6620) finished 
-    ## 17/06/02 22:57:40 INFO sparklyr: Worker (6620) R process completed
+    ## 17/06/04 00:11:15 INFO sparklyr: Gateway (1438) found mapping for session 1289
+    ## 17/06/04 00:11:15 INFO sparklyr: Worker (1289) accepted connection
+    ## 17/06/04 00:11:15 INFO sparklyr: Worker (1289) is waiting for sparklyr client to connect to port 61010
+    ## 17/06/04 00:11:15 INFO sparklyr: Worker (1289) received command 0
+    ## 17/06/04 00:11:15 INFO sparklyr: Worker (1289) found requested session matches current session
+    ## 17/06/04 00:11:15 INFO sparklyr: Worker (1289) is creating backend and allocating system resources
+    ## 17/06/04 00:11:15 INFO sparklyr: Worker (1289) created the backend
+    ## 17/06/04 00:11:15 INFO sparklyr: Worker (1289) is waiting for r process to end
+    ## 17/06/04 00:11:15 INFO sparklyr: RScript (1289) is connected to backend 
+    ## 17/06/04 00:11:15 INFO sparklyr: RScript (1289) is connecting to backend session 
+    ## 17/06/04 00:11:15 INFO sparklyr: RScript (1289) is connected to backend session 
+    ## 17/06/04 00:11:15 INFO sparklyr: RScript (1289) created connection 
+    ## 17/06/04 00:11:15 INFO sparklyr: RScript (1289) is connected 
+    ## 17/06/04 00:11:15 INFO sparklyr: RScript (1289) retrieved worker context id 124 
+    ## 17/06/04 00:11:15 INFO sparklyr: RScript (1289) retrieved worker context 
+    ## 17/06/04 00:11:15 INFO sparklyr: RScript (1289) found 5000 rows 
+    ## 17/06/04 00:11:16 INFO sparklyr: RScript (1289) retrieved 5000 rows 
+    ## 17/06/04 00:11:16 INFO sparklyr: RScript (1289) updated 5000 rows 
+    ## 17/06/04 00:11:16 INFO sparklyr: Worker (1289) Wait using lock for RScript completed
+    ## 17/06/04 00:11:16 INFO sparklyr: RScript (1289) finished apply 
+    ## 17/06/04 00:11:16 INFO sparklyr: RScript (1289) finished 
+    ## 17/06/04 00:11:16 INFO sparklyr: Worker (1289) R process completed
+    ## 17/06/04 00:11:16 INFO sparklyr: Worker (1289) is unregistering session in gateway
+    ## 17/06/04 00:11:16 INFO sparklyr: Gateway (1438) accepted connection
+    ## 17/06/04 00:11:16 INFO sparklyr: Worker (1289) is waiting for unregistration in gateway
+    ## 17/06/04 00:11:16 INFO sparklyr: Gateway (1438) is waiting for sparklyr client to connect to port 8880
+    ## 17/06/04 00:11:16 INFO sparklyr: Gateway (1438) received command 2
+    ## 17/06/04 00:11:16 INFO sparklyr: Gateway (1438) received session 1289 unregistration request
+    ## 17/06/04 00:11:16 INFO sparklyr: Gateway (1438) found session 1289 during unregistration request
+    ## 17/06/04 00:11:16 INFO sparklyr: Worker (1289) finished unregistration in gateway with status 0
 
 Finally, we disconnect:
 
