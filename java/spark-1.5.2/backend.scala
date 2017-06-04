@@ -68,6 +68,7 @@ class Backend {
   private[this] var isRemote: Boolean = false
   private[this] var isWorker: Boolean = false
 
+  private[this] var hostContext: String = null
   private[this] var gatewayServerSocket: ServerSocket = null
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
@@ -119,17 +120,23 @@ class Backend {
     available
   }
 
-  def init(portParam: Int,
-           sessionIdParam: Int,
-           isServiceParam: Boolean,
-           isRemoteParam: Boolean,
-           isWorkerParam: Boolean): Unit = {
-
-    port = portParam
-    sessionId = sessionIdParam
+  def setType(isServiceParam: Boolean,
+              isRemoteParam: Boolean,
+              isWorkerParam: Boolean) = {
     isService = isServiceParam
     isRemote = isRemoteParam
     isWorker = isWorkerParam
+  }
+
+  def setHostContext(hostContextParam: String) = {
+    hostContext = hostContextParam
+  }
+
+  def init(portParam: Int,
+           sessionIdParam: Int): Unit = {
+
+    port = portParam
+    sessionId = sessionIdParam
 
     logger = new Logger("Session", sessionId)
 
@@ -220,6 +227,8 @@ class Backend {
                 logger.log("is creating backend and allocating system resources")
 
                 val backendChannel = new BackendChannel(logger)
+                backendChannel.setHostContext(hostContext)
+
                 val backendPort: Int = backendChannel.init(isRemote)
 
                 logger.log("created the backend")

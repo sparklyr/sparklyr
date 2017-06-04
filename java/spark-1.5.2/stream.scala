@@ -12,7 +12,12 @@ import sparklyr.Serializer._
 
 object StreamHandler {
 
-  def read(msg: Array[Byte], classMap: Map[String, Object], logger: Logger): Array[Byte] = {
+  def read(
+    msg: Array[Byte],
+    classMap: Map[String, Object],
+    logger: Logger,
+    hostContext: String): Array[Byte] = {
+
     val bis = new ByteArrayInputStream(msg)
     val dis = new DataInputStream(bis)
 
@@ -46,9 +51,12 @@ object StreamHandler {
               writeInt(dos, -1)
               writeString(dos, s"Removing $objId failed: ${e.getMessage}")
           }
+        case "getHostContext" =>
+          writeInt(dos, 0)
+          writeObject(dos, hostContext.asInstanceOf[AnyRef])
         case _ =>
           dos.writeInt(-1)
-        writeString(dos, s"Error: unknown method $methodName")
+          writeString(dos, s"Error: unknown method $methodName")
       }
     } else {
       handleMethodCall(isStatic, objId, methodName, numArgs, dis, dos, classMap, logger)
