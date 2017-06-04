@@ -1,3 +1,14 @@
+create_hive_context.livy_connection <- function(sc) {
+  if (spark_version(sc) >= "2.0.0")
+    create_hive_context_v2(sc)
+  else
+    invoke_new(
+      sc,
+      "org.apache.spark.sql.hive.HiveContext",
+      sc$spark_context
+    )
+}
+
 #' @import httr
 #' @importFrom httr http_error
 #' @importFrom httr http_status
@@ -548,7 +559,7 @@ livy_connection <- function(master,
 
   session <- livy_create_session(master, config)
 
-  sc <- structure(class = c("spark_connection", "livy_connection"), list(
+  sc <- structure(class = c("spark_connection", "livy_connection", "DBIConnection"), list(
     master = master,
     sessionId = session$id,
     config = config,
@@ -719,17 +730,9 @@ initialize_connection.livy_connection <- function(sc) {
       sc$spark_context
     )
 
-    if (spark_version(sc) >= "2.0.0") {
-      sc$hive_context <- create_hive_context_v2(sc)
-    }
-    else {
-      sc$hive_context <- invoke_new(
-        sc,
-        "org.apache.spark.sql.hive.HiveContext",
-        sc$spark_context
-      )
+    sc$hive_context <- create_hive_context(sc)
 
-      # apply configuration
+    if (spark_version(sc) < "2.0.0") {
       params <- connection_config(sc, "spark.sql.")
       apply_config(params, hive_context, "setConf", "spark.sql.")
     }
