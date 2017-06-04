@@ -65,17 +65,18 @@ class WorkerContext[T: ClassTag](
 
 class WorkerRDD[T: ClassTag](
   parent: RDD[T],
-  sessionId: Int,
   closure: Array[Byte],
   columns: Array[String]
   ) extends RDD[T](parent) {
 
   private[this] var port: Int = 8880
+  private[this] var exception: Option[Exception] = None
 
   override def getPartitions = parent.partitions
 
   override def compute(split: Partition, task: TaskContext): Iterator[T] = {
 
+    val sessionId: Int = scala.util.Random.nextInt(10000)
     val logger = new Logger("Worker", sessionId)
     val lock: AnyRef = new Object()
 
@@ -162,14 +163,9 @@ class WorkerRDD[T: ClassTag](
 object WorkerHelper {
   def computeRdd(df: DataFrame, closure: Array[Byte]): RDD[Row] = {
 
-    val sessionId = scala.util.Random.nextInt(10000)
-    val logger = new Logger("Worker", sessionId)
-    logger.log("RDD compute starting")
-
     val parent: RDD[Row] = df.rdd
     val computed: RDD[Row] = new WorkerRDD[Row](
       parent,
-      sessionId,
       closure,
       df.columns)
 
