@@ -1,37 +1,37 @@
-log_env <- new.env()
+worker_log_env <- new.env()
 
-log_session <- function(sessionId) {
-  assign('sessionId', sessionId, envir = log_env)
+worker_log_session <- function(sessionId) {
+  assign('sessionId', sessionId, envir = worker_log_env)
 }
 
-log_format <- function(message, level = "INFO") {
+worker_log_format <- function(message, level = "INFO") {
   paste(
     format(Sys.time(), "%y/%m/%d %H:%M:%S"),
     " ",
     level,
     " sparklyr: RScript (",
-    log_env$sessionId,
+    worker_log_env$sessionId,
     ") ",
     message,
     sep = "")
 }
 
-log_level <- function(..., level) {
+worker_log_level <- function(..., level) {
   args = list(...)
   message <- paste(args, sep = "", collapse = "")
   formatted <- log_format(message, level)
   cat(formatted, "\n")
 }
 
-log <- function(...) {
+worker_log <- function(...) {
   log_level(..., level = "INFO")
 }
 
-log_warning<- function(...) {
+worker_log_warning<- function(...) {
   log_level(..., level = "WARN")
 }
 
-log_error <- function(...) {
+worker_log_error <- function(...) {
   log_level(..., level = "ERROR")
 }
 

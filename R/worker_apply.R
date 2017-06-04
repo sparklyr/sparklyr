@@ -1,6 +1,6 @@
 spark_worker_apply <- function(sc) {
   hostContextId <- invoke_method(sc, FALSE, "Handler", "getHostContext")
-  log("retrieved worker context id ", hostContextId)
+  worker_log("retrieved worker context id ", hostContextId)
 
   context <- structure(
     class = c("spark_jobj", "worker_jobj"),
@@ -10,13 +10,13 @@ spark_worker_apply <- function(sc) {
     )
   )
 
-  log("retrieved worker context")
+  worker_log("retrieved worker context")
 
   length <- worker_invoke(context, "getSourceArrayLength")
-  log("found ", length, " rows")
+  worker_log("found ", length, " rows")
 
   data <- worker_invoke(context, "getSourceArraySeq")
-  log("retrieved ", length(data), " rows")
+  worker_log("retrieved ", length(data), " rows")
 
   closureRaw <- worker_invoke(context, "getClosure")
   closure <- unserialize(closureRaw)
@@ -40,10 +40,10 @@ spark_worker_apply <- function(sc) {
   }
 
   worker_invoke(context, "setResultArraySeq", data)
-  log("updated ", length(data), " rows")
+  worker_log("updated ", length(data), " rows")
 
   spark_split <- worker_invoke(context, "finish")
-  log("finished apply")
+  worker_log("finished apply")
 }
 
 spark_worker_collect <- function(sc) {
