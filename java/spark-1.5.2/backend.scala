@@ -44,8 +44,8 @@ import scala.util.Try
  * gateway socket accept() method waiting for clients to connect. Once a client
  * connects, it launches a thread to process the client requests and blocks again.
  *
- * In the gateway socket, the thread listens for two commands: GetPorts or
- * RegisterInstance.
+ * In the gateway socket, the thread listens for commands: GetPorts,
+ * RegisterInstance or UnregisterInstance.
  *
  * GetPorts provides a mapping to the gateway/backend ports. In a single-client/
  * single-backend scenario, the sessionid from the current instance and the
@@ -69,6 +69,11 @@ class Backend {
   private[this] var isWorker: Boolean = false
 
   private[this] var hostContext: String = null
+
+  private[this] var isRunning: Boolean = true
+  private[this] var isRegistered: Boolean = false
+  private[this] var gatewayPort: Int = 0
+
   private[this] var gatewayServerSocket: ServerSocket = null
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
@@ -83,7 +88,7 @@ class Backend {
   private[this] var logger: Logger = new Logger("Session", 0);
 
   object GatewayOperattions extends Enumeration {
-    val GetPorts, RegisterInstance = Value
+    val GetPorts, RegisterInstance, UnregisterInstance = Value
   }
 
   def getOrCreateHiveContext(sc: SparkContext): HiveContext = {
@@ -173,19 +178,21 @@ class Backend {
         if (isWorker) logger = new Logger("Worker", sessionId)
 
         gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
-        val gatewayPort = port
+        gatewayPort = port
         port = gatewayServerSocket.getLocalPort()
 
         val success = register(gatewayPort, sessionId, port)
         if (!success) {
           logger.logError("failed to register on gateway port " + gatewayPort)
-          System.exit(1)
+          if (!isService) System.exit(1)
         }
+
+        isRegistered = true
       }
 
       gatewayServerSocket.setSoTimeout(0)
 
-      while(true) {
+      while(isRunning) {
         bind()
       }
     } catch {
@@ -251,6 +258,16 @@ class Backend {
 
                         if (!isService) System.exit(1)
                       }
+
+                      if (isRegistered) {
+                        val success = unregister(gatewayPort, sessionId)
+                        if (!success) {
+                          logger.logError("failed to unregister on gateway port " + gatewayPort)
+                          if (!isService) System.exit(1)
+                        }
+                      }
+
+                      isRunning = false
                     }
                   }.start()
 
@@ -309,12 +326,27 @@ class Backend {
 
               logger.log("received session " + registerSessionId + " registration request")
 
+              sessionsMap += (registerSessionId -> registerGatewayPort)
+
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
               dos.writeInt(0)
               dos.flush()
               dos.close()
+            }
+            case GatewayOperattions.UnregisterInstance => {
+              val unregisterSessionId = dis.readInt()
 
-              sessionsMap += (registerSessionId -> registerGatewayPort)
+              logger.log("received session " + unregisterSessionId + " unregistration request")
+
+              if (sessionsMap.contains(unregisterSessionId)) {
+                logger.log("found session " + unregisterSessionId + " during unregistration request")
+                sessionsMap -= unregisterSessionId
+              }
+
+              val dos = new DataOutputStream(gatewaySocket.getOutputStream())
+              dos.writeInt(0)
+              dos.flush()
+              dos.close()
             }
           }
 
@@ -345,6 +377,26 @@ class Backend {
     val status = dis.readInt()
 
     logger.log("finished registration in gateway with status " + status)
+
+    s.close()
+    status == 0
+  }
+
+  def unregister(gatewayPort: Int, sessionId: Int): Boolean = {
+    logger.log("is unregistering session in gateway")
+
+    val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
+
+    val dos = new DataOutputStream(s.getOutputStream())
+    dos.writeInt(GatewayOperattions.UnregisterInstance.id)
+    dos.writeInt(sessionId)
+
+    logger.log("is waiting for unregistration in gateway")
+
+    val dis = new DataInputStream(s.getInputStream())
+    val status = dis.readInt()
+
+    logger.log("finished unregistration in gateway with status " + status)
 
     s.close()
     status == 0
