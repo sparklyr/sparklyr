@@ -1,7 +1,7 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
-- Added `sdf_repartition()` to support repartitioning of Spark
-  DataFrames.
+- Added `sdf_repartition()` and `sdf_num_partitions()` to support
+  repartitioning and getting the number of partitions of Spark DataFrames.
 
 - Added `spark_set_checkpoint_dir()`, `spark_get_checkpoint_dir()`, and 
   `sdf_checkpoint()` to enable checkpointing.
