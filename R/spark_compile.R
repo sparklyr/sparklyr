@@ -45,9 +45,7 @@ spark_compile <- function(jar_name,
   jar_path <- file.path(java_path, jar_name)
 
   scala_path <- file.path(root, "java")
-  scala_files <- list.files(scala_path, pattern = "scala$",
-                            full.names = TRUE,
-                            recursive = TRUE)
+  scala_files <- list.files(scala_path, pattern = "scala$", full.names = TRUE)
 
   # apply user filter to scala files
   if (is.function(filter))
@@ -241,29 +239,25 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
       spark_version = "1.5.2",
       scalac_path = find_scalac("2.10"),
       jar_name = sprintf("%s-1.5-2.10.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("1.5.2")
+      jar_path = find_jar()
     ),
     spark_compilation_spec(
       spark_version = "1.6.1",
       scalac_path = find_scalac("2.10"),
       jar_name = sprintf("%s-1.6-2.10.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("1.6.1")
+      jar_path = find_jar()
     ),
     spark_compilation_spec(
       spark_version = "2.0.0",
       scalac_path = find_scalac("2.11"),
       jar_name = sprintf("%s-2.0-2.11.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("2.0.0")
+      jar_path = find_jar()
     ),
     spark_compilation_spec(
       spark_version = "2.1.0",
       scalac_path = find_scalac("2.11"),
       jar_name = sprintf("%s-2.1-2.11.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("2.1.0")
+      jar_path = find_jar()
     )
   )
 }
@@ -372,22 +366,4 @@ get_scalac_version <- function(scalac = Sys.which("scalac")) {
     system(cmd, intern = TRUE)
   splat <- strsplit(version_string, "\\s+", perl = TRUE)[[1]]
   splat[[4]]
-}
-
-make_version_filter <- function(version_upper) {
-  force(version_upper)
-
-  function(files) {
-    Filter(function(file) {
-      version <- file %>%
-        dirname() %>%
-        basename() %>%
-        strsplit("-") %>%
-        unlist() %>%
-        dplyr::last() %>%
-        numeric_version()
-
-      version <= numeric_version(version_upper)
-    }, files)
-  }
 }
