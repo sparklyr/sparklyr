@@ -1,5 +1,5 @@
 spark_worker_apply <- function(sc) {
-  hostContextId <- invoke_method(sc, FALSE, "Handler", "getHostContext")
+  hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
 
   context <- structure(
