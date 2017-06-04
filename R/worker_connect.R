@@ -54,6 +54,3 @@ spark_worker_connect <- function(sessionId) {
   sc
 }
 
-jobj_subclass.shell_backend <- function(con) {
-  "worker_jobj"
-}

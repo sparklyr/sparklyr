@@ -7,7 +7,7 @@ worker_invoke <- function(jobj, method, ...) {
   UseMethod("worker_invoke")
 }
 
-worker_invoke.worker_jobj <- function(jobj, method, ...) {
+worker_invoke.shell_jobj <- function(jobj, method, ...) {
   worker_invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)
 }
 
