@@ -118,6 +118,10 @@ class WorkerRDD[T: ClassTag](
         } catch {
           case e: Exception =>
             logger.logError("Failed to start backend: ", e)
+            exception = Some(e)
+            lock.synchronized {
+              lock.notify
+            }
         }
       }
     }.start()
@@ -128,17 +132,28 @@ class WorkerRDD[T: ClassTag](
           logger.log("RScript starting")
 
           val rscript = new Rscript(logger)
-          rscript.init(sessionId, lock)
+          rscript.init(sessionId)
         } catch {
           case e: Exception =>
             logger.logError("Failed to start rscript: ", e)
+            exception = Some(e)
+            lock.synchronized {
+              lock.notify
+            }
         }
       }
     }.start()
 
+    logger.log("Waiting using lock for RScript to complete")
     lock.synchronized {
       lock.wait()
     }
+
+    if (exception.isDefined) {
+      throw exception.get
+    }
+
+    logger.log("Wait using lock for RScript completed")
 
     return workerContext.getResultArray().iterator
   }

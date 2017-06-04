@@ -24,7 +24,7 @@ class Rscript(logger: Logger) {
     tempFile.getAbsolutePath()
   }
 
-  def init(sessionId: Int, lock: AnyRef) = {
+  def init(sessionId: Int) = {
     val sparkConf = SparkEnv.get.conf
     val command: String = sparkConf.get("spark.r.command", "Rscript")
 
@@ -49,10 +49,6 @@ class Rscript(logger: Logger) {
       logger.log("R process completed")
     } else {
       logger.logError("R process failed")
-
-      lock.synchronized {
-        lock.notify
-      }
 
       throw new Exception(s"sparklyr worker rscript failure, check worker logs for details.")
     }
