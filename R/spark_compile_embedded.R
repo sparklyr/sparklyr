@@ -1,5 +1,5 @@
 #' @export
-update_sources_class <- function() {
+spark_compile_embedded_sources <- function() {
   worker_files <- dir("R", full.names = TRUE, pattern = "worker")
   rlines <- unlist(lapply(worker_files, function(e) readLines(e)))
   rlines <- gsub("\\\\", "\\\\\\\\", rlines)
