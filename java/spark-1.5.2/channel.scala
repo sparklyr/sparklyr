@@ -25,6 +25,11 @@ class BackendChannel(logger: Logger) {
   private[this] var bootstrap: ServerBootstrap = null
   private[this] var bossGroup: EventLoopGroup = null
   private[this] var inetAddress: InetSocketAddress = null
+  private[this] var hostContext: String = null
+
+  def setHostContext(hostContextParam: String) {
+    hostContext = hostContextParam
+  }
 
   def init(remote: Boolean): Int = {
     if (remote) {
@@ -38,9 +43,9 @@ class BackendChannel(logger: Logger) {
     }
 
     val conf = new SparkConf()
-    bossGroup = new NioEventLoopGroup(conf.getInt("sparklyr.backend.threads", 2))
+    bossGroup = new NioEventLoopGroup(conf.getInt("sparklyr.backend.threads", 10))
     val workerGroup = bossGroup
-    val handler = new BackendHandler(this, logger)
+    val handler = new BackendHandler(this, logger, hostContext)
 
     bootstrap = new ServerBootstrap()
       .group(bossGroup, workerGroup)

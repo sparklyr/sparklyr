@@ -3,12 +3,13 @@
 // Changes to this file will be reverted.
 //
 
-import scala.collection.mutable.HashMap
+import scala.collection.mutable.{Map, SynchronizedMap, HashMap}
 import scala.language.existentials
 
 object JVMObjectTracker {
 
-  private[this] val objMap = new HashMap[String, Object]
+  private[this] val objMap = new HashMap[String, Object] with
+                             SynchronizedMap[String, Object]
 
   private[this] var objCounter: Int = 0
 

@@ -41,7 +41,8 @@ object Shell {
     val isRemote = args.contains("--remote")
 
     backend = new Backend()
-    backend.init(port, sessionId, isService, isRemote, false)
+    backend.setType(isService, isRemote, false)
+    backend.init(port, sessionId)
   }
 
   def getBackend(): Backend = {

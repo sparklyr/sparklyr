@@ -11,7 +11,10 @@ import sparklyr.Serializer._
 import sparklyr.StreamHandler._
 
 @Sharable
-class BackendHandler(channel: BackendChannel, logger: Logger)
+class BackendHandler(
+  channel: BackendChannel,
+  logger: Logger,
+  hostContext: String)
 extends SimpleChannelInboundHandler[Array[Byte]] {
 
   override def channelRead0(ctx: ChannelHandlerContext, msg: Array[Byte]): Unit = {
@@ -43,10 +46,10 @@ extends SimpleChannelInboundHandler[Array[Byte]] {
 
           System.exit(0)
         case _ =>
-          reply = StreamHandler.read(msg, null, logger)
+          reply = StreamHandler.read(msg, null, logger, hostContext)
       }
     } else {
-      reply = StreamHandler.read(msg, null, logger)
+      reply = StreamHandler.read(msg, null, logger, hostContext)
     }
 
     ctx.write(reply)
