@@ -1,6 +1,6 @@
-package SparkWorker
+package sparklyr
 
-object Embedded {
+object Sources {
   def sources: String = "" +
     "spark_worker_apply <- function(sc) {\n" +
     "  hostContextId <- invoke_method(sc, FALSE, \"Handler\", \"getHostContext\")\n" +

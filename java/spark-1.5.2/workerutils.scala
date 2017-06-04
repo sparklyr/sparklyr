@@ -1,4 +1,4 @@
-package SparkWorker
+package sparklyr
 
 import java.io._
 import java.util.Arrays
@@ -11,7 +11,7 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 
-object Utils {
+object WorkerUtils {
 
   def buildStructTypeForLongField(): StructType = {
     val fields = Array(StructField("id", LongType, false))

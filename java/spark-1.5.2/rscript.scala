@@ -1,4 +1,4 @@
-package SparkWorker
+package sparklyr
 
 import java.io.{File, FileWriter}
 import java.util.Arrays
@@ -14,7 +14,7 @@ import sparklyr.Logger
 
 class Rscript(logger: Logger) {
   def workerSourceFile(): String = {
-    val source = Embedded.sources
+    val source = Sources.sources
 
     val tempFile: File = new File(createTempDir + File.separator + "sparkworker.R")
     val outStream: FileWriter = new FileWriter(tempFile)

@@ -31,9 +31,9 @@ sdf_seq <- function(sc, from = 1L, to = 1L, by = 1L, repartition = NULL) {
   repartition <- ensure_scalar_integer(repartition)
 
   rdd <- invoke(spark_context(sc), "range", from, to, by, repartition)
-  rdd <- invoke_static(sc, "SparkWorker.Utils", "mapRddLongToRddRow", rdd)
+  rdd <- invoke_static(sc, "sparklyr.WorkerUtils", "mapRddLongToRddRow", rdd)
 
-  schema <- invoke_static(sc, "SparkWorker.Utils", "buildStructTypeForLongField")
+  schema <- invoke_static(sc, "sparklyr.WorkerUtils", "buildStructTypeForLongField")
   sdf <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
 
   sdf_register(sdf)

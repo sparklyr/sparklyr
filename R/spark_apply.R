@@ -29,7 +29,7 @@ spark_apply <- function(x, f, names = colnames(x)) {
 
   closure <- serialize(f, NULL)
 
-  rdd <- invoke_static(sc, "SparkWorker.WorkerHelper", "computeRdd", sdf, closure)
+  rdd <- invoke_static(sc, "sparklyr.WorkerHelper", "computeRdd", sdf, closure)
   schema <- spark_schema_from_rdd(rdd, names)
 
   transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)

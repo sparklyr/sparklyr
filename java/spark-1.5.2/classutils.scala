@@ -1,4 +1,4 @@
-package SparkWorker
+package sparklyr
 
 object ClassUtils {
   def getClassLoader: ClassLoader = {

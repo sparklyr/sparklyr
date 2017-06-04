@@ -1,4 +1,4 @@
-package SparkWorker
+package sparklyr
 
 import java.io.File
 import java.util.UUID

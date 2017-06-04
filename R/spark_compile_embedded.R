@@ -7,14 +7,14 @@ spark_compile_embedded_sources <- function() {
   rlines <- c(rlines, "spark_worker_main(commandArgs(trailingOnly = TRUE)[1])")
 
   lines <- c(
-    "package SparkWorker",
+    "package sparklyr",
     "",
-    "object Embedded {",
+    "object WorkerSources {",
     "  def sources: String = \"\" +",
     paste("    \"", rlines, "\\n\" +", sep = ""),
     "    \"\"",
     "}"
   )
 
-  writeLines(lines, file.path("java", "sources.scala"))
+  writeLines(lines, file.path("java", "spark-1.5.2", "workersources.scala"))
 }
