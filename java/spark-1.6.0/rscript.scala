@@ -10,8 +10,6 @@ import org.apache.spark.sql._
 import ClassUtils._
 import FileUtils._
 
-import sparklyr.Logger
-
 class Rscript(logger: Logger) {
   def workerSourceFile(): String = {
     val source = Sources.sources

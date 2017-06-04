@@ -9,12 +9,12 @@ spark_compile_embedded_sources <- function() {
   lines <- c(
     "package sparklyr",
     "",
-    "object WorkerSources {",
+    "object Sources {",
     "  def sources: String = \"\" +",
     paste("    \"", rlines, "\\n\" +", sep = ""),
     "    \"\"",
     "}"
   )
 
-  writeLines(lines, file.path("java", "spark-1.5.2", "workersources.scala"))
+  writeLines(lines, file.path("java", "spark-1.6.0", "sources.scala"))
 }

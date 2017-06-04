@@ -6,10 +6,6 @@ import org.apache.spark.sql._
 
 import scala.reflect.ClassTag
 
-import sparklyr.Backend
-import sparklyr.Logger
-import sparklyr.JVMObjectTracker
-
 class WorkerRDD[T: ClassTag](
   parent: RDD[T],
   closure: Array[Byte],

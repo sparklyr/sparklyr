@@ -6,10 +6,6 @@ import org.apache.spark.sql._
 
 import scala.reflect.ClassTag
 
-import sparklyr.Backend
-import sparklyr.Logger
-import sparklyr.JVMObjectTracker
-
 class WorkerContext[T: ClassTag](
   rdd: RDD[T],
   split: Partition,
