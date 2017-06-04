@@ -7,7 +7,7 @@ spark_worker_connect <- function(sessionId) {
   gatewayInfo <- spark_connect_gateway(gatewayAddress,
                                        gatewayPort,
                                        sessionId,
-                                       config = config,
+                                       config = list(),
                                        isStarting = TRUE)
 
   log("is connected to backend")
