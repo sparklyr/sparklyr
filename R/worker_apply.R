@@ -1,5 +1,15 @@
 spark_worker_apply <- function(sc) {
-  context <- worker_invoke_static(sc, "SparkWorker.WorkerRDD", "getContext")
+  hostContextId <- invoke_method(sc, FALSE, "Handler", "getHostContext")
+  log("retrieved worker context id ", hostContextId)
+
+  context <- structure(
+    class = c("spark_jobj", "worker_jobj"),
+    list(
+      id = hostContextId,
+      connection = sc
+    )
+  )
+
   log("retrieved worker context")
 
   length <- worker_invoke(context, "getSourceArrayLength")

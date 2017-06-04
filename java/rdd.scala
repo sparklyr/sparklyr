@@ -8,6 +8,7 @@ import scala.reflect.ClassTag
 
 import sparklyr.Backend
 import sparklyr.Logger
+import sparklyr.JVMObjectTracker
 
 class WorkerContext[T: ClassTag](
   rdd: RDD[T],
@@ -62,18 +63,6 @@ class WorkerContext[T: ClassTag](
   }
 }
 
-object WorkerRDD {
-  private var context: Option[AnyRef] = None
-
-  def setContext(contextParam: AnyRef) = {
-    context = Some(contextParam)
-  }
-
-  def getContext(): AnyRef = {
-    context.get
-  }
-}
-
 class WorkerRDD[T: ClassTag](
   parent: RDD[T],
   sessionId: Int,
@@ -99,7 +88,8 @@ class WorkerRDD[T: ClassTag](
       columns
     )
 
-    WorkerRDD.setContext(workerContext)
+    val contextId = JVMObjectTracker.put(workerContext)
+    logger.log("Tracking worker context under " + contextId)
 
     new Thread("starting backend thread") {
       override def run(): Unit = {
@@ -111,12 +101,19 @@ class WorkerRDD[T: ClassTag](
            * initialize backend as worker and service, since exceptions and
            * closing terminating the r session should not shutdown the process
            */
-          backend.init(
-            port,
-            sessionId,
+          backend.setType(
             true,   /* isService */
             false,  /* isRemote */
             true    /* isWorker */
+          )
+
+          backend.setHostContext(
+            contextId
+          )
+
+          backend.init(
+            port,
+            sessionId
           )
         } catch {
           case e: Exception =>
