@@ -3,7 +3,7 @@ spark_worker_apply <- function(sc) {
   worker_log("retrieved worker context id ", hostContextId)
 
   context <- structure(
-    class = c("spark_jobj", "worker_jobj"),
+    class = c("spark_jobj", "shell_jobj"),
     list(
       id = hostContextId,
       connection = sc
