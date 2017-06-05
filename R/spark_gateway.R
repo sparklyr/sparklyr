@@ -1,3 +1,36 @@
+master_is_gateway <- function(master) {
+  length(grep("^(sparklyr://)?[^:]+:[0-9]+$", master)) > 0
+}
+
+gateway_connection <- function(master, config) {
+  if (!master_is_gateway(master)) {
+    stop("sparklyr gateway master expected to be formatted as sparklyr://address:port")
+  }
+
+  protocol <- strsplit(master, "//")[[1]]
+  components <- strsplit(protocol[[2]], ":")[[1]]
+  gatewayAddress <- components[[1]]
+  gatewayPort <- as.integer(components[[2]])
+  sessionId <- 0
+
+  gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
+                                       gatewayPort = gatewayPort,
+                                       sessionId = sessionId,
+                                       config = config)
+
+  if (is.null(gatewayInfo)) {
+    stop("Failed to connect to gateway: ", master)
+  }
+
+  sc <- spark_gateway_connection(master, config, gatewayInfo, gatewayAddress)
+
+  if (is.null(gatewayInfo)) {
+    stop("Failed to open connection from gateway: ", master)
+  }
+
+  sc
+}
+
 spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
   tryCatch({
     # set timeout for socket connection
