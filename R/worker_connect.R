@@ -1,13 +1,14 @@
 spark_worker_connect <- function(sessionId) {
   gatewayPort <- "8880"
   gatewayAddress <- "localhost"
+  config <- list()
 
   worker_log("is connecting to backend using port ", gatewayPort)
 
   gatewayInfo <- spark_connect_gateway(gatewayAddress,
                                        gatewayPort,
                                        sessionId,
-                                       config = list(),
+                                       config = config,
                                        isStarting = TRUE)
 
   worker_log("is connected to backend")
@@ -25,12 +26,8 @@ spark_worker_connect <- function(sessionId) {
   }, error = function(err) {
     close(gatewayInfo$gateway)
 
-    abort_shell(
-      paste("Failed to open connection to backend:", err$message),
-      spark_submit_path,
-      shell_args,
-      output_file,
-      error_file
+    stop(
+      "Failed to open connection to backend:", err$message
     )
   })
 
