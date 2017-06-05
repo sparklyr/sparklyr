@@ -1,11 +1,11 @@
 livy_sources_included <- function() {
   c(
-    "/spark-1.5.2/invoke\\.scala",
-    "/spark-1.5.2/tracker\\.scala",
-    "/spark-1.5.2/serializer\\.scala",
-    "/spark-1.5.2/stream\\.scala",
-    "/spark-1.5.2/sqlutils\\.scala",
-    "/spark-1.5.2/utils\\.scala"
+    "/invoke\\.scala",
+    "/tracker\\.scala",
+    "/serializer\\.scala",
+    "/stream\\.scala",
+    "/sqlutils\\.scala",
+    "/utils\\.scala"
   )
 }
 
@@ -24,7 +24,8 @@ livy_sources_refresh <- function() {
   includedFiles <- scalaFiles[grepl(paste(includedPatterns, collapse = "|"), scalaFiles)]
 
   lapply(includedFiles, function(sourcePath) {
-    destinationPath <- file.path(livyPath, basename(sourcePath))
+    destinationPath <- file.path(livyPath, basename(dirname(sourcePath)),
+                                 basename(sourcePath))
 
     lines <- readLines(sourcePath)
 
