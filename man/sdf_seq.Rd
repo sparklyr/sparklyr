@@ -4,12 +4,15 @@
 \alias{sdf_seq}
 \title{Create DataFrame for Range}
 \usage{
-sdf_seq(sc, from = 1L, to = 1L, by = 1L, repartition = 0)
+sdf_seq(sc, from = 1L, to = 1L, by = 1L, repartition = NULL)
 }
 \arguments{
 \item{sc}{The associated Spark connection.}
 
 \item{from, to}{the start and end to use as a range}
+
+\item{repartition}{The number of partitions to use when distributing the
+data across the Spark cluster.}
 }
 \description{
 Creates a DataFrame for the given range

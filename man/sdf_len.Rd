@@ -4,12 +4,15 @@
 \alias{sdf_len}
 \title{Create DataFrame for Length}
 \usage{
-sdf_len(sc, length)
+sdf_len(sc, length, repartition = NULL)
 }
 \arguments{
 \item{sc}{The associated Spark connection.}
 
 \item{length}{desired length of the sequence.}
+
+\item{repartition}{The number of partitions to use when distributing the
+data across the Spark cluster.}
 }
 \description{
 Creates a DataFrame for the given length.

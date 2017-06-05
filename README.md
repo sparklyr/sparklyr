@@ -76,20 +76,19 @@ To start with here's a simple filtering example:
 flights_tbl %>% filter(dep_delay == 2)
 ```
 
-    ## Source:     lazy query [?? x 19]
-    ## Database:   spark_connection
-    ## 
+    ## # Source:   lazy query [?? x 19]
+    ## # Database: spark_connection
     ##     year month   day dep_time sched_dep_time dep_delay arr_time
     ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
-    ## 1   2013     1     1      517            515         2      830
-    ## 2   2013     1     1      542            540         2      923
-    ## 3   2013     1     1      702            700         2     1058
-    ## 4   2013     1     1      715            713         2      911
-    ## 5   2013     1     1      752            750         2     1025
-    ## 6   2013     1     1      917            915         2     1206
-    ## 7   2013     1     1      932            930         2     1219
-    ## 8   2013     1     1     1028           1026         2     1350
-    ## 9   2013     1     1     1042           1040         2     1325
+    ##  1  2013     1     1      517            515         2      830
+    ##  2  2013     1     1      542            540         2      923
+    ##  3  2013     1     1      702            700         2     1058
+    ##  4  2013     1     1      715            713         2      911
+    ##  5  2013     1     1      752            750         2     1025
+    ##  6  2013     1     1      917            915         2     1206
+    ##  7  2013     1     1      932            930         2     1219
+    ##  8  2013     1     1     1028           1026         2     1350
+    ##  9  2013     1     1     1042           1040         2     1325
     ## 10  2013     1     1     1231           1229         2     1523
     ## # ... with 6,223 more rows, and 12 more variables: sched_arr_time <int>,
     ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
@@ -129,22 +128,21 @@ batting_tbl %>%
   filter(min_rank(desc(H)) <= 2 & H > 0)
 ```
 
-    ## Source:     lazy query [?? x 7]
-    ## Database:   spark_connection
-    ## Grouped by: playerID
-    ## Ordered by: playerID, yearID, teamID
-    ## 
+    ## # Source:     lazy query [?? x 7]
+    ## # Database:   spark_connection
+    ## # Groups:     playerID
+    ## # Ordered by: playerID, yearID, teamID
     ##     playerID yearID teamID     G    AB     R     H
     ##        <chr>  <int>  <chr> <int> <int> <int> <int>
-    ## 1  abbotpa01   2000    SEA    35     5     1     2
-    ## 2  abbotpa01   2004    PHI    10    11     1     2
-    ## 3  abnersh01   1992    CHA    97   208    21    58
-    ## 4  abnersh01   1990    SDN    91   184    17    45
-    ## 5  abreujo02   2015    CHA   154   613    88   178
-    ## 6  abreujo02   2014    CHA   145   556    80   176
-    ## 7  acevejo01   2001    CIN    18    34     1     4
-    ## 8  acevejo01   2004    CIN    39    43     0     2
-    ## 9  adamsbe01   1919    PHI    78   232    14    54
+    ##  1 abbotpa01   2000    SEA    35     5     1     2
+    ##  2 abbotpa01   2004    PHI    10    11     1     2
+    ##  3 abnersh01   1992    CHA    97   208    21    58
+    ##  4 abnersh01   1990    SDN    91   184    17    45
+    ##  5 abreujo02   2015    CHA   154   613    88   178
+    ##  6 abreujo02   2014    CHA   145   556    80   176
+    ##  7 acevejo01   2001    CIN    18    34     1     4
+    ##  8 acevejo01   2004    CIN    39    43     0     2
+    ##  9 adamsbe01   1919    PHI    78   232    14    54
     ## 10 adamsbe01   1918    PHI    84   227    10    40
     ## # ... with 2.561e+04 more rows
 
@@ -257,6 +255,44 @@ src_tbls(sc)
     ## [1] "batting"      "flights"      "iris"         "iris_csv"    
     ## [5] "iris_json"    "iris_parquet" "mtcars"
 
+Distributed R
+-------------
+
+You can execute arbitrary r code across your cluster using `spark_apply`. For example, we can apply `rgamma` over `iris` as follows:
+
+``` r
+spark_apply(iris_tbl, function(row) {
+  lapply(row[1:4], function(e) e + rgamma(1,2))
+})
+```
+
+    ## # Source:   table<sparklyr_tmp_d35b6102f84a> [?? x 4]
+    ## # Database: spark_connection
+    ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
+    ##           <dbl>       <dbl>        <dbl>       <dbl>
+    ##  1     7.338957    7.094178     4.158265   1.4033008
+    ##  2     6.563777    5.886883     5.602078   2.9669747
+    ##  3     5.107747    4.099174     1.441690   5.7613227
+    ##  4     8.252411    5.903192     2.453009   3.8108592
+    ##  5     6.697740    4.614417     3.808702   2.9280005
+    ##  6     6.619197    7.086574     2.576391   2.8151522
+    ##  7     5.461198    6.607114     2.007291   1.2060951
+    ##  8     5.487382    4.842045     2.395688   0.9594603
+    ##  9     5.651136    3.515347     2.286136   2.0898123
+    ## 10     5.665144    4.600366     2.959581   3.1136008
+    ## # ... with 140 more rows
+
+We can also approximate π using `spark_apply` and `dplyr` as follows:
+
+``` r
+sdf_len(sc, 10000) %>%
+  spark_apply(function() sum(runif(2, min = -1, max = 1) ^ 2) < 1) %>%
+  filter(id) %>% count() %>% collect() * 4 / 10000
+```
+
+    ##        n
+    ## 1 3.1344
+
 Extensions
 ----------
 
@@ -314,16 +350,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/05/05 10:14:55 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 80 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//Rtmpi098Pf/file1d572d88f04.csv MapPartitionsRDD[329] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 17/05/05 10:14:55 INFO TaskSchedulerImpl: Adding task set 80.0 with 1 tasks
-    ## 17/05/05 10:14:55 INFO TaskSetManager: Starting task 0.0 in stage 80.0 (TID 149, localhost, partition 0,PROCESS_LOCAL, 2429 bytes)
-    ## 17/05/05 10:14:55 INFO Executor: Running task 0.0 in stage 80.0 (TID 149)
-    ## 17/05/05 10:14:55 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/Rtmpi098Pf/file1d572d88f04.csv:0+33313106
-    ## 17/05/05 10:14:56 INFO Executor: Finished task 0.0 in stage 80.0 (TID 149). 2082 bytes result sent to driver
-    ## 17/05/05 10:14:56 INFO TaskSetManager: Finished task 0.0 in stage 80.0 (TID 149) in 99 ms on localhost (1/1)
-    ## 17/05/05 10:14:56 INFO DAGScheduler: ResultStage 80 (count at NativeMethodAccessorImpl.java:-2) finished in 0.100 s
-    ## 17/05/05 10:14:56 INFO TaskSchedulerImpl: Removed TaskSet 80.0, whose tasks have all completed, from pool 
-    ## 17/05/05 10:14:56 INFO DAGScheduler: Job 54 finished: count at NativeMethodAccessorImpl.java:-2, took 0.102325 s
+    ## 17/06/04 20:55:56 INFO BlockManagerInfo: Removed broadcast_101_piece0 on localhost:62412 in memory (size: 10.3 KB, free: 483.0 MB)
+    ## 17/06/04 20:55:56 INFO ContextCleaner: Cleaned accumulator 342
+    ## 17/06/04 20:55:56 INFO BlockManagerInfo: Removed broadcast_100_piece0 on localhost:62412 in memory (size: 9.7 KB, free: 483.0 MB)
+    ## 17/06/04 20:55:56 INFO ContextCleaner: Cleaned accumulator 341
+    ## 17/06/04 20:55:56 INFO ContextCleaner: Cleaned shuffle 27
+    ## 17/06/04 20:55:56 INFO Executor: Finished task 0.0 in stage 87.0 (TID 158). 2082 bytes result sent to driver
+    ## 17/06/04 20:55:56 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 158) in 105 ms on localhost (1/1)
+    ## 17/06/04 20:55:56 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:-2) finished in 0.106 s
+    ## 17/06/04 20:55:56 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
+    ## 17/06/04 20:55:56 INFO DAGScheduler: Job 59 finished: count at NativeMethodAccessorImpl.java:-2, took 0.107618 s
 
 Finally, we disconnect from Spark:
 
@@ -386,7 +422,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1494004511649_1 
+    ## Model ID:  GLM_model_R_1496635003725_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -444,20 +480,19 @@ sc <- spark_connect(master = "http://localhost:8998", method = "livy")
 copy_to(sc, iris)
 ```
 
-    ## Source:     table<iris> [?? x 5]
-    ## Database:   spark_connection
-    ## 
+    ## # Source:   table<iris> [?? x 5]
+    ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
     ##           <dbl>       <dbl>        <dbl>       <dbl>   <chr>
-    ## 1           5.1         3.5          1.4         0.2  setosa
-    ## 2           4.9         3.0          1.4         0.2  setosa
-    ## 3           4.7         3.2          1.3         0.2  setosa
-    ## 4           4.6         3.1          1.5         0.2  setosa
-    ## 5           5.0         3.6          1.4         0.2  setosa
-    ## 6           5.4         3.9          1.7         0.4  setosa
-    ## 7           4.6         3.4          1.4         0.3  setosa
-    ## 8           5.0         3.4          1.5         0.2  setosa
-    ## 9           4.4         2.9          1.4         0.2  setosa
+    ##  1          5.1         3.5          1.4         0.2  setosa
+    ##  2          4.9         3.0          1.4         0.2  setosa
+    ##  3          4.7         3.2          1.3         0.2  setosa
+    ##  4          4.6         3.1          1.5         0.2  setosa
+    ##  5          5.0         3.6          1.4         0.2  setosa
+    ##  6          5.4         3.9          1.7         0.4  setosa
+    ##  7          4.6         3.4          1.4         0.3  setosa
+    ##  8          5.0         3.4          1.5         0.2  setosa
+    ##  9          4.4         2.9          1.4         0.2  setosa
     ## 10          4.9         3.1          1.5         0.1  setosa
     ## # ... with 140 more rows
 

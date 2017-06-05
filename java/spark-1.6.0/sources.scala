@@ -2,138 +2,29 @@ package sparklyr
 
 object Sources {
   def sources: String = "" +
-    "spark_worker_apply <- function(sc) {\n" +
-    "  hostContextId <- invoke_method(sc, FALSE, \"Handler\", \"getHostContext\")\n" +
-    "  log(\"retrieved worker context id \", hostContextId)\n" +
     "\n" +
-    "  context <- structure(\n" +
-    "    class = c(\"spark_jobj\", \"worker_jobj\"),\n" +
-    "    list(\n" +
-    "      id = hostContextId,\n" +
-    "      connection = sc\n" +
-    "    )\n" +
-    "  )\n" +
-    "\n" +
-    "  log(\"retrieved worker context\")\n" +
-    "\n" +
-    "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
-    "  log(\"found \", length, \" rows\")\n" +
-    "\n" +
-    "  data <- worker_invoke(context, \"getSourceArraySeq\")\n" +
-    "  log(\"retrieved \", length(data), \" rows\")\n" +
-    "\n" +
-    "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
-    "  closure <- unserialize(closureRaw)\n" +
-    "\n" +
-    "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
-    "\n" +
-    "  data <- lapply(data, function(e) {\n" +
-    "    names(e) <- columnNames\n" +
-    "    e\n" +
-    "  })\n" +
-    "\n" +
-    "  data <- if (length(formals(closure)) > 0)\n" +
-    "    lapply(data, closure)\n" +
-    "  else\n" +
-    "    lapply(data, function(e) {\n" +
-    "      closure()\n" +
-    "    })\n" +
-    "\n" +
-    "  if (!identical(typeof(data[[1]]), \"list\")) {\n" +
-    "    data <- lapply(data, function(e) list(e))\n" +
-    "  }\n" +
-    "\n" +
-    "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
-    "  log(\"updated \", length(data), \" rows\")\n" +
-    "\n" +
-    "  spark_split <- worker_invoke(context, \"finish\")\n" +
-    "  log(\"finished apply\")\n" +
+    "spark_config_value <- function(config, name, default = NULL) {\n" +
+    "  if (!name %in% names(config)) default else config[[name]]\n" +
     "}\n" +
+    "# nolint start\n" +
+    "# Type mapping from Java to R\n" +
+    "#\n" +
+    "# void -> NULL\n" +
+    "# Int -> integer\n" +
+    "# String -> character\n" +
+    "# Boolean -> logical\n" +
+    "# Float -> double\n" +
+    "# Double -> double\n" +
+    "# Long -> double\n" +
+    "# Array[Byte] -> raw\n" +
+    "# Date -> Date\n" +
+    "# Time -> POSIXct\n" +
+    "#\n" +
+    "# Array[T] -> list()\n" +
+    "# Object -> jobj\n" +
+    "#\n" +
+    "# nolint end\n" +
     "\n" +
-    "spark_worker_collect <- function(sc) {\n" +
-    "  collected <- invoke_static(sc, \"sparklyr.Utils\", \"collect\", sdf, separator$regexp)\n" +
-    "\n" +
-    "  transformed <- lapply(collected, function(e) {\n" +
-    "    sdf_deserialize_column(e, sc)\n" +
-    "  })\n" +
-    "}\n" +
-    "spark_worker_connect <- function(sessionId) {\n" +
-    "  gatewayPort <- \"8880\"\n" +
-    "  gatewayAddress <- \"localhost\"\n" +
-    "\n" +
-    "  log(\"is connecting to backend using port \", gatewayPort)\n" +
-    "\n" +
-    "  gatewayInfo <- spark_connect_gateway(gatewayAddress,\n" +
-    "                                       gatewayPort,\n" +
-    "                                       sessionId,\n" +
-    "                                       config = config,\n" +
-    "                                       isStarting = TRUE)\n" +
-    "\n" +
-    "  log(\"is connected to backend\")\n" +
-    "  log(\"is connecting to backend session\")\n" +
-    "\n" +
-    "  tryCatch({\n" +
-    "    # set timeout for socket connection\n" +
-    "    timeout <- spark_config_value(config, \"sparklyr.backend.timeout\", 30 * 24 * 60 * 60)\n" +
-    "    backend <- socketConnection(host = \"localhost\",\n" +
-    "                                port = gatewayInfo$backendPort,\n" +
-    "                                server = FALSE,\n" +
-    "                                blocking = TRUE,\n" +
-    "                                open = \"wb\",\n" +
-    "                                timeout = timeout)\n" +
-    "  }, error = function(err) {\n" +
-    "    close(gatewayInfo$gateway)\n" +
-    "\n" +
-    "    abort_shell(\n" +
-    "      paste(\"Failed to open connection to backend:\", err$message),\n" +
-    "      spark_submit_path,\n" +
-    "      shell_args,\n" +
-    "      output_file,\n" +
-    "      error_file\n" +
-    "    )\n" +
-    "  })\n" +
-    "\n" +
-    "  log(\"is connected to backend session\")\n" +
-    "\n" +
-    "  sc <- structure(class = c(\"spark_worker_connection\"), list(\n" +
-    "    # spark_connection\n" +
-    "    master = \"\",\n" +
-    "    method = \"shell\",\n" +
-    "    app_name = NULL,\n" +
-    "    config = NULL,\n" +
-    "    # spark_shell_connection\n" +
-    "    spark_home = NULL,\n" +
-    "    backend = backend,\n" +
-    "    monitor = gatewayInfo$gateway,\n" +
-    "    output_file = NULL\n" +
-    "  ))\n" +
-    "\n" +
-    "  log(\"created connection\")\n" +
-    "\n" +
-    "  sc\n" +
-    "}\n" +
-    "\n" +
-    "jobj_subclass.shell_backend <- function(con) {\n" +
-    "  \"worker_jobj\"\n" +
-    "}\n" +
-    "connection_is_open <- function(sc) {\n" +
-    "  bothOpen <- FALSE\n" +
-    "  if (!identical(sc, NULL)) {\n" +
-    "    tryCatch({\n" +
-    "      bothOpen <- isOpen(sc$backend) && isOpen(sc$monitor)\n" +
-    "    }, error = function(e) {\n" +
-    "    })\n" +
-    "  }\n" +
-    "  bothOpen\n" +
-    "}\n" +
-    "\n" +
-    "worker_connection <- function(x, ...) {\n" +
-    "  UseMethod(\"worker_connection\")\n" +
-    "}\n" +
-    "\n" +
-    "worker_connection.spark_jobj <- function(x, ...) {\n" +
-    "  x$connection\n" +
-    "}\n" +
     "readObject <- function(con) {\n" +
     "  # Read type first\n" +
     "  type <- readType(con)\n" +
@@ -366,25 +257,25 @@ object Sources {
     "  else\n" +
     "    spark_config_value(config, \"sparklyr.gateway.connect.timeout\", 1)\n" +
     "\n" +
-    "  sparklyr:::writeInt(gateway, spark_gateway_commands()[[\"GetPorts\"]])\n" +
-    "  sparklyr:::writeInt(gateway, sessionId)\n" +
-    "  sparklyr:::writeInt(gateway, if (isStarting) waitSeconds else 0)\n" +
+    "  writeInt(gateway, spark_gateway_commands()[[\"GetPorts\"]])\n" +
+    "  writeInt(gateway, sessionId)\n" +
+    "  writeInt(gateway, if (isStarting) waitSeconds else 0)\n" +
     "\n" +
     "  backendSessionId <- NULL\n" +
     "  redirectGatewayPort <- NULL\n" +
     "\n" +
     "  commandStart <- Sys.time()\n" +
     "  while(length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()) {\n" +
-    "    backendSessionId <- sparklyr:::readInt(gateway)\n" +
+    "    backendSessionId <- readInt(gateway)\n" +
     "    Sys.sleep(0.1)\n" +
     "  }\n" +
     "\n" +
-    "  redirectGatewayPort <- sparklyr:::readInt(gateway)\n" +
-    "  backendPort <- sparklyr:::readInt(gateway)\n" +
+    "  redirectGatewayPort <- readInt(gateway)\n" +
+    "  backendPort <- readInt(gateway)\n" +
     "\n" +
     "  if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {\n" +
     "    if (isStarting)\n" +
-    "      stop(\"sparklyr gateway did not respond while retrieving ports information after \", waitSeconds, \" seconds\")\n" +
+    "      stop(\"Sparklyr gateway did not respond while retrieving ports information after \", waitSeconds, \" seconds\")\n" +
     "    else\n" +
     "      return(NULL)\n" +
     "  }\n" +
@@ -414,6 +305,8 @@ object Sources {
     "    NULL\n" +
     "  }\n" +
     "  else {\n" +
+    "    worker_log(\"is querying ports from backend using port \", gatewayPort)\n" +
+    "\n" +
     "    gatewayPortsQuery <- query_gateway_for_port(gateway, sessionId, config, isStarting)\n" +
     "    if (is.null(gatewayPortsQuery) && !isStarting) {\n" +
     "      close(gateway)\n" +
@@ -422,6 +315,8 @@ object Sources {
     "\n" +
     "    redirectGatewayPort <- gatewayPortsQuery$redirectGatewayPort\n" +
     "    backendPort <- gatewayPortsQuery$backendPort\n" +
+    "\n" +
+    "    worker_log(\"found redirect gateway port \", redirectGatewayPort)\n" +
     "\n" +
     "    if (redirectGatewayPort == 0) {\n" +
     "      close(gateway)\n" +
@@ -443,8 +338,7 @@ object Sources {
     "    }\n" +
     "  }\n" +
     "}\n" +
-    "\n" +
-    "invoke_method <- function(sc, static, object, method, ...)\n" +
+    "core_invoke_method <- function(sc, static, object, method, ...)\n" +
     "{\n" +
     "  if (is.null(sc)) {\n" +
     "    stop(\"The connection is no longer valid.\")\n" +
@@ -498,47 +392,61 @@ object Sources {
     "  object <- readObject(backend)\n" +
     "  attach_connection(object, sc)\n" +
     "}\n" +
-    "\n" +
-    "worker_invoke <- function(jobj, method, ...) {\n" +
-    "  UseMethod(\"worker_invoke\")\n" +
-    "}\n" +
-    "\n" +
-    "worker_invoke.worker_jobj <- function(jobj, method, ...) {\n" +
-    "  invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)\n" +
-    "}\n" +
-    "\n" +
-    "worker_invoke_static <- function(sc, class, method, ...) {\n" +
-    "  invoke_method(sc, TRUE, class, method, ...)\n" +
-    "}\n" +
-    "\n" +
-    "worker_invoke_new <- function(sc, class, ...) {\n" +
-    "  invoke_method(sc, TRUE, class, \"<init>\", ...)\n" +
-    "}\n" +
+    "#' Retrieve a Spark JVM Object Reference\n" +
+    "#'\n" +
+    "#' This S3 generic is used for accessing the underlying Java Virtual Machine\n" +
+    "#' (JVM) Spark objects associated with \\R objects. These objects act as\n" +
+    "#' references to Spark objects living in the JVM. Methods on these objects\n" +
+    "#' can be called with the \\code{\\link{invoke}} family of functions.\n" +
+    "#'\n" +
+    "#' @param x An \\R object containing, or wrapping, a \\code{spark_jobj}.\n" +
+    "#' @param ... Optional arguments; currently unused.\n" +
+    "#'\n" +
+    "#' @seealso \\code{\\link{invoke}}, for calling methods on Java object references.\n" +
+    "#'\n" +
+    "#' @export\n" +
     "spark_jobj <- function(x, ...) {\n" +
     "  UseMethod(\"spark_jobj\")\n" +
     "}\n" +
     "\n" +
+    "\n" +
+    "#' @export\n" +
     "spark_jobj.default <- function(x, ...) {\n" +
     "  stop(\"Unable to retrieve a spark_jobj from object of class \",\n" +
     "       paste(class(x), collapse = \" \"), call. = FALSE)\n" +
     "}\n" +
     "\n" +
+    "#' @export\n" +
     "spark_jobj.spark_jobj <- function(x, ...) {\n" +
     "  x\n" +
     "}\n" +
     "\n" +
+    "#' @export\n" +
     "print.spark_jobj <- function(x, ...) {\n" +
-    "  print_jobj(worker_connection(x), x, ...)\n" +
+    "  print_jobj(spark_connection(x), x, ...)\n" +
     "}\n" +
     "\n" +
+    "#' Generic method for print jobj for a connection type\n" +
+    "#'\n" +
+    "#' @param sc \\code{spark_connection} (used for type dispatch)\n" +
+    "#' @param jobj Object to print\n" +
+    "#'\n" +
+    "#' @keywords internal\n" +
+    "#'\n" +
+    "#' @export\n" +
     "print_jobj <- function(sc, jobj, ...) {\n" +
     "  UseMethod(\"print_jobj\")\n" +
     "}\n" +
     "\n" +
+    "\n" +
+    "# Maintain a reference count of Java object references\n" +
+    "# This allows us to GC the java object when it is safe\n" +
     ".validJobjs <- new.env(parent = emptyenv())\n" +
     "\n" +
+    "# List of object ids to be removed\n" +
     ".toRemoveJobjs <- new.env(parent = emptyenv())\n" +
     "\n" +
+    "# Check if jobj was created with the current SparkContext\n" +
     "isValidJobj <- function(jobj) {\n" +
     "  TRUE\n" +
     "}\n" +
@@ -557,6 +465,7 @@ object Sources {
     "  UseMethod(\"jobj_subclass\")\n" +
     "}\n" +
     "\n" +
+    "# Handler for a java object that exists on the backend.\n" +
     "jobj_create <- function(con, objId) {\n" +
     "  if (!is.character(objId)) {\n" +
     "    stop(\"object id must be a character\")\n" +
@@ -580,13 +489,13 @@ object Sources {
     "  repr <- NULL\n" +
     "\n" +
     "  tryCatch({\n" +
-    "    class <- worker_invoke(jobj, \"getClass\")\n" +
+    "    class <- invoke(jobj, \"getClass\")\n" +
     "    if (inherits(class, \"spark_jobj\"))\n" +
-    "      class <- worker_invoke(class, \"toString\")\n" +
+    "      class <- invoke(class, \"toString\")\n" +
     "  }, error = function(e) {\n" +
     "  })\n" +
     "  tryCatch({\n" +
-    "    repr <- worker_invoke(jobj, \"toString\")\n" +
+    "    repr <- invoke(jobj, \"toString\")\n" +
     "  }, error = function(e) {\n" +
     "  })\n" +
     "  list(\n" +
@@ -597,17 +506,17 @@ object Sources {
     "\n" +
     "jobj_inspect <- function(jobj) {\n" +
     "  print(jobj)\n" +
-    "  if (!connection_is_open(worker_connection(jobj)))\n" +
+    "  if (!connection_is_open(spark_connection(jobj)))\n" +
     "    return(jobj)\n" +
     "\n" +
-    "  class <- worker_invoke(jobj, \"getClass\")\n" +
+    "  class <- invoke(jobj, \"getClass\")\n" +
     "\n" +
     "  cat(\"Fields:\\n\")\n" +
-    "  fields <- worker_invoke(class, \"getDeclaredFields\")\n" +
+    "  fields <- invoke(class, \"getDeclaredFields\")\n" +
     "  lapply(fields, function(field) { print(field) })\n" +
     "\n" +
     "  cat(\"Methods:\\n\")\n" +
-    "  methods <- worker_invoke(class, \"getDeclaredMethods\")\n" +
+    "  methods <- invoke(class, \"getDeclaredMethods\")\n" +
     "  lapply(methods, function(method) { print(method) })\n" +
     "\n" +
     "  jobj\n" +
@@ -657,69 +566,25 @@ object Sources {
     "\n" +
     "  jobj\n" +
     "}\n" +
-    "log_env <- new.env()\n" +
+    "# Utility functions to serialize R objects so they can be read in Java.\n" +
     "\n" +
-    "log_session <- function(sessionId) {\n" +
-    "  assign('sessionId', sessionId, envir = log_env)\n" +
-    "}\n" +
+    "# nolint start\n" +
+    "# Type mapping from R to Java\n" +
+    "#\n" +
+    "# NULL -> Void\n" +
+    "# integer -> Int\n" +
+    "# character -> String\n" +
+    "# logical -> Boolean\n" +
+    "# double, numeric -> Double\n" +
+    "# raw -> Array[Byte]\n" +
+    "# Date -> Date\n" +
+    "# POSIXct,POSIXlt -> Time\n" +
+    "#\n" +
+    "# list[T] -> Array[T], where T is one of above mentioned types\n" +
+    "# environment -> Map[String, T], where T is a native type\n" +
+    "# jobj -> Object, where jobj is an object created in the backend\n" +
+    "# nolint end\n" +
     "\n" +
-    "log_format <- function(message, level = \"INFO\") {\n" +
-    "  paste(\n" +
-    "    format(Sys.time(), \"%y/%m/%d %H:%M:%S\"),\n" +
-    "    \" \",\n" +
-    "    level,\n" +
-    "    \" sparklyr: RScript (\",\n" +
-    "    log_env$sessionId,\n" +
-    "    \") \",\n" +
-    "    message,\n" +
-    "    sep = \"\")\n" +
-    "}\n" +
-    "\n" +
-    "log_level <- function(..., level) {\n" +
-    "  args = list(...)\n" +
-    "  message <- paste(args, sep = \"\", collapse = \"\")\n" +
-    "  formatted <- log_format(message, level)\n" +
-    "  cat(formatted, \"\\n\")\n" +
-    "}\n" +
-    "\n" +
-    "log <- function(...) {\n" +
-    "  log_level(..., level = \"INFO\")\n" +
-    "}\n" +
-    "\n" +
-    "log_warning<- function(...) {\n" +
-    "  log_level(..., level = \"WARN\")\n" +
-    "}\n" +
-    "\n" +
-    "log_error <- function(...) {\n" +
-    "  log_level(..., level = \"ERROR\")\n" +
-    "}\n" +
-    "\n" +
-    "unlockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
-    "assign(\"stop\", function(...) {\n" +
-    "  log_error(...)\n" +
-    "  quit(status = -1)\n" +
-    "}, as.environment(\"package:base\"))\n" +
-    "lockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
-    "spark_worker_main <- function(sessionId) {\n" +
-    "  log_session(sessionId)\n" +
-    "  log(\"is starting\")\n" +
-    "\n" +
-    "  tryCatch({\n" +
-    "\n" +
-    "    sc <- spark_worker_connect(sessionId)\n" +
-    "    log(\"is connected\")\n" +
-    "\n" +
-    "    spark_worker_apply(sc)\n" +
-    "\n" +
-    "  }, error = function(e) {\n" +
-    "    stop(\"terminated unexpectedly: \", e)\n" +
-    "  })\n" +
-    "\n" +
-    "  log(\"finished\")\n" +
-    "}\n" +
-    "spark_config_value <- function(config, property, value) {\n" +
-    "  value\n" +
-    "}\n" +
     "getSerdeType <- function(object) {\n" +
     "  type <- class(object)[[1]]\n" +
     "\n" +
@@ -911,6 +776,218 @@ object Sources {
     "      writeObject(con, a)\n" +
     "    }\n" +
     "  }\n" +
+    "}\n" +
+    "spark_worker_apply <- function(sc) {\n" +
+    "  hostContextId <- worker_invoke_method(sc, FALSE, \"Handler\", \"getHostContext\")\n" +
+    "  worker_log(\"retrieved worker context id \", hostContextId)\n" +
+    "\n" +
+    "  context <- structure(\n" +
+    "    class = c(\"spark_jobj\", \"shell_jobj\"),\n" +
+    "    list(\n" +
+    "      id = hostContextId,\n" +
+    "      connection = sc\n" +
+    "    )\n" +
+    "  )\n" +
+    "\n" +
+    "  worker_log(\"retrieved worker context\")\n" +
+    "\n" +
+    "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
+    "  worker_log(\"found \", length, \" rows\")\n" +
+    "\n" +
+    "  data <- worker_invoke(context, \"getSourceArraySeq\")\n" +
+    "  worker_log(\"retrieved \", length(data), \" rows\")\n" +
+    "\n" +
+    "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
+    "  closure <- unserialize(closureRaw)\n" +
+    "\n" +
+    "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
+    "\n" +
+    "  data <- lapply(data, function(e) {\n" +
+    "    names(e) <- columnNames\n" +
+    "    e\n" +
+    "  })\n" +
+    "\n" +
+    "  data <- if (length(formals(closure)) > 0)\n" +
+    "    lapply(data, closure)\n" +
+    "  else\n" +
+    "    lapply(data, function(e) {\n" +
+    "      closure()\n" +
+    "    })\n" +
+    "\n" +
+    "  if (!identical(typeof(data[[1]]), \"list\")) {\n" +
+    "    data <- lapply(data, function(e) list(e))\n" +
+    "  }\n" +
+    "\n" +
+    "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
+    "  worker_log(\"updated \", length(data), \" rows\")\n" +
+    "\n" +
+    "  spark_split <- worker_invoke(context, \"finish\")\n" +
+    "  worker_log(\"finished apply\")\n" +
+    "}\n" +
+    "\n" +
+    "spark_worker_collect <- function(sc) {\n" +
+    "  collected <- invoke_static(sc, \"sparklyr.Utils\", \"collect\", sdf, separator$regexp)\n" +
+    "\n" +
+    "  transformed <- lapply(collected, function(e) {\n" +
+    "    sdf_deserialize_column(e, sc)\n" +
+    "  })\n" +
+    "}\n" +
+    "spark_worker_connect <- function(sessionId) {\n" +
+    "  gatewayPort <- \"8880\"\n" +
+    "  gatewayAddress <- \"localhost\"\n" +
+    "  config <- list()\n" +
+    "\n" +
+    "  worker_log(\"is connecting to backend using port \", gatewayPort)\n" +
+    "\n" +
+    "  gatewayInfo <- spark_connect_gateway(gatewayAddress,\n" +
+    "                                       gatewayPort,\n" +
+    "                                       sessionId,\n" +
+    "                                       config = config,\n" +
+    "                                       isStarting = TRUE)\n" +
+    "\n" +
+    "  worker_log(\"is connected to backend\")\n" +
+    "  worker_log(\"is connecting to backend session\")\n" +
+    "\n" +
+    "  tryCatch({\n" +
+    "    # set timeout for socket connection\n" +
+    "    timeout <- spark_config_value(config, \"sparklyr.backend.timeout\", 30 * 24 * 60 * 60)\n" +
+    "    backend <- socketConnection(host = \"localhost\",\n" +
+    "                                port = gatewayInfo$backendPort,\n" +
+    "                                server = FALSE,\n" +
+    "                                blocking = TRUE,\n" +
+    "                                open = \"wb\",\n" +
+    "                                timeout = timeout)\n" +
+    "  }, error = function(err) {\n" +
+    "    close(gatewayInfo$gateway)\n" +
+    "\n" +
+    "    stop(\n" +
+    "      \"Failed to open connection to backend:\", err$message\n" +
+    "    )\n" +
+    "  })\n" +
+    "\n" +
+    "  worker_log(\"is connected to backend session\")\n" +
+    "\n" +
+    "  sc <- structure(class = c(\"spark_worker_connection\"), list(\n" +
+    "    # spark_connection\n" +
+    "    master = \"\",\n" +
+    "    method = \"shell\",\n" +
+    "    app_name = NULL,\n" +
+    "    config = NULL,\n" +
+    "    # spark_shell_connection\n" +
+    "    spark_home = NULL,\n" +
+    "    backend = backend,\n" +
+    "    monitor = gatewayInfo$gateway,\n" +
+    "    output_file = NULL\n" +
+    "  ))\n" +
+    "\n" +
+    "  worker_log(\"created connection\")\n" +
+    "\n" +
+    "  sc\n" +
+    "}\n" +
+    "\n" +
+    "connection_is_open <- function(sc) {\n" +
+    "  bothOpen <- FALSE\n" +
+    "  if (!identical(sc, NULL)) {\n" +
+    "    tryCatch({\n" +
+    "      bothOpen <- isOpen(sc$backend) && isOpen(sc$monitor)\n" +
+    "    }, error = function(e) {\n" +
+    "    })\n" +
+    "  }\n" +
+    "  bothOpen\n" +
+    "}\n" +
+    "\n" +
+    "worker_connection <- function(x, ...) {\n" +
+    "  UseMethod(\"worker_connection\")\n" +
+    "}\n" +
+    "\n" +
+    "worker_connection.spark_jobj <- function(x, ...) {\n" +
+    "  x$connection\n" +
+    "}\n" +
+    "worker_invoke_method <- function(sc, static, object, method, ...)\n" +
+    "{\n" +
+    "  core_invoke_method(sc, static, object, method, ...)\n" +
+    "}\n" +
+    "\n" +
+    "worker_invoke <- function(jobj, method, ...) {\n" +
+    "  UseMethod(\"worker_invoke\")\n" +
+    "}\n" +
+    "\n" +
+    "worker_invoke.shell_jobj <- function(jobj, method, ...) {\n" +
+    "  worker_invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)\n" +
+    "}\n" +
+    "\n" +
+    "worker_invoke_static <- function(sc, class, method, ...) {\n" +
+    "  worker_invoke_method(sc, TRUE, class, method, ...)\n" +
+    "}\n" +
+    "\n" +
+    "worker_invoke_new <- function(sc, class, ...) {\n" +
+    "  invoke_method(sc, TRUE, class, \"<init>\", ...)\n" +
+    "}\n" +
+    "worker_log_env <- new.env()\n" +
+    "\n" +
+    "worker_log_session <- function(sessionId) {\n" +
+    "  assign('sessionId', sessionId, envir = worker_log_env)\n" +
+    "}\n" +
+    "\n" +
+    "worker_log_format <- function(message, level = \"INFO\") {\n" +
+    "  paste(\n" +
+    "    format(Sys.time(), \"%y/%m/%d %H:%M:%S\"),\n" +
+    "    \" \",\n" +
+    "    level,\n" +
+    "    \" sparklyr: RScript (\",\n" +
+    "    worker_log_env$sessionId,\n" +
+    "    \") \",\n" +
+    "    message,\n" +
+    "    sep = \"\")\n" +
+    "}\n" +
+    "\n" +
+    "worker_log_level <- function(..., level) {\n" +
+    "  if (is.null(worker_log_env$sessionId)) return()\n" +
+    "\n" +
+    "  args = list(...)\n" +
+    "  message <- paste(args, sep = \"\", collapse = \"\")\n" +
+    "  formatted <- worker_log_format(message, level)\n" +
+    "  cat(formatted, \"\\n\")\n" +
+    "}\n" +
+    "\n" +
+    "worker_log <- function(...) {\n" +
+    "  worker_log_level(..., level = \"INFO\")\n" +
+    "}\n" +
+    "\n" +
+    "worker_log_warning<- function(...) {\n" +
+    "  worker_log_level(..., level = \"WARN\")\n" +
+    "}\n" +
+    "\n" +
+    "worker_log_error <- function(...) {\n" +
+    "  worker_log_level(..., level = \"ERROR\")\n" +
+    "}\n" +
+    "spark_worker_main <- function(sessionId) {\n" +
+    "  spark_worker_hooks()\n" +
+    "\n" +
+    "  worker_log_session(sessionId)\n" +
+    "  worker_log(\"is starting\")\n" +
+    "\n" +
+    "  tryCatch({\n" +
+    "\n" +
+    "    sc <- spark_worker_connect(sessionId)\n" +
+    "    worker_log(\"is connected\")\n" +
+    "\n" +
+    "    spark_worker_apply(sc)\n" +
+    "\n" +
+    "  }, error = function(e) {\n" +
+    "    stop(\"terminated unexpectedly: \", e)\n" +
+    "  })\n" +
+    "\n" +
+    "  worker_log(\"finished\")\n" +
+    "}\n" +
+    "\n" +
+    "spark_worker_hooks <- function() {\n" +
+    "  unlockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
+    "  assign(\"stop\", function(...) {\n" +
+    "    worker_log_error(...)\n" +
+    "    quit(status = -1)\n" +
+    "  }, as.environment(\"package:base\"))\n" +
+    "  lockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
     "}\n" +
     "spark_worker_main(commandArgs(trailingOnly = TRUE)[1])\n" +
     ""
