@@ -727,3 +727,13 @@ sdf_repartition <- function(x, partitions = NULL, columns = NULL) {
   }
 }
 
+#' Gets number of partitions of a Spark DataFrame
+#'
+#' @template roxlate-ml-x
+#' @export
+sdf_num_partitions <- function(x) {
+  x %>%
+    spark_dataframe() %>%
+    invoke("rdd") %>%
+    invoke("getNumPartitions")
+}
