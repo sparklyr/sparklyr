@@ -1,69 +1,10 @@
 # Sparklyr 0.6.0 (UNRELEASED)
 
-- Added `sdf_repartition()` and `sdf_num_partitions()` to support
-  repartitioning and getting the number of partitions of Spark DataFrames.
+### Distributed R
 
-- Added `spark_set_checkpoint_dir()`, `spark_get_checkpoint_dir()`, and 
-  `sdf_checkpoint()` to enable checkpointing.
-  
-- Implemented `tidy`, `augment`, and `glance` from tidyverse/broom for
-  `ml_model_generalized_linear_regression` and `ml_model_linear_regression`
-  models.
+- Added `spark_apply()` to run distributed r code at scale.
 
-- Improved backend logging by adding type and session id prefix.
-  
-- Implemented `type_sum.jobj` (from tibble) to enable better printing of jobj
-  embedded in data frames.
-
-- Implemented `residuals()` and `sdf_residuals()` for Spark linear 
-  regression and GLM models. The former returns a R vector while 
-  the latter returns a `tbl_spark` of training data with a `residuals`
-  column added.
-  
-- Added `sdf_broadcast()` which can be used to hint the query
-  optimizer to perform a broadcast join in cases where a shuffle
-  hash join is planned but not optimal.
-  
-- Fixed backend issue that affects systems where `localhost` does
-  not resolve properly to the loopback address.
-
-- Added `sparklyr.log.console` to redirect logs to console, useful
-  to troubleshooting `spark_connect`.
-
-- Added `sparklyr.backend.args` as config option to enable passing
-  parameters to the `sparklyr` backend.
-
-- Added `ml_model_data()`, used for extracting data associated with
-  Spark ML models.
-
-- Added `sdf_bind_rows()` and `sdf_bind_cols()` -- these functions
-  are the `sparklyr` equivalent of `dplyr::bind_rows()` and 
-  `dplyr::bind_cols()`.
-
-- Added `sdf_separate_column()` -- this function allows one to separate
-  components of an array / vector column into separate scalar-valued
-  columns.
-
-- `sdf_with_sequential_id()` now supports `from` parameter to choose the
-  starting value of the id column.
-
-- Implemented `cbind.tbl_spark()`. This method works by first generating
-  index columns using `sdf_with_sequential_id()` then performing `inner_join()`.
-  Note that dplyr `_join()` functions should still be used for DataFrames 
-  with common keys since they are less expensive.
-
-- The `ml_save()` and `ml_load()` functions gain a `meta`
-  argument, allowing users to specify where R-level model
-  metadata should be saved independently of the Spark model
-  itself. This should help facilitate the saving and loading
-  of Spark models used in non-local connection scenarios.
-
-- Improved logging while establishing connections to `sparklyr`.
-
-- Added support for `jar_dep` in the compilation specification to
-  support additional `jars` through `spark_compile`.
-  
-- `spark_compile` now prints deprecation warnings.
+### External Data
 
 - Added `spark_read_source()`. This function reads data from a
   Spark data source which can be loaded through an Spark package.
@@ -71,26 +12,7 @@
 - Added support for `mode = "overwrite"` and `mode = "append"` to
   `spark_write_csv`.
 
-- Added `spark_home_set` to set with ease `SPARK_HOME`, specially
-  useful while teaching the basics of Spark and `sparklyr.
-
-- Fixed issue collecting data frames containing `\n`.
-
-- Added `download_scalac()` to assist downloading all the Scala compilers
-  required to build using `compile_package_jars` and provided support for
-  using any `scalac` minor versions while looking for the right compiler.
-
-- `ml_als_factorization` now supports the implicit matrix factorization
-   and nonnegative least square options.
-
-- Support for `dplyr 0.6` which among many improvements, increases
-  performance in some queries by making use of a new query optimizer.
-  
 - `spark_write_table` now supports saving to default Hive path.
-
-- Improved `spark_connect` performance.
-
-- `sample_frac` takes a fraction instead of a percent to match `dplyr`.
 
 - Improved performance of `spark_read_csv` reading remote data when
   `infer_schema = FALSE`.
@@ -102,27 +24,150 @@
   and `spark_write_table` for consistency with existing `spark_read_*` and
   `spark_write_*` functions.
 
-- Added `src_databases`. This function list all the available databases.
-
-- Improved support in dplyr commands to handle multiple databases.
-
-- Implemented new configuration checks to proactively report connection errors
-  in Windows.
-
-- While connecting to spark from Windows,  setting the `sparklyr.verbose` option
-  to `TRUE` prints detailed configuration steps.
-
 - Added support to specify a vector of column names in `spark_read_csv` to
   specify column names without having to set the type of each column.
 
 - Improved `copy_to`, `sdf_copy_to` and `dbWriteTable` performance under
   `yarn-client` mode.
 
+### dplyr
+
+- Support for `dplyr 0.6` which among many improvements, increases
+  performance in some queries by making use of a new query optimizer.
+
+- `sample_frac` takes a fraction instead of a percent to match `dplyr`.
+
+- Improved support in dplyr commands to handle multiple databases.
+
+- Improved performance of `sample_n()` and `sample_frac()` by using TABLESAMPLE
+  query.
+  
+### Databases
+
+- Added `src_databases`. This function list all the available databases.
+
 - Added `tbl_change_db()`. This function changes current database.
+
+### DataFrames
+
+- Added `sdf_len`, `sdf_seq` and `sdf_along` to help generate numeric
+  sequences as Spark DataFrames.
+
+- Added `spark_set_checkpoint_dir()`, `spark_get_checkpoint_dir()`, and 
+  `sdf_checkpoint()` to enable checkpointing.
+  
+- Added `sdf_broadcast()` which can be used to hint the query
+  optimizer to perform a broadcast join in cases where a shuffle
+  hash join is planned but not optimal.
+
+- Added `sdf_repartition()` and `sdf_num_partitions()` to support
+  repartitioning and getting the number of partitions of Spark DataFrames.
+
+- Added `sdf_bind_rows()` and `sdf_bind_cols()` -- these functions
+  are the `sparklyr` equivalent of `dplyr::bind_rows()` and 
+  `dplyr::bind_cols()`.
+  
+- Added `sdf_separate_column()` -- this function allows one to separate
+  components of an array / vector column into separate scalar-valued
+  columns.
+
+- `sdf_with_sequential_id()` now supports `from` parameter to choose the
+  starting value of the id column.
 
 - Added `sdf_pivot()`. This function provides a mechanism for constructing
   pivot tables, using Spark's 'groupBy' + 'pivot' functionality, with a
   formula interface similar to that of `reshape2::dcast()`.
+  
+### MLlib
+
+- Implemented `residuals()` and `sdf_residuals()` for Spark linear 
+  regression and GLM models. The former returns a R vector while 
+  the latter returns a `tbl_spark` of training data with a `residuals`
+  column added.
+  
+- Added `ml_model_data()`, used for extracting data associated with
+  Spark ML models.
+
+- The `ml_save()` and `ml_load()` functions gain a `meta`
+  argument, allowing users to specify where R-level model
+  metadata should be saved independently of the Spark model
+  itself. This should help facilitate the saving and loading
+  of Spark models used in non-local connection scenarios.
+
+- `ml_als_factorization` now supports the implicit matrix factorization
+   and nonnegative least square options.
+
+- Added `ft_count_vectorizer()`. This function can be used to transform
+  columns of a Spark DataFrame so that they might be used as input to `ml_lda()`.
+  This should make it easier to invoke `ml_lda()` on Spark data sets.
+  
+### Broom
+  
+- Implemented `tidy`, `augment`, and `glance` from tidyverse/broom for
+  `ml_model_generalized_linear_regression` and `ml_model_linear_regression`
+  models.
+  
+### R Compatibility
+
+- Implemented `cbind.tbl_spark()`. This method works by first generating
+  index columns using `sdf_with_sequential_id()` then performing `inner_join()`.
+  Note that dplyr `_join()` functions should still be used for DataFrames 
+  with common keys since they are less expensive.
+
+### Connections
+
+- Added `sparklyr.log.console` to redirect logs to console, useful
+  to troubleshooting `spark_connect`.
+
+- Added `sparklyr.backend.args` as config option to enable passing
+  parameters to the `sparklyr` backend.
+
+- Improved logging while establishing connections to `sparklyr`.
+
+- Improved `spark_connect` performance.
+
+- Implemented new configuration checks to proactively report connection errors
+  in Windows.
+
+- While connecting to spark from Windows, setting the `sparklyr.verbose` option
+  to `TRUE` prints detailed configuration steps.
+  
+### Compilation
+
+- Added support for `jar_dep` in the compilation specification to
+  support additional `jars` through `spark_compile`.
+
+- `spark_compile` now prints deprecation warnings.
+
+- Added `download_scalac()` to assist downloading all the Scala compilers
+  required to build using `compile_package_jars` and provided support for
+  using any `scalac` minor versions while looking for the right compiler.
+
+### Backend
+
+- Improved backend logging by adding type and session id prefix.
+
+### Miscellaneous
+
+- Implemented `type_sum.jobj` (from tibble) to enable better printing of jobj
+  embedded in data frames.
+
+- Added `spark_home_set` to set with ease `SPARK_HOME`, specially
+  useful while teaching the basics of Spark and `sparklyr.
+
+- Added support for the `sparklyr.ui.connections` option, which adds additional
+  connection options into the new connections dialog. The
+  `rstudio.spark.connections` option is now deprecated.
+
+- Implemented the "new connection dialog" as a Shiny application to be able to
+  support newer versions of RStudio that deprecate current connections ui.
+
+### Bug Fixes
+  
+- Fixed backend issue that affects systems where `localhost` does
+  not resolve properly to the loopback address.
+
+- Fixed issue collecting data frames containing `\n`.
 
 - Spark Null objects (objects of class NullType) discovered within numeric
   vectors are now collected as NAs, rather than lists of NAs.
@@ -132,20 +177,6 @@
 - Fixed issue in `spark_read_parquet()` and other read methods in which
   `spark_normalize_path()` would not work in some platforms while loading
   data using custom protocols like s3n:// for Amazon S3.
-
-- Added `ft_count_vectorizer()`. This function can be used to transform
-  columns of a Spark DataFrame so that they might be used as input to `ml_lda()`.
-  This should make it easier to invoke `ml_lda()` on Spark data sets.
-
-- Added support for the `sparklyr.ui.connections` option, which adds additional
-  connection options into the new connections dialog. The
-  `rstudio.spark.connections` option is now deprecated.
-
-- Implemented the "new connection dialog" as a Shiny application to be able to
-  support newer versions of RStudio that deprecate current connections ui.
-
-- Improved performance of `sample_n()` and `sample_frac()` by using TABLESAMPLE
-  query.
 
 - Resolved issue in `spark_save()` / `load_table()` to support saving / loading
   data and added path parameter in `spark_load_table()` for consistency with
