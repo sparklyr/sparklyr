@@ -10,7 +10,8 @@ object LivyUtils {
     "SQLUtils" -> SQLUtils,
     "StreamHandler" -> StreamHandler,
     "JVMObjectTracker" -> JVMObjectTracker,
-    "Utils" -> Utils
+    "Utils" -> Utils,
+    "Repartition" -> Repartition
   )
 
   def invokeFromBase64(msg: String): String = {
