@@ -14,8 +14,6 @@ import org.apache.spark.{SparkEnv, SparkException}
 
 object Utils {
 
-  var rPackages: Option[String] = None
-
   /**
    * Return a nice string representation of the exception. It will call "printStackTrace" to
    * recursively generate the stack trace including the exception and its causes.

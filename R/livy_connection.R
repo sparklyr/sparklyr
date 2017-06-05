@@ -699,15 +699,22 @@ livy_load_scala_sources <- function(sc) {
     "livyutils.scala"
   )
 
-  lapply(livySources, function(sourceName) {
+  livySourcesFiles <- file.path(find.package("sparklyr"), "livy") %>%
+    list.files(pattern = "scala$", full.names = TRUE, recursive = TRUE)
+
+  sourceOrder <- livySourcesFiles %>%
+    basename() %>%
+    match(livySources) %>%
+    order()
+
+  lapply(livySourcesFiles[sourceOrder], function(sourceFile) {
     tryCatch({
-      sourcesFile <- system.file(file.path("livy", sourceName), package = "sparklyr")
-      sources <- paste(readLines(sourcesFile), collapse = "\n")
+      sources <- paste(readLines(sourceFile), collapse = "\n")
 
     statement <- livy_statement_new(sources, NULL)
     livy_invoke_statement(sc, statement)
   }, error = function(e) {
-    stop("Failed to load ", sourceName, ": ", e$message)
+    stop("Failed to load ", basename(sourceFile), ": ", e$message)
   })
   })
 }

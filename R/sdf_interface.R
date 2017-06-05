@@ -715,7 +715,7 @@ sdf_repartition <- function(x, partitions = NULL, columns = NULL) {
       lapply(ensure_scalar_character)
 
     return(
-      invoke_static(sc, "sparklyr.Utils200", "repartition", sdf, partitions, columns) %>%
+      invoke_static(sc, "sparklyr.Repartition", "repartition", sdf, partitions, columns) %>%
         sdf_register()
     )
   } else {
