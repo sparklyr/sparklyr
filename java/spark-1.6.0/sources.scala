@@ -824,14 +824,6 @@ object Sources {
     "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  worker_log(\"finished apply\")\n" +
     "}\n" +
-    "\n" +
-    "spark_worker_collect <- function(sc) {\n" +
-    "  collected <- invoke_static(sc, \"sparklyr.Utils\", \"collect\", sdf, separator$regexp)\n" +
-    "\n" +
-    "  transformed <- lapply(collected, function(e) {\n" +
-    "    sdf_deserialize_column(e, sc)\n" +
-    "  })\n" +
-    "}\n" +
     "spark_worker_connect <- function(sessionId) {\n" +
     "  gatewayPort <- \"8880\"\n" +
     "  gatewayAddress <- \"localhost\"\n" +
@@ -982,12 +974,15 @@ object Sources {
     "}\n" +
     "\n" +
     "spark_worker_hooks <- function() {\n" +
-    "  unlockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
+    "  unlock <- get(\"unlockBinding\")\n" +
+    "  lock <- get(\"lockBinding\")\n" +
+    "\n" +
+    "  unlock(\"stop\",  as.environment(\"package:base\"))\n" +
     "  assign(\"stop\", function(...) {\n" +
     "    worker_log_error(...)\n" +
     "    quit(status = -1)\n" +
     "  }, as.environment(\"package:base\"))\n" +
-    "  lockBinding(\"stop\",  as.environment(\"package:base\"))\n" +
+    "  lock(\"stop\",  as.environment(\"package:base\"))\n" +
     "}\n" +
     "spark_worker_main(commandArgs(trailingOnly = TRUE)[1])\n" +
     ""
