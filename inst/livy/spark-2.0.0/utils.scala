@@ -5,9 +5,7 @@
 
 import org.apache.spark.sql._
 
-object Utils200 {
-
-  var rPackages: Option[String] = None
+object Repartition {
 
   def repartition(df: DataFrame, numPartitions: Int, partitionCols: String*): DataFrame = {
     val partitionExprs = partitionCols.map(df.col(_))
