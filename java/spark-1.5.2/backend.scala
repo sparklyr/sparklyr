@@ -169,7 +169,7 @@ class Backend {
         logger.log("found port " + port + " is available")
         logger = new Logger("Gateway", sessionId)
 
-        gatewayServerSocket = new ServerSocket(port, 1, inetAddress)
+        gatewayServerSocket = new ServerSocket(port, 100, inetAddress)
       }
       else
       {
