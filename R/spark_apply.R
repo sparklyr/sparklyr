@@ -21,7 +21,6 @@ spark_schema_from_rdd <- function(rdd, column_names) {
   )
 }
 
-#' @import sparklyr
 #' @export
 spark_apply <- function(x, f, names = colnames(x)) {
   sc <- spark_connection(x)
