@@ -17,6 +17,8 @@ worker_log_format <- function(message, level = "INFO") {
 }
 
 worker_log_level <- function(..., level) {
+  if (is.null(worker_log_env$sessionId)) return()
+
   args = list(...)
   message <- paste(args, sep = "", collapse = "")
   formatted <- worker_log_format(message, level)

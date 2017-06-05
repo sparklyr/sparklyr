@@ -89,6 +89,8 @@ spark_connect_gateway <- function(
     NULL
   }
   else {
+    worker_log("is querying ports from backend using port ", gatewayPort)
+
     gatewayPortsQuery <- query_gateway_for_port(gateway, sessionId, config, isStarting)
     if (is.null(gatewayPortsQuery) && !isStarting) {
       close(gateway)
@@ -97,6 +99,8 @@ spark_connect_gateway <- function(
 
     redirectGatewayPort <- gatewayPortsQuery$redirectGatewayPort
     backendPort <- gatewayPortsQuery$backendPort
+
+    worker_log("found redirect gateway port ", redirectGatewayPort)
 
     if (redirectGatewayPort == 0) {
       close(gateway)

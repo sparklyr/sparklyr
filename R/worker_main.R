@@ -1,7 +1,7 @@
 spark_worker_main <- function(sessionId) {
   spark_worker_hooks()
 
-  log_session(sessionId)
+  worker_log_session(sessionId)
   worker_log("is starting")
 
   tryCatch({
