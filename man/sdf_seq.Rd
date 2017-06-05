@@ -9,7 +9,9 @@ sdf_seq(sc, from = 1L, to = 1L, by = 1L, repartition = NULL)
 \arguments{
 \item{sc}{The associated Spark connection.}
 
-\item{from, to}{the start and end to use as a range}
+\item{from, to}{The start and end to use as a range}
+
+\item{by}{The increment of the sequence.}
 
 \item{repartition}{The number of partitions to use when distributing the
 data across the Spark cluster.}

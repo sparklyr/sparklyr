@@ -9,7 +9,7 @@ sdf_along(sc, along, repartition = NULL)
 \arguments{
 \item{sc}{The associated Spark connection.}
 
-\item{along}{take the length from the length of this argument.}
+\item{along}{Takes the length from the length of this argument.}
 
 \item{repartition}{The number of partitions to use when distributing the
 data across the Spark cluster.}

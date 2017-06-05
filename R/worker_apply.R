@@ -45,11 +45,3 @@ spark_worker_apply <- function(sc) {
   spark_split <- worker_invoke(context, "finish")
   worker_log("finished apply")
 }
-
-spark_worker_collect <- function(sc) {
-  collected <- invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
-
-  transformed <- lapply(collected, function(e) {
-    sdf_deserialize_column(e, sc)
-  })
-}

@@ -19,10 +19,13 @@ spark_worker_main <- function(sessionId) {
 }
 
 spark_worker_hooks <- function() {
-  unlockBinding("stop",  as.environment("package:base"))
+  unlock <- get("unlockBinding")
+  lock <- get("lockBinding")
+
+  unlock("stop",  as.environment("package:base"))
   assign("stop", function(...) {
     worker_log_error(...)
     quit(status = -1)
   }, as.environment("package:base"))
-  lockBinding("stop",  as.environment("package:base"))
+  lock("stop",  as.environment("package:base"))
 }
