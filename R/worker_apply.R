@@ -23,21 +23,19 @@ spark_worker_apply <- function(sc) {
 
   columnNames <- worker_invoke(context, "getColumns")
 
-  data <- lapply(data, function(e) {
-    names(e) <- columnNames
-    e
-  })
+  df <- do.call(rbind.data.frame, data)
+  colnames(df) <- columnNames[1: length(colnames(df))]
 
-  data <- if (length(formals(closure)) > 0)
-    lapply(data, closure)
-  else
-    lapply(data, function(e) {
-      closure()
-    })
+  worker_log("computing closure")
+  result <- closure(df)
+  worker_log("computed closure")
 
-  if (!identical(typeof(data[[1]]), "list")) {
-    data <- lapply(data, function(e) list(e))
+  if (!identical(class(result), "data.frame")) {
+    worker_log("data.frame expected but ", class(result), " found")
+    result <- data.frame(result)
   }
+
+  data <- apply(result, 1, as.list)
 
   worker_invoke(context, "setResultArraySeq", data)
   worker_log("updated ", length(data), " rows")
