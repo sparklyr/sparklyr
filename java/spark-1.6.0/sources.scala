@@ -802,21 +802,19 @@ object Sources {
     "\n" +
     "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
     "\n" +
-    "  data <- lapply(data, function(e) {\n" +
-    "    names(e) <- columnNames\n" +
-    "    e\n" +
-    "  })\n" +
+    "  df <- do.call(rbind.data.frame, data)\n" +
+    "  colnames(df) <- columnNames[1: length(colnames(df))]\n" +
     "\n" +
-    "  data <- if (length(formals(closure)) > 0)\n" +
-    "    lapply(data, closure)\n" +
-    "  else\n" +
-    "    lapply(data, function(e) {\n" +
-    "      closure()\n" +
-    "    })\n" +
+    "  worker_log(\"computing closure\")\n" +
+    "  result <- closure(df)\n" +
+    "  worker_log(\"computed closure\")\n" +
     "\n" +
-    "  if (!identical(typeof(data[[1]]), \"list\")) {\n" +
-    "    data <- lapply(data, function(e) list(e))\n" +
+    "  if (!identical(class(result), \"data.frame\")) {\n" +
+    "    worker_log(\"data.frame expected but \", class(result), \" found\")\n" +
+    "    result <- data.frame(result)\n" +
     "  }\n" +
+    "\n" +
+    "  data <- apply(result, 1, as.list)\n" +
     "\n" +
     "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
     "  worker_log(\"updated \", length(data), \" rows\")\n" +
