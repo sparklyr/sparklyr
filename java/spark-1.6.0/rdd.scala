@@ -77,6 +77,9 @@ class WorkerRDD[T: ClassTag](
 
           val rscript = new Rscript(logger)
           rscript.init(sessionId)
+          lock.synchronized {
+            lock.notify
+          }
         } catch {
           case e: Exception =>
             logger.logError("failed to run rscript: ", e)
