@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+run-tests () {
+    while [ "$#" -ne "0" ]; do
+	export SPARK_VERSION="$1"
+	echo "==> Running tests with Spark ${SPARK_VERSION} ..."
+	R --vanilla --slave -e "devtools::test()"
+	shift
+    done
+}
+
+if [ "$#" -eq "0" ]; then
+    run-tests 2.1.0 2.0.2 2.0.1 2.0.0 1.6.2 1.6.1
+else
+    run-tests "$@"
+fi
