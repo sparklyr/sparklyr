@@ -33,12 +33,12 @@ class WorkerRDD[T: ClassTag](
     )
 
     val contextId = JVMObjectTracker.put(workerContext)
-    logger.log("Tracking worker context under " + contextId)
+    logger.log("tracking worker context under " + contextId)
 
     new Thread("starting backend thread") {
       override def run(): Unit = {
         try {
-          logger.log("Backend starting")
+          logger.log("backend starting")
           val backend: Backend = new Backend()
 
           /*
@@ -61,7 +61,7 @@ class WorkerRDD[T: ClassTag](
           )
         } catch {
           case e: Exception =>
-            logger.logError("Failed to start backend: ", e)
+            logger.logError("failed to start backend: ", e)
             exception = Some(e)
             lock.synchronized {
               lock.notify
@@ -73,13 +73,13 @@ class WorkerRDD[T: ClassTag](
     new Thread("starting rscript thread") {
       override def run(): Unit = {
         try {
-          logger.log("RScript starting")
+          logger.log("rscript starting")
 
           val rscript = new Rscript(logger)
           rscript.init(sessionId)
         } catch {
           case e: Exception =>
-            logger.logError("Failed to start rscript: ", e)
+            logger.logError("failed to run rscript: ", e)
             exception = Some(e)
             lock.synchronized {
               lock.notify
@@ -88,16 +88,15 @@ class WorkerRDD[T: ClassTag](
       }
     }.start()
 
-    logger.log("Waiting using lock for RScript to complete")
+    logger.log("is waiting using lock for RScript to complete")
     lock.synchronized {
       lock.wait()
     }
+    logger.log("completed wait using lock for RScript")
 
     if (exception.isDefined) {
       throw exception.get
     }
-
-    logger.log("Wait using lock for RScript completed")
 
     return workerContext.getResultArray().iterator
   }
