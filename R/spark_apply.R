@@ -21,6 +21,15 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
   )
 }
 
+#' Apply a Function in Spark
+#'
+#' Applies a function to a Spark object (typically, a Spark DataFrame).
+#'
+#' @param x An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.
+#' @param f A function that transforms a data frame partition into a data frame.
+#' @param names The column names for the transformed object, defaults to the
+#'   names from the original object.
+#'
 #' @export
 spark_apply <- function(x, f, names = colnames(x)) {
   sc <- spark_connection(x)
