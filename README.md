@@ -261,37 +261,37 @@ Distributed R
 You can execute arbitrary r code across your cluster using `spark_apply`. For example, we can apply `rgamma` over `iris` as follows:
 
 ``` r
-spark_apply(iris_tbl, function(row) {
-  lapply(row[1:4], function(e) e + rgamma(1,2))
+spark_apply(iris_tbl, function(data) {
+  data[1:4] + rgamma(1,2)
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_d35b6102f84a> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_18054769f9828> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1     7.338957    7.094178     4.158265   1.4033008
-    ##  2     6.563777    5.886883     5.602078   2.9669747
-    ##  3     5.107747    4.099174     1.441690   5.7613227
-    ##  4     8.252411    5.903192     2.453009   3.8108592
-    ##  5     6.697740    4.614417     3.808702   2.9280005
-    ##  6     6.619197    7.086574     2.576391   2.8151522
-    ##  7     5.461198    6.607114     2.007291   1.2060951
-    ##  8     5.487382    4.842045     2.395688   0.9594603
-    ##  9     5.651136    3.515347     2.286136   2.0898123
-    ## 10     5.665144    4.600366     2.959581   3.1136008
+    ##  1     7.941613    6.341613     4.241613    3.041613
+    ##  2     7.741613    5.841613     4.241613    3.041613
+    ##  3     7.541613    6.041613     4.141613    3.041613
+    ##  4     7.441613    5.941613     4.341613    3.041613
+    ##  5     7.841613    6.441613     4.241613    3.041613
+    ##  6     8.241613    6.741613     4.541613    3.241613
+    ##  7     7.441613    6.241613     4.241613    3.141613
+    ##  8     7.841613    6.241613     4.341613    3.041613
+    ##  9     7.241613    5.741613     4.241613    3.041613
+    ## 10     7.741613    5.941613     4.341613    2.941613
     ## # ... with 140 more rows
 
 We can also approximate π using `spark_apply` and `dplyr` as follows:
 
 ``` r
 sdf_len(sc, 10000) %>%
-  spark_apply(function() sum(runif(2, min = -1, max = 1) ^ 2) < 1) %>%
+  spark_apply(function(d) rowSums(replicate(2, runif(nrow(d), min=-1, max=1)) ^ 2) < 1) %>%
   filter(id) %>% count() %>% collect() * 4 / 10000
 ```
 
     ##        n
-    ## 1 3.1344
+    ## 1 1.5432
 
 Extensions
 ----------
@@ -350,16 +350,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/06/04 20:55:56 INFO BlockManagerInfo: Removed broadcast_101_piece0 on localhost:62412 in memory (size: 10.3 KB, free: 483.0 MB)
-    ## 17/06/04 20:55:56 INFO ContextCleaner: Cleaned accumulator 342
-    ## 17/06/04 20:55:56 INFO BlockManagerInfo: Removed broadcast_100_piece0 on localhost:62412 in memory (size: 9.7 KB, free: 483.0 MB)
-    ## 17/06/04 20:55:56 INFO ContextCleaner: Cleaned accumulator 341
-    ## 17/06/04 20:55:56 INFO ContextCleaner: Cleaned shuffle 27
-    ## 17/06/04 20:55:56 INFO Executor: Finished task 0.0 in stage 87.0 (TID 158). 2082 bytes result sent to driver
-    ## 17/06/04 20:55:56 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 158) in 105 ms on localhost (1/1)
-    ## 17/06/04 20:55:56 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:-2) finished in 0.106 s
-    ## 17/06/04 20:55:56 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
-    ## 17/06/04 20:55:56 INFO DAGScheduler: Job 59 finished: count at NativeMethodAccessorImpl.java:-2, took 0.107618 s
+    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned accumulator 324
+    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned shuffle 26
+    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned accumulator 323
+    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned accumulator 322
+    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned accumulator 321
+    ## 17/06/06 16:11:33 INFO Executor: Finished task 0.0 in stage 87.0 (TID 158). 2082 bytes result sent to driver
+    ## 17/06/06 16:11:33 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 158) in 109 ms on localhost (1/1)
+    ## 17/06/06 16:11:33 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
+    ## 17/06/06 16:11:33 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:-2) finished in 0.109 s
+    ## 17/06/06 16:11:33 INFO DAGScheduler: Job 59 finished: count at NativeMethodAccessorImpl.java:-2, took 0.111723 s
 
 Finally, we disconnect from Spark:
 
@@ -422,7 +422,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1496635003725_1 
+    ## Model ID:  GLM_model_R_1496790738914_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
