@@ -177,6 +177,26 @@ iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 src_tbls(sc)
 ```
 
+
+## Distributed R
+
+You can execute arbitrary r code across your cluster using `spark_apply`. For
+example, we can apply `rgamma` over `iris` as follows:
+
+```{r}
+spark_apply(iris_tbl, function(data) {
+  data[1:4] + rgamma(1,2)
+})
+```
+
+We can also approximate π using `spark_apply` and `dplyr` as follows:
+
+```{r}
+sdf_len(sc, 10000) %>%
+  spark_apply(function(d) rowSums(replicate(2, runif(nrow(d), min=-1, max=1)) ^ 2) < 1) %>%
+  filter(id) %>% count() %>% collect() * 4 / 10000
+```
+
 ## Extensions
 
 The facilities used internally by sparklyr for its dplyr and machine learning interfaces are available to extension packages. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).

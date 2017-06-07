@@ -23,10 +23,6 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   mergedConfig
 }
 
-spark_config_value <- function(config, name, default = NULL) {
-  if (!name %in% names(config)) default else config[[name]]
-}
-
 spark_config_exists <- function(config, name, default = NULL) {
   if (!name %in% names(config)) default else !identical(config[[name]], FALSE)
 }
