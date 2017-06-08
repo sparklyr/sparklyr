@@ -707,8 +707,8 @@ sdf_repartition <- function(x, partitions = NULL, columns = NULL) {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  partitions <- partitions %||% 0L
-  ensure_scalar_integer(partitions)
+  partitions <- partitions %||% 0L %>%
+    ensure_scalar_integer()
 
   if (spark_version(sc) >= "2.0.0") {
     columns <- as.list(columns) %>%
