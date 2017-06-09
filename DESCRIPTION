@@ -37,6 +37,7 @@ Imports:
     httr,
     jsonlite,
     base64enc,
+    rlang (>= 0.1),
     rstudioapi,
     shiny (>= 1.0.1)
 Suggests:
