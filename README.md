@@ -23,7 +23,7 @@ You should also install a local version of Spark for development purposes:
 
 ``` r
 library(sparklyr)
-spark_install(version = "1.6.2")
+spark_install(version = "2.1.0")
 ```
 
 To upgrade to the latest version of sparklyr, run the following command and restart your r session:
@@ -266,20 +266,20 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_18054769f9828> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_e1c5659f067d> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1     7.941613    6.341613     4.241613    3.041613
-    ##  2     7.741613    5.841613     4.241613    3.041613
-    ##  3     7.541613    6.041613     4.141613    3.041613
-    ##  4     7.441613    5.941613     4.341613    3.041613
-    ##  5     7.841613    6.441613     4.241613    3.041613
-    ##  6     8.241613    6.741613     4.541613    3.241613
-    ##  7     7.441613    6.241613     4.241613    3.141613
-    ##  8     7.841613    6.241613     4.341613    3.041613
-    ##  9     7.241613    5.741613     4.241613    3.041613
-    ## 10     7.741613    5.941613     4.341613    2.941613
+    ##  1     7.708524    6.108524     4.008524    2.808524
+    ##  2     7.508524    5.608524     4.008524    2.808524
+    ##  3     7.308524    5.808524     3.908524    2.808524
+    ##  4     7.208524    5.708524     4.108524    2.808524
+    ##  5     7.608524    6.208524     4.008524    2.808524
+    ##  6     8.008524    6.508524     4.308524    3.008524
+    ##  7     7.208524    6.008524     4.008524    2.908524
+    ##  8     7.608524    6.008524     4.108524    2.808524
+    ##  9     7.008524    5.508524     4.008524    2.808524
+    ## 10     7.508524    5.708524     4.108524    2.708524
     ## # ... with 140 more rows
 
 We can also approximate π using `spark_apply` and `dplyr` as follows:
@@ -291,7 +291,7 @@ sdf_len(sc, 10000) %>%
 ```
 
     ##        n
-    ## 1 1.5432
+    ## 1 3.1416
 
 Extensions
 ----------
@@ -350,16 +350,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned accumulator 324
-    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned shuffle 26
-    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned accumulator 323
-    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned accumulator 322
-    ## 17/06/06 16:11:33 INFO ContextCleaner: Cleaned accumulator 321
-    ## 17/06/06 16:11:33 INFO Executor: Finished task 0.0 in stage 87.0 (TID 158). 2082 bytes result sent to driver
-    ## 17/06/06 16:11:33 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 158) in 109 ms on localhost (1/1)
-    ## 17/06/06 16:11:33 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
-    ## 17/06/06 16:11:33 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:-2) finished in 0.109 s
-    ## 17/06/06 16:11:33 INFO DAGScheduler: Job 59 finished: count at NativeMethodAccessorImpl.java:-2, took 0.111723 s
+    ## 17/06/08 22:48:45 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 87 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//Rtmpgrw6EP/filee1c570759a7d.csv MapPartitionsRDD[357] at textFile at NativeMethodAccessorImpl.java:-2)
+    ## 17/06/08 22:48:45 INFO TaskSchedulerImpl: Adding task set 87.0 with 1 tasks
+    ## 17/06/08 22:48:45 INFO TaskSetManager: Starting task 0.0 in stage 87.0 (TID 158, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
+    ## 17/06/08 22:48:45 INFO Executor: Running task 0.0 in stage 87.0 (TID 158)
+    ## 17/06/08 22:48:45 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/Rtmpgrw6EP/filee1c570759a7d.csv:0+33313106
+    ## 17/06/08 22:48:45 INFO Executor: Finished task 0.0 in stage 87.0 (TID 158). 2082 bytes result sent to driver
+    ## 17/06/08 22:48:45 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 158) in 107 ms on localhost (1/1)
+    ## 17/06/08 22:48:45 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
+    ## 17/06/08 22:48:45 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:-2) finished in 0.107 s
+    ## 17/06/08 22:48:45 INFO DAGScheduler: Job 59 finished: count at NativeMethodAccessorImpl.java:-2, took 0.109289 s
 
 Finally, we disconnect from Spark:
 
@@ -396,14 +396,14 @@ Using H2O
 [rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN package from [H2O](http://h2o.ai) that extends [sparklyr](http://spark.rstudio.com) to provide an interface into [Sparkling Water](https://github.com/h2oai/sparkling-water). For instance, the following example installs, configures and runs [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
 
 ``` r
-options(rsparkling.sparklingwater.version = "1.6.8")
+options(rsparkling.sparklingwater.version = "2.1.0")
 
 library(rsparkling)
 library(sparklyr)
 library(dplyr)
 library(h2o)
 
-sc <- spark_connect(master = "local", version = "1.6.2")
+sc <- spark_connect(master = "local", version = "2.1.0")
 mtcars_tbl <- copy_to(sc, mtcars, "mtcars")
 
 mtcars_h2o <- as_h2o_frame(sc, mtcars_tbl, strict_version_check = FALSE)
@@ -422,7 +422,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1496790738914_1 
+    ## Model ID:  GLM_model_R_1496987380367_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -430,8 +430,8 @@ mtcars_glm
     ## 1 nlambda = 100, lambda.max = 10.132, lambda.min = 0.1013, lambda.1se = -1.0
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
-    ##   number_of_iterations training_frame
-    ## 1                    0   frame_rdd_31
+    ##   number_of_iterations                                training_frame
+    ## 1                    0 frame_rdd_29_803ef3b729b31412c7a28957c5054516
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
