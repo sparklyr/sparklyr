@@ -2,7 +2,6 @@
 
 S3method("names<-",tbl_spark)
 S3method(collect,spark_jobj)
-S3method(collect,tbl_spark)
 S3method(connection_is_open,livy_connection)
 S3method(connection_is_open,spark_gateway_connection)
 S3method(connection_is_open,spark_shell_connection)
