@@ -13,5 +13,5 @@ test_that("left_join works as expected", {
   j1 <- left_join(d1, d2, by='x') %>% collect()
   j2 <- left_join(s1, s2, by='x')
 
-  assertthat::are_equal(j1, j2)
+  expect_equal(j1, j2)
 })
