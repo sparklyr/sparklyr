@@ -16,5 +16,5 @@ test_that("top_n works as expected", {
   tn1 <- test_tbl %>% count(X) %>% top_n(10) %>% collect()
   tn2 <- test_data %>% count(X) %>% top_n(10)
 
-  assertthat::are_equal(tn1, tn2)
+  expect_true(tn1 == tn2)
 })
