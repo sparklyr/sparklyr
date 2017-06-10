@@ -43,10 +43,6 @@ Imports:
     rstudioapi,
     shiny (>= 1.0.1),
     withr
-Remotes:
-    tidyverse/dplyr,
-    tidyverse/dbplyr,
-    tidyverse/rlang
 Suggests:
     testthat,
     RCurl,
