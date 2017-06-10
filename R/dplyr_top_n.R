@@ -51,10 +51,12 @@ top_n <- function(x, n, wt) {
 }
 
 overwrite_dplyr_top_n <- function(...) {
-  ns <- asNamespace("dplyr")
-  unlock <- get("unlockBinding")
-  unlock("top_n", ns)
-  assign("top_n", top_n, envir = ns)
-  lock <- get("lockBinding")
-  lock("top_n", env = ns)
+  if ("dplyr" %in% loadedNamespaces()) {
+    ns <- asNamespace("dplyr")
+    unlock <- get("unlockBinding")
+    unlock("top_n", ns)
+    assign("top_n", top_n, envir = ns)
+    lock <- get("lockBinding")
+    lock("top_n", env = ns)
+  }
 }
