@@ -1,4 +1,4 @@
-connection_is_open <- function(sc) {
+connection_is_open.spark_worker_connection <- function(sc) {
   bothOpen <- FALSE
   if (!identical(sc, NULL)) {
     tryCatch({
