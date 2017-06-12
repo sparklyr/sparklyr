@@ -625,7 +625,6 @@ spark_web.livy_connection <- function(sc, ...) {
   stop("Unsupported operation for livy connections")
 }
 
-#' @keywords internal
 #' @export
 connection_is_open.livy_connection <- function(sc) {
   session <- livy_try_get_session(sc)

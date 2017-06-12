@@ -77,7 +77,6 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
   sc
 }
 
-#' @keywords internal
 #' @export
 connection_is_open.spark_gateway_connection <- function(sc) {
   class(sc) <- "spark_shell_connection"
