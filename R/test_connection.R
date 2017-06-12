@@ -23,6 +23,7 @@ spark_log.test_connection <- function(sc, n = 100, filter = NULL, ...) {
 spark_web.test_connection <- function(sc, ...) {
 }
 
+#' @keywords internal
 #' @export
 connection_is_open.test_connection <- function(sc) {
   sc$state$open

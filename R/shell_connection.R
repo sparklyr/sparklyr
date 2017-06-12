@@ -354,6 +354,7 @@ stop_shell <- function(sc, terminate = FALSE) {
   close(sc$monitor)
 }
 
+#' @keywords internal
 #' @export
 connection_is_open.spark_shell_connection <- function(sc) {
   bothOpen <- FALSE

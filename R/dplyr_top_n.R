@@ -28,6 +28,8 @@
 #' @importFrom rlang inform
 #' @importFrom rlang is_scalar_integerish
 #' @importFrom rlang sym
+#' @importFrom dplyr filter
+#' @importFrom dplyr min_rank
 top_n <- function(x, n, wt) {
   # Workaround for https://github.com/tidyverse/dplyr/issues/2848
   # Reverts back to commit https://raw.githubusercontent.com/tidyverse/dplyr/f188ff2654e2f2afab5ddbc8f4cbb5f4ff9df5be/R/top-n.R
