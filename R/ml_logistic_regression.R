@@ -65,30 +65,70 @@ ml_logistic_regression <- function(x,
     invoke("setElasticNetParam", as.double(alpha)) %>%
     invoke("setRegParam", as.double(lambda))
 
-  if (only.model) return(model)
+  if (only.model)
+    return(model)
 
   fit <- model %>%
     invoke("fit", tdf)
 
-  coefficients <- fit %>%
-    invoke("coefficients") %>%
-    invoke("toArray")
-  names(coefficients) <- features
+  # multinomial vs. binomial models have separate APIs for
+  # retrieving results
+  numClasses <- invoke(fit, "numClasses")
+  isMultinomial <- numClasses > 2
 
-  hasIntercept <- invoke(fit, "getFitIntercept")
-  if (hasIntercept) {
-    intercept <- invoke(fit, "intercept")
-    coefficients <- c(coefficients, intercept)
-    names(coefficients) <- c(features, "(Intercept)")
+  # extract coefficients (can be either a vector or matrix, depending
+  # on binomial vs. multinomial)
+  coefficients <- if (isMultinomial) {
+
+    # multinomial
+    coefficients <- read_spark_matrix(fit, "coefficientMatrix")
+    colnames(coefficients) <- features
+
+    hasIntercept <- invoke(fit, "getFitIntercept")
+    if (hasIntercept) {
+      intercept <- read_spark_vector(fit, "interceptVector")
+      coefficients <- cbind(intercept, coefficients)
+      colnames(coefficients) <- c("(Intercept)", features)
+    }
+
+    coefficients
+
+  } else {
+
+    coefficients <- read_spark_vector(fit, "coefficients")
+
+    hasIntercept <- invoke(fit, "getFitIntercept")
+    if (hasIntercept) {
+      intercept <- invoke(fit, "intercept")
+      coefficients <- c(coefficients, intercept)
+      names(coefficients) <- c(features, "(Intercept)")
+    }
+
+    coefficients <- intercept_first(coefficients)
+    coefficients
+
   }
 
-  summary <- invoke(fit, "summary")
-  areaUnderROC <- invoke(summary, "areaUnderROC")
-  roc <- sdf_collect(invoke(summary, "roc"))
+  # multinomial models don't yet provide a 'summary' method
+  # (as of Spark 2.1.0) so certain features will not be enabled
+  # for those models
+  areaUnderROC <- NA
+  roc <- NA
+  if (!isMultinomial) {
+    summary <- invoke(fit, "summary")
+    areaUnderROC <- invoke(summary, "areaUnderROC")
+    roc <- sdf_collect(invoke(summary, "roc"))
+  }
 
-  coefficients <- intercept_first(coefficients)
+  model <- c(
+    if (isMultinomial)
+      "multinomial_logistic_regression"
+    else
+      "binomial_logistic_regression",
+    "logistic_regression"
+  )
 
-  ml_model("logistic_regression", fit,
+  ml_model(model, fit,
            features = features,
            response = response,
            intercept = intercept,
@@ -98,8 +138,7 @@ ml_logistic_regression <- function(x,
            data = df,
            ml.options = ml.options,
            categorical.transformations = categorical.transformations,
-           model.parameters = as.list(envir)
-  )
+           model.parameters = as.list(envir))
 }
 
 #' @export

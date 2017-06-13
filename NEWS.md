@@ -80,6 +80,9 @@
   
 ### MLlib
 
+- `ml_logistic_regression()` now supports multinomial regression, in
+  addition to binomial regression. (#748)
+
 - Implemented `residuals()` and `sdf_residuals()` for Spark linear 
   regression and GLM models. The former returns a R vector while 
   the latter returns a `tbl_spark` of training data with a `residuals`
