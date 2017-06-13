@@ -2,7 +2,8 @@
 
 ### Distributed R
 
-- Added `spark_apply()` to run distributed r code at scale.
+- Added `spark_apply()`, allowing users to use R code to directly
+  manipulate and transform Spark DataFrames.
 
 ### External Data
 
@@ -10,47 +11,45 @@
   Spark data source which can be loaded through an Spark package.
 
 - Added support for `mode = "overwrite"` and `mode = "append"` to
-  `spark_write_csv`.
+  `spark_write_csv()`.
 
-- `spark_write_table` now supports saving to default Hive path.
+- `spark_write_table()` now supports saving to default Hive path.
 
-- Improved performance of `spark_read_csv` reading remote data when
+- Improved performance of `spark_read_csv()` reading remote data when
   `infer_schema = FALSE`.
 
-- Added `spark_read_jdbc`. This function reads from a JDBC connection
+- Added `spark_read_jdbc()`. This function reads from a JDBC connection
   into a Spark DataFrame.
 
-- Renamed `spark_load_table` and `spark_save_table` into `spark_read_table`
-  and `spark_write_table` for consistency with existing `spark_read_*` and
-  `spark_write_*` functions.
+- Renamed `spark_load_table()` and `spark_save_table()` into `spark_read_table()`
+  and `spark_write_table()` for consistency with existing `spark_read_*()` and
+  `spark_write_*()` functions.
 
-- Added support to specify a vector of column names in `spark_read_csv` to
+- Added support to specify a vector of column names in `spark_read_csv()` to
   specify column names without having to set the type of each column.
 
-- Improved `copy_to`, `sdf_copy_to` and `dbWriteTable` performance under
+- Improved `copy_to()`, `sdf_copy_to()` and `dbWriteTable()` performance under
   `yarn-client` mode.
 
 ### dplyr
 
-- Support for `dplyr 0.6` which among many improvements, increases
+- Support for dplyr (>= 0.6) which among many improvements, increases
   performance in some queries by making use of a new query optimizer.
 
-- `sample_frac` takes a fraction instead of a percent to match `dplyr`.
+- `sample_frac()` takes a fraction instead of a percent to match dplyr.
 
-- Improved support in dplyr commands to handle multiple databases.
-
-- Improved performance of `sample_n()` and `sample_frac()` by using TABLESAMPLE
-  query.
+- Improved performance of `sample_n()` and `sample_frac()` through the use of
+  `TABLESAMPLE` in the generated query.
   
 ### Databases
 
-- Added `src_databases`. This function list all the available databases.
+- Added `src_databases()`. This function list all the available databases.
 
 - Added `tbl_change_db()`. This function changes current database.
 
 ### DataFrames
 
-- Added `sdf_len`, `sdf_seq` and `sdf_along` to help generate numeric
+- Added `sdf_len()`, `sdf_seq()` and `sdf_along()` to help generate numeric
   sequences as Spark DataFrames.
 
 - Added `spark_set_checkpoint_dir()`, `spark_get_checkpoint_dir()`, and 
@@ -91,13 +90,12 @@
 - Added `ml_model_data()`, used for extracting data associated with
   Spark ML models.
 
-- The `ml_save()` and `ml_load()` functions gain a `meta`
-  argument, allowing users to specify where R-level model
-  metadata should be saved independently of the Spark model
-  itself. This should help facilitate the saving and loading
+- The `ml_save()` and `ml_load()` functions gain a `meta` argument, allowing
+  users to specify where R-level model metadata should be saved independently
+  of the Spark model itself. This should help facilitate the saving and loading
   of Spark models used in non-local connection scenarios.
 
-- `ml_als_factorization` now supports the implicit matrix factorization
+- `ml_als_factorization()` now supports the implicit matrix factorization
    and nonnegative least square options.
 
 - Added `ft_count_vectorizer()`. This function can be used to transform
@@ -106,8 +104,8 @@
   
 ### Broom
   
-- Implemented `tidy`, `augment`, and `glance` from tidyverse/broom for
-  `ml_model_generalized_linear_regression` and `ml_model_linear_regression`
+- Implemented `tidy()`, `augment()`, and `glance()` from tidyverse/broom for
+  `ml_model_generalized_linear_regression()` and `ml_model_linear_regression()`
   models.
   
 ### R Compatibility
@@ -127,7 +125,7 @@
 
 - Improved logging while establishing connections to `sparklyr`.
 
-- Improved `spark_connect` performance.
+- Improved `spark_connect()` performance.
 
 - Implemented new configuration checks to proactively report connection errors
   in Windows.
@@ -138,9 +136,9 @@
 ### Compilation
 
 - Added support for `jar_dep` in the compilation specification to
-  support additional `jars` through `spark_compile`.
+  support additional `jars` through `spark_compile()`.
 
-- `spark_compile` now prints deprecation warnings.
+- `spark_compile()` now prints deprecation warnings.
 
 - Added `download_scalac()` to assist downloading all the Scala compilers
   required to build using `compile_package_jars` and provided support for
@@ -152,25 +150,26 @@
 
 ### Miscellaneous
 
-- Implemented `type_sum.jobj` (from tibble) to enable better printing of jobj
-  embedded in data frames.
+- Implemented `type_sum.jobj()` (from tibble) to enable better printing of jobj
+  objects embedded in data frames.
 
-- Added `spark_home_set` to set with ease `SPARK_HOME`, specially
-  useful while teaching the basics of Spark and `sparklyr.
+- Added the `spark_home_set()` function, to help facilitate the setting of the
+  `SPARK_HOME` environment variable. This should prove useful in teaching
+  environments, when teaching the basics of Spark and sparklyr.
 
 - Added support for the `sparklyr.ui.connections` option, which adds additional
   connection options into the new connections dialog. The
   `rstudio.spark.connections` option is now deprecated.
 
-- Implemented the "new connection dialog" as a Shiny application to be able to
-  support newer versions of RStudio that deprecate current connections ui.
+- Implemented the "New Connection Dialog" as a Shiny application to be able to
+  support newer versions of RStudio that deprecate current connections UI.
 
 ### Bug Fixes
   
 - Fixed backend issue that affects systems where `localhost` does
   not resolve properly to the loopback address.
 
-- Fixed issue collecting data frames containing `\n`.
+- Fixed issue collecting data frames containing newlines `\n`.
 
 - Spark Null objects (objects of class NullType) discovered within numeric
   vectors are now collected as NAs, rather than lists of NAs.
@@ -179,7 +178,7 @@
 
 - Fixed issue in `spark_read_parquet()` and other read methods in which
   `spark_normalize_path()` would not work in some platforms while loading
-  data using custom protocols like s3n:// for Amazon S3.
+  data using custom protocols like `s3n://` for Amazon S3.
 
 - Resolved issue in `spark_save()` / `load_table()` to support saving / loading
   data and added path parameter in `spark_load_table()` for consistency with
