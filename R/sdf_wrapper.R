@@ -250,10 +250,7 @@ sdf_separate_column <- function(x,
 
     # generate indices
     indices <- seq_len(n)
-
-    # generate names when not provided
-    if (is.null(names))
-      names <- sprintf("%s_%i", column, indices)
+    names <- sprintf("%s_%i", column, indices)
 
     # construct our into map
     into <- as.list(indices)
