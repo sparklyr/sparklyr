@@ -114,7 +114,7 @@ ml_logistic_regression <- function(x,
   # for those models
   areaUnderROC <- NA
   roc <- NA
-  if (!isMultinomial) {
+  if (invoke(fit, "hasSummary")) {
     summary <- invoke(fit, "summary")
     areaUnderROC <- invoke(summary, "areaUnderROC")
     roc <- sdf_collect(invoke(summary, "roc"))
