@@ -6,6 +6,16 @@ object Sources {
     "spark_config_value <- function(config, name, default = NULL) {\n" +
     "  if (!name %in% names(config)) default else config[[name]]\n" +
     "}\n" +
+    "#' Check whether the connection is open\n" +
+    "#'\n" +
+    "#' @param sc \\code{spark_connection}\n" +
+    "#'\n" +
+    "#' @keywords internal\n" +
+    "#'\n" +
+    "#' @export\n" +
+    "connection_is_open <- function(sc) {\n" +
+    "  UseMethod(\"connection_is_open\")\n" +
+    "}\n" +
     "# nolint start\n" +
     "# Type mapping from Java to R\n" +
     "#\n" +
@@ -875,7 +885,7 @@ object Sources {
     "  sc\n" +
     "}\n" +
     "\n" +
-    "connection_is_open <- function(sc) {\n" +
+    "connection_is_open.spark_worker_connection <- function(sc) {\n" +
     "  bothOpen <- FALSE\n" +
     "  if (!identical(sc, NULL)) {\n" +
     "    tryCatch({\n" +

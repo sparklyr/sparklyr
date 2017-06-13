@@ -98,7 +98,7 @@ object Utils {
   def collectImplLong(local: Array[Row], idx: Integer) = {
     local.map{row => {
       val el = row(idx)
-      if (el.isInstanceOf[Long]) el.asInstanceOf[Long] else scala.Long.MinValue
+      if (el.isInstanceOf[Long]) el.asInstanceOf[Long].toDouble else scala.Double.NaN
     }}
   }
 
