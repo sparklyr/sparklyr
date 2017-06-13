@@ -165,6 +165,8 @@
   support newer versions of RStudio that deprecate current connections UI.
 
 ### Bug Fixes
+
+- Fixed collecting `long` type columns when NAs are present (#463).
   
 - Fixed backend issue that affects systems where `localhost` does
   not resolve properly to the loopback address.
