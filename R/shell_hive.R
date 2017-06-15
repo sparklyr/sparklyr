@@ -1,4 +1,18 @@
 create_hive_context.spark_shell_connection <- function(sc) {
+  if (spark_version(sc) <= "2.0.1") {
+    # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle
+    # gracefully and triggers unexpected errors such as #532. Under these versions,
+    # we proactevely test getLocalHost() to warn users of this problem.
+
+    tryCatch({
+      invoke_static(sc, "java.net.InetAddress", "getLocalHost")
+    }, error = function(err) {
+      warning(
+        "Failed to retrieve localhost, please validate that the hostname is correctly mapped."
+      )
+    })
+  }
+
   if (spark_version(sc) >= "2.0.0")
     create_hive_context_v2(sc)
   else
