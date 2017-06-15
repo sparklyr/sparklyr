@@ -8,7 +8,8 @@ create_hive_context.spark_shell_connection <- function(sc) {
       invoke_static(sc, "java.net.InetAddress", "getLocalHost")
     }, error = function(err) {
       warning(
-        "Failed to retrieve localhost, please validate that the hostname is correctly mapped."
+        "Failed to retrieve localhost, please validate that the hostname is correctly mapped. ",
+        "Consider running `hostname` and adding that entry to your `/etc/hosts` file."
       )
     })
   }
