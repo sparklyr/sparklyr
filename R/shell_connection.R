@@ -28,8 +28,11 @@ shell_connection <- function(master,
     }
   }
 
+  # start with blank environment variables
+  environment <- new.env()
+
   # prepare windows environment
-  prepare_windows_environment(spark_home)
+  prepare_windows_environment(spark_home, environment)
 
   # verify that java is available
   validate_java_version(spark_home)
@@ -39,7 +42,6 @@ shell_connection <- function(master,
     stop("Failed to connect to Spark (SPARK_HOME is not set).")
 
   # apply environment variables
-  environment <- list()
   sparkEnvironmentVars <- connection_config(list(config = config, master = master), "spark.env.")
   lapply(names(sparkEnvironmentVars), function(varName) {
     environment[[varName]] <<- sparkEnvironmentVars[[varName]]
@@ -257,7 +259,7 @@ start_shell <- function(master,
     console_log <- spark_config_exists(config, "sparklyr.log.console", FALSE)
 
     # start the shell (w/ specified additional environment variables)
-    env <- unlist(environment)
+    env <- unlist(as.list(environment))
     withr::with_envvar(env, {
       system2(spark_submit_path,
         args = shell_args,
