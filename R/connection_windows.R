@@ -28,7 +28,7 @@ verify_msvcr100 <- function() {
   }
 }
 
-prepare_windows_environment <- function(sparkHome) {
+prepare_windows_environment <- function(sparkHome, environment) {
   verbose <- sparklyr_boolean_option("sparklyr.verbose")
   verboseMessage <- function(...) {
     if (verbose) message(...)
@@ -60,23 +60,10 @@ prepare_windows_environment <- function(sparkHome) {
   }
   verboseMessage("HADOOP_HOME exists under ", hadoopPath)
 
-  if (nchar(Sys.getenv("HADOOP_HOME")) == 0 ||
-      Sys.getenv("HADOOP_HOME") != hadoopPath) {
+  # assign HADOOP_HOME to system2 environment which is more reliable than SETX
+  environment$HADOOP_HOME <- hadoopPath
 
-    if (Sys.getenv("HADOOP_HOME") != hadoopPath) {
-      warning("HADOOP_HOME was already but does not match current Spark installation")
-    } else {
-      verboseMessage("HADOOP_HOME environment variable not set")
-    }
-
-    output <- system2(
-      "SETX", c("HADOOP_HOME", shQuote(hadoopPath)),
-      stdout = if(verbose) TRUE else NULL)
-
-    verboseMessage("HADOOP_HOME environment set with output ", output)
-  } else {
-    verboseMessage("HADOOP_HOME environment was already set to ", Sys.getenv("HADOOP_HOME"))
-  }
+  verboseMessage("HADOOP_HOME environment set with output ", output)
 
   # pre-create the hive temp folder to manage permissions issues
   appUserTempDir <- normalizePath(
