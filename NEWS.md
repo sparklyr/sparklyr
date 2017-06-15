@@ -166,6 +166,9 @@
 
 ### Bug Fixes
 
+- Fixed `spark_connect` under Windows issue when `newInstance0` is present in 
+  the logs.
+
 - Fixed collecting `long` type columns when NAs are present (#463).
   
 - Fixed backend issue that affects systems where `localhost` does
