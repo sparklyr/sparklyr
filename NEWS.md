@@ -33,6 +33,9 @@
 
 ### dplyr
 
+- Support for Hive built-in operators `%like%`, `%rlike%`, and
+  `%regexp%` for matching regular expressions in `filter()` and `mutate()`.
+
 - Support for dplyr (>= 0.6) which among many improvements, increases
   performance in some queries by making use of a new query optimizer.
 
