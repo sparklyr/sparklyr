@@ -105,7 +105,7 @@
 ### Broom
   
 - Implemented `tidy()`, `augment()`, and `glance()` from tidyverse/broom for
-  `ml_model_generalized_linear_regression()` and `ml_model_linear_regression()`
+  `ml_model_generalized_linear_regression` and `ml_model_linear_regression`
   models.
   
 ### R Compatibility
