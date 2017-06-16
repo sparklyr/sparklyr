@@ -20,12 +20,10 @@ shell_connection <- function(master,
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
-  # for local mode we support SPARK_HOME via locally installed versions
-  if (spark_master_is_local(master)) {
-    if (!nzchar(spark_home)) {
-      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
-      spark_home <- installInfo$sparkVersionDir
-    }
+  # for local mode we support SPARK_HOME via locally installed versions and version overrides SPARK_HOME
+  if (spark_master_is_local(master) && !is.null(version)) {
+    installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
+    spark_home <- installInfo$sparkVersionDir
   }
 
   # start with blank environment variables
