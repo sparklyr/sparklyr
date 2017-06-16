@@ -75,6 +75,10 @@ spark_connect <- function(master = "local",
            "entry in your config.yml")
   }
 
+  # allow case-insensitive local connections to help new users
+  if (identical("local", tolower(master)))
+    master <- "local"
+
   # determine whether we need cores in master
   passedMaster <- master
   cores <- spark_config_value(config, "sparklyr.cores.local")
