@@ -166,6 +166,9 @@
 
 ### Bug Fixes
 
+- `spark_connect` with `master = "local"` and a given `version` overrides
+  `SPARK_HOME` to avoid existing installation mismatches.
+
 - Fixed `spark_connect` under Windows issue when `newInstance0` is present in 
   the logs.
 
