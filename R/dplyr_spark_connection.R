@@ -68,7 +68,10 @@ sql_translate_env.spark_connection <- function(con) {
       or = function(x, y) dbplyr::build_sql(x, " or ", y),
       and = function(x, y) dbplyr::build_sql(x, " and ", y),
       pmin = function(...) build_sql_if_compare(..., con = con, compare = "<="),
-      pmax = function(...) build_sql_if_compare(..., con = con, compare = ">=")
+      pmax = function(...) build_sql_if_compare(..., con = con, compare = ">="),
+      `%like%` = function(x, y) dbplyr::build_sql(x, " like ", y),
+      `%rlike%` = function(x, y) dbplyr::build_sql(x, " rlike ", y),
+      `%regexp%`  = function(x, y) dbplyr::build_sql(x, " regexp ", y)
     ),
 
     aggregate = dbplyr::sql_translator(
