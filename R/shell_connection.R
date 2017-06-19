@@ -21,8 +21,10 @@ shell_connection <- function(master,
   config <- shell_connection_validate_config(config)
 
   # for local mode we support SPARK_HOME via locally installed versions and version overrides SPARK_HOME
-  if (spark_master_is_local(master) && !is.null(version)) {
+  if (spark_master_is_local(master)) {
     installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, connecting = TRUE)
+    if (is.null(version))
+      message("* Using Spark: ", installInfo$sparkVersion)
     spark_home <- installInfo$sparkVersionDir
   }
 
