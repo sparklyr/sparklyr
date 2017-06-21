@@ -143,7 +143,7 @@ on_connection_closed <- function(scon) {
 
 on_connection_updated <- function(scon, hint) {
   # avoid updating temp tables that are filtered out
-  if (!grepl("^sparklyr_tmp_", hint)) return();
+  if (grepl("^sparklyr_tmp_", hint)) return();
 
   viewer <- external_viewer()
   if (!is.null(viewer))
