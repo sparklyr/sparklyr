@@ -27,7 +27,7 @@ test_that("'spark_apply' can add columns", {
 
 test_that("'spark_apply' can concatenate", {
   expect_equal(
-    iris_tbl %>% spark_apply(function(e) apply(e, 1, paste, collapse = " ")) %>% collect(),
+    iris_tbl %>% spark_apply(function(e) apply(e, 1, paste, collapse = " "), names = "s") %>% collect(),
     iris_tbl %>% transmute(s = paste(Sepal_Length, Sepal_Width, Petal_Length, Petal_Width, Species)) %>% collect()
   )
 })

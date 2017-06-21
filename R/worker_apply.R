@@ -35,7 +35,7 @@ spark_worker_apply <- function(sc) {
     result <- data.frame(result)
   }
 
-  data <- apply(result, 1, as.list)
+  data <- lapply(1:nrow(result), function(i) as.list(result[i,]))
 
   worker_invoke(context, "setResultArraySeq", data)
   worker_log("updated ", length(data), " rows")
