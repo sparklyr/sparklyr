@@ -102,8 +102,13 @@ test_that("ft_quantile_discretizer() works with basic input", {
 
   # https://github.com/rstudio/sparklyr/issues/341
   # previously failed due to incorrect assertion on 'n.buckets' type
-  iris_tbl %>%
+  result <- iris_tbl %>%
     ft_quantile_discretizer(input.col = "Sepal_Length",
                             output.col = "Group",
                             n.buckets = 2)
+
+  grouped <- result %>%
+    group_by(Group) %>% summarize(n = n())
+
+  expect_equal(nrow(grouped), 2)
 })
