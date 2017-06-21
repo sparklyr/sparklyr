@@ -130,7 +130,7 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
     "sparklyr.Utils",
     "createDataFrameFromCsv",
     spark_context(sc),
-    tempfile,
+    paste("file://", tempfile, sep = ""),
     columns,
     as.integer(if (repartition <= 0) 1 else repartition),
     separator$regexp
