@@ -126,4 +126,8 @@ db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...
 {
   df <- spark_dataframe(con, sql)
   invoke(df, "registerTempTable", name)
+
+  # compute() is expected to preserve the query, cache as the closest mapping.
+  if (!sparklyr_boolean_option("sparklyr.dplyr.compute.nocache"))
+    tbl_cache(con, name)
 }
