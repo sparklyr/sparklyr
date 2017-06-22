@@ -824,7 +824,7 @@ object Sources {
     "    result <- data.frame(result)\n" +
     "  }\n" +
     "\n" +
-    "  data <- apply(result, 1, as.list)\n" +
+    "  data <- lapply(1:nrow(result), function(i) as.list(result[i,]))\n" +
     "\n" +
     "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
     "  worker_log(\"updated \", length(data), \" rows\")\n" +

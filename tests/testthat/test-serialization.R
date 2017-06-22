@@ -82,7 +82,7 @@ test_that("data.frames with many columns survive roundtrip", {
 })
 
 test_that("data.frames with many columns don't cause Java StackOverflows", {
-  skip_on_cran() && skip_unless_verbose("Skipping slow serialization test")
+  skip_on_cran()
 
   n <- 5000
   df <- matrix(0, ncol = 5000, nrow = 2) %>% as_data_frame()
@@ -124,19 +124,9 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
     stringsAsFactors = FALSE
   )
 
-  copy_to(sc, df, serializer = "csv_string", overwrite = TRUE)
+  df_tbl <- copy_to(sc, df, serializer = "csv_string", overwrite = TRUE)
 
+  expect_equal(nrow(df_tbl), 2)
+  expect_equal(ncol(df_tbl), 2)
 })
 
-test_that("newlines are properly serialized / deserialized", {
-  skip("NYI")
-
-  df <- data.frame(
-    x = 1:3,
-    y = c("a\nb", "b", "c"),
-    stringsAsFactors = FALSE
-  )
-
-  ensure_round_trip(sc, df)
-
-})
