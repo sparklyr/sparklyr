@@ -1,6 +1,30 @@
 spark_schema_from_rdd <- function(sc, rdd, column_names) {
-  firstRow <- rdd %>% invoke("first") %>% invoke("toSeq")
-  fields <- lapply(seq_along(firstRow), function(idx) {
+  sampleRows <- rdd %>% invoke(
+    "take",
+    sparklyr::ensure_scalar_integer(
+      spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+    )
+  )
+
+  colTypes <- NULL
+  lapply(sampleRows, function(r) {
+    row <- r %>% invoke("toSeq")
+
+    if (is.null(colTypes))
+      colTypes <<- replicate(length(row), "character")
+
+    lapply(seq_along(row), function(colIdx) {
+      colVal <- row[[colIdx]]
+      if (!is.na(colVal) && !is.null(colVal)) {
+        colTypes[[colIdx]] <<- typeof(colVal)
+      }
+    })
+  })
+
+  if (any(sapply(colTypes, is.null)))
+    stop("Failed to infer column types, please use explicit types.")
+
+  fields <- lapply(seq_along(colTypes), function(idx) {
     name <- if (is.null(column_names)) as.character(idx) else column_names[[idx]]
 
     invoke_static(
@@ -8,7 +32,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
       "sparklyr.SQLUtils",
       "createStructField",
       name,
-      typeof(firstRow[[idx]]),
+      typeof(colTypes[[idx]]),
       TRUE
     )
   })
