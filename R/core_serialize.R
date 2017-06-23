@@ -26,7 +26,13 @@ getSerdeType <- function(object) {
     # Check if all elements are of same type
     elemType <- unique(sapply(object, function(elem) { getSerdeType(elem) }))
     if (length(elemType) <= 1) {
-      "array"
+      # Check that there are no NAs in character arrays since they are unsupported in scala
+      hasCharNAs <- any(sapply(object, function(elem) is.character(elem) && is.na(elem)))
+      if (hasCharNAs) {
+        "list"
+      } else {
+        "array"
+      }
     } else {
       "list"
     }
