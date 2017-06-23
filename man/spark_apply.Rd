@@ -4,7 +4,7 @@
 \alias{spark_apply}
 \title{Apply a Function in Spark}
 \usage{
-spark_apply(x, f, names = colnames(x), memory = TRUE)
+spark_apply(x, f, names = colnames(x), memory = TRUE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -15,6 +15,8 @@ spark_apply(x, f, names = colnames(x), memory = TRUE)
 names from the original object.}
 
 \item{memory}{Boolean; should the table be cached into memory?}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Applies a function to a Spark object (typically, a Spark DataFrame).
