@@ -22,31 +22,35 @@ class Rscript(logger: Logger) {
     tempFile.getAbsolutePath()
   }
 
-  def init(sessionId: Int) = {
+  def init(sessionId: Int, config: String) = {
     val sparkConf = SparkEnv.get.conf
     val command: String = sparkConf.get("spark.r.command", "Rscript")
 
     val sourceFilePath: String = workerSourceFile()
-    logger.log("Path to source file " + sourceFilePath)
+    logger.log("using source file " + sourceFilePath)
+    logger.log(
+      "launching command " + command + " --vanilla <source-file> " +
+      sessionId.toString + " " + config)
 
     val processBuilder: ProcessBuilder = new ProcessBuilder(Arrays.asList(
       command,
       "--vanilla",
       sourceFilePath,
-      sessionId.toString
+      sessionId.toString,
+      config
     ))
 
     processBuilder.redirectErrorStream(true);
     processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 
-    logger.log("R process starting")
+    logger.log("is starting R process")
     val process: Process = processBuilder.start()
     val status: Int = process.waitFor()
 
     if (status == 0) {
-      logger.log("R process completed")
+      logger.log("completed R process")
     } else {
-      logger.logError("R process failed")
+      logger.logError("failed to complete R process")
 
       throw new Exception(s"sparklyr worker rscript failure, check worker logs for details.")
     }

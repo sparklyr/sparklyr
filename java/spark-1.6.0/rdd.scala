@@ -9,7 +9,8 @@ import scala.reflect.ClassTag
 class WorkerRDD[T: ClassTag](
   parent: RDD[T],
   closure: Array[Byte],
-  columns: Array[String]
+  columns: Array[String],
+  config: String
   ) extends RDD[T](parent) {
 
   private[this] var port: Int = 8880
@@ -33,12 +34,12 @@ class WorkerRDD[T: ClassTag](
     )
 
     val contextId = JVMObjectTracker.put(workerContext)
-    logger.log("tracking worker context under " + contextId)
+    logger.log("is tracking worker context under " + contextId)
 
     new Thread("starting backend thread") {
       override def run(): Unit = {
         try {
-          logger.log("backend starting")
+          logger.log("starting backend")
           val backend: Backend = new Backend()
 
           /*
@@ -73,10 +74,10 @@ class WorkerRDD[T: ClassTag](
     new Thread("starting rscript thread") {
       override def run(): Unit = {
         try {
-          logger.log("rscript starting")
+          logger.log("is starting rscript")
 
           val rscript = new Rscript(logger)
-          rscript.init(sessionId)
+          rscript.init(sessionId, config)
           lock.synchronized {
             lock.notify
           }
