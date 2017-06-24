@@ -387,9 +387,11 @@ object Sources {
     "    withr::with_options(list(\n" +
     "      warning.length = 8000\n" +
     "    ), {\n" +
-    "      if (nzchar(msg))\n" +
+    "      if (nzchar(msg)) {\n" +
+    "        core_warning_from_error(msg)\n" +
+    "\n" +
     "        stop(msg, call. = FALSE)\n" +
-    "      else {\n" +
+    "      } else {\n" +
     "        # read the spark log\n" +
     "        msg <- read_spark_log_error(sc)\n" +
     "        stop(msg, call. = FALSE)\n" +
@@ -401,6 +403,18 @@ object Sources {
     "\n" +
     "  object <- readObject(backend)\n" +
     "  attach_connection(object, sc)\n" +
+    "}\n" +
+    "\n" +
+    "core_warning_from_error <- function(msg) {\n" +
+    "  # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle\n" +
+    "  # gracefully and triggers unexpected errors such as #532. Under these versions,\n" +
+    "  # we proactevely test getLocalHost() to warn users of this problem.\n" +
+    "  if (grepl(\"ServiceConfigurationError.*tachyon\", msg, ignore.case = TRUE)) {\n" +
+    "    warning(\n" +
+    "      \"Failed to retrieve localhost, please validate that the hostname is correctly mapped. \",\n" +
+    "      \"Consider running `hostname` and adding that entry to your `/etc/hosts` file.\"\n" +
+    "    )\n" +
+    "  }\n" +
     "}\n" +
     "#' Retrieve a Spark JVM Object Reference\n" +
     "#'\n" +
