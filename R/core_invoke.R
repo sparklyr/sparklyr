@@ -37,9 +37,11 @@ core_invoke_method <- function(sc, static, object, method, ...)
     withr::with_options(list(
       warning.length = 8000
     ), {
-      if (nzchar(msg))
+      if (nzchar(msg)) {
+        core_warning_from_error(msg)
+
         stop(msg, call. = FALSE)
-      else {
+      } else {
         # read the spark log
         msg <- read_spark_log_error(sc)
         stop(msg, call. = FALSE)
@@ -51,4 +53,16 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   object <- readObject(backend)
   attach_connection(object, sc)
+}
+
+core_warning_from_error <- function(msg) {
+  # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle
+  # gracefully and triggers unexpected errors such as #532. Under these versions,
+  # we proactevely test getLocalHost() to warn users of this problem.
+  if (grepl("ServiceConfigurationError.*tachyon", msg, ignore.case = TRUE)) {
+    warning(
+      "Failed to retrieve localhost, please validate that the hostname is correctly mapped. ",
+      "Consider running `hostname` and adding that entry to your `/etc/hosts` file."
+    )
+  }
 }

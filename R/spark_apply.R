@@ -1,6 +1,30 @@
 spark_schema_from_rdd <- function(sc, rdd, column_names) {
-  firstRow <- rdd %>% invoke("first") %>% invoke("toSeq")
-  fields <- lapply(seq_along(firstRow), function(idx) {
+  sampleRows <- rdd %>% invoke(
+    "take",
+    sparklyr::ensure_scalar_integer(
+      spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+    )
+  )
+
+  colTypes <- NULL
+  lapply(sampleRows, function(r) {
+    row <- r %>% invoke("toSeq")
+
+    if (is.null(colTypes))
+      colTypes <<- replicate(length(row), "character")
+
+    lapply(seq_along(row), function(colIdx) {
+      colVal <- row[[colIdx]]
+      if (!is.na(colVal) && !is.null(colVal)) {
+        colTypes[[colIdx]] <<- typeof(colVal)
+      }
+    })
+  })
+
+  if (any(sapply(colTypes, is.null)))
+    stop("Failed to infer column types, please use explicit types.")
+
+  fields <- lapply(seq_along(colTypes), function(idx) {
     name <- if (is.null(column_names)) as.character(idx) else column_names[[idx]]
 
     invoke_static(
@@ -8,7 +32,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
       "sparklyr.SQLUtils",
       "createStructField",
       name,
-      typeof(firstRow[[idx]]),
+      colTypes[[idx]],
       TRUE
     )
   })
@@ -30,15 +54,31 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #' @param names The column names for the transformed object, defaults to the
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
+#' @param ... Optional arguments; currently unused.
 #'
 #' @export
-spark_apply <- function(x, f, names = colnames(x), memory = TRUE) {
+spark_apply <- function(x, f, names = colnames(x), memory = TRUE, ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
+  args <- list(...)
 
+  # create closure for the given function
   closure <- serialize(f, NULL)
 
-  rdd <- invoke_static(sc, "sparklyr.WorkerHelper", "computeRdd", sdf, closure)
+  # build the configuration definetion for each worker role
+
+  # create a configuration string to initialize each worker
+  worker_config <- worker_config_serialize(list(
+    debug = isTRUE(args$debug)
+  ))
+
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.WorkerHelper",
+    "computeRdd",
+    sdf,
+    closure,
+    worker_config)
 
   # while workers need to relaunch sparklyr backends, cache by default
   if (memory) rdd <- invoke(rdd, "cache")

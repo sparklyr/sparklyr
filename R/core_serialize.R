@@ -26,7 +26,17 @@ getSerdeType <- function(object) {
     # Check if all elements are of same type
     elemType <- unique(sapply(object, function(elem) { getSerdeType(elem) }))
     if (length(elemType) <= 1) {
-      "array"
+
+      # Check that there are no NAs in character arrays since they are unsupported in scala
+      hasCharNAs <- any(sapply(object, function(elem) {
+        (is.factor(elem) || is.character(elem)) && is.na(elem)
+      }))
+
+      if (hasCharNAs) {
+        "list"
+      } else {
+        "array"
+      }
     } else {
       "list"
     }
@@ -40,7 +50,7 @@ writeObject <- function(con, object, writeType = TRUE) {
   type <- class(object)[[1]]  # class of POSIXlt is c("POSIXlt", "POSIXt")
   # Checking types is needed here, since 'is.na' only handles atomic vectors,
   # lists and pairlists
-  if (type %in% c("integer", "character", "logical", "double", "numeric")) {
+  if (type %in% c("integer", "character", "logical", "double", "numeric", "factor")) {
     if (is.na(object)) {
       object <- NULL
       type <- "NULL"

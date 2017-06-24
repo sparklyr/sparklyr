@@ -60,13 +60,14 @@ class WorkerContext[T: ClassTag](
 }
 
 object WorkerHelper {
-  def computeRdd(df: DataFrame, closure: Array[Byte]): RDD[Row] = {
+  def computeRdd(df: DataFrame, closure: Array[Byte], config: String): RDD[Row] = {
 
     val parent: RDD[Row] = df.rdd
     val computed: RDD[Row] = new WorkerRDD[Row](
       parent,
       closure,
-      df.columns)
+      df.columns,
+      config)
 
     computed
   }

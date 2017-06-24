@@ -3,7 +3,7 @@ spark_compile_embedded_sources <- function() {
   rlines <- unlist(lapply(worker_files, function(e) readLines(e)))
   rlines <- gsub("\\\\", "\\\\\\\\", rlines)
   rlines <- gsub("\\\"", "\\\\\"", rlines)
-  rlines <- c(rlines, "spark_worker_main(commandArgs(trailingOnly = TRUE)[1])")
+  rlines <- c(rlines, "do.call(spark_worker_main, as.list(commandArgs(trailingOnly = TRUE)))")
 
   lines <- c(
     "package sparklyr",

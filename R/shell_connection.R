@@ -83,9 +83,10 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
     # sleep for one second to allow spark process to dump data into the log file
     Sys.sleep(1)
 
-    logLines <- if (!is.null(output_file) && file.exists(output_file))
-      paste(tail(readLines(output_file), n = maxRows), collapse = "\n")
-    else ""
+    logLines <- if (!is.null(output_file) && file.exists(output_file)) {
+      outputContent <- readLines(output_file)
+      paste(tail(outputContent, n = maxRows), collapse = "\n")
+    } else ""
 
     errorLines <- if (!is.null(error_file) && file.exists(error_file))
       paste(tail(readLines(error_file), n = maxRows), collapse = "\n")

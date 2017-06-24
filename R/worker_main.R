@@ -1,5 +1,15 @@
-spark_worker_main <- function(sessionId) {
+spark_worker_main <- function(sessionId, configRaw) {
   spark_worker_hooks()
+
+  config <- worker_config_deserialize(configRaw)
+
+  if (config$debug) {
+    worker_log("exiting to wait for debugging session to attach")
+
+    # sleep for 1 day to allow long debugging sessions
+    Sys.sleep(60*60*24)
+    return()
+  }
 
   worker_log_session(sessionId)
   worker_log("is starting")

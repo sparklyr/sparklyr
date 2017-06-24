@@ -387,9 +387,11 @@ object Sources {
     "    withr::with_options(list(\n" +
     "      warning.length = 8000\n" +
     "    ), {\n" +
-    "      if (nzchar(msg))\n" +
+    "      if (nzchar(msg)) {\n" +
+    "        core_warning_from_error(msg)\n" +
+    "\n" +
     "        stop(msg, call. = FALSE)\n" +
-    "      else {\n" +
+    "      } else {\n" +
     "        # read the spark log\n" +
     "        msg <- read_spark_log_error(sc)\n" +
     "        stop(msg, call. = FALSE)\n" +
@@ -401,6 +403,18 @@ object Sources {
     "\n" +
     "  object <- readObject(backend)\n" +
     "  attach_connection(object, sc)\n" +
+    "}\n" +
+    "\n" +
+    "core_warning_from_error <- function(msg) {\n" +
+    "  # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle\n" +
+    "  # gracefully and triggers unexpected errors such as #532. Under these versions,\n" +
+    "  # we proactevely test getLocalHost() to warn users of this problem.\n" +
+    "  if (grepl(\"ServiceConfigurationError.*tachyon\", msg, ignore.case = TRUE)) {\n" +
+    "    warning(\n" +
+    "      \"Failed to retrieve localhost, please validate that the hostname is correctly mapped. \",\n" +
+    "      \"Consider running `hostname` and adding that entry to your `/etc/hosts` file.\"\n" +
+    "    )\n" +
+    "  }\n" +
     "}\n" +
     "#' Retrieve a Spark JVM Object Reference\n" +
     "#'\n" +
@@ -604,7 +618,17 @@ object Sources {
     "    # Check if all elements are of same type\n" +
     "    elemType <- unique(sapply(object, function(elem) { getSerdeType(elem) }))\n" +
     "    if (length(elemType) <= 1) {\n" +
-    "      \"array\"\n" +
+    "\n" +
+    "      # Check that there are no NAs in character arrays since they are unsupported in scala\n" +
+    "      hasCharNAs <- any(sapply(object, function(elem) {\n" +
+    "        (is.factor(elem) || is.character(elem)) && is.na(elem)\n" +
+    "      }))\n" +
+    "\n" +
+    "      if (hasCharNAs) {\n" +
+    "        \"list\"\n" +
+    "      } else {\n" +
+    "        \"array\"\n" +
+    "      }\n" +
     "    } else {\n" +
     "      \"list\"\n" +
     "    }\n" +
@@ -618,7 +642,7 @@ object Sources {
     "  type <- class(object)[[1]]  # class of POSIXlt is c(\"POSIXlt\", \"POSIXt\")\n" +
     "  # Checking types is needed here, since 'is.na' only handles atomic vectors,\n" +
     "  # lists and pairlists\n" +
-    "  if (type %in% c(\"integer\", \"character\", \"logical\", \"double\", \"numeric\")) {\n" +
+    "  if (type %in% c(\"integer\", \"character\", \"logical\", \"double\", \"numeric\", \"factor\")) {\n" +
     "    if (is.na(object)) {\n" +
     "      object <- NULL\n" +
     "      type <- \"NULL\"\n" +
@@ -786,6 +810,20 @@ object Sources {
     "      writeObject(con, a)\n" +
     "    }\n" +
     "  }\n" +
+    "}\n" +
+    "worker_config_serialize <- function(config) {\n" +
+    "  paste(\n" +
+    "    if (isTRUE(config$debug)) \"TRUE\" else \"FALSE\",\n" +
+    "    collapse = \";\"\n" +
+    "  )\n" +
+    "}\n" +
+    "\n" +
+    "worker_config_deserialize <- function(raw) {\n" +
+    "  parts <- strsplit(raw, \";\")[[1]]\n" +
+    "\n" +
+    "  list(\n" +
+    "    debug = as.logical(parts[[1]])\n" +
+    "  )\n" +
     "}\n" +
     "spark_worker_apply <- function(sc) {\n" +
     "  hostContextId <- worker_invoke_method(sc, FALSE, \"Handler\", \"getHostContext\")\n" +
@@ -961,8 +999,18 @@ object Sources {
     "worker_log_error <- function(...) {\n" +
     "  worker_log_level(..., level = \"ERROR\")\n" +
     "}\n" +
-    "spark_worker_main <- function(sessionId) {\n" +
+    "spark_worker_main <- function(sessionId, configRaw) {\n" +
     "  spark_worker_hooks()\n" +
+    "\n" +
+    "  config <- worker_config_deserialize(configRaw)\n" +
+    "\n" +
+    "  if (config$debug) {\n" +
+    "    worker_log(\"exiting to wait for debugging session to attach\")\n" +
+    "\n" +
+    "    # sleep for 1 day to allow long debugging sessions\n" +
+    "    Sys.sleep(60*60*24)\n" +
+    "    return()\n" +
+    "  }\n" +
     "\n" +
     "  worker_log_session(sessionId)\n" +
     "  worker_log(\"is starting\")\n" +
@@ -992,6 +1040,6 @@ object Sources {
     "  }, as.environment(\"package:base\"))\n" +
     "  lock(\"stop\",  as.environment(\"package:base\"))\n" +
     "}\n" +
-    "spark_worker_main(commandArgs(trailingOnly = TRUE)[1])\n" +
+    "do.call(spark_worker_main, as.list(commandArgs(trailingOnly = TRUE)))\n" +
     ""
 }
