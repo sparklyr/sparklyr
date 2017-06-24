@@ -85,13 +85,6 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
 
     logLines <- if (!is.null(output_file) && file.exists(output_file)) {
       outputContent <- readLines(output_file)
-      if (grepl("ServiceConfigurationError.*tachyon", outputContent, ignore.case = TRUE)) {
-        warning(
-          "Failed to retrieve localhost, please validate that the hostname is correctly mapped. ",
-          "Consider running `hostname` and adding that entry to your `/etc/hosts` file."
-        )
-      }
-
       paste(tail(outputContent, n = maxRows), collapse = "\n")
     } else ""
 
