@@ -32,7 +32,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
       "sparklyr.SQLUtils",
       "createStructField",
       name,
-      typeof(colTypes[[idx]]),
+      colTypes[[idx]],
       TRUE
     )
   })
