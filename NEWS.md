@@ -33,6 +33,8 @@
 
 ### dplyr
 
+- Support for `sd()` and `var()` in windowed mutates.
+
 - Support for Hive built-in operators `%like%`, `%rlike%`, and
   `%regexp%` for matching regular expressions in `filter()` and `mutate()`.
 
