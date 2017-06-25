@@ -94,7 +94,13 @@ sql_translate_env.spark_connection <- function(con) {
           default = default,
           order = order
         )
-      }
+      },
+      cor = dbplyr::win_absent("cor"),
+      count = dbplyr::win_absent("count"),
+      cov = dbplyr::win_absent("cov"),
+      n_distinct = dbplyr::win_absent("n_distinct"),
+      sd = dbplyr::win_recycled("stddev_samp"),
+      var = dbplyr::win_recycled("var_samp")
     )
 
   )
