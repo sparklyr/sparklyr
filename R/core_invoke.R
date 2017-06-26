@@ -29,8 +29,22 @@ core_invoke_method <- function(sc, static, object, method, ...)
   writeBin(con, backend)
 
   returnStatus <- readInt(backend)
-  if (length(returnStatus) == 0)
-    stop("No status is returned. The sparklyr backend might have failed.")
+
+  if (length(returnStatus) == 0) {
+    # read the spark log
+    msg <- core_read_spark_log_error(sc)
+    close(sc$backend)
+    close(sc$monitor)
+    withr::with_options(list(
+      warning.length = 8000
+    ), {
+      stop(
+        "Unexpected state in sparklyr backend, terminating connection: ",
+        msg,
+        call. = FALSE)
+    })
+  }
+
   if (returnStatus != 0) {
     # get error message from backend and report to R
     msg <- readString(backend)
@@ -43,7 +57,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
         stop(msg, call. = FALSE)
       } else {
         # read the spark log
-        msg <- read_spark_log_error(sc)
+        msg <- core_read_spark_log_error(sc)
         stop(msg, call. = FALSE)
       }
     })
@@ -65,4 +79,22 @@ core_warning_from_error <- function(msg) {
       "Consider running `hostname` and adding that entry to your `/etc/hosts` file."
     )
   }
+}
+
+core_read_spark_log_error <- function(sc) {
+  # if there was no error message reported, then
+  # return information from the Spark logs. return
+  # all those with most recent timestamp
+  msg <- "failed to invoke spark command (unknown reason)"
+  try(silent = TRUE, {
+    log <- readLines(sc$output_file)
+    splat <- strsplit(log, "\\s+", perl = TRUE)
+    n <- length(splat)
+    timestamp <- splat[[n]][[2]]
+    regex <- paste("\\b", timestamp, "\\b", sep = "")
+    entries <- grep(regex, log, perl = TRUE, value = TRUE)
+    pasted <- paste(entries, collapse = "\n")
+    msg <- paste("failed to invoke spark command", pasted, sep = "\n")
+  })
+  msg
 }

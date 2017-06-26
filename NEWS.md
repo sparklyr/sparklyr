@@ -169,6 +169,9 @@
 
 ### Bug Fixes
 
+- Fixed session crash after "No status is returned" error by terminating
+  invalid connection and added support to print log trace during this error.
+
 - `compute()` now caches data in memory by default. To revert this beavior use
   `sparklyr.dplyr.compute.nocache` set to `TRUE`.
 

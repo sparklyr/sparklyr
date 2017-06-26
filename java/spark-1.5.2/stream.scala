@@ -33,14 +33,14 @@ object StreamHandler {
       methodName match {
         case "echo" =>
           val args = readArgs(numArgs, dis)
-          assert(numArgs == 1)
+          if (numArgs != 1) throw new IllegalArgumentException("echo should take a single argument")
 
           writeInt(dos, 0)
           writeObject(dos, args(0))
         case "rm" =>
           try {
             val t = readObjectType(dis)
-            assert(t == 'c')
+            if (t != 'c') throw new IllegalArgumentException("object removal expects a string")
             val objToRemove = readString(dis)
             JVMObjectTracker.remove(objToRemove)
             writeInt(dos, 0)
