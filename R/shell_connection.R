@@ -441,24 +441,6 @@ print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
   }
 }
 
-read_spark_log_error <- function(sc) {
-  # if there was no error message reported, then
-  # return information from the Spark logs. return
-  # all those with most recent timestamp
-  msg <- "failed to invoke spark command (unknown reason)"
-  try(silent = TRUE, {
-    log <- readr::read_lines(sc$output_file)
-    splat <- strsplit(log, "\\s+", perl = TRUE)
-    n <- length(splat)
-    timestamp <- splat[[n]][[2]]
-    regex <- paste("\\b", timestamp, "\\b", sep = "")
-    entries <- grep(regex, log, perl = TRUE, value = TRUE)
-    pasted <- paste(entries, collapse = "\n")
-    msg <- paste("failed to invoke spark command", pasted, sep = "\n")
-  })
-  msg
-}
-
 #' @export
 initialize_connection.spark_shell_connection <- function(sc) {
   # initialize and return the connection
