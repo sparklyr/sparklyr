@@ -89,7 +89,7 @@ object Serializer {
   def readStringBytes(in: DataInputStream, len: Int): String = {
     val bytes = new Array[Byte](len)
     in.readFully(bytes)
-    assert(bytes(len - 1) == 0)
+    if (bytes(len - 1) != 0) throw new IllegalArgumentException("length and stream do not match")
     val str = new String(bytes.dropRight(1), StandardCharsets.UTF_8)
     str
   }
