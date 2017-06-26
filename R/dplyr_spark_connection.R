@@ -50,11 +50,18 @@ build_sql_if_compare <- function(..., con, compare) {
 #' @export
 #' @importFrom dplyr sql_translate_env
 #' @importFrom dbplyr build_sql
+#' @importFrom dbplyr win_over
+#' @importFrom dbplyr sql
+#' @importFrom dbplyr win_current_group
+#' @importFrom dbplyr win_current_order
 sql_translate_env.spark_connection <- function(con) {
   win_recycled_params <- function(prefix) {
 
     function(x, y) {
+      # Use win_current_frame() once exported form `dbplyr`
+      sql_context <- get("sql_context", envir = asNamespace("dbplyr"))
       frame <- dbplyr:::sql_context$frame
+
       dbplyr::win_over(
         dbplyr::build_sql(dbplyr::sql(prefix), "(", x, ",", y, ")"),
         partition = dbplyr::win_current_group(),
