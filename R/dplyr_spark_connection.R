@@ -60,7 +60,7 @@ sql_translate_env.spark_connection <- function(con) {
     function(x, y) {
       # Use win_current_frame() once exported form `dbplyr`
       sql_context <- get("sql_context", envir = asNamespace("dbplyr"))
-      frame <- dbplyr:::sql_context$frame
+      frame <- sql_context$frame
 
       dbplyr::win_over(
         dbplyr::build_sql(dbplyr::sql(prefix), "(", x, ",", y, ")"),
