@@ -379,8 +379,22 @@ object Sources {
     "  writeBin(con, backend)\n" +
     "\n" +
     "  returnStatus <- readInt(backend)\n" +
-    "  if (length(returnStatus) == 0)\n" +
-    "    stop(\"No status is returned. The sparklyr backend might have failed.\")\n" +
+    "\n" +
+    "  if (length(returnStatus) == 0) {\n" +
+    "    # read the spark log\n" +
+    "    msg <- core_read_spark_log_error(sc)\n" +
+    "    close(sc$backend)\n" +
+    "    close(sc$monitor)\n" +
+    "    withr::with_options(list(\n" +
+    "      warning.length = 8000\n" +
+    "    ), {\n" +
+    "      stop(\n" +
+    "        \"Unexpected state in sparklyr backend, terminating connection: \",\n" +
+    "        msg,\n" +
+    "        call. = FALSE)\n" +
+    "    })\n" +
+    "  }\n" +
+    "\n" +
     "  if (returnStatus != 0) {\n" +
     "    # get error message from backend and report to R\n" +
     "    msg <- readString(backend)\n" +
@@ -393,7 +407,7 @@ object Sources {
     "        stop(msg, call. = FALSE)\n" +
     "      } else {\n" +
     "        # read the spark log\n" +
-    "        msg <- read_spark_log_error(sc)\n" +
+    "        msg <- core_read_spark_log_error(sc)\n" +
     "        stop(msg, call. = FALSE)\n" +
     "      }\n" +
     "    })\n" +
@@ -415,6 +429,24 @@ object Sources {
     "      \"Consider running `hostname` and adding that entry to your `/etc/hosts` file.\"\n" +
     "    )\n" +
     "  }\n" +
+    "}\n" +
+    "\n" +
+    "core_read_spark_log_error <- function(sc) {\n" +
+    "  # if there was no error message reported, then\n" +
+    "  # return information from the Spark logs. return\n" +
+    "  # all those with most recent timestamp\n" +
+    "  msg <- \"failed to invoke spark command (unknown reason)\"\n" +
+    "  try(silent = TRUE, {\n" +
+    "    log <- readLines(sc$output_file)\n" +
+    "    splat <- strsplit(log, \"\\\\s+\", perl = TRUE)\n" +
+    "    n <- length(splat)\n" +
+    "    timestamp <- splat[[n]][[2]]\n" +
+    "    regex <- paste(\"\\\\b\", timestamp, \"\\\\b\", sep = \"\")\n" +
+    "    entries <- grep(regex, log, perl = TRUE, value = TRUE)\n" +
+    "    pasted <- paste(entries, collapse = \"\\n\")\n" +
+    "    msg <- paste(\"failed to invoke spark command\", pasted, sep = \"\\n\")\n" +
+    "  })\n" +
+    "  msg\n" +
     "}\n" +
     "#' Retrieve a Spark JVM Object Reference\n" +
     "#'\n" +
