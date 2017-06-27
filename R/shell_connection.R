@@ -27,7 +27,7 @@ shell_connection <- function(master,
       spark_home <- installInfo$sparkVersionDir
 
       if (is.null(version))
-        message("* Using Spark: ", installInfo$sparkVersionDir)
+        message("* Using Spark: ", installInfo$sparkVersion)
     }
   }
 
