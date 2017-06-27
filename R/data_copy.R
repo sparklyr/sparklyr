@@ -23,9 +23,13 @@ spark_serialize_csv_file <- function(sc, df, columns, repartition) {
     write.csv(df, tempfile, row.names = FALSE, na = "")
   }
 
-  df <- spark_csv_read(sc, tempfile, csvOptions = list(
-    header = "true"
-  ), columns = columns)
+  df <- spark_csv_read(
+    sc,
+    paste("file:///", tempfile, sep = ""),
+    csvOptions = list(
+      header = "true"
+    ),
+    columns = columns)
 
   if (repartition > 0) {
     df <- invoke(df, "repartition", as.integer(repartition))

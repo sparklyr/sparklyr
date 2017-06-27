@@ -173,6 +173,9 @@
 
 ### Bug Fixes
 
+- Fixed `Path does not exist` referencing `hdfs` exception during `copy_to` under
+  systems configured with `HADOOP_HOME`.
+
 - Fixed session crash after "No status is returned" error by terminating
   invalid connection and added support to print log trace during this error.
 
