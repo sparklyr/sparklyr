@@ -118,7 +118,19 @@ sql_translate_env.spark_connection <- function(con) {
       cor = win_recycled_params("corr"),
       cov =  win_recycled_params("covar_samp"),
       sd =  dbplyr::win_recycled("stddev_samp"),
-      var = dbplyr::win_recycled("var_samp")
+      var = dbplyr::win_recycled("var_samp"),
+      cumprod = function(x) {
+        dbplyr::build_sql(
+          "exp(",
+          dbplyr::win_over(
+            dbplyr::build_sql("sum(log(", x, "))"),
+            partition = dbplyr::win_current_group(),
+            order = dbplyr::win_current_order(),
+            frame = c(-Inf, 0)
+          ),
+          ")"
+        )
+      }
     )
 
   )

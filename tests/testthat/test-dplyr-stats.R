@@ -58,3 +58,23 @@ test_that("cor, cov, sd and var works as expected over groups", {
 
   expect_equal(s1, s2)
 })
+
+test_that("sumprod works as expected", {
+  test_requires("dplyr")
+
+  stats <- data.frame(x=1:10)
+  stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
+
+  s1 <- stats %>% mutate(
+    cumprod = cumprod(x)
+  )
+
+  s2 <- stats_tbl %>%
+    mutate(
+      cumprod = cumprod(x)
+    ) %>%
+    collect() %>%
+    as.data.frame()
+
+  expect_equal(s1, s2)
+})
