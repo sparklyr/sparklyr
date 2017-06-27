@@ -50,7 +50,27 @@ build_sql_if_compare <- function(..., con, compare) {
 #' @export
 #' @importFrom dplyr sql_translate_env
 #' @importFrom dbplyr build_sql
+#' @importFrom dbplyr win_over
+#' @importFrom dbplyr sql
+#' @importFrom dbplyr win_current_group
+#' @importFrom dbplyr win_current_order
 sql_translate_env.spark_connection <- function(con) {
+  win_recycled_params <- function(prefix) {
+
+    function(x, y) {
+      # Use win_current_frame() once exported form `dbplyr`
+      sql_context <- get("sql_context", envir = asNamespace("dbplyr"))
+      frame <- sql_context$frame
+
+      dbplyr::win_over(
+        dbplyr::build_sql(dbplyr::sql(prefix), "(", x, ",", y, ")"),
+        partition = dbplyr::win_current_group(),
+        order = if (!is.null(frame)) dbplyr::win_current_order(),
+        frame = frame
+      )
+    }
+  }
+
   dbplyr::sql_variant(
 
     scalar = dbplyr::sql_translator(
@@ -79,10 +99,10 @@ sql_translate_env.spark_connection <- function(con) {
       n = function() dbplyr::sql("count(*)"),
       count = function() dbplyr::sql("count(*)"),
       n_distinct = function(...) dbplyr::build_sql("count(DISTINCT", list(...), ")"),
-      cor = function(...) dbplyr::build_sql("corr(", list(...), ")"),
-      cov = function(...) dbplyr::build_sql("covar_samp(", list(...), ")"),
-      sd =  function(...) dbplyr::build_sql("stddev_samp(", list(...), ")"),
-      var = function(...) dbplyr::build_sql("var_samp(", list(...), ")")
+      cor = dbplyr::sql_prefix("corr"),
+      cov = dbplyr::sql_prefix("covar_samp"),
+      sd =  dbplyr::sql_prefix("stddev_samp"),
+      var = dbplyr::sql_prefix("var_samp")
     ),
 
     window = dbplyr::sql_translator(
@@ -94,7 +114,11 @@ sql_translate_env.spark_connection <- function(con) {
           default = default,
           order = order
         )
-      }
+      },
+      cor = win_recycled_params("corr"),
+      cov =  win_recycled_params("covar_samp"),
+      sd =  dbplyr::win_recycled("stddev_samp"),
+      var = dbplyr::win_recycled("var_samp")
     )
 
   )

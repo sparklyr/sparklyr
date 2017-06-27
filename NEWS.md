@@ -33,6 +33,8 @@
 
 ### dplyr
 
+- Support for `cor()`, `cov()`, `sd()` and `var()` as window functions.
+
 - Support for Hive built-in operators `%like%`, `%rlike%`, and
   `%regexp%` for matching regular expressions in `filter()` and `mutate()`.
 
