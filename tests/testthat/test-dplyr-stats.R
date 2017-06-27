@@ -65,11 +65,14 @@ test_that("sumprod works as expected", {
   stats <- data.frame(x=1:10)
   stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
 
-  s1 <- stats %>% mutate(
-    cumprod = cumprod(x)
-  )
+  s1 <- stats %>%
+    arrange(x) %>%
+    mutate(
+      cumprod = cumprod(x)
+    )
 
   s2 <- stats_tbl %>%
+    arrange(x) %>%
     mutate(
       cumprod = cumprod(x)
     ) %>%
