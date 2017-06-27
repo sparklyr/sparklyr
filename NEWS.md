@@ -33,6 +33,8 @@
 
 ### dplyr
 
+- Support for `cumprod()` to calculate cumulative products.
+
 - Support for `cor()`, `cov()`, `sd()` and `var()` as window functions.
 
 - Support for Hive built-in operators `%like%`, `%rlike%`, and
