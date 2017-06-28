@@ -115,6 +115,11 @@ sql_translate_env.spark_connection <- function(con) {
           order = order
         )
       },
+      count = function() dbplyr::win_over(
+        dbplyr::sql("count(*)"),
+        partition = dbplyr::win_current_group()
+      ),
+      n_distinct = dbplyr::win_absent("distinct"),
       cor = win_recycled_params("corr"),
       cov =  win_recycled_params("covar_samp"),
       sd =  dbplyr::win_recycled("stddev_samp"),
