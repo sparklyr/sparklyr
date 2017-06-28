@@ -7,6 +7,9 @@
 
 ### External Data
 
+- Added `partition_by` parameter to `spark_write_csv()`, `spark_write_json()`,
+  `spark_write_table()` and `spark_write_parquet()`.
+
 - Added `spark_read_source()`. This function reads data from a
   Spark data source which can be loaded through an Spark package.
 

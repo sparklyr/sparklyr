@@ -4,7 +4,8 @@
 \alias{spark_write_table}
 \title{Writes a Spark DataFrame into a Spark table}
 \usage{
-spark_write_table(x, name, mode = NULL, options = list())
+spark_write_table(x, name, mode = NULL, options = list(),
+  partition_by = NULL, ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -14,6 +15,10 @@ spark_write_table(x, name, mode = NULL, options = list())
 \item{mode}{Specifies the behavior when data or table already exists.}
 
 \item{options}{A list of strings with additional options.}
+
+\item{partition_by}{Partitions the output by the given columns on the file system.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Writes a Spark DataFrame into a Spark table.
