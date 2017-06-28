@@ -128,12 +128,28 @@ sql_translate_env.spark_connection <- function(con) {
         dbplyr::build_sql(
           "exp(",
           dbplyr::win_over(
-            dbplyr::build_sql("sum(log(", x, "))"),
+            dbplyr::build_sql("sum(if(", x,
+                              "= 0, 0, ln(abs(", x,
+                              "))))"),
             partition = dbplyr::win_current_group(),
-            order = dbplyr::win_current_order(),
-            frame = c(-Inf, 0)
-          ),
-          ")"
+            order = dbplyr::win_current_order()
+          ), ") * (1 - 2 * pmod(",
+          # count number of negatives up to current row
+          #   and adjust sign accordingly
+          dbplyr::win_over(
+            dbplyr::build_sql("sum(if(", x,
+                              ">= 0, 0, 1))"),
+            partition = dbplyr::win_current_group(),
+            order = dbplyr::win_current_order()
+          ), ", 2)) * if(",
+          # if there's a zero then all cumprod after that row
+          #   vanish
+          dbplyr::win_over(
+            dbplyr::build_sql("min(abs(", x,
+                              "))"),
+            partition = dbplyr::win_current_group(),
+            order = dbplyr::win_current_order()
+          ), "= 0, 0, 1)"
         )
       }
     )

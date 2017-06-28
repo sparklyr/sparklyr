@@ -59,20 +59,21 @@ test_that("cor, cov, sd and var works as expected over groups", {
   expect_equal(s1, s2)
 })
 
-test_that("sumprod works as expected", {
+test_that("cumprod works as expected", {
   test_requires("dplyr")
 
-  stats <- data.frame(x=1:10)
+  stats <- data.frame(id = 1:10,
+                      x = c(1:3, -4, 5, -6, 7, 0, 0, 10))
   stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
 
   s1 <- stats %>%
-    arrange(x) %>%
+    arrange(id) %>%
     mutate(
       cumprod = cumprod(x)
     )
 
   s2 <- stats_tbl %>%
-    arrange(x) %>%
+    arrange(id) %>%
     mutate(
       cumprod = cumprod(x)
     ) %>%
