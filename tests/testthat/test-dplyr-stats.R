@@ -81,3 +81,21 @@ test_that("sumprod works as expected", {
 
   expect_equal(s1, s2)
 })
+
+test_that("count() works in grouped mutate", {
+  test_requires("dplyr")
+  iris_tbl <- testthat_tbl("iris")
+
+  c1 <- iris_tbl %>%
+    group_by(Species) %>%
+    mutate(n = count()) %>%
+    select(Species, n) %>%
+    distinct() %>%
+    collect()
+  c2 <- iris_tbl %>%
+    group_by(Species) %>%
+    count() %>%
+    collect()
+
+  expect_equal(c1, c2)
+})
