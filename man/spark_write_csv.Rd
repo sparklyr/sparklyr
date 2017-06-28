@@ -6,7 +6,7 @@
 \usage{
 spark_write_csv(x, path, header = TRUE, delimiter = ",", quote = "\\"",
   escape = "\\\\", charset = "UTF-8", null_value = NULL,
-  options = list(), mode = NULL)
+  options = list(), mode = NULL, partition_by = NULL, ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -29,6 +29,10 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 \item{options}{A list of strings with additional options.}
 
 \item{mode}{Specifies the behavior when data or table already exists.}
+
+\item{partition_by}{Partitions the output by the given columns on the file system.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Write a Spark DataFrame to a tabular (typically, comma-separated) file.

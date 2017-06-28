@@ -4,7 +4,8 @@
 \alias{spark_write_parquet}
 \title{Write a Spark DataFrame to a Parquet file}
 \usage{
-spark_write_parquet(x, path, mode = NULL, options = list())
+spark_write_parquet(x, path, mode = NULL, options = list(),
+  partition_by = NULL, ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -15,6 +16,10 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 \item{mode}{Specifies the behavior when data or table already exists.}
 
 \item{options}{A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.}
+
+\item{partition_by}{Partitions the output by the given columns on the file system.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Serialize a Spark DataFrame to the
