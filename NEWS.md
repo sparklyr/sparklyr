@@ -130,6 +130,9 @@
 
 ### Connections
 
+- Added `spark_context_config()` and `hive_context_config()` to retrieve
+  runtime configurations for the Spark and Hive contexts.
+
 - Added `sparklyr.log.console` to redirect logs to console, useful
   to troubleshooting `spark_connect`.
 
