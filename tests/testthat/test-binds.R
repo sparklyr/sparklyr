@@ -90,7 +90,7 @@ test_that("'sdf_bind_cols' supports programming", {
 
 test_that("'rbind.tbl_spark' agrees with local result ", {
   expect_equal(rbind(df1a_tbl, df4a_tbl) %>% collect(),
-         rbind(df1a, df4a))
+               rbind(df1a, df4a))
 })
 
 test_that("'sdf_bind_rows' agrees with local result", {
@@ -119,10 +119,31 @@ test_that("'sdf_bind_rows' errs for invalid ID", {
 
 test_that("'sdf_bind_rows' ignores NULL", {
   expect_equal(sdf_bind_rows(list(df1a_tbl, NULL, df4a_tbl)) %>% collect(),
-                 sdf_bind_rows(list(df1a_tbl, df4a_tbl)) %>% collect())
+               sdf_bind_rows(list(df1a_tbl, df4a_tbl)) %>% collect())
 })
 
 test_that("'sdf_bind_rows' err for non-tbl_spark", {
   expect_error(sdf_bind_rows(df1a_tbl, df1a),
                "all inputs must be tbl_spark")
+})
+
+test_that("'sdf_bind_rows' handles column type upcasting (#804)", {
+  test_requires("dplyr")
+
+  df5a <- data_frame(year = as.double(2005:2006),
+                    count = c(6, NaN),
+                    name = c("a", "b"))
+  df6a <- data_frame(year = 2007:2008,
+                    name = c("c", "d"),
+                    count = c(0, 0))
+  df5a_tbl <- testthat_tbl("df5a")
+  df6a_tbl <- testthat_tbl("df6a")
+
+  expect_equal(bind_rows(df5a, df6a),
+               sdf_bind_rows(df5a_tbl, df6a_tbl) %>%
+                 collect())
+
+  expect_equal(bind_rows(df6a, df5a),
+               sdf_bind_rows(df6a_tbl, df5a_tbl) %>%
+                 collect())
 })
