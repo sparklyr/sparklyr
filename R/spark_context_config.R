@@ -24,5 +24,8 @@ spark_context_config <- function(sc)
 #' @export
 hive_context_config <- function(sc)
 {
-  hive_context(sc) %>% invoke("conf") %>% invoke("getAll")
+  if (spark_version(sc) < "2.0.0")
+    hive_context(sc) %>% invoke("getAllConfs")
+  else
+    hive_context(sc) %>% invoke("conf") %>% invoke("getAll")
 }
