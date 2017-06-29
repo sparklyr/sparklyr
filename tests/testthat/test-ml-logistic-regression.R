@@ -30,3 +30,32 @@ test_that("we can fit multinomial models", {
   expect_equal(as.character(rp), as.character(sp))
 
 })
+
+test_that("weights column works for logistic regression", {
+  set.seed(42)
+  iris_weighted <- iris %>%
+    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
+                  ones = rep(1, nrow(iris)),
+                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+          family = binomial(logit), weights = weights,
+          data = iris_weighted)
+  s <- ml_logistic_regression(iris_weighted_tbl,
+                            response = "versicolor",
+                            features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+                            lambda = 0L,
+                            weights.column = "weights")
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+          family = binomial(logit), data = iris_weighted)
+  s <- ml_logistic_regression(iris_weighted_tbl,
+                            response = "versicolor",
+                            features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+                            lambda = 0L,
+                            weights.column = "ones")
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+})
+

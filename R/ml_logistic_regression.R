@@ -7,6 +7,7 @@
 #' @template roxlate-ml-features
 #' @template roxlate-ml-intercept
 #' @template roxlate-ml-regression-penalty
+#' @template roxlate-ml-weights-column
 #' @template roxlate-ml-iter-max
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
@@ -20,6 +21,7 @@ ml_logistic_regression <- function(x,
                                    intercept = TRUE,
                                    alpha = 0,
                                    lambda = 0,
+                                   weights.column = NULL,
                                    iter.max = 100L,
                                    ml.options = ml_options(),
                                    ...)
@@ -42,6 +44,7 @@ ml_logistic_regression <- function(x,
 
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
+  weights.column <- ensure_scalar_character(weights.column, allow.null = TRUE)
   iter.max <- ensure_scalar_integer(iter.max)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 
@@ -64,6 +67,11 @@ ml_logistic_regression <- function(x,
     invoke("setFitIntercept", as.logical(intercept)) %>%
     invoke("setElasticNetParam", as.double(alpha)) %>%
     invoke("setRegParam", as.double(lambda))
+
+  if (!is.null(weights.column)) {
+    model <- model %>%
+      invoke("setWeightCol", weights.column)
+  }
 
   if (only.model)
     return(model)
@@ -132,6 +140,7 @@ ml_logistic_regression <- function(x,
            features = features,
            response = response,
            intercept = intercept,
+           weights.column = weights.column,
            coefficients = coefficients,
            roc = roc,
            area.under.roc = areaUnderROC,

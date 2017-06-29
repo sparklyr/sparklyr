@@ -5,7 +5,8 @@
 \title{Spark ML -- Logistic Regression}
 \usage{
 ml_logistic_regression(x, response, features, intercept = TRUE, alpha = 0,
-  lambda = 0, iter.max = 100L, ml.options = ml_options(), ...)
+  lambda = 0, weights.column = NULL, iter.max = 100L,
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -26,6 +27,8 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 \item{alpha, lambda}{Parameters controlling loss function penalization (for e.g.
 lasso, elastic net, and ridge regression). See \strong{Details} for more
 information.}
+
+\item{weights.column}{The name of the column to use as weights for the model fit.}
 
 \item{iter.max}{The maximum number of iterations to use.}
 

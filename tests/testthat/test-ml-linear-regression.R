@@ -45,3 +45,30 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   }
 
 })
+
+test_that("weights column works for lm", {
+  set.seed(42)
+  iris_weighted <- iris %>%
+    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
+                  ones = rep(1, nrow(iris)),
+                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+
+  r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+          weights = weights, data = iris_weighted)
+  s <- ml_linear_regression(iris_weighted_tbl,
+                            response = "Sepal_Length",
+                            features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+                            lambda = 0L,
+                            weights.column = "weights")
+  expect_equal(unname(coef(r)), unname(coef(s)))
+
+  r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+          data = iris_weighted)
+  s <- ml_linear_regression(iris_weighted_tbl,
+                            response = "Sepal_Length",
+                            features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+                            lambda = 0L,
+                            weights.column = "ones")
+  expect_equal(unname(coef(r)), unname(coef(s)))
+})

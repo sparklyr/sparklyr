@@ -5,8 +5,8 @@
 \title{Spark ML -- Generalized Linear Regression}
 \usage{
 ml_generalized_linear_regression(x, response, features, intercept = TRUE,
-  family = gaussian(link = "identity"), iter.max = 100L,
-  ml.options = ml_options(), ...)
+  family = gaussian(link = "identity"), weights.column = NULL,
+  iter.max = 100L, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -26,6 +26,8 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{family}{The family / link function to use; analogous to those normally
 passed in to calls to \R's own \code{\link{glm}}.}
+
+\item{weights.column}{The name of the column to use as weights for the model fit.}
 
 \item{iter.max}{The maximum number of iterations to use.}
 

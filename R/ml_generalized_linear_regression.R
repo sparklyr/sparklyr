@@ -14,6 +14,7 @@
 #' @template roxlate-ml-intercept
 #' @param family The family / link function to use; analogous to those normally
 #'   passed in to calls to \R's own \code{\link{glm}}.
+#' @template roxlate-ml-weights-column
 #' @template roxlate-ml-iter-max
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
@@ -27,6 +28,7 @@ ml_generalized_linear_regression <-
            features,
            intercept = TRUE,
            family = gaussian(link = "identity"),
+           weights.column = NULL,
            iter.max = 100L,
            ml.options = ml_options(),
            ...)
@@ -50,6 +52,7 @@ ml_generalized_linear_regression <-
   )
 
   iter.max <- ensure_scalar_integer(iter.max)
+  weights.column <- ensure_scalar_character(weights.column, allow.null = TRUE)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   # parse 'family' argument in similar way to R's glm
@@ -87,6 +90,12 @@ ml_generalized_linear_regression <-
     invoke("setFitIntercept", intercept) %>%
     invoke("setFamily", family) %>%
     invoke("setLink", link)
+
+  if (!is.null(weights.column)) {
+    model <- model %>%
+      invoke("setWeightCol", weights.column)
+  }
+
 
   if (is.function(ml.options$model.transform))
     model <- ml.options$model.transform(model)
@@ -143,6 +152,7 @@ ml_generalized_linear_regression <-
     response = response,
     intercept = intercept,
     family = family,
+    weights.column = weights.column,
     link = link,
     coefficients = coefficients,
     standard.errors = errors,
