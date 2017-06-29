@@ -21,7 +21,7 @@ ml_linear_regression <- function(x,
                                  intercept = TRUE,
                                  alpha = 0,
                                  lambda = 0,
-                                 weights_column = NULL,
+                                 weights.column = NULL,
                                  iter.max = 100L,
                                  ml.options = ml_options(),
                                  ...)
@@ -44,7 +44,7 @@ ml_linear_regression <- function(x,
 
   alpha <- ensure_scalar_double(alpha)
   lambda <- ensure_scalar_double(lambda)
-  weights_column <- ensure_scalar_character(weights_column, allow.null = TRUE)
+  weights.column <- ensure_scalar_character(weights.column, allow.null = TRUE)
   iter.max <- ensure_scalar_integer(iter.max)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 
@@ -68,9 +68,10 @@ ml_linear_regression <- function(x,
     invoke("setElasticNetParam", as.double(alpha)) %>%
     invoke("setRegParam", as.double(lambda))
 
-  if (!is.null(weights_column))
+  if (!is.null(weights.column)) {
     model <- model %>%
-    invoke("setWeightCol", weights_column)
+      invoke("setWeightCol", weights.column)
+  }
 
   if (is.function(ml.options$model.transform))
     model <- ml.options$model.transform(model)
@@ -117,7 +118,7 @@ ml_linear_regression <- function(x,
            features = features,
            response = response,
            intercept = intercept,
-           weights_column = weights_column,
+           weights.column = weights.column,
            coefficients = coefficients,
            standard.errors = errors,
            t.values = tvalues,

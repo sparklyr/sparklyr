@@ -60,7 +60,7 @@ test_that("weights column works for lm", {
                             response = "Sepal_Length",
                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
                             lambda = 0L,
-                            weights_column = "weights")
+                            weights.column = "weights")
   expect_equal(unname(coef(r)), unname(coef(s)))
 
   r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
@@ -69,6 +69,6 @@ test_that("weights column works for lm", {
                             response = "Sepal_Length",
                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
                             lambda = 0L,
-                            weights_column = "ones")
+                            weights.column = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)))
 })

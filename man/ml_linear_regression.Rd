@@ -5,7 +5,7 @@
 \title{Spark ML -- Linear Regression}
 \usage{
 ml_linear_regression(x, response, features, intercept = TRUE, alpha = 0,
-  lambda = 0, weights_column = NULL, iter.max = 100L,
+  lambda = 0, weights.column = NULL, iter.max = 100L,
   ml.options = ml_options(), ...)
 }
 \arguments{
@@ -28,7 +28,7 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 lasso, elastic net, and ridge regression). See \strong{Details} for more
 information.}
 
-\item{weights_column}{The name of the column to use as weights for the model fit.}
+\item{weights.column}{The name of the column to use as weights for the model fit.}
 
 \item{iter.max}{The maximum number of iterations to use.}
 

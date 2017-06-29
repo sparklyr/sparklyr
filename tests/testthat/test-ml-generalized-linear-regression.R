@@ -49,7 +49,7 @@ test_that("weights column works for glm", {
   s <- ml_generalized_linear_regression(iris_weighted_tbl,
                                         response = "Sepal_Length",
                                         features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                                        weights_column = "weights")
+                                        weights.column = "weights")
   expect_equal(unname(coef(r)), unname(coef(s)))
 
   r <- glm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
@@ -57,6 +57,6 @@ test_that("weights column works for glm", {
   s <- ml_generalized_linear_regression(iris_weighted_tbl,
                                         response = "Sepal_Length",
                                         features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                                        weights_column = "ones")
+                                        weights.column = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)))
 })

@@ -46,7 +46,7 @@ test_that("weights column works for logistic regression", {
                             response = "versicolor",
                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
                             lambda = 0L,
-                            weights_column = "weights")
+                            weights.column = "weights")
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
@@ -55,7 +55,7 @@ test_that("weights column works for logistic regression", {
                             response = "versicolor",
                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
                             lambda = 0L,
-                            weights_column = "ones")
+                            weights.column = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
 

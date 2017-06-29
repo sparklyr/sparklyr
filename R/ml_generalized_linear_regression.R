@@ -28,7 +28,7 @@ ml_generalized_linear_regression <-
            features,
            intercept = TRUE,
            family = gaussian(link = "identity"),
-           weights_column = NULL,
+           weights.column = NULL,
            iter.max = 100L,
            ml.options = ml_options(),
            ...)
@@ -52,7 +52,7 @@ ml_generalized_linear_regression <-
   )
 
   iter.max <- ensure_scalar_integer(iter.max)
-  weights_column <- ensure_scalar_character(weights_column, allow.null = TRUE)
+  weights.column <- ensure_scalar_character(weights.column, allow.null = TRUE)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   # parse 'family' argument in similar way to R's glm
@@ -91,9 +91,11 @@ ml_generalized_linear_regression <-
     invoke("setFamily", family) %>%
     invoke("setLink", link)
 
-  if (!is.null(weights_column))
+  if (!is.null(weights.column)) {
     model <- model %>%
-    invoke("setWeightCol", weights_column)
+      invoke("setWeightCol", weights.column)
+  }
+
 
   if (is.function(ml.options$model.transform))
     model <- ml.options$model.transform(model)
@@ -150,7 +152,7 @@ ml_generalized_linear_regression <-
     response = response,
     intercept = intercept,
     family = family,
-    weights_column = weights_column,
+    weights.column = weights.column,
     link = link,
     coefficients = coefficients,
     standard.errors = errors,
