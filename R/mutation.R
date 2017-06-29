@@ -50,7 +50,7 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 
   columns <- sdf %>%
     invoke("columns") %>%
-    unlist
+    unlist()
 
   reorder_columns <- function(sdf) {
     cols <- columns %>%
@@ -100,10 +100,16 @@ sdf_bind_rows <- function(..., id = NULL) {
     dplyr::data_frame(name = col_names, type = col_types)
   })
 
+  master_schema <- schemas %>%
+    dplyr::bind_rows() %>%
+    dplyr::group_by(!! rlang::sym("name")) %>%
+    dplyr::slice(1)
+
   schema_complements <- schemas %>%
-    lapply(function(x) dplyr::setdiff(schemas %>%
-                                 dplyr::bind_rows() %>%
-                                 dplyr::distinct(), x))
+    lapply(function(x) master_schema %>%
+             dplyr::select(!! rlang::sym("name")) %>%
+             dplyr::setdiff(select(x, !!rlang::sym("name"))) %>%
+             dplyr::left_join(master_schema, by = "name"))
 
   sdf_augment <- function(x, schema_complement) {
     sdf <- spark_dataframe(x)
