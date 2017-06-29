@@ -91,12 +91,12 @@ sdf_bind_rows <- function(..., id = NULL) {
       invoke("schema")
     col_names <- schema %>%
       invoke("fieldNames") %>%
-      unlist
+      unlist()
     col_types <- schema %>%
       invoke("fields") %>%
       lapply(function(x) invoke(x, "dataType")) %>%
       lapply(function(x) invoke(x, "typeName")) %>%
-      unlist
+      unlist()
     dplyr::data_frame(name = col_names, type = col_types)
   })
 
