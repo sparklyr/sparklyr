@@ -89,7 +89,7 @@
   
 ### MLlib
 
-- GLM type models now support `weights_column` to specify weights in model
+- GLM type models now support `weights.column` to specify weights in model
   fitting. (#217)
 
 - `ml_logistic_regression()` now supports multinomial regression, in
