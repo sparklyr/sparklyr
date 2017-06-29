@@ -4,7 +4,7 @@
 \alias{sdf_repartition}
 \title{Repartition a Spark DataFrame}
 \usage{
-sdf_repartition(x, partitions = NULL, columns = NULL)
+sdf_repartition(x, partitions = NULL, partition_by = NULL)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -12,7 +12,7 @@ sdf_repartition(x, partitions = NULL, columns = NULL)
 
 \item{partitions}{number of partitions}
 
-\item{columns}{vector of column names used for partitioning, only supported for Spark 2.0+}
+\item{partition_by}{vector of column names used for partitioning, only supported for Spark 2.0+}
 }
 \description{
 Repartition a Spark DataFrame

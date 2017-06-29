@@ -9,7 +9,7 @@ test_that("sdf_repartition works", {
                4L)
 
   expect_equal(iris_tbl %>%
-                 sdf_repartition(columns = c("Species", "Petal_Width")) %>%
+                 sdf_repartition(partition_by = c("Species", "Petal_Width")) %>%
                  sdf_query_plan() %>%
                  dplyr::first() %>%
                  gsub("#[0-9]+", "", ., perl = TRUE),
@@ -17,7 +17,7 @@ test_that("sdf_repartition works", {
                  )
 
   expect_equal(iris_tbl %>%
-                 sdf_repartition(5L, columns = c("Species", "Petal_Width")) %>%
+                 sdf_repartition(5L, partition_by = c("Species", "Petal_Width")) %>%
                  sdf_query_plan() %>%
                  dplyr::first() %>%
                  gsub("#[0-9]+", "", ., perl = TRUE),
@@ -27,7 +27,7 @@ test_that("sdf_repartition works", {
 test_that("'sdf_partition' -- 'partitions' argument should take numeric (#735)", {
   iris_tbl <- testthat_tbl("iris")
   expect_equal(iris_tbl %>%
-                 sdf_repartition(6, columns = "Species") %>%
+                 sdf_repartition(6, partition_by = "Species") %>%
                  sdf_num_partitions(),
                6)
 })
