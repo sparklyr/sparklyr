@@ -700,10 +700,10 @@ sdf_broadcast <- function(x) {
 #' @template roxlate-ml-x
 #'
 #' @param partitions number of partitions
-#' @param columns vector of column names used for partitioning, only supported for Spark 2.0+
+#' @param partition_by vector of column names used for partitioning, only supported for Spark 2.0+
 #'
 #' @export
-sdf_repartition <- function(x, partitions = NULL, columns = NULL) {
+sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
@@ -711,15 +711,15 @@ sdf_repartition <- function(x, partitions = NULL, columns = NULL) {
     ensure_scalar_integer()
 
   if (spark_version(sc) >= "2.0.0") {
-    columns <- as.list(columns) %>%
+    partition_by <- as.list(partition_by) %>%
       lapply(ensure_scalar_character)
 
     return(
-      invoke_static(sc, "sparklyr.Repartition", "repartition", sdf, partitions, columns) %>%
+      invoke_static(sc, "sparklyr.Repartition", "repartition", sdf, partitions, partition_by) %>%
         sdf_register()
     )
   } else {
-    if (!is.null(columns))
+    if (!is.null(partition_by))
       stop("partitioning by columns only supported for Spark 2.0.0 and later")
 
     invoke(sdf, "repartition", partitions) %>%
