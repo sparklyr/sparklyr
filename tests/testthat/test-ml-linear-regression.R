@@ -59,7 +59,7 @@ test_that("weights column works for lm", {
   s <- ml_linear_regression(iris_weighted_tbl,
                             response = "Sepal_Length",
                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                            alpha = 0L,
+                            lambda = 0L,
                             weights_column = "weights")
   expect_equal(unname(coef(r)), unname(coef(s)))
 
@@ -68,7 +68,7 @@ test_that("weights column works for lm", {
   s <- ml_linear_regression(iris_weighted_tbl,
                             response = "Sepal_Length",
                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                            alpha = 0L,
+                            lambda = 0L,
                             weights_column = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)))
 })
