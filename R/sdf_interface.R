@@ -737,3 +737,22 @@ sdf_num_partitions <- function(x) {
     invoke("rdd") %>%
     invoke("getNumPartitions")
 }
+
+#' Coalesces a Spark DataFrame
+#'
+#' @template roxlate-ml-x
+#' @param partitions number of partitions
+#' @export
+sdf_coalesce <- function(x, partitions) {
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+
+  partitions <- ensure_scalar_integer(partitions)
+
+  if (partitions < 1)
+    stop("number of partitions must be positive")
+
+  sdf %>%
+    invoke("coalesce", partitions) %>%
+    sdf_register()
+}
