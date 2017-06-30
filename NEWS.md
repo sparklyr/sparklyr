@@ -69,8 +69,9 @@
   optimizer to perform a broadcast join in cases where a shuffle
   hash join is planned but not optimal.
 
-- Added `sdf_repartition()` and `sdf_num_partitions()` to support
-  repartitioning and getting the number of partitions of Spark DataFrames.
+- Added `sdf_repartition()`, `sdf_coalesce()`, and `sdf_num_partitions()` 
+  to support repartitioning and getting the number of partitions of Spark 
+  DataFrames.
 
 - Added `sdf_bind_rows()` and `sdf_bind_cols()` -- these functions
   are the `sparklyr` equivalent of `dplyr::bind_rows()` and 
