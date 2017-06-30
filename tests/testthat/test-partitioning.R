@@ -31,3 +31,13 @@ test_that("'sdf_partition' -- 'partitions' argument should take numeric (#735)",
                  sdf_num_partitions(),
                6)
 })
+
+test_that("'sdf_coalesce' works as expected", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_equal(iris_tbl %>%
+                 sdf_repartition(5) %>%
+                 sdf_coalesce(1) %>%
+                 sdf_num_partitions(),
+               1)
+})
