@@ -262,13 +262,16 @@ start_shell <- function(master,
 
     console_log <- spark_config_exists(config, "sparklyr.log.console", FALSE)
 
+    stdout_param <- if (console_log) "" else output_file
+    stderr_param <-if (console_log) "" else output_file
+
     # start the shell (w/ specified additional environment variables)
     env <- unlist(as.list(environment))
     withr::with_envvar(env, {
       system2(spark_submit_path,
         args = shell_args,
-        stdout = if (console_log) "" else output_file,
-        stderr = if (console_log) "" else output_file,
+        stdout = stdout_param,
+        stderr = stderr_param,
         wait = FALSE)
     })
 
