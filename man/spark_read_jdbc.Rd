@@ -5,7 +5,7 @@
 \title{Read from JDBC connection into a Spark DataFrame.}
 \usage{
 spark_read_jdbc(sc, name, options = list(), repartition = 0,
-  memory = TRUE, overwrite = TRUE)
+  memory = TRUE, overwrite = TRUE, columns = NULL, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -22,6 +22,10 @@ is, should the table be cached?)}
 
 \item{overwrite}{Boolean; overwrite the table with the given name if it
 already exists?}
+
+\item{columns}{A vector of column names or a named vector of column types.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Read from JDBC connection into a Spark DataFrame.

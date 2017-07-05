@@ -5,7 +5,7 @@
 \title{Read a Parquet file into a Spark DataFrame}
 \usage{
 spark_read_parquet(sc, name, path, options = list(), repartition = 0,
-  memory = TRUE, overwrite = TRUE)
+  memory = TRUE, overwrite = TRUE, columns = NULL, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -25,6 +25,10 @@ is, should the table be cached?)}
 
 \item{overwrite}{Boolean; overwrite the table with the given name if it
 already exists?}
+
+\item{columns}{A vector of column names or a named vector of column types.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Read a \href{https://parquet.apache.org/}{Parquet} file into a Spark
