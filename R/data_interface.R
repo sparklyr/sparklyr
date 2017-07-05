@@ -45,6 +45,7 @@ spark_csv_options <- function(header,
 #'   generated table. Use 0 (the default) to avoid partitioning.
 #' @param overwrite Boolean; overwrite the table with the given name if it
 #'   already exists?
+#' @param ... Optional arguments; currently unused.
 #'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}),
 #'   as well as the local file system (\code{file://}).
@@ -73,7 +74,8 @@ spark_read_csv <- function(sc,
                            options = list(),
                            repartition = 0,
                            memory = TRUE,
-                           overwrite = TRUE) {
+                           overwrite = TRUE,
+                           ...) {
   columnsHaveTypes <- length(names(columns)) > 0
   if (!identical(columns, NULL) & isTRUE(infer_schema) & columnsHaveTypes) {
     stop("'infer_schema' must be set to FALSE when 'columns' specifies column types")
@@ -207,11 +209,13 @@ spark_read_parquet <- function(sc,
                                options = list(),
                                repartition = 0,
                                memory = TRUE,
-                               overwrite = TRUE) {
+                               overwrite = TRUE,
+                               columns = NULL,
+                               ...) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "parquet", options)
+  df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "parquet", options, columns)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -283,11 +287,13 @@ spark_read_json <- function(sc,
                             options = list(),
                             repartition = 0,
                             memory = TRUE,
-                            overwrite = TRUE) {
+                            overwrite = TRUE,
+                            columns = NULL,
+                            ...) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, spark_normalize_path(path), "json", options)
+  df <- spark_data_read_generic(sc, spark_normalize_path(path), "json", options, columns)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -349,14 +355,27 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
   }
 }
 
-spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list()) {
+spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list(), columns = NULL) {
+  columnsHaveTypes <- length(names(columns)) > 0
+
   options <- invoke(hive_context(sc), "read")
 
   lapply(names(readOptions), function(optionName) {
     options <<- invoke(options, "option", optionName, readOptions[[optionName]])
   })
 
-  invoke(options, fileMethod, source)
+  if (columnsHaveTypes) {
+    columnDefs <- spark_data_build_types(sc, columns)
+    options <- invoke(options, "schema", columnDefs)
+  }
+
+  df <- invoke(options, fileMethod, source)
+
+  if (!columnsHaveTypes && !identical(columns, NULL)) {
+    df <- invoke(df, "toDF", as.list(columns))
+  }
+
+  df
 }
 
 spark_data_apply_mode <- function(options, mode) {
@@ -413,11 +432,13 @@ spark_read_table <- function(sc,
                              options = list(),
                              repartition = 0,
                              memory = TRUE,
-                             overwrite = TRUE) {
+                             overwrite = TRUE,
+                             columns = NULL,
+                             ...) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, name, "table", options)
+  df <- spark_data_read_generic(sc, name, "table", options, columns)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -534,11 +555,13 @@ spark_read_jdbc <- function(sc,
                              options = list(),
                              repartition = 0,
                              memory = TRUE,
-                             overwrite = TRUE) {
+                             overwrite = TRUE,
+                             columns = NULL,
+                             ...) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, "jdbc", "format", options) %>% invoke("load")
+  df <- spark_data_read_generic(sc, "jdbc", "format", options, columns) %>% invoke("load")
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -559,10 +582,12 @@ spark_read_source <- function(sc,
                             options = list(),
                             repartition = 0,
                             memory = TRUE,
-                            overwrite = TRUE) {
+                            overwrite = TRUE,
+                            columns = NULL,
+                            ...) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, source, "format", options) %>% invoke("load")
+  df <- spark_data_read_generic(sc, source, "format", options, columns) %>% invoke("load")
   spark_partition_register_df(sc, df, name, repartition, memory)
 }

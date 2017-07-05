@@ -7,7 +7,7 @@
 spark_read_csv(sc, name, path, header = TRUE, columns = NULL,
   infer_schema = TRUE, delimiter = ",", quote = "\\"", escape = "\\\\",
   charset = "UTF-8", null_value = NULL, options = list(),
-  repartition = 0, memory = TRUE, overwrite = TRUE)
+  repartition = 0, memory = TRUE, overwrite = TRUE, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -45,6 +45,8 @@ is, should the table be cached?)}
 
 \item{overwrite}{Boolean; overwrite the table with the given name if it
 already exists?}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Read a tabular data file into a Spark DataFrame.

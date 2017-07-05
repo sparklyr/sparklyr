@@ -7,6 +7,9 @@
 
 ### External Data
 
+- Added `columns` parameter to `spark_read_*()` functions to load data with
+  named columns or explicit column types.
+
 - Added `partition_by` parameter to `spark_write_csv()`, `spark_write_json()`,
   `spark_write_table()` and `spark_write_parquet()`.
 
