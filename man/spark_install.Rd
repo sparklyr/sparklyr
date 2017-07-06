@@ -55,9 +55,4 @@ Find a given Spark installation by version.
 Install versions of Spark for use with local Spark connections
   (i.e. \code{spark_connect(master = "local"})
 }
-\examples{
-
-spark_installed_versions()
-
-}
 \keyword{internal}

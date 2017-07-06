@@ -21,13 +21,7 @@ read_spark_versions_json <- function(file = spark_versions_url()) {
   .globals$sparkVersionsJson
 }
 
-
 #' @rdname spark_install
-#'
-#' @examples
-#'
-#' spark_installed_versions()
-#'
 #' @export
 spark_installed_versions <- function() {
 

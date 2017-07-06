@@ -15,12 +15,12 @@ used.}
 \item{verbose}{Logical. Should the function explain what is it doing?}
 }
 \value{
-The function is mostly invoked for the side-effect of setting the 
-\code{SPARK_HOME} environment variable. It also returns \code{TRUE} if the 
+The function is mostly invoked for the side-effect of setting the
+\code{SPARK_HOME} environment variable. It also returns \code{TRUE} if the
 environment was successfully set, and \code{FALSE} otherwise.
 }
 \description{
-Set the \code{SPARK_HOME} environment variable. This slightly speeds up some 
+Set the \code{SPARK_HOME} environment variable. This slightly speeds up some
 operations, including the connection time.
 }
 \examples{
