@@ -36,7 +36,7 @@ shell_connection <- function(master,
   environment <- new.env()
 
   # prepare windows environment
-  sparkinstall::spark_configure(spark_home, environment)
+  prepare_windows_environment(spark_home, environment)
 
   # verify that java is available
   validate_java_version(spark_home)
