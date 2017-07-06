@@ -1,5 +1,7 @@
 #' helper function to sync sparkinstall project to sparklyr
 #'
+#' See: https://github.com/rstudio/spark-install
+#'
 #' @param project_path The path to the sparkinstall project
 spark_install_sync <- function(project_path) {
   sources <- c(

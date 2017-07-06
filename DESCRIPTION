@@ -41,10 +41,7 @@ Imports:
     rprojroot,
     rstudioapi,
     shiny (>= 1.0.1),
-    sparkinstall,
     withr
-Remotes:
-    rstudio/spark-install/R
 Suggests:
     testthat,
     RCurl,
