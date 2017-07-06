@@ -10,5 +10,5 @@ spark_install_sync(project_path)
 \item{project_path}{The path to the sparkinstall project}
 }
 \description{
-helper function to sync sparkinstall project to sparklyr
+See: https://github.com/rstudio/spark-install
 }

@@ -8,7 +8,6 @@ shell_connection_validate_config <- function(config) {
 }
 
 # create a shell connection
-#' @import sparkinstall
 shell_connection <- function(master,
                              spark_home,
                              app_name,
