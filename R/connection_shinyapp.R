@@ -73,7 +73,7 @@ spark_ui_spark_choices <- function() {
 spark_ui_hadoop_choices <- function(sparkVersion) {
   availableVersions <- spark_ui_avaliable_versions()
 
-  selected <- spark_install_find(sparkVersion = sparkVersion, installedOnly = FALSE)$hadoopVersion
+  selected <- spark_install_find(version = sparkVersion, installed_only = FALSE)$hadoopVersion
 
   choiceValues <- unique(availableVersions[availableVersions$spark == sparkVersion,][["hadoop"]])
   choiceNames <- choiceValues
@@ -414,7 +414,7 @@ connection_spark_server <- function(input, output, session) {
     if (!identical(currentSparkSelection, NULL)) {
       currentSparkSelection <<- sparkVersion
 
-      hadoopDefault <- spark_install_find(sparkVersion = currentSparkSelection, installedOnly = FALSE)$hadoopVersion
+      hadoopDefault <- spark_install_find(version = currentSparkSelection, installed_only = FALSE)$hadoopVersion
 
       updateSelectInput(
         session,
