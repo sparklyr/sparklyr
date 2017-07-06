@@ -8,6 +8,7 @@ shell_connection_validate_config <- function(config) {
 }
 
 # create a shell connection
+#' @import sparkinstall
 shell_connection <- function(master,
                              spark_home,
                              app_name,
@@ -35,7 +36,7 @@ shell_connection <- function(master,
   environment <- new.env()
 
   # prepare windows environment
-  prepare_windows_environment(spark_home, environment)
+  sparkinstall::spark_configure(spark_home, environment)
 
   # verify that java is available
   validate_java_version(spark_home)

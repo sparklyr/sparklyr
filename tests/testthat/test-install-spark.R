@@ -4,7 +4,7 @@ test_that("supported spark_versions can be downloaded", {
   skip_on_cran()
   test_requires("RCurl")
 
-  versions <- spark_versions(latest = FALSE)
+  versions <- sparkinstall:::spark_versions(latest = FALSE)
   versions <- versions[versions$download != "", ]
   for (row in 1:nrow(versions)) {
     version <- versions[row, ]
@@ -15,7 +15,7 @@ test_that("supported spark_versions can be downloaded", {
 test_that("spark_versions downloads use https", {
   skip_on_cran()
 
-  versions <- spark_versions(latest = FALSE)
+  versions <- sparkinstall:::spark_versions(latest = FALSE)
   versions <- versions[versions$download != "", ]
   for (row in 1:nrow(versions)) {
     version <- versions[row, ]
