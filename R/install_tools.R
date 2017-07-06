@@ -3,19 +3,23 @@
 #' @param project_path The path to the sparkinstall project
 spark_install_sync <- function(project_path) {
   sources <- c(
-    "install.R",
-    "versions.R",
-    "windows.R"
+    "R/install.R",
+    "R/versions.R",
+    "R/windows.R",
+    "inst/extdata/config.json",
+    "inst/extdata/versions.json"
   )
 
   destinations <- c(
-    "install_spark.R",
-    "install_spark_versions.R",
-    "install_spark_windows.R"
+    "R/install_spark.R",
+    "R/install_spark_versions.R",
+    "R/install_spark_windows.R",
+    "inst/extdata/config.json",
+    "inst/extdata/versions.json"
   )
 
-  sources_paths <- file.path("R", sources)
-  destinations_paths <- file.path("R", destinations)
+  sources_paths <- sources
+  destinations_paths <- destinations
 
   file.copy(
     from = file.path(project_path, sources_paths),
