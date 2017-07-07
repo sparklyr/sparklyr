@@ -35,7 +35,7 @@ livy_validate_http_response <- function(message, req) {
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
 #' @param password The password to use in the Authorization header
-#' @param csrf_header Required when the Livy server has CSRF protection enabled. Defaults to \code{FALSE}.
+#' @param csrf_header Required when the Livy server has CSRF protection enabled. Defaults to \code{TRUE}.
 #'
 #' @details
 #'
@@ -48,7 +48,7 @@ livy_validate_http_response <- function(message, req) {
 #'
 #' @return Named list with configuration data
 livy_config <- function(config = spark_config(), username = NULL, password = NULL,
-                        csrf_header = FALSE) {
+                        csrf_header = TRUE) {
   if (!is.null(username) || !is.null(password)) {
     secret <- base64_enc(paste(username, password, sep = ":"))
 

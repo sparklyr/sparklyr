@@ -5,7 +5,7 @@
 \title{Create a Spark Configuration for Livy}
 \usage{
 livy_config(config = spark_config(), username = NULL, password = NULL,
-  csrf_header = FALSE)
+  csrf_header = TRUE)
 }
 \arguments{
 \item{config}{Optional base configuration}
@@ -14,7 +14,7 @@ livy_config(config = spark_config(), username = NULL, password = NULL,
 
 \item{password}{The password to use in the Authorization header}
 
-\item{csrf_header}{Required when the Livy server has CSRF protection enabled. Defaults to \code{FALSE}.}
+\item{csrf_header}{Required when the Livy server has CSRF protection enabled. Defaults to \code{TRUE}.}
 }
 \value{
 Named list with configuration data
