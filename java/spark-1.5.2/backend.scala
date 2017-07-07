@@ -63,6 +63,13 @@ import scala.util.Try
  * to the main gateway the port in which this instance will listen to.
  */
 
+object Backend {
+  /* Leaving this entry for backward compatibility with databricks */
+  def main(args: Array[String]): Unit = {
+    Shell.main(args)
+  }
+}
+
 class Backend {
   private[this] var isService: Boolean = false
   private[this] var isRemote: Boolean = false
