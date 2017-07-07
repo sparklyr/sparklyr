@@ -117,7 +117,7 @@ sdf_collect <- function(object) {
   # fix an issue where sometimes columns in a Spark DataFrame are empty
   # in such a case, we fill those with NAs of the same type (#477)
   n <- vapply(transformed, length, numeric(1))
-  rows <- max(n)
+  rows <- if (length(n) > 0) max(n) else 0
   fixed <- lapply(transformed, function(column) {
     if (length(column) == 0) {
       converter <- switch(

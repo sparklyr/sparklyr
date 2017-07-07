@@ -38,7 +38,7 @@ shell_connection <- function(master,
   prepare_windows_environment(spark_home, environment)
 
   # verify that java is available
-  validate_java_version(spark_home)
+  validate_java_version(master, spark_home)
 
   # error if there is no SPARK_HOME
   if (!nzchar(spark_home))

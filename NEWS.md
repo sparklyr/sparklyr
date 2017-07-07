@@ -153,6 +153,9 @@
 - While connecting to spark from Windows, setting the `sparklyr.verbose` option
   to `TRUE` prints detailed configuration steps.
   
+- Added `csrf_header` to `livy_config()` to enable connections to Livy servers with
+  CSRF protection enabled.
+  
 ### Compilation
 
 - Added support for `jar_dep` in the compilation specification to
@@ -185,6 +188,12 @@
   support newer versions of RStudio that deprecate current connections UI.
 
 ### Bug Fixes
+
+- When using `spark_connect()` in local clusters, it validates that `java` exists
+  under `JAVA_HOME` to help troubleshoot systems that have an incorrect `JAVA_HOME`.
+
+- Improved `argument is of length zero` error triggered while retrieving data 
+  with no columns to display.
 
 - Fixed `Path does not exist` referencing `hdfs` exception during `copy_to` under
   systems configured with `HADOOP_HOME`.

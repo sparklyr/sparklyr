@@ -4,7 +4,8 @@
 \alias{livy_config}
 \title{Create a Spark Configuration for Livy}
 \usage{
-livy_config(config = spark_config(), username = NULL, password = NULL)
+livy_config(config = spark_config(), username = NULL, password = NULL,
+  csrf_header = TRUE)
 }
 \arguments{
 \item{config}{Optional base configuration}
@@ -12,6 +13,8 @@ livy_config(config = spark_config(), username = NULL, password = NULL)
 \item{username}{The username to use in the Authorization header}
 
 \item{password}{The password to use in the Authorization header}
+
+\item{csrf_header}{Required when the Livy server has CSRF protection enabled. Defaults to \code{TRUE}.}
 }
 \value{
 Named list with configuration data
@@ -23,4 +26,7 @@ Create a Spark Configuration for Livy
 Extends a Spark \code{"spark_config"} configuration with settings
 for Livy. For instance, \code{"username"} and \code{"password"}
 define the basic authentication settings for a Livy session.
+
+When \code{"csrf_header"} is set to \code{TRUE}, the header \code{"X-Requested-By: sparklyr"}
+is added to all HTTP requests.
 }
