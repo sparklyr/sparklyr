@@ -186,6 +186,9 @@
 
 ### Bug Fixes
 
+- When using `spark_connect()` in local clusters, it validates that `java` exists
+  under `JAVA_HOME` to help troubleshoot systems that have an incorrect `JAVA_HOME`.
+
 - Improved `argument is of length zero` error triggered while retrieving data 
   with no columns to display.
 
