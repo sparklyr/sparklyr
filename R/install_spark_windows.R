@@ -1,12 +1,12 @@
 
 is_win64 <- function() {
   Sys.getenv("PROCESSOR_ARCHITECTURE") == "AMD64" ||
-  Sys.getenv("PROCESSOR_ARCHITEW6432") == "AMD64"
+    Sys.getenv("PROCESSOR_ARCHITEW6432") == "AMD64"
 }
 
 is_wow64 <- function() {
   Sys.getenv("PROCESSOR_ARCHITECTURE") == "x86" &&
-  Sys.getenv("PROCESSOR_ARCHITEW6432") == "AMD64"
+    Sys.getenv("PROCESSOR_ARCHITEW6432") == "AMD64"
 }
 
 verify_msvcr100 <- function() {
@@ -28,8 +28,8 @@ verify_msvcr100 <- function() {
   }
 }
 
-prepare_windows_environment <- function(sparkHome, environment) {
-  verbose <- sparklyr_boolean_option("sparklyr.verbose")
+prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
+  verbose <- identical(getOption("sparkinstall.verbose"), TRUE)
   verboseMessage <- function(...) {
     if (verbose) message(...)
   }
@@ -60,10 +60,30 @@ prepare_windows_environment <- function(sparkHome, environment) {
   }
   verboseMessage("HADOOP_HOME exists under ", hadoopPath)
 
-  # assign HADOOP_HOME to system2 environment which is more reliable than SETX
-  environment$HADOOP_HOME <- hadoopPath
+  if (is.null(sparkEnvironment)) {
+    if (nchar(Sys.getenv("HADOOP_HOME")) == 0 ||
+        Sys.getenv("HADOOP_HOME") != hadoopPath) {
 
-  verboseMessage("HADOOP_HOME environment set with output ", output)
+
+        if (Sys.getenv("HADOOP_HOME") != hadoopPath) {
+          warning("HADOOP_HOME was already but does not match current Spark installation")
+        } else {
+          verboseMessage("HADOOP_HOME environment variable not set")
+        }
+
+        output <- system2(
+          "SETX", c("HADOOP_HOME", shQuote(hadoopPath)),
+          stdout = if(verbose) TRUE else NULL)
+
+        verboseMessage("HADOOP_HOME environment set with output ", output)
+    } else {
+      verboseMessage("HADOOP_HOME environment was already set to ", Sys.getenv("HADOOP_HOME"))
+    }
+  }
+  else {
+    # assign HADOOP_HOME to system2 environment which is more reliable than SETX
+    sparkEnvironment$HADOOP_HOME <- hadoopPath
+  }
 
   # pre-create the hive temp folder to manage permissions issues
   appUserTempDir <- normalizePath(
