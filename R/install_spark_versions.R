@@ -21,7 +21,13 @@ read_spark_versions_json <- function(file = spark_versions_url()) {
   .globals$sparkVersionsJson
 }
 
+
 #' @rdname spark_install
+#'
+#' @examples
+#'
+#' spark_installed_versions()
+#'
 #' @export
 spark_installed_versions <- function() {
 
@@ -125,7 +131,7 @@ spark_versions <- function(latest = TRUE) {
       newRow$base <- if (NROW(currentRow) > 0) currentRow$base else ""
       newRow$pattern <- if (NROW(currentRow) > 0) currentRow$pattern else ""
       newRow$download <- if (NROW(currentRow) > 0) currentRow$download else ""
-      newRow$default <- identical(currentRow$spark, "1.6.2")
+      newRow$default <- identical(currentRow$spark, "2.1.0")
       newRow$hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0)
           identical(currentRow$hadoop, "2.7")
         else
