@@ -186,6 +186,9 @@
 
 ### Bug Fixes
 
+- Improved `argument is of length zero` error triggered while retrieving data 
+  with no columns to display.
+
 - Fixed `Path does not exist` referencing `hdfs` exception during `copy_to` under
   systems configured with `HADOOP_HOME`.
 
