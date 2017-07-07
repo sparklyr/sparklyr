@@ -105,3 +105,8 @@ print_jobj.spark_gateway_connection <- function(sc, jobj, ...) {
   class(sc) <- "spark_shell_connection"
   print_jobj(sc, jobj, ...)
 }
+
+#' @export
+initialize_connection.spark_gateway_connection <- function(...) {
+  initialize_connection.spark_shell_connection(...)
+}
