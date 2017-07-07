@@ -375,7 +375,8 @@ connection_spark_server <- function(input, output, session) {
       message <- paste(
         "In order to connect to Spark ",
         "your system needs to have Java installed (",
-        "no version of Java was detected).",
+        "no version of Java was detected or installation ",
+        "is invalid).",
         sep = ""
       )
 

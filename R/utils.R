@@ -2,11 +2,20 @@ is.installed <- function(package) {
   is.element(package, installed.packages()[,1])
 }
 
-get_java <- function() {
+get_java <- function(throws = FALSE) {
   java_home <- Sys.getenv("JAVA_HOME", unset = NA)
-  if (!is.na(java_home))
+  if (!is.na(java_home)) {
     java <- file.path(java_home, "bin", "java")
-  else
+    if (!file.exists(java)) {
+      if (throws) {
+        stop("Java is required to connect to Spark. ",
+             "JAVA_HOME is set but does not point to a valid version. ",
+             "Please fix JAVA_HOME or reinstall from: ",
+             java_install_url())
+      }
+      java <- ""
+    }
+  } else
     java <- Sys.which("java")
   java
 }
@@ -15,15 +24,16 @@ is_java_available <- function() {
   nzchar(get_java())
 }
 
-validate_java_version <- function(spark_home) {
-  # if somene sets SPARK_HOME, assume Java is available since some systems
+validate_java_version <- function(master, spark_home) {
+  # if someone sets SPARK_HOME and we are not in local more, assume Java
+  # is available since some systems.
   # (e.g. CDH) use versions of java not discoverable through JAVA_HOME.
-  if (!is.null(spark_home) && nchar(spark_home) > 0)
+  if (!spark_master_is_local(master) && !is.null(spark_home) && nchar(spark_home) > 0)
     return(TRUE)
 
   # find the active java executable
-  java <- get_java()
-  if (!nzchar(get_java()))
+  java <- get_java(throws = TRUE)
+  if (!nzchar(java))
     stop("Java is required to connect to Spark. Please download and install Java from ",
          java_install_url())
 
