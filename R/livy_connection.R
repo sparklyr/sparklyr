@@ -35,6 +35,7 @@ livy_validate_http_response <- function(message, req) {
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
 #' @param password The password to use in the Authorization header
+#' @param csrf_header Required when the Livy server has CSRF protection enabled. Defaults to \code{TRUE}.
 #'
 #' @details
 #'
@@ -42,8 +43,12 @@ livy_validate_http_response <- function(message, req) {
 #' for Livy. For instance, \code{"username"} and \code{"password"}
 #' define the basic authentication settings for a Livy session.
 #'
+#' When \code{"csrf_header"} is set to \code{TRUE}, the header \code{"X-Requested-By: sparklyr"}
+#' is added to all HTTP requests.
+#'
 #' @return Named list with configuration data
-livy_config <- function(config = spark_config(), username = NULL, password = NULL) {
+livy_config <- function(config = spark_config(), username = NULL, password = NULL,
+                        csrf_header = TRUE) {
   if (!is.null(username) || !is.null(password)) {
     secret <- base64_enc(paste(username, password, sep = ":"))
 
@@ -53,6 +58,14 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
           "Basic",
           base64_enc(paste(username, password, sep = ":"))
         )
+      )
+    )
+  }
+
+  if (csrf_header) {
+    config[["sparklyr.livy.headers"]] <- c(
+      config[["sparklyr.livy.headers"]], list(
+        "X-Requested-By" = "sparklyr"
       )
     )
   }
@@ -71,9 +84,9 @@ livy_get_httr_headers <- function(config, headers) {
 #' @importFrom httr GET
 livy_get_json <- function(url, config) {
   req <- GET(url,
-   livy_get_httr_headers(config, list(
-     "Content-Type" = "application/json"
-   ))
+             livy_get_httr_headers(config, list(
+               "Content-Type" = "application/json"
+             ))
   )
 
   livy_validate_http_response("Failed to retrieve livy session", req)
@@ -127,12 +140,12 @@ livy_create_session <- function(master, config) {
   )
 
   req <- POST(paste(master, "sessions", sep = "/"),
-    livy_get_httr_headers(config, list(
-      "Content-Type" = "application/json"
-    )),
-    body = toJSON(
-      data
-    )
+              livy_get_httr_headers(config, list(
+                "Content-Type" = "application/json"
+              )),
+              body = toJSON(
+                data
+              )
   )
 
   livy_validate_http_response("Failed to create livy session", req)
@@ -148,10 +161,10 @@ livy_create_session <- function(master, config) {
 
 livy_destroy_session <- function(sc) {
   req <- DELETE(paste(sc$master, "sessions", sc$sessionId, sep = "/"),
-    livy_get_httr_headers(sc$config, list(
-      "Content-Type" = "application/json"
-    )),
-    body = NULL
+                livy_get_httr_headers(sc$config, list(
+                  "Content-Type" = "application/json"
+                )),
+                body = NULL
   )
 
   livy_validate_http_response("Failed to destroy livy statement", req)
@@ -391,14 +404,14 @@ livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
-    livy_get_httr_headers(sc$config, list(
-      "Content-Type" = "application/json"
-    )),
-    body = toJSON(
-      list(
-        code = unbox(code)
-      )
-    )
+              livy_get_httr_headers(sc$config, list(
+                "Content-Type" = "application/json"
+              )),
+              body = toJSON(
+                list(
+                  code = unbox(code)
+                )
+              )
   )
 
   livy_validate_http_response("Failed to invoke livy statement", req)
@@ -711,11 +724,11 @@ livy_load_scala_sources <- function(sc) {
     tryCatch({
       sources <- paste(readLines(sourceFile), collapse = "\n")
 
-    statement <- livy_statement_new(sources, NULL)
-    livy_invoke_statement(sc, statement)
-  }, error = function(e) {
-    stop("Failed to load ", basename(sourceFile), ": ", e$message)
-  })
+      statement <- livy_statement_new(sources, NULL)
+      livy_invoke_statement(sc, statement)
+    }, error = function(e) {
+      stop("Failed to load ", basename(sourceFile), ": ", e$message)
+    })
   })
 }
 
