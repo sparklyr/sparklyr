@@ -283,6 +283,13 @@ class Backend {
                     logger.log("is terminating")
                     System.exit(0)
                   }
+
+                  // workers should always terminate but without exceptions
+                  if (isWorker) {
+                    logger.log("is terminating worker")
+                    isRunning = false
+                    gatewayServerSocket.close()
+                  }
                 }
               }
               else
