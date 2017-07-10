@@ -10,10 +10,10 @@ class WorkerRDD[T: ClassTag](
   parent: RDD[T],
   closure: Array[Byte],
   columns: Array[String],
-  config: String
+  config: String,
+  port: Int
   ) extends RDD[T](parent) {
 
-  private[this] var port: Int = 8880
   private[this] var exception: Option[Exception] = None
 
   override def getPartitions = parent.partitions
