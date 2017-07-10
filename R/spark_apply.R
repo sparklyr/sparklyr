@@ -69,7 +69,10 @@ spark_apply <- function(x, f, names = colnames(x), memory = TRUE, ...) {
 
   # create a configuration string to initialize each worker
   worker_config <- worker_config_serialize(list(
-    debug = isTRUE(args$debug)
+    c(
+      debug = isTRUE(args$debug),
+      sc$config
+    )
   ))
 
   rdd <- invoke_static(

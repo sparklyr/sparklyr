@@ -16,7 +16,7 @@ spark_worker_main <- function(sessionId, configRaw) {
 
   tryCatch({
 
-    sc <- spark_worker_connect(sessionId)
+    sc <- spark_worker_connect(sessionId, config)
     worker_log("is connected")
 
     spark_worker_apply(sc)
