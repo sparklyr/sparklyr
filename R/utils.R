@@ -6,6 +6,9 @@ get_java <- function(throws = FALSE) {
   java_home <- Sys.getenv("JAVA_HOME", unset = NA)
   if (!is.na(java_home)) {
     java <- file.path(java_home, "bin", "java")
+    if (identical(.Platform$OS.type, "windows")) {
+      java <- paste0(java, ".exe")
+    }     
     if (!file.exists(java)) {
       if (throws) {
         stop("Java is required to connect to Spark. ",
