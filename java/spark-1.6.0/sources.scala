@@ -846,7 +846,9 @@ object Sources {
     "worker_config_serialize <- function(config) {\n" +
     "  paste(\n" +
     "    if (isTRUE(config$debug)) \"TRUE\" else \"FALSE\",\n" +
-    "    collapse = \";\"\n" +
+    "    spark_config_value(config, \"sparklyr.gateway.port\", \"8880\"),\n" +
+    "    spark_config_value(config, \"sparklyr.gateway.address\", \"localhost\"),\n" +
+    "    sep = \";\"\n" +
     "  )\n" +
     "}\n" +
     "\n" +
@@ -854,7 +856,9 @@ object Sources {
     "  parts <- strsplit(raw, \";\")[[1]]\n" +
     "\n" +
     "  list(\n" +
-    "    debug = as.logical(parts[[1]])\n" +
+    "    debug = as.logical(parts[[1]]),\n" +
+    "    sparklyr.gateway.port = as.integer(parts[[2]]),\n" +
+    "    sparklyr.gateway.address = parts[[3]]\n" +
     "  )\n" +
     "}\n" +
     "spark_worker_apply <- function(sc) {\n" +
@@ -902,9 +906,9 @@ object Sources {
     "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  worker_log(\"finished apply\")\n" +
     "}\n" +
-    "spark_worker_connect <- function(sessionId) {\n" +
-    "  gatewayPort <- \"8880\"\n" +
-    "  gatewayAddress <- \"localhost\"\n" +
+    "spark_worker_connect <- function(sessionId, config) {\n" +
+    "  gatewayPort <- config$sparklyr.gateway.port\n" +
+    "  gatewayAddress <- config$sparklyr.gateway.address\n" +
     "  config <- list()\n" +
     "\n" +
     "  worker_log(\"is connecting to backend using port \", gatewayPort)\n" +
@@ -1049,7 +1053,7 @@ object Sources {
     "\n" +
     "  tryCatch({\n" +
     "\n" +
-    "    sc <- spark_worker_connect(sessionId)\n" +
+    "    sc <- spark_worker_connect(sessionId, config)\n" +
     "    worker_log(\"is connected\")\n" +
     "\n" +
     "    spark_worker_apply(sc)\n" +
