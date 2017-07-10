@@ -79,10 +79,7 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
 }
 
 #' @export
-connection_is_open.spark_gateway_connection <- function(sc) {
-  class(sc) <- "spark_shell_connection"
-  connection_is_open(sc)
-}
+connection_is_open.spark_gateway_connection <- connection_is_open.spark_shell_connection
 
 #' @export
 spark_log.spark_gateway_connection <- function(sc, n = 100, filter = NULL, ...) {
@@ -95,14 +92,8 @@ spark_web.spark_gateway_connection <- function(sc, ...) {
 }
 
 #' @export
-invoke_method.spark_gateway_connection <- function(sc, static, object, method, ...) {
-  class(sc) <- "spark_shell_connection"
-  invoke_method(sc, static, object, method, ...)
-}
+invoke_method.spark_gateway_connection <- invoke_method.spark_shell_connection
 
 #' @export
-print_jobj.spark_gateway_connection <- function(sc, jobj, ...) {
-  class(sc) <- "spark_shell_connection"
-  print_jobj(sc, jobj, ...)
-}
+print_jobj.spark_gateway_connection <- print_jobj.spark_shell_connection
 
