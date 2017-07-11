@@ -280,13 +280,13 @@ class Backend {
                   backendChannel.close()
 
                   if (!isService) {
-                    logger.log("is terminating")
+                    logger.log("is terminating backend")
                     System.exit(0)
                   }
 
                   // workers should always terminate but without exceptions
                   if (isWorker) {
-                    logger.log("is terminating worker")
+                    logger.log("is terminating backend")
                     isRunning = false
                     gatewayServerSocket.close()
                   }
