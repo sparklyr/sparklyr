@@ -236,14 +236,6 @@ connection_spark_server <- function(input, output, session) {
     }
   }
 
-  installSparkReactive <- reactive({
-    sparkSelection <- input$sparkversion
-    hadoopSelection <- input$hadoopversion
-    master <- input$master
-
-    checkUserInstallPreference(master, sparkSelection, hadoopSelection, FALSE)
-  })
-
   generateCode <- function(master, dbInterface, sparkVersion, hadoopVersion, installSpark) {
     paste(
       "library(sparklyr)\n",
@@ -291,10 +283,29 @@ connection_spark_server <- function(input, output, session) {
     dbInterface <- input$dbinterface
     sparkVersion <- input$sparkversion
     hadoopVersion <- input$hadoopversion
-    installSpark <- installSparkReactive()
     codeInvalidated <- stateValuesReactive$codeInvalidated
 
+    installSpark <- checkUserInstallPreference(master, sparkVersion, hadoopVersion, FALSE)
+
     generateCode(master, dbInterface, sparkVersion, hadoopVersion, installSpark)
+  })
+
+  installLater <- reactive({
+    master <- input$master
+    sparkVersion <- input$sparkversion
+    hadoopVersion <- input$hadoopversion
+  }) %>% debounce(200)
+
+  observe({
+    installLater()
+
+    isolate({
+      master <- input$master
+      sparkVersion <- input$sparkversion
+      hadoopVersion <- input$hadoopversion
+
+      checkUserInstallPreference(master, sparkVersion, hadoopVersion, TRUE)
+    })
   })
 
   observe({
@@ -423,25 +434,6 @@ connection_spark_server <- function(input, output, session) {
         choices = spark_ui_hadoop_choices(currentSparkSelection),
         selected = hadoopDefault
       )
-
-      stateValuesReactive$codeInvalidated <<- isolate({
-        stateValuesReactive$codeInvalidated + 1
-      })
-
-      checkUserInstallPreference(master, currentSparkSelection, spark_default_version()$hadoop, TRUE)
-    }
-  })
-
-  observe({
-    # Scope this reactive to only changes to hadoop version, by using a ref
-    # to currentSparkSelection we force this code to be always executed
-    # after the spark version changes.
-    hadoopVersion <- input$hadoopversion
-    master <- input$master
-
-    # Don't change anything while initializing
-    if (!identical(currentSparkSelection, NULL)) {
-      checkUserInstallPreference(master, currentSparkSelection, hadoopVersion, TRUE)
 
       stateValuesReactive$codeInvalidated <<- isolate({
         stateValuesReactive$codeInvalidated + 1
