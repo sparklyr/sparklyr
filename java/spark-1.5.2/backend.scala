@@ -63,6 +63,13 @@ import scala.util.Try
  * to the main gateway the port in which this instance will listen to.
  */
 
+object Backend {
+  /* Leaving this entry for backward compatibility with databricks */
+  def main(args: Array[String]): Unit = {
+    Shell.main(args)
+  }
+}
+
 class Backend {
   private[this] var isService: Boolean = false
   private[this] var isRemote: Boolean = false
@@ -273,8 +280,15 @@ class Backend {
                   backendChannel.close()
 
                   if (!isService) {
-                    logger.log("is terminating")
+                    logger.log("is terminating backend")
                     System.exit(0)
+                  }
+
+                  // workers should always terminate but without exceptions
+                  if (isWorker) {
+                    logger.log("is terminating backend")
+                    isRunning = false
+                    gatewayServerSocket.close()
                   }
                 }
               }

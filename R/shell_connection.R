@@ -459,7 +459,9 @@ initialize_connection.spark_shell_connection <- function(sc) {
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
       conf <- invoke(conf, "setMaster", sc$master)
-      conf <- invoke(conf, "setSparkHome", sc$spark_home)
+
+      if (!is.null(sc$spark_home))
+        conf <- invoke(conf, "setSparkHome", sc$spark_home)
 
       context_config <- connection_config(sc, "spark.", c("spark.sql."))
       apply_config(context_config, conf, "set", "spark.")

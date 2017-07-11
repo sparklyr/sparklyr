@@ -1,5 +1,5 @@
 master_is_gateway <- function(master) {
-  length(grep("^(sparklyr://)?[^:]+:[0-9]+$", master)) > 0
+  length(grep("^(sparklyr://)?[^:]+:[0-9]+(/[0-9]+)?$", master)) > 0
 }
 
 gateway_connection <- function(master, config) {
@@ -10,8 +10,9 @@ gateway_connection <- function(master, config) {
   protocol <- strsplit(master, "//")[[1]]
   components <- strsplit(protocol[[2]], ":")[[1]]
   gatewayAddress <- components[[1]]
-  gatewayPort <- as.integer(components[[2]])
-  sessionId <- 0
+  portAndSesssion <- strsplit(components[[2]], "/")[[1]]
+  gatewayPort <- as.integer(portAndSesssion[[1]])
+  sessionId <- if (length(portAndSesssion) > 1) as.integer(portAndSesssion[[2]]) else 0
 
   gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
                                        gatewayPort = gatewayPort,
@@ -34,7 +35,7 @@ gateway_connection <- function(master, config) {
 spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
   tryCatch({
     # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 60)
+    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
@@ -47,11 +48,11 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
   })
 
   # create the shell connection
-  sc <- structure(class = c("spark_connection", "spark_gateway_connection"), list(
+  sc <- structure(class = c("spark_connection", "spark_gateway_connection", "spark_shell_connection"), list(
     # spark_connection
     master = master,
     method = "gateway",
-    app_name = "",
+    app_name = "sparklyr",
     config = config,
     # spark_gateway_connection : spark_shell_connection
     spark_home = NULL,
@@ -78,10 +79,7 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
 }
 
 #' @export
-connection_is_open.spark_gateway_connection <- function(sc) {
-  class(sc) <- "spark_shell_connection"
-  connection_is_open(sc)
-}
+connection_is_open.spark_gateway_connection <- connection_is_open.spark_shell_connection
 
 #' @export
 spark_log.spark_gateway_connection <- function(sc, n = 100, filter = NULL, ...) {
@@ -94,13 +92,8 @@ spark_web.spark_gateway_connection <- function(sc, ...) {
 }
 
 #' @export
-invoke_method.spark_gateway_connection <- function(sc, static, object, method, ...) {
-  class(sc) <- "spark_shell_connection"
-  invoke_method(sc, static, object, method, ...)
-}
+invoke_method.spark_gateway_connection <- invoke_method.spark_shell_connection
 
 #' @export
-print_jobj.spark_gateway_connection <- function(sc, jobj, ...) {
-  class(sc) <- "spark_shell_connection"
-  print_jobj(sc, jobj, ...)
-}
+print_jobj.spark_gateway_connection <- print_jobj.spark_shell_connection
+

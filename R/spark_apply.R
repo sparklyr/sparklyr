@@ -68,9 +68,16 @@ spark_apply <- function(x, f, names = colnames(x), memory = TRUE, ...) {
   # build the configuration definetion for each worker role
 
   # create a configuration string to initialize each worker
-  worker_config <- worker_config_serialize(list(
-    debug = isTRUE(args$debug)
-  ))
+  worker_config <- worker_config_serialize(
+    c(
+      list(
+        debug = isTRUE(args$debug)
+      ),
+      sc$config
+    )
+  )
+
+  worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
   rdd <- invoke_static(
     sc,
@@ -78,7 +85,8 @@ spark_apply <- function(x, f, names = colnames(x), memory = TRUE, ...) {
     "computeRdd",
     sdf,
     closure,
-    worker_config)
+    worker_config,
+    as.integer(worker_port))
 
   # while workers need to relaunch sparklyr backends, cache by default
   if (memory) rdd <- invoke(rdd, "cache")
