@@ -245,28 +245,28 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
       scalac_path = find_scalac("2.10"),
       jar_name = sprintf("%s-1.5-2.10.jar", pkg),
       jar_path = find_jar(),
-      scala_filter = if(versioned) make_version_filter("1.5.2") else NULL
+      scala_filter = make_version_filter("1.5.2", versioned)
     ),
     spark_compilation_spec(
       spark_version = "1.6.1",
       scalac_path = find_scalac("2.10"),
       jar_name = sprintf("%s-1.6-2.10.jar", pkg),
       jar_path = find_jar(),
-      scala_filter = if(versioned) make_version_filter("1.6.1") else NULL
+      scala_filter = make_version_filter("1.6.1", versioned)
     ),
     spark_compilation_spec(
       spark_version = "2.0.0",
       scalac_path = find_scalac("2.11"),
       jar_name = sprintf("%s-2.0-2.11.jar", pkg),
       jar_path = find_jar(),
-      scala_filter = if(versioned) make_version_filter("2.0.0") else NULL
+      scala_filter = make_version_filter("2.0.0", versioned)
     ),
     spark_compilation_spec(
       spark_version = "2.1.0",
       scalac_path = find_scalac("2.11"),
       jar_name = sprintf("%s-2.1-2.11.jar", pkg),
       jar_path = find_jar(),
-      scala_filter = if(versioned) make_version_filter("2.1.0") else NULL
+      scala_filter = make_version_filter("2.1.0", versioned)
     )
   )
 }
@@ -377,20 +377,24 @@ get_scalac_version <- function(scalac = Sys.which("scalac")) {
   splat[[4]]
 }
 
-make_version_filter <- function(version_upper) {
+make_version_filter <- function(version_upper, versioned) {
   force(version_upper)
+  force(versioned)
 
-  function(files) {
-    Filter(function(file) {
-      version <- file %>%
-        dirname() %>%
-        basename() %>%
-        strsplit("-") %>%
-        unlist() %>%
-        dplyr::last() %>%
-        numeric_version()
+  if (!versioned)
+    function(files) files
+  else
+    function(files) {
+      Filter(function(file) {
+        version <- file %>%
+          dirname() %>%
+          basename() %>%
+          strsplit("-") %>%
+          unlist() %>%
+          dplyr::last() %>%
+          numeric_version()
 
-      version <= numeric_version(version_upper)
-    }, files)
+        version <= numeric_version(version_upper)
+      }, files)
   }
 }
