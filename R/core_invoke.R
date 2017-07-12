@@ -52,7 +52,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
       warning.length = 8000
     ), {
       if (nzchar(msg)) {
-        core_warning_from_error(msg)
+        core_handle_known_errors(sc, msg)
 
         stop(msg, call. = FALSE)
       } else {
@@ -69,7 +69,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   attach_connection(object, sc)
 }
 
-core_warning_from_error <- function(msg) {
+core_handle_known_errors <- function(sc, msg) {
   # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle
   # gracefully and triggers unexpected errors such as #532. Under these versions,
   # we proactevely test getLocalHost() to warn users of this problem.
@@ -78,6 +78,12 @@ core_warning_from_error <- function(msg) {
       "Failed to retrieve localhost, please validate that the hostname is correctly mapped. ",
       "Consider running `hostname` and adding that entry to your `/etc/hosts` file."
     )
+  }
+  else if (grepl("check worker logs for details", msg, ignore.case = TRUE) &&
+           spark_master_is_local(sc$master)) {
+    abort_shell(
+      "sparklyr worker rscript failure, check worker logs for details",
+      NULL, NULL, sc$output_file, sc$error_file)
   }
 }
 
