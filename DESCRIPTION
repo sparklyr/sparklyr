@@ -43,6 +43,7 @@ Imports:
     shiny (>= 1.0.1),
     withr
 Suggests:
+    ggplot2,
+    janeaustenr,
     testthat,
-    RCurl,
-    janeaustenr
+    RCurl
