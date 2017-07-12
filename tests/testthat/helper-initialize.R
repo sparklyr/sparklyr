@@ -1,10 +1,15 @@
 testthat_spark_connection <- function(version = NULL) {
+  if (nrow(spark_installed_versions()) == 0) {
+    spark_install("2.1.0")
+  }
+
+  expect_gt(nrow(spark_installed_versions()), 0)
 
   # generate connection if none yet exists
   connected <- FALSE
   if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
     sc <- get(".testthat_spark_connection", envir = .GlobalEnv)
-    connected <- sparklyr::connection_is_open(sc)
+    connected <- connection_is_open(sc)
   }
 
   if (!connected) {
