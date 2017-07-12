@@ -1,7 +1,9 @@
 testthat_spark_connection <- function(version = NULL) {
-  if (length(spark_installed_versions()) == 0) {
-    spark_install()
+  if (nrow(spark_installed_versions()) == 0) {
+    spark_install("2.1.0")
   }
+
+  expect_gt(nrow(spark_installed_versions()), 0)
 
   # generate connection if none yet exists
   connected <- FALSE
