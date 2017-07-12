@@ -2,7 +2,14 @@ package sparklyr
 
 object Sources {
   def sources: String = "" +
-    "\n" +
+    "#' A helper function to retrieve values from \\code{spark_config()}\n" +
+    "#'\n" +
+    "#' @param config The configuration list from \\code{spark_config()}\n" +
+    "#' @param name The name of the configuration entry\n" +
+    "#' @param default The default value to use when entry is not present\n" +
+    "#'\n" +
+    "#' @keywords internal\n" +
+    "#' @export\n" +
     "spark_config_value <- function(config, name, default = NULL) {\n" +
     "  if (!name %in% names(config)) default else config[[name]]\n" +
     "}\n" +
@@ -402,7 +409,7 @@ object Sources {
     "      warning.length = 8000\n" +
     "    ), {\n" +
     "      if (nzchar(msg)) {\n" +
-    "        core_warning_from_error(msg)\n" +
+    "        core_handle_known_errors(sc, msg)\n" +
     "\n" +
     "        stop(msg, call. = FALSE)\n" +
     "      } else {\n" +
@@ -423,7 +430,7 @@ object Sources {
     "  \"shell_jobj\"\n" +
     "}\n" +
     "\n" +
-    "core_warning_from_error <- function(msg) {\n" +
+    "core_handle_known_errors <- function(sc, msg) {\n" +
     "  # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle\n" +
     "  # gracefully and triggers unexpected errors such as #532. Under these versions,\n" +
     "  # we proactevely test getLocalHost() to warn users of this problem.\n" +
@@ -432,6 +439,12 @@ object Sources {
     "      \"Failed to retrieve localhost, please validate that the hostname is correctly mapped. \",\n" +
     "      \"Consider running `hostname` and adding that entry to your `/etc/hosts` file.\"\n" +
     "    )\n" +
+    "  }\n" +
+    "  else if (grepl(\"check worker logs for details\", msg, ignore.case = TRUE) &&\n" +
+    "           spark_master_is_local(sc$master)) {\n" +
+    "    abort_shell(\n" +
+    "      \"sparklyr worker rscript failure, check worker logs for details\",\n" +
+    "      NULL, NULL, sc$output_file, sc$error_file)\n" +
     "  }\n" +
     "}\n" +
     "\n" +
