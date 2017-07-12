@@ -281,7 +281,7 @@ spark_resolve_envpath <- function(path_with_end) {
 #' @export
 spark_install_dir <- function() {
   config <- fromJSON(
-    system.file("extdata/config.json", package = "sparkinstall")
+    system.file("extdata/config.json", package = packageName())
   )
 
   getOption("spark.install.dir", spark_resolve_envpath(config$dirs[[.Platform$OS.type]]))

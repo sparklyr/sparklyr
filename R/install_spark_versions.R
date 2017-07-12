@@ -70,7 +70,7 @@ spark_versions <- function(latest = TRUE) {
   packagePath <- if (!is.na(packagePathEnv))
     packagePathEnv
   else
-    system.file(file.path("extdata", "versions.json"), package = "sparkinstall")
+    system.file(file.path("extdata", "versions.json"), package = packageName())
 
   downloadData <- NULL
   if (latest) {
