@@ -23,6 +23,12 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   mergedConfig
 }
 
+#' A helper function to check value exist under \code{spark_config()}
+#'
+#' @param config The configuration list from \code{spark_config()}
+#' @param name The name of the configuration entry
+#' @param default The default value to use when entry is not present
+#'
 #' @keywords internal
 #' @export
 spark_config_exists <- function(config, name, default = NULL) {

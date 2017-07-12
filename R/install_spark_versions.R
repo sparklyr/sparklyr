@@ -62,6 +62,10 @@ spark_available_versions <- function() {
   versions
 }
 
+#' Retrieves a dataframe available Spark versions that van be installed.
+#'
+#' @param latest Check for latest version?
+#'
 #' @keywords internal
 #' @export
 spark_versions <- function(latest = TRUE) {
