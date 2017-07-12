@@ -45,3 +45,26 @@ test_that("'spark_apply' works with 'sdf_repartition'", {
     iris_tbl %>% collect()
   )
 })
+
+test_that("'spark_apply' works with 'group_by'", {
+
+  grouped_lm <- spark_apply(
+    iris_tbl,
+    function(e) {
+      data.frame(
+        e[1,]$Species,
+        lm(Petal_Width ~ Petal_Length, e)$coefficients[["(Intercept)"]])
+    },
+    names = c("Species", "Intercept"),
+    group_by = "Species") %>% collect()
+
+  lapply(
+    unique(iris$Species),
+    function(species_test) {
+      expect_equal(
+        grouped_lm[grouped_lm$Species == species_test, ]$Intercept,
+        lm(Petal.Width ~ Petal.Length, iris[iris$Species == species_test, ])$coefficients[["(Intercept)"]]
+      )
+    }
+  )
+})
