@@ -5,4 +5,7 @@ library(sparklyr)
 
 test_check("testthat")
 
-spark_disconnect_all()
+on.exit({
+  spark_disconnect_all()
+  Sys.sleep(3)
+})
