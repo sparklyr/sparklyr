@@ -105,7 +105,6 @@ spark_apply <- function(x,
   }
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
-  grouped <- !is.null(group_by)
 
   rdd <- invoke_static(
     sc,
@@ -116,7 +115,7 @@ spark_apply <- function(x,
     worker_config,
     as.integer(worker_port),
     as.list(sdf_columns),
-    grouped
+    group_by
     )
 
   # while workers need to relaunch sparklyr backends, cache by default

@@ -13,7 +13,7 @@ class WorkerContext[T: ClassTag](
   lock: AnyRef,
   closure: Array[Byte],
   columns: Array[String],
-  grouped: Boolean) {
+  groupBy: String) {
 
   private var result: Array[T] = Array[T]()
 
@@ -25,8 +25,8 @@ class WorkerContext[T: ClassTag](
     columns
   }
 
-  def getGrouped(): Boolean = {
-    grouped
+  def getGroupBy(): String = {
+    groupBy
   }
 
   def getSourceIterator(): Iterator[T] = {
@@ -71,7 +71,7 @@ object WorkerHelper {
     config: String,
     port: Int,
     columns: Array[String],
-    grouped: Boolean): RDD[Row] = {
+    groupBy: String): RDD[Row] = {
 
     val parent: RDD[Row] = rdd
     val computed: RDD[Row] = new WorkerRDD[Row](
@@ -80,7 +80,7 @@ object WorkerHelper {
       columns,
       config,
       port,
-      grouped)
+      groupBy)
 
     computed
   }

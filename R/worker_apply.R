@@ -12,14 +12,15 @@ spark_worker_apply <- function(sc) {
 
   worker_log("retrieved worker context")
 
+  grouped_by <- worker_invoke(context, "getGroupBy")
+  grouped <- !is.null(grouped_by)
+  if (grouped) worker_log("working over grouped data")
+
   length <- worker_invoke(context, "getSourceArrayLength")
   worker_log("found ", length, " rows")
 
   groups <- worker_invoke(context, "getSourceArraySeq")
-  worker_log("retrieved ", length(data), " rows")
-
-  grouped <- worker_invoke(context, "getGrouped")
-  if (grouped) worker_log("working over grouped data")
+  worker_log("retrieved ", length(groups), " rows")
 
   closureRaw <- worker_invoke(context, "getClosure")
   closure <- unserialize(closureRaw)
@@ -37,8 +38,14 @@ spark_worker_apply <- function(sc) {
     df <- do.call(rbind.data.frame, data)
     colnames(df) <- columnNames[1: length(colnames(df))]
 
+    g <- if (grouped) df[[grouped_by]][[1]] else NULL
+
     worker_log("computing closure")
-    result <- closure(df)
+    result <- switch (as.character(length(formals(closure))),
+      "0" = closure(),
+      "1" = closure(df),
+      "2" = closure(df, g)
+    )
     worker_log("computed closure")
 
     if (!identical(class(result), "data.frame")) {

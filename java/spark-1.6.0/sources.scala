@@ -879,14 +879,15 @@ object Sources {
     "\n" +
     "  worker_log(\"retrieved worker context\")\n" +
     "\n" +
+    "  grouped_by <- worker_invoke(context, \"getGroupBy\")\n" +
+    "  grouped <- !is.null(grouped_by)\n" +
+    "  if (grouped) worker_log(\"working over grouped data\")\n" +
+    "\n" +
     "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
     "  worker_log(\"found \", length, \" rows\")\n" +
     "\n" +
     "  groups <- worker_invoke(context, \"getSourceArraySeq\")\n" +
-    "  worker_log(\"retrieved \", length(data), \" rows\")\n" +
-    "\n" +
-    "  grouped <- worker_invoke(context, \"getGrouped\")\n" +
-    "  if (grouped) worker_log(\"working over grouped data\")\n" +
+    "  worker_log(\"retrieved \", length(groups), \" rows\")\n" +
     "\n" +
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
     "  closure <- unserialize(closureRaw)\n" +
@@ -904,8 +905,14 @@ object Sources {
     "    df <- do.call(rbind.data.frame, data)\n" +
     "    colnames(df) <- columnNames[1: length(colnames(df))]\n" +
     "\n" +
+    "    g <- if (grouped) df[[grouped_by]][[1]] else NULL\n" +
+    "\n" +
     "    worker_log(\"computing closure\")\n" +
-    "    result <- closure(df)\n" +
+    "    result <- switch (as.character(length(formals(closure))),\n" +
+    "      \"0\" = closure(),\n" +
+    "      \"1\" = closure(df),\n" +
+    "      \"2\" = closure(df, g)\n" +
+    "    )\n" +
     "    worker_log(\"computed closure\")\n" +
     "\n" +
     "    if (!identical(class(result), \"data.frame\")) {\n" +
