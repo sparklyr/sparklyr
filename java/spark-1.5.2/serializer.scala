@@ -261,107 +261,98 @@ object Serializer {
       value match {
         case v: java.lang.Character =>
           writeType(dos, "character")
-        writeString(dos, v.toString)
+          writeString(dos, v.toString)
         case v: java.lang.String =>
           writeType(dos, "character")
-        writeString(dos, v)
+          writeString(dos, v)
         case v: java.lang.Long =>
           writeType(dos, "double")
-        writeDouble(dos, v.toDouble)
+          writeDouble(dos, v.toDouble)
         case v: java.lang.Float =>
           writeType(dos, "double")
-        writeDouble(dos, v.toDouble)
+          writeDouble(dos, v.toDouble)
         case v: java.math.BigDecimal =>
           writeType(dos, "double")
-        writeDouble(dos, scala.math.BigDecimal(v).toDouble)
+          writeDouble(dos, scala.math.BigDecimal(v).toDouble)
         case v: java.lang.Double =>
           writeType(dos, "double")
-        writeDouble(dos, v)
+          writeDouble(dos, v)
         case v: java.lang.Byte =>
           writeType(dos, "integer")
-        writeInt(dos, v.toInt)
+          writeInt(dos, v.toInt)
         case v: java.lang.Short =>
           writeType(dos, "integer")
-        writeInt(dos, v.toInt)
+          writeInt(dos, v.toInt)
         case v: java.lang.Integer =>
           writeType(dos, "integer")
-        writeInt(dos, v)
+          writeInt(dos, v)
         case v: java.lang.Boolean =>
           writeType(dos, "logical")
-        writeBoolean(dos, v)
+          writeBoolean(dos, v)
         case v: java.sql.Date =>
           writeType(dos, "date")
-        writeDate(dos, v)
+          writeDate(dos, v)
         case v: java.sql.Time =>
           writeType(dos, "time")
-        writeTime(dos, v)
+          writeTime(dos, v)
         case v: java.sql.Timestamp =>
           writeType(dos, "time")
-        writeTime(dos, v)
-
-        // Handle arrays
-
-        // Array of primitive types
-
-        // Special handling for byte array
+          writeTime(dos, v)
+        case v: org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema =>
+          writeType(dos, "list")
+          writeInt(dos, v.length)
+          v.toSeq.foreach(elem => writeObject(dos, elem.asInstanceOf[AnyRef]))
         case v: Array[Byte] =>
           writeType(dos, "raw")
-        writeBytes(dos, v)
-
+          writeBytes(dos, v)
         case v: Array[Char] =>
           writeType(dos, "array")
-        writeStringArr(dos, v.map(_.toString))
+          writeStringArr(dos, v.map(_.toString))
         case v: Array[Short] =>
           writeType(dos, "array")
-        writeIntArr(dos, v.map(_.toInt))
+          writeIntArr(dos, v.map(_.toInt))
         case v: Array[Int] =>
           writeType(dos, "array")
-        writeIntArr(dos, v)
+          writeIntArr(dos, v)
         case v: Array[Long] =>
           writeType(dos, "array")
-        writeDoubleArr(dos, v.map(_.toDouble))
+          writeDoubleArr(dos, v.map(_.toDouble))
         case v: Array[Float] =>
           writeType(dos, "array")
-        writeDoubleArr(dos, v.map(_.toDouble))
+          writeDoubleArr(dos, v.map(_.toDouble))
         case v: Array[Double] =>
           writeType(dos, "array")
-        writeDoubleArr(dos, v)
+          writeDoubleArr(dos, v)
         case v: Array[Boolean] =>
           writeType(dos, "array")
-        writeBooleanArr(dos, v)
-
-        // Array of objects, null objects use "void" type
+          writeBooleanArr(dos, v)
         case v: Array[Object] =>
+          // Array of objects, null objects use "void" type
           writeType(dos, "list")
-        writeInt(dos, v.length)
-        v.foreach(elem => writeObject(dos, elem))
-
-        // Handle Properties
-        // This must be above the case java.util.Map below.
-        // (Properties implements Map<Object,Object> and will be serialized as map otherwise)
+          writeInt(dos, v.length)
+          v.foreach(elem => writeObject(dos, elem))
         case v: java.util.Properties =>
+          // Handle Properties
+          // This must be above the case java.util.Map below.
+          // (Properties implements Map<Object,Object> and will be serialized as map otherwise)
           writeType(dos, "jobj")
-        writeJObj(dos, value)
-
-        // Handle map
+          writeJObj(dos, value)
         case v: java.util.Map[_, _] =>
           writeType(dos, "map")
-        writeInt(dos, v.size)
-        val iter = v.entrySet.iterator
-        while(iter.hasNext) {
-          val entry = iter.next
-          val key = entry.getKey
-          val value = entry.getValue
-
-          writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
-        }
+          writeInt(dos, v.size)
+          val iter = v.entrySet.iterator
+          while(iter.hasNext) {
+            val entry = iter.next
+            val key = entry.getKey
+            val value = entry.getValue
+            writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+          }
         case v: scala.collection.Map[_, _] =>
           writeType(dos, "map")
-        writeInt(dos, v.size)
-        v.foreach { case (key, value) =>
-          writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
-        }
-
+          writeInt(dos, v.size)
+          v.foreach { case (key, value) =>
+            writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+          }
         case _ =>
           if (sqlSerDe == null || sqlSerDe._2 == null || !(sqlSerDe._2)(dos, value)) {
             writeType(dos, "jobj")

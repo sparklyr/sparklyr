@@ -1,6 +1,6 @@
 spark_worker_connect <- function(sessionId, config) {
-  gatewayPort <- config$sparklyr.gateway.port
-  gatewayAddress <- config$sparklyr.gateway.address
+  gatewayPort <- spark_config_value(config, "sparklyr.gateway.port", "8880")
+  gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
   config <- list()
 
   worker_log("is connecting to backend using port ", gatewayPort)

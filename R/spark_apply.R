@@ -57,15 +57,21 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
-spark_apply <- function(x, f, names = colnames(x), memory = TRUE, ...) {
+spark_apply <- function(x,
+                        f,
+                        names = colnames(x),
+                        memory = TRUE,
+                        group_by = NULL,
+                        ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
+  sdf_columns <- colnames(x)
+  rdd_base <- invoke(sdf, "rdd")
+  grouped <- !is.null(group_by)
   args <- list(...)
 
   # create closure for the given function
   closure <- serialize(f, NULL)
-
-  # build the configuration definetion for each worker role
 
   # create a configuration string to initialize each worker
   worker_config <- worker_config_serialize(
@@ -77,16 +83,40 @@ spark_apply <- function(x, f, names = colnames(x), memory = TRUE, ...) {
     )
   )
 
+  if (grouped) {
+    colpos <- which(colnames(x) == group_by)
+    if (length(colpos) == 0) stop("Column '", group_by, "' not found.")
+
+    grouped_schema <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBySchema", sdf)
+    grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, as.integer(colpos - 1))
+    grouped_df <- invoke(hive_context(sc), "createDataFrame", grouped_rdd, grouped_schema)
+
+    storage_level <- invoke_static(
+      sc,
+      "org.apache.spark.storage.StorageLevel",
+      ifelse(memory, "MEMORY_AND_DISK", "DISK_ONLY")
+    )
+
+    invoke(grouped_df, "persist", storage_level)
+    invoke(grouped_df, "count")
+
+    rdd_base <- grouped_df %>% invoke("rdd")
+  }
+
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
+  grouped <- !is.null(group_by)
 
   rdd <- invoke_static(
     sc,
     "sparklyr.WorkerHelper",
     "computeRdd",
-    sdf,
+    rdd_base,
     closure,
     worker_config,
-    as.integer(worker_port))
+    as.integer(worker_port),
+    as.list(sdf_columns),
+    grouped
+    )
 
   # while workers need to relaunch sparklyr backends, cache by default
   if (memory) rdd <- invoke(rdd, "cache")

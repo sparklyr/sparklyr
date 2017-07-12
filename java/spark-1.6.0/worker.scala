@@ -12,7 +12,8 @@ class WorkerContext[T: ClassTag](
   task: TaskContext,
   lock: AnyRef,
   closure: Array[Byte],
-  columns: Array[String]) {
+  columns: Array[String],
+  grouped: Boolean) {
 
   private var result: Array[T] = Array[T]()
 
@@ -22,6 +23,10 @@ class WorkerContext[T: ClassTag](
 
   def getColumns(): Array[String] = {
     columns
+  }
+
+  def getGrouped(): Boolean = {
+    grouped
   }
 
   def getSourceIterator(): Iterator[T] = {
@@ -61,18 +66,21 @@ class WorkerContext[T: ClassTag](
 
 object WorkerHelper {
   def computeRdd(
-    df: DataFrame,
+    rdd: RDD[Row],
     closure: Array[Byte],
     config: String,
-    port: Int): RDD[Row] = {
+    port: Int,
+    columns: Array[String],
+    grouped: Boolean): RDD[Row] = {
 
-    val parent: RDD[Row] = df.rdd
+    val parent: RDD[Row] = rdd
     val computed: RDD[Row] = new WorkerRDD[Row](
       parent,
       closure,
-      df.columns,
+      columns,
       config,
-      port)
+      port,
+      grouped)
 
     computed
   }

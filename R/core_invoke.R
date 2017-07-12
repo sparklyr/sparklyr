@@ -69,6 +69,10 @@ core_invoke_method <- function(sc, static, object, method, ...)
   attach_connection(object, sc)
 }
 
+jobj_subclass.shell_backend <- function(con) {
+  "shell_jobj"
+}
+
 core_warning_from_error <- function(msg) {
   # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle
   # gracefully and triggers unexpected errors such as #532. Under these versions,
