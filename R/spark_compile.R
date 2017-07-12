@@ -234,6 +234,7 @@ find_jar <- function() {
 #' Spark extensions, when used with \code{\link{compile_package_jars}}.
 #'
 #' @param pkg The package containing Spark extensions to be compiled.
+#'
 #' @export
 spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
   list(
@@ -379,15 +380,18 @@ make_version_filter <- function(version_upper) {
 
   function(files) {
     Filter(function(file) {
-      version <- file %>%
+      maybe_version <- file %>%
         dirname() %>%
         basename() %>%
         strsplit("-") %>%
         unlist() %>%
-        dplyr::last() %>%
-        numeric_version()
+        dplyr::last()
 
-      version <= numeric_version(version_upper)
+      if (grepl("([0-9]+\\.){2}[0-9]+", maybe_version)) {
+        numeric_version(maybe_version) <= numeric_version(version_upper)
+      } else {
+        TRUE
+      }
     }, files)
   }
 }
