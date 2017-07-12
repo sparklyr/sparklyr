@@ -4,4 +4,5 @@ library(testthat)
 library(sparklyr)
 
 test_check("testthat")
-testthat_spark_terminate()
+
+spark_disconnect_all()
