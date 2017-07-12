@@ -1,6 +1,6 @@
 testthat_spark_connection <- function(version = NULL) {
   if (length(spark_installed_versions()) == 0) {
-    install_spark()
+    spark_install()
   }
 
   # generate connection if none yet exists
