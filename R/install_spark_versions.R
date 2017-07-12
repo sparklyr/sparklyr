@@ -62,6 +62,8 @@ spark_available_versions <- function() {
   versions
 }
 
+#' @keywords internal
+#' @export
 spark_versions <- function(latest = TRUE) {
 
   # This function might be called during a custom configuration and the package

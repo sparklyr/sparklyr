@@ -39,6 +39,7 @@ test_that("the implementation of 'filter' functions as expected", {
 
 test_that("'head' uses 'limit' clause", {
   test_requires("dplyr")
+  test_requires("dbplyr")
 
   expect_true(
     grepl(
@@ -50,6 +51,7 @@ test_that("'head' uses 'limit' clause", {
 
 test_that("'left_join' does not use 'using' clause", {
   test_requires("dplyr")
+  test_requires("dbplyr")
 
   expect_equal(
     spark_version(sc) >= "2.0.0" && packageVersion("dplyr") < "0.5.0.90",
