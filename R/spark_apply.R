@@ -54,6 +54,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #' @param names The column names for the transformed object, defaults to the
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
+#' @param group_by Column name used to group by data frame partitions.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export

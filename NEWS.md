@@ -2,6 +2,9 @@
 
 ### Distributed R
 
+- Added `group_by` parameter to `spark_apply()`, to support operations
+  over groups of dataframes.
+  
 - Added `spark_apply()`, allowing users to use R code to directly
   manipulate and transform Spark DataFrames.
 

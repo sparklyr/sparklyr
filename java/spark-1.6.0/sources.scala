@@ -419,6 +419,10 @@ object Sources {
     "  attach_connection(object, sc)\n" +
     "}\n" +
     "\n" +
+    "jobj_subclass.shell_backend <- function(con) {\n" +
+    "  \"shell_jobj\"\n" +
+    "}\n" +
+    "\n" +
     "core_warning_from_error <- function(msg) {\n" +
     "  # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle\n" +
     "  # gracefully and triggers unexpected errors such as #532. Under these versions,\n" +
@@ -878,37 +882,50 @@ object Sources {
     "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
     "  worker_log(\"found \", length, \" rows\")\n" +
     "\n" +
-    "  data <- worker_invoke(context, \"getSourceArraySeq\")\n" +
+    "  groups <- worker_invoke(context, \"getSourceArraySeq\")\n" +
     "  worker_log(\"retrieved \", length(data), \" rows\")\n" +
+    "\n" +
+    "  grouped <- worker_invoke(context, \"getGrouped\")\n" +
+    "  if (grouped) worker_log(\"working over grouped data\")\n" +
     "\n" +
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
     "  closure <- unserialize(closureRaw)\n" +
     "\n" +
     "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
     "\n" +
-    "  df <- do.call(rbind.data.frame, data)\n" +
-    "  colnames(df) <- columnNames[1: length(colnames(df))]\n" +
+    "  if (!grouped) groups <- list(list(groups))\n" +
     "\n" +
-    "  worker_log(\"computing closure\")\n" +
-    "  result <- closure(df)\n" +
-    "  worker_log(\"computed closure\")\n" +
+    "  all_results <- NULL\n" +
     "\n" +
-    "  if (!identical(class(result), \"data.frame\")) {\n" +
-    "    worker_log(\"data.frame expected but \", class(result), \" found\")\n" +
-    "    result <- data.frame(result)\n" +
+    "  for (group_entry in groups) {\n" +
+    "    # serialized groups are wrapped over single lists\n" +
+    "    data <- group_entry[[1]]\n" +
+    "\n" +
+    "    df <- do.call(rbind.data.frame, data)\n" +
+    "    colnames(df) <- columnNames[1: length(colnames(df))]\n" +
+    "\n" +
+    "    worker_log(\"computing closure\")\n" +
+    "    result <- closure(df)\n" +
+    "    worker_log(\"computed closure\")\n" +
+    "\n" +
+    "    if (!identical(class(result), \"data.frame\")) {\n" +
+    "      worker_log(\"data.frame expected but \", class(result), \" found\")\n" +
+    "      result <- data.frame(result)\n" +
+    "    }\n" +
+    "\n" +
+    "    all_results <- rbind(all_results, result)\n" +
     "  }\n" +
     "\n" +
-    "  data <- lapply(1:nrow(result), function(i) as.list(result[i,]))\n" +
-    "\n" +
-    "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
+    "  all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))\n" +
+    "  worker_invoke(context, \"setResultArraySeq\", all_data)\n" +
     "  worker_log(\"updated \", length(data), \" rows\")\n" +
     "\n" +
     "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  worker_log(\"finished apply\")\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId, config) {\n" +
-    "  gatewayPort <- config$sparklyr.gateway.port\n" +
-    "  gatewayAddress <- config$sparklyr.gateway.address\n" +
+    "  gatewayPort <- spark_config_value(config, \"sparklyr.gateway.port\", 8880)\n" +
+    "  gatewayAddress <- spark_config_value(config, \"sparklyr.gateway.address\", \"localhost\")\n" +
     "  config <- list()\n" +
     "\n" +
     "  worker_log(\"is connecting to backend using port \", gatewayPort)\n" +
