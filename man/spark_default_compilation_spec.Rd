@@ -4,10 +4,13 @@
 \alias{spark_default_compilation_spec}
 \title{Default Compilation Specification for Spark Extensions}
 \usage{
-spark_default_compilation_spec(pkg = infer_active_package_name())
+spark_default_compilation_spec(pkg = infer_active_package_name(),
+  versioned = FALSE)
 }
 \arguments{
 \item{pkg}{The package containing Spark extensions to be compiled.}
+
+\item{versioned}{Uses versioned directories across multiple spark versions.}
 }
 \description{
 This is the default compilation specification used for
