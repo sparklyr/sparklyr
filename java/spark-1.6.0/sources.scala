@@ -907,9 +907,17 @@ object Sources {
     "\n" +
     "  closureRLangRaw <- worker_invoke(context, \"getClosureRLang\")\n" +
     "  if (length(closureRLangRaw) > 0) {\n" +
+<<<<<<< HEAD
     "    closureRLang <- spark_worker_rlang_unserialize(closureRLangRaw)\n" +
     "    if (!is.null(closureRLang)) {\n" +
     "      closure <- closureRLang\n" +
+=======
+    "    worker_log(\"found rlang closure\")\n" +
+    "    closureRLang <- spark_worker_rlang_unserialize()\n" +
+    "    if (!is.null(closureRLang)) {\n" +
+    "      closure <- closureRLang(closureRLangRaw)\n" +
+    "      worker_log(\"created rlang closure\")\n" +
+>>>>>>> 982d5bc... build jars and sources
     "    }\n" +
     "  }\n" +
     "\n" +
@@ -952,6 +960,7 @@ object Sources {
     "  worker_log(\"finished apply\")\n" +
     "}\n" +
     "\n" +
+<<<<<<< HEAD
     "spark_worker_rlang_unserialize <- function(closureRaw) {\n" +
     "  rlang_unserialize <- NULL\n" +
     "  if (exists(\"serialise_bytes\", envir = asNamespace(\"rlang\")))\n" +
@@ -965,6 +974,14 @@ object Sources {
     "  else {\n" +
     "    NULL\n" +
     "  }\n" +
+=======
+    "spark_worker_rlang_unserialize <- function() {\n" +
+    "  rlang_unserialize <- core_get_package_function(\"rlang\", \"bytes_unserialise\")\n" +
+    "  if (is.null(rlang_unserialize))\n" +
+    "    core_get_package_function(\"rlanglabs\", \"bytes_unserialise\")\n" +
+    "  else\n" +
+    "    rlang_unserialize\n" +
+>>>>>>> 982d5bc... build jars and sources
     "}\n" +
     "spark_worker_connect <- function(sessionId, config) {\n" +
     "  gatewayPort <- spark_config_value(config, \"sparklyr.gateway.port\", 8880)\n" +
