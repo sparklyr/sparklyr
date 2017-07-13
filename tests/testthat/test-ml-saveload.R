@@ -22,6 +22,8 @@ test_that("we can save + load a RandomForest regression model", {
 
 test_that("we can save + load tables using the various save/load APIs", {
   skip_on_cran()
+  skip_on_travis()
+
   mtcars_tbl <- testthat_tbl("mtcars")
 
   # pairs of read / write routines that should work together
