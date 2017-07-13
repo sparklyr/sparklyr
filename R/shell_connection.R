@@ -81,7 +81,7 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
   withr::with_options(list(
     warning.length = 8000
   ), {
-    maxRows <- 50
+    maxRows <- 100
 
     # sleep for one second to allow spark process to dump data into the log file
     Sys.sleep(1)
