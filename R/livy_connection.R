@@ -48,7 +48,7 @@ livy_validate_http_response <- function(message, req) {
 #'
 #' @return Named list with configuration data
 livy_config <- function(config = spark_config(), username = NULL, password = NULL,
-                        custom_headers=NULL, csrf_header = TRUE) {
+                        custom_headers = NULL, csrf_header = TRUE) {
   if (!is.null(username) || !is.null(password)) {
     secret <- base64_enc(paste(username, password, sep = ":"))
 
@@ -70,8 +70,8 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
     )
   }
 
-  if(!is.null(custom_headers)){
-    for (l in names(custom_headers)){
+  if(!is.null(custom_headers)) {
+    for (l in names(custom_headers)) {
       config[["sparklyr.livy.headers"]] <- c(
         config[["sparklyr.livy.headers"]], custom_headers[l])
     }
