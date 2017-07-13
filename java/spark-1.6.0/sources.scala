@@ -905,6 +905,14 @@ object Sources {
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
     "  closure <- unserialize(closureRaw)\n" +
     "\n" +
+    "  closureRLangRaw <- worker_invoke(context, \"getClosureRLang\")\n" +
+    "  if (length(closureRLangRaw) > 0) {\n" +
+    "    closureRLang <- spark_worker_rlang_unserialize(closureRLangRaw)\n" +
+    "    if (!is.null(closureRLang)) {\n" +
+    "      closure <- closureRLang\n" +
+    "    }\n" +
+    "  }\n" +
+    "\n" +
     "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
     "\n" +
     "  if (!grouped) groups <- list(list(groups))\n" +
@@ -942,6 +950,21 @@ object Sources {
     "\n" +
     "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  worker_log(\"finished apply\")\n" +
+    "}\n" +
+    "\n" +
+    "spark_worker_rlang_unserialize <- function(closureRaw) {\n" +
+    "  rlang_unserialize <- NULL\n" +
+    "  if (exists(\"serialise_bytes\", envir = asNamespace(\"rlang\")))\n" +
+    "    rlang_unserialize <- get(\"bytes_unserialise\", envir = asNamespace(\"rlang\"))\n" +
+    "  else if (exists(\"serialise_bytes\", envir = asNamespace(\"rlanglabs\")))\n" +
+    "    rlang_unserialize <- get(\"bytes_unserialise\", envir = asNamespace(\"rlanglabs\"))\n" +
+    "\n" +
+    "  if (!is.null(rlang_unserialize)) {\n" +
+    "    rlang_unserialize(closureRaw)\n" +
+    "  }\n" +
+    "  else {\n" +
+    "    NULL\n" +
+    "  }\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId, config) {\n" +
     "  gatewayPort <- spark_config_value(config, \"sparklyr.gateway.port\", 8880)\n" +

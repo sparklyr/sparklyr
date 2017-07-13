@@ -5,7 +5,7 @@
 \title{Apply a Function in Spark}
 \usage{
 spark_apply(x, f, names = colnames(x), memory = TRUE, group_by = NULL,
-  ...)
+  rlang = TRUE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -18,6 +18,8 @@ names from the original object.}
 \item{memory}{Boolean; should the table be cached into memory?}
 
 \item{group_by}{Column name used to group by data frame partitions.}
+
+\item{rlang}{Boolean; should the closure be serialize using the rlang package?}
 
 \item{...}{Optional arguments; currently unused.}
 }

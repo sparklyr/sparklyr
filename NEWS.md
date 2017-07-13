@@ -2,6 +2,9 @@
 
 ### Distributed R
 
+- Added `rlang` parameter to `spark_apply()`, to support by default
+  generic closures provided by the `rlang` package.
+
 - Added `group_by` parameter to `spark_apply()`, to support operations
   over groups of dataframes.
   
