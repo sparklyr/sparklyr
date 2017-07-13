@@ -77,7 +77,8 @@ spark_apply <- function(x,
   closure <- serialize(f, NULL)
 
   # create rlang closure
-  closure_rlang <- if (rlang) spark_apply_rlang_serialize(f) else NULL
+  rlang_serialize <- spark_apply_rlang_serialize()
+  closure_rlang <- if (rlang && !is.null(rlang_serialize)) rlang_serialize(f) else raw()
 
   # create a configuration string to initialize each worker
   worker_config <- worker_config_serialize(
@@ -134,18 +135,10 @@ spark_apply <- function(x,
   sdf_register(transformed)
 }
 
-spark_apply_rlang_serialize <- function(f) {
-  rlang_serialize <- NULL
-
-  if (exists("serialise_bytes",envir = asNamespace("rlang")))
-    rlang_serialize <- get("serialise_bytes", envir = asNamespace("rlang"))
-  else if (exists("serialise_bytes", envir = asNamespace("rlanglabs")))
-    rlang_serialize <- get("serialise_bytes", envir = asNamespace("rlanglabs"))
-
-  if (!is.null(rlang_serialize)) {
-    rlang_serialize(f)
-  }
-  else {
-    NULL
-  }
+spark_apply_rlang_serialize <- function() {
+  rlang_serialize <- core_get_package_function("rlang", "serialise_bytes")
+  if (is.null(rlang_serialize))
+    core_get_package_function("rlanglabs", "serialise_bytes")
+  else
+    rlang_serialize
 }

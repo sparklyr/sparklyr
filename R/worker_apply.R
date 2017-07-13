@@ -27,9 +27,11 @@ spark_worker_apply <- function(sc) {
 
   closureRLangRaw <- worker_invoke(context, "getClosureRLang")
   if (length(closureRLangRaw) > 0) {
-    closureRLang <- spark_worker_rlang_unserialize(closureRLangRaw)
+    worker_log("found rlang closure")
+    closureRLang <- spark_worker_rlang_unserialize()
     if (!is.null(closureRLang)) {
-      closure <- closureRLang
+      closure <- closureRLang(closureRLangRaw)
+      worker_log("created rlang closure")
     }
   }
 
@@ -72,17 +74,10 @@ spark_worker_apply <- function(sc) {
   worker_log("finished apply")
 }
 
-spark_worker_rlang_unserialize <- function(closureRaw) {
-  rlang_unserialize <- NULL
-  if (exists("serialise_bytes", envir = asNamespace("rlang")))
-    rlang_unserialize <- get("bytes_unserialise", envir = asNamespace("rlang"))
-  else if (exists("serialise_bytes", envir = asNamespace("rlanglabs")))
-    rlang_unserialize <- get("bytes_unserialise", envir = asNamespace("rlanglabs"))
-
-  if (!is.null(rlang_unserialize)) {
-    rlang_unserialize(closureRaw)
-  }
-  else {
-    NULL
-  }
+spark_worker_rlang_unserialize <- function() {
+  rlang_unserialize <- core_get_package_function("rlang", "bytes_unserialise")
+  if (is.null(rlang_unserialize))
+    core_get_package_function("rlanglabs", "bytes_unserialise")
+  else
+    rlang_unserialize
 }
