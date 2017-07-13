@@ -2,7 +2,14 @@ package sparklyr
 
 object Sources {
   def sources: String = "" +
-    "\n" +
+    "#' A helper function to retrieve values from \\code{spark_config()}\n" +
+    "#'\n" +
+    "#' @param config The configuration list from \\code{spark_config()}\n" +
+    "#' @param name The name of the configuration entry\n" +
+    "#' @param default The default value to use when entry is not present\n" +
+    "#'\n" +
+    "#' @keywords internal\n" +
+    "#' @export\n" +
     "spark_config_value <- function(config, name, default = NULL) {\n" +
     "  if (!name %in% names(config)) default else config[[name]]\n" +
     "}\n" +
@@ -402,7 +409,7 @@ object Sources {
     "      warning.length = 8000\n" +
     "    ), {\n" +
     "      if (nzchar(msg)) {\n" +
-    "        core_warning_from_error(msg)\n" +
+    "        core_handle_known_errors(sc, msg)\n" +
     "\n" +
     "        stop(msg, call. = FALSE)\n" +
     "      } else {\n" +
@@ -419,7 +426,11 @@ object Sources {
     "  attach_connection(object, sc)\n" +
     "}\n" +
     "\n" +
-    "core_warning_from_error <- function(msg) {\n" +
+    "jobj_subclass.shell_backend <- function(con) {\n" +
+    "  \"shell_jobj\"\n" +
+    "}\n" +
+    "\n" +
+    "core_handle_known_errors <- function(sc, msg) {\n" +
     "  # Some systems might have an invalid hostname that Spark <= 2.0.1 fails to handle\n" +
     "  # gracefully and triggers unexpected errors such as #532. Under these versions,\n" +
     "  # we proactevely test getLocalHost() to warn users of this problem.\n" +
@@ -428,6 +439,12 @@ object Sources {
     "      \"Failed to retrieve localhost, please validate that the hostname is correctly mapped. \",\n" +
     "      \"Consider running `hostname` and adding that entry to your `/etc/hosts` file.\"\n" +
     "    )\n" +
+    "  }\n" +
+    "  else if (grepl(\"check worker logs for details\", msg, ignore.case = TRUE) &&\n" +
+    "           spark_master_is_local(sc$master)) {\n" +
+    "    abort_shell(\n" +
+    "      \"sparklyr worker rscript failure, check worker logs for details\",\n" +
+    "      NULL, NULL, sc$output_file, sc$error_file)\n" +
     "  }\n" +
     "}\n" +
     "\n" +
@@ -875,40 +892,60 @@ object Sources {
     "\n" +
     "  worker_log(\"retrieved worker context\")\n" +
     "\n" +
+    "  grouped_by <- worker_invoke(context, \"getGroupBy\")\n" +
+    "  grouped <- !is.null(grouped_by)\n" +
+    "  if (grouped) worker_log(\"working over grouped data\")\n" +
+    "\n" +
     "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
     "  worker_log(\"found \", length, \" rows\")\n" +
     "\n" +
-    "  data <- worker_invoke(context, \"getSourceArraySeq\")\n" +
-    "  worker_log(\"retrieved \", length(data), \" rows\")\n" +
+    "  groups <- worker_invoke(context, \"getSourceArraySeq\")\n" +
+    "  worker_log(\"retrieved \", length(groups), \" rows\")\n" +
     "\n" +
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
     "  closure <- unserialize(closureRaw)\n" +
     "\n" +
     "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
     "\n" +
-    "  df <- do.call(rbind.data.frame, data)\n" +
-    "  colnames(df) <- columnNames[1: length(colnames(df))]\n" +
+    "  if (!grouped) groups <- list(list(groups))\n" +
     "\n" +
-    "  worker_log(\"computing closure\")\n" +
-    "  result <- closure(df)\n" +
-    "  worker_log(\"computed closure\")\n" +
+    "  all_results <- NULL\n" +
     "\n" +
-    "  if (!identical(class(result), \"data.frame\")) {\n" +
-    "    worker_log(\"data.frame expected but \", class(result), \" found\")\n" +
-    "    result <- data.frame(result)\n" +
+    "  for (group_entry in groups) {\n" +
+    "    # serialized groups are wrapped over single lists\n" +
+    "    data <- group_entry[[1]]\n" +
+    "\n" +
+    "    df <- do.call(rbind.data.frame, data)\n" +
+    "    colnames(df) <- columnNames[1: length(colnames(df))]\n" +
+    "\n" +
+    "    g <- if (grouped) df[[grouped_by]][[1]] else NULL\n" +
+    "\n" +
+    "    worker_log(\"computing closure\")\n" +
+    "    result <- switch (as.character(length(formals(closure))),\n" +
+    "      \"0\" = closure(),\n" +
+    "      \"1\" = closure(df),\n" +
+    "      \"2\" = closure(df, g)\n" +
+    "    )\n" +
+    "    worker_log(\"computed closure\")\n" +
+    "\n" +
+    "    if (!identical(class(result), \"data.frame\")) {\n" +
+    "      worker_log(\"data.frame expected but \", class(result), \" found\")\n" +
+    "      result <- data.frame(result)\n" +
+    "    }\n" +
+    "\n" +
+    "    all_results <- rbind(all_results, result)\n" +
     "  }\n" +
     "\n" +
-    "  data <- lapply(1:nrow(result), function(i) as.list(result[i,]))\n" +
-    "\n" +
-    "  worker_invoke(context, \"setResultArraySeq\", data)\n" +
+    "  all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))\n" +
+    "  worker_invoke(context, \"setResultArraySeq\", all_data)\n" +
     "  worker_log(\"updated \", length(data), \" rows\")\n" +
     "\n" +
     "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  worker_log(\"finished apply\")\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId, config) {\n" +
-    "  gatewayPort <- config$sparklyr.gateway.port\n" +
-    "  gatewayAddress <- config$sparklyr.gateway.address\n" +
+    "  gatewayPort <- spark_config_value(config, \"sparklyr.gateway.port\", 8880)\n" +
+    "  gatewayAddress <- spark_config_value(config, \"sparklyr.gateway.address\", \"localhost\")\n" +
     "  config <- list()\n" +
     "\n" +
     "  worker_log(\"is connecting to backend using port \", gatewayPort)\n" +

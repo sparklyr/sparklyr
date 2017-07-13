@@ -431,10 +431,6 @@ invoke_method.spark_shell_connection <- function(sc, static, object, method, ...
   core_invoke_method(sc, static, object, method, ...)
 }
 
-jobj_subclass.shell_backend <- function(con) {
-  "shell_jobj"
-}
-
 #' @export
 print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
   if (connection_is_open(sc)) {
