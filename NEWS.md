@@ -155,12 +155,9 @@
 
 - While connecting to spark from Windows, setting the `sparklyr.verbose` option
   to `TRUE` prints detailed configuration steps.
-  
-- Added `csrf_header` to `livy_config()` to enable connections to Livy servers with
-  CSRF protection enabled.
 
 - Added `custom_headers` to `livy_config()` to add custom headers to the REST call
-  to the Livy Server
+  to the Livy server
   
 ### Compilation
 
