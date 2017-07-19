@@ -294,6 +294,10 @@ spark_master_is_yarn_client <- function(master) {
   grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE)
 }
 
+spark_master_is_yarn_cluster <- function(master) {
+  grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE)
+}
+
 # Number of cores available in the local install
 spark_connection_local_cores <- function(sc) {
   spark_config_value(sc$config, "sparklyr.cores")

@@ -31,6 +31,13 @@ shell_connection <- function(master,
     }
   }
 
+  # for yarn-cluster we will try to read the yarn config and adjust gateway appropiately
+  if (spark_master_is_yarn_cluster(master)) {
+    if (is.null(config[["sparklyr.gateway.address"]])) {
+      config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway()
+    }
+  }
+
   # start with blank environment variables
   environment <- new.env()
 
