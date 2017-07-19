@@ -36,6 +36,9 @@ shell_connection <- function(master,
     if (is.null(config[["sparklyr.gateway.address"]])) {
       config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway()
     }
+
+    # running in yarn-cluster mode requires the driver to take external connections
+    remote <- TRUE
   }
 
   # start with blank environment variables
@@ -69,7 +72,8 @@ shell_connection <- function(master,
     extensions = extensions,
     environment = environment,
     shell_args = shell_args,
-    service = service
+    service = service,
+    remote = remote
   )
 }
 
@@ -134,11 +138,13 @@ start_shell <- function(master,
                         packages = NULL,
                         environment = NULL,
                         shell_args = NULL,
-                        service = FALSE) {
+                        service = FALSE,
+                        remote = FALSE) {
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
-  isService <- FALSE
+  isService <- service
+  isRemote <- remote
 
   sessionId <- if (isService)
       spark_session_id(app_name, master)
@@ -258,8 +264,7 @@ start_shell <- function(master,
       shell_args <- c(shell_args, "--service")
     }
 
-    isRemote <- FALSE
-    if (isService && isRemote) {
+    if (isRemote) {
       shell_args <- c(shell_args, "--remote")
     }
 
