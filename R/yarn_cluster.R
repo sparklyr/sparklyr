@@ -1,10 +1,15 @@
 spark_yarn_cluster_get_gateway <- function() {
-  hadoopConfDir <- Sys.getenv("YARN_CONF_DIR")
-  if (nchar(hadoopConfDir) == 0) {
-    stop("Yarn Cluster mode requires YARN_CONF_DIR to be set.")
+  confDir <- Sys.getenv("YARN_CONF_DIR")
+  if (nchar(confDir) == 0) {
+
+    # some systems don't set YARN_CONF_DIR but do set HADOOP_CONF_DIR
+    confDir <- Sys.getenv("HADOOP_CONF_DIR")
+    if (nchar(confDir) == 0) {
+      stop("Yarn Cluster mode requires YARN_CONF_DIR or HADOOP_CONF_DIR to be set.")
+    }
   }
 
-  yarnSite <- file.path(hadoopConfDir, "yarn-site.xml")
+  yarnSite <- file.path(confDir, "yarn-site.xml")
   if (!file.exists(yarnSite)) {
     stop("Yarn Cluster mode requires yarn-site.xml to exist under YARN_CONF_DIR")
   }
