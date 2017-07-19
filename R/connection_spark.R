@@ -121,8 +121,16 @@ spark_connect <- function(master = "local",
                              hadoop_version = hadoop_version,
                              shell_args = shell_args,
                              config = config,
-                             service = FALSE,
-                             remote = FALSE,
+                             service = spark_config_value(
+                               config,
+                               "sparklyr.gateway.service",
+                               FALSE),
+                             remote = spark_config_value(
+                               config,
+                               "sparklyr.gateway.remote",
+                               # running in yarn-cluster mode requires the
+                               # driver to take external connections
+                               TRUE),
                              extensions = extensions)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,

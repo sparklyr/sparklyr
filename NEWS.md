@@ -147,6 +147,10 @@
 
 ### Connections
 
+- Added support for `sparklyr.gateway.service` and `sparklyr.gateway.remote` to
+  enable/disable the gateway in service and to accept remote connections required
+  for Yarn Cluster mode.
+
 - Added support for Yarn Cluster mode using `master = "yarn-cluster"`. Either,
   explicitly set `config = list(sparklyr.gateway.address = "<driver-name>")` or
   implicitly `sparklyr` will read the `site-config.xml` for the `YARN_CONF_DIR`

@@ -37,9 +37,6 @@ shell_connection <- function(master,
     if (is.null(config[["sparklyr.gateway.address"]])) {
       config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway()
     }
-
-    # running in yarn-cluster mode requires the driver to take external connections
-    remote <- TRUE
   }
 
   # start with blank environment variables
