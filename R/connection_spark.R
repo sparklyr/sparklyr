@@ -122,6 +122,7 @@ spark_connect <- function(master = "local",
                              shell_args = shell_args,
                              config = config,
                              service = FALSE,
+                             remote = FALSE,
                              extensions = extensions)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,

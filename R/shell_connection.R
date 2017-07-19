@@ -16,12 +16,10 @@ shell_connection <- function(master,
                              shell_args,
                              config,
                              service,
+                             remote,
                              extensions) {
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
-
-  # by default, no remote connections
-  remote <- FALSE
 
   # for local mode we support SPARK_HOME via locally installed versions and version overrides SPARK_HOME
   if (spark_master_is_local(master)) {
