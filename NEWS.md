@@ -149,7 +149,7 @@
 
 - Added support for Yarn Cluster mode using `master = "yarn-cluster"`. Either,
   explicitly set `config = list(sparklyr.gateway.address = "<driver-name>")` or
-  implicitly `sparklyr` will read the `site-config.xml` for the `HADOOP_CONF_DIR`
+  implicitly `sparklyr` will read the `site-config.xml` for the `YARN_CONF_DIR`
   environment variable.
   
 - Added `spark_context_config()` and `hive_context_config()` to retrieve
