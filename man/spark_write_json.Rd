@@ -35,6 +35,8 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_read_table}},
   \code{\link{spark_save_table}},
   \code{\link{spark_write_csv}},
+  \code{\link{spark_write_jdbc}},
   \code{\link{spark_write_parquet}},
+  \code{\link{spark_write_source}},
   \code{\link{spark_write_table}}
 }

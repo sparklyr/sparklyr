@@ -10,6 +10,12 @@
 
 ### External Data
 
+- Added `spark_write_source()`. This function writes data into a
+  Spark data source which can be loaded through an Spark package.
+
+- Added `spark_write_jdbc()`. This function writes from a Spark DataFrame
+  into a JDBC connection.
+  
 - Added `columns` parameter to `spark_read_*()` functions to load data with
   named columns or explicit column types.
 
