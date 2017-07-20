@@ -473,9 +473,9 @@ initialize_connection.spark_shell_connection <- function(sc) {
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
 
-      if (!spark_master_is_yarn_cluster(sc$master)) {
-        conf <- invoke(conf, "setMaster", sc$master)
+      conf <- invoke(conf, "setMaster", sc$master)
 
+      if (!spark_master_is_yarn_cluster(sc$master)) {
         if (!is.null(sc$spark_home))
           conf <- invoke(conf, "setSparkHome", sc$spark_home)
       }
