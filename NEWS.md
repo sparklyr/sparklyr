@@ -147,6 +147,9 @@
 
 ### Connections
 
+- Support for gateway connections `sparklyr://hostname:port/session` and using
+  `spark-submit --class sparklyr.Shell sparklyr-2.1-2.11.jar <port> <id> --remote`.
+
 - Added support for `sparklyr.gateway.service` and `sparklyr.gateway.remote` to
   enable/disable the gateway in service and to accept remote connections required
   for Yarn Cluster mode.
