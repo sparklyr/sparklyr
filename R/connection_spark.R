@@ -112,6 +112,9 @@ spark_connect <- function(master = "local",
   if (master == "spark://HOST:PORT")
     method <- "test"
 
+  if (spark_master_is_gateway(master))
+    method <- "gateway"
+
   # spark-shell (local install of spark)
   if (method == "shell") {
     scon <- shell_connection(master = master,
@@ -139,6 +142,8 @@ spark_connect <- function(master = "local",
                             version,
                             hadoop_version ,
                             extensions)
+  } else if (method == "gateway") {
+    scon <- gateway_connection(master = master, config = config)
   } else if (method == "databricks") {
     scon <- databricks_connection(config = config,
                                   extensions)
@@ -305,6 +310,10 @@ spark_master_is_yarn_client <- function(master) {
 
 spark_master_is_yarn_cluster <- function(master) {
   grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE)
+}
+
+spark_master_is_gateway <- function(master) {
+  grepl("sparklyr://.*", master)
 }
 
 # Number of cores available in the local install
