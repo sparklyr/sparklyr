@@ -400,20 +400,38 @@ spark_data_write_generic <- function(df,
                                      path,
                                      fileMethod,
                                      mode = NULL,
-                                     csvOptions = list(),
-                                     partition_by = NULL) {
+                                     writeOptions = list(),
+                                     partition_by = NULL,
+                                     is_jdbc = FALSE) {
   options <- invoke(df, "write")
 
   options <- spark_data_apply_mode(options, mode)
 
-  lapply(names(csvOptions), function(csvOptionName) {
-    options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+  lapply(names(writeOptions), function(writeOptionName) {
+    options <<- invoke(options, "option", writeOptionName, writeOptions[[writeOptionName]])
   })
 
   if (!is.null(partition_by))
     options <- invoke(options, "partitionBy", as.list(partition_by))
 
-  invoke(options, fileMethod, path)
+  if (is_jdbc) {
+    sc <- spark_connection(df)
+
+    url <- writeOptions[["url"]]
+    writeOptions[["url"]] <- NULL
+    if (is.null(url)) stop("Option 'url' is expected while using jdbc")
+
+    properties <- invoke_new(sc, "java.util.Properties")
+    lapply(names(writeOptions), function(optionName) {
+      invoke(properties, "setProperty", optionName, as.character(writeOptions[[optionName]]))
+    })
+
+    invoke(options, fileMethod, url, path, properties)
+  }
+  else {
+    invoke(options, fileMethod, path)
+  }
+
   invisible(TRUE)
 }
 
@@ -590,4 +608,100 @@ spark_read_source <- function(sc,
 
   df <- spark_data_read_generic(sc, source, "format", options, columns) %>% invoke("load")
   spark_partition_register_df(sc, df, name, repartition, memory)
+}
+
+#' Writes a Spark DataFrame into a JDBC table
+#'
+#' Writes a Spark DataFrame into a JDBC table.
+#'
+#' @inheritParams spark_write_csv
+#' @param name The name to assign to the newly generated table.
+#' @param mode Specifies the behavior when data or table already exists.
+#' @param partition_by Partitions the output by the given columns on the file system.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_write_jdbc <- function(x,
+                             name,
+                             mode = NULL,
+                             options = list(),
+                             partition_by = NULL,
+                             ...) {
+  UseMethod("spark_write_jdbc")
+}
+
+#' @export
+spark_write_jdbc.tbl_spark <- function(x,
+                                       name,
+                                       mode = NULL,
+                                       options = list(),
+                                       partition_by = NULL,
+                                       ...) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  sc <- spark_connection(x)
+
+  spark_data_write_generic(sqlResult, name, "jdbc", mode, options, partition_by, is_jdbc = TRUE)
+}
+
+#' @export
+spark_write_jdbc.spark_jobj <- function(x,
+                                        name,
+                                        mode = NULL,
+                                        options = list(),
+                                        partition_by = NULL,
+                                        ...) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  sc <- spark_connection(x)
+
+  spark_data_write_generic(x, name, "jdbc", mode, options, partition_by, is_jdbc = TRUE)
+}
+
+#' Writes a Spark DataFrame into a generic source
+#'
+#' Writes a Spark DataFrame into a generic source.
+#'
+#' @inheritParams spark_write_csv
+#' @param name The name to assign to the newly generated table.
+#' @param source A data source capable of reading data.
+#' @param mode Specifies the behavior when data or table already exists.
+#' @param partition_by Partitions the output by the given columns on the file system.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_write_source <- function(x,
+                               name,
+                               source,
+                               mode = NULL,
+                               options = list(),
+                               partition_by = NULL,
+                               ...) {
+  UseMethod("spark_write_source")
+}
+
+#' @export
+spark_write_source.tbl_spark <- function(x,
+                                         name,
+                                         source,
+                                         mode = NULL,
+                                         options = list(),
+                                         partition_by = NULL,
+                                         ...) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  spark_data_write_generic(sqlResult, name, source, mode, options, partition_by)
+}
+
+#' @export
+spark_write_source.spark_jobj <- function(x,
+                                          name,
+                                          source,
+                                          mode = NULL,
+                                          options = list(),
+                                          partition_by = NULL,
+                                          ...) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  spark_data_write_generic(x, name, source, mode, options, partition_by)
 }
