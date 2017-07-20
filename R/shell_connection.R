@@ -37,6 +37,14 @@ shell_connection <- function(master,
     if (is.null(config[["sparklyr.gateway.address"]])) {
       config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway()
     }
+
+    if (is.null(config[["sparklyr.shell.deploy-mode"]])) {
+      config[["sparklyr.shell.deploy-mode"]] <- "cluster"
+    }
+
+    if (is.null(config[["sparklyr.shell.master"]])) {
+      config[["sparklyr.shell.master"]] <- "yarn"
+    }
   }
 
   # start with blank environment variables
@@ -464,10 +472,13 @@ initialize_connection.spark_shell_connection <- function(sc) {
       # create the spark config
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
-      conf <- invoke(conf, "setMaster", sc$master)
 
-      if (!is.null(sc$spark_home))
-        conf <- invoke(conf, "setSparkHome", sc$spark_home)
+      if (!spark_master_is_yarn_cluster(sc$master)) {
+        conf <- invoke(conf, "setMaster", sc$master)
+
+        if (!is.null(sc$spark_home))
+          conf <- invoke(conf, "setSparkHome", sc$spark_home)
+      }
 
       context_config <- connection_config(sc, "spark.", c("spark.sql."))
       apply_config(context_config, conf, "set", "spark.")
