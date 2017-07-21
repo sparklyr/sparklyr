@@ -154,11 +154,6 @@ connection_config <- function(sc, prefix, not_prefix = list()) {
   params
 }
 
-spark_master_is_local <- function(master) {
-  grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
-}
-
-
 #' View Entries in the Spark Log
 #'
 #' View the most recent entries in the Spark log. This can be useful when

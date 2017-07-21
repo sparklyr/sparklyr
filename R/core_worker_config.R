@@ -1,8 +1,8 @@
 worker_config_serialize <- function(config) {
   paste(
     if (isTRUE(config$debug)) "TRUE" else "FALSE",
-    spark_config_value(config, "sparklyr.gateway.port", "8880"),
-    spark_config_value(config, "sparklyr.gateway.address", "localhost"),
+    spark_config_value(config, "sparklyr.worker.gateway.port", "8880"),
+    spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
     sep = ";"
   )
 }

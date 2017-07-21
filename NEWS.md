@@ -2,6 +2,10 @@
 
 ### Distributed R
 
+- Added config options `sparklyr.worker.gateway.address` and
+  `sparklyr.worker.gateway.port` to configure gateway used under
+  worker nodes.
+
 - Added `group_by` parameter to `spark_apply()`, to support operations
   over groups of dataframes.
   
@@ -143,6 +147,18 @@
 
 ### Connections
 
+- Support for gateway connections `sparklyr://hostname:port/session` and using
+  `spark-submit --class sparklyr.Shell sparklyr-2.1-2.11.jar <port> <id> --remote`.
+
+- Added support for `sparklyr.gateway.service` and `sparklyr.gateway.remote` to
+  enable/disable the gateway in service and to accept remote connections required
+  for Yarn Cluster mode.
+
+- Added support for Yarn Cluster mode using `master = "yarn-cluster"`. Either,
+  explicitly set `config = list(sparklyr.gateway.address = "<driver-name>")` or
+  implicitly `sparklyr` will read the `site-config.xml` for the `YARN_CONF_DIR`
+  environment variable.
+  
 - Added `spark_context_config()` and `hive_context_config()` to retrieve
   runtime configurations for the Spark and Hive contexts.
 
