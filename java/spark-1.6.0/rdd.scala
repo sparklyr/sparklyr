@@ -13,7 +13,7 @@ class WorkerRDD[T: ClassTag](
   config: String,
   port: Int,
   groupBy: String,
-  packagesTar: String
+  bundlePath: String
   ) extends RDD[T](parent) {
 
   private[this] var exception: Option[Exception] = None
@@ -34,7 +34,7 @@ class WorkerRDD[T: ClassTag](
       closure,
       columns,
       groupBy,
-      packagesTar
+      bundlePath
     )
 
     val contextId = JVMObjectTracker.put(workerContext)
