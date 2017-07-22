@@ -13,7 +13,8 @@ class WorkerContext[T: ClassTag](
   lock: AnyRef,
   closure: Array[Byte],
   columns: Array[String],
-  groupBy: String) {
+  groupBy: String,
+  packagesTar: String) {
 
   private var result: Array[T] = Array[T]()
 
@@ -62,6 +63,10 @@ class WorkerContext[T: ClassTag](
       lock.notify
     }
   }
+
+  def getPackagesTar(): String = {
+    packagesTar
+  }
 }
 
 object WorkerHelper {
@@ -71,7 +76,8 @@ object WorkerHelper {
     config: String,
     port: Int,
     columns: Array[String],
-    groupBy: String): RDD[Row] = {
+    groupBy: String,
+    packagesTar: String): RDD[Row] = {
 
     val parent: RDD[Row] = rdd
     val computed: RDD[Row] = new WorkerRDD[Row](
@@ -80,7 +86,8 @@ object WorkerHelper {
       columns,
       config,
       port,
-      groupBy)
+      groupBy,
+      packagesTar)
 
     computed
   }

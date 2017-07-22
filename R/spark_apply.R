@@ -55,6 +55,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
+#' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
@@ -63,6 +64,7 @@ spark_apply <- function(x,
                         names = colnames(x),
                         memory = TRUE,
                         group_by = NULL,
+                        packages = TRUE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -106,6 +108,8 @@ spark_apply <- function(x,
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
+  packages_tar <- spark_apply_package()
+
   rdd <- invoke_static(
     sc,
     "sparklyr.WorkerHelper",
@@ -115,8 +119,9 @@ spark_apply <- function(x,
     worker_config,
     as.integer(worker_port),
     as.list(sdf_columns),
-    group_by
-    )
+    group_by,
+    packages_tar
+  )
 
   # while workers need to relaunch sparklyr backends, cache by default
   if (memory) rdd <- invoke(rdd, "cache")
