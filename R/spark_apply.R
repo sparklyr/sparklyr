@@ -108,7 +108,13 @@ spark_apply <- function(x,
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
-  packages_tar <- spark_apply_package()
+  packages_tar <- ""
+  if (packages) {
+    packages_tar <- spark_apply_package()
+    if (!is.null(packages_tar)) {
+      spark_context(sc) %>% invoke("addFile", packages_tar)
+    }
+  }
 
   rdd <- invoke_static(
     sc,
