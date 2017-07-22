@@ -12,6 +12,31 @@ spark_worker_apply <- function(sc) {
 
   worker_log("retrieved worker context")
 
+  bundlePath <- worker_invoke(context, "getBundlePath")
+  if (nchar(bundlePath) > 0) {
+    worker_log("using bundle ", bundlePath)
+
+    if (file.exists(bundlePath)) {
+      worker_log("found local bundle exists, skipping extraction")
+    }
+    else {
+      bundleName <- basename(bundlePath)
+
+      workerRootDir <- invoke_static(sc, "org.apache.spark.SparkFiles", "getRootDirectory")
+      sparkBundlePath <- file.path(workerRootDir, bundleName)
+
+      if (!file.exists(sparkBundlePath)) {
+        stop("failed to find bundle under SparkFiles root directory")
+      }
+
+      worker_log("updated .libPaths with bundle packages")
+      unbundlePath <- core_spark_apply_unbundle(sparkBundlePath, workerRootDir)
+
+      .libPaths(unbundlePath)
+      worker_log("updated .libPaths with bundle packages")
+    }
+  }
+
   grouped_by <- worker_invoke(context, "getGroupBy")
   grouped <- !is.null(grouped_by)
   if (grouped) worker_log("working over grouped data")
