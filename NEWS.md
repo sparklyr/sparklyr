@@ -2,6 +2,9 @@
 
 ### Distributed R
 
+- Added `packages` parameter to `spark_apply()` to distribute packages
+  across worker nodes automatically.
+
 - Added config options `sparklyr.worker.gateway.address` and
   `sparklyr.worker.gateway.port` to configure gateway used under
   worker nodes.
