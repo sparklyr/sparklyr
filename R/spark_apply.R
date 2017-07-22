@@ -73,6 +73,9 @@ spark_apply <- function(x,
   grouped <- !is.null(group_by)
   args <- list(...)
 
+  # disable package distribution for local connections
+  if (spark_master_is_local(sc$master)) packages = FALSE
+
   # create closure for the given function
   closure <- serialize(f, NULL)
 
@@ -110,9 +113,9 @@ spark_apply <- function(x,
 
   packages_tar <- ""
   if (packages) {
-    packages_tar <- spark_apply_package()
+    bundle_path <- core_spark_apply_bundle()
     if (!is.null(packages_tar)) {
-      spark_context(sc) %>% invoke("addFile", packages_tar)
+      spark_context(sc) %>% invoke("addFile", bundle_path)
     }
   }
 
@@ -126,7 +129,7 @@ spark_apply <- function(x,
     as.integer(worker_port),
     as.list(sdf_columns),
     group_by,
-    packages_tar
+    bundle_path
   )
 
   # while workers need to relaunch sparklyr backends, cache by default
