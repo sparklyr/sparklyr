@@ -461,6 +461,12 @@ print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
   }
 }
 
+shell_connection_config_defaults <- function() {
+  list(
+    spark.port.maxRetries = 128
+  )
+}
+
 #' @export
 initialize_connection.spark_shell_connection <- function(sc) {
   # initialize and return the connection
@@ -483,6 +489,11 @@ initialize_connection.spark_shell_connection <- function(sc) {
 
       context_config <- connection_config(sc, "spark.", c("spark.sql."))
       apply_config(context_config, conf, "set", "spark.")
+
+      default_config <- shell_connection_config_defaults()
+      default_config_remove <- Filter(function(e) e %in% names(context_config), names(default_config))
+      default_config[default_config_remove] <- NULL
+      apply_config(default_config, conf, "set", "spark.")
 
       # create the spark context and assign the connection to it
       sc$spark_context <- invoke_static(

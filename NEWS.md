@@ -147,6 +147,9 @@
 
 ### Connections
 
+- Increased default number of concurrent connections by setting default for
+  `spark.port.maxRetries` from 16 to 128.
+
 - Support for gateway connections `sparklyr://hostname:port/session` and using
   `spark-submit --class sparklyr.Shell sparklyr-2.1-2.11.jar <port> <id> --remote`.
 
