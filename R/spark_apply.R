@@ -111,7 +111,7 @@ spark_apply <- function(x,
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
-  packages_tar <- ""
+  bundle_path <- ""
   if (packages) {
     bundle_path <- core_spark_apply_bundle()
     if (!is.null(packages_tar)) {
