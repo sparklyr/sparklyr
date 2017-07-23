@@ -860,6 +860,13 @@ object Sources {
     "    }\n" +
     "  }\n" +
     "}\n" +
+    "core_get_package_function <- function(packageName, functionName) {\n" +
+    "  if (packageName %in% rownames(installed.packages()) &&\n" +
+    "      exists(functionName, envir = asNamespace(packageName)))\n" +
+    "    get(functionName, envir = asNamespace(packageName))\n" +
+    "  else\n" +
+    "    NULL\n" +
+    "}\n" +
     "worker_config_serialize <- function(config) {\n" +
     "  paste(\n" +
     "    if (isTRUE(config$debug)) \"TRUE\" else \"FALSE\",\n" +
@@ -905,6 +912,16 @@ object Sources {
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
     "  closure <- unserialize(closureRaw)\n" +
     "\n" +
+    "  closureRLangRaw <- worker_invoke(context, \"getClosureRLang\")\n" +
+    "  if (length(closureRLangRaw) > 0) {\n" +
+    "    worker_log(\"found rlang closure\")\n" +
+    "    closureRLang <- spark_worker_rlang_unserialize()\n" +
+    "    if (!is.null(closureRLang)) {\n" +
+    "      closure <- closureRLang(closureRLangRaw)\n" +
+    "      worker_log(\"created rlang closure\")\n" +
+    "    }\n" +
+    "  }\n" +
+    "\n" +
     "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
     "\n" +
     "  if (!grouped) groups <- list(list(groups))\n" +
@@ -942,6 +959,14 @@ object Sources {
     "\n" +
     "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  worker_log(\"finished apply\")\n" +
+    "}\n" +
+    "\n" +
+    "spark_worker_rlang_unserialize <- function() {\n" +
+    "  rlang_unserialize <- core_get_package_function(\"rlang\", \"bytes_unserialise\")\n" +
+    "  if (is.null(rlang_unserialize))\n" +
+    "    core_get_package_function(\"rlanglabs\", \"bytes_unserialise\")\n" +
+    "  else\n" +
+    "    rlang_unserialize\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId, config) {\n" +
     "  gatewayPort <- spark_config_value(config, \"sparklyr.worker.gateway.port\", 8880)\n" +

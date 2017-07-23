@@ -2,6 +2,9 @@
 
 ### Distributed R
 
+- Added `rlang` parameter to `spark_apply()`, to support by default
+  generic closures provided by the `rlang` package.
+  
 - Added config options `sparklyr.worker.gateway.address` and
   `sparklyr.worker.gateway.port` to configure gateway used under
   worker nodes.

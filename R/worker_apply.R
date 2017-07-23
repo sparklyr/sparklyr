@@ -25,6 +25,16 @@ spark_worker_apply <- function(sc) {
   closureRaw <- worker_invoke(context, "getClosure")
   closure <- unserialize(closureRaw)
 
+  closureRLangRaw <- worker_invoke(context, "getClosureRLang")
+  if (length(closureRLangRaw) > 0) {
+    worker_log("found rlang closure")
+    closureRLang <- spark_worker_rlang_unserialize()
+    if (!is.null(closureRLang)) {
+      closure <- closureRLang(closureRLangRaw)
+      worker_log("created rlang closure")
+    }
+  }
+
   columnNames <- worker_invoke(context, "getColumns")
 
   if (!grouped) groups <- list(list(groups))
@@ -62,4 +72,12 @@ spark_worker_apply <- function(sc) {
 
   spark_split <- worker_invoke(context, "finish")
   worker_log("finished apply")
+}
+
+spark_worker_rlang_unserialize <- function() {
+  rlang_unserialize <- core_get_package_function("rlang", "bytes_unserialise")
+  if (is.null(rlang_unserialize))
+    core_get_package_function("rlanglabs", "bytes_unserialise")
+  else
+    rlang_unserialize
 }

@@ -55,6 +55,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
+#' @param rlang Boolean; should the closure be serialize using the rlang package?
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
@@ -63,6 +64,7 @@ spark_apply <- function(x,
                         names = colnames(x),
                         memory = TRUE,
                         group_by = NULL,
+                        rlang = TRUE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -73,6 +75,10 @@ spark_apply <- function(x,
 
   # create closure for the given function
   closure <- serialize(f, NULL)
+
+  # create rlang closure
+  rlang_serialize <- spark_apply_rlang_serialize()
+  closure_rlang <- if (rlang && !is.null(rlang_serialize)) rlang_serialize(f) else raw()
 
   # create a configuration string to initialize each worker
   worker_config <- worker_config_serialize(
@@ -115,7 +121,8 @@ spark_apply <- function(x,
     worker_config,
     as.integer(worker_port),
     as.list(sdf_columns),
-    group_by
+    group_by,
+    closure_rlang
     )
 
   # while workers need to relaunch sparklyr backends, cache by default
@@ -126,4 +133,12 @@ spark_apply <- function(x,
   transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
 
   sdf_register(transformed)
+}
+
+spark_apply_rlang_serialize <- function() {
+  rlang_serialize <- core_get_package_function("rlang", "serialise_bytes")
+  if (is.null(rlang_serialize))
+    core_get_package_function("rlanglabs", "serialise_bytes")
+  else
+    rlang_serialize
 }
