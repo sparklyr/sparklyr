@@ -7,11 +7,16 @@ core_spark_apply_bundle_path <- function() {
 #' @keywords internal
 #' @export
 core_spark_apply_bundle <- function() {
-  userPackages <- .libPaths()[[1]]
   packagesTar <- core_spark_apply_bundle_path()
 
+  args <- c("-cf", packagesTar)
+  lapply(.libPaths(), function(e) {
+    args <<- c(args, "-C", e)
+  })
+  args <- c(args, ".")
+
   if (!file.exists(packagesTar)) {
-    system2("tar", c("-cf", packagesTar, "-C", userPackages[[1]], "."))
+    system2("tar", args)
   }
 
   packagesTar
