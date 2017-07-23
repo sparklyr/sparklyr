@@ -228,7 +228,7 @@ class Backend {
 
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
 
-              if (requestedSessionId == sessionId || requestedSessionId == 0)
+              if (requestedSessionId == sessionId)
               {
                 logger.log("found requested session matches current session")
                 logger.log("is creating backend and allocating system resources")
@@ -267,7 +267,9 @@ class Backend {
                         }
                       }
 
-                      isRunning = false
+                      if (!isService || isWorker) {
+                        isRunning = false
+                      }
                     }
                   }.start()
 

@@ -16,6 +16,7 @@ shell_connection <- function(master,
                              shell_args,
                              config,
                              service,
+                             remote,
                              extensions) {
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
@@ -28,6 +29,21 @@ shell_connection <- function(master,
 
       if (is.null(version))
         message("* Using Spark: ", installInfo$sparkVersion)
+    }
+  }
+
+  # for yarn-cluster we will try to read the yarn config and adjust gateway appropiately
+  if (spark_master_is_yarn_cluster(master)) {
+    if (is.null(config[["sparklyr.gateway.address"]])) {
+      config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway()
+    }
+
+    if (is.null(config[["sparklyr.shell.deploy-mode"]])) {
+      config[["sparklyr.shell.deploy-mode"]] <- "cluster"
+    }
+
+    if (is.null(config[["sparklyr.shell.master"]])) {
+      config[["sparklyr.shell.master"]] <- "yarn"
     }
   }
 
@@ -62,7 +78,8 @@ shell_connection <- function(master,
     extensions = extensions,
     environment = environment,
     shell_args = shell_args,
-    service = service
+    service = service,
+    remote = remote
   )
 }
 
@@ -127,11 +144,13 @@ start_shell <- function(master,
                         packages = NULL,
                         environment = NULL,
                         shell_args = NULL,
-                        service = FALSE) {
+                        service = FALSE,
+                        remote = FALSE) {
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
-  isService <- FALSE
+  isService <- service
+  isRemote <- remote
 
   sessionId <- if (isService)
       spark_session_id(app_name, master)
@@ -251,8 +270,7 @@ start_shell <- function(master,
       shell_args <- c(shell_args, "--service")
     }
 
-    isRemote <- FALSE
-    if (isService && isRemote) {
+    if (isRemote) {
       shell_args <- c(shell_args, "--remote")
     }
 
@@ -443,6 +461,12 @@ print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
   }
 }
 
+shell_connection_config_defaults <- function() {
+  list(
+    spark.port.maxRetries = 128
+  )
+}
+
 #' @export
 initialize_connection.spark_shell_connection <- function(sc) {
   # initialize and return the connection
@@ -454,13 +478,22 @@ initialize_connection.spark_shell_connection <- function(sc) {
       # create the spark config
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
-      conf <- invoke(conf, "setMaster", sc$master)
 
-      if (!is.null(sc$spark_home))
-        conf <- invoke(conf, "setSparkHome", sc$spark_home)
+      if (!spark_master_is_yarn_cluster(sc$master) &&
+          !spark_master_is_gateway(sc$master)) {
+        conf <- invoke(conf, "setMaster", sc$master)
+
+        if (!is.null(sc$spark_home))
+          conf <- invoke(conf, "setSparkHome", sc$spark_home)
+      }
 
       context_config <- connection_config(sc, "spark.", c("spark.sql."))
       apply_config(context_config, conf, "set", "spark.")
+
+      default_config <- shell_connection_config_defaults()
+      default_config_remove <- Filter(function(e) e %in% names(context_config), names(default_config))
+      default_config[default_config_remove] <- NULL
+      apply_config(default_config, conf, "set", "spark.")
 
       # create the spark context and assign the connection to it
       sc$spark_context <- invoke_static(

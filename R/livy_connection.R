@@ -35,7 +35,7 @@ livy_validate_http_response <- function(message, req) {
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
 #' @param password The password to use in the Authorization header
-#' @param csrf_header Required when the Livy server has CSRF protection enabled. Defaults to \code{TRUE}.
+#' @param custom_headers List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.
 #'
 #' @details
 #'
@@ -43,12 +43,12 @@ livy_validate_http_response <- function(message, req) {
 #' for Livy. For instance, \code{"username"} and \code{"password"}
 #' define the basic authentication settings for a Livy session.
 #'
-#' When \code{"csrf_header"} is set to \code{TRUE}, the header \code{"X-Requested-By: sparklyr"}
-#' is added to all HTTP requests.
+#' The default value of \code{"custom_headers"} is set to \code{list("X-Requested-By" = "sparklyr")}
+#' in order to facilitate connection to Livy servers with CSRF protection enabled.
 #'
 #' @return Named list with configuration data
 livy_config <- function(config = spark_config(), username = NULL, password = NULL,
-                        custom_headers = NULL, csrf_header = TRUE) {
+                        custom_headers = list("X-Requested-By" = "sparklyr")) {
   if (!is.null(username) || !is.null(password)) {
     secret <- base64_enc(paste(username, password, sep = ":"))
 
@@ -58,14 +58,6 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
           "Basic",
           base64_enc(paste(username, password, sep = ":"))
         )
-      )
-    )
-  }
-
-  if (csrf_header) {
-    config[["sparklyr.livy.headers"]] <- c(
-      config[["sparklyr.livy.headers"]], list(
-        "X-Requested-By" = "sparklyr"
       )
     )
   }

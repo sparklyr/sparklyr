@@ -4,6 +4,10 @@
 
 - Added `rlang` parameter to `spark_apply()`, to support by default
   generic closures provided by the `rlang` package.
+  
+- Added config options `sparklyr.worker.gateway.address` and
+  `sparklyr.worker.gateway.port` to configure gateway used under
+  worker nodes.
 
 - Added `group_by` parameter to `spark_apply()`, to support operations
   over groups of dataframes.
@@ -13,6 +17,12 @@
 
 ### External Data
 
+- Added `spark_write_source()`. This function writes data into a
+  Spark data source which can be loaded through an Spark package.
+
+- Added `spark_write_jdbc()`. This function writes from a Spark DataFrame
+  into a JDBC connection.
+  
 - Added `columns` parameter to `spark_read_*()` functions to load data with
   named columns or explicit column types.
 
@@ -140,6 +150,21 @@
 
 ### Connections
 
+- Increased default number of concurrent connections by setting default for
+  `spark.port.maxRetries` from 16 to 128.
+
+- Support for gateway connections `sparklyr://hostname:port/session` and using
+  `spark-submit --class sparklyr.Shell sparklyr-2.1-2.11.jar <port> <id> --remote`.
+
+- Added support for `sparklyr.gateway.service` and `sparklyr.gateway.remote` to
+  enable/disable the gateway in service and to accept remote connections required
+  for Yarn Cluster mode.
+
+- Added support for Yarn Cluster mode using `master = "yarn-cluster"`. Either,
+  explicitly set `config = list(sparklyr.gateway.address = "<driver-name>")` or
+  implicitly `sparklyr` will read the `site-config.xml` for the `YARN_CONF_DIR`
+  environment variable.
+  
 - Added `spark_context_config()` and `hive_context_config()` to retrieve
   runtime configurations for the Spark and Hive contexts.
 
@@ -158,12 +183,9 @@
 
 - While connecting to spark from Windows, setting the `sparklyr.verbose` option
   to `TRUE` prints detailed configuration steps.
-  
-- Added `csrf_header` to `livy_config()` to enable connections to Livy servers with
-  CSRF protection enabled.
 
 - Added `custom_headers` to `livy_config()` to add custom headers to the REST call
-  to the Livy Server
+  to the Livy server
   
 ### Compilation
 
