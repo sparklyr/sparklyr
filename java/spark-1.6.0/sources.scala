@@ -941,7 +941,7 @@ object Sources {
     "    else {\n" +
     "      bundleName <- basename(bundlePath)\n" +
     "\n" +
-    "      workerRootDir <- invoke_static(sc, \"org.apache.spark.SparkFiles\", \"getRootDirectory\")\n" +
+    "      workerRootDir <- worker_invoke_static(sc, \"org.apache.spark.SparkFiles\", \"getRootDirectory\")\n" +
     "      sparkBundlePath <- file.path(workerRootDir, bundleName)\n" +
     "\n" +
     "      if (!file.exists(sparkBundlePath)) {\n" +
