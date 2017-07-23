@@ -56,6 +56,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
 #' @param rlang Boolean; should the closure be serialize using the rlang package?
+#' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
@@ -65,6 +66,7 @@ spark_apply <- function(x,
                         memory = TRUE,
                         group_by = NULL,
                         rlang = TRUE,
+                        packages = TRUE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -72,6 +74,9 @@ spark_apply <- function(x,
   rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
+
+  # disable package distribution for local connections
+  if (spark_master_is_local(sc$master)) packages = FALSE
 
   # create closure for the given function
   closure <- serialize(f, NULL)
@@ -112,6 +117,14 @@ spark_apply <- function(x,
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
+  bundle_path <- ""
+  if (packages) {
+    bundle_path <- core_spark_apply_bundle()
+    if (!is.null(bundle_path)) {
+      spark_context(sc) %>% invoke("addFile", bundle_path)
+    }
+  }
+
   rdd <- invoke_static(
     sc,
     "sparklyr.WorkerHelper",
@@ -122,8 +135,9 @@ spark_apply <- function(x,
     as.integer(worker_port),
     as.list(sdf_columns),
     group_by,
-    closure_rlang
-    )
+    closure_rlang,
+    bundle_path
+  )
 
   # while workers need to relaunch sparklyr backends, cache by default
   if (memory) rdd <- invoke(rdd, "cache")
