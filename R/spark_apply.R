@@ -114,7 +114,7 @@ spark_apply <- function(x,
   bundle_path <- ""
   if (packages) {
     bundle_path <- core_spark_apply_bundle()
-    if (!is.null(packages_tar)) {
+    if (!is.null(bundle_path)) {
       spark_context(sc) %>% invoke("addFile", bundle_path)
     }
   }
