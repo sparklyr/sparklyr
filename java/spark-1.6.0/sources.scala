@@ -869,11 +869,16 @@ object Sources {
     "#' @keywords internal\n" +
     "#' @export\n" +
     "core_spark_apply_bundle <- function() {\n" +
-    "  userPackages <- .libPaths()[[1]]\n" +
     "  packagesTar <- core_spark_apply_bundle_path()\n" +
     "\n" +
+    "  args <- c(\"-cf\", packagesTar)\n" +
+    "  lapply(.libPaths(), function(e) {\n" +
+    "    args <<- c(args, \"-C\", e)\n" +
+    "  })\n" +
+    "  args <- c(args, \".\")\n" +
+    "\n" +
     "  if (!file.exists(packagesTar)) {\n" +
-    "    system2(\"tar\", c(\"-cf\", packagesTar, \"-C\", userPackages[[1]], \".\"))\n" +
+    "    system2(\"tar\", args)\n" +
     "  }\n" +
     "\n" +
     "  packagesTar\n" +
