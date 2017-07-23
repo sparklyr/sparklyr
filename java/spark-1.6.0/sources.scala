@@ -874,8 +874,8 @@ object Sources {
     "  args <- c(\"-cf\", packagesTar)\n" +
     "  lapply(.libPaths(), function(e) {\n" +
     "    args <<- c(args, \"-C\", e)\n" +
+    "    args <- c(args, \".\")\n" +
     "  })\n" +
-    "  args <- c(args, \".\")\n" +
     "\n" +
     "  if (!file.exists(packagesTar)) {\n" +
     "    system2(\"tar\", args)\n" +
