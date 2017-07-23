@@ -860,7 +860,6 @@ object Sources {
     "    }\n" +
     "  }\n" +
     "}\n" +
-<<<<<<< HEAD
     "core_spark_apply_bundle_path <- function() {\n" +
     "  file.path(tempdir(), \"packages.tar\")\n" +
     "}\n" +
@@ -899,14 +898,13 @@ object Sources {
     "  system2(\"tar\", c(\"-xf\", bundle_path, \"-C\", extractPath))\n" +
     "\n" +
     "  extractPath\n" +
-=======
+    "}\n" +
     "core_get_package_function <- function(packageName, functionName) {\n" +
     "  if (packageName %in% rownames(installed.packages()) &&\n" +
     "      exists(functionName, envir = asNamespace(packageName)))\n" +
     "    get(functionName, envir = asNamespace(packageName))\n" +
     "  else\n" +
     "    NULL\n" +
->>>>>>> feature/spark-apply-rlang-closure
     "}\n" +
     "worker_config_serialize <- function(config) {\n" +
     "  paste(\n" +

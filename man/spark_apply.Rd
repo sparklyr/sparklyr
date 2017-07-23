@@ -5,11 +5,7 @@
 \title{Apply a Function in Spark}
 \usage{
 spark_apply(x, f, names = colnames(x), memory = TRUE, group_by = NULL,
-<<<<<<< HEAD
-  packages = TRUE, ...)
-=======
-  rlang = TRUE, ...)
->>>>>>> feature/spark-apply-rlang-closure
+  rlang = TRUE, packages = TRUE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -23,11 +19,9 @@ names from the original object.}
 
 \item{group_by}{Column name used to group by data frame partitions.}
 
-<<<<<<< HEAD
-\item{packages}{Boolean; distribute \code{.libPaths()} packages to nodes?}
-=======
 \item{rlang}{Boolean; should the closure be serialize using the rlang package?}
->>>>>>> feature/spark-apply-rlang-closure
+
+\item{packages}{Boolean; distribute \code{.libPaths()} packages to nodes?}
 
 \item{...}{Optional arguments; currently unused.}
 }

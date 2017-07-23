@@ -82,7 +82,7 @@ object WorkerHelper {
     port: Int,
     columns: Array[String],
     groupBy: String,
-    closureRLang: Array[Byte]): RDD[Row],
+    closureRLang: Array[Byte],
     bundlePath: String): RDD[Row] = {
 
     val parent: RDD[Row] = rdd
