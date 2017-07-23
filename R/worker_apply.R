@@ -22,7 +22,7 @@ spark_worker_apply <- function(sc) {
     else {
       bundleName <- basename(bundlePath)
 
-      workerRootDir <- invoke_static(sc, "org.apache.spark.SparkFiles", "getRootDirectory")
+      workerRootDir <- worker_invoke_static(sc, "org.apache.spark.SparkFiles", "getRootDirectory")
       sparkBundlePath <- file.path(workerRootDir, bundleName)
 
       if (!file.exists(sparkBundlePath)) {
