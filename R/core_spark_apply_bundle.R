@@ -12,7 +12,7 @@ core_spark_apply_bundle <- function() {
   args <- c("-cf", packagesTar)
   lapply(.libPaths(), function(e) {
     args <<- c(args, "-C", e)
-    args <- c(args, ".")
+    args <<- c(args, ".")
   })
 
   if (!file.exists(packagesTar)) {
