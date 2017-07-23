@@ -14,12 +14,17 @@ class WorkerContext[T: ClassTag](
   closure: Array[Byte],
   columns: Array[String],
   groupBy: String,
+  closureRLang: Array[Byte],
   bundlePath: String) {
 
   private var result: Array[T] = Array[T]()
 
   def getClosure(): Array[Byte] = {
     closure
+  }
+
+  def getClosureRLang(): Array[Byte] = {
+    closureRLang
   }
 
   def getColumns(): Array[String] = {
@@ -77,6 +82,7 @@ object WorkerHelper {
     port: Int,
     columns: Array[String],
     groupBy: String,
+    closureRLang: Array[Byte]): RDD[Row],
     bundlePath: String): RDD[Row] = {
 
     val parent: RDD[Row] = rdd
@@ -87,6 +93,7 @@ object WorkerHelper {
       config,
       port,
       groupBy,
+      closureRLang,
       bundlePath)
 
     computed

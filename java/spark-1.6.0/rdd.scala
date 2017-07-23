@@ -13,6 +13,7 @@ class WorkerRDD[T: ClassTag](
   config: String,
   port: Int,
   groupBy: String,
+  closureRLang: Array[Byte],
   bundlePath: String
   ) extends RDD[T](parent) {
 
@@ -34,6 +35,7 @@ class WorkerRDD[T: ClassTag](
       closure,
       columns,
       groupBy,
+      closureRLang,
       bundlePath
     )
 
