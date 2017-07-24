@@ -119,6 +119,8 @@ spark_apply <- function(x,
     invoke(grouped_df, "count")
 
     rdd_base <- grouped_df %>% invoke("rdd")
+
+    names <- c(group_by, names)
   }
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")

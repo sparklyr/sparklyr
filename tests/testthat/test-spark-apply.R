@@ -51,11 +51,9 @@ test_that("'spark_apply' works with 'group_by'", {
   grouped_lm <- spark_apply(
     iris_tbl,
     function(e) {
-      data.frame(
-        e[1,]$Species,
-        lm(Petal_Width ~ Petal_Length, e)$coefficients[["(Intercept)"]])
+      lm(Petal_Width ~ Petal_Length, e)$coefficients[["(Intercept)"]])
     },
-    names = c("Species", "Intercept"),
+    names = "Intercept",
     group_by = "Species") %>% collect()
 
   lapply(
@@ -77,12 +75,9 @@ test_that("'spark_apply' works with 'group_by' over multiple columns", {
   grouped_lm <- spark_apply(
     iris_tbl_ints,
     function(e, species, petal_width) {
-      data.frame(
-        species,
-        petal_width,
-        lm(Petal_Width ~ Petal_Length, e)$coefficients[["(Intercept)"]])
+      lm(Petal_Width ~ Petal_Length, e)$coefficients[["(Intercept)"]]
     },
-    names = c("Species", "Petal_Width_Int", "Intercept"),
+    names = "Intercept",
     group_by = c("Species", "Petal_Width_Int")) %>% collect()
 
   iris_int <- iris %>% mutate(
