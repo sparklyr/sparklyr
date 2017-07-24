@@ -5,7 +5,7 @@
 \title{Feature Tranformation -- CountVectorizer}
 \usage{
 ft_count_vectorizer(x, input.col = NULL, output.col = NULL, min.df = NULL,
-  min.tf = NULL, vocab.size = NULL, ...)
+  min.tf = NULL, vocab.size = NULL, vocabulary.only = FALSE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -29,6 +29,8 @@ the document's token count).}
 
 \item{vocab.size}{Build a vocabulary that only considers the top
 vocab.size terms ordered by term frequency across the corpus.}
+
+\item{vocabulary.only}{Boolean; should the vocabulary only be returned?}
 
 \item{...}{Optional arguments; currently unused.}
 }
