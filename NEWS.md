@@ -112,6 +112,9 @@
   
 ### MLlib
 
+- Added `vocabulary.only` to `ft_count_vectorizer()` to retrieve the 
+  vocabulary with ease.
+
 - GLM type models now support `weights.column` to specify weights in model
   fitting. (#217)
 

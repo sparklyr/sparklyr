@@ -414,6 +414,7 @@ ft_regex_tokenizer <- function(x,
 #' the document's token count).
 #' @param vocab.size Build a vocabulary that only considers the top
 #' vocab.size terms ordered by term frequency across the corpus.
+#' @param vocabulary.only Boolean; should the vocabulary only be returned?
 #'
 #' @export
 ft_count_vectorizer <- function(x,
@@ -422,16 +423,20 @@ ft_count_vectorizer <- function(x,
                                 min.df = NULL,
                                 min.tf = NULL,
                                 vocab.size = NULL,
+                                vocabulary.only = FALSE,
                                 ...)
 {
   ml_backwards_compatibility_api()
   class <- "org.apache.spark.ml.feature.CountVectorizer"
-  invoke_simple_transformer(x, class, list(
-    setInputCol   = ensure_scalar_character(input.col),
-    setOutputCol  = ensure_scalar_character(output.col),
-    setMinDF      = min.df,
-    setMinTF      = min.tf,
-    setVocabSize  = vocab.size,
-    fit           = spark_dataframe(x)
-  ))
+  result <- invoke_simple_transformer(x, class, list(
+    setInputCol    = ensure_scalar_character(input.col),
+    setOutputCol   = ensure_scalar_character(output.col),
+    setMinDF       = min.df,
+    setMinTF       = min.tf,
+    setVocabSize   = vocab.size,
+    fit            = spark_dataframe(x)
+  ),
+  only.model = vocabulary.only)
+
+  if (vocabulary.only) as.character(invoke(result, "vocabulary")) else result
 }
