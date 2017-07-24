@@ -55,7 +55,9 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
-#' @param rlang Boolean; should the closure be serialize using the rlang package?
+#' @param rlang Boolean; Experimental; should the closure be serialize using
+#'   the rlang package? This functionality is currently being developed under
+#'   the rlang package. Once released, the experimental flag will be removed.
 #' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
 #' @param ... Optional arguments; currently unused.
 #'
@@ -65,7 +67,7 @@ spark_apply <- function(x,
                         names = colnames(x),
                         memory = TRUE,
                         group_by = NULL,
-                        rlang = TRUE,
+                        rlang = FALSE,
                         packages = TRUE,
                         ...) {
   sc <- spark_connection(x)
@@ -74,6 +76,8 @@ spark_apply <- function(x,
   rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
+
+  if (rlang) warning("The `rlang` parameter is under development and therefore, expermental.")
 
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) packages = FALSE
