@@ -67,8 +67,8 @@ spark_apply <- function(x,
                         names = colnames(x),
                         memory = TRUE,
                         group_by = NULL,
-                        rlang = FALSE,
                         packages = TRUE,
+                        rlang = FALSE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
