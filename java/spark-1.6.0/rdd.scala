@@ -12,7 +12,7 @@ class WorkerRDD[T: ClassTag](
   columns: Array[String],
   config: String,
   port: Int,
-  groupBy: String,
+  groupBy: Array[String],
   closureRLang: Array[Byte],
   bundlePath: String
   ) extends RDD[T](parent) {

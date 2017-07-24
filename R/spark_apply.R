@@ -100,11 +100,12 @@ spark_apply <- function(x,
   )
 
   if (grouped) {
-    colpos <- which(colnames(x) == group_by)
-    if (length(colpos) == 0) stop("Column '", group_by, "' not found.")
+    colpos <- which(colnames(x) %in% group_by)
+    if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
+
+    group_by_list <- as.list(as.integer(colpos - 1))
 
     grouped_schema <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBySchema", sdf)
-    group_by_list <- list(as.integer(colpos - 1))
     grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
     grouped_df <- invoke(hive_context(sc), "createDataFrame", grouped_rdd, grouped_schema)
 
@@ -139,7 +140,7 @@ spark_apply <- function(x,
     worker_config,
     as.integer(worker_port),
     as.list(sdf_columns),
-    group_by,
+    as.list(group_by),
     closure_rlang,
     bundle_path
   )
