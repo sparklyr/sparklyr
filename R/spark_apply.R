@@ -104,7 +104,8 @@ spark_apply <- function(x,
     if (length(colpos) == 0) stop("Column '", group_by, "' not found.")
 
     grouped_schema <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBySchema", sdf)
-    grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, as.integer(colpos - 1))
+    group_by_list <- list(as.integer(colpos - 1))
+    grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
     grouped_df <- invoke(hive_context(sc), "createDataFrame", grouped_rdd, grouped_schema)
 
     storage_level <- invoke_static(
