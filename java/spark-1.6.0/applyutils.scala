@@ -6,8 +6,8 @@ import org.apache.spark.sql._
 
 object ApplyUtils {
   def groupBy(rdd: RDD[Row], colPosition: Int): RDD[Row] = {
-    rdd.map(r => (r.get(colPosition), r.toSeq)).groupBy(r => r._1).map(
-      r => Row(r._2.map(x => Row.fromSeq(x._2)).toSeq)
+    rdd.groupBy(r => r.get(colPosition)).map(
+      r => Row(r._2.toSeq)
     )
   }
 
