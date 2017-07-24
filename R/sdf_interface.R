@@ -43,7 +43,7 @@ sdf_copy_to <- function(sc,
 #' @export
 sdf_copy_to.default <- function(sc,
                                 x,
-                                name = deparse(substitute(x)),
+                                name = spark_table_name(substitute(x)),
                                 memory = TRUE,
                                 repartition = 0L,
                                 overwrite = FALSE,

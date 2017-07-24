@@ -207,6 +207,9 @@
 
 ### Miscellaneous
 
+- `copy_to()` and `sdf_copy_to()` auto generate a `name` when an expression
+  can't be transformed into a table name.
+
 - Implemented `type_sum.jobj()` (from tibble) to enable better printing of jobj
   objects embedded in data frames.
 
