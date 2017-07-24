@@ -77,7 +77,7 @@ spark_apply <- function(x,
   grouped <- !is.null(group_by)
   args <- list(...)
 
-  if (rlang) warning("The `rlang` parameter is under development and therefore, expermental.")
+  if (rlang) warning("The `rlang` parameter is under active development.")
 
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) packages = FALSE
