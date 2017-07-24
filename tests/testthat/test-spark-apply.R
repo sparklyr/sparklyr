@@ -68,3 +68,39 @@ test_that("'spark_apply' works with 'group_by'", {
     }
   )
 })
+
+test_that("'spark_apply' works with 'group_by' over multiple columns", {
+
+  iris_tbl_ints <- iris_tbl %>%
+    mutate(Petal_Width_Int = as.integer(Petal_Width))
+
+  grouped_lm <- spark_apply(
+    iris_tbl_ints,
+    function(e, species, petal_width) {
+      data.frame(
+        species,
+        petal_width,
+        lm(Petal_Width ~ Petal_Length, e)$coefficients[["(Intercept)"]])
+    },
+    names = c("Species", "Petal_Width_Int", "Intercept"),
+    group_by = c("Species", "Petal_Width_Int")) %>% collect()
+
+  iris_int <- iris %>% mutate(
+    Petal_Width_Int = as.integer(Petal.Width),
+    GroupBy = paste(Species, Petal_Width_Int, sep = "|")
+  )
+
+  lapply(
+    unique(iris_int$GroupBy),
+    function(group_by_entry) {
+      parts <- strsplit(group_by_entry, "\\|")
+      species_test <- parts[[1]][[1]]
+      petal_width_test <- as.integer(parts[[1]][[2]])
+
+      expect_equal(
+        grouped_lm[grouped_lm$Species == species_test & grouped_lm$Petal_Width_Int == petal_width_test, ]$Intercept,
+        lm(Petal.Width ~ Petal.Length, iris_int[iris_int$Species == species_test & iris_int$Petal_Width_Int == petal_width_test, ])$coefficients[["(Intercept)"]]
+      )
+    }
+  )
+})
