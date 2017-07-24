@@ -969,7 +969,7 @@ object Sources {
     "  }\n" +
     "\n" +
     "  grouped_by <- worker_invoke(context, \"getGroupBy\")\n" +
-    "  grouped <- !is.null(grouped_by)\n" +
+    "  grouped <- !is.null(grouped_by) && length(grouped_by) > 0\n" +
     "  if (grouped) worker_log(\"working over grouped data\")\n" +
     "\n" +
     "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
@@ -1004,19 +1004,31 @@ object Sources {
     "    df <- do.call(rbind.data.frame, data)\n" +
     "    colnames(df) <- columnNames[1: length(colnames(df))]\n" +
     "\n" +
-    "    g <- if (grouped) df[[grouped_by]][[1]] else NULL\n" +
+    "    closure_params <- length(formals(closure))\n" +
+    "    closure_args <- c(\n" +
+    "      list(df),\n" +
+    "      as.list(\n" +
+    "        if (nrow(df) > 0)\n" +
+    "          lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])\n" +
+    "        else\n" +
+    "          NULL\n" +
+    "      )\n" +
+    "    )[0:closure_params]\n" +
     "\n" +
     "    worker_log(\"computing closure\")\n" +
-    "    result <- switch (as.character(length(formals(closure))),\n" +
-    "      \"0\" = closure(),\n" +
-    "      \"1\" = closure(df),\n" +
-    "      \"2\" = closure(df, g)\n" +
-    "    )\n" +
+    "    result <- do.call(closure, closure_args)\n" +
     "    worker_log(\"computed closure\")\n" +
     "\n" +
     "    if (!identical(class(result), \"data.frame\")) {\n" +
     "      worker_log(\"data.frame expected but \", class(result), \" found\")\n" +
     "      result <- data.frame(result)\n" +
+    "    }\n" +
+    "\n" +
+    "    if (grouped) {\n" +
+    "      new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])\n" +
+    "      names(new_column_values) <- grouped_by\n" +
+    "\n" +
+    "      result <- do.call(\"cbind\", list(new_column_values, result))\n" +
     "    }\n" +
     "\n" +
     "    all_results <- rbind(all_results, result)\n" +
