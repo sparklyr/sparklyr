@@ -38,7 +38,7 @@ spark_worker_apply <- function(sc) {
   }
 
   grouped_by <- worker_invoke(context, "getGroupBy")
-  grouped <- !is.null(grouped_by)
+  grouped <- !is.null(grouped_by) && length(grouped_by) > 0
   if (grouped) worker_log("working over grouped data")
 
   length <- worker_invoke(context, "getSourceArrayLength")
@@ -73,19 +73,31 @@ spark_worker_apply <- function(sc) {
     df <- do.call(rbind.data.frame, data)
     colnames(df) <- columnNames[1: length(colnames(df))]
 
-    g <- if (grouped) df[[grouped_by]][[1]] else NULL
+    closure_params <- length(formals(closure))
+    closure_args <- c(
+      list(df),
+      as.list(
+        if (nrow(df) > 0)
+          lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
+        else
+          NULL
+      )
+    )[0:closure_params]
 
     worker_log("computing closure")
-    result <- switch (as.character(length(formals(closure))),
-      "0" = closure(),
-      "1" = closure(df),
-      "2" = closure(df, g)
-    )
+    result <- do.call(closure, closure_args)
     worker_log("computed closure")
 
     if (!identical(class(result), "data.frame")) {
       worker_log("data.frame expected but ", class(result), " found")
       result <- data.frame(result)
+    }
+
+    if (grouped) {
+      new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
+      names(new_column_values) <- grouped_by
+
+      result <- do.call("cbind", list(new_column_values, result))
     }
 
     all_results <- rbind(all_results, result)

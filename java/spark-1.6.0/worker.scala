@@ -13,7 +13,7 @@ class WorkerContext[T: ClassTag](
   lock: AnyRef,
   closure: Array[Byte],
   columns: Array[String],
-  groupBy: String,
+  groupBy: Array[String],
   closureRLang: Array[Byte],
   bundlePath: String) {
 
@@ -31,7 +31,7 @@ class WorkerContext[T: ClassTag](
     columns
   }
 
-  def getGroupBy(): String = {
+  def getGroupBy(): Array[String] = {
     groupBy
   }
 
@@ -81,7 +81,7 @@ object WorkerHelper {
     config: String,
     port: Int,
     columns: Array[String],
-    groupBy: String,
+    groupBy: Array[String],
     closureRLang: Array[Byte],
     bundlePath: String): RDD[Row] = {
 

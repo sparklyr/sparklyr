@@ -55,7 +55,9 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
-#' @param rlang Boolean; should the closure be serialize using the rlang package?
+#' @param rlang Boolean; Experimental; should the closure be serialize using
+#'   the rlang package? This functionality is currently being developed under
+#'   the rlang package. Once released, the experimental flag will be removed.
 #' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
 #' @param ... Optional arguments; currently unused.
 #'
@@ -65,8 +67,8 @@ spark_apply <- function(x,
                         names = colnames(x),
                         memory = TRUE,
                         group_by = NULL,
-                        rlang = TRUE,
                         packages = TRUE,
+                        rlang = FALSE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -74,6 +76,8 @@ spark_apply <- function(x,
   rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
+
+  if (rlang) warning("The `rlang` parameter is under active development.")
 
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) packages = FALSE
@@ -96,11 +100,13 @@ spark_apply <- function(x,
   )
 
   if (grouped) {
-    colpos <- which(colnames(x) == group_by)
-    if (length(colpos) == 0) stop("Column '", group_by, "' not found.")
+    colpos <- which(colnames(x) %in% group_by)
+    if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
+
+    group_by_list <- as.list(as.integer(colpos - 1))
 
     grouped_schema <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBySchema", sdf)
-    grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, as.integer(colpos - 1))
+    grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
     grouped_df <- invoke(hive_context(sc), "createDataFrame", grouped_rdd, grouped_schema)
 
     storage_level <- invoke_static(
@@ -113,6 +119,8 @@ spark_apply <- function(x,
     invoke(grouped_df, "count")
 
     rdd_base <- grouped_df %>% invoke("rdd")
+
+    names <- c(group_by, names)
   }
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
@@ -134,7 +142,7 @@ spark_apply <- function(x,
     worker_config,
     as.integer(worker_port),
     as.list(sdf_columns),
-    group_by,
+    as.list(group_by),
     closure_rlang,
     bundle_path
   )

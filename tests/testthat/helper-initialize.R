@@ -15,11 +15,6 @@ testthat_spark_connection <- function(version = NULL) {
   if (!connected) {
     config <- spark_config()
 
-    # increase sparklyr logging to improve travis troublshooting
-    if (identical(Sys.getenv("TRAVIS"), "true")) {
-      config$sparklyr.log.console <- TRUE
-    }
-
     version <- version %||% Sys.getenv("SPARK_VERSION", unset = "2.1.0")
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version, config = config)
