@@ -180,8 +180,7 @@ src_tbls(sc)
 
 ## Distributed R
 
-You can execute arbitrary r code across your cluster using `spark_apply`. For
-example, we can apply `rgamma` over `iris` as follows:
+You can execute arbitrary r code across your cluster using `spark_apply`. For example, we can apply `rgamma` over `iris` as follows:
 
 ```{r}
 spark_apply(iris_tbl, function(data) {
@@ -189,12 +188,15 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-We can also approximate π using `spark_apply` and `dplyr` as follows:
+You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
 
 ```{r}
-sdf_len(sc, 10000) %>%
-  spark_apply(function(d) rowSums(replicate(2, runif(nrow(d), min=-1, max=1)) ^ 2) < 1) %>%
-  filter(id) %>% count() %>% collect() * 4 / 10000
+spark_apply(
+  iris_tbl,
+  function(e) broom::tidy(lm(Petal_Width ~ Petal_Length, e)),
+  names = c("term", "estimate", "std.error", "statistic", "p.value"),
+  group_by = "Species"
+)
 ```
 
 ## Extensions
