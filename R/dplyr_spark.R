@@ -96,7 +96,7 @@ db_data_type.spark_connection <- function(...) {
 #' @importFrom dplyr copy_to
 copy_to.spark_connection <- function(dest,
                                      df,
-                                     name = deparse(substitute(df)),
+                                     name = spark_table_name(substitute(df)),
                                      overwrite = FALSE,
                                      memory = TRUE,
                                      repartition = 0L,

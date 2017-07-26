@@ -24,3 +24,16 @@ spark_get_checkpoint_dir <- function(sc) {
                 "unboxString",
                 dir)
 }
+
+#' Generate a Table Name from Expression
+#'
+#' Attempts to generate a table name from an expression; othewise,
+#' assigns an auto-generated generic name with "sparklyr_" prefix.
+#'
+#' @param expr The expression to attempt to use as name
+#'
+#' @export
+spark_table_name <- function(expr) {
+  table_name <- deparse(expr)
+  if (grepl("^[a-zA-Z][a-zA-Z0-9_]*$", table_name)) table_name else random_string(prefix = "sparklyr_")
+}
