@@ -5,7 +5,7 @@
 \title{Apply a Function in Spark}
 \usage{
 spark_apply(x, f, names = colnames(x), memory = TRUE, group_by = NULL,
-  packages = TRUE, ...)
+  packages = TRUE, rlang = FALSE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -17,13 +17,7 @@ names from the original object.}
 
 \item{memory}{Boolean; should the table be cached into memory?}
 
-\item{group_by}{Column name used to group by data frame partitions.}
-
 \item{packages}{Boolean; distribute \code{.libPaths()} packages to nodes?}
-
-\item{rlang}{Boolean; Experimental; should the closure be serialize using
-the rlang package? This functionality is currently being developed under
-the rlang package. Once released, the experimental flag will be removed.}
 
 \item{...}{Optional arguments; currently unused.}
 }
