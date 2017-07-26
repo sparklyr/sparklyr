@@ -5,7 +5,7 @@
 \title{Apply a Function in Spark}
 \usage{
 spark_apply(x, f, names = colnames(x), memory = TRUE, group_by = NULL,
-  packages = TRUE, rlang = FALSE, ...)
+  packages = TRUE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

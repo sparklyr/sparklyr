@@ -54,10 +54,6 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #' @param names The column names for the transformed object, defaults to the
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
-#' @param group_by Column name used to group by data frame partitions.
-#' @param rlang Boolean; Experimental; should the closure be serialize using
-#'   the rlang package? This functionality is currently being developed under
-#'   the rlang package. Once released, the experimental flag will be removed.
 #' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
 #' @param ... Optional arguments; currently unused.
 #'
@@ -76,6 +72,7 @@ spark_apply <- function(x,
   rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
+  rlang <- spark_config_value(x$sc, "sparklyr.closures.rlang", FALSE)
 
   if (rlang) warning("The `rlang` parameter is under active development.")
 
