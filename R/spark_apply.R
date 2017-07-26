@@ -54,6 +54,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #' @param names The column names for the transformed object, defaults to the
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
+#' @param group_by Column name used to group by data frame partitions.
 #' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
 #' @param ... Optional arguments; currently unused.
 #'
@@ -64,7 +65,6 @@ spark_apply <- function(x,
                         memory = TRUE,
                         group_by = NULL,
                         packages = TRUE,
-                        rlang = FALSE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
