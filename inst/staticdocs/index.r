@@ -21,10 +21,12 @@ sd_section(
     "spark_read_jdbc",
     "spark_read_json",
     "spark_read_parquet",
+    "spark_read_source",
     "spark_read_table",
     "spark_write_csv",
     "spark_write_json",
     "spark_write_parquet",
+    "spark_write_source",
     "spark_write_table"
   )
 )
@@ -33,7 +35,9 @@ sd_section(
   "Spark Tables",
   "Functions for manipulating Spark Tables.",
   c(
+    "src_databases",
     "tbl_cache",
+    "tbl_change_db",
     "tbl_uncache"
   )
 )
@@ -42,13 +46,26 @@ sd_section(
   "Spark DataFrames",
   "Functions for maniplulating Spark DataFrames.",
   c(
+    "sdf_along",
+    "sdf_bind_cols",
+    "sdf_bind_rows",
+    "sdf_broadcast",
+    "sdf_checkpoint",
+    "sdf_coalesce",
     "sdf_copy_to",
+    "sdf_len",
     "sdf_mutate",
+    "sdf_num_partitions",
     "sdf_partition",
+    "sdf_pivot",
     "sdf_predict",
     "sdf_read_column",
     "sdf_register",
+    "sdf_repartition",
+    "sdf_residuals",
     "sdf_sample",
+    "sdf_separate_column",
+    "sdf_seq",
     "sdf_sort",
     "sdf_with_unique_id"
   )
@@ -66,6 +83,7 @@ sd_section(
     "ml_lda",
     "ml_linear_regression",
     "ml_logistic_regression",
+    "ml_model_data",
     "ml_multilayer_perceptron",
     "ml_naive_bayes",
     "ml_one_vs_rest",
@@ -81,6 +99,7 @@ sd_section(
   c(
     "ft_binarizer",
     "ft_bucketizer",
+    "ft_count_vectorizer",
     "ft_discrete_cosine_transform",
     "ft_elementwise_product",
     "ft_index_to_string",
@@ -127,6 +146,7 @@ sd_section(
     "download_scalac",
     "find_scalac",
     "hive_context",
+    "hive_context_config",
     "invoke",
     "java_context",
     "register_extension",
@@ -134,10 +154,20 @@ sd_section(
     "spark_default_compilation_spec",
     "spark_connection",
     "spark_context",
+    "spark_context_config",
     "spark_dataframe",
     "spark_dependency",
+    "spark_home_set",
     "spark_jobj",
     "spark_session",
     "spark_version"
+  )
+)
+
+sd_section(
+  "Distributed Computing",
+  "Functions for distributing computations across the cluster.",
+  c(
+    "spark_apply"
   )
 )
