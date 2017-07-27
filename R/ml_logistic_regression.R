@@ -88,6 +88,8 @@ ml_logistic_regression <- function(x,
   # on binomial vs. multinomial)
   coefficients <- if (isMultinomial) {
 
+    if (spark_version(sc) < "2.1.0") stop("Multinomial regression requires Spark 2.1.0 or higher.")
+
     # multinomial
     coefficients <- read_spark_matrix(fit, "coefficientMatrix")
     colnames(coefficients) <- features
