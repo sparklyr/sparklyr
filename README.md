@@ -266,20 +266,20 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_144b135be54bc> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_16c9a2c40da6d> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1       6.7104      5.1104       3.0104      1.8104
-    ##  2       6.5104      4.6104       3.0104      1.8104
-    ##  3       6.3104      4.8104       2.9104      1.8104
-    ##  4       6.2104      4.7104       3.1104      1.8104
-    ##  5       6.6104      5.2104       3.0104      1.8104
-    ##  6       7.0104      5.5104       3.3104      2.0104
-    ##  7       6.2104      5.0104       3.0104      1.9104
-    ##  8       6.6104      5.0104       3.1104      1.8104
-    ##  9       6.0104      4.5104       3.0104      1.8104
-    ## 10       6.5104      4.7104       3.1104      1.7104
+    ##  1     7.988345    6.388345     4.288345    3.088345
+    ##  2     7.788345    5.888345     4.288345    3.088345
+    ##  3     7.588345    6.088345     4.188345    3.088345
+    ##  4     7.488345    5.988345     4.388345    3.088345
+    ##  5     7.888345    6.488345     4.288345    3.088345
+    ##  6     8.288345    6.788345     4.588345    3.288345
+    ##  7     7.488345    6.288345     4.288345    3.188345
+    ##  8     7.888345    6.288345     4.388345    3.088345
+    ##  9     7.288345    5.788345     4.288345    3.088345
+    ## 10     7.788345    5.988345     4.388345    2.988345
     ## # ... with 140 more rows
 
 You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
@@ -293,7 +293,7 @@ spark_apply(
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_144b1539a1a88> [?? x 6]
+    ## # Source:   table<sparklyr_tmp_16c9a477a7eb8> [?? x 6]
     ## # Database: spark_connection
     ##      Species         term    estimate  std.error  statistic      p.value
     ##        <chr>        <chr>       <dbl>      <dbl>      <dbl>        <dbl>
@@ -361,16 +361,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/07/27 21:54:38 INFO ContextCleaner: Cleaned accumulator 5868
-    ## 17/07/27 21:54:38 INFO ContextCleaner: Cleaned shuffle 28
-    ## 17/07/27 21:54:38 INFO BlockManagerInfo: Removed broadcast_91_piece0 on 127.0.0.1:61072 in memory (size: 86.2 KB, free: 338.0 MB)
-    ## 17/07/27 21:54:38 INFO BlockManagerInfo: Removed broadcast_92_piece0 on 127.0.0.1:61072 in memory (size: 3.7 KB, free: 338.0 MB)
-    ## 17/07/27 21:54:38 INFO BlockManagerInfo: Removed broadcast_93_piece0 on 127.0.0.1:61072 in memory (size: 84.6 KB, free: 338.1 MB)
-    ## 17/07/27 21:54:38 INFO Executor: Finished task 0.0 in stage 87.0 (TID 148). 1196 bytes result sent to driver
-    ## 17/07/27 21:54:38 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 148) in 134 ms on localhost (executor driver) (1/1)
-    ## 17/07/27 21:54:38 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
-    ## 17/07/27 21:54:38 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:0) finished in 0.134 s
-    ## 17/07/27 21:54:38 INFO DAGScheduler: Job 55 finished: count at NativeMethodAccessorImpl.java:0, took 0.136818 s
+    ## 17/07/27 23:10:34 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 87 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpJO9ujN/file16c9a23decc5.csv MapPartitionsRDD[340] at textFile at NativeMethodAccessorImpl.java:0)
+    ## 17/07/27 23:10:34 INFO TaskSchedulerImpl: Adding task set 87.0 with 1 tasks
+    ## 17/07/27 23:10:34 INFO TaskSetManager: Starting task 0.0 in stage 87.0 (TID 148, localhost, executor driver, partition 0, PROCESS_LOCAL, 6009 bytes)
+    ## 17/07/27 23:10:34 INFO Executor: Running task 0.0 in stage 87.0 (TID 148)
+    ## 17/07/27 23:10:34 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpJO9ujN/file16c9a23decc5.csv:0+33313106
+    ## 17/07/27 23:10:34 INFO Executor: Finished task 0.0 in stage 87.0 (TID 148). 1123 bytes result sent to driver
+    ## 17/07/27 23:10:34 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 148) in 129 ms on localhost (executor driver) (1/1)
+    ## 17/07/27 23:10:34 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
+    ## 17/07/27 23:10:34 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:0) finished in 0.130 s
+    ## 17/07/27 23:10:34 INFO DAGScheduler: Job 55 finished: count at NativeMethodAccessorImpl.java:0, took 0.132388 s
 
 Finally, we disconnect from Spark:
 
@@ -389,15 +389,15 @@ The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/do
 
 Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
 
-<img src="tools/readme/spark-connect.png" class="screenshot" width=639 height=447/>
+<img src="tools/readme/spark-connect.png" class="screenshot" width=389/>
 
 Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster and preview Spark DataFrames using the standard RStudio data viewer:
 
-<img src="tools/readme/spark-dataview.png" class="screenshot" width=639 height=446/>
+<img src="tools/readme/spark-dataview.png" class="screenshot" width=639/>
 
 You can also connect to Spark through [Livy](http://livy.io) through a new connection dialog:
 
-<img src="tools/readme/spark-tab.png" class="screenshot" width=639 height=393/>
+<img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389/>
 
 The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
@@ -433,7 +433,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1501217702785_1 
+    ## Model ID:  GLM_model_R_1501222258016_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -442,7 +442,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                    0 frame_rdd_29_ae6e3b1992a907517f2c7680010a4490
+    ## 1                    0 frame_rdd_29_94c9913e0af6e119b3b413e51dad46b6
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
