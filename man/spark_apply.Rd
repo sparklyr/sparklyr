@@ -2,7 +2,7 @@
 % Please edit documentation in R/spark_apply.R
 \name{spark_apply}
 \alias{spark_apply}
-\title{Apply a Function in Spark}
+\title{Apply an R Function in Spark}
 \usage{
 spark_apply(x, f, names = colnames(x), memory = TRUE, group_by = NULL,
   packages = TRUE, ...)
@@ -24,5 +24,5 @@ names from the original object.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Applies a function to a Spark object (typically, a Spark DataFrame).
+Applies an R function to a Spark object (typically, a Spark DataFrame).
 }
