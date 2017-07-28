@@ -887,23 +887,6 @@ object Sources {
     "core_spark_apply_unbundle_path <- function() {\n" +
     "  file.path(\"sparklyr-bundle\")\n" +
     "}\n" +
-    "\n" +
-    "#' Extracts a bundle of dependencies required by \\code{spark_apply()}\n" +
-    "#'\n" +
-    "#' @param bundle_path Path to the bundle created using \\code{core_spark_apply_bundle()}\n" +
-    "#' @param base_path Base path to use while extracting bundles\n" +
-    "#'\n" +
-    "#' @keywords internal\n" +
-    "#' @export\n" +
-    "core_spark_apply_unbundle <- function(bundle_path, base_path) {\n" +
-    "  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())\n" +
-    "\n" +
-    "  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)\n" +
-    "\n" +
-    "  system2(\"tar\", c(\"-xf\", bundle_path, \"-C\", extractPath))\n" +
-    "\n" +
-    "  extractPath\n" +
-    "}\n" +
     "core_get_package_function <- function(packageName, functionName) {\n" +
     "  if (packageName %in% rownames(installed.packages()) &&\n" +
     "      exists(functionName, envir = asNamespace(packageName)))\n" +
@@ -960,8 +943,7 @@ object Sources {
     "        stop(\"failed to find bundle under SparkFiles root directory\")\n" +
     "      }\n" +
     "\n" +
-    "      worker_log(\"updated .libPaths with bundle packages\")\n" +
-    "      unbundlePath <- core_spark_apply_unbundle(sparkBundlePath, workerRootDir)\n" +
+    "      unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)\n" +
     "\n" +
     "      .libPaths(unbundlePath)\n" +
     "      worker_log(\"updated .libPaths with bundle packages\")\n" +
@@ -1048,6 +1030,26 @@ object Sources {
     "    core_get_package_function(\"rlanglabs\", \"bytes_unserialise\")\n" +
     "  else\n" +
     "    rlang_unserialize\n" +
+    "}\n" +
+    "\n" +
+    "#' Extracts a bundle of dependencies required by \\code{spark_apply()}\n" +
+    "#'\n" +
+    "#' @param bundle_path Path to the bundle created using \\code{core_spark_apply_bundle()}\n" +
+    "#' @param base_path Base path to use while extracting bundles\n" +
+    "#'\n" +
+    "#' @keywords internal\n" +
+    "#' @export\n" +
+    "worker_spark_apply_unbundle <- function(bundle_path, base_path) {\n" +
+    "  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())\n" +
+    "\n" +
+    "  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)\n" +
+    "\n" +
+    "  if (length(dir(extractPath)) == 0) {\n" +
+    "    worker_log(\"found that the unbundle path is empty, extracting:\", extractPath)\n" +
+    "    system2(\"tar\", c(\"-xf\", bundle_path, \"-C\", extractPath))\n" +
+    "  }\n" +
+    "\n" +
+    "  extractPath\n" +
     "}\n" +
     "spark_worker_connect <- function(sessionId, config) {\n" +
     "  gatewayPort <- spark_config_value(config, \"sparklyr.worker.gateway.port\", 8880)\n" +
