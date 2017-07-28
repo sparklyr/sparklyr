@@ -266,20 +266,20 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_d352fee1e02> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_144b135be54bc> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1     6.279425    4.679425     2.579425    1.379425
-    ##  2     6.079425    4.179425     2.579425    1.379425
-    ##  3     5.879425    4.379425     2.479425    1.379425
-    ##  4     5.779425    4.279425     2.679425    1.379425
-    ##  5     6.179425    4.779425     2.579425    1.379425
-    ##  6     6.579425    5.079425     2.879425    1.579425
-    ##  7     5.779425    4.579425     2.579425    1.479425
-    ##  8     6.179425    4.579425     2.679425    1.379425
-    ##  9     5.579425    4.079425     2.579425    1.379425
-    ## 10     6.079425    4.279425     2.679425    1.279425
+    ##  1       6.7104      5.1104       3.0104      1.8104
+    ##  2       6.5104      4.6104       3.0104      1.8104
+    ##  3       6.3104      4.8104       2.9104      1.8104
+    ##  4       6.2104      4.7104       3.1104      1.8104
+    ##  5       6.6104      5.2104       3.0104      1.8104
+    ##  6       7.0104      5.5104       3.3104      2.0104
+    ##  7       6.2104      5.0104       3.0104      1.9104
+    ##  8       6.6104      5.0104       3.1104      1.8104
+    ##  9       6.0104      4.5104       3.0104      1.8104
+    ## 10       6.5104      4.7104       3.1104      1.7104
     ## # ... with 140 more rows
 
 You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
@@ -293,16 +293,16 @@ spark_apply(
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_d354df0afce> [?? x 5]
+    ## # Source:   table<sparklyr_tmp_144b1539a1a88> [?? x 6]
     ## # Database: spark_connection
-    ##           term    estimate  std.error  statistic      p.value
-    ##          <chr>       <dbl>      <dbl>      <dbl>        <dbl>
-    ## 1  (Intercept) -0.08428835 0.16070140 -0.5245029 6.023428e-01
-    ## 2 Petal_Length  0.33105360 0.03750041  8.8279995 1.271916e-11
-    ## 3  (Intercept)  1.13603130 0.37936622  2.9945505 4.336312e-03
-    ## 4 Petal_Length  0.16029696 0.06800119  2.3572668 2.253577e-02
-    ## 5  (Intercept) -0.04822033 0.12164115 -0.3964146 6.935561e-01
-    ## 6 Petal_Length  0.20124509 0.08263253  2.4354220 1.863892e-02
+    ##      Species         term    estimate  std.error  statistic      p.value
+    ##        <chr>        <chr>       <dbl>      <dbl>      <dbl>        <dbl>
+    ## 1 versicolor  (Intercept) -0.08428835 0.16070140 -0.5245029 6.023428e-01
+    ## 2 versicolor Petal_Length  0.33105360 0.03750041  8.8279995 1.271916e-11
+    ## 3  virginica  (Intercept)  1.13603130 0.37936622  2.9945505 4.336312e-03
+    ## 4  virginica Petal_Length  0.16029696 0.06800119  2.3572668 2.253577e-02
+    ## 5     setosa  (Intercept) -0.04822033 0.12164115 -0.3964146 6.935561e-01
+    ## 6     setosa Petal_Length  0.20124509 0.08263253  2.4354220 1.863892e-02
 
 Extensions
 ----------
@@ -361,16 +361,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/07/26 14:50:59 INFO ContextCleaner: Cleaned accumulator 5656
-    ## 17/07/26 14:50:59 INFO BlockManagerInfo: Removed broadcast_89_piece0 on 127.0.0.1:62952 in memory (size: 3.7 KB, free: 338.1 MB)
-    ## 17/07/26 14:50:59 INFO ContextCleaner: Cleaned accumulator 5857
-    ## 17/07/26 14:50:59 INFO ContextCleaner: Cleaned accumulator 5862
-    ## 17/07/26 14:50:59 INFO BlockManagerInfo: Removed broadcast_93_piece0 on 127.0.0.1:62952 in memory (size: 17.6 KB, free: 338.1 MB)
-    ## 17/07/26 14:50:59 INFO Executor: Finished task 0.0 in stage 87.0 (TID 148). 1196 bytes result sent to driver
-    ## 17/07/26 14:50:59 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 148) in 136 ms on localhost (executor driver) (1/1)
-    ## 17/07/26 14:50:59 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
-    ## 17/07/26 14:50:59 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:0) finished in 0.136 s
-    ## 17/07/26 14:50:59 INFO DAGScheduler: Job 55 finished: count at NativeMethodAccessorImpl.java:0, took 0.139061 s
+    ## 17/07/27 21:54:38 INFO ContextCleaner: Cleaned accumulator 5868
+    ## 17/07/27 21:54:38 INFO ContextCleaner: Cleaned shuffle 28
+    ## 17/07/27 21:54:38 INFO BlockManagerInfo: Removed broadcast_91_piece0 on 127.0.0.1:61072 in memory (size: 86.2 KB, free: 338.0 MB)
+    ## 17/07/27 21:54:38 INFO BlockManagerInfo: Removed broadcast_92_piece0 on 127.0.0.1:61072 in memory (size: 3.7 KB, free: 338.0 MB)
+    ## 17/07/27 21:54:38 INFO BlockManagerInfo: Removed broadcast_93_piece0 on 127.0.0.1:61072 in memory (size: 84.6 KB, free: 338.1 MB)
+    ## 17/07/27 21:54:38 INFO Executor: Finished task 0.0 in stage 87.0 (TID 148). 1196 bytes result sent to driver
+    ## 17/07/27 21:54:38 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 148) in 134 ms on localhost (executor driver) (1/1)
+    ## 17/07/27 21:54:38 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
+    ## 17/07/27 21:54:38 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:0) finished in 0.134 s
+    ## 17/07/27 21:54:38 INFO DAGScheduler: Job 55 finished: count at NativeMethodAccessorImpl.java:0, took 0.136818 s
 
 Finally, we disconnect from Spark:
 
@@ -391,13 +391,13 @@ Once you've installed the sparklyr package, you should find a new **Spark** pane
 
 <img src="tools/readme/spark-connect.png" class="screenshot" width=639 height=447/>
 
-Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster:
-
-<img src="tools/readme/spark-tab.png" class="screenshot" width=639 height=393/>
-
-The Spark DataFrame preview uses the standard RStudio data viewer:
+Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster and preview Spark DataFrames using the standard RStudio data viewer:
 
 <img src="tools/readme/spark-dataview.png" class="screenshot" width=639 height=446/>
+
+You can also connect to Spark through [Livy](http://livy.io) through a new connection dialog:
+
+<img src="tools/readme/spark-tab.png" class="screenshot" width=639 height=393/>
 
 The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
@@ -433,7 +433,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1501105872843_1 
+    ## Model ID:  GLM_model_R_1501217702785_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -442,7 +442,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                    0 frame_rdd_29_945da208a0029ef9eebbc6781a6944f2
+    ## 1                    0 frame_rdd_29_ae6e3b1992a907517f2c7680010a4490
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
