@@ -22,3 +22,5 @@
 ^.classpath$
 ^.project$
 ^h2ologs$
+^docs$
+^_pkgdown\.yml$
