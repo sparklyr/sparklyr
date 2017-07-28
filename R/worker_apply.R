@@ -29,7 +29,6 @@ spark_worker_apply <- function(sc) {
         stop("failed to find bundle under SparkFiles root directory")
       }
 
-      worker_log("updated .libPaths with bundle packages")
       unbundlePath <- core_spark_apply_unbundle(sparkBundlePath, workerRootDir)
 
       .libPaths(unbundlePath)
