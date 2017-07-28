@@ -2,10 +2,10 @@
 % Please edit documentation in R/spark_apply.R
 \name{spark_apply}
 \alias{spark_apply}
-\title{Apply a Function in Spark}
+\title{Apply an R Function in Spark}
 \usage{
 spark_apply(x, f, names = colnames(x), memory = TRUE, group_by = NULL,
-  packages = TRUE, rlang = FALSE, ...)
+  packages = TRUE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -21,12 +21,8 @@ names from the original object.}
 
 \item{packages}{Boolean; distribute \code{.libPaths()} packages to nodes?}
 
-\item{rlang}{Boolean; Experimental; should the closure be serialize using
-the rlang package? This functionality is currently being developed under
-the rlang package. Once released, the experimental flag will be removed.}
-
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Applies a function to a Spark object (typically, a Spark DataFrame).
+Applies an R function to a Spark object (typically, a Spark DataFrame).
 }

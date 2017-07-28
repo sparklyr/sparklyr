@@ -134,16 +134,16 @@ batting_tbl %>%
     ## # Ordered by: playerID, yearID, teamID
     ##     playerID yearID teamID     G    AB     R     H
     ##        <chr>  <int>  <chr> <int> <int> <int> <int>
-    ##  1 abbotpa01   2000    SEA    35     5     1     2
-    ##  2 abbotpa01   2004    PHI    10    11     1     2
-    ##  3 abnersh01   1992    CHA    97   208    21    58
-    ##  4 abnersh01   1990    SDN    91   184    17    45
-    ##  5 abreujo02   2015    CHA   154   613    88   178
-    ##  6 abreujo02   2014    CHA   145   556    80   176
-    ##  7 acevejo01   2001    CIN    18    34     1     4
-    ##  8 acevejo01   2004    CIN    39    43     0     2
-    ##  9 adamsbe01   1919    PHI    78   232    14    54
-    ## 10 adamsbe01   1918    PHI    84   227    10    40
+    ##  1 aaronha01   1959    ML1   154   629   116   223
+    ##  2 aaronha01   1963    ML1   161   631   121   201
+    ##  3 abbotji01   1999    MIL    20    21     0     2
+    ##  4 abnersh01   1992    CHA    97   208    21    58
+    ##  5 abnersh01   1990    SDN    91   184    17    45
+    ##  6 acklefr01   1963    CHA     2     5     0     1
+    ##  7 acklefr01   1964    CHA     3     1     0     1
+    ##  8 adamecr01   2015    COL    26    53     4    13
+    ##  9 adamecr01   2014    COL     7    15     1     1
+    ## 10 adamsac01   1943    NY1    70    32     3     4
     ## # ... with 2.561e+04 more rows
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
@@ -203,7 +203,7 @@ fit
     ## 
     ## Coefficients:
     ## (Intercept)          wt         cyl 
-    ##   37.066699   -2.309504   -1.639546
+    ##   33.499452   -2.818463   -0.923187
 
 For linear regression models produced by Spark, we can use `summary()` to learn a bit more about the quality of our fit, and the statistical significance of each of our predictors.
 
@@ -214,19 +214,19 @@ summary(fit)
     ## Call: ml_linear_regression(., response = "mpg", features = c("wt", "cyl"))
     ## 
     ## Deviance Residuals::
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.6881 -1.0507 -0.4420  0.4757  3.3858 
+    ##    Min     1Q Median     3Q    Max 
+    ## -1.752 -1.134 -0.499  1.296  2.282 
     ## 
     ## Coefficients:
     ##             Estimate Std. Error t value  Pr(>|t|)    
-    ## (Intercept) 37.06670    2.76494 13.4059 2.981e-07 ***
-    ## wt          -2.30950    0.84748 -2.7252   0.02341 *  
-    ## cyl         -1.63955    0.58635 -2.7962   0.02084 *  
+    ## (Intercept) 33.49945    3.62256  9.2475 0.0002485 ***
+    ## wt          -2.81846    0.96619 -2.9171 0.0331257 *  
+    ## cyl         -0.92319    0.54639 -1.6896 0.1518998    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## R-Squared: 0.8665
-    ## Root Mean Squared Error: 1.799
+    ## R-Squared: 0.8274
+    ## Root Mean Squared Error: 1.422
 
 Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [machine learning](mllib.html) section.
 
@@ -266,32 +266,43 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_e1c5659f067d> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_16c9a2c40da6d> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1     7.708524    6.108524     4.008524    2.808524
-    ##  2     7.508524    5.608524     4.008524    2.808524
-    ##  3     7.308524    5.808524     3.908524    2.808524
-    ##  4     7.208524    5.708524     4.108524    2.808524
-    ##  5     7.608524    6.208524     4.008524    2.808524
-    ##  6     8.008524    6.508524     4.308524    3.008524
-    ##  7     7.208524    6.008524     4.008524    2.908524
-    ##  8     7.608524    6.008524     4.108524    2.808524
-    ##  9     7.008524    5.508524     4.008524    2.808524
-    ## 10     7.508524    5.708524     4.108524    2.708524
+    ##  1     7.988345    6.388345     4.288345    3.088345
+    ##  2     7.788345    5.888345     4.288345    3.088345
+    ##  3     7.588345    6.088345     4.188345    3.088345
+    ##  4     7.488345    5.988345     4.388345    3.088345
+    ##  5     7.888345    6.488345     4.288345    3.088345
+    ##  6     8.288345    6.788345     4.588345    3.288345
+    ##  7     7.488345    6.288345     4.288345    3.188345
+    ##  8     7.888345    6.288345     4.388345    3.088345
+    ##  9     7.288345    5.788345     4.288345    3.088345
+    ## 10     7.788345    5.988345     4.388345    2.988345
     ## # ... with 140 more rows
 
-We can also approximate π using `spark_apply` and `dplyr` as follows:
+You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
 
 ``` r
-sdf_len(sc, 10000) %>%
-  spark_apply(function(d) rowSums(replicate(2, runif(nrow(d), min=-1, max=1)) ^ 2) < 1) %>%
-  filter(id) %>% count() %>% collect() * 4 / 10000
+spark_apply(
+  iris_tbl,
+  function(e) broom::tidy(lm(Petal_Width ~ Petal_Length, e)),
+  names = c("term", "estimate", "std.error", "statistic", "p.value"),
+  group_by = "Species"
+)
 ```
 
-    ##        n
-    ## 1 3.1416
+    ## # Source:   table<sparklyr_tmp_16c9a477a7eb8> [?? x 6]
+    ## # Database: spark_connection
+    ##      Species         term    estimate  std.error  statistic      p.value
+    ##        <chr>        <chr>       <dbl>      <dbl>      <dbl>        <dbl>
+    ## 1 versicolor  (Intercept) -0.08428835 0.16070140 -0.5245029 6.023428e-01
+    ## 2 versicolor Petal_Length  0.33105360 0.03750041  8.8279995 1.271916e-11
+    ## 3  virginica  (Intercept)  1.13603130 0.37936622  2.9945505 4.336312e-03
+    ## 4  virginica Petal_Length  0.16029696 0.06800119  2.3572668 2.253577e-02
+    ## 5     setosa  (Intercept) -0.04822033 0.12164115 -0.3964146 6.935561e-01
+    ## 6     setosa Petal_Length  0.20124509 0.08263253  2.4354220 1.863892e-02
 
 Extensions
 ----------
@@ -350,16 +361,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/06/08 22:48:45 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 87 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//Rtmpgrw6EP/filee1c570759a7d.csv MapPartitionsRDD[357] at textFile at NativeMethodAccessorImpl.java:-2)
-    ## 17/06/08 22:48:45 INFO TaskSchedulerImpl: Adding task set 87.0 with 1 tasks
-    ## 17/06/08 22:48:45 INFO TaskSetManager: Starting task 0.0 in stage 87.0 (TID 158, localhost, partition 0,PROCESS_LOCAL, 2430 bytes)
-    ## 17/06/08 22:48:45 INFO Executor: Running task 0.0 in stage 87.0 (TID 158)
-    ## 17/06/08 22:48:45 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/Rtmpgrw6EP/filee1c570759a7d.csv:0+33313106
-    ## 17/06/08 22:48:45 INFO Executor: Finished task 0.0 in stage 87.0 (TID 158). 2082 bytes result sent to driver
-    ## 17/06/08 22:48:45 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 158) in 107 ms on localhost (1/1)
-    ## 17/06/08 22:48:45 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
-    ## 17/06/08 22:48:45 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:-2) finished in 0.107 s
-    ## 17/06/08 22:48:45 INFO DAGScheduler: Job 59 finished: count at NativeMethodAccessorImpl.java:-2, took 0.109289 s
+    ## 17/07/27 23:10:34 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 87 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpJO9ujN/file16c9a23decc5.csv MapPartitionsRDD[340] at textFile at NativeMethodAccessorImpl.java:0)
+    ## 17/07/27 23:10:34 INFO TaskSchedulerImpl: Adding task set 87.0 with 1 tasks
+    ## 17/07/27 23:10:34 INFO TaskSetManager: Starting task 0.0 in stage 87.0 (TID 148, localhost, executor driver, partition 0, PROCESS_LOCAL, 6009 bytes)
+    ## 17/07/27 23:10:34 INFO Executor: Running task 0.0 in stage 87.0 (TID 148)
+    ## 17/07/27 23:10:34 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpJO9ujN/file16c9a23decc5.csv:0+33313106
+    ## 17/07/27 23:10:34 INFO Executor: Finished task 0.0 in stage 87.0 (TID 148). 1123 bytes result sent to driver
+    ## 17/07/27 23:10:34 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 148) in 129 ms on localhost (executor driver) (1/1)
+    ## 17/07/27 23:10:34 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
+    ## 17/07/27 23:10:34 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:0) finished in 0.130 s
+    ## 17/07/27 23:10:34 INFO DAGScheduler: Job 55 finished: count at NativeMethodAccessorImpl.java:0, took 0.132388 s
 
 Finally, we disconnect from Spark:
 
@@ -378,15 +389,15 @@ The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/do
 
 Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
 
-<img src="tools/readme/spark-connect.png" class="screenshot" width=639 height=447/>
+<img src="tools/readme/spark-connect.png" class="screenshot" width=389/>
 
-Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster:
+Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster and preview Spark DataFrames using the standard RStudio data viewer:
 
-<img src="tools/readme/spark-tab.png" class="screenshot" width=639 height=393/>
+<img src="tools/readme/spark-dataview.png" class="screenshot" width=639/>
 
-The Spark DataFrame preview uses the standard RStudio data viewer:
+You can also connect to Spark through [Livy](http://livy.io) through a new connection dialog:
 
-<img src="tools/readme/spark-dataview.png" class="screenshot" width=639 height=446/>
+<img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389/>
 
 The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
@@ -422,7 +433,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1496987380367_1 
+    ## Model ID:  GLM_model_R_1501222258016_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -431,7 +442,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                    0 frame_rdd_29_803ef3b729b31412c7a28957c5054516
+    ## 1                    0 frame_rdd_29_94c9913e0af6e119b3b413e51dad46b6
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients

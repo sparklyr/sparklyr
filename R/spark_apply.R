@@ -45,9 +45,9 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
   )
 }
 
-#' Apply a Function in Spark
+#' Apply an R Function in Spark
 #'
-#' Applies a function to a Spark object (typically, a Spark DataFrame).
+#' Applies an R function to a Spark object (typically, a Spark DataFrame).
 #'
 #' @param x An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.
 #' @param f A function that transforms a data frame partition into a data frame.
@@ -55,9 +55,6 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
-#' @param rlang Boolean; Experimental; should the closure be serialize using
-#'   the rlang package? This functionality is currently being developed under
-#'   the rlang package. Once released, the experimental flag will be removed.
 #' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
 #' @param ... Optional arguments; currently unused.
 #'
@@ -68,7 +65,6 @@ spark_apply <- function(x,
                         memory = TRUE,
                         group_by = NULL,
                         packages = TRUE,
-                        rlang = FALSE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -76,6 +72,7 @@ spark_apply <- function(x,
   rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
+  rlang <- spark_config_value(x$sc, "sparklyr.closures.rlang", FALSE)
 
   if (rlang) warning("The `rlang` parameter is under active development.")
 

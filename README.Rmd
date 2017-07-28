@@ -180,8 +180,7 @@ src_tbls(sc)
 
 ## Distributed R
 
-You can execute arbitrary r code across your cluster using `spark_apply`. For
-example, we can apply `rgamma` over `iris` as follows:
+You can execute arbitrary r code across your cluster using `spark_apply`. For example, we can apply `rgamma` over `iris` as follows:
 
 ```{r}
 spark_apply(iris_tbl, function(data) {
@@ -189,12 +188,15 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-We can also approximate π using `spark_apply` and `dplyr` as follows:
+You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
 
 ```{r}
-sdf_len(sc, 10000) %>%
-  spark_apply(function(d) rowSums(replicate(2, runif(nrow(d), min=-1, max=1)) ^ 2) < 1) %>%
-  filter(id) %>% count() %>% collect() * 4 / 10000
+spark_apply(
+  iris_tbl,
+  function(e) broom::tidy(lm(Petal_Width ~ Petal_Length, e)),
+  names = c("term", "estimate", "std.error", "statistic", "p.value"),
+  group_by = "Species"
+)
 ```
 
 ## Extensions
@@ -268,15 +270,15 @@ The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/do
 
 Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
 
-<img src="tools/readme/spark-connect.png" class="screenshot" width=639 height=447/>
+<img src="tools/readme/spark-connect.png" class="screenshot" width=389 />
 
-Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster:
+Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster and preview Spark DataFrames using the standard RStudio data viewer:
 
-<img src="tools/readme/spark-tab.png" class="screenshot" width=639 height=393/>
+<img src="tools/readme/spark-dataview.png" class="screenshot" width=639 />
 
-The Spark DataFrame preview uses the standard RStudio data viewer:
+You can also connect to Spark through [Livy](http://livy.io) through a new connection dialog:
 
-<img src="tools/readme/spark-dataview.png" class="screenshot" width=639 height=446/>
+<img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389 />
 
 <div style="margin-bottom: 15px;"></div>
 
