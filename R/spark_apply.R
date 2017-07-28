@@ -124,9 +124,23 @@ spark_apply <- function(x,
 
   bundle_path <- ""
   if (packages) {
-    bundle_path <- core_spark_apply_bundle()
+    bundle_path <- core_spark_apply_bundle_path()
+    if (!file.exists(bundle_path)) {
+      bundle_path <- core_spark_apply_bundle()
+    }
+
     if (!is.null(bundle_path)) {
-      spark_context(sc) %>% invoke("addFile", bundle_path)
+      bundle_was_added <- file.exists(
+        invoke_static(
+          sc,
+          "org.apache.spark.SparkFiles",
+          "get",
+          basename(bundle_path))
+      )
+
+      if (!bundle_was_added) {
+        spark_context(sc) %>% invoke("addFile", bundle_path)
+      }
     }
   }
 

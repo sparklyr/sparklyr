@@ -25,20 +25,3 @@ core_spark_apply_bundle <- function() {
 core_spark_apply_unbundle_path <- function() {
   file.path("sparklyr-bundle")
 }
-
-#' Extracts a bundle of dependencies required by \code{spark_apply()}
-#'
-#' @param bundle_path Path to the bundle created using \code{core_spark_apply_bundle()}
-#' @param base_path Base path to use while extracting bundles
-#'
-#' @keywords internal
-#' @export
-core_spark_apply_unbundle <- function(bundle_path, base_path) {
-  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())
-
-  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)
-
-  system2("tar", c("-xf", bundle_path, "-C", extractPath))
-
-  extractPath
-}

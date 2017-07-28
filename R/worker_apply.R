@@ -29,8 +29,7 @@ spark_worker_apply <- function(sc) {
         stop("failed to find bundle under SparkFiles root directory")
       }
 
-      worker_log("updated .libPaths with bundle packages")
-      unbundlePath <- core_spark_apply_unbundle(sparkBundlePath, workerRootDir)
+      unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)
 
       .libPaths(unbundlePath)
       worker_log("updated .libPaths with bundle packages")
@@ -117,4 +116,24 @@ spark_worker_rlang_unserialize <- function() {
     core_get_package_function("rlanglabs", "bytes_unserialise")
   else
     rlang_unserialize
+}
+
+#' Extracts a bundle of dependencies required by \code{spark_apply()}
+#'
+#' @param bundle_path Path to the bundle created using \code{core_spark_apply_bundle()}
+#' @param base_path Base path to use while extracting bundles
+#'
+#' @keywords internal
+#' @export
+worker_spark_apply_unbundle <- function(bundle_path, base_path) {
+  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())
+
+  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)
+
+  if (length(dir(extractPath)) == 0) {
+    worker_log("found that the unbundle path is empty, extracting:", extractPath)
+    system2("tar", c("-xf", bundle_path, "-C", extractPath))
+  }
+
+  extractPath
 }
