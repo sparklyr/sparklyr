@@ -1,0 +1,170 @@
+---
+title: "Distributing R Computations"
+---
+
+## Overview
+
+**sparklyr** provides support to run arbitrary R code at scale within your Spark Cluster through `spark_apply()`. This is specially useful where there is a need to use functionality available only in R or R packages that is not available in Apache Spark nor [Spark Packages](https://spark-packages.org/).
+
+There are two main ways to make use of `spark_apply()`:
+
+1. **Computing over Rows** enables you to transform each row with a custom function.
+2. **Computing over Groups** enables you to transform a custom group with a custom function.
+
+Let's take a closer look at each.
+
+### Computing over Rows
+
+Lets run the simplest example, the identify function over a list of numbers:
+
+```{r}
+library(sparklyr)
+
+sc <- spark_connect(master = "local")
+
+sdf_len(sc, 5, repartition = 1) %>%
+  spark_apply(function(e) e)
+```
+
+Which returns what you would expect; however, what is `e`?
+
+```{r}
+sdf_len(sc, 10, repartition = 1) %>%
+  spark_apply(function(e) class(e))
+```
+
+That is correct, an R dataframe. While a dataframe is provided, it is indended to be used for row-by-row operations. This aligns with a known principle in the R community which is to preffer vectorized operations over row-by-row operations, performance-wise, they tend to be much faster.
+
+Let's take a look at another example, while this could work in some cases:
+
+```{r}
+sdf_len(sc, 100, repartition = 1) %>%
+  spark_apply(function(e) nrow(e))
+```
+
+Spark provides no guarantees on how the data is partitioned, specially after complex operations are perfomed over a dataset. If we force partitions on the dataset, this will be more clear:
+
+```{r}
+sdf_len(sc, 100, repartition = 3) %>%
+  spark_apply(function(e) nrow(e))
+```
+
+Since the only restriction we have is that the operation should affect only individual rows, we can still change columns, use functions, etc. For instance, we can remove a few columsn from the `iris` dataset:
+
+```{r}
+iris_tbl <- sdf_copy_to(sc, iris)
+
+iris_tbl %>%
+  spark_apply(function(e) e[1:3])
+```
+
+Or add some. However, `spark_apply` defaults to use the column names from the original dataset, if a new column is added (or a rename is needed), the `names` parameter must be used.
+
+```{r}
+iris_tbl %>%
+  spark_apply(function(e) cbind(3.1416, e), names = c("Pi", colnames(iris)))
+```
+
+### Computing over Groups
+
+While working over rows can be really useful, it certainly restricts some very interesting use cases. For isntance, supporse that you have a very large dataset, that requires linear regression to be computed over several subgroups of this data. To solve this and other use cases, you can make use of the `group_by` parameter as follows:
+
+```{r}
+iris_tbl %>%
+  spark_apply(function(e) nrow(e), group_by = "Species")
+```
+
+or more specifically, we can get the intercept using:
+
+```{r}
+iris_tbl %>%
+  spark_apply(
+    function(e) lm(Petal_Length ~ Petal_Width, e)$coefficients[["(Intercept)"]],
+    group_by = "Species")
+```
+
+## Distributing Packages
+
+Operating over rows and groups is useful but would be lacking functionality without support for the rich R packages the R community provides. To this end, with `spark_apply` you can make use of any package by installing it before connecting to Spark.
+
+For instance, we can use the `broom` package to create a tidy dataframe out of the model as follows:
+
+```{r}
+spark_apply(
+  iris_tbl,
+  function(e) broom::tidy(lm(Petal_Width ~ Petal_Length, e)),
+  names = c("term", "estimate", "std.error", "statistic", "p.value"),
+  group_by = "Species")
+```
+
+`spark_apply` supports packages by copying the contents of your local `.libPaths()` into each worker node making use of `SparkConf.addFile()`. It's not uncommon for R libraries to hundreds of megabytes of space; which means that this has to be copies once to each worker node while the `spark_connect` connection remains open. However, Spark is a cluster for big data and is efficient at copying GB of data between nodes, making the distribution of R packages a one-time cost over a few seconds for most clusters.
+
+Notice that the `packages` parameter takes no effect under `master="local"` since packages already exists in the local machine.
+
+## Handling Errors
+
+While working with distributed systems, troubleshooting can be less straightforward than expected. For instance, the following code will cause the distributed execution of the function to fail and produce the following error:
+
+```{r eval=F}
+spark_apply(iris_tbl, function(e) stop("Make this fail"))
+```
+
+```
+ Error in force(code) : 
+  sparklyr worker rscript failure, check worker logs for details
+```
+
+When getting this `check worker logs for details` message, it indicates that an error triggered while executing this function in a different computing node. While running in local mode, `sparklyr` will retrieve the worker logs that will look like:
+
+```
+---- Output Log ----
+(17/07/27 21:24:18 ERROR sparklyr: Worker (2427) is shutting down with exception ,java.net.SocketException: Socket closed)
+17/07/27 21:24:18 WARN TaskSetManager: Lost task 0.0 in stage 389.0 (TID 429, localhost, executor driver): 17/07/27 21:27:21 INFO sparklyr: RScript (4190) retrieved 150 rows 
+17/07/27 21:27:21 INFO sparklyr: RScript (4190) computing closure 
+17/07/27 21:27:21 ERROR sparklyr: RScript (4190) Make this fail 
+```
+
+Which points out the real failure being `ERROR sparklyr: RScript (4190) Make this fail` as you would expect.
+
+Is worth mentioning that different cluster providers and platforms expose worker logs in different ways. Specific documentation for your environment will point out how to retrieve these logs.
+
+## Requirements
+
+There are a few requirements worth listing out:
+
+- The **R Runtime** is expected to be pre-installed in the cluster for `spark_apply` to function. Failure to install the cluster will trigger a `Cannot run program, no such file or directory` error while attempting to use `spark_apply()`, contact your cluster administrator to consider making the R runtime available throughout the entire cluster.
+- An **Homogenius Cluster** is required since the driver node distributes, and potentially compiles, packages to the workers. For instance, the driver and workers must have the same processor architecture, system libraries, etc.
+
+## Limitations
+
+### Closures
+
+Closures are serialized using `serialize`, which is described as "A simple low-level interface for serializing to connections.". One of the current limitations of `serialize` is that it wont serialize objects being referenced outside of it's environment. For instance, the 
+
+### Livy
+
+Currently, Livy connections do not support distributing packages since the client machine where the libraries are precompiled might not have the same processor architecture, not operating systems that the cluster machines.
+
+## Configuration
+
+The following table describes relevant parameters while making use of `spark_apply`.
+
+| Value | Description  |
+|----------------------------|---------------------------------------------|
+| `spark.r.command`| The path to the R binary. Useful to select from multiple R versions. |
+| `sparklyr.worker.gateway.address` | The gateway address to use under each worker node. Defaults to `sparklyr.gateway.address`.|
+| `sparklyr.worker.gateway.port`| The gateway port to use under each worker node. Defaults to `sparklyr.gateway.port`.|
+
+For example, one could make use of an specific R version by running:
+
+```{r eval=FALSE}
+config <- spark_config()
+config[["spark.r.command"]] <- "<path-under-worker-to-r-version>"
+
+sc <- spark_connect(master = "local", config = config)
+sdf_len(sc, 10) %>% spark_apply(function(e) e)
+```
+
+```{r include=F}
+spark_disconnect(sc)
+```
