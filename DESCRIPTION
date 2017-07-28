@@ -33,6 +33,7 @@ Imports:
     digest,
     httr (>= 1.2.1),
     jsonlite (>= 1.4),
+    knitr,
     lazyeval (>= 0.2.0),
     methods,
     rappdirs,
@@ -49,3 +50,4 @@ Suggests:
     nycflights13,
     testthat,
     RCurl
+VignetteBuilder: knitr
