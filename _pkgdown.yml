@@ -1,0 +1,172 @@
+template:
+  params:
+    bootswatch: cosmo
+
+navbar:
+  title: "sparklyr"
+  type: inverse
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Gallery"
+      href: articles/gallery.html
+    - text: "Guides"
+      menu:
+        - text: "dplyr"
+          href: articles/guides-dplyr.html
+        - text: "mllib"
+          href: articles/guides-mllib.html
+        - text: "H2O"
+          href: articles/guides-h2o.html
+        - text: "Extensions"
+          href: articles/guides-extensions.html
+        - text: "Distributed R"
+          href: articles/guides-distributed-r.html
+    - text: "Deployment"
+      menu:
+        - text: "Overview"
+          href: articles/deployment-overview.html
+        - text: "Data Lakes"
+          href: articles/deployment-data-lakes.html
+        - text: "Cloudera"
+          href: articles/deployment-cdh.html
+        - text: "Amazon"
+          href: articles/deployment-amazon.html
+        - text: "Performance"
+          href: articles/deployment-performance.html
+    - text: "Reference"
+      menu:
+        - text: "Functions"
+          href: reference/index.html
+        - text: "Cheatsheet"
+          href: https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf
+        - text: "Media"
+          href: reference/media.html
+        - text: "News"
+          href: news/index.html
+  right:
+   - icon: fa-github
+     href: https://github.com/rstudio/reticulate
+
+reference:
+  - title: "Spark Operations"
+    contents:
+      - spark_config
+      - spark_connect
+      - spark_disconnect
+      - spark_install
+      - spark_log
+      - spark_web
+  - title: "Spark Data"
+    contents:
+      - spark_read_csv
+      - spark_read_jdbc
+      - spark_read_json
+      - spark_read_parquet
+      - spark_read_source
+      - spark_read_table
+      - spark_write_csv
+      - spark_write_jdbc
+      - spark_write_json
+      - spark_write_parquet
+      - spark_write_source
+      - spark_write_table
+  - title: "Spark Tables"
+    contents:
+      - src_databases
+      - tbl_cache
+      - tbl_change_db
+      - tbl_uncache
+  - title: "Spark DataFrames"
+    contents:
+      - sdf_along
+      - sdf_bind_cols
+      - sdf_bind_rows
+      - sdf_broadcast
+      - sdf_checkpoint
+      - sdf_coalesce
+      - sdf_copy_to
+      - sdf_len
+      - sdf_mutate
+      - sdf_num_partitions
+      - sdf_partition
+      - sdf_pivot
+      - sdf_predict
+      - sdf_read_column
+      - sdf_register
+      - sdf_repartition
+      - sdf_residuals
+      - sdf_sample
+      - sdf_separate_column
+      - sdf_seq
+      - sdf_sort
+      - sdf_with_unique_id
+  - title: "Spark Machine Learning"
+    contents:
+      - ml_als_factorization
+      - ml_decision_tree
+      - ml_generalized_linear_regression
+      - ml_gradient_boosted_trees
+      - ml_kmeans
+      - ml_lda
+      - ml_linear_regression
+      - ml_logistic_regression
+      - ml_model_data
+      - ml_multilayer_perceptron
+      - ml_naive_bayes
+      - ml_one_vs_rest
+      - ml_pca
+      - ml_random_forest
+      - ml_survival_regression
+  - title: "Spark Feature Transformers"
+    contents:
+      - ft_binarizer
+      - ft_bucketizer
+      - ft_count_vectorizer
+      - ft_discrete_cosine_transform
+      - ft_elementwise_product
+      - ft_index_to_string
+      - ft_one_hot_encoder
+      - ft_quantile_discretizer
+      - ft_sql_transformer
+      - ft_string_indexer
+      - ft_vector_assembler
+      - ft_tokenizer
+      - ft_regex_tokenizer
+      - ft_count_vectorizer
+  - title: "Spark Machine Learning Utilities"
+    contents:
+      - ml_binary_classification_eval
+      - ml_classification_eval
+      - ml_create_dummy_variables
+      - ml_model
+      - ml_tree_feature_importance
+      - ml_options
+      - ml_prepare_dataframe
+      - ml_prepare_response_features_intercept
+      - ml_saveload
+  - title: "Extensions"
+    contents:
+      - compile_package_jars
+      - connection_config
+      - download_scalac
+      - find_scalac
+      - hive_context
+      - hive_context_config
+      - invoke
+      - java_context
+      - register_extension
+      - spark_compilation_spec
+      - spark_default_compilation_spec
+      - spark_connection
+      - spark_context
+      - spark_context_config
+      - spark_dataframe
+      - spark_dependency
+      - spark_home_set
+      - spark_jobj
+      - spark_session
+      - spark_version
+  - title: "Distributed Computing"
+    contents:
+      - spark_apply
