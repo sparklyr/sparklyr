@@ -20,6 +20,8 @@ navbar:
           href: articles/guides-h2o.html
         - text: "Extensions"
           href: articles/guides-extensions.html
+        - text: "Caching"
+          href: articles/guides-caching.html
         - text: "Distributed R"
           href: articles/guides-distributed-r.html
     - text: "Deployment"
@@ -32,8 +34,6 @@ navbar:
           href: articles/deployment-cdh.html
         - text: "Amazon"
           href: articles/deployment-amazon.html
-        - text: "Performance"
-          href: articles/deployment-performance.html
     - text: "Reference"
       menu:
         - text: "Functions"
@@ -41,7 +41,7 @@ navbar:
         - text: "Cheatsheet"
           href: https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf
         - text: "Media"
-          href: reference/media.html
+          href: articles/reference-media.html
         - text: "News"
           href: news/index.html
   right:
