@@ -38,7 +38,9 @@ core_spark_apply_unbundle <- function(bundle_path, base_path) {
 
   if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)
 
-  system2("tar", c("-xf", bundle_path, "-C", extractPath))
+  if (length(dir(extractPath)) == 0) {
+    system2("tar", c("-xf", bundle_path, "-C", extractPath))
+  }
 
   extractPath
 }
