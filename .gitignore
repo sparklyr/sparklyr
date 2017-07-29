@@ -39,6 +39,6 @@ log4j.spark*
 .classpath
 # H2O Files
 h2ologs/*
-*/h2ologs/*
+**/h2ologs/*
 # IDE stuff
 .project
