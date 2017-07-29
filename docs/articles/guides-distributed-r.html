@@ -137,9 +137,9 @@
 <p>There are two main ways to make use of <code><a href="../reference/spark_apply.html">spark_apply()</a></code>:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Computing over Rows</strong> enables you to transform each row with a custom function.</li>
+<strong>Computing over Rows</strong> enables you to transform rows with a custom function.</li>
 <li>
-<strong>Computing over Groups</strong> enables you to transform a custom group with a custom function.</li>
+<strong>Computing over Groups</strong> enables you to transform groups with a custom function.</li>
 </ol>
 <div id="computing-over-rows" class="section level3">
 <h3 class="hasAnchor">
@@ -151,7 +151,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 
 <span class="kw"><a href="../reference/sdf_len.html">sdf_len</a></span>(sc, <span class="dv">5</span>, <span class="dt">repartition =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) e)</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1782266bb32e3&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_d52834e359e6&gt; [?? x 1]
 ## # Database: spark_connection
 ##      id
 ##   &lt;dbl&gt;
@@ -160,31 +160,31 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 ## 3     3
 ## 4     4
 ## 5     5</code></pre>
-<p>Which returns what you would expect. We can take a look at the class of <code>e</code>:</p>
+<p>Notice that under <code>function(e)</code>, <code>e</code> is a <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html">data frame</a> and <code>function(e)</code> is also expected to return a data frame or, at least, a result that can be casted into a data frame. We can take a look at the class of <code>e</code> by running:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/sdf_len.html">sdf_len</a></span>(sc, <span class="dv">10</span>, <span class="dt">repartition =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">class</span>(e))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1782228c376f2&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_d528407e23d8&gt; [?? x 1]
 ## # Database: spark_connection
 ##           id
 ##        &lt;chr&gt;
 ## 1 data.frame</code></pre>
-<p>Notice that a dataframe is provided which is indended to be used for row-by-row vectorized operations which, as it’s well known, is preffered within R.</p>
-<p>Since Spark provides no guarantees on how the data is partitioned, specially after complex operations are perfomed over a dataset, it is possible and likely that the data will be partitioned in arbitraries ways so, agregation is not suitable for row-by-row operations. Notice that three entries when the data is explicitly partitioned by three:</p>
+<p>Since Spark provides no guarantees on how the data is partitioned, specially after complex operations are perfomed over a dataset, it is possible and likely that the data will be partitioned arbitrarily. For instance, in the following example we will make an explicit request for three partitions and attempt to aggregate the number of rows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/sdf_len.html">sdf_len</a></span>(sc, <span class="dv">100</span>, <span class="dt">repartition =</span> <span class="dv">3</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">nrow</span>(e))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_17822476582d7&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_d5283b24a868&gt; [?? x 1]
 ## # Database: spark_connection
 ##      id
 ##   &lt;int&gt;
 ## 1    33
 ## 2    33
 ## 3    34</code></pre>
-<p>That said, as long as the operations are performed row-by-row, there is significant functionality available. From applying custom function, filtering rows, duplicating rows, or modyfing columns as shown in the following example:</p>
+<p>This operation also returns three rows (one for each partition), which makes the data frame provided by <code>function(e)</code> indended to be used for row-by-row vectorized operations and less suitable for agregation.</p>
+<p>That said, as long as <code>function(e)</code> operates row-by-row, there is still significant functionality made available through <code><a href="../reference/spark_apply.html">spark_apply()</a></code>. For instance, one can apply a custom function, filter rows, duplicate rows, or modify columns as shown below:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris_tbl &lt;-<span class="st"> </span><span class="kw">sdf_copy_to</span>(sc, iris)
 
 iris_tbl <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) e[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>])</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_17822f531159&gt; [?? x 3]
+<span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) e[, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>])</code></pre></div>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_d5284a61ab7a&gt; [?? x 3]
 ## # Database: spark_connection
 ##    Sepal_Length Sepal_Width Petal_Length
 ##           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;
@@ -199,10 +199,10 @@ iris_tbl <span class="op">%&gt;%</span>
 ##  9          4.4         2.9          1.4
 ## 10          4.9         3.1          1.5
 ## # ... with 140 more rows</code></pre>
-<p><code><a href="../reference/spark_apply.html">spark_apply()</a></code> defaults to use the column names from the original Spark dataframe; therefore, if a new column is added, or a rename is needed, the <code>names</code> parameter should be used:</p>
+<p><code><a href="../reference/spark_apply.html">spark_apply()</a></code> defaults to use the column names from the original Spark data frame; therefore, if a new column is added, or a rename is needed, the <code>names</code> parameter should be used:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">cbind</span>(<span class="fl">3.1416</span>, e), <span class="dt">names =</span> <span class="kw">c</span>(<span class="st">"Pi"</span>, <span class="kw">colnames</span>(iris)))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_17822518b86e3&gt; [?? x 6]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_d5282890c4d4&gt; [?? x 6]
 ## # Database: spark_connection
 ##        Pi Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 ##     &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;   &lt;chr&gt;
@@ -224,7 +224,7 @@ iris_tbl <span class="op">%&gt;%</span>
 <p>While working over rows can be really useful, it certainly restricts other use cases. For instance, suppose that you have a very large dataset that requires linear regression to be computed over several subgroups. To solve this, you can make use of the <code>group_by</code> parameter as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">nrow</span>(e), <span class="dt">group_by =</span> <span class="st">"Species"</span>)</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_178225d655561&gt; [?? x 2]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_d5284b6f50e5&gt; [?? x 2]
 ## # Database: spark_connection
 ##      Species Sepal_Length
 ##        &lt;chr&gt;        &lt;int&gt;
@@ -236,7 +236,7 @@ iris_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(
     <span class="cf">function</span>(e) <span class="kw">lm</span>(Petal_Length <span class="op">~</span><span class="st"> </span>Petal_Width, e)<span class="op">$</span>coefficients[[<span class="st">"(Intercept)"</span>]],
     <span class="dt">group_by =</span> <span class="st">"Species"</span>)</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_178225d1c5569&gt; [?? x 2]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_d52835793489&gt; [?? x 2]
 ## # Database: spark_connection
 ##      Species Sepal_Length
 ##        &lt;chr&gt;        &lt;dbl&gt;
@@ -249,22 +249,22 @@ iris_tbl <span class="op">%&gt;%</span>
 <h2 class="hasAnchor">
 <a href="#distributing-packages" class="anchor"></a>Distributing Packages</h2>
 <p>One of the most powerful features to use with <code><a href="../reference/spark_apply.html">spark_apply()</a></code> is the use of any package the R community provides. To use packages, install them before running <code><a href="../reference/spark-connections.html">spark_connect()</a></code>.</p>
-<p>For instance, we can use the <a href="https://cran.r-project.org/package=broom">broom</a> package to create a tidy dataframe out of the linear regression as follows:</p>
+<p>For instance, we can use the <a href="https://cran.r-project.org/package=broom">broom</a> package to create a tidy data frame out of the linear regression as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(
   iris_tbl,
-  <span class="cf">function</span>(e) broom<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/broom/topics/tidy">tidy</a></span>(<span class="kw">lm</span>(Petal_Width <span class="op">~</span><span class="st"> </span>Petal_Length, e)),
+  <span class="cf">function</span>(e) broom<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/broom/topics/tidy">tidy</a></span>(<span class="kw">lm</span>(Petal_Length <span class="op">~</span><span class="st"> </span>Petal_Width, e)),
   <span class="dt">names =</span> <span class="kw">c</span>(<span class="st">"term"</span>, <span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"statistic"</span>, <span class="st">"p.value"</span>),
   <span class="dt">group_by =</span> <span class="st">"Species"</span>)</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_17822150b92c5&gt; [?? x 6]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_d5284e9024cd&gt; [?? x 6]
 ## # Database: spark_connection
-##      Species         term    estimate  std.error  statistic      p.value
-##        &lt;chr&gt;        &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
-## 1 versicolor  (Intercept) -0.08428835 0.16070140 -0.5245029 6.023428e-01
-## 2 versicolor Petal_Length  0.33105360 0.03750041  8.8279995 1.271916e-11
-## 3  virginica  (Intercept)  1.13603130 0.37936622  2.9945505 4.336312e-03
-## 4  virginica Petal_Length  0.16029696 0.06800119  2.3572668 2.253577e-02
-## 5     setosa  (Intercept) -0.04822033 0.12164115 -0.3964146 6.935561e-01
-## 6     setosa Petal_Length  0.20124509 0.08263253  2.4354220 1.863892e-02</code></pre>
+##      Species        term  estimate std.error statistic      p.value
+##        &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+## 1 versicolor (Intercept) 1.7812754 0.2838234  6.276000 9.484134e-08
+## 2 versicolor Petal_Width 1.8693247 0.2117495  8.827999 1.271916e-11
+## 3  virginica (Intercept) 4.2406526 0.5612870  7.555230 1.041600e-09
+## 4  virginica Petal_Width 0.6472593 0.2745804  2.357267 2.253577e-02
+## 5     setosa (Intercept) 1.3275634 0.0599594 22.141037 7.676120e-27
+## 6     setosa Petal_Width 0.5464903 0.2243924  2.435422 1.863892e-02</code></pre>
 <p><code>spark_apply</code> supports packages by copying the contents of your local <code>.libPaths()</code> into each worker node making use of <code>SparkConf.addFile()</code>. It’s not uncommon for R libraries to use hundreds of megabytes of disk space; which means that all this data will be copied once to each worker node and be persisted in each node while the <code>spark_connect</code> connection remains open. However, Spark is a cluster designed for big data processing and can efficiently copying much more data between nodes. This makes the distribution of R packages a relatively small one-time tax usually completed within a couple seconds in most clusters.</p>
 <p>Notice that the <code>packages</code> parameter takes no effect under <code>master="local"</code> since packages already exists in the local machine.</p>
 </div>
