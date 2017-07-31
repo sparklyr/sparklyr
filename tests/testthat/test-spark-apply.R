@@ -99,3 +99,13 @@ test_that("'spark_apply' works with 'group_by' over multiple columns", {
     }
   )
 })
+
+test_that("'spark_apply' works over empty partitions", {
+  expect_equal(
+    sdf_len(sc, 10, repartition = 12) %>%
+      spark_apply(function(e) e) %>%
+      collect() %>%
+      as.data.frame(),
+    data.frame(id = seq_len(10))
+  )
+})
