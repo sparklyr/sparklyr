@@ -135,9 +135,7 @@ spark_connect <- function(master = "local",
                              remote = spark_config_value(
                                config,
                                "sparklyr.gateway.remote",
-                               # running in yarn-cluster mode requires the
-                               # driver to take external connections
-                               TRUE),
+                               spark_master_is_yarn_cluster(master)),
                              extensions = extensions)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,

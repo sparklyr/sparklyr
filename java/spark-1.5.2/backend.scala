@@ -114,12 +114,12 @@ class Backend {
     sc = nsc
   }
 
-  def portIsAvailable(port: Int) = {
+  def portIsAvailable(port: Int, inetAddress: InetAddress) = {
     var ss: ServerSocket = null
     var available = false
 
     Try {
-        ss = new ServerSocket(port, 1, InetAddress.getLoopbackAddress())
+        ss = new ServerSocket(port, 1, inetAddress)
         available = true
     }
 
@@ -164,7 +164,7 @@ class Backend {
     }
 
     try {
-      if (portIsAvailable(port))
+      if (portIsAvailable(port, inetAddress))
       {
         logger.log("found port " + port + " is available")
         logger = new Logger("Gateway", sessionId)
