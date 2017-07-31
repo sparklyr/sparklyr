@@ -70,7 +70,11 @@ spark_worker_apply <- function(sc) {
     data <- group_entry[[1]]
 
     df <- do.call(rbind.data.frame, data)
-    colnames(df) <- columnNames[1: length(colnames(df))]
+
+    if (nrow(df) == 0) {
+      worker_log("found that source has no rows to be proceesed, skipping")
+      next
+    }
 
     closure_params <- length(formals(closure))
     closure_args <- c(
@@ -102,9 +106,14 @@ spark_worker_apply <- function(sc) {
     all_results <- rbind(all_results, result)
   }
 
-  all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
-  worker_invoke(context, "setResultArraySeq", all_data)
-  worker_log("updated ", length(data), " rows")
+  if (!is.null(all_results)) {
+    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
+
+    worker_invoke(context, "setResultArraySeq", all_data)
+    worker_log("updated ", length(data), " rows")
+  } else {
+    worker_log("found no rows in closure result")
+  }
 
   spark_split <- worker_invoke(context, "finish")
   worker_log("finished apply")

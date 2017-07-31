@@ -1,5 +1,7 @@
 # Sparklyr 0.6.1 (UNRELEASED)
 
+- Fixed error triggered while processing empty partitions in `spark_apply()`.
+
 - Fixed slow printing issue caused by `print` calculating the total row count, 
   which is expensive for some tables.
 
