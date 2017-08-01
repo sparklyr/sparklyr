@@ -1,6 +1,10 @@
 # Sparklyr 0.6.1 (UNRELEASED)
 
-- Fixed `sparklyr 0.6` issue blocking concurrent `sparklyr` connections, which required to set `config$sparklyr.gateway.remote = FALSE` as workaround.
+- Fixed slow printing issue caused by `print` calculating the total row count, 
+  which is expensive for some tables.
+
+- Fixed `sparklyr 0.6` issue blocking concurrent `sparklyr` connections, which
+ required to set `config$sparklyr.gateway.remote = FALSE` as workaround.
 
 # Sparklyr 0.6.0
 
