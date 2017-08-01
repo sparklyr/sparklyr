@@ -23,6 +23,30 @@
     "base": "https://d3kbcqa49mib13.cloudfront.net/",
     "pattern": "spark-%s-bin-%s.tgz"
   },
+    {
+    "spark": "1.6.3",
+    "hadoop": "2.6",
+    "base": "https://d3kbcqa49mib13.cloudfront.net/",
+    "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "1.6.3",
+    "hadoop": "2.4",
+    "base": "https://d3kbcqa49mib13.cloudfront.net/",
+    "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "1.6.3",
+    "hadoop": "2.3",
+    "base": "https://d3kbcqa49mib13.cloudfront.net/",
+    "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "1.6.3",
+    "hadoop": "cdh4",
+    "base": "https://d3kbcqa49mib13.cloudfront.net/",
+    "pattern": "spark-%s-bin-%s.tgz"
+  },
   {
     "spark": "1.6.2",
     "hadoop": "2.6",
