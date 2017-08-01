@@ -66,7 +66,7 @@ test_that("spark_read_csv() can read long decimals", {
     path = "test.csv"
   )
 
-  expect_equal(nrow(df), 2)
+  expect_equal(sdf_nrow(df), 2)
 
   file.remove("test.csv")
 })
