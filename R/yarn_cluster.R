@@ -22,7 +22,7 @@ spark_yarn_cluster_get_gateway <- function() {
   )
 
   if (length(yarnResourceManagerAddress) == 0) {
-    stop("Yarn Cluster mode uses `yarn.resourcemanager.address` but is not present in yarn-size.xml")
+    stop("Yarn Cluster mode uses `yarn.resourcemanager.address` but is not present in yarn-site.xml")
   }
 
   strsplit(yarnResourceManagerAddress, ":")[[1]][[1]]
