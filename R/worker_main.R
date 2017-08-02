@@ -35,6 +35,13 @@ spark_worker_hooks <- function() {
   unlock("stop",  as.environment("package:base"))
   assign("stop", function(...) {
     worker_log_error(...)
+
+    frame_names <- list()
+    for (i in seq_len(sys.nframe())) {
+      current_call <- sys.call(i)
+      frame_names[[i]] <- paste(i, ": ", paste(deparse(current_call), collapse = "\n"), sep = "")
+    }
+    worker_log_error("collected callstack: \n", paste(rev(frame_names), collapse = "\n"))
     quit(status = -1)
   }, as.environment("package:base"))
   lock("stop",  as.environment("package:base"))
