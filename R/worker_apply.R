@@ -70,33 +70,36 @@ spark_worker_apply <- function(sc) {
     data <- group_entry[[1]]
 
     df <- do.call(rbind.data.frame, data)
+    result <- NULL
 
     if (nrow(df) == 0) {
-      worker_log("found that source has no rows to be proceesed, skipping")
-      next
+      worker_log("found that source has no rows to be proceesed")
     }
+    else {
+      colnames(df) <- columnNames[1: length(colnames(df))]
 
-    closure_params <- length(formals(closure))
-    closure_args <- c(
-      list(df),
-      as.list(
-        if (nrow(df) > 0)
-          lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
-        else
-          NULL
-      )
-    )[0:closure_params]
+      closure_params <- length(formals(closure))
+      closure_args <- c(
+        list(df),
+        as.list(
+          if (nrow(df) > 0)
+            lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
+          else
+            NULL
+        )
+      )[0:closure_params]
 
-    worker_log("computing closure")
-    result <- do.call(closure, closure_args)
-    worker_log("computed closure")
+      worker_log("computing closure")
+      result <- do.call(closure, closure_args)
+      worker_log("computed closure")
 
-    if (!identical(class(result), "data.frame")) {
-      worker_log("data.frame expected but ", class(result), " found")
-      result <- data.frame(result)
+      if (!identical(class(result), "data.frame")) {
+        worker_log("data.frame expected but ", class(result), " found")
+        result <- data.frame(result)
+      }
+
+      if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
     }
-
-    if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
 
     if (grouped) {
       new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
@@ -108,7 +111,7 @@ spark_worker_apply <- function(sc) {
     all_results <- rbind(all_results, result)
   }
 
-  if (!is.null(all_results) && nrow(all_results) > 0) {
+  if (!is.null(all_results)) {
     worker_log("updating ", nrow(all_results), " rows")
     all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
 
