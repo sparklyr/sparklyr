@@ -5,3 +5,7 @@ sudo: false
 cache: packages
 jdk:
   - oraclejdk8
+r_packages:
+  - covr
+after-success:
+  - Rscript -e 'covr::codecov()'

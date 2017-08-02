@@ -1,5 +1,7 @@
 # Sparklyr 0.6.1 (UNRELEASED)
 
+- Added support for Spark 1.6.3 under `spark_install()`
+
 - `spark_apply()` now logs the current callstack when it fails.
 
 - Fixed error triggered while processing empty partitions in `spark_apply()`.
