@@ -22,7 +22,7 @@ spark_worker_main <- function(sessionId, configRaw) {
     spark_worker_apply(sc)
 
   }, error = function(e) {
-    stop("terminated unexpectedly: ", e)
+    stop("terminated unexpectedly: ", e$message)
   })
 
   worker_log("finished")
@@ -35,6 +35,14 @@ spark_worker_hooks <- function() {
   unlock("stop",  as.environment("package:base"))
   assign("stop", function(...) {
     worker_log_error(...)
+
+    frame_names <- list()
+    frame_start <- max(1, sys.nframe() - 5)
+    for (i in frame_start:sys.nframe()) {
+      current_call <- sys.call(i)
+      frame_names[[1 + i - frame_start]] <- paste(i, ": ", paste(head(deparse(current_call), 5), collapse = "\n"), sep = "")
+    }
+    worker_log_error("collected callstack: \n", paste(rev(frame_names), collapse = "\n"))
     quit(status = -1)
   }, as.environment("package:base"))
   lock("stop",  as.environment("package:base"))

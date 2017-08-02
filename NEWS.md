@@ -1,5 +1,9 @@
 # Sparklyr 0.6.1 (UNRELEASED)
 
+- `spark_apply()` now logs the current callstack when it fails.
+
+- Fixed error triggered while processing empty partitions in `spark_apply()`.
+
 - Fixed slow printing issue caused by `print` calculating the total row count, 
   which is expensive for some tables.
 
