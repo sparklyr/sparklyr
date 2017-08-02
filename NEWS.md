@@ -1,6 +1,6 @@
 # Sparklyr 0.6.1 (UNRELEASED)
 
-- Added support to 
+- `spark_apply()` now logs the current callstack when it fails.
 
 - Fixed error triggered while processing empty partitions in `spark_apply()`.
 
