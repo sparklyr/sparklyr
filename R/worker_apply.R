@@ -107,6 +107,7 @@ spark_worker_apply <- function(sc) {
   }
 
   if (!is.null(all_results)) {
+    worker_log("updating ", length(data), " rows")
     all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
 
     worker_invoke(context, "setResultArraySeq", all_data)
