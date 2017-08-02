@@ -96,6 +96,8 @@ spark_worker_apply <- function(sc) {
       result <- data.frame(result)
     }
 
+    if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
+
     if (grouped) {
       new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
       names(new_column_values) <- grouped_by
@@ -106,12 +108,12 @@ spark_worker_apply <- function(sc) {
     all_results <- rbind(all_results, result)
   }
 
-  if (!is.null(all_results)) {
-    worker_log("updating ", length(data), " rows")
+  if (!is.null(all_results) && nrow(all_results) > 0) {
+    worker_log("updating ", nrow(all_results), " rows")
     all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
 
     worker_invoke(context, "setResultArraySeq", all_data)
-    worker_log("updated ", length(data), " rows")
+    worker_log("updated ", nrow(all_results), " rows")
   } else {
     worker_log("found no rows in closure result")
   }
