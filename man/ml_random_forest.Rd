@@ -5,8 +5,9 @@
 \title{Spark ML -- Random Forests}
 \usage{
 ml_random_forest(x, response, features, col.sample.rate = NULL,
-  max.bins = 32L, max.depth = 5L, min.info.gain = 0, min.rows = 1L,
-  num.trees = 20L, type = c("auto", "regression", "classification"),
+  impurity = c("auto", "gini", "entropy", "variance"), max.bins = 32L,
+  max.depth = 5L, min.info.gain = 0, min.rows = 1L, num.trees = 20L,
+  type = c("auto", "regression", "classification"),
   ml.options = ml_options(), ...)
 }
 \arguments{
@@ -25,6 +26,10 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{col.sample.rate}{The sampling rate of features to consider for splits at each tree node.
 Defaults to 1/3 for regression and sqrt(k)/k for classification where k is number of features.}
+
+\item{impurity}{Criterion used for information gain calculation
+One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to
+'gini' for classification and 'variance' for regression.}
 
 \item{max.bins}{The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at
