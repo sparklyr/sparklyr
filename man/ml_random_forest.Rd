@@ -5,8 +5,8 @@
 \title{Spark ML -- Random Forests}
 \usage{
 ml_random_forest(x, response, features, max.bins = 32L, max.depth = 5L,
-  num.trees = 20L, type = c("auto", "regression", "classification"),
-  ml.options = ml_options(), ...)
+  min.info.gain = 0, num.trees = 20L, type = c("auto", "regression",
+  "classification"), ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -28,6 +28,8 @@ each node. More bins give higher granularity.}
 
 \item{max.depth}{Maximum depth of the tree (>= 0); that is, the maximum
 number of nodes separating any leaves from the root of the tree.}
+
+\item{min.info.gain}{Minimum information gain for a split to be considered at a tree node. Should be >= 0, defaults to 0.}
 
 \item{num.trees}{Number of trees to train (>= 1).}
 

@@ -7,6 +7,7 @@
 #' @template roxlate-ml-features
 #' @template roxlate-ml-decision-trees-max-bins
 #' @template roxlate-ml-decision-trees-max-depth
+#' @template roxlate-ml-decision-trees-min-info-gain
 #' @template roxlate-ml-decision-trees-num-trees
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-options
@@ -20,6 +21,7 @@ ml_random_forest <- function(x,
                              features,
                              max.bins = 32L,
                              max.depth = 5L,
+                             min.info.gain = 0,
                              num.trees = 20L,
                              type = c("auto", "regression", "classification"),
                              ml.options = ml_options(),
@@ -43,6 +45,7 @@ ml_random_forest <- function(x,
 
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
+  min.info.gain <- ensure_scalar_double(min.info.gain)
   num.trees <- ensure_scalar_integer(num.trees)
   type <- match.arg(type)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
@@ -76,6 +79,7 @@ ml_random_forest <- function(x,
     invoke("setLabelCol", envir$response) %>%
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth) %>%
+    invoke("setMinInfoGain", min.info.gain) %>%
     invoke("setNumTrees", num.trees)
 
   if (is.function(ml.options$model.transform))
@@ -96,6 +100,7 @@ ml_random_forest <- function(x,
            response = response,
            max.bins = max.bins,
            max.depth = max.depth,
+           min.info.gain = min.info.gain,
            num.trees = num.trees,
            feature.importances = featureImportances,
            trees = invoke(fit, "trees"),
