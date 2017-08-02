@@ -110,5 +110,5 @@ test_that("ft_quantile_discretizer() works with basic input", {
   grouped <- result %>%
     group_by(Group) %>% summarize(n = n())
 
-  expect_equal(nrow(grouped), 2)
+  expect_equal(sdf_nrow(grouped), 2)
 })
