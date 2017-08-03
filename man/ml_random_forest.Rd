@@ -25,7 +25,9 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 \item{features}{The name of features (terms) to use for the model fit.}
 
 \item{col.sample.rate}{The sampling rate of features to consider for splits at each tree node.
-Defaults to 1/3 for regression and sqrt(k)/k for classification where k is number of features.}
+Defaults to 1/3 for regression and sqrt(k)/k for classification where k is number of features.
+For Spark versions prior to 2.0.0, arbitrary sampling rates are not supported, so the input is
+automatically mapped to one of "onethird", "sqrt", or "log2".}
 
 \item{impurity}{Criterion used for information gain calculation
 One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to

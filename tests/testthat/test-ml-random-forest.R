@@ -3,6 +3,17 @@ sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
 
+test_that("rf runs successfully when all args specified", {
+  expect_error(
+    iris_tbl %>%
+      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
+                       col.sample.rate = 1/3, impurity = "entropy", max.bins = 16L,
+                       max.depth = 3L, min.info.gain = 1e-5, min.rows = 2L,
+                       num.trees = 25L, thresholds = c(1/2, 1/3, 1/4), seed = 42L),
+    NA
+  )
+})
+
 test_that("thresholds parameter behaves as expected", {
   most_predicted_label <- function(x) x %>%
     count(prediction) %>%

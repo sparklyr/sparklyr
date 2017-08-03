@@ -57,7 +57,23 @@ ml_random_forest <- function(x,
   if (!is.null(col.sample.rate)) {
     if (!(col.sample.rate > 0 && col.sample.rate <= 1))
       stop("'col.sample.rate' must be in (0, 1]")
-    col.sample.rate <- ensure_scalar_character(as.character(col.sample.rate))
+    if (spark_version(sc) < "2.0.0") {
+      if (col.sample.rate == 1)
+        col.sample.rate <- "all"
+      else {
+        # Prior to Spark 2.0.0, random forest does not support arbitrary
+        #   column sampling rates. So we map the input to one of the supported
+        #   strategies: "onethird", "sqrt", or "log2".
+        strategies <- dplyr::data_frame(strategy = c("onethird", "sqrt", "log2"),
+                                        rate = c(1/3, sqrt(k)/k, log2(k)/k)) %>%
+          arrange(!! rlang::sym("rate"))
+        col.sample.rate <- strategies[["strategy"]][
+          max(findInterval(col.sample.rate, strategies[["rate"]]), 1)]
+        message("* Using feature subsetting strategy: ", col.sample.rate)
+      }
+    } else {
+      col.sample.rate <- ensure_scalar_character(as.character(col.sample.rate))
+    }
   } else {
     col.sample.rate <- "auto"
   }
