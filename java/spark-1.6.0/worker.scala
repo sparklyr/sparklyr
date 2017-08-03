@@ -86,30 +86,7 @@ object WorkerHelper {
     closureRLang: Array[Byte],
     bundlePath: String): RDD[Row] = {
 
-    val computed: RDD[Row] = new WorkerRDD[Row](
-      rdd,
-      closure,
-      columns,
-      config,
-      port,
-      groupBy,
-      closureRLang,
-      bundlePath)
-
-    computed
-  }
-
-  def computeTestRdd(
-    rdd: RDD[Row],
-    closure: Array[Byte],
-    config: String,
-    port: Int,
-    columns: Array[String],
-    groupBy: Array[String],
-    closureRLang: Array[Byte],
-    bundlePath: String): RDD[Row] = {
-
-    val computed: RDD[Row] = new WorkerTestRDD[Row](
+    val computed: RDD[Row] = new WorkerRDD(
       rdd,
       closure,
       columns,
