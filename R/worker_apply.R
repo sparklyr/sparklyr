@@ -43,7 +43,7 @@ spark_worker_apply <- function(sc) {
   length <- worker_invoke(context, "getSourceArrayLength")
   worker_log("found ", length, " rows")
 
-  groups <- worker_invoke(context, "getSourceArraySeq")
+  groups <- worker_invoke(context, if (grouped) "getSourceArrayGroupedSeq" else "getSourceArraySeq")
   worker_log("retrieved ", length(groups), " rows")
 
   closureRaw <- worker_invoke(context, "getClosure")
@@ -61,15 +61,12 @@ spark_worker_apply <- function(sc) {
 
   columnNames <- worker_invoke(context, "getColumns")
 
-  if (!grouped) groups <- list(list(groups))
+  if (!grouped) groups <- list(groups)
 
   all_results <- NULL
 
   for (group_entry in groups) {
-    # serialized groups are wrapped over single lists
-    data <- group_entry[[1]]
-
-    df <- do.call(rbind.data.frame, data)
+    df <- do.call(rbind.data.frame, group_entry)
     result <- NULL
 
     if (nrow(df) == 0) {
