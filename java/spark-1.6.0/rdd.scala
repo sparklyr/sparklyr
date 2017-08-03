@@ -205,6 +205,16 @@ class WorkerTestRDD[T: ClassTag](
       }
     }.start()
 
+    logger.log("is waiting using lock for RScript to complete")
+    lock.synchronized {
+      lock.wait()
+    }
+    logger.log("completed wait using lock for RScript")
+
+    if (exception.isDefined) {
+      throw exception.get
+    }
+
     val iter: Iterator[T] = firstParent.iterator(split, task)
     val result: Array[T] = iter.toArray
     val dummy:Array[org.apache.spark.sql.Row] = Array(org.apache.spark.sql.Row("a"), org.apache.spark.sql.Row("b"))

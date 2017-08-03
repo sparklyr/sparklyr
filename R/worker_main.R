@@ -1,4 +1,7 @@
 spark_worker_main <- function(sessionId, configRaw) {
+  # Terminate execution to test WorkerTestRDD
+  return()
+
   spark_worker_hooks()
 
   config <- worker_config_deserialize(configRaw)

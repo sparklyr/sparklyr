@@ -1196,6 +1196,9 @@ object Sources {
     "  worker_log_level(..., level = \"ERROR\")\n" +
     "}\n" +
     "spark_worker_main <- function(sessionId, configRaw) {\n" +
+    "  # Terminate execution to test WorkerTestRDD\n" +
+    "  return()\n" +
+    "\n" +
     "  spark_worker_hooks()\n" +
     "\n" +
     "  config <- worker_config_deserialize(configRaw)\n" +
