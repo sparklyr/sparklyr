@@ -134,29 +134,19 @@ spark_apply <- function(x,
     }
   }
 
-  if (test) {
-    rdd <- invoke_static(
-      sc,
-      "sparklyr.WorkerHelper",
-      "computeTestRdd",
-      rdd_base
-    )
-  }
-  else {
-    rdd <- invoke_static(
-      sc,
-      "sparklyr.WorkerHelper",
-      "computeRdd",
-      rdd_base,
-      closure,
-      worker_config,
-      as.integer(worker_port),
-      as.list(sdf_columns),
-      as.list(group_by),
-      closure_rlang,
-      bundle_path
-    )
-  }
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.WorkerHelper",
+    if (test) "computeTestRdd" else "computeRdd",
+    rdd_base,
+    closure,
+    worker_config,
+    as.integer(worker_port),
+    as.list(sdf_columns),
+    as.list(group_by),
+    closure_rlang,
+    bundle_path
+  )
 
   # while workers need to relaunch sparklyr backends, cache by default
   if (memory) rdd <- invoke(rdd, "cache")

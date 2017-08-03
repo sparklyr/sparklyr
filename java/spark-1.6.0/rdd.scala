@@ -113,10 +113,42 @@ class WorkerRDD[T: ClassTag](
   }
 }
 
-class WorkerTestRDD[T: scala.reflect.ClassTag](parent: org.apache.spark.rdd.RDD[T]) extends org.apache.spark.rdd.RDD[T](parent) {
+class WorkerTestRDD[T: ClassTag](
+  prev: RDD[T],
+  closure: Array[Byte],
+  columns: Array[String],
+  config: String,
+  port: Int,
+  groupBy: Array[String],
+  closureRLang: Array[Byte],
+  bundlePath: String
+  ) extends RDD[T](prev) {
 
-  override def getPartitions = parent.partitions
-  override def compute(split: org.apache.spark.Partition, task: org.apache.spark.TaskContext): Iterator[T] = {
+  private[this] var exception: Option[Exception] = None
+
+  override def getPartitions = firstParent.partitions
+
+  override def compute(split: Partition, task: TaskContext): Iterator[T] = {
+    val sessionId: Int = scala.util.Random.nextInt(10000)
+    val logger = new Logger("Worker", sessionId)
+    val lock: AnyRef = new Object()
+
+    val workerContext = new WorkerContext[T](
+      prev,
+      firstParent,
+      split,
+      task,
+      lock,
+      closure,
+      columns,
+      groupBy,
+      closureRLang,
+      bundlePath
+    )
+
+    val contextId = JVMObjectTracker.put(workerContext)
+    logger.log("is tracking worker context under " + contextId)
+
     val iter: Iterator[T] = firstParent.iterator(split, task)
     val result: Array[T] = iter.toArray
     val dummy:Array[org.apache.spark.sql.Row] = Array(org.apache.spark.sql.Row("a"), org.apache.spark.sql.Row("b"))
