@@ -149,6 +149,41 @@ class WorkerTestRDD[T: ClassTag](
     val contextId = JVMObjectTracker.put(workerContext)
     logger.log("is tracking worker context under " + contextId)
 
+    new Thread("starting backend thread") {
+      override def run(): Unit = {
+        try {
+          logger.log("starting backend")
+          val backend: Backend = new Backend()
+
+          /*
+           * initialize backend as worker and service, since exceptions and
+           * closing terminating the r session should not shutdown the process
+           */
+          backend.setType(
+            true,   /* isService */
+            false,  /* isRemote */
+            true    /* isWorker */
+          )
+
+          backend.setHostContext(
+            contextId
+          )
+
+          backend.init(
+            port,
+            sessionId
+          )
+        } catch {
+          case e: Exception =>
+            logger.logError("failed to start backend: ", e)
+            exception = Some(e)
+            lock.synchronized {
+              lock.notify
+            }
+        }
+      }
+    }.start()
+
     val iter: Iterator[T] = firstParent.iterator(split, task)
     val result: Array[T] = iter.toArray
     val dummy:Array[org.apache.spark.sql.Row] = Array(org.apache.spark.sql.Row("a"), org.apache.spark.sql.Row("b"))
