@@ -184,6 +184,27 @@ class WorkerTestRDD[T: ClassTag](
       }
     }.start()
 
+    new Thread("starting rscript thread") {
+      override def run(): Unit = {
+        try {
+          logger.log("is starting rscript")
+
+          val rscript = new Rscript(logger)
+          rscript.init(sessionId, config)
+          lock.synchronized {
+            lock.notify
+          }
+        } catch {
+          case e: Exception =>
+            logger.logError("failed to run rscript: ", e)
+            exception = Some(e)
+            lock.synchronized {
+              lock.notify
+            }
+        }
+      }
+    }.start()
+
     val iter: Iterator[T] = firstParent.iterator(split, task)
     val result: Array[T] = iter.toArray
     val dummy:Array[org.apache.spark.sql.Row] = Array(org.apache.spark.sql.Row("a"), org.apache.spark.sql.Row("b"))
