@@ -65,6 +65,7 @@ spark_apply <- function(x,
                         memory = TRUE,
                         group_by = NULL,
                         packages = TRUE,
+                        test = FALSE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -102,20 +103,9 @@ spark_apply <- function(x,
 
     group_by_list <- as.list(as.integer(colpos - 1))
 
-    grouped_schema <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBySchema", sdf)
     grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
-    grouped_df <- invoke(hive_context(sc), "createDataFrame", grouped_rdd, grouped_schema)
 
-    storage_level <- invoke_static(
-      sc,
-      "org.apache.spark.storage.StorageLevel",
-      ifelse(memory, "MEMORY_AND_DISK", "DISK_ONLY")
-    )
-
-    invoke(grouped_df, "persist", storage_level)
-    invoke(grouped_df, "count")
-
-    rdd_base <- grouped_df %>% invoke("rdd")
+    rdd_base <- grouped_rdd
 
     names <- c(group_by, names)
   }
@@ -144,19 +134,29 @@ spark_apply <- function(x,
     }
   }
 
-  rdd <- invoke_static(
-    sc,
-    "sparklyr.WorkerHelper",
-    "computeRdd",
-    rdd_base,
-    closure,
-    worker_config,
-    as.integer(worker_port),
-    as.list(sdf_columns),
-    as.list(group_by),
-    closure_rlang,
-    bundle_path
-  )
+  if (test) {
+    rdd <- invoke_static(
+      sc,
+      "sparklyr.WorkerHelper",
+      "computeTestRdd",
+      rdd_base
+    )
+  }
+  else {
+    rdd <- invoke_static(
+      sc,
+      "sparklyr.WorkerHelper",
+      "computeRdd",
+      rdd_base,
+      closure,
+      worker_config,
+      as.integer(worker_port),
+      as.list(sdf_columns),
+      as.list(group_by),
+      closure_rlang,
+      bundle_path
+    )
+  }
 
   # while workers need to relaunch sparklyr backends, cache by default
   if (memory) rdd <- invoke(rdd, "cache")

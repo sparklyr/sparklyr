@@ -7,7 +7,7 @@ import org.apache.spark.sql._
 import scala.reflect.ClassTag
 
 class WorkerRDD[T: ClassTag](
-  parent: RDD[T],
+  prev: RDD[T],
   closure: Array[Byte],
   columns: Array[String],
   config: String,
@@ -15,11 +15,11 @@ class WorkerRDD[T: ClassTag](
   groupBy: Array[String],
   closureRLang: Array[Byte],
   bundlePath: String
-  ) extends RDD[T](parent) {
+  ) extends RDD[T](prev) {
 
   private[this] var exception: Option[Exception] = None
 
-  override def getPartitions = parent.partitions
+  override def getPartitions = firstParent.partitions
 
   override def compute(split: Partition, task: TaskContext): Iterator[T] = {
 
@@ -28,7 +28,8 @@ class WorkerRDD[T: ClassTag](
     val lock: AnyRef = new Object()
 
     val workerContext = new WorkerContext[T](
-      parent,
+      prev,
+      firstParent,
       split,
       task,
       lock,
@@ -109,5 +110,17 @@ class WorkerRDD[T: ClassTag](
     }
 
     return workerContext.getResultArray().iterator
+  }
+}
+
+class WorkerTestRDD[T: scala.reflect.ClassTag](parent: org.apache.spark.rdd.RDD[T]) extends org.apache.spark.rdd.RDD[T](parent) {
+
+  override def getPartitions = parent.partitions
+  override def compute(split: org.apache.spark.Partition, task: org.apache.spark.TaskContext): Iterator[T] = {
+    val iter: Iterator[T] = firstParent.iterator(split, task)
+    val result: Array[T] = iter.toArray
+    val dummy:Array[org.apache.spark.sql.Row] = Array(org.apache.spark.sql.Row("a"), org.apache.spark.sql.Row("b"))
+
+    return dummy.map(x => x.asInstanceOf[T]).iterator
   }
 }

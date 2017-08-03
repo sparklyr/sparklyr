@@ -7,7 +7,8 @@ import org.apache.spark.sql._
 import scala.reflect.ClassTag
 
 class WorkerContext[T: ClassTag](
-  rdd: RDD[T],
+  prev: RDD[T],
+  firstParent: RDD[T],
   split: Partition,
   task: TaskContext,
   lock: AnyRef,
@@ -36,7 +37,7 @@ class WorkerContext[T: ClassTag](
   }
 
   def getSourceIterator(): Iterator[T] = {
-    rdd.iterator(split, task)
+    firstParent.iterator(split, task)
   }
 
   def getSourceArray(): Array[T] = {
@@ -85,9 +86,8 @@ object WorkerHelper {
     closureRLang: Array[Byte],
     bundlePath: String): RDD[Row] = {
 
-    val parent: RDD[Row] = rdd
     val computed: RDD[Row] = new WorkerRDD[Row](
-      parent,
+      rdd,
       closure,
       columns,
       config,
@@ -95,6 +95,14 @@ object WorkerHelper {
       groupBy,
       closureRLang,
       bundlePath)
+
+    computed
+  }
+
+  def computeTestRdd(
+    rdd: RDD[Row]): RDD[Row] = {
+
+    val computed: RDD[Row] = new WorkerTestRDD[Row](rdd)
 
     computed
   }
