@@ -5,10 +5,16 @@
 #' @template roxlate-ml-x
 #' @template roxlate-ml-response
 #' @template roxlate-ml-features
+#' @template roxlate-ml-decision-trees-col-sample-rate
+#' @template roxlate-ml-decision-trees-impurity
 #' @template roxlate-ml-decision-trees-max-bins
 #' @template roxlate-ml-decision-trees-max-depth
+#' @template roxlate-ml-decision-trees-min-info-gain
+#' @template roxlate-ml-decision-trees-min-rows
 #' @template roxlate-ml-decision-trees-num-trees
+#' @template roxlate-ml-decision-trees-thresholds
 #' @template roxlate-ml-decision-trees-type
+#' @template roxlate-ml-decision-trees-seed
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -18,9 +24,15 @@
 ml_random_forest <- function(x,
                              response,
                              features,
+                             col.sample.rate = NULL,
+                             impurity = c("auto", "gini", "entropy", "variance"),
                              max.bins = 32L,
                              max.depth = 5L,
+                             min.info.gain = 0,
+                             min.rows = 1L,
                              num.trees = 20L,
+                             thresholds = NULL,
+                             seed = NULL,
                              type = c("auto", "regression", "classification"),
                              ml.options = ml_options(),
                              ...)
@@ -41,11 +53,41 @@ ml_random_forest <- function(x,
     ml.options = ml.options
   )
 
+  col.sample.rate <- ensure_scalar_double(col.sample.rate, allow.null = TRUE)
+  if (!is.null(col.sample.rate)) {
+    if (!(col.sample.rate > 0 && col.sample.rate <= 1))
+      stop("'col.sample.rate' must be in (0, 1]")
+    if (spark_version(sc) < "2.0.0") {
+      if (col.sample.rate == 1)
+        col.sample.rate <- "all"
+      else {
+        # Prior to Spark 2.0.0, random forest does not support arbitrary
+        #   column sampling rates. So we map the input to one of the supported
+        #   strategies: "onethird", "sqrt", or "log2".
+        k <- length(features)
+        strategies <- dplyr::data_frame(strategy = c("onethird", "sqrt", "log2"),
+                                        rate = c(1/3, sqrt(k)/k, log2(k)/k)) %>%
+          arrange(!! rlang::sym("rate"))
+        col.sample.rate <- strategies[["strategy"]][
+          max(findInterval(col.sample.rate, strategies[["rate"]]), 1)]
+        message("* Using feature subsetting strategy: ", col.sample.rate)
+      }
+    } else {
+      col.sample.rate <- ensure_scalar_character(as.character(col.sample.rate))
+    }
+  } else {
+    col.sample.rate <- "auto"
+  }
+
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
+  min.info.gain <- ensure_scalar_double(min.info.gain)
+  min.rows <- ensure_scalar_integer(min.rows)
   num.trees <- ensure_scalar_integer(num.trees)
   type <- match.arg(type)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
+  thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
+  seed <- ensure_scalar_integer(seed, allow.null = TRUE)
 
   envir <- new.env(parent = emptyenv())
 
@@ -60,23 +102,47 @@ ml_random_forest <- function(x,
   schema <- sdf_schema(df)
   responseType <- schema[[response]]$type
 
-  envir$model <- if (identical(type, "regression"))
-    "org.apache.spark.ml.regression.RandomForestRegressor"
-  else if (identical(type, "classification"))
-    "org.apache.spark.ml.classification.RandomForestClassifier"
-  else if (responseType %in% c("DoubleType", "IntegerType"))
-    "org.apache.spark.ml.regression.RandomForestRegressor"
-  else
-    "org.apache.spark.ml.classification.RandomForestClassifier"
+  modelType <- if (identical(type, "regression"))
+    "regression"     else if (identical(type, "classification"))
+    "classification" else if (responseType %in% c("DoubleType", "IntegerType"))
+    "regression"     else
+    "classification"
+
+  envir$model <- ifelse(identical(modelType, "regression"),
+                        "org.apache.spark.ml.regression.RandomForestRegressor",
+                        "org.apache.spark.ml.classification.RandomForestClassifier")
+
+  impurity <- rlang::arg_match(impurity)
+  impurity <- if (identical(impurity, "auto")) {
+    ifelse(identical(modelType, "regression"), "variance", "gini")
+  } else if (identical(modelType, "classification")) {
+    if (!impurity %in% c("gini", "entropy"))
+      stop("'impurity' must be 'gini' or 'entropy' for classification")
+    impurity
+  } else {
+    if (!identical(impurity, "variance"))
+      stop("'impurity' must be 'variance' for regression")
+    impurity
+  }
 
   rf <- invoke_new(sc, envir$model)
 
   model <- rf %>%
+    invoke("setFeatureSubsetStrategy", col.sample.rate) %>%
     invoke("setFeaturesCol", envir$features) %>%
+    invoke("setImpurity", impurity) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth) %>%
+    invoke("setMinInfoGain", min.info.gain) %>%
+    invoke("setMinInstancesPerNode", min.rows) %>%
     invoke("setNumTrees", num.trees)
+
+  if (!is.null(thresholds))
+    model <- invoke(model, "setThresholds", thresholds)
+
+  if (!is.null(seed))
+    model <- invoke(model, "setSeed", seed)
 
   if (is.function(ml.options$model.transform))
     model <- ml.options$model.transform(model)
@@ -94,9 +160,15 @@ ml_random_forest <- function(x,
   ml_model("random_forest", fit,
            features = features,
            response = response,
+           col.sample.rate = col.sample.rate,
+           impurity = impurity,
            max.bins = max.bins,
            max.depth = max.depth,
+           min.info.gain = min.info.gain,
+           min.rows = min.rows,
            num.trees = num.trees,
+           thresholds = unlist(thresholds),
+           seed = seed,
            feature.importances = featureImportances,
            trees = invoke(fit, "trees"),
            data = df,

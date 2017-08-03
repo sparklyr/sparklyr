@@ -1,5 +1,8 @@
 # Sparklyr 0.6.1 (UNRELEASED)
 
+- Added to `ml_random_forest()` the following hyperparameter arguments:
+  `min.info.gain`, `col.sample.rate`, `min.rows`, `impurity`, and `thresholds`. Also added `seed` for reproducibility.
+
 - Added support for Spark 1.6.3 under `spark_install()`
 
 - `spark_apply()` now logs the current callstack when it fails.
