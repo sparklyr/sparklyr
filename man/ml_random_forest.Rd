@@ -7,8 +7,8 @@
 ml_random_forest(x, response, features, col.sample.rate = NULL,
   impurity = c("auto", "gini", "entropy", "variance"), max.bins = 32L,
   max.depth = 5L, min.info.gain = 0, min.rows = 1L, num.trees = 20L,
-  thresholds = NULL, type = c("auto", "regression", "classification"),
-  ml.options = ml_options(), ...)
+  thresholds = NULL, seed = NULL, type = c("auto", "regression",
+  "classification"), ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -49,6 +49,8 @@ the probability of predicting each class. Vector must have length equal
 to the number of classes, with values > 0 excepting that at most one
 value may be 0. The class with largest value p/t is predicted, where p
 is the original probability of that class and t is the class's threshold.}
+
+\item{seed}{Seed for random numbers.}
 
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response

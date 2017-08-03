@@ -62,3 +62,21 @@ test_that("error for bad impurity specification", {
     "'impurity' must be 'variance' for regression"
   )
 })
+
+test_that("random seed setting works", {
+  model_string <- function(x) x$.model %>%
+    invoke("toDebugString") %>%
+    strsplit("\n") %>%
+    unlist() %>%
+    tail(-1)
+
+  m1 <- iris_tbl %>%
+    ml_random_forest(Species ~ Sepal_Width, type = "classification",
+                     seed = 42L)
+
+  m2 <- iris_tbl %>%
+    ml_random_forest(Species ~ Sepal_Width, type = "classification",
+                     seed = 42L)
+
+  expect_equal(model_string(m1), model_string(m2))
+})
