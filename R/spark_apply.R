@@ -51,6 +51,10 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'
 #' @param x An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.
 #' @param f A function that transforms a data frame partition into a data frame.
+#'   The function \code{f} has signature \code{f(df, group1, group2, ...)} where
+#'   \code{df} is a data frame with the data to be processed and \code{group1} to
+#'   \code{groupN} contain the values of the \code{group_by} values. When
+#'   \code{group_by} is not specified, \code{f} takes only one argument.
 #' @param names The column names for the transformed object, defaults to the
 #'   names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
