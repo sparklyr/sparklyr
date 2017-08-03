@@ -14,6 +14,23 @@ test_that("rf runs successfully when all args specified", {
   )
 })
 
+test_that("col.sample.rate maps to correct strategy", {
+  if (spark_version(sc) >= "2.0.0") skip("not applicable to 2.0+")
+  expect_message(
+    iris_tbl %>%
+      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
+                       col.sample.rate = 1/3),
+    "Using feature subsetting strategy: onethird"
+  )
+
+  expect_message(
+    iris_tbl %>%
+      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
+                       col.sample.rate = 0.001),
+    "Using feature subsetting strategy: log2"
+  )
+})
+
 test_that("thresholds parameter behaves as expected", {
   most_predicted_label <- function(x) x %>%
     count(prediction) %>%
@@ -41,6 +58,7 @@ test_that("thresholds parameter behaves as expected", {
 })
 
 test_that("error for thresholds with wrong length", {
+  if (spark_version(sc) < "2.1.0") skip("threshold length checking implemented in 2.1.0")
   expect_error(
     iris_tbl %>%
       ml_random_forest(Species ~ Sepal_Width, type = "classification",
