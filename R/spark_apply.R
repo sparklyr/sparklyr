@@ -65,7 +65,6 @@ spark_apply <- function(x,
                         memory = TRUE,
                         group_by = NULL,
                         packages = TRUE,
-                        test = FALSE,
                         ...) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -137,7 +136,7 @@ spark_apply <- function(x,
   rdd <- invoke_static(
     sc,
     "sparklyr.WorkerHelper",
-    if (test) "computeTestRdd" else "computeRdd",
+    "computeRdd",
     rdd_base,
     closure,
     worker_config,
