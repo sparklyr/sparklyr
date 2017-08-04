@@ -49,7 +49,8 @@ ml_pca <- function(x,
 
   model <- pca %>%
     invoke("setK", k) %>%
-    invoke("setInputCol", envir$features)
+    invoke("setInputCol", envir$features) %>%
+    invoke("setOutputCol", envir$output)
 
   if (is.function(ml.options$model.transform))
     model <- ml.options$model.transform(model)
