@@ -87,7 +87,7 @@ ml_pca <- function(x,
     names(explainedVariance) <- pcNames
 
   ml_model("pca", fit,
-           K,
+           k = k,
            components = components,
            explained.variance = explainedVariance,
            data = df,
