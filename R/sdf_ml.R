@@ -234,6 +234,7 @@ sdf_project <- function(object, newdata,
   if (missing(newdata) || is.null(newdata))
     newdata <- object$data
 
+  id.column <- object$ml.options$id.column
   features.column <- object$ml.options$features.column
   output.column <- object$ml.options$output.column
 
@@ -244,8 +245,10 @@ sdf_project <- function(object, newdata,
 
   object$.model %>%
     invoke("transform", sdf) %>%
+    invoke("drop", id.column) %>%
+    invoke("drop", features.column) %>%
     sdf_register() %>%
     sdf_separate_column(output.column,
                         into = paste0(feature.prefix, seq_len(object$k))) %>%
-    select(-one_of(c(features.column, output.column)))
+    select(-!!rlang::sym(output.column))
 }
