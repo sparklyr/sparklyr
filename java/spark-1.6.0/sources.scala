@@ -957,7 +957,7 @@ object Sources {
     "  length <- worker_invoke(context, \"getSourceArrayLength\")\n" +
     "  worker_log(\"found \", length, \" rows\")\n" +
     "\n" +
-    "  groups <- worker_invoke(context, \"getSourceArraySeq\")\n" +
+    "  groups <- worker_invoke(context, if (grouped) \"getSourceArrayGroupedSeq\" else \"getSourceArraySeq\")\n" +
     "  worker_log(\"retrieved \", length(groups), \" rows\")\n" +
     "\n" +
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
@@ -1066,7 +1066,7 @@ object Sources {
     "\n" +
     "  extractPath\n" +
     "}\n" +
-    "spark_worker_connect <- function(sessionId, config) {\n" +
+    "spark_worker_connect <- function(sessionId, config = list()) {\n" +
     "  gatewayPort <- spark_config_value(config, \"sparklyr.worker.gateway.port\", 8880)\n" +
     "  gatewayAddress <- spark_config_value(config, \"sparklyr.worker.gateway.address\", \"localhost\")\n" +
     "  config <- list()\n" +
@@ -1195,10 +1195,7 @@ object Sources {
     "worker_log_error <- function(...) {\n" +
     "  worker_log_level(..., level = \"ERROR\")\n" +
     "}\n" +
-    "spark_worker_main <- function(sessionId, configRaw) {\n" +
-    "  # Terminate execution to test WorkerTestRDD\n" +
-    "  return()\n" +
-    "\n" +
+    "spark_worker_main <- function(sessionId, configRaw = worker_config_serialize(list())) {\n" +
     "  spark_worker_hooks()\n" +
     "\n" +
     "  config <- worker_config_deserialize(configRaw)\n" +
