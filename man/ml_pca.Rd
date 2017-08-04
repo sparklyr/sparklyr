@@ -4,7 +4,8 @@
 \alias{ml_pca}
 \title{Spark ML -- Principal Components Analysis}
 \usage{
-ml_pca(x, features = tbl_vars(x), ml.options = ml_options(), ...)
+ml_pca(x, features = tbl_vars(x), k = length(features),
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -12,6 +13,8 @@ ml_pca(x, features = tbl_vars(x), ml.options = ml_options(), ...)
 
 \item{features}{The columns to use in the principal components
 analysis. Defaults to all columns in \code{x}.}
+
+\item{k}{The number of principal components.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
