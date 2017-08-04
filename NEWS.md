@@ -1,6 +1,12 @@
 # Sparklyr 0.6.1 (UNRELEASED)
 
-- Added support for Spark 1.6.3 under `spark_install()`
+- `spark_apply()` now supports explicit column types using the `columns`
+  argument to avoid sampling types.
+
+- `spark_apply()` with `group_by` no longer requires persisting to disk
+  nor memory.
+
+- Added support for Spark 1.6.3 under `spark_install()`.
 
 - `spark_apply()` now logs the current callstack when it fails.
 
