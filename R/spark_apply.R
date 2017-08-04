@@ -1,4 +1,11 @@
 spark_schema_from_rdd <- function(sc, rdd, column_names) {
+  columns_typed <- length(names(column_names)) > 0
+
+  if (columns_typed) {
+    schema <- spark_data_build_types(sc, column_names)
+    return(schema)
+  }
+
   sampleRows <- rdd %>% invoke(
     "take",
     sparklyr::ensure_scalar_integer(
@@ -55,8 +62,8 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'   \code{df} is a data frame with the data to be processed and \code{group1} to
 #'   \code{groupN} contain the values of the \code{group_by} values. When
 #'   \code{group_by} is not specified, \code{f} takes only one argument.
-#' @param names The column names for the transformed object, defaults to the
-#'   names from the original object.
+#' @param columns A vector of column names or a named vector of column types for
+#'   the transformed object. Defaults to the names from the original object.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
 #' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
@@ -65,11 +72,12 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #' @export
 spark_apply <- function(x,
                         f,
-                        names = colnames(x),
+                        columns = colnames(x),
                         memory = TRUE,
                         group_by = NULL,
                         packages = TRUE,
                         ...) {
+  args <- list(...)
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
@@ -77,6 +85,13 @@ spark_apply <- function(x,
   grouped <- !is.null(group_by)
   args <- list(...)
   rlang <- spark_config_value(x$sc, "sparklyr.closures.rlang", FALSE)
+
+  # backward compatible support for names argument from 0.6
+  if (!is.null(args$names)) {
+    columns <- args$names
+  }
+
+  columns_typed <- length(names(columns)) > 0
 
   if (rlang) warning("The `rlang` parameter is under active development.")
 
@@ -110,7 +125,9 @@ spark_apply <- function(x,
 
     rdd_base <- grouped_rdd
 
-    names <- c(group_by, names)
+    if (!columns_typed) {
+      columns <- c(group_by, columns)
+    }
   }
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
@@ -154,7 +171,7 @@ spark_apply <- function(x,
   # while workers need to relaunch sparklyr backends, cache by default
   if (memory) rdd <- invoke(rdd, "cache")
 
-  schema <- spark_schema_from_rdd(sc, rdd, names)
+  schema <- spark_schema_from_rdd(sc, rdd, columns)
 
   transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
 
