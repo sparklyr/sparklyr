@@ -213,3 +213,39 @@ sdf_partition <- function(x,
   names(registered) <- nm
   registered
 }
+
+#' Project features onto principal components
+#'
+#' @template roxlate-sdf
+#' @param object A Spark PCA model object
+#' @param newdata An object coercible to a Spark DataFrame
+#' @param features A vector of names of columns to be projected
+#' @param feature.prefix The prefix used in naming the output features
+#' @param ... Optional arguments; currently unused.
+#'
+#' @export
+sdf_project <- function(object, newdata,
+                        features = dimnames(object$components)[[1]],
+                        feature.prefix = "PC", ...) {
+
+  ensure_scalar_character(feature.prefix)
+
+  # when newdata is not supplied, attempt to use original dataset
+  if (missing(newdata) || is.null(newdata))
+    newdata <- object$data
+
+  features.column <- object$ml.options$features.column
+  output.column <- object$ml.options$output.column
+
+  sdf <- ml_prepare_dataframe(newdata,
+                       features = features,
+                       ml.options = ml_options(features.column = features.column)
+  )
+
+  object$.model %>%
+    invoke("transform", sdf) %>%
+    sdf_register() %>%
+    sdf_separate_column(output.column,
+                        into = paste0(feature.prefix, seq_len(object$k))) %>%
+    select(-one_of(c(features.column, output.column)))
+}
