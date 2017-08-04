@@ -61,12 +61,15 @@ spark_worker_apply <- function(sc) {
 
   columnNames <- worker_invoke(context, "getColumns")
 
-  if (!grouped) groups <- list(groups)
+  if (!grouped) groups <- list(list(groups))
 
   all_results <- NULL
 
   for (group_entry in groups) {
-    df <- do.call(rbind.data.frame, group_entry)
+    # serialized groups are wrapped over single lists
+    data <- group_entry[[1]]
+
+    df <- do.call(rbind.data.frame, data)
     result <- NULL
 
     if (nrow(df) == 0) {
