@@ -43,7 +43,7 @@ spark_worker_apply <- function(sc) {
   length <- worker_invoke(context, "getSourceArrayLength")
   worker_log("found ", length, " rows")
 
-  groups <- worker_invoke(context, "getSourceArraySeq")
+  groups <- worker_invoke(context, if (grouped) "getSourceArrayGroupedSeq" else "getSourceArraySeq")
   worker_log("retrieved ", length(groups), " rows")
 
   closureRaw <- worker_invoke(context, "getClosure")
@@ -121,7 +121,6 @@ spark_worker_apply <- function(sc) {
     worker_log("found no rows in closure result")
   }
 
-  spark_split <- worker_invoke(context, "finish")
   worker_log("finished apply")
 }
 

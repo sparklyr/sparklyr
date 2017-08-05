@@ -1,7 +1,21 @@
-# Sparklyr 0.6.1 (UNRELEASED)
+# Sparklyr 0.7 (UNRELEASE)
 
 - Added to `ml_random_forest()` the following hyperparameter arguments:
   `min.info.gain`, `col.sample.rate`, `min.rows`, `impurity`, and `thresholds`. Also added `seed` for reproducibility.
+
+# Sparklyr 0.6.1 (UNRELEASED)
+
+- Fixed error in `spark_apply()` that may triggered when multiple CPUs
+  are used in a single node due to race conditions while accesing the
+  gateway service and another in the `JVMObjectTracker`.
+
+- `spark_apply()` now supports explicit column types using the `columns`
+  argument to avoid sampling types.
+
+- `spark_apply()` with `group_by` no longer requires persisting to disk
+  nor memory.
+
+- Added support for Spark 1.6.3 under `spark_install()`.
 
 - Added support for Spark 1.6.3 under `spark_install()`
 

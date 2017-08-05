@@ -9,6 +9,7 @@ object JVMObjectTracker {
                              SynchronizedMap[String, Object]
 
   private[this] var objCounter: Int = 0
+  private[this] val lock: AnyRef = new Object()
 
   def getObject(id: String): Object = {
     objMap(id)
@@ -19,10 +20,12 @@ object JVMObjectTracker {
   }
 
   def put(obj: Object): String = {
-    val objId = objCounter.toString
-    objCounter = objCounter + 1
-    objMap.put(objId, obj)
-    objId
+    lock.synchronized {
+      val objId = objCounter.toString
+      objCounter = objCounter + 1
+      objMap.put(objId, obj)
+      objId
+    }
   }
 
   def remove(id: String): Option[Object] = {

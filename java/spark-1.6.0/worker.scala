@@ -4,12 +4,8 @@ import org.apache.spark._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 
-import scala.reflect.ClassTag
-
-class WorkerContext[T: ClassTag](
-  rdd: RDD[T],
-  split: Partition,
-  task: TaskContext,
+class WorkerContext(
+  sourceArray: Array[Row],
   lock: AnyRef,
   closure: Array[Byte],
   columns: Array[String],
@@ -17,7 +13,7 @@ class WorkerContext[T: ClassTag](
   closureRLang: Array[Byte],
   bundlePath: String) {
 
-  private var result: Array[T] = Array[T]()
+  private var result: Array[Row] = Array[Row]()
 
   def getClosure(): Array[Byte] = {
     closure
@@ -35,31 +31,27 @@ class WorkerContext[T: ClassTag](
     groupBy
   }
 
-  def getSourceIterator(): Iterator[T] = {
-    rdd.iterator(split, task)
-  }
-
-  def getSourceArray(): Array[T] = {
-    getSourceIterator.toArray
+  def getSourceArray(): Array[Row] = {
+    sourceArray
   }
 
   def getSourceArrayLength(): Int = {
-    getSourceIterator.toArray.length
+    getSourceArray.length
   }
 
   def getSourceArraySeq(): Array[Seq[Any]] = {
-    getSourceArray.map(x => x.asInstanceOf[Row].toSeq)
+    getSourceArray.map(x => x.toSeq)
   }
 
-  def setResultArray(resultParam: Array[T]) = {
-    result = resultParam
+  def getSourceArrayGroupedSeq(): Array[Array[Array[Any]]] = {
+    getSourceArray.map(x => x.toSeq.map(g => g.asInstanceOf[Seq[Any]].toArray).toArray)
   }
 
   def setResultArraySeq(resultParam: Array[Any]) = {
-    result = resultParam.map(x => Row.fromSeq(x.asInstanceOf[Array[_]].toSeq).asInstanceOf[T])
+    result = resultParam.map(x => Row.fromSeq(x.asInstanceOf[Array[_]].toSeq))
   }
 
-  def getResultArray(): Array[T] = {
+  def getResultArray(): Array[Row] = {
     result
   }
 
@@ -85,9 +77,8 @@ object WorkerHelper {
     closureRLang: Array[Byte],
     bundlePath: String): RDD[Row] = {
 
-    val parent: RDD[Row] = rdd
-    val computed: RDD[Row] = new WorkerRDD[Row](
-      parent,
+    val computed: RDD[Row] = new WorkerRDD(
+      rdd,
       closure,
       columns,
       config,

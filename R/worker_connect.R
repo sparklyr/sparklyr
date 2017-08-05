@@ -1,5 +1,10 @@
-spark_worker_connect <- function(sessionId, config) {
-  gatewayPort <- spark_config_value(config, "sparklyr.worker.gateway.port", 8880)
+spark_worker_connect <- function(
+  sessionId,
+  backendPort = 8880,
+  config = list()) {
+
+  gatewayPort <- spark_config_value(config, "sparklyr.worker.gateway.port", backendPort)
+
   gatewayAddress <- spark_config_value(config, "sparklyr.worker.gateway.address", "localhost")
   config <- list()
 
