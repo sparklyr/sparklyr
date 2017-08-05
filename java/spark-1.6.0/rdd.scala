@@ -86,7 +86,7 @@ class WorkerRDD(
           logger.log("is starting rscript")
 
           val rscript = new Rscript(logger)
-          rscript.init(sessionId, config)
+          rscript.init(sessionId, backendPort, config)
           lock.synchronized {
             lock.notify
           }
