@@ -47,10 +47,6 @@ class WorkerContext(
     getSourceArray.map(x => x.toSeq.map(g => g.asInstanceOf[Seq[Any]].toArray).toArray)
   }
 
-  def setResultArray(resultParam: Array[Row]) = {
-    result = resultParam
-  }
-
   def setResultArraySeq(resultParam: Array[Any]) = {
     result = resultParam.map(x => Row.fromSeq(x.asInstanceOf[Array[_]].toSeq))
   }
