@@ -1,5 +1,9 @@
 # Sparklyr 0.6.1 (UNRELEASED)
 
+- Fixed error in `spark_apply()` that may triggered when multiple CPUs
+  are used in a single node due to race conditions while accesing the
+  gateway service and another in the `JVMObjectTracker`.
+
 - `spark_apply()` now supports explicit column types using the `columns`
   argument to avoid sampling types.
 

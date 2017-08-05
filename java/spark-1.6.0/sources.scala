@@ -1035,7 +1035,6 @@ object Sources {
     "    worker_log(\"found no rows in closure result\")\n" +
     "  }\n" +
     "\n" +
-    "  spark_split <- worker_invoke(context, \"finish\")\n" +
     "  worker_log(\"finished apply\")\n" +
     "}\n" +
     "\n" +
@@ -1066,8 +1065,13 @@ object Sources {
     "\n" +
     "  extractPath\n" +
     "}\n" +
-    "spark_worker_connect <- function(sessionId, config = list()) {\n" +
-    "  gatewayPort <- spark_config_value(config, \"sparklyr.worker.gateway.port\", 8880)\n" +
+    "spark_worker_connect <- function(\n" +
+    "  sessionId,\n" +
+    "  backendPort = 8880,\n" +
+    "  config = list()) {\n" +
+    "\n" +
+    "  gatewayPort <- spark_config_value(config, \"sparklyr.worker.gateway.port\", backendPort)\n" +
+    "\n" +
     "  gatewayAddress <- spark_config_value(config, \"sparklyr.worker.gateway.address\", \"localhost\")\n" +
     "  config <- list()\n" +
     "\n" +
@@ -1195,7 +1199,11 @@ object Sources {
     "worker_log_error <- function(...) {\n" +
     "  worker_log_level(..., level = \"ERROR\")\n" +
     "}\n" +
-    "spark_worker_main <- function(sessionId, configRaw = worker_config_serialize(list())) {\n" +
+    "spark_worker_main <- function(\n" +
+    "  sessionId,\n" +
+    "  backendPort = 8880,\n" +
+    "  configRaw = worker_config_serialize(list())) {\n" +
+    "\n" +
     "  spark_worker_hooks()\n" +
     "\n" +
     "  config <- worker_config_deserialize(configRaw)\n" +
@@ -1213,7 +1221,7 @@ object Sources {
     "\n" +
     "  tryCatch({\n" +
     "\n" +
-    "    sc <- spark_worker_connect(sessionId, config)\n" +
+    "    sc <- spark_worker_connect(sessionId, backendPort, config)\n" +
     "    worker_log(\"is connected\")\n" +
     "\n" +
     "    spark_worker_apply(sc)\n" +
