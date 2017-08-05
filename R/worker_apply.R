@@ -121,7 +121,6 @@ spark_worker_apply <- function(sc) {
     worker_log("found no rows in closure result")
   }
 
-  spark_split <- worker_invoke(context, "finish")
   worker_log("finished apply")
 }
 
