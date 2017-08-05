@@ -71,7 +71,7 @@ class WorkerRDD(
           backend.run()
         } catch {
           case e: Exception =>
-            logger.logError("failed to start backend: ", e)
+            logger.logError("failed while running backend: ", e)
             exception = Some(e)
             lock.synchronized {
               lock.notify
@@ -111,6 +111,7 @@ class WorkerRDD(
       throw exception.get
     }
 
+    logger.log("is returning RDD iterator with " + workerContext.getResultArray().length + " rows")
     return workerContext.getResultArray().iterator
   }
 }
