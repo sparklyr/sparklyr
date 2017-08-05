@@ -110,6 +110,10 @@ class Backend {
     sc
   }
 
+  def getPort(): Int = {
+    port
+  }
+
   def setSparkContext(nsc: SparkContext): Unit = {
     sc = nsc
   }
@@ -191,7 +195,20 @@ class Backend {
       }
 
       gatewayServerSocket.setSoTimeout(0)
+    } catch {
+      case e: IOException =>
+        logger.logError("is shutting down from init() with exception ", e)
+        if (!isService) System.exit(1)
+    }
 
+    // Delay load workers to retrieve ports from backend
+    if (!isWorker) run()
+
+    if (!isService) System.exit(0)
+  }
+
+  def run(): Unit = {
+    try {
       while(isRunning) {
         bind()
       }
@@ -200,11 +217,9 @@ class Backend {
         logger.log("is shutting down with expected SocketException")
         if (!isService) System.exit(1)
       case e: IOException =>
-        logger.logError("is shutting down with exception ", e)
+        logger.logError("is shutting down from run() with exception ", e)
         if (!isService) System.exit(1)
     }
-
-    if (!isService) System.exit(0)
   }
 
   def bind(): Unit = {

@@ -16,6 +16,7 @@ class WorkerRDD(
   ) extends RDD[Row](prev) {
 
   private[this] var exception: Option[Exception] = None
+  private[this] var backendPort: Int = 0
 
   override def getPartitions = firstParent.partitions
 
@@ -38,30 +39,36 @@ class WorkerRDD(
     val contextId = JVMObjectTracker.put(workerContext)
     logger.log("is tracking worker context under " + contextId)
 
+    logger.log("initializing backend")
+    val backend: Backend = new Backend()
+
+    /*
+     * initialize backend as worker and service, since exceptions and
+     * terminating the r session should not shutdown the process
+     */
+    backend.setType(
+      true,   /* isService */
+      false,  /* isRemote */
+      true    /* isWorker */
+    )
+
+    backend.setHostContext(
+      contextId
+    )
+
+    backend.init(
+      port,
+      sessionId
+    )
+
+    backendPort = backend.getPort()
+
     new Thread("starting backend thread") {
       override def run(): Unit = {
         try {
           logger.log("starting backend")
-          val backend: Backend = new Backend()
 
-          /*
-           * initialize backend as worker and service, since exceptions and
-           * closing terminating the r session should not shutdown the process
-           */
-          backend.setType(
-            true,   /* isService */
-            false,  /* isRemote */
-            true    /* isWorker */
-          )
-
-          backend.setHostContext(
-            contextId
-          )
-
-          backend.init(
-            port,
-            sessionId
-          )
+          backend.run()
         } catch {
           case e: Exception =>
             logger.logError("failed to start backend: ", e)

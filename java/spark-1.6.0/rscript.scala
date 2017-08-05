@@ -22,7 +22,7 @@ class Rscript(logger: Logger) {
     tempFile.getAbsolutePath()
   }
 
-  def init(sessionId: Int, config: String) = {
+  def init(sessionId: Int, backendPort: Int, config: String) = {
     val sparkConf = SparkEnv.get.conf
     val command: String = sparkConf.get("spark.r.command", "Rscript")
 
@@ -37,6 +37,7 @@ class Rscript(logger: Logger) {
       "--vanilla",
       sourceFilePath,
       sessionId.toString,
+      backendPort.toString,
       config
     ))
 

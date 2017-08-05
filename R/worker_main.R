@@ -1,4 +1,8 @@
-spark_worker_main <- function(sessionId, configRaw = worker_config_serialize(list())) {
+spark_worker_main <- function(
+  sessionId,
+  backendPort = 8880,
+  configRaw = worker_config_serialize(list())) {
+
   spark_worker_hooks()
 
   config <- worker_config_deserialize(configRaw)
@@ -16,7 +20,7 @@ spark_worker_main <- function(sessionId, configRaw = worker_config_serialize(lis
 
   tryCatch({
 
-    sc <- spark_worker_connect(sessionId, config)
+    sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
     spark_worker_apply(sc)
