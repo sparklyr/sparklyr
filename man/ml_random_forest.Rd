@@ -4,9 +4,11 @@
 \alias{ml_random_forest}
 \title{Spark ML -- Random Forests}
 \usage{
-ml_random_forest(x, response, features, max.bins = 32L, max.depth = 5L,
-  num.trees = 20L, type = c("auto", "regression", "classification"),
-  ml.options = ml_options(), ...)
+ml_random_forest(x, response, features, col.sample.rate = NULL,
+  impurity = c("auto", "gini", "entropy", "variance"), max.bins = 32L,
+  max.depth = 5L, min.info.gain = 0, min.rows = 1L, num.trees = 20L,
+  thresholds = NULL, seed = NULL, type = c("auto", "regression",
+  "classification"), ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -22,6 +24,15 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{features}{The name of features (terms) to use for the model fit.}
 
+\item{col.sample.rate}{The sampling rate of features to consider for splits at each tree node.
+Defaults to 1/3 for regression and sqrt(k)/k for classification where k is number of features.
+For Spark versions prior to 2.0.0, arbitrary sampling rates are not supported, so the input is
+automatically mapped to one of "onethird", "sqrt", or "log2".}
+
+\item{impurity}{Criterion used for information gain calculation
+One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to
+'gini' for classification and 'variance' for regression.}
+
 \item{max.bins}{The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at
 each node. More bins give higher granularity.}
@@ -29,7 +40,19 @@ each node. More bins give higher granularity.}
 \item{max.depth}{Maximum depth of the tree (>= 0); that is, the maximum
 number of nodes separating any leaves from the root of the tree.}
 
+\item{min.info.gain}{Minimum information gain for a split to be considered at a tree node. Should be >= 0, defaults to 0.}
+
+\item{min.rows}{Minimum number of instances each child must have after split.}
+
 \item{num.trees}{Number of trees to train (>= 1).}
+
+\item{thresholds}{Thresholds in multi-class classification to adjust
+the probability of predicting each class. Vector must have length equal
+to the number of classes, with values > 0 excepting that at most one
+value may be 0. The class with largest value p/t is predicted, where p
+is the original probability of that class and t is the class's threshold.}
+
+\item{seed}{Seed for random numbers.}
 
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response
