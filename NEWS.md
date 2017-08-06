@@ -1,4 +1,4 @@
-# Sparklyr 0.6.1 (UNRELEASED)
+# Sparklyr 0.6.1
 
 - Fixed error in `spark_apply()` that may triggered when multiple CPUs
   are used in a single node due to race conditions while accesing the
