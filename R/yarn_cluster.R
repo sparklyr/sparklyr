@@ -61,8 +61,25 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
   propertyValue
 }
 
+spark_yarn_cluster_get_resource_manager_webapp() {
+  rmHighAvailabilityId <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.id")
+
+  mainRMWebapp <- "yarn.resourcemanager.webapp.address"
+  if (length(rmHighAvailabilityId) > 0) {
+    mainRMWebapp <- paste(
+      "yarn.resourcemanager.webapp.address.",
+      resourceManagerHighAvailabilityId,
+      sep = ""
+    )
+  }
+
+  mainRMWebapp <- spark_yarn_cluster_get_conf_property(mainRMWebapp)
+
+  mainRMWebapp
+}
+
 spark_yarn_cluster_get_gateway <- function(config, start_time) {
-  resourceManagerWebapp <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.webapp.address")
+  resourceManagerWebapp <- spark_yarn_cluster_get_resource_manager_webapp()
 
   if (length(resourceManagerWebapp) == 0) {
     stop("Yarn Cluster mode uses `yarn.resourcemanager.webapp.address` but is not present in yarn-site.xml")
