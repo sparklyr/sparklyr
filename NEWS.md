@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASE)
 
+- Fix `compute()` to trigger refresh of the connections view.
+
 - Added to `ml_random_forest()` the following hyperparameter arguments:
   `min.info.gain`, `col.sample.rate`, `min.rows`, `impurity`, and `thresholds`. Also added `seed` for reproducibility.
 
