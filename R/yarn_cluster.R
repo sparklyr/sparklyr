@@ -62,10 +62,12 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
 }
 
 spark_yarn_cluster_get_resource_manager_webapp() {
-  rmHighAvailabilityId <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.id")
+  rmHighAvailability <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.enabled")
+  rmHighAvailability <- length(rmHighAvailability) > 0 && grepl("TRUE", rmHighAvailability, ignore.case = TRUE)
 
   mainRMWebapp <- "yarn.resourcemanager.webapp.address"
-  if (length(rmHighAvailabilityId) > 0) {
+  if (rmHighAvailability) {
+    rmHighAvailabilityId <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.id")
     mainRMWebapp <- paste(
       "yarn.resourcemanager.webapp.address.",
       resourceManagerHighAvailabilityId,
