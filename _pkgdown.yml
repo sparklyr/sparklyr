@@ -46,7 +46,7 @@ navbar:
           href: news/index.html
   right:
    - icon: fa-github
-     href: https://github.com/rstudio/reticulate
+     href: https://github.com/rstudio/sparklyr
 
 reference:
   - title: "Spark Operations"
