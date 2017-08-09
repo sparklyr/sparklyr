@@ -755,7 +755,7 @@ spark_write_text <- function(x,
                              options = list(),
                              partition_by = NULL,
                              ...) {
-  UseMethod("spark_write_json")
+  UseMethod("spark_write_text")
 }
 
 #' @export
