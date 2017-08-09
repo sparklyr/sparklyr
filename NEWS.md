@@ -1,3 +1,8 @@
+# Sparklyr 0.6.2
+
+- Fixed error in `connection_spark_shinyapp()` preventing users with
+  no Spark installation from using connection app.
+
 # Sparklyr 0.6.1
 
 - Fixed error in `spark_apply()` that may triggered when multiple CPUs
