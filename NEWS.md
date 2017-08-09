@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASE)
 
+- Addesd support for RStudio project templates to create an 
+  "R Package using sparklyr".
+  
 - Fix `compute()` to trigger refresh of the connections view.
 
 - Added to `ml_random_forest()` the following hyperparameter arguments:

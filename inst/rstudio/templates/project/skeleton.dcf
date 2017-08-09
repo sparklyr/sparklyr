@@ -1,0 +1,4 @@
+Title: R Package using sparklyr
+Binding: project_template
+OpenFiles: README.Rmd, R/main.R, java/main.scala
+Icon: spark.png
