@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASE)
 
+- Added support for `spark_read_text()` and `spark_write_text()` to
+  read from and to plain text files.
+
 - Addesd support for RStudio project templates to create an 
   "R Package using sparklyr".
   
