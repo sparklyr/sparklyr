@@ -170,7 +170,7 @@ Now the smaller data set can be plotted
 ```{r, eval=FALSE}
 ggplot(data = all_flights, aes(x = Month, y = n/1000, fill = factor(Year))) +
   geom_area(position = "dodge", alpha = 0.5) +
-  geom_line(alph a = 0.4) +
+  geom_line(alpha = 0.4) +
   scale_fill_brewer(palette = "Dark2", name = "Year") +
   scale_x_continuous(breaks = 1:12, labels = c("J","F","M","A","M","J","J","A","S","O","N","D")) +
   theme_light() +
