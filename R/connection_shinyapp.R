@@ -163,20 +163,23 @@ connection_spark_ui <- function() {
     div(
       style = paste("display: table-row; height: 10px")
     ),
-    div(style = "table-row",
-      selectInput(
-        "sparkversion",
-        "Spark version:",
-        choices = spark_ui_spark_choices(),
-        selected = spark_default_version()$spark,
-        selectize = FALSE
-      ),
-      selectInput(
-        "hadoopversion",
-        "Hadoop version:",
-        choices = spark_ui_hadoop_choices(spark_default_version()$spark),
-        selected = spark_default_version()$hadoop,
-        selectize = FALSE
+    conditionalPanel(
+      condition = "!output.notShowVersionsUi",
+      div(style = "table-row",
+        selectInput(
+          "sparkversion",
+          "Spark version:",
+          choices = spark_ui_spark_choices(),
+          selected = spark_default_version()$spark,
+          selectize = FALSE
+        ),
+        selectInput(
+          "hadoopversion",
+          "Hadoop version:",
+          choices = spark_ui_hadoop_choices(spark_default_version()$spark),
+          selected = spark_default_version()$hadoop,
+          selectize = FALSE
+        )
       )
     )
   )
@@ -189,6 +192,10 @@ connection_spark_server <- function(input, output, session) {
 
   hasDefaultHadoopVersion <- reactive({
     input$hadoopversion == spark_default_version()$hadoop
+  })
+
+  output$notShowVersionsUi <- reactive({
+    !identical(spark_home(), NULL)
   })
 
   userInstallPreference <- NULL
@@ -444,6 +451,8 @@ connection_spark_server <- function(input, output, session) {
   observe({
     rsApiWritePreference("sparklyr_dbinterface", input$dbinterface)
   })
+
+  outputOptions(output, "notShowVersionsUi", suspendWhenHidden = FALSE)
 }
 
 #' A Shiny app that can be used to construct a \code{spark_connect} statement
