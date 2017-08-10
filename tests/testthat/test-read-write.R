@@ -70,3 +70,32 @@ test_that("spark_read_csv() can read long decimals", {
 
   file.remove("test.csv")
 })
+
+test_that("spark_read_text() and spark_write_text() read and write basic files", {
+  text_file <- file("test.txt", "w+")
+  cat("1\n2\n3", file = text_file)
+  close(text_file)
+
+  sdf <- spark_read_text(
+    sc,
+    name = "test_spark_read",
+    path = "test.txt"
+  )
+
+  output_file <- "test_roundtrip.txt"
+  spark_write_text(
+    sdf,
+    path = output_file
+  )
+
+  sdf_roundtrip <- spark_read_text(
+    sc,
+    name = "test_spark_roundtrip",
+    path = "test_roundtrip.txt"
+  )
+
+  expect_equal(sdf %>% collect(), sdf_roundtrip %>% collect())
+
+  file.remove("test.txt")
+  unlink(output_file, recursive = TRUE)
+})

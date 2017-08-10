@@ -705,3 +705,77 @@ spark_write_source.spark_jobj <- function(x,
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   spark_data_write_generic(x, name, source, mode, options, partition_by)
 }
+
+#' Read a Text file into a Spark DataFrame
+#'
+#' Read a text file into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#'
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
+#'   the local file system (\code{file://}).
+#'
+#' If you are reading from a secure S3 bucket be sure that the \code{AWS_ACCESS_KEY_ID} and
+#'   \code{AWS_SECRET_ACCESS_KEY} environment variables are both defined.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_text <- function(sc,
+                            name,
+                            path,
+                            repartition = 0,
+                            memory = TRUE,
+                            overwrite = TRUE,
+                            ...) {
+
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+
+  columns = list(line = "character")
+
+  df <- spark_data_read_generic(sc, spark_normalize_path(path), "text", options, columns)
+  spark_partition_register_df(sc, df, name, repartition, memory)
+}
+
+#' Write a Spark DataFrame to a Text file
+#'
+#' Serialize a Spark DataFrame to the plain text format.
+#'
+#' @inheritParams spark_write_csv
+#' @param mode Specifies the behavior when data or table already exists.
+#' @param partition_by Partitions the output by the given columns on the file system.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_write_text <- function(x,
+                             path,
+                             mode = NULL,
+                             options = list(),
+                             partition_by = NULL,
+                             ...) {
+  UseMethod("spark_write_text")
+}
+
+#' @export
+spark_write_text.tbl_spark <- function(x,
+                                       path,
+                                       mode = NULL,
+                                       options = list(),
+                                       partition_by = NULL,
+                                       ...) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  spark_data_write_generic(sqlResult, spark_normalize_path(path), "text", mode, options, partition_by)
+}
+
+#' @export
+spark_write_text.spark_jobj <- function(x,
+                                        path,
+                                        mode = NULL,
+                                        options = list(),
+                                        partition_by = NULL,
+                                        ...) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  spark_data_write_generic(x, spark_normalize_path(path), "text", mode, options, partition_by)
+}
