@@ -1,4 +1,7 @@
-# Sparklyr 0.7 (UNRELEASE)
+# Sparklyr 0.7 (UNRELEASED)
+
+- Added support for `sparklyr.apply.env.` under `spark_config()` to
+  allow `spark_apply()` to initializae environment varaibles.
 
 - Added support for `spark_read_text()` and `spark_write_text()` to
   read from and to plain text files.
