@@ -84,7 +84,8 @@ spark_apply <- function(x,
   rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
-  rlang <- spark_config_value(x$sc, "sparklyr.closures.rlang", FALSE)
+  rlang <- spark_config_value(sc, "sparklyr.closures.rlang", FALSE)
+  proc_env <- connection_config(sc, "sparklyr.apply.env.")
 
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
@@ -165,7 +166,8 @@ spark_apply <- function(x,
     as.list(sdf_columns),
     as.list(group_by),
     closure_rlang,
-    bundle_path
+    bundle_path,
+    as.environment(proc_env)
   )
 
   # while workers need to relaunch sparklyr backends, cache by default

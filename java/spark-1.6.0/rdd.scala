@@ -12,7 +12,8 @@ class WorkerRDD(
   port: Int,
   groupBy: Array[String],
   closureRLang: Array[Byte],
-  bundlePath: String
+  bundlePath: String,
+  customEnv: Map[String, String]
   ) extends RDD[Row](prev) {
 
   private[this] var exception: Option[Exception] = None
@@ -86,7 +87,13 @@ class WorkerRDD(
           logger.log("is starting rscript")
 
           val rscript = new Rscript(logger)
-          rscript.init(sessionId, backendPort, config)
+          rscript.init(
+            sessionId,
+            backendPort,
+            config,
+            customEnv
+          )
+
           lock.synchronized {
             lock.notify
           }
