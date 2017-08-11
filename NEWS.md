@@ -8,6 +8,10 @@
   
 - Fix `compute()` to trigger refresh of the connections view.
 
+- Added a `k` argument to `ml_pca()` to enable specification of number of principal
+  components to extract. Also implemented `sdf_project()` to project datasets using
+  the results of `ml_pca()` models.
+
 - Added to `ml_random_forest()` the following hyperparameter arguments:
   `min.info.gain`, `col.sample.rate`, `min.rows`, `impurity`, and `thresholds`. Also added `seed` for reproducibility.
 

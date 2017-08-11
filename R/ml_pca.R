@@ -5,6 +5,7 @@
 #' @template roxlate-ml-x
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
+#' @param k The number of principal components.
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -14,10 +15,13 @@
 #' @importFrom dplyr tbl_vars
 ml_pca <- function(x,
                    features = tbl_vars(x),
+                   k = length(features),
                    ml.options = ml_options(),
                    ...)
 {
   ml_backwards_compatibility_api()
+
+  k <- ensure_scalar_integer(k)
 
   df <- spark_dataframe(x)
   sc <- spark_connection(df)
@@ -44,8 +48,9 @@ ml_pca <- function(x,
   pca <- invoke_new(sc, envir$model)
 
   model <- pca %>%
-    invoke("setK", length(features)) %>%
-    invoke("setInputCol", envir$features)
+    invoke("setK", k) %>%
+    invoke("setInputCol", envir$features) %>%
+    invoke("setOutputCol", envir$output)
 
   if (is.function(ml.options$model.transform))
     model <- ml.options$model.transform(model)
@@ -83,6 +88,7 @@ ml_pca <- function(x,
     names(explainedVariance) <- pcNames
 
   ml_model("pca", fit,
+           k = k,
            components = components,
            explained.variance = explainedVariance,
            data = df,

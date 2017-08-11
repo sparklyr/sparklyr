@@ -6,7 +6,8 @@
 \usage{
 ml_options(id.column = random_string("id"),
   response.column = random_string("response"),
-  features.column = random_string("features"), model.transform = NULL,
+  features.column = random_string("features"),
+  output.column = random_string("output"), model.transform = NULL,
   only.model = FALSE, na.action = getOption("na.action", "na.omit"), ...)
 }
 \arguments{
@@ -15,6 +16,8 @@ ml_options(id.column = random_string("id"),
 \item{response.column}{The name to assign to the generated response column.}
 
 \item{features.column}{The name to assign to the generated features column.}
+
+\item{output.column}{The name to assign to the generated output column.}
 
 \item{model.transform}{An optional \R function that accepts a Spark model
 and returns a Spark model. This can be used to supply optional Spark model

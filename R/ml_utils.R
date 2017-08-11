@@ -64,6 +64,7 @@ ml_prepare_dataframe <- function(x,
 
   # default report for feature, response variable names
   envir$features <- ml.options$features.column
+  envir$output <- ml.options$output.column
   envir$response <- response
   envir$labels <- NULL
 
