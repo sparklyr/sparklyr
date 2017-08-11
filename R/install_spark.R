@@ -68,7 +68,7 @@ spark_default_version <- function() {
     hadoop <- version$hadoopVersion
     # otherwise check available versions and take the default
   } else {
-    versions <- sparklyr::spark_versions()
+    versions <- spark_versions()
     versions <- subset(versions, versions$default == TRUE & versions$hadoop_default == TRUE)
     version <- versions[1,]
     spark <- version$spark
