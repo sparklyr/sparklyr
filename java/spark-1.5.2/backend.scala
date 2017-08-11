@@ -251,7 +251,7 @@ class Backend {
                 logger.log("found requested session matches current session")
                 logger.log("is creating backend and allocating system resources")
 
-                val backendChannel = new BackendChannel(logger)
+                val backendChannel = new BackendChannel(logger, terminate)
                 backendChannel.setHostContext(hostContext)
 
                 val backendPort: Int = backendChannel.init(isRemote)
@@ -275,18 +275,8 @@ class Backend {
                           logger.logError("failed with exception ", e)
 
                         if (!isService) System.exit(1)
-                      }
 
-                      if (isRegistered) {
-                        val success = unregister(gatewayPort, sessionId)
-                        if (!success) {
-                          logger.logError("failed to unregister on gateway port " + gatewayPort)
-                          if (!isService) System.exit(1)
-                        }
-                      }
-
-                      if (!isService || isWorker) {
-                        isRunning = false
+                        terminate()
                       }
                     }
                   }.start()
@@ -407,6 +397,20 @@ class Backend {
 
     s.close()
     status == 0
+  }
+
+  def terminate() = {
+    if (isRegistered) {
+      val success = unregister(gatewayPort, sessionId)
+      if (!success) {
+        logger.logError("failed to unregister on gateway port " + gatewayPort)
+        if (!isService) System.exit(1)
+      }
+    }
+
+    if (!isService || isWorker) {
+      isRunning = false
+    }
   }
 
   def unregister(gatewayPort: Int, sessionId: Int): Boolean = {

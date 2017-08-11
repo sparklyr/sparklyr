@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed `SIGPIPE` error under `spark_connect()` immediately after
+  a `spark_disconnect()` operation.
+
 - Added support for `sparklyr.apply.env.` under `spark_config()` to
   allow `spark_apply()` to initializae environment varaibles.
 

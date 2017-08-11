@@ -28,6 +28,12 @@ core_invoke_method <- function(sc, static, object, method, ...)
   backend <- sc$backend
   writeBin(con, backend)
 
+  if (identical(object, "Handler") &&
+      (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
+    # by the time we read response, backend might be already down.
+    return(NULL)
+  }
+
   returnStatus <- readInt(backend)
 
   if (length(returnStatus) == 0) {

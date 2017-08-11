@@ -19,7 +19,7 @@ import org.apache.spark.sql.hive.HiveContext
 
 import scala.util.Try
 
-class BackendChannel(logger: Logger) {
+class BackendChannel(logger: Logger, terminate: () => Unit) {
 
   private[this] var channelFuture: ChannelFuture = null
   private[this] var bootstrap: ServerBootstrap = null
@@ -72,6 +72,8 @@ class BackendChannel(logger: Logger) {
   }
 
   def close(): Unit = {
+    terminate()
+
     if (channelFuture != null) {
       // close is a local operation and should finish within milliseconds; timeout just to be safe
       channelFuture.channel().close().awaitUninterruptibly(10, TimeUnit.SECONDS)
