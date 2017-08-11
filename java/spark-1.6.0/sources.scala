@@ -385,6 +385,12 @@ object Sources {
     "  backend <- sc$backend\n" +
     "  writeBin(con, backend)\n" +
     "\n" +
+    "  if (identical(object, \"Handler\") &&\n" +
+    "      (identical(method, \"terminateBackend\") || identical(method, \"stopBackend\"))) {\n" +
+    "    # by the time we read response, backend might be already down.\n" +
+    "    return(NULL)\n" +
+    "  }\n" +
+    "\n" +
     "  returnStatus <- readInt(backend)\n" +
     "\n" +
     "  if (length(returnStatus) == 0) {\n" +
