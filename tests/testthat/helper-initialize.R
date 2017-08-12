@@ -88,7 +88,7 @@ sdf_query_plan <- function(x) {
 
 testthat_livy_connection <- function(version = NULL) {
   if (nrow(livy_installed_versions()) == 0) {
-    livy_install("0.3.0")
+    livy_install("0.3.0", spark_version = "2.1.0")
   }
 
   expect_gt(nrow(livy_installed_versions()), 0)
@@ -99,7 +99,7 @@ testthat_livy_connection <- function(version = NULL) {
     sc <- get(".testthat_livy_connection", envir = .GlobalEnv)
     connected <- TRUE
 
-    livy_service_start()
+    livy_service_start(version = "0.3.0", spark_version = "2.1.0")
 
     sc <- spark_connect(master = "http://localhost:8998", method = "livy")
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
