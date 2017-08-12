@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added unsupported error message to `sample_n()` and `sample_frac()`
+  when Spark is not 2.0 or higher.
+
 - Fixed `SIGPIPE` error under `spark_connect()` immediately after
   a `spark_disconnect()` operation.
 
