@@ -85,3 +85,26 @@ sdf_query_plan <- function(x) {
     strsplit("\n") %>%
     unlist()
 }
+
+testthat_livy_connection <- function(version = NULL) {
+  if (nrow(livy_installed_versions()) == 0) {
+    livy_install("0.3.0")
+  }
+
+  expect_gt(nrow(livy_installed_versions()), 0)
+
+  # generate connection if none yet exists
+  connected <- FALSE
+  if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
+    sc <- get(".testthat_livy_connection", envir = .GlobalEnv)
+    connected <- TRUE
+
+    livy_service_start()
+
+    sc <- spark_connect(master = "http://localhost:8998", method = "livy")
+    assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
+  }
+
+  # retrieve spark connection
+  get(".testthat_livy_connection", envir = .GlobalEnv)
+}

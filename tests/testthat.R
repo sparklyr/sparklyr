@@ -9,5 +9,6 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   on.exit({
     spark_disconnect_all()
     Sys.sleep(3)
+    livy_service_stop()
   })
 }
