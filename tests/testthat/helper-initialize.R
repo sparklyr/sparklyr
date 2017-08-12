@@ -98,13 +98,14 @@ testthat_livy_connection <- function(version = NULL) {
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
     sc <- get(".testthat_livy_connection", envir = .GlobalEnv)
     connected <- TRUE
+  }
 
+  if (!connected) {
     livy_service_start(version = "0.3.0", spark_version = "2.1.0")
 
     sc <- spark_connect(master = "http://localhost:8998", method = "livy")
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
   }
 
-  # retrieve spark connection
   get(".testthat_livy_connection", envir = .GlobalEnv)
 }
