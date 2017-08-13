@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for numeric arguments for `n` in `lead()` for dplyr.
+
 - Added unsupported error message to `sample_n()` and `sample_frac()`
   when Spark is not 2.0 or higher.
 
