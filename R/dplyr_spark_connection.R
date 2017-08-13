@@ -115,6 +115,14 @@ sql_translate_env.spark_connection <- function(con) {
           order = order
         )
       },
+      lead = function(x, n = 1L, default = NA, order = NULL) {
+        dbplyr::base_win$lead(
+          x = x,
+          n = as.integer(n),
+          default = default,
+          order = order
+        )
+      },
       count = function() dbplyr::win_over(
         dbplyr::sql("count(*)"),
         partition = dbplyr::win_current_group()
