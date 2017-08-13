@@ -1,9 +1,9 @@
 context("livy")
 test_requires("dplyr")
 
-lc <- testthat_livy_connection()
-
 test_that("'copy_to()' works under Livy connections", {
+  lc <- testthat_livy_connection()
+
   df <- data.frame(a = c(1, 2), b = c("A", "B"))
   df_tbl <- copy_to(lc, df)
 
