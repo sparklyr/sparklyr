@@ -8,7 +8,10 @@
 #' @template roxlate-ml-decision-trees-impurity
 #' @template roxlate-ml-decision-trees-max-bins
 #' @template roxlate-ml-decision-trees-max-depth
+#' @template roxlate-ml-decision-trees-min-info-gain
+#' @template roxlate-ml-decision-trees-min-rows
 #' @template roxlate-ml-decision-trees-type
+#' @template roxlate-ml-decision-trees-seed
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -21,7 +24,10 @@ ml_decision_tree <- function(x,
                              impurity = c("auto", "gini", "entropy", "variance"),
                              max.bins = 32L,
                              max.depth = 5L,
+                             min.info.gain = 0,
+                             min.rows = 1L,
                              type = c("auto", "regression", "classification"),
+                             seed = NULL,
                              ml.options = ml_options(),
                              ...)
 {
@@ -43,8 +49,11 @@ ml_decision_tree <- function(x,
 
   max.bins <- ensure_scalar_integer(max.bins)
   max.depth <- ensure_scalar_integer(max.depth)
+  min.info.gain <- ensure_scalar_double(min.info.gain)
+  min.rows <- ensure_scalar_integer(min.rows)
   type <- match.arg(type)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
+  seed <- ensure_scalar_integer(seed, allow.null = TRUE)
 
   envir <- new.env(parent = emptyenv())
 
@@ -61,9 +70,9 @@ ml_decision_tree <- function(x,
 
   modelType <- if (identical(type, "regression"))
     "regression"     else if (identical(type, "classification"))
-      "classification" else if (responseType %in% c("DoubleType", "IntegerType"))
-        "regression"     else
-          "classification"
+    "classification" else if (responseType %in% c("DoubleType", "IntegerType"))
+    "regression"     else
+    "classification"
 
   envir$model <- ifelse(identical(modelType, "regression"),
                         "org.apache.spark.ml.regression.RandomForestRegressor",
@@ -89,7 +98,12 @@ ml_decision_tree <- function(x,
     invoke("setLabelCol", envir$response) %>%
     invoke("setImpurity", impurity) %>%
     invoke("setMaxBins", max.bins) %>%
-    invoke("setMaxDepth", max.depth)
+    invoke("setMaxDepth", max.depth) %>%
+    invoke("setMinInfoGain", min.info.gain) %>%
+    invoke("setMinInstancesPerNode", min.rows)
+
+  if (!is.null(seed))
+    model <- invoke(model, "setSeed", seed)
 
   if (is.function(ml.options$model.transform))
     model <- ml.options$model.transform(model)
@@ -106,6 +120,9 @@ ml_decision_tree <- function(x,
            impurity = impurity,
            max.bins = max.bins,
            max.depth = max.depth,
+           min.info.gain = min.info.gain,
+           min.rows = min.rows,
+           seed = seed,
            categorical.transformations = categorical.transformations,
            data = df,
            ml.options = ml.options,

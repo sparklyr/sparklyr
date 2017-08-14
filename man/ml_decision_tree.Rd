@@ -5,8 +5,9 @@
 \title{Spark ML -- Decision Trees}
 \usage{
 ml_decision_tree(x, response, features, impurity = c("auto", "gini",
-  "entropy", "variance"), max.bins = 32L, max.depth = 5L, type = c("auto",
-  "regression", "classification"), ml.options = ml_options(), ...)
+  "entropy", "variance"), max.bins = 32L, max.depth = 5L,
+  min.info.gain = 0, min.rows = 1L, type = c("auto", "regression",
+  "classification"), seed = NULL, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -33,11 +34,17 @@ each node. More bins give higher granularity.}
 \item{max.depth}{Maximum depth of the tree (>= 0); that is, the maximum
 number of nodes separating any leaves from the root of the tree.}
 
+\item{min.info.gain}{Minimum information gain for a split to be considered at a tree node. Should be >= 0, defaults to 0.}
+
+\item{min.rows}{Minimum number of instances each child must have after split.}
+
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
+
+\item{seed}{Seed for random numbers.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
