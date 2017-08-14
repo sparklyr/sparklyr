@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Avoid tasks failing under `spark_apply()` and multiple  concurrent
+  partitions running while selecting backend port.
+
 - Added support for numeric arguments for `n` in `lead()` for dplyr.
 
 - Added unsupported error message to `sample_n()` and `sample_frac()`
