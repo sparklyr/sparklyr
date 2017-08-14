@@ -78,8 +78,8 @@ ml_decision_tree <- function(x,
     "classification"
 
   envir$model <- ifelse(identical(modelType, "regression"),
-                        "org.apache.spark.ml.regression.RandomForestRegressor",
-                        "org.apache.spark.ml.classification.RandomForestClassifier")
+                        "org.apache.spark.ml.regression.DecisionTreeRegressor",
+                        "org.apache.spark.ml.classification.DecisionTreeClassifier")
 
   rf <- invoke_new(sc, envir$model)
 

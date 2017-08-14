@@ -90,8 +90,8 @@ ml_gradient_boosted_trees <- function(x,
     "classification"
 
   envir$model <- ifelse(identical(modelType, "regression"),
-                        "org.apache.spark.ml.regression.RandomForestRegressor",
-                        "org.apache.spark.ml.classification.RandomForestClassifier")
+                        "org.apache.spark.ml.regression.GBTRegressor",
+                        "org.apache.spark.ml.classification.GBTClassifier")
 
   impurity <- rlang::arg_match(impurity)
   impurity <- if (identical(impurity, "auto")) {
