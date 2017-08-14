@@ -32,6 +32,7 @@ test_that("col.sample.rate maps to correct strategy", {
 })
 
 test_that("thresholds parameter behaves as expected", {
+  test_requires("dplyr")
   most_predicted_label <- function(x) x %>%
     count(prediction) %>%
     arrange(desc(n)) %>%
