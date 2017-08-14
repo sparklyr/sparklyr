@@ -6,6 +6,7 @@
 #' @template roxlate-ml-response
 #' @template roxlate-ml-features
 #' @template roxlate-ml-decision-trees-impurity
+#' @template roxlate-ml-decision-trees-loss-type
 #' @template roxlate-ml-decision-trees-max-bins
 #' @template roxlate-ml-decision-trees-max-depth
 #' @template roxlate-ml-decision-trees-type
@@ -19,6 +20,7 @@ ml_gradient_boosted_trees <- function(x,
                                       response,
                                       features,
                                       impurity = c("auto", "gini", "entropy", "variance"),
+                                      loss.type = c("auto", "logistic", "squared", "absolute"),
                                       max.bins = 32L,
                                       max.depth = 5L,
                                       type = c("auto", "regression", "classification"),
@@ -82,12 +84,27 @@ ml_gradient_boosted_trees <- function(x,
     impurity
   }
 
+  loss.type <- rlang::arg_match(loss.type)
+  loss.type <- if (identical(loss.type, "auto")) {
+    ifelse(identical(modelType, "classification"), "logistic", "squared")
+  } else if (identical(modelType, "regression")) {
+    if (!loss.type %in% c("squared", "absolute"))
+      stop("'loss.type' must be 'squared' or 'absolute' for regression")
+    loss.type
+  } else {
+    if (!identical(loss.type, "logistic"))
+      stop("'loss.type' must be 'logistic' for classification")
+    loss.type
+  }
+
+
   rf <- invoke_new(sc, envir$model)
 
   model <- rf %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setImpurity", impurity) %>%
     invoke("setLabelCol", envir$response) %>%
+    invoke("setLossType", loss.type) %>%
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth)
 
@@ -104,6 +121,7 @@ ml_gradient_boosted_trees <- function(x,
     features = features,
     response = response,
     impurity = impurity,
+    loss.type = loss.type,
     max.bins = max.bins,
     max.depth = max.depth,
     trees = invoke(fit, "trees"),

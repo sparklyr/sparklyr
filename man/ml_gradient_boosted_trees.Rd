@@ -5,7 +5,8 @@
 \title{Spark ML -- Gradient-Boosted Tree}
 \usage{
 ml_gradient_boosted_trees(x, response, features, impurity = c("auto", "gini",
-  "entropy", "variance"), max.bins = 32L, max.depth = 5L, type = c("auto",
+  "entropy", "variance"), loss.type = c("auto", "logistic", "squared",
+  "absolute"), max.bins = 32L, max.depth = 5L, type = c("auto",
   "regression", "classification"), ml.options = ml_options(), ...)
 }
 \arguments{
@@ -25,6 +26,9 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 \item{impurity}{Criterion used for information gain calculation
 One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to
 'gini' for classification and 'variance' for regression.}
+
+\item{loss.type}{Loss function which the algorithm tries to minimize. Defaults to \code{logistic}
+for classification and \code{squared} for regression.}
 
 \item{max.bins}{The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at
