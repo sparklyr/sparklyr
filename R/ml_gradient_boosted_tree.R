@@ -11,6 +11,7 @@
 #' @template roxlate-ml-decision-trees-max-depth
 #' @template roxlate-ml-decision-trees-num-trees
 #' @template roxlate-ml-decision-trees-min-info-gain
+#' @template roxlate-ml-decision-trees-min-rows
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
@@ -27,6 +28,7 @@ ml_gradient_boosted_trees <- function(x,
                                       max.depth = 5L,
                                       num.trees = 20L,
                                       min.info.gain = 0,
+                                      min.rows = 1L,
                                       type = c("auto", "regression", "classification"),
                                       ml.options = ml_options(),
                                       ...)
@@ -52,6 +54,7 @@ ml_gradient_boosted_trees <- function(x,
   num.trees <- ensure_scalar_integer(num.trees)
   if (num.trees < 1) stop("num.trees must be >= 1")
   min.info.gain <- ensure_scalar_double(min.info.gain)
+  min.rows <- ensure_scalar_integer(min.rows)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
   type <- match.arg(type)
 
@@ -115,6 +118,7 @@ ml_gradient_boosted_trees <- function(x,
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth) %>%
     invoke("setMinInfoGain", min.info.gain) %>%
+    invoke("setMinInstancesPerNode", min.rows) %>%
     invoke("setMaxIter", num.trees)
 
   if (is.function(ml.options$model.transform))
@@ -136,6 +140,7 @@ ml_gradient_boosted_trees <- function(x,
     num.trees = num.trees,
     trees = invoke(fit, "trees"),
     min.info.gain = min.info.gain,
+    min.rows = min.rows,
     data = df,
     ml.options = ml.options,
     categorical.transformations = categorical.transformations,
