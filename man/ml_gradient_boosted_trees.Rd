@@ -7,7 +7,7 @@
 ml_gradient_boosted_trees(x, response, features, impurity = c("auto", "gini",
   "entropy", "variance"), loss.type = c("auto", "logistic", "squared",
   "absolute"), max.bins = 32L, max.depth = 5L, num.trees = 20L,
-  type = c("auto", "regression", "classification"),
+  min.info.gain = 0, type = c("auto", "regression", "classification"),
   ml.options = ml_options(), ...)
 }
 \arguments{
@@ -39,6 +39,8 @@ each node. More bins give higher granularity.}
 number of nodes separating any leaves from the root of the tree.}
 
 \item{num.trees}{Number of trees to train (>= 1), defaults to 20.}
+
+\item{min.info.gain}{Minimum information gain for a split to be considered at a tree node. Should be >= 0, defaults to 0.}
 
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response
