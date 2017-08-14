@@ -6,8 +6,9 @@
 \usage{
 ml_gradient_boosted_trees(x, response, features, impurity = c("auto", "gini",
   "entropy", "variance"), loss.type = c("auto", "logistic", "squared",
-  "absolute"), max.bins = 32L, max.depth = 5L, type = c("auto",
-  "regression", "classification"), ml.options = ml_options(), ...)
+  "absolute"), max.bins = 32L, max.depth = 5L, num.trees = 20L,
+  type = c("auto", "regression", "classification"),
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -36,6 +37,8 @@ each node. More bins give higher granularity.}
 
 \item{max.depth}{Maximum depth of the tree (>= 0); that is, the maximum
 number of nodes separating any leaves from the root of the tree.}
+
+\item{num.trees}{Number of trees to train (>= 1), defaults to 20.}
 
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response
