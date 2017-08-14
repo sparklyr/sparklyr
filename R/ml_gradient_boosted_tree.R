@@ -14,6 +14,8 @@
 #' @template roxlate-ml-decision-trees-min-rows
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-decision-trees-seed
+#' @template roxlate-ml-decision-trees-learn-rate
+#' @template roxlate-ml-decision-trees-sample-rate
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -30,6 +32,8 @@ ml_gradient_boosted_trees <- function(x,
                                       num.trees = 20L,
                                       min.info.gain = 0,
                                       min.rows = 1L,
+                                      learn.rate = 0.1,
+                                      sample.rate = 1.0,
                                       type = c("auto", "regression", "classification"),
                                       seed = NULL,
                                       ml.options = ml_options(),
@@ -59,6 +63,8 @@ ml_gradient_boosted_trees <- function(x,
   min.rows <- ensure_scalar_integer(min.rows)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
   type <- match.arg(type)
+  learn.rate <- ensure_scalar_double(learn.rate)
+  sample.rate <- ensure_scalar_double(sample.rate)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
 
   envir <- new.env(parent = emptyenv())
@@ -122,7 +128,9 @@ ml_gradient_boosted_trees <- function(x,
     invoke("setMaxDepth", max.depth) %>%
     invoke("setMinInfoGain", min.info.gain) %>%
     invoke("setMinInstancesPerNode", min.rows) %>%
-    invoke("setMaxIter", num.trees)
+    invoke("setMaxIter", num.trees) %>%
+    invoke("setStepSize", learn.rate) %>%
+    invoke("setSubsamplingRate", sample.rate)
 
   if (!is.null(seed))
     model <- invoke(model, "setSeed", seed)
@@ -147,6 +155,8 @@ ml_gradient_boosted_trees <- function(x,
     trees = invoke(fit, "trees"),
     min.info.gain = min.info.gain,
     min.rows = min.rows,
+    learn.rate = learn.rate,
+    sample.rate = sample.rate,
     seed = seed,
     data = df,
     ml.options = ml.options,

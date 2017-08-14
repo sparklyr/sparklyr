@@ -7,8 +7,9 @@
 ml_gradient_boosted_trees(x, response, features, impurity = c("auto", "gini",
   "entropy", "variance"), loss.type = c("auto", "logistic", "squared",
   "absolute"), max.bins = 32L, max.depth = 5L, num.trees = 20L,
-  min.info.gain = 0, min.rows = 1L, type = c("auto", "regression",
-  "classification"), seed = NULL, ml.options = ml_options(), ...)
+  min.info.gain = 0, min.rows = 1L, learn.rate = 0.1, sample.rate = 1,
+  type = c("auto", "regression", "classification"), seed = NULL,
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -43,6 +44,10 @@ number of nodes separating any leaves from the root of the tree.}
 \item{min.info.gain}{Minimum information gain for a split to be considered at a tree node. Should be >= 0, defaults to 0.}
 
 \item{min.rows}{Minimum number of instances each child must have after split.}
+
+\item{learn.rate}{the learning rate or step size, defaults to 0.1.}
+
+\item{sample.rate}{Fraction of the training data used for learning each decision tree, defaults to 1.0.}
 
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response
