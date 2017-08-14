@@ -84,6 +84,7 @@ ml_random_forest <- function(x,
   min.info.gain <- ensure_scalar_double(min.info.gain)
   min.rows <- ensure_scalar_integer(min.rows)
   num.trees <- ensure_scalar_integer(num.trees)
+  if (num.trees < 1) stop("num.trees must be >= 1")
   type <- match.arg(type)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
   thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)

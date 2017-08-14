@@ -44,7 +44,7 @@ number of nodes separating any leaves from the root of the tree.}
 
 \item{min.rows}{Minimum number of instances each child must have after split.}
 
-\item{num.trees}{Number of trees to train (>= 1).}
+\item{num.trees}{Number of trees to train (>= 1), defaults to 20.}
 
 \item{thresholds}{Thresholds in multi-class classification to adjust
 the probability of predicting each class. Vector must have length equal
