@@ -8,8 +8,8 @@ ml_gradient_boosted_trees(x, response, features, impurity = c("auto", "gini",
   "entropy", "variance"), loss.type = c("auto", "logistic", "squared",
   "absolute"), max.bins = 32L, max.depth = 5L, num.trees = 20L,
   min.info.gain = 0, min.rows = 1L, learn.rate = 0.1, sample.rate = 1,
-  type = c("auto", "regression", "classification"), seed = NULL,
-  ml.options = ml_options(), ...)
+  type = c("auto", "regression", "classification"), thresholds = NULL,
+  seed = NULL, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -54,6 +54,12 @@ as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
+
+\item{thresholds}{Thresholds in multi-class classification to adjust
+the probability of predicting each class. Vector must have length equal
+to the number of classes, with values > 0 excepting that at most one
+value may be 0. The class with largest value p/t is predicted, where p
+is the original probability of that class and t is the class's threshold.}
 
 \item{seed}{Seed for random numbers.}
 

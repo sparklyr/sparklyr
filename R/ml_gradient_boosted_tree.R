@@ -16,6 +16,7 @@
 #' @template roxlate-ml-decision-trees-seed
 #' @template roxlate-ml-decision-trees-learn-rate
 #' @template roxlate-ml-decision-trees-sample-rate
+#' @template roxlate-ml-decision-trees-thresholds
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -35,6 +36,7 @@ ml_gradient_boosted_trees <- function(x,
                                       learn.rate = 0.1,
                                       sample.rate = 1.0,
                                       type = c("auto", "regression", "classification"),
+                                      thresholds = NULL,
                                       seed = NULL,
                                       ml.options = ml_options(),
                                       ...)
@@ -66,6 +68,7 @@ ml_gradient_boosted_trees <- function(x,
   learn.rate <- ensure_scalar_double(learn.rate)
   sample.rate <- ensure_scalar_double(sample.rate)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
+  thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
 
   envir <- new.env(parent = emptyenv())
 
@@ -132,6 +135,9 @@ ml_gradient_boosted_trees <- function(x,
     invoke("setStepSize", learn.rate) %>%
     invoke("setSubsamplingRate", sample.rate)
 
+  if (!is.null(thresholds))
+    model <- invoke(model, "setThresholds", thresholds)
+
   if (!is.null(seed))
     model <- invoke(model, "setSeed", seed)
 
@@ -157,6 +163,7 @@ ml_gradient_boosted_trees <- function(x,
     min.rows = min.rows,
     learn.rate = learn.rate,
     sample.rate = sample.rate,
+    thresholds = unlist(thresholds),
     seed = seed,
     data = df,
     ml.options = ml.options,
