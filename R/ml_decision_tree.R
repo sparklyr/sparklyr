@@ -10,6 +10,7 @@
 #' @template roxlate-ml-decision-trees-max-depth
 #' @template roxlate-ml-decision-trees-min-info-gain
 #' @template roxlate-ml-decision-trees-min-rows
+#' @template roxlate-ml-decision-trees-thresholds
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-decision-trees-seed
 #' @template roxlate-ml-options
@@ -27,6 +28,7 @@ ml_decision_tree <- function(x,
                              min.info.gain = 0,
                              min.rows = 1L,
                              type = c("auto", "regression", "classification"),
+                             thresholds = NULL,
                              seed = NULL,
                              ml.options = ml_options(),
                              ...)
@@ -53,6 +55,7 @@ ml_decision_tree <- function(x,
   min.rows <- ensure_scalar_integer(min.rows)
   type <- match.arg(type)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
+  thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
 
   envir <- new.env(parent = emptyenv())
@@ -102,6 +105,9 @@ ml_decision_tree <- function(x,
     invoke("setMinInfoGain", min.info.gain) %>%
     invoke("setMinInstancesPerNode", min.rows)
 
+  if (!is.null(thresholds))
+    model <- invoke(model, "setThresholds", thresholds)
+
   if (!is.null(seed))
     model <- invoke(model, "setSeed", seed)
 
@@ -122,6 +128,7 @@ ml_decision_tree <- function(x,
            max.depth = max.depth,
            min.info.gain = min.info.gain,
            min.rows = min.rows,
+           thresholds = unlist(thresholds),
            seed = seed,
            categorical.transformations = categorical.transformations,
            data = df,
