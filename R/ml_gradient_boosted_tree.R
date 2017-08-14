@@ -69,6 +69,9 @@ ml_gradient_boosted_trees <- function(x,
   sample.rate <- ensure_scalar_double(sample.rate)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
   thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
+  # https://issues.apache.org/jira/browse/SPARK-14975
+  if (spark_version(sc) < "2.2.0" && !is.null(thresholds))
+    stop("thresholds is only supported for GBT in Spark 2.2.0+")
 
   envir <- new.env(parent = emptyenv())
 
