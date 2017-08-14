@@ -8,7 +8,7 @@ ml_gradient_boosted_trees(x, response, features, impurity = c("auto", "gini",
   "entropy", "variance"), loss.type = c("auto", "logistic", "squared",
   "absolute"), max.bins = 32L, max.depth = 5L, num.trees = 20L,
   min.info.gain = 0, min.rows = 1L, type = c("auto", "regression",
-  "classification"), ml.options = ml_options(), ...)
+  "classification"), seed = NULL, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -49,6 +49,8 @@ as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
+
+\item{seed}{Seed for random numbers.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
