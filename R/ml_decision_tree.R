@@ -5,6 +5,7 @@
 #' @template roxlate-ml-x
 #' @template roxlate-ml-response
 #' @template roxlate-ml-features
+#' @template roxlate-ml-decision-trees-impurity
 #' @template roxlate-ml-decision-trees-max-bins
 #' @template roxlate-ml-decision-trees-max-depth
 #' @template roxlate-ml-decision-trees-type
@@ -17,6 +18,7 @@
 ml_decision_tree <- function(x,
                              response,
                              features,
+                             impurity = c("auto", "gini", "entropy", "variance"),
                              max.bins = 32L,
                              max.depth = 5L,
                              type = c("auto", "regression", "classification"),
@@ -57,23 +59,35 @@ ml_decision_tree <- function(x,
   schema <- sdf_schema(df)
   responseType <- schema[[response]]$type
 
-  regressor  <- "org.apache.spark.ml.regression.DecisionTreeRegressor"
-  classifier <- "org.apache.spark.ml.classification.DecisionTreeClassifier"
+  modelType <- if (identical(type, "regression"))
+    "regression"     else if (identical(type, "classification"))
+      "classification" else if (responseType %in% c("DoubleType", "IntegerType"))
+        "regression"     else
+          "classification"
 
-  envir$model <- if (identical(type, "regression"))
-    regressor
-  else if (identical(type, "classification"))
-    classifier
-  else if (responseType %in% c("DoubleType", "IntegerType"))
-    regressor
-  else
-    classifier
+  envir$model <- ifelse(identical(modelType, "regression"),
+                        "org.apache.spark.ml.regression.RandomForestRegressor",
+                        "org.apache.spark.ml.classification.RandomForestClassifier")
 
   rf <- invoke_new(sc, envir$model)
+
+  impurity <- rlang::arg_match(impurity)
+  impurity <- if (identical(impurity, "auto")) {
+    ifelse(identical(modelType, "regression"), "variance", "gini")
+  } else if (identical(modelType, "classification")) {
+    if (!impurity %in% c("gini", "entropy"))
+      stop("'impurity' must be 'gini' or 'entropy' for classification")
+    impurity
+  } else {
+    if (!identical(impurity, "variance"))
+      stop("'impurity' must be 'variance' for regression")
+    impurity
+  }
 
   model <- rf %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
+    invoke("setImpurity", impurity) %>%
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth)
 
@@ -89,6 +103,7 @@ ml_decision_tree <- function(x,
   ml_model("decision_tree", fit,
            features = features,
            response = response,
+           impurity = impurity,
            max.bins = max.bins,
            max.depth = max.depth,
            categorical.transformations = categorical.transformations,

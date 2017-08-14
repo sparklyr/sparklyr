@@ -4,9 +4,9 @@
 \alias{ml_decision_tree}
 \title{Spark ML -- Decision Trees}
 \usage{
-ml_decision_tree(x, response, features, max.bins = 32L, max.depth = 5L,
-  type = c("auto", "regression", "classification"),
-  ml.options = ml_options(), ...)
+ml_decision_tree(x, response, features, impurity = c("auto", "gini",
+  "entropy", "variance"), max.bins = 32L, max.depth = 5L, type = c("auto",
+  "regression", "classification"), ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -21,6 +21,10 @@ existing parameters is supposed; e.g. \code{response ~ feature1 + feature2 + ...
 The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{features}{The name of features (terms) to use for the model fit.}
+
+\item{impurity}{Criterion used for information gain calculation
+One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to
+'gini' for classification and 'variance' for regression.}
 
 \item{max.bins}{The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at
