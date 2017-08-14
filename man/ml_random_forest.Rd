@@ -7,8 +7,8 @@
 ml_random_forest(x, response, features, col.sample.rate = NULL,
   impurity = c("auto", "gini", "entropy", "variance"), max.bins = 32L,
   max.depth = 5L, min.info.gain = 0, min.rows = 1L, num.trees = 20L,
-  thresholds = NULL, seed = NULL, type = c("auto", "regression",
-  "classification"), ml.options = ml_options(), ...)
+  sample.rate = 1, thresholds = NULL, seed = NULL, type = c("auto",
+  "regression", "classification"), ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -45,6 +45,8 @@ number of nodes separating any leaves from the root of the tree.}
 \item{min.rows}{Minimum number of instances each child must have after split.}
 
 \item{num.trees}{Number of trees to train (>= 1), defaults to 20.}
+
+\item{sample.rate}{Fraction of the training data used for learning each decision tree, defaults to 1.0.}
 
 \item{thresholds}{Thresholds in multi-class classification to adjust
 the probability of predicting each class. Vector must have length equal

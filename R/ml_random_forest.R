@@ -14,6 +14,7 @@
 #' @template roxlate-ml-decision-trees-num-trees
 #' @template roxlate-ml-decision-trees-thresholds
 #' @template roxlate-ml-decision-trees-type
+#' @template roxlate-ml-decision-trees-sample-rate
 #' @template roxlate-ml-decision-trees-seed
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
@@ -31,6 +32,7 @@ ml_random_forest <- function(x,
                              min.info.gain = 0,
                              min.rows = 1L,
                              num.trees = 20L,
+                             sample.rate = 1.0,
                              thresholds = NULL,
                              seed = NULL,
                              type = c("auto", "regression", "classification"),
@@ -86,6 +88,7 @@ ml_random_forest <- function(x,
   num.trees <- ensure_scalar_integer(num.trees)
   if (num.trees < 1) stop("num.trees must be >= 1")
   type <- match.arg(type)
+  sample.rate <- ensure_scalar_double(sample.rate)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
   thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
@@ -137,7 +140,8 @@ ml_random_forest <- function(x,
     invoke("setMaxDepth", max.depth) %>%
     invoke("setMinInfoGain", min.info.gain) %>%
     invoke("setMinInstancesPerNode", min.rows) %>%
-    invoke("setNumTrees", num.trees)
+    invoke("setNumTrees", num.trees) %>%
+    invoke("setSubsamplingRate", sample.rate)
 
   if (!is.null(thresholds))
     model <- invoke(model, "setThresholds", thresholds)
@@ -169,6 +173,7 @@ ml_random_forest <- function(x,
            min.rows = min.rows,
            num.trees = num.trees,
            thresholds = unlist(thresholds),
+           sample.rate = sample.rate,
            seed = seed,
            feature.importances = featureImportances,
            trees = invoke(fit, "trees"),
