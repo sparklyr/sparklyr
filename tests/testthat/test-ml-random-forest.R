@@ -128,3 +128,14 @@ test_that("one-tree forest agrees with ml_decision_tree()", {
                  sdf_predict(iris_tbl) %>%
                  collect())
 })
+
+test_that("checkpointing works for rf", {
+  spark_set_checkpoint_dir(sc, tempdir())
+  expect_error(
+    iris_tbl %>%
+      ml_random_forest(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
+                       type = "regression",
+                       cache.node.ids = TRUE,
+                       checkpoint.interval = 5L),
+  NA)
+})
