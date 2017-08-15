@@ -1,1 +1,1 @@
-#' @param learn.rate the learning rate or step size, defaults to 0.1.
+#' @param learn.rate The learning rate or step size, defaults to 0.1.
