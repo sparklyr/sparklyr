@@ -9,7 +9,8 @@ ml_gradient_boosted_trees(x, response, features, impurity = c("auto", "gini",
   "absolute"), max.bins = 32L, max.depth = 5L, num.trees = 20L,
   min.info.gain = 0, min.rows = 1L, learn.rate = 0.1, sample.rate = 1,
   type = c("auto", "regression", "classification"), thresholds = NULL,
-  seed = NULL, checkpoint.interval = 10L, ml.options = ml_options(), ...)
+  seed = NULL, checkpoint.interval = 10L, cache.node.ids = FALSE,
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -65,6 +66,10 @@ is the original probability of that class and t is the class's threshold.}
 
 \item{checkpoint.interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
 E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
+
+\item{cache.node.ids}{If \code{FALSE}, the algorithm will pass trees to executors to match instances with nodes.
+If \code{TRUE}, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
+Defaults to \code{FALSE}.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
