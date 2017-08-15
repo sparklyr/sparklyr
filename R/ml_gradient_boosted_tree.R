@@ -132,9 +132,9 @@ ml_gradient_boosted_trees <- function(x,
   }
 
 
-  rf <- invoke_new(sc, envir$model)
+  gbt <- invoke_new(sc, envir$model)
 
-  model <- rf %>%
+  model <- gbt %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setImpurity", impurity) %>%
     invoke("setLabelCol", envir$response) %>%
