@@ -40,8 +40,18 @@ test_that("thresholds parameter behaves as expected", {
   expect_equal(most_predicted_label(gbt_predictions), 1)
 })
 
+test_that("informative error when using Spark version that doesn't support thresholds", {
+  expect_error(
+    iris_tbl %>%
+      filter(Species != "setosa") %>%
+      ml_gradient_boosted_trees(Species ~ Sepal_Width, type = "classification",
+                                thresholds = c(0, 1)),
+    "thresholds is only supported for GBT in Spark 2.2.0\\+"
+  )
+})
+
 test_that("error for thresholds with wrong length", {
-  if (spark_version(sc) < "2.2.0") skip("threshold length checking implemented in 2.1.0")
+  if (spark_version(sc) < "2.2.0") skip("thresholds not supported for Spark <2.2.0")
   expect_error(
     iris_tbl %>%
       filter(Species != "setosa") %>%
