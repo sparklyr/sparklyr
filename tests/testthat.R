@@ -4,11 +4,11 @@ library(testthat)
 library(sparklyr)
 
 if (identical(Sys.getenv("NOT_CRAN"), "true")) {
-  test_check("testthat")
+  test_check("sparklyr", filter = "livy")
 
   on.exit({
     spark_disconnect_all()
-    Sys.sleep(3)
     livy_service_stop()
+    Sys.sleep(3)
   })
 }
