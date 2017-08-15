@@ -168,7 +168,12 @@ class Backend {
     }
 
     try {
-      if (portIsAvailable(port, inetAddress))
+      if (isWorker)
+      {
+        gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
+        port = gatewayServerSocket.getLocalPort()
+      }
+      else if (portIsAvailable(port, inetAddress))
       {
         logger.log("found port " + port + " is available")
         logger = new Logger("Gateway", sessionId)
