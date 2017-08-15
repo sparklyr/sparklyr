@@ -9,7 +9,7 @@ ml_random_forest(x, response, features, col.sample.rate = NULL,
   max.depth = 5L, min.info.gain = 0, min.rows = 1L, num.trees = 20L,
   sample.rate = 1, thresholds = NULL, seed = NULL, type = c("auto",
   "regression", "classification"), checkpoint.interval = 10L,
-  ml.options = ml_options(), ...)
+  cache.node.ids = FALSE, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -65,6 +65,10 @@ then regression is used; classification otherwise.}
 
 \item{checkpoint.interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
 E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
+
+\item{cache.node.ids}{If \code{FALSE}, the algorithm will pass trees to executors to match instances with nodes.
+If \code{TRUE}, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
+Defaults to \code{FALSE}.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
