@@ -75,7 +75,7 @@ ml_random_forest <- function(x,
         message("* Using feature subsetting strategy: ", col.sample.rate)
       }
     } else {
-      col.sample.rate <- ensure_scalar_character(as.character(col.sample.rate))
+      col.sample.rate <- ensure_scalar_character(format(col.sample.rate, nsmall = 1L))
     }
   } else {
     col.sample.rate <- "auto"
