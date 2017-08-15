@@ -4,8 +4,11 @@
 \alias{ml_decision_tree}
 \title{Spark ML -- Decision Trees}
 \usage{
-ml_decision_tree(x, response, features, max.bins = 32L, max.depth = 5L,
-  type = c("auto", "regression", "classification"),
+ml_decision_tree(x, response, features, impurity = c("auto", "gini",
+  "entropy", "variance"), max.bins = 32L, max.depth = 5L,
+  min.info.gain = 0, min.rows = 1L, type = c("auto", "regression",
+  "classification"), thresholds = NULL, seed = NULL,
+  checkpoint.interval = 10L, cache.node.ids = FALSE, max.memory = 256L,
   ml.options = ml_options(), ...)
 }
 \arguments{
@@ -22,6 +25,10 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{features}{The name of features (terms) to use for the model fit.}
 
+\item{impurity}{Criterion used for information gain calculation
+One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to
+'gini' for classification and 'variance' for regression.}
+
 \item{max.bins}{The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at
 each node. More bins give higher granularity.}
@@ -29,11 +36,33 @@ each node. More bins give higher granularity.}
 \item{max.depth}{Maximum depth of the tree (>= 0); that is, the maximum
 number of nodes separating any leaves from the root of the tree.}
 
+\item{min.info.gain}{Minimum information gain for a split to be considered at a tree node. Should be >= 0, defaults to 0.}
+
+\item{min.rows}{Minimum number of instances each child must have after split.}
+
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
+
+\item{thresholds}{Thresholds in multi-class classification to adjust
+the probability of predicting each class. Vector must have length equal
+to the number of classes, with values > 0 excepting that at most one
+value may be 0. The class with largest value p/t is predicted, where p
+is the original probability of that class and t is the class's threshold.}
+
+\item{seed}{Seed for random numbers.}
+
+\item{checkpoint.interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
+
+\item{cache.node.ids}{If \code{FALSE}, the algorithm will pass trees to executors to match instances with nodes.
+If \code{TRUE}, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
+Defaults to \code{FALSE}.}
+
+\item{max.memory}{Maximum memory in MB allocated to histogram aggregation. If too small, then 1 node will be split per iteration,
+and its aggregates may exceed this size. Defaults to 256.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}

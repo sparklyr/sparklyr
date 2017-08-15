@@ -14,7 +14,11 @@
 #' @template roxlate-ml-decision-trees-num-trees
 #' @template roxlate-ml-decision-trees-thresholds
 #' @template roxlate-ml-decision-trees-type
+#' @template roxlate-ml-decision-trees-sample-rate
 #' @template roxlate-ml-decision-trees-seed
+#' @template roxlate-ml-checkpoint-interval
+#' @template roxlate-ml-decision-trees-cache-node-ids
+#' @template roxlate-ml-decision-trees-max-memory
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -31,9 +35,13 @@ ml_random_forest <- function(x,
                              min.info.gain = 0,
                              min.rows = 1L,
                              num.trees = 20L,
+                             sample.rate = 1.0,
                              thresholds = NULL,
                              seed = NULL,
                              type = c("auto", "regression", "classification"),
+                             checkpoint.interval = 10L,
+                             cache.node.ids = FALSE,
+                             max.memory = 256L,
                              ml.options = ml_options(),
                              ...)
 {
@@ -73,7 +81,7 @@ ml_random_forest <- function(x,
         message("* Using feature subsetting strategy: ", col.sample.rate)
       }
     } else {
-      col.sample.rate <- ensure_scalar_character(as.character(col.sample.rate))
+      col.sample.rate <- ensure_scalar_character(format(col.sample.rate, nsmall = 1L))
     }
   } else {
     col.sample.rate <- "auto"
@@ -84,10 +92,15 @@ ml_random_forest <- function(x,
   min.info.gain <- ensure_scalar_double(min.info.gain)
   min.rows <- ensure_scalar_integer(min.rows)
   num.trees <- ensure_scalar_integer(num.trees)
+  if (num.trees < 1) stop("num.trees must be >= 1")
   type <- match.arg(type)
+  sample.rate <- ensure_scalar_double(sample.rate)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
   thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
+  checkpoint.interval <- ensure_scalar_integer(checkpoint.interval)
+  cache.node.ids <- ensure_scalar_boolean(cache.node.ids)
+  max.memory <- ensure_scalar_integer(max.memory)
 
   envir <- new.env(parent = emptyenv())
 
@@ -136,7 +149,11 @@ ml_random_forest <- function(x,
     invoke("setMaxDepth", max.depth) %>%
     invoke("setMinInfoGain", min.info.gain) %>%
     invoke("setMinInstancesPerNode", min.rows) %>%
-    invoke("setNumTrees", num.trees)
+    invoke("setNumTrees", num.trees) %>%
+    invoke("setSubsamplingRate", sample.rate) %>%
+    invoke("setCheckpointInterval", checkpoint.interval) %>%
+    invoke("setCacheNodeIds", cache.node.ids) %>%
+    invoke("setMaxMemoryInMB", max.memory)
 
   if (!is.null(thresholds))
     model <- invoke(model, "setThresholds", thresholds)
@@ -168,10 +185,14 @@ ml_random_forest <- function(x,
            min.rows = min.rows,
            num.trees = num.trees,
            thresholds = unlist(thresholds),
+           sample.rate = sample.rate,
            seed = seed,
            feature.importances = featureImportances,
            trees = invoke(fit, "trees"),
            data = df,
+           checkpoint.interval = checkpoint.interval,
+           cache.node.ids = cache.node.ids,
+           max.memory = max.memory,
            ml.options = ml.options,
            categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
