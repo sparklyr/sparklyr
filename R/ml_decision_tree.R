@@ -89,7 +89,7 @@ ml_decision_tree <- function(x,
                         "org.apache.spark.ml.regression.DecisionTreeRegressor",
                         "org.apache.spark.ml.classification.DecisionTreeClassifier")
 
-  rf <- invoke_new(sc, envir$model)
+  dt <- invoke_new(sc, envir$model)
 
   impurity <- rlang::arg_match(impurity)
   impurity <- if (identical(impurity, "auto")) {
@@ -104,7 +104,7 @@ ml_decision_tree <- function(x,
     impurity
   }
 
-  model <- rf %>%
+  model <- dt %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setLabelCol", envir$response) %>%
     invoke("setImpurity", impurity) %>%
