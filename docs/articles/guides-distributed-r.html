@@ -106,7 +106,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -145,7 +145,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 
 <span class="kw"><a href="../reference/sdf_len.html">sdf_len</a></span>(sc, <span class="dv">5</span>, <span class="dt">repartition =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">I</span>(e))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b1ed4422b&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca6f020f7f&gt; [?? x 1]
 ## # Database: spark_connection
 ##      id
 ##   &lt;dbl&gt;
@@ -157,7 +157,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <p>Your R function should be designed to operate on an R <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html">data frame</a>. The R function passed to <code>spark_apply</code> expects a DataFrame and will return an object that can be cast as a DataFrame. We can use the <code>class</code> function to verify the class of the data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/sdf_len.html">sdf_len</a></span>(sc, <span class="dv">10</span>, <span class="dt">repartition =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">class</span>(e))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b4269692b&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca2d24d20&gt; [?? x 1]
 ## # Database: spark_connection
 ##           id
 ##        &lt;chr&gt;
@@ -167,7 +167,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 
 trees_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">nrow</span>(e), <span class="dt">names =</span> <span class="st">"n"</span>)</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b9be1371&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca4692dda9&gt; [?? x 1]
 ## # Database: spark_connection
 ##       n
 ##   &lt;int&gt;
@@ -175,7 +175,7 @@ trees_tbl <span class="op">%&gt;%</span>
 ## 2    15</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trees_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">head</span>(e, <span class="dv">1</span>))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b1dee64b6&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca5416a671&gt; [?? x 3]
 ## # Database: spark_connection
 ##   Girth Height Volume
 ##   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
@@ -184,7 +184,7 @@ trees_tbl <span class="op">%&gt;%</span>
 <p>We can apply any arbitrary function to the partitions in the Spark DataFrame. For instance, we can scale or jitter the columns. Notice that <code>spark_apply</code> applies the R function to all partitions and returns a single DataFrame.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trees_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">scale</span>(e))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b4451f045&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca88ddbc6&gt; [?? x 3]
 ## # Database: spark_connection
 ##         Girth      Height     Volume
 ##         &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
@@ -198,30 +198,30 @@ trees_tbl <span class="op">%&gt;%</span>
 ##  8 -0.3670805 -0.22963966 -0.6661453
 ##  9 -0.1040975  1.30129143  0.1427209
 ## 10  0.1296653 -0.84201210 -0.3029809
-## # ... with 21 more rows</code></pre>
+## # ... with more rows</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trees_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">lapply</span>(e, jitter))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b5f75650d&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca1957a88d&gt; [?? x 3]
 ## # Database: spark_connection
 ##        Girth   Height   Volume
 ##        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1  8.300609 70.06614 10.31927
-##  2  8.782202 63.14384 10.20913
-##  3 10.705198 80.85294 18.78867
-##  4 10.998014 66.08903 15.61699
-##  5 11.096001 80.09383 22.59187
-##  6 11.295074 79.01472 24.19148
-##  7 11.398111 76.09978 21.39239
-##  8 11.994976 74.98846 19.08380
-##  9 12.910685 85.03434 33.80400
-## 10 13.711526 70.80274 25.70250
-## # ... with 21 more rows</code></pre>
+##  1  8.287798 69.80712 10.28412
+##  2  8.785531 63.18090 10.21287
+##  3 10.715335 80.92861 18.78260
+##  4 10.985554 66.13940 15.60478
+##  5 11.108412 79.90033 22.58873
+##  6 11.284649 79.07133 24.21657
+##  7 11.415568 76.18763 21.40407
+##  8 12.010764 74.94982 19.08528
+##  9 12.884407 84.81160 33.78431
+## 10 13.700123 70.88096 25.70843
+## # ... with more rows</code></pre>
 <p>By default <code><a href="../reference/spark_apply.html">spark_apply()</a></code> derives the column names from the input Spark data frame. Use the <code>names</code> argument to rename or add new columns.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trees_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(
     <span class="cf">function</span>(e) <span class="kw">data.frame</span>(<span class="fl">2.54</span> <span class="op">*</span><span class="st"> </span>e<span class="op">$</span>Girth, e),
     <span class="dt">names =</span> <span class="kw">c</span>(<span class="st">"Girth(cm)"</span>, <span class="kw">colnames</span>(trees)))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b4bd58418&gt; [?? x 4]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca70e8fe07&gt; [?? x 4]
 ## # Database: spark_connection
 ##    `Girth(cm)` Girth Height Volume
 ##          &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
@@ -235,7 +235,7 @@ trees_tbl <span class="op">%&gt;%</span>
 ##  8      30.480  12.0     75   19.1
 ##  9      32.766  12.9     85   33.8
 ## 10      34.798  13.7     71   25.7
-## # ... with 21 more rows</code></pre>
+## # ... with more rows</code></pre>
 </div>
 <div id="group-by" class="section level3">
 <h3 class="hasAnchor">
@@ -245,7 +245,7 @@ trees_tbl <span class="op">%&gt;%</span>
 
 iris_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(nrow, <span class="dt">group_by =</span> <span class="st">"Species"</span>)</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b39f866ff&gt; [?? x 2]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca6d98d3de&gt; [?? x 2]
 ## # Database: spark_connection
 ##      Species Sepal_Length
 ##        &lt;chr&gt;        &lt;int&gt;
@@ -257,7 +257,7 @@ iris_tbl <span class="op">%&gt;%</span>
     <span class="cf">function</span>(e) <span class="kw">summary</span>(<span class="kw">lm</span>(Petal_Length <span class="op">~</span><span class="st"> </span>Petal_Width, e))<span class="op">$</span>r.squared,
     <span class="dt">names =</span> <span class="st">"r.squared"</span>,
     <span class="dt">group_by =</span> <span class="st">"Species"</span>)</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b63320d14&gt; [?? x 2]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca4c7dcc08&gt; [?? x 2]
 ## # Database: spark_connection
 ##      Species r.squared
 ##        &lt;chr&gt;     &lt;dbl&gt;
@@ -275,7 +275,7 @@ iris_tbl <span class="op">%&gt;%</span>
   <span class="cf">function</span>(e) broom<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/broom/topics/tidy">tidy</a></span>(<span class="kw">lm</span>(Petal_Length <span class="op">~</span><span class="st"> </span>Petal_Width, e)),
   <span class="dt">names =</span> <span class="kw">c</span>(<span class="st">"term"</span>, <span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"statistic"</span>, <span class="st">"p.value"</span>),
   <span class="dt">group_by =</span> <span class="st">"Species"</span>)</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1b5b74d91ed1&gt; [?? x 6]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca1b66a293&gt; [?? x 6]
 ## # Database: spark_connection
 ##      Species        term  estimate std.error statistic      p.value
 ##        &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;

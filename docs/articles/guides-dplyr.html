@@ -106,7 +106,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -225,7 +225,7 @@ airlines &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.ti
 ##  8  2013     1     1       -14        -3
 ##  9  2013     1     1        -8        -3
 ## 10  2013     1     1         8        -2
-## # ... with 3.368e+05 more rows</code></pre>
+## # ... with more rows</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(flights, dep_delay <span class="op">&gt;</span><span class="st"> </span><span class="dv">1000</span>)</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 19]
 ## # Database: spark_connection
@@ -256,10 +256,10 @@ airlines &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.ti
 ##  8  2013     6    27      959           1900       899     1236
 ##  9  2013     7    22     2257            759       898      121
 ## 10  2013    12     5      756           1700       896     1058
-## # ... with 3.368e+05 more rows, and 12 more variables:
-## #   sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-## #   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-## #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</code></pre>
+## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(flights, <span class="dt">mean_dep_delay =</span> <span class="kw">mean</span>(dep_delay))</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: spark_connection
@@ -281,10 +281,10 @@ airlines &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.ti
 ##  8  2013     1     1      557            600        -3      709
 ##  9  2013     1     1      557            600        -3      838
 ## 10  2013     1     1      558            600        -2      753
-## # ... with 3.368e+05 more rows, and 13 more variables:
-## #   sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-## #   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-## #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, speed &lt;dbl&gt;</code></pre>
+## # ... with more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, speed &lt;dbl&gt;</code></pre>
 </div>
 <div id="laziness" class="section level2">
 <h2 class="hasAnchor">
@@ -316,7 +316,7 @@ c4 &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyvers
 ##  8  2013     5    17      AA        -7      142     1089       2.366667
 ##  9  2013     5    17      AA        -6      148     1089       2.466667
 ## 10  2013     5    17      AA        -7      137      944       2.283333
-## # ... with 426 more rows</code></pre>
+## # ... with more rows</code></pre>
 </div>
 <div id="piping" class="section level2">
 <h2 class="hasAnchor">
@@ -382,7 +382,7 @@ c4 &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyvers
 ##  8      AA        -7      137      944       2.283333
 ##  9      AA        -1      195     1389       3.250000
 ## 10      AA        -2      294     2248       4.900000
-## # ... with 426 more rows</code></pre>
+## # ... with more rows</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_tbls.html">src_tbls</a></span>(sc)</code></pre></div>
 <pre><code>## [1] "airlines"     "carrierhours" "flights"</code></pre>
 </div>
@@ -422,10 +422,10 @@ bestworst &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(dep_delay <span class="op">==</span><span class="st"> </span><span class="kw">min</span>(dep_delay) <span class="op">||</span><span class="st"> </span>dep_delay <span class="op">==</span><span class="st"> </span><span class="kw">max</span>(dep_delay))
 dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/sql_build">sql_render</a></span>(bestworst)
 ## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`
-## FROM (SELECT `year`, `month`, `day`, `dep_delay`, min(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz4`, max(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz5`
+## FROM (SELECT `year`, `month`, `day`, `dep_delay`, min(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz5`, max(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz6`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `obvhhrzscj`) `zlwtireaxx`
-## WHERE (`dep_delay` = `zzz4` OR `dep_delay` = `zzz5`)
+## FROM `flights`) `zvubtprhso`) `spmpogatny`
+## WHERE (`dep_delay` = `zzz5` OR `dep_delay` = `zzz6`)
 bestworst
 ## # Source:   lazy query [?? x 4]
 ## # Database: spark_connection
@@ -442,7 +442,7 @@ bestworst
 ##  8  2013     1    29       -27
 ##  9  2013     1    29       235
 ## 10  2013     2     1       -15
-## # ... with 814 more rows</code></pre></div>
+## # ... with more rows</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Rank each flight within a daily</span>
 ranked &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(year, month, day) <span class="op">%&gt;%</span>
@@ -451,7 +451,7 @@ ranked &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span>
 dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/sql_build">sql_render</a></span>(ranked)</code></pre></div>
 <pre><code>## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`, rank() OVER (PARTITION BY `year`, `month`, `day` ORDER BY `dep_delay` DESC) AS `rank`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `clbqyajimm`</code></pre>
+## FROM `flights`) `ogiddqbrvf`</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ranked</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 5]
 ## # Database: spark_connection
@@ -468,7 +468,7 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ##  8  2013     1     1       192     8
 ##  9  2013     1     1       157     9
 ## 10  2013     1     1       155    10
-## # ... with 3.368e+05 more rows</code></pre>
+## # ... with more rows</code></pre>
 </div>
 <div id="peforming-joins" class="section level2">
 <h2 class="hasAnchor">
@@ -497,10 +497,10 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ##  8  2013     1     1      557            600        -3      709
 ##  9  2013     1     1      557            600        -3      838
 ## 10  2013     1     1      558            600        -2      753
-## # ... with 3.368e+05 more rows, and 13 more variables:
-## #   sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-## #   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-## #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
+## # ... with more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">flights <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(airlines, <span class="dt">by =</span> <span class="st">"carrier"</span>)</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 20]
 ## # Database: spark_connection
@@ -516,10 +516,10 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ##  8  2013     1     1      557            600        -3      709
 ##  9  2013     1     1      557            600        -3      838
 ## 10  2013     1     1      558            600        -2      753
-## # ... with 3.368e+05 more rows, and 13 more variables:
-## #   sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-## #   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-## #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
+## # ... with more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">flights <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(airlines, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">"carrier"</span>, <span class="st">"carrier"</span>))</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 20]
 ## # Database: spark_connection
@@ -535,10 +535,10 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ##  8  2013     1     1      557            600        -3      709
 ##  9  2013     1     1      557            600        -3      838
 ## 10  2013     1     1      558            600        -2      753
-## # ... with 3.368e+05 more rows, and 13 more variables:
-## #   sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-## #   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-## #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
+## # ... with more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
 </div>
 <div id="sampling" class="section level2">
 <h2 class="hasAnchor">
@@ -559,26 +559,26 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ##  8  2013     1     1      557            600        -3      709
 ##  9  2013     1     1      557            600        -3      838
 ## 10  2013     1     1      558            600        -2      753
-## # ... with 12 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,
-## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
-## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
-## #   time_hour &lt;dbl&gt;</code></pre>
+## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/sample.html">sample_frac</a></span>(flights, <span class="fl">0.01</span>)</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 19]
 ## # Database: spark_connection
 ##     year month   day dep_time sched_dep_time dep_delay arr_time
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
-##  1  2013     1     1      741            745        -4     1038
-##  2  2013     1     1     1137           1140        -3     1445
-##  3  2013     1     1     1459           1454         5     1750
-##  4  2013     1     1     1815           1805        10     1928
-##  5  2013     1     1     1856           1645       131     2212
-##  6  2013     1     2     1033            929        64     1235
-##  7  2013     1     2     1558           1600        -2     1923
-##  8  2013     1     2     1600           1553         7     1704
-##  9  2013     1     2     1742           1745        -3     2123
-## 10  2013     1     2     2043           1759       164     2251
-## # ... with 3,333 more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
+##  1  2013     1     1      517            515         2      830
+##  2  2013     1     1      555            600        -5      913
+##  3  2013     1     1      615            615         0     1039
+##  4  2013     1     1      859            900        -1     1140
+##  5  2013     1     1      904            906        -2     1207
+##  6  2013     1     1     1143           1145        -2     1512
+##  7  2013     1     1     1436           1435         1     1840
+##  8  2013     1     1     1506           1512        -6     1723
+##  9  2013     1     1     1522           1530        -8     1858
+## 10  2013     1     1     1654           1700        -6     2020
+## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
 ## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
 ## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
 ## #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</code></pre>
@@ -609,17 +609,17 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ## # Ordered by: -days_since
 ##    flight_date days_since     n
 ##          &lt;chr&gt;      &lt;int&gt; &lt;dbl&gt;
-##  1    2013-1-1       1668   842
-##  2    2013-1-2       1667   943
-##  3    2013-1-3       1666   914
-##  4    2013-1-4       1665   915
-##  5    2013-1-5       1664   720
-##  6    2013-1-6       1663   832
-##  7    2013-1-7       1662   933
-##  8    2013-1-8       1661   899
-##  9    2013-1-9       1660   902
-## 10   2013-1-10       1659   932
-## # ... with 355 more rows</code></pre>
+##  1    2013-1-1       1687   842
+##  2    2013-1-2       1686   943
+##  3    2013-1-3       1685   914
+##  4    2013-1-4       1684   915
+##  5    2013-1-5       1683   720
+##  6    2013-1-6       1682   832
+##  7    2013-1-7       1681   933
+##  8    2013-1-8       1680   899
+##  9    2013-1-9       1679   902
+## 10   2013-1-10       1678   932
+## # ... with more rows</code></pre>
 </div>
 </div>
   </div>

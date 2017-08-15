@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Runtime configuration interface for Hive — hive_context_config • sparklyr</title>
+<title>Write a Spark DataFrame to a Text file — spark_write_text • sparklyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -146,23 +146,63 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Runtime configuration interface for Hive</h1>
+    <h1>Write a Spark DataFrame to a Text file</h1>
     </div>
 
     
-    <p>Retrieves the runtime configuration interface for Hive.</p>
+    <p>Serialize a Spark DataFrame to the plain text format.</p>
     
 
-    <pre class="usage"><span class='fu'>hive_context_config</span>(<span class='no'>sc</span>)</pre>
+    <pre class="usage"><span class='fu'>spark_write_text</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>mode</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'>list</span>(),
+  <span class='kw'>partition_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>sc</th>
-      <td><p>A <code>spark_connection</code>.</p></td>
+      <th>x</th>
+      <td><p>A Spark DataFrame or dplyr operation</p></td>
+    </tr>
+    <tr>
+      <th>path</th>
+      <td><p>The path to the file. Needs to be accessible from the cluster.
+Supports the <samp>"hdfs://"</samp>, <samp>"s3n://"</samp> and <samp>"file://"</samp> protocols.</p></td>
+    </tr>
+    <tr>
+      <th>mode</th>
+      <td><p>Specifies the behavior when data or table already exists.</p></td>
+    </tr>
+    <tr>
+      <th>options</th>
+      <td><p>A list of strings with additional options.</p></td>
+    </tr>
+    <tr>
+      <th>partition_by</th>
+      <td><p>Partitions the output by the given columns on the file system.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <p>Other Spark serialization routines: <code><a href='spark_load_table.html'>spark_load_table</a></code>,
+  <code><a href='spark_read_csv.html'>spark_read_csv</a></code>,
+  <code><a href='spark_read_jdbc.html'>spark_read_jdbc</a></code>,
+  <code><a href='spark_read_json.html'>spark_read_json</a></code>,
+  <code><a href='spark_read_parquet.html'>spark_read_parquet</a></code>,
+  <code><a href='spark_read_source.html'>spark_read_source</a></code>,
+  <code><a href='spark_read_table.html'>spark_read_table</a></code>,
+  <code><a href='spark_read_text.html'>spark_read_text</a></code>,
+  <code><a href='spark_save_table.html'>spark_save_table</a></code>,
+  <code><a href='spark_write_csv.html'>spark_write_csv</a></code>,
+  <code><a href='spark_write_jdbc.html'>spark_write_jdbc</a></code>,
+  <code><a href='spark_write_json.html'>spark_write_json</a></code>,
+  <code><a href='spark_write_parquet.html'>spark_write_parquet</a></code>,
+  <code><a href='spark_write_source.html'>spark_write_source</a></code>,
+  <code><a href='spark_write_table.html'>spark_write_table</a></code></p>
     
 
   </div>
@@ -170,7 +210,9 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#see-also">See also</a></li>
+          </ul>
 
   </div>
 </div>
