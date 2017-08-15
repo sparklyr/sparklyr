@@ -8,7 +8,7 @@ ml_decision_tree(x, response, features, impurity = c("auto", "gini",
   "entropy", "variance"), max.bins = 32L, max.depth = 5L,
   min.info.gain = 0, min.rows = 1L, type = c("auto", "regression",
   "classification"), thresholds = NULL, seed = NULL,
-  checkpoint.interval = 10L, cache.node.ids = FALSE,
+  checkpoint.interval = 10L, cache.node.ids = FALSE, max.memory = 256L,
   ml.options = ml_options(), ...)
 }
 \arguments{
@@ -60,6 +60,9 @@ E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults
 \item{cache.node.ids}{If \code{FALSE}, the algorithm will pass trees to executors to match instances with nodes.
 If \code{TRUE}, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
 Defaults to \code{FALSE}.}
+
+\item{max.memory}{Maximum memory in MB allocated to histogram aggregation. If too small, then 1 node will be split per iteration,
+and its aggregates may exceed this size. Defaults to 256.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
