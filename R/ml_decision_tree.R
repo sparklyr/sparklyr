@@ -16,7 +16,7 @@
 #' @template roxlate-ml-checkpoint-interval
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
-#'
+#' @template roxlate-ml-decision-trees-cache-node-ids
 #' @family Spark ML routines
 #'
 #' @export
@@ -32,6 +32,7 @@ ml_decision_tree <- function(x,
                              thresholds = NULL,
                              seed = NULL,
                              checkpoint.interval = 10L,
+                             cache.node.ids = FALSE,
                              ml.options = ml_options(),
                              ...)
 {
@@ -60,6 +61,7 @@ ml_decision_tree <- function(x,
   thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
   checkpoint.interval <- ensure_scalar_integer(checkpoint.interval)
+  cache.node.ids <- ensure_scalar_boolean(cache.node.ids)
 
   envir <- new.env(parent = emptyenv())
 
@@ -107,7 +109,8 @@ ml_decision_tree <- function(x,
     invoke("setMaxDepth", max.depth) %>%
     invoke("setMinInfoGain", min.info.gain) %>%
     invoke("setMinInstancesPerNode", min.rows) %>%
-    invoke("setCheckpointInterval", checkpoint.interval)
+    invoke("setCheckpointInterval", checkpoint.interval) %>%
+    invoke("setCacheNodeIds", cache.node.ids)
 
   if (!is.null(thresholds))
     model <- invoke(model, "setThresholds", thresholds)
@@ -136,6 +139,7 @@ ml_decision_tree <- function(x,
            seed = seed,
            checkpoint.interval = checkpoint.interval,
            categorical.transformations = categorical.transformations,
+           cache.node.ids = cache.node.ids,
            data = df,
            ml.options = ml.options,
            model.parameters = as.list(envir)
