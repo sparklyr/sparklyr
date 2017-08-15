@@ -19,6 +19,7 @@
 #' @template roxlate-ml-decision-trees-thresholds
 #' @template roxlate-ml-checkpoint-interval
 #' @template roxlate-ml-decision-trees-cache-node-ids
+#' @template roxlate-ml-decision-trees-max-memory
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -42,6 +43,7 @@ ml_gradient_boosted_trees <- function(x,
                                       seed = NULL,
                                       checkpoint.interval = 10L,
                                       cache.node.ids = FALSE,
+                                      max.memory = 256L,
                                       ml.options = ml_options(),
                                       ...)
 {
@@ -78,6 +80,7 @@ ml_gradient_boosted_trees <- function(x,
     stop("thresholds is only supported for GBT in Spark 2.2.0+")
   checkpoint.interval <- ensure_scalar_integer(checkpoint.interval)
   cache.node.ids <- ensure_scalar_boolean(cache.node.ids)
+  max.memory <- ensure_scalar_integer(max.memory)
 
   envir <- new.env(parent = emptyenv())
 
@@ -144,7 +147,8 @@ ml_gradient_boosted_trees <- function(x,
     invoke("setStepSize", learn.rate) %>%
     invoke("setSubsamplingRate", sample.rate) %>%
     invoke("setCheckpointInterval", checkpoint.interval) %>%
-    invoke("setCacheNodeIds", cache.node.ids)
+    invoke("setCacheNodeIds", cache.node.ids) %>%
+    invoke("setMaxMemoryInMB", max.memory)
 
   if (!is.null(thresholds))
     model <- invoke(model, "setThresholds", thresholds)
@@ -178,6 +182,7 @@ ml_gradient_boosted_trees <- function(x,
     seed = seed,
     checkpoint.interval = checkpoint.interval,
     cache.node.ids = cache.node.ids,
+    max.memory = max.memory,
     data = df,
     ml.options = ml.options,
     categorical.transformations = categorical.transformations,
