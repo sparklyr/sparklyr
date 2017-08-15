@@ -13,6 +13,7 @@
 #' @template roxlate-ml-decision-trees-thresholds
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-decision-trees-seed
+#' @template roxlate-ml-checkpoint-interval
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -30,6 +31,7 @@ ml_decision_tree <- function(x,
                              type = c("auto", "regression", "classification"),
                              thresholds = NULL,
                              seed = NULL,
+                             checkpoint.interval = 10L,
                              ml.options = ml_options(),
                              ...)
 {
@@ -57,6 +59,7 @@ ml_decision_tree <- function(x,
   only.model <- ensure_scalar_boolean(ml.options$only.model)
   thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
+  checkpoint.interval <- ensure_scalar_integer(checkpoint.interval)
 
   envir <- new.env(parent = emptyenv())
 
@@ -103,7 +106,8 @@ ml_decision_tree <- function(x,
     invoke("setMaxBins", max.bins) %>%
     invoke("setMaxDepth", max.depth) %>%
     invoke("setMinInfoGain", min.info.gain) %>%
-    invoke("setMinInstancesPerNode", min.rows)
+    invoke("setMinInstancesPerNode", min.rows) %>%
+    invoke("setCheckpointInterval", checkpoint.interval)
 
   if (!is.null(thresholds))
     model <- invoke(model, "setThresholds", thresholds)
@@ -130,6 +134,7 @@ ml_decision_tree <- function(x,
            min.rows = min.rows,
            thresholds = unlist(thresholds),
            seed = seed,
+           checkpoint.interval = checkpoint.interval,
            categorical.transformations = categorical.transformations,
            data = df,
            ml.options = ml.options,

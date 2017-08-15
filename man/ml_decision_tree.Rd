@@ -8,7 +8,7 @@ ml_decision_tree(x, response, features, impurity = c("auto", "gini",
   "entropy", "variance"), max.bins = 32L, max.depth = 5L,
   min.info.gain = 0, min.rows = 1L, type = c("auto", "regression",
   "classification"), thresholds = NULL, seed = NULL,
-  ml.options = ml_options(), ...)
+  checkpoint.interval = 10L, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -52,6 +52,9 @@ value may be 0. The class with largest value p/t is predicted, where p
 is the original probability of that class and t is the class's threshold.}
 
 \item{seed}{Seed for random numbers.}
+
+\item{checkpoint.interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
