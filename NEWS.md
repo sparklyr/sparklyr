@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Implemented all tuning options from Spark ML for `ml_random_forest()`, `ml_gradient_boosted_trees()`, and `ml_decision_tree()`.
+
 - Avoid tasks failing under `spark_apply()` and multiple  concurrent
   partitions running while selecting backend port.
 
@@ -25,9 +27,6 @@
 - Added a `k` argument to `ml_pca()` to enable specification of number of principal
   components to extract. Also implemented `sdf_project()` to project datasets using
   the results of `ml_pca()` models.
-
-- Added to `ml_random_forest()` the following hyperparameter arguments:
-  `min.info.gain`, `col.sample.rate`, `min.rows`, `impurity`, and `thresholds`. Also added `seed` for reproducibility.
 
 # Sparklyr 0.6.1 (UNRELEASED)
 
