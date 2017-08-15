@@ -110,3 +110,21 @@ test_that("random seed setting works", {
 
   expect_equal(model_string(m1), model_string(m2))
 })
+
+test_that("one-tree forest agrees with ml_decision_tree()", {
+  rf <- iris_tbl %>%
+    ml_random_forest(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
+                              type = "regression",
+                              sample.rate = 1, col.sample.rate = 1,
+                              num.trees = 1L)
+  dt <- iris_tbl %>%
+    ml_decision_tree(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
+                     type = "regression")
+
+  expect_equal(rf %>%
+                 sdf_predict(iris_tbl) %>%
+                 collect(),
+               dt %>%
+                 sdf_predict(iris_tbl) %>%
+                 collect())
+})
