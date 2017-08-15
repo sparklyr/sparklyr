@@ -8,7 +8,8 @@ ml_random_forest(x, response, features, col.sample.rate = NULL,
   impurity = c("auto", "gini", "entropy", "variance"), max.bins = 32L,
   max.depth = 5L, min.info.gain = 0, min.rows = 1L, num.trees = 20L,
   sample.rate = 1, thresholds = NULL, seed = NULL, type = c("auto",
-  "regression", "classification"), ml.options = ml_options(), ...)
+  "regression", "classification"), checkpoint.interval = 10L,
+  ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -61,6 +62,9 @@ as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
+
+\item{checkpoint.interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}

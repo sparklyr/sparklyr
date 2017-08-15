@@ -16,6 +16,7 @@
 #' @template roxlate-ml-decision-trees-type
 #' @template roxlate-ml-decision-trees-sample-rate
 #' @template roxlate-ml-decision-trees-seed
+#' @template roxlate-ml-checkpoint-interval
 #' @template roxlate-ml-options
 #' @template roxlate-ml-dots
 #'
@@ -36,6 +37,7 @@ ml_random_forest <- function(x,
                              thresholds = NULL,
                              seed = NULL,
                              type = c("auto", "regression", "classification"),
+                             checkpoint.interval = 10L,
                              ml.options = ml_options(),
                              ...)
 {
@@ -92,6 +94,7 @@ ml_random_forest <- function(x,
   only.model <- ensure_scalar_boolean(ml.options$only.model)
   thresholds <- if (!is.null(thresholds)) lapply(thresholds, ensure_scalar_double)
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
+  checkpoint.interval <- ensure_scalar_integer(checkpoint.interval)
 
   envir <- new.env(parent = emptyenv())
 
@@ -141,7 +144,8 @@ ml_random_forest <- function(x,
     invoke("setMinInfoGain", min.info.gain) %>%
     invoke("setMinInstancesPerNode", min.rows) %>%
     invoke("setNumTrees", num.trees) %>%
-    invoke("setSubsamplingRate", sample.rate)
+    invoke("setSubsamplingRate", sample.rate) %>%
+    invoke("setCheckpointInterval", checkpoint.interval)
 
   if (!is.null(thresholds))
     model <- invoke(model, "setThresholds", thresholds)
@@ -178,6 +182,7 @@ ml_random_forest <- function(x,
            feature.importances = featureImportances,
            trees = invoke(fit, "trees"),
            data = df,
+           checkpoint.interval = checkpoint.interval,
            ml.options = ml.options,
            categorical.transformations = categorical.transformations,
            model.parameters = as.list(envir)
