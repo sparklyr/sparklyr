@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fix connection from closing when `invoke()` attempts to use a class
+  with a method that contains a reference to an undefined class.
+
 - Implemented all tuning options from Spark ML for `ml_random_forest()`, `ml_gradient_boosted_trees()`, and `ml_decision_tree()`.
 
 - Avoid tasks failing under `spark_apply()` and multiple  concurrent

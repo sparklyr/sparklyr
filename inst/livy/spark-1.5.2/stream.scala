@@ -108,6 +108,12 @@ object StreamHandler {
           writeString(dos, Utils.exceptionString(
             if (e.getCause == null) e else e.getCause
           ))
+        case e: NoClassDefFoundError =>
+          logger.logError(s"failed calling $methodName on $objId with no class dound error")
+          writeInt(dos, -1)
+          writeString(dos, Utils.exceptionString(
+            if (e.getCause == null) e else e.getCause
+          ))
       }
     }
 
