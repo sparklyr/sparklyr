@@ -4,27 +4,22 @@
 \alias{ft_sql_transformer}
 \title{Feature Transformation -- SQLTransformer}
 \usage{
-ft_sql_transformer(x, input.col = NULL, output.col = NULL, sql, ...)
+ft_sql_transformer(x, sql, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
-\item{input.col}{The name of the input column(s).}
-
-\item{output.col}{The name of the output column.}
-
 \item{sql}{A SQL statement.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{input.col}{The name of the input column(s).}
+
+\item{output.col}{The name of the output column.}
 }
 \description{
 Transform a data set using SQL. Use the \code{__THIS__}
 placeholder as a proxy for the active table.
-}
-\details{
-Although this function accepts the \code{input.col} and \code{output.col}
-arguments, they are ignored -- this interface is done purely for
-compatibility with \code{\link{sdf_mutate}}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
