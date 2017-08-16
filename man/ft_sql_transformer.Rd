@@ -12,31 +12,8 @@ ft_sql_transformer(x, sql, ...)
 \item{sql}{A SQL statement.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{input.col}{The name of the input column(s).}
-
-\item{output.col}{The name of the output column.}
 }
 \description{
 Transform a data set using SQL. Use the \code{__THIS__}
 placeholder as a proxy for the active table.
-}
-\seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
-  more information on the set of transformations available for DataFrame
-  columns in Spark.
-
-Other feature transformation routines: \code{\link{ft_binarizer}},
-  \code{\link{ft_bucketizer}},
-  \code{\link{ft_count_vectorizer}},
-  \code{\link{ft_discrete_cosine_transform}},
-  \code{\link{ft_elementwise_product}},
-  \code{\link{ft_index_to_string}},
-  \code{\link{ft_one_hot_encoder}},
-  \code{\link{ft_quantile_discretizer}},
-  \code{\link{ft_regex_tokenizer}},
-  \code{\link{ft_string_indexer}},
-  \code{\link{ft_tokenizer}},
-  \code{\link{ft_vector_assembler}},
-  \code{\link{sdf_mutate}}
 }
