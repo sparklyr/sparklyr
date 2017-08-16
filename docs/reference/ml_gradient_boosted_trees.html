@@ -130,7 +130,7 @@
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -153,9 +153,13 @@
     <p>Perform regression or classification using gradient-boosted trees.</p>
     
 
-    <pre class="usage"><span class='fu'>ml_gradient_boosted_trees</span>(<span class='no'>x</span>, <span class='no'>response</span>, <span class='no'>features</span>, <span class='kw'>max.bins</span> <span class='kw'>=</span> <span class='fl'>32L</span>,
-  <span class='kw'>max.depth</span> <span class='kw'>=</span> <span class='fl'>5L</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"regression"</span>, <span class='st'>"classification"</span>),
-  <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options.html'>ml_options</a></span>(), <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>ml_gradient_boosted_trees</span>(<span class='no'>x</span>, <span class='no'>response</span>, <span class='no'>features</span>, <span class='kw'>impurity</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"gini"</span>,
+  <span class='st'>"entropy"</span>, <span class='st'>"variance"</span>), <span class='kw'>loss.type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"logistic"</span>, <span class='st'>"squared"</span>,
+  <span class='st'>"absolute"</span>), <span class='kw'>max.bins</span> <span class='kw'>=</span> <span class='fl'>32L</span>, <span class='kw'>max.depth</span> <span class='kw'>=</span> <span class='fl'>5L</span>, <span class='kw'>num.trees</span> <span class='kw'>=</span> <span class='fl'>20L</span>,
+  <span class='kw'>min.info.gain</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>min.rows</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>learn.rate</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>sample.rate</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"regression"</span>, <span class='st'>"classification"</span>), <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>checkpoint.interval</span> <span class='kw'>=</span> <span class='fl'>10L</span>, <span class='kw'>cache.node.ids</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>max.memory</span> <span class='kw'>=</span> <span class='fl'>256L</span>, <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options.html'>ml_options</a></span>(), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -180,6 +184,17 @@ The intercept term can be omitted by using <code>- 1</code> in the model fit.</p
       <td><p>The name of features (terms) to use for the model fit.</p></td>
     </tr>
     <tr>
+      <th>impurity</th>
+      <td><p>Criterion used for information gain calculation
+One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to
+'gini' for classification and 'variance' for regression.</p></td>
+    </tr>
+    <tr>
+      <th>loss.type</th>
+      <td><p>Loss function which the algorithm tries to minimize. Defaults to <code>logistic</code>
+for classification and <code>squared</code> for regression.</p></td>
+    </tr>
+    <tr>
       <th>max.bins</th>
       <td><p>The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at
@@ -191,12 +206,60 @@ each node. More bins give higher granularity.</p></td>
 number of nodes separating any leaves from the root of the tree.</p></td>
     </tr>
     <tr>
+      <th>num.trees</th>
+      <td><p>Number of trees to train (&gt;= 1), defaults to 20.</p></td>
+    </tr>
+    <tr>
+      <th>min.info.gain</th>
+      <td><p>Minimum information gain for a split to be considered at a tree node. Should be &gt;= 0, defaults to 0.</p></td>
+    </tr>
+    <tr>
+      <th>min.rows</th>
+      <td><p>Minimum number of instances each child must have after split.</p></td>
+    </tr>
+    <tr>
+      <th>learn.rate</th>
+      <td><p>the learning rate or step size, defaults to 0.1.</p></td>
+    </tr>
+    <tr>
+      <th>sample.rate</th>
+      <td><p>Fraction of the training data used for learning each decision tree, defaults to 1.0.</p></td>
+    </tr>
+    <tr>
       <th>type</th>
       <td><p>The type of model to fit. <code>"regression"</code> treats the response
 as a continuous variable, while <code>"classification"</code> treats the response
 as a categorical variable. When <code>"auto"</code> is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.</p></td>
+    </tr>
+    <tr>
+      <th>thresholds</th>
+      <td><p>Thresholds in multi-class classification to adjust
+the probability of predicting each class. Vector must have length equal
+to the number of classes, with values &gt; 0 excepting that at most one
+value may be 0. The class with largest value p/t is predicted, where p
+is the original probability of that class and t is the class's threshold.</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p>Seed for random numbers.</p></td>
+    </tr>
+    <tr>
+      <th>checkpoint.interval</th>
+      <td><p>Set checkpoint interval (&gt;= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.</p></td>
+    </tr>
+    <tr>
+      <th>cache.node.ids</th>
+      <td><p>If <code>FALSE</code>, the algorithm will pass trees to executors to match instances with nodes.
+If <code>TRUE</code>, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
+Defaults to <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>max.memory</th>
+      <td><p>Maximum memory in MB allocated to histogram aggregation. If too small, then 1 node will be split per iteration,
+and its aggregates may exceed this size. Defaults to 256.</p></td>
     </tr>
     <tr>
       <th>ml.options</th>

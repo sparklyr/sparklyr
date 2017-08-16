@@ -106,7 +106,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -412,6 +412,96 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <li>ensure_scalar_boolean</li>
 <li>ensure_scalar_character</li>
 </ul>
+<p>In order to match the correct data types while calling Scala code from R, or retrieving results from Scala back to R, consider the following types mapping:</p>
+<table class="table">
+<thead><tr class="header">
+<th>From R</th>
+<th>Scala</th>
+<th>To R</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>NULL</td>
+<td>void</td>
+<td>NULL</td>
+</tr>
+<tr class="even">
+<td>integer</td>
+<td>Int</td>
+<td>integer</td>
+</tr>
+<tr class="odd">
+<td>character</td>
+<td>String</td>
+<td>character</td>
+</tr>
+<tr class="even">
+<td>logical</td>
+<td>Boolean</td>
+<td>logical</td>
+</tr>
+<tr class="odd">
+<td>double</td>
+<td>Double</td>
+<td>double</td>
+</tr>
+<tr class="even">
+<td>numeric</td>
+<td>Double</td>
+<td>double</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Float</td>
+<td>double</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Decimal</td>
+<td>double</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Long</td>
+<td>double</td>
+</tr>
+<tr class="even">
+<td>raw</td>
+<td>Array[Byte]</td>
+<td>raw</td>
+</tr>
+<tr class="odd">
+<td>Date</td>
+<td>Date</td>
+<td>Date</td>
+</tr>
+<tr class="even">
+<td>POSIXlt</td>
+<td>Time</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>POSIXct</td>
+<td>Time</td>
+<td>POSIXct</td>
+</tr>
+<tr class="even">
+<td>list</td>
+<td>Array[T]</td>
+<td>list</td>
+</tr>
+<tr class="odd">
+<td>environment</td>
+<td>Map[String, T]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>jobj</td>
+<td>Object</td>
+<td>jobj</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="compiling" class="section level2">
 <h2 class="hasAnchor">

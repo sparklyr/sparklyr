@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Runtime configuration interface for Hive — hive_context_config • sparklyr</title>
+<title>Support for Dimension Operations — sdf_dim • sparklyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -146,21 +146,26 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Runtime configuration interface for Hive</h1>
+    <h1>Support for Dimension Operations</h1>
     </div>
 
     
-    <p>Retrieves the runtime configuration interface for Hive.</p>
+    <p><code>sdf_dim()</code>,  <code>sdf_nrow()</code> and <code>sdf_ncol()</code> provide similar
+functionality to <code>dim()</code>, <code>nrow()</code> and <code>ncol()</code>.</p>
     
 
-    <pre class="usage"><span class='fu'>hive_context_config</span>(<span class='no'>sc</span>)</pre>
+    <pre class="usage"><span class='fu'>sdf_dim</span>(<span class='no'>x</span>)
+
+<span class='fu'>sdf_nrow</span>(<span class='no'>x</span>)
+
+<span class='fu'>sdf_ncol</span>(<span class='no'>x</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>sc</th>
-      <td><p>A <code>spark_connection</code>.</p></td>
+      <th>x</th>
+      <td><p>An object (usually a <code>spark_tbl</code>).</p></td>
     </tr>
     </table>
     

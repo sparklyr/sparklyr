@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Runtime configuration interface for Hive — hive_context_config • sparklyr</title>
+<title>Project features onto principal components — sdf_project • sparklyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -146,23 +146,53 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Runtime configuration interface for Hive</h1>
+    <h1>Project features onto principal components</h1>
     </div>
 
     
-    <p>Retrieves the runtime configuration interface for Hive.</p>
+    <p>Project features onto principal components</p>
     
 
-    <pre class="usage"><span class='fu'>hive_context_config</span>(<span class='no'>sc</span>)</pre>
+    <pre class="usage"><span class='fu'>sdf_project</span>(<span class='no'>object</span>, <span class='no'>newdata</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='fu'>dimnames</span>(<span class='no'>object</span>$<span class='no'>components</span>)<span class='kw'>[[</span><span class='fl'>1</span>]],
+  <span class='kw'>feature.prefix</span> <span class='kw'>=</span> <span class='st'>"PC"</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>sc</th>
-      <td><p>A <code>spark_connection</code>.</p></td>
+      <th>object</th>
+      <td><p>A Spark PCA model object</p></td>
+    </tr>
+    <tr>
+      <th>newdata</th>
+      <td><p>An object coercible to a Spark DataFrame</p></td>
+    </tr>
+    <tr>
+      <th>features</th>
+      <td><p>A vector of names of columns to be projected</p></td>
+    </tr>
+    <tr>
+      <th>feature.prefix</th>
+      <td><p>The prefix used in naming the output features</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="transforming-spark-dataframes"><a class="anchor" href="#transforming-spark-dataframes"></a>Transforming Spark DataFrames</h2>
+
+    
+    <p>The family of functions prefixed with <code>sdf_</code> generally access the Scala
+Spark DataFrame API directly, as opposed to the <code>dplyr</code> interface which
+uses Spark SQL. These functions will 'force' any pending SQL in a
+<code>dplyr</code> pipeline, such that the resulting <code>tbl_spark</code> object
+returned will no longer have the attached 'lazy' SQL operations. Note that
+the underlying Spark DataFrame <em>does</em> execute its operations lazily, so
+that even though the pending set of operations (currently) are not exposed at
+the <span style="R">R</span> level, these operations will only be executed when you explicitly
+<code>collect()</code> the table.</p>
     
 
   </div>
@@ -170,7 +200,9 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#transforming-spark-dataframes">Transforming Spark DataFrames</a></li>
+          </ul>
 
   </div>
 </div>

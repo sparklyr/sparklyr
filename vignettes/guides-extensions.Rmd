@@ -239,6 +239,27 @@ The [`ensure_*`](http://spark.rstudio.com/reference/sparklyr/latest/ensure.html)
 * ensure_scalar_boolean 
 * ensure_scalar_character
 
+In order to match the correct data types while calling Scala code from R, or retrieving results from Scala back to R, consider the following types mapping:
+
+| From R      | Scala          | To R      |
+|-------------|----------------|-----------|
+| NULL        | void           | NULL      |
+| integer     | Int            | integer   |
+| character   | String         | character |
+| logical     | Boolean        | logical   |
+| double      | Double         | double    |
+| numeric     | Double         | double    |
+|             | Float          | double    |
+|             | Decimal        | double    |
+|             | Long           | double    |
+| raw         | Array[Byte]    | raw       |
+| Date        | Date           | Date      |
+| POSIXlt     | Time           |           |
+| POSIXct     | Time           | POSIXct   |
+| list        | Array[T]       | list      |
+| environment | Map[String, T] |           |
+| jobj        | Object         | jobj      |
+
 ## Compiling
 
 Most Spark extensions won't need to define their own compilation specification, and can instead rely on the default behavior of `compile_package_jars`. For users who would like to take more control over where the scalac compilers should be looked up, use the [`spark_compilation_spec`](http://spark.rstudio.com/reference/sparklyr/latest/spark_compilation_spec.html) fucnction. The Spark compilation specification is used when compiling Spark extension Java Archives, and defines which versions of Spark, as well as which versions of Scala, should be used for compilation.
