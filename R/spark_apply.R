@@ -97,7 +97,7 @@ spark_apply <- function(x,
   if (rlang) warning("The `rlang` parameter is under active development.")
 
   # disable package distribution for local connections
-  if (spark_master_is_local(sc$master)) packages = FALSE
+  if (spark_master_is_local(sc$master)) packages <- FALSE
 
   # create closure for the given function
   closure <- serialize(f, NULL)
