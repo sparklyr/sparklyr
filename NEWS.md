@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fix to `spark_install()` to use the `/logs` subfolder to store local
+  `log4j` logs.
+
 - Fix to `spark_apply()` when R is used from a worker node since worker
   node already contains packages but still might be triggering different
   R session.
