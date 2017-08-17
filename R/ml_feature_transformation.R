@@ -238,18 +238,12 @@ ft_elementwise_product <- function(x,
 #' Transform a data set using SQL. Use the \code{__THIS__}
 #' placeholder as a proxy for the active table.
 #'
-#' Although this function accepts the \code{input.col} and \code{output.col}
-#' arguments, they are ignored -- this interface is done purely for
-#' compatibility with \code{\link{sdf_mutate}}.
-#'
-#' @template roxlate-ml-transformation
-#'
+#' @param x An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.
 #' @param sql A SQL statement.
+#' @param ... Optional arguments; currently unused.
 #'
 #' @export
 ft_sql_transformer <- function(x,
-                               input.col = NULL,
-                               output.col = NULL,
                                sql,
                                ...)
 {

@@ -46,7 +46,7 @@ number of nodes separating any leaves from the root of the tree.}
 
 \item{min.rows}{Minimum number of instances each child must have after split.}
 
-\item{learn.rate}{the learning rate or step size, defaults to 0.1.}
+\item{learn.rate}{The learning rate or step size, defaults to 0.1.}
 
 \item{sample.rate}{Fraction of the training data used for learning each decision tree, defaults to 1.0.}
 
