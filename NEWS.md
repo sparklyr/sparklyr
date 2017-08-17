@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fix to `spark_apply()` when R is used from a worker node since worker
+  node already contains packages but still might be triggering different
+  R session.
+
 - Fix connection from closing when `invoke()` attempts to use a class
   with a method that contains a reference to an undefined class.
 
