@@ -936,24 +936,19 @@ object Sources {
     "  if (nchar(bundlePath) > 0) {\n" +
     "    worker_log(\"using bundle \", bundlePath)\n" +
     "\n" +
-    "    if (file.exists(bundlePath)) {\n" +
-    "      worker_log(\"found local bundle exists, skipping extraction\")\n" +
+    "    bundleName <- basename(bundlePath)\n" +
+    "\n" +
+    "    workerRootDir <- worker_invoke_static(sc, \"org.apache.spark.SparkFiles\", \"getRootDirectory\")\n" +
+    "    sparkBundlePath <- file.path(workerRootDir, bundleName)\n" +
+    "\n" +
+    "    if (!file.exists(sparkBundlePath)) {\n" +
+    "      stop(\"failed to find bundle under SparkFiles root directory\")\n" +
     "    }\n" +
-    "    else {\n" +
-    "      bundleName <- basename(bundlePath)\n" +
     "\n" +
-    "      workerRootDir <- worker_invoke_static(sc, \"org.apache.spark.SparkFiles\", \"getRootDirectory\")\n" +
-    "      sparkBundlePath <- file.path(workerRootDir, bundleName)\n" +
+    "    unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)\n" +
     "\n" +
-    "      if (!file.exists(sparkBundlePath)) {\n" +
-    "        stop(\"failed to find bundle under SparkFiles root directory\")\n" +
-    "      }\n" +
-    "\n" +
-    "      unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)\n" +
-    "\n" +
-    "      .libPaths(unbundlePath)\n" +
-    "      worker_log(\"updated .libPaths with bundle packages\")\n" +
-    "    }\n" +
+    "    .libPaths(unbundlePath)\n" +
+    "    worker_log(\"updated .libPaths with bundle packages\")\n" +
     "  }\n" +
     "\n" +
     "  grouped_by <- worker_invoke(context, \"getGroupBy\")\n" +
