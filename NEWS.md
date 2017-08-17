@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Improved documentation and error cases for `metric` argument in
+  `ml_classification_eval()` and `ml_binary_classification_eval()`.
+
 - Fix to `spark_install()` to use the `/logs` subfolder to store local
   `log4j` logs.
 
