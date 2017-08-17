@@ -14,7 +14,8 @@ ml_classification_eval(predicted_tbl_spark, label, predicted_lbl,
 
 \item{predicted_lbl}{Name of the column that contains the predicted label NOT the scored probability. Support for binary and multi-class labels, column should be of double type (use as.double)}
 
-\item{metric}{A classification metric, one of: f1 (default), precision, recall, weightedPrecision, weightedRecall, accuracy}
+\item{metric}{A classification metric, for Spark 1.6: f1 (default), precision, recall, weightedPrecision, weightedRecall or accuracy;
+for Spark 2.X: f1 (default), weightedPrecision, weightedRecall or accuracy}
 }
 \value{
 see \code{metric}
