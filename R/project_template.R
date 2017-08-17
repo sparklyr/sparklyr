@@ -78,7 +78,7 @@ project_template <- function(path, ...) {
     "",
     "First build this package, then build its jars by running:",
     "",
-    "```{r evel=FALSE}",
+    "```{r eval=FALSE}",
     "sparklyr::compile_package_jars()",
     "```",
     "",
