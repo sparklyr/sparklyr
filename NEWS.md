@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- `spark_apply()` now adds generic column names when needed and 
+  validates `f` is a `function`.
+
 - Improved documentation and error cases for `metric` argument in
   `ml_classification_eval()` and `ml_binary_classification_eval()`.
 

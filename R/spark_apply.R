@@ -32,7 +32,12 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
     stop("Failed to infer column types, please use explicit types.")
 
   fields <- lapply(seq_along(colTypes), function(idx) {
-    name <- if (is.null(column_names)) as.character(idx) else column_names[[idx]]
+    name <- if (is.null(column_names))
+      as.character(idx)
+    else if (idx <= length(column_names))
+      column_names[[idx]]
+    else
+      paste0("X", idx)
 
     invoke_static(
       sc,
@@ -63,7 +68,8 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'   \code{groupN} contain the values of the \code{group_by} values. When
 #'   \code{group_by} is not specified, \code{f} takes only one argument.
 #' @param columns A vector of column names or a named vector of column types for
-#'   the transformed object. Defaults to the names from the original object.
+#'   the transformed object. Defaults to the names from the original object and
+#'   adds indexed column names when not enough columns are specified.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
 #' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
@@ -78,6 +84,8 @@ spark_apply <- function(x,
                         packages = TRUE,
                         ...) {
   args <- list(...)
+  assert_that(is.function(f))
+
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
