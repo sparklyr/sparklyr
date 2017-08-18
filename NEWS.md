@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fix race-condition first time `spark_apply()` is run when more
+  than one partition runs in a worker and both processes try to
+  unpack the packages bundle at the same time.
+
 - `spark_apply()` now adds generic column names when needed and 
   validates `f` is a `function`.
 
