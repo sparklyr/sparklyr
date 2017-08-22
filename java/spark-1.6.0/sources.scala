@@ -1056,12 +1056,24 @@ object Sources {
     "#' @export\n" +
     "worker_spark_apply_unbundle <- function(bundle_path, base_path) {\n" +
     "  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())\n" +
+    "  lockFile <- file.path(extractPath, \"sparklyr.lock\")\n" +
     "\n" +
     "  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)\n" +
     "\n" +
     "  if (length(dir(extractPath)) == 0) {\n" +
     "    worker_log(\"found that the unbundle path is empty, extracting:\", extractPath)\n" +
+    "\n" +
+    "    writeLines(lockFile)\n" +
     "    system2(\"tar\", c(\"-xf\", bundle_path, \"-C\", extractPath))\n" +
+    "    unlink(lockFile)\n" +
+    "  }\n" +
+    "\n" +
+    "  if (file.exists(lockFile)) {\n" +
+    "    worker_log(\"found that lock file exists, waiting\")\n" +
+    "    while (file.exists(lockFile)) {\n" +
+    "      Sys.sleep(1000)\n" +
+    "    }\n" +
+    "    worker_log(\"completed lock file wait\")\n" +
     "  }\n" +
     "\n" +
     "  extractPath\n" +
