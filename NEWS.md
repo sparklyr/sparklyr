@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for `spark_apply_log()` to enable logging in
+  worker nodes while using `spark_apply()`.
+
 - Fix to `spark_apply()` for `SparkUncaughtExceptionHandler`
   exception while running over large jobs that may overlap
   during an, now unnecesary, unregister operation.

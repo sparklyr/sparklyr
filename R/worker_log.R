@@ -4,12 +4,14 @@ worker_log_session <- function(sessionId) {
   assign('sessionId', sessionId, envir = worker_log_env)
 }
 
-worker_log_format <- function(message, level = "INFO") {
+worker_log_format <- function(message, level = "INFO", component = "RScript") {
   paste(
     format(Sys.time(), "%y/%m/%d %H:%M:%S"),
     " ",
     level,
-    " sparklyr: RScript (",
+    " sparklyr: ",
+    component,
+    " (",
     worker_log_env$sessionId,
     ") ",
     message,

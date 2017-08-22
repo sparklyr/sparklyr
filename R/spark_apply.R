@@ -195,3 +195,16 @@ spark_apply_rlang_serialize <- function() {
   else
     rlang_serialize
 }
+
+#' Log Writter for Spark Apply
+#'
+#' Writes data to log under \code{spark_apply()}.
+#'
+#' @param ... Arguments to write to log.
+#' @param level Severity level for this entry; recommended values: \code{INFO},
+#'   \code{ERROR} or \code{WARN}.
+#'
+#' @export
+spark_apply_log <- function(..., level = "INFO") {
+  worker_log_level(..., level = level, component = "Closure")
+}
