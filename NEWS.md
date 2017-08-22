@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fix to `spark_apply()` for `SparkUncaughtExceptionHandler`
+  exception while running over large jobs that may overlap
+  during an, now unnecesary, unregister operation.
+
 - Fix race-condition first time `spark_apply()` is run when more
   than one partition runs in a worker and both processes try to
   unpack the packages bundle at the same time.
