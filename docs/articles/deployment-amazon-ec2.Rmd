@@ -63,7 +63,7 @@ cd spark-2.1.0-bin-hadoop2.7
 
 - Run the command that starts the master service
 ```{}
-sudo spark-2.1.0-bin-hadoop2.7/sbin/start-master.sh
+sudo spark-2.0.0-bin-hadoop2.7/sbin/start-master.sh
 ```
 
 - Close the terminal connection (optional)
@@ -72,7 +72,7 @@ sudo spark-2.1.0-bin-hadoop2.7/sbin/start-master.sh
 
 - Start the slave service. **Important**: Use dots not dashes as separators for the Spark Master node's address
 ```{}
-sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://[Master node's IP address]:7077
+sudo spark-2.0.0-bin-hadoop2.7/sbin/start-slave.sh spark://[Master node's IP address]:7077
 ``` 
 
 - Close the terminal connection (optional)
@@ -145,6 +145,6 @@ library(sparklyr)
 library(dplyr)
 
 spark_connect(master="[Spark Master URL]", 
-              version = "2.1.0", 
+              version = "2.0.1", 
               spark_home = spark_home_dir())
 ```

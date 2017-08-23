@@ -106,7 +106,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -255,7 +255,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <p>Now the smaller data set can be plotted</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(<span class="dt">data =</span> all_flights, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x =</span> Month, <span class="dt">y =</span> n<span class="op">/</span><span class="dv">1000</span>, <span class="dt">fill =</span> <span class="kw">factor</span>(Year))) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_area</a></span>(<span class="dt">position =</span> <span class="st">"dodge"</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(alph <span class="dt">a =</span> <span class="fl">0.4</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(<span class="dt">alpha =</span> <span class="fl">0.4</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_brewer">scale_fill_brewer</a></span>(<span class="dt">palette =</span> <span class="st">"Dark2"</span>, <span class="dt">name =</span> <span class="st">"Year"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_x_continuous</a></span>(<span class="dt">breaks =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">"J"</span>,<span class="st">"F"</span>,<span class="st">"M"</span>,<span class="st">"A"</span>,<span class="st">"M"</span>,<span class="st">"J"</span>,<span class="st">"J"</span>,<span class="st">"A"</span>,<span class="st">"S"</span>,<span class="st">"O"</span>,<span class="st">"N"</span>,<span class="st">"D"</span>)) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_light</a></span>() <span class="op">+</span>

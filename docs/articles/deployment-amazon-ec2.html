@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spark Standalone Installation Guide • sparklyr</title>
+<title>Spark Standalone Deployment in AWS • sparklyr</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
@@ -106,7 +106,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -123,7 +123,7 @@
       </header><div class="row">
   <div class="col-md-9">
     <div class="page-header toc-ignore">
-      <h1>Spark Standalone Installation Guide</h1>
+      <h1>Spark Standalone Deployment in AWS</h1>
             
           </div>
 
@@ -147,7 +147,7 @@
 <li>
 <strong>Type:</strong> t2.medium</li>
 <li>
-<strong>OS:</strong> Ubuntu 14 (Trusty)</li>
+<strong>OS:</strong> Ubuntu 16.04 LTS</li>
 <li>
 <strong>Disk space:</strong> At least 20GB</li>
 <li>
@@ -178,9 +178,9 @@ sudo apt-get update</code></pre>
 <ul>
 <li>
 <p>Download and unpack a pre-compiled version of Spark. Here’s is the link to the <a href="http://spark.apache.org/downloads.html">official Spark download page</a></p>
-<pre><code>wget http://d3kbcqa49mib13.cloudfront.net/spark-2.0.1-bin-hadoop2.7.tgz
-tar -xvzf spark-2.0.1-bin-hadoop2.7.tgz
-cd spark-2.0.1-bin-hadoop2.7</code></pre>
+<pre><code>wget http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-hadoop2.7.tgz
+tar -xvzf spark-2.1.0-bin-hadoop2.7.tgz
+cd spark-2.1.0-bin-hadoop2.7</code></pre>
 </li>
 </ul>
 </div>
@@ -219,14 +219,14 @@ cd spark-2.0.1-bin-hadoop2.7</code></pre>
 <div id="rstudio-server" class="section level2">
 <h2 class="hasAnchor">
 <a href="#rstudio-server" class="anchor"></a>RStudio Server</h2>
-<p>Select one of the worker nodes to execute this section. Please check the <a href="https://www.rstudio.com/products/rstudio/download-server/">RStudio download page</a> for the latest version</p>
+<p>Select one of the nodes to execute this section. Please check the <a href="https://www.rstudio.com/products/rstudio/download-server/">RStudio download page</a> for the latest version</p>
 <div id="install-r" class="section level3">
 <h3 class="hasAnchor">
 <a href="#install-r" class="anchor"></a>Install R</h3>
 <ul>
 <li>
 <p>In order to get the latest R core, we will need to update the source list in Ubuntu.</p>
-<pre><code>sudo sh -c 'echo "deb http://cran.rstudio.com/bin/linux/ubuntu trusty/" &gt;&gt; /etc/apt/sources.list'
+<pre><code>sudo sh -c 'echo "deb http://cran.rstudio.com/bin/linux/ubuntu xenial/" &gt;&gt; /etc/apt/sources.list'
 gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9
 gpg -a --export E084DAB9 | sudo apt-key add -
 sudo apt-get update</code></pre>
@@ -244,8 +244,8 @@ sudo apt-get install gdebi-core</code></pre>
 <ul>
 <li>
 <p>We will download and install 1.044 of RStudio Server. To find the latest version, please visit the <a href="https://www.rstudio.com/products/rstudio/download3/">RStudio website</a>. In order to get the enhanced integration with Spark, RStudio version 1.044 or later will be needed.</p>
-<pre><code>wget https://download2.rstudio.org/rstudio-server-1.0.44-amd64.deb
-sudo gdebi rstudio-server-1.0.44-amd64.deb</code></pre>
+<pre><code>wget https://download2.rstudio.org/rstudio-server-1.0.153-amd64.deb
+sudo gdebi rstudio-server-1.0.153-amd64.deb</code></pre>
 </li>
 </ul>
 </div>
@@ -278,12 +278,7 @@ sudo apt-get -y install libxml2-dev</code></pre>
 <li><p>Log into RStudio (port 8787)</p></li>
 <li>
 <p>Use ‘rstudio-user’</p>
-<pre><code>install.packages("sparklyr")
-install.packages("tidyverse")</code></pre>
-</li>
-<li>
-<p>Install Spark files</p>
-<pre><code><a href="../reference/spark_install.html">spark_install("2.0.1")</a></code></pre>
+<pre><code>install.packages("sparklyr")</code></pre>
 </li>
 </ul>
 </div>
