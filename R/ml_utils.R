@@ -200,3 +200,11 @@ read_spark_matrix <- function(jobj, field) {
   data <- invoke(object, "toArray")
   matrix(data, nrow = nrow, ncol = ncol)
 }
+
+ml_wrap_in_pipeline <- function(jobj) {
+  sc <- spark_connection(jobj)
+  invoke_static(sc,
+                "sparklyr.MLUtils",
+                "wrapInPipeline",
+                jobj)
+}
