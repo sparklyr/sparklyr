@@ -90,7 +90,7 @@ flights_tbl %>% filter(dep_delay == 2)
     ##  8  2013     1     1     1028           1026         2     1350
     ##  9  2013     1     1     1042           1040         2     1325
     ## 10  2013     1     1     1231           1229         2     1523
-    ## # ... with 6,223 more rows, and 12 more variables: sched_arr_time <int>,
+    ## # ... with more rows, and 12 more variables: sched_arr_time <int>,
     ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
     ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
     ## #   minute <dbl>, time_hour <dbl>
@@ -141,10 +141,10 @@ batting_tbl %>%
     ##  5 abnersh01   1990    SDN    91   184    17    45
     ##  6 acklefr01   1963    CHA     2     5     0     1
     ##  7 acklefr01   1964    CHA     3     1     0     1
-    ##  8 adamecr01   2015    COL    26    53     4    13
-    ##  9 adamecr01   2014    COL     7    15     1     1
+    ##  8 adamecr01   2016    COL   121   225    25    49
+    ##  9 adamecr01   2015    COL    26    53     4    13
     ## 10 adamsac01   1943    NY1    70    32     3     4
-    ## # ... with 2.561e+04 more rows
+    ## # ... with more rows
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
 
@@ -266,21 +266,21 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_16c9a2c40da6d> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_104564f8ccff8> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1     7.988345    6.388345     4.288345    3.088345
-    ##  2     7.788345    5.888345     4.288345    3.088345
-    ##  3     7.588345    6.088345     4.188345    3.088345
-    ##  4     7.488345    5.988345     4.388345    3.088345
-    ##  5     7.888345    6.488345     4.288345    3.088345
-    ##  6     8.288345    6.788345     4.588345    3.288345
-    ##  7     7.488345    6.288345     4.288345    3.188345
-    ##  8     7.888345    6.288345     4.388345    3.088345
-    ##  9     7.288345    5.788345     4.288345    3.088345
-    ## 10     7.788345    5.988345     4.388345    2.988345
-    ## # ... with 140 more rows
+    ##  1     7.174844    5.574844     3.474844    2.274844
+    ##  2     6.974844    5.074844     3.474844    2.274844
+    ##  3     6.774844    5.274844     3.374844    2.274844
+    ##  4     6.674844    5.174844     3.574844    2.274844
+    ##  5     7.074844    5.674844     3.474844    2.274844
+    ##  6     7.474844    5.974844     3.774844    2.474844
+    ##  7     6.674844    5.474844     3.474844    2.374844
+    ##  8     7.074844    5.474844     3.574844    2.274844
+    ##  9     6.474844    4.974844     3.474844    2.274844
+    ## 10     6.974844    5.174844     3.574844    2.174844
+    ## # ... with more rows
 
 You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
 
@@ -293,7 +293,7 @@ spark_apply(
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_16c9a477a7eb8> [?? x 6]
+    ## # Source:   table<sparklyr_tmp_104562e74b684> [?? x 6]
     ## # Database: spark_connection
     ##      Species         term    estimate  std.error  statistic      p.value
     ##        <chr>        <chr>       <dbl>      <dbl>      <dbl>        <dbl>
@@ -361,16 +361,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/07/27 23:10:34 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 87 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpJO9ujN/file16c9a23decc5.csv MapPartitionsRDD[340] at textFile at NativeMethodAccessorImpl.java:0)
-    ## 17/07/27 23:10:34 INFO TaskSchedulerImpl: Adding task set 87.0 with 1 tasks
-    ## 17/07/27 23:10:34 INFO TaskSetManager: Starting task 0.0 in stage 87.0 (TID 148, localhost, executor driver, partition 0, PROCESS_LOCAL, 6009 bytes)
-    ## 17/07/27 23:10:34 INFO Executor: Running task 0.0 in stage 87.0 (TID 148)
-    ## 17/07/27 23:10:34 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpJO9ujN/file16c9a23decc5.csv:0+33313106
-    ## 17/07/27 23:10:34 INFO Executor: Finished task 0.0 in stage 87.0 (TID 148). 1123 bytes result sent to driver
-    ## 17/07/27 23:10:34 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 148) in 129 ms on localhost (executor driver) (1/1)
-    ## 17/07/27 23:10:34 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
-    ## 17/07/27 23:10:34 INFO DAGScheduler: ResultStage 87 (count at NativeMethodAccessorImpl.java:0) finished in 0.130 s
-    ## 17/07/27 23:10:34 INFO DAGScheduler: Job 55 finished: count at NativeMethodAccessorImpl.java:0, took 0.132388 s
+    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_76_piece0 on 127.0.0.1:50621 in memory (size: 79.3 KB, free: 338.1 MB)
+    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_77_piece0 on 127.0.0.1:50621 in memory (size: 81.6 KB, free: 338.1 MB)
+    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_78_piece0 on 127.0.0.1:50621 in memory (size: 10.0 KB, free: 338.1 MB)
+    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_79_piece0 on 127.0.0.1:50621 in memory (size: 81.2 KB, free: 338.2 MB)
+    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_80_piece0 on 127.0.0.1:50621 in memory (size: 83.6 KB, free: 338.3 MB)
+    ## 17/08/24 15:14:57 INFO Executor: Finished task 0.0 in stage 72.0 (TID 112). 1109 bytes result sent to driver
+    ## 17/08/24 15:14:57 INFO TaskSetManager: Finished task 0.0 in stage 72.0 (TID 112) in 122 ms on localhost (executor driver) (1/1)
+    ## 17/08/24 15:14:57 INFO TaskSchedulerImpl: Removed TaskSet 72.0, whose tasks have all completed, from pool 
+    ## 17/08/24 15:14:57 INFO DAGScheduler: ResultStage 72 (count at NativeMethodAccessorImpl.java:0) finished in 0.122 s
+    ## 17/08/24 15:14:57 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.124489 s
 
 Finally, we disconnect from Spark:
 
@@ -389,15 +389,15 @@ The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/do
 
 Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
 
-<img src="tools/readme/spark-connect.png" class="screenshot" width=389/>
+<img src="tools/readme/spark-connect.png" class="screenshot" width=389 />
 
 Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster and preview Spark DataFrames using the standard RStudio data viewer:
 
-<img src="tools/readme/spark-dataview.png" class="screenshot" width=639/>
+<img src="tools/readme/spark-dataview.png" class="screenshot" width=639 />
 
 You can also connect to Spark through [Livy](http://livy.io) through a new connection dialog:
 
-<img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389/>
+<img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389 />
 
 The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
@@ -433,7 +433,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1501222258016_1 
+    ## Model ID:  GLM_model_R_1503605720549_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -442,7 +442,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                    0 frame_rdd_29_94c9913e0af6e119b3b413e51dad46b6
+    ## 1                    0 frame_rdd_29_8bb40accb5c8c137f56e6c47bd7742c3
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
@@ -505,7 +505,7 @@ copy_to(sc, iris)
     ##  8          5.0         3.4          1.5         0.2  setosa
     ##  9          4.4         2.9          1.4         0.2  setosa
     ## 10          4.9         3.1          1.5         0.1  setosa
-    ## # ... with 140 more rows
+    ## # ... with more rows
 
 ``` r
 spark_disconnect(sc)

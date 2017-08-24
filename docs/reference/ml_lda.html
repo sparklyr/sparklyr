@@ -130,7 +130,7 @@
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -229,7 +229,7 @@ especially useful in conjunction with <code>do</code>.</p></td>
 
 <span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
 
-<span class='no'>austen_books</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/janeaustenr/topics/austen_books'>austen_books</a></span>()
+<span class='no'>austen_books</span> <span class='kw'>&lt;-</span> <span class='fu'>austen_books</span>()
 <span class='no'>books_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>sdf_copy_to</span>(<span class='no'>sc</span>, <span class='no'>austen_books</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 <span class='no'>first_tbl</span> <span class='kw'>&lt;-</span> <span class='no'>books_tbl</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='fu'>nchar</span>(<span class='no'>text</span>) <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='kw'>%&gt;%</span> <span class='fu'>head</span>(<span class='fl'>100</span>)
 

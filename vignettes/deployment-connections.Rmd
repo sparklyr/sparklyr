@@ -9,16 +9,7 @@ output:
 ---
 
 
-
-## Hadoop cluster
-
-Using Spark and R inside a Hadoop based *Data Lake* is very common at companies.  Because Spark is a relatively new technology, there is currently no good way to manage user connections to the Spark service centrally. There are some caps and settings that can be applied, but for most cases there are configurations that the R user will need to customize.  
-
-This fact puts the R user in an unusual position of individually deciding how much resources to consume from the cluster, so it is very important to work with the cluster's administration team or individual to ensure an optimized experience for all.
-
-The [Running on YARN](https://spark.apache.org/docs/latest/running-on-yarn.html) page in Spark's official website is the best place to start for configuration settings reference, please bookmark it.  Both, cluster administrators and users can benefit from this document.  If Spark is new to the company, the [YARN tunning](https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/) article, courtesy of Cloudera, does a great job at explaining how the Spark/YARN architecture works. 
-
-### Important points 
+## Spark clusters
 
 - **Executors are not servers** - In Spark, a server can have multiple **Executors**.  Because of how Spark works, it is better to requests multiple smaller executors than a few large executors, the [YARN tunning](https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/) article mentioned above does a great job expanding on this point.
 
@@ -26,16 +17,25 @@ The [Running on YARN](https://spark.apache.org/docs/latest/running-on-yarn.html)
 
 - **The cluster overrides 'silently'** -  Many times, no errors are returned when more than the allowed resources are requested, or if an attempt is made to change a setting fixed by the cluster. 
 
-- **Requesting more memory or CPUs for Executors than allowed will return an error** - This is one of the exceptions to the cluster's 'silent' overrides.  It will return a message similar to this:
-```
-    Failed during initialize_connection: java.lang.IllegalArgumentException: Required executor memory (16384+1638 MB) is above the max threshold (8192 MB) of this cluster! Please check the values of 'yarn.scheduler.maximum-allocation-mb' and/or 'yarn.nodemanager.resource.memory-mb'
-```
-**A cluster's administrator** is the only person who can make changes to the settings mentioned in the error. If the cluster is supported by a vendor, like Cloudera or Hortonworks, then the change can be made using the cluster's web UI.  Otherwise, changes to those settings are done directly in the *yarn-default.xml* file.
+
+## Hadoop cluster
+
+Using Spark and R inside a Hadoop based *Data Lake* is very common at companies.  Because Spark is a relatively new technology, there is currently no good way to manage user connections to the Spark service centrally. There are some caps and settings that can be applied, but for most cases there are configurations that the R user will need to customize.  
+
+The [Running on YARN](https://spark.apache.org/docs/latest/running-on-yarn.html) page in Spark's official website is the best place to start for configuration settings reference, please bookmark it.  Both, cluster administrators and users can benefit from this document.  If Spark is new to the company, the [YARN tunning](https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/) article, courtesy of Cloudera, does a great job at explaining how the Spark/YARN architecture works. 
+
+The following are the recommended Spark properties to set when connecting via R:
+
+- **spark.executor.memory**
+
+- **spark.executor.cores**
+
+- **spark.executor.instances**
+
+- **spark.dynamicAllocation.enabled**
 
 
-### Sample code
-
-The numbers used in this example should be adjusted to you specific environment.  The code below will request 5 executors, and 300 megabytes of memory and 2 cores for each executor.  
+### Example
 
 ```r
 library(sparklyr)
@@ -44,7 +44,7 @@ conf <- spark_config()
 
 conf$spark.executor.memory <- "300M"
 conf$spark.executor.cores <- 2
-conf$spark.executor.instances <- 5
+conf$spark.executor.instances <- 3
 conf$spark.dynamicAllocation.enabled <- "false"
 
 sc <- spark_connect(master = "yarn-client", 
@@ -53,21 +53,15 @@ sc <- spark_connect(master = "yarn-client",
                     config = conf)
 ```
 
-### Code breakdown
+![](images/deployment/connections/yarnclient.png)
 
-R  | Description
------------------------ | -------------------------------------------
-`conf <- spark_config()`| Initialize a variable with the contents form `spark_config()`
-`conf$spark.executor.memory <- "300M"` | Executor memory is capped by YARN
-`conf$spark.executor.cores <- 2`  | 
-`conf$spark.executor.instances <- 5` | Less instances may be allocated based on limits set by the cluster.  In this case, the limit is set at 3, so that is the most executors the session gets
-`conf$spark.dynamicAllocation.enabled <- "false"` | Disabling Dynamic Allocation allows the `spark.executor.instances` to be used
-`sc <- spark_connect(master = "yarn-client",` | Use `yarn-client` as the master
-`                    spark_home = "/usr/lib/spark/",` | Point `spark_home` to the cluster's Spark folder
-`                    version = "1.6.2",` | The version of Spark is restricted to what is available in the cluster 
-`                    config = conf)` | Pass the configuration variable to the `config` argument
+### Executor memory error
 
-![](images/deployment/connections/yarn-client.jpg)
+Requesting more memory or CPUs for Executors than allowed will return an error. This is one of the exceptions to the cluster's 'silent' overrides.  It will return a message similar to this:
+```
+    Failed during initialize_connection: java.lang.IllegalArgumentException: Required executor memory (16384+1638 MB) is above the max threshold (8192 MB) of this cluster! Please check the values of 'yarn.scheduler.maximum-allocation-mb' and/or 'yarn.nodemanager.resource.memory-mb'
+```
+**A cluster's administrator** is the only person who can make changes to the settings mentioned in the error. If the cluster is supported by a vendor, like Cloudera or Hortonworks, then the change can be made using the cluster's web UI.  Otherwise, changes to those settings are done directly in the *yarn-default.xml* file.
 
 ### Kerberos
 
@@ -81,13 +75,51 @@ For more information visit this site: [Apache - Authenticate with kinit](http://
 
 - A preferred option may be to use the out-of-the-box integration with Kerberos that the commercial offering of [RStudio Server](https://www.rstudio.com/products/rstudio-server-pro/) offers.
 
-## Stand Alone cluster
+## Standalone mode
 
-[pending]
+The default behavior in Standalone mode is to create one executor per worker. So in a 3 worker node cluster, there will be 3 executors setup.  The basic properties that can be set are:
 
-## Local 
+- **spark.executor.memory** - The requested memory cannot exceed the actual RAM available.  
 
-`spakrlyr` enables the use of Spark locally in a laptop or desktop.  
+- **spark.memory.fraction** - The default is set to 60% of the requested memory.
+
+- **spark.executor.cores** - The requested cores cannot be higher than the cores available in each worker.
+
+### Dynamic Allocation
+
+If dynamic allocation is disabled, then Spark will attempt to assign all of the available cores evenly across the cluster.  The property used is **spark.dynamicAllocation.enabled**.
+
+For example, the Standalone cluster used for this article has 3 worker nodes.  Each node has 14.7GB in RAM and 4 cores. This means that there are a total of 12 cores (3 workers with 4 cores) and 44.1GB in RAM (3 workers with 14.7GB in RAM each). 
+
+If the `spark.executor.cores` property is set to 2, and dynamic allocation is disabled, then Spark will spawn 6 executors.  The `spark.executor.memory` property should be set to a level that when the value is multiplied by 6 (number of executors) it will not be over total available RAM.  In this case, the value can be safely set to 7GB so that the total memory requested will be 42GB, which is under the available 44.1GB.
+
+
+### Example
+
+```r
+conf <- spark_config()
+conf$spark.executor.memory <- "7GB"
+conf$spark.memory.fraction <- 0.9
+conf$spark.executor.cores <- 2
+conf$spark.dynamicAllocation.enabled <- "false"
+
+sc <- spark_connect(master="spark://master-url:7077", 
+              version = "2.1.0",
+              config = conf,
+              spark_home = "/home/ubuntu/spark-2.1.0-bin-hadoop2.7/")
+```
+
+![](images/deployment/connections/standalone.png)
+
+## Local mode
+
+`spakrlyr` enables the use of Spark locally in a laptop or desktop.  The 
+
+- **sparklyr.cores.local**
+
+- **sparklyr.shell.driver-memory**
+
+- **spark.memory.fraction**
 
 ### Sample code
 
@@ -104,18 +136,7 @@ sc <- spark_connect(master = "local",
                     config = conf)
 ```
 
-### Code breakdown
 
-R  | Description
------------------------ | -------------------------------------------
-`conf <- spark_config()`| Initialize a variable with the contents form `spark_config()`
-`conf$sparklyr.cores.local  <- 4` | If not passed, it will default to the number of all cores in the computer
-`conf$sparklyr.shell.driver-memory <- "16G"`| The session will have one executor, the driver.  This means that we can request as much memory as the computer can spare.
-`conf$spark.memory.fraction <- 0.9` | Sets the percentage of the memory allocated for the data analysis.  It defaults to *0.4* or 40% of what is requested.  The value used in this instance will attempt to set the actual `driver-memory` to 13.5G, meaning 90% of 16.
-`sc <- spark_connect(master = "local",`                           |  
-`version = "2.1.0",   `                              | The default version will be set by `spark_install()`, but it can be overriden by passing `version`
-`config = conf)` | Pass the configuration variable to the `config` argument
+![](images/deployment/connections/local.png)
 
-
-![](images/deployment/connections/local.jpg)
 

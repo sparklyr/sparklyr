@@ -130,99 +130,53 @@
     
     
 <div class="contents">
-<div id="hadoop-cluster" class="section level2">
+<div id="spark-clusters" class="section level2">
 <h2 class="hasAnchor">
-<a href="#hadoop-cluster" class="anchor"></a>Hadoop cluster</h2>
-<p>Using Spark and R inside a Hadoop based <em>Data Lake</em> is very common at companies. Because Spark is a relatively new technology, there is currently no good way to manage user connections to the Spark service centrally. There are some caps and settings that can be applied, but for most cases there are configurations that the R user will need to customize.</p>
-<p>This fact puts the R user in an unusual position of individually deciding how much resources to consume from the cluster, so it is very important to work with the cluster’s administration team or individual to ensure an optimized experience for all.</p>
-<p>The <a href="https://spark.apache.org/docs/latest/running-on-yarn.html">Running on YARN</a> page in Spark’s official website is the best place to start for configuration settings reference, please bookmark it. Both, cluster administrators and users can benefit from this document. If Spark is new to the company, the <a href="https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/">YARN tunning</a> article, courtesy of Cloudera, does a great job at explaining how the Spark/YARN architecture works.</p>
-<div id="important-points" class="section level3">
-<h3 class="hasAnchor">
-<a href="#important-points" class="anchor"></a>Important points</h3>
+<a href="#spark-clusters" class="anchor"></a>Spark clusters</h2>
 <ul>
 <li><p><strong>Executors are not servers</strong> - In Spark, a server can have multiple <strong>Executors</strong>. Because of how Spark works, it is better to requests multiple smaller executors than a few large executors, the <a href="https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/">YARN tunning</a> article mentioned above does a great job expanding on this point.</p></li>
 <li><p><strong>Spark configuration properties passed by R are just requests</strong> - In most cases, the cluster has the final say regarding the resources apportioned to a given Spark session. Some limits are placed by Spark and some are placed by YARN.</p></li>
 <li><p><strong>The cluster overrides ‘silently’</strong> - Many times, no errors are returned when more than the allowed resources are requested, or if an attempt is made to change a setting fixed by the cluster.</p></li>
-<li>
-<p><strong>Requesting more memory or CPUs for Executors than allowed will return an error</strong> - This is one of the exceptions to the cluster’s ‘silent’ overrides. It will return a message similar to this:</p>
-<pre><code>Failed during initialize_connection: java.lang.IllegalArgumentException: Required executor memory (16384+1638 MB) is above the max threshold (8192 MB) of this cluster! Please check the values of 'yarn.scheduler.maximum-allocation-mb' and/or 'yarn.nodemanager.resource.memory-mb'</code></pre>
-<p><strong>A cluster’s administrator</strong> is the only person who can make changes to the settings mentioned in the error. If the cluster is supported by a vendor, like Cloudera or Hortonworks, then the change can be made using the cluster’s web UI. Otherwise, changes to those settings are done directly in the <em>yarn-default.xml</em> file.</p>
-</li>
 </ul>
 </div>
-<div id="sample-code" class="section level3">
+<div id="hadoop-cluster" class="section level2">
+<h2 class="hasAnchor">
+<a href="#hadoop-cluster" class="anchor"></a>Hadoop cluster</h2>
+<p>Using Spark and R inside a Hadoop based <em>Data Lake</em> is very common at companies. Because Spark is a relatively new technology, there is currently no good way to manage user connections to the Spark service centrally. There are some caps and settings that can be applied, but for most cases there are configurations that the R user will need to customize.</p>
+<p>The <a href="https://spark.apache.org/docs/latest/running-on-yarn.html">Running on YARN</a> page in Spark’s official website is the best place to start for configuration settings reference, please bookmark it. Both, cluster administrators and users can benefit from this document. If Spark is new to the company, the <a href="https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/">YARN tunning</a> article, courtesy of Cloudera, does a great job at explaining how the Spark/YARN architecture works.</p>
+<p>The following are the recommended Spark properties to set when connecting via R:</p>
+<ul>
+<li><p><strong>spark.executor.memory</strong></p></li>
+<li><p><strong>spark.executor.cores</strong></p></li>
+<li><p><strong>spark.executor.instances</strong></p></li>
+<li><p><strong>spark.dynamicAllocation.enabled</strong></p></li>
+</ul>
+<div id="example" class="section level3">
 <h3 class="hasAnchor">
-<a href="#sample-code" class="anchor"></a>Sample code</h3>
-<p>The numbers used in this example should be adjusted to you specific environment. The code below will request 5 executors, and 300 megabytes of memory and 2 cores for each executor.</p>
+<a href="#example" class="anchor"></a>Example</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(sparklyr)
 
 conf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark_config.html">spark_config</a></span>()
 
 conf<span class="op">$</span>spark.executor.memory &lt;-<span class="st"> "300M"</span>
 conf<span class="op">$</span>spark.executor.cores &lt;-<span class="st"> </span><span class="dv">2</span>
-conf<span class="op">$</span>spark.executor.instances &lt;-<span class="st"> </span><span class="dv">5</span>
+conf<span class="op">$</span>spark.executor.instances &lt;-<span class="st"> </span><span class="dv">3</span>
 conf<span class="op">$</span>spark.dynamicAllocation.enabled &lt;-<span class="st"> "false"</span>
 
 sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-connections.html">spark_connect</a></span>(<span class="dt">master =</span> <span class="st">"yarn-client"</span>, 
                     <span class="dt">spark_home =</span> <span class="st">"/usr/lib/spark/"</span>,
                     <span class="dt">version =</span> <span class="st">"1.6.0"</span>,
                     <span class="dt">config =</span> conf)</code></pre></div>
-</div>
-<div id="code-breakdown" class="section level3">
-<h3 class="hasAnchor">
-<a href="#code-breakdown" class="anchor"></a>Code breakdown</h3>
-<table style="width:94%;" class="table">
-<colgroup>
-<col width="33%">
-<col width="61%">
-</colgroup>
-<thead><tr class="header">
-<th>R</th>
-<th>Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><code>conf &lt;- spark_config()</code></td>
-<td>Initialize a variable with the contents form <code><a href="../reference/spark_config.html">spark_config()</a></code>
-</td>
-</tr>
-<tr class="even">
-<td><code>conf$spark.executor.memory &lt;- "300M"</code></td>
-<td>Executor memory is capped by YARN</td>
-</tr>
-<tr class="odd">
-<td><code>conf$spark.executor.cores &lt;- 2</code></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><code>conf$spark.executor.instances &lt;- 5</code></td>
-<td>Less instances may be allocated based on limits set by the cluster. In this case, the limit is set at 3, so that is the most executors the session gets</td>
-</tr>
-<tr class="odd">
-<td><code>conf$spark.dynamicAllocation.enabled &lt;- "false"</code></td>
-<td>Disabling Dynamic Allocation allows the <code>spark.executor.instances</code> to be used</td>
-</tr>
-<tr class="even">
-<td><code>sc &lt;- spark_connect(master = "yarn-client",</code></td>
-<td>Use <code>yarn-client</code> as the master</td>
-</tr>
-<tr class="odd">
-<td><code>spark_home = "/usr/lib/spark/",</code></td>
-<td>Point <code>spark_home</code> to the cluster’s Spark folder</td>
-</tr>
-<tr class="even">
-<td><code>version = "1.6.2",</code></td>
-<td>The version of Spark is restricted to what is available in the cluster</td>
-</tr>
-<tr class="odd">
-<td><code>config = conf)</code></td>
-<td>Pass the configuration variable to the <code>config</code> argument</td>
-</tr>
-</tbody>
-</table>
 <div class="figure">
-<img src="images/deployment/connections/yarn-client.jpg">
+<img src="images/deployment/connections/yarnclient.png">
 </div>
+</div>
+<div id="executor-memory-error" class="section level3">
+<h3 class="hasAnchor">
+<a href="#executor-memory-error" class="anchor"></a>Executor memory error</h3>
+<p>Requesting more memory or CPUs for Executors than allowed will return an error. This is one of the exceptions to the cluster’s ‘silent’ overrides. It will return a message similar to this:</p>
+<pre><code>    Failed during initialize_connection: java.lang.IllegalArgumentException: Required executor memory (16384+1638 MB) is above the max threshold (8192 MB) of this cluster! Please check the values of 'yarn.scheduler.maximum-allocation-mb' and/or 'yarn.nodemanager.resource.memory-mb'</code></pre>
+<p><strong>A cluster’s administrator</strong> is the only person who can make changes to the settings mentioned in the error. If the cluster is supported by a vendor, like Cloudera or Hortonworks, then the change can be made using the cluster’s web UI. Otherwise, changes to those settings are done directly in the <em>yarn-default.xml</em> file.</p>
 </div>
 <div id="kerberos" class="section level3">
 <h3 class="hasAnchor">
@@ -238,18 +192,52 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 </ul>
 </div>
 </div>
-<div id="stand-alone-cluster" class="section level2">
+<div id="standalone-mode" class="section level2">
 <h2 class="hasAnchor">
-<a href="#stand-alone-cluster" class="anchor"></a>Stand Alone cluster</h2>
-<p>[pending]</p>
-</div>
-<div id="local" class="section level2">
-<h2 class="hasAnchor">
-<a href="#local" class="anchor"></a>Local</h2>
-<p><code>spakrlyr</code> enables the use of Spark locally in a laptop or desktop.</p>
-<div id="sample-code-1" class="section level3">
+<a href="#standalone-mode" class="anchor"></a>Standalone mode</h2>
+<p>The default behavior in Standalone mode is to create one executor per worker. So in a 3 worker node cluster, there will be 3 executors setup. The basic properties that can be set are:</p>
+<ul>
+<li><p><strong>spark.executor.memory</strong> - The requested memory cannot exceed the actual RAM available.</p></li>
+<li><p><strong>spark.memory.fraction</strong> - The default is set to 60% of the requested memory.</p></li>
+<li><p><strong>spark.executor.cores</strong> - The requested cores cannot be higher than the cores available in each worker.</p></li>
+</ul>
+<div id="dynamic-allocation" class="section level3">
 <h3 class="hasAnchor">
-<a href="#sample-code-1" class="anchor"></a>Sample code</h3>
+<a href="#dynamic-allocation" class="anchor"></a>Dynamic Allocation</h3>
+<p>If dynamic allocation is disabled, then Spark will attempt to assign all of the available cores evenly across the cluster. The property used is <strong>spark.dynamicAllocation.enabled</strong>.</p>
+<p>For example, the Standalone cluster used for this article has 3 worker nodes. Each node has 14.7GB in RAM and 4 cores. This means that there are a total of 12 cores (3 workers with 4 cores) and 44.1GB in RAM (3 workers with 14.7GB in RAM each).</p>
+<p>If the <code>spark.executor.cores</code> property is set to 2, and dynamic allocation is disabled, then Spark will spawn 6 executors. The <code>spark.executor.memory</code> property should be set to a level that when the value is multiplied by 6 (number of executors) it will not be over total available RAM. In this case, the value can be safely set to 7GB so that the total memory requested will be 42GB, which is under the available 44.1GB.</p>
+</div>
+<div id="example-1" class="section level3">
+<h3 class="hasAnchor">
+<a href="#example-1" class="anchor"></a>Example</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">conf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark_config.html">spark_config</a></span>()
+conf<span class="op">$</span>spark.executor.memory &lt;-<span class="st"> "7GB"</span>
+conf<span class="op">$</span>spark.memory.fraction &lt;-<span class="st"> </span><span class="fl">0.9</span>
+conf<span class="op">$</span>spark.executor.cores &lt;-<span class="st"> </span><span class="dv">2</span>
+conf<span class="op">$</span>spark.dynamicAllocation.enabled &lt;-<span class="st"> "false"</span>
+
+sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-connections.html">spark_connect</a></span>(<span class="dt">master=</span><span class="st">"spark://master-url:7077"</span>, 
+              <span class="dt">version =</span> <span class="st">"2.1.0"</span>,
+              <span class="dt">config =</span> conf,
+              <span class="dt">spark_home =</span> <span class="st">"/home/ubuntu/spark-2.1.0-bin-hadoop2.7/"</span>)</code></pre></div>
+<div class="figure">
+<img src="images/deployment/connections/standalone.png">
+</div>
+</div>
+</div>
+<div id="local-mode" class="section level2">
+<h2 class="hasAnchor">
+<a href="#local-mode" class="anchor"></a>Local mode</h2>
+<p><code>spakrlyr</code> enables the use of Spark locally in a laptop or desktop. The</p>
+<ul>
+<li><p><strong>sparklyr.cores.local</strong></p></li>
+<li><p><strong>sparklyr.shell.driver-memory</strong></p></li>
+<li><p><strong>spark.memory.fraction</strong></p></li>
+</ul>
+<div id="sample-code" class="section level3">
+<h3 class="hasAnchor">
+<a href="#sample-code" class="anchor"></a>Sample code</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 conf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark_config.html">spark_config</a></span>()
 
@@ -260,54 +248,8 @@ conf<span class="op">$</span>spark.memory.fraction &lt;-<span class="st"> </span
 sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-connections.html">spark_connect</a></span>(<span class="dt">master =</span> <span class="st">"local"</span>, 
                     <span class="dt">version =</span> <span class="st">"2.1.0"</span>,
                     <span class="dt">config =</span> conf)</code></pre></div>
-</div>
-<div id="code-breakdown-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#code-breakdown-1" class="anchor"></a>Code breakdown</h3>
-<table style="width:94%;" class="table">
-<colgroup>
-<col width="33%">
-<col width="61%">
-</colgroup>
-<thead><tr class="header">
-<th>R</th>
-<th>Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><code>conf &lt;- spark_config()</code></td>
-<td>Initialize a variable with the contents form <code><a href="../reference/spark_config.html">spark_config()</a></code>
-</td>
-</tr>
-<tr class="even">
-<td><code>conf$sparklyr.cores.local  &lt;- 4</code></td>
-<td>If not passed, it will default to the number of all cores in the computer</td>
-</tr>
-<tr class="odd">
-<td><code>conf$sparklyr.shell.driver-memory &lt;- "16G"</code></td>
-<td>The session will have one executor, the driver. This means that we can request as much memory as the computer can spare.</td>
-</tr>
-<tr class="even">
-<td><code>conf$spark.memory.fraction &lt;- 0.9</code></td>
-<td>Sets the percentage of the memory allocated for the data analysis. It defaults to <em>0.4</em> or 40% of what is requested. The value used in this instance will attempt to set the actual <code>driver-memory</code> to 13.5G, meaning 90% of 16.</td>
-</tr>
-<tr class="odd">
-<td><code>sc &lt;- spark_connect(master = "local",</code></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><code>version = "2.1.0",</code></td>
-<td>The default version will be set by <code><a href="../reference/spark_install.html">spark_install()</a></code>, but it can be overriden by passing <code>version</code>
-</td>
-</tr>
-<tr class="odd">
-<td><code>config = conf)</code></td>
-<td>Pass the configuration variable to the <code>config</code> argument</td>
-</tr>
-</tbody>
-</table>
 <div class="figure">
-<img src="images/deployment/connections/local.jpg">
+<img src="images/deployment/connections/local.png">
 </div>
 </div>
 </div>
@@ -319,9 +261,10 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#hadoop-cluster">Hadoop cluster</a></li>
-      <li><a href="#stand-alone-cluster">Stand Alone cluster</a></li>
-      <li><a href="#local">Local</a></li>
+<li><a href="#spark-clusters">Spark clusters</a></li>
+      <li><a href="#hadoop-cluster">Hadoop cluster</a></li>
+      <li><a href="#standalone-mode">Standalone mode</a></li>
+      <li><a href="#local-mode">Local mode</a></li>
       </ul>
 </div>
       </div>

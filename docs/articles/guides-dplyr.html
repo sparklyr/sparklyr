@@ -422,10 +422,10 @@ bestworst &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(dep_delay <span class="op">==</span><span class="st"> </span><span class="kw">min</span>(dep_delay) <span class="op">||</span><span class="st"> </span>dep_delay <span class="op">==</span><span class="st"> </span><span class="kw">max</span>(dep_delay))
 dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/sql_build">sql_render</a></span>(bestworst)
 ## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`
-## FROM (SELECT `year`, `month`, `day`, `dep_delay`, min(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz4`, max(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz5`
+## FROM (SELECT `year`, `month`, `day`, `dep_delay`, min(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz5`, max(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz6`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `juihzbobgk`) `cgimarzmue`
-## WHERE (`dep_delay` = `zzz4` OR `dep_delay` = `zzz5`)
+## FROM `flights`) `efjzmlgqhp`) `qezptujrav`
+## WHERE (`dep_delay` = `zzz5` OR `dep_delay` = `zzz6`)
 bestworst
 ## # Source:   lazy query [?? x 4]
 ## # Database: spark_connection
@@ -451,7 +451,7 @@ ranked &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span>
 dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/sql_build">sql_render</a></span>(ranked)</code></pre></div>
 <pre><code>## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`, rank() OVER (PARTITION BY `year`, `month`, `day` ORDER BY `dep_delay` DESC) AS `rank`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `xbpkoxnqur`</code></pre>
+## FROM `flights`) `epxdfutsqo`</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ranked</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 5]
 ## # Database: spark_connection
@@ -568,16 +568,16 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ## # Database: spark_connection
 ##     year month   day dep_time sched_dep_time dep_delay arr_time
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
-##  1  2013     1     1     1543           1550        -7     1933
-##  2  2013     1     1     1758           1749         9     2020
-##  3  2013     1     1     1814           1700        74     2051
-##  4  2013     1     1     2224           2200        24     2324
-##  5  2013     1     2      657            700        -3      806
-##  6  2013     1     2      745            730        15     1112
-##  7  2013     1     2     1020           1023        -3     1242
-##  8  2013     1     2     1200           1145        15     1418
-##  9  2013     1     2     1228           1045       103     1354
-## 10  2013     1     2     1732           1734        -2     1850
+##  1  2013     1     1      544            545        -1     1004
+##  2  2013     1     1      749            710        39      939
+##  3  2013     1     1      813            815        -2     1103
+##  4  2013     1     1      835            835         0     1210
+##  5  2013     1     1      908            915        -7     1004
+##  6  2013     1     1     1024           1029        -5     1140
+##  7  2013     1     1     1030           1035        -5     1229
+##  8  2013     1     1     1044           1041         3     1339
+##  9  2013     1     1     1355           1350         5     1537
+## 10  2013     1     1     1449           1450        -1     1651
 ## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
 ## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
 ## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
@@ -609,16 +609,16 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ## # Ordered by: -days_since
 ##    flight_date days_since     n
 ##          &lt;chr&gt;      &lt;int&gt; &lt;dbl&gt;
-##  1    2013-1-1       1695   842
-##  2    2013-1-2       1694   943
-##  3    2013-1-3       1693   914
-##  4    2013-1-4       1692   915
-##  5    2013-1-5       1691   720
-##  6    2013-1-6       1690   832
-##  7    2013-1-7       1689   933
-##  8    2013-1-8       1688   899
-##  9    2013-1-9       1687   902
-## 10   2013-1-10       1686   932
+##  1    2013-1-1       1696   842
+##  2    2013-1-2       1695   943
+##  3    2013-1-3       1694   914
+##  4    2013-1-4       1693   915
+##  5    2013-1-5       1692   720
+##  6    2013-1-6       1691   832
+##  7    2013-1-7       1690   933
+##  8    2013-1-8       1689   899
+##  9    2013-1-9       1688   902
+## 10   2013-1-10       1687   932
 ## # ... with more rows</code></pre>
 </div>
 </div>

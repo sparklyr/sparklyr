@@ -25,7 +25,7 @@ Here are the details of the EC2 instance, just deploy one at this point:
 - **Type:** t2.medium
 - **OS:** Ubuntu 16.04 LTS
 - **Disk space:** At least 20GB 
-- **Security group:** Consider opening the following ports: 8080 (Spark UI), 4040 (Spark Worker UI), 8088 (sparklyr UI), 8787 (RStudio)
+- **Security group:** Open the following ports: 8080 (Spark UI), 4040 (Spark Worker UI), 8088 (sparklyr UI) and 8787 (RStudio).  Also open *All TCP* ports for the machines inside the security group.
 
 ## Spark
 
@@ -56,26 +56,6 @@ cd spark-2.1.0-bin-hadoop2.7
 - We will create an image of the server.  In Amazon, these are called AMIs, for information please see the [User Guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
 
 - Launch 3 instances of the AMI 
-
-### Start the Master node
-
-- Select one of the 4 servers to become your Master node
-
-- Run the command that starts the master service
-```{}
-sudo spark-2.1.0-bin-hadoop2.7/sbin/start-master.sh
-```
-
-- Close the terminal connection (optional)
-
-### Start Worker nodes
-
-- Start the slave service. **Important**: Use dots not dashes as separators for the Spark Master node's address
-```{}
-sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://[Master node's IP address]:7077
-``` 
-
-- Close the terminal connection (optional)
 
 ## RStudio Server
 
@@ -121,12 +101,34 @@ sudo apt-get -y install libxml2-dev
 sudo adduser rstudio-user
 ```
 
+
+### Start the Master node
+
+- Select one of the servers to become your Master node
+
+- Run the command that starts the master service
+```{}
+sudo spark-2.1.0-bin-hadoop2.7/sbin/start-master.sh
+```
+
+- Close the terminal connection (optional)
+
+### Start Worker nodes
+
+- Start the slave service. **Important**: Use dots not dashes as separators for the Spark Master node's address
+```{}
+sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://[Master node's IP address]:7077
+``` 
+sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://ip-172-30-1-94.us-west-2.compute.internal:7077
+- Close the terminal connection (optional)
+
+
 ### Pre-load pacakges
 
 - Log into RStudio (port 8787)
 
 - Use 'rstudio-user'
-```{}
+```r
 install.packages("sparklyr")
 ```
 
@@ -139,12 +141,19 @@ install.packages("sparklyr")
 - Logon to RStudio 
 
 - Run the following code
-```{r, eval=FALSE}
+
+
+```r
 
 library(sparklyr)
-library(dplyr)
 
-spark_connect(master="[Spark Master URL]", 
-              version = "2.1.0", 
-              spark_home = spark_home_dir())
+conf <- spark_config()
+conf$spark.executor.memory <- "2GB"
+conf$spark.memory.fraction <- 0.9
+
+sc <- spark_connect(master="[Spark Master URL]", 
+              version = "2.1.0",
+              config = conf,
+              spark_home = "/home/ubuntu/spark-2.1.0-bin-hadoop2.7/")
+
 ```

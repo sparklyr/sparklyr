@@ -142,8 +142,8 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(sparklyr)
 count_lines &lt;-<span class="st"> </span><span class="cf">function</span>(sc, file) {
   <span class="kw"><a href="../reference/spark-api.html">spark_context</a></span>(sc) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"textFile"</span>, file, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"count"</span>)
+<span class="st">    </span><span class="kw">invoke</span>(<span class="st">"textFile"</span>, file, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">invoke</span>(<span class="st">"count"</span>)
 }</code></pre></div>
 <p>The <code>count_lines</code> function takes a <code>spark_connection</code> (<code>sc</code>) argument which enables it to obtain a reference to the <code>SparkContext</code> object, and in turn call the <code>textFile().count()</code> method.</p>
 <p>You can use this function with an existing sparklyr connection as follows:</p>
@@ -250,12 +250,12 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 </table>
 <p>For example, to create a new instance of the <code>java.math.BigInteger</code> class and then call the <code>longValue()</code> method on it you would use code like this:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">billionBigInteger &lt;-<span class="st"> </span><span class="kw"><a href="../reference/invoke.html">invoke_new</a></span>(sc, <span class="st">"java.math.BigInteger"</span>, <span class="st">"1000000000"</span>)
-billion &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(billionBigInteger, <span class="st">"longValue"</span>)</code></pre></div>
+billion &lt;-<span class="st"> </span><span class="kw">invoke</span>(billionBigInteger, <span class="st">"longValue"</span>)</code></pre></div>
 <p>Note the <code>sc</code> argument: that’s the <code>spark_connection</code> object which is provided by the front-end package (e.g. sparklyr).</p>
 <p>The previous example can be re-written to be more compact and clear using <a href="https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html">magrittr</a> pipes:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">billion &lt;-<span class="st"> </span>sc <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="../reference/invoke.html">invoke_new</a></span>(<span class="st">"java.math.BigInteger"</span>, <span class="st">"1000000000"</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"longValue"</span>)</code></pre></div>
+<span class="st">    </span><span class="kw">invoke</span>(<span class="st">"longValue"</span>)</code></pre></div>
 <p>This syntax is similar to the method-chaining syntax often used with Scala code so is generally preferred.</p>
 <p>Calling a static method of a class is also straightforward. For example, to call the <code>Math::hypot()</code> static function you would use this code:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hypot &lt;-<span class="st"> </span>sc <span class="op">%&gt;%</span><span class="st"> </span>
@@ -268,8 +268,8 @@ billion &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocu
 <p>Here’s the wrapper function for <code>textFile().count()</code> which we defined earlier:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">count_lines &lt;-<span class="st"> </span><span class="cf">function</span>(sc, file) {
   <span class="kw"><a href="../reference/spark-api.html">spark_context</a></span>(sc) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"textFile"</span>, file, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">      </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"count"</span>)
+<span class="st">    </span><span class="kw">invoke</span>(<span class="st">"textFile"</span>, file, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">invoke</span>(<span class="st">"count"</span>)
 }</code></pre></div>
 <p>The <code>count_lines</code> function takes a <code>spark_connection</code> (<code>sc</code>) argument which enables it to obtain a reference to the <code>SparkContext</code> object, and in turn call the <code>textFile().count()</code> method.</p>
 <p>The following functions are useful for implementing wrapper functions of various kinds:</p>
@@ -325,8 +325,8 @@ billion &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocu
   <span class="co"># methods (note that the df and features are passed to the analyze function)</span>
   summary &lt;-<span class="st"> </span>sc <span class="op">%&gt;%</span><span class="st">  </span>
 <span class="st">    </span><span class="kw"><a href="../reference/invoke.html">invoke_new</a></span>(<span class="st">"com.example.tools.Analyzer"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">      </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"analyze"</span>, df, features) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">      </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"summary"</span>)
+<span class="st">      </span><span class="kw">invoke</span>(<span class="st">"analyze"</span>, df, features) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">invoke</span>(<span class="st">"summary"</span>)
 
   <span class="co"># return the results</span>
   summary

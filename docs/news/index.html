@@ -130,7 +130,7 @@
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -151,6 +151,37 @@
     </div>
 
     <div class="contents">
+    <div id="sparklyr-0-7-unreleased" class="section level1">
+<h1 class="hasAnchor">
+<a href="#sparklyr-0-7-unreleased" class="anchor"></a>Sparklyr 0.7 (UNRELEASED)</h1>
+<ul>
+<li><p>Avoid tasks failing under <code><a href="../reference/spark_apply.html">spark_apply()</a></code> and multiple concurrent partitions running while selecting backend port.</p></li>
+<li><p>Added support for numeric arguments for <code>n</code> in <code>lead()</code> for dplyr.</p></li>
+<li><p>Added unsupported error message to <code>sample_n()</code> and <code>sample_frac()</code> when Spark is not 2.0 or higher.</p></li>
+<li><p>Fixed <code>SIGPIPE</code> error under <code><a href="../reference/spark-connections.html">spark_connect()</a></code> immediately after a <code><a href="../reference/spark-connections.html">spark_disconnect()</a></code> operation.</p></li>
+<li><p>Added support for <code>sparklyr.apply.env.</code> under <code><a href="../reference/spark_config.html">spark_config()</a></code> to allow <code><a href="../reference/spark_apply.html">spark_apply()</a></code> to initializae environment varaibles.</p></li>
+<li><p>Added support for <code><a href="../reference/spark_read_text.html">spark_read_text()</a></code> and <code><a href="../reference/spark_write_text.html">spark_write_text()</a></code> to read from and to plain text files.</p></li>
+<li><p>Addesd support for RStudio project templates to create an “R Package using sparklyr”.</p></li>
+<li><p>Fix <code>compute()</code> to trigger refresh of the connections view.</p></li>
+<li><p>Added a <code>k</code> argument to <code><a href="../reference/ml_pca.html">ml_pca()</a></code> to enable specification of number of principal components to extract. Also implemented <code><a href="../reference/sdf_project.html">sdf_project()</a></code> to project datasets using the results of <code><a href="../reference/ml_pca.html">ml_pca()</a></code> models.</p></li>
+<li><p>Added to <code><a href="../reference/ml_random_forest.html">ml_random_forest()</a></code> the following hyperparameter arguments: <code>min.info.gain</code>, <code>col.sample.rate</code>, <code>min.rows</code>, <code>impurity</code>, and <code>thresholds</code>. Also added <code>seed</code> for reproducibility.</p></li>
+</ul>
+</div>
+    <div id="sparklyr-0-6-1-unreleased" class="section level1">
+<h1 class="hasAnchor">
+<a href="#sparklyr-0-6-1-unreleased" class="anchor"></a>Sparklyr 0.6.1 (UNRELEASED)</h1>
+<ul>
+<li><p>Fixed error in <code><a href="../reference/spark_apply.html">spark_apply()</a></code> that may triggered when multiple CPUs are used in a single node due to race conditions while accesing the gateway service and another in the <code>JVMObjectTracker</code>.</p></li>
+<li><p><code><a href="../reference/spark_apply.html">spark_apply()</a></code> now supports explicit column types using the <code>columns</code> argument to avoid sampling types.</p></li>
+<li><p><code><a href="../reference/spark_apply.html">spark_apply()</a></code> with <code>group_by</code> no longer requires persisting to disk nor memory.</p></li>
+<li><p>Added support for Spark 1.6.3 under <code><a href="../reference/spark_install.html">spark_install()</a></code>.</p></li>
+<li><p>Added support for Spark 1.6.3 under <code><a href="../reference/spark_install.html">spark_install()</a></code></p></li>
+<li><p><code><a href="../reference/spark_apply.html">spark_apply()</a></code> now logs the current callstack when it fails.</p></li>
+<li><p>Fixed error triggered while processing empty partitions in <code><a href="../reference/spark_apply.html">spark_apply()</a></code>.</p></li>
+<li><p>Fixed slow printing issue caused by <code>print</code> calculating the total row count, which is expensive for some tables.</p></li>
+<li><p>Fixed <code>sparklyr 0.6</code> issue blocking concurrent <code>sparklyr</code> connections, which required to set <code>config$sparklyr.gateway.remote = FALSE</code> as workaround.</p></li>
+</ul>
+</div>
     <div id="sparklyr-0-6-0" class="section level1">
 <h1 class="hasAnchor">
 <a href="#sparklyr-0-6-0" class="anchor"></a>Sparklyr 0.6.0</h1>
@@ -397,6 +428,8 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#sparklyr-0-7-unreleased">0.7</a></li>
+        <li><a href="#sparklyr-0-6-1-unreleased">0.6.1</a></li>
         <li><a href="#sparklyr-0-6-0">0.6.0</a></li>
         <li><a href="#sparklyr-0-5-5">0.5.5</a></li>
         <li><a href="#sparklyr-0-5-4">0.5.4</a></li>

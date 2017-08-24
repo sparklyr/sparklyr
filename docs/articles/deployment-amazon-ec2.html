@@ -151,7 +151,7 @@
 <li>
 <strong>Disk space:</strong> At least 20GB</li>
 <li>
-<strong>Security group:</strong> Consider opening the following ports: 8080 (Spark UI), 4040 (Spark Worker UI), 8088 (sparklyr UI), 8787 (RStudio)</li>
+<strong>Security group:</strong> Open the following ports: 8080 (Spark UI), 4040 (Spark Worker UI), 8088 (sparklyr UI) and 8787 (RStudio). Also open <em>All TCP</em> ports for the machines inside the security group.</li>
 </ul>
 </div>
 <div id="spark" class="section level2">
@@ -190,29 +190,6 @@ cd spark-2.1.0-bin-hadoop2.7</code></pre>
 <ul>
 <li><p>We will create an image of the server. In Amazon, these are called AMIs, for information please see the <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">User Guide</a>.</p></li>
 <li><p>Launch 3 instances of the AMI</p></li>
-</ul>
-</div>
-<div id="start-the-master-node" class="section level3">
-<h3 class="hasAnchor">
-<a href="#start-the-master-node" class="anchor"></a>Start the Master node</h3>
-<ul>
-<li><p>Select one of the 4 servers to become your Master node</p></li>
-<li>
-<p>Run the command that starts the master service</p>
-<pre><code>sudo spark-2.0.0-bin-hadoop2.7/sbin/start-master.sh</code></pre>
-</li>
-<li><p>Close the terminal connection (optional)</p></li>
-</ul>
-</div>
-<div id="start-worker-nodes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#start-worker-nodes" class="anchor"></a>Start Worker nodes</h3>
-<ul>
-<li>
-<p>Start the slave service. <strong>Important</strong>: Use dots not dashes as separators for the Spark Master node’s address</p>
-<pre><code>sudo spark-2.0.0-bin-hadoop2.7/sbin/start-slave.sh spark://[Master node's IP address]:7077</code></pre>
-</li>
-<li><p>Close the terminal connection (optional)</p></li>
 </ul>
 </div>
 </div>
@@ -271,6 +248,29 @@ sudo apt-get -y install libxml2-dev</code></pre>
 </li>
 </ul>
 </div>
+<div id="start-the-master-node" class="section level3">
+<h3 class="hasAnchor">
+<a href="#start-the-master-node" class="anchor"></a>Start the Master node</h3>
+<ul>
+<li><p>Select one of the servers to become your Master node</p></li>
+<li>
+<p>Run the command that starts the master service</p>
+<pre><code>sudo spark-2.1.0-bin-hadoop2.7/sbin/start-master.sh</code></pre>
+</li>
+<li><p>Close the terminal connection (optional)</p></li>
+</ul>
+</div>
+<div id="start-worker-nodes" class="section level3">
+<h3 class="hasAnchor">
+<a href="#start-worker-nodes" class="anchor"></a>Start Worker nodes</h3>
+<ul>
+<li>
+<p>Start the slave service. <strong>Important</strong>: Use dots not dashes as separators for the Spark Master node’s address</p>
+<pre><code>sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://[Master node's IP address]:7077</code></pre>
+sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://ip-172-30-1-94.us-west-2.compute.internal:7077</li>
+<li><p>Close the terminal connection (optional)</p></li>
+</ul>
+</div>
 <div id="pre-load-pacakges" class="section level3">
 <h3 class="hasAnchor">
 <a href="#pre-load-pacakges" class="anchor"></a>Pre-load pacakges</h3>
@@ -278,7 +278,7 @@ sudo apt-get -y install libxml2-dev</code></pre>
 <li><p>Log into RStudio (port 8787)</p></li>
 <li>
 <p>Use ‘rstudio-user’</p>
-<pre><code>install.packages("sparklyr")</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"sparklyr"</span>)</code></pre></div>
 </li>
 </ul>
 </div>
@@ -291,12 +291,17 @@ sudo apt-get -y install libxml2-dev</code></pre>
 <li><p>Logon to RStudio</p></li>
 <li><p>Run the following code</p></li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(sparklyr)
-<span class="kw">library</span>(dplyr)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="kw">library</span>(sparklyr)
 
-<span class="kw"><a href="../reference/spark-connections.html">spark_connect</a></span>(<span class="dt">master=</span><span class="st">"[Spark Master URL]"</span>, 
-              <span class="dt">version =</span> <span class="st">"2.0.1"</span>, 
-              <span class="dt">spark_home =</span> <span class="kw"><a href="../reference/spark_home_dir.html">spark_home_dir</a></span>())</code></pre></div>
+conf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark_config.html">spark_config</a></span>()
+conf<span class="op">$</span>spark.executor.memory &lt;-<span class="st"> "2GB"</span>
+conf<span class="op">$</span>spark.memory.fraction &lt;-<span class="st"> </span><span class="fl">0.9</span>
+
+sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-connections.html">spark_connect</a></span>(<span class="dt">master=</span><span class="st">"[Spark Master URL]"</span>, 
+              <span class="dt">version =</span> <span class="st">"2.1.0"</span>,
+              <span class="dt">config =</span> conf,
+              <span class="dt">spark_home =</span> <span class="st">"/home/ubuntu/spark-2.1.0-bin-hadoop2.7/"</span>)</code></pre></div>
 </div>
 </div>
 </div>
