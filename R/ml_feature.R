@@ -6,6 +6,10 @@ ml_tokenizer <- function(sc, input_col, output_col, name) {
     invoke("setOutputCol", output_col)
   pipeline_stage <- setNames(list(
     list(
+      name = name,
+      type = .stage %>%
+        invoke("getClass") %>%
+        invoke("getName"),
       .stage = .stage)
   ), name)
 
