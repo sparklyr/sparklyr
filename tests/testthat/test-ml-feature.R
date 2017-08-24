@@ -27,3 +27,11 @@ test_that("ml_tokenizer() output should return user-inputed name and type of tra
   expect_equal(stage[["name"]], "tok")
   expect_equal(stage[["type"]], "org.apache.spark.ml.feature.Tokenizer")
 })
+
+test_that("ml_tokenizer() uses Spark uid of transformer by default for name", {
+  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y")
+  default_name <- names(tokenizer$stages)
+  uid <- tokenizer$stages[[default_name]]$.stage %>%
+    invoke("uid")
+  expect_equal(default_name, uid)
+})

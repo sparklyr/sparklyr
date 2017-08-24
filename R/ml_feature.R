@@ -1,9 +1,11 @@
 #' @export
-ml_tokenizer <- function(sc, input_col, output_col, name) {
+ml_tokenizer <- function(sc, input_col, output_col, name = NULL) {
   .stage <- invoke_new(sc,
                      "org.apache.spark.ml.feature.Tokenizer") %>%
     invoke("setInputCol", input_col) %>%
     invoke("setOutputCol", output_col)
+
+  name <- name %||% invoke(.stage, "uid")
   pipeline_stage <- setNames(list(
     list(
       name = name,
