@@ -153,7 +153,7 @@ fitted.ml_model <- function(object, ...) {
 residuals.ml_model <- function(object, ...) {
   stop(paste0("'residuals()' not yet supported for ",
               setdiff(class(object), "ml_model"))
-       )
+  )
 }
 
 #' Model Residuals
@@ -207,4 +207,18 @@ ml_wrap_in_pipeline <- function(jobj) {
                 "sparklyr.MLUtils",
                 "wrapInPipeline",
                 jobj)
+}
+
+ml_get_param_map <- function(jobj) {
+  invoke_static(sc,
+                "sparklyr.MLUtils",
+                "getParamMap",
+                jobj) %>%
+    ml_map_param_names()
+}
+
+ml_map_param_names <- function(params_list) {
+  names(params_list) <- sapply(names(params_list),
+                          function(param) param_mapping_s_to_r[[param]])
+  params_list
 }

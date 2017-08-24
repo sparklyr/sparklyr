@@ -35,3 +35,9 @@ test_that("ml_tokenizer() uses Spark uid of transformer by default for name", {
     invoke("uid")
   expect_equal(default_name, uid)
 })
+
+test_that("ml_tokenizer() returns params of transformer", {
+  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y", "tok")
+  params <- list(input_col = "x", output_col = "y")
+  expect_true(dplyr::setequal(tokenizer$stages$tok$params, params))
+})

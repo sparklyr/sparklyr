@@ -12,6 +12,7 @@ ml_tokenizer <- function(sc, input_col, output_col, name = NULL) {
       type = .stage %>%
         invoke("getClass") %>%
         invoke("getName"),
+      params = ml_get_param_map(.stage),
       .stage = .stage)
   ), name)
 

@@ -7,4 +7,9 @@ object MLUtils {
     new Pipeline()
       .setStages(Array(pipelineStage))
   }
+
+  def getParamMap(pipelineStage: PipelineStage): Map[String, Any] = {
+    Map(pipelineStage.extractParamMap.toSeq map {
+      pair => pair.param.name -> pair.value}: _*)
+  }
 }
