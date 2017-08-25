@@ -136,7 +136,7 @@
 <div id="customizing-connections" class="section level2">
 <h2 class="hasAnchor">
 <a href="#customizing-connections" class="anchor"></a>Customizing connections</h2>
-<p>A connection to Spark can be customized by setting the values of certain Spark properties. In <code>sparklyr</code>, Spark properties can be set by using the <code>conf</code> argument in the <code><a href="../reference/spark-connections.html">spark_connect()</a></code> function.</p>
+<p>A connection to Spark can be customized by setting the values of certain Spark properties. In <code>sparklyr</code>, Spark properties can be set by using the <code>config</code> argument in the <code><a href="../reference/spark-connections.html">spark_connect()</a></code> function.</p>
 <p>By default, <code><a href="../reference/spark-connections.html">spark_connect()</a></code> uses <code><a href="../reference/spark_config.html">spark_config()</a></code> as the default configuration. But that can be customized as shown in the example code below. Because of the unending number of possible combinations, <code><a href="../reference/spark_config.html">spark_config()</a></code> contains only a basic configuration, so it will be very likely that additional settings will be needed to properly connect to the cluster.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">conf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark_config.html">spark_config</a></span>()   <span class="co"># Load variable with spark_config()</span>
 
@@ -166,9 +166,9 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 </ul>
 </div>
 </div>
-<div id="hadoop-cluster" class="section level2">
+<div id="yarn-cluster" class="section level2">
 <h2 class="hasAnchor">
-<a href="#hadoop-cluster" class="anchor"></a>Hadoop cluster</h2>
+<a href="#yarn-cluster" class="anchor"></a>YARN cluster</h2>
 <div id="background" class="section level3">
 <h3 class="hasAnchor">
 <a href="#background" class="anchor"></a>Background</h3>
@@ -203,7 +203,8 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <div id="executors-page" class="section level4">
 <h4 class="hasAnchor">
 <a href="#executors-page" class="anchor"></a>Executors page</h4>
-<p>To see how the requested configuration affected the Spark connection, go to the <strong>Executors</strong> page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040:</p>
+<p>To see how the requested configuration affected the Spark connection, go to the <strong>Executors</strong> page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040.</p>
+<p>Notice that 155.3MB per executor are assigned instead of the 300MB requested. This is because the <em>spark.memory.fraction</em> has been fixed by the cluster, plus, there is fixed amount of memory designated for overhead.</p>
 <div class="figure">
 <img src="images/deployment/connections/yarnclient.png">
 </div>
@@ -222,11 +223,11 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <p>There are two options to access a “kerberized” data lake:</p>
 <ul>
 <li>
-<p>Use <em>kinit</em> to get and cache the ticket. After <em>kinit</em> is installed and configured, it can then be used in R via a <code>system()</code> call:p</p>
+<p>Use <em>kinit</em> to get and cache the ticket. After <em>kinit</em> is installed and configured. After <em>kinit</em> is setup, it can used in R via a <code>system()</code> call prior to connecting to the cluster:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system</span>(<span class="st">"echo '&lt;password&gt;' | kinit &lt;username&gt;"</span>)</code></pre></div>
 <p>For more information visit this site: <a href="http://directory.apache.org/apacheds/kerberos-ug/4.1-authenticate-kinit.html">Apache - Authenticate with kinit</a></p>
 </li>
-<li><p>A preferred option may be to use the out-of-the-box integration with Kerberos that the commercial offering of <a href="https://www.rstudio.com/products/rstudio-server-pro/">RStudio Server</a> offers.</p></li>
+<li><p>A preferred option may be to use the out-of-the-box integration with Kerberos that the commercial version of <a href="https://www.rstudio.com/products/rstudio-server-pro/">RStudio Server</a> offers.</p></li>
 </ul>
 </div>
 </div>
@@ -316,7 +317,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#customizing-connections">Customizing connections</a></li>
-      <li><a href="#hadoop-cluster">Hadoop cluster</a></li>
+      <li><a href="#yarn-cluster">YARN cluster</a></li>
       <li><a href="#standalone-mode">Standalone mode</a></li>
       <li><a href="#local-mode">Local mode</a></li>
       </ul>
