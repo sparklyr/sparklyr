@@ -71,16 +71,19 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
-      <a href="../articles/guides-extensions.html">Extensions</a>
+      <a href="../articles/deployment-connections.html">User connection options</a>
     </li>
     <li>
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
+    </li>
+    <li>
+      <a href="../articles/guides-extensions.html">Extensions</a>
     </li>
   </ul>
 </li>
@@ -155,8 +158,6 @@
 <h1 class="hasAnchor">
 <a href="#sparklyr-0-7-unreleased" class="anchor"></a>Sparklyr 0.7 (UNRELEASED)</h1>
 <ul>
-<li><p>Fix connection from closing when <code>invoke()</code> attempts to use a class with a method that contains a reference to an undefined class.</p></li>
-<li><p>Implemented all tuning options from Spark ML for <code><a href="../reference/ml_random_forest.html">ml_random_forest()</a></code>, <code><a href="../reference/ml_gradient_boosted_trees.html">ml_gradient_boosted_trees()</a></code>, and <code><a href="../reference/ml_decision_tree.html">ml_decision_tree()</a></code>.</p></li>
 <li><p>Avoid tasks failing under <code><a href="../reference/spark_apply.html">spark_apply()</a></code> and multiple concurrent partitions running while selecting backend port.</p></li>
 <li><p>Added support for numeric arguments for <code>n</code> in <code>lead()</code> for dplyr.</p></li>
 <li><p>Added unsupported error message to <code>sample_n()</code> and <code>sample_frac()</code> when Spark is not 2.0 or higher.</p></li>
@@ -166,6 +167,7 @@
 <li><p>Addesd support for RStudio project templates to create an “R Package using sparklyr”.</p></li>
 <li><p>Fix <code>compute()</code> to trigger refresh of the connections view.</p></li>
 <li><p>Added a <code>k</code> argument to <code><a href="../reference/ml_pca.html">ml_pca()</a></code> to enable specification of number of principal components to extract. Also implemented <code><a href="../reference/sdf_project.html">sdf_project()</a></code> to project datasets using the results of <code><a href="../reference/ml_pca.html">ml_pca()</a></code> models.</p></li>
+<li><p>Added to <code><a href="../reference/ml_random_forest.html">ml_random_forest()</a></code> the following hyperparameter arguments: <code>min.info.gain</code>, <code>col.sample.rate</code>, <code>min.rows</code>, <code>impurity</code>, and <code>thresholds</code>. Also added <code>seed</code> for reproducibility.</p></li>
 </ul>
 </div>
     <div id="sparklyr-0-6-1-unreleased" class="section level1">

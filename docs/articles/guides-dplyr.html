@@ -48,16 +48,19 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
-      <a href="../articles/guides-extensions.html">Extensions</a>
+      <a href="../articles/deployment-connections.html">User connection options</a>
     </li>
     <li>
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
+    </li>
+    <li>
+      <a href="../articles/guides-extensions.html">Extensions</a>
     </li>
   </ul>
 </li>
@@ -424,7 +427,7 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`
 ## FROM (SELECT `year`, `month`, `day`, `dep_delay`, min(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz5`, max(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz6`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `zvubtprhso`) `spmpogatny`
+## FROM `flights`) `spionddzel`) `dtnqqikhhx`
 ## WHERE (`dep_delay` = `zzz5` OR `dep_delay` = `zzz6`)
 bestworst
 ## # Source:   lazy query [?? x 4]
@@ -451,7 +454,7 @@ ranked &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span>
 dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/sql_build">sql_render</a></span>(ranked)</code></pre></div>
 <pre><code>## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`, rank() OVER (PARTITION BY `year`, `month`, `day` ORDER BY `dep_delay` DESC) AS `rank`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `ogiddqbrvf`</code></pre>
+## FROM `flights`) `dcmgkzezcv`</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ranked</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 5]
 ## # Database: spark_connection
@@ -609,16 +612,16 @@ dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentat
 ## # Ordered by: -days_since
 ##    flight_date days_since     n
 ##          &lt;chr&gt;      &lt;int&gt; &lt;dbl&gt;
-##  1    2013-1-1       1687   842
-##  2    2013-1-2       1686   943
-##  3    2013-1-3       1685   914
-##  4    2013-1-4       1684   915
-##  5    2013-1-5       1683   720
-##  6    2013-1-6       1682   832
-##  7    2013-1-7       1681   933
-##  8    2013-1-8       1680   899
-##  9    2013-1-9       1679   902
-## 10   2013-1-10       1678   932
+##  1    2013-1-1       1697   842
+##  2    2013-1-2       1696   943
+##  3    2013-1-3       1695   914
+##  4    2013-1-4       1694   915
+##  5    2013-1-5       1693   720
+##  6    2013-1-6       1692   832
+##  7    2013-1-7       1691   933
+##  8    2013-1-8       1690   899
+##  9    2013-1-9       1689   902
+## 10   2013-1-10       1688   932
 ## # ... with more rows</code></pre>
 </div>
 </div>

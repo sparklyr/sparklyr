@@ -71,16 +71,19 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
-      <a href="../articles/guides-extensions.html">Extensions</a>
+      <a href="../articles/deployment-connections.html">User connection options</a>
     </li>
     <li>
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
+    </li>
+    <li>
+      <a href="../articles/guides-extensions.html">Extensions</a>
     </li>
   </ul>
 </li>
@@ -229,7 +232,7 @@ especially useful in conjunction with <code>do</code>.</p></td>
 
 <span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
 
-<span class='no'>austen_books</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/janeaustenr/topics/austen_books'>austen_books</a></span>()
+<span class='no'>austen_books</span> <span class='kw'>&lt;-</span> <span class='fu'>austen_books</span>()
 <span class='no'>books_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>sdf_copy_to</span>(<span class='no'>sc</span>, <span class='no'>austen_books</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 <span class='no'>first_tbl</span> <span class='kw'>&lt;-</span> <span class='no'>books_tbl</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='fu'>nchar</span>(<span class='no'>text</span>) <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='kw'>%&gt;%</span> <span class='fu'>head</span>(<span class='fl'>100</span>)
 

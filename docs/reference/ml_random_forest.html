@@ -71,16 +71,19 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
-      <a href="../articles/guides-extensions.html">Extensions</a>
+      <a href="../articles/deployment-connections.html">User connection options</a>
     </li>
     <li>
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
+    </li>
+    <li>
+      <a href="../articles/guides-extensions.html">Extensions</a>
     </li>
   </ul>
 </li>
@@ -156,10 +159,8 @@
     <pre class="usage"><span class='fu'>ml_random_forest</span>(<span class='no'>x</span>, <span class='no'>response</span>, <span class='no'>features</span>, <span class='kw'>col.sample.rate</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>impurity</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"gini"</span>, <span class='st'>"entropy"</span>, <span class='st'>"variance"</span>), <span class='kw'>max.bins</span> <span class='kw'>=</span> <span class='fl'>32L</span>,
   <span class='kw'>max.depth</span> <span class='kw'>=</span> <span class='fl'>5L</span>, <span class='kw'>min.info.gain</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>min.rows</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>num.trees</span> <span class='kw'>=</span> <span class='fl'>20L</span>,
-  <span class='kw'>sample.rate</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>,
-  <span class='st'>"regression"</span>, <span class='st'>"classification"</span>), <span class='kw'>checkpoint.interval</span> <span class='kw'>=</span> <span class='fl'>10L</span>,
-  <span class='kw'>cache.node.ids</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>max.memory</span> <span class='kw'>=</span> <span class='fl'>256L</span>, <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options.html'>ml_options</a></span>(),
-  <span class='no'>...</span>)</pre>
+  <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"regression"</span>,
+  <span class='st'>"classification"</span>), <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options.html'>ml_options</a></span>(), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -222,6 +223,18 @@ number of nodes separating any leaves from the root of the tree.</p></td>
     <tr>
       <th>sample.rate</th>
       <td><p>Fraction of the training data used for learning each decision tree, defaults to 1.0.</p></td>
+    </tr>
+    <tr>
+      <th>thresholds</th>
+      <td><p>Thresholds in multi-class classification to adjust
+the probability of predicting each class. Vector must have length equal
+to the number of classes, with values &gt; 0 excepting that at most one
+value may be 0. The class with largest value p/t is predicted, where p
+is the original probability of that class and t is the class's threshold.</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p>Seed for random numbers.</p></td>
     </tr>
     <tr>
       <th>thresholds</th>
