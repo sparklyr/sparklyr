@@ -10,6 +10,7 @@
 #' @param alpha Concentration parameter for the prior placed on documents' distributions over topics. This is a singleton which is replicated to a vector of length \code{k} in fitting (as currently EM optimizer only supports symmetric distributions, so all values in the vector should be the same). For Expectation-Maximization optimizer values should be > 1.0.
 #' By default \code{alpha = (50 / k) + 1}, where \code{50/k} is common in LDA libraries and +1 follows from Asuncion et al. (2009), who recommend a +1 adjustment for EM.
 #' @param beta Concentration parameter for the prior placed on topics' distributions over terms. For Expectation-Maximization optimizer value should be > 1.0 and by default \code{beta = 0.1 + 1}, where 0.1 gives a small amount of smoothing and +1 follows Asuncion et al. (2009), who recommend a +1 adjustment for EM.
+#' @param iter Maximum number of iterations.
 #' @examples
 #' \dontrun{
 #' library(janeaustenr)
@@ -48,6 +49,7 @@ ml_lda <- function(x,
                    k = length(features),
                    alpha = (50 / k) + 1,
                    beta = 0.1 + 1,
+                   iter = 20,
                    ml.options = ml_options(),
                    ...)
 {
@@ -66,6 +68,7 @@ ml_lda <- function(x,
   alpha      <- ensure_scalar_double(alpha)
   beta       <- ensure_scalar_double(beta)
   k          <- ensure_scalar_integer(k)
+  iter       <- ensure_scalar_integer(iter)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   stopifnot(alpha > 1)
@@ -84,6 +87,7 @@ ml_lda <- function(x,
 
   model <- lda %>%
     invoke("setK", k) %>%
+    invoke("setMaxIter", iter) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setTopicConcentration", as.double(beta)) %>%
     invoke("setDocConcentration", as.double(alpha))
@@ -98,11 +102,13 @@ ml_lda <- function(x,
     invoke("fit", tdf)
 
   topics.matrix <- read_spark_matrix(fit, "topicsMatrix")
+  topics.description <- invoke(fit, "describeTopics") %>% sdf_collect()
   estimated.doc.concentration <- read_spark_vector(fit, "estimatedDocConcentration")
 
   ml_model("lda", fit,
     features = features,
     topics.matrix = topics.matrix,
+    topics.description = topics.description,
     estimated.doc.concentration = estimated.doc.concentration,
     data = df,
     ml.options = ml.options,
