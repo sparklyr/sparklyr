@@ -41,3 +41,9 @@ test_that("ml_tokenizer() returns params of transformer", {
   params <- list(input_col = "x", output_col = "y")
   expect_true(dplyr::setequal(tokenizer$stages$tok$params, params))
 })
+
+test_that("ml_binarizer() returns params of transformer", {
+  binarizer <- ml_binarizer(sc, input_col = "x", output_col = "y", threshold = 0.5, name = "bin")
+  params <- list(input_col = "x", output_col = "y", threshold = 0.5)
+  expect_true(dplyr::setequal(binarizer$stages$bin$params, params))
+})
