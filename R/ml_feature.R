@@ -9,9 +9,7 @@ ml_tokenizer <- function(sc, input_col, output_col, name = NULL) {
   pipeline_stage <- setNames(list(
     list(
       name = name,
-      type = .stage %>%
-        invoke("getClass") %>%
-        invoke("getName"),
+      type = jobj_info(.stage)$class,
       params = ml_get_param_map(.stage),
       .stage = .stage)
   ), name)
