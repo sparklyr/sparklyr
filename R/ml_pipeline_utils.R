@@ -1,7 +1,7 @@
 ml_pipeline_stage <- function(jobj, name) {
   name <- name %||% invoke(jobj, "uid")
 
-  structure(setNames(list(
+  structure(stats::setNames(list(
     list(
       name = name,
       type = jobj_info(jobj)$class,
