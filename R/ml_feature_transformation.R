@@ -435,3 +435,23 @@ ft_count_vectorizer <- function(x,
 
   if (vocabulary.only) as.character(invoke(result, "vocabulary")) else result
 }
+
+#' Feature Tranformation -- StopWordsRemover
+#'
+#' A feature transformer that drops all the stop words from the input sequence.
+#'
+#' @template roxlate-ml-transformation
+#'
+#' @export
+ft_stop_words_remover <- function(x,
+                                  input.col,
+                                  output.col,
+                                  ...)
+{
+  sparklyr:::ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.StopWordsRemover"
+  sparklyr:::invoke_simple_transformer(x, class, list(
+    setInputCol  = sparklyr:::ensure_scalar_character(input.col),
+    setOutputCol = sparklyr:::ensure_scalar_character(output.col)
+  ))
+}
