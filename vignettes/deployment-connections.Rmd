@@ -10,7 +10,7 @@ output:
 
 ## Customizing connections
 
-A connection to Spark can be customized by setting the values of certain Spark properties.  In `sparklyr`, Spark properties can be set by using the `conf` argument in the `spark_connect()` function.    
+A connection to Spark can be customized by setting the values of certain Spark properties.  In `sparklyr`, Spark properties can be set by using the `config` argument in the `spark_connect()` function.    
 
 By default, `spark_connect()` uses `spark_config()` as the default configuration.  But that can be customized as shown in the example code below. Because of the unending number of possible combinations, `spark_config()` contains only a basic configuration, so it will be very likely that additional settings will be needed to properly connect to the cluster.
 
@@ -45,7 +45,7 @@ It may be useful to provide some simple definitions for the Spark nomenclature:
 
 - **The cluster overrides 'silently'** -  Many times, no errors are returned when more resources than allowed are requested, or if an attempt is made to change a setting fixed by the cluster. 
 
-## Hadoop cluster
+## YARN cluster
 
 ### Background
 
@@ -86,7 +86,9 @@ sc <- spark_connect(master = "yarn-client",
 
 #### Executors page 
 
-To see how the requested configuration affected the Spark connection, go to the **Executors** page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040:
+To see how the requested configuration affected the Spark connection, go to the **Executors** page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040.
+
+Notice that 155.3MB per executor are assigned instead of the 300MB requested.  This is because the *spark.memory.fraction* has been fixed by the cluster, plus, there is fixed amount of memory designated for overhead.  
 
 ![](images/deployment/connections/yarnclient.png)
 
@@ -102,13 +104,13 @@ Requesting more memory or CPUs for Executors than allowed will return an error. 
 
 There are two options to access a "kerberized" data lake:
 
-- Use *kinit* to get and cache the ticket. After *kinit* is installed and configured, it can then be used in R via a `system()` call:p
+- Use *kinit* to get and cache the ticket. After *kinit* is installed and configured. After *kinit* is setup, it can used in R via a `system()` call prior to connecting to the cluster: 
 ```r
 system("echo '<password>' | kinit <username>")
 ```
 For more information visit this site: [Apache - Authenticate with kinit](http://directory.apache.org/apacheds/kerberos-ug/4.1-authenticate-kinit.html)
 
-- A preferred option may be to use the out-of-the-box integration with Kerberos that the commercial offering of [RStudio Server](https://www.rstudio.com/products/rstudio-server-pro/) offers.
+- A preferred option may be to use the out-of-the-box integration with Kerberos that the commercial version of [RStudio Server](https://www.rstudio.com/products/rstudio-server-pro/) offers.
 
 ## Standalone mode
 
