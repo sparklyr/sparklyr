@@ -1,7 +1,13 @@
 ml_create_param_mapping_tables <- function() {
   param_mapping_list <-
     list("input_col" = "inputCol",
-         "output_col" = "outputCol")
+         "output_col" = "outputCol",
+         "label_col" = "labelCol",
+         "prediction_col" = "predictionCol",
+         "probability_col" = "probabilityCol",
+         "raw_prediction_col" = "rawPredictionCol",
+         "alpha" = "elasticNetParam",
+         "intercept" = "intercept")
 
   # param_mapping_r_to_s <- new.env(hash = TRUE)
   param_mapping_s_to_r <- new.env(hash = TRUE, size = length(param_mapping_list))

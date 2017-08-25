@@ -565,7 +565,7 @@ object Sources {
     "  tryCatch({\n" +
     "    class <- invoke(jobj, \"getClass\")\n" +
     "    if (inherits(class, \"spark_jobj\"))\n" +
-    "      class <- invoke(class, \"toString\")\n" +
+    "      class <- invoke(class, \"getName\")\n" +
     "  }, error = function(e) {\n" +
     "  })\n" +
     "  tryCatch({\n" +
