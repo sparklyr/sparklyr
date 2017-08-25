@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Feature transformers (`ft_*` functions) now explicitly
+  require `input.col` and `output.col` to be specified.
+
 - Added support for `spark_apply_log()` to enable logging in
   worker nodes while using `spark_apply()`.
 

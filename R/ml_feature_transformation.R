@@ -9,8 +9,8 @@
 #'
 #' @export
 ft_vector_assembler <- function(x,
-                                input.col = NULL,
-                                output.col = NULL,
+                                input.col,
+                                output.col,
                                 ...)
 {
   ml_backwards_compatibility_api()
@@ -37,8 +37,8 @@ ft_vector_assembler <- function(x,
 #'
 #' @export
 ft_string_indexer <- function(x,
-                              input.col = NULL,
-                              output.col = NULL,
+                              input.col,
+                              output.col,
                               params = NULL,
                               ...)
 {
@@ -79,8 +79,8 @@ ft_string_indexer <- function(x,
 #'
 #' @export
 ft_binarizer <- function(x,
-                         input.col = NULL,
-                         output.col = NULL,
+                         input.col,
+                         output.col,
                          threshold = 0.5,
                          ...)
 {
@@ -104,8 +104,8 @@ ft_binarizer <- function(x,
 #'
 #' @export
 ft_discrete_cosine_transform <- function(x,
-                                         input.col = NULL,
-                                         output.col = NULL,
+                                         input.col,
+                                         output.col,
                                          inverse = FALSE,
                                          ...)
 {
@@ -128,8 +128,8 @@ ft_discrete_cosine_transform <- function(x,
 #'
 #' @export
 ft_index_to_string <- function(x,
-                               input.col = NULL,
-                               output.col = NULL,
+                               input.col,
+                               output.col,
                                ...)
 {
   ml_backwards_compatibility_api()
@@ -192,8 +192,8 @@ ft_index_to_string <- function(x,
 #'
 #' @export
 ft_bucketizer <- function(x,
-                          input.col = NULL,
-                          output.col = NULL,
+                          input.col,
+                          output.col,
                           splits,
                           ...)
 {
@@ -219,8 +219,8 @@ ft_bucketizer <- function(x,
 #'
 #' @export
 ft_elementwise_product <- function(x,
-                                   input.col = NULL,
-                                   output.col = NULL,
+                                   input.col,
+                                   output.col,
                                    scaling.col,
                                    ...)
 {
@@ -272,8 +272,8 @@ ft_sql_transformer <- function(x,
 #'
 #' @export
 ft_quantile_discretizer <- function(x,
-                                    input.col = NULL,
-                                    output.col = NULL,
+                                    input.col,
+                                    output.col,
                                     n.buckets = 5L,
                                     ...)
 {
@@ -299,8 +299,8 @@ ft_quantile_discretizer <- function(x,
 #'
 #' @export
 ft_one_hot_encoder <- function(x,
-                               input.col = NULL,
-                               output.col = NULL,
+                               input.col,
+                               output.col,
                                drop.last = TRUE,
                                ...)
 {
@@ -322,8 +322,8 @@ ft_one_hot_encoder <- function(x,
 #'
 #' @export
 ft_tokenizer <- function(x,
-                         input.col = NULL,
-                         output.col = NULL,
+                         input.col,
+                         output.col,
                          ...)
 {
   ml_backwards_compatibility_api()
@@ -346,8 +346,8 @@ ft_tokenizer <- function(x,
 #'
 #' @export
 ft_regex_tokenizer <- function(x,
-                               input.col = NULL,
-                               output.col = NULL,
+                               input.col,
+                               output.col,
                                pattern,
                                ...)
 {
@@ -373,8 +373,8 @@ ft_regex_tokenizer <- function(x,
 # #'
 # #' @export
 # ft_hashing_tf <- function(x,
-#                           input.col = NULL,
-#                           output.col = NULL,
+#                           input.col,
+#                           output.col,
 #                           n.features = NULL,
 #                           binary = FALSE,
 #                           ...)
@@ -412,8 +412,8 @@ ft_regex_tokenizer <- function(x,
 #'
 #' @export
 ft_count_vectorizer <- function(x,
-                                input.col = NULL,
-                                output.col = NULL,
+                                input.col,
+                                output.col,
                                 min.df = NULL,
                                 min.tf = NULL,
                                 vocab.size = NULL,
