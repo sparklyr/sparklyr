@@ -210,6 +210,7 @@ ml_wrap_in_pipeline <- function(jobj) {
 }
 
 ml_get_param_map <- function(jobj) {
+  sc <- spark_connection(jobj)
   invoke_static(sc,
                 "sparklyr.MLUtils",
                 "getParamMap",
