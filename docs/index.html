@@ -48,16 +48,19 @@
       <a href="articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="articles/guides-h2o.html">H2O</a>
+      <a href="articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
-      <a href="articles/guides-extensions.html">Extensions</a>
+      <a href="articles/deployment-connections.html">User connection options</a>
     </li>
     <li>
       <a href="articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="articles/guides-distributed-r.html">Distributed R</a>
+      <a href="articles/guides-h2o.html">H2O</a>
+    </li>
+    <li>
+      <a href="articles/guides-extensions.html">Extensions</a>
     </li>
   </ul>
 </li>
@@ -324,20 +327,20 @@ iris_json_tbl &lt;-<span class="st"> </span><span class="kw"><a href="reference/
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark_apply.html">spark_apply</a></span>(iris_tbl, <span class="cf">function</span>(data) {
   data[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>] <span class="op">+</span><span class="st"> </span><span class="kw">rgamma</span>(<span class="dv">1</span>,<span class="dv">2</span>)
 })</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1050f29e06aa2&gt; [?? x 4]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_118fd5007f7aa&gt; [?? x 4]
 ## # Database: spark_connection
 ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
 ##           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
-##  1     5.723259    4.123259     2.023259   0.8232595
-##  2     5.523259    3.623259     2.023259   0.8232595
-##  3     5.323259    3.823259     1.923259   0.8232595
-##  4     5.223259    3.723259     2.123259   0.8232595
-##  5     5.623259    4.223259     2.023259   0.8232595
-##  6     6.023259    4.523259     2.323259   1.0232595
-##  7     5.223259    4.023259     2.023259   0.9232595
-##  8     5.623259    4.023259     2.123259   0.8232595
-##  9     5.023259    3.523259     2.023259   0.8232595
-## 10     5.523259    3.723259     2.123259   0.7232595
+##  1      7.06982     5.46982      3.36982     2.16982
+##  2      6.86982     4.96982      3.36982     2.16982
+##  3      6.66982     5.16982      3.26982     2.16982
+##  4      6.56982     5.06982      3.46982     2.16982
+##  5      6.96982     5.56982      3.36982     2.16982
+##  6      7.36982     5.86982      3.66982     2.36982
+##  7      6.56982     5.36982      3.36982     2.26982
+##  8      6.96982     5.36982      3.46982     2.16982
+##  9      6.36982     4.86982      3.36982     2.16982
+## 10      6.86982     5.06982      3.46982     2.06982
 ## # ... with more rows</code></pre>
 <p>You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark_apply.html">spark_apply</a></span>(
@@ -346,7 +349,7 @@ iris_json_tbl &lt;-<span class="st"> </span><span class="kw"><a href="reference/
   <span class="dt">names =</span> <span class="kw">c</span>(<span class="st">"term"</span>, <span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"statistic"</span>, <span class="st">"p.value"</span>),
   <span class="dt">group_by =</span> <span class="st">"Species"</span>
 )</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1050fd5b3a51&gt; [?? x 6]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_118fd583f9c2b&gt; [?? x 6]
 ## # Database: spark_connection
 ##      Species         term    estimate  std.error  statistic      p.value
 ##        &lt;chr&gt;        &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
@@ -369,8 +372,8 @@ tempfile &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span cl
 <span class="co"># define an R interface to Spark line counting</span>
 count_lines &lt;-<span class="st"> </span><span class="cf">function</span>(sc, path) {
   <span class="kw"><a href="reference/spark-api.html">spark_context</a></span>(sc) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"textFile"</span>, path, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">      </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"count"</span>)
+<span class="st">    </span><span class="kw">invoke</span>(<span class="st">"textFile"</span>, path, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">invoke</span>(<span class="st">"count"</span>)
 }
 
 <span class="co"># call spark to count the lines of the CSV</span>
@@ -393,16 +396,16 @@ count_lines &lt;-<span class="st"> </span><span class="cf">function</span>(sc, p
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark_web.html">spark_web</a></span>(sc)</code></pre></div>
 <p>You can show the log using the <code>spark_log</code> function:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark_log.html">spark_log</a></span>(sc, <span class="dt">n =</span> <span class="dv">10</span>)</code></pre></div>
-<pre><code>## 17/08/24 15:18:07 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 72 (/var/folders/vd/krh_y3qd0c5bw8k77lmdtw7r0000gn/T//Rtmpe8V94A/file1050ff900237.csv MapPartitionsRDD[293] at textFile at NativeMethodAccessorImpl.java:0)
-## 17/08/24 15:18:07 INFO TaskSchedulerImpl: Adding task set 72.0 with 1 tasks
-## 17/08/24 15:18:07 INFO TaskSetManager: Starting task 0.0 in stage 72.0 (TID 112, localhost, executor driver, partition 0, PROCESS_LOCAL, 6009 bytes)
-## 17/08/24 15:18:07 INFO Executor: Running task 0.0 in stage 72.0 (TID 112)
-## 17/08/24 15:18:07 INFO HadoopRDD: Input split: file:/var/folders/vd/krh_y3qd0c5bw8k77lmdtw7r0000gn/T/Rtmpe8V94A/file1050ff900237.csv:0+33313106
-## 17/08/24 15:18:08 INFO Executor: Finished task 0.0 in stage 72.0 (TID 112). 1123 bytes result sent to driver
-## 17/08/24 15:18:08 INFO TaskSetManager: Finished task 0.0 in stage 72.0 (TID 112) in 119 ms on localhost (executor driver) (1/1)
-## 17/08/24 15:18:08 INFO TaskSchedulerImpl: Removed TaskSet 72.0, whose tasks have all completed, from pool 
-## 17/08/24 15:18:08 INFO DAGScheduler: ResultStage 72 (count at NativeMethodAccessorImpl.java:0) finished in 0.119 s
-## 17/08/24 15:18:08 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.122277 s</code></pre>
+<pre><code>## 17/08/25 12:57:40 INFO ContextCleaner: Cleaned accumulator 4349
+## 17/08/25 12:57:40 INFO BlockManagerInfo: Removed broadcast_73_piece0 on 127.0.0.1:50036 in memory (size: 10.0 KB, free: 338.3 MB)
+## 17/08/25 12:57:40 INFO BlockManagerInfo: Removed broadcast_74_piece0 on 127.0.0.1:50036 in memory (size: 3.7 KB, free: 338.3 MB)
+## 17/08/25 12:57:40 INFO ContextCleaner: Cleaned accumulator 4459
+## 17/08/25 12:57:40 INFO ContextCleaner: Cleaned accumulator 4460
+## 17/08/25 12:57:40 INFO Executor: Finished task 0.0 in stage 72.0 (TID 112). 1196 bytes result sent to driver
+## 17/08/25 12:57:40 INFO TaskSetManager: Finished task 0.0 in stage 72.0 (TID 112) in 131 ms on localhost (executor driver) (1/1)
+## 17/08/25 12:57:40 INFO TaskSchedulerImpl: Removed TaskSet 72.0, whose tasks have all completed, from pool 
+## 17/08/25 12:57:40 INFO DAGScheduler: ResultStage 72 (count at NativeMethodAccessorImpl.java:0) finished in 0.131 s
+## 17/08/25 12:57:40 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.134441 s</code></pre>
 <p>Finally, we disconnect from Spark:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark-connections.html">spark_disconnect</a></span>(sc)</code></pre></div>
 </div>
@@ -451,7 +454,7 @@ mtcars_glm &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rd
 ## ==============
 ## 
 ## H2ORegressionModel: glm
-## Model ID:  GLM_model_R_1503605911303_1 
+## Model ID:  GLM_model_R_1503683883296_1 
 ## GLM Model: summary
 ##     family     link                              regularization
 ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -460,7 +463,7 @@ mtcars_glm &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rd
 ##   number_of_predictors_total number_of_active_predictors
 ## 1                          2                           2
 ##   number_of_iterations                                training_frame
-## 1                    0 frame_rdd_29_a9a7851c7ad9be74b8771e9d1de34a50
+## 1                    0 frame_rdd_29_9b117dc470ba6f8aa3340ee2e18d44eb
 ## 
 ## Coefficients: glm coefficients
 ##       names coefficients standardized_coefficients

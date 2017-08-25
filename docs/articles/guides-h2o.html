@@ -48,16 +48,19 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
-      <a href="../articles/guides-extensions.html">Extensions</a>
+      <a href="../articles/deployment-connections.html">User connection options</a>
     </li>
     <li>
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
+    </li>
+    <li>
+      <a href="../articles/guides-extensions.html">Extensions</a>
     </li>
   </ul>
 </li>
@@ -183,11 +186,11 @@ partitions &lt;-<span class="st"> </span>mtcars_tbl <span class="op">%&gt;%</spa
 <p>Now, we convert our training and test sets into H2O Frames using rsparkling conversion functions. We have already split the data into training and test frames using dplyr.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">training &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rsparkling/topics/as_h2o_frame">as_h2o_frame</a></span>(sc, partitions<span class="op">$</span>training, <span class="dt">strict_version_check =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>## Warning in h2o.clusterInfo(): 
-## Your H2O cluster version is too old (6 months and 24 days)!
+## Your H2O cluster version is too old (6 months and 25 days)!
 ## Please download and install the latest version from http://h2o.ai/download/</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rsparkling/topics/as_h2o_frame">as_h2o_frame</a></span>(sc, partitions<span class="op">$</span>test, <span class="dt">strict_version_check =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>## Warning in h2o.clusterInfo(): 
-## Your H2O cluster version is too old (6 months and 24 days)!
+## Your H2O cluster version is too old (6 months and 25 days)!
 ## Please download and install the latest version from http://h2o.ai/download/</code></pre>
 <p>Alternatively, we can use the <code><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.splitFrame">h2o.splitFrame()</a></code> function instead of <code><a href="../reference/sdf_partition.html">sdf_partition()</a></code> to partition the data within H2O instead of Spark (e.g. <code>partitions &lt;- h2o.splitFrame(as_h2o_frame(mtcars_tbl), 0.5)</code>)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit a linear model to the training dataset</span>
@@ -201,7 +204,7 @@ glm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 ## ==============
 ## 
 ## H2ORegressionModel: glm
-## Model ID:  GLM_model_R_1503606159162_1 
+## Model ID:  GLM_model_R_1503684109678_1 
 ## GLM Model: summary
 ##     family     link                               regularization
 ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.05468 )
@@ -209,8 +212,8 @@ glm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 ## 1 nlambda = 100, lambda.max = 5.4682, lambda.min = 0.05468, lambda.1se = -1.0
 ##   number_of_predictors_total number_of_active_predictors
 ## 1                          2                           2
-##   number_of_iterations                                training_frame
-## 1                    0 frame_rdd_32_8b667ddda76d9a9863fe54e58d1a462c
+##   number_of_iterations                               training_frame
+## 1                    0 frame_rdd_32_8d800eecc2806f51fa504de54664e58
 ## 
 ## Coefficients: glm coefficients
 ##       names coefficients standardized_coefficients
@@ -492,7 +495,7 @@ iris_tbl</code></pre></div>
 ## ==============
 ## 
 ## H2ODimReductionModel: pca
-## Model ID:  PCA_model_R_1503606159162_3 
+## Model ID:  PCA_model_R_1503684109678_3 
 ## Importance of components: 
 ##                             pc1      pc2      pc3      pc4
 ## Standard deviation     7.861342 1.455041 0.283531 0.154411
@@ -594,11 +597,11 @@ x &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.performance">h2o.performance</a></span>(dl_fit, <span class="dt">newdata =</span> splits[[<span class="dv">2</span>]])</code></pre></div>
 <pre><code>## H2ORegressionMetrics: deeplearning
 ## 
-## MSE:  253.5431
-## RMSE:  15.92304
-## MAE:  13.04667
-## RMSLE:  1.884042
-## Mean Residual Deviance :  253.5431</code></pre>
+## MSE:  279.1715
+## RMSE:  16.70843
+## MAE:  13.18417
+## RMSLE:  1.879956
+## Mean Residual Deviance :  279.1715</code></pre>
 <p>Note that the above metrics are not reproducible when H2O’s Deep Learning is run on multiple cores, however, the metrics should be fairly stable across repeat runs.</p>
 </div>
 <div id="grid-search" class="section level3">
@@ -725,9 +728,9 @@ gbm_gridperf2 &lt;-<span class="st"> </span><span class="kw"><a href="http://www
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gbm_gridperf2<span class="op">@</span>summary_table[<span class="dv">1</span>,]</code></pre></div>
 <pre><code>## Hyper-Parameter Search Summary: ordered by increasing mse
 ##   col_sample_rate learn_rate max_depth sample_rate          model_ids
-## 1             0.1       0.01         6         0.5 gbm_grid2_model_14
+## 1             0.4       0.01         5         0.5 gbm_grid2_model_31
 ##                  mse
-## 1 249.75545865974544</code></pre>
+## 1 249.34100191149807</code></pre>
 <p>In the examples above, we generated two different grids, specified by <code>grid_id</code>. The first grid was called <code>grid_id = "gbm_grid1"</code> and the second was called <code>grid_id = "gbm_grid2"</code>. However, if we are using the same dataset &amp; algorithm in two grid searches, it probably makes more sense just to add the results of the second grid search to the first. If you want to add models to an existing grid, rather than create a new one, you simply re-use the same <code>grid_id</code>.</p>
 </div>
 </div>

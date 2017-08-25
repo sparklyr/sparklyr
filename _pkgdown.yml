@@ -16,14 +16,16 @@ navbar:
           href: articles/guides-dplyr.html
         - text: "mllib"
           href: articles/guides-mllib.html
+        - text: "Distributed R"
+          href: articles/guides-distributed-r.html
+        - text: "User connection options"
+          href: articles/deployment-connections.html
+        - text: "Caching"
+          href: articles/guides-caching.html
         - text: "H2O"
           href: articles/guides-h2o.html
         - text: "Extensions"
           href: articles/guides-extensions.html
-        - text: "Caching"
-          href: articles/guides-caching.html
-        - text: "Distributed R"
-          href: articles/guides-distributed-r.html
     - text: "Deployment"
       menu:
         - text: "Overview"

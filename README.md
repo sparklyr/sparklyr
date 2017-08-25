@@ -266,20 +266,20 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_104564f8ccff8> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_117d835ce14f9> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1     7.174844    5.574844     3.474844    2.274844
-    ##  2     6.974844    5.074844     3.474844    2.274844
-    ##  3     6.774844    5.274844     3.374844    2.274844
-    ##  4     6.674844    5.174844     3.574844    2.274844
-    ##  5     7.074844    5.674844     3.474844    2.274844
-    ##  6     7.474844    5.974844     3.774844    2.474844
-    ##  7     6.674844    5.474844     3.474844    2.374844
-    ##  8     7.074844    5.474844     3.574844    2.274844
-    ##  9     6.474844    4.974844     3.474844    2.274844
-    ## 10     6.974844    5.174844     3.574844    2.174844
+    ##  1     9.983684    8.383684     6.283684    5.083684
+    ##  2     9.783684    7.883684     6.283684    5.083684
+    ##  3     9.583684    8.083684     6.183684    5.083684
+    ##  4     9.483684    7.983684     6.383684    5.083684
+    ##  5     9.883684    8.483684     6.283684    5.083684
+    ##  6    10.283684    8.783684     6.583684    5.283684
+    ##  7     9.483684    8.283684     6.283684    5.183684
+    ##  8     9.883684    8.283684     6.383684    5.083684
+    ##  9     9.283684    7.783684     6.283684    5.083684
+    ## 10     9.783684    7.983684     6.383684    4.983684
     ## # ... with more rows
 
 You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
@@ -293,7 +293,7 @@ spark_apply(
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_104562e74b684> [?? x 6]
+    ## # Source:   table<sparklyr_tmp_117d876fbf859> [?? x 6]
     ## # Database: spark_connection
     ##      Species         term    estimate  std.error  statistic      p.value
     ##        <chr>        <chr>       <dbl>      <dbl>      <dbl>        <dbl>
@@ -361,16 +361,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_76_piece0 on 127.0.0.1:50621 in memory (size: 79.3 KB, free: 338.1 MB)
-    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_77_piece0 on 127.0.0.1:50621 in memory (size: 81.6 KB, free: 338.1 MB)
-    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_78_piece0 on 127.0.0.1:50621 in memory (size: 10.0 KB, free: 338.1 MB)
-    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_79_piece0 on 127.0.0.1:50621 in memory (size: 81.2 KB, free: 338.2 MB)
-    ## 17/08/24 15:14:57 INFO BlockManagerInfo: Removed broadcast_80_piece0 on 127.0.0.1:50621 in memory (size: 83.6 KB, free: 338.3 MB)
-    ## 17/08/24 15:14:57 INFO Executor: Finished task 0.0 in stage 72.0 (TID 112). 1109 bytes result sent to driver
-    ## 17/08/24 15:14:57 INFO TaskSetManager: Finished task 0.0 in stage 72.0 (TID 112) in 122 ms on localhost (executor driver) (1/1)
-    ## 17/08/24 15:14:57 INFO TaskSchedulerImpl: Removed TaskSet 72.0, whose tasks have all completed, from pool 
-    ## 17/08/24 15:14:57 INFO DAGScheduler: ResultStage 72 (count at NativeMethodAccessorImpl.java:0) finished in 0.122 s
-    ## 17/08/24 15:14:57 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.124489 s
+    ## 17/08/25 12:54:28 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 72 (/var/folders/vd/krh_y3qd0c5bw8k77lmdtw7r0000gn/T//Rtmps6VbEg/file117d8538598e1.csv MapPartitionsRDD[293] at textFile at NativeMethodAccessorImpl.java:0)
+    ## 17/08/25 12:54:28 INFO TaskSchedulerImpl: Adding task set 72.0 with 1 tasks
+    ## 17/08/25 12:54:28 INFO TaskSetManager: Starting task 0.0 in stage 72.0 (TID 112, localhost, executor driver, partition 0, PROCESS_LOCAL, 6010 bytes)
+    ## 17/08/25 12:54:28 INFO Executor: Running task 0.0 in stage 72.0 (TID 112)
+    ## 17/08/25 12:54:28 INFO HadoopRDD: Input split: file:/var/folders/vd/krh_y3qd0c5bw8k77lmdtw7r0000gn/T/Rtmps6VbEg/file117d8538598e1.csv:0+33313106
+    ## 17/08/25 12:54:28 INFO Executor: Finished task 0.0 in stage 72.0 (TID 112). 1123 bytes result sent to driver
+    ## 17/08/25 12:54:28 INFO TaskSetManager: Finished task 0.0 in stage 72.0 (TID 112) in 114 ms on localhost (executor driver) (1/1)
+    ## 17/08/25 12:54:28 INFO TaskSchedulerImpl: Removed TaskSet 72.0, whose tasks have all completed, from pool 
+    ## 17/08/25 12:54:28 INFO DAGScheduler: ResultStage 72 (count at NativeMethodAccessorImpl.java:0) finished in 0.114 s
+    ## 17/08/25 12:54:28 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.117630 s
 
 Finally, we disconnect from Spark:
 
@@ -433,7 +433,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1503605720549_1 
+    ## Model ID:  GLM_model_R_1503683692912_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -442,7 +442,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                    0 frame_rdd_29_8bb40accb5c8c137f56e6c47bd7742c3
+    ## 1                    0 frame_rdd_29_970371551cefadb7219d3e25e94a4bc0
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
