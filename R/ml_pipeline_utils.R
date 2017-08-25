@@ -20,3 +20,12 @@ ml_pipeline <- function(jobj, name) {
     class = "ml_pipeline"
   )
 }
+
+ml_new_transformer <- function(sc, class, input_col, output_col) {
+  ensure_scalar_character(input_col)
+  ensure_scalar_character(output_col)
+  invoke_new(sc, class) %>%
+    invoke("setInputCol", input_col) %>%
+    invoke("setOutputCol", output_col)
+}
+
