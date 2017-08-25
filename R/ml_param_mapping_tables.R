@@ -4,7 +4,7 @@ ml_create_param_mapping_tables <- function() {
          "output_col" = "outputCol")
 
   # param_mapping_r_to_s <- new.env(hash = TRUE)
-  param_mapping_s_to_r <- new.env(hash = TRUE)
+  param_mapping_s_to_r <- new.env(hash = TRUE, size = length(param_mapping_list))
 
   invisible(lapply(names(param_mapping_list),
                    function(x) {
