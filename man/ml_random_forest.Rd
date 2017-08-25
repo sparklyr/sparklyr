@@ -7,8 +7,10 @@
 ml_random_forest(x, response, features, col.sample.rate = NULL,
   impurity = c("auto", "gini", "entropy", "variance"), max.bins = 32L,
   max.depth = 5L, min.info.gain = 0, min.rows = 1L, num.trees = 20L,
-  thresholds = NULL, seed = NULL, type = c("auto", "regression",
-  "classification"), ml.options = ml_options(), ...)
+  sample.rate = 1, thresholds = NULL, seed = NULL, type = c("auto",
+  "regression", "classification"), checkpoint.interval = 10L,
+  cache.node.ids = FALSE, max.memory = 256L, ml.options = ml_options(),
+  ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -44,7 +46,9 @@ number of nodes separating any leaves from the root of the tree.}
 
 \item{min.rows}{Minimum number of instances each child must have after split.}
 
-\item{num.trees}{Number of trees to train (>= 1).}
+\item{num.trees}{Number of trees to train (>= 1), defaults to 20.}
+
+\item{sample.rate}{Fraction of the training data used for learning each decision tree, defaults to 1.0.}
 
 \item{thresholds}{Thresholds in multi-class classification to adjust
 the probability of predicting each class. Vector must have length equal
@@ -59,6 +63,16 @@ as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
 inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
+
+\item{checkpoint.interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
+
+\item{cache.node.ids}{If \code{FALSE}, the algorithm will pass trees to executors to match instances with nodes.
+If \code{TRUE}, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
+Defaults to \code{FALSE}.}
+
+\item{max.memory}{Maximum memory in MB allocated to histogram aggregation. If too small, then 1 node will be split per iteration,
+and its aggregates may exceed this size. Defaults to 256.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}

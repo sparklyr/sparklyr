@@ -17,7 +17,8 @@ The function \code{f} has signature \code{f(df, group1, group2, ...)} where
 \code{group_by} is not specified, \code{f} takes only one argument.}
 
 \item{columns}{A vector of column names or a named vector of column types for
-the transformed object. Defaults to the names from the original object.}
+the transformed object. Defaults to the names from the original object and
+adds indexed column names when not enough columns are specified.}
 
 \item{memory}{Boolean; should the table be cached into memory?}
 

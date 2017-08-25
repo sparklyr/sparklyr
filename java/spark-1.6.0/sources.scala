@@ -936,24 +936,19 @@ object Sources {
     "  if (nchar(bundlePath) > 0) {\n" +
     "    worker_log(\"using bundle \", bundlePath)\n" +
     "\n" +
-    "    if (file.exists(bundlePath)) {\n" +
-    "      worker_log(\"found local bundle exists, skipping extraction\")\n" +
+    "    bundleName <- basename(bundlePath)\n" +
+    "\n" +
+    "    workerRootDir <- worker_invoke_static(sc, \"org.apache.spark.SparkFiles\", \"getRootDirectory\")\n" +
+    "    sparkBundlePath <- file.path(workerRootDir, bundleName)\n" +
+    "\n" +
+    "    if (!file.exists(sparkBundlePath)) {\n" +
+    "      stop(\"failed to find bundle under SparkFiles root directory\")\n" +
     "    }\n" +
-    "    else {\n" +
-    "      bundleName <- basename(bundlePath)\n" +
     "\n" +
-    "      workerRootDir <- worker_invoke_static(sc, \"org.apache.spark.SparkFiles\", \"getRootDirectory\")\n" +
-    "      sparkBundlePath <- file.path(workerRootDir, bundleName)\n" +
+    "    unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)\n" +
     "\n" +
-    "      if (!file.exists(sparkBundlePath)) {\n" +
-    "        stop(\"failed to find bundle under SparkFiles root directory\")\n" +
-    "      }\n" +
-    "\n" +
-    "      unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)\n" +
-    "\n" +
-    "      .libPaths(unbundlePath)\n" +
-    "      worker_log(\"updated .libPaths with bundle packages\")\n" +
-    "    }\n" +
+    "    .libPaths(unbundlePath)\n" +
+    "    worker_log(\"updated .libPaths with bundle packages\")\n" +
     "  }\n" +
     "\n" +
     "  grouped_by <- worker_invoke(context, \"getGroupBy\")\n" +
@@ -1061,12 +1056,24 @@ object Sources {
     "#' @export\n" +
     "worker_spark_apply_unbundle <- function(bundle_path, base_path) {\n" +
     "  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())\n" +
+    "  lockFile <- file.path(extractPath, \"sparklyr.lock\")\n" +
     "\n" +
     "  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)\n" +
     "\n" +
     "  if (length(dir(extractPath)) == 0) {\n" +
     "    worker_log(\"found that the unbundle path is empty, extracting:\", extractPath)\n" +
+    "\n" +
+    "    writeLines(lockFile)\n" +
     "    system2(\"tar\", c(\"-xf\", bundle_path, \"-C\", extractPath))\n" +
+    "    unlink(lockFile)\n" +
+    "  }\n" +
+    "\n" +
+    "  if (file.exists(lockFile)) {\n" +
+    "    worker_log(\"found that lock file exists, waiting\")\n" +
+    "    while (file.exists(lockFile)) {\n" +
+    "      Sys.sleep(1000)\n" +
+    "    }\n" +
+    "    worker_log(\"completed lock file wait\")\n" +
     "  }\n" +
     "\n" +
     "  extractPath\n" +

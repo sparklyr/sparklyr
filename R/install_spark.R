@@ -68,7 +68,7 @@ spark_default_version <- function() {
     hadoop <- version$hadoopVersion
     # otherwise check available versions and take the default
   } else {
-    versions <- sparklyr::spark_versions()
+    versions <- spark_versions()
     versions <- subset(versions, versions$default == TRUE & versions$hadoop_default == TRUE)
     version <- versions[1,]
     spark <- version$spark
@@ -197,7 +197,7 @@ spark_install <- function(version = NULL,
         list(
           "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
           "log4j.appender.localfile" = "log4j.appender.localfile=org.apache.log4j.DailyRollingFileAppender",
-          "log4j.appender.localfile.file" = "log4j.appender.localfile.file=log4j.spark.log",
+          "log4j.appender.localfile.file" = "log4j.appender.localfile.file=logs/log4j.spark.log",
           "log4j.appender.localfile.layout" = "log4j.appender.localfile.layout=org.apache.log4j.PatternLayout",
           "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"),
         reset)

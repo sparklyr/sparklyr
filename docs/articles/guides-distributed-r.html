@@ -204,20 +204,21 @@ trees_tbl <span class="op">%&gt;%</span>
 ## # ... with more rows</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trees_tbl <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(<span class="cf">function</span>(e) <span class="kw">lapply</span>(e, jitter))</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_11a6052aa732c&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_23ca1957a88d&gt; [?? x 3]
 ## # Database: spark_connection
 ##        Girth   Height   Volume
 ##        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1  8.298331 69.95389 10.31717
-##  2  8.798234 63.13972 10.19109
-##  3 10.691022 80.98142 18.78720
-##  4 11.002317 66.14627 15.59630
-##  5 11.115085 79.98871 22.60202
-##  6 11.289436 79.14985 24.21968
-##  7 11.382294 75.88585 21.38918
-##  8 11.983347 74.84239 19.09690
-##  9 12.880388 84.96205 33.80962
-## 10 13.685136 71.16401 25.70928
+##  1  8.287798 69.80712 10.28412
+##  2  8.785531 63.18090 10.21287
+##  3 10.715335 80.92861 18.78260
+##  4 10.985554 66.13940 15.60478
+##  5 11.108412 79.90033 22.58873
+##  6 11.284649 79.07133 24.21657
+##  7 11.415568 76.18763 21.40407
+##  8 12.010764 74.94982 19.08528
+##  9 12.884407 84.81160 33.78431
+## 10 13.700123 70.88096 25.70843
+
 ## # ... with more rows</code></pre>
 <p>By default <code><a href="../reference/spark_apply.html">spark_apply()</a></code> derives the column names from the input Spark data frame. Use the <code>names</code> argument to rename or add new columns.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trees_tbl <span class="op">%&gt;%</span>

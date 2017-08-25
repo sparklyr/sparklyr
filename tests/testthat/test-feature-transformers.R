@@ -90,6 +90,9 @@ test_that("the feature transforming family of functions has consistent API", {
   exports <- getNamespaceExports(ns)
   fts <- grep("^ft_", exports, value = TRUE)
 
+  # ft_sql_transformer does not use input.col and output.col
+  fts <- fts[fts != "ft_sql_transformer"]
+
   for (ft in fts) {
     transformer <- get(ft, envir = ns, mode = "function")
     fmls <- names(formals(transformer))

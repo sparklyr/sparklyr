@@ -4,14 +4,10 @@
 \alias{ft_sql_transformer}
 \title{Feature Transformation -- SQLTransformer}
 \usage{
-ft_sql_transformer(x, input.col = NULL, output.col = NULL, sql, ...)
+ft_sql_transformer(x, sql, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
-
-\item{input.col}{The name of the input column(s).}
-
-\item{output.col}{The name of the output column.}
 
 \item{sql}{A SQL statement.}
 
@@ -20,28 +16,4 @@ ft_sql_transformer(x, input.col = NULL, output.col = NULL, sql, ...)
 \description{
 Transform a data set using SQL. Use the \code{__THIS__}
 placeholder as a proxy for the active table.
-}
-\details{
-Although this function accepts the \code{input.col} and \code{output.col}
-arguments, they are ignored -- this interface is done purely for
-compatibility with \code{\link{sdf_mutate}}.
-}
-\seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
-  more information on the set of transformations available for DataFrame
-  columns in Spark.
-
-Other feature transformation routines: \code{\link{ft_binarizer}},
-  \code{\link{ft_bucketizer}},
-  \code{\link{ft_count_vectorizer}},
-  \code{\link{ft_discrete_cosine_transform}},
-  \code{\link{ft_elementwise_product}},
-  \code{\link{ft_index_to_string}},
-  \code{\link{ft_one_hot_encoder}},
-  \code{\link{ft_quantile_discretizer}},
-  \code{\link{ft_regex_tokenizer}},
-  \code{\link{ft_string_indexer}},
-  \code{\link{ft_tokenizer}},
-  \code{\link{ft_vector_assembler}},
-  \code{\link{sdf_mutate}}
 }
