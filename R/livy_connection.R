@@ -131,11 +131,24 @@ livy_config_get <- function(master, config) {
 
 #' @importFrom httr POST
 #' @importFrom jsonlite unbox
-livy_create_session <- function(master, config) {
+livy_create_session <- function(master, config, ...) {
   data <- list(
     kind = unbox("spark"),
     conf = livy_config_get(master, config)
   )
+  allowed_params <- c("proxyUser", "jars", "pyFiles", "files", "driverMemory", "driverCores", "executorMemory",
+                      "executorCores", "numExecutors", "archives", "queue", "name", "heartbeatTimeoutInSecond")
+  additional_params <- list(...)
+  if(length(additional_params) > 0) {
+    valid_params <- names(additional_params) %in% allowed_params
+    if(!all(valid_params)){
+      stop(paste0(names(additional_params[!valid_params]), sep = ", "), " are not valid session parameters. Valid parameters are: ", paste0(allowed_params, sep = ", "))
+    }
+    singleValues = c("proxyUser", "driverMemory", "driverCores", "executorMemory", "executorCores", "numExecutors", "queue", "name", "heartbeatInSecond")
+    singleValues <- singleValues[singleValues %in% names(additional_params)]
+    additional_params[singleValues] <- lapply(additional_params[singleValues], unbox)
+    data <- append(data, additional_params)
+  }
 
   req <- POST(paste(master, "sessions", sep = "/"),
               livy_get_httr_headers(config, list(
@@ -552,7 +565,8 @@ livy_connection <- function(master,
                             app_name,
                             version,
                             hadoop_version,
-                            extensions) {
+                            extensions,
+                            ...) {
 
   livy_connection_not_used_warn(app_name, "sparklyr")
   livy_connection_not_used_warn(version)
@@ -568,7 +582,7 @@ livy_connection <- function(master,
 
   livy_validate_master(master, config)
 
-  session <- livy_create_session(master, config)
+  session <- livy_create_session(master, config, ...)
 
   sc <- structure(class = c("spark_connection", "livy_connection", "DBIConnection"), list(
     master = master,
