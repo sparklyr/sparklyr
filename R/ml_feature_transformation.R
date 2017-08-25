@@ -71,7 +71,8 @@ ft_string_indexer <- function(x,
 #'
 #' Apply thresholding to a column, such that values less than or equal to the
 #' \code{threshold} are assigned the value 0.0, and values greater than the
-#' threshold are assigned the value 1.0.
+#' threshold are assigned the value 1.0. Column output is numeric for
+#' compatibility with other modeling functions.
 #'
 #' @template roxlate-ml-transformation
 #'
