@@ -372,8 +372,8 @@ tempfile &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span cl
 <span class="co"># define an R interface to Spark line counting</span>
 count_lines &lt;-<span class="st"> </span><span class="cf">function</span>(sc, path) {
   <span class="kw"><a href="reference/spark-api.html">spark_context</a></span>(sc) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">invoke</span>(<span class="st">"textFile"</span>, path, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">      </span><span class="kw">invoke</span>(<span class="st">"count"</span>)
+<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"textFile"</span>, path, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"count"</span>)
 }
 
 <span class="co"># call spark to count the lines of the CSV</span>
@@ -539,7 +539,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="reference/spark-conne
 <li>Javier Luraschi <br><small class="roles"> Author, maintainer </small> </li>
 <li>Kevin Ushey <br><small class="roles"> Author </small> </li>
 <li>JJ Allaire <br><small class="roles"> Author </small> </li>
-<li> The Apache Software Foundation <br><small class="roles"> Author, copyright holder </small> </li>
+<li> The Apache Software Foundation <br><small class="roles"> Author, copyright holder </small> </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
 <h2>Dev status</h2>

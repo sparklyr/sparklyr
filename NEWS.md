@@ -1,5 +1,34 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for `spark_apply_log()` to enable logging in
+  worker nodes while using `spark_apply()`.
+
+- Fix to `spark_apply()` for `SparkUncaughtExceptionHandler`
+  exception while running over large jobs that may overlap
+  during an, now unnecesary, unregister operation.
+
+- Fix race-condition first time `spark_apply()` is run when more
+  than one partition runs in a worker and both processes try to
+  unpack the packages bundle at the same time.
+
+- `spark_apply()` now adds generic column names when needed and 
+  validates `f` is a `function`.
+
+- Improved documentation and error cases for `metric` argument in
+  `ml_classification_eval()` and `ml_binary_classification_eval()`.
+
+- Fix to `spark_install()` to use the `/logs` subfolder to store local
+  `log4j` logs.
+
+- Fix to `spark_apply()` when R is used from a worker node since worker
+  node already contains packages but still might be triggering different
+  R session.
+
+- Fix connection from closing when `invoke()` attempts to use a class
+  with a method that contains a reference to an undefined class.
+
+- Implemented all tuning options from Spark ML for `ml_random_forest()`, `ml_gradient_boosted_trees()`, and `ml_decision_tree()`.
+
 - Avoid tasks failing under `spark_apply()` and multiple  concurrent
   partitions running while selecting backend port.
 
@@ -25,9 +54,6 @@
 - Added a `k` argument to `ml_pca()` to enable specification of number of principal
   components to extract. Also implemented `sdf_project()` to project datasets using
   the results of `ml_pca()` models.
-
-- Added to `ml_random_forest()` the following hyperparameter arguments:
-  `min.info.gain`, `col.sample.rate`, `min.rows`, `impurity`, and `thresholds`. Also added `seed` for reproducibility.
 
 # Sparklyr 0.6.1 (UNRELEASED)
 

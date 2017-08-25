@@ -14,7 +14,7 @@ ml_binary_classification_eval(predicted_tbl_spark, label, score,
 
 \item{score}{Name of column contains the scored probability of a success (ie 1)}
 
-\item{metric}{The classification metric -  one of: areaUnderRoc (default) or areaUnderPR}
+\item{metric}{The classification metric - one of: areaUnderRoc (default) or areaUnderPR (not available in Spark 2.X)}
 }
 \value{
 area under the specified curve

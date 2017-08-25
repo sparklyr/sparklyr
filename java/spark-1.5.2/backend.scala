@@ -405,7 +405,7 @@ class Backend {
   }
 
   def terminate() = {
-    if (isRegistered) {
+    if (isRegistered && !isWorker) {
       val success = unregister(gatewayPort, sessionId)
       if (!success) {
         logger.logError("failed to unregister on gateway port " + gatewayPort)
@@ -419,22 +419,28 @@ class Backend {
   }
 
   def unregister(gatewayPort: Int, sessionId: Int): Boolean = {
-    logger.log("is unregistering session in gateway")
+    try {
+      logger.log("is unregistering session in gateway")
 
-    val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
+      val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
-    val dos = new DataOutputStream(s.getOutputStream())
-    dos.writeInt(GatewayOperattions.UnregisterInstance.id)
-    dos.writeInt(sessionId)
+      val dos = new DataOutputStream(s.getOutputStream())
+      dos.writeInt(GatewayOperattions.UnregisterInstance.id)
+      dos.writeInt(sessionId)
 
-    logger.log("is waiting for unregistration in gateway")
+      logger.log("is waiting for unregistration in gateway")
 
-    val dis = new DataInputStream(s.getInputStream())
-    val status = dis.readInt()
+      val dis = new DataInputStream(s.getInputStream())
+      val status = dis.readInt()
 
-    logger.log("finished unregistration in gateway with status " + status)
+      logger.log("finished unregistration in gateway with status " + status)
 
-    s.close()
-    status == 0
+      s.close()
+      status == 0
+    } catch {
+      case e: Exception =>
+        logger.log("failed to unregister from gateway: " + e.toString)
+        false
+    }
   }
 }

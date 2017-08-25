@@ -16,24 +16,19 @@ spark_worker_apply <- function(sc) {
   if (nchar(bundlePath) > 0) {
     worker_log("using bundle ", bundlePath)
 
-    if (file.exists(bundlePath)) {
-      worker_log("found local bundle exists, skipping extraction")
+    bundleName <- basename(bundlePath)
+
+    workerRootDir <- worker_invoke_static(sc, "org.apache.spark.SparkFiles", "getRootDirectory")
+    sparkBundlePath <- file.path(workerRootDir, bundleName)
+
+    if (!file.exists(sparkBundlePath)) {
+      stop("failed to find bundle under SparkFiles root directory")
     }
-    else {
-      bundleName <- basename(bundlePath)
 
-      workerRootDir <- worker_invoke_static(sc, "org.apache.spark.SparkFiles", "getRootDirectory")
-      sparkBundlePath <- file.path(workerRootDir, bundleName)
+    unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)
 
-      if (!file.exists(sparkBundlePath)) {
-        stop("failed to find bundle under SparkFiles root directory")
-      }
-
-      unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)
-
-      .libPaths(unbundlePath)
-      worker_log("updated .libPaths with bundle packages")
-    }
+    .libPaths(unbundlePath)
+    worker_log("updated .libPaths with bundle packages")
   }
 
   grouped_by <- worker_invoke(context, "getGroupBy")
@@ -141,12 +136,24 @@ spark_worker_rlang_unserialize <- function() {
 #' @export
 worker_spark_apply_unbundle <- function(bundle_path, base_path) {
   extractPath <- file.path(base_path, core_spark_apply_unbundle_path())
+  lockFile <- file.path(extractPath, "sparklyr.lock")
 
   if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)
 
   if (length(dir(extractPath)) == 0) {
     worker_log("found that the unbundle path is empty, extracting:", extractPath)
+
+    writeLines(lockFile)
     system2("tar", c("-xf", bundle_path, "-C", extractPath))
+    unlink(lockFile)
+  }
+
+  if (file.exists(lockFile)) {
+    worker_log("found that lock file exists, waiting")
+    while (file.exists(lockFile)) {
+      Sys.sleep(1000)
+    }
+    worker_log("completed lock file wait")
   }
 
   extractPath
