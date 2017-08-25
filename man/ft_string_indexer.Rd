@@ -4,8 +4,7 @@
 \alias{ft_string_indexer}
 \title{Feature Transformation -- StringIndexer}
 \usage{
-ft_string_indexer(x, input.col = NULL, output.col = NULL, params = NULL,
-  ...)
+ft_string_indexer(x, input.col, output.col, params = NULL, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

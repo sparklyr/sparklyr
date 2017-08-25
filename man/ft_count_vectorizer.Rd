@@ -4,8 +4,8 @@
 \alias{ft_count_vectorizer}
 \title{Feature Tranformation -- CountVectorizer}
 \usage{
-ft_count_vectorizer(x, input.col = NULL, output.col = NULL, min.df = NULL,
-  min.tf = NULL, vocab.size = NULL, vocabulary.only = FALSE, ...)
+ft_count_vectorizer(x, input.col, output.col, min.df = NULL, min.tf = NULL,
+  vocab.size = NULL, vocabulary.only = FALSE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
