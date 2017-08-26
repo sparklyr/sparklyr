@@ -31,11 +31,14 @@ livy_validate_http_response <- function(message, req) {
 #' @export
 #'
 #' @importFrom jsonlite base64_enc
+#' @importFrom jsonlite unbox
+#' @importFrom snakecase to_any_case
 #'
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
 #' @param password The password to use in the Authorization header
 #' @param custom_headers List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.
+#' @param ... additional Livy session parameters
 #'
 #' @details
 #'
@@ -46,9 +49,26 @@ livy_validate_http_response <- function(message, req) {
 #' The default value of \code{"custom_headers"} is set to \code{list("X-Requested-By" = "sparklyr")}
 #' in order to facilitate connection to Livy servers with CSRF protection enabled.
 #'
+#' Additional parameters for Livy sessions are:
+#' \describe{
+#'   \item{\code{proxy_user}}{User to impersonate when starting the session}
+#'   \item{\code{jars}}{jars to be used in this session}
+#'   \item{\code{py_files}}{Python files to be used in this session}
+#'   \item{\code{files}}{files to be used in this session}
+#'   \item{\code{driver_memory}}{Amount of memory to use for the driver process}
+#'   \item{\code{driver_cores}}{Number of cores to use for the driver process}
+#'   \item{\code{executor_memory}}{Amount of memory to use per executor process}
+#'   \item{\code{executor_cores}}{Number of cores to use for each executor}
+#'   \item{\code{num_executors}}{Number of executors to launch for this session}
+#'   \item{\code{archives}}{Archives to be used in this session}
+#'   \item{\code{queue}}{The name of the YARN queue to which submitted}
+#'   \item{\code{queue}}{The name of this session}
+#'   \item{\code{heartbeat_timeout_in_second}}{Timeout in seconds to which session be orphaned}
+#' }
+#'
 #' @return Named list with configuration data
 livy_config <- function(config = spark_config(), username = NULL, password = NULL,
-                        custom_headers = list("X-Requested-By" = "sparklyr")) {
+                        custom_headers = list("X-Requested-By" = "sparklyr"), ...) {
   if (!is.null(username) || !is.null(password)) {
     secret <- base64_enc(paste(username, password, sep = ":"))
 
@@ -66,6 +86,26 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
     for (l in names(custom_headers)) {
       config[["sparklyr.livy.headers"]] <- c(
         config[["sparklyr.livy.headers"]], custom_headers[l])
+    }
+  }
+
+  #Params need to be restrictued or livy will complain about unknown parameters
+  allowed_params <- c("proxy_user", "jars", "py_files", "files", "driver_memory", "driver_cores", "executor_memory",
+    "executor_cores", "num_executors", "archives", "queue", "name", "heartbeat_timeout")
+
+  additional_params <- list(...)
+
+  if(length(additional_params) > 0) {
+    valid_params <- names(additional_params) %in% allowed_params
+    if(!all(valid_params)){
+      stop(paste0(names(additional_params[!valid_params]), sep = ", "), " are not valid session parameters. Valid parameters are: ", paste0(allowed_params, sep = ", "))
+    }
+    singleValues = c("proxy_user", "driver_memory", "driver_cores", "executor_memory", "executor_cores", "num_executors", "queue", "name", "heartbeat_timeout_in_second")
+    singleValues <- singleValues[singleValues %in% names(additional_params)]
+    additional_params[singleValues] <- lapply(additional_params[singleValues], unbox)
+    for(l in names(additional_params)){
+      #Parse the params names from snake_case to camelCase
+      config[[paste0("livy.", to_any_case(l, case = "small_camel"))]] <- additional_params[[l]]
     }
   }
   config
@@ -123,32 +163,20 @@ livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
 
 #' @importFrom jsonlite toJSON
 livy_config_get <- function(master, config) {
-  livyConfig <- livy_config_get_prefix(master, config, "livy.", NULL)
   sparkConfig <- livy_config_get_prefix(master, config, "spark.", c("spark.sql."))
-
-  c(livyConfig, sparkConfig)
+  c(sparkConfig)
 }
 
 #' @importFrom httr POST
 #' @importFrom jsonlite unbox
-livy_create_session <- function(master, config, ...) {
+livy_create_session <- function(master, config) {
   data <- list(
     kind = unbox("spark"),
     conf = livy_config_get(master, config)
   )
-  allowed_params <- c("proxyUser", "jars", "pyFiles", "files", "driverMemory", "driverCores", "executorMemory",
-                      "executorCores", "numExecutors", "archives", "queue", "name", "heartbeatTimeoutInSecond")
-  additional_params <- list(...)
-  if(length(additional_params) > 0) {
-    valid_params <- names(additional_params) %in% allowed_params
-    if(!all(valid_params)){
-      stop(paste0(names(additional_params[!valid_params]), sep = ", "), " are not valid session parameters. Valid parameters are: ", paste0(allowed_params, sep = ", "))
-    }
-    singleValues = c("proxyUser", "driverMemory", "driverCores", "executorMemory", "executorCores", "numExecutors", "queue", "name", "heartbeatInSecond")
-    singleValues <- singleValues[singleValues %in% names(additional_params)]
-    additional_params[singleValues] <- lapply(additional_params[singleValues], unbox)
-    data <- append(data, additional_params)
-  }
+
+  session_params <- connection_config(list(master = master, config = config), "livy.", NULL)
+  if(length(session_params) > 0) data <- append(data, session_params)sdf
 
   req <- POST(paste(master, "sessions", sep = "/"),
               livy_get_httr_headers(config, list(
@@ -565,8 +593,7 @@ livy_connection <- function(master,
                             app_name,
                             version,
                             hadoop_version,
-                            extensions,
-                            ...) {
+                            extensions) {
 
   livy_connection_not_used_warn(app_name, "sparklyr")
   livy_connection_not_used_warn(version)
@@ -582,7 +609,7 @@ livy_connection <- function(master,
 
   livy_validate_master(master, config)
 
-  session <- livy_create_session(master, config, ...)
+  session <- livy_create_session(master, config)
 
   sc <- structure(class = c("spark_connection", "livy_connection", "DBIConnection"), list(
     master = master,

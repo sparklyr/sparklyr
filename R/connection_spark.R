@@ -143,8 +143,7 @@ spark_connect <- function(master = "local",
                             app_name,
                             version,
                             hadoop_version ,
-                            extensions,
-                            ...)
+                            extensions)
   } else if (method == "gateway") {
     scon <- gateway_connection(master = master, config = config)
   } else if (method == "databricks") {
