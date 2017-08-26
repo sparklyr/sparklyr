@@ -47,3 +47,16 @@ test_that("ml_binarizer() returns params of transformer", {
   params <- list(input_col = "x", output_col = "y", threshold = 0.5)
   expect_true(dplyr::setequal(binarizer$stages$bin$params, params))
 })
+
+test_that("ml_binarizer.tbl_spark() works as expected", {
+  df <- data.frame(id = 0:2L, feature = c(0.1, 0.8, 0.2))
+  df_tbl <- copy_to(sc, df, overwrite = TRUE)
+  expect_equal(
+    df_tbl %>%
+      ml_binarizer(input_col = "feature", output_col = "binarized_feature",
+                   threshold = 0.5) %>%
+      collect(),
+    df %>%
+      mutate(binarized_feature = c(0.0, 1.0, 0.0))
+  )
+})

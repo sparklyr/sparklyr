@@ -27,3 +27,15 @@ ml_binarizer.spark_connection <- function(sc, input_col, output_col, threshold,
 
   ml_pipeline(.stage, name)
 }
+
+#' @export
+ml_binarizer.tbl_spark <- function(x, input_col, output_col, threshold,
+                                   name = NULL, ...) {
+  sc <- spark_connection(x)
+  sdf <- spark_dataframe(x)
+  binarizer <- ml_binarizer(sc, input_col, output_col, threshold, name)
+  binarizer$.pipeline %>%
+    invoke("fit", sdf) %>%
+    invoke("transform", sdf) %>%
+    sdf_register()
+}
