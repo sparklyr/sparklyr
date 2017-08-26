@@ -1,5 +1,10 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added `topics.description` under `ml_lda()` result.
+
+- Added support for `ft_stop_words_remover()` to strip out
+  stop words from tokens.
+
 - Feature transformers (`ft_*` functions) now explicitly
   require `input.col` and `output.col` to be specified.
 
