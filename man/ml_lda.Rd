@@ -5,7 +5,8 @@
 \title{Spark ML -- Latent Dirichlet Allocation}
 \usage{
 ml_lda(x, features = tbl_vars(x), k = length(features), alpha = (50/k) +
-  1, beta = 0.1 + 1, iter = NULL, ml.options = ml_options(), ...)
+  1, beta = 0.1 + 1, optimizer = c("EMLDAOptimizer", "OnlineLDAOptimizer"),
+  max.iterations = NULL, ml.options = ml_options(), ...)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame (typically, a
@@ -20,7 +21,9 @@ By default \code{alpha = (50 / k) + 1}, where \code{50/k} is common in LDA libra
 
 \item{beta}{Concentration parameter for the prior placed on topics' distributions over terms. For Expectation-Maximization optimizer value should be > 1.0 and by default \code{beta = 0.1 + 1}, where 0.1 gives a small amount of smoothing and +1 follows Asuncion et al. (2009), who recommend a +1 adjustment for EM.}
 
-\item{iter}{Maximum number of iterations.}
+\item{optimizer}{The optimizer, either \code{EMLDAOptimizer} or \code{OnlineLDAOptimizer}.}
+
+\item{max.iterations}{Maximum number of iterations.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}

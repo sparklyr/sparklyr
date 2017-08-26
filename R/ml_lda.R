@@ -10,6 +10,7 @@
 #' @param alpha Concentration parameter for the prior placed on documents' distributions over topics. This is a singleton which is replicated to a vector of length \code{k} in fitting (as currently EM optimizer only supports symmetric distributions, so all values in the vector should be the same). For Expectation-Maximization optimizer values should be > 1.0.
 #' By default \code{alpha = (50 / k) + 1}, where \code{50/k} is common in LDA libraries and +1 follows from Asuncion et al. (2009), who recommend a +1 adjustment for EM.
 #' @param beta Concentration parameter for the prior placed on topics' distributions over terms. For Expectation-Maximization optimizer value should be > 1.0 and by default \code{beta = 0.1 + 1}, where 0.1 gives a small amount of smoothing and +1 follows Asuncion et al. (2009), who recommend a +1 adjustment for EM.
+#' @param optimizer The optimizer, either \code{EMLDAOptimizer} or \code{OnlineLDAOptimizer}.
 #' @param max.iterations Maximum number of iterations.
 #' @examples
 #' \dontrun{
@@ -50,10 +51,7 @@ ml_lda <- function(x,
                    alpha = (50 / k) + 1,
                    beta = 0.1 + 1,
                    optimizer = c("EMLDAOptimizer", "OnlineLDAOptimizer"),
-                   doc.concentration = NULL,
-                   topic.concentration = NULL,
                    max.iterations = NULL,
-                   checkpoint.interval = NULL,
                    ml.options = ml_options(),
                    ...)
 {
@@ -73,10 +71,7 @@ ml_lda <- function(x,
   beta                 <- ensure_scalar_double(beta)
   k                    <- ensure_scalar_integer(k)
   optimizer            <- if (is.null(optimizer)) optimizer else ensure_scalar_character(optimizer)
-  doc.concentration    <- if (is.null(doc.concentration)) iter else ensure_scalar_double(doc.concentration)
-  topic.concentration  <- if (is.null(topic.concentration)) iter else ensure_scalar_double(topic.concentration)
   max.iterations       <- if (is.null(max.iterations)) iter else ensure_scalar_integer(max.iterations)
-  checkpoint.interval  <- if (is.null(checkpoint.interval)) iter else ensure_scalar_integer(checkpoint.interval)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   stopifnot(alpha > 1)
@@ -94,18 +89,12 @@ ml_lda <- function(x,
   lda <- invoke_new(sc, envir$model)
 
   if (is.null(optimizer)) optimizer <- invoke("getOptimizer")
-  if (is.null(doc.concentration)) optimizer <- invoke("getDocConcentration")
-  if (is.null(topic.concentration)) optimizer <- invoke("getTopicConcentration")
   if (is.null(max.iterations)) optimizer <- invoke("getMaxIterations")
-  if (is.null(checkpoint.interval)) optimizer <- invoke("getCheckpointInterval")
 
   model <- lda %>%
     invoke("setK", k) %>%
     invoke("setOptimizer", optimizer) %>%
-    invoke("setDocConcentration", doc.concentration) %>%
-    invoke("setTopicConcentration", topic.concentration) %>%
     invoke("setMaxIter", max.iterations) %>%
-    invoke("setCheckpointInterval", checkpoint.interval) %>%
     invoke("setFeaturesCol", envir$features) %>%
     invoke("setTopicConcentration", as.double(beta)) %>%
     invoke("setDocConcentration", as.double(alpha))
