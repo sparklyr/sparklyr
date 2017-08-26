@@ -16,7 +16,7 @@ test_that("we can fit multinomial models", {
 
   # fit multinomial model with Spark
   tbl <- copy_to(sc, data, overwrite = TRUE)
-  s <- ml_logistic_regression(y ~ x, data = tbl)
+  s <- ml_logistic_regression(tbl, y ~ x)
 
   # validate that they generate conforming predictions
   # (it seems their parameterizations are different so
