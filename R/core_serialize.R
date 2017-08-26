@@ -29,7 +29,7 @@ getSerdeType <- function(object) {
 
       # Check that there are no NAs in character arrays since they are unsupported in scala
       hasCharNAs <- any(sapply(object, function(elem) {
-        (is.factor(elem) || is.character(elem)) && is.na(elem)
+        (is.factor(elem) || is.character(elem) || is.integer(elem)) && is.na(elem)
       }))
 
       if (hasCharNAs) {
