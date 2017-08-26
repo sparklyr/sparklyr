@@ -54,3 +54,9 @@ ml_map_param_names <- function(params_list) {
   params_list
 }
 
+ml_fit_and_transform <- function(sdf, pipeline) {
+  pipeline$.pipeline %>%
+    invoke("fit", sdf) %>%
+    invoke("transform", sdf) %>%
+    sdf_register()
+}

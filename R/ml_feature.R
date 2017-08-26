@@ -35,8 +35,5 @@ ml_binarizer.tbl_spark <- function(x, input_col, output_col, threshold,
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
   binarizer <- ml_binarizer(sc, input_col, output_col, threshold, name)
-  binarizer$.pipeline %>%
-    invoke("fit", sdf) %>%
-    invoke("transform", sdf) %>%
-    sdf_register()
+  ml_fit_and_transform(sdf, binarizer)
 }
