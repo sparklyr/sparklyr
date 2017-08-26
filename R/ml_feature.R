@@ -1,27 +1,28 @@
 #' @export
-ml_tokenizer <- function(...) {
+ml_tokenizer <- function(x, input_col, output_col, name = NULL, ...) {
   UseMethod("ml_tokenizer")
 }
 
 #' @export
-ml_tokenizer.spark_connection <- function(sc, input_col, output_col, name = NULL, ...) {
+ml_tokenizer.spark_connection <- function(x, input_col, output_col, name = NULL, ...) {
 
-  .stage <- ml_new_transformer(sc, "org.apache.spark.ml.feature.Tokenizer",
+  .stage <- ml_new_transformer(x, "org.apache.spark.ml.feature.Tokenizer",
                                input_col, output_col)
 
   ml_pipeline(.stage, name)
 }
 
 #' @export
-ml_binarizer <- function(...) {
+ml_binarizer <- function(x, input_col, output_col, threshold,
+                         name = NULL, ...) {
   UseMethod("ml_binarizer")
 }
 
 #' @export
-ml_binarizer.spark_connection <- function(sc, input_col, output_col, threshold,
+ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold,
                                           name = NULL, ...) {
   threshold <- ensure_scalar_double(threshold)
-  .stage <- ml_new_transformer(sc, "org.apache.spark.ml.feature.Binarizer",
+  .stage <- ml_new_transformer(x, "org.apache.spark.ml.feature.Binarizer",
                                input_col, output_col) %>%
     invoke("setThreshold", threshold)
 
