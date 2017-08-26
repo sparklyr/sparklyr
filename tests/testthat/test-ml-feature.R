@@ -42,6 +42,30 @@ test_that("ml_tokenizer() returns params of transformer", {
   expect_true(dplyr::setequal(tokenizer$stages$tok$params, params))
 })
 
+test_that("ml_tokenizer.tbl_spark() works as expected", {
+  # skip_on_cran()
+  test_requires("janeaustenr")
+  austen     <- austen_books()
+  austen_tbl <- testthat_tbl("austen")
+
+  spark_tokens <- austen_tbl %>%
+    na.omit() %>%
+    filter(length(text) > 0) %>%
+    head(10) %>%
+    ml_tokenizer(input_col = "text", output_col = "tokens") %>%
+    sdf_read_column("tokens") %>%
+    lapply(unlist)
+
+  r_tokens <- austen %>%
+    filter(nzchar(text)) %>%
+    head(10) %>%
+    `$`("text") %>%
+    tolower() %>%
+    strsplit("\\s")
+
+  expect_identical(spark_tokens, r_tokens)
+})
+
 test_that("ml_binarizer() returns params of transformer", {
   binarizer <- ml_binarizer(sc, input_col = "x", output_col = "y", threshold = 0.5, name = "bin")
   params <- list(input_col = "x", output_col = "y", threshold = 0.5)

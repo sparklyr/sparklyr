@@ -13,6 +13,14 @@ ml_tokenizer.spark_connection <- function(x, input_col, output_col, name = NULL,
 }
 
 #' @export
+ml_tokenizer.tbl_spark <- function(x, input_col, output_col, name = NULL, ...) {
+  sc <- spark_connection(x)
+  sdf <- spark_dataframe(x)
+  tokenizer <- ml_tokenizer(sc, input_col, output_col, name)
+  ml_fit_and_transform(sdf, tokenizer)
+}
+
+#' @export
 ml_binarizer <- function(x, input_col, output_col, threshold,
                          name = NULL, ...) {
   UseMethod("ml_binarizer")
