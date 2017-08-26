@@ -293,7 +293,8 @@ ft_quantile_discretizer <- function(x,
 #' One-hot encoding maps a column of label indices to a column of binary
 #' vectors, with at most a single one-value. This encoding allows algorithms
 #' which expect continuous features, such as Logistic Regression, to use
-#' categorical features.
+#' categorical features. Typically, used with  \code{ft_string_indexer()} to
+#' index a column first.
 #'
 #' @template roxlate-ml-transformation
 #' @param drop.last Boolean; drop the last category?
