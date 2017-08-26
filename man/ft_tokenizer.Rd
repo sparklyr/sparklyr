@@ -4,7 +4,7 @@
 \alias{ft_tokenizer}
 \title{Feature Tranformation -- Tokenizer}
 \usage{
-ft_tokenizer(x, input.col = NULL, output.col = NULL, ...)
+ft_tokenizer(x, input.col, output.col, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

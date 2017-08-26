@@ -4,7 +4,7 @@
 \alias{ft_index_to_string}
 \title{Feature Transformation -- IndexToString}
 \usage{
-ft_index_to_string(x, input.col = NULL, output.col = NULL, ...)
+ft_index_to_string(x, input.col, output.col, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

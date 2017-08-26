@@ -4,8 +4,7 @@
 \alias{ft_one_hot_encoder}
 \title{Feature Transformation -- OneHotEncoder}
 \usage{
-ft_one_hot_encoder(x, input.col = NULL, output.col = NULL,
-  drop.last = TRUE, ...)
+ft_one_hot_encoder(x, input.col, output.col, drop.last = TRUE, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

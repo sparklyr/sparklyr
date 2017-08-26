@@ -4,7 +4,7 @@
 \alias{ft_bucketizer}
 \title{Feature Transformation -- Bucketizer}
 \usage{
-ft_bucketizer(x, input.col = NULL, output.col = NULL, splits, ...)
+ft_bucketizer(x, input.col, output.col, splits, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

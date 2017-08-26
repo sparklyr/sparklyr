@@ -4,7 +4,7 @@
 \alias{ft_binarizer}
 \title{Feature Transformation -- Binarizer}
 \usage{
-ft_binarizer(x, input.col = NULL, output.col = NULL, threshold = 0.5, ...)
+ft_binarizer(x, input.col, output.col, threshold = 0.5, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -20,7 +20,8 @@ ft_binarizer(x, input.col = NULL, output.col = NULL, threshold = 0.5, ...)
 \description{
 Apply thresholding to a column, such that values less than or equal to the
 \code{threshold} are assigned the value 0.0, and values greater than the
-threshold are assigned the value 1.0.
+threshold are assigned the value 1.0. Column output is numeric for
+compatibility with other modeling functions.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for

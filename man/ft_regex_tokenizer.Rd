@@ -4,7 +4,7 @@
 \alias{ft_regex_tokenizer}
 \title{Feature Tranformation -- RegexTokenizer}
 \usage{
-ft_regex_tokenizer(x, input.col = NULL, output.col = NULL, pattern, ...)
+ft_regex_tokenizer(x, input.col, output.col, pattern, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}

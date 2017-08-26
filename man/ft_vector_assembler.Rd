@@ -4,7 +4,7 @@
 \alias{ft_vector_assembler}
 \title{Feature Transformation -- VectorAssembler}
 \usage{
-ft_vector_assembler(x, input.col = NULL, output.col = NULL, ...)
+ft_vector_assembler(x, input.col, output.col, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
