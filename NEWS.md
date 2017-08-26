@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed issue in `invoke()` calls while using integer arrays
+  that contain `NA` which can be commonly experienced
+  while using `spark_apply()`.
+
 - Added `topics.description` under `ml_lda()` result.
 
 - Added support for `ft_stop_words_remover()` to strip out
