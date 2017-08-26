@@ -176,7 +176,7 @@ livy_create_session <- function(master, config) {
   )
 
   session_params <- connection_config(list(master = master, config = config), "livy.", NULL)
-  if(length(session_params) > 0) data <- append(data, session_params)sdf
+  if(length(session_params) > 0) data <- append(data, session_params)
 
   req <- POST(paste(master, "sessions", sep = "/"),
               livy_get_httr_headers(config, list(
