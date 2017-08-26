@@ -10,7 +10,7 @@
 #' @param alpha Concentration parameter for the prior placed on documents' distributions over topics. This is a singleton which is replicated to a vector of length \code{k} in fitting (as currently EM optimizer only supports symmetric distributions, so all values in the vector should be the same). For Expectation-Maximization optimizer values should be > 1.0.
 #' By default \code{alpha = (50 / k) + 1}, where \code{50/k} is common in LDA libraries and +1 follows from Asuncion et al. (2009), who recommend a +1 adjustment for EM.
 #' @param beta Concentration parameter for the prior placed on topics' distributions over terms. For Expectation-Maximization optimizer value should be > 1.0 and by default \code{beta = 0.1 + 1}, where 0.1 gives a small amount of smoothing and +1 follows Asuncion et al. (2009), who recommend a +1 adjustment for EM.
-#' @param optimizer The optimizer, either \code{EMLDAOptimizer} or \code{OnlineLDAOptimizer}.
+#' @param optimizer The optimizer, either \code{online} for Online Variational Bayes or \code{em} for Expectation-Maximization.
 #' @param max.iterations Maximum number of iterations.
 #' @examples
 #' \dontrun{
@@ -43,6 +43,8 @@
 #'
 #' For terminology used in LDA model see \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.clustering.LDA}{Spark LDA documentation}.
 #'
+#' Expectation-Maximization: Asuncion et al. \href{http://arxiv.org/pdf/1205.2662.pdf}{On Smoothing and Inference for Topic Models.} Uncertainty in Artificial Intelligence, 2009.
+#'
 #' @export
 #' @importFrom dplyr tbl_vars
 ml_lda <- function(x,
@@ -50,8 +52,8 @@ ml_lda <- function(x,
                    k = length(features),
                    alpha = (50 / k) + 1,
                    beta = 0.1 + 1,
-                   optimizer = c("EMLDAOptimizer", "OnlineLDAOptimizer"),
-                   max.iterations = NULL,
+                   optimizer = "online",
+                   max.iterations = 20,
                    ml.options = ml_options(),
                    ...)
 {
@@ -70,8 +72,8 @@ ml_lda <- function(x,
   alpha                <- ensure_scalar_double(alpha)
   beta                 <- ensure_scalar_double(beta)
   k                    <- ensure_scalar_integer(k)
-  optimizer            <- if (is.null(optimizer)) optimizer else ensure_scalar_character(optimizer)
-  max.iterations       <- if (is.null(max.iterations)) iter else ensure_scalar_integer(max.iterations)
+  optimizer            <- ensure_scalar_character(optimizer)
+  max.iterations       <- ensure_scalar_integer(max.iterations)
   only.model <- ensure_scalar_boolean(ml.options$only.model)
 
   stopifnot(alpha > 1)
@@ -87,9 +89,6 @@ ml_lda <- function(x,
 
   envir$model <- "org.apache.spark.ml.clustering.LDA"
   lda <- invoke_new(sc, envir$model)
-
-  if (is.null(optimizer)) optimizer <- invoke("getOptimizer")
-  if (is.null(max.iterations)) optimizer <- invoke("getMaxIterations")
 
   model <- lda %>%
     invoke("setK", k) %>%
