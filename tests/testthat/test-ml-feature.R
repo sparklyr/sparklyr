@@ -3,8 +3,8 @@ context("ml feature")
 sc <- testthat_spark_connection()
 
 test_that("We can instantiate tokenizer object", {
-  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y", name = "tok")
-  stage_class <- tokenizer$stages[["tok"]]$.stage %>%
+  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y")
+  stage_class <- tokenizer$stages[["tok", exact = FALSE]]$.stage %>%
     invoke("getClass") %>%
     invoke("getName")
   expect_equal(stage_class, "org.apache.spark.ml.feature.Tokenizer")
@@ -13,7 +13,7 @@ test_that("We can instantiate tokenizer object", {
 test_that("ml_tokenizer() should return a Pipeline object", {
   # we want all R objects to have a corresponding Pipeline jobj
   #   for consistency rather than worry about Pipeline vs PipelineStage.
-  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y", name = "tok")
+  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y")
   pipeline_class <- tokenizer$.pipeline %>%
     invoke("getClass") %>%
     invoke("getName")
@@ -21,23 +21,22 @@ test_that("ml_tokenizer() should return a Pipeline object", {
   expect_equal(pipeline_class, "org.apache.spark.ml.Pipeline")
 })
 
-test_that("ml_tokenizer() output should return user-inputed name and type of transformer", {
-  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y", name = "tok")
+test_that("ml_tokenizer() output should return type of transformer", {
+  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y")
   stage <- tokenizer$stages$tok
-  expect_equal(stage[["name"]], "tok")
   expect_equal(stage[["type"]], "org.apache.spark.ml.feature.Tokenizer")
 })
 
-test_that("ml_tokenizer() uses Spark uid of transformer by default for name", {
+test_that("ml_tokenizer() uses Spark uid for stage name", {
   tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y")
-  default_name <- names(tokenizer$stages)
-  uid <- tokenizer$stages[[default_name]]$.stage %>%
+  stage_name <- names(tokenizer$stages)
+  uid <- tokenizer$stages[[stage_name]]$.stage %>%
     invoke("uid")
-  expect_equal(default_name, uid)
+  expect_equal(stage_name, uid)
 })
 
 test_that("ml_tokenizer() returns params of transformer", {
-  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y", "tok")
+  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y")
   params <- list(input_col = "x", output_col = "y")
   expect_true(dplyr::setequal(tokenizer$stages$tok$params, params))
 })
@@ -67,7 +66,7 @@ test_that("ml_tokenizer.tbl_spark() works as expected", {
 })
 
 test_that("ml_binarizer() returns params of transformer", {
-  binarizer <- ml_binarizer(sc, input_col = "x", output_col = "y", threshold = 0.5, name = "bin")
+  binarizer <- ml_binarizer(sc, input_col = "x", output_col = "y", threshold = 0.5)
   params <- list(input_col = "x", output_col = "y", threshold = 0.5)
   expect_true(dplyr::setequal(binarizer$stages$bin$params, params))
 })

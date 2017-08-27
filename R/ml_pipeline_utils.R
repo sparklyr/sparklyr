@@ -1,21 +1,18 @@
-ml_pipeline_stage <- function(jobj, name) {
-  name <- name %||% invoke(jobj, "uid")
-
+ml_pipeline_stage <- function(jobj) {
   structure(stats::setNames(list(
     list(
-      name = name,
       type = jobj_info(jobj)$class,
       params = ml_get_param_map(jobj),
       .stage = jobj)
-  ), name),
+  ), invoke(jobj, "uid")),
   class = "ml_pipeline_stage"
   )
 }
 
-ml_pipeline <- function(jobj, name) {
+ml_pipeline <- function(jobj) {
   structure(
     list(
-      stages = ml_pipeline_stage(jobj, name),
+      stages = ml_pipeline_stage(jobj),
       .pipeline = ml_wrap_in_pipeline(jobj)),
     class = "ml_pipeline"
   )

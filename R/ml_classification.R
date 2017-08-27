@@ -21,7 +21,7 @@ ml_logistic_regression <- function(...) {
 
 #' @export
 ml_logistic_regression.spark_connection <- function(
-  sc, intercept = TRUE, alpha = 0, name = NULL,
+  sc, intercept = TRUE, alpha = 0,
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
@@ -37,5 +37,5 @@ ml_logistic_regression.spark_connection <- function(
     invoke("setElasticNetParam", alpha) %>%
     invoke("setFitIntercept", intercept)
 
-  ml_pipeline(.stage, name)
+  ml_pipeline(.stage)
 }
