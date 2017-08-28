@@ -51,9 +51,21 @@ ml_map_param_names <- function(params_list) {
   params_list
 }
 
-ml_fit_and_transform <- function(sdf, pipeline) {
+ml_fit_and_transform <- function(x, pipeline) {
+  sdf <- spark_dataframe(x)
   pipeline$.pipeline %>%
     invoke("fit", sdf) %>%
     invoke("transform", sdf) %>%
     sdf_register()
+}
+
+ml_new_stage_modified_args <- function(call_frame) {
+  envir <- rlang::caller_env()
+  modified_args <- call_frame %>%
+    rlang::lang_standardise() %>%
+    rlang::lang_args() %>%
+    rlang::modify(x = rlang::expr(spark_connection(x)))
+  stage_constructor <- sub("\\..*$", "", rlang::lang_name(call_frame))
+  rlang::lang(stage_constructor, rlang::splice(modified_args)) %>%
+    rlang::eval_tidy(env = envir)
 }

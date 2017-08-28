@@ -14,10 +14,9 @@ ml_tokenizer.spark_connection <- function(x, input_col, output_col, ...) {
 
 #' @export
 ml_tokenizer.tbl_spark <- function(x, input_col, output_col, ...) {
-  sc <- spark_connection(x)
-  sdf <- spark_dataframe(x)
-  tokenizer <- ml_tokenizer(sc, input_col, output_col)
-  ml_fit_and_transform(sdf, tokenizer)
+  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  ml_fit_and_transform(x, transformer)
+
 }
 
 #' @export
@@ -37,8 +36,6 @@ ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold, .
 
 #' @export
 ml_binarizer.tbl_spark <- function(x, input_col, output_col, threshold, ...) {
-  sc <- spark_connection(x)
-  sdf <- spark_dataframe(x)
-  binarizer <- ml_binarizer(sc, input_col, output_col, threshold)
-  ml_fit_and_transform(sdf, binarizer)
+  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  ml_fit_and_transform(x, transformer)
 }
