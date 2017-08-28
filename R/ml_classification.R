@@ -15,23 +15,23 @@ ml_new_classifier <- function(sc, class,
 }
 
 #' @export
-ml_logistic_regression <- function(...) {
+ml_logistic_regression <- function(x, ...) {
   UseMethod("ml_logistic_regression")
 }
 
 #' @export
 ml_logistic_regression.spark_connection <- function(
-  sc, intercept = TRUE, alpha = 0,
+  x, intercept = TRUE, alpha = 0,
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
-  raw_prediction_col = "rawPrediction") {
+  raw_prediction_col = "rawPrediction", ...) {
 
   alpha <- ensure_scalar_double(alpha)
   intercept <- ensure_scalar_boolean(intercept)
 
   .stage <- ml_new_classifier(
-    sc, "org.apache.spark.ml.classification.LogisticRegression",
+    x, "org.apache.spark.ml.classification.LogisticRegression",
     label_col, prediction_col, probability_col, raw_prediction_col
   ) %>%
     invoke("setElasticNetParam", alpha) %>%
