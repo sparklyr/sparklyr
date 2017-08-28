@@ -42,3 +42,18 @@ ml_load_pipeline <- function(sc, path) {
     invoke("load", path)
   ml_pipeline(jobj)
 }
+
+#' @export
+ml_fit <- function(x, data, ...) {
+  jobj <- x$.pipeline %>%
+    invoke("fit", spark_dataframe(data))
+  stages <- jobj %>%
+    invoke("stages") %>%
+    sapply(ml_pipeline_stage)
+
+  structure(
+    list(stages = stages,
+         .pipeline_model = jobj),
+    class = "ml_pipeline_model"
+  )
+}

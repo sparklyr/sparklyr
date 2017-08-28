@@ -51,3 +51,37 @@ ml_binarizer.tbl_spark <- function(x, input_col, output_col, threshold, ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_fit_and_transform(x, transformer)
 }
+
+#' @export
+ml_hashing_tf <- function(x, input_col, output_col, binary = FALSE,
+                          num_features = 2^18, ...) {
+  UseMethod("ml_hashing_tf")
+}
+
+#' @export
+ml_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FALSE,
+                                           num_features = 2^18, ...) {
+  ensure_scalar_boolean(binary)
+  num_features <- ensure_scalar_integer(num_features)
+  .stage <- ml_new_transformer(x, "org.apache.spark.ml.feature.HashingTF",
+                               input_col, output_col) %>%
+    invoke("setBinary", binary) %>%
+    invoke("setNumFeatures", num_features)
+
+  ml_pipeline(.stage)
+}
+
+#' @export
+ml_hashing_tf.ml_pipeline <- function(x, input_col, output_col, binary = FALSE,
+                                      num_features = 2^18, ...) {
+  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  ml_stages(x, transformer)
+}
+
+#' @export
+ml_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
+                                    num_features = 2^18, ....) {
+  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  ml_fit_and_transform(x, transformer)
+
+}

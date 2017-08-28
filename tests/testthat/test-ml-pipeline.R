@@ -58,3 +58,23 @@ test_that("ml_save_pipeline()/ml_load_pipeline() work for ml_pipeline", {
   expect_equal(p1_uid, p2_uid)
   expect_equal(p1_params, p2_params)
 })
+
+test_that("ml_fit() returns a ml_pipeline_model", {
+  training <- data_frame(
+    id = 0:3L,
+    text = c("a b c d e spark",
+             "b d",
+             "spark f g h",
+             "hadoop mapreduce"),
+    label = c(1, 0, 1, 0)
+  )
+  training_tbl <- copy_to(sc, training, overwrite = TRUE)
+
+  tokenizer <- ml_tokenizer(sc, input_col = "text", output_col = "words")
+  hashing_tf <- ml_hashing_tf(sc, input_col = "words", output_col = "features")
+  lr <- ml_logistic_regression(sc, max_iter = 10, lambda = 0.001)
+  pipeline <- ml_stages(tokenizer, hashing_tf, lr)
+
+  model <- ml_fit(pipeline, training_tbl)
+  expect_equal(class(model), "ml_pipeline_model")
+})
