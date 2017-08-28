@@ -9,3 +9,8 @@ ml_stages <- function(x, ...) {
                 x$.pipeline, dots) %>%
     ml_pipeline()
 }
+
+#' @export
+spark_connection.ml_pipeline <- function(x, ...) {
+  spark_connection(x$.pipeline)
+}

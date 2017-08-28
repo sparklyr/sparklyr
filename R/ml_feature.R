@@ -13,6 +13,12 @@ ml_tokenizer.spark_connection <- function(x, input_col, output_col, ...) {
 }
 
 #' @export
+ml_tokenizer.ml_pipeline <- function(x, input_col, output_col, ...) {
+  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  ml_stages(x, transformer)
+}
+
+#' @export
 ml_tokenizer.tbl_spark <- function(x, input_col, output_col, ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_fit_and_transform(x, transformer)
@@ -32,6 +38,12 @@ ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold, .
     invoke("setThreshold", threshold)
 
   ml_pipeline(.stage)
+}
+
+#' @export
+ml_binarizer.ml_pipeline <- function(x, input_col, output_col, threshold, ...) {
+  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  ml_stages(x, transformer)
 }
 
 #' @export
