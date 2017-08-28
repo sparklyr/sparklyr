@@ -37,3 +37,24 @@ test_that("ml_transformer.ml_pipeline() works as expected", {
   expect_equal(p1_params, p2_params)
   expect_equal(class(p2), "ml_pipeline")
 })
+
+test_that("ml_save_pipeline()/ml_load_pipeline() work for ml_pipeline", {
+  p1 <- ml_tokenizer(sc, "x", "y") %>%
+    ml_binarizer("in", "out", 0.5)
+  path <- tempfile()
+  ml_save_pipeline(p1, path)
+  p2 <- ml_load_pipeline(sc, path)
+
+  p1_uid <- p1$.pipeline %>%
+    invoke("uid")
+  p2_uid <- p2$.pipeline %>%
+    invoke("uid")
+
+  p1_params <- p1$stages %>%
+    lapply(function(x) x$params)
+  p2_params <- p2$stages %>%
+    lapply(function(x) x$params)
+
+  expect_equal(p1_uid, p2_uid)
+  expect_equal(p1_params, p2_params)
+})
