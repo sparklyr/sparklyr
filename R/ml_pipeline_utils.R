@@ -70,7 +70,7 @@ ml_new_stage_modified_args <- function(call_frame) {
   modified_args <- call_frame %>%
     rlang::lang_standardise() %>%
     rlang::lang_args() %>%
-    rlang::modify(x = rlang::expr(spark_connection(x)))
+    rlang::modify(x = rlang::parse_expr("spark_connection(x)"))
   stage_constructor <- sub("\\..*$", "", rlang::lang_name(call_frame))
   rlang::lang(stage_constructor, rlang::splice(modified_args)) %>%
     rlang::eval_tidy(env = envir)
