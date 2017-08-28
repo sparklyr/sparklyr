@@ -32,7 +32,6 @@ livy_validate_http_response <- function(message, req) {
 #'
 #' @importFrom jsonlite base64_enc
 #' @importFrom jsonlite unbox
-#' @importFrom snakecase to_any_case
 #'
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
@@ -63,7 +62,7 @@ livy_validate_http_response <- function(message, req) {
 #'   \item{\code{archives}}{Archives to be used in this session}
 #'   \item{\code{queue}}{The name of the YARN queue to which submitted}
 #'   \item{\code{queue}}{The name of this session}
-#'   \item{\code{heartbeat_timeout_in_second}}{Timeout in seconds to which session be orphaned}
+#'   \item{\code{heartbeat_timeout}}{Timeout in seconds to which session be orphaned}
 #' }
 #'
 #' @return Named list with configuration data
@@ -100,12 +99,30 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
     if(!all(valid_params)){
       stop(paste0(names(additional_params[!valid_params]), sep = ", "), " are not valid session parameters. Valid parameters are: ", paste0(allowed_params, sep = ", "))
     }
-    singleValues = c("proxy_user", "driver_memory", "driver_cores", "executor_memory", "executor_cores", "num_executors", "queue", "name", "heartbeat_timeout_in_second")
+    singleValues = c("proxy_user", "driver_memory", "driver_cores", "executor_memory", "executor_cores", "num_executors", "queue", "name", "heartbeat_timeout")
     singleValues <- singleValues[singleValues %in% names(additional_params)]
     additional_params[singleValues] <- lapply(additional_params[singleValues], unbox)
+
+    #snake_case to camelCase mapping
+    params_map <- c(
+      proxy_user = "proxyUser",
+      jars = "jars",
+      py_files = "pyFiles",
+      files = "files",
+      driver_memory = "driverMemory",
+      driver_cores = "driverCores",
+      executor_memory = "executorMemory",
+      executor_cores = "executorCores",
+      num_executors = "numExecutors",
+      archives = "archives",
+      queue = "queue",
+      name = "name",
+      heartbeat_timeout = "heartbeatTimeoutInSecond"
+    )
+
     for(l in names(additional_params)){
       #Parse the params names from snake_case to camelCase
-      config[[paste0("livy.", to_any_case(l, case = "small_camel"))]] <- additional_params[[l]]
+      config[[paste0("livy.", params_map[[l]])]] <- additional_params[[l]]
     }
   }
   config
