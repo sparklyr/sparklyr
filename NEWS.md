@@ -67,6 +67,9 @@
   components to extract. Also implemented `sdf_project()` to project datasets using
   the results of `ml_pca()` models.
 
+- Added support for additional livy session creation parameters using
+  the `livy_config()` function.
+
 # Sparklyr 0.6.1 (UNRELEASED)
 
 - Fixed error in `spark_apply()` that may triggered when multiple CPUs

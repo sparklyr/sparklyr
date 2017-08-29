@@ -5,7 +5,7 @@
 \title{Create a Spark Configuration for Livy}
 \usage{
 livy_config(config = spark_config(), username = NULL, password = NULL,
-  custom_headers = list(`X-Requested-By` = "sparklyr"))
+  custom_headers = list(`X-Requested-By` = "sparklyr"), ...)
 }
 \arguments{
 \item{config}{Optional base configuration}
@@ -15,6 +15,8 @@ livy_config(config = spark_config(), username = NULL, password = NULL,
 \item{password}{The password to use in the Authorization header}
 
 \item{custom_headers}{List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.}
+
+\item{...}{additional Livy session parameters}
 }
 \value{
 Named list with configuration data
@@ -29,4 +31,21 @@ define the basic authentication settings for a Livy session.
 
 The default value of \code{"custom_headers"} is set to \code{list("X-Requested-By" = "sparklyr")}
 in order to facilitate connection to Livy servers with CSRF protection enabled.
+
+Additional parameters for Livy sessions are:
+\describe{
+  \item{\code{proxy_user}}{User to impersonate when starting the session}
+  \item{\code{jars}}{jars to be used in this session}
+  \item{\code{py_files}}{Python files to be used in this session}
+  \item{\code{files}}{files to be used in this session}
+  \item{\code{driver_memory}}{Amount of memory to use for the driver process}
+  \item{\code{driver_cores}}{Number of cores to use for the driver process}
+  \item{\code{executor_memory}}{Amount of memory to use per executor process}
+  \item{\code{executor_cores}}{Number of cores to use for each executor}
+  \item{\code{num_executors}}{Number of executors to launch for this session}
+  \item{\code{archives}}{Archives to be used in this session}
+  \item{\code{queue}}{The name of the YARN queue to which submitted}
+  \item{\code{queue}}{The name of this session}
+  \item{\code{heartbeat_timeout}}{Timeout in seconds to which session be orphaned}
+}
 }
