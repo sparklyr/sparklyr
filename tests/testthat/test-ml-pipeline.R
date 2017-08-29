@@ -94,4 +94,18 @@ test_that("ml_[save/load]_model() work for ml_pipeline_model", {
     sapply(function(x) invoke(x$.stage, "uid"))
   expect_equal(model1_uids, model2_uids)
 
+  test <- data_frame(
+    id = 4:7L,
+    text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
+  )
+  test_tbl <- copy_to(sc, test, overwrite = TRUE)
+
+  score_test_set <- function(x, data) {
+    x$.pipeline_model %>%
+      invoke("transform", spark_dataframe(data)) %>%
+      sdf_register() %>%
+      pull(probability)
+  }
+  expect_equal(score_test_set(model1, test_tbl), score_test_set(model2, test_tbl))
+
 })
