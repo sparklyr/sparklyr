@@ -16,12 +16,21 @@ ml_pipeline <- function(jobj) {
                           jobj) %>%
     sapply(ml_pipeline_stage)
 
-  structure(
-    list(
-      stages = stages,
-      .pipeline = ml_wrap_in_pipeline(jobj)),
-    class = "ml_pipeline"
-  )
+  if (identical(jobj_info(jobj)$class, "org.apache.spark.ml.PipelineModel")) {
+    structure(
+      list(
+        stages = stages,
+        .pipeline_model = jobj),
+      class = "ml_pipeline_model"
+    )
+  } else {
+    structure(
+      list(
+        stages = stages,
+        .pipeline = ml_wrap_in_pipeline(jobj)),
+      class = "ml_pipeline"
+    )
+  }
 }
 
 ml_new_transformer <- function(sc, class, input_col, output_col) {
