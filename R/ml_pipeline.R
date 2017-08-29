@@ -44,6 +44,28 @@ ml_load_pipeline <- function(sc, path) {
 }
 
 #' @export
+ml_save_model <- function(x, path, overwrite = FALSE, ...) {
+  ensure_scalar_character(path)
+  ml_writer <- x$.pipeline %>%
+    invoke("write")
+
+  if (overwrite) {
+    ml_writer %>%
+      invoke("overwrite") %>%
+      invoke("save", path)
+  } else {
+    ml_writer %>%
+      invoke("save", path)
+  }
+}
+
+#' @export
+ml_load_model <- function(sc, path) {
+  jobj <- invoke_static(sc, "org.apache.spark.ml.PipelineModel", "load", path)
+  ml_pipeline(jobj)
+}
+
+#' @export
 ml_fit <- function(x, data, ...) {
   jobj <- x$.pipeline %>%
     invoke("fit", spark_dataframe(data))

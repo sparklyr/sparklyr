@@ -39,3 +39,14 @@ ml_logistic_regression.spark_connection <- function(
 
   ml_pipeline(.stage)
 }
+
+#' @export
+ml_logistic_regression.ml_pipeline <- function(
+  x, intercept = TRUE, alpha = 0,
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction", ...) {
+  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  ml_stages(x, transformer)
+}

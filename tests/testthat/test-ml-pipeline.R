@@ -2,6 +2,16 @@ context("ml pipeine")
 
 sc <- testthat_spark_connection()
 
+training <- data_frame(
+  id = 0:3L,
+  text = c("a b c d e spark",
+           "b d",
+           "spark f g h",
+           "hadoop mapreduce"),
+  label = c(1, 0, 1, 0)
+)
+training_tbl <- copy_to(sc, training, overwrite = TRUE)
+
 test_that("ml_stages() combines pipelines", {
   tokenizer <- ml_tokenizer(sc, "x", "y")
   binarizer <- ml_binarizer(sc, "in", "out", 0.5)
@@ -60,15 +70,6 @@ test_that("ml_save_pipeline()/ml_load_pipeline() work for ml_pipeline", {
 })
 
 test_that("ml_fit() returns a ml_pipeline_model", {
-  training <- data_frame(
-    id = 0:3L,
-    text = c("a b c d e spark",
-             "b d",
-             "spark f g h",
-             "hadoop mapreduce"),
-    label = c(1, 0, 1, 0)
-  )
-  training_tbl <- copy_to(sc, training, overwrite = TRUE)
 
   tokenizer <- ml_tokenizer(sc, input_col = "text", output_col = "words")
   hashing_tf <- ml_hashing_tf(sc, input_col = "words", output_col = "features")
@@ -77,4 +78,20 @@ test_that("ml_fit() returns a ml_pipeline_model", {
 
   model <- ml_fit(pipeline, training_tbl)
   expect_equal(class(model), "ml_pipeline_model")
+})
+
+test_that("ml_[save/load]_model() work for ml_pipeline_model", {
+  pipeline <- ml_tokenizer(sc, input_col = "text", output_col = "words") %>%
+    ml_hashing_tf(input_col = "words", output_col = "features") %>%
+    ml_logistic_regression(max_iter = 10, lambda = 0.001)
+  model1 <- ml_fit(pipeline, training_tbl)
+  path <- tempfile("model")
+  ml_save_model(model1, path)
+  model2 <- ml_load_model(sc, path)
+  model1_uids <- model1$stages %>%
+    sapply(function(x) invoke(x$.stage, "uid"))
+  model2_uids <- model2$stages %>%
+    sapply(function(x) invoke(x$.stage, "uid"))
+  expect_equal(model1_uids, model2_uids)
+
 })

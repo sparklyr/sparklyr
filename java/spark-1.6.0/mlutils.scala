@@ -23,9 +23,17 @@ object MLUtils {
     .setStages(explodePipeline(pipeline) ++ stages.flatMap(explodePipeline))
   }
 
+  def getStages(stage: PipelineStage): Array[_ <: PipelineStage] = {
+    if (stage.isInstanceOf[PipelineModel]) {
+      stage.asInstanceOf[PipelineModel].stages
+    } else {
+      stage.asInstanceOf[Pipeline].getStages
+    }
+  }
+
   def explodePipeline(pipeline: PipelineStage): Array[PipelineStage] = {
     def f(stage: PipelineStage): Array[PipelineStage] = {
-      val pipeline = Try(stage.asInstanceOf[Pipeline].getStages)
+      val pipeline = Try(getStages(stage))
       pipeline match {
         case Failure(s) => Array(stage)
         case Success(s) => s.flatMap(f)
