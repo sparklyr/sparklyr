@@ -27,12 +27,7 @@ ml_pipeline.ml_pipeline_stage <- function(x, ..., uid = random_string("pipeline_
                         "createPipelineFromStages",
                         uid,
                         stages)
-  jobj
-  #   invoke_new(sc, "org.apache.spark.ml.Pipeline", uid)
-
-  # jobj %>%
-  #   invoke("setStages", dots)
-  # wrapper(jobj)
+  ml_pipeline_info(jobj)
 }
 
 #' @export
@@ -49,7 +44,7 @@ ml_stages <- function(x, ...) {
 
 #' @export
 spark_connection.ml_pipeline <- function(x, ...) {
-  spark_connection(x$.pipeline)
+  spark_connection(x$.jobj)
 }
 
 #' @export

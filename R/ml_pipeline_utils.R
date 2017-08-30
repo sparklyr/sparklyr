@@ -1,4 +1,4 @@
-ml_pipeline_stage <- function(jobj) {
+ml_pipeline_stage_info <- function(jobj) {
   structure(
     list(
       uid = invoke(jobj, "uid"),
@@ -10,6 +10,37 @@ ml_pipeline_stage <- function(jobj) {
   )
 }
 
+ml_add_stage <- function(x, transformer) {
+  sc <- spark_connection(x)
+  stages <- if (is.null(x$stages)) list(transformer$.jobj) else {
+    x$.jobj %>%
+      invoke("getStages") %>%
+      c(transformer$.jobj)
+  }
+
+  jobj <- invoke_static(sc, "sparklyr.MLUtils",
+                        "createPipelineFromStages",
+                        x$uid,
+                        stages)
+  ml_pipeline_info(jobj)
+}
+
+ml_pipeline_info <- function(jobj) {
+  structure(
+    list(
+      uid = invoke(jobj, "uid"),
+      type = jobj_info(jobj)$class,
+      stages = jobj %>%
+        invoke("getStages") %>%
+        lapply(ml_pipeline_stage_info),
+      stage_uids = jobj %>%
+        invoke("getStages") %>%
+        sapply(function(x) invoke(x, "uid")),
+      .jobj = jobj
+    ),
+    class = c("ml_pipeline", "ml_pipeline_stage")
+  )
+}
 # ml_pipeline <- function(jobj) {
 #   stages <- invoke_static(spark_connection(jobj),
 #                           "sparklyr.MLUtils",

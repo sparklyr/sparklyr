@@ -25,35 +25,27 @@ test_that("ml_pipeline() combines pipeline_stages into a pipeline", {
   tokenizer <- ml_tokenizer(sc, "x", "y")
   binarizer <- ml_binarizer(sc, "in", "out", 0.5)
   pipeline <- ml_pipeline(tokenizer, binarizer)
-  pipeline_stage_names <- names(pipeline$stages)
-  individual_stage_names <- c(tokenizer$uid, binarizer$uid)
-  expect_equal(pipeline_stage_names, individual_stage_names)
-  expect_equal(class(pipeline), "ml_pipeline")
+  individual_stage_uids <- c(tokenizer$uid, binarizer$uid)
+  expect_equal(pipeline$stage_uids, individual_stage_uids)
+  expect_equal(class(pipeline)[1], "ml_pipeline")
 })
 
 test_that("ml_transformer.ml_pipeline() works as expected", {
   tokenizer <- ml_tokenizer(sc, "x", "y")
   binarizer <- ml_binarizer(sc, "in", "out", 0.5)
 
-  p1 <- ml_stages(tokenizer, binarizer)
+  p1 <- ml_pipeline(tokenizer, binarizer)
 
-  p2 <- ml_tokenizer(sc, "x", "y") %>%
+  p2 <- ml_pipeline(sc) %>%
+    ml_tokenizer("x", "y") %>%
     ml_binarizer("in", "out", 0.5)
 
-  remove_uid <- function(params) {
-    names(params) <- sub("_.*$", "", names(params))
-    params
-  }
-
   p1_params <- p1$stages %>%
-    lapply(function(x) x$params) %>%
-    remove_uid()
+    lapply(function(x) x$param_map)
   p2_params <- p2$stages %>%
-    lapply(function(x) x$params) %>%
-    remove_uid()
-
+    lapply(function(x) x$param_map)
   expect_equal(p1_params, p2_params)
-  expect_equal(class(p2), "ml_pipeline")
+  expect_equal(class(p2)[1], "ml_pipeline")
 })
 
 test_that("ml_save_pipeline()/ml_load_pipeline() work for ml_pipeline", {
