@@ -1,15 +1,15 @@
 #' @export
-ml_tokenizer <- function(x, input_col, output_col, ...) {
+ml_tokenizer <- function(x, input_col, output_col, uid, ...) {
   UseMethod("ml_tokenizer")
 }
 
 #' @export
-ml_tokenizer.spark_connection <- function(x, input_col, output_col, ...) {
+ml_tokenizer.spark_connection <- function(x, input_col, output_col, uid = "tokenizer", ...) {
 
-  .stage <- ml_new_transformer(x, "org.apache.spark.ml.feature.Tokenizer",
-                               input_col, output_col)
+  .jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Tokenizer",
+                               input_col, output_col, uid)
 
-  ml_pipeline(.stage)
+  ml_pipeline_stage(.jobj)
 }
 
 #' @export

@@ -1,10 +1,11 @@
 ml_pipeline_stage <- function(jobj) {
-  structure(stats::setNames(list(
+  structure(
     list(
+      uid = invoke(jobj, "uid"),
       type = jobj_info(jobj)$class,
-      params = ml_get_param_map(jobj),
-      .stage = jobj)
-  ), invoke(jobj, "uid")),
+      param_map = ml_get_param_map(jobj),
+      .jobj = jobj
+      ),
   class = "ml_pipeline_stage"
   )
 }
@@ -33,10 +34,11 @@ ml_pipeline <- function(jobj) {
   }
 }
 
-ml_new_transformer <- function(sc, class, input_col, output_col) {
+ml_new_transformer <- function(sc, class, input_col, output_col, uid) {
   ensure_scalar_character(input_col)
   ensure_scalar_character(output_col)
-  invoke_new(sc, class) %>%
+  ensure_scalar_character(uid)
+  invoke_new(sc, class, uid) %>%
     invoke("setInputCol", input_col) %>%
     invoke("setOutputCol", output_col)
 }
