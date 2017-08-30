@@ -56,7 +56,7 @@ test_that("ml_transformer.ml_pipeline() works as expected", {
   expect_equal(class(p2)[1], "ml_pipeline")
 })
 
-test_that("ml_save_pipeline()/ml_load_pipeline() work for ml_pipeline", {
+test_that("ml_save_pipeline()/ml_load_pipeline() work for unnested pipelines", {
   p1 <- ml_pipeline(sc) %>%
     ml_tokenizer("x", "y") %>%
     ml_binarizer("in", "out", 0.5)
@@ -72,6 +72,29 @@ test_that("ml_save_pipeline()/ml_load_pipeline() work for ml_pipeline", {
 
   expect_equal(p1$uid, p2$uid)
   expect_equal(p1_params, p2_params)
+})
+
+test_that("ml_save_pipeline()/ml_load_pipeline() work for nested pipeline", {
+  p1a <- ml_pipeline(ml_tokenizer(sc, "x", "y"))
+  p1b <- ml_binarizer(sc, "in", "out", 0.5)
+  p1 <- ml_pipeline(p1a, p1b)
+  path <- tempfile()
+  ml_save_pipeline(p1, path)
+  p2 <- ml_load_pipeline(sc, path)
+
+
+  p1_params <- p1$stages %>%
+    lapply(function(x) x$param_map)
+  p2_params <- p2$stages %>%
+    lapply(function(x) x$param_map)
+
+  p1_tok_params <- p1$stages[[1]]$stages[[1]]$param_map
+  p2_tok_params <- p2$stages[[1]]$stages[[1]]$param_map
+
+  expect_equal(p1$uid, p2$uid)
+  expect_equal(p1_tok_params, p2_tok_params)
+  expect_equal(p1_params, p2_params)
+  expect_equal(p1$stage_uids, p2$stage_uids)
 })
 
 test_that("ml_fit() returns a ml_pipeline_model", {
