@@ -12,7 +12,7 @@ ml_pipeline.spark_connection <- function(x, uid = random_string("pipeline_")) {
          stages = NULL,
          type = jobj_info(jobj)$class,
          .jobj = jobj),
-    class = "ml_pipeline"
+    class = c("ml_pipeline", "ml_pipeline_stage")
   )
 }
 
