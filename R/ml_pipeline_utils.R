@@ -41,6 +41,23 @@ ml_pipeline_info <- function(jobj) {
     class = c("ml_pipeline", "ml_pipeline_stage")
   )
 }
+
+ml_pipeline_model_info <- function(jobj) {
+  structure(
+    list(
+      uid = invoke(jobj, "uid"),
+      type = jobj_info(jobj)$class,
+      stages = jobj %>%
+        invoke("stages") %>%
+        lapply(ml_pipeline_stage_info),
+      stage_uids = jobj %>%
+        invoke("stages") %>%
+        sapply(function(x) invoke(x, "uid")),
+      .jobj = jobj
+    ),
+    class = c("ml_pipeline_model", "ml_pipeline_stage")
+  )
+}
 # ml_pipeline <- function(jobj) {
 #   stages <- invoke_static(spark_connection(jobj),
 #                           "sparklyr.MLUtils",

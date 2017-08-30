@@ -45,5 +45,5 @@ ml_save_model <- function(x, path, overwrite = FALSE, ...) {
 #' @export
 ml_load_model <- function(sc, path) {
   jobj <- invoke_static(sc, "org.apache.spark.ml.PipelineModel", "load", path)
-  ml_pipeline_info(jobj)
+  ml_pipeline_model_info(jobj)
 }

@@ -53,16 +53,14 @@ spark_connection.ml_pipeline_stage <- function(x, ...) {
 }
 
 #' @export
-ml_fit <- function(x, data, ...) {
-  jobj <- x$.pipeline %>%
-    invoke("fit", spark_dataframe(data))
-  stages <- jobj %>%
-    invoke("stages") %>%
-    sapply(ml_pipeline_stage)
+spark_connection.ml_pipeline_model <- function(x, ...) {
+  spark_connection(x$.jobj)
+}
 
-  structure(
-    list(stages = stages,
-         .pipeline_model = jobj),
-    class = "ml_pipeline_model"
-  )
+#' @export
+ml_fit <- function(x, data, ...) {
+  jobj <- x$.jobj %>%
+    invoke("fit", spark_dataframe(data))
+
+  ml_pipeline_model_info(jobj)
 }

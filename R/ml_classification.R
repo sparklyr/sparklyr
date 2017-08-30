@@ -1,4 +1,5 @@
 ml_new_classifier <- function(sc, class,
+                              uid = uid,
                               label_col,
                               prediction_col,
                               probability_col,
@@ -7,7 +8,7 @@ ml_new_classifier <- function(sc, class,
   ensure_scalar_character(prediction_col)
   ensure_scalar_character(probability_col)
   ensure_scalar_character(raw_prediction_col)
-  invoke_new(sc, class) %>%
+  invoke_new(sc, class, uid) %>%
     invoke("setLabelCol", label_col) %>%
     invoke("setPredictionCol", prediction_col) %>%
     invoke("setProbabilityCol", probability_col) %>%
@@ -25,19 +26,19 @@ ml_logistic_regression.spark_connection <- function(
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
-  raw_prediction_col = "rawPrediction", ...) {
+  raw_prediction_col = "rawPrediction", uid = random_string("logistic_regression_"), ...) {
 
   alpha <- ensure_scalar_double(alpha)
   intercept <- ensure_scalar_boolean(intercept)
 
-  .stage <- ml_new_classifier(
-    x, "org.apache.spark.ml.classification.LogisticRegression",
+  jobj <- ml_new_classifier(
+    x, "org.apache.spark.ml.classification.LogisticRegression", uid,
     label_col, prediction_col, probability_col, raw_prediction_col
   ) %>%
     invoke("setElasticNetParam", alpha) %>%
     invoke("setFitIntercept", intercept)
 
-  ml_pipeline(.stage)
+  ml_pipeline_stage_info(jobj)
 }
 
 #' @export
@@ -46,7 +47,7 @@ ml_logistic_regression.ml_pipeline <- function(
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
-  raw_prediction_col = "rawPrediction", ...) {
+  raw_prediction_col = "rawPrediction", uid = random_string("logistic_regression_"), ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
-  ml_stages(x, transformer)
+  ml_add_stage(x, transformer)
 }
