@@ -5,14 +5,14 @@ ml_pipeline_stage_info <- function(jobj) {
       type = jobj_info(jobj)$class,
       param_map = ml_get_param_map(jobj),
       .jobj = jobj
-      ),
-  class = "ml_pipeline_stage"
+    ),
+    class = "ml_pipeline_stage"
   )
 }
 
 ml_add_stage <- function(x, transformer) {
   sc <- spark_connection(x)
-  stages <- if (is.null(x$stages)) list(transformer$.jobj) else {
+  stages <- if (rlang::is_na(x$stages)) list(transformer$.jobj) else {
     x$.jobj %>%
       invoke("getStages") %>%
       c(transformer$.jobj)
@@ -22,24 +22,49 @@ ml_add_stage <- function(x, transformer) {
                         "createPipelineFromStages",
                         x$uid,
                         stages)
-  ml_pipeline_info(jobj)
+  ml_info(jobj)
 }
 
-ml_pipeline_info <- function(jobj) {
-  structure(
-    list(
-      uid = invoke(jobj, "uid"),
-      type = jobj_info(jobj)$class,
-      stages = jobj %>%
+# ml_pipeline_info <- function(jobj) {
+#   structure(
+#     list(
+#       uid = invoke(jobj, "uid"),
+#       type = jobj_info(jobj)$class,
+#       stages = jobj %>%
+#         invoke("getStages") %>%
+#         lapply(ml_pipeline_stage_info),
+#       stage_uids = jobj %>%
+#         invoke("getStages") %>%
+#         sapply(function(x) invoke(x, "uid")),
+#       .jobj = jobj
+#     ),
+#     class = c("ml_pipeline", "ml_pipeline_stage")
+#   )
+# }
+
+ml_info <- function(jobj) {
+  uid <- invoke(jobj, "uid")
+  type <- jobj_info(jobj)$class
+  if (identical(type, "org.apache.spark.ml.Pipeline")) {
+    stages <- tryCatch({
+      jobj %>%
         invoke("getStages") %>%
-        lapply(ml_pipeline_stage_info),
-      stage_uids = jobj %>%
-        invoke("getStages") %>%
-        sapply(function(x) invoke(x, "uid")),
-      .jobj = jobj
-    ),
-    class = c("ml_pipeline", "ml_pipeline_stage")
-  )
+        lapply(ml_info)
+    },
+    error = function(e) {
+      NA
+    })
+    structure(
+      list(uid = uid,
+           type = type,
+           stages = stages,
+           stage_uids = if (rlang::is_na(stages)) NA else sapply(stages, function(x) x$uid),
+           .jobj = jobj),
+      class = c("ml_pipeline", "ml_pipeline_stage")
+    )
+  } else {
+    ml_pipeline_stage_info(jobj)
+  }
 }
 
 ml_pipeline_model_info <- function(jobj) {
@@ -49,7 +74,7 @@ ml_pipeline_model_info <- function(jobj) {
       type = jobj_info(jobj)$class,
       stages = jobj %>%
         invoke("stages") %>%
-        lapply(ml_pipeline_stage_info),
+        lapply(ml_info),
       stage_uids = jobj %>%
         invoke("stages") %>%
         sapply(function(x) invoke(x, "uid")),
