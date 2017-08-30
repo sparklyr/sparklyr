@@ -4,6 +4,11 @@ import org.apache.spark.ml._
 import scala.util.{Try, Success, Failure}
 
 object MLUtils {
+  def createPipelineFromStages(uid: String, stages: PipelineStage*): Pipeline = {
+    new Pipeline(uid)
+      .setStages(stages.toArray)
+  }
+
   def wrapInPipeline(pipelineStage: PipelineStage): Pipeline = {
     if (pipelineStage.isInstanceOf[Pipeline]) {
       pipelineStage.asInstanceOf[Pipeline]

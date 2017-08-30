@@ -1,4 +1,41 @@
 #' @export
+ml_pipeline <- function(x, ..., uid = random_string("pipeline_")) {
+  UseMethod("ml_pipeline")
+}
+
+#' @export
+ml_pipeline.spark_connection <- function(x, uid = random_string("pipeline_")) {
+  ensure_scalar_character(uid)
+  jobj <- invoke_new(x, "org.apache.spark.ml.Pipeline", uid)
+  structure(
+    list(uid = invoke(jobj, "uid"),
+         stages = NULL,
+         type = jobj_info(jobj)$class,
+         .jobj = jobj),
+    class = "ml_pipeline"
+  )
+}
+
+#' @export
+ml_pipeline.ml_pipeline_stage <- function(x, ..., uid = random_string("pipeline_")) {
+  ensure_scalar_character(uid)
+  sc <- spark_connection(x)
+  dots <- list(...) %>%
+    lapply(function(x) x$.jobj)
+  stages <- c(x$.jobj, dots)
+  jobj <- invoke_static(sc, "sparklyr.MLUtils",
+                        "createPipelineFromStages",
+                        uid,
+                        stages)
+  jobj
+  #   invoke_new(sc, "org.apache.spark.ml.Pipeline", uid)
+
+  # jobj %>%
+  #   invoke("setStages", dots)
+  # wrapper(jobj)
+}
+
+#' @export
 ml_stages <- function(x, ...) {
   sc <- spark_connection(x$.pipeline)
   dots <- list(...) %>%
@@ -13,6 +50,11 @@ ml_stages <- function(x, ...) {
 #' @export
 spark_connection.ml_pipeline <- function(x, ...) {
   spark_connection(x$.pipeline)
+}
+
+#' @export
+spark_connection.ml_pipeline_stage <- function(x, ...) {
+  spark_connection(x$.jobj)
 }
 
 #' @export

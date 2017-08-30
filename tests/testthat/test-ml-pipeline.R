@@ -12,13 +12,21 @@ training <- data_frame(
 )
 training_tbl <- copy_to(sc, training, overwrite = TRUE)
 
-test_that("ml_stages() combines pipelines", {
+test_that("ml_pipeline() returns a ml_pipeline", {
+  p <- ml_pipeline(sc)
+  expect_equal(class(p), "ml_pipeline")
+  expect_equal(length(p$stages), 0)
+  expect_equal(p$type, "org.apache.spark.ml.Pipeline")
+  uid_prefix <- gsub(pattern = "_.+$", replacement = "", p$uid)
+  expect_equal(uid_prefix, "pipeline")
+})
+
+test_that("ml_pipeline() combines pipeline_stages into a pipeline", {
   tokenizer <- ml_tokenizer(sc, "x", "y")
   binarizer <- ml_binarizer(sc, "in", "out", 0.5)
-  pipeline <- tokenizer %>%
-    ml_stages(binarizer)
+  pipeline <- ml_pipeline(tokenizer, binarizer)
   pipeline_stage_names <- names(pipeline$stages)
-  individual_stage_names <- c(names(tokenizer$stages), names(binarizer$stages))
+  individual_stage_names <- c(tokenizer$uid, binarizer$uid)
   expect_equal(pipeline_stage_names, individual_stage_names)
   expect_equal(class(pipeline), "ml_pipeline")
 })
