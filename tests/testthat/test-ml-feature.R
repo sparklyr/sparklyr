@@ -42,7 +42,7 @@ test_that("ml_tokenizer.tbl_spark() works as expected", {
 test_that("ml_binarizer() returns params of transformer", {
   binarizer <- ml_binarizer(sc, input_col = "x", output_col = "y", threshold = 0.5)
   params <- list(input_col = "x", output_col = "y", threshold = 0.5)
-  expect_true(dplyr::setequal(binarizer$stages$bin$params, params))
+  expect_true(dplyr::setequal(binarizer$param_map, params))
 })
 
 test_that("ml_binarizer.tbl_spark() works as expected", {

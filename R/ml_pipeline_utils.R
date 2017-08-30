@@ -76,6 +76,13 @@ ml_fit_and_transform <- function(x, pipeline) {
     sdf_register()
 }
 
+ml_transform <- function(x, data) {
+  sdf <- spark_dataframe(data)
+  x$.jobj %>%
+    invoke("transform", sdf) %>%
+    sdf_register()
+}
+
 ml_new_stage_modified_args <- function(call_frame) {
   envir <- rlang::caller_env()
   modified_args <- call_frame %>%
