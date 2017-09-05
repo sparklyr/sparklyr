@@ -2,6 +2,7 @@ package sparklyr
 
 import org.apache.spark.ml._
 import scala.util.{Try, Success, Failure}
+import org.apache.spark.ml.param._
 
 object MLUtils {
   def createPipelineFromStages(uid: String, stages: PipelineStage*): Pipeline = {
@@ -45,5 +46,16 @@ object MLUtils {
       }
     }
     f(pipeline) filterNot {_.isInstanceOf[Pipeline]}
+  }
+
+  def paramMapsToList(paramMaps: Array[ParamMap]): Seq[Map[String, Any]] = {
+    paramMaps.toSeq.map(x => Map(x.toSeq map {
+      pair => pair.param.name -> pair.value}: _*))
+  }
+
+  def paramMapToList(paramMap: ParamMap): Array[(String, String, Any)] = {
+    paramMap.toSeq.map(
+      pair => (pair.param.parent, pair.param.name, pair.value)
+      ).toArray
   }
 }
