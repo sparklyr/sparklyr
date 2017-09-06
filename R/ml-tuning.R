@@ -1,5 +1,5 @@
 #' @export
-ml_param_grid <- function(param_list) {
+ml_build_params <- function(param_list) {
   names(param_list) %>% # stages
     lapply(function(stage) {
       stage_params <- param_list[[stage]]
@@ -40,7 +40,7 @@ ml_cross_validator.spark_connection <- function(x, estimator, estimator_param_ma
                               "uidStagesMapping",
                               estimator)
 
-  param_maps <- ml_param_grid(estimator_param_maps) %>%
+  param_maps <- estimator_param_maps %>%
     lapply(function(param_map) Reduce(
       # function to put ParamMap to ParamMap
       function(x, param_pair) invoke(x, "put", param_pair$param, param_pair$value),
