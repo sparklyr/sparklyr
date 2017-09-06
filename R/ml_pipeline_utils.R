@@ -166,3 +166,13 @@ ml_new_stage_modified_args <- function(call_frame) {
   rlang::lang(stage_constructor, rlang::splice(modified_args)) %>%
     rlang::eval_tidy(env = envir)
 }
+
+ml_map_param_name <- function(x, direction = c("sr", "rs")) {
+  direction <- rlang::arg_match(direction)
+  mapping <- if (identical(direction, "sr"))
+    param_mapping_s_to_r
+  else
+    param_mapping_r_to_s
+
+    unname(sapply(x, function(nm) mapping[[nm]]))
+}

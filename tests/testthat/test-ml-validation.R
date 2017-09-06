@@ -3,7 +3,8 @@ context("ml validation")
 sc <- testthat_spark_connection()
 
 test_that("ml_cross_validator() parses grid correctly", {
-  pipeline <- ml_tokenizer(sc, input_col = "text", output_col = "words") %>%
+  pipeline <- ml_pipeline(sc) %>%
+    ml_tokenizer(input_col = "text", output_col = "words") %>%
     ml_hashing_tf(input_col = "words", output_col = "features",
                   uid = "hashing_tf_1") %>%
     ml_logistic_regression(max_iter = 10, lambda = 0.001, uid = "logistic_1")
@@ -28,11 +29,11 @@ test_that("ml_cross_validator() parses grid correctly", {
   cv <- ml_cross_validator(
     sc,
     estimator = pipeline,
-    evaluator = invoke_new(sc, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator"),
-    estimator_param_maps = param_grid
+    # evaluator = invoke_new(sc, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator"),
+    param_maps = param_grid
   )
   expect_equal(
     ml_param_grid(param_grid_full_stage_names),
-    cv$estimator_param_maps
+    cv$param_maps
   )
 })

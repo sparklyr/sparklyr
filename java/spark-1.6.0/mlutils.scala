@@ -3,6 +3,7 @@ package sparklyr
 import org.apache.spark.ml._
 import scala.util.{Try, Success, Failure}
 import org.apache.spark.ml.param._
+import org.apache.spark.ml.tuning.CrossValidator
 
 object MLUtils {
   def createPipelineFromStages(uid: String, stages: PipelineStage*): Pipeline = {
@@ -48,6 +49,10 @@ object MLUtils {
     f(pipeline) filterNot {_.isInstanceOf[Pipeline]}
   }
 
+  def uidStagesMapping(pipeline: Pipeline): Map[String, PipelineStage] = {
+    explodePipeline(pipeline).toSeq.map(x => (x.uid -> x)).toMap
+  }
+
   def paramMapsToList(paramMaps: Array[ParamMap]): Seq[Map[String, Any]] = {
     paramMaps.toSeq.map(x => Map(x.toSeq map {
       pair => pair.param.name -> pair.value}: _*))
@@ -57,5 +62,9 @@ object MLUtils {
     paramMap.toSeq.map(
       pair => (pair.param.parent, pair.param.name, pair.value)
       ).toArray
+  }
+
+  def setParamMaps(cv: CrossValidator, paramMaps: ParamMap*): CrossValidator = {
+    cv.setEstimatorParamMaps(paramMaps.toArray)
   }
 }
