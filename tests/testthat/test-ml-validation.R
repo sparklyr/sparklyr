@@ -30,10 +30,10 @@ test_that("ml_cross_validator() parses grid correctly", {
     sc,
     estimator = pipeline,
     # evaluator = invoke_new(sc, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator"),
-    param_maps = param_grid
+    estimator_param_maps = param_grid
   )
   expect_equal(
     ml_param_grid(param_grid_full_stage_names),
-    cv$param_maps
+    cv$estimator_param_maps
   )
 })

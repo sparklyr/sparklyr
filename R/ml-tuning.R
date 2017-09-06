@@ -18,7 +18,7 @@ ml_param_grid <- function(param_list) {
 }
 
 #' @export
-ml_cross_validator <- function(x, estimator, param_maps
+ml_cross_validator <- function(x, estimator, estimator_param_maps
                                # evaluator,
                                # num_folds, seed,
                                # uid = random_string("cross_validator_")
@@ -27,7 +27,7 @@ ml_cross_validator <- function(x, estimator, param_maps
 }
 
 #' @export
-ml_cross_validator.spark_connection <- function(x, estimator, param_maps
+ml_cross_validator.spark_connection <- function(x, estimator, estimator_param_maps
                                                 # evaluator,
                                                 # num_folds,
                                                 # seed,
@@ -40,7 +40,7 @@ ml_cross_validator.spark_connection <- function(x, estimator, param_maps
                               "uidStagesMapping",
                               estimator)
 
-  param_maps <- ml_param_grid(param_maps) %>%
+  param_maps <- ml_param_grid(estimator_param_maps) %>%
     lapply(function(param_map) Reduce(
       # function to put ParamMap to ParamMap
       function(x, param_pair) invoke(x, "put", param_pair$param, param_pair$value),
@@ -79,7 +79,7 @@ ml_cross_validator.spark_connection <- function(x, estimator, param_maps
   structure(
     list(
       type = jobj_info(jobj)$class,
-      param_maps = param_maps,
+      estimator_param_maps = param_maps,
       .jobj = jobj
     ),
     class = "ml_cross_validator"
