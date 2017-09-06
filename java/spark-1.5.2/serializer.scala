@@ -304,8 +304,8 @@ object Serializer {
           writeType(dos, "list")
           writeInt(dos, v.length)
           v.foreach(elem => writeObject(dos, elem))
-        case v: Product =>
-          // Tuples
+        case v: Tuple3[String, String, Any] =>
+          // Tuple3
           writeType(dos, "list")
           writeInt(dos, v.productArity)
           v.productIterator.foreach(elem => writeObject(dos, elem.asInstanceOf[Object]))
