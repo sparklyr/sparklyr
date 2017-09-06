@@ -39,11 +39,11 @@ shell_connection <- function(master,
     }
 
     if (is.null(config[["sparklyr.shell.deploy-mode"]])) {
-      config[["sparklyr.shell.deploy-mode"]] <- "cluster"
+      shell_args <- c(shell_args, "--deploy-mode", "cluster")
     }
 
     if (is.null(config[["sparklyr.shell.master"]])) {
-      config[["sparklyr.shell.master"]] <- "yarn"
+      shell_args <- c(shell_args, "--master", "yarn")
     }
   }
 
