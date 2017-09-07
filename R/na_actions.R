@@ -59,7 +59,7 @@ na.omit.spark_jobj <- function(object, columns = NULL, ...) {
   }
 
   # using a df created from drop actions reduces performance, see #308.
-  if (identical(n_before, n_after)) {
+  if (identical(n_before, n_after) && getOption("na.omit.cache", TRUE)) {
     sdf_register(object)
   } else {
     result <- sdf_register(dropped)
