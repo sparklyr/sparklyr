@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for `na.omit.cache` option that when set to
+  `FALSE` will prevent `na.omit` from caching results when
+  rows are dropped.
+
 - Added support in `spark_connect()` for `yarn-cluster` with
   hight-availability enabled.
   
