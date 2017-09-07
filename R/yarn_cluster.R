@@ -106,11 +106,11 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
 
   mainRMWebappValue <- spark_yarn_cluster_get_conf_property(mainRMWebapp)
 
-  if (is.null(mainRMWebapp)) {
+  if (is.null(mainRMWebappValue)) {
     stop("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml")
   }
 
-  mainRMWebapp
+  mainRMWebappValue
 }
 
 spark_yarn_cluster_get_gateway <- function(config, start_time) {
