@@ -293,7 +293,7 @@ start_shell <- function(master,
 
     # for yarn-cluster
     if (spark_master_is_yarn_cluster(master) && is.null(config[["sparklyr.gateway.address"]])) {
-      config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway(config, start_time)
+      gatewayAddress <- config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway(config, start_time)
     }
 
     tryCatch({
