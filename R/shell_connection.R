@@ -34,10 +34,6 @@ shell_connection <- function(master,
 
   # for yarn-cluster set deploy mode as shell arguments
   if (spark_master_is_yarn_cluster(master)) {
-    if (is.null(config[["sparklyr.gateway.address"]])) {
-      config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway()
-    }
-
     if (is.null(config[["sparklyr.shell.deploy-mode"]])) {
       shell_args <- c(shell_args, "--deploy-mode", "cluster")
     }
