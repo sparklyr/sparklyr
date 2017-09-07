@@ -240,54 +240,6 @@ livy_get_session <- function(sc) {
   session
 }
 
-livy_code_quote_parameters <- function(params) {
-  if (length(params) == 0) {
-    ""
-  } else {
-    params <- lapply(params, function(param) {
-      paramClass <- class(param)
-      if (is.character(param)) {
-        # substitute illegal characters
-        param <- gsub("\n", "\" + sys.props(\"line.separator\") + \"", param)
-
-        paste("\"", param, "\"", sep = "")
-      }
-      else if ("livy_jobj" %in% paramClass) {
-        paste(param$varName, "._2", sep = "")
-      }
-      else if (is.numeric(param)) {
-        paste(
-          "new java.lang.Integer(",
-          param,
-          ")",
-          sep = ""
-        )
-      }
-      else if (is.logical(param)) {
-        paste(
-          "new java.lang.Boolean(",
-          if (isTRUE(param)) "true" else "false",
-          ")",
-          sep = ""
-        )
-      }
-      else if (is.list(param)) {
-        paste(
-          "Array(",
-          livy_code_quote_parameters(param),
-          ")",
-          sep = ""
-        )
-      }
-      else {
-        stop("Unsupported parameter ", param, " of class ", paste(paramClass, collapse = ", "), " detected")
-      }
-    })
-
-    paste(params, collapse = ",")
-  }
-}
-
 livy_code_new_return_var <- function(sc) {
   totalReturnVars <- sc$code$totalReturnVars
   name <- paste("sparklyrRetVar", totalReturnVars, sep = "_")
