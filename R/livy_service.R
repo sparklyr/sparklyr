@@ -47,7 +47,7 @@ livy_service_stop <- function() {
     stop("Unsupported command in this platform")
   }
 
-  if (length(system2("jps", c("| grep \"LivyServer\""), stdout = NULL)) > 0) {
+  if (length(system2("jps", c("| grep \"LivyServer\""), stdout = TRUE)) > 0) {
     system2("kill", c("`jps | grep \"LivyServer\" | cut -d \" \" -f 1`"), wait = TRUE)
   }
 }
