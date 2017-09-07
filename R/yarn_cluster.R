@@ -61,21 +61,54 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
   propertyValue
 }
 
-spark_yarn_cluster_get_resource_manager_webapp() {
+spark_yarn_cluster_resource_manager_is_online <- function(rm_webapp) {
+  rmQuery <- paste0(
+    "http",
+    "://",
+    rm_webapp,
+    "/ws/v1/cluster/info"
+  )
+
+  tryCatch({
+    !httr::http_error(rmQuery)
+  }, error = function(err) {
+    FALSE
+  })
+}
+
+spark_yarn_cluster_get_resource_manager_webapp <- function() {
   rmHighAvailability <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.enabled")
   rmHighAvailability <- length(rmHighAvailability) > 0 && grepl("TRUE", rmHighAvailability, ignore.case = TRUE)
 
   mainRMWebapp <- "yarn.resourcemanager.webapp.address"
   if (rmHighAvailability) {
     rmHighAvailabilityId <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.id")
-    mainRMWebapp <- paste(
-      "yarn.resourcemanager.webapp.address.",
-      resourceManagerHighAvailabilityId,
-      sep = ""
-    )
+
+    rmHighAvailabilityIds <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.rm-ids")
+    rmHighAvailabilityIds <- strsplit(rmHighAvailabilityIds, ",")[[1]]
+    rmHighAvailabilityIds <- resourceManagerHighAvailabilityIds[rmHighAvailabilityIds != rmHighAvailabilityId]
+    rmHighAvailabilityIds <- c(rmHighAvailabilityId, rmHighAvailabilityIds)
+
+    mainRMWebapp <- NULL
+    for (rmId in rmHighAvailabilityIds) {
+      rmCandidate <- paste0("yarn.resourcemanager.webapp.address.", rmId)
+
+      if (spark_yarn_cluster_resource_manager_is_online(rmCandidate)) {
+        mainRMWebapp <- rmCandidate
+        break;
+      }
+    }
+
+    if (is.null(mainRMWebapp)) {
+      stop("Failed to find online resource manager under High Availability cluster.")
+    }
   }
 
-  mainRMWebapp <- spark_yarn_cluster_get_conf_property(mainRMWebapp)
+  mainRMWebappValue <- spark_yarn_cluster_get_conf_property(mainRMWebapp)
+
+  if (is.null(mainRMWebapp)) {
+    stop("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml")
+  }
 
   mainRMWebapp
 }
