@@ -86,7 +86,7 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
 
     rmHighAvailabilityIds <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.rm-ids")
     rmHighAvailabilityIds <- strsplit(rmHighAvailabilityIds, ",")[[1]]
-    rmHighAvailabilityIds <- resourceManagerHighAvailabilityIds[rmHighAvailabilityIds != rmHighAvailabilityId]
+    rmHighAvailabilityIds <- rmHighAvailabilityIds[rmHighAvailabilityIds != rmHighAvailabilityId]
     rmHighAvailabilityIds <- c(rmHighAvailabilityId, rmHighAvailabilityIds)
 
     mainRMWebapp <- NULL
