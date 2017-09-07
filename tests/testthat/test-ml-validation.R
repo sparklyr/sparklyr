@@ -32,10 +32,19 @@ test_that("ml_cross_validator() parses grid correctly", {
     # evaluator = invoke_new(sc, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator"),
     estimator_param_maps = param_grid
   )
-  str(ml_build_params(param_grid_full_stage_names))
-  str(cv$estimator_param_maps)
+
+  expected_param_maps <- param_grid_full_stage_names %>%
+    sparklyr:::ml_expand_params() %>%
+    sparklyr:::ml_build_param_maps()
+
+  list_sorter <- function(l) {
+    l[sort(names(l))]
+  }
+
+  # str(lapply(expected_param_maps, list_sorter))
+  # str(lapply(cv$estimator_param_maps, list_sorter))
   expect_identical(
-    ml_build_params(param_grid_full_stage_names),
-    cv$estimator_param_maps
+    lapply(expected_param_maps, list_sorter),
+    lapply(cv$estimator_param_maps, list_sorter)
   )
 })

@@ -53,6 +53,14 @@ object MLUtils {
     explodePipeline(pipeline).toSeq.map(x => (x.uid -> x)).toMap
   }
 
+  def paramMapToNestedList(paramMap: ParamMap): Map[String, Map[String, Any]] = {
+    paramMap.toSeq.map(
+      pair => (pair.param.parent, pair.param.name, pair.value)
+    )
+    .groupBy(_._1)
+    .map {case(k, p) => k -> p.map {case (_, n, v) => n -> v}.toMap}
+  }
+
   def paramMapToList(paramMap: ParamMap): Map[String, Any] = {
     paramMap.toSeq.map(
       pair => (pair.param.name -> pair.value)
