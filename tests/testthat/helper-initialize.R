@@ -1,4 +1,11 @@
 testthat_spark_connection <- function(version = NULL) {
+  if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
+    spark_disconnect_all()
+    livy_service_stop()
+    remove(".testthat_livy_connection", envir = .GlobalEnv)
+    Sys.sleep(3)
+  }
+
   if (nrow(spark_installed_versions()) == 0) {
     spark_install("2.1.0")
   }
@@ -87,6 +94,16 @@ sdf_query_plan <- function(x) {
 }
 
 testthat_livy_connection <- function(version = NULL) {
+  if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
+    spark_disconnect_all()
+    remove(".testthat_spark_connection", envir = .GlobalEnv)
+    Sys.sleep(3)
+  }
+
+  if (nrow(spark_installed_versions()) == 0) {
+    spark_install("2.1.0")
+  }
+
   if (nrow(livy_installed_versions()) == 0) {
     livy_install("0.3.0", spark_version = "2.1.0")
   }
