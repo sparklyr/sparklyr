@@ -19,7 +19,7 @@ test_that("ml_cross_validator() parses grid correctly", {
   )
   param_grid_full_stage_names <- list(
     hashing_tf_1 = list(
-      num_features = list(2^5, 2^10)
+      num_features = list(as.integer(2^5), as.integer(2^10))
     ),
     logistic_1 = list(
       max_iter = list(5L, 10L),
@@ -32,6 +32,8 @@ test_that("ml_cross_validator() parses grid correctly", {
     # evaluator = invoke_new(sc, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator"),
     estimator_param_maps = param_grid
   )
+  str(ml_build_params(param_grid_full_stage_names))
+  str(cv$estimator_param_maps)
   expect_identical(
     ml_build_params(param_grid_full_stage_names),
     cv$estimator_param_maps

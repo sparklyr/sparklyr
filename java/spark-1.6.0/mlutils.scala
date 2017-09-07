@@ -53,12 +53,13 @@ object MLUtils {
     explodePipeline(pipeline).toSeq.map(x => (x.uid -> x)).toMap
   }
 
-  def paramMapsToList(paramMaps: Array[ParamMap]): Seq[Map[String, Any]] = {
-    paramMaps.toSeq.map(x => Map(x.toSeq map {
-      pair => pair.param.name -> pair.value}: _*))
+  def paramMapToList(paramMap: ParamMap): Map[String, Any] = {
+    paramMap.toSeq.map(
+      pair => (pair.param.name -> pair.value)
+      ).toMap
   }
 
-  def paramMapToList(paramMap: ParamMap): Array[(String, String, Any)] = {
+  def paramMapToTriples(paramMap: ParamMap): Array[(String, String, Any)] = {
     paramMap.toSeq.map(
       pair => (pair.param.parent, pair.param.name, pair.value)
       ).toArray

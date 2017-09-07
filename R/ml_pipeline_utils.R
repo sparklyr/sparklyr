@@ -131,15 +131,15 @@ ml_get_param_map <- function(jobj) {
                 "sparklyr.MLUtils",
                 "getParamMap",
                 jobj) %>%
-    ml_map_param_names()
+    ml_map_param_list_names()
 }
 
-ml_map_param_names <- function(params_list) {
-  names(params_list) <- sapply(
-    names(params_list),
-    function(param) param_mapping_s_to_r[[param]] %||% param)
-  params_list
-}
+# ml_map_param_names <- function(params_list) {
+#   names(params_list) <- sapply(
+#     names(params_list),
+#     function(param) param_mapping_s_to_r[[param]] %||% param)
+#   params_list
+# }
 
 ml_fit_and_transform <- function(x, pipeline) {
   sdf <- spark_dataframe(x)
@@ -167,12 +167,26 @@ ml_new_stage_modified_args <- function(call_frame) {
     rlang::eval_tidy(env = envir)
 }
 
-ml_map_param_name <- function(x, direction = c("sr", "rs")) {
+# ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
+#   UseMethod("ml_map_param_names")
+# }
+
+ml_map_param_list_names <- function(x, direction = c("sr", "rs"), ...) {
   direction <- rlang::arg_match(direction)
   mapping <- if (identical(direction, "sr"))
     param_mapping_s_to_r
   else
     param_mapping_r_to_s
 
-    unname(sapply(x, function(nm) mapping[[nm]]))
+  rlang::set_names(x, unname(sapply(names(x), function(nm) mapping[[nm]] %||% nm)))
+}
+
+ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
+  direction <- rlang::arg_match(direction)
+  mapping <- if (identical(direction, "sr"))
+    param_mapping_s_to_r
+  else
+    param_mapping_r_to_s
+
+  unname(sapply(x, function(nm) mapping[[nm]] %||% nm))
 }
