@@ -5,7 +5,8 @@ livy_sources_included <- function() {
     "/serializer\\.scala",
     "/stream\\.scala",
     "/sqlutils\\.scala",
-    "/utils\\.scala"
+    "/utils\\.scala",
+    "/repartition\\.scala"
   )
 }
 

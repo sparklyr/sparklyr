@@ -765,6 +765,7 @@ livy_load_scala_sources <- function(sc) {
     "tracker.scala",
     "serializer.scala",
     "stream.scala",
+    "repartition.scala",
     "livyutils.scala"
   )
 
