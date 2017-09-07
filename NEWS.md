@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for `spark_connect()` with `master="yarn-cluster"`
+  to query YARN resource manager API and retrieve the correct
+  container host name.
+
 - Fixed issue in `invoke()` calls while using integer arrays
   that contain `NA` which can be commonly experienced
   while using `spark_apply()`.

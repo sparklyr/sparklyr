@@ -1,4 +1,4 @@
-spark_yarn_cluster_get_gateway <- function() {
+spark_yarn_cluster_get_conf_property <- function(property) {
   confDir <- Sys.getenv("YARN_CONF_DIR")
   if (nchar(confDir) == 0) {
 
@@ -16,14 +16,66 @@ spark_yarn_cluster_get_gateway <- function() {
 
   yarnSiteXml <- xml2::read_xml(yarnSite)
 
-  yarnResourceManagerAddress <- xml2::xml_text(xml2::xml_find_all(
-    yarnSiteXml,
-    "//name[.='yarn.resourcemanager.address']/parent::property/value")
+  yarnPropertyValue <- xml2::xml_text(xml2::xml_find_all(
+      yarnSiteXml,
+      paste0("//name[.='", property, "']/parent::property/value")
+    )
   )
 
-  if (length(yarnResourceManagerAddress) == 0) {
-    stop("Yarn Cluster mode uses `yarn.resourcemanager.address` but is not present in yarn-site.xml")
+  yarnPropertyValue
+}
+
+spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, property) {
+  resourceManagerQuery <- paste0(
+    "http",
+    "://",
+    rm_webapp,
+    "/ws/v1/cluster/apps?startedTimeBegin=",
+    start_time,
+    "&applicationType=SPARK"
+  )
+
+  waitSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.start.timeout", 60)
+  commandStart <- Sys.time()
+  propertyValue <- NULL
+
+  while(length(propertyValue) == 0 && commandStart + waitSeconds > Sys.time()) {
+    resourceManagerResponce <- httr::GET(resourceManagerQuery)
+    yarnApps <- httr::content(resourceManagerResponce)
+
+    newSparklyrApps <- Filter(function(e) grepl("sparklyr.*", e[[1]]$name), yarnApps$apps)
+
+    if (length(newSparklyrApps) > 1) {
+      stop("Multiple sparklyr apps submitted at once to this yarn cluster, aborting, please retry")
+    }
+
+    newSparklyrApp <- newSparklyrApps[[1]][[1]]
+    if (property %in% names(newSparklyrApp)) {
+      propertyValue <- newSparklyrApp[[property]]
+    }
+    else {
+      Sys.sleep(1)
+    }
   }
 
-  strsplit(yarnResourceManagerAddress, ":")[[1]][[1]]
+  propertyValue
+}
+
+spark_yarn_cluster_get_gateway <- function(config, start_time) {
+  resourceManagerWebapp <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.webapp.address")
+
+  if (length(resourceManagerWebapp) == 0) {
+    stop("Yarn Cluster mode uses `yarn.resourcemanager.webapp.address` but is not present in yarn-site.xml")
+  }
+
+  amHostHttpAddress <- spark_yarn_cluster_get_app_property(
+    config, start_time,
+    resourceManagerWebapp,
+    "amHostHttpAddress")
+
+  if (is.null(amHostHttpAddress)) {
+    stop("Failed to retrieve new sparklyr yarn application from ", resourceManagerWebapp)
+  }
+
+  strsplit(amHostHttpAddress, ":")[[1]][[1]]
 }
