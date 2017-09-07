@@ -768,7 +768,7 @@ livy_load_scala_sources <- function(sc) {
     "livyutils.scala"
   )
 
-  livySourcesFiles <- file.path(find.package("sparklyr"), "livy") %>%
+  livySourcesFiles <- system.file("livy", package = "sparklyr") %>%
     list.files(pattern = "scala$", full.names = TRUE, recursive = TRUE)
 
   sourceOrder <- livySourcesFiles %>%
