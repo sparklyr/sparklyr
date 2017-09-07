@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support in `spark_connect()` for `yarn-cluster` with
+  hight-availability enabled.
+  
 - Added support for `spark_connect()` with `master="yarn-cluster"`
   to query YARN resource manager API and retrieve the correct
   container host name.
