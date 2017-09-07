@@ -25,23 +25,6 @@ ml_add_stage <- function(x, transformer) {
   ml_info(jobj)
 }
 
-# ml_pipeline_info <- function(jobj) {
-#   structure(
-#     list(
-#       uid = invoke(jobj, "uid"),
-#       type = jobj_info(jobj)$class,
-#       stages = jobj %>%
-#         invoke("getStages") %>%
-#         lapply(ml_pipeline_stage_info),
-#       stage_uids = jobj %>%
-#         invoke("getStages") %>%
-#         sapply(function(x) invoke(x, "uid")),
-#       .jobj = jobj
-#     ),
-#     class = c("ml_pipeline", "ml_pipeline_stage")
-#   )
-# }
-
 ml_info <- function(jobj) {
   uid <- invoke(jobj, "uid")
   type <- jobj_info(jobj)$class
@@ -83,29 +66,6 @@ ml_pipeline_model_info <- function(jobj) {
     class = c("ml_pipeline_model", "ml_pipeline_stage")
   )
 }
-# ml_pipeline <- function(jobj) {
-#   stages <- invoke_static(spark_connection(jobj),
-#                           "sparklyr.MLUtils",
-#                           "explodePipeline",
-#                           jobj) %>%
-#     sapply(ml_pipeline_stage)
-#
-#   if (identical(jobj_info(jobj)$class, "org.apache.spark.ml.PipelineModel")) {
-#     structure(
-#       list(
-#         stages = stages,
-#         .pipeline_model = jobj),
-#       class = "ml_pipeline_model"
-#     )
-#   } else {
-#     structure(
-#       list(
-#         stages = stages,
-#         .pipeline = ml_wrap_in_pipeline(jobj)),
-#       class = "ml_pipeline"
-#     )
-#   }
-# }
 
 ml_new_transformer <- function(sc, class, input_col, output_col, uid) {
   ensure_scalar_character(input_col)
@@ -134,13 +94,6 @@ ml_get_param_map <- function(jobj) {
     ml_map_param_list_names()
 }
 
-# ml_map_param_names <- function(params_list) {
-#   names(params_list) <- sapply(
-#     names(params_list),
-#     function(param) param_mapping_s_to_r[[param]] %||% param)
-#   params_list
-# }
-
 ml_fit_and_transform <- function(x, pipeline) {
   sdf <- spark_dataframe(x)
   pipeline$.pipeline %>%
@@ -166,10 +119,6 @@ ml_new_stage_modified_args <- function(call_frame) {
   rlang::lang(stage_constructor, rlang::splice(modified_args)) %>%
     rlang::eval_tidy(env = envir)
 }
-
-# ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
-#   UseMethod("ml_map_param_names")
-# }
 
 ml_map_param_list_names <- function(x, direction = c("sr", "rs"), ...) {
   direction <- rlang::arg_match(direction)
