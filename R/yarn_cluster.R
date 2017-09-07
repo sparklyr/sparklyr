@@ -92,8 +92,9 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
     mainRMWebapp <- NULL
     for (rmId in rmHighAvailabilityIds) {
       rmCandidate <- paste0("yarn.resourcemanager.webapp.address.", rmId)
+      rmCandidateValue <- spark_yarn_cluster_get_conf_property(rmCandidate)
 
-      if (spark_yarn_cluster_resource_manager_is_online(rmCandidate)) {
+      if (spark_yarn_cluster_resource_manager_is_online(rmCandidateValue)) {
         mainRMWebapp <- rmCandidate
         break;
       }
