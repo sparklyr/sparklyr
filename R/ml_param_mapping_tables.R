@@ -6,12 +6,12 @@ ml_create_param_mapping_tables <- function() {
          "prediction_col" = "predictionCol",
          "probability_col" = "probabilityCol",
          "raw_prediction_col" = "rawPredictionCol",
-         "features" = "featuresCol",
-         "alpha" = "elasticNetParam",
-         "intercept" = "fitIntercept",
+         "features_col" = "featuresCol",
+         "elastic_net_param" = "elasticNetParam",
+         "fit_intercept" = "fitIntercept",
          "max_iter" = "maxIter",
          "aggregation_depth" = "aggregationDepth",
-         "lambda" = "regParam",
+         "reg_param" = "regParam",
          "num_features" = "numFeatures")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
