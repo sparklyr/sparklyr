@@ -59,10 +59,16 @@ test_that("ml_binarizer.tbl_spark() works as expected", {
   )
 })
 
-test_that("ml_binarizer() input checking", {
+test_that("ml_binarizer() input checking works", {
   expect_identical(class(ml_binarizer(sc, "in", "out", 1L)$param_map$threshold),
                    "numeric")
   expect_error(ml_binarizer(sc, "in", "out", "foo"),
                "length-one numeric vector")
+})
 
+test_that("ml_hashing_tf() input checking works", {
+  expect_identical(class(ml_hashing_tf(sc, "in", "out", num_features = 25)$param_map$num_features),
+                   "integer")
+  expect_error(ml_hashing_tf(sc, "in", "out", binary = 1),
+               "length-one logical vector")
 })
