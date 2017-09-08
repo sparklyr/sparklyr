@@ -191,7 +191,7 @@ spark_install <- function(version = NULL,
   }
 
   if (!identical(logging, NULL)) {
-    sparkLog4jFile <- Sys.getenv(SPARKINSTALL_LOG4J_FILE, "logs/log4j.spark.log")
+    sparkLog4jFile <- Sys.getenv("SPARKINSTALL_LOG4J_FILE", "logs/log4j.spark.log")
     tryCatch({
       spark_conf_log4j_set_value(
         installInfo,
