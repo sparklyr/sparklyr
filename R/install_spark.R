@@ -196,10 +196,11 @@ spark_install <- function(version = NULL,
         installInfo,
         list(
           "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
-          "log4j.appender.localfile" = "log4j.appender.localfile=org.apache.log4j.DailyRollingFileAppender",
+          "log4j.appender.localfile" = "log4j.appender.localfile=org.apache.log4j.RollingFileAppender",
           "log4j.appender.localfile.file" = "log4j.appender.localfile.file=logs/log4j.spark.log",
           "log4j.appender.localfile.layout" = "log4j.appender.localfile.layout=org.apache.log4j.PatternLayout",
-          "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"),
+          "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n",
+          "log4j.appender.localfile.maxfilesize" = "2MB"),
         reset)
     }, error = function(e) {
       warning("Failed to set logging settings")
