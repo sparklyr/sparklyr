@@ -48,6 +48,25 @@ ml_build_param_maps <- function(param_list) {
     rlang::flatten()
 }
 
+ml_spark_param_map <- function(param_map, uid_stages) {
+  stage_uids <- names(param_map)
+  param_jobj_value_list <- stage_uids %>%
+    lapply(function(stage_uid) {
+      params <- param_map[[stage_uid]]
+      names(params) %>%
+        lapply(function(param_name) {
+          list(param_jobj = uid_stages[[stage_uid]] %>%
+                 invoke(sparklyr:::ml_map_param_names(param_name, "rs")),
+               value = params[[param_name]])
+        })
+    }) %>%
+    rlang::flatten()
+
+  Reduce(function(x, pair) invoke(x, "put", pair$param_jobj, pair$value),
+         param_jobj_value_list,
+         invoke_new(sc, "org.apache.spark.ml.param.ParamMap"))
+}
+
 #' @export
 ml_cross_validator <- function(x, estimator, estimator_param_maps
                                # evaluator,
@@ -82,24 +101,7 @@ ml_cross_validator.spark_connection <- function(x, estimator, estimator_param_ma
     ml_expand_params() %>%
     ml_validate_params(uid_stages, current_param_list) %>%
     ml_build_param_maps() %>%
-    lapply(function(param_map) {
-      stage_uids <- names(param_map)
-      param_jobj_value_list <- stage_uids %>%
-        lapply(function(stage_uid) {
-          params <- param_map[[stage_uid]]
-          names(params) %>%
-            lapply(function(param_name) {
-              list(param_jobj = uid_stages[[stage_uid]] %>%
-                     invoke(sparklyr:::ml_map_param_names(param_name, "rs")),
-                   value = params[[param_name]])
-            })
-        }) %>%
-        rlang::flatten()
-
-      Reduce(function(x, pair) invoke(x, "put", pair$param_jobj, pair$value),
-             param_jobj_value_list,
-             invoke_new(sc, "org.apache.spark.ml.param.ParamMap"))
-    })
+    lapply(ml_spark_param_map, uid_stages = uid_stages)
 
   jobj <- invoke_new(sc, "org.apache.spark.ml.tuning.CrossValidator") %>%
     (function(cv) invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
