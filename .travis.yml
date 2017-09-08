@@ -14,4 +14,6 @@ script:
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
     travis_wait 20 Rscript -e 'covr::codecov()'
 after_failure:
-  - cat /tmp/sparklyr.log
+  - |
+    cat /tmp/sparklyr.log
+    sleep 5
