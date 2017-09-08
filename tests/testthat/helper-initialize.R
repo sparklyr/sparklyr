@@ -118,7 +118,11 @@ testthat_livy_connection <- function(version = NULL) {
   }
 
   if (!connected) {
-    livy_service_start(version = "0.3.0", spark_version = "2.1.0")
+    livy_service_start(
+      version = "0.3.0",
+      spark_version = "2.1.0",
+      stdout = FALSE,
+      stderr = FALSE)
 
     sc <- spark_connect(master = "http://localhost:8998", method = "livy")
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)

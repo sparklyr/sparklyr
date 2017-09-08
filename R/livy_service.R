@@ -4,10 +4,17 @@
 #'
 #' @param version The version of \samp{livy} to use.
 #' @param spark_version The version of \samp{spark} to connect to.
+#' @param stdout,stderr where output to ‘stdout’ or ‘stderr’ with
+#'   same options as \code{system2}.
+#' @param ... Optional arguments; currently unused.
 #'
 #' @rdname livy_service
 #' @export
-livy_service_start <- function(version = NULL, spark_version = NULL) {
+livy_service_start <- function(version = NULL,
+                               spark_version = NULL,
+                               stdout = "",
+                               stderr = "",
+                               ...) {
   env <- unlist(list(
     "SPARK_HOME" = spark_home_dir(version = spark_version)
   ))
@@ -31,7 +38,9 @@ livy_service_start <- function(version = NULL, spark_version = NULL) {
   withr::with_envvar(env, {
     system2(
       livyStart,
-      wait = FALSE
+      wait = FALSE,
+      stdout = stdout,
+      stderr = stderr
     )
   })
 }
