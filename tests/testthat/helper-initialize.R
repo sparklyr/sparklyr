@@ -1,9 +1,9 @@
 testthat_spark_connection <- function(version = NULL) {
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
+    Sys.sleep(3)
     livy_service_stop()
     remove(".testthat_livy_connection", envir = .GlobalEnv)
-    Sys.sleep(3)
   }
 
   if (nrow(spark_installed_versions()) == 0) {
@@ -51,12 +51,14 @@ skip_unless_verbose <- function(message = NULL) {
 
 test_requires <- function(...) {
 
-  for (pkg in list(...)) {
-    if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
-      fmt <- "test requires '%s' but '%s' is not installed"
-      skip(sprintf(fmt, pkg, pkg))
+  suppressPackageStartupMessages({
+    for (pkg in list(...)) {
+      if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
+        fmt <- "test requires '%s' but '%s' is not installed"
+        skip(sprintf(fmt, pkg, pkg))
+      }
     }
-  }
+  })
 
   invisible(TRUE)
 }

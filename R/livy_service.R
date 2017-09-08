@@ -57,6 +57,6 @@ livy_service_stop <- function() {
   }
 
   if (any(grepl(".*LivyServer", system2("jps", stdout = TRUE)))) {
-    system2("kill", c("`jps | grep \"LivyServer\" | cut -d \" \" -f 1`"), wait = TRUE)
+    system2("kill", c("-9", "`jps | grep \"LivyServer\" | cut -d \" \" -f 1`"), wait = TRUE)
   }
 }
