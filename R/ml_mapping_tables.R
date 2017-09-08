@@ -1,4 +1,4 @@
-ml_create_param_mapping_tables <- function() {
+ml_create_mapping_tables <- function() {
   param_mapping_list <-
     list("input_col" = "inputCol",
          "output_col" = "outputCol",
