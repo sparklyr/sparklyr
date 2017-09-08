@@ -46,6 +46,7 @@ test_that("ml_binarizer() returns params of transformer", {
 })
 
 test_that("ml_binarizer.tbl_spark() works as expected", {
+  test_requires("dplyr")
   df <- data.frame(id = 0:2L, feature = c(0.1, 0.8, 0.2))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
   expect_equal(
