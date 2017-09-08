@@ -169,6 +169,7 @@ sql_translate_env.spark_connection <- function(con) {
 #' @importFrom dplyr sql_set_op
 #' @importFrom dbplyr build_sql
 #' @importFrom dbplyr sql
+#' @keywords internal
 sql_set_op.spark_connection <- function(con, x, y, method) {
   if (spark_version(con) < "2.0.0") {
     # Spark 1.6 does not allow parentheses
