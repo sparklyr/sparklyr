@@ -53,10 +53,16 @@ validate_java_version <- function(master, spark_home) {
 
   # transform to usable R version string
   splat <- strsplit(versionLine, "\\s+", perl = TRUE)[[1]]
+
+  splatVersion <- splat[grepl("[0-9]+\\.[0-9]+\\.[0-9]+", splat)]
+  if (length(splatVersion) != 1)
+    stop("Java version detected but couldn't parse version from: ", versionLine)
+
   parsedVersion <- regex_replace(
-    splat[[length(splat)]],
+    splatVersion,
     "^\"|\"$" = "",
-    "_" = "."
+    "_" = ".",
+    "[^0-9.]+" = ""
   )
 
   if (!is.character(parsedVersion) || nchar(parsedVersion) < 1)
