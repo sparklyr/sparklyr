@@ -59,6 +59,11 @@ test_that("ml_binarizer.tbl_spark() works as expected", {
   )
 })
 
+test_that("ml_binarizer() threshold defaults to 0", {
+  expect_identical(ml_binarizer(sc, "in", "out")$param_map$threshold,
+                   0)
+})
+
 test_that("ml_binarizer() input checking works", {
   expect_identical(class(ml_binarizer(sc, "in", "out", 1L)$param_map$threshold),
                    "numeric")

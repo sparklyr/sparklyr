@@ -28,12 +28,12 @@ ml_tokenizer.tbl_spark <- function(x, input_col, output_col, uid = random_string
 }
 
 #' @export
-ml_binarizer <- function(x, input_col, output_col, threshold, uid = random_string("binarizer_"), ...) {
+ml_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_string("binarizer_"), ...) {
   UseMethod("ml_binarizer")
 }
 
 #' @export
-ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold,
+ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold = 0,
                                           uid = random_string("binarizer_"), ...) {
 
   ml_validate_args(rlang::caller_env())
@@ -45,14 +45,14 @@ ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold,
 }
 
 #' @export
-ml_binarizer.ml_pipeline <- function(x, input_col, output_col, threshold,
+ml_binarizer.ml_pipeline <- function(x, input_col, output_col, threshold = 0,
                                      uid = random_string("binarizer_"), ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_add_stage(x, transformer)
 }
 
 #' @export
-ml_binarizer.tbl_spark <- function(x, input_col, output_col, threshold,
+ml_binarizer.tbl_spark <- function(x, input_col, output_col, threshold = 0,
                                    uid = random_string("binarizer_"), ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_transform(transformer, x)
