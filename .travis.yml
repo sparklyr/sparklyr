@@ -15,5 +15,5 @@ script:
     travis_wait 20 Rscript -e 'covr::codecov()'
 after_failure:
   - |
-    cat /tmp/sparklyr.log
+    cat logs/log4j.spark.log
     sleep 5
