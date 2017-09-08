@@ -34,9 +34,7 @@ ml_logistic_regression.spark_connection <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction", uid = random_string("logistic_regression_"), ...) {
 
-  elastic_net_param <- ensure_scalar_double(elastic_net_param)
-  fit_intercept <- ensure_scalar_boolean(fit_intercept)
-  max_iter <- ensure_scalar_integer(max_iter)
+  ml_validate_args(rlang::caller_env())
 
   jobj <- ml_new_classifier(
     x, "org.apache.spark.ml.classification.LogisticRegression", uid,
