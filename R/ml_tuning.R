@@ -30,8 +30,8 @@ ml_validate_params <- function(stages_params, uid_stages, current_param_list) {
         `[[`("class")
       lapply(stages_params[[stage_name]], function(params) {
         do.call(ml_get_stage_validator(stage_class),
-                list(.args = params,
-                     .current_args = current_param_list %>%
+                list(args = params,
+                     current_args = current_param_list %>%
                        `[[`(stage_uids[stage_name]) %>%
                        ml_map_param_list_names()
                 )
