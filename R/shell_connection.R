@@ -271,8 +271,8 @@ start_shell <- function(master,
     }
 
     # create temp file for stdout and stderr
-    output_file <- tempfile(fileext = "_spark.log")
-    error_file <- tempfile(fileext = "_spark.err")
+    output_file <- Sys.getenv("SPARKLYR_LOG_FILE", tempfile(fileext = "_spark.log"))
+    error_file <- Sys.getenv("SPARKLYR_LOG_FILE", tempfile(fileext = "_spark.err"))
 
     console_log <- spark_config_exists(config, "sparklyr.log.console", FALSE)
 
