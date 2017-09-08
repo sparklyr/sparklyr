@@ -5,7 +5,8 @@
 \alias{livy_service_stop}
 \title{Start Livy}
 \usage{
-livy_service_start(version = NULL, spark_version = NULL)
+livy_service_start(version = NULL, spark_version = NULL, stdout = "",
+  stderr = "", ...)
 
 livy_service_stop()
 }
@@ -13,6 +14,11 @@ livy_service_stop()
 \item{version}{The version of \samp{livy} to use.}
 
 \item{spark_version}{The version of \samp{spark} to connect to.}
+
+\item{stdout, stderr}{where output to ‘stdout’ or ‘stderr’ with
+same options as \code{system2}.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Starts the livy service.
