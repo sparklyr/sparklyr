@@ -3,15 +3,15 @@ context("ml feature")
 sc <- testthat_spark_connection()
 
 test_that("We can instantiate tokenizer object", {
-  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y", uid = "tok")
+  tokenizer <- ml_tokenizer(sc, "x", "y", uid = "tok")
   expect_equal(tokenizer$type, "org.apache.spark.ml.feature.Tokenizer")
   expect_equal(tokenizer$uid, "tok")
   expect_equal(class(tokenizer), "ml_pipeline_stage")
 })
 
 test_that("ml_tokenizer() returns params of transformer", {
-  tokenizer <- ml_tokenizer(sc, input_col = "x", output_col = "y")
-  expected_params <- list(input_col = "x", output_col = "y")
+  tokenizer <- ml_tokenizer(sc, "x", "y")
+  expected_params <- list("x", "y")
   expect_true(dplyr::setequal(tokenizer$param_map, expected_params))
 })
 
@@ -25,7 +25,7 @@ test_that("ml_tokenizer.tbl_spark() works as expected", {
     na.omit() %>%
     filter(length(text) > 0) %>%
     head(10) %>%
-    ml_tokenizer(input_col = "text", output_col = "tokens") %>%
+    ml_tokenizer("text", "tokens") %>%
     sdf_read_column("tokens") %>%
     lapply(unlist)
 
@@ -40,8 +40,8 @@ test_that("ml_tokenizer.tbl_spark() works as expected", {
 })
 
 test_that("ml_binarizer() returns params of transformer", {
-  binarizer <- ml_binarizer(sc, input_col = "x", output_col = "y", threshold = 0.5)
-  params <- list(input_col = "x", output_col = "y", threshold = 0.5)
+  binarizer <- ml_binarizer(sc, "x", "y", threshold = 0.5)
+  params <- list("x", "y", threshold = 0.5)
   expect_true(dplyr::setequal(binarizer$param_map, params))
 })
 
@@ -51,8 +51,7 @@ test_that("ml_binarizer.tbl_spark() works as expected", {
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
   expect_equal(
     df_tbl %>%
-      ml_binarizer(input_col = "feature", output_col = "binarized_feature",
-                   threshold = 0.5) %>%
+      ml_binarizer("feature", "binarized_feature", threshold = 0.5) %>%
       collect(),
     df %>%
       mutate(binarized_feature = c(0.0, 1.0, 0.0))

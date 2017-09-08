@@ -110,8 +110,8 @@ test_that("ml_fit() returns a ml_pipeline_model", {
 
 test_that("ml_[save/load]_model() work for ml_pipeline_model", {
   pipeline <- ml_pipeline(sc) %>%
-    ml_tokenizer(input_col = "text", output_col = "words") %>%
-    ml_hashing_tf(input_col = "words", output_col = "features") %>%
+    ml_tokenizer("text", "words") %>%
+    ml_hashing_tf("words", "features") %>%
     ml_logistic_regression(max_iter = 10, lambda = 0.001)
   model1 <- ml_fit(pipeline, training_tbl)
   path <- tempfile("model")
