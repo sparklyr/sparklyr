@@ -10,6 +10,5 @@ r_packages:
 script:
   - |
     R CMD build .
-    travis_wait 20 R CMD check --no-build-vignettes --no-manual sparklyr*tar.gz
-after_success:
-  - travis_wait 20 Rscript -e 'covr::codecov()'
+    R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
+    travis_wait 20 Rscript -e 'covr::codecov()'
