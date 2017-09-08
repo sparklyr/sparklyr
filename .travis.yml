@@ -7,5 +7,9 @@ jdk:
   - oraclejdk8
 r_packages:
   - covr
+script:
+  - |
+    R CMD build .
+    travis_wait 20 R CMD check --no-build-vignettes --no-manual sparklyr*tar.gz
 after_success:
   - Rscript -e 'covr::codecov()'
