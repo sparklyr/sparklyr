@@ -58,3 +58,11 @@ test_that("ml_binarizer.tbl_spark() works as expected", {
       mutate(binarized_feature = c(0.0, 1.0, 0.0))
   )
 })
+
+test_that("ml_binarizer() input checking", {
+  expect_identical(class(ml_binarizer(sc, "in", "out", 1L)$param_map$threshold),
+                   "numeric")
+  expect_error(ml_binarizer(sc, "in", "out", "foo"),
+               "length-one numeric vector")
+
+})

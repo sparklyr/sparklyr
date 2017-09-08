@@ -35,7 +35,8 @@ ml_binarizer <- function(x, input_col, output_col, threshold, uid = random_strin
 #' @export
 ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold,
                                           uid = random_string("binarizer_"), ...) {
-  threshold <- ensure_scalar_double(threshold)
+
+  ml_validate_args(rlang::caller_env())
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Binarizer",
                              input_col, output_col, uid) %>%
     invoke("setThreshold", threshold)
@@ -66,6 +67,8 @@ ml_hashing_tf <- function(x, input_col, output_col, binary = FALSE,
 #' @export
 ml_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FALSE,
                                            num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+
+  ml_validate_args(rlang::caller_env())
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.HashingTF",
                              input_col, output_col, uid)
 
