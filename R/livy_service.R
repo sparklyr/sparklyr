@@ -4,7 +4,7 @@
 #'
 #' @param version The version of \samp{livy} to use.
 #' @param spark_version The version of \samp{spark} to connect to.
-#' @param stdout,stderr where output to ‘stdout’ or ‘stderr’ with
+#' @param stdout,stderr where output to 'stdout' or 'stderr' with
 #'   same options as \code{system2}.
 #' @param ... Optional arguments; currently unused.
 #'
