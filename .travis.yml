@@ -7,10 +7,12 @@ jdk:
   - oraclejdk8
 r_packages:
   - covr
+env:
+  - SPARKLYR_LOG_FILE=/tmp/sparklyr.log
 script:
   - |
     R CMD build .
     R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
     travis_wait 20 Rscript -e 'covr::codecov()'
 after_failure:
-  - find /tmp/Rtmp* -name "*_spark.log" -exec cat {} \;
+  - cat /tmp/sparklyr.log
