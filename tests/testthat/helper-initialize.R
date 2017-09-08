@@ -7,7 +7,7 @@ testthat_spark_connection <- function(version = NULL) {
   }
 
   if (nrow(spark_installed_versions()) == 0) {
-    spark_install("2.1.0", logging = "WARN")
+    spark_install("2.1.0")
   }
 
   expect_gt(nrow(spark_installed_versions()), 0)
@@ -103,7 +103,7 @@ testthat_livy_connection <- function(version = NULL) {
   }
 
   if (nrow(spark_installed_versions()) == 0) {
-    spark_install("2.1.0", logging = "WARN")
+    spark_install("2.1.0")
   }
 
   if (nrow(livy_installed_versions()) == 0) {
