@@ -7,12 +7,9 @@ jdk:
   - oraclejdk8
 r_packages:
   - covr
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y gdb
 script:
   - |
     R CMD build .
     travis_wait 20 R CMD check --no-build-vignettes --no-manual sparklyr*tar.gz
 after_success:
-  - gdb -ex=r --args Rscript -e 'covr::codecov()'
+  - Rscript -e 'covr::codecov()'
