@@ -15,5 +15,5 @@ script:
     travis_wait 30 Rscript -e 'covr::codecov()'
 after_failure:
   - |
-    tail -c 1048576 /tmp/sparklyr.log
-    sleep 5
+    tail -n 500 /tmp/sparklyr.log
+    sleep 2
