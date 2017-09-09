@@ -42,7 +42,10 @@ spark_worker_apply <- function(sc) {
   worker_log("retrieved ", length(groups), " rows")
 
   closureRaw <- worker_invoke(context, "getClosure")
+  worker_log("retrieved closure")
+
   closure <- unserialize(closureRaw)
+  worker_log("unserialized closure")
 
   closureRLangRaw <- worker_invoke(context, "getClosureRLang")
   if (length(closureRLangRaw) > 0) {
