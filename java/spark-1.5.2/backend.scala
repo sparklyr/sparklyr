@@ -219,7 +219,7 @@ class Backend {
       }
     } catch {
       case e: java.net.SocketException =>
-        logger.log("is shutting down with expected SocketException")
+        logger.log("is shutting down with expected SocketException", e)
         if (!isService) System.exit(1)
       case e: IOException =>
         logger.logError("is shutting down from run() with exception ", e)

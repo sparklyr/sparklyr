@@ -15,6 +15,10 @@ class Logger(role: String, id: Int)  {
     System.out.println(getDate() + " INFO sparklyr: " + role + " (" + id + ") " + message)
   }
 
+  def log(message: String, e: Exception) = {
+    System.err.println(getDate() + " INFO sparklyr: " + role + " (" + id + ") " + message, e.toString)
+  }
+
   def logError(message: String) = {
     System.err.println(getDate() + " ERROR sparklyr: " + role + " (" + id + ") " + message)
   }
