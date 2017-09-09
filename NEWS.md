@@ -1,7 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
-- Added support for `SPARKLYR_LOG_FILE` and `SPARKINSTALL_LOG4J_FILE`
-  environment variable to specify a file as log output.
+- Added support for the `SPARKLYR_LOG_FILE` environment 
+  variable to specify the file used for log output.
   
 - Fixed regression for `union_all()` affecting Spark 1.6.X.
 

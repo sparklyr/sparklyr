@@ -42,10 +42,7 @@ spark_worker_apply <- function(sc) {
   worker_log("retrieved ", length(groups), " rows")
 
   closureRaw <- worker_invoke(context, "getClosure")
-  worker_log("retrieved closure")
-
   closure <- unserialize(closureRaw)
-  worker_log("unserialized closure")
 
   closureRLangRaw <- worker_invoke(context, "getClosureRLang")
   if (length(closureRLangRaw) > 0) {
@@ -58,18 +55,15 @@ spark_worker_apply <- function(sc) {
   }
 
   columnNames <- worker_invoke(context, "getColumns")
-  worker_log("retrieved ", length(columnNames), " column names")
 
   if (!grouped) groups <- list(list(groups))
 
   all_results <- NULL
 
-  worker_log("starting iteration over rows")
   for (group_entry in groups) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
 
-    worker_log("binding data to dataframe")
     df <- do.call(rbind.data.frame, data)
     result <- NULL
 
@@ -77,8 +71,6 @@ spark_worker_apply <- function(sc) {
       worker_log("found that source has no rows to be proceesed")
     }
     else {
-      worker_log("found that source has ", nrow(df), " rows to be proceesed")
-
       colnames(df) <- columnNames[1: length(colnames(df))]
 
       closure_params <- length(formals(closure))
