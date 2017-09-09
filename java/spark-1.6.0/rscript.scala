@@ -64,7 +64,7 @@ class Rscript(logger: Logger) {
     } else {
       logger.logError("failed to complete R process")
 
-      throw new Exception("sparklyr worker rscript failure with status" + status + ", check worker logs for details.")
+      throw new Exception("sparklyr worker rscript failure with status " + status + ", check worker logs for details.")
     }
   }
 }
