@@ -21,5 +21,5 @@ test_that("'find_scalac' can find scala version", {
 })
 
 test_that("'spark_default_compilation_spec' can create default specification", {
-  expect_gte(spark_default_compilation_spec(), 5)
+  expect_gte(length(spark_default_compilation_spec()), 5)
 })
