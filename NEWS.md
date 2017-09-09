@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for the `SPARKLYR_LOG_FILE` environment 
+  variable to specify the file used for log output.
+  
 - Fixed regression for `union_all()` affecting Spark 1.6.X.
 
 - Added support for `na.omit.cache` option that when set to

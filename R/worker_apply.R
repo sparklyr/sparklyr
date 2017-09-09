@@ -143,7 +143,7 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path) {
   if (length(dir(extractPath)) == 0) {
     worker_log("found that the unbundle path is empty, extracting:", extractPath)
 
-    writeLines(lockFile)
+    writeLines("", lockFile)
     system2("tar", c("-xf", bundle_path, "-C", extractPath))
     unlink(lockFile)
   }

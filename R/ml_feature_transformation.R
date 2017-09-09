@@ -449,10 +449,10 @@ ft_stop_words_remover <- function(x,
                                   output.col,
                                   ...)
 {
-  sparklyr:::ml_backwards_compatibility_api()
+  ml_backwards_compatibility_api()
   class <- "org.apache.spark.ml.feature.StopWordsRemover"
-  sparklyr:::invoke_simple_transformer(x, class, list(
-    setInputCol  = sparklyr:::ensure_scalar_character(input.col),
-    setOutputCol = sparklyr:::ensure_scalar_character(output.col)
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col)
   ))
 }

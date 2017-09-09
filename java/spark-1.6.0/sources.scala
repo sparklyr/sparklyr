@@ -1063,7 +1063,7 @@ object Sources {
     "  if (length(dir(extractPath)) == 0) {\n" +
     "    worker_log(\"found that the unbundle path is empty, extracting:\", extractPath)\n" +
     "\n" +
-    "    writeLines(lockFile)\n" +
+    "    writeLines(\"\", lockFile)\n" +
     "    system2(\"tar\", c(\"-xf\", bundle_path, \"-C\", extractPath))\n" +
     "    unlink(lockFile)\n" +
     "  }\n" +

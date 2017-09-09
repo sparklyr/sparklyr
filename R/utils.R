@@ -8,7 +8,7 @@ get_java <- function(throws = FALSE) {
     java <- file.path(java_home, "bin", "java")
     if (identical(.Platform$OS.type, "windows")) {
       java <- paste0(java, ".exe")
-    }     
+    }
     if (!file.exists(java)) {
       if (throws) {
         stop("Java is required to connect to Spark. ",
@@ -46,13 +46,27 @@ validate_java_version <- function(master, spark_home) {
     stop("Java version not detected. Please download and install Java from ",
          java_install_url())
 
+  # find line with version info
+  versionLine <- version[grepl("version", version)]
+  if (length(versionLine) != 1)
+    stop("Java version detected but couldn't parse version from ", paste(version, collapse = " - "))
+
   # transform to usable R version string
-  splat <- strsplit(version[[1]], "\\s+", perl = TRUE)[[1]]
+  splat <- strsplit(versionLine, "\\s+", perl = TRUE)[[1]]
+
+  splatVersion <- splat[grepl("[0-9]+\\.[0-9]+\\.[0-9]+", splat)]
+  if (length(splatVersion) != 1)
+    stop("Java version detected but couldn't parse version from: ", versionLine)
+
   parsedVersion <- regex_replace(
-    splat[[length(splat)]],
+    splatVersion,
     "^\"|\"$" = "",
-    "_" = "."
+    "_" = ".",
+    "[^0-9.]+" = ""
   )
+
+  if (!is.character(parsedVersion) || nchar(parsedVersion) < 1)
+    stop("Java version detected but couldn't parse version from: ", versionLine)
 
   # ensure Java 1.7 or higher
   if (compareVersion(parsedVersion, "1.7") < 0)
@@ -66,7 +80,7 @@ java_install_url <- function() {
   "https://www.java.com/en/"
 }
 
-starts_with <- function(lhs, rhs) {
+utils_starts_with <- function(lhs, rhs) {
   if (nchar(lhs) < nchar(rhs))
     return(FALSE)
   identical(substring(lhs, 1, nchar(rhs)), rhs)
@@ -74,7 +88,7 @@ starts_with <- function(lhs, rhs) {
 
 aliased_path <- function(path) {
   home <- path.expand("~/")
-  if (starts_with(path, home))
+  if (utils_starts_with(path, home))
     path <- file.path("~", substring(path, nchar(home) + 1))
   path
 }
