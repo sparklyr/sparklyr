@@ -286,9 +286,14 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
 #' See \code{find_scalac} for a list of paths searched and used by
 #' this function to install the required compilers.
 #'
+#' @param dest_path The destination path where scalac will be
+#'   downloaded to.
+#'
 #' @export
-download_scalac <- function() {
-  dest_path <- scalac_default_locations()[[1]]
+download_scalac <- function(dest_path = NULL) {
+  if (is.null(dest_path)) {
+    dest_path <- scalac_default_locations()[[1]]
+  }
 
   if (!dir.exists(dest_path)) {
     dir.create(dest_path, recursive = TRUE)

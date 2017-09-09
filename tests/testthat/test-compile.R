@@ -1,23 +1,25 @@
 context("compile")
 
-scalac_is_available <- function(version) {
+scalac_is_available <- function(version, download_path) {
   tryCatch({
-    find_scalac(version)
+    find_scalac(version, download_path)
     TRUE
   }, error = function(e) FALSE)
 }
 
-ensure_download_scalac <- function() {
-  if (!scalac_is_available("2.10") || !scalac_is_available("2.11")) {
-    download_scalac()
+ensure_download_scalac <- function(download_path) {
+  if (!scalac_is_available("2.10", download_path) || !scalac_is_available("2.11", download_path)) {
+    download_scalac(download_path)
   }
 }
 
 test_that("'find_scalac' can find scala version", {
-  ensure_download_scalac()
+  download_path <- tempdir()
 
-  expect_true(scalac_is_available("2.10"))
-  expect_true(scalac_is_available("2.11"))
+  ensure_download_scalac(download_path)
+
+  expect_true(scalac_is_available("2.10", download_path))
+  expect_true(scalac_is_available("2.11", download_path))
 })
 
 test_that("'spark_default_compilation_spec' can create default specification", {
