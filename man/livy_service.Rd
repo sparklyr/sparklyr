@@ -15,8 +15,8 @@ livy_service_stop()
 
 \item{spark_version}{The version of \samp{spark} to connect to.}
 
-\item{stdout, stderr}{where output to 'stdout' or 'stderr' with
-same options as \code{system2}.}
+\item{stdout, stderr}{where output to 'stdout' or 'stderr' should
+be sent. Same options as \code{system2}.}
 
 \item{...}{Optional arguments; currently unused.}
 }
