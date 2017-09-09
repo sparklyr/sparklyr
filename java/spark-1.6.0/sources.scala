@@ -962,7 +962,10 @@ object Sources {
     "  worker_log(\"retrieved \", length(groups), \" rows\")\n" +
     "\n" +
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
+    "  worker_log(\"retrieved closure\")\n" +
+    "\n" +
     "  closure <- unserialize(closureRaw)\n" +
+    "  worker_log(\"unserialized closure\")\n" +
     "\n" +
     "  closureRLangRaw <- worker_invoke(context, \"getClosureRLang\")\n" +
     "  if (length(closureRLangRaw) > 0) {\n" +
@@ -975,15 +978,18 @@ object Sources {
     "  }\n" +
     "\n" +
     "  columnNames <- worker_invoke(context, \"getColumns\")\n" +
+    "  worker_log(\"retrieved \", length(columnNames), \" column names\")\n" +
     "\n" +
     "  if (!grouped) groups <- list(list(groups))\n" +
     "\n" +
     "  all_results <- NULL\n" +
     "\n" +
+    "  worker_log(\"starting iteration over rows\")\n" +
     "  for (group_entry in groups) {\n" +
     "    # serialized groups are wrapped over single lists\n" +
     "    data <- group_entry[[1]]\n" +
     "\n" +
+    "    worker_log(\"binding data to dataframe\")\n" +
     "    df <- do.call(rbind.data.frame, data)\n" +
     "    result <- NULL\n" +
     "\n" +
@@ -991,6 +997,8 @@ object Sources {
     "      worker_log(\"found that source has no rows to be proceesed\")\n" +
     "    }\n" +
     "    else {\n" +
+    "      worker_log(\"found that source has \", nrow(df), \" rows to be proceesed\")\n" +
+    "\n" +
     "      colnames(df) <- columnNames[1: length(colnames(df))]\n" +
     "\n" +
     "      closure_params <- length(formals(closure))\n" +
@@ -1063,7 +1071,7 @@ object Sources {
     "  if (length(dir(extractPath)) == 0) {\n" +
     "    worker_log(\"found that the unbundle path is empty, extracting:\", extractPath)\n" +
     "\n" +
-    "    writeLines(lockFile)\n" +
+    "    writeLines(\"\", lockFile)\n" +
     "    system2(\"tar\", c(\"-xf\", bundle_path, \"-C\", extractPath))\n" +
     "    unlink(lockFile)\n" +
     "  }\n" +
