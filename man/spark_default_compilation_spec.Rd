@@ -4,10 +4,15 @@
 \alias{spark_default_compilation_spec}
 \title{Default Compilation Specification for Spark Extensions}
 \usage{
-spark_default_compilation_spec(pkg = infer_active_package_name())
+spark_default_compilation_spec(pkg = infer_active_package_name(),
+  locations = NULL)
 }
 \arguments{
 \item{pkg}{The package containing Spark extensions to be compiled.}
+
+\item{locations}{Additional locations to scan. By default, the
+directories \code{/opt/scala} and \code{/usr/local/scala} will
+be scanned.}
 }
 \description{
 This is the default compilation specification used for

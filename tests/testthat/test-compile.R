@@ -13,15 +13,16 @@ ensure_download_scalac <- function(download_path) {
   }
 }
 
+scalac_download_path <- tempdir()
+
 test_that("'find_scalac' can find scala version", {
-  download_path <- tempdir()
+  ensure_download_scalac(scalac_download_path)
 
-  ensure_download_scalac(download_path)
-
-  expect_true(scalac_is_available("2.10", download_path))
-  expect_true(scalac_is_available("2.11", download_path))
+  expect_true(scalac_is_available("2.10", scalac_download_path))
+  expect_true(scalac_is_available("2.11", scalac_download_path))
 })
 
 test_that("'spark_default_compilation_spec' can create default specification", {
-  expect_gte(length(spark_default_compilation_spec()), 5)
+  spec <- spark_default_compilation_spec(locations = scalac_download_path)
+  expect_gte(length(spec), 5)
 })
