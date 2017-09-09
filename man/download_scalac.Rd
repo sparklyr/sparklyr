@@ -4,7 +4,11 @@
 \alias{download_scalac}
 \title{Downloads default Scala Compilers}
 \usage{
-download_scalac()
+download_scalac(dest_path = NULL)
+}
+\arguments{
+\item{dest_path}{The destination path where scalac will be
+downloaded to.}
 }
 \description{
 \code{compile_package_jars} requires several versions of the

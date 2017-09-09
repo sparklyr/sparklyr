@@ -234,41 +234,46 @@ find_jar <- function() {
 #' Spark extensions, when used with \code{\link{compile_package_jars}}.
 #'
 #' @param pkg The package containing Spark extensions to be compiled.
+#' @param locations Additional locations to scan. By default, the
+#'   directories \code{/opt/scala} and \code{/usr/local/scala} will
+#'   be scanned.
 #'
 #' @export
-spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
+spark_default_compilation_spec <- function(
+  pkg = infer_active_package_name(),
+  locations = NULL) {
   list(
     spark_compilation_spec(
       spark_version = "1.5.2",
-      scalac_path = find_scalac("2.10"),
+      scalac_path = find_scalac("2.10", locations),
       jar_name = sprintf("%s-1.5-2.10.jar", pkg),
       jar_path = find_jar(),
       scala_filter = make_version_filter("1.5.2")
     ),
     spark_compilation_spec(
       spark_version = "1.6.1",
-      scalac_path = find_scalac("2.10"),
+      scalac_path = find_scalac("2.10", locations),
       jar_name = sprintf("%s-1.6-2.10.jar", pkg),
       jar_path = find_jar(),
       scala_filter = make_version_filter("1.6.1")
     ),
     spark_compilation_spec(
       spark_version = "2.0.0",
-      scalac_path = find_scalac("2.11"),
+      scalac_path = find_scalac("2.11", locations),
       jar_name = sprintf("%s-2.0-2.11.jar", pkg),
       jar_path = find_jar(),
       scala_filter = make_version_filter("2.0.0")
     ),
     spark_compilation_spec(
       spark_version = "2.1.0",
-      scalac_path = find_scalac("2.11"),
+      scalac_path = find_scalac("2.11", locations),
       jar_name = sprintf("%s-2.1-2.11.jar", pkg),
       jar_path = find_jar(),
       scala_filter = make_version_filter("2.1.0")
     ),
     spark_compilation_spec(
       spark_version = "2.2.0",
-      scalac_path = find_scalac("2.11"),
+      scalac_path = find_scalac("2.11", locations),
       jar_name = sprintf("%s-2.2-2.11.jar", pkg),
       jar_path = find_jar(),
       scala_filter = make_version_filter("2.2.0")
@@ -286,9 +291,14 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name()) {
 #' See \code{find_scalac} for a list of paths searched and used by
 #' this function to install the required compilers.
 #'
+#' @param dest_path The destination path where scalac will be
+#'   downloaded to.
+#'
 #' @export
-download_scalac <- function() {
-  dest_path <- scalac_default_locations()[[1]]
+download_scalac <- function(dest_path = NULL) {
+  if (is.null(dest_path)) {
+    dest_path <- scalac_default_locations()[[1]]
+  }
 
   if (!dir.exists(dest_path)) {
     dir.create(dest_path, recursive = TRUE)

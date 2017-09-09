@@ -1,3 +1,4 @@
+# nocov start
 
 is_win64 <- function() {
   Sys.getenv("PROCESSOR_ARCHITECTURE") == "AMD64" ||
@@ -178,6 +179,4 @@ stop_with_winutils_error <- function(hadoopBinPath) {
     call. = FALSE
   )
 }
-
-
-
+# nocov end
