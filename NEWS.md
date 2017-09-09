@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed regression for `union_all()` affecting Spark 1.6.X.
+
 - Added support for `na.omit.cache` option that when set to
   `FALSE` will prevent `na.omit` from caching results when
   rows are dropped.
