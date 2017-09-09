@@ -2,6 +2,8 @@
 
 - Added support for `SPARKLYR_LOG_FILE` and `SPARKINSTALL_LOG4J_FILE`
   environment variable to specify a file as log output.
+  
+- Fixed regression for `union_all()` affecting Spark 1.6.X.
 
 - Added support for `na.omit.cache` option that when set to
   `FALSE` will prevent `na.omit` from caching results when
