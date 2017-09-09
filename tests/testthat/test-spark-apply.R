@@ -106,6 +106,6 @@ test_that("'spark_apply' works over empty partitions", {
       spark_apply(function(e) e) %>%
       collect() %>%
       as.data.frame(),
-    data.frame(id = seq_len(10))
+    data.frame(id = seq_len(2))
   )
 })
