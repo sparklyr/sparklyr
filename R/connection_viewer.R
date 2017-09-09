@@ -1,3 +1,5 @@
+# nocov start
+
 # connection-specific actions possible with Spark connections
 spark_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
@@ -206,3 +208,5 @@ to_host_display <- function(sc) {
 to_host <- function(sc) {
   paste0(to_host_display(sc), " - ", sc$app_name)
 }
+
+# nocov end
