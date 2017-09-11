@@ -48,7 +48,7 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
       <a href="../articles/guides-extensions.html">Extensions</a>
@@ -57,7 +57,7 @@
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
     </li>
   </ul>
 </li>
@@ -93,7 +93,7 @@
       <a href="../reference/index.html">Functions</a>
     </li>
     <li>
-      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf">Cheatsheet</a>
+      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr-cheatsheet.pdf">Cheatsheet</a>
     </li>
     <li>
       <a href="../articles/reference-media.html">Media</a>
@@ -106,7 +106,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -189,14 +189,14 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <h3 class="hasAnchor">
 <a href="#lazy-transform" class="anchor"></a>Lazy Transform</h3>
 <p>The following <strong>dplyr</strong> script will not be immediately run, so the code is processed quickly. There are some check-ups made, but for the most part it is building a Spark SQL statement in the background.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">flights_table &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc,<span class="st">"flights_spark_2008"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">DepDelay =</span> <span class="kw">as.numeric</span>(DepDelay),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">flights_table &lt;-<span class="st"> </span><span class="kw">tbl</span>(sc,<span class="st">"flights_spark_2008"</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">DepDelay =</span> <span class="kw">as.numeric</span>(DepDelay),
          <span class="dt">ArrDelay =</span> <span class="kw">as.numeric</span>(ArrDelay),
          DepDelay <span class="op">&gt;</span><span class="st"> </span><span class="dv">15</span> , DepDelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">240</span>,
          ArrDelay <span class="op">&gt;</span><span class="st"> </span><span class="op">-</span><span class="dv">60</span> , ArrDelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">360</span>, 
          <span class="dt">Gain =</span> DepDelay <span class="op">-</span><span class="st"> </span>ArrDelay) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(ArrDelay <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(Origin, Dest, UniqueCarrier, Distance, DepDelay, ArrDelay, Gain)</code></pre></div>
+<span class="st">  </span><span class="kw">filter</span>(ArrDelay <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(Origin, Dest, UniqueCarrier, Distance, DepDelay, ArrDelay, Gain)</code></pre></div>
 </div>
 <div id="register-in-spark" class="section level3">
 <h3 class="hasAnchor">
@@ -234,17 +234,17 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <h3 class="hasAnchor">
 <a href="#union-and-transform" class="anchor"></a>Union and Transform</h3>
 <p>The <strong>union</strong> command is akin to the <strong>bind_rows</strong> dyplyr command. It will allow us to append the 2007 file to the 2008 file, and as with the previous transform, this script will be evaluated lazily.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">all_flights &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc, <span class="st">"flights_spark_2008"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/setops.html">union</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc, <span class="st">"flights_spark_2007"</span>)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(Year, Month) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tally.html">tally</a></span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">all_flights &lt;-<span class="st"> </span><span class="kw">tbl</span>(sc, <span class="st">"flights_spark_2008"</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">union</span>(<span class="kw">tbl</span>(sc, <span class="st">"flights_spark_2007"</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(Year, Month) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">tally</span>()</code></pre></div>
 </div>
 <div id="collect-into-r" class="section level3">
 <h3 class="hasAnchor">
 <a href="#collect-into-r" class="anchor"></a>Collect into R</h3>
 <p>When receiving a <strong>collect</strong> command, Spark will execute the SQL statement and send the results back to R in a data frame. In this case, R only loads 24 observations into a data frame called <em>all_flights</em>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">all_flights &lt;-<span class="st"> </span>all_flights <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/compute.html">collect</a></span>()</code></pre></div>
+<span class="st">  </span><span class="kw">collect</span>()</code></pre></div>
 <center>
 <a href="images/deployment/performance/all-flights.png"> <img src="images/deployment/performance/all-flights.png" width="400px"></a>
 </center>
@@ -253,13 +253,13 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <h3 class="hasAnchor">
 <a href="#plot-in-r" class="anchor"></a>Plot in R</h3>
 <p>Now the smaller data set can be plotted</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(<span class="dt">data =</span> all_flights, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x =</span> Month, <span class="dt">y =</span> n<span class="op">/</span><span class="dv">1000</span>, <span class="dt">fill =</span> <span class="kw">factor</span>(Year))) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_area</a></span>(<span class="dt">position =</span> <span class="st">"dodge"</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(alph <span class="dt">a =</span> <span class="fl">0.4</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_brewer">scale_fill_brewer</a></span>(<span class="dt">palette =</span> <span class="st">"Dark2"</span>, <span class="dt">name =</span> <span class="st">"Year"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_x_continuous</a></span>(<span class="dt">breaks =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">"J"</span>,<span class="st">"F"</span>,<span class="st">"M"</span>,<span class="st">"A"</span>,<span class="st">"M"</span>,<span class="st">"J"</span>,<span class="st">"J"</span>,<span class="st">"A"</span>,<span class="st">"S"</span>,<span class="st">"O"</span>,<span class="st">"N"</span>,<span class="st">"D"</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_light</a></span>() <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">y=</span><span class="st">"Number of Flights (Thousands)"</span>, <span class="dt">title =</span> <span class="st">"Number of Flights Year-Over-Year"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> all_flights, <span class="kw">aes</span>(<span class="dt">x =</span> Month, <span class="dt">y =</span> n<span class="op">/</span><span class="dv">1000</span>, <span class="dt">fill =</span> <span class="kw">factor</span>(Year))) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_area</span>(<span class="dt">position =</span> <span class="st">"dodge"</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">alpha =</span> <span class="fl">0.4</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_fill_brewer</span>(<span class="dt">palette =</span> <span class="st">"Dark2"</span>, <span class="dt">name =</span> <span class="st">"Year"</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">"J"</span>,<span class="st">"F"</span>,<span class="st">"M"</span>,<span class="st">"A"</span>,<span class="st">"M"</span>,<span class="st">"J"</span>,<span class="st">"J"</span>,<span class="st">"A"</span>,<span class="st">"S"</span>,<span class="st">"O"</span>,<span class="st">"N"</span>,<span class="st">"D"</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_light</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">"Number of Flights (Thousands)"</span>, <span class="dt">title =</span> <span class="st">"Number of Flights Year-Over-Year"</span>)</code></pre></div>
 <center>
 <a href="images/deployment/performance/new-plot.png"> <img src="images/deployment/performance/new-plot.png" width="600"></a>
 </center>

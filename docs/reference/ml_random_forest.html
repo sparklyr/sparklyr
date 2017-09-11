@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Spark ML -- Random Forests — ml_random_forest • sparklyr</title>
+<title>Spark ML -- Random Forests � ml_random_forest • sparklyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -71,7 +71,7 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
       <a href="../articles/guides-extensions.html">Extensions</a>
@@ -80,7 +80,7 @@
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
     </li>
   </ul>
 </li>
@@ -116,7 +116,7 @@
       <a href="../reference/index.html">Functions</a>
     </li>
     <li>
-      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf">Cheatsheet</a>
+      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr-cheatsheet.pdf">Cheatsheet</a>
     </li>
     <li>
       <a href="../articles/reference-media.html">Media</a>
@@ -130,7 +130,7 @@
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -153,9 +153,11 @@
     <p>Perform regression or classification using random forests with a Spark DataFrame.</p>
     
 
-    <pre class="usage"><span class='fu'>ml_random_forest</span>(<span class='no'>x</span>, <span class='no'>response</span>, <span class='no'>features</span>, <span class='kw'>max.bins</span> <span class='kw'>=</span> <span class='fl'>32L</span>, <span class='kw'>max.depth</span> <span class='kw'>=</span> <span class='fl'>5L</span>,
-  <span class='kw'>num.trees</span> <span class='kw'>=</span> <span class='fl'>20L</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"regression"</span>, <span class='st'>"classification"</span>),
-  <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options.html'>ml_options</a></span>(), <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>ml_random_forest</span>(<span class='no'>x</span>, <span class='no'>response</span>, <span class='no'>features</span>, <span class='kw'>col.sample.rate</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>impurity</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"gini"</span>, <span class='st'>"entropy"</span>, <span class='st'>"variance"</span>), <span class='kw'>max.bins</span> <span class='kw'>=</span> <span class='fl'>32L</span>,
+  <span class='kw'>max.depth</span> <span class='kw'>=</span> <span class='fl'>5L</span>, <span class='kw'>min.info.gain</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>min.rows</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>num.trees</span> <span class='kw'>=</span> <span class='fl'>20L</span>,
+  <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"regression"</span>,
+  <span class='st'>"classification"</span>), <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options.html'>ml_options</a></span>(), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -180,6 +182,19 @@ The intercept term can be omitted by using <code>- 1</code> in the model fit.</p
       <td><p>The name of features (terms) to use for the model fit.</p></td>
     </tr>
     <tr>
+      <th>col.sample.rate</th>
+      <td><p>The sampling rate of features to consider for splits at each tree node.
+Defaults to 1/3 for regression and sqrt(k)/k for classification where k is number of features.
+For Spark versions prior to 2.0.0, arbitrary sampling rates are not supported, so the input is
+automatically mapped to one of "onethird", "sqrt", or "log2".</p></td>
+    </tr>
+    <tr>
+      <th>impurity</th>
+      <td><p>Criterion used for information gain calculation
+One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to
+'gini' for classification and 'variance' for regression.</p></td>
+    </tr>
+    <tr>
       <th>max.bins</th>
       <td><p>The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at
@@ -191,8 +206,28 @@ each node. More bins give higher granularity.</p></td>
 number of nodes separating any leaves from the root of the tree.</p></td>
     </tr>
     <tr>
+      <th>min.info.gain</th>
+      <td><p>Minimum information gain for a split to be considered at a tree node. Should be &gt;= 0, defaults to 0.</p></td>
+    </tr>
+    <tr>
+      <th>min.rows</th>
+      <td><p>Minimum number of instances each child must have after split.</p></td>
+    </tr>
+    <tr>
       <th>num.trees</th>
       <td><p>Number of trees to train (&gt;= 1).</p></td>
+    </tr>
+    <tr>
+      <th>thresholds</th>
+      <td><p>Thresholds in multi-class classification to adjust
+the probability of predicting each class. Vector must have length equal
+to the number of classes, with values &gt; 0 excepting that at most one
+value may be 0. The class with largest value p/t is predicted, where p
+is the original probability of that class and t is the class's threshold.</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p>Seed for random numbers.</p></td>
     </tr>
     <tr>
       <th>type</th>

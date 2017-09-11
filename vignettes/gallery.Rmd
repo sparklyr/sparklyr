@@ -60,6 +60,14 @@ thumbnail("Analyzing a billion NYC taxi trips in Spark", "images/examples/h2o.pn
 ```
 
 
+###Text mining with Spark & sparklyr
+
+```{r, echo=FALSE}
+div(class = "col-sm-6","This article focuses on a set of functions that can be used for text mining with Spark and sparklyr. The main goal is to illustrate how to perform most of the data preparation and analysis with commands that will run inside the Spark cluster, as opposed to locally in R. Because of that, the amount of data used will be small.")
+thumbnail("Text mining with Spark & sparklyr", "guides-textmining_files/figure-html/unnamed-chunk-14-1.png", "guides-textmining.html")
+```
+
+
 ###Total US births
 
 ```{r, echo=FALSE}

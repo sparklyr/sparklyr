@@ -16,14 +16,14 @@ navbar:
           href: articles/guides-dplyr.html
         - text: "mllib"
           href: articles/guides-mllib.html
-        - text: "H2O"
-          href: articles/guides-h2o.html
+        - text: "Distributed R"
+          href: articles/guides-distributed-r.html
         - text: "Extensions"
           href: articles/guides-extensions.html
         - text: "Caching"
           href: articles/guides-caching.html
-        - text: "Distributed R"
-          href: articles/guides-distributed-r.html
+        - text: "H2O"
+          href: articles/guides-h2o.html
     - text: "Deployment"
       menu:
         - text: "Overview"
@@ -39,7 +39,7 @@ navbar:
         - text: "Functions"
           href: reference/index.html
         - text: "Cheatsheet"
-          href: https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf
+          href: https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr-cheatsheet.pdf
         - text: "Media"
           href: articles/reference-media.html
         - text: "News"

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Options for Spark ML Routines — ml_options • sparklyr</title>
+<title>Options for Spark ML Routines � ml_options • sparklyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -71,7 +71,7 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
       <a href="../articles/guides-extensions.html">Extensions</a>
@@ -80,7 +80,7 @@
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
     </li>
   </ul>
 </li>
@@ -116,7 +116,7 @@
       <a href="../reference/index.html">Functions</a>
     </li>
     <li>
-      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf">Cheatsheet</a>
+      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr-cheatsheet.pdf">Cheatsheet</a>
     </li>
     <li>
       <a href="../articles/reference-media.html">Media</a>
@@ -130,7 +130,7 @@
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -156,7 +156,8 @@ facets of the model outputs produced.</p>
 
     <pre class="usage"><span class='fu'>ml_options</span>(<span class='kw'>id.column</span> <span class='kw'>=</span> <span class='fu'>random_string</span>(<span class='st'>"id"</span>),
   <span class='kw'>response.column</span> <span class='kw'>=</span> <span class='fu'>random_string</span>(<span class='st'>"response"</span>),
-  <span class='kw'>features.column</span> <span class='kw'>=</span> <span class='fu'>random_string</span>(<span class='st'>"features"</span>), <span class='kw'>model.transform</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features.column</span> <span class='kw'>=</span> <span class='fu'>random_string</span>(<span class='st'>"features"</span>),
+  <span class='kw'>output.column</span> <span class='kw'>=</span> <span class='fu'>random_string</span>(<span class='st'>"output"</span>), <span class='kw'>model.transform</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>only.model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>na.action</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"na.action"</span>, <span class='st'>"na.omit"</span>), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
@@ -173,6 +174,10 @@ facets of the model outputs produced.</p>
     <tr>
       <th>features.column</th>
       <td><p>The name to assign to the generated features column.</p></td>
+    </tr>
+    <tr>
+      <th>output.column</th>
+      <td><p>The name to assign to the generated output column.</p></td>
     </tr>
     <tr>
       <th>model.transform</th>

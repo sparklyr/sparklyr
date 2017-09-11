@@ -48,7 +48,7 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
       <a href="../articles/guides-extensions.html">Extensions</a>
@@ -57,7 +57,7 @@
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
     </li>
   </ul>
 </li>
@@ -93,7 +93,7 @@
       <a href="../reference/index.html">Functions</a>
     </li>
     <li>
-      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf">Cheatsheet</a>
+      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr-cheatsheet.pdf">Cheatsheet</a>
     </li>
     <li>
       <a href="../articles/reference-media.html">Media</a>
@@ -106,7 +106,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -403,15 +403,15 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-co
 <p>Use <code>tbl_cache</code> to load the flights table into memory. Caching tables will make analysis much faster. Create a dplyr reference to the Spark DataFrame.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Cache flights Hive table into Spark</span>
 <span class="kw"><a href="../reference/tbl_cache.html">tbl_cache</a></span>(sc, <span class="st">'flights'</span>)
-flights_tbl &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc, <span class="st">'flights'</span>)
+flights_tbl &lt;-<span class="st"> </span><span class="kw">tbl</span>(sc, <span class="st">'flights'</span>)
 
 <span class="co"># Cache airlines Hive table into Spark</span>
 <span class="kw"><a href="../reference/tbl_cache.html">tbl_cache</a></span>(sc, <span class="st">'airlines'</span>)
-airlines_tbl &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc, <span class="st">'airlines'</span>)
+airlines_tbl &lt;-<span class="st"> </span><span class="kw">tbl</span>(sc, <span class="st">'airlines'</span>)
 
 <span class="co"># Cache airports Hive table into Spark</span>
 <span class="kw"><a href="../reference/tbl_cache.html">tbl_cache</a></span>(sc, <span class="st">'airports'</span>)
-airports_tbl &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc, <span class="st">'airports'</span>)</code></pre></div>
+airports_tbl &lt;-<span class="st"> </span><span class="kw">tbl</span>(sc, <span class="st">'airports'</span>)</code></pre></div>
 </div>
 <div id="create-a-model-data-set" class="section level2">
 <h2 class="hasAnchor">
@@ -419,21 +419,21 @@ airports_tbl &lt;-<span class="st"> </span><span class="kw"><a href="http://dply
 <p>Filter the data to contain only the records to be used in the fitted model. Join carrier descriptions for reference. Create a new variable called <code>gain</code> which represents the amount of time gained (or lost) in flight.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Filter records and create target variable 'gain'</span>
 model_data &lt;-<span class="st"> </span>flights_tbl <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="op">!</span><span class="kw">is.na</span>(arrdelay) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(depdelay) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(distance)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(depdelay <span class="op">&gt;</span><span class="st"> </span><span class="dv">15</span> <span class="op">&amp;</span><span class="st"> </span>depdelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">240</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(arrdelay <span class="op">&gt;</span><span class="st"> </span><span class="op">-</span><span class="dv">60</span> <span class="op">&amp;</span><span class="st"> </span>arrdelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">360</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(year <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2003</span> <span class="op">&amp;</span><span class="st"> </span>year <span class="op">&lt;=</span><span class="st"> </span><span class="dv">2007</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(airlines_tbl, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">"uniquecarrier"</span> =<span class="st"> "code"</span>)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">gain =</span> depdelay <span class="op">-</span><span class="st"> </span>arrdelay) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(year, month, arrdelay, depdelay, distance, uniquecarrier, description, gain)
+<span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(arrdelay) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(depdelay) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(distance)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(depdelay <span class="op">&gt;</span><span class="st"> </span><span class="dv">15</span> <span class="op">&amp;</span><span class="st"> </span>depdelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">240</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(arrdelay <span class="op">&gt;</span><span class="st"> </span><span class="op">-</span><span class="dv">60</span> <span class="op">&amp;</span><span class="st"> </span>arrdelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">360</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(year <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2003</span> <span class="op">&amp;</span><span class="st"> </span>year <span class="op">&lt;=</span><span class="st"> </span><span class="dv">2007</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">left_join</span>(airlines_tbl, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">"uniquecarrier"</span> =<span class="st"> "code"</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gain =</span> depdelay <span class="op">-</span><span class="st"> </span>arrdelay) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(year, month, arrdelay, depdelay, distance, uniquecarrier, description, gain)
 
 <span class="co"># Summarize data by carrier</span>
 model_data <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(uniquecarrier) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span>(<span class="dt">description =</span> <span class="kw">min</span>(description), <span class="dt">gain=</span><span class="kw">mean</span>(gain), 
+<span class="st">  </span><span class="kw">group_by</span>(uniquecarrier) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">description =</span> <span class="kw">min</span>(description), <span class="dt">gain=</span><span class="kw">mean</span>(gain), 
             <span class="dt">distance=</span><span class="kw">mean</span>(distance), <span class="dt">depdelay=</span><span class="kw">mean</span>(depdelay)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(description, gain, distance, depdelay) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(gain)</code></pre></div>
+<span class="st">  </span><span class="kw">select</span>(description, gain, distance, depdelay) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">arrange</span>(gain)</code></pre></div>
 <pre><code>Source:   query [?? x 4]
 Database: spark connection master=yarn-client app=sparklyr local=FALSE
 
@@ -509,11 +509,11 @@ Root Mean Squared Error: 17.74</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate average gains by predicted decile</span>
 model_deciles &lt;-<span class="st"> </span><span class="kw">lapply</span>(model_partition, <span class="cf">function</span>(x) {
   <span class="kw"><a href="../reference/sdf_predict.html">sdf_predict</a></span>(ml1, x) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">decile =</span> <span class="kw"><a href="http://dplyr.tidyverse.org/reference/ranking.html">ntile</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/desc.html">desc</a></span>(prediction), <span class="dv">10</span>)) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(decile) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span>(<span class="dt">gain =</span> <span class="kw">mean</span>(gain)) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(decile, gain) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/compute.html">collect</a></span>()
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">decile =</span> <span class="kw">ntile</span>(<span class="kw">desc</span>(prediction), <span class="dv">10</span>)) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>(decile) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarize</span>(<span class="dt">gain =</span> <span class="kw">mean</span>(gain)) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">select</span>(decile, gain) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">collect</span>()
 })
 
 <span class="co"># Create a summary dataset for plotting</span>
@@ -525,9 +525,9 @@ deciles &lt;-<span class="st"> </span><span class="kw">rbind</span>(
 
 <span class="co"># Plot average gains by predicted decile</span>
 deciles <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="kw">factor</span>(decile), gain, <span class="dt">fill =</span> data)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_bar">geom_bar</a></span>(<span class="dt">stat =</span> <span class="st">'identity'</span>, <span class="dt">position =</span> <span class="st">'dodge'</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title =</span> <span class="st">'Average gain by predicted decile'</span>, <span class="dt">x =</span> <span class="st">'Decile'</span>, <span class="dt">y =</span> <span class="st">'Minutes'</span>)</code></pre></div>
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="kw">factor</span>(decile), gain, <span class="dt">fill =</span> data)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">'identity'</span>, <span class="dt">position =</span> <span class="st">'dodge'</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">'Average gain by predicted decile'</span>, <span class="dt">x =</span> <span class="st">'Decile'</span>, <span class="dt">y =</span> <span class="st">'Minutes'</span>)</code></pre></div>
 <p>
 <img src="images/deployment/amazon-emr/performance-1.png" width="600/"></p>
 </div>
@@ -537,27 +537,27 @@ deciles <span class="op">%&gt;%</span>
 <p>Compare actual gains to predicted gains for an out of time sample.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Select data from an out of time sample</span>
 data_<span class="dv">2008</span> &lt;-<span class="st"> </span>flights_tbl <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="op">!</span><span class="kw">is.na</span>(arrdelay) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(depdelay) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(distance)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(depdelay <span class="op">&gt;</span><span class="st"> </span><span class="dv">15</span> <span class="op">&amp;</span><span class="st"> </span>depdelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">240</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(arrdelay <span class="op">&gt;</span><span class="st"> </span><span class="op">-</span><span class="dv">60</span> <span class="op">&amp;</span><span class="st"> </span>arrdelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">360</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(year <span class="op">==</span><span class="st"> </span><span class="dv">2008</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(airlines_tbl, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">"uniquecarrier"</span> =<span class="st"> "code"</span>)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">gain =</span> depdelay <span class="op">-</span><span class="st"> </span>arrdelay) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(year, month, arrdelay, depdelay, distance, uniquecarrier, description, gain, origin,dest)
+<span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(arrdelay) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(depdelay) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(distance)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(depdelay <span class="op">&gt;</span><span class="st"> </span><span class="dv">15</span> <span class="op">&amp;</span><span class="st"> </span>depdelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">240</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(arrdelay <span class="op">&gt;</span><span class="st"> </span><span class="op">-</span><span class="dv">60</span> <span class="op">&amp;</span><span class="st"> </span>arrdelay <span class="op">&lt;</span><span class="st"> </span><span class="dv">360</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(year <span class="op">==</span><span class="st"> </span><span class="dv">2008</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">left_join</span>(airlines_tbl, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">"uniquecarrier"</span> =<span class="st"> "code"</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gain =</span> depdelay <span class="op">-</span><span class="st"> </span>arrdelay) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(year, month, arrdelay, depdelay, distance, uniquecarrier, description, gain, origin,dest)
 
 <span class="co"># Summarize data by carrier</span>
 carrier &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sdf_predict.html">sdf_predict</a></span>(ml1, data_<span class="dv">2008</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(description) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span>(<span class="dt">gain =</span> <span class="kw">mean</span>(gain), <span class="dt">prediction =</span> <span class="kw">mean</span>(prediction), <span class="dt">freq =</span> <span class="kw"><a href="http://dplyr.tidyverse.org/reference/n.html">n</a></span>()) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(freq <span class="op">&gt;</span><span class="st"> </span><span class="dv">10000</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(description) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">gain =</span> <span class="kw">mean</span>(gain), <span class="dt">prediction =</span> <span class="kw">mean</span>(prediction), <span class="dt">freq =</span> <span class="kw">n</span>()) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(freq <span class="op">&gt;</span><span class="st"> </span><span class="dv">10000</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span>collect
 
 <span class="co"># Plot actual gains and predicted gains by airline carrier</span>
-<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(carrier, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(gain, prediction)) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_point">geom_point</a></span>(<span class="dt">alpha =</span> <span class="fl">0.75</span>, <span class="dt">color =</span> <span class="st">'red'</span>, <span class="dt">shape =</span> <span class="dv">3</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_abline">geom_abline</a></span>(<span class="dt">intercept =</span> <span class="dv">0</span>, <span class="dt">slope =</span> <span class="dv">1</span>, <span class="dt">alpha =</span> <span class="fl">0.15</span>, <span class="dt">color =</span> <span class="st">'blue'</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_text">geom_text</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">label =</span> <span class="kw">substr</span>(description, <span class="dv">1</span>, <span class="dv">20</span>)), <span class="dt">size =</span> <span class="dv">3</span>, <span class="dt">alpha =</span> <span class="fl">0.75</span>, <span class="dt">vjust =</span> <span class="op">-</span><span class="dv">1</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">'Average Gains Forecast'</span>, <span class="dt">x =</span> <span class="st">'Actual'</span>, <span class="dt">y =</span> <span class="st">'Predicted'</span>)</code></pre></div>
+<span class="kw">ggplot</span>(carrier, <span class="kw">aes</span>(gain, prediction)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.75</span>, <span class="dt">color =</span> <span class="st">'red'</span>, <span class="dt">shape =</span> <span class="dv">3</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">intercept =</span> <span class="dv">0</span>, <span class="dt">slope =</span> <span class="dv">1</span>, <span class="dt">alpha =</span> <span class="fl">0.15</span>, <span class="dt">color =</span> <span class="st">'blue'</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_text</span>(<span class="kw">aes</span>(<span class="dt">label =</span> <span class="kw">substr</span>(description, <span class="dv">1</span>, <span class="dv">20</span>)), <span class="dt">size =</span> <span class="dv">3</span>, <span class="dt">alpha =</span> <span class="fl">0.75</span>, <span class="dt">vjust =</span> <span class="op">-</span><span class="dv">1</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">'Average Gains Forecast'</span>, <span class="dt">x =</span> <span class="st">'Actual'</span>, <span class="dt">y =</span> <span class="st">'Predicted'</span>)</code></pre></div>
 <p>
 <img src="images/deployment/amazon-emr/forecast-1.png" width="600/"></p>
 <p>Some carriers make up more time than others in flight, but the differences are relatively small. The average time gains between the best and worst airlines is only six minutes. The best predictor of time gained is not carrier but flight distance. The biggest gains were associated with the longest flights.</p>
@@ -573,10 +573,10 @@ carrier &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sdf
 <p>Aggregate the scored data by origin, destination, and airline. Save the aggregated data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Summarize by origin, destination, and carrier</span>
 summary_<span class="dv">2008</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sdf_predict.html">sdf_predict</a></span>(ml1, data_<span class="dv">2008</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">rename</a></span>(<span class="dt">carrier =</span> uniquecarrier, <span class="dt">airline =</span> description) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(origin, dest, carrier, airline) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span>(
-    <span class="dt">flights =</span> <span class="kw"><a href="http://dplyr.tidyverse.org/reference/n.html">n</a></span>(),
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">carrier =</span> uniquecarrier, <span class="dt">airline =</span> description) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(origin, dest, carrier, airline) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(
+    <span class="dt">flights =</span> <span class="kw">n</span>(),
     <span class="dt">distance =</span> <span class="kw">mean</span>(distance),
     <span class="dt">avg_dep_delay =</span> <span class="kw">mean</span>(depdelay),
     <span class="dt">avg_arr_delay =</span> <span class="kw">mean</span>(arrdelay),
@@ -585,8 +585,8 @@ summary_<span class="dv">2008</span> &lt;-<span class="st"> </span><span class="
     )
 
 <span class="co"># Collect and save objects</span>
-pred_data &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/compute.html">collect</a></span>(summary_<span class="dv">2008</span>)
-airports &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/compute.html">collect</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(airports_tbl, name, faa, lat, lon))
+pred_data &lt;-<span class="st"> </span><span class="kw">collect</span>(summary_<span class="dv">2008</span>)
+airports &lt;-<span class="st"> </span><span class="kw">collect</span>(<span class="kw">select</span>(airports_tbl, name, faa, lat, lon))
 ml1_summary &lt;-<span class="st"> </span><span class="kw">capture.output</span>(<span class="kw">summary</span>(ml1))
 <span class="kw">save</span>(pred_data, airports, ml1_summary, <span class="dt">file =</span> <span class="st">'flights_pred_2008.RData'</span>)</code></pre></div>
 </div>

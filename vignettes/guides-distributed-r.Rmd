@@ -1,5 +1,9 @@
 ---
 title: "Distributing R Computations"
+output:
+  github_document:
+    fig_width: 9
+    fig_height: 5
 ---
 
 ## Overview

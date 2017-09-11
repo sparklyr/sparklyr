@@ -48,7 +48,7 @@
       <a href="../articles/guides-mllib.html">mllib</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
     </li>
     <li>
       <a href="../articles/guides-extensions.html">Extensions</a>
@@ -57,7 +57,7 @@
       <a href="../articles/guides-caching.html">Caching</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/guides-h2o.html">H2O</a>
     </li>
   </ul>
 </li>
@@ -93,7 +93,7 @@
       <a href="../reference/index.html">Functions</a>
     </li>
     <li>
-      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf">Cheatsheet</a>
+      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr-cheatsheet.pdf">Cheatsheet</a>
     </li>
     <li>
       <a href="../articles/reference-media.html">Media</a>
@@ -106,7 +106,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/reticulate">
+  <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
      
   </a>
@@ -372,7 +372,7 @@
 ##     intersect, setdiff, setequal, union</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spark-connections.html">spark_connect</a></span>(<span class="dt">master =</span> <span class="st">"local"</span>)</code></pre></div>
 <pre><code>## * Using Spark: 2.1.0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris_tbl &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(sc, iris, <span class="st">"iris"</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, iris, <span class="st">"iris"</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
 iris_tbl</code></pre></div>
 <pre><code>## # Source:   table&lt;iris&gt; [?? x 5]
 ## # Database: spark_connection
@@ -388,13 +388,13 @@ iris_tbl</code></pre></div>
 ##  8          5.0         3.4          1.5         0.2  setosa
 ##  9          4.4         2.9          1.4         0.2  setosa
 ## 10          4.9         3.1          1.5         0.1  setosa
-## # ... with 140 more rows</code></pre>
+## # ... with more rows</code></pre>
 <div id="k-means-clustering" class="section level3">
 <h3 class="hasAnchor">
 <a href="#k-means-clustering" class="anchor"></a>K-Means Clustering</h3>
 <p>Use Spark’s <a href="http://spark.apache.org/docs/latest/ml-clustering.html#k-means">K-means clustering</a> to partition a dataset into groups. K-means clustering partitions points into <code>k</code> groups, such that the sum of squares from points to the assigned cluster centers is minimized.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kmeans_model &lt;-<span class="st"> </span>iris_tbl <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(Petal_Width, Petal_Length) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(Petal_Width, Petal_Length) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/ml_kmeans.html">ml_kmeans</a></span>(<span class="dt">centers =</span> <span class="dv">3</span>)</code></pre></div>
 <pre><code>## * No rows dropped by 'na.omit' call</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print our model fit</span>
@@ -419,16 +419,16 @@ predicted &lt;-<span class="st"> </span><span class="kw"><a href="../reference/s
 ##   virginica   6  0 44</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot cluster membership</span>
 <span class="kw"><a href="../reference/sdf_predict.html">sdf_predict</a></span>(kmeans_model) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/compute.html">collect</a></span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(Petal_Length, Petal_Width)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_point">geom_point</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(Petal_Width, Petal_Length, <span class="dt">col =</span> <span class="kw">factor</span>(prediction <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)),
+<span class="st">  </span><span class="kw">collect</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(Petal_Length, Petal_Width)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(Petal_Width, Petal_Length, <span class="dt">col =</span> <span class="kw">factor</span>(prediction <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)),
              <span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_point">geom_point</a></span>(<span class="dt">data =</span> kmeans_model<span class="op">$</span>centers, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(Petal_Width, Petal_Length),
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data =</span> kmeans_model<span class="op">$</span>centers, <span class="kw">aes</span>(Petal_Width, Petal_Length),
              <span class="dt">col =</span> scales<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/scales/topics/muted">muted</a></span>(<span class="kw">c</span>(<span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>)),
              <span class="dt">pch =</span> <span class="st">'x'</span>, <span class="dt">size =</span> <span class="dv">12</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_hue">scale_color_discrete</a></span>(<span class="dt">name =</span> <span class="st">"Predicted Cluster"</span>,
+<span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="dt">name =</span> <span class="st">"Predicted Cluster"</span>,
                        <span class="dt">labels =</span> <span class="kw">paste</span>(<span class="st">"Cluster"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(
+<span class="st">  </span><span class="kw">labs</span>(
     <span class="dt">x =</span> <span class="st">"Petal Length"</span>,
     <span class="dt">y =</span> <span class="st">"Petal Width"</span>,
     <span class="dt">title =</span> <span class="st">"K-Means Clustering"</span>,
@@ -441,18 +441,18 @@ predicted &lt;-<span class="st"> </span><span class="kw"><a href="../reference/s
 <a href="#linear-regression" class="anchor"></a>Linear Regression</h3>
 <p>Use Spark’s <a href="http://spark.apache.org/docs/latest/ml-classification-regression.html#linear-regression">linear regression</a> to model the linear relationship between a response variable and one or more explanatory variables.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lm_model &lt;-<span class="st"> </span>iris_tbl <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(Petal_Width, Petal_Length) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(Petal_Width, Petal_Length) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/ml_linear_regression.html">ml_linear_regression</a></span>(Petal_Length <span class="op">~</span><span class="st"> </span>Petal_Width)</code></pre></div>
 <pre><code>## * No rows dropped by 'na.omit' call</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris_tbl <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(Petal_Width, Petal_Length) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(Petal_Width, Petal_Length) <span class="op">%&gt;%</span>
 <span class="st">  </span>collect <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(Petal_Length, Petal_Width)) <span class="op">+</span>
-<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_point">geom_point</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(Petal_Width, Petal_Length), <span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span>
-<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_abline">geom_abline</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">slope =</span> <span class="kw">coef</span>(lm_model)[[<span class="st">"Petal_Width"</span>]],
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(Petal_Length, Petal_Width)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(Petal_Width, Petal_Length), <span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_abline</span>(<span class="kw">aes</span>(<span class="dt">slope =</span> <span class="kw">coef</span>(lm_model)[[<span class="st">"Petal_Width"</span>]],
                     <span class="dt">intercept =</span> <span class="kw">coef</span>(lm_model)[[<span class="st">"(Intercept)"</span>]]),
                 <span class="dt">color =</span> <span class="st">"red"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(
+<span class="st">  </span><span class="kw">labs</span>(
     <span class="dt">x =</span> <span class="st">"Petal Width"</span>,
     <span class="dt">y =</span> <span class="st">"Petal Length"</span>,
     <span class="dt">title =</span> <span class="st">"Linear Regression: Petal Length ~ Petal Width"</span>,
@@ -467,7 +467,7 @@ predicted &lt;-<span class="st"> </span><span class="kw"><a href="../reference/s
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prepare beaver dataset</span>
 beaver &lt;-<span class="st"> </span>beaver2
 beaver<span class="op">$</span>activ &lt;-<span class="st"> </span><span class="kw">factor</span>(beaver<span class="op">$</span>activ, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">"Non-Active"</span>, <span class="st">"Active"</span>))
-<span class="kw"><a href="http://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(sc, beaver, <span class="st">"beaver"</span>)</code></pre></div>
+<span class="kw">copy_to</span>(sc, beaver, <span class="st">"beaver"</span>)</code></pre></div>
 <pre><code>## # Source:   table&lt;beaver&gt; [?? x 4]
 ## # Database: spark_connection
 ##      day  time  temp      activ
@@ -482,11 +482,11 @@ beaver<span class="op">$</span>activ &lt;-<span class="st"> </span><span class="
 ##  8   307  1040 36.90 Non-Active
 ##  9   307  1050 36.95 Non-Active
 ## 10   307  1100 36.89 Non-Active
-## # ... with 90 more rows</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">beaver_tbl &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc, <span class="st">"beaver"</span>)
+## # ... with more rows</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">beaver_tbl &lt;-<span class="st"> </span><span class="kw">tbl</span>(sc, <span class="st">"beaver"</span>)
 
 glm_model &lt;-<span class="st"> </span>beaver_tbl <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">binary_response =</span> <span class="kw">as.numeric</span>(activ <span class="op">==</span><span class="st"> "Active"</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">binary_response =</span> <span class="kw">as.numeric</span>(activ <span class="op">==</span><span class="st"> "Active"</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/ml_logistic_regression.html">ml_logistic_regression</a></span>(binary_response <span class="op">~</span><span class="st"> </span>temp)</code></pre></div>
 <pre><code>## * No rows dropped by 'na.omit' call</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_model</code></pre></div>
@@ -500,8 +500,8 @@ glm_model &lt;-<span class="st"> </span>beaver_tbl <span class="op">%&gt;%</span
 <h3 class="hasAnchor">
 <a href="#pca" class="anchor"></a>PCA</h3>
 <p>Use Spark’s <a href="https://spark.apache.org/docs/latest/mllib-dimensionality-reduction.html">Principal Components Analysis (PCA)</a> to perform dimensionality reduction. PCA is a statistical method to find a rotation such that the first coordinate has the largest variance possible, and each succeeding coordinate in turn has the largest variance possible.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pca_model &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc, <span class="st">"iris"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="op">-</span>Species) <span class="op">%&gt;%</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pca_model &lt;-<span class="st"> </span><span class="kw">tbl</span>(sc, <span class="st">"iris"</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>Species) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/ml_pca.html">ml_pca</a></span>()</code></pre></div>
 <pre><code>## * No rows dropped by 'na.omit' call</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(pca_model)</code></pre></div>
@@ -539,7 +539,7 @@ glm_model &lt;-<span class="st"> </span>beaver_tbl <span class="op">%&gt;%</span
 <h3 class="hasAnchor">
 <a href="#sdf-partitioning" class="anchor"></a>SDF Partitioning</h3>
 <p>Split a Spark DataFrame into training, test datasets.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">partitions &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(sc, <span class="st">"iris"</span>) <span class="op">%&gt;%</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">partitions &lt;-<span class="st"> </span><span class="kw">tbl</span>(sc, <span class="st">"iris"</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/sdf_partition.html">sdf_partition</a></span>(<span class="dt">training =</span> <span class="fl">0.75</span>, <span class="dt">test =</span> <span class="fl">0.25</span>, <span class="dt">seed =</span> <span class="dv">1099</span>)
 
 fit &lt;-<span class="st"> </span>partitions<span class="op">$</span>training <span class="op">%&gt;%</span>
@@ -547,8 +547,8 @@ fit &lt;-<span class="st"> </span>partitions<span class="op">$</span>training <s
 <pre><code>## * No rows dropped by 'na.omit' call</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">estimate_mse &lt;-<span class="st"> </span><span class="cf">function</span>(df){
   <span class="kw"><a href="../reference/sdf_predict.html">sdf_predict</a></span>(fit, df) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">resid =</span> Petal_Length <span class="op">-</span><span class="st"> </span>prediction) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span>(<span class="dt">mse =</span> <span class="kw">mean</span>(resid <span class="op">^</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">resid =</span> Petal_Length <span class="op">-</span><span class="st"> </span>prediction) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mse =</span> <span class="kw">mean</span>(resid <span class="op">^</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span>collect
 }
 
@@ -585,7 +585,7 @@ fit &lt;-<span class="st"> </span>partitions<span class="op">$</span>training <s
 <span class="st">  </span>collect
   
 ft_string2idx <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(Species, Species_idx, Species_remap) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(Species, Species_idx, Species_remap) <span class="op">%&gt;%</span>
 <span class="st">  </span>distinct</code></pre></div>
 <pre><code>## # A tibble: 3 x 3
 ##      Species Species_idx Species_remap
@@ -599,7 +599,7 @@ ft_string2idx <span class="op">%&gt;%</span>
 <a href="#example-workflow" class="anchor"></a>Example Workflow</h3>
 <p>Let’s walk through a simple example to demonstrate the use of Spark’s machine learning algorithms within R. We’ll use <a href="reference/sparklyr/latest/ml_linear_regression.html">ml_linear_regression</a> to fit a linear regression model. Using the built-in <code>mtcars</code> dataset, we’ll try to predict a car’s fuel consumption (<code>mpg</code>) based on its weight (<code>wt</code>), and the number of cylinders the engine contains (<code>cyl</code>).</p>
 <p>First, we will copy the <code>mtcars</code> dataset into Spark.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars_tbl &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(sc, mtcars, <span class="st">"mtcars"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, mtcars, <span class="st">"mtcars"</span>)</code></pre></div>
 <p>Transform the data with Spark SQL, feature transformers, and DataFrame functions.</p>
 <ol style="list-style-type: decimal">
 <li>Use Spark SQL to remove all cars with horsepower less than 100</li>
@@ -609,7 +609,7 @@ ft_string2idx <span class="op">%&gt;%</span>
 <p>Then fit a linear model using spark ML. Model MPG as a function of weight and cylinders.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># transform our data set, and then partition into 'training', 'test'</span>
 partitions &lt;-<span class="st"> </span>mtcars_tbl <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(hp <span class="op">&gt;=</span><span class="st"> </span><span class="dv">100</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(hp <span class="op">&gt;=</span><span class="st"> </span><span class="dv">100</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">sdf_mutate</span>(<span class="dt">cyl8 =</span> <span class="kw"><a href="../reference/ft_bucketizer.html">ft_bucketizer</a></span>(cyl, <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">8</span>,<span class="dv">12</span>))) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/sdf_partition.html">sdf_partition</a></span>(<span class="dt">training =</span> <span class="fl">0.5</span>, <span class="dt">test =</span> <span class="fl">0.5</span>, <span class="dt">seed =</span> <span class="dv">888</span>)
 
@@ -642,12 +642,12 @@ pred &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sdf_pr
 <span class="st">  </span>collect
 
 <span class="co"># Plot the predicted versus actual mpg</span>
-<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(pred, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x =</span> mpg, <span class="dt">y =</span> prediction)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_abline">geom_abline</a></span>(<span class="dt">lty =</span> <span class="st">"dashed"</span>, <span class="dt">col =</span> <span class="st">"red"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_point">geom_point</a></span>() <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/theme">theme</a></span>(<span class="dt">plot.title =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/element">element_text</a></span>(<span class="dt">hjust =</span> <span class="fl">0.5</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/coord_fixed">coord_fixed</a></span>(<span class="dt">ratio =</span> <span class="dv">1</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(
+<span class="kw">ggplot</span>(pred, <span class="kw">aes</span>(<span class="dt">x =</span> mpg, <span class="dt">y =</span> prediction)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">lty =</span> <span class="st">"dashed"</span>, <span class="dt">col =</span> <span class="st">"red"</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust =</span> <span class="fl">0.5</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">coord_fixed</span>(<span class="dt">ratio =</span> <span class="dv">1</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(
     <span class="dt">x =</span> <span class="st">"Actual Fuel Consumption"</span>,
     <span class="dt">y =</span> <span class="st">"Predicted Fuel Consumption"</span>,
     <span class="dt">title =</span> <span class="st">"Predicted vs. Actual Fuel Consumption"</span>
