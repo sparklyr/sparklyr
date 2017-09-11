@@ -314,7 +314,7 @@ doyle &lt;-<span class="st">  </span><span class="kw"><a href="../reference/spar
 <a href="#words-used-the-most" class="anchor"></a>Words used the most</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">word_count &lt;-<span class="st"> </span>all_words <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(author, word) <span class="op">%&gt;%</span>
-<span class="st">  </span>tally <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">tally</span>() <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n)) 
   
 word_count</code></pre></div>
@@ -378,7 +378,7 @@ doyle_unique</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">all_words <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">filter</span>(author <span class="op">==</span><span class="st"> "twain"</span>,
          word <span class="op">==</span><span class="st"> "sherlock"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span>tally</code></pre></div>
+<span class="st">  </span><span class="kw">tally</span>()</code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: spark_connection
 ##       n
@@ -389,7 +389,7 @@ doyle_unique</code></pre></div>
 <div id="instr-lower" class="section level3">
 <h3 class="hasAnchor">
 <a href="#instr-lower" class="anchor"></a>instr &amp; lower</h3>
-<p>Most of these lines are in a short story by Mark Twain called <a href="https://www.gutenberg.org/files/3180/3180-h/3180-h.htm#link2H_4_0008">A Doudle Barrelled Detective Story</a>. As per the <a href="https://en.wikipedia.org/wiki/A_Double_Barrelled_Detective_Story">Wikipedia</a> page about this story, this is a satire by Twain on the mystery novel genre, published in 1902.</p>
+<p>Most of these lines are in a short story by Mark Twain called <a href="https://www.gutenberg.org/files/3180/3180-h/3180-h.htm#link2H_4_0008">A Double Barrelled Detective Story</a>. As per the <a href="https://en.wikipedia.org/wiki/A_Double_Barrelled_Detective_Story">Wikipedia</a> page about this story, this is a satire by Twain on the mystery novel genre, published in 1902.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">twain <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">line =</span> <span class="kw">lower</span>(line)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">filter</span>(<span class="kw">instr</span>(line, <span class="st">"sherlock"</span>) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span>
