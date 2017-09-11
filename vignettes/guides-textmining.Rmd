@@ -165,7 +165,7 @@ all_words <- doyle %>%
 ```{r}
 word_count <- all_words %>%
   group_by(author, word) %>%
-  tally %>%
+  tally() %>%
   arrange(desc(n)) 
   
 word_count
@@ -203,14 +203,14 @@ The word cloud highlighted something interesting.  The word **lestrade** is list
 all_words %>%
   filter(author == "twain",
          word == "sherlock") %>%
-  tally
+  tally()
 ```
 
 The `all_words` table **contains 16 instances** of the word **sherlock** in the words used by Twain in his works.  The **instr** Hive UDF is used to extract the lines that contain that word in the `twain` table.  This Hive function works can be used instead of `base::grep()` or `stringr::str_detect()`. To account for any word capitalization, the **lower** command will be used in `mutate()` to make all words in the full text lower cap.
 
 ### instr & lower
 
-Most of these lines are in a short story by Mark Twain called [A Doudle Barrelled Detective Story](https://www.gutenberg.org/files/3180/3180-h/3180-h.htm#link2H_4_0008). As per the [Wikipedia](https://en.wikipedia.org/wiki/A_Double_Barrelled_Detective_Story) page about this story, this is a satire by Twain on the mystery novel genre, published in 1902.
+Most of these lines are in a short story by Mark Twain called [A Double Barrelled Detective Story](https://www.gutenberg.org/files/3180/3180-h/3180-h.htm#link2H_4_0008). As per the [Wikipedia](https://en.wikipedia.org/wiki/A_Double_Barrelled_Detective_Story) page about this story, this is a satire by Twain on the mystery novel genre, published in 1902.
 
 
 ```{r}
