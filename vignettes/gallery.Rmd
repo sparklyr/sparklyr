@@ -59,6 +59,13 @@ div(class = "col-sm-6","You can use Spark and R to analyze data at scale. This d
 thumbnail("Analyzing a billion NYC taxi trips in Spark", "images/examples/h2o.png", "gallery-taxi-trips.nb.html")
 ```
 
+### Text mining with Spark 
+
+```{r, echo=FALSE}
+div(class = "col-sm-6","This article focuses on a set of functions that can be used for text mining with Spark and `sparklyr`.  The main goal is to illustrate how to perform most of the data preparation and analysis with commands that will run inside the Spark cluster, as opposed to locally in R.")
+thumbnail("Text mining with Spark & sparklyr", "guides-textmining_files/figure-html/unnamed-chunk-14-1.png", "guides-textmining.html")
+```
+
 
 ###Total US births
 
