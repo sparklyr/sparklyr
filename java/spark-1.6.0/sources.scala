@@ -1217,24 +1217,25 @@ object Sources {
     "spark_worker_main <- function(\n" +
     "  sessionId,\n" +
     "  backendPort = 8880,\n" +
-    "  configRaw = worker_config_serialize(list())) {\n" +
+    "  configRaw = NULL) {\n" +
     "\n" +
     "  spark_worker_hooks()\n" +
     "\n" +
-    "  config <- worker_config_deserialize(configRaw)\n" +
-    "\n" +
-    "  if (config$debug) {\n" +
-    "    worker_log(\"exiting to wait for debugging session to attach\")\n" +
-    "\n" +
-    "    # sleep for 1 day to allow long debugging sessions\n" +
-    "    Sys.sleep(60*60*24)\n" +
-    "    return()\n" +
-    "  }\n" +
-    "\n" +
-    "  worker_log_session(sessionId)\n" +
-    "  worker_log(\"is starting\")\n" +
-    "\n" +
     "  tryCatch({\n" +
+    "    if (is.null(configRaw)) configRaw <- worker_config_serialize(list())\n" +
+    "\n" +
+    "    config <- worker_config_deserialize(configRaw)\n" +
+    "\n" +
+    "    if (config$debug) {\n" +
+    "      worker_log(\"exiting to wait for debugging session to attach\")\n" +
+    "\n" +
+    "      # sleep for 1 day to allow long debugging sessions\n" +
+    "      Sys.sleep(60*60*24)\n" +
+    "      return()\n" +
+    "    }\n" +
+    "\n" +
+    "    worker_log_session(sessionId)\n" +
+    "    worker_log(\"is starting\")\n" +
     "\n" +
     "    sc <- spark_worker_connect(sessionId, backendPort, config)\n" +
     "    worker_log(\"is connected\")\n" +
@@ -1242,7 +1243,9 @@ object Sources {
     "    spark_worker_apply(sc)\n" +
     "\n" +
     "  }, error = function(e) {\n" +
-    "    stop(\"terminated unexpectedly: \", e$message)\n" +
+    "    worker_log_error(\"terminated unexpectedly: \", e$message)\n" +
+    "    worker_log_error(\"collected callstack: \\n\", get(\".stopLastError\", env = .GlobalEnv))\n" +
+    "    quit(status = -1)\n" +
     "  })\n" +
     "\n" +
     "  worker_log(\"finished\")\n" +
@@ -1252,18 +1255,18 @@ object Sources {
     "  unlock <- get(\"unlockBinding\")\n" +
     "  lock <- get(\"lockBinding\")\n" +
     "\n" +
+    "  originalStop <- stop\n" +
     "  unlock(\"stop\",  as.environment(\"package:base\"))\n" +
     "  assign(\"stop\", function(...) {\n" +
-    "    worker_log_error(...)\n" +
-    "\n" +
     "    frame_names <- list()\n" +
     "    frame_start <- max(1, sys.nframe() - 5)\n" +
     "    for (i in frame_start:sys.nframe()) {\n" +
     "      current_call <- sys.call(i)\n" +
     "      frame_names[[1 + i - frame_start]] <- paste(i, \": \", paste(head(deparse(current_call), 5), collapse = \"\\n\"), sep = \"\")\n" +
     "    }\n" +
-    "    worker_log_error(\"collected callstack: \\n\", paste(rev(frame_names), collapse = \"\\n\"))\n" +
-    "    quit(status = -1)\n" +
+    "\n" +
+    "    assign(\".stopLastError\", paste(rev(frame_names), collapse = \"\\n\"), env = .GlobalEnv)\n" +
+    "    originalStop(...)\n" +
     "  }, as.environment(\"package:base\"))\n" +
     "  lock(\"stop\",  as.environment(\"package:base\"))\n" +
     "}\n" +
