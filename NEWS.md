@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fix to `spark_apply()` while using `tryCatch()` within
+  closure and increased callstack printed to logs when
+  error triggers within closure.
+
 - Added support for the `SPARKLYR_LOG_FILE` environment 
   variable to specify the file used for log output.
   
