@@ -64,3 +64,20 @@ ml_fit <- function(x, data, ...) {
 
   ml_pipeline_model_info(jobj)
 }
+
+#' @export
+ml_transform <- function(x, data, ...) {
+  sdf <- spark_dataframe(data)
+  x$.jobj %>%
+    invoke("transform", sdf) %>%
+    sdf_register()
+}
+
+#' @export
+ml_fit_and_transform <- function(x, pipeline) {
+  sdf <- spark_dataframe(x)
+  pipeline$.pipeline %>%
+    invoke("fit", sdf) %>%
+    invoke("transform", sdf) %>%
+    sdf_register()
+}

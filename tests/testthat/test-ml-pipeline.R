@@ -10,7 +10,14 @@ training <- data_frame(
            "hadoop mapreduce"),
   label = c(1, 0, 1, 0)
 )
-training_tbl <- copy_to(sc, training, overwrite = TRUE)
+
+training_tbl <- testthat_tbl("training")
+
+test <- data_frame(
+  id = 4:7L,
+  text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
+)
+test_tbl <- testthat_tbl("test")
 
 test_that("ml_pipeline() returns a c('ml_pipeline', 'ml_pipeline_stage')", {
   p <- ml_pipeline(sc)
@@ -118,12 +125,6 @@ test_that("ml_[save/load]_model() work for ml_pipeline_model", {
   ml_save_model(model1, path)
   model2 <- ml_load_model(sc, path)
   expect_equal(model1$stage_uids, model2$stage_uids)
-
-  test <- data_frame(
-    id = 4:7L,
-    text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
-  )
-  test_tbl <- copy_to(sc, test, overwrite = TRUE)
 
   score_test_set <- function(x, data) {
     x$.jobj %>%
