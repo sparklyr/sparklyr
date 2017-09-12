@@ -2,16 +2,17 @@ ml_create_mapping_tables <- function() {
   param_mapping_list <-
     list("input_col" = "inputCol",
          "output_col" = "outputCol",
+         "elastic_net_param" = "elasticNetParam",
+         "features_col" = "featuresCol",
+         "fit_intercept" = "fitIntercept",
          "label_col" = "labelCol",
+         "max_iter" = "maxIter",
          "prediction_col" = "predictionCol",
          "probability_col" = "probabilityCol",
          "raw_prediction_col" = "rawPredictionCol",
-         "features_col" = "featuresCol",
-         "elastic_net_param" = "elasticNetParam",
-         "fit_intercept" = "fitIntercept",
-         "max_iter" = "maxIter",
-         "aggregation_depth" = "aggregationDepth",
          "reg_param" = "regParam",
+         "weight_col" = "weightCol",
+         "aggregation_depth" = "aggregationDepth",
          "num_features" = "numFeatures")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
