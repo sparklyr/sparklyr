@@ -63,6 +63,8 @@ sdf_deserialize_column <- function(column, sc) {
 #' Read a single column from a Spark DataFrame, and return
 #' the contents of that column back to \R.
 #'
+#' It is expected for this operation to preserve row order.
+#'
 #' @template roxlate-ml-x
 #' @param column The name of a column within \code{x}.
 #' @export
