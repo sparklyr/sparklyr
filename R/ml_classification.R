@@ -63,7 +63,7 @@ ml_logistic_regression.spark_connection <- function(
     invoke("setRegParam", reg_param) %>%
     invoke("setMaxIter", max_iter)
 
-  ml_pipeline_stage_info(jobj)
+  ml_info(jobj)
 }
 
 #' @export
