@@ -10,7 +10,7 @@ ml_args_to_validate <- function(args, current_args) {
 }
 
 
-ml_validate_args <- function(env = rlang::caller_env(2)) {
+ml_validate_args <- function(env) {
   constructor_frame <- rlang::caller_frame()
   validator_fn <- constructor_frame$fn_name %>%
     (function(x) gsub("^ml_", "ml_validator_", x)) %>%
@@ -21,7 +21,7 @@ ml_validate_args <- function(env = rlang::caller_env(2)) {
     lapply(rlang::eval_tidy, env = env)
   default_args <- Filter(Negate(rlang::is_symbol), # filter out args without defaults
                          rlang::fn_fmls(constructor_frame$fn)) %>%
-    lapply(rlang::eval_tidy, env = env)
+    lapply(rlang::eval_tidy, env = rlang::ns_env("sparklyr"))
 
   validated_args <- rlang::invoke(
     validator_fn, args = args, current_args = default_args
