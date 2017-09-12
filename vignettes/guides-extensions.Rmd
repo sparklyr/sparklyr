@@ -56,6 +56,7 @@ Here are links to some additional examples of extension packages:
 | [`crassy`](https://github.com/AkhilNairAmey/crassy) | Connect to Cassandra with sparklyr using the `Spark-Cassandra-Connector`. |
 | [`sparklygraphs`](https://github.com/kevinykuo/sparklygraphs) | R interface for [GraphFrames](https://graphframes.github.io/) which aims to provide the functionality of [GraphX](http://spark.apache.org/graphx/). |
 | [`sparklyr.nested`](https://mitre.github.io/sparklyr.nested/) | Extension for working with nested data. |
+| [`sparklyudf`](https://github.com/javierluraschi/sparklyudf) | Simple example registering an Scala UDF within an extension package. |
 
 ## Core Types
 

@@ -55,6 +55,7 @@ Here are links to some additional examples of extension packages:
 | [`sparkavro`](https://github.com/chezou/sparkavro) | Load Avro data into Spark with sparklyr. It is a wrapper of [spark-avro](https://github.com/databricks/spark-avro) |
 | [`crassy`](https://github.com/AkhilNairAmey/crassy) | Connect to Cassandra with sparklyr using the `Spark-Cassandra-Connector`. |
 | [`sparklygraphs`](https://github.com/kevinykuo/sparklygraphs) | R interface for [GraphFrames](https://graphframes.github.io/) which aims to provide the functionality of [GraphX](http://spark.apache.org/graphx/). |
+| [`sparklyudf`](https://github.com/javierluraschi/sparklyudf) | Simple example registering an Scala UDF within an extension package. |
 
 ## Core Types
 
