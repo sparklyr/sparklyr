@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Performance improvement for quering field names from tables
+  impacting tables and `dplyr` queries, most noticeable in
+  `na.omit` with several columns.
+
 - Fix to `spark_apply()` when closure returns a `data.frame`
   that contains no rows and has one or more columns.
 
