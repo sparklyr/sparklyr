@@ -70,8 +70,15 @@ spark_yarn_cluster_resource_manager_is_online <- function(rm_webapp) {
   )
 
   tryCatch({
-    !httr::http_error(rmQuery)
+    rmResult <- httr::GET(rmQuery)
+    if (httr::http_error(rmResult)) {
+      warning("Failed to open ", rmQuery, " with status ", httr::status_code(rmResult), ". ")
+      FALSE
+    } else {
+      TRUE
+    }
   }, error = function(err) {
+    warning("Failed to open ", rmQuery, ". ", err)
     FALSE
   })
 }
