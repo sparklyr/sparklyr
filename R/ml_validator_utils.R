@@ -18,9 +18,12 @@ ml_validate_args <- function(env) {
   args <- constructor_frame$expr %>%
     rlang::lang_standardise() %>%
     rlang::lang_args() %>%
+    # evaluate in calling environment of public function
     lapply(rlang::eval_tidy, env = env)
-  default_args <- Filter(Negate(rlang::is_symbol), # filter out args without defaults
+  # filter out args without defaults
+  default_args <- Filter(Negate(rlang::is_symbol),
                          rlang::fn_fmls(constructor_frame$fn)) %>%
+    # evaluate default args in package namespace
     lapply(rlang::eval_tidy, env = rlang::ns_env("sparklyr"))
 
   validated_args <- rlang::invoke(
