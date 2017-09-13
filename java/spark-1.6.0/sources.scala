@@ -1026,7 +1026,7 @@ object Sources {
     "    all_results <- rbind(all_results, result)\n" +
     "  }\n" +
     "\n" +
-    "  if (!is.null(all_results)) {\n" +
+    "  if (!is.null(all_results) && nrow(all_results) > 0) {\n" +
     "    worker_log(\"updating \", nrow(all_results), \" rows\")\n" +
     "    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))\n" +
     "\n" +
@@ -1244,7 +1244,9 @@ object Sources {
     "\n" +
     "  }, error = function(e) {\n" +
     "    worker_log_error(\"terminated unexpectedly: \", e$message)\n" +
-    "    worker_log_error(\"collected callstack: \\n\", get(\".stopLastError\", env = .GlobalEnv))\n" +
+    "    if (exists(\".stopLastError\", envir = .GlobalEnv)) {\n" +
+    "      worker_log_error(\"collected callstack: \\n\", get(\".stopLastError\", envir = .GlobalEnv))\n" +
+    "    }\n" +
     "    quit(status = -1)\n" +
     "  })\n" +
     "\n" +
@@ -1265,7 +1267,7 @@ object Sources {
     "      frame_names[[1 + i - frame_start]] <- paste(i, \": \", paste(head(deparse(current_call), 5), collapse = \"\\n\"), sep = \"\")\n" +
     "    }\n" +
     "\n" +
-    "    assign(\".stopLastError\", paste(rev(frame_names), collapse = \"\\n\"), env = .GlobalEnv)\n" +
+    "    assign(\".stopLastError\", paste(rev(frame_names), collapse = \"\\n\"), envir = .GlobalEnv)\n" +
     "    originalStop(...)\n" +
     "  }, as.environment(\"package:base\"))\n" +
     "  lock(\"stop\",  as.environment(\"package:base\"))\n" +
