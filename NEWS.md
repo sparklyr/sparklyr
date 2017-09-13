@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fix to `spark_apply()` when closure returns a `data.frame`
+  that contains no rows and has one or more columns.
+
 - Fix to `spark_apply()` while using `tryCatch()` within
   closure and increased callstack printed to logs when
   error triggers within closure.

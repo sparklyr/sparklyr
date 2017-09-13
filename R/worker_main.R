@@ -28,7 +28,9 @@ spark_worker_main <- function(
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)
-    worker_log_error("collected callstack: \n", get(".stopLastError", env = .GlobalEnv))
+    if (exists(".stopLastError", envir = .GlobalEnv)) {
+      worker_log_error("collected callstack: \n", get(".stopLastError", envir = .GlobalEnv))
+    }
     quit(status = -1)
   })
 
@@ -49,7 +51,7 @@ spark_worker_hooks <- function() {
       frame_names[[1 + i - frame_start]] <- paste(i, ": ", paste(head(deparse(current_call), 5), collapse = "\n"), sep = "")
     }
 
-    assign(".stopLastError", paste(rev(frame_names), collapse = "\n"), env = .GlobalEnv)
+    assign(".stopLastError", paste(rev(frame_names), collapse = "\n"), envir = .GlobalEnv)
     originalStop(...)
   }, as.environment("package:base"))
   lock("stop",  as.environment("package:base"))

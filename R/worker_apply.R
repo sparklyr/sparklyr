@@ -106,7 +106,7 @@ spark_worker_apply <- function(sc) {
     all_results <- rbind(all_results, result)
   }
 
-  if (!is.null(all_results)) {
+  if (!is.null(all_results) && nrow(all_results) > 0) {
     worker_log("updating ", nrow(all_results), " rows")
     all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
 

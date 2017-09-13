@@ -16,4 +16,5 @@ script:
 after_failure:
   - |
     tail -n 500 /tmp/sparklyr.log
+    travis_wait 30 R CMD check --no-build-vignettes --no-manual sparklyr*tar.gz
     sleep 2
