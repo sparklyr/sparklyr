@@ -13,14 +13,14 @@ ml_validator_binarizer <- function(args, current_args) {
     `[`(names(args))
 }
 
-ml_validator_string_indexer <- function(args, curreng_args) {
+ml_validator_string_indexer <- function(args, current_args) {
   within(ml_args_to_validate(args, current_args), {
     handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
   }) %>%
     `[`(names(args))
 }
 
-ml_validator_one_hot_encoder <- function(args, curreng_args) {
+ml_validator_one_hot_encoder <- function(args, current_args) {
   within(ml_args_to_validate(args, current_args), {
     drop_last <- ensure_scalar_boolean(drop_last)
   }) %>%
