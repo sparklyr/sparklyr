@@ -36,8 +36,6 @@ ml_r_formula.ml_pipeline <- function(
 ) {
 
   stage <- ml_new_stage_modified_args(rlang::call_frame())
-  # FIXME following line should be redundant, remove after tests pass
-  # stage <- if (is.null(dataset)) transformer else ml_fit(transformer, dataset)
   ml_add_stage(x, stage)
 
 }
@@ -91,8 +89,6 @@ ml_string_indexer.ml_pipeline <- function(
 ) {
 
   stage <- ml_new_stage_modified_args(rlang::call_frame())
-  # FIXME following line should be redundant, remove after tests pass
-  # stage <- if (is.null(dataset)) transformer else ml_fit(transformer, dataset)
   ml_add_stage(x, stage)
 
 }
