@@ -56,28 +56,3 @@ spark_connection.ml_pipeline_stage <- function(x, ...) {
 spark_connection.ml_pipeline_model <- function(x, ...) {
   spark_connection(x$.jobj)
 }
-
-#' @export
-ml_fit <- function(x, data, ...) {
-  jobj <- x$.jobj %>%
-    invoke("fit", spark_dataframe(data))
-
-  ml_pipeline_model_info(jobj)
-}
-
-#' @export
-ml_transform <- function(x, data, ...) {
-  sdf <- spark_dataframe(data)
-  x$.jobj %>%
-    invoke("transform", sdf) %>%
-    sdf_register()
-}
-
-#' @export
-ml_fit_and_transform <- function(x, pipeline) {
-  sdf <- spark_dataframe(x)
-  pipeline$.pipeline %>%
-    invoke("fit", sdf) %>%
-    invoke("transform", sdf) %>%
-    sdf_register()
-}

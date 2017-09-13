@@ -10,6 +10,18 @@ ml_pipeline_stage_info <- function(jobj) {
   )
 }
 
+ml_transformer_info <- function(jobj) {
+  structure(
+    list(
+      uid = invoke(jobj, "uid"),
+      type = jobj_info(jobj)$class,
+      param_map = ml_get_param_map(jobj),
+      .jobj = jobj
+    ),
+    class = c("ml_transformer", "ml_pipeline_stage")
+  )
+}
+
 ml_info <- function(jobj) {
   uid <- invoke(jobj, "uid")
   type <- jobj_info(jobj)$class

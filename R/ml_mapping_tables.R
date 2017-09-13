@@ -2,6 +2,7 @@ ml_create_mapping_tables <- function() {
   param_mapping_list <-
     list("input_col" = "inputCol",
          "output_col" = "outputCol",
+         # ml_logistic_regression
          "elastic_net_param" = "elasticNetParam",
          "features_col" = "featuresCol",
          "fit_intercept" = "fitIntercept",
@@ -13,7 +14,15 @@ ml_create_mapping_tables <- function() {
          "reg_param" = "regParam",
          "weight_col" = "weightCol",
          "aggregation_depth" = "aggregationDepth",
-         "num_features" = "numFeatures")
+         "num_features" = "numFeatures",
+         # ml_r_formula
+         "force_index_label" = "forceIndexLabel",
+         # ml_string_indexer
+         "handle_invalid" = "handleInvalid",
+         # ml_one_hot_encoder
+         "drop_last" = "dropLast",
+         # ml_vector_assembler
+         "input_cols" = "inputCols")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
