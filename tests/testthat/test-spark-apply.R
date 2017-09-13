@@ -141,7 +141,7 @@ test_that("'spark_apply' can filter using dplyr", {
     sdf_len(sc, 10) %>%
       spark_apply(function(e) dplyr::filter(e, id > 1)) %>%
       collect() %>%
-      nrow(),
+      as.data.frame(),
     data.frame(id = c(2:10))
   )
 })
