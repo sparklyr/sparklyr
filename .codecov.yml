@@ -1,0 +1,6 @@
+# Code Coverage: see https://docs.codecov.io/v4.3.6/docs/codecov-yaml
+
+coverage:
+  range: 40..75
+
+comment: false
