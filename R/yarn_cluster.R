@@ -90,13 +90,20 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
     rmHighAvailabilityIds <- c(rmHighAvailabilityId, rmHighAvailabilityIds)
 
     mainRMWebapp <- NULL
-    for (rmId in rmHighAvailabilityIds) {
-      rmCandidate <- paste0("yarn.resourcemanager.webapp.address.", rmId)
-      rmCandidateValue <- spark_yarn_cluster_get_conf_property(rmCandidate)
+    propCandidates <- c(
+      "yarn.resourcemanager.webapp.address.",
+      "yarn.resourcemanager.admin.address."
+    )
 
-      if (spark_yarn_cluster_resource_manager_is_online(rmCandidateValue)) {
-        mainRMWebapp <- rmCandidate
-        break;
+    for (propCandidate in propCandidates) {
+      for (rmId in rmHighAvailabilityIds) {
+        rmCandidate <- paste0(propCandidate, rmId)
+        rmCandidateValue <- spark_yarn_cluster_get_conf_property(rmCandidate)
+
+        if (spark_yarn_cluster_resource_manager_is_online(rmCandidateValue)) {
+          mainRMWebapp <- rmCandidate
+          break;
+        }
       }
     }
 
