@@ -2,7 +2,7 @@
 
 #' @export
 ml_r_formula <- function(x, formula, features_col = "features", label_col = "label",
-                         force_index_label = FALSE,
+                         force_index_label = FALSE, dataset = NULL,
                          uid = random_string("r_formula_"), ...) {
   UseMethod("ml_r_formula")
 }
@@ -10,7 +10,7 @@ ml_r_formula <- function(x, formula, features_col = "features", label_col = "lab
 #' @export
 ml_r_formula.spark_connection <- function(
   x, formula, features_col = "features", label_col = "label",
-  force_index_label = FALSE,
+  force_index_label = FALSE, dataset = NULL,
   uid = random_string("r_formula_"), ...) {
 
   jobj <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", uid) %>%
@@ -31,7 +31,7 @@ ml_r_formula.spark_connection <- function(
 #' @export
 ml_r_formula.ml_pipeline <- function(
   x, formula, features_col = "features", label_col = "label",
-  force_index_label = FALSE,
+  force_index_label = FALSE, dataset = NULL,
   uid = random_string("r_formula_"), ...
 ) {
 
@@ -45,7 +45,7 @@ ml_r_formula.ml_pipeline <- function(
 #' @export
 ml_r_formula.tbl_spark <- function(
   x, formula, features_col = "features", label_col = "label",
-  force_index_label = FALSE,
+  force_index_label = FALSE, dataset = NULL,
   uid = random_string("r_formula_"), ...
 ) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
@@ -57,7 +57,7 @@ ml_r_formula.tbl_spark <- function(
 #' @export
 ml_string_indexer <- function(
   x, input_col, output_col,
-  handle_invalid = c("error", "skip", "keep"),
+  handle_invalid = "error", dataset = NULL,
   uid = random_string("string_indexer_"), ...) {
   UseMethod("ml_string_indexer")
 }
@@ -65,7 +65,7 @@ ml_string_indexer <- function(
 #' @export
 ml_string_indexer.spark_connection <- function(
   x, input_col, output_col,
-  handle_invalid = c("error", "skip", "keep"),
+  handle_invalid = "error", dataset = NULL,
   uid = random_string("string_indexer_"), ...) {
 
   ml_validate_args(rlang::caller_env())
@@ -86,7 +86,7 @@ ml_string_indexer.spark_connection <- function(
 #' @export
 ml_string_indexer.ml_pipeline <- function(
   x, input_col, output_col,
-  handle_invalid = c("error", "skip", "keep"),
+  handle_invalid = "error", dataset = NULL,
   uid = random_string("string_indexer_"), ...
 ) {
 
@@ -100,7 +100,7 @@ ml_string_indexer.ml_pipeline <- function(
 #' @export
 ml_string_indexer.tbl_spark <- function(
   x, input_col, output_col,
-  handle_invalid = c("error", "skip", "keep"),
+  handle_invalid = "error", dataset = NULL,
   uid = random_string("string_indexer_"), ...
 ) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
