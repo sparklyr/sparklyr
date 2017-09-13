@@ -20,5 +20,6 @@ test_that("r formula works as expected", {
     select(features, label) %>%
     collect()
 
-  expect_equal(df1, df2)
+  expect_equal(pull(df1, features), pull(df2, features))
+  expect_equal(pull(df1, label), pull(df2, label))
 })
