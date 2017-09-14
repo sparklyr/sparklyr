@@ -176,7 +176,7 @@ spark_apply <- function(x,
     closure_rlang,
     bundle_path,
     as.environment(proc_env),
-    60
+    as.integer(60)
   )
 
   # while workers need to relaunch sparklyr backends, cache by default
