@@ -70,8 +70,15 @@ spark_yarn_cluster_resource_manager_is_online <- function(rm_webapp) {
   )
 
   tryCatch({
-    !httr::http_error(rmQuery)
+    rmResult <- httr::GET(rmQuery)
+    if (httr::http_error(rmResult)) {
+      warning("Failed to open ", rmQuery, " with status ", httr::status_code(rmResult), ". ")
+      FALSE
+    } else {
+      TRUE
+    }
   }, error = function(err) {
+    warning("Failed to open ", rmQuery, ". ", err)
     FALSE
   })
 }
@@ -86,17 +93,27 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
 
     rmHighAvailabilityIds <- spark_yarn_cluster_get_conf_property("yarn.resourcemanager.ha.rm-ids")
     rmHighAvailabilityIds <- strsplit(rmHighAvailabilityIds, ",")[[1]]
-    rmHighAvailabilityIds <- rmHighAvailabilityIds[rmHighAvailabilityIds != rmHighAvailabilityId]
-    rmHighAvailabilityIds <- c(rmHighAvailabilityId, rmHighAvailabilityIds)
+
+    if (length(rmHighAvailabilityId) > 0) {
+      rmHighAvailabilityIds <- rmHighAvailabilityIds[rmHighAvailabilityIds != rmHighAvailabilityId]
+      rmHighAvailabilityIds <- c(rmHighAvailabilityId, rmHighAvailabilityIds)
+    }
 
     mainRMWebapp <- NULL
-    for (rmId in rmHighAvailabilityIds) {
-      rmCandidate <- paste0("yarn.resourcemanager.webapp.address.", rmId)
-      rmCandidateValue <- spark_yarn_cluster_get_conf_property(rmCandidate)
+    propCandidates <- c(
+      "yarn.resourcemanager.webapp.address.",
+      "yarn.resourcemanager.admin.address."
+    )
 
-      if (spark_yarn_cluster_resource_manager_is_online(rmCandidateValue)) {
-        mainRMWebapp <- rmCandidate
-        break;
+    for (propCandidate in propCandidates) {
+      for (rmId in rmHighAvailabilityIds) {
+        rmCandidate <- paste0(propCandidate, rmId)
+        rmCandidateValue <- spark_yarn_cluster_get_conf_property(rmCandidate)
+
+        if (spark_yarn_cluster_resource_manager_is_online(rmCandidateValue)) {
+          mainRMWebapp <- rmCandidate
+          break;
+        }
       }
     }
 
