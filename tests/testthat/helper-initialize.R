@@ -23,10 +23,10 @@ testthat_spark_connection <- function(version = NULL) {
   if (!connected) {
     config <- spark_config()
 
-    config$sparklyr.sanitize.column.names.verbose <- TRUE
-    config$sparklyr.verbose <- TRUE
-    config$sparklyr.na.ommit.verbose <- TRUE
-    config$sparklyr.na.action.verbose <- TRUE
+    options(sparklyr.sanitize.column.names.verbose = TRUE)
+    options(sparklyr.verbose = TRUE)
+    options(sparklyr.na.omit.verbose = TRUE)
+    options(sparklyr.na.action.verbose = TRUE)
 
     version <- version %||% Sys.getenv("SPARK_VERSION", unset = "2.1.0")
     setwd(tempdir())
