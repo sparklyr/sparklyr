@@ -3,12 +3,33 @@ spark_worker_main <- function(
   backendPort = 8880,
   configRaw = NULL) {
 
+  if (is.null(configRaw)) configRaw <- worker_config_serialize(list())
+  config <- worker_config_deserialize(configRaw)
+
+  if (config$covr) {
+    file_coverage <- get("file_coverage", asNamespace("covr"))
+
+    config$covr <- FALSE
+
+    test_file <- tempfile("worker_script.R")
+    cat(paste0(
+      "spark_worker_main(",
+      sessionId,
+      backendPort,
+      "\"",
+      worker_config_serialize(config),
+      "\"",
+      ")"
+    ), file = test_file)
+
+    file_coverage(src, test_file)
+    return()
+  }
+
   spark_worker_hooks()
 
   tryCatch({
-    if (is.null(configRaw)) configRaw <- worker_config_serialize(list())
 
-    config <- worker_config_deserialize(configRaw)
 
     if (config$debug) {
       worker_log("exiting to wait for debugging session to attach")

@@ -118,7 +118,8 @@ spark_apply <- function(x,
   worker_config <- worker_config_serialize(
     c(
       list(
-        debug = isTRUE(args$debug)
+        debug = isTRUE(args$debug),
+        covr = isTRUE(args$covr)
       ),
       sc$config
     )
