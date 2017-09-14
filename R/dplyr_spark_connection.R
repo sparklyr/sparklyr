@@ -185,6 +185,9 @@ sql_set_op.spark_connection <- function(con, x, y, method) {
 }
 
 #' @export
+#' @importFrom dplyr db_query_fields
+#' @importFrom dbplyr sql_select
+#' @importFrom dbplyr sql_subquery
 #' @keywords internal
 db_query_fields.spark_connection <- function(con, sql, ...) {
   sqlFields <- sql_select(
