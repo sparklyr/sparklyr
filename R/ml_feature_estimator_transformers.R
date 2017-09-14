@@ -24,7 +24,7 @@ ml_r_formula.spark_connection <- function(
   else {
     jobj %>%
       ml_fit(dataset) %>%
-      ml_transformer_info()
+      new_ml_transformer()
   }
 }
 
@@ -77,7 +77,7 @@ ml_string_indexer.spark_connection <- function(
   else {
     jobj %>%
       ml_fit(dataset) %>%
-      ml_transformer_info()
+      new_ml_transformer()
   }
 }
 

@@ -16,7 +16,7 @@ ml_fit.ml_estimator <- function(x, data, ...) {
   jobj <- x$.jobj %>%
     invoke("fit", spark_dataframe(data))
 
-  ml_transformer_info(jobj)
+  new_ml_transformer(jobj)
 }
 
 #' @export
