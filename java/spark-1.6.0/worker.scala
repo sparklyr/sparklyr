@@ -77,7 +77,8 @@ object WorkerHelper {
     groupBy: Array[String],
     closureRLang: Array[Byte],
     bundlePath: String,
-    customEnv: java.util.Map[Object, Object]
+    customEnv: java.util.Map[Object, Object],
+    connectionTimeout: Int
   ): RDD[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
@@ -95,7 +96,8 @@ object WorkerHelper {
       groupBy,
       closureRLang,
       bundlePath,
-      Map() ++ customEnvMap)
+      Map() ++ customEnvMap,
+      connectionTimeout)
 
     computed
   }

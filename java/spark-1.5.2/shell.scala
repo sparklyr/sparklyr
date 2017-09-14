@@ -37,12 +37,17 @@ object Shell {
 
     val port = args(0).toInt
     val sessionId = args(1).toInt
+    val connectionTimeout = if (args.length <= 2) 60 else scala.util.Try(args(2).toInt).toOption match {
+      case i:Some[_] => args(2).toInt
+      case _ => 60
+    }
+
     val isService = args.contains("--service")
     val isRemote = args.contains("--remote")
 
     backend = new Backend()
     backend.setType(isService, isRemote, false)
-    backend.init(port, sessionId)
+    backend.init(port, sessionId, connectionTimeout)
   }
 
   def getBackend(): Backend = {
