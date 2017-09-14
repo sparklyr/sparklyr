@@ -10,7 +10,7 @@ ml_add_stage <- function(x, transformer) {
                         "createPipelineFromStages",
                         x$uid,
                         stages)
-  ml_info(jobj)
+  new_ml_pipeline(jobj)
 }
 
 ml_new_transformer <- function(sc, class, input_col, output_col, uid) {

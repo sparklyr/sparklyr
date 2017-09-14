@@ -8,7 +8,7 @@ ml_fit.ml_pipeline <- function(x, data, ...) {
   jobj <- x$.jobj %>%
     invoke("fit", spark_dataframe(data))
 
-  ml_pipeline_model_info(jobj)
+  new_ml_pipeline_model(jobj)
 }
 
 #' @export

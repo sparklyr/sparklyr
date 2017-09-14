@@ -7,13 +7,7 @@ ml_pipeline <- function(x, ..., uid = random_string("pipeline_")) {
 ml_pipeline.spark_connection <- function(x, uid = random_string("pipeline_")) {
   ensure_scalar_character(uid)
   jobj <- invoke_new(x, "org.apache.spark.ml.Pipeline", uid)
-  structure(
-    list(uid = invoke(jobj, "uid"),
-         stages = NA,
-         type = jobj_info(jobj)$class,
-         .jobj = jobj),
-    class = c("ml_pipeline", "ml_pipeline_stage")
-  )
+  new_ml_pipeline(jobj)
 }
 
 #' @export
@@ -27,7 +21,7 @@ ml_pipeline.ml_pipeline_stage <- function(x, ..., uid = random_string("pipeline_
                         "createPipelineFromStages",
                         uid,
                         stages)
-  ml_info(jobj)
+  new_ml_pipeline(jobj)
 }
 
 #' @export

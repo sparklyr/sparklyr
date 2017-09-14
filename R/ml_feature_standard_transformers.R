@@ -11,7 +11,7 @@ ml_tokenizer.spark_connection <- function(x, input_col, output_col, uid = random
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Tokenizer",
                              input_col, output_col, uid)
 
-  ml_info(jobj)
+  new_ml_transformer(jobj)
 }
 
 #' @export
@@ -45,7 +45,7 @@ ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold = 
                              input_col, output_col, uid) %>%
     invoke("setThreshold", threshold)
 
-  ml_info(jobj)
+  new_ml_transformer(jobj)
 }
 
 #' @export
@@ -78,7 +78,7 @@ ml_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FA
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.HashingTF",
                              input_col, output_col, uid)
 
-  ml_info(jobj)
+  new_ml_transformer(jobj)
 }
 
 #' @export
@@ -116,7 +116,7 @@ ml_one_hot_encoder.spark_connection <- function(
                              input_col, output_col, uid) %>%
     invoke("setDropLast", drop_last)
 
-  ml_info(jobj)
+  new_ml_transformer(jobj)
 }
 
 #' @export
@@ -160,7 +160,7 @@ ml_vector_assembler.spark_connection <- function(
     invoke("setInputCols", input_cols) %>%
     invoke("setOutputCol", output_col)
 
-  ml_info(jobj)
+  new_ml_transformer(jobj)
 }
 
 #' @export

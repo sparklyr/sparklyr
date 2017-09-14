@@ -6,7 +6,7 @@ test_that("We can instantiate tokenizer object", {
   tokenizer <- ml_tokenizer(sc, "x", "y", uid = "tok")
   expect_equal(tokenizer$type, "org.apache.spark.ml.feature.Tokenizer")
   expect_equal(tokenizer$uid, "tok")
-  expect_equal(class(tokenizer), "ml_pipeline_stage")
+  expect_equal(class(tokenizer), c("ml_transformer", "ml_pipeline_stage"))
 })
 
 test_that("ml_tokenizer() returns params of transformer", {

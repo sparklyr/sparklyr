@@ -20,7 +20,7 @@ ml_r_formula.spark_connection <- function(
     invoke("setLabelCol", label_col)
 
   if (is.null(dataset))
-    ml_info(jobj)
+    new_ml_estimator(jobj)
   else {
     jobj %>%
       ml_fit(dataset) %>%
@@ -73,7 +73,7 @@ ml_string_indexer.spark_connection <- function(
     invoke("setHandleInvalid", handle_invalid)
 
   if (is.null(dataset))
-    ml_info(jobj)
+    new_ml_estimator(jobj)
   else {
     jobj %>%
       ml_fit(dataset) %>%
