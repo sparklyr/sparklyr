@@ -7,6 +7,7 @@ testthat_spark_connection <- function(version = NULL) {
   }
 
   if (nrow(spark_installed_versions()) == 0) {
+    options(sparkinstall.verbose = TRUE)
     spark_install("2.1.0")
   }
 
@@ -21,6 +22,11 @@ testthat_spark_connection <- function(version = NULL) {
 
   if (!connected) {
     config <- spark_config()
+
+    config$sparklyr.sanitize.column.names.verbose <- TRUE
+    config$sparklyr.verbose <- TRUE
+    config$sparklyr.na.ommit.verbose <- TRUE
+    config$sparklyr.na.action.verbose <- TRUE
 
     version <- version %||% Sys.getenv("SPARK_VERSION", unset = "2.1.0")
     setwd(tempdir())
