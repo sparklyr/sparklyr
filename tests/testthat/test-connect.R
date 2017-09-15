@@ -33,6 +33,13 @@ test_that("'spark_connect' fails with bad configuration'", {
 test_that("'spark_session_id' generates different ids for different apps", {
   expect_true(
     spark_session_id(app_name = "foo", master = "local") !=
+    spark_session_id(app_name = "bar", master = "local")
+  )
+})
+
+test_that("'spark_session_id' generates same ids for same apps", {
+  expect_equal(
+    spark_session_id(app_name = "foo", master = "local"),
     spark_session_id(app_name = "foo", master = "local")
   )
 })
