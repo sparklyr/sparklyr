@@ -90,6 +90,10 @@ spark_session_id <- function(app_name, master) {
   hex_to_int(hashed) %% .Machine$integer.max
 }
 
+spark_session_random <- function() {
+  floor(openssl::rand_num(1) * 100000)
+}
+
 abort_shell <- function(message, spark_submit_path, shell_args, output_file, error_file) {
   withr::with_options(list(
     warning.length = 8000
@@ -151,7 +155,7 @@ start_shell <- function(master,
   sessionId <- if (isService)
       spark_session_id(app_name, master)
   else
-    floor(stats::runif(1, min = 0, max = 10000))
+      spark_session_random()
 
   # attempt to connect into an existing gateway
   gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
