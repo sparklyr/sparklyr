@@ -52,10 +52,22 @@ new_ml_transformer <- function(jobj, ..., subclass = NULL) {
                         subclass = c(subclass, "ml_transformer"))
 }
 
+new_ml_prediction_model <- function(jobj, ..., subclass = NULL) {
+  new_ml_transformer(jobj,
+                     ...,
+                     subclass = c(subclass, "ml_prediction_model"))
+}
+
 new_ml_estimator <- function(jobj, ..., subclass = NULL) {
   new_ml_pipeline_stage(jobj,
                         ...,
                         subclass = c(subclass, "ml_estimator"))
+}
+
+new_ml_predictor <- function(jobj, ..., subclass = NULL) {
+  new_ml_estimator(jobj,
+                   ...,
+                   subclass = c(subclass, "ml_predictor"))
 }
 
 new_ml_cross_validator <- function(jobj) {
@@ -92,7 +104,7 @@ new_ml_pipeline <- function(jobj, ..., subclass = NULL) {
 new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
   stages <- tryCatch({
     jobj %>%
-      invoke("getStages") %>%
+      invoke("stages") %>%
       lapply(ml_constructor_dispatch)
   },
   error = function(e) {

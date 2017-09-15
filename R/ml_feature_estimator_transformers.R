@@ -13,19 +13,17 @@ ml_r_formula.spark_connection <- function(
   force_index_label = FALSE, dataset = NULL,
   uid = random_string("r_formula_"), ...) {
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", uid) %>%
+  estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", uid) %>%
     invoke("setFeaturesCol", features_col) %>%
     invoke("setForceIndexLabel", force_index_label) %>%
     invoke("setFormula", formula) %>%
-    invoke("setLabelCol", label_col)
+    invoke("setLabelCol", label_col) %>%
+    new_ml_estimator()
 
   if (is.null(dataset))
-    new_ml_estimator(jobj)
-  else {
-    jobj %>%
-      ml_fit(dataset) %>%
-      new_ml_transformer()
-  }
+    estimator
+  else
+    ml_fit(estimator, dataset)
 }
 
 #' @export
@@ -68,17 +66,15 @@ ml_string_indexer.spark_connection <- function(
 
   ml_validate_args(rlang::caller_env())
 
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.StringIndexer",
+  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StringIndexer",
                              input_col, output_col, uid) %>%
-    invoke("setHandleInvalid", handle_invalid)
+    invoke("setHandleInvalid", handle_invalid) %>%
+    new_ml_estimator()
 
   if (is.null(dataset))
-    new_ml_estimator(jobj)
-  else {
-    jobj %>%
-      ml_fit(dataset) %>%
-      new_ml_transformer()
-  }
+    estimator
+  else
+    ml_fit(estimator, dataset)
 }
 
 #' @export
