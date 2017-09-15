@@ -63,7 +63,7 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
   if (length(propertyValue) == 0) {
     stop(
       "Failed to retrieve new sparklyr yarn application from ",
-      resourceManagerQuery, " after ", format(Sys.time() - commandStart, ", last result: "),
+      resourceManagerQuery, " after ", format(Sys.time() - start_time, ", last result: "),
       yarnApps
     )
   }
@@ -149,7 +149,8 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
   }
 
   amHostHttpAddress <- spark_yarn_cluster_get_app_property(
-    config, start_time,
+    config,
+    start_time,
     resourceManagerWebapp,
     "amHostHttpAddress")
 
