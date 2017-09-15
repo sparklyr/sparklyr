@@ -28,7 +28,8 @@ ml_validate_args <- function(env) {
 
   validated_args <- rlang::invoke(
     validator_fn, args = args, current_args = default_args
-  )
+  ) %>%
+    `[`(names(args))
 
   invisible(
     lapply(names(validated_args),
