@@ -1,8 +1,8 @@
-context("ml validation")
+context("ml tuning")
 
 sc <- testthat_spark_connection()
 
-test_that("ml_cross_validator() parses grid correctly", {
+test_that("ml_cross_validator() works correctly", {
   pipeline <- ml_pipeline(sc) %>%
     ml_tokenizer("text", "words", uid = "tokenizer_1") %>%
     ml_hashing_tf("words", "features", uid = "hashing_tf_1") %>%
@@ -40,10 +40,18 @@ test_that("ml_cross_validator() parses grid correctly", {
     l[sort(names(l))]
   }
 
-  # str(lapply(expected_param_maps, list_sorter))
-  # str(lapply(cv$estimator_param_maps, list_sorter))
+  diff <- mapply(function(x, y) mapply(function(a, b) setdiff(a, b), x, y),
+         lapply(expected_param_maps, list_sorter),
+         lapply(cv$estimator_param_maps, list_sorter), SIMPLIFY = FALSE)
+
   expect_identical(
-    lapply(expected_param_maps, list_sorter),
-    lapply(cv$estimator_param_maps, list_sorter)
+    c(diff),
+    rep(list(list(hashing_tf_1 = list(),
+         logistic_1 = list())), 8)
+  )
+
+  expect_identical(
+    class(cv),
+    c("ml_cross_validator", "ml_estimator", "ml_pipeline_stage")
   )
 })

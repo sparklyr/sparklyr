@@ -5,9 +5,10 @@ ml_is_instance_of <- function(jobj, type) {
     invoke("isInstance", jobj)
 }
 
-ml_inherited <- function(jobj) {
+ml_ancestry <- function(jobj) {
   classes <- c("classification.Classifier",
                "classification.ClassificationModel",
+               "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
 
@@ -23,11 +24,12 @@ ml_package <- function(jobj) {
 }
 
 ml_constructor_dispatch <- function(jobj) {
-  switch(ml_inherited(jobj)[1],
+  switch(ml_ancestry(jobj)[1],
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),
          "Estimator" = new_ml_estimator(jobj),
+         "tuning.CrossValidator" = new_ml_cross_validator(jobj),
          new_ml_pipeline_stage(jobj))
 }
 
@@ -57,6 +59,21 @@ new_ml_estimator <- function(jobj, ..., subclass = NULL) {
   new_ml_pipeline_stage(jobj,
                         ...,
                         subclass = c(subclass, "ml_estimator"))
+}
+
+new_ml_cross_validator <- function(jobj) {
+  sc <- spark_connection(jobj)
+  param_maps <- jobj %>%
+    invoke("getEstimatorParamMaps") %>%
+    lapply(function(x) invoke_static(sc,
+                                     "sparklyr.MLUtils",
+                                     "paramMapToNestedList",
+                                     x)) %>%
+    lapply(function(x) lapply(x, ml_map_param_list_names))
+
+  new_ml_estimator(jobj,
+                   estimator_param_maps = param_maps,
+                   subclass = "ml_cross_validator")
 }
 
 new_ml_pipeline <- function(jobj, ..., subclass = NULL) {
