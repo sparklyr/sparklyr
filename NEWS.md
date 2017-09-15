@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Enabled support for Java 9 for clusters configured with 
+  Hadoop 2.8. Java 9 blocked on 'master=local' unless
+  'options(sparklyr.java9 = TRUE)' is set.
+
 - Fixed issue in `spark_connect()` where using `set.seed()`
   before connection would cause session ids to be duplicates
   and connections to be reused.
