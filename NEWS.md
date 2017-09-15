@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed issue in `spark_connect()` where using `set.seed()`
+  before connection would cause session ids to be duplicates
+  and connections to be reused.
+
 - Fixed issue in `spark_connect()` blocking gateway port when
   connection was never started to the backend, for isntasnce,
   while interrupting the r session while connecting.
