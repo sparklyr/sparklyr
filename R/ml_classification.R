@@ -18,6 +18,7 @@ ml_new_classifier <- function(sc, class,
 #' @export
 ml_logistic_regression <- function(
   x,
+  formula = NULL,
   features_col = "features",
   label_col = "label",
   family = c("auto", "binomial", "multinomial"),
@@ -27,6 +28,7 @@ ml_logistic_regression <- function(
   max_iter = 100L,
   threshold = 0.5,
   thresholds = NULL,
+  weight_col = NULL,
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
@@ -38,6 +40,7 @@ ml_logistic_regression <- function(
 #' @export
 ml_logistic_regression.spark_connection <- function(
   x,
+  formula = NULL,
   features_col = "features",
   label_col = "label",
   family = c("auto", "binomial", "multinomial"),
@@ -47,6 +50,7 @@ ml_logistic_regression.spark_connection <- function(
   max_iter = 100L,
   threshold = 0.5,
   thresholds = NULL,
+  weight_col = NULL,
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
@@ -63,12 +67,16 @@ ml_logistic_regression.spark_connection <- function(
     invoke("setRegParam", reg_param) %>%
     invoke("setMaxIter", max_iter)
 
-  ml_info(jobj)
+  if (!is.null(weight_col))
+    jobj <- invoke(jobj, "setWeightCol", weight_col)
+
+  new_ml_predictor(jobj)
 }
 
 #' @export
 ml_logistic_regression.ml_pipeline <- function(
   x,
+  formula = NULL,
   features_col = "features",
   label_col = "label",
   family = c("auto", "binomial", "multinomial"),
@@ -78,6 +86,7 @@ ml_logistic_regression.ml_pipeline <- function(
   max_iter = 100L,
   threshold = 0.5,
   thresholds = NULL,
+  weight_col = NULL,
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
@@ -90,6 +99,7 @@ ml_logistic_regression.ml_pipeline <- function(
 #' @export
 ml_logistic_regression.tbl_spark <- function(
   x,
+  formula = NULL,
   features_col = "features",
   label_col = "label",
   family = c("auto", "binomial", "multinomial"),
@@ -99,20 +109,32 @@ ml_logistic_regression.tbl_spark <- function(
   max_iter = 100L,
   threshold = 0.5,
   thresholds = NULL,
+  weight_col = NULL,
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...) {
 
-  transformer <- ml_new_stage_modified_args(rlang::call_frame())
-  # ml_transform(transformer, x)
-  jobj <- transformer$.jobj %>%
-    invoke("fit", spark_dataframe(x))
+  logistic_regression <- ml_new_stage_modified_args(rlang::call_frame())
 
-  structure(
-    list(
-      .jobj = jobj
-    ),
-    class = c("ml_logistic_regression_model", "ml_pipeline_stage")
-  )
+  if (is.null(formula)) {
+    logistic_regression %>%
+      ml_fit(x)
+  } else {
+    sc <- spark_connection(x)
+    r_formula <- ml_r_formula(sc, formula, features_col,
+                              label_col, force_index_label = TRUE,
+                              dataset = x)
+    pipeline <- ml_pipeline(r_formula, logistic_regression)
+
+    pipeline_model <- pipeline %>%
+      ml_fit(x)
+
+    new_ml_model_logistic_regression(
+      pipeline,
+      pipeline_model,
+      logistic_regression$uid,
+      formula,
+      dataset = x)
+  }
 }

@@ -6,5 +6,6 @@ ml_validator_logistic_regression <- function(args, current_args) {
     family <- rlang::arg_match(family, c("auto", "binomial", "multinomial"))
     fit_intercept <- ensure_scalar_boolean(fit_intercept)
     threshold <- ensure_scalar_double(threshold)
+    weight_col <- ensure_scalar_character(weight_col, allow.null = TRUE)
   })
 }

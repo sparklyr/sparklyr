@@ -20,6 +20,14 @@ ml_fit.ml_estimator <- function(x, data, ...) {
 }
 
 #' @export
+ml_fit.ml_predictor <- function(x, data, ...) {
+  jobj <- x$.jobj %>%
+    invoke("fit", spark_dataframe(data))
+
+  new_ml_prediction_model(jobj)
+}
+
+#' @export
 ml_fit.ml_transformer <- function(x, data, ...) {
   stop("cannot invoke 'fit' on transformers; 'ml_fit()' should be used with estimators")
 }

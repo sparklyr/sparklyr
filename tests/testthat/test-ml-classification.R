@@ -19,11 +19,17 @@ test <- data_frame(
 )
 test_tbl <- testthat_tbl("test")
 
-# test_that("ml_logistic_regression() returns params", {
+# test_that("ml_logistic_regression interprets params apporpriately", {
 #   lr <- ml_logistic_regression(sc, intercept = TRUE, elastic_net_param = 0)
 #   expected_params <- list(intercept = TRUE, elastic_net_param = 0)
 #   params <- lr$param_map
 #   expect_equal(setdiff(expected_params, params), list())
+# })
+#
+# test_that("ml_logistic_regression.spark_connect() returns object with correct class", {
+#   lr <- ml_logistic_regression(sc, intercept = TRUE, elastic_net_param = 0)
+#   expect_equal(class(lr), c("ml_predictor", "ml_estimator",
+#                             "ml_pipeline_stage"))
 # })
 #
 # test_that("ml_logistic_regression() does input checking", {
@@ -32,7 +38,7 @@ test_tbl <- testthat_tbl("test")
 #   expect_equal(ml_logistic_regression(sc, max_iter = 25)$param_map$max_iter,
 #                25L)
 # })
-
+#
 test_that("ml_logistic_regression.tbl_spark() works properly", {
   training_tbl <- testthat_tbl("training")
   test_tbl <- testthat_tbl("test")
@@ -42,20 +48,49 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
     ml_hashing_tf("words", "features", num_features = 1000) %>%
     ml_logistic_regression(max_iter = 10, reg_param = 0.001)
 
-  m_1 <- pipeline %>%
-    ml_fit(training_tbl) %>%
+  m1 <- pipeline %>%
+    ml_fit(training_tbl)
+  m1_predictions <- m1 %>%
     ml_transform(test_tbl) %>%
     dplyr::pull(probability)
 
-  m_2 <- training_tbl %>%
+  m2 <- training_tbl %>%
     ml_tokenizer("text", "words") %>%
     ml_hashing_tf("words", "features", num_features = 1000) %>%
-    ml_logistic_regression(max_iter = 10, reg_param = 0.001) %>%
+    ml_logistic_regression(max_iter = 10, reg_param = 0.001)
+  m2_predictions <- m2 %>%
     ml_transform(test_tbl %>%
                    ml_tokenizer("text", "words") %>%
                    ml_hashing_tf("words", "features", num_features = 1000)) %>%
     dplyr::pull(probability)
 
-  expect_equal(m_1, m_2)
+  expect_equal(m1_predictions, m2_predictions)
+  expect_identical(class(m2), c("ml_prediction_model",
+                                "ml_transformer", "ml_pipeline_stage"))
+})
 
+test_that("ml_logistic_regression() agrees with stats::glm()", {
+  set.seed(42)
+  iris_weighted <- iris %>%
+    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
+                  ones = rep(1, nrow(iris)),
+                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+           family = binomial(logit), weights = weights,
+           data = iris_weighted)
+  s <- ml_logistic_regression(iris_weighted_tbl,
+                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                              reg_param = 0L,
+                              weight_col = "weights")
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+           family = binomial(logit), data = iris_weighted)
+  s <- ml_logistic_regression(iris_weighted_tbl,
+                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                              reg_param = 0L,
+                              weight_col = "ones")
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
