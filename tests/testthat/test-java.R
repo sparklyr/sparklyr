@@ -1,7 +1,7 @@
 context("java")
 
 test_that("'validate_java_version_line' fails with 1.6", {
-  expect_failure(
+  expect_error(
     validate_java_version_line(
       "local",
       c(
@@ -27,7 +27,7 @@ test_that("'validate_java_version_line' works with 1.8", {
 })
 
 test_that("'validate_java_version_line' fails with java 9 in local mode", {
-  expect_failure(
+  expect_error(
     validate_java_version_line(
       "local",
       c(
