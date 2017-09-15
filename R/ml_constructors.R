@@ -34,9 +34,6 @@ ml_constructor_dispatch <- function(jobj) {
 }
 
 new_ml_pipeline_stage <- function(jobj, ..., subclass = NULL) {
-  # if (identical(jobj_info(jobj)$class, "org.apache.spark.ml.Pipeline"))
-  #   new_ml_pipeline(jobj)
-  # else
   structure(
     list(
       uid = invoke(jobj, "uid"),
