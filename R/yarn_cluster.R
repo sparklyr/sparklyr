@@ -38,6 +38,7 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
   waitSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.start.timeout", 60)
   commandStart <- Sys.time()
   propertyValue <- NULL
+  yarnApps <- NULL
 
   while(length(propertyValue) == 0 && commandStart + waitSeconds > Sys.time()) {
     resourceManagerResponce <- httr::GET(resourceManagerQuery)
@@ -49,13 +50,22 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
       stop("Multiple sparklyr apps submitted at once to this yarn cluster, aborting, please retry")
     }
 
-    newSparklyrApp <- newSparklyrApps[[1]][[1]]
-    if (property %in% names(newSparklyrApp)) {
-      propertyValue <- newSparklyrApp[[property]]
+    if (length(newSparklyrApps) > 0 && length(newSparklyrApps[[1]]) > 0) {
+      newSparklyrApp <- newSparklyrApps[[1]][[1]]
+      if (property %in% names(newSparklyrApp)) {
+        propertyValue <- newSparklyrApp[[property]]
+      }
     }
-    else {
-      Sys.sleep(1)
-    }
+
+    if (length(propertyValue) == 0) Sys.sleep(1)
+  }
+
+  if (length(propertyValue) == 0) {
+    stop(
+      "Failed to retrieve new sparklyr yarn application from ",
+      resourceManagerQuery, " after ", format(Sys.time() - start_time, ", last result: "),
+      yarnApps
+    )
   }
 
   propertyValue
@@ -139,13 +149,10 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
   }
 
   amHostHttpAddress <- spark_yarn_cluster_get_app_property(
-    config, start_time,
+    config,
+    start_time,
     resourceManagerWebapp,
     "amHostHttpAddress")
-
-  if (is.null(amHostHttpAddress)) {
-    stop("Failed to retrieve new sparklyr yarn application from ", resourceManagerWebapp)
-  }
 
   strsplit(amHostHttpAddress, ":")[[1]][[1]]
 }
