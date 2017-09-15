@@ -84,6 +84,7 @@ class Backend {
   private[this] var gatewayServerSocket: ServerSocket = null
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
+  private[this] var connectionTimeout: Int = 60
 
   private[this] var sc: SparkContext = null
   private[this] var hc: HiveContext = null
@@ -93,6 +94,8 @@ class Backend {
   private[this] var inetAddress: InetAddress = InetAddress.getLoopbackAddress()
 
   private[this] var logger: Logger = new Logger("Session", 0);
+
+  private[this] var oneConnection: Boolean = false;
 
   object GatewayOperattions extends Enumeration {
     val GetPorts, RegisterInstance, UnregisterInstance = Value
@@ -149,10 +152,12 @@ class Backend {
   }
 
   def init(portParam: Int,
-           sessionIdParam: Int): Unit = {
+           sessionIdParam: Int,
+           connectionTimeoutParam: Int): Unit = {
 
     port = portParam
     sessionId = sessionIdParam
+    connectionTimeout = connectionTimeoutParam
 
     logger = new Logger("Session", sessionId)
 
@@ -214,6 +219,7 @@ class Backend {
 
   def run(): Unit = {
     try {
+      initMonitor()
       while(isRunning) {
         bind()
       }
@@ -227,9 +233,23 @@ class Backend {
     }
   }
 
+  def initMonitor(): Unit = {
+    new Thread("starting init monitor thread") {
+      override def run(): Unit = {
+        Thread.sleep(connectionTimeout * 1000)
+        if (!oneConnection && !isService) {
+          logger.log("is terminating backend since no client has connected after " + connectionTimeout + " seconds")
+          System.exit(1)
+        }
+      }
+    }.start()
+  }
+
   def bind(): Unit = {
     logger.log("is waiting for sparklyr client to connect to port " + port)
     val gatewaySocket = gatewayServerSocket.accept()
+
+    oneConnection = true
 
     logger.log("accepted connection")
     val buf = new Array[Byte](1024)

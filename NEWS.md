@@ -1,5 +1,9 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed issue in `spark_connect()` blocking gateway port when
+  connection was never started to the backend, for isntasnce,
+  while interrupting the r session while connecting.
+  
 - Performance improvement for quering field names from tables
   impacting tables and `dplyr` queries, most noticeable in
   `na.omit` with several columns.
