@@ -27,21 +27,7 @@ is_java_available <- function() {
   nzchar(get_java())
 }
 
-validate_java_version <- function(master, spark_home) {
-  # if someone sets SPARK_HOME and we are not in local more, assume Java
-  # is available since some systems.
-  # (e.g. CDH) use versions of java not discoverable through JAVA_HOME.
-  if (!spark_master_is_local(master) && !is.null(spark_home) && nchar(spark_home) > 0)
-    return(TRUE)
-
-  # find the active java executable
-  java <- get_java(throws = TRUE)
-  if (!nzchar(java))
-    stop("Java is required to connect to Spark. Please download and install Java from ",
-         java_install_url())
-
-  # query its version
-  version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
+validate_java_version_line <- function(master, version) {
   if (length(version) < 1)
     stop("Java version not detected. Please download and install Java from ",
          java_install_url())
@@ -72,6 +58,31 @@ validate_java_version <- function(master, spark_home) {
   if (compareVersion(parsedVersion, "1.7") < 0)
     stop("Java version", parsedVersion, " detected but 1.7+ is required. Please download and install Java from ",
          java_install_url())
+
+  if (compareVersion(parsedVersion, "1.9") >= 0 && spark_master_is_local(master)  && !getOption("sparklyr.java9", FALSE)) {
+    stop(
+      "Java 9 is currently unsupported in Spark distributions unless you manually install Hadoop 2.8 ",
+      "and manually configure Spark. Please consider uninstalling Java 9 and reinstalling Java 8. ",
+      "To override this failure set 'options(sparklyr.java9 = TRUE)'.")
+  }
+}
+
+validate_java_version <- function(master, spark_home) {
+  # if someone sets SPARK_HOME and we are not in local more, assume Java
+  # is available since some systems.
+  # (e.g. CDH) use versions of java not discoverable through JAVA_HOME.
+  if (!spark_master_is_local(master) && !is.null(spark_home) && nchar(spark_home) > 0)
+    return(TRUE)
+
+  # find the active java executable
+  java <- get_java(throws = TRUE)
+  if (!nzchar(java))
+    stop("Java is required to connect to Spark. Please download and install Java from ",
+         java_install_url())
+
+  # query its version
+  version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
+  validate_java_version_line(master, version)
 
   TRUE
 }
