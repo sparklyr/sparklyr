@@ -62,3 +62,22 @@ test_that("ml_transformer.ml_pipeline() works as expected", {
   expect_equal(p1_params, p2_params)
   expect_equal(class(p2)[1], "ml_pipeline")
 })
+
+test_that("ml_transform() fails on estimators", {
+  iris_tbl <- testthat_tbl("iris")
+  string_indexer <- ml_string_indexer(sc, "Species", "species_idx")
+  expect_error(string_indexer %>%
+                 ml_transform(iris_tbl),
+               "cannot invoke 'transform' on estimators")
+})
+
+test_that("ml_fit() and ml_fit_and_transform() fail on transformers", {
+  iris_tbl <- testthat_tbl("iris")
+  binarizer <- ml_binarizer(sc, "Petal_Width", "petal_width_binarized")
+  expect_error(binarizer %>%
+                 ml_fit(iris_tbl),
+               "cannot invoke 'fit' on transformers")
+  expect_error(binarizer %>%
+                 ml_fit_and_transform(iris_tbl),
+               "cannot invoke 'fit' on transformers")
+})
