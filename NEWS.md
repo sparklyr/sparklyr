@@ -1,4 +1,4 @@
-# Sparklyr 0.7 (UNRELEASED)
+# Sparklyr 0.6.3
 
 - Enabled support for Java 9 for clusters configured with 
   Hadoop 2.8. Java 9 blocked on 'master=local' unless
@@ -109,7 +109,7 @@
 - Added support for additional livy session creation parameters using
   the `livy_config()` function.
 
-# Sparklyr 0.6.1 (UNRELEASED)
+# Sparklyr 0.6.1
 
 - Fixed error in `spark_apply()` that may triggered when multiple CPUs
   are used in a single node due to race conditions while accesing the
