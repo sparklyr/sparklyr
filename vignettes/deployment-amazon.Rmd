@@ -28,7 +28,7 @@ thumbnail <- function(title, img, href, caption = TRUE) {
 ### Amazon EMR
 
 ```{r, echo=FALSE}
-div(class = "col-sm-6","This document describes how to setup an EMR cluster, create Hive tables, connect to Spark, analize data, cache data, train a model, visualize predictions and build a dashboard.")
+div(class = "col-sm-6","This document describes how to setup an EMR cluster, create Hive tables, connect to Spark, analyze data, cache data, train a model, visualize predictions and build a dashboard.")
 thumbnail("Amazon EMR", "images/deployment/amazon-emr/emrConfigStep4.png", "deployment-amazon-emr.html")
 ```
 
