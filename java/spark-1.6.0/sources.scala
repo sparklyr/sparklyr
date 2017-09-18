@@ -1214,6 +1214,8 @@ object Sources {
     "worker_log_error <- function(...) {\n" +
     "  worker_log_level(..., level = \"ERROR\")\n" +
     "}\n" +
+    ".worker_globals <- new.env(parent = emptyenv())\n" +
+    "\n" +
     "spark_worker_main <- function(\n" +
     "  sessionId,\n" +
     "  backendPort = 8880,\n" +
@@ -1245,7 +1247,7 @@ object Sources {
     "  }, error = function(e) {\n" +
     "    worker_log_error(\"terminated unexpectedly: \", e$message)\n" +
     "    if (exists(\".stopLastError\", envir = .GlobalEnv)) {\n" +
-    "      worker_log_error(\"collected callstack: \\n\", get(\".stopLastError\", envir = .GlobalEnv))\n" +
+    "      worker_log_error(\"collected callstack: \\n\", get(\".stopLastError\", envir = .worker_globals))\n" +
     "    }\n" +
     "    quit(status = -1)\n" +
     "  })\n" +
@@ -1267,7 +1269,7 @@ object Sources {
     "      frame_names[[1 + i - frame_start]] <- paste(i, \": \", paste(head(deparse(current_call), 5), collapse = \"\\n\"), sep = \"\")\n" +
     "    }\n" +
     "\n" +
-    "    assign(\".stopLastError\", paste(rev(frame_names), collapse = \"\\n\"), envir = .GlobalEnv)\n" +
+    "    assign(\".stopLastError\", paste(rev(frame_names), collapse = \"\\n\"), envir = .worker_globals)\n" +
     "    originalStop(...)\n" +
     "  }, as.environment(\"package:base\"))\n" +
     "  lock(\"stop\",  as.environment(\"package:base\"))\n" +
