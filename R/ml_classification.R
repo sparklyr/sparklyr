@@ -18,7 +18,6 @@ ml_new_classifier <- function(sc, class,
 #' @export
 ml_logistic_regression <- function(
   x,
-  formula = NULL,
   features_col = "features",
   label_col = "label",
   family = c("auto", "binomial", "multinomial"),
@@ -40,7 +39,6 @@ ml_logistic_regression <- function(
 #' @export
 ml_logistic_regression.spark_connection <- function(
   x,
-  formula = NULL,
   features_col = "features",
   label_col = "label",
   family = c("auto", "binomial", "multinomial"),
@@ -76,7 +74,6 @@ ml_logistic_regression.spark_connection <- function(
 #' @export
 ml_logistic_regression.ml_pipeline <- function(
   x,
-  formula = NULL,
   features_col = "features",
   label_col = "label",
   family = c("auto", "binomial", "multinomial"),
