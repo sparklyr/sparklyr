@@ -12,7 +12,7 @@ spark_write_jdbc(x, name, mode = NULL, options = list(),
 
 \item{name}{The name to assign to the newly generated table.}
 
-\item{mode}{Specifies the behavior when data or table already exists.}
+\item{mode}{A \code{character} element.  Specifies the behavior when data or table already exists. Supported values include: error, append, overwrite and ignore.  For more details see also \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes} for your version of Spark.}
 
 \item{options}{A list of strings with additional options.}
 
@@ -40,3 +40,4 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
+\concept{Spark serialization routines}
