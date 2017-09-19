@@ -1,3 +1,10 @@
+
+# Sparklyr 0.6.4
+
+- Added support in`yarn-cluster` for `sparklyr.yarn.cluster.lookup.prefix`,
+  `sparklyr.yarn.cluster.lookup.username` and `sparklyr.yarn.cluster.lookup.byname`
+  to control the new application lookup behavior.
+
 # Sparklyr 0.6.3
 
 - Enabled support for Java 9 for clusters configured with 

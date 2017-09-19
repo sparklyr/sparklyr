@@ -40,11 +40,20 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
   propertyValue <- NULL
   yarnApps <- NULL
 
+  appLookupPrefix <- spark_config_value(config, "sparklyr.yarn.cluster.lookup.prefix", "sparklyr")
+  appLoookupUser <- if ("USER" %in% names(Sys.getenv())) Sys.getenv()[["USER"]] else spark_config_value(config, "sparklyr.yarn.cluster.lookup.username", NULL)
+  appLookupUseUser <- spark_config_value(config, "sparklyr.yarn.cluster.lookup.byname", !is.null(appLoookupUser))
+
   while(length(propertyValue) == 0 && commandStart + waitSeconds > Sys.time()) {
     resourceManagerResponce <- httr::GET(resourceManagerQuery)
     yarnApps <- httr::content(resourceManagerResponce)
 
-    newSparklyrApps <- Filter(function(e) grepl("sparklyr.*", e[[1]]$name), yarnApps$apps)
+    if (appLookupUseUser) {
+      newSparklyrApps <- Filter(function(e) grepl(appLoookupUser, e[[1]]$user), yarnApps$apps)
+    }
+    else {
+      newSparklyrApps <- Filter(function(e) grepl(paste0(appLookupPrefix , ".*"), e[[1]]$name), yarnApps$apps)
+    }
 
     if (length(newSparklyrApps) > 1) {
       stop("Multiple sparklyr apps submitted at once to this yarn cluster, aborting, please retry")
