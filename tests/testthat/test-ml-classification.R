@@ -26,6 +26,8 @@ iris_weighted <- iris %>%
                 ones = rep(1, nrow(iris)),
                 versicolor = ifelse(Species == "versicolor", 1L, 0L))
 
+iris_weighted_tbl <- testthat_tbl("iris_weighted")
+
 test_that("ml_logistic_regression interprets params apporpriately", {
   lr <- ml_logistic_regression(sc, intercept = TRUE, elastic_net_param = 0)
   expected_params <- list(intercept = TRUE, elastic_net_param = 0)
@@ -78,8 +80,6 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
 
 test_that("ml_logistic_regression() agrees with stats::glm()", {
 
-  iris_weighted_tbl <- testthat_tbl("iris_weighted")
-
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
            family = binomial(logit), weights = weights,
            data = iris_weighted)
@@ -99,7 +99,6 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
 })
 
 test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted formulas", {
-  iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
   m1 <- ml_logistic_regression(
     iris_weighted_tbl,
@@ -112,4 +111,45 @@ test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted for
   )
 
   expect_identical(m1$formula, m2$formula)
+})
+
+test_that("ml_logistic_regression.tbl_spark() takes 'response' and 'features'
+          columns instead of formula for backwards compatibility", {
+  m1 <- ml_logistic_regression(
+    iris_weighted_tbl,
+    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width"
+  )
+
+  m2 <- ml_logistic_regression(
+    iris_weighted_tbl,
+    response = "versicolor",
+    features = c("Sepal_Width", "Petal_Length", "Petal_Width")
+  )
+
+  expect_identical(m1$formula, m2$formula)
+})
+
+test_that("ml_logistic_regression.tbl_spark() warns when 'response' is a formula and
+          'features' is specified", {
+  expect_warning(
+    ml_logistic_regression(iris_weighted_tbl, response = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
+                           features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
+    "'features' is ignored when a formula is specified"
+  )
+})
+
+test_that("ml_logistic_regression.tbl_spark() errors if 'formula' is specified and either
+          'response' or 'features' is specified", {
+  expect_error(
+    ml_logistic_regression(iris_weighted_tbl,
+                           "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                           response = "versicolor"),
+    "only one of 'formula' or 'response'-'features' should be specified"
+  )
+  expect_error(
+    ml_logistic_regression(iris_weighted_tbl,
+                           "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                           features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
+    "only one of 'formula' or 'response'-'features' should be specified"
+  )
 })

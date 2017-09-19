@@ -36,3 +36,38 @@ ml_validate_args <- function(env) {
            function(x) assign(x, validated_args[[x]], constructor_frame$env))
   )
 }
+
+ml_formula_transformation <- function(env = rlang::caller_env(2)) {
+  constructor_frame <- rlang::caller_frame()
+  args <- constructor_frame$expr %>%
+    rlang::lang_standardise() %>%
+    rlang::lang_args() %>%
+    `[`(c("formula", "response", "features")) %>%
+    lapply(rlang::eval_tidy, env = env)
+
+  formula <- if (is.null(args$formula) && !is.null(args$response)) {
+    # if 'formula' isn't specified but 'response' is...
+    if (rlang::is_formula(args$response)) {
+      # if 'response' is a formula, warn is 'features' is also specified
+      if (!is.null(args$features)) warning("'features' is ignored when a formula is specified")
+      # convert formula to string
+      rlang::expr_text(args$response, width = 500L)
+    } else
+    # otherwise, if both 'response' and 'features' are specified, treat them as
+    #   variable names, and construct formula string
+      paste0(args$response, " ~ ", paste(args$features, collapse = " + "))
+  } else if (!is.null(args$formula)) {
+    # now if 'formula' is specified, check to see that 'response' and 'features' are not
+    if (!is.null(args$response) || !is.null(args$features))
+      stop("only one of 'formula' or 'response'-'features' should be specified")
+    if (rlang::is_formula(args$formula))
+      # if user inputs a formula, convert it to string
+      rlang::expr_text(args$formula, width = 500L)
+    else
+      # otherwise just returns as is
+      args$formula
+  } else
+    args$formula
+
+  assign("formula", formula, constructor_frame$env)
+}
