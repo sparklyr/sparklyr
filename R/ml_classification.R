@@ -121,6 +121,7 @@ ml_logistic_regression.tbl_spark <- function(
     logistic_regression %>%
       ml_fit(x)
   } else {
+    formula <- (if (rlang::is_formula(formula)) rlang::expr_text else identity)(formula)
     sc <- spark_connection(x)
     r_formula <- ml_r_formula(sc, formula, features_col,
                               label_col, force_index_label = TRUE,

@@ -20,6 +20,12 @@ test <- data_frame(
 )
 test_tbl <- testthat_tbl("test")
 
+set.seed(42)
+iris_weighted <- iris %>%
+  dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
+                ones = rep(1, nrow(iris)),
+                versicolor = ifelse(Species == "versicolor", 1L, 0L))
+
 test_that("ml_logistic_regression interprets params apporpriately", {
   lr <- ml_logistic_regression(sc, intercept = TRUE, elastic_net_param = 0)
   expected_params <- list(intercept = TRUE, elastic_net_param = 0)
@@ -71,11 +77,7 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
 })
 
 test_that("ml_logistic_regression() agrees with stats::glm()", {
-  set.seed(42)
-  iris_weighted <- iris %>%
-    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
-                  ones = rep(1, nrow(iris)),
-                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
@@ -94,4 +96,20 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
                               reg_param = 0L,
                               weight_col = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+})
+
+test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted formulas", {
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+
+  m1 <- ml_logistic_regression(
+    iris_weighted_tbl,
+    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width"
+  )
+
+  m2 <- ml_logistic_regression(
+    iris_weighted_tbl,
+    formula = versicolor ~ Sepal_Width + Petal_Length + Petal_Width
+  )
+
+  expect_identical(m1$formula, m2$formula)
 })
