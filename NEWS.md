@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+# Sparklyr 0.6.3
+
 - Enabled support for Java 9 for clusters configured with 
   Hadoop 2.8. Java 9 blocked on 'master=local' unless
   'options(sparklyr.java9 = TRUE)' is set.
@@ -78,7 +80,8 @@
 - Fix connection from closing when `invoke()` attempts to use a class
   with a method that contains a reference to an undefined class.
 
-- Implemented all tuning options from Spark ML for `ml_random_forest()`, `ml_gradient_boosted_trees()`, and `ml_decision_tree()`.
+- Implemented all tuning options from Spark ML for `ml_random_forest()`,
+  `ml_gradient_boosted_trees()`, and `ml_decision_tree()`.
 
 - Avoid tasks failing under `spark_apply()` and multiple  concurrent
   partitions running while selecting backend port.
@@ -102,14 +105,19 @@
   
 - Fix `compute()` to trigger refresh of the connections view.
 
-- Added a `k` argument to `ml_pca()` to enable specification of number of principal
-  components to extract. Also implemented `sdf_project()` to project datasets using
-  the results of `ml_pca()` models.
+- Added a `k` argument to `ml_pca()` to enable specification of number of
+  principal components to extract. Also implemented `sdf_project()` to project
+  datasets using the results of `ml_pca()` models.
 
 - Added support for additional livy session creation parameters using
   the `livy_config()` function.
 
-# Sparklyr 0.6.1 (UNRELEASED)
+# Sparklyr 0.6.2
+
+- Fix connection_spark_shinyapp() under RStudio 1.1 to avoid error while
+  listing Spark installation options for the first time.
+
+# Sparklyr 0.6.1
 
 - Fixed error in `spark_apply()` that may triggered when multiple CPUs
   are used in a single node due to race conditions while accesing the
@@ -424,7 +432,8 @@
 
 - Fix to `spark_connect` affecting Windows users and Spark 1.6.x.
 
-- Fix to Livy connections which would cause connections to fail while connection is on 'waiting' state.
+- Fix to Livy connections which would cause connections to fail while connection
+  is on 'waiting' state.
 
 # Sparklyr 0.5.0
 

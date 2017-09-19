@@ -157,7 +157,35 @@
     <div id="sparklyr-0-7-unreleased" class="section level1">
 <h1 class="hasAnchor">
 <a href="#sparklyr-0-7-unreleased" class="anchor"></a>Sparklyr 0.7 (UNRELEASED)</h1>
+</div>
+    <div id="sparklyr-0-6-3" class="section level1">
+<h1 class="hasAnchor">
+<a href="#sparklyr-0-6-3" class="anchor"></a>Sparklyr 0.6.3</h1>
 <ul>
+<li><p>Enabled support for Java 9 for clusters configured with Hadoop 2.8. Java 9 blocked on ‘master=local’ unless ‘options(sparklyr.java9 = TRUE)’ is set.</p></li>
+<li><p>Fixed issue in <code><a href="../reference/spark-connections.html">spark_connect()</a></code> where using <code>set.seed()</code> before connection would cause session ids to be duplicates and connections to be reused.</p></li>
+<li><p>Fixed issue in <code><a href="../reference/spark-connections.html">spark_connect()</a></code> blocking gateway port when connection was never started to the backend, for isntasnce, while interrupting the r session while connecting.</p></li>
+<li><p>Performance improvement for quering field names from tables impacting tables and <code>dplyr</code> queries, most noticeable in <code>na.omit</code> with several columns.</p></li>
+<li><p>Fix to <code><a href="../reference/spark_apply.html">spark_apply()</a></code> when closure returns a <code>data.frame</code> that contains no rows and has one or more columns.</p></li>
+<li><p>Fix to <code><a href="../reference/spark_apply.html">spark_apply()</a></code> while using <code>tryCatch()</code> within closure and increased callstack printed to logs when error triggers within closure.</p></li>
+<li><p>Added support for the <code>SPARKLYR_LOG_FILE</code> environment variable to specify the file used for log output.</p></li>
+<li><p>Fixed regression for <code>union_all()</code> affecting Spark 1.6.X.</p></li>
+<li><p>Added support for <code>na.omit.cache</code> option that when set to <code>FALSE</code> will prevent <code>na.omit</code> from caching results when rows are dropped.</p></li>
+<li><p>Added support in <code><a href="../reference/spark-connections.html">spark_connect()</a></code> for <code>yarn-cluster</code> with hight-availability enabled.</p></li>
+<li><p>Added support for <code><a href="../reference/spark-connections.html">spark_connect()</a></code> with <code>master="yarn-cluster"</code> to query YARN resource manager API and retrieve the correct container host name.</p></li>
+<li><p>Fixed issue in <code>invoke()</code> calls while using integer arrays that contain <code>NA</code> which can be commonly experienced while using <code><a href="../reference/spark_apply.html">spark_apply()</a></code>.</p></li>
+<li><p>Added <code>topics.description</code> under <code><a href="../reference/ml_lda.html">ml_lda()</a></code> result.</p></li>
+<li><p>Added support for <code><a href="../reference/ft_stop_words_remover.html">ft_stop_words_remover()</a></code> to strip out stop words from tokens.</p></li>
+<li><p>Feature transformers (<code>ft_*</code> functions) now explicitly require <code>input.col</code> and <code>output.col</code> to be specified.</p></li>
+<li><p>Added support for <code><a href="../reference/spark_apply_log.html">spark_apply_log()</a></code> to enable logging in worker nodes while using <code><a href="../reference/spark_apply.html">spark_apply()</a></code>.</p></li>
+<li><p>Fix to <code><a href="../reference/spark_apply.html">spark_apply()</a></code> for <code>SparkUncaughtExceptionHandler</code> exception while running over large jobs that may overlap during an, now unnecesary, unregister operation.</p></li>
+<li><p>Fix race-condition first time <code><a href="../reference/spark_apply.html">spark_apply()</a></code> is run when more than one partition runs in a worker and both processes try to unpack the packages bundle at the same time.</p></li>
+<li><p><code><a href="../reference/spark_apply.html">spark_apply()</a></code> now adds generic column names when needed and validates <code>f</code> is a <code>function</code>.</p></li>
+<li><p>Improved documentation and error cases for <code>metric</code> argument in <code><a href="../reference/ml_classification_eval.html">ml_classification_eval()</a></code> and <code><a href="../reference/ml_binary_classification_eval.html">ml_binary_classification_eval()</a></code>.</p></li>
+<li><p>Fix to <code><a href="../reference/spark_install.html">spark_install()</a></code> to use the <code>/logs</code> subfolder to store local <code>log4j</code> logs.</p></li>
+<li><p>Fix to <code><a href="../reference/spark_apply.html">spark_apply()</a></code> when R is used from a worker node since worker node already contains packages but still might be triggering different R session.</p></li>
+<li><p>Fix connection from closing when <code>invoke()</code> attempts to use a class with a method that contains a reference to an undefined class.</p></li>
+<li><p>Implemented all tuning options from Spark ML for <code><a href="../reference/ml_random_forest.html">ml_random_forest()</a></code>, <code><a href="../reference/ml_gradient_boosted_trees.html">ml_gradient_boosted_trees()</a></code>, and <code><a href="../reference/ml_decision_tree.html">ml_decision_tree()</a></code>.</p></li>
 <li><p>Avoid tasks failing under <code><a href="../reference/spark_apply.html">spark_apply()</a></code> and multiple concurrent partitions running while selecting backend port.</p></li>
 <li><p>Added support for numeric arguments for <code>n</code> in <code>lead()</code> for dplyr.</p></li>
 <li><p>Added unsupported error message to <code>sample_n()</code> and <code>sample_frac()</code> when Spark is not 2.0 or higher.</p></li>
@@ -167,12 +195,19 @@
 <li><p>Addesd support for RStudio project templates to create an “R Package using sparklyr”.</p></li>
 <li><p>Fix <code>compute()</code> to trigger refresh of the connections view.</p></li>
 <li><p>Added a <code>k</code> argument to <code><a href="../reference/ml_pca.html">ml_pca()</a></code> to enable specification of number of principal components to extract. Also implemented <code><a href="../reference/sdf_project.html">sdf_project()</a></code> to project datasets using the results of <code><a href="../reference/ml_pca.html">ml_pca()</a></code> models.</p></li>
-<li><p>Added to <code><a href="../reference/ml_random_forest.html">ml_random_forest()</a></code> the following hyperparameter arguments: <code>min.info.gain</code>, <code>col.sample.rate</code>, <code>min.rows</code>, <code>impurity</code>, and <code>thresholds</code>. Also added <code>seed</code> for reproducibility.</p></li>
+<li><p>Added support for additional livy session creation parameters using the <code><a href="../reference/livy_config.html">livy_config()</a></code> function.</p></li>
 </ul>
 </div>
-    <div id="sparklyr-0-6-1-unreleased" class="section level1">
+    <div id="sparklyr-0-6-2" class="section level1">
 <h1 class="hasAnchor">
-<a href="#sparklyr-0-6-1-unreleased" class="anchor"></a>Sparklyr 0.6.1 (UNRELEASED)</h1>
+<a href="#sparklyr-0-6-2" class="anchor"></a>Sparklyr 0.6.2</h1>
+<ul>
+<li>Fix connection_spark_shinyapp() under RStudio 1.1 to avoid error while listing Spark installation options for the first time.</li>
+</ul>
+</div>
+    <div id="sparklyr-0-6-1" class="section level1">
+<h1 class="hasAnchor">
+<a href="#sparklyr-0-6-1" class="anchor"></a>Sparklyr 0.6.1</h1>
 <ul>
 <li><p>Fixed error in <code><a href="../reference/spark_apply.html">spark_apply()</a></code> that may triggered when multiple CPUs are used in a single node due to race conditions while accesing the gateway service and another in the <code>JVMObjectTracker</code>.</p></li>
 <li><p><code><a href="../reference/spark_apply.html">spark_apply()</a></code> now supports explicit column types using the <code>columns</code> argument to avoid sampling types.</p></li>
@@ -432,7 +467,9 @@
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
         <li><a href="#sparklyr-0-7-unreleased">0.7</a></li>
-        <li><a href="#sparklyr-0-6-1-unreleased">0.6.1</a></li>
+        <li><a href="#sparklyr-0-6-3">0.6.3</a></li>
+        <li><a href="#sparklyr-0-6-2">0.6.2</a></li>
+        <li><a href="#sparklyr-0-6-1">0.6.1</a></li>
         <li><a href="#sparklyr-0-6-0">0.6.0</a></li>
         <li><a href="#sparklyr-0-5-5">0.5.5</a></li>
         <li><a href="#sparklyr-0-5-4">0.5.4</a></li>
