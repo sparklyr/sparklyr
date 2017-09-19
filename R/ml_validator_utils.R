@@ -1,13 +1,29 @@
-ml_get_stage_validator <- function(x) {
-  class <- ml_class_mapping[[x]] %||% stop("validator mapping failed")
-  paste0("ml_validator_", class)
+ml_map_class <- function(x) {
+  ml_class_mapping[[x]] %||% stop("class mapping failed")
 }
 
-ml_args_to_validate <- function(args, current_args) {
+ml_get_stage_validator <- function(x) {
+  paste0("ml_validator_", ml_map_class(x))
+}
+
+ml_get_stage_constructor <- function(x) {
+  paste0("ml_", ml_map_class(x))
+}
+
+ml_args_to_validate <- function(args, current_args, default_args = current_args) {
+  # creates a list of arguments to validate
+  # precedence: user input, then, current pipeline params,
+  #   then default args from formals
   input_arg_names <- names(args)
-  current_arg_names <- names(current_args) %>%
-    setdiff(input_arg_names)
-  c(current_args[current_arg_names], args)
+  current_arg_names <- names(current_args)
+  default_arg_names <- names(default_args)
+
+  args %>%
+    c(current_args[setdiff(current_arg_names, input_arg_names)]) %>%
+    c(default_args[setdiff(default_arg_names,
+                           union(input_arg_names, current_arg_names)
+                           )]
+      )
 }
 
 
@@ -27,8 +43,10 @@ ml_validate_args <- function(env) {
     # evaluate default args in package namespace
     lapply(rlang::eval_tidy, env = rlang::ns_env("sparklyr"))
 
+  args_to_validate <- ml_args_to_validate(args, default_args)
+
   validated_args <- rlang::invoke(
-    validator_fn, args = args, current_args = default_args
+    validator_fn, args = args_to_validate
   ) %>%
     `[`(names(args))
 
