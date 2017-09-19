@@ -29,13 +29,20 @@ ml_validate_params <- function(stages_params, uid_stages, current_param_list) {
         jobj_info() %>%
         `[[`("class")
       lapply(stages_params[[stage_name]], function(params) {
-        do.call(ml_get_stage_validator(stage_class),
-                list(args = params,
-                     current_args = current_param_list %>%
-                       `[[`(stage_uids[stage_name]) %>%
-                       ml_map_param_list_names()
-                )
-        )
+        args_to_validate <- ml_args_to_validate(
+          args = params,
+          current_args = current_param_list %>%
+            `[[`(stage_uids[stage_name]) %>%
+            ml_map_param_list_names(),
+          default_args = Filter(
+            Negate(rlang::is_symbol),
+            stage_class %>%
+              ml_get_stage_constructor() %>%
+              rlang::fn_fmls() %>%
+              rlang::modify(uid = NULL)
+          ))
+        rlang::invoke(ml_get_stage_validator(stage_class),
+                      args = args_to_validate)
       })
     }) %>%
     rlang::set_names(stage_uids)
@@ -53,12 +60,14 @@ ml_spark_param_map <- function(param_map, sc, uid_stages) {
   param_jobj_value_list <- stage_uids %>%
     lapply(function(stage_uid) {
       params <- param_map[[stage_uid]]
-      names(params) %>%
-        lapply(function(param_name) {
-          list(param_jobj = uid_stages[[stage_uid]] %>%
-                 invoke(sparklyr:::ml_map_param_names(param_name, "rs")),
-               value = params[[param_name]])
-        })
+      Filter(function(x) !rlang::is_null(x$value),
+             names(params) %>%
+               lapply(function(param_name) {
+                 list(param_jobj = uid_stages[[stage_uid]] %>%
+                        invoke(sparklyr:::ml_map_param_names(param_name, "rs")),
+                      value = params[[param_name]]
+                 )
+               }))
     }) %>%
     rlang::flatten()
 
