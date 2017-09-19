@@ -119,7 +119,7 @@ It is worth mentioning that different cluster providers and platforms expose wor
 
 The **R Runtime** is expected to be pre-installed in the cluster for `spark_apply` to function. Failure to install the cluster will trigger a `Cannot run program, no such file or directory` error while attempting to use `spark_apply()`. Contact your cluster administrator to consider making the R runtime available throughout the entire cluster.
 
-A **Homogenius Cluster** is required since the driver node distributes, and potentially compiles, packages to the workers. For instance, the driver and workers must have the same processor architecture, system libraries, etc.
+A **Homogeneous Cluster** is required since the driver node distributes, and potentially compiles, packages to the workers. For instance, the driver and workers must have the same processor architecture, system libraries, etc.
 
 ## Configuration
 

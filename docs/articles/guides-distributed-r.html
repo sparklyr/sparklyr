@@ -37,7 +37,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Guides
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -67,7 +67,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Deployment
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -88,7 +88,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -111,7 +111,7 @@
 <li>
   <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -122,16 +122,16 @@
 </div>
 <!--/.navbar -->
 
-      
+
       </header><div class="row">
   <div class="col-md-9">
     <div class="page-header toc-ignore">
       <h1>Distributing R Computations</h1>
-            
+
           </div>
 
-    
-    
+
+
 <div class="contents">
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
@@ -296,13 +296,13 @@ iris_tbl <span class="op">%&gt;%</span>
 <a href="#handling-errors" class="anchor"></a>Handling Errors</h2>
 <p>It can be more difficult to troubleshoot R issues in a cluster than in local mode. For instance, the following R code causes the distributed execution to fail and suggests you check the logs for details.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/spark_apply.html">spark_apply</a></span>(iris_tbl, <span class="cf">function</span>(e) <span class="kw">stop</span>(<span class="st">"Make this fail"</span>))</code></pre></div>
-<pre><code> Error in force(code) : 
+<pre><code> Error in force(code) :
   sparklyr worker rscript failure, check worker logs for details</code></pre>
 <p>In local mode, <code>sparklyr</code> will retrieve the logs for you. The logs point out the real failure as <code>ERROR sparklyr: RScript (4190) Make this fail</code> as you might expect.</p>
 <pre><code>---- Output Log ----
 (17/07/27 21:24:18 ERROR sparklyr: Worker (2427) is shutting down with exception ,java.net.SocketException: Socket closed)
-17/07/27 21:24:18 WARN TaskSetManager: Lost task 0.0 in stage 389.0 (TID 429, localhost, executor driver): 17/07/27 21:27:21 INFO sparklyr: RScript (4190) retrieved 150 rows 
-17/07/27 21:27:21 INFO sparklyr: RScript (4190) computing closure 
+17/07/27 21:24:18 WARN TaskSetManager: Lost task 0.0 in stage 389.0 (TID 429, localhost, executor driver): 17/07/27 21:27:21 INFO sparklyr: RScript (4190) retrieved 150 rows
+17/07/27 21:27:21 INFO sparklyr: RScript (4190) computing closure
 17/07/27 21:27:21 ERROR sparklyr: RScript (4190) Make this fail </code></pre>
 <p>It is worth mentioning that different cluster providers and platforms expose worker logs in different ways. Specific documentation for your environment will point out how to retrieve these logs.</p>
 </div>
@@ -310,7 +310,7 @@ iris_tbl <span class="op">%&gt;%</span>
 <h2 class="hasAnchor">
 <a href="#requirements" class="anchor"></a>Requirements</h2>
 <p>The <strong>R Runtime</strong> is expected to be pre-installed in the cluster for <code>spark_apply</code> to function. Failure to install the cluster will trigger a <code>Cannot run program, no such file or directory</code> error while attempting to use <code><a href="../reference/spark_apply.html">spark_apply()</a></code>. Contact your cluster administrator to consider making the R runtime available throughout the entire cluster.</p>
-<p>A <strong>Homogenius Cluster</strong> is required since the driver node distributes, and potentially compiles, packages to the workers. For instance, the driver and workers must have the same processor architecture, system libraries, etc.</p>
+<p>A <strong>Homogeneous Cluster</strong> is required since the driver node distributes, and potentially compiles, packages to the workers. For instance, the driver and workers must have the same processor architecture, system libraries, etc.</p>
 </div>
 <div id="configuration" class="section level2">
 <h2 class="hasAnchor">
