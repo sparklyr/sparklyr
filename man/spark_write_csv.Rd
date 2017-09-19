@@ -28,7 +28,7 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{options}{A list of strings with additional options.}
 
-\item{mode}{Specifies the behavior when data or table already exists.}
+\item{mode}{A \code{character} element.  Specifies the behavior when data or table already exists. Supported values include: error, append, overwrite and ignore.  For more details see also \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes} for your version of Spark.}
 
 \item{partition_by}{Partitions the output by the given columns on the file system.}
 
@@ -54,3 +54,4 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
+\concept{Spark serialization routines}
