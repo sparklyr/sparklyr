@@ -1,5 +1,6 @@
 ml_get_stage_validator <- function(x) {
-  validator_mapping[[x]] %||% stop("validator mapping failed")
+  class <- ml_class_mapping[[x]] %||% stop("validator mapping failed")
+  paste0("ml_validator_", class)
 }
 
 ml_args_to_validate <- function(args, current_args) {
