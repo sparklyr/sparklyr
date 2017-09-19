@@ -66,7 +66,7 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
     ), {
       stop(
         "Failed to retrieve new sparklyr yarn application from ",
-        resourceManagerQuery, " after ", format(Sys.time() - commandStart, ", last result: "),
+        resourceManagerQuery, " after ", format(Sys.time() - commandStart, digits = 1), ", last result: ",
         yarnApps
       )
     })
