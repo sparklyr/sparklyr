@@ -180,7 +180,7 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
       if (model$param_map[["fit_intercept"]]) {
         intercept <- read_spark_vector(jobj, "interceptVector")
         coefficients <- cbind(intercept, coefficients)
-        colnames(coefficients) <- c("(Intercept)", features)
+        colnames(coefficients) <- c("(Intercept)", feature_names)
       }
       coefficients
     } else {
