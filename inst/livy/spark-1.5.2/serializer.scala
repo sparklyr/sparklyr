@@ -20,21 +20,6 @@ object Serializer {
     this.sqlSerDe = sqlSerDe
   }
 
-  // Type mapping from R to Java
-  //
-  // NULL -> void
-  // integer -> Int
-  // character -> String
-  // logical -> Boolean
-  // double, numeric -> Double
-  // raw -> Array[Byte]
-  // Date -> Date
-  // POSIXlt/POSIXct -> Time
-  //
-  // list[T] -> Array[T], where T is one of above mentioned types
-  // environment -> Map[String, T], where T is a native type
-  // jobj -> Object, where jobj is an object created in the backend
-
   def readObjectType(dis: DataInputStream): Char = {
     dis.readByte().toChar
   }
@@ -144,7 +129,21 @@ object Serializer {
     (0 until len).map(_ => readString(in)).toArray
   }
 
-  // All elements of an array must be of the same type
+  def readArrayArr(in: DataInputStream): Array[_] = {
+    val len = readInt(in)
+    (0 until len).map(_ => readArray(in)).toArray
+  }
+
+  def readListArr(in: DataInputStream): Array[_] = {
+    val len = readInt(in)
+    (0 until len).map(_ => readList(in)).toArray
+  }
+
+  def readDateArr(in: DataInputStream): Array[Date] = {
+    val len = readInt(in)
+    (0 until len).map(_ => readDate(in)).toArray
+  }
+
   def readArray(dis: DataInputStream): Array[_] = {
     val arrType = readObjectType(dis)
     arrType match {
@@ -154,12 +153,9 @@ object Serializer {
       case 'b' => readBooleanArr(dis)
       case 'j' => readStringArr(dis).map(x => JVMObjectTracker.getObject(x))
       case 'r' => readBytesArr(dis)
-      case 'a' =>
-        val len = readInt(dis)
-      (0 until len).map(_ => readArray(dis)).toArray
-      case 'l' =>
-        val len = readInt(dis)
-      (0 until len).map(_ => readList(dis)).toArray
+      case 'a' => readArrayArr(dis)
+      case 'l' => readListArr(dis)
+      case 'D' => readDateArr(dis)
       case _ =>
         if (sqlSerDe == null || sqlSerDe._1 == null) {
           throw new IllegalArgumentException (s"Invalid array type $arrType")
@@ -177,8 +173,6 @@ object Serializer {
     }
   }
 
-  // Each element of a list can be of different type. They are all represented
-  // as Object on JVM side
   def readList(dis: DataInputStream): Array[Object] = {
     val len = readInt(dis)
     (0 until len).map(_ => readObject(dis)).toArray
@@ -187,7 +181,6 @@ object Serializer {
   def readMap(in: DataInputStream): java.util.Map[Object, Object] = {
     val len = readInt(in)
     if (len > 0) {
-      // Keys is an array of String
       val keys = readArray(in).asInstanceOf[Array[Object]]
       val values = readList(in)
 
@@ -196,25 +189,6 @@ object Serializer {
       new java.util.HashMap[Object, Object]()
     }
   }
-
-  // Methods to write out data from Java to R
-  //
-  // Type mapping from Java to R
-  //
-  // void -> NULL
-  // Int -> integer
-  // String -> character
-  // Boolean -> logical
-  // Float -> double
-  // Double -> double
-  // Decimal -> double
-  // Long -> double
-  // Array[Byte] -> raw
-  // Date -> Date
-  // Time -> POSIXct
-  //
-    // Array[T] -> list()
-  // Object -> jobj
 
   def writeType(dos: DataOutputStream, typeStr: String): Unit = {
     typeStr match {
@@ -226,9 +200,7 @@ object Serializer {
       case "date" => dos.writeByte('D')
       case "time" => dos.writeByte('t')
       case "raw" => dos.writeByte('r')
-      // Array of primitive types
       case "array" => dos.writeByte('a')
-      // Array of objects
       case "list" => dos.writeByte('l')
       case "map" => dos.writeByte('e')
       case "jobj" => dos.writeByte('j')
@@ -251,15 +223,11 @@ object Serializer {
     if (obj == null) {
       writeType(dos, "void")
     } else {
-      // Convert ArrayType collected from DataFrame to Java array
-      // Collected data of ArrayType from a DataFrame is observed to be of
-      // type "scala.collection.mutable.WrappedArray"
-      val value =
-        if (obj.isInstanceOf[WrappedArray[_]]) {
-          obj.asInstanceOf[WrappedArray[_]].toArray
-        } else {
-          obj
-        }
+      val value = if (obj.isInstanceOf[WrappedArray[_]]) {
+        obj.asInstanceOf[WrappedArray[_]].toArray
+      } else {
+        obj
+      }
 
       value match {
         case v: java.lang.Character =>
@@ -330,14 +298,10 @@ object Serializer {
           writeType(dos, "array")
           writeBooleanArr(dos, v)
         case v: Array[Object] =>
-          // Array of objects, null objects use "void" type
           writeType(dos, "list")
           writeInt(dos, v.length)
           v.foreach(elem => writeObject(dos, elem))
         case v: java.util.Properties =>
-          // Handle Properties
-          // This must be above the case java.util.Map below.
-          // (Properties implements Map<Object,Object> and will be serialized as map otherwise)
           writeType(dos, "jobj")
           writeJObj(dos, value)
         case v: java.util.Map[_, _] =>
@@ -430,11 +394,4 @@ object Serializer {
     out.writeInt(value.length)
     value.foreach(v => writeString(out, v))
   }
-
-}
-
-object SerializationFormats {
-  val BYTE = "byte"
-  val STRING = "string"
-  val ROW = "row"
 }
