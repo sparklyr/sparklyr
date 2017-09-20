@@ -143,6 +143,32 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
   invoke(hive_context(sc), "createDataFrame", rdd, structType)
 }
 
+spark_serialize_typed_columns <- function(sc, df, columns, repartition) {
+  structType <- spark_data_build_types(sc, columns)
+
+  rows <- lapply(seq_len(NROW(df)), function(e) as.list(df[e,]))
+
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "startDataFrame",
+    spark_context(sc),
+    rows,
+    as.integer(if (repartition <= 0) 1 else repartition)
+  )
+
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "createDataFrameFromColumns",
+    spark_context(sc),
+    rows,
+    as.integer(if (repartition <= 0) 1 else repartition)
+  )
+
+  invoke(hive_context(sc), "createDataFrame", rdd, structType)
+}
+
 spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
@@ -182,7 +208,8 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
     "csv_file" = spark_serialize_csv_file,
     "typed_list" = spark_serialize_typed_list,
     "csv_string" = spark_serialize_csv_string,
-    "csv_file_scala" = spark_serialize_csv_scala
+    "csv_file_scala" = spark_serialize_csv_scala,
+    "typed_columns" = spark_serialize_typed_columns
   )
 
   df <- serializers[[serializer]](sc, df, columns, repartition)
