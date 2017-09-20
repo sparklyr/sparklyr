@@ -11,7 +11,7 @@ object Test {
   }
 
   def unarySeq(xs : Seq[Double]) = xs.map(x => x * x).sum
-  def unaryNullable_seq(xs : Seq[Double]) = Option(xs) match {
+  def unaryNullableSeq(xs : Seq[Double]) = Option(xs) match {
     case None => -1
     case Some(ys) => ys.map(y => y * y).sum
   }
