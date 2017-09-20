@@ -17,24 +17,15 @@ spark_yarn_cluster_get_conf_property <- function(property) {
   yarnSiteXml <- xml2::read_xml(yarnSite)
 
   yarnPropertyValue <- xml2::xml_text(xml2::xml_find_all(
-      yarnSiteXml,
-      paste0("//name[.='", property, "']/parent::property/value")
-    )
+    yarnSiteXml,
+    paste0("//name[.='", property, "']/parent::property/value")
+  )
   )
 
   yarnPropertyValue
 }
 
 spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, property) {
-  resourceManagerQuery <- paste0(
-    "http",
-    "://",
-    rm_webapp,
-    "/ws/v1/cluster/apps?startedTimeBegin=",
-    start_time,
-    "&applicationType=SPARK"
-  )
-
   waitSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.start.timeout", 60)
   commandStart <- Sys.time()
   propertyValue <- NULL
@@ -43,6 +34,16 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
   appLookupPrefix <- spark_config_value(config, "sparklyr.yarn.cluster.lookup.prefix", "sparklyr")
   appLoookupUser <- if ("USER" %in% names(Sys.getenv())) Sys.getenv()[["USER"]] else spark_config_value(config, "sparklyr.yarn.cluster.lookup.username", NULL)
   appLookupUseUser <- spark_config_value(config, "sparklyr.yarn.cluster.lookup.byname", !is.null(appLoookupUser))
+
+  resourceManagerQuery <- paste0(
+    "http",
+    "://",
+    rm_webapp,
+    "/ws/v1/cluster/apps?startedTimeBegin=",
+    start_time,
+    "&applicationType=SPARK",
+    if (appLookupUseUser) paste0("&user=", appLoookupUser) else ""
+  )
 
   while(length(propertyValue) == 0 && commandStart + waitSeconds > Sys.time()) {
     resourceManagerResponce <- httr::GET(resourceManagerQuery)
