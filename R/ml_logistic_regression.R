@@ -1,3 +1,254 @@
+#' @export
+ml_logistic_regression <- function(
+  x,
+  features_col = "features",
+  label_col = "label",
+  family = c("auto", "binomial", "multinomial"),
+  fit_intercept = TRUE,
+  elastic_net_param = 0,
+  reg_param = 0,
+  max_iter = 100L,
+  threshold = 0.5,
+  thresholds = NULL,
+  weight_col = NULL,
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("logistic_regression_"), ...
+) {
+  UseMethod("ml_logistic_regression")
+}
+
+#' @export
+ml_logistic_regression.spark_connection <- function(
+  x,
+  features_col = "features",
+  label_col = "label",
+  family = c("auto", "binomial", "multinomial"),
+  fit_intercept = TRUE,
+  elastic_net_param = 0,
+  reg_param = 0,
+  max_iter = 100L,
+  threshold = 0.5,
+  thresholds = NULL,
+  weight_col = NULL,
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("logistic_regression_"), ...) {
+
+  ml_validate_args(rlang::caller_env())
+
+  jobj <- ml_new_classifier(
+    x, "org.apache.spark.ml.classification.LogisticRegression", uid,
+    label_col, prediction_col, probability_col, raw_prediction_col
+  ) %>%
+    invoke("setElasticNetParam", elastic_net_param) %>%
+    invoke("setFitIntercept", fit_intercept) %>%
+    invoke("setRegParam", reg_param) %>%
+    invoke("setMaxIter", max_iter)
+
+  if (!is.null(weight_col))
+    jobj <- invoke(jobj, "setWeightCol", weight_col)
+
+  new_ml_logistic_regression(jobj)
+}
+
+#' @export
+ml_logistic_regression.ml_pipeline <- function(
+  x,
+  features_col = "features",
+  label_col = "label",
+  family = c("auto", "binomial", "multinomial"),
+  fit_intercept = TRUE,
+  elastic_net_param = 0,
+  reg_param = 0,
+  max_iter = 100L,
+  threshold = 0.5,
+  thresholds = NULL,
+  weight_col = NULL,
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("logistic_regression_"), ...) {
+
+  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  ml_add_stage(x, transformer)
+}
+
+#' @export
+ml_logistic_regression.tbl_spark <- function(
+  x,
+  formula = NULL,
+  response = NULL,
+  features = NULL,
+  features_col = "features",
+  label_col = "label",
+  family = c("auto", "binomial", "multinomial"),
+  fit_intercept = TRUE,
+  elastic_net_param = 0,
+  reg_param = 0,
+  max_iter = 100L,
+  threshold = 0.5,
+  thresholds = NULL,
+  weight_col = NULL,
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("logistic_regression_"), ...) {
+
+  logistic_regression <- ml_new_stage_modified_args(rlang::call_frame())
+
+  ml_formula_transformation()
+
+  if (is.null(formula)) {
+    logistic_regression %>%
+      ml_fit(x)
+  } else {
+    # formula <- (if (rlang::is_formula(formula)) rlang::expr_text else identity)(formula)
+    sc <- spark_connection(x)
+    r_formula <- ml_r_formula(sc, formula, features_col,
+                              label_col, force_index_label = TRUE,
+                              dataset = x)
+    pipeline <- ml_pipeline(r_formula, logistic_regression)
+
+    pipeline_model <- pipeline %>%
+      ml_fit(x)
+
+    new_ml_model_logistic_regression(
+      pipeline,
+      pipeline_model,
+      logistic_regression$uid,
+      formula,
+      dataset = x)
+  }
+}
+
+# Constructors
+
+new_ml_logistic_regression <- function(jobj) {
+  new_ml_predictor(jobj, subclass = "ml_logistic_regression")
+}
+
+new_ml_logistic_regression_model <- function(jobj) {
+  new_ml_prediction_model(jobj, "ml_logistic_regression_model")
+}
+
+new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid, formula, dataset,
+                                             .call) {
+
+  model <- pipeline_model$stages %>%
+    `[[`(grep(model_uid, pipeline_model$stage_uids))
+
+  jobj <- model$.jobj
+
+  sc <- spark_connection(model)
+
+  features_col <- model$param_map$features_col
+
+  transformed_sdf <- pipeline_model %>%
+    ml_transform(dataset) %>%
+    spark_dataframe()
+
+  feature_names <- transformed_sdf %>%
+    invoke("schema") %>%
+    invoke("apply", transformed_sdf %>%
+             invoke("schema") %>%
+             invoke("fieldIndex", features_col) %>%
+             ensure_scalar_integer()) %>%
+    invoke("metadata") %>%
+    invoke("json") %>%
+    jsonlite::fromJSON() %>%
+    `[[`("ml_attr") %>%
+    `[[`("attrs") %>%
+    `[[`("numeric") %>%
+    dplyr::pull("name")
+
+    # multinomial vs. binomial models have separate APIs for
+    # retrieving results
+    is_multinomial <- invoke(jobj, "numClasses") > 2
+
+    # extract coefficients (can be either a vector or matrix, depending
+    # on binomial vs. multinomial)
+    coefficients <- if (is_multinomial) {
+      if (spark_version(sc) < "2.1.0") stop("Multinomial regression requires Spark 2.1.0 or higher.")
+
+      # multinomial
+      coefficients <- read_spark_matrix(jobj, "coefficientMatrix")
+      colnames(coefficients) <- feature_names
+
+      if (model$param_map[["fit_intercept"]]) {
+        intercept <- read_spark_vector(jobj, "interceptVector")
+        coefficients <- cbind(intercept, coefficients)
+        colnames(coefficients) <- c("(Intercept)", features)
+      }
+      coefficients
+    } else {
+      # binomial
+      coefficients <- jobj %>%
+        sparklyr:::read_spark_vector("coefficients")
+      coefficients <- if (model$param_map[["fit_intercept"]])
+        rlang::set_names(
+          c(invoke(jobj, "intercept"), coefficients),
+          c("(Intercept)", feature_names)
+        )
+      else
+        rlang::set_names(coefficients, feature_names)
+      coefficients
+    }
+
+  call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
+
+  summary <- if (invoke(model$.jobj, "hasSummary"))
+    new_ml_summary_logistic_regression_model(invoke(model$.jobj, "summary"))
+  else NA
+
+  new_ml_model_classification(
+    pipeline, pipeline_model, model_uid, formula, dataset,
+    coefficients = coefficients,
+    summary = summary,
+    subclass = "ml_model_logistic_regression",
+    .call = call
+  )
+}
+
+new_ml_summary_logistic_regression_model <- function(jobj) {
+  new_ml_summary(
+    jobj,
+    area_under_roc = invoke(jobj, "areaUnderROC"),
+    f_measure_by_threshold = invoke(jobj, "fMeasureByThreshold"),
+    features_col = invoke(jobj, "featuresCol"),
+    label_col = invoke(jobj, "labelCol"),
+    objective_history = invoke(jobj, "objectiveHistory"),
+    pr = invoke(jobj, "pr"),
+    precision_by_threshold = invoke(jobj, "precisionByThreshold"),
+    predictions = invoke(jobj, "predictions"),
+    probability_col = invoke(jobj, "probabilityCol"),
+    recall_by_threshold = invoke(jobj, "recallByThreshold"),
+    roc = invoke(jobj, "roc"),
+    total_iterations = invoke(jobj, "totalIterations"),
+    subclass = "ml_summary_logistic_regression")
+}
+# Generic implementations
+
+#' @export
+print.ml_model_logistic_regression <- function(x, ...) {
+  ml_model_print_call(x)
+  print_newline()
+  cat("Formula: ", x$formula, "\n\n", sep = "")
+  cat("Coefficients:", sep = "\n")
+  print(x$coefficients)
+}
+
+#' @export
+summary.ml_model_logistic_regression <- function(object, ...) {
+  ml_model_print_call(object)
+  print_newline()
+  ml_model_print_coefficients(object)
+  print_newline()
+}
+
+
 #' Spark ML -- Logistic Regression
 #'
 #' Perform logistic regression on a Spark DataFrame.
@@ -152,25 +403,7 @@
 #'            model.parameters = as.list(envir))
 #' }
 #'
-#' #' @export
-#' print.ml_model_logistic_regression <- function(x, ...) {
+
 #'
-#'   # report what model was fitted
-#'   formula <- paste(x$response, "~", paste(x$features, collapse = " + "))
-#'   cat("Call: ", formula, "\n\n", sep = "")
-#'
-#'   # report coefficients
-#'   cat("Coefficients:", sep = "\n")
-#'   print(x$coefficients)
-#' }
-#'
-#' #' @export
-#' summary.ml_model_logistic_regression <- function(object, ...) {
-#'   ml_model_print_call(object)
-#'   print_newline()
-#'   # ml_model_print_residuals(object)
-#'   # print_newline()
-#'   ml_model_print_coefficients(object)
-#'   print_newline()
-#' }
+
 #'
