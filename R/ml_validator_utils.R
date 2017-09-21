@@ -90,10 +90,11 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   assign("formula", formula, constructor_frame$env)
 }
 
-ml_extract_specified_args <- function(validated_args, nms, old_new_mapping) {
+ml_extract_specified_args <- function(validated_args, nms, old_new_mapping = NULL) {
   validated_args <- list(
     args = validated_args,
-    nms = mapply(`%||%`, old_new_mapping[nms], nms)
+    nms = if (rlang::is_null(old_new_mapping)) nms else
+      mapply(`%||%`, old_new_mapping[nms], nms)
   ) %>%
     (function(x) x$args[x$nms])
 }
