@@ -129,7 +129,7 @@ spark_worker_rlang_unserialize <- function() {
 
 #' Extracts a bundle of dependencies required by \code{spark_apply()}
 #'
-#' @param bundle_path Path to the bundle created using \code{core_spark_apply_bundle()}
+#' @param bundle_path Path to the bundle created using \code{spark_apply_bundle()}
 #' @param base_path Base path to use while extracting bundles
 #'
 #' @keywords internal
