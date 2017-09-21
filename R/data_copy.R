@@ -151,7 +151,13 @@ spark_serialize_typed_columns <- function(sc, df, columns, repartition) {
   rdd <- invoke_static(
     sc,
     "sparklyr.Utils",
-    "startDataFrame",
+    "startColumnFrame"
+  )
+
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "createDataFrameFromColumns",
     spark_context(sc),
     rows,
     as.integer(if (repartition <= 0) 1 else repartition)
@@ -160,7 +166,7 @@ spark_serialize_typed_columns <- function(sc, df, columns, repartition) {
   rdd <- invoke_static(
     sc,
     "sparklyr.Utils",
-    "createDataFrameFromColumns",
+    "endDataFrame",
     spark_context(sc),
     rows,
     as.integer(if (repartition <= 0) 1 else repartition)
