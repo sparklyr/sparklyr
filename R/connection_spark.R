@@ -107,8 +107,8 @@ spark_connect <- function(master = "local",
   }))
 
   # clean spark_apply per-connection cache
-  if (file.exists(core_spark_apply_bundle_path()))
-    unlink(core_spark_apply_bundle_path())
+  if (dir.exists(spark_apply_bundle_path()))
+    unlink(spark_apply_bundle_path(), recursive = TRUE)
 
   # connect using the specified method
 
