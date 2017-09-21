@@ -67,32 +67,32 @@ ft_string_indexer <- function(x,
   sdf_register(transformed)
 }
 
-#' Feature Transformation -- Binarizer
-#'
-#' Apply thresholding to a column, such that values less than or equal to the
-#' \code{threshold} are assigned the value 0.0, and values greater than the
-#' threshold are assigned the value 1.0. Column output is numeric for
-#' compatibility with other modeling functions.
-#'
-#' @template roxlate-ml-transformation
-#'
-#' @param threshold The numeric threshold.
-#'
-#' @export
-ft_binarizer <- function(x,
-                         input.col,
-                         output.col,
-                         threshold = 0.5,
-                         ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.Binarizer"
-  invoke_simple_transformer(x, class, list(
-    setInputCol  = ensure_scalar_character(input.col),
-    setOutputCol = ensure_scalar_character(output.col),
-    setThreshold = ensure_scalar_double(threshold)
-  ))
-}
+#' #' Feature Transformation -- Binarizer
+#' #'
+#' #' Apply thresholding to a column, such that values less than or equal to the
+#' #' \code{threshold} are assigned the value 0.0, and values greater than the
+#' #' threshold are assigned the value 1.0. Column output is numeric for
+#' #' compatibility with other modeling functions.
+#' #'
+#' #' @template roxlate-ml-transformation
+#' #'
+#' #' @param threshold The numeric threshold.
+#' #'
+#' #' @export
+#' ft_binarizer <- function(x,
+#'                          input.col,
+#'                          output.col,
+#'                          threshold = 0.5,
+#'                          ...)
+#' {
+#'   ml_backwards_compatibility_api()
+#'   class <- "org.apache.spark.ml.feature.Binarizer"
+#'   invoke_simple_transformer(x, class, list(
+#'     setInputCol  = ensure_scalar_character(input.col),
+#'     setOutputCol = ensure_scalar_character(output.col),
+#'     setThreshold = ensure_scalar_double(threshold)
+#'   ))
+#' }
 
 #' Feature Transformation -- Discrete Cosine Transform (DCT)
 #'
@@ -315,26 +315,26 @@ ft_one_hot_encoder <- function(x,
   ))
 }
 
-#' Feature Tranformation -- Tokenizer
-#'
-#' A tokenizer that converts the input string to lowercase and then splits it
-#' by white spaces.
-#'
-#' @template roxlate-ml-transformation
-#'
-#' @export
-ft_tokenizer <- function(x,
-                         input.col,
-                         output.col,
-                         ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.Tokenizer"
-  invoke_simple_transformer(x, class, list(
-    setInputCol  = ensure_scalar_character(input.col),
-    setOutputCol = ensure_scalar_character(output.col)
-  ))
-}
+#' #' Feature Tranformation -- Tokenizer
+#' #'
+#' #' A tokenizer that converts the input string to lowercase and then splits it
+#' #' by white spaces.
+#' #'
+#' #' @template roxlate-ml-transformation
+#' #'
+#' #' @export
+#' ft_tokenizer <- function(x,
+#'                          input.col,
+#'                          output.col,
+#'                          ...)
+#' {
+#'   ml_backwards_compatibility_api()
+#'   class <- "org.apache.spark.ml.feature.Tokenizer"
+#'   invoke_simple_transformer(x, class, list(
+#'     setInputCol  = ensure_scalar_character(input.col),
+#'     setOutputCol = ensure_scalar_character(output.col)
+#'   ))
+#' }
 
 #' Feature Tranformation -- RegexTokenizer
 #'

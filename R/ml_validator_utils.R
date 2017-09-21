@@ -30,7 +30,7 @@ ml_args_to_validate <- function(args, current_args, default_args = current_args)
 ml_validate_args <- function(env) {
   constructor_frame <- rlang::caller_frame()
   validator_fn <- constructor_frame$fn_name %>%
-    (function(x) gsub("^ml_", "ml_validator_", x)) %>%
+    (function(x) gsub("^(ml_|ft_)", "ml_validator_", x)) %>%
     (function(x) gsub("\\..*$", "", x))
   args <- constructor_frame$expr %>%
     rlang::lang_standardise() %>%

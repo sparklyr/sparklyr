@@ -2,7 +2,33 @@
 % Please edit documentation in R/ml_feature_transformation.R
 \name{ft_discrete_cosine_transform}
 \alias{ft_discrete_cosine_transform}
-\title{Feature Transformation -- Discrete Cosine Transform (DCT)}
+\title{#' Feature Transformation -- Binarizer
+#'
+#' Apply thresholding to a column, such that values less than or equal to the
+#' \code{threshold} are assigned the value 0.0, and values greater than the
+#' threshold are assigned the value 1.0. Column output is numeric for
+#' compatibility with other modeling functions.
+#'
+#' @template roxlate-ml-transformation
+#'
+#' @param threshold The numeric threshold.
+#'
+#' @export
+ft_binarizer <- function(x,
+                         input.col,
+                         output.col,
+                         threshold = 0.5,
+                         ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.Binarizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col),
+    setThreshold = ensure_scalar_double(threshold)
+  ))
+}
+Feature Transformation -- Discrete Cosine Transform (DCT)}
 \usage{
 ft_discrete_cosine_transform(x, input.col, output.col, inverse = FALSE, ...)
 }
@@ -26,8 +52,7 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformation routines: \code{\link{ft_binarizer}},
-  \code{\link{ft_bucketizer}},
+Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_count_vectorizer}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
@@ -36,7 +61,6 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_stop_words_remover}},
   \code{\link{ft_string_indexer}},
-  \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }

@@ -28,8 +28,7 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformation routines: \code{\link{ft_binarizer}},
-  \code{\link{ft_bucketizer}},
+Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_count_vectorizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_index_to_string}},
@@ -38,7 +37,6 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_stop_words_remover}},
   \code{\link{ft_string_indexer}},
-  \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }

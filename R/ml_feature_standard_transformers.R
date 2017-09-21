@@ -1,12 +1,12 @@
 # Tokenizer
 
 #' @export
-ml_tokenizer <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
-  UseMethod("ml_tokenizer")
+ft_tokenizer <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
+  UseMethod("ft_tokenizer")
 }
 
 #' @export
-ml_tokenizer.spark_connection <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
+ft_tokenizer.spark_connection <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
 
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Tokenizer",
                              input_col, output_col, uid)
@@ -15,7 +15,7 @@ ml_tokenizer.spark_connection <- function(x, input_col, output_col, uid = random
 }
 
 #' @export
-ml_tokenizer.ml_pipeline <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
+ft_tokenizer.ml_pipeline <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
 
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_add_stage(x, transformer)
@@ -23,7 +23,7 @@ ml_tokenizer.ml_pipeline <- function(x, input_col, output_col, uid = random_stri
 }
 
 #' @export
-ml_tokenizer.tbl_spark <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
+ft_tokenizer.tbl_spark <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_transform(transformer, x)
 
@@ -32,12 +32,12 @@ ml_tokenizer.tbl_spark <- function(x, input_col, output_col, uid = random_string
 # Binarizer
 
 #' @export
-ml_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_string("binarizer_"), ...) {
-  UseMethod("ml_binarizer")
+ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_string("binarizer_"), ...) {
+  UseMethod("ft_binarizer")
 }
 
 #' @export
-ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold = 0,
+ft_binarizer.spark_connection <- function(x, input_col, output_col, threshold = 0,
                                           uid = random_string("binarizer_"), ...) {
 
   ml_validate_args(rlang::caller_env())
@@ -49,14 +49,14 @@ ml_binarizer.spark_connection <- function(x, input_col, output_col, threshold = 
 }
 
 #' @export
-ml_binarizer.ml_pipeline <- function(x, input_col, output_col, threshold = 0,
+ft_binarizer.ml_pipeline <- function(x, input_col, output_col, threshold = 0,
                                      uid = random_string("binarizer_"), ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_add_stage(x, transformer)
 }
 
 #' @export
-ml_binarizer.tbl_spark <- function(x, input_col, output_col, threshold = 0,
+ft_binarizer.tbl_spark <- function(x, input_col, output_col, threshold = 0,
                                    uid = random_string("binarizer_"), ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_transform(transformer, x)
