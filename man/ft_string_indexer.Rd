@@ -2,7 +2,29 @@
 % Please edit documentation in R/ml_feature_transformation.R
 \name{ft_string_indexer}
 \alias{ft_string_indexer}
-\title{Feature Transformation -- StringIndexer}
+\title{#' Feature Transformation -- VectorAssembler
+#'
+#' Combine multiple vectors into a single row-vector; that is,
+#' where each row element of the newly generated column is a
+#' vector formed by concatenating each row element from the
+#' specified input columns.
+#'
+#' @template roxlate-ml-transformation
+#'
+#' @export
+ft_vector_assembler <- function(x,
+                                input.col,
+                                output.col,
+                                ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.VectorAssembler"
+  invoke_simple_transformer(x, class, list(
+    setInputCols = as.list(as.character(input.col)),
+    setOutputCol = ensure_scalar_character(output.col)
+  ))
+}
+Feature Transformation -- StringIndexer}
 \usage{
 ft_string_indexer(x, input.col, output.col, params = NULL, ...)
 }
@@ -36,10 +58,8 @@ Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
-  \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_quantile_discretizer}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_stop_words_remover}},
-  \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }

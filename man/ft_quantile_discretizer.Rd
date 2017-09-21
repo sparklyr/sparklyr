@@ -39,10 +39,7 @@ Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
-  \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_stop_words_remover}},
-  \code{\link{ft_string_indexer}},
-  \code{\link{ft_vector_assembler}},
-  \code{\link{sdf_mutate}}
+  \code{\link{ft_string_indexer}}, \code{\link{sdf_mutate}}
 }

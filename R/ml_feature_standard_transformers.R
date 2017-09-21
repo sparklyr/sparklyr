@@ -65,13 +65,13 @@ ft_binarizer.tbl_spark <- function(x, input_col, output_col, threshold = 0,
 # HashingTF
 
 #' @export
-ml_hashing_tf <- function(x, input_col, output_col, binary = FALSE,
+ft_hashing_tf <- function(x, input_col, output_col, binary = FALSE,
                           num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
-  UseMethod("ml_hashing_tf")
+  UseMethod("ft_hashing_tf")
 }
 
 #' @export
-ml_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FALSE,
+ft_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FALSE,
                                            num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
 
   ml_validate_args(rlang::caller_env())
@@ -82,14 +82,14 @@ ml_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FA
 }
 
 #' @export
-ml_hashing_tf.ml_pipeline <- function(x, input_col, output_col, binary = FALSE,
+ft_hashing_tf.ml_pipeline <- function(x, input_col, output_col, binary = FALSE,
                                       num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_add_stage(x, transformer)
 }
 
 #' @export
-ml_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
+ft_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
                                     num_features = 2^18, uid = random_string("hashing_tf_"), ....) {
   transformer <- ml_new_stage_modified_args(rlang::call_frame())
   ml_transform(transformer, x)
@@ -99,14 +99,14 @@ ml_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
 # OneHotEncoder
 
 #' @export
-ml_one_hot_encoder <- function(
+ft_one_hot_encoder <- function(
   x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...) {
-  UseMethod("ml_one_hot_encoder")
+  UseMethod("ft_one_hot_encoder")
 }
 
 #' @export
-ml_one_hot_encoder.spark_connection <- function(
+ft_one_hot_encoder.spark_connection <- function(
   x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...) {
 
@@ -120,7 +120,7 @@ ml_one_hot_encoder.spark_connection <- function(
 }
 
 #' @export
-ml_one_hot_encoder.ml_pipeline <- function(
+ft_one_hot_encoder.ml_pipeline <- function(
   x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...) {
 
@@ -129,7 +129,7 @@ ml_one_hot_encoder.ml_pipeline <- function(
 }
 
 #' @export
-ml_one_hot_encoder.tbl_spark <- function(
+ft_one_hot_encoder.tbl_spark <- function(
   x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...) {
 
@@ -140,14 +140,14 @@ ml_one_hot_encoder.tbl_spark <- function(
 # VectorAssembler
 
 #' @export
-ml_vector_assembler <- function(
+ft_vector_assembler <- function(
   x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...) {
-  UseMethod("ml_vector_assembler")
+  UseMethod("ft_vector_assembler")
 }
 
 #' @export
-ml_vector_assembler.spark_connection <- function(
+ft_vector_assembler.spark_connection <- function(
   x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...) {
 
@@ -164,7 +164,7 @@ ml_vector_assembler.spark_connection <- function(
 }
 
 #' @export
-ml_vector_assembler.ml_pipeline <- function(
+ft_vector_assembler.ml_pipeline <- function(
   x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...) {
 
@@ -173,7 +173,7 @@ ml_vector_assembler.ml_pipeline <- function(
 }
 
 #' @export
-ml_vector_assembler.tbl_spark <- function(
+ft_vector_assembler.tbl_spark <- function(
   x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...) {
 

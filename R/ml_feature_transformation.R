@@ -1,25 +1,25 @@
-#' Feature Transformation -- VectorAssembler
-#'
-#' Combine multiple vectors into a single row-vector; that is,
-#' where each row element of the newly generated column is a
-#' vector formed by concatenating each row element from the
-#' specified input columns.
-#'
-#' @template roxlate-ml-transformation
-#'
-#' @export
-ft_vector_assembler <- function(x,
-                                input.col,
-                                output.col,
-                                ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.VectorAssembler"
-  invoke_simple_transformer(x, class, list(
-    setInputCols = as.list(as.character(input.col)),
-    setOutputCol = ensure_scalar_character(output.col)
-  ))
-}
+#' #' Feature Transformation -- VectorAssembler
+#' #'
+#' #' Combine multiple vectors into a single row-vector; that is,
+#' #' where each row element of the newly generated column is a
+#' #' vector formed by concatenating each row element from the
+#' #' specified input columns.
+#' #'
+#' #' @template roxlate-ml-transformation
+#' #'
+#' #' @export
+#' ft_vector_assembler <- function(x,
+#'                                 input.col,
+#'                                 output.col,
+#'                                 ...)
+#' {
+#'   ml_backwards_compatibility_api()
+#'   class <- "org.apache.spark.ml.feature.VectorAssembler"
+#'   invoke_simple_transformer(x, class, list(
+#'     setInputCols = as.list(as.character(input.col)),
+#'     setOutputCol = ensure_scalar_character(output.col)
+#'   ))
+#' }
 
 #' Feature Transformation -- StringIndexer
 #'
@@ -288,32 +288,32 @@ ft_quantile_discretizer <- function(x,
   ))
 }
 
-#' Feature Transformation -- OneHotEncoder
-#'
-#' One-hot encoding maps a column of label indices to a column of binary
-#' vectors, with at most a single one-value. This encoding allows algorithms
-#' which expect continuous features, such as Logistic Regression, to use
-#' categorical features. Typically, used with  \code{ft_string_indexer()} to
-#' index a column first.
-#'
-#' @template roxlate-ml-transformation
-#' @param drop.last Boolean; drop the last category?
-#'
-#' @export
-ft_one_hot_encoder <- function(x,
-                               input.col,
-                               output.col,
-                               drop.last = TRUE,
-                               ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.OneHotEncoder"
-  invoke_simple_transformer(x, class, list(
-    setInputCol  = ensure_scalar_character(input.col),
-    setOutputCol = ensure_scalar_character(output.col),
-    setDropLast  = ensure_scalar_boolean(drop.last)
-  ))
-}
+#' #' Feature Transformation -- OneHotEncoder
+#' #'
+#' #' One-hot encoding maps a column of label indices to a column of binary
+#' #' vectors, with at most a single one-value. This encoding allows algorithms
+#' #' which expect continuous features, such as Logistic Regression, to use
+#' #' categorical features. Typically, used with  \code{ft_string_indexer()} to
+#' #' index a column first.
+#' #'
+#' #' @template roxlate-ml-transformation
+#' #' @param drop.last Boolean; drop the last category?
+#' #'
+#' #' @export
+#' ft_one_hot_encoder <- function(x,
+#'                                input.col,
+#'                                output.col,
+#'                                drop.last = TRUE,
+#'                                ...)
+#' {
+#'   ml_backwards_compatibility_api()
+#'   class <- "org.apache.spark.ml.feature.OneHotEncoder"
+#'   invoke_simple_transformer(x, class, list(
+#'     setInputCol  = ensure_scalar_character(input.col),
+#'     setOutputCol = ensure_scalar_character(output.col),
+#'     setDropLast  = ensure_scalar_boolean(drop.last)
+#'   ))
+#' }
 
 #' #' Feature Tranformation -- Tokenizer
 #' #'

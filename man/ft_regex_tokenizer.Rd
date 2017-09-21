@@ -2,7 +2,33 @@
 % Please edit documentation in R/ml_feature_transformation.R
 \name{ft_regex_tokenizer}
 \alias{ft_regex_tokenizer}
-\title{#' Feature Tranformation -- Tokenizer
+\title{#' Feature Transformation -- OneHotEncoder
+#'
+#' One-hot encoding maps a column of label indices to a column of binary
+#' vectors, with at most a single one-value. This encoding allows algorithms
+#' which expect continuous features, such as Logistic Regression, to use
+#' categorical features. Typically, used with  \code{ft_string_indexer()} to
+#' index a column first.
+#'
+#' @template roxlate-ml-transformation
+#' @param drop.last Boolean; drop the last category?
+#'
+#' @export
+ft_one_hot_encoder <- function(x,
+                               input.col,
+                               output.col,
+                               drop.last = TRUE,
+                               ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.OneHotEncoder"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col),
+    setDropLast  = ensure_scalar_boolean(drop.last)
+  ))
+}
+#' Feature Tranformation -- Tokenizer
 #'
 #' A tokenizer that converts the input string to lowercase and then splits it
 #' by white spaces.
@@ -53,10 +79,7 @@ Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
-  \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_quantile_discretizer}},
   \code{\link{ft_stop_words_remover}},
-  \code{\link{ft_string_indexer}},
-  \code{\link{ft_vector_assembler}},
-  \code{\link{sdf_mutate}}
+  \code{\link{ft_string_indexer}}, \code{\link{sdf_mutate}}
 }
