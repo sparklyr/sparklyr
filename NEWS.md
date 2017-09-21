@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support in `spark_apply()` for specifying  a list of `packages` to
+  distribute to each worker node.
+
 - Added support in`yarn-cluster` for `sparklyr.yarn.cluster.lookup.prefix`,
   `sparklyr.yarn.cluster.lookup.username` and `sparklyr.yarn.cluster.lookup.byname`
   to control the new application lookup behavior.
