@@ -182,7 +182,8 @@ ml_validate_params <- function(stages_params, uid_stages, current_param_list) {
           ))
         # calls the appropriate validator and returns a list
         rlang::invoke(ml_get_stage_validator(stage_class),
-                      args = args_to_validate)
+                      args = args_to_validate,
+                      nms = names(params))
       })
     }) %>%
     rlang::set_names(stage_uids)
