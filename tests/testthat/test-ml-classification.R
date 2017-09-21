@@ -37,7 +37,7 @@ test_that("ml_logistic_regression interprets params apporpriately", {
 
 test_that("ml_logistic_regression.spark_connect() returns object with correct class", {
   lr <- ml_logistic_regression(sc, intercept = TRUE, elastic_net_param = 0)
-  expect_equal(class(lr), c("ml_predictor", "ml_estimator",
+  expect_equal(class(lr), c("ml_logistic_regression", "ml_predictor", "ml_estimator",
                             "ml_pipeline_stage"))
 })
 
