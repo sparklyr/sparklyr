@@ -2,12 +2,31 @@ context("spark apply bundle")
 
 sc <- testthat_spark_connection()
 
-test_that("'core_spark_apply_bundle' can `core_spark_apply_unbundle`", {
-  bundlePath <- core_spark_apply_bundle()
+test_that("'spark_apply_bundle' can `worker_spark_apply_unbundle`", {
+  bundlePath <- spark_apply_bundle()
   unbundlePath <- worker_spark_apply_unbundle(bundlePath, tempdir())
 
   unlink(bundlePath, recursive = TRUE)
   unlink(unbundlePath, recursive = TRUE)
 
   succeed()
+})
+
+test_that("'spark_apply_packages' uses different names for different packages", {
+  expect_true(
+    length(spark_apply_packages("broom")) > 0
+  )
+})
+
+
+test_that("'spark_apply_packages' uses different names for different packages", {
+  expect_true(
+    spark_apply_bundle_file(spark_apply_packages("broom")) !=
+    spark_apply_bundle_file(spark_apply_packages("tidyr"))
+  )
+
+  expect_true(
+    spark_apply_bundle_file(spark_apply_packages("broom")) ==
+    spark_apply_bundle_file(spark_apply_packages("broom"))
+  )
 })
