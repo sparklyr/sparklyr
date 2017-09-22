@@ -20,13 +20,8 @@ test_that("'spark_apply_packages' uses different names for different packages", 
 
 
 test_that("'spark_apply_packages' uses different names for different packages", {
-  expect_true(
-    spark_apply_bundle_file(spark_apply_packages("broom")) !=
-    spark_apply_bundle_file(spark_apply_packages("tidyr"))
-  )
+  broom_file <- spark_apply_bundle_file(spark_apply_packages("broom"))
+  tidyr_file <- spark_apply_bundle_file(spark_apply_packages("tidyr"))
 
-  expect_true(
-    spark_apply_bundle_file(spark_apply_packages("broom")) ==
-    spark_apply_bundle_file(spark_apply_packages("broom"))
-  )
+  expect_true(broom_file != tidyr_file)
 })
