@@ -97,3 +97,12 @@ ml_validator_bucketizer <- function(args, nms) {
     }), nms, input_output_mapping
   )
 }
+
+# ElementwiseProduct
+ml_validator_elementwise_product <- function(args, nms) {
+  ml_extract_specified_args(
+    within(args, {
+      scaling_vec <- lapply(scaling_vec, ensure_scalar_double)
+    }), nms, input_output_mapping
+  )
+}

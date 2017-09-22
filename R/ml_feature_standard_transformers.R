@@ -289,3 +289,45 @@ ft_bucketizer.tbl_spark <- function(
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
+
+# ElementwiseProduct
+
+#' @export
+ft_elementwise_product <- function(
+  x, input_col, output_col, scaling_vec,
+  uid = random_string("elementwise_product_"), ...) {
+  UseMethod("ft_elementwise_product")
+}
+
+#' @export
+ft_elementwise_product.spark_connection <- function(
+  x, input_col, output_col, scaling_vec,
+  uid = random_string("elementwise_product_"), ...) {
+
+  ml_validate_args()
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.ElementwiseProduct",
+                             input_col, output_col, uid) %>%
+    (function(jobj) invoke_static(x,
+                               "sparklyr.MLUtils2",
+                               "setScalingVec",
+                               jobj, scaling_vec))
+
+  new_ml_transformer(jobj)
+}
+
+#' @export
+ft_elementwise_product.ml_pipeline <- function(
+  x, input_col, output_col, scaling_vec,
+  uid = random_string("elementwise_product_"), ...) {
+
+  transformer <- ml_new_stage_modified_args()
+  ml_add_stage(x, transformer)
+}
+
+#' @export
+ft_elementwise_product.tbl_spark <- function(
+  x, input_col, output_col, scaling_vec,
+  uid = random_string("elementwise_product_"), ...) {
+  transformer <- ml_new_stage_modified_args()
+  ml_transform(transformer, x)
+}

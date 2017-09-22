@@ -35,7 +35,6 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   columns in Spark.
 
 Other feature transformation routines: \code{\link{ft_count_vectorizer}},
-  \code{\link{ft_elementwise_product}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_stop_words_remover}},
   \code{\link{sdf_mutate}}

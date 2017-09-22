@@ -109,19 +109,34 @@ sc <- testthat_spark_connection()
 
 test_that("ft_index_to_string() works", {
   df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
-  df_tbl <- copy_to(sc, df, overwrite = TRUE)
+  df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
 
   s1 <- df_tbl %>%
     ft_string_indexer("string", "indexed") %>%
     ft_index_to_string("indexed", "string2") %>%
-    pull(string2)
+    dplyr::pull(string2)
 
   expect_identical(s1, c("foo", "bar", "foo", "foo"))
 
   s2 <- df_tbl %>%
     ft_string_indexer("string", "indexed") %>%
     ft_index_to_string("indexed", "string2", c("wow", "cool")) %>%
-    pull(string2)
+    dplyr::pull(string2)
 
   expect_identical(s2, c("wow", "cool", "wow", "wow"))
+})
+
+test_that("ft_elementwise_product() works", {
+  df <- data.frame(a = 1, b = 3, c = 5)
+  df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
+
+  nums <- df_tbl %>%
+    ft_vector_assembler(list("a", "b", "c"), output_col = "features") %>%
+    ft_elementwise_product("features", "multiplied", c(2, 4, 6)) %>%
+    dplyr::pull(multiplied) %>%
+    rlang::flatten_dbl()
+
+  expect_identical(nums,
+                   c(1, 3, 5) * c(2, 4, 6))
+
 })

@@ -207,32 +207,32 @@
 #'   ))
 #' }
 
-#' Feature Transformation -- ElementwiseProduct
-#'
-#' Computes the element-wise product between two columns. Generally, this is
-#' intended as a scaling transformation, where an input vector is scaled by
-#' another vector, but this should apply for all element-wise product
-#' transformations.
-#'
-#' @template roxlate-ml-transformation
-#'
-#' @param scaling.col The column used to scale \code{input.col}.
-#'
-#' @export
-ft_elementwise_product <- function(x,
-                                   input.col,
-                                   output.col,
-                                   scaling.col,
-                                   ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.ElementwiseProduct"
-  invoke_simple_transformer(x, class, list(
-    setInputCol   = ensure_scalar_character(input.col),
-    setOutputCol  = ensure_scalar_character(output.col),
-    setScalingVec = ensure_scalar_character(scaling.col)
-  ))
-}
+#' #' Feature Transformation -- ElementwiseProduct
+#' #'
+#' #' Computes the element-wise product between two columns. Generally, this is
+#' #' intended as a scaling transformation, where an input vector is scaled by
+#' #' another vector, but this should apply for all element-wise product
+#' #' transformations.
+#' #'
+#' #' @template roxlate-ml-transformation
+#' #'
+#' #' @param scaling.col The column used to scale \code{input.col}.
+#' #'
+#' #' @export
+#' ft_elementwise_product <- function(x,
+#'                                    input.col,
+#'                                    output.col,
+#'                                    scaling.col,
+#'                                    ...)
+#' {
+#'   ml_backwards_compatibility_api()
+#'   class <- "org.apache.spark.ml.feature.ElementwiseProduct"
+#'   invoke_simple_transformer(x, class, list(
+#'     setInputCol   = ensure_scalar_character(input.col),
+#'     setOutputCol  = ensure_scalar_character(output.col),
+#'     setScalingVec = ensure_scalar_character(scaling.col)
+#'   ))
+#' }
 
 #' Feature Transformation -- SQLTransformer
 #'
