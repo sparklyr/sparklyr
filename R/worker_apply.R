@@ -20,7 +20,7 @@ spark_worker_apply <- function(sc) {
     workerRootDir <- worker_invoke_static(sc, "org.apache.spark.SparkFiles", "getRootDirectory")
     sparkBundlePath <- file.path(workerRootDir, bundleName)
 
-    worker_log("using bundle path ", sparkBundlePath)
+    worker_log("using bundle path ", normalizePath(sparkBundlePath))
 
     if (!file.exists(sparkBundlePath)) {
       stop("failed to find bundle under SparkFiles root directory")
