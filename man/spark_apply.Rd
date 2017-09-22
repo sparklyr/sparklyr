@@ -24,7 +24,14 @@ adds indexed column names when not enough columns are specified.}
 
 \item{group_by}{Column name used to group by data frame partitions.}
 
-\item{packages}{Boolean; distribute \code{.libPaths()} packages to nodes?}
+\item{packages}{Boolean to distribute \code{.libPaths()} packages to each node,
+  or a list of packages to distribute.
+
+  For offline clusters where \code{available.packages()} is not available,
+  manually download the packages database from
+ https://cran.r-project.org/web/packages/packages.rds and set
+  \code{Sys.setenv(sparklyr.apply.packagesdb = "<pathl-to-rds>")}. Otherwise,
+  all packages will be used by default.}
 
 \item{...}{Optional arguments; currently unused.}
 }

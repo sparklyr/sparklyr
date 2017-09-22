@@ -7,7 +7,7 @@
 worker_spark_apply_unbundle(bundle_path, base_path)
 }
 \arguments{
-\item{bundle_path}{Path to the bundle created using \code{core_spark_apply_bundle()}}
+\item{bundle_path}{Path to the bundle created using \code{spark_apply_bundle()}}
 
 \item{base_path}{Base path to use while extracting bundles}
 }
