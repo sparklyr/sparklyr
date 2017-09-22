@@ -35,24 +35,27 @@ spark_apply_bundle <- function(packages = TRUE) {
   if (!dir.exists(spark_apply_bundle_path()))
     dir.create(spark_apply_bundle_path(), recursive = TRUE)
 
-  args <- c("-cf", packagesTar)
-
-  if (isTRUE(packages)) {
-    lapply(.libPaths(), function(e) {
-      args <<- c(args, "-C", e)
-      args <<- c(args, ".")
-    })
-  } else {
-    lapply(.libPaths(), function(e) {
-      args <<- c(args, "-C", e)
-
-      lapply(packages, function(p) {
-        if (file.exists(file.path(e, p))) {
-          args <<- c(args, p)
-        }
-      })
-    })
-  }
+  args <- c(
+    "-cf",
+    packagesTar,
+    if (isTRUE(packages)) {
+      lapply(.libPaths(), function(e) {
+        c("-C", e, ".")
+      }) %>% unlist()
+    } else {
+      lapply(.libPaths(), function(e) {
+        c(
+          "-C",
+          e,
+          lapply(packages, function(p) {
+            if (file.exists(file.path(e, p))) {
+              p
+            }
+          }) %>% Filter(Negate(is.null), .) %>% unlist()
+        )
+      }) %>% unlist()
+    }
+  )
 
   if (!file.exists(packagesTar)) {
     system2("tar", args)
