@@ -4,7 +4,7 @@
 \alias{worker_spark_apply_unbundle}
 \title{Extracts a bundle of dependencies required by \code{spark_apply()}}
 \usage{
-worker_spark_apply_unbundle(bundle_path, base_path)
+worker_spark_apply_unbundle(bundle_path, base_path, bundle_name)
 }
 \arguments{
 \item{bundle_path}{Path to the bundle created using \code{spark_apply_bundle()}}
