@@ -127,6 +127,10 @@ spark_worker_rlang_unserialize <- function() {
     rlang_unserialize
 }
 
+spark_worker_unbundle_path <- function() {
+  file.path("sparklyr-bundle")
+}
+
 #' Extracts a bundle of dependencies required by \code{spark_apply()}
 #'
 #' @param bundle_path Path to the bundle created using \code{spark_apply_bundle()}
@@ -135,7 +139,7 @@ spark_worker_rlang_unserialize <- function() {
 #' @keywords internal
 #' @export
 worker_spark_apply_unbundle <- function(bundle_path, base_path) {
-  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())
+  extractPath <- file.path(base_path, spark_worker_unbundle_path())
   lockFile <- file.path(extractPath, "sparklyr.lock")
 
   if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)

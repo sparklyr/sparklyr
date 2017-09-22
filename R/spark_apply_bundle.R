@@ -60,7 +60,3 @@ spark_apply_bundle <- function(packages = TRUE) {
 
   packagesTar
 }
-
-core_spark_apply_unbundle_path <- function() {
-  file.path("sparklyr-bundle")
-}
