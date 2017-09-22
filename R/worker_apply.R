@@ -143,7 +143,7 @@ spark_worker_unbundle_path <- function() {
 #'
 #' @keywords internal
 #' @export
-worker_spark_apply_unbundle <- function(bundle_path, extract_path, bundle_name) {
+worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
   extractPath <- file.path(base_path, spark_worker_unbundle_path(), bundle_name)
   lockFile <- file.path(extractPath, "sparklyr.lock")
 
