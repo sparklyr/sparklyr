@@ -913,7 +913,7 @@ object Sources {
     "    workerRootDir <- worker_invoke_static(sc, \"org.apache.spark.SparkFiles\", \"getRootDirectory\")\n" +
     "    sparkBundlePath <- file.path(workerRootDir, bundleName)\n" +
     "\n" +
-    "    worker_log(\"using bundle path \", sparkBundlePath)\n" +
+    "    worker_log(\"using bundle path \", normalizePath(sparkBundlePath))\n" +
     "\n" +
     "    if (!file.exists(sparkBundlePath)) {\n" +
     "      stop(\"failed to find bundle under SparkFiles root directory\")\n" +
