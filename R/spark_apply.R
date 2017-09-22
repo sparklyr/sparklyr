@@ -83,7 +83,7 @@ spark_apply_packages <- function(packages) {
   } else {
     deps <- tools::package_dependencies(packages, db = db)
     names(deps) <- NULL
-    unlist(deps)
+    c(unlist(deps), packages)
   }
 }
 
