@@ -70,9 +70,9 @@ test_that("ft_binarizer() input checking works", {
                "length-one numeric vector")
 })
 
-test_that("ml_hashing_tf() input checking works", {
-  expect_identical(class(ml_hashing_tf(sc, "in", "out", num_features = 25)$param_map$num_features),
+test_that("ft_hashing_tf() input checking works", {
+  expect_identical(class(ft_hashing_tf(sc, "in", "out", num_features = 25)$param_map$num_features),
                    "integer")
-  expect_error(ml_hashing_tf(sc, "in", "out", binary = 1),
+  expect_error(ft_hashing_tf(sc, "in", "out", binary = 1),
                "length-one logical vector")
 })

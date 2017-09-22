@@ -21,8 +21,8 @@ test_tbl <- testthat_tbl("test")
 
 test_that("ml_save_pipeline()/ml_load_pipeline() work for unnested pipelines", {
   p1 <- ml_pipeline(sc) %>%
-    ml_tokenizer("x", "y") %>%
-    ml_binarizer("in", "out", 0.5)
+    ft_tokenizer("x", "y") %>%
+    ft_binarizer("in", "out", 0.5)
   path <- tempfile()
   ml_save_pipeline(p1, path)
   p2 <- ml_load_pipeline(sc, path)
@@ -38,8 +38,8 @@ test_that("ml_save_pipeline()/ml_load_pipeline() work for unnested pipelines", {
 })
 
 test_that("ml_save_pipeline()/ml_load_pipeline() work for nested pipeline", {
-  p1a <- ml_pipeline(ml_tokenizer(sc, "x", "y"))
-  p1b <- ml_binarizer(sc, "in", "out", 0.5)
+  p1a <- ml_pipeline(ft_tokenizer(sc, "x", "y"))
+  p1b <- ft_binarizer(sc, "in", "out", 0.5)
   p1 <- ml_pipeline(p1a, p1b)
   path <- tempfile()
   ml_save_pipeline(p1, path)
@@ -58,8 +58,8 @@ test_that("ml_save_pipeline()/ml_load_pipeline() work for nested pipeline", {
 
 test_that("ml_fit() returns a ml_pipeline_model", {
 
-  tokenizer <- ml_tokenizer(sc, input_col = "text", output_col = "words")
-  hashing_tf <- ml_hashing_tf(sc, input_col = "words", output_col = "features")
+  tokenizer <- ft_tokenizer(sc, input_col = "text", output_col = "words")
+  hashing_tf <- ft_hashing_tf(sc, input_col = "words", output_col = "features")
   lr <- ml_logistic_regression(sc, max_iter = 10, lambda = 0.001)
   pipeline <- ml_pipeline(tokenizer, hashing_tf, lr)
 
@@ -69,8 +69,8 @@ test_that("ml_fit() returns a ml_pipeline_model", {
 
 test_that("ml_[save/load]_model() work for ml_pipeline_model", {
   pipeline <- ml_pipeline(sc) %>%
-    ml_tokenizer("text", "words") %>%
-    ml_hashing_tf("words", "features") %>%
+    ft_tokenizer("text", "words") %>%
+    ft_hashing_tf("words", "features") %>%
     ml_logistic_regression(max_iter = 10, lambda = 0.001)
   model1 <- ml_fit(pipeline, training_tbl)
   path <- tempfile("model")

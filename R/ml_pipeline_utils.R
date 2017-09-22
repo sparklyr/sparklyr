@@ -40,13 +40,15 @@ ml_get_param_map <- function(jobj) {
     ml_map_param_list_names()
 }
 
-ml_new_stage_modified_args <- function(call_frame) {
-  envir <- rlang::caller_env()
-  modified_args <- call_frame %>%
+ml_new_stage_modified_args <- function(envir = rlang::caller_env(2)) {
+  caller_frame <- rlang::caller_frame()
+  modified_args <- caller_frame %>%
     rlang::lang_standardise() %>%
     rlang::lang_args() %>%
-    rlang::modify(x = rlang::parse_expr("spark_connection(x)"))
-  stage_constructor <- sub("\\..*$", "", rlang::lang_name(call_frame))
+    rlang::modify(x = rlang::new_quosure(
+      rlang::parse_expr("spark_connection(x)"),
+      env = caller_frame$env))
+  stage_constructor <- sub("\\..*$", "", rlang::lang_name(caller_frame))
   rlang::lang(stage_constructor, rlang::splice(modified_args)) %>%
     rlang::eval_tidy(env = envir)
 }

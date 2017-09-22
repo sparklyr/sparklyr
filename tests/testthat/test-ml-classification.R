@@ -53,8 +53,8 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
   test_tbl <- testthat_tbl("test")
 
   pipeline <- ml_pipeline(sc) %>%
-    ml_tokenizer("text", "words") %>%
-    ml_hashing_tf("words", "features", num_features = 1000) %>%
+    ft_tokenizer("text", "words") %>%
+    ft_hashing_tf("words", "features", num_features = 1000) %>%
     ml_logistic_regression(max_iter = 10, reg_param = 0.001)
 
   m1 <- pipeline %>%
@@ -64,13 +64,13 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
     dplyr::pull(probability)
 
   m2 <- training_tbl %>%
-    ml_tokenizer("text", "words") %>%
-    ml_hashing_tf("words", "features", num_features = 1000) %>%
+    ft_tokenizer("text", "words") %>%
+    ft_hashing_tf("words", "features", num_features = 1000) %>%
     ml_logistic_regression(max_iter = 10, reg_param = 0.001)
   m2_predictions <- m2 %>%
     ml_transform(test_tbl %>%
-                   ml_tokenizer("text", "words") %>%
-                   ml_hashing_tf("words", "features", num_features = 1000)) %>%
+                   ft_tokenizer("text", "words") %>%
+                   ft_hashing_tf("words", "features", num_features = 1000)) %>%
     dplyr::pull(probability)
 
   expect_equal(m1_predictions, m2_predictions)

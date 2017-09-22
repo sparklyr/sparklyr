@@ -49,5 +49,5 @@ Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_quantile_discretizer}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_stop_words_remover}},
-  \code{\link{ft_string_indexer}}, \code{\link{sdf_mutate}}
+  \code{\link{sdf_mutate}}
 }

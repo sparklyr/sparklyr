@@ -7,7 +7,12 @@ ml_get_stage_validator <- function(x) {
 }
 
 ml_get_stage_constructor <- function(x) {
-  paste0("ml_", ml_map_class(x))
+  package <- x %>%
+    strsplit("\\.") %>%
+    rlang::flatten_chr() %>%
+    dplyr::nth(-2)
+  prefix <- if (identical(package, "feature")) "ft_" else "ml_"
+  paste0(prefix, ml_map_class(x))
 }
 
 ml_args_to_validate <- function(args, current_args, default_args = current_args) {
@@ -27,19 +32,19 @@ ml_args_to_validate <- function(args, current_args, default_args = current_args)
 }
 
 
-ml_validate_args <- function(env) {
-  constructor_frame <- rlang::caller_frame()
-  validator_fn <- constructor_frame$fn_name %>%
+ml_validate_args <- function(env = rlang::caller_env(2)) {
+  caller_frame <- rlang::caller_frame()
+  validator_fn <- caller_frame$fn_name %>%
     (function(x) gsub("^(ml_|ft_)", "ml_validator_", x)) %>%
     (function(x) gsub("\\..*$", "", x))
-  args <- constructor_frame$expr %>%
+  args <- caller_frame$expr %>%
     rlang::lang_standardise() %>%
     rlang::lang_args() %>%
     # evaluate in calling environment of public function
     lapply(rlang::eval_tidy, env = env)
   # filter out args without defaults
   default_args <- Filter(Negate(rlang::is_symbol),
-                         rlang::fn_fmls(constructor_frame$fn)) %>%
+                         rlang::fn_fmls(caller_frame$fn)) %>%
     # evaluate default args in package namespace
     lapply(rlang::eval_tidy, env = rlang::ns_env("sparklyr"))
 
@@ -51,13 +56,13 @@ ml_validate_args <- function(env) {
 
   invisible(
     lapply(names(validated_args),
-           function(x) assign(x, validated_args[[x]], constructor_frame$env))
+           function(x) assign(x, validated_args[[x]], caller_frame$env))
   )
 }
 
 ml_formula_transformation <- function(env = rlang::caller_env(2)) {
-  constructor_frame <- rlang::caller_frame()
-  args <- constructor_frame$expr %>%
+  caller_frame <- rlang::caller_frame()
+  args <- caller_frame$expr %>%
     rlang::lang_standardise() %>%
     rlang::lang_args() %>%
     `[`(c("formula", "response", "features")) %>%
@@ -87,7 +92,7 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   } else
     args$formula
 
-  assign("formula", formula, constructor_frame$env)
+  assign("formula", formula, caller_frame$env)
 }
 
 ml_extract_specified_args <- function(validated_args, nms, old_new_mapping = NULL) {

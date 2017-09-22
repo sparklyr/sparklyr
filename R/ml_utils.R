@@ -73,7 +73,7 @@ ml_prepare_dataframe <- function(x,
     responseType <- schema[[response]]$type
     if (responseType == "StringType") {
       envir$response <- ml.options$response.column
-      df <- ft_string_indexer(df, response, envir$response, envir)
+      df <- ft_string_indexer(sdf_register(df), response, envir$response, params = envir)
     } else if (responseType != "DoubleType") {
       envir$response <- ml.options$response.column
       castedColumn <- df %>%
@@ -85,7 +85,7 @@ ml_prepare_dataframe <- function(x,
   }
 
   # assemble features vector
-  transformed <- ft_vector_assembler(df, features, envir$features)
+  transformed <- ft_vector_assembler(sdf_register(df), features, envir$features)
 
   # return as vanilla spark dataframe
   spark_dataframe(transformed)

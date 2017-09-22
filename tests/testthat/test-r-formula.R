@@ -6,9 +6,9 @@ iris_tbl <- testthat_tbl("iris")
 
 test_that("r formula works as expected", {
   pipeline <- ml_pipeline(sc) %>%
-    ml_string_indexer("Species", "species_idx") %>%
-    ml_one_hot_encoder("species_idx", "species_dummy") %>%
-    ml_vector_assembler(list("Petal_Width", "species_dummy"), "features")
+    ft_string_indexer("Species", "species_idx") %>%
+    ft_one_hot_encoder("species_idx", "species_dummy") %>%
+    ft_vector_assembler(list("Petal_Width", "species_dummy"), "features")
 
   df1 <- pipeline %>%
     ml_fit_and_transform(iris_tbl) %>%
@@ -16,7 +16,7 @@ test_that("r formula works as expected", {
     collect()
 
   df2 <- iris_tbl %>%
-    ml_r_formula("Sepal_Length ~ Petal_Width + Species") %>%
+    ft_r_formula("Sepal_Length ~ Petal_Width + Species") %>%
     select(features, label) %>%
     collect()
 

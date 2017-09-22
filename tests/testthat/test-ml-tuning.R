@@ -4,8 +4,8 @@ sc <- testthat_spark_connection()
 
 test_that("ml_cross_validator() works correctly", {
   pipeline <- ml_pipeline(sc) %>%
-    ml_tokenizer("text", "words", uid = "tokenizer_1") %>%
-    ml_hashing_tf("words", "features", uid = "hashing_tf_1") %>%
+    ft_tokenizer("text", "words", uid = "tokenizer_1") %>%
+    ft_hashing_tf("words", "features", uid = "hashing_tf_1") %>%
     ml_logistic_regression(max_iter = 10, reg_param = 0.001, uid = "logistic_1")
   param_grid <- list(
     hash = list(

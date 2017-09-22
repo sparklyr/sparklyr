@@ -37,7 +37,7 @@ ml_logistic_regression.spark_connection <- function(
   raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...) {
 
-  ml_validate_args(rlang::caller_env())
+  ml_validate_args()
 
   jobj <- ml_new_classifier(
     x, "org.apache.spark.ml.classification.LogisticRegression", uid,
@@ -72,7 +72,7 @@ ml_logistic_regression.ml_pipeline <- function(
   raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...) {
 
-  transformer <- ml_new_stage_modified_args(rlang::call_frame())
+  transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
 }
 
@@ -97,7 +97,7 @@ ml_logistic_regression.tbl_spark <- function(
   raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...) {
 
-  logistic_regression <- ml_new_stage_modified_args(rlang::call_frame())
+  logistic_regression <- ml_new_stage_modified_args()
 
   ml_formula_transformation()
 
@@ -107,7 +107,7 @@ ml_logistic_regression.tbl_spark <- function(
   } else {
     # formula <- (if (rlang::is_formula(formula)) rlang::expr_text else identity)(formula)
     sc <- spark_connection(x)
-    r_formula <- ml_r_formula(sc, formula, features_col,
+    r_formula <- ft_r_formula(sc, formula, features_col,
                               label_col, force_index_label = TRUE,
                               dataset = x)
     pipeline <- ml_pipeline(r_formula, logistic_regression)

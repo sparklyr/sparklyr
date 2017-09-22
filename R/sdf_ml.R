@@ -35,7 +35,7 @@ sdf_predict <- function(object, newdata, ...) {
 
   # assemble into feature vector, apply transformation and return predictions
   params <- object$model.parameters
-  assembled <- spark_dataframe(ft_vector_assembler(sdf, object$features, params$features))
+  assembled <- spark_dataframe(ft_vector_assembler(sdf_register(sdf), object$features, params$features))
   transformed <- invoke(object$.model, "transform", assembled)
   dropped <- invoke(transformed, "drop", params$features)
   sdf_register(dropped)

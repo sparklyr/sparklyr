@@ -29,8 +29,8 @@ test_that("ml_pipeline() returns a c('ml_pipeline', 'ml_estimator', 'ml_pipeline
 })
 
 test_that("ml_pipeline() combines pipeline_stages into a pipeline", {
-  tokenizer <- ml_tokenizer(sc, "x", "y")
-  binarizer <- ml_binarizer(sc, "in", "out", 0.5)
+  tokenizer <- ft_tokenizer(sc, "x", "y")
+  binarizer <- ft_binarizer(sc, "in", "out", 0.5)
   pipeline <- ml_pipeline(tokenizer, binarizer)
   individual_stage_uids <- c(tokenizer$uid, binarizer$uid)
   expect_equal(pipeline$stage_uids, individual_stage_uids)
@@ -39,21 +39,21 @@ test_that("ml_pipeline() combines pipeline_stages into a pipeline", {
 
 test_that("we can create nested pipelines", {
   p0 <- ml_pipeline(sc)
-  tokenizer <- ml_tokenizer(sc, "x", "y")
+  tokenizer <- ft_tokenizer(sc, "x", "y")
   pipeline <- ml_pipeline(p0, tokenizer)
   expect_equal(class(pipeline$stages[[1]])[1], "ml_pipeline")
   expect_equal(pipeline$stages[[1]]$stages, NA)
 })
 
 test_that("ml_transformer.ml_pipeline() works as expected", {
-  tokenizer <- ml_tokenizer(sc, "x", "y")
-  binarizer <- ml_binarizer(sc, "in", "out", 0.5)
+  tokenizer <- ft_tokenizer(sc, "x", "y")
+  binarizer <- ft_binarizer(sc, "in", "out", 0.5)
 
   p1 <- ml_pipeline(tokenizer, binarizer)
 
   p2 <- ml_pipeline(sc) %>%
-    ml_tokenizer("x", "y") %>%
-    ml_binarizer("in", "out", 0.5)
+    ft_tokenizer("x", "y") %>%
+    ft_binarizer("in", "out", 0.5)
 
   p1_params <- p1$stages %>%
     lapply(function(x) x$param_map)
@@ -65,7 +65,7 @@ test_that("ml_transformer.ml_pipeline() works as expected", {
 
 test_that("ml_transform() fails on estimators", {
   iris_tbl <- testthat_tbl("iris")
-  string_indexer <- ml_string_indexer(sc, "Species", "species_idx")
+  string_indexer <- ft_string_indexer(sc, "Species", "species_idx")
   expect_error(string_indexer %>%
                  ml_transform(iris_tbl),
                "cannot invoke 'transform' on estimators")
@@ -73,7 +73,7 @@ test_that("ml_transform() fails on estimators", {
 
 test_that("ml_fit() and ml_fit_and_transform() fail on transformers", {
   iris_tbl <- testthat_tbl("iris")
-  binarizer <- ml_binarizer(sc, "Petal_Width", "petal_width_binarized")
+  binarizer <- ft_binarizer(sc, "Petal_Width", "petal_width_binarized")
   expect_error(binarizer %>%
                  ml_fit(iris_tbl),
                "cannot invoke 'fit' on transformers")

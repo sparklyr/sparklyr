@@ -40,3 +40,18 @@ ml_validator_one_hot_encoder <- function(args, nms) {
     c(input_output_mapping, list(drop.last = "drop_last"))
   )
 }
+
+ml_validator_vector_assembler <- function(args, nms) {
+  old_new_mapping <- list(
+    input.col = "input_cols",
+    output.col = "output_col"
+  )
+  ml_extract_specified_args(
+    within(args, {
+      input_cols <- input_cols %>%
+        lapply(ensure_scalar_character)
+      output_col <- ensure_scalar_character(output_col)
+    }),
+    nms, old_new_mapping
+  )
+}
