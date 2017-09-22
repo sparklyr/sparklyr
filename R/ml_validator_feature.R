@@ -86,3 +86,14 @@ ml_validator_index_to_string <- function(args, nms) {
     }), nms, input_output_mapping
   )
 }
+
+# Bucketizer
+ml_validator_bucketizer <- function(args, nms) {
+  ml_extract_specified_args(
+    within(args, {
+      if (length(splits) < 3) stop("length(splits) must be at least 3")
+      splits <- lapply(splits, ensure_scalar_double)
+      handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
+    }), nms, input_output_mapping
+  )
+}

@@ -23,8 +23,7 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformation routines: \code{\link{ft_bucketizer}},
-  \code{\link{ft_count_vectorizer}},
+Other feature transformation routines: \code{\link{ft_count_vectorizer}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_quantile_discretizer}},
   \code{\link{ft_regex_tokenizer}},

@@ -180,32 +180,32 @@
 #     invoke("transform", df)
 # }
 
-#' Feature Transformation -- Bucketizer
-#'
-#' Similar to \R's \code{\link{cut}} function, this transforms a numeric column
-#' into a discretized column, with breaks specified through the \code{splits}
-#' parameter.
-#'
-#' @template roxlate-ml-transformation
-#'
-#' @param splits A numeric vector of cutpoints, indicating the bucket
-#'   boundaries.
-#'
-#' @export
-ft_bucketizer <- function(x,
-                          input.col,
-                          output.col,
-                          splits,
-                          ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.Bucketizer"
-  invoke_simple_transformer(x, class, list(
-    setInputCol  = ensure_scalar_character(input.col),
-    setOutputCol = ensure_scalar_character(output.col),
-    setSplits    = as.list(as.numeric(splits))
-  ))
-}
+#' #' Feature Transformation -- Bucketizer
+#' #'
+#' #' Similar to \R's \code{\link{cut}} function, this transforms a numeric column
+#' #' into a discretized column, with breaks specified through the \code{splits}
+#' #' parameter.
+#' #'
+#' #' @template roxlate-ml-transformation
+#' #'
+#' #' @param splits A numeric vector of cutpoints, indicating the bucket
+#' #'   boundaries.
+#' #'
+#' #' @export
+#' ft_bucketizer <- function(x,
+#'                           input.col,
+#'                           output.col,
+#'                           splits,
+#'                           ...)
+#' {
+#'   ml_backwards_compatibility_api()
+#'   class <- "org.apache.spark.ml.feature.Bucketizer"
+#'   invoke_simple_transformer(x, class, list(
+#'     setInputCol  = ensure_scalar_character(input.col),
+#'     setOutputCol = ensure_scalar_character(output.col),
+#'     setSplits    = as.list(as.numeric(splits))
+#'   ))
+#' }
 
 #' Feature Transformation -- ElementwiseProduct
 #'
