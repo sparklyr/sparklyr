@@ -76,3 +76,13 @@ ml_validator_dct <- function(args, nms) {
     }), nms, input_output_mapping
   )
 }
+
+# IndexToString
+ml_validator_index_to_string <- function(args, nms) {
+  ml_extract_specified_args(
+    within(args, {
+      if (!rlang::is_null(labels))
+        labels <- lapply(labels, ensure_scalar_character)
+    }), nms, input_output_mapping
+  )
+}

@@ -210,3 +210,42 @@ ft_dct.tbl_spark <- function(x, input_col, output_col, inverse = FALSE, uid = ra
 
 #' @export
 ft_discrete_cosine_transform <- ft_dct
+
+# IndexToString
+
+#' @export
+ft_index_to_string <- function(x, input_col, output_col, labels = NULL,
+                               uid = random_string("index_to_string_"), ...) {
+  UseMethod("ft_index_to_string")
+}
+
+#' @export
+ft_index_to_string.spark_connection <- function(
+  x, input_col, output_col, labels = NULL, uid = random_string("index_to_string_"), ...) {
+
+  ml_validate_args()
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.IndexToString",
+                             input_col, output_col, uid)
+
+  if (!rlang::is_null(labels))
+    jobj <- invoke(jobj, "setLabels", labels)
+
+  new_ml_transformer(jobj)
+}
+
+#' @export
+ft_index_to_string.ml_pipeline <- function(
+  x, input_col, output_col, labels = NULL,
+  uid = random_string("index_to_string_"), ...) {
+
+  transformer <- ml_new_stage_modified_args()
+  ml_add_stage(x, transformer)
+}
+
+#' @export
+ft_index_to_string.tbl_spark <- function(
+  x, input_col, output_col, labels = NULL,
+  uid = random_string("index_to_string_"), ...) {
+  transformer <- ml_new_stage_modified_args()
+  ml_transform(transformer, x)
+}

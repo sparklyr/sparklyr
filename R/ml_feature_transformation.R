@@ -119,27 +119,27 @@
 #'   ))
 #' }
 
-#' Feature Transformation -- IndexToString
-#'
-#' Symmetrically to \code{\link{ft_string_indexer}},
-#' \code{ft_index_to_string} maps a column of label indices back to a
-#' column containing the original labels as strings.
-#'
-#' @template roxlate-ml-transformation
-#'
-#' @export
-ft_index_to_string <- function(x,
-                               input.col,
-                               output.col,
-                               ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.IndexToString"
-  invoke_simple_transformer(x, class, list(
-    setInputCol  = ensure_scalar_character(input.col),
-    setOutputCol = ensure_scalar_character(output.col)
-  ))
-}
+#' #' Feature Transformation -- IndexToString
+#' #'
+#' #' Symmetrically to \code{\link{ft_string_indexer}},
+#' #' \code{ft_index_to_string} maps a column of label indices back to a
+#' #' column containing the original labels as strings.
+#' #'
+#' #' @template roxlate-ml-transformation
+#' #'
+#' #' @export
+#' ft_index_to_string <- function(x,
+#'                                input.col,
+#'                                output.col,
+#'                                ...)
+#' {
+#'   ml_backwards_compatibility_api()
+#'   class <- "org.apache.spark.ml.feature.IndexToString"
+#'   invoke_simple_transformer(x, class, list(
+#'     setInputCol  = ensure_scalar_character(input.col),
+#'     setOutputCol = ensure_scalar_character(output.col)
+#'   ))
+#' }
 
 ## TODO: These routines with so-called 'row vector' features by
 ## default, but it would be much nicer to implement routines to
