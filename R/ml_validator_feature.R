@@ -3,6 +3,7 @@ input_output_mapping <- list(
   output.col = "output_col"
 )
 
+# HashingTF
 ml_validator_hashing_tf <- function(args, nms) {
   ml_extract_specified_args(
     within(args, {
@@ -13,6 +14,7 @@ ml_validator_hashing_tf <- function(args, nms) {
   )
 }
 
+# Binarizer
 ml_validator_binarizer <- function(args, nms) {
   ml_extract_specified_args(
     within(args, {
@@ -22,6 +24,7 @@ ml_validator_binarizer <- function(args, nms) {
   )
 }
 
+# StringIndexer
 ml_validator_string_indexer <- function(args, nms) {
   ml_extract_specified_args(
     within(args, {
@@ -31,6 +34,7 @@ ml_validator_string_indexer <- function(args, nms) {
   )
 }
 
+# OneHotEncoder
 ml_validator_one_hot_encoder <- function(args, nms) {
   ml_extract_specified_args(
     within(args, {
@@ -41,6 +45,7 @@ ml_validator_one_hot_encoder <- function(args, nms) {
   )
 }
 
+# VectorAssembler
 ml_validator_vector_assembler <- function(args, nms) {
   old_new_mapping <- list(
     input.col = "input_cols",
