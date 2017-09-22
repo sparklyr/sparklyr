@@ -4,7 +4,7 @@ sc <- testthat_spark_connection()
 
 test_that("'spark_apply_bundle' can `worker_spark_apply_unbundle`", {
   bundlePath <- spark_apply_bundle()
-  unbundlePath <- worker_spark_apply_unbundle(bundlePath, tempdir())
+  unbundlePath <- worker_spark_apply_unbundle(bundlePath, tempdir(), "package")
 
   unlink(bundlePath, recursive = TRUE)
   unlink(unbundlePath, recursive = TRUE)
