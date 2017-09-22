@@ -61,9 +61,9 @@ spark_apply_packages <- function(packages) {
   db <- Sys.getenv("sparklyr.apply.packagesdb")
   if (nchar(db) == 0) {
     if (!exists("availablePackagesChache", envir = .globals)) {
-      tryCatch({
-        db <- available.packages()
-      }, error = function() {
+      db <- tryCatch({
+        available.packages()
+      }, error = function(e) {
         warning(
           "Failed to run 'available.packages()', using offline connection? ",
           "See '?spark_apply' for details."
