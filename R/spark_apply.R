@@ -131,7 +131,6 @@ spark_apply <- function(x,
   args <- list(...)
   rlang <- spark_config_value(sc, "sparklyr.closures.rlang", FALSE)
   proc_env <- connection_config(sc, "sparklyr.apply.env.")
-  if (is.character(packages)) packages <- spark_apply_packages(packages)
 
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
@@ -183,7 +182,9 @@ spark_apply <- function(x,
   if (isTRUE(packages) || is.character(packages)) {
     bundle_path <- spark_apply_bundle_file(packages)
     if (!file.exists(bundle_path)) {
-      bundle_path <- spark_apply_bundle(packages)
+      packages_deps <- if (is.character(packages)) spark_apply_packages(packages) else packages
+
+      bundle_path <- spark_apply_bundle(packages_deps)
     }
 
     if (!is.null(bundle_path)) {
