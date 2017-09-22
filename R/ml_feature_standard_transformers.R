@@ -8,6 +8,7 @@ ft_tokenizer <- function(x, input_col, output_col, uid = random_string("tokenize
 #' @export
 ft_tokenizer.spark_connection <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
 
+  ml_validate_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Tokenizer",
                              input_col, output_col, uid)
 
@@ -19,14 +20,12 @@ ft_tokenizer.ml_pipeline <- function(x, input_col, output_col, uid = random_stri
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
-
 }
 
 #' @export
 ft_tokenizer.tbl_spark <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
-
 }
 
 # Binarizer
