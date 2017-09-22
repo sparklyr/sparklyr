@@ -83,7 +83,7 @@ spark_apply_packages <- function(packages) {
   } else {
     deps <- tools::package_dependencies(packages, db = db, recursive = TRUE)
     names(deps) <- NULL
-    c(unlist(deps), packages)
+    unique(c(unlist(deps), packages))
   }
 }
 
