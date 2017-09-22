@@ -81,7 +81,7 @@ spark_apply_packages <- function(packages) {
   if (is.null(db)) {
     TRUE
   } else {
-    deps <- tools::package_dependencies(packages, db = db)
+    deps <- tools::package_dependencies(packages, db = db, recursive = TRUE)
     names(deps) <- NULL
     c(unlist(deps), packages)
   }
