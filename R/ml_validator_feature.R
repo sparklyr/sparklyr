@@ -67,3 +67,12 @@ ml_validator_tokenizer <- function(args, nms) {
     args, nms, input_output_mapping
   )
 }
+
+# DCT
+ml_validator_dct <- function(args, nms) {
+  ml_extract_specified_args(
+    within(args, {
+      inverse <- ensure_scalar_boolean(inverse)
+    }), nms, input_output_mapping
+  )
+}

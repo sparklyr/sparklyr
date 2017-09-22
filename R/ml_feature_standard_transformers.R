@@ -176,3 +176,37 @@ ft_vector_assembler.tbl_spark <- function(
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
+
+# DCT
+
+#' @export
+ft_dct <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+  UseMethod("ft_dct")
+}
+
+#' @export
+ft_dct.spark_connection <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+
+  ml_validate_args()
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.DCT",
+                             input_col, output_col, uid) %>%
+    invoke("setInverse", inverse)
+
+  new_ml_transformer(jobj)
+}
+
+#' @export
+ft_dct.ml_pipeline <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+
+  transformer <- ml_new_stage_modified_args()
+  ml_add_stage(x, transformer)
+}
+
+#' @export
+ft_dct.tbl_spark <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+  transformer <- ml_new_stage_modified_args()
+  ml_transform(transformer, x)
+}
+
+#' @export
+ft_discrete_cosine_transform <- ft_dct

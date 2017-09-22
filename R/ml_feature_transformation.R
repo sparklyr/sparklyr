@@ -94,30 +94,30 @@
 #'   ))
 #' }
 
-#' Feature Transformation -- Discrete Cosine Transform (DCT)
-#'
-#' Transform a column in the time domain into another column in the frequency
-#' domain.
-#'
-#' @template roxlate-ml-transformation
-#'
-#' @param inverse Perform inverse DCT?
-#'
-#' @export
-ft_discrete_cosine_transform <- function(x,
-                                         input.col,
-                                         output.col,
-                                         inverse = FALSE,
-                                         ...)
-{
-  ml_backwards_compatibility_api()
-  class <- "org.apache.spark.ml.feature.DCT"
-  invoke_simple_transformer(x, class, list(
-    setInputCol  = ensure_scalar_character(input.col),
-    setOutputCol = ensure_scalar_character(output.col),
-    setInverse   = ensure_scalar_boolean(inverse)
-  ))
-}
+#' #' Feature Transformation -- Discrete Cosine Transform (DCT)
+#' #'
+#' #' Transform a column in the time domain into another column in the frequency
+#' #' domain.
+#' #'
+#' #' @template roxlate-ml-transformation
+#' #'
+#' #' @param inverse Perform inverse DCT?
+#' #'
+#' #' @export
+#' ft_discrete_cosine_transform <- function(x,
+#'                                          input.col,
+#'                                          output.col,
+#'                                          inverse = FALSE,
+#'                                          ...)
+#' {
+#'   ml_backwards_compatibility_api()
+#'   class <- "org.apache.spark.ml.feature.DCT"
+#'   invoke_simple_transformer(x, class, list(
+#'     setInputCol  = ensure_scalar_character(input.col),
+#'     setOutputCol = ensure_scalar_character(output.col),
+#'     setInverse   = ensure_scalar_boolean(inverse)
+#'   ))
+#' }
 
 #' Feature Transformation -- IndexToString
 #'

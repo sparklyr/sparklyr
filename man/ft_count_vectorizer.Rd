@@ -43,7 +43,6 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   columns in Spark.
 
 Other feature transformation routines: \code{\link{ft_bucketizer}},
-  \code{\link{ft_discrete_cosine_transform}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_quantile_discretizer}},
