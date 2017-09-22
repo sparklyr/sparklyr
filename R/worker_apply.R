@@ -14,18 +14,23 @@ spark_worker_apply <- function(sc) {
 
   bundlePath <- worker_invoke(context, "getBundlePath")
   if (nchar(bundlePath) > 0) {
-    worker_log("using bundle ", bundlePath)
-
     bundleName <- basename(bundlePath)
+    worker_log("using bundle name ", bundleName)
 
     workerRootDir <- worker_invoke_static(sc, "org.apache.spark.SparkFiles", "getRootDirectory")
     sparkBundlePath <- file.path(workerRootDir, bundleName)
+
+    worker_log("using bundle path ", normalizePath(sparkBundlePath))
 
     if (!file.exists(sparkBundlePath)) {
       stop("failed to find bundle under SparkFiles root directory")
     }
 
-    unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)
+    unbundlePath <- worker_spark_apply_unbundle(
+      sparkBundlePath,
+      workerRootDir,
+      tools::file_path_sans_ext(bundleName)
+    )
 
     .libPaths(unbundlePath)
     worker_log("updated .libPaths with bundle packages")
@@ -127,15 +132,19 @@ spark_worker_rlang_unserialize <- function() {
     rlang_unserialize
 }
 
+spark_worker_unbundle_path <- function() {
+  file.path("sparklyr-bundle")
+}
+
 #' Extracts a bundle of dependencies required by \code{spark_apply()}
 #'
-#' @param bundle_path Path to the bundle created using \code{core_spark_apply_bundle()}
+#' @param bundle_path Path to the bundle created using \code{spark_apply_bundle()}
 #' @param base_path Base path to use while extracting bundles
 #'
 #' @keywords internal
 #' @export
-worker_spark_apply_unbundle <- function(bundle_path, base_path) {
-  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())
+worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
+  extractPath <- file.path(base_path, spark_worker_unbundle_path(), bundle_name)
   lockFile <- file.path(extractPath, "sparklyr.lock")
 
   if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)

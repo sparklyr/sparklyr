@@ -57,6 +57,36 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
   )
 }
 
+spark_apply_packages <- function(packages) {
+  db <- Sys.getenv("sparklyr.apply.packagesdb")
+  if (nchar(db) == 0) {
+    if (!exists("availablePackagesChache", envir = .globals)) {
+      db <- tryCatch({
+        available.packages()
+      }, error = function(e) {
+        warning(
+          "Failed to run 'available.packages()', using offline connection? ",
+          "See '?spark_apply' for details."
+        )
+        NULL
+      })
+
+      assign("availablePackagesChache", db, envir = .globals)
+    }
+    else {
+      db <- get("availablePackagesChache", envir = .globals)
+    }
+  }
+
+  if (is.null(db)) {
+    TRUE
+  } else {
+    deps <- tools::package_dependencies(packages, db = db, recursive = TRUE)
+    names(deps) <- NULL
+    unique(c(unlist(deps), packages))
+  }
+}
+
 #' Apply an R Function in Spark
 #'
 #' Applies an R function to a Spark object (typically, a Spark DataFrame).
@@ -72,7 +102,14 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 #'   adds indexed column names when not enough columns are specified.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
-#' @param packages Boolean; distribute \code{.libPaths()} packages to nodes?
+#' @param packages Boolean to distribute \code{.libPaths()} packages to each node,
+#'   or a list of packages to distribute.
+#'
+#'   For offline clusters where \code{available.packages()} is not available,
+#'   manually download the packages database from
+#'  https://cran.r-project.org/web/packages/packages.rds and set
+#'   \code{Sys.setenv(sparklyr.apply.packagesdb = "<pathl-to-rds>")}. Otherwise,
+#'   all packages will be used by default.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
@@ -142,10 +179,12 @@ spark_apply <- function(x,
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
   bundle_path <- ""
-  if (packages) {
-    bundle_path <- core_spark_apply_bundle_path()
+  if (isTRUE(packages) || is.character(packages)) {
+    bundle_path <- spark_apply_bundle_file(packages)
     if (!file.exists(bundle_path)) {
-      bundle_path <- core_spark_apply_bundle()
+      packages_deps <- if (is.character(packages)) spark_apply_packages(packages) else packages
+
+      bundle_path <- spark_apply_bundle(packages_deps)
     }
 
     if (!is.null(bundle_path)) {
