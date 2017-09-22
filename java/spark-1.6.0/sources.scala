@@ -919,7 +919,11 @@ object Sources {
     "      stop(\"failed to find bundle under SparkFiles root directory\")\n" +
     "    }\n" +
     "\n" +
-    "    unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)\n" +
+    "    unbundlePath <- worker_spark_apply_unbundle(\n" +
+    "      sparkBundlePath,\n" +
+    "      workerRootDir,\n" +
+    "      tools::file_path_sans_ext(bundleName)\n" +
+    "    )\n" +
     "\n" +
     "    .libPaths(unbundlePath)\n" +
     "    worker_log(\"updated .libPaths with bundle packages\")\n" +
@@ -1032,8 +1036,8 @@ object Sources {
     "#'\n" +
     "#' @keywords internal\n" +
     "#' @export\n" +
-    "worker_spark_apply_unbundle <- function(bundle_path, base_path) {\n" +
-    "  extractPath <- file.path(base_path, spark_worker_unbundle_path())\n" +
+    "worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {\n" +
+    "  extractPath <- file.path(base_path, spark_worker_unbundle_path(), bundle_name)\n" +
     "  lockFile <- file.path(extractPath, \"sparklyr.lock\")\n" +
     "\n" +
     "  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)\n" +
