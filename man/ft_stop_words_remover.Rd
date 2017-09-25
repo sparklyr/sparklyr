@@ -25,6 +25,5 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
 
 Other feature transformation routines: \code{\link{ft_count_vectorizer}},
   \code{\link{ft_quantile_discretizer}},
-  \code{\link{ft_regex_tokenizer}},
   \code{\link{sdf_mutate}}
 }

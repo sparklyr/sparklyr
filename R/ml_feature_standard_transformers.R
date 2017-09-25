@@ -296,6 +296,8 @@ ft_bucketizer.tbl_spark <- function(
 ft_elementwise_product <- function(
   x, input_col, output_col, scaling_vec,
   uid = random_string("elementwise_product_"), ...) {
+  if (spark_version(spark_connection(x)) < "2.0.0")
+    stop("'ft_elementwise_product()' is only supported for Spark 2.0+")
   UseMethod("ft_elementwise_product")
 }
 
@@ -328,6 +330,52 @@ ft_elementwise_product.ml_pipeline <- function(
 ft_elementwise_product.tbl_spark <- function(
   x, input_col, output_col, scaling_vec,
   uid = random_string("elementwise_product_"), ...) {
+  transformer <- ml_new_stage_modified_args()
+  ml_transform(transformer, x)
+}
+
+# RegexTokenizer
+
+#' @export
+ft_regex_tokenizer <- function(
+  x, input_col, output_col, gaps = TRUE,
+  min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
+  uid = random_string("regex_tokenizer_"), ...) {
+  UseMethod("ft_regex_tokenizer")
+}
+
+#' @export
+ft_regex_tokenizer.spark_connection <- function(
+  x, input_col, output_col, gaps = TRUE,
+  min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
+  uid = random_string("regex_tokenizer_"), ...) {
+
+  ml_validate_args()
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.RegexTokenizer",
+                             input_col, output_col, uid) %>%
+    invoke("setGaps", gaps) %>%
+    invoke("setMinTokenLength", min_token_length) %>%
+    invoke("setPattern", pattern) %>%
+    invoke("setToLowercase", to_lower_case)
+
+  new_ml_transformer(jobj)
+}
+
+#' @export
+ft_regex_tokenizer.ml_pipeline <- function(
+  x, input_col, output_col, gaps = TRUE,
+  min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
+  uid = random_string("regex_tokenizer_"), ...) {
+
+  transformer <- ml_new_stage_modified_args()
+  ml_add_stage(x, transformer)
+}
+
+#' @export
+ft_regex_tokenizer.tbl_spark <- function(
+  x, input_col, output_col, gaps = TRUE,
+  min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
+  uid = random_string("regex_tokenizer_"), ...) {
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }

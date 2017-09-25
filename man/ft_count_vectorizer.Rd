@@ -2,7 +2,78 @@
 % Please edit documentation in R/ml_feature_transformation.R
 \name{ft_count_vectorizer}
 \alias{ft_count_vectorizer}
-\title{Feature Tranformation -- CountVectorizer}
+\title{#' Feature Transformation -- OneHotEncoder
+#'
+#' One-hot encoding maps a column of label indices to a column of binary
+#' vectors, with at most a single one-value. This encoding allows algorithms
+#' which expect continuous features, such as Logistic Regression, to use
+#' categorical features. Typically, used with  \code{ft_string_indexer()} to
+#' index a column first.
+#'
+#' @template roxlate-ml-transformation
+#' @param drop.last Boolean; drop the last category?
+#'
+#' @export
+ft_one_hot_encoder <- function(x,
+                               input.col,
+                               output.col,
+                               drop.last = TRUE,
+                               ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.OneHotEncoder"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col),
+    setDropLast  = ensure_scalar_boolean(drop.last)
+  ))
+}
+#' Feature Tranformation -- Tokenizer
+#'
+#' A tokenizer that converts the input string to lowercase and then splits it
+#' by white spaces.
+#'
+#' @template roxlate-ml-transformation
+#'
+#' @export
+ft_tokenizer <- function(x,
+                         input.col,
+                         output.col,
+                         ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.Tokenizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col)
+  ))
+}
+#' Feature Tranformation -- RegexTokenizer
+#'
+#' A regex based tokenizer that extracts tokens either by using the provided
+#' regex pattern to split the text (default) or repeatedly matching the regex
+#' (if gaps is false). Optional parameters also allow filtering tokens using a
+#' minimal length. It returns an array of strings that can be empty.
+#'
+#' @template roxlate-ml-transformation
+#' @param pattern The regular expression pattern to be used.
+#'
+#' @export
+ft_regex_tokenizer <- function(x,
+                               input.col,
+                               output.col,
+                               pattern,
+                               ...)
+{
+  ml_backwards_compatibility_api()
+  class <- "org.apache.spark.ml.feature.RegexTokenizer"
+  invoke_simple_transformer(x, class, list(
+    setInputCol  = ensure_scalar_character(input.col),
+    setOutputCol = ensure_scalar_character(output.col),
+    setPattern   = ensure_scalar_character(pattern)
+  ))
+}
+Feature Tranformation -- CountVectorizer}
 \usage{
 ft_count_vectorizer(x, input.col, output.col, min.df = NULL, min.tf = NULL,
   vocab.size = NULL, vocabulary.only = FALSE, ...)
@@ -43,7 +114,6 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   columns in Spark.
 
 Other feature transformation routines: \code{\link{ft_quantile_discretizer}},
-  \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_stop_words_remover}},
   \code{\link{sdf_mutate}}
 }

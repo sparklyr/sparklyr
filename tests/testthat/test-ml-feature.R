@@ -106,26 +106,26 @@ sc <- testthat_spark_connection()
 #   expect_equal(out1, expected_out)
 #   expect_equal(out2, expected_out)
 # })
-
-test_that("ft_index_to_string() works", {
-  df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
-  df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
-
-  s1 <- df_tbl %>%
-    ft_string_indexer("string", "indexed") %>%
-    ft_index_to_string("indexed", "string2") %>%
-    dplyr::pull(string2)
-
-  expect_identical(s1, c("foo", "bar", "foo", "foo"))
-
-  s2 <- df_tbl %>%
-    ft_string_indexer("string", "indexed") %>%
-    ft_index_to_string("indexed", "string2", c("wow", "cool")) %>%
-    dplyr::pull(string2)
-
-  expect_identical(s2, c("wow", "cool", "wow", "wow"))
-})
-
+#
+# test_that("ft_index_to_string() works", {
+#   df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
+#   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
+#
+#   s1 <- df_tbl %>%
+#     ft_string_indexer("string", "indexed") %>%
+#     ft_index_to_string("indexed", "string2") %>%
+#     dplyr::pull(string2)
+#
+#   expect_identical(s1, c("foo", "bar", "foo", "foo"))
+#
+#   s2 <- df_tbl %>%
+#     ft_string_indexer("string", "indexed") %>%
+#     ft_index_to_string("indexed", "string2", c("wow", "cool")) %>%
+#     dplyr::pull(string2)
+#
+#   expect_identical(s2, c("wow", "cool", "wow", "wow"))
+# })
+#
 test_that("ft_elementwise_product() works", {
   df <- data.frame(a = 1, b = 3, c = 5)
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
@@ -139,4 +139,23 @@ test_that("ft_elementwise_product() works", {
   expect_identical(nums,
                    c(1, 3, 5) * c(2, 4, 6))
 
+})
+
+test_that("ft_regex_tokenizer() works", {
+  test_requires("dplyr")
+  sentence_df <- data_frame(
+    id = c(0, 1, 2),
+    sentence = c("Hi I heard about Spark",
+                 "I wish Java could use case classes",
+                 "Logistic,regression,models,are,neat")
+  )
+  sentence_tbl <- testthat_tbl("sentence_df")
+
+  expect_identical(
+    sentence_tbl %>%
+      ft_regex_tokenizer("sentence", "words", pattern = "\\W") %>%
+      collect() %>%
+      mutate(words = sapply(words, length)) %>%
+      pull(words),
+    c(5L, 7L, 5L))
 })
