@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fix to `spark_apply()` when package distribution deadlock triggers in 
+  environments where multiple executors run under the same node.
+
 - Added support in `spark_apply()` for specifying  a list of `packages` to
   distribute to each worker node.
 
