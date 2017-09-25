@@ -160,7 +160,7 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
   if (file.exists(lockFile)) {
     worker_log("found that lock file exists, waiting")
     while (file.exists(lockFile)) {
-      Sys.sleep(1000)
+      Sys.sleep(1)
     }
     worker_log("completed lock file wait")
   }
