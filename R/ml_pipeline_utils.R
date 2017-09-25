@@ -45,7 +45,7 @@ ml_new_stage_modified_args <- function(envir = rlang::caller_env(2)) {
   arg_quos <- caller_frame %>%
     rlang::lang_standardise() %>%
     rlang::lang_args() %>%
-    lapply(rlang::new_quosure, env = caller_frame$env)
+    lapply(rlang::new_quosure, env = envir)
   modified_args <- rlang::modify(
     arg_quos,
     # x = quo(spark_connection(!!modified_args[["x"]]))
