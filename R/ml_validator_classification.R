@@ -10,7 +10,6 @@ ml_validator_logistic_regression <- function(args, nms) {
 
   ml_apply_validation(
     {
-      bind_old_to_new(old_new_mapping)
       elastic_net_param <- ensure_scalar_double(elastic_net_param)
       reg_param <- ensure_scalar_double(reg_param)
       max_iter <- ensure_scalar_integer(max_iter)
