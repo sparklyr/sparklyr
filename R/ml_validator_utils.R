@@ -93,30 +93,6 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   assign("formula", formula, caller_frame$env)
 }
 
-ml_extract_specified_args <- function(validated_args, nms, old_new_mapping = NULL) {
-  validated_args <- list(
-    args = validated_args,
-    nms = if (rlang::is_null(old_new_mapping)) nms else
-      mapply(`%||%`, old_new_mapping[nms], nms)
-  ) %>%
-    (function(x) x$args[x$nms])
-}
-
-#' @importFrom rlang env_has env_get is_null
-bind_old_to_new <- function(old_new_mapping) {
-  # for backwards compatibility
-  envir <- rlang::caller_env()
-  mapply(function(old, new, envir) {
-    if (env_has(envir, old) && (!env_has(envir, new) || is_null(env_get(envir, new))))
-      rlang::env_bind(envir, !!new := rlang::env_get(envir, old))
-    invisible(NULL)
-  },
-  names(old_new_mapping),
-  old_new_mapping,
-  MoreArgs = list(envir = envir)
-  )
-}
-
 ml_apply_validation <- function(expr, args, nms, old_new_mapping) {
   validations <- rlang::enexpr(expr)
   rlang::invoke(within,
