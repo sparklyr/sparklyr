@@ -157,12 +157,15 @@ ml_validator_quantile_discretizer <- function(args, nms) {
       n.buckets = "num_buckets"
     ), input_output_mapping
   )
-  ml_extract_specified_args(
-    within(args, {
+
+  args %>%
+    rlang::set_names(
+      mapply(`%||%`, old_new_mapping[names(args)], names(args))
+      ) %>%
+    within({
       handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
       num_buckets <- ensure_scalar_integer(num_buckets)
       relative_error <- ensure_scalar_double(relative_error)
-    }),
-    nms, old_new_mapping
-  )
+    }) %>%
+    `[`(nms)
 }
