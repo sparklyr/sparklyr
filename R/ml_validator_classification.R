@@ -8,8 +8,8 @@ ml_validator_logistic_regression <- function(args, nms) {
     max.iter = "max_iter"
   )
 
-  ml_extract_specified_args(
-    within(args, {
+  ml_apply_validation(
+    {
       bind_old_to_new(old_new_mapping)
       elastic_net_param <- ensure_scalar_double(elastic_net_param)
       reg_param <- ensure_scalar_double(reg_param)
@@ -19,8 +19,8 @@ ml_validator_logistic_regression <- function(args, nms) {
       threshold <- ensure_scalar_double(threshold)
       if (!is.null(weight_col))
         weight_col <- ensure_scalar_character(weight_col)
-    }),
-    nms, old_new_mapping
+    },
+    args, nms, old_new_mapping
   )
 }
 

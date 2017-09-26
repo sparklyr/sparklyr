@@ -125,5 +125,5 @@ ml_apply_validation <- function(expr, args, nms, old_new_mapping) {
                 ),
                 expr = validations,
                 .bury = NULL) %>%
-    `[`(nms)
+    `[`(mapply(`%||%`, old_new_mapping[nms], nms))
 }
