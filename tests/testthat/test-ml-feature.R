@@ -208,3 +208,15 @@ test_that("ft_count_vectorizer() works", {
   # vocab extraction
   expect_identical(cv_model$vocabulary, list("a", "b", "c"))
 })
+
+test_that("ft_quantile_discretizer works", {
+  df <- data_frame(id = 0:4L,
+                   hour = c(18, 19, 8, 5, 2))
+  df_tbl <- copy_to(sc, df, overwrite = TRUE)
+
+  expect_identical(df_tbl %>%
+    ft_quantile_discretizer("hour", "result", num_buckets = 3) %>%
+    pull(result),
+    c(2, 2, 1, 1, 0)
+  )
+})

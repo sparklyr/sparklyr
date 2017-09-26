@@ -435,3 +435,48 @@ ft_stop_words_remover.tbl_spark <- function(
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
+
+# QuantileDiscretizer
+
+#' @export
+ft_quantile_discretizer <- function(
+  x, input_col, output_col, handle_invalid = "error",
+  num_buckets = 2L, relative_error = 0.001,
+  uid = random_string("quantile_discretizer_"), ...) {
+  UseMethod("ft_quantile_discretizer")
+}
+
+#' @export
+ft_quantile_discretizer.spark_connection <- function(
+  x, input_col, output_col, handle_invalid = "error",
+  num_buckets = 2L, relative_error = 0.001,
+  uid = random_string("quantile_discretizer_"), ...) {
+
+  ml_validate_args()
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.QuantileDiscretizer",
+                             input_col, output_col, uid) %>%
+    invoke("setHandleInvalid", handle_invalid) %>%
+    invoke("setNumBuckets", num_buckets) %>%
+    invoke("setRelativeError", relative_error)
+
+  new_ml_transformer(jobj)
+}
+
+#' @export
+ft_quantile_discretizer.ml_pipeline <- function(
+  x, input_col, output_col, handle_invalid = "error",
+  num_buckets = 2L, relative_error = 0.001,
+  uid = random_string("quantile_discretizer_"), ...) {
+
+  transformer <- ml_new_stage_modified_args()
+  ml_add_stage(x, transformer)
+}
+
+#' @export
+ft_quantile_discretizer.tbl_spark <- function(
+  x, input_col, output_col, handle_invalid = "error",
+  num_buckets = 2L, relative_error = 0.001,
+  uid = random_string("quantile_discretizer_"), ...) {
+  transformer <- ml_new_stage_modified_args()
+  ml_transform(transformer, x)
+}

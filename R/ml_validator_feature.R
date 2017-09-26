@@ -130,6 +130,7 @@ ml_validator_stop_words_remover <- function(args, nms) {
 }
 
 # CountVectorizer
+
 ml_validator_count_vectorizer <- function(args, nms) {
   old_new_mapping <- c(
     list(
@@ -144,6 +145,23 @@ ml_validator_count_vectorizer <- function(args, nms) {
       min_df <- ensure_scalar_double(min_df)
       min_tf <- ensure_scalar_double(min_tf)
       vocab_size <- ensure_scalar_integer(vocab_size)
+    }),
+    nms, old_new_mapping
+  )
+}
+
+# QuantileDiscretizer
+ml_validator_quantile_discretizer <- function(args, nms) {
+  old_new_mapping <- c(
+    list(
+      n.buckets = "num_buckets"
+    ), input_output_mapping
+  )
+  ml_extract_specified_args(
+    within(args, {
+      handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
+      num_buckets <- ensure_scalar_integer(num_buckets)
+      relative_error <- ensure_scalar_double(relative_error)
     }),
     nms, old_new_mapping
   )
