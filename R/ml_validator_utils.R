@@ -116,3 +116,14 @@ bind_old_to_new <- function(old_new_mapping) {
   MoreArgs = list(envir = envir)
   )
 }
+
+ml_apply_validation <- function(expr, args, nms, old_new_mapping) {
+  validations <- rlang::enexpr(expr)
+  rlang::invoke(within,
+                data = rlang::set_names(
+                  args, mapply(`%||%`, old_new_mapping[names(args)], names(args))
+                ),
+                expr = validations,
+                .bury = NULL) %>%
+    `[`(nms)
+}
