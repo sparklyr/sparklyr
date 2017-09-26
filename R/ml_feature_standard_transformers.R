@@ -433,16 +433,5 @@ ft_stop_words_remover.tbl_spark <- function(
   uid = random_string("stop_words_remover_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
-  # args <-rlang::lang_standardise() %>%
-  #   rlang::lang_args()
-  #   # rlang::modify(x = rlang::new_quosure(
-  #   #   rlang::parse_expr("spark_connection(x)"),
-  #   #   env = caller_frame$env))
-  # stage_constructor <- sub("\\..*$", "", rlang::call_frame()$fn_name)
-  # rlang::eval_tidy(rlang::lang(stage_constructor, rlang::splice(args)),
-  #                  data = list(x = quo(spark_connection(x))),
-  #                  env = envir)
-  #
-  # )
   ml_transform(transformer, x)
 }
