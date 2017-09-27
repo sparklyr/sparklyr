@@ -294,6 +294,9 @@ object Serializer {
         case v: Array[Boolean] =>
           writeType(dos, "array")
           writeBooleanArr(dos, v)
+        case v: Array[Timestamp] =>
+          writeType(dos, "array")
+          writeTimestampArr(dos, v)
         case v: Array[Object] =>
           writeType(dos, "list")
           writeInt(dos, v.length)
@@ -384,6 +387,12 @@ object Serializer {
     writeType(out, "logical")
     out.writeInt(value.length)
     value.foreach(v => writeBoolean(out, v))
+  }
+
+  def writeTimestampArr(out: DataOutputStream, value: Array[java.sql.Timestamp]): Unit = {
+    writeType(out, "time")
+    out.writeInt(value.length)
+    value.foreach(v => writeTime(out, v))
   }
 
   def writeStringArr(out: DataOutputStream, value: Array[String]): Unit = {

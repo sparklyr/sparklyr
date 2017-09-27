@@ -66,6 +66,8 @@ readArray <- function(con) {
     return(readInt(con, n = len))
   } else if (type == "b") {
     return(readBoolean(con, n = len))
+  } else if (type == "t") {
+    return(readTime(con, n = len))
   }
 
   if (len > 0) {

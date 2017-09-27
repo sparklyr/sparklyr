@@ -158,6 +158,13 @@ object Utils {
     }}
   }
 
+  def collectImplTimeStamp(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[java.sql.Timestamp]) el.asInstanceOf[java.sql.Timestamp] else new java.sql.Timestamp(System.currentTimeMillis)
+    }}
+  }
+
   def collectImplDefault(local: Array[Row], idx: Integer) = {
     local.map(row => row(idx))
   }
@@ -179,7 +186,7 @@ object Utils {
       case "ShortType"            => collectImplShort(local, idx)
       case "Decimal"              => collectImplForceString(local, idx, separator)
 
-      case "TimestampType"        => collectImplForceString(local, idx, separator)
+      case "TimestampType"        => collectImplTimeStamp(local, idx)
       case "CalendarIntervalType" => collectImplForceString(local, idx, separator)
       case "DateType"             => collectImplForceString(local, idx, separator)
 
