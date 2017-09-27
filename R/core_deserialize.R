@@ -30,6 +30,16 @@ readString <- function(con) {
   string
 }
 
+readDateArray <- function(con, n = 1) {
+  dates <- list()
+  for (i in 1:n) {
+    string <- readString(con)
+    dates[[i]] <- as.Date(string)
+  }
+
+  do.call("c", dates)
+}
+
 readInt <- function(con, n = 1) {
   readBin(con, integer(), n = n, endian = "big")
 }
@@ -59,7 +69,6 @@ readArray <- function(con) {
   type <- readType(con)
   len <- readInt(con)
 
-  # short-circuit for reading arrays of double, int, logical
   if (type == "d") {
     return(readDouble(con, n = len))
   } else if (type == "i") {
@@ -68,6 +77,8 @@ readArray <- function(con) {
     return(readBoolean(con, n = len))
   } else if (type == "t") {
     return(readTime(con, n = len))
+  } else if (type == "D") {
+    return(readDateArray(con, n = len))
   }
 
   if (len > 0) {
