@@ -55,6 +55,16 @@ object Sources {
     "  string\n" +
     "}\n" +
     "\n" +
+    "readDateArray <- function(con, n = 1) {\n" +
+    "  dates <- list()\n" +
+    "  for (i in 1:n) {\n" +
+    "    string <- readString(con)\n" +
+    "    dates[[i]] <- as.Date(string)\n" +
+    "  }\n" +
+    "\n" +
+    "  do.call(\"c\", dates)\n" +
+    "}\n" +
+    "\n" +
     "readInt <- function(con, n = 1) {\n" +
     "  readBin(con, integer(), n = n, endian = \"big\")\n" +
     "}\n" +
@@ -84,7 +94,6 @@ object Sources {
     "  type <- readType(con)\n" +
     "  len <- readInt(con)\n" +
     "\n" +
-    "  # short-circuit for reading arrays of double, int, logical\n" +
     "  if (type == \"d\") {\n" +
     "    return(readDouble(con, n = len))\n" +
     "  } else if (type == \"i\") {\n" +
@@ -93,6 +102,8 @@ object Sources {
     "    return(readBoolean(con, n = len))\n" +
     "  } else if (type == \"t\") {\n" +
     "    return(readTime(con, n = len))\n" +
+    "  } else if (type == \"D\") {\n" +
+    "    return(readDateArray(con, n = len))\n" +
     "  }\n" +
     "\n" +
     "  if (len > 0) {\n" +
