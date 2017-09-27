@@ -189,18 +189,18 @@ object Serializer {
 
   def writeType(dos: DataOutputStream, typeStr: String): Unit = {
     typeStr match {
-      case "void" => dos.writeByte('n')
+      case "void"      => dos.writeByte('n')
       case "character" => dos.writeByte('c')
-      case "double" => dos.writeByte('d')
-      case "integer" => dos.writeByte('i')
-      case "logical" => dos.writeByte('b')
-      case "date" => dos.writeByte('D')
-      case "time" => dos.writeByte('t')
-      case "raw" => dos.writeByte('r')
-      case "array" => dos.writeByte('a')
-      case "list" => dos.writeByte('l')
-      case "map" => dos.writeByte('e')
-      case "jobj" => dos.writeByte('j')
+      case "double"    => dos.writeByte('d')
+      case "integer"   => dos.writeByte('i')
+      case "logical"   => dos.writeByte('b')
+      case "date"      => dos.writeByte('D')
+      case "time"      => dos.writeByte('t')
+      case "raw"       => dos.writeByte('r')
+      case "array"     => dos.writeByte('a')
+      case "list"      => dos.writeByte('l')
+      case "map"       => dos.writeByte('e')
+      case "jobj"      => dos.writeByte('j')
       case _ => throw new IllegalArgumentException(s"Invalid type $typeStr")
     }
   }

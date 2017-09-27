@@ -1,22 +1,3 @@
-# nolint start
-# Type mapping from Java to R
-#
-# void -> NULL
-# Int -> integer
-# String -> character
-# Boolean -> logical
-# Float -> double
-# Double -> double
-# Long -> double
-# Array[Byte] -> raw
-# Date -> Date
-# Time -> POSIXct
-#
-# Array[T] -> list()
-# Object -> jobj
-#
-# nolint end
-
 readObject <- function(con) {
   # Read type first
   type <- readType(con)
