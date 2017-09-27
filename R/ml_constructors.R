@@ -128,3 +128,29 @@ new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
                      ...,
                      subclass = c(subclass, "ml_pipeline_model"))
 }
+
+#' @export
+print.ml_transformer <- function(x, ...) {
+  short_type <- strsplit(x$type, "\\.") %>%
+    rlang::flatten_chr() %>%
+    dplyr::last()
+  cat("A Spark", short_type, "(Transformer) \n")
+  cat("UID:", x$uid, "\n")
+  cat("Class:", x$type, "\n")
+  cat("Params:", "\n")
+  for (param in names(x$param_map))
+    cat("  ", param, ":", capture.output(str(x$param_map[[param]])), "\n")
+}
+
+#' @export
+print.ml_estimator <- function(x, ...) {
+  short_type <- strsplit(x$type, "\\.") %>%
+    rlang::flatten_chr() %>%
+    dplyr::last()
+  cat("A Spark", short_type, "(Estimator) \n")
+  cat("UID:", x$uid, "\n")
+  cat("Class:", x$type, "\n")
+  cat("Params:", "\n")
+  for (param in names(x$param_map))
+    cat("  ", param, ":", capture.output(str(x$param_map[[param]])), "\n")
+}
