@@ -135,18 +135,18 @@ test_that("collect() can retrieve all data types correctly", {
   library(dplyr)
 
   sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
-  rdate <- as.Date("01-01-2010", "%d-%m-%Y")
-  rtime <- as.POSIXct(1, origin = "1970-01-01")
+  rdate <- as.Date("01-01-2010", "%d-%m-%Y") %>% as.character()
+  rtime <- as.POSIXct(1, origin = "1970-01-01") %>% as.character()
 
   hive_type <- tibble::frame_data(
     ~stype,     ~svalue,       ~rtype,   ~rvalue,
     "tinyint",       "1",       "raw",       "1",
     "smallint",      "1",   "integer",       "1",
     "integer",       "1",   "integer",       "1",
-    "bigint",        "1",    "double",       "1",
-    "float",         "1",    "double",     "1.0",
-    "double",        "1",    "double",     "1.0",
-    "decimal",       "1",    "double",       "1",
+    "bigint",        "1",   "numeric",       "1",
+    "float",         "1",   "numeric",       "1",
+    "double",        "1",   "numeric",       "1",
+    "decimal",       "1",   "numeric",       "1",
     "timestamp",     "1",   "POSIXct",     rtime,
     "date",        sdate,      "Date",     rdate,
     "string",          1, "character",       "1",
@@ -164,7 +164,7 @@ test_that("collect() can retrieve all data types correctly", {
     paste("SELECT", .)
 
   spark_types <- DBI::dbGetQuery(sc, spark_query) %>%
-    lapply(function(e) class(e)) %>%
+    lapply(function(e) class(e)[[1]]) %>%
     as.character()
 
   expect_equal(
@@ -173,7 +173,9 @@ test_that("collect() can retrieve all data types correctly", {
   )
 
   spark_results <- DBI::dbGetQuery(sc, spark_query) %>%
-    as.character()
+    lapply(as.character)
+  names(spark_results) <- NULL
+  spark_results <- spark_results %>% unlist()
 
   expect_equal(
     spark_results,
