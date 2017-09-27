@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed collection of `DateType` and `TimestampTime` from `character` to 
+  proper `Date` and `POSIXct` types.
+
 - Fix to `spark_apply()` when package distribution deadlock triggers in 
   environments where multiple executors run under the same node.
 
