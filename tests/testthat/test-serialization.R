@@ -134,39 +134,57 @@ test_that("collect() can retrieve all data types correctly", {
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
   library(dplyr)
 
-  hive_type <- frame_data(
-    ~stype,      ~value,     ~rtype,
-    "tinyint",        1,  "integer",
-    "smallint",       1,  "integer",
-    "integer",        1,  "integer",
-    "bigint",         1,  "double",
-    "float",          1,  "double",
-    "double",         1,  "double",
-    "decimal",        1,  "double",
-    "timestamp",      1,  "integer",
-    "date",           1,  "date",
-    "string",         1,  "character",
-    "varchar",        1,  "character",
-    "char",           1,  "character",
-    "boolean",        1,  "logical"
+  sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
+  rdate <- as.Date("01-01-2010", "%d-%m-%Y")
+  rtime <- as.POSIXct(1, origin = "1970-01-01")
+
+  hive_type <- tibble::frame_data(
+    ~stype,     ~svalue,     ~rtype,   ~rvalue,
+    "tinyint",       "1",  "integer",      "1",
+    "smallint",      "1",  "integer",      "1",
+    "integer",       "1",  "integer",      "1",
+    "bigint",        "1",  "double",       "1",
+    "float",         "1",  "double",     "1.0",
+    "double",        "1",  "double",     "1.0",
+    "decimal",       "1",  "double",       "1",
+    "timestamp",     "1",  "integer",    rtime,
+    "date",        sdate,  "Date",       rdate,
+    "string",          1,  "character",    "1",
+    "varchar",         1,  "character",    "1",
+    "char",            1,  "character",    "1",
+    "boolean",    "true",  "logical",    "TRUE"
   )
 
-  types_query_select <- paste(
-    hive_type %>%
-    lapply(seq_along(hive_types), function(idx) {
-      paste0("cast(", hive_types[[idx]], " as ", names(hive_types)[[idx]], ") as F", idx)
-    }) %>% unlist(),
-    collapse = ", "
-  )
+  spark_query <- hive_type %>%
+    mutate(
+      query = paste0("cast(", svalue, " as ", stype, ") as ", stype, "_col")
+    ) %>%
+    pull(query) %>%
+    paste(collapse = ", ")
 
-  types_query <- DBI::dbGetQuery(sc,
+  spark_types <- DBI::dbGetQuery(sc,
     paste(
       "SELECT ",
-      types_query_select
+      spark_query
     )
+  ) %>% lapply(function(e) class(e)) %>% as.character()
+
+  expect_equal(
+    spark_types,
+    hive_type %>% pull(rtype)
   )
 
-  types_query %>% lapply(function(e) typeof(e))
+  spark_results <- DBI::dbGetQuery(sc,
+    paste(
+      "SELECT ",
+      spark_query
+    )
+  ) %>% as.character()
+
+  expect_equal(
+    spark_results,
+    hive_type %>% pull(rvalue)
+  )
 
   expect_equal(sdf_nrow(df_tbl), 2)
   expect_equal(sdf_ncol(df_tbl), 2)
