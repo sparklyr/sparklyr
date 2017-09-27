@@ -23,25 +23,6 @@ object Sources {
     "connection_is_open <- function(sc) {\n" +
     "  UseMethod(\"connection_is_open\")\n" +
     "}\n" +
-    "# nolint start\n" +
-    "# Type mapping from Java to R\n" +
-    "#\n" +
-    "# void -> NULL\n" +
-    "# Int -> integer\n" +
-    "# String -> character\n" +
-    "# Boolean -> logical\n" +
-    "# Float -> double\n" +
-    "# Double -> double\n" +
-    "# Long -> double\n" +
-    "# Array[Byte] -> raw\n" +
-    "# Date -> Date\n" +
-    "# Time -> POSIXct\n" +
-    "#\n" +
-    "# Array[T] -> list()\n" +
-    "# Object -> jobj\n" +
-    "#\n" +
-    "# nolint end\n" +
-    "\n" +
     "readObject <- function(con) {\n" +
     "  # Read type first\n" +
     "  type <- readType(con)\n" +
@@ -110,6 +91,8 @@ object Sources {
     "    return(readInt(con, n = len))\n" +
     "  } else if (type == \"b\") {\n" +
     "    return(readBoolean(con, n = len))\n" +
+    "  } else if (type == \"t\") {\n" +
+    "    return(readTime(con, n = len))\n" +
     "  }\n" +
     "\n" +
     "  if (len > 0) {\n" +
