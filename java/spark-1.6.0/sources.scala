@@ -1053,7 +1053,7 @@ object Sources {
     "  if (file.exists(lockFile)) {\n" +
     "    worker_log(\"found that lock file exists, waiting\")\n" +
     "    while (file.exists(lockFile)) {\n" +
-    "      Sys.sleep(1000)\n" +
+    "      Sys.sleep(1)\n" +
     "    }\n" +
     "    worker_log(\"completed lock file wait\")\n" +
     "  }\n" +
