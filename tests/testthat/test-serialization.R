@@ -147,7 +147,7 @@ test_that("collect() can retrieve all data types correctly", {
     "float",         "1",    "double",     "1.0",
     "double",        "1",    "double",     "1.0",
     "decimal",       "1",    "double",       "1",
-    "timestamp",     "1",   "integer",     rtime,
+    "timestamp",     "1",   "POSIXct",     rtime,
     "date",        sdate,      "Date",     rdate,
     "string",          1, "character",       "1",
     "varchar",         1, "character",       "1",
