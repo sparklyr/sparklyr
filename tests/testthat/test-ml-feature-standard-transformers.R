@@ -73,6 +73,10 @@ test_that("ft_binarizer() input checking works", {
                    "numeric")
   expect_error(ft_binarizer(sc, "in", "out", "foo"),
                "length-one numeric vector")
+
+  bin <- ft_binarizer(sc, "in", "out", threshold = 10)
+  expect_equal(ml_get_params(bin, list("input_col", "output_col", "threshold")),
+               list(input_col = "in", output_col = "out", threshold = 10))
 })
 
 # HashingTF
@@ -82,6 +86,13 @@ test_that("ft_hashing_tf() input checking works", {
                    "integer")
   expect_error(ft_hashing_tf(sc, "in", "out", binary = 1),
                "length-one logical vector")
+
+  htf <- ft_hashing_tf(sc, "in", "out", binary = TRUE, num_features = 1024)
+
+  expect_equal(
+    ml_get_params(htf, list("input_col", "output_col", "binary", "num_features")),
+    list(input_col = "in", output_col = "out", binary = TRUE, num_features = 1024)
+  )
 })
 
 # DCT
@@ -114,6 +125,13 @@ test_that("ft_dct() works", {
 
   expect_equal(out1, expected_out)
   expect_equal(out2, expected_out)
+
+  dct <- ft_dct(sc, "features", "featuresDCT", inverse = TRUE)
+
+  expect_equal(
+    ml_get_params(dct, list("input_col", "output_col", "inverse")),
+    list(input_col = "features", output_col = "featuresDCT", inverse = TRUE)
+  )
 })
 
 # IndexToString
@@ -135,6 +153,15 @@ test_that("ft_index_to_string() works", {
     dplyr::pull(string2)
 
   expect_identical(s2, c("wow", "cool", "wow", "wow"))
+
+  its <- ft_index_to_string(sc, "indexed", "string", labels = list("foo", "bar"))
+
+  expect_equal(
+    ml_get_params(its, list("input_col", "output_col", "labels")),
+    list(input_col = "indexed",
+         output_col = "string",
+         labels = list("foo", "bar"))
+  )
 })
 
 # ElementwiseProduct
@@ -151,6 +178,19 @@ test_that("ft_elementwise_product() works", {
 
   expect_identical(nums,
                    c(1, 3, 5) * c(2, 4, 6))
+
+  ewp <- ft_elementwise_product(
+    sc, "features", "multiplied", scaling_vec = c(1, 3, 5))
+
+  expect_equal(
+    ml_get_params(ewp, list(
+      "input_col", "output_col", "scaling_vec"
+    )),
+    list(input_col = "features",
+         output_col = "multiplied",
+         scaling_vec = c(1, 3, 5))
+  )
+
 
 })
 
@@ -173,6 +213,23 @@ test_that("ft_regex_tokenizer() works", {
       mutate(words = sapply(words, length)) %>%
       pull(words),
     c(5L, 7L, 5L))
+
+  rt <- ft_regex_tokenizer(
+    sc, "sentence", "words",
+    gaps = TRUE, min_token_length = 2, pattern = "\\W", to_lower_case = FALSE)
+
+  expect_equal(
+    ml_get_params(rt, list(
+      "input_col", "output_col", "gaps", "min_token_length", "pattern", "to_lower_case"
+    )),
+    list(input_col = "sentence",
+         output_col = "words",
+         gaps = TRUE,
+         min_token_length = 2L,
+         pattern = "\\W",
+         to_lower_case = FALSE)
+  )
+
 })
 
 # StopWordsRemover

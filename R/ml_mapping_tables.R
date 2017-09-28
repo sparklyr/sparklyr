@@ -15,17 +15,22 @@ ml_create_mapping_tables <- function() {
          "weight_col" = "weightCol",
          "aggregation_depth" = "aggregationDepth",
          "num_features" = "numFeatures",
-         # ml_r_formula
+         # ft_r_formula
          "force_index_label" = "forceIndexLabel",
-         # ml_string_indexer
+         # ft_string_indexer
          "handle_invalid" = "handleInvalid",
-         # ml_one_hot_encoder
+         # ft_one_hot_encoder
          "drop_last" = "dropLast",
-         # ml_vector_assembler
+         # ft_vector_assembler
          "input_cols" = "inputCols",
-         # ml_stop_words_remover
+         # ft_stop_words_remover
          "case_sensitive" = "caseSensitive",
-         "stop_words" = "stopWords")
+         "stop_words" = "stopWords",
+         # ft_elementwise_product
+         "scaling_vec" = "scalingVec",
+         # ft_regex_tokenizer
+         "min_token_length" = "minTokenLength",
+         "to_lower_case" = "toLowercase")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
