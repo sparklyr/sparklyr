@@ -40,6 +40,9 @@ test_that("infer correct overloaded method", {
 })
 
 test_that("roundtrip date array", {
-  dates <- c(as.Date("2016/1/1"), as.Date("2016/1/1"))
-  expect_equal(invoke_static(sc, "sparklyr.Test", "roundtrip", dates), dates)
+  dates <- list(as.Date("2016/1/1"), as.Date("2016/1/1"))
+  expect_equal(
+    invoke_static(sc, "sparklyr.Test", "roundtrip", dates),
+    dates %>% do.call("c", .)
+  )
 })

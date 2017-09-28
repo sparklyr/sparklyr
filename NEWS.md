@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added `sparklyr.collect.datechars` option to enable collecting `DateType` and
+  `TimestampTime` as `characters` to support compatibility with previos versions.
+
 - Fixed collection of `DateType` and `TimestampTime` from `character` to 
   proper `Date` and `POSIXct` types.
 
