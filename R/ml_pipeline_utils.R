@@ -33,11 +33,16 @@ ml_wrap_in_pipeline <- function(jobj) {
 
 ml_get_param_map <- function(jobj) {
   sc <- spark_connection(jobj)
-  invoke_static(sc,
-                "sparklyr.MLUtils",
-                "getParamMap",
-                jobj) %>%
-    ml_map_param_list_names()
+  object <- if (spark_version(sc) < "2.0.0")
+    "sparklyr.MLUtils"
+  else
+    "sparklyr.MLUtils2"
+
+    invoke_static(sc,
+                  object,
+                  "getParamMap",
+                  jobj) %>%
+      ml_map_param_list_names()
 }
 
 ml_new_stage_modified_args <- function(envir = rlang::caller_env(2)) {
@@ -81,7 +86,7 @@ ml_param_map <- function(x, ...) {
 
 #' @export
 ml_get_param <- function(x, param, ...) {
-  ml_param_map(x)[[param]] %||% stop("param not found")
+  ml_param_map(x)[[param]] %||% stop("param ", param, " not found")
 }
 
 #' @export
