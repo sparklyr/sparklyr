@@ -79,3 +79,12 @@ ml_param_map <- function(x, ...) {
   x$param_map %||% stop("'x' does not have a param map")
 }
 
+#' @export
+ml_get_param <- function(x, param, ...) {
+  ml_param_map(x)[[param]] %||% stop("param not found")
+}
+
+#' @export
+ml_uid <- function(x) {
+  x$uid %||% stop("uid not found")
+}
