@@ -75,7 +75,9 @@ ft_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FA
 
   ml_validate_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.HashingTF",
-                             input_col, output_col, uid)
+                             input_col, output_col, uid) %>%
+    invoke("setBinary", binary) %>%
+    invoke("setNumFeatures", num_features)
 
   new_ml_transformer(jobj)
 }
