@@ -140,7 +140,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   hive_type <- tibble::frame_data(
     ~stype,     ~svalue,       ~rtype,   ~rvalue,
-    "tinyint",       "1",       "raw",      "01",
+    "tinyint",       "1",   "integer",       "1",
     "smallint",      "1",   "integer",       "1",
     "integer",       "1",   "integer",       "1",
     "bigint",        "1",   "numeric",       "1",
@@ -187,25 +187,25 @@ test_that("collect() can retrieve NULL data types as NAs", {
   library(dplyr)
 
   hive_type <- tibble::frame_data(
-        ~stype,    ~svalue,       ~rtype,   ~rvalue,
-     "tinyint",     "NULL",        "raw",      "NA",
-    "smallint",     "NULL",    "integer",      "NA",
-     "integer",     "NULL",    "integer",      "NA",
-      "bigint",     "NULL",    "numeric",      "NA",
-       "float",     "NULL",    "numeric",      "NA",
-      "double",     "NULL",    "numeric",      "NA",
-     "decimal",     "NULL",    "numeric",      "NA",
-   "timestamp",     "NULL",    "POSIXct",      "NA",
-        "date",     "NULL",       "Date",      "NA",
-      "string",     "NULL",  "character",      "NA",
-     "varchar",     "NULL",  "character",      "NA",
-        "char",     "NULL",  "character",      "NA",
-     "boolean",     "NULL",    "logical",       "NA"
+        ~stype,        ~rtype,
+     "tinyint",     "integer",
+    "smallint",     "integer",
+     "integer",     "integer",
+      "bigint",     "numeric",
+       "float",     "numeric",
+      "double",     "numeric",
+     "decimal",     "numeric",
+   "timestamp",     "POSIXct",
+        "date",        "Date",
+      "string",   "character",
+     "varchar",   "character",
+        "char",   "character",
+     "boolean",     "logical"
   )
 
   spark_query <- hive_type %>%
     mutate(
-      query = paste0("cast(", svalue, " as ", stype, ") as ", stype, "_col")
+      query = paste0("cast(NULL as ", stype, ") as ", stype, "_col")
     ) %>%
     pull(query) %>%
     paste(collapse = ", ") %>%
