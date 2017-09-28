@@ -103,6 +103,4 @@ test_that("ml_stage() and ml_stages() work properly", {
   expect_equal(ml_stages(pipeline, c("tok1", "bin")) %>%
                  sapply(ml_uid),
                c("tok1", "bin1"))
-
-
 })
