@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed collection of `short`, `float`, `byte` and `logical` to properly
+  return NAs.
+
 - Added `sparklyr.collect.datechars` option to enable collecting `DateType` and
   `TimestampTime` as `characters` to support compatibility with previos versions.
 
