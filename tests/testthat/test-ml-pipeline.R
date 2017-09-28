@@ -81,3 +81,28 @@ test_that("ml_fit() and ml_fit_and_transform() fail on transformers", {
                  ml_fit_and_transform(iris_tbl),
                "cannot invoke 'fit' on transformers")
 })
+
+test_that("ml_stage() and ml_stages() work properly", {
+  pipeline <- ml_pipeline(sc) %>%
+    ft_tokenizer("a", "b", uid = "tok1") %>%
+    ft_tokenizer("c", "d", uid = "tok2") %>%
+    ft_binarizer("e", "f", uid = "bin1")
+
+  expect_error(ml_stage(pipeline, "blah"),
+               "stage not found")
+  expect_error(ml_stage(pipeline, "tok"),
+               "multiple stages found")
+  expect_equal(pipeline %>%
+                 ml_stage("bin") %>%
+                 ml_uid(),
+               "bin1")
+  expect_error(ml_stages(pipeline, c("blah")),
+               "no stages found for identifier blah")
+  expect_error(ml_stages(pipeline, c("tok", "bin")),
+               "multiple stages found for identifier tok")
+  expect_equal(ml_stages(pipeline, c("tok1", "bin")) %>%
+                 sapply(ml_uid),
+               c("tok1", "bin1"))
+
+
+})

@@ -95,3 +95,30 @@ ml_get_params <- function(x, params, ...) {
 ml_uid <- function(x) {
   x$uid %||% stop("uid not found")
 }
+
+#' @export
+ml_stage <- function(x, stage) {
+  matched_index <- grep(paste0("^", stage), x$stage_uids)
+  switch(length(matched_index) %>% as.character(),
+         "0" = stop("stage not found"),
+         "1" = x$stages[[matched_index]],
+         stop("multiple stages found")
+         )
+}
+
+#' @export
+ml_stages <- function(x, stages) {
+  matched_indexes <- lapply(stages, function(stage) grep(paste0("^", stage), x$stage_uids)) %>%
+    rlang::set_names(stages)
+
+  bad_matches <- Filter(function(idx) length(idx) != 1, matched_indexes)
+
+  if (length(bad_matches)) {
+    bad_match <- bad_matches[[1]]
+    switch(as.character(length(bad_match)),
+           "0" = stop("no stages found for identifier ", names(bad_matches)[1]),
+           stop("multiple stages found for identifier ", names(bad_matches)[1])
+    )
+  }
+  x$stages[unlist(matched_indexes)]
+}
