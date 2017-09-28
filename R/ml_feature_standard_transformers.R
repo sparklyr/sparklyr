@@ -224,6 +224,17 @@ ft_vector_assembler.tbl_spark <- function(
 
 # DCT
 
+#' Feature Transformation -- Discrete Cosine Transform (DCT)
+#'
+#' A feature transformer that takes the 1D discrete cosine transform of a real
+#'   vector. No zero padding is performed on the input vector. It returns a real
+#'   vector of the same length representing the DCT. The return vector is scaled
+#'   such that the transform matrix is unitary (aka scaled DCT-II).
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#'
+#' @param inverse Indicates whether to perform the inverse DCT (TRUE) or forward DCT (FALSE).
 #' @export
 ft_dct <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
   UseMethod("ft_dct")
