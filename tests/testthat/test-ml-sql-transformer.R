@@ -22,4 +22,19 @@ test_that("ft_sql/dplyr_transformer() works", {
     transformed %>%
       collect()
   )
+
+  sql_transformer <- ft_sql_transformer(
+    sc, "select *, petal_width * 2 as pw2 from __THIS__")
+
+  expect_equal(
+    ml_param_map(sql_transformer),
+    list(statement = "select *, petal_width * 2 as pw2 from __THIS__")
+  )
+
+  dplyr_transformer <- ft_dplyr_transformer(sc, transformed)
+
+  expect_equal(
+    ml_param_map(dplyr_transformer),
+    list(statement = "SELECT `Sepal_Length`, `Sepal_Width`, `Petal_Length`, `Petal_Width`, `Species`, `Petal_Width` * 2.0 AS `pw2`\nFROM __THIS__")
+  )
 })
