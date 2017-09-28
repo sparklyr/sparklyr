@@ -85,6 +85,13 @@ ml_get_param <- function(x, param, ...) {
 }
 
 #' @export
+ml_get_params <- function(x, params, ...) {
+  params %>%
+    lapply(function(param) ml_get_param(x, param)) %>%
+    rlang::set_names(unlist(params))
+}
+
+#' @export
 ml_uid <- function(x) {
   x$uid %||% stop("uid not found")
 }
