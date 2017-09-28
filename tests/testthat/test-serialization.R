@@ -140,7 +140,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   hive_type <- tibble::frame_data(
     ~stype,     ~svalue,       ~rtype,   ~rvalue,
-    "tinyint",       "1",       "raw",       "1",
+    "tinyint",       "1",       "raw",      "01",
     "smallint",      "1",   "integer",       "1",
     "integer",       "1",   "integer",       "1",
     "bigint",        "1",   "numeric",       "1",
