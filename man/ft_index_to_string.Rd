@@ -48,7 +48,9 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   columns in Spark.
 
 Other feature transformers: \code{\link{ft_binarizer}},
-  \code{\link{ft_dct}}, \code{\link{ft_one_hot_encoder}},
+  \code{\link{ft_bucketizer}}, \code{\link{ft_dct}},
+  \code{\link{ft_elementwise_product}},
+  \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_stop_words_remover}},
   \code{\link{ft_tokenizer}},

@@ -319,6 +319,18 @@ ft_index_to_string.tbl_spark <- function(
 
 # Bucketizer
 
+#' Feature Transformation -- Bucketizer
+#'
+#' Similar to \R's \code{\link{cut}} function, this transforms a numeric column
+#' into a discretized column, with breaks specified through the \code{splits}
+#' parameter.
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#' @template roxlate-ml-feature-handle-invalid
+#'
+#' @param splits A numeric vector of cutpoints, indicating the bucket boundaries.
+#'
 #' @export
 ft_bucketizer <- function(
   x, input_col, output_col, splits, handle_invalid = "error",
@@ -359,6 +371,16 @@ ft_bucketizer.tbl_spark <- function(
 
 # ElementwiseProduct
 
+#' Feature Transformation -- ElementwiseProduct
+#'
+#' Outputs the Hadamard product (i.e., the element-wise product) of each input vector
+#'   with a provided "weight" vector. In other words, it scales each column of the
+#'   dataset by a scalar multiplier.
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#' @param scaling_vec the vector to multiply with input vectors
+#'
 #' @export
 ft_elementwise_product <- function(
   x, input_col, output_col, scaling_vec,

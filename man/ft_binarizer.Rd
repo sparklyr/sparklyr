@@ -47,7 +47,9 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformers: \code{\link{ft_dct}},
+Other feature transformers: \code{\link{ft_bucketizer}},
+  \code{\link{ft_dct}},
+  \code{\link{ft_elementwise_product}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_regex_tokenizer}},
