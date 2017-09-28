@@ -102,13 +102,6 @@ object Utils {
     }}
   }
 
-  def collectImplByte(local: Array[Row], idx: Integer) = {
-    local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[Byte]) el.asInstanceOf[Byte] else scala.Byte.MinValue
-    }}
-  }
-
   def collectImplFloat(local: Array[Row], idx: Integer) = {
     local.map{row => {
       val el = row(idx)
@@ -184,7 +177,7 @@ object Utils {
       case "StringType"           => collectImplString(local, idx, separator)
       case "LongType"             => collectImplLong(local, idx)
 
-      case "ByteType"             => collectImplByte(local, idx)
+      case "ByteType"             => collectImplInteger(local, idx)
       case "FloatType"            => collectImplFloat(local, idx)
       case "ShortType"            => collectImplInteger(local, idx)
       case "Decimal"              => collectImplForceString(local, idx, separator)
