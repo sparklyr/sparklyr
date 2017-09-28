@@ -269,6 +269,17 @@ ft_discrete_cosine_transform <- ft_dct
 
 # IndexToString
 
+#' Feature Transformation -- IndexToString
+#'
+#' A Transformer that maps a column of indices back to a new column of
+#'   corresponding string values. The index-string mapping is either from
+#'   the ML attributes of the input column, or from user-supplied labels
+#'    (which take precedence over ML attributes).
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#'
+#' @param labels Optional param for array of labels specifying index-string mapping.
 #' @export
 ft_index_to_string <- function(x, input_col, output_col, labels = NULL,
                                uid = random_string("index_to_string_"), ...) {
