@@ -113,13 +113,6 @@ object Utils {
     }}
   }
 
-  def collectImplShort(local: Array[Row], idx: Integer) = {
-    local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[Short]) el.asInstanceOf[Short] else scala.Short.MinValue
-    }}
-  }
-
   def collectImplForceString(local: Array[Row], idx: Integer, separator: String) = {
     var text = local.map{row => {
       val el = row(idx)
@@ -190,7 +183,7 @@ object Utils {
 
       case "ByteType"             => collectImplByte(local, idx)
       case "FloatType"            => collectImplFloat(local, idx)
-      case "ShortType"            => collectImplShort(local, idx)
+      case "ShortType"            => collectImplInteger(local, idx)
       case "Decimal"              => collectImplForceString(local, idx, separator)
 
       case "TimestampType"        => collectImplTimestamp(local, idx)
