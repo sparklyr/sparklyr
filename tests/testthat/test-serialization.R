@@ -182,3 +182,47 @@ test_that("collect() can retrieve all data types correctly", {
     hive_type %>% pull(rvalue)
   )
 })
+
+test_that("collect() can retrieve NULL data types as NAs", {
+  library(dplyr)
+
+  hive_type <- tibble::frame_data(
+        ~stype,    ~svalue,       ~rtype,   ~rvalue,
+     "tinyint",     "NULL",        "raw",      "NA",
+    "smallint",     "NULL",    "integer",      "NA",
+     "integer",     "NULL",    "integer",      "NA",
+      "bigint",     "NULL",    "numeric",      "NA",
+       "float",     "NULL",    "numeric",      "NA",
+      "double",     "NULL",    "numeric",      "NA",
+     "decimal",     "NULL",    "numeric",      "NA",
+   "timestamp",     "NULL",    "POSIXct",      "NA",
+        "date",     "NULL",       "Date",      "NA",
+      "string",     "NULL",  "character",      "NA",
+     "varchar",     "NULL",  "character",      "NA",
+        "char",     "NULL",  "character",      "NA",
+     "boolean",     "NULL",    "logical",       "NA"
+  )
+
+  spark_query <- hive_type %>%
+    mutate(
+      query = paste0("cast(", svalue, " as ", stype, ") as ", stype, "_col")
+    ) %>%
+    pull(query) %>%
+    paste(collapse = ", ") %>%
+    paste("SELECT", .)
+
+  spark_types <- DBI::dbGetQuery(sc, spark_query) %>%
+    lapply(function(e) class(e)[[1]]) %>%
+    as.character()
+
+  expect_equal(
+    spark_types,
+    hive_type %>% pull(rtype)
+  )
+
+  spark_results <- DBI::dbGetQuery(sc, spark_query)
+
+  lapply(names(spark_results), function(e) {
+    expect_true(is.na(spark_results[[e]]), paste(e, "expected to be NA"))
+  })
+})
