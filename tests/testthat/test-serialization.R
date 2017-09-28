@@ -130,3 +130,55 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
   expect_equal(sdf_ncol(df_tbl), 2)
 })
 
+test_that("collect() can retrieve all data types correctly", {
+  # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
+  library(dplyr)
+
+  sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
+  rdate <- as.Date("01-01-2010", "%d-%m-%Y") %>% as.character()
+  rtime <- as.POSIXct(1, origin = "1970-01-01") %>% as.character()
+
+  hive_type <- tibble::frame_data(
+    ~stype,     ~svalue,       ~rtype,   ~rvalue,
+    "tinyint",       "1",       "raw",      "01",
+    "smallint",      "1",   "integer",       "1",
+    "integer",       "1",   "integer",       "1",
+    "bigint",        "1",   "numeric",       "1",
+    "float",         "1",   "numeric",       "1",
+    "double",        "1",   "numeric",       "1",
+    "decimal",       "1",   "numeric",       "1",
+    "timestamp",     "1",   "POSIXct",     rtime,
+    "date",        sdate,      "Date",     rdate,
+    "string",          1, "character",       "1",
+    "varchar",         1, "character",       "1",
+    "char",            1, "character",       "1",
+    "boolean",    "true",   "logical",    "TRUE"
+  )
+
+  spark_query <- hive_type %>%
+    mutate(
+      query = paste0("cast(", svalue, " as ", stype, ") as ", stype, "_col")
+    ) %>%
+    pull(query) %>%
+    paste(collapse = ", ") %>%
+    paste("SELECT", .)
+
+  spark_types <- DBI::dbGetQuery(sc, spark_query) %>%
+    lapply(function(e) class(e)[[1]]) %>%
+    as.character()
+
+  expect_equal(
+    spark_types,
+    hive_type %>% pull(rtype)
+  )
+
+  spark_results <- DBI::dbGetQuery(sc, spark_query) %>%
+    lapply(as.character)
+  names(spark_results) <- NULL
+  spark_results <- spark_results %>% unlist()
+
+  expect_equal(
+    spark_results,
+    hive_type %>% pull(rvalue)
+  )
+})

@@ -1,22 +1,3 @@
-# nolint start
-# Type mapping from Java to R
-#
-# void -> NULL
-# Int -> integer
-# String -> character
-# Boolean -> logical
-# Float -> double
-# Double -> double
-# Long -> double
-# Array[Byte] -> raw
-# Date -> Date
-# Time -> POSIXct
-#
-# Array[T] -> list()
-# Object -> jobj
-#
-# nolint end
-
 readObject <- function(con) {
   # Read type first
   type <- readType(con)
@@ -49,6 +30,18 @@ readString <- function(con) {
   string
 }
 
+readDateArray <- function(con, n = 1) {
+  dates <- list()
+
+  collectStrings <- getOption("sparklyr.collect.datechars", FALSE)
+  for (i in 1:n) {
+    string <- readString(con)
+    dates[[i]] <- if (collectStrings) string else as.Date(string)
+  }
+
+  do.call("c", dates)
+}
+
 readInt <- function(con, n = 1) {
   readBin(con, integer(), n = n, endian = "big")
 }
@@ -71,20 +64,24 @@ readDate <- function(con) {
 
 readTime <- function(con, n = 1) {
   t <- readDouble(con, n)
-  as.POSIXct(t, origin = "1970-01-01")
+  r <- as.POSIXct(t, origin = "1970-01-01")
+  if (getOption("sparklyr.collect.datechars", FALSE)) as.character(r) else r
 }
 
 readArray <- function(con) {
   type <- readType(con)
   len <- readInt(con)
 
-  # short-circuit for reading arrays of double, int, logical
   if (type == "d") {
     return(readDouble(con, n = len))
   } else if (type == "i") {
     return(readInt(con, n = len))
   } else if (type == "b") {
     return(readBoolean(con, n = len))
+  } else if (type == "t") {
+    return(readTime(con, n = len))
+  } else if (type == "D") {
+    return(readDateArray(con, n = len))
   }
 
   if (len > 0) {

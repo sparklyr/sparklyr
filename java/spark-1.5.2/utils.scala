@@ -158,6 +158,20 @@ object Utils {
     }}
   }
 
+  def collectImplTimestamp(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[java.sql.Timestamp]) el.asInstanceOf[java.sql.Timestamp] else new java.sql.Timestamp(0)
+    }}
+  }
+
+  def collectImplDate(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[java.sql.Date]) el.asInstanceOf[java.sql.Date] else new java.sql.Date(0)
+    }}
+  }
+
   def collectImplDefault(local: Array[Row], idx: Integer) = {
     local.map(row => row(idx))
   }
@@ -179,9 +193,9 @@ object Utils {
       case "ShortType"            => collectImplShort(local, idx)
       case "Decimal"              => collectImplForceString(local, idx, separator)
 
-      case "TimestampType"        => collectImplForceString(local, idx, separator)
+      case "TimestampType"        => collectImplTimestamp(local, idx)
       case "CalendarIntervalType" => collectImplForceString(local, idx, separator)
-      case "DateType"             => collectImplForceString(local, idx, separator)
+      case "DateType"             => collectImplDate(local, idx)
 
       case ReDecimalType(_)       => collectImplDecimal(local, idx)
       case ReVectorType(_)        => collectImplVector(local, idx)
