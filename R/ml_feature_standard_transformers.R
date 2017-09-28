@@ -107,6 +107,18 @@ ft_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
 
 # OneHotEncoder
 
+#' Feature Transformation -- OneHotEncoder
+#'
+#' One-hot encoding maps a column of label indices to a column of binary
+#' vectors, with at most a single one-value. This encoding allows algorithms
+#' which expect continuous features, such as Logistic Regression, to use
+#' categorical features. Typically, used with  \code{ft_string_indexer()} to
+#' index a column first.
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#' @param drop_last Whether to drop the last category. Defaults to \code{TRUE}.
+#'
 #' @export
 ft_one_hot_encoder <- function(
   x, input_col, output_col, drop_last = TRUE,
@@ -346,7 +358,21 @@ ft_elementwise_product.tbl_spark <- function(
 
 # RegexTokenizer
 
-
+#' Feature Tranformation -- RegexTokenizer
+#'
+#' A regex based tokenizer that extracts tokens either by using the provided
+#' regex pattern to split the text (default) or repeatedly matching the regex
+#' (if \code{gaps} is false). Optional parameters also allow filtering tokens using a
+#' minimal length. It returns an array of strings that can be empty.
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#'
+#' @param gaps Indicates whether regex splits on gaps (TRUE) or matches tokens (FALSE).
+#' @param min_token_length Minimum token length, greater than or equal to 0.
+#' @param pattern The regular expression pattern to be used.
+#' @param to_lower_case Indicates whether to convert all characters to lowercase before tokenizing.
+#'
 #' @export
 ft_regex_tokenizer <- function(
   x, input_col, output_col, gaps = TRUE,
