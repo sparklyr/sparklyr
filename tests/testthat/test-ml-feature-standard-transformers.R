@@ -2,6 +2,8 @@ context("ml feature (transformers)")
 
 sc <- testthat_spark_connection()
 
+# Tokenizer
+
 test_that("We can instantiate tokenizer object", {
   tokenizer <- ft_tokenizer(sc, "x", "y", uid = "tok")
   expect_equal(tokenizer$type, "org.apache.spark.ml.feature.Tokenizer")
@@ -40,6 +42,8 @@ test_that("ft_tokenizer.tbl_spark() works as expected", {
   expect_identical(spark_tokens, r_tokens)
 })
 
+# Binarizer
+
 test_that("ft_binarizer() returns params of transformer", {
   binarizer <- ft_binarizer(sc, "x", "y", threshold = 0.5)
   params <- list("x", "y", threshold = 0.5)
@@ -71,6 +75,8 @@ test_that("ft_binarizer() input checking works", {
                "length-one numeric vector")
 })
 
+# HashingTF
+
 test_that("ft_hashing_tf() input checking works", {
   expect_identical(class(ft_hashing_tf(sc, "in", "out", num_features = 25)$param_map$num_features),
                    "integer")
@@ -78,6 +84,7 @@ test_that("ft_hashing_tf() input checking works", {
                "length-one logical vector")
 })
 
+# DCT
 
 test_that("ft_dct() works", {
   df <- data.frame(
@@ -109,6 +116,8 @@ test_that("ft_dct() works", {
   expect_equal(out2, expected_out)
 })
 
+# IndexToString
+
 test_that("ft_index_to_string() works", {
   df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
@@ -128,6 +137,8 @@ test_that("ft_index_to_string() works", {
   expect_identical(s2, c("wow", "cool", "wow", "wow"))
 })
 
+# ElementwiseProduct
+
 test_that("ft_elementwise_product() works", {
   df <- data.frame(a = 1, b = 3, c = 5)
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
@@ -142,6 +153,8 @@ test_that("ft_elementwise_product() works", {
                    c(1, 3, 5) * c(2, 4, 6))
 
 })
+
+# RegexTokenizer
 
 test_that("ft_regex_tokenizer() works", {
   test_requires("dplyr")
@@ -161,6 +174,8 @@ test_that("ft_regex_tokenizer() works", {
       pull(words),
     c(5L, 7L, 5L))
 })
+
+# StopWordsRemover
 
 test_that("ft_stop_words_remover() works", {
   test_requires("dplyr")
@@ -182,5 +197,18 @@ test_that("ft_stop_words_remover() works", {
       ft_stop_words_remover("words", "filtered", stop_words = list("I", "Mary", "lamb")) %>%
       pull(filtered),
     list(list("saw", "the", "red", "balloon"), list("had", "a", "little"))
+  )
+
+  swr <- ft_stop_words_remover(
+    sc, "input", "output", case_sensitive = TRUE,
+    stop_words = as.list(letters), uid = "hello")
+
+  expect_equal(
+    ml_get_params(swr, list(
+    "input_col", "output_col", "case_sensitive", "stop_words")),
+    list(input_col = "input",
+         output_col = "output",
+         case_sensitive = TRUE,
+         stop_words = as.list(letters))
   )
 })

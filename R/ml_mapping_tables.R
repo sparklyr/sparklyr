@@ -22,7 +22,10 @@ ml_create_mapping_tables <- function() {
          # ml_one_hot_encoder
          "drop_last" = "dropLast",
          # ml_vector_assembler
-         "input_cols" = "inputCols")
+         "input_cols" = "inputCols",
+         # ml_stop_words_remover
+         "case_sensitive" = "caseSensitive",
+         "stop_words" = "stopWords")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
