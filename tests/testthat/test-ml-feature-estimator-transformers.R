@@ -25,6 +25,22 @@ test_that("ft_count_vectorizer() works", {
 
   # vocab extraction
   expect_identical(cv_model$vocabulary, list("a", "b", "c"))
+
+  cv <- ft_count_vectorizer(
+    sc, "words", "features", binary = TRUE, min_df = 2, min_tf = 2,
+    vocab_size = 1024
+  )
+
+  expect_equal(ml_get_params(cv, list(
+    "input_col", "output_col", "binary", "min_df", "min_tf", "vocab_size"
+  )),
+  list(input_col = "words",
+       output_col = "features",
+       binary = TRUE,
+       min_df = 2L,
+       min_tf = 2L,
+       vocab_size = 1024L)
+  )
 })
 
 test_that("ft_quantile_discretizer works", {
@@ -37,4 +53,17 @@ test_that("ft_quantile_discretizer works", {
                      pull(result),
                    c(2, 2, 1, 1, 0)
   )
+
+
+  qd <- ft_quantile_discretizer(
+    sc, "hour", "result", handle_invalid = "skip",
+    num_buckets = 3L, relative_error = 0.01)
+  expect_equal(ml_get_params(qd, list(
+    "input_col", "output_col", "handle_invalid", "num_buckets", "relative_error"
+  )),
+  list(input_col = "hour",
+       output_col = "result",
+       handle_invalid = "skip",
+       num_buckets = 3L,
+       relative_error = 0.01))
 })

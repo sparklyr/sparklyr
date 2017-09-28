@@ -30,7 +30,14 @@ ml_create_mapping_tables <- function() {
          "scaling_vec" = "scalingVec",
          # ft_regex_tokenizer
          "min_token_length" = "minTokenLength",
-         "to_lower_case" = "toLowercase")
+         "to_lower_case" = "toLowercase",
+         # ft_count_vectorizer
+         "min_df" = "minDF",
+         "min_tf" = "minTF",
+         "vocab_size" = "vocabSize",
+         # ft_quantile_discretizer
+         "num_buckets" = "numBuckets",
+         "relative_error" = "relativeError")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
