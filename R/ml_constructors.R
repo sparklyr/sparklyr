@@ -138,27 +138,27 @@ ml_short_type <- function(x) {
 #' @export
 print.ml_transformer <- function(x, ...) {
   cat(ml_short_type(x), "(Transformer) \n")
-  cat(paste0("  [", x$uid, "]"),"\n")
+  cat(paste0("<", x$uid, ">"),"\n")
   for (param in names(x$param_map))
-    cat("    ", param, ":", capture.output(str(x$param_map[[param]])), "\n")
+    cat("  ", param, ":", capture.output(str(x$param_map[[param]])), "\n")
 }
 
 #' @export
 print.ml_estimator <- function(x, ...) {
   cat(ml_short_type(x), "(Estimator) \n")
-  cat(paste0("  [", x$uid, "]"),"\n")
+  cat(paste0("<", x$uid, ">"),"\n")
   for (param in names(x$param_map))
-    cat("    ", param, ":", capture.output(str(x$param_map[[param]])), "\n")
+    cat("  ", param, ":", capture.output(str(x$param_map[[param]])), "\n")
 }
 
 #' @export
 print.ml_pipeline <- function(x, ...) {
   cat("Pipeline \n")
-  cat(paste0("  [", x$uid, "]"),"\n")
-  cat("  Stages:", "\n")
+  cat(paste0("<", x$uid, ">"),"\n")
+  cat("  Stages", "\n")
   for (stage in x$stages) {
     stage_output <- capture.output(print(stage))
-    cat(paste0("    |--", stage_output[1]), sep = "\n")
-    cat(paste0("    | ", stage_output[-1]), sep = "\n")
+    cat(paste0("  |--", stage_output[1]), sep = "\n")
+    cat(paste0("  |  ", stage_output[-1]), sep = "\n")
   }
 }
