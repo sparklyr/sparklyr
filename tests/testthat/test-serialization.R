@@ -181,7 +181,4 @@ test_that("collect() can retrieve all data types correctly", {
     spark_results,
     hive_type %>% pull(rvalue)
   )
-
-  expect_equal(sdf_nrow(df_tbl), 2)
-  expect_equal(sdf_ncol(df_tbl), 2)
 })
