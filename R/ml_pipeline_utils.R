@@ -73,3 +73,9 @@ ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
 
   unname(sapply(x, function(nm) mapping[[nm]] %||% nm))
 }
+
+#' @export
+ml_param_map <- function(x, ...) {
+  x$param_map %||% stop("'x' does not have a param map")
+}
+
