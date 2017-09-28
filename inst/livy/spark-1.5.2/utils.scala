@@ -102,13 +102,6 @@ object Utils {
     }}
   }
 
-  def collectImplFloat(local: Array[Row], idx: Integer) = {
-    local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[Float]) el.asInstanceOf[Float] else scala.Float.MinValue
-    }}
-  }
-
   def collectImplForceString(local: Array[Row], idx: Integer, separator: String) = {
     var text = local.map{row => {
       val el = row(idx)
@@ -178,7 +171,7 @@ object Utils {
       case "LongType"             => collectImplLong(local, idx)
 
       case "ByteType"             => collectImplInteger(local, idx)
-      case "FloatType"            => collectImplFloat(local, idx)
+      case "FloatType"            => collectImplDouble(local, idx)
       case "ShortType"            => collectImplInteger(local, idx)
       case "Decimal"              => collectImplForceString(local, idx, separator)
 

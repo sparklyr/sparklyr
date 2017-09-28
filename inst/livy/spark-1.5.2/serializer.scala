@@ -404,7 +404,7 @@ object Serializer {
   def writeDateArr(out: DataOutputStream, value: Array[java.sql.Date]): Unit = {
     writeType(out, "date")
     out.writeInt(value.length)
-    value.foreach(v => writeString(out, v.toString))
+    value.foreach(v => writeTime(out, new java.sql.Timestamp(v.getTime())))
   }
 
   def writeStringArr(out: DataOutputStream, value: Array[String]): Unit = {

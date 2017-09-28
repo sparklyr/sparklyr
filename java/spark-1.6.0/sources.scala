@@ -56,15 +56,7 @@ object Sources {
     "}\n" +
     "\n" +
     "readDateArray <- function(con, n = 1) {\n" +
-    "  dates <- list()\n" +
-    "\n" +
-    "  collectStrings <- getOption(\"sparklyr.collect.datechars\", FALSE)\n" +
-    "  for (i in 1:n) {\n" +
-    "    string <- readString(con)\n" +
-    "    dates[[i]] <- if (collectStrings) string else as.Date(string)\n" +
-    "  }\n" +
-    "\n" +
-    "  do.call(\"c\", dates)\n" +
+    "  as.Date(readTime(con, n = 1))\n" +
     "}\n" +
     "\n" +
     "readInt <- function(con, n = 1) {\n" +
@@ -89,8 +81,12 @@ object Sources {
     "\n" +
     "readTime <- function(con, n = 1) {\n" +
     "  t <- readDouble(con, n)\n" +
+    "  timeNA <- as.POSIXct(0, origin = \"1970-01-01\")\n" +
+    "\n" +
     "  r <- as.POSIXct(t, origin = \"1970-01-01\")\n" +
-    "  if (getOption(\"sparklyr.collect.datechars\", FALSE)) as.character(r) else r\n" +
+    "  if (getOption(\"sparklyr.collect.datechars\", FALSE)) as.character(r) else {\n" +
+    "    if (r == timeNA) as.POSIXct(NA) else r\n" +
+    "  }\n" +
     "}\n" +
     "\n" +
     "readArray <- function(con) {\n" +
