@@ -17,7 +17,7 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{options}{A list of strings with additional options.}
 
-\item{partition_by}{Partitions the output by the given columns on the file system.}
+\item{partition_by}{A \code{character} vector. Partitions the output by the given columns on the file system.}
 
 \item{...}{Optional arguments; currently unused.}
 }
