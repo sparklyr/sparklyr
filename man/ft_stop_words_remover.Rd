@@ -49,7 +49,9 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
 
 ml_default_stop_words
 
-Other feature transformers: \code{\link{ft_one_hot_encoder}},
+Other feature transformers: \code{\link{ft_binarizer}},
+  \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_regex_tokenizer}},
-  \code{\link{ft_tokenizer}}
+  \code{\link{ft_tokenizer}},
+  \code{\link{ft_vector_assembler}}
 }

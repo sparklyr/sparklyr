@@ -38,6 +38,18 @@ ft_tokenizer.tbl_spark <- function(x, input_col, output_col, uid = random_string
 
 # Binarizer
 
+#' Feature Transformation -- Binarizer
+#'
+#' Apply thresholding to a column, such that values less than or equal to the
+#' \code{threshold} are assigned the value 0.0, and values greater than the
+#' threshold are assigned the value 1.0. Column output is numeric for
+#' compatibility with other modeling functions.
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#'
+#' @param threshold Threshold used to binarize continuous features.
+#'
 #' @export
 ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_string("binarizer_"), ...) {
   UseMethod("ft_binarizer")
@@ -160,6 +172,17 @@ ft_one_hot_encoder.tbl_spark <- function(
 
 # VectorAssembler
 
+#' Feature Transformation -- VectorAssembler
+#'
+#' Combine multiple vectors into a single row-vector; that is,
+#' where each row element of the newly generated column is a
+#' vector formed by concatenating each row element from the
+#' specified input columns.
+#'
+#' @param input_cols The names of the input columns
+#' @param output_col The name of the output column.
+#' @template roxlate-ml-feature-transformer
+#'
 #' @export
 ft_vector_assembler <- function(
   x, input_cols, output_col,

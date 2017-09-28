@@ -1,25 +1,3 @@
-#' #' Feature Transformation -- VectorAssembler
-#' #'
-#' #' Combine multiple vectors into a single row-vector; that is,
-#' #' where each row element of the newly generated column is a
-#' #' vector formed by concatenating each row element from the
-#' #' specified input columns.
-#' #'
-#' #' @template roxlate-ml-transformation
-#' #'
-#' #' @export
-#' ft_vector_assembler <- function(x,
-#'                                 input.col,
-#'                                 output.col,
-#'                                 ...)
-#' {
-#'   ml_backwards_compatibility_api()
-#'   class <- "org.apache.spark.ml.feature.VectorAssembler"
-#'   invoke_simple_transformer(x, class, list(
-#'     setInputCols = as.list(as.character(input.col)),
-#'     setOutputCol = ensure_scalar_character(output.col)
-#'   ))
-#' }
 
 #' #' Feature Transformation -- StringIndexer
 #' #'
@@ -65,33 +43,6 @@
 #'   transformed <- invoke(sim, "transform", df)
 #'
 #'   sdf_register(transformed)
-#' }
-
-#' #' Feature Transformation -- Binarizer
-#' #'
-#' #' Apply thresholding to a column, such that values less than or equal to the
-#' #' \code{threshold} are assigned the value 0.0, and values greater than the
-#' #' threshold are assigned the value 1.0. Column output is numeric for
-#' #' compatibility with other modeling functions.
-#' #'
-#' #' @template roxlate-ml-transformation
-#' #'
-#' #' @param threshold The numeric threshold.
-#' #'
-#' #' @export
-#' ft_binarizer <- function(x,
-#'                          input.col,
-#'                          output.col,
-#'                          threshold = 0.5,
-#'                          ...)
-#' {
-#'   ml_backwards_compatibility_api()
-#'   class <- "org.apache.spark.ml.feature.Binarizer"
-#'   invoke_simple_transformer(x, class, list(
-#'     setInputCol  = ensure_scalar_character(input.col),
-#'     setOutputCol = ensure_scalar_character(output.col),
-#'     setThreshold = ensure_scalar_double(threshold)
-#'   ))
 #' }
 
 #' #' Feature Transformation -- Discrete Cosine Transform (DCT)
@@ -361,24 +312,4 @@
 #'   only.model = vocabulary.only)
 #'
 #'   if (vocabulary.only) as.character(invoke(result, "vocabulary")) else result
-#' }
-
-#' #' Feature Tranformation -- StopWordsRemover
-#' #'
-#' #' A feature transformer that drops all the stop words from the input sequence.
-#' #'
-#' #' @template roxlate-ml-transformation
-#' #'
-#' #' @export
-#' ft_stop_words_remover <- function(x,
-#'                                   input.col,
-#'                                   output.col,
-#'                                   ...)
-#' {
-#'   sparklyr:::ml_backwards_compatibility_api()
-#'   class <- "org.apache.spark.ml.feature.StopWordsRemover"
-#'   sparklyr:::invoke_simple_transformer(x, class, list(
-#'     setInputCol  = sparklyr:::ensure_scalar_character(input.col),
-#'     setOutputCol = sparklyr:::ensure_scalar_character(output.col)
-#'   ))
 #' }
