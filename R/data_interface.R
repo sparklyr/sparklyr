@@ -128,7 +128,7 @@ spark_read_csv <- function(sc,
 #' @param options A list of strings with additional options.
 #' @param mode A \code{character} element.  Specifies the behavior when data or table already exists. Supported values include: error, append, overwrite and ignore.  For more details see also \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes} for your version of Spark.
 #'
-#' @param partition_by Partitions the output by the given columns on the file system.
+#' @param partition_by A \code{character} vector. Partitions the output by the given columns on the file system.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
@@ -227,7 +227,6 @@ spark_read_parquet <- function(sc,
 #'
 #' @inheritParams spark_write_csv
 #' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
-#' @param partition_by Partitions the output by the given columns on the file system.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
@@ -303,7 +302,6 @@ spark_read_json <- function(sc,
 #' Object Notation} format.
 #'
 #' @inheritParams spark_write_csv
-#' @param partition_by Partitions the output by the given columns on the file system.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
@@ -493,7 +491,6 @@ spark_load_table <- function(sc,
 #'
 #' @inheritParams spark_write_csv
 #' @param name The name to assign to the newly generated table.
-#' @param partition_by Partitions the output by the given columns on the file system.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
@@ -613,7 +610,6 @@ spark_read_source <- function(sc,
 #'
 #' @inheritParams spark_write_csv
 #' @param name The name to assign to the newly generated table.
-#' @param partition_by Partitions the output by the given columns on the file system.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
@@ -661,7 +657,6 @@ spark_write_jdbc.spark_jobj <- function(x,
 #' @inheritParams spark_write_csv
 #' @param name The name to assign to the newly generated table.
 #' @param source A data source capable of reading data.
-#' @param partition_by Partitions the output by the given columns on the file system.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
@@ -737,7 +732,6 @@ spark_read_text <- function(sc,
 #' Serialize a Spark DataFrame to the plain text format.
 #'
 #' @inheritParams spark_write_csv
-#' @param partition_by Partitions the output by the given columns on the file system.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
