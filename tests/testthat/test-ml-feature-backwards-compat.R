@@ -1,4 +1,4 @@
-context("feature transformers")
+context("ml feature - backwards compat")
 
 test_requires("dplyr")
 test_requires("janeaustenr")
@@ -81,23 +81,6 @@ test_that("ft_regex_tokenizer() works as expected", {
 
   expect_identical(spark_tokens, r_tokens)
 
-})
-
-test_that("the feature transforming family of functions has consistent API", {
-  skip_on_cran()
-
-  ns <- asNamespace("sparklyr")
-  exports <- getNamespaceExports(ns)
-  fts <- grep("^ft_", exports, value = TRUE)
-
-  # ft_sql_transformer does not use input.col and output.col
-  fts <- fts[fts != "ft_sql_transformer"]
-
-  for (ft in fts) {
-    transformer <- get(ft, envir = ns, mode = "function")
-    fmls <- names(formals(transformer))
-    expect_true(all(c("input.col", "output.col", "...") %in% fmls))
-  }
 })
 
 test_that("ft_quantile_discretizer() works with basic input", {
