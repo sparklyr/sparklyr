@@ -75,7 +75,7 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
     dplyr::pull(probability)
 
   expect_equal(m1_predictions, m2_predictions)
-  expect_identical(class(m2), c("ml_prediction_model",
+  expect_identical(class(m2), c("ml_logistic_regression_model", "ml_prediction_model",
                                 "ml_transformer", "ml_pipeline_stage"))
 })
 
