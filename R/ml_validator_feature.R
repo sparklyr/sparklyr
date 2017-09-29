@@ -176,4 +176,13 @@ ml_validator_quantile_discretizer <- function(args, nms) {
   )
 }
 
+# SQLTransformer
+ml_validator_sql_transformer <- function(args, nms) {
+  ml_apply_validation(
+    {
+      statement <- ensure_scalar_character(statement)
+    },
+    args, nms, list(sql = "statement")
+  )
+}
 
