@@ -162,3 +162,9 @@ print.ml_pipeline <- function(x, ...) {
     cat(paste0("  |  ", stage_output[-1]), sep = "\n")
   }
 }
+
+#' @export
+is_ml_transformer <- function(x) inherits(x, "ml_transformer")
+
+#' @export
+is_ml_estimator <- function(x) inherits(x, "ml_estimator")
