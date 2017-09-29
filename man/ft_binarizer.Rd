@@ -53,6 +53,7 @@ Other feature transformers: \code{\link{ft_bucketizer}},
   \code{\link{ft_index_to_string}},
   \code{\link{ft_one_hot_encoder}},
   \code{\link{ft_regex_tokenizer}},
+  \code{\link{ft_sql_transformer}},
   \code{\link{ft_stop_words_remover}},
   \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}}
