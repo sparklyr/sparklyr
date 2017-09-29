@@ -131,7 +131,44 @@ new_ml_logistic_regression <- function(jobj) {
 }
 
 new_ml_logistic_regression_model <- function(jobj) {
-  new_ml_prediction_model(jobj, "ml_logistic_regression_model")
+  summary = if (invoke(jobj, "hasSummary"))
+    new_ml_summary_logistic_regression_model(invoke(jobj, "summary"))
+  else NA
+
+  new_ml_prediction_model(
+    jobj,
+    coefficients = read_spark_vector(jobj, "coefficients"),
+    coefficient_matrix = read_spark_matrix(jobj, "coefficientMatrix"),
+    intercept = invoke(jobj, "intercept"),
+    intercept_vector = read_spark_vector(jobj, "interceptVector"),
+    num_classes = invoke(jobj, "numClasses"),
+    num_features = invoke(jobj, "numFeatures"),
+    features_col = invoke(jobj, "getFeaturesCol"),
+    prediction_col = invoke(jobj, "getPredictionCol"),
+    probability_col = invoke(jobj, "getProbabilityCol"),
+    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
+    threshold = if (ml_is_set(jobj, "threshold")) invoke(jobj, "getThreshold") else NA,
+    thresholds = if (ml_is_set(jobj, "thresholds")) invoke(jobj, "getThresholds") else NA,
+    summary = summary,
+    subclass = "ml_logistic_regression_model")
+}
+
+new_ml_summary_logistic_regression_model <- function(jobj) {
+  new_ml_summary(
+    jobj,
+    area_under_roc = invoke(jobj, "areaUnderROC"),
+    f_measure_by_threshold = invoke(jobj, "fMeasureByThreshold") %>% collect(),
+    features_col = invoke(jobj, "featuresCol"),
+    label_col = invoke(jobj, "labelCol"),
+    objective_history = invoke(jobj, "objectiveHistory"),
+    pr = invoke(jobj, "pr") %>% collect(),
+    precision_by_threshold = invoke(jobj, "precisionByThreshold") %>% collect(),
+    predictions = invoke(jobj, "predictions") %>% sdf_register(),
+    probability_col = invoke(jobj, "probabilityCol"),
+    recall_by_threshold = invoke(jobj, "recallByThreshold") %>% collect(),
+    roc = invoke(jobj, "roc") %>% collect(),
+    total_iterations = invoke(jobj, "totalIterations"),
+    subclass = "ml_summary_logistic_regression")
 }
 
 new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid, formula, dataset,
@@ -164,44 +201,41 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
     `[[`("numeric") %>%
     dplyr::pull("name")
 
-    # multinomial vs. binomial models have separate APIs for
-    # retrieving results
-    is_multinomial <- invoke(jobj, "numClasses") > 2
+  # multinomial vs. binomial models have separate APIs for
+  # retrieving results
+  is_multinomial <- invoke(jobj, "numClasses") > 2
 
-    # extract coefficients (can be either a vector or matrix, depending
-    # on binomial vs. multinomial)
-    coefficients <- if (is_multinomial) {
-      if (spark_version(sc) < "2.1.0") stop("Multinomial regression requires Spark 2.1.0 or higher.")
+  # extract coefficients (can be either a vector or matrix, depending
+  # on binomial vs. multinomial)
+  coefficients <- if (is_multinomial) {
+    if (spark_version(sc) < "2.1.0") stop("Multinomial regression requires Spark 2.1.0 or higher.")
 
-      # multinomial
-      coefficients <- read_spark_matrix(jobj, "coefficientMatrix")
-      colnames(coefficients) <- feature_names
+    # multinomial
+    coefficients <- model$coefficient_matrix
+    colnames(coefficients) <- feature_names
 
-      if (ml_param(model, "fit_intercept")) {
-        intercept <- read_spark_vector(jobj, "interceptVector")
-        coefficients <- cbind(intercept, coefficients)
-        colnames(coefficients) <- c("(Intercept)", feature_names)
-      }
-      coefficients
-    } else {
-      # binomial
-      coefficients <- jobj %>%
-        sparklyr:::read_spark_vector("coefficients")
-      coefficients <- if (ml_param(model, "fit_intercept"))
-        rlang::set_names(
-          c(invoke(jobj, "intercept"), coefficients),
-          c("(Intercept)", feature_names)
-        )
-      else
-        rlang::set_names(coefficients, feature_names)
-      coefficients
+    if (ml_param(model, "fit_intercept")) {
+      intercept <- model$intercept
+      coefficients <- cbind(intercept, coefficients)
+      colnames(coefficients) <- c("(Intercept)", feature_names)
     }
+    coefficients
+  } else {
+    # binomial
+
+    coefficients <- if (ml_param(model, "fit_intercept"))
+      rlang::set_names(
+        c(invoke(jobj, "intercept"), model$coefficients),
+        c("(Intercept)", feature_names)
+      )
+    else
+      rlang::set_names(coefficients, feature_names)
+    coefficients
+  }
 
   call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
 
-  summary <- if (invoke(spark_jobj(model), "hasSummary"))
-    new_ml_summary_logistic_regression_model(invoke(spark_jobj(model), "summary"))
-  else NA
+  summary <- model$summary
 
   new_ml_model_classification(
     pipeline, pipeline_model, model_uid, formula, dataset,
@@ -212,24 +246,15 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
   )
 }
 
-new_ml_summary_logistic_regression_model <- function(jobj) {
-  new_ml_summary(
-    jobj,
-    area_under_roc = invoke(jobj, "areaUnderROC"),
-    f_measure_by_threshold = invoke(jobj, "fMeasureByThreshold"),
-    features_col = invoke(jobj, "featuresCol"),
-    label_col = invoke(jobj, "labelCol"),
-    objective_history = invoke(jobj, "objectiveHistory"),
-    pr = invoke(jobj, "pr"),
-    precision_by_threshold = invoke(jobj, "precisionByThreshold"),
-    predictions = invoke(jobj, "predictions"),
-    probability_col = invoke(jobj, "probabilityCol"),
-    recall_by_threshold = invoke(jobj, "recallByThreshold"),
-    roc = invoke(jobj, "roc"),
-    total_iterations = invoke(jobj, "totalIterations"),
-    subclass = "ml_summary_logistic_regression")
-}
+
 # Generic implementations
+
+#' @export
+ml_fit.ml_logistic_regression <- function(x, data, ...) {
+  jobj <- spark_jobj(x) %>%
+    invoke("fit", spark_dataframe(data))
+  new_ml_logistic_regression_model(jobj)
+}
 
 #' @export
 print.ml_model_logistic_regression <- function(x, ...) {
@@ -238,6 +263,37 @@ print.ml_model_logistic_regression <- function(x, ...) {
   cat("Formula: ", x$formula, "\n\n", sep = "")
   cat("Coefficients:", sep = "\n")
   print(x$coefficients)
+}
+
+#' @export
+print.ml_summary_logistic_regression <- function(x, ...) {
+  cat(ml_short_type(x), "\n")
+  out_list <- list(
+    area_under_roc = x$area_under_roc,
+    features_col = x$features_col,
+    label_col = x$label_col,
+    probability_col = x$probability_col
+  )
+  for (item in names(out_list))
+    cat("  ", item, ":", capture.output(str(out_list[[item]])), "\n")
+}
+
+#' @export
+print.ml_logistic_regression_model <- function(x, ...) {
+  cat(ml_short_type(x), "(Transformer) \n")
+  cat(paste0("<", ml_uid(x), ">"),"\n")
+  item_names <- names(x) %>%
+    setdiff(c("uid", "type", "param_map", "summary", ".jobj")) %>%
+    setdiff(
+      if (x$num_classes > 2)
+        c("coefficients", "intercept")
+      else
+        c("coefficient_matrix", "intercept_vector")
+    )
+  for (item in item_names)
+    if (!rlang::is_na(x[[item]]))
+      cat("  ", item, ":", capture.output(str(x[[item]])), "\n")
+
 }
 
 #' @export

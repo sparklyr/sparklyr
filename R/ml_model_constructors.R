@@ -24,9 +24,10 @@ new_ml_model_prediction <- function(pipeline, pipeline_model, model_uid, formula
     subclass = c(subclass, "ml_model_prediction"))
 }
 
-new_ml_model_classification <- function(pipeline, pipeline_model, model_uid, formula, ..., subclass = NULL) {
+new_ml_model_classification <- function(pipeline, pipeline_model, model_uid, formula, dataset, ..., subclass = NULL) {
   new_ml_model_prediction(
     pipeline, pipeline_model, model_uid, formula,
+    dataset = dataset,
     ...,
     subclass = c(subclass, "ml_model_classification"))
 }
