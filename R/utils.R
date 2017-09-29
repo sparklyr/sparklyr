@@ -112,10 +112,6 @@ random_string <- function(prefix = "table") {
   basename(tempfile(prefix))
 }
 
-"%||%" <- function(x, y) {
-  if (is.null(x)) y else x
-}
-
 is_spark_v2 <- function(scon) {
   spark_version(scon) >= "2.0.0"
 }
