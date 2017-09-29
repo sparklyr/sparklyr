@@ -6,7 +6,7 @@ ml_save_pipeline <- function(x, path, overwrite = FALSE, ...) {
 #' @export
 ml_save_pipeline.ml_pipeline <- function(x, path, overwrite = FALSE, ...) {
   ensure_scalar_character(path)
-  ml_writer <- x$.jobj %>%
+  ml_writer <- spark_jobj(x) %>%
     invoke("write")
 
   if (overwrite) {
@@ -29,7 +29,7 @@ ml_load_pipeline <- function(sc, path) {
 #' @export
 ml_save_model <- function(x, path, overwrite = FALSE, ...) {
   ensure_scalar_character(path)
-  ml_writer <- x$.jobj %>%
+  ml_writer <- spark_jobj(x) %>%
     invoke("write")
 
   if (overwrite) {

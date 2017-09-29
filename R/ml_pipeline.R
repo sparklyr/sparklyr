@@ -15,8 +15,8 @@ ml_pipeline.ml_pipeline_stage <- function(x, ..., uid = random_string("pipeline_
   ensure_scalar_character(uid)
   sc <- spark_connection(x)
   dots <- list(...) %>%
-    lapply(function(x) x$.jobj)
-  stages <- c(x$.jobj, dots)
+    lapply(function(x) spark_jobj(x))
+  stages <- c(spark_jobj(x), dots)
   jobj <- invoke_static(sc, "sparklyr.MLUtils",
                         "createPipelineFromStages",
                         uid,
@@ -26,15 +26,15 @@ ml_pipeline.ml_pipeline_stage <- function(x, ..., uid = random_string("pipeline_
 
 #' @export
 spark_connection.ml_pipeline <- function(x, ...) {
-  spark_connection(x$.jobj)
+  spark_connection(spark_jobj(x))
 }
 
 #' @export
 spark_connection.ml_pipeline_stage <- function(x, ...) {
-  spark_connection(x$.jobj)
+  spark_connection(spark_jobj(x))
 }
 
 #' @export
 spark_connection.ml_pipeline_model <- function(x, ...) {
-  spark_connection(x$.jobj)
+  spark_connection(spark_jobj(x))
 }

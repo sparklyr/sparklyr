@@ -166,7 +166,7 @@ ft_string_indexer.tbl_spark <- function(
       stage
     else
       ml_fit(stage, x)
-    dots$params$labels <- transformer$.jobj %>%
+    dots$params$labels <- spark_jobj(transformer) %>%
       invoke("labels") %>%
       as.character()
     transformer %>%

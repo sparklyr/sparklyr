@@ -168,3 +168,6 @@ is_ml_transformer <- function(x) inherits(x, "ml_transformer")
 
 #' @export
 is_ml_estimator <- function(x) inherits(x, "ml_estimator")
+
+#' @export
+spark_jobj.ml_pipeline_stage <- function(x, ...) x$.jobj

@@ -5,7 +5,7 @@ ml_fit <- function(x, data, ...) {
 
 #' @export
 ml_fit.ml_pipeline <- function(x, data, ...) {
-  jobj <- x$.jobj %>%
+  jobj <- spark_jobj(x) %>%
     invoke("fit", spark_dataframe(data))
 
   new_ml_pipeline_model(jobj)
@@ -13,7 +13,7 @@ ml_fit.ml_pipeline <- function(x, data, ...) {
 
 #' @export
 ml_fit.ml_estimator <- function(x, data, ...) {
-  jobj <- x$.jobj %>%
+  jobj <- spark_jobj(x) %>%
     invoke("fit", spark_dataframe(data))
 
   new_ml_transformer(jobj)
@@ -21,7 +21,7 @@ ml_fit.ml_estimator <- function(x, data, ...) {
 
 #' @export
 ml_fit.ml_predictor <- function(x, data, ...) {
-  jobj <- x$.jobj %>%
+  jobj <- spark_jobj(x) %>%
     invoke("fit", spark_dataframe(data))
 
   new_ml_prediction_model(jobj)
@@ -29,7 +29,7 @@ ml_fit.ml_predictor <- function(x, data, ...) {
 
 #' @export
 ml_fit.ml_count_vectorizer <- function(x, data, ...) {
-  jobj <- x$.jobj %>%
+  jobj <- spark_jobj(x) %>%
     invoke("fit", spark_dataframe(data))
 
   new_ml_count_vectorizer_model(jobj)
@@ -48,7 +48,7 @@ ml_transform <- function(x, data, ...) {
 #' @export
 ml_transform.ml_transformer <- function(x, data, ...) {
   sdf <- spark_dataframe(data)
-  x$.jobj %>%
+  spark_jobj(x) %>%
     invoke("transform", sdf) %>%
     sdf_register()
 }
@@ -66,7 +66,7 @@ ml_fit_and_transform <- function(x, data, ...) {
 #' @export
 ml_fit_and_transform.ml_estimator <- function(x, data, ...) {
   sdf <- spark_dataframe(data)
-  x$.jobj%>%
+  spark_jobj(x)%>%
     invoke("fit", sdf) %>%
     invoke("transform", sdf) %>%
     sdf_register()

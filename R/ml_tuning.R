@@ -238,7 +238,7 @@ ml_cross_validator.spark_connection <- function(x, estimator, estimator_param_ma
                                                 # uid = random_string("cross_validator_")
 ) {
   sc <- x
-  estimator <- estimator$.jobj
+  estimator <- spark_jobj(estimator)
   uid_stages <- invoke_static(sc,
                               "sparklyr.MLUtils",
                               "uidStagesMapping",

@@ -140,7 +140,7 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
   model <- pipeline_model$stages %>%
     `[[`(grep(model_uid, pipeline_model$stage_uids))
 
-  jobj <- model$.jobj
+  jobj <- spark_jobj(model)
 
   sc <- spark_connection(model)
 
@@ -199,8 +199,8 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
 
   call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
 
-  summary <- if (invoke(model$.jobj, "hasSummary"))
-    new_ml_summary_logistic_regression_model(invoke(model$.jobj, "summary"))
+  summary <- if (invoke(spark_jobj(model), "hasSummary"))
+    new_ml_summary_logistic_regression_model(invoke(spark_jobj(model), "summary"))
   else NA
 
   new_ml_model_classification(
