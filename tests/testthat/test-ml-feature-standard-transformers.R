@@ -81,7 +81,7 @@ test_that("ft_binarizer() input checking works", {
 
 # HashingTF
 
-test_that("ft_hashing_tf() input checking works", {
+test_that("ft_hashing_tf() works", {
   expect_identical(class(ft_hashing_tf(sc, "in", "out", num_features = 25)$param_map$num_features),
                    "integer")
   expect_error(ft_hashing_tf(sc, "in", "out", binary = 1),
@@ -92,6 +92,13 @@ test_that("ft_hashing_tf() input checking works", {
   expect_equal(
     ml_get_params(htf, list("input_col", "output_col", "binary", "num_features")),
     list(input_col = "in", output_col = "out", binary = TRUE, num_features = 1024)
+  )
+
+  htf <- ft_hashing_tf(sc, "in", "out")
+
+  expect_equal(
+    ml_get_params(htf, list("input_col", "output_col", "binary", "num_features")),
+    list(input_col = "in", output_col = "out", binary = FALSE, num_features = 2^18)
   )
 })
 

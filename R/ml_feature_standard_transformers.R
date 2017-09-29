@@ -91,13 +91,13 @@ ft_binarizer.tbl_spark <- function(x, input_col, output_col, threshold = 0,
 #'
 #' @export
 ft_hashing_tf <- function(x, input_col, output_col, binary = FALSE,
-                          num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+                          num_features = as.integer(2^18), uid = random_string("hashing_tf_"), ...) {
   UseMethod("ft_hashing_tf")
 }
 
 #' @export
 ft_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FALSE,
-                                           num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+                                           num_features = as.integer(2^18), uid = random_string("hashing_tf_"), ...) {
 
   ml_validate_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.HashingTF",
@@ -110,14 +110,14 @@ ft_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FA
 
 #' @export
 ft_hashing_tf.ml_pipeline <- function(x, input_col, output_col, binary = FALSE,
-                                      num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+                                      num_features = as.integer(2^18), uid = random_string("hashing_tf_"), ...) {
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
 }
 
 #' @export
 ft_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
-                                    num_features = 2^18, uid = random_string("hashing_tf_"), ....) {
+                                    num_features = as.integer(2^18), uid = random_string("hashing_tf_"), ....) {
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 
