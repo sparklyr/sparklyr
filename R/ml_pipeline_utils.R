@@ -140,3 +140,12 @@ ml_stages <- function(x, stages = NULL) {
     x$stages[unlist(matched_indexes)]
   }
 }
+
+#' @export
+ml_is_set <- function(x, param) {
+  jobj <- spark_jobj(x)
+  param_jobj <- jobj %>%
+    invoke(ml_map_param_names(param, direction = "rs"))
+  jobj %>%
+    invoke("isSet", param_jobj)
+}
