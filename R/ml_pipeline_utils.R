@@ -10,9 +10,15 @@ ml_pipeline_stage <- function(jobj) {
 }
 
 ml_pipeline <- function(jobj) {
+  stages <- invoke_static(spark_connection(jobj),
+                          "sparklyr.MLUtils",
+                          "explodePipeline",
+                          jobj) %>%
+    sapply(ml_pipeline_stage)
+
   structure(
     list(
-      stages = ml_pipeline_stage(jobj),
+      stages = stages,
       .pipeline = ml_wrap_in_pipeline(jobj)),
     class = "ml_pipeline"
   )

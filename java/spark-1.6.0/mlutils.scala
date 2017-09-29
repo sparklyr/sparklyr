@@ -5,8 +5,12 @@ import scala.util.{Try, Success, Failure}
 
 object MLUtils {
   def wrapInPipeline(pipelineStage: PipelineStage): Pipeline = {
-    new Pipeline()
+    if (pipelineStage.isInstanceOf[Pipeline]) {
+      pipelineStage.asInstanceOf[Pipeline]
+    } else {
+      new Pipeline()
       .setStages(Array(pipelineStage))
+    }
   }
 
   def getParamMap(pipelineStage: PipelineStage): Map[String, Any] = {
