@@ -1,5 +1,6 @@
 new_ml_model <- function(pipeline, pipeline_model, model_uid, ..., subclass = NULL) {
-  model_params <- pipeline_model$stages %>%
+  model_params <- pipeline_model %>%
+    ml_stages() %>%
     `[[`(grep(model_uid, pipeline_model$stage_uids)) %>%
     `[[`("param_map")
 

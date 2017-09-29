@@ -156,7 +156,7 @@ print.ml_pipeline <- function(x, ...) {
   cat("Pipeline \n")
   cat(paste0("<", x$uid, ">"),"\n")
   cat("  Stages", "\n")
-  for (stage in x$stages) {
+  for (stage in ml_stages(x)) {
     stage_output <- capture.output(print(stage))
     cat(paste0("  |--", stage_output[1]), sep = "\n")
     cat(paste0("  |  ", stage_output[-1]), sep = "\n")

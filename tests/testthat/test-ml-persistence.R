@@ -28,9 +28,11 @@ test_that("ml_save_pipeline()/ml_load_pipeline() work for unnested pipelines", {
   p2 <- ml_load_pipeline(sc, path)
 
 
-  p1_params <- p1$stages %>%
+  p1_params <- p1 %>%
+    ml_stage() %>%
     lapply(ml_param_map)
-  p2_params <- p2$stages %>%
+  p2_params <- p2 %>%
+    ml_stages() %>%
     lapply(ml_param_map)
 
   expect_equal(p1$uid, p2$uid)

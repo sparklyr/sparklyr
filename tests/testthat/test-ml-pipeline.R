@@ -22,7 +22,7 @@ test_tbl <- testthat_tbl("test")
 test_that("ml_pipeline() returns a c('ml_pipeline', 'ml_estimator', 'ml_pipeline_stage')", {
   p <- ml_pipeline(sc)
   expect_equal(class(p), c("ml_pipeline", "ml_estimator", "ml_pipeline_stage"))
-  expect_equal(p$stages, NA)
+  expect_equal(ml_stages(p), NA)
   expect_equal(p$type, "org.apache.spark.ml.Pipeline")
   uid_prefix <- gsub(pattern = "_.+$", replacement = "", p$uid)
   expect_equal(uid_prefix, "pipeline")
@@ -55,9 +55,11 @@ test_that("ml_transformer.ml_pipeline() works as expected", {
     ft_tokenizer("x", "y") %>%
     ft_binarizer("in", "out", 0.5)
 
-  p1_params <- p1$stages %>%
+  p1_params <- p1 %>%
+    ml_stages() %>%
     lapply(ml_param_map)
-  p2_params <- p2$stages %>%
+  p2_params <- p2 %>%
+    ml_stages() %>%
     lapply(ml_param_map)
   expect_equal(p1_params, p2_params)
   expect_equal(class(p2)[1], "ml_pipeline")

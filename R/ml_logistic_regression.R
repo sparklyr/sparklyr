@@ -137,8 +137,8 @@ new_ml_logistic_regression_model <- function(jobj) {
 new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid, formula, dataset,
                                              .call) {
 
-  model <- pipeline_model$stages %>%
-    `[[`(grep(model_uid, pipeline_model$stage_uids))
+  model <- pipeline_model %>%
+    ml_stage(model_uid)
 
   jobj <- spark_jobj(model)
 
