@@ -199,8 +199,7 @@ test_that("collect() can retrieve NULL data types as NAs", {
         "date",        "Date",
       "string",   "character",
      "varchar",   "character",
-        "char",   "character",
-     "boolean",     "logical"
+        "char",   "character"
   )
 
   spark_query <- hive_type %>%
