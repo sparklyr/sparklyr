@@ -95,6 +95,27 @@ object Utils {
     }}
   }
 
+  def collectImplFloat(local: Array[Row], idx: Integer): Array[Double]  = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Float]) el.asInstanceOf[Float].toDouble else scala.Double.NaN
+    }}
+  }
+
+  def collectImplByte(local: Array[Row], idx: Integer): Array[Int] = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Byte]) el.asInstanceOf[Byte].toInt else scala.Int.MinValue
+    }}
+  }
+
+  def collectImplShort(local: Array[Row], idx: Integer): Array[Int] = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Short]) el.asInstanceOf[Short].toInt else scala.Int.MinValue
+    }}
+  }
+
   def collectImplLong(local: Array[Row], idx: Integer) = {
     local.map{row => {
       val el = row(idx)
@@ -170,9 +191,9 @@ object Utils {
       case "StringType"           => collectImplString(local, idx, separator)
       case "LongType"             => collectImplLong(local, idx)
 
-      case "ByteType"             => collectImplInteger(local, idx)
-      case "FloatType"            => collectImplDouble(local, idx)
-      case "ShortType"            => collectImplInteger(local, idx)
+      case "ByteType"             => collectImplByte(local, idx)
+      case "FloatType"            => collectImplFloat(local, idx)
+      case "ShortType"            => collectImplShort(local, idx)
       case "Decimal"              => collectImplForceString(local, idx, separator)
 
       case "TimestampType"        => collectImplTimestamp(local, idx)

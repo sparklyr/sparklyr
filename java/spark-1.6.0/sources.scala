@@ -81,9 +81,9 @@ object Sources {
     "\n" +
     "readTime <- function(con, n = 1) {\n" +
     "  t <- readDouble(con, n)\n" +
-    "  timeNA <- as.POSIXct(0, origin = \"1970-01-01\")\n" +
+    "  timeNA <- as.POSIXct(0, origin = \"1970-01-01\", tz = \"UTC\")\n" +
     "\n" +
-    "  r <- as.POSIXct(t, origin = \"1970-01-01\")\n" +
+    "  r <- as.POSIXct(t, origin = \"1970-01-01\", tz = \"UTC\")\n" +
     "  if (getOption(\"sparklyr.collect.datechars\", FALSE)) as.character(r) else {\n" +
     "    if (r == timeNA) as.POSIXct(NA) else r\n" +
     "  }\n" +
