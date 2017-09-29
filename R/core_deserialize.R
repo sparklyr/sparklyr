@@ -31,7 +31,7 @@ readString <- function(con) {
 }
 
 readDateArray <- function(con, n = 1) {
-  as.Date(readTime(con, n = 1))
+  as.Date(readTime(con, n))
 }
 
 readInt <- function(con, n = 1) {
