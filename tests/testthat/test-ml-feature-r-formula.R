@@ -22,4 +22,18 @@ test_that("r formula works as expected", {
 
   expect_equal(pull(df1, features), pull(df2, features))
   expect_equal(pull(df1, label), pull(df2, label))
+
+  rf <- ft_r_formula(
+    sc, "Sepal_Length ~ Petal_Width + Species", features_col = "x",
+    label_col = "y", force_index_label = TRUE)
+
+  expect_equal(
+    ml_get_params(rf, list(
+      "formula", "features_col", "label_col", "force_index_label"
+    )),
+    list(formula = "Sepal_Length ~ Petal_Width + Species",
+         features_col = "x",
+         label_col = "y",
+         force_index_label = TRUE)
+  )
 })
