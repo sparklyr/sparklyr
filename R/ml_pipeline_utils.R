@@ -112,18 +112,22 @@ ml_stage <- function(x, stage) {
 }
 
 #' @export
-ml_stages <- function(x, stages) {
-  matched_indexes <- lapply(stages, function(stage) grep(paste0("^", stage), x$stage_uids)) %>%
-    rlang::set_names(stages)
+ml_stages <- function(x, stages = NULL) {
+  if (rlang::is_null(stages)) {
+    x$stages
+  } else {
+    matched_indexes <- lapply(stages, function(stage) grep(paste0("^", stage), x$stage_uids)) %>%
+      rlang::set_names(stages)
 
-  bad_matches <- Filter(function(idx) length(idx) != 1, matched_indexes)
+    bad_matches <- Filter(function(idx) length(idx) != 1, matched_indexes)
 
-  if (length(bad_matches)) {
-    bad_match <- bad_matches[[1]]
-    switch(as.character(length(bad_match)),
-           "0" = stop("no stages found for identifier ", names(bad_matches)[1]),
-           stop("multiple stages found for identifier ", names(bad_matches)[1])
-    )
+    if (length(bad_matches)) {
+      bad_match <- bad_matches[[1]]
+      switch(as.character(length(bad_match)),
+             "0" = stop("no stages found for identifier ", names(bad_matches)[1]),
+             stop("multiple stages found for identifier ", names(bad_matches)[1])
+      )
+    }
+    x$stages[unlist(matched_indexes)]
   }
-  x$stages[unlist(matched_indexes)]
 }
