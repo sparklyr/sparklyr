@@ -56,7 +56,8 @@ object Sources {
     "}\n" +
     "\n" +
     "readDateArray <- function(con, n = 1) {\n" +
-    "  as.Date(readTime(con, n))\n" +
+    "  r <- readTime(con, n)\n" +
+    "  if (getOption(\"sparklyr.collect.datechars\", FALSE)) r else as.Date(r)\n" +
     "}\n" +
     "\n" +
     "readInt <- function(con, n = 1) {\n" +
