@@ -62,4 +62,7 @@ test_that("ml_is_set works", {
   lr <- ml_logistic_regression(sc, reg_param = 0L)
   expect_true(ml_is_set(lr, "reg_param"))
   expect_false(ml_is_set(lr, "thresholds"))
+
+  expect_true(ml_is_set(spark_jobj(lr), "reg_param"))
+  expect_false(ml_is_set(spark_jobj(lr), "thresholds"))
 })

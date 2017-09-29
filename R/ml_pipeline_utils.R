@@ -142,10 +142,23 @@ ml_stages <- function(x, stages = NULL) {
 }
 
 #' @export
-ml_is_set <- function(x, param) {
+ml_is_set <- function(x, param, ...) {
+  UseMethod("ml_is_set")
+}
+
+#' @export
+ml_is_set.ml_pipeline_stage <- function(x, param) {
   jobj <- spark_jobj(x)
   param_jobj <- jobj %>%
     invoke(ml_map_param_names(param, direction = "rs"))
   jobj %>%
+    invoke("isSet", param_jobj)
+}
+
+#' @export
+ml_is_set.spark_jobj <- function(x, param) {
+  param_jobj <- x %>%
+    invoke(ml_map_param_names(param, direction = "rs"))
+  x %>%
     invoke("isSet", param_jobj)
 }
