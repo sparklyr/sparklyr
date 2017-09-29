@@ -34,6 +34,5 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformation routines: \code{\link{ft_count_vectorizer}},
-  \code{\link{sdf_mutate}}
+Other feature transformation routines: \code{\link{sdf_mutate}}
 }

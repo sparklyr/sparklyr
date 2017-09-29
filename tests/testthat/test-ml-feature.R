@@ -9,6 +9,7 @@ sc <- testthat_spark_connection()
 #   expect_equal(class(tokenizer), c("ml_transformer", "ml_pipeline_stage"))
 # })
 #
+#
 # test_that("ft_tokenizer() returns params of transformer", {
 #   tokenizer <- ft_tokenizer(sc, "x", "y")
 #   expected_params <- list("x", "y")
@@ -76,7 +77,7 @@ sc <- testthat_spark_connection()
 #   expect_error(ft_hashing_tf(sc, "in", "out", binary = 1),
 #                "length-one logical vector")
 # })
-
+#
 # test_that("ft_dct() works", {
 #   df <- data.frame(
 #     f1 = c(0, -1, 14),
@@ -159,26 +160,51 @@ sc <- testthat_spark_connection()
 #       pull(words),
 #     c(5L, 7L, 5L))
 # })
+#
+# test_that("ft_stop_words_remover() works", {
+#   test_requires("dplyr")
+#   df <- data_frame(id = c(0, 1),
+#                    raw = c("I saw the red balloon", "Mary had a little lamb"))
+#   df_tbl <- copy_to(sc, df, overwrite = TRUE)
+#
+#   expect_identical(
+#     df_tbl %>%
+#       ft_tokenizer("raw", "words") %>%
+#       ft_stop_words_remover("words", "filtered") %>%
+#       pull(filtered),
+#     list(list("saw", "red", "balloon"), list("mary", "little", "lamb"))
+#   )
+#
+#   expect_identical(
+#     df_tbl %>%
+#       ft_tokenizer("raw", "words") %>%
+#       ft_stop_words_remover("words", "filtered", stop_words = list("I", "Mary", "lamb")) %>%
+#       pull(filtered),
+#     list(list("saw", "the", "red", "balloon"), list("had", "a", "little"))
+#   )
+# })
 
-test_that("ft_stop_words_remover() works", {
-  test_requires("dplyr")
-  df <- data_frame(id = c(0, 1),
-                   raw = c("I saw the red balloon", "Mary had a little lamb"))
+test_that("ft_count_vectorizer() works", {
+  df <- data_frame(text = c("a b c", "a a a b b c"))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
-  expect_identical(
-    df_tbl %>%
-      ft_tokenizer("raw", "words") %>%
-      ft_stop_words_remover("words", "filtered") %>%
-      pull(filtered),
-    list(list("saw", "red", "balloon"), list("mary", "little", "lamb"))
-  )
+  counts <- df_tbl %>%
+    ft_tokenizer("text", "words") %>%
+    ft_count_vectorizer("words", "features") %>%
+    pull(features)
 
-  expect_identical(
-    df_tbl %>%
-      ft_tokenizer("raw", "words") %>%
-      ft_stop_words_remover("words", "filtered", stop_words = list("I", "Mary", "lamb")) %>%
-      pull(filtered),
-    list(list("saw", "the", "red", "balloon"), list("had", "a", "little"))
-  )
+  expect_identical(counts, list(c(1, 1, 1), c(3, 2, 1)))
+
+  # correct classes
+  expect_identical(class(ft_count_vectorizer(sc, "words", "features"))[1],
+                   "ml_count_vectorizer")
+
+  cv_model <- ft_count_vectorizer(sc, "words", "features") %>%
+    ml_fit(ft_tokenizer(df_tbl, "text", "words"))
+
+  expect_identical(class(cv_model)[1],
+                   "ml_count_vectorizer_model")
+
+  # vocab extraction
+  expect_identical(cv_model$vocabulary, list("a", "b", "c"))
 })

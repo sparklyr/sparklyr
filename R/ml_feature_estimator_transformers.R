@@ -111,3 +111,57 @@ ft_string_indexer.tbl_spark <- function(
     ml_fit_and_transform(estimator, x)
   }
 }
+
+# CountVectorizer
+
+#' @export
+ft_count_vectorizer <- function(
+  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
+  vocab_size = 2^18, dataset = NULL,
+  uid = random_string("count_vectorizer_"), ...) {
+  UseMethod("ft_count_vectorizer")
+}
+
+#' @export
+ft_count_vectorizer.spark_connection <- function(
+  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
+  vocab_size = as.integer(2^18), dataset = NULL,
+  uid = random_string("count_vectorizer_"), ...) {
+
+  ml_validate_args()
+
+  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.CountVectorizer",
+                                  input_col, output_col, uid) %>%
+    invoke("setBinary", binary) %>%
+    invoke("setMinDF", min_df) %>%
+    invoke("setMinTF", min_tf) %>%
+    invoke("setVocabSize", vocab_size) %>%
+    new_ml_count_vectorizer()
+
+  if (is.null(dataset))
+    estimator
+  else
+    ml_fit(estimator, dataset)
+}
+
+#' @export
+ft_count_vectorizer.ml_pipeline <- function(
+  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
+  vocab_size = 2^18, dataset = NULL,
+  uid = random_string("count_vectorizer_"), ...
+) {
+
+  stage <- ml_new_stage_modified_args()
+  ml_add_stage(x, stage)
+
+}
+
+#' @export
+ft_count_vectorizer.tbl_spark <- function(
+  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
+  vocab_size = 2^18, dataset = NULL,
+  uid = random_string("count_vectorizer_"), ...
+) {
+  transformer <- ml_new_stage_modified_args()
+  ml_fit_and_transform(transformer, x)
+}

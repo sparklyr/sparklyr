@@ -28,6 +28,14 @@ ml_fit.ml_predictor <- function(x, data, ...) {
 }
 
 #' @export
+ml_fit.ml_count_vectorizer <- function(x, data, ...) {
+  jobj <- x$.jobj %>%
+    invoke("fit", spark_dataframe(data))
+
+  new_ml_count_vectorizer_model(jobj)
+}
+
+#' @export
 ml_fit.ml_transformer <- function(x, data, ...) {
   stop("cannot invoke 'fit' on transformers; 'ml_fit()' should be used with estimators")
 }

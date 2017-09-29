@@ -54,6 +54,5 @@ dplyr::src_tbls(sc)
 }
 }
 \seealso{
-Other feature transformation routines: \code{\link{ft_count_vectorizer}},
-  \code{\link{ft_quantile_discretizer}}
+Other feature transformation routines: \code{\link{ft_quantile_discretizer}}
 }

@@ -6,8 +6,8 @@ ml_is_instance_of <- function(jobj, type) {
 }
 
 ml_ancestry <- function(jobj) {
-  classes <- c("classification.Classifier",
-               "classification.ClassificationModel",
+  classes <- c("feature.CountVectorizer", "feature.CountVectorizerModel",
+               "classification.Classifier", "classification.ClassificationModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
@@ -25,6 +25,8 @@ ml_package <- function(jobj) {
 
 ml_constructor_dispatch <- function(jobj) {
   switch(ml_ancestry(jobj)[1],
+         "feature.CountVectorizer" = new_ml_count_vectorizer(jobj),
+         "feature.CountVectorizerModel" = new_ml_count_vectorizer_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),
@@ -62,6 +64,16 @@ new_ml_estimator <- function(jobj, ..., subclass = NULL) {
   new_ml_pipeline_stage(jobj,
                         ...,
                         subclass = c(subclass, "ml_estimator"))
+}
+
+new_ml_count_vectorizer <- function(jobj) {
+  new_ml_estimator(jobj, subclass = "ml_count_vectorizer")
+}
+
+new_ml_count_vectorizer_model <- function(jobj) {
+  new_ml_transformer(jobj,
+                   vocabulary = invoke(jobj, "vocabulary"),
+                   subclass = "ml_count_vectorizer_model")
 }
 
 new_ml_predictor <- function(jobj, ..., subclass = NULL) {

@@ -128,3 +128,23 @@ ml_validator_stop_words_remover <- function(args, nms) {
     }), nms, input_output_mapping
   )
 }
+
+# CountVectorizer
+ml_validator_count_vectorizer <- function(args, nms) {
+  old_new_mapping <- c(
+    list(
+      min.df = "min_df",
+      min.tf = "min_tf",
+      vocab.size = "vocab_size"
+    ), input_output_mapping
+  )
+  ml_extract_specified_args(
+    within(args, {
+      binary <- ensure_scalar_boolean(binary)
+      min_df <- ensure_scalar_double(min_df)
+      min_tf <- ensure_scalar_double(min_tf)
+      vocab_size <- ensure_scalar_integer(vocab_size)
+    }),
+    nms, old_new_mapping
+  )
+}
