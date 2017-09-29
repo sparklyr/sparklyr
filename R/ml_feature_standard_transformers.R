@@ -1,5 +1,3 @@
-# Tokenizer
-
 #' Feature Tranformation -- Tokenizer
 #'
 #' A tokenizer that converts the input string to lowercase and then splits it
@@ -35,8 +33,6 @@ ft_tokenizer.tbl_spark <- function(x, input_col, output_col, uid = random_string
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
-
-# Binarizer
 
 #' Feature Transformation -- Binarizer
 #'
@@ -80,8 +76,6 @@ ft_binarizer.tbl_spark <- function(x, input_col, output_col, threshold = 0,
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
-
-# HashingTF
 
 #' Feature Transformation -- HashingTF
 #'
@@ -128,8 +122,6 @@ ft_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
   ml_transform(transformer, x)
 
 }
-
-# OneHotEncoder
 
 #' Feature Transformation -- OneHotEncoder
 #'
@@ -182,8 +174,6 @@ ft_one_hot_encoder.tbl_spark <- function(
   ml_transform(transformer, x)
 }
 
-# VectorAssembler
-
 #' Feature Transformation -- VectorAssembler
 #'
 #' Combine multiple vectors into a single row-vector; that is,
@@ -233,8 +223,6 @@ ft_vector_assembler.tbl_spark <- function(
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
-
-# DCT
 
 #' Feature Transformation -- Discrete Cosine Transform (DCT)
 #'
@@ -331,8 +319,6 @@ ft_index_to_string.tbl_spark <- function(
   ml_transform(transformer, x)
 }
 
-# Bucketizer
-
 #' Feature Transformation -- Bucketizer
 #'
 #' Similar to \R's \code{\link{cut}} function, this transforms a numeric column
@@ -382,8 +368,6 @@ ft_bucketizer.tbl_spark <- function(
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
-
-# ElementwiseProduct
 
 #' Feature Transformation -- ElementwiseProduct
 #'
@@ -436,8 +420,6 @@ ft_elementwise_product.tbl_spark <- function(
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
-
-# RegexTokenizer
 
 #' Feature Tranformation -- RegexTokenizer
 #'
@@ -497,8 +479,6 @@ ft_regex_tokenizer.tbl_spark <- function(
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
-
-# StopWordsRemover
 
 #' Default stop words
 #'

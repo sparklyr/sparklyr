@@ -1,5 +1,3 @@
-# RFormula
-
 #' Feature Tranformation -- RFormula (Estimator)
 #'
 #' Implements the transforms required for fitting a dataset against an R model
@@ -181,8 +179,6 @@ ft_string_indexer.tbl_spark <- function(
   }
 }
 
-# CountVectorizer
-
 #' Feature Tranformation -- CountVectorizer (Estimator)
 #'
 #' Extracts a vocabulary from document collections.
@@ -265,9 +261,6 @@ ft_count_vectorizer.tbl_spark <- function(
   else
     ml_fit_and_transform(stage, x)
 }
-
-
-# QuantileDiscretizer
 
 #' Feature Transformation -- QuantileDiscretizer (Estimator)
 #'
