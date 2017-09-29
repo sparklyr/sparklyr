@@ -85,14 +85,14 @@ ml_param_map <- function(x, ...) {
 }
 
 #' @export
-ml_get_param <- function(x, param, ...) {
+ml_param <- function(x, param, ...) {
   ml_param_map(x)[[param]] %||% stop("param ", param, " not found")
 }
 
 #' @export
-ml_get_params <- function(x, params, ...) {
+ml_params <- function(x, params, ...) {
   params %>%
-    lapply(function(param) ml_get_param(x, param)) %>%
+    lapply(function(param) ml_param(x, param)) %>%
     rlang::set_names(unlist(params))
 }
 

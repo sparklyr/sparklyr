@@ -45,7 +45,7 @@ test_that("ml_logistic_regression() does input checking", {
   expect_error(ml_logistic_regression(sc, elastic_net_param = "foo"),
                "length-one numeric vector")
   expect_equal(ml_logistic_regression(sc, max_iter = 25) %>%
-                 ml_get_param("max_iter"),
+                 ml_param("max_iter"),
                25L)
 })
 

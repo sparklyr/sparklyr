@@ -65,20 +65,20 @@ test_that("ft_binarizer.tbl_spark() works as expected", {
 
 test_that("ft_binarizer() threshold defaults to 0", {
   expect_identical(ft_binarizer(sc, "in", "out") %>%
-                     ml_get_param("threshold"),
+                     ml_param("threshold"),
                    0)
 })
 
 test_that("ft_binarizer() input checking works", {
   expect_identical(ft_binarizer(sc, "in", "out", 1L) %>%
-                     ml_get_param("threshold") %>%
+                     ml_param("threshold") %>%
                      class(),
                    "numeric")
   expect_error(ft_binarizer(sc, "in", "out", "foo"),
                "length-one numeric vector")
 
   bin <- ft_binarizer(sc, "in", "out", threshold = 10)
-  expect_equal(ml_get_params(bin, list("input_col", "output_col", "threshold")),
+  expect_equal(ml_params(bin, list("input_col", "output_col", "threshold")),
                list(input_col = "in", output_col = "out", threshold = 10))
 })
 
@@ -86,7 +86,7 @@ test_that("ft_binarizer() input checking works", {
 
 test_that("ft_hashing_tf() works", {
   expect_identical(ft_hashing_tf(sc, "in", "out", num_features = 25) %>%
-                     ml_get_param("num_features") %>%
+                     ml_param("num_features") %>%
                      class(),
                    "integer")
   expect_error(ft_hashing_tf(sc, "in", "out", binary = 1),
@@ -95,14 +95,14 @@ test_that("ft_hashing_tf() works", {
   htf <- ft_hashing_tf(sc, "in", "out", binary = TRUE, num_features = 1024)
 
   expect_equal(
-    ml_get_params(htf, list("input_col", "output_col", "binary", "num_features")),
+    ml_params(htf, list("input_col", "output_col", "binary", "num_features")),
     list(input_col = "in", output_col = "out", binary = TRUE, num_features = 1024)
   )
 
   htf <- ft_hashing_tf(sc, "in", "out")
 
   expect_equal(
-    ml_get_params(htf, list("input_col", "output_col", "binary", "num_features")),
+    ml_params(htf, list("input_col", "output_col", "binary", "num_features")),
     list(input_col = "in", output_col = "out", binary = FALSE, num_features = 2^18)
   )
 })
@@ -141,7 +141,7 @@ test_that("ft_dct() works", {
   dct <- ft_dct(sc, "features", "featuresDCT", inverse = TRUE)
 
   expect_equal(
-    ml_get_params(dct, list("input_col", "output_col", "inverse")),
+    ml_params(dct, list("input_col", "output_col", "inverse")),
     list(input_col = "features", output_col = "featuresDCT", inverse = TRUE)
   )
 })
@@ -169,7 +169,7 @@ test_that("ft_index_to_string() works", {
   its <- ft_index_to_string(sc, "indexed", "string", labels = list("foo", "bar"))
 
   expect_equal(
-    ml_get_params(its, list("input_col", "output_col", "labels")),
+    ml_params(its, list("input_col", "output_col", "labels")),
     list(input_col = "indexed",
          output_col = "string",
          labels = list("foo", "bar"))
@@ -195,7 +195,7 @@ test_that("ft_elementwise_product() works", {
     sc, "features", "multiplied", scaling_vec = c(1, 3, 5))
 
   expect_equal(
-    ml_get_params(ewp, list(
+    ml_params(ewp, list(
       "input_col", "output_col", "scaling_vec"
     )),
     list(input_col = "features",
@@ -231,7 +231,7 @@ test_that("ft_regex_tokenizer() works", {
     gaps = TRUE, min_token_length = 2, pattern = "\\W", to_lower_case = FALSE)
 
   expect_equal(
-    ml_get_params(rt, list(
+    ml_params(rt, list(
       "input_col", "output_col", "gaps", "min_token_length", "pattern", "to_lower_case"
     )),
     list(input_col = "sentence",
@@ -273,7 +273,7 @@ test_that("ft_stop_words_remover() works", {
     stop_words = as.list(letters), uid = "hello")
 
   expect_equal(
-    ml_get_params(swr, list(
+    ml_params(swr, list(
     "input_col", "output_col", "case_sensitive", "stop_words")),
     list(input_col = "input",
          output_col = "output",

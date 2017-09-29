@@ -144,7 +144,7 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
 
   sc <- spark_connection(model)
 
-  features_col <- ml_get_param(model, "features_col")
+  features_col <- ml_param(model, "features_col")
 
   transformed_sdf <- pipeline_model %>%
     ml_transform(dataset) %>%
@@ -177,7 +177,7 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
       coefficients <- read_spark_matrix(jobj, "coefficientMatrix")
       colnames(coefficients) <- feature_names
 
-      if (ml_get_param(model, "fit_intercept")) {
+      if (ml_param(model, "fit_intercept")) {
         intercept <- read_spark_vector(jobj, "interceptVector")
         coefficients <- cbind(intercept, coefficients)
         colnames(coefficients) <- c("(Intercept)", feature_names)
@@ -187,7 +187,7 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
       # binomial
       coefficients <- jobj %>%
         sparklyr:::read_spark_vector("coefficients")
-      coefficients <- if (ml_get_param(model, "fit_intercept"))
+      coefficients <- if (ml_param(model, "fit_intercept"))
         rlang::set_names(
           c(invoke(jobj, "intercept"), coefficients),
           c("(Intercept)", feature_names)

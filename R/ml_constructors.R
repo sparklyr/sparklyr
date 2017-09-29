@@ -140,7 +140,7 @@ print.ml_transformer <- function(x, ...) {
   cat(ml_short_type(x), "(Transformer) \n")
   cat(paste0("<", x$uid, ">"),"\n")
   for (param in names(ml_param_map(x)))
-    cat("  ", param, ":", capture.output(str(ml_get_param(x, param))), "\n")
+    cat("  ", param, ":", capture.output(str(ml_param(x, param))), "\n")
 }
 
 #' @export
@@ -148,7 +148,7 @@ print.ml_estimator <- function(x, ...) {
   cat(ml_short_type(x), "(Estimator) \n")
   cat(paste0("<", x$uid, ">"),"\n")
   for (param in names(ml_param_map(x)))
-    cat("  ", param, ":", capture.output(str(ml_get_param(x, param))), "\n")
+    cat("  ", param, ":", capture.output(str(ml_param(x, param))), "\n")
 }
 
 #' @export

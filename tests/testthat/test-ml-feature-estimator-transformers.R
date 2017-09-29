@@ -37,7 +37,7 @@ test_that("ft_count_vectorizer() works", {
     vocab_size = 1024
   )
 
-  expect_equal(ml_get_params(cv, list(
+  expect_equal(ml_params(cv, list(
     "input_col", "output_col", "binary", "min_df", "min_tf", "vocab_size"
   )),
   list(input_col = "words",
@@ -54,7 +54,7 @@ test_that("ft_string_indexer works", {
     sc, "in", "out", handle_invalid = "skip"
   )
 
-  expect_equal(ml_get_params(si, list(
+  expect_equal(ml_params(si, list(
     "input_col", "output_col", "handle_invalid"
   )),
   list(input_col = "in",
@@ -83,7 +83,7 @@ test_that("ft_quantile_discretizer works", {
   qd <- ft_quantile_discretizer(
     sc, "hour", "result", handle_invalid = "skip",
     num_buckets = 3L, relative_error = 0.01)
-  expect_equal(ml_get_params(qd, list(
+  expect_equal(ml_params(qd, list(
     "input_col", "output_col", "handle_invalid", "num_buckets", "relative_error"
   )),
   list(input_col = "hour",
