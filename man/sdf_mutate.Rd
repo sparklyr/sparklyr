@@ -53,6 +53,3 @@ head(beaver_tbl)
 dplyr::src_tbls(sc)
 }
 }
-\seealso{
-Other feature transformation routines: \code{\link{ft_quantile_discretizer}}
-}
