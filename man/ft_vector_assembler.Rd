@@ -54,5 +54,6 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_stop_words_remover}},
+  \code{\link{ft_string_indexer}},
   \code{\link{ft_tokenizer}}
 }

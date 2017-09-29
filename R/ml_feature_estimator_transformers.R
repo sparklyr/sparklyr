@@ -35,7 +35,6 @@
 #'  DataFrame, the output label column will be created from the specified
 #'  response variable in the formula.
 #'
-#' @template roxlate-ml-feature-input-output-col
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-estimator-transformer
 #'
@@ -101,6 +100,19 @@ ft_r_formula.tbl_spark <- function(
 
 # StringIndexer
 
+#' Feature Tranformation -- StringIndexer (Estimator)
+#'
+#' A label indexer that maps a string column of labels to an ML column of
+#'   label indices. If the input column is numeric, we cast it to string and
+#'   index the string values. The indices are in \code{[0, numLabels)}, ordered by
+#'   label frequencies. So the most frequent label gets index 0. This function
+#'   is the inverse of \code{\link{ft_index_to_string}}.
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#' @template roxlate-ml-feature-estimator-transformer
+#' @template roxlate-ml-feature-handle-invalid
+#' @seealso \code{\link{ft_index_to_string}}
 #' @export
 ft_string_indexer <- function(
   x, input_col, output_col,

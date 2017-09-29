@@ -26,10 +26,6 @@ feature "transformer" against \code{dataset}. See details.}
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{input_col}{The name of the input column.}
-
-\item{output_col}{The name of the output column.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -106,6 +102,7 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_stop_words_remover}},
+  \code{\link{ft_string_indexer}},
   \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}}
 }

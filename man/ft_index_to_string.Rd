@@ -40,12 +40,15 @@ The object returned depends on the class of \code{x}.
 A Transformer that maps a column of indices back to a new column of
   corresponding string values. The index-string mapping is either from
   the ML attributes of the input column, or from user-supplied labels
-   (which take precedence over ML attributes).
+   (which take precedence over ML attributes). This function is the inverse
+   of \code{\link{ft_string_indexer}}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
+
+\code{\link{ft_string_indexer}}
 
 Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_bucketizer}}, \code{\link{ft_dct}},
@@ -55,6 +58,7 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_regex_tokenizer}},
   \code{\link{ft_sql_transformer}},
   \code{\link{ft_stop_words_remover}},
+  \code{\link{ft_string_indexer}},
   \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}}
 }
