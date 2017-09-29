@@ -31,15 +31,8 @@ readString <- function(con) {
 }
 
 readDateArray <- function(con, n = 1) {
-  dates <- list()
-
-  collectStrings <- getOption("sparklyr.collect.datechars", FALSE)
-  for (i in 1:n) {
-    string <- readString(con)
-    dates[[i]] <- if (collectStrings) string else as.Date(string)
-  }
-
-  do.call("c", dates)
+  r <- readTime(con, n)
+  if (getOption("sparklyr.collect.datechars", FALSE)) r else as.Date(r)
 }
 
 readInt <- function(con, n = 1) {
@@ -64,8 +57,13 @@ readDate <- function(con) {
 
 readTime <- function(con, n = 1) {
   t <- readDouble(con, n)
-  r <- as.POSIXct(t, origin = "1970-01-01")
-  if (getOption("sparklyr.collect.datechars", FALSE)) as.character(r) else r
+  timeNA <- as.POSIXct(0, origin = "1970-01-01", tz = "UTC")
+
+  r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
+  if (getOption("sparklyr.collect.datechars", FALSE)) as.character(r) else {
+    r[r == timeNA] <- as.POSIXct(NA)
+    r
+  }
 }
 
 readArray <- function(con) {

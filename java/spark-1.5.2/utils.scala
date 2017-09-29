@@ -92,31 +92,31 @@ object Utils {
     }}
   }
 
+  def collectImplFloat(local: Array[Row], idx: Integer): Array[Double]  = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Float]) el.asInstanceOf[Float].toDouble else scala.Double.NaN
+    }}
+  }
+
+  def collectImplByte(local: Array[Row], idx: Integer): Array[Int] = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Byte]) el.asInstanceOf[Byte].toInt else scala.Int.MinValue
+    }}
+  }
+
+  def collectImplShort(local: Array[Row], idx: Integer): Array[Int] = {
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Short]) el.asInstanceOf[Short].toInt else scala.Int.MinValue
+    }}
+  }
+
   def collectImplLong(local: Array[Row], idx: Integer) = {
     local.map{row => {
       val el = row(idx)
       if (el.isInstanceOf[Long]) el.asInstanceOf[Long].toDouble else scala.Double.NaN
-    }}
-  }
-
-  def collectImplByte(local: Array[Row], idx: Integer) = {
-    local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[Byte]) el.asInstanceOf[Byte] else scala.Byte.MinValue
-    }}
-  }
-
-  def collectImplFloat(local: Array[Row], idx: Integer) = {
-    local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[Float]) el.asInstanceOf[Float] else scala.Float.MinValue
-    }}
-  }
-
-  def collectImplShort(local: Array[Row], idx: Integer) = {
-    local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[Short]) el.asInstanceOf[Short] else scala.Short.MinValue
     }}
   }
 
