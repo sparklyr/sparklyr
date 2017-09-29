@@ -31,7 +31,8 @@ readString <- function(con) {
 }
 
 readDateArray <- function(con, n = 1) {
-  as.Date(readTime(con, n))
+  r <- readTime(con, n)
+  if (getOption("sparklyr.collect.datechars", FALSE)) r else as.Date(r)
 }
 
 readInt <- function(con, n = 1) {
