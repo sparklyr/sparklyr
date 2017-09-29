@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_estimator_transformers.R
 \name{ft_quantile_discretizer}
 \alias{ft_quantile_discretizer}
-\title{Feature Transformation -- QuantileDiscretizer}
+\title{Feature Transformation -- QuantileDiscretizer (Estimator)}
 \usage{
 ft_quantile_discretizer(x, input_col, output_col, handle_invalid = "error",
   num_buckets = 2L, relative_error = 0.001, dataset = NULL,
@@ -97,7 +97,8 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
 \code{\link{ft_bucketizer}}
 
 Other feature transformers: \code{\link{ft_binarizer}},
-  \code{\link{ft_bucketizer}}, \code{\link{ft_dct}},
+  \code{\link{ft_bucketizer}},
+  \code{\link{ft_count_vectorizer}}, \code{\link{ft_dct}},
   \code{\link{ft_elementwise_product}},
   \code{\link{ft_hashing_tf}},
   \code{\link{ft_index_to_string}},
