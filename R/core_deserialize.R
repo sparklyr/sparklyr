@@ -60,7 +60,8 @@ readTime <- function(con, n = 1) {
 
   r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
   if (getOption("sparklyr.collect.datechars", FALSE)) as.character(r) else {
-    if (r == timeNA) as.POSIXct(NA) else r
+    r[r == timeNA] <- as.POSIXct(NA)
+    r
   }
 }
 
