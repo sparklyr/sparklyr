@@ -136,7 +136,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
   rdate <- as.Date("01-01-2010", "%d-%m-%Y") %>% as.character()
-  rtime <- as.POSIXct(1, origin = "1970-01-01") %>% as.character()
+  rtime <- as.POSIXct(1, origin = "1970-01-01", tz = "UTC") %>% as.character()
 
   hive_type <- tibble::frame_data(
     ~stype,     ~svalue,       ~rtype,   ~rvalue,
