@@ -44,8 +44,12 @@ ft_r_formula.tbl_spark <- function(
   force_index_label = FALSE, dataset = NULL,
   uid = random_string("r_formula_"), ...
 ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_fit_and_transform(transformer, x)
+  stage <- ml_new_stage_modified_args()
+
+  if (is_ml_transformer(stage))
+    ml_transform(stage, x)
+  else
+    ml_fit_and_transform(stage, x)
 }
 
 # StringIndexer
@@ -97,18 +101,24 @@ ft_string_indexer.tbl_spark <- function(
 ) {
   dots <- rlang::dots_list(...)
 
-  estimator <- ml_new_stage_modified_args()
+  stage <- ml_new_stage_modified_args()
 
   # backwards compatibility for params argument
   if (rlang::has_name(dots, "params") && rlang::is_env(dots$params)) {
-    transformer <- ml_fit(estimator, x)
+    transformer <- if (is_ml_transformer(stage))
+      stage
+    else
+      ml_fit(stage, x)
     dots$params$labels <- transformer$.jobj %>%
       invoke("labels") %>%
       as.character()
     transformer %>%
       ml_transform(x)
   } else {
-    ml_fit_and_transform(estimator, x)
+    if (is_ml_transformer(stage))
+      ml_transform(stage, x)
+    else
+      ml_fit_and_transform(stage, x)
   }
 }
 
@@ -162,8 +172,12 @@ ft_count_vectorizer.tbl_spark <- function(
   vocab_size = 2^18, dataset = NULL,
   uid = random_string("count_vectorizer_"), ...
 ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_fit_and_transform(transformer, x)
+  stage <- ml_new_stage_modified_args()
+
+  if (is_ml_transformer(stage))
+    ml_transform(stage, x)
+  else
+    ml_fit_and_transform(stage, x)
 }
 
 
@@ -212,6 +226,10 @@ ft_quantile_discretizer.tbl_spark <- function(
   x, input_col, output_col, handle_invalid = "error",
   num_buckets = 2L, relative_error = 0.001, dataset = NULL,
   uid = random_string("quantile_discretizer_"), ...) {
-  estimator <- ml_new_stage_modified_args()
-  ml_fit_and_transform(estimator, x)
+  stage <- ml_new_stage_modified_args()
+
+  if (is_ml_transformer(stage))
+    ml_transform(stage, x)
+  else
+    ml_fit_and_transform(stage, x)
 }

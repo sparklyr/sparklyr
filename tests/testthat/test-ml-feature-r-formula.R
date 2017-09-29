@@ -20,8 +20,15 @@ test_that("r formula works as expected", {
     select(features, label) %>%
     collect()
 
+  df3 <- iris_tbl %>%
+    ft_r_formula(., "Sepal_Length ~ Petal_Width + Species", dataset = .) %>%
+    select(features, label) %>%
+    collect()
+
   expect_equal(pull(df1, features), pull(df2, features))
+  expect_equal(pull(df1, features), pull(df3, features))
   expect_equal(pull(df1, label), pull(df2, label))
+  expect_equal(pull(df1, label), pull(df3, label))
 
   rf <- ft_r_formula(
     sc, "Sepal_Length ~ Petal_Width + Species", features_col = "x",

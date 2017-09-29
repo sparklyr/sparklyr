@@ -11,7 +11,13 @@ test_that("ft_count_vectorizer() works", {
     ft_count_vectorizer("words", "features") %>%
     pull(features)
 
+  counts2 <- df_tbl %>%
+    ft_tokenizer("text", "words") %>%
+    ft_count_vectorizer(., "words", "features", dataset = .) %>%
+    pull(features)
+
   expect_identical(counts, list(c(1, 1, 1), c(3, 2, 1)))
+  expect_identical(counts2, list(c(1, 1, 1), c(3, 2, 1)))
 
   # correct classes
   expect_identical(class(ft_count_vectorizer(sc, "words", "features"))[1],
@@ -48,12 +54,16 @@ test_that("ft_quantile_discretizer works", {
                    hour = c(18, 19, 8, 5, 2))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
-  expect_identical(df_tbl %>%
-                     ft_quantile_discretizer("hour", "result", num_buckets = 3) %>%
-                     pull(result),
-                   c(2, 2, 1, 1, 0)
-  )
+  result <- df_tbl %>%
+    ft_quantile_discretizer("hour", "result", num_buckets = 3) %>%
+    pull(result)
 
+  result2 <- df_tbl %>%
+    ft_quantile_discretizer(., "hour", "result", num_buckets = 3, dataset = .) %>%
+    pull(result)
+
+  expect_identical(result, c(2, 2, 1, 1, 0))
+  expect_identical(result2, c(2, 2, 1, 1, 0))
 
   qd <- ft_quantile_discretizer(
     sc, "hour", "result", handle_invalid = "skip",
