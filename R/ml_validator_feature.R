@@ -118,3 +118,13 @@ ml_validator_regex_tokenizer <- function(args, nms) {
     }), nms, input_output_mapping
   )
 }
+
+# StopWordsRemover
+ml_validator_stop_words_remover <- function(args, nms) {
+  ml_extract_specified_args(
+    within(args, {
+      case_sensitive <- ensure_scalar_boolean(case_sensitive)
+      stop_words <- lapply(stop_words, ensure_scalar_character)
+    }), nms, input_output_mapping
+  )
+}

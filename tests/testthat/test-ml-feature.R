@@ -126,36 +126,59 @@ sc <- testthat_spark_connection()
 #   expect_identical(s2, c("wow", "cool", "wow", "wow"))
 # })
 #
-test_that("ft_elementwise_product() works", {
-  df <- data.frame(a = 1, b = 3, c = 5)
-  df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
+# test_that("ft_elementwise_product() works", {
+#   df <- data.frame(a = 1, b = 3, c = 5)
+#   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
+#
+#   nums <- df_tbl %>%
+#     ft_vector_assembler(list("a", "b", "c"), output_col = "features") %>%
+#     ft_elementwise_product("features", "multiplied", c(2, 4, 6)) %>%
+#     dplyr::pull(multiplied) %>%
+#     rlang::flatten_dbl()
+#
+#   expect_identical(nums,
+#                    c(1, 3, 5) * c(2, 4, 6))
+#
+# })
+#
+# test_that("ft_regex_tokenizer() works", {
+#   test_requires("dplyr")
+#   sentence_df <- data_frame(
+#     id = c(0, 1, 2),
+#     sentence = c("Hi I heard about Spark",
+#                  "I wish Java could use case classes",
+#                  "Logistic,regression,models,are,neat")
+#   )
+#   sentence_tbl <- testthat_tbl("sentence_df")
+#
+#   expect_identical(
+#     sentence_tbl %>%
+#       ft_regex_tokenizer("sentence", "words", pattern = "\\W") %>%
+#       collect() %>%
+#       mutate(words = sapply(words, length)) %>%
+#       pull(words),
+#     c(5L, 7L, 5L))
+# })
 
-  nums <- df_tbl %>%
-    ft_vector_assembler(list("a", "b", "c"), output_col = "features") %>%
-    ft_elementwise_product("features", "multiplied", c(2, 4, 6)) %>%
-    dplyr::pull(multiplied) %>%
-    rlang::flatten_dbl()
-
-  expect_identical(nums,
-                   c(1, 3, 5) * c(2, 4, 6))
-
-})
-
-test_that("ft_regex_tokenizer() works", {
+test_that("ft_stop_words_remover() works", {
   test_requires("dplyr")
-  sentence_df <- data_frame(
-    id = c(0, 1, 2),
-    sentence = c("Hi I heard about Spark",
-                 "I wish Java could use case classes",
-                 "Logistic,regression,models,are,neat")
-  )
-  sentence_tbl <- testthat_tbl("sentence_df")
+  df <- data_frame(id = c(0, 1),
+                   raw = c("I saw the red balloon", "Mary had a little lamb"))
+  df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
   expect_identical(
-    sentence_tbl %>%
-      ft_regex_tokenizer("sentence", "words", pattern = "\\W") %>%
-      collect() %>%
-      mutate(words = sapply(words, length)) %>%
-      pull(words),
-    c(5L, 7L, 5L))
+    df_tbl %>%
+      ft_tokenizer("raw", "words") %>%
+      ft_stop_words_remover("words", "filtered") %>%
+      pull(filtered),
+    list(list("saw", "red", "balloon"), list("mary", "little", "lamb"))
+  )
+
+  expect_identical(
+    df_tbl %>%
+      ft_tokenizer("raw", "words") %>%
+      ft_stop_words_remover("words", "filtered", stop_words = list("I", "Mary", "lamb")) %>%
+      pull(filtered),
+    list(list("saw", "the", "red", "balloon"), list("had", "a", "little"))
+  )
 })

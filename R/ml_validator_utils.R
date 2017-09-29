@@ -37,16 +37,26 @@ ml_validate_args <- function(env = rlang::caller_env(2)) {
   validator_fn <- caller_frame$fn_name %>%
     (function(x) gsub("^(ml_|ft_)", "ml_validator_", x)) %>%
     (function(x) gsub("\\..*$", "", x))
-  args <- caller_frame$expr %>%
+
+  # args <- caller_frame$expr %>%
+  #   rlang::lang_standardise() %>%
+  #   rlang::lang_args() %>%
+  #   # evaluate in calling environment of public function
+  #   lapply(rlang::eval_tidy, env = env)
+
+  args <- caller_frame %>%
     rlang::lang_standardise() %>%
     rlang::lang_args() %>%
-    # evaluate in calling environment of public function
-    lapply(rlang::eval_tidy, env = env)
+    lapply(rlang::new_quosure, env = caller_frame$env) %>%
+    lapply(rlang::eval_tidy)
+
   # filter out args without defaults
   default_args <- Filter(Negate(rlang::is_symbol),
                          rlang::fn_fmls(caller_frame$fn)) %>%
+    lapply(rlang::new_quosure, env = caller_frame$env) %>%
+    lapply(rlang::eval_tidy)
     # evaluate default args in package namespace
-    lapply(rlang::eval_tidy, env = rlang::ns_env("sparklyr"))
+    # lapply(rlang::eval_tidy, env = rlang::ns_env("sparklyr"))
 
   args_to_validate <- ml_args_to_validate(args, default_args)
 

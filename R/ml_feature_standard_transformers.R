@@ -379,3 +379,70 @@ ft_regex_tokenizer.tbl_spark <- function(
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
+
+# StopWordsRemover
+
+#' @export
+ft_default_stop_words <- function(
+  sc, language = c("danish", "dutch", "english", "finnish",
+                   "french", "german", "hungarian", "italian",
+                   "norwegian", "portuguese", "russian", "spanish",
+                   "swedish", "turkish"), ...) {
+  language <- rlang::arg_match(language)
+  invoke_static(sc, "org.apache.spark.ml.feature.StopWordsRemover",
+                "loadDefaultStopWords", language)
+}
+
+#' @export
+ft_stop_words_remover <- function(
+  x, input_col, output_col, case_sensitive = FALSE,
+  stop_words = ft_default_stop_words(spark_connection(x), "english"),
+  uid = random_string("stop_words_remover_"), ...) {
+  UseMethod("ft_stop_words_remover")
+}
+
+#' @export
+ft_stop_words_remover.spark_connection <- function(
+  x, input_col, output_col, case_sensitive = FALSE,
+  stop_words = ft_default_stop_words(spark_connection(x), "english"),
+  uid = random_string("stop_words_remover_"), ...) {
+
+  ml_validate_args()
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.StopWordsRemover",
+                             input_col, output_col, uid) %>%
+    invoke("setCaseSensitive", case_sensitive) %>%
+    invoke("setStopWords", stop_words)
+
+  new_ml_transformer(jobj)
+}
+
+#' @export
+ft_stop_words_remover.ml_pipeline <- function(
+  x, input_col, output_col, case_sensitive = FALSE,
+  stop_words = ft_default_stop_words(spark_connection(x), "english"),
+  uid = random_string("stop_words_remover_"), ...) {
+
+  transformer <- ml_new_stage_modified_args()
+  ml_add_stage(x, transformer)
+}
+
+#' @export
+ft_stop_words_remover.tbl_spark <- function(
+  x, input_col, output_col, case_sensitive = FALSE,
+  stop_words = ft_default_stop_words(spark_connection(x), "english"),
+  uid = random_string("stop_words_remover_"), ...) {
+
+  transformer <- ml_new_stage_modified_args()
+  # args <-rlang::lang_standardise() %>%
+  #   rlang::lang_args()
+  #   # rlang::modify(x = rlang::new_quosure(
+  #   #   rlang::parse_expr("spark_connection(x)"),
+  #   #   env = caller_frame$env))
+  # stage_constructor <- sub("\\..*$", "", rlang::call_frame()$fn_name)
+  # rlang::eval_tidy(rlang::lang(stage_constructor, rlang::splice(args)),
+  #                  data = list(x = quo(spark_connection(x))),
+  #                  env = envir)
+  #
+  # )
+  ml_transform(transformer, x)
+}
