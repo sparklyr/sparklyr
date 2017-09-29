@@ -49,6 +49,21 @@ test_that("ft_count_vectorizer() works", {
   )
 })
 
+test_that("ft_string_indexer works", {
+  si <- ft_string_indexer(
+    sc, "in", "out", handle_invalid = "skip"
+  )
+
+  expect_equal(ml_get_params(si, list(
+    "input_col", "output_col", "handle_invalid"
+  )),
+  list(input_col = "in",
+       output_col = "out",
+       handle_invalid = "skip"))
+
+  expect_true(is_ml_estimator(si))
+})
+
 test_that("ft_quantile_discretizer works", {
   df <- data_frame(id = 0:4L,
                    hour = c(18, 19, 8, 5, 2))
