@@ -41,8 +41,8 @@ test_that("we can create nested pipelines", {
   p0 <- ml_pipeline(sc)
   tokenizer <- ft_tokenizer(sc, "x", "y")
   pipeline <- ml_pipeline(p0, tokenizer)
-  expect_equal(class(pipeline$stages[[1]])[1], "ml_pipeline")
-  expect_equal(pipeline$stages[[1]]$stages, NA)
+  expect_equal(class(ml_stage(pipeline, 1))[1], "ml_pipeline")
+  expect_equal(ml_stage(pipeline, 1) %>% ml_stages(), NA)
 })
 
 test_that("ml_transformer.ml_pipeline() works as expected", {
@@ -109,4 +109,14 @@ test_that("ml_stage() and ml_stages() work properly", {
   expect_equal(ml_stages(pipeline) %>%
                  sapply(ml_uid),
                c("tok1", "tok2", "bin1"))
+
+  expect_equal(ml_stage(pipeline, 1) %>%
+                 ml_uid(),
+               "tok1")
+  expect_equal(ml_stages(pipeline, 1) %>%
+                 sapply(ml_uid),
+               "tok1")
+  expect_equal(ml_stages(pipeline, 1:2) %>%
+                 sapply(ml_uid),
+               c("tok1", "tok2"))
 })

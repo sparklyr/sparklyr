@@ -103,7 +103,11 @@ ml_uid <- function(x) {
 
 #' @export
 ml_stage <- function(x, stage) {
-  matched_index <- grep(paste0("^", stage), x$stage_uids)
+  matched_index <- if (is.numeric(stage))
+    stage
+  else
+    grep(paste0("^", stage), x$stage_uids)
+
   switch(length(matched_index) %>% as.character(),
          "0" = stop("stage not found"),
          "1" = x$stages[[matched_index]],
@@ -116,8 +120,13 @@ ml_stages <- function(x, stages = NULL) {
   if (rlang::is_null(stages)) {
     x$stages
   } else {
-    matched_indexes <- lapply(stages, function(stage) grep(paste0("^", stage), x$stage_uids)) %>%
-      rlang::set_names(stages)
+    matched_indexes <- if (is.numeric(stages))
+    {
+      stages
+    } else {
+      lapply(stages, function(stage) grep(paste0("^", stage), x$stage_uids)) %>%
+        rlang::set_names(stages)
+    }
 
     bad_matches <- Filter(function(idx) length(idx) != 1, matched_indexes)
 
