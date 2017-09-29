@@ -131,15 +131,17 @@ new_ml_logistic_regression <- function(jobj) {
 }
 
 new_ml_logistic_regression_model <- function(jobj) {
-  summary = if (invoke(jobj, "hasSummary"))
+  summary <- if (invoke(jobj, "hasSummary"))
     new_ml_summary_logistic_regression_model(invoke(jobj, "summary"))
   else NA
 
+  is_multinomial <- invoke(jobj, "numClasses") > 2
+
   new_ml_prediction_model(
     jobj,
-    coefficients = read_spark_vector(jobj, "coefficients"),
+    coefficients = if (is_multinomial) NA else read_spark_vector(jobj, "coefficients"),
     coefficient_matrix = read_spark_matrix(jobj, "coefficientMatrix"),
-    intercept = invoke(jobj, "intercept"),
+    intercept = if (is_multinomial) NA else invoke(jobj, "intercept"),
     intercept_vector = read_spark_vector(jobj, "interceptVector"),
     num_classes = invoke(jobj, "numClasses"),
     num_features = invoke(jobj, "numFeatures"),
@@ -182,24 +184,18 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
   sc <- spark_connection(model)
 
   features_col <- ml_param(model, "features_col")
+  label_col <- ml_param(model, "label_col")
 
-  transformed_sdf <- pipeline_model %>%
-    ml_transform(dataset) %>%
-    spark_dataframe()
+  transformed_tbl <- pipeline_model %>%
+    ml_transform(dataset)
 
-  feature_names <- transformed_sdf %>%
-    invoke("schema") %>%
-    invoke("apply", transformed_sdf %>%
-             invoke("schema") %>%
-             invoke("fieldIndex", features_col) %>%
-             ensure_scalar_integer()) %>%
-    invoke("metadata") %>%
-    invoke("json") %>%
-    jsonlite::fromJSON() %>%
-    `[[`("ml_attr") %>%
+  feature_names <- ml_column_metadata(transformed_tbl, features_col) %>%
     `[[`("attrs") %>%
     `[[`("numeric") %>%
     dplyr::pull("name")
+
+  index_labels <- ml_column_metadata(transformed_tbl, label_col) %>%
+    `[[`("vals")
 
   # multinomial vs. binomial models have separate APIs for
   # retrieving results
@@ -240,6 +236,7 @@ new_ml_model_logistic_regression <- function(pipeline, pipeline_model, model_uid
   new_ml_model_classification(
     pipeline, pipeline_model, model_uid, formula, dataset,
     coefficients = coefficients,
+    .index_labels = index_labels,
     summary = summary,
     subclass = "ml_model_logistic_regression",
     .call = call
@@ -304,6 +301,17 @@ summary.ml_model_logistic_regression <- function(object, ...) {
   print_newline()
 }
 
+#' @export
+predict.ml_model_classification <- function(object,
+                             newdata = ml_model_data(object),
+                             ...)
+{
+  object$pipeline_model %>%
+    ml_transform(newdata) %>%
+    ft_index_to_string("prediction", "prediction_labels",
+                       labels = object$.index_labels) %>%
+    sdf_read_column("prediction_labels")
+}
 
 #' Spark ML -- Logistic Regression
 #'

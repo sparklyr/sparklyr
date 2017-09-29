@@ -162,3 +162,17 @@ ml_is_set.spark_jobj <- function(x, param) {
   x %>%
     invoke("isSet", param_jobj)
 }
+
+ml_column_metadata <- function(tbl, column) {
+  sdf <- spark_dataframe(tbl)
+  sdf %>%
+    invoke("schema") %>%
+    invoke("apply", sdf %>%
+             invoke("schema") %>%
+             invoke("fieldIndex", column) %>%
+             ensure_scalar_integer()) %>%
+    invoke("metadata") %>%
+    invoke("json") %>%
+    jsonlite::fromJSON() %>%
+    `[[`("ml_attr")
+}
