@@ -1,5 +1,13 @@
 # Tokenizer
 
+#' Feature Tranformation -- Tokenizer
+#'
+#' A tokenizer that converts the input string to lowercase and then splits it
+#' by white spaces.
+#'
+#' @template roxlate-ml-feature-input-output-col
+#' @template roxlate-ml-feature-transformer
+#'
 #' @export
 ft_tokenizer <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
   UseMethod("ft_tokenizer")
@@ -337,6 +345,7 @@ ft_elementwise_product.tbl_spark <- function(
 }
 
 # RegexTokenizer
+
 
 #' @export
 ft_regex_tokenizer <- function(
