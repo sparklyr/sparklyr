@@ -56,7 +56,7 @@ object Sources {
     "}\n" +
     "\n" +
     "readDateArray <- function(con, n = 1) {\n" +
-    "  as.Date(readTime(con, n = 1))\n" +
+    "  as.Date(readTime(con, n))\n" +
     "}\n" +
     "\n" +
     "readInt <- function(con, n = 1) {\n" +
@@ -85,7 +85,8 @@ object Sources {
     "\n" +
     "  r <- as.POSIXct(t, origin = \"1970-01-01\", tz = \"UTC\")\n" +
     "  if (getOption(\"sparklyr.collect.datechars\", FALSE)) as.character(r) else {\n" +
-    "    if (r == timeNA) as.POSIXct(NA) else r\n" +
+    "    r[r == timeNA] <- as.POSIXct(NA)\n" +
+    "    r\n" +
     "  }\n" +
     "}\n" +
     "\n" +
