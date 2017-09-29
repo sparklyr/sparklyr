@@ -29,9 +29,9 @@ test_that("ml_save_pipeline()/ml_load_pipeline() work for unnested pipelines", {
 
 
   p1_params <- p1$stages %>%
-    lapply(function(x) x$param_map)
+    lapply(ml_param_map)
   p2_params <- p2$stages %>%
-    lapply(function(x) x$param_map)
+    lapply(ml_param_map)
 
   expect_equal(p1$uid, p2$uid)
   expect_equal(p1_params, p2_params)
@@ -45,10 +45,10 @@ test_that("ml_save_pipeline()/ml_load_pipeline() work for nested pipeline", {
   ml_save_pipeline(p1, path)
   p2 <- ml_load_pipeline(sc, path)
 
-  p1_tok_params <- p1$stages[[1]]$stages[[1]]$param_map
-  p2_tok_params <- p2$stages[[1]]$stages[[1]]$param_map
-  p1_bin_params <- p1$stages[[2]]$param_map
-  p2_bin_params <- p2$stages[[2]]$param_map
+  p1_tok_params <- p1$stages[[1]]$stages[[1]] %>% ml_param_map()
+  p2_tok_params <- p2$stages[[1]]$stages[[1]] %>% ml_param_map()
+  p1_bin_params <- p1$stages[[2]] %>% ml_param_map()
+  p2_bin_params <- p2$stages[[2]] %>% ml_param_map()
 
   expect_equal(p1$uid, p2$uid)
   expect_equal(p1_tok_params, p2_tok_params)

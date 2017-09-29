@@ -31,7 +31,7 @@ iris_weighted_tbl <- testthat_tbl("iris_weighted")
 test_that("ml_logistic_regression interprets params apporpriately", {
   lr <- ml_logistic_regression(sc, intercept = TRUE, elastic_net_param = 0)
   expected_params <- list(intercept = TRUE, elastic_net_param = 0)
-  params <- lr$param_map
+  params <- ml_param_map(lr)
   expect_equal(setdiff(expected_params, params), list())
 })
 
@@ -44,7 +44,8 @@ test_that("ml_logistic_regression.spark_connect() returns object with correct cl
 test_that("ml_logistic_regression() does input checking", {
   expect_error(ml_logistic_regression(sc, elastic_net_param = "foo"),
                "length-one numeric vector")
-  expect_equal(ml_logistic_regression(sc, max_iter = 25)$param_map$max_iter,
+  expect_equal(ml_logistic_regression(sc, max_iter = 25) %>%
+                 ml_get_param("max_iter"),
                25L)
 })
 

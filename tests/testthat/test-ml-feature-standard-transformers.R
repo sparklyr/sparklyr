@@ -15,7 +15,7 @@ test_that("We can instantiate tokenizer object", {
 test_that("ft_tokenizer() returns params of transformer", {
   tokenizer <- ft_tokenizer(sc, "x", "y")
   expected_params <- list("x", "y")
-  expect_true(dplyr::setequal(tokenizer$param_map, expected_params))
+  expect_true(dplyr::setequal(ml_param_map(tokenizer), expected_params))
 })
 
 test_that("ft_tokenizer.tbl_spark() works as expected", {
@@ -47,7 +47,7 @@ test_that("ft_tokenizer.tbl_spark() works as expected", {
 test_that("ft_binarizer() returns params of transformer", {
   binarizer <- ft_binarizer(sc, "x", "y", threshold = 0.5)
   params <- list("x", "y", threshold = 0.5)
-  expect_true(dplyr::setequal(binarizer$param_map, params))
+  expect_true(dplyr::setequal(ml_param_map(binarizer), params))
 })
 
 test_that("ft_binarizer.tbl_spark() works as expected", {
@@ -64,12 +64,15 @@ test_that("ft_binarizer.tbl_spark() works as expected", {
 })
 
 test_that("ft_binarizer() threshold defaults to 0", {
-  expect_identical(ft_binarizer(sc, "in", "out")$param_map$threshold,
+  expect_identical(ft_binarizer(sc, "in", "out") %>%
+                     ml_get_param("threshold"),
                    0)
 })
 
 test_that("ft_binarizer() input checking works", {
-  expect_identical(class(ft_binarizer(sc, "in", "out", 1L)$param_map$threshold),
+  expect_identical(ft_binarizer(sc, "in", "out", 1L) %>%
+                     ml_get_param("threshold") %>%
+                     class(),
                    "numeric")
   expect_error(ft_binarizer(sc, "in", "out", "foo"),
                "length-one numeric vector")
@@ -82,7 +85,9 @@ test_that("ft_binarizer() input checking works", {
 # HashingTF
 
 test_that("ft_hashing_tf() works", {
-  expect_identical(class(ft_hashing_tf(sc, "in", "out", num_features = 25)$param_map$num_features),
+  expect_identical(ft_hashing_tf(sc, "in", "out", num_features = 25) %>%
+                     ml_get_param("num_features") %>%
+                     class(),
                    "integer")
   expect_error(ft_hashing_tf(sc, "in", "out", binary = 1),
                "length-one logical vector")

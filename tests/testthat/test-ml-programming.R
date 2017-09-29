@@ -42,7 +42,7 @@ test_that("one can program with ft_ function (.spark_connection)", {
 
   for (binarizer in list(bin1, bin2, bin3))
     expect_identical(
-      binarizer$param_map,
+      ml_param_map(binarizer),
       list(
         output_col = "is_big",
         threshold = 0.3,

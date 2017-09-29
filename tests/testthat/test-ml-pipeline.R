@@ -56,9 +56,9 @@ test_that("ml_transformer.ml_pipeline() works as expected", {
     ft_binarizer("in", "out", 0.5)
 
   p1_params <- p1$stages %>%
-    lapply(function(x) x$param_map)
+    lapply(ml_param_map)
   p2_params <- p2$stages %>%
-    lapply(function(x) x$param_map)
+    lapply(ml_param_map)
   expect_equal(p1_params, p2_params)
   expect_equal(class(p2)[1], "ml_pipeline")
 })
