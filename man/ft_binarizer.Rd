@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_binarizer}
 \alias{ft_binarizer}
-\title{Feature Transformation -- Binarizer}
+\title{Feature Transformation -- Binarizer (Transformer)}
 \usage{
 ft_binarizer(x, input_col, output_col, threshold = 0,
   uid = random_string("binarizer_"), ...)

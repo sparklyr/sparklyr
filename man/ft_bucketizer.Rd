@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_bucketizer}
 \alias{ft_bucketizer}
-\title{Feature Transformation -- Bucketizer}
+\title{Feature Transformation -- Bucketizer (Transformer)}
 \usage{
 ft_bucketizer(x, input_col, output_col, splits, handle_invalid = "error",
   uid = random_string("bucketizer_"), ...)

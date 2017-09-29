@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_tokenizer}
 \alias{ft_tokenizer}
-\title{Feature Tranformation -- Tokenizer}
+\title{Feature Tranformation -- Tokenizer (Transformer)}
 \usage{
 ft_tokenizer(x, input_col, output_col, uid = random_string("tokenizer_"), ...)
 }

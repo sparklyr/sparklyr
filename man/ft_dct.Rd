@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_dct}
 \alias{ft_dct}
-\title{Feature Transformation -- Discrete Cosine Transform (DCT)}
+\title{Feature Transformation -- Discrete Cosine Transform (DCT) (Transformer)}
 \usage{
 ft_dct(x, input_col, output_col, inverse = FALSE,
   uid = random_string("dct_"), ...)

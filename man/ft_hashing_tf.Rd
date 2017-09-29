@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_hashing_tf}
 \alias{ft_hashing_tf}
-\title{Feature Transformation -- HashingTF}
+\title{Feature Transformation -- HashingTF (Transformer)}
 \usage{
 ft_hashing_tf(x, input_col, output_col, binary = FALSE, num_features = 2^18,
   uid = random_string("hashing_tf_"), ...)

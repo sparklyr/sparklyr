@@ -26,5 +26,5 @@ Supported languages: danish, dutch, english, finnish, french,
   for more details
 }
 \seealso{
-ft_stop_words_remover
+\code{\link{ft_stop_words_remover}}
 }

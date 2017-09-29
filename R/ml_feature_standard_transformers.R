@@ -1,4 +1,4 @@
-#' Feature Tranformation -- Tokenizer
+#' Feature Tranformation -- Tokenizer (Transformer)
 #'
 #' A tokenizer that converts the input string to lowercase and then splits it
 #' by white spaces.
@@ -34,7 +34,7 @@ ft_tokenizer.tbl_spark <- function(x, input_col, output_col, uid = random_string
   ml_transform(transformer, x)
 }
 
-#' Feature Transformation -- Binarizer
+#' Feature Transformation -- Binarizer (Transformer)
 #'
 #' Apply thresholding to a column, such that values less than or equal to the
 #' \code{threshold} are assigned the value 0.0, and values greater than the
@@ -77,7 +77,7 @@ ft_binarizer.tbl_spark <- function(x, input_col, output_col, threshold = 0,
   ml_transform(transformer, x)
 }
 
-#' Feature Transformation -- HashingTF
+#' Feature Transformation -- HashingTF (Transformer)
 #'
 #' Maps a sequence of terms to their term frequencies using the hashing trick.
 #'
@@ -123,7 +123,7 @@ ft_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
 
 }
 
-#' Feature Transformation -- OneHotEncoder
+#' Feature Transformation -- OneHotEncoder (Transformer)
 #'
 #' One-hot encoding maps a column of label indices to a column of binary
 #' vectors, with at most a single one-value. This encoding allows algorithms
@@ -174,7 +174,7 @@ ft_one_hot_encoder.tbl_spark <- function(
   ml_transform(transformer, x)
 }
 
-#' Feature Transformation -- VectorAssembler
+#' Feature Transformation -- VectorAssembler (Transformer)
 #'
 #' Combine multiple vectors into a single row-vector; that is,
 #' where each row element of the newly generated column is a
@@ -224,7 +224,7 @@ ft_vector_assembler.tbl_spark <- function(
   ml_transform(transformer, x)
 }
 
-#' Feature Transformation -- Discrete Cosine Transform (DCT)
+#' Feature Transformation -- Discrete Cosine Transform (DCT) (Transformer)
 #'
 #' A feature transformer that takes the 1D discrete cosine transform of a real
 #'   vector. No zero padding is performed on the input vector. It returns a real
@@ -269,7 +269,7 @@ ft_discrete_cosine_transform <- ft_dct
 
 # IndexToString
 
-#' Feature Transformation -- IndexToString
+#' Feature Transformation -- IndexToString (Transformer)
 #'
 #' A Transformer that maps a column of indices back to a new column of
 #'   corresponding string values. The index-string mapping is either from
@@ -319,7 +319,7 @@ ft_index_to_string.tbl_spark <- function(
   ml_transform(transformer, x)
 }
 
-#' Feature Transformation -- Bucketizer
+#' Feature Transformation -- Bucketizer (Transformer)
 #'
 #' Similar to \R's \code{\link{cut}} function, this transforms a numeric column
 #' into a discretized column, with breaks specified through the \code{splits}
@@ -369,7 +369,7 @@ ft_bucketizer.tbl_spark <- function(
   ml_transform(transformer, x)
 }
 
-#' Feature Transformation -- ElementwiseProduct
+#' Feature Transformation -- ElementwiseProduct (Transformer)
 #'
 #' Outputs the Hadamard product (i.e., the element-wise product) of each input vector
 #'   with a provided "weight" vector. In other words, it scales each column of the
@@ -421,7 +421,7 @@ ft_elementwise_product.tbl_spark <- function(
   ml_transform(transformer, x)
 }
 
-#' Feature Tranformation -- RegexTokenizer
+#' Feature Tranformation -- RegexTokenizer (Transformer)
 #'
 #' A regex based tokenizer that extracts tokens either by using the provided
 #' regex pattern to split the text (default) or repeatedly matching the regex
@@ -494,7 +494,7 @@ ft_regex_tokenizer.tbl_spark <- function(
 #'
 #' @return A list of stop words.
 #'
-#' @seealso ft_stop_words_remover
+#' @seealso \code{\link{ft_stop_words_remover}}
 #' @export
 ml_default_stop_words <- function(
   sc, language = c("danish", "dutch", "english", "finnish",
@@ -506,7 +506,7 @@ ml_default_stop_words <- function(
                 "loadDefaultStopWords", language)
 }
 
-#' Feature Tranformation -- StopWordsRemover
+#' Feature Tranformation -- StopWordsRemover (Transformer)
 #'
 #' A feature transformer that filters out stop words from input.
 #'
@@ -516,7 +516,7 @@ ml_default_stop_words <- function(
 #' @param case_sensitive Whether to do a case sensitive comparison over the stop words.
 #' @param stop_words The words to be filtered out.
 #'
-#' @seealso ml_default_stop_words
+#' @seealso \code{\link{ml_default_stop_words}}
 #'
 #' @export
 ft_stop_words_remover <- function(

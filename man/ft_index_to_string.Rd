@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_index_to_string}
 \alias{ft_index_to_string}
-\title{Feature Transformation -- IndexToString}
+\title{Feature Transformation -- IndexToString (Transformer)}
 \usage{
 ft_index_to_string(x, input_col, output_col, labels = NULL,
   uid = random_string("index_to_string_"), ...)

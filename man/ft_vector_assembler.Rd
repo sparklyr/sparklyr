@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_vector_assembler}
 \alias{ft_vector_assembler}
-\title{Feature Transformation -- VectorAssembler}
+\title{Feature Transformation -- VectorAssembler (Transformer)}
 \usage{
 ft_vector_assembler(x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...)

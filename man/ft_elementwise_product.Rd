@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_elementwise_product}
 \alias{ft_elementwise_product}
-\title{Feature Transformation -- ElementwiseProduct}
+\title{Feature Transformation -- ElementwiseProduct (Transformer)}
 \usage{
 ft_elementwise_product(x, input_col, output_col, scaling_vec,
   uid = random_string("elementwise_product_"), ...)

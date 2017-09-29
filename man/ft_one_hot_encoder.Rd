@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_one_hot_encoder}
 \alias{ft_one_hot_encoder}
-\title{Feature Transformation -- OneHotEncoder}
+\title{Feature Transformation -- OneHotEncoder (Transformer)}
 \usage{
 ft_one_hot_encoder(x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...)
