@@ -69,7 +69,7 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   formula <- if (is.null(args$formula) && !is.null(args$response)) {
     # if 'formula' isn't specified but 'response' is...
     if (rlang::is_formula(args$response)) {
-      # if 'response' is a formula, warn is 'features' is also specified
+      # if 'response' is a formula, warn if 'features' is also specified
       if (!is.null(args$features)) warning("'features' is ignored when a formula is specified")
       # convert formula to string
       rlang::expr_text(args$response, width = 500L)
