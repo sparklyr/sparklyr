@@ -264,3 +264,22 @@ ml_cross_validator.spark_connection <- function(x, estimator, estimator_param_ma
 
   new_ml_cross_validator(jobj)
 }
+
+# Constructors
+#
+new_ml_cross_validator <- function(jobj) {
+  sc <- spark_connection(jobj)
+  param_maps <- jobj %>%
+    invoke("getEstimatorParamMaps") %>%
+    lapply(function(x)
+      invoke_static(sc,
+                    "sparklyr.MLUtils",
+                    "paramMapToNestedList",
+                    x)) %>%
+    lapply(function(x)
+      lapply(x, ml_map_param_list_names))
+
+  new_ml_estimator(jobj,
+                   estimator_param_maps = param_maps,
+                   subclass = "ml_cross_validator")
+}

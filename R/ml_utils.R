@@ -200,3 +200,9 @@ read_spark_matrix <- function(jobj, field) {
   data <- invoke(object, "toArray")
   matrix(data, nrow = nrow, ncol = ncol)
 }
+
+ml_short_type <- function(x) {
+  strsplit(x$type, "\\.") %>%
+    rlang::flatten_chr() %>%
+    dplyr::last()
+}
