@@ -10,9 +10,8 @@ ml_model_print_call <- function(model) {
 ml_model_print_residuals <- function(model,
                                      residuals.header = "Residuals") {
 
-  residuals <- model$.model %>%
-    invoke("summary") %>%
-    invoke("residuals")
+  residuals <- model$summary$residuals %>%
+    spark_dataframe()
 
   # randomly sample residuals and produce quantiles based on
   # sample to avoid slowness in Spark's 'percentile_approx()'
