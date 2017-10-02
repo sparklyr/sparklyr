@@ -68,16 +68,6 @@ new_ml_estimator <- function(jobj, ..., subclass = NULL) {
                         subclass = c(subclass, "ml_estimator"))
 }
 
-new_ml_count_vectorizer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_count_vectorizer")
-}
-
-new_ml_count_vectorizer_model <- function(jobj) {
-  new_ml_transformer(jobj,
-                   vocabulary = invoke(jobj, "vocabulary"),
-                   subclass = "ml_count_vectorizer_model")
-}
-
 new_ml_predictor <- function(jobj, ..., subclass = NULL) {
   new_ml_estimator(jobj,
                    ...,
