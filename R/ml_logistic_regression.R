@@ -3,7 +3,7 @@ ml_logistic_regression <- function(
   x,
   features_col = "features",
   label_col = "label",
-  family = c("auto", "binomial", "multinomial"),
+  family = "auto",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -14,7 +14,10 @@ ml_logistic_regression <- function(
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  uid = random_string("logistic_regression_"), ...
+  uid = random_string("logistic_regression_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...
 ) {
   UseMethod("ml_logistic_regression")
 }
@@ -24,7 +27,7 @@ ml_logistic_regression.spark_connection <- function(
   x,
   features_col = "features",
   label_col = "label",
-  family = c("auto", "binomial", "multinomial"),
+  family = "auto",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -35,20 +38,30 @@ ml_logistic_regression.spark_connection <- function(
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  uid = random_string("logistic_regression_"), ...) {
+  uid = random_string("logistic_regression_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...) {
 
   ml_validate_args()
 
   jobj <- ml_new_classifier(
     x, "org.apache.spark.ml.classification.LogisticRegression", uid,
-    label_col, prediction_col, probability_col, raw_prediction_col
+    features_col = features_col, label_col = label_col,
+    prediction_col = prediction_col, probability_col = probability_col,
+    raw_prediction_col = raw_prediction_col
   ) %>%
-    invoke("setElasticNetParam", elastic_net_param) %>%
+    invoke("setFamily", family) %>%
     invoke("setFitIntercept", fit_intercept) %>%
+    invoke("setElasticNetParam", elastic_net_param) %>%
     invoke("setRegParam", reg_param) %>%
-    invoke("setMaxIter", max_iter)
+    invoke("setMaxIter", max_iter) %>%
+    invoke("setThreshold", threshold)
 
-  if (!is.null(weight_col))
+  if (!rlang::is_null(thresholds))
+    jobj <- invoke(jobj, "setThresholds", thresholds)
+
+  if (!rlang::is_null(weight_col))
     jobj <- invoke(jobj, "setWeightCol", weight_col)
 
   new_ml_logistic_regression(jobj)
@@ -59,7 +72,7 @@ ml_logistic_regression.ml_pipeline <- function(
   x,
   features_col = "features",
   label_col = "label",
-  family = c("auto", "binomial", "multinomial"),
+  family = "auto",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -70,7 +83,10 @@ ml_logistic_regression.ml_pipeline <- function(
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  uid = random_string("logistic_regression_"), ...) {
+  uid = random_string("logistic_regression_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -84,7 +100,7 @@ ml_logistic_regression.tbl_spark <- function(
   features = NULL,
   features_col = "features",
   label_col = "label",
-  family = c("auto", "binomial", "multinomial"),
+  family = "auto",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -122,6 +138,33 @@ ml_logistic_regression.tbl_spark <- function(
       formula,
       dataset = x)
   }
+}
+
+# Validator
+
+ml_validator_logistic_regression <- function(args, nms) {
+  old_new_mapping <- list(
+    intercept = "fit_intercept",
+    alpha = "elastic_net_param",
+    lambda = "reg_param",
+    weights.column = "weight_col",
+    iter.max = "max_iter",
+    max.iter = "max_iter"
+  )
+
+  ml_apply_validation(
+    {
+      elastic_net_param <- ensure_scalar_double(elastic_net_param)
+      reg_param <- ensure_scalar_double(reg_param)
+      max_iter <- ensure_scalar_integer(max_iter)
+      family <- rlang::arg_match(family, c("auto", "binomial", "multinomial"))
+      fit_intercept <- ensure_scalar_boolean(fit_intercept)
+      threshold <- ensure_scalar_double(threshold)
+      if (!is.null(weight_col))
+        weight_col <- ensure_scalar_character(weight_col)
+    },
+    args, nms, old_new_mapping
+  )
 }
 
 # Constructors

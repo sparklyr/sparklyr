@@ -2,6 +2,43 @@ context("logistic regression")
 
 sc <- testthat_spark_connection()
 
+test_that("ml_logistic_regression parameter setting works", {
+  lr <- ml_logistic_regression(
+    sc,
+    elastic_net_param = 0.1,
+    family = "binomial",
+    features_col = "fcol",
+    fit_intercept = FALSE,
+    label_col = "lcol",
+    max_iter = 50L,
+    threshold = 0.4,
+    weight_col = "wcol",
+    prediction_col = "pcol",
+    probability_col = "probcol",
+    raw_prediction_col = "rpcol")
+
+  expect_equal(
+    ml_params(lr, list(
+      "elastic_net_param", "family", "features_col", "fit_intercept", "label_col",
+      "max_iter", "threshold", "weight_col", "prediction_col", "probability_col",
+      "raw_prediction_col"
+    )),
+    list(
+      elastic_net_param = 0.1,
+      family = "binomial",
+      features_col = "fcol",
+      fit_intercept = FALSE,
+      label_col = "lcol",
+      max_iter = 50L,
+      threshold = 0.4,
+      weight_col = "wcol",
+      prediction_col = "pcol",
+      probability_col = "probcol",
+      raw_prediction_col = "rpcol"
+    )
+  )
+})
+
 test_that("we can fit multinomial models", {
   test_requires("nnet", "dplyr")
 
