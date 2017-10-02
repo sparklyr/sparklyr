@@ -8,6 +8,7 @@ ml_is_instance_of <- function(jobj, type) {
 ml_ancestry <- function(jobj) {
   classes <- c("feature.CountVectorizer", "feature.CountVectorizerModel",
                "classification.LogisticRegression", "classification.LogisticRegressionModel",
+               "regression.LinearRegression", "regression.LinearRegressionModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
@@ -29,6 +30,8 @@ ml_constructor_dispatch <- function(jobj) {
          "feature.CountVectorizerModel" = new_ml_count_vectorizer_model(jobj),
          "classification.LogisticRegressionModel" = new_ml_logistic_regression_model(jobj),
          "classification.LogisticRegression" = new_ml_logistic_regression(jobj),
+         "regression.LinearRegression" = new_ml_linear_regression(jobj),
+         "regression.LinearRegressionModel" = new_ml_linear_regression_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),

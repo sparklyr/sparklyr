@@ -31,3 +31,11 @@ new_ml_model_classification <- function(pipeline, pipeline_model, model_uid, for
     ...,
     subclass = c(subclass, "ml_model_classification"))
 }
+
+new_ml_model_regression <- function(pipeline, pipeline_model, model_uid, formula, dataset, ..., subclass = NULL) {
+  new_ml_model_prediction(
+    pipeline, pipeline_model, model_uid, formula,
+    dataset = dataset,
+    ...,
+    subclass = c(subclass, "ml_model_regression"))
+}

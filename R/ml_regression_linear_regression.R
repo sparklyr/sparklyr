@@ -12,7 +12,10 @@ ml_linear_regression <- function(
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
-  uid = random_string("linear_regression_"), ...
+  uid = random_string("linear_regression_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...
 ) {
   UseMethod("ml_linear_regression")
 }
@@ -31,7 +34,10 @@ ml_linear_regression.spark_connection <- function(
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
-  uid = random_string("linear_regression_"), ...) {
+  uid = random_string("linear_regression_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...) {
 
   ml_validate_args()
 
@@ -67,10 +73,59 @@ ml_linear_regression.ml_pipeline <- function(
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
-  uid = random_string("linear_regression_"), ...) {
+  uid = random_string("linear_regression_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
+}
+
+#' @export
+ml_linear_regression.tbl_spark <- function(
+  x,
+  formula = NULL,
+  response = NULL,
+  features = NULL,
+  features_col = "features",
+  label_col = "label",
+  fit_intercept = TRUE,
+  elastic_net_param = 0,
+  reg_param = 0,
+  max_iter = 100L,
+  weight_col = NULL,
+  prediction_col = "prediction",
+  solver = "auto",
+  standardization = TRUE,
+  tol = 1e-6,
+  uid = random_string("linear_regression_"), ...) {
+
+  predictor <- ml_new_stage_modified_args()
+
+  ml_formula_transformation()
+
+  if (is.null(formula)) {
+    predictor %>%
+      ml_fit(x)
+  } else {
+    # formula <- (if (rlang::is_formula(formula)) rlang::expr_text else identity)(formula)
+    sc <- spark_connection(x)
+    r_formula <- ft_r_formula(sc, formula, features_col,
+                              label_col,
+                              dataset = x)
+    pipeline <- ml_pipeline(r_formula, predictor)
+
+    pipeline_model <- pipeline %>%
+      ml_fit(x)
+
+    new_ml_model_linear_regression(
+      pipeline,
+      pipeline_model,
+      predictor$uid,
+      formula,
+      dataset = x)
+  }
 }
 
 # Validator
@@ -106,9 +161,9 @@ new_ml_linear_regression <- function(jobj) {
   new_ml_predictor(jobj, subclass = "ml_linear_regression")
 }
 
-new_ml_logistic_regression_model <- function(jobj) {
+new_ml_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary"))
-    new_ml_summary_linear_regression_model(invoke(jobj, "summary"))
+    new_ml_summary_linear_regression_model(invoke(jobj, "summary"), solver = invoke(jobj, "solver"))
   else NA
 
   new_ml_prediction_model(
@@ -122,11 +177,14 @@ new_ml_logistic_regression_model <- function(jobj) {
     subclass = "ml_linear_regression_model")
 }
 
-new_ml_summary_linear_regression_model <- function(jobj) {
+new_ml_summary_linear_regression_model <- function(jobj, solver) {
+  is_normal_solver <- identical(solver, "normal")
   new_ml_summary(
     jobj,
-    coefficient_standard_errors = invoke(jobj, "coefficientStandardErrors"),
-    degrees_of_freedom = invoke(jobj, "degreesOfFreedom"),
+    coefficient_standard_errors = if (is_normal_solver)
+      invoke(jobj, "coefficientStandardErrors") else NA,
+    degrees_of_freedom = if (spark_version(spark_connection(jobj)) >= "2.2.0")
+      invoke(jobj, "degreesOfFreedom") else NA,
     deviance_residuals = invoke(jobj, "devianceResiduals"),
     explained_variance = invoke(jobj, "explainedVariance"),
     features_col = invoke(jobj, "featuresCol"),
@@ -134,13 +192,13 @@ new_ml_summary_linear_regression_model <- function(jobj) {
     mean_absolute_error = invoke(jobj, "meanAbsoluteError"),
     mean_squared_error = invoke(jobj, "meanSquaredError"),
     num_instances = invoke(jobj, "numInstances"),
-    p_values = invoke(jobj, "pValues"),
+    p_values = if (is_normal_solver) invoke(jobj, "pValues") else NA,
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     r2 = invoke(jobj, "r2"),
     residuals = invoke(jobj, "residuals") %>% sdf_register(),
     root_mean_squared_error = invoke(jobj, "rootMeanSquaredError"),
-    t_values = invoke(jobj, "tValues"),
+    t_values = if (is_normal_solver) invoke(jobj, "tValues") else NA,
     subclass = "ml_summary_linear_regression")
 }
 
@@ -162,7 +220,7 @@ new_ml_model_linear_regression <- function(
     dplyr::pull("name")
 
     coefficients <- model$coefficients
-    colnames(coefficients) <- feature_names
+    names(coefficients) <- feature_names
 
     coefficients <- if (ml_param(model, "fit_intercept"))
       rlang::set_names(
@@ -173,11 +231,20 @@ new_ml_model_linear_regression <- function(
 
   summary <- model$summary
 
-  new_ml_model_classification(
+  new_ml_model_regression(
     pipeline, pipeline_model, model_uid, formula, dataset,
     coefficients = coefficients,
     summary = summary,
     subclass = "ml_model_linear_regression",
     .call = call
   )
+}
+
+# Generic implementations
+
+#' @export
+ml_fit.ml_linear_regression <- function(x, data, ...) {
+  jobj <- spark_jobj(x) %>%
+    invoke("fit", spark_dataframe(data))
+  new_ml_linear_regression_model(jobj)
 }

@@ -6,6 +6,8 @@ expect_coef_equal <- function(lhs, rhs) {
   lhs <- lhs[nm]
   rhs <- rhs[nm]
 
+  # print(data.frame(lhs = lhs, rhs = rhs))
+
   expect_true(all.equal(lhs, rhs, tolerance = 0.01))
 }
 
@@ -43,68 +45,72 @@ test_that("ml_linear_regression param setting works", {
       tol = 1e-5
     )
   )
+
+  lr2 <- ml_linear_regression(sc, alpha = 0.2, lambda = 0.1)
+  expect_equal(ml_params(lr2, c("elastic_net_param", "reg_param")),
+               list(elastic_net_param = 0.2, reg_param = 0.1))
 })
 
-# test_that("ml_linear_regression and 'penalized' produce similar model fits", {
-#   skip_on_cran()
-#   test_requires("glmnet")
-#
-#   mtcars_tbl <- testthat_tbl("mtcars")
-#
-#   values <- seq(0, 0.5, by = 0.1)
-#   parMatrix <- expand.grid(values, values, KEEP.OUT.ATTRS = FALSE)
-#
-#   for (i in seq_len(nrow(parMatrix))) {
-#     alpha  <- parMatrix[[1]][[i]]
-#     lambda <- parMatrix[[2]][[i]]
-#
-#     gFit <- glmnet::glmnet(
-#       x = as.matrix(mtcars[, c("cyl", "disp")]),
-#       y = mtcars$mpg,
-#       family = "gaussian",
-#       alpha = alpha,
-#       lambda = lambda
-#     )
-#
-#     sFit <- ml_linear_regression(
-#       mtcars_tbl,
-#       "mpg",
-#       c("cyl", "disp"),
-#       alpha = alpha,
-#       lambda = lambda
-#     )
-#
-#     gCoef <- coefficients(gFit)[, 1]
-#     sCoef <- coefficients(sFit)
-#
-#     expect_coef_equal(gCoef, sCoef)
-#   }
-#
-# })
-#
-# test_that("weights column works for lm", {
-#   set.seed(42)
-#   iris_weighted <- iris %>%
-#     dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
-#                   ones = rep(1, nrow(iris)),
-#                   versicolor = ifelse(Species == "versicolor", 1L, 0L))
-#   iris_weighted_tbl <- testthat_tbl("iris_weighted")
-#
-#   r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
-#           weights = weights, data = iris_weighted)
-#   s <- ml_linear_regression(iris_weighted_tbl,
-#                             response = "Sepal_Length",
-#                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-#                             lambda = 0L,
-#                             weights.column = "weights")
-#   expect_equal(unname(coef(r)), unname(coef(s)))
-#
-#   r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
-#           data = iris_weighted)
-#   s <- ml_linear_regression(iris_weighted_tbl,
-#                             response = "Sepal_Length",
-#                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-#                             lambda = 0L,
-#                             weights.column = "ones")
-#   expect_equal(unname(coef(r)), unname(coef(s)))
-# })
+test_that("ml_linear_regression and 'penalized' produce similar model fits", {
+  # skip_on_cran()
+  test_requires("glmnet")
+
+  mtcars_tbl <- testthat_tbl("mtcars")
+
+  values <- seq(0, 0.5, by = 0.1)
+  parMatrix <- expand.grid(values, values, KEEP.OUT.ATTRS = FALSE)
+
+  for (i in seq_len(nrow(parMatrix))) {
+    alpha  <- parMatrix[[1]][[i]]
+    lambda <- parMatrix[[2]][[i]]
+
+    gFit <- glmnet::glmnet(
+      x = as.matrix(mtcars[, c("cyl", "disp")]),
+      y = mtcars$mpg,
+      family = "gaussian",
+      alpha = alpha,
+      lambda = lambda
+    )
+
+    sFit <- ml_linear_regression(
+      mtcars_tbl,
+      response = "mpg",
+      features = c("cyl", "disp"),
+      alpha = alpha,
+      lambda = lambda
+    )
+
+    gCoef <- coefficients(gFit)[, 1]
+    sCoef <- coefficients(sFit)
+
+    expect_coef_equal(gCoef, sCoef)
+  }
+
+})
+
+test_that("weights column works for lm", {
+  set.seed(42)
+  iris_weighted <- iris %>%
+    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
+                  ones = rep(1, nrow(iris)),
+                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+
+  r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+          weights = weights, data = iris_weighted)
+  s <- ml_linear_regression(iris_weighted_tbl,
+                            response = "Sepal_Length",
+                            features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+                            lambda = 0L,
+                            weights.column = "weights")
+  expect_equal(unname(coef(r)), unname(coef(s)))
+
+  r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+          data = iris_weighted)
+  s <- ml_linear_regression(iris_weighted_tbl,
+                            response = "Sepal_Length",
+                            features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+                            lambda = 0L,
+                            weights.column = "ones")
+  expect_equal(unname(coef(r)), unname(coef(s)))
+})
