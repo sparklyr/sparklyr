@@ -95,10 +95,18 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
 
 ml_apply_validation <- function(expr, args, nms, old_new_mapping) {
   validations <- rlang::enexpr(expr)
+
+  data <- names(args) %>%
+    (function(x) setdiff(x, old_new_mapping %>%
+                           `[`(intersect(names(old_new_mapping), x)))
+    ) %>%
+    (function(x) args[x]) %>%
+    (function(x) rlang::set_names(
+      x, mapply(`%||%`, old_new_mapping[names(x)], names(x)))
+     )
+
   rlang::invoke(within,
-                data = rlang::set_names(
-                  args, mapply(`%||%`, old_new_mapping[names(args)], names(args))
-                ),
+                data = data,
                 expr = validations,
                 .bury = NULL) %>%
     `[`(mapply(`%||%`, old_new_mapping[nms], nms))
