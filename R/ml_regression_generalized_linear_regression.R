@@ -51,6 +51,7 @@ ml_generalized_linear_regression.spark_connection <- function(
     x, "org.apache.spark.ml.regression.GeneralizedLinearRegression", uid,
     features_col, label_col, prediction_col
   ) %>%
+    invoke("setFamily", family) %>%
     invoke("setFitIntercept", fit_intercept) %>%
     invoke("setRegParam", reg_param) %>%
     invoke("setMaxIter", max_iter) %>%
@@ -69,7 +70,7 @@ ml_generalized_linear_regression.spark_connection <- function(
   if (!rlang::is_null(link_prediction_col))
     jobj <- invoke(jobj, "setLinkPredictionCol", link_prediction_col)
 
-  if (!rlang::is_null(link))
+  if (!rlang::is_null(weight_col))
     jobj <- invoke(jobj, "setWeightCol", weight_col)
 
   new_ml_generalized_linear_regression(jobj)
@@ -277,4 +278,44 @@ new_ml_model_generalized_linear_regression <- function(
     subclass = "ml_model_generalized_linear_regression",
     .call = call
   )
+}
+
+# Generic implementations
+
+#' @export
+residuals.ml_model_generalized_linear_regression <- function(
+  object,
+  type = c("deviance", "pearson", "working", "response"),
+  ...) {
+
+  type <- rlang::arg_match(type)
+  ensure_scalar_character(type)
+
+  residuals <- object %>%
+    `[[`("summary") %>%
+    `[[`("residuals") %>%
+    `[[`(type)
+
+  sdf_read_column(residuals, paste0(type, "Residuals"))
+}
+
+#' @rdname sdf_residuals
+#' @param type type of residuals which should be returned.
+#' @export
+sdf_residuals.ml_model_generalized_linear_regression <- function(
+  object,
+  type = c("deviance", "pearson", "working", "response"),
+  ...) {
+
+  type <- rlang::arg_match(type)
+  ensure_scalar_character(type)
+
+  residuals <- object %>%
+    `[[`("summary") %>%
+    `[[`("residuals") %>%
+    `[[`(type) %>%
+    dplyr::rename(residuals = !!rlang::sym(paste0(type, "Residuals")))
+
+  ml_model_data(object) %>%
+    sdf_fast_bind_cols(residuals)
 }
