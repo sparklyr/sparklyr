@@ -283,6 +283,61 @@ new_ml_model_generalized_linear_regression <- function(
 # Generic implementations
 
 #' @export
+ml_fit.ml_generalized_linear_regression <- function(x, data, ...) {
+  jobj <- spark_jobj(x) %>%
+    invoke("fit", spark_dataframe(data))
+  new_ml_generalized_linear_regression_model(jobj)
+}
+
+#' @export
+print.ml_model_generalized_linear_regression <-
+  function(x, digits = max(3L, getOption("digits") - 3L), ...)
+{
+  ml_model_print_call(x)
+  print_newline()
+  ml_model_print_coefficients(x)
+  print_newline()
+
+  cat(
+    sprintf("Degress of Freedom:  %s Total (i.e. Null);  %s Residual",
+            x$summary$residual_degree_of_freedom_null,
+            x$summary$residual_degree_of_freedom),
+    sep = "\n"
+  )
+  cat(sprintf("Null Deviance:       %s", signif(x$summary$null_deviance, digits)), sep = "\n")
+  cat(sprintf("Residual Deviance:   %s\tAIC: %s",
+              signif(x$summary$deviance, digits),
+              signif(x$summary$aic, digits)), sep = "\n")
+}
+
+#' @export
+summary.ml_model_generalized_linear_regression <-
+  function(object, digits = max(3L, getOption("digits") - 3L), ...)
+{
+  ml_model_print_call(object)
+  print_newline()
+  ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
+  print_newline()
+  ml_model_print_coefficients_detailed(object)
+  print_newline()
+
+  printf("(Dispersion paramter for %s family taken to be %s)\n\n",
+         ml_param(object, "family"),
+         signif(object$summary$dispersion, digits + 3))
+
+  printf("   Null  deviance: %s on %s degress of freedom\n",
+         signif(object$summary$null_deviance, digits + 2),
+         signif(object$summary$residual_degree_of_freedom_null, digits))
+
+  printf("Residual deviance: %s on %s degrees of freedom\n",
+         signif(object$summary$deviance, digits + 2),
+         signif(object$summary$degrees_of_freedom, digits))
+  printf("AIC: %s\n", signif(object$summary$aic, digits + 1))
+
+  invisible(object)
+}
+
+#' @export
 residuals.ml_model_generalized_linear_regression <- function(
   object,
   type = c("deviance", "pearson", "working", "response"),
