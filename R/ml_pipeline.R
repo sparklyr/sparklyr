@@ -55,12 +55,15 @@ new_ml_pipeline <- function(jobj, ..., subclass = NULL) {
 new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
   stages <- tryCatch({
     jobj %>%
-      invoke("stages") %>%
-      lapply(ml_constructor_dispatch)
+      invoke("stages")
   },
   error = function(e) {
     NA
   })
+
+  if (!rlang::is_na(stages))
+    stages <- lapply(stages, ml_constructor_dispatch)
+
   new_ml_transformer(
     jobj,
     stages = stages,
