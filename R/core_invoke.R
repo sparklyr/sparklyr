@@ -4,6 +4,12 @@ core_invoke_method <- function(sc, static, object, method, ...)
     stop("The connection is no longer valid.")
   }
 
+  # flush in case restart has left us in invalid state
+  flush <- c(1)
+  while(length(flush) > 0) {
+    flush <- readBin(sc$backend, integer(), 1)
+  }
+
   # if the object is a jobj then get it's id
   if (inherits(object, "spark_jobj"))
     object <- object$id

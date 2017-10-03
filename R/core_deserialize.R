@@ -1,3 +1,18 @@
+readBinWait <- function(con, what, n, endian = NULL) {
+  timeout <- spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+
+  result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+
+  commandStart <- Sys.time()
+  while(length(result) == 0 && commandStart + timeout > Sys.time()) {
+    Sys.sleep(0.01)
+
+    result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+  }
+
+  result
+}
+
 readObject <- function(con) {
   # Read type first
   type <- readType(con)
@@ -24,7 +39,7 @@ readTypedObject <- function(con, type) {
 
 readString <- function(con) {
   stringLen <- readInt(con)
-  raw <- readBin(con, raw(), stringLen, endian = "big")
+  raw <- readBinWait(con, raw(), stringLen, endian = "big")
   string <- rawToChar(raw)
   Encoding(string) <- "UTF-8"
   string
@@ -36,11 +51,11 @@ readDateArray <- function(con, n = 1) {
 }
 
 readInt <- function(con, n = 1) {
-  readBin(con, integer(), n = n, endian = "big")
+  readBinWait(con, integer(), n = n, endian = "big")
 }
 
 readDouble <- function(con, n = 1) {
-  readBin(con, double(), n = n, endian = "big")
+  readBinWait(con, double(), n = n, endian = "big")
 }
 
 readBoolean <- function(con, n = 1) {
@@ -48,7 +63,7 @@ readBoolean <- function(con, n = 1) {
 }
 
 readType <- function(con) {
-  rawToChar(readBin(con, "raw", n = 1L))
+  rawToChar(readBinWait(con, "raw", n = 1L))
 }
 
 readDate <- function(con) {
@@ -145,5 +160,5 @@ readStruct <- function(con) {
 
 readRaw <- function(con) {
   dataLen <- readInt(con)
-  readBin(con, raw(), as.integer(dataLen), endian = "big")
+  readBinWait(con, raw(), as.integer(dataLen), endian = "big")
 }
