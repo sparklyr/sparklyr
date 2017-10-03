@@ -199,6 +199,7 @@ new_ml_summary_linear_regression_model <- function(jobj, solver) {
     residuals = invoke(jobj, "residuals") %>% sdf_register(),
     root_mean_squared_error = invoke(jobj, "rootMeanSquaredError"),
     t_values = if (is_normal_solver) invoke(jobj, "tValues") else NA,
+    .solver = solver,
     subclass = "ml_summary_linear_regression")
 }
 
@@ -256,6 +257,28 @@ print.ml_model_linear_regression <- function(x, ...) {
   cat("Formula: ", x$formula, "\n\n", sep = "")
   cat("Coefficients:", sep = "\n")
   print(x$coefficients)
+}
+
+#' @export
+print.ml_summary_linear_regression <- function(x, ...) {
+  cat(ml_short_type(x), "\n")
+  item_names <- names(x) %>%
+    setdiff(c("uid", "predictions", "residuals")) %>%
+    setdiff(if (!identical(x$.solver, "normal"))
+      c("coefficient_standard_errors", "p_values", "t_values") else NULL)
+  for (item in names(item_names))
+    cat("  ", item, ":", capture.output(str(out_list[[item]])), "\n")
+}
+
+#' @export
+print.ml_linear_regression_model <- function(x, ...) {
+  cat(ml_short_type(x), "(Transformer) \n")
+  cat(paste0("<", ml_uid(x), ">"),"\n")
+  item_names <- names(x) %>%
+    setdiff(c("uid", "type", "param_map", "summary", ".jobj"))
+  for (item in item_names)
+    if (!rlang::is_na(x[[item]]))
+      cat("  ", item, ":", capture.output(str(x[[item]])), "\n")
 }
 
 #' @export

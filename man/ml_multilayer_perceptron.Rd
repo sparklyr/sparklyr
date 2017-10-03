@@ -45,7 +45,6 @@ Creates and trains multilayer perceptron on a Spark DataFrame.
 \seealso{
 Other Spark ML routines: \code{\link{ml_als_factorization}},
   \code{\link{ml_decision_tree}},
-  \code{\link{ml_generalized_linear_regression}},
   \code{\link{ml_gradient_boosted_trees}},
   \code{\link{ml_kmeans}}, \code{\link{ml_lda}},
   \code{\link{ml_naive_bayes}},

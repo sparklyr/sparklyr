@@ -37,7 +37,11 @@ ml_create_mapping_tables <- function() {
          "vocab_size" = "vocabSize",
          # ft_quantile_discretizer
          "num_buckets" = "numBuckets",
-         "relative_error" = "relativeError")
+         "relative_error" = "relativeError",
+         # ml_generalized_linear_regression
+         "link_prediction_col" = "linkPredictionCol",
+         "variance_power" = "variancePower",
+         "link_power" = "linkPower")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

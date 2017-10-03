@@ -6,9 +6,13 @@ ml_is_instance_of <- function(jobj, type) {
 }
 
 ml_ancestry <- function(jobj) {
+  # TODO optimize
   classes <- c("feature.CountVectorizer", "feature.CountVectorizerModel",
-               "classification.LogisticRegression", "classification.LogisticRegressionModel",
+               "classification.LogisticRegression",
+               "classification.LogisticRegressionModel",
                "regression.LinearRegression", "regression.LinearRegressionModel",
+               "regression.GeneralizedLinearRegression",
+               "regression.GeneralizedLinearRegressionModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
@@ -25,6 +29,7 @@ ml_package <- function(jobj) {
 }
 
 ml_constructor_dispatch <- function(jobj) {
+  # TODO consider mapping using hash table
   switch(ml_ancestry(jobj)[1],
          "feature.CountVectorizer" = new_ml_count_vectorizer(jobj),
          "feature.CountVectorizerModel" = new_ml_count_vectorizer_model(jobj),
@@ -32,6 +37,8 @@ ml_constructor_dispatch <- function(jobj) {
          "classification.LogisticRegression" = new_ml_logistic_regression(jobj),
          "regression.LinearRegression" = new_ml_linear_regression(jobj),
          "regression.LinearRegressionModel" = new_ml_linear_regression_model(jobj),
+         "regression.GeneralizedLinearRegression" = new_ml_generalized_linear_regression(jobj),
+         "regression.GeneralizedLinearRegressionModel" = new_ml_generalized_linear_regression_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),
