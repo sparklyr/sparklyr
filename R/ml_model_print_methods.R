@@ -11,6 +11,7 @@ ml_model_print_residuals <- function(model,
                                      residuals.header = "Residuals") {
 
   residuals <- model$summary$residuals %>%
+    (function(x) if (is.function(x)) x() else x) %>%
     spark_dataframe()
 
   # randomly sample residuals and produce quantiles based on

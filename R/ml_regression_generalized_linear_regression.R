@@ -233,12 +233,7 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj) {
     rank = invoke(jobj, "rank"),
     residual_degree_of_freedom = invoke(jobj, "residualDegreeOfFreedom"),
     residual_degree_of_freedom_null = invoke(jobj, "residualDegreeOfFreedomNull"),
-    residuals = list(
-      deviance = resid("deviance"),
-      pearson = resid("pearson"),
-      working = resid("working"),
-      response = resid("response")
-    ),
+    residuals = function(type = "deviance") (invoke(jobj, "residuals", type) %>% sdf_register()),
     subclass = "ml_summary_generalized_linear_regression")
 }
 
@@ -322,7 +317,7 @@ summary.ml_model_generalized_linear_regression <-
   print_newline()
 
   printf("(Dispersion paramter for %s family taken to be %s)\n\n",
-         ml_param(object, "family"),
+         ml_param(ml_stage(object$pipeline_model, 2), "family"),
          signif(object$summary$dispersion, digits + 3))
 
   printf("   Null  deviance: %s on %s degress of freedom\n",
@@ -349,7 +344,7 @@ residuals.ml_model_generalized_linear_regression <- function(
   residuals <- object %>%
     `[[`("summary") %>%
     `[[`("residuals") %>%
-    `[[`(type)
+    do.call(list(type = type))
 
   sdf_read_column(residuals, paste0(type, "Residuals"))
 }
@@ -368,7 +363,7 @@ sdf_residuals.ml_model_generalized_linear_regression <- function(
   residuals <- object %>%
     `[[`("summary") %>%
     `[[`("residuals") %>%
-    `[[`(type) %>%
+    do.call(list(type = type)) %>%
     dplyr::rename(residuals = !!rlang::sym(paste0(type, "Residuals")))
 
   ml_model_data(object) %>%
