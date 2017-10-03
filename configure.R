@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 library(sparklyr)
-sparklyr:::ml_create_mapping_tables()
 sparklyr:::livy_sources_refresh()
 
 sparklyr:::spark_compile_embedded_sources()
