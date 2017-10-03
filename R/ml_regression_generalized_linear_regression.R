@@ -141,11 +141,12 @@ ml_generalized_linear_regression.tbl_spark <- function(
       ml_fit(x)
 
     new_ml_model_generalized_linear_regression(
-      pipeline,
-      pipeline_model,
-      predictor$uid,
-      formula,
-      dataset = x)
+      pipeline = pipeline,
+      pipeline_model = pipeline_model,
+      model = pipeline_model %>%
+        ml_stage(2),
+      dataset = x,
+      formula = formula)
   }
 }
 
@@ -238,10 +239,8 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj) {
 }
 
 new_ml_model_generalized_linear_regression <- function(
-  pipeline, pipeline_model, model_uid, formula, dataset, .call) {
+  pipeline, pipeline_model, model, dataset, formula) {
 
-  model <- pipeline_model %>%
-    ml_stage(model_uid)
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
   features_col <- ml_param(model, "features_col")
@@ -267,7 +266,7 @@ new_ml_model_generalized_linear_regression <- function(
   summary <- model$summary
 
   new_ml_model_regression(
-    pipeline, pipeline_model, model_uid, formula, dataset,
+    pipeline, pipeline_model, model, dataset, formula,
     coefficients = coefficients,
     summary = summary,
     subclass = "ml_model_generalized_linear_regression",

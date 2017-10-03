@@ -132,11 +132,11 @@ ml_logistic_regression.tbl_spark <- function(
       ml_fit(x)
 
     new_ml_model_logistic_regression(
-      pipeline,
-      pipeline_model,
-      logistic_regression$uid,
-      formula,
-      dataset = x)
+      pipeline = pipeline,
+      pipeline_model = pipeline_model,
+      model = ml_stage(pipeline_model, 2),
+      dataset = x,
+      formula = formula)
   }
 }
 
@@ -217,10 +217,8 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
 }
 
 new_ml_model_logistic_regression <- function(
-  pipeline, pipeline_model, model_uid, formula, dataset, .call) {
+  pipeline, pipeline_model, model, dataset, formula) {
 
-  model <- pipeline_model %>%
-    ml_stage(model_uid)
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
   features_col <- ml_param(model, "features_col")
@@ -273,7 +271,8 @@ new_ml_model_logistic_regression <- function(
   summary <- model$summary
 
   new_ml_model_classification(
-    pipeline, pipeline_model, model_uid, formula, dataset,
+    pipeline, pipeline_model,
+    model, dataset, formula,
     coefficients = coefficients,
     .index_labels = index_labels,
     summary = summary,
