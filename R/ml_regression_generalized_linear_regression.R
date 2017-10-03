@@ -224,17 +224,23 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj) {
   new_ml_summary(
     jobj,
     aic = invoke(jobj, "aic"),
+    coefficient_standard_errors = try_null(invoke(jobj, "coefficientStandardErrors")),
     degrees_of_freedom = invoke(jobj, "degreesOfFreedom"),
     deviance = invoke(jobj, "deviance"),
     dispersion = invoke(jobj, "dispersion"),
     null_deviance = invoke(jobj, "nullDeviance"),
-    num_instances = if (version > "2.2.0") invoke(jobj, "numInstances") else NA,
+    num_instances = if (version > "2.2.0") invoke(jobj, "numInstances") else NULL,
+    num_iterations = try_null(invoke(jobj, "numIterations")),
+    p_values = try_null(invoke(jobj, "pValues")),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     rank = invoke(jobj, "rank"),
     residual_degree_of_freedom = invoke(jobj, "residualDegreeOfFreedom"),
     residual_degree_of_freedom_null = invoke(jobj, "residualDegreeOfFreedomNull"),
-    residuals = function(type = "deviance") (invoke(jobj, "residuals", type) %>% sdf_register()),
+    residuals = function(type = "deviance") (invoke(jobj, "residuals", type)
+                                             %>% sdf_register()),
+    solver = try_null(invoke(Jobj, "solver")),
+    t_values = try_null(invoke(jobj, "tValues")),
     subclass = "ml_summary_generalized_linear_regression")
 }
 
@@ -270,6 +276,8 @@ new_ml_model_generalized_linear_regression <- function(
     coefficients = coefficients,
     summary = summary,
     subclass = "ml_model_generalized_linear_regression",
+    .response = gsub("~.+$", "", formula) %>% trimws(),
+    .features = feature_names,
     .call = call
   )
 }
