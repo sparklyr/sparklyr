@@ -85,14 +85,15 @@ ml_param_map <- function(x, ...) {
 }
 
 #' @export
-ml_param <- function(x, param, ...) {
-  ml_param_map(x)[[param]] %||% stop("param ", param, " not found")
+ml_param <- function(x, param, allow_null = FALSE, ...) {
+  ml_param_map(x)[[param]] %||% if (allow_null) NULL else
+    stop("param ", param, " not found")
 }
 
 #' @export
-ml_params <- function(x, params, ...) {
+ml_params <- function(x, params, allow_null = FALSE, ...) {
   params %>%
-    lapply(function(param) ml_param(x, param)) %>%
+    lapply(function(param) ml_param(x, param, allow_null)) %>%
     rlang::set_names(unlist(params))
 }
 
@@ -175,4 +176,12 @@ ml_column_metadata <- function(tbl, column) {
     invoke("json") %>%
     jsonlite::fromJSON() %>%
     `[[`("ml_attr")
+}
+
+#' @export
+ml_summary <- function(x, metric = NULL) {
+  if (rlang::is_null(metric))
+    x$summary %||% stop(deparse(substitute(x)), " has no summary")
+  else
+    x$summary[[metric]] %||% stop("metric ", metric, " not found")
 }
