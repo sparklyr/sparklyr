@@ -10,6 +10,13 @@
 #'
 #' @export
 sdf_predict <- function(object, newdata, ...) {
+  UseMethod("sdf_predict")
+}
+
+
+
+#' @export
+sdf_predict.default <- function(object, newdata, ...) {
 
   # when newdata is not supplied, attempt to use original dataset
   if (missing(newdata) || is.null(newdata))
