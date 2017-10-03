@@ -329,7 +329,6 @@ print.ml_logistic_regression_model <- function(x, ...) {
   for (item in item_names)
     if (!rlang::is_na(x[[item]]))
       cat("  ", item, ":", capture.output(str(x[[item]])), "\n")
-
 }
 
 #' @export
