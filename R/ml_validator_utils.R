@@ -93,7 +93,7 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   assign("formula", formula, caller_frame$env)
 }
 
-ml_apply_validation <- function(
+ml_validate_args <- function(
   args, expr = NULL,
   mapping_list = list(
     input.col = "input_col",

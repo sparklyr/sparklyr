@@ -6,7 +6,7 @@ input_output_mapping <- list(
 # HashingTF
 ml_validator_hashing_tf <- function(args, nms) {
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       ensure_scalar_boolean(binary)
       num_features <- ensure_scalar_integer(num_features)
     }) %>%
@@ -16,7 +16,7 @@ ml_validator_hashing_tf <- function(args, nms) {
 # Binarizer
 ml_validator_binarizer <- function(args, nms) {
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       threshold <- ensure_scalar_double(threshold)
     }) %>%
     ml_extract_args(nms)
@@ -25,7 +25,7 @@ ml_validator_binarizer <- function(args, nms) {
 # StringIndexer
 ml_validator_string_indexer <- function(args, nms) {
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       handle_invalid <- rlang::arg_match(
         handle_invalid, c("error", "skip", "keep"))
     }) %>%
@@ -36,7 +36,7 @@ ml_validator_string_indexer <- function(args, nms) {
 ml_validator_one_hot_encoder <- function(args, nms) {
   old_new_mapping <- c(input_output_mapping, list(drop.last = "drop_last"))
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       drop_last <- ensure_scalar_boolean(drop_last)
     }) %>%
     ml_extract_args(nms)
@@ -50,7 +50,7 @@ ml_validator_vector_assembler <- function(args, nms) {
   )
 
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       input_cols <- input_cols %>%
         lapply(ensure_scalar_character)
       output_col <- ensure_scalar_character(output_col)
@@ -61,14 +61,14 @@ ml_validator_vector_assembler <- function(args, nms) {
 # Tokenizer
 ml_validator_tokenizer <- function(args, nms) {
   args %>%
-    ml_apply_validation() %>%
+    ml_validate_args() %>%
     ml_extract_args(nms)
 }
 
 # DCT
 ml_validator_dct <- function(args, nms) {
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       inverse <- ensure_scalar_boolean(inverse)
     }) %>%
     ml_extract_args(nms)
@@ -76,7 +76,8 @@ ml_validator_dct <- function(args, nms) {
 
 # IndexToString
 ml_validator_index_to_string <- function(args, nms) {
-  args %>% ml_apply_validation({
+  args %>%
+    ml_validate_args({
       if (!rlang::is_null(labels))
         labels <- lapply(labels, ensure_scalar_character)
     }) %>%
@@ -86,7 +87,7 @@ ml_validator_index_to_string <- function(args, nms) {
 # Bucketizer
 ml_validator_bucketizer <- function(args, nms) {
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       if (length(splits) < 3) stop("length(splits) must be at least 3")
       splits <- lapply(splits, ensure_scalar_double)
       handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
@@ -97,7 +98,7 @@ ml_validator_bucketizer <- function(args, nms) {
 # ElementwiseProduct
 ml_validator_elementwise_product <- function(args, nms) {
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       scaling_vec <- lapply(scaling_vec, ensure_scalar_double)
     }) %>%
     ml_extract_args(nms)
@@ -106,7 +107,7 @@ ml_validator_elementwise_product <- function(args, nms) {
 # RegexTokenizer
 ml_validator_regex_tokenizer <- function(args, nms) {
   args %>%
-    ml_apply_validation(
+    ml_validate_args(
     {
       gaps <- ensure_scalar_boolean(gaps)
       min_token_length <- ensure_scalar_integer(min_token_length)
@@ -119,7 +120,7 @@ ml_validator_regex_tokenizer <- function(args, nms) {
 # StopWordsRemover
 ml_validator_stop_words_remover <- function(args, nms) {
   args %>%
-    ml_apply_validation(
+    ml_validate_args(
     {
       case_sensitive <- ensure_scalar_boolean(case_sensitive)
       stop_words <- lapply(stop_words, ensure_scalar_character)
@@ -139,7 +140,7 @@ ml_validator_count_vectorizer <- function(args, nms) {
   )
 
   args %>%
-    ml_apply_validation(
+    ml_validate_args(
     {
       binary <- ensure_scalar_boolean(binary)
       min_df <- ensure_scalar_double(min_df)
@@ -158,7 +159,7 @@ ml_validator_quantile_discretizer <- function(args, nms) {
   )
 
   args %>%
-    ml_apply_validation(
+    ml_validate_args(
     {
       handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
       num_buckets <- ensure_scalar_integer(num_buckets)
@@ -170,7 +171,7 @@ ml_validator_quantile_discretizer <- function(args, nms) {
 # SQLTransformer
 ml_validator_sql_transformer <- function(args, nms) {
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       statement <- ensure_scalar_character(statement)
     }, list(sql = "statement")) %>%
     ml_extract_args(nms, list(sql = "statement"))

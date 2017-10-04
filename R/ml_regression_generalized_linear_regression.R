@@ -160,7 +160,7 @@ ml_validator_generalized_linear_regression <- function(args, nms) {
   )
 
   args %>%
-    ml_apply_validation({
+    ml_validate_args({
       reg_param <- ensure_scalar_double(reg_param)
       # TODO bounds on regularization parameters
       max_iter <- ensure_scalar_integer(max_iter)
