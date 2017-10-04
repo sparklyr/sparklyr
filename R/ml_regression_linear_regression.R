@@ -234,6 +234,8 @@ new_ml_model_linear_regression <- function(
     coefficients = coefficients,
     summary = summary,
     subclass = "ml_model_linear_regression",
+    .response = gsub("~.+$", "", formula) %>% trimws(),
+    .features = feature_names,
     .call = call
   )
 }
