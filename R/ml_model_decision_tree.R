@@ -71,7 +71,6 @@ ml_decision_tree.tbl_spark <- function(
                     regression = ml_decision_tree_regressor,
                     classification = ml_decision_tree_classifier)
 
-  impurity <- rlang::arg_match(impurity)
   impurity <- if (identical(impurity, "auto")) {
     if (identical(model_type, "regression")) "variance" else "gini"
   } else if (identical(model_type, "classification")) {
