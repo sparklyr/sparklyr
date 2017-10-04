@@ -39,6 +39,8 @@ ml_constructor_dispatch <- function(jobj) {
          "regression.LinearRegressionModel" = new_ml_linear_regression_model(jobj),
          "regression.GeneralizedLinearRegression" = new_ml_generalized_linear_regression(jobj),
          "regression.GeneralizedLinearRegressionModel" = new_ml_generalized_linear_regression_model(jobj),
+         "regression.DecisionTreeRegressor" = new_ml_decision_tree_regressor(jobj),
+         "regression.DecisionTreeRegressionModel" = new_ml_decision_tree_regression_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),

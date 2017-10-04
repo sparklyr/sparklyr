@@ -41,7 +41,16 @@ ml_create_mapping_tables <- function() {
          # ml_generalized_linear_regression
          "link_prediction_col" = "linkPredictionCol",
          "variance_power" = "variancePower",
-         "link_power" = "linkPower")
+         "link_power" = "linkPower",
+         # ml_decision_tree_regressor
+         "variance_col" = "varianceCol",
+         "checkpoint_interval" = "checkpointInterval",
+         "max_bins" = "maxBins",
+         "max_depth" = "maxDepth",
+         "min_info_gain" = "minInfoGain",
+         "min_instances_per_node" = "minInstancesPerNode",
+         "cache_node_ids" = "cacheNodeIds",
+         "max_memory_in_mb" = "maxMemoryInMB")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
