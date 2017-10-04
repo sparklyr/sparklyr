@@ -50,3 +50,13 @@ new_ml_model_regression <- function(
     ...,
     subclass = c(subclass, "ml_model_regression"))
 }
+
+#' @export
+sdf_predict.ml_model_classification <- function(object, newdata, ...) {
+  if (missing(newdata) || is.null(newdata))
+    newdata <- object$dataset
+
+  object$pipeline_model %>%
+    ml_transform(newdata) %>%
+    select(!!!rlang::syms(c(tbl_vars(newdata), "prediction")))
+}
