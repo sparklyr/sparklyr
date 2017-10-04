@@ -27,8 +27,8 @@ ml_args_to_validate <- function(args, current_args, default_args = current_args)
     c(current_args[setdiff(current_arg_names, input_arg_names)]) %>%
     c(default_args[setdiff(default_arg_names,
                            union(input_arg_names, current_arg_names)
-                           )]
-      )
+    )]
+    )
 }
 
 
@@ -74,8 +74,8 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
       # convert formula to string
       rlang::expr_text(args$response, width = 500L)
     } else
-    # otherwise, if both 'response' and 'features' are specified, treat them as
-    #   variable names, and construct formula string
+      # otherwise, if both 'response' and 'features' are specified, treat them as
+      #   variable names, and construct formula string
       paste0(args$response, " ~ ", paste(args$features, collapse = " + "))
   } else if (!is.null(args$formula)) {
     # now if 'formula' is specified, check to see that 'response' and 'features' are not
@@ -93,21 +93,33 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   assign("formula", formula, caller_frame$env)
 }
 
-ml_apply_validation <- function(expr, args, nms, old_new_mapping) {
+ml_apply_validation <- function(
+  args, expr = NULL,
+  mapping_list = list(
+    input.col = "input_col",
+    output.col = "output_col"
+  )) {
   validations <- rlang::enexpr(expr)
 
   data <- names(args) %>%
-    (function(x) setdiff(x, old_new_mapping %>%
-                           `[`(intersect(names(old_new_mapping), x)))
+    (function(x) setdiff(x, mapping_list %>%
+                           `[`(intersect(names(mapping_list), x)))
     ) %>%
     (function(x) args[x]) %>%
     (function(x) rlang::set_names(
-      x, mapply(`%||%`, old_new_mapping[names(x)], names(x)))
-     )
+      x, mapply(`%||%`, mapping_list[names(x)], names(x)))
+    )
 
   rlang::invoke(within,
                 data = data,
                 expr = validations,
-                .bury = NULL) %>%
-    `[`(mapply(`%||%`, old_new_mapping[nms], nms))
+                .bury = NULL)
+}
+
+ml_extract_args <- function(
+  args, nms, mapping_list = list(
+    input.col = "input_col",
+    output.col = "output_col"
+  )) {
+  args[mapply(`%||%`, mapping_list[nms], nms)]
 }

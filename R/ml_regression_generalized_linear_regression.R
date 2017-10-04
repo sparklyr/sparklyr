@@ -159,8 +159,8 @@ ml_validator_generalized_linear_regression <- function(args, nms) {
     max.iter = "max_iter"
   )
 
-  ml_apply_validation(
-    {
+  args %>%
+    ml_apply_validation({
       reg_param <- ensure_scalar_double(reg_param)
       # TODO bounds on regularization parameters
       max_iter <- ensure_scalar_integer(max_iter)
@@ -185,9 +185,8 @@ ml_validator_generalized_linear_regression <- function(args, nms) {
         weight_col <- ensure_scalar_character(weight_col)
       if (!rlang::is_null(link_prediction_col))
         link_prediction_col <- ensure_scalar_character(link_prediction_col)
-    },
-    args, nms, old_new_mapping
-  )
+    }, old_new_mapping) %>%
+    ml_extract_args(nms, old_new_mapping)
 }
 
 # Constructors
@@ -294,50 +293,50 @@ ml_fit.ml_generalized_linear_regression <- function(x, data, ...) {
 #' @export
 print.ml_model_generalized_linear_regression <-
   function(x, digits = max(3L, getOption("digits") - 3L), ...)
-{
-  ml_model_print_call(x)
-  print_newline()
-  ml_model_print_coefficients(x)
-  print_newline()
+  {
+    ml_model_print_call(x)
+    print_newline()
+    ml_model_print_coefficients(x)
+    print_newline()
 
-  cat(
-    sprintf("Degress of Freedom:  %s Total (i.e. Null);  %s Residual",
-            x$summary$residual_degree_of_freedom_null,
-            x$summary$residual_degree_of_freedom),
-    sep = "\n"
-  )
-  cat(sprintf("Null Deviance:       %s", signif(x$summary$null_deviance, digits)), sep = "\n")
-  cat(sprintf("Residual Deviance:   %s\tAIC: %s",
-              signif(x$summary$deviance, digits),
-              signif(x$summary$aic, digits)), sep = "\n")
-}
+    cat(
+      sprintf("Degress of Freedom:  %s Total (i.e. Null);  %s Residual",
+              x$summary$residual_degree_of_freedom_null,
+              x$summary$residual_degree_of_freedom),
+      sep = "\n"
+    )
+    cat(sprintf("Null Deviance:       %s", signif(x$summary$null_deviance, digits)), sep = "\n")
+    cat(sprintf("Residual Deviance:   %s\tAIC: %s",
+                signif(x$summary$deviance, digits),
+                signif(x$summary$aic, digits)), sep = "\n")
+  }
 
 #' @export
 summary.ml_model_generalized_linear_regression <-
   function(object, digits = max(3L, getOption("digits") - 3L), ...)
-{
-  ml_model_print_call(object)
-  print_newline()
-  ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
-  print_newline()
-  ml_model_print_coefficients_detailed(object)
-  print_newline()
+  {
+    ml_model_print_call(object)
+    print_newline()
+    ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
+    print_newline()
+    ml_model_print_coefficients_detailed(object)
+    print_newline()
 
-  printf("(Dispersion paramter for %s family taken to be %s)\n\n",
-         ml_param(ml_stage(object$pipeline_model, 2), "family"),
-         signif(object$summary$dispersion, digits + 3))
+    printf("(Dispersion paramter for %s family taken to be %s)\n\n",
+           ml_param(ml_stage(object$pipeline_model, 2), "family"),
+           signif(object$summary$dispersion, digits + 3))
 
-  printf("   Null  deviance: %s on %s degress of freedom\n",
-         signif(object$summary$null_deviance, digits + 2),
-         signif(object$summary$residual_degree_of_freedom_null, digits))
+    printf("   Null  deviance: %s on %s degress of freedom\n",
+           signif(object$summary$null_deviance, digits + 2),
+           signif(object$summary$residual_degree_of_freedom_null, digits))
 
-  printf("Residual deviance: %s on %s degrees of freedom\n",
-         signif(object$summary$deviance, digits + 2),
-         signif(object$summary$degrees_of_freedom, digits))
-  printf("AIC: %s\n", signif(object$summary$aic, digits + 1))
+    printf("Residual deviance: %s on %s degrees of freedom\n",
+           signif(object$summary$deviance, digits + 2),
+           signif(object$summary$degrees_of_freedom, digits))
+    printf("AIC: %s\n", signif(object$summary$aic, digits + 1))
 
-  invisible(object)
-}
+    invisible(object)
+  }
 
 #' @export
 residuals.ml_model_generalized_linear_regression <- function(

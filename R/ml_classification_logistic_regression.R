@@ -152,8 +152,8 @@ ml_validator_logistic_regression <- function(args, nms) {
     max.iter = "max_iter"
   )
 
-  ml_apply_validation(
-    {
+  args %>%
+    ml_apply_validation({
       elastic_net_param <- ensure_scalar_double(elastic_net_param)
       reg_param <- ensure_scalar_double(reg_param)
       max_iter <- ensure_scalar_integer(max_iter)
@@ -162,9 +162,8 @@ ml_validator_logistic_regression <- function(args, nms) {
       threshold <- ensure_scalar_double(threshold)
       if (!is.null(weight_col))
         weight_col <- ensure_scalar_character(weight_col)
-    },
-    args, nms, old_new_mapping
-  )
+    }, old_new_mapping) %>%
+    ml_extract_args(nms, old_new_mapping)
 }
 
 # Constructors
