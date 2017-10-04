@@ -13,6 +13,8 @@ ml_ancestry <- function(jobj) {
                "regression.LinearRegression", "regression.LinearRegressionModel",
                "regression.GeneralizedLinearRegression",
                "regression.GeneralizedLinearRegressionModel",
+               "regression.DecisionTreeRegressor", "regression.DecisionTreeRegressionModel",
+               "classification.DecisionTreeClassifier", "classification.DecisionTreeClassificationModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
