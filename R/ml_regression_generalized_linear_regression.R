@@ -45,7 +45,7 @@ ml_generalized_linear_regression.spark_connection <- function(
   response = NULL,
   features = NULL, ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
 
   jobj <- ml_new_regressor(
     x, "org.apache.spark.ml.regression.GeneralizedLinearRegression", uid,

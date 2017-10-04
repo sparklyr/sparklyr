@@ -32,7 +32,7 @@ ml_args_to_validate <- function(args, current_args, default_args = current_args)
 }
 
 
-ml_validate_args <- function(env = rlang::caller_env(2)) {
+ml_ratify_args <- function(env = rlang::caller_env(2)) {
   caller_frame <- rlang::caller_frame()
   validator_fn <- caller_frame$fn_name %>%
     (function(x) gsub("^(ml_|ft_)", "ml_validator_", x)) %>%

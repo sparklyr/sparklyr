@@ -39,7 +39,7 @@ ft_count_vectorizer.spark_connection <- function(
   vocab_size = as.integer(2^18), dataset = NULL,
   uid = random_string("count_vectorizer_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
 
   estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.CountVectorizer",
                                   input_col, output_col, uid) %>%

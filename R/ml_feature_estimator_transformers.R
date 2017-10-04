@@ -125,7 +125,7 @@ ft_string_indexer.spark_connection <- function(
   handle_invalid = "error", dataset = NULL,
   uid = random_string("string_indexer_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
 
   estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StringIndexer",
                                   input_col, output_col, uid) %>%
@@ -234,7 +234,7 @@ ft_quantile_discretizer.spark_connection <- function(
   num_buckets = 2L, relative_error = 0.001, dataset = NULL,
   uid = random_string("quantile_discretizer_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.QuantileDiscretizer",
                                   input_col, output_col, uid) %>%
     invoke("setHandleInvalid", handle_invalid) %>%

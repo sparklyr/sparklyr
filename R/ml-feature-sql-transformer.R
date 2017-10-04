@@ -25,7 +25,7 @@ ft_sql_transformer.spark_connection <- function(
   x, statement,
   uid = random_string("sql_transformer_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- invoke_new(x, "org.apache.spark.ml.feature.SQLTransformer", uid) %>%
     invoke("setStatement", statement)
 

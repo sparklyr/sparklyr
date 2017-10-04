@@ -43,7 +43,7 @@ ml_logistic_regression.spark_connection <- function(
   response = NULL,
   features = NULL, ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
 
   jobj <- ml_new_classifier(
     x, "org.apache.spark.ml.classification.LogisticRegression", uid,

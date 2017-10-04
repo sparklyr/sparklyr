@@ -14,7 +14,7 @@ ft_tokenizer <- function(x, input_col, output_col, uid = random_string("tokenize
 #' @export
 ft_tokenizer.spark_connection <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Tokenizer",
                              input_col, output_col, uid)
 
@@ -55,7 +55,7 @@ ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_s
 ft_binarizer.spark_connection <- function(x, input_col, output_col, threshold = 0,
                                           uid = random_string("binarizer_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Binarizer",
                              input_col, output_col, uid) %>%
     invoke("setThreshold", threshold)
@@ -99,7 +99,7 @@ ft_hashing_tf <- function(x, input_col, output_col, binary = FALSE,
 ft_hashing_tf.spark_connection <- function(x, input_col, output_col, binary = FALSE,
                                            num_features = as.integer(2^18), uid = random_string("hashing_tf_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.HashingTF",
                              input_col, output_col, uid) %>%
     invoke("setBinary", binary) %>%
@@ -147,7 +147,7 @@ ft_one_hot_encoder.spark_connection <- function(
   x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
 
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.OneHotEncoder",
                              input_col, output_col, uid) %>%
@@ -197,7 +197,7 @@ ft_vector_assembler.spark_connection <- function(
   x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
 
   jobj <- invoke_new(x, "org.apache.spark.ml.feature.VectorAssembler", uid) %>%
     invoke("setInputCols", input_cols) %>%
@@ -243,7 +243,7 @@ ft_dct <- function(x, input_col, output_col, inverse = FALSE, uid = random_strin
 #' @export
 ft_dct.spark_connection <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.DCT",
                              input_col, output_col, uid) %>%
     invoke("setInverse", inverse)
@@ -292,7 +292,7 @@ ft_index_to_string <- function(x, input_col, output_col, labels = NULL,
 ft_index_to_string.spark_connection <- function(
   x, input_col, output_col, labels = NULL, uid = random_string("index_to_string_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.IndexToString",
                              input_col, output_col, uid)
 
@@ -343,7 +343,7 @@ ft_bucketizer.spark_connection <- function(
   x, input_col, output_col, splits, handle_invalid = "error",
   uid = random_string("bucketizer_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Bucketizer",
                              input_col, output_col, uid) %>%
     invoke("setSplits", splits) %>%
@@ -393,7 +393,7 @@ ft_elementwise_product.spark_connection <- function(
   x, input_col, output_col, scaling_vec,
   uid = random_string("elementwise_product_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.ElementwiseProduct",
                              input_col, output_col, uid) %>%
     (function(jobj) invoke_static(x,
@@ -450,7 +450,7 @@ ft_regex_tokenizer.spark_connection <- function(
   min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
   uid = random_string("regex_tokenizer_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.RegexTokenizer",
                              input_col, output_col, uid) %>%
     invoke("setGaps", gaps) %>%
@@ -532,7 +532,7 @@ ft_stop_words_remover.spark_connection <- function(
   stop_words = ml_default_stop_words(spark_connection(x), "english"),
   uid = random_string("stop_words_remover_"), ...) {
 
-  ml_validate_args()
+  ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.StopWordsRemover",
                              input_col, output_col, uid) %>%
     invoke("setCaseSensitive", case_sensitive) %>%
