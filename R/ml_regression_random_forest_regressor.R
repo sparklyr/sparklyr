@@ -153,13 +153,14 @@ ml_validator_random_forest_regressor <- function(args, nms) {
   old_new_mapping <- list(
     max.bins = "max_bins",
     max.depth = "max_depth",
-    num.trees = "max_iter",
     min.info.gain = "min_info_gain",
     sample.rate = "subsampling_rate",
     min.rows = "min_instances_per_node",
     checkpoint.interval = "checkpoint_interval",
     cache.node.ids = "cache_node_ids",
-    max.memory = "max_memory_in_mb"
+    max.memory = "max_memory_in_mb",
+    num.trees = "num_trees",
+    col.sample.rate = "feature_subset_strategy"
   )
 
   args %>%
