@@ -4,6 +4,7 @@ ml_decision_tree <- function(
   formula = NULL,
   response = NULL,
   features = NULL,
+  type = c("auto", "regression", "classification"),
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
