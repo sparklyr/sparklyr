@@ -47,6 +47,5 @@ Other Spark ML routines: \code{\link{ml_als_factorization}},
   \code{\link{ml_multilayer_perceptron}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_one_vs_rest}}, \code{\link{ml_pca}},
-  \code{\link{ml_random_forest}},
   \code{\link{ml_survival_regression}}
 }
