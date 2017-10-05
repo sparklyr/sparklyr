@@ -71,3 +71,9 @@ sdf_predict.ml_model_regression <- function(object, newdata, ...) {
     ml_transform(newdata) %>%
     select(!!!rlang::syms(c(tbl_vars(newdata), "prediction")))
 }
+
+#' @export
+print.ml_model <- function(x, ...) {
+  cat("Call: ", x$formula, "\n\n", sep = "")
+  cat(invoke(spark_jobj(x$model), "toString"), sep = "\n")
+}
