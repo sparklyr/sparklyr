@@ -43,8 +43,8 @@ especially useful in conjunction with \code{\link{do}}.}
 Perform alternating least squares matrix factorization on a Spark DataFrame.
 }
 \seealso{
-Other Spark ML routines: \code{\link{ml_gradient_boosted_trees}},
-  \code{\link{ml_kmeans}}, \code{\link{ml_lda}},
+Other Spark ML routines: \code{\link{ml_kmeans}},
+  \code{\link{ml_lda}},
   \code{\link{ml_multilayer_perceptron}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_one_vs_rest}}, \code{\link{ml_pca}},

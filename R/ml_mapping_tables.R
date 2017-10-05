@@ -50,7 +50,11 @@ ml_create_mapping_tables <- function() {
          "min_info_gain" = "minInfoGain",
          "min_instances_per_node" = "minInstancesPerNode",
          "cache_node_ids" = "cacheNodeIds",
-         "max_memory_in_mb" = "maxMemoryInMB")
+         "max_memory_in_mb" = "maxMemoryInMB",
+         # ml_gbt_classifier
+         "loss_type" = "lossType",
+         "step_size" = "stepSize",
+         "subsampling_rate" = "subsamplingRate")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

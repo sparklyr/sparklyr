@@ -15,6 +15,7 @@ ml_ancestry <- function(jobj) {
                "regression.GeneralizedLinearRegressionModel",
                "regression.DecisionTreeRegressor", "regression.DecisionTreeRegressionModel",
                "classification.DecisionTreeClassifier", "classification.DecisionTreeClassificationModel",
+               "classification.GBTClassifier", "classification.GBTClassificationModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
@@ -37,6 +38,8 @@ ml_constructor_dispatch <- function(jobj) {
          "feature.CountVectorizerModel" = new_ml_count_vectorizer_model(jobj),
          "classification.LogisticRegressionModel" = new_ml_logistic_regression_model(jobj),
          "classification.LogisticRegression" = new_ml_logistic_regression(jobj),
+         "classification.GBTClassifier" = new_ml_gbt_classifier(jobj),
+         "classification.GBTClassificationModel", new_ml_gbt_classification_model(jobj),
          "regression.LinearRegression" = new_ml_linear_regression(jobj),
          "regression.LinearRegressionModel" = new_ml_linear_regression_model(jobj),
          "regression.GeneralizedLinearRegression" = new_ml_generalized_linear_regression(jobj),
