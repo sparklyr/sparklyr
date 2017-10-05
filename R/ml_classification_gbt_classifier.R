@@ -214,10 +214,9 @@ new_ml_gbt_classification_model <- function(jobj) {
 
   new_ml_prediction_model(
     jobj,
-    depth = invoke(jobj, "depth"),
     feature_importances = try_null(read_spark_vector(jobj, "featureImportances")),
     num_trees = invoke(jobj, "numTrees"),
-    num_classes = invoke(jobj, "numClasses"),
+    num_classes = try_null(invoke(jobj, "numClasses")),
     num_features = invoke(jobj, "numFeatures"),
     total_num_nodes = invoke(jobj, "totalNumNodes"),
     tree_weights = invoke(jobj, "treeWeights"),
