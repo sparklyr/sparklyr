@@ -1,4 +1,4 @@
-context("random forest")
+context("ml random forest")
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
@@ -6,7 +6,7 @@ iris_tbl <- testthat_tbl("iris")
 test_that("ml_random_forest_classifier() parses params correctly", {
   args <- list(
     x = sc, label_col = "col", features_col = "fcol", prediction_col = "pcol",
-    probability_col = "prcol", raw_prediction_col = "rpcol",
+    probability_col = "prcol", raw_prediction_col = "rpcol", impurity = "entropy",
     feature_subset_strategy = "onethird",
     checkpoint_interval = 9, max_bins = 30, max_depth = 6,
     num_trees = 19, min_info_gain = 0.01, min_instances_per_node = 2,
@@ -18,6 +18,18 @@ test_that("ml_random_forest_classifier() parses params correctly", {
   expect_equal(ml_params(rfc, names(args)[-1]), args[-1])
 })
 
+test_that("ml_random_forest_regressor() parses params correctly", {
+  args <- list(
+    x = sc, label_col = "col", features_col = "fcol", prediction_col = "pcol",
+    impurity = "variance", feature_subset_strategy = "onethird",
+    checkpoint_interval = 9, max_bins = 30, max_depth = 6,
+    num_trees = 19, min_info_gain = 0.01, min_instances_per_node = 2,
+    subsampling_rate = 0.9, seed = 42, cache_node_ids = TRUE,
+    max_memory_in_mb = 128
+  )
+  rfr <- do.call(ml_random_forest_regressor, args)
+  expect_equal(ml_params(rfr, names(args)[-1]), args[-1])
+})
 #
 # test_that("rf runs successfully when all args specified", {
 #   expect_error(

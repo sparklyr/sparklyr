@@ -19,6 +19,7 @@ ml_ancestry <- function(jobj) {
                "regression.GeneralizedLinearRegressionModel",
                "regression.DecisionTreeRegressor", "regression.DecisionTreeRegressionModel",
                "regression.GBTRegressor", "regression.GBTRegressionModel",
+               "regression.RandomForestRegressor", "regression.RandomForestRegressionModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
@@ -53,6 +54,8 @@ ml_constructor_dispatch <- function(jobj) {
          "regression.DecisionTreeRegressionModel" = new_ml_decision_tree_regression_model(jobj),
          "regression.GBTRegressor" = new_ml_gbt_regressor(jobj),
          "regression.GBTRegressionModel" = new_ml_gbt_regression_model(jobj),
+         "regression.RandomForestRegressor" = new_ml_random_forest_regressor(jobj),
+         "regression.RandomForestRegressionModel" = new_ml_random_forest_regression_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),
