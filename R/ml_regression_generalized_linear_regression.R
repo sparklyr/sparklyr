@@ -376,13 +376,4 @@ sdf_residuals.ml_model_generalized_linear_regression <- function(
     sdf_fast_bind_cols(residuals)
 }
 
-#' @export
-sdf_predict.ml_model_generalized_linear_regression <- function(object, newdata, ...) {
-  # when newdata is not supplied, attempt to use original dataset
-  if (missing(newdata) || is.null(newdata))
-    newdata <- object$dataset
 
-  object$pipeline_model %>%
-    ml_transform(newdata) %>%
-    select(!!!rlang::syms(c(tbl_vars(newdata), "prediction")))
-}

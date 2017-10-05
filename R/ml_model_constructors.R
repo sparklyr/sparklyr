@@ -60,3 +60,14 @@ sdf_predict.ml_model_classification <- function(object, newdata, ...) {
     ml_transform(newdata) %>%
     select(!!!rlang::syms(c(tbl_vars(newdata), "prediction")))
 }
+
+#' @export
+sdf_predict.ml_model_regression <- function(object, newdata, ...) {
+  # when newdata is not supplied, attempt to use original dataset
+  if (missing(newdata) || is.null(newdata))
+    newdata <- object$dataset
+
+  object$pipeline_model %>%
+    ml_transform(newdata) %>%
+    select(!!!rlang::syms(c(tbl_vars(newdata), "prediction")))
+}
