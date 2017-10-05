@@ -112,15 +112,15 @@ test_that("one-tree ensemble agrees with ml_decision_tree()", {
                  sdf_predict(iris_tbl) %>%
                  collect())
 })
-#
-# test_that("checkpointing works for gbt", {
-#   spark_set_checkpoint_dir(sc, tempdir())
-#   expect_error(
-#     iris_tbl %>%
-#       ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
-#                                 type = "regression",
-#                                 cache.node.ids = TRUE,
-#                                 checkpoint.interval = 5L),
-#     NA
-#   )
-# })
+
+test_that("checkpointing works for gbt", {
+  spark_set_checkpoint_dir(sc, tempdir())
+  expect_error(
+    iris_tbl %>%
+      ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
+                                type = "regression",
+                                cache.node.ids = TRUE,
+                                checkpoint.interval = 5L),
+    NA
+  )
+})
