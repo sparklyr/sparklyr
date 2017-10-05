@@ -7,6 +7,7 @@ ml_random_forest_classifier <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   feature_subset_strategy = "auto",
+  impurity = "gini",
   checkpoint_interval = 10L,
   max_bins = 32L,
   max_depth = 5L,
@@ -35,6 +36,7 @@ ml_random_forest_classifier.spark_connection <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   feature_subset_strategy = "auto",
+  impurity = "gini",
   checkpoint_interval = 10L,
   max_bins = 32L,
   max_depth = 5L,
@@ -68,7 +70,8 @@ ml_random_forest_classifier.spark_connection <- function(
     invoke("setMaxMemoryInMB", max_memory_in_mb) %>%
     invoke("setNumTrees", num_trees) %>%
     invoke("setSubsamplingRate", subsampling_rate) %>%
-    invoke("setFeatureSubsetStrategy", feature_subset_strategy)
+    invoke("setFeatureSubsetStrategy", feature_subset_strategy) %>%
+    invoke("setImpurity", impurity)
 
   if(!rlang::is_null(thresholds))
     jobj <- invoke(jobj, "setThresholds", thresholds)
@@ -88,6 +91,7 @@ ml_random_forest_classifier.ml_pipeline <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   feature_subset_strategy = "auto",
+  impurity = "gini",
   checkpoint_interval = 10L,
   max_bins = 32L,
   max_depth = 5L,
@@ -120,6 +124,7 @@ ml_random_forest_classifier.tbl_spark <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   feature_subset_strategy = "auto",
+  impurity = "gini",
   checkpoint_interval = 10L,
   max_bins = 32L,
   max_depth = 5L,
@@ -191,6 +196,7 @@ ml_validator_random_forest_classifier <- function(args, nms) {
       num_trees <- ensure_scalar_integer(num_trees)
       subsampling_rate <- ensure_scalar_double(subsampling_rate)
       feature_subset_strategy <- ensure_scalar_character(feature_subset_strategy)
+      impurity <- rlang::arg_match(impurity, c("gini", "entropy"))
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }
