@@ -170,32 +170,20 @@ ml_gbt_classifier.tbl_spark <- function(
 
 # Validator
 ml_validator_gbt_classifier <- function(args, nms) {
-  old_new_mapping <- list(
-    max.bins = "max_bins",
-    max.depth = "max_depth",
-    num.trees = "max_iter",
-    loss.type = "loss_type",
-    min.info.gain = "min_info_gain",
-    sample.rate = "subsampling_rate",
-    min.rows = "min_instances_per_node",
-    checkpoint.interval = "checkpoint_interval",
-    cache.node.ids = "cache_node_ids",
-    max.memory = "max_memory_in_mb"
+  old_new_mapping <- c(
+    ml_tree_param_mapping(),
+    list(
+      num.trees = "max_iter",
+      loss.type = "loss_type",
+      sample.rate = "subsampling_rate"
+    )
   )
 
   args %>%
+    ml_validate_decision_tree_args() %>%
     ml_validate_args({
-      max_bins <- ensure_scalar_integer(max_bins)
-      max_depth <- ensure_scalar_integer(max_depth)
-      min_info_gain <- ensure_scalar_double(min_info_gain)
-      min_instances_per_node <- ensure_scalar_integer(min_instances_per_node)
-      seed <- ensure_scalar_integer(seed, allow.null = TRUE)
-      checkpoint_interval <- ensure_scalar_integer(checkpoint_interval)
-      cache_node_ids <- ensure_scalar_boolean(cache_node_ids)
-      max_memory_in_mb <- ensure_scalar_integer(max_memory_in_mb)
       if (!rlang::is_null(thresholds))
         thresholds <- lapply(thresholds, ensure_scalar_double)
-
       max_iter <- ensure_scalar_integer(max_iter)
       step_size <- ensure_scalar_double(step_size)
       subsampling_rate <- ensure_scalar_double(subsampling_rate)

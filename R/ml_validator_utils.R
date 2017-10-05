@@ -123,3 +123,29 @@ ml_extract_args <- function(
   )) {
   args[mapply(`%||%`, mapping_list[nms], nms)]
 }
+
+ml_tree_param_mapping <- function() {
+  list(
+    max.bins = "max_bins",
+    max.depth = "max_depth",
+    min.info.gain = "min_info_gain",
+    min.rows = "min_instances_per_node",
+    checkpoint.interval = "checkpoint_interval",
+    cache.node.ids = "cache_node_ids",
+    max.memory = "max_memory_in_mb"
+  )
+}
+
+ml_validate_decision_tree_args <- function(args) {
+  args %>%
+    ml_validate_args({
+      max_bins <- ensure_scalar_integer(max_bins)
+      max_depth <- ensure_scalar_integer(max_depth)
+      min_info_gain <- ensure_scalar_double(min_info_gain)
+      min_instances_per_node <- ensure_scalar_integer(min_instances_per_node)
+      seed <- ensure_scalar_integer(seed, allow.null = TRUE)
+      checkpoint_interval <- ensure_scalar_integer(checkpoint_interval)
+      cache_node_ids <- ensure_scalar_boolean(cache_node_ids)
+      max_memory_in_mb <- ensure_scalar_integer(max_memory_in_mb)
+    }, ml_tree_param_mapping())
+}
