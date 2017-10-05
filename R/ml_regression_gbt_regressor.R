@@ -192,10 +192,8 @@ new_ml_gbt_regression_model <- function(jobj) {
 
   new_ml_prediction_model(
     jobj,
-    depth = invoke(jobj, "depth"),
     feature_importances = try_null(read_spark_vector(jobj, "featureImportances")),
     num_trees = invoke(jobj, "numTrees"),
-    num_classes = invoke(jobj, "numClasses"),
     num_features = invoke(jobj, "numFeatures"),
     total_num_nodes = invoke(jobj, "totalNumNodes"),
     tree_weights = invoke(jobj, "treeWeights"),
@@ -203,9 +201,6 @@ new_ml_gbt_regression_model <- function(jobj) {
       lapply(new_ml_decision_tree_regression_model),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = try_null(invoke(jobj, "getProbabilityCol")),
-    raw_prediction_col = try_null(invoke(jobj, "getRawPredictionCol")),
-    thresholds = try_null(invoke(jobj, "getThresholds")),
     subclass = "ml_gbt_regression_model")
 }
 
