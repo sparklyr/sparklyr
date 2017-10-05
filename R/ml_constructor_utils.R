@@ -40,7 +40,7 @@ ml_constructor_dispatch <- function(jobj) {
          "classification.LogisticRegressionModel" = new_ml_logistic_regression_model(jobj),
          "classification.LogisticRegression" = new_ml_logistic_regression(jobj),
          "classification.GBTClassifier" = new_ml_gbt_classifier(jobj),
-         "classification.GBTClassificationModel", new_ml_gbt_classification_model(jobj),
+         "classification.GBTClassificationModel" = new_ml_gbt_classification_model(jobj),
          "regression.LinearRegression" = new_ml_linear_regression(jobj),
          "regression.LinearRegressionModel" = new_ml_linear_regression_model(jobj),
          "regression.GeneralizedLinearRegression" = new_ml_generalized_linear_regression(jobj),
