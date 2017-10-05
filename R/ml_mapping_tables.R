@@ -54,7 +54,10 @@ ml_create_mapping_tables <- function() {
          # ml_gbt_classifier
          "loss_type" = "lossType",
          "step_size" = "stepSize",
-         "subsampling_rate" = "subsamplingRate")
+         "subsampling_rate" = "subsamplingRate",
+         # ml_random_forest_classifier
+         "num_trees" = "numTrees",
+         "feature_subset_strategy" = "featureSubsetStrategy")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
