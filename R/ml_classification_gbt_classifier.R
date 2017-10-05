@@ -118,6 +118,9 @@ ml_gbt_classifier.ml_pipeline <- function(
 #' @export
 ml_gbt_classifier.tbl_spark <- function(
   x,
+  formula = NULL,
+  response = NULL,
+  features = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
@@ -136,10 +139,7 @@ ml_gbt_classifier.tbl_spark <- function(
   thresholds = NULL,
   cache_node_ids = FALSE,
   max_memory_in_mb = 256L,
-  uid = random_string("gbt_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("gbt_classifier_"), ...) {
 
   predictor <- ml_new_stage_modified_args()
 

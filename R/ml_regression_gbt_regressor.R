@@ -74,6 +74,9 @@ ml_gbt_regressor.spark_connection <- function(
 #' @export
 ml_gbt_regressor.ml_pipeline <- function(
   x,
+  formula = NULL,
+  response = NULL,
+  features = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
@@ -89,10 +92,7 @@ ml_gbt_regressor.ml_pipeline <- function(
   seed = NULL,
   cache_node_ids = FALSE,
   max_memory_in_mb = 256L,
-  uid = random_string("gbt_regressor_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("gbt_regressor_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
