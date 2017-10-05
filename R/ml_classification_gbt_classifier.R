@@ -195,6 +195,11 @@ ml_validator_gbt_classifier <- function(args, nms) {
       max_memory_in_mb <- ensure_scalar_integer(max_memory_in_mb)
       if (!rlang::is_null(thresholds))
         thresholds <- lapply(thresholds, ensure_scalar_double)
+
+      max_iter <- ensure_scalar_integer(max_iter)
+      step_size <- ensure_scalar_double(step_size)
+      subsampling_rate <- ensure_scalar_double(subsampling_rate)
+      loss_type <- ensure_scalar_character(loss_type)
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }

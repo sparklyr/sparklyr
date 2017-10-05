@@ -8,10 +8,10 @@ test_that("ml_gbt_classifier() parses params correctly (<2.2)", {
   args <- list(
     x = sc, features_col = "fcol", prediction_col = "pcol",
     # probability_col = "prcol", raw_prediction_col = "rpcol",
-    checkpoint_interval = 9L, loss_type = "logistic",
-    max_bins = 30L, max_depth = 6L,
-    max_iter = 19L, min_info_gain = 0.01, min_instances_per_node = 2L,
-    step_size = 0.01, subsampling_rate = 0.9, seed = 42L,
+    checkpoint_interval = 9, loss_type = "logistic",
+    max_bins = 30, max_depth = 6,
+    max_iter = 19, min_info_gain = 0.01, min_instances_per_node = 2,
+    step_size = 0.01, subsampling_rate = 0.9, seed = 42,
     # thresholds = c(0.1, 0.3, 0.6),
     cache_node_ids = TRUE,
     max_memory_in_mb = 128
@@ -25,10 +25,10 @@ test_that("ml_gbt_classifier() parses params correctly (>=2.2)", {
   args <- list(
     x = sc, features_col = "fcol", prediction_col = "pcol",
     probability_col = "prcol", raw_prediction_col = "rpcol",
-    checkpoint_interval = 9L, loss_type = "logistic",
-    max_bins = 30L, max_depth = 6L,
-    max_iter = 19L, min_info_gain = 0.01, min_instances_per_node = 2L,
-    step_size = 0.01, subsampling_rate = 0.9, seed = 42L,
+    checkpoint_interval = 9, loss_type = "logistic",
+    max_bins = 30, max_depth = 6,
+    max_iter = 19, min_info_gain = 0.01, min_instances_per_node = 2,
+    step_size = 0.01, subsampling_rate = 0.9, seed = 42,
     thresholds = c(0.1, 0.3, 0.6),
     cache_node_ids = TRUE,
     max_memory_in_mb = 128
