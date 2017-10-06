@@ -1,3 +1,15 @@
+#' Spark ML -- Decision Trees
+#'
+#' Perform regression using decision trees.
+#'
+#' @template roxlate-ml-algo
+#' @template roxlate-ml-decision-trees-base-params
+#' @template roxlate-ml-predictor-params
+#' @template roxlate-ml-formula-params
+#'
+#' @param variance_col (Optional) Column name for the biased sample variance of prediction.
+#' @param impurity Criterion used for information gain calculation. Supported: "variance". (default = variance)
+#'
 #' @export
 ml_decision_tree_regressor <- function(
   x,
@@ -6,7 +18,7 @@ ml_decision_tree_regressor <- function(
   prediction_col = "prediction",
   variance_col = NULL,
   checkpoint_interval = 10L,
-  impurity = "auto",
+  impurity = "variance",
   max_bins = 32L,
   max_depth = 5L,
   min_info_gain = 0,
@@ -30,7 +42,7 @@ ml_decision_tree_regressor.spark_connection <- function(
   prediction_col = "prediction",
   variance_col = NULL,
   checkpoint_interval = 10L,
-  impurity = "auto",
+  impurity = "variance",
   max_bins = 32L,
   max_depth = 5L,
   min_info_gain = 0,
@@ -75,7 +87,7 @@ ml_decision_tree_regressor.ml_pipeline <- function(
   prediction_col = "prediction",
   variance_col = NULL,
   checkpoint_interval = 10L,
-  impurity = "auto",
+  impurity = "variance",
   max_bins = 32L,
   max_depth = 5L,
   min_info_gain = 0,
@@ -103,7 +115,7 @@ ml_decision_tree_regressor.tbl_spark <- function(
   prediction_col = "prediction",
   variance_col = NULL,
   checkpoint_interval = 10L,
-  impurity = "auto",
+  impurity = "variance",
   max_bins = 32L,
   max_depth = 5L,
   min_info_gain = 0,
@@ -145,6 +157,7 @@ ml_validator_decision_tree_regressor <- function(args, nms) {
   args %>%
     ml_validate_decision_tree_args() %>%
     ml_validate_args({
+      impurity <- rlang::arg_match(impurity, "variance")
       variance_col <- ensure_scalar_character(variance_col, allow.null = TRUE)
     }, ml_tree_param_mapping()) %>%
     ml_extract_args(nms, ml_tree_param_mapping())

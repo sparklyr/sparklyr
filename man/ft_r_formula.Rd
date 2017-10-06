@@ -31,15 +31,15 @@ feature "transformer" against \code{dataset}. See details.}
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection} When \code{x} is a \code{spark_connection}, the function returns a \code{ml_transformer},
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns a \code{ml_transformer},
   a \code{ml_estimator}, or one of their subclasses. The object contains a pointer to
   a Spark \code{Transformer} or \code{Estimator} object and can be used to compose
   \code{Pipeline} objects.
 
-  \item \code{ml_pipeline} When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
+  \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
   the transformer or estimator appended to the pipline.
 
-  \item \code{tbl_spark} When \code{x} is a \code{tbl_spark}, a transformer is constructed then
+  \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a transformer is constructed then
   immediately applied to the input \code{tbl_spark}, returning a \code{tbl_spark}
 }
 }
