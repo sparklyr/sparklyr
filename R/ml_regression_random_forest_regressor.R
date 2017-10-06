@@ -1,3 +1,5 @@
+#' @rdname ml_random_forest
+#' @template roxlate-ml-predictor-params
 #' @export
 ml_random_forest_regressor <- function(
   x,

@@ -1,3 +1,5 @@
+#' @rdname ml_random_forest
+#' @template roxlate-ml-probabilistic-classifier-params
 #' @export
 ml_random_forest_classifier <- function(
   x,
