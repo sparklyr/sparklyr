@@ -1,4 +1,4 @@
-context("ml pipeline")
+context("ml pipeline utils")
 
 sc <- testthat_spark_connection()
 
