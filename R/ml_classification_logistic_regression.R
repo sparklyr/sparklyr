@@ -202,13 +202,10 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
 }
 
 new_ml_model_logistic_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula) {
+  pipeline, pipeline_model, model, dataset, formula, feature_names, index_labels) {
 
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
-
-  feature_names <- ml_feature_names_metadata(pipeline_model, dataset, features_col)
-  index_labels <- ml_index_labels_metadata(pipeline_model, dataset, label_col)
 
   # multinomial vs. binomial models have separate APIs for
   # retrieving results
@@ -250,6 +247,7 @@ new_ml_model_logistic_regression <- function(
     pipeline, pipeline_model,
     model, dataset, formula,
     coefficients = coefficients,
+    .feature_names = feature_names,
     .index_labels = index_labels,
     summary = summary,
     subclass = "ml_model_logistic_regression",
