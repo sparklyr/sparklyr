@@ -25,36 +25,6 @@ ml_gradient_boosted_trees <- function(
   max_memory_in_mb = 256L,
   uid = random_string("gradient_boosted_trees_"), ...
 ) {
-  UseMethod("ml_gradient_boosted_trees")
-}
-
-#' @export
-ml_gradient_boosted_trees.tbl_spark <- function(
-  x,
-  formula = NULL,
-  response = NULL,
-  features = NULL,
-  type = c("auto", "regression", "classification"),
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  loss_type = c("auto", "logistic", "squared", "absolute"),
-  max_bins = 32L,
-  max_depth = 5L,
-  max_iter = 20L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  step_size = 0.1,
-  subsampling_rate = 1,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("gradient_boosted_trees_"), ...
-) {
 
   ml_formula_transformation()
   response_col <- gsub("~.+$", "", formula) %>% trimws()
