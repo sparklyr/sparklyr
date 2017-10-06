@@ -1,3 +1,21 @@
+#' Spark ML -- Gradient Boosted Trees
+#'
+#' Perform classification and regression using gradient boosted trees.
+#'
+#' @template roxlate-ml-algo
+#' @template roxlate-ml-decision-trees-base-params
+#' @template roxlate-ml-formula-params
+#' @param max_iter Maxmimum number of iterations.
+#' @param step_size Step size (a.k.a. learning rate) in interval (0, 1] for shrinking the contribution of each estimator. (default = 0.1)
+#' @param subsampling_rate Fraction of the training data used for learning each decision tree, in range (0, 1]. (default = 1.0)
+#' @param loss_type Loss function which GBT tries to minimize. Supported: \code{"squared"} (L2) and \code{"absolute"} (L1) (default = squared) for regression and \code{"logistic"} (default) for classification. For \code{ml_gradient_boosted_trees}, setting \code{"auto"}
+#'   will default to the appropriate loss type based on model type.
+#' @name ml_gradient_boosted_trees
+NULL
+
+#' @rdname ml_gradient_boosted_trees
+#' @template roxlate-ml-decision-trees-type
+#' @details \code{ml_gradient_boosted_trees} is a wrapper around \code{ml_gbt_regressor.tbl_spark} and \code{ml_gbt_classifier.tbl_spark} and calls the appropriate method based on model type.
 #' @export
 ml_gradient_boosted_trees <- function(
   x,

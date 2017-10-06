@@ -1,3 +1,5 @@
+#' @rdname ml_gradient_boosted_trees
+#' @template roxlate-ml-predictor-params
 #' @export
 ml_gbt_regressor <- function(
   x,
