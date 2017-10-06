@@ -247,10 +247,10 @@ new_ml_model_logistic_regression <- function(
     pipeline, pipeline_model,
     model, dataset, formula,
     coefficients = coefficients,
-    .feature_names = feature_names,
-    .index_labels = index_labels,
     summary = summary,
     subclass = "ml_model_logistic_regression",
+    .features = feature_names,
+    .index_labels = index_labels,
     .call = call
   )
 }

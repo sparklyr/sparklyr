@@ -21,6 +21,7 @@ new_ml_model_prediction <- function(
     model = model,
     dataset = dataset,
     formula = formula,
+    .response = gsub("~.+$", "", formula) %>% trimws(),
     ...,
     subclass = c(subclass, "ml_model_prediction"))
 }

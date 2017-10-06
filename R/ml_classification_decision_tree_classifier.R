@@ -131,22 +131,10 @@ ml_decision_tree_classifier.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
-
-    sc <- spark_connection(x)
-    r_formula <- ft_r_formula(sc, formula, features_col,
-                              label_col, force_index_label = TRUE,
-                              dataset = x)
-    pipeline <- ml_pipeline(r_formula, predictor)
-
-    pipeline_model <- pipeline %>%
-      ml_fit(x)
-
-    new_ml_model_decision_tree_classification(
-      pipeline,
-      pipeline_model,
-      model = pipeline_model %>% ml_stage(2),
-      dataset = x,
-      formula = formula)
+    ml_generate_ml_model(
+      x, predictor, formula, features_col, label_col,
+      "classification", new_ml_model_decision_tree_classification
+      )
   }
 }
 
@@ -185,28 +173,16 @@ new_ml_decision_tree_classification_model <- function(jobj) {
 }
 
 new_ml_model_decision_tree_classification <- function(
-  pipeline, pipeline_model, model, dataset, formula) {
-
-  jobj <- spark_jobj(model)
-  sc <- spark_connection(model)
-  features_col <- ml_param(model, "features_col")
-  label_col <- ml_param(model, "label_col")
-  transformed_tbl <- pipeline_model %>%
-    ml_transform(dataset)
-
-  feature_names <- ml_column_metadata(transformed_tbl, features_col) %>%
-    `[[`("attrs") %>%
-    `[[`("numeric") %>%
-    dplyr::pull("name")
+  pipeline, pipeline_model, model, dataset, formula, feature_names,
+  index_labels) {
 
   call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
 
   new_ml_model_classification(
     pipeline, pipeline_model, model, dataset, formula,
-    coefficients = coefficients,
     subclass = "ml_model_decision_tree_classification",
-    .response = gsub("~.+$", "", formula) %>% trimws(),
     .features = feature_names,
+    .index_labels = index_labels,
     .call = call
   )
 }
