@@ -1,3 +1,5 @@
+#' @rdname ml_decision_tree
+#' @template roxlate-ml-probabilistic-classifier-params
 #' @export
 ml_decision_tree_classifier <- function(
   x,
@@ -7,7 +9,7 @@ ml_decision_tree_classifier <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   checkpoint_interval = 10L,
-  impurity = "auto",
+  impurity = "gini",
   max_bins = 32L,
   max_depth = 5L,
   min_info_gain = 0,
@@ -33,7 +35,7 @@ ml_decision_tree_classifier.spark_connection <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   checkpoint_interval = 10L,
-  impurity = "auto",
+  impurity = "gini",
   max_bins = 32L,
   max_depth = 5L,
   min_info_gain = 0,
@@ -80,7 +82,7 @@ ml_decision_tree_classifier.ml_pipeline <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   checkpoint_interval = 10L,
-  impurity = "auto",
+  impurity = "gini",
   max_bins = 32L,
   max_depth = 5L,
   min_info_gain = 0,
@@ -110,7 +112,7 @@ ml_decision_tree_classifier.tbl_spark <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   checkpoint_interval = 10L,
-  impurity = "auto",
+  impurity = "gini",
   max_bins = 32L,
   max_depth = 5L,
   min_info_gain = 0,
@@ -132,7 +134,7 @@ ml_decision_tree_classifier.tbl_spark <- function(
 
     sc <- spark_connection(x)
     r_formula <- ft_r_formula(sc, formula, features_col,
-                              label_col,
+                              label_col, force_index_label = TRUE,
                               dataset = x)
     pipeline <- ml_pipeline(r_formula, predictor)
 
@@ -155,6 +157,7 @@ ml_validator_decision_tree_classifier <- function(args, nms) {
     ml_validate_args({
       if (!rlang::is_null(thresholds))
         thresholds <- lapply(thresholds, ensure_scalar_double)
+      impurity <- rlang::arg_match(impurity, c("gini", "entropy"))
     }, ml_tree_param_mapping()) %>%
     ml_extract_args(nms, ml_tree_param_mapping())
 }

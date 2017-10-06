@@ -152,7 +152,7 @@ ml_gbt_classifier.tbl_spark <- function(
 
     sc <- spark_connection(x)
     r_formula <- ft_r_formula(sc, formula, features_col,
-                              label_col,
+                              label_col, force_index_label = TRUE,
                               dataset = x)
     pipeline <- ml_pipeline(r_formula, predictor)
 
