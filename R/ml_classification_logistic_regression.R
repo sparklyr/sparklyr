@@ -227,7 +227,8 @@ new_ml_model_logistic_regression <- function(
 
   feature_names <- ml_column_metadata(transformed_tbl, features_col) %>%
     `[[`("attrs") %>%
-    `[[`("numeric") %>%
+    dplyr::bind_rows() %>%
+    arrange(!!rlang::sym("idx")) %>%
     dplyr::pull("name")
 
   index_labels <- ml_column_metadata(transformed_tbl, label_col) %>%
