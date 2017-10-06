@@ -113,30 +113,16 @@ ml_logistic_regression.tbl_spark <- function(
   raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...) {
 
-  logistic_regression <- ml_new_stage_modified_args()
+  predictor <- ml_new_stage_modified_args()
 
   ml_formula_transformation()
 
   if (is.null(formula)) {
-    logistic_regression %>%
+    predictor %>%
       ml_fit(x)
   } else {
-    # formula <- (if (rlang::is_formula(formula)) rlang::expr_text else identity)(formula)
-    sc <- spark_connection(x)
-    r_formula <- ft_r_formula(sc, formula, features_col,
-                              label_col, force_index_label = TRUE,
-                              dataset = x)
-    pipeline <- ml_pipeline(r_formula, logistic_regression)
-
-    pipeline_model <- pipeline %>%
-      ml_fit(x)
-
-    new_ml_model_logistic_regression(
-      pipeline = pipeline,
-      pipeline_model = pipeline_model,
-      model = ml_stage(pipeline_model, 2),
-      dataset = x,
-      formula = formula)
+    ml_generate_ml_model(x, predictor, formula, features_col, label_col,
+                         "classification", new_ml_model_logistic_regression)
   }
 }
 
@@ -220,19 +206,9 @@ new_ml_model_logistic_regression <- function(
 
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
-  features_col <- ml_param(model, "features_col")
-  label_col <- ml_param(model, "label_col")
-  transformed_tbl <- pipeline_model %>%
-    ml_transform(dataset)
 
-  feature_names <- ml_column_metadata(transformed_tbl, features_col) %>%
-    `[[`("attrs") %>%
-    dplyr::bind_rows() %>%
-    arrange(!!rlang::sym("idx")) %>%
-    dplyr::pull("name")
-
-  index_labels <- ml_column_metadata(transformed_tbl, label_col) %>%
-    `[[`("vals")
+  feature_names <- ml_feature_names_metadata(pipeline_model, dataset, features_col)
+  index_labels <- ml_index_labels_metadata(pipeline_model, dataset, label_col)
 
   # multinomial vs. binomial models have separate APIs for
   # retrieving results
