@@ -73,9 +73,15 @@ sdf_predict.ml_model_regression <- function(object, newdata, ...) {
   if (missing(newdata) || is.null(newdata))
     newdata <- object$dataset
 
+  cols <- object$model %>%
+    ml_params(c("prediction_col", "variance_col"),
+              allow_null = TRUE) %>%
+    (function(x) Filter(length, x)) %>%
+    unlist(use.names = FALSE)
+
   object$pipeline_model %>%
     ml_transform(newdata) %>%
-    select(!!!rlang::syms(c(tbl_vars(newdata), "prediction")))
+    select(!!!rlang::syms(c(tbl_vars(newdata), cols)))
 }
 
 #' @export
