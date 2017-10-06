@@ -1,15 +1,6 @@
-#' Spark ML -- Decision Trees
-#'
-#' Perform regression using decision trees.
-#'
-#' @template roxlate-ml-algo
-#' @template roxlate-ml-decision-trees-base-params
-#' @template roxlate-ml-predictor-params
-#' @template roxlate-ml-formula-params
-#'
+#' @rdname ml_decision_tree
 #' @param variance_col (Optional) Column name for the biased sample variance of prediction.
-#' @param impurity Criterion used for information gain calculation. Supported: "variance". (default = variance)
-#'
+#' @template roxlate-ml-predictor-params
 #' @export
 ml_decision_tree_regressor <- function(
   x,
