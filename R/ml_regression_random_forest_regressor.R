@@ -181,13 +181,7 @@ new_ml_random_forest_regression_model <- function(jobj) {
 
 new_ml_model_random_forest_regression <- function(
   pipeline, pipeline_model, model, dataset, formula,
-  feature_names) {
-
-  jobj <- spark_jobj(model)
-  sc <- spark_connection(model)
-
-  call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
-
+  feature_names, call) {
   new_ml_model_regression(
     pipeline, pipeline_model, model, dataset, formula,
     subclass = "ml_model_random_forest_regression",

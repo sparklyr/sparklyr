@@ -32,13 +32,17 @@ ml_generate_ml_model <- function(x, predictor, formula, features_col, label_col,
 
   feature_names <- ml_feature_names_metadata(pipeline_model, x, features_col)
 
+  call <- sys.call(sys.parent())
+  call_string <- paste(deparse(call, width.cutoff = 500), " ")
+
   args <- list(
     pipeline = pipeline,
     pipeline_model = pipeline_model,
     model = ml_stage(pipeline_model, 2),
     dataset = x,
     formula = formula,
-    feature_names = feature_names
+    feature_names = feature_names,
+    call = call_string
   ) %>%
     (function(args) if (classification) rlang::modify(
       args, index_labels = ml_index_labels_metadata(pipeline_model, x, label_col)

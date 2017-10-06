@@ -205,10 +205,8 @@ new_ml_random_forest_classification_model <- function(jobj) {
 }
 
 new_ml_model_random_forest_classification <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, index_labels) {
-
-  call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
-
+  pipeline, pipeline_model, model, dataset, formula, feature_names,
+  index_labels, call) {
   new_ml_model_classification(
     pipeline, pipeline_model, model, dataset, formula,
     subclass = "ml_model_random_forest_classification",

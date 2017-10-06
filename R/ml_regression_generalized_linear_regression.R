@@ -231,7 +231,7 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj) {
 }
 
 new_ml_model_generalized_linear_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names) {
+  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
 
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
@@ -243,8 +243,6 @@ new_ml_model_generalized_linear_regression <- function(
     rlang::set_names(
       c(invoke(jobj, "intercept"), model$coefficients),
       c("(Intercept)", feature_names))
-
-  call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
 
   summary <- model$summary
 

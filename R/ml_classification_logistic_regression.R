@@ -202,7 +202,8 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
 }
 
 new_ml_model_logistic_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, index_labels) {
+  pipeline, pipeline_model, model, dataset, formula, feature_names, index_labels,
+  call) {
 
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
@@ -238,8 +239,6 @@ new_ml_model_logistic_regression <- function(
       rlang::set_names(coefficients, feature_names)
     coefficients
   }
-
-  call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
 
   summary <- model$summary
 

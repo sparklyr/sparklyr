@@ -208,12 +208,10 @@ new_ml_gbt_classification_model <- function(jobj) {
 
 new_ml_model_gbt_classification <- function(
   pipeline, pipeline_model, model, dataset, formula, feature_names,
-  index_labels) {
+  index_labels, call) {
 
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
-
-  call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
 
   new_ml_model_classification(
     pipeline, pipeline_model, model, dataset, formula,

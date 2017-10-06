@@ -182,9 +182,7 @@ new_ml_gbt_regression_model <- function(jobj) {
 }
 
 new_ml_model_gbt_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names) {
-
-  call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
+  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
 
   new_ml_model_regression(
     pipeline, pipeline_model, model, dataset, formula,

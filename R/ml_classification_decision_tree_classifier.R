@@ -174,9 +174,7 @@ new_ml_decision_tree_classification_model <- function(jobj) {
 
 new_ml_model_decision_tree_classification <- function(
   pipeline, pipeline_model, model, dataset, formula, feature_names,
-  index_labels) {
-
-  call <- rlang::ctxt_frame(rlang::ctxt_frame()$caller_pos)$expr
+  index_labels, call) {
 
   new_ml_model_classification(
     pipeline, pipeline_model, model, dataset, formula,
