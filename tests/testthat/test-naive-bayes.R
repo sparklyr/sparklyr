@@ -37,7 +37,7 @@ test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
     ml_naive_bayes(Class ~ .)
 
   Rp <- as.numeric(R$apriori / sum(R$apriori))
-  Sp <- as.numeric(exp(model$model$pi))
+  Sp <- as.numeric(exp(model[["pi"]]))
 
   expect_equal(Rp, Sp, tolerance = 0.001)
 })

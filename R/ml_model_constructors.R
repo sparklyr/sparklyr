@@ -29,14 +29,17 @@ new_ml_model_prediction <- function(
 new_ml_model_classification <- function(
   pipeline, pipeline_model,
   model, dataset, formula, ..., subclass = NULL) {
-  new_ml_model_prediction(
-    pipeline = pipeline,
-    pipeline_model = pipeline_model,
-    model = model,
-    dataset = dataset,
-    formula = formula,
-    ...,
-    subclass = c(subclass, "ml_model_classification"))
+
+  # workaround for partial matching of `pi` to `pipeline` in
+  #   ml_naive_bayes()
+  do.call(new_ml_model_prediction,
+          rlang::ll(pipeline = pipeline,
+                     pipeline_model = pipeline_model,
+                     model = model,
+                     dataset = dataset,
+                     formula = formula,
+                     !!! rlang::dots_list(...),
+                     subclass = c(subclass, "ml_model_classification")))
 }
 
 new_ml_model_regression <- function(
