@@ -2,6 +2,7 @@ package sparklyr
 
 
 import org.apache.spark.ml.feature.ElementwiseProduct
+import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
 import org.apache.spark.ml.linalg._
 import org.apache.spark.ml.PipelineStage
 
@@ -14,6 +15,11 @@ object MLUtils2 {
     v: Array[Double]): ElementwiseProduct = {
     elementwiseProduct.setScalingVec(sparkVector(v))
   }
+
+  def setInitialWeights(mlp: MultilayerPerceptronClassifier,
+    v: Array[Double]): MultilayerPerceptronClassifier = {
+      mlp.setInitialWeights(sparkVector(v))
+    }
 
   def getParamMap(pipelineStage: PipelineStage): Map[String, Any] = {
     Map(pipelineStage.extractParamMap.toSeq map {

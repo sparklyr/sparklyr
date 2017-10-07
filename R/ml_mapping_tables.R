@@ -59,7 +59,10 @@ ml_create_mapping_tables <- function() {
          "num_trees" = "numTrees",
          "feature_subset_strategy" = "featureSubsetStrategy",
          # ml_naive_bayes
-         "model_type" = "modelType")
+         "model_type" = "modelType",
+         # ml_multilayer_perceptron_classifier
+         "block_size" = "blockSize",
+         "initial_weights" = "initialWeights")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

@@ -145,5 +145,6 @@ See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} 
 
 Other ml algorithms: \code{\link{ml_decision_tree_classifier}},
   \code{\link{ml_gbt_classifier}},
+  \code{\link{ml_multilayer_perceptron_classifier}},
   \code{\link{ml_naive_bayes}}
 }
