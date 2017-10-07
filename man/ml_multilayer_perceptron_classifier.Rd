@@ -15,8 +15,7 @@ ml_multilayer_perceptron_classifier(x, features_col = "features",
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
-\item{layers}{A numeric vector describing the hidden layers -- each element in the vector
-gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three hidden layers with 4, 5, and 2 nodes, respectively.}
+\item{layers}{A numeric vector describing the layers -- each element in the vector gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three layers, with an input (feature) layer of size 4, an intermediate layer of size 5, and an output (class) layer of size 2.}
 
 \item{max_iter}{The maximum number of iterations to use.}
 

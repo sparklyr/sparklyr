@@ -4,8 +4,7 @@
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-formula-params
 #' @template roxlate-ml-predictor-params
-#' @param layers A numeric vector describing the hidden layers -- each element in the vector
-#'   gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three hidden layers with 4, 5, and 2 nodes, respectively.
+#' @param layers A numeric vector describing the layers -- each element in the vector gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three layers, with an input (feature) layer of size 4, an intermediate layer of size 5, and an output (class) layer of size 2.
 #' @template roxlate-ml-tol
 #' @template roxlate-ml-max-iter
 #' @template roxlate-ml-seed
