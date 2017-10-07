@@ -126,5 +126,6 @@ See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} 
   more information on the set of supervised learning algorithms.
 
 Other ml algorithms: \code{\link{ml_gbt_classifier}},
+  \code{\link{ml_naive_bayes}},
   \code{\link{ml_random_forest_classifier}}
 }

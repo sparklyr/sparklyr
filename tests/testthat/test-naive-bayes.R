@@ -1,9 +1,20 @@
-context("naive bayes")
+context("ml naive bayes")
 
 sc <- testthat_spark_connection()
 
+test_that("ml_naive_bayes() parses params correctly", {
+  args <- list(
+    x = sc, label_col = "col", features_col = "fcol", prediction_col = "pcol",
+    probability_col = "prcol", raw_prediction_col = "rpcol",
+    model_type = "bernoulli", smoothing = 0.6, thresholds = c(0.2, 0.4, 0.6),
+    weight_col = "wcol"
+  )
+  nb <- do.call(ml_naive_bayes, args)
+  expect_equal(ml_params(nb, names(args)[-1]), args[-1])
+})
+
 test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
-  skip_on_cran()
+  # skip_on_cran()
   test_requires("e1071", "mlbench")
 
   data("HouseVotes84", package = "mlbench")
@@ -22,10 +33,11 @@ test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
 
   # compute Spark-side naive bayes model
   model <- S <- tbl %>%
-    ml_naive_bayes(Class ~ ., ml.options = ml_options(na.action = na.omit))
+    na.omit() %>%
+    ml_naive_bayes(Class ~ .)
 
   Rp <- as.numeric(R$apriori / sum(R$apriori))
-  Sp <- as.numeric(exp(model$pi))
+  Sp <- as.numeric(exp(model$model$pi))
 
-  expect_equal(Rp, Sp)
+  expect_equal(Rp, Sp, tolerance = 0.001)
 })

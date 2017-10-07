@@ -57,7 +57,9 @@ ml_create_mapping_tables <- function() {
          "subsampling_rate" = "subsamplingRate",
          # ml_random_forest_classifier
          "num_trees" = "numTrees",
-         "feature_subset_strategy" = "featureSubsetStrategy")
+         "feature_subset_strategy" = "featureSubsetStrategy",
+         # ml_naive_bayes
+         "model_type" = "modelType")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

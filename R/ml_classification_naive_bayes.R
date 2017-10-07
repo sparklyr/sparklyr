@@ -1,0 +1,181 @@
+#' Spark ML -- Naive-Bayes
+#'
+#' Naive Bayes Classifiers. It supports Multinomial NB (see \href{http://nlp.stanford.edu/IR-book/html/htmledition/naive-bayes-text-classification-1.html}{here}) which can handle finitely supported discrete data. For example, by converting documents into TF-IDF vectors, it can be used for document classification. By making every vector a binary (0/1) data, it can also be used as Bernoulli NB (see \href{http://nlp.stanford.edu/IR-book/html/htmledition/the-bernoulli-model-1.html}{here}). The input feature values must be nonnegative.
+#'
+#' @template roxlate-ml-algo
+#' @template roxlate-ml-probabilistic-classifier-params
+#' @template roxlate-ml-formula-params
+#' @param model_type The model type. Supported options: \code{"multinomial"}
+#'   and \code{"bernoulli"}. (default = \code{multinomial})
+#' @param smoothing The (Laplace) smoothing parameter. Defaults to zero.
+#' @param weight_col Weight column name. If this is not set or empty, we treat all instance
+#'   weights as 1.0.
+#' @export
+ml_naive_bayes <- function(
+  x,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
+  uid = random_string("naive_bayes_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...
+) {
+  UseMethod("ml_naive_bayes")
+}
+
+#' @export
+ml_naive_bayes.spark_connection <- function(
+  x,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
+  uid = random_string("naive_bayes_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...) {
+
+  ml_ratify_args()
+
+  jobj <- ml_new_classifier(
+    x, "org.apache.spark.ml.classification.NaiveBayes", uid,
+    features_col, label_col, prediction_col, probability_col, raw_prediction_col
+  ) %>%
+    invoke("setSmoothing", smoothing) %>%
+    invoke("setModelType", model_type)
+
+  if(!rlang::is_null(thresholds))
+    jobj <- invoke(jobj, "setThresholds", thresholds)
+
+  if (!rlang::is_null(weight_col))
+    jobj <- invoke(jobj, "setWeightCol", weight_col)
+
+  new_ml_naive_bayes(jobj)
+}
+
+#' @export
+ml_naive_bayes.ml_pipeline <- function(
+  x,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
+  uid = random_string("naive_bayes_"),
+  formula = NULL,
+  response = NULL,
+  features = NULL, ...) {
+
+  transformer <- ml_new_stage_modified_args()
+  ml_add_stage(x, transformer)
+}
+
+#' @export
+ml_naive_bayes.tbl_spark <- function(
+  x,
+  formula = NULL,
+  response = NULL,
+  features = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
+  uid = random_string("naive_bayes_"), ...) {
+
+  predictor <- ml_new_stage_modified_args()
+
+  ml_formula_transformation()
+
+  if (is.null(formula)) {
+    predictor %>%
+      ml_fit(x)
+  } else {
+    ml_generate_ml_model(
+      x, predictor, formula, features_col, label_col,
+      "classification", new_ml_model_naive_bayes
+    )
+  }
+}
+
+# Validator
+ml_validator_naive_bayes <- function(args, nms) {
+  old_new_mapping <- list(
+    lambda = "smoothing"
+  )
+  args %>%
+    ml_validate_args({
+      if (!rlang::is_null(thresholds))
+        thresholds <- lapply(thresholds, ensure_scalar_double)
+
+      smoothing <- ensure_scalar_double(smoothing)
+      if (!rlang::is_null(weight_col))
+        weight_col <- ensure_scalar_character(weight_col)
+      model_type <- rlang::arg_match(model_type, c("multinomial", "bernoulli"))
+    }, old_new_mapping) %>%
+    ml_extract_args(nms, old_new_mapping)
+}
+
+# Constructors
+
+new_ml_naive_bayes <- function(jobj) {
+  new_ml_predictor(jobj, subclass = "ml_naive_bayes")
+}
+
+new_ml_naive_bayes_model <- function(jobj) {
+
+  new_ml_prediction_model(
+    jobj,
+    num_features = invoke(jobj, "numFeatures"),
+    num_classes = invoke(jobj, "numClasses"),
+    pi = read_spark_vector(jobj, "pi"),
+    theta = read_spark_matrix(jobj, "theta"),
+    features_col = invoke(jobj, "getFeaturesCol"),
+    prediction_col = invoke(jobj, "getPredictionCol"),
+    probability_col = invoke(jobj, "getProbabilityCol"),
+    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
+    thresholds = try_null(invoke(jobj, "getThresholds")),
+    subclass = "ml_naive_bayes_model")
+}
+
+new_ml_model_naive_bayes <- function(
+  pipeline, pipeline_model, model, dataset, formula, feature_names,
+  index_labels, call) {
+
+  new_ml_model_classification(
+    pipeline, pipeline_model, model, dataset, formula,
+    subclass = "ml_model_naive_bayes",
+    .features = feature_names,
+    .index_labels = index_labels,
+    .call = call
+  )
+}
+
+# Generic implementations
+
+#' @export
+ml_fit.ml_naive_bayes <- function(x, data, ...) {
+  jobj <- spark_jobj(x) %>%
+    invoke("fit", spark_dataframe(data))
+  new_ml_naive_bayes_model(jobj)
+}
