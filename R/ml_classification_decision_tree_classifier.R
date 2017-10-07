@@ -163,6 +163,7 @@ new_ml_decision_tree_classification_model <- function(jobj) {
     depth = invoke(jobj, "depth"),
     feature_importances = try_null(read_spark_vector(jobj, "featureImportances")),
     num_features = invoke(jobj, "numFeatures"),
+    num_classes = try_null(invoke(jobj, "numClasses")),
     num_nodes = invoke(jobj, "numNodes"),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
