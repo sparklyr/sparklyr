@@ -51,6 +51,19 @@ test_that("ml_linear_regression param setting works", {
                list(elastic_net_param = 0.2, reg_param = 0.1))
 })
 
+test_that("ml_linear_regression() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_linear_regression() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_linear_regression,
+                           c("x", "uid", "...", "weight_col"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
 test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   # skip_on_cran()
   test_requires("glmnet")
