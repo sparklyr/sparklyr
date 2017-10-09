@@ -99,7 +99,8 @@ new_ml_one_vs_rest <- function(jobj) {
 new_ml_one_vs_rest_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
-    models = invoke(jobj, "models"),
+    models = invoke(jobj, "models") %>%
+      lapply(ml_constructor_dispatch),
     subclass = "ml_one_vs_rest_model")
 }
 
