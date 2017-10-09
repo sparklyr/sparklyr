@@ -34,12 +34,12 @@ new_ml_model_classification <- function(
   #   ml_naive_bayes()
   do.call(new_ml_model_prediction,
           rlang::ll(pipeline = pipeline,
-                     pipeline_model = pipeline_model,
-                     model = model,
-                     dataset = dataset,
-                     formula = formula,
-                     !!! rlang::dots_list(...),
-                     subclass = c(subclass, "ml_model_classification")))
+                    pipeline_model = pipeline_model,
+                    model = model,
+                    dataset = dataset,
+                    formula = formula,
+                    !!! rlang::dots_list(...),
+                    subclass = c(subclass, "ml_model_classification")))
 }
 
 new_ml_model_regression <- function(
@@ -55,8 +55,15 @@ new_ml_model_regression <- function(
     subclass = c(subclass, "ml_model_regression"))
 }
 
+
+
 #' @export
-sdf_predict.ml_model_classification <- function(object, newdata, ...) {
+sdf_predict.ml_model_classification <- function(
+  object, newdata, predicted_label_col = "predicted_label",
+  probability_prefix = "probability_", ...) {
+  ensure_scalar_character(predicted_label_col)
+  ensure_scalar_character(probability_prefix)
+
   if (missing(newdata) || is.null(newdata))
     newdata <- object$dataset
 
@@ -66,9 +73,20 @@ sdf_predict.ml_model_classification <- function(object, newdata, ...) {
     (function(x) Filter(length, x)) %>%
     unlist(use.names = FALSE)
 
-  object$pipeline_model %>%
+  predictions <- object$pipeline_model %>%
     ml_transform(newdata) %>%
-    select(!!!rlang::syms(c(tbl_vars(newdata), cols)))
+    select(!!!rlang::syms(c(tbl_vars(newdata), cols))) %>%
+    ft_index_to_string(ml_param(object$model, "prediction_col"), predicted_label_col, labels = object$.index_labels)
+
+  probability_col <- ml_param(object$model, "probability_col", allow_null = TRUE)
+  if (rlang::is_null(probability_col))
+    predictions
+  else
+    sdf_separate_column(
+      predictions, probability_col,
+      paste0(probability_prefix, spark_sanitize_names(object$.index_labels))
+      )
+
 }
 
 #' @export
