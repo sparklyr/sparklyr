@@ -1,24 +1,44 @@
+#' Spark ML -- Generalized Linear Regression
+#'
+#' Perform regression using Generalized Linear Model (GLM).
+#'
+#' @template roxlate-ml-algo
+#' @template roxlate-ml-formula-params
+#' @template roxlate-ml-linear-regression-params
+#' @template roxlate-ml-predictor-params
+#' @param family Name of family which is a description of the error distribution to be used in the model. Supported options: "gaussian", "binomial", "poisson", "gamma" and "tweedie". Default is "gaussian".
+#' @param link Name of link function which provides the relationship between the linear predictor and the mean of the distribution function. See for supported link functions.
+#' @param link_power Index in the power link function. Only applicable to the Tweedie family. Note that link power 0, 1, -1 or 0.5 corresponds to the Log, Identity, Inverse or Sqrt link, respectively. When not set, this value defaults to 1 - variancePower, which matches the R "statmod" package.
+#' @param link_prediction_col Link prediction (linear predictor) column name. Default is not set, which means we do not output link prediction.
+#' @param solver Solver algorithm for optimization.
+#' @param variance_power Power in the variance function of the Tweedie distribution which provides the relationship between the variance and mean of the distribution. Only applicable to the Tweedie family. (see \href{https://en.wikipedia.org/wiki/Tweedie_distribution}{Tweedie Distribution (Wikipedia)}) Supported values: 0 and [1, Inf). Note that variance power 0, 1, or 2 corresponds to the Gaussian, Poisson or Gamma family, respectively.
+#'
+#' @details Valid link functions for each family is listed below. The first link function of each family is the default one.
+#'   \itemize{
+#'     \item gaussian: "identity", "log", "inverse"
+#'     \item binomial: "logit", "probit", "cloglog"
+#'     \item poisson: "log", "identity", "sqrt"
+#'     \item gamma: "inverse", "identity", "log"
+#'     \item tweedie: power link function specified through \code{link_power}. The default link power in the tweedie family is \code{1 - variance_power}.
+#'     }
 #' @export
 ml_generalized_linear_regression <- function(
   x,
   family = "gaussian",
-  features_col = "features",
-  label_col = "label",
-  fit_intercept = TRUE,
   link = NULL,
+  fit_intercept = TRUE,
   link_power = NULL,
   link_prediction_col = NULL,
   reg_param = 0,
   max_iter = 25L,
   weight_col = NULL,
-  prediction_col = "prediction",
   solver = "irls",
   tol = 1e-6,
   variance_power = 0,
-  uid = random_string("generalized_linear_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("generalized_linear_regression_"), ...
 ) {
   spark_require_version(spark_connection(x), "2.0.0")
   UseMethod("ml_generalized_linear_regression")
@@ -28,22 +48,20 @@ ml_generalized_linear_regression <- function(
 ml_generalized_linear_regression.spark_connection <- function(
   x,
   family = "gaussian",
-  features_col = "features",
-  label_col = "label",
-  fit_intercept = TRUE,
   link = NULL,
+  fit_intercept = TRUE,
+  link_power = NULL,
   link_prediction_col = NULL,
   reg_param = 0,
   max_iter = 25L,
   weight_col = NULL,
-  prediction_col = "prediction",
   solver = "irls",
   tol = 1e-6,
   variance_power = 0,
-  uid = random_string("generalized_linear_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("generalized_linear_regression_"), ...) {
 
   ml_ratify_args()
 
@@ -80,22 +98,20 @@ ml_generalized_linear_regression.spark_connection <- function(
 ml_generalized_linear_regression.ml_pipeline <- function(
   x,
   family = "gaussian",
-  features_col = "features",
-  label_col = "label",
-  fit_intercept = TRUE,
   link = NULL,
+  fit_intercept = TRUE,
+  link_power = NULL,
   link_prediction_col = NULL,
   reg_param = 0,
   max_iter = 25L,
   weight_col = NULL,
-  prediction_col = "prediction",
   solver = "irls",
   tol = 1e-6,
   variance_power = 0,
-  uid = random_string("generalized_linear_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("generalized_linear_regression_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -104,21 +120,22 @@ ml_generalized_linear_regression.ml_pipeline <- function(
 #' @export
 ml_generalized_linear_regression.tbl_spark <- function(
   x,
+  formula = NULL,
   family = "gaussian",
-  features_col = "features",
-  label_col = "label",
-  fit_intercept = TRUE,
   link = NULL,
+  fit_intercept = TRUE,
+  link_power = NULL,
   link_prediction_col = NULL,
   reg_param = 0,
   max_iter = 25L,
   weight_col = NULL,
-  prediction_col = "prediction",
   solver = "irls",
   tol = 1e-6,
   variance_power = 0,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("generalized_linear_regression_"),
-  formula = NULL,
   response = NULL,
   features = NULL, ...) {
 
