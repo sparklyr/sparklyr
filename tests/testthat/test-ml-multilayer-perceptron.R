@@ -14,6 +14,19 @@ test_that("ml_multilayer_perceptron_classifier() parses params correctly", {
   expect_equal(ml_params(mlpc, names(args)[-1]), args[-1])
 })
 
+test_that("ml_multilayer_perceptron() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_multilayer_perceptron(layers = c(2, 2)) %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_multilayer_perceptron,
+                           c("x", "uid", "...", "initial_weights", "seed", "layers"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
 test_that("ml_multilayer_perceptron returns correct number of weights", {
   iris_tbl <- testthat_tbl("iris")
   mlp <- ml_multilayer_perceptron_classifier(

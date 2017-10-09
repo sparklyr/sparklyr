@@ -5,12 +5,11 @@
 \alias{ml_multilayer_perceptron_classifier}
 \title{Spark ML -- Multilayer Perceptron}
 \usage{
-ml_multilayer_perceptron_classifier(x, features_col = "features",
-  label_col = "label", prediction_col = "prediction", layers,
-  max_iter = 100L, seed = NULL, step_size = 0.03, tol = 1e-06,
-  block_size = 128L, initial_weights = NULL, solver = "l-bfgs",
-  uid = random_string("multilayer_perceptron_classifier_"), formula = NULL,
-  response = NULL, features = NULL, ...)
+ml_multilayer_perceptron_classifier(x, layers, max_iter = 100L,
+  step_size = 0.03, tol = 1e-06, block_size = 128L, solver = "l-bfgs",
+  seed = NULL, initial_weights = NULL, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  uid = random_string("multilayer_perceptron_classifier_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -19,29 +18,29 @@ ml_multilayer_perceptron_classifier(x, features_col = "features",
 
 \item{max_iter}{The maximum number of iterations to use.}
 
-\item{seed}{A random seed. Set this value if you need your results to be
-reproducible across repeated calls.}
-
 \item{step_size}{Step size to be used for each iteration of optimization (> 0).}
 
 \item{tol}{Param for the convergence tolerance for iterative algorithms.}
 
 \item{block_size}{Block size for stacking input data in matrices to speed up the computation. Data is stacked within partitions. If block size is more than remaining data in a partition then it is adjusted to the size of this data. Recommended size is between 10 and 1000. Default: 128}
 
-\item{initial_weights}{The initial weights of the model.}
-
 \item{solver}{The solver algorithm for optimization. Supported options: "gd" (minibatch gradient descent) or "l-bfgs". Default: "l-bfgs"}
+
+\item{seed}{A random seed. Set this value if you need your results to be
+reproducible across repeated calls.}
+
+\item{initial_weights}{The initial weights of the model.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
+\item{...}{Optional arguments; currently unused.}
 
-\item{response}{(Deprecated) The name of the response column (as a length-one character
-vector.)}
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{response}{(Deprecated) The name of the response column (as a length-one character
+vector.)}
 }
 \value{
 The object returned depends on the class of \code{x}.

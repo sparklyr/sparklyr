@@ -15,21 +15,18 @@
 #' @export
 ml_multilayer_perceptron_classifier <- function(
   x,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
   layers,
   max_iter = 100L,
-  seed = NULL,
   step_size = 0.03,
   tol = 1e-06,
   block_size = 128L,
-  initial_weights = NULL,
   solver = "l-bfgs",
-  uid = random_string("multilayer_perceptron_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...
+  seed = NULL,
+  initial_weights = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("multilayer_perceptron_classifier_"), ...
 ) {
   UseMethod("ml_multilayer_perceptron_classifier")
 }
@@ -37,21 +34,18 @@ ml_multilayer_perceptron_classifier <- function(
 #' @export
 ml_multilayer_perceptron_classifier.spark_connection <- function(
   x,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
   layers,
   max_iter = 100L,
-  seed = NULL,
   step_size = 0.03,
   tol = 1e-06,
   block_size = 128L,
-  initial_weights = NULL,
   solver = "l-bfgs",
-  uid = random_string("multilayer_perceptron_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  seed = NULL,
+  initial_weights = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("multilayer_perceptron_classifier_"), ...) {
 
   ml_ratify_args()
 
@@ -82,21 +76,18 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(
 #' @export
 ml_multilayer_perceptron_classifier.ml_pipeline <- function(
   x,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
   layers,
   max_iter = 100L,
-  seed = NULL,
   step_size = 0.03,
   tol = 1e-06,
   block_size = 128L,
-  initial_weights = NULL,
   solver = "l-bfgs",
-  uid = random_string("multilayer_perceptron_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  seed = NULL,
+  initial_weights = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("multilayer_perceptron_classifier_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -106,20 +97,20 @@ ml_multilayer_perceptron_classifier.ml_pipeline <- function(
 ml_multilayer_perceptron_classifier.tbl_spark <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
   layers,
   max_iter = 100L,
-  seed = NULL,
   step_size = 0.03,
   tol = 1e-06,
   block_size = 128L,
-  initial_weights = NULL,
   solver = "l-bfgs",
-  uid = random_string("multilayer_perceptron_classifier_"), ...) {
+  seed = NULL,
+  initial_weights = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("multilayer_perceptron_classifier_"),
+  response = NULL,
+  features = NULL, ...) {
 
   predictor <- ml_new_stage_modified_args()
 
