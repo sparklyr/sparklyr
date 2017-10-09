@@ -11,7 +11,7 @@ ml_one_vs_rest(x, classifier, features_col = "features",
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
-\item{classifier}{Base binary classifier that we reduce multiclass classification into.}
+\item{classifier}{Object of class \code{ml_estimator}. Base binary classifier that we reduce multiclass classification into.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 

@@ -5,7 +5,7 @@
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-formula-params
 #' @template roxlate-ml-predictor-params
-#' @param classifier Base binary classifier that we reduce multiclass classification into.
+#' @param classifier Object of class \code{ml_estimator}. Base binary classifier that we reduce multiclass classification into.
 #' @export
 ml_one_vs_rest <- function(
   x,
