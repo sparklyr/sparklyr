@@ -8,16 +8,15 @@
 \alias{ml_random_forest_regressor}
 \title{Spark ML -- Random Forest}
 \usage{
-ml_random_forest_classifier(x, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
-  probability_col = "probability", raw_prediction_col = "rawPrediction",
-  feature_subset_strategy = "auto", impurity = "gini",
-  checkpoint_interval = 10L, max_bins = 32L, max_depth = 5L,
-  num_trees = 20L, min_info_gain = 0, min_instances_per_node = 1L,
-  subsampling_rate = 1, seed = NULL, thresholds = NULL,
-  cache_node_ids = FALSE, max_memory_in_mb = 256L,
-  uid = random_string("random_forest_classifier_"), formula = NULL,
-  response = NULL, features = NULL, ...)
+ml_random_forest_classifier(x, num_trees = 20L, subsampling_rate = 1,
+  max_depth = 5L, min_instances_per_node = 1L,
+  feature_subset_strategy = "auto", impurity = "gini", min_info_gain = 0,
+  max_bins = 32L, seed = NULL, thresholds = NULL,
+  checkpoint_interval = 10L, cache_node_ids = FALSE,
+  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
+  prediction_col = "prediction", probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("random_forest_classifier_"), ...)
 
 ml_random_forest(x, formula = NULL, response = NULL, features = NULL,
   type = c("auto", "regression", "classification"),
@@ -30,21 +29,27 @@ ml_random_forest(x, formula = NULL, response = NULL, features = NULL,
   thresholds = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256L,
   uid = random_string("random_forest_"), ...)
 
-ml_random_forest_regressor(x, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
+ml_random_forest_regressor(x, num_trees = 20L, subsampling_rate = 1,
+  max_depth = 5L, min_instances_per_node = 1L,
   feature_subset_strategy = "auto", impurity = "variance",
-  checkpoint_interval = 10L, max_bins = 32L, max_depth = 5L,
-  num_trees = 20L, min_info_gain = 0, min_instances_per_node = 1L,
-  subsampling_rate = 1, seed = NULL, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, uid = random_string("random_forest_regressor_"),
-  formula = NULL, response = NULL, features = NULL, ...)
+  min_info_gain = 0, max_bins = 32L, seed = NULL,
+  checkpoint_interval = 10L, cache_node_ids = FALSE,
+  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("random_forest_regressor_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
-\item{probability_col}{Column name for predicted class conditional probabilities.}
+\item{num_trees}{Number of trees to train (>= 1). If 1, then no bootstrapping is used. If > 1, then bootstrapping is done.}
 
-\item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
+\item{subsampling_rate}{Fraction of the training data used for learning each decision tree, in range (0, 1]. (default = 1.0)}
+
+\item{max_depth}{Maximum depth of the tree (>= 0); that is, the maximum
+number of nodes separating any leaves from the root of the tree.}
+
+\item{min_instances_per_node}{Minimum number of instances each child must
+have after split.}
 
 \item{feature_subset_strategy}{The number of features to consider for splits at each tree node. See details for options.}
 
@@ -53,29 +58,19 @@ and "gini" (default) for classification and "variance" (default) for regression.
 \code{ml_decision_tree}, setting \code{"auto"} will default to the appropriate
 criterion based on model type.}
 
-\item{checkpoint_interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
-E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
+\item{min_info_gain}{Minimum information gain for a split to be considered
+at a tree node. Should be >= 0, defaults to 0.}
 
 \item{max_bins}{The maximum number of bins used for discretizing
 continuous features and for choosing how to split on features at
 each node. More bins give higher granularity.}
 
-\item{max_depth}{Maximum depth of the tree (>= 0); that is, the maximum
-number of nodes separating any leaves from the root of the tree.}
-
-\item{num_trees}{Number of trees to train (>= 1). If 1, then no bootstrapping is used. If > 1, then bootstrapping is done.}
-
-\item{min_info_gain}{Minimum information gain for a split to be considered
-at a tree node. Should be >= 0, defaults to 0.}
-
-\item{min_instances_per_node}{Minimum number of instances each child must
-have after split.}
-
-\item{subsampling_rate}{Fraction of the training data used for learning each decision tree, in range (0, 1]. (default = 1.0)}
-
 \item{seed}{Seed for random numbers.}
 
 \item{thresholds}{Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value \code{p/t} is predicted, where \code{p} is the original probability of that class and \code{t} is the class's threshold.}
+
+\item{checkpoint_interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
 
 \item{cache_node_ids}{If \code{FALSE}, the algorithm will pass trees to executors to match instances with nodes.
 If \code{TRUE}, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
@@ -85,7 +80,13 @@ Defaults to \code{FALSE}.}
 If too small, then 1 node will be split per iteration,
 and its aggregates may exceed this size. Defaults to 256.}
 
+\item{probability_col}{Column name for predicted class conditional probabilities.}
+
+\item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
+
 \item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
@@ -93,8 +94,6 @@ and its aggregates may exceed this size. Defaults to 256.}
 vector.)}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
-
-\item{...}{Optional arguments; currently unused.}
 
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response

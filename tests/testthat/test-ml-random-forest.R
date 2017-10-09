@@ -31,6 +31,32 @@ test_that("ml_random_forest_regressor() parses params correctly", {
   expect_equal(ml_params(rfr, names(args)[-1]), args[-1])
 })
 
+test_that("ml_random_forest_classifier() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_random_forest_classifier() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_random_forest_classifier,
+                           c("x", "uid", "...", "thresholds", "seed"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
+test_that("ml_random_forest_regressor() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_random_forest_regressor() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_random_forest_regressor,
+                           c("x", "uid", "...", "seed"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
 test_that("rf runs successfully when all args specified", {
   expect_error(
     iris_tbl %>%
