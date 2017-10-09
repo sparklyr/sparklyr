@@ -24,7 +24,9 @@ test_that("ml_logistic_regression parameter setting/getting works", {
   expect_equal(
     ml_params(lr, names(args)[-1]),
               args[-1])
+})
 
+test_that("logistic regression default params are correct", {
   lr <- ml_pipeline(sc) %>%
     ml_logistic_regression() %>%
     ml_stage(1)
@@ -35,7 +37,6 @@ test_that("ml_logistic_regression parameter setting/getting works", {
   expect_equal(
     ml_params(lr, names(args)),
     args)
-
 })
 
 test_that("we can fit multinomial models", {
