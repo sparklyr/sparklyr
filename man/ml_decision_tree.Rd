@@ -27,13 +27,12 @@ ml_decision_tree(x, formula = NULL, response = NULL, features = NULL,
   seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
   max_memory_in_mb = 256L, uid = random_string("decision_tree_"), ...)
 
-ml_decision_tree_regressor(x, features_col = "features",
-  label_col = "label", prediction_col = "prediction", variance_col = NULL,
-  checkpoint_interval = 10L, impurity = "variance", max_bins = 32L,
-  max_depth = 5L, min_info_gain = 0, min_instances_per_node = 1L,
-  seed = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_regressor_"), formula = NULL,
-  response = NULL, features = NULL, ...)
+ml_decision_tree_regressor(x, max_depth = 5L, max_bins = 32L,
+  min_instances_per_node = 1L, min_info_gain = 0, impurity = "variance",
+  seed = NULL, cache_node_ids = FALSE, checkpoint_interval = 10L,
+  max_memory_in_mb = 256L, variance_col = NULL, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  uid = random_string("decision_tree_regressor_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

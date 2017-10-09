@@ -4,23 +4,20 @@
 #' @export
 ml_decision_tree_regressor <- function(
   x,
+  max_depth = 5L,
+  max_bins = 32L,
+  min_instances_per_node = 1L,
+  min_info_gain = 0,
+  impurity = "variance",
+  seed = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10L,
+  max_memory_in_mb = 256L,
+  variance_col = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
-  variance_col = NULL,
-  checkpoint_interval = 10L,
-  impurity = "variance",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_regressor_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...
+  uid = random_string("decision_tree_regressor_"), ...
 ) {
   UseMethod("ml_decision_tree_regressor")
 }
@@ -28,23 +25,20 @@ ml_decision_tree_regressor <- function(
 #' @export
 ml_decision_tree_regressor.spark_connection <- function(
   x,
+  max_depth = 5L,
+  max_bins = 32L,
+  min_instances_per_node = 1L,
+  min_info_gain = 0,
+  impurity = "variance",
+  seed = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10L,
+  max_memory_in_mb = 256L,
+  variance_col = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
-  variance_col = NULL,
-  checkpoint_interval = 10L,
-  impurity = "variance",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_regressor_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("decision_tree_regressor_"), ...) {
 
   ml_ratify_args()
 
@@ -73,23 +67,20 @@ ml_decision_tree_regressor.spark_connection <- function(
 #' @export
 ml_decision_tree_regressor.ml_pipeline <- function(
   x,
+  max_depth = 5L,
+  max_bins = 32L,
+  min_instances_per_node = 1L,
+  min_info_gain = 0,
+  impurity = "variance",
+  seed = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10L,
+  max_memory_in_mb = 256L,
+  variance_col = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
-  variance_col = NULL,
-  checkpoint_interval = 10L,
-  impurity = "variance",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_regressor_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("decision_tree_regressor_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -99,22 +90,22 @@ ml_decision_tree_regressor.ml_pipeline <- function(
 ml_decision_tree_regressor.tbl_spark <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
+  max_depth = 5L,
+  max_bins = 32L,
+  min_instances_per_node = 1L,
+  min_info_gain = 0,
+  impurity = "variance",
+  seed = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10L,
+  max_memory_in_mb = 256L,
+  variance_col = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
-  variance_col = NULL,
-  checkpoint_interval = 10L,
-  impurity = "variance",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_regressor_"), ...) {
+  uid = random_string("decision_tree_regressor_"),
+  response = NULL,
+  features = NULL, ...) {
 
   predictor <- ml_new_stage_modified_args()
 
