@@ -2,9 +2,9 @@ context("logistic regression")
 
 sc <- testthat_spark_connection()
 
-test_that("ml_logistic_regression parameter setting works", {
-  lr <- ml_logistic_regression(
-    sc,
+test_that("ml_logistic_regression parameter setting/getting works", {
+  args <- list(
+    x = sc,
     elastic_net_param = 0.1,
     family = "binomial",
     features_col = "fcol",
@@ -12,31 +12,29 @@ test_that("ml_logistic_regression parameter setting works", {
     label_col = "lcol",
     max_iter = 50L,
     threshold = 0.4,
+    aggregation_depth = 3,
     weight_col = "wcol",
     prediction_col = "pcol",
     probability_col = "probcol",
     raw_prediction_col = "rpcol")
 
+  lr <- do.call(ml_logistic_regression, args)
+
   expect_equal(
-    ml_params(lr, list(
-      "elastic_net_param", "family", "features_col", "fit_intercept", "label_col",
-      "max_iter", "threshold", "weight_col", "prediction_col", "probability_col",
-      "raw_prediction_col"
-    )),
-    list(
-      elastic_net_param = 0.1,
-      family = "binomial",
-      features_col = "fcol",
-      fit_intercept = FALSE,
-      label_col = "lcol",
-      max_iter = 50L,
-      threshold = 0.4,
-      weight_col = "wcol",
-      prediction_col = "pcol",
-      probability_col = "probcol",
-      raw_prediction_col = "rpcol"
-    )
-  )
+    ml_params(lr, names(args)[-1]),
+              args[-1])
+
+  lr <- ml_pipeline(sc) %>%
+    ml_logistic_regression() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_logistic_regression,
+                           c("x", "uid", "...", "thresholds", "weight_col"))
+
+  expect_equal(
+    ml_params(lr, names(args)),
+    args)
+
 })
 
 test_that("we can fit multinomial models", {

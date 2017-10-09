@@ -4,6 +4,9 @@ ml_logistic_regression <- function(
   features_col = "features",
   label_col = "label",
   family = "auto",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -11,13 +14,9 @@ ml_logistic_regression <- function(
   threshold = 0.5,
   thresholds = NULL,
   weight_col = NULL,
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
+  aggregation_depth = 2L,
   uid = random_string("logistic_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...
+  ...
 ) {
   UseMethod("ml_logistic_regression")
 }
@@ -28,6 +27,9 @@ ml_logistic_regression.spark_connection <- function(
   features_col = "features",
   label_col = "label",
   family = "auto",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -35,13 +37,9 @@ ml_logistic_regression.spark_connection <- function(
   threshold = 0.5,
   thresholds = NULL,
   weight_col = NULL,
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
+  aggregation_depth = 2L,
   uid = random_string("logistic_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  ...) {
 
   ml_ratify_args()
 
@@ -56,7 +54,8 @@ ml_logistic_regression.spark_connection <- function(
     invoke("setElasticNetParam", elastic_net_param) %>%
     invoke("setRegParam", reg_param) %>%
     invoke("setMaxIter", max_iter) %>%
-    invoke("setThreshold", threshold)
+    invoke("setThreshold", threshold) %>%
+    invoke("setAggregationDepth", aggregation_depth)
 
   if (!rlang::is_null(thresholds))
     jobj <- invoke(jobj, "setThresholds", thresholds)
@@ -84,9 +83,7 @@ ml_logistic_regression.ml_pipeline <- function(
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -101,6 +98,9 @@ ml_logistic_regression.tbl_spark <- function(
   features_col = "features",
   label_col = "label",
   family = "auto",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -108,9 +108,7 @@ ml_logistic_regression.tbl_spark <- function(
   threshold = 0.5,
   thresholds = NULL,
   weight_col = NULL,
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
+  aggregation_depth = 2L,
   uid = random_string("logistic_regression_"), ...) {
 
   predictor <- ml_new_stage_modified_args()
@@ -148,6 +146,7 @@ ml_validator_logistic_regression <- function(args, nms) {
       threshold <- ensure_scalar_double(threshold)
       if (!is.null(weight_col))
         weight_col <- ensure_scalar_character(weight_col)
+      aggregation_depth <- ensure_scalar_integer(aggregation_depth)
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }

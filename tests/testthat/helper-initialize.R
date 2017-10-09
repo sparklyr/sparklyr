@@ -140,3 +140,8 @@ testthat_livy_connection <- function(version = NULL) {
 
   get(".testthat_livy_connection", envir = .GlobalEnv)
 }
+
+get_default_args <- function(fn, exclude = c("x", "uid", "...")) {
+  formals(fn) %>%
+    (function(x) x[setdiff(names(x), exclude)])
+}
