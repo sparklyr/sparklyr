@@ -66,6 +66,8 @@ ml_constructor_dispatch <- function(jobj) {
          "regression.GBTRegressionModel" = new_ml_gbt_regression_model(jobj),
          "regression.RandomForestRegressor" = new_ml_random_forest_regressor(jobj),
          "regression.RandomForestRegressionModel" = new_ml_random_forest_regression_model(jobj),
+         "regression.AFTSurvivalRegression" = new_ml_aft_survival_regression(jobj),
+         "regression.AFTSurvivalRegressionModel" = new_ml_aft_survival_regression_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),

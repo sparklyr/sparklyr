@@ -8,7 +8,7 @@
 #' @template roxlate-ml-probabilistic-classifier-params
 #' @template roxlate-ml-elastic-net-param
 #' @param threshold in binary classification prediction, in range [0, 1].
-#' @param aggregation_depth Suggested depth for treeAggregate (>= 2).
+#' @template roxlate-ml-aggregation-depth
 #' @export
 ml_logistic_regression <- function(
   x,

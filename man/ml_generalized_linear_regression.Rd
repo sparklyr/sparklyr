@@ -77,7 +77,8 @@ Valid link functions for each family is listed below. The first link function of
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
 
-Other ml algorithms: \code{\link{ml_decision_tree_classifier}},
+Other ml algorithms: \code{\link{ml_aft_survival_regression}},
+  \code{\link{ml_decision_tree_classifier}},
   \code{\link{ml_gbt_classifier}},
   \code{\link{ml_linear_regression}},
   \code{\link{ml_logistic_regression}},

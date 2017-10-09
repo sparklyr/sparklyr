@@ -62,7 +62,11 @@ ml_create_mapping_tables <- function() {
          "model_type" = "modelType",
          # ml_multilayer_perceptron_classifier
          "block_size" = "blockSize",
-         "initial_weights" = "initialWeights")
+         "initial_weights" = "initialWeights",
+         # ml_aft_survival_regression
+         "censor_col" = "censorCol",
+         "quantile_probabilities" = "quantileProbabilities",
+         "quantiles_col" = "quantilesCol")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

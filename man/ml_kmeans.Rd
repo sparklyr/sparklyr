@@ -43,6 +43,5 @@ For information on how Spark k-means clustering is implemented, please see
   \url{http://spark.apache.org/docs/latest/mllib-clustering.html#k-means}.
 
 Other Spark ML routines: \code{\link{ml_als_factorization}},
-  \code{\link{ml_lda}}, \code{\link{ml_pca}},
-  \code{\link{ml_survival_regression}}
+  \code{\link{ml_lda}}, \code{\link{ml_pca}}
 }

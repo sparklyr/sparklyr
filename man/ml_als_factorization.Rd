@@ -44,6 +44,5 @@ Perform alternating least squares matrix factorization on a Spark DataFrame.
 }
 \seealso{
 Other Spark ML routines: \code{\link{ml_kmeans}},
-  \code{\link{ml_lda}}, \code{\link{ml_pca}},
-  \code{\link{ml_survival_regression}}
+  \code{\link{ml_lda}}, \code{\link{ml_pca}}
 }
