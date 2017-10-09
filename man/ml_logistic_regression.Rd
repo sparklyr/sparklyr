@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_classification_logistic_regression.R
 \name{ml_logistic_regression}
 \alias{ml_logistic_regression}
-\title{Spark ML -- Logistic Regression.}
+\title{Spark ML -- Logistic Regression}
 \usage{
 ml_logistic_regression(x, features_col = "features", label_col = "label",
   family = "auto", prediction_col = "prediction",

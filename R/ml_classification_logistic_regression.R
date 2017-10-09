@@ -1,4 +1,4 @@
-#' Spark ML -- Logistic Regression.
+#' Spark ML -- Logistic Regression
 #'
 #' Perform classification using logistic regression.
 #'
