@@ -39,6 +39,20 @@ test_that("ml_generalized_linear_regression() sets params correctly", {
   )
 })
 
+test_that("ml_generalized_linear_regression() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_generalized_linear_regression() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_generalized_linear_regression,
+                           c("x", "uid", "...", "weight_col", "link", "link_power", "link_prediction_col",
+                             "variance_power"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
 test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and residuals", {
   # skip_on_cran()
 
