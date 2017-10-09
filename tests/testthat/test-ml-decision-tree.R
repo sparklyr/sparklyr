@@ -26,6 +26,19 @@ test_that("ml_decision_tree_regressor() param parsing works" , {
   ))
 })
 
+test_that("ml_decision_classifier() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_decision_tree_classifier() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_decision_tree_classifier,
+                           c("x", "uid", "...", "thresholds", "weight_col", "seed"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
 test_that("ml_decision_tree_classifier() param parsing works" , {
   dtc <- ml_decision_tree_classifier(
     sc, features_col = "fcol", label_col = "lcol", prediction_col = "pcol",

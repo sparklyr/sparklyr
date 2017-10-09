@@ -3,25 +3,22 @@
 #' @export
 ml_decision_tree_classifier <- function(
   x,
+  max_depth = 5L,
+  max_bins = 32L,
+  min_instances_per_node = 1L,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10L,
+  max_memory_in_mb = 256L,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  impurity = "gini",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...
+  uid = random_string("decision_tree_classifier_"), ...
 ) {
   UseMethod("ml_decision_tree_classifier")
 }
@@ -29,25 +26,22 @@ ml_decision_tree_classifier <- function(
 #' @export
 ml_decision_tree_classifier.spark_connection <- function(
   x,
+  max_depth = 5L,
+  max_bins = 32L,
+  min_instances_per_node = 1L,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10L,
+  max_memory_in_mb = 256L,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  impurity = "gini",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("decision_tree_classifier_"), ...) {
 
   ml_ratify_args()
 
@@ -76,25 +70,22 @@ ml_decision_tree_classifier.spark_connection <- function(
 #' @export
 ml_decision_tree_classifier.ml_pipeline <- function(
   x,
+  max_depth = 5L,
+  max_bins = 32L,
+  min_instances_per_node = 1L,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10L,
+  max_memory_in_mb = 256L,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  impurity = "gini",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("decision_tree_classifier_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -104,24 +95,24 @@ ml_decision_tree_classifier.ml_pipeline <- function(
 ml_decision_tree_classifier.tbl_spark <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
+  max_depth = 5L,
+  max_bins = 32L,
+  min_instances_per_node = 1L,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10L,
+  max_memory_in_mb = 256L,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  impurity = "gini",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_classifier_"), ...) {
+  uid = random_string("decision_tree_classifier_"),
+  response = NULL,
+  features = NULL, ...) {
 
   predictor <- ml_new_stage_modified_args()
 
