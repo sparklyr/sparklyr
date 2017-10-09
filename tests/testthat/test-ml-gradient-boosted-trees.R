@@ -66,6 +66,33 @@ test_that("ml_gbt_classifier() default params are correct (>= 2.2.0)", {
     args)
 })
 
+test_that("ml_gbt_regressor() parses params correctly", {
+  args <- list(
+    x = sc, features_col = "fcol", prediction_col = "pcol",
+    checkpoint_interval = 9, loss_type = "absolute",
+    max_bins = 30, max_depth = 6,
+    max_iter = 19, min_info_gain = 0.01, min_instances_per_node = 2,
+    step_size = 0.01, subsampling_rate = 0.9, seed = 42,
+    cache_node_ids = TRUE,
+    max_memory_in_mb = 128
+  )
+  gbtr <- do.call(ml_gbt_regressor, args)
+  expect_equal(ml_params(gbtr, names(args)[-1]), args[-1])
+})
+
+test_that("ml_gbt_regressor() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_gbt_regressor() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_gbt_regressor,
+                           c("x", "uid", "...", "seed"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
 test_that("ml_gbt_regressor() parases params correct", {
   args <- list(
     x = sc, features_col = "fcol", prediction_col = "pcol",

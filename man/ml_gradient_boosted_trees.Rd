@@ -29,13 +29,12 @@ ml_gradient_boosted_trees(x, formula = NULL, response = NULL,
   max_memory_in_mb = 256L, uid = random_string("gradient_boosted_trees_"),
   ...)
 
-ml_gbt_regressor(x, features_col = "features", label_col = "label",
-  prediction_col = "prediction", checkpoint_interval = 10L,
-  loss_type = "squared", max_bins = 32L, max_depth = 5L, max_iter = 20L,
-  min_info_gain = 0, min_instances_per_node = 1L, step_size = 0.1,
-  subsampling_rate = 1, seed = NULL, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, uid = random_string("gbt_regressor_"),
-  formula = NULL, response = NULL, features = NULL, ...)
+ml_gbt_regressor(x, max_iter = 20L, max_depth = 5L, step_size = 0.1,
+  subsampling_rate = 1, min_instances_per_node = 1L, max_bins = 32L,
+  min_info_gain = 0, loss_type = "squared", seed = NULL,
+  checkpoint_interval = 10L, cache_node_ids = FALSE,
+  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
+  prediction_col = "prediction", uid = random_string("gbt_regressor_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
