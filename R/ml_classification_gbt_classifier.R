@@ -3,28 +3,25 @@
 #' @export
 ml_gbt_classifier <- function(
   x,
+  max_iter = 20L,
+  max_depth = 5L,
+  step_size = 0.1,
+  subsampling_rate = 1,
+  min_instances_per_node = 1L,
+  max_bins = 32L,
+  min_info_gain = 0,
+  loss_type = "logistic",
+  seed = NULL,
+  thresholds = NULL,
+  checkpoint_interval = 10L,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256L,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  loss_type = "logistic",
-  max_bins = 32L,
-  max_depth = 5L,
-  max_iter = 20L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  step_size = 0.1,
-  subsampling_rate = 1,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("gbt_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...
+  uid = random_string("gbt_classifier_"), ...
 ) {
   UseMethod("ml_gbt_classifier")
 }
@@ -32,27 +29,25 @@ ml_gbt_classifier <- function(
 #' @export
 ml_gbt_classifier.spark_connection <- function(
   x,
+  max_iter = 20L,
+  max_depth = 5L,
+  step_size = 0.1,
+  subsampling_rate = 1,
+  min_instances_per_node = 1L,
+  max_bins = 32L,
+  min_info_gain = 0,
+  loss_type = "logistic",
+  seed = NULL,
+  thresholds = NULL,
+  checkpoint_interval = 10L,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256L,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  max_bins = 32L,
-  max_depth = 5L,
-  max_iter = 20L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  step_size = 0.1,
-  subsampling_rate = 1,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("gbt_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("gbt_classifier_"), ...) {
 
   ml_ratify_args()
 
@@ -90,28 +85,25 @@ ml_gbt_classifier.spark_connection <- function(
 #' @export
 ml_gbt_classifier.ml_pipeline <- function(
   x,
+  max_iter = 20L,
+  max_depth = 5L,
+  step_size = 0.1,
+  subsampling_rate = 1,
+  min_instances_per_node = 1L,
+  max_bins = 32L,
+  min_info_gain = 0,
+  loss_type = "logistic",
+  seed = NULL,
+  thresholds = NULL,
+  checkpoint_interval = 10L,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256L,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  loss_type = "logistic",
-  max_bins = 32L,
-  max_depth = 5L,
-  max_iter = 20L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  step_size = 0.1,
-  subsampling_rate = 1,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("gbt_classifier_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("gbt_classifier_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -121,27 +113,27 @@ ml_gbt_classifier.ml_pipeline <- function(
 ml_gbt_classifier.tbl_spark <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
+  max_iter = 20L,
+  max_depth = 5L,
+  step_size = 0.1,
+  subsampling_rate = 1,
+  min_instances_per_node = 1L,
+  max_bins = 32L,
+  min_info_gain = 0,
+  loss_type = "logistic",
+  seed = NULL,
+  thresholds = NULL,
+  checkpoint_interval = 10L,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256L,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  loss_type = "logistic",
-  max_bins = 32L,
-  max_depth = 5L,
-  max_iter = 20L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  step_size = 0.1,
-  subsampling_rate = 1,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("gbt_classifier_"), ...) {
+  uid = random_string("gbt_classifier_"),
+  response = NULL,
+  features = NULL, ...) {
 
   predictor <- ml_new_stage_modified_args()
 
@@ -170,7 +162,7 @@ ml_validator_gbt_classifier <- function(args, nms) {
   args %>%
     ml_validate_decision_tree_args() %>%
     ml_validate_args({
-      if (!rlang::is_null(thresholds))
+      if (rlang::env_has(nms = "thresholds") && !rlang::is_null(thresholds))
         thresholds <- lapply(thresholds, ensure_scalar_double)
       max_iter <- ensure_scalar_integer(max_iter)
       step_size <- ensure_scalar_double(step_size)

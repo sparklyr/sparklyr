@@ -37,6 +37,35 @@ test_that("ml_gbt_classifier() parses params correctly (>=2.2)", {
   expect_equal(ml_params(gbtc, names(args)[-1]), args[-1])
 })
 
+test_that("ml_gbt_classifier() default params are correct (<2.2)", {
+  if (spark_version(sc) >= "2.2.0") skip("")
+  predictor <- ml_pipeline(sc) %>%
+    ml_gbt_classifier() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_gbt_classifier,
+                           c("x", "uid", "...", "seed", "thresholds", "probability_col",
+                             "raw_prediction_col"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
+test_that("ml_gbt_classifier() default params are correct (>= 2.2.0)", {
+  if (spark_version(sc) < "2.2.0") skip("")
+  predictor <- ml_pipeline(sc) %>%
+    ml_gbt_classifier() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_gbt_classifier,
+                           c("x", "uid", "...", "seed", "thresholds"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
 test_that("ml_gbt_regressor() parases params correct", {
   args <- list(
     x = sc, features_col = "fcol", prediction_col = "pcol",
