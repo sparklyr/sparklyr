@@ -24,6 +24,8 @@ reproducible across repeated calls.}
 
 \item{step_size}{Step size to be used for each iteration of optimization (> 0).}
 
+\item{tol}{Param for the convergence tolerance for iterative algorithms.}
+
 \item{block_size}{Block size for stacking input data in matrices to speed up the computation. Data is stacked within partitions. If block size is more than remaining data in a partition then it is adjusted to the size of this data. Recommended size is between 10 and 1000. Default: 128}
 
 \item{initial_weights}{The initial weights of the model.}
@@ -40,8 +42,6 @@ vector.)}
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{tolerance}{Param for the convergence tolerance for iterative algorithms.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -73,6 +73,7 @@ See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} 
 
 Other ml algorithms: \code{\link{ml_decision_tree_classifier}},
   \code{\link{ml_gbt_classifier}},
+  \code{\link{ml_logistic_regression}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_random_forest_classifier}}
 }

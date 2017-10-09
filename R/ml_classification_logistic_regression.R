@@ -1,3 +1,14 @@
+#' Spark ML -- Logistic Regression.
+#'
+#' Perform classification using logistic regression.
+#'
+#' @template roxlate-ml-algo
+#' @template roxlate-ml-formula-params
+#' @template roxlate-ml-linear-regression-params
+#' @template roxlate-ml-probabilistic-classifier-params
+#' @param elastic_net_param ElasticNet mixing parameter, in range [0, 1]. For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty.
+#' @param threshold in binary classification prediction, in range [0, 1].
+#' @param aggregation_depth Suggested depth for treeAggregate (>= 2).
 #' @export
 ml_logistic_regression <- function(
   x,
@@ -13,6 +24,7 @@ ml_logistic_regression <- function(
   max_iter = 100L,
   threshold = 0.5,
   thresholds = NULL,
+  tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
   uid = random_string("logistic_regression_"),
@@ -36,6 +48,7 @@ ml_logistic_regression.spark_connection <- function(
   max_iter = 100L,
   threshold = 0.5,
   thresholds = NULL,
+  tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
   uid = random_string("logistic_regression_"),
@@ -55,7 +68,8 @@ ml_logistic_regression.spark_connection <- function(
     invoke("setRegParam", reg_param) %>%
     invoke("setMaxIter", max_iter) %>%
     invoke("setThreshold", threshold) %>%
-    invoke("setAggregationDepth", aggregation_depth)
+    invoke("setAggregationDepth", aggregation_depth) %>%
+    invoke("setTol", tol)
 
   if (!rlang::is_null(thresholds))
     jobj <- invoke(jobj, "setThresholds", thresholds)
@@ -78,6 +92,7 @@ ml_logistic_regression.ml_pipeline <- function(
   max_iter = 100L,
   threshold = 0.5,
   thresholds = NULL,
+  tol = 1e-06,
   weight_col = NULL,
   prediction_col = "prediction",
   probability_col = "probability",
@@ -107,6 +122,7 @@ ml_logistic_regression.tbl_spark <- function(
   max_iter = 100L,
   threshold = 0.5,
   thresholds = NULL,
+  tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
   uid = random_string("logistic_regression_"), ...) {
@@ -147,6 +163,7 @@ ml_validator_logistic_regression <- function(args, nms) {
       if (!is.null(weight_col))
         weight_col <- ensure_scalar_character(weight_col)
       aggregation_depth <- ensure_scalar_integer(aggregation_depth)
+      tol <- ensure_scalar_double(tol)
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }

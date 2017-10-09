@@ -28,8 +28,6 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{features}{The name of features (terms) to use for the model fit.}
 
-\item{intercept}{Boolean; should the model be fit with an intercept term?}
-
 \item{envir}{The \R environment in which the \code{response}, \code{features}
 and \code{intercept} bindings should be mutated. (Typically, the parent frame).}
 
@@ -41,6 +39,8 @@ environment.}
 
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
+
+\item{fit_intercept}{Boolean; should the model be fit with an intercept term?}
 }
 \description{
 Pre-process / normalize the inputs typically passed to a

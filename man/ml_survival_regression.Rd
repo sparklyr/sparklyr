@@ -21,8 +21,6 @@ The intercept term can be omitted by using \code{- 1} in the model fit.}
 
 \item{features}{The name of features (terms) to use for the model fit.}
 
-\item{intercept}{Boolean; should the model be fit with an intercept term?}
-
 \item{censor}{The name of the vector that provides censoring information.
 This should be a numeric vector, with 0 marking uncensored data, and
 1 marking right-censored data.}
@@ -36,6 +34,8 @@ This should be a numeric vector, with 0 marking uncensored data, and
 specify the data to be used when \code{x} is a formula; this allows calls
 of the form \code{ml_linear_regression(y ~ x, data = tbl)}, and is
 especially useful in conjunction with \code{\link{do}}.}
+
+\item{fit_intercept}{Boolean; should the model be fit with an intercept term?}
 }
 \description{
 Perform survival regression on a Spark DataFrame, using an Accelerated

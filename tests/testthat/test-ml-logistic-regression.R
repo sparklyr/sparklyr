@@ -13,6 +13,7 @@ test_that("ml_logistic_regression parameter setting/getting works", {
     max_iter = 50L,
     threshold = 0.4,
     aggregation_depth = 3,
+    tol = 1e-05,
     weight_col = "wcol",
     prediction_col = "pcol",
     probability_col = "probcol",

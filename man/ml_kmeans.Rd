@@ -19,8 +19,6 @@ ml_kmeans(x, centers, iter.max = 100, features = tbl_vars(x),
 
 \item{compute.cost}{Whether to compute cost for \code{k-means} model using Spark's \href{https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/KMeansModel.scala#L84}{computeCost}.}
 
-\item{tolerance}{Param for the convergence tolerance for iterative algorithms.}
-
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
 
@@ -28,6 +26,8 @@ ml_kmeans(x, centers, iter.max = 100, features = tbl_vars(x),
 specify the data to be used when \code{x} is a formula; this allows calls
 of the form \code{ml_linear_regression(y ~ x, data = tbl)}, and is
 especially useful in conjunction with \code{\link{do}}.}
+
+\item{tol}{Param for the convergence tolerance for iterative algorithms.}
 }
 \value{
 \link{ml_model} object of class \code{kmeans} with overloaded \code{print}, \code{fitted} and \code{predict} functions.
