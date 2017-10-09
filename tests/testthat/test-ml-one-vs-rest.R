@@ -42,3 +42,13 @@ test_that("ml_one_vs_rest with two classes agrees with logistic regression", {
     sdf_predict(lr_model, iris_tbl2) %>% pull(predicted_label)
   )
 })
+
+test_that("ml_one_vs_rest fits the right number of estimators", {
+  test_requires("dplyr")
+  iris_tbl <- testthat_tbl("iris")
+  lr <- ml_logistic_regression(sc)
+
+  ovr_model <- ml_one_vs_rest(iris_tbl, Species ~ ., classifier = lr)
+
+  expect_equal(length(ovr_model$model$models), 3)
+})
