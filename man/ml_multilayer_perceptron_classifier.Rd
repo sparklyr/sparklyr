@@ -76,5 +76,6 @@ Other ml algorithms: \code{\link{ml_decision_tree_classifier}},
   \code{\link{ml_linear_regression}},
   \code{\link{ml_logistic_regression}},
   \code{\link{ml_naive_bayes}},
+  \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
