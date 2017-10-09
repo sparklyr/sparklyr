@@ -13,19 +13,16 @@
 #' @export
 ml_naive_bayes <- function(
   x,
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  model_type = "multinomial",
-  smoothing = 1,
-  thresholds = NULL,
-  weight_col = NULL,
-  uid = random_string("naive_bayes_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...
+  uid = random_string("naive_bayes_"), ...
 ) {
   UseMethod("ml_naive_bayes")
 }
@@ -33,19 +30,16 @@ ml_naive_bayes <- function(
 #' @export
 ml_naive_bayes.spark_connection <- function(
   x,
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  model_type = "multinomial",
-  smoothing = 1,
-  thresholds = NULL,
-  weight_col = NULL,
-  uid = random_string("naive_bayes_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("naive_bayes_"), ...) {
 
   ml_ratify_args()
 
@@ -68,19 +62,16 @@ ml_naive_bayes.spark_connection <- function(
 #' @export
 ml_naive_bayes.ml_pipeline <- function(
   x,
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  model_type = "multinomial",
-  smoothing = 1,
-  thresholds = NULL,
-  weight_col = NULL,
-  uid = random_string("naive_bayes_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("naive_bayes_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -90,18 +81,18 @@ ml_naive_bayes.ml_pipeline <- function(
 ml_naive_bayes.tbl_spark <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
   features_col = "features",
   label_col = "label",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  model_type = "multinomial",
-  smoothing = 1,
-  thresholds = NULL,
-  weight_col = NULL,
-  uid = random_string("naive_bayes_"), ...) {
+  uid = random_string("naive_bayes_"),
+  response = NULL,
+  features = NULL, ...) {
 
   predictor <- ml_new_stage_modified_args()
 

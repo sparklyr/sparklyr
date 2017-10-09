@@ -13,6 +13,19 @@ test_that("ml_naive_bayes() parses params correctly", {
   expect_equal(ml_params(nb, names(args)[-1]), args[-1])
 })
 
+test_that("ml_naive_bayes() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_naive_bayes(layers = c(2, 2)) %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_naive_bayes,
+                           c("x", "uid", "...", "thresholds", "weight_col"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
 test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
   # skip_on_cran()
   test_requires("e1071", "mlbench")
