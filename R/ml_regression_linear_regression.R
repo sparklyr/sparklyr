@@ -1,21 +1,28 @@
+#' Spark ML -- Linear Regression
+#'
+#' Perform regression using linear regression.
+#'
+#' @template roxlate-ml-algo
+#' @template roxlate-ml-formula-params
+#' @template roxlate-ml-linear-regression-params
+#' @template roxlate-ml-predictor-params
+#' @template roxlate-ml-elastic-net-param
+#' @param solver Solver algorithm for optimization.
 #' @export
 ml_linear_regression <- function(
   x,
-  features_col = "features",
-  label_col = "label",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
   max_iter = 100L,
   weight_col = NULL,
-  prediction_col = "prediction",
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
-  uid = random_string("linear_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("linear_regression_"), ...
 ) {
   UseMethod("ml_linear_regression")
 }
@@ -34,10 +41,7 @@ ml_linear_regression.spark_connection <- function(
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
-  uid = random_string("linear_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("linear_regression_"), ...) {
 
   ml_ratify_args()
 
@@ -73,10 +77,7 @@ ml_linear_regression.ml_pipeline <- function(
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
-  uid = random_string("linear_regression_"),
-  formula = NULL,
-  response = NULL,
-  features = NULL, ...) {
+  uid = random_string("linear_regression_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -86,8 +87,6 @@ ml_linear_regression.ml_pipeline <- function(
 ml_linear_regression.tbl_spark <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
   features_col = "features",
   label_col = "label",
   fit_intercept = TRUE,
@@ -99,7 +98,9 @@ ml_linear_regression.tbl_spark <- function(
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
-  uid = random_string("linear_regression_"), ...) {
+  uid = random_string("linear_regression_"),
+  response = NULL,
+  features = NULL,...) {
 
   predictor <- ml_new_stage_modified_args()
 

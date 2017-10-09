@@ -6,7 +6,7 @@
 #' @template roxlate-ml-formula-params
 #' @template roxlate-ml-linear-regression-params
 #' @template roxlate-ml-probabilistic-classifier-params
-#' @param elastic_net_param ElasticNet mixing parameter, in range [0, 1]. For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty.
+#' @template roxlate-ml-elastic-net-param
 #' @param threshold in binary classification prediction, in range [0, 1].
 #' @param aggregation_depth Suggested depth for treeAggregate (>= 2).
 #' @export
