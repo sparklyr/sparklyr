@@ -12,12 +12,6 @@
 #' @export
 ml_logistic_regression <- function(
   x,
-  features_col = "features",
-  label_col = "label",
-  family = "auto",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -27,6 +21,12 @@ ml_logistic_regression <- function(
   tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
+  features_col = "features",
+  label_col = "label",
+  family = "auto",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"),
   ...
 ) {
@@ -36,12 +36,6 @@ ml_logistic_regression <- function(
 #' @export
 ml_logistic_regression.spark_connection <- function(
   x,
-  features_col = "features",
-  label_col = "label",
-  family = "auto",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -51,6 +45,12 @@ ml_logistic_regression.spark_connection <- function(
   tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
+  features_col = "features",
+  label_col = "label",
+  family = "auto",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"),
   ...) {
 
@@ -83,9 +83,6 @@ ml_logistic_regression.spark_connection <- function(
 #' @export
 ml_logistic_regression.ml_pipeline <- function(
   x,
-  features_col = "features",
-  label_col = "label",
-  family = "auto",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -94,6 +91,10 @@ ml_logistic_regression.ml_pipeline <- function(
   thresholds = NULL,
   tol = 1e-06,
   weight_col = NULL,
+  aggregation_depth = 2L,
+  features_col = "features",
+  label_col = "label",
+  family = "auto",
   prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
@@ -108,14 +109,6 @@ ml_logistic_regression.ml_pipeline <- function(
 ml_logistic_regression.tbl_spark <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
-  features_col = "features",
-  label_col = "label",
-  family = "auto",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -125,7 +118,15 @@ ml_logistic_regression.tbl_spark <- function(
   tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
-  uid = random_string("logistic_regression_"), ...) {
+  features_col = "features",
+  label_col = "label",
+  family = "auto",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("logistic_regression_"),
+  response = NULL,
+  features = NULL, ...) {
 
   predictor <- ml_new_stage_modified_args()
 

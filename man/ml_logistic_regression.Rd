@@ -4,20 +4,16 @@
 \alias{ml_logistic_regression}
 \title{Spark ML -- Logistic Regression}
 \usage{
-ml_logistic_regression(x, features_col = "features", label_col = "label",
-  family = "auto", prediction_col = "prediction",
-  probability_col = "probability", raw_prediction_col = "rawPrediction",
-  fit_intercept = TRUE, elastic_net_param = 0, reg_param = 0,
-  max_iter = 100L, threshold = 0.5, thresholds = NULL, tol = 1e-06,
-  weight_col = NULL, aggregation_depth = 2L,
+ml_logistic_regression(x, fit_intercept = TRUE, elastic_net_param = 0,
+  reg_param = 0, max_iter = 100L, threshold = 0.5, thresholds = NULL,
+  tol = 1e-06, weight_col = NULL, aggregation_depth = 2L,
+  features_col = "features", label_col = "label", family = "auto",
+  prediction_col = "prediction", probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
-
-\item{probability_col}{Column name for predicted class conditional probabilities.}
-
-\item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
 
 \item{elastic_net_param}{ElasticNet mixing parameter, in range [0, 1]. For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty.}
 
@@ -28,6 +24,10 @@ ml_logistic_regression(x, features_col = "features", label_col = "label",
 \item{thresholds}{Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value \code{p/t} is predicted, where \code{p} is the original probability of that class and \code{t} is the class's threshold.}
 
 \item{aggregation_depth}{Suggested depth for treeAggregate (>= 2).}
+
+\item{probability_col}{Column name for predicted class conditional probabilities.}
+
+\item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
