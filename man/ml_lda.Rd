@@ -67,6 +67,5 @@ Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Al
 Asuncion et al. (2009)
 }
 \seealso{
-Other Spark ML routines: \code{\link{ml_als_factorization}},
-  \code{\link{ml_kmeans}}
+Other Spark ML routines: \code{\link{ml_kmeans}}
 }

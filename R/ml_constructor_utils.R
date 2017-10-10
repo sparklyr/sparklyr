@@ -35,6 +35,7 @@ ml_ancestry <- function(jobj) {
                "regression.RandomForestRegressionModel",
                "regression.IsotonicRegression",
                "regression.IsotonicRegressionModel",
+               "recommendation.ALS", "recommendation.ALSModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
@@ -85,6 +86,8 @@ ml_constructor_dispatch <- function(jobj) {
          "regression.AFTSurvivalRegressionModel" = new_ml_aft_survival_regression_model(jobj),
          "regression.IsotonicRegression" = new_ml_isotonic_regression(jobj),
          "regression.IsotonicRegressionModel" = new_ml_isotonic_regression_model(jobj),
+         "recommendation.ALS" = new_ml_als(jobj),
+         "recommendation.ALSModel" = new_ml_als_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),

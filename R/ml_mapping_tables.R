@@ -68,7 +68,17 @@ ml_create_mapping_tables <- function() {
          "quantile_probabilities" = "quantileProbabilities",
          "quantiles_col" = "quantilesCol",
          # ml_isotonic_regression
-         "feature_index" = "featureIndex")
+         "feature_index" = "featureIndex",
+         # ml_als
+         "rating_col" = "ratingCol",
+         "user_col" = "userCol",
+         "item_col" = "itemCol",
+         "implicit_prefs" = "implicitPrefs",
+         "num_user_blocks" = "numUserBlocks",
+         "num_item_blocks" = "numItemBlocks",
+         "cold_start_strategy" = "coldStartStrategy",
+         "intermediate_storage_level" = "intermediateStorageLevel",
+         "final_storage_level" = "finalStorageLevel")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
