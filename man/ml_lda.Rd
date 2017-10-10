@@ -68,5 +68,5 @@ Asuncion et al. (2009)
 }
 \seealso{
 Other Spark ML routines: \code{\link{ml_als_factorization}},
-  \code{\link{ml_kmeans}}, \code{\link{ml_pca}}
+  \code{\link{ml_kmeans}}
 }

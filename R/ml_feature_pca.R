@@ -89,3 +89,76 @@ ml_fit.ml_pca <- function(x, data, ...) {
     invoke("fit", spark_dataframe(data))
   new_ml_pca_model(jobj)
 }
+
+#' @rdname ft_pca
+#' @param features The columns to use in the principal components
+#'   analysis. Defaults to all columns in \code{x}.
+#' @param k The number of principal components.
+#' @param pc_prefix Length-one character vector used to prepend names of components.
+#'
+#' @details \code{ml_pca()} is a wrapper around \code{ft_pca()} that returns a
+#'   \code{ml_model}.
+#'
+#' @export
+#' @importFrom dplyr tbl_vars
+ml_pca <- function(x,
+                   features = tbl_vars(x),
+                   k = length(features),
+                   pc_prefix = "PC",
+                   ...)
+{
+  k <- ensure_scalar_integer(k)
+
+  sc <- spark_connection(x)
+
+  assembled <- random_string("assembled")
+  out <- random_string("out")
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_vector_assembler(features, assembled) %>%
+    ft_pca(assembled, out, k = k)
+
+  pipeline_model <- pipeline %>%
+    ml_fit(x)
+
+  model <- pipeline_model %>%
+    ml_stage(2)
+
+  pc <- model$pc
+  pc_names <- paste0(pc_prefix, seq_len(ncol(pc)))
+  rownames(pc) <- features
+  colnames(pc) <- pc_names
+
+  explained_variance <- model$explained_variance
+
+  if (!is.null(explained_variance))
+    names(explained_variance) <- pc_names
+
+  new_ml_model(
+    pipeline = pipeline,
+    pipeline_model = pipeline_model,
+    model = model,
+    k = k,
+    pc = pc,
+    explained_variance = explained_variance,
+    dataset = x,
+    subclass = "ml_model_pca"
+  )
+}
+
+#' @export
+print.ml_model_pca <- function(x, ...) {
+
+  cat("Explained variance:", sep = "\n")
+  if (is.null(x$explained_variance)) {
+    cat("[not available in this version of Spark]", sep = "\n")
+  } else {
+    print_newline()
+    print(x$explained_variance)
+  }
+
+  print_newline()
+  cat("Rotation:", sep = "\n")
+  print(x$pc)
+}
+

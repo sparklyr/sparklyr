@@ -227,35 +227,37 @@ sdf_partition <- function(x,
 #' @param object A Spark PCA model object
 #' @param newdata An object coercible to a Spark DataFrame
 #' @param features A vector of names of columns to be projected
-#' @param feature.prefix The prefix used in naming the output features
+#' @param feature_prefix The prefix used in naming the output features
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
 sdf_project <- function(object, newdata,
-                        features = dimnames(object$components)[[1]],
-                        feature.prefix = "PC", ...) {
+                        features = dimnames(object$pc)[[1]],
+                        feature_prefix = NULL, ...) {
 
-  ensure_scalar_character(feature.prefix)
+  dots <- list(...)
+  if (!rlang::is_null(dots$feature.prefix))
+    assign("feature_prefix", dots$feature.prefix)
+
+
+  ensure_scalar_character(feature_prefix, allow.null = TRUE)
 
   # when newdata is not supplied, attempt to use original dataset
   if (missing(newdata) || is.null(newdata))
-    newdata <- object$data
+    newdata <- object$dataset
 
-  id.column <- object$ml.options$id.column
-  features.column <- object$ml.options$features.column
-  output.column <- object$ml.options$output.column
+  output_names <- if (rlang::is_null(feature_prefix))
+    dimnames(object$pc)[[2]]
+  else
+    paste0(feature_prefix, seq_len(object$k))
 
-  sdf <- ml_prepare_dataframe(newdata,
-                       features = features,
-                       ml.options = ml_options(features.column = features.column)
-  )
+  assembled <- random_string("assembled")
+  out <- random_string("out")
 
-  object$.model %>%
-    invoke("transform", sdf) %>%
-    invoke("drop", id.column) %>%
-    invoke("drop", features.column) %>%
-    sdf_register() %>%
-    sdf_separate_column(output.column,
-                        into = paste0(feature.prefix, seq_len(object$k))) %>%
-    select(-!!rlang::sym(output.column))
+  object$model %>%
+    ml_set_param("input_col", assembled) %>%
+    ml_set_param("output_col", out) %>%
+    ml_transform(ft_vector_assembler(newdata, features, assembled)) %>%
+    sdf_separate_column(column = out, into = output_names) %>%
+    select(!!! rlang::syms(c(colnames(newdata), output_names)))
 }

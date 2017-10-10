@@ -2,10 +2,14 @@
 % Please edit documentation in R/ml_feature_pca.R
 \name{ft_pca}
 \alias{ft_pca}
+\alias{ml_pca}
 \title{Feature Tranformation -- PCA (Estimator)}
 \usage{
 ft_pca(x, input_col, output_col, k, dataset = NULL,
   uid = random_string("pca_"), ...)
+
+ml_pca(x, features = tbl_vars(x), k = length(features), pc_prefix = "PC",
+  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -22,6 +26,13 @@ feature "transformer" against \code{dataset}. See details.}
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{features}{The columns to use in the principal components
+analysis. Defaults to all columns in \code{x}.}
+
+\item{pc_prefix}{Length-one character vector used to prepend names of components.}
+
+\item{k}{The number of principal components.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -53,6 +64,9 @@ When \code{dataset} is provided for an estimator transformer, the function
   When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
   in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
   to obtain a transformer, which is then immediately used to transform \code{x}.
+
+\code{ml_pca()} is a wrapper around \code{ft_pca()} that returns a
+  \code{ml_model}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for

@@ -100,6 +100,18 @@ ml_params <- function(x, params, allow_null = FALSE, ...) {
     rlang::set_names(unlist(params))
 }
 
+ml_set_param <- function(x, param, value, ...) {
+  # TODO: consider exporting and implementing ml_set_params()
+  setter <- param %>%
+    ml_map_param_names(direction = "rs") %>%
+    (function(x) paste0("set",
+                        toupper(substr(x, 1, 1)),
+                        substr(x, 2, nchar(x))))
+  spark_jobj(x) %>%
+    invoke(setter, value) %>%
+    ml_constructor_dispatch()
+}
+
 #' @export
 ml_uid <- function(x) {
   x$uid %||% stop("uid not found")
