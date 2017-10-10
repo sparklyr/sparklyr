@@ -24,3 +24,27 @@ test_that("ml_isotonic_regression() default params are correct", {
     ml_params(predictor, names(args)),
     args)
 })
+
+test_that("ml_isotonic_regression() works properly", {
+  test_requires("dplyr")
+  df <- data.frame(
+    x = 1:9,
+    y = c(1, 2, 3, 1, 6, 17, 16, 17, 18)
+  )
+  df_tbl <- copy_to(sc, df, overwrite = TRUE)
+  ir <- ml_isotonic_regression(df_tbl, y ~ x)
+  expect_equal(
+    sdf_predict(ir, df_tbl) %>% pull(prediction),
+    c(1, 2, 2, 2, 6, 16.5, 16.5, 17, 18)
+  )
+
+  expect_equal(
+    ir$model$boundaries,
+    c(1, 2, 4, 5, 6, 7, 8, 9)
+  )
+
+  expect_equal(
+    ir$model$predictions,
+    c(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0)
+  )
+})
