@@ -163,7 +163,8 @@ new_ml_linear_svc_model <- function(jobj) {
 }
 
 new_ml_model_linear_svc <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
+  pipeline, pipeline_model, model, dataset, formula, feature_names,
+  index_labels, call) {
 
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
@@ -181,6 +182,7 @@ new_ml_model_linear_svc <- function(
     coefficients = coefficients,
     subclass = "ml_model_linear_svc",
     .features = feature_names,
+    .index_labels = index_labels,
     .call = call
   )
 }

@@ -58,7 +58,7 @@ ml_constructor_dispatch <- function(jobj) {
          "classification.OneVsRest" = new_ml_one_vs_rest(jobj),
          "classification.OneVsRestModel" = new_ml_one_vs_rest_model(jobj),
          "classification.LinearSVC" = new_ml_linear_svc(jobj),
-         "classification.LinearSVCModel" = new_ml_linear_regression_model(jobj),
+         "classification.LinearSVCModel" = new_ml_linear_svc_model(jobj),
          "regression.LinearRegression" = new_ml_linear_regression(jobj),
          "regression.LinearRegressionModel" = new_ml_linear_regression_model(jobj),
          "regression.GeneralizedLinearRegression" = new_ml_generalized_linear_regression(jobj),
