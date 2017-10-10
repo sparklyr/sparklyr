@@ -244,14 +244,15 @@ sdf_separate_column <- function(x,
   if (is.null(into)) {
 
     # determine the length of vector elements (assume all
-    # elements have the same length as the first)
-    first <- invoke(sdf, "first")
-    index <- invoke(first, "fieldIndex", column)
-    vector <- invoke(first, "get", as.integer(index))
-    n <- invoke(vector, "size")
-
+    # elements have the same length as the first) and
     # generate indices
-    indices <- seq_len(n)
+    indices <- x %>%
+      head(1) %>%
+      dplyr::pull(!!rlang::sym(column)) %>%
+      rlang::flatten_dbl() %>%
+      length() %>%
+      seq_len()
+
     names <- sprintf("%s_%i", column, indices)
 
     # construct our into map
