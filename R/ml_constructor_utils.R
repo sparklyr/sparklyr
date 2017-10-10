@@ -11,6 +11,7 @@ ml_is_instance_of <- function(jobj, type) {
 ml_ancestry <- function(jobj) {
   # TODO optimize
   classes <- c("feature.CountVectorizer", "feature.CountVectorizerModel",
+               "feature.PCA", "feature.PCAModel",
                "classification.LogisticRegression",
                "classification.LogisticRegressionModel",
                "classification.DecisionTreeClassifier",
@@ -54,6 +55,8 @@ ml_constructor_dispatch <- function(jobj) {
   switch(ml_ancestry(jobj)[1],
          "feature.CountVectorizer" = new_ml_count_vectorizer(jobj),
          "feature.CountVectorizerModel" = new_ml_count_vectorizer_model(jobj),
+         "feature.PCA" = new_ml_pca(jobj),
+         "feature.PCAModel" = new_ml_pca_model(jobj),
          "classification.LogisticRegressionModel" = new_ml_logistic_regression_model(jobj),
          "classification.LogisticRegression" = new_ml_logistic_regression(jobj),
          "classification.GBTClassifier" = new_ml_gbt_classifier(jobj),

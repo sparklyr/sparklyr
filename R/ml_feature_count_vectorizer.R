@@ -81,6 +81,28 @@ ft_count_vectorizer.tbl_spark <- function(
     ml_fit_and_transform(stage, x)
 }
 
+# Validator
+
+ml_validator_count_vectorizer <- function(args, nms) {
+  old_new_mapping <- c(
+    list(
+      min.df = "min_df",
+      min.tf = "min_tf",
+      vocab.size = "vocab_size"
+    ), input_output_mapping
+  )
+
+  args %>%
+    ml_validate_args(
+      {
+        binary <- ensure_scalar_boolean(binary)
+        min_df <- ensure_scalar_double(min_df)
+        min_tf <- ensure_scalar_double(min_tf)
+        vocab_size <- ensure_scalar_integer(vocab_size)
+      }, old_new_mapping) %>%
+    ml_extract_args(nms, old_new_mapping)
+}
+
 # Constructors
 #
 new_ml_count_vectorizer <- function(jobj) {
@@ -91,4 +113,14 @@ new_ml_count_vectorizer_model <- function(jobj) {
   new_ml_transformer(jobj,
                      vocabulary = invoke(jobj, "vocabulary"),
                      subclass = "ml_count_vectorizer_model")
+}
+
+# Generic implementations
+
+#' @export
+ml_fit.ml_count_vectorizer <- function(x, data, ...) {
+  jobj <- spark_jobj(x) %>%
+    invoke("fit", spark_dataframe(data))
+
+  new_ml_count_vectorizer_model(jobj)
 }
