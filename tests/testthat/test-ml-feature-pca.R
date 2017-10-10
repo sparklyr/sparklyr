@@ -9,6 +9,17 @@ mat <- data_frame(
   V4 = c(7, 4, 6),
   V5 = c(0, 5, 7))
 
+test_that("ft_pca() param setting", {
+  args <- list(
+    x = sc, input_col = "in", output_col = "out", k = 4
+  )
+  ft <- do.call(ft_pca, args)
+  expect_equal(
+    ml_params(ft, names(args)[-1]),
+    args[-1]
+  )
+})
+
 test_that("ft_pca() works", {
   test_requires("dplyr")
 
