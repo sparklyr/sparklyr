@@ -127,6 +127,7 @@ See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} 
 Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_gbt_classifier}},
   \code{\link{ml_generalized_linear_regression}},
+  \code{\link{ml_isotonic_regression}},
   \code{\link{ml_linear_regression}},
   \code{\link{ml_linear_svc}},
   \code{\link{ml_logistic_regression}},

@@ -1,8 +1,11 @@
 ml_is_instance_of <- function(jobj, type) {
   sc <- spark_connection(jobj)
-  invoke_static(sc, "java.lang.Class", "forName",
-                paste0("org.apache.spark.ml.", type)) %>%
-    invoke("isInstance", jobj)
+  tryCatch(
+    invoke_static(sc, "java.lang.Class", "forName",
+                  paste0("org.apache.spark.ml.", type)) %>%
+      invoke("isInstance", jobj),
+    error = function(e) FALSE
+  )
 }
 
 ml_ancestry <- function(jobj) {
@@ -10,8 +13,10 @@ ml_ancestry <- function(jobj) {
   classes <- c("feature.CountVectorizer", "feature.CountVectorizerModel",
                "classification.LogisticRegression",
                "classification.LogisticRegressionModel",
-               "classification.DecisionTreeClassifier", "classification.DecisionTreeClassificationModel",
-               "classification.GBTClassifier", "classification.GBTClassificationModel",
+               "classification.DecisionTreeClassifier",
+               "classification.DecisionTreeClassificationModel",
+               "classification.GBTClassifier",
+               "classification.GBTClassificationModel",
                "classification.RandomForestClassifier",
                "classification.RandomForestClassificationModel",
                "classification.NaiveBayes", "classification.NaiveBayesModel",
@@ -22,9 +27,13 @@ ml_ancestry <- function(jobj) {
                "regression.LinearRegression", "regression.LinearRegressionModel",
                "regression.GeneralizedLinearRegression",
                "regression.GeneralizedLinearRegressionModel",
-               "regression.DecisionTreeRegressor", "regression.DecisionTreeRegressionModel",
+               "regression.DecisionTreeRegressor",
+               "regression.DecisionTreeRegressionModel",
                "regression.GBTRegressor", "regression.GBTRegressionModel",
-               "regression.RandomForestRegressor", "regression.RandomForestRegressionModel",
+               "regression.RandomForestRegressor",
+               "regression.RandomForestRegressionModel",
+               "regression.IsotonicRegression",
+               "regression.IsotonicRegressionModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
@@ -71,6 +80,8 @@ ml_constructor_dispatch <- function(jobj) {
          "regression.RandomForestRegressionModel" = new_ml_random_forest_regression_model(jobj),
          "regression.AFTSurvivalRegression" = new_ml_aft_survival_regression(jobj),
          "regression.AFTSurvivalRegressionModel" = new_ml_aft_survival_regression_model(jobj),
+         "regression.IsotonicRegression" = new_ml_isotonic_regression(jobj),
+         "regression.IsotonicRegressionModel" = new_ml_isotonic_regression_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),

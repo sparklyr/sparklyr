@@ -66,7 +66,9 @@ ml_create_mapping_tables <- function() {
          # ml_aft_survival_regression
          "censor_col" = "censorCol",
          "quantile_probabilities" = "quantileProbabilities",
-         "quantiles_col" = "quantilesCol")
+         "quantiles_col" = "quantilesCol",
+         # ml_isotonic_regression
+         "feature_index" = "featureIndex")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
