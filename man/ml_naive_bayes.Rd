@@ -11,8 +11,6 @@ ml_naive_bayes(x, model_type = "multinomial", smoothing = 1,
   uid = random_string("naive_bayes_"), ...)
 }
 \arguments{
-\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
-
 \item{model_type}{The model type. Supported options: \code{"multinomial"}
 and \code{"bernoulli"}. (default = \code{multinomial})}
 
@@ -26,10 +24,6 @@ weights as 1.0.}
 \item{probability_col}{Column name for predicted class conditional probabilities.}
 
 \item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
-
-\item{uid}{A character string used to uniquely identify the ML estimator.}
-
-\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 

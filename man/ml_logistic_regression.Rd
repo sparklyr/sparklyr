@@ -13,8 +13,6 @@ ml_logistic_regression(x, fit_intercept = TRUE, elastic_net_param = 0,
   uid = random_string("logistic_regression_"), ...)
 }
 \arguments{
-\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
-
 \item{elastic_net_param}{ElasticNet mixing parameter, in range [0, 1]. For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty.}
 
 \item{reg_param}{Regularization parameter (aka lambda)}
@@ -28,10 +26,6 @@ ml_logistic_regression(x, fit_intercept = TRUE, elastic_net_param = 0,
 \item{probability_col}{Column name for predicted class conditional probabilities.}
 
 \item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
-
-\item{uid}{A character string used to uniquely identify the ML estimator.}
-
-\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 

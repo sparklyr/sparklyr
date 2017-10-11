@@ -7,8 +7,7 @@
 sdf_pivot(x, formula, fun.aggregate = "count")
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{formula}{A two-sided \R formula of the form \code{x_1 + x_2 + ... ~ y_1}.
 The left-hand side of the formula indicates which variables are used for grouping,

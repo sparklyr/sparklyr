@@ -2,6 +2,45 @@
 #'
 #' Perform recommendation using Alternating Least Squares (ALS) matrix factorization.
 #'
+#' @template roxlate-ml-x
+#' @param rating_col Column name for ratings. Default: "rating"
+#' @param user_col Column name for user ids. Ids must be integers. Other numeric types are supported for this column, but will be cast to integers as long as they fall within the integer value range. Default: "user"
+#' @param item_col Column name for item ids. Ids must be integers. Other numeric types are supported for this column, but will be cast to integers as long as they fall within the integer value range. Default: "item"
+#' @param rank Rank of the matrix factorization (positive). Default: 10
+#' @param reg_param Regularization parameter.
+#' @param implicit_prefs Whether to use implicit preference. Default: FALSE.
+#' @param alpha Alpha parameter in the implicit preference formulation (nonnegative).
+#' @param nonnegative Whether to apply nonnegativity constraints. Default: FALSE.
+#' @param max_iter Maximum number of iterations.
+#' @param num_user_blocks Number of user blocks (positive). Default: 10
+#' @param num_item_blocks Number of item blocks (positive). Default: 10
+#' @template roxlate-ml-checkpoint-interval
+#' @param cold_start_strategy Strategy for dealing with unknown or new users/items at prediction time. This may be useful in cross-validation or production scenarios, for handling user/item ids the model has not seen in the training data. Supported values: - "nan": predicted value for unknown ids will be NaN. - "drop": rows in the input DataFrame containing unknown ids will be dropped from the output DataFrame containing predictions. Default: "nan".
+#' @param intermediate_storage_level StorageLevel for intermediate datasets. Pass in a string representation of \code{StorageLevel}. Cannot be "NONE". Default: "MEMORY_AND_DISK".
+#' @param final_storage_level StorageLevel for ALS model factors. Pass in a string representation of \code{StorageLevel}. Default: "MEMORY_AND_DISK".
+#' @template roxlate-ml-uid
+#' @template roxlate-ml-dots
+#' @return ALS attempts to estimate the ratings matrix R as the product of two lower-rank matrices, X and Y, i.e. X * Yt = R. Typically these approximations are called 'factor' matrices. The general approach is iterative. During each iteration, one of the factor matrices is held constant, while the other is solved for using least squares. The newly-solved factor matrix is then held constant while solving for the other factor matrix.
+#'
+#' This is a blocked implementation of the ALS factorization algorithm that groups the two sets of factors (referred to as "users" and "products") into blocks and reduces communication by only sending one copy of each user vector to each product block on each iteration, and only for the product blocks that need that user's feature vector. This is achieved by pre-computing some information about the ratings matrix to determine the "out-links" of each user (which blocks of products it will contribute to) and "in-link" information for each product (which of the feature vectors it receives from each user block it will depend on). This allows us to send only an array of feature vectors between each user block and product block, and have the product block find the users' ratings and update the products based on these messages.
+#'
+#' For implicit preference data, the algorithm used is based on "Collaborative Filtering for Implicit Feedback Datasets", available at \url{http://dx.doi.org/10.1109/ICDM.2008.22}, adapted for the blocked approach used here.
+#'
+#' Essentially instead of finding the low-rank approximations to the rating matrix R, this finds the approximations for a preference matrix P where the elements of P are 1 if r is greater than 0 and 0 if r is less than or equal to 0. The ratings then act as 'confidence' values related to strength of indicated user preferences rather than explicit ratings given to items.
+#'
+#' The object returned depends on the class of \code{x}.
+#'
+#' \itemize{
+#'   \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_als} recommender object, which is an Estimator.
+#'
+#'   \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
+#'   the recommender appended to the pipline.
+#'
+#'   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a recommender
+#'   estimator is constructed then immediately fit with the input
+#'   \code{tbl_spark}, returning a recommendation model, i.e. \code{ml_als_model}.
+#' }
+#'
 #' @export
 ml_als <- function(
   x,
@@ -47,7 +86,7 @@ ml_als.spark_connection <- function(
 
   ml_ratify_args()
 
-  jobj <- invoke_new(sc, "org.apache.spark.ml.recommendation.ALS", uid) %>%
+  jobj <- invoke_new(x, "org.apache.spark.ml.recommendation.ALS", uid) %>%
     invoke("setRatingCol", rating_col) %>%
     invoke("setUserCol", user_col) %>%
     invoke("setItemCol", item_col) %>%

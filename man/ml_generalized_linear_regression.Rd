@@ -12,8 +12,6 @@ ml_generalized_linear_regression(x, family = "gaussian", link = NULL,
   uid = random_string("generalized_linear_regression_"), ...)
 }
 \arguments{
-\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
-
 \item{family}{Name of family which is a description of the error distribution to be used in the model. Supported options: "gaussian", "binomial", "poisson", "gamma" and "tweedie". Default is "gaussian".}
 
 \item{link}{Name of link function which provides the relationship between the linear predictor and the mean of the distribution function. See for supported link functions.}
@@ -27,10 +25,6 @@ ml_generalized_linear_regression(x, family = "gaussian", link = NULL,
 \item{solver}{Solver algorithm for optimization.}
 
 \item{variance_power}{Power in the variance function of the Tweedie distribution which provides the relationship between the variance and mean of the distribution. Only applicable to the Tweedie family. (see \href{https://en.wikipedia.org/wiki/Tweedie_distribution}{Tweedie Distribution (Wikipedia)}) Supported values: 0 and [1, Inf). Note that variance power 0, 1, or 2 corresponds to the Gaussian, Poisson or Gamma family, respectively.}
-
-\item{uid}{A character string used to uniquely identify the ML estimator.}
-
-\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 

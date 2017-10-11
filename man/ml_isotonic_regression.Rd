@@ -10,17 +10,11 @@ ml_isotonic_regression(x, feature_index = 0L, isotonic = TRUE,
   uid = random_string("isotonic_regression_"), ...)
 }
 \arguments{
-\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
-
 \item{feature_index}{Index of the feature if \code{features_col} is a vector column (default: 0), no effect otherwise.}
 
 \item{isotonic}{Whether the output sequence should be isotonic/increasing (true) or antitonic/decreasing (false). Default: true}
 
 \item{weight_col}{The name of the column to use as weights for the model fit.}
-
-\item{uid}{A character string used to uniquely identify the ML estimator.}
-
-\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 

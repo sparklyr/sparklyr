@@ -8,8 +8,7 @@ sdf_quantile(x, column, probabilities = c(0, 0.25, 0.5, 0.75, 1),
   relative.error = 1e-05)
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{column}{The column for which quantiles should be computed.}
 

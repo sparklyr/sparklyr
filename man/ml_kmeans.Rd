@@ -8,8 +8,7 @@ ml_kmeans(x, centers, iter.max = 100, features = tbl_vars(x),
   compute.cost = TRUE, tolerance = 1e-04, ml.options = ml_options(), ...)
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{centers}{The number of cluster centers to compute.}
 
@@ -22,10 +21,7 @@ ml_kmeans(x, centers, iter.max = 100, features = tbl_vars(x),
 \item{ml.options}{Optional arguments, used to affect the model generated. See
 \code{\link{ml_options}} for more details.}
 
-\item{...}{Optional arguments. The \code{data} argument can be used to
-specify the data to be used when \code{x} is a formula; this allows calls
-of the form \code{ml_linear_regression(y ~ x, data = tbl)}, and is
-especially useful in conjunction with \code{\link{do}}.}
+\item{...}{Optional arguments; currently unused.}
 
 \item{tol}{Param for the convergence tolerance for iterative algorithms.}
 }

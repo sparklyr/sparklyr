@@ -7,8 +7,7 @@
 sdf_repartition(x, partitions = NULL, partition_by = NULL)
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{partitions}{number of partitions}
 

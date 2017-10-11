@@ -15,8 +15,7 @@ ml_prepare_features(x, features, envir = parent.frame(),
   ml.options = ml_options())
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{response}{The name of the response vector (as a length-one character
 vector), or a formula, giving a symbolic description of the model to be
