@@ -32,3 +32,28 @@ test_that("ml_als() default params are correct", {
     ml_params(predictor, names(args)),
     args)
 })
+
+test_that("ml_recommend() works", {
+  if (spark_version(sc) < "2.2.0") skip("")
+
+  user <- c(0, 0, 1, 1, 2, 2)
+  item <- c(0, 1, 1, 2, 1, 2)
+  rating <- c(4.0, 2.0, 3.0, 4.0, 1.0, 5.0)
+
+  df <- data.frame(user = user, item = item, rating = rating)
+  movie_ratings <- sdf_copy_to(sc, df, "movie_rating", overwrite = TRUE)
+
+  als_model <- ml_als(movie_ratings)
+  expect_identical(
+    als_model %>%
+      ml_recommend("users", 2) %>%
+      colnames(),
+    c("item", "recommendations", "user", "rating")
+  )
+  expect_identical(
+    als_model %>%
+      ml_recommend("items", 2) %>%
+      colnames(),
+    c("user", "recommendations", "item", "rating")
+  )
+})

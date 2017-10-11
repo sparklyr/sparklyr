@@ -194,3 +194,26 @@ ml_fit.ml_als <- function(x, data, ...) {
     invoke("fit", spark_dataframe(data))
   new_ml_als_model(jobj)
 }
+
+# Helpers
+
+#' @rdname ml_als
+#' @param model An ALS model object
+#' @param type What to recommend, one of \code{items} or \code{users}
+#' @param n Maximum number of recommendations to return
+#'
+#' @details \code{ml_recommend()} returns the top \code{n} users/items recommended for each item/user, for all items/users. The output has been transformed (exploded and separated) from the default Spark outputs to be more user friendly.
+#'
+#' @export
+ml_recommend <- function(model, type = c("items", "users"), n = 1) {
+  if (spark_version(spark_connection(model)) < "2.2.0")
+    stop("'ml_recommend()' is only support for Spark 2.2+")
+
+  type <- match.arg(type)
+  n <- ensure_scalar_integer(n)
+  (switch(type,
+          items = model$recommend_for_all_users,
+          users = model$recommend_for_all_items))(n) %>%
+    mutate(recommendations = explode(!!as.name("recommendations"))) %>%
+    sdf_separate_column("recommendations")
+}

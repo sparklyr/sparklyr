@@ -2,6 +2,7 @@
 % Please edit documentation in R/ml_recommendation_als.R
 \name{ml_als}
 \alias{ml_als}
+\alias{ml_recommend}
 \title{Spark ML -- ALS}
 \usage{
 ml_als(x, rating_col = "rating", user_col = "user", item_col = "item",
@@ -11,7 +12,19 @@ ml_als(x, rating_col = "rating", user_col = "user", item_col = "item",
   cold_start_strategy = "nan",
   intermediate_storage_level = "MEMORY_AND_DISK",
   final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...)
+
+ml_recommend(model, type = c("items", "users"), n = 1)
+}
+\arguments{
+\item{model}{An ALS model object}
+
+\item{type}{What to recommend, one of \code{items} or \code{users}}
+
+\item{n}{Maximum number of recommendations to return}
 }
 \description{
 Perform recommendation using Alternating Least Squares (ALS) matrix factorization.
+}
+\details{
+\code{ml_recommend()} returns the top \code{n} users/items recommended for each item/user, for all items/users. The output has been transformed (exploded and separated) from the default Spark outputs to be more user friendly.
 }
