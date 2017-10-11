@@ -256,3 +256,7 @@ ml_recommend <- function(model, type = c("items", "users"), n = 1) {
     mutate(recommendations = explode(!!as.name("recommendations"))) %>%
     sdf_separate_column("recommendations")
 }
+
+# backwards compat
+#' @export
+ml_als_factorization <- ml_als.tbl_spark
