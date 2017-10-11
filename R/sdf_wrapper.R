@@ -240,6 +240,8 @@ sdf_separate_column <- function(x,
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
 
+  into_is_set <- ensure_scalar_boolean(!is.null(into))
+
   # when 'into' is NULL, we auto-generate a names -> index map
   if (is.null(into)) {
 
@@ -249,7 +251,7 @@ sdf_separate_column <- function(x,
     indices <- x %>%
       head(1) %>%
       dplyr::pull(!!rlang::sym(column)) %>%
-      rlang::flatten_dbl() %>%
+      rlang::flatten() %>%
       length() %>%
       seq_len()
 
@@ -281,7 +283,8 @@ sdf_separate_column <- function(x,
     sdf,
     column,
     as.list(names),
-    as.list(indices)
+    as.list(indices),
+    into_is_set
   )
 
   # and give it back
