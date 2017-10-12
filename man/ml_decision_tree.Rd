@@ -4,7 +4,6 @@
 \name{ml_decision_tree_classifier}
 \alias{ml_decision_tree_classifier}
 \alias{ml_decision_tree}
-\alias{ml_decision_tree}
 \alias{ml_decision_tree_regressor}
 \title{Spark ML -- Decision Trees}
 \usage{
@@ -35,6 +34,8 @@ ml_decision_tree_regressor(x, max_depth = 5L, max_bins = 32L,
   uid = random_string("decision_tree_regressor_"), ...)
 }
 \arguments{
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
 \item{max_depth}{Maximum depth of the tree (>= 0); that is, the maximum
 number of nodes separating any leaves from the root of the tree.}
 
@@ -71,6 +72,10 @@ and its aggregates may exceed this size. Defaults to 256.}
 \item{probability_col}{Column name for predicted class conditional probabilities.}
 
 \item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
@@ -130,3 +135,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

@@ -4,7 +4,6 @@
 \name{ml_gbt_classifier}
 \alias{ml_gbt_classifier}
 \alias{ml_gradient_boosted_trees}
-\alias{ml_gradient_boosted_trees}
 \alias{ml_gbt_regressor}
 \title{Spark ML -- Gradient Boosted Trees}
 \usage{
@@ -37,6 +36,8 @@ ml_gbt_regressor(x, max_iter = 20L, max_depth = 5L, step_size = 0.1,
   prediction_col = "prediction", uid = random_string("gbt_regressor_"), ...)
 }
 \arguments{
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
 \item{max_iter}{Maxmimum number of iterations.}
 
 \item{max_depth}{Maximum depth of the tree (>= 0); that is, the maximum
@@ -77,6 +78,10 @@ and its aggregates may exceed this size. Defaults to 256.}
 \item{probability_col}{Column name for predicted class conditional probabilities.}
 
 \item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
@@ -134,3 +139,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

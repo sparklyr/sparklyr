@@ -8,6 +8,58 @@ ml_kmeans(x, k = 2L, max_iter = 20L, tol = 1e-04, init_steps = 2L,
   init_mode = "k-means||", seed = NULL, features_col = "features",
   prediction_col = "prediction", uid = random_string("kmeans_"), ...)
 }
+\arguments{
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{k}{The number of clusters to create}
+
+\item{max_iter}{The maximum number of iterations to use.}
+
+\item{tol}{Param for the convergence tolerance for iterative algorithms.}
+
+\item{init_steps}{Number of steps for the k-means|| initialization mode. This is an advanced setting -- the default of 2 is almost always enough. Must be > 0. Default: 2.}
+
+\item{init_mode}{Initialization algorithm. This can be either "random" to choose random points as initial cluster centers, or "k-means||" to use a parallel variant of k-means++ (Bahmani et al., Scalable K-Means++, VLDB 2012). Default: k-means||.}
+
+\item{seed}{A random seed. Set this value if you need your results to be
+reproducible across repeated calls.}
+
+\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{prediction_col}{Prediction column name.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
+}
+\value{
+The object returned depends on the class of \code{x}.
+
+\itemize{
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
+  a Spark \code{Estimator} object and can be used to compose
+  \code{Pipeline} objects.
+
+  \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
+  the clustering estimator appended to the pipline.
+
+  \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, an estimator is constructed then
+  immediately fit with the input \code{tbl_spark}, returning a clustering model.
+
+  \item \code{tbl_spark}, with \code{formula} or \code{features} specified: When \code{formula}
+    is specified, the input \code{tbl_spark} is first transformed using a
+    \code{RFormula} transformer before being fit by
+    the estimator. The object returned in this case is a \code{ml_model} which is a
+    wrapper of a \code{ml_pipeline_model}. This signature does not apply to \code{ml_lda()}.
+}
+}
 \description{
 K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
 }
+\seealso{
+See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
+  more information on the set of clustering algorithms.
+
+Other ml clustering algorithms: \code{\link{ml_gaussian_mixture}}
+}
+\concept{ml clustering algorithms}

@@ -9,7 +9,13 @@ ml_one_vs_rest(x, classifier, features_col = "features",
   uid = random_string("one_vs_rest_"), ...)
 }
 \arguments{
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
 \item{classifier}{Object of class \code{ml_estimator}. Base binary classifier that we reduce multiclass classification into.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
@@ -58,3 +64,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

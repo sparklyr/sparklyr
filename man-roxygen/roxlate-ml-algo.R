@@ -1,6 +1,6 @@
-#' @template roxlate-ml-x
-#' @template roxlate-ml-uid
-#' @template roxlate-ml-dots
+#' @param x A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.
+#' @param uid A character string used to uniquely identify the ML estimator.
+#' @param ... Optional arguments; currently unused.
 #'
 #' @seealso See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
 #'   more information on the set of supervised learning algorithms.

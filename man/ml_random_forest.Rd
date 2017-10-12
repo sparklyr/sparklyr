@@ -4,7 +4,6 @@
 \name{ml_random_forest_classifier}
 \alias{ml_random_forest_classifier}
 \alias{ml_random_forest}
-\alias{ml_random_forest}
 \alias{ml_random_forest_regressor}
 \title{Spark ML -- Random Forest}
 \usage{
@@ -39,6 +38,8 @@ ml_random_forest_regressor(x, num_trees = 20L, subsampling_rate = 1,
   uid = random_string("random_forest_regressor_"), ...)
 }
 \arguments{
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
 \item{num_trees}{Number of trees to train (>= 1). If 1, then no bootstrapping is used. If > 1, then bootstrapping is done.}
 
 \item{subsampling_rate}{Fraction of the training data used for learning each decision tree, in range (0, 1]. (default = 1.0)}
@@ -81,6 +82,10 @@ and its aggregates may exceed this size. Defaults to 256.}
 \item{probability_col}{Column name for predicted class conditional probabilities.}
 
 \item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
@@ -148,3 +153,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_one_vs_rest}}
 }
+\concept{ml algorithms}

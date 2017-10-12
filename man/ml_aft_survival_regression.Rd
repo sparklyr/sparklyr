@@ -12,6 +12,8 @@ ml_aft_survival_regression(x, censor_col = "censor",
   uid = random_string("aft_survival_regression_"), ...)
 }
 \arguments{
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
 \item{censor_col}{Censor column name. The value of this column could be 0 or 1. If the value is 1, it means the event has occurred i.e. uncensored; otherwise censored.}
 
 \item{quantile_probabilities}{Quantile probabilities array. Values of the quantile probabilities array should be in the range (0, 1) and the array should be non-empty.}
@@ -25,6 +27,10 @@ ml_aft_survival_regression(x, censor_col = "censor",
 \item{aggregation_depth}{Suggested depth for treeAggregate (>= 2).}
 
 \item{quantiles_col}{Quantiles column name. This column will output quantiles of corresponding quantileProbabilities if it is set.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
@@ -73,3 +79,4 @@ Other ml algorithms: \code{\link{ml_decision_tree_classifier}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

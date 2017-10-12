@@ -10,6 +10,8 @@ ml_gaussian_mixture(x, k = 2L, max_iter = 100L, tol = 0.01, seed = NULL,
   ...)
 }
 \arguments{
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
 \item{k}{The number of clusters to create}
 
 \item{max_iter}{The maximum number of iterations to use.}
@@ -24,6 +26,10 @@ reproducible across repeated calls.}
 \item{prediction_col}{Prediction column name.}
 
 \item{probability_col}{Column name for predicted class conditional probabilities. Note: Not all models output well-calibrated probability estimates! These probabilities should be treated as confidences, not precise probabilities.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -52,4 +58,7 @@ This class performs expectation maximization for multivariate Gaussian Mixture M
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
+
+Other ml clustering algorithms: \code{\link{ml_kmeans}}
 }
+\concept{ml clustering algorithms}

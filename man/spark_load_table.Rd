@@ -46,3 +46,4 @@ Other Spark serialization routines: \code{\link{spark_read_csv}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
+\concept{Spark serialization routines}

@@ -2,6 +2,13 @@
 #'
 #' K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
 #'
+#' @template roxlate-ml-clustering-algo
+#' @template roxlate-ml-clustering-params
+#' @template roxlate-ml-tol
+#' @template roxlate-ml-prediction-col
+#' @param init_steps Number of steps for the k-means|| initialization mode. This is an advanced setting -- the default of 2 is almost always enough. Must be > 0. Default: 2.
+#' @param init_mode Initialization algorithm. This can be either "random" to choose random points as initial cluster centers, or "k-means||" to use a parallel variant of k-means++ (Bahmani et al., Scalable K-Means++, VLDB 2012). Default: k-means||.
+#'
 #' @export
 ml_kmeans <- function(
   x,
@@ -192,3 +199,9 @@ print.ml_model_kmeans <- function(x, ...) {
   )
 
 }
+
+# TODO
+#' #' @export
+#' fitted.ml_model_kmeans <- function(object, ...) {
+#'   predict(object)
+#' }
