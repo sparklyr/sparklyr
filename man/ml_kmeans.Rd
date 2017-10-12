@@ -60,6 +60,7 @@ K-means clustering with support for k-means|| initialization proposed by Bahmani
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
 
-Other ml clustering algorithms: \code{\link{ml_gaussian_mixture}}
+Other ml clustering algorithms: \code{\link{ml_bisecting_kmeans}},
+  \code{\link{ml_gaussian_mixture}}
 }
 \concept{ml clustering algorithms}

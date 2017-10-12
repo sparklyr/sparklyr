@@ -2,6 +2,11 @@
 #'
 #' A bisecting k-means algorithm based on the paper "A comparison of document clustering techniques" by Steinbach, Karypis, and Kumar, with modification to fit Spark. The algorithm starts from a single cluster that contains all points. Iteratively it finds divisible clusters on the bottom level and bisects each of them using k-means, until there are k leaf clusters in total or no leaf clusters are divisible. The bisecting steps of clusters on the same level are grouped together to increase parallelism. If bisecting all divisible clusters on the bottom level would result more than k leaf clusters, larger clusters get higher priority.
 #'
+#' @template roxlate-ml-clustering-algo
+#' @template roxlate-ml-clustering-params
+#' @template roxlate-ml-prediction-col
+#' @param min_divisible_cluster_size The minimum number of points (if greater than or equal to 1.0) or the minimum proportion of points (if less than 1.0) of a divisible cluster (default: 1.0).
+#'
 #' @export
 ml_bisecting_kmeans <- function(
   x,
