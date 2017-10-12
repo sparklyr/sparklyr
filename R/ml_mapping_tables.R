@@ -78,7 +78,15 @@ ml_create_mapping_tables <- function() {
          "num_item_blocks" = "numItemBlocks",
          "cold_start_strategy" = "coldStartStrategy",
          "intermediate_storage_level" = "intermediateStorageLevel",
-         "final_storage_level" = "finalStorageLevel")
+         "final_storage_level" = "finalStorageLevel",
+         # ml_lda
+         "doc_concentration" = "docConcentration",
+         "topic_concentration" = "topicConcentration",
+         "keep_last_checkpoint" = "keepLastCheckpoint",
+         "learning_decay" = "learningDecay",
+         "learning_offset" = "learningOffset",
+         "optimize_doc_concentration" = "optimizeDocConcentration",
+         "topic_distribution_col" = "topicDistributionCol")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

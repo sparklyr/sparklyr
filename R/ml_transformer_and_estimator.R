@@ -10,6 +10,12 @@ new_ml_prediction_model <- function(jobj, ..., subclass = NULL) {
                      subclass = c(subclass, "ml_prediction_model"))
 }
 
+new_ml_clustering_model <- function(jobj, ..., subclass = NULL) {
+  new_ml_transformer(jobj,
+                     ...,
+                     subclass = c(subclass, "ml_clustering_model"))
+}
+
 new_ml_estimator <- function(jobj, ..., subclass = NULL) {
   new_ml_pipeline_stage(jobj,
                         ...,
