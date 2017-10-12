@@ -266,3 +266,25 @@ ml_fit.ml_lda <- function(x, data, ...) {
     invoke("fit", spark_dataframe(data))
   new_ml_lda_model(jobj)
 }
+
+# TODO
+#' #' @export
+#' print.ml_model_lda <- function(x, ...) {
+#'
+#'   header <- sprintf(
+#'     "An LDA model fit on %s features",
+#'     length(x$features)
+#'   )
+#'
+#'   cat(header, sep = "\n")
+#'   print_newline()
+#'
+#'   cat("Topics Matrix:", sep = "\n")
+#'   print(x$topics.matrix)
+#'   print_newline()
+#'
+#'   cat("Estimated Document Concentration:", sep = "\n")
+#'   print(x$estimated.doc.concentration)
+#'   print_newline()
+#'
+#' }
