@@ -39,6 +39,7 @@ ml_ancestry <- function(jobj) {
                "clustering.LDA", "clustering.LDAModel",
                "clustering.KMeans", "clustering.KMeansModel",
                "clustering.BisectingKMeans", "clustering.BisectingKMeansModel",
+               "clustering.GaussianMixture", "clustering.GaussianMixtureModel",
                "tuning.CrossValidator",
                "Pipeline", "PipelineModel",
                "Estimator", "Transformer")
@@ -95,6 +96,8 @@ ml_constructor_dispatch <- function(jobj) {
          "clustering.KMeans" = new_ml_kmeans(jobj), "clustering.KMeansModel" = new_ml_kmeans_model(jobj),
          "clustering.BisectingKMeans" = new_ml_bisecting_kmeans(jobj),
          "clustering.BisectingKMeansModel" = new_ml_bisecting_kmeans_model(jobj),
+         "clustering.GaussianMixture" = new_ml_gaussian_mixture(jobj),
+         "clustering.GaussianMixtureModel" = new_ml_gaussian_mixture_model(jobj),
          "Pipeline" = new_ml_pipeline(jobj),
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),
