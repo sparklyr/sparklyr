@@ -1,3 +1,21 @@
+#' Spark ML -- Latent Dirichlet Allocation
+#'
+#' Latent Dirichlet Allocation (LDA), a topic model designed for text documents.
+#'
+#' @details
+#'
+#' Terminology:
+#' \itemize{
+#'   \item "term" = "word": an element of the vocabulary
+#'   \item "token": instance of a term appearing in a document
+#'   \item "topic": multinomial distribution over terms representing some concept
+#'   \item "document": one piece of text, corresponding to one row in the input data
+#' }
+#'
+#' Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Allocation." JMLR, 2003.
+#'
+#' Input data (\code{features_col}): LDA is given a collection of documents as input data, via the \code{features_col} parameter. Each document is specified as a Vector of length \code{vocab_size}, where each entry is the count for the corresponding term (word) in the document. Feature transformers such as \code{\link{ft_tokenizer}} and \code{\link{ft_count_vectorizer}} can be useful for converting text to word count vectors
+#'
 #' @export
 ml_lda <- function(
   x,
