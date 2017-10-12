@@ -242,7 +242,7 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj) {
     residual_degree_of_freedom_null = invoke(jobj, "residualDegreeOfFreedomNull"),
     residuals = function(type = "deviance") (invoke(jobj, "residuals", type)
                                              %>% sdf_register()),
-    solver = try_null(invoke(Jobj, "solver")),
+    solver = try_null(invoke(jobj, "solver")),
     t_values = try_null(invoke(jobj, "tValues")),
     subclass = "ml_summary_generalized_linear_regression")
 }

@@ -7,7 +7,7 @@ input_output_mapping <- list(
 ml_validator_hashing_tf <- function(args, nms) {
   args %>%
     ml_validate_args({
-      ensure_scalar_boolean(binary)
+      binary <- ensure_scalar_boolean(binary)
       num_features <- ensure_scalar_integer(num_features)
     }) %>%
     ml_extract_args(nms)

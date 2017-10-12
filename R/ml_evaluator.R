@@ -76,7 +76,7 @@ ml_multiclass_classification_evaluator <- function(dataset, label_col, predictio
 
   if (spark_version(sc) >= "2.0.0" && !metric_name %in% spark_metric[["2.0"]] ||
       spark_version(sc) <  "2.0.0" && !metric_name %in% spark_metric[["1.6"]]) {
-    stop("Metric ", metric, " is unsupported in Spark ", spark_version(sc))
+    stop("Metric ", metric_name, " is unsupported in Spark ", spark_version(sc))
   }
 
   res <- invoke_new(sc, "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator") %>%

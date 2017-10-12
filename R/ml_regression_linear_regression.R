@@ -244,7 +244,7 @@ print.ml_summary_linear_regression <- function(x, ...) {
     setdiff(if (!identical(x$.solver, "normal"))
       c("coefficient_standard_errors", "p_values", "t_values") else NULL)
   for (item in names(item_names))
-    cat("  ", item, ":", capture.output(str(out_list[[item]])), "\n")
+    cat("  ", item, ":", capture.output(str(x[[item]])), "\n")
 }
 
 #' @export

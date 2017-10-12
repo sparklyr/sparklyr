@@ -64,6 +64,7 @@ ml_gaussian_mixture.ml_pipeline <- function(
 #' @export
 ml_gaussian_mixture.tbl_spark <- function(
   x,
+  formula = NULL,
   k = 2L,
   max_iter = 100L,
   tol = 0.01,

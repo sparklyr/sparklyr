@@ -52,7 +52,7 @@ ml_new_stage_modified_args <- function(envir = rlang::caller_env(2)) {
     rlang::lang_args() %>%
     lapply(rlang::new_quosure, env = envir) %>%
     rlang::modify(
-      x = rlang::new_quosure(rlang::expr(spark_connection(x)), env = caller_frame$env)
+      x = rlang::new_quosure(rlang::parse_expr("spark_connection(x)"), env = caller_frame$env)
     ) %>%
     # filter `features` so it doesn't get partial matched to `features_col`
     (function(x) x[setdiff(names(x), "features")])

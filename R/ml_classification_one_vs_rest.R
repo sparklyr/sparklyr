@@ -85,7 +85,8 @@ ml_one_vs_rest.tbl_spark <- function(
 ml_validator_one_vs_rest <- function(args, nms) {
   args %>%
     ml_validate_args({
-      inherits(classifier, "ml_predictor")
+      classifier <- if (inherits(classifier, "ml_predictor")) classifier else
+        stop("classifier must be a ml_predictor")
     }) %>%
     ml_extract_args(nms)
 }
