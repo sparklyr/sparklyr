@@ -86,7 +86,11 @@ ml_create_mapping_tables <- function() {
          "learning_decay" = "learningDecay",
          "learning_offset" = "learningOffset",
          "optimize_doc_concentration" = "optimizeDocConcentration",
-         "topic_distribution_col" = "topicDistributionCol")
+         "topic_distribution_col" = "topicDistributionCol",
+         # ml_kmeans
+         "max_iter" = "maxIter",
+         "init_steps" = "initSteps",
+         "init_mode" = "initMode")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

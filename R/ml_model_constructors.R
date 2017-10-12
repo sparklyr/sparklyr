@@ -55,7 +55,18 @@ new_ml_model_regression <- function(
     subclass = c(subclass, "ml_model_regression"))
 }
 
-
+new_ml_model_clustering <- function(
+  pipeline, pipeline_model, model, dataset, formula, ...,
+  subclass = NULL) {
+  new_ml_model(
+    pipeline = pipeline,
+    pipeline_model = pipeline_model,
+    model = model,
+    dataset = dataset,
+    formula = formula,
+    ...,
+    subclass = c(subclass, "ml_model_clustering"))
+}
 
 #' @export
 sdf_predict.ml_model_classification <- function(

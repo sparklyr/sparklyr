@@ -19,7 +19,8 @@ ml_feature_names_metadata <- function(pipeline_model, dataset, features_col) {
     dplyr::pull("name")
 }
 
-ml_generate_ml_model <- function(x, predictor, formula, features_col, label_col, type,
+ml_generate_ml_model <- function(x, predictor, formula, features_col = "features",
+                                 label_col = "label", type,
                                  constructor) {
   sc <- spark_connection(x)
   classification <- identical(type, "classification")
