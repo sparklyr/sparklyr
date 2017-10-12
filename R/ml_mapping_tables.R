@@ -90,7 +90,9 @@ ml_create_mapping_tables <- function() {
          # ml_kmeans
          "max_iter" = "maxIter",
          "init_steps" = "initSteps",
-         "init_mode" = "initMode")
+         "init_mode" = "initMode",
+         # ml_bisecting_kmeans
+         "min_divisible_cluster_size" = "minDivisibleClusterSize")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

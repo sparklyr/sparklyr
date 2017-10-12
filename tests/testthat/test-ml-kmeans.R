@@ -1,4 +1,4 @@
-context("ml clustering")
+context("ml kmeans")
 
 sc <- testthat_spark_connection()
 test_requires("dplyr")
