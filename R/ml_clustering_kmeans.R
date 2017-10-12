@@ -73,7 +73,6 @@ ml_kmeans.tbl_spark <- function(
   features_col = "features",
   prediction_col = "prediction",
   uid = random_string("kmeans_"),
-  response = NULL,
   features = NULL, ...) {
 
   predictor <- ml_new_stage_modified_args()
@@ -91,13 +90,11 @@ ml_kmeans.tbl_spark <- function(
 
 # Validator
 ml_validator_kmeans <- function(args, nms) {
-  old_new_mapping <- c(
-    ml_tree_param_mapping(),
-    list(
+  old_new_mapping <- list(
       centers = "k",
       tolerance = "tol",
       iter.max = "max_iter"
-    ))
+    )
 
   args %>%
     ml_validate_args({
