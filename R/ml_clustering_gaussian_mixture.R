@@ -2,6 +2,11 @@
 #'
 #' This class performs expectation maximization for multivariate Gaussian Mixture Models (GMMs). A GMM represents a composite distribution of independent Gaussian distributions with associated "mixing" weights specifying each's contribution to the composite. Given a set of sample points, this class will maximize the log-likelihood for a mixture of k Gaussians, iterating until the log-likelihood changes by less than \code{tol}, or until it has reached the max number of iterations. While this process is generally guaranteed to converge, it is not guaranteed to find a global optimum.
 #'
+#' @template roxlate-ml-clustering-algo
+#' @template roxlate-ml-clustering-params
+#' @template roxlate-ml-tol
+#' @template roxlate-ml-prediction-col
+#' @param probability_col Column name for predicted class conditional probabilities. Note: Not all models output well-calibrated probability estimates! These probabilities should be treated as confidences, not precise probabilities.
 #' @export
 ml_gaussian_mixture <- function(
   x,
