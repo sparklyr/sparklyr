@@ -40,6 +40,9 @@ ml_recommend(model, type = c("items", "users"), n = 1)
 
 \item{num_item_blocks}{Number of item blocks (positive). Default: 10}
 
+\item{checkpoint_interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
+
 \item{cold_start_strategy}{Strategy for dealing with unknown or new users/items at prediction time. This may be useful in cross-validation or production scenarios, for handling user/item ids the model has not seen in the training data. Supported values: - "nan": predicted value for unknown ids will be NaN. - "drop": rows in the input DataFrame containing unknown ids will be dropped from the output DataFrame containing predictions. Default: "nan".}
 
 \item{intermediate_storage_level}{StorageLevel for intermediate datasets. Pass in a string representation of \code{StorageLevel}. Cannot be "NONE". Default: "MEMORY_AND_DISK".}
@@ -55,9 +58,6 @@ ml_recommend(model, type = c("items", "users"), n = 1)
 \item{type}{What to recommend, one of \code{items} or \code{users}}
 
 \item{n}{Maximum number of recommendations to return}
-
-\item{checkpoint.interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
-E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
 }
 \value{
 ALS attempts to estimate the ratings matrix R as the product of two lower-rank matrices, X and Y, i.e. X * Yt = R. Typically these approximations are called 'factor' matrices. The general approach is iterative. During each iteration, one of the factor matrices is held constant, while the other is solved for using least squares. The newly-solved factor matrix is then held constant while solving for the other factor matrix.

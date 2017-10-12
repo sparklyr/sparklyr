@@ -12,11 +12,69 @@ ml_lda(x, k = 10L, max_iter = 20L, doc_concentration = NULL,
   features_col = "features", topic_distribution_col = "topicDistribution",
   uid = random_string("lda_"), ...)
 }
+\arguments{
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{k}{The number of clusters to create}
+
+\item{max_iter}{The maximum number of iterations to use.}
+
+\item{doc_concentration}{Concentration parameter (commonly named "alpha") for the prior placed on documents' distributions over topics ("theta"). See details.}
+
+\item{topic_concentration}{Concentration parameter (commonly named "beta" or "eta") for the prior placed on topics' distributions over terms.}
+
+\item{subsampling_rate}{(For Online optimizer only) Fraction of the corpus to be sampled and used in each iteration of mini-batch gradient descent, in range (0, 1]. Note that this should be adjusted in synch with \code{max_iter} so the entire corpus is used. Specifically, set both so that maxIterations * miniBatchFraction greater than or equal to 1.}
+
+\item{optimizer}{Optimizer or inference algorithm used to estimate the LDA model. Supported: "online" for Online Variational Bayes (default) and "em" for Expectation-Maximization.}
+
+\item{checkpoint_interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
+
+\item{keep_last_checkpoint}{(For EM optimizer only) If using checkpointing, this indicates whether to keep the last checkpoint. If \code{FALSE}, then the checkpoint will be deleted. Deleting the checkpoint can cause failures if a data partition is lost, so set this bit with care. Note that checkpoints will be cleaned up via reference counting, regardless.}
+
+\item{learning_decay}{(For Online optimizer only) Learning rate, set as an exponential decay rate. This should be between (0.5, 1.0] to guarantee asymptotic convergence. This is called "kappa" in the Online LDA paper (Hoffman et al., 2010). Default: 0.51, based on Hoffman et al.}
+
+\item{learning_offset}{(For Online optimizer only) A (positive) learning parameter that downweights early iterations. Larger values make early iterations count less. This is called "tau0" in the Online LDA paper (Hoffman et al., 2010) Default: 1024, following Hoffman et al.}
+
+\item{optimize_doc_concentration}{(For Online optimizer only) Indicates whether the \code{doc_concentration} (Dirichlet parameter for document-topic distribution) will be optimized during training. Setting this to true will make the model more expressive and fit the training data better. Default: \code{FALSE}}
+
+\item{seed}{A random seed. Set this value if you need your results to be
+reproducible across repeated calls.}
+
+\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{topic_distribution_col}{Output column with estimates of the topic mixture distribution for each document (often called "theta" in the literature). Returns a vector of zeros for an empty document.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
+}
+\value{
+The object returned depends on the class of \code{x}.
+
+\itemize{
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
+  a Spark \code{Estimator} object and can be used to compose
+  \code{Pipeline} objects.
+
+  \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
+  the clustering estimator appended to the pipline.
+
+  \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, an estimator is constructed then
+  immediately fit with the input \code{tbl_spark}, returning a clustering model.
+
+  \item \code{tbl_spark}, with \code{formula} or \code{features} specified: When \code{formula}
+    is specified, the input \code{tbl_spark} is first transformed using a
+    \code{RFormula} transformer before being fit by
+    the estimator. The object returned in this case is a \code{ml_model} which is a
+    wrapper of a \code{ml_pipeline_model}. This signature does not apply to \code{ml_lda()}.
+}
+}
 \description{
 Latent Dirichlet Allocation (LDA), a topic model designed for text documents.
 }
 \details{
-Terminology:
+Terminology for LDA:
 \itemize{
   \item "term" = "word": an element of the vocabulary
   \item "token": instance of a term appearing in a document
@@ -28,3 +86,66 @@ Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Al
 
 Input data (\code{features_col}): LDA is given a collection of documents as input data, via the \code{features_col} parameter. Each document is specified as a Vector of length \code{vocab_size}, where each entry is the count for the corresponding term (word) in the document. Feature transformers such as \code{\link{ft_tokenizer}} and \code{\link{ft_count_vectorizer}} can be useful for converting text to word count vectors
 }
+\section{Parameter details}{
+
+
+\subsection{\code{doc_concentration}}{
+  This is the parameter to a Dirichlet distribution, where larger values mean more smoothing (more regularization). If not set by the user, then \code{doc_concentration} is set automatically. If set to singleton vector [alpha], then alpha is replicated to a vector of length k in fitting. Otherwise, the \code{doc_concentration} vector must be length k. (default = automatic)
+
+  Optimizer-specific parameter settings:
+
+EM
+
+\itemize{
+  \item Currently only supports symmetric distributions, so all values in the vector should be the same.
+  \item Values should be greater than 1.0
+  \item default = uniformly (50 / k) + 1, where 50/k is common in LDA libraries and +1 follows from Asuncion et al. (2009), who recommend a +1 adjustment for EM.
+}
+
+Online
+
+\itemize{
+  \item Values should be greater than or equal to 0
+  \item default = uniformly (1.0 / k), following the implementation from \href{https://github.com/Blei-Lab/onlineldavb}{here}
+  }
+}
+
+\subsection{\code{topic_concentration}}{
+
+This is the parameter to a symmetric Dirichlet distribution.
+
+Note: The topics' distributions over terms are called "beta" in the original LDA paper by Blei et al., but are called "phi" in many later papers such as Asuncion et al., 2009.
+
+If not set by the user, then \code{topic_concentration} is set automatically. (default = automatic)
+
+Optimizer-specific parameter settings:
+
+EM
+
+\itemize{
+  \item Value should be greater than 1.0
+  \item default = 0.1 + 1, where 0.1 gives a small amount of smoothing and +1 follows Asuncion et al. (2009), who recommend a +1 adjustment for EM.
+}
+
+Online
+
+\itemize{
+  \item Value should be greater than or equal to 0
+  \item default = (1.0 / k), following the implementation from \href{https://github.com/Blei-Lab/onlineldavb}{here}.
+  }
+}
+
+\subsection{\code{topic_distribution_col}}{
+  This uses a variational approximation following Hoffman et al. (2010), where the approximate distribution is called "gamma." Technically, this method returns this approximation "gamma" for each document.
+}
+}
+
+\seealso{
+See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
+  more information on the set of clustering algorithms.
+
+Other ml clustering algorithms: \code{\link{ml_bisecting_kmeans}},
+  \code{\link{ml_gaussian_mixture}},
+  \code{\link{ml_kmeans}}
+}
+\concept{ml clustering algorithms}

@@ -58,6 +58,6 @@ See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
 
 Other ml clustering algorithms: \code{\link{ml_gaussian_mixture}},
-  \code{\link{ml_kmeans}}
+  \code{\link{ml_kmeans}}, \code{\link{ml_lda}}
 }
 \concept{ml clustering algorithms}
