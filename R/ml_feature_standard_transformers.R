@@ -117,7 +117,7 @@ ft_hashing_tf.ml_pipeline <- function(x, input_col, output_col, binary = FALSE,
 
 #' @export
 ft_hashing_tf.tbl_spark <- function(x, input_col, output_col, binary = FALSE,
-                                    num_features = as.integer(2^18), uid = random_string("hashing_tf_"), ....) {
+                                    num_features = as.integer(2^18), uid = random_string("hashing_tf_"), ...) {
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 

@@ -32,17 +32,17 @@ ml_linear_regression <- function(
 ml_linear_regression.spark_connection <- function(
   x,
   formula = NULL,
-  features_col = "features",
-  label_col = "label",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
   max_iter = 100L,
   weight_col = NULL,
-  prediction_col = "prediction",
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("linear_regression_"), ...) {
 
   ml_ratify_args()
@@ -69,17 +69,17 @@ ml_linear_regression.spark_connection <- function(
 ml_linear_regression.ml_pipeline <- function(
   x,
   formula = NULL,
-  features_col = "features",
-  label_col = "label",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
   max_iter = 100L,
   weight_col = NULL,
-  prediction_col = "prediction",
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("linear_regression_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
@@ -90,17 +90,17 @@ ml_linear_regression.ml_pipeline <- function(
 ml_linear_regression.tbl_spark <- function(
   x,
   formula = NULL,
-  features_col = "features",
-  label_col = "label",
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
   max_iter = 100L,
   weight_col = NULL,
-  prediction_col = "prediction",
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("linear_regression_"),
   response = NULL,
   features = NULL,...) {

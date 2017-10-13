@@ -163,7 +163,7 @@ ml_is_set <- function(x, param, ...) {
 }
 
 #' @export
-ml_is_set.ml_pipeline_stage <- function(x, param) {
+ml_is_set.ml_pipeline_stage <- function(x, param, ...) {
   jobj <- spark_jobj(x)
   param_jobj <- jobj %>%
     invoke(ml_map_param_names(param, direction = "rs"))
@@ -172,7 +172,7 @@ ml_is_set.ml_pipeline_stage <- function(x, param) {
 }
 
 #' @export
-ml_is_set.spark_jobj <- function(x, param) {
+ml_is_set.spark_jobj <- function(x, param, ...) {
   param_jobj <- x %>%
     invoke(ml_map_param_names(param, direction = "rs"))
   x %>%
