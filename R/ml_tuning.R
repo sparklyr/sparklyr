@@ -208,7 +208,7 @@ ml_spark_param_map <- function(param_map, sc, uid_stages) {
                lapply(function(param_name) {
                  # get the Param object by calling `[stage].[param]` in Scala
                  list(param_jobj = uid_stages[[stage_uid]] %>%
-                        invoke(sparklyr:::ml_map_param_names(param_name, "rs")),
+                        invoke(ml_map_param_names(param_name, "rs")),
                       value = params[[param_name]]
                  )
                }))
