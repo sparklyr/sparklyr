@@ -4,9 +4,10 @@
 \alias{ml_kmeans}
 \title{Spark ML -- K-Means Clustering}
 \usage{
-ml_kmeans(x, k = 2L, max_iter = 20L, tol = 1e-04, init_steps = 2L,
-  init_mode = "k-means||", seed = NULL, features_col = "features",
-  prediction_col = "prediction", uid = random_string("kmeans_"), ...)
+ml_kmeans(x, formula = NULL, k = 2L, max_iter = 20L, tol = 1e-04,
+  init_steps = 2L, init_mode = "k-means||", seed = NULL,
+  features_col = "features", prediction_col = "prediction",
+  uid = random_string("kmeans_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

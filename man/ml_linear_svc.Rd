@@ -4,14 +4,17 @@
 \alias{ml_linear_svc}
 \title{Spark ML -- LinearSVC}
 \usage{
-ml_linear_svc(x, fit_intercept = TRUE, reg_param = 0, max_iter = 100L,
-  standardization = TRUE, weight_col = NULL, tol = 1e-06, threshold = 0,
-  aggregation_depth = 2L, features_col = "features", label_col = "label",
+ml_linear_svc(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
+  max_iter = 100L, standardization = TRUE, weight_col = NULL,
+  tol = 1e-06, threshold = 0, aggregation_depth = 2L,
+  features_col = "features", label_col = "label",
   prediction_col = "prediction", raw_prediction_col = "rawPrediction",
   uid = random_string("linear_svc_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{reg_param}{Regularization parameter (aka lambda)}
 
@@ -24,8 +27,6 @@ ml_linear_svc(x, fit_intercept = TRUE, reg_param = 0, max_iter = 100L,
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 

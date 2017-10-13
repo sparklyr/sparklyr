@@ -4,16 +4,18 @@
 \alias{ml_logistic_regression}
 \title{Spark ML -- Logistic Regression}
 \usage{
-ml_logistic_regression(x, fit_intercept = TRUE, elastic_net_param = 0,
-  reg_param = 0, max_iter = 100L, threshold = 0.5, thresholds = NULL,
-  tol = 1e-06, weight_col = NULL, aggregation_depth = 2L,
-  features_col = "features", label_col = "label", family = "auto",
-  prediction_col = "prediction", probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
+ml_logistic_regression(x, formula = NULL, fit_intercept = TRUE,
+  elastic_net_param = 0, reg_param = 0, max_iter = 100L,
+  threshold = 0.5, thresholds = NULL, tol = 1e-06, weight_col = NULL,
+  aggregation_depth = 2L, features_col = "features", label_col = "label",
+  family = "auto", prediction_col = "prediction",
+  probability_col = "probability", raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{elastic_net_param}{ElasticNet mixing parameter, in range [0, 1]. For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty.}
 
@@ -32,8 +34,6 @@ ml_logistic_regression(x, fit_intercept = TRUE, elastic_net_param = 0,
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 

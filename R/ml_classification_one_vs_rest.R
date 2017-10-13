@@ -9,6 +9,7 @@
 #' @export
 ml_one_vs_rest <- function(
   x,
+  formula = NULL,
   classifier,
   features_col = "features",
   label_col = "label",
@@ -22,6 +23,7 @@ ml_one_vs_rest <- function(
 #' @export
 ml_one_vs_rest.spark_connection <- function(
   x,
+  formula = NULL,
   classifier,
   features_col = "features",
   label_col = "label",
@@ -44,6 +46,7 @@ ml_one_vs_rest.spark_connection <- function(
 #' @export
 ml_one_vs_rest.ml_pipeline <- function(
   x,
+  formula = NULL,
   classifier,
   features_col = "features",
   label_col = "label",

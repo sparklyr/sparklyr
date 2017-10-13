@@ -4,7 +4,7 @@
 \alias{ml_aft_survival_regression}
 \title{Spark ML -- Survival Regression}
 \usage{
-ml_aft_survival_regression(x, censor_col = "censor",
+ml_aft_survival_regression(x, formula = NULL, censor_col = "censor",
   quantile_probabilities = list(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95,
   0.99), fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
   aggregation_depth = 2L, quantiles_col = NULL, features_col = "features",
@@ -13,6 +13,8 @@ ml_aft_survival_regression(x, censor_col = "censor",
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{censor_col}{Censor column name. The value of this column could be 0 or 1. If the value is 1, it means the event has occurred i.e. uncensored; otherwise censored.}
 
@@ -31,8 +33,6 @@ ml_aft_survival_regression(x, censor_col = "censor",
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 

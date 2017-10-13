@@ -15,6 +15,7 @@
 #' @export
 ml_multilayer_perceptron_classifier <- function(
   x,
+  formula = NULL,
   layers,
   max_iter = 100L,
   step_size = 0.03,
@@ -34,6 +35,7 @@ ml_multilayer_perceptron_classifier <- function(
 #' @export
 ml_multilayer_perceptron_classifier.spark_connection <- function(
   x,
+  formula = NULL,
   layers,
   max_iter = 100L,
   step_size = 0.03,
@@ -76,6 +78,7 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(
 #' @export
 ml_multilayer_perceptron_classifier.ml_pipeline <- function(
   x,
+  formula = NULL,
   layers,
   max_iter = 100L,
   step_size = 0.03,

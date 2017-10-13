@@ -5,14 +5,17 @@
 \alias{ml_multilayer_perceptron_classifier}
 \title{Spark ML -- Multilayer Perceptron}
 \usage{
-ml_multilayer_perceptron_classifier(x, layers, max_iter = 100L,
-  step_size = 0.03, tol = 1e-06, block_size = 128L, solver = "l-bfgs",
-  seed = NULL, initial_weights = NULL, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
+ml_multilayer_perceptron_classifier(x, formula = NULL, layers,
+  max_iter = 100L, step_size = 0.03, tol = 1e-06, block_size = 128L,
+  solver = "l-bfgs", seed = NULL, initial_weights = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("multilayer_perceptron_classifier_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{layers}{A numeric vector describing the layers -- each element in the vector gives the size of a layer. For example, \code{c(4, 5, 2)} would imply three layers, with an input (feature) layer of size 4, an intermediate layer of size 5, and an output (class) layer of size 2.}
 
@@ -34,8 +37,6 @@ reproducible across repeated calls.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 

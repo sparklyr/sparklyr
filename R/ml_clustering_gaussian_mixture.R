@@ -10,6 +10,7 @@
 #' @export
 ml_gaussian_mixture <- function(
   x,
+  formula = NULL,
   k = 2L,
   max_iter = 100L,
   tol = 0.01,
@@ -25,6 +26,7 @@ ml_gaussian_mixture <- function(
 #' @export
 ml_gaussian_mixture.spark_connection <- function(
   x,
+  formula = NULL,
   k = 2L,
   max_iter = 100L,
   tol = 0.01,
@@ -48,6 +50,7 @@ ml_gaussian_mixture.spark_connection <- function(
 #' @export
 ml_gaussian_mixture.ml_pipeline <- function(
   x,
+  formula = NULL,
   k = 2L,
   max_iter = 100L,
   tol = 0.01,

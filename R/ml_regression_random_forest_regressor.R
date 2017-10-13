@@ -3,6 +3,7 @@
 #' @export
 ml_random_forest_regressor <- function(
   x,
+  formula = NULL,
   num_trees = 20L,
   subsampling_rate = 1,
   max_depth = 5L,
@@ -26,6 +27,7 @@ ml_random_forest_regressor <- function(
 #' @export
 ml_random_forest_regressor.spark_connection <- function(
   x,
+  formula = NULL,
   num_trees = 20L,
   subsampling_rate = 1,
   max_depth = 5L,
@@ -70,6 +72,7 @@ ml_random_forest_regressor.spark_connection <- function(
 #' @export
 ml_random_forest_regressor.ml_pipeline <- function(
   x,
+  formula = NULL,
   num_trees = 20L,
   subsampling_rate = 1,
   max_depth = 5L,

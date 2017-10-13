@@ -3,6 +3,7 @@
 #' @export
 ml_gbt_regressor <- function(
   x,
+  formula = NULL,
   max_iter = 20L,
   max_depth = 5L,
   step_size = 0.1,
@@ -26,6 +27,7 @@ ml_gbt_regressor <- function(
 #' @export
 ml_gbt_regressor.spark_connection <- function(
   x,
+  formula = NULL,
   max_iter = 20L,
   max_depth = 5L,
   step_size = 0.1,
@@ -70,6 +72,7 @@ ml_gbt_regressor.spark_connection <- function(
 #' @export
 ml_gbt_regressor.ml_pipeline <- function(
   x,
+  formula = NULL,
   max_iter = 20L,
   max_depth = 5L,
   step_size = 0.1,

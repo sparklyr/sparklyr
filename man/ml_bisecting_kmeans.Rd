@@ -4,8 +4,8 @@
 \alias{ml_bisecting_kmeans}
 \title{Spark ML -- Bisecting K-Means Clustering}
 \usage{
-ml_bisecting_kmeans(x, k = 4L, max_iter = 20L, seed = NULL,
-  min_divisible_cluster_size = 1, features_col = "features",
+ml_bisecting_kmeans(x, formula = NULL, k = 4L, max_iter = 20L,
+  seed = NULL, min_divisible_cluster_size = 1, features_col = "features",
   prediction_col = "prediction",
   uid = random_string("bisecting_bisecting_kmeans_"), ...)
 }

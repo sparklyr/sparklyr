@@ -10,6 +10,7 @@
 #' @export
 ml_bisecting_kmeans <- function(
   x,
+  formula = NULL,
   k = 4L,
   max_iter = 20L,
   seed = NULL,
@@ -24,6 +25,7 @@ ml_bisecting_kmeans <- function(
 #' @export
 ml_bisecting_kmeans.spark_connection <- function(
   x,
+  formula = NULL,
   k = 4L,
   max_iter = 20L,
   seed = NULL,
@@ -45,6 +47,7 @@ ml_bisecting_kmeans.spark_connection <- function(
 #' @export
 ml_bisecting_kmeans.ml_pipeline <- function(
   x,
+  formula = NULL,
   k = 4L,
   max_iter = 20L,
   seed = NULL,

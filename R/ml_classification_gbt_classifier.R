@@ -3,6 +3,7 @@
 #' @export
 ml_gbt_classifier <- function(
   x,
+  formula = NULL,
   max_iter = 20L,
   max_depth = 5L,
   step_size = 0.1,
@@ -29,6 +30,7 @@ ml_gbt_classifier <- function(
 #' @export
 ml_gbt_classifier.spark_connection <- function(
   x,
+  formula = NULL,
   max_iter = 20L,
   max_depth = 5L,
   step_size = 0.1,
@@ -85,6 +87,7 @@ ml_gbt_classifier.spark_connection <- function(
 #' @export
 ml_gbt_classifier.ml_pipeline <- function(
   x,
+  formula = NULL,
   max_iter = 20L,
   max_depth = 5L,
   step_size = 0.1,

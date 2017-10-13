@@ -11,6 +11,7 @@
 #' @export
 ml_isotonic_regression <- function(
   x,
+  formula = NULL,
   feature_index = 0L,
   isotonic = TRUE,
   weight_col = NULL,
@@ -25,6 +26,7 @@ ml_isotonic_regression <- function(
 #' @export
 ml_isotonic_regression.spark_connection <- function(
   x,
+  formula = NULL,
   feature_index = 0L,
   isotonic = TRUE,
   weight_col = NULL,
@@ -51,6 +53,7 @@ ml_isotonic_regression.spark_connection <- function(
 #' @export
 ml_isotonic_regression.ml_pipeline <- function(
   x,
+  formula = NULL,
   feature_index = 0L,
   isotonic = TRUE,
   weight_col = NULL,

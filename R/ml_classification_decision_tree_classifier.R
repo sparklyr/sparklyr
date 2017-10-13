@@ -3,6 +3,7 @@
 #' @export
 ml_decision_tree_classifier <- function(
   x,
+  formula = NULL,
   max_depth = 5L,
   max_bins = 32L,
   min_instances_per_node = 1L,
@@ -26,6 +27,7 @@ ml_decision_tree_classifier <- function(
 #' @export
 ml_decision_tree_classifier.spark_connection <- function(
   x,
+  formula = NULL,
   max_depth = 5L,
   max_bins = 32L,
   min_instances_per_node = 1L,
@@ -70,6 +72,7 @@ ml_decision_tree_classifier.spark_connection <- function(
 #' @export
 ml_decision_tree_classifier.ml_pipeline <- function(
   x,
+  formula = NULL,
   max_depth = 5L,
   max_bins = 32L,
   min_instances_per_node = 1L,

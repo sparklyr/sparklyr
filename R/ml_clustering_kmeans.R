@@ -12,6 +12,7 @@
 #' @export
 ml_kmeans <- function(
   x,
+  formula = NULL,
   k = 2L,
   max_iter = 20L,
   tol = 1e-4,
@@ -28,6 +29,7 @@ ml_kmeans <- function(
 #' @export
 ml_kmeans.spark_connection <- function(
   x,
+  formula = NULL,
   k = 2L,
   max_iter = 20L,
   tol = 1e-4,
@@ -53,6 +55,7 @@ ml_kmeans.spark_connection <- function(
 #' @export
 ml_kmeans.ml_pipeline <- function(
   x,
+  formula = NULL,
   k = 2L,
   max_iter = 20L,
   tol = 1e-4,

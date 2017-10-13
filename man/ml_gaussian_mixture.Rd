@@ -4,10 +4,10 @@
 \alias{ml_gaussian_mixture}
 \title{Spark ML -- Gaussian Mixture clustering.}
 \usage{
-ml_gaussian_mixture(x, k = 2L, max_iter = 100L, tol = 0.01, seed = NULL,
-  features_col = "features", prediction_col = "prediction",
-  probability_col = "probability", uid = random_string("gaussian_mixture_"),
-  ...)
+ml_gaussian_mixture(x, formula = NULL, k = 2L, max_iter = 100L,
+  tol = 0.01, seed = NULL, features_col = "features",
+  prediction_col = "prediction", probability_col = "probability",
+  uid = random_string("gaussian_mixture_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

@@ -12,6 +12,7 @@
 #' @export
 ml_logistic_regression <- function(
   x,
+  formula = NULL,
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -36,6 +37,7 @@ ml_logistic_regression <- function(
 #' @export
 ml_logistic_regression.spark_connection <- function(
   x,
+  formula = NULL,
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -83,6 +85,7 @@ ml_logistic_regression.spark_connection <- function(
 #' @export
 ml_logistic_regression.ml_pipeline <- function(
   x,
+  formula = NULL,
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,

@@ -11,6 +11,7 @@
 #' @export
 ml_linear_regression <- function(
   x,
+  formula = NULL,
   fit_intercept = TRUE,
   elastic_net_param = 0,
   reg_param = 0,
@@ -30,6 +31,7 @@ ml_linear_regression <- function(
 #' @export
 ml_linear_regression.spark_connection <- function(
   x,
+  formula = NULL,
   features_col = "features",
   label_col = "label",
   fit_intercept = TRUE,
@@ -66,6 +68,7 @@ ml_linear_regression.spark_connection <- function(
 #' @export
 ml_linear_regression.ml_pipeline <- function(
   x,
+  formula = NULL,
   features_col = "features",
   label_col = "label",
   fit_intercept = TRUE,

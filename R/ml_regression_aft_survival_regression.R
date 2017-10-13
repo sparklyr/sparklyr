@@ -15,6 +15,7 @@
 #' @export
 ml_aft_survival_regression <- function(
   x,
+  formula = NULL,
   censor_col = "censor",
   quantile_probabilities = list(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
   fit_intercept = TRUE,
@@ -33,6 +34,7 @@ ml_aft_survival_regression <- function(
 #' @export
 ml_aft_survival_regression.spark_connection <- function(
   x,
+  formula = NULL,
   censor_col = "censor",
   quantile_probabilities = list(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
   fit_intercept = TRUE,
@@ -68,6 +70,7 @@ ml_aft_survival_regression.spark_connection <- function(
 #' @export
 ml_aft_survival_regression.ml_pipeline <- function(
   x,
+  formula = NULL,
   censor_col = "censor",
   quantile_probabilities = list(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
   fit_intercept = TRUE,

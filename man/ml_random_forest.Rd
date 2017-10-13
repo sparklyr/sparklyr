@@ -7,8 +7,8 @@
 \alias{ml_random_forest_regressor}
 \title{Spark ML -- Random Forest}
 \usage{
-ml_random_forest_classifier(x, num_trees = 20L, subsampling_rate = 1,
-  max_depth = 5L, min_instances_per_node = 1L,
+ml_random_forest_classifier(x, formula = NULL, num_trees = 20L,
+  subsampling_rate = 1, max_depth = 5L, min_instances_per_node = 1L,
   feature_subset_strategy = "auto", impurity = "gini", min_info_gain = 0,
   max_bins = 32L, seed = NULL, thresholds = NULL,
   checkpoint_interval = 10L, cache_node_ids = FALSE,
@@ -28,8 +28,8 @@ ml_random_forest(x, formula = NULL, response = NULL, features = NULL,
   thresholds = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256L,
   uid = random_string("random_forest_"), ...)
 
-ml_random_forest_regressor(x, num_trees = 20L, subsampling_rate = 1,
-  max_depth = 5L, min_instances_per_node = 1L,
+ml_random_forest_regressor(x, formula = NULL, num_trees = 20L,
+  subsampling_rate = 1, max_depth = 5L, min_instances_per_node = 1L,
   feature_subset_strategy = "auto", impurity = "variance",
   min_info_gain = 0, max_bins = 32L, seed = NULL,
   checkpoint_interval = 10L, cache_node_ids = FALSE,
@@ -39,6 +39,8 @@ ml_random_forest_regressor(x, num_trees = 20L, subsampling_rate = 1,
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{num_trees}{Number of trees to train (>= 1). If 1, then no bootstrapping is used. If > 1, then bootstrapping is done.}
 
@@ -86,8 +88,6 @@ and its aggregates may exceed this size. Defaults to 256.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{response}{(Deprecated) The name of the response column (as a length-one character
 vector.)}

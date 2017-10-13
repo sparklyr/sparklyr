@@ -4,20 +4,20 @@
 \alias{ml_one_vs_rest}
 \title{Spark ML -- OneVsRest}
 \usage{
-ml_one_vs_rest(x, classifier, features_col = "features",
+ml_one_vs_rest(x, formula = NULL, classifier, features_col = "features",
   label_col = "label", prediction_col = "prediction",
   uid = random_string("one_vs_rest_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
+
 \item{classifier}{Object of class \code{ml_estimator}. Base binary classifier that we reduce multiclass classification into.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 

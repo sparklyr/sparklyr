@@ -12,6 +12,7 @@
 #' @export
 ml_linear_svc <- function(
   x,
+  formula = NULL,
   fit_intercept = TRUE,
   reg_param = 0,
   max_iter = 100L,
@@ -32,6 +33,7 @@ ml_linear_svc <- function(
 #' @export
 ml_linear_svc.spark_connection <- function(
   x,
+  formula = NULL,
   fit_intercept = TRUE,
   reg_param = 0,
   max_iter = 100L,
@@ -70,6 +72,7 @@ ml_linear_svc.spark_connection <- function(
 #' @export
 ml_linear_svc.ml_pipeline <- function(
   x,
+  formula = NULL,
   fit_intercept = TRUE,
   reg_param = 0,
   max_iter = 100L,

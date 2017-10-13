@@ -7,11 +7,12 @@
 \alias{ml_gbt_regressor}
 \title{Spark ML -- Gradient Boosted Trees}
 \usage{
-ml_gbt_classifier(x, max_iter = 20L, max_depth = 5L, step_size = 0.1,
-  subsampling_rate = 1, min_instances_per_node = 1L, max_bins = 32L,
-  min_info_gain = 0, loss_type = "logistic", seed = NULL,
-  thresholds = NULL, checkpoint_interval = 10L, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
+ml_gbt_classifier(x, formula = NULL, max_iter = 20L, max_depth = 5L,
+  step_size = 0.1, subsampling_rate = 1, min_instances_per_node = 1L,
+  max_bins = 32L, min_info_gain = 0, loss_type = "logistic",
+  seed = NULL, thresholds = NULL, checkpoint_interval = 10L,
+  cache_node_ids = FALSE, max_memory_in_mb = 256L,
+  features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("gbt_classifier_"), ...)
@@ -28,15 +29,17 @@ ml_gradient_boosted_trees(x, formula = NULL, response = NULL,
   max_memory_in_mb = 256L, uid = random_string("gradient_boosted_trees_"),
   ...)
 
-ml_gbt_regressor(x, max_iter = 20L, max_depth = 5L, step_size = 0.1,
-  subsampling_rate = 1, min_instances_per_node = 1L, max_bins = 32L,
-  min_info_gain = 0, loss_type = "squared", seed = NULL,
+ml_gbt_regressor(x, formula = NULL, max_iter = 20L, max_depth = 5L,
+  step_size = 0.1, subsampling_rate = 1, min_instances_per_node = 1L,
+  max_bins = 32L, min_info_gain = 0, loss_type = "squared", seed = NULL,
   checkpoint_interval = 10L, cache_node_ids = FALSE,
   max_memory_in_mb = 256L, features_col = "features", label_col = "label",
   prediction_col = "prediction", uid = random_string("gbt_regressor_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{max_iter}{Maxmimum number of iterations.}
 
@@ -82,8 +85,6 @@ and its aggregates may exceed this size. Defaults to 256.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{response}{(Deprecated) The name of the response column (as a length-one character
 vector.)}

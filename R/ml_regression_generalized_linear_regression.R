@@ -24,6 +24,7 @@
 #' @export
 ml_generalized_linear_regression <- function(
   x,
+  formula = NULL,
   family = "gaussian",
   link = NULL,
   fit_intercept = TRUE,
@@ -47,6 +48,7 @@ ml_generalized_linear_regression <- function(
 #' @export
 ml_generalized_linear_regression.spark_connection <- function(
   x,
+  formula = NULL,
   family = "gaussian",
   link = NULL,
   fit_intercept = TRUE,
@@ -97,6 +99,7 @@ ml_generalized_linear_regression.spark_connection <- function(
 #' @export
 ml_generalized_linear_regression.ml_pipeline <- function(
   x,
+  formula = NULL,
   family = "gaussian",
   link = NULL,
   fit_intercept = TRUE,

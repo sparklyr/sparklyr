@@ -4,15 +4,18 @@
 \alias{ml_generalized_linear_regression}
 \title{Spark ML -- Generalized Linear Regression}
 \usage{
-ml_generalized_linear_regression(x, family = "gaussian", link = NULL,
-  fit_intercept = TRUE, link_power = NULL, link_prediction_col = NULL,
-  reg_param = 0, max_iter = 25L, weight_col = NULL, solver = "irls",
-  tol = 1e-06, variance_power = 0, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
+ml_generalized_linear_regression(x, formula = NULL, family = "gaussian",
+  link = NULL, fit_intercept = TRUE, link_power = NULL,
+  link_prediction_col = NULL, reg_param = 0, max_iter = 25L,
+  weight_col = NULL, solver = "irls", tol = 1e-06, variance_power = 0,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("generalized_linear_regression_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{family}{Name of family which is a description of the error distribution to be used in the model. Supported options: "gaussian", "binomial", "poisson", "gamma" and "tweedie". Default is "gaussian".}
 
@@ -31,8 +34,6 @@ ml_generalized_linear_regression(x, family = "gaussian", link = NULL,
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 

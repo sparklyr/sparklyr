@@ -7,11 +7,11 @@
 \alias{ml_decision_tree_regressor}
 \title{Spark ML -- Decision Trees}
 \usage{
-ml_decision_tree_classifier(x, max_depth = 5L, max_bins = 32L,
-  min_instances_per_node = 1L, min_info_gain = 0, impurity = "gini",
-  seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
-  checkpoint_interval = 10L, max_memory_in_mb = 256L,
-  features_col = "features", label_col = "label",
+ml_decision_tree_classifier(x, formula = NULL, max_depth = 5L,
+  max_bins = 32L, min_instances_per_node = 1L, min_info_gain = 0,
+  impurity = "gini", seed = NULL, thresholds = NULL,
+  cache_node_ids = FALSE, checkpoint_interval = 10L,
+  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("decision_tree_classifier_"), ...)
@@ -26,15 +26,18 @@ ml_decision_tree(x, formula = NULL, response = NULL, features = NULL,
   seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
   max_memory_in_mb = 256L, uid = random_string("decision_tree_"), ...)
 
-ml_decision_tree_regressor(x, max_depth = 5L, max_bins = 32L,
-  min_instances_per_node = 1L, min_info_gain = 0, impurity = "variance",
-  seed = NULL, cache_node_ids = FALSE, checkpoint_interval = 10L,
-  max_memory_in_mb = 256L, variance_col = NULL, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
+ml_decision_tree_regressor(x, formula = NULL, max_depth = 5L,
+  max_bins = 32L, min_instances_per_node = 1L, min_info_gain = 0,
+  impurity = "variance", seed = NULL, cache_node_ids = FALSE,
+  checkpoint_interval = 10L, max_memory_in_mb = 256L, variance_col = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("decision_tree_regressor_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{max_depth}{Maximum depth of the tree (>= 0); that is, the maximum
 number of nodes separating any leaves from the root of the tree.}
@@ -76,8 +79,6 @@ and its aggregates may exceed this size. Defaults to 256.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{response}{(Deprecated) The name of the response column (as a length-one character
 vector.)}

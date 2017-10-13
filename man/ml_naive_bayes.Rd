@@ -4,14 +4,17 @@
 \alias{ml_naive_bayes}
 \title{Spark ML -- Naive-Bayes}
 \usage{
-ml_naive_bayes(x, model_type = "multinomial", smoothing = 1,
-  thresholds = NULL, weight_col = NULL, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
-  probability_col = "probability", raw_prediction_col = "rawPrediction",
-  uid = random_string("naive_bayes_"), ...)
+ml_naive_bayes(x, formula = NULL, model_type = "multinomial",
+  smoothing = 1, thresholds = NULL, weight_col = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction", probability_col = "probability",
+  raw_prediction_col = "rawPrediction", uid = random_string("naive_bayes_"),
+  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{model_type}{The model type. Supported options: \code{"multinomial"}
 and \code{"bernoulli"}. (default = \code{multinomial})}
@@ -30,8 +33,6 @@ weights as 1.0.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 

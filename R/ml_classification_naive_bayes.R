@@ -13,6 +13,7 @@
 #' @export
 ml_naive_bayes <- function(
   x,
+  formula = NULL,
   model_type = "multinomial",
   smoothing = 1,
   thresholds = NULL,
@@ -30,6 +31,7 @@ ml_naive_bayes <- function(
 #' @export
 ml_naive_bayes.spark_connection <- function(
   x,
+  formula = NULL,
   model_type = "multinomial",
   smoothing = 1,
   thresholds = NULL,
@@ -62,6 +64,7 @@ ml_naive_bayes.spark_connection <- function(
 #' @export
 ml_naive_bayes.ml_pipeline <- function(
   x,
+  formula = NULL,
   model_type = "multinomial",
   smoothing = 1,
   thresholds = NULL,

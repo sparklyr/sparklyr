@@ -4,13 +4,15 @@
 \alias{ml_isotonic_regression}
 \title{Spark ML -- Isotonic Regression}
 \usage{
-ml_isotonic_regression(x, feature_index = 0L, isotonic = TRUE,
-  weight_col = NULL, features_col = "features", label_col = "label",
-  prediction_col = "prediction",
+ml_isotonic_regression(x, formula = NULL, feature_index = 0L,
+  isotonic = TRUE, weight_col = NULL, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
   uid = random_string("isotonic_regression_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{feature_index}{Index of the feature if \code{features_col} is a vector column (default: 0), no effect otherwise.}
 
@@ -21,8 +23,6 @@ ml_isotonic_regression(x, feature_index = 0L, isotonic = TRUE,
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 
