@@ -27,4 +27,4 @@
 ^_pkgdown\.yml$
 ^vignettes/
 ^logs$
-$build_mapping_tables\.R$
+^build_mapping_tables\.R$
