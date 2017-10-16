@@ -2,7 +2,7 @@
 #'
 #' A set of functions to calculate performance metrics for prediction models. Also see the Spark ML Documentation \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.evaluation.package}{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.evaluation.package}
 #'
-#' @param dataset a \code{tbl_spark} containing a label column and a raw prediction column. This should be the output of \code{\link{sdf_predict}} or \code{\link{ml_predict}}.
+#' @param x A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}} or \code{\link{ml_predict}}.
 #' @param label_col Name of column string specifying which column contains the true labels or values.
 #' @param metric_name The performance metric. See details.
 #' @param prediction_col Name of the column that contains the predicted
@@ -58,7 +58,7 @@ ml_binary_classification_evaluator.tbl_spark <- function(x, label_col, raw_predi
 # Validator
 ml_validator_binary_classification_evaluator <- function(args, nms) {
   old_new_mapping <- list(
-    predicted_tbl_spark = "dataset",
+    predicted_tbl_spark = "x",
     label = "label_col",
     score = "raw_prediction_col",
     metric = "metric_name"
@@ -121,7 +121,7 @@ ml_multiclass_classification_evaluator.tbl_spark <- function(x, label_col, predi
 # Validator
 ml_validator_multiclass_classification_evaluator <- function(args, nms) {
   old_new_mapping <- list(
-    predicted_tbl_spark = "dataset",
+    predicted_tbl_spark = "x",
     label = "label_col",
     predicted_lbl = "prediction_col",
     metric = "metric_name"

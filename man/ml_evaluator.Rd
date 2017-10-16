@@ -19,6 +19,8 @@ ml_classification_eval(x, label_col, prediction_col, metric_name = "f1")
 ml_regression_evaluator(x, label_col, prediction_col, metric_name = "rmse")
 }
 \arguments{
+\item{x}{A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}} or \code{\link{ml_predict}}.}
+
 \item{label_col}{Name of column string specifying which column contains the true labels or values.}
 
 \item{raw_prediction_col}{Name of column contains the scored probability of a success}
@@ -28,8 +30,6 @@ ml_regression_evaluator(x, label_col, prediction_col, metric_name = "rmse")
 \item{prediction_col}{Name of the column that contains the predicted
 label or value NOT the scored probability. Column should be of type
 \code{Double}.}
-
-\item{dataset}{a \code{tbl_spark} containing a label column and a raw prediction column. This should be the output of \code{\link{sdf_predict}} or \code{\link{ml_predict}}.}
 }
 \value{
 The calculated performance metric
