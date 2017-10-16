@@ -194,9 +194,9 @@ ml_survival_regression <- ml_aft_survival_regression
 # Generic implementations
 
 #' @export
-ml_fit.ml_aft_survival_regression <- function(x, data, ...) {
+ml_fit.ml_aft_survival_regression <- function(x, dataset, ...) {
   jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(data))
+    invoke("fit", spark_dataframe(dataset))
   new_ml_aft_survival_regression_model(jobj)
 }
 

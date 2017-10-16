@@ -4,12 +4,12 @@
 #'
 #' @param x An \code{ml_pipeline_stage} object.
 #' @param dataset A \code{tbl_spark}.
+#' @template roxlate-ml-dots
 #'
 #' @name ml-estimators-transformers
 NULL
 
 #' @rdname ml-estimators-transformers
-#' @param x An object.
 #' @export
 is_ml_transformer <- function(x) inherits(x, "ml_transformer")
 

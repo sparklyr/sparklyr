@@ -154,8 +154,8 @@ new_ml_model_gaussian_mixture <- function(
 # Generic implementations
 
 #' @export
-ml_fit.ml_gaussian_mixture <- function(x, data, ...) {
+ml_fit.ml_gaussian_mixture <- function(x, dataset, ...) {
   jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(data))
+    invoke("fit", spark_dataframe(dataset))
   new_ml_gaussian_mixture_model(jobj)
 }

@@ -280,9 +280,9 @@ new_ml_model_logistic_regression <- function(
 # Generic implementations
 
 #' @export
-ml_fit.ml_logistic_regression <- function(x, data, ...) {
+ml_fit.ml_logistic_regression <- function(x, dataset, ...) {
   jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(data))
+    invoke("fit", spark_dataframe(dataset))
   new_ml_logistic_regression_model(jobj)
 }
 

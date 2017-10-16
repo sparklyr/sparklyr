@@ -228,9 +228,9 @@ new_ml_als_model <- function(jobj) {
 # Generic implementations
 
 #' @export
-ml_fit.ml_als <- function(x, data, ...) {
+ml_fit.ml_als <- function(x, dataset, ...) {
   jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(data))
+    invoke("fit", spark_dataframe(dataset))
   new_ml_als_model(jobj)
 }
 

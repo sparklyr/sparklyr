@@ -189,8 +189,8 @@ new_ml_model_gbt_regression <- function(
 # Generic implementations
 
 #' @export
-ml_fit.ml_gbt_regressor <- function(x, data, ...) {
+ml_fit.ml_gbt_regressor <- function(x, dataset, ...) {
   jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(data))
+    invoke("fit", spark_dataframe(dataset))
   new_ml_gbt_regression_model(jobj)
 }

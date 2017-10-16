@@ -225,9 +225,9 @@ new_ml_model_linear_regression <- function(
 # Generic implementations
 
 #' @export
-ml_fit.ml_linear_regression <- function(x, data, ...) {
+ml_fit.ml_linear_regression <- function(x, dataset, ...) {
   jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(data))
+    invoke("fit", spark_dataframe(dataset))
   new_ml_linear_regression_model(jobj)
 }
 
