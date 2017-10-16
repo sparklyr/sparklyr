@@ -236,6 +236,9 @@ ml_fit.ml_als <- function(x, data, ...) {
 
 # Helpers
 
+# Hideous hack
+utils::globalVariables("explode")
+
 #' @rdname ml_als
 #' @param model An ALS model object
 #' @param type What to recommend, one of \code{items} or \code{users}
