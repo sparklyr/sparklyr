@@ -118,7 +118,7 @@ ml_create_mapping_tables <- function() {
                      ml_class_mapping[[x]] <- ml_class_mapping_list[[x]]
                    }))
 
-  devtools::use_data(param_mapping_r_to_s, param_mapping_s_to_r,
-                     ml_class_mapping,
-                     internal = TRUE, overwrite = TRUE)
+  rlang::ll(param_mapping_r_to_s = param_mapping_r_to_s,
+            param_mapping_s_to_r = param_mapping_s_to_r,
+            ml_class_mapping = ml_class_mapping)
 }
