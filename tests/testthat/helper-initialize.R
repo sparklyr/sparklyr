@@ -1,4 +1,6 @@
 testthat_spark_connection <- function(version = NULL) {
+  stop("Trigger test failure")
+
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
     Sys.sleep(3)
