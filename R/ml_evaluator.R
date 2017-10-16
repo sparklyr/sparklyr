@@ -2,7 +2,7 @@
 #'
 #' A set of functions to calculate performance metrics for prediction models. Also see the Spark ML Documentation \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.evaluation.package}{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.evaluation.package}
 #'
-#' @param x A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}} or \code{\link{ml_predict}}.
+#' @param x A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}}.
 #' @param label_col Name of column string specifying which column contains the true labels or values.
 #' @param metric_name The performance metric. See details.
 #' @param prediction_col Name of the column that contains the predicted

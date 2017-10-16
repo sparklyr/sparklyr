@@ -23,7 +23,7 @@ ml_classification_eval(x, label_col, prediction_col, metric_name = "f1")
 ml_regression_evaluator(x, label_col, prediction_col, metric_name = "rmse")
 }
 \arguments{
-\item{x}{A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}} or \code{\link{ml_predict}}.}
+\item{x}{A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}}.}
 
 \item{label_col}{Name of column string specifying which column contains the true labels or values.}
 
