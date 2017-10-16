@@ -172,60 +172,6 @@ object Sources {
     "  dataLen <- readInt(con)\n" +
     "  readBin(con, raw(), as.integer(dataLen), endian = \"big\")\n" +
     "}\n" +
-    "\n" +
-    "readRawLen <- function(con, dataLen) {\n" +
-    "  readBin(con, raw(), as.integer(dataLen), endian = \"big\")\n" +
-    "}\n" +
-    "\n" +
-    "readDeserialize <- function(con) {\n" +
-    "  # We have two cases that are possible - In one, the entire partition is\n" +
-    "  # encoded as a byte array, so we have only one value to read. If so just\n" +
-    "  # return firstData\n" +
-    "  dataLen <- readInt(con)\n" +
-    "  firstData <- unserialize(\n" +
-    "    readBin(con, raw(), as.integer(dataLen), endian = \"big\"))\n" +
-    "\n" +
-    "  # Else, read things into a list\n" +
-    "  dataLen <- readInt(con)\n" +
-    "  if (length(dataLen) > 0 && dataLen > 0) {\n" +
-    "    data <- list(firstData)\n" +
-    "    while (length(dataLen) > 0 && dataLen > 0) {\n" +
-    "      data[[length(data) + 1L]] <- unserialize(\n" +
-    "        readBin(con, raw(), as.integer(dataLen), endian = \"big\"))\n" +
-    "      dataLen <- readInt(con)\n" +
-    "    }\n" +
-    "    unlist(data, recursive = FALSE)\n" +
-    "  } else {\n" +
-    "    firstData\n" +
-    "  }\n" +
-    "}\n" +
-    "\n" +
-    "readMultipleObjects <- function(inputCon) {\n" +
-    "  # readMultipleObjects will read multiple continuous objects from\n" +
-    "  # a DataOutputStream. There is no preceding field telling the count\n" +
-    "  # of the objects, so the number of objects varies, we try to read\n" +
-    "  # all objects in a loop until the end of the stream.\n" +
-    "  data <- list()\n" +
-    "  while (TRUE) {\n" +
-    "    # If reaching the end of the stream, type returned should be \"\".\n" +
-    "    type <- readType(inputCon)\n" +
-    "    if (type == \"\") {\n" +
-    "      break\n" +
-    "    }\n" +
-    "    data[[length(data) + 1L]] <- readTypedObject(inputCon, type)\n" +
-    "  }\n" +
-    "  data # this is a list of named lists now\n" +
-    "}\n" +
-    "\n" +
-    "readRowList <- function(obj) {\n" +
-    "  # readRowList is meant for use inside an lapply. As a result, it is\n" +
-    "  # necessary to open a standalone connection for the row and consume\n" +
-    "  # the numCols bytes inside the read function in order to correctly\n" +
-    "  # deserialize the row.\n" +
-    "  rawObj <- rawConnection(obj, \"r+\")\n" +
-    "  on.exit(close(rawObj))\n" +
-    "  readObject(rawObj)\n" +
-    "}\n" +
     "wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {\n" +
     "  waitSeconds <- if (isStarting)\n" +
     "    spark_config_value(config, \"sparklyr.gateway.start.timeout\", 60)\n" +
