@@ -3,6 +3,7 @@
 \name{ml_evaluator}
 \alias{ml_evaluator}
 \alias{ml_binary_classification_evaluator}
+\alias{ml_binary_classification_eval}
 \alias{ml_multiclass_classification_evaluator}
 \alias{ml_classification_eval}
 \alias{ml_regression_evaluator}
@@ -10,6 +11,9 @@
 \usage{
 ml_binary_classification_evaluator(x, label_col, raw_prediction_col,
   metric_name = "areaUnderROC")
+
+ml_binary_classification_eval(x, label_col, prediction_col,
+  metric_name = "f1")
 
 ml_multiclass_classification_evaluator(x, label_col, prediction_col,
   metric_name = "f1")
@@ -45,6 +49,8 @@ The following metrics are supported
    \item Regression: \code{rmse} (root mean squared error, default),
    \code{mse} (mean squared error), \code{r2}, or \code{mae} (mean absolute error.)
   }
+
+\code{ml_binary_classification_eval()} is an alias for \code{ml_binary_classification_evaluator()} for backwards compatibility.
 
 \code{ml_classification_eval()} is an alias for \code{ml_multiclass_classification_evaluator()} for backwards compatibility.
 }

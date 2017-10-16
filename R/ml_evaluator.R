@@ -73,10 +73,13 @@ ml_validator_binary_classification_evaluator <- function(args, nms) {
     ml_extract_args(nms, old_new_mapping)
 }
 
+#' @rdname ml_evaluator
+#' @details \code{ml_binary_classification_eval()} is an alias for \code{ml_binary_classification_evaluator()} for backwards compatibility.
 #' @export
-ml_binary_classification_eval <- ml_binary_classification_evaluator
+ml_binary_classification_eval <- function(x, label_col, prediction_col, metric_name = "f1") {
+  UseMethod("ml_binary_classification_evaluator")
+}
 
-ml_validator_binary_classification_eval <- ml_validator_binary_classification_evaluator
 
 #' @rdname ml_evaluator
 #' @export
