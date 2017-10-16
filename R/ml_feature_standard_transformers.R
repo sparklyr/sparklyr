@@ -267,7 +267,9 @@ ft_dct.tbl_spark <- function(x, input_col, output_col, inverse = FALSE, uid = ra
 #' @rdname ft_dct
 #' @details \code{ft_discrete_cosine_transform()} is an alias for \code{ft_dct.tbl_spark()} for backwards compatibility.
 #' @export
-ft_discrete_cosine_transform <- ft_dct.tbl_spark
+ft_discrete_cosine_transform <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+  ft_dct.tbl_spark(x, input_col, output_col, inverse, uid)
+}
 
 # IndexToString
 

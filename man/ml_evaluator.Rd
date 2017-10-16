@@ -4,21 +4,21 @@
 \alias{ml_evaluator}
 \alias{ml_binary_classification_evaluator}
 \alias{ml_multiclass_classification_evaluator}
+\alias{ml_classification_eval}
 \alias{ml_regression_evaluator}
 \title{Spark ML - Evaluators}
 \usage{
-ml_binary_classification_evaluator(dataset, label_col, raw_prediction_col,
+ml_binary_classification_evaluator(x, label_col, raw_prediction_col,
   metric_name = "areaUnderROC")
 
-ml_multiclass_classification_evaluator(dataset, label_col, prediction_col,
+ml_multiclass_classification_evaluator(x, label_col, prediction_col,
   metric_name = "f1")
 
-ml_regression_evaluator(dataset, label_col, prediction_col,
-  metric_name = "rmse")
+ml_classification_eval(x, label_col, prediction_col, metric_name = "f1")
+
+ml_regression_evaluator(x, label_col, prediction_col, metric_name = "rmse")
 }
 \arguments{
-\item{dataset}{a \code{tbl_spark} containing a label column and a raw prediction column. This should be the output of \code{\link{sdf_predict}} or \code{\link{ml_predict}}.}
-
 \item{label_col}{Name of column string specifying which column contains the true labels or values.}
 
 \item{raw_prediction_col}{Name of column contains the scored probability of a success}
@@ -28,6 +28,8 @@ ml_regression_evaluator(dataset, label_col, prediction_col,
 \item{prediction_col}{Name of the column that contains the predicted
 label or value NOT the scored probability. Column should be of type
 \code{Double}.}
+
+\item{dataset}{a \code{tbl_spark} containing a label column and a raw prediction column. This should be the output of \code{\link{sdf_predict}} or \code{\link{ml_predict}}.}
 }
 \value{
 The calculated performance metric
@@ -43,4 +45,6 @@ The following metrics are supported
    \item Regression: \code{rmse} (root mean squared error, default),
    \code{mse} (mean squared error), \code{r2}, or \code{mae} (mean absolute error.)
   }
+
+\code{ml_classification_eval()} is an alias for \code{ml_multiclass_classification_evaluator.tbl_spark()} for backwards compatibility.
 }
