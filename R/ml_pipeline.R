@@ -1,3 +1,12 @@
+#' Spark ML -- Pipelines
+#'
+#' Create Spark ML Pipelines
+#'
+#' @param x Either a \code{spark_connection} or \code{ml_pipeline_stage} objects
+#' @template roxlate-ml-uid
+#' @param ... \code{ml_pipeline_stage} objects.
+#'
+#' @return When \code{x} is a \code{spark_connection}, \code{ml_pipeline()} returns an empty pipeline object. When \code{x} is a \code{ml_pipeline_stage}, \code{ml_pipeline()} returns an \code{ml_pipeline} with the stages set to \code{x} and any transformers or estimators given in \code{...}.
 #' @export
 ml_pipeline <- function(x, ..., uid = random_string("pipeline_")) {
   UseMethod("ml_pipeline")

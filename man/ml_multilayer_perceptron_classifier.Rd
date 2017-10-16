@@ -3,6 +3,7 @@
 %   R/ml_classification_multilayer_perceptron_classifier.R
 \name{ml_multilayer_perceptron_classifier}
 \alias{ml_multilayer_perceptron_classifier}
+\alias{ml_multilayer_perceptron}
 \title{Spark ML -- Multilayer Perceptron}
 \usage{
 ml_multilayer_perceptron_classifier(x, formula = NULL, layers,
@@ -11,6 +12,13 @@ ml_multilayer_perceptron_classifier(x, formula = NULL, layers,
   features_col = "features", label_col = "label",
   prediction_col = "prediction",
   uid = random_string("multilayer_perceptron_classifier_"), ...)
+
+ml_multilayer_perceptron(x, formula = NULL, layers, max_iter = 100L,
+  step_size = 0.03, tol = 1e-06, block_size = 128L, solver = "l-bfgs",
+  seed = NULL, initial_weights = NULL, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  uid = random_string("multilayer_perceptron_classifier_"), response = NULL,
+  features = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -43,6 +51,10 @@ reproducible across repeated calls.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{response}{(Deprecated) The name of the response column (as a length-one character vector.)}
+
+\item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -67,6 +79,9 @@ The object returned depends on the class of \code{x}.
 }
 \description{
 Classification model based on the Multilayer Perceptron. Each layer has sigmoid activation function, output layer has softmax.
+}
+\details{
+\code{ml_multilayer_perceptron()} is an alias for \code{ml_multilayer_perceptron_classifier()} for backwards compatibility.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for

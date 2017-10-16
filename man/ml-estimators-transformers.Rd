@@ -24,7 +24,7 @@ ml_fit_and_transform(x, dataset, ...)
 
 \item{dataset}{A \code{tbl_spark}.}
 
-\item{x}{An object.}
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Methods for Spark ML Estimators and Transformers

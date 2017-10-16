@@ -128,9 +128,29 @@ ml_multilayer_perceptron_classifier.tbl_spark <- function(
   }
 }
 
-# Backwards compat
+#' @rdname ml_multilayer_perceptron_classifier
+#' @template roxlate-ml-old-feature-response
+#' @details \code{ml_multilayer_perceptron()} is an alias for \code{ml_multilayer_perceptron_classifier()} for backwards compatibility.
 #' @export
-ml_multilayer_perceptron <- ml_multilayer_perceptron_classifier
+ml_multilayer_perceptron <- function(
+  x,
+  formula = NULL,
+  layers,
+  max_iter = 100L,
+  step_size = 0.03,
+  tol = 1e-06,
+  block_size = 128L,
+  solver = "l-bfgs",
+  seed = NULL,
+  initial_weights = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("multilayer_perceptron_classifier_"),
+  response = NULL,
+  features = NULL, ...) {
+  UseMethod("ml_multilayer_perceptron_classifier")
+}
 
 # Validator
 ml_validator_multilayer_perceptron_classifier <- function(args, nms) {

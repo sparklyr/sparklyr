@@ -2,6 +2,7 @@
 % Please edit documentation in R/ml_regression_aft_survival_regression.R
 \name{ml_aft_survival_regression}
 \alias{ml_aft_survival_regression}
+\alias{ml_survival_regression}
 \title{Spark ML -- Survival Regression}
 \usage{
 ml_aft_survival_regression(x, formula = NULL, censor_col = "censor",
@@ -10,6 +11,14 @@ ml_aft_survival_regression(x, formula = NULL, censor_col = "censor",
   aggregation_depth = 2L, quantiles_col = NULL, features_col = "features",
   label_col = "label", prediction_col = "prediction",
   uid = random_string("aft_survival_regression_"), ...)
+
+ml_survival_regression(x, formula = NULL, censor_col = "censor",
+  quantile_probabilities = list(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95,
+  0.99), fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+  aggregation_depth = 2L, quantiles_col = NULL, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  uid = random_string("aft_survival_regression_"), response = NULL,
+  features = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -39,6 +48,10 @@ ml_aft_survival_regression(x, formula = NULL, censor_col = "censor",
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{response}{(Deprecated) The name of the response column (as a length-one character vector.)}
+
+\item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -63,6 +76,9 @@ The object returned depends on the class of \code{x}.
 }
 \description{
 Fit a parametric survival regression model named accelerated failure time (AFT) model (see \href{https://en.wikipedia.org/wiki/Accelerated_failure_time_model}{Accelerated failure time model (Wikipedia)}) based on the Weibull distribution of the survival time.
+}
+\details{
+\code{ml_survival_regression()} is an alias for \code{ml_aft_survival_regression()} for backwards compatibility.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for

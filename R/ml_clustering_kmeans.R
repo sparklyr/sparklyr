@@ -178,9 +178,9 @@ new_ml_model_kmeans <- function(
 # Generic implementations
 
 #' @export
-ml_fit.ml_kmeans <- function(x, data, ...) {
+ml_fit.ml_kmeans <- function(x, dataset, ...) {
   jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(data))
+    invoke("fit", spark_dataframe(dataset))
   new_ml_kmeans_model(jobj)
 }
 

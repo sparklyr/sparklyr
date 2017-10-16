@@ -187,9 +187,29 @@ new_ml_model_aft_survival_regression <- function(
   )
 }
 
-# Backwards compatibility
+
+#' @rdname ml_aft_survival_regression
+#' @template roxlate-ml-old-feature-response
+#' @details \code{ml_survival_regression()} is an alias for \code{ml_aft_survival_regression()} for backwards compatibility.
 #' @export
-ml_survival_regression <- ml_aft_survival_regression
+ml_survival_regression <- function(
+  x,
+  formula = NULL,
+  censor_col = "censor",
+  quantile_probabilities = list(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+  fit_intercept = TRUE,
+  max_iter = 100L,
+  tol = 1e-06,
+  aggregation_depth = 2L,
+  quantiles_col = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("aft_survival_regression_"),
+  response = NULL,
+  features = NULL,...) {
+  UseMethod("ml_aft_survival_regression")
+}
 
 # Generic implementations
 

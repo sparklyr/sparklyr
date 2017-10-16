@@ -108,6 +108,11 @@ transpose_list <- function(list) {
   do.call(Map, c(c, list, USE.NAMES = FALSE))
 }
 
+#' Random string generation
+#'
+#' Generate a random string with a given prefix.
+#'
+#' @param prefix A length-one character vector.
 #' @export
 random_string <- function(prefix = "table") {
   basename(tempfile(prefix))
