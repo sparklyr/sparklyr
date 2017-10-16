@@ -33,7 +33,7 @@ test_that("ml_kmeans() default params are correct", {
 })
 
 test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
-  # skip_on_cran()
+  skip_on_cran()
 
   if (spark_version(sc) < "2.0.0")
     skip("requires Spark 2.0.0")

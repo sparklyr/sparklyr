@@ -65,7 +65,7 @@ test_that("ml_linear_regression() default params are correct", {
 })
 
 test_that("ml_linear_regression and 'penalized' produce similar model fits", {
-  # skip_on_cran()
+  skip_on_cran()
   test_requires("glmnet")
 
   mtcars_tbl <- testthat_tbl("mtcars")

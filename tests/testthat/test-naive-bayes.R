@@ -27,7 +27,7 @@ test_that("ml_naive_bayes() default params are correct", {
 })
 
 test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
-  # skip_on_cran()
+  skip_on_cran()
   test_requires("e1071", "mlbench")
 
   data("HouseVotes84", package = "mlbench")

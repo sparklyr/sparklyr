@@ -54,7 +54,7 @@ test_that("ml_generalized_linear_regression() default params are correct", {
 })
 
 test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and residuals", {
-  # skip_on_cran()
+  skip_on_cran()
 
   if (spark_version(sc) < "2.0.0")
     skip("requires Spark 2.0.0")
