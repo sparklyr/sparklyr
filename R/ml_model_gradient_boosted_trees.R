@@ -16,12 +16,11 @@ NULL
 #' @rdname ml_gradient_boosted_trees
 #' @template roxlate-ml-decision-trees-type
 #' @details \code{ml_gradient_boosted_trees} is a wrapper around \code{ml_gbt_regressor.tbl_spark} and \code{ml_gbt_classifier.tbl_spark} and calls the appropriate method based on model type.
+#' @template roxlate-ml-old-feature-response
 #' @export
 ml_gradient_boosted_trees <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
   type = c("auto", "regression", "classification"),
   features_col = "features",
   label_col = "label",
@@ -41,7 +40,9 @@ ml_gradient_boosted_trees <- function(
   thresholds = NULL,
   cache_node_ids = FALSE,
   max_memory_in_mb = 256L,
-  uid = random_string("gradient_boosted_trees_"), ...
+  uid = random_string("gradient_boosted_trees_"),
+  response = NULL,
+  features = NULL,...
 ) {
 
   ml_formula_transformation()

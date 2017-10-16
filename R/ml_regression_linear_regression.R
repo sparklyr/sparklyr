@@ -7,6 +7,7 @@
 #' @template roxlate-ml-linear-regression-params
 #' @template roxlate-ml-predictor-params
 #' @template roxlate-ml-elastic-net-param
+#' @template roxlate-ml-standardization
 #' @param solver Solver algorithm for optimization.
 #' @export
 ml_linear_regression <- function(

@@ -7,6 +7,7 @@
 #' @template roxlate-ml-linear-regression-params
 #' @template roxlate-ml-predictor-params
 #' @template roxlate-ml-aggregation-depth
+#' @template roxlate-ml-standardization
 #' @param threshold in binary classification prediction, in range [0, 1].
 #' @param raw_prediction_col Raw prediction (a.k.a. confidence) column name.
 #' @export

@@ -17,15 +17,31 @@ ml_logistic_regression(x, formula = NULL, fit_intercept = TRUE,
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
+\item{fit_intercept}{Boolean; should the model be fit with an intercept term?}
+
 \item{elastic_net_param}{ElasticNet mixing parameter, in range [0, 1]. For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty.}
 
 \item{reg_param}{Regularization parameter (aka lambda)}
+
+\item{max_iter}{The maximum number of iterations to use.}
 
 \item{threshold}{in binary classification prediction, in range [0, 1].}
 
 \item{thresholds}{Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value \code{p/t} is predicted, where \code{p} is the original probability of that class and \code{t} is the class's threshold.}
 
+\item{tol}{Param for the convergence tolerance for iterative algorithms.}
+
+\item{weight_col}{The name of the column to use as weights for the model fit.}
+
 \item{aggregation_depth}{Suggested depth for treeAggregate (>= 2).}
+
+\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{family}{Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."}
+
+\item{prediction_col}{Prediction column name.}
 
 \item{probability_col}{Column name for predicted class conditional probabilities.}
 
@@ -34,11 +50,6 @@ ml_logistic_regression(x, formula = NULL, fit_intercept = TRUE,
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
-
-\item{response}{(Deprecated) The name of the response column (as a length-one character
-vector.)}
 }
 \value{
 The object returned depends on the class of \code{x}.

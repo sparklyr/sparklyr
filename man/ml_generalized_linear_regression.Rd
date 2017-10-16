@@ -21,24 +21,33 @@ ml_generalized_linear_regression(x, formula = NULL, family = "gaussian",
 
 \item{link}{Name of link function which provides the relationship between the linear predictor and the mean of the distribution function. See for supported link functions.}
 
+\item{fit_intercept}{Boolean; should the model be fit with an intercept term?}
+
 \item{link_power}{Index in the power link function. Only applicable to the Tweedie family. Note that link power 0, 1, -1 or 0.5 corresponds to the Log, Identity, Inverse or Sqrt link, respectively. When not set, this value defaults to 1 - variancePower, which matches the R "statmod" package.}
 
 \item{link_prediction_col}{Link prediction (linear predictor) column name. Default is not set, which means we do not output link prediction.}
 
 \item{reg_param}{Regularization parameter (aka lambda)}
 
+\item{max_iter}{The maximum number of iterations to use.}
+
+\item{weight_col}{The name of the column to use as weights for the model fit.}
+
 \item{solver}{Solver algorithm for optimization.}
 
+\item{tol}{Param for the convergence tolerance for iterative algorithms.}
+
 \item{variance_power}{Power in the variance function of the Tweedie distribution which provides the relationship between the variance and mean of the distribution. Only applicable to the Tweedie family. (see \href{https://en.wikipedia.org/wiki/Tweedie_distribution}{Tweedie Distribution (Wikipedia)}) Supported values: 0 and [1, Inf). Note that variance power 0, 1, or 2 corresponds to the Gaussian, Poisson or Gamma family, respectively.}
+
+\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{prediction_col}{Prediction column name.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
-
-\item{response}{(Deprecated) The name of the response column (as a length-one character
-vector.)}
 }
 \value{
 The object returned depends on the class of \code{x}.

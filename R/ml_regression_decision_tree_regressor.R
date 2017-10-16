@@ -1,6 +1,5 @@
 #' @rdname ml_decision_tree
 #' @param variance_col (Optional) Column name for the biased sample variance of prediction.
-#' @template roxlate-ml-predictor-params
 #' @export
 ml_decision_tree_regressor <- function(
   x,

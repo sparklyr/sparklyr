@@ -486,6 +486,7 @@ ft_regex_tokenizer.tbl_spark <- function(
 #'
 #' @param sc A \code{spark_connection}
 #' @param language A character string.
+#' @template roxlate-ml-dots
 #'
 #' @details Supported languages: danish, dutch, english, finnish, french,
 #'   german, hungarian, italian, norwegian, portuguese, russian, spanish,

@@ -12,6 +12,8 @@ ml_kmeans(x, formula = NULL, k = 2L, max_iter = 20L, tol = 1e-04,
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
+
 \item{k}{The number of clusters to create}
 
 \item{max_iter}{The maximum number of iterations to use.}

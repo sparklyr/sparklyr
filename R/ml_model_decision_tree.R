@@ -4,6 +4,7 @@
 #'
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-decision-trees-base-params
+#' @template roxlate-ml-old-feature-response
 #' @template roxlate-ml-formula-params
 #' @param impurity Criterion used for information gain calculation. Supported: "entropy"
 #'   and "gini" (default) for classification and "variance" (default) for regression. For
@@ -15,12 +16,11 @@ NULL
 #' @rdname ml_decision_tree
 #' @template roxlate-ml-decision-trees-type
 #' @details \code{ml_decision_tree} is a wrapper around \code{ml_decision_tree_regressor.tbl_spark} and \code{ml_decision_tree_classifier.tbl_spark} and calls the appropriate method based on model type.
+#' @template roxlate-ml-predictor-params
 #' @export
 ml_decision_tree <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
   type = c("auto", "regression", "classification"),
   features_col = "features",
   label_col = "label",
@@ -38,7 +38,9 @@ ml_decision_tree <- function(
   thresholds = NULL,
   cache_node_ids = FALSE,
   max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_"), ...
+  uid = random_string("decision_tree_"),
+  response = NULL,
+  features = NULL, ...
 ) {
 
   ml_formula_transformation()

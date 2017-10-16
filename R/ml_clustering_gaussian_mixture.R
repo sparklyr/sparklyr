@@ -6,6 +6,7 @@
 #' @template roxlate-ml-clustering-params
 #' @template roxlate-ml-tol
 #' @template roxlate-ml-prediction-col
+#' @template roxlate-ml-formula-params
 #' @param probability_col Column name for predicted class conditional probabilities. Note: Not all models output well-calibrated probability estimates! These probabilities should be treated as confidences, not precise probabilities.
 #' @export
 ml_gaussian_mixture <- function(

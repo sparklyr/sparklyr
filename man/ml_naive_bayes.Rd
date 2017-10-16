@@ -26,6 +26,12 @@ and \code{"bernoulli"}. (default = \code{multinomial})}
 \item{weight_col}{Weight column name. If this is not set or empty, we treat all instance
 weights as 1.0.}
 
+\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{prediction_col}{Prediction column name.}
+
 \item{probability_col}{Column name for predicted class conditional probabilities.}
 
 \item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
@@ -33,11 +39,6 @@ weights as 1.0.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
-
-\item{response}{(Deprecated) The name of the response column (as a length-one character
-vector.)}
 }
 \value{
 The object returned depends on the class of \code{x}.

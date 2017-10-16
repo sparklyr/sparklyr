@@ -16,15 +16,15 @@ ml_decision_tree_classifier(x, formula = NULL, max_depth = 5L,
   raw_prediction_col = "rawPrediction",
   uid = random_string("decision_tree_classifier_"), ...)
 
-ml_decision_tree(x, formula = NULL, response = NULL, features = NULL,
-  type = c("auto", "regression", "classification"),
-  features_col = "features", label_col = "label",
+ml_decision_tree(x, formula = NULL, type = c("auto", "regression",
+  "classification"), features_col = "features", label_col = "label",
   prediction_col = "prediction", variance_col = NULL,
   probability_col = "probability", raw_prediction_col = "rawPrediction",
   checkpoint_interval = 10L, impurity = "auto", max_bins = 32L,
   max_depth = 5L, min_info_gain = 0, min_instances_per_node = 1L,
   seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, uid = random_string("decision_tree_"), ...)
+  max_memory_in_mb = 256L, uid = random_string("decision_tree_"),
+  response = NULL, features = NULL, ...)
 
 ml_decision_tree_regressor(x, formula = NULL, max_depth = 5L,
   max_bins = 32L, min_instances_per_node = 1L, min_info_gain = 0,
@@ -72,6 +72,12 @@ E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults
 If too small, then 1 node will be split per iteration,
 and its aggregates may exceed this size. Defaults to 256.}
 
+\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{prediction_col}{Prediction column name.}
+
 \item{probability_col}{Column name for predicted class conditional probabilities.}
 
 \item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
@@ -80,11 +86,6 @@ and its aggregates may exceed this size. Defaults to 256.}
 
 \item{...}{Optional arguments; currently unused.}
 
-\item{response}{(Deprecated) The name of the response column (as a length-one character
-vector.)}
-
-\item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
-
 \item{type}{The type of model to fit. \code{"regression"} treats the response
 as a continuous variable, while \code{"classification"} treats the response
 as a categorical variable. When \code{"auto"} is used, the model type is
@@ -92,6 +93,10 @@ inferred based on the response variable type -- if it is a numeric type,
 then regression is used; classification otherwise.}
 
 \item{variance_col}{(Optional) Column name for the biased sample variance of prediction.}
+
+\item{response}{(Deprecated) The name of the response column (as a length-one character vector.)}
+
+\item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
 }
 \value{
 The object returned depends on the class of \code{x}.

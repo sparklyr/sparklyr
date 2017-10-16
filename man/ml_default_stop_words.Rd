@@ -12,6 +12,8 @@ ml_default_stop_words(sc, language = c("danish", "dutch", "english",
 \item{sc}{A \code{spark_connection}}
 
 \item{language}{A character string.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \value{
 A list of stop words.

@@ -5,7 +5,9 @@
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-formula-params
 #' @template roxlate-ml-linear-regression-params
+#' @template roxlate-ml-predictor-params
 #' @template roxlate-ml-probabilistic-classifier-params
+#' @param family Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."
 #' @template roxlate-ml-elastic-net-param
 #' @param threshold in binary classification prediction, in range [0, 1].
 #' @template roxlate-ml-aggregation-depth

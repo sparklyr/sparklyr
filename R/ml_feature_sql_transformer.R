@@ -9,7 +9,6 @@
 #'   select clause that Spark SQL supports. Users can also use Spark SQL built-in
 #'   function and UDFs to operate on these selected columns.
 #'
-#' @template roxlate-ml-feature-input-output-col
 #' @template roxlate-ml-feature-transformer
 #' @param statement A SQL statement.
 #'

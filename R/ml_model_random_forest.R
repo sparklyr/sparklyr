@@ -5,6 +5,8 @@
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-decision-trees-base-params
 #' @template roxlate-ml-formula-params
+#' @template roxlate-ml-predictor-params
+#' @template roxlate-ml-old-feature-response
 #' @param impurity Criterion used for information gain calculation. Supported: "entropy"
 #'   and "gini" (default) for classification and "variance" (default) for regression. For
 #'   \code{ml_decision_tree}, setting \code{"auto"} will default to the appropriate
@@ -31,8 +33,6 @@ NULL
 ml_random_forest <- function(
   x,
   formula = NULL,
-  response = NULL,
-  features = NULL,
   type = c("auto", "regression", "classification"),
   features_col = "features",
   label_col = "label",
@@ -52,7 +52,9 @@ ml_random_forest <- function(
   thresholds = NULL,
   cache_node_ids = FALSE,
   max_memory_in_mb = 256L,
-  uid = random_string("random_forest_"), ...
+  uid = random_string("random_forest_"),
+  response = NULL,
+  features = NULL, ...
 ) {
 
   ml_formula_transformation()

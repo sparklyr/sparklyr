@@ -93,7 +93,6 @@ ml_fit.ml_pca <- function(x, data, ...) {
 #' @rdname ft_pca
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
-#' @param k The number of principal components.
 #' @param pc_prefix Length-one character vector used to prepend names of components.
 #'
 #' @details \code{ml_pca()} is a wrapper around \code{ft_pca()} that returns a

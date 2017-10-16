@@ -19,10 +19,6 @@ ft_dplyr_transformer(x, tbl, uid = random_string("dplyr_transformer_"), ...)
 \item{...}{Optional arguments; currently unused.}
 
 \item{tbl}{A \code{tbl_spark} generated using \code{dplyr} transformations.}
-
-\item{input_col}{The name of the input column.}
-
-\item{output_col}{The name of the output column.}
 }
 \value{
 The object returned depends on the class of \code{x}.

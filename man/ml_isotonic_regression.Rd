@@ -20,14 +20,15 @@ ml_isotonic_regression(x, formula = NULL, feature_index = 0L,
 
 \item{weight_col}{The name of the column to use as weights for the model fit.}
 
+\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{prediction_col}{Prediction column name.}
+
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
-
-\item{response}{(Deprecated) The name of the response column (as a length-one character
-vector.)}
 }
 \value{
 The object returned depends on the class of \code{x}.

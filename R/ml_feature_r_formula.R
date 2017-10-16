@@ -35,6 +35,8 @@
 #'
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-estimator-transformer
+#' @template roxlate-ml-features-col
+#' @template roxlate-ml-label-col
 #'
 #' @param formula R formula as a character string or a formula. Formula objects are
 #'   converted to character strings directly and the environment is not captured.

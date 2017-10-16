@@ -31,8 +31,6 @@ feature "transformer" against \code{dataset}. See details.}
 analysis. Defaults to all columns in \code{x}.}
 
 \item{pc_prefix}{Length-one character vector used to prepend names of components.}
-
-\item{k}{The number of principal components.}
 }
 \value{
 The object returned depends on the class of \code{x}.

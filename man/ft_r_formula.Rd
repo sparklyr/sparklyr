@@ -14,6 +14,10 @@ ft_r_formula(x, formula, features_col = "features", label_col = "label",
 \item{formula}{R formula as a character string or a formula. Formula objects are
 converted to character strings directly and the environment is not captured.}
 
+\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
+
+\item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
+
 \item{force_index_label}{Force to index label whether it is numeric or
 string type. Usually we index label only when it is string type. If
 the formula was used by classification algorithms, we can force to index

@@ -4,6 +4,7 @@
 #'
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-probabilistic-classifier-params
+#' @template roxlate-ml-predictor-params
 #' @template roxlate-ml-formula-params
 #' @param model_type The model type. Supported options: \code{"multinomial"}
 #'   and \code{"bernoulli"}. (default = \code{multinomial})
