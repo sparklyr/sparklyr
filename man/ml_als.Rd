@@ -96,5 +96,5 @@ Perform recommendation using Alternating Least Squares (ALS) matrix factorizatio
 \details{
 \code{ml_recommend()} returns the top \code{n} users/items recommended for each item/user, for all items/users. The output has been transformed (exploded and separated) from the default Spark outputs to be more user friendly.
 
-\code{ml_als_factorization()} is an alias for \code{ml_als.tbl_spark} for backwards compatibility.
+\code{ml_als_factorization()} is an alias for \code{ml_als()} for backwards compatibility.
 }

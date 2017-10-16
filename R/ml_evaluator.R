@@ -138,11 +138,11 @@ ml_validator_multiclass_classification_evaluator <- function(args, nms) {
 }
 
 #' @rdname ml_evaluator
-#' @details \code{ml_classification_eval()} is an alias for \code{ml_multiclass_classification_evaluator.tbl_spark()} for backwards compatibility.
+#' @details \code{ml_classification_eval()} is an alias for \code{ml_multiclass_classification_evaluator()} for backwards compatibility.
 #' @export
-ml_classification_eval <- ml_multiclass_classification_evaluator.tbl_spark
-
-ml_validator_classification_eval <- ml_validator_multiclass_classification_evaluator
+ml_classification_eval <- function(x, label_col, prediction_col, metric_name = "f1") {
+  UseMethod("ml_multiclass_classification_evaluator")
+}
 
 #' @rdname ml_evaluator
 #' @export

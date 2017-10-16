@@ -46,5 +46,5 @@ The following metrics are supported
    \code{mse} (mean squared error), \code{r2}, or \code{mae} (mean absolute error.)
   }
 
-\code{ml_classification_eval()} is an alias for \code{ml_multiclass_classification_evaluator.tbl_spark()} for backwards compatibility.
+\code{ml_classification_eval()} is an alias for \code{ml_multiclass_classification_evaluator()} for backwards compatibility.
 }

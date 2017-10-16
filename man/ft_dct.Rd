@@ -47,7 +47,7 @@ A feature transformer that takes the 1D discrete cosine transform of a real
   such that the transform matrix is unitary (aka scaled DCT-II).
 }
 \details{
-\code{ft_discrete_cosine_transform()} is an alias for \code{ft_dct.tbl_spark()} for backwards compatibility.
+\code{ft_discrete_cosine_transform()} is an alias for \code{ft_dct} for backwards compatibility.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for

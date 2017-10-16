@@ -261,6 +261,26 @@ ml_recommend <- function(model, type = c("items", "users"), n = 1) {
 }
 
 #' @rdname ml_als
-#' @details \code{ml_als_factorization()} is an alias for \code{ml_als.tbl_spark} for backwards compatibility.
+#' @details \code{ml_als_factorization()} is an alias for \code{ml_als()} for backwards compatibility.
 #' @export
-ml_als_factorization <- ml_als.tbl_spark
+ml_als_factorization <- function(
+  x,
+  rating_col = "rating",
+  user_col = "user",
+  item_col = "item",
+  rank = 10L,
+  reg_param = 0.1,
+  implicit_prefs = FALSE,
+  alpha = 1,
+  nonnegative = FALSE,
+  max_iter = 10L,
+  num_user_blocks = 10L,
+  num_item_blocks = 10L,
+  checkpoint_interval = 10L,
+  cold_start_strategy = "nan",
+  intermediate_storage_level = "MEMORY_AND_DISK",
+  final_storage_level = "MEMORY_AND_DISK",
+  uid = random_string("als_"), ...) {
+
+  UseMethod("ml_als")
+}
