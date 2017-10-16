@@ -5,6 +5,7 @@ import org.apache.spark.ml.feature.ElementwiseProduct
 import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
 import org.apache.spark.ml.linalg._
 import org.apache.spark.ml.PipelineStage
+import org.apache.spark.ml.param.Params
 
 object MLUtils2 {
   def sparkVector(v: Array[Double]): Vector = {
@@ -21,8 +22,8 @@ object MLUtils2 {
       mlp.setInitialWeights(sparkVector(v))
     }
 
-  def getParamMap(pipelineStage: PipelineStage): Map[String, Any] = {
-    Map(pipelineStage.extractParamMap.toSeq map {
+  def getParamMap[T <: Params](obj: T): Map[String, Any] = {
+    Map(obj.extractParamMap.toSeq map {
       pair => pair.param.name -> (pair.value match {
         case v: DenseVector => v.toArray
         case _ => pair.value

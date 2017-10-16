@@ -4,6 +4,7 @@ import org.apache.spark.ml._
 import scala.util.{Try, Success, Failure}
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.tuning.CrossValidator
+import org.apache.spark.ml.param.Params
 
 object MLUtils {
   def createPipelineFromStages(uid: String, stages: PipelineStage*): Pipeline = {
@@ -20,8 +21,8 @@ object MLUtils {
     }
   }
 
-  def getParamMap(pipelineStage: PipelineStage): Map[String, Any] = {
-    Map(pipelineStage.extractParamMap.toSeq map {
+  def getParamMap[T <: Params](obj: T): Map[String, Any] = {
+    Map(obj.extractParamMap.toSeq map {
       pair => pair.param.name -> pair.value}: _*)
   }
 
