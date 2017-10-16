@@ -2,9 +2,13 @@
 % Please edit documentation in R/ml_feature_standard_transformers.R
 \name{ft_dct}
 \alias{ft_dct}
+\alias{ft_discrete_cosine_transform}
 \title{Feature Transformation -- Discrete Cosine Transform (DCT) (Transformer)}
 \usage{
 ft_dct(x, input_col, output_col, inverse = FALSE,
+  uid = random_string("dct_"), ...)
+
+ft_discrete_cosine_transform(x, input_col, output_col, inverse = FALSE,
   uid = random_string("dct_"), ...)
 }
 \arguments{
@@ -41,6 +45,9 @@ A feature transformer that takes the 1D discrete cosine transform of a real
   vector. No zero padding is performed on the input vector. It returns a real
   vector of the same length representing the DCT. The return vector is scaled
   such that the transform matrix is unitary (aka scaled DCT-II).
+}
+\details{
+\code{ft_discrete_cosine_transform()} is an alias for \code{ft_dct.tbl_spark()} for backwards compatibility.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for

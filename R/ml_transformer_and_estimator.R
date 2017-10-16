@@ -44,8 +44,18 @@ print.ml_estimator <- function(x, ...) {
     cat("  ", param, ":", capture.output(str(ml_param(x, param))), "\n")
 }
 
+#' Spark ML -- Transformers and Estimators
+#'
+#' Transformer and Estimator objects.
+#'
+#' @name ml-pipelines
+NULL
+
+#' @rdname ml-pipelines
+#' @param x An object.
 #' @export
 is_ml_transformer <- function(x) inherits(x, "ml_transformer")
 
+#' @rdname ml-pipelines
 #' @export
 is_ml_estimator <- function(x) inherits(x, "ml_estimator")

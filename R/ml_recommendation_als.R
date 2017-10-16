@@ -260,6 +260,7 @@ ml_recommend <- function(model, type = c("items", "users"), n = 1) {
     sdf_separate_column("recommendations")
 }
 
-# backwards compat
+#' @rdname ml_als
+#' @details \code{ml_als_factorization()} is an alias for \code{ml_als.tbl_spark} for backwards compatibility.
 #' @export
 ml_als_factorization <- ml_als.tbl_spark
