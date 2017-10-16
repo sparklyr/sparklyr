@@ -16,8 +16,6 @@ script:
 after_failure:
   - |
     tail -n 500 /tmp/sparklyr.log
-    pwd
-    ls
     cd tests
     export NOT_CRAN=true
     travis_wait 30 RScript testthat.R
