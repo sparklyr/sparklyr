@@ -102,7 +102,7 @@ ml_constructor_dispatch <- function(jobj) {
          "PipelineModel" = new_ml_pipeline_model(jobj),
          "Transformer" = new_ml_transformer(jobj),
          "Estimator" = new_ml_estimator(jobj),
-         "tuning.CrossValidator" = new_ml_cross_validator(jobj),
+         # "tuning.CrossValidator" = new_ml_cross_validator(jobj),
          new_ml_pipeline_stage(jobj))
 }
 
