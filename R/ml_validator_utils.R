@@ -2,17 +2,20 @@ ml_map_class <- function(x) {
   ml_class_mapping[[x]] %||% stop("class mapping failed")
 }
 
-ml_get_stage_validator <- function(x) {
-  paste0("ml_validator_", ml_map_class(x))
+ml_get_stage_validator <- function(jobj) {
+  paste0("ml_validator_",
+         ml_map_class(jobj_class(jobj)[1]))
 }
 
-ml_get_stage_constructor <- function(x) {
-  package <- x %>%
+ml_get_stage_constructor <- function(jobj) {
+  package <- jobj %>%
+    jobj_class(simple_name = FALSE) %>%
+    head(1) %>%
     strsplit("\\.") %>%
     rlang::flatten_chr() %>%
     dplyr::nth(-2)
   prefix <- if (identical(package, "feature")) "ft_" else "ml_"
-  paste0(prefix, ml_map_class(x))
+  paste0(prefix, ml_map_class(jobj_class(jobj)[1]))
 }
 
 ml_args_to_validate <- function(args, current_args, default_args = current_args) {

@@ -7,10 +7,10 @@ test_that("checkpoint directory getting/setting works", {
   expect_match(spark_get_checkpoint_dir(sc), "foobar")
 })
 
-test_that("spark_class() works", {
+test_that("jobj_class() works", {
   lr <- ml_logistic_regression(sc)
   expect_equal(
-    spark_class(spark_jobj(lr), simple_name = FALSE),
+    jobj_class(spark_jobj(lr), simple_name = FALSE),
     c("org.apache.spark.ml.classification.LogisticRegression",
       "org.apache.spark.ml.classification.ProbabilisticClassifier",
       "org.apache.spark.ml.classification.Classifier",
@@ -21,7 +21,7 @@ test_that("spark_class() works", {
   )
 
   expect_equal(
-    spark_class(spark_jobj(lr)),
+    jobj_class(spark_jobj(lr)),
     c("LogisticRegression",
       "ProbabilisticClassifier",
       "Classifier",

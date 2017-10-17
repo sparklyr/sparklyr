@@ -46,7 +46,7 @@ spark_table_name <- function(expr) {
 #' @param simple_name Whether to return simple names, defaults to TRUE
 #' @keywords internal
 #' @export
-spark_class <- function(jobj, simple_name = TRUE) {
+jobj_class <- function(jobj, simple_name = TRUE) {
   invoke_static(spark_connection(jobj),
                 "sparklyr.Utils",
                 "getAncestry",
