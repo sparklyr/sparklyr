@@ -24,7 +24,7 @@ points are grouped. Must be greater than or equal to 2.}
 
 \item{relative_error}{Relative error (see documentation for
 org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
-\link[https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions]{here}
+\href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here}
 for description). Must be in the range [0, 1]. default: 0.001}
 
 \item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
@@ -71,7 +71,7 @@ NaN handling: null and NaN values will be ignored from the column
 
 Algorithm: The bin ranges are chosen using an approximate algorithm (see
   the documentation for org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
-  \link[https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions]{here} for a detailed description). The precision of the approximation can be
+  \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here} for a detailed description). The precision of the approximation can be
   controlled with the \code{relative_error} parameter. The lower and upper bin
   bounds will be -Infinity and +Infinity, covering all real values.
 
