@@ -136,7 +136,7 @@ ml_create_mapping_tables <- function() {
     "GeneralizedLinearRegressionModel" = "generalized_linear_regression_model",
     "DecisionTreeRegressor" = "decision_tree_regressor",
     "DecisionTreeRegressionModel" = "decision_tree_regression_model",
-    "GBTRegressor" = "gbt_regresssor",
+    "GBTRegressor" = "gbt_regressor",
     "GBTRegressionModel" = "gbt_regression_model",
     "RandomForestRegressor" = "random_forest_regressor",
     "RandomForestRegressionModel" = "random_forest_regression_model",
@@ -164,16 +164,20 @@ ml_create_mapping_tables <- function() {
     "LDA" = "lda",
     "LDAModel" = "lda_model",
     "KMeans" = "kmeans",
-    "KMeansModel" = "KMeansModel",
+    "KMeansModel" = "kmeans_model",
     "BisectingKMeans" = "bisecting_kmeans",
     "BisectingKMeansModel" = "bisecting_kmeans_model",
     "GaussianMixture" = "gaussian_mixture",
     "GaussianMixtureModel" = "gaussian_mixture_model",
+    # tuning
+    "CrossValidator" = "cross_validator",
+    "CrossValidatorModel" = "cross_validator_model",
     # pipeline
     "Pipeline" = "pipeline",
     "PipelineModel" = "pipeline_model",
     "Transformer" = "transformer",
-    "Estimator" = "estimator"
+    "Estimator" = "estimator",
+    "PipelineStage" = "pipeline_stage"
   )
 
   ml_class_mapping <- new.env(parent = emptyenv(),

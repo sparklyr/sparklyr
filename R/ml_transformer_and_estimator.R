@@ -23,17 +23,9 @@ ml_fit <- function(x, dataset, ...) {
   if (!is_ml_estimator(x))
     stop("'ml_fit()' is only applicable to 'ml_estimator' objects")
 
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-
-  constructor <- jobj %>%
-    jobj_class() %>%
-    lapply(ml_map_class) %>%
-    rlang::flatten_chr() %>%
-    head(1) %>%
-    (function(x) paste0("new_ml_", x))
-
-  do.call(constructor, list(jobj = jobj))
+  spark_jobj(x) %>%
+    invoke("fit", spark_dataframe(dataset)) %>%
+    ml_constructor_dispatch()
 }
 
 #' @rdname ml-estimators-transformers
