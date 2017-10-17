@@ -20,38 +20,20 @@ is_ml_estimator <- function(x) inherits(x, "ml_estimator")
 #' @rdname ml-estimators-transformers
 #' @export
 ml_fit <- function(x, dataset, ...) {
-  UseMethod("ml_fit")
-}
+  if (!is_ml_estimator(x))
+    stop("'ml_fit()' is only applicable to 'ml_estimator' objects")
 
-#' @export
-ml_fit.ml_pipeline <- function(x, dataset, ...) {
   jobj <- spark_jobj(x) %>%
     invoke("fit", spark_dataframe(dataset))
 
-  new_ml_pipeline_model(jobj)
-}
+  constructor <- jobj %>%
+    jobj_class() %>%
+    lapply(ml_map_class) %>%
+    rlang::flatten_chr() %>%
+    head(1) %>%
+    (function(x) paste0("new_ml_", x))
 
-#' @export
-ml_fit.ml_estimator <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-
-  new_ml_transformer(jobj)
-}
-
-#' @export
-ml_fit.ml_predictor <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-
-  new_ml_prediction_model(jobj)
-}
-
-
-
-#' @export
-ml_fit.ml_transformer <- function(x, dataset, ...) {
-  stop("cannot invoke 'fit' on transformers; 'ml_fit()' should be used with estimators")
+  do.call(constructor, list(jobj = jobj))
 }
 
 #' @rdname ml-estimators-transformers
