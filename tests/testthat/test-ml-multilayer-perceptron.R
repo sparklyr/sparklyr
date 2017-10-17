@@ -20,7 +20,8 @@ test_that("ml_multilayer_perceptron() default params are correct", {
     ml_stage(1)
 
   args <- get_default_args(ml_multilayer_perceptron,
-                           c("x", "uid", "...", "initial_weights", "seed", "layers"))
+                           c("x", "uid", "...", "initial_weights", "seed",
+                             "layers", "response", "features"))
 
   expect_equal(
     ml_params(predictor, names(args)),
