@@ -39,30 +39,19 @@ ml_fit <- function(x, dataset, ...) {
 #' @rdname ml-estimators-transformers
 #' @export
 ml_transform <- function(x, dataset, ...) {
-  UseMethod("ml_transform")
-}
-
-#' @export
-ml_transform.ml_transformer <- function(x, dataset, ...) {
+  if (!is_ml_transformer(x))
+    stop("'ml_transform()' is only applicable to 'ml_transformer' objects")
   sdf <- spark_dataframe(dataset)
   spark_jobj(x) %>%
     invoke("transform", sdf) %>%
     sdf_register()
 }
 
-#' @export
-ml_transform.ml_estimator <- function(x, dataset, ...) {
-  stop("cannot invoke 'transform' on estimators; 'ml_transform()' should be used with transformers")
-}
-
 #' @rdname ml-estimators-transformers
 #' @export
 ml_fit_and_transform <- function(x, dataset, ...) {
-  UseMethod("ml_fit_and_transform")
-}
-
-#' @export
-ml_fit_and_transform.ml_estimator <- function(x, dataset, ...) {
+  if (!is_ml_estimator(x))
+    stop("'ml_fit_and_transform()' is only applicable to 'ml_estimator' objects")
   sdf <- spark_dataframe(dataset)
   spark_jobj(x)%>%
     invoke("fit", sdf) %>%
@@ -70,10 +59,6 @@ ml_fit_and_transform.ml_estimator <- function(x, dataset, ...) {
     sdf_register()
 }
 
-#' @export
-ml_fit_and_transform.ml_transformer <- function(x, dataset, ...) {
-  stop("cannot invoke 'fit' on transformers; 'ml_fit_and_transform()' should be used with estimators")
-}
 
 #' @export
 print.ml_transformer <- function(x, ...) {
