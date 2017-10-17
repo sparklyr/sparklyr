@@ -114,13 +114,3 @@ new_ml_count_vectorizer_model <- function(jobj) {
                      vocabulary = invoke(jobj, "vocabulary"),
                      subclass = "ml_count_vectorizer_model")
 }
-
-# Generic implementations
-
-#' @export
-ml_fit.ml_count_vectorizer <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-
-  new_ml_count_vectorizer_model(jobj)
-}

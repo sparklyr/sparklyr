@@ -179,13 +179,6 @@ new_ml_model_naive_bayes <- function(
 # Generic implementations
 
 #' @export
-ml_fit.ml_naive_bayes <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-  new_ml_naive_bayes_model(jobj)
-}
-
-#' @export
 print.ml_model_naive_bayes <- function(x, ...) {
 
   ml_model_print_call(x)

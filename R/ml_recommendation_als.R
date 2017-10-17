@@ -225,15 +225,6 @@ new_ml_als_model <- function(jobj) {
     subclass = "ml_als_model")
 }
 
-# Generic implementations
-
-#' @export
-ml_fit.ml_als <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-  new_ml_als_model(jobj)
-}
-
 # Helpers
 
 # Hideous hack

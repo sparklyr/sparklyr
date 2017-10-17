@@ -209,12 +209,3 @@ new_ml_model_random_forest_classification <- function(
     .call = call
   )
 }
-
-# Generic implementations
-
-#' @export
-ml_fit.ml_random_forest_classifier <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-  new_ml_random_forest_classification_model(jobj)
-}
