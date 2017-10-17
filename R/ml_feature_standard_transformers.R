@@ -323,56 +323,6 @@ ft_index_to_string.tbl_spark <- function(
   ml_transform(transformer, x)
 }
 
-#' Feature Transformation -- Bucketizer (Transformer)
-#'
-#' Similar to \R's \code{\link{cut}} function, this transforms a numeric column
-#' into a discretized column, with breaks specified through the \code{splits}
-#' parameter.
-#'
-#' @template roxlate-ml-feature-input-output-col
-#' @template roxlate-ml-feature-transformer
-#' @template roxlate-ml-feature-handle-invalid
-#'
-#' @param splits A numeric vector of cutpoints, indicating the bucket boundaries.
-#'
-#' @export
-ft_bucketizer <- function(
-  x, input_col, output_col, splits, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...) {
-  UseMethod("ft_bucketizer")
-}
-
-#' @export
-ft_bucketizer.spark_connection <- function(
-  x, input_col, output_col, splits, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...) {
-
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Bucketizer",
-                             input_col, output_col, uid) %>%
-    invoke("setSplits", splits) %>%
-    invoke("setHandleInvalid", handle_invalid)
-
-  new_ml_transformer(jobj)
-}
-
-#' @export
-ft_bucketizer.ml_pipeline <- function(
-  x, input_col, output_col, splits, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...) {
-
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
-}
-
-#' @export
-ft_bucketizer.tbl_spark <- function(
-  x, input_col, output_col, splits, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
-}
-
 #' Feature Transformation -- ElementwiseProduct (Transformer)
 #'
 #' Outputs the Hadamard product (i.e., the element-wise product) of each input vector
