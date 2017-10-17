@@ -7,7 +7,6 @@ ml_model_data <- function(object) {
   sdf_register(object$data)
 }
 
-
 try_null <- function(expr) {
   tryCatch(expr, error = function(e) NULL)
 }
