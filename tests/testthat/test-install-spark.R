@@ -1,6 +1,7 @@
 context("install")
 
 test_that("supported spark_versions can be downloaded", {
+  skip("")
   skip_on_cran()
   test_requires("RCurl")
 
@@ -13,6 +14,7 @@ test_that("supported spark_versions can be downloaded", {
 })
 
 test_that("spark_versions downloads use https", {
+  skip("")
   skip_on_cran()
 
   versions <- spark_versions(latest = FALSE)

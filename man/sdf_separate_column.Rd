@@ -7,8 +7,7 @@
 sdf_separate_column(x, column, into = NULL)
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{column}{The name of a (vector-typed) column.}
 

@@ -76,3 +76,48 @@ test_that("we can separate array<string> columns", {
   expect_equal(as.list(first), lapply(all, `[[`, 1))
 
 })
+
+test_that("we can separate struct columns (#690)", {
+  date_seq <- seq.Date(
+    from = as.Date("2013-01-01"),
+    to = as.Date("2017-01-01"),
+    by = "1 day")
+
+  date_sdf <- copy_to(sc, tibble::data_frame(event_date = as.character(date_seq)),
+                      overwrite = TRUE)
+
+  sliding_window_sdf <- date_sdf %>%
+    dplyr::mutate(sw = window(event_date, "150 days", "30 days"))
+  split1 <- sliding_window_sdf %>%
+    sdf_separate_column("sw")
+  split2 <- sliding_window_sdf %>%
+    sdf_separate_column("sw", c("a", "b"))
+  split3 <- sliding_window_sdf %>%
+    sdf_separate_column("sw", list("c" = 2))
+
+  expect_identical(
+    colnames(split1),
+    c("event_date", "sw", "start", "end")
+  )
+  expect_identical(
+    split1 %>%
+      pull(start) %>%
+      head(1) %>%
+      as.Date(),
+    as.Date("2012-08-18 UTC")
+  )
+  expect_identical(
+    split2 %>%
+      pull(b) %>%
+      head(1) %>%
+      as.Date(),
+    as.Date("2013-01-15 UTC")
+  )
+  expect_identical(
+    split3 %>%
+      pull(c) %>%
+      head(1) %>%
+      as.Date(),
+    as.Date("2013-01-15 UTC")
+  )
+})

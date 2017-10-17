@@ -7,8 +7,7 @@
 sdf_last_index(x, id = "id")
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{id}{The name of the index column.}
 }

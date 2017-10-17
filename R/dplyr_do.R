@@ -36,8 +36,12 @@ do.tbl_spark <- function(.data, ...) {
 
     # apply filters
     filtered <- sdf
-    for (filter in filters)
-      filtered <- invoke(filtered, "filter", filter)
+    for (filter in filters) {
+      filtered <- spark_dataframe(filtered) %>%
+        invoke("filter", filter) %>%
+        sdf_register()
+    }
+
 
     # apply functions with this data
     fits <- enumerate(quosures, function(name, quosure) {

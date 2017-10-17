@@ -93,6 +93,7 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
 })
 
 test_that("'sdf_predict()', 'predict()' return same results", {
+  skip("re-enable after implementing predict()")
   test_requires("dplyr")
 
   model <- flights_tbl %>%

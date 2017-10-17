@@ -7,8 +7,7 @@
 sdf_persist(x, storage.level = "MEMORY_AND_DISK")
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{storage.level}{The storage level to be used. Please view the
 \href{http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}

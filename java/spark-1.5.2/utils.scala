@@ -265,10 +265,43 @@ object Utils {
     df.select(colexprs: _*)
   }
 
+  def separateColumnStruct(df: DataFrame,
+                          column: String,
+                          names: Array[String],
+                          indices: Array[Int],
+                          intoIsSet: Boolean) =
+  {
+    // extract columns of interest
+    var col = df.apply(column)
+    var colexprs = df.columns.map(df.apply(_))
+
+    val fieldNames: Array[String] = df
+      .select(column)
+      .schema
+      .fields
+      .flatMap(f => f.dataType match { case struct: StructType => struct.fields})
+      .map(_.name)
+
+    val outNames: Array[String] = if (intoIsSet) names else
+      fieldNames
+
+    // append column expressions that separate from
+    // desired column
+    (0 until outNames.length).map{i => {
+      val name = outNames(i)
+      val index = indices(i)
+      colexprs :+= col.getItem(fieldNames(index)).as(name)
+    }}
+
+    // select with these column expressions
+    df.select(colexprs: _*)
+  }
+
   def separateColumn(df: DataFrame,
                      column: String,
                      names: Array[String],
-                     indices: Array[Int]) =
+                     indices: Array[Int],
+                     intoIsSet: Boolean) =
   {
     // extract column of interest
     val col = df.apply(column)
@@ -281,6 +314,7 @@ object Utils {
     typeName match {
       case "array"  => separateColumnArray(df, column, names, indices)
       case "vector" => separateColumnVector(df, column, names, indices)
+      case "struct" => separateColumnStruct(df, column, names, indices, intoIsSet)
       case _        => {
         throw new IllegalArgumentException("unhandled type '" + typeName + "'")
       }

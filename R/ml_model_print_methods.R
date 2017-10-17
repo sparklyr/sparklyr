@@ -3,16 +3,16 @@ print_newline <- function() {
 }
 
 ml_model_print_call <- function(model) {
-  printf("Call: %s\n", paste(deparse(model$.call, width.cutoff = 500), collapse = " "))
+  printf("Call: %s\n", model$.call)
   invisible(model$.call)
 }
 
 ml_model_print_residuals <- function(model,
                                      residuals.header = "Residuals") {
 
-  residuals <- model$.model %>%
-    invoke("summary") %>%
-    invoke("residuals")
+  residuals <- model$summary$residuals %>%
+    (function(x) if (is.function(x)) x() else x) %>%
+    spark_dataframe()
 
   # randomly sample residuals and produce quantiles based on
   # sample to avoid slowness in Spark's 'percentile_approx()'

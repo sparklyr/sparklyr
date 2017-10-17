@@ -1,1 +1,1 @@
-#' @param max.iter The maximum number of iterations to use.
+#' @param max_iter The maximum number of iterations to use.

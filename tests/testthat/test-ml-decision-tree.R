@@ -1,7 +1,82 @@
-context("decision tree")
+context("ml decision tree")
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
+
+test_that("ml_decision_tree_regressor() param parsing works" , {
+  dtr <- ml_decision_tree_regressor(
+    sc, features_col = "fcol", label_col = "lcol", prediction_col = "pcol",
+    variance_col = "vcol", checkpoint_interval = 11, impurity = "variance",
+    max_bins = 64, max_depth = 1, min_info_gain = 0.001,
+    min_instances_per_node = 2, seed = 42, cache_node_ids = TRUE,
+    max_memory_in_mb = 128
+  )
+
+  expect_equal(ml_params(dtr, list(
+    "features_col", "label_col", "prediction_col", "variance_col", "checkpoint_interval",
+    "impurity", "max_bins", "max_depth", "min_info_gain", "min_instances_per_node",
+    "seed", "cache_node_ids", "max_memory_in_mb"
+  )),
+  list(
+    features_col = "fcol", label_col = "lcol", prediction_col = "pcol",
+    variance_col = "vcol", checkpoint_interval = 11L, impurity = "variance",
+    max_bins = 64L, max_depth = 1L, min_info_gain = 0.001,
+    min_instances_per_node = 2L, seed = 42L, cache_node_ids = TRUE,
+    max_memory_in_mb = 128L
+  ))
+})
+
+test_that("ml_decision_tree_classifier() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_decision_tree_classifier() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_decision_tree_classifier,
+                           c("x", "uid", "...", "thresholds", "seed"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
+test_that("ml_decision_tree_regressor() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_decision_tree_regressor() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_decision_tree_regressor,
+                           c("x", "uid", "...", "variance_col", "seed"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
+test_that("ml_decision_tree_classifier() param parsing works" , {
+  dtc <- ml_decision_tree_classifier(
+    sc, features_col = "fcol", label_col = "lcol", prediction_col = "pcol",
+    probability_col = "prcol", raw_prediction_col = "rpcol",
+    checkpoint_interval = 11, impurity = "gini",
+    max_bins = 64, max_depth = 1, min_info_gain = 0.001, thresholds = c(0.1, 0.3, 0.5),
+    min_instances_per_node = 2, seed = 42, cache_node_ids = TRUE,
+    max_memory_in_mb = 128
+  )
+
+  expect_equal(ml_params(dtc, list(
+    "features_col", "label_col", "prediction_col", "probability_col", "raw_prediction_col",
+    "checkpoint_interval", "impurity", "max_bins", "max_depth", "min_info_gain",
+    "thresholds", "min_instances_per_node",
+    "seed", "cache_node_ids", "max_memory_in_mb"
+  )),
+  list(
+    features_col = "fcol", label_col = "lcol", prediction_col = "pcol",
+    probability_col = "prcol", raw_prediction_col = "rpcol",
+    checkpoint_interval = 11L, impurity = "gini",
+    max_bins = 64L, max_depth = 1L, min_info_gain = 0.001, thresholds = c(0.1, 0.3, 0.5),
+    min_instances_per_node = 2L, seed = 42L, cache_node_ids = TRUE,
+    max_memory_in_mb = 128L
+  ))
+})
 
 test_that("decision tree runs successfully when all args specified", {
   expect_error(

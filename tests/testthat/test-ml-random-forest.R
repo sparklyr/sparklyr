@@ -1,7 +1,61 @@
-context("random forest")
+context("ml random forest")
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
+
+test_that("ml_random_forest_classifier() parses params correctly", {
+  args <- list(
+    x = sc, label_col = "col", features_col = "fcol", prediction_col = "pcol",
+    probability_col = "prcol", raw_prediction_col = "rpcol", impurity = "entropy",
+    feature_subset_strategy = "onethird",
+    checkpoint_interval = 9, max_bins = 30, max_depth = 6,
+    num_trees = 19, min_info_gain = 0.01, min_instances_per_node = 2,
+    subsampling_rate = 0.9, seed = 42,
+    thresholds = c(0.1, 0.3, 0.6), cache_node_ids = TRUE,
+    max_memory_in_mb = 128
+  )
+  rfc <- do.call(ml_random_forest_classifier, args)
+  expect_equal(ml_params(rfc, names(args)[-1]), args[-1])
+})
+
+test_that("ml_random_forest_regressor() parses params correctly", {
+  args <- list(
+    x = sc, label_col = "col", features_col = "fcol", prediction_col = "pcol",
+    impurity = "variance", feature_subset_strategy = "onethird",
+    checkpoint_interval = 9, max_bins = 30, max_depth = 6,
+    num_trees = 19, min_info_gain = 0.01, min_instances_per_node = 2,
+    subsampling_rate = 0.9, seed = 42, cache_node_ids = TRUE,
+    max_memory_in_mb = 128
+  )
+  rfr <- do.call(ml_random_forest_regressor, args)
+  expect_equal(ml_params(rfr, names(args)[-1]), args[-1])
+})
+
+test_that("ml_random_forest_classifier() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_random_forest_classifier() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_random_forest_classifier,
+                           c("x", "uid", "...", "thresholds", "seed"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
+
+test_that("ml_random_forest_regressor() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_random_forest_regressor() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_random_forest_regressor,
+                           c("x", "uid", "...", "seed"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
 
 test_that("rf runs successfully when all args specified", {
   expect_error(
@@ -29,6 +83,15 @@ test_that("col.sample.rate maps to correct strategy", {
                        col.sample.rate = 0.001),
     "Using feature subsetting strategy: log2"
   )
+})
+
+test_that("col.sample.rate argument is respected", {
+  if (spark_version(sc) < "2.0") skip("not applicable to <2.0")
+  rf <- ml_random_forest(iris_tbl, Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
+                         col.sample.rate = 0.001)
+
+  expect_equal(ml_param(rf$model, "feature_subset_strategy"),
+               "0.001")
 })
 
 test_that("thresholds parameter behaves as expected", {
@@ -94,7 +157,7 @@ test_that("error for bad impurity specification", {
 })
 
 test_that("random seed setting works", {
-  model_string <- function(x) x$.model %>%
+  model_string <- function(x) spark_jobj(x$model) %>%
     invoke("toDebugString") %>%
     strsplit("\n") %>%
     unlist() %>%

@@ -28,7 +28,9 @@ testthat_spark_connection <- function(version = NULL) {
     options(sparklyr.na.omit.verbose = TRUE)
     options(sparklyr.na.action.verbose = TRUE)
 
-    version <- version %||% Sys.getenv("SPARK_VERSION", unset = "2.1.0")
+    version <- ifelse(is.null(version),
+                      Sys.getenv("SPARK_VERSION", unset = "2.1.0"), version)
+
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version, config = config)
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
@@ -137,4 +139,9 @@ testthat_livy_connection <- function(version = NULL) {
   }
 
   get(".testthat_livy_connection", envir = .GlobalEnv)
+}
+
+get_default_args <- function(fn, exclude = NULL) {
+  formals(fn) %>%
+    (function(x) x[setdiff(names(x), c(exclude, c("x", "uid", "...", "formula")))])
 }

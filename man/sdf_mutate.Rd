@@ -2,7 +2,6 @@
 % Please edit documentation in R/sdf_interface.R
 \name{sdf_mutate}
 \alias{sdf_mutate}
-\alias{sdf_mutate}
 \alias{sdf_mutate_}
 \title{Mutate a Spark DataFrame}
 \usage{
@@ -53,18 +52,4 @@ head(beaver_tbl)
 dplyr::src_tbls(sc)
 }
 }
-\seealso{
-Other feature transformation routines: \code{\link{ft_binarizer}},
-  \code{\link{ft_bucketizer}},
-  \code{\link{ft_count_vectorizer}},
-  \code{\link{ft_discrete_cosine_transform}},
-  \code{\link{ft_elementwise_product}},
-  \code{\link{ft_index_to_string}},
-  \code{\link{ft_one_hot_encoder}},
-  \code{\link{ft_quantile_discretizer}},
-  \code{\link{ft_regex_tokenizer}},
-  \code{\link{ft_stop_words_remover}},
-  \code{\link{ft_string_indexer}},
-  \code{\link{ft_tokenizer}},
-  \code{\link{ft_vector_assembler}}
-}
+\concept{feature transformation routines}

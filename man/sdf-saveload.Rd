@@ -17,8 +17,7 @@ sdf_save_parquet(x, path, overwrite = FALSE, append = FALSE)
 sdf_load_parquet(sc, path)
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{name}{The table name to assign to the saved Spark DataFrame.}
 

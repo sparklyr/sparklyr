@@ -7,8 +7,7 @@
 sdf_broadcast(x)
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 }
 \description{
 Used to force broadcast hash joins.

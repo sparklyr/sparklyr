@@ -50,7 +50,9 @@ spark_apply_bundle <- function(packages = TRUE) {
             added_packages <<- c(added_packages, p)
             p
           }
-        }) %>% Filter(Negate(is.null), .) %>% unlist()
+        }) %>%
+          (function(x) Filter(Negate(is.null), x)) %>%
+          unlist()
 
         if (length(sublib_packages) > 0) c("-C", e, sublib_packages) else NULL
       }) %>% unlist()

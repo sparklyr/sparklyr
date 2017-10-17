@@ -8,8 +8,7 @@ ml_create_dummy_variables(x, input, reference = NULL, levels = NULL,
   labels = NULL, envir = new.env(parent = emptyenv()))
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{input}{The name of the input column.}
 

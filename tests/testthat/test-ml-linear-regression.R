@@ -1,4 +1,4 @@
-context("lm")
+context("ml linear regression")
 sc <- testthat_spark_connection()
 
 expect_coef_equal <- function(lhs, rhs) {
@@ -6,8 +6,63 @@ expect_coef_equal <- function(lhs, rhs) {
   lhs <- lhs[nm]
   rhs <- rhs[nm]
 
+  # print(data.frame(lhs = lhs, rhs = rhs))
+
   expect_true(all.equal(lhs, rhs, tolerance = 0.01))
 }
+
+test_that("ml_linear_regression param setting works", {
+  lr <- ml_linear_regression(
+    sc,
+    features_col = "fcol",
+    label_col = "lcol",
+    fit_intercept = FALSE,
+    elastic_net_param = 0.1,
+    reg_param = 0.2,
+    max_iter = 50L,
+    weight_col = "wcol",
+    prediction_col = "pcol",
+    solver = "l-bfgs",
+    standardization = FALSE,
+    tol = 1e-5)
+  expect_equal(
+    ml_params(lr, list(
+      "features_col", "label_col", "fit_intercept", "elastic_net_param",
+      "reg_param", "max_iter", "weight_col", "prediction_col", "solver",
+      "standardization", "tol"
+    )),
+    list(
+      features_col = "fcol",
+      label_col = "lcol",
+      fit_intercept = FALSE,
+      elastic_net_param = 0.1,
+      reg_param = 0.2,
+      max_iter = 50L,
+      weight_col = "wcol",
+      prediction_col = "pcol",
+      solver = "l-bfgs",
+      standardization = FALSE,
+      tol = 1e-5
+    )
+  )
+
+  lr2 <- ml_linear_regression(sc, alpha = 0.2, lambda = 0.1)
+  expect_equal(ml_params(lr2, c("elastic_net_param", "reg_param")),
+               list(elastic_net_param = 0.2, reg_param = 0.1))
+})
+
+test_that("ml_linear_regression() default params are correct", {
+  predictor <- ml_pipeline(sc) %>%
+    ml_linear_regression() %>%
+    ml_stage(1)
+
+  args <- get_default_args(ml_linear_regression,
+                           c("x", "uid", "...", "weight_col"))
+
+  expect_equal(
+    ml_params(predictor, names(args)),
+    args)
+})
 
 test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   skip_on_cran()
@@ -32,8 +87,8 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
 
     sFit <- ml_linear_regression(
       mtcars_tbl,
-      "mpg",
-      c("cyl", "disp"),
+      response = "mpg",
+      features = c("cyl", "disp"),
       alpha = alpha,
       lambda = lambda
     )
