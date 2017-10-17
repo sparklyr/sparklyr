@@ -28,3 +28,4 @@
 ^vignettes/
 ^logs$
 ^build_mapping_tables\.R$
+^\.travis\.R$
