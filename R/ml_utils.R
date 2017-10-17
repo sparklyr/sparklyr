@@ -77,23 +77,6 @@ sdf_residuals <- function(object, ...) {
   UseMethod("sdf_residuals")
 }
 
-
-reorder_first <- function(vector, name) {
-  if (is.null(vector))
-    return(vector)
-
-  nm <- names(vector)
-  if (is.null(nm) || !name %in% nm)
-    return(vector)
-
-  ordered <- c(name, base::setdiff(nm, name))
-  vector[ordered]
-}
-
-intercept_first <- function(vector) {
-  reorder_first(vector, "(Intercept)")
-}
-
 read_spark_vector <- function(jobj, field) {
   object <- invoke(jobj, field)
   invoke(object, "toArray")
