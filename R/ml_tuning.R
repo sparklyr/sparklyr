@@ -223,21 +223,25 @@ ml_spark_param_map <- function(param_map, sc, uid_stages) {
 }
 
 #' @export
-ml_cross_validator <- function(x, estimator, estimator_param_maps
-                               # evaluator,
-                               # num_folds, seed,
-                               # uid = random_string("cross_validator_")
+ml_cross_validator <- function(x, estimator, estimator_param_maps,
+                               evaluator,
+                               num_folds = 3L, seed,
+                               uid = random_string("cross_validator_")
 ) {
   UseMethod("ml_cross_validator")
 }
 
 #' @export
-ml_cross_validator.spark_connection <- function(x, estimator, estimator_param_maps
-                                                # evaluator,
-                                                # num_folds,
-                                                # seed,
-                                                # uid = random_string("cross_validator_")
+ml_cross_validator.spark_connection <- function(
+  x, estimator, estimator_param_maps,
+  evaluator,
+  num_folds = 3L,
+  seed,
+  uid = random_string("cross_validator_")
 ) {
+
+  num_folds <- ensure_scalar_integer(num_folds)
+  seed <- ensure_scalar_integer(seed)
   sc <- x
   estimator <- spark_jobj(estimator)
   uid_stages <- invoke_static(sc,
@@ -261,10 +265,28 @@ ml_cross_validator.spark_connection <- function(x, estimator, estimator_param_ma
   jobj <- invoke_new(sc, "org.apache.spark.ml.tuning.CrossValidator") %>%
     (function(cv) invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
                                 cv, param_maps)) %>%
-    invoke("setEstimator", estimator)
+    invoke("setEstimator", estimator) %>%
+    invoke("setEvaluator", spark_jobj(evaluator)) %>%
+    invoke("setNumFolds", num_folds)
+
 
   new_ml_cross_validator(jobj)
 }
+
+param_maps_to_df <- function(param_maps) {
+  param_maps %>%
+    lapply(function(param_map) {
+      param_map %>%
+        lapply(data.frame, stringsAsFactors = FALSE) %>%
+        (function(x) sapply(seq_along(x), function(n) {
+          fn <- function(x) paste(x, n, sep = "_S")
+          x[[n]] %>%
+            dplyr::rename_all(fn)
+        })) %>% dplyr::bind_cols()
+    }) %>%
+    dplyr::bind_rows()
+}
+
 
 # Constructors
 #
