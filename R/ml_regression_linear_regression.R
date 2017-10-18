@@ -156,7 +156,7 @@ new_ml_linear_regression <- function(jobj) {
 new_ml_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary"))
     new_ml_summary_linear_regression_model(invoke(jobj, "summary"), solver = invoke(jobj, "solver"))
-  else NA
+  else NULL
 
   new_ml_prediction_model(
     jobj,
@@ -174,9 +174,9 @@ new_ml_summary_linear_regression_model <- function(jobj, solver) {
   new_ml_summary(
     jobj,
     coefficient_standard_errors = if (is_normal_solver)
-      invoke(jobj, "coefficientStandardErrors") else NA,
+      invoke(jobj, "coefficientStandardErrors") else NULL,
     degrees_of_freedom = if (spark_version(spark_connection(jobj)) >= "2.2.0")
-      invoke(jobj, "degreesOfFreedom") else NA,
+      invoke(jobj, "degreesOfFreedom") else NULL,
     deviance_residuals = invoke(jobj, "devianceResiduals"),
     explained_variance = invoke(jobj, "explainedVariance"),
     features_col = invoke(jobj, "featuresCol"),
@@ -184,13 +184,13 @@ new_ml_summary_linear_regression_model <- function(jobj, solver) {
     mean_absolute_error = invoke(jobj, "meanAbsoluteError"),
     mean_squared_error = invoke(jobj, "meanSquaredError"),
     num_instances = invoke(jobj, "numInstances"),
-    p_values = if (is_normal_solver) invoke(jobj, "pValues") else NA,
+    p_values = if (is_normal_solver) invoke(jobj, "pValues") else NULL,
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     r2 = invoke(jobj, "r2"),
     residuals = invoke(jobj, "residuals") %>% sdf_register(),
     root_mean_squared_error = invoke(jobj, "rootMeanSquaredError"),
-    t_values = if (is_normal_solver) invoke(jobj, "tValues") else NA,
+    t_values = if (is_normal_solver) invoke(jobj, "tValues") else NULL,
     .solver = solver,
     subclass = "ml_summary_linear_regression")
 }
@@ -246,13 +246,7 @@ print.ml_summary_linear_regression <- function(x, ...) {
 
 #' @export
 print.ml_linear_regression_model <- function(x, ...) {
-  cat(ml_short_type(x), "(Transformer) \n")
-  cat(paste0("<", ml_uid(x), ">"),"\n")
-  item_names <- names(x) %>%
-    setdiff(c("uid", "type", "param_map", "summary", ".jobj"))
-  for (item in item_names)
-    if (!rlang::is_na(x[[item]]))
-      cat("  ", item, ":", capture.output(str(x[[item]])), "\n")
+  ml_print_model(x, c("coefficients", "intercept", "num_features"))
 }
 
 #' @export
