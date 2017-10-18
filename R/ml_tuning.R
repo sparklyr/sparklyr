@@ -223,10 +223,13 @@ ml_spark_param_map <- function(param_map, sc, uid_stages) {
 }
 
 #' @export
-ml_cross_validator <- function(x, estimator, estimator_param_maps,
-                               evaluator,
-                               num_folds = 3L, seed,
-                               uid = random_string("cross_validator_")
+ml_cross_validator <- function(
+  x, estimator, estimator_param_maps,
+  evaluator,
+  num_folds = 3L,
+  seed = NULL,
+  uid = random_string("cross_validator_"),
+  ...
 ) {
   UseMethod("ml_cross_validator")
 }
@@ -236,18 +239,21 @@ ml_cross_validator.spark_connection <- function(
   x, estimator, estimator_param_maps,
   evaluator,
   num_folds = 3L,
-  seed,
-  uid = random_string("cross_validator_")
+  seed = NULL,
+  uid = random_string("cross_validator_"),
+  ...
 ) {
 
-  num_folds <- ensure_scalar_integer(num_folds)
-  seed <- ensure_scalar_integer(seed)
   sc <- x
-  estimator <- spark_jobj(estimator)
-  uid_stages <- invoke_static(sc,
-                              "sparklyr.MLUtils",
-                              "uidStagesMapping",
-                              estimator)
+  num_folds <- ensure_scalar_integer(num_folds)
+  seed <- ensure_scalar_integer(seed, allow.null = TRUE)
+  uid_stages <- if (inherits(estimator, "ml_pipeline"))
+    invoke_static(sc,
+                  "sparklyr.MLUtils",
+                  "uidStagesMapping",
+                  spark_jobj(estimator))
+  else
+    setNames(list(spark_jobj(estimator)), ml_uid(estimator))
 
   current_param_list <- uid_stages %>%
     lapply(invoke, "extractParamMap") %>%
@@ -265,7 +271,7 @@ ml_cross_validator.spark_connection <- function(
   jobj <- invoke_new(sc, "org.apache.spark.ml.tuning.CrossValidator") %>%
     (function(cv) invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
                                 cv, param_maps)) %>%
-    invoke("setEstimator", estimator) %>%
+    invoke("setEstimator", spark_jobj(estimator)) %>%
     invoke("setEvaluator", spark_jobj(evaluator)) %>%
     invoke("setNumFolds", num_folds)
 
@@ -273,26 +279,48 @@ ml_cross_validator.spark_connection <- function(
   new_ml_cross_validator(jobj)
 }
 
+#' @export
+ml_cross_validator.ml_pipeline <- function(
+  x, estimator, estimator_param_maps,
+  evaluator,
+  num_folds = 3L,
+  seed = NULL,
+  uid = random_string("cross_validator_"),
+  ...
+) {
+  cv <- ml_new_stage_modified_args()
+  ml_add_stage(x, cv)
+}
+
+#' @export
+ml_cross_validator.tbl_spark <- function(
+  x, estimator, estimator_param_maps,
+  evaluator,
+  num_folds = 3L,
+  seed = NULL,
+  uid = random_string("cross_validator_"),
+  ...
+) {
+  cv <- ml_new_stage_modified_args()
+  cv %>%
+    ml_fit(x)
+}
+
 param_maps_to_df <- function(param_maps) {
   param_maps %>%
     lapply(function(param_map) {
       param_map %>%
         lapply(data.frame, stringsAsFactors = FALSE) %>%
-        (function(x) sapply(seq_along(x), function(n) {
+        (function(x) lapply(seq_along(x), function(n) {
           fn <- function(x) paste(x, n, sep = "_S")
-          x[[n]] %>%
-            dplyr::rename_all(fn)
+          dplyr::rename_all(x[[n]], fn)
         })) %>% dplyr::bind_cols()
     }) %>%
     dplyr::bind_rows()
 }
 
-
-# Constructors
-#
-new_ml_cross_validator <- function(jobj) {
-  sc <- spark_connection(jobj)
-  param_maps <- jobj %>%
+ml_get_estimator_param_maps <- function(jobj) {
+  jobj %>%
     invoke("getEstimatorParamMaps") %>%
     lapply(function(x)
       invoke_static(sc,
@@ -301,8 +329,32 @@ new_ml_cross_validator <- function(jobj) {
                     x)) %>%
     lapply(function(x)
       lapply(x, ml_map_param_list_names))
+}
+
+# Constructors
+#
+new_ml_cross_validator <- function(jobj) {
+  sc <- spark_connection(jobj)
+  param_maps <- ml_get_estimator_param_maps(jobj)
 
   new_ml_estimator(jobj,
                    estimator_param_maps = param_maps,
                    subclass = "ml_cross_validator")
+}
+
+new_ml_cross_validator_model <- function(jobj) {
+  avg_metrics <- invoke(jobj, "avgMetrics")
+  metric_name <- jobj %>%
+    invoke("getEvaluator") %>%
+    invoke("getMetricName") %>%
+    rlang::sym()
+  new_ml_transformer(
+    jobj,
+    avg_metrics = avg_metrics,
+    avg_metrics_df = ml_get_estimator_param_maps(jobj) %>%
+      param_maps_to_df() %>%
+      dplyr::mutate(!!metric_name := avg_metrics) %>%
+      dplyr::select(!!metric_name, dplyr::everything()),
+    best_model = ml_constructor_dispatch(invoke(jobj, "bestModel")),
+    subclass = "ml_cross_validator_model")
 }
