@@ -54,26 +54,17 @@ ml_fit_and_transform <- function(x, dataset, ...) {
 
 #' @export
 print.ml_transformer <- function(x, ...) {
-  cat(ml_short_type(x), "(Transformer) \n")
-  cat(paste0("<", x$uid, ">"),"\n")
-  out_names <- ml_param_map(x) %>%
-    names() %>%
-    (function(x) grep("col|cols$", x, value = TRUE))
-  for (param in out_names)
-    cat(paste0("  ", param, ": ", ml_param(x, param), "\n"))
+  ml_print_class(x)
+  ml_print_uid(x)
+  ml_print_input_output(x)
 }
 
 #' @export
 print.ml_estimator <- function(x, ...) {
-  cat(ml_short_type(x), "(Estimator) \n")
-  cat(paste0("<", x$uid, ">"),"\n")
-  out_names <- ml_param_map(x) %>%
-    names() %>%
-    (function(x) grep("col|cols$", x, value = TRUE))
-  for (param in out_names)
-    cat(paste0("  ", param, ": ", ml_param(x, param), "\n"))
+  ml_print_class(x)
+  ml_print_uid(x)
+  ml_print_input_output(x)
 }
-
 
 new_ml_transformer <- function(jobj, ..., subclass = NULL) {
   new_ml_pipeline_stage(jobj,

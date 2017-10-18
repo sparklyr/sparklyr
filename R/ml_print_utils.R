@@ -1,3 +1,29 @@
+ml_print_uid <- function(x) cat(paste0("<", x$uid, ">"), "\n")
+
+ml_print_class <- function(x, type) {
+  type <- if (is_ml_estimator(x))
+    "Estimator"
+  else if (is_ml_transformer(x))
+    "Transformer"
+  else
+    class(x)[1]
+  cat(ml_short_type(x), paste0("(", type, ")\n"))
+}
+
+ml_print_input_output <- function(x) {
+  out_names <- ml_param_map(x) %>%
+    names() %>%
+    (function(x) grep("col|cols$", x, value = TRUE))
+  for (param in out_names)
+    cat(paste0("  ", param, ": ", ml_param(x, param), "\n"))
+}
+
+ml_print_items <- function(x, items) {
+  for (item in items)
+    if (!rlang::is_null(x[[item]]))
+      cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")
+}
+
 print_newline <- function() {
   cat("", sep = "\n")
 }
