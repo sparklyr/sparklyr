@@ -24,6 +24,13 @@ ml_print_items <- function(x, items) {
       cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")
 }
 
+ml_print_model <- function(x, items) {
+  ml_print_class(x)
+  ml_print_uid(x)
+  ml_print_items(x, items)
+  ml_print_input_output(x)
+}
+
 print_newline <- function() {
   cat("", sep = "\n")
 }
