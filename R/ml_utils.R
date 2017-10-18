@@ -91,7 +91,5 @@ read_spark_matrix <- function(jobj, field) {
 }
 
 ml_short_type <- function(x) {
-  strsplit(x$type, "\\.") %>%
-    rlang::flatten_chr() %>%
-    dplyr::last()
+  jobj_class(spark_jobj(x))[1]
 }

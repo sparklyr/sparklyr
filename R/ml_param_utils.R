@@ -48,7 +48,8 @@ ml_param <- function(x, param, allow_null = FALSE, ...) {
 
 #' @rdname ml-params
 #' @export
-ml_params <- function(x, params, allow_null = FALSE, ...) {
+ml_params <- function(x, params = NULL, allow_null = FALSE, ...) {
+  params <- params %||% names(x$param_map)
   params %>%
     lapply(function(param) ml_param(x, param, allow_null)) %>%
     rlang::set_names(unlist(params))

@@ -113,8 +113,8 @@ print.ml_pipeline <- function(x, ...) {
   cat("  Stages", "\n")
   for (n in seq_len(num_stages)) {
     stage_output <- capture.output(print(ml_stage(x, n)))
-    cat(paste0("  |--[", n, "]", stage_output[1]), sep = "\n")
-    cat(paste0("  |     ", stage_output[-1]), sep = "\n")
+    cat(paste0("  |--", n, " ", stage_output[1]), sep = "\n")
+    cat(paste0("  |    ", stage_output[-1]), sep = "\n")
   }
 }
 
@@ -130,8 +130,8 @@ print.ml_pipeline_model <- function(x, ...) {
   cat("  Stages", "\n")
   for (n in seq_len(num_stages)) {
     stage_output <- capture.output(print(ml_stage(x, n)))
-    cat(paste0("  |--[", n, "]", stage_output[1]), sep = "\n")
-    cat(paste0("  |     ", stage_output[-1]), sep = "\n")
+    cat(paste0("  |--", n, " ", stage_output[1]), sep = "\n")
+    cat(paste0("  |    ", stage_output[-1]), sep = "\n")
   }
 }
 

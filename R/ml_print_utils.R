@@ -18,15 +18,26 @@ ml_print_input_output <- function(x) {
     cat(paste0("  ", param, ": ", ml_param(x, param), "\n"))
 }
 
-ml_print_items <- function(x, items) {
+ml_print_items <- function(x, items = NULL) {
+  if (rlang::is_null(items))
+    items <- names(x) %>%
+      setdiff(c("uid", "param_map", "summary", ".jobj")) %>%
+      (function(nms) grep(".*(?<!col|cols)$", nms, value = TRUE, perl = TRUE))
   for (item in items)
     if (!rlang::is_null(x[[item]]))
       cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")
 }
 
-ml_print_model <- function(x, items) {
+ml_print_model <- function(x, items = NULL) {
   ml_print_class(x)
   ml_print_uid(x)
+  ml_print_items(x, items)
+  ml_print_input_output(x)
+}
+
+ml_print_model_summary <- function(x, items = NULL) {
+  ml_print_class(x)
+  items <- items %||% grep(".*(?<!col|cols)$", names(x), value = TRUE, perl = TRUE)
   ml_print_items(x, items)
   ml_print_input_output(x)
 }
