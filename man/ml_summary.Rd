@@ -4,12 +4,14 @@
 \alias{ml_summary}
 \title{Spark ML -- Extraction of summary metrics}
 \usage{
-ml_summary(x, metric = NULL)
+ml_summary(x, metric = NULL, allow_null = TRUE)
 }
 \arguments{
 \item{x}{A Spark ML model that has a summary.}
 
 \item{metric}{The name of the metric to extract. If not set, returns the summary object.}
+
+\item{allow_null}{Whether null results are allowed when the metric is not found in the summary.}
 }
 \description{
 Extracts a metric from the summary object of a Spark ML model.
