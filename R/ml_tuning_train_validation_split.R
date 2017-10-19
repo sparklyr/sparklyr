@@ -1,3 +1,5 @@
+#' @rdname ml-tuning
+#' @param train_ratio Ratio between train and validation data. Must be between 0 and 1. Default: 0.75
 #' @export
 ml_train_validation_split <- function(
   x, estimator, estimator_param_maps,

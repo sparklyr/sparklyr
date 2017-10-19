@@ -1,3 +1,32 @@
+#' Spark ML -- Tuning
+#'
+#' Perform hyper-parameter tuning using either K-fold cross validation or train-validation split.
+#'
+#' @details \code{ml_cross_validator()} performs k-fold cross validation while \code{ml_train_validation_split()} performs tunining on one pair of train and validation datasets.
+#'
+#' @return The object returned depends on the class of \code{x}.
+#'
+#' \itemize{
+#'   \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_cross_validator} or \code{ml_traing_validation_split} object.
+#'
+#'   \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
+#'   the tuning estimator appended to the pipline.
+#'
+#'   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a tuning estimator is constructed then
+#'   immediately fit with the input \code{tbl_spark}, returning a \code{ml_cross_validation_model} or a
+#'   \code{ml_train_validation_split_model} object.
+#' }
+#'
+#' @param x A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.
+#' @param uid A character string used to uniquely identify the ML estimator.
+#' @param ... Optional arguments; currently unused.
+#' @param estimator A \code{ml_estimator} object.
+#' @param estimator_param_maps A named list of stages and hyper-parameter sets to tune. See details.
+#' @param evaluator A \code{ml_evaluator} object, see \link{ml_evaluator}.
+#' @template roxlate-ml-seed
+#' @name ml-tuning
+NULL
+
 ml_expand_params <- function(param_grid) {
   param_grid %>%
     lapply(function(stage) {

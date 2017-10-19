@@ -1,3 +1,5 @@
+#' @rdname ml-tuning
+#' @param num_folds Number of folds for cross validation. Must be >= 2. Default: 3
 #' @export
 ml_cross_validator <- function(
   x, estimator, estimator_param_maps,
