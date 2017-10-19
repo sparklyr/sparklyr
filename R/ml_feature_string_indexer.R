@@ -30,7 +30,7 @@ ft_string_indexer.spark_connection <- function(
   estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StringIndexer",
                                   input_col, output_col, uid) %>%
     invoke("setHandleInvalid", handle_invalid) %>%
-    new_ml_estimator()
+    new_ml_string_indexer()
 
   if (is.null(dataset))
     estimator
@@ -77,4 +77,8 @@ ft_string_indexer.tbl_spark <- function(
     else
       ml_fit_and_transform(stage, x)
   }
+}
+
+new_ml_string_indexer <- function(jobj) {
+  new_ml_estimator(jobj, subclass = "string_indexer")
 }
