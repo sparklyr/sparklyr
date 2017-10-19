@@ -82,3 +82,7 @@ ft_string_indexer.tbl_spark <- function(
 new_ml_string_indexer <- function(jobj) {
   new_ml_estimator(jobj, subclass = "string_indexer")
 }
+
+new_ml_string_indexer_model <- function(jobj) {
+  new_ml_transformer(jobj, subclass = "string_indexer_model")
+}

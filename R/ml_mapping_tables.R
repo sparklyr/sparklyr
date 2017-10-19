@@ -108,7 +108,7 @@ ml_create_mapping_tables <- function() {
                    }))
 
   ml_class_mapping_list <- list(
-    # feature
+    # feature (transformers)
     "HashingTF" = "hashing_tf",
     "Binarizer" = "binarizer",
     "Bucketizer" = "bucketizer",
@@ -116,15 +116,19 @@ ml_create_mapping_tables <- function() {
     "ElementwiseProduct" = "elementwise_product",
     "IndexToString" = "index_to_string",
     "OneHotEncoder" = "one_hot_encoder",
-    "QuantileDiscretizer" = "quantile_discretizer",
     "RegexTokenizer" = "regex_tokenizer",
-    "RFormula" = "r_formula",
     "SQLTransformer" = "sql_transformer",
     "StopWordsRemover" = "stop_words_remover",
-    "StringIndexer" = "string_indexer",
     "Tokenizer" = "tokenizer",
     "VectorAssembler" = "vector_assembler",
+    # feature (estimators)
     "VectorIndexer" = "vector_indexer",
+    "VectorIndexerModel" = "vector_indexer_model",
+    "QuantileDiscretizer" = "quantile_discretizer",
+    "RFormula" = "r_formula",
+    "RFormulaModel" = "r_formula_model",
+    "StringIndexer" = "string_indexer",
+    "StringIndexerModel" = "string_indexer_model",
     "CountVectorizer" = "count_vectorizer",
     "CountVectorizerModel" = "count_vectorizer_model",
     "PCA" = "pca",

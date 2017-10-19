@@ -104,6 +104,10 @@ new_ml_r_formula <- function(jobj) {
   new_ml_estimator(jobj, subclass = "ml_r_formula")
 }
 
+new_ml_r_formula_model <- function(jobj) {
+  new_ml_transformer(jobj, subclass = "ml_r_formula_model")
+}
+
 # Validator
 
 ml_validator_r_formula <- function(args, nms) {
