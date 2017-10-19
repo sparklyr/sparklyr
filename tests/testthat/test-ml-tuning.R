@@ -53,6 +53,6 @@ test_that("ml_cross_validator() works correctly", {
 
   expect_identical(
     class(cv),
-    c("ml_cross_validator", "ml_estimator", "ml_pipeline_stage")
+    c("ml_cross_validator", "ml_tuning", "ml_estimator", "ml_pipeline_stage")
   )
 })

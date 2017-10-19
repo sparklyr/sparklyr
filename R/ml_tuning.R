@@ -115,8 +115,6 @@ ml_get_estimator_param_maps <- function(jobj) {
       lapply(x, ml_map_param_list_names))
 }
 
-
-
 ml_new_validator <- function(
   sc, class, estimator, evaluator, estimator_param_maps, seed) {
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
@@ -156,4 +154,15 @@ ml_new_validator <- function(
     jobj <- invoke(jobj, "setSeed", seed)
 
   jobj
+}
+
+new_ml_tuning <- function(jobj, ..., subclass = NULL) {
+  new_ml_estimator(jobj,
+                   estimator = invoke(jobj, "getEstimator") %>%
+                     ml_constructor_dispatch(),
+                   evaluator = invoke(jobj, "getEvaluator") %>%
+                     ml_constructor_dispatch(),
+                   estimator_param_maps = ml_get_estimator_param_maps(jobj),
+                   ...,
+                   subclass = c(subclass, "ml_tuning"))
 }

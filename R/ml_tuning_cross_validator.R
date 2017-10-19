@@ -58,14 +58,9 @@ ml_cross_validator.tbl_spark <- function(
 # Constructors
 #
 new_ml_cross_validator <- function(jobj) {
-  new_ml_estimator(jobj,
-                   estimator = invoke(jobj, "getEstimator") %>%
-                     ml_constructor_dispatch(),
-                   evaluator = invoke(jobj, "getEvaluator") %>%
-                     ml_constructor_dispatch(),
-                   estimator_param_maps = ml_get_estimator_param_maps(jobj),
-                   num_folds = invoke(jobj, "getNumFolds"),
-                   subclass = "ml_cross_validator")
+  new_ml_tuning(jobj,
+                num_folds = invoke(jobj, "getNumFolds"),
+                subclass = "ml_cross_validator")
 }
 
 new_ml_cross_validator_model <- function(jobj) {
