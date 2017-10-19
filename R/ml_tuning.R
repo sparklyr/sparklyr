@@ -27,6 +27,8 @@
 #' @name ml-tuning
 NULL
 
+# TODO add some examples to docs
+
 ml_expand_params <- function(param_grid) {
   param_grid %>%
     lapply(function(stage) {
