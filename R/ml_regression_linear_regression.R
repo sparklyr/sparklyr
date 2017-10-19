@@ -155,7 +155,7 @@ new_ml_linear_regression <- function(jobj) {
 
 new_ml_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary"))
-    new_ml_summary_linear_regression_model(invoke(jobj, "summary"), solver = invoke(jobj, "solver"))
+    new_ml_summary_linear_regression_model(invoke(jobj, "summary"))
   else NULL
 
   new_ml_prediction_model(
@@ -169,12 +169,10 @@ new_ml_linear_regression_model <- function(jobj) {
     subclass = "ml_linear_regression_model")
 }
 
-new_ml_summary_linear_regression_model <- function(jobj, solver) {
-  is_normal_solver <- identical(solver, "normal")
+new_ml_summary_linear_regression_model <- function(jobj) {
   new_ml_summary(
     jobj,
-    coefficient_standard_errors = if (is_normal_solver)
-      invoke(jobj, "coefficientStandardErrors") else NULL,
+    coefficient_standard_errors = try_null(invoke(jobj, "coefficientStandardErrors")),
     degrees_of_freedom = if (spark_version(spark_connection(jobj)) >= "2.2.0")
       invoke(jobj, "degreesOfFreedom") else NULL,
     deviance_residuals = invoke(jobj, "devianceResiduals"),
@@ -184,14 +182,13 @@ new_ml_summary_linear_regression_model <- function(jobj, solver) {
     mean_absolute_error = invoke(jobj, "meanAbsoluteError"),
     mean_squared_error = invoke(jobj, "meanSquaredError"),
     num_instances = invoke(jobj, "numInstances"),
-    p_values = if (is_normal_solver) invoke(jobj, "pValues") else NULL,
+    p_values = try_null(invoke(jobj, "pValues")),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     r2 = invoke(jobj, "r2"),
     residuals = invoke(jobj, "residuals") %>% sdf_register(),
     root_mean_squared_error = invoke(jobj, "rootMeanSquaredError"),
-    t_values = if (is_normal_solver) invoke(jobj, "tValues") else NULL,
-    .solver = solver,
+    t_values = try_null(invoke(jobj, "tValues")),
     subclass = "ml_summary_linear_regression")
 }
 
