@@ -8,7 +8,7 @@ test_that("We can instantiate tokenizer object", {
   tokenizer <- ft_tokenizer(sc, "x", "y", uid = "tok")
   expect_equal(jobj_class(spark_jobj(tokenizer), simple_name = FALSE)[1], "org.apache.spark.ml.feature.Tokenizer")
   expect_equal(tokenizer$uid, "tok")
-  expect_equal(class(tokenizer), c("ml_transformer", "ml_pipeline_stage"))
+  expect_equal(class(tokenizer), c("ml_tokenizer", "ml_transformer", "ml_pipeline_stage"))
 })
 
 

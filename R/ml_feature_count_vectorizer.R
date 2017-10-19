@@ -104,7 +104,7 @@ ml_validator_count_vectorizer <- function(args, nms) {
 }
 
 # Constructors
-#
+
 new_ml_count_vectorizer <- function(jobj) {
   new_ml_estimator(jobj, subclass = "ml_count_vectorizer")
 }

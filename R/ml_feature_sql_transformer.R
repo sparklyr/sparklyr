@@ -28,7 +28,7 @@ ft_sql_transformer.spark_connection <- function(
   jobj <- invoke_new(x, "org.apache.spark.ml.feature.SQLTransformer", uid) %>%
     invoke("setStatement", statement)
 
-  new_ml_transformer(jobj)
+  new_ml_sql_transformer(jobj)
 }
 
 #' @export
@@ -46,6 +46,10 @@ ft_sql_transformer.tbl_spark <- function(
   uid = random_string("sql_transformer_"), ...) {
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
+}
+
+new_ml_sql_transformer <- function(jobj) {
+  new_ml_transformer(jobj, subclass = "ml_sql_transformer")
 }
 
 # dplyr transformer
