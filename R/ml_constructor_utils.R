@@ -36,7 +36,6 @@ new_ml_pipeline_stage <- function(jobj, ..., subclass = NULL) {
   structure(
     list(
       uid = invoke(jobj, "uid"),
-      # type = jobj_info(jobj)$class,
       param_map = ml_get_param_map(jobj),
       ...,
       .jobj = jobj
