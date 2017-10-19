@@ -133,12 +133,3 @@ new_ml_model_isotonic_regression <- function(
     .call = call
   )
 }
-
-# Generic implementations
-
-#' @export
-ml_fit.ml_isotonic_regression <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-  new_ml_isotonic_regression_model(jobj)
-}

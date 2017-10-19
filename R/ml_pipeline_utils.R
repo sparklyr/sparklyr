@@ -130,10 +130,15 @@ ml_column_metadata <- function(tbl, column) {
 #'
 #' @param x A Spark ML model that has a summary.
 #' @param metric The name of the metric to extract. If not set, returns the summary object.
+#' @param allow_null Whether null results are allowed when the metric is not found in the summary.
 #' @export
-ml_summary <- function(x, metric = NULL) {
+ml_summary <- function(x, metric = NULL, allow_null = TRUE) {
+  # TODO allow_null should have same default as ml_param().
+
   if (rlang::is_null(metric))
     x$summary %||% stop(deparse(substitute(x)), " has no summary")
+  else if (allow_null)
+    x$summary[[metric]]
   else
     x$summary[[metric]] %||% stop("metric ", metric, " not found")
 }

@@ -23,7 +23,7 @@ test_that("ml_pipeline() returns a c('ml_pipeline', 'ml_estimator', 'ml_pipeline
   p <- ml_pipeline(sc)
   expect_equal(class(p), c("ml_pipeline", "ml_estimator", "ml_pipeline_stage"))
   expect_equal(ml_stages(p), NA)
-  expect_equal(p$type, "org.apache.spark.ml.Pipeline")
+  expect_equal(jobj_class(spark_jobj(p))[1], "Pipeline")
   uid_prefix <- gsub(pattern = "_.+$", replacement = "", p$uid)
   expect_equal(uid_prefix, "pipeline")
 })

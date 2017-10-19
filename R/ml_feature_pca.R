@@ -82,14 +82,6 @@ new_ml_pca_model <- function(jobj) {
     subclass = "ml_pca_model")
 }
 
-# Generic implementations
-#' @export
-ml_fit.ml_pca <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-  new_ml_pca_model(jobj)
-}
-
 #' @rdname ft_pca
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.

@@ -104,7 +104,7 @@ ml_validator_count_vectorizer <- function(args, nms) {
 }
 
 # Constructors
-#
+
 new_ml_count_vectorizer <- function(jobj) {
   new_ml_estimator(jobj, subclass = "ml_count_vectorizer")
 }
@@ -113,14 +113,4 @@ new_ml_count_vectorizer_model <- function(jobj) {
   new_ml_transformer(jobj,
                      vocabulary = invoke(jobj, "vocabulary"),
                      subclass = "ml_count_vectorizer_model")
-}
-
-# Generic implementations
-
-#' @export
-ml_fit.ml_count_vectorizer <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-
-  new_ml_count_vectorizer_model(jobj)
 }

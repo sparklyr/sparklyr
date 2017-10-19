@@ -194,13 +194,6 @@ new_ml_model_linear_svc <- function(
 # Generic implementations
 
 #' @export
-ml_fit.ml_linear_svc <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-  new_ml_linear_svc_model(jobj)
-}
-
-#' @export
 print.ml_model_linear_svc <- function(x, ...) {
   ml_model_print_call(x)
   print_newline()

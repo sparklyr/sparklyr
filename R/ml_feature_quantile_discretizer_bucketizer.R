@@ -1,82 +1,66 @@
-#' Feature Tranformation -- StringIndexer (Estimator)
+#' Feature Transformation -- Bucketizer (Transformer)
 #'
-#' A label indexer that maps a string column of labels to an ML column of
-#'   label indices. If the input column is numeric, we cast it to string and
-#'   index the string values. The indices are in \code{[0, numLabels)}, ordered by
-#'   label frequencies. So the most frequent label gets index 0. This function
-#'   is the inverse of \code{\link{ft_index_to_string}}.
+#' Similar to \R's \code{\link{cut}} function, this transforms a numeric column
+#' into a discretized column, with breaks specified through the \code{splits}
+#' parameter.
 #'
 #' @template roxlate-ml-feature-input-output-col
 #' @template roxlate-ml-feature-transformer
-#' @template roxlate-ml-feature-estimator-transformer
 #' @template roxlate-ml-feature-handle-invalid
-#' @seealso \code{\link{ft_index_to_string}}
+#'
+#' @param splits A numeric vector of cutpoints, indicating the bucket boundaries.
+#'
 #' @export
-ft_string_indexer <- function(
-  x, input_col, output_col,
-  handle_invalid = "error", dataset = NULL,
-  uid = random_string("string_indexer_"), ...) {
-  UseMethod("ft_string_indexer")
+ft_bucketizer <- function(
+  x, input_col, output_col, splits, handle_invalid = "error",
+  uid = random_string("bucketizer_"), ...) {
+  UseMethod("ft_bucketizer")
 }
 
 #' @export
-ft_string_indexer.spark_connection <- function(
-  x, input_col, output_col,
-  handle_invalid = "error", dataset = NULL,
-  uid = random_string("string_indexer_"), ...) {
+ft_bucketizer.spark_connection <- function(
+  x, input_col, output_col, splits, handle_invalid = "error",
+  uid = random_string("bucketizer_"), ...) {
 
   ml_ratify_args()
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Bucketizer",
+                             input_col, output_col, uid) %>%
+    invoke("setSplits", splits) %>%
+    invoke("setHandleInvalid", handle_invalid)
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StringIndexer",
-                                  input_col, output_col, uid) %>%
-    invoke("setHandleInvalid", handle_invalid) %>%
-    new_ml_estimator()
-
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  new_ml_bucketizer(jobj)
 }
 
 #' @export
-ft_string_indexer.ml_pipeline <- function(
-  x, input_col, output_col,
-  handle_invalid = "error", dataset = NULL,
-  uid = random_string("string_indexer_"), ...
-) {
+ft_bucketizer.ml_pipeline <- function(
+  x, input_col, output_col, splits, handle_invalid = "error",
+  uid = random_string("bucketizer_"), ...) {
 
-  stage <- ml_new_stage_modified_args()
-  ml_add_stage(x, stage)
-
+  transformer <- ml_new_stage_modified_args()
+  ml_add_stage(x, transformer)
 }
 
 #' @export
-ft_string_indexer.tbl_spark <- function(
-  x, input_col, output_col,
-  handle_invalid = "error", dataset = NULL,
-  uid = random_string("string_indexer_"), ...
-) {
-  dots <- rlang::dots_list(...)
+ft_bucketizer.tbl_spark <- function(
+  x, input_col, output_col, splits, handle_invalid = "error",
+  uid = random_string("bucketizer_"), ...) {
+  transformer <- ml_new_stage_modified_args()
+  ml_transform(transformer, x)
+}
 
-  stage <- ml_new_stage_modified_args()
+new_ml_bucketizer <- function(jobj) {
+  new_ml_transformer(jobj, subclass = "ml_bucketizer")
+}
 
-  # backwards compatibility for params argument
-  if (rlang::has_name(dots, "params") && rlang::is_env(dots$params)) {
-    transformer <- if (is_ml_transformer(stage))
-      stage
-    else
-      ml_fit(stage, x)
-    dots$params$labels <- spark_jobj(transformer) %>%
-      invoke("labels") %>%
-      as.character()
-    transformer %>%
-      ml_transform(x)
-  } else {
-    if (is_ml_transformer(stage))
-      ml_transform(stage, x)
-    else
-      ml_fit_and_transform(stage, x)
-  }
+# Validator
+ml_validator_bucketizer <- function(args, nms) {
+  args %>%
+    ml_validate_args({
+      if (length(splits) < 3) stop("length(splits) must be at least 3")
+      splits <- lapply(splits, ensure_scalar_double)
+      handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
+    }) %>%
+    ml_extract_args(nms)
 }
 
 #' Feature Transformation -- QuantileDiscretizer (Estimator)
@@ -140,7 +124,7 @@ ft_quantile_discretizer.spark_connection <- function(
     invoke("setHandleInvalid", handle_invalid) %>%
     invoke("setNumBuckets", num_buckets) %>%
     invoke("setRelativeError", relative_error) %>%
-    new_ml_estimator()
+    new_ml_quantile_discretizer()
 
   if (is.null(dataset))
     estimator
@@ -169,4 +153,26 @@ ft_quantile_discretizer.tbl_spark <- function(
     ml_transform(stage, x)
   else
     ml_fit_and_transform(stage, x)
+}
+
+new_ml_quantile_discretizer <- function(jobj) {
+  new_ml_estimator(jobj, subclass = "quantile_discretizer")
+}
+
+# Validator
+ml_validator_quantile_discretizer <- function(args, nms) {
+  old_new_mapping <- c(
+    list(
+      n.buckets = "num_buckets"
+    ), input_output_mapping
+  )
+
+  args %>%
+    ml_validate_args(
+      {
+        handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
+        num_buckets <- ensure_scalar_integer(num_buckets)
+        relative_error <- ensure_scalar_double(relative_error)
+      }, old_new_mapping) %>%
+    ml_extract_args(nms, old_new_mapping)
 }

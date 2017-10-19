@@ -9,18 +9,20 @@
 \alias{ml_regression_evaluator}
 \title{Spark ML - Evaluators}
 \usage{
-ml_binary_classification_evaluator(x, label_col, raw_prediction_col,
-  metric_name = "areaUnderROC")
+ml_binary_classification_evaluator(x, label_col = "label",
+  raw_prediction_col = "rawPrediction", metric_name = "areaUnderROC")
 
-ml_binary_classification_eval(x, label_col, prediction_col,
-  metric_name = "f1")
+ml_binary_classification_eval(x, label_col = "label",
+  prediction_col = "prediction", metric_name = "f1")
 
-ml_multiclass_classification_evaluator(x, label_col, prediction_col,
-  metric_name = "f1")
+ml_multiclass_classification_evaluator(x, label_col = "label",
+  prediction_col = "prediction", metric_name = "f1")
 
-ml_classification_eval(x, label_col, prediction_col, metric_name = "f1")
+ml_classification_eval(x, label_col = "label",
+  prediction_col = "prediction", metric_name = "f1")
 
-ml_regression_evaluator(x, label_col, prediction_col, metric_name = "rmse")
+ml_regression_evaluator(x, label_col = "label",
+  prediction_col = "prediction", metric_name = "rmse")
 }
 \arguments{
 \item{x}{A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}}.}

@@ -66,7 +66,7 @@ ft_r_formula.spark_connection <- function(
     invoke("setForceIndexLabel", force_index_label) %>%
     invoke("setFormula", formula) %>%
     invoke("setLabelCol", label_col) %>%
-    new_ml_estimator()
+    new_ml_r_formula()
 
   if (is.null(dataset))
     estimator
@@ -98,6 +98,14 @@ ft_r_formula.tbl_spark <- function(
     ml_transform(stage, x)
   else
     ml_fit_and_transform(stage, x)
+}
+
+new_ml_r_formula <- function(jobj) {
+  new_ml_estimator(jobj, subclass = "ml_r_formula")
+}
+
+new_ml_r_formula_model <- function(jobj) {
+  new_ml_transformer(jobj, subclass = "ml_r_formula_model")
 }
 
 # Validator

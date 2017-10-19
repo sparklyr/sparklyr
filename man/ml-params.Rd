@@ -14,7 +14,7 @@ ml_param_map(x, ...)
 
 ml_param(x, param, allow_null = FALSE, ...)
 
-ml_params(x, params, allow_null = FALSE, ...)
+ml_params(x, params = NULL, allow_null = FALSE, ...)
 }
 \arguments{
 \item{x}{A Spark ML object, either a pipeline stage or an evaluator.}

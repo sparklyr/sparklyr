@@ -103,13 +103,35 @@ spark_connection.ml_pipeline_model <- function(x, ...) {
 
 #' @export
 print.ml_pipeline <- function(x, ...) {
-  cat("Pipeline \n")
+  cat(paste0("Pipeline (Estimator) with "))
+  num_stages <- length(ml_stages(x))
+  if (num_stages == 1)
+    cat("1 stage \n")
+  else
+    cat(paste0(num_stages, " stages \n"))
   cat(paste0("<", x$uid, ">"), "\n")
   cat("  Stages", "\n")
-  for (stage in ml_stages(x)) {
-    stage_output <- capture.output(print(stage))
-    cat(paste0("  |--", stage_output[1]), sep = "\n")
-    cat(paste0("  |  ", stage_output[-1]), sep = "\n")
+  for (n in seq_len(num_stages)) {
+    stage_output <- capture.output(print(ml_stage(x, n)))
+    cat(paste0("  |--", n, " ", stage_output[1]), sep = "\n")
+    cat(paste0("  |    ", stage_output[-1]), sep = "\n")
+  }
+}
+
+#' @export
+print.ml_pipeline_model <- function(x, ...) {
+  cat(paste0("PipelineModel (Transformer) with "))
+  num_stages <- length(ml_stages(x))
+  if (num_stages == 1)
+    cat("1 stage \n")
+  else
+    cat(paste0(num_stages, " stages \n"))
+  cat(paste0("<", x$uid, ">"), "\n")
+  cat("  Stages", "\n")
+  for (n in seq_len(num_stages)) {
+    stage_output <- capture.output(print(ml_stage(x, n)))
+    cat(paste0("  |--", n, " ", stage_output[1]), sep = "\n")
+    cat(paste0("  |    ", stage_output[-1]), sep = "\n")
   }
 }
 

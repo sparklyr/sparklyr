@@ -7,7 +7,7 @@ test_that("ml_transform() fails on estimators", {
   string_indexer <- ft_string_indexer(sc, "Species", "species_idx")
   expect_error(string_indexer %>%
                  ml_transform(iris_tbl),
-               "cannot invoke 'transform' on estimators")
+               "is only applicable to")
 })
 
 test_that("ml_fit() and ml_fit_and_transform() fail on transformers", {
@@ -15,10 +15,10 @@ test_that("ml_fit() and ml_fit_and_transform() fail on transformers", {
   binarizer <- ft_binarizer(sc, "Petal_Width", "petal_width_binarized")
   expect_error(binarizer %>%
                  ml_fit(iris_tbl),
-               "cannot invoke 'fit' on transformers")
+               "is only applicable to")
   expect_error(binarizer %>%
                  ml_fit_and_transform(iris_tbl),
-               "cannot invoke 'fit' on transformers")
+               "is only applicable to")
 })
 
 test_that("ml_stage() and ml_stages() work properly", {

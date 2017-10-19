@@ -435,6 +435,13 @@ object Utils {
     case Some(s) => s
     case None => ""
   }
+
+  def getAncestry(obj: AnyRef, simpleName: Boolean = true): Array[String] = {
+    def supers(cl: Class[_]): List[Class[_]] = {
+      if (cl == null) Nil else cl :: supers(cl.getSuperclass)
+    }
+  supers(obj.getClass).map(if (simpleName) _.getSimpleName else _.getName).toArray
+  }
 }
 
 

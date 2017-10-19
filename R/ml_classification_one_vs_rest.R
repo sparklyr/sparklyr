@@ -121,13 +121,3 @@ new_ml_model_one_vs_rest <- function(
     .call = call
   )
 }
-
-
-# Generic implementations
-
-#' @export
-ml_fit.ml_one_vs_rest <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-  new_ml_one_vs_rest_model(jobj)
-}

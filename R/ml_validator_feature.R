@@ -84,16 +84,6 @@ ml_validator_index_to_string <- function(args, nms) {
     ml_extract_args(nms)
 }
 
-# Bucketizer
-ml_validator_bucketizer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      if (length(splits) < 3) stop("length(splits) must be at least 3")
-      splits <- lapply(splits, ensure_scalar_double)
-      handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
-    }) %>%
-    ml_extract_args(nms)
-}
 
 # ElementwiseProduct
 ml_validator_elementwise_product <- function(args, nms) {
@@ -126,26 +116,6 @@ ml_validator_stop_words_remover <- function(args, nms) {
       stop_words <- lapply(stop_words, ensure_scalar_character)
     }) %>%
     ml_extract_args(nms)
-}
-
-
-
-# QuantileDiscretizer
-ml_validator_quantile_discretizer <- function(args, nms) {
-  old_new_mapping <- c(
-    list(
-      n.buckets = "num_buckets"
-    ), input_output_mapping
-  )
-
-  args %>%
-    ml_validate_args(
-    {
-      handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
-      num_buckets <- ensure_scalar_integer(num_buckets)
-      relative_error <- ensure_scalar_double(relative_error)
-    }, old_new_mapping) %>%
-    ml_extract_args(nms, old_new_mapping)
 }
 
 # SQLTransformer

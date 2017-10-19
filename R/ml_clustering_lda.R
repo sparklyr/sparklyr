@@ -260,13 +260,6 @@ new_ml_lda_model <- function(jobj) {
 
 # Generic implementations
 
-#' @export
-ml_fit.ml_lda <- function(x, dataset, ...) {
-  jobj <- spark_jobj(x) %>%
-    invoke("fit", spark_dataframe(dataset))
-  new_ml_lda_model(jobj)
-}
-
 # TODO
 #' #' @export
 #' print.ml_model_lda <- function(x, ...) {
