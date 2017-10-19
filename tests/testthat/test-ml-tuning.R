@@ -28,7 +28,8 @@ test_that("ml_cross_validator() works correctly", {
   cv <- ml_cross_validator(
     sc,
     estimator = pipeline,
-    # evaluator = invoke_new(sc, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator"),
+    evaluator = ml_binary_classification_evaluator(sc, label_col = "label",
+                                                   raw_prediction_col = "rawPrediction"),
     estimator_param_maps = param_grid
   )
 
