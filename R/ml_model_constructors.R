@@ -69,6 +69,11 @@ new_ml_model_clustering <- function(
 }
 
 #' @export
+spark_jobj.ml_model <- function(x, ...) {
+  spark_jobj(x$pipeline_model)
+}
+
+#' @export
 sdf_predict.ml_model_classification <- function(
   object, newdata, predicted_label_col = "predicted_label",
   probability_prefix = "probability_", ...) {
