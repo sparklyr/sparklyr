@@ -124,7 +124,7 @@ ft_quantile_discretizer.spark_connection <- function(
     invoke("setHandleInvalid", handle_invalid) %>%
     invoke("setNumBuckets", num_buckets) %>%
     invoke("setRelativeError", relative_error) %>%
-    new_ml_estimator()
+    new_ml_quantile_discretizer()
 
   if (is.null(dataset))
     estimator
@@ -153,6 +153,10 @@ ft_quantile_discretizer.tbl_spark <- function(
     ml_transform(stage, x)
   else
     ml_fit_and_transform(stage, x)
+}
+
+new_ml_quantile_discretizer <- function(jobj) {
+  new_ml_estimator(jobj, subclass = "quantile_discretizer")
 }
 
 # Validator
