@@ -181,7 +181,7 @@ ml_regression_evaluator.tbl_spark <- function(
     ml_evaluate(x)
 }
 
-# Constructor
+# Constructors
 
 new_ml_evaluator <- function(jobj, ..., subclass = NULL) {
   structure(
@@ -194,6 +194,18 @@ new_ml_evaluator <- function(jobj, ..., subclass = NULL) {
     ),
     class = c(subclass, "ml_evaluator")
   )
+}
+
+new_ml_binary_classification_evaluator <- function(jobj) {
+  new_ml_evaluator(jobj, subclass = "ml_binary_classification_evaluator")
+}
+
+new_ml_multiclass_classification_evaluator <- function(jobj) {
+  new_ml_evaluator(jobj, subclass = "ml_multiclass_classification_evaluator")
+}
+
+new_ml_regression_evaluator <- function(jobj) {
+  new_ml_evaluator(jobj, subclass = "ml_regression_evaluator")
 }
 
 # Generic implementations

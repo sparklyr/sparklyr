@@ -92,7 +92,9 @@ ml_create_mapping_tables <- function() {
          "init_steps" = "initSteps",
          "init_mode" = "initMode",
          # ml_bisecting_kmeans
-         "min_divisible_cluster_size" = "minDivisibleClusterSize")
+         "min_divisible_cluster_size" = "minDivisibleClusterSize",
+         # evaluators
+         "metric_name" = "metricName")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
@@ -111,7 +113,7 @@ ml_create_mapping_tables <- function() {
     "Binarizer" = "binarizer",
     "Bucketizer" = "bucketizer",
     "DCT" = "dct",
-    "ElementwiseProdct" = "elementwise_product",
+    "ElementwiseProduct" = "elementwise_product",
     "IndexToString" = "index_to_string",
     "OneHotEncoder" = "one_hot_encoder",
     "QuantileDiscretizer" = "quantile_discretizer",
@@ -172,6 +174,10 @@ ml_create_mapping_tables <- function() {
     # tuning
     "CrossValidator" = "cross_validator",
     "CrossValidatorModel" = "cross_validator_model",
+    # evaluation
+    "BinaryClassificationEvaluator" = "binary_classification_evaluator",
+    "MulticlassClassificationEvaluator" = "multiclass_classification_evaluator",
+    "RegressionEvaluator" = "regression_evaluator",
     # pipeline
     "Pipeline" = "pipeline",
     "PipelineModel" = "pipeline_model",
