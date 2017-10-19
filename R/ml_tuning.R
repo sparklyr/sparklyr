@@ -129,7 +129,7 @@ ml_new_validator <- function(
                   "sparklyr.MLUtils",
                   "uidStagesMapping",
                   spark_jobj(estimator)) else
-    setNames(list(spark_jobj(estimator)), ml_uid(estimator))
+    rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
 
   current_param_list <- uid_stages %>%
     lapply(invoke, "extractParamMap") %>%
@@ -168,13 +168,9 @@ new_ml_tuning <- function(jobj, ..., subclass = NULL) {
 }
 
 new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
-  metric_name <- jobj %>%
-    invoke("getEvaluator") %>%
-    invoke("getMetricName") %>%
-    rlang::sym()
+  # TODO move metrics here
   new_ml_transformer(
     jobj,
-    metric_name = metric_name,
     best_model = ml_constructor_dispatch(invoke(jobj, "bestModel")),
     ...,
     subclass = c(subclass, "ml_tuning_model"))

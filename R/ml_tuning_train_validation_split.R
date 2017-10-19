@@ -65,8 +65,13 @@ new_ml_train_validation_split <- function(jobj) {
 
 new_ml_train_validation_split_model <- function(jobj) {
   validation_metrics <- invoke(jobj, "validationMetrics")
+  metric_name <- jobj %>%
+    invoke("getEvaluator") %>%
+    invoke("getMetricName") %>%
+    rlang::sym()
   new_ml_tuning_model(
     jobj,
+    metric_name = metric_name,
     validation_metrics = validation_metrics,
     validation_metrics_df = ml_get_estimator_param_maps(jobj) %>%
       param_maps_to_df() %>%

@@ -65,9 +65,14 @@ new_ml_cross_validator <- function(jobj) {
 
 new_ml_cross_validator_model <- function(jobj) {
   avg_metrics <- invoke(jobj, "avgMetrics")
+  metric_name <- jobj %>%
+    invoke("getEvaluator") %>%
+    invoke("getMetricName") %>%
+    rlang::sym()
 
   new_ml_tuning_model(
     jobj,
+    metric_name = metric_name,
     avg_metrics = avg_metrics,
     avg_metrics_df = ml_get_estimator_param_maps(jobj) %>%
       param_maps_to_df() %>%
