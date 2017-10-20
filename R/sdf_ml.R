@@ -13,41 +13,6 @@ sdf_predict <- function(object, newdata, ...) {
   UseMethod("sdf_predict")
 }
 
-
-
-#' @export
-sdf_predict.default <- function(object, newdata, ...) {
-
-  # when newdata is not supplied, attempt to use original dataset
-  if (missing(newdata) || is.null(newdata))
-    newdata <- object$data
-
-  # convert to spark dataframe
-  sdf <- spark_dataframe(newdata)
-
-  # construct dummy variables if required
-  ctfm <- object$categorical.transformations
-  if (is.environment(ctfm)) {
-    ctfm <- as.list(ctfm)
-    enumerate(ctfm, function(key, val) {
-      sdf <<- ml_create_dummy_variables(
-        x = sdf,
-        input = key,
-        reference = val$reference,
-        levels = val$levels,
-        labels = val$labels
-      )
-    })
-  }
-
-  # assemble into feature vector, apply transformation and return predictions
-  params <- object$model.parameters
-  assembled <- spark_dataframe(ft_vector_assembler(sdf_register(sdf), object$features, params$features))
-  transformed <- invoke(object$.model, "transform", assembled)
-  dropped <- invoke(transformed, "drop", params$features)
-  sdf_register(dropped)
-}
-
 #' Partition a Spark Dataframe
 #'
 #' Partition a Spark DataFrame into multiple groups. This routine is useful
