@@ -93,13 +93,11 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
 })
 
 test_that("'sdf_predict()', 'predict()' return same results", {
-  skip("re-enable after implementing predict()")
   test_requires("dplyr")
 
   model <- flights_tbl %>%
+    na.omit() %>%
     ml_decision_tree(sched_dep_time ~ dep_time)
-
-  id <- model$model.parameters$id
 
   predictions <- sdf_predict(model)
   n1 <- spark_dataframe(predictions) %>% invoke("count")
@@ -108,13 +106,11 @@ test_that("'sdf_predict()', 'predict()' return same results", {
   expect_equal(n1, n2)
 
   lhs <- predictions %>%
-    arrange(!!model$model.parameters$id) %>%
     sdf_read_column("prediction")
 
   rhs <- predict(model)
 
   expect_identical(lhs, rhs)
-
 })
 
 test_that("copy_to() succeeds when last column contains missing / empty values", {
