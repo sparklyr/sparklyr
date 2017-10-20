@@ -92,6 +92,7 @@ ml_multiclass_classification_evaluator <- function(
   UseMethod("ml_multiclass_classification_evaluator")
 }
 
+#' @export
 ml_multiclass_classification_evaluator.spark_connection <- function(
   x, label_col = "label", prediction_col = "prediction", metric_name = "f1"
 ) {
