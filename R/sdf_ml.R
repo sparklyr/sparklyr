@@ -1,18 +1,3 @@
-#' Model Predictions with Spark DataFrames
-#'
-#' Given a \code{ml_model} fit alongside a new data set, produce a new Spark
-#' DataFrame with predicted values encoded in the \code{"prediction"} column.
-#'
-#' @param object,newdata An object coercable to a Spark DataFrame.
-#' @param ... Optional arguments; currently unused.
-#'
-#' @family Spark data frames
-#'
-#' @export
-sdf_predict <- function(object, newdata, ...) {
-  UseMethod("sdf_predict")
-}
-
 #' Partition a Spark Dataframe
 #'
 #' Partition a Spark DataFrame into multiple groups. This routine is useful

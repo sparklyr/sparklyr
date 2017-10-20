@@ -12,34 +12,22 @@ try_null <- function(expr) {
 }
 
 #' @export
-#' @importFrom dplyr arrange
-#' @importFrom lazyeval interp
-predict.ml_model <- function(object,
-                             newdata = object$data,
-                             ...)
+predict.ml_model_classification <- function(object,
+                                            newdata = ml_model_data(object),
+                                            ...)
 {
-  # 'sdf_predict()' does not necessarily return a data set with the same row
-  # order as the input data; generate a unique id and re-order based on this
-  id <- random_string("id_")
-  sdf <- newdata %>%
-    sdf_with_unique_id(id) %>%
-    spark_dataframe()
+  ml_predict(object, newdata) %>%
+    sdf_read_column("predicted_label")
+}
 
-  # perform prediction
-  params <- object$model.parameters
-  predicted <- sdf_predict(object, sdf, ...)
+#' @export
+predict.ml_model_regression <- function(
+  object, newdata = ml_model_data(object), ...
+) {
+  prediction_col <- ml_param(object$model, "prediction_col")
 
-  # re-order based on id column
-  arranged <- arrange(predicted, id)
-
-  # read column
-  column <- sdf_read_column(arranged, "prediction")
-
-  # re-map label ids back to actual labels
-  if (is.character(params$labels) && is.numeric(column))
-    column <- params$labels[column + 1]
-
-  column
+  ml_predict(object, newdata) %>%
+    sdf_read_column(prediction_col)
 }
 
 #' @export

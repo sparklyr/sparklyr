@@ -319,15 +319,3 @@ summary.ml_model_logistic_regression <- function(object, ...) {
   ml_model_print_coefficients(object)
   print_newline()
 }
-
-#' @export
-predict.ml_model_classification <- function(object,
-                             newdata = ml_model_data(object),
-                             ...)
-{
-  object$pipeline_model %>%
-    ml_transform(newdata) %>%
-    ft_index_to_string("prediction", "prediction_labels",
-                       labels = object$.index_labels) %>%
-    sdf_read_column("prediction_labels")
-}
