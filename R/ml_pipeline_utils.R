@@ -142,3 +142,8 @@ ml_summary <- function(x, metric = NULL, allow_null = TRUE) {
   else
     x$summary[[metric]] %||% stop("metric ", metric, " not found")
 }
+
+ml_new_identifiable <- function(sc, class, uid) {
+  uid <- ensure_scalar_character(uid)
+  invoke_new(sc, class, uid)
+}
