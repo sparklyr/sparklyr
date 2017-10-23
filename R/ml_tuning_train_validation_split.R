@@ -97,6 +97,6 @@ print.ml_train_validation_split_model <- function(x, ...) {
 }
 
 #' @export
-summary.ml_train_validation_split_model <- function(x, ...) {
-  print_tuning_summary(x, "tvs")
+summary.ml_train_validation_split_model <- function(object, ...) {
+  print_tuning_summary(object, "tvs")
 }

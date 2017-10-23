@@ -98,6 +98,6 @@ print.ml_cross_validator_model <- function(x, ...) {
 }
 
 #' @export
-summary.ml_cross_validator_model <- function(x, ...) {
-  print_tuning_summary(x, "cv")
+summary.ml_cross_validator_model <- function(object, ...) {
+  print_tuning_summary(object, "cv")
 }
