@@ -73,6 +73,7 @@ new_ml_train_validation_split_model <- function(jobj) {
     rlang::sym()
   new_ml_tuning_model(
     jobj,
+    train_ratio = invoke(jobj, "getTrainRatio"),
     metric_name = metric_name,
     validation_metrics = validation_metrics,
     validation_metrics_df = ml_get_estimator_param_maps(jobj) %>%
@@ -86,16 +87,16 @@ new_ml_train_validation_split_model <- function(jobj) {
 
 #' @export
 print.ml_train_validation_split <- function(x, ...) {
-  num_sets <- length(x$estimator_param_maps)
+  print_tuning_info(x, "tvs")
+}
 
-  ml_print_class(x)
-  ml_print_uid(x)
-  cat(paste0("  ", "Estimator: ", ml_short_type(x$estimator), " "))
-  ml_print_uid(x$estimator)
-  cat(paste0("  Evaluator: ", ml_short_type(x$evaluator), " "))
-  ml_print_uid(x$evaluator)
-  cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
-  cat("  Train Ratio:", x$train_ratio, "\n")
-  cat("  Tuning over", num_sets, "hyperparameter",
-      if (num_sets == 1) "set" else "sets")
+#' @export
+print.ml_train_validation_split_model <- function(x, ...) {
+  print_tuning_info(x, "tvs")
+  print_best_model(x)
+}
+
+#' @export
+summary.ml_train_validation_split_model <- function(x, ...) {
+  print_tuning_summary(x, "tvs")
 }
