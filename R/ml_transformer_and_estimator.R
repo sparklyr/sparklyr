@@ -2,14 +2,16 @@
 print.ml_transformer <- function(x, ...) {
   ml_print_class(x)
   ml_print_uid(x)
-  ml_print_input_output(x)
+  ml_print_column_name_params(x)
+  ml_print_transformer_info(x)
 }
 
 #' @export
 print.ml_estimator <- function(x, ...) {
   ml_print_class(x)
   ml_print_uid(x)
-  ml_print_input_output(x)
+  ml_print_column_name_params(x)
+  ml_print_params(x)
 }
 
 new_ml_transformer <- function(jobj, ..., subclass = NULL) {

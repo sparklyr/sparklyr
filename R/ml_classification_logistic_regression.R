@@ -302,17 +302,6 @@ print.ml_summary_logistic_regression <- function(x, ...) {
 }
 
 #' @export
-print.ml_logistic_regression_model <- function(x, ...) {
-  # coef_items <- if (x$num_classes > 2)
-  #   c("coefficient_matrix", "intercept_vector")
-  # else
-  #   c("coefficients", "intercept")
-  # items <- c(coef_items, "num_classes", "num_features", "threshold", "thresholds")
-
-  ml_print_model(x)
-}
-
-#' @export
 summary.ml_model_logistic_regression <- function(object, ...) {
   ml_model_print_call(object)
   print_newline()
