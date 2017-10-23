@@ -88,64 +88,16 @@ new_ml_cross_validator_model <- function(jobj) {
 
 #' @export
 print.ml_cross_validator <- function(x, ...) {
-  num_sets <- length(x$estimator_param_maps)
-
-  ml_print_class(x)
-  ml_print_uid(x)
-  cat(" (Tuning Info)\n")
-  cat(paste0("  Estimator: ", ml_short_type(x$estimator), "\n"))
-  cat(paste0("             "))
-  ml_print_uid(x$estimator)
-  cat(paste0("  Evaluator: ", ml_short_type(x$evaluator), "\n"))
-  cat(paste0("             "))
-  ml_print_uid(x$evaluator)
-  cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
-  cat("  Number of folds:", x$num_folds, "\n")
-  cat("  Tuning over", num_sets, "hyperparameter",
-      if (num_sets == 1) "set" else "sets")
+  print_tuning_info(x, "cv")
 }
 
 #' @export
 print.ml_cross_validator_model <- function(x, ...) {
-  num_sets <- length(x$estimator_param_maps)
-
-  ml_print_class(x)
-  ml_print_uid(x)
-  cat(" (Tuning Info)\n")
-  cat(paste0("  Estimator: ", ml_short_type(x$estimator), "\n"))
-  cat(paste0("             "))
-  ml_print_uid(x$estimator)
-  cat(paste0("  Evaluator: ", ml_short_type(x$evaluator), "\n"))
-  cat(paste0("             "))
-  ml_print_uid(x$evaluator)
-  cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
-  cat("  Number of folds:", x$num_folds, "\n")
-  cat("  Tuned over", num_sets, "hyperparameter",
-      if (num_sets == 1) "set" else "sets")
-  cat("\n (Best Model)\n")
-  best_model_output <- capture.output(print(x$best_model))
-  cat(paste0("  ", best_model_output), sep = "\n")
+  print_tuning_info(x, "cv")
+  print_best_model(x)
 }
 
 #' @export
 summary.ml_cross_validator_model <- function(x, ...) {
-  num_sets <- length(x$estimator_param_maps)
-
-  cat("Summary for ", ml_short_type(x), " ")
-  ml_print_uid(x)
-
-  cat(paste0("Tuned ", ml_short_type(x$estimator), "\n"))
-  cat(paste0("  with ", ml_param(x$evaluator, "metric_name"), "\n"))
-  cat(paste0("  over ", num_sets, " hyperparameter ",
-             if (num_sets == 1) "set" else "sets"), "\n")
-  cat("  via", paste0(x$num_folds, "-fold cross validation"), "\n\n")
-  cat(paste0("Estimator: ", ml_short_type(x$estimator), "\n"))
-  cat(paste0("           "))
-  ml_print_uid(x$estimator)
-  cat(paste0("Evaluator: ", ml_short_type(x$evaluator), "\n"))
-  cat(paste0("           "))
-  ml_print_uid(x$evaluator)
-  cat("\n")
-  cat(paste0("Results Summary:"), "\n")
-  print(x$avg_metrics_df)
+  print_tuning_summary(x, "cv")
 }

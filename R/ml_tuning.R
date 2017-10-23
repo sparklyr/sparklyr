@@ -213,3 +213,65 @@ new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
     ...,
     subclass = c(subclass, "ml_tuning_model"))
 }
+
+print_tuning_info <- function(x, type = c("cv", "tvs")) {
+  type <- match.arg(type)
+  num_sets <- length(x$estimator_param_maps)
+
+  ml_print_class(x)
+  ml_print_uid(x)
+  cat(" (Parameters -- Tuning)\n")
+  cat(paste0("  estimator: ", ml_short_type(x$estimator), "\n"))
+  cat(paste0("             "))
+  ml_print_uid(x$estimator)
+  cat(paste0("  evaluator: ", ml_short_type(x$evaluator), "\n"))
+  cat(paste0("             "))
+  ml_print_uid(x$evaluator)
+  cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
+  if (identical(type, "cv"))
+    cat("  num_folds:", x$num_folds, "\n")
+  else
+    cat("  train_ratio:", x$train_ratio, "\n")
+  cat("  [Tuned over", num_sets, "hyperparameter",
+      if (num_sets == 1) "set]" else "sets]")
+}
+
+print_best_model <- function(x) {
+  cat("\n (Best Model)\n")
+  best_model_output <- capture.output(print(x$best_model))
+  cat(paste0("  ", best_model_output), sep = "\n")
+}
+
+print_tuning_summary <- function(x, type = c("cv", "tvs")) {
+  type <- match.arg(type)
+  num_sets <- length(x$estimator_param_maps)
+
+  cat(paste0("Summary for ", ml_short_type(x)), "\n")
+  cat(paste0("            "))
+  ml_print_uid(x)
+  cat("\n")
+
+  cat(paste0("Tuned ", ml_short_type(x$estimator), "\n"))
+  cat(paste0("  with metric ", ml_param(x$evaluator, "metric_name"), "\n"))
+  cat(paste0("  over ", num_sets, " hyperparameter ",
+             if (num_sets == 1) "set" else "sets"), "\n")
+
+  if (identical(type, "cv"))
+    cat("  via", paste0(x$num_folds, "-fold cross validation"), "\n\n")
+  else
+    cat("  via", paste0(x$train_ratio, "/", 1 - x$train_ratio, " train-validation split"))
+
+  cat(paste0("Estimator: ", ml_short_type(x$estimator), "\n"))
+  cat(paste0("           "))
+  ml_print_uid(x$estimator)
+  cat(paste0("Evaluator: ", ml_short_type(x$evaluator), "\n"))
+  cat(paste0("           "))
+  ml_print_uid(x$evaluator)
+  cat("\n")
+
+  cat(paste0("Results Summary:"), "\n")
+  if (identical(type, "cv"))
+    print(x$avg_metrics_df)
+  else
+    print(x$validation_metrics_df)
+}
