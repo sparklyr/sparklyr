@@ -178,6 +178,8 @@ ml_create_mapping_tables <- function() {
     # tuning
     "CrossValidator" = "cross_validator",
     "CrossValidatorModel" = "cross_validator_model",
+    "TrainValidationSplit" = "train_validation_split",
+    "TrainValidationSplitModel" = "train_validation_split_model",
     # evaluation
     "BinaryClassificationEvaluator" = "binary_classification_evaluator",
     "MulticlassClassificationEvaluator" = "multiclass_classification_evaluator",
