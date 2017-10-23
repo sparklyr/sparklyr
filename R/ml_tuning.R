@@ -257,9 +257,10 @@ print_tuning_summary <- function(x, type = c("cv", "tvs")) {
              if (num_sets == 1) "set" else "sets"), "\n")
 
   if (identical(type, "cv"))
-    cat("  via", paste0(x$num_folds, "-fold cross validation"), "\n\n")
+    cat("  via", paste0(x$num_folds, "-fold cross validation"))
   else
     cat("  via", paste0(x$train_ratio, "/", 1 - x$train_ratio, " train-validation split"))
+  cat("\n\n")
 
   cat(paste0("Estimator: ", ml_short_type(x$estimator), "\n"))
   cat(paste0("           "))
