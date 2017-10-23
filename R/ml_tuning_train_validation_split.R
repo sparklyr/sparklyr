@@ -24,7 +24,7 @@ ml_train_validation_split.spark_connection <- function(
 
   train_ratio <- ensure_scalar_double(train_ratio)
 
-  ml_new_validator(x, "org.apache.spark.ml.tuning.TrainValidationSplit",
+  ml_new_validator(x, "org.apache.spark.ml.tuning.TrainValidationSplit", uid,
                    estimator, evaluator, estimator_param_maps, seed) %>%
     invoke("setTrainRatio", train_ratio) %>%
     new_ml_train_validation_split()

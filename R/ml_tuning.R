@@ -147,8 +147,10 @@ ml_get_estimator_param_maps <- function(jobj) {
 }
 
 ml_new_validator <- function(
-  sc, class, estimator, evaluator, estimator_param_maps, seed) {
+  sc, class, uid, estimator, evaluator, estimator_param_maps, seed) {
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
+
+  uid <- ensure_scalar_character(uid)
 
   if (!inherits(evaluator, "ml_evaluator"))
     stop("evaluator must be a 'ml_evaluator'")
@@ -175,7 +177,7 @@ ml_new_validator <- function(
     ml_build_param_maps() %>%
     lapply(ml_spark_param_map, sc, uid_stages)
 
-  jobj <- invoke_new(sc, class) %>%
+  jobj <- invoke_new(sc, class, uid) %>%
     (function(cv) invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
                                 cv, param_maps)) %>%
     invoke("setEstimator", spark_jobj(estimator)) %>%
@@ -202,6 +204,11 @@ new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
   # TODO move metrics here
   new_ml_transformer(
     jobj,
+    estimator = invoke(jobj, "getEstimator") %>%
+      ml_constructor_dispatch(),
+    evaluator = invoke(jobj, "getEvaluator") %>%
+      ml_constructor_dispatch(),
+    estimator_param_maps = ml_get_estimator_param_maps(jobj),
     best_model = ml_constructor_dispatch(invoke(jobj, "bestModel")),
     ...,
     subclass = c(subclass, "ml_tuning_model"))
