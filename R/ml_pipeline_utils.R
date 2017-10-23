@@ -1,6 +1,6 @@
 ml_add_stage <- function(x, transformer) {
   sc <- spark_connection(x)
-  stages <- if (rlang::is_na(x$stages)) list(spark_jobj(transformer)) else {
+  stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(transformer)) else {
     spark_jobj(x) %>%
       invoke("getStages") %>%
       c(spark_jobj(transformer))
@@ -8,7 +8,7 @@ ml_add_stage <- function(x, transformer) {
 
   jobj <- invoke_static(sc, "sparklyr.MLUtils",
                         "createPipelineFromStages",
-                        x$uid,
+                        ml_uid(x),
                         stages)
   new_ml_pipeline(jobj)
 }
