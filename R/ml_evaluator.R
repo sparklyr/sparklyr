@@ -252,8 +252,9 @@ spark_jobj.ml_evaluator <- function(x, ...) {
 print.ml_evaluator <- function(x, ...) {
   cat(ml_short_type(x), "(Evaluator) \n")
   cat(paste0("<", x$uid, ">"),"\n")
-  for (param in names(ml_param_map(x)))
-    cat("  ", param, ":", capture.output(str(ml_param(x, param))), "\n")
+  ml_print_column_name_params(x)
+  cat(" (Evaluation Metric)\n")
+  cat(paste0("  ", "metric_name: ", ml_param(x, "metric_name")))
 }
 
 #' Spark ML -- Evaluate prediction frames with evaluators
