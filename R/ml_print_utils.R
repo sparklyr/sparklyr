@@ -32,7 +32,7 @@ ml_print_transformer_info <- function(x) {
   items <- names(x) %>%
       setdiff(c("uid", "param_map", "summary", ".jobj")) %>%
       grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
-  if (length(items)) {
+  if (length(Filter(length, x[items]))) {
     cat(" (Transformer Info)\n")
     for (item in sort(items))
       if (!rlang::is_null(x[[item]]))

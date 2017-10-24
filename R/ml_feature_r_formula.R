@@ -105,7 +105,11 @@ new_ml_r_formula <- function(jobj) {
 }
 
 new_ml_r_formula_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_r_formula_model")
+  new_ml_transformer(jobj,
+                     formula = try_null(jobj %>%
+                                          invoke("parent") %>%
+                                          invoke("getFormula")),
+                     subclass = "ml_r_formula_model")
 }
 
 # Validator
