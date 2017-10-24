@@ -19,19 +19,14 @@
 #' @rdname ml_saveload
 #' @name   ml_saveload
 #' @export
-ml_load <- function(sc, file, meta = ml_load_meta(file)) {
+ml_load <- function(sc, file) {
   ensure_scalar_character(file)
   file <- path.expand(file)
 
-  # read the R metadata
-  r <- resolve_fn(meta, file)
-
-  # determine Model class name from fit object name
-  rModelName <- regex_replace(
-    r$model.parameters$model,
-    "Classifier$" = "Classification",
-    "Regressor$"  = "Regression"
-  )
+  #Read the R metadata
+  system(paste0("hdfs dfs -get ",paste0(file,"/metadata.rds ~/")))
+  r <- readRDS("~/metadata.rds")
+  rModelName <- r$model.parameters$model
 
   # read the Spark model
   modelName <- paste0(rModelName, "Model")
@@ -46,33 +41,25 @@ ml_load <- function(sc, file, meta = ml_load_meta(file)) {
 
 #' @rdname ml_saveload
 #' @export
-ml_save <- function(model, file, meta = ml_save_meta(model, file)) {
+ml_save <- function(model, file) {
   ensure_scalar_character(file)
   file <- path.expand(file)
-
+  
+  # Remove old copy in HDFS if exists
+  system(paste0("hdfs dfs -rm -r ",file))
+  
   # save the Spark bits
   invoke(model$.model, "save", file)
-
+  
   # save the R bits
   r <- model
   r$.model <- NULL
-  resolve_fn(meta, r, file)
+  saveRDS(r, "~/metadata.rds")
+  system(
+    paste("hdfs dfs -put -f ~/metadata.rds", file)
+  )
+  
+  system("rm ~/metadata.rds")
 
   file
-}
-
-ml_save_meta <- function(model, file) {
-  fn <- getOption("sparklyr.ml.save")
-  if (is.function(fn))
-    return(fn(model, file))
-
-  saveRDS(model, file = file.path(file, "metadata.rds"))
-}
-
-ml_load_meta <- function(file) {
-  fn <- getOption("sparklyr.ml.load")
-  if (is.function(fn))
-    return(fn(file))
-
-  readRDS(file.path(file, "metadata.rds"))
 }
