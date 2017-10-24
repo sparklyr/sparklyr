@@ -39,7 +39,7 @@ ml_print_transformer_info <- function(x) {
         if (rlang::is_atomic(x[[item]])) {
           cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")
         } else
-          cat(paste0("  ", item, ": <", class(x[[item]]), ">"), "\n")
+          cat(paste0("  ", item, ": <", class(x[[item]])[1], ">"), "\n")
   }
 }
 
