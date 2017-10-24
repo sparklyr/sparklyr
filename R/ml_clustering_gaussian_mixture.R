@@ -118,7 +118,10 @@ new_ml_gaussian_mixture_model <- function(jobj) {
   new_ml_clustering_model(
     jobj,
     gaussians = invoke(jobj, "gaussians"),
-    gaussians_df = invoke(jobj, "gaussiansDF") %>% sdf_register(),
+    gaussians_df = invoke(jobj, "gaussiansDF") %>%
+      sdf_register() %>%
+      collect() %>%
+      dplyr::mutate(cov = lapply(cov, read_spark_matrix)),
     weights = invoke(jobj, "weights"),
     summary = summary,
     subclass = "ml_gaussian_mixture_model")

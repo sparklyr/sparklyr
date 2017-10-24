@@ -29,3 +29,21 @@ test_that("ml_gaussian_mixture() default params are correct", {
     ml_params(predictor, names(args)),
     args)
 })
+
+test_that("ml_gaussian_mixture() works properly", {
+  sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_kmeans_data.txt", full.names = TRUE)
+  sample_data <- spark_read_libsvm(sc, "sample_data",
+                                   sample_data_path, overwrite = TRUE)
+
+  gmm <- ml_gaussian_mixture(sample_data, k = 2, seed = 1)
+
+  expect_equal(gmm$weights, c(0.5, 0.5))
+  expect_equal(gmm$gaussians_df %>% pull(mean),
+               list(c(0.1, 0.1, 0.1), c(9.1, 9.1, 9.1)))
+  expect_equal(gmm$gaussians_df %>% pull(cov),
+               list(matrix(rep(0.00666666667, 9), nrow = 3),
+                    matrix(rep(0.00666666667, 9), nrow = 3))
+  )
+
+
+})
