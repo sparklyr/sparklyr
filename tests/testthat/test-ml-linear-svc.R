@@ -30,3 +30,18 @@ test_that("ml_linear_svc() default params are correct", {
     ml_params(predictor, names(args)),
     args)
 })
+
+test_that("ml_linear_svc() runs", {
+  skip_if_not(spark_version(sc) >= "2.2.0")
+  iris_tbl2 <- testthat_tbl("iris") %>%
+    mutate(is_versicolor = ifelse(
+      Species == "versicolor", "versicolor", "other")) %>%
+    select(-Species)
+
+  expect_error(
+    ml_linear_svc(iris_tbl2, is_versicolor ~ .) %>%
+      sdf_predict(iris_tbl2) %>%
+      pull(predicted_label),
+    NA
+  )
+})
