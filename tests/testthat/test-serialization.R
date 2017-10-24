@@ -195,13 +195,13 @@ test_that("collect() can retrieve NULL data types as NAs", {
    "timestamp",     "POSIXct",
         "date",        "Date",
       "string",   "character",
-     "varchar",   "character",
-        "char",   "character"
+ "varchar(10)",   "character",
+    "char(10)",   "character"
   )
 
   spark_query <- hive_type %>%
     mutate(
-      query = paste0("cast(NULL as ", stype, ") as ", stype, "_col")
+      query = paste0("cast(NULL as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col")
     ) %>%
     pull(query) %>%
     paste(collapse = ", ") %>%
