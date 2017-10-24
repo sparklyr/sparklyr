@@ -34,6 +34,7 @@ Read from JDBC connection into a Spark DataFrame.
 Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_read_csv}},
   \code{\link{spark_read_json}},
+  \code{\link{spark_read_libsvm}},
   \code{\link{spark_read_parquet}},
   \code{\link{spark_read_source}},
   \code{\link{spark_read_table}},

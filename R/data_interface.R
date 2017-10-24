@@ -577,6 +577,30 @@ spark_read_jdbc <- function(sc,
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
+#' Read libsvm file into a Spark DataFrame.
+#'
+#' Read libsvm file into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_libsvm <- function(sc,
+                            name,
+                            path,
+                            repartition = 0,
+                            memory = TRUE,
+                            overwrite = TRUE,
+                            ...) {
+
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+
+  df <- spark_data_read_generic(sc, "libsvm", "format", options) %>%
+    invoke("load", spark_normalize_path(path))
+  spark_partition_register_df(sc, df, name, repartition, memory)
+}
+
 #' Read from a generic source into a Spark DataFrame.
 #'
 #' Read from a generic source into a Spark DataFrame.
