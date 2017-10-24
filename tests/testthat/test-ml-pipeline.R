@@ -64,3 +64,21 @@ test_that("ml_transformer.ml_pipeline() works as expected", {
   expect_equal(p1_params, p2_params)
   expect_equal(class(p2)[1], "ml_pipeline")
 })
+
+test_that("empty pipeline has no stages", {
+  expect_null(ml_pipeline(sc) %>% ml_stages())
+})
+
+test_that("pipeline printing works", {
+  output <- capture.output(ml_pipeline(sc))
+  expect_identical(output[1], "Pipeline (Estimator) with no stages")
+
+  output <- capture.output(ml_pipeline(ft_binarizer(sc, "in", "out")))
+  expect_identical(output[1], "Pipeline (Estimator) with 1 stage")
+
+  output <- capture.output(ml_pipeline(ft_binarizer(sc, "in", "out"), ml_logistic_regression(sc)))
+  expect_identical(output[1], "Pipeline (Estimator) with 2 stages")
+  expect_identical(output[4], "  |--1 Binarizer (Transformer)")
+  expect_identical(output[6], "  |     (Parameters -- Column Names)")
+  expect_identical(output[9], "  |--2 LogisticRegression (Estimator)")
+})
