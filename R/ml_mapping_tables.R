@@ -162,7 +162,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "OneVsRest" = "one_vs_rest",
     "OneVsRestModel" = "one_vs_rest_model",
     "LinearSVC" = "linear_svc",
-    "LinearSVCMOdel" = "linear_svc_model",
+    "LinearSVCModel" = "linear_svc_model",
     # recommendation
     "ALS" = "als",
     "ALSModel" = "als_model",
