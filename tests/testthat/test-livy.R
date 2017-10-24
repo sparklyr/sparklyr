@@ -6,7 +6,7 @@ test_that("'spark_version()' works under Livy connections", {
   lc <- testthat_livy_connection()
 
   version <- spark_version(lc)
-  expect_equal(version, numeric_version("2.1.0"))
+  expect_equal(version, numeric_version("2.2.0"))
 })
 
 test_that("'copy_to()' works under Livy connections", {
