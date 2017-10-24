@@ -36,25 +36,11 @@ ml_print_transformer_info <- function(x) {
     cat(" (Transformer Info)\n")
     for (item in sort(items))
       if (!rlang::is_null(x[[item]]))
-        cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")
+        if (rlang::is_atomic(x[[item]])) {
+          cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")
+        } else
+          cat(paste0("  ", item, ": <", class(x[[item]]), ">"), "\n")
   }
-}
-
-ml_print_items <- function(x, items = NULL) {
-  if (rlang::is_null(items))
-    items <- names(x) %>%
-      setdiff(c("uid", "param_map", "summary", ".jobj")) %>%
-      grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
-  for (item in sort(items))
-    if (!rlang::is_null(x[[item]]))
-      cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")
-}
-
-ml_print_model_summary <- function(x, items = NULL) {
-  ml_print_class(x)
-  items <- items %||% grep(".*(?<!col|cols)$", names(x), value = TRUE, perl = TRUE)
-  ml_print_items(x, items)
-  ml_print_column_name_params(x)
 }
 
 print_newline <- function() {
