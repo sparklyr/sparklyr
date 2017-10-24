@@ -11,3 +11,5 @@ set_option_default <- function(...) {
     sparklyr.na.action.verbose = TRUE
   )
 }
+
+utils::globalVariables(".")

@@ -241,10 +241,6 @@ print.ml_summary_linear_regression <- function(x, ...) {
     cat("  ", item, ":", capture.output(str(x[[item]])), "\n")
 }
 
-#' @export
-print.ml_linear_regression_model <- function(x, ...) {
-  ml_print_model(x, c("coefficients", "intercept", "num_features"))
-}
 
 #' @export
 summary.ml_model_linear_regression <- function(object, ...) {

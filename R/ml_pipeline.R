@@ -46,13 +46,13 @@ new_ml_pipeline <- function(jobj, ..., subclass = NULL) {
       lapply(ml_constructor_dispatch)
   },
   error = function(e) {
-    NA
+    NULL
   })
   new_ml_estimator(
     jobj,
     stages = stages,
-    stage_uids = if (rlang::is_na(stages))
-      NA
+    stage_uids = if (rlang::is_null(stages))
+      NULL
     else
       sapply(stages, function(x)
         x$uid),
@@ -67,7 +67,7 @@ new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
       invoke("stages")
   },
   error = function(e) {
-    NA
+    NULL
   })
 
   if (!rlang::is_na(stages))
@@ -76,8 +76,8 @@ new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
   new_ml_transformer(
     jobj,
     stages = stages,
-    stage_uids = if (rlang::is_na(stages))
-      NA
+    stage_uids = if (rlang::is_null(stages))
+      NULL
     else
       sapply(stages, function(x)
         x$uid),
@@ -101,38 +101,39 @@ spark_connection.ml_pipeline_model <- function(x, ...) {
   spark_connection(spark_jobj(x))
 }
 
-#' @export
-print.ml_pipeline <- function(x, ...) {
-  cat(paste0("Pipeline (Estimator) with "))
-  num_stages <- length(ml_stages(x))
-  if (num_stages == 1)
-    cat("1 stage \n")
+print_pipeline <- function(x, type = c("pipeline", "pipeline_model")) {
+  type <- match.arg(type)
+  if (identical(type, "pipeline"))
+    cat(paste0("Pipeline (Estimator) with "))
   else
-    cat(paste0(num_stages, " stages \n"))
+    cat(paste0("PipelineModel (Transformer) with "))
+  num_stages <- length(ml_stages(x))
+  if (num_stages == 0)
+    cat("no stages")
+  else if (num_stages == 1)
+    cat("1 stage")
+  else
+    cat(paste0(num_stages, " stages"))
+  cat("\n")
   cat(paste0("<", x$uid, ">"), "\n")
-  cat("  Stages", "\n")
-  for (n in seq_len(num_stages)) {
-    stage_output <- capture.output(print(ml_stage(x, n)))
-    cat(paste0("  |--", n, " ", stage_output[1]), sep = "\n")
-    cat(paste0("  |    ", stage_output[-1]), sep = "\n")
+  if (num_stages > 0) {
+    cat("  Stages", "\n")
+    for (n in seq_len(num_stages)) {
+      stage_output <- capture.output(print(ml_stage(x, n)))
+      cat(paste0("  |--", n, " ", stage_output[1]), sep = "\n")
+      cat(paste0("  |    ", stage_output[-1]), sep = "\n")
+    }
   }
 }
 
 #' @export
+print.ml_pipeline <- function(x, ...) {
+  print_pipeline(x, "pipeline")
+}
+
+#' @export
 print.ml_pipeline_model <- function(x, ...) {
-  cat(paste0("PipelineModel (Transformer) with "))
-  num_stages <- length(ml_stages(x))
-  if (num_stages == 1)
-    cat("1 stage \n")
-  else
-    cat(paste0(num_stages, " stages \n"))
-  cat(paste0("<", x$uid, ">"), "\n")
-  cat("  Stages", "\n")
-  for (n in seq_len(num_stages)) {
-    stage_output <- capture.output(print(ml_stage(x, n)))
-    cat(paste0("  |--", n, " ", stage_output[1]), sep = "\n")
-    cat(paste0("  |    ", stage_output[-1]), sep = "\n")
-  }
+  print_pipeline(x, "pipeline_model")
 }
 
 #' @export

@@ -3,7 +3,7 @@ package sparklyr
 import org.apache.spark.ml._
 import scala.util.{Try, Success, Failure}
 import org.apache.spark.ml.param._
-import org.apache.spark.ml.tuning.CrossValidator
+import org.apache.spark.ml.tuning._
 import org.apache.spark.ml.param.Params
 
 object MLUtils {
@@ -76,5 +76,9 @@ object MLUtils {
 
   def setParamMaps(cv: CrossValidator, paramMaps: ParamMap*): CrossValidator = {
     cv.setEstimatorParamMaps(paramMaps.toArray)
+  }
+
+  def setParamMaps(tvs: TrainValidationSplit, paramMaps: ParamMap*): TrainValidationSplit = {
+    tvs.setEstimatorParamMaps(paramMaps.toArray)
   }
 }

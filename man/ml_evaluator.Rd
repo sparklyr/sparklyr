@@ -10,19 +10,22 @@
 \title{Spark ML - Evaluators}
 \usage{
 ml_binary_classification_evaluator(x, label_col = "label",
-  raw_prediction_col = "rawPrediction", metric_name = "areaUnderROC")
+  raw_prediction_col = "rawPrediction", metric_name = "areaUnderROC",
+  uid = random_string("binary_classification_evaluator_"), ...)
 
 ml_binary_classification_eval(x, label_col = "label",
-  prediction_col = "prediction", metric_name = "f1")
+  prediction_col = "prediction", metric_name = "areaUnderROC")
 
 ml_multiclass_classification_evaluator(x, label_col = "label",
-  prediction_col = "prediction", metric_name = "f1")
+  prediction_col = "prediction", metric_name = "f1",
+  uid = random_string("multiclass_classification_evaluator_"), ...)
 
 ml_classification_eval(x, label_col = "label",
   prediction_col = "prediction", metric_name = "f1")
 
 ml_regression_evaluator(x, label_col = "label",
-  prediction_col = "prediction", metric_name = "rmse")
+  prediction_col = "prediction", metric_name = "rmse",
+  uid = random_string("regression_evaluator_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}}.}
@@ -32,6 +35,10 @@ ml_regression_evaluator(x, label_col = "label",
 \item{raw_prediction_col}{Name of column contains the scored probability of a success}
 
 \item{metric_name}{The performance metric. See details.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
 
 \item{prediction_col}{Name of the column that contains the predicted
 label or value NOT the scored probability. Column should be of type

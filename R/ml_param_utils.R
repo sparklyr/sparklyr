@@ -59,9 +59,9 @@ ml_set_param <- function(x, param, value, ...) {
   # TODO: consider exporting and implementing ml_set_params()
   setter <- param %>%
     ml_map_param_names(direction = "rs") %>%
-    (function(x) paste0("set",
-                        toupper(substr(x, 1, 1)),
-                        substr(x, 2, nchar(x))))
+    {paste0("set",
+           toupper(substr(., 1, 1)),
+           substr(., 2, nchar(.)))}
   spark_jobj(x) %>%
     invoke(setter, value) %>%
     ml_constructor_dispatch()

@@ -1,4 +1,4 @@
-ml_create_mapping_tables <- function() {
+ml_create_mapping_tables <- function() { # nocov start
   param_mapping_list <-
     list("input_col" = "inputCol",
          "output_col" = "outputCol",
@@ -178,6 +178,8 @@ ml_create_mapping_tables <- function() {
     # tuning
     "CrossValidator" = "cross_validator",
     "CrossValidatorModel" = "cross_validator_model",
+    "TrainValidationSplit" = "train_validation_split",
+    "TrainValidationSplitModel" = "train_validation_split_model",
     # evaluation
     "BinaryClassificationEvaluator" = "binary_classification_evaluator",
     "MulticlassClassificationEvaluator" = "multiclass_classification_evaluator",
@@ -201,4 +203,4 @@ ml_create_mapping_tables <- function() {
   rlang::ll(param_mapping_r_to_s = param_mapping_r_to_s,
             param_mapping_s_to_r = param_mapping_s_to_r,
             ml_class_mapping = ml_class_mapping)
-}
+} # nocov end

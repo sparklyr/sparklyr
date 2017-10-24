@@ -24,7 +24,7 @@ ml_cross_validator.spark_connection <- function(
 
   num_folds <- ensure_scalar_integer(num_folds)
 
-  ml_new_validator(x, "org.apache.spark.ml.tuning.CrossValidator",
+  ml_new_validator(x, "org.apache.spark.ml.tuning.CrossValidator", uid,
                    estimator, evaluator, estimator_param_maps, seed) %>%
     invoke("setNumFolds", num_folds) %>%
     new_ml_cross_validator()
@@ -74,6 +74,7 @@ new_ml_cross_validator_model <- function(jobj) {
 
   new_ml_tuning_model(
     jobj,
+    num_folds = invoke(jobj, "getNumFolds"),
     metric_name = metric_name,
     avg_metrics = avg_metrics,
     avg_metrics_df = ml_get_estimator_param_maps(jobj) %>%
@@ -87,16 +88,16 @@ new_ml_cross_validator_model <- function(jobj) {
 
 #' @export
 print.ml_cross_validator <- function(x, ...) {
-  num_sets <- length(x$estimator_param_maps)
+  print_tuning_info(x, "cv")
+}
 
-  ml_print_class(x)
-  ml_print_uid(x)
-  cat(paste0("  ", "Estimator: ", ml_short_type(x$estimator), " "))
-  ml_print_uid(x$estimator)
-  cat(paste0("  Evaluator: ", ml_short_type(x$evaluator), " "))
-  ml_print_uid(x$evaluator)
-  cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
-  cat("  Number of folds:", x$num_folds, "\n")
-  cat("  Tuning over", num_sets, "hyperparameter",
-      if (num_sets == 1) "set" else "sets")
+#' @export
+print.ml_cross_validator_model <- function(x, ...) {
+  print_tuning_info(x, "cv")
+  print_best_model(x)
+}
+
+#' @export
+summary.ml_cross_validator_model <- function(object, ...) {
+  print_tuning_summary(object, "cv")
 }

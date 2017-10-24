@@ -44,7 +44,7 @@ ml_expand_params <- function(param_grid) {
         expand.grid(stringsAsFactors = FALSE) %>%
         apply(1, list) %>%
         rlang::flatten() %>%
-        lapply(function(x) x %>%
+        lapply(. %>%
                  unname() %>%
                  rlang::flatten())
     })
@@ -59,9 +59,6 @@ ml_validate_params <- function(stages_params, uid_stages, current_param_list) {
     lapply(function(stage_name) {
       stage_jobj <- uid_stages %>%
         `[[`(stage_uids[stage_name])
-      # %>%
-      #   jobj_class(simple_name = FALSE) %>%
-      #   dplyr::first()
       lapply(stages_params[[stage_name]], function(params) {
         args_to_validate <- ml_args_to_validate(
           args = params,
@@ -147,8 +144,10 @@ ml_get_estimator_param_maps <- function(jobj) {
 }
 
 ml_new_validator <- function(
-  sc, class, estimator, evaluator, estimator_param_maps, seed) {
+  sc, class, uid, estimator, evaluator, estimator_param_maps, seed) {
   seed <- ensure_scalar_integer(seed, allow.null = TRUE)
+
+  uid <- ensure_scalar_character(uid)
 
   if (!inherits(evaluator, "ml_evaluator"))
     stop("evaluator must be a 'ml_evaluator'")
@@ -160,7 +159,7 @@ ml_new_validator <- function(
                   "sparklyr.MLUtils",
                   "uidStagesMapping",
                   spark_jobj(estimator)) else
-    rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
+                    rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
 
   current_param_list <- uid_stages %>%
     lapply(invoke, "extractParamMap") %>%
@@ -175,9 +174,9 @@ ml_new_validator <- function(
     ml_build_param_maps() %>%
     lapply(ml_spark_param_map, sc, uid_stages)
 
-  jobj <- invoke_new(sc, class) %>%
-    (function(cv) invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
-                                cv, param_maps)) %>%
+  jobj <- invoke_new(sc, class, uid) %>%
+    invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
+                  ., param_maps) %>%
     invoke("setEstimator", spark_jobj(estimator)) %>%
     invoke("setEvaluator", spark_jobj(evaluator))
 
@@ -202,7 +201,75 @@ new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
   # TODO move metrics here
   new_ml_transformer(
     jobj,
+    estimator = invoke(jobj, "getEstimator") %>%
+      ml_constructor_dispatch(),
+    evaluator = invoke(jobj, "getEvaluator") %>%
+      ml_constructor_dispatch(),
+    estimator_param_maps = ml_get_estimator_param_maps(jobj),
     best_model = ml_constructor_dispatch(invoke(jobj, "bestModel")),
     ...,
     subclass = c(subclass, "ml_tuning_model"))
+}
+
+print_tuning_info <- function(x, type = c("cv", "tvs")) {
+  type <- match.arg(type)
+  num_sets <- length(x$estimator_param_maps)
+
+  ml_print_class(x)
+  ml_print_uid(x)
+  cat(" (Parameters -- Tuning)\n")
+  cat(paste0("  estimator: ", ml_short_type(x$estimator), "\n"))
+  cat(paste0("             "))
+  ml_print_uid(x$estimator)
+  cat(paste0("  evaluator: ", ml_short_type(x$evaluator), "\n"))
+  cat(paste0("             "))
+  ml_print_uid(x$evaluator)
+  cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
+  if (identical(type, "cv"))
+    cat("  num_folds:", x$num_folds, "\n")
+  else
+    cat("  train_ratio:", x$train_ratio, "\n")
+  cat("  [Tuned over", num_sets, "hyperparameter",
+      if (num_sets == 1) "set]" else "sets]")
+}
+
+print_best_model <- function(x) {
+  cat("\n (Best Model)\n")
+  best_model_output <- capture.output(print(x$best_model))
+  cat(paste0("  ", best_model_output), sep = "\n")
+}
+
+print_tuning_summary <- function(x, type = c("cv", "tvs")) {
+  type <- match.arg(type)
+  num_sets <- length(x$estimator_param_maps)
+
+  cat(paste0("Summary for ", ml_short_type(x)), "\n")
+  cat(paste0("            "))
+  ml_print_uid(x)
+  cat("\n")
+
+  cat(paste0("Tuned ", ml_short_type(x$estimator), "\n"))
+  cat(paste0("  with metric ", ml_param(x$evaluator, "metric_name"), "\n"))
+  cat(paste0("  over ", num_sets, " hyperparameter ",
+             if (num_sets == 1) "set" else "sets"), "\n")
+
+  if (identical(type, "cv"))
+    cat("  via", paste0(x$num_folds, "-fold cross validation"))
+  else
+    cat("  via", paste0(x$train_ratio, "/", 1 - x$train_ratio, " train-validation split"))
+  cat("\n\n")
+
+  cat(paste0("Estimator: ", ml_short_type(x$estimator), "\n"))
+  cat(paste0("           "))
+  ml_print_uid(x$estimator)
+  cat(paste0("Evaluator: ", ml_short_type(x$evaluator), "\n"))
+  cat(paste0("           "))
+  ml_print_uid(x$evaluator)
+  cat("\n")
+
+  cat(paste0("Results Summary:"), "\n")
+  if (identical(type, "cv"))
+    print(x$avg_metrics_df)
+  else
+    print(x$validation_metrics_df)
 }

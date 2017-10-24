@@ -75,7 +75,7 @@ ml_predict.ml_model_regression <- function(x, dataset, ...) {
   cols <- x$model %>%
     ml_params(c("prediction_col", "variance_col"),
               allow_null = TRUE) %>%
-    (function(x) Filter(length, x)) %>%
+    Filter(length, .) %>%
     unlist(use.names = FALSE)
 
   x$pipeline_model %>%
@@ -98,7 +98,7 @@ ml_predict.ml_model_classification <- function(
   cols <- x$model %>%
     ml_params(c("prediction_col", "probability_col", "raw_prediction_col"),
               allow_null = TRUE) %>%
-    (function(x) Filter(length, x)) %>%
+    Filter(length, .) %>%
     unlist(use.names = FALSE)
 
   predictions <- x$pipeline_model %>%

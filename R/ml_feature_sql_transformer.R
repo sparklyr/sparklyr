@@ -59,7 +59,7 @@ ft_extract_sql <- function(x) {
                        x[["ops"]][["x"]][1],
                        "`")
   dbplyr::sql_render(x) %>%
-    (function(x) gsub(table_name, "__THIS__", x))
+    gsub(table_name, "__THIS__", .)
 }
 
 #' @rdname sql-transformer
