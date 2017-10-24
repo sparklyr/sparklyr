@@ -59,9 +59,6 @@ ml_validate_params <- function(stages_params, uid_stages, current_param_list) {
     lapply(function(stage_name) {
       stage_jobj <- uid_stages %>%
         `[[`(stage_uids[stage_name])
-      # %>%
-      #   jobj_class(simple_name = FALSE) %>%
-      #   dplyr::first()
       lapply(stages_params[[stage_name]], function(params) {
         args_to_validate <- ml_args_to_validate(
           args = params,
