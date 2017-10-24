@@ -8,7 +8,7 @@ testthat_spark_connection <- function(version = NULL) {
 
   if (nrow(spark_installed_versions()) == 0) {
     options(sparkinstall.verbose = TRUE)
-    spark_install("2.1.0")
+    spark_install("2.2.0")
   }
 
   expect_gt(nrow(spark_installed_versions()), 0)
@@ -29,7 +29,7 @@ testthat_spark_connection <- function(version = NULL) {
     options(sparklyr.na.action.verbose = TRUE)
 
     version <- ifelse(is.null(version),
-                      Sys.getenv("SPARK_VERSION", unset = "2.1.0"), version)
+                      Sys.getenv("SPARK_VERSION", unset = "2.2.0"), version)
 
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version, config = config)
@@ -111,11 +111,11 @@ testthat_livy_connection <- function(version = NULL) {
   }
 
   if (nrow(spark_installed_versions()) == 0) {
-    spark_install("2.1.0")
+    spark_install("2.2.0")
   }
 
   if (nrow(livy_installed_versions()) == 0) {
-    livy_install("0.3.0", spark_version = "2.1.0")
+    livy_install("0.3.0", spark_version = "2.2.0")
   }
 
   expect_gt(nrow(livy_installed_versions()), 0)
@@ -130,7 +130,7 @@ testthat_livy_connection <- function(version = NULL) {
   if (!connected) {
     livy_service_start(
       version = "0.3.0",
-      spark_version = "2.1.0",
+      spark_version = "2.2.0",
       stdout = FALSE,
       stderr = FALSE)
 
