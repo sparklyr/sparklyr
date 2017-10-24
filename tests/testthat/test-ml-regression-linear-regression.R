@@ -1,4 +1,4 @@
-context("ml linear regression")
+context("ml regression - linear regression")
 sc <- testthat_spark_connection()
 
 expect_coef_equal <- function(lhs, rhs) {

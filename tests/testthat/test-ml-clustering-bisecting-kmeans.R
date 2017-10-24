@@ -1,4 +1,4 @@
-context("ml bisecting kmeans")
+context("ml clustering - bisecting kmeans")
 
 sc <- testthat_spark_connection()
 test_requires("dplyr")

@@ -1,4 +1,4 @@
-context("ml one vs rest")
+context("ml classification - one vs rest")
 
 sc <- testthat_spark_connection()
 

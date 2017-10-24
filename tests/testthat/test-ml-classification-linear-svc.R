@@ -1,4 +1,4 @@
-context("ml linear svc")
+context("ml classification - linear svc")
 
 sc <- testthat_spark_connection()
 

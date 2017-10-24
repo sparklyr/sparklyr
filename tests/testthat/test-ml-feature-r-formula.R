@@ -1,4 +1,4 @@
-context("r formula")
+context("ml feature - r formula")
 
 sc <- testthat_spark_connection()
 

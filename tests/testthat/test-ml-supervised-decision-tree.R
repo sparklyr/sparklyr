@@ -1,4 +1,4 @@
-context("ml decision tree")
+context("ml supervised - decision tree")
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")

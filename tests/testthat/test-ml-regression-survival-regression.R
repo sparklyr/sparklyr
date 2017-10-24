@@ -1,4 +1,4 @@
-context("ml aft survival regression")
+context("ml regression - aft survival regression")
 
 sc <- testthat_spark_connection()
 

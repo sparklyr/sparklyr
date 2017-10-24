@@ -1,4 +1,4 @@
-context("ml gradient boosted trees")
+context("ml supervised - gradient boosted trees")
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")

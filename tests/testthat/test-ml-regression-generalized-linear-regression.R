@@ -1,4 +1,4 @@
-context("glm")
+context("ml regression - glm")
 
 sc <- testthat_spark_connection()
 

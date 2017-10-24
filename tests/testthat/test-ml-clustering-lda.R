@@ -1,4 +1,4 @@
-context("ml lda")
+context("ml clustering - lda")
 
 sc <- testthat_spark_connection()
 

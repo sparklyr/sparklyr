@@ -1,4 +1,4 @@
-context("ml naive bayes")
+context("ml classification - naive bayes")
 
 sc <- testthat_spark_connection()
 

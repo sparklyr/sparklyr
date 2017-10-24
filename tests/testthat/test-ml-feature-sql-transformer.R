@@ -1,4 +1,4 @@
-context("ml sql transformer")
+context("ml feature - sql transformer")
 
 sc <- testthat_spark_connection()
 

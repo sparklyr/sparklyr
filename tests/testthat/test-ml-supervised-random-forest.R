@@ -1,4 +1,4 @@
-context("ml random forest")
+context("ml supervised - random forest")
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")

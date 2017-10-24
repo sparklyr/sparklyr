@@ -1,4 +1,4 @@
-context("feature - pca")
+context("ml feature - pca")
 
 sc <- testthat_spark_connection()
 

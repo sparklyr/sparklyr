@@ -1,4 +1,4 @@
-context("ml multilayer perceptron")
+context("ml classification - multilayer perceptron")
 
 sc <- testthat_spark_connection()
 

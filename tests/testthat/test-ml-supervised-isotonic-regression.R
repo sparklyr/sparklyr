@@ -1,4 +1,4 @@
-context("ml isotonic regression")
+context("ml regression - isotonic regression")
 
 sc <- testthat_spark_connection()
 

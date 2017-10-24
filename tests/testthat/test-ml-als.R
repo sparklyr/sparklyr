@@ -1,4 +1,4 @@
-context("ml als")
+context("ml recommendation - als")
 
 sc <- testthat_spark_connection()
 
