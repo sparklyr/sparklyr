@@ -18,7 +18,8 @@ NULL
 #' @rdname ml-persistence
 #' @export
 ml_save <- function(x, path, overwrite = FALSE, ...) {
-  path <- ensure_scalar_character(path)
+  path <- ensure_scalar_character(path) %>%
+    spark_normalize_path()
   overwrite <- ensure_scalar_boolean(overwrite)
 
   ml_writer <- spark_jobj(x) %>%
@@ -37,6 +38,9 @@ ml_save <- function(x, path, overwrite = FALSE, ...) {
 #' @rdname ml-persistence
 #' @export
 ml_load <- function(sc, path) {
+  path <- ensure_scalar_character(path) %>%
+    spark_normalize_path()
+
   class <- paste0(path, "/metadata/part-00000") %>%
     jsonlite::read_json() %>%
     `[[`("class")
