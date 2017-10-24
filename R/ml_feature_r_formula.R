@@ -117,7 +117,7 @@ new_ml_r_formula_model <- function(jobj) {
 ml_validator_r_formula <- function(args, nms) {
   args %>%
     ml_validate_args({
-      if (is.formula(formula))
+      if (rlang::is_formula(formula))
         formula <- rlang::expr_text(args$formula, width = 500L)
       formula <- ensure_scalar_character(formula)
       features_col <- ensure_scalar_character(features_col)
