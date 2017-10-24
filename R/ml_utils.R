@@ -70,8 +70,8 @@ read_spark_vector <- function(jobj, field) {
   invoke(object, "toArray")
 }
 
-read_spark_matrix <- function(jobj, field) {
-  object <- invoke(jobj, field)
+read_spark_matrix <- function(jobj, field = NULL) {
+  object <- if (rlang::is_null(field)) jobj else invoke(jobj, field)
   nrow <- invoke(object, "numRows")
   ncol <- invoke(object, "numCols")
   data <- invoke(object, "toArray")
