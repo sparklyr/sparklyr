@@ -147,14 +147,14 @@ test_that("collect() can retrieve all data types correctly", {
     "timestamp",     "1",   "POSIXct",     rtime,
     "date",        sdate,      "Date",     rdate,
     "string",          1, "character",       "1",
-    "varchar",         1, "character",       "1",
-    "char",            1, "character",       "1",
+    "varchar(10)",     1, "character",       "1",
+    "char(10)",        1, "character",       "1",
     "boolean",    "true",   "logical",    "TRUE"
   )
 
   spark_query <- hive_type %>%
     mutate(
-      query = paste0("cast(", svalue, " as ", stype, ") as ", stype, "_col")
+      query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col")
     ) %>%
     pull(query) %>%
     paste(collapse = ", ") %>%
