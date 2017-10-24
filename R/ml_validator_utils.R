@@ -38,8 +38,8 @@ ml_args_to_validate <- function(args, current_args, default_args = current_args)
 ml_ratify_args <- function(env = rlang::caller_env(2)) {
   caller_frame <- rlang::caller_frame()
   validator_fn <- caller_frame$fn_name %>%
-    (function(x) gsub("^(ml_|ft_)", "ml_validator_", x)) %>%
-    (function(x) gsub("\\..*$", "", x))
+    gsub("^(ml_|ft_)", "ml_validator_", .) %>%
+    gsub("\\..*$", "", .)
   args <- caller_frame %>%
     rlang::lang_standardise() %>%
     rlang::lang_args()
@@ -105,12 +105,10 @@ ml_validate_args <- function(
   validations <- rlang::enexpr(expr)
 
   data <- names(args) %>%
-    (function(x) setdiff(x, mapping_list %>%
-                           `[`(intersect(names(mapping_list), x)))
-    ) %>%
-    (function(x) args[x]) %>%
-    (function(x) rlang::set_names(
-      x, mapply(`%||%`, mapping_list[names(x)], names(x)))
+    setdiff(mapping_list[intersect(names(mapping_list), .)]) %>%
+    args[.] %>%
+    rlang::set_names(
+      mapply(`%||%`, mapping_list[names(.)], names(.))
     )
 
   rlang::invoke(within,

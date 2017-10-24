@@ -44,7 +44,7 @@ ml_expand_params <- function(param_grid) {
         expand.grid(stringsAsFactors = FALSE) %>%
         apply(1, list) %>%
         rlang::flatten() %>%
-        lapply(function(x) x %>%
+        lapply(. %>%
                  unname() %>%
                  rlang::flatten())
     })
@@ -162,7 +162,7 @@ ml_new_validator <- function(
                   "sparklyr.MLUtils",
                   "uidStagesMapping",
                   spark_jobj(estimator)) else
-    rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
+                    rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
 
   current_param_list <- uid_stages %>%
     lapply(invoke, "extractParamMap") %>%
@@ -178,8 +178,8 @@ ml_new_validator <- function(
     lapply(ml_spark_param_map, sc, uid_stages)
 
   jobj <- invoke_new(sc, class, uid) %>%
-    (function(cv) invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
-                                cv, param_maps)) %>%
+    invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
+                  ., param_maps) %>%
     invoke("setEstimator", spark_jobj(estimator)) %>%
     invoke("setEvaluator", spark_jobj(evaluator))
 

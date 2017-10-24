@@ -14,7 +14,7 @@ ml_print_column_name_params <- function(x) {
   cat(" (Parameters -- Column Names)\n")
   out_names <- ml_param_map(x) %>%
     names() %>%
-    (function(x) grep("col|cols$", x, value = TRUE))
+    grep("col|cols$", ., value = TRUE)
   for (param in sort(out_names))
     cat(paste0("  ", param, ": ", ml_param(x, param), "\n"))
 }
@@ -23,7 +23,7 @@ ml_print_params <- function(x) {
   cat(" (Parameters)\n")
   out_names <- ml_param_map(x) %>%
     names() %>%
-    (function(nms) grep(".*(?<!col|cols)$", nms, value = TRUE, perl = TRUE))
+    grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
   for (param in sort(out_names))
     cat(paste0("  ", param, ": ", ml_param(x, param), "\n"))
 }
@@ -31,7 +31,7 @@ ml_print_params <- function(x) {
 ml_print_transformer_info <- function(x) {
   items <- names(x) %>%
       setdiff(c("uid", "param_map", "summary", ".jobj")) %>%
-      (function(nms) grep(".*(?<!col|cols)$", nms, value = TRUE, perl = TRUE))
+      grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
   if (length(items)) {
     cat(" (Transformer Info)\n")
     for (item in sort(items))
@@ -44,7 +44,7 @@ ml_print_items <- function(x, items = NULL) {
   if (rlang::is_null(items))
     items <- names(x) %>%
       setdiff(c("uid", "param_map", "summary", ".jobj")) %>%
-      (function(nms) grep(".*(?<!col|cols)$", nms, value = TRUE, perl = TRUE))
+      grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
   for (item in sort(items))
     if (!rlang::is_null(x[[item]]))
       cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")

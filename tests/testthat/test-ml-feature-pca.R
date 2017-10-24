@@ -2,7 +2,7 @@ context("feature - pca")
 
 sc <- testthat_spark_connection()
 
-mat <- data_frame(
+mat <- dplyr::data_frame(
   V1 = c(0, 2, 4),
   V2 = c(1, 0, 0),
   V3 = c(0, 3, 0),
