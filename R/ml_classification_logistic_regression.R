@@ -289,19 +289,6 @@ print.ml_model_logistic_regression <- function(x, ...) {
 }
 
 #' @export
-print.ml_summary_logistic_regression <- function(x, ...) {
-  cat(ml_short_type(x), "\n")
-  out_list <- list(
-    area_under_roc = x$area_under_roc,
-    features_col = x$features_col,
-    label_col = x$label_col,
-    probability_col = x$probability_col
-  )
-  for (item in names(out_list))
-    cat("  ", item, ":", capture.output(str(out_list[[item]])), "\n")
-}
-
-#' @export
 summary.ml_model_logistic_regression <- function(object, ...) {
   ml_model_print_call(object)
   print_newline()

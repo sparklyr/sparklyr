@@ -231,18 +231,6 @@ print.ml_model_linear_regression <- function(x, ...) {
 }
 
 #' @export
-print.ml_summary_linear_regression <- function(x, ...) {
-  cat(ml_short_type(x), "\n")
-  item_names <- names(x) %>%
-    setdiff(c("uid", "predictions", "residuals")) %>%
-    setdiff(if (!identical(x$.solver, "normal"))
-      c("coefficient_standard_errors", "p_values", "t_values") else NULL)
-  for (item in names(item_names))
-    cat("  ", item, ":", capture.output(str(x[[item]])), "\n")
-}
-
-
-#' @export
 summary.ml_model_linear_regression <- function(object, ...) {
 
   ml_model_print_call(object)
