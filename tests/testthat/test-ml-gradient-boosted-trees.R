@@ -142,6 +142,7 @@ test_that("thresholds parameter behaves as expected", {
 })
 
 test_that("informative error when using Spark version that doesn't support thresholds", {
+  if (spark_version(sc) >= "2.2.0") skip("not applicable, threshold is supported")
   expect_error(
     iris_tbl %>%
       filter(Species != "setosa") %>%
