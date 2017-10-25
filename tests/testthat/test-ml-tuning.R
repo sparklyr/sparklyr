@@ -56,3 +56,57 @@ test_that("ml_cross_validator() works correctly", {
     c("ml_cross_validator", "ml_tuning", "ml_estimator", "ml_pipeline_stage")
   )
 })
+
+test_that("we can cross validate a logistic regression", {
+  iris_tbl <- testthat_tbl("iris")
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl) %>%
+    ml_logistic_regression(sc)
+
+  grid <- list(
+    logistic = list(
+      reg_param = c(0, 0.01),
+      elastic_net_param = c(0, 0.01)
+    )
+  )
+  cvm <- ml_cross_validator(iris_tbl, estimator = pipeline, estimator_param_maps = grid,
+                     evaluator = ml_multiclass_classification_evaluator(sc),
+                     seed = 1)
+
+  expect_identical(names(cvm$avg_metrics_df),
+               c("f1", "elastic_net_param_S1", "reg_param_S1"))
+  expect_identical(nrow(cvm$avg_metrics_df), 4L)
+  summary_string <- capture.output(summary(cvm)) %>%
+    paste0(collapse = "\n")
+
+  expect_match(summary_string,
+               "3-fold cross validation")
+})
+
+test_that("we can train a regression with train-validation-split", {
+  iris_tbl <- testthat_tbl("iris")
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl) %>%
+    ml_logistic_regression(sc)
+
+  grid <- list(
+    logistic = list(
+      reg_param = c(0, 0.01),
+      elastic_net_param = c(0, 0.01)
+    )
+  )
+  tvsm <- ml_train_validation_split(iris_tbl, estimator = pipeline, estimator_param_maps = grid,
+                            evaluator = ml_multiclass_classification_evaluator(sc),
+                            seed = 1)
+
+  expect_identical(names(tvsm$validation_metrics_df),
+                   c("f1", "elastic_net_param_S1", "reg_param_S1"))
+  expect_identical(nrow(tvsm$validation_metrics_df), 4L)
+  summary_string <- capture.output(summary(tvsm)) %>%
+    paste0(collapse = "\n")
+
+  expect_match(summary_string,
+               "0\\.75/0\\.25 train-validation split")
+})
