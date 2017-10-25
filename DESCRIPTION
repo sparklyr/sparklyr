@@ -4,6 +4,7 @@ Title: R Interface to Apache Spark
 Version: 0.7.0-9100
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
+    person("Kevin", "Kuo", role = "aut", email = "kevin.kuo@rstudio.com"),
     person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
     person("JJ", "Allaire", role = "aut", email = "jj@rstudio.com"),
     person(family = "RStudio", role = c("cph")),
