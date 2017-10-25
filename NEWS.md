@@ -1,6 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
-- Various ML improvements, including support for pipelines, additional algorithms, hyper-parameter tuning, and better model persistence.
+- Various ML improvements, including support for pipelines, additional algorithms,
+  hyper-parameter tuning, and better model persistence.
 
 - Added `spark_read_libsvm()` for reading libsvm files.
 
