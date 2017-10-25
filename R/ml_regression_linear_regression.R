@@ -235,7 +235,7 @@ summary.ml_model_linear_regression <- function(object, ...) {
 
   ml_model_print_call(object)
   print_newline()
-  ml_model_print_residuals(object, residuals.header = "Deviance Residuals:")
+  ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
   print_newline()
   ml_model_print_coefficients_detailed(object)
   print_newline()

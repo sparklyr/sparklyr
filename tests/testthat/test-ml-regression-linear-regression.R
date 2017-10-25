@@ -127,3 +127,17 @@ test_that("weights column works for lm", {
                             weights.column = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)))
 })
+
+test_that("ml_linear_regression print methods work", {
+  iris_tbl <- testthat_tbl("iris")
+  print_output <- ml_linear_regression(
+    iris_tbl, Petal_Length ~ Petal_Width) %>%
+    capture.output()
+  expect_equal(print_output[6], "(Intercept) Petal_Width ")
+
+  summary_output <- capture.output(summary(ml_linear_regression(
+    iris_tbl, Petal_Length ~ Petal_Width)))
+
+  expect_equal(summary_output[8], "(Intercept) Petal_Width ")
+  expect_match(summary_output[11], "R-Squared")
+})
