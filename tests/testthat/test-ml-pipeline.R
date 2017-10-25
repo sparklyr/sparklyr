@@ -70,13 +70,13 @@ test_that("empty pipeline has no stages", {
 })
 
 test_that("pipeline printing works", {
-  output <- capture.output(ml_pipeline(sc))
+  output <- capture.output(print(ml_pipeline(sc)))
   expect_identical(output[1], "Pipeline (Estimator) with no stages")
 
-  output <- capture.output(ml_pipeline(ft_binarizer(sc, "in", "out")))
+  output <- capture.output(print(ml_pipeline(ft_binarizer(sc, "in", "out"))))
   expect_identical(output[1], "Pipeline (Estimator) with 1 stage")
 
-  output <- capture.output(ml_pipeline(ft_binarizer(sc, "in", "out"), ml_logistic_regression(sc)))
+  output <- capture.output(print(ml_pipeline(ft_binarizer(sc, "in", "out"), ml_logistic_regression(sc))))
   expect_identical(output[1], "Pipeline (Estimator) with 2 stages")
   expect_identical(output[4], "  |--1 Binarizer (Transformer)")
   expect_identical(output[6], "  |     (Parameters -- Column Names)")
