@@ -4,12 +4,10 @@
 \alias{ml_tree_feature_importance}
 \title{Spark ML - Feature Importance for Tree Models}
 \usage{
-ml_tree_feature_importance(sc, model)
+ml_tree_feature_importance(model, ...)
 }
 \arguments{
-\item{sc}{A \code{spark_connection}.}
-
-\item{model}{An \code{ml_model} encapsulating the output from a decision tree.}
+\item{model}{A decision tree-based \code{ml_model}}
 }
 \value{
 A sorted data frame with feature labels and their relative importance.

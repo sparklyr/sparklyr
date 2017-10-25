@@ -132,40 +132,34 @@ ml_model_print_centers <- function(model) {
 
 #' Spark ML - Feature Importance for Tree Models
 #'
-#' @param sc A \code{spark_connection}.
-#' @param model An \code{ml_model} encapsulating the output from a decision tree.
+#' @param model A decision tree-based \code{ml_model}
 #'
 #' @return A sorted data frame with feature labels and their relative importance.
 #' @export
-#' @importFrom dplyr arrange
-#' @importFrom dplyr desc
-ml_tree_feature_importance <- function(sc, model)
+ml_tree_feature_importance <- function(model, ...)
 {
-  supported <- c("ml_model_gradient_boosted_trees",
-                 "ml_model_decision_tree",
-                 "ml_model_random_forest")
+  # backwards compat, old signature was function(sc, model)
+  if (inherits(model, "spark_connection"))
+    model <- rlang::dots_list(...) %>% unlist()
 
-  if (!inherits(model, supported)) {
-    fmt <- "cannot call 'ml_tree_feature_importance' on object of class %s"
-    deparsed <- paste(deparse(class(model), width.cutoff = 500), collapse = " ")
-    stop(sprintf(fmt, deparsed))
-  }
+  supported <- grepl(
+    "ml_model_decision_tree|ml_model_gbt|ml_model_random_forest",
+    class(model)[1])
+
+  if (!supported)
+    stop("ml_tree_feature_importance() not supported for ", class(model)[1])
 
   # enforce Spark 2.0.0 for certain models
-  requires_spark_2 <- c(
-    "ml_model_decision_tree",
-    "ml_model_gradient_boosted_trees"
-  )
+  requires_spark_2 <- grepl(
+    "ml_model_decision_tree|ml_model_gbt",
+    class(model)[1])
 
-  if (inherits(model, requires_spark_2))
-    spark_require_version(sc, "2.0.0")
+  if (requires_spark_2)
+    spark_require_version(spark_connection(spark_jobj(model)), "2.0.0")
 
-  importance <- invoke(model$.model, "featureImportances") %>%
-    invoke("toArray") %>%
-    cbind(model$features) %>%
-    as.data.frame()
-
-  colnames(importance) <- c("importance", "feature")
-
-  importance %>% arrange(desc(importance))
+  model$model$feature_importances %>%
+    cbind(model$.features, .) %>%
+    as.data.frame() %>%
+    rlang::set_names(c("feature", "importance")) %>%
+    dplyr::arrange(dplyr::desc(!!rlang::sym("importance")))
 }
