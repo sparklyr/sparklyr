@@ -1,5 +1,11 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Various ML improvements, including support for pipelines, additional algorithms, hyper-parameter tuning, and better model persistence.
+
+- Added `spark_read_libsvm()` for reading libsvm files.
+
+- Added support for separating struct columns in `sdf_separate_column()`.
+
 - Fixed collection of `short`, `float` and `byte` to properly return NAs.
 
 - Added `sparklyr.collect.datechars` option to enable collecting `DateType` and
