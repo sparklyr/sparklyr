@@ -97,7 +97,7 @@ jobj_info <- function(jobj) {
   tryCatch({
     class <- invoke(jobj, "getClass")
     if (inherits(class, "spark_jobj"))
-      class <- invoke(class, "toString")
+      class <- invoke(class, "getName")
   }, error = function(e) {
   })
   tryCatch({

@@ -7,8 +7,7 @@
 sdf_num_partitions(x)
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 }
 \description{
 Gets number of partitions of a Spark DataFrame

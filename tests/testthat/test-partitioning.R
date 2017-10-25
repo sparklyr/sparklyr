@@ -8,12 +8,12 @@ test_that("sdf_repartition works", {
                  sdf_num_partitions(),
                4L)
 
-  expect_equal(iris_tbl %>%
+  expect_match(iris_tbl %>%
                  sdf_repartition(partition_by = c("Species", "Petal_Width")) %>%
                  sdf_query_plan() %>%
                  dplyr::first() %>%
                  gsub("#[0-9]+", "", ., perl = TRUE),
-               "RepartitionByExpression [Species, Petal_Width]"
+               "RepartitionByExpression \\[Species, Petal_Width\\]"
                  )
 
   expect_equal(iris_tbl %>%

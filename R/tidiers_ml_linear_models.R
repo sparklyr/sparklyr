@@ -15,17 +15,22 @@ NULL
 #' @export
 tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
                                                         ...) {
-
+  model <- x$model
   ensure_scalar_boolean(exponentiate)
 
-  stat_names <- c("coefficients", "standard.errors", "t.values", "p.values")
-
+  stats <- c("coefficient_standard_errors", "t_values", "p_values")
   new_names <- c("estimate", "std.error", "statistic", "p.value")
 
   if (exponentiate) {
-    if (! x$link %in% c("log", "logit")) {
-      warning(paste("Exponentiating coefficients, but model did not use",
-                    "a log or logit link function"))
+    exp_warning <- paste("Exponentiating coefficients, but model did not use",
+                         "a log or logit link function")
+
+    if (rlang::is_null(ml_param(model, "link", allow_null = TRUE))) {
+      if (!ml_param(model, "family") %in% c("binomial", "poisson"))
+        warning(exp_warning)
+    } else {
+      if (!ml_param(model, "link") %in% c("log", "logit"))
+        warning(exp_warning)
     }
     trans <- exp
     # drop standard errors because they're not valid after exponentiating
@@ -35,7 +40,13 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
     vars <- dplyr::select_vars(c("term", new_names), everything())
   }
 
-  extract_estimate_statistics(x, stat_names, new_names) %>%
+
+  coefficients <- list(x$coefficients)
+  statistics <- stats %>%
+    lapply(function(x) ml_summary(model, x))
+  c(coefficients, statistics) %>%
+    as.data.frame() %>%
+    broom::fix_data_frame(newnames = new_names) %>%
     mutate(estimate = trans(!!sym("estimate"))) %>%
     select(!!!syms(vars))
 
@@ -45,12 +56,19 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
 #' @export
 tidy.ml_model_linear_regression <- function(x,
                                             ...) {
-  stat_names <- c("coefficients", "standard.errors", "t.values", "p.values")
+
+  model <- x$model
+  stats <- c("coefficient_standard_errors", "t_values", "p_values")
   new_names <- c("estimate", "std.error", "statistic", "p.value")
   vars <- dplyr::select_vars(c("term", new_names), everything())
 
-  extract_estimate_statistics(x, stat_names, new_names) %>%
-    select(!!!rlang::syms(vars))
+  coefficients <- list(x$coefficients)
+  statistics <- stats %>%
+    lapply(function(x) ml_summary(model, x))
+  c(coefficients, statistics) %>%
+    as.data.frame() %>%
+    broom::fix_data_frame(newnames = new_names) %>%
+    select(!!!syms(vars))
 }
 
 #' @rdname ml_glm_tidiers
@@ -73,8 +91,7 @@ augment.ml_model_generalized_linear_regression <-
     if (!is.null(newdata) && !identical(type.residuals, "working"))
       stop("'type.residuals' must be set to 'working' when 'newdata' is supplied")
 
-    newdata <- newdata %||% (ml_model_data(x) %>%
-                               select(- !!! sym(x$model.parameters$id)))
+    newdata <- newdata %||% ml_model_data(x)
 
     # We calculate working residuals on training data via SparkSQL directly
     # instead of calling the MLlib API.
@@ -82,7 +99,7 @@ augment.ml_model_generalized_linear_regression <-
       predictions <- sdf_predict(x, newdata) %>%
         rename(fitted = !!"prediction")
       return(predictions %>%
-               mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
+               mutate(resid = `-`(!!sym(x$.response), !!sym("fitted")))
       )
     }
 
@@ -103,8 +120,8 @@ augment.ml_model_linear_regression <- augment.ml_model_generalized_linear_regres
 #' @rdname ml_glm_tidiers
 #' @export
 glance.ml_model_generalized_linear_regression <- function(x, ...) {
-  metric_names <- c("null.deviance", "residual.dof.null", "aic", "deviance",
-                    "residual.dof")
+  metric_names <- c("null_deviance", "residual_degree_of_freedom_null", "aic", "deviance",
+                    "residual_degree_of_freedom")
   new_names <- c("null.deviance", "df.null", "AIC", "deviance", "df.residual")
   extract_model_metrics(x, metric_names, new_names)
 }
@@ -112,8 +129,11 @@ glance.ml_model_generalized_linear_regression <- function(x, ...) {
 #' @rdname ml_glm_tidiers
 #' @export
 glance.ml_model_linear_regression <- function(x, ...) {
-  metric_names <- c("explained.variance", "mean.absolute.error", "mean.squared.error",
-                    "r.squared", "root.mean.squared.error")
-  new_names <- metric_names
+  # browser()
+  metric_names <- c("explained_variance", "mean_absolute_error",
+                    "mean_squared_error",
+                    "r2", "root_mean_squared_error")
+  new_names <- c("explained.variance", "mean.absolute.error",
+                 "mean.squared.error", "r.squared", "root.mean.squared.error")
   extract_model_metrics(x, metric_names, new_names)
 }

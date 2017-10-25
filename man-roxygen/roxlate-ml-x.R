@@ -1,3 +1,2 @@
-#' @param x An object coercable to a Spark DataFrame (typically, a
-#'   \code{tbl_spark}).
+#' @param x A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.
 

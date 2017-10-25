@@ -66,6 +66,7 @@ When \code{header} is \code{FALSE}, the column names are generated with a
 Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_json}},
+  \code{\link{spark_read_libsvm}},
   \code{\link{spark_read_parquet}},
   \code{\link{spark_read_source}},
   \code{\link{spark_read_table}},
@@ -79,3 +80,4 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
+\concept{Spark serialization routines}

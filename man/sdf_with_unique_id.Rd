@@ -7,8 +7,7 @@
 sdf_with_unique_id(x, id = "id")
 }
 \arguments{
-\item{x}{An object coercable to a Spark DataFrame (typically, a
-\code{tbl_spark}).}
+\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{id}{The name of the column to host the generated IDs.}
 }

@@ -101,5 +101,5 @@ test_that("'sdf_broadcast' forces broadcast hash join", {
     invoke("queryExecution") %>%
     invoke("optimizedPlan") %>%
     invoke("toString")
-  expect_match(query_plan, "BroadcastHint")
+  expect_match(query_plan, "BroadcastHint|isBroadcastable=true")
 })

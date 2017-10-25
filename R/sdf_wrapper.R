@@ -240,18 +240,21 @@ sdf_separate_column <- function(x,
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
 
+  into_is_set <- ensure_scalar_boolean(!is.null(into))
+
   # when 'into' is NULL, we auto-generate a names -> index map
   if (is.null(into)) {
 
     # determine the length of vector elements (assume all
-    # elements have the same length as the first)
-    first <- invoke(sdf, "first")
-    index <- invoke(first, "fieldIndex", column)
-    vector <- invoke(first, "get", as.integer(index))
-    n <- invoke(vector, "size")
-
+    # elements have the same length as the first) and
     # generate indices
-    indices <- seq_len(n)
+    indices <- x %>%
+      head(1) %>%
+      dplyr::pull(!!rlang::sym(column)) %>%
+      rlang::flatten() %>%
+      length() %>%
+      seq_len()
+
     names <- sprintf("%s_%i", column, indices)
 
     # construct our into map
@@ -280,7 +283,8 @@ sdf_separate_column <- function(x,
     sdf,
     column,
     as.list(names),
-    as.list(indices)
+    as.list(indices),
+    into_is_set
   )
 
   # and give it back
