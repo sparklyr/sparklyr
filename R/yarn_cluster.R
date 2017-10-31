@@ -148,14 +148,14 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
 
   mainRMWebappValue <- spark_yarn_cluster_get_conf_property(mainRMWebapp)
 
-  if (is.null(mainRMWebappValue)) {
+  if (length(mainRMWebappValue) == 0) {
     if (rmHighAvailability) {
       stop("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml")
     }
     else {
       mainRM <- "yarn.resourcemanager.address"
       mainRMValue <- spark_yarn_cluster_get_conf_property(mainRM)
-      if (is.null(mainRMValue)) {
+      if (length(mainRMValue) == 0) {
         stop("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml")
       }
       else {
