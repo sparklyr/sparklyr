@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Implemented workaround to support in `spark_write_table()` for
+  `mode = 'append'`.
+
 - Various ML improvements, including support for pipelines, additional algorithms,
   hyper-parameter tuning, and better model persistence.
 

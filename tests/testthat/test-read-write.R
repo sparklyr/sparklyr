@@ -99,3 +99,30 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
   file.remove("test.txt")
   unlink(output_file, recursive = TRUE)
 })
+
+test_that("spark_write_table() can append data", {
+  library(dplyr)
+
+  create_table <-
+  "
+  CREATE EXTERNAL TABLE `test_write_table_append` (
+  `id` bigint )
+  ROW FORMAT SERDE
+  'org.apache.hadoop.hive.ql.io.orc.OrcSerde'
+  STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.orc.OrcInputFormat'
+  OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'
+  LOCATION
+  'writetableappend'
+  "
+
+  DBI::dbGetQuery(sc, create_table)
+  df <- copy_to(sc, data.frame(id = 1L))
+
+  spark_write_table(df, "test_write_table_append", mode = 'append')
+
+  append_table <- tbl(sc, "test_write_table_append")
+
+  expect_equal(sdf_nrow(append_table), 1)
+})
