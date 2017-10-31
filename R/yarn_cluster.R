@@ -241,9 +241,10 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     appId,
     "state")
 
-  if (is.null(currentState)) {
+  if (currentState %in% c("NEW", "NEW_SAVING", "SUBMITTED")) {
     stop(
-      "Yarn application was not accepted after ", waitAcceptedSeconds, " seconds. ",
+      "Yarn application ", appId, " and state ", currentState, " ",
+      "was not accepted after ", waitAcceptedSeconds, " seconds. ",
       "Please check that the cluster has enough available resources or increase ",
       "the wait time by changing 'config$sparklyr.yarn.cluster.accepted.timeout'."
     )
