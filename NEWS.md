@@ -1,6 +1,9 @@
 
 # Sparklyr 0.6.4
 
+- Added support for `sparklyr.yarn.cluster.accepted.timeout` under `yarn-cluster`
+  to allow users to wait for resources under cluster with high waiting times.
+
 - Fix to `spark_apply()` when package distribution deadlock triggers in 
   environments where multiple executors run under the same node.
 
