@@ -99,11 +99,7 @@ spark_yarn_cluster_get_app_property <- function(rm_webapp, appId, property) {
   resourceManagerResponce <- httr::GET(resourceManagerQuery)
   yarnApp <- httr::content(resourceManagerResponce)
 
-  if (property %in% names(yarnApp)) {
-    propertyValue <- yarnApp[[property]]
-  }
-
-  if (length(propertyValue) == 0) {
+  if (!"app" %in% names(yarnApp) || !property %in% names(yarnApp$app)) {
     withr::with_options(list(
       warning.length = 8000
     ), {
@@ -114,7 +110,7 @@ spark_yarn_cluster_get_app_property <- function(rm_webapp, appId, property) {
     })
   }
 
-  propertyValue
+  yarnApp$app[[property]]
 }
 
 spark_yarn_cluster_resource_manager_is_online <- function(rm_webapp) {
