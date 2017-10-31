@@ -130,7 +130,7 @@ spark_yarn_cluster_while_app <- function(rm_webapp, appId, waitSeconds, conditio
 
     if (!condition(yarnResponse$app)) break;
 
-    sleepTime <- ifelse(commandStart - waitSeconds > 60, 30, 1)
+    sleepTime <- ifelse(Sys.time() - commandStart > 60, 30, 1)
     Sys.sleep(sleepTime)
   }
 }
@@ -266,7 +266,7 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     appId,
     waitHostAddressSeconds,
     function(app) {
-      "amHostHttpAddress" %in% names(app)
+      !"amHostHttpAddress" %in% names(app)
     })
 
   amHostHttpAddress <- spark_yarn_cluster_get_app_property(
