@@ -159,8 +159,8 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
         stop("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml")
       }
       else {
-        mainRMWebapp <- paste(sub(":[0-9]+$", "", mainRMValue), 8088, sep = ":")
-        warning("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml, using default port: ", mainRMWebapp)
+        mainRMWebappValue <- paste(sub(":[0-9]+$", "", mainRMValue), 8088, sep = ":")
+        warning("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml, using default port: ", mainRMWebappValue)
       }
     }
   }
