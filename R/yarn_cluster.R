@@ -241,7 +241,7 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     appId,
     "state")
 
-  if (currentState %in% c("NEW", "NEW_SAVING", "SUBMITTED")) {
+  if (toupper(currentState) %in% c("NEW", "NEW_SAVING", "SUBMITTED")) {
     stop(
       "Yarn application ", appId, " and state ", currentState, " ",
       "was not accepted after ", waitAcceptedSeconds, " seconds. ",
@@ -250,7 +250,7 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     )
   }
 
-  if (tolower(currentState) != "accepted") {
+  if (toupper(currentState) != "ACCEPTED") {
     stop(
       "Yarn submission changed to state '", currentState, "' while 'accpted' ",
       "state was expected for app: ", appId
