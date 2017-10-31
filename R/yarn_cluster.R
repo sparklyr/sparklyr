@@ -27,7 +27,7 @@ spark_yarn_cluster_get_conf_property <- function(property) {
 
 spark_yarn_cluster_get_app_id <- function(config, start_time, rm_webapp) {
   property <- "id"
-  waitSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.start.timeout", 60)
+  waitSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.start.timeout", 30)
   commandStart <- Sys.time()
   propertyValue <- NULL
   yarnApps <- NULL
@@ -111,6 +111,26 @@ spark_yarn_cluster_get_app_property <- function(rm_webapp, appId, property) {
   }
 
   yarnApp$app[[property]]
+}
+
+spark_yarn_cluster_wait_for_app <- function(rm_webapp, appId, waitSeconds, condition) {
+  commandStart <- Sys.time()
+
+  resourceManagerQuery <- paste0(
+    "http",
+    "://",
+    rm_webapp,
+    "/ws/v1/cluster/apps/",
+    appId
+  )
+
+  while(commandStart + waitSeconds > Sys.time()) {
+    resourceManagerResponce <- httr::GET(resourceManagerQuery)
+    yarnResponse <- httr::content(resourceManagerResponce)
+
+    if (!condition(yarnResponse$app)) break;
+    Sys.sleep(1)
+  }
 }
 
 spark_yarn_cluster_resource_manager_is_online <- function(rm_webapp) {
@@ -206,6 +226,35 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     config,
     start_time,
     resourceManagerWebapp)
+
+  waitAcceptedSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.accepted.timeout", 30)
+  spark_yarn_cluster_wait_for_app(
+    resourceManagerWebapp,
+    appId,
+    waitAcceptedSeconds,
+    function(app) {
+      toupper(app$state) %in% c("NEW", "NEW_SAVING", "SUBMITTED")
+    })
+
+  currentState <- spark_yarn_cluster_get_app_property(
+    resourceManagerWebapp,
+    appId,
+    "state")
+
+  if (is.null(currentState)) {
+    stop(
+      "Yarn application was not accepted after ", waitAcceptedSeconds, " seconds. ",
+      "Please check that the cluster has enough available resources or increase ",
+      "the wait time by changing 'config$sparklyr.yarn.cluster.accepted.timeout'."
+    )
+  }
+
+  if (tolower(currentState) != "accepted") {
+    stop(
+      "Yarn submission changed to state '", currentState, "' while 'accpted' ",
+      "state was expected for app: ", appId
+    )
+  }
 
   amHostHttpAddress <- spark_yarn_cluster_get_app_property(
     resourceManagerWebapp,
