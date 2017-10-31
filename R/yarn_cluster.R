@@ -149,7 +149,20 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
   mainRMWebappValue <- spark_yarn_cluster_get_conf_property(mainRMWebapp)
 
   if (is.null(mainRMWebappValue)) {
-    stop("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml")
+    if (rmHighAvailability) {
+      stop("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml")
+    }
+    else {
+      mainRM <- "yarn.resourcemanager.address"
+      mainRMValue <- spark_yarn_cluster_get_conf_property(mainRM)
+      if (is.null(mainRMValue)) {
+        stop("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml")
+      }
+      else {
+        mainRMWebapp <- paste(sub(":[0-9]+$", "", mainRMValue), 8088, sep = ":")
+        warning("Failed to retrieve ", mainRMWebapp, " from yarn-site.xml, using default port: ", mainRMWebapp)
+      }
+    }
   }
 
   mainRMWebappValue
