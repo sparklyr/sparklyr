@@ -25,7 +25,8 @@ spark_yarn_cluster_get_conf_property <- function(property) {
   yarnPropertyValue
 }
 
-spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, property) {
+spark_yarn_cluster_get_app_id <- function(config, start_time, rm_webapp) {
+  property <- "id"
   waitSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.start.timeout", 60)
   commandStart <- Sys.time()
   propertyValue <- NULL
@@ -79,6 +80,36 @@ spark_yarn_cluster_get_app_property <- function(config, start_time, rm_webapp, p
         resourceManagerQuery, " after ", format(Sys.time() - commandStart, digits = 1),
         ", check yarn.resourcemanager.webapp.address under yarn-site.xml. Last result: ",
         yarnApps
+      )
+    })
+  }
+
+  propertyValue
+}
+
+spark_yarn_cluster_get_app_property <- function(rm_webapp, appId, property) {
+  resourceManagerQuery <- paste0(
+    "http",
+    "://",
+    rm_webapp,
+    "/ws/v1/cluster/apps/",
+    appId
+  )
+
+  resourceManagerResponce <- httr::GET(resourceManagerQuery)
+  yarnApp <- httr::content(resourceManagerResponce)
+
+  if (property %in% names(yarnApp)) {
+    propertyValue <- yarnApp[[property]]
+  }
+
+  if (length(propertyValue) == 0) {
+    withr::with_options(list(
+      warning.length = 8000
+    ), {
+      stop(
+        "Failed to retrieve '", property, "' from ", appId, ". Last result: ",
+        yarnApp
       )
     })
   }
@@ -175,10 +206,14 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     stop("Yarn Cluster mode uses `yarn.resourcemanager.webapp.address` but is not present in yarn-site.xml")
   }
 
-  amHostHttpAddress <- spark_yarn_cluster_get_app_property(
+  appId <- spark_yarn_cluster_get_app_id(
     config,
     start_time,
+    resourceManagerWebapp)
+
+  amHostHttpAddress <- spark_yarn_cluster_get_app_property(
     resourceManagerWebapp,
+    appId,
     "amHostHttpAddress")
 
   strsplit(amHostHttpAddress, ":")[[1]][[1]]
