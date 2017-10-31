@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for `sparklyr.yarn.cluster.accepted.timeout` under `yarn-cluster`
+  to allow users to wait for resources under cluster with high waiting times.
+
 - Implemented workaround to support in `spark_write_table()` for
   `mode = 'append'`.
 
