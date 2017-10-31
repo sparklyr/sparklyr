@@ -113,7 +113,7 @@ spark_yarn_cluster_get_app_property <- function(rm_webapp, appId, property) {
   yarnApp$app[[property]]
 }
 
-spark_yarn_cluster_wait_for_app <- function(rm_webapp, appId, waitSeconds, condition) {
+spark_yarn_cluster_while_app <- function(rm_webapp, appId, waitSeconds, condition) {
   commandStart <- Sys.time()
 
   resourceManagerQuery <- paste0(
@@ -129,7 +129,9 @@ spark_yarn_cluster_wait_for_app <- function(rm_webapp, appId, waitSeconds, condi
     yarnResponse <- httr::content(resourceManagerResponce)
 
     if (!condition(yarnResponse$app)) break;
-    Sys.sleep(1)
+
+    sleepTime <- ifelse(commandStart - waitSeconds > 60, 30, 1)
+    Sys.sleep(sleepTime)
   }
 }
 
@@ -228,7 +230,7 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     resourceManagerWebapp)
 
   waitAcceptedSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.accepted.timeout", 30)
-  spark_yarn_cluster_wait_for_app(
+  spark_yarn_cluster_while_app(
     resourceManagerWebapp,
     appId,
     waitAcceptedSeconds,
@@ -256,6 +258,16 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
       "state was expected for app: ", appId
     )
   }
+
+  # there is sometimes a delay to assign the host address even after app is in ACCEPTED state
+  waitHostAddressSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.hostadddress.timeout", 10)
+  spark_yarn_cluster_while_app(
+    resourceManagerWebapp,
+    appId,
+    waitHostAddressSeconds,
+    function(app) {
+      "amHostHttpAddress" %in% names(app)
+    })
 
   amHostHttpAddress <- spark_yarn_cluster_get_app_property(
     resourceManagerWebapp,
