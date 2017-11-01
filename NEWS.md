@@ -1,6 +1,9 @@
 
 # Sparklyr 0.6.4
 
+- Added support for HTTPS for `yarn-cluster` which is acticated by setting
+  `yarn.http.policy` to `HTTPS_ONLY` in `yarn-site.xml`.
+
 - Added support for `sparklyr.yarn.cluster.accepted.timeout` under `yarn-cluster`
   to allow users to wait for resources under cluster with high waiting times.
 
