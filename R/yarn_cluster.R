@@ -37,8 +37,6 @@ spark_yarn_cluster_get_app_id <- function(config, start_time, rm_webapp) {
   appLookupUseUser <- spark_config_value(config, "sparklyr.yarn.cluster.lookup.byname", !is.null(appLoookupUser))
 
   resourceManagerQuery <- paste0(
-    "http",
-    "://",
     rm_webapp,
     "/ws/v1/cluster/apps?startedTimeBegin=",
     start_time,
@@ -89,8 +87,6 @@ spark_yarn_cluster_get_app_id <- function(config, start_time, rm_webapp) {
 
 spark_yarn_cluster_get_app_property <- function(rm_webapp, appId, property, errorMessage = "") {
   resourceManagerQuery <- paste0(
-    "http",
-    "://",
     rm_webapp,
     "/ws/v1/cluster/apps/",
     appId
@@ -117,8 +113,6 @@ spark_yarn_cluster_while_app <- function(rm_webapp, appId, waitSeconds, conditio
   commandStart <- Sys.time()
 
   resourceManagerQuery <- paste0(
-    "http",
-    "://",
     rm_webapp,
     "/ws/v1/cluster/apps/",
     appId
@@ -137,8 +131,6 @@ spark_yarn_cluster_while_app <- function(rm_webapp, appId, waitSeconds, conditio
 
 spark_yarn_cluster_resource_manager_is_online <- function(rm_webapp) {
   rmQuery <- paste0(
-    "http",
-    "://",
     rm_webapp,
     "/ws/v1/cluster/info"
   )
@@ -217,12 +209,23 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
   mainRMWebappValue
 }
 
+spark_yarn_cluster_get_protocol <- function() {
+  useHttpsValue <- spark_yarn_cluster_get_conf_property("yarn.http.policy")
+
+  if (length(useHttpsValue) > 0 && toupper(useHttpsValue) == "HTTPS_ONLY")
+    "https"
+  else
+    "http"
+}
+
 spark_yarn_cluster_get_gateway <- function(config, start_time) {
   resourceManagerWebapp <- spark_yarn_cluster_get_resource_manager_webapp()
 
   if (length(resourceManagerWebapp) == 0) {
     stop("Yarn Cluster mode uses `yarn.resourcemanager.webapp.address` but is not present in yarn-site.xml")
   }
+
+  resourceManagerWebapp <- paste0(spark_yarn_cluster_get_protocol(), "://", resourceManagerWebapp)
 
   appId <- spark_yarn_cluster_get_app_id(
     config,
