@@ -108,11 +108,14 @@ spark_apply_packages_is_bundle <- function(packages) {
 #' @param group_by Column name used to group by data frame partitions.
 #' @param packages Boolean to distribute \code{.libPaths()} packages to each node,
 #'   a list of packages to distribute, or a package bundle created with
-#'   \code{spark_apply_packages()}.
+#'   \code{spark_apply_bundle()}.
 #'
-#'   For clusters using Livy or under Yarn cluster mode, \code{packages} must
-#'   point to a package bundle that was manually created using
-#'   \code{spark_apply_packages()} and made available across the cluster.
+#'   For clusters using Livy or Yarn cluster mode, \code{packages} must
+#'   point to a package bundle path created using \code{spark_apply_bundle()}
+#'   and made available as a Spark file. For Yarn cluster mode, the bundle
+#'   can be registered as a Spark file using \code{config$sparklyr.shell.files}.
+#'   For Livy, this bundle must be copied into the cluster and then made available
+#'   using \code{invoke(spark_context(sc), "addFile", "<path-to-file>")}.
 #'
 #'   For offline clusters where \code{available.packages()} is not available,
 #'   manually download the packages database from
@@ -192,11 +195,10 @@ spark_apply <- function(x,
     bundle_path <- packages
   }
   else if (isTRUE(packages) || is.character(packages)) {
-    bundle_path <- spark_apply_bundle_file(packages)
+    bundle_base <- spark_apply_bundle_path()
+    bundle_path <- spark_apply_bundle_file(packages, bundle_base)
     if (!file.exists(bundle_path)) {
-      packages_deps <- if (is.character(packages)) spark_apply_packages(packages) else packages
-
-      bundle_path <- spark_apply_bundle(packages_deps)
+      bundle_path <- spark_apply_bundle(packages, bundle_base)
     }
 
     if (!is.null(bundle_path)) {
