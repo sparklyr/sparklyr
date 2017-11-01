@@ -42,3 +42,4 @@ Other feature transformation routines: \code{\link{ft_bucketizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{sdf_mutate}}
 }
+\concept{feature transformation routines}

@@ -2,7 +2,6 @@
 % Please edit documentation in R/sdf_interface.R
 \name{sdf_mutate}
 \alias{sdf_mutate}
-\alias{sdf_mutate}
 \alias{sdf_mutate_}
 \title{Mutate a Spark DataFrame}
 \usage{
@@ -68,3 +67,4 @@ Other feature transformation routines: \code{\link{ft_binarizer}},
   \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}}
 }
+\concept{feature transformation routines}

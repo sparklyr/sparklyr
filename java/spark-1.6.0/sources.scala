@@ -866,33 +866,6 @@ object Sources {
     "    }\n" +
     "  }\n" +
     "}\n" +
-    "core_spark_apply_bundle_path <- function() {\n" +
-    "  file.path(tempdir(), \"packages.tar\")\n" +
-    "}\n" +
-    "\n" +
-    "#' Creates a bundle of dependencies required by \\code{spark_apply()}\n" +
-    "#'\n" +
-    "#' @keywords internal\n" +
-    "#' @export\n" +
-    "core_spark_apply_bundle <- function() {\n" +
-    "  packagesTar <- core_spark_apply_bundle_path()\n" +
-    "\n" +
-    "  args <- c(\"-cf\", packagesTar)\n" +
-    "  lapply(.libPaths(), function(e) {\n" +
-    "    args <<- c(args, \"-C\", e)\n" +
-    "    args <<- c(args, \".\")\n" +
-    "  })\n" +
-    "\n" +
-    "  if (!file.exists(packagesTar)) {\n" +
-    "    system2(\"tar\", args)\n" +
-    "  }\n" +
-    "\n" +
-    "  packagesTar\n" +
-    "}\n" +
-    "\n" +
-    "core_spark_apply_unbundle_path <- function() {\n" +
-    "  file.path(\"sparklyr-bundle\")\n" +
-    "}\n" +
     "core_get_package_function <- function(packageName, functionName) {\n" +
     "  if (packageName %in% rownames(installed.packages()) &&\n" +
     "      exists(functionName, envir = asNamespace(packageName)))\n" +
@@ -934,18 +907,23 @@ object Sources {
     "\n" +
     "  bundlePath <- worker_invoke(context, \"getBundlePath\")\n" +
     "  if (nchar(bundlePath) > 0) {\n" +
-    "    worker_log(\"using bundle \", bundlePath)\n" +
-    "\n" +
     "    bundleName <- basename(bundlePath)\n" +
+    "    worker_log(\"using bundle name \", bundleName)\n" +
     "\n" +
     "    workerRootDir <- worker_invoke_static(sc, \"org.apache.spark.SparkFiles\", \"getRootDirectory\")\n" +
     "    sparkBundlePath <- file.path(workerRootDir, bundleName)\n" +
+    "\n" +
+    "    worker_log(\"using bundle path \", normalizePath(sparkBundlePath))\n" +
     "\n" +
     "    if (!file.exists(sparkBundlePath)) {\n" +
     "      stop(\"failed to find bundle under SparkFiles root directory\")\n" +
     "    }\n" +
     "\n" +
-    "    unbundlePath <- worker_spark_apply_unbundle(sparkBundlePath, workerRootDir)\n" +
+    "    unbundlePath <- worker_spark_apply_unbundle(\n" +
+    "      sparkBundlePath,\n" +
+    "      workerRootDir,\n" +
+    "      tools::file_path_sans_ext(bundleName)\n" +
+    "    )\n" +
     "\n" +
     "    .libPaths(unbundlePath)\n" +
     "    worker_log(\"updated .libPaths with bundle packages\")\n" +
@@ -1047,15 +1025,19 @@ object Sources {
     "    rlang_unserialize\n" +
     "}\n" +
     "\n" +
+    "spark_worker_unbundle_path <- function() {\n" +
+    "  file.path(\"sparklyr-bundle\")\n" +
+    "}\n" +
+    "\n" +
     "#' Extracts a bundle of dependencies required by \\code{spark_apply()}\n" +
     "#'\n" +
-    "#' @param bundle_path Path to the bundle created using \\code{core_spark_apply_bundle()}\n" +
+    "#' @param bundle_path Path to the bundle created using \\code{spark_apply_bundle()}\n" +
     "#' @param base_path Base path to use while extracting bundles\n" +
     "#'\n" +
     "#' @keywords internal\n" +
     "#' @export\n" +
-    "worker_spark_apply_unbundle <- function(bundle_path, base_path) {\n" +
-    "  extractPath <- file.path(base_path, core_spark_apply_unbundle_path())\n" +
+    "worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {\n" +
+    "  extractPath <- file.path(base_path, spark_worker_unbundle_path(), bundle_name)\n" +
     "  lockFile <- file.path(extractPath, \"sparklyr.lock\")\n" +
     "\n" +
     "  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)\n" +
@@ -1071,7 +1053,7 @@ object Sources {
     "  if (file.exists(lockFile)) {\n" +
     "    worker_log(\"found that lock file exists, waiting\")\n" +
     "    while (file.exists(lockFile)) {\n" +
-    "      Sys.sleep(1000)\n" +
+    "      Sys.sleep(1)\n" +
     "    }\n" +
     "    worker_log(\"completed lock file wait\")\n" +
     "  }\n" +

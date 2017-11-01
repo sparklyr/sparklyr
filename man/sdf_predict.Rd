@@ -20,3 +20,4 @@ Other Spark data frames: \code{\link{sdf_copy_to}},
   \code{\link{sdf_partition}}, \code{\link{sdf_register}},
   \code{\link{sdf_sample}}, \code{\link{sdf_sort}}
 }
+\concept{Spark data frames}

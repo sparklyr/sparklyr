@@ -50,8 +50,6 @@ reference spark and hadoop versions respectively.}
 List with information about the installed version.
 }
 \description{
-Find a given Spark installation by version.
-
 Install versions of Spark for use with local Spark connections
   (i.e. \code{spark_connect(master = "local"})
 }

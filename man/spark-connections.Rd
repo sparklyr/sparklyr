@@ -2,13 +2,9 @@
 % Please edit documentation in R/connection_spark.R
 \name{spark-connections}
 \alias{spark-connections}
-\alias{spark-connections}
 \alias{spark_connect}
-\alias{spark-connections}
 \alias{spark_connection_is_open}
-\alias{spark-connections}
 \alias{spark_disconnect}
-\alias{spark-connections}
 \alias{spark_disconnect_all}
 \title{Manage Spark Connections}
 \usage{

@@ -55,3 +55,4 @@ Other Spark ML routines: \code{\link{ml_decision_tree}},
   \code{\link{ml_random_forest}},
   \code{\link{ml_survival_regression}}
 }
+\concept{Spark ML routines}

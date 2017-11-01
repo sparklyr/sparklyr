@@ -40,3 +40,4 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_source}},
   \code{\link{spark_write_text}}
 }
+\concept{Spark serialization routines}
