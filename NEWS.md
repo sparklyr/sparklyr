@@ -1,6 +1,6 @@
 # Sparklyr 0.7 (UNRELEASED)
 
-- Added support for HTTPS for `yarn-cluster` which is acticated by setting
+- Added support for HTTPS for `yarn-cluster` which is activated by setting
   `yarn.http.policy` to `HTTPS_ONLY` in `yarn-site.xml`.
 
 - Added support for `sparklyr.yarn.cluster.accepted.timeout` under `yarn-cluster`
