@@ -87,6 +87,10 @@ spark_apply_packages <- function(packages) {
   }
 }
 
+spark_apply_packages_is_bundle <- function(packages) {
+  is.character(packages) && length(packages) == 1 && grepl("\\.tar$", packages)
+}
+
 #' Apply an R Function in Spark
 #'
 #' Applies an R function to a Spark object (typically, a Spark DataFrame).
@@ -103,7 +107,12 @@ spark_apply_packages <- function(packages) {
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
 #' @param packages Boolean to distribute \code{.libPaths()} packages to each node,
-#'   or a list of packages to distribute.
+#'   a list of packages to distribute, or a package bundle created with
+#'   \code{spark_apply_packages()}.
+#'
+#'   For clusters using Livy or under Yarn cluster mode, \code{packages} must
+#'   point to a package bundle that was manually created using
+#'   \code{spark_apply_packages()} and made available across the cluster.
 #'
 #'   For offline clusters where \code{available.packages()} is not available,
 #'   manually download the packages database from
@@ -179,7 +188,10 @@ spark_apply <- function(x,
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
   bundle_path <- ""
-  if (isTRUE(packages) || is.character(packages)) {
+  if (spark_apply_packages_is_bundle(packages)) {
+    bundle_path <- packages
+  }
+  else if (isTRUE(packages) || is.character(packages)) {
     bundle_path <- spark_apply_bundle_file(packages)
     if (!file.exists(bundle_path)) {
       packages_deps <- if (is.character(packages)) spark_apply_packages(packages) else packages
