@@ -49,14 +49,14 @@ spark_apply_bundle <- function(packages = TRUE, base_path = getwd()) {
     } else {
       added_packages <- list()
       lapply(.libPaths(), function(e) {
-        sublib_packages <- lapply(packages, function(p) {
-          if (file.exists(file.path(e, p)) && !p %in% added_packages) {
-            added_packages <<- c(added_packages, p)
-            p
-          }
-        }) %>%
-          Filter(Negate(is.null), .) %>%
-          unlist()
+        sublib_packages <- Filter(
+          Negate(is.null),
+          lapply(packages, function(p) {
+            if (file.exists(file.path(e, p)) && !p %in% added_packages) {
+              added_packages <<- c(added_packages, p)
+              p
+            }
+          })) %>% unlist()
 
         if (length(sublib_packages) > 0) c("-C", e, sublib_packages) else NULL
       }) %>% unlist()
