@@ -25,7 +25,12 @@ adds indexed column names when not enough columns are specified.}
 \item{group_by}{Column name used to group by data frame partitions.}
 
 \item{packages}{Boolean to distribute \code{.libPaths()} packages to each node,
-  or a list of packages to distribute.
+  a list of packages to distribute, or a package bundle created with
+  \code{spark_apply_bundle()}.
+
+  For clusters using Livy or Yarn cluster mode, \code{packages} must
+  point to a package bundle created using \code{spark_apply_bundle()}
+  and made available as a Spark file using \code{config$sparklyr.shell.files}.
 
   For offline clusters where \code{available.packages()} is not available,
   manually download the packages database from

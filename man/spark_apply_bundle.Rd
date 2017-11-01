@@ -2,14 +2,15 @@
 % Please edit documentation in R/spark_apply_bundle.R
 \name{spark_apply_bundle}
 \alias{spark_apply_bundle}
-\title{Creates a bundle of dependencies required by \code{spark_apply()}}
+\title{Create Bundle for Spark Apply}
 \usage{
-spark_apply_bundle(packages = TRUE)
+spark_apply_bundle(packages = TRUE, base_path = getwd())
 }
 \arguments{
 \item{packages}{List of packages to pack or \code{TRUE} to pack all.}
+
+\item{base_path}{Base path used to store the resulting bundle.}
 }
 \description{
-Creates a bundle of dependencies required by \code{spark_apply()}
+Creates a bundle of packages for \code{spark_apply()}.
 }
-\keyword{internal}

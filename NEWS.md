@@ -1,11 +1,5 @@
 # Sparklyr 0.7 (UNRELEASED)
 
-- Added support for HTTPS for `yarn-cluster` which is activated by setting
-  `yarn.http.policy` to `HTTPS_ONLY` in `yarn-site.xml`.
-
-- Added support for `sparklyr.yarn.cluster.accepted.timeout` under `yarn-cluster`
-  to allow users to wait for resources under cluster with high waiting times.
-
 - Implemented workaround to support in `spark_write_table()` for
   `mode = 'append'`.
 
@@ -24,6 +18,14 @@
 - Fixed collection of `DateType` and `TimestampTime` from `character` to 
   proper `Date` and `POSIXct` types.
 
+# Sparklyr 0.6.4
+
+- Added support for HTTPS for `yarn-cluster` which is activated by setting
+  `yarn.http.policy` to `HTTPS_ONLY` in `yarn-site.xml`.
+
+- Added support for `sparklyr.yarn.cluster.accepted.timeout` under `yarn-cluster`
+  to allow users to wait for resources under cluster with high waiting times.
+  
 - Fix to `spark_apply()` when package distribution deadlock triggers in 
   environments where multiple executors run under the same node.
 
@@ -33,7 +35,7 @@
 - Added support in`yarn-cluster` for `sparklyr.yarn.cluster.lookup.prefix`,
   `sparklyr.yarn.cluster.lookup.username` and `sparklyr.yarn.cluster.lookup.byname`
   to control the new application lookup behavior.
-
+  
 # Sparklyr 0.6.3
 
 - Enabled support for Java 9 for clusters configured with 
