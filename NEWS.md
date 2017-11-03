@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for `context` parameter in `spark_apply()` to allow callers to
+  pass additional contextual information to the `f()` closure.
+
 - Implemented workaround to support in `spark_write_table()` for
   `mode = 'append'`.
 

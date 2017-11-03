@@ -97,8 +97,9 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'
 #' @param x An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.
 #' @param f A function that transforms a data frame partition into a data frame.
-#'   The function \code{f} has signature \code{f(df, group1, group2, ...)} where
-#'   \code{df} is a data frame with the data to be processed and \code{group1} to
+#'   The function \code{f} has signature \code{f(df, context, group1, group2, ...)} where
+#'   \code{df} is a data frame with the data to be processed, \code{context}
+#'   is an optional object passed as the \code{context} parameter and \code{group1} to
 #'   \code{groupN} contain the values of the \code{group_by} values. When
 #'   \code{group_by} is not specified, \code{f} takes only one argument.
 #' @param columns A vector of column names or a named vector of column types for
@@ -119,6 +120,7 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'  https://cran.r-project.org/web/packages/packages.rds and set
 #'   \code{Sys.setenv(sparklyr.apply.packagesdb = "<pathl-to-rds>")}. Otherwise,
 #'   all packages will be used by default.
+#' @param context Optional object to be serialized and passed back to \code{f()}.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
@@ -128,6 +130,7 @@ spark_apply <- function(x,
                         memory = TRUE,
                         group_by = NULL,
                         packages = TRUE,
+                        context = NULL,
                         ...) {
   args <- list(...)
   assert_that(is.function(f))
@@ -138,7 +141,7 @@ spark_apply <- function(x,
   rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
-  rlang <- spark_config_value(sc, "sparklyr.closures.rlang", FALSE)
+  rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
   proc_env <- connection_config(sc, "sparklyr.apply.env.")
 
   # backward compatible support for names argument from 0.6
@@ -155,6 +158,7 @@ spark_apply <- function(x,
 
   # create closure for the given function
   closure <- serialize(f, NULL)
+  context_serialize <- serialize(context, NULL)
 
   # create rlang closure
   rlang_serialize <- spark_apply_rlang_serialize()
@@ -226,7 +230,8 @@ spark_apply <- function(x,
     closure_rlang,
     bundle_path,
     as.environment(proc_env),
-    as.integer(60)
+    as.integer(60),
+    context_serialize
   )
 
   # while workers need to relaunch sparklyr backends, cache by default

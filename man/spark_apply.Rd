@@ -5,14 +5,15 @@
 \title{Apply an R Function in Spark}
 \usage{
 spark_apply(x, f, columns = colnames(x), memory = TRUE, group_by = NULL,
-  packages = TRUE, ...)
+  packages = TRUE, context = NULL, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{f}{A function that transforms a data frame partition into a data frame.
-The function \code{f} has signature \code{f(df, group1, group2, ...)} where
-\code{df} is a data frame with the data to be processed and \code{group1} to
+The function \code{f} has signature \code{f(df, context, group1, group2, ...)} where
+\code{df} is a data frame with the data to be processed, \code{context}
+is an optional object passed as the \code{context} parameter and \code{group1} to
 \code{groupN} contain the values of the \code{group_by} values. When
 \code{group_by} is not specified, \code{f} takes only one argument.}
 
@@ -37,6 +38,8 @@ adds indexed column names when not enough columns are specified.}
  https://cran.r-project.org/web/packages/packages.rds and set
   \code{Sys.setenv(sparklyr.apply.packagesdb = "<pathl-to-rds>")}. Otherwise,
   all packages will be used by default.}
+
+\item{context}{Optional object to be serialized and passed back to \code{f()}.}
 
 \item{...}{Optional arguments; currently unused.}
 }

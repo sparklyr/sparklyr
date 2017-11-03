@@ -14,7 +14,8 @@ class WorkerRDD(
   closureRLang: Array[Byte],
   bundlePath: String,
   customEnv: Map[String, String],
-  connectionTimeout: Int
+  connectionTimeout: Int,
+  context: Array[Byte]
   ) extends RDD[Row](prev) {
 
   private[this] var exception: Option[Exception] = None
@@ -35,7 +36,8 @@ class WorkerRDD(
       columns,
       groupBy,
       closureRLang,
-      bundlePath
+      bundlePath,
+      context
     )
 
     val contextId = JVMObjectTracker.put(workerContext)

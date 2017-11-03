@@ -49,6 +49,9 @@ spark_worker_apply <- function(sc) {
   closureRaw <- worker_invoke(context, "getClosure")
   closure <- unserialize(closureRaw)
 
+  funcContextRaw <- worker_invoke(context, "getContext")
+  funcContext <- unserialize(funcContextRaw)
+
   closureRLangRaw <- worker_invoke(context, "getClosureRLang")
   if (length(closureRLangRaw) > 0) {
     worker_log("found rlang closure")
@@ -81,6 +84,7 @@ spark_worker_apply <- function(sc) {
       closure_params <- length(formals(closure))
       closure_args <- c(
         list(df),
+        if (!is.null(funcContext)) list(funcContext) else NULL,
         as.list(
           if (nrow(df) > 0)
             lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
