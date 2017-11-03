@@ -158,7 +158,7 @@ spark_apply <- function(x,
 
   # create closure for the given function
   closure <- serialize(f, NULL)
-  context_serialize <- serialize(context)
+  context_serialize <- serialize(context, NULL)
 
   # create rlang closure
   rlang_serialize <- spark_apply_rlang_serialize()
