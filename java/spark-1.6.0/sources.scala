@@ -883,6 +883,9 @@ object Sources {
     "  closureRaw <- worker_invoke(context, \"getClosure\")\n" +
     "  closure <- unserialize(closureRaw)\n" +
     "\n" +
+    "  funcContextRaw <- worker_invoke(context, \"getContext\")\n" +
+    "  funcContext <- unserialize(funcContextRaw)\n" +
+    "\n" +
     "  closureRLangRaw <- worker_invoke(context, \"getClosureRLang\")\n" +
     "  if (length(closureRLangRaw) > 0) {\n" +
     "    worker_log(\"found rlang closure\")\n" +
@@ -915,6 +918,7 @@ object Sources {
     "      closure_params <- length(formals(closure))\n" +
     "      closure_args <- c(\n" +
     "        list(df),\n" +
+    "        if (!is.null(funcContext)) list(funcContext) else NULL,\n" +
     "        as.list(\n" +
     "          if (nrow(df) > 0)\n" +
     "            lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])\n" +
