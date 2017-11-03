@@ -1,6 +1,9 @@
 
 # Sparklyr 0.6.4
 
+- Added support for `spark_apply_bundle()` to support `spark_apply()` under
+  `yarn-cluster` mode.
+
 - Added support for HTTPS for `yarn-cluster` which is activated by setting
   `yarn.http.policy` to `HTTPS_ONLY` in `yarn-site.xml`.
 
