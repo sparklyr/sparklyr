@@ -12,7 +12,8 @@ class WorkerContext(
   columns: Array[String],
   groupBy: Array[String],
   closureRLang: Array[Byte],
-  bundlePath: String) {
+  bundlePath: String,
+  context: Array[Byte]) {
 
   private var result: Array[Row] = Array[Row]()
 
@@ -65,6 +66,10 @@ class WorkerContext(
   def getBundlePath(): String = {
     bundlePath
   }
+
+  def getContext(): Array[Byte] = {
+    context
+  }
 }
 
 object WorkerHelper {
@@ -78,7 +83,8 @@ object WorkerHelper {
     closureRLang: Array[Byte],
     bundlePath: String,
     customEnv: java.util.Map[Object, Object],
-    connectionTimeout: Int
+    connectionTimeout: Int,
+    context: Array[Byte]
   ): RDD[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
@@ -97,7 +103,8 @@ object WorkerHelper {
       closureRLang,
       bundlePath,
       Map() ++ customEnvMap,
-      connectionTimeout)
+      connectionTimeout,
+      context)
 
     computed
   }
