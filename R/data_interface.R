@@ -430,7 +430,9 @@ spark_data_write_generic <- function(df,
     invoke(options, fileMethod, url, path, properties)
   }
   else {
-    invoke(options, fileMethod, path)
+    options <- invoke(options, fileMethod, path)
+    # Need to call save explicitly in case of generic 'format'
+    if(fileMethod == "format") invoke(options, "save")
   }
 
   invisible(TRUE)
@@ -693,7 +695,6 @@ spark_write_jdbc.spark_jobj <- function(x,
 #'
 #' @export
 spark_write_source <- function(x,
-                               name,
                                source,
                                mode = NULL,
                                options = list(),
@@ -704,26 +705,24 @@ spark_write_source <- function(x,
 
 #' @export
 spark_write_source.tbl_spark <- function(x,
-                                         name,
                                          source,
                                          mode = NULL,
                                          options = list(),
                                          partition_by = NULL,
                                          ...) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, name, source, mode, options, partition_by)
+  spark_data_write_generic(sqlResult, source, "format", mode, options, partition_by)
 }
 
 #' @export
 spark_write_source.spark_jobj <- function(x,
-                                          name,
                                           source,
                                           mode = NULL,
                                           options = list(),
                                           partition_by = NULL,
                                           ...) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, name, source, mode, options, partition_by)
+  spark_data_write_generic(x, source, "format", mode, options, partition_by)
 }
 
 #' Read a Text file into a Spark DataFrame
