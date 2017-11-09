@@ -24,9 +24,13 @@ ml_generate_ml_model <- function(x, predictor, formula, features_col = "features
                                  constructor) {
   sc <- spark_connection(x)
   classification <- identical(type, "classification")
-  r_formula <- ft_r_formula(sc, formula, features_col, label_col,
+  r_formula <- if (spark_version(sc) >= "2.1.0")
+    ft_r_formula(sc, formula, features_col, label_col,
                             force_index_label = if (classification) TRUE else FALSE,
                             dataset = x)
+  else
+    ft_r_formula(sc, formula, features_col, label_col, dataset = x)
+
   pipeline <- ml_pipeline(r_formula, predictor)
   pipeline_model <- pipeline %>%
     ml_fit(x)
