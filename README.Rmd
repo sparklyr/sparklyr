@@ -289,7 +289,7 @@ The RStudio IDE features for sparklyr are available now as part of the [RStudio 
 [rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN package from [H2O](http://h2o.ai) that extends [sparklyr](http://spark.rstudio.com) to provide an interface into [Sparkling Water](https://github.com/h2oai/sparkling-water). For instance, the following example installs, configures and runs [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
 
 ```{r results='hide', message=FALSE}
-options(rsparkling.sparklingwater.version = "2.1.0")
+options(rsparkling.sparklingwater.version = "2.1.14")
 
 library(rsparkling)
 library(sparklyr)

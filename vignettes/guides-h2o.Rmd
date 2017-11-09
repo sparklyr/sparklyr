@@ -29,7 +29,7 @@ install.packages("rsparkling")
 Then set the Sparkling Water version for rsparkling.:
 
 ```{r}
-options(rsparkling.sparklingwater.version = "2.1.0")
+options(rsparkling.sparklingwater.version = "2.1.14")
 ```
 
 For Spark `2.0.x` set `rsparkling.sparklingwater.version` to `2.0.3` instead, for Spark `1.6.2` use `1.6.8`.
