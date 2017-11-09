@@ -66,14 +66,14 @@ ml_logistic_regression.spark_connection <- function(
     prediction_col = prediction_col, probability_col = probability_col,
     raw_prediction_col = raw_prediction_col
   ) %>%
-    invoke("setFamily", family) %>%
     invoke("setFitIntercept", fit_intercept) %>%
     invoke("setElasticNetParam", elastic_net_param) %>%
     invoke("setRegParam", reg_param) %>%
     invoke("setMaxIter", max_iter) %>%
     invoke("setThreshold", threshold) %>%
-    invoke("setAggregationDepth", aggregation_depth) %>%
-    invoke("setTol", tol)
+    invoke("setTol", tol) %>%
+    jobj_set_param("setFamily", family, "auto", "2.1.0") %>%
+    jobj_set_param("setAggregationDepth", aggregation_depth, 2L, "2.1.0")
 
   if (!rlang::is_null(thresholds))
     jobj <- invoke(jobj, "setThresholds", thresholds)
@@ -209,7 +209,9 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
   new_ml_summary(
     jobj,
     area_under_roc = invoke(jobj, "areaUnderROC"),
-    f_measure_by_threshold = invoke(jobj, "fMeasureByThreshold") %>% collect(),
+    f_measure_by_threshold = invoke(jobj, "fMeasureByThreshold") %>%
+      invoke("withColumnRenamed", "F-Measure", "F_Measure") %>%
+      collect(),
     features_col = invoke(jobj, "featuresCol"),
     label_col = invoke(jobj, "labelCol"),
     objective_history = invoke(jobj, "objectiveHistory"),
