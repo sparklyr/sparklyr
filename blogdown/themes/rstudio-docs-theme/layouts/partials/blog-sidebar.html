@@ -1,0 +1,29 @@
+
+
+ 
+<div class="block">
+<div class="markdowned">
+<h3>Categories</h3>
+<ul class="terms-list">
+  {{ range $key, $value := .Site.Taxonomies.categories }}
+  <li>
+    <a href="{{ (print "/categories/" (urlize $key) ".html") | relURL }}">
+      {{ $key }}
+    </a>
+    &nbsp;({{ len $value }})
+  </li>
+  {{ end }}
+</ul>
+</div>
+</div>
+  
+  
+<div class="block">
+<div class="markdowned">
+<h3>Subscribe</h3>
+<p class="marketo-caption">Subscribe by Email or the <a href="{{ relURL "/index.xml" }}">RSS feed</a>.</p>
+{{ partial "marketo-subscribe" . }}
+</div>
+</div>
+
+  

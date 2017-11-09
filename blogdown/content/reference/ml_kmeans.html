@@ -1,0 +1,105 @@
+---
+title: "Spark ML -- K-Means Clustering"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#value">Value</a></li>
+
+    <li><a href="#references">References</a></li>
+
+    <li><a href="#see-also">See also</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Perform k-means clustering on a Spark DataFrame.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_kmeans</span>(<span class='no'>x</span>, <span class='no'>centers</span>, <span class='kw'>iter.max</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='fu'>tbl_vars</span>(<span class='no'>x</span>),
+  <span class='kw'>compute.cost</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>tolerance</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>, <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options'>ml_options</a></span>(), <span class='no'>...</span>)</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>x</td>
+      <td><p>An object coercable to a Spark DataFrame (typically, a
+<code>tbl_spark</code>).</p></td>
+    </tr>
+    <tr>
+      <td>centers</td>
+      <td><p>The number of cluster centers to compute.</p></td>
+    </tr>
+    <tr>
+      <td>iter.max</td>
+      <td><p>The maximum number of iterations to use.</p></td>
+    </tr>
+    <tr>
+      <td>features</td>
+      <td><p>The name of features (terms) to use for the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>compute.cost</td>
+      <td><p>Whether to compute cost for <code>k-means</code> model using Spark's <a href='https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/KMeansModel.scala#L84'>computeCost</a>.</p></td>
+    </tr>
+    <tr>
+      <td>tolerance</td>
+      <td><p>Param for the convergence tolerance for iterative algorithms.</p></td>
+    </tr>
+    <tr>
+      <td>ml.options</td>
+      <td><p>Optional arguments, used to affect the model generated. See
+<code><a href='ml_options'>ml_options</a></code> for more details.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments. The <code>data</code> argument can be used to
+specify the data to be used when <code>x</code> is a formula; this allows calls
+of the form <code><a href='ml_linear_regression'>ml_linear_regression(y ~ x, data = tbl)</a></code>, and is
+especially useful in conjunction with <code>do</code>.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="value">Value</h2>
+
+    <p><a href='ml_model'>ml_model</a> object of class <code>kmeans</code> with overloaded <code>print</code>, <code>fitted</code> and <code>predict</code> functions.</p>
+    
+    <h2 id="references">References</h2>
+
+    <p>Bahmani et al., Scalable K-Means++, VLDB 2012</p>
+    
+    <h2 id="see-also">See also</h2>
+
+    <p>For information on how Spark k-means clustering is implemented, please see
+  <a href='http://spark.apache.org/docs/latest/mllib-clustering#k-means'>http://spark.apache.org/docs/latest/mllib-clustering#k-means</a>.</p>
+<p>Other Spark ML routines: <code><a href='ml_als_factorization'>ml_als_factorization</a></code>,
+  <code><a href='ml_decision_tree'>ml_decision_tree</a></code>,
+  <code><a href='ml_generalized_linear_regression'>ml_generalized_linear_regression</a></code>,
+  <code><a href='ml_gradient_boosted_trees'>ml_gradient_boosted_trees</a></code>,
+  <code><a href='ml_lda'>ml_lda</a></code>, <code><a href='ml_linear_regression'>ml_linear_regression</a></code>,
+  <code><a href='ml_logistic_regression'>ml_logistic_regression</a></code>,
+  <code><a href='ml_multilayer_perceptron'>ml_multilayer_perceptron</a></code>,
+  <code><a href='ml_naive_bayes'>ml_naive_bayes</a></code>,
+  <code><a href='ml_one_vs_rest'>ml_one_vs_rest</a></code>, <code><a href='ml_pca'>ml_pca</a></code>,
+  <code><a href='ml_random_forest'>ml_random_forest</a></code>,
+  <code><a href='ml_survival_regression'>ml_survival_regression</a></code></p>
+    
+
+    
+    </div>
+    
+    </div>
+

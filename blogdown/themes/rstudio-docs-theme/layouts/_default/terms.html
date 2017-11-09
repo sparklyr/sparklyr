@@ -1,0 +1,38 @@
+{{ partial "head" . }}
+
+<div class="single-page">
+  {{ partial "nav" . }}
+</div>
+
+<div class="page documentation">
+    <div class="side-menu" id="side-menu">
+    
+    
+    
+    </div>
+    <div class="content">
+
+      <h1 class="content-header">{{ .Title }}</h1>
+
+      <div class="markdowned">
+        <ul>
+        {{ range $key, $value := .Data.Terms }}
+        <li>
+          <a href="{{ (print "/" $.Data.Plural "/" (urlize $key) ".html") | relURL }}">
+            {{ $key }}
+          </a>
+          ({{ len $value }})
+        </li>
+        {{ end }}
+      </ul>
+
+      </div>
+      
+      {{ partial "footer" .}}
+      
+    </div>
+</div>
+
+</body>
+</html>
+

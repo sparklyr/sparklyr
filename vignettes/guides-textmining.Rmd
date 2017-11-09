@@ -1,10 +1,9 @@
 ---
 title: "Text mining with Spark & sparklyr"
 output:
-  html_document:
-    toc: yes
-    toc_float:
-      collapsed: no
+  github_document:
+    fig_width: 9
+    fig_height: 5
 ---
 
 

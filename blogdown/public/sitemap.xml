@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>/</loc>
+  </url>
+  
+  <url>
+    <loc>/guides/textmining/</loc>
+  </url>
+  
+  <url>
+    <loc>/news/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/connection_spark_shinyapp/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_config_exists/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_config_value/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark-api/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_with_sequential_id/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_with_unique_id/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_apply/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_bind/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_broadcast/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/tbl_cache/</loc>
+  </url>
+  
+  <url>
+    <loc>/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/reference/connection_is_open/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_checkpoint/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_coalesce/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_compile/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/compile_package_jars/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_quantile/</loc>
+  </url>
+  
+  <url>
+    <loc>/guides/connections/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_copy_to/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/copy_to.spark_connection/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_len/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_seq/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_along/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_create_dummy_variables/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/livy_config/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_model/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_apply_bundle/</loc>
+  </url>
+  
+  <url>
+    <loc>/extensions/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/dbisparkresult-class/</loc>
+  </url>
+  
+  <url>
+    <loc>/guides/data-lakes/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_default_compilation_spec/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_compilation_spec/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_dependency/</loc>
+  </url>
+  
+  <url>
+    <loc>/deployment/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/find_scalac/</loc>
+  </url>
+  
+  <url>
+    <loc>/guides/distributed-r/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/download_scalac/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ensure/</loc>
+  </url>
+  
+  <url>
+    <loc>/examples/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/reference/worker_spark_apply_unbundle/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_model_data/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_fast_bind_cols/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_count_vectorizer/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_regex_tokenizer/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_stop_words_remover/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_tokenizer/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_binarizer/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_bucketizer/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_discrete_cosine_transform/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_elementwise_product/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_index_to_string/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_one_hot_encoder/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_quantile_discretizer/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_sql_transformer/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_string_indexer/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ft_vector_assembler/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_install/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_home_dir/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_table_name/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/invoke_method/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/print_jobj/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_version/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_version_from_home/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_num_partitions/</loc>
+  </url>
+  
+  <url>
+    <loc>/guides/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/reference/livy_install/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/invoke/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_apply_log/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark-connections/</loc>
+  </url>
+  
+  <url>
+    <loc>/dplyr/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_predict/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_residuals/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_mutate/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/reexports/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_web/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_options/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_partition/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_persist/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/pipe/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_pivot/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_prepare_inputs/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_prepare_dataframe/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_project/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_sample/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_config/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_read_csv/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_read_column/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_read_json/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_read_parquet/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_read_text/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/connection_config/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_read_jdbc/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_read_source/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_schema/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_load_table/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_read_table/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/reference/register_extension/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_register/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_repartition/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/na.replace/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_dataframe/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_jobj/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_connection/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_versions/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_last_index/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/hive_context_config/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_context_config/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf-saveload/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_saveload/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_save_table/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_separate_column/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_home_set/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/checkpoint_directory/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/src_databases/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_sort/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_binary_classification_eval/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_classification_eval/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_tree_feature_importance/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_als_factorization/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_decision_tree/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_generalized_linear_regression/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_gradient_boosted_trees/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_kmeans/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_lda/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_linear_regression/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_logistic_regression/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_multilayer_perceptron/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_naive_bayes/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_one_vs_rest/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_pca/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_random_forest/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_survival_regression/</loc>
+  </url>
+  
+  <url>
+    <loc>/mlib/</loc>
+  </url>
+  
+  <url>
+    <loc>/examples/stand-alone-aws/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/livy_service/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/sdf_dim/</loc>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/reference/ml_glm_tidiers/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/tbl_uncache/</loc>
+  </url>
+  
+  <url>
+    <loc>/guides/caching/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/tbl_change_db/</loc>
+  </url>
+  
+  <url>
+    <loc>/examples/cloudera-aws/</loc>
+  </url>
+  
+  <url>
+    <loc>/examples/yarn-cluster-emr/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_log/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_write_csv/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_write_json/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_write_parquet/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_write_text/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_write_jdbc/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_write_table/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_write_source/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_default_version/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/spark_install_sync/</loc>
+  </url>
+  
+</urlset>

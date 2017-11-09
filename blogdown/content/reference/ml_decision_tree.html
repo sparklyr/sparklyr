@@ -1,0 +1,150 @@
+---
+title: "Spark ML -- Decision Trees"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#see-also">See also</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Perform regression or classification using decision trees.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_decision_tree</span>(<span class='no'>x</span>, <span class='no'>response</span>, <span class='no'>features</span>, <span class='kw'>impurity</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"gini"</span>,
+  <span class='st'>"entropy"</span>, <span class='st'>"variance"</span>), <span class='kw'>max.bins</span> <span class='kw'>=</span> <span class='fl'>32L</span>, <span class='kw'>max.depth</span> <span class='kw'>=</span> <span class='fl'>5L</span>,
+  <span class='kw'>min.info.gain</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>min.rows</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"auto"</span>, <span class='st'>"regression"</span>,
+  <span class='st'>"classification"</span>), <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>checkpoint.interval</span> <span class='kw'>=</span> <span class='fl'>10L</span>, <span class='kw'>cache.node.ids</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>max.memory</span> <span class='kw'>=</span> <span class='fl'>256L</span>,
+  <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options'>ml_options</a></span>(), <span class='no'>...</span>)</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>x</td>
+      <td><p>An object coercable to a Spark DataFrame (typically, a
+<code>tbl_spark</code>).</p></td>
+    </tr>
+    <tr>
+      <td>response</td>
+      <td><p>The name of the response vector (as a length-one character
+vector), or a formula, giving a symbolic description of the model to be
+fitted. When <code>response</code> is a formula, it is used in preference to other
+parameters to set the <code>response</code>, <code>features</code>, and <code>intercept</code>
+parameters (if available). Currently, only simple linear combinations of
+existing parameters is supposed; e.g. <code>response ~ feature1 + feature2 + ...</code>.
+The intercept term can be omitted by using <code>- 1</code> in the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>features</td>
+      <td><p>The name of features (terms) to use for the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>impurity</td>
+      <td><p>Criterion used for information gain calculation
+One of 'auto', 'gini', 'entropy', or 'variance'. 'auto' defaults to
+'gini' for classification and 'variance' for regression.</p></td>
+    </tr>
+    <tr>
+      <td>max.bins</td>
+      <td><p>The maximum number of bins used for discretizing
+continuous features and for choosing how to split on features at
+each node. More bins give higher granularity.</p></td>
+    </tr>
+    <tr>
+      <td>max.depth</td>
+      <td><p>Maximum depth of the tree (&gt;= 0); that is, the maximum
+number of nodes separating any leaves from the root of the tree.</p></td>
+    </tr>
+    <tr>
+      <td>min.info.gain</td>
+      <td><p>Minimum information gain for a split to be considered at a tree node. Should be &gt;= 0, defaults to 0.</p></td>
+    </tr>
+    <tr>
+      <td>min.rows</td>
+      <td><p>Minimum number of instances each child must have after split.</p></td>
+    </tr>
+    <tr>
+      <td>type</td>
+      <td><p>The type of model to fit. <code>"regression"</code> treats the response
+as a continuous variable, while <code>"classification"</code> treats the response
+as a categorical variable. When <code>"auto"</code> is used, the model type is
+inferred based on the response variable type -- if it is a numeric type,
+then regression is used; classification otherwise.</p></td>
+    </tr>
+    <tr>
+      <td>thresholds</td>
+      <td><p>Thresholds in multi-class classification to adjust
+the probability of predicting each class. Vector must have length equal
+to the number of classes, with values &gt; 0 excepting that at most one
+value may be 0. The class with largest value p/t is predicted, where p
+is the original probability of that class and t is the class's threshold.</p></td>
+    </tr>
+    <tr>
+      <td>seed</td>
+      <td><p>Seed for random numbers.</p></td>
+    </tr>
+    <tr>
+      <td>checkpoint.interval</td>
+      <td><p>Set checkpoint interval (&gt;= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.</p></td>
+    </tr>
+    <tr>
+      <td>cache.node.ids</td>
+      <td><p>If <code>FALSE</code>, the algorithm will pass trees to executors to match instances with nodes.
+If <code>TRUE</code>, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
+Defaults to <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <td>max.memory</td>
+      <td><p>Maximum memory in MB allocated to histogram aggregation. If too small, then 1 node will be split per iteration,
+and its aggregates may exceed this size. Defaults to 256.</p></td>
+    </tr>
+    <tr>
+      <td>ml.options</td>
+      <td><p>Optional arguments, used to affect the model generated. See
+<code><a href='ml_options'>ml_options</a></code> for more details.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments. The <code>data</code> argument can be used to
+specify the data to be used when <code>x</code> is a formula; this allows calls
+of the form <code><a href='ml_linear_regression'>ml_linear_regression(y ~ x, data = tbl)</a></code>, and is
+especially useful in conjunction with <code>do</code>.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="see-also">See also</h2>
+
+    <p>Other Spark ML routines: <code><a href='ml_als_factorization'>ml_als_factorization</a></code>,
+  <code><a href='ml_generalized_linear_regression'>ml_generalized_linear_regression</a></code>,
+  <code><a href='ml_gradient_boosted_trees'>ml_gradient_boosted_trees</a></code>,
+  <code><a href='ml_kmeans'>ml_kmeans</a></code>, <code><a href='ml_lda'>ml_lda</a></code>,
+  <code><a href='ml_linear_regression'>ml_linear_regression</a></code>,
+  <code><a href='ml_logistic_regression'>ml_logistic_regression</a></code>,
+  <code><a href='ml_multilayer_perceptron'>ml_multilayer_perceptron</a></code>,
+  <code><a href='ml_naive_bayes'>ml_naive_bayes</a></code>,
+  <code><a href='ml_one_vs_rest'>ml_one_vs_rest</a></code>, <code><a href='ml_pca'>ml_pca</a></code>,
+  <code><a href='ml_random_forest'>ml_random_forest</a></code>,
+  <code><a href='ml_survival_regression'>ml_survival_regression</a></code></p>
+    
+
+    
+    </div>
+    
+    </div>
+

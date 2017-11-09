@@ -1,0 +1,71 @@
+{{ partial "head" . }}
+
+<div class="single-page">
+  {{ partial "nav" . }}
+</div>
+
+<div class="page documentation">
+    <div class="side-menu" id="side-menu">
+    {{ $currentNode := .}}
+
+
+    {{  range .Site.Menus.main.ByWeight  }}
+    
+        <div class="side-menu__item__link">
+          <img class="side-menu__item__link__icon" src="/images/icons/block-retina.png" alt="">
+          <p class="side-menu__item__link__text">{{ .Name }}</p>
+        </div>
+
+        <ul class="side-menu__sub">
+          {{ range .Children }}
+            <li class="side-menu__sub__item{{if $currentNode.IsMenuCurrent "main" . }} active{{end}}">
+              <a id="menu-link-{{.URL}}" class="side-menu__sub__item__text" href="{{.URL}}" data-url="{{.URL}}">{{ .Name }} </a>
+            </li>
+          {{ end }}
+        </ul>
+          
+
+    {{ end }}
+    
+    
+    </div>
+    <div class="content">
+
+      <h1 class="content-header">{{ replace .Title "-" " "  }} </h1>
+
+      <div class="markdowned">
+      <div class="doc-page">
+    
+      <div class="doc-page-index">
+      <ul id="gumshoe-container" data-gumshoe>
+      </ul>
+      </div>
+  
+      <div class="doc-page-body">  
+          <table cellpadding="0">
+            <col width="300">
+            {{ range .Paginator.Pages }}
+              <tr>
+                <td>
+                <a id="menu-link-{{.URL}}"  class="side-menu__sub__item__text" href = "{{ .URL }}">
+                  {{ .Title }}
+                </td>
+                <td> {{ .Summary }} </td>
+              </tr>
+           {{ end }}
+          </table>
+      </div>
+      </div>
+      </div>
+      
+      {{ partial "footer" .}}
+      
+    </div>
+</div>
+
+</body>
+</html>
+
+
+
+

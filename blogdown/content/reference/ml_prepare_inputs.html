@@ -1,0 +1,112 @@
+---
+title: "Pre-process the Inputs to a Spark ML Routine"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#details">Details</a></li>
+    
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Pre-process / normalize the inputs typically passed to a
+Spark ML routine.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_prepare_response_features_intercept</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>response</span>, <span class='no'>features</span>,
+  <span class='no'>intercept</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'>parent.frame</span>(),
+  <span class='kw'>categorical.transformations</span> <span class='kw'>=</span> <span class='fu'>new.env</span>(<span class='kw'>parent</span> <span class='kw'>=</span> <span class='fu'>emptyenv</span>()),
+  <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options'>ml_options</a></span>())
+
+<span class='fu'>ml_prepare_features</span>(<span class='no'>x</span>, <span class='no'>features</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'>parent.frame</span>(),
+  <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options'>ml_options</a></span>())</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>x</td>
+      <td><p>An object coercable to a Spark DataFrame (typically, a
+<code>tbl_spark</code>).</p></td>
+    </tr>
+    <tr>
+      <td>response</td>
+      <td><p>The name of the response vector (as a length-one character
+vector), or a formula, giving a symbolic description of the model to be
+fitted. When <code>response</code> is a formula, it is used in preference to other
+parameters to set the <code>response</code>, <code>features</code>, and <code>intercept</code>
+parameters (if available). Currently, only simple linear combinations of
+existing parameters is supposed; e.g. <code>response ~ feature1 + feature2 + ...</code>.
+The intercept term can be omitted by using <code>- 1</code> in the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>features</td>
+      <td><p>The name of features (terms) to use for the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>intercept</td>
+      <td><p>Boolean; should the model be fit with an intercept term?</p></td>
+    </tr>
+    <tr>
+      <td>envir</td>
+      <td><p>The <span style="R">R</span> environment in which the <code>response</code>, <code>features</code>
+and <code>intercept</code> bindings should be mutated. (Typically, the parent frame).</p></td>
+    </tr>
+    <tr>
+      <td>categorical.transformations</td>
+      <td><p>An <span style="R">R</span> environment used to record what
+categorical variables were binarized in this procedure. Categorical
+variables that included in the model formula will be transformed into
+binary variables, and the generated mappings will be stored in this
+environment.</p></td>
+    </tr>
+    <tr>
+      <td>ml.options</td>
+      <td><p>Optional arguments, used to affect the model generated. See
+<code><a href='ml_options'>ml_options</a></code> for more details.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="details">Details</h2>
+
+    <p>Pre-processing of these inputs typically involves:</p><ol>
+<li><p>Handling the case where <code>response</code> is itself a formula
+      describing the model to be fit, thereby extracting the names
+      of the <code>response</code> and <code>features</code> to be used,</p></li>
+<li><p>Splitting categorical features into dummy variables (so they
+      can easily be accommodated + specified in the underlying
+      Spark ML model fit),</p></li>
+<li><p>Mutating the associated variables <em>in the specified environment</em>.</p></li>
+</ol>
+    <p>Please take heed of the last point, as while this is useful in practice,
+the behavior will be very surprising if you are not expecting it.</p>
+    
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># NOT RUN {</span>
+<span class='co'># note that ml_prepare_features, by default, mutates the 'features'</span>
+<span class='co'># binding in the same environment in which the function was called</span>
+<span class='fu'>local</span>({
+   <span class='fu'>ml_prepare_features</span>(<span class='kw'>features</span> <span class='kw'>=</span> ~ <span class='no'>x1</span> + <span class='no'>x2</span> + <span class='no'>x3</span>)
+   <span class='fu'>print</span>(<span class='no'>features</span>) <span class='co'># c("x1", "x2", "x3")</span>
+})
+<span class='co'># }</span></code></pre></div>
+    
+    </div>
+    
+    </div>
+

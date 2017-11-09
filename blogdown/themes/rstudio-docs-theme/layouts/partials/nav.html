@@ -1,0 +1,91 @@
+<nav data-gumshoe-header aria-label="Header" id="header" class="top-menu">
+  <div class="left">
+     <a href = "/" data-parenturl="" class="top-menu-item site-title">{{ .Site.Title }}</a>
+     <span class="logo-from">from</span>
+     <a href="/">
+      <div id="logo" class="logo"></div>
+    </a>
+  </div>
+
+  
+  {{ $repo := $.Param "repo" }}
+
+  <div class="right">
+    <div class="top-menu-items" id="top-menu-items">
+      {{ range .Site.Menus.main }}
+        <a href="{{.URL}}" data-parenturl="{{.URL}}" class="top-menu-item">{{.Name}}</a>
+      {{ end }}
+    </div>
+
+    <a href="{{ $.Param "repo" }}" class="github-logo">
+      <i class="fa fa-lg fa-github" aria-hidden="true"></i>
+    </a>
+
+    <!---
+    <div class="search-button">
+      <i class="fa fa-lg fa-search"></i>
+    </div>
+    --->
+    
+  </div>
+</nav>
+
+<nav aria-label="Header" id="mobile-header">
+  <a href = "/">{{ .Site.Title }}</a>
+  <div class="right">
+    <a href="{{ $.Param "repo" }}" class="github-logo">
+      <i class="fa fa-lg fa-github" aria-hidden="true"></i>
+    </a>
+    <div class="hamburger">
+      <i class="fa fa-lg fa-bars" aria-hidden="true"></i>
+    </div>
+
+  </div>
+
+</nav>
+
+<div id="mobile-menu-container">
+<ul id="mobile-menu">
+  {{range .Site.Menus.main}}
+    <li>
+      <a href="{{.URL}}">{{ .Name }}</a>
+       {{if .Children }}<i class="fa fa-chevron-right" aria-hidden="true"></i>{{ end }}
+    </li>
+    <ul>
+    {{range .Children}}
+      <li>
+        <a href="{{.URL}}">{{.Name}}</a>
+        {{if .Children }}{{ if not (in .Identifier "-examples") }}{{ if not (in .Identifier "-reference") }}<i class="fa fa-chevron-right" aria-hidden="true"></i>{{ end }}{{ end }}{{ end }}
+      </li>
+      {{if .Children }}{{ if not (in .Identifier "-examples") }}{{ if not (in .Identifier "-reference") }}
+      <ul>
+        {{range .Children}}
+          <li>
+            <a href="{{.URL}}">{{ .Name }}</a>
+          </li>
+        {{ end }}
+      </ul>
+      {{ end }}{{ end }}{{ end }}
+    {{ end }}
+    </ul>
+  {{ end }}
+</ul>
+</div>
+
+<div id="search-bar" class="search-bar">
+  <p class="search-bar__icon"><i class="fa fa-lg fa-search"></i> </p>
+  <div class="search-bar__input">
+      <input type="text" name="search" class="st-default-search-input">
+  </div>
+  <div class="search-bar__exit">
+    <i class="fa fa-lg fa-times"></i>
+  </div>
+
+  <div class="inline-search-results">
+    <ul>
+
+    </ul>
+  </div>
+</div>
+
+

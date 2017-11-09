@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    theBaseUrl = location.origin + "/";
+  </script>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+  <title></title>
+  <meta name="generator" content="Hugo 0.26" />
+
+  
+  <meta name="description" content="An R interface to Spark">
+  
+  <link rel="canonical" href="/news/">
+  
+
+  <meta property="og:url" content="/news/">
+  <meta property="og:title" content="sparklyr">
+  <meta name="apple-mobile-web-app-title" content="sparklyr">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    @font-face {
+      font-family: 'Icon';
+      src: url('fonts/icon.eot?52m981');
+      src: url('fonts/icon.eot?#iefix52m981')
+      format('embedded-opentype'),
+      url('fonts/icon.woff?52m981')
+      format('woff'),
+      url('fonts/icon.ttf?52m981')
+      format('truetype'),
+      url('fonts/icon.svg?52m981#icon')
+      format('svg');
+      font-weight: normal;
+      font-style: normal;
+    }
+  </style>
+
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/site-styles.css">
+
+  <script src="/js/vendor.js"></script>
+
+  <script src="/js/app.js"></script>
+  
+  <link rel="shortcut icon" href="/images/favicon.png">
+
+  
+</head>
+<body>
+
+
+<div class="single-page">
+  <nav data-gumshoe-header aria-label="Header" id="header" class="top-menu">
+  <div class="left">
+     <a href = "/" data-parenturl="" class="top-menu-item site-title">sparklyr</a>
+     <span class="logo-from">from</span>
+     <a href="/">
+      <div id="logo" class="logo"></div>
+    </a>
+  </div>
+
+
+  <div class="right">
+    <div class="top-menu-items" id="top-menu-items">
+        <a href="/dplyr" data-parenturl="/dplyr" class="top-menu-item">dplyr</a>
+        <a href="/mlib" data-parenturl="/mlib" class="top-menu-item">MLib</a>
+        <a href="/extensions" data-parenturl="/extensions" class="top-menu-item">Extensions</a>
+        <a href="/news" data-parenturl="/news" class="top-menu-item">News</a>
+        <a href="/reference" data-parenturl="/reference" class="top-menu-item">Reference</a>
+    </div>
+    
+
+    
+    
+  </div>
+</nav>
+
+<nav aria-label="Header" id="mobile-header">
+  <a href = "/">sparklyr</a>
+  <div class="right">
+    <a href="https://github.com/rstudio/sparklyr" class="github-logo">
+      <i class="fa fa-lg fa-github" aria-hidden="true"></i>
+    </a>
+    <div class="hamburger">
+      <i class="fa fa-lg fa-bars" aria-hidden="true"></i>
+    </div>
+
+  </div>
+
+</nav>
+
+<div id="mobile-menu-container">
+<ul id="mobile-menu">
+  
+    <li>
+      <a href="">Using sparklyr</a>
+       <i class="fa fa-chevron-right" aria-hidden="true"></i>
+    </li>
+    <ul>
+    
+      <li>
+        <a href="/guides/connections/">Getting Started</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/dplyr/">Manipulating data</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/mlib/">Machine Learning</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/guides/caching/">Understanding Caching</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/deployment/">Deployment Options</a>
+        
+      </li>
+      
+    
+    </ul>
+  
+    <li>
+      <a href="">Guides</a>
+       <i class="fa fa-chevron-right" aria-hidden="true"></i>
+    </li>
+    <ul>
+    
+      <li>
+        <a href="/guides/distributed-r/">Distributed R</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/guides/data-lakes/">Data Lakes</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/extensions/">Extend sparklyr</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/guides/textmining">Text mining</a>
+        
+      </li>
+      
+    
+    </ul>
+  
+    <li>
+      <a href="/examples/">Deployment Examples</a>
+       <i class="fa fa-chevron-right" aria-hidden="true"></i>
+    </li>
+    <ul>
+    
+      <li>
+        <a href="/examples/stand-alone-aws/">Standalone cluster (AWS)</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/examples/yarn-cluster-emr/">YARN cluster (EMR)</a>
+        
+      </li>
+      
+    
+      <li>
+        <a href="/examples/cloudera-aws/">Cloudera cluster</a>
+        
+      </li>
+      
+    
+    </ul>
+  
+    <li>
+      <a href="/reference/">Reference</a>
+       
+    </li>
+    <ul>
+    
+    </ul>
+  
+</ul>
+</div>
+
+<div id="search-bar" class="search-bar">
+  <p class="search-bar__icon"><i class="fa fa-lg fa-search"></i> </p>
+  <div class="search-bar__input">
+      <input type="text" name="search" class="st-default-search-input">
+  </div>
+  <div class="search-bar__exit">
+    <i class="fa fa-lg fa-times"></i>
+  </div>
+
+  <div class="inline-search-results">
+    <ul>
+
+    </ul>
+  </div>
+</div>
+
+
+
+</div>
+
+<div class="page documentation">
+    <div class="side-menu" id="side-menu">
+    
+    
+  
+
+    
+
+        <a href="" class="side-menu__item__link">
+          <img class="side-menu__item__link__icon" src="/images/icons/block-retina.png" alt="">
+          <p class="side-menu__item__link__text">Using sparklyr</p>
+        </a>
+
+        <ul class="side-menu__sub">
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/guides/connections/" class="side-menu__sub__item__text" href="/guides/connections/" data-url="/guides/connections/">Getting Started</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/dplyr/" class="side-menu__sub__item__text" href="/dplyr/" data-url="/dplyr/">Manipulating data</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/mlib/" class="side-menu__sub__item__text" href="/mlib/" data-url="/mlib/">Machine Learning</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/guides/caching/" class="side-menu__sub__item__text" href="/guides/caching/" data-url="/guides/caching/">Understanding Caching</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/deployment/" class="side-menu__sub__item__text" href="/deployment/" data-url="/deployment/">Deployment Options</a>
+            </li>
+          
+        </ul>
+          
+
+    
+
+        <a href="" class="side-menu__item__link">
+          <img class="side-menu__item__link__icon" src="/images/icons/block-retina.png" alt="">
+          <p class="side-menu__item__link__text">Guides</p>
+        </a>
+
+        <ul class="side-menu__sub">
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/guides/distributed-r/" class="side-menu__sub__item__text" href="/guides/distributed-r/" data-url="/guides/distributed-r/">Distributed R</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/guides/data-lakes/" class="side-menu__sub__item__text" href="/guides/data-lakes/" data-url="/guides/data-lakes/">Data Lakes</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/extensions/" class="side-menu__sub__item__text" href="/extensions/" data-url="/extensions/">Extend sparklyr</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/guides/textmining" class="side-menu__sub__item__text" href="/guides/textmining" data-url="/guides/textmining">Text mining</a>
+            </li>
+          
+        </ul>
+          
+
+    
+
+        <a href="/examples/" class="side-menu__item__link">
+          <img class="side-menu__item__link__icon" src="/images/icons/block-retina.png" alt="">
+          <p class="side-menu__item__link__text">Deployment Examples</p>
+        </a>
+
+        <ul class="side-menu__sub">
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/examples/stand-alone-aws/" class="side-menu__sub__item__text" href="/examples/stand-alone-aws/" data-url="/examples/stand-alone-aws/">Standalone cluster (AWS)</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/examples/yarn-cluster-emr/" class="side-menu__sub__item__text" href="/examples/yarn-cluster-emr/" data-url="/examples/yarn-cluster-emr/">YARN cluster (EMR)</a>
+            </li>
+          
+            <li class="side-menu__sub__item ">
+              <a id="menu-link-/examples/cloudera-aws/" class="side-menu__sub__item__text" href="/examples/cloudera-aws/" data-url="/examples/cloudera-aws/">Cloudera cluster</a>
+            </li>
+          
+        </ul>
+          
+
+    
+
+        <a href="/reference/" class="side-menu__item__link">
+          <img class="side-menu__item__link__icon" src="/images/icons/block-retina.png" alt="">
+          <p class="side-menu__item__link__text">Reference</p>
+        </a>
+
+        <ul class="side-menu__sub">
+          
+        </ul>
+          
+
+    
+    
+    
+    </div>
+    <div class="content">
+
+      <h1 class="content-header"> </h1>
+
+      <div class="markdowned">
+      <div class="doc-page">
+    
+      <div class="doc-page-index">
+      <ul id="gumshoe-container" data-gumshoe>
+      </ul>
+      </div>
+  
+      <div class="doc-page-body">  
+        
+
+<h1 id="sparklyr-0-7-unreleased">Sparklyr 0.7 (UNRELEASED)</h1>
+
+<ul>
+<li><p>Added support for <code>context</code> parameter in <code>spark_apply()</code> to allow callers to
+pass additional contextual information to the <code>f()</code> closure.</p></li>
+
+<li><p>Implemented workaround to support in <code>spark_write_table()</code> for
+<code>mode = 'append'</code>.</p></li>
+
+<li><p>Various ML improvements, including support for pipelines, additional algorithms,
+hyper-parameter tuning, and better model persistence.</p></li>
+
+<li><p>Added <code>spark_read_libsvm()</code> for reading libsvm files.</p></li>
+
+<li><p>Added support for separating struct columns in <code>sdf_separate_column()</code>.</p></li>
+
+<li><p>Fixed collection of <code>short</code>, <code>float</code> and <code>byte</code> to properly return NAs.</p></li>
+
+<li><p>Added <code>sparklyr.collect.datechars</code> option to enable collecting <code>DateType</code> and
+<code>TimestampTime</code> as <code>characters</code> to support compatibility with previos versions.</p></li>
+
+<li><p>Fixed collection of <code>DateType</code> and <code>TimestampTime</code> from <code>character</code> to
+proper <code>Date</code> and <code>POSIXct</code> types.</p></li>
+</ul>
+
+<h1 id="sparklyr-0-6-4">Sparklyr 0.6.4</h1>
+
+<ul>
+<li><p>Added support for HTTPS for <code>yarn-cluster</code> which is activated by setting
+<code>yarn.http.policy</code> to <code>HTTPS_ONLY</code> in <code>yarn-site.xml</code>.</p></li>
+
+<li><p>Added support for <code>sparklyr.yarn.cluster.accepted.timeout</code> under <code>yarn-cluster</code>
+to allow users to wait for resources under cluster with high waiting times.</p></li>
+
+<li><p>Fix to <code>spark_apply()</code> when package distribution deadlock triggers in
+environments where multiple executors run under the same node.</p></li>
+
+<li><p>Added support in <code>spark_apply()</code> for specifying  a list of <code>packages</code> to
+distribute to each worker node.</p></li>
+
+<li><p>Added support in<code>yarn-cluster</code> for <code>sparklyr.yarn.cluster.lookup.prefix</code>,
+<code>sparklyr.yarn.cluster.lookup.username</code> and <code>sparklyr.yarn.cluster.lookup.byname</code>
+to control the new application lookup behavior.</p></li>
+</ul>
+
+<h1 id="sparklyr-0-6-3">Sparklyr 0.6.3</h1>
+
+<ul>
+<li><p>Enabled support for Java 9 for clusters configured with
+Hadoop 2.8. Java 9 blocked on &lsquo;master=local&rsquo; unless
+&lsquo;options(sparklyr.java9 = TRUE)&rsquo; is set.</p></li>
+
+<li><p>Fixed issue in <code>spark_connect()</code> where using <code>set.seed()</code>
+before connection would cause session ids to be duplicates
+and connections to be reused.</p></li>
+
+<li><p>Fixed issue in <code>spark_connect()</code> blocking gateway port when
+connection was never started to the backend, for isntasnce,
+while interrupting the r session while connecting.</p></li>
+
+<li><p>Performance improvement for quering field names from tables
+impacting tables and <code>dplyr</code> queries, most noticeable in
+<code>na.omit</code> with several columns.</p></li>
+
+<li><p>Fix to <code>spark_apply()</code> when closure returns a <code>data.frame</code>
+that contains no rows and has one or more columns.</p></li>
+
+<li><p>Fix to <code>spark_apply()</code> while using <code>tryCatch()</code> within
+closure and increased callstack printed to logs when
+error triggers within closure.</p></li>
+
+<li><p>Added support for the <code>SPARKLYR_LOG_FILE</code> environment
+variable to specify the file used for log output.</p></li>
+
+<li><p>Fixed regression for <code>union_all()</code> affecting Spark 1.6.X.</p></li>
+
+<li><p>Added support for <code>na.omit.cache</code> option that when set to
+<code>FALSE</code> will prevent <code>na.omit</code> from caching results when
+rows are dropped.</p></li>
+
+<li><p>Added support in <code>spark_connect()</code> for <code>yarn-cluster</code> with
+hight-availability enabled.</p></li>
+
+<li><p>Added support for <code>spark_connect()</code> with <code>master=&quot;yarn-cluster&quot;</code>
+to query YARN resource manager API and retrieve the correct
+container host name.</p></li>
+
+<li><p>Fixed issue in <code>invoke()</code> calls while using integer arrays
+that contain <code>NA</code> which can be commonly experienced
+while using <code>spark_apply()</code>.</p></li>
+
+<li><p>Added <code>topics.description</code> under <code>ml_lda()</code> result.</p></li>
+
+<li><p>Added support for <code>ft_stop_words_remover()</code> to strip out
+stop words from tokens.</p></li>
+
+<li><p>Feature transformers (<code>ft_*</code> functions) now explicitly
+require <code>input.col</code> and <code>output.col</code> to be specified.</p></li>
+
+<li><p>Added support for <code>spark_apply_log()</code> to enable logging in
+worker nodes while using <code>spark_apply()</code>.</p></li>
+
+<li><p>Fix to <code>spark_apply()</code> for <code>SparkUncaughtExceptionHandler</code>
+exception while running over large jobs that may overlap
+during an, now unnecesary, unregister operation.</p></li>
+
+<li><p>Fix race-condition first time <code>spark_apply()</code> is run when more
+than one partition runs in a worker and both processes try to
+unpack the packages bundle at the same time.</p></li>
+
+<li><p><code>spark_apply()</code> now adds generic column names when needed and
+validates <code>f</code> is a <code>function</code>.</p></li>
+
+<li><p>Improved documentation and error cases for <code>metric</code> argument in
+<code>ml_classification_eval()</code> and <code>ml_binary_classification_eval()</code>.</p></li>
+
+<li><p>Fix to <code>spark_install()</code> to use the <code>/logs</code> subfolder to store local
+<code>log4j</code> logs.</p></li>
+
+<li><p>Fix to <code>spark_apply()</code> when R is used from a worker node since worker
+node already contains packages but still might be triggering different
+R session.</p></li>
+
+<li><p>Fix connection from closing when <code>invoke()</code> attempts to use a class
+with a method that contains a reference to an undefined class.</p></li>
+
+<li><p>Implemented all tuning options from Spark ML for <code>ml_random_forest()</code>,
+<code>ml_gradient_boosted_trees()</code>, and <code>ml_decision_tree()</code>.</p></li>
+
+<li><p>Avoid tasks failing under <code>spark_apply()</code> and multiple  concurrent
+partitions running while selecting backend port.</p></li>
+
+<li><p>Added support for numeric arguments for <code>n</code> in <code>lead()</code> for dplyr.</p></li>
+
+<li><p>Added unsupported error message to <code>sample_n()</code> and <code>sample_frac()</code>
+when Spark is not 2.0 or higher.</p></li>
+
+<li><p>Fixed <code>SIGPIPE</code> error under <code>spark_connect()</code> immediately after
+a <code>spark_disconnect()</code> operation.</p></li>
+
+<li><p>Added support for <code>sparklyr.apply.env.</code> under <code>spark_config()</code> to
+allow <code>spark_apply()</code> to initializae environment varaibles.</p></li>
+
+<li><p>Added support for <code>spark_read_text()</code> and <code>spark_write_text()</code> to
+read from and to plain text files.</p></li>
+
+<li><p>Addesd support for RStudio project templates to create an
+&ldquo;R Package using sparklyr&rdquo;.</p></li>
+
+<li><p>Fix <code>compute()</code> to trigger refresh of the connections view.</p></li>
+
+<li><p>Added a <code>k</code> argument to <code>ml_pca()</code> to enable specification of number of
+principal components to extract. Also implemented <code>sdf_project()</code> to project
+datasets using the results of <code>ml_pca()</code> models.</p></li>
+
+<li><p>Added support for additional livy session creation parameters using
+the <code>livy_config()</code> function.</p></li>
+</ul>
+
+<h1 id="sparklyr-0-6-2">Sparklyr 0.6.2</h1>
+
+<ul>
+<li>Fix connection_spark_shinyapp() under RStudio 1.1 to avoid error while
+listing Spark installation options for the first time.</li>
+</ul>
+
+<h1 id="sparklyr-0-6-1">Sparklyr 0.6.1</h1>
+
+<ul>
+<li><p>Fixed error in <code>spark_apply()</code> that may triggered when multiple CPUs
+are used in a single node due to race conditions while accesing the
+gateway service and another in the <code>JVMObjectTracker</code>.</p></li>
+
+<li><p><code>spark_apply()</code> now supports explicit column types using the <code>columns</code>
+argument to avoid sampling types.</p></li>
+
+<li><p><code>spark_apply()</code> with <code>group_by</code> no longer requires persisting to disk
+nor memory.</p></li>
+
+<li><p>Added support for Spark 1.6.3 under <code>spark_install()</code>.</p></li>
+
+<li><p>Added support for Spark 1.6.3 under <code>spark_install()</code></p></li>
+
+<li><p><code>spark_apply()</code> now logs the current callstack when it fails.</p></li>
+
+<li><p>Fixed error triggered while processing empty partitions in <code>spark_apply()</code>.</p></li>
+
+<li><p>Fixed slow printing issue caused by <code>print</code> calculating the total row count,
+which is expensive for some tables.</p></li>
+
+<li><p>Fixed <code>sparklyr 0.6</code> issue blocking concurrent <code>sparklyr</code> connections, which
+required to set <code>config$sparklyr.gateway.remote = FALSE</code> as workaround.</p></li>
+</ul>
+
+<h1 id="sparklyr-0-6-0">Sparklyr 0.6.0</h1>
+
+<h3 id="distributed-r">Distributed R</h3>
+
+<ul>
+<li><p>Added <code>packages</code> parameter to <code>spark_apply()</code> to distribute packages
+across worker nodes automatically.</p></li>
+
+<li><p>Added <code>sparklyr.closures.rlang</code> as a <code>spark_config()</code> value to support
+generic closures provided by the <code>rlang</code> package.</p></li>
+
+<li><p>Added config options <code>sparklyr.worker.gateway.address</code> and
+<code>sparklyr.worker.gateway.port</code> to configure gateway used under
+worker nodes.</p></li>
+
+<li><p>Added <code>group_by</code> parameter to <code>spark_apply()</code>, to support operations
+over groups of dataframes.</p></li>
+
+<li><p>Added <code>spark_apply()</code>, allowing users to use R code to directly
+manipulate and transform Spark DataFrames.</p></li>
+</ul>
+
+<h3 id="external-data">External Data</h3>
+
+<ul>
+<li><p>Added <code>spark_write_source()</code>. This function writes data into a
+Spark data source which can be loaded through an Spark package.</p></li>
+
+<li><p>Added <code>spark_write_jdbc()</code>. This function writes from a Spark DataFrame
+into a JDBC connection.</p></li>
+
+<li><p>Added <code>columns</code> parameter to <code>spark_read_*()</code> functions to load data with
+named columns or explicit column types.</p></li>
+
+<li><p>Added <code>partition_by</code> parameter to <code>spark_write_csv()</code>, <code>spark_write_json()</code>,
+<code>spark_write_table()</code> and <code>spark_write_parquet()</code>.</p></li>
+
+<li><p>Added <code>spark_read_source()</code>. This function reads data from a
+Spark data source which can be loaded through an Spark package.</p></li>
+
+<li><p>Added support for <code>mode = &quot;overwrite&quot;</code> and <code>mode = &quot;append&quot;</code> to
+<code>spark_write_csv()</code>.</p></li>
+
+<li><p><code>spark_write_table()</code> now supports saving to default Hive path.</p></li>
+
+<li><p>Improved performance of <code>spark_read_csv()</code> reading remote data when
+<code>infer_schema = FALSE</code>.</p></li>
+
+<li><p>Added <code>spark_read_jdbc()</code>. This function reads from a JDBC connection
+into a Spark DataFrame.</p></li>
+
+<li><p>Renamed <code>spark_load_table()</code> and <code>spark_save_table()</code> into <code>spark_read_table()</code>
+and <code>spark_write_table()</code> for consistency with existing <code>spark_read_*()</code> and
+<code>spark_write_*()</code> functions.</p></li>
+
+<li><p>Added support to specify a vector of column names in <code>spark_read_csv()</code> to
+specify column names without having to set the type of each column.</p></li>
+
+<li><p>Improved <code>copy_to()</code>, <code>sdf_copy_to()</code> and <code>dbWriteTable()</code> performance under
+<code>yarn-client</code> mode.</p></li>
+</ul>
+
+<h3 id="dplyr">dplyr</h3>
+
+<ul>
+<li><p>Support for <code>cumprod()</code> to calculate cumulative products.</p></li>
+
+<li><p>Support for <code>cor()</code>, <code>cov()</code>, <code>sd()</code> and <code>var()</code> as window functions.</p></li>
+
+<li><p>Support for Hive built-in operators <code>%like%</code>, <code>%rlike%</code>, and
+<code>%regexp%</code> for matching regular expressions in <code>filter()</code> and <code>mutate()</code>.</p></li>
+
+<li><p>Support for dplyr (&gt;= 0.6) which among many improvements, increases
+performance in some queries by making use of a new query optimizer.</p></li>
+
+<li><p><code>sample_frac()</code> takes a fraction instead of a percent to match dplyr.</p></li>
+
+<li><p>Improved performance of <code>sample_n()</code> and <code>sample_frac()</code> through the use of
+<code>TABLESAMPLE</code> in the generated query.</p></li>
+</ul>
+
+<h3 id="databases">Databases</h3>
+
+<ul>
+<li><p>Added <code>src_databases()</code>. This function list all the available databases.</p></li>
+
+<li><p>Added <code>tbl_change_db()</code>. This function changes current database.</p></li>
+</ul>
+
+<h3 id="dataframes">DataFrames</h3>
+
+<ul>
+<li><p>Added <code>sdf_len()</code>, <code>sdf_seq()</code> and <code>sdf_along()</code> to help generate numeric
+sequences as Spark DataFrames.</p></li>
+
+<li><p>Added <code>spark_set_checkpoint_dir()</code>, <code>spark_get_checkpoint_dir()</code>, and
+<code>sdf_checkpoint()</code> to enable checkpointing.</p></li>
+
+<li><p>Added <code>sdf_broadcast()</code> which can be used to hint the query
+optimizer to perform a broadcast join in cases where a shuffle
+hash join is planned but not optimal.</p></li>
+
+<li><p>Added <code>sdf_repartition()</code>, <code>sdf_coalesce()</code>, and <code>sdf_num_partitions()</code>
+to support repartitioning and getting the number of partitions of Spark
+DataFrames.</p></li>
+
+<li><p>Added <code>sdf_bind_rows()</code> and <code>sdf_bind_cols()</code> &ndash; these functions
+are the <code>sparklyr</code> equivalent of <code>dplyr::bind_rows()</code> and
+<code>dplyr::bind_cols()</code>.</p></li>
+
+<li><p>Added <code>sdf_separate_column()</code> &ndash; this function allows one to separate
+components of an array / vector column into separate scalar-valued
+columns.</p></li>
+
+<li><p><code>sdf_with_sequential_id()</code> now supports <code>from</code> parameter to choose the
+starting value of the id column.</p></li>
+
+<li><p>Added <code>sdf_pivot()</code>. This function provides a mechanism for constructing
+pivot tables, using Spark&rsquo;s &lsquo;groupBy&rsquo; + &lsquo;pivot&rsquo; functionality, with a
+formula interface similar to that of <code>reshape2::dcast()</code>.</p></li>
+</ul>
+
+<h3 id="mllib">MLlib</h3>
+
+<ul>
+<li><p>Added <code>vocabulary.only</code> to <code>ft_count_vectorizer()</code> to retrieve the
+vocabulary with ease.</p></li>
+
+<li><p>GLM type models now support <code>weights.column</code> to specify weights in model
+fitting. (#217)</p></li>
+
+<li><p><code>ml_logistic_regression()</code> now supports multinomial regression, in
+addition to binomial regression [requires Spark 2.1.0 or greater]. (#748)</p></li>
+
+<li><p>Implemented <code>residuals()</code> and <code>sdf_residuals()</code> for Spark linear
+regression and GLM models. The former returns a R vector while
+the latter returns a <code>tbl_spark</code> of training data with a <code>residuals</code>
+column added.</p></li>
+
+<li><p>Added <code>ml_model_data()</code>, used for extracting data associated with
+Spark ML models.</p></li>
+
+<li><p>The <code>ml_save()</code> and <code>ml_load()</code> functions gain a <code>meta</code> argument, allowing
+users to specify where R-level model metadata should be saved independently
+of the Spark model itself. This should help facilitate the saving and loading
+of Spark models used in non-local connection scenarios.</p></li>
+
+<li><p><code>ml_als_factorization()</code> now supports the implicit matrix factorization
+and nonnegative least square options.</p></li>
+
+<li><p>Added <code>ft_count_vectorizer()</code>. This function can be used to transform
+columns of a Spark DataFrame so that they might be used as input to <code>ml_lda()</code>.
+This should make it easier to invoke <code>ml_lda()</code> on Spark data sets.</p></li>
+</ul>
+
+<h3 id="broom">Broom</h3>
+
+<ul>
+<li>Implemented <code>tidy()</code>, <code>augment()</code>, and <code>glance()</code> from tidyverse/broom for
+<code>ml_model_generalized_linear_regression</code> and <code>ml_model_linear_regression</code>
+models.
+<br /></li>
+</ul>
+
+<h3 id="r-compatibility">R Compatibility</h3>
+
+<ul>
+<li>Implemented <code>cbind.tbl_spark()</code>. This method works by first generating
+index columns using <code>sdf_with_sequential_id()</code> then performing <code>inner_join()</code>.
+Note that dplyr <code>_join()</code> functions should still be used for DataFrames
+with common keys since they are less expensive.</li>
+</ul>
+
+<h3 id="connections">Connections</h3>
+
+<ul>
+<li><p>Increased default number of concurrent connections by setting default for
+<code>spark.port.maxRetries</code> from 16 to 128.</p></li>
+
+<li><p>Support for gateway connections <code>sparklyr://hostname:port/session</code> and using
+<code>spark-submit --class sparklyr.Shell sparklyr-2.1-2.11.jar &lt;port&gt; &lt;id&gt; --remote</code>.</p></li>
+
+<li><p>Added support for <code>sparklyr.gateway.service</code> and <code>sparklyr.gateway.remote</code> to
+enable/disable the gateway in service and to accept remote connections required
+for Yarn Cluster mode.</p></li>
+
+<li><p>Added support for Yarn Cluster mode using <code>master = &quot;yarn-cluster&quot;</code>. Either,
+explicitly set <code>config = list(sparklyr.gateway.address = &quot;&lt;driver-name&gt;&quot;)</code> or
+implicitly <code>sparklyr</code> will read the <code>site-config.xml</code> for the <code>YARN_CONF_DIR</code>
+environment variable.</p></li>
+
+<li><p>Added <code>spark_context_config()</code> and <code>hive_context_config()</code> to retrieve
+runtime configurations for the Spark and Hive contexts.</p></li>
+
+<li><p>Added <code>sparklyr.log.console</code> to redirect logs to console, useful
+to troubleshooting <code>spark_connect</code>.</p></li>
+
+<li><p>Added <code>sparklyr.backend.args</code> as config option to enable passing
+parameters to the <code>sparklyr</code> backend.</p></li>
+
+<li><p>Improved logging while establishing connections to <code>sparklyr</code>.</p></li>
+
+<li><p>Improved <code>spark_connect()</code> performance.</p></li>
+
+<li><p>Implemented new configuration checks to proactively report connection errors
+in Windows.</p></li>
+
+<li><p>While connecting to spark from Windows, setting the <code>sparklyr.verbose</code> option
+to <code>TRUE</code> prints detailed configuration steps.</p></li>
+
+<li><p>Added <code>custom_headers</code> to <code>livy_config()</code> to add custom headers to the REST call
+to the Livy server</p></li>
+</ul>
+
+<h3 id="compilation">Compilation</h3>
+
+<ul>
+<li><p>Added support for <code>jar_dep</code> in the compilation specification to
+support additional <code>jars</code> through <code>spark_compile()</code>.</p></li>
+
+<li><p><code>spark_compile()</code> now prints deprecation warnings.</p></li>
+
+<li><p>Added <code>download_scalac()</code> to assist downloading all the Scala compilers
+required to build using <code>compile_package_jars</code> and provided support for
+using any <code>scalac</code> minor versions while looking for the right compiler.</p></li>
+</ul>
+
+<h3 id="backend">Backend</h3>
+
+<ul>
+<li>Improved backend logging by adding type and session id prefix.</li>
+</ul>
+
+<h3 id="miscellaneous">Miscellaneous</h3>
+
+<ul>
+<li><p><code>copy_to()</code> and <code>sdf_copy_to()</code> auto generate a <code>name</code> when an expression
+can&rsquo;t be transformed into a table name.</p></li>
+
+<li><p>Implemented <code>type_sum.jobj()</code> (from tibble) to enable better printing of jobj
+objects embedded in data frames.</p></li>
+
+<li><p>Added the <code>spark_home_set()</code> function, to help facilitate the setting of the
+<code>SPARK_HOME</code> environment variable. This should prove useful in teaching
+environments, when teaching the basics of Spark and sparklyr.</p></li>
+
+<li><p>Added support for the <code>sparklyr.ui.connections</code> option, which adds additional
+connection options into the new connections dialog. The
+<code>rstudio.spark.connections</code> option is now deprecated.</p></li>
+
+<li><p>Implemented the &ldquo;New Connection Dialog&rdquo; as a Shiny application to be able to
+support newer versions of RStudio that deprecate current connections UI.</p></li>
+</ul>
+
+<h3 id="bug-fixes">Bug Fixes</h3>
+
+<ul>
+<li><p>When using <code>spark_connect()</code> in local clusters, it validates that <code>java</code> exists
+under <code>JAVA_HOME</code> to help troubleshoot systems that have an incorrect <code>JAVA_HOME</code>.</p></li>
+
+<li><p>Improved <code>argument is of length zero</code> error triggered while retrieving data
+with no columns to display.</p></li>
+
+<li><p>Fixed <code>Path does not exist</code> referencing <code>hdfs</code> exception during <code>copy_to</code> under
+systems configured with <code>HADOOP_HOME</code>.</p></li>
+
+<li><p>Fixed session crash after &ldquo;No status is returned&rdquo; error by terminating
+invalid connection and added support to print log trace during this error.</p></li>
+
+<li><p><code>compute()</code> now caches data in memory by default. To revert this beavior use
+<code>sparklyr.dplyr.compute.nocache</code> set to <code>TRUE</code>.</p></li>
+
+<li><p><code>spark_connect()</code> with <code>master = &quot;local&quot;</code> and a given <code>version</code> overrides
+<code>SPARK_HOME</code> to avoid existing installation mismatches.</p></li>
+
+<li><p>Fixed <code>spark_connect()</code> under Windows issue when <code>newInstance0</code> is present in
+the logs.</p></li>
+
+<li><p>Fixed collecting <code>long</code> type columns when NAs are present (#463).</p></li>
+
+<li><p>Fixed backend issue that affects systems where <code>localhost</code> does
+not resolve properly to the loopback address.</p></li>
+
+<li><p>Fixed issue collecting data frames containing newlines <code>\n</code>.</p></li>
+
+<li><p>Spark Null objects (objects of class NullType) discovered within numeric
+vectors are now collected as NAs, rather than lists of NAs.</p></li>
+
+<li><p>Fixed warning while connecting with livy and improved 401 message.</p></li>
+
+<li><p>Fixed issue in <code>spark_read_parquet()</code> and other read methods in which
+<code>spark_normalize_path()</code> would not work in some platforms while loading
+data using custom protocols like <code>s3n://</code> for Amazon S3.</p></li>
+
+<li><p>Resolved issue in <code>spark_save()</code> / <code>load_table()</code> to support saving / loading
+data and added path parameter in <code>spark_load_table()</code> for consistency with
+other functions.</p></li>
+</ul>
+
+<h1 id="sparklyr-0-5-5">Sparklyr 0.5.5</h1>
+
+<ul>
+<li>Implemented support for <code>connectionViewer</code> interface required in RStudio 1.1
+and <code>spark_connect</code> with <code>mode=&quot;databricks&quot;</code>.</li>
+</ul>
+
+<h1 id="sparklyr-0-5-4">Sparklyr 0.5.4</h1>
+
+<ul>
+<li>Implemented support for <code>dplyr 0.6</code> and Spark 2.1.x.
+<br /></li>
+</ul>
+
+<h1 id="sparklyr-0-5-3">Sparklyr 0.5.3</h1>
+
+<ul>
+<li>Implemented support for <code>DBI 0.6</code>.</li>
+</ul>
+
+<h1 id="sparklyr-0-5-2">Sparklyr 0.5.2</h1>
+
+<ul>
+<li><p>Fix to <code>spark_connect</code> affecting Windows users and Spark 1.6.x.</p></li>
+
+<li><p>Fix to Livy connections which would cause connections to fail while connection
+is on &lsquo;waiting&rsquo; state.</p></li>
+</ul>
+
+<h1 id="sparklyr-0-5-0">Sparklyr 0.5.0</h1>
+
+<ul>
+<li><p>Implemented basic authorization for Livy connections using
+<code>livy_config_auth()</code>.</p></li>
+
+<li><p>Added support to specify additional <code>spark-submit</code> parameters using the
+<code>sparklyr.shell.args</code> environment variable.</p></li>
+
+<li><p>Renamed <code>sdf_load()</code> and <code>sdf_save()</code> to <code>spark_read()</code> and <code>spark_write()</code>
+for consistency.</p></li>
+
+<li><p>The functions <code>tbl_cache()</code> and <code>tbl_uncache()</code> can now be using without
+requiring the <code>dplyr</code> namespace to be loaded.</p></li>
+
+<li><p><code>spark_read_csv(..., columns = &lt;...&gt;, header = FALSE)</code> should now work as
+expected &ndash; previously, <code>sparklyr</code> would still attempt to normalize the
+column names provided.</p></li>
+
+<li><p>Support to configure Livy using the <code>livy.</code> prefix in the <code>config.yml</code> file.</p></li>
+
+<li><p>Implemented experimental support for Livy through: <code>livy_install()</code>,
+<code>livy_service_start()</code>, <code>livy_service_stop()</code> and
+<code>spark_connect(method = &quot;livy&quot;)</code>.</p></li>
+
+<li><p>The <code>ml</code> routines now accept <code>data</code> as an optional argument, to support
+calls of the form e.g. <code>ml_linear_regression(y ~ x, data = data)</code>. This
+should be especially helpful in conjunction with <code>dplyr::do()</code>.</p></li>
+
+<li><p>Spark <code>DenseVector</code> and <code>SparseVector</code> objects are now deserialized as
+R numeric vectors, rather than Spark objects. This should make it easier
+to work with the output produced by <code>sdf_predict()</code> with Random Forest
+models, for example.</p></li>
+
+<li><p>Implemented <code>dim.tbl_spark()</code>. This should ensure that <code>dim()</code>, <code>nrow()</code>
+and <code>ncol()</code> all produce the expected result with <code>tbl_spark</code>s.</p></li>
+
+<li><p>Improved Spark 2.0 installation in Windows by creating <code>spark-defaults.conf</code>
+and configuring <code>spark.sql.warehouse.dir</code>.</p></li>
+
+<li><p>Embedded Apache Spark package dependencies to avoid requiring internet
+connectivity while connecting for the first through <code>spark_connect</code>. The
+<code>sparklyr.csv.embedded</code> config setting was added to configure a regular
+expression to match Spark versions where the embedded package is deployed.</p></li>
+
+<li><p>Increased exception callstack and message length to include full
+error details when an exception is thrown in Spark.</p></li>
+
+<li><p>Improved validation of supported Java versions.</p></li>
+
+<li><p>The <code>spark_read_csv()</code> function now accepts the <code>infer_schema</code> parameter,
+controlling whether the columns schema should be inferred from the underlying
+file itself. Disabling this should improve performance when the schema is
+known beforehand.</p></li>
+
+<li><p>Added a <code>do_.tbl_spark</code> implementation, allowing for the execution of
+<code>dplyr::do</code> statements on Spark DataFrames. Currently, the computation is
+performed in serial across the different groups specified on the Spark
+DataFrame; in the future we hope to explore a parallel implementation.
+Note that <code>do_</code> always returns a <code>tbl_df</code> rather than a <code>tbl_spark</code>, as
+the objects produced within a <code>do_</code> query may not necessarily be Spark
+objects.</p></li>
+
+<li><p>Improved errors, warnings and fallbacks for unsupported Spark versions.</p></li>
+
+<li><p><code>sparklyr</code> now defaults to <code>tar = &quot;internal&quot;</code> in its calls to <code>untar()</code>.
+This should help resolve issues some Windows users have seen related to
+an inability to connect to Spark, which ultimately were caused by a lack
+of permissions on the Spark installation.</p></li>
+
+<li><p>Resolved an issue where <code>copy_to()</code> and other R =&gt; Spark data transfer
+functions could fail when the last column contained missing / empty values.
+(#265)</p></li>
+
+<li><p>Added <code>sdf_persist()</code> as a wrapper to the Spark DataFrame <code>persist()</code> API.</p></li>
+
+<li><p>Resolved an issue where <code>predict()</code> could produce results in the wrong
+order for large Spark DataFrames.</p></li>
+
+<li><p>Implemented support for <code>na.action</code> with the various Spark ML routines. The
+value of <code>getOption(&quot;na.action&quot;)</code> is used by default. Users can customize the
+<code>na.action</code> argument through the <code>ml.options</code> object accepted by all ML
+routines.</p></li>
+
+<li><p>On Windows, long paths, and paths containing spaces, are now supported within
+calls to <code>spark_connect()</code>.</p></li>
+
+<li><p>The <code>lag()</code> window function now accepts numeric values for <code>n</code>. Previously,
+only integer values were accepted. (#249)</p></li>
+
+<li><p>Added support to configure Ppark environment variables using <code>spark.env.*</code> config.</p></li>
+
+<li><p>Added support for the <code>Tokenizer</code> and <code>RegexTokenizer</code> feature transformers.
+These are exported as the <code>ft_tokenizer()</code> and <code>ft_regex_tokenizer()</code> functions.</p></li>
+
+<li><p>Resolved an issue where attempting to call <code>copy_to()</code> with an R <code>data.frame</code>
+containing many columns could fail with a Java StackOverflow. (#244)</p></li>
+
+<li><p>Resolved an issue where attempting to call <code>collect()</code> on a Spark DataFrame
+containing many columns could produce the wrong result. (#242)</p></li>
+
+<li><p>Added support to parameterize network timeouts using the
+<code>sparklyr.backend.timeout</code>, <code>sparklyr.gateway.start.timeout</code> and
+<code>sparklyr.gateway.connect.timeout</code> config settings.</p></li>
+
+<li><p>Improved logging while establishing connections to <code>sparklyr</code>.</p></li>
+
+<li><p>Added <code>sparklyr.gateway.port</code> and <code>sparklyr.gateway.address</code> as config settings.</p></li>
+
+<li><p>The <code>spark_log()</code> function now accepts the <code>filter</code> parameter. This can be used
+to filter entries within the Spark log.</p></li>
+
+<li><p>Increased network timeout for <code>sparklyr.backend.timeout</code>.</p></li>
+
+<li><p>Moved <code>spark.jars.default</code> setting from options to Spark config.</p></li>
+
+<li><p><code>sparklyr</code> now properly respects the Hive metastore directory with the
+<code>sdf_save_table()</code> and <code>sdf_load_table()</code> APIs for Spark &lt; 2.0.0.</p></li>
+
+<li><p>Added <code>sdf_quantile()</code> as a means of computing (approximate) quantiles
+for a column of a Spark DataFrame.</p></li>
+
+<li><p>Added support for <code>n_distinct(...)</code> within the <code>dplyr</code> interface, based on
+call to Hive function <code>count(DISTINCT ...)</code>. (#220)</p></li>
+</ul>
+
+<h1 id="sparklyr-0-4-0">Sparklyr 0.4.0</h1>
+
+<ul>
+<li>First release to CRAN.</li>
+</ul>
+
+        
+      </div>
+      </div>
+      </div>
+      
+      
+<footer>
+
+
+
+</footer>
+      
+    </div>
+</div>
+
+</body>
+</html>
+

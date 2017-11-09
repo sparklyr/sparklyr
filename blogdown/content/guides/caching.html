@@ -1,0 +1,130 @@
+---
+title: "Understanding Spark Caching"
+output: 
+  html_document:
+    toc_depth: 3
+---
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Spark also supports pulling data sets into a cluster-wide in-memory cache. This is very useful when data is accessed repeatedly, such as when querying a small dataset or when running an iterative algorithm like random forests. Since operations in Spark are lazy, caching can help force computation. Sparklyr tools can be used to cache and uncache DataFrames. The Spark UI will tell you which DataFrames and what percentages are in memory.</p>
+<p>By using a reproducible example, we will review some of the main configuration settings, commands and command arguments that can be used that can help you get the best out of Spark’s memory management options.</p>
+</div>
+<div id="preparation" class="section level2">
+<h2>Preparation</h2>
+<div id="download-test-data" class="section level3">
+<h3>Download Test Data</h3>
+<p>The 2008 and 2007 Flights data from the Statistical Computing site will be used for this exercise. The <strong>spark_read_csv</strong> supports reading compressed CSV files in a <strong>bz2</strong> format, so no additional file preparation is needed.</p>
+<pre class="r"><code>if(!file.exists(&quot;2008.csv.bz2&quot;))
+  {download.file(&quot;http://stat-computing.org/dataexpo/2009/2008.csv.bz2&quot;, &quot;2008.csv.bz2&quot;)}
+if(!file.exists(&quot;2007.csv.bz2&quot;))
+  {download.file(&quot;http://stat-computing.org/dataexpo/2009/2007.csv.bz2&quot;, &quot;2007.csv.bz2&quot;)}</code></pre>
+</div>
+<div id="start-a-spark-session" class="section level3">
+<h3>Start a Spark session</h3>
+<p>A local deployment will be used for this example.</p>
+<pre class="r"><code>library(sparklyr)
+library(dplyr)
+library(ggplot2)
+
+# Install Spark version 2
+spark_install(version = &quot;2.0.0&quot;)
+
+# Customize the connection configuration
+conf &lt;- spark_config()
+conf$`sparklyr.shell.driver-memory` &lt;- &quot;16G&quot;
+
+# Connect to Spark
+sc &lt;- spark_connect(master = &quot;local&quot;, config = conf, version = &quot;2.0.0&quot;)</code></pre>
+</div>
+</div>
+<div id="the-memory-argument" class="section level2">
+<h2>The Memory Argument</h2>
+<p>In the <em>spark_read_…</em> functions, the <strong>memory</strong> argument controls if the data will be loaded into memory as an RDD. Setting it to <strong>FALSE</strong> means that Spark will essentially map the file, but not make a copy of it in memory. This makes the <strong>spark_read_csv</strong> command run faster, but the trade off is that any data transformation operations will take much longer.</p>
+<pre class="r"><code>spark_read_csv(sc, &quot;flights_spark_2008&quot;, &quot;2008.csv.bz2&quot;, memory = FALSE)</code></pre>
+<p>In the RStudio IDE, the <strong>flights_spark_2008</strong> table now shows up in the Spark tab.</p>
+<center>
+<a href="images/deployment/performance/latest-tab1.png"> <img src="/images/deployment/performance/latest-tab1.png" , width="400px"/> </a>
+</center>
+<p>To access the Spark Web UI, click the <strong>SparkUI</strong> button in the <strong>RStudio Spark Tab</strong>. As expected, the <strong>Storage</strong> page shows no tables loaded into memory.</p>
+<center>
+<a href="images/deployment/performance/storage-1.png"> <img src="/images/deployment/performance/storage-1.png" , width="1000px"/> </a>
+</center>
+</div>
+<div id="loading-less-data-into-memory" class="section level2">
+<h2>Loading Less Data into Memory</h2>
+<p>Using the pre-processing capabilities of Spark, the data will be transformed before being loaded into memory. In this section, we will continue to build on the example started in the <strong>Spark Read</strong> section</p>
+<div id="lazy-transform" class="section level3">
+<h3>Lazy Transform</h3>
+<p>The following <strong>dplyr</strong> script will not be immediately run, so the code is processed quickly. There are some check-ups made, but for the most part it is building a Spark SQL statement in the background.</p>
+<pre class="r"><code>flights_table &lt;- tbl(sc,&quot;flights_spark_2008&quot;) %&gt;%
+  mutate(DepDelay = as.numeric(DepDelay),
+         ArrDelay = as.numeric(ArrDelay),
+         DepDelay &gt; 15 , DepDelay &lt; 240,
+         ArrDelay &gt; -60 , ArrDelay &lt; 360, 
+         Gain = DepDelay - ArrDelay) %&gt;%
+  filter(ArrDelay &gt; 0) %&gt;%
+  select(Origin, Dest, UniqueCarrier, Distance, DepDelay, ArrDelay, Gain)</code></pre>
+</div>
+<div id="register-in-spark" class="section level3">
+<h3>Register in Spark</h3>
+<p><strong>sdf_register</strong> will register the resulting Spark SQL in Spark. The results will show up as a table called <strong>flights_spark</strong>. But a table of the same name is still not loaded into memory in Spark.</p>
+<pre class="r"><code>sdf_register(flights_table, &quot;flights_spark&quot;)</code></pre>
+<center>
+<a href="images/deployment/performance/spark-tab-3.png"> <img src="/images/deployment/performance/spark-tab-3.png", width="400px"/> </a>
+</center>
+</div>
+<div id="cache-into-memory" class="section level3">
+<h3>Cache into Memory</h3>
+<p>The <strong>tbl_cache</strong> command loads the results into an Spark RDD in memory, so any analysis from there on will not need to re-read and re-transform the original file. The resulting Spark RDD is smaller than the original file because the transformations created a smaller data set than the original file.</p>
+<pre class="r"><code>tbl_cache(sc, &quot;flights_spark&quot;)</code></pre>
+<center>
+<a href="images/deployment/performance/storage-new-3.png"> <img src="/images/deployment/performance/storage-new-3.png", width="1000px"/> </a>
+</center>
+</div>
+<div id="driver-memory" class="section level3">
+<h3>Driver Memory</h3>
+<p>In the <strong>Executors</strong> page of the Spark Web UI, we can see that the Storage Memory is at about half of the 16 gigabytes requested. This is mainly because of a Spark setting called <strong>spark.memory.fraction</strong>, which reserves by default 40% of the memory requested.</p>
+<center>
+<a href="images/deployment/performance/drivers-1.png"> <img src="/images/deployment/performance/drivers-1.png", width="1000px"/> </a>
+</center>
+</div>
+</div>
+<div id="process-on-the-fly" class="section level2">
+<h2>Process on the fly</h2>
+<p>The plan is to read the Flights 2007 file, combine it with the 2008 file and summarize the data without bringing either file fully into memory.</p>
+<pre class="r"><code>spark_read_csv(sc, &quot;flights_spark_2007&quot; , &quot;2007.csv.bz2&quot;, memory = FALSE)</code></pre>
+<div id="union-and-transform" class="section level3">
+<h3>Union and Transform</h3>
+<p>The <strong>union</strong> command is akin to the <strong>bind_rows</strong> dyplyr command. It will allow us to append the 2007 file to the 2008 file, and as with the previous transform, this script will be evaluated lazily.</p>
+<pre class="r"><code>all_flights &lt;- tbl(sc, &quot;flights_spark_2008&quot;) %&gt;%
+  union(tbl(sc, &quot;flights_spark_2007&quot;)) %&gt;%
+  group_by(Year, Month) %&gt;%
+  tally()</code></pre>
+</div>
+<div id="collect-into-r" class="section level3">
+<h3>Collect into R</h3>
+<p>When receiving a <strong>collect</strong> command, Spark will execute the SQL statement and send the results back to R in a data frame. In this case, R only loads 24 observations into a data frame called <em>all_flights</em>.</p>
+<pre class="r"><code>all_flights &lt;- all_flights %&gt;%
+  collect()</code></pre>
+<center>
+<a href="images/deployment/performance/all-flights.png"> <img src="/images/deployment/performance/all-flights.png", width="400px"/> </a>
+</center>
+</div>
+<div id="plot-in-r" class="section level3">
+<h3>Plot in R</h3>
+<p>Now the smaller data set can be plotted</p>
+<pre class="r"><code>ggplot(data = all_flights, aes(x = Month, y = n/1000, fill = factor(Year))) +
+  geom_area(position = &quot;dodge&quot;, alpha = 0.5) +
+  geom_line(alpha = 0.4) +
+  scale_fill_brewer(palette = &quot;Dark2&quot;, name = &quot;Year&quot;) +
+  scale_x_continuous(breaks = 1:12, labels = c(&quot;J&quot;,&quot;F&quot;,&quot;M&quot;,&quot;A&quot;,&quot;M&quot;,&quot;J&quot;,&quot;J&quot;,&quot;A&quot;,&quot;S&quot;,&quot;O&quot;,&quot;N&quot;,&quot;D&quot;)) +
+  theme_light() +
+  labs(y=&quot;Number of Flights (Thousands)&quot;, title = &quot;Number of Flights Year-Over-Year&quot;)</code></pre>
+<center>
+<a href="images/deployment/performance/new-plot.png"> <img src="/images/deployment/performance/new-plot.png", width="600"/> </a>
+</center>
+</div>
+</div>

@@ -6,13 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Feature Transformation -- StringIndexer — ft_string_indexer • sparklyr</title>
+<title>Feature Tranformation -- StringIndexer (Estimator) � ft_string_indexer • sparklyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -39,7 +39,7 @@
   <body>
     <div class="container template-reference-topic">
       <header>
-      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
@@ -52,92 +52,78 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">Home</a>
+  <a href="..//index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
 </li>
 <li>
-  <a href="../articles/gallery.html">Gallery</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Guides
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/guides-dplyr.html">dplyr</a>
+      <a href="../articles/deployment-amazon-ec2.html">Spark Standalone Deployment in AWS</a>
     </li>
     <li>
-      <a href="../articles/guides-mllib.html">mllib</a>
+      <a href="../articles/deployment-amazon-emr.html">Using sparklyr with an Apache Spark cluster</a>
     </li>
     <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+      <a href="../articles/deployment-amazon.html">Deployments to Amazon</a>
     </li>
     <li>
-      <a href="../articles/deployment-connections.html">User connection options</a>
+      <a href="../articles/deployment-cdh.html">Using sparklyr with an Apache Spark cluster</a>
     </li>
     <li>
-      <a href="../articles/guides-caching.html">Caching</a>
+      <a href="../articles/deployment-connections.html">Configuring Spark Connections</a>
     </li>
     <li>
-      <a href="../articles/guides-h2o.html">H2O</a>
+      <a href="../articles/deployment-data-lakes.html">Data Science using a Data Lake</a>
     </li>
     <li>
-      <a href="../articles/guides-extensions.html">Extensions</a>
-    </li>
-  </ul>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Deployment
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/deployment-overview.html">Overview</a>
+      <a href="../articles/deployment-overview.html">Deployment and Configuration</a>
     </li>
     <li>
-      <a href="../articles/deployment-data-lakes.html">Data Lakes</a>
+      <a href="../articles/gallery.html">Analyzing Data with sparklyr</a>
     </li>
     <li>
-      <a href="../articles/deployment-cdh.html">Cloudera</a>
+      <a href="../articles/guides-caching.html">Understanding Spark Caching</a>
     </li>
     <li>
-      <a href="../articles/deployment-amazon.html">Amazon</a>
-    </li>
-  </ul>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Reference
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../reference/index.html">Functions</a>
+      <a href="../articles/guides-distributed-r.html">Distributing R Computations</a>
     </li>
     <li>
-      <a href="https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/sparklyr.pdf">Cheatsheet</a>
+      <a href="../articles/guides-dplyr.html">Manipulating Data with dplyr</a>
+    </li>
+    <li>
+      <a href="../articles/guides-extensions.html">Creating Extensions for sparklyr</a>
+    </li>
+    <li>
+      <a href="../articles/guides-h2o.html">Sparkling Water (H2O) Machine Learning</a>
+    </li>
+    <li>
+      <a href="../articles/guides-mllib.html">Spark Machine Learning Library (MLlib)</a>
+    </li>
+    <li>
+      <a href="../articles/guides-textmining.html">Text mining with Spark &amp; sparklyr</a>
     </li>
     <li>
       <a href="../articles/reference-media.html">Media</a>
     </li>
-    <li>
-      <a href="../news/index.html">News</a>
-    </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/rstudio/sparklyr">
-    <span class="fa fa-github"></span>
-     
-  </a>
-</li>
+        
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -149,40 +135,49 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Feature Transformation -- StringIndexer</h1>
+    <h1>Feature Tranformation -- StringIndexer (Estimator)</h1>
     </div>
 
     
-    <p>Encode a column of labels into a column of label indices.
-The indices are in [0, numLabels), ordered by label frequencies, with
-the most frequent label assigned index 0. The transformation
-can be reversed with <code><a href='ft_index_to_string.html'>ft_index_to_string</a></code>.</p>
+    <p>A label indexer that maps a string column of labels to an ML column of
+  label indices. If the input column is numeric, we cast it to string and
+  index the string values. The indices are in <code>[0, numLabels)</code>, ordered by
+  label frequencies. So the most frequent label gets index 0. This function
+  is the inverse of <code><a href='ft_index_to_string.html'>ft_index_to_string</a></code>.</p>
     
 
-    <pre class="usage"><span class='fu'>ft_string_indexer</span>(<span class='no'>x</span>, <span class='kw'>input.col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>output.col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>ft_string_indexer</span>(<span class='no'>x</span>, <span class='no'>input_col</span>, <span class='no'>output_col</span>, <span class='kw'>handle_invalid</span> <span class='kw'>=</span> <span class='st'>"error"</span>,
+  <span class='kw'>dataset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"string_indexer_"</span>), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>An object (usually a <code>spark_tbl</code>) coercable to a Spark DataFrame.</p></td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
     </tr>
     <tr>
-      <th>input.col</th>
-      <td><p>The name of the input column(s).</p></td>
+      <th>input_col</th>
+      <td><p>The name of the input column.</p></td>
     </tr>
     <tr>
-      <th>output.col</th>
+      <th>output_col</th>
       <td><p>The name of the output column.</p></td>
     </tr>
     <tr>
-      <th>params</th>
-      <td><p>An (optional) <span style="R">R</span> environment -- when available,
-the index &lt;-&gt; label mapping generated by the string indexer
-will be injected into this environment under the <code>labels</code>
-key.</p></td>
+      <th>handle_invalid</th>
+      <td><p>Param for how to handle invalid entries. Options are
+'skip' (filter out rows with invalid values), 'error' (throw an error), or
+'keep' (keep invalid values in a special additional bucket). Default: "error"</p></td>
+    </tr>
+    <tr>
+      <th>dataset</th>
+      <td><p>(Optional) A <code>tbl_spark</code>. If provided, eagerly fit the (estimator)
+feature "transformer" against <code>dataset</code>. See details.</p></td>
+    </tr>
+    <tr>
+      <th>uid</th>
+      <td><p>A character string used to uniquely identify the feature transformer.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -190,24 +185,52 @@ key.</p></td>
     </tr>
     </table>
     
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>The object returned depends on the class of <code>x</code>.</p><ul>
+<li><p><code>spark_connection</code>: When <code>x</code> is a <code>spark_connection</code>, the function returns a <code>ml_transformer</code>,
+  a <code>ml_estimator</code>, or one of their subclasses. The object contains a pointer to
+  a Spark <code>Transformer</code> or <code>Estimator</code> object and can be used to compose
+  <code>Pipeline</code> objects.</p></li>
+<li><p><code>ml_pipeline</code>: When <code>x</code> is a <code>ml_pipeline</code>, the function returns a <code>ml_pipeline</code> with
+  the transformer or estimator appended to the pipline.</p></li>
+<li><p><code>tbl_spark</code>: When <code>x</code> is a <code>tbl_spark</code>, a transformer is constructed then
+  immediately applied to the input <code>tbl_spark</code>, returning a <code>tbl_spark</code></p></li>
+</ul>
+
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>When <code>dataset</code> is provided for an estimator transformer, the function
+  internally calls <code><a href='ml-transform-methods.html'>ml_fit()</a></code> against <code>dataset</code>. Hence, the methods for
+  <code>spark_connection</code> and <code>ml_pipeline</code> will then return a <code>ml_transformer</code>
+  and a <code>ml_pipeline</code> with a <code>ml_transformer</code> appended, respectively. When
+  <code>x</code> is a <code>tbl_spark</code>, the estimator will be fit against <code>dataset</code> before
+  transforming <code>x</code>.</p>
+<p>When <code>dataset</code> is not specified, the constructor returns a <code>ml_estimator</code>, and,
+  in the case where <code>x</code> is a <code>tbl_spark</code>, the estimator fits against <code>x</code> then
+  to obtain a transformer, which is then immediately used to transform <code>x</code>.</p>
+    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
   more information on the set of transformations available for DataFrame
-  columns in Spark.</p>
-<p>Other feature transformation routines: <code><a href='ft_binarizer.html'>ft_binarizer</a></code>,
+  columns in Spark.
+    <code><a href='ft_index_to_string.html'>ft_index_to_string</a></code></p>
+<p>Other feature transformers: <code><a href='ft_binarizer.html'>ft_binarizer</a></code>,
   <code><a href='ft_bucketizer.html'>ft_bucketizer</a></code>,
-  <code><a href='ft_count_vectorizer.html'>ft_count_vectorizer</a></code>,
-  <code><a href='ft_discrete_cosine_transform.html'>ft_discrete_cosine_transform</a></code>,
+  <code><a href='ft_count_vectorizer.html'>ft_count_vectorizer</a></code>, <code><a href='ft_dct.html'>ft_dct</a></code>,
   <code><a href='ft_elementwise_product.html'>ft_elementwise_product</a></code>,
+  <code><a href='ft_hashing_tf.html'>ft_hashing_tf</a></code>,
   <code><a href='ft_index_to_string.html'>ft_index_to_string</a></code>,
-  <code><a href='ft_one_hot_encoder.html'>ft_one_hot_encoder</a></code>,
+  <code><a href='ft_one_hot_encoder.html'>ft_one_hot_encoder</a></code>, <code><a href='ft_pca.html'>ft_pca</a></code>,
   <code><a href='ft_quantile_discretizer.html'>ft_quantile_discretizer</a></code>,
+  <code><a href='ft_r_formula.html'>ft_r_formula</a></code>,
   <code><a href='ft_regex_tokenizer.html'>ft_regex_tokenizer</a></code>,
-  <code><a href='ft_sql_transformer.html'>ft_sql_transformer</a></code>,
+  <code><a href='sql-transformer.html'>ft_sql_transformer</a></code>,
+  <code><a href='ft_stop_words_remover.html'>ft_stop_words_remover</a></code>,
   <code><a href='ft_tokenizer.html'>ft_tokenizer</a></code>,
-  <code><a href='ft_vector_assembler.html'>ft_vector_assembler</a></code>,
-  <code>sdf_mutate</code></p>
+  <code><a href='ft_vector_assembler.html'>ft_vector_assembler</a></code></p>
     
 
   </div>
@@ -216,6 +239,10 @@ key.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
+      <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
+
       <li><a href="#see-also">See also</a></li>
           </ul>
 
@@ -224,7 +251,7 @@ key.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Javier Luraschi, Kevin Ushey, JJ Allaire,  The Apache Software Foundation.</p>
+  <p>Developed by Javier Luraschi, Kevin Kuo, Kevin Ushey, JJ Allaire,  The Apache Software Foundation.</p>
 </div>
 
 <div class="pkgdown">
