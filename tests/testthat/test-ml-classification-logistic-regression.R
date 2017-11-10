@@ -190,7 +190,7 @@ test_that("logistic regression default params are correct", {
                            c("x", "uid", "...", "thresholds", "weight_col"))
 
   if (spark_version(sc) < "2.1.0")
-    args <- rlang::modify(args, aggregation_depth = NULL)
+    args <- rlang::modify(args, aggregation_depth = NULL, family = NULL)
 
   expect_equal(
     ml_params(lr, names(args)),
