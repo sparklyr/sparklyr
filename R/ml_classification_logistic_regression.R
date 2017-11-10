@@ -190,9 +190,9 @@ new_ml_logistic_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     coefficients = if (is_multinomial) NULL else read_spark_vector(jobj, "coefficients"),
-    coefficient_matrix = read_spark_matrix(jobj, "coefficientMatrix"),
+    coefficient_matrix = try_null(read_spark_matrix(jobj, "coefficientMatrix")),
     intercept = if (is_multinomial) NULL else invoke(jobj, "intercept"),
-    intercept_vector = read_spark_vector(jobj, "interceptVector"),
+    intercept_vector = try_null(read_spark_vector(jobj, "interceptVector")),
     num_classes = invoke(jobj, "numClasses"),
     num_features = invoke(jobj, "numFeatures"),
     features_col = invoke(jobj, "getFeaturesCol"),
