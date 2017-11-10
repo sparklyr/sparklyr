@@ -1,3 +1,9 @@
+library(pkgdown)
+library(dplyr)
+library(purrr)
+library(stringr)
+library(crayon)
+library(yaml)
 
 rebuild_site <- function(overwrite = FALSE){
   process_content(overwrite = overwrite)
@@ -10,14 +16,6 @@ rebuild_site <- function(overwrite = FALSE){
   on.exit(setwd(old_wd))
 
 }
-
-
-library(pkgdown)
-library(dplyr)
-library(purrr)
-library(stringr)
-library(crayon)
-library(yaml)
 
 copy_repo <- function(github_repo, package_folder = "repos"){
   project_name <- strsplit(github_repo, "/")
@@ -33,7 +31,6 @@ replace_text <- function(location, lookfor, replacewith){
   new_read_in_file <- gsub(lookfor, replacewith, x = read_in_file, ignore.case = TRUE)
   if(sum(read_in_file != new_read_in_file) > 0)write(new_read_in_file, location)
 }
-
 
 replace_text_folder <- function(path = NULL, type = "Rmd", find, replace){
   file_list <- list.files(path)
@@ -109,8 +106,6 @@ reset_public <- function(){
   dir.create(target_path("public"))
 }
 
-
-
 site_setup <- function(){
   yaml::yaml.load_file("_blogdown.yml")
 }
@@ -158,7 +153,6 @@ process_reference <- function(overwrite = FALSE){
     target_path("content/reference"),
     overwrite = FALSE
   )
-
 
   # cleanup-reference makes changes to the content of the Reference pages only
   site_setup()$`cleanup-reference` %>%

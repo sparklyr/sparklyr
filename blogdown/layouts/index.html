@@ -7,8 +7,8 @@
 <div class="page documentation">
     <div class="side-menu" id="side-menu">
     {{ $currentNode := .}}
-    
-  
+
+
 
     {{  range .Site.Menus.main.ByWeight  }}
 
@@ -24,11 +24,11 @@
             </li>
           {{ end }}
         </ul>
-          
+
 
     {{ end }}
-    
-    
+
+
     </div>
     <div class="content">
 
@@ -36,21 +36,21 @@
 
       <div class="markdowned">
       <div class="doc-page">
-    
+
       <div class="doc-page-index">
-      <ul id="gumshoe-container" data-gumshoe>
-      </ul>
+        <ul id="gumshoe-container" data-gumshoe>
+        </ul>
       </div>
-  
-      <div class="doc-page-body">  
+
+      <div class="doc-page-body">
         {{ .Content }}
-        
+
       </div>
       </div>
       </div>
-      
+
       {{ partial "footer" .}}
-      
+
     </div>
 </div>
 
