@@ -57,7 +57,8 @@ test_that("ml_cross_validator() works correctly", {
   )
 })
 
-test_that("we can cross validate a logistic regression", {
+test_that("we can cross validate a logistic regression with xval", {
+  if (spark_version(sc) < "2.1.0") skip("multinomial logistic regression not supported")
   iris_tbl <- testthat_tbl("iris")
 
   pipeline <- ml_pipeline(sc) %>%
@@ -85,6 +86,7 @@ test_that("we can cross validate a logistic regression", {
 })
 
 test_that("we can train a regression with train-validation-split", {
+  if (spark_version(sc) < "2.1.0") skip("multinomial logistic regression not supported")
   iris_tbl <- testthat_tbl("iris")
 
   pipeline <- ml_pipeline(sc) %>%
