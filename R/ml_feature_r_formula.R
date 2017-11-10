@@ -40,7 +40,7 @@
 #'
 #' @param formula R formula as a character string or a formula. Formula objects are
 #'   converted to character strings directly and the environment is not captured.
-#' @param force_index_label Force to index label whether it is numeric or
+#' @param force_index_label (Spark 2.1.0+) Force to index label whether it is numeric or
 #'   string type. Usually we index label only when it is string type. If
 #'   the formula was used by classification algorithms, we can force to index
 #'   label even it is numeric type by setting this param with true.
@@ -63,9 +63,9 @@ ft_r_formula.spark_connection <- function(
 
   estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", uid) %>%
     invoke("setFeaturesCol", features_col) %>%
-    invoke("setForceIndexLabel", force_index_label) %>%
     invoke("setFormula", formula) %>%
     invoke("setLabelCol", label_col) %>%
+    jobj_set_param("setForceIndexLabel", force_index_label, FALSE, "2.1.0") %>%
     new_ml_r_formula()
 
   if (is.null(dataset))

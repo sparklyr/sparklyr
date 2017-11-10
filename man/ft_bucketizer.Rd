@@ -16,7 +16,7 @@ ft_bucketizer(x, input_col, output_col, splits, handle_invalid = "error",
 
 \item{splits}{A numeric vector of cutpoints, indicating the bucket boundaries.}
 
-\item{handle_invalid}{Param for how to handle invalid entries. Options are
+\item{handle_invalid}{(Spark 2.1.0+) Param for how to handle invalid entries. Options are
 'skip' (filter out rows with invalid values), 'error' (throw an error), or
 'keep' (keep invalid values in a special additional bucket). Default: "error"}
 

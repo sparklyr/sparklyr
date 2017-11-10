@@ -7,9 +7,12 @@ test_that("ml_aft_survival_regression param setting", {
     x = sc, censor_col = "ccol",
     quantile_probabilities = c(0.01, 0.25, 0.5, 0.75, 0.95),
     fit_intercept = FALSE, max_iter = 50, tol = 1e-04,
-    aggregation_depth = 3, quantiles_col = "qcol",
+    quantiles_col = "qcol",
     label_col = "col", features_col = "fcol", prediction_col = "pcol"
   )
+  if (spark_version(sc) >= "2.1.0")
+    args <- c(args, aggregation_depth = 3)
+
   ovr <- do.call(ml_aft_survival_regression, args)
   expect_equal(ml_params(ovr, names(args)[-1]), args[-1])
 })
@@ -21,8 +24,12 @@ test_that("ml_aft_survival_regression() default params are correct", {
     ml_stage(1)
 
   args <- get_default_args(ml_aft_survival_regression,
-                           c("x", "uid", "...", "quantiles_col")) %>%
-    lapply(eval)
+                           c("x", "uid", "...", "quantiles_col"))
+
+  if (spark_version(sc) < "2.1.0")
+    args <- rlang::modify(args, aggregation_depth = NULL, family = NULL)
+
+  args <- lapply(Filter(length, args), eval)
 
   expect_equal(
     within(ml_params(predictor, names(args)),
@@ -62,7 +69,8 @@ test_that("ml_aft_survival_regression() works properly", {
   aft_model <- ml_aft_survival_regression(training_tbl, label ~ V1 + V2, features_col = "feat")
   expect_equal(coef(aft_model),
                structure(c(2.63808989630564, -0.496304411053117, 0.198452172529228
-               ), .Names = c("(Intercept)", "V1", "V2")))
+               ), .Names = c("(Intercept)", "V1", "V2")),
+               tolerance = 1e-05)
   output <- capture.output(aft_model)
   expect_identical(output[3], "Formula: label ~ V1 + V2")
 })

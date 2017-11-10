@@ -35,7 +35,7 @@ ml_survival_regression(x, formula = NULL, censor_col = "censor",
 
 \item{tol}{Param for the convergence tolerance for iterative algorithms.}
 
-\item{aggregation_depth}{Suggested depth for treeAggregate (>= 2).}
+\item{aggregation_depth}{(Spark 2.1.0+) Suggested depth for treeAggregate (>= 2).}
 
 \item{quantiles_col}{Quantiles column name. This column will output quantiles of corresponding quantileProbabilities if it is set.}
 

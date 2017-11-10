@@ -18,7 +18,7 @@ converted to character strings directly and the environment is not captured.}
 
 \item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
 
-\item{force_index_label}{Force to index label whether it is numeric or
+\item{force_index_label}{(Spark 2.1.0+) Force to index label whether it is numeric or
 string type. Usually we index label only when it is string type. If
 the formula was used by classification algorithms, we can force to index
 label even it is numeric type by setting this param with true.

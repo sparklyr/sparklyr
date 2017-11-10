@@ -26,7 +26,7 @@ ft_bucketizer.spark_connection <- function(
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Bucketizer",
                              input_col, output_col, uid) %>%
     invoke("setSplits", splits) %>%
-    invoke("setHandleInvalid", handle_invalid)
+    jobj_set_param("setHandleInvalid", handle_invalid, "error", "2.1.0")
 
   new_ml_bucketizer(jobj)
 }
@@ -121,7 +121,7 @@ ft_quantile_discretizer.spark_connection <- function(
   ml_ratify_args()
   estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.QuantileDiscretizer",
                                   input_col, output_col, uid) %>%
-    invoke("setHandleInvalid", handle_invalid) %>%
+    jobj_set_param("setHandleInvalid", handle_invalid, "error", "2.1.0") %>%
     invoke("setNumBuckets", num_buckets) %>%
     invoke("setRelativeError", relative_error) %>%
     new_ml_quantile_discretizer()

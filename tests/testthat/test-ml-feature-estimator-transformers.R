@@ -50,16 +50,20 @@ test_that("ft_count_vectorizer() works", {
 })
 
 test_that("ft_string_indexer works", {
-  si <- ft_string_indexer(
-    sc, "in", "out", handle_invalid = "skip"
-  )
 
-  expect_equal(ml_params(si, list(
-    "input_col", "output_col", "handle_invalid"
-  )),
-  list(input_col = "in",
-       output_col = "out",
-       handle_invalid = "skip"))
+  args <- list(
+    x = sc,
+    input_col = "in",
+    output_col = "out")
+
+  if (spark_version(sc) >= "2.1.0")
+    args <- c(args, handle_invalid = "skip")
+
+  si <- do.call(ft_string_indexer, args)
+
+  expect_equal(
+    ml_params(si, names(args)[-1]),
+    args[-1])
 
   expect_true(is_ml_estimator(si))
 })
@@ -80,15 +84,19 @@ test_that("ft_quantile_discretizer works", {
   expect_identical(result, c(2, 2, 1, 1, 0))
   expect_identical(result2, c(2, 2, 1, 1, 0))
 
-  qd <- ft_quantile_discretizer(
-    sc, "hour", "result", handle_invalid = "skip",
-    num_buckets = 3L, relative_error = 0.01)
-  expect_equal(ml_params(qd, list(
-    "input_col", "output_col", "handle_invalid", "num_buckets", "relative_error"
-  )),
-  list(input_col = "hour",
-       output_col = "result",
-       handle_invalid = "skip",
-       num_buckets = 3L,
-       relative_error = 0.01))
+  args <- list(
+    x = sc,
+    input_col = "hour",
+    output_col = "result",
+    num_buckets = 3L,
+    relative_error = 0.01)
+
+  if (spark_version(sc) >= "2.1.0")
+    args <- c(args, handle_invalid = "skip")
+
+  qd <- do.call(ft_quantile_discretizer, args)
+
+  expect_equal(
+    ml_params(qd, names(args)[-1]),
+    args[-1])
 })

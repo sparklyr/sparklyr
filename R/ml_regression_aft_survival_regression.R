@@ -59,7 +59,7 @@ ml_aft_survival_regression.spark_connection <- function(
     invoke("setCensorCol", censor_col) %>%
     invoke("setFitIntercept", fit_intercept) %>%
     invoke("setQuantileProbabilities", quantile_probabilities) %>%
-    invoke("setAggregationDepth", aggregation_depth)
+    jobj_set_param("setAggregationDepth", aggregation_depth, 2L, "2.1.0")
 
   if (!rlang::is_null(quantiles_col))
     jobj <- invoke(jobj, "setQuantilesCol", quantiles_col)

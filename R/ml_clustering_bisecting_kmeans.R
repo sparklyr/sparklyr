@@ -105,9 +105,10 @@ new_ml_bisecting_kmeans <- function(jobj) {
 
 new_ml_bisecting_kmeans_model <- function(jobj) {
 
-  summary <- if (invoke(jobj, "hasSummary"))
+  has_summary <- tryCatch(invoke(jobj, "hasSummary"),
+                          error = function(e) FALSE)
+  summary <- if (has_summary)
     new_ml_summary_bisecting_kmeans_model(invoke(jobj, "summary"))
-  else NULL
 
   new_ml_clustering_model(
     jobj,

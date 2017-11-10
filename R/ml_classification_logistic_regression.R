@@ -7,7 +7,7 @@
 #' @template roxlate-ml-linear-regression-params
 #' @template roxlate-ml-predictor-params
 #' @template roxlate-ml-probabilistic-classifier-params
-#' @param family Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."
+#' @param family (Spark 2.1.0+) Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."
 #' @template roxlate-ml-elastic-net-param
 #' @param threshold in binary classification prediction, in range [0, 1].
 #' @template roxlate-ml-aggregation-depth
@@ -66,14 +66,14 @@ ml_logistic_regression.spark_connection <- function(
     prediction_col = prediction_col, probability_col = probability_col,
     raw_prediction_col = raw_prediction_col
   ) %>%
-    invoke("setFamily", family) %>%
     invoke("setFitIntercept", fit_intercept) %>%
     invoke("setElasticNetParam", elastic_net_param) %>%
     invoke("setRegParam", reg_param) %>%
     invoke("setMaxIter", max_iter) %>%
     invoke("setThreshold", threshold) %>%
-    invoke("setAggregationDepth", aggregation_depth) %>%
-    invoke("setTol", tol)
+    invoke("setTol", tol) %>%
+    jobj_set_param("setFamily", family, "auto", "2.1.0") %>%
+    jobj_set_param("setAggregationDepth", aggregation_depth, 2L, "2.1.0")
 
   if (!rlang::is_null(thresholds))
     jobj <- invoke(jobj, "setThresholds", thresholds)
@@ -190,9 +190,9 @@ new_ml_logistic_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     coefficients = if (is_multinomial) NULL else read_spark_vector(jobj, "coefficients"),
-    coefficient_matrix = read_spark_matrix(jobj, "coefficientMatrix"),
+    coefficient_matrix = try_null(read_spark_matrix(jobj, "coefficientMatrix")),
     intercept = if (is_multinomial) NULL else invoke(jobj, "intercept"),
-    intercept_vector = read_spark_vector(jobj, "interceptVector"),
+    intercept_vector = try_null(read_spark_vector(jobj, "interceptVector")),
     num_classes = invoke(jobj, "numClasses"),
     num_features = invoke(jobj, "numFeatures"),
     features_col = invoke(jobj, "getFeaturesCol"),
@@ -209,7 +209,9 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
   new_ml_summary(
     jobj,
     area_under_roc = invoke(jobj, "areaUnderROC"),
-    f_measure_by_threshold = invoke(jobj, "fMeasureByThreshold") %>% collect(),
+    f_measure_by_threshold = invoke(jobj, "fMeasureByThreshold") %>%
+      invoke("withColumnRenamed", "F-Measure", "F_Measure") %>%
+      collect(),
     features_col = invoke(jobj, "featuresCol"),
     label_col = invoke(jobj, "labelCol"),
     objective_history = invoke(jobj, "objectiveHistory"),

@@ -33,13 +33,13 @@ ml_logistic_regression(x, formula = NULL, fit_intercept = TRUE,
 
 \item{weight_col}{The name of the column to use as weights for the model fit.}
 
-\item{aggregation_depth}{Suggested depth for treeAggregate (>= 2).}
+\item{aggregation_depth}{(Spark 2.1.0+) Suggested depth for treeAggregate (>= 2).}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 
 \item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
 
-\item{family}{Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."}
+\item{family}{(Spark 2.1.0+) Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."}
 
 \item{prediction_col}{Prediction column name.}
 

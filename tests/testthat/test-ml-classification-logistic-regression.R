@@ -160,18 +160,19 @@ test_that("ml_logistic_regression parameter setting/getting works", {
   args <- list(
     x = sc,
     elastic_net_param = 0.1,
-    family = "binomial",
     features_col = "fcol",
     fit_intercept = FALSE,
     label_col = "lcol",
     max_iter = 50L,
     threshold = 0.4,
-    aggregation_depth = 3,
     tol = 1e-05,
     weight_col = "wcol",
     prediction_col = "pcol",
     probability_col = "probcol",
     raw_prediction_col = "rpcol")
+
+  if (spark_version(sc) >= "2.1.0")
+    args <- c(args, aggregation_depth = 3, family = "binomial")
 
   lr <- do.call(ml_logistic_regression, args)
 
@@ -188,12 +189,16 @@ test_that("logistic regression default params are correct", {
   args <- get_default_args(ml_logistic_regression,
                            c("x", "uid", "...", "thresholds", "weight_col"))
 
+  if (spark_version(sc) < "2.1.0")
+    args <- rlang::modify(args, aggregation_depth = NULL, family = NULL)
+
   expect_equal(
     ml_params(lr, names(args)),
     args)
 })
 
 test_that("we can fit multinomial models", {
+  if (spark_version(sc) < "2.1.0") skip("multinomial models not supported < 2.1.0")
   test_requires("nnet", "dplyr")
 
   n <- 200

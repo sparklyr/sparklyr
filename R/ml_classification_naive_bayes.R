@@ -9,8 +9,7 @@
 #' @param model_type The model type. Supported options: \code{"multinomial"}
 #'   and \code{"bernoulli"}. (default = \code{multinomial})
 #' @param smoothing The (Laplace) smoothing parameter. Defaults to zero.
-#' @param weight_col Weight column name. If this is not set or empty, we treat all instance
-#'   weights as 1.0.
+#' @param weight_col (Spark 2.1.0+) Weight column name. If this is not set or empty, we treat all instance weights as 1.0.
 #' @export
 ml_naive_bayes <- function(
   x,
@@ -57,7 +56,7 @@ ml_naive_bayes.spark_connection <- function(
     jobj <- invoke(jobj, "setThresholds", thresholds)
 
   if (!rlang::is_null(weight_col))
-    jobj <- invoke(jobj, "setWeightCol", weight_col)
+    jobj <- jobj_set_param(jobj, "setWeightCol", weight_col, NULL, "2.1.0")
 
   new_ml_naive_bayes(jobj)
 }

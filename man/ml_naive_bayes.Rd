@@ -23,8 +23,7 @@ and \code{"bernoulli"}. (default = \code{multinomial})}
 
 \item{thresholds}{Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value \code{p/t} is predicted, where \code{p} is the original probability of that class and \code{t} is the class's threshold.}
 
-\item{weight_col}{Weight column name. If this is not set or empty, we treat all instance
-weights as 1.0.}
+\item{weight_col}{(Spark 2.1.0+) Weight column name. If this is not set or empty, we treat all instance weights as 1.0.}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 
