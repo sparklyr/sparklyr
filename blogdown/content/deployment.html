@@ -1,5 +1,7 @@
 ---
 title: "Deployment and Configuration"
+aliases:
+ /articles/deployment-overview.html 
 ---
 
 
@@ -325,7 +327,7 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;, config = config, versio
 <div id="connection-options" class="section level3">
 <h3>Connection Options</h3>
 <p>The RStudio IDE Spark pane provides a <strong>New Connection</strong> dialog to assist in connecting with both local instances of Spark and Spark clusters:</p>
-<p><img src="/images/deployment/overview/connect-to-spark.png" width=486 /></p>
+<p><img src="images/deployment/overview/connect-to-spark.png" width=486 /></p>
 <p>You can configure which connection choices are presented using the <code>rstudio.spark.connections</code> option. By default, users are presented with possibility of both local and cluster connections, however, you can modify this behavior to present only one of these, or even a specific Spark master URL. Some commonly used combinations of connection choices include:</p>
 <table>
 <colgroup>

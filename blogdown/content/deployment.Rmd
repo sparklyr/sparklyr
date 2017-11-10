@@ -1,5 +1,7 @@
 ---
 title: "Deployment and Configuration"
+aliases:
+ /articles/deployment-overview.html 
 ---
 
 ```{r setup, include = FALSE}
@@ -291,7 +293,7 @@ RStudio Server provides a web-based IDE interface to a remote R session, making 
 
 The RStudio IDE Spark pane provides a **New Connection** dialog to assist in connecting with both local instances of Spark and Spark clusters:
 
-<img src="/images/deployment/overview/connect-to-spark.png" width=486 />
+<img src="images/deployment/overview/connect-to-spark.png" width=486 />
 
 You can configure which connection choices are presented using the `rstudio.spark.connections` option. By default, users are presented with possibility of both local and cluster connections, however, you can modify this behavior to present only one of these, or even a specific Spark master URL. Some commonly used combinations of connection choices include:
 

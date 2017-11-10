@@ -3,6 +3,8 @@ title: "Understanding Spark Caching"
 output: 
   html_document:
     toc_depth: 3
+aliases:
+  /articles/guides-caching.html
 ---
 
 
@@ -46,11 +48,11 @@ sc &lt;- spark_connect(master = &quot;local&quot;, config = conf, version = &quo
 <pre class="r"><code>spark_read_csv(sc, &quot;flights_spark_2008&quot;, &quot;2008.csv.bz2&quot;, memory = FALSE)</code></pre>
 <p>In the RStudio IDE, the <strong>flights_spark_2008</strong> table now shows up in the Spark tab.</p>
 <center>
-<a href="images/deployment/performance/latest-tab1.png"> <img src="/images/deployment/performance/latest-tab1.png" , width="400px"/> </a>
+<a href="images/deployment/performance/latest-tab1.png"> <img src="images/deployment/performance/latest-tab1.png" , width="400px"/> </a>
 </center>
 <p>To access the Spark Web UI, click the <strong>SparkUI</strong> button in the <strong>RStudio Spark Tab</strong>. As expected, the <strong>Storage</strong> page shows no tables loaded into memory.</p>
 <center>
-<a href="images/deployment/performance/storage-1.png"> <img src="/images/deployment/performance/storage-1.png" , width="1000px"/> </a>
+<a href="images/deployment/performance/storage-1.png"> <img src="images/deployment/performance/storage-1.png" , width="1000px"/> </a>
 </center>
 </div>
 <div id="loading-less-data-into-memory" class="section level2">
@@ -73,7 +75,7 @@ sc &lt;- spark_connect(master = &quot;local&quot;, config = conf, version = &quo
 <p><strong>sdf_register</strong> will register the resulting Spark SQL in Spark. The results will show up as a table called <strong>flights_spark</strong>. But a table of the same name is still not loaded into memory in Spark.</p>
 <pre class="r"><code>sdf_register(flights_table, &quot;flights_spark&quot;)</code></pre>
 <center>
-<a href="images/deployment/performance/spark-tab-3.png"> <img src="/images/deployment/performance/spark-tab-3.png", width="400px"/> </a>
+<a href="images/deployment/performance/spark-tab-3.png"> <img src="images/deployment/performance/spark-tab-3.png", width="400px"/> </a>
 </center>
 </div>
 <div id="cache-into-memory" class="section level3">
@@ -81,14 +83,14 @@ sc &lt;- spark_connect(master = &quot;local&quot;, config = conf, version = &quo
 <p>The <strong>tbl_cache</strong> command loads the results into an Spark RDD in memory, so any analysis from there on will not need to re-read and re-transform the original file. The resulting Spark RDD is smaller than the original file because the transformations created a smaller data set than the original file.</p>
 <pre class="r"><code>tbl_cache(sc, &quot;flights_spark&quot;)</code></pre>
 <center>
-<a href="images/deployment/performance/storage-new-3.png"> <img src="/images/deployment/performance/storage-new-3.png", width="1000px"/> </a>
+<a href="images/deployment/performance/storage-new-3.png"> <img src="images/deployment/performance/storage-new-3.png", width="1000px"/> </a>
 </center>
 </div>
 <div id="driver-memory" class="section level3">
 <h3>Driver Memory</h3>
 <p>In the <strong>Executors</strong> page of the Spark Web UI, we can see that the Storage Memory is at about half of the 16 gigabytes requested. This is mainly because of a Spark setting called <strong>spark.memory.fraction</strong>, which reserves by default 40% of the memory requested.</p>
 <center>
-<a href="images/deployment/performance/drivers-1.png"> <img src="/images/deployment/performance/drivers-1.png", width="1000px"/> </a>
+<a href="images/deployment/performance/drivers-1.png"> <img src="images/deployment/performance/drivers-1.png", width="1000px"/> </a>
 </center>
 </div>
 </div>
@@ -110,7 +112,7 @@ sc &lt;- spark_connect(master = &quot;local&quot;, config = conf, version = &quo
 <pre class="r"><code>all_flights &lt;- all_flights %&gt;%
   collect()</code></pre>
 <center>
-<a href="images/deployment/performance/all-flights.png"> <img src="/images/deployment/performance/all-flights.png", width="400px"/> </a>
+<a href="images/deployment/performance/all-flights.png"> <img src="images/deployment/performance/all-flights.png", width="400px"/> </a>
 </center>
 </div>
 <div id="plot-in-r" class="section level3">
@@ -124,7 +126,7 @@ sc &lt;- spark_connect(master = &quot;local&quot;, config = conf, version = &quo
   theme_light() +
   labs(y=&quot;Number of Flights (Thousands)&quot;, title = &quot;Number of Flights Year-Over-Year&quot;)</code></pre>
 <center>
-<a href="images/deployment/performance/new-plot.png"> <img src="/images/deployment/performance/new-plot.png", width="600"/> </a>
+<a href="images/deployment/performance/new-plot.png"> <img src="images/deployment/performance/new-plot.png", width="600"/> </a>
 </center>
 </div>
 </div>

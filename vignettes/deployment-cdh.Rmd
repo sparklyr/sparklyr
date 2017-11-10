@@ -8,6 +8,8 @@ output:
       collapsed: false
 params:
   width: 600
+aliases:
+  /articles/deployment-cdh.html
 ---
 # Summary 
 

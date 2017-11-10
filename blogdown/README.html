@@ -124,26 +124,55 @@ $(document).ready(function () {
 <div id="new-article" class="section level2">
 <h2>New article</h2>
 <ol style="list-style-type: decimal">
-<li>Add article in the proper repo folder</li>
-<li>List the new article in the _blogdown.yml file</li>
-<li>Source the build_site.R script</li>
+<li>Add article in the proper repo sub-folder, such as <code>vignettes</code></li>
+<li>List the new article in the <code>_blogdown.yml</code> file</li>
+<li>Source the <code>build_site.R</code> script</li>
 <li>Run <code>rebuild_site()</code></li>
 </ol>
 </div>
 <div id="update-an-article" class="section level2">
 <h2>Update an article</h2>
 <ol style="list-style-type: decimal">
-<li>Make changes to the article inside the repo (vignettes)</li>
-<li>Delete the existing article in the blogdown/content subfolder</li>
-<li>Source the build_site.R script</li>
+<li>Make changes in the proper repo sub-folder, such as <code>vignettes</code></li>
+<li>Delete the existing article in the <strong>blogdown/content</strong> folder or sub-folder inside it</li>
+<li>Source the <code>build_site.R</code> script</li>
 <li>Run <code>rebuild_site()</code></li>
 </ol>
 </div>
-<div id="ful-refresh" class="section level2">
-<h2>Ful refresh</h2>
+<div id="use-an-md-file-as-the-source" class="section level2">
+<h2>Use an <code>md</code> file as the source</h2>
 <ol style="list-style-type: decimal">
-<li>Source the build_site.R script</li>
+<li>Change the working directory to the <code>vignettes</code> folder</li>
+<li>Change the article output to <code>md_output</code> or <code>github_document</code></li>
+<li>Knit the <code>.Rmd</code> file</li>
+<li>Set the working directory back to the repo</li>
+<li>List the new <code>.md</code> file in the <code>_blogdown.yml</code> file</li>
+<li>List the images folder in the <code>_blogodwn.yml</code> file, see the path pattern for other <code>.md</code> files in the <code>_blogdown.yml</code> file</li>
+<li>Source the <code>build_site.R</code> script</li>
+<li>Run <code>process_reference(overwrite = TRUE))</code></li>
+</ol>
+</div>
+<div id="updates-to-reference" class="section level2">
+<h2>Updates to Reference</h2>
+<ol style="list-style-type: decimal">
+<li>List any new function in the <code>reference</code> section of the <code>_blogdown.yml</code> file</li>
+<li>Source the <code>build_site.R</code> script</li>
+<li>Run <code>process_reference(overwrite = TRUE))</code></li>
+</ol>
+</div>
+<div id="full-refresh" class="section level2">
+<h2>Full refresh</h2>
+<ol style="list-style-type: decimal">
+<li>Source the <code>build_site.R</code> script</li>
 <li>Run <code>rebuild_site(overwrite = TRUE)</code></li>
+</ol>
+</div>
+<div id="preview-the-site" class="section level2">
+<h2>Preview the site</h2>
+<ol style="list-style-type: decimal">
+<li>Change the working directory to the <strong>blogdown</strong> sub-directory</li>
+<li>Run <code>blogdown::serve_site()</code></li>
+<li>Set the working directory back to the package after done</li>
 </ol>
 </div>
 </div>

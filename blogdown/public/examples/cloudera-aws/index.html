@@ -353,17 +353,17 @@
 <div id="cdh-5" class="section level2">
 <h2>CDH 5</h2>
 <p>We will start with a Cloudera cluster CDH version 5.8.2 (free version) with an underlaying Ubuntu Linux distribution.</p>
-<p><img src="/images/deployment/cdh/manager-landing-page.png" width=600/></p>
+<p><img src="images/deployment/cdh/manager-landing-page.png" width=600/></p>
 </div>
 <div id="spark-1.6" class="section level2">
 <h2>Spark 1.6</h2>
 <p>The default Spark 1.6.0 parcel is in installed and running</p>
-<p><img src="/images/deployment/cdh/spark-history-server-1.png" width=600/></p>
+<p><img src="images/deployment/cdh/spark-history-server-1.png" width=600/></p>
 </div>
 <div id="hive-data" class="section level2">
 <h2>Hive data</h2>
 <p>For this demo, we have created and populated 3 tables in Hive. The table names are: flights, airlines and airports. Using Hue, we can see the loaded tables. For the links to the data files and their Hive import scripts please see <em>Appendix A</em>.</p>
-<p><img src="/images/deployment/cdh/hue-metastore-1.png" width=600/></p>
+<p><img src="images/deployment/cdh/hue-metastore-1.png" width=600/></p>
 </div>
 </div>
 <div id="install-rstudio" class="section level1">
@@ -393,7 +393,7 @@ sudo usermod -a -G supergroup rstudio</code></pre>
 <h1>Connect to Spark</h1>
 <p>Log in to RStudio Server by pointing a browser at your master node IP:8787.</p>
 <p>
-<img src="/images/deployment/cdh/sign-in-1.png" width=600/>
+<img src="images/deployment/cdh/sign-in-1.png" width=600/>
 </p>
 <p>Set the environment variable <code>SPARK_HOME</code> and then run <code>spark_connect</code>. After connecting you will be able to browse the Hive metadata in the RStudio Server Spark pane.</p>
 <pre class="r"><code>library(sparklyr)
@@ -403,22 +403,22 @@ library(ggplot2)
 sc &lt;- spark_connect(master = &quot;yarn-client&quot;, version=&quot;1.6.0&quot;, spark_home = &#39;/opt/cloudera/parcels/CDH/lib/spark/&#39;)</code></pre>
 <p>Once you are connected, you will see the Spark pane appear along with your hive tables.</p>
 <p>
-<img src="/images/deployment/cdh/spark-pane-1.png" width=600/>
+<img src="images/deployment/cdh/spark-pane-1.png" width=600/>
 </p>
 <p>You can inspect your tables by clicking on the data icon.</p>
 <p>
-<img src="/images/deployment/cdh/tables-1.png" width=600/>
+<img src="images/deployment/cdh/tables-1.png" width=600/>
 </p>
 <p>This is what the tables look like loaded in Spark via the History Server Web UI (port 18088)</p>
 <p>
-<img src="/images/deployment/cdh/spark-rdd-1.png" width=600/>
+<img src="images/deployment/cdh/spark-rdd-1.png" width=600/>
 </p>
 </div>
 <div id="data-analysis" class="section level1">
 <h1>Data analysis</h1>
 <p>Is there evidence to suggest that some airline carriers make up time in flight? This analysis predicts time gained in flight by airline carrier.</p>
 <p>
-<img src="/images/deployment/cdh/data-analysis-1.png" width=600/>
+<img src="images/deployment/cdh/data-analysis-1.png" width=600/>
 </p>
 <div id="cache-the-tables-into-memory" class="section level2">
 <h2>Cache the tables into memory</h2>
@@ -548,7 +548,7 @@ deciles %&gt;%
   geom_bar(stat = &#39;identity&#39;, position = &#39;dodge&#39;) +
   labs(title = &#39;Average gain by predicted decile&#39;, x = &#39;Decile&#39;, y = &#39;Minutes&#39;)</code></pre>
 <p>
-<img src="/images/deployment/cdh/performance-1.png" width=600/>
+<img src="images/deployment/cdh/performance-1.png" width=600/>
 </p>
 </div>
 <div id="visualize-predictions" class="section level2">
@@ -578,7 +578,7 @@ ggplot(carrier, aes(gain, prediction)) +
   geom_text(aes(label = substr(description, 1, 20)), size = 3, alpha = 0.75, vjust = -1) +
   labs(title=&#39;Average Gains Forecast&#39;, x = &#39;Actual&#39;, y = &#39;Predicted&#39;)</code></pre>
 <p>
-<img src="/images/deployment/cdh/forecast-1.png" width=600/>
+<img src="images/deployment/cdh/forecast-1.png" width=600/>
 </p>
 <p>Some carriers make up more time than others in flight, but the differences are relatively small. The average time gains between the best and worst airlines is only six minutes. The best predictor of time gained is not carrier but flight distance. The biggest gains were associated with the longest flights.</p>
 </div>
@@ -611,7 +611,7 @@ save(pred_data, airports, ml1_summary, file = &#39;flights_pred_2008.RData&#39;)
 <div id="publish-dashboard" class="section level2">
 <h2>Publish dashboard</h2>
 <p>Use the saved data to build an R Markdown <a href="http://rmarkdown.rstudio.com/flexdashboard/index.html">flexdashboard</a>. Publish the flexdashboard</p>
-<p><img src="/images/deployment/cdh/flex-1.png" width=600/></p>
+<p><img src="images/deployment/cdh/flex-1.png" width=600/></p>
 </div>
 </div>
 <div id="appendix" class="section level1">

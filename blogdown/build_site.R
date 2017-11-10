@@ -1,6 +1,5 @@
 
 rebuild_site <- function(overwrite = FALSE){
-  source("blogdown/build_helpers.R")
   process_content(overwrite = overwrite)
   process_reference(overwrite = overwrite)
   reset_public()

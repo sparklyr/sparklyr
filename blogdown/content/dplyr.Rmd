@@ -3,6 +3,8 @@ title: "Manipulating Data with dplyr"
 output: 
   html_document:
     toc_depth: 2
+aliases:
+  /articles/guides-dplyr.html
 ---
 
 ## Overview

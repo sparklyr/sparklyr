@@ -3,6 +3,8 @@ title: "Data Science using a Data Lake"
 output: 
   html_document:
     toc_depth: 2
+aliases:
+  /articles/deployment-data-lakes.html
 ---
 
 ```{r setup, include=FALSE}

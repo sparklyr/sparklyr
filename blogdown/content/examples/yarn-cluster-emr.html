@@ -13,7 +13,7 @@ params:
 
 
 <p>This document demonstrates how to use <code>sparklyr</code> with an Apache Spark cluster. Data are downloaded from the web and stored in Hive tables on HDFS across multiple worker nodes. RStudio Server is installed on the master node and orchestrates the analysis in spark. Here is the basic workflow.</p>
-<p><img src="/images/deployment/amazon-emr/workflowShare.png" width=600/></p>
+<p><img src="images/deployment/amazon-emr/workflowShare.png" width=600/></p>
 <div id="data-preparation" class="section level1">
 <h1>Data preparation</h1>
 <div id="set-up-the-cluster" class="section level2">
@@ -26,7 +26,7 @@ params:
 <li>Sudo privileges in order to install software from the command line</li>
 </ul>
 <p>
-<img src="/images/deployment/amazon-emr/emrArchitecture.png" width=600/>
+<img src="images/deployment/amazon-emr/emrArchitecture.png" width=600/>
 </p>
 <div id="build-an-emr-cluster" class="section level3">
 <h3>Build an EMR cluster</h3>
@@ -35,41 +35,41 @@ params:
 <li>An AWS key pair (.pem key) so you can SSH into the EC2 master node</li>
 <li>A security group that gives you access to port 22 on your IP and port 8787 from anywhere</li>
 </ul>
-<p><img src="/images/deployment/amazon-emr/awsNewSecurityGroup.png" width=600/></p>
+<p><img src="images/deployment/amazon-emr/awsNewSecurityGroup.png" width=600/></p>
 <hr />
 <div id="step-1-select-software" class="section level4">
 <h4>Step 1: Select software</h4>
 <p>Make sure to select Hive and Spark as part of the install. Note that by choosing Spark, R will also be installed on the master node as part of the distribution.</p>
-<p><img src="/images/deployment/amazon-emr/emrConfigStep1.png" width=600/></p>
+<p><img src="images/deployment/amazon-emr/emrConfigStep1.png" width=600/></p>
 <hr />
 </div>
 <div id="step-2-select-hardware" class="section level4">
 <h4>Step 2: Select hardware</h4>
 <p>Install 2 core nodes and one master node with m3.xlarge 80 GiB storage per node. You can easily increase the number of nodes later.</p>
-<p><img src="/images/deployment/amazon-emr/emrConfigStep2.png" width=600/></p>
+<p><img src="images/deployment/amazon-emr/emrConfigStep2.png" width=600/></p>
 <hr />
 </div>
 <div id="step-3-select-general-cluster-settings" class="section level4">
 <h4>Step 3: Select general cluster settings</h4>
 <p>Click next on the general cluster settings.</p>
-<p><img src="/images/deployment/amazon-emr/emrConfigStep3.png" width=600/></p>
+<p><img src="images/deployment/amazon-emr/emrConfigStep3.png" width=600/></p>
 <hr />
 </div>
 <div id="step-4-select-security" class="section level4">
 <h4>Step 4: Select security</h4>
 <p>Enter your EC2 key pair and security group. Make sure the security group has ports 22 and 8787 open.</p>
-<p><img src="/images/deployment/amazon-emr/emrConfigStep4.png" width=600/></p>
+<p><img src="images/deployment/amazon-emr/emrConfigStep4.png" width=600/></p>
 <hr />
 </div>
 </div>
 <div id="connect-to-emr" class="section level3">
 <h3>Connect to EMR</h3>
 <p>The cluster page will give you details about your EMR cluster and instructions on connecting.</p>
-<p><img src="/images/deployment/amazon-emr/awsClusterConnect.png" width=600/></p>
+<p><img src="images/deployment/amazon-emr/awsClusterConnect.png" width=600/></p>
 <p>Connect to the master node via SSH using your key pair. Once you connect you will see the EMR welcome.</p>
 <pre class="bash"><code># Log in to master node
 ssh -i ~/spark-demo.pem hadoop@ec2-52-10-102-11.us-west-2.compute.amazonaws.com</code></pre>
-<p><img src="/images/deployment/amazon-emr/emrLogin.png" width=600/></p>
+<p><img src="images/deployment/amazon-emr/emrLogin.png" width=600/></p>
 </div>
 <div id="install-rstudio-server" class="section level3">
 <h3>Install RStudio Server</h3>
@@ -241,7 +241,7 @@ LOAD DATA INPATH &#39;/user/rstudio-user/airports&#39; INTO TABLE airports;</cod
 <h2>Connect to Spark</h2>
 <p>Log in to RStudio Server by pointing a browser at your master node IP:8787.</p>
 <p>
-<img src="/images/deployment/amazon-emr/rstudioLogin.png" width=600/>
+<img src="images/deployment/amazon-emr/rstudioLogin.png" width=600/>
 </p>
 <p>Set the environment variable <code>SPARK_HOME</code> and then run <code>spark_connect</code>. After connecting you will be able to browse the Hive metadata in the RStudio Server Spark pane.</p>
 <pre class="r"><code># Connect to Spark
@@ -253,11 +253,11 @@ config &lt;- spark_config()
 sc &lt;- spark_connect(master = &quot;yarn-client&quot;, config = config, version = &#39;1.6.2&#39;)</code></pre>
 <p>Once you are connected, you will see the Spark pane appear along with your hive tables.</p>
 <p>
-<img src="/images/deployment/amazon-emr/rstudioSparkPane.png" width=600/>
+<img src="images/deployment/amazon-emr/rstudioSparkPane.png" width=600/>
 </p>
 <p>You can inspect your tables by clicking on the data icon.</p>
 <p>
-<img src="/images/deployment/amazon-emr/rstudioData.png" width=600/>
+<img src="images/deployment/amazon-emr/rstudioData.png" width=600/>
 </p>
 </div>
 </div>
@@ -265,7 +265,7 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;, config = config, versio
 <h1>Data analysis</h1>
 <p>Is there evidence to suggest that some airline carriers make up time in flight? This analysis predicts time gained in flight by airline carrier.</p>
 <p>
-<img src="/images/deployment/amazon-emr/rstudio.png" width=600/>
+<img src="images/deployment/amazon-emr/rstudio.png" width=600/>
 </p>
 <div id="cache-the-tables-into-memory" class="section level2">
 <h2>Cache the tables into memory</h2>
@@ -395,7 +395,7 @@ deciles %&gt;%
   geom_bar(stat = &#39;identity&#39;, position = &#39;dodge&#39;) +
   labs(title = &#39;Average gain by predicted decile&#39;, x = &#39;Decile&#39;, y = &#39;Minutes&#39;)</code></pre>
 <p>
-<img src="/images/deployment/amazon-emr/performance-1.png" width=600/>
+<img src="images/deployment/amazon-emr/performance-1.png" width=600/>
 </p>
 </div>
 <div id="visualize-predictions" class="section level2">
@@ -425,7 +425,7 @@ ggplot(carrier, aes(gain, prediction)) +
   geom_text(aes(label = substr(description, 1, 20)), size = 3, alpha = 0.75, vjust = -1) +
   labs(title=&#39;Average Gains Forecast&#39;, x = &#39;Actual&#39;, y = &#39;Predicted&#39;)</code></pre>
 <p>
-<img src="/images/deployment/amazon-emr/forecast-1.png" width=600/>
+<img src="images/deployment/amazon-emr/forecast-1.png" width=600/>
 </p>
 <p>Some carriers make up more time than others in flight, but the differences are relatively small. The average time gains between the best and worst airlines is only six minutes. The best predictor of time gained is not carrier but flight distance. The biggest gains were associated with the longest flights.</p>
 </div>
@@ -459,7 +459,7 @@ save(pred_data, airports, ml1_summary, file = &#39;flights_pred_2008.RData&#39;)
 <h2>Publish dashboard</h2>
 Use the saved data to build an R Markdown <a href="http://rmarkdown.rstudio.com/flexdashboard/index.html">flexdashboard</a>. Publish the flexdashboard to <a href="https://www.rstudio.com/products/shiny-server-pro/">Shiny Server</a>, <a href="https://www.rstudio.com/products/shinyapps/">Shinyapps.io</a> or <a href="https://www.rstudio.com/products/connect/">RStudio Connect</a>.
 <p>
-<a href="https://beta.rstudioconnect.com/content/1439/"> <img src="/images/deployment/amazon-emr/flightsDashboard.png" width=600/> </a>
+<a href="https://beta.rstudioconnect.com/content/1439/"> <img src="images/deployment/amazon-emr/flightsDashboard.png" width=600/> </a>
 </p>
 </div>
 </div>

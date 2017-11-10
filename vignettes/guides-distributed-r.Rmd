@@ -1,5 +1,7 @@
 ---
 title: "Distributing R Computations"
+aliases:
+  /articles/guides-distributed-r.html
 ---
 
 ## Overview

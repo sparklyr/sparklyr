@@ -3,6 +3,8 @@ title: "Understanding Spark Caching"
 output: 
   html_document:
     toc_depth: 3
+aliases:
+  /articles/guides-caching.html
 ---
 
 ```{r, include=FALSE}

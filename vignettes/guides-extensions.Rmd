@@ -3,6 +3,8 @@ title: "Creating Extensions for sparklyr"
 output:
   html_document:
     toc_depth: 2
+aliases:
+  /articles/guides-extensions.html
 ---
 
 ```{r setup, include=FALSE}
