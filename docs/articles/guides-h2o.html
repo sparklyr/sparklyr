@@ -37,19 +37,37 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Guides
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/guides-dplyr.html">dplyr</a>
+    </li>
+    <li>
+      <a href="../articles/guides-mllib.html">mllib</a>
+    </li>
+    <li>
+      <a href="../articles/guides-distributed-r.html">Distributed R</a>
+    </li>
+    <li>
+      <a href="../articles/deployment-connections.html">User connection options</a>
+    </li>
+    <li>
+      <a href="../articles/guides-caching.html">Caching</a>
+    </li>
+    <li>
       <a href="../articles/guides-h2o.html">H2O</a>
+    </li>
+    <li>
+      <a href="../articles/guides-extensions.html">Extensions</a>
     </li>
   </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Deployment
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -70,7 +88,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -93,7 +111,7 @@
 <li>
   <a href="https://github.com/rstudio/sparklyr">
     <span class="fa fa-github"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -104,16 +122,16 @@
 </div>
 <!--/.navbar -->
 
-      
+
       </header><div class="row">
   <div class="col-md-9">
     <div class="page-header toc-ignore">
       <h1>Sparkling Water (H2O) Machine Learning</h1>
-            
+
           </div>
 
-    
-    
+
+
 <div class="contents">
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
@@ -171,17 +189,17 @@ partitions &lt;-<span class="st"> </span>mtcars_tbl <span class="op">%&gt;%</spa
 test &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rsparkling/topics/as_h2o_frame">as_h2o_frame</a></span>(sc, partitions<span class="op">$</span>test, <span class="dt">strict_version_check =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p>Alternatively, we can use the <code><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.splitFrame">h2o.splitFrame()</a></code> function instead of <code><a href="../reference/sdf_partition.html">sdf_partition()</a></code> to partition the data within H2O instead of Spark (e.g. <code>partitions &lt;- h2o.splitFrame(as_h2o_frame(mtcars_tbl), 0.5)</code>)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit a linear model to the training dataset</span>
-glm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.glm">h2o.glm</a></span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="st">"wt"</span>, <span class="st">"cyl"</span>), 
-                     <span class="dt">y =</span> <span class="st">"mpg"</span>, 
+glm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.glm">h2o.glm</a></span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="st">"wt"</span>, <span class="st">"cyl"</span>),
+                     <span class="dt">y =</span> <span class="st">"mpg"</span>,
                      <span class="dt">training_frame =</span> training,
                      <span class="dt">lambda_search =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>For linear regression models produced by H2O, we can use either <code>print()</code> or <code>summary()</code> to learn a bit more about the quality of our fit. The <code>summary()</code> method returns some extra information about scoring history and variable importance.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_model</code></pre></div>
 <pre><code>## Model Details:
 ## ==============
-## 
+##
 ## H2ORegressionModel: glm
-## Model ID:  GLM_model_R_1510272550151_1 
+## Model ID:  GLM_model_R_1510272550151_1
 ## GLM Model: summary
 ##     family     link                               regularization
 ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.05468 )
@@ -191,16 +209,16 @@ glm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 ## 1                          2                           2
 ##   number_of_iterations                                training_frame
 ## 1                  100 frame_rdd_32_9f8c8e7e26090886a016a3b3bfdf40a2
-## 
+##
 ## Coefficients: glm coefficients
 ##       names coefficients standardized_coefficients
 ## 1 Intercept    32.997281                 16.625000
 ## 2       cyl    -0.906688                 -1.349195
 ## 3        wt    -2.712562                 -2.282649
-## 
+##
 ## H2ORegressionMetrics: glm
 ## ** Reported on training data. **
-## 
+##
 ## MSE:  2.03293
 ## RMSE:  1.425808
 ## MAE:  1.306314
@@ -440,7 +458,7 @@ iris_tbl</code></pre></div>
 <h3 class="hasAnchor">
 <a href="#k-means-clustering" class="anchor"></a>K-Means Clustering</h3>
 <p>Use H2O’s <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/k-means.html">K-means clustering</a> to partition a dataset into groups. K-means clustering partitions points into <code>k</code> groups, such that the sum of squares from points to the assigned cluster centers is minimized.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kmeans_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.kmeans">h2o.kmeans</a></span>(<span class="dt">training_frame =</span> iris_hf, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kmeans_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.kmeans">h2o.kmeans</a></span>(<span class="dt">training_frame =</span> iris_hf,
                            <span class="dt">x =</span> <span class="dv">3</span><span class="op">:</span><span class="dv">4</span>,
                            <span class="dt">k =</span> <span class="dv">3</span>,
                            <span class="dt">seed =</span> <span class="dv">1</span>)</code></pre></div>
@@ -453,7 +471,7 @@ iris_tbl</code></pre></div>
 ## 3     4.296154     1.32500</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print the centroid statistics</span>
 <span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.centroid_stats">h2o.centroid_stats</a></span>(kmeans_model)</code></pre></div>
-<pre><code>## Centroid Statistics: 
+<pre><code>## Centroid Statistics:
 ##   centroid     size within_cluster_sum_of_squares
 ## 1        1 50.00000                       1.41087
 ## 2        2 48.00000                       9.29317
@@ -474,18 +492,18 @@ iris_tbl</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pca_model</code></pre></div>
 <pre><code>## Model Details:
 ## ==============
-## 
+##
 ## H2ODimReductionModel: pca
-## Model ID:  PCA_model_R_1510272550151_3 
-## Importance of components: 
+## Model ID:  PCA_model_R_1510272550151_3
+## Importance of components:
 ##                             pc1      pc2      pc3      pc4
 ## Standard deviation     7.861342 1.455041 0.283531 0.154411
 ## Proportion of Variance 0.965303 0.033069 0.001256 0.000372
 ## Cumulative Proportion  0.965303 0.998372 0.999628 1.000000
-## 
-## 
+##
+##
 ## H2ODimReductionMetrics: pca
-## 
+##
 ## No model metrics available for PCA</code></pre>
 </div>
 <div id="random-forest" class="section level3">
@@ -499,7 +517,7 @@ iris_hf[,y] &lt;-<span class="st"> </span><span class="kw"><a href="http://www.r
 <p>We can split the <code>iris_hf</code> H2O Frame into a train and test set (the split defaults to 75/25 train/test).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">splits &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.splitFrame">h2o.splitFrame</a></span>(iris_hf, <span class="dt">seed =</span> <span class="dv">1</span>)</code></pre></div>
 <p>Then we can train a Random Forest model:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rf_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.randomForest">h2o.randomForest</a></span>(<span class="dt">x =</span> x, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rf_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.randomForest">h2o.randomForest</a></span>(<span class="dt">x =</span> x,
                              <span class="dt">y =</span> y,
                              <span class="dt">training_frame =</span> splits[[<span class="dv">1</span>]],
                              <span class="dt">validation_frame =</span> splits[[<span class="dv">2</span>]],
@@ -524,10 +542,10 @@ iris_hf[,y] &lt;-<span class="st"> </span><span class="kw"><a href="http://www.r
 <a href="#gradient-boosting-machine" class="anchor"></a>Gradient Boosting Machine</h3>
 <p>The <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/gbm.html">Gradient Boosting Machine (GBM)</a> is one of H2O’s most popular algorithms, as it works well on many types of data. We will continue to use the iris dataset as an example for this problem.</p>
 <p>Using the same dataset and <code>x</code> and <code>y</code> from above, we can train a GBM:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gbm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.gbm">h2o.gbm</a></span>(<span class="dt">x =</span> x, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gbm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.gbm">h2o.gbm</a></span>(<span class="dt">x =</span> x,
                      <span class="dt">y =</span> y,
                      <span class="dt">training_frame =</span> splits[[<span class="dv">1</span>]],
-                     <span class="dt">validation_frame =</span> splits[[<span class="dv">2</span>]],                     
+                     <span class="dt">validation_frame =</span> splits[[<span class="dv">2</span>]],
                      <span class="dt">ntrees =</span> <span class="dv">20</span>,
                      <span class="dt">max_depth =</span> <span class="dv">3</span>,
                      <span class="dt">learn_rate =</span> <span class="fl">0.01</span>,
@@ -577,7 +595,7 @@ x &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse
 <p>Evaluate performance on a test set:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.performance">h2o.performance</a></span>(dl_fit, <span class="dt">newdata =</span> splits[[<span class="dv">2</span>]])</code></pre></div>
 <pre><code>## H2ORegressionMetrics: deeplearning
-## 
+##
 ## MSE:  280.7796
 ## RMSE:  16.75648
 ## MAE:  13.85877
@@ -632,22 +650,22 @@ gbm_grid1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
                       <span class="dt">hyper_params =</span> gbm_params1)
 
 <span class="co"># Get the grid results, sorted by validation MSE</span>
-gbm_gridperf1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.getGrid">h2o.getGrid</a></span>(<span class="dt">grid_id =</span> <span class="st">"gbm_grid1"</span>, 
-                             <span class="dt">sort_by =</span> <span class="st">"mse"</span>, 
+gbm_gridperf1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.getGrid">h2o.getGrid</a></span>(<span class="dt">grid_id =</span> <span class="st">"gbm_grid1"</span>,
+                             <span class="dt">sort_by =</span> <span class="st">"mse"</span>,
                              <span class="dt">decreasing =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gbm_gridperf1</code></pre></div>
 <pre><code>## H2O Grid Details
 ## ================
-## 
-## Grid ID: gbm_grid1 
-## Used hyper parameters: 
-##   -  col_sample_rate 
-##   -  learn_rate 
-##   -  max_depth 
-##   -  sample_rate 
-## Number of models: 36 
-## Number of failed models: 0 
-## 
+##
+## Grid ID: gbm_grid1
+## Used hyper parameters:
+##   -  col_sample_rate
+##   -  learn_rate
+##   -  max_depth
+##   -  sample_rate
+## Number of models: 36
+## Number of failed models: 0
+##
 ## Hyper-Parameter Search Summary: ordered by increasing mse
 ##   col_sample_rate learn_rate max_depth sample_rate          model_ids
 ## 1             1.0        0.1         9         1.0 gbm_grid1_model_35
@@ -661,7 +679,7 @@ gbm_gridperf1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www
 ## 3 102.78632321923726
 ## 4  126.4217260351778
 ## 5  149.6066650109763
-## 
+##
 ## ---
 ##    col_sample_rate learn_rate max_depth sample_rate          model_ids
 ## 31             0.5       0.01         3         0.8  gbm_grid1_model_1
@@ -688,7 +706,7 @@ gbm_params2 &lt;-<span class="st"> </span><span class="kw">list</span>(<span cla
                     <span class="dt">max_depth =</span> <span class="kw">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">1</span>),
                     <span class="dt">sample_rate =</span> <span class="kw">seq</span>(<span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>),
                     <span class="dt">col_sample_rate =</span> <span class="kw">seq</span>(<span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>))
-search_criteria2 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">strategy =</span> <span class="st">"RandomDiscrete"</span>, 
+search_criteria2 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">strategy =</span> <span class="st">"RandomDiscrete"</span>,
                          <span class="dt">max_models =</span> <span class="dv">50</span>)
 
 <span class="co"># Train and validate a grid of GBMs</span>
@@ -702,8 +720,8 @@ gbm_grid2 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
                       <span class="dt">search_criteria =</span> search_criteria2)
 
 <span class="co"># Get the grid results, sorted by validation MSE</span>
-gbm_gridperf2 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.getGrid">h2o.getGrid</a></span>(<span class="dt">grid_id =</span> <span class="st">"gbm_grid2"</span>, 
-                             <span class="dt">sort_by =</span> <span class="st">"mse"</span>, 
+gbm_gridperf2 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.getGrid">h2o.getGrid</a></span>(<span class="dt">grid_id =</span> <span class="st">"gbm_grid2"</span>,
+                             <span class="dt">sort_by =</span> <span class="st">"mse"</span>,
                              <span class="dt">decreasing =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p>To get the best model, as measured by validation MSE, we simply grab the first row of the <code>gbm_gridperf2@summary_table</code> object, since this table is already sorted such that the lowest MSE model is on top.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gbm_gridperf2<span class="op">@</span>summary_table[<span class="dv">1</span>,]</code></pre></div>
