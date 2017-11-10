@@ -1,7 +1,11 @@
 ml_index_labels_metadata <- function(pipeline_model, dataset, label_col) {
-  r_formula_model <- ml_stage(pipeline_model, 1)
-  transformed_tbl <- ml_transform(r_formula_model, dataset)
-  label_col <- ml_param(r_formula_model, "label_col")
+  label_indexer_model <- ml_stages(pipeline_model) %>%
+    dplyr::nth(-2) # second from last, either RFormulaModel or StringIndexerModel
+  transformed_tbl <- ml_transform(label_indexer_model, dataset)
+  label_col <- if (inherits(label_indexer_model, "ml_r_formula_model"))
+    ml_param(label_indexer_model, "label_col")
+  else
+    ml_param(label_indexer_model, "output_col")
 
   ml_column_metadata(transformed_tbl, label_col) %>%
     `[[`("vals")
@@ -24,14 +28,30 @@ ml_generate_ml_model <- function(x, predictor, formula, features_col = "features
                                  constructor) {
   sc <- spark_connection(x)
   classification <- identical(type, "classification")
-  r_formula <- if (spark_version(sc) >= "2.1.0")
-    ft_r_formula(sc, formula, features_col, label_col,
-                            force_index_label = if (classification) TRUE else FALSE,
-                            dataset = x)
-  else
-    ft_r_formula(sc, formula, features_col, label_col, dataset = x)
 
-  pipeline <- ml_pipeline(r_formula, predictor)
+  r_formula <- if (classification) {
+    if (spark_version(sc) >= "2.1.0")
+      ft_r_formula(sc, formula, features_col, label_col,
+                   force_index_label = TRUE)
+    else
+      ft_r_formula(sc, formula, features_col, random_string(label_col))
+  } else
+    ft_r_formula(sc, formula, features_col, label_col)
+
+  string_indexer <- if (classification && spark_version(sc) < "2.1.0") {
+    response_col <- formula %>%
+      strsplit("~", fixed = TRUE) %>%
+      rlang::flatten_chr() %>%
+      head(1) %>%
+      trimws()
+
+    ft_string_indexer(sc, response_col, label_col)
+  }
+
+  pipeline <- do.call(ml_pipeline,
+                      Filter(length, list(r_formula, string_indexer, predictor))
+  )
+
   pipeline_model <- pipeline %>%
     ml_fit(x)
 
@@ -43,7 +63,7 @@ ml_generate_ml_model <- function(x, predictor, formula, features_col = "features
   args <- list(
     pipeline = pipeline,
     pipeline_model = pipeline_model,
-    model = ml_stage(pipeline_model, 2),
+    model = ml_stages(pipeline_model) %>% dplyr::last(),
     dataset = x,
     formula = formula,
     feature_names = feature_names,
