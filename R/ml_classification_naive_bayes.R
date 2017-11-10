@@ -57,7 +57,7 @@ ml_naive_bayes.spark_connection <- function(
     jobj <- invoke(jobj, "setThresholds", thresholds)
 
   if (!rlang::is_null(weight_col))
-    jobj <- invoke(jobj, "setWeightCol", weight_col)
+    jobj <- jobj_set_param(jobj, "setWeightCol", weight_col, NULL, "2.1.0")
 
   new_ml_naive_bayes(jobj)
 }

@@ -6,9 +6,10 @@ test_that("ml_naive_bayes() parses params correctly", {
   args <- list(
     x = sc, label_col = "col", features_col = "fcol", prediction_col = "pcol",
     probability_col = "prcol", raw_prediction_col = "rpcol",
-    model_type = "bernoulli", smoothing = 0.6, thresholds = c(0.2, 0.4, 0.6),
-    weight_col = "wcol"
+    model_type = "bernoulli", smoothing = 0.6, thresholds = c(0.2, 0.4, 0.6)
   )
+  if (spark_version(sc) >= "2.1.0")
+    args <- c(args, weight_col = "wcol")
   nb <- do.call(ml_naive_bayes, args)
   expect_equal(ml_params(nb, names(args)[-1]), args[-1])
 })
