@@ -29,7 +29,7 @@ ft_string_indexer.spark_connection <- function(
 
   estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StringIndexer",
                                   input_col, output_col, uid) %>%
-    invoke("setHandleInvalid", handle_invalid) %>%
+    jobj_set_param("setHandleInvalid", handle_invalid, "error", "2.1.0") %>%
     new_ml_string_indexer()
 
   if (is.null(dataset))
