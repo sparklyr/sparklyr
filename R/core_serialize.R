@@ -10,7 +10,7 @@
 # double, numeric -> Double
 # raw -> Array[Byte]
 # Date -> Date
-# POSIXct,POSIXlt -> Time
+# POSIXct,POSIXlt -> Timestamp
 #
 # list[T] -> Array[T], where T is one of above mentioned types
 # environment -> Map[String, T], where T is a native type

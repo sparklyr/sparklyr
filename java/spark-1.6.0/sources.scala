@@ -598,7 +598,7 @@ object Sources {
     "# double, numeric -> Double\n" +
     "# raw -> Array[Byte]\n" +
     "# Date -> Date\n" +
-    "# POSIXct,POSIXlt -> Time\n" +
+    "# POSIXct,POSIXlt -> Timestamp\n" +
     "#\n" +
     "# list[T] -> Array[T], where T is one of above mentioned types\n" +
     "# environment -> Map[String, T], where T is a native type\n" +

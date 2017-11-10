@@ -13,6 +13,12 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
     )
   )
 
+  map_special_types <- list(
+    date = "date",
+    posixct = "timestamp",
+    posixt = "timestamp"
+  )
+
   colTypes <- NULL
   lapply(sampleRows, function(r) {
     row <- r %>% invoke("toSeq")
@@ -22,7 +28,10 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 
     lapply(seq_along(row), function(colIdx) {
       colVal <- row[[colIdx]]
-      if (!is.na(colVal) && !is.null(colVal)) {
+      lowerClass <- tolower(class(colVal)[[1]])
+      if (lowerClass %in% names(map_special_types)) {
+        colTypes[[colIdx]] <<- map_special_types[[lowerClass]]
+      } else if (!is.na(colVal) && !is.null(colVal)) {
         colTypes[[colIdx]] <<- typeof(colVal)
       }
     })

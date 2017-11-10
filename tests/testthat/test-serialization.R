@@ -222,3 +222,15 @@ test_that("collect() can retrieve NULL data types as NAs", {
     expect_true(is.na(spark_results[[e]]), paste(e, "expected to be NA"))
   })
 })
+
+test_that("invoke() can roundtrip POSIXlt fields", {
+  invoke_static(
+    sc,
+    "sparklyr.Test",
+    "roundtrip",
+    list(
+      as.POSIXlt(Sys.time(), "GMT"),
+      as.POSIXlt(Sys.time(), "GMT")
+    )
+  )
+})
