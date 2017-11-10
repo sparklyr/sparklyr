@@ -1,5 +1,10 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed data frames with dates in `spark_apply()` retrieved as `Date` instead
+  of doubles.
+
+- Add support to use `invoke()` with arrays of POSIXlt and POSIXct.
+
 - Added support for `context` parameter in `spark_apply()` to allow callers to
   pass additional contextual information to the `f()` closure.
 
