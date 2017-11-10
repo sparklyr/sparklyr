@@ -30,19 +30,20 @@ test_that("r formula works as expected", {
   expect_equal(pull(df1, label), pull(df2, label))
   expect_equal(pull(df1, label), pull(df3, label))
 
-  rf <- ft_r_formula(
-    sc, "Sepal_Length ~ Petal_Width + Species", features_col = "x",
-    label_col = "y", force_index_label = TRUE)
+  args <- list(
+    x = sc,
+    formula = "Sepal_Length ~ Petal_Width + Species",
+    features_col = "x",
+    label_col = "y")
+
+  if (spark_version(sc) >= "2.1.0")
+    args <- c(args, force_index_label = TRUE)
+
+  rf <- do.call(ft_r_formula, args)
 
   expect_equal(
-    ml_params(rf, list(
-      "formula", "features_col", "label_col", "force_index_label"
-    )),
-    list(formula = "Sepal_Length ~ Petal_Width + Species",
-         features_col = "x",
-         label_col = "y",
-         force_index_label = TRUE)
-  )
+    ml_params(rf, names(args)[-1]),
+    args[-1])
 })
 
 test_that("ft_r_formula takes formula", {
