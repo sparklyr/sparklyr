@@ -141,6 +141,11 @@ object Serializer {
     (0 until len).map(_ => readDate(in)).toArray
   }
 
+  def readTimeArr(in: DataInputStream): Array[Time] = {
+    val len = readInt(in)
+    (0 until len).map(_ => readTime(in)).toArray
+  }
+
   def readArray(dis: DataInputStream): Array[_] = {
     val arrType = readObjectType(dis)
     arrType match {
@@ -153,6 +158,7 @@ object Serializer {
       case 'a' => readArrayArr(dis)
       case 'l' => readListArr(dis)
       case 'D' => readDateArr(dis)
+      case 't' => readTimeArr(dis)
       case _ =>
         if (sqlSerDe == null || sqlSerDe._1 == null) {
           throw new IllegalArgumentException (s"Invalid array type $arrType")
