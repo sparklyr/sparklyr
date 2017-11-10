@@ -17,7 +17,7 @@ sc &lt;- spark_connect(master = &quot;local&quot;)
 
 sdf_len(sc, 5, repartition = 1) %&gt;%
   spark_apply(function(e) I(e))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd859226785&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_1734d31467e&gt; [?? x 1]
 ## # Database: spark_connection
 ##      id
 ##   &lt;dbl&gt;
@@ -29,7 +29,7 @@ sdf_len(sc, 5, repartition = 1) %&gt;%
 <p>Your R function should be designed to operate on an R <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html">data frame</a>. The R function passed to <code>spark_apply</code> expects a DataFrame and will return an object that can be cast as a DataFrame. We can use the <code>class</code> function to verify the class of the data.</p>
 <pre class="r"><code>sdf_len(sc, 10, repartition = 1) %&gt;%
   spark_apply(function(e) class(e))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd86a8d76b0&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_17344b2155e0&gt; [?? x 1]
 ## # Database: spark_connection
 ##           id
 ##        &lt;chr&gt;
@@ -39,7 +39,7 @@ sdf_len(sc, 5, repartition = 1) %&gt;%
 
 trees_tbl %&gt;%
   spark_apply(function(e) nrow(e), names = &quot;n&quot;)</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd866423ac5&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_173433ae1ccc&gt; [?? x 1]
 ## # Database: spark_connection
 ##       n
 ##   &lt;int&gt;
@@ -47,7 +47,7 @@ trees_tbl %&gt;%
 ## 2    15</code></pre>
 <pre class="r"><code>trees_tbl %&gt;%
   spark_apply(function(e) head(e, 1))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd81b8e7a8f&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_173478ad3015&gt; [?? x 3]
 ## # Database: spark_connection
 ##   Girth Height Volume
 ##   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
@@ -56,7 +56,7 @@ trees_tbl %&gt;%
 <p>We can apply any arbitrary function to the partitions in the Spark DataFrame. For instance, we can scale or jitter the columns. Notice that <code>spark_apply</code> applies the R function to all partitions and returns a single DataFrame.</p>
 <pre class="r"><code>trees_tbl %&gt;%
   spark_apply(function(e) scale(e))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd87898319&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_17347b8053d3&gt; [?? x 3]
 ## # Database: spark_connection
 ##         Girth      Height     Volume
 ##         &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
@@ -73,27 +73,27 @@ trees_tbl %&gt;%
 ## # ... with more rows</code></pre>
 <pre class="r"><code>trees_tbl %&gt;%
   spark_apply(function(e) lapply(e, jitter))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd84b917372&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_173466da274d&gt; [?? x 3]
 ## # Database: spark_connection
 ##        Girth   Height   Volume
 ##        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1  8.312546 70.12510 10.31373
-##  2  8.807756 62.85239 10.18610
-##  3 10.698922 80.94557 18.80198
-##  4 11.007216 66.00932 15.58839
-##  5 11.082718 79.93033 22.61549
-##  6 11.304914 78.85334 24.21569
-##  7 11.404381 76.00863 21.41327
-##  8 11.987049 74.92525 19.11004
-##  9 12.892416 85.16844 33.80476
-## 10 13.714423 71.11322 25.70391
+##  1  8.286913 69.88287 10.30229
+##  2  8.780494 63.02573 10.19758
+##  3 10.694891 81.13725 18.80640
+##  4 11.007587 66.03293 15.60759
+##  5 11.119601 80.10108 22.61776
+##  6 11.316853 78.92134 24.20892
+##  7 11.411034 76.17756 21.38142
+##  8 11.991983 74.86208 19.10290
+##  9 12.894124 84.97818 33.78572
+## 10 13.701241 70.85436 25.71667
 ## # ... with more rows</code></pre>
 <p>By default <code>spark_apply()</code> derives the column names from the input Spark data frame. Use the <code>names</code> argument to rename or add new columns.</p>
 <pre class="r"><code>trees_tbl %&gt;%
   spark_apply(
     function(e) data.frame(2.54 * e$Girth, e),
     names = c(&quot;Girth(cm)&quot;, colnames(trees)))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd87d7231fd&gt; [?? x 4]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_1734b70431a&gt; [?? x 4]
 ## # Database: spark_connection
 ##    `Girth(cm)` Girth Height Volume
 ##          &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
@@ -116,7 +116,7 @@ trees_tbl %&gt;%
 
 iris_tbl %&gt;%
   spark_apply(nrow, group_by = &quot;Species&quot;)</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd852ea7e8d&gt; [?? x 2]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_173450cd2bec&gt; [?? x 2]
 ## # Database: spark_connection
 ##      Species Sepal_Length
 ##        &lt;chr&gt;        &lt;int&gt;
@@ -128,7 +128,7 @@ iris_tbl %&gt;%
     function(e) summary(lm(Petal_Length ~ Petal_Width, e))$r.squared,
     names = &quot;r.squared&quot;,
     group_by = &quot;Species&quot;)</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd84c56559d&gt; [?? x 2]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_173446b663a&gt; [?? x 2]
 ## # Database: spark_connection
 ##      Species r.squared
 ##        &lt;chr&gt;     &lt;dbl&gt;
@@ -145,7 +145,7 @@ iris_tbl %&gt;%
   function(e) broom::tidy(lm(Petal_Length ~ Petal_Width, e)),
   names = c(&quot;term&quot;, &quot;estimate&quot;, &quot;std.error&quot;, &quot;statistic&quot;, &quot;p.value&quot;),
   group_by = &quot;Species&quot;)</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1cd86e1b16ef&gt; [?? x 6]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_17341fea5079&gt; [?? x 6]
 ## # Database: spark_connection
 ##      Species        term  estimate std.error statistic      p.value
 ##        &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
