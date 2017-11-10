@@ -42,25 +42,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/guides-dplyr.html">dplyr</a>
-    </li>
-    <li>
-      <a href="../articles/guides-mllib.html">mllib</a>
-    </li>
-    <li>
-      <a href="../articles/guides-distributed-r.html">Distributed R</a>
-    </li>
-    <li>
-      <a href="../articles/deployment-connections.html">User connection options</a>
-    </li>
-    <li>
-      <a href="../articles/guides-caching.html">Caching</a>
-    </li>
-    <li>
       <a href="../articles/guides-h2o.html">H2O</a>
-    </li>
-    <li>
-      <a href="../articles/guides-extensions.html">Extensions</a>
     </li>
   </ul>
 </li>
@@ -154,7 +136,7 @@
 <p>You can install the <strong>rsparkling</strong> package from CRAN as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"rsparkling"</span>)</code></pre></div>
 <p>Then set the Sparkling Water version for rsparkling.:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">rsparkling.sparklingwater.version =</span> <span class="st">"2.1.0"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">rsparkling.sparklingwater.version =</span> <span class="st">"2.1.14"</span>)</code></pre></div>
 <p>For Spark <code>2.0.x</code> set <code>rsparkling.sparklingwater.version</code> to <code>2.0.3</code> instead, for Spark <code>1.6.2</code> use <code>1.6.8</code>.</p>
 </div>
 <div id="using-h2o" class="section level2">
@@ -162,8 +144,9 @@
 <a href="#using-h2o" class="anchor"></a>Using H2O</h2>
 <p>Now let’s walk through a simple example to demonstrate the use of H2O’s machine learning algorithms within R. We’ll use <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html">h2o.glm</a> to fit a linear regression model. Using the built-in <code>mtcars</code> dataset, we’ll try to predict a car’s fuel consumption (<code>mpg</code>) based on its weight (<code>wt</code>), and the number of cylinders the engine contains (<code>cyl</code>).</p>
 <p>First, we will initialize a local Spark connection, and copy the <code>mtcars</code> dataset into Spark.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rsparkling)
-<span class="kw">library</span>(sparklyr)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rsparkling)</code></pre></div>
+<pre><code>## Warning: package 'rsparkling' was built under R version 3.4.2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(sparklyr)
 <span class="kw">library</span>(h2o)
 <span class="kw">library</span>(dplyr)
 
@@ -184,14 +167,8 @@ partitions &lt;-<span class="st"> </span>mtcars_tbl <span class="op">%&gt;%</spa
 <span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">cyl8 =</span> cyl <span class="op">==</span><span class="st"> </span><span class="dv">8</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="../reference/sdf_partition.html">sdf_partition</a></span>(<span class="dt">training =</span> <span class="fl">0.5</span>, <span class="dt">test =</span> <span class="fl">0.5</span>, <span class="dt">seed =</span> <span class="dv">1099</span>)</code></pre></div>
 <p>Now, we convert our training and test sets into H2O Frames using rsparkling conversion functions. We have already split the data into training and test frames using dplyr.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">training &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rsparkling/topics/as_h2o_frame">as_h2o_frame</a></span>(sc, partitions<span class="op">$</span>training, <span class="dt">strict_version_check =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>## Warning in h2o.clusterInfo(): 
-## Your H2O cluster version is too old (6 months and 25 days)!
-## Please download and install the latest version from http://h2o.ai/download/</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rsparkling/topics/as_h2o_frame">as_h2o_frame</a></span>(sc, partitions<span class="op">$</span>test, <span class="dt">strict_version_check =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>## Warning in h2o.clusterInfo(): 
-## Your H2O cluster version is too old (6 months and 25 days)!
-## Please download and install the latest version from http://h2o.ai/download/</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">training &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rsparkling/topics/as_h2o_frame">as_h2o_frame</a></span>(sc, partitions<span class="op">$</span>training, <span class="dt">strict_version_check =</span> <span class="ot">FALSE</span>)
+test &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rsparkling/topics/as_h2o_frame">as_h2o_frame</a></span>(sc, partitions<span class="op">$</span>test, <span class="dt">strict_version_check =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p>Alternatively, we can use the <code><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.splitFrame">h2o.splitFrame()</a></code> function instead of <code><a href="../reference/sdf_partition.html">sdf_partition()</a></code> to partition the data within H2O instead of Spark (e.g. <code>partitions &lt;- h2o.splitFrame(as_h2o_frame(mtcars_tbl), 0.5)</code>)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit a linear model to the training dataset</span>
 glm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.glm">h2o.glm</a></span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="st">"wt"</span>, <span class="st">"cyl"</span>), 
@@ -204,7 +181,7 @@ glm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 ## ==============
 ## 
 ## H2ORegressionModel: glm
-## Model ID:  GLM_model_R_1503684109678_1 
+## Model ID:  GLM_model_R_1510272550151_1 
 ## GLM Model: summary
 ##     family     link                               regularization
 ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.05468 )
@@ -212,8 +189,8 @@ glm_model &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 ## 1 nlambda = 100, lambda.max = 5.4682, lambda.min = 0.05468, lambda.1se = -1.0
 ##   number_of_predictors_total number_of_active_predictors
 ## 1                          2                           2
-##   number_of_iterations                               training_frame
-## 1                    0 frame_rdd_32_8d800eecc2806f51fa504de54664e58
+##   number_of_iterations                                training_frame
+## 1                  100 frame_rdd_32_9f8c8e7e26090886a016a3b3bfdf40a2
 ## 
 ## Coefficients: glm coefficients
 ##       names coefficients standardized_coefficients
@@ -490,12 +467,16 @@ iris_tbl</code></pre></div>
                         <span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,
                         <span class="dt">k =</span> <span class="dv">4</span>,
                         <span class="dt">seed =</span> <span class="dv">1</span>)</code></pre></div>
+<pre><code>## Warning in doTryCatch(return(expr), name, parentenv, handler): _train:
+## Dataset used may contain fewer number of rows due to removal of rows with
+## NA/missing values. If this is not desirable, set impute_missing argument in
+## pca call to TRUE/True/true/... depending on the client language.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pca_model</code></pre></div>
 <pre><code>## Model Details:
 ## ==============
 ## 
 ## H2ODimReductionModel: pca
-## Model ID:  PCA_model_R_1503684109678_3 
+## Model ID:  PCA_model_R_1510272550151_3 
 ## Importance of components: 
 ##                             pc1      pc2      pc3      pc4
 ## Standard deviation     7.861342 1.455041 0.283531 0.154411
@@ -528,7 +509,7 @@ iris_hf[,y] &lt;-<span class="st"> </span><span class="kw"><a href="http://www.r
                              <span class="dt">seed =</span> <span class="dv">1</span>)</code></pre></div>
 <p>Since we passed a validation frame, the validation metrics will be calculated. We can retrieve individual metrics using functions such as <code><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.mse">h2o.mse(rf_model, valid = TRUE)</a></code>. The confusion matrix can be printed using the following:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.confusionMatrix">h2o.confusionMatrix</a></span>(rf_model, <span class="dt">valid =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Confusion Matrix: vertical: actual; across: predicted
+<pre><code>## Confusion Matrix: Row labels: Actual class; Column labels: Predicted class
 ##            setosa versicolor virginica  Error     Rate
 ## setosa          7          0         0 0.0000 =  0 / 7
 ## versicolor      0         13         0 0.0000 = 0 / 13
@@ -554,7 +535,7 @@ iris_hf[,y] &lt;-<span class="st"> </span><span class="kw"><a href="http://www.r
                      <span class="dt">seed =</span> <span class="dv">1</span>)</code></pre></div>
 <p>Since this is a multi-class problem, we may be interested in inspecting the confusion matrix on a hold-out set. Since we passed along a <code>validatin_frame</code> at train time, the validation metrics are already computed and we just need to retreive them from the model object.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.confusionMatrix">h2o.confusionMatrix</a></span>(gbm_model, <span class="dt">valid =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Confusion Matrix: vertical: actual; across: predicted
+<pre><code>## Confusion Matrix: Row labels: Actual class; Column labels: Predicted class
 ##            setosa versicolor virginica  Error     Rate
 ## setosa          7          0         0 0.0000 =  0 / 7
 ## versicolor      0         13         0 0.0000 = 0 / 13
@@ -597,11 +578,11 @@ x &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/h2o/topics/h2o.performance">h2o.performance</a></span>(dl_fit, <span class="dt">newdata =</span> splits[[<span class="dv">2</span>]])</code></pre></div>
 <pre><code>## H2ORegressionMetrics: deeplearning
 ## 
-## MSE:  279.1715
-## RMSE:  16.70843
-## MAE:  13.18417
-## RMSLE:  1.879956
-## Mean Residual Deviance :  279.1715</code></pre>
+## MSE:  280.7796
+## RMSE:  16.75648
+## MAE:  13.85877
+## RMSLE:  1.968329
+## Mean Residual Deviance :  280.7796</code></pre>
 <p>Note that the above metrics are not reproducible when H2O’s Deep Learning is run on multiple cores, however, the metrics should be fairly stable across repeat runs.</p>
 </div>
 <div id="grid-search" class="section level3">
@@ -728,9 +709,9 @@ gbm_gridperf2 &lt;-<span class="st"> </span><span class="kw"><a href="http://www
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gbm_gridperf2<span class="op">@</span>summary_table[<span class="dv">1</span>,]</code></pre></div>
 <pre><code>## Hyper-Parameter Search Summary: ordered by increasing mse
 ##   col_sample_rate learn_rate max_depth sample_rate          model_ids
-## 1             0.4       0.01         5         0.5 gbm_grid2_model_31
+## 1             1.0       0.01         3         1.0 gbm_grid2_model_37
 ##                  mse
-## 1 249.34100191149807</code></pre>
+## 1 244.98771263058234</code></pre>
 <p>In the examples above, we generated two different grids, specified by <code>grid_id</code>. The first grid was called <code>grid_id = "gbm_grid1"</code> and the second was called <code>grid_id = "gbm_grid2"</code>. However, if we are using the same dataset &amp; algorithm in two grid searches, it probably makes more sense just to add the results of the second grid search to the first. If you want to add models to an existing grid, rather than create a new one, you simply re-use the same <code>grid_id</code>.</p>
 </div>
 </div>
@@ -791,7 +772,7 @@ gbm_gridperf2 &lt;-<span class="st"> </span><span class="kw"><a href="http://www
 
 
       <footer><div class="copyright">
-  <p>Developed by Javier Luraschi, Kevin Ushey, JJ Allaire,  The Apache Software Foundation.</p>
+  <p>Developed by Javier Luraschi, Kevin Kuo, Kevin Ushey, JJ Allaire,  The Apache Software Foundation.</p>
 </div>
 
 <div class="pkgdown">
