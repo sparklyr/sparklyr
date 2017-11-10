@@ -30,7 +30,7 @@ ml_linear_svc(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
 
 \item{threshold}{in binary classification prediction, in range [0, 1].}
 
-\item{aggregation_depth}{Suggested depth for treeAggregate (>= 2).}
+\item{aggregation_depth}{(Spark 2.1.0+) Suggested depth for treeAggregate (>= 2).}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 

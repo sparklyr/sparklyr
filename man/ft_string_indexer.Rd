@@ -14,7 +14,7 @@ ft_string_indexer(x, input_col, output_col, handle_invalid = "error",
 
 \item{output_col}{The name of the output column.}
 
-\item{handle_invalid}{Param for how to handle invalid entries. Options are
+\item{handle_invalid}{(Spark 2.1.0+) Param for how to handle invalid entries. Options are
 'skip' (filter out rows with invalid values), 'error' (throw an error), or
 'keep' (keep invalid values in a special additional bucket). Default: "error"}
 
