@@ -141,7 +141,7 @@ object Serializer {
     (0 until len).map(_ => readDate(in)).toArray
   }
 
-  def readTimeArr(in: DataInputStream): Array[Time] = {
+  def readTimeArr(in: DataInputStream): Array[Timestamp] = {
     val len = readInt(in)
     (0 until len).map(_ => readTime(in)).toArray
   }
