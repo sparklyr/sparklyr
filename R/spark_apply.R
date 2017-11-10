@@ -22,7 +22,9 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 
     lapply(seq_along(row), function(colIdx) {
       colVal <- row[[colIdx]]
-      if (!is.na(colVal) && !is.null(colVal)) {
+      if (tolower(class(colVal)) == "date") {
+        colTypes[[colIdx]] <<- "date"
+      } else if (!is.na(colVal) && !is.null(colVal)) {
         colTypes[[colIdx]] <<- typeof(colVal)
       }
     })
