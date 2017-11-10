@@ -191,15 +191,12 @@ partitions <- mtcars_tbl %>%
 # fit a linear model to the training dataset
 fit <- partitions$training %>%
   ml_linear_regression(response = "mpg", features = c("wt", "cyl"))
-```
-
-    ## * No rows dropped by 'na.omit' call
-
-``` r
 fit
 ```
 
-    ## Call: ml_linear_regression(., response = "mpg", features = c("wt", "cyl"))
+    ## Call: ml_linear_regression.tbl_spark(., response = "mpg", features = c("wt", "cyl"))  
+    ## 
+    ## Formula: mpg ~ wt + cyl
     ## 
     ## Coefficients:
     ## (Intercept)          wt         cyl 
@@ -211,24 +208,20 @@ For linear regression models produced by Spark, we can use `summary()` to learn 
 summary(fit)
 ```
 
-    ## Call: ml_linear_regression(., response = "mpg", features = c("wt", "cyl"))
+    ## Call: ml_linear_regression.tbl_spark(., response = "mpg", features = c("wt", "cyl"))  
     ## 
-    ## Deviance Residuals::
+    ## Deviance Residuals:
     ##    Min     1Q Median     3Q    Max 
     ## -1.752 -1.134 -0.499  1.296  2.282 
     ## 
     ## Coefficients:
-    ##             Estimate Std. Error t value  Pr(>|t|)    
-    ## (Intercept) 33.49945    3.62256  9.2475 0.0002485 ***
-    ## wt          -2.81846    0.96619 -2.9171 0.0331257 *  
-    ## cyl         -0.92319    0.54639 -1.6896 0.1518998    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## (Intercept)          wt         cyl 
+    ##   33.499452   -2.818463   -0.923187 
     ## 
     ## R-Squared: 0.8274
     ## Root Mean Squared Error: 1.422
 
-Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [machine learning](https://github.com/rstudio/sparklyr/blob/master/docs/articles/mllib.html) section.
+Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [machine learning](mllib.html) section.
 
 Reading and Writing Data
 ------------------------
@@ -266,20 +259,20 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_117d835ce14f9> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_115c74acb6510> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1     9.983684    8.383684     6.283684    5.083684
-    ##  2     9.783684    7.883684     6.283684    5.083684
-    ##  3     9.583684    8.083684     6.183684    5.083684
-    ##  4     9.483684    7.983684     6.383684    5.083684
-    ##  5     9.883684    8.483684     6.283684    5.083684
-    ##  6    10.283684    8.783684     6.583684    5.283684
-    ##  7     9.483684    8.283684     6.283684    5.183684
-    ##  8     9.883684    8.283684     6.383684    5.083684
-    ##  9     9.283684    7.783684     6.283684    5.083684
-    ## 10     9.783684    7.983684     6.383684    4.983684
+    ##  1     5.336757    3.736757     1.636757   0.4367573
+    ##  2     5.136757    3.236757     1.636757   0.4367573
+    ##  3     4.936757    3.436757     1.536757   0.4367573
+    ##  4     4.836757    3.336757     1.736757   0.4367573
+    ##  5     5.236757    3.836757     1.636757   0.4367573
+    ##  6     5.636757    4.136757     1.936757   0.6367573
+    ##  7     4.836757    3.636757     1.636757   0.5367573
+    ##  8     5.236757    3.636757     1.736757   0.4367573
+    ##  9     4.636757    3.136757     1.636757   0.4367573
+    ## 10     5.136757    3.336757     1.736757   0.3367573
     ## # ... with more rows
 
 You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
@@ -293,7 +286,7 @@ spark_apply(
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_117d876fbf859> [?? x 6]
+    ## # Source:   table<sparklyr_tmp_115c73965f30> [?? x 6]
     ## # Database: spark_connection
     ##      Species         term    estimate  std.error  statistic      p.value
     ##        <chr>        <chr>       <dbl>      <dbl>      <dbl>        <dbl>
@@ -361,16 +354,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 17/08/25 12:54:28 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 72 (/var/folders/vd/krh_y3qd0c5bw8k77lmdtw7r0000gn/T//Rtmps6VbEg/file117d8538598e1.csv MapPartitionsRDD[293] at textFile at NativeMethodAccessorImpl.java:0)
-    ## 17/08/25 12:54:28 INFO TaskSchedulerImpl: Adding task set 72.0 with 1 tasks
-    ## 17/08/25 12:54:28 INFO TaskSetManager: Starting task 0.0 in stage 72.0 (TID 112, localhost, executor driver, partition 0, PROCESS_LOCAL, 6010 bytes)
-    ## 17/08/25 12:54:28 INFO Executor: Running task 0.0 in stage 72.0 (TID 112)
-    ## 17/08/25 12:54:28 INFO HadoopRDD: Input split: file:/var/folders/vd/krh_y3qd0c5bw8k77lmdtw7r0000gn/T/Rtmps6VbEg/file117d8538598e1.csv:0+33313106
-    ## 17/08/25 12:54:28 INFO Executor: Finished task 0.0 in stage 72.0 (TID 112). 1123 bytes result sent to driver
-    ## 17/08/25 12:54:28 INFO TaskSetManager: Finished task 0.0 in stage 72.0 (TID 112) in 114 ms on localhost (executor driver) (1/1)
-    ## 17/08/25 12:54:28 INFO TaskSchedulerImpl: Removed TaskSet 72.0, whose tasks have all completed, from pool 
-    ## 17/08/25 12:54:28 INFO DAGScheduler: ResultStage 72 (count at NativeMethodAccessorImpl.java:0) finished in 0.114 s
-    ## 17/08/25 12:54:28 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.117630 s
+    ## 17/11/09 15:55:18 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 69 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpyR8oP9/file115c74b94924.csv MapPartitionsRDD[258] at textFile at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+    ## 17/11/09 15:55:18 INFO TaskSchedulerImpl: Adding task set 69.0 with 1 tasks
+    ## 17/11/09 15:55:18 INFO TaskSetManager: Starting task 0.0 in stage 69.0 (TID 140, localhost, executor driver, partition 0, PROCESS_LOCAL, 4904 bytes)
+    ## 17/11/09 15:55:18 INFO Executor: Running task 0.0 in stage 69.0 (TID 140)
+    ## 17/11/09 15:55:18 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpyR8oP9/file115c74b94924.csv:0+33313106
+    ## 17/11/09 15:55:18 INFO Executor: Finished task 0.0 in stage 69.0 (TID 140). 832 bytes result sent to driver
+    ## 17/11/09 15:55:18 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 140) in 126 ms on localhost (executor driver) (1/1)
+    ## 17/11/09 15:55:18 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
+    ## 17/11/09 15:55:18 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.126 s
+    ## 17/11/09 15:55:18 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.131380 s
 
 Finally, we disconnect from Spark:
 
@@ -407,7 +400,7 @@ Using H2O
 [rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN package from [H2O](http://h2o.ai) that extends [sparklyr](http://spark.rstudio.com) to provide an interface into [Sparkling Water](https://github.com/h2oai/sparkling-water). For instance, the following example installs, configures and runs [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
 
 ``` r
-options(rsparkling.sparklingwater.version = "2.1.0")
+options(rsparkling.sparklingwater.version = "2.1.14")
 
 library(rsparkling)
 library(sparklyr)
@@ -433,7 +426,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1503683692912_1 
+    ## Model ID:  GLM_model_R_1510271749678_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -442,7 +435,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                    0 frame_rdd_29_970371551cefadb7219d3e25e94a4bc0
+    ## 1                  100 frame_rdd_29_b907d4915799eac74fb1ea60ad594bbf
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients

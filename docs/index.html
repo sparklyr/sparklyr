@@ -271,29 +271,26 @@ partitions &lt;-<span class="st"> </span>mtcars_tbl <span class="op">%&gt;%</spa
 
 <span class="co"># fit a linear model to the training dataset</span>
 fit &lt;-<span class="st"> </span>partitions<span class="op">$</span>training <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="reference/ml_linear_regression.html">ml_linear_regression</a></span>(<span class="dt">response =</span> <span class="st">"mpg"</span>, <span class="dt">features =</span> <span class="kw">c</span>(<span class="st">"wt"</span>, <span class="st">"cyl"</span>))</code></pre></div>
-<pre><code>## * No rows dropped by 'na.omit' call</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit</code></pre></div>
-<pre><code>## Call: ml_linear_regression(., response = "mpg", features = c("wt", "cyl"))
+<span class="st">  </span><span class="kw"><a href="reference/ml_linear_regression.html">ml_linear_regression</a></span>(<span class="dt">response =</span> <span class="st">"mpg"</span>, <span class="dt">features =</span> <span class="kw">c</span>(<span class="st">"wt"</span>, <span class="st">"cyl"</span>))
+fit</code></pre></div>
+<pre><code>## Call: ml_linear_regression.tbl_spark(., response = "mpg", features = c("wt", "cyl"))  
+## 
+## Formula: mpg ~ wt + cyl
 ## 
 ## Coefficients:
 ## (Intercept)          wt         cyl 
 ##   33.499452   -2.818463   -0.923187</code></pre>
 <p>For linear regression models produced by Spark, we can use <code>summary()</code> to learn a bit more about the quality of our fit, and the statistical significance of each of our predictors.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(fit)</code></pre></div>
-<pre><code>## Call: ml_linear_regression(., response = "mpg", features = c("wt", "cyl"))
+<pre><code>## Call: ml_linear_regression.tbl_spark(., response = "mpg", features = c("wt", "cyl"))  
 ## 
-## Deviance Residuals::
+## Deviance Residuals:
 ##    Min     1Q Median     3Q    Max 
 ## -1.752 -1.134 -0.499  1.296  2.282 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value  Pr(&gt;|t|)    
-## (Intercept) 33.49945    3.62256  9.2475 0.0002485 ***
-## wt          -2.81846    0.96619 -2.9171 0.0331257 *  
-## cyl         -0.92319    0.54639 -1.6896 0.1518998    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## (Intercept)          wt         cyl 
+##   33.499452   -2.818463   -0.923187 
 ## 
 ## R-Squared: 0.8274
 ## Root Mean Squared Error: 1.422</code></pre>
@@ -327,20 +324,20 @@ iris_json_tbl &lt;-<span class="st"> </span><span class="kw"><a href="reference/
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark_apply.html">spark_apply</a></span>(iris_tbl, <span class="cf">function</span>(data) {
   data[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>] <span class="op">+</span><span class="st"> </span><span class="kw">rgamma</span>(<span class="dv">1</span>,<span class="dv">2</span>)
 })</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_118fd5007f7aa&gt; [?? x 4]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_118c34f3123d&gt; [?? x 4]
 ## # Database: spark_connection
 ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
 ##           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
-##  1      7.06982     5.46982      3.36982     2.16982
-##  2      6.86982     4.96982      3.36982     2.16982
-##  3      6.66982     5.16982      3.26982     2.16982
-##  4      6.56982     5.06982      3.46982     2.16982
-##  5      6.96982     5.56982      3.36982     2.16982
-##  6      7.36982     5.86982      3.66982     2.36982
-##  7      6.56982     5.36982      3.36982     2.26982
-##  8      6.96982     5.36982      3.46982     2.16982
-##  9      6.36982     4.86982      3.36982     2.16982
-## 10      6.86982     5.06982      3.46982     2.06982
+##  1     6.882104    5.282104     3.182104    1.982104
+##  2     6.682104    4.782104     3.182104    1.982104
+##  3     6.482104    4.982104     3.082104    1.982104
+##  4     6.382104    4.882104     3.282104    1.982104
+##  5     6.782104    5.382104     3.182104    1.982104
+##  6     7.182104    5.682104     3.482104    2.182104
+##  7     6.382104    5.182104     3.182104    2.082104
+##  8     6.782104    5.182104     3.282104    1.982104
+##  9     6.182104    4.682104     3.182104    1.982104
+## 10     6.682104    4.882104     3.282104    1.882104
 ## # ... with more rows</code></pre>
 <p>You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark_apply.html">spark_apply</a></span>(
@@ -349,7 +346,7 @@ iris_json_tbl &lt;-<span class="st"> </span><span class="kw"><a href="reference/
   <span class="dt">names =</span> <span class="kw">c</span>(<span class="st">"term"</span>, <span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"statistic"</span>, <span class="st">"p.value"</span>),
   <span class="dt">group_by =</span> <span class="st">"Species"</span>
 )</code></pre></div>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_118fd583f9c2b&gt; [?? x 6]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_118c34a9aa85e&gt; [?? x 6]
 ## # Database: spark_connection
 ##      Species         term    estimate  std.error  statistic      p.value
 ##        &lt;chr&gt;        &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
@@ -372,8 +369,8 @@ tempfile &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span cl
 <span class="co"># define an R interface to Spark line counting</span>
 count_lines &lt;-<span class="st"> </span><span class="cf">function</span>(sc, path) {
   <span class="kw"><a href="reference/spark-api.html">spark_context</a></span>(sc) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"textFile"</span>, path, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">      </span><span class="kw"><a href="http://www.rdocumentation.org/packages/sparklyr/topics/invoke">invoke</a></span>(<span class="st">"count"</span>)
+<span class="st">    </span><span class="kw"><a href="reference/invoke.html">invoke</a></span>(<span class="st">"textFile"</span>, path, 1L) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw"><a href="reference/invoke.html">invoke</a></span>(<span class="st">"count"</span>)
 }
 
 <span class="co"># call spark to count the lines of the CSV</span>
@@ -396,16 +393,16 @@ count_lines &lt;-<span class="st"> </span><span class="cf">function</span>(sc, p
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark_web.html">spark_web</a></span>(sc)</code></pre></div>
 <p>You can show the log using the <code>spark_log</code> function:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark_log.html">spark_log</a></span>(sc, <span class="dt">n =</span> <span class="dv">10</span>)</code></pre></div>
-<pre><code>## 17/08/25 12:57:40 INFO ContextCleaner: Cleaned accumulator 4349
-## 17/08/25 12:57:40 INFO BlockManagerInfo: Removed broadcast_73_piece0 on 127.0.0.1:50036 in memory (size: 10.0 KB, free: 338.3 MB)
-## 17/08/25 12:57:40 INFO BlockManagerInfo: Removed broadcast_74_piece0 on 127.0.0.1:50036 in memory (size: 3.7 KB, free: 338.3 MB)
-## 17/08/25 12:57:40 INFO ContextCleaner: Cleaned accumulator 4459
-## 17/08/25 12:57:40 INFO ContextCleaner: Cleaned accumulator 4460
-## 17/08/25 12:57:40 INFO Executor: Finished task 0.0 in stage 72.0 (TID 112). 1196 bytes result sent to driver
-## 17/08/25 12:57:40 INFO TaskSetManager: Finished task 0.0 in stage 72.0 (TID 112) in 131 ms on localhost (executor driver) (1/1)
-## 17/08/25 12:57:40 INFO TaskSchedulerImpl: Removed TaskSet 72.0, whose tasks have all completed, from pool 
-## 17/08/25 12:57:40 INFO DAGScheduler: ResultStage 72 (count at NativeMethodAccessorImpl.java:0) finished in 0.131 s
-## 17/08/25 12:57:40 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.134441 s</code></pre>
+<pre><code>## 17/11/09 15:58:45 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 69 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpHRdREy/file118c36e21fe75.csv MapPartitionsRDD[258] at textFile at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+## 17/11/09 15:58:45 INFO TaskSchedulerImpl: Adding task set 69.0 with 1 tasks
+## 17/11/09 15:58:45 INFO TaskSetManager: Starting task 0.0 in stage 69.0 (TID 140, localhost, executor driver, partition 0, PROCESS_LOCAL, 4905 bytes)
+## 17/11/09 15:58:45 INFO Executor: Running task 0.0 in stage 69.0 (TID 140)
+## 17/11/09 15:58:45 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpHRdREy/file118c36e21fe75.csv:0+33313106
+## 17/11/09 15:58:45 INFO Executor: Finished task 0.0 in stage 69.0 (TID 140). 832 bytes result sent to driver
+## 17/11/09 15:58:45 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 140) in 147 ms on localhost (executor driver) (1/1)
+## 17/11/09 15:58:45 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
+## 17/11/09 15:58:45 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.148 s
+## 17/11/09 15:58:45 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.154719 s</code></pre>
 <p>Finally, we disconnect from Spark:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/spark-connections.html">spark_disconnect</a></span>(sc)</code></pre></div>
 </div>
@@ -433,7 +430,7 @@ count_lines &lt;-<span class="st"> </span><span class="cf">function</span>(sc, p
 <h2 class="hasAnchor">
 <a href="#using-h2o" class="anchor"></a>Using H2O</h2>
 <p><a href="https://cran.r-project.org/package=rsparkling">rsparkling</a> is a CRAN package from <a href="http://h2o.ai">H2O</a> that extends <a href="http://spark.rstudio.com">sparklyr</a> to provide an interface into <a href="https://github.com/h2oai/sparkling-water">Sparkling Water</a>. For instance, the following example installs, configures and runs <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html">h2o.glm</a>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">rsparkling.sparklingwater.version =</span> <span class="st">"2.1.0"</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">rsparkling.sparklingwater.version =</span> <span class="st">"2.1.14"</span>)
 
 <span class="kw">library</span>(rsparkling)
 <span class="kw">library</span>(sparklyr)
@@ -454,7 +451,7 @@ mtcars_glm &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rd
 ## ==============
 ## 
 ## H2ORegressionModel: glm
-## Model ID:  GLM_model_R_1503683883296_1 
+## Model ID:  GLM_model_R_1510271956912_1 
 ## GLM Model: summary
 ##     family     link                              regularization
 ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -463,7 +460,7 @@ mtcars_glm &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rd
 ##   number_of_predictors_total number_of_active_predictors
 ## 1                          2                           2
 ##   number_of_iterations                                training_frame
-## 1                    0 frame_rdd_29_9b117dc470ba6f8aa3340ee2e18d44eb
+## 1                  100 frame_rdd_29_93f2c165c719dd3c7f9b20bd37394f74
 ## 
 ## Coefficients: glm coefficients
 ##       names coefficients standardized_coefficients
@@ -537,6 +534,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="reference/spark-conne
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>Javier Luraschi <br><small class="roles"> Author, maintainer </small> </li>
+<li>Kevin Kuo <br><small class="roles"> Author </small> </li>
 <li>Kevin Ushey <br><small class="roles"> Author </small> </li>
 <li>JJ Allaire <br><small class="roles"> Author </small> </li>
 <li> The Apache Software Foundation <br><small class="roles"> Author, copyright holder </small> </li>
@@ -546,6 +544,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="reference/spark-conne
 <ul class="list-unstyled">
 <li><a href="https://travis-ci.org/rstudio/sparklyr"><img src="https://travis-ci.org/rstudio/sparklyr.svg?branch=master" alt="Build Status"></a></li>
 <li><a href="https://cran.r-project.org/package=sparklyr"><img src="https://www.r-pkg.org/badges/version/sparklyr" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://codecov.io/gh/rstudio/sparklyr"><img src="https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg" alt="codecov"></a></li>
 <li><a href="https://gitter.im/rstudio/sparklyr?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/rstudio/sparklyr.svg" alt="Join the chat at https://gitter.im/rstudio/sparklyr"></a></li>
 </ul>
 </div>
@@ -554,7 +553,7 @@ sc &lt;-<span class="st"> </span><span class="kw"><a href="reference/spark-conne
 
 
       <footer><div class="copyright">
-  <p>Developed by Javier Luraschi, Kevin Ushey, JJ Allaire,  The Apache Software Foundation.</p>
+  <p>Developed by Javier Luraschi, Kevin Kuo, Kevin Ushey, JJ Allaire,  The Apache Software Foundation.</p>
 </div>
 
 <div class="pkgdown">
