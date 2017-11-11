@@ -27,6 +27,26 @@ test_that("ml_naive_bayes() default params are correct", {
     args)
 })
 
+test_that("ml_naive_bayes() works properly", {
+  sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_libsvm_data.txt", full.names = TRUE)
+
+  sample_data <- spark_read_libsvm(sc, "sample_data",
+                                   sample_data_path, overwrite = TRUE)
+
+  sample_data_partitioned <- sample_data %>%
+    sdf_partition(weights = c(train = 0.7, test = 0.3), seed = 1)
+
+  model <- ml_naive_bayes(sample_data_partitioned$train)
+
+  predictions <- model %>%
+    ml_predict(sample_data_partitioned$test)
+
+  expect_equal(ml_multiclass_classification_evaluator(
+    predictions, label_col = "label", prediction_col = "prediction",
+    metric_name = "accuracy"),
+    1.0)
+})
+
 test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
   skip_on_cran()
   test_requires("e1071", "mlbench")
