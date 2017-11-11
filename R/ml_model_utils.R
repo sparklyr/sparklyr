@@ -19,7 +19,7 @@ ml_feature_names_metadata <- function(pipeline_model, dataset, features_col) {
   ml_column_metadata(transformed_tbl, features_col) %>%
     `[[`("attrs") %>%
     dplyr::bind_rows() %>%
-    arrange(!!rlang::sym("idx")) %>%
+    dplyr::arrange(!!rlang::sym("idx")) %>%
     dplyr::pull("name")
 }
 
