@@ -6,6 +6,7 @@ metadataformat = "yaml"
 pluralizeListTitles =   "false"
 ignoreFiles = ["\\.Rmd$", "_files$", "_cache$"]
 canonifyurls = true
+googleAnalytics = "UA-20375833-13"
 
 [params]
     description = "An R interface to Spark"
