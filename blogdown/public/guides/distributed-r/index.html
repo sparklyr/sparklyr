@@ -366,7 +366,7 @@ sc &lt;- spark_connect(master = &quot;local&quot;)
 
 sdf_len(sc, 5, repartition = 1) %&gt;%
   spark_apply(function(e) I(e))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_136072114db8&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_2190210018ba&gt; [?? x 1]
 ## # Database: spark_connection
 ##      id
 ##   &lt;dbl&gt;
@@ -378,7 +378,7 @@ sdf_len(sc, 5, repartition = 1) %&gt;%
 <p>Your R function should be designed to operate on an R <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html">data frame</a>. The R function passed to <code>spark_apply</code> expects a DataFrame and will return an object that can be cast as a DataFrame. We can use the <code>class</code> function to verify the class of the data.</p>
 <pre class="r"><code>sdf_len(sc, 10, repartition = 1) %&gt;%
   spark_apply(function(e) class(e))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_136021684dd4&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_219052c83fc8&gt; [?? x 1]
 ## # Database: spark_connection
 ##           id
 ##        &lt;chr&gt;
@@ -388,7 +388,7 @@ sdf_len(sc, 5, repartition = 1) %&gt;%
 
 trees_tbl %&gt;%
   spark_apply(function(e) nrow(e), names = &quot;n&quot;)</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_13604a355db&gt; [?? x 1]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_219053c31326&gt; [?? x 1]
 ## # Database: spark_connection
 ##       n
 ##   &lt;int&gt;
@@ -396,7 +396,7 @@ trees_tbl %&gt;%
 ## 2    15</code></pre>
 <pre class="r"><code>trees_tbl %&gt;%
   spark_apply(function(e) head(e, 1))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_136073777903&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_21901f8b1a3e&gt; [?? x 3]
 ## # Database: spark_connection
 ##   Girth Height Volume
 ##   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
@@ -405,7 +405,7 @@ trees_tbl %&gt;%
 <p>We can apply any arbitrary function to the partitions in the Spark DataFrame. For instance, we can scale or jitter the columns. Notice that <code>spark_apply</code> applies the R function to all partitions and returns a single DataFrame.</p>
 <pre class="r"><code>trees_tbl %&gt;%
   spark_apply(function(e) scale(e))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_136036e662b6&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_21907b3c4650&gt; [?? x 3]
 ## # Database: spark_connection
 ##         Girth      Height     Volume
 ##         &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
@@ -422,27 +422,27 @@ trees_tbl %&gt;%
 ## # ... with more rows</code></pre>
 <pre class="r"><code>trees_tbl %&gt;%
   spark_apply(function(e) lapply(e, jitter))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_136028ea5d8c&gt; [?? x 3]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_219040334dd1&gt; [?? x 3]
 ## # Database: spark_connection
 ##        Girth   Height   Volume
 ##        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1  8.306226 69.93174 10.30161
-##  2  8.819532 63.04411 10.20020
-##  3 10.684577 81.03221 18.79846
-##  4 11.000716 66.02814 15.58193
-##  5 11.086309 80.11441 22.61375
-##  6 11.293063 79.12578 24.18765
-##  7 11.415101 76.01268 21.39673
-##  8 11.988713 75.00927 19.09719
-##  9 12.907665 84.91666 33.79510
-## 10 13.692112 71.03792 25.69104
+##  1  8.286404 70.03850 10.30019
+##  2  8.794795 63.17289 10.20995
+##  3 10.714440 81.10641 18.79966
+##  4 11.017128 65.82704 15.59249
+##  5 11.105606 79.87400 22.60416
+##  6 11.319941 79.16692 24.20653
+##  7 11.401426 75.97831 21.39137
+##  8 11.997453 75.01478 19.08498
+##  9 12.905805 84.82529 33.81999
+## 10 13.712843 70.96950 25.70580
 ## # ... with more rows</code></pre>
 <p>By default <code>spark_apply()</code> derives the column names from the input Spark data frame. Use the <code>names</code> argument to rename or add new columns.</p>
 <pre class="r"><code>trees_tbl %&gt;%
   spark_apply(
     function(e) data.frame(2.54 * e$Girth, e),
     names = c(&quot;Girth(cm)&quot;, colnames(trees)))</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_1360574d5642&gt; [?? x 4]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_21904083b5f&gt; [?? x 4]
 ## # Database: spark_connection
 ##    `Girth(cm)` Girth Height Volume
 ##          &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
@@ -465,7 +465,7 @@ trees_tbl %&gt;%
 
 iris_tbl %&gt;%
   spark_apply(nrow, group_by = &quot;Species&quot;)</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_136046f05763&gt; [?? x 2]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_2190306f720a&gt; [?? x 2]
 ## # Database: spark_connection
 ##      Species Sepal_Length
 ##        &lt;chr&gt;        &lt;int&gt;
@@ -477,7 +477,7 @@ iris_tbl %&gt;%
     function(e) summary(lm(Petal_Length ~ Petal_Width, e))$r.squared,
     names = &quot;r.squared&quot;,
     group_by = &quot;Species&quot;)</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_136050bb3e0&gt; [?? x 2]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_219030cf4930&gt; [?? x 2]
 ## # Database: spark_connection
 ##      Species r.squared
 ##        &lt;chr&gt;     &lt;dbl&gt;
@@ -494,7 +494,7 @@ iris_tbl %&gt;%
   function(e) broom::tidy(lm(Petal_Length ~ Petal_Width, e)),
   names = c(&quot;term&quot;, &quot;estimate&quot;, &quot;std.error&quot;, &quot;statistic&quot;, &quot;p.value&quot;),
   group_by = &quot;Species&quot;)</code></pre>
-<pre><code>## # Source:   table&lt;sparklyr_tmp_13602cc11838&gt; [?? x 6]
+<pre><code>## # Source:   table&lt;sparklyr_tmp_21906ccf73e4&gt; [?? x 6]
 ## # Database: spark_connection
 ##      Species        term  estimate std.error statistic      p.value
 ##        &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
@@ -590,6 +590,17 @@ spark_apply(iris_tbl, function(e) e + external_value)</code></pre>
       
       
 <footer>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-20375833-13', 'auto');
+ga('send', 'pageview');
+</script>
 
 
 

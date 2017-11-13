@@ -285,7 +285,7 @@ dbplyr::sql_render(bestworst)
 ## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`
 ## FROM (SELECT `year`, `month`, `day`, `dep_delay`, min(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz5`, max(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz6`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `unobjcfzxy`) `bjguksjhqv`
+## FROM `flights`) `hgpnrplbmd`) `xmxtutmkid`
 ## WHERE (`dep_delay` = `zzz5` OR `dep_delay` = `zzz6`)
 bestworst
 ## # Source:   lazy query [?? x 4]
@@ -312,7 +312,7 @@ ranked &lt;- flights %&gt;%
 dbplyr::sql_render(ranked)</code></pre>
 <pre><code>## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`, rank() OVER (PARTITION BY `year`, `month`, `day` ORDER BY `dep_delay` DESC) AS `rank`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `kmybzeqoxa`</code></pre>
+## FROM `flights`) `bhmotnqley`</code></pre>
 <pre class="r"><code>ranked</code></pre>
 <pre><code>## # Source:   lazy query [?? x 5]
 ## # Database: spark_connection
@@ -427,16 +427,16 @@ dbplyr::sql_render(ranked)</code></pre>
 ## # Database: spark_connection
 ##     year month   day dep_time sched_dep_time dep_delay arr_time
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
-##  1  2013     1     1      557            600        -3      709
-##  2  2013     1     1      940            945        -5     1119
-##  3  2013     1     1     1158           1205        -7     1530
-##  4  2013     1     1     1355           1356        -1     1646
-##  5  2013     1     1     1453           1450         3     1707
-##  6  2013     1     1     1508           1450        18     1813
-##  7  2013     1     1     1814           1700        74     2051
-##  8  2013     1     1     1925           1930        -5     2037
-##  9  2013     1     1     1959           1930        29     2331
-## 10  2013     1     1     2000           1930        30     2255
+##  1  2013     1     1      711            715        -4     1151
+##  2  2013     1     1      752            759        -7      955
+##  3  2013     1     1      857            900        -3     1124
+##  4  2013     1     1      936            945        -9     1257
+##  5  2013     1     1     1109           1115        -6     1402
+##  6  2013     1     1     1245           1249        -4     1722
+##  7  2013     1     1     1400           1400         0     1634
+##  8  2013     1     1     1657           1650         7     1921
+##  9  2013     1     1     1859           1900        -1     2012
+## 10  2013     1     2      558            600        -2      838
 ## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
 ## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
 ## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
@@ -466,15 +466,15 @@ dbplyr::sql_render(ranked)</code></pre>
 ## # Ordered by: -days_since
 ##    flight_date days_since     n
 ##          &lt;chr&gt;      &lt;int&gt; &lt;dbl&gt;
-##  1    2013-1-1       1774   842
-##  2    2013-1-2       1773   943
-##  3    2013-1-3       1772   914
-##  4    2013-1-4       1771   915
-##  5    2013-1-5       1770   720
-##  6    2013-1-6       1769   832
-##  7    2013-1-7       1768   933
-##  8    2013-1-8       1767   899
-##  9    2013-1-9       1766   902
-## 10   2013-1-10       1765   932
+##  1    2013-1-1       1777   842
+##  2    2013-1-2       1776   943
+##  3    2013-1-3       1775   914
+##  4    2013-1-4       1774   915
+##  5    2013-1-5       1773   720
+##  6    2013-1-6       1772   832
+##  7    2013-1-7       1771   933
+##  8    2013-1-8       1770   899
+##  9    2013-1-9       1769   902
+## 10   2013-1-10       1768   932
 ## # ... with more rows</code></pre>
 </div>
