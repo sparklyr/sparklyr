@@ -1,0 +1,40 @@
+
+{{ partial "head" . }}
+
+<div class="single-page">
+  {{ partial "nav" . }}
+</div>
+
+<div class="page documentation">
+    <div class="side-menu" id="side-menu">
+    
+    {{ partial "blog-sidebar" . }}
+    
+    </div>
+    <div class="content">
+
+      <main>
+        
+      <h1 class="content-header">Category: {{ .Title }}</h1>  
+        
+      <div class="markdowned">
+      {{ .Content }}
+      </div>
+     
+      {{ range (where .Paginator.Pages "Section" "!=" "") }}
+      {{ partial "blog-article" . }}
+      {{ end }}
+    
+      {{ template "_internal/pagination.html" . }}
+      
+      </main>
+        
+      {{ partial "footer" .}}
+      
+    </div>
+</div>
+
+</body>
+</html>
+
+

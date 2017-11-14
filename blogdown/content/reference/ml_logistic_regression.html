@@ -1,0 +1,117 @@
+---
+title: "Spark ML -- Logistic Regression"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#details">Details</a></li>
+
+    <li><a href="#see-also">See also</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Perform logistic regression on a Spark DataFrame.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_logistic_regression</span>(<span class='no'>x</span>, <span class='no'>response</span>, <span class='no'>features</span>, <span class='kw'>intercept</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>lambda</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>weights.column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>iter.max</span> <span class='kw'>=</span> <span class='fl'>100L</span>,
+  <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options'>ml_options</a></span>(), <span class='no'>...</span>)</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>x</td>
+      <td><p>An object coercable to a Spark DataFrame (typically, a
+<code>tbl_spark</code>).</p></td>
+    </tr>
+    <tr>
+      <td>response</td>
+      <td><p>The name of the response vector (as a length-one character
+vector), or a formula, giving a symbolic description of the model to be
+fitted. When <code>response</code> is a formula, it is used in preference to other
+parameters to set the <code>response</code>, <code>features</code>, and <code>intercept</code>
+parameters (if available). Currently, only simple linear combinations of
+existing parameters is supposed; e.g. <code>response ~ feature1 + feature2 + ...</code>.
+The intercept term can be omitted by using <code>- 1</code> in the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>features</td>
+      <td><p>The name of features (terms) to use for the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>intercept</td>
+      <td><p>Boolean; should the model be fit with an intercept term?</p></td>
+    </tr>
+    <tr>
+      <td>alpha, lambda</td>
+      <td><p>Parameters controlling loss function penalization (for e.g.
+lasso, elastic net, and ridge regression). See <strong>Details</strong> for more
+information.</p></td>
+    </tr>
+    <tr>
+      <td>weights.column</td>
+      <td><p>The name of the column to use as weights for the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>iter.max</td>
+      <td><p>The maximum number of iterations to use.</p></td>
+    </tr>
+    <tr>
+      <td>ml.options</td>
+      <td><p>Optional arguments, used to affect the model generated. See
+<code><a href='ml_options'>ml_options</a></code> for more details.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments. The <code>data</code> argument can be used to
+specify the data to be used when <code>x</code> is a formula; this allows calls
+of the form <code><a href='ml_linear_regression'>ml_linear_regression(y ~ x, data = tbl)</a></code>, and is
+especially useful in conjunction with <code>do</code>.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="details">Details</h2>
+
+    <p>Spark implements for both \(L1\) and \(L2\) regularization in linear
+regression models. See the preamble in the
+<a href='http://spark.apache.org/docs/latest/ml-classification-regression'>Spark Classification and Regression</a>
+documentation for more details on how the loss function is parameterized.</p>
+<p>In particular, with <code>alpha</code> set to 1, the parameterization
+is equivalent to a <a href='https://en.wikipedia.org/wiki/Lasso_(statistics)'>lasso</a>
+model; if <code>alpha</code> is set to 0, the parameterization is equivalent to
+a <a href='https://en.wikipedia.org/wiki/Tikhonov_regularization'>ridge regression</a> model.</p>
+    
+    <h2 id="see-also">See also</h2>
+
+    <p>Other Spark ML routines: <code><a href='ml_als_factorization'>ml_als_factorization</a></code>,
+  <code><a href='ml_decision_tree'>ml_decision_tree</a></code>,
+  <code><a href='ml_generalized_linear_regression'>ml_generalized_linear_regression</a></code>,
+  <code><a href='ml_gradient_boosted_trees'>ml_gradient_boosted_trees</a></code>,
+  <code><a href='ml_kmeans'>ml_kmeans</a></code>, <code><a href='ml_lda'>ml_lda</a></code>,
+  <code><a href='ml_linear_regression'>ml_linear_regression</a></code>,
+  <code><a href='ml_multilayer_perceptron'>ml_multilayer_perceptron</a></code>,
+  <code><a href='ml_naive_bayes'>ml_naive_bayes</a></code>,
+  <code><a href='ml_one_vs_rest'>ml_one_vs_rest</a></code>, <code><a href='ml_pca'>ml_pca</a></code>,
+  <code><a href='ml_random_forest'>ml_random_forest</a></code>,
+  <code><a href='ml_survival_regression'>ml_survival_regression</a></code></p>
+    
+
+    
+    </div>
+    
+    </div>
+

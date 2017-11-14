@@ -1,0 +1,90 @@
+---
+title: "Feature Transformation -- QuantileDiscretizer"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#details">Details</a></li>
+
+    <li><a href="#see-also">See also</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Takes a column with continuous features and outputs a column with binned
+categorical features. The bin ranges are chosen by taking a sample of the
+data and dividing it into roughly equal parts. The lower and upper bin bounds
+will be -Infinity and +Infinity, covering all real values. This attempts to
+find numBuckets partitions based on a sample of the given input data, but it
+may find fewer depending on the data sample values.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_quantile_discretizer</span>(<span class='no'>x</span>, <span class='no'>input.col</span>, <span class='no'>output.col</span>, <span class='kw'>n.buckets</span> <span class='kw'>=</span> <span class='fl'>5L</span>, <span class='no'>...</span>)</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>x</td>
+      <td><p>An object (usually a <code>spark_tbl</code>) coercable to a Spark DataFrame.</p></td>
+    </tr>
+    <tr>
+      <td>input.col</td>
+      <td><p>The name of the input column(s).</p></td>
+    </tr>
+    <tr>
+      <td>output.col</td>
+      <td><p>The name of the output column.</p></td>
+    </tr>
+    <tr>
+      <td>n.buckets</td>
+      <td><p>The number of buckets to use.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="details">Details</h2>
+
+    <p>Note that the result may be different every time you run it, since the sample
+strategy behind it is non-deterministic.</p>
+    
+    <h2 id="see-also">See also</h2>
+
+    <p>See <a href='http://spark.apache.org/docs/latest/ml-features'>http://spark.apache.org/docs/latest/ml-features</a> for
+  more information on the set of transformations available for DataFrame
+  columns in Spark.</p>
+<p>Other feature transformation routines: <code><a href='ft_binarizer'>ft_binarizer</a></code>,
+  <code><a href='ft_bucketizer'>ft_bucketizer</a></code>,
+  <code><a href='ft_count_vectorizer'>ft_count_vectorizer</a></code>,
+  <code><a href='ft_discrete_cosine_transform'>ft_discrete_cosine_transform</a></code>,
+  <code><a href='ft_elementwise_product'>ft_elementwise_product</a></code>,
+  <code><a href='ft_index_to_string'>ft_index_to_string</a></code>,
+  <code><a href='ft_one_hot_encoder'>ft_one_hot_encoder</a></code>,
+  <code><a href='ft_regex_tokenizer'>ft_regex_tokenizer</a></code>,
+  <code><a href='ft_stop_words_remover'>ft_stop_words_remover</a></code>,
+  <code><a href='ft_string_indexer'>ft_string_indexer</a></code>,
+  <code><a href='ft_tokenizer'>ft_tokenizer</a></code>,
+  <code><a href='ft_vector_assembler'>ft_vector_assembler</a></code>,
+  <code>sdf_mutate</code></p>
+    
+
+    
+    </div>
+    
+    </div>
+

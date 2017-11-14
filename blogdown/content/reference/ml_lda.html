@@ -1,0 +1,132 @@
+---
+title: "Spark ML -- Latent Dirichlet Allocation"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#note">Note</a></li>
+
+    <li><a href="#references">References</a></li>
+
+    <li><a href="#see-also">See also</a></li>
+    
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Fit a Latent Dirichlet Allocation (LDA) model to a Spark DataFrame.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_lda</span>(<span class='no'>x</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='fu'>tbl_vars</span>(<span class='no'>x</span>), <span class='kw'>k</span> <span class='kw'>=</span> <span class='fu'>length</span>(<span class='no'>features</span>), <span class='kw'>alpha</span> <span class='kw'>=</span> (<span class='fl'>50</span>/<span class='no'>k</span>) +
+  <span class='fl'>1</span>, <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>0.1</span> + <span class='fl'>1</span>, <span class='kw'>optimizer</span> <span class='kw'>=</span> <span class='st'>"online"</span>, <span class='kw'>max.iterations</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options'>ml_options</a></span>(), <span class='no'>...</span>)</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>x</td>
+      <td><p>An object coercable to a Spark DataFrame (typically, a
+<code>tbl_spark</code>).</p></td>
+    </tr>
+    <tr>
+      <td>features</td>
+      <td><p>The name of features (terms) to use for the model fit.</p></td>
+    </tr>
+    <tr>
+      <td>k</td>
+      <td><p>The number of topics to estimate.</p></td>
+    </tr>
+    <tr>
+      <td>alpha</td>
+      <td><p>Concentration parameter for the prior placed on documents' distributions over topics. This is a singleton which is replicated to a vector of length <code>k</code> in fitting (as currently EM optimizer only supports symmetric distributions, so all values in the vector should be the same). For Expectation-Maximization optimizer values should be &gt; 1.0.
+By default <code>alpha = (50 / k) + 1</code>, where <code>50/k</code> is common in LDA libraries and +1 follows from Asuncion et al. (2009), who recommend a +1 adjustment for EM.</p></td>
+    </tr>
+    <tr>
+      <td>beta</td>
+      <td><p>Concentration parameter for the prior placed on topics' distributions over terms. For Expectation-Maximization optimizer value should be &gt; 1.0 and by default <code>beta = 0.1 + 1</code>, where 0.1 gives a small amount of smoothing and +1 follows Asuncion et al. (2009), who recommend a +1 adjustment for EM.</p></td>
+    </tr>
+    <tr>
+      <td>optimizer</td>
+      <td><p>The optimizer, either <code>online</code> for Online Variational Bayes or <code>em</code> for Expectation-Maximization.</p></td>
+    </tr>
+    <tr>
+      <td>max.iterations</td>
+      <td><p>Maximum number of iterations.</p></td>
+    </tr>
+    <tr>
+      <td>ml.options</td>
+      <td><p>Optional arguments, used to affect the model generated. See
+<code><a href='ml_options'>ml_options</a></code> for more details.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments. The <code>data</code> argument can be used to
+specify the data to be used when <code>x</code> is a formula; this allows calls
+of the form <code><a href='ml_linear_regression'>ml_linear_regression(y ~ x, data = tbl)</a></code>, and is
+especially useful in conjunction with <code>do</code>.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="note">Note</h2>
+
+    <p>The topics' distributions over terms are called "beta" in the original LDA paper by Blei et al., but are called "phi" in many later papers such as Asuncion et al., 2009.</p>
+<p>For terminology used in LDA model see <a href='https://spark.apache.org/docs/latest/api/scala/index#org.apache.spark.ml.clustering.LDA'>Spark LDA documentation</a>.</p>
+<p>Expectation-Maximization: Asuncion et al. <a href='http://arxiv.org/pdf/1205.2662.pdf'>On Smoothing and Inference for Topic Models.</a> Uncertainty in Artificial Intelligence, 2009.</p>
+    
+    <h2 id="references">References</h2>
+
+    <p>Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Allocation." JMLR, 2003.</p>
+<p>Asuncion et al. (2009)</p>
+    
+    <h2 id="see-also">See also</h2>
+
+    <p>Other Spark ML routines: <code><a href='ml_als_factorization'>ml_als_factorization</a></code>,
+  <code><a href='ml_decision_tree'>ml_decision_tree</a></code>,
+  <code><a href='ml_generalized_linear_regression'>ml_generalized_linear_regression</a></code>,
+  <code><a href='ml_gradient_boosted_trees'>ml_gradient_boosted_trees</a></code>,
+  <code><a href='ml_kmeans'>ml_kmeans</a></code>,
+  <code><a href='ml_linear_regression'>ml_linear_regression</a></code>,
+  <code><a href='ml_logistic_regression'>ml_logistic_regression</a></code>,
+  <code><a href='ml_multilayer_perceptron'>ml_multilayer_perceptron</a></code>,
+  <code><a href='ml_naive_bayes'>ml_naive_bayes</a></code>,
+  <code><a href='ml_one_vs_rest'>ml_one_vs_rest</a></code>, <code><a href='ml_pca'>ml_pca</a></code>,
+  <code><a href='ml_random_forest'>ml_random_forest</a></code>,
+  <code><a href='ml_survival_regression'>ml_survival_regression</a></code></p>
+    
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># NOT RUN {</span>
+<span class='fu'>library</span>(<span class='no'>janeaustenr</span>)
+<span class='fu'>library</span>(<span class='no'>sparklyr</span>)
+<span class='fu'>library</span>(<span class='no'>dplyr</span>)
+
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+
+<span class='no'>austen_books</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/janeaustenr/topics/austen_books'>austen_books</a></span>()
+<span class='no'>books_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>sdf_copy_to</span>(<span class='no'>sc</span>, <span class='no'>austen_books</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>first_tbl</span> <span class='kw'>&lt;-</span> <span class='no'>books_tbl</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter'>filter</a></span>(<span class='fu'>nchar</span>(<span class='no'>text</span>) <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='kw'>%&gt;%</span> <span class='fu'>head</span>(<span class='fl'>100</span>)
+
+<span class='no'>first_tbl</span> <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='ft_tokenizer'>ft_tokenizer</a></span>(<span class='st'>"text"</span>, <span class='st'>"tokens"</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='ft_count_vectorizer'>ft_count_vectorizer</a></span>(<span class='st'>"tokens"</span>, <span class='st'>"features"</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'>ml_lda</span>(<span class='st'>"features"</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>4</span>)
+<span class='co'># }</span></code></pre></div>
+    
+    </div>
+    
+    </div>
+

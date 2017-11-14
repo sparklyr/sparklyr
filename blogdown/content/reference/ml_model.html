@@ -1,0 +1,62 @@
+---
+title: "Create an ML Model Object"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+            </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Create an ML model object, wrapping the result of a Spark ML routine call.
+The generated object will be an <span style="R">R</span> list with S3 classes
+<code>c("ml_model_&lt;class&gt;", "ml_model")</code>.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_model</span>(<span class='no'>class</span>, <span class='no'>model</span>, <span class='no'>...</span>, <span class='kw'>.call</span> <span class='kw'>=</span> <span class='fu'>sys.call</span>(<span class='fu'>sys.parent</span>()))</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>class</td>
+      <td><p>The name of the machine learning routine used in the
+encompassing model. Note that the model name generated will be
+generated as <code>ml_model_&lt;class&gt;</code>; that is, <code>ml_model</code>
+will be prefixed.</p></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td><p>The underlying Spark model object.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Additional model information; typically supplied as named
+values.</p></td>
+    </tr>
+    <tr>
+      <td>.call</td>
+      <td><p>The <span style="R">R</span> call used in generating this model object (ie,
+the top-level <span style="R">R</span> routine that wraps over the associated Spark ML
+routine). Typically used for print output in e.g. <code>print</code>
+and <code>summary</code> methods.</p></td>
+    </tr>
+    </table>
+    
+
+    
+    </div>
+    
+    </div>
+

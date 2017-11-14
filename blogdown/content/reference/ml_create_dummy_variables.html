@@ -1,0 +1,98 @@
+---
+title: "Create Dummy Variables"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#details">Details</a></li>
+
+    <li><a href="#auxiliary-information">Auxiliary Information</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Given a column in a Spark DataFrame, generate a new Spark DataFrame
+containing dummy variable columns.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_create_dummy_variables</span>(<span class='no'>x</span>, <span class='no'>input</span>, <span class='kw'>reference</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>levels</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>labels</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'>new.env</span>(<span class='kw'>parent</span> <span class='kw'>=</span> <span class='fu'>emptyenv</span>()))</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>x</td>
+      <td><p>An object coercable to a Spark DataFrame (typically, a
+<code>tbl_spark</code>).</p></td>
+    </tr>
+    <tr>
+      <td>input</td>
+      <td><p>The name of the input column.</p></td>
+    </tr>
+    <tr>
+      <td>reference</td>
+      <td><p>The reference label. This variable is omitted when
+generating dummy variables (to avoid perfect multi-collinearity if
+all dummy variables were to be used in the model fit); to generate
+dummy variables for all columns this can be explicitly set as <code>NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <td>levels</td>
+      <td><p>The set of levels for which dummy variables should be generated.
+By default, constructs one variable for each unique value occurring in
+the column specified by <code>input</code>.</p></td>
+    </tr>
+    <tr>
+      <td>labels</td>
+      <td><p>An optional <span style="R">R</span> list, mapping values in the <code>input</code>
+column to column names to be assigned to the associated dummy variable.</p></td>
+    </tr>
+    <tr>
+      <td>envir</td>
+      <td><p>An optional <span style="R">R</span> environment; when provided, it will be filled
+with useful auxiliary information. See <strong>Auxiliary Information</strong> for
+more information.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="details">Details</h2>
+
+    <p>The dummy variables are generated in a similar mechanism to
+<code>model.matrix</code>, where categorical variables are expanded into a
+set of binary (dummy) variables. These dummy variables can be used for
+regression of categorical variables within the various regression routines
+provided by <code>sparklyr</code>.</p>
+    
+    <h2 id="auxiliary-information">Auxiliary Information</h2>
+
+    
+    <p>The <code>envir</code> argument can be used as a mechanism for returning
+optional information. Currently, the following pieces are returned:</p><table><tr><td>
+<code>levels</code>:</td>
+<td> The set of unique values discovered within the input column.</td>
+</tr><tr><td>
+<code>columns</code>:</td>
+<td> The column names generated.</td>
+</tr></table>
+    <p>If the <code>envir</code> argument is supplied, the names of any dummy variables
+generated will be included, under the <code>labels</code> key.</p>
+    
+
+    
+    </div>
+    
+    </div>
+

@@ -1,0 +1,68 @@
+---
+title: "Save / Load a Spark ML Model Fit"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#details">Details</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Save / load a <code>ml_model</code> fit.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_load</span>(<span class='no'>sc</span>, <span class='no'>file</span>, <span class='kw'>meta</span> <span class='kw'>=</span> <span class='fu'>ml_load_meta</span>(<span class='no'>file</span>))
+
+<span class='fu'>ml_save</span>(<span class='no'>model</span>, <span class='no'>file</span>, <span class='kw'>meta</span> <span class='kw'>=</span> <span class='fu'>ml_save_meta</span>(<span class='no'>model</span>, <span class='no'>file</span>))</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>sc</td>
+      <td><p>A <code>spark_connection</code>.</p></td>
+    </tr>
+    <tr>
+      <td>file</td>
+      <td><p>The path where the Spark model should be serialized / deserialized.</p></td>
+    </tr>
+    <tr>
+      <td>meta</td>
+      <td><p>The path where the <span style="R">R</span> metadata should be serialized / deserialized.
+Currently, this must be a local filesystem path. Alternatively, this can be
+an <span style="R">R</span> function that saves / loads the metadata object.</p></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td><p>A <code>ml_model</code> fit.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="details">Details</h2>
+
+    <p>These functions are currently experimental and not yet ready for production
+use. Unfortunately, the training summary information for regression fits
+(linear, logistic, generalized) are currently not serialized as part of the
+model fit, and so model fits recovered through <code>ml_load</code> will not work
+with e.g. <code>fitted</code>, <code>residuals</code>, and so on. Such fits should still
+be suitable for generating predictions with new data, however.</p>
+    
+
+    
+    </div>
+    
+    </div>
+

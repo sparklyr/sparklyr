@@ -1,6 +1,10 @@
 ---
 title: Sparkling Water (H2O) Machine Learning
+output:
+  github_document
 ---
+
+#Sparkling Water (H2O) Machine Learning
 
 ## Overview
 

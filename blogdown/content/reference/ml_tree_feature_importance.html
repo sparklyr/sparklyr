@@ -1,0 +1,51 @@
+---
+title: "Spark ML - Feature Importance for Tree Models"
+
+---
+    
+    <div class="doc-page">
+    
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    
+    <li><a href="#value">Value</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Spark ML - Feature Importance for Tree Models</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_tree_feature_importance</span>(<span class='no'>sc</span>, <span class='no'>model</span>)</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+    
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>  
+      
+    <tr>
+      <td>sc</td>
+      <td><p>A <code>spark_connection</code>.</p></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td><p>An <code>ml_model</code> encapsulating the output from a decision tree.</p></td>
+    </tr>
+    </table>
+    
+    <h2 id="value">Value</h2>
+
+    <p>A sorted data frame with feature labels and their relative importance.</p>
+    
+
+    
+    </div>
+    
+    </div>
+

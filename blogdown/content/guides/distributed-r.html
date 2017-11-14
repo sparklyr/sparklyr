@@ -1,0 +1,237 @@
+---
+title: "Distributing R Computations"
+aliases:
+  /articles/guides-distributed-r.html
+---
+
+
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p><strong>sparklyr</strong> provides support to run arbitrary R code at scale within your Spark Cluster through <code>spark_apply()</code>. This is especially useful where there is a need to use functionality available only in R or R packages that is not available in Apache Spark nor <a href="https://spark-packages.org/">Spark Packages</a>.</p>
+<p><code>spark_apply()</code> applies an R function to a Spark object (typically, a Spark DataFrame). Spark objects are partitioned so they can be distributed across a cluster. You can use <code>spark_apply</code> with the default partitions or you can define your own partitions with the <code>group_by</code> argument. Your R function must return another Spark DataFrame. <code>spark_apply</code> will run your R function on each partition and output a single Spark DataFrame.</p>
+<div id="apply-an-r-function-to-a-spark-object" class="section level3">
+<h3>Apply an R function to a Spark Object</h3>
+<p>Lets run a simple example. We will apply the identify function, <code>I()</code>, over a list of numbers we created with the <code>sdf_len</code> function.</p>
+<pre class="r"><code>library(sparklyr)
+
+sc &lt;- spark_connect(master = &quot;local&quot;)
+
+sdf_len(sc, 5, repartition = 1) %&gt;%
+  spark_apply(function(e) I(e))</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_2190210018ba&gt; [?? x 1]
+## # Database: spark_connection
+##      id
+##   &lt;dbl&gt;
+## 1     1
+## 2     2
+## 3     3
+## 4     4
+## 5     5</code></pre>
+<p>Your R function should be designed to operate on an R <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html">data frame</a>. The R function passed to <code>spark_apply</code> expects a DataFrame and will return an object that can be cast as a DataFrame. We can use the <code>class</code> function to verify the class of the data.</p>
+<pre class="r"><code>sdf_len(sc, 10, repartition = 1) %&gt;%
+  spark_apply(function(e) class(e))</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_219052c83fc8&gt; [?? x 1]
+## # Database: spark_connection
+##           id
+##        &lt;chr&gt;
+## 1 data.frame</code></pre>
+<p>Spark will partition your data by hash or range so it can be distributed across a cluster. In the following example we create two partitions and count the number of rows in each partition. Then we print the first record in each partition.</p>
+<pre class="r"><code>trees_tbl &lt;- sdf_copy_to(sc, trees, repartition = 2)
+
+trees_tbl %&gt;%
+  spark_apply(function(e) nrow(e), names = &quot;n&quot;)</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_219053c31326&gt; [?? x 1]
+## # Database: spark_connection
+##       n
+##   &lt;int&gt;
+## 1    16
+## 2    15</code></pre>
+<pre class="r"><code>trees_tbl %&gt;%
+  spark_apply(function(e) head(e, 1))</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_21901f8b1a3e&gt; [?? x 3]
+## # Database: spark_connection
+##   Girth Height Volume
+##   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1   8.3     70   10.3
+## 2   8.6     65   10.3</code></pre>
+<p>We can apply any arbitrary function to the partitions in the Spark DataFrame. For instance, we can scale or jitter the columns. Notice that <code>spark_apply</code> applies the R function to all partitions and returns a single DataFrame.</p>
+<pre class="r"><code>trees_tbl %&gt;%
+  spark_apply(function(e) scale(e))</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_21907b3c4650&gt; [?? x 3]
+## # Database: spark_connection
+##         Girth      Height     Volume
+##         &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
+##  1 -1.4482330 -0.99510521 -1.1503645
+##  2 -1.3021313 -2.06675697 -1.1558670
+##  3 -0.7469449  0.68891899 -0.6826528
+##  4 -0.6592839 -1.60747764 -0.8587325
+##  5 -0.6300635  0.53582588 -0.4735581
+##  6 -0.5716229  0.38273277 -0.3855183
+##  7 -0.5424025 -0.07654655 -0.5395880
+##  8 -0.3670805 -0.22963966 -0.6661453
+##  9 -0.1040975  1.30129143  0.1427209
+## 10  0.1296653 -0.84201210 -0.3029809
+## # ... with more rows</code></pre>
+<pre class="r"><code>trees_tbl %&gt;%
+  spark_apply(function(e) lapply(e, jitter))</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_219040334dd1&gt; [?? x 3]
+## # Database: spark_connection
+##        Girth   Height   Volume
+##        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+##  1  8.286404 70.03850 10.30019
+##  2  8.794795 63.17289 10.20995
+##  3 10.714440 81.10641 18.79966
+##  4 11.017128 65.82704 15.59249
+##  5 11.105606 79.87400 22.60416
+##  6 11.319941 79.16692 24.20653
+##  7 11.401426 75.97831 21.39137
+##  8 11.997453 75.01478 19.08498
+##  9 12.905805 84.82529 33.81999
+## 10 13.712843 70.96950 25.70580
+## # ... with more rows</code></pre>
+<p>By default <code>spark_apply()</code> derives the column names from the input Spark data frame. Use the <code>names</code> argument to rename or add new columns.</p>
+<pre class="r"><code>trees_tbl %&gt;%
+  spark_apply(
+    function(e) data.frame(2.54 * e$Girth, e),
+    names = c(&quot;Girth(cm)&quot;, colnames(trees)))</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_21904083b5f&gt; [?? x 4]
+## # Database: spark_connection
+##    `Girth(cm)` Girth Height Volume
+##          &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1      21.082   8.3     70   10.3
+##  2      22.352   8.8     63   10.2
+##  3      27.178  10.7     81   18.8
+##  4      27.940  11.0     66   15.6
+##  5      28.194  11.1     80   22.6
+##  6      28.702  11.3     79   24.2
+##  7      28.956  11.4     76   21.4
+##  8      30.480  12.0     75   19.1
+##  9      32.766  12.9     85   33.8
+## 10      34.798  13.7     71   25.7
+## # ... with more rows</code></pre>
+</div>
+<div id="group-by" class="section level3">
+<h3>Group By</h3>
+<p>In some cases you may want to apply your R function to specific groups in your data. For example, suppose you want to compute regression models against specific subgroups. To solve this, you can specify a <code>group_by</code> argument. This example counts the number of rows in <code>iris</code> by species and then fits a simple linear model for each species.</p>
+<pre class="r"><code>iris_tbl &lt;- sdf_copy_to(sc, iris)
+
+iris_tbl %&gt;%
+  spark_apply(nrow, group_by = &quot;Species&quot;)</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_2190306f720a&gt; [?? x 2]
+## # Database: spark_connection
+##      Species Sepal_Length
+##        &lt;chr&gt;        &lt;int&gt;
+## 1 versicolor           50
+## 2  virginica           50
+## 3     setosa           50</code></pre>
+<pre class="r"><code>iris_tbl %&gt;%
+  spark_apply(
+    function(e) summary(lm(Petal_Length ~ Petal_Width, e))$r.squared,
+    names = &quot;r.squared&quot;,
+    group_by = &quot;Species&quot;)</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_219030cf4930&gt; [?? x 2]
+## # Database: spark_connection
+##      Species r.squared
+##        &lt;chr&gt;     &lt;dbl&gt;
+## 1 versicolor 0.6188467
+## 2  virginica 0.1037537
+## 3     setosa 0.1099785</code></pre>
+</div>
+</div>
+<div id="distributing-packages" class="section level2">
+<h2>Distributing Packages</h2>
+<p>With <code>spark_apply()</code> you can use any R package inside Spark. For instance, you can use the <a href="https://cran.r-project.org/package=broom">broom</a> package to create a tidy data frame from linear regression output.</p>
+<pre class="r"><code>spark_apply(
+  iris_tbl,
+  function(e) broom::tidy(lm(Petal_Length ~ Petal_Width, e)),
+  names = c(&quot;term&quot;, &quot;estimate&quot;, &quot;std.error&quot;, &quot;statistic&quot;, &quot;p.value&quot;),
+  group_by = &quot;Species&quot;)</code></pre>
+<pre><code>## # Source:   table&lt;sparklyr_tmp_21906ccf73e4&gt; [?? x 6]
+## # Database: spark_connection
+##      Species        term  estimate std.error statistic      p.value
+##        &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+## 1 versicolor (Intercept) 1.7812754 0.2838234  6.276000 9.484134e-08
+## 2 versicolor Petal_Width 1.8693247 0.2117495  8.827999 1.271916e-11
+## 3  virginica (Intercept) 4.2406526 0.5612870  7.555230 1.041600e-09
+## 4  virginica Petal_Width 0.6472593 0.2745804  2.357267 2.253577e-02
+## 5     setosa (Intercept) 1.3275634 0.0599594 22.141037 7.676120e-27
+## 6     setosa Petal_Width 0.5464903 0.2243924  2.435422 1.863892e-02</code></pre>
+<p>To use R packages inside Spark, your packages must be installed on the worker nodes. The first time you call <code>spark_apply</code> all of the contents in your local <code>.libPaths()</code> will be copied into each Spark worker node via the <code>SparkConf.addFile()</code> function. Packages will only be copied once and will persist as long as the connection remains open. It’s not uncommon for R libraries to be several gigabytes in size, so be prepared for a one-time tax while the R packages are copied over to your Spark cluster. You can disable package distribution by setting <code>packages = FALSE</code>. Note: packages are not copied in local mode (<code>master=&quot;local&quot;</code>) because the packages already exist on the system.</p>
+</div>
+<div id="handling-errors" class="section level2">
+<h2>Handling Errors</h2>
+<p>It can be more difficult to troubleshoot R issues in a cluster than in local mode. For instance, the following R code causes the distributed execution to fail and suggests you check the logs for details.</p>
+<pre class="r"><code>spark_apply(iris_tbl, function(e) stop(&quot;Make this fail&quot;))</code></pre>
+<pre><code> Error in force(code) : 
+  sparklyr worker rscript failure, check worker logs for details</code></pre>
+<p>In local mode, <code>sparklyr</code> will retrieve the logs for you. The logs point out the real failure as <code>ERROR sparklyr: RScript (4190) Make this fail</code> as you might expect.</p>
+<pre><code>---- Output Log ----
+(17/07/27 21:24:18 ERROR sparklyr: Worker (2427) is shutting down with exception ,java.net.SocketException: Socket closed)
+17/07/27 21:24:18 WARN TaskSetManager: Lost task 0.0 in stage 389.0 (TID 429, localhost, executor driver): 17/07/27 21:27:21 INFO sparklyr: RScript (4190) retrieved 150 rows 
+17/07/27 21:27:21 INFO sparklyr: RScript (4190) computing closure 
+17/07/27 21:27:21 ERROR sparklyr: RScript (4190) Make this fail </code></pre>
+<p>It is worth mentioning that different cluster providers and platforms expose worker logs in different ways. Specific documentation for your environment will point out how to retrieve these logs.</p>
+</div>
+<div id="requirements" class="section level2">
+<h2>Requirements</h2>
+<p>The <strong>R Runtime</strong> is expected to be pre-installed in the cluster for <code>spark_apply</code> to function. Failure to install the cluster will trigger a <code>Cannot run program, no such file or directory</code> error while attempting to use <code>spark_apply()</code>. Contact your cluster administrator to consider making the R runtime available throughout the entire cluster.</p>
+<p>A <strong>Homogeneous Cluster</strong> is required since the driver node distributes, and potentially compiles, packages to the workers. For instance, the driver and workers must have the same processor architecture, system libraries, etc.</p>
+</div>
+<div id="configuration" class="section level2">
+<h2>Configuration</h2>
+<p>The following table describes relevant parameters while making use of <code>spark_apply</code>.</p>
+<table>
+<colgroup>
+<col width="38%" />
+<col width="61%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>spark.r.command</code></td>
+<td>The path to the R binary. Useful to select from multiple R versions.</td>
+</tr>
+<tr class="even">
+<td><code>sparklyr.worker.gateway.address</code></td>
+<td>The gateway address to use under each worker node. Defaults to <code>sparklyr.gateway.address</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>sparklyr.worker.gateway.port</code></td>
+<td>The gateway port to use under each worker node. Defaults to <code>sparklyr.gateway.port</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>For example, one could make use of an specific R version by running:</p>
+<pre class="r"><code>config &lt;- spark_config()
+config[[&quot;spark.r.command&quot;]] &lt;- &quot;&lt;path-to-r-version&gt;&quot;
+
+sc &lt;- spark_connect(master = &quot;local&quot;, config = config)
+sdf_len(sc, 10) %&gt;% spark_apply(function(e) e)</code></pre>
+</div>
+<div id="limitations" class="section level2">
+<h2>Limitations</h2>
+<div id="closures" class="section level3">
+<h3>Closures</h3>
+<p>Closures are serialized using <code>serialize</code>, which is described as “A simple low-level interface for serializing to connections.”. One of the current limitations of <code>serialize</code> is that it wont serialize objects being referenced outside of it’s environment. For instance, the following function will error out since the closures references <code>external_value</code>:</p>
+<pre class="r"><code>external_value &lt;- 1
+spark_apply(iris_tbl, function(e) e + external_value)</code></pre>
+</div>
+<div id="livy" class="section level3">
+<h3>Livy</h3>
+<p>Currently, Livy connections do not support distributing packages since the client machine where the libraries are precompiled might not have the same processor architecture, not operating systems that the cluster machines.</p>
+</div>
+<div id="computing-over-groups" class="section level3">
+<h3>Computing over Groups</h3>
+<p>While performing computations over groups, <code>spark_apply()</code> will provide partitions over the selected column; however, this implies that each partition can fit into a worker node, if this is not the case an exception will be thrown. To perform operations over groups that exceed the resources of a single node, one can consider partitioning to smaller units or use <code>dplyr::do</code> which is currently optimized for large partitions.</p>
+</div>
+<div id="package-installation" class="section level3">
+<h3>Package Installation</h3>
+<p>Since packages are copied only once for the duration of the <code>spark_connect()</code> connection, installing additional packages is not supported while the connection is active. Therefore, if a new package needs to be installed, <code>spark_disconnect()</code> the connection, modify packages and reconnect.</p>
+</div>
+</div>

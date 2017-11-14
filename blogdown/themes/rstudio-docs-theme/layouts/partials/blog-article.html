@@ -1,0 +1,25 @@
+
+
+<section class="article-list">
+<h1><a href="{{ .URL }}">{{ .Title }}</a></h1>
+<div class="markdowned">
+<p class="post-date">
+  {{ .Date.Format "2006-01-02" }}
+  {{ with .Params.author }}{{ . }}{{ end }}
+  <span class="categories">
+  &mdash;
+  {{ with .Params.categories }}
+  {{ range . }}
+  <a href="{{ relURL (print "/categories/" (urlize .) ".html") }}">{{ . }}</a>
+  {{ end }}
+  {{ end }}
+  </span>
+</p>
+</div>
+<div class="summary markdowned">
+<p>
+  {{ default .Summary .Description }}
+  <a href="{{ .URL }}" class="more" title="Read More...">Read more &rarr;</a>
+</p>
+</div>
+</section>
