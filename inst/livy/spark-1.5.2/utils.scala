@@ -399,11 +399,10 @@ object Utils {
    */
 
   def addSequentialIndex(
-    sc: SparkContext,
     df: DataFrame,
     from: Int,
     id: String) : DataFrame = {
-      val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+      val sqlContext = df.sqlContext
       sqlContext.createDataFrame(
         df.rdd.zipWithIndex.map {
           case (row: Row, i: Long) => Row.fromSeq(row.toSeq :+ (i.toDouble + from.toDouble))

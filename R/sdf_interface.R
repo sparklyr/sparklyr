@@ -341,7 +341,6 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
   transformed <- invoke_static(sc,
                                "sparklyr.Utils",
                                "addSequentialIndex",
-                               spark_context(sc),
                                sdf,
                                from,
                                id)
