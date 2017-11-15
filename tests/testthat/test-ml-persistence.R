@@ -108,6 +108,7 @@ test_that("we can ml_save/load a feature transformer", {
 })
 
 test_that("we can save a ml_model and load a pipeline model back", {
+  test_requires_version("2.0.0", "some pipeline stages requires Spark 2.0+")
   set.seed(42)
   iris_weighted <- iris %>%
     dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
