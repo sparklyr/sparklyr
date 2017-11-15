@@ -85,26 +85,18 @@ test_that("ft_binarizer() input checking works", {
 # HashingTF
 
 test_that("ft_hashing_tf() works", {
-  expect_identical(ft_hashing_tf(sc, "in", "out", num_features = 25) %>%
-                     ml_param("num_features") %>%
-                     class(),
-                   "integer")
+  args <- list(x = sc, input_col = "in", output_col = "out", num_features = 1024) %>%
+    param_add_version("2.0.0", binary = TRUE)
+
+  transformer <- do.call(ft_hashing_tf, args)
+
+  expect_equal(ml_params(transformer, names(args)[-1]), args[-1])
+})
+
+test_that('ft_hashing_tf() input checking', {
+  test_requires_version("2.0.0", "binary arg requires spark 2.0+")
   expect_error(ft_hashing_tf(sc, "in", "out", binary = 1),
                "length-one logical vector")
-
-  htf <- ft_hashing_tf(sc, "in", "out", binary = TRUE, num_features = 1024)
-
-  expect_equal(
-    ml_params(htf, list("input_col", "output_col", "binary", "num_features")),
-    list(input_col = "in", output_col = "out", binary = TRUE, num_features = 1024)
-  )
-
-  htf <- ft_hashing_tf(sc, "in", "out")
-
-  expect_equal(
-    ml_params(htf, list("input_col", "output_col", "binary", "num_features")),
-    list(input_col = "in", output_col = "out", binary = FALSE, num_features = 2^18)
-  )
 })
 
 # IndexToString
@@ -208,6 +200,7 @@ test_that("ft_regex_tokenizer() works", {
 # StopWordsRemover
 
 test_that("ft_stop_words_remover() works", {
+  test_requires_version("2.0.0", "loadDefaultStopWords requires Spark 2.0+")
   test_requires("dplyr")
   df <- data_frame(id = c(0, 1),
                    raw = c("I saw the red balloon", "Mary had a little lamb"))
