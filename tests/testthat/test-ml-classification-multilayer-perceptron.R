@@ -8,7 +8,7 @@ test_that("ml_multilayer_perceptron_classifier() parses params correctly", {
     x = sc, features_col = "fcol", prediction_col = "pcol",
     label_col = "lcol", layers = c(20, 40, 20),
     max_iter = 90, seed = 56,
-    tol = 1e-05, block_size = 256,
+    tol = 1e-05, block_size = 256
   ) %>%
     param_add_version("2.0.0", solver = "gd",
                       step_size = 0.01)
