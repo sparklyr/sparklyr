@@ -15,9 +15,9 @@
 #' @param num_user_blocks Number of user blocks (positive). Default: 10
 #' @param num_item_blocks Number of item blocks (positive). Default: 10
 #' @template roxlate-ml-checkpoint-interval
-#' @param cold_start_strategy Strategy for dealing with unknown or new users/items at prediction time. This may be useful in cross-validation or production scenarios, for handling user/item ids the model has not seen in the training data. Supported values: - "nan": predicted value for unknown ids will be NaN. - "drop": rows in the input DataFrame containing unknown ids will be dropped from the output DataFrame containing predictions. Default: "nan".
-#' @param intermediate_storage_level StorageLevel for intermediate datasets. Pass in a string representation of \code{StorageLevel}. Cannot be "NONE". Default: "MEMORY_AND_DISK".
-#' @param final_storage_level StorageLevel for ALS model factors. Pass in a string representation of \code{StorageLevel}. Default: "MEMORY_AND_DISK".
+#' @param cold_start_strategy (Spark 2.2.0+) Strategy for dealing with unknown or new users/items at prediction time. This may be useful in cross-validation or production scenarios, for handling user/item ids the model has not seen in the training data. Supported values: - "nan": predicted value for unknown ids will be NaN. - "drop": rows in the input DataFrame containing unknown ids will be dropped from the output DataFrame containing predictions. Default: "nan".
+#' @param intermediate_storage_level (Spark 2.0.0+) StorageLevel for intermediate datasets. Pass in a string representation of \code{StorageLevel}. Cannot be "NONE". Default: "MEMORY_AND_DISK".
+#' @param final_storage_level (Spark 2.0.0+) StorageLevel for ALS model factors. Pass in a string representation of \code{StorageLevel}. Default: "MEMORY_AND_DISK".
 #' @template roxlate-ml-uid
 #' @template roxlate-ml-dots
 #' @return ALS attempts to estimate the ratings matrix R as the product of two lower-rank matrices, X and Y, i.e. X * Yt = R. Typically these approximations are called 'factor' matrices. The general approach is iterative. During each iteration, one of the factor matrices is held constant, while the other is solved for using least squares. The newly-solved factor matrix is then held constant while solving for the other factor matrix.
@@ -99,12 +99,12 @@ ml_als.spark_connection <- function(
     invoke("setNumUserBlocks", num_user_blocks) %>%
     invoke("setNumItemBlocks", num_item_blocks) %>%
     invoke("setCheckpointInterval", checkpoint_interval) %>%
-    invoke("setIntermediateStorageLevel", intermediate_storage_level) %>%
-    invoke("setFinalStorageLevel", final_storage_level)
-
-  if (spark_version(x) >= "2.2.0")
-    jobj <- jobj %>%
-      invoke("setColdStartStrategy", cold_start_strategy)
+    jobj_set_param("setIntermediateStorageLevel", intermediate_storage_level,
+                   "MEMORY_AND_DISK", "2.0.0") %>%
+    jobj_set_param("setFinalStorageLevel", final_storage_level,
+                   "MEMORY_AND_DISK", "2.0.0") %>%
+    jobj_set_param("setColdStartStrategy", cold_start_strategy,
+                   "nan", "2.2.0")
 
   new_ml_als(jobj)
 }

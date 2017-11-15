@@ -52,11 +52,11 @@ ml_als_factorization(x, rating_col = "rating", user_col = "user",
 \item{checkpoint_interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
 E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
 
-\item{cold_start_strategy}{Strategy for dealing with unknown or new users/items at prediction time. This may be useful in cross-validation or production scenarios, for handling user/item ids the model has not seen in the training data. Supported values: - "nan": predicted value for unknown ids will be NaN. - "drop": rows in the input DataFrame containing unknown ids will be dropped from the output DataFrame containing predictions. Default: "nan".}
+\item{cold_start_strategy}{(Spark 2.2.0+) Strategy for dealing with unknown or new users/items at prediction time. This may be useful in cross-validation or production scenarios, for handling user/item ids the model has not seen in the training data. Supported values: - "nan": predicted value for unknown ids will be NaN. - "drop": rows in the input DataFrame containing unknown ids will be dropped from the output DataFrame containing predictions. Default: "nan".}
 
-\item{intermediate_storage_level}{StorageLevel for intermediate datasets. Pass in a string representation of \code{StorageLevel}. Cannot be "NONE". Default: "MEMORY_AND_DISK".}
+\item{intermediate_storage_level}{(Spark 2.0.0+) StorageLevel for intermediate datasets. Pass in a string representation of \code{StorageLevel}. Cannot be "NONE". Default: "MEMORY_AND_DISK".}
 
-\item{final_storage_level}{StorageLevel for ALS model factors. Pass in a string representation of \code{StorageLevel}. Default: "MEMORY_AND_DISK".}
+\item{final_storage_level}{(Spark 2.0.0+) StorageLevel for ALS model factors. Pass in a string representation of \code{StorageLevel}. Default: "MEMORY_AND_DISK".}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
