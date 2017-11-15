@@ -78,6 +78,7 @@ test_that("we can separate array<string> columns", {
 })
 
 test_that("we can separate struct columns (#690)", {
+  test_requires_version("2.0.0", "hive window support")
   date_seq <- seq.Date(
     from = as.Date("2013-01-01"),
     to = as.Date("2017-01-01"),
