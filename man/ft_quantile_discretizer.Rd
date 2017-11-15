@@ -22,7 +22,7 @@ ft_quantile_discretizer(x, input_col, output_col, handle_invalid = "error",
 \item{num_buckets}{Number of buckets (quantiles, or categories) into which data
 points are grouped. Must be greater than or equal to 2.}
 
-\item{relative_error}{Relative error (see documentation for
+\item{relative_error}{(Spark 2.0.0+) Relative error (see documentation for
 org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
 \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here}
 for description). Must be in the range [0, 1]. default: 0.001}
