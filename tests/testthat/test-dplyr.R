@@ -74,6 +74,7 @@ test_that("the implementation of 'left_join' functions as expected", {
 })
 
 test_that("the implementation of 'sample_n' functions as expected", {
+  test_requires("2.0.0", "sample_n() not supported")
   test_requires("dplyr")
 
   # As of Spark 2.1.0, sampling functions are not exact.
