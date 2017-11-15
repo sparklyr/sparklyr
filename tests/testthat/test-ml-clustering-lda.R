@@ -10,13 +10,10 @@ test_that("ml_lda param setting", {
     keep_last_checkpoint = FALSE, learning_decay = 0.52,
     learning_offset = 1000, optimize_doc_concentration = FALSE,
     seed = 89, features_col = "fcol", topic_distribution_col = "tdcol"
-  )
+  ) %>%
+    param_add_version("2.0.0", keep_last_checkpoint = FALSE)
   predictor <- do.call(ml_lda, args)
-  args_to_check <- if (spark_version(sc) >= "2.0.0")
-    setdiff(names(args), "x")
-  else
-    setdiff(names(args), c("x", "keep_last_checkpoint"))
-  expect_equal(ml_params(predictor, args_to_check), args[args_to_check])
+  expect_equal(ml_params(predictor, names(args)[-1]), args[-1])
 })
 
 test_that("ml_lda() default params are correct", {
@@ -27,7 +24,8 @@ test_that("ml_lda() default params are correct", {
 
   args <- get_default_args(
     ml_lda,
-    c("x", "uid", "...", "keep_last_checkpoint", "doc_concentration", "topic_concentration", "seed"))
+    c("x", "uid", "...", "doc_concentration", "topic_concentration", "seed")) %>%
+    param_filter_version("2.0.0", "keep_last_checkpoint")
 
   expect_equal(
     ml_params(predictor, names(args)),
