@@ -132,6 +132,7 @@ test_that("ft_index_to_string() works", {
 # ElementwiseProduct
 
 test_that("ft_elementwise_product() works", {
+  test_requires_version('2.0.0', "elementwise product requires spark 2.0+")
   df <- data.frame(a = 1, b = 3, c = 5)
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
 
