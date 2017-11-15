@@ -155,3 +155,18 @@ test_requires_version <- function(min_version, comment = NULL) {
     skip(msg)
   }
 }
+
+param_filter_version <- function(args, min_version, params) {
+  sc <- testthat_spark_connection()
+  if (spark_version(sc) < min_version)
+    args[params] <- NULL
+  args
+}
+
+param_add_version <- function(args, min_version, ...) {
+  sc <- testthat_spark_connection()
+  if (spark_version(sc) >= min_version)
+    c(args, as.list(...))
+  else
+    args
+}
