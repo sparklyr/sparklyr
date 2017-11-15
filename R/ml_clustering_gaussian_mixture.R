@@ -21,6 +21,7 @@ ml_gaussian_mixture <- function(
   probability_col = "probability",
   uid = random_string("gaussian_mixture_"), ...
 ) {
+  if (spark_version(x) < "2.0.0") stop ("Gaussian mixture requires Spark 2.0.0 or higher")
   UseMethod("ml_gaussian_mixture")
 }
 
