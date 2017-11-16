@@ -166,7 +166,7 @@ param_filter_version <- function(args, min_version, params) {
 param_add_version <- function(args, min_version, ...) {
   sc <- testthat_spark_connection()
   if (spark_version(sc) >= min_version)
-    c(args, as.list(...))
+    c(args, list(...))
   else
     args
 }
