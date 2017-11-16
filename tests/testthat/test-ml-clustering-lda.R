@@ -9,9 +9,10 @@ test_that("ml_lda param setting", {
     optimizer = "em", checkpoint_interval = 8,
     learning_decay = 0.52,
     learning_offset = 1000, optimize_doc_concentration = FALSE,
-    seed = 89, features_col = "fcol", topic_distribution_col = "tdcol"
+    seed = 89, features_col = "fcol"
   ) %>%
-    param_add_version("2.0.0", keep_last_checkpoint = FALSE)
+    param_add_version("2.0.0", keep_last_checkpoint = FALSE,
+                      topic_distribution_col = "tdcol")
   predictor <- do.call(ml_lda, args)
   expect_equal(ml_params(predictor, names(args)[-1]), args[-1])
 })
