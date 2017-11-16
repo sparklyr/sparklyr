@@ -57,7 +57,8 @@ ml_decision_tree_regressor.spark_connection <- function(
     invoke("setMaxMemoryInMB", max_memory_in_mb)
 
   if (!rlang::is_null(variance_col))
-    jobj <- invoke(jobj, "setVarianceCol", variance_col)
+    jobj <- jobj_set_param(jobj, "setVarianceCol", variance_col,
+                           NULL, "2.0.0")
 
   if (!rlang::is_null(seed))
     jobj <- invoke(jobj, "setSeed", seed)
