@@ -15,10 +15,15 @@ iris_tbl <- testthat_tbl("iris")
 # })
 
 test_that("basic binary classification evaluation works", {
-  df <- data.frame(label = c(1, 1, 0, 0), rawPrediction = c(1, 1, 0, 0))
+  df <- data.frame(label = c(1, 1, 0, 0), features1 = c(1, 1, 0, 0))
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
+  model <- df_tbl %>%
+    ft_vector_assembler("features1","features") %>%
+    ml_logistic_regression()
   auc <- ml_binary_classification_evaluator(
-    df_tbl, label_col = "label", raw_prediction_col = "rawPrediction")
+    model %>%
+      ml_predict(ft_vector_assembler(df_tbl, "features1","features")),
+    label_col = "label", raw_prediction_col = "rawPrediction")
   expect_equal(auc, 1)
 })
 
