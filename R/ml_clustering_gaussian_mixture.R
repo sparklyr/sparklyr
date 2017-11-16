@@ -21,7 +21,8 @@ ml_gaussian_mixture <- function(
   probability_col = "probability",
   uid = random_string("gaussian_mixture_"), ...
 ) {
-  if (spark_version(x) < "2.0.0") stop ("Gaussian mixture requires Spark 2.0.0 or higher")
+  if (spark_version(spark_connection(x)) < "2.0.0")
+    stop("Gaussian mixture requires Spark 2.0.0 or higher")
   UseMethod("ml_gaussian_mixture")
 }
 
@@ -122,7 +123,7 @@ new_ml_gaussian_mixture_model <- function(jobj) {
     gaussians_df = invoke(jobj, "gaussiansDF") %>%
       sdf_register() %>%
       collect() %>%
-      dplyr::mutate(cov = lapply(cov, read_spark_matrix)),
+      dplyr::mutate(!!rlang::sym("cov") := lapply(!!rlang::sym("cov"), read_spark_matrix)),
     weights = invoke(jobj, "weights"),
     summary = summary,
     subclass = "ml_gaussian_mixture_model")

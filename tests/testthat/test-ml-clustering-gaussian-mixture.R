@@ -11,9 +11,8 @@ test_that("ml_gaussian_mixture param setting", {
     prediction_col = "pcol", probability_col = "prcol"
   )
   predictor <- do.call(ml_gaussian_mixture, args)
-  args_to_check <- setdiff(names(args), "x")
 
-  expect_equal(ml_params(predictor, args_to_check), args[args_to_check])
+  expect_equal(ml_params(predictor, names(args)[-1]), args[-1])
 })
 
 test_that("ml_gaussian_mixture() default params are correct", {
