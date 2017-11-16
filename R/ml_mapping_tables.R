@@ -82,6 +82,7 @@ ml_create_mapping_tables <- function() { # nocov start
          # ml_lda
          "doc_concentration" = "docConcentration",
          "topic_concentration" = "topicConcentration",
+         "topic_distribution_col" = "topicDistributionCol",
          "keep_last_checkpoint" = "keepLastCheckpoint",
          "learning_decay" = "learningDecay",
          "learning_offset" = "learningOffset",

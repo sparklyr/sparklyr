@@ -5,6 +5,7 @@ test_requires("dplyr")
 data(iris)
 
 test_that("ml_bisecting_kmeans param setting", {
+  test_requires_version("2.0.0", "bisecting kmeans support")
   args <- list(
     x = sc, k = 9, max_iter = 11, min_divisible_cluster_size = 3,
     seed = 98, features_col = "fcol",
@@ -17,7 +18,7 @@ test_that("ml_bisecting_kmeans param setting", {
 })
 
 test_that("ml_bisecting_kmeans() default params are correct", {
-
+  test_requires_version("2.0.0", "bisecting kmeans support")
   predictor <- ml_pipeline(sc) %>%
     ml_bisecting_kmeans() %>%
     ml_stage(1)
@@ -32,6 +33,7 @@ test_that("ml_bisecting_kmeans() default params are correct", {
 })
 
 test_that("ml_bisecting_kmeans() works properly", {
+  test_requires_version("2.0.0", "bisecting kmeans support")
   sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_libsvm_data.txt", full.names = TRUE)
 
   sample_data <- spark_read_libsvm(sc, "sample_data",

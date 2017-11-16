@@ -28,6 +28,7 @@ test_that("ml_naive_bayes() default params are correct", {
 })
 
 test_that("ml_naive_bayes() works properly", {
+  test_requires_version("2.0.0", "accuracy metric support")
   sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_libsvm_data.txt", full.names = TRUE)
 
   sample_data <- spark_read_libsvm(sc, "sample_data",

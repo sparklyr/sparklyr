@@ -79,8 +79,8 @@ test_that("col.sample.rate maps to correct strategy", {
 
   expect_message(
     iris_tbl %>%
-      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
-                       col.sample.rate = 0.001),
+      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width + Petal_Length, type = "classification",
+                       col.sample.rate = 1/2),
     "Using feature subsetting strategy: log2"
   )
 })

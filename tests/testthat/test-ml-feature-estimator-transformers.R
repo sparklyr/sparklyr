@@ -3,6 +3,7 @@ context("ml feature (estimators)")
 sc <- testthat_spark_connection()
 
 test_that("ft_count_vectorizer() works", {
+  test_requires_version("2.0.0", "features require Spark 2.0+")
   df <- data_frame(text = c("a b c", "a a a b b c"))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
@@ -83,16 +84,16 @@ test_that("ft_quantile_discretizer works", {
 
   expect_identical(result, c(2, 2, 1, 1, 0))
   expect_identical(result2, c(2, 2, 1, 1, 0))
+})
 
+test_that("ft_quantile_descretizer() param setting", {
   args <- list(
     x = sc,
     input_col = "hour",
     output_col = "result",
-    num_buckets = 3L,
-    relative_error = 0.01)
-
-  if (spark_version(sc) >= "2.1.0")
-    args <- c(args, handle_invalid = "skip")
+    num_buckets = 3L) %>%
+    param_add_version("2.1.0", handle_invalid = "skip") %>%
+    param_add_version("2.0.0", relative_error = 0.01)
 
   qd <- do.call(ft_quantile_discretizer, args)
 

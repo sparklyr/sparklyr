@@ -687,7 +687,6 @@ spark_write_jdbc.spark_jobj <- function(x,
 #' Writes a Spark DataFrame into a generic source.
 #'
 #' @inheritParams spark_write_csv
-#' @param name The name to assign to the newly generated table.
 #' @param source A data source capable of reading data.
 #' @param ... Optional arguments; currently unused.
 #'

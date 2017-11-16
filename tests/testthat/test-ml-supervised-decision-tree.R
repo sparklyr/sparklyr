@@ -4,26 +4,18 @@ sc <- testthat_spark_connection()
 iris_tbl <- testthat_tbl("iris")
 
 test_that("ml_decision_tree_regressor() param parsing works" , {
-  dtr <- ml_decision_tree_regressor(
-    sc, features_col = "fcol", label_col = "lcol", prediction_col = "pcol",
-    variance_col = "vcol", checkpoint_interval = 11, impurity = "variance",
+
+  args <- list(
+    x = sc, features_col = "fcol", label_col = "lcol", prediction_col = "pcol",
+    checkpoint_interval = 11, impurity = "variance",
     max_bins = 64, max_depth = 1, min_info_gain = 0.001,
     min_instances_per_node = 2, seed = 42, cache_node_ids = TRUE,
     max_memory_in_mb = 128
-  )
+  ) %>%
+    param_add_version("2.0.0", variance_col = "vcol")
 
-  expect_equal(ml_params(dtr, list(
-    "features_col", "label_col", "prediction_col", "variance_col", "checkpoint_interval",
-    "impurity", "max_bins", "max_depth", "min_info_gain", "min_instances_per_node",
-    "seed", "cache_node_ids", "max_memory_in_mb"
-  )),
-  list(
-    features_col = "fcol", label_col = "lcol", prediction_col = "pcol",
-    variance_col = "vcol", checkpoint_interval = 11L, impurity = "variance",
-    max_bins = 64L, max_depth = 1L, min_info_gain = 0.001,
-    min_instances_per_node = 2L, seed = 42L, cache_node_ids = TRUE,
-    max_memory_in_mb = 128L
-  ))
+  predictor <- do.call(ml_decision_tree_regressor, args)
+  expect_equal(ml_params(predictor, names(args)[-1]), args[-1])
 })
 
 test_that("ml_decision_tree_classifier() default params are correct", {
@@ -45,7 +37,7 @@ test_that("ml_decision_tree_regressor() default params are correct", {
     ml_stage(1)
 
   args <- get_default_args(ml_decision_tree_regressor,
-                           c("x", "uid", "...", "variance_col", "seed"))
+                           c("x", "uid", "...", "seed", "variance_col"))
 
   expect_equal(
     ml_params(predictor, names(args)),

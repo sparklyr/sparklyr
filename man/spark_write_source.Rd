@@ -24,8 +24,6 @@ spark_write_source(x, source, mode = NULL, options = list(),
 \item{partition_by}{A \code{character} vector. Partitions the output by the given columns on the file system.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{name}{The name to assign to the newly generated table.}
 }
 \description{
 Writes a Spark DataFrame into a generic source.

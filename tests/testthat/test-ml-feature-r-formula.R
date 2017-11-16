@@ -48,7 +48,7 @@ test_that("r formula works as expected", {
 
 test_that("ft_r_formula takes formula", {
   iris_tbl <- testthat_tbl("iris")
-  v1 <- ft_r_formula(iris_tbl, "~ Sepal_Length + Petal_Length") %>% pull(features)
-  v2 <- ft_r_formula(iris_tbl, ~ Sepal_Length + Petal_Length) %>% pull(features)
+  v1 <- ft_r_formula(iris_tbl, "Species ~ Sepal_Length + Petal_Length") %>% pull(features)
+  v2 <- ft_r_formula(iris_tbl, Species ~ Sepal_Length + Petal_Length) %>% pull(features)
   expect_equal(v1, v2)
 })

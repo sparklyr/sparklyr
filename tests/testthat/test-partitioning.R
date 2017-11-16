@@ -7,14 +7,18 @@ test_that("sdf_repartition works", {
                  sdf_repartition(4L) %>%
                  sdf_num_partitions(),
                4L)
+})
 
+test_that("sdf_reparition: partitioning by column works", {
+  test_requires_version("2.0.0", "partitioning by column requires spark 2.0+")
+  iris_tbl <- testthat_tbl("iris")
   expect_match(iris_tbl %>%
                  sdf_repartition(partition_by = c("Species", "Petal_Width")) %>%
                  sdf_query_plan() %>%
                  dplyr::first() %>%
                  gsub("#[0-9]+", "", ., perl = TRUE),
                "RepartitionByExpression \\[Species, Petal_Width\\]"
-                 )
+  )
 
   expect_equal(iris_tbl %>%
                  sdf_repartition(5L, partition_by = c("Species", "Petal_Width")) %>%
@@ -25,6 +29,7 @@ test_that("sdf_repartition works", {
 })
 
 test_that("'sdf_partition' -- 'partitions' argument should take numeric (#735)", {
+  test_requires_version("2.0.0", "partitioning by column requires spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
   expect_equal(iris_tbl %>%
                  sdf_repartition(6, partition_by = "Species") %>%

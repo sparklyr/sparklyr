@@ -133,6 +133,7 @@ ml_model_print_centers <- function(model) {
 #' Spark ML - Feature Importance for Tree Models
 #'
 #' @param model A decision tree-based \code{ml_model}
+#' @template roxlate-ml-dots
 #'
 #' @return A sorted data frame with feature labels and their relative importance.
 #' @export

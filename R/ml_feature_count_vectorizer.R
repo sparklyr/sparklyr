@@ -43,7 +43,7 @@ ft_count_vectorizer.spark_connection <- function(
 
   estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.CountVectorizer",
                                   input_col, output_col, uid) %>%
-    invoke("setBinary", binary) %>%
+    jobj_set_param("setBinary", binary, FALSE, "2.0.0") %>%
     invoke("setMinDF", min_df) %>%
     invoke("setMinTF", min_tf) %>%
     invoke("setVocabSize", vocab_size) %>%

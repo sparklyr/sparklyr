@@ -84,7 +84,18 @@ test_that("ft_regex_tokenizer() works as expected", {
 })
 
 test_that("ft_quantile_discretizer() works with basic input", {
+  test_requires_version("2.0.0", "unidentified bug affecting <2.0.0")
   skip_on_cran()
+
+  # Fails in 1.6.x
+  # > iris_tbl %>% ft_quantile_discretizer(input.col = "Sepal_Length", output.col = "Group", n.buckets = 2) %>% group_by(Group) %>% summarize(count = n())
+  # # Source:   lazy query [?? x 2]
+  # # Database: spark_connection
+  #    Group count
+  #    <dbl> <dbl>
+  # 1     0    65
+  # 2     1    84
+  # 3     2     1
 
   # https://github.com/rstudio/sparklyr/issues/341
   # previously failed due to incorrect assertion on 'n.buckets' type

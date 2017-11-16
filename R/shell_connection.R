@@ -235,8 +235,8 @@ start_shell <- function(master,
         length(grep(config[["sparklyr.csv.embedded"]], spark_version)) > 0) {
       jars <- c(
         jars,
-        normalizePath(system.file(file.path("java", "spark-csv_2.11-1.3.0.jar"), package = "sparklyr")),
-        normalizePath(system.file(file.path("java", "commons-csv-1.1.jar"), package = "sparklyr")),
+        normalizePath(system.file(file.path("java", "spark-csv_2.11-1.5.0.jar"), package = "sparklyr")),
+        normalizePath(system.file(file.path("java", "commons-csv-1.5.jar"), package = "sparklyr")),
         normalizePath(system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr"))
       )
     }

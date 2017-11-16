@@ -56,11 +56,11 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(
   jobj <- ml_new_predictor(x, class, uid, features_col,
                      label_col, prediction_col) %>%
     invoke("setMaxIter", max_iter) %>%
-    invoke("setStepSize", step_size) %>%
+    jobj_set_param("setStepSize", step_size, 0.03, "2.0.0") %>%
     invoke("setLayers", layers) %>%
     invoke("setTol", tol) %>%
     invoke("setBlockSize", block_size) %>%
-    invoke("setSolver", solver)
+    jobj_set_param("setSolver", solver, "l-bfgs", "2.0.0")
 
 
   if(!rlang::is_null(initial_weights) && spark_version(x) >= "2.0.0")

@@ -8,6 +8,8 @@ ml_tree_feature_importance(model, ...)
 }
 \arguments{
 \item{model}{A decision tree-based \code{ml_model}}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \value{
 A sorted data frame with feature labels and their relative importance.

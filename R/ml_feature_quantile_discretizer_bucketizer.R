@@ -98,7 +98,7 @@ ml_validator_bucketizer <- function(args, nms) {
 #'
 #' @param num_buckets Number of buckets (quantiles, or categories) into which data
 #'   points are grouped. Must be greater than or equal to 2.
-#' @param relative_error Relative error (see documentation for
+#' @param relative_error (Spark 2.0.0+) Relative error (see documentation for
 #'   org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
 #'   \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here}
 #'   for description). Must be in the range [0, 1]. default: 0.001
@@ -123,7 +123,7 @@ ft_quantile_discretizer.spark_connection <- function(
                                   input_col, output_col, uid) %>%
     jobj_set_param("setHandleInvalid", handle_invalid, "error", "2.1.0") %>%
     invoke("setNumBuckets", num_buckets) %>%
-    invoke("setRelativeError", relative_error) %>%
+    jobj_set_param("setRelativeError", relative_error, 0.001, "2.0.0") %>%
     new_ml_quantile_discretizer()
 
   if (is.null(dataset))

@@ -30,7 +30,7 @@ ml_lda(x, k = 10L, max_iter = 20L, doc_concentration = NULL,
 \item{checkpoint_interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
 E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
 
-\item{keep_last_checkpoint}{(For EM optimizer only) If using checkpointing, this indicates whether to keep the last checkpoint. If \code{FALSE}, then the checkpoint will be deleted. Deleting the checkpoint can cause failures if a data partition is lost, so set this bit with care. Note that checkpoints will be cleaned up via reference counting, regardless.}
+\item{keep_last_checkpoint}{(Spark 2.0.0+) (For EM optimizer only) If using checkpointing, this indicates whether to keep the last checkpoint. If \code{FALSE}, then the checkpoint will be deleted. Deleting the checkpoint can cause failures if a data partition is lost, so set this bit with care. Note that checkpoints will be cleaned up via reference counting, regardless.}
 
 \item{learning_decay}{(For Online optimizer only) Learning rate, set as an exponential decay rate. This should be between (0.5, 1.0] to guarantee asymptotic convergence. This is called "kappa" in the Online LDA paper (Hoffman et al., 2010). Default: 0.51, based on Hoffman et al.}
 

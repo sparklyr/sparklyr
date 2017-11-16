@@ -81,7 +81,7 @@
 #' @param learning_offset (For Online optimizer only) A (positive) learning parameter that downweights early iterations. Larger values make early iterations count less. This is called "tau0" in the Online LDA paper (Hoffman et al., 2010) Default: 1024, following Hoffman et al.
 #' @param optimize_doc_concentration (For Online optimizer only) Indicates whether the \code{doc_concentration} (Dirichlet parameter for document-topic distribution) will be optimized during training. Setting this to true will make the model more expressive and fit the training data better. Default: \code{FALSE}
 #'
-#' @param keep_last_checkpoint (For EM optimizer only) If using checkpointing, this indicates whether to keep the last checkpoint. If \code{FALSE}, then the checkpoint will be deleted. Deleting the checkpoint can cause failures if a data partition is lost, so set this bit with care. Note that checkpoints will be cleaned up via reference counting, regardless.
+#' @param keep_last_checkpoint (Spark 2.0.0+) (For EM optimizer only) If using checkpointing, this indicates whether to keep the last checkpoint. If \code{FALSE}, then the checkpoint will be deleted. Deleting the checkpoint can cause failures if a data partition is lost, so set this bit with care. Note that checkpoints will be cleaned up via reference counting, regardless.
 #'
 #' @export
 ml_lda <- function(
@@ -132,7 +132,8 @@ ml_lda.spark_connection <- function(
     invoke("setSubsamplingRate", subsampling_rate) %>%
     invoke("setOptimizer", optimizer) %>%
     invoke("setCheckpointInterval", checkpoint_interval) %>%
-    invoke("setKeepLastCheckpoint", keep_last_checkpoint) %>%
+    jobj_set_param("setKeepLastCheckpoint", keep_last_checkpoint,
+                   TRUE, "2.0.0") %>%
     invoke("setLearningDecay", learning_decay) %>%
     invoke("setLearningOffset", learning_offset) %>%
     invoke("setOptimizeDocConcentration", optimize_doc_concentration) %>%

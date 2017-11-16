@@ -145,3 +145,28 @@ get_default_args <- function(fn, exclude = NULL) {
   formals(fn) %>%
     (function(x) x[setdiff(names(x), c(exclude, c("x", "uid", "...", "formula")))])
 }
+
+test_requires_version <- function(min_version, comment = NULL) {
+  sc <- testthat_spark_connection()
+  if (spark_version(sc) < min_version) {
+    msg <- paste0("test requires Spark version ", min_version)
+    if (!is.null(comment))
+      msg <- paste0(msg, ": ", comment)
+    skip(msg)
+  }
+}
+
+param_filter_version <- function(args, min_version, params) {
+  sc <- testthat_spark_connection()
+  if (spark_version(sc) < min_version)
+    args[params] <- NULL
+  args
+}
+
+param_add_version <- function(args, min_version, ...) {
+  sc <- testthat_spark_connection()
+  if (spark_version(sc) >= min_version)
+    c(args, list(...))
+  else
+    args
+}

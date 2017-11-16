@@ -2,6 +2,7 @@ context("dplyr join")
 sc <- testthat_spark_connection()
 
 test_that("left_join works as expected", {
+  test_requires_version("2.0.0", "dots in column names")
   test_requires("dplyr")
 
   s1 <- data.frame(x=1:3, y=4:6)
