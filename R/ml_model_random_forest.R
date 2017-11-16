@@ -97,12 +97,17 @@ ml_random_forest <- function(
         # Prior to Spark 2.0.0, random forest does not support arbitrary
         #   column sampling rates. So we map the input to one of the supported
         #   strategies: "onethird", "sqrt", or "log2".
-        k <- length(features)
+        k <- gsub("^.+~", "", formula) %>%
+          trimws() %>%
+          strsplit("\\+") %>%
+          rlang::flatten_chr() %>%
+          length()
         strategies <- dplyr::data_frame(strategy = c("onethird", "sqrt", "log2"),
                                         rate = c(1/3, sqrt(k)/k, log2(k)/k)) %>%
-          arrange(!! rlang::sym("rate"))
-        strategy <- strategies[["strategy"]][
-          max(findInterval(col.sample.rate, strategies[["rate"]]), 1)]
+          dplyr::arrange(!! rlang::sym("rate"))
+        strategy <- strategies %>%
+          dplyr::pull("strategy") %>%
+          `[[`(max(findInterval(col.sample.rate, strategies[["rate"]]), 1))
         message("* Using feature subsetting strategy: ", strategy)
         strategy
       }
