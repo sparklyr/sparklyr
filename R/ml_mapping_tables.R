@@ -122,6 +122,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "StopWordsRemover" = "stop_words_remover",
     "Tokenizer" = "tokenizer",
     "VectorAssembler" = "vector_assembler",
+    "NGram" = "ngram",
     # feature (estimators)
     "VectorIndexer" = "vector_indexer",
     "VectorIndexerModel" = "vector_indexer_model",
