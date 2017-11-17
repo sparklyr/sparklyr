@@ -170,7 +170,7 @@ test_that("ft_regex_tokenizer() works", {
                  "I wish Java could use case classes",
                  "Logistic,regression,models,are,neat")
   )
-  sentence_tbl <- testthat_tbl("sentence_df")
+  sentence_tbl <- copy_to(sc, sentence_df, overwrite = TRUE)
 
   expect_identical(
     sentence_tbl %>%

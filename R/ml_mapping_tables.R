@@ -15,6 +15,13 @@ ml_create_mapping_tables <- function() { # nocov start
          "weight_col" = "weightCol",
          "aggregation_depth" = "aggregationDepth",
          "num_features" = "numFeatures",
+         # ft_word2vec
+         "vector_size" = "vectorSize",
+         "min_count" = "minCount",
+         "max_sentence_length" = "maxSentenceLength",
+         "num_partitions" = "numPartitions",
+         # ft_idf
+         "min_doc_freq" = "minDocFreq",
          # ft_r_formula
          "force_index_label" = "forceIndexLabel",
          # ft_string_indexer
@@ -122,7 +129,10 @@ ml_create_mapping_tables <- function() { # nocov start
     "StopWordsRemover" = "stop_words_remover",
     "Tokenizer" = "tokenizer",
     "VectorAssembler" = "vector_assembler",
+    "NGram" = "ngram",
     # feature (estimators)
+    "Word2Vec" = "word2vec",
+    "IDF" = "idf",
     "VectorIndexer" = "vector_indexer",
     "VectorIndexerModel" = "vector_indexer_model",
     "QuantileDiscretizer" = "quantile_discretizer",
