@@ -20,7 +20,8 @@ ft_ngram.spark_connection <- function(x, input_col, output_col, n = 2L,
 
   ml_ratify_args()
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.NGram",
-                             input_col, output_col, uid)
+                             input_col, output_col, uid) %>%
+    invoke("setN", n)
 
   new_ml_ngram(jobj)
 }

@@ -16,4 +16,15 @@ test_that("ft_ngram() works properly", {
                    c("the purrrers", "purrrers on", "on the", "the bus", "bus go",
                      "go map", "map map", "map map")
                    )
+
+  trigrams <- sentence_tbl %>%
+    ft_tokenizer("sentence", "words") %>%
+    ft_ngram("words", "trigrams", n = 3) %>%
+    pull(trigrams) %>%
+    unlist()
+
+  expect_identical(trigrams,
+                   c("the purrrers on", "purrrers on the", "on the bus", "the bus go",
+                     "bus go map", "go map map", "map map map")
+  )
 })
