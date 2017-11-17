@@ -15,6 +15,11 @@ ml_create_mapping_tables <- function() { # nocov start
          "weight_col" = "weightCol",
          "aggregation_depth" = "aggregationDepth",
          "num_features" = "numFeatures",
+         # ft_word2vec
+         "vector_size" = "vectorSize",
+         "min_count" = "minCount",
+         "max_sentence_length" = "maxSentenceLength",
+         "num_partitions" = "numPartitions",
          # ft_idf
          "min_doc_freq" = "minDocFreq",
          # ft_r_formula
@@ -126,6 +131,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "VectorAssembler" = "vector_assembler",
     "NGram" = "ngram",
     # feature (estimators)
+    "Word2Vec" = "word2vec",
     "IDF" = "idf",
     "VectorIndexer" = "vector_indexer",
     "VectorIndexerModel" = "vector_indexer_model",
