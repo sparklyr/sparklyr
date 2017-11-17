@@ -15,6 +15,8 @@ ml_create_mapping_tables <- function() { # nocov start
          "weight_col" = "weightCol",
          "aggregation_depth" = "aggregationDepth",
          "num_features" = "numFeatures",
+         # ft_idf
+         "min_doc_freq" = "minDocFreq",
          # ft_r_formula
          "force_index_label" = "forceIndexLabel",
          # ft_string_indexer
@@ -124,6 +126,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "VectorAssembler" = "vector_assembler",
     "NGram" = "ngram",
     # feature (estimators)
+    "IDF" = "idf",
     "VectorIndexer" = "vector_indexer",
     "VectorIndexerModel" = "vector_indexer_model",
     "QuantileDiscretizer" = "quantile_discretizer",
