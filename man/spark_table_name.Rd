@@ -10,6 +10,6 @@ spark_table_name(expr)
 \item{expr}{The expression to attempt to use as name}
 }
 \description{
-Attempts to generate a table name from an expression; othewise,
+Attempts to generate a table name from an expression; otherwise,
 assigns an auto-generated generic name with "sparklyr_" prefix.
 }

@@ -44,7 +44,7 @@ The object returned depends on the class of \code{x}.
   \code{Pipeline} objects.
 
   \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
-  the clustering estimator appended to the pipline.
+  the clustering estimator appended to the pipeline.
 
   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, an estimator is constructed then
   immediately fit with the input \code{tbl_spark}, returning a clustering model.

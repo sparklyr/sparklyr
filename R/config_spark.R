@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param file Name of the configuration file
-#' @param use_default TRUE to use the built-in detaults provided in this package
+#' @param use_default TRUE to use the built-in defaults provided in this package
 #'
 #' @details
 #'

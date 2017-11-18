@@ -2,7 +2,7 @@
 #'
 #' Perform hyper-parameter tuning using either K-fold cross validation or train-validation split.
 #'
-#' @details \code{ml_cross_validator()} performs k-fold cross validation while \code{ml_train_validation_split()} performs tunining on one pair of train and validation datasets.
+#' @details \code{ml_cross_validator()} performs k-fold cross validation while \code{ml_train_validation_split()} performs tuning on one pair of train and validation datasets.
 #'
 #' @return The object returned depends on the class of \code{x}.
 #'
@@ -10,7 +10,7 @@
 #'   \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_cross_validator} or \code{ml_traing_validation_split} object.
 #'
 #'   \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
-#'   the tuning estimator appended to the pipline.
+#'   the tuning estimator appended to the pipeline.
 #'
 #'   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a tuning estimator is constructed then
 #'   immediately fit with the input \code{tbl_spark}, returning a \code{ml_cross_validation_model} or a

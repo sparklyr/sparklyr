@@ -20,7 +20,7 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{quote}{The character used as a quote, defaults to \code{"hdfs://"}.}
 
-\item{escape}{The chatacter used to escape other characters, defaults to \code{\\}.}
+\item{escape}{The character used to escape other characters, defaults to \code{\\}.}
 
 \item{charset}{The character set, defaults to \code{"UTF-8"}.}
 
@@ -30,7 +30,7 @@ Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
 
 \item{mode}{A \code{character} element. Specifies the behavior when data or
   table already exists. Supported values include: 'error', 'append', 'overwrite' and
-  ignore. Notice that 'overwrite' will also change the column structrure.
+  ignore. Notice that 'overwrite' will also change the column structure.
 
   For more details see also \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes}
   for your version of Spark.}

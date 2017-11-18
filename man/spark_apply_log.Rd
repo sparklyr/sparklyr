@@ -2,7 +2,7 @@
 % Please edit documentation in R/spark_apply.R
 \name{spark_apply_log}
 \alias{spark_apply_log}
-\title{Log Writter for Spark Apply}
+\title{Log Writer for Spark Apply}
 \usage{
 spark_apply_log(..., level = "INFO")
 }

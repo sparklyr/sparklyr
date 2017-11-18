@@ -27,7 +27,7 @@ spark_get_checkpoint_dir <- function(sc) {
 
 #' Generate a Table Name from Expression
 #'
-#' Attempts to generate a table name from an expression; othewise,
+#' Attempts to generate a table name from an expression; otherwise,
 #' assigns an auto-generated generic name with "sparklyr_" prefix.
 #'
 #' @param expr The expression to attempt to use as name

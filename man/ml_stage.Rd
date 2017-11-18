@@ -14,7 +14,7 @@ ml_stages(x, stages = NULL)
 
 \item{stage}{The UID of a stage in the pipeline.}
 
-\item{stages}{The UIDs of stages in the pieline as a character vector.}
+\item{stages}{The UIDs of stages in the pipeline as a character vector.}
 }
 \value{
 For \code{ml_stage()}: The stage specified.
