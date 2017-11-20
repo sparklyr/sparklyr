@@ -261,7 +261,7 @@ spark_apply_rlang_serialize <- function() {
     rlang_serialize
 }
 
-#' Log Writter for Spark Apply
+#' Log Writer for Spark Apply
 #'
 #' Writes data to log under \code{spark_apply()}.
 #'

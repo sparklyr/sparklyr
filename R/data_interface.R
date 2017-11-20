@@ -122,13 +122,13 @@ spark_read_csv <- function(sc,
 #' @param header Should the first row of data be used as a header? Defaults to \code{TRUE}.
 #' @param delimiter The character used to delimit each column, defaults to \code{,}.
 #' @param quote The character used as a quote, defaults to \code{"hdfs://"}.
-#' @param escape The chatacter used to escape other characters, defaults to \code{\\}.
+#' @param escape The character used to escape other characters, defaults to \code{\\}.
 #' @param charset The character set, defaults to \code{"UTF-8"}.
 #' @param null_value The character to use for default values, defaults to \code{NULL}.
 #' @param options A list of strings with additional options.
 #' @param mode A \code{character} element. Specifies the behavior when data or
 #'   table already exists. Supported values include: 'error', 'append', 'overwrite' and
-#'   ignore. Notice that 'overwrite' will also change the column structrure.
+#'   ignore. Notice that 'overwrite' will also change the column structure.
 #'
 #'   For more details see also \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes}
 #'   for your version of Spark.

@@ -83,7 +83,7 @@ The object returned depends on the class of \code{x}.
   \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_als} recommender object, which is an Estimator.
 
   \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
-  the recommender appended to the pipline.
+  the recommender appended to the pipeline.
 
   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a recommender
   estimator is constructed then immediately fit with the input

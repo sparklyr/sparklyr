@@ -82,7 +82,7 @@ ml_stage <- function(x, stage) {
 }
 
 #' @rdname ml_stage
-#' @param stages The UIDs of stages in the pieline as a character vector.
+#' @param stages The UIDs of stages in the pipeline as a character vector.
 #' @return For \code{ml_stages()}: A list of stages. If \code{stages} is not set, the function returns all stages of the pipeline in a list.
 #' @export
 ml_stages <- function(x, stages = NULL) {

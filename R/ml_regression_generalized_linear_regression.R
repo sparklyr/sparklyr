@@ -16,7 +16,7 @@
 #' @details Valid link functions for each family is listed below. The first link function of each family is the default one.
 #'   \itemize{
 #'     \item gaussian: "identity", "log", "inverse"
-#'     \item binomial: "logit", "probit", "cloglog"
+#'     \item binomial: "logit", "probit", "loglog"
 #'     \item poisson: "log", "identity", "sqrt"
 #'     \item gamma: "inverse", "identity", "log"
 #'     \item tweedie: power link function specified through \code{link_power}. The default link power in the tweedie family is \code{1 - variance_power}.

@@ -17,7 +17,7 @@
 #'   \code{Pipeline} objects.
 #'
 #'   \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
-#'   the transformer or estimator appended to the pipline.
+#'   the transformer or estimator appended to the pipeline.
 #'
 #'   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a transformer is constructed then
 #'   immediately applied to the input \code{tbl_spark}, returning a \code{tbl_spark}
