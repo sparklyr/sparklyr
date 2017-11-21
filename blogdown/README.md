@@ -41,9 +41,8 @@
 
 ## Preview the site
 
-1. Change the working directory to the **blogdown** sub-directory
-2. Run `blogdown::serve_site()`
-3. Set the working directory back to the package after done
+1. Run `blogdown::serve_site()`
+
 
 
 
