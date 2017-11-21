@@ -42,3 +42,5 @@ h2ologs/*
 **/h2ologs/*
 # IDE stuff
 .project
+# blogdown
+/blogdown/public
