@@ -28,12 +28,13 @@ contentDir = "blogdown/content"
     MathJaxCDN = "//cdn.bootcss.com"
     MathJaxVersion = "2.7.1"
 
+    favicon = "favicon.png"
+
     [params.logo]
     url = "logo.png"
     width = 50
     height = 50
     alt = "Logo"
-
 
 [[menu.main]]
     weight = 10
