@@ -540,3 +540,23 @@ sdf_coalesce <- function(x, partitions) {
     invoke("coalesce", partitions) %>%
     sdf_register()
 }
+
+#' Compute summary statistics for columns of a data frame
+#'
+#' @param x An object coercible to a Spark DataFrame
+#' @param cols Columns to compute statistics for, given as a character vector
+#' @export
+sdf_describe <- function(x, cols = colnames(x)) {
+  in_df <- cols %in% colnames(x)
+  if (any(!in_df)) {
+    msg <- paste0("The following columns are not in the data frame: ",
+                  paste0(cols[which(!in_df)], collapse = ", "))
+    stop(msg)
+  }
+  cols <- lapply(cols, ensure_scalar_character)
+
+  x %>%
+    spark_dataframe() %>%
+    invoke("describe", cols) %>%
+    sdf_register()
+}

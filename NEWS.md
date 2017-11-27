@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Implemented `sdf_describe()` to easily compute summary statistics for
+data frames.
+
 - Fixed data frames with dates in `spark_apply()` retrieved as `Date` instead
   of doubles.
 
