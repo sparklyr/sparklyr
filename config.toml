@@ -19,7 +19,6 @@ contentDir = "blogdown/content"
     copyright = "Copyright 2017, RStudio, Inc."
 	  repo = "https://github.com/rstudio/sparklyr"
 
-    # options for highlight.js (version, additional languages, and theme)
     highlightjsVersion = "9.11.0"
     highlightjsCDN = "//cdn.bootcss.com"
     highlightjsLang = ["r", "yaml"]
@@ -28,7 +27,7 @@ contentDir = "blogdown/content"
     MathJaxCDN = "//cdn.bootcss.com"
     MathJaxVersion = "2.7.1"
 
-    favicon = "favicon.png"
+    favicon = "/favicon.png"
 
     [params.logo]
     url = "logo.png"
