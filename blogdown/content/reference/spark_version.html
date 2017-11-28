@@ -1,10 +1,12 @@
 ---
 title: "Get the Spark Version Associated with a Spark Connection"
-
+aliases:
+  - reference/sparklyr/latest/spark_version.html
+  - reference/spark_version.html
 ---
-    
+
     <div class="doc-page">
-    
+
     <div class="doc-page-index">
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
@@ -25,12 +27,12 @@ title: "Get the Spark Version Associated with a Spark Connection"
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
-    
+
     <colgroup>
       <col class="name" />
       <col class="desc" />
-    </colgroup>  
-      
+    </colgroup>
+
     <tr>
       <td>sc</td>
       <td><p>A <code>spark_connection</code>.</p></td>
@@ -45,11 +47,10 @@ title: "Get the Spark Version Associated with a Spark Connection"
 
     <p>Suffixes for e.g. preview versions, or snapshotted versions,
 are trimmed -- if you require the full Spark version, you can
-retrieve it with <code>invoke(spark_context(sc), "version")</code>.</p>
+retrieve it with <code><a href='invoke.html'>invoke(spark_context(sc), "version")</a></code>.</p>
     
 
-    
     </div>
-    
+
     </div>
 

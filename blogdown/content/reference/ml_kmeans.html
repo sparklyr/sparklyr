@@ -1,17 +1,17 @@
 ---
 title: "Spark ML -- K-Means Clustering"
-
+aliases:
+  - reference/sparklyr/latest/ml_kmeans.html
+  - reference/ml_kmeans.html
 ---
-    
+
     <div class="doc-page">
-    
+
     <div class="doc-page-index">
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
     
     <li><a href="#value">Value</a></li>
-
-    <li><a href="#references">References</a></li>
 
     <li><a href="#see-also">See also</a></li>
         </ul>
@@ -20,86 +20,100 @@ title: "Spark ML -- K-Means Clustering"
     <div class="doc-page-body">
 
     
-    <p>Perform k-means clustering on a Spark DataFrame.</p>
+    <p>K-means clustering with support for k-means|| initialization proposed by Bahmani et al.</p>
     
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_kmeans</span>(<span class='no'>x</span>, <span class='no'>centers</span>, <span class='kw'>iter.max</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='fu'>tbl_vars</span>(<span class='no'>x</span>),
-  <span class='kw'>compute.cost</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>tolerance</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>, <span class='kw'>ml.options</span> <span class='kw'>=</span> <span class='fu'><a href='ml_options'>ml_options</a></span>(), <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_kmeans</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>2L</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20L</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
+  <span class='kw'>init_steps</span> <span class='kw'>=</span> <span class='fl'>2L</span>, <span class='kw'>init_mode</span> <span class='kw'>=</span> <span class='st'>"k-means||"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"kmeans_"</span>), <span class='no'>...</span>)</code></pre></div>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
-    
+
     <colgroup>
       <col class="name" />
       <col class="desc" />
-    </colgroup>  
-      
+    </colgroup>
+
     <tr>
       <td>x</td>
-      <td><p>An object coercable to a Spark DataFrame (typically, a
-<code>tbl_spark</code>).</p></td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
     </tr>
     <tr>
-      <td>centers</td>
-      <td><p>The number of cluster centers to compute.</p></td>
+      <td>formula</td>
+      <td><p>Used when <code>x</code> is a <code>tbl_spark</code>. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see <a href='ft_r_formula.html'>ft_r_formula</a> for details.</p></td>
     </tr>
     <tr>
-      <td>iter.max</td>
+      <td>k</td>
+      <td><p>The number of clusters to create</p></td>
+    </tr>
+    <tr>
+      <td>max_iter</td>
       <td><p>The maximum number of iterations to use.</p></td>
     </tr>
     <tr>
-      <td>features</td>
-      <td><p>The name of features (terms) to use for the model fit.</p></td>
-    </tr>
-    <tr>
-      <td>compute.cost</td>
-      <td><p>Whether to compute cost for <code>k-means</code> model using Spark's <a href='https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/KMeansModel.scala#L84'>computeCost</a>.</p></td>
-    </tr>
-    <tr>
-      <td>tolerance</td>
+      <td>tol</td>
       <td><p>Param for the convergence tolerance for iterative algorithms.</p></td>
     </tr>
     <tr>
-      <td>ml.options</td>
-      <td><p>Optional arguments, used to affect the model generated. See
-<code><a href='ml_options'>ml_options</a></code> for more details.</p></td>
+      <td>init_steps</td>
+      <td><p>Number of steps for the k-means|| initialization mode. This is an advanced setting -- the default of 2 is almost always enough. Must be &gt; 0. Default: 2.</p></td>
+    </tr>
+    <tr>
+      <td>init_mode</td>
+      <td><p>Initialization algorithm. This can be either "random" to choose random points as initial cluster centers, or "k-means||" to use a parallel variant of k-means++ (Bahmani et al., Scalable K-Means++, VLDB 2012). Default: k-means||.</p></td>
+    </tr>
+    <tr>
+      <td>seed</td>
+      <td><p>A random seed. Set this value if you need your results to be
+reproducible across repeated calls.</p></td>
+    </tr>
+    <tr>
+      <td>features_col</td>
+      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>prediction_col</td>
+      <td><p>Prediction column name.</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the ML estimator.</p></td>
     </tr>
     <tr>
       <td>...</td>
-      <td><p>Optional arguments. The <code>data</code> argument can be used to
-specify the data to be used when <code>x</code> is a formula; this allows calls
-of the form <code><a href='ml_linear_regression'>ml_linear_regression(y ~ x, data = tbl)</a></code>, and is
-especially useful in conjunction with <code>do</code>.</p></td>
+      <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
     
     <h2 id="value">Value</h2>
 
-    <p><a href='ml_model'>ml_model</a> object of class <code>kmeans</code> with overloaded <code>print</code>, <code>fitted</code> and <code>predict</code> functions.</p>
-    
-    <h2 id="references">References</h2>
+    <p>The object returned depends on the class of <code>x</code>.</p><ul>
+<li><p><code>spark_connection</code>: When <code>x</code> is a <code>spark_connection</code>, the function returns an instance of a <code>ml_estimator</code> object. The object contains a pointer to
+  a Spark <code>Estimator</code> object and can be used to compose
+  <code>Pipeline</code> objects.</p></li>
+<li><p><code>ml_pipeline</code>: When <code>x</code> is a <code>ml_pipeline</code>, the function returns a <code>ml_pipeline</code> with
+  the clustering estimator appended to the pipeline.</p></li>
+<li><p><code>tbl_spark</code>: When <code>x</code> is a <code>tbl_spark</code>, an estimator is constructed then
+  immediately fit with the input <code>tbl_spark</code>, returning a clustering model.</p></li>
+<li><p><code>tbl_spark</code>, with <code>formula</code> or <code>features</code> specified: When <code>formula</code>
+    is specified, the input <code>tbl_spark</code> is first transformed using a
+    <code>RFormula</code> transformer before being fit by
+    the estimator. The object returned in this case is a <code>ml_model</code> which is a
+    wrapper of a <code>ml_pipeline_model</code>. This signature does not apply to <code><a href='ml_lda.html'>ml_lda()</a></code>.</p></li>
+</ul>
 
-    <p>Bahmani et al., Scalable K-Means++, VLDB 2012</p>
     
     <h2 id="see-also">See also</h2>
 
-    <p>For information on how Spark k-means clustering is implemented, please see
-  <a href='http://spark.apache.org/docs/latest/mllib-clustering#k-means'>http://spark.apache.org/docs/latest/mllib-clustering#k-means</a>.</p>
-<p>Other Spark ML routines: <code><a href='ml_als_factorization'>ml_als_factorization</a></code>,
-  <code><a href='ml_decision_tree'>ml_decision_tree</a></code>,
-  <code><a href='ml_generalized_linear_regression'>ml_generalized_linear_regression</a></code>,
-  <code><a href='ml_gradient_boosted_trees'>ml_gradient_boosted_trees</a></code>,
-  <code><a href='ml_lda'>ml_lda</a></code>, <code><a href='ml_linear_regression'>ml_linear_regression</a></code>,
-  <code><a href='ml_logistic_regression'>ml_logistic_regression</a></code>,
-  <code><a href='ml_multilayer_perceptron'>ml_multilayer_perceptron</a></code>,
-  <code><a href='ml_naive_bayes'>ml_naive_bayes</a></code>,
-  <code><a href='ml_one_vs_rest'>ml_one_vs_rest</a></code>, <code><a href='ml_pca'>ml_pca</a></code>,
-  <code><a href='ml_random_forest'>ml_random_forest</a></code>,
-  <code><a href='ml_survival_regression'>ml_survival_regression</a></code></p>
+    <p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
+  more information on the set of clustering algorithms.</p>
+<p>Other ml clustering algorithms: <code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a></code>,
+  <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a></code>, <code><a href='ml_lda.html'>ml_lda</a></code></p>
     
 
-    
     </div>
-    
+
     </div>
 

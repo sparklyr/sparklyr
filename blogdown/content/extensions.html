@@ -96,15 +96,15 @@ count_lines(sc, &quot;hdfs://path/data.csv&quot;)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_connection.html"><code>spark_connection</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_connection.html"><code>spark_connection</code></a></td>
 <td>Connection between R and the Spark shell process</td>
 </tr>
 <tr class="even">
-<td><a href="reference/sparklyr/latest/spark_jobj.html"><code>spark_jobj</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_jobj.html"><code>spark_jobj</code></a></td>
 <td>Instance of a remote Spark object</td>
 </tr>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_dataframe.html"><code>spark_dataframe</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_dataframe.html"><code>spark_dataframe</code></a></td>
 <td>Instance of a remote Spark DataFrame object</td>
 </tr>
 </tbody>
@@ -123,15 +123,15 @@ count_lines(sc, &quot;hdfs://path/data.csv&quot;)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/invoke.html"><code>invoke</code></a></td>
+<td><a href="/reference/sparklyr/latest/invoke.html"><code>invoke</code></a></td>
 <td>Call a method on an object</td>
 </tr>
 <tr class="even">
-<td><a href="reference/sparklyr/latest/invoke.html"><code>invoke_new</code></a></td>
+<td><a href="/reference/sparklyr/latest/invoke.html"><code>invoke_new</code></a></td>
 <td>Create a new object by invoking a constructor</td>
 </tr>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/invoke.html"><code>invoke_static</code></a></td>
+<td><a href="/reference/sparklyr/latest/invoke.html"><code>invoke_static</code></a></td>
 <td>Call a static method on an object</td>
 </tr>
 </tbody>
@@ -173,27 +173,27 @@ billion &lt;- invoke(billionBigInteger, &quot;longValue&quot;)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_connection.html"><code>spark_connection</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_connection.html"><code>spark_connection</code></a></td>
 <td>Get the Spark connection associated with an object (S3)</td>
 </tr>
 <tr class="even">
-<td><a href="reference/sparklyr/latest/spark_jobj.html"><code>spark_jobj</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_jobj.html"><code>spark_jobj</code></a></td>
 <td>Get the Spark jobj associated with an object (S3)</td>
 </tr>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_dataframe.html"><code>spark_dataframe</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_dataframe.html"><code>spark_dataframe</code></a></td>
 <td>Get the Spark DataFrame associated with an object (S3)</td>
 </tr>
 <tr class="even">
-<td><a href="reference/sparklyr/latest/spark_context.html"><code>spark_context</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_context.html"><code>spark_context</code></a></td>
 <td>Get the SparkContext for a <code>spark_connection</code></td>
 </tr>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/hive_context.html"><code>hive_context</code></a></td>
+<td><a href="/reference/sparklyr/latest/hive_context.html"><code>hive_context</code></a></td>
 <td>Get the HiveContext for a <code>spark_connection</code></td>
 </tr>
 <tr class="even">
-<td><a href="reference/sparklyr/latest/spark_version.html"><code>spark_version</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_version.html"><code>spark_version</code></a></td>
 <td>Get the version of Spark (as a <code>numeric_version</code>) for a <code>spark_connection</code></td>
 </tr>
 </tbody>
@@ -237,7 +237,7 @@ billion &lt;- invoke(billionBigInteger, &quot;longValue&quot;)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_dependency"><code>spark_dependency</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_dependency"><code>spark_dependency</code></a></td>
 <td>Define a Spark dependency consisting of JAR files and Spark packages</td>
 </tr>
 </tbody>
@@ -291,7 +291,7 @@ sc &lt;- spark_connect(master = &quot;local&quot;)</code></pre>
 </div>
 <div id="data-types" class="section level2">
 <h2>Data Types</h2>
-<p>The <a href="http://spark.rstudio.com/reference/sparklyr/latest/ensure.html"><code>ensure_*</code></a> family of functions can be used to enforce specific data types that are passed to a Spark routine. For example, Spark routines that require an integer will not accept an R numeric element. Use these functions ensure certain parameters are scalar integers, or scalar doubles, and so on.</p>
+<p>The <a href="http://spark.rstudio.com//reference/sparklyr/latest/ensure.html"><code>ensure_*</code></a> family of functions can be used to enforce specific data types that are passed to a Spark routine. For example, Spark routines that require an integer will not accept an R numeric element. Use these functions ensure certain parameters are scalar integers, or scalar doubles, and so on.</p>
 <ul>
 <li>ensure_scalar_integer</li>
 <li>ensure_scalar_double</li>
@@ -393,5 +393,5 @@ sc &lt;- spark_connect(master = &quot;local&quot;)</code></pre>
 </div>
 <div id="compiling" class="section level2">
 <h2>Compiling</h2>
-<p>Most Spark extensions won’t need to define their own compilation specification, and can instead rely on the default behavior of <code>compile_package_jars</code>. For users who would like to take more control over where the scalac compilers should be looked up, use the <a href="http://spark.rstudio.com/reference/sparklyr/latest/spark_compilation_spec.html"><code>spark_compilation_spec</code></a> fucnction. The Spark compilation specification is used when compiling Spark extension Java Archives, and defines which versions of Spark, as well as which versions of Scala, should be used for compilation.</p>
+<p>Most Spark extensions won’t need to define their own compilation specification, and can instead rely on the default behavior of <code>compile_package_jars</code>. For users who would like to take more control over where the scalac compilers should be looked up, use the <a href="http://spark.rstudio.com//reference/sparklyr/latest/spark_compilation_spec.html"><code>spark_compilation_spec</code></a> fucnction. The Spark compilation specification is used when compiling Spark extension Java Archives, and defines which versions of Spark, as well as which versions of Scala, should be used for compilation.</p>
 </div>

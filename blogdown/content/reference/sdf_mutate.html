@@ -1,17 +1,17 @@
 ---
 title: "Mutate a Spark DataFrame"
-
+aliases:
+  - reference/sparklyr/latest/sdf_mutate.html
+  - reference/sdf_mutate.html
 ---
-    
+
     <div class="doc-page">
-    
+
     <div class="doc-page-index">
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
     
     <li><a href="#transforming-spark-dataframes">Transforming Spark DataFrames</a></li>
-
-    <li><a href="#see-also">See also</a></li>
     
     <li><a href="#examples">Examples</a></li>
     </ul>
@@ -20,7 +20,7 @@ title: "Mutate a Spark DataFrame"
     <div class="doc-page-body">
 
     
-    <p>Use Spark's <a href='http://spark.apache.org/docs/latest/ml-features'>feature transformers</a>
+    <p>Use Spark's <a href='http://spark.apache.org/docs/latest/ml-features.html'>feature transformers</a>
 to mutate a Spark DataFrame.</p>
     
 
@@ -30,12 +30,12 @@ to mutate a Spark DataFrame.</p>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
-    
+
     <colgroup>
       <col class="name" />
       <col class="desc" />
-    </colgroup>  
-      
+    </colgroup>
+
     <tr>
       <td>.data</td>
       <td><p>A <code>spark_tbl</code>.</p></td>
@@ -64,22 +64,6 @@ that even though the pending set of operations (currently) are not exposed at
 the <span style="R">R</span> level, these operations will only be executed when you explicitly
 <code>collect()</code> the table.</p>
     
-    <h2 id="see-also">See also</h2>
-
-    <p>Other feature transformation routines: <code><a href='ft_binarizer'>ft_binarizer</a></code>,
-  <code><a href='ft_bucketizer'>ft_bucketizer</a></code>,
-  <code><a href='ft_count_vectorizer'>ft_count_vectorizer</a></code>,
-  <code><a href='ft_discrete_cosine_transform'>ft_discrete_cosine_transform</a></code>,
-  <code><a href='ft_elementwise_product'>ft_elementwise_product</a></code>,
-  <code><a href='ft_index_to_string'>ft_index_to_string</a></code>,
-  <code><a href='ft_one_hot_encoder'>ft_one_hot_encoder</a></code>,
-  <code><a href='ft_quantile_discretizer'>ft_quantile_discretizer</a></code>,
-  <code><a href='ft_regex_tokenizer'>ft_regex_tokenizer</a></code>,
-  <code><a href='ft_stop_words_remover'>ft_stop_words_remover</a></code>,
-  <code><a href='ft_string_indexer'>ft_string_indexer</a></code>,
-  <code><a href='ft_tokenizer'>ft_tokenizer</a></code>,
-  <code><a href='ft_vector_assembler'>ft_vector_assembler</a></code></p>
-    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># NOT RUN {</span>
@@ -88,17 +72,16 @@ the <span style="R">R</span> level, these operations will only be executed when 
 <span class='no'>beaver_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>copy_to</span>(<span class='no'>sc</span>, <span class='no'>beaver1</span>, <span class='st'>"beaver"</span>)
 <span class='no'>beaver_tbl</span> <span class='kw'>%&gt;%</span>
   <span class='fu'>mutate</span>(<span class='kw'>squared</span> <span class='kw'>=</span> <span class='no'>temp</span> ^ <span class='fl'>2</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'>sdf_mutate</span>(<span class='kw'>warm</span> <span class='kw'>=</span> <span class='fu'><a href='ft_binarizer'>ft_binarizer</a></span>(<span class='no'>squared</span>, <span class='fl'>1000</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='sdf_register'>sdf_register</a></span>(<span class='st'>"mutated"</span>)
+  <span class='fu'>sdf_mutate</span>(<span class='kw'>warm</span> <span class='kw'>=</span> <span class='fu'><a href='ft_binarizer.html'>ft_binarizer</a></span>(<span class='no'>squared</span>, <span class='fl'>1000</span>)) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='sdf_register.html'>sdf_register</a></span>(<span class='st'>"mutated"</span>)
 
 <span class='co'># view our newly constructed tbl</span>
 <span class='fu'>head</span>(<span class='no'>beaver_tbl</span>)
 
 <span class='co'># note that we have two separate tbls registered</span>
-<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_tbls'>src_tbls</a></span>(<span class='no'>sc</span>)
+<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_tbls.html'>src_tbls</a></span>(<span class='no'>sc</span>)
 <span class='co'># }</span></code></pre></div>
-    
     </div>
-    
+
     </div>
 

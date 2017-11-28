@@ -23,7 +23,7 @@ aliases:
 <p>In contrast, our focus is on the process that happens before that: the discipline that produces the model, meaning <strong>Data Science</strong>.</p>
 <center>
 <p>
-<img src="images/deployment/data-lakes/slide-1.png" align='center'/>
+<img src="/images/deployment/data-lakes/slide-1.png" align='center'/>
 </p>
 </center>
 <p>In their <a href="http://r4ds.had.co.nz/">R for Data Science</a> book, Hadley Wickham and Garrett Grolemund provide a great diagram that nicely illustrates the Data Science process: We <strong>import</strong> data into memory with R and clean and <strong>tidy</strong> the data. Then we go into a cyclical process called <strong>understand</strong>, which helps us to get to know our data, and hopefully find the answer to the question we started with. This cycle typically involves making <strong>transformations</strong> to our tidied data, using the transformed data to fit <strong>models</strong>, and <strong>visualizing</strong> results. Once we find an answer to our question, we then <strong>communicate</strong> the results.</p>
@@ -34,7 +34,7 @@ aliases:
 <p>What happens when the data that needs to be analyzed is very large, like the data sets found in a Hadoop cluster? It would be impossible to fit these in memory, so workarounds are normally used. Possible workarounds include using a comparatively minuscule data sample, or download as much data as possible. This becomes disruptive to Data Scientists because either the small sample may not be representative, or they have to wait a long time in every iteration of importing a lot of data, exploring a lot of data, and modeling a lot of data.</p>
 <center>
 <p>
-<img src="images/deployment/data-lakes/slide-2.png" align='center'/>
+<img src="/images/deployment/data-lakes/slide-2.png" align='center'/>
 </p>
 </center>
 </div>
@@ -44,7 +44,7 @@ aliases:
 <p>The approach, then, is to <strong>push as much compute</strong> to the cluster as possible, using R primarily as an interface to Spark for the Data Scientist, which will then <strong>collect as few results</strong> as possible back into R memory, mostly to <strong>visualize</strong> and <strong>communicate</strong>. As shown in the slide, the more <strong>import</strong>, <strong>tidy</strong>, <strong>transform</strong> and <strong>modeling</strong> work we can push to Spark, the faster we can analyze very large data sets.</p>
 <center>
 <p>
-<img src="images/deployment/data-lakes/slide-3.png" align='center'/>
+<img src="/images/deployment/data-lakes/slide-3.png" align='center'/>
 </p>
 </center>
 </div>
@@ -57,7 +57,7 @@ aliases:
 </ul>
 <center>
 <p>
-<img src="images/deployment/data-lakes/slide-4.png" align='center'/>
+<img src="/images/deployment/data-lakes/slide-4.png" align='center'/>
 </p>
 </center>
 </div>
@@ -75,7 +75,7 @@ aliases:
 <p>With sparklyr, the Data Scientist will be able to access the Data Lake’s data, and also gain an additional, very powerful <strong>understand</strong> layer via Spark. sparklyr, along with the <a href="https://www.rstudio.com/products/rstudio/">RStudio IDE</a> and the <a href="http://tidyverse.org/">tidyverse</a> packages, provides the Data Scientist with an excellent toolbox to analyze data, big and small.</p>
 <center>
 <p>
-<img src="images/deployment/data-lakes/slide-5.png" align='center'/>
+<img src="/images/deployment/data-lakes/slide-5.png" align='center'/>
 </p>
 </center>
 </div>

@@ -1,10 +1,12 @@
 ---
 title: "Define a Spark Compilation Specification"
-
+aliases:
+  - reference/sparklyr/latest/spark_compilation_spec.html
+  - reference/spark_compilation_spec.html
 ---
-    
+
     <div class="doc-page">
-    
+
     <div class="doc-page-index">
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
@@ -16,7 +18,7 @@ title: "Define a Spark Compilation Specification"
     <div class="doc-page-body">
 
     
-    <p>For use with <code><a href='compile_package_jars'>compile_package_jars</a></code>. The Spark compilation
+    <p>For use with <code><a href='compile_package_jars.html'>compile_package_jars</a></code>. The Spark compilation
 specification is used when compiling Spark extension Java Archives, and
 defines which versions of Spark, as well as which versions of Scala, should
 be used for compilation.</p>
@@ -28,12 +30,12 @@ be used for compilation.</p>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
-    
+
     <colgroup>
       <col class="name" />
       <col class="desc" />
-    </colgroup>  
-      
+    </colgroup>
+
     <tr>
       <td>spark_version</td>
       <td><p>The Spark version to build against. This can
@@ -44,7 +46,7 @@ be left unset if the path to a suitable Spark home is supplied.</p></td>
       <td><p>The path to a Spark home installation. This can
 be left unset if <code>spark_version</code> is supplied; in such a case,
 <code>sparklyr</code> will attempt to discover the associated Spark
-installation using <code><a href='spark_home_dir'>spark_home_dir</a></code>.</p></td>
+installation using <code><a href='spark_home_dir.html'>spark_home_dir</a></code>.</p></td>
     </tr>
     <tr>
       <td>scalac_path</td>
@@ -81,8 +83,7 @@ during compilation of your Spark extension.</p></td>
 and can instead rely on the default behavior of <code>compile_package_jars</code>.</p>
     
 
-    
     </div>
-    
+
     </div>
 

@@ -1,10 +1,12 @@
 ---
 title: "Pivot a Spark DataFrame"
-
+aliases:
+  - reference/sparklyr/latest/sdf_pivot.html
+  - reference/sdf_pivot.html
 ---
-    
+
     <div class="doc-page">
-    
+
     <div class="doc-page-index">
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
@@ -22,16 +24,15 @@ that from <code><a href='http://www.rdocumentation.org/packages/reshape2/topics/
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
-    
+
     <colgroup>
       <col class="name" />
       <col class="desc" />
-    </colgroup>  
-      
+    </colgroup>
+
     <tr>
       <td>x</td>
-      <td><p>An object coercable to a Spark DataFrame (typically, a
-<code>tbl_spark</code>).</p></td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
     </tr>
     <tr>
       <td>formula</td>
@@ -50,8 +51,7 @@ or an <span style="R">R</span> function that is invoked on the grouped dataset.<
     </table>
     
 
-    
     </div>
-    
+
     </div>
 

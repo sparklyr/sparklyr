@@ -23,19 +23,19 @@ This demonstration is focused on adding RStudio integration to an existing Cloud
 
 We will start with a Cloudera cluster CDH version 5.8.2 (free version) with an underlaying Ubuntu Linux distribution.
 
-<img src="images/deployment/cdh/manager-landing-page.png" width=`r params$width`/>
+<img src="/images/deployment/cdh/manager-landing-page.png" width=`r params$width`/>
 
 ##Spark 1.6
 
 The default Spark 1.6.0 parcel is in installed and running
 
-<img src="images/deployment/cdh/spark-history-server-1.png" width=`r params$width`/>
+<img src="/images/deployment/cdh/spark-history-server-1.png" width=`r params$width`/>
 
 ## Hive data
 
 For this demo, we have created and populated 3 tables in Hive.  The table names are: flights, airlines and airports. Using Hue, we can see the loaded tables. For the links to the data files and their Hive import scripts please see *Appendix A*.
 
-<img src="images/deployment/cdh/hue-metastore-1.png" width=`r params$width`/>
+<img src="/images/deployment/cdh/hue-metastore-1.png" width=`r params$width`/>
 
 
 # Install RStudio
@@ -80,7 +80,7 @@ sudo usermod -a -G supergroup rstudio
 
 Log in to RStudio Server by pointing a browser at your master node IP:8787.
 
-<p><img src="images/deployment/cdh/sign-in-1.png" width=`r params$width`/></p>
+<p><img src="/images/deployment/cdh/sign-in-1.png" width=`r params$width`/></p>
 
 Set the environment variable `SPARK_HOME` and then run `spark_connect`. After connecting you will be able to browse the Hive metadata in the RStudio Server Spark pane.
 
@@ -95,21 +95,21 @@ sc <- spark_connect(master = "yarn-client", version="1.6.0", spark_home = '/opt/
 
 Once you are connected, you will see the Spark pane appear along with your hive tables.
 
-<p><img src="images/deployment/cdh/spark-pane-1.png" width=`r params$width`/></p>
+<p><img src="/images/deployment/cdh/spark-pane-1.png" width=`r params$width`/></p>
 
 You can inspect your tables by clicking on the data icon.
 
-<p><img src="images/deployment/cdh/tables-1.png" width=`r params$width`/></p>
+<p><img src="/images/deployment/cdh/tables-1.png" width=`r params$width`/></p>
 
 This is what the tables look like loaded in Spark via the History Server Web UI (port 18088)
 
-<p><img src="images/deployment/cdh/spark-rdd-1.png" width=`r params$width`/></p>
+<p><img src="/images/deployment/cdh/spark-rdd-1.png" width=`r params$width`/></p>
 
 # Data analysis
 
 Is there evidence to suggest that some airline carriers make up time in flight? This analysis predicts time gained in flight by airline carrier.
 
-<p><img src="images/deployment/cdh/data-analysis-1.png" width=`r params$width`/></p>
+<p><img src="/images/deployment/cdh/data-analysis-1.png" width=`r params$width`/></p>
 
 ## Cache the tables into memory
 
@@ -255,7 +255,7 @@ deciles %>%
   labs(title = 'Average gain by predicted decile', x = 'Decile', y = 'Minutes')
 ```
 
-<p><img src="images/deployment/cdh/performance-1.png" width=`r params$width`/></p>
+<p><img src="/images/deployment/cdh/performance-1.png" width=`r params$width`/></p>
 
 ## Visualize predictions
 
@@ -287,7 +287,7 @@ ggplot(carrier, aes(gain, prediction)) +
   labs(title='Average Gains Forecast', x = 'Actual', y = 'Predicted')
 ```
 
-<p><img src="images/deployment/cdh/forecast-1.png" width=`r params$width`/></p>
+<p><img src="/images/deployment/cdh/forecast-1.png" width=`r params$width`/></p>
 
 Some carriers make up more time than others in flight, but the differences are relatively small. The average time gains between the best and worst airlines is only six minutes. The best predictor of time gained is not carrier but flight distance. The biggest gains were associated with the longest flights.
 
@@ -324,7 +324,7 @@ save(pred_data, airports, ml1_summary, file = 'flights_pred_2008.RData')
 
 Use the saved data to build an R Markdown [flexdashboard](http://rmarkdown.rstudio.com/flexdashboard/index.html). Publish the flexdashboard 
 
-<img src="images/deployment/cdh/flex-1.png" width=`r params$width`/>
+<img src="/images/deployment/cdh/flex-1.png" width=`r params$width`/>
 
 
 #Appendix

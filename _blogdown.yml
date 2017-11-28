@@ -2,7 +2,7 @@ path:
   - source: ""
     target: "blogdown"
 template:
-  path: "templates"
+  path: "/blogdown/themes/rstudio-docs-theme/pkgdown/templates"
 site:
   - source: "README.md"
     target: "content/_index.md"
@@ -67,6 +67,10 @@ cleanup:
     type: "html"
     find: "    parent: \"sparklyr-top\""
     replace: ""
+  - target: "content"
+    type: "Rmd"
+    find: 'reference/sparklyr'
+    replace: '/reference/sparklyr'
 cleanup-reference:
   - type: "html"
     find: ".html"
@@ -170,12 +174,7 @@ reference:
     contents:
       - ml_binary_classification_eval
       - ml_classification_eval
-      - ml_model
       - ml_tree_feature_importance
-      - ml_options
-      - ml_prepare_dataframe
-      - ml_prepare_response_features_intercept
-      - ml_saveload
   - title: "Extensions"
     contents:
       - compile_package_jars

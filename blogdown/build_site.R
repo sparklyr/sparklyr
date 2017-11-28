@@ -9,6 +9,7 @@ rebuild_site <- function(overwrite = FALSE){
   process_content(overwrite = overwrite)
   process_reference(overwrite = overwrite)
   reset_public()
+
   blogdown::build_site(local = TRUE)
 
 }
@@ -117,9 +118,17 @@ process_content <- function(overwrite = FALSE, target = NULL){
       overwrite = overwrite
     ))
 
+  if(overwrite){
+    site$site %>%
+      walk(~unlink(
+        paste0(strsplit(target_path(.x[[2]]), split = "\\.")[[1]][1], ".html"),
+        force = TRUE
+      ))
+  }
+
   site$cleanup %>%
     map(~replace_text_folder(
-      path = .x[[1]],
+      path = file.path(target_path(), .x[[1]]),
       type = .x[[2]],
       find = .x[[3]],
       replace = .x[[4]]))
@@ -135,10 +144,11 @@ process_reference <- function(overwrite = FALSE){
     rprojroot::find_rstudio_root_file(),
     reference$template$path
   )
+
+  if(file.exists(source_path("_pkgdown.yml")))unlink(source_path("_pkgdown.yml"))
   reference <- as.character(yaml::as.yaml(reference))
   writeLines(reference, "_pkgdown.yml")
 
-  if(file.exists(source_path("_pkgdown.yml")))unlink(source_path("_pkgdown.yml"))
 
   if(overwrite)unlink(file.path(source_path("docs/reference"), "*.*"), recursive = TRUE)
 
@@ -147,12 +157,12 @@ process_reference <- function(overwrite = FALSE){
   copy_content(
     source_path("docs/reference"),
     target_path("content/reference"),
-    overwrite = FALSE
+    overwrite = TRUE
   )
 
   # cleanup-reference makes changes to the content of the Reference pages only
-  site_setup()$`cleanup-reference` %>%
-    walk(~replace_text_folder(target_path("content/reference"), .x[[1]], .x[[2]], .x[[3]]))
+  # site_setup()$`cleanup-reference` %>%
+  #   walk(~replace_text_folder(target_path("content/reference"), .x[[1]], .x[[2]], .x[[3]]))
 
 }
 

@@ -1,10 +1,12 @@
 ---
 title: "Separate a Vector Column into Scalar Columns"
-
+aliases:
+  - reference/sparklyr/latest/sdf_separate_column.html
+  - reference/sdf_separate_column.html
 ---
-    
+
     <div class="doc-page">
-    
+
     <div class="doc-page-index">
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
@@ -23,16 +25,15 @@ the different elements in the column <code>column</code>.</p>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
-    
+
     <colgroup>
       <col class="name" />
       <col class="desc" />
-    </colgroup>  
-      
+    </colgroup>
+
     <tr>
       <td>x</td>
-      <td><p>An object coercable to a Spark DataFrame (typically, a
-<code>tbl_spark</code>).</p></td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
     </tr>
     <tr>
       <td>column</td>
@@ -49,8 +50,7 @@ vector element should be extracted.</p></td>
     </table>
     
 
-    
     </div>
-    
+
     </div>
 

@@ -36,15 +36,15 @@ aliases:
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_read_csv.html"><code>spark_read_csv</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_read_csv.html"><code>spark_read_csv</code></a></td>
 <td>Reads a CSV file and provides a data source compatible with dplyr</td>
 </tr>
 <tr class="even">
-<td><a href="reference/sparklyr/latest/spark_read_json.html"><code>spark_read_json</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_read_json.html"><code>spark_read_json</code></a></td>
 <td>Reads a JSON file and provides a data source compatible with dplyr</td>
 </tr>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_read_json.html"><code>spark_read_parquet</code></a></td>
+<td><a href="/reference/sparklyr/latest/spark_read_json.html"><code>spark_read_parquet</code></a></td>
 <td>Reads a parquet file and provides a data source compatible with dplyr</td>
 </tr>
 </tbody>
@@ -285,7 +285,7 @@ dbplyr::sql_render(bestworst)
 ## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`
 ## FROM (SELECT `year`, `month`, `day`, `dep_delay`, min(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz5`, max(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz6`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `hgpnrplbmd`) `xmxtutmkid`
+## FROM `flights`) `actzrbkrii`) `fnlmsumdwp`
 ## WHERE (`dep_delay` = `zzz5` OR `dep_delay` = `zzz6`)
 bestworst
 ## # Source:   lazy query [?? x 4]
@@ -312,7 +312,7 @@ ranked &lt;- flights %&gt;%
 dbplyr::sql_render(ranked)</code></pre>
 <pre><code>## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`, rank() OVER (PARTITION BY `year`, `month`, `day` ORDER BY `dep_delay` DESC) AS `rank`
 ## FROM (SELECT `year` AS `year`, `month` AS `month`, `day` AS `day`, `dep_delay` AS `dep_delay`
-## FROM `flights`) `bhmotnqley`</code></pre>
+## FROM `flights`) `eqjruihalu`</code></pre>
 <pre class="r"><code>ranked</code></pre>
 <pre><code>## # Source:   lazy query [?? x 5]
 ## # Database: spark_connection
@@ -427,16 +427,16 @@ dbplyr::sql_render(ranked)</code></pre>
 ## # Database: spark_connection
 ##     year month   day dep_time sched_dep_time dep_delay arr_time
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
-##  1  2013     1     1      711            715        -4     1151
-##  2  2013     1     1      752            759        -7      955
-##  3  2013     1     1      857            900        -3     1124
-##  4  2013     1     1      936            945        -9     1257
-##  5  2013     1     1     1109           1115        -6     1402
-##  6  2013     1     1     1245           1249        -4     1722
-##  7  2013     1     1     1400           1400         0     1634
-##  8  2013     1     1     1657           1650         7     1921
-##  9  2013     1     1     1859           1900        -1     2012
-## 10  2013     1     2      558            600        -2      838
+##  1  2013     1     1      732            735        -3      857
+##  2  2013     1     1      832            840        -8     1006
+##  3  2013     1     1      856            855         1     1140
+##  4  2013     1     1     1453           1500        -7     1601
+##  5  2013     1     1     1809           1810        -1     2117
+##  6  2013     1     1     1811           1759        12     2132
+##  7  2013     1     1     1832           1828         4     2144
+##  8  2013     1     1     1909           1912        -3     2239
+##  9  2013     1     1     1957           2000        -3     2321
+## 10  2013     1     1     2050           1959        51     2229
 ## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
 ## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
 ## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
@@ -444,11 +444,11 @@ dbplyr::sql_render(ranked)</code></pre>
 </div>
 <div id="writing-data" class="section level2">
 <h2>Writing Data</h2>
-<p>It is often useful to save the results of your analysis or the tables that you have generated on your Spark cluster into persistent storage. The best option in many scenarios is to write the table out to a <a href="https://parquet.apache.org/">Parquet</a> file using the <a href="reference/sparklyr/spark_write_parquet.html">spark_write_parquet</a> function. For example:</p>
+<p>It is often useful to save the results of your analysis or the tables that you have generated on your Spark cluster into persistent storage. The best option in many scenarios is to write the table out to a <a href="https://parquet.apache.org/">Parquet</a> file using the <a href="/reference/sparklyr/spark_write_parquet.html">spark_write_parquet</a> function. For example:</p>
 <pre class="r"><code>spark_write_parquet(tbl, &quot;hdfs://hdfs.company.org:9000/hdfs-path/data&quot;)</code></pre>
-<p>This will write the Spark DataFrame referenced by the tbl R variable to the given HDFS path. You can use the <a href="reference/sparklyr/spark_read_parquet.html">spark_read_parquet</a> function to read the same table back into a subsequent Spark session:</p>
+<p>This will write the Spark DataFrame referenced by the tbl R variable to the given HDFS path. You can use the <a href="/reference/sparklyr/spark_read_parquet.html">spark_read_parquet</a> function to read the same table back into a subsequent Spark session:</p>
 <pre class="r"><code>tbl &lt;- spark_read_parquet(sc, &quot;data&quot;, &quot;hdfs://hdfs.company.org:9000/hdfs-path/data&quot;)</code></pre>
-<p>You can also write data as CSV or JSON using the <a href="reference/sparklyr/spark_write_csv.html">spark_write_csv</a> and <a href="reference/sparklyr/spark_write_json.html">spark_write_json</a> functions.</p>
+<p>You can also write data as CSV or JSON using the <a href="/reference/sparklyr/spark_write_csv.html">spark_write_csv</a> and <a href="/reference/sparklyr/spark_write_json.html">spark_write_json</a> functions.</p>
 </div>
 <div id="hive-functions" class="section level2">
 <h2>Hive Functions</h2>
@@ -466,15 +466,15 @@ dbplyr::sql_render(ranked)</code></pre>
 ## # Ordered by: -days_since
 ##    flight_date days_since     n
 ##          &lt;chr&gt;      &lt;int&gt; &lt;dbl&gt;
-##  1    2013-1-1       1777   842
-##  2    2013-1-2       1776   943
-##  3    2013-1-3       1775   914
-##  4    2013-1-4       1774   915
-##  5    2013-1-5       1773   720
-##  6    2013-1-6       1772   832
-##  7    2013-1-7       1771   933
-##  8    2013-1-8       1770   899
-##  9    2013-1-9       1769   902
-## 10   2013-1-10       1768   932
+##  1    2013-1-1       1792   842
+##  2    2013-1-2       1791   943
+##  3    2013-1-3       1790   914
+##  4    2013-1-4       1789   915
+##  5    2013-1-5       1788   720
+##  6    2013-1-6       1787   832
+##  7    2013-1-7       1786   933
+##  8    2013-1-8       1785   899
+##  9    2013-1-9       1784   902
+## 10   2013-1-10       1783   932
 ## # ... with more rows</code></pre>
 </div>

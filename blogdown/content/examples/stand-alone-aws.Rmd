@@ -14,7 +14,7 @@ What makes a server the Master node is only the fact that it is running the **ma
 
 The topology will look something like this:
 
-<p><img src="images/deployment/amazon-ec2/spark-sa-setup.png" width='600px' align='center'/></p>
+<p><img src="/images/deployment/amazon-ec2/spark-sa-setup.png" width='600px' align='center'/></p>
 
 
 
@@ -134,7 +134,7 @@ install.packages("sparklyr")
 
 ### Connect to the Spark Master
 
-- Navigate to the Spark Master's UI, typically on port 8080 <img src="images/deployment/amazon-ec2/spark-master.png" class="screenshot" width=639 />
+- Navigate to the Spark Master's UI, typically on port 8080 <img src="/images/deployment/amazon-ec2/spark-master.png" class="screenshot" width=639 />
 
 - Note the **Spark Master URL**
 

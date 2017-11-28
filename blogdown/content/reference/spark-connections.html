@@ -1,10 +1,12 @@
 ---
 title: "Manage Spark Connections"
-
+aliases:
+  - reference/sparklyr/latest/spark-connections.html
+  - reference/spark-connections.html
 ---
-    
+
     <div class="doc-page">
-    
+
     <div class="doc-page-index">
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
@@ -21,7 +23,7 @@ title: "Manage Spark Connections"
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_connect</span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='fu'>Sys.getenv</span>(<span class='st'>"SPARK_HOME"</span>),
   <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"shell"</span>, <span class='st'>"livy"</span>, <span class='st'>"databricks"</span>, <span class='st'>"test"</span>), <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>,
-  <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hadoop_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config'>spark_config</a></span>(),
+  <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hadoop_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
   <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/sparklyr/topics/register_extension'>registered_extensions</a></span>(), <span class='no'>...</span>)
 
 <span class='fu'>spark_connection_is_open</span>(<span class='no'>sc</span>)
@@ -32,17 +34,17 @@ title: "Manage Spark Connections"
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
-    
+
     <colgroup>
       <col class="name" />
       <col class="desc" />
-    </colgroup>  
-      
+    </colgroup>
+
     <tr>
       <td>master</td>
       <td><p>Spark cluster url to connect to. Use <code>"local"</code> to
 connect to a local instance of Spark installed via
-<code><a href='spark_install'>spark_install</a></code>.</p></td>
+<code><a href='spark_install.html'>spark_install</a></code>.</p></td>
     </tr>
     <tr>
       <td>spark_home</td>
@@ -75,13 +77,13 @@ cluster.</p></td>
     <tr>
       <td>config</td>
       <td><p>Custom configuration for the generated Spark connection. See
-<code><a href='spark_config'>spark_config</a></code> for details.</p></td>
+<code><a href='spark_config.html'>spark_config</a></code> for details.</p></td>
     </tr>
     <tr>
       <td>extensions</td>
       <td><p>Extension packages to enable for this connection. By
 default, all packages enabled through the use of
-<code><a href='register_extension'>sparklyr::register_extension</a></code> will be passed here.</p></td>
+<code><a href='register_extension.html'>sparklyr::register_extension</a></code> will be passed here.</p></td>
     </tr>
     <tr>
       <td>...</td>
@@ -97,10 +99,9 @@ default, all packages enabled through the use of
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
 <span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'>spark_connect</span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"spark://HOST:PORT"</span>)
-<span class='fu'><a href='connection_is_open'>connection_is_open</a></span>(<span class='no'>sc</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='fu'><a href='connection_is_open.html'>connection_is_open</a></span>(<span class='no'>sc</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='fu'>spark_disconnect</span>(<span class='no'>sc</span>)</div></code></pre></div>
-    
     </div>
-    
+
     </div>
 

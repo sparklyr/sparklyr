@@ -70,13 +70,13 @@ spark_read_csv(sc, "flights_spark_2008", "2008.csv.bz2", memory = FALSE)
 In the RStudio IDE, the **flights_spark_2008** table now shows up in the Spark tab. 
 
 <center><a href="images/deployment/performance/latest-tab1.png">
-  <img src="images/deployment/performance/latest-tab1.png" , width="400px"/>
+  <img src="/images/deployment/performance/latest-tab1.png" , width="400px"/>
 </a></center>
 
 To access the Spark Web UI, click the **SparkUI** button in the **RStudio Spark Tab**. As expected, the **Storage** page shows no tables loaded into memory.
 
 <center><a href="images/deployment/performance/storage-1.png">
-  <img src="images/deployment/performance/storage-1.png" , width="1000px"/>
+  <img src="/images/deployment/performance/storage-1.png" , width="1000px"/>
 </a></center>
 
 
@@ -109,7 +109,7 @@ sdf_register(flights_table, "flights_spark")
 ```
 
 <center><a href="images/deployment/performance/spark-tab-3.png">
-  <img src="images/deployment/performance/spark-tab-3.png", width="400px"/>
+  <img src="/images/deployment/performance/spark-tab-3.png", width="400px"/>
 </a></center>
 
 ### Cache into Memory
@@ -121,7 +121,7 @@ tbl_cache(sc, "flights_spark")
 ```
 
 <center><a href="images/deployment/performance/storage-new-3.png">
-  <img src="images/deployment/performance/storage-new-3.png", width="1000px"/>
+  <img src="/images/deployment/performance/storage-new-3.png", width="1000px"/>
 </a></center>
 
 ### Driver Memory
@@ -129,7 +129,7 @@ tbl_cache(sc, "flights_spark")
 In the **Executors** page of the Spark Web UI, we can see that the Storage Memory is at about half of the 16 gigabytes requested.  This is mainly because of a Spark setting called **spark.memory.fraction**, which reserves by default 40% of the memory requested.
 
 <center><a href="images/deployment/performance/drivers-1.png">
-  <img src="images/deployment/performance/drivers-1.png", width="1000px"/>
+  <img src="/images/deployment/performance/drivers-1.png", width="1000px"/>
 </a></center>
 
 ## Process on the fly
@@ -162,7 +162,7 @@ all_flights <- all_flights %>%
 ```
 
 <center><a href="images/deployment/performance/all-flights.png">
-  <img src="images/deployment/performance/all-flights.png", width="400px"/>
+  <img src="/images/deployment/performance/all-flights.png", width="400px"/>
 </a></center>
 
 ### Plot in R
@@ -180,5 +180,5 @@ ggplot(data = all_flights, aes(x = Month, y = n/1000, fill = factor(Year))) +
 ```
 
 <center><a href="images/deployment/performance/new-plot.png">
-  <img src="images/deployment/performance/new-plot.png", width="600"/>
+  <img src="/images/deployment/performance/new-plot.png", width="600"/>
 </a></center>

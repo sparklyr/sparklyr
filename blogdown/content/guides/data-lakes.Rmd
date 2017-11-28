@@ -26,7 +26,7 @@ It is very important to preface the Use Case review with some background informa
 
 In contrast, our focus is on the process that happens before that: the discipline that produces the model, meaning **Data Science**.
 
-<center><p><img src="images/deployment/data-lakes/slide-1.png" align='center'/></p></center>
+<center><p><img src="/images/deployment/data-lakes/slide-1.png" align='center'/></p></center>
 
 
 In their [R for Data Science](http://r4ds.had.co.nz/) book, Hadley Wickham and Garrett Grolemund provide a great diagram that nicely illustrates the Data Science process: We **import** data into memory with R and clean and **tidy** the data.  Then we go into a cyclical process called **understand**, which helps us to get to know our data, and hopefully find the answer to the question we started with.  This cycle typically involves making **transformations** to our tidied data, using the transformed data to fit **models**, and **visualizing** results. Once we find an answer to our question, we then **communicate** the results.
@@ -38,7 +38,7 @@ Data Scientists like using R because it allows them to complete a Data Science p
 
 What happens when the data that needs to be analyzed is very large, like the data sets found in a Hadoop cluster?  It would be impossible to fit these in memory, so workarounds are normally used.  Possible workarounds include using a comparatively minuscule data sample, or download as much data as possible.  This becomes disruptive to Data Scientists because either the small sample may not be representative, or they have to wait a long time in every iteration of importing a lot of data, exploring a lot of data, and modeling a lot of data.  
 
-<center><p><img src="images/deployment/data-lakes/slide-2.png" align='center'/></p></center>
+<center><p><img src="/images/deployment/data-lakes/slide-2.png" align='center'/></p></center>
 
 ## Spark as an Analysis Engine
 
@@ -46,7 +46,7 @@ We noticed that a very important mental leap to make is to see Spark not just as
 
 The approach, then, is to **push as much compute** to the cluster as possible, using R primarily as an interface to Spark for the Data Scientist, which will then **collect as few results** as possible back into R memory, mostly to **visualize** and **communicate**.  As shown in the slide, the more **import**, **tidy**, **transform** and **modeling** work we can push to Spark, the faster we can analyze very large data sets.
 
-<center><p><img src="images/deployment/data-lakes/slide-3.png" align='center'/></p></center>
+<center><p><img src="/images/deployment/data-lakes/slide-3.png" align='center'/></p></center>
 
 ## Cluster Setup
 
@@ -55,7 +55,7 @@ Here is an illustration of how R, RStudio, and sparklyr can be added to the YARN
 - R, RStudio, and sparklyr need to be installed on one node only, typically an edge node
 - The Data Scientist can access R, Spark, and the cluster via a web browser by navigating to the RStudio IDE inside the edge node
 
-<center><p><img src="images/deployment/data-lakes/slide-4.png" align='center'/></p></center>
+<center><p><img src="/images/deployment/data-lakes/slide-4.png" align='center'/></p></center>
 
 ## Considerations 
 
@@ -71,4 +71,4 @@ There are some important considerations to keep in mind when combining your Data
 
 With sparklyr, the Data Scientist will be able to access the Data Lake's data, and also gain an additional, very powerful **understand** layer via Spark.  sparklyr, along with the [RStudio IDE](https://www.rstudio.com/products/rstudio/) and the [tidyverse](http://tidyverse.org/) packages, provides the Data Scientist with an excellent toolbox to analyze data, big and small.
 
-<center><p><img src="images/deployment/data-lakes/slide-5.png" align='center'/></p></center>
+<center><p><img src="/images/deployment/data-lakes/slide-5.png" align='center'/></p></center>
