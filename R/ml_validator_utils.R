@@ -80,6 +80,9 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
       # otherwise, if both 'response' and 'features' are specified, treat them as
       #   variable names, and construct formula string
       paste0(args$response, " ~ ", paste(args$features, collapse = " + "))
+  } else if (is.null(args$formula) && is.null(args$response) && !is.null(args$features)) {
+    # if only 'features' is specified, e.g. in clustering algorithms
+    paste0("~ ", paste(args$features, collapse = " + "))
   } else if (!is.null(args$formula)) {
     # now if 'formula' is specified, check to see that 'response' and 'features' are not
     if (!is.null(args$response) || !is.null(args$features))
