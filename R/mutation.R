@@ -137,7 +137,7 @@ sdf_bind_rows <- function(..., id = NULL) {
     if (!all(rlang::have_name(dots)))
       names(dots) <- as.character(seq_along(dots))
     augmented_dots <- Map(
-      function(x, label) dplyr::mutate(x, !!! sym(id) := label),
+      function(x, label) dplyr::mutate(x, !!sym(id) := label),
       augmented_dots,
       names(dots)
     )
@@ -182,7 +182,7 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 
     Reduce(function(x, y) dplyr::inner_join(x, y, by = id),
            dots_with_ids) %>%
-    select(- !!! rlang::sym(id))
+    select(- !!rlang::sym(id))
 }
 
 #' @rdname sdf_bind

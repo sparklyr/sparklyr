@@ -363,7 +363,7 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
 sdf_last_index <- function(x, id = "id") {
 
   sdf <- x %>%
-    dplyr::transmute(!!! sym(id) := as.numeric(!!! sym(id))) %>%
+    dplyr::transmute(!!sym(id) := as.numeric(!!sym(id))) %>%
     spark_dataframe()
   sc <- spark_connection(sdf)
   ensure_scalar_character(id)

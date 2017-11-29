@@ -39,7 +39,7 @@ Imports:
     openssl (>= 0.8),
     rappdirs,
     readr (>= 1.1.0),
-    rlang (>= 0.1.2.9000),
+    rlang (>= 0.1.4),
     rprojroot,
     rstudioapi,
     shiny (>= 1.0.1),
@@ -51,5 +51,3 @@ Suggests:
     nycflights13,
     testthat,
     RCurl
-Remotes:
-    tidyverse/rlang
