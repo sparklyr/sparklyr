@@ -68,7 +68,7 @@ cleanup:
   find: '    parent: "sparklyr-top"'
   replace: ''
 - target: content
-  type: html
+  type: Rmd
   find: reference/sparklyr
   replace: /reference/sparklyr
 cleanup-reference:
