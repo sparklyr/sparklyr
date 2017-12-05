@@ -66,7 +66,7 @@ Three classes are defined for representing the fundamental types of the R to Jav
 
 | Function | Description  |
 |----------------------------|---------------------------------------------|
-| [`spark_connection`](reference/sparklyr/latest/spark_connection.html) | Connection between R and the Spark shell process |
+| [`spark_connection`](/reference/spark-connections/) | Connection between R and the Spark shell process |
 | [`spark_jobj`](reference/sparklyr/latest/spark_jobj.html) | Instance of a remote Spark object |
 | [`spark_dataframe`](reference/sparklyr/latest/spark_dataframe.html) | Instance of a remote Spark DataFrame object |
 
@@ -128,11 +128,11 @@ The following functions are useful for implementing wrapper functions of various
 
 | Function | Description  |
 |----------------------------|---------------------------------------------|
-| [`spark_connection`](reference/sparklyr/latest/spark_connection.html) | Get the Spark connection associated with an object (S3)|
+| [`spark_connection`](/reference/spark-connections/) | Get the Spark connection associated with an object (S3)|
 | [`spark_jobj`](reference/sparklyr/latest/spark_jobj.html) | Get the Spark jobj associated with an object (S3) |
 | [`spark_dataframe`](reference/sparklyr/latest/spark_dataframe.html) | Get the Spark DataFrame associated with an object (S3) |
-| [`spark_context`](reference/sparklyr/latest/spark_context.html) | Get the SparkContext for a `spark_connection` |
-| [`hive_context`](reference/sparklyr/latest/hive_context.html) | Get the HiveContext for a `spark_connection` |
+| [`spark_context`](/reference/spark-api/) | Get the SparkContext for a `spark_connection` |
+| [`hive_context`](/reference/spark-api/) | Get the HiveContext for a `spark_connection` |
 | [`spark_version`](reference/sparklyr/latest/spark_version.html) | Get the version of Spark (as a `numeric_version`) for a `spark_connection` |
 
 

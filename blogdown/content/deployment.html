@@ -16,9 +16,9 @@ aliases:
 <div id="local-deployment" class="section level3">
 <h3>Local Deployment</h3>
 <p>Local mode is an excellent way to learn and experiment with Spark. Local mode also provides a convenient development environment for analyses, reports, and applications that you plan to eventually deploy to a multi-node Spark cluster.</p>
-<p>To work in local mode you should first install a version of Spark for local use. You can do this using the <a href="/reference/sparklyr/latest/spark_install.html">spark_install</a> function, for example:</p>
-<pre class="r"><code>sparklyr::spark_install(version = &quot;1.6.2&quot;)</code></pre>
-<p>To connect to the local Spark instance you pass “local” as the value of the Spark master node to <a href="/reference/sparklyr/latest/spark_connect.html">spark_connect</a>:</p>
+<p>To work in local mode you should first install a version of Spark for local use. You can do this using the <a href="/reference/spark_install">spark_install</a> function, for example:</p>
+<pre class="r"><code>sparklyr::spark_install(version = &quot;2.1.0&quot;)</code></pre>
+<p>To connect to the local Spark instance you pass “local” as the value of the Spark master node to <a href="/reference/spark-connections/">spark_connect</a>:</p>
 <pre class="r"><code>library(sparklyr)
 sc &lt;- spark_connect(master = &quot;local&quot;)</code></pre>
 <p>For the local development scenario, see the <a href="#configuration">Configuration</a> section below for details on how to have the same code work seamlessly in both development and production environments.</p>
@@ -30,7 +30,7 @@ sc &lt;- spark_connect(master = &quot;local&quot;)</code></pre>
 <p>The most straightforward way to run R within or near to the cluster is either a remote SSH session or via <a href="https://www.rstudio.com/products/rstudio/">RStudio Server</a>.</p>
 <p>In cluster mode you use the version of Spark already deployed on the cluster node. This version is located via the <code>SPARK_HOME</code> environment variable, so you should be sure that this variable is correctly defined on your server before attempting a connection. This would typically be done within the <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html">Renviron.site</a> configuration file. For example:</p>
 <pre class="sh"><code>SPARK_HOME=/opt/spark/spark-2.0.0-bin-hadoop2.6</code></pre>
-<p>To connect, pass the address of the master node to <a href="/reference/sparklyr/latest/spark_connect.html">spark_connect</a>, for example:</p>
+<p>To connect, pass the address of the master node to <a href="/reference/spark-connections/">spark_connect</a>, for example:</p>
 <pre class="r"><code>library(sparklyr)
 sc &lt;- spark_connect(master = &quot;spark://local:7077&quot;)</code></pre>
 <p>For a <a href="http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/index.html">Hadoop YARN</a> cluster, you can connect using the YARN master, for example:</p>
@@ -56,10 +56,10 @@ livy_service_stop()</code></pre>
 </div>
 <div id="connection-tools" class="section level3">
 <h3>Connection Tools</h3>
-<p>You can view the Spark web UI via the <a href="/reference/sparklyr/latest/spark_web.html">spark_web</a> function, and view the Spark log via the <a href="/reference/sparklyr/latest/spark_log.html">spark_log</a> function:</p>
+<p>You can view the Spark web UI via the <a href="/reference/spark_web">spark_web</a> function, and view the Spark log via the <a href="/reference/spark_log">spark_log</a> function:</p>
 <pre class="r"><code>spark_web(sc)
 spark_log(sc)</code></pre>
-<p>You can disconnect from Spark using the <a href="/reference/sparklyr/latest/spark_disconnect.html">spark_disconnect</a> function:</p>
+<p>You can disconnect from Spark using the <a href="/reference/spark-connections/">spark_disconnect</a> function:</p>
 <pre class="r"><code>spark_disconnect(sc)</code></pre>
 </div>
 <div id="collect" class="section level3">
@@ -82,7 +82,7 @@ spark_log(sc)</code></pre>
 <p>This section describes the various options available for configuring both the behavior of the <strong>sparklyr</strong> package as well as the underlying Spark cluster. Creating multiple configuration profiles (e.g. development, test, production) is also covered.</p>
 <div id="config-files" class="section level3">
 <h3>Config Files</h3>
-<p>The configuration for a Spark connection is specified via the <code>config</code> parameter of the <a href="/reference/sparklyr/latest/spark_connect.html">spark_connect</a> function. By default the configuration is established by calling the <a href="/reference/sparklyr/latest/spark_config.html">spark_config</a> function. This code represents the default behavior:</p>
+<p>The configuration for a Spark connection is specified via the <code>config</code> parameter of the <a href="/reference/spark-connections/">spark_connect</a> function. By default the configuration is established by calling the <a href="/reference/spark_config/">spark_config</a> function. This code represents the default behavior:</p>
 <pre class="r"><code>spark_connect(master = &quot;local&quot;, config = spark_config())</code></pre>
 <p>By default the <a href="/reference/sparklyr/latest/spark_config.html">spark_config</a> function reads configuration data from a file named <code>config.yml</code> located in the current working directory (or in parent directories if not located in the working directory). This file is not required and only need be provided for overriding default behavior. You can also specify an alternate config file name and/or location.</p>
 <p>The <code>config.yml</code> file is in turn processed using the <a href="https://github.com/rstudio/config">config</a> package, which enables support for multiple named configuration profiles.</p>
@@ -243,7 +243,7 @@ production:
   
 production:
   spark.master: &quot;spark://local:7077&quot;</code></pre>
-<p>With this configuration, you can omit the <code>master</code> argument entirely from the call to <a href="/reference/sparklyr/latest/spark_connect.html">spark_connect</a>:</p>
+<p>With this configuration, you can omit the <code>master</code> argument entirely from the call to <a href="/reference/spark-connections/">spark_connect</a>:</p>
 <pre class="r"><code>sc &lt;- spark_connect()</code></pre>
 <p>Note that the currently active configuration is determined via the value of <code>R_CONFIG_ACTIVE</code> environment variable. See the <a href="https://github.com/rstudio/config">config package documentation</a> for additional details.</p>
 </div>
