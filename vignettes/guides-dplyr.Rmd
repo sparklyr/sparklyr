@@ -1,8 +1,7 @@
 ---
 title: "Manipulating Data with dplyr"
-output: 
-  html_document:
-    toc_depth: 2
+output:
+  github_document
 aliases:
   /articles/guides-dplyr.html
 ---

@@ -1,9 +1,3 @@
-+++
-aliases = [
-    "articles/guides-textmining.html"
-]
-+++
-
 Text mining with Spark & sparklyr
 ================
 

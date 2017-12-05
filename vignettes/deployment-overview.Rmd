@@ -19,13 +19,13 @@ There are two well supported deployment modes for **sparklyr**:
 
 Local mode is an excellent way to learn and experiment with Spark. Local mode also provides a convenient development environment for analyses, reports, and applications that you plan to eventually deploy to a multi-node Spark cluster.
 
-To work in local mode you should first install a version of Spark for local use. You can do this using the [spark_install](reference/sparklyr/latest/spark_install.html) function, for example:
+To work in local mode you should first install a version of Spark for local use. You can do this using the [spark_install](/reference/spark_install) function, for example:
 
 ```{r}
-sparklyr::spark_install(version = "1.6.2")
+sparklyr::spark_install(version = "2.1.0")
 ```
 
-To connect to the local Spark instance you pass "local" as the value of the Spark master node to [spark_connect](reference/sparklyr/latest/spark_connect.html):
+To connect to the local Spark instance you pass "local" as the value of the Spark master node to [spark_connect](/reference/spark-connections/):
 
 ```{r}
 library(sparklyr)
@@ -48,7 +48,7 @@ In cluster mode you use the version of Spark already deployed on the cluster nod
 SPARK_HOME=/opt/spark/spark-2.0.0-bin-hadoop2.6
 ```
 
-To connect, pass the address of the master node to [spark_connect](reference/sparklyr/latest/spark_connect.html), for example:
+To connect, pass the address of the master node to [spark_connect](/reference/spark-connections/), for example:
 
 ```{r}
 library(sparklyr)
@@ -92,14 +92,14 @@ livy_service_stop()
 
 ### Connection Tools
 
-You can view the Spark web UI via the [spark_web](reference/sparklyr/latest/spark_web.html) function, and view the Spark log via the [spark_log](reference/sparklyr/latest/spark_log.html) function:
+You can view the Spark web UI via the [spark_web](/reference/spark_web) function, and view the Spark log via the [spark_log](/reference/spark_log) function:
 
 ```{r}
 spark_web(sc)
 spark_log(sc)
 ```
 
-You can disconnect from Spark using the [spark_disconnect](reference/sparklyr/latest/spark_disconnect.html) function:
+You can disconnect from Spark using the [spark_disconnect](/reference/spark-connections/) function:
 
 ```{r}
 spark_disconnect(sc)
@@ -126,7 +126,7 @@ This section describes the various options available for configuring both the be
 
 ### Config Files
 
-The configuration for a Spark connection is specified via the `config` parameter of the [spark_connect](reference/sparklyr/latest/spark_connect.html) function. By default the configuration is established by calling the [spark_config](reference/sparklyr/latest/spark_config.html) function. This code represents the default behavior:
+The configuration for a Spark connection is specified via the `config` parameter of the [spark_connect](/reference/spark-connections/) function. By default the configuration is established by calling the [spark_config](/reference/spark_config/) function. This code represents the default behavior:
 
 ```{r}
 spark_connect(master = "local", config = spark_config())
@@ -231,7 +231,7 @@ production:
   spark.master: "spark://local:7077"
 ```
 
-With this configuration, you can omit the `master` argument entirely from the call to [spark_connect](reference/sparklyr/latest/spark_connect.html):
+With this configuration, you can omit the `master` argument entirely from the call to [spark_connect](/reference/spark-connections/):
 
 ```{r}
 sc <- spark_connect()

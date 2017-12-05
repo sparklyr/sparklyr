@@ -10,7 +10,13 @@ rebuild_site <- function(overwrite = FALSE){
   process_reference(overwrite = overwrite)
   reset_public()
 
+  old <- getwd()
+
+  setwd(file.path(old, target_path()))
+
   blogdown::build_site(local = TRUE)
+
+  on.exit(setwd(old))
 
 }
 

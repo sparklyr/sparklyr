@@ -1,5 +1,7 @@
 ---
 title: "Spark Machine Learning Library (MLlib)"
+output:
+  github_document
 aliases:
   /articles/guides-mllib.html
 ---
