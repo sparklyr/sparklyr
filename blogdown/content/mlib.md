@@ -39,7 +39,7 @@ Spark's machine learning library can be accessed from sparklyr through the `ml_*
 | [`ml_naive_bayes`](/reference/ml_naive_bayes)                                     | Naive-Bayes                   |
 | [`ml_multilayer_perceptron`](/reference/ml_multilayer_perceptron)                 | Multilayer Perceptron         |
 | [`ml_lda`](/reference/ml_lda)                                                     | Latent Dirichlet Allocation   |
-| [`ml_one_vs_rest`](/reference/ml_lda)                                             | One vs Rest                   |
+| [`ml_one_vs_rest`](/reference/ml_one_vs_rest)                                             | One vs Rest                   |
 
 ### Formulas
 
@@ -175,10 +175,6 @@ Functions for creating custom wrappers to other Spark ML algorithms.
 <tr class="odd">
 <td><a href="/reference/ml_prepare_dataframe"><code>ml_prepare_dataframe</code></a></td>
 <td>Prepares a Spark DataFrame for Spark ML Routines.</td>
-</tr>
-<tr class="even">
-<td><a href="/reference/ml_prepare_inputs"><code>ml_prepare_response_features_intercept</code></a></td>
-<td>Pre-process / normalize the inputs typically passed to a Spark ML routine.</td>
 </tr>
 </tbody>
 </table>
