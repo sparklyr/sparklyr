@@ -31,15 +31,15 @@ You can read data into Spark DataFrames using the following functions:
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_read_csv.html"><code>spark_read_csv</code></a></td>
+<td><a href="/reference/spark_read_csv"><code>spark_read_csv</code></a></td>
 <td>Reads a CSV file and provides a data source compatible with dplyr</td>
 </tr>
 <tr class="even">
-<td><a href="reference/sparklyr/latest/spark_read_json.html"><code>spark_read_json</code></a></td>
+<td><a href="/reference/spark_read_json"><code>spark_read_json</code></a></td>
 <td>Reads a JSON file and provides a data source compatible with dplyr</td>
 </tr>
 <tr class="odd">
-<td><a href="reference/sparklyr/latest/spark_read_json.html"><code>spark_read_parquet</code></a></td>
+<td><a href="/reference/spark_read_json"><code>spark_read_parquet</code></a></td>
 <td>Reads a parquet file and provides a data source compatible with dplyr</td>
 </tr>
 </tbody>
@@ -550,19 +550,19 @@ sample_frac(flights, 0.01)
 Writing Data
 ------------
 
-It is often useful to save the results of your analysis or the tables that you have generated on your Spark cluster into persistent storage. The best option in many scenarios is to write the table out to a [Parquet](https://parquet.apache.org/) file using the [spark\_write\_parquet](reference/sparklyr/spark_write_parquet.html) function. For example:
+It is often useful to save the results of your analysis or the tables that you have generated on your Spark cluster into persistent storage. The best option in many scenarios is to write the table out to a [Parquet](https://parquet.apache.org/) file using the [spark\_write\_parquet](/reference/sparklyr/spark_write_parquet) function. For example:
 
 ``` r
 spark_write_parquet(tbl, "hdfs://hdfs.company.org:9000/hdfs-path/data")
 ```
 
-This will write the Spark DataFrame referenced by the tbl R variable to the given HDFS path. You can use the [spark\_read\_parquet](reference/sparklyr/spark_read_parquet.html) function to read the same table back into a subsequent Spark session:
+This will write the Spark DataFrame referenced by the tbl R variable to the given HDFS path. You can use the [spark\_read\_parquet](/reference/sparklyr/spark_read_parquet) function to read the same table back into a subsequent Spark session:
 
 ``` r
 tbl <- spark_read_parquet(sc, "data", "hdfs://hdfs.company.org:9000/hdfs-path/data")
 ```
 
-You can also write data as CSV or JSON using the [spark\_write\_csv](reference/sparklyr/spark_write_csv.html) and [spark\_write\_json](reference/sparklyr/spark_write_json.html) functions.
+You can also write data as CSV or JSON using the [spark\_write\_csv](/reference/sparklyr/spark_write_csv) and [spark\_write\_json](/reference/sparklyr/spark_write_json) functions.
 
 Hive Functions
 --------------
