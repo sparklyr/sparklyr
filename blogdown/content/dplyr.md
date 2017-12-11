@@ -562,7 +562,7 @@ This will write the Spark DataFrame referenced by the tbl R variable to the give
 tbl <- spark_read_parquet(sc, "data", "hdfs://hdfs.company.org:9000/hdfs-path/data")
 ```
 
-You can also write data as CSV or JSON using the [spark\_write\_csv](/reference/sparklyr/spark_write_csv) and [spark\_write\_json](/reference/sparklyr/spark_write_json) functions.
+You can also write data as CSV or JSON using the [spark\_write\_csv](/reference/spark_write_csv) and [spark\_write\_json](/reference/spark_write_json) functions.
 
 Hive Functions
 --------------

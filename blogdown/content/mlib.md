@@ -35,9 +35,9 @@ Spark's machine learning library can be accessed from sparklyr through the `ml_*
 | [`ml_decision_tree`](/reference/ml_decision_tree)                                 | Decision Trees                |
 | [`ml_random_forest`](/reference/ml_random_forest)                                 | Random Forests                |
 | [`ml_gradient_boosted_trees`](/reference/ml_gradient_boosted_trees)               | Gradient-Boosted Trees        |
-| [`ml_pca`](/reference/ml_pca)                                                     | Principal Components Analysis |
+| [`ml_pca`](/reference/ft_pca)                                                     | Principal Components Analysis |
 | [`ml_naive_bayes`](/reference/ml_naive_bayes)                                     | Naive-Bayes                   |
-| [`ml_multilayer_perceptron`](/reference/ml_multilayer_perceptron)                 | Multilayer Perceptron         |
+| [`ml_multilayer_perceptron`](/reference/ml_multilayer_perceptron_classifier)                 | Multilayer Perceptron         |
 | [`ml_lda`](/reference/ml_lda)                                                     | Latent Dirichlet Allocation   |
 | [`ml_one_vs_rest`](/reference/ml_one_vs_rest)                                             | One vs Rest                   |
 
@@ -81,7 +81,7 @@ A model is often fit not on a dataset as-is, but instead on some transformation 
 <td>Bucketizer transforms a column of continuous features to a column of feature buckets</td>
 </tr>
 <tr class="odd">
-<td><a href="/reference/ft_discrete_cosine_transform"><code>ft_discrete_cosine_transform</code></a></td>
+<td><a href="/reference/ft_dct"><code>ft_discrete_cosine_transform</code></a></td>
 <td>Transforms a length NN real-valued sequence in the time domain into another length NN real-valued sequence in the frequency domain</td>
 </tr>
 <tr class="even">
@@ -97,7 +97,7 @@ A model is often fit not on a dataset as-is, but instead on some transformation 
 <td>Takes a column with continuous features and outputs a column with binned categorical features</td>
 </tr>
 <tr class="odd">
-<td><a href="/reference/ft_sql_transformer"><code>ft_sql_transformer</code></a></td>
+<td><a href="/reference/sql-transformer"><code>ft_sql_transformer</code></a></td>
 <td>Implements the transformations which are defined by a SQL statement</td>
 </tr>
 <tr class="even">
@@ -129,11 +129,11 @@ Functions for interacting with Spark ML model fits.
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="/reference/ml_binary_classification_eval"><code>ml_binary_classification_eval</code></a></td>
+<td><a href="/reference/ml_evaluator"><code>ml_binary_classification_eval</code></a></td>
 <td>Calculates the area under the curve for a binary classification model.</td>
 </tr>
 <tr class="even">
-<td><a href="/reference/ml_classification_eval"><code>ml_classification_eval</code></a></td>
+<td><a href="/reference/ml_evaluator"><code>ml_classification_eval</code></a></td>
 <td>Calculates performance metrics (i.e. f1, precision, recall, weightedPrecision, weightedRecall, and accuracy) for binary and multiclass classification model.</td>
 </tr>
 <tr class="odd">
@@ -163,18 +163,6 @@ Functions for creating custom wrappers to other Spark ML algorithms.
 <tr class="odd">
 <td><a href="/reference/ensure"><code>ensure</code></a></td>
 <td>Enforces Specific Structure for R Objects.</td>
-</tr>
-<tr class="odd">
-<td><a href="/reference/ml_model"><code>ml_model</code></a></td>
-<td>Creates an ML Model Object.</td>
-</tr>
-<tr class="even">
-<td><a href="/reference/ml_options"><code>ml_options</code></a></td>
-<td>Provides Options for Spark.ML Routines.</td>
-</tr>
-<tr class="odd">
-<td><a href="/reference/ml_prepare_dataframe"><code>ml_prepare_dataframe</code></a></td>
-<td>Prepares a Spark DataFrame for Spark ML Routines.</td>
 </tr>
 </tbody>
 </table>
