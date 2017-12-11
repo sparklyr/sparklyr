@@ -5,7 +5,7 @@
 \title{Read a Parquet file into a Spark DataFrame}
 \usage{
 spark_read_parquet(sc, name, path, options = list(), repartition = 0,
-  memory = TRUE, overwrite = TRUE, columns = NULL, ...)
+  memory = TRUE, overwrite = TRUE, columns = NULL, schema = NULL, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -27,6 +27,8 @@ is, should the table be cached?)}
 already exists?}
 
 \item{columns}{A vector of column names or a named vector of column types.}
+
+\item{schema}{A (java) read schema. Useful for optimizing read operation on nested data.}
 
 \item{...}{Optional arguments; currently unused.}
 }
@@ -59,4 +61,3 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
-\concept{Spark serialization routines}
