@@ -197,6 +197,7 @@ spark_write_csv.spark_jobj <- function(x,
 #'
 #' @inheritParams spark_read_csv
 #' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param schema A (java) read schema. Useful for optimizing read operation on nested data.
 #'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}), as well as
 #'   the local file system (\code{file://}).
@@ -216,11 +217,12 @@ spark_read_parquet <- function(sc,
                                memory = TRUE,
                                overwrite = TRUE,
                                columns = NULL,
+                               schema = NULL,
                                ...) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "parquet", options, columns)
+  df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "parquet", options, columns, schema)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -356,8 +358,9 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
   }
 }
 
-spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list(), columns = NULL) {
+spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list(), columns = NULL, schema = NULL) {
   columnsHaveTypes <- length(names(columns)) > 0
+  readSchemaProvided <- !is.null(schema)
 
   options <- invoke(hive_context(sc), "read")
 
@@ -365,8 +368,12 @@ spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list()
     options <<- invoke(options, "option", optionName, readOptions[[optionName]])
   })
 
-  if (columnsHaveTypes) {
+  if (readSchemaProvided) {
+    columnDefs <- schema
+  } else if (columnsHaveTypes) {
     columnDefs <- spark_data_build_types(sc, columns)
+  }
+  if (readSchemaProvided || columnsHaveTypes) {
     options <- invoke(options, "schema", columnDefs)
   }
 
