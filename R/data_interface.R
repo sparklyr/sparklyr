@@ -374,7 +374,7 @@ spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list()
     columnDefs <- spark_data_build_types(sc, columns)
   }
   if (readSchemaProvided || columnsHaveTypes) {
-    options <<- invoke(options, "schema", columnDefs)
+    options <- invoke(options, "schema", columnDefs)
   }
 
   df <- invoke(options, fileMethod, source)
