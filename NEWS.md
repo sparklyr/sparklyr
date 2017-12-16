@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Livy new connection dialog now prompts for password using
+`rstudioapi::askForPassword()`.
+
 - Added `schema` parameter to `spark_read_parquet()` that enables reading
 a subset of the schema to increase performance.
 
