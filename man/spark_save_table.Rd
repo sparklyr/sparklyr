@@ -10,7 +10,7 @@ spark_save_table(x, path, mode = NULL, options = list())
 \item{x}{A Spark DataFrame or dplyr operation}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 
 \item{mode}{A \code{character} element. Specifies the behavior when data or
   table already exists. Supported values include: 'error', 'append', 'overwrite' and
@@ -42,4 +42,3 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
-\concept{Spark serialization routines}

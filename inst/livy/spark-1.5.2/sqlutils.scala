@@ -28,10 +28,10 @@ object SQLUtils {
     dataType match {
       case "byte" => org.apache.spark.sql.types.ByteType
       case "integer" => org.apache.spark.sql.types.IntegerType
-      case "long" => org.apache.spark.sql.types.LongType
       case "float" => org.apache.spark.sql.types.FloatType
       case "double" => org.apache.spark.sql.types.DoubleType
       case "numeric" => org.apache.spark.sql.types.DoubleType
+      case "long" => org.apache.spark.sql.types.LongType
       case "character" => org.apache.spark.sql.types.StringType
       case "string" => org.apache.spark.sql.types.StringType
       case "binary" => org.apache.spark.sql.types.BinaryType

@@ -2,6 +2,7 @@
 % Please edit documentation in R/sdf_interface.R
 \name{sdf_mutate}
 \alias{sdf_mutate}
+\alias{sdf_mutate}
 \alias{sdf_mutate_}
 \title{Mutate a Spark DataFrame}
 \usage{
@@ -52,4 +53,3 @@ head(beaver_tbl)
 dplyr::src_tbls(sc)
 }
 }
-\concept{feature transformation routines}

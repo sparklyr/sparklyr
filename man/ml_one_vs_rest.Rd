@@ -65,4 +65,3 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_random_forest_classifier}}
 }
-\concept{ml algorithms}

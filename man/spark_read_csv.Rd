@@ -15,7 +15,7 @@ spark_read_csv(sc, name, path, header = TRUE, columns = NULL,
 \item{name}{The name to assign to the newly generated table.}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 
 \item{header}{Boolean; should the first row of data be used as a header?
 Defaults to \code{TRUE}.}
@@ -52,12 +52,17 @@ already exists?}
 Read a tabular data file into a Spark DataFrame.
 }
 \details{
-You can read data from HDFS (\code{hdfs://}), S3 (\code{s3n://}),
+You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}),
   as well as the local file system (\code{file://}).
 
-If you are reading from a secure S3 bucket be sure that the
-\code{AWS_ACCESS_KEY_ID} and \code{AWS_SECRET_ACCESS_KEY} environment
-variables are both defined.
+If you are reading from a secure S3 bucket be sure to set the following in your spark-defaults.conf
+\code{spark.hadoop.fs.s3a.access.key}, \code{spark.hadoop.fs.s3a.secret.key} or any of the methods outlined in the aws-sdk
+documentation \href{http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html}{Working with AWS credentials}
+In order to work with the newer \code{s3a://} protocol also set the values for \code{spark.hadoop.fs.s3a.impl} and \code{spark.hadoop.fs.s3a.endpoint }.
+In addition, to support v4 of the S3 api be sure to pass the \code{-Dcom.amazonaws.services.s3.enableV4} driver options
+for the config key \code{spark.driver.extraJavaOptions }
+For instructions on how to configure \code{s3n://} check the hadoop documentation:
+\href{https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html#Authentication_properties}{s3n authentication properties}
 
 When \code{header} is \code{FALSE}, the column names are generated with a
 \code{V} prefix; e.g. \code{V1, V2, ...}.
@@ -80,4 +85,3 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
-\concept{Spark serialization routines}

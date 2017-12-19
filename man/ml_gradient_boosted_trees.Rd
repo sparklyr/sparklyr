@@ -4,6 +4,7 @@
 \name{ml_gbt_classifier}
 \alias{ml_gbt_classifier}
 \alias{ml_gradient_boosted_trees}
+\alias{ml_gradient_boosted_trees}
 \alias{ml_gbt_regressor}
 \title{Spark ML -- Gradient Boosted Trees}
 \usage{
@@ -144,4 +145,3 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
-\concept{ml algorithms}

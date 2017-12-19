@@ -20,6 +20,20 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   userConfig <- tryCatch(config::get(file = file), error = function(e) NULL)
 
   mergedConfig <- merge_lists(baseConfig, userConfig)
+
+  if (nchar(Sys.getenv("SPARK_DRIVER_CLASSPATH")) > 0 &&
+      is.null(mergedConfig$master$`sparklyr.shell.driver-class-path`)) {
+    mergedConfig$master$`sparklyr.shell.driver-class-path` <- Sys.getenv("SPARK_DRIVER_CLASSPATH")
+  }
+
+  if (is.null(mergedConfig$sparklyr.cores.local)) {
+    mergedConfig$sparklyr.cores.local <- parallel::detectCores()
+  }
+
+  if (is.null(mergedConfig$spark.sql.shuffle.partitions.local)) {
+    mergedConfig$spark.sql.shuffle.partitions.local <- parallel::detectCores()
+  }
+
   mergedConfig
 }
 

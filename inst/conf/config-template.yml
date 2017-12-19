@@ -1,7 +1,5 @@
 default:
   # local-only configuration
-  sparklyr.cores.local: !expr parallel::detectCores()
-  spark.sql.shuffle.partitions.local: !expr parallel::detectCores()
   spark.env.SPARK_LOCAL_IP.local: 127.0.0.1
 
   # include the embedded csv package for spark 1.x
@@ -12,4 +10,3 @@ default:
 
   # command line arguments to spark-shell
   # sparklyr.shell.*
-  sparklyr.shell.driver-class-path: !expr Sys.getenv("SPARK_DRIVER_CLASSPATH")

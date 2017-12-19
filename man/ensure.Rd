@@ -2,9 +2,13 @@
 % Please edit documentation in R/precondition.R
 \name{ensure}
 \alias{ensure}
+\alias{ensure}
 \alias{ensure_scalar_integer}
+\alias{ensure}
 \alias{ensure_scalar_double}
+\alias{ensure}
 \alias{ensure_scalar_boolean}
+\alias{ensure}
 \alias{ensure_scalar_character}
 \title{Enforce Specific Structure for R Objects}
 \usage{

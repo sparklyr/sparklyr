@@ -4,6 +4,7 @@
 \name{ml_decision_tree_classifier}
 \alias{ml_decision_tree_classifier}
 \alias{ml_decision_tree}
+\alias{ml_decision_tree}
 \alias{ml_decision_tree_regressor}
 \title{Spark ML -- Decision Trees}
 \usage{
@@ -141,4 +142,3 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
-\concept{ml algorithms}

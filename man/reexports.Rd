@@ -4,7 +4,9 @@
 \name{reexports}
 \alias{reexports}
 \alias{tidy}
+\alias{reexports}
 \alias{augment}
+\alias{reexports}
 \alias{glance}
 \title{Objects exported from other packages}
 \keyword{internal}

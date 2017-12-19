@@ -63,4 +63,3 @@ Other feature transformers: \code{\link{ft_bucketizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{ft_word2vec}}
 }
-\concept{feature transformers}
