@@ -13,7 +13,7 @@ spark_read_libsvm(sc, name, path, repartition = 0, memory = TRUE,
 \item{name}{The name to assign to the newly generated table.}
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the \samp{"hdfs://"}, \samp{"s3n://"} and \samp{"file://"} protocols.}
+Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 
 \item{repartition}{The number of partitions used to distribute the
 generated table. Use 0 (the default) to avoid partitioning.}
@@ -47,4 +47,3 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
-\concept{Spark serialization routines}

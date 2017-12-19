@@ -4,6 +4,7 @@
 \name{ml_random_forest_classifier}
 \alias{ml_random_forest_classifier}
 \alias{ml_random_forest}
+\alias{ml_random_forest}
 \alias{ml_random_forest_regressor}
 \title{Spark ML -- Random Forest}
 \usage{
@@ -158,4 +159,3 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_one_vs_rest}}
 }
-\concept{ml algorithms}

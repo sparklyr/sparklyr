@@ -88,4 +88,3 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_assembler}},
   \code{\link{ft_word2vec}}
 }
-\concept{feature transformers}

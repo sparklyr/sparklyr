@@ -96,4 +96,3 @@ Other ml algorithms: \code{\link{ml_decision_tree_classifier}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
-\concept{ml algorithms}

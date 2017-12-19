@@ -93,4 +93,3 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}}
 }
-\concept{feature transformers}
