@@ -207,10 +207,20 @@ start_shell <- function(master,
 
     # determine path to spark_submit
     spark_submit <- switch(.Platform$OS.type,
-                           unix = "spark-submit",
-                           windows = "spark-submit2.cmd"
-    )
-    spark_submit_path <- normalizePath(file.path(spark_home, "bin", spark_submit))
+                           unix = c("spark2-submit", "spark-submit"),
+                           windows = "spark-submit2.cmd")
+
+    spark_submit_paths <- unlist(lapply(
+      spark_submit,
+      function(submit_path) {
+        normalizePath(file.path(spark_home, "bin", submit_path), mustWork = FALSE)
+      }))
+
+    if (!any(file.exists(spark_submit_paths))) {
+      stop("Failed to find spark-submit under '", spark_home, "', please verify SPARK_HOME.")
+    }
+
+    spark_submit_path <- spark_submit_paths[[which(file.exists(spark_submit_paths))[[1]]]]
 
     # resolve extensions
     spark_version <- numeric_version(
