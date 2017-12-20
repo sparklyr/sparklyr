@@ -1,6 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
-- Added support for Spark 2.X under Cloudera clusters.
+- Improved support for Spark 2.X under Cloudera clusters by prioritizing
+use of `spark2-submit` over `spark-submit`.
 
 - Livy new connection dialog now prompts for password using
 `rstudioapi::askForPassword()`.
