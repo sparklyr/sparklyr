@@ -245,6 +245,7 @@ new_ml_model_logistic_regression <- function(
     # multinomial
     coefficients <- model$coefficient_matrix
     colnames(coefficients) <- feature_names
+    rownames(coefficients) <- index_labels
 
     if (ml_param(model, "fit_intercept")) {
       intercept <- model$intercept_vector
