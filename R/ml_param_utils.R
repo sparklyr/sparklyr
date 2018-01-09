@@ -56,7 +56,6 @@ ml_params <- function(x, params = NULL, allow_null = FALSE, ...) {
 }
 
 ml_set_param <- function(x, param, value, ...) {
-  # TODO: consider exporting and implementing ml_set_params()
   setter <- param %>%
     ml_map_param_names(direction = "rs") %>%
     {paste0("set",
