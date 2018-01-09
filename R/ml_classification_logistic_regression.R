@@ -131,7 +131,8 @@ ml_logistic_regression.tbl_spark <- function(
   raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"),
   response = NULL,
-  features = NULL, ...) {
+  features = NULL,
+  predicted_label_col = "predicted_label", ...) {
 
   predictor <- ml_new_stage_modified_args()
 
@@ -141,9 +142,11 @@ ml_logistic_regression.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, predictor, formula, features_col, label_col,
-                         "classification", "predicted_label",
-                         new_ml_model_logistic_regression)
+    ml_generate_ml_model(
+      x, predictor = predictor, formula = formula,
+      features_col = features_col, label_col = label_col,
+      type = "classification", predicted_label_col,
+      constructor = new_ml_model_logistic_regression)
   }
 }
 
