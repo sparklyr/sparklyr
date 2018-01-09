@@ -142,7 +142,8 @@ ml_logistic_regression.tbl_spark <- function(
       ml_fit(x)
   } else {
     ml_generate_ml_model(x, predictor, formula, features_col, label_col,
-                         "classification", new_ml_model_logistic_regression)
+                         "classification", "predicted_label",
+                         new_ml_model_logistic_regression)
   }
 }
 
