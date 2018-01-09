@@ -169,7 +169,6 @@ ml_validator_generalized_linear_regression <- function(args, nms) {
   args %>%
     ml_validate_args({
       reg_param <- ensure_scalar_double(reg_param)
-      # TODO bounds on regularization parameters
       max_iter <- ensure_scalar_integer(max_iter)
       if (is.function(family)) {
         family <- family()
@@ -184,7 +183,6 @@ ml_validator_generalized_linear_regression <- function(args, nms) {
         family <- ensure_scalar_character(family$family)
       }
 
-      # TODO check family-link compatibility on R side
       fit_intercept <- ensure_scalar_boolean(fit_intercept)
       solver <- rlang::arg_match(solver, c("irls"))
       tol <- ensure_scalar_double(tol)

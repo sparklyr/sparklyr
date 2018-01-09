@@ -27,8 +27,6 @@
 #' @name ml-tuning
 NULL
 
-# TODO add some examples to docs
-
 ml_expand_params <- function(param_grid) {
   param_grid %>%
     lapply(function(stage) {
@@ -198,7 +196,6 @@ new_ml_tuning <- function(jobj, ..., subclass = NULL) {
 }
 
 new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
-  # TODO move metrics here
   new_ml_transformer(
     jobj,
     estimator = invoke(jobj, "getEstimator") %>%
