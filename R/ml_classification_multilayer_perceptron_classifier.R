@@ -113,7 +113,8 @@ ml_multilayer_perceptron_classifier.tbl_spark <- function(
   prediction_col = "prediction",
   uid = random_string("multilayer_perceptron_classifier_"),
   response = NULL,
-  features = NULL, ...) {
+  features = NULL,
+  predicted_label_col = "predicted_label", ...) {
 
   predictor <- ml_new_stage_modified_args()
 
@@ -124,7 +125,9 @@ ml_multilayer_perceptron_classifier.tbl_spark <- function(
       ml_fit(x)
   } else {
     ml_generate_ml_model(x, predictor, formula, features_col, label_col,
-                         "classification", new_ml_model_multilayer_perceptron_classification)
+                         "classification",
+                         new_ml_model_multilayer_perceptron_classification,
+                         predicted_label_col)
   }
 }
 

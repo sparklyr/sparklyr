@@ -136,7 +136,8 @@ ml_gbt_classifier.tbl_spark <- function(
   raw_prediction_col = "rawPrediction",
   uid = random_string("gbt_classifier_"),
   response = NULL,
-  features = NULL, ...) {
+  features = NULL,
+  predicted_label_col = "predicted_label", ...) {
 
   predictor <- ml_new_stage_modified_args()
 
@@ -147,7 +148,8 @@ ml_gbt_classifier.tbl_spark <- function(
       ml_fit(x)
   } else {
     ml_generate_ml_model(x, predictor, formula, features_col, label_col,
-                         "classification", new_ml_model_gbt_classification)
+                         "classification", new_ml_model_gbt_classification,
+                         predicted_label_col)
   }
 }
 

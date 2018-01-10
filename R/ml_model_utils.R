@@ -24,8 +24,8 @@ ml_feature_names_metadata <- function(pipeline_model, dataset, features_col) {
 
 ml_generate_ml_model <- function(
   x, predictor, formula, features_col = "features",
-  label_col = "label", type, predicted_label_col,
-  constructor) {
+  label_col = "label", type,
+  constructor, predicted_label_col = NULL) {
   sc <- spark_connection(x)
   classification <- identical(type, "classification")
 

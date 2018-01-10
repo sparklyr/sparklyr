@@ -110,7 +110,8 @@ ml_linear_svc.tbl_spark <- function(
   raw_prediction_col = "rawPrediction",
   uid = random_string("linear_svc_"),
   response = NULL,
-  features = NULL,...) {
+  features = NULL,
+  predicted_label_col = "predicted_label", ...) {
 
   predictor <- ml_new_stage_modified_args()
 
@@ -122,7 +123,7 @@ ml_linear_svc.tbl_spark <- function(
   } else {
     ml_generate_ml_model(
       x, predictor, formula, features_col, label_col,
-      "classification", new_ml_model_linear_svc
+      "classification", new_ml_model_linear_svc, predicted_label_col
     )
   }
 }

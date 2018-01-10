@@ -145,8 +145,9 @@ ml_logistic_regression.tbl_spark <- function(
     ml_generate_ml_model(
       x, predictor = predictor, formula = formula,
       features_col = features_col, label_col = label_col,
-      type = "classification", predicted_label_col,
-      constructor = new_ml_model_logistic_regression)
+      type = "classification",
+      constructor = new_ml_model_logistic_regression,
+      predicted_label_col)
   }
 }
 
