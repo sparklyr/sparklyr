@@ -45,6 +45,15 @@ ml_save.default <- function(x, path, overwrite = FALSE, ...) {
 #' @export
 ml_save.ml_model <- function(x, path, overwrite = FALSE,
                              type = c("pipeline_model", "pipeline"), ...) {
+  version <- x %>%
+    spark_jobj() %>%
+    spark_connection() %>%
+    spark_version()
+
+  # https://issues.apache.org/jira/browse/SPARK-11891
+  if (version < "2.0.0")
+    stop("Saving of 'ml_model' is supported in Spark 2.0.0+")
+
   path <- ensure_scalar_character(path) %>%
     spark_normalize_path()
   overwrite <- ensure_scalar_boolean(overwrite)
