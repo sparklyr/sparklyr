@@ -21,7 +21,7 @@ ft_word2vec(x, input_col, output_col, vector_size = 100L, min_count = 5L,
 \item{min_count}{The minimum number of times a token must appear to be included in
 the word2vec model's vocabulary. Default: 5}
 
-\item{max_sentence_length}{Sets the maximum length (in words) of each sentence
+\item{max_sentence_length}{(Spark 2.0.0+) Sets the maximum length (in words) of each sentence
 in the input data. Any sentence longer than this threshold will be divided into
 chunks of up to \code{max_sentence_length} size. Default: 1000}
 
