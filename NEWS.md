@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed error in the Spark connection dialog for clusters using a proxy.
+
 - Improved support for Spark 2.X under Cloudera clusters by prioritizing
 use of `spark2-submit` over `spark-submit`.
 
