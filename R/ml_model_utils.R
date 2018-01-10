@@ -76,6 +76,15 @@ ml_generate_ml_model <- function(
       ml_fit(x)
   }
 
+  # workaround for https://issues.apache.org/jira/browse/SPARK-19953
+  model_uid <- if (spark_version(sc) < "2.2.0")
+    switch(class(predictor)[[1]],
+           ml_random_forest_regressor = "rfr",
+           ml_random_forest_classifier = "rfc",
+           ml_uid(predictor))
+  else
+    ml_uid(predictor)
+
   feature_names <- ml_feature_names_metadata(pipeline_model, x, features_col)
 
   call <- sys.call(sys.parent())
@@ -84,7 +93,7 @@ ml_generate_ml_model <- function(
   args <- list(
     pipeline = pipeline,
     pipeline_model = pipeline_model,
-    model = ml_stage(pipeline_model, ml_uid(predictor)),
+    model = ml_stage(pipeline_model, model_uid),
     dataset = x,
     formula = formula,
     feature_names = feature_names,
