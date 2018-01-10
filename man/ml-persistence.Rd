@@ -3,10 +3,14 @@
 \name{ml-persistence}
 \alias{ml-persistence}
 \alias{ml_save}
+\alias{ml_save.ml_model}
 \alias{ml_load}
 \title{Spark ML -- Model Persistence}
 \usage{
 ml_save(x, path, overwrite = FALSE, ...)
+
+\method{ml_save}{ml_model}(x, path, overwrite = FALSE,
+  type = c("pipeline_model", "pipeline"), ...)
 
 ml_load(sc, path)
 }
@@ -18,6 +22,8 @@ ml_load(sc, path)
 \item{overwrite}{Whether to overwrite the existing path, defaults to \code{FALSE}.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{type}{Whether to save the pipeline model or the pipeline.}
 
 \item{sc}{A Spark connection.}
 }
