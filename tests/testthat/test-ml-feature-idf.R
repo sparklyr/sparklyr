@@ -3,6 +3,7 @@ context("ml feature - idf")
 sc <- testthat_spark_connection()
 
 test_that("ft_idf() works properly", {
+  test_requires_version("2.0.0", "hashing implementation changed in 2.0 -- https://issues.apache.org/jira/browse/SPARK-10574")
   test_requires("dplyr")
   sentence_df <- data.frame(
     sentence = c("Hi I heard about Spark",
