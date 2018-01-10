@@ -131,7 +131,8 @@ ml_logistic_regression.tbl_spark <- function(
   raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"),
   response = NULL,
-  features = NULL, ...) {
+  features = NULL,
+  predicted_label_col = "predicted_label", ...) {
 
   predictor <- ml_new_stage_modified_args()
 
@@ -141,8 +142,12 @@ ml_logistic_regression.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, predictor, formula, features_col, label_col,
-                         "classification", new_ml_model_logistic_regression)
+    ml_generate_ml_model(
+      x, predictor = predictor, formula = formula,
+      features_col = features_col, label_col = label_col,
+      type = "classification",
+      constructor = new_ml_model_logistic_regression,
+      predicted_label_col)
   }
 }
 
@@ -244,6 +249,7 @@ new_ml_model_logistic_regression <- function(
     # multinomial
     coefficients <- model$coefficient_matrix
     colnames(coefficients) <- feature_names
+    rownames(coefficients) <- index_labels
 
     if (ml_param(model, "fit_intercept")) {
       intercept <- model$intercept_vector

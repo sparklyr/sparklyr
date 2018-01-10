@@ -24,7 +24,6 @@ ml_fit_and_transform(x, dataset, ...)
 ml_predict(x, dataset, ...)
 
 \method{ml_predict}{ml_model_classification}(x, dataset,
-  predicted_label_col = "predicted_label",
   probability_prefix = "probability_", ...)
 }
 \arguments{
@@ -33,8 +32,6 @@ ml_predict(x, dataset, ...)
 \item{dataset}{A \code{tbl_spark}.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{predicted_label_col}{Column name for predicted label output}
 
 \item{probability_prefix}{String used to prepend the class probability output columns.}
 }

@@ -6,7 +6,7 @@
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-estimator-transformer
 #' @template roxlate-ml-max-iter
-#' @param max_sentence_length Sets the maximum length (in words) of each sentence
+#' @param max_sentence_length (Spark 2.0.0+) Sets the maximum length (in words) of each sentence
 #'   in the input data. Any sentence longer than this threshold will be divided into
 #'   chunks of up to \code{max_sentence_length} size. Default: 1000
 #' @param min_count The minimum number of times a token must appear to be included in
@@ -36,10 +36,10 @@ ft_word2vec.spark_connection <- function(
                                   input_col, output_col, uid) %>%
     invoke("setVectorSize", vector_size) %>%
     invoke("setMinCount", min_count) %>%
-    invoke("setMaxSentenceLength", max_sentence_length) %>%
     invoke("setNumPartitions", num_partitions) %>%
     invoke("setStepSize", step_size) %>%
-    invoke("setMaxIter", max_iter)
+    invoke("setMaxIter", max_iter) %>%
+    jobj_set_param("setMaxSentenceLength", max_sentence_length, 1000L, "2.0.0")
 
   if (!rlang::is_null(seed))
     jobj <- invoke(jobj, "setSeed", seed)

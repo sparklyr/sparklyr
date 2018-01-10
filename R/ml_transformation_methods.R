@@ -83,28 +83,18 @@ ml_predict.ml_model_regression <- function(x, dataset, ...) {
     select(!!!rlang::syms(c(tbl_vars(dataset), cols)))
 }
 #' @rdname ml-transform-methods
-#' @param predicted_label_col Column name for predicted label output
 #' @param probability_prefix String used to prepend the class probability output columns.
 #' @export
 ml_predict.ml_model_classification <- function(
-  x, dataset, predicted_label_col = "predicted_label",
+  x, dataset,
   probability_prefix = "probability_", ...) {
-  ensure_scalar_character(predicted_label_col)
   ensure_scalar_character(probability_prefix)
 
   if (missing(dataset) || rlang::is_null(dataset))
     dataset <- x$dataset
 
-  cols <- x$model %>%
-    ml_params(c("prediction_col", "probability_col", "raw_prediction_col"),
-              allow_null = TRUE) %>%
-    Filter(length, .) %>%
-    unlist(use.names = FALSE)
-
   predictions <- x$pipeline_model %>%
-    ml_transform(dataset) %>%
-    select(!!!rlang::syms(c(tbl_vars(dataset), cols))) %>%
-    ft_index_to_string(ml_param(x$model, "prediction_col"), predicted_label_col, labels = x$.index_labels)
+    ml_transform(dataset)
 
   probability_col <- ml_param(x$model, "probability_col", allow_null = TRUE)
   if (rlang::is_null(probability_col))

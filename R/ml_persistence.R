@@ -18,11 +18,51 @@ NULL
 #' @rdname ml-persistence
 #' @export
 ml_save <- function(x, path, overwrite = FALSE, ...) {
+  UseMethod("ml_save")
+}
+
+#' @export
+ml_save.default <- function(x, path, overwrite = FALSE, ...) {
   path <- ensure_scalar_character(path) %>%
     spark_normalize_path()
   overwrite <- ensure_scalar_boolean(overwrite)
 
   ml_writer <- spark_jobj(x) %>%
+    invoke("write")
+
+  if (overwrite) {
+    ml_writer %>%
+      invoke("overwrite") %>%
+      invoke("save", path)
+  } else {
+    ml_writer %>%
+      invoke("save", path)
+  }
+}
+
+#' @rdname ml-persistence
+#' @param type Whether to save the pipeline model or the pipeline.
+#' @export
+ml_save.ml_model <- function(x, path, overwrite = FALSE,
+                             type = c("pipeline_model", "pipeline"), ...) {
+  version <- x %>%
+    spark_jobj() %>%
+    spark_connection() %>%
+    spark_version()
+
+  # https://issues.apache.org/jira/browse/SPARK-11891
+  if (version < "2.0.0")
+    stop("Saving of 'ml_model' is supported in Spark 2.0.0+")
+
+  path <- ensure_scalar_character(path) %>%
+    spark_normalize_path()
+  overwrite <- ensure_scalar_boolean(overwrite)
+  type <- match.arg(type)
+
+  ml_writer <- (
+    if (identical(type, "pipeline_model")) x$pipeline_model else x$pipeline
+    ) %>%
+    spark_jobj() %>%
     invoke("write")
 
   if (overwrite) {

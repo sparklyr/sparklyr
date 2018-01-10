@@ -108,7 +108,7 @@ test_that("we can ml_save/load a feature transformer", {
 })
 
 test_that("we can save a ml_model and load a pipeline model back", {
-  test_requires_version("2.0.0", "some pipeline stages requires Spark 2.0+")
+  test_requires_version("2.0.0", "RFormula export requires Spark 2.0+")
   set.seed(42)
   iris_weighted <- iris %>%
     dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
@@ -138,5 +138,30 @@ test_that("we can save a ml_model and load a pipeline model back", {
 
   expect_identical(ml_stage(m1$pipeline_model, 2)$coefficients,
                ml_stage(m2, 2)$coefficients
+  )
+})
+
+test_that("we can fit a pipeline saved then loaded from ml_model", {
+  test_requires_version("2.0.0", "RFormula export requires Spark 2.0+")
+  set.seed(42)
+  iris_weighted <- iris %>%
+    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
+                  ones = rep(1, nrow(iris)),
+                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+
+  m1 <- ml_logistic_regression(
+    iris_weighted_tbl,
+    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width"
+  )
+
+  path <- tempfile("lr_mlmodel")
+  ml_save(m1, path, overwrite = TRUE, type = "pipeline")
+  pipeline <- ml_load(sc, path)
+  m2 <- pipeline %>%
+    ml_fit(iris_weighted_tbl)
+  expect_identical(ml_stage(m1$pipeline_model, 2)$coefficients,
+                   ml_stage(m2, 2)$coefficients
   )
 })

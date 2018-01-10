@@ -1,9 +1,13 @@
 ml_add_stage <- function(x, transformer) {
   sc <- spark_connection(x)
   stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(transformer)) else {
-    spark_jobj(x) %>%
+    tryCatch(spark_jobj(x) %>%
       invoke("getStages") %>%
-      c(spark_jobj(transformer))
+      c(spark_jobj(transformer)),
+      error = function(e) spark_jobj(x) %>%
+        invoke("stages") %>%
+        c(spark_jobj(transformer))
+    )
   }
 
   jobj <- invoke_static(sc, "sparklyr.MLUtils",
