@@ -63,11 +63,11 @@ ft_idf.tbl_spark <- function(
 }
 
 new_ml_idf <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "idf")
+  new_ml_estimator(jobj, subclass = "ml_idf")
 }
 
 new_ml_idf_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "idf_model")
+  new_ml_transformer(jobj, subclass = "ml_idf_model")
 }
 
 ml_validator_idf <- function(args, nms) {
