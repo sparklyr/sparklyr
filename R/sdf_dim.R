@@ -18,8 +18,8 @@ sdf_dim <- function(x) {
 
 #' @export
 #' @rdname sdf_dim
-sdf_nrow <- function(x) sdf_dim(x)[[1]]
+sdf_nrow <- function(x) invoke(spark_dataframe(x), "count")
 
 #' @export
 #' @rdname sdf_dim
-sdf_ncol <- function(x) sdf_dim(x)[[2]]
+sdf_ncol <- function(x) length(invoke(spark_dataframe(x), "columns"))
