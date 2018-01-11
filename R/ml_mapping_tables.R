@@ -20,6 +20,9 @@ ml_create_mapping_tables <- function() { # nocov start
          "min_count" = "minCount",
          "max_sentence_length" = "maxSentenceLength",
          "num_partitions" = "numPartitions",
+         # ft_chisq_selector
+         "num_top_features" = "numTopFeatures",
+         "selector_type" = "selectorType",
          # ft_idf
          "min_doc_freq" = "minDocFreq",
          # ft_r_formula
@@ -131,6 +134,8 @@ ml_create_mapping_tables <- function() { # nocov start
     "VectorAssembler" = "vector_assembler",
     "NGram" = "ngram",
     # feature (estimators)
+    "ChiSqSelector" = "chisq_selector",
+    "ChiSqSelectorModel" = "chisq_selector_model",
     "Word2Vec" = "word2vec",
     "Word2VecModel" = "word2vec_model",
     "IDF" = "idf",
