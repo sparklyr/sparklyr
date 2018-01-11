@@ -50,6 +50,7 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
 \code{\link{ml_default_stop_words}}
 
 Other feature transformers: \code{\link{ft_binarizer}},
+  \code{\link{ft_bucketed_random_projection_lsh}},
   \code{\link{ft_bucketizer}},
   \code{\link{ft_chisq_selector}},
   \code{\link{ft_count_vectorizer}}, \code{\link{ft_dct}},

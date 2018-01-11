@@ -47,7 +47,8 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformers: \code{\link{ft_bucketizer}},
+Other feature transformers: \code{\link{ft_bucketed_random_projection_lsh}},
+  \code{\link{ft_bucketizer}},
   \code{\link{ft_chisq_selector}},
   \code{\link{ft_count_vectorizer}}, \code{\link{ft_dct}},
   \code{\link{ft_elementwise_product}},
