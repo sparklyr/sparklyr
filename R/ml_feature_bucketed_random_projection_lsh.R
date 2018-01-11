@@ -96,5 +96,18 @@ new_ml_bucketed_random_projection_lsh <- function(jobj) {
 }
 
 new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "bucketed_random_projection_lsh_model")
+  new_ml_transformer(
+    jobj,
+    approx_nearest_neighbors = function(
+      dataset, key, num_nearest_neighbors, dist_col = "distCol") {
+      dataset <- spark_dataframe(dataset)
+      key <- lapply(key, ensure_scalar_double)
+      num_nearest_neighbors <- ensure_scalar_integer(num_nearest_neighbors)
+      dist_col <- ensure_scalar_character(dist_col)
+      jobj %>%
+        invoke("approxNearestNeighbors",
+               dataset, key, num_nearest_neighbors, dist_col) %>%
+        sdf_register()
+    },
+    subclass = "bucketed_random_projection_lsh_model")
 }
