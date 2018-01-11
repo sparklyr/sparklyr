@@ -24,10 +24,16 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
   lsh <- ft_bucketed_random_projection_lsh(
     sc, input_col = "features", output_col = "hashes",
     bucket_length = 2, num_hash_tables = 3, dataset = dfA_tbl)
-  expect_equal(lsh %>%
+  transformed <- lsh %>%
     ml_transform(dfA_tbl) %>%
-    colnames(),
+    collect()
+  expect_equal(
+    colnames(transformed),
     c("id", "V1", "V2", "features", "hashes")
+  )
+  expect_equal(
+    sdf_nrow(transformed),
+    4
   )
 })
 
