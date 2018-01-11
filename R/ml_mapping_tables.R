@@ -132,7 +132,9 @@ ml_create_mapping_tables <- function() { # nocov start
     "NGram" = "ngram",
     # feature (estimators)
     "Word2Vec" = "word2vec",
+    "Word2VecModel" = "word2vec_model",
     "IDF" = "idf",
+    "IDFModel" = "idf_model",
     "VectorIndexer" = "vector_indexer",
     "VectorIndexerModel" = "vector_indexer_model",
     "QuantileDiscretizer" = "quantile_discretizer",
