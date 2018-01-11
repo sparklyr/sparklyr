@@ -16,7 +16,7 @@
 #' @export
 ft_bucketed_random_projection_lsh <- function(
   x, input_col, output_col,
-  bucket_length, num_hash_tables, seed = NULL,
+  bucket_length, num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
   uid = random_string("bucketed_random_project_lsh_"), ...) {
   UseMethod("ft_bucketed_random_projection_lsh")
@@ -25,7 +25,7 @@ ft_bucketed_random_projection_lsh <- function(
 #' @export
 ft_bucketed_random_projection_lsh.spark_connection <- function(
   x, input_col, output_col,
-  bucket_length, num_hash_tables, seed = NULL,
+  bucket_length, num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
   uid = random_string("bucketed_random_projection_lsh_"), ...) {
 
@@ -49,7 +49,7 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(
 #' @export
 ft_bucketed_random_projection_lsh.ml_pipeline <- function(
   x, input_col, output_col,
-  bucket_length, num_hash_tables, seed = NULL,
+  bucket_length, num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
   uid = random_string("bucketed_random_projection_lsh_"), ...
 ) {
@@ -62,7 +62,7 @@ ft_bucketed_random_projection_lsh.ml_pipeline <- function(
 #' @export
 ft_bucketed_random_projection_lsh.tbl_spark <- function(
   x, input_col, output_col,
-  bucket_length, num_hash_tables, seed = NULL,
+  bucket_length, num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
   uid = random_string("bucketed_random_projection_lsh_"), ...
 ) {

@@ -5,7 +5,7 @@
 \title{Feature Tranformation -- Bucketed Random Projection LSH (Estimator)}
 \usage{
 ft_bucketed_random_projection_lsh(x, input_col, output_col, bucket_length,
-  num_hash_tables, seed = NULL, dataset = NULL,
+  num_hash_tables = 1L, seed = NULL, dataset = NULL,
   uid = random_string("bucketed_random_project_lsh_"), ...)
 }
 \arguments{
