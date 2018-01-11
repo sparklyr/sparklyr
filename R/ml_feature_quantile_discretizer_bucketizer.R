@@ -156,7 +156,7 @@ ft_quantile_discretizer.tbl_spark <- function(
 }
 
 new_ml_quantile_discretizer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "quantile_discretizer")
+  new_ml_estimator(jobj, subclass = "ml_quantile_discretizer")
 }
 
 # Validator
