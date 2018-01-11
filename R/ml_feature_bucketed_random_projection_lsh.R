@@ -34,11 +34,15 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(
 
   ml_ratify_args()
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
                                   input_col, output_col, uid) %>%
     invoke("setBucketLength", bucket_length) %>%
-    invoke("setNumHashTables", num_hash_tables) %>%
-    new_ml_bucketed_random_projection_lsh()
+    invoke("setNumHashTables", num_hash_tables)
+
+  if (!rlang::is_null(seed))
+    jobj <- invoke(jobj, "setSeed", seed)
+
+  estimator <- new_ml_bucketed_random_projection_lsh(jobj)
 
   if (is.null(dataset))
     estimator
@@ -81,6 +85,8 @@ ml_validator_bucketed_random_projection_lsh <- function(args, nms) {
     ml_validate_args({
       bucket_length <- ensure_scalar_double(bucket_length)
       num_hash_tables <- ensure_scalar_integer(num_hash_tables)
+      if (!rlang::is_null(seed))
+        seed <- ensure_scalar_integer(seed)
     }) %>%
     ml_extract_args(nms)
 }
