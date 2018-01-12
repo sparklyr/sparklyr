@@ -31,6 +31,8 @@ ft_imputer.spark_connection <- function(
   uid = random_string("imputer_"), ...
 ) {
 
+  if (spark_version(x) < "2.2.0") stop("ft_imputer() requires Spark 2.2.0+")
+
   ml_ratify_args()
   jobj <- invoke_new(x, "org.apache.spark.ml.feature.Imputer", uid) %>%
     invoke("setInputCols", input_cols) %>%
