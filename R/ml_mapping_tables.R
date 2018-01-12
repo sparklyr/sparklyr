@@ -15,6 +15,9 @@ ml_create_mapping_tables <- function() { # nocov start
          "weight_col" = "weightCol",
          "aggregation_depth" = "aggregationDepth",
          "num_features" = "numFeatures",
+         # ft_imputer
+         "missing_value" = "missingValue",
+         "output_cols" = "outputCols",
          # ft_word2vec
          "vector_size" = "vectorSize",
          "min_count" = "minCount",
@@ -135,6 +138,8 @@ ml_create_mapping_tables <- function() { # nocov start
     "NGram" = "ngram",
     "VectorSlicer" = "vector_slicer",
     # feature (estimators)
+    "Imputer" = "imputer",
+    "ImputerModel" = "imputer_model",
     "ChiSqSelector" = "chisq_selector",
     "ChiSqSelectorModel" = "chisq_selector_model",
     "Word2Vec" = "word2vec",
