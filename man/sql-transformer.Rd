@@ -71,5 +71,5 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_string_indexer}},
   \code{\link{ft_tokenizer}},
   \code{\link{ft_vector_assembler}},
-  \code{\link{ft_word2vec}}
+  \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
