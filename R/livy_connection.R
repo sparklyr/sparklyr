@@ -30,7 +30,7 @@ livy_validate_http_response <- function(message, req) {
 #'
 #' @export
 #'
-#' @importFrom jsonlite base64_enc
+#' @importFrom base64enc base64encode
 #' @importFrom jsonlite unbox
 #'
 #' @param config Optional base configuration
@@ -69,7 +69,7 @@ livy_validate_http_response <- function(message, req) {
 livy_config <- function(config = spark_config(), username = NULL, password = NULL,
                         custom_headers = list("X-Requested-By" = "sparklyr"), ...) {
   if (!is.null(username) || !is.null(password)) {
-    secret <- base64_enc(paste(username, password, sep = ":"))
+    secret <- base64encode(paste(username, password, sep = ":"))
 
     config[["sparklyr.livy.headers"]] <- c(
       config[["sparklyr.livy.headers"]], list(
