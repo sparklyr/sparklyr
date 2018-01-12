@@ -139,6 +139,8 @@ ml_create_mapping_tables <- function() { # nocov start
     "NGram" = "ngram",
     "VectorSlicer" = "vector_slicer",
     # feature (estimators)
+    "MinMaxScaler" = "min_max_scaler",
+    "MinMaxScalerModel" = "min_max_scaler_model",
     "MaxAbsScaler" = "max_abs_scaler",
     "MaxAbsScalerModel" = "max_abs_scaler_model",
     "Imputer" = "imputer",
