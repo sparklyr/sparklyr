@@ -133,6 +133,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "Tokenizer" = "tokenizer",
     "VectorAssembler" = "vector_assembler",
     "NGram" = "ngram",
+    "VectorSlicer" = "vector_slicer",
     # feature (estimators)
     "ChiSqSelector" = "chisq_selector",
     "ChiSqSelectorModel" = "chisq_selector_model",
