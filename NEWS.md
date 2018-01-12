@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed issue in which connecting to Livy would fail due to long user names
+  or long passwords.
+
 - Fixed error in the Spark connection dialog for clusters using a proxy.
 
 - Improved support for Spark 2.X under Cloudera clusters by prioritizing
