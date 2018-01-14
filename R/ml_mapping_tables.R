@@ -15,6 +15,9 @@ ml_create_mapping_tables <- function() { # nocov start
          "weight_col" = "weightCol",
          "aggregation_depth" = "aggregationDepth",
          "num_features" = "numFeatures",
+         # ft_standard_scaler
+         "with_mean" = "withMean",
+         "with_std" = "withStd",
          # ft_imputer
          "missing_value" = "missingValue",
          "output_cols" = "outputCols",
@@ -141,6 +144,8 @@ ml_create_mapping_tables <- function() { # nocov start
     "NGram" = "ngram",
     "VectorSlicer" = "vector_slicer",
     # feature (estimators)
+    "StandardScaler" = "standard_scaler",
+    "StandardScalerModel" = "standard_scaler_model",
     "MinMaxScaler" = "min_max_scaler",
     "MinMaxScalerModel" = "min_max_scaler_model",
     "MaxAbsScaler" = "max_abs_scaler",
