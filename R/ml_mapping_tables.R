@@ -123,6 +123,7 @@ ml_create_mapping_tables <- function() { # nocov start
 
   ml_class_mapping_list <- list(
     # feature (transformers)
+    "PolynomialExpansion" = "polynomial_expansion",
     "Normalizer" = "normalizer",
     "Interaction" = "interaction",
     "HashingTF" = "hashing_tf",
