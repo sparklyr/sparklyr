@@ -128,16 +128,7 @@ sdf_predict <- function(x, model, ...) {
 }
 
 #' @export
-sdf_predict.ml_model_classification <- function(
-  x, model, ...) {
-
-  ml_predict(x, dataset = model, ...)
-}
-
-#' @export
-sdf_predict.ml_model_regression <- function(
-  x, model, ...) {
-
+sdf_predict.ml_model <- function(x, model, ...) {
   ml_predict(x, dataset = model, ...)
 }
 
