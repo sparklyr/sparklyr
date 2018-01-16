@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support to collect `VectorUDT` column types with nested arrays.
+
 - Fixed issue in which connecting to Livy would fail due to long user names
   or long passwords.
 
