@@ -178,6 +178,8 @@ ml_create_mapping_tables <- function() { # nocov start
     "PCAModel" = "pca_model",
     "BucketedRandomProjectionLSH" = "bucketed_random_projection_lsh",
     "BucketedRandomProjectionLSHModel" = "bucketed_random_projection_lsh_model",
+    "MinHashLSH" = "min_hash_lsh",
+    "MinHashLSHModel" = "min_hash_lsh_model",
     # regression
     "LogisticRegression" = "logistic_regression",
     "LogisticRegressionModel" = "logistic_regression_model",
