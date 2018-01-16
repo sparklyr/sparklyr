@@ -38,7 +38,7 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(
   ml_ratify_args()
 
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
-                                  input_col, output_col, uid) %>%
+                             input_col, output_col, uid) %>%
     invoke("setBucketLength", bucket_length) %>%
     invoke("setNumHashTables", num_hash_tables)
 
