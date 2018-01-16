@@ -1,16 +1,21 @@
 
 setMethod("dbWriteTable", "spark_connection",
-  function(conn, name, value, temporary = TRUE, repartition = 0, serializer = NULL) {
-    if (!temporary) {
-      stop("Writing to non-temporary tables is not supported yet")
-    }
-
+  function(conn, name, value, temporary = getOption("sparklyr.dbwritetable.temp", FALSE), append = FALSE, repartition = 0, serializer = NULL) {
     found <- dbExistsTable(conn, name)
     if (found) {
       stop("Table ", name, " already exists")
     }
 
-    spark_data_copy(conn, value, name, repartition, serializer = serializer)
+    temp_name <- if (identical(temporary, FALSE)) random_string("sparklyr_tmp_") else name
+
+    spark_data_copy(conn, value, temp_name, repartition, serializer = serializer)
+
+    if (identical(temporary, FALSE))
+      spark_write_table(
+        tbl(sc, temp_name),
+        name,
+        if (identical(append, TRUE)) "append" else NULL
+      )
 
     invisible(TRUE)
   }
