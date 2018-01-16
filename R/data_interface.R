@@ -566,7 +566,7 @@ spark_write_table.tbl_spark <- function(x,
       "Upgrade to Spark 2.X or use this function in a non-local Spark cluster.")
   }
 
-  fileMethod <- ifelse(mode == "append", "insertInto", "saveAsTable")
+  fileMethod <- ifelse(identical(mode, "append"), "insertInto", "saveAsTable")
 
   spark_data_write_generic(sqlResult, name, fileMethod, mode, options, partition_by)
 }
