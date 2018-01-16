@@ -1,4 +1,4 @@
-context("ml feature lsh")
+context("ml feature bucketed random projection lsh")
 
 sc <- testthat_spark_connection()
 
