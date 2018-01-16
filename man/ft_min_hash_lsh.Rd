@@ -5,7 +5,7 @@
 \title{Feature Tranformation -- MinHashLSH (Estimator)}
 \usage{
 ft_min_hash_lsh(x, input_col, output_col, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL, uid = random_string("bucketed_random_project_lsh_"), ...)
+  dataset = NULL, uid = random_string("min_hash_lsh_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

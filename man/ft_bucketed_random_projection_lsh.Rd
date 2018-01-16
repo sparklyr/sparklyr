@@ -6,7 +6,7 @@
 \usage{
 ft_bucketed_random_projection_lsh(x, input_col, output_col, bucket_length,
   num_hash_tables = 1L, seed = NULL, dataset = NULL,
-  uid = random_string("bucketed_random_project_lsh_"), ...)
+  uid = random_string("bucketed_random_projection_lsh_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
