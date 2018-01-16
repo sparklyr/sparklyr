@@ -28,8 +28,8 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
     ml_transform(dfA_tbl) %>%
     dplyr::collect()
   expect_equal(
-    colnames(transformed),
-    c("id", "V1", "V2", "features", "hashes")
+    transformed %>% dplyr::pull(hashes) %>% head(1) %>% unlist() %>% length(),
+    3
   )
   expect_equal(
     nrow(transformed),
