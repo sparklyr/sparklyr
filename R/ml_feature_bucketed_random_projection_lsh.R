@@ -101,9 +101,7 @@ new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
     approx_nearest_neighbors = function(
       dataset, key, num_nearest_neighbors, dist_col = "distCol") {
       dataset <- spark_dataframe(dataset)
-      key <- lapply(key, ensure_scalar_double) %>%
-        invoke_static(spark_connection(jobj),
-                      "org.apache.spark.ml.linalg.Vectors", "dense", .)
+      key <- spark_dense_vector(spark_connection(jobj), key)
       num_nearest_neighbors <- ensure_scalar_integer(num_nearest_neighbors)
       dist_col <- ensure_scalar_character(dist_col)
       jobj %>%
