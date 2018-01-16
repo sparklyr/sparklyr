@@ -153,7 +153,8 @@ object Utils {
       val el = row(idx)
       el match {
         case null => Array.empty
-        case _    => el.getClass.getDeclaredMethod("toArray").invoke(el)
+        case _: Seq[_] => el.asInstanceOf[Seq[Any]].toArray
+        case _ => el.getClass.getDeclaredMethod("toArray").invoke(el)
       }
     }}
   }
