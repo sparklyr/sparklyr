@@ -15,6 +15,10 @@ ml_create_mapping_tables <- function() { # nocov start
          "weight_col" = "weightCol",
          "aggregation_depth" = "aggregationDepth",
          "num_features" = "numFeatures",
+         "lower_bounds_on_coefficients" = "lowerBoundsOnCoefficients",
+         "upper_bounds_on_coefficients" = "upperBoundsOnCoefficients",
+         "lower_bounds_on_intercepts" = "lowerBoundsOnIntercepts",
+         "upper_bounds_on_intercepts" = "upperBoundsOnIntercepts",
          # ft_standard_scaler
          "with_mean" = "withMean",
          "with_std" = "withStd",

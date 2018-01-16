@@ -11,6 +11,14 @@
 #' @template roxlate-ml-elastic-net-param
 #' @param threshold in binary classification prediction, in range [0, 1].
 #' @template roxlate-ml-aggregation-depth
+#' @param lower_bounds_on_coefficients (Spark 2.2.0+) Lower bounds on coefficients if fitting under bound constrained optimization.
+#'   The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.
+#' @param lower_bounds_on_intercepts (Spark 2.2.0+) Lower bounds on intercepts if fitting under bound constrained optimization.
+#'   The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.
+#' @param upper_bounds_on_coefficients (Spark 2.2.0+) Upper bounds on coefficients if fitting under bound constrained optimization.
+#'   The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.
+#' @param upper_bounds_on_intercepts (Spark 2.2.0+) Upper bounds on intercepts if fitting under bound constrained optimization.
+#'   The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.
 #' @export
 ml_logistic_regression <- function(
   x,
@@ -24,6 +32,10 @@ ml_logistic_regression <- function(
   tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
+  lower_bounds_on_coefficients = NULL,
+  lower_bounds_on_intercepts = NULL,
+  upper_bounds_on_coefficients = NULL,
+  upper_bounds_on_intercepts = NULL,
   features_col = "features",
   label_col = "label",
   family = "auto",
@@ -49,6 +61,10 @@ ml_logistic_regression.spark_connection <- function(
   tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
+  lower_bounds_on_coefficients = NULL,
+  lower_bounds_on_intercepts = NULL,
+  upper_bounds_on_coefficients = NULL,
+  upper_bounds_on_intercepts = NULL,
   features_col = "features",
   label_col = "label",
   family = "auto",
@@ -77,9 +93,24 @@ ml_logistic_regression.spark_connection <- function(
 
   if (!rlang::is_null(thresholds))
     jobj <- invoke(jobj, "setThresholds", thresholds)
-
   if (!rlang::is_null(weight_col))
     jobj <- invoke(jobj, "setWeightCol", weight_col)
+  if (!rlang::is_null(lower_bounds_on_coefficients))
+    jobj <- jobj_set_param(jobj, "setLowerBoundsOnCoefficients",
+                           lower_bounds_on_coefficients,
+                           NULL, "2.2.0")
+  if (!rlang::is_null(upper_bounds_on_coefficients))
+    jobj <- jobj_set_param(jobj, "setUpperBoundsOnCoefficients",
+                           upper_bounds_on_coefficients,
+                           NULL, "2.2.0")
+  if (!rlang::is_null(lower_bounds_on_intercepts))
+    jobj <- jobj_set_param(jobj, "setLowerBoundsOnIntercepts",
+                           lower_bounds_on_intercepts,
+                           NULL, "2.2.0")
+  if (!rlang::is_null(upper_bounds_on_intercepts))
+    jobj <- jobj_set_param(jobj, "setUpperBoundsOnIntercepts",
+                           upper_bounds_on_intercepts,
+                           NULL, "2.2.0")
 
   new_ml_logistic_regression(jobj)
 }
@@ -97,6 +128,10 @@ ml_logistic_regression.ml_pipeline <- function(
   tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
+  lower_bounds_on_coefficients = NULL,
+  lower_bounds_on_intercepts = NULL,
+  upper_bounds_on_coefficients = NULL,
+  upper_bounds_on_intercepts = NULL,
   features_col = "features",
   label_col = "label",
   family = "auto",
@@ -123,6 +158,10 @@ ml_logistic_regression.tbl_spark <- function(
   tol = 1e-06,
   weight_col = NULL,
   aggregation_depth = 2L,
+  lower_bounds_on_coefficients = NULL,
+  lower_bounds_on_intercepts = NULL,
+  upper_bounds_on_coefficients = NULL,
+  upper_bounds_on_intercepts = NULL,
   features_col = "features",
   label_col = "label",
   family = "auto",
@@ -174,7 +213,18 @@ ml_validator_logistic_regression <- function(args, nms) {
       if (!is.null(weight_col))
         weight_col <- ensure_scalar_character(weight_col)
       aggregation_depth <- ensure_scalar_integer(aggregation_depth)
-      tol <- ensure_scalar_double(tol)
+      if (!is.null(lower_bounds_on_coefficients))
+        lower_bounds_on_coefficients <- spark_dense_matrix(
+          x, lower_bounds_on_coefficients)
+      if (!is.null(upper_bounds_on_coefficients))
+        upper_bounds_on_coefficients <- spark_dense_matrix(
+          x, upper_bounds_on_coefficients)
+      if (!is.null(lower_bounds_on_intercepts))
+        lower_bounds_on_intercepts <- spark_dense_vector(
+          x, lower_bounds_on_intercepts)
+      if (!is.null(upper_bounds_on_intercepts))
+        upper_bounds_on_intercepts <- spark_dense_vector(
+          x, upper_bounds_on_intercepts)
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }

@@ -7,8 +7,10 @@
 ml_logistic_regression(x, formula = NULL, fit_intercept = TRUE,
   elastic_net_param = 0, reg_param = 0, max_iter = 100L,
   threshold = 0.5, thresholds = NULL, tol = 1e-06, weight_col = NULL,
-  aggregation_depth = 2L, features_col = "features", label_col = "label",
-  family = "auto", prediction_col = "prediction",
+  aggregation_depth = 2L, lower_bounds_on_coefficients = NULL,
+  lower_bounds_on_intercepts = NULL, upper_bounds_on_coefficients = NULL,
+  upper_bounds_on_intercepts = NULL, features_col = "features",
+  label_col = "label", family = "auto", prediction_col = "prediction",
   probability_col = "probability", raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...)
 }
@@ -34,6 +36,18 @@ ml_logistic_regression(x, formula = NULL, fit_intercept = TRUE,
 \item{weight_col}{The name of the column to use as weights for the model fit.}
 
 \item{aggregation_depth}{(Spark 2.1.0+) Suggested depth for treeAggregate (>= 2).}
+
+\item{lower_bounds_on_coefficients}{(Spark 2.2.0+) Lower bounds on coefficients if fitting under bound constrained optimization.
+The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.}
+
+\item{lower_bounds_on_intercepts}{(Spark 2.2.0+) Lower bounds on intercepts if fitting under bound constrained optimization.
+The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.}
+
+\item{upper_bounds_on_coefficients}{(Spark 2.2.0+) Upper bounds on coefficients if fitting under bound constrained optimization.
+The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.}
+
+\item{upper_bounds_on_intercepts}{(Spark 2.2.0+) Upper bounds on intercepts if fitting under bound constrained optimization.
+The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 
