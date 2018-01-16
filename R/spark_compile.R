@@ -405,7 +405,26 @@ make_version_filter <- function(version_upper) {
         dplyr::last()
 
       if (grepl("([0-9]+\\.){2}[0-9]+", maybe_version)) {
-        numeric_version(maybe_version) <= numeric_version(version_upper)
+        use_file <- numeric_version(maybe_version) <= numeric_version(version_upper)
+        file_name <- basename(file)
+
+        # is there is more than one file with the same name
+        if (sum(file_name == basename(files)) > 1) {
+          repeated_names <- Filter(function(e) grepl(file_name, e), files)
+          other_versions <- repeated_names %>%
+            dirname() %>%
+            basename() %>%
+            strsplit("-") %>%
+            sapply(function(e) e[-1]) %>%
+            numeric_version() %>%
+            Filter(function(e) e <= numeric_version(version_upper), .)
+
+          # only use the file with the biggest version
+          numeric_version(maybe_version) == max(other_versions)
+        }
+        else {
+          use_file
+        }
       } else {
         TRUE
       }
