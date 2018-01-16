@@ -106,6 +106,16 @@ ml_predict.ml_model_classification <- function(
     )
 }
 
+#' @export
+ml_predict.ml_model_clustering <- function(x, dataset, ...) {
+  # when dataset is not supplied, attempt to use original dataset
+  if (missing(dataset) || rlang::is_null(dataset))
+    dataset <- x$dataset
+
+  x$pipeline_model %>%
+    ml_transform(dataset)
+}
+
 #' Spark ML -- Transform, fit, and predict methods (sdf_ interface)
 #'
 #' Methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
@@ -128,16 +138,7 @@ sdf_predict <- function(x, model, ...) {
 }
 
 #' @export
-sdf_predict.ml_model_classification <- function(
-  x, model, ...) {
-
-  ml_predict(x, dataset = model, ...)
-}
-
-#' @export
-sdf_predict.ml_model_regression <- function(
-  x, model, ...) {
-
+sdf_predict.ml_model <- function(x, model, ...) {
   ml_predict(x, dataset = model, ...)
 }
 
