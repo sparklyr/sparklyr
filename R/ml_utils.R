@@ -98,3 +98,14 @@ jobj_set_param <- function(jobj, method, param, default, min_version) {
       invoke(method, param)
   }
 }
+
+spark_dense_matrix <- function(sc, mat) {
+  invoke_new(
+    sc, "org.apache.spark.ml.linalg.DenseMatrix", dim(mat)[1L], dim(mat)[2L],
+    as.list(mat))
+}
+
+spark_dense_vector <- function(sc, vec) {
+  invoke_static(sc,  "org.apache.spark.ml.linalg.Vectors", "dense",
+                as.list(vec))
+}
