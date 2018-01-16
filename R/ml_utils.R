@@ -109,3 +109,10 @@ spark_dense_vector <- function(sc, vec) {
   invoke_static(sc,  "org.apache.spark.ml.linalg.Vectors", "dense",
                 as.list(vec))
 }
+
+spark_sql_column <- function(sc, col, alias = NULL) {
+  jobj <- invoke_new(sc, "org.apache.spark.sql.Column", col)
+  if (!is.null(alias))
+    jobj <- invoke(jobj, "alias", alias)
+  jobj
+}
