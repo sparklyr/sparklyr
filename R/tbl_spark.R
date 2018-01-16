@@ -1,6 +1,6 @@
 #' @export
 dim.tbl_spark <- function(x) {
-  NA
+  c(NA_real_, sdf_ncol(x))
 }
 
 #' @export
