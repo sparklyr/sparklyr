@@ -3,7 +3,7 @@ context("ml feature lsh")
 sc <- testthat_spark_connection()
 
 dfA <- data.frame(
-  id = 1:4,
+  id = 0:3,
   V1 = c(1, 1, -1, -1),
   V2 = c(1, -1, -1, 1)
 )
@@ -14,26 +14,38 @@ dfB <- data.frame(
   V2 = c(0, 0, 1, -1)
 )
 
-dfA_tbl <- sdf_copy_to(sc, dfA) %>%
+dfA_tbl <- sdf_copy_to(sc, dfA, overwrite = TRUE) %>%
   ft_vector_assembler(c("V1", "V2"), "features")
-dfB_tbl <- sdf_copy_to(sc, dfB) %>%
+dfB_tbl <- sdf_copy_to(sc, dfB, overwrite = TRUE) %>%
   ft_vector_assembler(c("V1", "V2"), "features")
 
 test_that("ft_bucketed_random_projection_lsh() works properly", {
   test_requires_version("2.1.0", "LSH requires 2.1+")
   lsh <- ft_bucketed_random_projection_lsh(
     sc, input_col = "features", output_col = "hashes",
-    bucket_length = 2, num_hash_tables = 3, dataset = dfA_tbl)
+    bucket_length = 2, num_hash_tables = 3, dataset = dfA_tbl, seed = 666)
   transformed <- lsh %>%
     ml_transform(dfA_tbl) %>%
-    collect()
+    dplyr::collect()
   expect_equal(
     colnames(transformed),
     c("id", "V1", "V2", "features", "hashes")
   )
   expect_equal(
-    sdf_nrow(transformed),
+    nrow(transformed),
     4
+  )
+  expect_equal(
+    lsh$approx_nearest_neighbors(dfA_tbl, c(1, 0), num_nearest_neighbors = 2) %>%
+      dplyr::pull(id),
+    c(0, 1)
+  )
+  expect_equal(
+    lsh$approx_similarity_join(dfA_tbl, dfB_tbl, 2) %>%
+      dplyr::arrange(id_a, id_b) %>%
+      ft_vector_assembler(c("id_a", "id_b"), "joined_pairs") %>%
+      dplyr::pull(joined_pairs),
+    list(c(0, 4), c(0, 6), c(1, 4), c(1, 7), c(2, 5), c(2, 7), c(3, 5), c(3, 6))
   )
 })
 
