@@ -95,3 +95,13 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
   expect_equivalent(lhs, rhs)
 
 })
+
+test_that("ml_model_kmeans can be used with ml_predict()", {
+  iris_tbl <- testthat_tbl("iris")
+  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5)
+  expect_equal(ml_predict(iris_kmeans, iris_tbl) %>%
+    dplyr::distinct(prediction) %>%
+    dplyr::arrange(prediction) %>%
+    dplyr::pull(prediction),
+    0:4)
+})
