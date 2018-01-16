@@ -116,44 +116,44 @@ test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted for
 
 test_that("ml_logistic_regression.tbl_spark() takes 'response' and 'features'
           columns instead of formula for backwards compatibility", {
-  m1 <- ml_logistic_regression(
-    iris_weighted_tbl,
-    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width"
-  )
+            m1 <- ml_logistic_regression(
+              iris_weighted_tbl,
+              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width"
+            )
 
-  m2 <- ml_logistic_regression(
-    iris_weighted_tbl,
-    response = "versicolor",
-    features = c("Sepal_Width", "Petal_Length", "Petal_Width")
-  )
+            m2 <- ml_logistic_regression(
+              iris_weighted_tbl,
+              response = "versicolor",
+              features = c("Sepal_Width", "Petal_Length", "Petal_Width")
+            )
 
-  expect_identical(m1$formula, m2$formula)
-})
+            expect_identical(m1$formula, m2$formula)
+          })
 
 test_that("ml_logistic_regression.tbl_spark() warns when 'response' is a formula and
           'features' is specified", {
-  expect_warning(
-    ml_logistic_regression(iris_weighted_tbl, response = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
-                           features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
-    "'features' is ignored when a formula is specified"
-  )
-})
+            expect_warning(
+              ml_logistic_regression(iris_weighted_tbl, response = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
+                                     features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
+              "'features' is ignored when a formula is specified"
+            )
+          })
 
 test_that("ml_logistic_regression.tbl_spark() errors if 'formula' is specified and either
           'response' or 'features' is specified", {
-  expect_error(
-    ml_logistic_regression(iris_weighted_tbl,
-                           "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                           response = "versicolor"),
-    "only one of 'formula' or 'response'-'features' should be specified"
-  )
-  expect_error(
-    ml_logistic_regression(iris_weighted_tbl,
-                           "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                           features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
-    "only one of 'formula' or 'response'-'features' should be specified"
-  )
-})
+            expect_error(
+              ml_logistic_regression(iris_weighted_tbl,
+                                     "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                                     response = "versicolor"),
+              "only one of 'formula' or 'response'-'features' should be specified"
+            )
+            expect_error(
+              ml_logistic_regression(iris_weighted_tbl,
+                                     "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                                     features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
+              "only one of 'formula' or 'response'-'features' should be specified"
+            )
+          })
 
 
 test_that("ml_logistic_regression parameter setting/getting works", {
@@ -186,8 +186,11 @@ test_that("logistic regression default params are correct", {
     ml_logistic_regression() %>%
     ml_stage(1)
 
-  args <- get_default_args(ml_logistic_regression,
-                           c("x", "uid", "...", "thresholds", "weight_col"))
+  args <- get_default_args(
+    ml_logistic_regression,
+    c("x", "uid", "...", "thresholds", "weight_col",
+      "lower_bounds_on_coefficients", "upper_bounds_on_coefficients",
+      "lower_bounds_on_intercepts", "upper_bounds_on_intercepts"))
 
   if (spark_version(sc) < "2.1.0")
     args <- rlang::modify(args, aggregation_depth = NULL, family = NULL)
@@ -255,3 +258,16 @@ test_that("weights column works for logistic regression", {
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
 
+test_that("logistic regression bounds on coefficients", {
+  test_requires_version("2.2.0", "coefficient bounds require 2.2+")
+
+  iris_tbl <- testthat_tbl("iris")
+  lr <- ml_logistic_regression(
+    iris_tbl, Species ~ Petal_Width + Sepal_Length,
+    upper_bounds_on_coefficients = matrix(rep(1, 6), nrow = 3),
+    lower_bounds_on_coefficients = matrix(rep(-1, 6), nrow = 3),
+    upper_bounds_on_intercepts = c(1, 1, 1),
+    lower_bounds_on_intercepts = c(-1, -1, -1))
+  expect_equal(max(coef(lr)), 1)
+  expect_equal(min(coef(lr)), -1)
+})
