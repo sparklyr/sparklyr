@@ -1,5 +1,10 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support in `dbWriteTable()` for `temporary = FALSE` to allow persisting
+  table across connections. Changed default value for `temporary` to `TRUE` to match
+  `DBI` specification, for compatibility, default value can be reverted back to 
+  `FALSE` using the `sparklyr.dbwritetable.temp` option.
+
 - `ncol()` now returns the number of columns instead of `NA`, and `nrow()` now
   returns `NA_real_`.
 
