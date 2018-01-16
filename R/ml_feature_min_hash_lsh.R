@@ -15,7 +15,7 @@ ft_min_hash_lsh <- function(
   x, input_col, output_col,
   num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
-  uid = random_string("bucketed_random_project_lsh_"), ...) {
+  uid = random_string("min_hash_lsh_"), ...) {
   UseMethod("ft_min_hash_lsh")
 }
 
@@ -31,7 +31,7 @@ ft_min_hash_lsh.spark_connection <- function(
 
   ml_ratify_args()
 
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
+  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.MinHashLSH",
                              input_col, output_col, uid) %>%
     invoke("setNumHashTables", num_hash_tables)
 
