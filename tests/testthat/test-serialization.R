@@ -234,3 +234,35 @@ test_that("invoke() can roundtrip POSIXlt fields", {
     )
   )
 })
+
+test_that("invoke() can roundtrip collect fields", {
+  invoke_static(
+    sc,
+    "sparklyr.Test",
+    "roundtrip",
+    list(
+      as.POSIXlt(Sys.time(), "GMT"),
+      as.POSIXlt(Sys.time(), "GMT")
+    )
+  )
+})
+
+test_that("collect() can retrieve as.POSIXct fields with timezones", {
+  tz_entries <- list(
+    as.POSIXct("2018-01-01", tz = "UTC"),
+    as.POSIXct("2018-01-01", tz = "GMT"),
+    as.POSIXct("2018-01-01", tz = "America/Los_Angeles"),
+    as.POSIXct("2018-01-01 03:33", tz = "America/Los_Angeles"),
+    as.POSIXct("2018-01-01 03:33", tz = "Europe/Brussels")
+  )
+
+  collected <- sdf_len(sc, 1) %>%
+    spark_apply(function(e, c) c, context = list(tzs = tz_entries)) %>%
+    collect() %>%
+    as.list() %>%
+    unname()
+
+  expect_true(
+    all.equal(tz_entries, collected)
+  )
+})
