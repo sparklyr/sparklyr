@@ -130,4 +130,8 @@ db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...
   # compute() is expected to preserve the query, cache as the closest mapping.
   if (!sparklyr_boolean_option("sparklyr.dplyr.compute.nocache"))
     tbl_cache(con, name)
+
+  # dbplyr expects db_save_query to retrieve the table name
+  name
+}
 }

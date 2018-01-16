@@ -126,3 +126,15 @@ test_that("spark_write_table() can append data", {
 
   expect_equal(sdf_nrow(append_table), 1)
 })
+
+test_that("spark_write_table() can write data", {
+  library(dplyr)
+
+  df <- copy_to(sc, data.frame(id = 1L))
+
+  spark_write_table(df, "test_write_table_new")
+
+  append_table <- tbl(sc, "test_write_table_new")
+
+  expect_equal(sdf_nrow(append_table), 1)
+})
