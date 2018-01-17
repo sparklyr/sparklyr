@@ -11,7 +11,7 @@ r_packages:
   - covr
 
 env:
-  - SPARK_VERSION="1.6.2"
+  - SPARK_VERSION="1.6.3"
   - SPARK_VERSION="2.2.0"
 
 script:
