@@ -95,7 +95,7 @@ ml_kmeans.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
-    if (spark_version(x) < "2.0.0")
+    if (spark_version(spark_connection(x)) < "2.0.0")
       stop("ml_kmeans() with formula interface requires Spark 2.0.0+")
     ml_generate_ml_model(x, predictor = predictor, formula = formula, features_col = features_col,
                          type = "clustering", constructor = new_ml_model_kmeans)
