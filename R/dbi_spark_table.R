@@ -12,7 +12,7 @@ setMethod("dbWriteTable", "spark_connection",
 
     if (identical(temporary, FALSE))
       spark_write_table(
-        tbl(sc, temp_name),
+        tbl(conn, temp_name),
         name,
         if (identical(append, TRUE)) "append" else NULL
       )
