@@ -20,7 +20,6 @@ test_that("'copy_to()' works under Livy connections", {
 })
 
 test_that("'livy_config()' works with extended parameters", {
-  skip("")
   config <- livy_config(num_executors = 1)
 
   expect_equal(as.integer(config$livy.numExecutors), 1)
