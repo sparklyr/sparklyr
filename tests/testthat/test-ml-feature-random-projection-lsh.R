@@ -36,12 +36,12 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
     4
   )
   expect_equal(
-    lsh$approx_nearest_neighbors(dfA_tbl, c(1, 0), num_nearest_neighbors = 2) %>%
+    ml_approx_nearest_neighbors(lsh, dfA_tbl, c(1, 0), num_nearest_neighbors = 2) %>%
       dplyr::pull(id),
     c(0, 1)
   )
   expect_equal(
-    lsh$approx_similarity_join(dfA_tbl, dfB_tbl, 2) %>%
+    ml_approx_similarity_join(lsh, dfA_tbl, dfB_tbl, 2) %>%
       dplyr::arrange(id_a, id_b) %>%
       ft_vector_assembler(c("id_a", "id_b"), "joined_pairs") %>%
       dplyr::pull(joined_pairs),

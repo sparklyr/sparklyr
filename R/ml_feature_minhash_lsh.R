@@ -1,30 +1,19 @@
-#' Feature Tranformation -- MinHashLSH (Estimator)
-#'
-#' Locality Sensitive Hashing for Jaccard distance.
-#'
-#' @template roxlate-ml-feature-input-output-col
-#' @template roxlate-ml-feature-transformer
-#' @template roxlate-ml-feature-estimator-transformer
-#' @param num_hash_tables Number of hash tables used in LSH OR-amplification. LSH
-#'   OR-amplification can be used to reduce the false negative rate. Higher values
-#'   for this param lead to a reduced false negative rate, at the expense of added
-#'    computational complexity.
-#' @template roxlate-ml-seed
+#' @rdname ft_lsh
 #' @export
-ft_min_hash_lsh <- function(
+ft_minhash_lsh <- function(
   x, input_col, output_col,
   num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
-  uid = random_string("min_hash_lsh_"), ...) {
-  UseMethod("ft_min_hash_lsh")
+  uid = random_string("minhash_lsh_"), ...) {
+  UseMethod("ft_minhash_lsh")
 }
 
 #' @export
-ft_min_hash_lsh.spark_connection <- function(
+ft_minhash_lsh.spark_connection <- function(
   x, input_col, output_col,
   num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
-  uid = random_string("min_hash_lsh_"), ...) {
+  uid = random_string("minhash_lsh_"), ...) {
 
   if (spark_version(x) < "2.1.0")
     stop("LSH is supported in Spark 2.1.0+")
@@ -38,7 +27,7 @@ ft_min_hash_lsh.spark_connection <- function(
   if (!rlang::is_null(seed))
     jobj <- invoke(jobj, "setSeed", seed)
 
-  estimator <- new_ml_min_hash_lsh(jobj)
+  estimator <- new_ml_minhash_lsh(jobj)
 
   if (is.null(dataset))
     estimator
@@ -47,11 +36,11 @@ ft_min_hash_lsh.spark_connection <- function(
 }
 
 #' @export
-ft_min_hash_lsh.ml_pipeline <- function(
+ft_minhash_lsh.ml_pipeline <- function(
   x, input_col, output_col,
   num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
-  uid = random_string("min_hash_lsh_"), ...
+  uid = random_string("minhash_lsh_"), ...
 ) {
 
   stage <- ml_new_stage_modified_args()
@@ -60,11 +49,11 @@ ft_min_hash_lsh.ml_pipeline <- function(
 }
 
 #' @export
-ft_min_hash_lsh.tbl_spark <- function(
+ft_minhash_lsh.tbl_spark <- function(
   x, input_col, output_col,
   num_hash_tables = 1L, seed = NULL,
   dataset = NULL,
-  uid = random_string("min_hash_lsh_"), ...
+  uid = random_string("minhash_lsh_"), ...
 ) {
   dots <- rlang::dots_list(...)
 
@@ -76,7 +65,7 @@ ft_min_hash_lsh.tbl_spark <- function(
     ml_fit_and_transform(stage, x)
 }
 
-ml_validator_min_hash_lsh <- function(args, nms) {
+ml_validator_minhash_lsh <- function(args, nms) {
   args %>%
     ml_validate_args({
       num_hash_tables <- ensure_scalar_integer(num_hash_tables)
@@ -86,14 +75,14 @@ ml_validator_min_hash_lsh <- function(args, nms) {
     ml_extract_args(nms)
 }
 
-new_ml_min_hash_lsh <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_min_hash_lsh")
+new_ml_minhash_lsh <- function(jobj) {
+  new_ml_estimator(jobj, subclass = "ml_minhash_lsh")
 }
 
-new_ml_min_hash_lsh_model <- function(jobj) {
+new_ml_minhash_lsh_model <- function(jobj) {
   new_ml_transformer(
     jobj,
     approx_nearest_neighbors = make_approx_nearest_neighbors(jobj),
     approx_similarity_join = make_approx_similarity_join(jobj),
-    subclass = "ml_min_hash_lsh_model")
+    subclass = "ml_minhash_lsh_model")
 }

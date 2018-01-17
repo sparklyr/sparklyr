@@ -45,7 +45,6 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   columns in Spark.
 
 Other feature transformers: \code{\link{ft_binarizer}},
-  \code{\link{ft_bucketed_random_projection_lsh}},
   \code{\link{ft_bucketizer}},
   \code{\link{ft_chisq_selector}},
   \code{\link{ft_count_vectorizer}}, \code{\link{ft_dct}},
@@ -53,9 +52,8 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_hashing_tf}}, \code{\link{ft_idf}},
   \code{\link{ft_imputer}},
   \code{\link{ft_index_to_string}},
-  \code{\link{ft_interaction}},
+  \code{\link{ft_interaction}}, \code{\link{ft_lsh}},
   \code{\link{ft_max_abs_scaler}},
-  \code{\link{ft_min_hash_lsh}},
   \code{\link{ft_min_max_scaler}}, \code{\link{ft_ngram}},
   \code{\link{ft_one_hot_encoder}}, \code{\link{ft_pca}},
   \code{\link{ft_polynomial_expansion}},

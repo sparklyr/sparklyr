@@ -1,6 +1,7 @@
-#' Feature Tranformation -- Bucketed Random Projection LSH (Estimator)
+#' Feature Tranformation -- LSH (Estimator)
 #'
-#' Locality Sensitive Hashing functions for Euclidean distance metrics.
+#' Locality Sensitive Hashing functions for Euclidean distance
+#'   (Bucketed Random Projection) and Jaccard distance (MinHash).
 #'
 #' @template roxlate-ml-feature-input-output-col
 #' @template roxlate-ml-feature-transformer
@@ -13,6 +14,7 @@
 #'   for this param lead to a reduced false negative rate, at the expense of added
 #'    computational complexity.
 #' @template roxlate-ml-seed
+#' @name ft_lsh
 #' @export
 ft_bucketed_random_projection_lsh <- function(
   x, input_col, output_col,

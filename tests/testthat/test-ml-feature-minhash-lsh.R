@@ -1,4 +1,4 @@
-context("ml feature min hash lsh")
+context("ml feature minhash lsh")
 
 sc <- testthat_spark_connection()
 
@@ -21,9 +21,9 @@ dfA_tbl <- sdf_copy_to(sc, dfA, overwrite = TRUE) %>%
 dfB_tbl <- sdf_copy_to(sc, dfB, overwrite = TRUE) %>%
   ft_vector_assembler(paste0("V", 0:5), "features")
 
-test_that("ft_min_hash_lsh() works properly", {
+test_that("ft_minhash_lsh() works properly", {
   test_requires_version("2.1.0", "LSH requires 2.1+")
-  lsh <- ft_min_hash_lsh(
+  lsh <- ft_minhash_lsh(
     sc, input_col = "features", output_col = "hashes",
     num_hash_tables = 5, dataset = dfA_tbl, seed = 666)
   transformed <- lsh %>%
@@ -38,12 +38,12 @@ test_that("ft_min_hash_lsh() works properly", {
     3
   )
   expect_equal(
-    lsh$approx_nearest_neighbors(dfA_tbl, c(0, 1, 0, 1, 0, 0), num_nearest_neighbors = 2) %>%
+    ml_approx_nearest_neighbors(lsh, dfA_tbl, c(0, 1, 0, 1, 0, 0), num_nearest_neighbors = 2) %>%
       dplyr::pull(distCol),
     c(0.75, 0.75)
   )
   expect_equal(
-    lsh$approx_similarity_join(dfA_tbl, dfB_tbl, 0.6) %>%
+    ml_approx_similarity_join(lsh, dfA_tbl, dfB_tbl, 0.6) %>%
       dplyr::arrange(id_a, id_b) %>%
       ft_vector_assembler(c("id_a", "id_b"), "joined_pairs") %>%
       dplyr::pull(joined_pairs),
@@ -52,12 +52,12 @@ test_that("ft_min_hash_lsh() works properly", {
 })
 
 
-test_that("ft_min_hash_lsh() param setting", {
+test_that("ft_minhash_lsh() param setting", {
   test_requires_version("2.1.0", "LSH requires 2.1+")
   args <- list(
     x = sc, input_col = "input", output_col = "output",
     num_hash_tables = 2, seed = 56
   )
-  estimator <- do.call(ft_min_hash_lsh, args)
+  estimator <- do.call(ft_minhash_lsh, args)
   expect_equal(ml_params(estimator, names(args)[-1]), args[-1])
 })
