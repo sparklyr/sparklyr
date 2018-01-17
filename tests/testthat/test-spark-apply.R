@@ -132,7 +132,7 @@ test_that("'spark_apply' can filter data.frame", {
       spark_apply(function(e) as.data.frame(e[e$id > 1,])) %>%
       collect() %>%
       nrow(),
-    0
+    9
   )
 })
 
