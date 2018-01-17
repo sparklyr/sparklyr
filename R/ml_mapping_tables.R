@@ -92,6 +92,10 @@ ml_create_mapping_tables <- function() { # nocov start
          "quantiles_col" = "quantilesCol",
          # ml_isotonic_regression
          "feature_index" = "featureIndex",
+         # ml_fpgrowth
+         "items_col" = "itemsCol",
+         "min_confidence" = "minConfidence",
+         "min_support" = "minSupport",
          # ml_als
          "rating_col" = "ratingCol",
          "user_col" = "userCol",
@@ -222,6 +226,9 @@ ml_create_mapping_tables <- function() { # nocov start
     "BisectingKMeansModel" = "bisecting_kmeans_model",
     "GaussianMixture" = "gaussian_mixture",
     "GaussianMixtureModel" = "gaussian_mixture_model",
+    # fpm
+    "FPGrowth" = "fpgrowth",
+    "FPGrowthModel" = "fpgrowth_model",
     # tuning
     "CrossValidator" = "cross_validator",
     "CrossValidatorModel" = "cross_validator_model",
