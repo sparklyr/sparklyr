@@ -15,6 +15,7 @@
 #'    computational complexity.
 #' @template roxlate-ml-seed
 #' @name ft_lsh
+#' @seealso ft_lsh_utils
 #' @export
 ft_bucketed_random_projection_lsh <- function(
   x, input_col, output_col,

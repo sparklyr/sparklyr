@@ -31,7 +31,9 @@ make_approx_similarity_join <- function(jobj) {
   }
 }
 
-#' @rdname ft_lsh
+#' Utility functions for LSH models
+#'
+#' @name ft_lsh_utils
 #' @param model A fitted LSH model, returned by either \code{ft_minhash_lsh()}
 #'   or \code{ft_bucketed_random_projection_lsh()}.
 #' @param dataset The dataset to search for nearest neighbors of the key.
@@ -45,7 +47,7 @@ ml_approx_nearest_neighbors <- function(
   model$approx_nearest_neighbors(dataset, key, num_nearest_neighbors, dist_col)
 }
 
-#' @rdname ft_lsh
+#' @rdname ft_lsh_utils
 #' @param dataset_a One of the datasets to join.
 #' @param dataset_b Another dataset to join.
 #' @param threshold The threshold for the distance of row pairs.
