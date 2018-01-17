@@ -3,8 +3,7 @@ context("ml feature chisq selector")
 sc <- testthat_spark_connection()
 
 test_that("ft_chisq_select() works properly", {
-  if (spark_version(sc) < "2.0.0") skip("ft_chisq_select() not supported before 2.0.0")
-
+  test_requires_version("2.1.0", "Spark behavior changed (https://issues.apache.org/jira/browse/SPARK-17870)")
   df <- dplyr::tribble(
     ~id, ~V1, ~V2, ~V3, ~V4, ~clicked,
     7,   0,   0,   18,  1,   1,
