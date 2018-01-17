@@ -152,6 +152,10 @@ test_that("collect() can retrieve all data types correctly", {
     "boolean",    "true",   "logical",    "TRUE"
   )
 
+  if (spark_version(sc) < "2.2.0") {
+    hive_type <- hive_type %>% filter(stype != "integer")
+  }
+
   spark_query <- hive_type %>%
     mutate(
       query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col")
@@ -198,6 +202,10 @@ test_that("collect() can retrieve NULL data types as NAs", {
  "varchar(10)",   "character",
     "char(10)",   "character"
   )
+
+  if (spark_version(sc) < "2.2.0") {
+    hive_type <- hive_type %>% filter(stype != "integer")
+  }
 
   spark_query <- hive_type %>%
     mutate(
