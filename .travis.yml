@@ -18,9 +18,15 @@ env:
 script:
   - |
     R CMD build .
-    R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
+    if [[ $SPARK_VERSION == "2.2.0" ]]; then
+      R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
+    else
+      R CMD check --no-build-vignettes --no-manual sparklyr*tar.gz
+    fi
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
-    travis_wait 30 Rscript -e 'covr::codecov()'
+    if [[ $SPARK_VERSION == "2.2.0" ]]; then
+      travis_wait 30 Rscript -e 'covr::codecov()'
+    fi
 
 after_failure:
   - |
