@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- `spark_web()` is is more reliable under Spark 2.X by making use of a new API
+  to programmatically find the right address.
+
 - Added support in `dbWriteTable()` for `temporary = FALSE` to allow persisting
   table across connections. Changed default value for `temporary` to `TRUE` to match
   `DBI` specification, for compatibility, default value can be reverted back to 
