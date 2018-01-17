@@ -3,16 +3,24 @@
 language: r
 sudo: false
 cache: packages
+
 jdk:
   - oraclejdk8
+
 r_packages:
   - covr
+
+env:
+  - SPARK_VERSION="1.6.3"
+  - SPARK_VERSION="2.2.0"
+
 script:
   - |
     R CMD build .
     R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
     travis_wait 30 Rscript -e 'covr::codecov()'
+
 after_failure:
   - |
     tail -n 500 /tmp/sparklyr.log

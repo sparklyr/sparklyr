@@ -11,6 +11,7 @@
 #'   Any pattern that appears more than (min_support * size-of-the-dataset) times
 #'    will be output in the frequent itemsets. Default: 0.3
 #' @template roxlate-ml-prediction-col
+#' @template roxlate-ml-uid
 #' @name ml_fpgrowth
 #' @export
 ml_fpgrowth <- function(
