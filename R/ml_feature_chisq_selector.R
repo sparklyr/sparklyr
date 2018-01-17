@@ -99,7 +99,7 @@ ml_validator_chisq_selector <- function(args, nms) {
       fpr <- ensure_scalar_double(fpr)
       fwe <- ensure_scalar_double(fwe)
       num_top_features <- ensure_scalar_integer(num_top_features)
-      perentile <- ensure_scalar_double(percentile)
+      percentile <- ensure_scalar_double(percentile)
       selector_type <- rlang::arg_match(
         selector_type,
         c("numTopFeatures", "percentile", "fpr", "fdr", "fwe"))

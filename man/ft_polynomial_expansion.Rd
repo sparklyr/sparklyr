@@ -4,7 +4,7 @@
 \alias{ft_polynomial_expansion}
 \title{Feature Transformation -- PolynomialExpansion (Transformer)}
 \usage{
-ft_polynomial_expansion(x, input_col, output_col, threshold = 0,
+ft_polynomial_expansion(x, input_col, output_col, degree = 2L,
   uid = random_string("polynomial_expansion_"), ...)
 }
 \arguments{
@@ -14,12 +14,12 @@ ft_polynomial_expansion(x, input_col, output_col, threshold = 0,
 
 \item{output_col}{The name of the output column.}
 
+\item{degree}{The polynomial degree to expand, which should be greater
+than equal to 1. A value of 1 means no expansion. Default: 2}
+
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{degree}{The polynomial degree to expand, which should be greater
-than equal to 1. A value of 1 means no expansion. Default: 2}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -55,7 +55,7 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_hashing_tf}}, \code{\link{ft_idf}},
   \code{\link{ft_imputer}},
   \code{\link{ft_index_to_string}},
-  \code{\link{ft_interaction}},
+  \code{\link{ft_interaction}}, \code{\link{ft_lsh}},
   \code{\link{ft_max_abs_scaler}},
   \code{\link{ft_min_max_scaler}}, \code{\link{ft_ngram}},
   \code{\link{ft_normalizer}},

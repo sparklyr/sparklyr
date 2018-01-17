@@ -10,7 +10,7 @@
 #' @param degree The polynomial degree to expand, which should be greater
 #'   than equal to 1. A value of 1 means no expansion. Default: 2
 #' @export
-ft_polynomial_expansion <- function(x, input_col, output_col, threshold = 0, uid = random_string("polynomial_expansion_"), ...) {
+ft_polynomial_expansion <- function(x, input_col, output_col, degree = 2L, uid = random_string("polynomial_expansion_"), ...) {
   UseMethod("ft_polynomial_expansion")
 }
 

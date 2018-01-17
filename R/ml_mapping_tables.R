@@ -33,6 +33,9 @@ ml_create_mapping_tables <- function() { # nocov start
          # ft_chisq_selector
          "num_top_features" = "numTopFeatures",
          "selector_type" = "selectorType",
+         # ft_bucketed_random_projection_lsh
+         "bucket_length" = "bucketLength",
+         "num_hash_tables" = "numHashTables",
          # ft_idf
          "min_doc_freq" = "minDocFreq",
          # ft_r_formula
@@ -173,6 +176,10 @@ ml_create_mapping_tables <- function() { # nocov start
     "CountVectorizerModel" = "count_vectorizer_model",
     "PCA" = "pca",
     "PCAModel" = "pca_model",
+    "BucketedRandomProjectionLSH" = "bucketed_random_projection_lsh",
+    "BucketedRandomProjectionLSHModel" = "bucketed_random_projection_lsh_model",
+    "MinHashLSH" = "minhash_lsh",
+    "MinHashLSHModel" = "minhash_lsh_model",
     # regression
     "LogisticRegression" = "logistic_regression",
     "LogisticRegressionModel" = "logistic_regression_model",

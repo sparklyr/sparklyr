@@ -95,22 +95,35 @@ ml_logistic_regression.spark_connection <- function(
     jobj <- invoke(jobj, "setThresholds", thresholds)
   if (!rlang::is_null(weight_col))
     jobj <- invoke(jobj, "setWeightCol", weight_col)
-  if (!rlang::is_null(lower_bounds_on_coefficients))
+
+  if (!rlang::is_null(lower_bounds_on_coefficients)) {
+    lower_bounds_on_coefficients <- spark_dense_matrix(x, lower_bounds_on_coefficients)
     jobj <- jobj_set_param(jobj, "setLowerBoundsOnCoefficients",
                            lower_bounds_on_coefficients,
                            NULL, "2.2.0")
-  if (!rlang::is_null(upper_bounds_on_coefficients))
+  }
+
+  if (!rlang::is_null(upper_bounds_on_coefficients)) {
+    upper_bounds_on_coefficients <- spark_dense_matrix(x, upper_bounds_on_coefficients)
     jobj <- jobj_set_param(jobj, "setUpperBoundsOnCoefficients",
                            upper_bounds_on_coefficients,
                            NULL, "2.2.0")
-  if (!rlang::is_null(lower_bounds_on_intercepts))
+  }
+
+  if (!rlang::is_null(lower_bounds_on_intercepts)) {
+    lower_bounds_on_intercepts <- spark_dense_vector(x, lower_bounds_on_intercepts)
     jobj <- jobj_set_param(jobj, "setLowerBoundsOnIntercepts",
                            lower_bounds_on_intercepts,
                            NULL, "2.2.0")
-  if (!rlang::is_null(upper_bounds_on_intercepts))
+  }
+
+  if (!rlang::is_null(upper_bounds_on_intercepts)) {
+    upper_bounds_on_intercepts <- spark_dense_vector(x, upper_bounds_on_intercepts)
     jobj <- jobj_set_param(jobj, "setUpperBoundsOnIntercepts",
                            upper_bounds_on_intercepts,
                            NULL, "2.2.0")
+  }
+
 
   new_ml_logistic_regression(jobj)
 }
@@ -192,6 +205,12 @@ ml_logistic_regression.tbl_spark <- function(
 
 # Validator
 
+ensure_matrix_double <- function(mat) {
+  mat %>%
+    sapply(ensure_scalar_double) %>%
+    matrix(nrow = nrow(mat))
+}
+
 ml_validator_logistic_regression <- function(args, nms) {
   old_new_mapping <- list(
     intercept = "fit_intercept",
@@ -214,17 +233,17 @@ ml_validator_logistic_regression <- function(args, nms) {
         weight_col <- ensure_scalar_character(weight_col)
       aggregation_depth <- ensure_scalar_integer(aggregation_depth)
       if (!is.null(lower_bounds_on_coefficients))
-        lower_bounds_on_coefficients <- spark_dense_matrix(
-          x, lower_bounds_on_coefficients)
+        lower_bounds_on_coefficients <- ensure_matrix_double(
+          lower_bounds_on_coefficients)
       if (!is.null(upper_bounds_on_coefficients))
-        upper_bounds_on_coefficients <- spark_dense_matrix(
-          x, upper_bounds_on_coefficients)
+        upper_bounds_on_coefficients <- ensure_matrix_double(
+          upper_bounds_on_coefficients)
       if (!is.null(lower_bounds_on_intercepts))
-        lower_bounds_on_intercepts <- spark_dense_vector(
-          x, lower_bounds_on_intercepts)
+        lower_bounds_on_intercepts <- sapply(
+          lower_bounds_on_intercepts, ensure_scalar_double)
       if (!is.null(upper_bounds_on_intercepts))
-        upper_bounds_on_intercepts <- spark_dense_vector(
-          x, upper_bounds_on_intercepts)
+        upper_bounds_on_intercepts <- sapply(
+          upper_bounds_on_intercepts, ensure_scalar_double)
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }
