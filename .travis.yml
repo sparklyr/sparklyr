@@ -3,6 +3,7 @@
 language: r
 sudo: false
 cache: packages
+warnings_are_errors: true
 
 jdk:
   - oraclejdk8
