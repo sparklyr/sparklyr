@@ -3,6 +3,8 @@ context("ml feature chisq selector")
 sc <- testthat_spark_connection()
 
 test_that("ft_chisq_select() works properly", {
+  if (spark_version(sc) < "2.0.0") skip("ft_chisq_select() not supported before 2.0.0")
+
   df <- dplyr::tribble(
     ~id, ~V1, ~V2, ~V3, ~V4, ~clicked,
     7,   0,   0,   18,  1,   1,
@@ -11,7 +13,7 @@ test_that("ft_chisq_select() works properly", {
   )
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     ft_vector_assembler(paste0("V", 1:4), "features") %>%
-    dplyr::select(-starts_with("V"))
+    dplyr::select(-dplyr::starts_with("V"))
 
   result <- ft_chisq_selector(
     df_tbl, "features", "selectedFeatures", "clicked",

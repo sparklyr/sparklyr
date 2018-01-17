@@ -126,13 +126,13 @@ test_that("'spark_apply' works over 'tryCatch'", {
   )
 })
 
-test_that("'spark_apply' works over empty partitions", {
+test_that("'spark_apply' can filter data.frame", {
   expect_equal(
     sdf_len(sc, 10) %>%
-      spark_apply(function(e) as.data.frame(e[e$x > 1,])) %>%
+      spark_apply(function(e) as.data.frame(e[e$id > 1,])) %>%
       collect() %>%
       nrow(),
-    0
+    9
   )
 })
 

@@ -781,7 +781,7 @@ spark_read_text <- function(sc,
 
   columns = list(line = "character")
 
-  df <- spark_data_read_generic(sc, spark_normalize_path(path), "text", options, columns)
+  df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "text", options, columns)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
