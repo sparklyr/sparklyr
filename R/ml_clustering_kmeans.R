@@ -1,6 +1,7 @@
 #' Spark ML -- K-Means Clustering
 #'
 #' K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
+#'   Requires Spark 2.0.0 or later.
 #'
 #' @template roxlate-ml-clustering-algo
 #' @template roxlate-ml-clustering-params
@@ -40,6 +41,9 @@ ml_kmeans.spark_connection <- function(
   features_col = "features",
   prediction_col = "prediction",
   uid = random_string("kmeans_"), ...) {
+
+  if (spark_version(x) < "2.0.0")
+    stop("ml_kmeans() requires Spark 2.0.0+")
 
   ml_ratify_args()
 

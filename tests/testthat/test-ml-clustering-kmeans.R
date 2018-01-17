@@ -5,6 +5,7 @@ test_requires("dplyr")
 data(iris)
 
 test_that("ml_kmeans param setting", {
+  test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
   args <- list(
     x = sc, k = 9, max_iter = 11, tol = 1e-5,
     init_steps = 3L, init_mode = "random",
@@ -18,7 +19,7 @@ test_that("ml_kmeans param setting", {
 })
 
 test_that("ml_kmeans() default params are correct", {
-
+  test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
   predictor <- ml_pipeline(sc) %>%
     ml_kmeans() %>%
     ml_stage(1)
@@ -33,6 +34,7 @@ test_that("ml_kmeans() default params are correct", {
 })
 
 test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
+  test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
   skip_on_cran()
 
   if (spark_version(sc) < "2.0.0")
@@ -65,10 +67,7 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
 })
 
 test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)", {
-  skip_on_cran()
-
-  if (spark_version(sc) < "2.0.0")
-    skip("requires Spark 2.0.0")
+  test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
 
   iris_tbl <- testthat_tbl("iris")
 
@@ -97,8 +96,7 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 })
 
 test_that("ml_model_kmeans can be used with ml_predict()", {
-  if (spark_version(sc) < "2.0.0") skip("ml_model_kmeans() not supported before 2.0.0")
-
+  test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5)
   expect_equal(ml_predict(iris_kmeans, iris_tbl) %>%

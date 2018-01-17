@@ -58,6 +58,7 @@ The object returned depends on the class of \code{x}.
 }
 \description{
 K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
+  Requires Spark 2.0.0 or later.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
