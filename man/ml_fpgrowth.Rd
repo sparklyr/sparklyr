@@ -31,6 +31,8 @@ Any pattern that appears more than (min_support * size-of-the-dataset) times
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
+\item{...}{Optional arguments; currently unused.}
+
 \item{model}{A fitted FPGrowth model returned by \code{ml_fpgrowth()}}
 }
 \description{

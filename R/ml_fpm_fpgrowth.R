@@ -12,6 +12,7 @@
 #'    will be output in the frequent itemsets. Default: 0.3
 #' @template roxlate-ml-prediction-col
 #' @template roxlate-ml-uid
+#' @template roxlate-ml-dots
 #' @name ml_fpgrowth
 #' @export
 ml_fpgrowth <- function(
