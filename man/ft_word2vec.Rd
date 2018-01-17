@@ -2,12 +2,15 @@
 % Please edit documentation in R/ml_feature_word2vec.R
 \name{ft_word2vec}
 \alias{ft_word2vec}
+\alias{ml_find_synonyms}
 \title{Feature Tranformation -- Word2Vec (Estimator)}
 \usage{
 ft_word2vec(x, input_col, output_col, vector_size = 100L, min_count = 5L,
   max_sentence_length = 1000L, num_partitions = 1L, step_size = 0.025,
   max_iter = 1L, seed = NULL, dataset = NULL,
   uid = random_string("word2vec_"), ...)
+
+ml_find_synonyms(model, word, num)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -40,6 +43,12 @@ feature "transformer" against \code{dataset}. See details.}
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{model}{A fitted \code{Word2Vec} model, returned by \code{ft_word2vec()}.}
+
+\item{word}{A word, as a length-one character vector.}
+
+\item{num}{Number of words closest in similarity to the given word to find.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -56,6 +65,8 @@ The object returned depends on the class of \code{x}.
   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a transformer is constructed then
   immediately applied to the input \code{tbl_spark}, returning a \code{tbl_spark}
 }
+
+\code{ml_find_synonyms()} returns a DataFrame of synonyms and cosine similarities
 }
 \description{
 Word2Vec transforms a word into a code for further natural language processing or machine learning process.
