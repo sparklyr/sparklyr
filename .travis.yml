@@ -1,8 +1,15 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
+
 sudo: false
-cache: packages
+
+cache:
+  packages: true
+  directories:
+    - $HOME/spark
+    - $HOME/.cache/livy
+
 warnings_are_errors: true
 
 jdk:
