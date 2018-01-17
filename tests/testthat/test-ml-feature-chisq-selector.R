@@ -11,7 +11,7 @@ test_that("ft_chisq_select() works properly", {
   )
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     ft_vector_assembler(paste0("V", 1:4), "features") %>%
-    dplyr::select(-starts_with("V"))
+    dplyr::select(-dplyr::starts_with("V"))
 
   result <- ft_chisq_selector(
     df_tbl, "features", "selectedFeatures", "clicked",
