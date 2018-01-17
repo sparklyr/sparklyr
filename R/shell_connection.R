@@ -178,11 +178,11 @@ start_shell <- function(master,
 
       app_jar <- spark_default_app_jar(versionSparkHome)
       if (typeof(app_jar) != "character" || nchar(app_jar) == 0) {
-        stop("sparklyr does not currently support Spark version: ", versionSparkHome)
+        stop("sparklyr does not support Spark version: ", versionSparkHome)
       }
 
       if (compareVersion(versionSparkHome, "1.6") < 0) {
-        warning("sparklyr does not currently support Spark version: ", versionSparkHome)
+        warning("sparklyr does not support Spark version: ", versionSparkHome)
       }
 
       app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE), type = shQuoteType)
