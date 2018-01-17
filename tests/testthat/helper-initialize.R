@@ -1,4 +1,6 @@
-testthat_spark_connection <- function(version = NULL) {
+testthat_spark_connection <- function() {
+  version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
+
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
     Sys.sleep(3)
@@ -6,9 +8,10 @@ testthat_spark_connection <- function(version = NULL) {
     remove(".testthat_livy_connection", envir = .GlobalEnv)
   }
 
-  if (nrow(spark_installed_versions()) == 0) {
+  spark_installed <- spark_installed_versions()
+  if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
     options(sparkinstall.verbose = TRUE)
-    spark_install("2.2.0")
+    spark_install(version)
   }
 
   expect_gt(nrow(spark_installed_versions()), 0)
@@ -27,9 +30,6 @@ testthat_spark_connection <- function(version = NULL) {
     options(sparklyr.verbose = TRUE)
     options(sparklyr.na.omit.verbose = TRUE)
     options(sparklyr.na.action.verbose = TRUE)
-
-    version <- ifelse(is.null(version),
-                      Sys.getenv("SPARK_VERSION", unset = "2.2.0"), version)
 
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version, config = config)
@@ -103,19 +103,22 @@ sdf_query_plan <- function(x) {
     unlist()
 }
 
-testthat_livy_connection <- function(version = NULL) {
+testthat_livy_connection <- function() {
+  version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
+
   if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
     remove(".testthat_spark_connection", envir = .GlobalEnv)
     Sys.sleep(3)
   }
 
-  if (nrow(spark_installed_versions()) == 0) {
-    spark_install("2.2.0")
+  spark_installed <- spark_installed_versions()
+  if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
+    spark_install(version)
   }
 
   if (nrow(livy_installed_versions()) == 0) {
-    livy_install("0.3.0", spark_version = "2.2.0")
+    livy_install("0.3.0", spark_version = version)
   }
 
   expect_gt(nrow(livy_installed_versions()), 0)
@@ -130,7 +133,7 @@ testthat_livy_connection <- function(version = NULL) {
   if (!connected) {
     livy_service_start(
       version = "0.3.0",
-      spark_version = "2.2.0",
+      spark_version = version,
       stdout = FALSE,
       stderr = FALSE)
 
