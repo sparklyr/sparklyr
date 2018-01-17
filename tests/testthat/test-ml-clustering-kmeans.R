@@ -97,6 +97,8 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 })
 
 test_that("ml_model_kmeans can be used with ml_predict()", {
+  if (spark_version(sc) >= "2.2.0") skip("")
+
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5)
   expect_equal(ml_predict(iris_kmeans, iris_tbl) %>%

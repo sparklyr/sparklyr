@@ -3,6 +3,8 @@ context("ml feature max abs scaler")
 sc <- testthat_spark_connection()
 
 test_that("ft_max_abs_scaler() works properly", {
+  if (spark_version(sc) >= "2.2.0") skip("")
+
   df <- data.frame(
     id = 0:2,
     V1 = c(1, 2, 4),
