@@ -216,9 +216,3 @@ ml_compute_cost <- function(model, dataset) {
   } else
     model$compute_cost(dataset)
 }
-
-# TODO
-#' #' @export
-#' fitted.ml_model_kmeans <- function(object, ...) {
-#'   predict(object)
-#' }

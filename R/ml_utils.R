@@ -31,16 +31,13 @@ predict.ml_model_regression <- function(
 }
 
 #' @export
-fitted.ml_model <- function(object, ...) {
+fitted.ml_model_prediction <- function(object, ...) {
 
-  predictions <- object$.model %>%
-    invoke("summary") %>%
-    invoke("predictions")
-
-  id <- object$model.parameters$id
-  object$data %>%
-    invoke("join", predictions, as.list(id)) %>%
-    sdf_read_column("prediction")
+  prediction_col <- object$model %>%
+    ml_param("prediction_col")
+  object %>%
+    ml_predict() %>%
+    dplyr::pull(!!rlang::sym(prediction_col))
 }
 
 #' @export
