@@ -15,4 +15,12 @@ test_that("ft_vector_indexer() works properly", {
     unlist() %>%
     length(),
   692L)
+
+  expect_identical(sample_data %>%
+                     ft_vector_indexer("features", "indexed", max_categories = 10) %>%
+                     head(1) %>%
+                     dplyr::pull(indexed) %>%
+                     unlist() %>%
+                     length(),
+                   692L)
 })
