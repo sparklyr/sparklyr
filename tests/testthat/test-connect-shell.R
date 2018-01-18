@@ -1,4 +1,4 @@
-context("spark connections")
+context("connections - shell")
 
 sc <- testthat_spark_connection()
 
