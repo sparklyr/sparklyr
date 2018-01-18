@@ -10,6 +10,8 @@ object Test {
     case Some(j) => j * j
   }
 
+  def unaryPrimitiveString(s : String) = s
+
   def unarySeq(xs : Seq[Double]) = xs.map(x => x * x).sum
   def unaryNullableSeq(xs : Seq[Double]) = Option(xs) match {
     case None => -1

@@ -21,6 +21,9 @@ test_that("we can invoke_static with 1 scalar argument", {
                                ensure_scalar_integer(5)), 25)
 
     expect_equal(invoke_static(sc, "sparklyr.Test", "unaryNullableInteger", NULL), -1)
+
+    expect_equal(invoke_static(sc, "sparklyr.Test", "unaryPrimitiveString",
+                               ensure_scalar("test")), "test")
 })
 
 test_that("we can invoke_static with 1 Seq argument", {
