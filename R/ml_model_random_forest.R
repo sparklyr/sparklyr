@@ -63,6 +63,9 @@ ml_random_forest <- function(
   sdf <- spark_dataframe(x)
   # choose classification vs. regression model based on column type
   schema <- sdf_schema(sdf)
+  if (!response_col %in% names(schema))
+    stop(paste0(response_col, " is not a column in the input dataset"))
+
   response_type <- schema[[response_col]]$type
 
   type <- rlang::arg_match(type)
