@@ -2,6 +2,9 @@
 % Please edit documentation in R/ml_clustering_lda.R
 \name{ml_lda}
 \alias{ml_lda}
+\alias{ml_describe_topics}
+\alias{ml_log_likelihood}
+\alias{ml_log_perplexity}
 \title{Spark ML -- Latent Dirichlet Allocation}
 \usage{
 ml_lda(x, k = 10L, max_iter = 20L, doc_concentration = NULL,
@@ -11,6 +14,12 @@ ml_lda(x, k = 10L, max_iter = 20L, doc_concentration = NULL,
   learning_offset = 1024, optimize_doc_concentration = TRUE, seed = NULL,
   features_col = "features", topic_distribution_col = "topicDistribution",
   uid = random_string("lda_"), ...)
+
+ml_describe_topics(model, max_terms_per_topic = 10L)
+
+ml_log_likelihood(model, dataset)
+
+ml_log_perplexity(model, dataset)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -48,6 +57,12 @@ reproducible across repeated calls.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{model}{A fitted LDA model returned by \code{ml_lda()}.}
+
+\item{max_terms_per_topic}{Maximum number of terms to collect for each topic. Default value of 10.}
+
+\item{dataset}{test corpus to use for calculating log likelihood or log perplexity}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -69,6 +84,11 @@ The object returned depends on the class of \code{x}.
     the estimator. The object returned in this case is a \code{ml_model} which is a
     wrapper of a \code{ml_pipeline_model}. This signature does not apply to \code{ml_lda()}.
 }
+
+\code{ml_describe_topics} returns a DataFrame with topics and their top-weighted terms.
+
+\code{ml_log_likelihood} calculates a lower bound on the log likelihood of
+  the entire corpus
 }
 \description{
 Latent Dirichlet Allocation (LDA), a topic model designed for text documents.
