@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Fixed `SIGPIPE` error under `spark_connect()` immediately after
+  a `spark_disconnect()` operation.
+
 - `spark_web()` is is more reliable under Spark 2.X by making use of a new API
   to programmatically find the right address.
 

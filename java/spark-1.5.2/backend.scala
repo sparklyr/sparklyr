@@ -316,6 +316,8 @@ class Backend {
 
                   if (!isService) {
                     logger.log("is terminating backend")
+
+                    gatewayServerSocket.close()
                     System.exit(0)
                   }
 
