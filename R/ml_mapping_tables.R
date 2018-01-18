@@ -22,6 +22,8 @@ ml_create_mapping_tables <- function() { # nocov start
          # ft_standard_scaler
          "with_mean" = "withMean",
          "with_std" = "withStd",
+         # ft_vector_indexer
+         "max_categories" = "maxCategories",
          # ft_imputer
          "missing_value" = "missingValue",
          "output_cols" = "outputCols",
@@ -155,6 +157,8 @@ ml_create_mapping_tables <- function() { # nocov start
     "NGram" = "ngram",
     "VectorSlicer" = "vector_slicer",
     # feature (estimators)
+    "VectorIndexer" = "vector_indexer",
+    "VectorIndexerModel" = "VectorIndexerModel",
     "StandardScaler" = "standard_scaler",
     "StandardScalerModel" = "standard_scaler_model",
     "MinMaxScaler" = "min_max_scaler",
