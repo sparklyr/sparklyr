@@ -89,7 +89,8 @@ new_ml_word2vec_model <- function(jobj) {
                      find_synonyms = function(word, num) {
                        word <- ensure_scalar_character(word)
                        num <- ensure_scalar_integer(num)
-                       invoke(jobj, "findSynonyms", word, num)
+                       invoke(jobj, "findSynonyms", word, num) %>%
+                         sdf_register()
                      },
                      find_synonyms_array = function(word, num) {
                        word <- ensure_scalar_character(word)
@@ -112,4 +113,14 @@ ml_validator_word2vec <- function(args, nms) {
       seed <- ensure_scalar_integer(seed, allow.null = TRUE)
     }) %>%
     ml_extract_args(nms)
+}
+
+#' @rdname ft_word2vec
+#' @param model A fitted \code{Word2Vec} model, returned by \code{ft_word2vec()}.
+#' @param word A word, as a length-one character vector.
+#' @param num Number of words closest in similarity to the given word to find.
+#' @return \code{ml_find_synonyms()} returns a DataFrame of synonyms and cosine similarities
+#' @export
+ml_find_synonyms <- function(model, word, num) {
+  model$find_synonyms(word, num)
 }

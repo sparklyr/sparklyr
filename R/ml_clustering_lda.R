@@ -241,14 +241,9 @@ new_ml_lda_model <- function(jobj) {
   new_ml_clustering_model(
     jobj,
     is_distributed = invoke(jobj, "isDistributed"),
-    describe_topics = function(max_terms_per_topic = NULL) {
+    describe_topics = function(max_terms_per_topic = 10L) {
       max_terms_per_topic <- ensure_scalar_integer(max_terms_per_topic, allow.null = TRUE)
-
-      (if (rlang::is_null(max_terms_per_topic))
-        invoke(jobj, "describeTopics")
-      else
-        invoke(jobj, "describeTopics", max_terms_per_topic)
-      ) %>%
+      invoke(jobj, "describeTopics", max_terms_per_topic) %>%
         sdf_register()
     },
     estimated_doc_concentration = try_null(invoke(jobj, "estimatedDocConcentration")),
@@ -258,6 +253,26 @@ new_ml_lda_model <- function(jobj) {
     vocab_size = invoke(jobj, "vocabSize"),
     subclass = "ml_lda_model")
 }
+
+#' @rdname ml_lda
+#' @return \code{ml_describe_topics} returns a DataFrame with topics and their top-weighted terms.
+#' @param model A fitted LDA model returned by \code{ml_lda()}.
+#' @param max_terms_per_topic Maximum number of terms to collect for each topic. Default value of 10.
+#' @export
+ml_describe_topics <- function(model, max_terms_per_topic = 10L) {
+  model$describe_topics(max_terms_per_topic)
+}
+
+#' @rdname ml_lda
+#' @return \code{ml_log_likelihood} calculates a lower bound on the log likelihood of
+#'   the entire corpus
+#' @param dataset test corpus to use for calculating log likelihood or log perplexity
+#' @export
+ml_log_likelihood <- function(model, dataset) model$log_likelihood(dataset)
+
+#' @rdname ml_lda
+#' @export
+ml_log_perplexity <- function(model, dataset) model$log_perplexity(dataset)
 
 # Generic implementations
 

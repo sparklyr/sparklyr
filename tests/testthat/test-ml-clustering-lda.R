@@ -33,3 +33,27 @@ test_that("ml_lda() default params are correct", {
     ml_params(predictor, names(args)),
     args)
 })
+
+test_that("ml_lda() works properly", {
+  sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_lda_libsvm_data.txt", full.names = TRUE)
+  sample_data <- spark_read_libsvm(sc, "sample_data",
+                                   sample_data_path, overwrite = TRUE)
+  lda <- ml_lda(sample_data, k = 10, max_iter = 10, seed = 5432)
+  ll <- ml_log_likelihood(lda, sample_data)
+  expect_equal(ll, -805.0026, tolerance = 0.1)
+  lp <- ml_log_perplexity(lda, sample_data)
+  expect_equal(lp, 3.096164, tolerance = 0.1)
+  topics <- ml_describe_topics(lda, 3)
+  expect_identical(
+    topics %>% dplyr::pull(termWeights) %>% head(1) %>% unlist() %>% length(),
+    3L
+  )
+  expect_identical(
+    colnames(ml_transform(lda, sample_data)),
+    c("label", "features", "topicDistribution")
+  )
+  expect_identical(
+    sdf_nrow(ml_transform(lda, sample_data)),
+    12
+  )
+})

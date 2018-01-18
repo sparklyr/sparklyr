@@ -93,13 +93,23 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 
 })
 
-test_that("ml_model_kmeans can be used with ml_predict()", {
+test_that("ml_kmeans() works properly", {
   test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
   iris_tbl <- testthat_tbl("iris")
-  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5)
+  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5, seed = 11)
   expect_equal(ml_predict(iris_kmeans, iris_tbl) %>%
     dplyr::distinct(prediction) %>%
     dplyr::arrange(prediction) %>%
     dplyr::pull(prediction),
     0:4)
+  expect_equal(
+    ml_compute_cost(iris_kmeans, iris_tbl),
+    46.7123, tolerance = 0.01
+  )
+  expect_equal(
+    iris_tbl %>%
+      ft_r_formula(~ . - Species) %>%
+      ml_compute_cost(iris_kmeans$model, .),
+    46.7123, tolerance = 0.01
+  )
 })
