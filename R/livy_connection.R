@@ -69,8 +69,6 @@ livy_validate_http_response <- function(message, req) {
 livy_config <- function(config = spark_config(), username = NULL, password = NULL,
                         custom_headers = list("X-Requested-By" = "sparklyr"), ...) {
   if (!is.null(username) || !is.null(password)) {
-    secret <- base64encode(paste(username, password, sep = ":"))
-
     config[["sparklyr.livy.headers"]] <- c(
       config[["sparklyr.livy.headers"]], list(
         Authorization = paste(
@@ -81,7 +79,7 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
     )
   }
 
-  if(!is.null(custom_headers)) {
+  if (!is.null(custom_headers)) {
     for (l in names(custom_headers)) {
       config[["sparklyr.livy.headers"]] <- c(
         config[["sparklyr.livy.headers"]], custom_headers[l])
@@ -94,9 +92,9 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
 
   additional_params <- list(...)
 
-  if(length(additional_params) > 0) {
+  if (length(additional_params) > 0) {
     valid_params <- names(additional_params) %in% allowed_params
-    if(!all(valid_params)){
+    if (!all(valid_params)) {
       stop(paste0(names(additional_params[!valid_params]), sep = ", "), " are not valid session parameters. Valid parameters are: ", paste0(allowed_params, sep = ", "))
     }
     singleValues = c("proxy_user", "driver_memory", "driver_cores", "executor_memory", "executor_cores", "num_executors", "queue", "name", "heartbeat_timeout")
@@ -120,7 +118,7 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
       heartbeat_timeout = "heartbeatTimeoutInSecond"
     )
 
-    for(l in names(additional_params)){
+    for (l in names(additional_params)){
       #Parse the params names from snake_case to camelCase
       config[[paste0("livy.", params_map[[l]])]] <- additional_params[[l]]
     }
@@ -193,7 +191,7 @@ livy_create_session <- function(master, config) {
   )
 
   session_params <- connection_config(list(master = master, config = config), "livy.", NULL)
-  if(length(session_params) > 0) data <- append(data, session_params)
+  if (length(session_params) > 0) data <- append(data, session_params)
 
   req <- POST(paste(master, "sessions", sep = "/"),
               livy_get_httr_headers(config, list(
@@ -301,91 +299,6 @@ livy_statement_compose_magic <- function(lobj, magic) {
   )
 }
 
-livy_statement_parse_response <- function(text, lobj) {
-  nullResponses <- list(
-    "defined (module|object|class).*"
-  )
-
-  if (regexec(paste(nullResponses, collapse = "|"), text)[[1]][[1]] > 0) {
-    return(NULL)
-  }
-
-  text <- gsub("\n", "", text)
-
-  parsedRegExp <- regexec("([^:]+): (.*) = (.*)", text)
-  parsed <- regmatches(text, parsedRegExp)
-  if (length(parsed) != 1) {
-    stop("Failed to parse statement reponse: ", text)
-  }
-
-  parsed <- parsed[[1]]
-  if (length(parsed) != 4) {
-    stop("Failed to parse statement reponse: ", text)
-  }
-
-  varName <- parsed[[2]]
-  scalaTypeRaw <- parsed[[3]]
-  scalaValue <- parsed[[4]]
-
-  removeQuotes <- function(e) gsub("^\"|\"$", "", e)
-
-  livyToRTypeMap <- list(
-    "String" = list(
-      type = "character",
-      parse = function(e) removeQuotes(e)
-    ),
-    "java.lang.String" = list(
-      type = "character",
-      parse = function(e) removeQuotes(e)
-    ),
-    "java.io.Serializable" = list(
-      type = "character",
-      parse = function(e) removeQuotes(e)
-    ),
-    "int" = list(
-      type = "integer",
-      parse = function(e) as.integer(e)
-    ),
-    "java.lang.Integer" = list(
-      type = "integer",
-      parse = function(e) as.integer(e)
-    ),
-    "null" = list(
-      type = "NULL",
-      parse = function(e) NULL
-    )
-  )
-
-  scalaTypeIsArray <- function(scalaType) grepl("^\\[.*", scalaType, perl = TRUE)
-  scalaTypeOfArray <- function(scalaType) {
-    parsed <- regmatches(scalaType, regexec("^\\[L(.*);", scalaType, perl = TRUE))
-    parsed[[1]][[2]]
-  }
-
-  scalaType <- if (scalaTypeIsArray(scalaTypeRaw)) scalaTypeOfArray(scalaTypeRaw) else scalaTypeRaw
-
-  type <- "object"
-  lobj$varType <- scalaType
-  value <- lobj
-
-  if (scalaType %in% names(livyToRTypeMap)) {
-    livyToRTypeMapInst <- livyToRTypeMap[[scalaType]]
-    type <- livyToRTypeMapInst$type
-    value <- livyToRTypeMapInst$parse(scalaValue)
-  }
-
-  if (scalaTypeIsArray(scalaTypeRaw)) {
-    lobj$collection = list(
-      type = "array",
-      entries = type
-    )
-    lobj
-  }
-  else {
-    value
-  }
-}
-
 livy_get_statement <- function(sc, statementId) {
   statement <- livy_get_json(
     paste(sc$master, "sessions", sc$sessionId, "statements", statementId, sep = "/"),
@@ -430,7 +343,7 @@ livy_post_statement <- function(sc, code) {
   waitTimeout <- spark_config_value(sc$config, "livy.session.command.timeout", 60)
   waitTimeout <- waitTimeout * 10
   sleepTime <- 0.001
-  while ((statementReponse$state == "running"||statementReponse$state == "waiting" )&&
+  while ((statementReponse$state == "running" || statementReponse$state == "waiting" ) &&
          waitTimeout > 0) {
     statementReponse <- livy_get_statement(sc, statementReponse$id)
 
@@ -472,7 +385,6 @@ livy_invoke_statement <- function(sc, statement) {
   supportedDataTypes <- list(
     "text/plain" = list(
       dataToResult = function(data) {
-        livy_statement_parse_response(data, statement$lobj)
       }
     ),
     "application/json" = list(
@@ -532,15 +444,13 @@ livy_validate_master <- function(master, config) {
   retries <- 5
   retriesErr <- NULL
   while (retries >= 0) {
-    commandStart <- Sys.time()
-
     tryCatch({
       livy_get_sessions(master, config)
     }, error = function(err) {
       retriesErr <- err
     })
 
-    retries <- retries- 1;
+    retries <- retries - 1;
     Sys.sleep(1)
   }
 
