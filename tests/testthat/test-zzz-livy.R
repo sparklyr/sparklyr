@@ -24,3 +24,12 @@ test_that("'livy_config()' works with extended parameters", {
 
   expect_equal(as.integer(config$livy.numExecutors), 1)
 })
+
+test_that("'livy_config()' works with authentication", {
+  config <- livy_config(username = "foo", password = "bar")
+
+  expect_equal(
+    config$sparklyr.livy.headers$Authorization,
+    "Basic Zm9vOmJhcg=="
+  )
+})
