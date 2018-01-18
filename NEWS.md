@@ -1,5 +1,8 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for `spark_web()` for Livy and Databricks connections when
+  using Spark 2.X.
+
 - Fixed `SIGPIPE` error under `spark_connect()` immediately after
   a `spark_disconnect()` operation.
 
