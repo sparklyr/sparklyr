@@ -45,9 +45,7 @@ fitted.ml_model <- function(object, ...) {
 
 #' @export
 residuals.ml_model <- function(object, ...) {
-  stop(paste0("'residuals()' not yet supported for ",
-              setdiff(class(object), "ml_model"))
-  )
+  stop(paste0("'residuals()' not supported for ", class(object)[[1]]))
 }
 
 #' Model Residuals
