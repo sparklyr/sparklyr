@@ -14,18 +14,6 @@ ensure_not_null <- function(object) {
   object %||% stop(sprintf("'%s' is NULL", deparse(substitute(object))))
 }
 
-ensure_scalar <- function(object) {
-
-  if (length(object) != 1 || !is.numeric(object)) {
-    stopf(
-      "'%s' is not a length-one numeric value",
-      deparse(substitute(object))
-    )
-  }
-
-  object
-}
-
 #' Enforce Specific Structure for R Objects
 #'
 #' These routines are useful when preparing to pass objects to

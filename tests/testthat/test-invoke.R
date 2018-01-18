@@ -46,3 +46,14 @@ test_that("roundtrip date array", {
     do.call("c", dates)
   )
 })
+
+test_that("we can invoke_static using make_ensure_scalar_impl", {
+  test_ensure_scalar_integer <- make_ensure_scalar_impl(
+    is.numeric,
+    "a length-one integer vector",
+    as.integer
+  )
+
+  expect_equal(invoke_static(sc, "sparklyr.Test", "unaryPrimitiveInt",
+                             test_ensure_scalar_integer(5)), 25)
+})

@@ -57,7 +57,10 @@ test_jobj_create <- function(sc) {
 
 #' @export
 invoke.test_jobj <- function(jobj, method, ...) {
-  test_jobj_create(jobj$connection)
+  if (method == "version")
+    "1.0.0"
+  else
+    test_jobj_create(jobj$connection)
 }
 
 #' @export
@@ -82,4 +85,9 @@ sdf_import.test_connection <- function(x, sc, ...) {
 #' @export
 sdf_copy_to.test_connection <- function(sc, x, ...) {
   x
+}
+
+#' @export
+create_hive_context.test_connection <- function(sc) {
+  test_jobj_create(sc)
 }

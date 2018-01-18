@@ -38,34 +38,6 @@ spark_serialize_csv_file <- function(sc, df, columns, repartition) {
   df
 }
 
-spark_serialize_typed_list <- function(sc, df, columns, repartition) {
-  structType <- spark_data_build_types(sc, columns)
-
-  # Map date and time columns as standard doubles
-  df <- as.data.frame(lapply(df, function(e) {
-    if (inherits(e, "POSIXt") || inherits(e, "Date"))
-      sapply(e, function(t) {
-        class(t) <- NULL
-        t
-      })
-    else
-      e
-  }), optional = TRUE)
-
-  rows <- lapply(seq_len(NROW(df)), function(e) as.list(df[e,]))
-
-  rdd <- invoke_static(
-    sc,
-    "sparklyr.Utils",
-    "createDataFrame",
-    spark_context(sc),
-    rows,
-    as.integer(if (repartition <= 0) 1 else repartition)
-  )
-
-  invoke(hive_context(sc), "createDataFrame", rdd, structType)
-}
-
 spark_serialize_csv_string <- function(sc, df, columns, repartition) {
   structType <- spark_data_build_types(sc, columns)
 
@@ -180,7 +152,6 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
 
   serializers <- list(
     "csv_file" = spark_serialize_csv_file,
-    "typed_list" = spark_serialize_typed_list,
     "csv_string" = spark_serialize_csv_string,
     "csv_file_scala" = spark_serialize_csv_scala
   )

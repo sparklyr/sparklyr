@@ -190,6 +190,14 @@ spark_web <- function(sc, ...) {
   if (!is.null(sc$config$sparklyr.sparkui.url)) {
     structure(sc$config$sparklyr.sparkui.url, class = "spark_web_url")
   }
+  else if (spark_version(sc) >= "2.0.0" &&
+           !spark_context(sc) %>% invoke("uiWebUrl") %>% invoke("isEmpty")) {
+
+    spark_context(sc) %>%
+      invoke("uiWebUrl") %>%
+      invoke("get") %>%
+      structure(class = "spark_web_url")
+  }
   else {
     UseMethod("spark_web")
   }

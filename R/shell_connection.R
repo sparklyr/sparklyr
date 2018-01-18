@@ -445,30 +445,18 @@ spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
 
 #' @export
 spark_web.spark_shell_connection <- function(sc, ...) {
-
-  if (spark_version(sc) >= "2.0.0" &&
-      !spark_context(sc) %>% invoke("uiWebUrl") %>% invoke("isEmpty")) {
-
-    web_url <- spark_context(sc) %>%
-      invoke("uiWebUrl") %>%
-      invoke("get") %>%
-      structure(class = "spark_web_url")
-
-    return(web_url)
-  }
-
   lines <- spark_log(sc, n = 200)
 
-  uiLine <- grep("Started SparkUI at ", lines, perl=TRUE, value=TRUE)
+  uiLine <- grep("Started SparkUI at ", lines, perl = TRUE, value = TRUE)
   if (length(uiLine) > 0) {
     matches <- regexpr("http://.*", uiLine)
-    match <-regmatches(uiLine, matches)
+    match <- regmatches(uiLine, matches)
     if (length(match) > 0) {
       return(structure(match, class = "spark_web_url"))
     }
   }
 
-  uiLine <- grep(".*Bound SparkUI to.*", lines, perl=TRUE, value=TRUE)
+  uiLine <- grep(".*Bound SparkUI to.*", lines, perl = TRUE, value = TRUE)
   if (length(uiLine) > 0) {
     matches <- regexec(".*Bound SparkUI to.*and started at (http.*)", uiLine)
     match <- regmatches(uiLine, matches)

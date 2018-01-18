@@ -83,12 +83,12 @@ connection_is_open.spark_gateway_connection <- connection_is_open.spark_shell_co
 
 #' @export
 spark_log.spark_gateway_connection <- function(sc, n = 100, filter = NULL, ...) {
-  stop("spark_log is not available while connecting thorugh an sparklyr gateway")
+  stop("spark_log is not available while connecting through an sparklyr gateway")
 }
 
 #' @export
 spark_web.spark_gateway_connection <- function(sc, ...) {
-  stop("spark_web is not available while connecting thorugh an sparklyr gateway")
+  stop("spark_web is not available while connecting through an sparklyr gateway")
 }
 
 #' @export
