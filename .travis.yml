@@ -6,9 +6,6 @@ sudo: false
 
 cache:
   packages: true
-  directories:
-    - $HOME/spark
-    - $HOME/.cache/livy
 
 warnings_are_errors: true
 
