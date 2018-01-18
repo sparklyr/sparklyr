@@ -73,7 +73,7 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
       config[["sparklyr.livy.headers"]], list(
         Authorization = paste(
           "Basic",
-          base64encode(paste(username, password, sep = ":"))
+          base64encode(charToRaw(paste(username, password, sep = ":")))
         )
       )
     )
