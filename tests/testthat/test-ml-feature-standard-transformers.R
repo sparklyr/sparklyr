@@ -99,36 +99,6 @@ test_that('ft_hashing_tf() input checking', {
                "length-one logical vector")
 })
 
-# IndexToString
-
-test_that("ft_index_to_string() works", {
-  df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
-  df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
-
-  s1 <- df_tbl %>%
-    ft_string_indexer("string", "indexed") %>%
-    ft_index_to_string("indexed", "string2") %>%
-    dplyr::pull(string2)
-
-  expect_identical(s1, c("foo", "bar", "foo", "foo"))
-
-  s2 <- df_tbl %>%
-    ft_string_indexer("string", "indexed") %>%
-    ft_index_to_string("indexed", "string2", c("wow", "cool")) %>%
-    dplyr::pull(string2)
-
-  expect_identical(s2, c("wow", "cool", "wow", "wow"))
-
-  its <- ft_index_to_string(sc, "indexed", "string", labels = list("foo", "bar"))
-
-  expect_equal(
-    ml_params(its, list("input_col", "output_col", "labels")),
-    list(input_col = "indexed",
-         output_col = "string",
-         labels = list("foo", "bar"))
-  )
-})
-
 # ElementwiseProduct
 
 test_that("ft_elementwise_product() works", {

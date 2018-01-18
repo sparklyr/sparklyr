@@ -2,10 +2,13 @@
 % Please edit documentation in R/ml_feature_string_indexer.R
 \name{ft_string_indexer}
 \alias{ft_string_indexer}
+\alias{ml_labels}
 \title{Feature Tranformation -- StringIndexer (Estimator)}
 \usage{
 ft_string_indexer(x, input_col, output_col, handle_invalid = "error",
   dataset = NULL, uid = random_string("string_indexer_"), ...)
+
+ml_labels(model)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -24,6 +27,8 @@ feature "transformer" against \code{dataset}. See details.}
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{model}{A fitted StringIndexer model returned by \code{ft_string_indexer()}}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -40,6 +45,8 @@ The object returned depends on the class of \code{x}.
   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a transformer is constructed then
   immediately applied to the input \code{tbl_spark}, returning a \code{tbl_spark}
 }
+
+\code{ml_labels()} returns a vector of labels, corresponding to indices to be assigned.
 }
 \description{
 A label indexer that maps a string column of labels to an ML column of
