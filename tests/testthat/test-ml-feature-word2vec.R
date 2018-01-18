@@ -19,6 +19,7 @@ test_that("ft_word2vec() returns result with correct length", {
 })
 
 test_that("ml_find_synonyms works properly", {
+  test_requires_version("2.0.0", "spark computation different in 1.6.x")
   model <- ft_word2vec(sc, "words", "result", vector_size= 3, min_count = 0,
                        dataset = tokenized_tbl)
   expect_equal(
