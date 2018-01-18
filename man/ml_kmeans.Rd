@@ -2,12 +2,15 @@
 % Please edit documentation in R/ml_clustering_kmeans.R
 \name{ml_kmeans}
 \alias{ml_kmeans}
+\alias{ml_compute_cost}
 \title{Spark ML -- K-Means Clustering}
 \usage{
 ml_kmeans(x, formula = NULL, k = 2L, max_iter = 20L, tol = 1e-04,
   init_steps = 2L, init_mode = "k-means||", seed = NULL,
   features_col = "features", prediction_col = "prediction",
   uid = random_string("kmeans_"), ...)
+
+ml_compute_cost(model, dataset)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -34,6 +37,10 @@ reproducible across repeated calls.}
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{model}{A fitted K-means model returned by \code{ml_kmeans()}}
+
+\item{dataset}{Dataset on which to calculate K-means cost}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -55,6 +62,10 @@ The object returned depends on the class of \code{x}.
     the estimator. The object returned in this case is a \code{ml_model} which is a
     wrapper of a \code{ml_pipeline_model}. This signature does not apply to \code{ml_lda()}.
 }
+
+\code{ml_compute_cost()} returns the K-means cost (sum of
+  squared distances of points to their nearest center) for the model
+  on the given data.
 }
 \description{
 K-means clustering with support for k-means|| initialization proposed by Bahmani et al.

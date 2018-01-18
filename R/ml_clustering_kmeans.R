@@ -182,7 +182,6 @@ new_ml_model_kmeans <- function(
 
 #' @export
 print.ml_model_kmeans <- function(x, ...) {
-
   preamble <- sprintf(
     "K-means clustering with %s %s",
     nrow(x$centers),
@@ -197,7 +196,25 @@ print.ml_model_kmeans <- function(x, ...) {
   cat("Within Set Sum of Squared Errors = ",
       if (is.null(x$cost)) "not computed." else x$cost
   )
+}
 
+#' @rdname ml_kmeans
+#' @param model A fitted K-means model returned by \code{ml_kmeans()}
+#' @param dataset Dataset on which to calculate K-means cost
+#' @return \code{ml_compute_cost()} returns the K-means cost (sum of
+#'   squared distances of points to their nearest center) for the model
+#'   on the given data.
+#' @export
+ml_compute_cost <- function(model, dataset) {
+  version <- spark_version(spark_connection(spark_jobj(model)))
+  if (version < "2.0.0") stop("'ml_compute_cost()' requires Spark 2.0+")
+  if (inherits(model, "ml_model_kmeans")) {
+    model$pipeline_model %>%
+      ml_stage(1) %>%
+      ml_transform(dataset) %>%
+      model$model$compute_cost()
+  } else
+    model$compute_cost(dataset)
 }
 
 # TODO
