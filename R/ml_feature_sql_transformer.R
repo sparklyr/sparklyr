@@ -55,11 +55,15 @@ new_ml_sql_transformer <- function(jobj) {
 # dplyr transformer
 
 ft_extract_sql <- function(x) {
-  table_name <- paste0("`",
-                       x[["ops"]][["x"]][1],
-                       "`")
-  dbplyr::sql_render(x) %>%
-    gsub(table_name, "__THIS__", .)
+  get_base_name <- function(o) {
+    if (!inherits(o$x, "ident"))
+      get_base_name(o$x)
+    else
+      o$x
+  }
+  pattern <- paste0("\\b", get_base_name(x$ops), "\\b")
+
+  gsub(pattern, "__THIS__", dbplyr::sql_render(x))
 }
 
 #' @rdname sql-transformer
