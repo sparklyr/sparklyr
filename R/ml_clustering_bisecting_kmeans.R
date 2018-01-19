@@ -134,8 +134,7 @@ new_ml_model_bisecting_kmeans <- function(
   summary <- model$summary
 
   centers <- model$cluster_centers %>%
-    sapply(invoke, "toArray") %>%
-    t() %>%
+    do.call(rbind, .) %>%
     as.data.frame() %>%
     rlang::set_names(feature_names)
 
