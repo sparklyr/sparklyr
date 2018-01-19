@@ -1201,6 +1201,9 @@ object Sources {
     "  }, as.environment(\"package:base\"))\n" +
     "  lock(\"stop\",  as.environment(\"package:base\"))\n" +
     "}\n" +
-    "do.call(spark_worker_main, as.list(commandArgs(trailingOnly = TRUE)))\n" +
+    "if (identical(Sys.getenv('SPARKLYR_WORKER_PACKAGE'), 'TRUE'))\n" +
+    "  do.call(sparklyr:::spark_worker_main, as.list(commandArgs(trailingOnly = TRUE)))\n" +
+    "else\n" +
+    "  do.call(spark_worker_main, as.list(commandArgs(trailingOnly = TRUE)))\n" +
     ""
 }
