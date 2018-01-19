@@ -1,0 +1,35 @@
+CrossValidatorModel (Transformer)
+<cv_1> 
+ (Parameters -- Tuning)
+  estimator: Pipeline
+             <pipeline_1> 
+  evaluator: MulticlassClassificationEvaluator
+             <eval1> 
+    with metric f1 
+  num_folds: 3 
+  [Tuned over 4 hyperparameter sets]
+ (Best Model)
+  PipelineModel (Transformer) with 2 stages
+  <pipeline_1> 
+    Stages 
+    |--1 RFormulaModel (Transformer)
+    |    <r_formula_1> 
+    |     (Parameters -- Column Names)
+    |      features_col: features
+    |      label_col: label
+    |     (Transformer Info)
+    |      formula:  chr "Species ~ Petal_Width + Petal_Length" 
+    |--2 LogisticRegressionModel (Transformer)
+    |    <logreg_1> 
+    |     (Parameters -- Column Names)
+    |      features_col: features
+    |      label_col: label
+    |      prediction_col: prediction
+    |      probability_col: probability
+    |      raw_prediction_col: rawPrediction
+    |     (Transformer Info)
+    |      coefficient_matrix:  num [1:3, 1:2] 9.28 19.73 -29 2.06 7.82 ... 
+    |      intercept_vector:  num [1:3] -4.9 -50.2 55.1 
+    |      num_classes:  int 3 
+    |      num_features:  int 2 
+    |      threshold:  num 0.5 
