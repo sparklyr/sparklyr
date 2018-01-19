@@ -84,8 +84,10 @@ test_that("data.frames with many columns survive roundtrip", {
 test_that("data.frames with many columns don't cause Java StackOverflows", {
   skip_on_cran()
 
-  n <- 5000
-  df <- matrix(0, ncol = 5000, nrow = 2) %>% as_data_frame()
+  version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
+
+  n <- if (version >= "2.0.0") 500 else 5000
+  df <- matrix(0, ncol = n, nrow = 2) %>% as_data_frame()
   sdf <- copy_to(sc, df, overwrite = TRUE)
 
   # the above failed with a Java StackOverflow with older versions of sparklyr

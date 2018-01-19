@@ -2,6 +2,9 @@
 
 - Added support for Spark 2.2.1.
 
+- Switched `copy_to` serializer to use Scala implementation, this change can be
+  reverted by setting the `sparklyr.copy.serializer` option to `csv_file`.
+
 - Added support for `spark_web()` for Livy and Databricks connections when
   using Spark 2.X.
 
