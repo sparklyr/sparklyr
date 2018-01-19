@@ -1,0 +1,5 @@
+Call: ml_decision_tree(iris_tbl, Species ~ Petal_Length + Sepal_Width, seed = 24, uid = "dt1")  
+
+Formula: Species ~ Petal_Length + Sepal_Width
+
+DecisionTreeClassificationModel (uid=dt1) of depth 5 with 21 nodes
