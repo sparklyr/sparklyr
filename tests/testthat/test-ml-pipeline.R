@@ -82,3 +82,16 @@ test_that("pipeline printing works", {
   expect_identical(output[6], "  |     (Parameters -- Column Names)")
   expect_identical(output[9], "  |--2 LogisticRegression (Estimator)")
 })
+
+test_that("Error when specifying formula without tbl_spark for ml_ routines", {
+  expect_error(
+    ml_pipeline(sc) %>%
+      ml_logistic_regression(Species ~ Petal_Length),
+    "formula should only be specified when calling ml_logistic_regression on a tbl_spark"
+  )
+
+  expect_error(
+    ml_logistic_regression(sc, Species ~ Petal_Length),
+    "formula should only be specified when calling ml_logistic_regression on a tbl_spark"
+  )
+})

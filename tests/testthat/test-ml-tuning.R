@@ -64,7 +64,7 @@ test_that("we can cross validate a logistic regression with xval", {
   pipeline <- ml_pipeline(sc, uid = "pipeline_1") %>%
     ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl,
                  uid = "r_formula_1") %>%
-    ml_logistic_regression(sc, uid = "logreg_1")
+    ml_logistic_regression(uid = "logreg_1")
 
   bad_grid <- list(
     logistic = list(
@@ -113,7 +113,7 @@ test_that("we can train a regression with train-validation-split", {
 
   pipeline <- ml_pipeline(sc) %>%
     ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl) %>%
-    ml_logistic_regression(sc)
+    ml_logistic_regression()
 
   grid <- list(
     logistic = list(
