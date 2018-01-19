@@ -4,7 +4,7 @@
 \alias{ml_summary}
 \title{Spark ML -- Extraction of summary metrics}
 \usage{
-ml_summary(x, metric = NULL, allow_null = TRUE)
+ml_summary(x, metric = NULL, allow_null = FALSE)
 }
 \arguments{
 \item{x}{A Spark ML model that has a summary.}
