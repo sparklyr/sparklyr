@@ -9,7 +9,7 @@ test_that("ft_standard_scaler() works properly", {
                                    sample_data_path, overwrite = TRUE)
   scaler <- ft_standard_scaler(
     sc, input_col = "features", output_col = "scaledFeatures",
-    with_std = TRUE, with_mean = FALSE
+    with_std = TRUE, with_mean = FALSE, uid = "standard_scalaer_999"
   )
 
   scaler_model <- ml_fit(scaler, sample_data)
@@ -22,5 +22,10 @@ test_that("ft_standard_scaler() works properly", {
       unlist() %>%
       sum(),
     295.3425, tolerance = 0.001
+  )
+
+  expect_output_file(
+    print(scaler_model),
+    output_file("print/standard-scaler-model.txt")
   )
 })
