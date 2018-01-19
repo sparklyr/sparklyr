@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for Spark 2.2.1.
+
 - Added support for `spark_web()` for Livy and Databricks connections when
   using Spark 2.X.
 
