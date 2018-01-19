@@ -37,6 +37,28 @@ ml_args_to_validate <- function(args, current_args, default_args = current_args)
 
 ml_ratify_args <- function(env = rlang::caller_env(2)) {
   caller_frame <- rlang::caller_frame()
+  caller <- caller_frame$fn_name %>%
+    strsplit("\\.") %>%
+    unlist() %>%
+    head(1)
+
+  if (grepl("^ml_", caller)) {
+    # if caller is a ml_ function (as opposed to ft_),
+    #   get calls to function in the stack
+    calls <- sys.calls()
+    calls <- calls %>%
+      sapply(`[[`, 1) %>%
+      sapply(deparse) %>%
+      grep(caller, ., value = TRUE)
+
+    # if formula is specified and we didn't dispatch to ml_*.tbl_spark,
+    #   throw error
+    if (!any(grepl("tbl_spark", calls)) &&
+        !rlang::is_null(caller_frame$env[["formula"]]))
+      stop(paste0("formula should only be specified when calling ",
+                  caller, " on a tbl_spark"))
+  }
+
   validator_fn <- caller_frame$fn_name %>%
     gsub("^(ml_|ft_)", "ml_validator_", .) %>%
     gsub("\\..*$", "", .)

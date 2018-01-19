@@ -43,7 +43,7 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
 
   coefficients <- list(x$coefficients)
   statistics <- stats %>%
-    lapply(function(x) ml_summary(model, x))
+    lapply(function(x) ml_summary(model, x, allow_null = TRUE))
   c(coefficients, statistics) %>%
     as.data.frame() %>%
     broom::fix_data_frame(newnames = new_names) %>%
@@ -64,7 +64,7 @@ tidy.ml_model_linear_regression <- function(x,
 
   coefficients <- list(x$coefficients)
   statistics <- stats %>%
-    lapply(function(x) ml_summary(model, x))
+    lapply(function(x) ml_summary(model, x, allow_null = TRUE))
   c(coefficients, statistics) %>%
     as.data.frame() %>%
     broom::fix_data_frame(newnames = new_names) %>%

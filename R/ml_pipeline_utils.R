@@ -136,7 +136,7 @@ ml_column_metadata <- function(tbl, column) {
 #' @param metric The name of the metric to extract. If not set, returns the summary object.
 #' @param allow_null Whether null results are allowed when the metric is not found in the summary.
 #' @export
-ml_summary <- function(x, metric = NULL, allow_null = TRUE) {
+ml_summary <- function(x, metric = NULL, allow_null = FALSE) {
   if (rlang::is_null(metric))
     x$summary %||% stop(deparse(substitute(x)), " has no summary")
   else if (allow_null)
