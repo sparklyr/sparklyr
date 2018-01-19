@@ -29,6 +29,7 @@ script:
     fi
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
     if [[ $SPARK_VERSION == "2.2.0" ]]; then
+      export SPARKLYR_WORKER_PACKAGE=TRUE
       travis_wait 30 Rscript -e 'covr::codecov()'
     fi
 
