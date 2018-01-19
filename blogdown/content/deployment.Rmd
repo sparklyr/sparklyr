@@ -132,7 +132,7 @@ The configuration for a Spark connection is specified via the `config` parameter
 spark_connect(master = "local", config = spark_config())
 ```
 
-By default the [spark_config](/reference/sparklyr/latest/spark_config.html) function reads configuration data from a file named `config.yml` located in the current working directory (or in parent directories if not located in the working directory). This file is not required and only need be provided for overriding default behavior. You can also specify an alternate config file name and/or location.
+By default the [spark_config](////reference/sparklyr/latest/spark_config.html) function reads configuration data from a file named `config.yml` located in the current working directory (or in parent directories if not located in the working directory). This file is not required and only need be provided for overriding default behavior. You can also specify an alternate config file name and/or location.
 
 The `config.yml` file is in turn processed using the [config](https://github.com/rstudio/config) package, which enables support for multiple named configuration profiles.
 

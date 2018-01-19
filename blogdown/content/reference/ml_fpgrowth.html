@@ -1,0 +1,79 @@
+---
+title: "Frequent Pattern Mining -- FPGrowth"
+aliases:
+  - reference/sparklyr/latest/ml_fpgrowth.html
+---
+
+    <div class="doc-page">
+
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+            </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>A parallel FP-growth algorithm to mine frequent itemsets.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_fpgrowth</span>(<span class='no'>x</span>, <span class='kw'>items_col</span> <span class='kw'>=</span> <span class='st'>"items"</span>, <span class='kw'>min_confidence</span> <span class='kw'>=</span> <span class='fl'>0.8</span>,
+  <span class='kw'>min_support</span> <span class='kw'>=</span> <span class='fl'>0.3</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"fpgrowth_"</span>), <span class='no'>...</span>)
+
+<span class='fu'>ml_association_rules</span>(<span class='no'>model</span>)
+
+<span class='fu'>ml_freq_itemsets</span>(<span class='no'>model</span>)</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>items_col</td>
+      <td><p>Items column name. Default: "items"</p></td>
+    </tr>
+    <tr>
+      <td>min_confidence</td>
+      <td><p>Minimal confidence for generating Association Rule.
+<code>min_confidence</code> will not affect the mining for frequent itemsets, but
+will affect the association rules generation. Default: 0.8</p></td>
+    </tr>
+    <tr>
+      <td>min_support</td>
+      <td><p>Minimal support level of the frequent pattern. [0.0, 1.0].
+Any pattern that appears more than (min_support * size-of-the-dataset) times
+ will be output in the frequent itemsets. Default: 0.3</p></td>
+    </tr>
+    <tr>
+      <td>prediction_col</td>
+      <td><p>Prediction column name.</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the ML estimator.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td><p>A fitted FPGrowth model returned by <code>ml_fpgrowth()</code></p></td>
+    </tr>
+    </table>
+    
+
+    </div>
+
+    </div>
+

@@ -6,8 +6,8 @@ template:
 site:
   - source: "README.md"
     target: "content/_index.md"
-  - source: "vignettes/guides-dplyr.md"
-    target: "content/dplyr.md"
+  - source: "vignettes/guides-dplyr.Rmd"
+    target: "content/dplyr.Rmd"
   - source: "vignettes/guides-dplyr_files/"
     target: "static/dplyr/guides-dplyr_files/"
   - source: "vignettes/guides-mllib.md"
