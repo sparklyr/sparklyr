@@ -146,6 +146,8 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
   columns <- lapply(df, function(e) {
     if (is.factor(e))
       "character"
+    else if ("POSIXct" %in% class(e))
+      "timestamp"
     else
       typeof(e)
   })
