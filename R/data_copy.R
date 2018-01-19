@@ -115,7 +115,13 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
   invoke(hive_context(sc), "createDataFrame", rdd, structType)
 }
 
-spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") {
+spark_data_copy <- function(
+  sc,
+  df,
+  name,
+  repartition,
+  serializer = getOption("sparklyr.copy.serializer", "csv_file")) {
+
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -124,13 +130,11 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
     stop("Using a local file to copy data is not supported for remote clusters")
   }
 
-  csv_exists <- spark_csv_is_loaded(sc)
   serializer <- ifelse(is.null(serializer),
-                       ifelse(spark_connection_is_local(sc) && csv_exists,
-                              "csv_file",
-                              ifelse(spark_connection_is_yarn_client(sc),
-                                     "csv_file_scala",
-                                     "csv_string")),
+                       ifelse(spark_connection_is_local(sc) ||
+                              spark_connection_is_yarn_client(sc),
+                              "csv_file_scala",
+                              "csv_string"),
                        serializer)
 
   # Spark unfortunately has a number of issues with '.'s in column names, e.g.
@@ -146,6 +150,8 @@ spark_data_copy <- function(sc, df, name, repartition, serializer = "csv_file") 
   columns <- lapply(df, function(e) {
     if (is.factor(e))
       "character"
+    else if ("POSIXct" %in% class(e))
+      "timestamp"
     else
       typeof(e)
   })
