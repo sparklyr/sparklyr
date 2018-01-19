@@ -227,19 +227,19 @@ sample_frac(flights, 0.01)
 
 ## Writing Data
 
-It is often useful to save the results of your analysis or the tables that you have generated on your Spark cluster into persistent storage. The best option in many scenarios is to write the table out to a [Parquet](https://parquet.apache.org/) file using the [spark_write_parquet](reference/sparklyr/spark_write_parquet.html) function. For example:
+It is often useful to save the results of your analysis or the tables that you have generated on your Spark cluster into persistent storage. The best option in many scenarios is to write the table out to a [Parquet](https://parquet.apache.org/) file using the [spark_write_parquet](/reference/sparklyr/spark_write_parquet.html) function. For example:
 
 ```{r eval=F}
 spark_write_parquet(tbl, "hdfs://hdfs.company.org:9000/hdfs-path/data")
 ```
 
-This will write the Spark DataFrame referenced by the tbl R variable to the given HDFS path. You can use the [spark_read_parquet](reference/sparklyr/spark_read_parquet.html) function to read the same table back into a subsequent Spark session:
+This will write the Spark DataFrame referenced by the tbl R variable to the given HDFS path. You can use the [spark_read_parquet](/reference/sparklyr/spark_read_parquet.html) function to read the same table back into a subsequent Spark session:
 
 ```{r eval=F}
 tbl <- spark_read_parquet(sc, "data", "hdfs://hdfs.company.org:9000/hdfs-path/data")
 ```
 
-You can also write data as CSV or JSON using the [spark_write_csv](reference/sparklyr/spark_write_csv.html) and [spark_write_json](reference/sparklyr/spark_write_json.html) functions.
+You can also write data as CSV or JSON using the [spark_write_csv](/reference/sparklyr/spark_write_csv.html) and [spark_write_json](/reference/sparklyr/spark_write_json.html) functions.
 
 ## Hive Functions
 
