@@ -63,6 +63,9 @@ ml_random_forest <- function(
   sdf <- spark_dataframe(x)
   # choose classification vs. regression model based on column type
   schema <- sdf_schema(sdf)
+  if (!response_col %in% names(schema))
+    stop(paste0(response_col, " is not a column in the input dataset"))
+
   response_type <- schema[[response_col]]$type
 
   type <- rlang::arg_match(type)
@@ -91,7 +94,7 @@ ml_random_forest <- function(
     if (!(col.sample.rate > 0 && col.sample.rate <= 1))
       stop("'col.sample.rate' must be in (0, 1]")
     col.sample.rate <- if (spark_version(sc) < "2.0.0") {
-      if (col.sample.rate == 1)
+      if (col.sample.rate == 1) # nocov start
         "all"
       else {
         # Prior to Spark 2.0.0, random forest does not support arbitrary
@@ -110,7 +113,7 @@ ml_random_forest <- function(
           `[[`(max(findInterval(col.sample.rate, strategies[["rate"]]), 1))
         message("* Using feature subsetting strategy: ", strategy)
         strategy
-      }
+      } # nocov end
     } else {
       ensure_scalar_character(format(col.sample.rate, nsmall = 1L))
     }

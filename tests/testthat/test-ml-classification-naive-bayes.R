@@ -76,3 +76,16 @@ test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
 
   expect_equal(Rp, Sp, tolerance = 0.001)
 })
+
+test_that("ml_naive_bayes() print outputs are correct", {
+  iris_tbl <- testthat_tbl("iris")
+  m <- ml_naive_bayes(iris_tbl, Species ~ Petal_Width + Petal_Length)
+  expect_output_file(
+    print(m),
+    output_file("print/naive_bayes.txt")
+  )
+  expect_output_file(
+    summary(m),
+    output_file("print/naive_bayes.txt"), update = FALSE
+  )
+})

@@ -113,3 +113,12 @@ test_that("ml_kmeans() works properly", {
     46.7123, tolerance = 0.01
   )
 })
+
+test_that("ml_bisecting_kmeans() works properly", {
+  test_requires_version("2.0.0", "ml_bisecting_kmeans() requires Spark 2.0.0+")
+  iris_tbl <- testthat_tbl("iris")
+  expect_output_file(
+    ml_bisecting_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11),
+    output_file("print/bisecting-kmeans.txt")
+  )
+})

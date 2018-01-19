@@ -134,7 +134,8 @@ new_ml_kmeans_model <- function(jobj) {
 
   new_ml_clustering_model(
     jobj,
-    cluster_centers = try_null(invoke(jobj, "clusterCenters")),
+    cluster_centers = try_null(invoke(jobj, "clusterCenters")) %>%
+      lapply(invoke, "toArray"),
     compute_cost = function(dataset) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },
@@ -155,8 +156,7 @@ new_ml_model_kmeans <- function(
   summary <- model$summary
 
   centers <- model$cluster_centers %>%
-    sapply(invoke, "toArray") %>%
-    t() %>%
+    do.call(rbind, .) %>%
     as.data.frame() %>%
     rlang::set_names(feature_names)
 
@@ -216,9 +216,3 @@ ml_compute_cost <- function(model, dataset) {
   } else
     model$compute_cost(dataset)
 }
-
-# TODO
-#' #' @export
-#' fitted.ml_model_kmeans <- function(object, ...) {
-#'   predict(object)
-#' }

@@ -61,19 +61,37 @@ test_that("we can cross validate a logistic regression with xval", {
   if (spark_version(sc) < "2.1.0") skip("multinomial logistic regression not supported")
   iris_tbl <- testthat_tbl("iris")
 
-  pipeline <- ml_pipeline(sc) %>%
-    ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl) %>%
-    ml_logistic_regression(sc)
+  pipeline <- ml_pipeline(sc, uid = "pipeline_1") %>%
+    ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl,
+                 uid = "r_formula_1") %>%
+    ml_logistic_regression(sc, uid = "logreg_1")
 
-  grid <- list(
+  bad_grid <- list(
     logistic = list(
       reg_param = c(0, 0.01),
       elastic_net_param = c(0, 0.01)
     )
   )
-  cvm <- ml_cross_validator(iris_tbl, estimator = pipeline, estimator_param_maps = grid,
-                     evaluator = ml_multiclass_classification_evaluator(sc),
-                     seed = 1)
+
+  expect_error(
+    ml_cross_validator(
+      iris_tbl, estimator = pipeline, estimator_param_maps = bad_grid,
+      evaluator = ml_multiclass_classification_evaluator(sc),
+      seed = 1, uid = "cv_1"),
+    "The name logistic matches no stages in pipeline"
+  )
+
+  grid <- list(
+    logreg_1 = list(
+      reg_param = c(0, 0.01),
+      elastic_net_param = c(0, 0.01)
+    )
+  )
+
+  cvm <- ml_cross_validator(
+    iris_tbl, estimator = pipeline, estimator_param_maps = grid,
+    evaluator = ml_multiclass_classification_evaluator(sc, uid = "eval1"),
+    seed = 1, uid = "cv_1")
 
   expect_identical(names(cvm$avg_metrics_df),
                c("f1", "elastic_net_param_S1", "reg_param_S1"))
@@ -83,6 +101,10 @@ test_that("we can cross validate a logistic regression with xval", {
 
   expect_match(summary_string,
                "3-fold cross validation")
+  expect_output_file(
+    print(cvm),
+    output_file("print/cross-validator-model.txt")
+  )
 })
 
 test_that("we can train a regression with train-validation-split", {

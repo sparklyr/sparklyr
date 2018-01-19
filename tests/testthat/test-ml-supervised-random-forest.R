@@ -202,3 +202,16 @@ test_that("checkpointing works for rf", {
                        checkpoint.interval = 5L),
   NA)
 })
+
+test_that("ml_random_forest() provides informative error for bad response_col", {
+  expect_error(
+    ml_random_forest(iris_tbl, Sepal.Length ~ Sepal.Width),
+    "Sepal.Length is not a column in the input dataset")
+})
+
+test_that("residuals() call on ml_model_random_forest_regression errors", {
+  expect_error(
+    ml_random_forest(iris_tbl, Sepal_Length ~ Sepal_Width) %>% residuals(),
+    "'residuals\\(\\)' not supported for ml_model_random_forest_regression"
+  )
+})

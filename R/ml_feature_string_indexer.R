@@ -84,5 +84,14 @@ new_ml_string_indexer <- function(jobj) {
 }
 
 new_ml_string_indexer_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_string_indexer_model")
+  new_ml_transformer(jobj,
+                     labels = invoke(jobj, "labels") %>%
+                       as.character(),
+                     subclass = "ml_string_indexer_model")
 }
+
+#' @rdname ft_string_indexer
+#' @param model A fitted StringIndexer model returned by \code{ft_string_indexer()}
+#' @return \code{ml_labels()} returns a vector of labels, corresponding to indices to be assigned.
+#' @export
+ml_labels <- function(model) model$labels

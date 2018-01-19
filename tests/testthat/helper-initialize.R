@@ -173,3 +173,5 @@ param_add_version <- function(args, min_version, ...) {
   else
     args
 }
+
+output_file <- function(filename) file.path("output", filename)

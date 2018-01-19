@@ -50,36 +50,47 @@ ml_expand_params <- function(param_grid) {
 
 ml_validate_params <- function(stages_params, uid_stages, current_param_list) {
   stage_names <- names(stages_params)
-  # match stage names
-  stage_uids <- sapply(paste0("^", stage_names), grep, names(uid_stages), value = TRUE) %>%
-    rlang::set_names(stage_names)
-  stage_names %>%
-    lapply(function(stage_name) {
-      stage_jobj <- uid_stages %>%
-        `[[`(stage_uids[stage_name])
-      lapply(stages_params[[stage_name]], function(params) {
-        args_to_validate <- ml_args_to_validate(
-          args = params,
-          # current param list parsed from the pipeline jobj
-          current_args = current_param_list %>%
-            `[[`(stage_uids[stage_name]) %>%
-            ml_map_param_list_names(),
-          # default args from the stage constructor, excluding args with no default
-          #   and `uid`
-          default_args = Filter(
-            Negate(rlang::is_symbol),
-            stage_jobj %>%
-              ml_get_stage_constructor() %>%
-              rlang::fn_fmls() %>%
-              rlang::modify(uid = NULL)
-          ))
-        # calls the appropriate validator and returns a list
-        rlang::invoke(ml_get_stage_validator(stage_jobj),
-                      args = args_to_validate,
-                      nms = names(params))
-      })
-    }) %>%
-    rlang::set_names(stage_uids)
+  matched_indices <- stage_names %>%
+    sapply(function(x) {
+      matched_index <- grepl(paste0("^", x), names(uid_stages)) %>% which()
+      if (length(matched_index) > 1)
+        stop(paste0("The name ", x,
+                    " matches more than 1 stage in pipeline"))
+      if (length(matched_index) == 0)
+        stop(paste0("The name ", x, " matches no stages in pipeline"))
+      matched_index
+    })
+
+# match stage names
+stage_uids <- names(uid_stages)[matched_indices] %>%
+  rlang::set_names(stage_names)
+stage_names %>%
+  lapply(function(stage_name) {
+    stage_jobj <- uid_stages %>%
+      `[[`(stage_uids[stage_name])
+    lapply(stages_params[[stage_name]], function(params) {
+      args_to_validate <- ml_args_to_validate(
+        args = params,
+        # current param list parsed from the pipeline jobj
+        current_args = current_param_list %>%
+          `[[`(stage_uids[stage_name]) %>%
+          ml_map_param_list_names(),
+        # default args from the stage constructor, excluding args with no default
+        #   and `uid`
+        default_args = Filter(
+          Negate(rlang::is_symbol),
+          stage_jobj %>%
+            ml_get_stage_constructor() %>%
+            rlang::fn_fmls() %>%
+            rlang::modify(uid = NULL)
+        ))
+      # calls the appropriate validator and returns a list
+      rlang::invoke(ml_get_stage_validator(stage_jobj),
+                    args = args_to_validate,
+                    nms = names(params))
+    })
+  }) %>%
+  rlang::set_names(stage_uids)
 }
 
 ml_build_param_maps <- function(param_list) {

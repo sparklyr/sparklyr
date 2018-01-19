@@ -141,3 +141,12 @@ test_that("ml_linear_regression print methods work", {
   expect_equal(summary_output[8], "(Intercept) Petal_Width ")
   expect_match(summary_output[11], "R-Squared")
 })
+
+test_that("fitted() works for linear regression", {
+  iris_tbl <- testthat_tbl("iris")
+  m <- ml_linear_regression(iris_tbl, Petal_Width ~ Petal_Length)
+  expect_equal(
+    length(fitted(m)),
+    nrow(iris)
+  )
+})

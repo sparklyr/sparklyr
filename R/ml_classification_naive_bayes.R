@@ -199,5 +199,4 @@ print.ml_model_naive_bayes <- function(x, ...) {
 #' @export
 summary.ml_model_naive_bayes <- function(object, ...) {
   print(object, ...)
-  object
 }

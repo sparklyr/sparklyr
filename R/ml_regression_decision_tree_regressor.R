@@ -118,9 +118,12 @@ ml_decision_tree_regressor.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
+    call <- if (identical(sys.call(sys.parent())[[1]], quote(ml_decision_tree)))
+      sys.call(sys.parent())
     ml_generate_ml_model(
       x, predictor, formula, features_col, label_col,
-      "regression", new_ml_model_decision_tree_regression
+      "regression", new_ml_model_decision_tree_regression,
+      call = call
     )
   }
 }
