@@ -382,9 +382,10 @@ object Utils {
         val value = r(idx)
 
         column match {
-          case "integer"  => if (Try(value.toInt).isSuccess) value.toInt else null.asInstanceOf[Int]
-          case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
-          case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
+          case "integer"   => if (Try(value.toInt).isSuccess) value.toInt else null.asInstanceOf[Int]
+          case "double"    => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
+          case "logical"   => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
+          case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
           case _ => value
         }
       })
