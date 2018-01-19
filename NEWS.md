@@ -1,5 +1,7 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for Spark 2.2.1.
+
 - Switched `copy_to` serializer to use Scala implementation, this change can be
   reverted by setting the `sparklyr.copy.serializer` option to `csv_file`.
 
