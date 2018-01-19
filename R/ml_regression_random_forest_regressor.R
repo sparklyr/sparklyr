@@ -124,8 +124,11 @@ ml_random_forest_regressor.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
+    call <- if (identical(sys.call(sys.parent())[[1]], quote(ml_random_forest)))
+      sys.call(sys.parent())
     ml_generate_ml_model(x, predictor, formula, features_col, label_col,
-                         "regression", new_ml_model_random_forest_regression)
+                         "regression", new_ml_model_random_forest_regression,
+                         call = call)
   }
 }
 

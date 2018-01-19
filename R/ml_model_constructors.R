@@ -75,6 +75,8 @@ spark_jobj.ml_model <- function(x, ...) {
 
 #' @export
 print.ml_model <- function(x, ...) {
-  cat("Call: ", x$formula, "\n\n", sep = "")
+  ml_model_print_call(x)
+  print_newline()
+  cat("Formula: ", x$formula, "\n\n", sep = "")
   cat(invoke(spark_jobj(x$model), "toString"), sep = "\n")
 }

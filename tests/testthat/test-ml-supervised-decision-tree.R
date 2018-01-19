@@ -134,3 +134,17 @@ test_that("error for bad impurity specification", {
     "'impurity' must be 'variance' for regression"
   )
 })
+
+test_that("ml_decision_tree print outputs are correct", {
+  expect_output_file(
+    ml_decision_tree(iris_tbl, Species ~ Petal_Length + Sepal_Width,
+                     seed = 24, uid = "dt1"),
+    output_file("print/decision-tree.txt")
+  )
+
+  expect_output_file(
+    ml_decision_tree_classifier(iris_tbl, Species ~ Petal_Length + Sepal_Width,
+                                seed = 54, uid = "dt2"),
+    output_file("print/decision_tree_classifier.txt")
+  )
+})
