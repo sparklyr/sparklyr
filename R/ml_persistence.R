@@ -78,12 +78,20 @@ ml_save.ml_model <- function(x, path, overwrite = FALSE,
 #' @rdname ml-persistence
 #' @export
 ml_load <- function(sc, path) {
-  path <- ensure_scalar_character(path) %>%
-    spark_normalize_path()
+  is_local <- spark_context(sc) %>%
+    invoke("isLocal")
 
-  class <- paste0(path, "/metadata/part-00000") %>%
-    jsonlite::read_json() %>%
-    `[[`("class")
+  if (is_local) {
+    path <- ensure_scalar_character(path) %>%
+      spark_normalize_path()
+    class <- paste0(path, "/metadata/part-00000") %>%
+      jsonlite::read_json() %>%
+      `[[`("class")
+  } else {
+    class <- spark_read_json(sc, random_string("ml_load_metadata"),
+                             paste0(path, "/metadata/part-00000")) %>%
+      dplyr::pull(!!rlang::sym("class"))
+  }
 
   invoke_static(sc, class, "load", path) %>%
     ml_constructor_dispatch()
