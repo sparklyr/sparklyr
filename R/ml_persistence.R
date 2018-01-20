@@ -89,7 +89,7 @@ ml_load <- function(sc, path) {
       `[[`("class")
   } else {
     class <- spark_read_json(sc, random_string("ml_load_metadata"),
-                    path) %>%
+                             paste0(path, "/metadata/part-00000")) %>%
       dplyr::pull(!!rlang::sym("class"))
   }
 
