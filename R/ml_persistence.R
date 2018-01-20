@@ -81,9 +81,18 @@ ml_load <- function(sc, path) {
   path <- ensure_scalar_character(path) %>%
     spark_normalize_path()
 
-  class <- paste0(path, "/metadata/part-00000") %>%
-    jsonlite::read_json() %>%
-    `[[`("class")
+  is_local <- spark_context(sc) %>%
+    invoke("isLocal")
+
+  class <- if (is_local) {
+    paste0(path, "/metadata/part-00000") %>%
+      jsonlite::read_json() %>%
+      `[[`("class")
+  } else {
+    spark_read_json(sc, random_string("ml_load_metadata"),
+                    path) %>%
+      dplyr::pull(!!rlang::sym("class"))
+  }
 
   invoke_static(sc, class, "load", path) %>%
     ml_constructor_dispatch()
