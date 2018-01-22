@@ -96,8 +96,10 @@ new_ml_fpgrowth <- function(jobj) {
 new_ml_fpgrowth_model <- function(jobj) {
   new_ml_transformer(
     jobj,
-    association_rules = invoke(jobj, "associationRules"),
-    freq_itemsets = invoke(jobj, "freqItemsets"),
+    association_rules = invoke(jobj, "associationRules") %>%
+      sdf_register(),
+    freq_itemsets = invoke(jobj, "freqItemsets") %>%
+      sdf_register(),
     subclass = "ml_fpgrowth_model")
 }
 
