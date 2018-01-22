@@ -16,7 +16,9 @@ ml_print_column_name_params <- function(x) {
     names() %>%
     grep("col|cols$", ., value = TRUE)
   for (param in sort(out_names))
-    cat(paste0("  ", param, ": ", ml_param(x, param), "\n"))
+    cat(paste0("  ", param, ": ",
+               paste0(ml_param(x, param), collapse = ", "),
+               "\n"))
 }
 
 ml_print_params <- function(x) {
