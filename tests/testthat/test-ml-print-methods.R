@@ -40,3 +40,10 @@ test_that("ml_tree_feature_importance() works properly", {
   expect_equal(nrow(rf_importance), 3)
   expect_equal(rf_importance, dt_importance)
 })
+
+test_that("input_cols print correctly", {
+  expect_output_file(
+    print(ft_vector_assembler(sc, c("foo", "bar"), "features", uid = "va")),
+    output_file("print/vector-assembler.txt")
+  )
+})
