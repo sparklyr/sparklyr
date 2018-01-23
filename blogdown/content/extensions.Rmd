@@ -67,8 +67,8 @@ Three classes are defined for representing the fundamental types of the R to Jav
 | Function | Description  |
 |----------------------------|---------------------------------------------|
 | [`spark_connection`](/reference/spark-connections/) | Connection between R and the Spark shell process |
-| [`spark_jobj`](/////reference/sparklyr/latest/spark_jobj.html) | Instance of a remote Spark object |
-| [`spark_dataframe`](/////reference/sparklyr/latest/spark_dataframe.html) | Instance of a remote Spark DataFrame object |
+| [`spark_jobj`](/reference/sparklyr/latest/spark_jobj.html) | Instance of a remote Spark object |
+| [`spark_dataframe`](/reference/sparklyr/latest/spark_dataframe.html) | Instance of a remote Spark DataFrame object |
 
 S3 methods are defined for each of these classes so they can be easily converted to or from objects that contain or wrap them. Note that for any given `spark_jobj` it's possible to discover the underlying `spark_connection`.
 
@@ -78,9 +78,9 @@ There are several functions available for calling the methods of Java objects an
 
 | Function | Description  |
 |----------------------------|---------------------------------------------|
-| [`invoke`](/////reference/sparklyr/latest/invoke.html) | Call a method on an object |
-| [`invoke_new`](/////reference/sparklyr/latest/invoke.html) | Create a new object by invoking a constructor |
-| [`invoke_static`](/////reference/sparklyr/latest/invoke.html) | Call a static method on an object  |
+| [`invoke`](/reference/sparklyr/latest/invoke.html) | Call a method on an object |
+| [`invoke_new`](/reference/sparklyr/latest/invoke.html) | Create a new object by invoking a constructor |
+| [`invoke_static`](/reference/sparklyr/latest/invoke.html) | Call a static method on an object  |
 
 For example, to create a new instance of the `java.math.BigInteger` class and then call the `longValue()` method on it you would use code like this:
 
@@ -129,11 +129,11 @@ The following functions are useful for implementing wrapper functions of various
 | Function | Description  |
 |----------------------------|---------------------------------------------|
 | [`spark_connection`](/reference/spark-connections/) | Get the Spark connection associated with an object (S3)|
-| [`spark_jobj`](/////reference/sparklyr/latest/spark_jobj.html) | Get the Spark jobj associated with an object (S3) |
-| [`spark_dataframe`](/////reference/sparklyr/latest/spark_dataframe.html) | Get the Spark DataFrame associated with an object (S3) |
+| [`spark_jobj`](/reference/sparklyr/latest/spark_jobj.html) | Get the Spark jobj associated with an object (S3) |
+| [`spark_dataframe`](/reference/sparklyr/latest/spark_dataframe.html) | Get the Spark DataFrame associated with an object (S3) |
 | [`spark_context`](/reference/spark-api/) | Get the SparkContext for a `spark_connection` |
 | [`hive_context`](/reference/spark-api/) | Get the HiveContext for a `spark_connection` |
-| [`spark_version`](/////reference/sparklyr/latest/spark_version.html) | Get the version of Spark (as a `numeric_version`) for a `spark_connection` |
+| [`spark_version`](/reference/sparklyr/latest/spark_version.html) | Get the version of Spark (as a `numeric_version`) for a `spark_connection` |
 
 
 
@@ -172,7 +172,7 @@ When creating R packages which implement interfaces to Spark you may need to inc
 
 | Function | Description  |
 |----------------------------|---------------------------------------------|
-| [`spark_dependency`](/////reference/sparklyr/latest/spark_dependency) | Define a Spark dependency consisting of JAR files and Spark packages |
+| [`spark_dependency`](/reference/sparklyr/latest/spark_dependency) | Define a Spark dependency consisting of JAR files and Spark packages |
 
 Your extension package can specify it's dependencies by implementing a function named `spark_dependencies` within the package (this function should *not* be publicly exported). For example, let's say you were creating an extension package named **sparkds** that needs to include a custom JAR as well as the Redshift and Apache Avro packages:
 
@@ -236,7 +236,7 @@ When including a JAR file within an R package distributed on CRAN, you should fo
 
 ## Data Types
 
-The [`ensure_*`](http://spark.rstudio.com//////reference/sparklyr/latest/ensure.html) family of functions can be used to enforce specific data types that are passed to a Spark routine. For example, Spark routines that require an integer will not accept an R numeric element. Use these functions ensure certain parameters are scalar integers, or scalar doubles, and so on.
+The [`ensure_*`](http://spark.rstudio.com//reference/sparklyr/latest/ensure.html) family of functions can be used to enforce specific data types that are passed to a Spark routine. For example, Spark routines that require an integer will not accept an R numeric element. Use these functions ensure certain parameters are scalar integers, or scalar doubles, and so on.
 
 * ensure_scalar_integer 
 * ensure_scalar_double
@@ -266,7 +266,7 @@ In order to match the correct data types while calling Scala code from R, or ret
 
 ## Compiling
 
-Most Spark extensions won't need to define their own compilation specification, and can instead rely on the default behavior of `compile_package_jars`. For users who would like to take more control over where the scalac compilers should be looked up, use the [`spark_compilation_spec`](http://spark.rstudio.com//////reference/sparklyr/latest/spark_compilation_spec.html) fucnction. The Spark compilation specification is used when compiling Spark extension Java Archives, and defines which versions of Spark, as well as which versions of Scala, should be used for compilation.
+Most Spark extensions won't need to define their own compilation specification, and can instead rely on the default behavior of `compile_package_jars`. For users who would like to take more control over where the scalac compilers should be looked up, use the [`spark_compilation_spec`](http://spark.rstudio.com//reference/sparklyr/latest/spark_compilation_spec.html) fucnction. The Spark compilation specification is used when compiling Spark extension Java Archives, and defines which versions of Spark, as well as which versions of Scala, should be used for compilation.
 
 
 

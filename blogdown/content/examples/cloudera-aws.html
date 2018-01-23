@@ -14,30 +14,26 @@ aliases:
 
 
 
-<div id="summary" class="section level1">
+<section id="summary" class="level1">
 <h1>Summary</h1>
 <p>This document demonstrates how to use <code>sparklyr</code> with an Cloudera Hadoop &amp; Spark cluster. Data are downloaded from the web and stored in Hive tables on HDFS across multiple worker nodes. RStudio Server is installed on the master node and orchestrates the analysis in spark.</p>
-</div>
-<div id="cloudera-cluster" class="section level1">
+</section>
+<section id="cloudera-cluster" class="level1">
 <h1>Cloudera Cluster</h1>
 <p>This demonstration is focused on adding RStudio integration to an existing Cloudera cluster. The assumption will be made that there no aid is needed to setup and administer the cluster.</p>
-<div id="cdh-5" class="section level2">
-<h2>CDH 5</h2>
+<p>##CDH 5</p>
 <p>We will start with a Cloudera cluster CDH version 5.8.2 (free version) with an underlaying Ubuntu Linux distribution.</p>
 <p><img src="/images/deployment/cdh/manager-landing-page.png" width=600/></p>
-</div>
-<div id="spark-1.6" class="section level2">
-<h2>Spark 1.6</h2>
+<p>##Spark 1.6</p>
 <p>The default Spark 1.6.0 parcel is in installed and running</p>
 <p><img src="/images/deployment/cdh/spark-history-server-1.png" width=600/></p>
-</div>
-<div id="hive-data" class="section level2">
+<section id="hive-data" class="level2">
 <h2>Hive data</h2>
 <p>For this demo, we have created and populated 3 tables in Hive. The table names are: flights, airlines and airports. Using Hue, we can see the loaded tables. For the links to the data files and their Hive import scripts please see <em>Appendix A</em>.</p>
 <p><img src="/images/deployment/cdh/hue-metastore-1.png" width=600/></p>
-</div>
-</div>
-<div id="install-rstudio" class="section level1">
+</section>
+</section>
+<section id="install-rstudio" class="level1">
 <h1>Install RStudio</h1>
 <p>The latest version of R is needed. In Ubuntu, the default core R is not the latest so we have to update the source list. We will also install a few other dependencies.</p>
 <pre class="bash"><code>sudo sh -c &#39;echo &quot;deb http://cran.rstudio.com/bin/linux/ubuntu trusty/&quot; &gt;&gt; /etc/apt/sources.list&#39;
@@ -51,16 +47,16 @@ sudo apt-get -y install libssl-dev</code></pre>
 <p>We will install the preview version of RStudio Server</p>
 <pre class="bash"><code>wget https://s3.amazonaws.com/rstudio-dailybuilds/rstudio-server-1.0.40-amd64.deb
 sudo gdebi rstudio-server-1.0.49-amd64.deb</code></pre>
-<div id="create-and-configure-a-user" class="section level3">
+<section id="create-and-configure-a-user" class="level3">
 <h3>Create and configure a User</h3>
 <p>Create a user called <code>rstudio</code> that will perform the data analysis.</p>
 <pre class="bash"><code>sudo adduser rstudio</code></pre>
 <p>To ease security restriction in this demo, we will add the new user to the default super group defined in the <strong>dfs.permissions.superusergroup</strong> setting in CDH</p>
 <pre class="bash"><code>sudo groupadd supergroup
 sudo usermod -a -G supergroup rstudio</code></pre>
-</div>
-</div>
-<div id="connect-to-spark" class="section level1">
+</section>
+</section>
+<section id="connect-to-spark" class="level1">
 <h1>Connect to Spark</h1>
 <p>Log in to RStudio Server by pointing a browser at your master node IP:8787.</p>
 <p>
@@ -84,14 +80,14 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;, version=&quot;1.6.0&quo
 <p>
 <img src="/images/deployment/cdh/spark-rdd-1.png" width=600/>
 </p>
-</div>
-<div id="data-analysis" class="section level1">
+</section>
+<section id="data-analysis" class="level1">
 <h1>Data analysis</h1>
 <p>Is there evidence to suggest that some airline carriers make up time in flight? This analysis predicts time gained in flight by airline carrier.</p>
 <p>
 <img src="/images/deployment/cdh/data-analysis-1.png" width=600/>
 </p>
-<div id="cache-the-tables-into-memory" class="section level2">
+<section id="cache-the-tables-into-memory" class="level2">
 <h2>Cache the tables into memory</h2>
 <p>Use <code>tbl_cache</code> to load the flights table into memory. Caching tables will make analysis much faster. Create a dplyr reference to the Spark DataFrame.</p>
 <pre class="r"><code># Cache flights Hive table into Spark
@@ -105,8 +101,8 @@ airlines_tbl &lt;- tbl(sc, &#39;airlines&#39;)
 # Cache airports Hive table into Spark
 tbl_cache(sc, &#39;airports&#39;)
 airports_tbl &lt;- tbl(sc, &#39;airports&#39;)</code></pre>
-</div>
-<div id="create-a-model-data-set" class="section level2">
+</section>
+<section id="create-a-model-data-set" class="level2">
 <h2>Create a model data set</h2>
 <p>Filter the data to contain only the records to be used in the fitted model. Join carrier descriptions for reference. Create a new variable called <code>gain</code> which represents the amount of time gained (or lost) in flight.</p>
 <pre class="r"><code># Filter records and create target variable &#39;gain&#39;
@@ -142,8 +138,8 @@ Database: spark connection master=yarn-client app=sparklyr local=FALSE
 9        American Airlines Inc. -0.9631200 1066.8396 56.78222
 10  AirTran Airways Corporation -0.9411572  665.6574 53.38363
 # ... with more rows</code></pre>
-</div>
-<div id="train-a-linear-model" class="section level2">
+</section>
+<section id="train-a-linear-model" class="level2">
 <h2>Train a linear model</h2>
 <p>Predict time gained or lost in flight as a function of distance, departure delay, and airline carrier.</p>
 <pre class="r"><code># Partition the data into training and validation sets
@@ -192,8 +188,8 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 
 R-Squared: 0.02301
 Root Mean Squared Error: 17.83</code></pre>
-</div>
-<div id="assess-model-performance" class="section level2">
+</section>
+<section id="assess-model-performance" class="level2">
 <h2>Assess model performance</h2>
 <p>Compare the model performance using the validation data.</p>
 <pre class="r"><code># Calculate average gains by predicted decile
@@ -221,8 +217,8 @@ deciles %&gt;%
 <p>
 <img src="/images/deployment/cdh/performance-1.png" width=600/>
 </p>
-</div>
-<div id="visualize-predictions" class="section level2">
+</section>
+<section id="visualize-predictions" class="level2">
 <h2>Visualize predictions</h2>
 <p>Compare actual gains to predicted gains for an out of time sample.</p>
 <pre class="r"><code># Select data from an out of time sample
@@ -252,12 +248,12 @@ ggplot(carrier, aes(gain, prediction)) +
 <img src="/images/deployment/cdh/forecast-1.png" width=600/>
 </p>
 <p>Some carriers make up more time than others in flight, but the differences are relatively small. The average time gains between the best and worst airlines is only six minutes. The best predictor of time gained is not carrier but flight distance. The biggest gains were associated with the longest flights.</p>
-</div>
-</div>
-<div id="share-insights" class="section level1">
+</section>
+</section>
+<section id="share-insights" class="level1">
 <h1>Share Insights</h1>
 <p>This simple linear model contains a wealth of detailed information about carriers, distances traveled, and flight delays. These detailed insights can be conveyed to a non-technical audiance via an interactive <a href="http://rmarkdown.rstudio.com/flexdashboard/index.html">flexdashboard</a>.</p>
-<div id="build-dashboard" class="section level2">
+<section id="build-dashboard" class="level2">
 <h2>Build dashboard</h2>
 <p>Aggregate the scored data by origin, destination, and airline. Save the aggregated data.</p>
 <pre class="r"><code># Summarize by origin, destination, and carrier
@@ -278,16 +274,13 @@ pred_data &lt;- collect(summary_2008)
 airports &lt;- collect(select(airports_tbl, name, faa, lat, lon))
 ml1_summary &lt;- capture.output(summary(ml1))
 save(pred_data, airports, ml1_summary, file = &#39;flights_pred_2008.RData&#39;)</code></pre>
-</div>
-<div id="publish-dashboard" class="section level2">
+</section>
+<section id="publish-dashboard" class="level2">
 <h2>Publish dashboard</h2>
 <p>Use the saved data to build an R Markdown <a href="http://rmarkdown.rstudio.com/flexdashboard/index.html">flexdashboard</a>. Publish the flexdashboard</p>
 <p><img src="/images/deployment/cdh/flex-1.png" width=600/></p>
-</div>
-</div>
-<div id="appendix" class="section level1">
-<h1>Appendix</h1>
-<div id="appendix-a---data-files" class="section level3">
+<p>#Appendix</p>
+<section id="appendix-a---data-files" class="level3">
 <h3>Appendix A - Data files</h3>
 <p>Run the following script to download data from the web onto your master node. Download the yearly flight data and the airlines lookup table.</p>
 <pre class="bash"><code># Make download directory
@@ -308,8 +301,8 @@ wget -O /tmp/airlines.csv http://www.transtats.bts.gov/Download_Lookup.asp?Looku
 
 # Download airports data
 wget -O /tmp/airports.csv https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat</code></pre>
-</div>
-<div id="hive-tables" class="section level3">
+</section>
+<section id="hive-tables" class="level3">
 <h3>Hive tables</h3>
 <p>We used the Hue interface, logged in as ‘admin’ to load the data into HDFS and then into Hive.</p>
 <pre class="sql"><code>CREATE EXTERNAL TABLE IF NOT EXISTS flights
@@ -389,5 +382,6 @@ WITH SERDEPROPERTIES
 )
 STORED AS TEXTFILE;</code></pre>
 <pre class="sql"><code>LOAD DATA INPATH &#39;/user/admin/airports.dat&#39; INTO TABLE airports;</code></pre>
-</div>
-</div>
+</section>
+</section>
+</section>

@@ -10,6 +10,43 @@ aliases:
   /articles/deployment-connections.html
 ---
 
+
+
+## Local mode
+
+Local mode is an excellent way to learn and experiment with Spark. Local mode also provides a convenient development environment for analyses, reports, and applications that you plan to eventually deploy to a multi-node Spark cluster.
+
+To work in local mode you should first install a version of Spark for local use. You can do this using the `spark_install()` function, for example:
+
+### Recommended properties
+
+The following are the recommended Spark properties to set when connecting via R:
+
+- **sparklyr.cores.local** - It defaults to using all of the available cores. Not a necessary property to set, unless there's a reason to use less cores than available for a given Spark session.
+
+- **sparklyr.shell.driver-memory** - The limit is the amount of RAM available in the computer minus what would be needed for OS operations.  
+
+- **spark.memory.fraction** - The default is set to 60% of the requested memory per executor.  For more information, please see this [Memory Management Overview](https://spark.apache.org/docs/latest/tuning.html#memory-management-overview) page in the official Spark website.
+
+### Connection example
+
+```r
+conf$`sparklyr.cores.local` <- 4
+conf$`sparklyr.shell.driver-memory` <- "16G"
+conf$spark.memory.fraction <- 0.9
+
+sc <- spark_connect(master = "local", 
+                    version = "2.1.0",
+                    config = conf)
+```
+
+#### Executors page 
+
+To see how the requested configuration affected the Spark connection, go to the **Executors** page in the Spark Web UI available in http://localhost:4040/storage/
+
+
+![](/images/deployment/connections/local.png)
+
 ## Customizing connections
 
 A connection to Spark can be customized by setting the values of certain Spark properties.  In `sparklyr`, Spark properties can be set by using the `config` argument in the `spark_connect()` function.    
@@ -24,7 +61,6 @@ conf$spark.executor.memory <- "16G" # Use `$` to add or set values
 sc <- spark_connect(master = "yarn-client", 
                     config = conf)  # Pass the conf variable 
 ```
-
 ### Spark definitions
 
 It may be useful to provide some simple definitions for the Spark nomenclature: 
@@ -45,7 +81,7 @@ It may be useful to provide some simple definitions for the Spark nomenclature:
 
 - **Spark configuration properties passed by R are just requests** - In most cases, the cluster has the final say regarding the resources apportioned to a given Spark session. 
 
-- **The cluster overrides 'silently'** -  Many times, no errors are returned when more resources than allowed are requested, or if an attempt is made to change a setting fixed by the cluster. 
+- **The cluster overrides 'silently'** -  Many times, no errors are returned when more resources than allowed are requested, or if an attempt is made to change a setting fixed by the cluster.
 
 ## YARN cluster
 
@@ -66,8 +102,6 @@ The following are the recommended Spark properties to set when connecting via R:
 - **spark.executor.instances** - Number of executors to start. This property is acknowledged by the cluster if *spark.dynamicAllocation.enabled* is set to "false".
 
 - **spark.dynamicAllocation.enabled** -  Overrides the mechanism that Spark provides to dynamically adjust resources.  Disabling it provides more control over the number of the Executors that can be started, which in turn impact the amount of storage available for the session. For more information, please see the [Dynamic Resource Allocation](https://spark.apache.org/docs/latest/job-scheduling.html#dynamic-resource-allocation) page in the official Spark website.
-
-
 
 ### Connection example
 
@@ -92,7 +126,7 @@ To see how the requested configuration affected the Spark connection, go to the 
 
 Notice that 155.3MB per executor are assigned instead of the 300MB requested.  This is because the *spark.memory.fraction* has been fixed by the cluster, plus, there is fixed amount of memory designated for overhead.  
 
-![](images/deployment/connections/yarnclient.png)
+![](/images/deployment/connections/yarnclient.png)
 
 ### Executor memory error {#yarn-executor}
 
@@ -157,37 +191,4 @@ sc <- spark_connect(master="spark://master-url:7077",
 
 To see how the requested configuration affected the Spark connection, go to the **Executors** page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040:
 
-![](images/deployment/connections/standalone.png)
-
-## Local mode
-
-### Recommended properties
-
-The following are the recommended Spark properties to set when connecting via R:
-
-- **sparklyr.cores.local** - It defaults to using all of the available cores. Not a necessary property to set, unless there's a reason to use less cores than available for a given Spark session.
-
-- **sparklyr.shell.driver-memory** - The limit is the amount of RAM available in the computer minus what would be needed for OS operations.  
-
-- **spark.memory.fraction** - The default is set to 60% of the requested memory per executor.  For more information, please see this [Memory Management Overview](https://spark.apache.org/docs/latest/tuning.html#memory-management-overview) page in the official Spark website.
-
-### Connection example
-
-```r
-conf$`sparklyr.cores.local` <- 4
-conf$`sparklyr.shell.driver-memory` <- "16G"
-conf$spark.memory.fraction <- 0.9
-
-sc <- spark_connect(master = "local", 
-                    version = "2.1.0",
-                    config = conf)
-```
-
-#### Executors page 
-
-To see how the requested configuration affected the Spark connection, go to the **Executors** page in the Spark Web UI available in http://localhost:4040/storage/
-
-
-![](images/deployment/connections/local.png)
-
-
+![](/images/deployment/connections/standalone.png)

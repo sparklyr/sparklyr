@@ -5,9 +5,10 @@ library(stringr)
 library(crayon)
 library(yaml)
 
-rebuild_site <- function(overwrite = FALSE){
+rebuild_site <- function(overwrite = FALSE, skip_reference = TRUE){
+
   process_content(overwrite = overwrite)
-  process_reference(overwrite = overwrite)
+  if(!skip_reference) process_reference(overwrite = overwrite)
   reset_public()
 
   old <- getwd()
@@ -15,7 +16,6 @@ rebuild_site <- function(overwrite = FALSE){
   blogdown::build_site(local = TRUE)
 
   on.exit(setwd(old))
-
 }
 
 copy_repo <- function(github_repo, package_folder = "repos"){

@@ -1,12 +1,50 @@
 # Sparklyr 0.7 (UNRELEASED)
 
+- Added support for Spark 2.2.1.
+
+- Switched `copy_to` serializer to use Scala implementation, this change can be
+  reverted by setting the `sparklyr.copy.serializer` option to `csv_file`.
+
+- Added support for `spark_web()` for Livy and Databricks connections when
+  using Spark 2.X.
+
+- Fixed `SIGPIPE` error under `spark_connect()` immediately after
+  a `spark_disconnect()` operation.
+
+- `spark_web()` is is more reliable under Spark 2.X by making use of a new API
+  to programmatically find the right address.
+
+- Added support in `dbWriteTable()` for `temporary = FALSE` to allow persisting
+  table across connections. Changed default value for `temporary` to `TRUE` to match
+  `DBI` specification, for compatibility, default value can be reverted back to 
+  `FALSE` using the `sparklyr.dbwritetable.temp` option.
+
+- `ncol()` now returns the number of columns instead of `NA`, and `nrow()` now
+  returns `NA_real_`.
+
+- Added support to collect `VectorUDT` column types with nested arrays.
+
+- Fixed issue in which connecting to Livy would fail due to long user names
+  or long passwords.
+
+- Fixed error in the Spark connection dialog for clusters using a proxy.
+
+- Improved support for Spark 2.X under Cloudera clusters by prioritizing
+use of `spark2-submit` over `spark-submit`.
+
+- Livy new connection dialog now prompts for password using
+`rstudioapi::askForPassword()`.
+
+- Added `schema` parameter to `spark_read_parquet()` that enables reading
+a subset of the schema to increase performance.
+
 - Implemented `sdf_describe()` to easily compute summary statistics for
 data frames.
 
 - Fixed data frames with dates in `spark_apply()` retrieved as `Date` instead
   of doubles.
 
-- Add support to use `invoke()` with arrays of POSIXlt and POSIXct.
+- Added support to use `invoke()` with arrays of POSIXlt and POSIXct.
 
 - Added support for `context` parameter in `spark_apply()` to allow callers to
   pass additional contextual information to the `f()` closure.
