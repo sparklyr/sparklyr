@@ -95,36 +95,42 @@ src_tbls(sc)</code></pre>
 <pre class="r"><code>filter(flights, dep_delay &gt; 1000)</code></pre>
 <pre><code>## # Source: lazy query [?? x 19]
 ## # Database: spark_connection
-##    year month   day dep_t~ sche~ dep_~ arr_~ sche~ arr_~ carr~ flig~ tail~
-##   &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
-## 1  2013     1     9    641   900  1301  1242  1530  1272 HA       51 N384~
-## 2  2013     1    10   1121  1635  1126  1239  1810  1109 MQ     3695 N517~
-## 3  2013     6    15   1432  1935  1137  1607  2120  1127 MQ     3535 N504~
-## 4  2013     7    22    845  1600  1005  1044  1815   989 MQ     3075 N665~
-## 5  2013     9    20   1139  1845  1014  1457  2210  1007 AA      177 N338~
-## # ... with 7 more variables: origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-## #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</code></pre>
+##    year month   day dep_time sched_dep_time dep_delay arr_time
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+## 1  2013     1     9      641            900      1301     1242
+## 2  2013     1    10     1121           1635      1126     1239
+## 3  2013     6    15     1432           1935      1137     1607
+## 4  2013     7    22      845           1600      1005     1044
+## 5  2013     9    20     1139           1845      1014     1457
+## # ... with 12 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,
+## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
+## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour
+## #   &lt;dttm&gt;</code></pre>
 <pre class="r"><code>arrange(flights, desc(dep_delay))</code></pre>
 <pre><code>## # Source: table&lt;flights&gt; [?? x 19]
 ## # Database: spark_connection
 ## # Ordered by: desc(dep_delay)
-##     year month   day dep_~ sche~ dep_~ arr_~ sche~ arr_~ carr~ flig~ tail~
-##    &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
-##  1  2013     1     9   641   900  1301  1242  1530  1272 HA       51 N384~
-##  2  2013     6    15  1432  1935  1137  1607  2120  1127 MQ     3535 N504~
-##  3  2013     1    10  1121  1635  1126  1239  1810  1109 MQ     3695 N517~
-##  4  2013     9    20  1139  1845  1014  1457  2210  1007 AA      177 N338~
-##  5  2013     7    22   845  1600  1005  1044  1815   989 MQ     3075 N665~
-##  6  2013     4    10  1100  1900   960  1342  2211   931 DL     2391 N959~
-##  7  2013     3    17  2321   810   911   135  1020   915 DL     2119 N927~
-##  8  2013     6    27   959  1900   899  1236  2226   850 DL     2007 N376~
-##  9  2013     7    22  2257   759   898   121  1026   895 DL     2047 N671~
-## 10  2013    12     5   756  1700   896  1058  2020   878 AA      172 N5DM~
-## # ... with more rows, and 7 more variables: origin &lt;chr&gt;, dest &lt;chr&gt;,
-## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour
-## #   &lt;dbl&gt;</code></pre>
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     9      641            900      1301     1242
+##  2  2013     6    15     1432           1935      1137     1607
+##  3  2013     1    10     1121           1635      1126     1239
+##  4  2013     9    20     1139           1845      1014     1457
+##  5  2013     7    22      845           1600      1005     1044
+##  6  2013     4    10     1100           1900       960     1342
+##  7  2013     3    17     2321            810       911      135
+##  8  2013     6    27      959           1900       899     1236
+##  9  2013     7    22     2257            759       898      121
+## 10  2013    12     5      756           1700       896     1058
+## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin
+## #   &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute
+## #   &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
 <pre class="r"><code>summarise(flights, mean_dep_delay = mean(dep_delay))</code></pre>
 <pre><code>## Warning: Missing values are always removed in SQL.
+## Use `AVG(x, na.rm = TRUE)` to silence this warning
+
+## Warning: Missing values are always removed in SQL.
 ## Use `AVG(x, na.rm = TRUE)` to silence this warning</code></pre>
 <pre><code>## # Source: lazy query [?? x 1]
 ## # Database: spark_connection
@@ -134,21 +140,22 @@ src_tbls(sc)</code></pre>
 <pre class="r"><code>mutate(flights, speed = distance / air_time * 60)</code></pre>
 <pre><code>## # Source: lazy query [?? x 20]
 ## # Database: spark_connection
-##     year month   day dep_t~ sched_~ dep_d~ arr_~ sched~ arr_d~ carr~ flig~
-##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
-##  1  2013     1     1    517     515   2.00   830    819  11.0  UA     1545
-##  2  2013     1     1    533     529   4.00   850    830  20.0  UA     1714
-##  3  2013     1     1    542     540   2.00   923    850  33.0  AA     1141
-##  4  2013     1     1    544     545  -1.00  1004   1022 -18.0  B6      725
-##  5  2013     1     1    554     600  -6.00   812    837 -25.0  DL      461
-##  6  2013     1     1    554     558  -4.00   740    728  12.0  UA     1696
-##  7  2013     1     1    555     600  -5.00   913    854  19.0  B6      507
-##  8  2013     1     1    557     600  -3.00   709    723 -14.0  EV     5708
-##  9  2013     1     1    557     600  -3.00   838    846 - 8.00 B6       79
-## 10  2013     1     1    558     600  -2.00   753    745   8.00 AA      301
-## # ... with more rows, and 9 more variables: tailnum &lt;chr&gt;, origin &lt;chr&gt;,
-## #   dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
-## #   time_hour &lt;dbl&gt;, speed &lt;dbl&gt;</code></pre>
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      517            515      2.00      830
+##  2  2013     1     1      533            529      4.00      850
+##  3  2013     1     1      542            540      2.00      923
+##  4  2013     1     1      544            545     -1.00     1004
+##  5  2013     1     1      554            600     -6.00      812
+##  6  2013     1     1      554            558     -4.00      740
+##  7  2013     1     1      555            600     -5.00      913
+##  8  2013     1     1      557            600     -3.00      709
+##  9  2013     1     1      557            600     -3.00      838
+## 10  2013     1     1      558            600     -2.00      753
+## # ... with more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin
+## #   &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute
+## #   &lt;dbl&gt;, time_hour &lt;dttm&gt;, speed &lt;dbl&gt;</code></pre>
 </section>
 <section id="laziness" class="level2">
 <h2>Laziness</h2>
@@ -197,6 +204,9 @@ c4 &lt;- mutate(c3, air_time_hours = air_time / 60)</code></pre>
   group_by(carrier) %&gt;%
   summarize(count = n(), mean_dep_delay = mean(dep_delay))</code></pre>
 <pre><code>## Warning: Missing values are always removed in SQL.
+## Use `AVG(x, na.rm = TRUE)` to silence this warning
+
+## Warning: Missing values are always removed in SQL.
 ## Use `AVG(x, na.rm = TRUE)` to silence this warning</code></pre>
 <pre><code>## # Source: lazy query [?? x 3]
 ## # Database: spark_connection
@@ -268,12 +278,16 @@ dbplyr::sql_render(bestworst)
 ## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`
 ## FROM (SELECT `year`, `month`, `day`, `dep_delay`, min(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz3`, max(`dep_delay`) OVER (PARTITION BY `year`, `month`, `day`) AS `zzz4`
 ## FROM (SELECT `year`, `month`, `day`, `dep_delay`
-## FROM `flights`) `qymbrqbchb`) `hedphwbptr`
+## FROM `flights`) `vrwihsqyyg`) `wcumbuvuna`
 ## WHERE (`dep_delay` = `zzz3` OR `dep_delay` = `zzz4`)
 bestworst
 ## Warning: Missing values are always removed in SQL.
 ## Use `min(x, na.rm = TRUE)` to silence this warning
 
+## Warning: Missing values are always removed in SQL.
+## Use `max(x, na.rm = TRUE)` to silence this warning
+## Warning: Missing values are always removed in SQL.
+## Use `min(x, na.rm = TRUE)` to silence this warning
 ## Warning: Missing values are always removed in SQL.
 ## Use `max(x, na.rm = TRUE)` to silence this warning
 ## # Source: lazy query [?? x 4]
@@ -300,7 +314,7 @@ ranked &lt;- flights %&gt;%
 dbplyr::sql_render(ranked)</code></pre>
 <pre><code>## &lt;SQL&gt; SELECT `year`, `month`, `day`, `dep_delay`, rank() OVER (PARTITION BY `year`, `month`, `day` ORDER BY `dep_delay` DESC) AS `rank`
 ## FROM (SELECT `year`, `month`, `day`, `dep_delay`
-## FROM `flights`) `wqbhqprokn`</code></pre>
+## FROM `flights`) `dqlehpfkns`</code></pre>
 <pre class="r"><code>ranked</code></pre>
 <pre><code>## # Source: lazy query [?? x 5]
 ## # Database: spark_connection
@@ -333,57 +347,60 @@ dbplyr::sql_render(ranked)</code></pre>
 <pre><code>## Joining, by = &quot;carrier&quot;</code></pre>
 <pre><code>## # Source: lazy query [?? x 20]
 ## # Database: spark_connection
-##     year month   day dep_t~ sched_~ dep_d~ arr_~ sched~ arr_d~ carr~ flig~
-##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
-##  1  2013     1     1    517     515   2.00   830    819  11.0  UA     1545
-##  2  2013     1     1    533     529   4.00   850    830  20.0  UA     1714
-##  3  2013     1     1    542     540   2.00   923    850  33.0  AA     1141
-##  4  2013     1     1    544     545  -1.00  1004   1022 -18.0  B6      725
-##  5  2013     1     1    554     600  -6.00   812    837 -25.0  DL      461
-##  6  2013     1     1    554     558  -4.00   740    728  12.0  UA     1696
-##  7  2013     1     1    555     600  -5.00   913    854  19.0  B6      507
-##  8  2013     1     1    557     600  -3.00   709    723 -14.0  EV     5708
-##  9  2013     1     1    557     600  -3.00   838    846 - 8.00 B6       79
-## 10  2013     1     1    558     600  -2.00   753    745   8.00 AA      301
-## # ... with more rows, and 9 more variables: tailnum &lt;chr&gt;, origin &lt;chr&gt;,
-## #   dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
-## #   time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      517            515      2.00      830
+##  2  2013     1     1      533            529      4.00      850
+##  3  2013     1     1      542            540      2.00      923
+##  4  2013     1     1      544            545     -1.00     1004
+##  5  2013     1     1      554            600     -6.00      812
+##  6  2013     1     1      554            558     -4.00      740
+##  7  2013     1     1      555            600     -5.00      913
+##  8  2013     1     1      557            600     -3.00      709
+##  9  2013     1     1      557            600     -3.00      838
+## 10  2013     1     1      558            600     -2.00      753
+## # ... with more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin
+## #   &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute
+## #   &lt;dbl&gt;, time_hour &lt;dttm&gt;, name &lt;chr&gt;</code></pre>
 <pre class="r"><code>flights %&gt;% left_join(airlines, by = &quot;carrier&quot;)</code></pre>
 <pre><code>## # Source: lazy query [?? x 20]
 ## # Database: spark_connection
-##     year month   day dep_t~ sched_~ dep_d~ arr_~ sched~ arr_d~ carr~ flig~
-##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
-##  1  2013     1     1    517     515   2.00   830    819  11.0  UA     1545
-##  2  2013     1     1    533     529   4.00   850    830  20.0  UA     1714
-##  3  2013     1     1    542     540   2.00   923    850  33.0  AA     1141
-##  4  2013     1     1    544     545  -1.00  1004   1022 -18.0  B6      725
-##  5  2013     1     1    554     600  -6.00   812    837 -25.0  DL      461
-##  6  2013     1     1    554     558  -4.00   740    728  12.0  UA     1696
-##  7  2013     1     1    555     600  -5.00   913    854  19.0  B6      507
-##  8  2013     1     1    557     600  -3.00   709    723 -14.0  EV     5708
-##  9  2013     1     1    557     600  -3.00   838    846 - 8.00 B6       79
-## 10  2013     1     1    558     600  -2.00   753    745   8.00 AA      301
-## # ... with more rows, and 9 more variables: tailnum &lt;chr&gt;, origin &lt;chr&gt;,
-## #   dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
-## #   time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      517            515      2.00      830
+##  2  2013     1     1      533            529      4.00      850
+##  3  2013     1     1      542            540      2.00      923
+##  4  2013     1     1      544            545     -1.00     1004
+##  5  2013     1     1      554            600     -6.00      812
+##  6  2013     1     1      554            558     -4.00      740
+##  7  2013     1     1      555            600     -5.00      913
+##  8  2013     1     1      557            600     -3.00      709
+##  9  2013     1     1      557            600     -3.00      838
+## 10  2013     1     1      558            600     -2.00      753
+## # ... with more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin
+## #   &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute
+## #   &lt;dbl&gt;, time_hour &lt;dttm&gt;, name &lt;chr&gt;</code></pre>
 <pre class="r"><code>flights %&gt;% left_join(airlines, by = c(&quot;carrier&quot;, &quot;carrier&quot;))</code></pre>
 <pre><code>## # Source: lazy query [?? x 20]
 ## # Database: spark_connection
-##     year month   day dep_t~ sched_~ dep_d~ arr_~ sched~ arr_d~ carr~ flig~
-##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
-##  1  2013     1     1    517     515   2.00   830    819  11.0  UA     1545
-##  2  2013     1     1    533     529   4.00   850    830  20.0  UA     1714
-##  3  2013     1     1    542     540   2.00   923    850  33.0  AA     1141
-##  4  2013     1     1    544     545  -1.00  1004   1022 -18.0  B6      725
-##  5  2013     1     1    554     600  -6.00   812    837 -25.0  DL      461
-##  6  2013     1     1    554     558  -4.00   740    728  12.0  UA     1696
-##  7  2013     1     1    555     600  -5.00   913    854  19.0  B6      507
-##  8  2013     1     1    557     600  -3.00   709    723 -14.0  EV     5708
-##  9  2013     1     1    557     600  -3.00   838    846 - 8.00 B6       79
-## 10  2013     1     1    558     600  -2.00   753    745   8.00 AA      301
-## # ... with more rows, and 9 more variables: tailnum &lt;chr&gt;, origin &lt;chr&gt;,
-## #   dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
-## #   time_hour &lt;dbl&gt;, name &lt;chr&gt;</code></pre>
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      517            515      2.00      830
+##  2  2013     1     1      533            529      4.00      850
+##  3  2013     1     1      542            540      2.00      923
+##  4  2013     1     1      544            545     -1.00     1004
+##  5  2013     1     1      554            600     -6.00      812
+##  6  2013     1     1      554            558     -4.00      740
+##  7  2013     1     1      555            600     -5.00      913
+##  8  2013     1     1      557            600     -3.00      709
+##  9  2013     1     1      557            600     -3.00      838
+## 10  2013     1     1      558            600     -2.00      753
+## # ... with more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin
+## #   &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute
+## #   &lt;dbl&gt;, time_hour &lt;dttm&gt;, name &lt;chr&gt;</code></pre>
 </section>
 <section id="sampling" class="level2">
 <h2>Sampling</h2>
@@ -391,39 +408,41 @@ dbplyr::sql_render(ranked)</code></pre>
 <pre class="r"><code>sample_n(flights, 10)</code></pre>
 <pre><code>## # Source: lazy query [?? x 19]
 ## # Database: spark_connection
-##     year month   day dep_t~ sched_~ dep_d~ arr_~ sched~ arr_d~ carr~ flig~
-##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
-##  1  2013     1     1    517     515   2.00   830    819  11.0  UA     1545
-##  2  2013     1     1    533     529   4.00   850    830  20.0  UA     1714
-##  3  2013     1     1    542     540   2.00   923    850  33.0  AA     1141
-##  4  2013     1     1    544     545  -1.00  1004   1022 -18.0  B6      725
-##  5  2013     1     1    554     600  -6.00   812    837 -25.0  DL      461
-##  6  2013     1     1    554     558  -4.00   740    728  12.0  UA     1696
-##  7  2013     1     1    555     600  -5.00   913    854  19.0  B6      507
-##  8  2013     1     1    557     600  -3.00   709    723 -14.0  EV     5708
-##  9  2013     1     1    557     600  -3.00   838    846 - 8.00 B6       79
-## 10  2013     1     1    558     600  -2.00   753    745   8.00 AA      301
-## # ... with more rows, and 8 more variables: tailnum &lt;chr&gt;, origin &lt;chr&gt;,
-## #   dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
-## #   time_hour &lt;dbl&gt;</code></pre>
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      517            515      2.00      830
+##  2  2013     1     1      533            529      4.00      850
+##  3  2013     1     1      542            540      2.00      923
+##  4  2013     1     1      544            545     -1.00     1004
+##  5  2013     1     1      554            600     -6.00      812
+##  6  2013     1     1      554            558     -4.00      740
+##  7  2013     1     1      555            600     -5.00      913
+##  8  2013     1     1      557            600     -3.00      709
+##  9  2013     1     1      557            600     -3.00      838
+## 10  2013     1     1      558            600     -2.00      753
+## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin
+## #   &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute
+## #   &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
 <pre class="r"><code>sample_frac(flights, 0.01)</code></pre>
 <pre><code>## # Source: lazy query [?? x 19]
 ## # Database: spark_connection
-##     year month   day dep_t~ sched_~ dep_d~ arr_~ sched~ arr_d~ carr~ flig~
-##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
-##  1  2013     1     1    623     610  13.0    920    915   5.00 AA     1837
-##  2  2013     1     1    846     845   1.00  1138   1205 -27.0  B6      553
-##  3  2013     1     1   1030    1035 - 5.00  1229   1246 -17.0  EV     4277
-##  4  2013     1     1   1157    1205 - 8.00  1342   1345 - 3.00 MQ     4431
-##  5  2013     1     1   1431    1429   2.00  1727   1722   5.00 B6     1161
-##  6  2013     1     1   1453    1500 - 7.00  1601   1620 -19.0  US     2179
-##  7  2013     1     1   1641    1650 - 9.00  1746   1820 -34.0  AA     1790
-##  8  2013     1     1   1655    1655   0     2025   2030 - 5.00 VX      413
-##  9  2013     1     1   1726    1730 - 4.00  2054   2050   4.00 AA      543
-## 10  2013     1     1   1806    1810 - 4.00  2002   1945  17.0  MQ     4484
-## # ... with more rows, and 8 more variables: tailnum &lt;chr&gt;, origin &lt;chr&gt;,
-## #   dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
-## #   time_hour &lt;dbl&gt;</code></pre>
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      558            600    - 2.00      753
+##  2  2013     1     1      723            725    - 2.00     1013
+##  3  2013     1     1      805            815    -10.0      1006
+##  4  2013     1     1      904            906    - 2.00     1207
+##  5  2013     1     1     1127           1129    - 2.00     1303
+##  6  2013     1     1     1219           1220    - 1.00     1415
+##  7  2013     1     1     1510           1517    - 7.00     1811
+##  8  2013     1     1     1811           1759     12.0      2132
+##  9  2013     1     1     1850           1850      0        2249
+## 10  2013     1     2      629            615     14.0       746
+## # ... with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin
+## #   &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute
+## #   &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
 </section>
 <section id="writing-data" class="level2">
 <h2>Writing Data</h2>

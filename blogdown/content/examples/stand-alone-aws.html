@@ -9,7 +9,7 @@ output:
 
 
 
-<div id="overview" class="section level2">
+<section id="overview" class="level2">
 <h2>Overview</h2>
 <p>The plan is to launch 4 identical EC2 server instances. One server will be the Master node and the other 3 the worker nodes. In one of the worker nodes, we will install RStudio server.</p>
 <p>What makes a server the Master node is only the fact that it is running the <strong>master</strong> service, while the other machines are running the <strong>slave</strong> service and are pointed to that first master. This simple setup, allows us to install the same Spark components on all 4 servers and then just add RStudio to one of them.</p>
@@ -17,8 +17,8 @@ output:
 <p>
 <img src="/images/deployment/amazon-ec2/spark-sa-setup.png" width='600px' align='center'/>
 </p>
-</div>
-<div id="aws-ec-instances" class="section level2">
+</section>
+<section id="aws-ec-instances" class="level2">
 <h2>AWS EC Instances</h2>
 <p>Here are the details of the EC2 instance, just deploy one at this point:</p>
 <ul>
@@ -27,105 +27,108 @@ output:
 <li><strong>Disk space:</strong> At least 20GB</li>
 <li><strong>Security group:</strong> Open the following ports: 8080 (Spark UI), 4040 (Spark Worker UI), 8088 (sparklyr UI) and 8787 (RStudio). Also open <em>All TCP</em> ports for the machines inside the security group.</li>
 </ul>
-</div>
-<div id="spark" class="section level2">
+</section>
+<section id="spark" class="level2">
 <h2>Spark</h2>
 <p>Perform the steps in this section on all of the servers that will be part of the cluster.</p>
-<div id="install-java-8" class="section level3">
+<section id="install-java-8" class="level3">
 <h3>Install Java 8</h3>
 <ul>
-<li><p>We will add the Java 8 repository, install it and set it as default</p>
+<li>We will add the Java 8 repository, install it and set it as default</li>
+</ul>
 <pre><code>sudo apt-add-repository ppa:webupd8team/java
 sudo apt-get update
 sudo apt-get install oracle-java8-installer
 sudo apt-get install oracle-java8-set-default
-sudo apt-get update</code></pre></li>
-</ul>
-</div>
-<div id="download-spark" class="section level3">
+sudo apt-get update</code></pre>
+</section>
+<section id="download-spark" class="level3">
 <h3>Download Spark</h3>
 <ul>
-<li><p>Download and unpack a pre-compiled version of Spark. Here’s is the link to the <a href="http://spark.apache.org/downloads.html">official Spark download page</a></p>
+<li>Download and unpack a pre-compiled version of Spark. Here’s is the link to the <a href="http://spark.apache.org/downloads.html">official Spark download page</a></li>
+</ul>
 <pre><code>wget http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-hadoop2.7.tgz
 tar -xvzf spark-2.1.0-bin-hadoop2.7.tgz
-cd spark-2.1.0-bin-hadoop2.7</code></pre></li>
-</ul>
-</div>
-<div id="create-and-launch-ami" class="section level3">
+cd spark-2.1.0-bin-hadoop2.7</code></pre>
+</section>
+<section id="create-and-launch-ami" class="level3">
 <h3>Create and launch AMI</h3>
 <ul>
 <li><p>We will create an image of the server. In Amazon, these are called AMIs, for information please see the <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">User Guide</a>.</p></li>
 <li><p>Launch 3 instances of the AMI</p></li>
 </ul>
-</div>
-</div>
-<div id="rstudio-server" class="section level2">
+</section>
+</section>
+<section id="rstudio-server" class="level2">
 <h2>RStudio Server</h2>
 <p>Select one of the nodes to execute this section. Please check the <a href="https://www.rstudio.com/products/rstudio/download-server/">RStudio download page</a> for the latest version</p>
-<div id="install-r" class="section level3">
+<section id="install-r" class="level3">
 <h3>Install R</h3>
 <ul>
-<li><p>In order to get the latest R core, we will need to update the source list in Ubuntu.</p>
+<li>In order to get the latest R core, we will need to update the source list in Ubuntu.</li>
+</ul>
 <pre><code>sudo sh -c &#39;echo &quot;deb http://cran.rstudio.com/bin/linux/ubuntu xenial/&quot; &gt;&gt; /etc/apt/sources.list&#39;
 gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9
 gpg -a --export E084DAB9 | sudo apt-key add -
-sudo apt-get update</code></pre></li>
-<li><p>Now we can install R</p>
-<pre><code>sudo apt-get install r-base
-sudo apt-get install gdebi-core</code></pre></li>
+sudo apt-get update</code></pre>
+<ul>
+<li>Now we can install R</li>
 </ul>
-</div>
-<div id="install-rstudio" class="section level3">
+<pre><code>sudo apt-get install r-base
+sudo apt-get install gdebi-core</code></pre>
+</section>
+<section id="install-rstudio" class="level3">
 <h3>Install RStudio</h3>
 <ul>
-<li><p>We will download and install 1.044 of RStudio Server. To find the latest version, please visit the <a href="https://www.rstudio.com/products/rstudio/download3/">RStudio website</a>. In order to get the enhanced integration with Spark, RStudio version 1.044 or later will be needed.</p>
-<pre><code>wget https://download2.rstudio.org/rstudio-server-1.0.153-amd64.deb
-sudo gdebi rstudio-server-1.0.153-amd64.deb</code></pre></li>
+<li>We will download and install 1.044 of RStudio Server. To find the latest version, please visit the <a href="https://www.rstudio.com/products/rstudio/download3/">RStudio website</a>. In order to get the enhanced integration with Spark, RStudio version 1.044 or later will be needed.</li>
 </ul>
-</div>
-<div id="install-dependencies" class="section level3">
+<pre><code>wget https://download2.rstudio.org/rstudio-server-1.0.153-amd64.deb
+sudo gdebi rstudio-server-1.0.153-amd64.deb</code></pre>
+</section>
+<section id="install-dependencies" class="level3">
 <h3>Install dependencies</h3>
 <ul>
-<li><p>Run the following commands</p>
+<li>Run the following commands</li>
+</ul>
 <pre><code>sudo apt-get -y install libcurl4-gnutls-dev
 sudo apt-get -y install libssl-dev
-sudo apt-get -y install libxml2-dev</code></pre></li>
-</ul>
-</div>
-<div id="add-default-user" class="section level3">
+sudo apt-get -y install libxml2-dev</code></pre>
+</section>
+<section id="add-default-user" class="level3">
 <h3>Add default user</h3>
 <ul>
-<li><p>Run the following command to add a default user</p>
-<pre><code>sudo adduser rstudio-user</code></pre></li>
+<li>Run the following command to add a default user</li>
 </ul>
-</div>
-<div id="start-the-master-node" class="section level3">
+<pre><code>sudo adduser rstudio-user</code></pre>
+</section>
+<section id="start-the-master-node" class="level3">
 <h3>Start the Master node</h3>
 <ul>
 <li><p>Select one of the servers to become your Master node</p></li>
-<li><p>Run the command that starts the master service</p>
-<pre><code>sudo spark-2.1.0-bin-hadoop2.7/sbin/start-master.sh</code></pre></li>
-<li><p>Close the terminal connection (optional)</p></li>
+<li>Run the command that starts the master service</li>
 </ul>
-</div>
-<div id="start-worker-nodes" class="section level3">
+<pre><code>sudo spark-2.1.0-bin-hadoop2.7/sbin/start-master.sh</code></pre>
+<ul>
+<li>Close the terminal connection (optional)</li>
+</ul>
+</section>
+<section id="start-worker-nodes" class="level3">
 <h3>Start Worker nodes</h3>
 <ul>
-<li><p>Start the slave service. <strong>Important</strong>: Use dots not dashes as separators for the Spark Master node’s address</p>
-<pre><code>sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://[Master node&#39;s IP address]:7077</code></pre>
-sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://ip-172-30-1-94.us-west-2.compute.internal:7077</li>
-<li><p>Close the terminal connection (optional)</p></li>
+<li>Start the slave service. <strong>Important</strong>: Use dots not dashes as separators for the Spark Master node’s address</li>
 </ul>
-</div>
-<div id="pre-load-pacakges" class="section level3">
+<pre><code>sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://[Master node&#39;s IP address]:7077</code></pre>
+<p>sudo spark-2.1.0-bin-hadoop2.7/sbin/start-slave.sh spark://ip-172-30-1-94.us-west-2.compute.internal:7077 - Close the terminal connection (optional)</p>
+</section>
+<section id="pre-load-pacakges" class="level3">
 <h3>Pre-load pacakges</h3>
 <ul>
 <li><p>Log into RStudio (port 8787)</p></li>
-<li><p>Use ‘rstudio-user’</p>
-<pre class="r"><code>install.packages(&quot;sparklyr&quot;)</code></pre></li>
+<li>Use ‘rstudio-user’</li>
 </ul>
-</div>
-<div id="connect-to-the-spark-master" class="section level3">
+<pre class="r"><code>install.packages(&quot;sparklyr&quot;)</code></pre>
+</section>
+<section id="connect-to-the-spark-master" class="level3">
 <h3>Connect to the Spark Master</h3>
 <ul>
 <li><p>Navigate to the Spark Master’s UI, typically on port 8080 <img src="/images/deployment/amazon-ec2/spark-master.png" class="screenshot" width=639 /></p></li>
@@ -145,5 +148,5 @@ sc &lt;- spark_connect(master=&quot;[Spark Master URL]&quot;,
               config = conf,
               spark_home = &quot;/home/ubuntu/spark-2.1.0-bin-hadoop2.7/&quot;)
 </code></pre>
-</div>
-</div>
+</section>
+</section>

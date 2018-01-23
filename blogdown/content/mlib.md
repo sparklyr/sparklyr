@@ -4,7 +4,7 @@ Spark Machine Learning Library (MLlib)
 Overview
 --------
 
-**sparklyr** provides bindings to Spark's distributed [machine learning](https://spark.apache.org/docs/latest/mllib-guide.html) library. In particular, sparklyr allows you to access the machine learning routines provided by the [spark.ml](https://spark.apache.org/docs/latest/ml-guide.html) package. Together with sparklyr's [dplyr](/dplyr) interface, you can easily create and tune machine learning workflows on Spark, orchestrated entirely within R.
+**sparklyr** provides bindings to Spark's distributed [machine learning](https://spark.apache.org/docs/latest/mllib-guide.html) library. In particular, sparklyr allows you to access the machine learning routines provided by the [spark.ml](https://spark.apache.org/docs/latest/ml-guide.html) package. Together with sparklyr's [dplyr](dplyr.html) interface, you can easily create and tune machine learning workflows on Spark, orchestrated entirely within R.
 
 sparklyr provides three families of functions that you can use with Spark machine learning:
 
@@ -14,7 +14,7 @@ sparklyr provides three families of functions that you can use with Spark machin
 
 An analytic workflow with sparklyr might be composed of the following stages. For an example see [Example Workflow](#example-workflow).
 
-1.  Perform SQL queries through the sparklyr [dplyr](/dplyr) interface,
+1.  Perform SQL queries through the sparklyr [dplyr](dplyr.html) interface,
 2.  Use the `sdf_*` and `ft_*` family of functions to generate new columns, or partition your data set,
 3.  Choose an appropriate machine learning algorithm from the `ml_*` family of functions to model your data,
 4.  Inspect the quality of your model fit, and use it to make predictions with new data.
@@ -27,19 +27,19 @@ Spark's machine learning library can be accessed from sparklyr through the `ml_*
 
 | Function                                                                                              | Description                   |
 |-------------------------------------------------------------------------------------------------------|-------------------------------|
-| [`ml_kmeans`](/reference/ml_kmeans)                                               | K-Means Clustering            |
-| [`ml_linear_regression`](/reference/ml_linear_regression)                         | Linear Regression             |
-| [`ml_logistic_regression`](/reference/ml_logistic_regression)                     | Logistic Regression           |
-| [`ml_survival_regression`](/reference/ml_survival_regression)                     | Survival Regression           |
-| [`ml_generalized_linear_regression`](/reference/ml_generalized_linear_regression) | Generalized Linear Regression |
-| [`ml_decision_tree`](/reference/ml_decision_tree)                                 | Decision Trees                |
-| [`ml_random_forest`](/reference/ml_random_forest)                                 | Random Forests                |
-| [`ml_gradient_boosted_trees`](/reference/ml_gradient_boosted_trees)               | Gradient-Boosted Trees        |
-| [`ml_pca`](/reference/ft_pca)                                                     | Principal Components Analysis |
-| [`ml_naive_bayes`](/reference/ml_naive_bayes)                                     | Naive-Bayes                   |
-| [`ml_multilayer_perceptron`](/reference/ml_multilayer_perceptron_classifier)                 | Multilayer Perceptron         |
-| [`ml_lda`](/reference/ml_lda)                                                     | Latent Dirichlet Allocation   |
-| [`ml_one_vs_rest`](/reference/ml_one_vs_rest)                                             | One vs Rest                   |
+| [`ml_kmeans`](reference/sparklyr/latest/ml_kmeans.html)                                               | K-Means Clustering            |
+| [`ml_linear_regression`](reference/sparklyr/latest/ml_linear_regression.html)                         | Linear Regression             |
+| [`ml_logistic_regression`](reference/sparklyr/latest/ml_logistic_regression.html)                     | Logistic Regression           |
+| [`ml_survival_regression`](reference/sparklyr/latest/ml_survival_regression.html)                     | Survival Regression           |
+| [`ml_generalized_linear_regression`](reference/sparklyr/latest/ml_generalized_linear_regression.html) | Generalized Linear Regression |
+| [`ml_decision_tree`](reference/sparklyr/latest/ml_decision_tree.html)                                 | Decision Trees                |
+| [`ml_random_forest`](reference/sparklyr/latest/ml_random_forest.html)                                 | Random Forests                |
+| [`ml_gradient_boosted_trees`](reference/sparklyr/latest/ml_gradient_boosted_trees.html)               | Gradient-Boosted Trees        |
+| [`ml_pca`](reference/sparklyr/latest/ml_pca.html)                                                     | Principal Components Analysis |
+| [`ml_naive_bayes`](reference/sparklyr/latest/ml_naive_bayes.html)                                     | Naive-Bayes                   |
+| [`ml_multilayer_perceptron`](reference/sparklyr/latest/ml_multilayer_perceptron.html)                 | Multilayer Perceptron         |
+| [`ml_lda`](reference/sparklyr/latest/ml_lda.html)                                                     | Latent Dirichlet Allocation   |
+| [`ml_one_vs_rest`](reference/sparklyr/latest/ml_lda.html)                                             | One vs Rest                   |
 
 ### Formulas
 
@@ -58,7 +58,7 @@ The Spark model output can be modified with the `ml_options` argument in the `ml
 Transformers
 ------------
 
-A model is often fit not on a dataset as-is, but instead on some transformation of that dataset. Spark provides [feature transformers](http://spark.apache.org/docs/latest/ml-features), facilitating many common transformations of data within a Spark DataFrame, and sparklyr exposes these within the `ft_*` family of functions. These routines generally take one or more input columns, and generate a new output column formed as a transformation of those columns.
+A model is often fit not on a dataset as-is, but instead on some transformation of that dataset. Spark provides [feature transformers](http://spark.apache.org/docs/latest/ml-features.html), facilitating many common transformations of data within a Spark DataFrame, and sparklyr exposes these within the `ft_*` family of functions. These routines generally take one or more input columns, and generate a new output column formed as a transformation of those columns.
 
 <table>
 <colgroup>
@@ -73,39 +73,39 @@ A model is often fit not on a dataset as-is, but instead on some transformation 
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="/reference/ft_binarizer"><code>ft_binarizer</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_binarizer.html"><code>ft_binarizer</code></a></td>
 <td>Threshold numerical features to binary (0/1) feature</td>
 </tr>
 <tr class="even">
-<td><a href="/reference/ft_bucketizer"><code>ft_bucketizer</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_bucketizer.html"><code>ft_bucketizer</code></a></td>
 <td>Bucketizer transforms a column of continuous features to a column of feature buckets</td>
 </tr>
 <tr class="odd">
-<td><a href="/reference/ft_dct"><code>ft_discrete_cosine_transform</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_discrete_cosine_transform.html"><code>ft_discrete_cosine_transform</code></a></td>
 <td>Transforms a length NN real-valued sequence in the time domain into another length NN real-valued sequence in the frequency domain</td>
 </tr>
 <tr class="even">
-<td><a href="/reference/ft_elementwise_product"><code>ft_elementwise_product</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_elementwise_product.html"><code>ft_elementwise_product</code></a></td>
 <td>Multiplies each input vector by a provided weight vector, using element-wise multiplication.</td>
 </tr>
 <tr class="odd">
-<td><a href="/reference/ft_index_to_string"><code>ft_index_to_string</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_index_to_string.html"><code>ft_index_to_string</code></a></td>
 <td>Maps a column of label indices back to a column containing the original labels as strings</td>
 </tr>
 <tr class="even">
-<td><a href="/reference/ft_quantile_discretizer"><code>ft_quantile_discretizer</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_quantile_discretizer.html"><code>ft_quantile_discretizer</code></a></td>
 <td>Takes a column with continuous features and outputs a column with binned categorical features</td>
 </tr>
 <tr class="odd">
-<td><a href="/reference/sql-transformer"><code>ft_sql_transformer</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_sql_transformer.html"><code>ft_sql_transformer</code></a></td>
 <td>Implements the transformations which are defined by a SQL statement</td>
 </tr>
 <tr class="even">
-<td><a href="/reference/ft_string_indexer"><code>ft_string_indexer</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_string_indexer.html"><code>ft_string_indexer</code></a></td>
 <td>Encodes a string column of labels to a column of label indices</td>
 </tr>
 <tr class="odd">
-<td><a href="/reference/ft_vector_assembler"><code>ft_vector_assembler</code></a></td>
+<td><a href="reference/sparklyr/latest/ft_vector_assembler.html"><code>ft_vector_assembler</code></a></td>
 <td>Combines a given list of columns into a single vector column</td>
 </tr>
 </tbody>
@@ -129,16 +129,20 @@ Functions for interacting with Spark ML model fits.
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="/reference/ml_evaluator"><code>ml_binary_classification_eval</code></a></td>
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_binary_classification_eval.html"><code>ml_binary_classification_eval</code></a></td>
 <td>Calculates the area under the curve for a binary classification model.</td>
 </tr>
 <tr class="even">
-<td><a href="/reference/ml_evaluator"><code>ml_classification_eval</code></a></td>
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_classification_eval.html"><code>ml_classification_eval</code></a></td>
 <td>Calculates performance metrics (i.e. f1, precision, recall, weightedPrecision, weightedRecall, and accuracy) for binary and multiclass classification model.</td>
 </tr>
 <tr class="odd">
-<td><a href="/reference/ml_tree_feature_importance"><code>ml_tree_feature_importance</code></a></td>
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_tree_feature_importance.html"><code>ml_tree_feature_importance</code></a></td>
 <td>Calculates variable importance for decision trees (i.e. decision trees, random forests, gradient boosted trees).</td>
+</tr>
+<tr class="even">
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_saveload.html"><code>ml_saveload</code></a></td>
+<td>Save and load model fits. For use with scoring models across platforms (e.g. using a model as an estimator in a Spark application). <em>These functions are currently experimental and not yet ready for production use.</em></td>
 </tr>
 </tbody>
 </table>
@@ -161,8 +165,28 @@ Functions for creating custom wrappers to other Spark ML algorithms.
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="/reference/ensure"><code>ensure</code></a></td>
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ensure.html"><code>ensure</code></a></td>
 <td>Enforces Specific Structure for R Objects.</td>
+</tr>
+<tr class="even">
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_create_dummy_variables.html"><code>ml_create_dummy_variables</code></a></td>
+<td>Given a column in a Spark DataFrame, generate a new Spark DataFrame containing dummy variable columns.</td>
+</tr>
+<tr class="odd">
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_model.html"><code>ml_model</code></a></td>
+<td>Creates an ML Model Object.</td>
+</tr>
+<tr class="even">
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_options.html"><code>ml_options</code></a></td>
+<td>Provides Options for Spark.ML Routines.</td>
+</tr>
+<tr class="odd">
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_prepare_dataframe.html"><code>ml_prepare_dataframe</code></a></td>
+<td>Prepares a Spark DataFrame for Spark ML Routines.</td>
+</tr>
+<tr class="even">
+<td><a href="http://spark.rstudio.com/reference/sparklyr/latest/ml_prepare_inputs.html"><code>ml_prepare_response_features_intercept</code></a></td>
+<td>Pre-process / normalize the inputs typically passed to a Spark ML routine.</td>
 </tr>
 </tbody>
 </table>
@@ -174,9 +198,27 @@ We will use the `iris` data set to examine a handful of learning algorithms and 
 
 ``` r
 library(sparklyr)
+```
+
+    ## Warning: package 'sparklyr' was built under R version 3.4.3
+
+``` r
 library(ggplot2)
 library(dplyr)
+```
 
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
 sc <- spark_connect(master = "local")
 ```
 
@@ -345,7 +387,7 @@ glm_model
 
 ### PCA
 
-Use Spark's [Principal Components Analysis (PCA)](https://spark.apache.org/docs/latest/mllib-dimensionality-reduction) to perform dimensionality reduction. PCA is a statistical method to find a rotation such that the first coordinate has the largest variance possible, and each succeeding coordinate in turn has the largest variance possible.
+Use Spark's [Principal Components Analysis (PCA)](https://spark.apache.org/docs/latest/mllib-dimensionality-reduction.html) to perform dimensionality reduction. PCA is a statistical method to find a rotation such that the first coordinate has the largest variance possible, and each succeeding coordinate in turn has the largest variance possible.
 
 ``` r
 pca_model <- tbl(sc, "iris") %>%
@@ -448,7 +490,7 @@ table(ft_string2idx$Species, ft_string2idx$Species_remap)
 
 ### SDF Mutate
 
-[sdf\_mutate](/reference/sdf_mutate) is provided as a helper function, to allow you to use feature transformers. For example, the previous code snippet could have been written as:
+[sdf\_mutate](reference/sparklyr/latest/sdf_mutate.html) is provided as a helper function, to allow you to use feature transformers. For example, the previous code snippet could have been written as:
 
 ``` r
 ft_string2idx <- iris_tbl %>%
@@ -470,7 +512,7 @@ ft_string2idx %>%
 
 ### Example Workflow
 
-Let's walk through a simple example to demonstrate the use of Spark's machine learning algorithms within R. We'll use [ml\_linear\_regression](/reference/ml_linear_regression) to fit a linear regression model. Using the built-in `mtcars` dataset, we'll try to predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`).
+Let's walk through a simple example to demonstrate the use of Spark's machine learning algorithms within R. We'll use [ml\_linear\_regression](reference/sparklyr/latest/ml_linear_regression.html) to fit a linear regression model. Using the built-in `mtcars` dataset, we'll try to predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`).
 
 First, we will copy the `mtcars` dataset into Spark.
 
