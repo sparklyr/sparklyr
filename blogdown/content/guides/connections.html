@@ -15,7 +15,7 @@ aliases:
 <section id="local-mode" class="level2">
 <h2>Local mode</h2>
 <p>Local mode is an excellent way to learn and experiment with Spark. Local mode also provides a convenient development environment for analyses, reports, and applications that you plan to eventually deploy to a multi-node Spark cluster.</p>
-<p>To work in local mode you should first install a version of Spark for local use. You can do this using the <code>spark_install()</code> function, for example:</p>
+<p>To work in local mode, you should <strong>first install a version of Spark for local use</strong>. You can do this using the <code>spark_install()</code> function, for example:</p>
 <section id="recommended-properties" class="level3">
 <h3>Recommended properties</h3>
 <p>The following are the recommended Spark properties to set when connecting via R:</p>
@@ -71,8 +71,8 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;,
 </ul>
 </section>
 </section>
-<section id="yarn-cluster" class="level2">
-<h2>YARN cluster</h2>
+<section id="yarn" class="level2">
+<h2>YARN</h2>
 <section id="background" class="level3">
 <h3>Background</h3>
 <p>Using Spark and R inside a Hadoop based <em>Data Lake</em> is becoming a common practice at companies. Currently, <em>there is no good way to manage user connections to the Spark service centrally</em>. There are some caps and settings that can be applied, but in most cases there are configurations that the R user will need to customize.</p>
@@ -88,8 +88,9 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;,
 <li><p><strong>spark.dynamicAllocation.enabled</strong> - Overrides the mechanism that Spark provides to dynamically adjust resources. Disabling it provides more control over the number of the Executors that can be started, which in turn impact the amount of storage available for the session. For more information, please see the <a href="https://spark.apache.org/docs/latest/job-scheduling.html#dynamic-resource-allocation">Dynamic Resource Allocation</a> page in the official Spark website.</p></li>
 </ul>
 </section>
-<section id="connection-example-1" class="level3">
-<h3>Connection example</h3>
+<section id="client-mode" class="level3">
+<h3>Client mode</h3>
+<p>Using <code>yarn-client</code> as the value for the <code>master</code> argument in <code>spark_connect()</code> will make the server in which R is running to be the Spark’s session driver. Here is a sample connection:</p>
 <pre class="r"><code>conf &lt;- spark_config()
 
 conf$spark.executor.memory &lt;- &quot;300M&quot;
@@ -107,6 +108,26 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;,
 <p>Notice that 155.3MB per executor are assigned instead of the 300MB requested. This is because the <em>spark.memory.fraction</em> has been fixed by the cluster, plus, there is fixed amount of memory designated for overhead.</p>
 <p><img src="/images/deployment/connections/yarnclient.png" /></p>
 </section>
+</section>
+<section id="cluster-mode" class="level3">
+<h3>Cluster mode</h3>
+<p>Running in cluster mode means that YARN will choose where the driver of the Spark session will run. This means that the server where R is running may not necessarily be the driver for that session. Here is a good write-up explaining how running Spark applications work: <a href="https://www.cloudera.com/documentation/enterprise/5-12-x/topics/cdh_ig_running_spark_on_yarn.html">Running Spark on YARN</a></p>
+<p>The server will need to have copies of at least two files: <code>yarn-site.xml</code> and <code>hive-site.xml</code>. There may be other files needed based on your cluster’s individual setup.</p>
+<p>This is an example of connecting to a Cloudera cluster:</p>
+<pre class="r"><code>library(sparklyr)
+
+Sys.setenv(JAVA_HOME=&quot;/usr/lib/jvm/java-7-oracle-cloudera/&quot;)
+Sys.setenv(SPARK_HOME = &#39;/opt/cloudera/parcels/CDH/lib/spark&#39;)
+Sys.setenv(YARN_CONF_DIR = &#39;/opt/cloudera/parcels/CDH/lib/spark/conf/yarn-conf&#39;)
+
+conf$spark.executor.memory &lt;- &quot;300M&quot;
+conf$spark.executor.cores &lt;- 2
+conf$spark.executor.instances &lt;- 3
+conf$spark.dynamicAllocation.enabled &lt;- &quot;false&quot;
+conf &lt;- spark_config()
+
+sc &lt;- spark_connect(master = &quot;yarn-cluster&quot;, 
+                    config = conf)</code></pre>
 </section>
 <section id="yarn-executor" class="level3">
 <h3>Executor memory error</h3>
@@ -145,7 +166,7 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;,
 <p>If the <code>spark.executor.cores</code> property is set to 2, and dynamic allocation is disabled, then Spark will spawn 6 executors. The <code>spark.executor.memory</code> property should be set to a level that when the value is multiplied by 6 (number of executors) it will not be over total available RAM. In this case, the value can be safely set to 7GB so that the total memory requested will be 42GB, which is under the available 44.1GB.</p>
 </section>
 </section>
-<section id="connection-example-2" class="level3">
+<section id="connection-example-1" class="level3">
 <h3>Connection example</h3>
 <pre class="r"><code>conf &lt;- spark_config()
 conf$spark.executor.memory &lt;- &quot;7GB&quot;
