@@ -93,13 +93,13 @@ publishDir = "blogdown/public"
 
 [[menu.main]]
     weight = 51
-    name = "Standalone cluster (AWS)"
+    name = "Standalone cluster"
     parent = "Deployment Examples"
     url = "/examples/stand-alone-aws/"
 
 [[menu.main]]
     weight = 52
-    name = "YARN cluster (EMR)"
+    name = "YARN cluster"
     parent = "Deployment Examples"
     url = "/examples/yarn-cluster-emr/"
 
