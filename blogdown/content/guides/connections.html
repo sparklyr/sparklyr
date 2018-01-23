@@ -102,6 +102,12 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;,
                     spark_home = &quot;/usr/lib/spark/&quot;,
                     version = &quot;1.6.0&quot;,
                     config = conf)</code></pre>
+<section id="executors-page-1" class="level4">
+<h4>Executors page</h4>
+<p>To see how the requested configuration affected the Spark connection, go to the <strong>Executors</strong> page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040.</p>
+<p>Notice that 155.3MB per executor are assigned instead of the 300MB requested. This is because the <em>spark.memory.fraction</em> has been fixed by the cluster, plus, there is fixed amount of memory designated for overhead.</p>
+<p><img src="/images/deployment/connections/yarnclient.png" /></p>
+</section>
 </section>
 <section id="cluster-mode" class="level3">
 <h3>Cluster mode</h3>
@@ -121,15 +127,7 @@ conf$spark.dynamicAllocation.enabled &lt;- &quot;false&quot;
 conf &lt;- spark_config()
 
 sc &lt;- spark_connect(master = &quot;yarn-cluster&quot;, 
-                    config = conf)
-</code></pre>
-<p>For YARN Cluster Mode, we should probably have a connection example and also mention that they need to correctly configured the client machine for YARN Cluster mode, maybe add a reference back to the official docs and mention that at the very least they need to copy: <code>yarn-site.xml</code> and <code>hive-site.xml</code>. The trick here is that there might be other files they need to configure for their particular cluster so we can’t be too prescriptive.</p>
-<section id="executors-page-1" class="level4">
-<h4>Executors page</h4>
-<p>To see how the requested configuration affected the Spark connection, go to the <strong>Executors</strong> page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040.</p>
-<p>Notice that 155.3MB per executor are assigned instead of the 300MB requested. This is because the <em>spark.memory.fraction</em> has been fixed by the cluster, plus, there is fixed amount of memory designated for overhead.</p>
-<p><img src="/images/deployment/connections/yarnclient.png" /></p>
-</section>
+                    config = conf)</code></pre>
 </section>
 <section id="yarn-executor" class="level3">
 <h3>Executor memory error</h3>

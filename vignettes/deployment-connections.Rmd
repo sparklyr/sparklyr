@@ -119,12 +119,19 @@ sc <- spark_connect(master = "yarn-client",
                     config = conf)
 ```
 
+#### Executors page 
+
+To see how the requested configuration affected the Spark connection, go to the **Executors** page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040.
+
+Notice that 155.3MB per executor are assigned instead of the 300MB requested.  This is because the *spark.memory.fraction* has been fixed by the cluster, plus, there is fixed amount of memory designated for overhead.  
+
+![](/images/deployment/connections/yarnclient.png)
+
 ### Cluster mode
 
 Running in cluster mode means that YARN will choose where the driver of the Spark session will run.  This means that the server where R is running may not necessarily be the driver for that session. Here is a good write-up explaining how running Spark applications work: [Running Spark on YARN](https://www.cloudera.com/documentation/enterprise/5-12-x/topics/cdh_ig_running_spark_on_yarn.html)
 
 The server will need to have copies of at least two files: `yarn-site.xml` and `hive-site.xml`.  There may be other files needed based on your cluster's individual setup.  
-
 
 This is an example of connecting to a Cloudera cluster:
 ```r
@@ -142,19 +149,8 @@ conf <- spark_config()
 
 sc <- spark_connect(master = "yarn-cluster", 
                     config = conf)
-
 ```
 
-
-For YARN Cluster Mode, we should probably have a connection example and also mention that they need to correctly configured the client machine for YARN Cluster mode, maybe add a reference back to the official docs and mention that at the very least they need to copy: `yarn-site.xml` and `hive-site.xml`. The trick here is that there might be other files they need to configure for their particular cluster so we can’t be too prescriptive.
-
-#### Executors page 
-
-To see how the requested configuration affected the Spark connection, go to the **Executors** page in the Spark Web UI. Typically, the Spark Web UI can be found using the exact same URL used for RStudio but on port 4040.
-
-Notice that 155.3MB per executor are assigned instead of the 300MB requested.  This is because the *spark.memory.fraction* has been fixed by the cluster, plus, there is fixed amount of memory designated for overhead.  
-
-![](/images/deployment/connections/yarnclient.png)
 
 ### Executor memory error {#yarn-executor}
 
