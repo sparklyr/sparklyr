@@ -10,13 +10,11 @@ aliases:
   /articles/deployment-connections.html
 ---
 
-
-
 ## Local mode
 
 Local mode is an excellent way to learn and experiment with Spark. Local mode also provides a convenient development environment for analyses, reports, and applications that you plan to eventually deploy to a multi-node Spark cluster.
 
-To work in local mode you should first install a version of Spark for local use. You can do this using the `spark_install()` function, for example:
+To work in local mode, you should **first install a version of Spark for local use**. You can do this using the `spark_install()` function, for example:
 
 ### Recommended properties
 
@@ -83,7 +81,7 @@ It may be useful to provide some simple definitions for the Spark nomenclature:
 
 - **The cluster overrides 'silently'** -  Many times, no errors are returned when more resources than allowed are requested, or if an attempt is made to change a setting fixed by the cluster.
 
-## YARN cluster
+## YARN 
 
 ### Background
 
@@ -103,8 +101,9 @@ The following are the recommended Spark properties to set when connecting via R:
 
 - **spark.dynamicAllocation.enabled** -  Overrides the mechanism that Spark provides to dynamically adjust resources.  Disabling it provides more control over the number of the Executors that can be started, which in turn impact the amount of storage available for the session. For more information, please see the [Dynamic Resource Allocation](https://spark.apache.org/docs/latest/job-scheduling.html#dynamic-resource-allocation) page in the official Spark website.
 
-### Connection example
+### Client mode
 
+Using `yarn-client` as the value for the `master` argument in `spark_connect()` will make the server in which R is running to be the Spark's session driver.  Here is a sample connection:
 
 ```r
 conf <- spark_config()
@@ -119,6 +118,35 @@ sc <- spark_connect(master = "yarn-client",
                     version = "1.6.0",
                     config = conf)
 ```
+
+### Cluster mode
+
+Running in cluster mode means that YARN will choose where the driver of the Spark session will run.  This means that the server where R is running may not necessarily be the driver for that session. Here is a good write-up explaining how running Spark applications work: [Running Spark on YARN](https://www.cloudera.com/documentation/enterprise/5-12-x/topics/cdh_ig_running_spark_on_yarn.html)
+
+The server will need to have copies of at least two files: `yarn-site.xml` and `hive-site.xml`.  There may be other files needed based on your cluster's individual setup.  
+
+
+This is an example of connecting to a Cloudera cluster:
+```r
+library(sparklyr)
+
+Sys.setenv(JAVA_HOME="/usr/lib/jvm/java-7-oracle-cloudera/")
+Sys.setenv(SPARK_HOME = '/opt/cloudera/parcels/CDH/lib/spark')
+Sys.setenv(YARN_CONF_DIR = '/opt/cloudera/parcels/CDH/lib/spark/conf/yarn-conf')
+
+conf$spark.executor.memory <- "300M"
+conf$spark.executor.cores <- 2
+conf$spark.executor.instances <- 3
+conf$spark.dynamicAllocation.enabled <- "false"
+conf <- spark_config()
+
+sc <- spark_connect(master = "yarn-cluster", 
+                    config = conf)
+
+```
+
+
+For YARN Cluster Mode, we should probably have a connection example and also mention that they need to correctly configured the client machine for YARN Cluster mode, maybe add a reference back to the official docs and mention that at the very least they need to copy: `yarn-site.xml` and `hive-site.xml`. The trick here is that there might be other files they need to configure for their particular cluster so we can’t be too prescriptive.
 
 #### Executors page 
 
