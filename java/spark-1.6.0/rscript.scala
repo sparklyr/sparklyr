@@ -7,6 +7,8 @@ import org.apache.spark._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 
+import scala.collection.JavaConverters._
+
 import ClassUtils._
 import FileUtils._
 
@@ -34,18 +36,21 @@ class Rscript(logger: Logger) {
 
     val sourceFilePath: String = workerSourceFile()
     logger.log("using source file " + sourceFilePath)
-    logger.log(
-      "launching command " + command + " --vanilla <source-file> " +
-      sessionId.toString + " " + config)
 
-    val processBuilder: ProcessBuilder = new ProcessBuilder(Arrays.asList(
+    val vanilla = options.getOrElse("vanilla", "true") == "true"
+
+    val commandParams = List(
       command,
-      "--vanilla",
+      if (vanilla) "--vanilla" else "",
       sourceFilePath,
       sessionId.toString,
       backendPort.toString,
       config
-    ))
+    ).filter(_.nonEmpty)
+
+    logger.log("launching command " + commandParams.mkString(" "))
+
+    val processBuilder: ProcessBuilder = new ProcessBuilder(commandParams.asJava)
 
     val processEnv = processBuilder.environment();
     for ((k, v) <- customEnv) {
