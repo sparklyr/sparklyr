@@ -132,6 +132,27 @@ spark_apply_packages_is_bundle <- function(packages) {
 #' @param context Optional object to be serialized and passed back to \code{f()}.
 #' @param ... Optional arguments; currently unused.
 #'
+#' @section Configuration:
+#'
+#' \code{spark_config()} settings can be specified to change the workers
+#' environment.
+#'
+#' For instance, to set additional environment variables to each
+#' worker node use the \code{sparklyr.apply.env.*} config, to launch workers
+#' without \code{--vanilla} use \code{sparklyr.apply.options.vanilla} set to
+#' \code{FALSE}.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' library(sparklyr)
+#' sc <- spark_connect(master = "local")
+#'
+#' # creates an Spark data frame with 10 elements then multiply times 10 in R
+#' sdf_len(sc, 10) %>% spark_apply(function(df) df * 10)
+#'
+#' }
+#'
 #' @export
 spark_apply <- function(x,
                         f,
@@ -226,6 +247,11 @@ spark_apply <- function(x,
     }
   }
 
+  spark_apply_options <- lapply(
+    connection_config(sc, "sparklyr.apply.options."),
+    as.character
+  )
+
   rdd <- invoke_static(
     sc,
     "sparklyr.WorkerHelper",
@@ -240,7 +266,8 @@ spark_apply <- function(x,
     bundle_path,
     as.environment(proc_env),
     as.integer(60),
-    context_serialize
+    context_serialize,
+    as.environment(spark_apply_options)
   )
 
   # while workers need to relaunch sparklyr backends, cache by default

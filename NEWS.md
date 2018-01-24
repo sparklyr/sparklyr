@@ -1,4 +1,9 @@
-# Sparklyr 0.7 (UNRELEASED)
+# Sparklyr 0.7.1 (UNRELEASED)
+
+- Added support for `sparklyr.apply.options.vanilla` to be set to `FALSE`
+  to avoid using `--vanilla` while launching R worker role.
+
+# Sparklyr 0.7
 
 - Added support for Spark 2.2.1.
 
