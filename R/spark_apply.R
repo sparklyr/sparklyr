@@ -226,7 +226,10 @@ spark_apply <- function(x,
     }
   }
 
-  spark_apply_options <- connection_config(sc, "sparklyr.apply.options.")
+  spark_apply_options <- lapply(
+    connection_config(sc, "sparklyr.apply.options."),
+    as.character
+  )
 
   rdd <- invoke_static(
     sc,
@@ -243,7 +246,7 @@ spark_apply <- function(x,
     as.environment(proc_env),
     as.integer(60),
     context_serialize,
-    spark_apply_options
+    as.environment(spark_apply_options)
   )
 
   # while workers need to relaunch sparklyr backends, cache by default
