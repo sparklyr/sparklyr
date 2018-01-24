@@ -15,7 +15,8 @@ class WorkerRDD(
   bundlePath: String,
   customEnv: Map[String, String],
   connectionTimeout: Int,
-  context: Array[Byte]
+  context: Array[Byte],
+  options: Map[String, String]
   ) extends RDD[Row](prev) {
 
   private[this] var exception: Option[Exception] = None
@@ -95,7 +96,8 @@ class WorkerRDD(
             sessionId,
             backendPort,
             config,
-            customEnv
+            customEnv,
+            options
           )
 
           lock.synchronized {

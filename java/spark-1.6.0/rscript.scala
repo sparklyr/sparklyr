@@ -26,7 +26,8 @@ class Rscript(logger: Logger) {
     sessionId: Int,
     backendPort: Int,
     config: String,
-    customEnv: Map[String, String]) = {
+    customEnv: Map[String, String],
+    options: Map[String, String]) = {
 
     val sparkConf = SparkEnv.get.conf
     val command: String = sparkConf.get("spark.r.command", "Rscript")

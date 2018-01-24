@@ -84,11 +84,18 @@ object WorkerHelper {
     bundlePath: String,
     customEnv: java.util.Map[Object, Object],
     connectionTimeout: Int,
-    context: Array[Byte]
+    context: Array[Byte],
+    options: java.util.Map[Object, Object]
   ): RDD[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
     customEnv.foreach(kv => customEnvMap.put(
+      kv._1.asInstanceOf[String],
+      kv._2.asInstanceOf[String])
+    )
+
+    var optionsMap = scala.collection.mutable.Map[String, String]();
+    options.foreach(kv => optionsMap.put(
       kv._1.asInstanceOf[String],
       kv._2.asInstanceOf[String])
     )
@@ -104,7 +111,8 @@ object WorkerHelper {
       bundlePath,
       Map() ++ customEnvMap,
       connectionTimeout,
-      context)
+      context,
+      Map() ++ optionsMap)
 
     computed
   }
