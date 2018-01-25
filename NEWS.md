@@ -1,5 +1,8 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Added support for `sparklyr.apply.options.rscript.before` to run a custom
+  command before launching the R worker role.
+
 - Added support for `sparklyr.apply.options.vanilla` to be set to `FALSE`
   to avoid using `--vanilla` while launching R worker role.
 
