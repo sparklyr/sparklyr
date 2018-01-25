@@ -13,15 +13,35 @@ import ClassUtils._
 import FileUtils._
 
 class Rscript(logger: Logger) {
+  val scratchDir: File = createTempDir
+
   def workerSourceFile(): String = {
     val source = Sources.sources
 
-    val tempFile: File = new File(createTempDir + File.separator + "sparkworker.R")
+    val tempFile: File = new File(scratchDir + File.separator + "sparkworker.R")
     val outStream: FileWriter = new FileWriter(tempFile)
     outStream.write(source)
     outStream.flush()
 
     tempFile.getAbsolutePath()
+  }
+
+  def run(commands: String) = {
+    val processBuilder: ProcessBuilder = new ProcessBuilder(commands.split(" ").toList.asJava)
+
+    processBuilder.redirectErrorStream(true);
+    processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+    processBuilder.directory(scratchDir);
+
+    logger.log("is running custom command: " + commands)
+    val process: Process = processBuilder.start()
+    val status: Int = process.waitFor()
+
+    if (status == 0) {
+      logger.log("completed custom command")
+    } else {
+      logger.logError("failed to complete custom command")
+    }
   }
 
   def init(
@@ -36,6 +56,10 @@ class Rscript(logger: Logger) {
 
     val sourceFilePath: String = workerSourceFile()
     logger.log("using source file " + sourceFilePath)
+
+    if (options.contains("rscript.before")) {
+      run(options.getOrElse("rscript.before", ""))
+    }
 
     val vanilla = options.getOrElse("vanilla", "true") == "true"
 
