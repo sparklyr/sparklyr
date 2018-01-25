@@ -55,7 +55,8 @@ environment.
 For instance, to set additional environment variables to each
 worker node use the \code{sparklyr.apply.env.*} config, to launch workers
 without \code{--vanilla} use \code{sparklyr.apply.options.vanilla} set to
-\code{FALSE}.
+\code{FALSE}, to run a custom script before launching Rscript use
+\code{sparklyr.apply.options.rscript.before}.
 }
 
 \examples{
