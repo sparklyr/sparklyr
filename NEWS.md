@@ -1,5 +1,8 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Fixed regression blocking use of `livy.session.start.timeout` parameter
+  in Livy connections.
+
 - Added support for `sparklyr.apply.options.rscript.before` to run a custom
   command before launching the R worker role.
 
