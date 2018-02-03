@@ -87,18 +87,30 @@ ml_kmeans.tbl_spark <- function(
   uid = random_string("kmeans_"),
   features = NULL, ...) {
 
-  predictor <- ml_new_stage_modified_args()
+  if (spark_version(spark_connection(x)) < "2.0.0") {
+    params <- list(...)
+    ml_kmeans_mllib(
+      x = x,
+      centers = params$centers %||% k,
+      iter.max = params$iter.max %||% max_iter,
+      features = params$features %||% features,
+      compute.cost = params$compute.cost %||% TRUE,
+      tolerance = params$tolerance %||% tol,
+      ml.options = params$ml.options %||% ml_options()
+    )
+  }
+  else {
+    predictor <- ml_new_stage_modified_args()
 
-  ml_formula_transformation()
+    ml_formula_transformation()
 
-  if (is.null(formula)) {
-    predictor %>%
-      ml_fit(x)
-  } else {
-    if (spark_version(spark_connection(x)) < "2.0.0")
-      stop("ml_kmeans() with formula interface requires Spark 2.0.0+")
-    ml_generate_ml_model(x, predictor = predictor, formula = formula, features_col = features_col,
-                         type = "clustering", constructor = new_ml_model_kmeans)
+    if (is.null(formula)) {
+      predictor %>%
+        ml_fit(x)
+    } else {
+      ml_generate_ml_model(x, predictor = predictor, formula = formula, features_col = features_col,
+                             type = "clustering", constructor = new_ml_model_kmeans)
+    }
   }
 }
 
@@ -215,4 +227,105 @@ ml_compute_cost <- function(model, dataset) {
       model$model$compute_cost()
   } else
     model$compute_cost(dataset)
+}
+
+ml_kmeans_mllib <- function(x,
+                            centers,
+                            iter.max = 100,
+                            features = tbl_vars(x),
+                            compute.cost = TRUE,
+                            tolerance = 0.0001,
+                            ml.options = ml_options(),
+                            ...)
+{
+  ml_backwards_compatibility_api()
+
+  df <- spark_dataframe(x)
+  sc <- spark_connection(df)
+
+  df <- ml_prepare_features(
+    x = df,
+    features = features,
+    envir = environment(),
+    ml.options = ml.options
+  )
+
+  centers <- ensure_scalar_integer(centers)
+  iter.max <- ensure_scalar_integer(iter.max)
+  only.model <- ensure_scalar_boolean(ml.options$only.model)
+  tolerance <- ensure_scalar_double(tolerance)
+
+  envir <- new.env(parent = emptyenv())
+
+  envir$id <- ml.options$id.column
+  df <- df %>%
+    sdf_with_unique_id(envir$id) %>%
+    spark_dataframe()
+
+  tdf <- ml_prepare_dataframe(df, features, ml.options = ml.options, envir = envir)
+
+  envir$model <- "org.apache.spark.ml.clustering.KMeans"
+  kmeans <- invoke_new(sc, envir$model)
+
+  model <- kmeans %>%
+    invoke("setK", centers) %>%
+    invoke("setMaxIter", iter.max) %>%
+    invoke("setTol", tolerance) %>%
+    invoke("setFeaturesCol", envir$features)
+
+  if (is.function(ml.options$model.transform))
+    model <- ml.options$model.transform(model)
+
+  if (only.model)
+    return(model)
+
+  fit <- model %>%
+    invoke("fit", tdf)
+
+  # extract cluster centers
+  kmmCenters <- invoke(fit, "clusterCenters")
+
+  # compute cost for k-means
+  if (compute.cost) {
+    kmmCost <- tryCatch(
+      invoke(fit, "computeCost", tdf),
+      error = function(e) NULL
+    )
+  }
+
+  centersList <- transpose_list(lapply(kmmCenters, function(center) {
+    as.numeric(invoke(center, "toArray"))
+  }))
+
+  names(centersList) <- features
+  centers <- as.data.frame(centersList, stringsAsFactors = FALSE, optional = TRUE)
+
+  ml_model("kmeans", fit,
+           centers = centers,
+           features = features,
+           data = df,
+           ml.options = ml.options,
+           model.parameters = as.list(envir),
+           cost = ifelse(compute.cost, kmmCost, NULL)
+  )
+}
+
+#' @export
+print.ml_model_kmeans <- function(x, ...) {
+
+  preamble <- sprintf(
+    "K-means clustering with %s %s",
+    nrow(x$centers),
+    if (nrow(x$centers) == 1) "cluster" else "clusters"
+  )
+
+  cat(preamble, sep = "\n")
+  print_newline()
+  ml_model_print_centers(x)
+
+  print_newline()
+  cat("Within Set Sum of Squared Errors = ",
+      if (is.null(x$cost)) "not computed." else x$cost
+  )
+
 }
