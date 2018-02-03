@@ -84,16 +84,6 @@ ml_model_print_centers <- function(model) {
 
 }
 
-
-#' Spark ML - Feature Importance for Tree Models
-#'
-#' @param sc A \code{spark_connection}.
-#' @param model An \code{ml_model} encapsulating the output from a decision tree.
-#'
-#' @return A sorted data frame with feature labels and their relative importance.
-#' @export
-#' @importFrom dplyr arrange
-#' @importFrom dplyr desc
 ml_tree_feature_importance <- function(sc, model)
 {
   supported <- c("ml_model_gradient_boosted_trees",
