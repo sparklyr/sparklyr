@@ -145,7 +145,8 @@ ml_prepare_dataframe <- function(x,
   }
 
   # assemble features vector
-  transformed <- ft_vector_assembler(df, features, envir$features)
+  df_tbl <- sdf_register(df)
+  transformed <- ft_vector_assembler(df_tbl, features, envir$features)
 
   # return as vanilla spark dataframe
   spark_dataframe(transformed)
