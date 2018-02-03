@@ -32,11 +32,10 @@ test_that("ml_kmeans() default params are correct", {
 })
 
 test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
-  test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
   skip_on_cran()
 
-  if (spark_version(sc) < "2.0.0")
-    skip("requires Spark 2.0.0")
+  if (spark_version(sc) >= "2.0.0")
+    skip("Spark 1.6.X test")
 
   iris_tbl <- testthat_tbl("iris")
 
@@ -50,8 +49,7 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
     kmeans(centers = 3)
 
   S <- iris_tbl %>%
-    select(Sepal_Length, Petal_Length) %>%
-    ml_kmeans(~ ., centers = 3L)
+    ml_kmeans(centers = 3L, features = c("Sepal_Length", "Petal_Length"))
 
   lhs <- as.matrix(R$centers)
   rhs <- as.matrix(S$centers)
@@ -113,4 +111,3 @@ test_that("ml_kmeans() works properly", {
     46.7123, tolerance = 0.01
   )
 })
-
