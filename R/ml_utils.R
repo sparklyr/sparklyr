@@ -111,3 +111,42 @@ spark_sql_column <- function(sc, col, alias = NULL) {
     jobj <- invoke(jobj, "alias", alias)
   jobj
 }
+
+ml_prepare_dataframe <- function(x,
+                                 features,
+                                 response = NULL,
+                                 ...,
+                                 ml.options = ml_options(),
+                                 envir = new.env(parent = emptyenv()))
+{
+  df <- spark_dataframe(x)
+  schema <- sdf_schema(df)
+
+  # default report for feature, response variable names
+  envir$features <- ml.options$features.column
+  envir$output <- ml.options$output.column
+  envir$response <- response
+  envir$labels <- NULL
+
+  # ensure numeric response
+  if (!is.null(response)) {
+    responseType <- schema[[response]]$type
+    if (responseType == "StringType") {
+      envir$response <- ml.options$response.column
+      df <- ft_string_indexer(df, response, envir$response, envir)
+    } else if (responseType != "DoubleType") {
+      envir$response <- ml.options$response.column
+      castedColumn <- df %>%
+        invoke("col", response) %>%
+        invoke("cast", "double")
+      df <- df %>%
+        invoke("withColumn", envir$response, castedColumn)
+    }
+  }
+
+  # assemble features vector
+  transformed <- ft_vector_assembler(df, features, envir$features)
+
+  # return as vanilla spark dataframe
+  spark_dataframe(transformed)
+}
