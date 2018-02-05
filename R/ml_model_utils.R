@@ -54,7 +54,7 @@ ml_generate_ml_model <- function(
       attr("term.labels")
 
     vector_assembler <- ft_vector_assembler(
-      sc, input_cols = featues, output_col = features_col
+      sc, input_cols = features, output_col = features_col
     )
     ml_pipeline(vector_assembler, predictor)
 
