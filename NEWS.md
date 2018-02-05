@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Fixed regression blocking use of `ml_kmeans()` in Spark 1.6.x.
+
 - Fixed regression blocking use of `livy.session.start.timeout` parameter
   in Livy connections.
 
