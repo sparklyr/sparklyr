@@ -65,7 +65,6 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
 })
 
 test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)", {
-  test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
 
   iris_tbl <- testthat_tbl("iris")
 
@@ -94,7 +93,6 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 })
 
 test_that("ml_kmeans() works properly", {
-  test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5, seed = 11)
   expect_equal(ml_predict(iris_kmeans, iris_tbl) %>%
@@ -102,6 +100,12 @@ test_that("ml_kmeans() works properly", {
     dplyr::arrange(prediction) %>%
     dplyr::pull(prediction),
     0:4)
+})
+
+test_that("ml_compute_cost() for kmeans works properly", {
+  test_requires_version("2.0.0", "ml_compute_cost() requires Spark 2.0+")
+  iris_tbl <- testthat_tbl("iris")
+  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5, seed = 11)
   expect_equal(
     ml_compute_cost(iris_kmeans, iris_tbl),
     46.7123, tolerance = 0.01
@@ -113,4 +117,3 @@ test_that("ml_kmeans() works properly", {
     46.7123, tolerance = 0.01
   )
 })
-
