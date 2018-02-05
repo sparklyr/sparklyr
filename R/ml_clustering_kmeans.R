@@ -95,6 +95,8 @@ ml_kmeans.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
+    if (spark_version(spark_connection(x)) < "2.0.0")
+      stop("ml_kmeans() with formula interface requires Spark 2.0.0+")
     ml_generate_ml_model(x, predictor = predictor, formula = formula, features_col = features_col,
                          type = "clustering", constructor = new_ml_model_kmeans)
   }
@@ -126,7 +128,9 @@ new_ml_kmeans <- function(jobj) {
 
 new_ml_kmeans_model <- function(jobj) {
 
-  summary <- try_null(new_ml_summary_kmeans_model(invoke(jobj, "summary")))
+  summary <- if (invoke(jobj, "hasSummary"))
+    new_ml_summary_kmeans_model(invoke(jobj, "summary"))
+  else NULL
 
   new_ml_clustering_model(
     jobj,
