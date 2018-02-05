@@ -126,9 +126,7 @@ new_ml_kmeans <- function(jobj) {
 
 new_ml_kmeans_model <- function(jobj) {
 
-  summary <- if (invoke(jobj, "hasSummary"))
-    new_ml_summary_kmeans_model(invoke(jobj, "summary"))
-  else NULL
+  summary <- try_null(new_ml_summary_kmeans_model(invoke(jobj, "summary")))
 
   new_ml_clustering_model(
     jobj,
