@@ -11,9 +11,12 @@ ml_index_labels_metadata <- function(label_indexer_model, dataset, label_col) {
 }
 
 ml_feature_names_metadata <- function(pipeline_model, dataset, features_col) {
-  r_formula_model <- ml_stage(pipeline_model, 1)
-  transformed_tbl <- ml_transform(r_formula_model, dataset)
-  features_col <- ml_param(r_formula_model, "features_col")
+  preprocessor <- ml_stage(pipeline_model, 1)
+  transformed_tbl <- ml_transform(preprocessor, dataset)
+  features_col <- if (inherits(preprocessor, "ml_r_formula_model"))
+    ml_param(preprocessor, "features_col")
+  else # vector assembler
+    ml_param(preprocessor, "output_col")
 
   ml_column_metadata(transformed_tbl, features_col) %>%
     `[[`("attrs") %>%
