@@ -45,6 +45,19 @@ ml_generate_ml_model <- function(
       pipeline <- ml_pipeline(r_formula, string_indexer, predictor)
     }
     pipeline
+  } else if (identical(type, "clustering") && spark_version(sc) < "2.0.0") {
+    # one-sided formulas not supported prior to Spark 2.0
+    rdf <- sdf_schema(x) %>%
+      lapply(`[[`, "name") %>%
+      as.data.frame(stringsAsFactors = FALSE)
+    features <- stats::terms(as.formula(formula), data = rdf) %>%
+      attr("term.labels")
+
+    vector_assembler <- ft_vector_assembler(
+      sc, input_cols = featues, output_col = features_col
+    )
+    ml_pipeline(vector_assembler, predictor)
+
   } else {
     r_formula <- ft_r_formula(sc, formula, features_col, label_col)
     ml_pipeline(r_formula, predictor)
