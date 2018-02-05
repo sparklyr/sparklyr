@@ -40,6 +40,7 @@ test_that("ft_sql/dplyr_transformer() works", {
 })
 
 test_that("ft_dplyr_transformer() handles cases where table name isn't quoted (#1249)", {
+  test_requires_version("2.0.0", "sample_frac() requires Spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
   sampled <- iris_tbl %>%
     sample_frac(0.01)
