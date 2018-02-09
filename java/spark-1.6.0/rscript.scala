@@ -13,7 +13,7 @@ import ClassUtils._
 import FileUtils._
 
 class Rscript(logger: Logger) {
-  val scratchDir: File = createTempDir
+  val scratchDir: File = new File(SparkFiles.getRootDirectory)
 
   def workerSourceFile(): String = {
     val source = Sources.sources
@@ -84,6 +84,7 @@ class Rscript(logger: Logger) {
 
     processBuilder.redirectErrorStream(true);
     processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+    processBuilder.directory(scratchDir);
 
     logger.log("is starting R process")
     val process: Process = processBuilder.start()
