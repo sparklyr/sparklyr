@@ -13,7 +13,7 @@ import ClassUtils._
 import FileUtils._
 
 class Rscript(logger: Logger) {
-  val scratchDir: File = createTempDir
+  val scratchDir: File = new File(SparkFiles.getRootDirectory)
 
   def workerSourceFile(): String = {
     val source = Sources.sources
