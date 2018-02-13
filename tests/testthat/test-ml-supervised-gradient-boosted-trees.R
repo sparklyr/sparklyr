@@ -181,3 +181,10 @@ test_that("checkpointing works for gbt", {
     NA
   )
 })
+
+test_that('ml_gradient_boosted_trees() supports response-features syntax', {
+  iris_tbl <- testthat_tbl("iris")
+  ml_gradient_boosted_trees(iris_tbl,
+                            response = 'Sepal_Length',
+                            features = c('Sepal_Width', 'Petal_Length'))
+})

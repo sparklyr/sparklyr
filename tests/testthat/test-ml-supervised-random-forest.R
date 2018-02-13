@@ -215,3 +215,13 @@ test_that("residuals() call on ml_model_random_forest_regression errors", {
     "'residuals\\(\\)' not supported for ml_model_random_forest_regression"
   )
 })
+
+test_that("ml_random_forest() supports response-features syntax", {
+  iris_tbl <- testthat_tbl("iris")
+  expect_error(
+    ml_random_forest(iris_tbl,
+                     response = 'Sepal_Length',
+                     features = c('Sepal_Width', 'Petal_Length')),
+    NA
+  )
+})
