@@ -148,3 +148,13 @@ test_that("ml_decision_tree print outputs are correct", {
     output_file("print/decision_tree_classifier.txt")
   )
 })
+
+test_that("ml_decision_tree() supports response-features syntax (#1302)", {
+  iris_tbl <- testthat_tbl("iris")
+  expect_error(
+    ml_decision_tree(iris_tbl,
+                     response = 'Sepal_Length',
+                     features = c('Sepal_Width', 'Petal_Length')),
+    NA
+  )
+})

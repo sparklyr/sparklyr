@@ -82,5 +82,7 @@ ml_gradient_boosted_trees <- function(
                     classification = ml_gbt_classifier)
 
   args <- c(as.list(environment()), list(...))
+  args$response <- NULL
+  args$features <- NULL
   do.call(routine, args)
 }

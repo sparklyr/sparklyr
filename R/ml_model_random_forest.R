@@ -125,5 +125,7 @@ ml_random_forest <- function(
                     classification = ml_random_forest_classifier)
 
   args <- c(as.list(environment()), list(...))
+  args$response <- NULL
+  args$features <- NULL
   do.call(routine, args)
 }
