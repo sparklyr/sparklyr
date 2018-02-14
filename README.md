@@ -513,7 +513,7 @@ livy_service_stop()
 To connect to remote `livy` clusters that support basic authentication connect as:
 
 ``` r
-config <- livy_config_auth("<username>", "<password">)
+config <- livy_config(username="<username>", password="<password">)
 sc <- spark_connect(master = "<address>", method = "livy", config = config)
 spark_disconnect(sc)
 ```
