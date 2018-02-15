@@ -1,18 +1,17 @@
 package sparklyr
 
-import java.io.{File, FileWriter}
-import java.util.Arrays
-
-import org.apache.spark._
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql._
-
-import scala.collection.JavaConverters._
-
-import ClassUtils._
-import FileUtils._
-
 class Rscript(logger: Logger) {
+  import java.io.{File, FileWriter}
+  import java.util.Arrays
+
+  import org.apache.spark._
+  import org.apache.spark.sql._
+
+  import scala.collection.JavaConverters._
+
+  import ClassUtils._
+  import FileUtils._
+
   val scratchDir: File = new File(SparkFiles.getRootDirectory)
 
   def workerSourceFile(): String = {
