@@ -6,7 +6,21 @@ livy_sources_included <- function() {
     "/stream\\.scala",
     "/sqlutils\\.scala",
     "/utils\\.scala",
-    "/repartition\\.scala"
+    "/repartition\\.scala",
+    "/tracker\\.scala",
+    "/livyutils\\.scala",
+    "/applyutils\\.scala",
+    "/classutils\\.scala",
+    "/fileutils\\.scala",
+    "/rscript\\.scala",
+    "/sources\\.scala",
+    "/workercontext\\.scala",
+    "/channel\\.scala",
+    "/handler\\.scala",
+    "/backend\\.scala",
+    "/workerhelper\\.scala",
+    "/workerrdd\\.scala",
+    "/workerutils\\.scala"
   )
 }
 

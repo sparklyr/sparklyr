@@ -633,6 +633,18 @@ livy_load_scala_sources <- function(sc) {
     "serializer.scala",
     "stream.scala",
     "repartition.scala",
+    "applyutils.scala",
+    "classutils.scala",
+    "fileutils.scala",
+    "sources.scala",
+    "rscript.scala",
+    "workercontext.scala",
+    "handler.scala",
+    "channel.scala",
+    "backend.scala",
+    "workerrdd.scala",
+    "workerhelper.scala",
+    "workerutils.scala",
     "livyutils.scala"
   )
 
