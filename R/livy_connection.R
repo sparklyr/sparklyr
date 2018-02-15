@@ -292,12 +292,20 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
 
   var_name <- livy_code_new_return_var(sc)
 
-  code <- paste(
+  invoke_var <- paste(
     "var ", var_name, " = ",
-    "LivyUtils.invokeFromBase64(\"",
-    serialized,
-    "\")",
+    "LivyUtils.invokeFromBase64(",
+    last_var,
+    ")",
     sep = ""
+  )
+
+  code <- paste(
+    c(
+      chunk_vars,
+      invoke_var
+    ),
+    collapse = "\n"
   )
 
   livy_statement_new(
