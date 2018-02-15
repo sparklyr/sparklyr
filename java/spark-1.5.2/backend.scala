@@ -44,7 +44,7 @@ package sparklyr
  * to the main gateway the port in which this instance will listen to.
  */
 
-class Backend {
+class Backend() {
   import java.io.{DataInputStream, DataOutputStream}
   import java.io.{File, FileOutputStream, IOException}
   import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
@@ -81,6 +81,12 @@ class Backend {
   private[this] var logger: Logger = new Logger("Session", 0);
 
   private[this] var oneConnection: Boolean = false;
+
+  private[this] var defaultTracker: Option[JVMObjectTracker] = None
+
+  def setTracker(tracker: JVMObjectTracker): Unit = {
+    defaultTracker = Option(tracker)
+  }
 
   object GatewayOperattions extends Enumeration {
     val GetPorts, RegisterInstance, UnregisterInstance = Value
@@ -261,7 +267,9 @@ class Backend {
                 logger.log("found requested session matches current session")
                 logger.log("is creating backend and allocating system resources")
 
-                val backendChannel = new BackendChannel(logger, terminate)
+                val tracker = if (defaultTracker.isDefined) defaultTracker.get else new JVMObjectTracker();
+                val serializer = new Serializer(tracker);
+                val backendChannel = new BackendChannel(logger, terminate, serializer, tracker)
                 backendChannel.setHostContext(hostContext)
 
                 val backendPort: Int = backendChannel.init(isRemote)

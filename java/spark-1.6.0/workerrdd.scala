@@ -41,11 +41,13 @@ class WorkerRDD(
       context
     )
 
-    val contextId = JVMObjectTracker.put(workerContext)
+    val tracker = new JVMObjectTracker()
+    val contextId = tracker.put(workerContext)
     logger.log("is tracking worker context under " + contextId)
 
     logger.log("initializing backend")
     val backend: Backend = new Backend()
+    backend.setTracker(tracker)
 
     /*
      * initialize backend as worker and service, since exceptions and
