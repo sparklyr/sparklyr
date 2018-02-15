@@ -32,6 +32,9 @@ object WorkerHelper {
       kv._2.asInstanceOf[String])
     )
 
+    val customEnvImmMap = (Map() ++ customEnvMap).toMap
+    val optionsImmMap = (Map() ++ optionsMap).toMap
+
     val computed: RDD[Row] = new WorkerRDD(
       rdd,
       closure,
@@ -41,10 +44,10 @@ object WorkerHelper {
       groupBy,
       closureRLang,
       bundlePath,
-      Map() ++ customEnvMap,
+      customEnvImmMap,
       connectionTimeout,
       context,
-      Map() ++ optionsMap)
+      optionsImmMap)
 
     computed
   }
