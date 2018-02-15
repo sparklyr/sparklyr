@@ -30,6 +30,9 @@ livy_sources_refresh <- function() {
 
     lines <- readLines(sourcePath)
 
+    if (!dir.exists(dirname(destinationPath)))
+      dir.create(dirname(destinationPath), recursive = TRUE)
+
     write("//", file = destinationPath, append = FALSE)
     write("// This file was automatically generated using livy_sources_refresh()", file = destinationPath, append = TRUE)
     write("// Changes to this file will be reverted.", file = destinationPath, append = TRUE)
