@@ -363,7 +363,12 @@ livy_post_statement <- function(sc, code) {
     withr::with_options(list(
       warning.length = 8000
     ), {
-      stop("Failed to execute Livy statement with error: ", statementReponse$output$evalue)
+      stop(
+        "Failed to execute Livy statement with error: ",
+        statementReponse$output$evalue,
+        "\nTraceback: ",
+        paste(statementReponse$output$traceback, collapse = "")
+      )
     })
   }
 
