@@ -2,6 +2,9 @@ class Logger(role: String, id: Int) {
   def log(message: String) = {
   }
 
+  def log(message: String, e: Exception) = {
+  }
+
   def logError(message: String) = {
   }
 
