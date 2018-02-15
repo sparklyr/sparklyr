@@ -3,7 +3,7 @@
 // Changes to this file will be reverted.
 //
 
-object ClassUtils {
+class ClassUtils {
   def getClassLoader: ClassLoader = {
     Option(Thread.currentThread().getContextClassLoader).getOrElse(getClass.getClassLoader)
   }

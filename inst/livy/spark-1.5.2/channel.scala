@@ -3,7 +3,7 @@
 // Changes to this file will be reverted.
 //
 
-class BackendChannel(logger: Logger, terminate: () => Unit) {
+class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializer, tracker: JVMObjectTracker) {
 
   import java.io.{DataInputStream, DataOutputStream}
   import java.io.{File, FileOutputStream, IOException}
@@ -48,7 +48,7 @@ class BackendChannel(logger: Logger, terminate: () => Unit) {
     val conf = new SparkConf()
     bossGroup = new NioEventLoopGroup(conf.getInt("sparklyr.backend.threads", 10))
     val workerGroup = bossGroup
-    val handler = new BackendHandler(() => this.close(), logger, hostContext)
+    val handler = new BackendHandler(() => this.close(), logger, hostContext, serializer, tracker)
 
     bootstrap = new ServerBootstrap()
       .group(bossGroup, workerGroup)

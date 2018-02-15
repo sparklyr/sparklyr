@@ -18,21 +18,6 @@ import org.apache.spark.{SparkEnv, SparkException}
 object Utils {
 
   /**
-   * Return a nice string representation of the exception. It will call "printStackTrace" to
-   * recursively generate the stack trace including the exception and its causes.
-   */
-  def exceptionString(e: Throwable): String = {
-    if (e == null) {
-      "No exception information provided."
-    } else {
-      // Use e.printStackTrace here because e.getStackTrace doesn't include the cause
-      val stringWriter = new StringWriter()
-      e.printStackTrace(new PrintWriter(stringWriter))
-      stringWriter.toString
-    }
-  }
-
-  /**
    * Utilities for collecting columns / Datasets back to R
    */
 

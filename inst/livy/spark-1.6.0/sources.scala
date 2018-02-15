@@ -3,7 +3,7 @@
 // Changes to this file will be reverted.
 //
 
-object Sources {
+class Sources {
   def sources: String = """
 #' A helper function to retrieve values from \code{spark_config()}
 #'
