@@ -29,7 +29,7 @@ script:
     fi
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
     if [[ $SPARK_VERSION == "2.2.0" ]]; then
-      travis_wait 30 Rscript -e 'covr::codecov()'
+      travis_wait 35 Rscript -e 'covr::codecov()'
     fi
 
 after_failure:
@@ -37,5 +37,5 @@ after_failure:
     grep -B 10 -A 20 ERROR /tmp/sparklyr.log
     cd tests
     export NOT_CRAN=true
-    travis_wait 30 Rscript ../.travis.R
+    travis_wait 35 Rscript ../.travis.R
     sleep 2
