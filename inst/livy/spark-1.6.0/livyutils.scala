@@ -10,8 +10,6 @@ object LivyUtils {
     "Utils" -> Utils,
     "Repartition" -> Repartition,
     "ApplyUtils" -> ApplyUtils,
-    "ClassUtils" -> ClassUtils,
-    "FileUtils" -> FileUtils,
     "WorkerHelper" -> WorkerHelper,
     "WorkerUtils" -> WorkerUtils
   )

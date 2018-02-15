@@ -1,9 +1,9 @@
 package sparklyr
 
-import java.io.File
-import java.util.UUID
+class FileUtils {
+  import java.io.File
+  import java.util.UUID
 
-object FileUtils {
   def ensureDir(base: String, path: String): File = {
     var dir: File = new File(base, path)
     if (!dir.exists()) {

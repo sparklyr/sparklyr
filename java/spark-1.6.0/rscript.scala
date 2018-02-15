@@ -9,17 +9,32 @@ class Rscript(logger: Logger) {
 
   import scala.collection.JavaConverters._
 
-  import ClassUtils._
-  import FileUtils._
+  def getScratchDir(): File = {
+    val sparkFiles = Class.forName("org.apache.spark.SparkFiles")
+    val selectedMethods = sparkFiles.getMethods.filter(m => m.getName == "getRootDirectory")
+    val rootDir = selectedMethods(0).invoke(sparkFiles).asInstanceOf[String]
+    new File(rootDir)
+  }
 
-  val scratchDir: File = new File(SparkFiles.getRootDirectory)
+  def getCommand(): String = {
+    // val sparkConf = SparkEnv.get.conf
+    val sparkEnvRoot = Class.forName("org.apache.spark.SparkEnv")
+    val selectedMethods = sparkEnvRoot.getMethods.filter(m => m.getName == "get")
+    val sparkEnv: SparkEnv= selectedMethods(0).invoke(sparkEnvRoot).asInstanceOf[SparkEnv]
 
-  val rsources = new Sources()
+    val sparkEnvMethods = sparkEnv.getClass.getMethods.filter(m => m.getName == "conf")
+    val sparkConf: SparkConf = sparkEnvMethods(0).invoke(sparkEnv).asInstanceOf[SparkConf]
+
+    // val command: String = sparkConf.get("spark.r.command", "Rscript")
+    val sparkConfMethods = sparkConf.getClass.getMethods.filter(m => m.getName == "get")
+    sparkConfMethods(1).invoke(sparkConf, "spark.r.command", "Rscript").asInstanceOf[String]
+  }
 
   def workerSourceFile(): String = {
+    val rsources = new Sources()
     val source = rsources.sources
 
-    val tempFile: File = new File(scratchDir + File.separator + "sparkworker.R")
+    val tempFile: File = new File(getScratchDir() + File.separator + "sparkworker.R")
     val outStream: FileWriter = new FileWriter(tempFile)
     outStream.write(source)
     outStream.flush()
@@ -32,7 +47,7 @@ class Rscript(logger: Logger) {
 
     processBuilder.redirectErrorStream(true);
     processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-    processBuilder.directory(scratchDir);
+    processBuilder.directory(getScratchDir());
 
     logger.log("is running custom command: " + commands)
     val process: Process = processBuilder.start()
@@ -52,8 +67,7 @@ class Rscript(logger: Logger) {
     customEnv: Map[String, String],
     options: Map[String, String]) = {
 
-    val sparkConf = SparkEnv.get.conf
-    val command: String = sparkConf.get("spark.r.command", "Rscript")
+    val command: String = getCommand()
 
     val sourceFilePath: String = workerSourceFile()
     logger.log("using source file " + sourceFilePath)
@@ -85,7 +99,7 @@ class Rscript(logger: Logger) {
 
     processBuilder.redirectErrorStream(true);
     processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-    processBuilder.directory(scratchDir);
+    processBuilder.directory(getScratchDir());
 
     logger.log("is starting R process")
     val process: Process = processBuilder.start()
