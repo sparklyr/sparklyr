@@ -265,13 +265,35 @@ livy_statement_new <- function(code, lobj) {
   )
 }
 
+livy_serialized_chunks <- function(serialized, n) {
+  num_chars <- nchar(serialized)
+  start <- seq(1, num_chars, by = n)
+  sapply(seq_along(start), function(i) {
+    end <- if (i < length(start)) start[i + 1] - 1 else num_chars
+    substr(serialized, start[i], end)
+  })
+}
+
 livy_statement_compose <- function(sc, static, class, method, ...) {
   serialized <- livy_invoke_serialize(sc = sc, static = static, object = class, method = method, ...)
+  chunks <- livy_serialized_chunks(serialized, 1000)
 
-  varName <- livy_code_new_return_var(sc)
+  chunk_vars <- list()
+  last_var <- NULL
+  for (i in 1:length(chunks)) {
+    var_name <- livy_code_new_return_var(sc)
+    if (is.null(last_var))
+      chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", "\"", chunks[i], "\"", sep = ""))
+    else
+      chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, " + \"", chunks[i], "\"", sep = ""))
+
+    last_var = var_name
+  }
+
+  var_name <- livy_code_new_return_var(sc)
 
   code <- paste(
-    "var ", varName, " = ",
+    "var ", var_name, " = ",
     "LivyUtils.invokeFromBase64(\"",
     serialized,
     "\")",
@@ -280,7 +302,7 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
 
   livy_statement_new(
     code = code,
-    lobj = livy_jobj_create(sc, varName)
+    lobj = livy_jobj_create(sc, var_name)
   )
 }
 
