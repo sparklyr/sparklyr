@@ -6,7 +6,7 @@ spark_compile_embedded_sources <- function() {
   lines <- c(
     "package sparklyr",
     "",
-    "object Sources {",
+    "class Sources {",
     "  def sources: String = \"\"\"",
     rlines,
     "    \"\"\"",

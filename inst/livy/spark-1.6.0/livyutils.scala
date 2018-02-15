@@ -12,7 +12,6 @@ object LivyUtils {
     "ApplyUtils" -> ApplyUtils,
     "ClassUtils" -> ClassUtils,
     "FileUtils" -> FileUtils,
-    "Sources" -> Sources,
     "WorkerHelper" -> WorkerHelper,
     "WorkerUtils" -> WorkerUtils
   )

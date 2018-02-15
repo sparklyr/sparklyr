@@ -14,8 +14,10 @@ class Rscript(logger: Logger) {
 
   val scratchDir: File = new File(SparkFiles.getRootDirectory)
 
+  val rsources = new Sources()
+
   def workerSourceFile(): String = {
-    val source = Sources.sources
+    val source = rsources.sources
 
     val tempFile: File = new File(scratchDir + File.separator + "sparkworker.R")
     val outStream: FileWriter = new FileWriter(tempFile)

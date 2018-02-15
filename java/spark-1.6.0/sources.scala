@@ -1,6 +1,6 @@
 package sparklyr
 
-object Sources {
+class Sources {
   def sources: String = """
 #' A helper function to retrieve values from \code{spark_config()}
 #'
