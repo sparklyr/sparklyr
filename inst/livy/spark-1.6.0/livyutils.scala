@@ -11,7 +11,13 @@ object LivyUtils {
     "StreamHandler" -> StreamHandler,
     "JVMObjectTracker" -> JVMObjectTracker,
     "Utils" -> Utils,
-    "Repartition" -> Repartition
+    "Repartition" -> Repartition,
+    "ApplyUtils" -> ApplyUtils,
+    "ClassUtils" -> ClassUtils,
+    "FileUtils" -> FileUtils,
+    "Sources" -> Sources,
+    "WorkerHelper" -> WorkerHelper,
+    "WorkerUtils" -> WorkerUtils
   )
 
   def invokeFromBase64(msg: String): String = {
