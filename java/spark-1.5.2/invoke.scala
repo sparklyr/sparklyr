@@ -3,7 +3,7 @@ package sparklyr
 import scala.collection.mutable.HashMap
 import scala.language.existentials
 
-object Invoke {
+class Invoke {
   // Find a matching method signature in an array of signatures of constructors
   // or methods of the same name according to the passed arguments. Arguments
   // may be converted in order to match a signature.

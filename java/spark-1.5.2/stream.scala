@@ -2,13 +2,15 @@ package sparklyr
 
 class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
 
-  import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+  import java.io._
 
   import scala.collection.mutable.HashMap
   import scala.language.existentials
 
   import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
   import io.netty.channel.ChannelHandler.Sharable
+
+  val invoke = new Invoke()
 
   def read(
     msg: Array[Byte],
@@ -63,6 +65,21 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
     bos.toByteArray
   }
 
+  /**
+   * Return a nice string representation of the exception. It will call "printStackTrace" to
+   * recursively generate the stack trace including the exception and its causes.
+   */
+  def exceptionString(e: Throwable): String = {
+    if (e == null) {
+      "No exception information provided."
+    } else {
+      // Use e.printStackTrace here because e.getStackTrace doesn't include the cause
+      val stringWriter = new StringWriter()
+      e.printStackTrace(new PrintWriter(stringWriter))
+      stringWriter.toString
+    }
+  }
+
   def handleMethodCall(
     isStatic: Boolean,
     objId: String,
@@ -92,7 +109,7 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
         }
 
         val args = readArgs(numArgs, dis)
-        val res = Invoke.invoke(cls, objId, obj, methodName, args, logger)
+        val res = invoke.invoke(cls, objId, obj, methodName, args, logger)
 
         serializer.writeInt(dos, 0)
         serializer.writeObject(dos, res.asInstanceOf[AnyRef])
@@ -100,13 +117,13 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
         case e: Exception =>
           logger.logError(s"failed calling $methodName on $objId")
           serializer.writeInt(dos, -1)
-          serializer.writeString(dos, Utils.exceptionString(
+          serializer.writeString(dos, exceptionString(
             if (e.getCause == null) e else e.getCause
           ))
         case e: NoClassDefFoundError =>
           logger.logError(s"failed calling $methodName on $objId with no class dound error")
           serializer.writeInt(dos, -1)
-          serializer.writeString(dos, Utils.exceptionString(
+          serializer.writeString(dos, exceptionString(
             if (e.getCause == null) e else e.getCause
           ))
       }
