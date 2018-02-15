@@ -1,11 +1,9 @@
 package sparklyr
 
 import org.apache.spark._
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql._
 
 class WorkerRDD(
-  prev: RDD[Row],
+  prev: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row],
   closure: Array[Byte],
   columns: Array[String],
   config: String,
@@ -17,14 +15,16 @@ class WorkerRDD(
   connectionTimeout: Int,
   context: Array[Byte],
   options: Map[String, String]
-  ) extends RDD[Row](prev) {
+  ) extends org.apache.spark.rdd.RDD[org.apache.spark.sql.Row](prev) {
+
+  import org.apache.spark._;
 
   private[this] var exception: Option[Exception] = None
   private[this] var backendPort: Int = 0
 
   override def getPartitions = firstParent.partitions
 
-  override def compute(split: Partition, task: TaskContext): Iterator[Row] = {
+  override def compute(split: Partition, task: TaskContext): Iterator[org.apache.spark.sql.Row] = {
 
     val sessionId: Int = scala.util.Random.nextInt(10000)
     val logger = new Logger("Worker", sessionId)
