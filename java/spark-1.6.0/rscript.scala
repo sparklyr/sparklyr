@@ -16,7 +16,7 @@ class Rscript(logger: Logger) {
     new File(rootDir)
   }
 
-  def getSparkConf(): SparkConf {
+  def getSparkConf(): SparkConf = {
     // val sparkConf = SparkEnv.get.conf
     val sparkEnvRoot = Class.forName("org.apache.spark.SparkEnv")
     val selectedMethods = sparkEnvRoot.getMethods.filter(
