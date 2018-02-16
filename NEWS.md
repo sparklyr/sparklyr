@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `sample_frac()` and `sample_n()` now work properly in nontrivial queries (#1299)
+
 - Added support for `spark_apply()` under Livy connections.
 
 - Fixed regression blocking use of response-features syntax in some `ml_` functions (#1302).
