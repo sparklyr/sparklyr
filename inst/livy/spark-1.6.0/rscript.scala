@@ -19,18 +19,22 @@ class Rscript(logger: Logger) {
     new File(rootDir)
   }
 
-  def getCommand(): String = {
+  def getSparkConf(): SparkConf = {
     // val sparkConf = SparkEnv.get.conf
     val sparkEnvRoot = Class.forName("org.apache.spark.SparkEnv")
     val selectedMethods = sparkEnvRoot.getMethods.filter(
-      m => m.getName == "get" && m.getParameterTypes.length == 1
+      m => m.getName == "get" && m.getParameterTypes.length == 0
     )
     val sparkEnv: SparkEnv= selectedMethods(0).invoke(sparkEnvRoot).asInstanceOf[SparkEnv]
 
     val sparkEnvMethods = sparkEnv.getClass.getMethods.filter(
-      m => m.getName == "conf" && m.getParameterTypes.length == 1
+      m => m.getName == "conf" && m.getParameterTypes.length == 0
     )
-    val sparkConf: SparkConf = sparkEnvMethods(0).invoke(sparkEnv).asInstanceOf[SparkConf]
+    sparkEnvMethods(0).invoke(sparkEnv).asInstanceOf[SparkConf]
+  }
+
+  def getCommand(): String = {
+    val sparkConf: SparkConf = getSparkConf()
 
     // val command: String = sparkConf.get("spark.r.command", "Rscript")
     val sparkConfMethods = sparkConf.getClass.getMethods.filter(
