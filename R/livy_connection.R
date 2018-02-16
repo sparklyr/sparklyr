@@ -365,7 +365,10 @@ livy_post_statement <- function(sc, code) {
     ), {
       stop(
         "Failed to execute Livy statement with error: ",
-        statementReponse$output$evalue,
+        if (is.null(statementReponse$output$evalue))
+          jsonlite::toJSON(statementReponse)
+        else
+          statementReponse$output$evalue,
         "\nTraceback: ",
         paste(statementReponse$output$traceback, collapse = "")
       )
