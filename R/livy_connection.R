@@ -281,13 +281,21 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
   chunk_vars <- list()
   last_var <- NULL
   for (i in 1:length(chunks)) {
-    var_name <- livy_code_new_return_var(sc)
-    if (is.null(last_var))
-      chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", "\"", chunks[i], "\"", sep = ""))
-    else
-      chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, " + \"", chunks[i], "\"", sep = ""))
+    if (is.null(last_var)) {
+      var_name <- paste("\"", chunks[i], "\"", sep = "")
+    }
+    else {
+      if (length(chunk_vars) == 0) {
+        var_name <- livy_code_new_return_var(sc)
+        chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, sep = ""))
+        last_var <- var_name
+      }
 
-    last_var = var_name
+      var_name <- livy_code_new_return_var(sc)
+      chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, " + \"", chunks[i], "\"", sep = ""))
+    }
+
+    last_var <- var_name
   }
 
   var_name <- livy_code_new_return_var(sc)
