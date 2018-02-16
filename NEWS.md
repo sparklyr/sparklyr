@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Added support for `spark_apply()` under Livy connections.
+
 - Fixed regression blocking use of response-features syntax in some `ml_` functions (#1302).
 
 - Fixed file not found error in `spark_apply()` while working under low

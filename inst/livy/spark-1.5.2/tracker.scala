@@ -3,16 +3,16 @@
 // Changes to this file will be reverted.
 //
 
-import scala.collection.mutable.{Map, SynchronizedMap, HashMap}
-import scala.language.existentials
+class JVMObjectTracker {
 
-object JVMObjectTracker {
+  import scala.collection.mutable.{Map, SynchronizedMap, HashMap}
+  import scala.language.existentials
 
-  private[this] val objMap = new HashMap[String, Object] with
+  val objMap = new HashMap[String, Object] with
                              SynchronizedMap[String, Object]
 
-  private[this] var objCounter: Int = 0
-  private[this] val lock: AnyRef = new Object()
+  var objCounter: Int = 0
+  val lock: AnyRef = new Object()
 
   def getObject(id: String): Object = {
     objMap(id)

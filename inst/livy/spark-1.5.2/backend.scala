@@ -1,4 +1,7 @@
-package sparklyr
+//
+// This file was automatically generated using livy_sources_refresh()
+// Changes to this file will be reverted.
+//
 
 /*
  * The Backend class is launched from Spark through spark-submit with the following

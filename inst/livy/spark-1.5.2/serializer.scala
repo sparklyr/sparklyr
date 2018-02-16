@@ -3,14 +3,14 @@
 // Changes to this file will be reverted.
 //
 
-import java.io.{DataInputStream, DataOutputStream}
-import java.nio.charset.StandardCharsets
-import java.sql.{Date, Time, Timestamp}
+class Serializer(tracker: JVMObjectTracker) {
+  import java.io.{DataInputStream, DataOutputStream}
+  import java.nio.charset.StandardCharsets
+  import java.sql.{Date, Time, Timestamp}
 
-import scala.collection.JavaConverters._
-import scala.collection.mutable.WrappedArray
+  import scala.collection.JavaConverters._
+  import scala.collection.mutable.WrappedArray
 
-object Serializer {
   type ReadObject = (DataInputStream, Char) => Object
   type WriteObject = (DataOutputStream, Object) => Boolean
 
@@ -44,7 +44,7 @@ object Serializer {
         case 'l' => readList(dis)
         case 'D' => readDate(dis)
         case 't' => readTime(dis)
-        case 'j' => JVMObjectTracker.getObject(readString(dis))
+        case 'j' => tracker.getObject(readString(dis))
         case _ =>
           if (sqlSerDe == null || sqlSerDe._1 == null) {
             throw new IllegalArgumentException (s"Invalid type $dataType")
@@ -156,7 +156,7 @@ object Serializer {
       case 'c' => readStringArr(dis)
       case 'd' => readDoubleArr(dis)
       case 'b' => readBooleanArr(dis)
-      case 'j' => readStringArr(dis).map(x => JVMObjectTracker.getObject(x))
+      case 'j' => readStringArr(dis).map(x => tracker.getObject(x))
       case 'r' => readBytesArr(dis)
       case 'a' => readArrayArr(dis)
       case 'l' => readListArr(dis)
@@ -384,7 +384,7 @@ object Serializer {
   }
 
   def writeJObj(out: DataOutputStream, value: Object): Unit = {
-    val objId = JVMObjectTracker.put(value)
+    val objId = tracker.put(value)
     writeString(out, objId)
   }
 

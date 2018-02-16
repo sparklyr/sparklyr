@@ -265,22 +265,60 @@ livy_statement_new <- function(code, lobj) {
   )
 }
 
+livy_serialized_chunks <- function(serialized, n) {
+  num_chars <- nchar(serialized)
+  start <- seq(1, num_chars, by = n)
+  sapply(seq_along(start), function(i) {
+    end <- if (i < length(start)) start[i + 1] - 1 else num_chars
+    substr(serialized, start[i], end)
+  })
+}
+
 livy_statement_compose <- function(sc, static, class, method, ...) {
   serialized <- livy_invoke_serialize(sc = sc, static = static, object = class, method = method, ...)
+  chunks <- livy_serialized_chunks(serialized, 1000)
 
-  varName <- livy_code_new_return_var(sc)
+  chunk_vars <- list()
+  last_var <- NULL
+  for (i in 1:length(chunks)) {
+    if (is.null(last_var)) {
+      var_name <- paste("\"", chunks[i], "\"", sep = "")
+    }
+    else {
+      if (length(chunk_vars) == 0) {
+        var_name <- livy_code_new_return_var(sc)
+        chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, sep = ""))
+        last_var <- var_name
+      }
+
+      var_name <- livy_code_new_return_var(sc)
+      chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, " + \"", chunks[i], "\"", sep = ""))
+    }
+
+    last_var <- var_name
+  }
+
+  var_name <- livy_code_new_return_var(sc)
+
+  invoke_var <- paste(
+    "var ", var_name, " = ",
+    "LivyUtils.invokeFromBase64(",
+    last_var,
+    ")",
+    sep = ""
+  )
 
   code <- paste(
-    "var ", varName, " = ",
-    "LivyUtils.invokeFromBase64(\"",
-    serialized,
-    "\")",
-    sep = ""
+    c(
+      chunk_vars,
+      invoke_var
+    ),
+    collapse = "\n"
   )
 
   livy_statement_new(
     code = code,
-    lobj = livy_jobj_create(sc, varName)
+    lobj = livy_jobj_create(sc, var_name)
   )
 }
 
@@ -363,7 +401,15 @@ livy_post_statement <- function(sc, code) {
     withr::with_options(list(
       warning.length = 8000
     ), {
-      stop("Failed to execute Livy statement with error: ", statementReponse$output$evalue)
+      stop(
+        "Failed to execute Livy statement with error: ",
+        if (is.null(statementReponse$output$evalue))
+          jsonlite::toJSON(statementReponse)
+        else
+          statementReponse$output$evalue,
+        "\nTraceback: ",
+        paste(statementReponse$output$traceback, collapse = "")
+      )
     })
   }
 
@@ -628,6 +674,18 @@ livy_load_scala_sources <- function(sc) {
     "serializer.scala",
     "stream.scala",
     "repartition.scala",
+    "applyutils.scala",
+    "classutils.scala",
+    "fileutils.scala",
+    "sources.scala",
+    "rscript.scala",
+    "workercontext.scala",
+    "handler.scala",
+    "channel.scala",
+    "backend.scala",
+    "workerrdd.scala",
+    "workerhelper.scala",
+    "workerutils.scala",
     "livyutils.scala"
   )
 
@@ -641,6 +699,8 @@ livy_load_scala_sources <- function(sc) {
 
   lapply(livySourcesFiles[sourceOrder], function(sourceFile) {
     tryCatch({
+      if (sparklyr_boolean_option("sparklyr.verbose")) message("Loading ", basename(sourceFile))
+
       sources <- paste(readLines(sourceFile), collapse = "\n")
 
       statement <- livy_statement_new(sources, NULL)

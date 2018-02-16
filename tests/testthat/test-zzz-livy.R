@@ -33,3 +33,12 @@ test_that("'livy_config()' works with authentication", {
     "Basic Zm9vOmJhcg=="
   )
 })
+
+test_that("'spark_apply()' works under Livy connections", {
+  lc <- testthat_livy_connection()
+
+  df <- data.frame(id = 10)
+  apply_tbl <- sdf_len(lc, 1) %>% spark_apply(function(x) 10)
+
+  expect_equal(apply_tbl %>% collect(), df)
+})

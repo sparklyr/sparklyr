@@ -6,18 +6,22 @@ object LivyUtils {
   // accessed through reflection.
   val globalClassMap = Map(
     "Logger" -> new Logger("", 0),
-    "Serializer" -> Serializer,
     "SQLUtils" -> SQLUtils,
-    "StreamHandler" -> StreamHandler,
-    "JVMObjectTracker" -> JVMObjectTracker,
     "Utils" -> Utils,
-    "Repartition" -> Repartition
+    "Repartition" -> Repartition,
+    "ApplyUtils" -> ApplyUtils,
+    "WorkerHelper" -> WorkerHelper,
+    "WorkerUtils" -> WorkerUtils
   )
+
+  val tracker = new JVMObjectTracker()
+  val serializer = new Serializer(tracker)
+  val streamHandler = new StreamHandler(serializer, tracker)
 
   def invokeFromBase64(msg: String): String = {
 
     val decoded: Array[Byte] = DatatypeConverter.parseBase64Binary(msg)
-    val result = StreamHandler.read(
+    val result = streamHandler.read(
       decoded,
       globalClassMap,
       new Logger("", 0),

@@ -1,4 +1,7 @@
-package sparklyr
+//
+// This file was automatically generated using livy_sources_refresh()
+// Changes to this file will be reverted.
+//
 
 class Rscript(logger: Logger) {
   import java.io.{File, FileWriter}

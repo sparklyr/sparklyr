@@ -1,4 +1,7 @@
-package sparklyr
+//
+// This file was automatically generated using livy_sources_refresh()
+// Changes to this file will be reverted.
+//
 
 class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializer, tracker: JVMObjectTracker) {
 
