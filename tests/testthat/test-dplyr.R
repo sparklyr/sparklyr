@@ -90,9 +90,27 @@ test_that("the implementation of 'sample_frac' functions returns a sample", {
 
   # As of Spark 2.1.0, sampling functions are not exact.
   expect_lt(
-    iris_tbl %>% sample_frac(0.2) %>% collect() %>% nrow(),
+    iris_tbl %>% select(Petal_Length) %>%
+      sample_frac(0.2) %>% collect() %>% nrow(),
     nrow(iris)
   )
+
+  expect_lt(
+    iris_tbl %>% select(Petal_Length) %>%
+      sample_n(10) %>% collect() %>% nrow(),
+    nrow(iris)
+  )
+})
+
+test_that("'sample_n' and 'sample_frac' work in nontrivial queries (#1299)", {
+  test_requires_version("2.0.0", "sample_n() support")
+  test_requires("dplyr")
+
+  expect_lt(
+    iris_tbl %>% sample_n(10) %>% collect() %>% nrow(),
+    nrow(iris)
+  )
+
 })
 
 test_that("'sdf_broadcast' forces broadcast hash join", {

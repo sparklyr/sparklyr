@@ -5,11 +5,15 @@
 #' @importFrom dbplyr select_query
 sql_build.op_sample_n <- function(op, con, ...) {
   select_query(
-    from = sql(paste(
-      sql_build(op$x, con = con),
-      " TABLESAMPLE (",
-      as.integer(op$args$size),
-      " rows)", sep = "")),
+    from = sql(
+      sql_render(op$x, con = con),
+      sql(paste0(" TABLESAMPLE (",
+                 as.integer(op$args$size),
+                 " rows) ", collapse = ""))
+    ) %>%
+      as.character() %>%
+      paste0(collapse = "") %>%
+      sql(),
     select = build_sql("*")
   )
 }
@@ -19,11 +23,15 @@ sql_build.op_sample_n <- function(op, con, ...) {
 #' @importFrom dbplyr select_query
 sql_build.op_sample_frac <- function(op, con, ...) {
   select_query(
-    from = sql(paste(
-      sql_build(op$x, con = con),
-      " TABLESAMPLE (",
-      op$args$size * 100,
-      " PERCENT)", sep = "")),
+    from = sql(
+      sql_render(op$x, con = con),
+      sql(paste0(" TABLESAMPLE (",
+                 op$args$size * 100,
+                 " PERCENT)", collapse = ""))
+    ) %>%
+      as.character() %>%
+      paste0(collapse = "") %>%
+      sql(),
     select = build_sql("*")
   )
 }
