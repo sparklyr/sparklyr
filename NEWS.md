@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Support the `sdf_predict(ml_transformer, dataset)` signature with a deprecation warning. Also added a deprecation warning to the usage of `sdf_predict(ml_model, dataset)`. (#1287)
+
 - `sample_frac()` and `sample_n()` now work properly in nontrivial queries (#1299)
 
 - Added support for `spark_apply()` under Livy connections.
