@@ -8,7 +8,7 @@
 #'
 #' @details Supported languages: danish, dutch, english, finnish, french,
 #'   german, hungarian, italian, norwegian, portuguese, russian, spanish,
-#'   swedish, turkish. See \url{http://anoncvs.postgresql.org/cvsweb.cgi/pgsql/src/backend/snowball/stopwords/}
+#'   swedish, turkish. Defaults to English. See \url{http://anoncvs.postgresql.org/cvsweb.cgi/pgsql/src/backend/snowball/stopwords/}
 #'   for more details
 #'
 #' @return A list of stop words.
@@ -16,7 +16,7 @@
 #' @seealso \code{\link{ft_stop_words_remover}}
 #' @export
 ml_default_stop_words <- function(
-  sc, language = c("danish", "dutch", "english", "finnish",
+  sc, language = c("english", "danish", "dutch", "finnish",
                    "french", "german", "hungarian", "italian",
                    "norwegian", "portuguese", "russian", "spanish",
                    "swedish", "turkish"), ...) {
