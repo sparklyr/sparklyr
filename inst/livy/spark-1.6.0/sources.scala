@@ -909,6 +909,7 @@ spark_worker_apply <- function(sc) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
 
+    data$stringsAsFactors <- FALSE
     df <- do.call(rbind.data.frame, data)
     result <- NULL
 
