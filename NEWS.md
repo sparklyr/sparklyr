@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Fixed data frame provided by `spark_apply()` to not provide characters not factors (#1313).
+
 - `ml_default_stop_words()` now returns English stop words by default (#1280).
 
 - Support the `sdf_predict(ml_transformer, dataset)` signature with a deprecation warning. Also added a deprecation warning to the usage of `sdf_predict(ml_model, dataset)`. (#1287)
