@@ -271,16 +271,13 @@ sdf_mutate_ <- function(.data, ..., .dots) {
 
     # construct a new call with the input variable injected
     # for evaluation
-    preamble <- list(
+    preamble <- c(list(
       lazy_expr[[1]],        # function
-      data,                  # data
+      data,                  # data,
       output_col=output_col  # output column
-    )
+    ), inputs)               # inputs
 
-    call <- as.call(c(
-      preamble,
-      unlist(inputs)         # parsed (and evaluated if applicable), inputs
-    ))
+    call <- as.call(preamble)
 
     # evaluate call
     data <- eval(call, envir = lazy_env)
