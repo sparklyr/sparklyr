@@ -241,7 +241,7 @@ sdf_mutate <- function(.data, ...) {
 
 #' @name sdf_mutate
 #' @export
-#' @importFrom lazyeval all_dots
+#' @importFrom lazyeval all_dots is_atomic
 sdf_mutate_ <- function(.data, ..., .dots) {
   dots <- all_dots(.dots, ..., all_named = TRUE)
   data <- .data
@@ -260,8 +260,8 @@ sdf_mutate_ <- function(.data, ..., .dots) {
                      function(el) {
                        if (is.call(el)) {
                          eval(el, envir = lazy_env)
-                       } else if (is.numeric(lazy_expr))
-                         lazy_expr
+                       } else if (is_atomic(el))
+                         el
                        else {
                          as.character(el)
                        }
