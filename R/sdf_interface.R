@@ -241,7 +241,7 @@ sdf_mutate <- function(.data, ...) {
 
 #' @name sdf_mutate
 #' @export
-#' @importFrom lazyeval all_dots
+#' @importFrom lazyeval all_dots is_atomic
 sdf_mutate_ <- function(.data, ..., .dots) {
   dots <- all_dots(.dots, ..., all_named = TRUE)
   data <- .data
@@ -252,30 +252,32 @@ sdf_mutate_ <- function(.data, ..., .dots) {
     lazy_expr <- dots[[i]]$expr
     lazy_env  <- dots[[i]]$env
 
-    # figure out the input column -- we aren't being very
-    # principled about non-standard evaluation here
-    el <- lazy_expr[[2]]
-    input_col <- if (is.call(el)) {
-      eval(el, envir = lazy_env)
-    } else {
-      as.character(el)
-    }
+    # parse inputs now since some may need to be evaluated in
+    # the local R environment and others maybe spark DataFrame
+    # column names
+    inputs <- as.list(lazy_expr[-1])
+    inputs <- lapply(inputs,
+                     function(el) {
+                       if (is.call(el)) {
+                         eval(el, envir = lazy_env)
+                       } else if (is_atomic(el))
+                         el
+                       else {
+                         as.character(el)
+                       }
+                     })
 
     output_col <- as.character(names(dots)[[i]])
 
     # construct a new call with the input variable injected
     # for evaluation
-    preamble <- list(
-      lazy_expr[[1]], # function
-      data,           # data
-      input_col,      # input column
-      output_col      # output column
-    )
+    preamble <- c(list(
+      lazy_expr[[1]],        # function
+      data,                  # data,
+      output_col=output_col  # output column
+    ), inputs)               # inputs
 
-    call <- as.call(c(
-      preamble,
-      as.list(lazy_expr[-c(1, 2)])
-    ))
+    call <- as.call(preamble)
 
     # evaluate call
     data <- eval(call, envir = lazy_env)
