@@ -1,4 +1,32 @@
-# Sparklyr 0.7 (UNRELEASED)
+# Sparklyr 0.7.1 (UNRELEASED)
+
+- Fixed data frame provided by `spark_apply()` to not provide characters not factors (#1313).
+
+- `ml_default_stop_words()` now returns English stop words by default (#1280).
+
+- Support the `sdf_predict(ml_transformer, dataset)` signature with a deprecation warning. Also added a deprecation warning to the usage of `sdf_predict(ml_model, dataset)`. (#1287)
+
+- `sample_frac()` and `sample_n()` now work properly in nontrivial queries (#1299)
+
+- Added support for `spark_apply()` under Livy connections.
+
+- Fixed regression blocking use of response-features syntax in some `ml_` functions (#1302).
+
+- Fixed file not found error in `spark_apply()` while working under low
+  disk space.
+
+- Fixed regression blocking use of `ml_kmeans()` in Spark 1.6.x.
+
+- Fixed regression blocking use of `livy.session.start.timeout` parameter
+  in Livy connections.
+
+- Added support for `sparklyr.apply.options.rscript.before` to run a custom
+  command before launching the R worker role.
+
+- Added support for `sparklyr.apply.options.vanilla` to be set to `FALSE`
+  to avoid using `--vanilla` while launching R worker role.
+
+# Sparklyr 0.7
 
 - Added support for Spark 2.2.1.
 
