@@ -161,7 +161,7 @@ and its aggregates may exceed this size. Defaults to 256.</p></td>
     </tr>
     <tr>
       <td>...</td>
-      <td><p>Optional arguments; currently unused.</p></td>
+      <td><p>Optional arguments; see Details.</p></td>
     </tr>
     <tr>
       <td>type</td>
@@ -201,7 +201,8 @@ then regression is used; classification otherwise.</p></td>
     
     <h2 id="details">Details</h2>
 
-    <p>The supported options for <code>feature_subset_strategy</code> are</p><ul>
+    <p>When <code>x</code> is a <code>tbl_spark</code> and <code>formula</code> (alternatively, <code>response</code> and <code>features</code>) is specified, the function returns a <code>ml_model</code> object wrapping a <code>ml_pipeline_model</code> which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument <code>predicted_label_col</code> (defaults to <code>"predicted_label"</code>) can be used to specify the name of the predicted label column. In addition to the fitted <code>ml_pipeline_model</code>, <code>ml_model</code> objects also contain a <code>ml_pipeline</code> object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by <code><a href='ml-persistence.html'>ml_save</a></code> with <code>type = "pipeline"</code> to faciliate model refresh workflows.</p>
+<p>The supported options for <code>feature_subset_strategy</code> are</p><ul>
 <li><p><code>"auto"</code>: Choose automatically for task: If <code>num_trees == 1</code>, set to <code>"all"</code>. If <code>num_trees &gt; 1</code> (forest), set to <code>"sqrt"</code> for classification and to <code>"onethird"</code> for regression.</p></li>
 <li><p><code>"all"</code>: use all features</p></li>
 <li><p><code>"onethird"</code>: use 1/3 of the features</p></li>

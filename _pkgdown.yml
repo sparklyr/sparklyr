@@ -6,8 +6,8 @@ template:
 site:
 - source: README.md
   target: content/_index.md
-- source: vignettes/guides-dplyr.Rmd
-  target: content/dplyr.Rmd
+- source: vignettes/guides-dplyr.md
+  target: content/dplyr.md
 - source: vignettes/guides-dplyr_files/
   target: static/dplyr/guides-dplyr_files/
 - source: vignettes/guides-mllib.md
@@ -20,6 +20,8 @@ site:
   target: content/guides/textmining.md
 - source: vignettes/guides-textmining_files/
   target: static/guides/textmining/guides-textmining_files/
+- source: vignettes/guides-pipelines.md
+  target: content/guides/pipelines.md
 - source: vignettes/guides-h2o.md
   target: content/guides/h2o.md
 - source: vignettes/guides-h2o_files/

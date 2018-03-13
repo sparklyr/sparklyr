@@ -6,14 +6,14 @@ aliases:
 
 
 
-<section id="deployment" class="level2">
+<div id="deployment" class="section level2">
 <h2>Deployment</h2>
 <p>There are two well supported deployment modes for <strong>sparklyr</strong>:</p>
 <ul>
 <li>Local — Working on a local desktop typically with smaller/sampled datasets</li>
 <li>Cluster — Working directly within or alongside a Spark cluster (<a href="http://spark.apache.org/docs/latest/spark-standalone.html">standalone</a>, <a href="http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/index.html">YARN</a>, <a href="http://mesos.apache.org/">Mesos</a>, etc.)</li>
 </ul>
-<section id="local-deployment" class="level3">
+<div id="local-deployment" class="section level3">
 <h3>Local Deployment</h3>
 <p>Local mode is an excellent way to learn and experiment with Spark. Local mode also provides a convenient development environment for analyses, reports, and applications that you plan to eventually deploy to a multi-node Spark cluster.</p>
 <p>To work in local mode you should first install a version of Spark for local use. You can do this using the <a href="/reference/spark_install">spark_install</a> function, for example:</p>
@@ -22,8 +22,8 @@ aliases:
 <pre class="r"><code>library(sparklyr)
 sc &lt;- spark_connect(master = &quot;local&quot;)</code></pre>
 <p>For the local development scenario, see the <a href="#configuration">Configuration</a> section below for details on how to have the same code work seamlessly in both development and production environments.</p>
-</section>
-<section id="cluster-deployment" class="level3">
+</div>
+<div id="cluster-deployment" class="section level3">
 <h3>Cluster Deployment</h3>
 <p>A common deployment strategy is to submit your application from a gateway machine that is physically co-located with your worker machines (e.g. Master node in a standalone EC2 cluster). In this setup, client mode is appropriate. In client mode, the driver is launched directly within the spark-submit process which acts as a client to the cluster. The input and output of the application is attached to the console. Thus, this mode is especially suitable for applications that involve the REPL (e.g. Spark shell). For more information see <a href="http://spark.apache.org/docs/latest/submitting-applications.html">Submitting Applications</a>.</p>
 <p>To use spaklyr with a Spark cluster you should locate your R session on a machine that is either directly on one of the cluster nodes or is close to the cluster (for networking performance). In the case where R is not running directly on the cluster you should also ensure that the machine has a Spark version and configuration <strong>identical</strong> to that of the cluster nodes.</p>
@@ -40,8 +40,8 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;)</code></pre>
 <pre class="r"><code>library(sparklyr)
 cluster_url &lt;- system(&#39;cat /root/spark-ec2/cluster-url&#39;, intern=TRUE)
 sc &lt;- spark_connect(master = cluster_url)</code></pre>
-</section>
-<section id="livy-connections" class="level3">
+</div>
+<div id="livy-connections" class="section level3">
 <h3>Livy Connections</h3>
 <p><a href="http://livy.io/">Livy</a>, <em>“An Open Source REST Service for Apache Spark (Apache License)”</em> , is available starting in <code>sparklyr 0.5</code> as an <strong>experimental</strong> feature. Among many scenarios, this enables connections from the RStudio desktop to Apache Spark when Livy is available and correctly configured in the remote cluster.</p>
 <p>To work with Livy locally, <code>sparklyr</code> supports <code>livy_install()</code> which installs Livy in your local environment, this is similar to <code>spark_install()</code>. Since Livy is a service to enable remote connections into Apache Spark, the service needs to be started with <code>livy_service_start()</code>. Once the service is running, <code>spark_connect()</code> needs to reference the running service and use <code>method = &quot;Livy&quot;</code>, then <code>sparklyr</code> can be used as usual. A short example follows:</p>
@@ -53,16 +53,16 @@ copy_to(sc, iris)
 
 spark_disconnect(sc)
 livy_service_stop()</code></pre>
-</section>
-<section id="connection-tools" class="level3">
+</div>
+<div id="connection-tools" class="section level3">
 <h3>Connection Tools</h3>
 <p>You can view the Spark web UI via the <a href="/reference/spark_web">spark_web</a> function, and view the Spark log via the <a href="/reference/spark_log">spark_log</a> function:</p>
 <pre class="r"><code>spark_web(sc)
 spark_log(sc)</code></pre>
 <p>You can disconnect from Spark using the <a href="/reference/spark-connections/">spark_disconnect</a> function:</p>
 <pre class="r"><code>spark_disconnect(sc)</code></pre>
-</section>
-<section id="collect" class="level3">
+</div>
+<div id="collect" class="section level3">
 <h3>Collect</h3>
 <p>The <code>collect</code> function transfers data from Spark into R. The data are collected from a cluster environment and transfered into local R memory. In the process, all data is first transfered from executor nodes to the driver node. Therefore, the driver node must have enough memory to collect all the data.</p>
 <p>Collecting data on the driver node is relatively slow. The process also inflates the data as it moves from the executor nodes to the driver node. Caution should be used when collecting large data.</p>
@@ -75,19 +75,19 @@ spark_log(sc)</code></pre>
 <li>spark.yarn.driver.memoryOverhead</li>
 <li>spark.driver.maxResultSize</li>
 </ul>
-</section>
-</section>
-<section id="configuration" class="level2">
+</div>
+</div>
+<div id="configuration" class="section level2">
 <h2>Configuration</h2>
 <p>This section describes the various options available for configuring both the behavior of the <strong>sparklyr</strong> package as well as the underlying Spark cluster. Creating multiple configuration profiles (e.g. development, test, production) is also covered.</p>
-<section id="config-files" class="level3">
+<div id="config-files" class="section level3">
 <h3>Config Files</h3>
 <p>The configuration for a Spark connection is specified via the <code>config</code> parameter of the <a href="/reference/spark-connections/">spark_connect</a> function. By default the configuration is established by calling the <a href="/reference/spark_config/">spark_config</a> function. This code represents the default behavior:</p>
 <pre class="r"><code>spark_connect(master = &quot;local&quot;, config = spark_config())</code></pre>
 <p>By default the <a href="/reference/sparklyr/latest/spark_config.html">spark_config</a> function reads configuration data from a file named <code>config.yml</code> located in the current working directory (or in parent directories if not located in the working directory). This file is not required and only need be provided for overriding default behavior. You can also specify an alternate config file name and/or location.</p>
 <p>The <code>config.yml</code> file is in turn processed using the <a href="https://github.com/rstudio/config">config</a> package, which enables support for multiple named configuration profiles.</p>
-</section>
-<section id="package-options" class="level3">
+</div>
+<div id="package-options" class="section level3">
 <h3>Package Options</h3>
 <p>There are a number of options available to configure the behavior of the sparklyr package:</p>
 <p>For example, this configuration file sets the number of local cores to 4 and the amount of memory allocated for the Spark driver to 4G:</p>
@@ -95,12 +95,12 @@ spark_log(sc)</code></pre>
   sparklyr.cores.local: 4
   sparklyr.shell.driver-memory: 4G</code></pre>
 <p>Note that the use of <code>default</code> will be explained below in <a href="#multiple-profiles">Multiple Profiles</a>.</p>
-<section id="spark" class="level4">
+<div id="spark" class="section level4">
 <h4>Spark</h4>
 <table>
 <colgroup>
-<col style="width: 38%" />
-<col style="width: 61%" />
+<col width="38%" />
+<col width="61%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -115,13 +115,13 @@ spark_log(sc)</code></pre>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="runtime" class="level4">
+</div>
+<div id="runtime" class="section level4">
 <h4>Runtime</h4>
 <table>
 <colgroup>
-<col style="width: 38%" />
-<col style="width: 61%" />
+<col width="38%" />
+<col width="61%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -148,13 +148,13 @@ spark_log(sc)</code></pre>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="diagnostics" class="level4">
+</div>
+<div id="diagnostics" class="section level4">
 <h4>Diagnostics</h4>
 <table>
 <colgroup>
-<col style="width: 38%" />
-<col style="width: 61%" />
+<col width="38%" />
+<col width="61%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -185,15 +185,15 @@ spark_log(sc)</code></pre>
 </tr>
 </tbody>
 </table>
-</section>
-</section>
-<section id="spark-options" class="level3">
+</div>
+</div>
+<div id="spark-options" class="section level3">
 <h3>Spark Options</h3>
 <p>You can also use <code>config.yml</code> to specify arbitrary Spark configuration properties:</p>
 <table>
 <colgroup>
-<col style="width: 20%" />
-<col style="width: 79%" />
+<col width="20%" />
+<col width="79%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -216,15 +216,15 @@ spark_log(sc)</code></pre>
 <pre class="yaml"><code>default:
   spark.local.dir: /tmp/spark-scratch
   spark.sql.shuffle.partitions: 100</code></pre>
-</section>
-<section id="user-options" class="level3">
+</div>
+<div id="user-options" class="section level3">
 <h3>User Options</h3>
 <p>You can also include arbitrary custom user options within the <code>config.yml</code> file. These can be named anything you like so long as they <em>do not</em> use either <code>spark</code> or <code>sparklyr</code> as a prefix. For example, this configuration file defines <code>dataset</code> and <code>sample-size</code> options:</p>
 <pre class="yaml"><code>default:
   dataset: &quot;observations.parquet&quot;
   sample-size: 10000</code></pre>
-</section>
-<section id="multiple-profiles" class="level3">
+</div>
+<div id="multiple-profiles" class="section level3">
 <h3>Multiple Profiles</h3>
 <p>The <a href="https://github.com/rstudio/config">config</a> package enables the definition of multiple named configuration profiles for different environments (e.g. default, test, production). All environments automatically inherit from the <code>default</code> environment and can optionally also inherit from each other.</p>
 <p>For example, you might want to use a distinct datasets for development and testing or might want to use custom Spark configuration properties that are only applied when running on a production cluster. Here’s how that would be expressed in <code>config.yml</code>:</p>
@@ -246,8 +246,8 @@ production:
 <p>With this configuration, you can omit the <code>master</code> argument entirely from the call to <a href="/reference/spark-connections/">spark_connect</a>:</p>
 <pre class="r"><code>sc &lt;- spark_connect()</code></pre>
 <p>Note that the currently active configuration is determined via the value of <code>R_CONFIG_ACTIVE</code> environment variable. See the <a href="https://github.com/rstudio/config">config package documentation</a> for additional details.</p>
-</section>
-<section id="tuning" class="level3">
+</div>
+<div id="tuning" class="section level3">
 <h3>Tuning</h3>
 <p>In general, you will need to tune a Spark cluster for it to perform well. Spark applications tend to consume a lot of resources. There are many knobs to control the performance of Yarn and executor (i.e. worker) nodes in a cluster. Some of the parameters to pay attention to are as follows:</p>
 <ul>
@@ -259,7 +259,7 @@ production:
 <li>spark.executor.cores</li>
 <li>spark.executor.instances (if is not enabled)</li>
 </ul>
-<section id="example-config" class="level4">
+<div id="example-config" class="section level4">
 <h4>Example Config</h4>
 <p>Here is an example spark configuration for an EMR cluster on AWS with 1 master and 2 worker nodes. Eache node has 8 vCPU and 61 GiB of memory.</p>
 <table>
@@ -305,34 +305,34 @@ production:
 </tbody>
 </table>
 <p>Configuration parameters can be set in the config R object or can be set in the <code>config.yml</code>. Alternatively, they can be set in the <code>spark-defaults.conf</code>.</p>
-<section id="configuration-in-r-script" class="level5">
+<div id="configuration-in-r-script" class="section level5">
 <h5>Configuration in R script</h5>
 <pre class="r"><code>config &lt;- spark_config()
 config$spark.executor.cores &lt;- 2
 config$spark.executor.memory &lt;- &quot;4G&quot;
 sc &lt;- spark_connect(master = &quot;yarn-client&quot;, config = config, version = &#39;2.0.0&#39;)</code></pre>
-</section>
-<section id="configuration-in-yaml-script" class="level5">
+</div>
+<div id="configuration-in-yaml-script" class="section level5">
 <h5>Configuration in YAML script</h5>
 <pre class="yaml"><code>default:
   spark.executor.cores: 2
   spark.executor.memory: 4G</code></pre>
-</section>
-</section>
-</section>
-</section>
-<section id="rstudio-server" class="level2">
+</div>
+</div>
+</div>
+</div>
+<div id="rstudio-server" class="section level2">
 <h2>RStudio Server</h2>
 <p>RStudio Server provides a web-based IDE interface to a remote R session, making it ideal for use as a front-end to a Spark cluster. This section covers some additional configuration options that are useful for RStudio Server.</p>
-<section id="connection-options" class="level3">
+<div id="connection-options" class="section level3">
 <h3>Connection Options</h3>
 <p>The RStudio IDE Spark pane provides a <strong>New Connection</strong> dialog to assist in connecting with both local instances of Spark and Spark clusters:</p>
 <p><img src="/images/deployment/overview/connect-to-spark.png" width=486 /></p>
 <p>You can configure which connection choices are presented using the <code>rstudio.spark.connections</code> option. By default, users are presented with possibility of both local and cluster connections, however, you can modify this behavior to present only one of these, or even a specific Spark master URL. Some commonly used combinations of connection choices include:</p>
 <table>
 <colgroup>
-<col style="width: 38%" />
-<col style="width: 61%" />
+<col width="38%" />
+<col width="61%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -361,12 +361,12 @@ sc &lt;- spark_connect(master = &quot;yarn-client&quot;, config = config, versio
 </table>
 <p>This option should generally be set within <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html">Rprofile.site</a>. For example:</p>
 <pre class="r"><code>options(rstudio.spark.connections = &quot;spark://local:7077&quot;)</code></pre>
-</section>
-<section id="spark-installations" class="level3">
+</div>
+<div id="spark-installations" class="section level3">
 <h3>Spark Installations</h3>
 <p>If you are running within local mode (as opposed to cluster mode) you may want to provide pre-installed Spark version(s) to be shared by all users of the server. You can do this by installing Spark versions within a shared directory (e.g. <code>/opt/spark</code>) then designating it as the Spark installation directory.</p>
 <p>For example, after installing one or more versions of Spark to <code>/opt/spark</code> you would add the following to <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html">Rprofile.site</a>:</p>
 <pre class="r"><code>options(spark.install.dir = &quot;/opt/spark&quot;)</code></pre>
 <p>If this directory is read-only for ordinary users then RStudio will not offer installation of additional versions, which will help guide users to a version that is known to be compatible with versions of Spark deployed on clusters in the same organization.</p>
-</section>
-</section>
+</div>
+</div>

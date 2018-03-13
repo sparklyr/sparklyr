@@ -1,7 +1,7 @@
 ---
 title: "Invoke a Method on a JVM Object"
 aliases:
-  - reference/sparklyr/latest/invoke.html
+  - reference/sparklyr/latest/invoke
 ---
 
     <div class="doc-page">
@@ -75,8 +75,8 @@ mechanism for invoking various Java object methods directly from <span style="R"
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
-<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"spark://HOST:PORT"</span>)
-<span class='fu'><a href='spark-api.html'>spark_context</a></span>(<span class='no'>sc</span>) <span class='kw'>%&gt;%</span>
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"spark://HOST:PORT"</span>)
+<span class='fu'><a href='spark-api'>spark_context</a></span>(<span class='no'>sc</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>invoke</span>(<span class='st'>"textFile"</span>, <span class='st'>"file.csv"</span>, <span class='fl'>1L</span>) <span class='kw'>%&gt;%</span>
     <span class='fu'>invoke</span>(<span class='st'>"count"</span>)</div><div class='input'>
 </div></code></pre></div>

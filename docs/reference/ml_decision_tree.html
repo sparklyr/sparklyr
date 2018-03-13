@@ -146,7 +146,7 @@ and its aggregates may exceed this size. Defaults to 256.</p></td>
     </tr>
     <tr>
       <td>...</td>
-      <td><p>Optional arguments; currently unused.</p></td>
+      <td><p>Optional arguments; see Details.</p></td>
     </tr>
     <tr>
       <td>type</td>
@@ -190,7 +190,8 @@ then regression is used; classification otherwise.</p></td>
     
     <h2 id="details">Details</h2>
 
-    <p><code>ml_decision_tree</code> is a wrapper around <code>ml_decision_tree_regressor.tbl_spark</code> and <code>ml_decision_tree_classifier.tbl_spark</code> and calls the appropriate method based on model type.</p>
+    <p>When <code>x</code> is a <code>tbl_spark</code> and <code>formula</code> (alternatively, <code>response</code> and <code>features</code>) is specified, the function returns a <code>ml_model</code> object wrapping a <code>ml_pipeline_model</code> which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument <code>predicted_label_col</code> (defaults to <code>"predicted_label"</code>) can be used to specify the name of the predicted label column. In addition to the fitted <code>ml_pipeline_model</code>, <code>ml_model</code> objects also contain a <code>ml_pipeline</code> object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by <code><a href='ml-persistence.html'>ml_save</a></code> with <code>type = "pipeline"</code> to faciliate model refresh workflows.
+    <code>ml_decision_tree</code> is a wrapper around <code>ml_decision_tree_regressor.tbl_spark</code> and <code>ml_decision_tree_classifier.tbl_spark</code> and calls the appropriate method based on model type.</p>
     
     <h2 id="see-also">See also</h2>
 

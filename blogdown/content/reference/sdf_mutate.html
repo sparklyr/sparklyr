@@ -1,7 +1,7 @@
 ---
 title: "Mutate a Spark DataFrame"
 aliases:
-  - reference/sparklyr/latest/sdf_mutate.html
+  - reference/sparklyr/latest/sdf_mutate
 ---
 
     <div class="doc-page">
@@ -19,7 +19,7 @@ aliases:
     <div class="doc-page-body">
 
     
-    <p>Use Spark's <a href='http://spark.apache.org/docs/latest/ml-features.html'>feature transformers</a>
+    <p>Use Spark's <a href='http://spark.apache.org/docs/latest/ml-features'>feature transformers</a>
 to mutate a Spark DataFrame.</p>
     
 
@@ -71,14 +71,14 @@ the <span style="R">R</span> level, these operations will only be executed when 
 <span class='no'>beaver_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>copy_to</span>(<span class='no'>sc</span>, <span class='no'>beaver1</span>, <span class='st'>"beaver"</span>)
 <span class='no'>beaver_tbl</span> <span class='kw'>%&gt;%</span>
   <span class='fu'>mutate</span>(<span class='kw'>squared</span> <span class='kw'>=</span> <span class='no'>temp</span> ^ <span class='fl'>2</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'>sdf_mutate</span>(<span class='kw'>warm</span> <span class='kw'>=</span> <span class='fu'><a href='ft_binarizer.html'>ft_binarizer</a></span>(<span class='no'>squared</span>, <span class='fl'>1000</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='sdf_register.html'>sdf_register</a></span>(<span class='st'>"mutated"</span>)
+  <span class='fu'>sdf_mutate</span>(<span class='kw'>warm</span> <span class='kw'>=</span> <span class='fu'><a href='ft_binarizer'>ft_binarizer</a></span>(<span class='no'>squared</span>, <span class='fl'>1000</span>)) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='sdf_register'>sdf_register</a></span>(<span class='st'>"mutated"</span>)
 
 <span class='co'># view our newly constructed tbl</span>
 <span class='fu'>head</span>(<span class='no'>beaver_tbl</span>)
 
 <span class='co'># note that we have two separate tbls registered</span>
-<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_tbls.html'>src_tbls</a></span>(<span class='no'>sc</span>)
+<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_tbls'>src_tbls</a></span>(<span class='no'>sc</span>)
 <span class='co'># }</span></code></pre></div>
     </div>
 

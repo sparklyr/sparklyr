@@ -32,7 +32,13 @@ aliases:
   <span class='kw'>keep_last_checkpoint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>learning_decay</span> <span class='kw'>=</span> <span class='fl'>0.51</span>,
   <span class='kw'>learning_offset</span> <span class='kw'>=</span> <span class='fl'>1024</span>, <span class='kw'>optimize_doc_concentration</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>topic_distribution_col</span> <span class='kw'>=</span> <span class='st'>"topicDistribution"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"lda_"</span>), <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"lda_"</span>), <span class='no'>...</span>)
+
+<span class='fu'>ml_describe_topics</span>(<span class='no'>model</span>, <span class='kw'>max_terms_per_topic</span> <span class='kw'>=</span> <span class='fl'>10L</span>)
+
+<span class='fu'>ml_log_likelihood</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)
+
+<span class='fu'>ml_log_perplexity</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)</code></pre></div>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -112,6 +118,18 @@ reproducible across repeated calls.</p></td>
       <td>...</td>
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
+    <tr>
+      <td>model</td>
+      <td><p>A fitted LDA model returned by <code>ml_lda()</code>.</p></td>
+    </tr>
+    <tr>
+      <td>max_terms_per_topic</td>
+      <td><p>Maximum number of terms to collect for each topic. Default value of 10.</p></td>
+    </tr>
+    <tr>
+      <td>dataset</td>
+      <td><p>test corpus to use for calculating log likelihood or log perplexity</p></td>
+    </tr>
     </table>
     
     <h2 id="value">Value</h2>
@@ -129,8 +147,10 @@ reproducible across repeated calls.</p></td>
     <code>RFormula</code> transformer before being fit by
     the estimator. The object returned in this case is a <code>ml_model</code> which is a
     wrapper of a <code>ml_pipeline_model</code>. This signature does not apply to <code>ml_lda()</code>.</p></li>
-</ul>
+</ul><p><code>ml_describe_topics</code> returns a DataFrame with topics and their top-weighted terms.
 
+<code>ml_log_likelihood</code> calculates a lower bound on the log likelihood of
+  the entire corpus</p>
     
     <h2 id="details">Details</h2>
 
