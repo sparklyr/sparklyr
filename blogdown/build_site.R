@@ -5,7 +5,7 @@ library(stringr)
 library(crayon)
 library(yaml)
 
-rebuild_site <- function(overwrite = FALSE, skip_reference = TRUE){
+rebuild_site <- function(overwrite = TRUE, skip_reference = FALSE){
 
   process_content(overwrite = overwrite)
   if(!skip_reference) process_reference(overwrite = overwrite)
@@ -164,9 +164,9 @@ process_reference <- function(overwrite = FALSE){
     overwrite = TRUE
   )
 
-  # cleanup-reference makes changes to the content of the Reference pages only
-  # site_setup()$`cleanup-reference` %>%
-  #   walk(~replace_text_folder(target_path("content/reference"), .x[[1]], .x[[2]], .x[[3]]))
+#build cleanup-reference makes changes to the content of the Reference pages only
+   site_setup()$`cleanup-reference` %>%
+     walk(~replace_text_folder(target_path("content/reference"), .x[[1]], .x[[2]], .x[[3]]))
 
 }
 

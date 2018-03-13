@@ -1,7 +1,7 @@
 ---
 title: "Spark ML -- Latent Dirichlet Allocation"
 aliases:
-  - reference/sparklyr/latest/ml_lda.html
+  - reference/sparklyr/latest/ml_lda
 ---
 
     <div class="doc-page">
@@ -32,7 +32,13 @@ aliases:
   <span class='kw'>keep_last_checkpoint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>learning_decay</span> <span class='kw'>=</span> <span class='fl'>0.51</span>,
   <span class='kw'>learning_offset</span> <span class='kw'>=</span> <span class='fl'>1024</span>, <span class='kw'>optimize_doc_concentration</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>topic_distribution_col</span> <span class='kw'>=</span> <span class='st'>"topicDistribution"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"lda_"</span>), <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string'>random_string</a></span>(<span class='st'>"lda_"</span>), <span class='no'>...</span>)
+
+<span class='fu'>ml_describe_topics</span>(<span class='no'>model</span>, <span class='kw'>max_terms_per_topic</span> <span class='kw'>=</span> <span class='fl'>10L</span>)
+
+<span class='fu'>ml_log_likelihood</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)
+
+<span class='fu'>ml_log_perplexity</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)</code></pre></div>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -98,7 +104,7 @@ reproducible across repeated calls.</p></td>
     </tr>
     <tr>
       <td>features_col</td>
-      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula'>ft_r_formula</a></code>.</p></td>
     </tr>
     <tr>
       <td>topic_distribution_col</td>
@@ -111,6 +117,18 @@ reproducible across repeated calls.</p></td>
     <tr>
       <td>...</td>
       <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td><p>A fitted LDA model returned by <code>ml_lda()</code>.</p></td>
+    </tr>
+    <tr>
+      <td>max_terms_per_topic</td>
+      <td><p>Maximum number of terms to collect for each topic. Default value of 10.</p></td>
+    </tr>
+    <tr>
+      <td>dataset</td>
+      <td><p>test corpus to use for calculating log likelihood or log perplexity</p></td>
     </tr>
     </table>
     
@@ -129,8 +147,10 @@ reproducible across repeated calls.</p></td>
     <code>RFormula</code> transformer before being fit by
     the estimator. The object returned in this case is a <code>ml_model</code> which is a
     wrapper of a <code>ml_pipeline_model</code>. This signature does not apply to <code>ml_lda()</code>.</p></li>
-</ul>
+</ul><p><code>ml_describe_topics</code> returns a DataFrame with topics and their top-weighted terms.
 
+<code>ml_log_likelihood</code> calculates a lower bound on the log likelihood of
+  the entire corpus</p>
     
     <h2 id="details">Details</h2>
 
@@ -141,7 +161,7 @@ reproducible across repeated calls.</p></td>
 <li><p>"document": one piece of text, corresponding to one row in the input data</p></li>
 </ul>
     <p>Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Allocation." JMLR, 2003.</p>
-<p>Input data (<code>features_col</code>): LDA is given a collection of documents as input data, via the <code>features_col</code> parameter. Each document is specified as a Vector of length <code>vocab_size</code>, where each entry is the count for the corresponding term (word) in the document. Feature transformers such as <code><a href='ft_tokenizer.html'>ft_tokenizer</a></code> and <code><a href='ft_count_vectorizer.html'>ft_count_vectorizer</a></code> can be useful for converting text to word count vectors</p>
+<p>Input data (<code>features_col</code>): LDA is given a collection of documents as input data, via the <code>features_col</code> parameter. Each document is specified as a Vector of length <code>vocab_size</code>, where each entry is the count for the corresponding term (word) in the document. Feature transformers such as <code><a href='ft_tokenizer'>ft_tokenizer</a></code> and <code><a href='ft_count_vectorizer'>ft_count_vectorizer</a></code> can be useful for converting text to word count vectors</p>
     
     <h2 id="parameter-details">Parameter details</h2>
 
@@ -180,11 +200,11 @@ reproducible across repeated calls.</p></td>
     
     <h2 id="see-also">See also</h2>
 
-    <p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
+    <p>See <a href='http://spark.apache.org/docs/latest/ml-clustering'>http://spark.apache.org/docs/latest/ml-clustering</a> for
   more information on the set of clustering algorithms.</p>
-<p>Other ml clustering algorithms: <code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a></code>,
-  <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a></code>,
-  <code><a href='ml_kmeans.html'>ml_kmeans</a></code></p>
+<p>Other ml clustering algorithms: <code><a href='ml_bisecting_kmeans'>ml_bisecting_kmeans</a></code>,
+  <code><a href='ml_gaussian_mixture'>ml_gaussian_mixture</a></code>,
+  <code><a href='ml_kmeans'>ml_kmeans</a></code></p>
     
 
     </div>

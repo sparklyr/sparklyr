@@ -465,9 +465,7 @@ spark_disconnect(sc)
 Connecting through Livy
 -----------------------
 
-[Livy](https://github.com/cloudera/livy) enables remote connections to Apache Spark clusters. Connecting to Spark clusters through Livy is **under experimental development** in `sparklyr`. Please post any feedback or questions as a GitHub issue as needed.
-
-Before connecting to Livy, you will need the connection information to an existing service running Livy. Otherwise, to test `livy` in your local environment, you can install it and run it locally as follows:
+[Livy](https://github.com/cloudera/livy) enables remote connections to Apache Spark clusters. Before connecting to Livy, you will need the connection information to an existing service running Livy. Otherwise, to test `livy` in your local environment, you can install it and run it locally as follows:
 
 ``` r
 livy_install()

@@ -1,7 +1,7 @@
 ---
 title: "Read a JSON file into a Spark DataFrame"
 aliases:
-  - reference/sparklyr/latest/spark_read_json.html
+  - reference/sparklyr/latest/spark_read_json
 ---
 
     <div class="doc-page">
@@ -45,7 +45,7 @@ Object Notation</a> format into a Spark DataFrame.</p>
     <tr>
       <td>path</td>
       <td><p>The path to the file. Needs to be accessible from the cluster.
-Supports the <samp>"hdfs://"</samp>, <samp>"s3n://"</samp> and <samp>"file://"</samp> protocols.</p></td>
+Supports the <samp>"hdfs://"</samp>, <samp>"s3a://"</samp> and <samp>"file://"</samp> protocols.</p></td>
     </tr>
     <tr>
       <td>options</td>
@@ -78,29 +78,35 @@ already exists?</p></td>
     
     <h2 id="details">Details</h2>
 
-    <p>You can read data from HDFS (<code>hdfs://</code>), S3 (<code>s3n://</code>), as well as
+    <p>You can read data from HDFS (<code>hdfs://</code>), S3 (<code>s3a://</code>), as well as
   the local file system (<code>file://</code>).</p>
-<p>If you are reading from a secure S3 bucket be sure that the <code>AWS_ACCESS_KEY_ID</code> and
-  <code>AWS_SECRET_ACCESS_KEY</code> environment variables are both defined.</p>
+<p>If you are reading from a secure S3 bucket be sure to set the following in your spark-defaults.conf
+<code>spark.hadoop.fs.s3a.access.key</code>, <code>spark.hadoop.fs.s3a.secret.key</code> or any of the methods outlined in the aws-sdk
+documentation <a href='http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials'>Working with AWS credentials</a>
+In order to work with the newer <code>s3a://</code> protocol also set the values for <code>spark.hadoop.fs.s3a.impl</code> and <code>spark.hadoop.fs.s3a.endpoint </code>.
+In addition, to support v4 of the S3 api be sure to pass the <code>-Dcom.amazonaws.services.s3.enableV4</code> driver options
+for the config key <code>spark.driver.extraJavaOptions </code>
+For instructions on how to configure <code>s3n://</code> check the hadoop documentation:
+<a href='https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index#Authentication_properties'>s3n authentication properties</a></p>
     
     <h2 id="see-also">See also</h2>
 
-    <p>Other Spark serialization routines: <code><a href='spark_load_table.html'>spark_load_table</a></code>,
-  <code><a href='spark_read_csv.html'>spark_read_csv</a></code>,
-  <code><a href='spark_read_jdbc.html'>spark_read_jdbc</a></code>,
-  <code><a href='spark_read_libsvm.html'>spark_read_libsvm</a></code>,
-  <code><a href='spark_read_parquet.html'>spark_read_parquet</a></code>,
-  <code><a href='spark_read_source.html'>spark_read_source</a></code>,
-  <code><a href='spark_read_table.html'>spark_read_table</a></code>,
-  <code><a href='spark_read_text.html'>spark_read_text</a></code>,
-  <code><a href='spark_save_table.html'>spark_save_table</a></code>,
-  <code><a href='spark_write_csv.html'>spark_write_csv</a></code>,
-  <code><a href='spark_write_jdbc.html'>spark_write_jdbc</a></code>,
-  <code><a href='spark_write_json.html'>spark_write_json</a></code>,
-  <code><a href='spark_write_parquet.html'>spark_write_parquet</a></code>,
-  <code><a href='spark_write_source.html'>spark_write_source</a></code>,
-  <code><a href='spark_write_table.html'>spark_write_table</a></code>,
-  <code><a href='spark_write_text.html'>spark_write_text</a></code></p>
+    <p>Other Spark serialization routines: <code><a href='spark_load_table'>spark_load_table</a></code>,
+  <code><a href='spark_read_csv'>spark_read_csv</a></code>,
+  <code><a href='spark_read_jdbc'>spark_read_jdbc</a></code>,
+  <code><a href='spark_read_libsvm'>spark_read_libsvm</a></code>,
+  <code><a href='spark_read_parquet'>spark_read_parquet</a></code>,
+  <code><a href='spark_read_source'>spark_read_source</a></code>,
+  <code><a href='spark_read_table'>spark_read_table</a></code>,
+  <code><a href='spark_read_text'>spark_read_text</a></code>,
+  <code><a href='spark_save_table'>spark_save_table</a></code>,
+  <code><a href='spark_write_csv'>spark_write_csv</a></code>,
+  <code><a href='spark_write_jdbc'>spark_write_jdbc</a></code>,
+  <code><a href='spark_write_json'>spark_write_json</a></code>,
+  <code><a href='spark_write_parquet'>spark_write_parquet</a></code>,
+  <code><a href='spark_write_source'>spark_write_source</a></code>,
+  <code><a href='spark_write_table'>spark_write_table</a></code>,
+  <code><a href='spark_write_text'>spark_write_text</a></code></p>
     
 
     </div>

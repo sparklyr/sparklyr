@@ -1,7 +1,7 @@
 ---
 title: "Spark ML - Evaluators"
 aliases:
-  - reference/sparklyr/latest/ml_evaluator.html
+  - reference/sparklyr/latest/ml_evaluator
 ---
 
     <div class="doc-page">
@@ -19,26 +19,26 @@ aliases:
     <div class="doc-page-body">
 
     
-    <p>A set of functions to calculate performance metrics for prediction models. Also see the Spark ML Documentation <a href='https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.evaluation.package'>https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.evaluation.package</a></p>
+    <p>A set of functions to calculate performance metrics for prediction models. Also see the Spark ML Documentation <a href='https://spark.apache.org/docs/latest/api/scala/index#org.apache.spark.ml.evaluation.package'>https://spark.apache.org/docs/latest/api/scala/index#org.apache.spark.ml.evaluation.package</a></p>
     
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_binary_classification_evaluator</span>(<span class='no'>x</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
   <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='st'>"rawPrediction"</span>, <span class='kw'>metric_name</span> <span class='kw'>=</span> <span class='st'>"areaUnderROC"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"binary_classification_evaluator_"</span>), <span class='no'>...</span>)
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string'>random_string</a></span>(<span class='st'>"binary_classification_evaluator_"</span>), <span class='no'>...</span>)
 
 <span class='fu'>ml_binary_classification_eval</span>(<span class='no'>x</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
   <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>metric_name</span> <span class='kw'>=</span> <span class='st'>"areaUnderROC"</span>)
 
 <span class='fu'>ml_multiclass_classification_evaluator</span>(<span class='no'>x</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
   <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>metric_name</span> <span class='kw'>=</span> <span class='st'>"f1"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"multiclass_classification_evaluator_"</span>), <span class='no'>...</span>)
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string'>random_string</a></span>(<span class='st'>"multiclass_classification_evaluator_"</span>), <span class='no'>...</span>)
 
 <span class='fu'>ml_classification_eval</span>(<span class='no'>x</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
   <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>metric_name</span> <span class='kw'>=</span> <span class='st'>"f1"</span>)
 
 <span class='fu'>ml_regression_evaluator</span>(<span class='no'>x</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
   <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>metric_name</span> <span class='kw'>=</span> <span class='st'>"rmse"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"regression_evaluator_"</span>), <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string'>random_string</a></span>(<span class='st'>"regression_evaluator_"</span>), <span class='no'>...</span>)</code></pre></div>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -50,7 +50,7 @@ aliases:
 
     <tr>
       <td>x</td>
-      <td><p>A <code>spark_connection</code> object or a <code>tbl_spark</code> containing label and prediction columns. The latter should be the output of <code><a href='sdf-transform-methods.html'>sdf_predict</a></code>.</p></td>
+      <td><p>A <code>spark_connection</code> object or a <code>tbl_spark</code> containing label and prediction columns. The latter should be the output of <code><a href='sdf-transform-methods'>sdf_predict</a></code>.</p></td>
     </tr>
     <tr>
       <td>label_col</td>

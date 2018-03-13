@@ -1,7 +1,7 @@
 ---
 title: "Spark ML -- Bisecting K-Means Clustering"
 aliases:
-  - reference/sparklyr/latest/ml_bisecting_kmeans.html
+  - reference/sparklyr/latest/ml_bisecting_kmeans
 ---
 
     <div class="doc-page">
@@ -25,7 +25,7 @@ aliases:
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_bisecting_kmeans</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>4L</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20L</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>min_divisible_cluster_size</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
   <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"bisecting_bisecting_kmeans_"</span>), <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string'>random_string</a></span>(<span class='st'>"bisecting_bisecting_kmeans_"</span>), <span class='no'>...</span>)</code></pre></div>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -41,7 +41,7 @@ aliases:
     </tr>
     <tr>
       <td>formula</td>
-      <td><p>Used when <code>x</code> is a <code>tbl_spark</code>. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see <a href='ft_r_formula.html'>ft_r_formula</a> for details.</p></td>
+      <td><p>Used when <code>x</code> is a <code>tbl_spark</code>. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see <a href='ft_r_formula'>ft_r_formula</a> for details.</p></td>
     </tr>
     <tr>
       <td>k</td>
@@ -62,7 +62,7 @@ reproducible across repeated calls.</p></td>
     </tr>
     <tr>
       <td>features_col</td>
-      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula'>ft_r_formula</a></code>.</p></td>
     </tr>
     <tr>
       <td>prediction_col</td>
@@ -92,16 +92,16 @@ reproducible across repeated calls.</p></td>
     is specified, the input <code>tbl_spark</code> is first transformed using a
     <code>RFormula</code> transformer before being fit by
     the estimator. The object returned in this case is a <code>ml_model</code> which is a
-    wrapper of a <code>ml_pipeline_model</code>. This signature does not apply to <code><a href='ml_lda.html'>ml_lda()</a></code>.</p></li>
+    wrapper of a <code>ml_pipeline_model</code>. This signature does not apply to <code><a href='ml_lda'>ml_lda()</a></code>.</p></li>
 </ul>
 
     
     <h2 id="see-also">See also</h2>
 
-    <p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
+    <p>See <a href='http://spark.apache.org/docs/latest/ml-clustering'>http://spark.apache.org/docs/latest/ml-clustering</a> for
   more information on the set of clustering algorithms.</p>
-<p>Other ml clustering algorithms: <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a></code>,
-  <code><a href='ml_kmeans.html'>ml_kmeans</a></code>, <code><a href='ml_lda.html'>ml_lda</a></code></p>
+<p>Other ml clustering algorithms: <code><a href='ml_gaussian_mixture'>ml_gaussian_mixture</a></code>,
+  <code><a href='ml_kmeans'>ml_kmeans</a></code>, <code><a href='ml_lda'>ml_lda</a></code></p>
     
 
     </div>

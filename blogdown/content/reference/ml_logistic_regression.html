@@ -1,7 +1,7 @@
 ---
 title: "Spark ML -- Logistic Regression"
 aliases:
-  - reference/sparklyr/latest/ml_logistic_regression.html
+  - reference/sparklyr/latest/ml_logistic_regression
 ---
 
     <div class="doc-page">
@@ -11,6 +11,8 @@ aliases:
     <li><a href="#arguments">Arguments</a></li>
     
     <li><a href="#value">Value</a></li>
+
+    <li><a href="#details">Details</a></li>
 
     <li><a href="#see-also">See also</a></li>
         </ul>
@@ -25,10 +27,12 @@ aliases:
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_logistic_regression</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fit_intercept</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>elastic_net_param</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>reg_param</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100L</span>,
   <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>, <span class='kw'>weight_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>aggregation_depth</span> <span class='kw'>=</span> <span class='fl'>2L</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
-  <span class='kw'>family</span> <span class='kw'>=</span> <span class='st'>"auto"</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>aggregation_depth</span> <span class='kw'>=</span> <span class='fl'>2L</span>, <span class='kw'>lower_bounds_on_coefficients</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>lower_bounds_on_intercepts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>upper_bounds_on_coefficients</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>upper_bounds_on_intercepts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='st'>"auto"</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
   <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>, <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='st'>"rawPrediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"logistic_regression_"</span>), <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string'>random_string</a></span>(<span class='st'>"logistic_regression_"</span>), <span class='no'>...</span>)</code></pre></div>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -44,7 +48,7 @@ aliases:
     </tr>
     <tr>
       <td>formula</td>
-      <td><p>Used when <code>x</code> is a <code>tbl_spark</code>. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see <a href='ft_r_formula.html'>ft_r_formula</a> for details.</p></td>
+      <td><p>Used when <code>x</code> is a <code>tbl_spark</code>. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see <a href='ft_r_formula'>ft_r_formula</a> for details.</p></td>
     </tr>
     <tr>
       <td>fit_intercept</td>
@@ -83,12 +87,32 @@ aliases:
       <td><p>(Spark 2.1.0+) Suggested depth for treeAggregate (&gt;= 2).</p></td>
     </tr>
     <tr>
+      <td>lower_bounds_on_coefficients</td>
+      <td><p>(Spark 2.2.0+) Lower bounds on coefficients if fitting under bound constrained optimization.
+The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.</p></td>
+    </tr>
+    <tr>
+      <td>lower_bounds_on_intercepts</td>
+      <td><p>(Spark 2.2.0+) Lower bounds on intercepts if fitting under bound constrained optimization.
+The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.</p></td>
+    </tr>
+    <tr>
+      <td>upper_bounds_on_coefficients</td>
+      <td><p>(Spark 2.2.0+) Upper bounds on coefficients if fitting under bound constrained optimization.
+The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.</p></td>
+    </tr>
+    <tr>
+      <td>upper_bounds_on_intercepts</td>
+      <td><p>(Spark 2.2.0+) Upper bounds on intercepts if fitting under bound constrained optimization.
+The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.</p></td>
+    </tr>
+    <tr>
       <td>features_col</td>
-      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula'>ft_r_formula</a></code>.</p></td>
     </tr>
     <tr>
       <td>label_col</td>
-      <td><p>Label column name. The column should be a numeric column. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+      <td><p>Label column name. The column should be a numeric column. Usually this column is output by <code><a href='ft_r_formula'>ft_r_formula</a></code>.</p></td>
     </tr>
     <tr>
       <td>family</td>
@@ -112,7 +136,7 @@ aliases:
     </tr>
     <tr>
       <td>...</td>
-      <td><p>Optional arguments; currently unused.</p></td>
+      <td><p>Optional arguments; see Details.</p></td>
     </tr>
     </table>
     
@@ -134,21 +158,25 @@ aliases:
 </ul>
 
     
+    <h2 id="details">Details</h2>
+
+    <p>When <code>x</code> is a <code>tbl_spark</code> and <code>formula</code> (alternatively, <code>response</code> and <code>features</code>) is specified, the function returns a <code>ml_model</code> object wrapping a <code>ml_pipeline_model</code> which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument <code>predicted_label_col</code> (defaults to <code>"predicted_label"</code>) can be used to specify the name of the predicted label column. In addition to the fitted <code>ml_pipeline_model</code>, <code>ml_model</code> objects also contain a <code>ml_pipeline</code> object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by <code><a href='ml-persistence'>ml_save</a></code> with <code>type = "pipeline"</code> to faciliate model refresh workflows.</p>
+    
     <h2 id="see-also">See also</h2>
 
-    <p>See <a href='http://spark.apache.org/docs/latest/ml-classification-regression.html'>http://spark.apache.org/docs/latest/ml-classification-regression.html</a> for
+    <p>See <a href='http://spark.apache.org/docs/latest/ml-classification-regression'>http://spark.apache.org/docs/latest/ml-classification-regression</a> for
   more information on the set of supervised learning algorithms.</p>
-<p>Other ml algorithms: <code><a href='ml_aft_survival_regression.html'>ml_aft_survival_regression</a></code>,
-  <code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a></code>,
-  <code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a></code>,
-  <code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a></code>,
-  <code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a></code>,
-  <code><a href='ml_linear_regression.html'>ml_linear_regression</a></code>,
-  <code><a href='ml_linear_svc.html'>ml_linear_svc</a></code>,
-  <code><a href='ml_multilayer_perceptron_classifier.html'>ml_multilayer_perceptron_classifier</a></code>,
-  <code><a href='ml_naive_bayes.html'>ml_naive_bayes</a></code>,
-  <code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a></code>,
-  <code><a href='ml_random_forest.html'>ml_random_forest_classifier</a></code></p>
+<p>Other ml algorithms: <code><a href='ml_aft_survival_regression'>ml_aft_survival_regression</a></code>,
+  <code><a href='ml_decision_tree'>ml_decision_tree_classifier</a></code>,
+  <code><a href='ml_gradient_boosted_trees'>ml_gbt_classifier</a></code>,
+  <code><a href='ml_generalized_linear_regression'>ml_generalized_linear_regression</a></code>,
+  <code><a href='ml_isotonic_regression'>ml_isotonic_regression</a></code>,
+  <code><a href='ml_linear_regression'>ml_linear_regression</a></code>,
+  <code><a href='ml_linear_svc'>ml_linear_svc</a></code>,
+  <code><a href='ml_multilayer_perceptron_classifier'>ml_multilayer_perceptron_classifier</a></code>,
+  <code><a href='ml_naive_bayes'>ml_naive_bayes</a></code>,
+  <code><a href='ml_one_vs_rest'>ml_one_vs_rest</a></code>,
+  <code><a href='ml_random_forest'>ml_random_forest_classifier</a></code></p>
     
 
     </div>

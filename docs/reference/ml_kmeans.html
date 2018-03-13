@@ -19,13 +19,16 @@ aliases:
     <div class="doc-page-body">
 
     
-    <p>K-means clustering with support for k-means|| initialization proposed by Bahmani et al.</p>
+    <p>K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
+  Using `ml_kmeans()` with the formula interface requires Spark 2.0+.</p>
     
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_kmeans</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>2L</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20L</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
   <span class='kw'>init_steps</span> <span class='kw'>=</span> <span class='fl'>2L</span>, <span class='kw'>init_mode</span> <span class='kw'>=</span> <span class='st'>"k-means||"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"kmeans_"</span>), <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"kmeans_"</span>), <span class='no'>...</span>)
+
+<span class='fu'>ml_compute_cost</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)</code></pre></div>
     
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -84,6 +87,14 @@ reproducible across repeated calls.</p></td>
       <td>...</td>
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
+    <tr>
+      <td>model</td>
+      <td><p>A fitted K-means model returned by <code>ml_kmeans()</code></p></td>
+    </tr>
+    <tr>
+      <td>dataset</td>
+      <td><p>Dataset on which to calculate K-means cost</p></td>
+    </tr>
     </table>
     
     <h2 id="value">Value</h2>
@@ -101,8 +112,9 @@ reproducible across repeated calls.</p></td>
     <code>RFormula</code> transformer before being fit by
     the estimator. The object returned in this case is a <code>ml_model</code> which is a
     wrapper of a <code>ml_pipeline_model</code>. This signature does not apply to <code><a href='ml_lda.html'>ml_lda()</a></code>.</p></li>
-</ul>
-
+</ul><p><code>ml_compute_cost()</code> returns the K-means cost (sum of
+  squared distances of points to their nearest center) for the model
+  on the given data.</p>
     
     <h2 id="see-also">See also</h2>
 

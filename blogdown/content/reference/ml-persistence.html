@@ -1,7 +1,7 @@
 ---
 title: "Spark ML -- Model Persistence"
 aliases:
-  - reference/sparklyr/latest/ml-persistence.html
+  - reference/sparklyr/latest/ml-persistence
 ---
 
     <div class="doc-page">
@@ -21,6 +21,10 @@ aliases:
     
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_save</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model</span>
+<span class='fu'>ml_save</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"pipeline_model"</span>, <span class='st'>"pipeline"</span>), <span class='no'>...</span>)
 
 <span class='fu'>ml_load</span>(<span class='no'>sc</span>, <span class='no'>path</span>)</code></pre></div>
     
@@ -47,6 +51,10 @@ aliases:
     <tr>
       <td>...</td>
       <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>type</td>
+      <td><p>Whether to save the pipeline model or the pipeline.</p></td>
     </tr>
     <tr>
       <td>sc</td>

@@ -1,7 +1,7 @@
 ---
 title: "Copy an R Data Frame to Spark"
 aliases:
-  - reference/sparklyr/latest/copy_to.spark_connection.html
+  - reference/sparklyr/latest/copy_to.spark_connection
 ---
 
     <div class="doc-page">
@@ -24,7 +24,7 @@ act as a <code>dplyr</code>-compatible interface to the underlying Spark table.<
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for spark_connection</span>
 <span class='fu'>copy_to</span>(<span class='no'>dest</span>, <span class='no'>df</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'><a href='spark_table_name.html'>spark_table_name</a></span>(<span class='fu'>substitute</span>(<span class='no'>df</span>)), <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'><a href='spark_table_name'>spark_table_name</a></span>(<span class='fu'>substitute</span>(<span class='no'>df</span>)), <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>memory</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>repartition</span> <span class='kw'>=</span> <span class='fl'>0L</span>, <span class='no'>...</span>)</code></pre></div>
     
     <h2 id="arguments">Arguments</h2>

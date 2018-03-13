@@ -1,7 +1,7 @@
 ---
 title: "Copy an Object into Spark"
 aliases:
-  - reference/sparklyr/latest/sdf_copy_to.html
+  - reference/sparklyr/latest/sdf_copy_to
 ---
 
     <div class="doc-page">
@@ -80,14 +80,14 @@ implementing the associated method on <code>sdf_import</code>.</p>
     
     <h2 id="see-also">See also</h2>
 
-    <p>Other Spark data frames: <code><a href='sdf_partition.html'>sdf_partition</a></code>,
-  <code><a href='sdf_register.html'>sdf_register</a></code>, <code><a href='sdf_sample.html'>sdf_sample</a></code>,
-  <code><a href='sdf_sort.html'>sdf_sort</a></code></p>
+    <p>Other Spark data frames: <code><a href='sdf_partition'>sdf_partition</a></code>,
+  <code><a href='sdf_register'>sdf_register</a></code>, <code><a href='sdf_sample'>sdf_sample</a></code>,
+  <code><a href='sdf_sort'>sdf_sort</a></code></p>
     
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
-<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"spark://HOST:PORT"</span>)
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"spark://HOST:PORT"</span>)
 <span class='fu'>sdf_copy_to</span>(<span class='no'>sc</span>, <span class='no'>iris</span>)</div><div class='output co'>#&gt;     Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
 #&gt; 1            5.1         3.5          1.4         0.2     setosa
 #&gt; 2            4.9         3.0          1.4         0.2     setosa

@@ -1,7 +1,7 @@
 ---
 title: "Spark Pipelines"
 output:
-  github_document
+  md_document
 ---
 
 ```{r, include = FALSE}
@@ -84,14 +84,15 @@ df <- spark_flights %>%
 ```
 
 This is the resulting pipeline stage produced from the `dplyr` code:
-```{r}
+```{r, eval = FALSE}
 ft_dplyr_transformer(sc, df)
 ```
 
-The `parm_map` attribute contains the SQL statement that will be used for the pipeline.  Notice that the `flights` table name has been replace with `__THIS__`.  This allows the pipeline to accept different table names as its source, making the pipeline very modular. 
+Use the `ml_param()` function to extract the "statement" attribute. That attribute contains the finalized SQL statement.  Notice that the `flights` table name has been replace with `__THIS__`.  This allows the pipeline to accept different table names as its source, making the pipeline very modular. 
 
 ```{r}
-ft_dplyr_transformer(sc, df)$param_map
+ft_dplyr_transformer(sc, df) %>%
+  ml_param("statement")
 ```
 
 ### Ceating the Pipeline
@@ -169,15 +170,14 @@ predictions %>%
 
 ## Save the pipelines to disk
 
+The `ml_save()` command can be used to save the Pipeline and PipelineModel to disk.  The resulting output is a folder with the selected name, which contains all of the necessary Scala scripts:
 ```{r, message = FALSE}
 ml_save(
   flights_pipeline,
   "flights_pipeline",
   overwrite = TRUE
 )
-```
 
-```{r, message = FALSE}
 ml_save(
   fitted_pipeline,
   "flights_model",
@@ -185,9 +185,15 @@ ml_save(
 )
 ```
 
+## Use an existing PipelineModel
+
+The `ml_load()` command can be used to re-load Pipelines and PipelineModels.  The saved ML Pipeline files can only be loaded into an open Spark session.
+
 ```{r}
 reloaded_model <- ml_load(sc, "flights_model")
 ```
+
+A simple query can be used as the table that will be used to make the new predictions.  This of course, does not have to done in R, at this time the "flights_model" can be loaded into an independent Spark session outside of R.
 
 ```{r}
 new_df <- spark_flights %>%
@@ -196,26 +202,29 @@ new_df <- spark_flights %>%
     day == 5
   )
 
-new_df  
+ml_transform(reloaded_model, new_df) 
 ```
 
+## Re-fit an existing Pipeline
 
+First, reload the pipeline into an open Spark session:
 ```{r}
 reloaded_pipeline <- ml_load(sc, "flights_pipeline")
-
 ```
 
+Use `ml_fit()` again to pass new data, in this case, `sample_frac()` is used instead of `sdf_partition()` to provide the new data.  The idea being that the re-fitting would happen at a later date than when the model was initially fitted.
 ```{r}
 new_model <-  ml_fit(reloaded_pipeline, sample_frac(spark_flights, 0.01))
 
 new_model
 ```
 
+The new model can be saved using `ml_save()`.  A new name is used in this case, but the same name as the existing PipelineModel to replace it.
 ```{r}
 ml_save(new_model, "new_flights_model", overwrite = TRUE)
 ```
 
-
+Finally, this example is complete by closing the Spark session.
 ```{r}
 spark_disconnect(sc)
 ```
