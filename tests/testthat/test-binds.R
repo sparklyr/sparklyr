@@ -54,7 +54,7 @@ test_that("'cbind' works as expected", {
   expect_equal(cbind(df1a_10part_tbl, df2a_tbl) %>% collect(),
                cbind(df1a, df2a))
   expect_error(cbind(df1a_tbl, df3a_tbl),
-               "Not all inputs have the same number of rows, for example:\\n       tbl nrow\\n1 df3a_tbl    2\\n2 df1a_tbl    3")
+               "All inputs must have the same number of rows.")
   expect_error(cbind(df1a_tbl, NULL),
                "Unable to retrieve a Spark DataFrame from object of class NULL")
 })
@@ -63,13 +63,11 @@ test_that("'sdf_bind_cols' agrees with 'cbind'", {
   expect_equal(sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect(),
                cbind(df1a_tbl, df2a_tbl) %>% collect())
   expect_error(sdf_bind_cols(df1a_tbl, df3a_tbl),
-               "Not all inputs have the same number of rows, for example:\\n       tbl nrow\\n1 df3a_tbl    2\\n2 df1a_tbl    3")
+               "All inputs must have the same number of rows.")
 })
 
 test_that("'sdf_bind_cols' handles lists", {
   expect_equal(sdf_bind_cols(list(df1a_tbl, df2a_tbl)) %>% collect(),
-               sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect())
-  expect_equal(sdf_bind_cols(df1a_tbl, list(df2a_tbl)) %>% collect(),
                sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect())
 })
 
@@ -83,7 +81,7 @@ test_that("'sdf_bind_cols' supports programming", {
   expect_equal(sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect(),
                fn(df1a_tbl, df2a_tbl) %>% collect())
   expect_error(fn(df1a_tbl, df3a_tbl),
-               "Not all inputs have the same number of rows, for example:\\n       tbl nrow\\n1 df3a_tbl    2\\n2 df1a_tbl    3")
+               "All inputs must have the same number of rows.")
 })
 
 # rows -------------------------------------------------------

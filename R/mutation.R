@@ -165,19 +165,7 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
     unlist
 
   if (length(unique(dots_num_rows)) > 1) {
-    names_tbls <- substitute(list(...))[-1] %>%
-      sapply(deparse)
-    names_tbls <- gsub("~", "", names_tbls)
-
-    output_table <- dplyr::data_frame(tbl = names_tbls,
-                               nrow = dots_num_rows) %>%
-      dplyr::group_by(nrow) %>%
-      dplyr::slice(1) %>%
-      as.data.frame()
-    output_table <- paste(capture.output(print(output_table)), collapse = "\n")
-
-    stop("Not all inputs have the same number of rows, for example:\n",
-         output_table)
+    stop("All inputs must have the same number of rows.", call. = FALSE)
   }
 
     Reduce(function(x, y) dplyr::inner_join(x, y, by = id),
@@ -192,21 +180,7 @@ sdf_bind_cols <- function(...) {
   if (! all(sapply(dots, is.tbl_spark)))
     stop("all inputs must be tbl_spark")
 
-  nonempty <- rlang::dots_splice(...) %>%
-    sapply(Negate(rlang::is_empty)) %>%
-    which()
-
-  envir <- rlang::caller_env()
-  quosures <- rlang::exprs(...) %>%
-    # if 'list(sdf)' is one of the args we want 'sdf'
-    lapply(function(x) if (rlang::is_lang(x))
-      rlang::lang_tail(x) else x) %>%
-    unlist() %>%
-    lapply(rlang::new_quosure, env = envir) %>%
-    `[`(nonempty)
-
-  rlang::lang("cbind", !!! quosures)  %>%
-    rlang::eval_tidy()
+  do.call(cbind, dots)
 }
 
 mutate_names <- function(x, value) {

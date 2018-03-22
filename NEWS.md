@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `cbind()` and `sdf_bind_cols()` don't use NSE internally anymore and no longer output names of mismatched data frames on error (#1363).
+
 - Fixed data frame provided by `spark_apply()` to not provide characters not factors (#1313).
 
 - `ml_default_stop_words()` now returns English stop words by default (#1280).
