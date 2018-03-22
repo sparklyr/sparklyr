@@ -615,12 +615,10 @@ getSerdeType <- function(object) {
     elemType <- unique(sapply(object, function(elem) { getSerdeType(elem) }))
     if (length(elemType) <= 1) {
 
-      # Check that there are no NAs in character arrays since they are unsupported in scala
-      hasCharNAs <- any(sapply(object, function(elem) {
-        (is.factor(elem) || is.character(elem) || is.integer(elem)) && is.na(elem)
-      }))
+      # Check that there are no NAs in arrays since they are unsupported in scala
+      hasNAs <- any(is.na(object))
 
-      if (hasCharNAs) {
+      if (hasNAs) {
         "list"
       } else {
         "array"
@@ -632,13 +630,9 @@ getSerdeType <- function(object) {
 }
 
 writeObject <- function(con, object, writeType = TRUE) {
-  # NOTE: In R vectors have same type as objects. So we don't support
-  # passing in vectors as arrays and instead require arrays to be passed
-  # as lists.
-  type <- class(object)[[1]]  # class of POSIXlt is c("POSIXlt", "POSIXt")
-  # Checking types is needed here, since 'is.na' only handles atomic vectors,
-  # lists and pairlists
-  if (type %in% c("integer", "character", "logical", "double", "numeric", "factor")) {
+  type <- class(object)[[1]]
+
+  if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
     if (is.na(object)) {
       object <- NULL
       type <- "NULL"
