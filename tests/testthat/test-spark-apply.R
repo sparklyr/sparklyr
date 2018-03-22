@@ -160,7 +160,7 @@ test_that("'spark_apply' can return 'NA's", {
 
   expect_equal(
     sdf_len(sc, 1) %>%
-      spark_apply(function(e) data.frame(dates = c(as.Date("1/1/2001"), NA))) %>%
+      spark_apply(function(e) data.frame(dates = c(as.Date("2001/1/1"), NA))) %>%
       collect() %>%
       nrow(),
     2
