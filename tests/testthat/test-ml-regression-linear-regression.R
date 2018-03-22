@@ -57,7 +57,7 @@ test_that("ml_linear_regression() default params are correct", {
     ml_stage(1)
 
   args <- get_default_args(ml_linear_regression,
-                           c("x", "uid", "...", "weight_col"))
+                           exclude = c("x", "uid", "...", "weight_col", "loss"))
 
   expect_equal(
     ml_params(predictor, names(args)),

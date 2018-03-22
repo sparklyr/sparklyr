@@ -8,6 +8,8 @@
 #' @template roxlate-ml-predictor-params
 #' @template roxlate-ml-elastic-net-param
 #' @template roxlate-ml-standardization
+#' @param loss The loss function to be optimized. Supported options: "squaredError"
+#'    and "huber". Default: "squaredError"
 #' @param solver Solver algorithm for optimization.
 #' @export
 ml_linear_regression <- function(
@@ -18,6 +20,7 @@ ml_linear_regression <- function(
   reg_param = 0,
   max_iter = 100L,
   weight_col = NULL,
+  loss = "squaredError",
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
@@ -38,6 +41,7 @@ ml_linear_regression.spark_connection <- function(
   reg_param = 0,
   max_iter = 100L,
   weight_col = NULL,
+  loss = "squaredError",
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
@@ -58,7 +62,9 @@ ml_linear_regression.spark_connection <- function(
     invoke("setMaxIter", max_iter) %>%
     invoke("setSolver", solver) %>%
     invoke("setStandardization", standardization) %>%
-    invoke("setTol", tol)
+    invoke("setTol", tol) %>%
+    jobj_set_param("setLoss", loss,
+                   "squaredError", "2.3.0")
 
   if (!is.null(weight_col))
     jobj <- invoke(jobj, "setWeightCol", weight_col)
@@ -75,6 +81,7 @@ ml_linear_regression.ml_pipeline <- function(
   reg_param = 0,
   max_iter = 100L,
   weight_col = NULL,
+  loss = "squaredError",
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
@@ -96,6 +103,7 @@ ml_linear_regression.tbl_spark <- function(
   reg_param = 0,
   max_iter = 100L,
   weight_col = NULL,
+  loss = "squaredError",
   solver = "auto",
   standardization = TRUE,
   tol = 1e-6,
@@ -165,6 +173,7 @@ new_ml_linear_regression_model <- function(jobj) {
     num_features = invoke(jobj, "numFeatures"),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
+    scale = if (spark_version(spark_connection(jobj)) >= "2.3.0") invoke(jobj, "scale"),
     summary = summary,
     subclass = "ml_linear_regression_model")
 }
