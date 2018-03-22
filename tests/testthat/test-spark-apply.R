@@ -145,3 +145,24 @@ test_that("'spark_apply' can filter using dplyr", {
     data.frame(id = c(2:10))
   )
 })
+
+test_that("'spark_apply' can return dates with 'NA's", {
+  dates <- data.frame(dates = c(as.Date("2015/12/19"), as.Date(NA), as.Date("2015/12/19")))
+  dates_tbl <- copy_to(dates, overwrite = TRUE)
+
+  expect_equal(
+    dates_tbl %>%
+      spark_apply(function(e) e) %>%
+      collect() %>%
+      nrow(),
+    nrow(dates)
+  )
+
+  expect_equal(
+    dates_tbl %>%
+      spark_apply(function(e) as.Date(e)) %>%
+      collect() %>%
+      nrow(),
+    nrow(dates)
+  )
+})
