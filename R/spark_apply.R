@@ -206,7 +206,7 @@ spark_apply <- function(x,
   )
 
   # add debug connection message
-  if (identical(debug, TRUE) && !is.null(sc$session_id)) {
+  if (isTRUE(args$debug) && !is.null(sc$session_id)) {
     message("Debugging spark_apply(), connect to worker debugging session as follows:")
     message("  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click")
     message("     'Log' under the connection, look for the last entry with contents:")
