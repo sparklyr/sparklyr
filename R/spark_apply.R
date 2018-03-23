@@ -205,6 +205,17 @@ spark_apply <- function(x,
     )
   )
 
+  # add debug connection message
+  if (isTRUE(args$debug) && !is.null(sc$session_id)) {
+    message("Debugging spark_apply(), connect to worker debugging session as follows:")
+    message("  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click")
+    message("     'Log' under the connection, look for the last entry with contents:")
+    message("     'Session (<sessionid>) is waiting for sparklyr client to connect to port <port>'")
+    message("  2. From a new R session run:")
+    message("     debugonce(sparklyr:::spark_worker_main)")
+    message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
+  }
+
   if (grouped) {
     colpos <- which(colnames(x) %in% group_by)
     if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")

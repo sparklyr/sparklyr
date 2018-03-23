@@ -1,3 +1,5 @@
+library(sparklyr)
+
 testthat_spark_connection <- function() {
   version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
 

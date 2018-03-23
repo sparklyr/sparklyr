@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Fixed serialization issues most commonly hit while using `spark_apply()` with NAs (#1365, #1366).
+
 - `cbind()` and `sdf_bind_cols()` don't use NSE internally anymore and no longer output names of mismatched data frames on error (#1363).
 
 - Fixed data frame provided by `spark_apply()` to not provide characters not factors (#1313).
@@ -12,7 +14,7 @@
 
 - Added support for `spark_apply()` under Livy connections.
 
-- Fixed regression blocking use of response-features syntax in some `ml_` functions (#1302).
+- Fixed regression blocking use of response-features syntax in some `ml_`functions (#1302).
 
 - Fixed file not found error in `spark_apply()` while working under low
   disk space.
