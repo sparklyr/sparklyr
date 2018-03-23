@@ -63,22 +63,29 @@ spark_installed_versions <- function() {
   })
   versions <- data.frame(spark = spark,
                          hadoop = hadoop,
-                         dir = dir,
+                         dir = file.path(spark_install_dir(), dir),
                          stringsAsFactors = FALSE)
 
   versions
 }
 
-
+#' @param show_hadoop Show Hadoop distributions?
+#'
 #' @rdname spark_install
+#'
 #' @export
-spark_available_versions <- function() {
+spark_available_versions <- function(show_hadoop = FALSE) {
   versions <- read_spark_versions_json(latest = TRUE)
   versions <- versions[versions$spark >= "1.6.0", 1:2]
-  versions$install <- paste0("spark_install(version = \"",
-                             versions$spark, "\", ",
-                             "hadoop_version = \"", versions$hadoop,
-                             "\")")
+  selection <- if (show_hadoop) c("spark", "hadoop") else "spark"
+
+  versions <- versions %>%
+    dplyr::arrange(desc(spark), desc(hadoop)) %>%
+    subset(select = selection) %>%
+    unique()
+
+  rownames(versions) <- 1:nrow(versions)
+
   versions
 }
 
