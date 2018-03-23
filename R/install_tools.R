@@ -3,6 +3,7 @@
 #' See: https://github.com/rstudio/spark-install
 #'
 #' @param project_path The path to the sparkinstall project
+#' @keywords internal
 spark_install_sync <- function(project_path) {
   sources <- c(
     "R/install.R",

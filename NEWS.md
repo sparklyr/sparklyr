@@ -1,5 +1,10 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `spark_available_versions()` was changed to only return available Spark versions, Hadoop versions
+  can be still retrieved using `hadoop = TRUE`.
+
+- `spark_installed_versions()` was changed to retrieve the full path to the installation folder.
+
 - Fixed serialization issues most commonly hit while using `spark_apply()` with NAs (#1365, #1366).
 
 - `cbind()` and `sdf_bind_cols()` don't use NSE internally anymore and no longer output names of mismatched data frames on error (#1363).
