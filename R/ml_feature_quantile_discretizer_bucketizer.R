@@ -8,24 +8,44 @@
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-handle-invalid
 #'
+#' @param input_cols Names of input columns.
+#' @param output_cols Names of output columns.
 #' @param splits A numeric vector of cutpoints, indicating the bucket boundaries.
+#' @param splits_array Parameter for specifying multiple splits parameters. Each
+#'    element in this array can be used to map continuous features into buckets.
 #'
 #' @export
 ft_bucketizer <- function(
-  x, input_col, output_col, splits, handle_invalid = "error",
+  x, input_col = NULL, output_col = NULL,
+  input_cols = NULL, output_cols = NULL,
+  splits = NULL, splits_array = NULL, handle_invalid = "error",
   uid = random_string("bucketizer_"), ...) {
   UseMethod("ft_bucketizer")
 }
 
 #' @export
 ft_bucketizer.spark_connection <- function(
-  x, input_col, output_col, splits, handle_invalid = "error",
+  x, input_col = NULL, output_col = NULL,
+  input_cols = NULL, output_cols = NULL,
+  splits = NULL, splits_array = NULL, handle_invalid = "error",
   uid = random_string("bucketizer_"), ...) {
 
   ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Bucketizer",
-                             input_col, output_col, uid) %>%
-    invoke("setSplits", splits) %>%
+
+  jobj <- invoke_new(x, "org.apache.spark.ml.feature.Bucketizer", uid)
+  if (is.null(splits_array)) {
+    jobj <- jobj %>%
+      invoke("setInputCol", input_col) %>%
+      invoke("setOutputCol", output_col) %>%
+      invoke("setSplits", splits)
+  } else {
+    jobj <- jobj %>%
+      invoke("setInputCols", input_cols) %>%
+      invoke("setOutputCols", output_cols)
+    jobj <- invoke_static(x, "sparklyr.BucketizerUtils", "setSplitsArrayParam",
+                          jobj, splits_array)
+  }
+  jobj <- jobj %>%
     jobj_set_param("setHandleInvalid", handle_invalid, "error", "2.1.0")
 
   new_ml_bucketizer(jobj)
@@ -33,7 +53,9 @@ ft_bucketizer.spark_connection <- function(
 
 #' @export
 ft_bucketizer.ml_pipeline <- function(
-  x, input_col, output_col, splits, handle_invalid = "error",
+  x, input_col = NULL, output_col = NULL,
+  input_cols = NULL, output_cols = NULL,
+  splits = NULL, splits_array = NULL, handle_invalid = "error",
   uid = random_string("bucketizer_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
@@ -42,7 +64,9 @@ ft_bucketizer.ml_pipeline <- function(
 
 #' @export
 ft_bucketizer.tbl_spark <- function(
-  x, input_col, output_col, splits, handle_invalid = "error",
+  x, input_col = NULL, output_col = NULL,
+  input_cols = NULL, output_cols = NULL,
+  splits = NULL, splits_array = NULL, handle_invalid = "error",
   uid = random_string("bucketizer_"), ...) {
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
@@ -56,8 +80,24 @@ new_ml_bucketizer <- function(jobj) {
 ml_validator_bucketizer <- function(args, nms) {
   args %>%
     ml_validate_args({
-      if (length(splits) < 3) stop("length(splits) must be at least 3")
-      splits <- lapply(splits, ensure_scalar_double)
+      uid <- ensure_scalar_character(uid)
+      if (is.null(input_col) && is.null(input_cols))
+        stop("One of 'input_col' or 'input_cols' must be specified.", call. = FALSE)
+      if (is.null(output_col) && is.null(output_cols))
+        stop("One of 'output_col' or 'output_cols' must be specified.", call. = FALSE)
+      if (is.null(splits_array)) {
+        input_col <- ensure_scalar_character(input_col)
+        output_col <- ensure_scalar_character(output_col)
+        if (length(splits) < 3) stop("length(splits) must be at least 3")
+        splits <- lapply(splits, ensure_scalar_double)
+      }
+      if (is.null(splits)) {
+        input_cols <- lapply(input_cols, ensure_scalar_character)
+        output_cols <- lapply(output_cols, ensure_scalar_character)
+        splits_array <- lapply(splits_array, function(x) lapply(x, ensure_scalar_double))
+      }
+
+
       handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
     }) %>%
     ml_extract_args(nms)

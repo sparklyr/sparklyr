@@ -63,6 +63,8 @@ ml_create_mapping_tables <- function() { # nocov start
          # ft_quantile_discretizer
          "num_buckets" = "numBuckets",
          "relative_error" = "relativeError",
+         # ft_bucketizer
+         "splits_array" = "splitsArray",
          # ml_generalized_linear_regression
          "link_prediction_col" = "linkPredictionCol",
          "variance_power" = "variancePower",

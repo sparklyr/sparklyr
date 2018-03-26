@@ -4,8 +4,9 @@
 \alias{ft_bucketizer}
 \title{Feature Transformation -- Bucketizer (Transformer)}
 \usage{
-ft_bucketizer(x, input_col, output_col, splits, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...)
+ft_bucketizer(x, input_col = NULL, output_col = NULL, input_cols = NULL,
+  output_cols = NULL, splits = NULL, splits_array = NULL,
+  handle_invalid = "error", uid = random_string("bucketizer_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -14,7 +15,14 @@ ft_bucketizer(x, input_col, output_col, splits, handle_invalid = "error",
 
 \item{output_col}{The name of the output column.}
 
+\item{input_cols}{Names of input columns.}
+
+\item{output_cols}{Names of output columns.}
+
 \item{splits}{A numeric vector of cutpoints, indicating the bucket boundaries.}
+
+\item{splits_array}{Parameter for specifying multiple splits parameters. Each
+element in this array can be used to map continuous features into buckets.}
 
 \item{handle_invalid}{(Spark 2.1.0+) Param for how to handle invalid entries. Options are
 'skip' (filter out rows with invalid values), 'error' (throw an error), or
