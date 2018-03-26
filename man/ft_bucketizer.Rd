@@ -4,8 +4,8 @@
 \alias{ft_bucketizer}
 \title{Feature Transformation -- Bucketizer (Transformer)}
 \usage{
-ft_bucketizer(x, input_col = NULL, output_col = NULL, input_cols = NULL,
-  output_cols = NULL, splits = NULL, splits_array = NULL,
+ft_bucketizer(x, input_col = NULL, output_col = NULL, splits = NULL,
+  input_cols = NULL, output_cols = NULL, splits_array = NULL,
   handle_invalid = "error", uid = random_string("bucketizer_"), ...)
 }
 \arguments{
@@ -15,11 +15,11 @@ ft_bucketizer(x, input_col = NULL, output_col = NULL, input_cols = NULL,
 
 \item{output_col}{The name of the output column.}
 
+\item{splits}{A numeric vector of cutpoints, indicating the bucket boundaries.}
+
 \item{input_cols}{Names of input columns.}
 
 \item{output_cols}{Names of output columns.}
-
-\item{splits}{A numeric vector of cutpoints, indicating the bucket boundaries.}
 
 \item{splits_array}{Parameter for specifying multiple splits parameters. Each
 element in this array can be used to map continuous features into buckets.}

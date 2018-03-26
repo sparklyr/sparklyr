@@ -16,19 +16,17 @@
 #'
 #' @export
 ft_bucketizer <- function(
-  x, input_col = NULL, output_col = NULL,
-  input_cols = NULL, output_cols = NULL,
-  splits = NULL, splits_array = NULL, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...) {
+  x, input_col = NULL, output_col = NULL, splits = NULL,
+  input_cols = NULL, output_cols = NULL, splits_array = NULL,
+  handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
   UseMethod("ft_bucketizer")
 }
 
 #' @export
 ft_bucketizer.spark_connection <- function(
-  x, input_col = NULL, output_col = NULL,
-  input_cols = NULL, output_cols = NULL,
-  splits = NULL, splits_array = NULL, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...) {
+  x, input_col = NULL, output_col = NULL, splits = NULL,
+  input_cols = NULL, output_cols = NULL, splits_array = NULL,
+  handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
 
   ml_ratify_args()
 
@@ -53,10 +51,9 @@ ft_bucketizer.spark_connection <- function(
 
 #' @export
 ft_bucketizer.ml_pipeline <- function(
-  x, input_col = NULL, output_col = NULL,
-  input_cols = NULL, output_cols = NULL,
-  splits = NULL, splits_array = NULL, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...) {
+  x, input_col = NULL, output_col = NULL, splits = NULL,
+  input_cols = NULL, output_cols = NULL, splits_array = NULL,
+  handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
 
   transformer <- ml_new_stage_modified_args()
   ml_add_stage(x, transformer)
@@ -64,10 +61,9 @@ ft_bucketizer.ml_pipeline <- function(
 
 #' @export
 ft_bucketizer.tbl_spark <- function(
-  x, input_col = NULL, output_col = NULL,
-  input_cols = NULL, output_cols = NULL,
-  splits = NULL, splits_array = NULL, handle_invalid = "error",
-  uid = random_string("bucketizer_"), ...) {
+  x, input_col = NULL, output_col = NULL, splits = NULL,
+  input_cols = NULL, output_cols = NULL, splits_array = NULL,
+  handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
   transformer <- ml_new_stage_modified_args()
   ml_transform(transformer, x)
 }
