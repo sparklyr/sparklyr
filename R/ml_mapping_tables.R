@@ -62,6 +62,7 @@ ml_create_mapping_tables <- function() { # nocov start
          "vocab_size" = "vocabSize",
          # ft_quantile_discretizer
          "num_buckets" = "numBuckets",
+         "num_buckets_array" = "numBucketsArray",
          "relative_error" = "relativeError",
          # ft_bucketizer
          "splits_array" = "splitsArray",

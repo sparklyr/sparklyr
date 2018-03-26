@@ -132,8 +132,12 @@ ml_validator_bucketizer <- function(args, nms) {
 #' @template roxlate-ml-feature-estimator-transformer
 #' @template roxlate-ml-feature-handle-invalid
 #'
+#' @param input_cols Names of input columns.
+#' @param output_cols Names of output columns.
 #' @param num_buckets Number of buckets (quantiles, or categories) into which data
 #'   points are grouped. Must be greater than or equal to 2.
+#' @param num_buckets_array Array of number of buckets (quantiles, or categories)
+#'   into which data points are grouped. Each value must be greater than or equal to 2.
 #' @param relative_error (Spark 2.0.0+) Relative error (see documentation for
 #'   org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
 #'   \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here}
@@ -142,24 +146,39 @@ ml_validator_bucketizer <- function(args, nms) {
 #' @seealso \code{\link{ft_bucketizer}}
 #' @export
 ft_quantile_discretizer <- function(
-  x, input_col, output_col, handle_invalid = "error",
-  num_buckets = 2L, relative_error = 0.001, dataset = NULL,
+  x, input_col = NULL, output_col = NULL, num_buckets = 2L,
+  input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
+  handle_invalid = "error", relative_error = 0.001, dataset = NULL,
   uid = random_string("quantile_discretizer_"), ...) {
   UseMethod("ft_quantile_discretizer")
 }
 
 #' @export
 ft_quantile_discretizer.spark_connection <- function(
-  x, input_col, output_col, handle_invalid = "error",
-  num_buckets = 2L, relative_error = 0.001, dataset = NULL,
+  x, input_col = NULL, output_col = NULL, num_buckets = 2L,
+  input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
+  handle_invalid = "error", relative_error = 0.001, dataset = NULL,
   uid = random_string("quantile_discretizer_"), ...) {
 
   ml_ratify_args()
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.QuantileDiscretizer",
-                                  input_col, output_col, uid) %>%
+
+  jobj <- invoke_new(x, "org.apache.spark.ml.feature.QuantileDiscretizer", uid) %>%
     jobj_set_param("setHandleInvalid", handle_invalid, "error", "2.1.0") %>%
-    invoke("setNumBuckets", num_buckets) %>%
-    jobj_set_param("setRelativeError", relative_error, 0.001, "2.0.0") %>%
+    jobj_set_param("setRelativeError", relative_error, 0.001, "2.0.0")
+
+  if (is.null(num_buckets_array)) {
+    jobj <- jobj %>%
+      invoke("setInputCol", input_col) %>%
+      invoke("setOutputCol", output_col) %>%
+      invoke("setNumBuckets", num_buckets)
+  } else {
+    jobj <- jobj %>%
+      invoke("setInputCols", input_cols) %>%
+      invoke("setOutputCols", output_cols) %>%
+      invoke("setNumBucketsArray", num_buckets_array)
+  }
+
+  estimator <- jobj %>%
     new_ml_quantile_discretizer()
 
   if (is.null(dataset))
@@ -170,8 +189,9 @@ ft_quantile_discretizer.spark_connection <- function(
 
 #' @export
 ft_quantile_discretizer.ml_pipeline <- function(
-  x, input_col, output_col, handle_invalid = "error",
-  num_buckets = 2L, relative_error = 0.001, dataset = NULL,
+  x, input_col = NULL, output_col = NULL, num_buckets = 2L,
+  input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
+  handle_invalid = "error", relative_error = 0.001, dataset = NULL,
   uid = random_string("quantile_discretizer_"), ...) {
 
   stage <- ml_new_stage_modified_args()
@@ -180,8 +200,9 @@ ft_quantile_discretizer.ml_pipeline <- function(
 
 #' @export
 ft_quantile_discretizer.tbl_spark <- function(
-  x, input_col, output_col, handle_invalid = "error",
-  num_buckets = 2L, relative_error = 0.001, dataset = NULL,
+  x, input_col = NULL, output_col = NULL, num_buckets = 2L,
+  input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
+  handle_invalid = "error", relative_error = 0.001, dataset = NULL,
   uid = random_string("quantile_discretizer_"), ...) {
   stage <- ml_new_stage_modified_args()
 
@@ -206,8 +227,23 @@ ml_validator_quantile_discretizer <- function(args, nms) {
   args %>%
     ml_validate_args(
       {
+        uid <- ensure_scalar_character(uid)
+        if (is.null(input_col) && is.null(input_cols))
+          stop("One of 'input_col' or 'input_cols' must be specified.", call. = FALSE)
+        if (is.null(output_col) && is.null(output_cols))
+          stop("One of 'output_col' or 'output_cols' must be specified.", call. = FALSE)
+        if (is.null(num_buckets_array)) {
+          input_col <- ensure_scalar_character(input_col)
+          output_col <- ensure_scalar_character(output_col)
+          num_buckets <- ensure_scalar_integer(num_buckets)
+        }
+        if (!is.null(num_buckets)) {
+          input_cols <- lapply(input_cols, ensure_scalar_character)
+          output_cols <- lapply(output_cols, ensure_scalar_character)
+          num_buckets_array <- lapply(num_buckets_array, ensure_scalar_integer)
+        }
+
         handle_invalid <- rlang::arg_match(handle_invalid, c("error", "skip", "keep"))
-        num_buckets <- ensure_scalar_integer(num_buckets)
         relative_error <- ensure_scalar_double(relative_error)
       }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
