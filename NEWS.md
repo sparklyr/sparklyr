@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `spark_connection` and `spark_jobj` classes are now exported (#1374).
+
 - Fixed issue with `Date` type not roundtripping with `spark_apply() (#1376).
 
 - `spark_available_versions()` was changed to only return available Spark versions, Hadoop versions
