@@ -54,7 +54,7 @@ NULL
 #' spark_disconnect(sc)
 #'
 #' @export
-spark_connect <- function(master = "local",
+spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
                           method = c("shell", "livy", "databricks", "test"),
                           app_name = "sparklyr",
