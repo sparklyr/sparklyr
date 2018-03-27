@@ -909,11 +909,11 @@ spark_worker_apply <- function(sc) {
     has_dates <- any(sapply(data[[1]], class) == "Date")
     if (has_dates) {
       first_row <- data[[1]]
-      lapply(seq_along(first_row), function(idx) {
+      for (idx in seq_along(first_row)) {
         if (identical(class(first_row[[idx]]), "Date")) {
           df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
         }
-      })
+      }
     }
 
     result <- NULL
