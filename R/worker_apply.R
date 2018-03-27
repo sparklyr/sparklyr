@@ -73,6 +73,18 @@ spark_worker_apply <- function(sc) {
     data <- group_entry[[1]]
 
     df <- do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+
+    # rbind removes Date classes so we re-assign them here
+    has_dates <- any(sapply(data[[1]], class) == "Date")
+    if (has_dates) {
+      first_row <- data[[1]]
+      for (idx in seq_along(first_row)) {
+        if (identical(class(first_row[[idx]]), "Date")) {
+          df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
+        }
+      }
+    }
+
     result <- NULL
 
     if (nrow(df) == 0) {
