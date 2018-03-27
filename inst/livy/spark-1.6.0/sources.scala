@@ -635,9 +635,11 @@ getSerdeType <- function(object) {
 writeObject <- function(con, object, writeType = TRUE) {
   type <- class(object)[[1]]
 
-  if (!type %in% c("list", "struct", "environment") && is.na(object)) {
-    object <- NULL
-    type <- "NULL"
+  if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
+    if (is.na(object)) {
+      object <- NULL
+      type <- "NULL"
+    }
   }
 
   serdeType <- getSerdeType(object)
@@ -902,6 +904,18 @@ spark_worker_apply <- function(sc) {
     data <- group_entry[[1]]
 
     df <- do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+
+    # rbind removes Date classes so we re-assign them here
+    has_dates <- any(sapply(data[[1]], class) == "Date")
+    if (has_dates) {
+      first_row <- data[[1]]
+      lapply(seq_along(first_row), function(idx) {
+        if (identical(class(first_row[[idx]]), "Date")) {
+          df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
+        }
+      })
+    }
+
     result <- NULL
 
     if (nrow(df) == 0) {
