@@ -4,6 +4,9 @@ sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
 
+dates <- data.frame(dates = c(as.Date("2015/12/19"), as.Date(NA), as.Date("2015/12/19")))
+dates_tbl <- testthat_tbl("dates")
+
 test_that("'spark_apply' can apply identity function", {
   expect_equal(
     iris_tbl %>% spark_apply(function(e) e) %>% collect(),
@@ -147,9 +150,6 @@ test_that("'spark_apply' can filter using dplyr", {
 })
 
 test_that("'spark_apply' can return 'NA's", {
-  dates <- data.frame(dates = c(as.Date("2015/12/19"), as.Date(NA), as.Date("2015/12/19")))
-  dates_tbl <- copy_to(sc, dates, overwrite = TRUE)
-
   expect_equal(
     dates_tbl %>%
       spark_apply(function(e) e) %>%
@@ -157,12 +157,26 @@ test_that("'spark_apply' can return 'NA's", {
       nrow(),
     nrow(dates)
   )
+})
 
+test_that("'spark_apply' can return 'NA's for dates", {
   expect_equal(
     sdf_len(sc, 1) %>%
       spark_apply(function(e) data.frame(dates = c(as.Date("2001/1/1"), NA))) %>%
       collect() %>%
       nrow(),
     2
+  )
+})
+
+test_that("'spark_apply' can roundtrip dates", {
+  expect_equal(
+    dates_tbl %>%
+      spark_apply(function(e) as.Date(e[[1]], origin = "1970-01-01")) %>%
+      spark_apply(function(e) e) %>%
+      collect() %>%
+      pull(dates) %>%
+      class(),
+    "Date"
   )
 })
