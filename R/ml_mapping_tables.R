@@ -66,6 +66,8 @@ ml_create_mapping_tables <- function() { # nocov start
          "relative_error" = "relativeError",
          # ft_bucketizer
          "splits_array" = "splitsArray",
+         # ft_feature-hasher
+         "categorical_cols" = "categoricalCols",
          # ml_generalized_linear_regression
          "link_prediction_col" = "linkPredictionCol",
          "variance_power" = "variancePower",
@@ -159,6 +161,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "VectorAssembler" = "vector_assembler",
     "NGram" = "ngram",
     "VectorSlicer" = "vector_slicer",
+    "FeatureHasher" = "feature_hasher",
     # feature (estimators)
     "VectorIndexer" = "vector_indexer",
     "VectorIndexerModel" = "VectorIndexerModel",
