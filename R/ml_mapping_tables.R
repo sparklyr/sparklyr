@@ -248,6 +248,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "BinaryClassificationEvaluator" = "binary_classification_evaluator",
     "MulticlassClassificationEvaluator" = "multiclass_classification_evaluator",
     "RegressionEvaluator" = "regression_evaluator",
+    "ClusteringEvaluator" = "clustering_evaluator",
     # pipeline
     "Pipeline" = "pipeline",
     "PipelineModel" = "pipeline_model",
