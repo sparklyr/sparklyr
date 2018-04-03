@@ -119,7 +119,14 @@ class Invoke {
 
       return ctors(index.get).newInstance(args : _*).asInstanceOf[Object]
     } else {
-      throw new IllegalArgumentException("invalid method " + methodName + " for object " + objId)
+      val fields = cls.getFields
+      val selectedField = fields.filter(m => m.getName == methodName)
+      if (selectedField.length == 1) {
+        return selectedField(0).get(obj)
+      }
+      else {
+        throw new IllegalArgumentException("invalid method " + methodName + " for object " + objId + "/" + cls.getName + " fields " + fields.length + " selected " + selectedField.length)
+      }
     }
   }
 }
