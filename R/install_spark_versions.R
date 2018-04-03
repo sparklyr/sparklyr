@@ -79,10 +79,7 @@ spark_available_versions <- function(show_hadoop = FALSE) {
   versions <- versions[versions$spark >= "1.6.0", 1:2]
   selection <- if (show_hadoop) c("spark", "hadoop") else "spark"
 
-  versions <- versions %>%
-    dplyr::arrange(desc(spark), desc(hadoop)) %>%
-    subset(select = selection) %>%
-    unique()
+  versions <- unique(subset(versions, select = selection))
 
   rownames(versions) <- 1:nrow(versions)
 
