@@ -5,7 +5,8 @@
 \title{Create a Spark Configuration for Livy}
 \usage{
 livy_config(config = spark_config(), username = NULL, password = NULL,
-  custom_headers = list(`X-Requested-By` = "sparklyr"), ...)
+  negotiate = FALSE, custom_headers = list(`X-Requested-By` = "sparklyr"),
+  ...)
 }
 \arguments{
 \item{config}{Optional base configuration}
@@ -13,6 +14,8 @@ livy_config(config = spark_config(), username = NULL, password = NULL,
 \item{username}{The username to use in the Authorization header}
 
 \item{password}{The password to use in the Authorization header}
+
+\item{negotiate}{Whether to use gssnegotiate method or not}
 
 \item{custom_headers}{List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.}
 
