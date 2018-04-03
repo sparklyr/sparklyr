@@ -660,6 +660,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXlt = writeTime(con, object),
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
+         `data.frame` = writeList(con, object),
          stop(paste("Unsupported type for serialization", type)))
 }
 
@@ -735,6 +736,7 @@ writeType <- function(con, class) {
                  POSIXlt = "t",
                  POSIXct = "t",
                  factor = "c",
+                 `data.frame` = "l",
                  stop(paste("Unsupported type for serialization", class)))
   writeBin(charToRaw(type), con)
 }

@@ -663,6 +663,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXlt = writeTime(con, object),
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
+         `data.frame` = writeList(con, object),
          stop(paste("Unsupported type for serialization", type)))
 }
 
@@ -738,6 +739,7 @@ writeType <- function(con, class) {
                  POSIXlt = "t",
                  POSIXct = "t",
                  factor = "c",
+                 `data.frame` = "l",
                  stop(paste("Unsupported type for serialization", class)))
   writeBin(charToRaw(type), con)
 }
@@ -906,8 +908,8 @@ spark_worker_apply <- function(sc) {
     df <- do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
 
     # rbind removes Date classes so we re-assign them here
-    has_dates <- any(sapply(data[[1]], class) == "Date")
-    if (has_dates) {
+    if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0 &&
+        any(sapply(data[[1]], class) == "Date")) {
       first_row <- data[[1]]
       for (idx in seq_along(first_row)) {
         if (identical(class(first_row[[idx]]), "Date")) {

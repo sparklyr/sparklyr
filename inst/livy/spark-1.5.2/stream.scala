@@ -99,6 +99,13 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
             obj = classMap(objId)
             classMap(objId).getClass.asInstanceOf[Class[_]]
           }
+          else if (!Utils.classExists(objId) && Utils.classExists(objId + ".package$")) {
+            val pkgCls = Class.forName(objId + ".package$")
+
+            val mdlField = pkgCls.getField("MODULE$")
+            obj = mdlField.get(null)
+            obj.getClass
+          }
           else {
             Class.forName(objId)
           }
@@ -124,7 +131,7 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
             if (e.getCause == null) e else e.getCause
           ))
         case e: NoClassDefFoundError =>
-          logger.logError(s"failed calling $methodName on $objId with no class dound error")
+          logger.logError(s"failed calling $methodName on $objId with no class found error")
           serializer.writeInt(dos, -1)
           serializer.writeString(dos, exceptionString(
             if (e.getCause == null) e else e.getCause
