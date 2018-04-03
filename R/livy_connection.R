@@ -36,6 +36,7 @@ livy_validate_http_response <- function(message, req) {
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
 #' @param password The password to use in the Authorization header
+#' @param negotiate Whether to use gssnegotiate method or not
 #' @param custom_headers List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.
 #' @param ... additional Livy session parameters
 #'
@@ -66,17 +67,12 @@ livy_validate_http_response <- function(message, req) {
 #' }
 #'
 #' @return Named list with configuration data
-livy_config <- function(config = spark_config(), username = NULL, password = NULL,
+livy_config <- function(config = spark_config(), username = NULL, password = NULL, negotiate = FALSE,
                         custom_headers = list("X-Requested-By" = "sparklyr"), ...) {
-  if (!is.null(username) || !is.null(password)) {
-    config[["sparklyr.livy.headers"]] <- c(
-      config[["sparklyr.livy.headers"]], list(
-        Authorization = paste(
-          "Basic",
-          base64encode(charToRaw(paste(username, password, sep = ":")))
-        )
-      )
-    )
+  if (negotiate) {
+    config[["sparklyr.livy.auth"]] <- httr::authenticate("", "", type = "gssnegotiate")
+  } else if (!is.null(username) || !is.null(password)) {
+    config[["sparklyr.livy.auth"]] <- httr::authenticate(username, password, type = "basic")
   }
 
   if (!is.null(custom_headers)) {
@@ -139,7 +135,8 @@ livy_get_json <- function(url, config) {
   req <- GET(url,
              livy_get_httr_headers(config, list(
                "Content-Type" = "application/json"
-             ))
+             )),
+             config$sparklyr.livy.auth
   )
 
   livy_validate_http_response("Failed to retrieve livy session", req)
@@ -199,7 +196,8 @@ livy_create_session <- function(master, config) {
               )),
               body = toJSON(
                 data
-              )
+              ),
+              config$sparklyr.livy.auth
   )
 
   livy_validate_http_response("Failed to create livy session", req)
@@ -218,7 +216,8 @@ livy_destroy_session <- function(sc) {
                 livy_get_httr_headers(sc$config, list(
                   "Content-Type" = "application/json"
                 )),
-                body = NULL
+                body = NULL,
+                sc$config$sparklyr.livy.auth
   )
 
   livy_validate_http_response("Failed to destroy livy statement", req)
@@ -370,7 +369,8 @@ livy_post_statement <- function(sc, code) {
                 list(
                   code = unbox(code)
                 )
-              )
+              ),
+              sc$config$sparklyr.livy.auth
   )
 
   livy_validate_http_response("Failed to invoke livy statement", req)
