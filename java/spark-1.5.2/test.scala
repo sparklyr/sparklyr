@@ -26,3 +26,7 @@ object Test {
 
   def unaryArrayToClass(array: Array[_]): String = array.getClass.getName
 }
+
+package object test {
+  def testPackageObject(s : String): String = s
+}
