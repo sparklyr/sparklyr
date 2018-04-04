@@ -346,6 +346,10 @@ object Utils {
     sc.parallelize(data, partitions)
   }
 
+  def classExists(name: String): Boolean = {
+    scala.util.Try(Class.forName(name)).isSuccess
+  }
+
   def createDataFrameFromCsv(
     sc: SparkContext,
     path: String,
