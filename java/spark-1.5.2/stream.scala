@@ -12,6 +12,10 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
 
   val invoke = new Invoke()
 
+  def classExists(name: String): Boolean = {
+    scala.util.Try(Class.forName(name)).isSuccess
+  }
+
   def read(
     msg: Array[Byte],
     classMap: Map[String, Object],
@@ -96,7 +100,7 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
             obj = classMap(objId)
             classMap(objId).getClass.asInstanceOf[Class[_]]
           }
-          else if (!Utils.classExists(objId) && Utils.classExists(objId + ".package$")) {
+          else if (!classExists(objId) && classExists(objId + ".package$")) {
             val pkgCls = Class.forName(objId + ".package$")
 
             val mdlField = pkgCls.getField("MODULE$")
