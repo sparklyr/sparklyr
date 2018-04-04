@@ -1,9 +1,7 @@
 # register the spark_connection S3 class for use in setClass slots
 
-#' @exportClass spark_connection
 methods::setOldClass("spark_connection")
 
-#' @exportClass spark_jobj
 methods::setOldClass("spark_jobj")
 
 .spark_default_version <- numeric_version("1.6.2")

@@ -78,6 +78,7 @@ spark_session <- function(sc) {
 #' @param x An \R object from which a \code{spark_connection} can be obtained.
 #' @param ... Optional arguments; currently unused.
 #'
+#' @exportClass spark_connection
 #' @export
 spark_connection <- function(x, ...) {
   UseMethod("spark_connection")
