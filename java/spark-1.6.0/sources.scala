@@ -424,6 +424,7 @@ core_read_spark_log_error <- function(sc) {
 #'
 #' @seealso \code{\link{invoke}}, for calling methods on Java object references.
 #'
+#' @exportClass spark_jobj
 #' @export
 spark_jobj <- function(x, ...) {
   UseMethod("spark_jobj")
@@ -660,6 +661,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXlt = writeTime(con, object),
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
+         `data.frame` = writeList(con, object),
          stop(paste("Unsupported type for serialization", type)))
 }
 
@@ -735,6 +737,7 @@ writeType <- function(con, class) {
                  POSIXlt = "t",
                  POSIXct = "t",
                  factor = "c",
+                 `data.frame` = "l",
                  stop(paste("Unsupported type for serialization", class)))
   writeBin(charToRaw(type), con)
 }

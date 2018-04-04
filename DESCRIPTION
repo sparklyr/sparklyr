@@ -43,7 +43,6 @@ Imports:
     rprojroot,
     rstudioapi,
     shiny (>= 1.0.1),
-    tibble,
     withr,
     xml2
 Suggests:
@@ -51,4 +50,5 @@ Suggests:
     janeaustenr,
     nycflights13,
     testthat,
+    tibble,
     RCurl

@@ -1,5 +1,9 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Livy now supports Kerberos authentication.
+
+- `invoke_static()` now supports calling Scala's package objects (#1384).
+
 - `spark_connection` and `spark_jobj` classes are now exported (#1374).
 
 - Fixed issue with `Date` type not roundtripping with `spark_apply() (#1376).

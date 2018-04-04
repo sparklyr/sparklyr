@@ -57,3 +57,10 @@ test_that("we can invoke_static using make_ensure_scalar_impl", {
   expect_equal(invoke_static(sc, "sparklyr.Test", "unaryPrimitiveInt",
                              test_ensure_scalar_integer(5)), 25)
 })
+
+test_that("we can invoke_static 'package object' types", {
+  expect_equal(
+    invoke_static(sc, "sparklyr.test", "testPackageObject", "x"),
+    "x"
+  )
+})
