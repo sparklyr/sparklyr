@@ -101,10 +101,6 @@ test_that("we can cross validate a logistic regression with xval", {
 
   expect_match(summary_string,
                "3-fold cross validation")
-  expect_output_file(
-    print(cvm),
-    output_file("print/cross-validator-model.txt")
-  )
 })
 
 test_that("we can train a regression with train-validation-split", {

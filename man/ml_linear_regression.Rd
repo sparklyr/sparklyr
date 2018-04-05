@@ -6,10 +6,10 @@
 \usage{
 ml_linear_regression(x, formula = NULL, fit_intercept = TRUE,
   elastic_net_param = 0, reg_param = 0, max_iter = 100L,
-  weight_col = NULL, solver = "auto", standardization = TRUE,
-  tol = 1e-06, features_col = "features", label_col = "label",
-  prediction_col = "prediction", uid = random_string("linear_regression_"),
-  ...)
+  weight_col = NULL, loss = "squaredError", solver = "auto",
+  standardization = TRUE, tol = 1e-06, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  uid = random_string("linear_regression_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -25,6 +25,9 @@ ml_linear_regression(x, formula = NULL, fit_intercept = TRUE,
 \item{max_iter}{The maximum number of iterations to use.}
 
 \item{weight_col}{The name of the column to use as weights for the model fit.}
+
+\item{loss}{The loss function to be optimized. Supported options: "squaredError"
+and "huber". Default: "squaredError"}
 
 \item{solver}{Solver algorithm for optimization.}
 

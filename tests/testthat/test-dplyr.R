@@ -2,6 +2,7 @@ context("dplyr")
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
+test_requires("dplyr")
 
 df1 <- data_frame(a = 1:3, b = letters[1:3])
 df2 <- data_frame(b = letters[1:3], c = letters[24:26])
@@ -121,5 +122,5 @@ test_that("'sdf_broadcast' forces broadcast hash join", {
     invoke("queryExecution") %>%
     invoke("optimizedPlan") %>%
     invoke("toString")
-  expect_match(query_plan, "BroadcastHint|isBroadcastable=true")
+  expect_match(query_plan, "B|broadcast")
 })

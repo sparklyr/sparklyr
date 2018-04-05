@@ -62,7 +62,12 @@ ml_create_mapping_tables <- function() { # nocov start
          "vocab_size" = "vocabSize",
          # ft_quantile_discretizer
          "num_buckets" = "numBuckets",
+         "num_buckets_array" = "numBucketsArray",
          "relative_error" = "relativeError",
+         # ft_bucketizer
+         "splits_array" = "splitsArray",
+         # ft_feature-hasher
+         "categorical_cols" = "categoricalCols",
          # ml_generalized_linear_regression
          "link_prediction_col" = "linkPredictionCol",
          "variance_power" = "variancePower",
@@ -156,6 +161,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "VectorAssembler" = "vector_assembler",
     "NGram" = "ngram",
     "VectorSlicer" = "vector_slicer",
+    "FeatureHasher" = "feature_hasher",
     # feature (estimators)
     "VectorIndexer" = "vector_indexer",
     "VectorIndexerModel" = "VectorIndexerModel",
@@ -242,6 +248,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "BinaryClassificationEvaluator" = "binary_classification_evaluator",
     "MulticlassClassificationEvaluator" = "multiclass_classification_evaluator",
     "RegressionEvaluator" = "regression_evaluator",
+    "ClusteringEvaluator" = "clustering_evaluator",
     # pipeline
     "Pipeline" = "pipeline",
     "PipelineModel" = "pipeline_model",
