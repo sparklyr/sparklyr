@@ -47,3 +47,16 @@ test_that("input_cols print correctly", {
     output_file("print/vector-assembler.txt")
   )
 })
+
+test_that("ml_ helper functions print calls correctly (#1393)", {
+  car_db <- testthat_tbl("mtcars")
+
+  res1 <- sparklyr::ml_random_forest(x = car_db, formula = mpg ~ ., type = "regression",
+                                    feature_subset_strategy = "3", seed = sample.int(10^5, 1))
+  call1 <- gsub("^sparklyr::", "", res1$.call)
+
+  res2 <- ml_random_forest(x = car_db, formula = mpg ~ ., type = "regression",
+                           feature_subset_strategy = "3", seed = sample.int(10^5, 1))
+  call2 <- res2$.call
+  expect_identical(call1, call2)
+})
