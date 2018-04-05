@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `ml_` helper functions such as `ml_random_forest()` now capture calls correctly (#1393).
+
 - Added support for Huber loss for linear regression (#1335).
 
 - `ft_bucketizer()` and `ft_quantile_discretizer()` now support
