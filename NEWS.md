@@ -1,5 +1,14 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Added support for Huber loss for linear regression (#1335).
+
+- `ft_bucketizer()` and `ft_quantile_discretizer()` now support
+  multiple input columns (#1338, #1339).
+  
+- Added `ft_feature_hasher()` (#1336).
+
+- Added `ml_clustering_evaluator()` (#1333).
+
 - Livy now supports Kerberos authentication.
 
 - `invoke_static()` now supports calling Scala's package objects (#1384).
