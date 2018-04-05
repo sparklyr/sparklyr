@@ -24,8 +24,6 @@ treat as categorical.}
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{threshold}{Threshold used to binarize continuous features.}
 }
 \value{
 The object returned depends on the class of \code{x}.

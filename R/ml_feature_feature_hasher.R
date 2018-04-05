@@ -37,8 +37,6 @@
 #'   treat as categorical.
 #' @template roxlate-ml-feature-transformer
 #'
-#' @param threshold Threshold used to binarize continuous features.
-#'
 #' @export
 ft_feature_hasher <- function(
   x, input_cols, output_col,
