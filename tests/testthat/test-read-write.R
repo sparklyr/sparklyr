@@ -102,6 +102,7 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
 
 test_that("spark_write_table() can append data", {
   if (spark_version(sc) < "2.2.0") skip("svc not supported before 2.2.0")
+  if (spark_version(sc) >= "2.3.0") skip("see #1391")
   test_requires("dplyr")
 
   create_table <-

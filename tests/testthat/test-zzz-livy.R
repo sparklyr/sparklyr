@@ -2,6 +2,8 @@ context("livy")
 test_requires("dplyr")
 
 test_that("'spark_version()' works under Livy connections", {
+  sc <- testthat_spark_connection()
+  if (spark_version(sc) >= "2.3.0") skip("see #1391")
   lc <- testthat_livy_connection()
 
   version <- spark_version(lc)
@@ -11,6 +13,8 @@ test_that("'spark_version()' works under Livy connections", {
 })
 
 test_that("'copy_to()' works under Livy connections", {
+  sc <- testthat_spark_connection()
+  if (spark_version(sc) >= "2.3.0") skip("see #1391")
   lc <- testthat_livy_connection()
 
   df <- data.frame(a = c(1, 2), b = c("A", "B"), stringsAsFactors = FALSE)
@@ -42,6 +46,8 @@ test_that("'livy_config()' works with authentication", {
 })
 
 test_that("'spark_apply()' works under Livy connections", {
+  sc <- testthat_spark_connection()
+  if (spark_version(sc) >= "2.3.0") skip("see #1391")
   lc <- testthat_livy_connection()
 
   df <- data.frame(id = 10)
