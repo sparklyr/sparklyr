@@ -3,19 +3,19 @@
 // Changes to this file will be reverted.
 //
 
-@io.netty.channel.ChannelHandler.Sharable
+@_root_.io.netty.channel.ChannelHandler.Sharable
 class BackendHandler(
   close: () => Unit,
   logger: Logger,
   hostContext: String,
   serializer: Serializer,
-  tracker: JVMObjectTracker) extends io.netty.channel.SimpleChannelInboundHandler[Array[Byte]] {
+  tracker: JVMObjectTracker) extends _root_.io.netty.channel.SimpleChannelInboundHandler[Array[Byte]] {
 
   import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
 
   import scala.language.existentials
 
-  import io.netty.channel.ChannelHandlerContext
+  import _root_.io.netty.channel.ChannelHandlerContext
 
   var streamHandler = new StreamHandler(serializer, tracker)
 
