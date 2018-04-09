@@ -13,7 +13,7 @@
 #'   A version of Spark known to be compatible with the requested version of
 #'   \samp{livy} is chosen when possible.
 #' @export
-livy_install <- function(version       = "0.3.0",
+livy_install <- function(version       = "0.5.0",
                          spark_home    = NULL,
                          spark_version = NULL)
 {
@@ -29,7 +29,9 @@ livy_install <- function(version       = "0.3.0",
       spark_version <- switch(
         version,
         "0.2.0" = "1.6.2",
-        "0.3.0" = "2.0.1"
+        "0.3.0" = "2.0.1",
+        "0.4.0" = "2.1.0",
+        "0.5.0" = "2.2.0"
       )
     }
 
@@ -86,10 +88,18 @@ livy_install <- function(version       = "0.3.0",
   }
 
   # construct path to livy download
-  url <- sprintf(
-    "http://archive.cloudera.com/beta/livy/livy-server-%s.zip",
-    version
-  )
+  if (version <= "0.3.0") {
+    url <- sprintf(
+      "http://archive.cloudera.com/beta/livy/livy-server-%s.zip",
+      version
+    )
+  } else {
+    url <- sprintf(
+      "http://archive.apache.org/dist/incubator/livy/%s-incubating/livy-%s-incubating-bin.zip",
+      version,
+      version
+    )
+  }
 
   # download to cache directory
   ensure_directory(livy_cache)
@@ -142,7 +152,7 @@ livy_install <- function(version       = "0.3.0",
 #' @rdname livy_install
 #' @export
 livy_available_versions <- function() {
-  versions <- data.frame(livy = c("0.2.0", "0.3.0"))
+  versions <- data.frame(livy = c("0.2.0", "0.3.0", "0.4.0", "0.5.0"))
 
   versions$install <- paste0("livy_install(version = \"",
                              versions$livy,
