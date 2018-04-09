@@ -134,7 +134,7 @@ testthat_livy_connection <- function() {
 
   if (!connected) {
     livy_service_start(
-      version = "0.3.0",
+      version = "0.5.0",
       spark_version = version,
       stdout = FALSE,
       stderr = FALSE)
