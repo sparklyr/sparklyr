@@ -51,4 +51,8 @@ Suggests:
     nycflights13,
     testthat,
     tibble,
-    RCurl
+    RCurl,
+    tidyr,
+    purrr,
+    corrr,
+    rlang

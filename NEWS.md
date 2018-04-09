@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Added support for `corrr:correlate()`. Needs `corrr` dev version - @edgararuiz
+
 - Added support for Huber loss for linear regression (#1335).
 
 - `ft_bucketizer()` and `ft_quantile_discretizer()` now support
