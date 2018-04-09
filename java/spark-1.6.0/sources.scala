@@ -907,11 +907,14 @@ spark_worker_apply <- function(sc) {
 
     # rbind removes Date classes so we re-assign them here
     if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0 &&
-        any(sapply(data[[1]], class) == "Date")) {
+        any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
       first_row <- data[[1]]
       for (idx in seq_along(first_row)) {
-        if (identical(class(first_row[[idx]]), "Date")) {
+        first_class <- class(first_row[[idx]])[[1]]
+        if (identical(first_class, "Date")) {
           df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
+        } else if (identical(first_class, "POSIXct")) {
+          df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
         }
       }
     }
