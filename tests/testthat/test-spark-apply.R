@@ -180,3 +180,16 @@ test_that("'spark_apply' can roundtrip dates", {
     "Date"
   )
 })
+
+test_that("'spark_apply' can roundtrip Date-Time", {
+  expect_equal(
+    dates_tbl %>%
+      spark_apply(function(e) as.POSIXct(e[[1]], origin = "1970-01-01")) %>%
+      spark_apply(function(e) e) %>%
+      collect() %>%
+      pull(dates) %>%
+      class() %>%
+      first(),
+    "POSIXct"
+  )
+})
