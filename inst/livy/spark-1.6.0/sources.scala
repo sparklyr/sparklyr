@@ -819,6 +819,7 @@ worker_config_serialize <- function(config) {
     if (isTRUE(config$debug)) "TRUE" else "FALSE",
     spark_config_value(config, "sparklyr.worker.gateway.port", "8880"),
     spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
+    if (isTRUE(config$profile)) "TRUE" else "FALSE",
     sep = ";"
   )
 }
@@ -829,7 +830,8 @@ worker_config_deserialize <- function(raw) {
   list(
     debug = as.logical(parts[[1]]),
     sparklyr.gateway.port = as.integer(parts[[2]]),
-    sparklyr.gateway.address = parts[[3]]
+    sparklyr.gateway.address = parts[[3]],
+    profile = as.logical(parts[[4]])
   )
 }
 spark_worker_apply <- function(sc) {
@@ -910,11 +912,14 @@ spark_worker_apply <- function(sc) {
 
     # rbind removes Date classes so we re-assign them here
     if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0 &&
-        any(sapply(data[[1]], class) == "Date")) {
+        any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
       first_row <- data[[1]]
       for (idx in seq_along(first_row)) {
-        if (identical(class(first_row[[idx]]), "Date")) {
+        first_class <- class(first_row[[idx]])[[1]]
+        if (identical(first_class, "Date")) {
           df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
+        } else if (identical(first_class, "POSIXct")) {
+          df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
         }
       }
     }
@@ -1167,6 +1172,12 @@ spark_worker_main <- function(
 
     config <- worker_config_deserialize(configRaw)
 
+    if (identical(config$profile, TRUE)) {
+      profile_name <- paste("spark-apply-", as.numeric(Sys.time()), ".Rprof", sep = "")
+      worker_log("starting new profile in ", file.path(getwd(), profile_name))
+      utils::Rprof(profile_name)
+    }
+
     if (config$debug) {
       worker_log("exiting to wait for debugging session to attach")
 
@@ -1182,6 +1193,11 @@ spark_worker_main <- function(
     worker_log("is connected")
 
     spark_worker_apply(sc)
+
+    if (identical(config$profile, TRUE)) {
+      # utils::Rprof(NULL)
+      worker_log("closing profile")
+    }
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)

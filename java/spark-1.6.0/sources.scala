@@ -816,6 +816,7 @@ worker_config_serialize <- function(config) {
     if (isTRUE(config$debug)) "TRUE" else "FALSE",
     spark_config_value(config, "sparklyr.worker.gateway.port", "8880"),
     spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
+    if (isTRUE(config$profile)) "TRUE" else "FALSE",
     sep = ";"
   )
 }
@@ -826,7 +827,8 @@ worker_config_deserialize <- function(raw) {
   list(
     debug = as.logical(parts[[1]]),
     sparklyr.gateway.port = as.integer(parts[[2]]),
-    sparklyr.gateway.address = parts[[3]]
+    sparklyr.gateway.address = parts[[3]],
+    profile = as.logical(parts[[4]])
   )
 }
 spark_worker_apply <- function(sc) {
@@ -1163,9 +1165,17 @@ spark_worker_main <- function(
   spark_worker_hooks()
 
   tryCatch({
+    worker_log_session(sessionId)
+
     if (is.null(configRaw)) configRaw <- worker_config_serialize(list())
 
     config <- worker_config_deserialize(configRaw)
+
+    if (identical(config$profile, TRUE)) {
+      profile_name <- paste("spark-apply-", as.numeric(Sys.time()), ".Rprof", sep = "")
+      worker_log("starting new profile in ", file.path(getwd(), profile_name))
+      utils::Rprof(profile_name)
+    }
 
     if (config$debug) {
       worker_log("exiting to wait for debugging session to attach")
@@ -1175,13 +1185,17 @@ spark_worker_main <- function(
       return()
     }
 
-    worker_log_session(sessionId)
     worker_log("is starting")
 
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
     spark_worker_apply(sc)
+
+    if (identical(config$profile, TRUE)) {
+      # utils::Rprof(NULL)
+      worker_log("closing profile")
+    }
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)
