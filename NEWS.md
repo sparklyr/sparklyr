@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `ml_` routines no longer capture the calling expression (#1393).
+
 - Added support for `profile` parameter in `spark_apply()` that collects a
   profile to measure perpformance that can be rendered using the `profvis`
   package.
