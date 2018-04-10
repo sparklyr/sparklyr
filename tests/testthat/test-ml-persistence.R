@@ -2,6 +2,7 @@ context("ml persistence")
 
 sc <- testthat_spark_connection()
 
+test_requires("dplyr")
 training <- data_frame(
   id = 0:3L,
   text = c("a b c d e spark",
@@ -24,7 +25,11 @@ test_that("ml_save/ml_load work for unnested pipelines", {
     ft_tokenizer("x", "y") %>%
     ft_binarizer("in", "out", 0.5)
   path <- tempfile()
-  ml_save(p1, path)
+  expect_message(
+    ml_save(p1, path),
+    "Model successfully saved\\."
+  )
+
   p2 <- ml_load(sc, path)
 
 

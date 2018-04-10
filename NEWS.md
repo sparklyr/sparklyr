@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `ml_save()` outputs message when model is successfully saved (#1348).
+
 - `ml_` routines no longer capture the calling expression (#1393).
 
 - Added support for `profile` parameter in `spark_apply()` that collects a
