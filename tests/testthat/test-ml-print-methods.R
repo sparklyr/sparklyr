@@ -15,8 +15,11 @@ test_that("printing works for ml_model_logistic_regression", {
     response = "versicolor",
     features = c("Sepal_Width", "Petal_Length", "Petal_Width"))
 
-  expect_output(print(s),
-                "Call: ml_logistic_regression.tbl_spark\\(")
+  expect_known_output(
+    s,
+    output_file("print/logreg.txt"),
+    print = TRUE
+  )
 
 })
 

@@ -1,0 +1,5 @@
+Formula: versicolor ~ Sepal_Width + Petal_Length + Petal_Width
+
+Coefficients:
+ (Intercept)  Sepal_Width Petal_Length  Petal_Width 
+    6.950625    -2.956547     1.125247    -2.614799 

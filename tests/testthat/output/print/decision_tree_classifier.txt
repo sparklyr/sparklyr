@@ -1,5 +1,3 @@
-Call: ml_decision_tree_classifier.tbl_spark(iris_tbl, Species ~ Petal_Length + Sepal_Width, seed = 54, uid = "dt2")  
-
 Formula: Species ~ Petal_Length + Sepal_Width
 
 DecisionTreeClassificationModel (uid=dt2) of depth 5 with 21 nodes
