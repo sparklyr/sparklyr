@@ -187,8 +187,7 @@ new_ml_model_linear_svc <- function(
     coefficients = coefficients,
     subclass = "ml_model_linear_svc",
     .features = feature_names,
-    .index_labels = index_labels,
-    .call = call
+    .index_labels = index_labels
   )
 }
 

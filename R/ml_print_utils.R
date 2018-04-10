@@ -49,11 +49,6 @@ print_newline <- function() {
   cat("", sep = "\n")
 }
 
-ml_model_print_call <- function(model) {
-  printf("Call: %s\n", model$.call)
-  invisible(model$.call)
-}
-
 ml_model_print_residuals <- function(model,
                                      residuals.header = "Residuals") {
 
