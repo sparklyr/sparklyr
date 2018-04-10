@@ -172,8 +172,7 @@ new_ml_model_naive_bayes <- function(
     !!! list(pi = pi,
     theta = theta,
     .features = feature_names,
-    .index_labels = index_labels,
-    .call = call)
+    .index_labels = index_labels)
   )
 }
 
@@ -181,10 +180,6 @@ new_ml_model_naive_bayes <- function(
 
 #' @export
 print.ml_model_naive_bayes <- function(x, ...) {
-
-  ml_model_print_call(x)
-  print_newline()
-
   printf("A-priority probabilities:\n")
   print(exp(x$pi))
   print_newline()

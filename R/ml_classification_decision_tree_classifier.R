@@ -126,13 +126,11 @@ ml_decision_tree_classifier.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
-    call <- if (identical(sys.call(sys.parent())[[1]], quote(ml_decision_tree)))
-      sys.call(sys.parent())
     ml_generate_ml_model(
       x, predictor, formula, features_col, label_col,
       "classification",
       new_ml_model_decision_tree_classification,
-      predicted_label_col, call
+      predicted_label_col
       )
   }
 }
@@ -180,7 +178,6 @@ new_ml_model_decision_tree_classification <- function(
     pipeline, pipeline_model, model, dataset, formula,
     subclass = "ml_model_decision_tree_classification",
     .features = feature_names,
-    .index_labels = index_labels,
-    .call = call
+    .index_labels = index_labels
   )
 }

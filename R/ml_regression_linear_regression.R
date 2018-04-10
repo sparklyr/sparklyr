@@ -223,8 +223,7 @@ new_ml_model_linear_regression <- function(
     coefficients = coefficients,
     summary = summary,
     subclass = "ml_model_linear_regression",
-    .features = feature_names,
-    .call = call
+    .features = feature_names
   )
 }
 
@@ -232,8 +231,6 @@ new_ml_model_linear_regression <- function(
 
 #' @export
 print.ml_model_linear_regression <- function(x, ...) {
-  ml_model_print_call(x)
-  print_newline()
   cat("Formula: ", x$formula, "\n\n", sep = "")
   cat("Coefficients:", sep = "\n")
   print(x$coefficients)
@@ -241,9 +238,6 @@ print.ml_model_linear_regression <- function(x, ...) {
 
 #' @export
 summary.ml_model_linear_regression <- function(object, ...) {
-
-  ml_model_print_call(object)
-  print_newline()
   ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
   print_newline()
   ml_model_print_coefficients_detailed(object)

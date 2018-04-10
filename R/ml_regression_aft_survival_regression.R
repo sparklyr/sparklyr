@@ -182,8 +182,7 @@ new_ml_model_aft_survival_regression <- function(
     pipeline, pipeline_model, model, dataset, formula,
     coefficients = coefficients,
     subclass = "ml_model_aft_survival_regression",
-    .features = feature_names,
-    .call = call
+    .features = feature_names
   )
 }
 
@@ -215,8 +214,6 @@ ml_survival_regression <- function(
 
 #' @export
 print.ml_model_aft_survival_regression <- function(x, ...) {
-  ml_model_print_call(x)
-  print_newline()
   cat("Formula: ", x$formula, "\n\n", sep = "")
   cat("Coefficients:", sep = "\n")
   print(x$coefficients)

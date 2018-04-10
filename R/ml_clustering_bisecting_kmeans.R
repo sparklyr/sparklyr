@@ -151,8 +151,7 @@ new_ml_model_bisecting_kmeans <- function(
     cost = cost,
     summary = summary,
     subclass = "ml_model_bisecting_kmeans",
-    .features = feature_names,
-    .call = call
+    .features = feature_names
   )
 }
 

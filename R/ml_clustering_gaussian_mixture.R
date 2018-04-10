@@ -151,7 +151,6 @@ new_ml_model_gaussian_mixture <- function(
     gaussians_df = model$gaussians_df,
     summary = summary,
     subclass = "ml_model_gaussian_mixture",
-    .features = feature_names,
-    .call = call
+    .features = feature_names
   )
 }
