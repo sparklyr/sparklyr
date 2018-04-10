@@ -129,7 +129,6 @@ new_ml_model_isotonic_regression <- function(
   new_ml_model_regression(
     pipeline, pipeline_model, model, dataset, formula,
     subclass = "ml_model_isotonic_regression",
-    .features = feature_names,
-    .call = call
+    .features = feature_names
   )
 }

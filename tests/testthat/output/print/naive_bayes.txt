@@ -1,5 +1,3 @@
-Call: ml_naive_bayes.tbl_spark(iris_tbl, Species ~ Petal_Width + Petal_Length)  
-
 A-priority probabilities:
 versicolor  virginica     setosa 
  0.3333333  0.3333333  0.3333333 

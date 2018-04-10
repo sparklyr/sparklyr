@@ -120,15 +120,18 @@ test_that("weights column works for glm", {
 test_that("ml_generalized_linear_regression print methods work", {
   test_requires_version("2.0.0", "glm requires spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
-  print_output <- ml_generalized_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width) %>%
-    capture.output()
-  expect_equal(print_output[4], "(Intercept) Petal_Width ")
-  expect_match(print_output[7], "Degress of Freedom")
+  glm_model <- ml_generalized_linear_regression(
+    iris_tbl, Petal_Length ~ Petal_Width)
 
-  summary_output <- capture.output(summary(ml_generalized_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width)))
+  expect_known_output(
+    glm_model,
+    output_file("print/glm.txt"),
+    print = TRUE
+  )
 
-  expect_equal(summary_output[8], "(Intercept) Petal_Width ")
-  expect_match(summary_output[13], "Null")
+  expect_known_output(
+    summary(glm_model),
+    output_file("print/glm-summary.txt"),
+    print = TRUE
+  )
 })

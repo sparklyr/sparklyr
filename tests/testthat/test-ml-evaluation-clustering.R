@@ -1,6 +1,7 @@
 context("ml evaluation - clustering")
 
 test_that("ml_clustering_evaluator() works", {
+  test_requires_version("2.3.0", "ml clustering evaluator requires spark 2.3+")
   sc <- testthat_spark_connection()
   sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_kmeans_data.txt", full.names = TRUE)
   sample_data <- spark_read_libsvm(sc, "sample_data",

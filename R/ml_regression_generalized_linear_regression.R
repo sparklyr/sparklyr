@@ -269,8 +269,7 @@ new_ml_model_generalized_linear_regression <- function(
     coefficients = coefficients,
     summary = summary,
     subclass = "ml_model_generalized_linear_regression",
-    .features = feature_names,
-    .call = call
+    .features = feature_names
   )
 }
 
@@ -280,8 +279,6 @@ new_ml_model_generalized_linear_regression <- function(
 print.ml_model_generalized_linear_regression <-
   function(x, digits = max(3L, getOption("digits") - 3L), ...)
   {
-    ml_model_print_call(x)
-    print_newline()
     ml_model_print_coefficients(x)
     print_newline()
 
@@ -301,8 +298,6 @@ print.ml_model_generalized_linear_regression <-
 summary.ml_model_generalized_linear_regression <-
   function(object, digits = max(3L, getOption("digits") - 3L), ...)
   {
-    ml_model_print_call(object)
-    print_newline()
     ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
     print_newline()
     ml_model_print_coefficients_detailed(object)

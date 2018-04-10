@@ -120,7 +120,6 @@ new_ml_model_one_vs_rest <- function(
     model, dataset, formula,
     subclass = "ml_model_one_vs_rest",
     .features = feature_names,
-    .index_labels = index_labels,
-    .call = call
+    .index_labels = index_labels
   )
 }
