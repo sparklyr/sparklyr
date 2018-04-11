@@ -5,10 +5,10 @@
 \title{Spark ML -- Generalized Linear Regression}
 \usage{
 ml_generalized_linear_regression(x, formula = NULL, family = "gaussian",
-  link = NULL, fit_intercept = TRUE, link_power = NULL,
-  link_prediction_col = NULL, reg_param = 0, max_iter = 25L,
-  weight_col = NULL, solver = "irls", tol = 1e-06, variance_power = 0,
-  features_col = "features", label_col = "label",
+  link = NULL, fit_intercept = TRUE, offset_col = NULL,
+  link_power = NULL, link_prediction_col = NULL, reg_param = 0,
+  max_iter = 25L, weight_col = NULL, solver = "irls", tol = 1e-06,
+  variance_power = 0, features_col = "features", label_col = "label",
   prediction_col = "prediction",
   uid = random_string("generalized_linear_regression_"), ...)
 }
@@ -22,6 +22,8 @@ ml_generalized_linear_regression(x, formula = NULL, family = "gaussian",
 \item{link}{Name of link function which provides the relationship between the linear predictor and the mean of the distribution function. See for supported link functions.}
 
 \item{fit_intercept}{Boolean; should the model be fit with an intercept term?}
+
+\item{offset_col}{Offset column name. If this is not set, we treat all instance offsets as 0.0. The feature specified as offset has a constant coefficient of 1.0.}
 
 \item{link_power}{Index in the power link function. Only applicable to the Tweedie family. Note that link power 0, 1, -1 or 0.5 corresponds to the Log, Identity, Inverse or Sqrt link, respectively. When not set, this value defaults to 1 - variancePower, which matches the R "statmod" package.}
 

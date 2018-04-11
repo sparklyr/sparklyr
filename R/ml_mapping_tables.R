@@ -72,6 +72,7 @@ ml_create_mapping_tables <- function() { # nocov start
          "link_prediction_col" = "linkPredictionCol",
          "variance_power" = "variancePower",
          "link_power" = "linkPower",
+         "offset_col" = "offsetCol",
          # ml_decision_tree_regressor
          "variance_col" = "varianceCol",
          "checkpoint_interval" = "checkpointInterval",
