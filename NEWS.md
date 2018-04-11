@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Added support for `offset` argument in `ml_generalized_linear_regression()` (#1396).
+
 - `ml_save()` outputs message when model is successfully saved (#1348).
 
 - `ml_` routines no longer capture the calling expression (#1393).
