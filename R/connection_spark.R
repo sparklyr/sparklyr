@@ -323,7 +323,7 @@ spark_master_is_yarn_client <- function(master) {
 spark_master_is_yarn_cluster <- function(master, config) {
   grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE) ||
     (
-      identical(config[["sparklyr.shell.deploy-mode"]], cluster) &&
+      identical(config[["sparklyr.shell.deploy-mode"]], "cluster") &&
       identical(master, "yarn")
     )
 }
