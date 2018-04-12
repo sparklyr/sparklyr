@@ -1,5 +1,8 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `yarn-cluster` now supported by connecting with `master="yarn"` and
+  `config` entry `sparklyr.shell.deploy-mode` set to `cluster` (#1404).
+  
 - Added support for `offset` argument in `ml_generalized_linear_regression()` (#1396).
 
 - `ml_save()` outputs message when model is successfully saved (#1348).
