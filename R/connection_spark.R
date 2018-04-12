@@ -145,7 +145,7 @@ spark_connect <- function(master,
                              remote = spark_config_value(
                                config,
                                "sparklyr.gateway.remote",
-                               spark_master_is_yarn_cluster(master)),
+                               spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
@@ -320,8 +320,12 @@ spark_master_is_yarn_client <- function(master) {
   grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE)
 }
 
-spark_master_is_yarn_cluster <- function(master) {
-  grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE)
+spark_master_is_yarn_cluster <- function(master, config) {
+  grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE) ||
+    (
+      identical(config[["sparklyr.shell.deploy-mode"]], cluster) &&
+      identical(master, "yarn")
+    )
 }
 
 spark_master_is_gateway <- function(master) {
