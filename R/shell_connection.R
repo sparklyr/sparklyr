@@ -33,7 +33,7 @@ shell_connection <- function(master,
   }
 
   # for yarn-cluster set deploy mode as shell arguments
-  if (spark_master_is_yarn_cluster(master)) {
+  if (spark_master_is_yarn_cluster(master, config)) {
     if (is.null(config[["sparklyr.shell.deploy-mode"]])) {
       shell_args <- c(shell_args, "--deploy-mode", "cluster")
     }
@@ -306,7 +306,7 @@ start_shell <- function(master,
     })
 
     # for yarn-cluster
-    if (spark_master_is_yarn_cluster(master) && is.null(config[["sparklyr.gateway.address"]])) {
+    if (spark_master_is_yarn_cluster(master, config) && is.null(config[["sparklyr.gateway.address"]])) {
       gatewayAddress <- config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway(config, start_time)
     }
 
@@ -322,7 +322,7 @@ start_shell <- function(master,
         paste(
           "Failed while connecting to sparklyr to port (",
           gatewayPort,
-          if (spark_master_is_yarn_cluster(master)) {
+          if (spark_master_is_yarn_cluster(master, config)) {
             paste0(
               ") and address (",
               config[["sparklyr.gateway.address"]]
@@ -505,7 +505,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
 
-      if (!spark_master_is_yarn_cluster(sc$master) &&
+      if (!spark_master_is_yarn_cluster(sc$master, sc$config) &&
           !spark_master_is_gateway(sc$master)) {
         conf <- invoke(conf, "setMaster", sc$master)
 
