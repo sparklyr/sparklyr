@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `sdf_copy_to()` no longer gives a spurious warning when user enters a multiline expression for `x` (#1386).
+
 - Added `ml_vocabulary()` to extract vocabulary from count vectorizer model and `ml_topics_matrix()` to extract matrix from LDA model.
 
 - `ml_tree_feature_importance()` now works properly with decision tree classification models (#1401).
