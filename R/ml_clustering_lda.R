@@ -275,27 +275,3 @@ ml_log_likelihood <- function(model, dataset) model$log_likelihood(dataset)
 #' @rdname ml_lda
 #' @export
 ml_log_perplexity <- function(model, dataset) model$log_perplexity(dataset)
-
-# Generic implementations
-
-# TODO
-#' #' @export
-#' print.ml_model_lda <- function(x, ...) {
-#'
-#'   header <- sprintf(
-#'     "An LDA model fit on %s features",
-#'     length(x$features)
-#'   )
-#'
-#'   cat(header, sep = "\n")
-#'   print_newline()
-#'
-#'   cat("Topics Matrix:", sep = "\n")
-#'   print(x$topics.matrix)
-#'   print_newline()
-#'
-#'   cat("Estimated Document Concentration:", sep = "\n")
-#'   print(x$estimated.doc.concentration)
-#'   print_newline()
-#'
-#' }
