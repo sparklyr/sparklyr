@@ -698,7 +698,7 @@ livy_load_scala_sources <- function(sc) {
     order()
 
   livySparkVersion <- livy_post_statement(sc, "sc.version") %>%
-    gsub("^.+= ", "", .) %>%
+    gsub("^.+= |[\n\r \t]", "", .) %>%
     numeric_version()
 
   livySourcesFiles <- livySourcesFiles[sourceOrder] %>%
