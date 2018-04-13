@@ -11,8 +11,11 @@ object LivyUtils {
     "Repartition" -> Repartition,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
-    "WorkerUtils" -> WorkerUtils
-  )
+    "WorkerUtils" -> WorkerUtils,
+    "MLUtils" -> MLUtils,
+    "MLUtils2" -> MLUtils2,
+    "BucketizerUtils" -> BucketizerUtils
+   )
 
   val tracker = new JVMObjectTracker()
   val serializer = new Serializer(tracker)
