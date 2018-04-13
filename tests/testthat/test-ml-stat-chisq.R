@@ -8,7 +8,7 @@ df_tbl <- sdf_copy_to(sc, data.frame(
 ), overwrite = TRUE)
 
 test_that("ml_chisquare_test() works", {
-
+  test_requires_version("2.2.0", "chisquare test supported in spark 2.2+")
   expect_identical(
     df_tbl %>%
     ml_chisquare_test(features = "gender",
@@ -20,6 +20,7 @@ test_that("ml_chisquare_test() works", {
 })
 
 test_that("ml_chisquare_test() errors on bad column spec", {
+  test_requires_version("2.2.0", "chisquare test supported in spark 2.2+")
   expect_error(
     df_tbl %>%
       ml_chisquare_test(features = "foo",
