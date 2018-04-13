@@ -697,7 +697,21 @@ livy_load_scala_sources <- function(sc) {
     match(livySources) %>%
     order()
 
-  lapply(livySourcesFiles[sourceOrder], function(sourceFile) {
+  livySparkVersion <- livy_post_statement(sc, "sc.version") %>%
+    gsub("^.+= ", "", .) %>%
+    numeric_version()
+
+  livySourcesFiles <- livySourcesFiles[sourceOrder] %>%
+    Filter(function(x) {
+      requiredVersion <- x %>%
+        dirname() %>%
+        basename() %>%
+        gsub("^spark-", "", .) %>%
+        numeric_version()
+      requiredVersion <= livySparkVersion
+    }, .)
+
+  lapply(livySourcesFiles, function(sourceFile) {
     tryCatch({
       if (sparklyr_boolean_option("sparklyr.verbose")) message("Loading ", basename(sourceFile))
 
