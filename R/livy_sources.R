@@ -20,7 +20,11 @@ livy_sources_included <- function() {
     "/backend\\.scala",
     "/workerhelper\\.scala",
     "/workerrdd\\.scala",
-    "/workerutils\\.scala"
+    "/workerutils\\.scala",
+    "/mlutils\\.scala",
+    "/mlutils2\\.scala",
+    "/bucketizerutils\\.scala"
+    # New files might require entries to livy_load_scala_sources and globalClassMap
   )
 }
 

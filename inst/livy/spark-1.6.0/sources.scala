@@ -1168,6 +1168,8 @@ spark_worker_main <- function(
   spark_worker_hooks()
 
   tryCatch({
+    worker_log_session(sessionId)
+
     if (is.null(configRaw)) configRaw <- worker_config_serialize(list())
 
     config <- worker_config_deserialize(configRaw)
@@ -1186,7 +1188,6 @@ spark_worker_main <- function(
       return()
     }
 
-    worker_log_session(sessionId)
     worker_log("is starting")
 
     sc <- spark_worker_connect(sessionId, backendPort, config)

@@ -12,7 +12,8 @@ object LivyUtils {
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
     "WorkerUtils" -> WorkerUtils,
-    "MLUtils" -> MLUtils
+    "MLUtils" -> MLUtils,
+    "MLUtils2" -> MLUtils2
    )
 
   val tracker = new JVMObjectTracker()

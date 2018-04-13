@@ -686,6 +686,10 @@ livy_load_scala_sources <- function(sc) {
     "workerrdd.scala",
     "workerhelper.scala",
     "workerutils.scala",
+    "mlutils.scala",
+    "mlutils2.scala",
+    "bucketizerutils.scala",
+    # LivyUtils should be the last file to include to map classes correctly
     "livyutils.scala"
   )
 
@@ -697,9 +701,24 @@ livy_load_scala_sources <- function(sc) {
     match(livySources) %>%
     order()
 
-  lapply(livySourcesFiles[sourceOrder], function(sourceFile) {
+  livySparkVersion <- livy_post_statement(sc, "sc.version") %>%
+    gsub("^.+= |[\n\r \t]", "", .) %>%
+    numeric_version()
+
+  livySourcesFiles <- livySourcesFiles[sourceOrder] %>%
+    Filter(function(x) {
+      requiredVersion <- x %>%
+        dirname() %>%
+        basename() %>%
+        gsub("^spark-", "", .) %>%
+        numeric_version()
+      requiredVersion <= livySparkVersion
+    }, .)
+
+  lapply(livySourcesFiles, function(sourceFile) {
     tryCatch({
-      if (sparklyr_boolean_option("sparklyr.verbose")) message("Loading ", basename(sourceFile))
+      subpath_name <- file.path(basename(dirname(sourceFile)), sourceFile)
+      if (sparklyr_boolean_option("sparklyr.verbose")) message("Loading ", subpath_name)
 
       sources <- paste(readLines(sourceFile), collapse = "\n")
 
