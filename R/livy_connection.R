@@ -748,6 +748,9 @@ initialize_connection.livy_connection <- function(sc) {
       sc$spark_context
     )
 
+    # cache spark version
+    sc$spark_version <- spark_version(sc)
+
     sc$hive_context <- create_hive_context(sc)
 
     if (spark_version(sc) < "2.0.0") {
