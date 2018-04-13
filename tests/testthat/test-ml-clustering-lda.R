@@ -57,3 +57,29 @@ test_that("ml_lda() works properly", {
     12
   )
 })
+
+test_that("ml_lda/ft_count_vectorizer helper functions (#1353)", {
+  fake_data <- data.frame(a = c(1, 2, 3, 4),
+                          b = c("the groggy", "frog was", "a very groggy", "frog"))
+  fake_tbl <- sdf_copy_to(sc, fake_data, overwrite = TRUE)
+
+  fake_tokenized <- fake_tbl %>%
+    ft_tokenizer(input_col = 'b', output_col = 'tokens')
+
+  count_vectorizer_model <- ft_count_vectorizer(sc, input_col = "tokens", output_col = "features",
+                                                dataset = fake_tokenized)
+
+  fake_model <- count_vectorizer_model %>%
+    ml_transform(fake_tokenized) %>%
+    ml_lda(features_col = 'features', k = 2)
+
+  topics_matrix <- ml_topics_matrix(fake_model)
+  expect_identical(
+    dim(topics_matrix),
+    c(6L, 2L)
+  )
+  expect_identical(
+    ml_vocabulary(count_vectorizer_model),
+    c("frog", "groggy", "was", "a", "the", "very")
+  )
+})
