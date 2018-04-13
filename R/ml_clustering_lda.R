@@ -275,3 +275,7 @@ ml_log_likelihood <- function(model, dataset) model$log_likelihood(dataset)
 #' @rdname ml_lda
 #' @export
 ml_log_perplexity <- function(model, dataset) model$log_perplexity(dataset)
+
+#' @rdname ml_lda
+#' @export
+ml_topics_matrix <- function(model) model$topics_matrix

@@ -5,6 +5,7 @@
 \alias{ml_describe_topics}
 \alias{ml_log_likelihood}
 \alias{ml_log_perplexity}
+\alias{ml_topics_matrix}
 \title{Spark ML -- Latent Dirichlet Allocation}
 \usage{
 ml_lda(x, k = 10L, max_iter = 20L, doc_concentration = NULL,
@@ -20,6 +21,8 @@ ml_describe_topics(model, max_terms_per_topic = 10L)
 ml_log_likelihood(model, dataset)
 
 ml_log_perplexity(model, dataset)
+
+ml_topics_matrix(model)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
