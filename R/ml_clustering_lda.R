@@ -249,7 +249,9 @@ new_ml_lda_model <- function(jobj) {
     estimated_doc_concentration = try_null(invoke(jobj, "estimatedDocConcentration")),
     log_likelihood = function(dataset) invoke(jobj, "logLikelihood", spark_dataframe(dataset)),
     log_perplexity = function(dataset) invoke(jobj, "logPerplexity", spark_dataframe(dataset)),
+    # topicsMatrix deprecated
     topicsMatrix = try_null(read_spark_matrix(jobj, "topicsMatrix")),
+    topics_matrix = try_null(read_spark_matrix(jobj, "topicsMatrix")),
     vocab_size = invoke(jobj, "vocabSize"),
     subclass = "ml_lda_model")
 }
