@@ -717,7 +717,8 @@ livy_load_scala_sources <- function(sc) {
 
   lapply(livySourcesFiles, function(sourceFile) {
     tryCatch({
-      if (sparklyr_boolean_option("sparklyr.verbose")) message("Loading ", basename(sourceFile))
+      subpath_name <- file.path(basename(dirname(sourceFile)), sourceFile)
+      if (sparklyr_boolean_option("sparklyr.verbose")) message("Loading ", subpath_name)
 
       sources <- paste(readLines(sourceFile), collapse = "\n")
 
