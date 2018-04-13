@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `ml_tree_feature_importance()` now works properly with decision tree classification models (#1401).
+
 - Added `ml_corr()` for calculating correlation matrices and `ml_chisquare_test()` for performing chi-square hypothesis testing (#1247).
 
 - `yarn-cluster` now supported by connecting with `master="yarn"` and

@@ -23,6 +23,19 @@ test_that("ml_tree_feature_importance() works properly", {
   expect_equal(rf_importance, dt_importance)
 })
 
+test_that("ml_tree_feature_importance() works for decision tree classification", {
+  iris_tbl <- testthat_tbl("iris")
+  dt <- iris_tbl %>%
+    ml_decision_tree(
+      Species ~ Sepal_Length + Sepal_Width + Petal_Length + Petal_Width,
+      type = "classification"
+      )
+  expect_identical(
+    ml_tree_feature_importance(dt) %>% names(),
+    c("feature", "importance")
+  )
+})
+
 test_that("input_cols print correctly", {
   expect_output_file(
     print(ft_vector_assembler(sc, c("foo", "bar"), "features", uid = "va")),
