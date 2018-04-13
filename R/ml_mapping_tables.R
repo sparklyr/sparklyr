@@ -215,6 +215,8 @@ ml_create_mapping_tables <- function() { # nocov start
     # classification
     "GBTClassifier" = "gbt_classifier",
     "GBTClassificationModel" = "gbt_classification_model",
+    "DecisionTreeClassifier" = "decision_tree_classifier",
+    "DecisionTreeClassificationModel" = "decision_tree_classification_model",
     "RandomForestClassifier" = "random_forest_classifier",
     "RandomForestClassificationModel" = "random_forest_classification_model",
     "NaiveBayes" = "naive_bayes",
