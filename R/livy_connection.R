@@ -686,6 +686,10 @@ livy_load_scala_sources <- function(sc) {
     "workerrdd.scala",
     "workerhelper.scala",
     "workerutils.scala",
+    "mlutils.scala",
+    "mlutils2.scala",
+    "bucketizerutils.scala",
+    # LivyUtils should be the last file to include to map classes correctly
     "livyutils.scala"
   )
 
