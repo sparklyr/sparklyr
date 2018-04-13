@@ -44,7 +44,8 @@ Imports:
     rstudioapi,
     shiny (>= 1.0.1),
     withr,
-    xml2
+    xml2,
+    tidyr
 Suggests:
     ggplot2,
     janeaustenr,
