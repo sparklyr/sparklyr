@@ -114,3 +114,11 @@ new_ml_count_vectorizer_model <- function(jobj) {
                      vocabulary = invoke(jobj, "vocabulary"),
                      subclass = "ml_count_vectorizer_model")
 }
+
+#' @rdname ft_count_vectorizer
+#' @param model A \code{ml_count_vectorizer_model}.
+#' @return \code{ml_vocabulary()} returns a vector of vocabulary built.
+#' @export
+ml_vocabulary <- function(model) {
+  unlist(model$vocabulary)
+}
