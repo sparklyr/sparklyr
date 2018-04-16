@@ -717,7 +717,7 @@ livy_load_scala_sources <- function(sc) {
 
   lapply(livySourcesFiles, function(sourceFile) {
     tryCatch({
-      subpath_name <- file.path(basename(dirname(sourceFile)), sourceFile)
+      subpath_name <- file.path(basename(dirname(sourceFile)), basename(sourceFile))
       if (sparklyr_boolean_option("sparklyr.verbose")) message("Loading ", subpath_name)
 
       sources <- paste(readLines(sourceFile), collapse = "\n")
@@ -747,6 +747,9 @@ initialize_connection.livy_connection <- function(sc) {
       "fromSparkContext",
       sc$spark_context
     )
+
+    # cache spark version
+    sc$spark_version <- spark_version(sc)
 
     sc$hive_context <- create_hive_context(sc)
 
