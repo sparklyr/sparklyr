@@ -71,6 +71,13 @@ The object returned depends on the class of \code{x}.
 K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
   Using `ml_kmeans()` with the formula interface requires Spark 2.0+.
 }
+\examples{
+
+sc <- spark_connect(master = "local")
+iris_tb <- sdf_copy_to(sc, iris, name = "iris_tb", overwrite = TRUE)
+ml_kmeans(iris_tb, Species ~ .)
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
