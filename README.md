@@ -1,17 +1,27 @@
 sparklyr: R interface for Apache Spark
 ================
 
-[![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) [![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr) [![Join the chat at https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<img src="tools/readme/sparklyr-package.png" width=200 align="right" style="margin-left: 20px; margin-right: 20px"/>
 
-<img src="tools/readme/sparklyr-illustration.png" width=364 height=197 align="right"/>
+[![Build
+Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr)
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
+[![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr)
+[![Join the chat at
+https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
--   Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
--   Filter and aggregate Spark datasets then bring them into R for <br/> analysis and visualization.
--   Use Spark's distributed [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) library from R.
--   Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide <br/> interfaces to Spark packages.
+  - Connect to [Spark](http://spark.apache.org/) from R. The sparklyr
+    package provides a complete [dplyr](https://github.com/hadley/dplyr)
+    backend.
+  - Filter and aggregate Spark datasets then bring them into R for
+    analysis and visualization.
+  - Use Spark’s distributed [machine
+    learning](http://spark.apache.org/docs/latest/mllib-guide.html)
+    library from R.
+  - Create [extensions](http://spark.rstudio.com/extensions.html) that
+    call the full Spark API and provide interfaces to Spark packages.
 
-Installation
-------------
+## Installation
 
 You can install the **sparklyr** package from CRAN as follows:
 
@@ -19,41 +29,53 @@ You can install the **sparklyr** package from CRAN as follows:
 install.packages("sparklyr")
 ```
 
-You should also install a local version of Spark for development purposes:
+You should also install a local version of Spark for development
+purposes:
 
 ``` r
 library(sparklyr)
 spark_install(version = "2.1.0")
 ```
 
-To upgrade to the latest version of sparklyr, run the following command and restart your r session:
+To upgrade to the latest version of sparklyr, run the following command
+and restart your r session:
 
 ``` r
 devtools::install_github("rstudio/sparklyr")
 ```
 
-If you use the RStudio IDE, you should also download the latest [preview release](https://www.rstudio.com/products/rstudio/download/preview/) of the IDE which includes several enhancements for interacting with Spark (see the [RStudio IDE](#rstudio-ide) section below for more details).
+If you use the RStudio IDE, you should also download the latest [preview
+release](https://www.rstudio.com/products/rstudio/download/preview/) of
+the IDE which includes several enhancements for interacting with Spark
+(see the [RStudio IDE](#rstudio-ide) section below for more details).
 
-Connecting to Spark
--------------------
+## Connecting to Spark
 
-You can connect to both local instances of Spark as well as remote Spark clusters. Here we'll connect to a local instance of Spark via the [spark\_connect](http://spark.rstudio.com/reference/sparklyr/latest/spark_connect.html) function:
+You can connect to both local instances of Spark as well as remote Spark
+clusters. Here we’ll connect to a local instance of Spark via the
+[spark\_connect](http://spark.rstudio.com/reference/sparklyr/latest/spark_connect.html)
+function:
 
 ``` r
 library(sparklyr)
 sc <- spark_connect(master = "local")
 ```
 
-The returned Spark connection (`sc`) provides a remote dplyr data source to the Spark cluster.
+The returned Spark connection (`sc`) provides a remote dplyr data source
+to the Spark cluster.
 
-For more information on connecting to remote Spark clusters see the [Deployment](http://spark.rstudio.com/deployment.html) section of the sparklyr website.
+For more information on connecting to remote Spark clusters see the
+[Deployment](http://spark.rstudio.com/deployment.html) section of the
+sparklyr website.
 
-Using dplyr
------------
+## Using dplyr
 
-We can now use all of the available dplyr verbs against the tables within the cluster.
+We can now use all of the available dplyr verbs against the tables
+within the cluster.
 
-We'll start by copying some datasets from R into the Spark cluster (note that you may need to install the nycflights13 and Lahman packages in order to execute this code):
+We’ll start by copying some datasets from R into the Spark cluster (note
+that you may need to install the nycflights13 and Lahman packages in
+order to execute this code):
 
 ``` r
 install.packages(c("nycflights13", "Lahman"))
@@ -69,7 +91,7 @@ src_tbls(sc)
 
     ## [1] "batting" "flights" "iris"
 
-To start with here's a simple filtering example:
+To start with here’s a simple filtering example:
 
 ``` r
 # filter by departure delay and print the first few records
@@ -80,22 +102,24 @@ flights_tbl %>% filter(dep_delay == 2)
     ## # Database: spark_connection
     ##     year month   day dep_time sched_dep_time dep_delay arr_time
     ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
-    ##  1  2013     1     1      517            515         2      830
-    ##  2  2013     1     1      542            540         2      923
-    ##  3  2013     1     1      702            700         2     1058
-    ##  4  2013     1     1      715            713         2      911
-    ##  5  2013     1     1      752            750         2     1025
-    ##  6  2013     1     1      917            915         2     1206
-    ##  7  2013     1     1      932            930         2     1219
-    ##  8  2013     1     1     1028           1026         2     1350
-    ##  9  2013     1     1     1042           1040         2     1325
-    ## 10  2013     1     1     1231           1229         2     1523
+    ##  1  2013     1     1      517            515      2.00      830
+    ##  2  2013     1     1      542            540      2.00      923
+    ##  3  2013     1     1      702            700      2.00     1058
+    ##  4  2013     1     1      715            713      2.00      911
+    ##  5  2013     1     1      752            750      2.00     1025
+    ##  6  2013     1     1      917            915      2.00     1206
+    ##  7  2013     1     1      932            930      2.00     1219
+    ##  8  2013     1     1     1028           1026      2.00     1350
+    ##  9  2013     1     1     1042           1040      2.00     1325
+    ## 10  2013     1     1     1231           1229      2.00     1523
     ## # ... with more rows, and 12 more variables: sched_arr_time <int>,
     ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
     ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
-    ## #   minute <dbl>, time_hour <dbl>
+    ## #   minute <dbl>, time_hour <dttm>
 
-[Introduction to dplyr](https://CRAN.R-project.org/package=dplyr) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
+[Introduction to dplyr](https://CRAN.R-project.org/package=dplyr)
+provides additional dplyr examples you can try. For example, consider
+the last example from the tutorial which plots data on flight delays:
 
 ``` r
 delay <- flights_tbl %>% 
@@ -114,11 +138,12 @@ ggplot(delay, aes(dist, delay)) +
 
     ## `geom_smooth()` using method = 'gam'
 
-![](tools/readme/ggplot2-1.png)
+![](tools/readme/ggplot2-1.png)<!-- -->
 
 ### Window Functions
 
-dplyr [window functions](https://CRAN.R-project.org/package=dplyr) are also supported, for example:
+dplyr [window functions](https://CRAN.R-project.org/package=dplyr) are
+also supported, for example:
 
 ``` r
 batting_tbl %>%
@@ -132,26 +157,31 @@ batting_tbl %>%
     ## # Database:   spark_connection
     ## # Groups:     playerID
     ## # Ordered by: playerID, yearID, teamID
-    ##     playerID yearID teamID     G    AB     R     H
-    ##        <chr>  <int>  <chr> <int> <int> <int> <int>
-    ##  1 aaronha01   1959    ML1   154   629   116   223
-    ##  2 aaronha01   1963    ML1   161   631   121   201
-    ##  3 abbotji01   1999    MIL    20    21     0     2
-    ##  4 abnersh01   1992    CHA    97   208    21    58
-    ##  5 abnersh01   1990    SDN    91   184    17    45
-    ##  6 acklefr01   1963    CHA     2     5     0     1
-    ##  7 acklefr01   1964    CHA     3     1     0     1
-    ##  8 adamecr01   2016    COL   121   225    25    49
-    ##  9 adamecr01   2015    COL    26    53     4    13
-    ## 10 adamsac01   1943    NY1    70    32     3     4
+    ##    playerID  yearID teamID     G    AB     R     H
+    ##    <chr>      <int> <chr>  <int> <int> <int> <int>
+    ##  1 aaronha01   1959 ML1      154   629   116   223
+    ##  2 aaronha01   1963 ML1      161   631   121   201
+    ##  3 abbotji01   1999 MIL       20    21     0     2
+    ##  4 abnersh01   1992 CHA       97   208    21    58
+    ##  5 abnersh01   1990 SDN       91   184    17    45
+    ##  6 acklefr01   1963 CHA        2     5     0     1
+    ##  7 acklefr01   1964 CHA        3     1     0     1
+    ##  8 adamecr01   2016 COL      121   225    25    49
+    ##  9 adamecr01   2015 COL       26    53     4    13
+    ## 10 adamsac01   1943 NY1       70    32     3     4
     ## # ... with more rows
 
-For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
+For additional documentation on using dplyr with Spark see the
+[dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr
+website.
 
-Using SQL
----------
+## Using SQL
 
-It's also possible to execute SQL queries directly against tables within a Spark cluster. The `spark_connection` object implements a [DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can use `dbGetQuery` to execute SQL and return the result as an R data frame:
+It’s also possible to execute SQL queries directly against tables within
+a Spark cluster. The `spark_connection` object implements a
+[DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can
+use `dbGetQuery` to execute SQL and return the result as an R data
+frame:
 
 ``` r
 library(DBI)
@@ -171,12 +201,22 @@ iris_preview
     ## 9           4.4         2.9          1.4         0.2  setosa
     ## 10          4.9         3.1          1.5         0.1  setosa
 
-Machine Learning
-----------------
+## Machine Learning
 
-You can orchestrate machine learning algorithms in a Spark cluster via the [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) functions within **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows.
+You can orchestrate machine learning algorithms in a Spark cluster via
+the [machine
+learning](http://spark.apache.org/docs/latest/mllib-guide.html)
+functions within **sparklyr**. These functions connect to a set of
+high-level APIs built on top of DataFrames that help you create and tune
+machine learning workflows.
 
-Here's an example where we use [ml\_linear\_regression](http://spark.rstudio.com/reference/sparklyr/latest/ml_linear_regression.html) to fit a linear regression model. We'll use the built-in `mtcars` dataset, and see if we can predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`). We'll assume in each case that the relationship between `mpg` and each of our features is linear.
+Here’s an example where we use
+[ml\_linear\_regression](http://spark.rstudio.com/reference/sparklyr/latest/ml_linear_regression.html)
+to fit a linear regression model. We’ll use the built-in `mtcars`
+dataset, and see if we can predict a car’s fuel consumption (`mpg`)
+based on its weight (`wt`), and the number of cylinders the engine
+contains (`cyl`). We’ll assume in each case that the relationship
+between `mpg` and each of our features is linear.
 
 ``` r
 # copy mtcars into spark
@@ -194,22 +234,20 @@ fit <- partitions$training %>%
 fit
 ```
 
-    ## Call: ml_linear_regression.tbl_spark(., response = "mpg", features = c("wt", "cyl"))  
-    ## 
     ## Formula: mpg ~ wt + cyl
     ## 
     ## Coefficients:
     ## (Intercept)          wt         cyl 
     ##   33.499452   -2.818463   -0.923187
 
-For linear regression models produced by Spark, we can use `summary()` to learn a bit more about the quality of our fit, and the statistical significance of each of our predictors.
+For linear regression models produced by Spark, we can use `summary()`
+to learn a bit more about the quality of our fit, and the statistical
+significance of each of our predictors.
 
 ``` r
 summary(fit)
 ```
 
-    ## Call: ml_linear_regression.tbl_spark(., response = "mpg", features = c("wt", "cyl"))  
-    ## 
     ## Deviance Residuals:
     ##    Min     1Q Median     3Q    Max 
     ## -1.752 -1.134 -0.499  1.296  2.282 
@@ -221,12 +259,15 @@ summary(fit)
     ## R-Squared: 0.8274
     ## Root Mean Squared Error: 1.422
 
-Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [machine learning](mllib.html) section.
+Spark machine learning supports a wide array of algorithms and feature
+transformations and as illustrated above it’s easy to chain these
+functions together with dplyr pipelines. To learn more see the [machine
+learning](mllib.html) section.
 
-Reading and Writing Data
-------------------------
+## Reading and Writing Data
 
-You can read and write data in CSV, JSON, and Parquet formats. Data can be stored in HDFS, S3, or on the local filesystem of cluster nodes.
+You can read and write data in CSV, JSON, and Parquet formats. Data can
+be stored in HDFS, S3, or on the local filesystem of cluster nodes.
 
 ``` r
 temp_csv <- tempfile(fileext = ".csv")
@@ -248,10 +289,11 @@ src_tbls(sc)
     ## [1] "batting"      "flights"      "iris"         "iris_csv"    
     ## [5] "iris_json"    "iris_parquet" "mtcars"
 
-Distributed R
--------------
+## Distributed R
 
-You can execute arbitrary r code across your cluster using `spark_apply`. For example, we can apply `rgamma` over `iris` as follows:
+You can execute arbitrary r code across your cluster using
+`spark_apply`. For example, we can apply `rgamma` over `iris` as
+follows:
 
 ``` r
 spark_apply(iris_tbl, function(data) {
@@ -259,23 +301,24 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_115c74acb6510> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_31156f2a4437> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1     5.336757    3.736757     1.636757   0.4367573
-    ##  2     5.136757    3.236757     1.636757   0.4367573
-    ##  3     4.936757    3.436757     1.536757   0.4367573
-    ##  4     4.836757    3.336757     1.736757   0.4367573
-    ##  5     5.236757    3.836757     1.636757   0.4367573
-    ##  6     5.636757    4.136757     1.936757   0.6367573
-    ##  7     4.836757    3.636757     1.636757   0.5367573
-    ##  8     5.236757    3.636757     1.736757   0.4367573
-    ##  9     4.636757    3.136757     1.636757   0.4367573
-    ## 10     5.136757    3.336757     1.736757   0.3367573
+    ##  1         8.30        6.70         4.60        3.40
+    ##  2         8.10        6.20         4.60        3.40
+    ##  3         7.90        6.40         4.50        3.40
+    ##  4         7.80        6.30         4.70        3.40
+    ##  5         8.20        6.80         4.60        3.40
+    ##  6         8.60        7.10         4.90        3.60
+    ##  7         7.80        6.60         4.60        3.50
+    ##  8         8.20        6.60         4.70        3.40
+    ##  9         7.60        6.10         4.60        3.40
+    ## 10         8.10        6.30         4.70        3.30
     ## # ... with more rows
 
-You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
+You can also group by columns to perform an operation over each group of
+rows and make use of any package within the closure:
 
 ``` r
 spark_apply(
@@ -286,23 +329,27 @@ spark_apply(
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_115c73965f30> [?? x 6]
+    ## # Source:   table<sparklyr_tmp_31153ed80428> [?? x 6]
     ## # Database: spark_connection
-    ##      Species         term    estimate  std.error  statistic      p.value
-    ##        <chr>        <chr>       <dbl>      <dbl>      <dbl>        <dbl>
-    ## 1 versicolor  (Intercept) -0.08428835 0.16070140 -0.5245029 6.023428e-01
-    ## 2 versicolor Petal_Length  0.33105360 0.03750041  8.8279995 1.271916e-11
-    ## 3  virginica  (Intercept)  1.13603130 0.37936622  2.9945505 4.336312e-03
-    ## 4  virginica Petal_Length  0.16029696 0.06800119  2.3572668 2.253577e-02
-    ## 5     setosa  (Intercept) -0.04822033 0.12164115 -0.3964146 6.935561e-01
-    ## 6     setosa Petal_Length  0.20124509 0.08263253  2.4354220 1.863892e-02
+    ##   Species    term         estimate std.error statistic         p.value
+    ##   <chr>      <chr>           <dbl>     <dbl>     <dbl>           <dbl>
+    ## 1 versicolor (Intercept)   -0.0843    0.161     -0.525 0.602          
+    ## 2 versicolor Petal_Length   0.331     0.0375     8.83  0.0000000000127
+    ## 3 virginica  (Intercept)    1.14      0.379      2.99  0.00434        
+    ## 4 virginica  Petal_Length   0.160     0.0680     2.36  0.0225         
+    ## 5 setosa     (Intercept)   -0.0482    0.122     -0.396 0.694          
+    ## 6 setosa     Petal_Length   0.201     0.0826     2.44  0.0186
 
-Extensions
-----------
+## Extensions
 
-The facilities used internally by sparklyr for its dplyr and machine learning interfaces are available to extension packages. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).
+The facilities used internally by sparklyr for its dplyr and machine
+learning interfaces are available to extension packages. Since Spark is
+a general purpose cluster computing system there are many potential
+applications for extensions (e.g. interfaces to custom machine learning
+pipelines, interfaces to 3rd party Spark packages, etc.).
 
-Here's a simple example that wraps a Spark text file line counting function with an R function:
+Here’s a simple example that wraps a Spark text file line counting
+function with an R function:
 
 ``` r
 # write a CSV 
@@ -322,10 +369,11 @@ count_lines(sc, tempfile)
 
     ## [1] 336777
 
-To learn more about creating extensions see the [Extensions](http://spark.rstudio.com/extensions.html) section of the sparklyr website.
+To learn more about creating extensions see the
+[Extensions](http://spark.rstudio.com/extensions.html) section of the
+sparklyr website.
 
-Table Utilities
----------------
+## Table Utilities
 
 You can cache a table into memory with:
 
@@ -339,8 +387,7 @@ and unload from memory using:
 tbl_uncache(sc, "batting")
 ```
 
-Connection Utilities
---------------------
+## Connection Utilities
 
 You can view the Spark web console using the `spark_web` function:
 
@@ -348,22 +395,23 @@ You can view the Spark web console using the `spark_web` function:
 spark_web(sc)
 ```
 
-You can show the log using the `spark_log` function:
+You can show the log using the `spark_log`
+    function:
 
 ``` r
 spark_log(sc, n = 10)
 ```
 
-    ## 17/11/09 15:55:18 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 69 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpyR8oP9/file115c74b94924.csv MapPartitionsRDD[258] at textFile at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
-    ## 17/11/09 15:55:18 INFO TaskSchedulerImpl: Adding task set 69.0 with 1 tasks
-    ## 17/11/09 15:55:18 INFO TaskSetManager: Starting task 0.0 in stage 69.0 (TID 140, localhost, executor driver, partition 0, PROCESS_LOCAL, 4904 bytes)
-    ## 17/11/09 15:55:18 INFO Executor: Running task 0.0 in stage 69.0 (TID 140)
-    ## 17/11/09 15:55:18 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpyR8oP9/file115c74b94924.csv:0+33313106
-    ## 17/11/09 15:55:18 INFO Executor: Finished task 0.0 in stage 69.0 (TID 140). 832 bytes result sent to driver
-    ## 17/11/09 15:55:18 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 140) in 126 ms on localhost (executor driver) (1/1)
-    ## 17/11/09 15:55:18 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
-    ## 17/11/09 15:55:18 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.126 s
-    ## 17/11/09 15:55:18 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.131380 s
+    ## 18/04/23 10:29:12 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmppHpKCG/file31151c012844.csv:0+33313106
+    ## 18/04/23 10:29:12 INFO BlockManagerInfo: Removed broadcast_73_piece0 on 127.0.0.1:58732 in memory (size: 11.4 KB, free: 340.3 MB)
+    ## 18/04/23 10:29:12 INFO BlockManagerInfo: Removed broadcast_72_piece0 on 127.0.0.1:58732 in memory (size: 10.6 KB, free: 340.3 MB)
+    ## 18/04/23 10:29:12 INFO BlockManagerInfo: Removed broadcast_71_piece0 on 127.0.0.1:58732 in memory (size: 7.7 KB, free: 340.3 MB)
+    ## 18/04/23 10:29:12 INFO BlockManagerInfo: Removed broadcast_70_piece0 on 127.0.0.1:58732 in memory (size: 9.5 KB, free: 340.3 MB)
+    ## 18/04/23 10:29:12 INFO Executor: Finished task 0.0 in stage 69.0 (TID 115). 875 bytes result sent to driver
+    ## 18/04/23 10:29:12 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 115) in 183 ms on localhost (executor driver) (1/1)
+    ## 18/04/23 10:29:12 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
+    ## 18/04/23 10:29:12 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.183 s
+    ## 18/04/23 10:29:12 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.188827 s
 
 Finally, we disconnect from Spark:
 
@@ -371,37 +419,55 @@ Finally, we disconnect from Spark:
 spark_disconnect(sc)
 ```
 
-RStudio IDE
------------
+## RStudio IDE
 
-The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/download/preview/) of the RStudio IDE includes integrated support for Spark and the sparklyr package, including tools for:
+The latest RStudio [Preview
+Release](https://www.rstudio.com/products/rstudio/download/preview/) of
+the RStudio IDE includes integrated support for Spark and the sparklyr
+package, including tools for:
 
--   Creating and managing Spark connections
--   Browsing the tables and columns of Spark DataFrames
--   Previewing the first 1,000 rows of Spark DataFrames
+  - Creating and managing Spark connections
+  - Browsing the tables and columns of Spark DataFrames
+  - Previewing the first 1,000 rows of Spark DataFrames
 
-Once you've installed the sparklyr package, you should find a new **Spark** pane within the IDE. This pane includes a **New Connection** dialog which can be used to make connections to local or remote Spark instances:
+Once you’ve installed the sparklyr package, you should find a new
+**Spark** pane within the IDE. This pane includes a **New Connection**
+dialog which can be used to make connections to local or remote Spark
+instances:
 
 <img src="tools/readme/spark-connect.png" class="screenshot" width=389 />
 
-Once you've connected to Spark you'll be able to browse the tables contained within the Spark cluster and preview Spark DataFrames using the standard RStudio data viewer:
+Once you’ve connected to Spark you’ll be able to browse the tables
+contained within the Spark cluster and preview Spark DataFrames using
+the standard RStudio data
+viewer:
 
 <img src="tools/readme/spark-dataview.png" class="screenshot" width=639 />
 
-You can also connect to Spark through [Livy](http://livy.io) through a new connection dialog:
+You can also connect to Spark through [Livy](http://livy.io) through a
+new connection
+dialog:
 
 <img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389 />
 
-The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
+<div style="margin-bottom: 15px;">
 
-Using H2O
----------
+</div>
 
-[rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN package from [H2O](http://h2o.ai) that extends [sparklyr](http://spark.rstudio.com) to provide an interface into [Sparkling Water](https://github.com/h2oai/sparkling-water). For instance, the following example installs, configures and runs [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
+The RStudio IDE features for sparklyr are available now as part of the
+[RStudio Preview
+Release](https://www.rstudio.com/products/rstudio/download/preview/).
+
+## Using H2O
+
+[rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN
+package from [H2O](http://h2o.ai) that extends
+[sparklyr](http://spark.rstudio.com) to provide an interface into
+[Sparkling Water](https://github.com/h2oai/sparkling-water). For
+instance, the following example installs, configures and runs
+[h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
 
 ``` r
-options(rsparkling.sparklingwater.version = "2.1.14")
-
 library(rsparkling)
 library(sparklyr)
 library(dplyr)
@@ -426,7 +492,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1510271749678_1 
+    ## Model ID:  GLM_model_R_1524504574477_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -435,7 +501,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                  100 frame_rdd_29_b907d4915799eac74fb1ea60ad594bbf
+    ## 1                  100 frame_rdd_31_b77cecc191973299d2e9b6b052ec4257
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
@@ -462,10 +528,16 @@ mtcars_glm
 spark_disconnect(sc)
 ```
 
-Connecting through Livy
------------------------
+## Connecting through Livy
 
-[Livy](https://github.com/cloudera/livy) enables remote connections to Apache Spark clusters. Before connecting to Livy, you will need the connection information to an existing service running Livy. Otherwise, to test `livy` in your local environment, you can install it and run it locally as follows:
+[Livy](https://github.com/cloudera/livy) enables remote connections to
+Apache Spark clusters. Connecting to Spark clusters through Livy is
+**under experimental development** in `sparklyr`. Please post any
+feedback or questions as a GitHub issue as needed.
+
+Before connecting to Livy, you will need the connection information to
+an existing service running Livy. Otherwise, to test `livy` in your
+local environment, you can install it and run it locally as follows:
 
 ``` r
 livy_install()
@@ -475,7 +547,9 @@ livy_install()
 livy_service_start()
 ```
 
-To connect, use the Livy service address as `master` and `method = "livy"` in `spark_connect`. Once connection completes, use `sparklyr` as usual, for instance:
+To connect, use the Livy service address as `master` and `method =
+"livy"` in `spark_connect`. Once connection completes, use `sparklyr` as
+usual, for instance:
 
 ``` r
 sc <- spark_connect(master = "http://localhost:8998", method = "livy")
@@ -485,30 +559,32 @@ copy_to(sc, iris)
     ## # Source:   table<iris> [?? x 5]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
-    ##           <dbl>       <dbl>        <dbl>       <dbl>   <chr>
-    ##  1          5.1         3.5          1.4         0.2  setosa
-    ##  2          4.9         3.0          1.4         0.2  setosa
-    ##  3          4.7         3.2          1.3         0.2  setosa
-    ##  4          4.6         3.1          1.5         0.2  setosa
-    ##  5          5.0         3.6          1.4         0.2  setosa
-    ##  6          5.4         3.9          1.7         0.4  setosa
-    ##  7          4.6         3.4          1.4         0.3  setosa
-    ##  8          5.0         3.4          1.5         0.2  setosa
-    ##  9          4.4         2.9          1.4         0.2  setosa
-    ## 10          4.9         3.1          1.5         0.1  setosa
+    ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
+    ##  1         5.10        3.50         1.40       0.200 setosa 
+    ##  2         4.90        3.00         1.40       0.200 setosa 
+    ##  3         4.70        3.20         1.30       0.200 setosa 
+    ##  4         4.60        3.10         1.50       0.200 setosa 
+    ##  5         5.00        3.60         1.40       0.200 setosa 
+    ##  6         5.40        3.90         1.70       0.400 setosa 
+    ##  7         4.60        3.40         1.40       0.300 setosa 
+    ##  8         5.00        3.40         1.50       0.200 setosa 
+    ##  9         4.40        2.90         1.40       0.200 setosa 
+    ## 10         4.90        3.10         1.50       0.100 setosa 
     ## # ... with more rows
 
 ``` r
 spark_disconnect(sc)
 ```
 
-Once you are done using `livy` locally, you should stop this service with:
+Once you are done using `livy` locally, you should stop this service
+with:
 
 ``` r
 livy_service_stop()
 ```
 
-To connect to remote `livy` clusters that support basic authentication connect as:
+To connect to remote `livy` clusters that support basic authentication
+connect as:
 
 ``` r
 config <- livy_config(username="<username>", password="<password">)

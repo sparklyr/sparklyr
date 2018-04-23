@@ -6,6 +6,8 @@ output:
     fig_height: 5
 ---
 
+<img src="tools/readme/sparklyr-package.png" width=200 align="right" style="margin-left: 20px; margin-right: 20px"/>
+
 [![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) [![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr) [![Join the chat at https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ```{r setup, include=FALSE}
@@ -14,13 +16,10 @@ knitr::opts_chunk$set(warning = FALSE)
 knitr::opts_chunk$set(fig.path = "tools/readme/", dev = "png")
 ```
 
-
-<img src="tools/readme/sparklyr-illustration.png" width=364 height=197 align="right"/>
-
-- Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
-- Filter and aggregate Spark datasets then bring them into R for <br/> analysis and visualization.
+- Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a complete [dplyr](https://github.com/hadley/dplyr) backend.
+- Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
 - Use Spark's distributed [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) library from R.
-- Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide <br/> interfaces to Spark packages. 
+- Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide interfaces to Spark packages. 
 
 ## Installation
 
