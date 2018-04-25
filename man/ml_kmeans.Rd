@@ -72,10 +72,11 @@ K-means clustering with support for k-means|| initialization proposed by Bahmani
   Using `ml_kmeans()` with the formula interface requires Spark 2.0+.
 }
 \examples{
-
+\dontrun{
 sc <- spark_connect(master = "local")
-iris_tb <- sdf_copy_to(sc, iris, name = "iris_tb", overwrite = TRUE)
-ml_kmeans(iris_tb, Species ~ .)
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+ml_kmeans(iris_tbl, Species ~ .)
+}
 
 }
 \seealso{

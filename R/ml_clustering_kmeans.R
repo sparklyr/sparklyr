@@ -12,10 +12,11 @@
 #' @param init_mode Initialization algorithm. This can be either "random" to choose random points as initial cluster centers, or "k-means||" to use a parallel variant of k-means++ (Bahmani et al., Scalable K-Means++, VLDB 2012). Default: k-means||.
 #'
 #' @examples
-#'
+#'\dontrun{
 #' sc <- spark_connect(master = "local")
-#' iris_tb <- sdf_copy_to(sc, iris, name = "iris_tb", overwrite = TRUE)
-#' ml_kmeans(iris_tb, Species ~ .)
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#' ml_kmeans(iris_tbl, Species ~ .)
+#'}
 #'
 #' @export
 ml_kmeans <- function(
