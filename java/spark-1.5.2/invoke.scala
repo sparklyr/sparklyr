@@ -33,6 +33,14 @@ class Invoke {
               // The case that the parameter type is a Scala Seq and the argument
               // is a Java array is considered matching. The array will be converted
               // to a Seq later if this method is matched.
+            } else if (parameterType == classOf[Char] && args(i) != null &&
+                       args(i).isInstanceOf[String]) {
+              // The case that parameter type is a Char and the argument is a string.
+              // Check that the string has length 1.
+              if (args(i).asInstanceOf[String].length != 1) argMatched = false
+            } else if (parameterType == classOf[Short] && args(i) != null &&
+                       args(i).isInstanceOf[Integer]) {
+              // The case that the parameter type is Short and the argument is Integer.
             } else {
               var parameterWrapperType = parameterType
 
@@ -64,6 +72,14 @@ class Invoke {
                   args(i) != null && args(i).getClass.isArray) {
                 // Convert a Java array to scala Seq
                 args(i) = args(i).asInstanceOf[Array[_]].toSeq
+              } else if (parameterTypes(i) == classOf[Char] &&
+                         args(i) != null && args(i).isInstanceOf[String]) {
+                // Convert String to Char
+                args(i) = new java.lang.Character(args(i).asInstanceOf[String](0))
+              } else if (parameterTypes(i) == classOf[Short] &&
+                         args(i) != null && args(i).isInstanceOf[Integer]) {
+                // Convert Integer to Short
+                args(i) = new java.lang.Short(args(i).asInstanceOf[Integer].toShort)
               }
             }
 
