@@ -48,7 +48,7 @@ class Invoke {
               if (parameterType.isPrimitive) {
                 parameterWrapperType = parameterType match {
                   case java.lang.Integer.TYPE => classOf[java.lang.Integer]
-                  case java.lang.Long.TYPE => classOf[java.lang.Integer]
+                  case java.lang.Long.TYPE => classOf[java.lang.Double]
                   case java.lang.Double.TYPE => classOf[java.lang.Double]
                   case java.lang.Boolean.TYPE => classOf[java.lang.Boolean]
                   case _ => parameterType
@@ -80,7 +80,14 @@ class Invoke {
                          args(i) != null && args(i).isInstanceOf[Integer]) {
                 // Convert Integer to Short
                 args(i) = new java.lang.Short(args(i).asInstanceOf[Integer].toShort)
-              }
+              } else if (parameterTypes(i) == classOf[Long] &&
+                         args(i) != null && args(i).isInstanceOf[Double]) {
+                val argDouble = args(i).asInstanceOf[Double]
+                if (argDouble > Long.MaxValue || argDouble < Long.MinValue) {
+                  throw new Exception("Unable to cast numeric to Long: out of range.")
+                }
+                args(i) = new java.lang.Long(argDouble.toLong)
+               }
             }
 
             return Some(index)
