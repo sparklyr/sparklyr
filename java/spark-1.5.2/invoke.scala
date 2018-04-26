@@ -83,7 +83,11 @@ class Invoke {
               } else if (parameterTypes(i) == classOf[Short] &&
                          args(i) != null && args(i).isInstanceOf[Integer]) {
                 // Convert Integer to Short
-                args(i) = new java.lang.Short(args(i).asInstanceOf[Integer].toShort)
+                val argInt = args(i).asInstanceOf[Integer]
+                if (argInt > Short.MaxValue || argInt < Short.MinValue) {
+                  throw new Exception("Unable to cast integer to Short: out of range.")
+                }
+                args(i) = new java.lang.Short(argInt.toShort)
               } else if (parameterTypes(i) == classOf[Long] &&
                          args(i) != null && args(i).isInstanceOf[Double]) {
                 // Try to convert Double to Long

@@ -92,3 +92,15 @@ test_that("numeric to Long out of range error", {
     "java\\.lang\\.Exception: Unable to cast numeric to Long: out of range\\."
   )
 })
+
+test_that("integer to Short out of range error", {
+  big_number <- invoke_static(sc, "scala.Short", "MaxValue") * 2
+  expect_error(
+    invoke_new(sc, "java.lang.Short", as.integer(big_number)),
+    "java\\.lang\\.Exception: Unable to cast integer to Short: out of range\\."
+  )
+  expect_error(
+    invoke_new(sc, "java.lang.Short", as.integer(-1 * big_number)),
+    "java\\.lang\\.Exception: Unable to cast integer to Short: out of range\\."
+  )
+})
