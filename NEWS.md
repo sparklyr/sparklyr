@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- `invoke*()` method dispatch now supports `Char` and `Short` parameters. Also, `Long` parameters now allow numeric arguments, but integers are supported for backwards compatibility (#1395).
+
 - `sdf_copy_to()` no longer gives a spurious warning when user enters a multiline expression for `x` (#1386).
 
 - Added `ml_vocabulary()` to extract vocabulary from count vectorizer model and `ml_topics_matrix()` to extract matrix from LDA model.
