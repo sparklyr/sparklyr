@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Added `ml_feature_importances()` for extracing feature importances from tree-based models (#1436). `ml_tree_feature_importance()` is maintained as an alias.
+
 - `invoke*()` method dispatch now supports `Char` and `Short` parameters. Also, `Long` parameters now allow numeric arguments, but integers are supported for backwards compatibility (#1395).
 
 - `sdf_copy_to()` no longer gives a spurious warning when user enters a multiline expression for `x` (#1386).
