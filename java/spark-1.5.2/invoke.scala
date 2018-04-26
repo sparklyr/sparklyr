@@ -35,12 +35,16 @@ class Invoke {
               // to a Seq later if this method is matched.
             } else if (parameterType == classOf[Char] && args(i) != null &&
                        args(i).isInstanceOf[String]) {
-              // The case that parameter type is a Char and the argument is a string.
+              // Pparameter type is Char and argument is String.
               // Check that the string has length 1.
               if (args(i).asInstanceOf[String].length != 1) argMatched = false
             } else if (parameterType == classOf[Short] && args(i) != null &&
                        args(i).isInstanceOf[Integer]) {
-              // The case that the parameter type is Short and the argument is Integer.
+              // Parameter type is Short and argument is Integer.
+            } else if (parameterType == classOf[Long] && args(i) != null &&
+                       args(i).isInstanceOf[Integer]) {
+              // Parameter type is Long and argument is Integer.
+              // This is done for backwards compatibility.
             } else {
               var parameterWrapperType = parameterType
 
@@ -82,12 +86,16 @@ class Invoke {
                 args(i) = new java.lang.Short(args(i).asInstanceOf[Integer].toShort)
               } else if (parameterTypes(i) == classOf[Long] &&
                          args(i) != null && args(i).isInstanceOf[Double]) {
+                // Try to convert Double to Long
                 val argDouble = args(i).asInstanceOf[Double]
                 if (argDouble > Long.MaxValue || argDouble < Long.MinValue) {
                   throw new Exception("Unable to cast numeric to Long: out of range.")
                 }
                 args(i) = new java.lang.Long(argDouble.toLong)
-               }
+              } else if (parameterTypes(i) == classOf[Long] &&
+                          args(i) != null && args(i).isInstanceOf[Integer]) {
+                args(i) = new java.lang.Long(args(i).asInstanceOf[Integer].toLong)
+              }
             }
 
             return Some(index)

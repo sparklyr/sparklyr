@@ -71,6 +71,11 @@ test_that("we can invoke methods with Char/Short/Long/Float parameters (#1395)",
   )
 
   expect_identical(
+    invoke_new(sc, "java.lang.Long", 42L),
+    42
+  )
+
+  expect_identical(
     invoke_new(sc, "java.lang.Float", 42),
     42
   )
