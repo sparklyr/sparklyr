@@ -1,5 +1,7 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Added support for `feature_subset_strategy` parameter in GBT algorithms (#1445).
+
 - Added `string_order_type` to `ft_string_indexer()` to allow control over how strings are indexed (#1443).
 
 - Added `ft_string_indexer_model()` constructor for the string indexer transformer (#1442).

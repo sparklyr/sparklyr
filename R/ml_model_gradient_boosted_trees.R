@@ -5,6 +5,7 @@
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-decision-trees-base-params
 #' @template roxlate-ml-formula-params
+#' @template roxlate-ml-feature-subset-strategy
 #' @param max_iter Maxmimum number of iterations.
 #' @param step_size Step size (a.k.a. learning rate) in interval (0, 1] for shrinking the contribution of each estimator. (default = 0.1)
 #' @param subsampling_rate Fraction of the training data used for learning each decision tree, in range (0, 1]. (default = 1.0)
@@ -36,6 +37,7 @@ ml_gradient_boosted_trees <- function(
   min_instances_per_node = 1L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   seed = NULL,
   thresholds = NULL,
   cache_node_ids = FALSE,

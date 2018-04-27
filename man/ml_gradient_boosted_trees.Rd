@@ -9,11 +9,11 @@
 \title{Spark ML -- Gradient Boosted Trees}
 \usage{
 ml_gbt_classifier(x, formula = NULL, max_iter = 20L, max_depth = 5L,
-  step_size = 0.1, subsampling_rate = 1, min_instances_per_node = 1L,
-  max_bins = 32L, min_info_gain = 0, loss_type = "logistic",
-  seed = NULL, thresholds = NULL, checkpoint_interval = 10L,
-  cache_node_ids = FALSE, max_memory_in_mb = 256L,
-  features_col = "features", label_col = "label",
+  step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
+  min_instances_per_node = 1L, max_bins = 32L, min_info_gain = 0,
+  loss_type = "logistic", seed = NULL, thresholds = NULL,
+  checkpoint_interval = 10L, cache_node_ids = FALSE,
+  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("gbt_classifier_"), ...)
@@ -25,15 +25,17 @@ ml_gradient_boosted_trees(x, formula = NULL, type = c("auto", "regression",
   loss_type = c("auto", "logistic", "squared", "absolute"), max_bins = 32L,
   max_depth = 5L, max_iter = 20L, min_info_gain = 0,
   min_instances_per_node = 1L, step_size = 0.1, subsampling_rate = 1,
-  seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, uid = random_string("gradient_boosted_trees_"),
-  response = NULL, features = NULL, ...)
+  feature_subset_strategy = "auto", seed = NULL, thresholds = NULL,
+  cache_node_ids = FALSE, max_memory_in_mb = 256L,
+  uid = random_string("gradient_boosted_trees_"), response = NULL,
+  features = NULL, ...)
 
 ml_gbt_regressor(x, formula = NULL, max_iter = 20L, max_depth = 5L,
-  step_size = 0.1, subsampling_rate = 1, min_instances_per_node = 1L,
-  max_bins = 32L, min_info_gain = 0, loss_type = "squared", seed = NULL,
-  checkpoint_interval = 10L, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
+  step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
+  min_instances_per_node = 1L, max_bins = 32L, min_info_gain = 0,
+  loss_type = "squared", seed = NULL, checkpoint_interval = 10L,
+  cache_node_ids = FALSE, max_memory_in_mb = 256L,
+  features_col = "features", label_col = "label",
   prediction_col = "prediction", uid = random_string("gbt_regressor_"), ...)
 }
 \arguments{
@@ -49,6 +51,8 @@ number of nodes separating any leaves from the root of the tree.}
 \item{step_size}{Step size (a.k.a. learning rate) in interval (0, 1] for shrinking the contribution of each estimator. (default = 0.1)}
 
 \item{subsampling_rate}{Fraction of the training data used for learning each decision tree, in range (0, 1]. (default = 1.0)}
+
+\item{feature_subset_strategy}{The number of features to consider for splits at each tree node. See details for options.}
 
 \item{min_instances_per_node}{Minimum number of instances each child must
 have after split.}
@@ -128,6 +132,16 @@ Perform classification and regression using gradient boosted trees.
 }
 \details{
 When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{response} and \code{features}) is specified, the function returns a \code{ml_model} object wrapping a \code{ml_pipeline_model} which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument \code{predicted_label_col} (defaults to \code{"predicted_label"}) can be used to specify the name of the predicted label column. In addition to the fitted \code{ml_pipeline_model}, \code{ml_model} objects also contain a \code{ml_pipeline} object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by \code{\link{ml_save}} with \code{type = "pipeline"} to faciliate model refresh workflows.
+
+The supported options for \code{feature_subset_strategy} are
+  \itemize{
+    \item \code{"auto"}: Choose automatically for task: If \code{num_trees == 1}, set to \code{"all"}. If \code{num_trees > 1} (forest), set to \code{"sqrt"} for classification and to \code{"onethird"} for regression.
+    \item \code{"all"}: use all features
+    \item \code{"onethird"}: use 1/3 of the features
+    \item \code{"sqrt"}: use use sqrt(number of features)
+    \item \code{"log2"}: use log2(number of features)
+    \item \code{"n"}: when \code{n} is in the range (0, 1.0], use n * number of features. When \code{n} is in the range (1, number of features), use \code{n} features. (default = \code{"auto"})
+    }
 
 \code{ml_gradient_boosted_trees} is a wrapper around \code{ml_gbt_regressor.tbl_spark} and \code{ml_gbt_classifier.tbl_spark} and calls the appropriate method based on model type.
 }
