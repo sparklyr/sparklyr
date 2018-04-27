@@ -1,5 +1,9 @@
 # Sparklyr 0.7.1 (UNRELEASED)
 
+- Added `collect_sub_models` parameter to `ml_cross_validator()` and `ml_train_validation_split()` and helper function `ml_sub_models()` to allow inspecting models trained for each fold/parameter set (#1362).
+
+- Added `parallelism` parameter to `ml_cross_validator()` and `ml_train_validation_split()` to allow tuning in parallel (#1446).
+
 - Added support for `feature_subset_strategy` parameter in GBT algorithms (#1445).
 
 - Added `string_order_type` to `ft_string_indexer()` to allow control over how strings are indexed (#1443).

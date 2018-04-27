@@ -131,7 +131,9 @@ ml_create_mapping_tables <- function() { # nocov start
          # ml_bisecting_kmeans
          "min_divisible_cluster_size" = "minDivisibleClusterSize",
          # evaluators
-         "metric_name" = "metricName")
+         "metric_name" = "metricName",
+         # tuning
+         "collect_sub_models" = "collectSubModels")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))

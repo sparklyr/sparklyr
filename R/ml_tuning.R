@@ -23,6 +23,11 @@
 #' @param estimator A \code{ml_estimator} object.
 #' @param estimator_param_maps A named list of stages and hyper-parameter sets to tune. See details.
 #' @param evaluator A \code{ml_evaluator} object, see \link{ml_evaluator}.
+#' @param collect_sub_models Whether to collect a list of sub-models trained during tuning.
+#'   If set to \code{FALSE}, then only the single best sub-model will be available after fitting.
+#'   If set to true, then all sub-models will be available. Warning: For large models, collecting
+#'   all sub-models can cause OOMs on the Spark driver.
+#' @param parallelism The number of threads to use when running parallel algorithms. Default is 1 for serial execution.
 #' @template roxlate-ml-seed
 #' @name ml-tuning
 NULL
@@ -280,4 +285,20 @@ print_tuning_summary <- function(x, type = c("cv", "tvs")) {
     print(x$avg_metrics_df)
   else
     print(x$validation_metrics_df)
+}
+
+#' @rdname ml-tuning
+#' @param model A cross validation or train-validation-split model.
+#' @return For cross validation, \code{ml_sub_models()} returns a nested
+#'   list of models, where the first layer represents fold indices and the
+#'   second layer represents param maps. For train-validation split,
+#'   \code{ml_sub_models()} returns a list of models, corresponding to the
+#'   order of the estimator param maps.
+#' @export
+ml_sub_models <- function(model) {
+  fn <- model$sub_models %||% stop(
+    "Cannot extract sub models. `collect_sub_models` must be set to TRUE in ",
+    "ml_cross_validator() or ml_train_split_validation()."
+  )
+  fn()
 }

@@ -32,7 +32,7 @@ ml_regression_evaluator(x, label_col = "label",
 
 \item{label_col}{Name of column string specifying which column contains the true labels or values.}
 
-\item{raw_prediction_col}{Name of column contains the scored probability of a success}
+\item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
 
 \item{metric_name}{The performance metric. See details.}
 
