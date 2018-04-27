@@ -44,6 +44,7 @@ ml_create_mapping_tables <- function() { # nocov start
          "force_index_label" = "forceIndexLabel",
          # ft_string_indexer
          "handle_invalid" = "handleInvalid",
+         "string_order_type" = "stringOrderType",
          # ft_one_hot_encoder
          "drop_last" = "dropLast",
          # ft_vector_assembler

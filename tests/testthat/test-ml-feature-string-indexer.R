@@ -43,3 +43,28 @@ test_that("ft_index_to_string() works", {
          labels = list("foo", "bar"))
   )
 })
+
+test_that("ft_string_indexer respects `string_order_type`", {
+  test_requires_version("2.3.0", "string_order_type supported in Spark 2.3")
+  expect_identical(df_tbl %>%
+    ft_string_indexer("string", "indexed", string_order_type = "alphabetAsc") %>%
+    dplyr::pull(indexed),
+    c(1, 0, 1, 1)
+  )
+})
+
+test_that("ft_string_indexer_model works", {
+  expect_identical(
+    ft_string_indexer_model(sc, "string", "indexed", labels = c("foo", "bar")) %>%
+      ml_transform(df_tbl) %>%
+      dplyr::pull(indexed),
+    c(0, 1, 0, 0)
+  )
+
+  expect_identical(
+    df_tbl %>%
+      ft_string_indexer_model("string", "indexed", labels = c("bar", "foo")) %>%
+      dplyr::pull(indexed),
+    c(1, 0, 1, 1)
+  )
+})
