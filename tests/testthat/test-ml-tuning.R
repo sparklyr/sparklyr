@@ -3,6 +3,7 @@ context("ml tuning")
 sc <- testthat_spark_connection()
 
 test_that("ml_cross_validator() works correctly", {
+  test_requires_version("2.3.0")
   pipeline <- ml_pipeline(sc) %>%
     ft_tokenizer("text", "words", uid = "tokenizer_1") %>%
     ft_hashing_tf("words", "features", uid = "hashing_tf_1") %>%
@@ -30,8 +31,11 @@ test_that("ml_cross_validator() works correctly", {
     estimator = pipeline,
     evaluator = ml_binary_classification_evaluator(sc, label_col = "label",
                                                    raw_prediction_col = "rawPrediction"),
-    estimator_param_maps = param_grid
+    estimator_param_maps = param_grid,
+    parallelism = 2
   )
+
+  expect_identical(ml_param(cv, "parallelism"), 2L)
 
   expected_param_maps <- param_grid_full_stage_names %>%
     sparklyr:::ml_expand_params() %>%

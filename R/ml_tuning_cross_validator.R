@@ -6,6 +6,7 @@ ml_cross_validator <- function(
   evaluator,
   num_folds = 3L,
   collect_sub_models = FALSE,
+  parallelism = 1L,
   seed = NULL,
   uid = random_string("cross_validator_"),
   ...
@@ -19,6 +20,7 @@ ml_cross_validator.spark_connection <- function(
   evaluator,
   num_folds = 3L,
   collect_sub_models = FALSE,
+  parallelism = 1L,
   seed = NULL,
   uid = random_string("cross_validator_"),
   ...
@@ -26,11 +28,13 @@ ml_cross_validator.spark_connection <- function(
 
   num_folds <- ensure_scalar_integer(num_folds)
   collect_sub_models <- ensure_scalar_boolean(collect_sub_models)
+  parallelism <- ensure_scalar_integer(parallelism)
 
   ml_new_validator(x, "org.apache.spark.ml.tuning.CrossValidator", uid,
                    estimator, evaluator, estimator_param_maps, seed) %>%
     invoke("setNumFolds", num_folds) %>%
     jobj_set_param("setCollectSubModels", collect_sub_models, FALSE, "2.3.0") %>%
+    jobj_set_param("setParallelism", parallelism, 1L, "2.3.0") %>%
     new_ml_cross_validator()
 }
 
@@ -40,6 +44,7 @@ ml_cross_validator.ml_pipeline <- function(
   evaluator,
   num_folds = 3L,
   collect_sub_models = FALSE,
+  parallelism = 1L,
   seed = NULL,
   uid = random_string("cross_validator_"),
   ...
@@ -54,6 +59,7 @@ ml_cross_validator.tbl_spark <- function(
   evaluator,
   num_folds = 3L,
   collect_sub_models = FALSE,
+  parallelism = 1L,
   seed = NULL,
   uid = random_string("cross_validator_"),
   ...

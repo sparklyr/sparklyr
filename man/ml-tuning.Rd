@@ -11,12 +11,12 @@
 ml_sub_models(model)
 
 ml_cross_validator(x, estimator, estimator_param_maps, evaluator,
-  num_folds = 3L, collect_sub_models = FALSE, seed = NULL,
-  uid = random_string("cross_validator_"), ...)
+  num_folds = 3L, collect_sub_models = FALSE, parallelism = 1L,
+  seed = NULL, uid = random_string("cross_validator_"), ...)
 
 ml_train_validation_split(x, estimator, estimator_param_maps, evaluator,
-  train_ratio = 0.75, collect_sub_models = FALSE, seed = NULL,
-  uid = random_string("train_validation_split_"), ...)
+  train_ratio = 0.75, collect_sub_models = FALSE, parallelism = 1L,
+  seed = NULL, uid = random_string("train_validation_split_"), ...)
 }
 \arguments{
 \item{model}{A cross validation or train-validation-split model.}
@@ -35,6 +35,8 @@ ml_train_validation_split(x, estimator, estimator_param_maps, evaluator,
 If set to \code{FALSE}, then only the single best sub-model will be available after fitting.
 If set to true, then all sub-models will be available. Warning: For large models, collecting
 all sub-models can cause OOMs on the Spark driver.}
+
+\item{parallelism}{The number of threads to use when running parallel algorithms. Default is 1 for serial execution.}
 
 \item{seed}{A random seed. Set this value if you need your results to be
 reproducible across repeated calls.}

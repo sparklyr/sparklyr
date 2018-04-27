@@ -27,6 +27,7 @@
 #'   If set to \code{FALSE}, then only the single best sub-model will be available after fitting.
 #'   If set to true, then all sub-models will be available. Warning: For large models, collecting
 #'   all sub-models can cause OOMs on the Spark driver.
+#' @param parallelism The number of threads to use when running parallel algorithms. Default is 1 for serial execution.
 #' @template roxlate-ml-seed
 #' @name ml-tuning
 NULL
