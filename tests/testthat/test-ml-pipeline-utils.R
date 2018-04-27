@@ -7,7 +7,7 @@ test_that("ml_transform() fails on estimators", {
   string_indexer <- ft_string_indexer(sc, "Species", "species_idx")
   expect_error(string_indexer %>%
                  ml_transform(iris_tbl),
-               "is only applicable to")
+               "Transformers must be 'ml_transformer' objects")
 })
 
 test_that("ml_fit() and ml_fit_and_transform() fail on transformers", {
@@ -65,4 +65,23 @@ test_that("ml_is_set works", {
 
   expect_true(ml_is_set(spark_jobj(lr), "reg_param"))
   expect_false(ml_is_set(spark_jobj(lr), "thresholds"))
+})
+
+test_that("ml_transform take list of transformers (#1444)", {
+  iris_tbl <- testthat_tbl("iris")
+  string_indexer <- ft_string_indexer(sc, "Species", "label", dataset = iris_tbl)
+  pipeline <- ml_pipeline(string_indexer) %>%
+    ft_vector_assembler(c("Petal_Width", "Petal_Length"), "features") %>%
+    ml_logistic_regression() %>%
+    ft_index_to_string("prediction", "predicted_label",
+                       labels = ml_labels(string_indexer))
+  pipeline_model <- ml_fit(pipeline, iris_tbl)
+  stages <- pipeline_model %>%
+    ml_stages(c("vector_assembler", "logistic", "index_to_string"))
+
+  transformed1 <- ml_transform(stages, iris_tbl) %>%
+    dplyr::pull(prediction)
+  transformed2 <- Reduce(sdf_transform, stages, init = iris_tbl) %>%
+    dplyr::pull(prediction)
+  expect_equal(transformed1, transformed2)
 })
