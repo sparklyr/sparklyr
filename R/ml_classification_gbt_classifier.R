@@ -8,6 +8,7 @@ ml_gbt_classifier <- function(
   max_depth = 5L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   min_instances_per_node = 1L,
   max_bins = 32L,
   min_info_gain = 0,
@@ -35,6 +36,7 @@ ml_gbt_classifier.spark_connection <- function(
   max_depth = 5L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   min_instances_per_node = 1L,
   max_bins = 32L,
   min_info_gain = 0,
@@ -73,7 +75,9 @@ ml_gbt_classifier.spark_connection <- function(
     invoke("setLossType", loss_type) %>%
     invoke("setMaxIter", max_iter) %>%
     invoke("setStepSize", step_size) %>%
-    invoke("setSubsamplingRate", subsampling_rate)
+    invoke("setSubsamplingRate", subsampling_rate) %>%
+    jobj_set_param("setFeatureSubsetStrategy", feature_subset_strategy,
+                   "auto", "2.3.0")
 
   if(!rlang::is_null(thresholds) && spark_version(x) >= "2.2.0")
     jobj <- invoke(jobj, "setThresholds", thresholds)
@@ -92,6 +96,7 @@ ml_gbt_classifier.ml_pipeline <- function(
   max_depth = 5L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   min_instances_per_node = 1L,
   max_bins = 32L,
   min_info_gain = 0,
@@ -120,6 +125,7 @@ ml_gbt_classifier.tbl_spark <- function(
   max_depth = 5L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   min_instances_per_node = 1L,
   max_bins = 32L,
   min_info_gain = 0,
@@ -173,6 +179,7 @@ ml_validator_gbt_classifier <- function(args, nms) {
       step_size <- ensure_scalar_double(step_size)
       subsampling_rate <- ensure_scalar_double(subsampling_rate)
       loss_type <- ensure_scalar_character(loss_type)
+      feature_subset_strategy <- ensure_scalar_character(feature_subset_strategy)
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }
