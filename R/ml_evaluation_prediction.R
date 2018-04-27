@@ -24,7 +24,7 @@ NULL
 
 #' @rdname ml_evaluator
 #' @export
-#' @param raw_prediction_col Name of column contains the scored probability of a success
+#' @param raw_prediction_col Raw prediction (a.k.a. confidence) column name.
 ml_binary_classification_evaluator <- function(
   x, label_col = "label",
   raw_prediction_col = "rawPrediction",
