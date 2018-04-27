@@ -161,7 +161,6 @@ new_ml_random_forest_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     feature_importances = try_null(read_spark_vector(jobj, "featureImportances")),
-    num_trees = invoke(jobj, "numTrees"),
     num_features = invoke(jobj, "numFeatures"),
     total_num_nodes = invoke(jobj, "totalNumNodes"),
     tree_weights = invoke(jobj, "treeWeights"),
