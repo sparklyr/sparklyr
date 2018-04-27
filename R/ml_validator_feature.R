@@ -22,16 +22,6 @@ ml_validator_binarizer <- function(args, nms) {
     ml_extract_args(nms)
 }
 
-# StringIndexer
-ml_validator_string_indexer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      handle_invalid <- rlang::arg_match(
-        handle_invalid, c("error", "skip", "keep"))
-    }) %>%
-    ml_extract_args(nms)
-}
-
 # OneHotEncoder
 ml_validator_one_hot_encoder <- function(args, nms) {
   old_new_mapping <- c(input_output_mapping, list(drop.last = "drop_last"))

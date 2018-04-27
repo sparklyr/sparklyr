@@ -10,11 +10,17 @@
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-estimator-transformer
 #' @template roxlate-ml-feature-handle-invalid
+#' @param string_order_type (Spark 2.3+)How to order labels of string column.
+#'  The first label after ordering is assigned an index of 0. Options are
+#'  \code{"frequencyDesc"}, \code{"frequencyAsc"}, \code{"alphabetDesc"}, and \code{"alphabetAsc"}.
+#'  Defaults to \code{"frequencyDesc"}.
 #' @seealso \code{\link{ft_index_to_string}}
 #' @export
 ft_string_indexer <- function(
   x, input_col, output_col,
-  handle_invalid = "error", dataset = NULL,
+  handle_invalid = "error",
+  string_order_type = "frequencyDesc",
+  dataset = NULL,
   uid = random_string("string_indexer_"), ...) {
   UseMethod("ft_string_indexer")
 }
@@ -22,7 +28,9 @@ ft_string_indexer <- function(
 #' @export
 ft_string_indexer.spark_connection <- function(
   x, input_col, output_col,
-  handle_invalid = "error", dataset = NULL,
+  handle_invalid = "error",
+  string_order_type = "frequencyDesc",
+  dataset = NULL,
   uid = random_string("string_indexer_"), ...) {
 
   ml_ratify_args()
@@ -30,6 +38,7 @@ ft_string_indexer.spark_connection <- function(
   estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StringIndexer",
                                   input_col, output_col, uid) %>%
     jobj_set_param("setHandleInvalid", handle_invalid, "error", "2.1.0") %>%
+    jobj_set_param("setStringOrderType", string_order_type, "frequencyDesc", "2.3.0") %>%
     new_ml_string_indexer()
 
   if (is.null(dataset))
@@ -41,7 +50,9 @@ ft_string_indexer.spark_connection <- function(
 #' @export
 ft_string_indexer.ml_pipeline <- function(
   x, input_col, output_col,
-  handle_invalid = "error", dataset = NULL,
+  handle_invalid = "error",
+  string_order_type = "frequencyDesc",
+  dataset = NULL,
   uid = random_string("string_indexer_"), ...
 ) {
 
@@ -53,7 +64,9 @@ ft_string_indexer.ml_pipeline <- function(
 #' @export
 ft_string_indexer.tbl_spark <- function(
   x, input_col, output_col,
-  handle_invalid = "error", dataset = NULL,
+  handle_invalid = "error",
+  string_order_type = "frequencyDesc",
+  dataset = NULL,
   uid = random_string("string_indexer_"), ...
 ) {
   dots <- rlang::dots_list(...)
@@ -88,6 +101,19 @@ new_ml_string_indexer_model <- function(jobj) {
                      labels = invoke(jobj, "labels") %>%
                        as.character(),
                      subclass = "ml_string_indexer_model")
+}
+
+ml_validator_string_indexer <- function(args, nms) {
+  args %>%
+    ml_validate_args({
+      handle_invalid <- rlang::arg_match(
+        handle_invalid, c("error", "skip", "keep"))
+      string_order_type <- rlang::arg_match(
+        string_order_type,
+        c("frequencyDesc", "frequencyAsc", "alphabetDesc", "alphabetAsc")
+      )
+    }) %>%
+    ml_extract_args(nms)
 }
 
 #' @rdname ft_string_indexer
