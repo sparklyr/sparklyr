@@ -27,7 +27,7 @@ ml_predict(x, dataset, ...)
   probability_prefix = "probability_", ...)
 }
 \arguments{
-\item{x}{A \code{ml_estimator}, \code{ml_transformer}, or \code{ml_model} object.}
+\item{x}{A \code{ml_estimator}, \code{ml_transformer} (or a list thereof), or \code{ml_model} object.}
 
 \item{dataset}{A \code{tbl_spark}.}
 
