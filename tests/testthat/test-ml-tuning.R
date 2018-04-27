@@ -42,13 +42,13 @@ test_that("ml_cross_validator() works correctly", {
   }
 
   diff <- mapply(function(x, y) mapply(function(a, b) setdiff(a, b), x, y),
-         lapply(expected_param_maps, list_sorter),
-         lapply(cv$estimator_param_maps, list_sorter), SIMPLIFY = FALSE)
+                 lapply(expected_param_maps, list_sorter),
+                 lapply(cv$estimator_param_maps, list_sorter), SIMPLIFY = FALSE)
 
   expect_identical(
     c(diff),
     rep(list(list(hashing_tf_1 = list(),
-         logistic_1 = list())), 8)
+                  logistic_1 = list())), 8)
   )
 
   expect_identical(
@@ -58,7 +58,7 @@ test_that("ml_cross_validator() works correctly", {
 })
 
 test_that("we can cross validate a logistic regression with xval", {
-  if (spark_version(sc) < "2.1.0") skip("multinomial logistic regression not supported")
+  test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
 
   pipeline <- ml_pipeline(sc, uid = "pipeline_1") %>%
@@ -91,20 +91,24 @@ test_that("we can cross validate a logistic regression with xval", {
   cvm <- ml_cross_validator(
     iris_tbl, estimator = pipeline, estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc, uid = "eval1"),
+    collect_sub_models = TRUE,
     seed = 1, uid = "cv_1")
 
   expect_identical(names(cvm$avg_metrics_df),
-               c("f1", "elastic_net_param_S1", "reg_param_S1"))
+                   c("f1", "elastic_net_param_S1", "reg_param_S1"))
   expect_identical(nrow(cvm$avg_metrics_df), 4L)
   summary_string <- capture.output(summary(cvm)) %>%
     paste0(collapse = "\n")
 
   expect_match(summary_string,
                "3-fold cross validation")
+
+  sub_models <- ml_sub_models(cvm)
+  expect_identical(length(unlist(sub_models, recursive = FALSE)), 12L)
 })
 
 test_that("we can train a regression with train-validation-split", {
-  if (spark_version(sc) < "2.1.0") skip("multinomial logistic regression not supported")
+  test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
 
   pipeline <- ml_pipeline(sc) %>%
@@ -117,9 +121,11 @@ test_that("we can train a regression with train-validation-split", {
       elastic_net_param = c(0, 0.01)
     )
   )
-  tvsm <- ml_train_validation_split(iris_tbl, estimator = pipeline, estimator_param_maps = grid,
-                            evaluator = ml_multiclass_classification_evaluator(sc),
-                            seed = 1)
+  tvsm <- ml_train_validation_split(
+    iris_tbl, estimator = pipeline, estimator_param_maps = grid,
+    evaluator = ml_multiclass_classification_evaluator(sc),
+    collect_sub_models = TRUE,
+    seed = 1)
 
   expect_identical(names(tvsm$validation_metrics_df),
                    c("f1", "elastic_net_param_S1", "reg_param_S1"))
@@ -129,4 +135,8 @@ test_that("we can train a regression with train-validation-split", {
 
   expect_match(summary_string,
                "0\\.75/0\\.25 train-validation split")
+
+  sub_models <- ml_sub_models(tvsm)
+  expect_identical(length(sub_models), 4L)
+  expect_identical(class(sub_models[[1]])[[1]], "ml_pipeline_model")
 })
