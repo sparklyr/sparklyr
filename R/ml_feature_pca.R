@@ -90,6 +90,18 @@ new_ml_pca_model <- function(jobj) {
 #' @details \code{ml_pca()} is a wrapper around \code{ft_pca()} that returns a
 #'   \code{ml_model}.
 #'
+#' @examples
+#' \dontrun{
+#' library(dplyr)
+#'
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' iris_tbl %>%
+#'   select(-Species) %>%
+#'   ml_pca(k = 2)
+#' }
+#'
 #' @export
 #' @importFrom dplyr tbl_vars
 ml_pca <- function(x,
