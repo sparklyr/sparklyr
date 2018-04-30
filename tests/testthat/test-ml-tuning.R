@@ -99,7 +99,7 @@ test_that("we can cross validate a logistic regression with xval", {
     seed = 1, uid = "cv_1")
 
   expect_identical(names(cvm$avg_metrics_df),
-                   c("f1", "elastic_net_param_S1", "reg_param_S1"))
+                   c("f1", "elastic_net_param_1", "reg_param_1"))
   expect_identical(nrow(cvm$avg_metrics_df), 4L)
   summary_string <- capture.output(summary(cvm)) %>%
     paste0(collapse = "\n")
@@ -132,7 +132,7 @@ test_that("we can train a regression with train-validation-split", {
     seed = 1)
 
   expect_identical(names(tvsm$validation_metrics_df),
-                   c("f1", "elastic_net_param_S1", "reg_param_S1"))
+                   c("f1", "elastic_net_param_1", "reg_param_1"))
   expect_identical(nrow(tvsm$validation_metrics_df), 4L)
   summary_string <- capture.output(summary(tvsm)) %>%
     paste0(collapse = "\n")
@@ -143,4 +143,54 @@ test_that("we can train a regression with train-validation-split", {
   sub_models <- ml_sub_models(tvsm)
   expect_identical(length(sub_models), 4L)
   expect_identical(class(sub_models[[1]])[[1]], "ml_pipeline_model")
+})
+
+test_that("ml_validation_metrics() works properly", {
+  test_requires_version("2.3.0")
+  iris_tbl <- testthat_tbl("iris")
+
+  labels <- c("setosa", "versicolor", "virginica")
+  pipeline <- ml_pipeline(sc) %>%
+    ft_vector_assembler(
+      c("Sepal_Width", "Sepal_Length", "Petal_Width", "Petal_Length"),
+      "features"
+    ) %>%
+    ft_string_indexer_model("Species", "label", labels = labels) %>%
+    ml_logistic_regression()
+
+  grid <- list(
+    logistic = list(
+      elastic_net_param = c(0.25, 0.75),
+      reg_param = c(1e-3, 1e-4)
+    )
+  )
+  cv <- ml_cross_validator(
+    sc, estimator = pipeline, estimator_param_maps = grid,
+    evaluator = ml_multiclass_classification_evaluator(sc),
+    num_folds = 3, parallelism = 4
+  )
+  cv_model <- ml_fit(cv, iris_tbl)
+  cv_metrics <- ml_validation_metrics(cv_model)
+
+  tvs <- ml_train_validation_split(
+    sc, estimator = pipeline, estimator_param_maps = grid,
+    evaluator = ml_multiclass_classification_evaluator(sc),
+    parallelism = 4
+  )
+  tvs_model <- ml_fit(tvs, iris_tbl)
+  tvs_metrics <- ml_validation_metrics(tvs_model)
+
+  expect_identical(
+    names(cv_metrics),
+    c("f1", "elastic_net_param_1", "reg_param_1")
+  )
+
+  expect_identical(nrow(cv_metrics), 4L)
+
+  expect_identical(
+    names(tvs_metrics),
+    c("f1", "elastic_net_param_1", "reg_param_1")
+  )
+
+  expect_identical(nrow(tvs_metrics), 4L)
 })
