@@ -137,7 +137,7 @@ param_maps_to_df <- function(param_maps) {
       param_map %>%
         lapply(data.frame, stringsAsFactors = FALSE) %>%
         (function(x) lapply(seq_along(x), function(n) {
-          fn <- function(x) paste(x, n, sep = "_S")
+          fn <- function(x) paste(x, n, sep = "_")
           dplyr::rename_all(x[[n]], fn)
         })) %>% dplyr::bind_cols()
     }) %>%
@@ -301,4 +301,18 @@ ml_sub_models <- function(model) {
     "ml_cross_validator() or ml_train_split_validation()."
   )
   fn()
+}
+
+#' @rdname ml-tuning
+#' @return \code{ml_validation_metrics()} returns a data frame of performance
+#'   metrics and hyperparameter combinations.
+#' @export
+ml_validation_metrics <- function(model) {
+  if (inherits(model, "ml_cross_validator_model"))
+    model$avg_metrics_df
+  else if (inherits(model, "ml_train_validation_split_model"))
+    model$validation_metrics_df
+  else
+    stop("ml_validation_metrics() must be called on `ml_cross_validator_model` ",
+         "or `ml_train_validation_split_model`.", call. = FALSE)
 }
