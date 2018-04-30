@@ -18,7 +18,7 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 
 \item{delimiter}{The character used to delimit each column, defaults to \code{,}.}
 
-\item{quote}{The character used as a quote, defaults to \code{"hdfs://"}.}
+\item{quote}{The character used as a quote. Defaults to \samp{'"'}.}
 
 \item{escape}{The character used to escape other characters, defaults to \code{\\}.}
 
