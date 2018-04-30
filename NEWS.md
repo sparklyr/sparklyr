@@ -78,6 +78,8 @@
 
 ### Miscellaneous
 
+- Fixed typo in `sparklyr.yarn.cluster.hostaddress.timeot` (#1318).
+
 - Fixed regression blocking use of `livy.session.start.timeout` parameter
   in Livy connections.
 
