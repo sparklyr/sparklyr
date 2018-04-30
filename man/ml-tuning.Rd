@@ -4,11 +4,14 @@
 \name{ml-tuning}
 \alias{ml-tuning}
 \alias{ml_sub_models}
+\alias{ml_validation_metrics}
 \alias{ml_cross_validator}
 \alias{ml_train_validation_split}
 \title{Spark ML -- Tuning}
 \usage{
 ml_sub_models(model)
+
+ml_validation_metrics(model)
 
 ml_cross_validator(x, estimator, estimator_param_maps, evaluator,
   num_folds = 3L, collect_sub_models = FALSE, parallelism = 1L,
@@ -66,6 +69,9 @@ For cross validation, \code{ml_sub_models()} returns a nested
   second layer represents param maps. For train-validation split,
   \code{ml_sub_models()} returns a list of models, corresponding to the
   order of the estimator param maps.
+
+\code{ml_validation_metrics()} returns a data frame of performance
+  metrics and hyperparameter combinations.
 }
 \description{
 Perform hyper-parameter tuning using either K-fold cross validation or train-validation split.
