@@ -172,13 +172,13 @@ test_that("ml_validation_metrics() works properly", {
   cv_model <- ml_fit(cv, iris_tbl)
   cv_metrics <- ml_validation_metrics(cv_model)
 
-  tsv <- ml_cross_validator(
+  tvs <- ml_train_validation_split(
     sc, estimator = pipeline, estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc),
     parallelism = 4
   )
-  tsv_model <- ml_fit(cv, iris_tbl)
-  tsv_metrics <- ml_validation_metrics(tsv_model)
+  tvs_model <- ml_fit(tvs, iris_tbl)
+  tvs_metrics <- ml_validation_metrics(tvs_model)
 
   expect_identical(
     names(cv_metrics),
@@ -188,9 +188,9 @@ test_that("ml_validation_metrics() works properly", {
   expect_identical(nrow(cv_metrics), 4L)
 
   expect_identical(
-    names(tsv_metrics),
+    names(tvs_metrics),
     c("f1", "elastic_net_param_1", "reg_param_1")
   )
 
-  expect_identical(nrow(tsv_metrics), 4L)
+  expect_identical(nrow(tvs_metrics), 4L)
 })
