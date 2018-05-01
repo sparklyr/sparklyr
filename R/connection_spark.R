@@ -64,7 +64,7 @@ NULL
 #' spark_disconnect(sc)
 #'
 #' @export
-spark_connect <- function(master = "local",
+spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
                           method = c("shell", "livy", "databricks", "test"),
                           app_name = "sparklyr",
@@ -78,11 +78,15 @@ spark_connect <- function(master = "local",
   method <- match.arg(method)
 
   # master can be missing if it's specified in the config file
-  if (missing(master) && method != "databricks") {
-    master <- config$spark.master
-    if (is.null(master))
-      stop("You must either pass a value for master or include a spark.master ",
-           "entry in your config.yml")
+  if (missing(master)) {
+    if (identical(method, "databricks")) {
+      master <- "databricks"
+    } else {
+      master <- config$spark.master
+      if (is.null(master))
+        stop("You must either pass a value for master or include a spark.master ",
+             "entry in your config.yml")
+    }
   }
 
   # determine whether we need cores in master
