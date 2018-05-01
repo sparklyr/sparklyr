@@ -61,6 +61,8 @@ livy_sources_refresh <- function() {
 
     lines <- gsub("^import sparklyr\\.", "import ", lines)
 
+    lines <- gsub("io\\.netty\\.", "_root_.io.netty.", lines)
+
     lapply(lines, function(line) {
       write(line, file = destinationPath, append = TRUE)
     })
