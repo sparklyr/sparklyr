@@ -10,8 +10,8 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
   import scala.collection.mutable.HashMap
   import scala.language.existentials
 
-  import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
-  import io.netty.channel.ChannelHandler.Sharable
+  import _root_.io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
+  import _root_.io.netty.channel.ChannelHandler.Sharable
 
   val invoke = new Invoke()
 
