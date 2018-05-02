@@ -54,7 +54,7 @@ test_that("ml_gbt_classifier() default params are correct (<2.2)", {
 })
 
 test_that("ml_gbt_classifier() default params are correct (>= 2.2.0)", {
-  if (spark_version(sc) < "2.2.0") skip("")
+  test_requires_version("2.3.0")
   predictor <- ml_pipeline(sc) %>%
     ml_gbt_classifier() %>%
     ml_stage(1)
@@ -84,6 +84,7 @@ test_that("ml_gbt_regressor() parses params correctly", {
 })
 
 test_that("ml_gbt_regressor() default params are correct", {
+  test_requires_version("2.3.0")
   predictor <- ml_pipeline(sc) %>%
     ml_gbt_regressor() %>%
     ml_stage(1)
