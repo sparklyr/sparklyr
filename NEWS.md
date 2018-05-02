@@ -1,3 +1,7 @@
+# Sparklyr 0.8.1
+
+- Fixed regression for connections using `mode` with `databricks`.
+
 # Sparklyr 0.8.0
 
 ### Spark ML
