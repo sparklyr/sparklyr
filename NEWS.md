@@ -1,3 +1,5 @@
+# Sparklyr 0.9 (unreleased)
+
 # Sparklyr 0.8.1
 
 - Fixed regression for connections using `mode` with `databricks`.
