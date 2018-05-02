@@ -682,6 +682,7 @@ livy_load_scala_sources <- function(sc) {
     "workercontext.scala",
     "handler.scala",
     "channel.scala",
+    "shell.scala",
     "backend.scala",
     "workerrdd.scala",
     "workerhelper.scala",

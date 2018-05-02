@@ -1,22 +1,5 @@
 package sparklyr
 
-import java.io.{DataInputStream, DataOutputStream}
-import java.io.{File, FileOutputStream, IOException}
-import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
-import java.util.concurrent.TimeUnit
-
-import io.netty.bootstrap.ServerBootstrap
-import io.netty.channel.{ChannelFuture, ChannelInitializer, EventLoopGroup}
-import io.netty.channel.nio.NioEventLoopGroup
-import io.netty.channel.socket.SocketChannel
-import io.netty.channel.socket.nio.NioServerSocketChannel
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder
-import io.netty.handler.codec.bytes.{ByteArrayDecoder, ByteArrayEncoder}
-
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
-import org.apache.spark.sql.hive.HiveContext
-
 import scala.util.Try
 
 object Shell {
