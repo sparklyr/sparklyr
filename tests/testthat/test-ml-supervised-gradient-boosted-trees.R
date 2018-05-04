@@ -46,7 +46,7 @@ test_that("ml_gbt_classifier() default params are correct (<2.2)", {
 
   args <- get_default_args(ml_gbt_classifier,
                            c("x", "uid", "...", "seed", "thresholds", "probability_col",
-                             "raw_prediction_col"))
+                             "raw_prediction_col", "feature_subset_strategy"))
 
   expect_equal(
     ml_params(predictor, names(args)),
@@ -111,6 +111,7 @@ test_that("ml_gbt_regressor() parases params correct", {
 })
 
 test_that("gbt runs successfully when all args specified", {
+  test_requires("dplyr")
   iris_tbl <- testthat_tbl("iris")
   model <- iris_tbl %>%
     filter(Species != "setosa") %>%
@@ -147,6 +148,7 @@ test_that("thresholds parameter behaves as expected", {
 })
 
 test_that("informative error when using Spark version that doesn't support thresholds", {
+  test_requires("dplyr")
   if (spark_version(sc) >= "2.2.0") skip("not applicable, threshold is supported")
   expect_error(
     iris_tbl %>%
@@ -158,6 +160,7 @@ test_that("informative error when using Spark version that doesn't support thres
 })
 
 test_that("one-tree ensemble agrees with ml_decision_tree()", {
+  test_requires("dplyr")
   gbt <- iris_tbl %>%
     ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression",
