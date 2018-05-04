@@ -120,9 +120,10 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'   a list of packages to distribute, or a package bundle created with
 #'   \code{spark_apply_bundle()}.
 #'
-#'   For clusters using Livy or Yarn cluster mode, \code{packages} must
-#'   point to a package bundle created using \code{spark_apply_bundle()}
-#'   and made available as a Spark file using \code{config$sparklyr.shell.files}.
+#'   For clusters using Yarn cluster mode, \code{packages} can point to a package
+#'   bundle created using \code{spark_apply_bundle()} and made available as a Spark
+#'   file using \code{config$sparklyr.shell.files}. For clusters using Livy, packages
+#'   can be manually installed on the driver node.
 #'
 #'   For offline clusters where \code{available.packages()} is not available,
 #'   manually download the packages database from
