@@ -1,5 +1,9 @@
 # Sparklyr 0.9 (unreleased)
 
+# Sparklyr 0.8.2 (unreleased)
+
+- Fixed regression for connections using Livy and Spark 1.6.X.
+
 # Sparklyr 0.8.1
 
 - Fixed regression for connections using `mode` with `databricks`.
