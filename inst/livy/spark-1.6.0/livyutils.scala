@@ -8,7 +8,6 @@ object LivyUtils {
     "Logger" -> new Logger("", 0),
     "SQLUtils" -> SQLUtils,
     "Utils" -> Utils,
-    "Repartition" -> Repartition,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
     "WorkerUtils" -> WorkerUtils,
