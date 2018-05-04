@@ -3,6 +3,7 @@ context("ml helpers")
 sc <- testthat_spark_connection()
 
 test_that("ml_feature_importances work properly (#1436)", {
+  test_requires_version("2.0.0")
   mtcars_tbl <- testthat_tbl("mtcars")
   feature_cols <-
     c("mpg", "cyl", "disp", "hp", "drat", "wt", "qsec", "vs", "gear", "carb")
