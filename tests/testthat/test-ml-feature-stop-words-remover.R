@@ -40,6 +40,7 @@ test_that("ft_stop_words_remover() works", {
 })
 
 test_that("ml_default_stop_words() defaults to English (#1280)", {
+  test_requires_version("2.0.0", "loadDefaultStopWords requires Spark 2.0+")
   expect_identical(
     ml_default_stop_words(sc) %>%
       head(5),

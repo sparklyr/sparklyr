@@ -24,6 +24,7 @@ test_that("ml_tree_feature_importance() works properly", {
 })
 
 test_that("ml_tree_feature_importance() works for decision tree classification", {
+  test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
   dt <- iris_tbl %>%
     ml_decision_tree(

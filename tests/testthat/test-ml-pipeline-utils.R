@@ -68,6 +68,7 @@ test_that("ml_is_set works", {
 })
 
 test_that("ml_transform take list of transformers (#1444)", {
+  test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
   string_indexer <- ft_string_indexer(sc, "Species", "label", dataset = iris_tbl)
   pipeline <- ml_pipeline(string_indexer) %>%

@@ -80,6 +80,6 @@ test_that("ml_lda/ft_count_vectorizer helper functions (#1353)", {
   )
   expect_identical(
     ml_vocabulary(count_vectorizer_model),
-    c("frog", "groggy", "was", "a", "the", "very")
+    unlist(count_vectorizer_model$vocabulary)
   )
 })
