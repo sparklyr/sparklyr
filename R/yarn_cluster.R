@@ -167,6 +167,7 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
 
     mainRMWebapp <- NULL
     propCandidates <- c(
+      "yarn.resourcemanager.webapp.https.address.",
       "yarn.resourcemanager.webapp.address.",
       "yarn.resourcemanager.admin.address."
     )
