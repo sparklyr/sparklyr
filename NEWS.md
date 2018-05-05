@@ -2,11 +2,11 @@
 
 # Sparklyr 0.8.2 (unreleased)
 
+- Support for resource managers using `https` in `yarn-cluster` mode (#1459).
+
 - Fixed regression for connections using Livy and Spark 1.6.X.
 
 # Sparklyr 0.8.1
-
-- Support for resource managers using `https` in `yarn-cluster` mode (#1459).
 
 - Fixed regression for connections using `mode` with `databricks`.
 
