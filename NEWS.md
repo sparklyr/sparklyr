@@ -6,6 +6,8 @@
 
 # Sparklyr 0.8.1
 
+- Support for resource managers using `https` in `yarn-cluster` mode (#1459).
+
 - Fixed regression for connections using `mode` with `databricks`.
 
 # Sparklyr 0.8.0
