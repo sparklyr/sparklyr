@@ -1,6 +1,4 @@
-# Sparklyr 0.9 (unreleased)
-
-# Sparklyr 0.8.2 (unreleased)
+# Sparklyr 0.8.2
 
 - Support for resource managers using `https` in `yarn-cluster` mode (#1459).
 
