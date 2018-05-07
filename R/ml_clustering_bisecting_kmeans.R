@@ -8,6 +8,18 @@
 #' @template roxlate-ml-prediction-col
 #' @param min_divisible_cluster_size The minimum number of points (if greater than or equal to 1.0) or the minimum proportion of points (if less than 1.0) of a divisible cluster (default: 1.0).
 #'
+#' @examples
+#' \dontrun{
+#' library(dplyr)
+#'
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' iris_tbl %>%
+#'   select(-Species) %>%
+#'   ml_bisecting_kmeans(k = 4 , Species ~ .)
+#' }
+#'
 #' @export
 ml_bisecting_kmeans <- function(
   x,

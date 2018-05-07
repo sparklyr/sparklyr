@@ -55,6 +55,19 @@ The object returned depends on the class of \code{x}.
 \description{
 A bisecting k-means algorithm based on the paper "A comparison of document clustering techniques" by Steinbach, Karypis, and Kumar, with modification to fit Spark. The algorithm starts from a single cluster that contains all points. Iteratively it finds divisible clusters on the bottom level and bisects each of them using k-means, until there are k leaf clusters in total or no leaf clusters are divisible. The bisecting steps of clusters on the same level are grouped together to increase parallelism. If bisecting all divisible clusters on the bottom level would result more than k leaf clusters, larger clusters get higher priority.
 }
+\examples{
+\dontrun{
+library(dplyr)
+
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+iris_tbl \%>\%
+  select(-Species) \%>\%
+  ml_bisecting_kmeans(k = 4 , Species ~ .)
+}
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
