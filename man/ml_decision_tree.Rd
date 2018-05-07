@@ -128,6 +128,26 @@ When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{res
 
 \code{ml_decision_tree} is a wrapper around \code{ml_decision_tree_regressor.tbl_spark} and \code{ml_decision_tree_classifier.tbl_spark} and calls the appropriate method based on model type.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+partitions <- iris_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+iris_training <- partitions$training
+iris_test <- partitions$test
+
+dt_model <- iris_training \%>\%
+  ml_decision_tree(Species ~ .)
+
+pred <- sdf_predict(iris_test, dt_model)
+
+ml_multiclass_classification_evaluator(pred)
+}
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
