@@ -17,6 +17,26 @@ NULL
 #' @template roxlate-ml-decision-trees-type
 #' @details \code{ml_decision_tree} is a wrapper around \code{ml_decision_tree_regressor.tbl_spark} and \code{ml_decision_tree_classifier.tbl_spark} and calls the appropriate method based on model type.
 #' @template roxlate-ml-predictor-params
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' partitions <- iris_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' iris_training <- partitions$training
+#' iris_test <- partitions$test
+#'
+#' dt_model <- iris_training %>%
+#'   ml_decision_tree(Species ~ .)
+#'
+#' pred <- sdf_predict(iris_test, dt_model)
+#'
+#' ml_multiclass_classification_evaluator(pred)
+#' }
+#'
 #' @export
 ml_decision_tree <- function(
   x,
