@@ -15,10 +15,10 @@ install:
 environment:
   global:
     WARNINGS_ARE_ERRORS: 1
+    NOT_CRAN: 1
 
   matrix:
   - SPARK_VERSION: "1.6.3"
-  - SPARK_VERSION: "2.2.1"
   - SPARK_VERSION: "2.3.0"
 
 build_script:
