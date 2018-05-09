@@ -32,3 +32,4 @@
 ^blogdown/
 ^_blogdown.yml$
 ^config.toml$
+^appveyor.yml$
