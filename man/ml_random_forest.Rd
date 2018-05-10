@@ -145,6 +145,25 @@ The supported options for \code{feature_subset_strategy} are
 
 \code{ml_random_forest} is a wrapper around \code{ml_random_forest_regressor.tbl_spark} and \code{ml_random_forest_classifier.tbl_spark} and calls the appropriate method based on model type.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)#'
+
+partitions <- iris_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+iris_training <- partitions$training
+iris_test <- partitions$test
+
+rf_model <- iris_training \%>\%
+  ml_random_forest(Species ~ ., type = "classification")
+
+pred <- sdf_predict(iris_test, rf_model)
+
+ml_multiclass_classification_evaluator(pred)
+}
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
