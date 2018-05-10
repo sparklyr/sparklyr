@@ -5,6 +5,7 @@ library(sparklyr)
 if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   if (Sys.getenv("INSTALL_WINUTILS") == "true") {
+    options(sparkinstall.verbose = TRUE)
     message("Installing winutils...")
 
     version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
