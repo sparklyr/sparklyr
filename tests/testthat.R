@@ -16,7 +16,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     winutils_path <- file.path(winutils_dir, "winutils.exe", fsep = "\\")
 
     download.file(
-      "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/winutils.exe",
+      "https://code.google.com/archive/p/rrd-hadoop-win32/source/default/source/winutils.exe",
       winutils_path
     )
 
