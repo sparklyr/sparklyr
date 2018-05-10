@@ -8,7 +8,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     message("Installing winutils...")
 
     version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
-    spark_dir <-  "spark-2.3.0-bin-hadoop2.7"
+    hadoop_version <- if (version < "2.0.0") "2.6" else "2.7"
+    spark_dir <- paste("spark-", version, "-bin-hadoop", hadoop_version, sep = "")
     winutils_dir <- file.path(Sys.getenv("LOCALAPPDATA"), "spark", spark_dir, "tmp", "hadoop", "bin", fsep = "\\")
     dir.create(winutils_dir, recursive = TRUE)
     winutils_path <- file.path(winutils_dir, "winutils.exe", fsep = "\\")
@@ -17,6 +18,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
       "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/winutils.exe",
       winutils_path
     )
+
+    message("Installed winutils in ", winutils_path)
   }
 
   test_check("sparklyr")
