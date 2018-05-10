@@ -5,6 +5,8 @@ sparklyr: R interface for Apache Spark
 
 [![Build
 Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/rstudio/sparklyr?branch=master&svg=true)](https://ci.appveyor.com/project/rstudio/sparklyr)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
 [![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr)
 [![Join the chat at
@@ -301,20 +303,20 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_31156f2a4437> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_185fd368e61a7> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1         8.30        6.70         4.60        3.40
-    ##  2         8.10        6.20         4.60        3.40
-    ##  3         7.90        6.40         4.50        3.40
-    ##  4         7.80        6.30         4.70        3.40
-    ##  5         8.20        6.80         4.60        3.40
-    ##  6         8.60        7.10         4.90        3.60
-    ##  7         7.80        6.60         4.60        3.50
-    ##  8         8.20        6.60         4.70        3.40
-    ##  9         7.60        6.10         4.60        3.40
-    ## 10         8.10        6.30         4.70        3.30
+    ##  1         5.95        4.35         2.25       1.05 
+    ##  2         5.75        3.85         2.25       1.05 
+    ##  3         5.55        4.05         2.15       1.05 
+    ##  4         5.45        3.95         2.35       1.05 
+    ##  5         5.85        4.45         2.25       1.05 
+    ##  6         6.25        4.75         2.55       1.25 
+    ##  7         5.45        4.25         2.25       1.15 
+    ##  8         5.85        4.25         2.35       1.05 
+    ##  9         5.25        3.75         2.25       1.05 
+    ## 10         5.75        3.95         2.35       0.949
     ## # ... with more rows
 
 You can also group by columns to perform an operation over each group of
@@ -329,7 +331,7 @@ spark_apply(
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_31153ed80428> [?? x 6]
+    ## # Source:   table<sparklyr_tmp_185fd36f0df96> [?? x 6]
     ## # Database: spark_connection
     ##   Species    term         estimate std.error statistic         p.value
     ##   <chr>      <chr>           <dbl>     <dbl>     <dbl>           <dbl>
@@ -402,16 +404,16 @@ You can show the log using the `spark_log`
 spark_log(sc, n = 10)
 ```
 
-    ## 18/04/23 10:29:12 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmppHpKCG/file31151c012844.csv:0+33313106
-    ## 18/04/23 10:29:12 INFO BlockManagerInfo: Removed broadcast_73_piece0 on 127.0.0.1:58732 in memory (size: 11.4 KB, free: 340.3 MB)
-    ## 18/04/23 10:29:12 INFO BlockManagerInfo: Removed broadcast_72_piece0 on 127.0.0.1:58732 in memory (size: 10.6 KB, free: 340.3 MB)
-    ## 18/04/23 10:29:12 INFO BlockManagerInfo: Removed broadcast_71_piece0 on 127.0.0.1:58732 in memory (size: 7.7 KB, free: 340.3 MB)
-    ## 18/04/23 10:29:12 INFO BlockManagerInfo: Removed broadcast_70_piece0 on 127.0.0.1:58732 in memory (size: 9.5 KB, free: 340.3 MB)
-    ## 18/04/23 10:29:12 INFO Executor: Finished task 0.0 in stage 69.0 (TID 115). 875 bytes result sent to driver
-    ## 18/04/23 10:29:12 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 115) in 183 ms on localhost (executor driver) (1/1)
-    ## 18/04/23 10:29:12 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
-    ## 18/04/23 10:29:12 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.183 s
-    ## 18/04/23 10:29:12 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.188827 s
+    ## 18/05/09 17:20:38 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 69 (/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T//RtmpI8jGZo/file185fd1a08882b.csv MapPartitionsRDD[327] at textFile at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+    ## 18/05/09 17:20:38 INFO TaskSchedulerImpl: Adding task set 69.0 with 1 tasks
+    ## 18/05/09 17:20:38 INFO TaskSetManager: Starting task 0.0 in stage 69.0 (TID 115, localhost, executor driver, partition 0, PROCESS_LOCAL, 7933 bytes)
+    ## 18/05/09 17:20:38 INFO Executor: Running task 0.0 in stage 69.0 (TID 115)
+    ## 18/05/09 17:20:38 INFO HadoopRDD: Input split: file:/var/folders/fz/v6wfsg2x1fb1rw4f6r0x4jwm0000gn/T/RtmpI8jGZo/file185fd1a08882b.csv:0+33313106
+    ## 18/05/09 17:20:38 INFO Executor: Finished task 0.0 in stage 69.0 (TID 115). 832 bytes result sent to driver
+    ## 18/05/09 17:20:38 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 115) in 155 ms on localhost (executor driver) (1/1)
+    ## 18/05/09 17:20:38 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
+    ## 18/05/09 17:20:38 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.158 s
+    ## 18/05/09 17:20:38 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.160999 s
 
 Finally, we disconnect from Spark:
 
@@ -492,7 +494,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1524504574477_1 
+    ## Model ID:  GLM_model_R_1525911673092_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -501,7 +503,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                  100 frame_rdd_31_b77cecc191973299d2e9b6b052ec4257
+    ## 1                  100 frame_rdd_31_a1d3ad9118dbdf304a9b340c260e4ced
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
