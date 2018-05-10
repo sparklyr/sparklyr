@@ -12,6 +12,8 @@ install:
 
 # Adapt as necessary starting from here
 
+platform: x64
+
 environment:
   global:
     R_ARCH: x64
