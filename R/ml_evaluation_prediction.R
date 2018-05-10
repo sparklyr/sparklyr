@@ -19,6 +19,43 @@
 #'   }
 #'
 #' @return The calculated performance metric
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' mtcars_tbl <- sdf_copy_to(sc, mtcars, name = "mtcars_tbl", overwrite = TRUE)
+#'
+#' partitions <- mtcars_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' mtcars_training <- partitions$training
+#' mtcars_test <- partitions$test
+#'
+#' # for multiclass classification
+#' rf_model <- mtcars_training %>%
+#'   ml_random_forest(cyl ~ ., type = "classification")
+#'
+#' pred <- sdf_predict(mtcars_test, rf_model)
+#'
+#' ml_multiclass_classification_evaluator(pred)
+#'
+#' # for regression
+#' rf_model <- mtcars_training %>%
+#'   ml_random_forest(cyl ~ ., type = "regression")
+#'
+#' pred <- sdf_predict(mtcars_test, rf_model)
+#'
+#' ml_regression_evaluator(pred, label_col = "cyl")
+#'
+#' # for binary classification
+#' rf_model <- mtcars_training %>%
+#'   ml_random_forest(am ~ gear + carb, type = "classification")
+#'
+#' pred <- sdf_predict(mtcars_test, rf_model)
+#'
+#' ml_binary_classification_evaluator(pred)
+#' }
+#'
 #' @name ml_evaluator
 NULL
 
