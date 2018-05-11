@@ -17,7 +17,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
     download.file(
       "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/winutils.exe",
-      winutils_path
+      winutils_path,
+      mode = "wb"
     )
 
     message("Installed winutils in ", winutils_path)
