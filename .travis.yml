@@ -10,7 +10,7 @@ cache:
 warnings_are_errors: true
 
 jdk:
-  - oraclejdk8
+  - oraclejdk7
 
 r_packages:
   - covr
