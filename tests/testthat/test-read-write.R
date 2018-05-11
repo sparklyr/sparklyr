@@ -3,6 +3,9 @@ context("read-write")
 sc <- testthat_spark_connection()
 
 test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
+  if (.Platform$OS.type == "windows")
+    skip("CSV encoding is slightly different in windows")
+
   csv <- file("test.csv", "w+", encoding = "latin1")
   cat("Município;var;var 1.0\n1233;1;2", file=csv)
   close(csv)
