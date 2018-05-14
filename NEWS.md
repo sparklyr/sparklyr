@@ -1,5 +1,7 @@
 # Sparklyr 0.9 (unreleased)
 
+# Sparklyr 0.8.3
+
 - Support for Spark 2.3 in local windows clusters (#1473).
 
 # Sparklyr 0.8.2
