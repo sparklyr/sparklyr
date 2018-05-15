@@ -12,6 +12,27 @@
 #' @param block_size Block size for stacking input data in matrices to speed up the computation. Data is stacked within partitions. If block size is more than remaining data in a partition then it is adjusted to the size of this data. Recommended size is between 10 and 1000. Default: 128
 #' @param initial_weights The initial weights of the model.
 #' @param solver The solver algorithm for optimization. Supported options: "gd" (minibatch gradient descent) or "l-bfgs". Default: "l-bfgs"
+#'
+#' @examples
+#' \dontrun{
+#' sc <-  spark_connect(master = "local")
+#'
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#' partitions <- iris_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' iris_training <- partitions$training
+#' iris_test <- partitions$test
+#'
+#' mlp_model <- iris_training %>%
+#'   ml_multilayer_perceptron(Species ~ ., layers = c(4,3,3))
+#'
+#' pred <- sdf_predict(iris_test, mlp_model)
+#'
+#' ml_multiclass_classification_evaluator(pred)
+#' }
+
+
 #' @export
 ml_multilayer_perceptron_classifier <- function(
   x,
