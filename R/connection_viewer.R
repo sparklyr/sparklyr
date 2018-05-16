@@ -19,6 +19,7 @@ spark_actions <- function(scon) {
   )
 
   if (exists(".rs.api.documentNew")) {
+    documentNew <- get(".rs.api.documentNew")
     actions <- c(
       actions,
       list(
@@ -52,7 +53,7 @@ spark_actions <- function(scon) {
               sep = "\n"
             )
 
-            .rs.api.documentNew("sql", contents, row = 2, column = 15, execute = TRUE)
+            documentNew("sql", contents, row = 2, column = 15, execute = TRUE)
           }
         )
       )
