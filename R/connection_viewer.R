@@ -3,7 +3,7 @@
 # connection-specific actions possible with Spark connections
 spark_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
-  list(
+  actions <- list(
     SparkUI = list(
         icon = file.path(icons, "spark-ui.png"),
         callback = function() {
@@ -15,14 +15,63 @@ spark_actions <- function(scon) {
         callback = function() {
           file.edit(spark_log_file(scon))
         }
-    ),
-    Help = list(
+    )
+  )
+
+  if (exists(".rs.api.documentNew")) {
+    actions <- c(
+      actions,
+      list(
+        SQL = list(
+          icon = file.path(icons, "edit-sql.png"),
+          callback = function() {
+
+            varname <- "sc"
+            if (exists("sc", envir = .GlobalEnv)) {
+              sc <- get("sc", envir = .GlobalEnv)
+              if (!identical(sc, scon)) {
+                i <- 1
+                while (exists(varname, envir = .GlobalEnv)) {
+                  varname <- paste("sc_preview", i, sep = "")
+                  i <- i + 1
+                }
+                assign(varname, scon, envir = .GlobalEnv)
+              }
+            }
+
+            tables <- dbListTables(scon)
+
+            contents <- paste(
+              paste("-- !preview conn=", varname, sep = ""),
+              "",
+              if (length(tables) > 0)
+                paste("SELECT * FROM `", tables[[1]], "` LIMIT 1000", sep = "")
+              else
+                "SELECT 1",
+              "",
+              sep = "\n"
+            )
+
+            .rs.api.documentNew("sql", contents, row = 2, column = 15, execute = TRUE)
+          }
+        )
+      )
+    )
+  }
+
+  actions <- c(
+    actions,
+    list(
+      Help = list(
         icon = file.path(icons, "help.png"),
         callback = function() {
           utils::browseURL("http://spark.rstudio.com")
         }
+      )
     )
   )
+
+  actions
 }
 
 on_connection_opened <- function(scon, env, connectCall) {
