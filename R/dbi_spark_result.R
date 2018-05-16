@@ -88,7 +88,18 @@ setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA
   df <- df_from_sdf(res@conn, res@sdf, end)
 
   if (n > 0) {
-    df <- df[start:end, ]
+    range <- 0
+    if (nrow(df) > 0)
+    {
+      end <- min(nrow(df), nrow(df))
+      range <- start:end
+    }
+    df <- df[range, ]
+  }
+
+  if (nrow(df) == 0)
+  {
+    df <- df[]
   }
 
   dfFetch <- as.data.frame(df, drop = FALSE, optional = TRUE)
