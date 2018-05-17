@@ -21,6 +21,9 @@ test_that("tidy.{glm type models} works", {
              exp.names = c("term", "estimate", "statistic", "p.value"))
   expect_equal(td2$term, c("(Intercept)", "wt", "disp"))
 
+  glmfit1_r <- glm(mpg ~ wt, mtcars, family = "gaussian")
+  expect_equal(broom::tidy(glmfit1_r), broom::tidy(glmfit1))
+
   lmfit1 <- ml_linear_regression(mtcars_tbl, "mpg ~ wt")
   td1 <- tidy(lmfit1)
   check_tidy(td1, exp.row = 2,
@@ -32,6 +35,9 @@ test_that("tidy.{glm type models} works", {
   check_tidy(td2, exp.row = 3,
              exp.names = c("estimate", "std.error", "statistic", "p.value"))
   expect_equal(td2$term, c("(Intercept)", "wt", "disp"))
+
+  lmfit1_r <- lm(mpg ~ wt, mtcars)
+  expect_equal(broom::tidy(lmfit1_r), broom::tidy(lmfit1))
 })
 
 test_that("augment.{glm type models} works", {
