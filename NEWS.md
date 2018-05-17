@@ -1,4 +1,6 @@
-# Sparklyr 0.9 (unreleased)
+# Sparklyr 0.8.4 (unreleased)
+
+- `broom::tidy()` for linear regression and generalized linear regression models now give correct results (#1501).
 
 # Sparklyr 0.8.3
 
