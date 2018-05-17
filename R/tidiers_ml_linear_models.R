@@ -47,8 +47,8 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
   c(coefficients, statistics) %>%
     as.data.frame() %>%
     broom::fix_data_frame(newnames = new_names) %>%
-    mutate(estimate = trans(!!sym("estimate"))) %>%
-    select(!!!syms(vars))
+    dplyr::mutate(estimate = trans(!!sym("estimate"))) %>%
+    dplyr::select(!!!syms(vars))
 
 }
 
