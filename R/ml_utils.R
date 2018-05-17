@@ -111,3 +111,10 @@ spark_sql_column <- function(sc, col, alias = NULL) {
     jobj <- invoke(jobj, "alias", alias)
   jobj
 }
+
+make_stats_arranger <- function(fit_intercept) {
+  if (fit_intercept)
+    function(x) { force(x); c(tail(x, 1), head(x, length(x) - 1)) }
+  else
+    identity
+}
