@@ -1,5 +1,8 @@
 # Sparklyr 0.8.4 (unreleased)
 
+- Support for `sparklyr.spark-submit` as `config` entry to allow customizing the `spark-submit`
+  command.
+
 - Changed `spark_connect()` to give precedence to the `version` parameter over `SPARK_HOME_VERSION` and
   other automatic version detection mechanisms, improved automatic version detection in Spark 2.X.
   
