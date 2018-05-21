@@ -1,5 +1,7 @@
 # Sparklyr 0.8.4 (unreleased)
 
+- Fixed DESCRIPTION file to include test packages as requested by CRAN.
+
 - Support for `sparklyr.spark-submit` as `config` entry to allow customizing the `spark-submit`
   command.
 
