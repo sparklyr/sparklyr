@@ -1,5 +1,7 @@
 # Sparklyr 0.8.4 (unreleased)
 
+- `sdf_bind_rows()` prepends id column to match column order changes in `dplyr 0.7.5`.
+
 - `broom::tidy()` for linear regression and generalized linear regression models now give correct results (#1501).
 
 # Sparklyr 0.8.3

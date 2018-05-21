@@ -106,7 +106,7 @@ sdf_bind_rows <- function(..., id = NULL) {
     dplyr::slice(1)
 
   schema_complements <- schemas %>%
-    lapply(function(x) master_schema %>%
+    lapply(function(x) dplyr::as_data_frame(master_schema) %>%
              dplyr::select(!! rlang::sym("name")) %>%
              dplyr::setdiff(select(x, !!rlang::sym("name"))) %>%
              dplyr::left_join(master_schema, by = "name"))
@@ -137,7 +137,9 @@ sdf_bind_rows <- function(..., id = NULL) {
     if (!all(rlang::have_name(dots)))
       names(dots) <- as.character(seq_along(dots))
     augmented_dots <- Map(
-      function(x, label) dplyr::mutate(x, !!sym(id) := label),
+      function(x, label)
+        dplyr::mutate(x, !!sym(id) := label) %>%
+        dplyr::select(!!sym(id), everything()),
       augmented_dots,
       names(dots)
     )
