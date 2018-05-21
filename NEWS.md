@@ -1,6 +1,10 @@
 # Sparklyr 0.8.4 (unreleased)
 
-- `sdf_bind_rows()` prepends id column to match column order changes in `dplyr 0.7.5`.
+- Changed `spark_connect()` to give precedence to the `version` parameter over `SPARK_HOME_VERSION` and
+  other automatic version detection mechanisms, improved automatic version detection in Spark 2.X.
+  
+- Fixed `sdf_bind_rows()` with `dplyr 0.7.5` and prepend id column instead of appending it to match
+  behavior.
 
 - `broom::tidy()` for linear regression and generalized linear regression models now give correct results (#1501).
 
