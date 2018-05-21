@@ -49,9 +49,12 @@ Imports:
     tidyr
 Suggests:
     ggplot2,
+    glmnet,
     janeaustenr,
     Lahman,
+    nnet,
     nycflights13,
     RCurl,
+    reshape2,
     testthat,
     tibble
