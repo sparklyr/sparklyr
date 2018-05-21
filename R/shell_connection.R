@@ -210,6 +210,9 @@ start_shell <- function(master,
                            unix = c("spark2-submit", "spark-submit"),
                            windows = "spark-submit2.cmd")
 
+    # allow users to override spark-submit if needed
+    spark_submit <- spark_config_value(config, "sparklyr.spark-submit", spark_submit)
+
     spark_submit_paths <- unlist(lapply(
       spark_submit,
       function(submit_path) {
@@ -217,7 +220,7 @@ start_shell <- function(master,
       }))
 
     if (!any(file.exists(spark_submit_paths))) {
-      stop("Failed to find spark-submit under '", spark_home, "', please verify SPARK_HOME.")
+      stop("Failed to find '", paste(spark_submit, collapse = "' or '"), "' under '", spark_home, "', please verify SPARK_HOME.")
     }
 
     spark_submit_path <- spark_submit_paths[[which(file.exists(spark_submit_paths))[[1]]]]
