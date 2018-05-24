@@ -7,7 +7,7 @@
 #' @param value Logical, Integer, or Character configuration value to set.
 #' @export
 spark_get_config <- function(sc, config) {
-  if (spark_version(x) < "2.0.0")
+  if (spark_version(sc) < "2.0.0")
     stop("spark_get_config() requires Spark 2.0.0+")
   
   sc %>%
@@ -19,7 +19,7 @@ spark_get_config <- function(sc, config) {
 #' @rdname spark_get_conf
 #' @export
 spark_set_config <- function(sc, config, value) {
-  if (spark_version(x) < "2.0.0")
+  if (spark_version(sc) < "2.0.0")
     stop("spark_set_config() requires Spark 2.0.0+")
   
   if (is.numeric(value))

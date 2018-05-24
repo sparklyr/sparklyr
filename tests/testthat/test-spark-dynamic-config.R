@@ -4,7 +4,7 @@ sc <- testthat_spark_connection()
 
 test_that("configuration getter works", {
   
-  if (spark_version(x) >= "2.0.0") {
+  if (spark_version(sc) >= "2.0.0") {
     spark_set_config(sc, "spark.sql.shuffle.partitions.local", 1L)
     expect_equal("1",
                  spark_get_config(sc, "spark.sql.shuffle.partitions.local"))
