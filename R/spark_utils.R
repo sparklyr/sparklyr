@@ -56,3 +56,25 @@ jobj_class <- function(jobj, simple_name = TRUE) {
                 ensure_scalar_boolean(simple_name)) %>%
     unlist()
 }
+
+#' Description of dependencies for debugging
+#' 
+#' Print a plan of execution to generate \code{x}. This plan will, among other things, show the
+#' number of partitions in parenthesis at the far left and indicate stages using indendatations.
+#' 
+#' @param x An \R object wrapping, or containing, a Spark DataFrame.
+#' @export
+spark_debug_string <- function(x, print=TRUE) {
+  debug_string <- x %>%
+    spark_dataframe() %>% 
+    invoke("rdd") %>% 
+    invoke("toDebugString") 
+  
+  if (print)
+    cat(debug_string)
+  
+  debug_string %>% 
+    strsplit("\n", fixed=TRUE) %>%
+    unlist() %>%
+    invisible()
+}
