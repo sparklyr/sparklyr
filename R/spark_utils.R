@@ -64,10 +64,17 @@ jobj_class <- function(jobj, simple_name = TRUE) {
 #' 
 #' @param x An \R object wrapping, or containing, a Spark DataFrame.
 #' @export
-spark_debug_string <- function(x) {
-  spark_dataframe(x) %>% 
+spark_debug_string <- function(x, print=TRUE) {
+  debug_string <- x %>%
+    spark_dataframe() %>% 
     invoke("rdd") %>% 
-    invoke("toDebugString") %>% 
+    invoke("toDebugString") 
+  
+  if (print)
+    cat(debug_string)
+  
+  debug_string %>% 
     strsplit("\n", fixed=TRUE) %>%
-    unlist()
+    unlist() %>%
+    invisible()
 }
