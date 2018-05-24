@@ -31,3 +31,9 @@ test_that("jobj_class() works", {
       "Object")
   )
 })
+
+test_that("debug_string works", {
+  spk_iris <- copy_to(sc, iris, overwrite = TRUE)
+  debug <- spark_debug_string(spk_iris)
+  expect_true(grepl("^\\(1\\)", debug[1]))
+})
