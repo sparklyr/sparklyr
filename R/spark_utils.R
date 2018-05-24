@@ -59,7 +59,7 @@ jobj_class <- function(jobj, simple_name = TRUE) {
 
 #' Description of dependencies for debugging
 #' 
-#' Print a plan of execution to generate \code{.data}. This plan will, among other things, show the
+#' Print a plan of execution to generate \code{x}. This plan will, among other things, show the
 #' number of partitions in parenthesis at the far left and indicate stages using indendatations.
 #' 
 #' @param x An \R object wrapping, or containing, a Spark DataFrame.
