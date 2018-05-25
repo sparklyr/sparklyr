@@ -104,16 +104,16 @@ flights_tbl %>% filter(dep_delay == 2)
     ## # Database: spark_connection
     ##     year month   day dep_time sched_dep_time dep_delay arr_time
     ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
-    ##  1  2013     1     1      517            515      2.00      830
-    ##  2  2013     1     1      542            540      2.00      923
-    ##  3  2013     1     1      702            700      2.00     1058
-    ##  4  2013     1     1      715            713      2.00      911
-    ##  5  2013     1     1      752            750      2.00     1025
-    ##  6  2013     1     1      917            915      2.00     1206
-    ##  7  2013     1     1      932            930      2.00     1219
-    ##  8  2013     1     1     1028           1026      2.00     1350
-    ##  9  2013     1     1     1042           1040      2.00     1325
-    ## 10  2013     1     1     1231           1229      2.00     1523
+    ##  1  2013     1     1      517            515         2      830
+    ##  2  2013     1     1      542            540         2      923
+    ##  3  2013     1     1      702            700         2     1058
+    ##  4  2013     1     1      715            713         2      911
+    ##  5  2013     1     1      752            750         2     1025
+    ##  6  2013     1     1      917            915         2     1206
+    ##  7  2013     1     1      932            930         2     1219
+    ##  8  2013     1     1     1028           1026         2     1350
+    ##  9  2013     1     1     1042           1040         2     1325
+    ## 10  2013     1     1     1231           1229         2     1523
     ## # ... with more rows, and 12 more variables: sched_arr_time <int>,
     ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
     ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
@@ -303,20 +303,20 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_85516b79c04f> [?? x 4]
+    ## # Source:   table<sparklyr_tmp_d1564a7b34a4> [?? x 4]
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1         6.10        4.50         2.40        1.20
-    ##  2         5.90        4.00         2.40        1.20
-    ##  3         5.70        4.20         2.30        1.20
-    ##  4         5.60        4.10         2.50        1.20
-    ##  5         6.00        4.60         2.40        1.20
-    ##  6         6.40        4.90         2.70        1.40
-    ##  7         5.60        4.40         2.40        1.30
-    ##  8         6.00        4.40         2.50        1.20
-    ##  9         5.40        3.90         2.40        1.20
-    ## 10         5.90        4.10         2.50        1.10
+    ##  1         8.47        6.87         4.77        3.57
+    ##  2         8.27        6.37         4.77        3.57
+    ##  3         8.07        6.57         4.67        3.57
+    ##  4         7.97        6.47         4.87        3.57
+    ##  5         8.37        6.97         4.77        3.57
+    ##  6         8.77        7.27         5.07        3.77
+    ##  7         7.97        6.77         4.77        3.67
+    ##  8         8.37        6.77         4.87        3.57
+    ##  9         7.77        6.27         4.77        3.57
+    ## 10         8.27        6.47         4.87        3.47
     ## # ... with more rows
 
 You can also group by columns to perform an operation over each group of
@@ -331,16 +331,16 @@ spark_apply(
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_855135d0974> [?? x 6]
+    ## # Source:   table<sparklyr_tmp_d15652cdc540> [?? x 6]
     ## # Database: spark_connection
-    ##   Species    term         estimate std.error statistic         p.value
-    ##   <chr>      <chr>           <dbl>     <dbl>     <dbl>           <dbl>
-    ## 1 versicolor (Intercept)   -0.0843    0.161     -0.525 0.602          
-    ## 2 versicolor Petal_Length   0.331     0.0375     8.83  0.0000000000127
-    ## 3 virginica  (Intercept)    1.14      0.379      2.99  0.00434        
-    ## 4 virginica  Petal_Length   0.160     0.0680     2.36  0.0225         
-    ## 5 setosa     (Intercept)   -0.0482    0.122     -0.396 0.694          
-    ## 6 setosa     Petal_Length   0.201     0.0826     2.44  0.0186
+    ##   Species    term         estimate std.error statistic  p.value
+    ##   <chr>      <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+    ## 1 versicolor (Intercept)   -0.0843    0.161     -0.525 6.02e- 1
+    ## 2 versicolor Petal_Length   0.331     0.0375     8.83  1.27e-11
+    ## 3 virginica  (Intercept)    1.14      0.379      2.99  4.34e- 3
+    ## 4 virginica  Petal_Length   0.160     0.0680     2.36  2.25e- 2
+    ## 5 setosa     (Intercept)   -0.0482    0.122     -0.396 6.94e- 1
+    ## 6 setosa     Petal_Length   0.201     0.0826     2.44  1.86e- 2
 
 ## Extensions
 
@@ -403,16 +403,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 18/05/11 16:28:05 INFO ContextCleaner: Cleaned accumulator 2137
-    ## 18/05/11 16:28:05 INFO ContextCleaner: Cleaned accumulator 2144
-    ## 18/05/11 16:28:05 INFO ContextCleaner: Cleaned accumulator 2131
-    ## 18/05/11 16:28:05 INFO ContextCleaner: Cleaned accumulator 2125
-    ## 18/05/11 16:28:05 INFO ContextCleaner: Cleaned accumulator 2130
-    ## 18/05/11 16:28:05 INFO Executor: Finished task 0.0 in stage 69.0 (TID 115). 875 bytes result sent to driver
-    ## 18/05/11 16:28:05 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 115) in 212 ms on localhost (executor driver) (1/1)
-    ## 18/05/11 16:28:05 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
-    ## 18/05/11 16:28:05 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.218 s
-    ## 18/05/11 16:28:05 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.221819 s
+    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2135
+    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2136
+    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2146
+    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2138
+    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2126
+    ## 18/05/25 09:19:44 INFO Executor: Finished task 0.0 in stage 69.0 (TID 115). 918 bytes result sent to driver
+    ## 18/05/25 09:19:44 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 115) in 177 ms on localhost (executor driver) (1/1)
+    ## 18/05/25 09:19:44 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
+    ## 18/05/25 09:19:44 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.180 s
+    ## 18/05/25 09:19:44 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.183200 s
 
 Finally, we disconnect from Spark:
 
@@ -493,7 +493,7 @@ mtcars_glm
     ## ==============
     ## 
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1526081305304_1 
+    ## Model ID:  GLM_model_R_1527265202599_1 
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -502,7 +502,7 @@ mtcars_glm
     ##   number_of_predictors_total number_of_active_predictors
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
-    ## 1                  100 frame_rdd_31_bca594512cb838eb839e214dce6c4622
+    ## 1                  100 frame_rdd_31_ad5c4e88ec97eb8ccedae9475ad34e02
     ## 
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
@@ -561,16 +561,16 @@ copy_to(sc, iris)
     ## # Database: spark_connection
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
     ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
-    ##  1         5.10        3.50         1.40       0.200 setosa 
-    ##  2         4.90        3.00         1.40       0.200 setosa 
-    ##  3         4.70        3.20         1.30       0.200 setosa 
-    ##  4         4.60        3.10         1.50       0.200 setosa 
-    ##  5         5.00        3.60         1.40       0.200 setosa 
-    ##  6         5.40        3.90         1.70       0.400 setosa 
-    ##  7         4.60        3.40         1.40       0.300 setosa 
-    ##  8         5.00        3.40         1.50       0.200 setosa 
-    ##  9         4.40        2.90         1.40       0.200 setosa 
-    ## 10         4.90        3.10         1.50       0.100 setosa 
+    ##  1          5.1         3.5          1.4         0.2 setosa 
+    ##  2          4.9         3            1.4         0.2 setosa 
+    ##  3          4.7         3.2          1.3         0.2 setosa 
+    ##  4          4.6         3.1          1.5         0.2 setosa 
+    ##  5          5           3.6          1.4         0.2 setosa 
+    ##  6          5.4         3.9          1.7         0.4 setosa 
+    ##  7          4.6         3.4          1.4         0.3 setosa 
+    ##  8          5           3.4          1.5         0.2 setosa 
+    ##  9          4.4         2.9          1.4         0.2 setosa 
+    ## 10          4.9         3.1          1.5         0.1 setosa 
     ## # ... with more rows
 
 ``` r

@@ -1,4 +1,4 @@
-# Sparklyr 0.8.4 (unreleased)
+# Sparklyr 0.8.4
 
 - Added support for `spark_session_config()` to modify spark session settings.
 
