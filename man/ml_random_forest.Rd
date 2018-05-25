@@ -148,7 +148,7 @@ The supported options for \code{feature_subset_strategy} are
 \examples{
 \dontrun{
 sc <- spark_connect(master = "local")
-iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)#'
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 
 partitions <- iris_tbl \%>\%
   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
