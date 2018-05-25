@@ -2,7 +2,7 @@
 
 - Added support for `spark_session_config()` to modify spark session settings.
 
-- Added support for `spark_debug_string()` to print execution plan.
+- Added support for `sdf_debug_string()` to print execution plan for a Spark DataFrame.
 
 - Fixed DESCRIPTION file to include test packages as requested by CRAN.
 
