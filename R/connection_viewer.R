@@ -31,12 +31,14 @@ spark_actions <- function(scon) {
             if (exists("sc", envir = .GlobalEnv)) {
               sc <- get("sc", envir = .GlobalEnv)
               if (!identical(sc, scon)) {
-                i <- 1
-                while (exists(varname, envir = .GlobalEnv)) {
-                  varname <- paste("sc_preview", i, sep = "")
-                  i <- i + 1
-                }
-                assign(varname, scon, envir = .GlobalEnv)
+                varname <- Filter(
+                  function(e) identical(get(e, envir = .GlobalEnv), scon),
+                  ls(envir = .GlobalEnv))
+
+                if (identical(length(varname), 0L))
+                  varname <- ""
+                else
+                  varname <- varname[[1]]
               }
             }
 
