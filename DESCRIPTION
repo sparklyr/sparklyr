@@ -52,6 +52,7 @@ Suggests:
     glmnet,
     janeaustenr,
     Lahman,
+    mlbench,
     nnet,
     nycflights13,
     RCurl,
