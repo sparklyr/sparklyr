@@ -9,7 +9,7 @@ sdf_debug_string(x, print = TRUE)
 \arguments{
 \item{x}{An \R object wrapping, or containing, a Spark DataFrame.}
 
-\item{x}{An \R object wrapping, or containing, a Spark DataFrame.}
+\item{print}{Print debug information?}
 }
 \description{
 Prints plan of execution to generate \code{x}. This plan will, among other things, show the

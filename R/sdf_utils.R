@@ -37,7 +37,7 @@ sdf_fast_bind_cols <- function(...) {
 #' number of partitions in parenthesis at the far left and indicate stages using indentation.
 #'
 #' @param x An \R object wrapping, or containing, a Spark DataFrame.
-#' @param x An \R object wrapping, or containing, a Spark DataFrame.
+#' @param print Print debug information?
 #'
 #' @export
 sdf_debug_string <- function(x, print = TRUE) {
