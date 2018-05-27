@@ -72,6 +72,25 @@ Perform regression using linear regression.
 \details{
 When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{response} and \code{features}) is specified, the function returns a \code{ml_model} object wrapping a \code{ml_pipeline_model} which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument \code{predicted_label_col} (defaults to \code{"predicted_label"}) can be used to specify the name of the predicted label column. In addition to the fitted \code{ml_pipeline_model}, \code{ml_model} objects also contain a \code{ml_pipeline} object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by \code{\link{ml_save}} with \code{type = "pipeline"} to faciliate model refresh workflows.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+mtcars_tbl <- sdf_copy_to(sc, mtcars, name = "mtcars_tbl", overwrite = TRUE)
+
+partitions <- mtcars_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+mtcars_training <- partitions$training
+mtcars_test <- partitions$test
+
+lm_model <- mtcars_training \%>\%
+  ml_linear_regression(mpg ~ .)
+
+pred <- sdf_predict(mtcars_test, lm_model)
+
+ml_regression_evaluator(pred, label_col = "mpg")
+}
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.

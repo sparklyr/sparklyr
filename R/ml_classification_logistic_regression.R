@@ -19,6 +19,26 @@
 #'   The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.
 #' @param upper_bounds_on_intercepts (Spark 2.2.0+) Upper bounds on intercepts if fitting under bound constrained optimization.
 #'   The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' mtcars_tbl <- sdf_copy_to(sc, mtcars, name = "mtcars_tbl", overwrite = TRUE)
+#'
+#' partitions <- mtcars_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' mtcars_training <- partitions$training
+#' mtcars_test <- partitions$test
+#'
+#' lr_model <- mtcars_training %>%
+#'   ml_logistic_regression(am ~ gear + carb)
+#'
+#' pred <- sdf_predict(mtcars_test, lr_model)
+#'
+#' ml_binary_classification_evaluator(pred)
+#' }
+#'
 #' @export
 ml_logistic_regression <- function(
   x,
