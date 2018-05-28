@@ -11,6 +11,25 @@
 #' @param loss The loss function to be optimized. Supported options: "squaredError"
 #'    and "huber". Default: "squaredError"
 #' @param solver Solver algorithm for optimization.
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' mtcars_tbl <- sdf_copy_to(sc, mtcars, name = "mtcars_tbl", overwrite = TRUE)
+#'
+#' partitions <- mtcars_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' mtcars_training <- partitions$training
+#' mtcars_test <- partitions$test
+#'
+#' lm_model <- mtcars_training %>%
+#'   ml_linear_regression(mpg ~ .)
+#'
+#' pred <- sdf_predict(mtcars_test, lm_model)
+#'
+#' ml_regression_evaluator(pred, label_col = "mpg")
+#' }
 #' @export
 ml_linear_regression <- function(
   x,
