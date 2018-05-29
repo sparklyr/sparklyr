@@ -1,5 +1,7 @@
 # Sparklyr 0.9.0 (unreleased)
 
+- Removed `install` column from `livy_available_versions()`.
+
 # Sparklyr 0.8.4
 
 - Added support for `spark_session_config()` to modify spark session settings.

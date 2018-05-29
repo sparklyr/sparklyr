@@ -154,10 +154,6 @@ livy_install <- function(version       = "0.5.0",
 livy_available_versions <- function() {
   versions <- data.frame(livy = c("0.2.0", "0.3.0", "0.4.0", "0.5.0"))
 
-  versions$install <- paste0("livy_install(version = \"",
-                             versions$livy,
-                             "\")")
-
   versions
 }
 
