@@ -1,5 +1,7 @@
 # Sparklyr 0.9.0 (unreleased)
 
+- Avoid preparing windows environment in non-local connections.
+
 - Removed `install` column from `livy_available_versions()`.
 
 # Sparklyr 0.8.4
