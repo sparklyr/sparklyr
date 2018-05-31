@@ -26,7 +26,6 @@ environment:
   - SPARK_VERSION: "2.3.0"
 
 build_script:
-  - travis-tool.sh install_github rstudio/sparklyr
   - travis-tool.sh install_deps
 
 test_script:
