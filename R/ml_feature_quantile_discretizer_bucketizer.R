@@ -14,6 +14,20 @@
 #' @param splits_array Parameter for specifying multiple splits parameters. Each
 #'    element in this array can be used to map continuous features into buckets.
 #'
+#' @examples
+#' \dontrun{
+#' library(dplyr)
+#'
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' iris_tbl %>%
+#'   ft_bucketizer(input_col  = "Sepal_Length",
+#'                 output_col = "Sepal_Length_bucket",
+#'                 splits     = c(0, 4.5, 5, 8)) %>%
+#'   select(Sepal_Length, Sepal_Length_bucket, Species)
+#' }
+#'
 #' @export
 ft_bucketizer <- function(
   x, input_col = NULL, output_col = NULL, splits = NULL,
