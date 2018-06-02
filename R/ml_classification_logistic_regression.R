@@ -94,51 +94,60 @@ ml_logistic_regression.spark_connection <- function(
   uid = random_string("logistic_regression_"),
   ...) {
 
-  ml_ratify_args()
+  .args <- c(as.list(environment()), list(...)) %>%
+    ml_backwards_compatibility(list(
+      intercept = "fit_intercept",
+      alpha = "elastic_net_param",
+      lambda = "reg_param",
+      weights.column = "weight_col",
+      iter.max = "max_iter",
+      max.iter = "max_iter"
+    )) %>%
+    ml_validator_logistic_regression()
 
   jobj <- ml_new_classifier(
-    x, "org.apache.spark.ml.classification.LogisticRegression", uid,
-    features_col = features_col, label_col = label_col,
-    prediction_col = prediction_col, probability_col = probability_col,
-    raw_prediction_col = raw_prediction_col
+    x, "org.apache.spark.ml.classification.LogisticRegression", .args$uid,
+    features_col = .args$features_col, label_col = .args$label_col,
+    prediction_col = .args$prediction_col, probability_col = .args$probability_col,
+    raw_prediction_col = .args$raw_prediction_col
   ) %>%
-    invoke("setFitIntercept", fit_intercept) %>%
-    invoke("setElasticNetParam", elastic_net_param) %>%
-    invoke("setRegParam", reg_param) %>%
-    invoke("setMaxIter", max_iter) %>%
-    invoke("setThreshold", threshold) %>%
-    invoke("setTol", tol) %>%
-    jobj_set_param("setFamily", family, "auto", "2.1.0") %>%
-    jobj_set_param("setAggregationDepth", aggregation_depth, 2L, "2.1.0")
+    invoke("setFitIntercept", .args$fit_intercept) %>%
+    invoke("setElasticNetParam", .args$elastic_net_param) %>%
+    invoke("setRegParam", .args$reg_param) %>%
+    invoke("setMaxIter", .args$max_iter) %>%
+    invoke("setThreshold", .args$threshold) %>%
+    invoke("setTol", .args$tol) %>%
+    jobj_set_param("setFamily", .args$family, "auto", "2.1.0") %>%
+    jobj_set_param("setAggregationDepth", .args$aggregation_depth, 2L, "2.1.0")
 
-  if (!rlang::is_null(thresholds))
-    jobj <- invoke(jobj, "setThresholds", thresholds)
-  if (!rlang::is_null(weight_col))
-    jobj <- invoke(jobj, "setWeightCol", weight_col)
+  if (!rlang::is_null(.args$thresholds))
+    jobj <- invoke(jobj, "setThresholds", .args$thresholds)
+  if (!rlang::is_null(.args$weight_col))
+    jobj <- invoke(jobj, "setWeightCol", .args$weight_col)
 
-  if (!rlang::is_null(lower_bounds_on_coefficients)) {
-    lower_bounds_on_coefficients <- spark_dense_matrix(x, lower_bounds_on_coefficients)
+  if (!rlang::is_null(.args$lower_bounds_on_coefficients)) {
+    lower_bounds_on_coefficients <- spark_dense_matrix(x, .args$lower_bounds_on_coefficients)
     jobj <- jobj_set_param(jobj, "setLowerBoundsOnCoefficients",
                            lower_bounds_on_coefficients,
                            NULL, "2.2.0")
   }
 
-  if (!rlang::is_null(upper_bounds_on_coefficients)) {
-    upper_bounds_on_coefficients <- spark_dense_matrix(x, upper_bounds_on_coefficients)
+  if (!rlang::is_null(.args$upper_bounds_on_coefficients)) {
+    upper_bounds_on_coefficients <- spark_dense_matrix(x, .args$upper_bounds_on_coefficients)
     jobj <- jobj_set_param(jobj, "setUpperBoundsOnCoefficients",
                            upper_bounds_on_coefficients,
                            NULL, "2.2.0")
   }
 
-  if (!rlang::is_null(lower_bounds_on_intercepts)) {
-    lower_bounds_on_intercepts <- spark_dense_vector(x, lower_bounds_on_intercepts)
+  if (!rlang::is_null(.args$lower_bounds_on_intercepts)) {
+    lower_bounds_on_intercepts <- spark_dense_vector(x, .args$lower_bounds_on_intercepts)
     jobj <- jobj_set_param(jobj, "setLowerBoundsOnIntercepts",
                            lower_bounds_on_intercepts,
                            NULL, "2.2.0")
   }
 
-  if (!rlang::is_null(upper_bounds_on_intercepts)) {
-    upper_bounds_on_intercepts <- spark_dense_vector(x, upper_bounds_on_intercepts)
+  if (!rlang::is_null(.args$upper_bounds_on_intercepts)) {
+    upper_bounds_on_intercepts <- spark_dense_vector(x, .args$upper_bounds_on_intercepts)
     jobj <- jobj_set_param(jobj, "setUpperBoundsOnIntercepts",
                            upper_bounds_on_intercepts,
                            NULL, "2.2.0")
@@ -231,42 +240,67 @@ ensure_matrix_double <- function(mat) {
     matrix(nrow = nrow(mat))
 }
 
-ml_validator_logistic_regression <- function(args, nms) {
-  old_new_mapping <- list(
-    intercept = "fit_intercept",
-    alpha = "elastic_net_param",
-    lambda = "reg_param",
-    weights.column = "weight_col",
-    iter.max = "max_iter",
-    max.iter = "max_iter"
-  )
-
-  args %>%
-    ml_validate_args({
-      elastic_net_param <- ensure_scalar_double(elastic_net_param)
-      reg_param <- ensure_scalar_double(reg_param)
-      max_iter <- ensure_scalar_integer(max_iter)
-      family <- rlang::arg_match(family, c("auto", "binomial", "multinomial"))
-      fit_intercept <- ensure_scalar_boolean(fit_intercept)
-      threshold <- ensure_scalar_double(threshold)
-      if (!is.null(weight_col))
-        weight_col <- ensure_scalar_character(weight_col)
-      aggregation_depth <- ensure_scalar_integer(aggregation_depth)
-      if (!is.null(lower_bounds_on_coefficients))
-        lower_bounds_on_coefficients <- ensure_matrix_double(
-          lower_bounds_on_coefficients)
-      if (!is.null(upper_bounds_on_coefficients))
-        upper_bounds_on_coefficients <- ensure_matrix_double(
-          upper_bounds_on_coefficients)
-      if (!is.null(lower_bounds_on_intercepts))
-        lower_bounds_on_intercepts <- sapply(
-          lower_bounds_on_intercepts, ensure_scalar_double)
-      if (!is.null(upper_bounds_on_intercepts))
-        upper_bounds_on_intercepts <- sapply(
-          upper_bounds_on_intercepts, ensure_scalar_double)
-    }, old_new_mapping) %>%
-    ml_extract_args(nms, old_new_mapping)
+ml_validator_logistic_regression <- function(.args) {
+  .args$elastic_net_param <- ensure_scalar_double(.args$elastic_net_param)
+  .args$reg_param <- ensure_scalar_double(.args$reg_param)
+  .args$max_iter <- ensure_scalar_integer(.args$max_iter)
+  .args$family <- ensure_valid_option(.args$family, c("auto", "binomial", "multinomial"))
+  .args$fit_intercept <- ensure_scalar_boolean(.args$fit_intercept)
+  .args$threshold <- ensure_scalar_double(.args$threshold)
+  if (!is.null(.args$weight_col))
+    .args$weight_col <- ensure_scalar_character(.args$weight_col)
+  .args$aggregation_depth <- ensure_scalar_integer(.args$aggregation_depth)
+  if (!is.null(.args$lower_bounds_on_coefficients))
+    .args$lower_bounds_on_coefficients <- ensure_matrix_double(
+      .args$lower_bounds_on_coefficients)
+  if (!is.null(.args$upper_bounds_on_coefficients))
+    .args$upper_bounds_on_coefficients <- ensure_matrix_double(
+      .args$upper_bounds_on_coefficients)
+  if (!is.null(.args$lower_bounds_on_intercepts))
+    .args$lower_bounds_on_intercepts <- sapply(
+      .args$lower_bounds_on_intercepts, ensure_scalar_double)
+  if (!is.null(.args$upper_bounds_on_intercepts))
+    .args$upper_bounds_on_intercepts <- sapply(
+      .args$upper_bounds_on_intercepts, ensure_scalar_double)
+  .args
 }
+
+# ml_validator_logistic_regression <- function(args, nms) {
+  # old_new_mapping <- list(
+  #   intercept = "fit_intercept",
+  #   alpha = "elastic_net_param",
+  #   lambda = "reg_param",
+  #   weights.column = "weight_col",
+  #   iter.max = "max_iter",
+  #   max.iter = "max_iter"
+  # )
+#
+#   args %>%
+#     ml_validate_args({
+#       elastic_net_param <- ensure_scalar_double(elastic_net_param)
+#       reg_param <- ensure_scalar_double(reg_param)
+#       max_iter <- ensure_scalar_integer(max_iter)
+#       family <- rlang::arg_match(family, c("auto", "binomial", "multinomial"))
+#       fit_intercept <- ensure_scalar_boolean(fit_intercept)
+#       threshold <- ensure_scalar_double(threshold)
+#       if (!is.null(weight_col))
+#         weight_col <- ensure_scalar_character(weight_col)
+#       aggregation_depth <- ensure_scalar_integer(aggregation_depth)
+#       if (!is.null(lower_bounds_on_coefficients))
+#         lower_bounds_on_coefficients <- ensure_matrix_double(
+#           lower_bounds_on_coefficients)
+#       if (!is.null(upper_bounds_on_coefficients))
+#         upper_bounds_on_coefficients <- ensure_matrix_double(
+#           upper_bounds_on_coefficients)
+#       if (!is.null(lower_bounds_on_intercepts))
+#         lower_bounds_on_intercepts <- sapply(
+#           lower_bounds_on_intercepts, ensure_scalar_double)
+#       if (!is.null(upper_bounds_on_intercepts))
+#         upper_bounds_on_intercepts <- sapply(
+#           upper_bounds_on_intercepts, ensure_scalar_double)
+#     }, old_new_mapping) %>%
+#     ml_extract_args(nms, old_new_mapping)
+# }
 
 # Constructors
 

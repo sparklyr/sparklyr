@@ -25,6 +25,18 @@ ft_string_indexer <- function(
   UseMethod("ft_string_indexer")
 }
 
+ml_validator_string_indexer <- function(.args) {
+  .args$input_col <- ensure_scalar_character(.args$input_col)
+  .args$output_col <- ensure_scalar_character(.args$output_col)
+  .args$handle_invalid <- ensure_valid_option(
+    .args$handle_invalid, c("error", "skip", "keep"))
+  .args$string_order_type <- ensure_valid_option(
+    .args$string_order_type,
+    c("frequencyDesc", "frequencyAsc", "alphabetDesc", "alphabetAsc")
+  )
+  .args
+}
+
 #' @export
 ft_string_indexer.spark_connection <- function(
   x, input_col, output_col,
@@ -33,12 +45,15 @@ ft_string_indexer.spark_connection <- function(
   dataset = NULL,
   uid = random_string("string_indexer_"), ...) {
 
-  ml_ratify_args()
+  .args <- c(as.list(environment()), list(...)) %>%
+    ml_backwards_compatibility() %>%
+    ml_validator_string_indexer()
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StringIndexer",
-                                  input_col, output_col, uid) %>%
-    jobj_set_param("setHandleInvalid", handle_invalid, "error", "2.1.0") %>%
-    jobj_set_param("setStringOrderType", string_order_type, "frequencyDesc", "2.3.0") %>%
+  estimator <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.StringIndexer",
+    .args$input_col, .args$output_col, .args$uid) %>%
+    jobj_set_param("setHandleInvalid", .args$handle_invalid, "error", "2.1.0") %>%
+    jobj_set_param("setStringOrderType", .args$string_order_type, "frequencyDesc", "2.3.0") %>%
     new_ml_string_indexer()
 
   if (is.null(dataset))
@@ -103,18 +118,18 @@ new_ml_string_indexer_model <- function(jobj) {
                      subclass = "ml_string_indexer_model")
 }
 
-ml_validator_string_indexer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      handle_invalid <- rlang::arg_match(
-        handle_invalid, c("error", "skip", "keep"))
-      string_order_type <- rlang::arg_match(
-        string_order_type,
-        c("frequencyDesc", "frequencyAsc", "alphabetDesc", "alphabetAsc")
-      )
-    }) %>%
-    ml_extract_args(nms)
-}
+# ml_validator_string_indexer <- function(args, nms) {
+#   args %>%
+#     ml_validate_args({
+#       handle_invalid <- rlang::arg_match(
+#         handle_invalid, c("error", "skip", "keep"))
+#       string_order_type <- rlang::arg_match(
+#         string_order_type,
+#         c("frequencyDesc", "frequencyAsc", "alphabetDesc", "alphabetAsc")
+#       )
+#     }) %>%
+#     ml_extract_args(nms)
+# }
 
 #' @rdname ft_string_indexer
 #' @param model A fitted StringIndexer model returned by \code{ft_string_indexer()}
