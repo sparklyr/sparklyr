@@ -10,6 +10,8 @@
 \alias{ensure_scalar_boolean}
 \alias{ensure}
 \alias{ensure_scalar_character}
+\alias{ensure}
+\alias{ensure_valid_option}
 \title{Enforce Specific Structure for R Objects}
 \usage{
 ensure_scalar_integer(object, allow.na = FALSE, allow.null = FALSE,
@@ -23,6 +25,8 @@ ensure_scalar_boolean(object, allow.na = FALSE, allow.null = FALSE,
 
 ensure_scalar_character(object, allow.na = FALSE, allow.null = FALSE,
   default = NULL)
+
+ensure_valid_option(object, options, allow.na = FALSE, allow.null = FALSE)
 }
 \arguments{
 \item{object}{An \R object.}
@@ -34,6 +38,8 @@ ensure_scalar_character(object, allow.na = FALSE, allow.null = FALSE,
 \item{default}{If \code{object} is \code{NULL}, what value should
 be used in its place? If \code{default} is specified, \code{allow.null}
 is ignored (and assumed to be \code{TRUE}).}
+
+\item{options}{Vector of valid options.}
 }
 \description{
 These routines are useful when preparing to pass objects to
