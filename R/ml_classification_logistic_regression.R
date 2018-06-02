@@ -183,7 +183,32 @@ ml_logistic_regression.ml_pipeline <- function(
   uid = random_string("logistic_regression_"),
   ...) {
 
-  transformer <- ml_new_stage_modified_args()
+  transformer <- ml_logistic_regression.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    fit_intercept = fit_intercept,
+    elastic_net_param = elastic_net_param,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    threshold = threshold,
+    thresholds = thresholds,
+    tol = tol,
+    weight_col = weight_col,
+    aggregation_depth = aggregation_depth,
+    lower_bounds_on_coefficients = lower_bounds_on_coefficients,
+    lower_bounds_on_intercepts = lower_bounds_on_intercepts,
+    upper_bounds_on_coefficients = upper_bounds_on_coefficients,
+    upper_bounds_on_intercepts = upper_bounds_on_intercepts,
+    features_col = features_col,
+    label_col = label_col,
+    family = family,
+    prediction_col = prediction_col,
+    probability_col = probability_col,
+    raw_prediction_col = raw_prediction_col,
+    uid = uid,
+    ...
+  )
+
   ml_add_stage(x, transformer)
 }
 
@@ -215,7 +240,31 @@ ml_logistic_regression.tbl_spark <- function(
   features = NULL,
   predicted_label_col = "predicted_label", ...) {
 
-  predictor <- ml_new_stage_modified_args()
+  predictor <- ml_logistic_regression.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    fit_intercept = fit_intercept,
+    elastic_net_param = elastic_net_param,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    threshold = threshold,
+    thresholds = thresholds,
+    tol = tol,
+    weight_col = weight_col,
+    aggregation_depth = aggregation_depth,
+    lower_bounds_on_coefficients = lower_bounds_on_coefficients,
+    lower_bounds_on_intercepts = lower_bounds_on_intercepts,
+    upper_bounds_on_coefficients = upper_bounds_on_coefficients,
+    upper_bounds_on_intercepts = upper_bounds_on_intercepts,
+    features_col = features_col,
+    label_col = label_col,
+    family = family,
+    prediction_col = prediction_col,
+    probability_col = probability_col,
+    raw_prediction_col = raw_prediction_col,
+    uid = uid,
+    ...
+  )
 
   ml_formula_transformation()
 
@@ -264,43 +313,6 @@ ml_validator_logistic_regression <- function(.args) {
       .args$upper_bounds_on_intercepts, ensure_scalar_double)
   .args
 }
-
-# ml_validator_logistic_regression <- function(args, nms) {
-  # old_new_mapping <- list(
-  #   intercept = "fit_intercept",
-  #   alpha = "elastic_net_param",
-  #   lambda = "reg_param",
-  #   weights.column = "weight_col",
-  #   iter.max = "max_iter",
-  #   max.iter = "max_iter"
-  # )
-#
-#   args %>%
-#     ml_validate_args({
-#       elastic_net_param <- ensure_scalar_double(elastic_net_param)
-#       reg_param <- ensure_scalar_double(reg_param)
-#       max_iter <- ensure_scalar_integer(max_iter)
-#       family <- rlang::arg_match(family, c("auto", "binomial", "multinomial"))
-#       fit_intercept <- ensure_scalar_boolean(fit_intercept)
-#       threshold <- ensure_scalar_double(threshold)
-#       if (!is.null(weight_col))
-#         weight_col <- ensure_scalar_character(weight_col)
-#       aggregation_depth <- ensure_scalar_integer(aggregation_depth)
-#       if (!is.null(lower_bounds_on_coefficients))
-#         lower_bounds_on_coefficients <- ensure_matrix_double(
-#           lower_bounds_on_coefficients)
-#       if (!is.null(upper_bounds_on_coefficients))
-#         upper_bounds_on_coefficients <- ensure_matrix_double(
-#           upper_bounds_on_coefficients)
-#       if (!is.null(lower_bounds_on_intercepts))
-#         lower_bounds_on_intercepts <- sapply(
-#           lower_bounds_on_intercepts, ensure_scalar_double)
-#       if (!is.null(upper_bounds_on_intercepts))
-#         upper_bounds_on_intercepts <- sapply(
-#           upper_bounds_on_intercepts, ensure_scalar_double)
-#     }, old_new_mapping) %>%
-#     ml_extract_args(nms, old_new_mapping)
-# }
 
 # Constructors
 
