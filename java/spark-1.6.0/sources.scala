@@ -868,6 +868,11 @@ spark_worker_apply <- function(sc) {
     .libPaths(unbundlePath)
     worker_log("updated .libPaths with bundle packages")
   }
+  else {
+    spark_env <- worker_invoke_static(sc, "org.apache.spark.SparkEnv", "get")
+    spark_libpaths <- worker_invoke(worker_invoke(spark_env, "conf"), "get", "spark.r.libpaths", NULL)
+    if (!is.null(spark_libpaths)) .libPaths(spark_libpaths)
+  }
 
   grouped_by <- worker_invoke(context, "getGroupBy")
   grouped <- !is.null(grouped_by) && length(grouped_by) > 0

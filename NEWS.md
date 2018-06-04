@@ -1,5 +1,8 @@
 # Sparklyr 0.9.0 (unreleased)
 
+- Added support for `spark.r.libpaths` to configure package library in
+  `spark_apply()` (#1530).
+
 - Fixed Livy version with MapR distributions.
 
 - Avoid preparing windows environment in non-local connections.
