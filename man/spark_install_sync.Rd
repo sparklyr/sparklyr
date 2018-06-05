@@ -12,3 +12,4 @@ spark_install_sync(project_path)
 \description{
 See: https://github.com/rstudio/spark-install
 }
+\keyword{internal}

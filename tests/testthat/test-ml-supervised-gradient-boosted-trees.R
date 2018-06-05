@@ -20,15 +20,16 @@ test_that("ml_gbt_classifier() parses params correctly (<2.2)", {
   expect_equal(ml_params(gbtc, names(args)[-1]), args[-1])
 })
 
-test_that("ml_gbt_classifier() parses params correctly (>=2.2)", {
-  if (spark_version(sc) < "2.2.0") skip("probabilities not supported before Spark 2.2")
+test_that("ml_gbt_classifier() parses params correctly (>=2.3)", {
+  test_requires_version("2.3.0")
   args <- list(
     x = sc, features_col = "fcol", prediction_col = "pcol",
     probability_col = "prcol", raw_prediction_col = "rpcol",
     checkpoint_interval = 9, loss_type = "logistic",
     max_bins = 30, max_depth = 6,
     max_iter = 19, min_info_gain = 0.01, min_instances_per_node = 2,
-    step_size = 0.01, subsampling_rate = 0.9, seed = 42,
+    step_size = 0.01, subsampling_rate = 0.9,
+    feature_subset_strategy = "onethird", seed = 42,
     thresholds = c(0.1, 0.3, 0.6),
     cache_node_ids = TRUE,
     max_memory_in_mb = 128
@@ -45,7 +46,7 @@ test_that("ml_gbt_classifier() default params are correct (<2.2)", {
 
   args <- get_default_args(ml_gbt_classifier,
                            c("x", "uid", "...", "seed", "thresholds", "probability_col",
-                             "raw_prediction_col"))
+                             "raw_prediction_col", "feature_subset_strategy"))
 
   expect_equal(
     ml_params(predictor, names(args)),
@@ -53,7 +54,7 @@ test_that("ml_gbt_classifier() default params are correct (<2.2)", {
 })
 
 test_that("ml_gbt_classifier() default params are correct (>= 2.2.0)", {
-  if (spark_version(sc) < "2.2.0") skip("")
+  test_requires_version("2.3.0")
   predictor <- ml_pipeline(sc) %>%
     ml_gbt_classifier() %>%
     ml_stage(1)
@@ -67,12 +68,14 @@ test_that("ml_gbt_classifier() default params are correct (>= 2.2.0)", {
 })
 
 test_that("ml_gbt_regressor() parses params correctly", {
+  test_requires_version("2.3.0")
   args <- list(
     x = sc, features_col = "fcol", prediction_col = "pcol",
     checkpoint_interval = 9, loss_type = "absolute",
     max_bins = 30, max_depth = 6,
     max_iter = 19, min_info_gain = 0.01, min_instances_per_node = 2,
-    step_size = 0.01, subsampling_rate = 0.9, seed = 42,
+    step_size = 0.01, subsampling_rate = 0.9,
+    feature_subset_strategy = "onethird", seed = 42,
     cache_node_ids = TRUE,
     max_memory_in_mb = 128
   )
@@ -81,6 +84,7 @@ test_that("ml_gbt_regressor() parses params correctly", {
 })
 
 test_that("ml_gbt_regressor() default params are correct", {
+  test_requires_version("2.3.0")
   predictor <- ml_pipeline(sc) %>%
     ml_gbt_regressor() %>%
     ml_stage(1)
@@ -107,6 +111,8 @@ test_that("ml_gbt_regressor() parases params correct", {
 })
 
 test_that("gbt runs successfully when all args specified", {
+  test_requires("dplyr")
+  iris_tbl <- testthat_tbl("iris")
   model <- iris_tbl %>%
     filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width + Sepal_Length + Petal_Width,
@@ -142,6 +148,7 @@ test_that("thresholds parameter behaves as expected", {
 })
 
 test_that("informative error when using Spark version that doesn't support thresholds", {
+  test_requires("dplyr")
   if (spark_version(sc) >= "2.2.0") skip("not applicable, threshold is supported")
   expect_error(
     iris_tbl %>%
@@ -153,6 +160,7 @@ test_that("informative error when using Spark version that doesn't support thres
 })
 
 test_that("one-tree ensemble agrees with ml_decision_tree()", {
+  test_requires("dplyr")
   gbt <- iris_tbl %>%
     ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression",

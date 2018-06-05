@@ -1,5 +1,15 @@
 # register the spark_connection S3 class for use in setClass slots
+
+#' spark_connection class
+#'
+#' @name spark_connection-class
+#' @exportClass spark_connection
 methods::setOldClass("spark_connection")
+
+#' spark_jobj class
+#'
+#' @name spark_jobj-class
+#' @exportClass spark_jobj
 methods::setOldClass("spark_jobj")
 
 .spark_default_version <- numeric_version("1.6.2")
@@ -54,7 +64,7 @@ NULL
 #' spark_disconnect(sc)
 #'
 #' @export
-spark_connect <- function(master = "local",
+spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
                           method = c("shell", "livy", "databricks", "test"),
                           app_name = "sparklyr",
@@ -68,11 +78,15 @@ spark_connect <- function(master = "local",
   method <- match.arg(method)
 
   # master can be missing if it's specified in the config file
-  if (missing(master) && method != "databricks") {
-    master <- config$spark.master
-    if (is.null(master))
-      stop("You must either pass a value for master or include a spark.master ",
-           "entry in your config.yml")
+  if (missing(master)) {
+    if (identical(method, "databricks")) {
+      master <- "databricks"
+    } else {
+      master <- config$spark.master
+      if (is.null(master))
+        stop("You must either pass a value for master or include a spark.master ",
+             "entry in your config.yml")
+    }
   }
 
   # determine whether we need cores in master
@@ -135,7 +149,7 @@ spark_connect <- function(master = "local",
                              remote = spark_config_value(
                                config,
                                "sparklyr.gateway.remote",
-                               spark_master_is_yarn_cluster(master)),
+                               spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
@@ -310,8 +324,12 @@ spark_master_is_yarn_client <- function(master) {
   grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE)
 }
 
-spark_master_is_yarn_cluster <- function(master) {
-  grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE)
+spark_master_is_yarn_cluster <- function(master, config) {
+  grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE) ||
+    (
+      identical(config[["sparklyr.shell.deploy-mode"]], "cluster") &&
+      identical(master, "yarn")
+    )
 }
 
 spark_master_is_gateway <- function(master) {

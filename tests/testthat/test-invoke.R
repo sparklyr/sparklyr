@@ -47,13 +47,60 @@ test_that("roundtrip date array", {
   )
 })
 
-test_that("we can invoke_static using make_ensure_scalar_impl", {
-  test_ensure_scalar_integer <- make_ensure_scalar_impl(
-    is.numeric,
-    "a length-one integer vector",
-    as.integer
+test_that("we can invoke_static 'package object' types", {
+  expect_equal(
+    invoke_static(sc, "sparklyr.test", "testPackageObject", "x"),
+    "x"
+  )
+})
+
+test_that("we can invoke methods with Char/Short/Long/Float parameters (#1395)", {
+  expect_identical(
+    invoke_new(sc, "java.lang.Character", "f"),
+    "f"
   )
 
-  expect_equal(invoke_static(sc, "sparklyr.Test", "unaryPrimitiveInt",
-                             test_ensure_scalar_integer(5)), 25)
+  expect_identical(
+    invoke_new(sc, "java.lang.Short", 42L),
+    42L
+  )
+
+  expect_identical(
+    invoke_new(sc, "java.lang.Long", 42),
+    42
+  )
+
+  expect_identical(
+    invoke_new(sc, "java.lang.Long", 42L),
+    42
+  )
+
+  expect_identical(
+    invoke_new(sc, "java.lang.Float", 42),
+    42
+  )
+})
+
+test_that("numeric to Long out of range error", {
+  big_number <- invoke_static(sc, "scala.Long", "MaxValue") * 2
+  expect_error(
+    invoke_new(sc, "java.lang.Long", big_number),
+    "java\\.lang\\.Exception: Unable to cast numeric to Long: out of range\\."
+  )
+  expect_error(
+    invoke_new(sc, "java.lang.Long", -1 * big_number),
+    "java\\.lang\\.Exception: Unable to cast numeric to Long: out of range\\."
+  )
+})
+
+test_that("integer to Short out of range error", {
+  big_number <- invoke_static(sc, "scala.Short", "MaxValue") * 2
+  expect_error(
+    invoke_new(sc, "java.lang.Short", as.integer(big_number)),
+    "java\\.lang\\.Exception: Unable to cast integer to Short: out of range\\."
+  )
+  expect_error(
+    invoke_new(sc, "java.lang.Short", as.integer(-1 * big_number)),
+    "java\\.lang\\.Exception: Unable to cast integer to Short: out of range\\."
+  )
 })

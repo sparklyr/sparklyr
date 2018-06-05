@@ -3,7 +3,7 @@ context("ml regression - glm")
 sc <- testthat_spark_connection()
 
 test_that("ml_generalized_linear_regression() sets params correctly", {
-  test_requires_version("2.0.0", "glm requires spark 2.0+")
+  test_requires_version("2.3.0", "offset supported in spark 2.3+")
   glr <- ml_generalized_linear_regression(
     sc,
     family = "binomial",
@@ -16,13 +16,14 @@ test_that("ml_generalized_linear_regression() sets params correctly", {
     max_iter = 50L,
     weight_col = "wcol",
     prediction_col = "pcol",
+    offset_col = "ocol",
     tol = 1e-5
   )
   expect_equal(
     ml_params(glr, list(
       "family", "link", "features_col", "label_col", "fit_intercept",
       "link_prediction_col", "reg_param", "max_iter", "weight_col",
-      "prediction_col", "tol"
+      "prediction_col", "offset_col", "tol"
     )),
     list(
       family = "binomial",
@@ -35,6 +36,7 @@ test_that("ml_generalized_linear_regression() sets params correctly", {
       max_iter = 50L,
       weight_col = "wcol",
       prediction_col = "pcol",
+      offset_col = "ocol",
       tol = 1e-5
     )
   )
@@ -48,7 +50,7 @@ test_that("ml_generalized_linear_regression() default params are correct", {
 
   args <- get_default_args(ml_generalized_linear_regression,
                            c("x", "uid", "...", "weight_col", "link", "link_power", "link_prediction_col",
-                             "variance_power"))
+                             "variance_power", "offset_col"))
 
   expect_equal(
     ml_params(predictor, names(args)),
@@ -58,6 +60,7 @@ test_that("ml_generalized_linear_regression() default params are correct", {
 test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and residuals", {
   test_requires_version("2.0.0", "glm requires spark 2.0+")
   skip_on_cran()
+  test_requires("dplyr")
 
   if (spark_version(sc) < "2.0.0")
     skip("requires Spark 2.0.0")
@@ -120,15 +123,18 @@ test_that("weights column works for glm", {
 test_that("ml_generalized_linear_regression print methods work", {
   test_requires_version("2.0.0", "glm requires spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
-  print_output <- ml_generalized_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width) %>%
-    capture.output()
-  expect_equal(print_output[4], "(Intercept) Petal_Width ")
-  expect_match(print_output[7], "Degress of Freedom")
+  glm_model <- ml_generalized_linear_regression(
+    iris_tbl, Petal_Length ~ Petal_Width)
 
-  summary_output <- capture.output(summary(ml_generalized_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width)))
+  expect_known_output(
+    glm_model,
+    output_file("print/glm.txt"),
+    print = TRUE
+  )
 
-  expect_equal(summary_output[8], "(Intercept) Petal_Width ")
-  expect_match(summary_output[13], "Null")
+  expect_known_output(
+    summary(glm_model),
+    output_file("print/glm-summary.txt"),
+    print = TRUE
+  )
 })

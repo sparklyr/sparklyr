@@ -167,6 +167,7 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
 
     mainRMWebapp <- NULL
     propCandidates <- c(
+      "yarn.resourcemanager.webapp.https.address.",
       "yarn.resourcemanager.webapp.address.",
       "yarn.resourcemanager.admin.address."
     )
@@ -263,7 +264,7 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
   }
 
   # there is sometimes a delay to assign the host address even after app is in ACCEPTED state
-  waitHostAddressSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.hostadddress.timeout", 30)
+  waitHostAddressSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.hostaddress.timeout", 30)
   spark_yarn_cluster_while_app(
     resourceManagerWebapp,
     appId,
@@ -276,7 +277,7 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     resourceManagerWebapp,
     appId,
     "amHostHttpAddress",
-    ", try adjusting 'config$sparklyr.yarn.cluster.hostadddress.timeout'")
+    ", try adjusting 'config$sparklyr.yarn.cluster.hostaddress.timeout'")
 
   strsplit(amHostHttpAddress, ":")[[1]][[1]]
 }

@@ -19,6 +19,26 @@
 #'   The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.
 #' @param upper_bounds_on_intercepts (Spark 2.2.0+) Upper bounds on intercepts if fitting under bound constrained optimization.
 #'   The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' mtcars_tbl <- sdf_copy_to(sc, mtcars, name = "mtcars_tbl", overwrite = TRUE)
+#'
+#' partitions <- mtcars_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' mtcars_training <- partitions$training
+#' mtcars_test <- partitions$test
+#'
+#' lr_model <- mtcars_training %>%
+#'   ml_logistic_regression(am ~ gear + carb)
+#'
+#' pred <- sdf_predict(mtcars_test, lr_model)
+#'
+#' ml_binary_classification_evaluator(pred)
+#' }
+#'
 #' @export
 ml_logistic_regression <- function(
   x,
@@ -255,11 +275,16 @@ new_ml_logistic_regression <- function(jobj) {
 }
 
 new_ml_logistic_regression_model <- function(jobj) {
-  summary <- if (invoke(jobj, "hasSummary"))
-    new_ml_summary_logistic_regression_model(invoke(jobj, "summary"))
-  else NULL
-
   is_multinomial <- invoke(jobj, "numClasses") > 2
+
+  summary <- if (invoke(jobj, "hasSummary")) {
+    summary_jobj <- if (spark_version(spark_connection(jobj)) >= "2.3.0" &&
+                        !is_multinomial)
+      invoke(jobj, "binarySummary")
+    else
+      jobj
+    new_ml_summary_logistic_regression_model(invoke(jobj, "summary"))
+  }
 
   new_ml_prediction_model(
     jobj,
@@ -282,19 +307,28 @@ new_ml_logistic_regression_model <- function(jobj) {
 new_ml_summary_logistic_regression_model <- function(jobj) {
   new_ml_summary(
     jobj,
-    area_under_roc = invoke(jobj, "areaUnderROC"),
-    f_measure_by_threshold = invoke(jobj, "fMeasureByThreshold") %>%
+    area_under_roc = try_null(invoke(jobj, "areaUnderROC")),
+    f_measure_by_threshold = try_null(invoke(jobj, "fMeasureByThreshold") %>%
       invoke("withColumnRenamed", "F-Measure", "F_Measure") %>%
-      collect(),
+      collect()),
+    false_positive_rate_by_label = try_null(invoke(jobj, "falsePositiveRateByLabel")),
+    precision_by_label = try_null(invoke(jobj, "precisionByLabel")),
+    recall_by_label = try_null(invoke(jobj, "recallByLabel")),
+    true_positive_rate_by_label = try_null(invoke(jobj, "truePositiveRateByLabel")),
+    weighted_f_measure = try_null(invoke(jobj, "weightedFMeasure")),
+    weighted_false_positive_rate = try_null(invoke(jobj, "weightedFalsePositiveRate")),
+    weighted_precision = try_null(invoke(jobj, "weightedPrecision")),
+    weighted_recall = try_null(invoke(jobj, "weightedRecall")),
+    weighted_true_positive_rate = try_null(invoke(jobj, "weightedTruePositiveRate")),
     features_col = invoke(jobj, "featuresCol"),
     label_col = invoke(jobj, "labelCol"),
     objective_history = invoke(jobj, "objectiveHistory"),
-    pr = invoke(jobj, "pr") %>% collect(),
-    precision_by_threshold = invoke(jobj, "precisionByThreshold") %>% collect(),
+    pr = try_null(invoke(jobj, "pr") %>% collect()),
+    precision_by_threshold = try_null(invoke(jobj, "precisionByThreshold") %>% collect()),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     probability_col = invoke(jobj, "probabilityCol"),
-    recall_by_threshold = invoke(jobj, "recallByThreshold") %>% collect(),
-    roc = invoke(jobj, "roc") %>% collect(),
+    recall_by_threshold = try_null(invoke(jobj, "recallByThreshold") %>% collect()),
+    roc = try_null(invoke(jobj, "roc") %>% collect()),
     total_iterations = invoke(jobj, "totalIterations"),
     subclass = "ml_summary_logistic_regression")
 }
@@ -348,8 +382,7 @@ new_ml_model_logistic_regression <- function(
     summary = summary,
     subclass = "ml_model_logistic_regression",
     .features = feature_names,
-    .index_labels = index_labels,
-    .call = call
+    .index_labels = index_labels
   )
 }
 
@@ -358,8 +391,6 @@ new_ml_model_logistic_regression <- function(
 
 #' @export
 print.ml_model_logistic_regression <- function(x, ...) {
-  ml_model_print_call(x)
-  print_newline()
   cat("Formula: ", x$formula, "\n\n", sep = "")
   cat("Coefficients:", sep = "\n")
   print(x$coefficients)
@@ -367,8 +398,6 @@ print.ml_model_logistic_regression <- function(x, ...) {
 
 #' @export
 summary.ml_model_logistic_regression <- function(object, ...) {
-  ml_model_print_call(object)
-  print_newline()
   ml_model_print_coefficients(object)
   print_newline()
 }

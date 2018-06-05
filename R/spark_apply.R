@@ -120,9 +120,10 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'   a list of packages to distribute, or a package bundle created with
 #'   \code{spark_apply_bundle()}.
 #'
-#'   For clusters using Livy or Yarn cluster mode, \code{packages} must
-#'   point to a package bundle created using \code{spark_apply_bundle()}
-#'   and made available as a Spark file using \code{config$sparklyr.shell.files}.
+#'   For clusters using Yarn cluster mode, \code{packages} can point to a package
+#'   bundle created using \code{spark_apply_bundle()} and made available as a Spark
+#'   file using \code{config$sparklyr.shell.files}. For clusters using Livy, packages
+#'   can be manually installed on the driver node.
 #'
 #'   For offline clusters where \code{available.packages()} is not available,
 #'   manually download the packages database from
@@ -199,11 +200,23 @@ spark_apply <- function(x,
   worker_config <- worker_config_serialize(
     c(
       list(
-        debug = isTRUE(args$debug)
+        debug = isTRUE(args$debug),
+        profile = isTRUE(args$profile)
       ),
       sc$config
     )
   )
+
+  # add debug connection message
+  if (isTRUE(args$debug)) {
+    message("Debugging spark_apply(), connect to worker debugging session as follows:")
+    message("  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click")
+    message("     'Log' under the connection, look for the last entry with contents:")
+    message("     'Session (<sessionid>) is waiting for sparklyr client to connect to port <port>'")
+    message("  2. From a new R session run:")
+    message("     debugonce(sparklyr:::spark_worker_main)")
+    message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
+  }
 
   if (grouped) {
     colpos <- which(colnames(x) %in% group_by)

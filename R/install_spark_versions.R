@@ -63,22 +63,26 @@ spark_installed_versions <- function() {
   })
   versions <- data.frame(spark = spark,
                          hadoop = hadoop,
-                         dir = dir,
+                         dir = file.path(spark_install_dir(), dir),
                          stringsAsFactors = FALSE)
 
   versions
 }
 
-
+#' @param show_hadoop Show Hadoop distributions?
+#'
 #' @rdname spark_install
+#'
 #' @export
-spark_available_versions <- function() {
+spark_available_versions <- function(show_hadoop = FALSE) {
   versions <- read_spark_versions_json(latest = TRUE)
   versions <- versions[versions$spark >= "1.6.0", 1:2]
-  versions$install <- paste0("spark_install(version = \"",
-                             versions$spark, "\", ",
-                             "hadoop_version = \"", versions$hadoop,
-                             "\")")
+  selection <- if (show_hadoop) c("spark", "hadoop") else "spark"
+
+  versions <- unique(subset(versions, select = selection))
+
+  rownames(versions) <- 1:nrow(versions)
+
   versions
 }
 
@@ -105,7 +109,7 @@ spark_versions <- function(latest = TRUE) {
   downloadData$hadoop_default <- rep(FALSE, NROW(downloadData))
 
   # apply spark and hadoop versions
-  downloadData[downloadData$spark == "2.2.0" & downloadData$hadoop == "2.7", ]$default <- TRUE
+  downloadData[downloadData$spark == "2.3.0" & downloadData$hadoop == "2.7", ]$default <- TRUE
   lapply(unique(downloadData$spark), function(version) {
     validVersions <- downloadData[grepl("2", downloadData$hadoop) & downloadData$spark == version, ]
     maxHadoop <- validVersions[with(validVersions, order(hadoop, decreasing = TRUE)), ]$hadoop[[1]]
@@ -132,7 +136,7 @@ spark_versions <- function(latest = TRUE) {
       newRow$base <- if (NROW(currentRow) > 0) currentRow$base else ""
       newRow$pattern <- if (NROW(currentRow) > 0) currentRow$pattern else ""
       newRow$download <- if (NROW(currentRow) > 0) currentRow$download else ""
-      newRow$default <- identical(currentRow$spark, "2.2.0")
+      newRow$default <- identical(currentRow$spark, "2.3.0")
       newRow$hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0)
           identical(currentRow$hadoop, "2.7")
         else

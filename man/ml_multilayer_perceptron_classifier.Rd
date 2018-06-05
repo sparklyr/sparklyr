@@ -85,6 +85,25 @@ When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{res
 
 \code{ml_multilayer_perceptron()} is an alias for \code{ml_multilayer_perceptron_classifier()} for backwards compatibility.
 }
+\examples{
+\dontrun{
+sc <-  spark_connect(master = "local")
+
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+partitions <- iris_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+iris_training <- partitions$training
+iris_test <- partitions$test
+
+mlp_model <- iris_training \%>\%
+  ml_multilayer_perceptron(Species ~ ., layers = c(4,3,3))
+
+pred <- sdf_predict(iris_test, mlp_model)
+
+ml_multiclass_classification_evaluator(pred)
+}
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.

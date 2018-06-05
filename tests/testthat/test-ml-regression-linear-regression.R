@@ -57,7 +57,7 @@ test_that("ml_linear_regression() default params are correct", {
     ml_stage(1)
 
   args <- get_default_args(ml_linear_regression,
-                           c("x", "uid", "...", "weight_col"))
+                           exclude = c("x", "uid", "...", "weight_col", "loss"))
 
   expect_equal(
     ml_params(predictor, names(args)),
@@ -130,16 +130,20 @@ test_that("weights column works for lm", {
 
 test_that("ml_linear_regression print methods work", {
   iris_tbl <- testthat_tbl("iris")
-  print_output <- ml_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width) %>%
-    capture.output()
-  expect_equal(print_output[6], "(Intercept) Petal_Width ")
+  linear_model <- ml_linear_regression(
+    iris_tbl, Petal_Length ~ Petal_Width)
 
-  summary_output <- capture.output(summary(ml_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width)))
+  expect_known_output(
+    linear_model,
+    output_file("print/linear-regression.txt"),
+    print = TRUE
+  )
 
-  expect_equal(summary_output[8], "(Intercept) Petal_Width ")
-  expect_match(summary_output[11], "R-Squared")
+  expect_known_output(
+    summary(linear_model),
+    output_file("print/linear-regression-summary.txt"),
+    print = TRUE
+  )
 })
 
 test_that("fitted() works for linear regression", {

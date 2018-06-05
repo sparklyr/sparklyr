@@ -187,8 +187,7 @@ new_ml_model_linear_svc <- function(
     coefficients = coefficients,
     subclass = "ml_model_linear_svc",
     .features = feature_names,
-    .index_labels = index_labels,
-    .call = call
+    .index_labels = index_labels
   )
 }
 
@@ -196,8 +195,6 @@ new_ml_model_linear_svc <- function(
 
 #' @export
 print.ml_model_linear_svc <- function(x, ...) {
-  ml_model_print_call(x)
-  print_newline()
   cat("Formula: ", x$formula, "\n\n", sep = "")
   cat("Coefficients:", sep = "\n")
   print(x$coefficients)

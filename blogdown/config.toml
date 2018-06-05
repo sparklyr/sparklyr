@@ -1,8 +1,0 @@
-baseurl = "/"
-languageCode = "en-us"
-title = "sparklyr"
-theme = "rstudio-docs-theme"
-metadataformat = "yaml"
-pluralizeListTitles =   "false"
-ignoreFiles = ["\\.Rmd$", "_files$", "_cache$"]
-canonifyurls = true

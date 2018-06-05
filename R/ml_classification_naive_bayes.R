@@ -10,6 +10,26 @@
 #'   and \code{"bernoulli"}. (default = \code{multinomial})
 #' @param smoothing The (Laplace) smoothing parameter. Defaults to 1.
 #' @param weight_col (Spark 2.1.0+) Weight column name. If this is not set or empty, we treat all instance weights as 1.0.
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' partitions <- iris_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' iris_training <- partitions$training
+#' iris_test <- partitions$test
+#'
+#' nb_model <- iris_training %>%
+#'   ml_naive_bayes(Species ~ .)
+#'
+#' pred <- sdf_predict(iris_test, nb_model)
+#'
+#' ml_multiclass_classification_evaluator(pred)
+#' }
+#'
 #' @export
 ml_naive_bayes <- function(
   x,
@@ -172,8 +192,7 @@ new_ml_model_naive_bayes <- function(
     !!! list(pi = pi,
     theta = theta,
     .features = feature_names,
-    .index_labels = index_labels,
-    .call = call)
+    .index_labels = index_labels)
   )
 }
 
@@ -181,10 +200,6 @@ new_ml_model_naive_bayes <- function(
 
 #' @export
 print.ml_model_naive_bayes <- function(x, ...) {
-
-  ml_model_print_call(x)
-  print_newline()
-
   printf("A-priority probabilities:\n")
   print(exp(x$pi))
   print_newline()

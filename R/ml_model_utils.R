@@ -28,7 +28,7 @@ ml_feature_names_metadata <- function(pipeline_model, dataset, features_col) {
 ml_generate_ml_model <- function(
   x, predictor, formula, features_col = "features",
   label_col = "label", type,
-  constructor, predicted_label_col = NULL, call = NULL) {
+  constructor, predicted_label_col = NULL) {
   sc <- spark_connection(x)
   classification <- identical(type, "classification")
 
@@ -103,17 +103,13 @@ ml_generate_ml_model <- function(
 
   feature_names <- ml_feature_names_metadata(pipeline_model, x, features_col)
 
-  call <- call %||% sys.call(sys.parent())
-  call_string <- paste(deparse(call, width.cutoff = 500), " ")
-
   args <- list(
     pipeline = pipeline,
     pipeline_model = pipeline_model,
     model = ml_stage(pipeline_model, model_uid),
     dataset = x,
     formula = formula,
-    feature_names = feature_names,
-    call = call_string
+    feature_names = feature_names
   ) %>%
     (function(args) if (classification) rlang::modify(
       args, index_labels = index_labels

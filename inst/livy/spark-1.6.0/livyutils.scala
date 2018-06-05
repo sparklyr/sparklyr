@@ -8,11 +8,12 @@ object LivyUtils {
     "Logger" -> new Logger("", 0),
     "SQLUtils" -> SQLUtils,
     "Utils" -> Utils,
-    "Repartition" -> Repartition,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
-    "WorkerUtils" -> WorkerUtils
-  )
+    "WorkerUtils" -> WorkerUtils,
+    "MLUtils" -> MLUtils,
+    "Shell" -> Shell
+   )
 
   val tracker = new JVMObjectTracker()
   val serializer = new Serializer(tracker)

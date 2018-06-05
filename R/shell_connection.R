@@ -33,7 +33,7 @@ shell_connection <- function(master,
   }
 
   # for yarn-cluster set deploy mode as shell arguments
-  if (spark_master_is_yarn_cluster(master)) {
+  if (spark_master_is_yarn_cluster(master, config)) {
     if (is.null(config[["sparklyr.shell.deploy-mode"]])) {
       shell_args <- c(shell_args, "--deploy-mode", "cluster")
     }
@@ -47,7 +47,9 @@ shell_connection <- function(master,
   environment <- new.env()
 
   # prepare windows environment
-  prepare_windows_environment(spark_home, environment)
+  if (spark_master_is_local(master)) {
+    prepare_windows_environment(spark_home, environment)
+  }
 
   # verify that java is available
   validate_java_version(master, spark_home)
@@ -210,6 +212,9 @@ start_shell <- function(master,
                            unix = c("spark2-submit", "spark-submit"),
                            windows = "spark-submit2.cmd")
 
+    # allow users to override spark-submit if needed
+    spark_submit <- spark_config_value(config, "sparklyr.spark-submit", spark_submit)
+
     spark_submit_paths <- unlist(lapply(
       spark_submit,
       function(submit_path) {
@@ -217,7 +222,7 @@ start_shell <- function(master,
       }))
 
     if (!any(file.exists(spark_submit_paths))) {
-      stop("Failed to find spark-submit under '", spark_home, "', please verify SPARK_HOME.")
+      stop("Failed to find '", paste(spark_submit, collapse = "' or '"), "' under '", spark_home, "', please verify SPARK_HOME.")
     }
 
     spark_submit_path <- spark_submit_paths[[which(file.exists(spark_submit_paths))[[1]]]]
@@ -306,7 +311,7 @@ start_shell <- function(master,
     })
 
     # for yarn-cluster
-    if (spark_master_is_yarn_cluster(master) && is.null(config[["sparklyr.gateway.address"]])) {
+    if (spark_master_is_yarn_cluster(master, config) && is.null(config[["sparklyr.gateway.address"]])) {
       gatewayAddress <- config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway(config, start_time)
     }
 
@@ -322,7 +327,7 @@ start_shell <- function(master,
         paste(
           "Failed while connecting to sparklyr to port (",
           gatewayPort,
-          if (spark_master_is_yarn_cluster(master)) {
+          if (spark_master_is_yarn_cluster(master, config)) {
             paste0(
               ") and address (",
               config[["sparklyr.gateway.address"]]
@@ -505,7 +510,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
 
-      if (!spark_master_is_yarn_cluster(sc$master) &&
+      if (!spark_master_is_yarn_cluster(sc$master, sc$config) &&
           !spark_master_is_gateway(sc$master)) {
         conf <- invoke(conf, "setMaster", sc$master)
 

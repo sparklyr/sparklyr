@@ -2,11 +2,14 @@
 % Please edit documentation in R/ml_feature_count_vectorizer.R
 \name{ft_count_vectorizer}
 \alias{ft_count_vectorizer}
+\alias{ml_vocabulary}
 \title{Feature Tranformation -- CountVectorizer (Estimator)}
 \usage{
 ft_count_vectorizer(x, input_col, output_col, binary = FALSE, min_df = 1,
   min_tf = 1, vocab_size = as.integer(2^18), dataset = NULL,
   uid = random_string("count_vectorizer_"), ...)
+
+ml_vocabulary(model)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -43,6 +46,8 @@ feature "transformer" against \code{dataset}. See details.}
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{model}{A \code{ml_count_vectorizer_model}.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -59,6 +64,8 @@ The object returned depends on the class of \code{x}.
   \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a transformer is constructed then
   immediately applied to the input \code{tbl_spark}, returning a \code{tbl_spark}
 }
+
+\code{ml_vocabulary()} returns a vector of vocabulary built.
 }
 \description{
 Extracts a vocabulary from document collections.
@@ -84,6 +91,7 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_bucketizer}},
   \code{\link{ft_chisq_selector}}, \code{\link{ft_dct}},
   \code{\link{ft_elementwise_product}},
+  \code{\link{ft_feature_hasher}},
   \code{\link{ft_hashing_tf}}, \code{\link{ft_idf}},
   \code{\link{ft_imputer}},
   \code{\link{ft_index_to_string}},

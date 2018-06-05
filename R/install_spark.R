@@ -216,7 +216,7 @@ spark_install <- function(version = NULL,
       )
 
       if (.Platform$OS.type == "windows") {
-        hivePath <- normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "hive"), mustWork = FALSE)
+        hivePath <- normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "hive"), mustWork = FALSE, winslash = "/")
 
         hiveProperties <- c(hiveProperties, list(
           "hive.exec.scratchdir" = hivePath,

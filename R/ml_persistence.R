@@ -38,6 +38,9 @@ ml_save.default <- function(x, path, overwrite = FALSE, ...) {
     ml_writer %>%
       invoke("save", path)
   }
+
+  message("Model successfully saved.")
+  invisible(NULL)
 }
 
 #' @rdname ml-persistence
@@ -73,6 +76,9 @@ ml_save.ml_model <- function(x, path, overwrite = FALSE,
     ml_writer %>%
       invoke("save", path)
   }
+
+  message("Model successfully saved.")
+  invisible(NULL)
 }
 
 #' @rdname ml-persistence

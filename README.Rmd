@@ -6,7 +6,9 @@ output:
     fig_height: 5
 ---
 
-[![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) [![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr) [![Join the chat at https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<img src="tools/readme/sparklyr-package.png" width=200 align="right" style="margin-left: 20px; margin-right: 20px"/>
+
+[![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstudio/sparklyr?branch=master&svg=true)](https://ci.appveyor.com/project/JavierLuraschi/sparklyr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) [![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr) [![Join the chat at https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(eval = TRUE)
@@ -14,13 +16,10 @@ knitr::opts_chunk$set(warning = FALSE)
 knitr::opts_chunk$set(fig.path = "tools/readme/", dev = "png")
 ```
 
-
-<img src="tools/readme/sparklyr-illustration.png" width=364 height=197 align="right"/>
-
-- Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a <br/> complete [dplyr](https://github.com/hadley/dplyr) backend.
-- Filter and aggregate Spark datasets then bring them into R for <br/> analysis and visualization.
+- Connect to [Spark](http://spark.apache.org/) from R. The sparklyr package provides a complete [dplyr](https://github.com/hadley/dplyr) backend.
+- Filter and aggregate Spark datasets then bring them into R for analysis and visualization.
 - Use Spark's distributed [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) library from R.
-- Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide <br/> interfaces to Spark packages. 
+- Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API and provide interfaces to Spark packages. 
 
 ## Installation
 
@@ -289,8 +288,6 @@ The RStudio IDE features for sparklyr are available now as part of the [RStudio 
 [rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN package from [H2O](http://h2o.ai) that extends [sparklyr](http://spark.rstudio.com) to provide an interface into [Sparkling Water](https://github.com/h2oai/sparkling-water). For instance, the following example installs, configures and runs [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
 
 ```{r results='hide', message=FALSE}
-options(rsparkling.sparklingwater.version = "2.1.14")
-
 library(rsparkling)
 library(sparklyr)
 library(dplyr)
@@ -348,7 +345,7 @@ livy_service_stop()
 To connect to remote `livy` clusters that support basic authentication connect as:
 
 ```{r eval=FALSE}
-config <- livy_config(username="<username>", password="<password">)
+config <- livy_config(username="<username>", password="<password>")
 sc <- spark_connect(master = "<address>", method = "livy", config = config)
 spark_disconnect(sc)
 ```

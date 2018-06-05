@@ -143,12 +143,10 @@ ml_random_forest_classifier.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
-    call <- if (identical(sys.call(sys.parent())[[1]], quote(ml_random_forest)))
-      sys.call(sys.parent())
     ml_generate_ml_model(
       x, predictor, formula, features_col, label_col,
       "classification", new_ml_model_random_forest_classification,
-      predicted_label_col, call = call
+      predicted_label_col
     )
   }
 }
@@ -187,7 +185,6 @@ new_ml_random_forest_classification_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     feature_importances = try_null(read_spark_vector(jobj, "featureImportances")),
-    num_trees = invoke(jobj, "numTrees"),
     num_classes = try_null(invoke(jobj, "numClasses")),
     num_features = invoke(jobj, "numFeatures"),
     total_num_nodes = invoke(jobj, "totalNumNodes"),
@@ -209,7 +206,6 @@ new_ml_model_random_forest_classification <- function(
     pipeline, pipeline_model, model, dataset, formula,
     subclass = "ml_model_random_forest_classification",
     .features = feature_names,
-    .index_labels = index_labels,
-    .call = call
+    .index_labels = index_labels
   )
 }

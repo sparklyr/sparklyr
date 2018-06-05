@@ -249,7 +249,9 @@ new_ml_lda_model <- function(jobj) {
     estimated_doc_concentration = try_null(invoke(jobj, "estimatedDocConcentration")),
     log_likelihood = function(dataset) invoke(jobj, "logLikelihood", spark_dataframe(dataset)),
     log_perplexity = function(dataset) invoke(jobj, "logPerplexity", spark_dataframe(dataset)),
+    # topicsMatrix deprecated
     topicsMatrix = try_null(read_spark_matrix(jobj, "topicsMatrix")),
+    topics_matrix = try_null(read_spark_matrix(jobj, "topicsMatrix")),
     vocab_size = invoke(jobj, "vocabSize"),
     subclass = "ml_lda_model")
 }
@@ -274,26 +276,6 @@ ml_log_likelihood <- function(model, dataset) model$log_likelihood(dataset)
 #' @export
 ml_log_perplexity <- function(model, dataset) model$log_perplexity(dataset)
 
-# Generic implementations
-
-# TODO
-#' #' @export
-#' print.ml_model_lda <- function(x, ...) {
-#'
-#'   header <- sprintf(
-#'     "An LDA model fit on %s features",
-#'     length(x$features)
-#'   )
-#'
-#'   cat(header, sep = "\n")
-#'   print_newline()
-#'
-#'   cat("Topics Matrix:", sep = "\n")
-#'   print(x$topics.matrix)
-#'   print_newline()
-#'
-#'   cat("Estimated Document Concentration:", sep = "\n")
-#'   print(x$estimated.doc.concentration)
-#'   print_newline()
-#'
-#' }
+#' @rdname ml_lda
+#' @export
+ml_topics_matrix <- function(model) model$topics_matrix

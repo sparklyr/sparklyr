@@ -2,7 +2,7 @@
 % Please edit documentation in R/spark_context_config.R
 \name{spark_context_config}
 \alias{spark_context_config}
-\title{Runtime configuration interface for Spark.}
+\title{Runtime configuration interface for the Spark Context.}
 \usage{
 spark_context_config(sc)
 }
@@ -10,5 +10,5 @@ spark_context_config(sc)
 \item{sc}{A \code{spark_connection}.}
 }
 \description{
-Retrieves the runtime configuration interface for Spark.
+Retrieves the runtime configuration interface for the Spark Context.
 }

@@ -427,6 +427,7 @@ core_read_spark_log_error <- function(sc) {
 #'
 #' @seealso \code{\link{invoke}}, for calling methods on Java object references.
 #'
+#' @exportClass spark_jobj
 #' @export
 spark_jobj <- function(x, ...) {
   UseMethod("spark_jobj")
@@ -618,12 +619,10 @@ getSerdeType <- function(object) {
     elemType <- unique(sapply(object, function(elem) { getSerdeType(elem) }))
     if (length(elemType) <= 1) {
 
-      # Check that there are no NAs in character arrays since they are unsupported in scala
-      hasCharNAs <- any(sapply(object, function(elem) {
-        (is.factor(elem) || is.character(elem) || is.integer(elem)) && is.na(elem)
-      }))
+      # Check that there are no NAs in arrays since they are unsupported in scala
+      hasNAs <- any(is.na(object))
 
-      if (hasCharNAs) {
+      if (hasNAs) {
         "list"
       } else {
         "array"
@@ -635,13 +634,9 @@ getSerdeType <- function(object) {
 }
 
 writeObject <- function(con, object, writeType = TRUE) {
-  # NOTE: In R vectors have same type as objects. So we don't support
-  # passing in vectors as arrays and instead require arrays to be passed
-  # as lists.
-  type <- class(object)[[1]]  # class of POSIXlt is c("POSIXlt", "POSIXt")
-  # Checking types is needed here, since 'is.na' only handles atomic vectors,
-  # lists and pairlists
-  if (type %in% c("integer", "character", "logical", "double", "numeric", "factor")) {
+  type <- class(object)[[1]]
+
+  if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
     if (is.na(object)) {
       object <- NULL
       type <- "NULL"
@@ -669,6 +664,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXlt = writeTime(con, object),
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
+         `data.frame` = writeList(con, object),
          stop(paste("Unsupported type for serialization", type)))
 }
 
@@ -744,6 +740,7 @@ writeType <- function(con, class) {
                  POSIXlt = "t",
                  POSIXct = "t",
                  factor = "c",
+                 `data.frame` = "l",
                  stop(paste("Unsupported type for serialization", class)))
   writeBin(charToRaw(type), con)
 }
@@ -822,6 +819,7 @@ worker_config_serialize <- function(config) {
     if (isTRUE(config$debug)) "TRUE" else "FALSE",
     spark_config_value(config, "sparklyr.worker.gateway.port", "8880"),
     spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
+    if (isTRUE(config$profile)) "TRUE" else "FALSE",
     sep = ";"
   )
 }
@@ -832,7 +830,8 @@ worker_config_deserialize <- function(raw) {
   list(
     debug = as.logical(parts[[1]]),
     sparklyr.gateway.port = as.integer(parts[[2]]),
-    sparklyr.gateway.address = parts[[3]]
+    sparklyr.gateway.address = parts[[3]],
+    profile = as.logical(parts[[4]])
   )
 }
 spark_worker_apply <- function(sc) {
@@ -909,8 +908,22 @@ spark_worker_apply <- function(sc) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
 
-    data$stringsAsFactors <- FALSE
-    df <- do.call(rbind.data.frame, data)
+    df <- do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+
+    # rbind removes Date classes so we re-assign them here
+    if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0 &&
+        any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
+      first_row <- data[[1]]
+      for (idx in seq_along(first_row)) {
+        first_class <- class(first_row[[idx]])[[1]]
+        if (identical(first_class, "Date")) {
+          df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
+        } else if (identical(first_class, "POSIXct")) {
+          df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
+        }
+      }
+    }
+
     result <- NULL
 
     if (nrow(df) == 0) {
@@ -1155,9 +1168,17 @@ spark_worker_main <- function(
   spark_worker_hooks()
 
   tryCatch({
+    worker_log_session(sessionId)
+
     if (is.null(configRaw)) configRaw <- worker_config_serialize(list())
 
     config <- worker_config_deserialize(configRaw)
+
+    if (identical(config$profile, TRUE)) {
+      profile_name <- paste("spark-apply-", as.numeric(Sys.time()), ".Rprof", sep = "")
+      worker_log("starting new profile in ", file.path(getwd(), profile_name))
+      utils::Rprof(profile_name)
+    }
 
     if (config$debug) {
       worker_log("exiting to wait for debugging session to attach")
@@ -1167,13 +1188,17 @@ spark_worker_main <- function(
       return()
     }
 
-    worker_log_session(sessionId)
     worker_log("is starting")
 
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
     spark_worker_apply(sc)
+
+    if (identical(config$profile, TRUE)) {
+      # utils::Rprof(NULL)
+      worker_log("closing profile")
+    }
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)

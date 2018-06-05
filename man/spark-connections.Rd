@@ -12,7 +12,7 @@
 \alias{spark_disconnect_all}
 \title{Manage Spark Connections}
 \usage{
-spark_connect(master = "local", spark_home = Sys.getenv("SPARK_HOME"),
+spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
   method = c("shell", "livy", "databricks", "test"), app_name = "sparklyr",
   version = NULL, hadoop_version = NULL, config = spark_config(),
   extensions = sparklyr::registered_extensions(), ...)

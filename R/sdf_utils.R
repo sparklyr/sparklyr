@@ -30,3 +30,27 @@ sdf_fast_bind_cols <- function(...) {
   Reduce(zip_sdf, lapply(dots, spark_dataframe)) %>%
     sdf_register()
 }
+
+#' Debug Info for Spark DataFrame
+#'
+#' Prints plan of execution to generate \code{x}. This plan will, among other things, show the
+#' number of partitions in parenthesis at the far left and indicate stages using indentation.
+#'
+#' @param x An \R object wrapping, or containing, a Spark DataFrame.
+#' @param print Print debug information?
+#'
+#' @export
+sdf_debug_string <- function(x, print = TRUE) {
+  debug_string <- x %>%
+    spark_dataframe() %>%
+    invoke("rdd") %>%
+    invoke("toDebugString")
+
+  if (print)
+    cat(debug_string)
+
+  debug_string %>%
+    strsplit("\n", fixed=TRUE) %>%
+    unlist() %>%
+    invisible()
+}

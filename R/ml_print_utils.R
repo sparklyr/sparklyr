@@ -49,11 +49,6 @@ print_newline <- function() {
   cat("", sep = "\n")
 }
 
-ml_model_print_call <- function(model) {
-  printf("Call: %s\n", model$.call)
-  invisible(model$.call)
-}
-
 ml_model_print_residuals <- function(model,
                                      residuals.header = "Residuals") {
 
@@ -129,40 +124,4 @@ ml_model_print_centers <- function(model) {
   cat("Cluster centers:", sep = "\n")
   print(model$centers)
 
-}
-
-
-#' Spark ML - Feature Importance for Tree Models
-#'
-#' @param model A decision tree-based \code{ml_model}
-#' @template roxlate-ml-dots
-#'
-#' @return A sorted data frame with feature labels and their relative importance.
-#' @export
-ml_tree_feature_importance <- function(model, ...)
-{
-  # backwards compat, old signature was function(sc, model)
-  if (inherits(model, "spark_connection"))
-    model <- rlang::dots_list(...) %>% unlist()
-
-  supported <- grepl(
-    "ml_model_decision_tree|ml_model_gbt|ml_model_random_forest",
-    class(model)[1])
-
-  if (!supported)
-    stop("ml_tree_feature_importance() not supported for ", class(model)[1])
-
-  # enforce Spark 2.0.0 for certain models
-  requires_spark_2 <- grepl(
-    "ml_model_decision_tree|ml_model_gbt",
-    class(model)[1])
-
-  if (requires_spark_2)
-    spark_require_version(spark_connection(spark_jobj(model)), "2.0.0")
-
-  model$model$feature_importances %>%
-    cbind(model$.features, .) %>%
-    as.data.frame() %>%
-    rlang::set_names(c("feature", "importance")) %>%
-    dplyr::arrange(dplyr::desc(!!rlang::sym("importance")))
 }

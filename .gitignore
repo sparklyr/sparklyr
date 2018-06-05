@@ -44,3 +44,6 @@ h2ologs/*
 .project
 # blogdown
 /blogdown/public
+flights_model
+flights_pipeline
+new_flights_model

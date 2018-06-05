@@ -4,8 +4,10 @@
 \alias{ft_quantile_discretizer}
 \title{Feature Transformation -- QuantileDiscretizer (Estimator)}
 \usage{
-ft_quantile_discretizer(x, input_col, output_col, handle_invalid = "error",
-  num_buckets = 2L, relative_error = 0.001, dataset = NULL,
+ft_quantile_discretizer(x, input_col = NULL, output_col = NULL,
+  num_buckets = 2L, input_cols = NULL, output_cols = NULL,
+  num_buckets_array = NULL, handle_invalid = "error",
+  relative_error = 0.001, dataset = NULL,
   uid = random_string("quantile_discretizer_"), ...)
 }
 \arguments{
@@ -15,12 +17,19 @@ ft_quantile_discretizer(x, input_col, output_col, handle_invalid = "error",
 
 \item{output_col}{The name of the output column.}
 
+\item{num_buckets}{Number of buckets (quantiles, or categories) into which data
+points are grouped. Must be greater than or equal to 2.}
+
+\item{input_cols}{Names of input columns.}
+
+\item{output_cols}{Names of output columns.}
+
+\item{num_buckets_array}{Array of number of buckets (quantiles, or categories)
+into which data points are grouped. Each value must be greater than or equal to 2.}
+
 \item{handle_invalid}{(Spark 2.1.0+) Param for how to handle invalid entries. Options are
 'skip' (filter out rows with invalid values), 'error' (throw an error), or
 'keep' (keep invalid values in a special additional bucket). Default: "error"}
-
-\item{num_buckets}{Number of buckets (quantiles, or categories) into which data
-points are grouped. Must be greater than or equal to 2.}
 
 \item{relative_error}{(Spark 2.0.0+) Relative error (see documentation for
 org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
@@ -101,6 +110,7 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_chisq_selector}},
   \code{\link{ft_count_vectorizer}}, \code{\link{ft_dct}},
   \code{\link{ft_elementwise_product}},
+  \code{\link{ft_feature_hasher}},
   \code{\link{ft_hashing_tf}}, \code{\link{ft_idf}},
   \code{\link{ft_imputer}},
   \code{\link{ft_index_to_string}},

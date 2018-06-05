@@ -3,6 +3,9 @@ context("read-write")
 sc <- testthat_spark_connection()
 
 test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
+  if (.Platform$OS.type == "windows")
+    skip("CSV encoding is slightly different in windows")
+
   csv <- file("test.csv", "w+", encoding = "latin1")
   cat("Município;var;var 1.0\n1233;1;2", file=csv)
   close(csv)
@@ -36,6 +39,8 @@ test_that("spark_read_json() can load data using column names", {
 })
 
 test_that("spark_read_json() can load data using column types", {
+  test_requires("dplyr")
+
   json <- file("test.json", "w+")
   cat("{\"Sepal_Length\":5.1,\"Species\":\"setosa\", \"Other\": { \"a\": 1, \"b\": \"x\"}}\n", file = json)
   cat("{\"Sepal_Length\":4.9,\"Species\":\"setosa\", \"Other\": { \"a\": 2, \"b\": \"y\"}}\n", file = json)
@@ -72,6 +77,8 @@ test_that("spark_read_csv() can read long decimals", {
 })
 
 test_that("spark_read_text() and spark_write_text() read and write basic files", {
+  test_requires("dplyr")
+
   text_file <- file("test.txt", "w+")
   cat("1\n2\n3", file = text_file)
   close(text_file)
@@ -104,28 +111,19 @@ test_that("spark_write_table() can append data", {
   if (spark_version(sc) < "2.2.0") skip("svc not supported before 2.2.0")
   test_requires("dplyr")
 
-  create_table <-
-  "
-  CREATE EXTERNAL TABLE `test_write_table_append` (
-  `id` bigint )
-  ROW FORMAT SERDE
-  'org.apache.hadoop.hive.ql.io.orc.OrcSerde'
-  STORED AS INPUTFORMAT
-  'org.apache.hadoop.hive.ql.io.orc.OrcInputFormat'
-  OUTPUTFORMAT
-  'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'
-  LOCATION
-  'writetableappend'
-  "
+  iris_tbl <- testthat_tbl("iris")
 
-  DBI::dbGetQuery(sc, create_table)
-  df <- copy_to(sc, data.frame(id = 1L))
+  spark_write_table(iris_tbl, "iris_append_tbl")
+  expect_equal(
+    sdf_nrow(tbl(sc, "iris_append_tbl")),
+    nrow(iris)
+  )
 
-  spark_write_table(df, "test_write_table_append", mode = 'append')
-
-  append_table <- tbl(sc, "test_write_table_append")
-
-  expect_equal(sdf_nrow(append_table), 1)
+  spark_write_table(iris_tbl, "iris_append_tbl", mode = "append")
+  expect_equal(
+    sdf_nrow(tbl(sc, "iris_append_tbl")),
+    2 * nrow(iris)
+  )
 })
 
 test_that("spark_write_table() can write data", {

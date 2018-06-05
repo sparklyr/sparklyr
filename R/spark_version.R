@@ -51,6 +51,9 @@ spark_version_from_home_version <- function() {
 #' @export
 spark_version_from_home <- function(spark_home, default = NULL) {
   versionAttempts <- list(
+    useDefault = function() {
+      default
+    },
     useEnvironmentVariable = function() {
       spark_version_from_home_version()
     },
@@ -67,7 +70,8 @@ spark_version_from_home <- function(spark_home, default = NULL) {
     useAssemblies = function() {
       candidateVersions <- list(
         list(path = "lib", pattern = "spark-assembly-([0-9\\.]*)-hadoop.[0-9\\.]*\\.jar"),
-        list(path = "yarn", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar")
+        list(path = "yarn", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
+        list(path = "yarn", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar")
       )
 
       candidateFiles <- lapply(candidateVersions, function(e) {
@@ -90,9 +94,6 @@ spark_version_from_home <- function(spark_home, default = NULL) {
           return(match[[1]][[2]])
         }
       }
-    },
-    useDefault = function() {
-      default
     }
   )
 

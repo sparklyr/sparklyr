@@ -8,9 +8,17 @@ spark_worker_main <- function(
   spark_worker_hooks()
 
   tryCatch({
+    worker_log_session(sessionId)
+
     if (is.null(configRaw)) configRaw <- worker_config_serialize(list())
 
     config <- worker_config_deserialize(configRaw)
+
+    if (identical(config$profile, TRUE)) {
+      profile_name <- paste("spark-apply-", as.numeric(Sys.time()), ".Rprof", sep = "")
+      worker_log("starting new profile in ", file.path(getwd(), profile_name))
+      utils::Rprof(profile_name)
+    }
 
     if (config$debug) {
       worker_log("exiting to wait for debugging session to attach")
@@ -20,13 +28,17 @@ spark_worker_main <- function(
       return()
     }
 
-    worker_log_session(sessionId)
     worker_log("is starting")
 
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
     spark_worker_apply(sc)
+
+    if (identical(config$profile, TRUE)) {
+      # utils::Rprof(NULL)
+      worker_log("closing profile")
+    }
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)

@@ -44,6 +44,7 @@ ml_create_mapping_tables <- function() { # nocov start
          "force_index_label" = "forceIndexLabel",
          # ft_string_indexer
          "handle_invalid" = "handleInvalid",
+         "string_order_type" = "stringOrderType",
          # ft_one_hot_encoder
          "drop_last" = "dropLast",
          # ft_vector_assembler
@@ -62,11 +63,17 @@ ml_create_mapping_tables <- function() { # nocov start
          "vocab_size" = "vocabSize",
          # ft_quantile_discretizer
          "num_buckets" = "numBuckets",
+         "num_buckets_array" = "numBucketsArray",
          "relative_error" = "relativeError",
+         # ft_bucketizer
+         "splits_array" = "splitsArray",
+         # ft_feature-hasher
+         "categorical_cols" = "categoricalCols",
          # ml_generalized_linear_regression
          "link_prediction_col" = "linkPredictionCol",
          "variance_power" = "variancePower",
          "link_power" = "linkPower",
+         "offset_col" = "offsetCol",
          # ml_decision_tree_regressor
          "variance_col" = "varianceCol",
          "checkpoint_interval" = "checkpointInterval",
@@ -124,7 +131,9 @@ ml_create_mapping_tables <- function() { # nocov start
          # ml_bisecting_kmeans
          "min_divisible_cluster_size" = "minDivisibleClusterSize",
          # evaluators
-         "metric_name" = "metricName")
+         "metric_name" = "metricName",
+         # tuning
+         "collect_sub_models" = "collectSubModels")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
@@ -156,6 +165,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "VectorAssembler" = "vector_assembler",
     "NGram" = "ngram",
     "VectorSlicer" = "vector_slicer",
+    "FeatureHasher" = "feature_hasher",
     # feature (estimators)
     "VectorIndexer" = "vector_indexer",
     "VectorIndexerModel" = "VectorIndexerModel",
@@ -208,6 +218,8 @@ ml_create_mapping_tables <- function() { # nocov start
     # classification
     "GBTClassifier" = "gbt_classifier",
     "GBTClassificationModel" = "gbt_classification_model",
+    "DecisionTreeClassifier" = "decision_tree_classifier",
+    "DecisionTreeClassificationModel" = "decision_tree_classification_model",
     "RandomForestClassifier" = "random_forest_classifier",
     "RandomForestClassificationModel" = "random_forest_classification_model",
     "NaiveBayes" = "naive_bayes",
@@ -242,6 +254,7 @@ ml_create_mapping_tables <- function() { # nocov start
     "BinaryClassificationEvaluator" = "binary_classification_evaluator",
     "MulticlassClassificationEvaluator" = "multiclass_classification_evaluator",
     "RegressionEvaluator" = "regression_evaluator",
+    "ClusteringEvaluator" = "clustering_evaluator",
     # pipeline
     "Pipeline" = "pipeline",
     "PipelineModel" = "pipeline_model",

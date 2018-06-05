@@ -3,19 +3,27 @@
 %   R/ml_tuning_train_validation_split.R
 \name{ml-tuning}
 \alias{ml-tuning}
+\alias{ml_sub_models}
+\alias{ml_validation_metrics}
 \alias{ml_cross_validator}
 \alias{ml_train_validation_split}
 \title{Spark ML -- Tuning}
 \usage{
+ml_sub_models(model)
+
+ml_validation_metrics(model)
+
 ml_cross_validator(x, estimator, estimator_param_maps, evaluator,
-  num_folds = 3L, seed = NULL, uid = random_string("cross_validator_"),
-  ...)
+  num_folds = 3L, collect_sub_models = FALSE, parallelism = 1L,
+  seed = NULL, uid = random_string("cross_validator_"), ...)
 
 ml_train_validation_split(x, estimator, estimator_param_maps, evaluator,
-  train_ratio = 0.75, seed = NULL,
-  uid = random_string("train_validation_split_"), ...)
+  train_ratio = 0.75, collect_sub_models = FALSE, parallelism = 1L,
+  seed = NULL, uid = random_string("train_validation_split_"), ...)
 }
 \arguments{
+\item{model}{A cross validation or train-validation-split model.}
+
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{estimator}{A \code{ml_estimator} object.}
@@ -25,6 +33,13 @@ ml_train_validation_split(x, estimator, estimator_param_maps, evaluator,
 \item{evaluator}{A \code{ml_evaluator} object, see \link{ml_evaluator}.}
 
 \item{num_folds}{Number of folds for cross validation. Must be >= 2. Default: 3}
+
+\item{collect_sub_models}{Whether to collect a list of sub-models trained during tuning.
+If set to \code{FALSE}, then only the single best sub-model will be available after fitting.
+If set to true, then all sub-models will be available. Warning: For large models, collecting
+all sub-models can cause OOMs on the Spark driver.}
+
+\item{parallelism}{The number of threads to use when running parallel algorithms. Default is 1 for serial execution.}
 
 \item{seed}{A random seed. Set this value if you need your results to be
 reproducible across repeated calls.}
@@ -48,6 +63,15 @@ The object returned depends on the class of \code{x}.
   immediately fit with the input \code{tbl_spark}, returning a \code{ml_cross_validation_model} or a
   \code{ml_train_validation_split_model} object.
 }
+
+For cross validation, \code{ml_sub_models()} returns a nested
+  list of models, where the first layer represents fold indices and the
+  second layer represents param maps. For train-validation split,
+  \code{ml_sub_models()} returns a list of models, corresponding to the
+  order of the estimator param maps.
+
+\code{ml_validation_metrics()} returns a data frame of performance
+  metrics and hyperparameter combinations.
 }
 \description{
 Perform hyper-parameter tuning using either K-fold cross validation or train-validation split.

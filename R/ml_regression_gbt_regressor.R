@@ -8,6 +8,7 @@ ml_gbt_regressor <- function(
   max_depth = 5L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   min_instances_per_node = 1L,
   max_bins = 32L,
   min_info_gain = 0,
@@ -32,6 +33,7 @@ ml_gbt_regressor.spark_connection <- function(
   max_depth = 5L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   min_instances_per_node = 1L,
   max_bins = 32L,
   min_info_gain = 0,
@@ -61,7 +63,9 @@ ml_gbt_regressor.spark_connection <- function(
     invoke("setLossType", loss_type) %>%
     invoke("setMaxIter", max_iter) %>%
     invoke("setStepSize", step_size) %>%
-    invoke("setSubsamplingRate", subsampling_rate)
+    invoke("setSubsamplingRate", subsampling_rate) %>%
+    jobj_set_param("setFeatureSubsetStrategy", feature_subset_strategy,
+                   "auto", "2.3.0")
 
   if (!rlang::is_null(seed))
     jobj <- invoke(jobj, "setSeed", seed)
@@ -77,6 +81,7 @@ ml_gbt_regressor.ml_pipeline <- function(
   max_depth = 5L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   min_instances_per_node = 1L,
   max_bins = 32L,
   min_info_gain = 0,
@@ -102,6 +107,7 @@ ml_gbt_regressor.tbl_spark <- function(
   max_depth = 5L,
   step_size = 0.1,
   subsampling_rate = 1,
+  feature_subset_strategy = "auto",
   min_instances_per_node = 1L,
   max_bins = 32L,
   min_info_gain = 0,
@@ -125,11 +131,9 @@ ml_gbt_regressor.tbl_spark <- function(
     predictor %>%
       ml_fit(x)
   } else {
-    call <- if (identical(sys.call(sys.parent())[[1]], quote(ml_gradient_boosted_trees)))
-      sys.call(sys.parent())
     ml_generate_ml_model(
       x, predictor, formula, features_col, label_col,
-      "regression", new_ml_model_gbt_regression, call = call
+      "regression", new_ml_model_gbt_regression
     )
   }
 }
@@ -151,6 +155,7 @@ ml_validator_gbt_regressor <- function(args, nms) {
       step_size <- ensure_scalar_double(step_size)
       subsampling_rate <- ensure_scalar_double(subsampling_rate)
       loss_type <- ensure_scalar_character(loss_type)
+      feature_subset_strategy <- ensure_scalar_character(feature_subset_strategy)
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }
@@ -166,7 +171,6 @@ new_ml_gbt_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     feature_importances = try_null(read_spark_vector(jobj, "featureImportances")),
-    num_trees = invoke(jobj, "numTrees"),
     num_features = invoke(jobj, "numFeatures"),
     total_num_nodes = invoke(jobj, "totalNumNodes"),
     tree_weights = invoke(jobj, "treeWeights"),
@@ -183,7 +187,6 @@ new_ml_model_gbt_regression <- function(
   new_ml_model_regression(
     pipeline, pipeline_model, model, dataset, formula,
     subclass = "ml_model_gbt_regression",
-    .features = feature_names,
-    .call = call
+    .features = feature_names
   )
 }

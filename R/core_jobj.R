@@ -10,6 +10,7 @@
 #'
 #' @seealso \code{\link{invoke}}, for calling methods on Java object references.
 #'
+#' @exportClass spark_jobj
 #' @export
 spark_jobj <- function(x, ...) {
   UseMethod("spark_jobj")

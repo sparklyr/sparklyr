@@ -6,6 +6,7 @@
 #' @template roxlate-ml-formula-params
 #' @template roxlate-ml-linear-regression-params
 #' @template roxlate-ml-predictor-params
+#' @param offset_col Offset column name. If this is not set, we treat all instance offsets as 0.0. The feature specified as offset has a constant coefficient of 1.0.
 #' @param family Name of family which is a description of the error distribution to be used in the model. Supported options: "gaussian", "binomial", "poisson", "gamma" and "tweedie". Default is "gaussian".
 #' @param link Name of link function which provides the relationship between the linear predictor and the mean of the distribution function. See for supported link functions.
 #' @param link_power Index in the power link function. Only applicable to the Tweedie family. Note that link power 0, 1, -1 or 0.5 corresponds to the Log, Identity, Inverse or Sqrt link, respectively. When not set, this value defaults to 1 - variancePower, which matches the R "statmod" package.
@@ -28,6 +29,7 @@ ml_generalized_linear_regression <- function(
   family = "gaussian",
   link = NULL,
   fit_intercept = TRUE,
+  offset_col = NULL,
   link_power = NULL,
   link_prediction_col = NULL,
   reg_param = 0,
@@ -52,6 +54,7 @@ ml_generalized_linear_regression.spark_connection <- function(
   family = "gaussian",
   link = NULL,
   fit_intercept = TRUE,
+  offset_col = NULL,
   link_power = NULL,
   link_prediction_col = NULL,
   reg_param = 0,
@@ -93,6 +96,9 @@ ml_generalized_linear_regression.spark_connection <- function(
   if (!rlang::is_null(weight_col))
     jobj <- invoke(jobj, "setWeightCol", weight_col)
 
+  if (!rlang::is_null(offset_col))
+    jobj <- jobj_set_param(jobj, "setOffsetCol", offset_col, NULL, "2.3.0")
+
   new_ml_generalized_linear_regression(jobj)
 }
 
@@ -103,6 +109,7 @@ ml_generalized_linear_regression.ml_pipeline <- function(
   family = "gaussian",
   link = NULL,
   fit_intercept = TRUE,
+  offset_col = NULL,
   link_power = NULL,
   link_prediction_col = NULL,
   reg_param = 0,
@@ -127,6 +134,7 @@ ml_generalized_linear_regression.tbl_spark <- function(
   family = "gaussian",
   link = NULL,
   fit_intercept = TRUE,
+  offset_col = NULL,
   link_power = NULL,
   link_prediction_col = NULL,
   reg_param = 0,
@@ -186,6 +194,8 @@ ml_validator_generalized_linear_regression <- function(args, nms) {
       fit_intercept <- ensure_scalar_boolean(fit_intercept)
       solver <- rlang::arg_match(solver, c("irls"))
       tol <- ensure_scalar_double(tol)
+      if (!rlang::is_null(offset_col))
+        offset_col <- ensure_scalar_character(offset_col)
       if (!rlang::is_null(weight_col))
         weight_col <- ensure_scalar_character(weight_col)
       if (!rlang::is_null(link_prediction_col))
@@ -203,7 +213,10 @@ new_ml_generalized_linear_regression <- function(jobj) {
 new_ml_generalized_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary"))
   {
-    new_ml_summary_generalized_linear_regression_model(invoke(jobj, "summary"))
+    fit_intercept <- ml_get_param_map(jobj)$fit_intercept
+    new_ml_summary_generalized_linear_regression_model(
+      invoke(jobj, "summary"), fit_intercept
+      )
   } else NA
 
   new_ml_prediction_model(
@@ -218,24 +231,28 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     subclass = "ml_generalized_linear_regression_model")
 }
 
-new_ml_summary_generalized_linear_regression_model <- function(jobj) {
+new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_intercept) {
   version <- jobj %>%
     spark_connection() %>%
     spark_version()
   resid <- function(x) invoke(jobj, "residuals", x) %>%
     sdf_register()
 
+  arrange_stats <- make_stats_arranger(fit_intercept)
+
   new_ml_summary(
     jobj,
     aic = invoke(jobj, "aic"),
-    coefficient_standard_errors = try_null(invoke(jobj, "coefficientStandardErrors")),
+    coefficient_standard_errors = try_null(invoke(jobj, "coefficientStandardErrors")) %>%
+      arrange_stats(),
     degrees_of_freedom = invoke(jobj, "degreesOfFreedom"),
     deviance = invoke(jobj, "deviance"),
     dispersion = invoke(jobj, "dispersion"),
     null_deviance = invoke(jobj, "nullDeviance"),
     num_instances = if (version > "2.2.0") invoke(jobj, "numInstances") else NULL,
     num_iterations = try_null(invoke(jobj, "numIterations")),
-    p_values = try_null(invoke(jobj, "pValues")),
+    p_values = try_null(invoke(jobj, "pValues")) %>%
+      arrange_stats(),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     rank = invoke(jobj, "rank"),
@@ -244,7 +261,8 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj) {
     residuals = function(type = "deviance") (invoke(jobj, "residuals", type)
                                              %>% sdf_register()),
     solver = try_null(invoke(jobj, "solver")),
-    t_values = try_null(invoke(jobj, "tValues")),
+    t_values = try_null(invoke(jobj, "tValues")) %>%
+      arrange_stats(),
     subclass = "ml_summary_generalized_linear_regression")
 }
 
@@ -269,8 +287,7 @@ new_ml_model_generalized_linear_regression <- function(
     coefficients = coefficients,
     summary = summary,
     subclass = "ml_model_generalized_linear_regression",
-    .features = feature_names,
-    .call = call
+    .features = feature_names
   )
 }
 
@@ -280,8 +297,6 @@ new_ml_model_generalized_linear_regression <- function(
 print.ml_model_generalized_linear_regression <-
   function(x, digits = max(3L, getOption("digits") - 3L), ...)
   {
-    ml_model_print_call(x)
-    print_newline()
     ml_model_print_coefficients(x)
     print_newline()
 
@@ -301,8 +316,6 @@ print.ml_model_generalized_linear_regression <-
 summary.ml_model_generalized_linear_regression <-
   function(object, digits = max(3L, getOption("digits") - 3L), ...)
   {
-    ml_model_print_call(object)
-    print_newline()
     ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
     print_newline()
     ml_model_print_coefficients_detailed(object)

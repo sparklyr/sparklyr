@@ -253,7 +253,7 @@ sdf_separate_column <- function(x,
       dplyr::pull(!!rlang::sym(column)) %>%
       rlang::flatten() %>%
       length() %>%
-      seq_len()
+      seq_len(.)
 
     names <- sprintf("%s_%i", column, indices)
 

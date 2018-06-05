@@ -35,7 +35,9 @@ spark_get_checkpoint_dir <- function(sc) {
 #' @export
 spark_table_name <- function(expr) {
   table_name <- deparse(expr)
-  if (grepl("^[a-zA-Z][a-zA-Z0-9_]*$", table_name)) table_name else random_string(prefix = "sparklyr_")
+  if (identical(length(table_name), 1L) &&
+      grepl("^[a-zA-Z][a-zA-Z0-9_]*$", table_name[[1]])
+  ) table_name else random_string(prefix = "sparklyr_")
 }
 
 #' Superclasses of object

@@ -71,6 +71,4 @@ test_that("ml_aft_survival_regression() works properly", {
                structure(c(2.63808989630564, -0.496304411053117, 0.198452172529228
                ), .Names = c("(Intercept)", "V1", "V2")),
                tolerance = 1e-05)
-  output <- capture.output(aft_model)
-  expect_identical(output[3], "Formula: label ~ V1 + V2")
 })
