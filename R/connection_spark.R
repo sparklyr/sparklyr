@@ -36,8 +36,8 @@ spark_default_app_jar <- function(version) {
 #'   \code{SPARK_HOME} is defined, it will be always be used unless the
 #'   \code{version} parameter is specified to force the use of a locally
 #'   installed version.
-#' @param method The method used to connect to Spark. Currently, only
-#'   \code{"shell"} is supported.
+#' @param method The method used to connect to Spark: \code{"shell"},
+#'   \code{"livy"}, \code{"gateway"} and \code{"databricks"}.
 #' @param app_name The application name to be used while running in the Spark
 #'   cluster.
 #' @param version The version of Spark to use. Only applicable to
@@ -49,7 +49,8 @@ spark_default_app_jar <- function(version) {
 #'   \code{\link[=register_extension]{sparklyr::register_extension}} will be passed here.
 #' @param config Custom configuration for the generated Spark connection. See
 #'   \code{\link{spark_config}} for details.
-#' @param ... Optional arguments; currently unused.
+#' @param ... Additional configuration parameters to be added to \code{config} using
+#'   \code{spark_config()}.
 #'
 #' @name spark-connections
 NULL
@@ -64,13 +65,13 @@ NULL
 #' spark_disconnect(sc)
 #'
 #' @export
-spark_connect <- function(master,
+spark_connect <- function(config = spark_config(),
+                          master = NULL,
                           spark_home = Sys.getenv("SPARK_HOME"),
                           method = c("shell", "livy", "databricks", "test"),
                           app_name = "sparklyr",
                           version = NULL,
                           hadoop_version = NULL,
-                          config = spark_config(),
                           extensions = sparklyr::registered_extensions(),
                           ...)
 {

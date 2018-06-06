@@ -8,5 +8,5 @@ default:
   # default spark packages to load
   # sparklyr.defaultPackages:
 
-  # command line arguments to spark-shell
+  # command line arguments to spark-submit
   # sparklyr.shell.*

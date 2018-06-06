@@ -1,16 +1,35 @@
 #' Read Spark Configuration
 #'
 #' @export
-#' @param file Name of the configuration file
-#' @param use_default TRUE to use the built-in defaults provided in this package
+#' @param master Spark cluster url to connect to. Use \code{"local"} to
+#'   connect to a local instance of Spark installed via
+#'   \code{\link{spark_install}}.
+#' @param memory Total memory to use in driver and executors. Requires
+#'   \code{master} to be set to translate correctly to each cluster manager.
+#' @param cores Total memory to use in driver and executors. Requires
+#'   \code{master} to be set to translate correctly to each cluster manager.
+#' @param file Name of the configuration file.
+#' @param ... Configuration parameters, for example, `spark.num.executors`.
 #'
 #' @details
 #'
 #' Read Spark configuration using the \pkg{\link[config]{config}} package.
 #'
+#' The \code{use_default} parameter is deprecated but still supported for
+#' compatibility.
+#'
 #' @return Named list with configuration data
-spark_config <- function(file = "config.yml", use_default = TRUE) {
+spark_config <- function(
+  master = "local",
+  memory = NULL,
+  cores = NULL,
+  file = "config.yml",
+  ...
+) {
   baseConfig <- list()
+
+  params <- list(...)
+  use_default <- if (is.null(params$use_default)) TRUE
 
   if (use_default) {
     localConfigFile <- system.file(file.path("conf", "config-template.yml"), package = "sparklyr")
@@ -35,6 +54,16 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   }
 
   mergedConfig
+}
+
+#' Save Spark Configuration
+#'
+#' @param config The configuration list from \code{spark_config()}
+#' @param file file Name of the configuration file.
+#'
+#' @export
+spark_config_save <- function(config, file) {
+  yaml::write_yaml(list(default = config), file)
 }
 
 #' A helper function to check value exist under \code{spark_config()}
