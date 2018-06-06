@@ -1,5 +1,8 @@
 # Sparklyr 0.9.0 (unreleased)
 
+- Added support for `sparklyr.apply.packages` to configure default
+  behavior for `spark_apply()` parameters (#1530).
+
 - Added support for `spark.r.libpaths` to configure package library in
   `spark_apply()` (#1530).
 
