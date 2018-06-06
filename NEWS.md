@@ -1,5 +1,7 @@
 # Sparklyr 0.9.0 (unreleased)
 
+- Fixed Livy version with MapR distributions.
+
 - Avoid preparing windows environment in non-local connections.
 
 - Removed `install` column from `livy_available_versions()`.
