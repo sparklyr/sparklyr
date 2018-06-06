@@ -130,6 +130,11 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'  https://cran.r-project.org/web/packages/packages.rds and set
 #'   \code{Sys.setenv(sparklyr.apply.packagesdb = "<pathl-to-rds>")}. Otherwise,
 #'   all packages will be used by default.
+#'
+#'   For clusters where R packages already installed in every worker node,
+#'   the \code{spark.r.libpaths} config entry can be set in \code{spark_config()}
+#'   to the local packages library. If specified, the packages parameter becomes
+#'   disabled.
 #' @param context Optional object to be serialized and passed back to \code{f()}.
 #' @param ... Optional arguments; currently unused.
 #'
@@ -174,11 +179,17 @@ spark_apply <- function(x,
   grouped <- !is.null(group_by)
   args <- list(...)
   rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
+  libpaths <- spark_config_value(sc$config, "spark.r.libpaths", FALSE)
   proc_env <- connection_config(sc, "sparklyr.apply.env.")
 
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
     columns <- args$names
+  }
+
+  # disable packages if worker is already properly configured
+  if (identical(libpaths, TRUE)) {
+    packages <- FALSE
   }
 
   columns_typed <- length(names(columns)) > 0
