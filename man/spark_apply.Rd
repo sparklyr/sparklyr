@@ -5,7 +5,7 @@
 \title{Apply an R Function in Spark}
 \usage{
 spark_apply(x, f, columns = colnames(x), memory = TRUE, group_by = NULL,
-  packages = TRUE, context = NULL, ...)
+  packages = NULL, context = NULL, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -29,6 +29,9 @@ adds indexed column names when not enough columns are specified.}
   a list of packages to distribute, or a package bundle created with
   \code{spark_apply_bundle()}.
 
+  Defaults to \code{TRUE} or the \code{sparklyr.apply.packages} value set in
+  \code{spark_config()}.
+
   For clusters using Yarn cluster mode, \code{packages} can point to a package
   bundle created using \code{spark_apply_bundle()} and made available as a Spark
   file using \code{config$sparklyr.shell.files}. For clusters using Livy, packages
@@ -38,7 +41,11 @@ adds indexed column names when not enough columns are specified.}
   manually download the packages database from
  https://cran.r-project.org/web/packages/packages.rds and set
   \code{Sys.setenv(sparklyr.apply.packagesdb = "<pathl-to-rds>")}. Otherwise,
-  all packages will be used by default.}
+  all packages will be used by default.
+
+  For clusters where R packages already installed in every worker node,
+  the \code{spark.r.libpaths} config entry can be set in \code{spark_config()}
+  to the local packages library.}
 
 \item{context}{Optional object to be serialized and passed back to \code{f()}.}
 
