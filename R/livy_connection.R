@@ -704,6 +704,7 @@ livy_load_scala_sources <- function(sc) {
 
   livySparkVersion <- livy_post_statement(sc, "sc.version") %>%
     gsub("^.+= |[\n\r \t]", "", .) %>%
+    spark_version_clean() %>%
     numeric_version()
 
   livySourcesFiles <- livySourcesFiles[sourceOrder] %>%
@@ -712,6 +713,7 @@ livy_load_scala_sources <- function(sc) {
         dirname() %>%
         basename() %>%
         gsub("^spark-", "", .) %>%
+        spark_version_clean() %>%
         numeric_version()
       requiredVersion <= livySparkVersion
     }, .)
