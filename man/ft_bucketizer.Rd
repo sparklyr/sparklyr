@@ -53,6 +53,21 @@ Similar to \R's \code{\link{cut}} function, this transforms a numeric column
 into a discretized column, with breaks specified through the \code{splits}
 parameter.
 }
+\examples{
+\dontrun{
+library(dplyr)
+
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+iris_tbl \%>\%
+  ft_bucketizer(input_col  = "Sepal_Length",
+                output_col = "Sepal_Length_bucket",
+                splits     = c(0, 4.5, 5, 8)) \%>\%
+  select(Sepal_Length, Sepal_Length_bucket, Species)
+}
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame

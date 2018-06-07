@@ -120,6 +120,9 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'   a list of packages to distribute, or a package bundle created with
 #'   \code{spark_apply_bundle()}.
 #'
+#'   Defaults to \code{TRUE} or the \code{sparklyr.apply.packages} value set in
+#'   \code{spark_config()}.
+#'
 #'   For clusters using Yarn cluster mode, \code{packages} can point to a package
 #'   bundle created using \code{spark_apply_bundle()} and made available as a Spark
 #'   file using \code{config$sparklyr.shell.files}. For clusters using Livy, packages
@@ -130,6 +133,10 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'  https://cran.r-project.org/web/packages/packages.rds and set
 #'   \code{Sys.setenv(sparklyr.apply.packagesdb = "<pathl-to-rds>")}. Otherwise,
 #'   all packages will be used by default.
+#'
+#'   For clusters where R packages already installed in every worker node,
+#'   the \code{spark.r.libpaths} config entry can be set in \code{spark_config()}
+#'   to the local packages library.
 #' @param context Optional object to be serialized and passed back to \code{f()}.
 #' @param ... Optional arguments; currently unused.
 #'
@@ -161,7 +168,7 @@ spark_apply <- function(x,
                         columns = colnames(x),
                         memory = TRUE,
                         group_by = NULL,
-                        packages = TRUE,
+                        packages = NULL,
                         context = NULL,
                         ...) {
   args <- list(...)
@@ -174,11 +181,22 @@ spark_apply <- function(x,
   grouped <- !is.null(group_by)
   args <- list(...)
   rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
+  packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
   proc_env <- connection_config(sc, "sparklyr.apply.env.")
 
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
     columns <- args$names
+  }
+
+  # set default value for packages based on config
+  if (identical(packages, NULL)) {
+    if (identical(packages_config, NULL)) {
+      packages <- TRUE
+    }
+    else {
+      packages <- packages_config
+    }
   }
 
   columns_typed <- length(names(columns)) > 0
