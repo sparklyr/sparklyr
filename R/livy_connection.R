@@ -378,17 +378,19 @@ livy_post_statement <- function(sc, code) {
   statementReponse <- content(req)
   assert_that(!is.null(statementReponse$id))
 
-  waitTimeout <- spark_config_value(sc$config, "livy.session.command.timeout", 60)
-  waitTimeout <- waitTimeout * 10
+  waitTimeout <- spark_config_value(sc$config, "livy.session.command.timeout", 30 * 24 * 60 * 60)
+  pollInterval <- spark_config_value(sc$config, "livy.session.command.interval", 5)
+
+  commandStart <- Sys.time()
+
   sleepTime <- 0.001
   while ((statementReponse$state == "running" || statementReponse$state == "waiting" ) &&
-         waitTimeout > 0) {
+         Sys.time() < commandStart + waitTimeout) {
     statementReponse <- livy_get_statement(sc, statementReponse$id)
 
     Sys.sleep(sleepTime)
 
-    waitTimeout <- waitTimeout - 1
-    sleepTime <- sleepTime * 2
+    sleepTime <- min(pollInterval, sleepTime * 2)
   }
 
   if (statementReponse$state != "available") {
