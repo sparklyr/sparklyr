@@ -1,5 +1,10 @@
 # Sparklyr 0.9.0 (unreleased)
 
+- Improve performance in Livy for long execution queries, fixed
+  `livy.session.command.timeout` and support for 
+  `livy.session.command.interval` to control max polling while waiting
+  for command response (#1538).
+
 - Added support for `sparklyr.apply.packages` to configure default
   behavior for `spark_apply()` parameters (#1530).
 
