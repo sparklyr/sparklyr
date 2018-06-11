@@ -7,5 +7,9 @@
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
-  if (!name %in% names(config)) default else config[[name]]
+  matches <- name %in% names(config)
+  if (!any(matches))
+    default
+  else
+    config[[name]][[1]]
 }

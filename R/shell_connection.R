@@ -71,8 +71,8 @@ shell_connection <- function(master,
     spark_version = version,
     app_name = app_name,
     config = config,
-    jars = spark_config_value(config, "sparklyr.jars.default", list()),
-    packages = spark_config_value(config, "sparklyr.defaultPackages"),
+    jars = spark_config_value(config, c("sparklyr.jars", "sparklyr.jars.default"), list()),
+    packages = spark_config_value(config, c("sparklyr.packages", "sparklyr.defaultPackages")),
     extensions = extensions,
     environment = environment,
     shell_args = shell_args,
@@ -293,7 +293,11 @@ start_shell <- function(master,
     output_file <- Sys.getenv("SPARKLYR_LOG_FILE", tempfile(fileext = "_spark.log"))
     error_file <- Sys.getenv("SPARKLYR_LOG_FILE", tempfile(fileext = "_spark.err"))
 
-    console_log <- spark_config_exists(config, "sparklyr.log.console", FALSE)
+    console_log <- spark_config_exists(
+      config,
+      "sparklyr.log.console",
+      identical(spark_config_value(config, "sparklyr.log", ""), "console")
+    )
 
     stdout_param <- if (console_log) "" else output_file
     stderr_param <- if (console_log) "" else output_file
