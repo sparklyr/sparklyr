@@ -98,9 +98,11 @@ ml_load <- function(sc, path) {
     dplyr::pull(!!rlang::sym("class"))
 
   # Drop temp view
-  spark_session(sc) %>%
-    invoke("catalog") %>%
-    invoke("dropTempView", metadata_table_name)
+  if (spark_version(sc) > "2.0.0") {
+    spark_session(sc) %>%
+      invoke("catalog") %>%
+      invoke("dropTempView", metadata_table_name)
+  }
 
   invoke_static(sc, class, "load", path) %>%
     ml_constructor_dispatch()
