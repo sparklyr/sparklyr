@@ -7,3 +7,7 @@ dim.tbl_spark <- function(x) {
 type_sum.spark_jobj <- function(x) {
   paste0(jobj_info(x)$repr)
 }
+
+tbl_spark_ignored <- function() {
+  "^sparklyr_tmp_|^ml_load_metadata"
+}

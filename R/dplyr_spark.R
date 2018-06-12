@@ -62,7 +62,7 @@ src_tbls.spark_connection <- function(x, ...) {
   tbls <- invoke(sql, "sql", "SHOW TABLES")
   tableNames <- sdf_read_column(tbls, "tableName")
 
-  filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
+  filtered <- grep(tbl_spark_ignored(), tableNames, invert = TRUE, value = TRUE)
   sort(filtered)
 }
 
