@@ -1,9 +1,22 @@
 # Sparklyr 0.9.0 (unreleased)
 
+### Data
+
+- Added support to read and write ORC files using `spark_read_orc()` and
+  `spark_write_orc()` (#1548).
+  
+### Livy
+
 - Improve performance in Livy for long execution queries, fixed
   `livy.session.command.timeout` and support for 
   `livy.session.command.interval` to control max polling while waiting
   for command response (#1538).
+
+- Fixed Livy version with MapR distributions.
+
+- Removed `install` column from `livy_available_versions()`.
+
+### Distributed R
 
 - Added support for `sparklyr.apply.packages` to configure default
   behavior for `spark_apply()` parameters (#1530).
@@ -11,11 +24,9 @@
 - Added support for `spark.r.libpaths` to configure package library in
   `spark_apply()` (#1530).
 
-- Fixed Livy version with MapR distributions.
+### Connections
 
 - Avoid preparing windows environment in non-local connections.
-
-- Removed `install` column from `livy_available_versions()`.
 
 # Sparklyr 0.8.4
 
