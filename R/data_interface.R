@@ -277,7 +277,7 @@ spark_write_parquet.spark_jobj <- function(x,
                                            partition_by = NULL,
                                            ...) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, normalizePath(path), "parquet", mode, options, partition_by)
+  spark_data_write_generic(x, spark_normalize_path(path), "parquet", mode, options, partition_by)
 }
 
 #' Read a JSON file into a Spark DataFrame
@@ -824,4 +824,79 @@ spark_write_text.spark_jobj <- function(x,
                                         ...) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   spark_data_write_generic(x, spark_normalize_path(path), "text", mode, options, partition_by)
+}
+
+#' Read a ORC file into a Spark DataFrame
+#'
+#' Read a \href{https://orc.apache.org/}{ORC} file into a Spark
+#' DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param schema A (java) read schema. Useful for optimizing read operation on nested data.
+#'
+#' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
+#'   the local file system (\code{file://}).
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_orc <- function(sc,
+                           name,
+                           path,
+                           options = list(),
+                           repartition = 0,
+                           memory = TRUE,
+                           overwrite = TRUE,
+                           columns = NULL,
+                           schema = NULL,
+                           ...) {
+
+  if (overwrite) spark_remove_table_if_exists(sc, name)
+
+  df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "orc", options, columns, schema)
+  spark_partition_register_df(sc, df, name, repartition, memory)
+}
+
+#' Write a Spark DataFrame to a ORC file
+#'
+#' Serialize a Spark DataFrame to the
+#' \href{https://orc.apache.org/}{ORC} format.
+#'
+#' @inheritParams spark_write_csv
+#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_write_orc <- function(x,
+                            path,
+                            mode = NULL,
+                            options = list(),
+                            partition_by = NULL,
+                            ...) {
+  UseMethod("spark_write_orc")
+}
+
+#' @export
+spark_write_orc.tbl_spark <- function(x,
+                                      path,
+                                      mode = NULL,
+                                      options = list(),
+                                      partition_by = NULL,
+                                      ...) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  spark_data_write_generic(sqlResult, spark_normalize_path(path), "orc", mode, options, partition_by)
+}
+
+#' @export
+spark_write_orc.spark_jobj <- function(x,
+                                       path,
+                                       mode = NULL,
+                                       options = list(),
+                                       partition_by = NULL,
+                                       ...) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  spark_data_write_generic(x, spark_normalize_path(path), "orc", mode, options, partition_by)
 }
