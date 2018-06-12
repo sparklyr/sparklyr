@@ -26,6 +26,8 @@
 
 ### Connections
 
+- `ml_load()` no longer keeps extraneous table views which was cluttering up the RStudio Connections pane (@randomgambit, #1549).
+
 - Avoid preparing windows environment in non-local connections.
 
 # Sparklyr 0.8.4
