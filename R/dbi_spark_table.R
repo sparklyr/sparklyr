@@ -33,7 +33,7 @@ setMethod("dbListTables", "spark_connection", function(conn) {
   df <- df_from_sql(conn, "SHOW TABLES")
 
   tableNames <- df$tableName
-  filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
+  filtered <- grep(tbl_spark_ignored(), tableNames, invert = TRUE, value = TRUE)
   sort(filtered)
 })
 
