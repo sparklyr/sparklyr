@@ -74,7 +74,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
     # read the spark log
     msg <- core_read_spark_log_error(sc)
     close(sc$backend)
-    close(sc$monitor)
+    close(sc$gateway)
     withr::with_options(list(
       warning.length = 8000
     ), {

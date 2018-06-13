@@ -381,7 +381,7 @@ start_shell <- function(master,
     # spark_shell_connection
     spark_home = spark_home,
     backend = backend,
-    monitor = gatewayInfo$gateway,
+    gateway = gatewayInfo$gateway,
     output_file = output_file,
     sessionId = sessionId,
     state = new.env()
@@ -411,7 +411,7 @@ stop_shell <- function(sc, terminate = FALSE) {
                 terminationMode)
 
   close(sc$backend)
-  close(sc$monitor)
+  close(sc$gateway)
 }
 
 #' @export
@@ -419,7 +419,7 @@ connection_is_open.spark_shell_connection <- function(sc) {
   bothOpen <- FALSE
   if (!identical(sc, NULL)) {
     tryCatch({
-      bothOpen <- isOpen(sc$backend) && isOpen(sc$monitor)
+      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateaway)
     }, error = function(e) {
     })
   }

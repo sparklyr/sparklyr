@@ -47,7 +47,7 @@ spark_worker_connect <- function(
     # spark_shell_connection
     spark_home = NULL,
     backend = backend,
-    monitor = gatewayInfo$gateway,
+    gateway = gatewayInfo$gateway,
     output_file = NULL
   ))
 

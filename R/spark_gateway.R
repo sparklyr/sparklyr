@@ -57,7 +57,7 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
     # spark_gateway_connection : spark_shell_connection
     spark_home = NULL,
     backend = backend,
-    monitor = gatewayInfo$gateway,
+    gateway = gatewayInfo$gateway,
     output_file = NULL
   ))
 
