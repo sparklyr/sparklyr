@@ -426,7 +426,7 @@ connection_is_open.spark_shell_connection <- function(sc) {
   bothOpen <- FALSE
   if (!identical(sc, NULL)) {
     tryCatch({
-      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateaway)
+      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
     }, error = function(e) {
     })
   }
