@@ -193,5 +193,8 @@ readStruct <- function(con) {
 
 readRaw <- function(con) {
   dataLen <- readInt(con)
-  readBinWait(con, raw(), as.integer(dataLen), endian = "big")
+  if (dataLen == 0)
+    raw()
+  else
+    readBinWait(con, raw(), as.integer(dataLen), endian = "big")
 }
