@@ -56,15 +56,24 @@ readDateArray <- function(con, n = 1) {
 }
 
 readInt <- function(con, n = 1) {
-  readBinWait(con, integer(), n = n, endian = "big")
+  if (n == 0)
+    integer(0)
+  else
+    readBinWait(con, integer(), n = n, endian = "big")
 }
 
 readDouble <- function(con, n = 1) {
-  readBinWait(con, double(), n = n, endian = "big")
+  if (n == 0)
+    double(0)
+  else
+    readBinWait(con, double(), n = n, endian = "big")
 }
 
 readBoolean <- function(con, n = 1) {
-  as.logical(readInt(con, n = n))
+  if (n == 0)
+    logical(0)
+  else
+    as.logical(readInt(con, n = n))
 }
 
 readType <- function(con) {
@@ -76,13 +85,19 @@ readDate <- function(con) {
 }
 
 readTime <- function(con, n = 1) {
-  t <- readDouble(con, n)
-  timeNA <- as.POSIXct(0, origin = "1970-01-01", tz = "UTC")
+  if (identical(n, 0))
+    as.POSIXct(character(0))
+  else {
+    t <- readDouble(con, n)
+    timeNA <- as.POSIXct(0, origin = "1970-01-01", tz = "UTC")
 
-  r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
-  if (getOption("sparklyr.collect.datechars", FALSE)) as.character(r) else {
-    r[r == timeNA] <- as.POSIXct(NA)
-    r
+    r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
+    if (getOption("sparklyr.collect.datechars", FALSE))
+      as.character(r)
+    else {
+      r[r == timeNA] <- as.POSIXct(NA)
+      r
+    }
   }
 }
 
