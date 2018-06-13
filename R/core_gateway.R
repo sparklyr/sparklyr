@@ -35,15 +35,27 @@ spark_gateway_commands <- function() {
   )
 }
 
+spark_gateway_startup_options <- function() {
+  list(
+    "Default" = 0,
+    "Monitoring" = 1
+  )
+}
+
 query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   waitSeconds <- if (isStarting)
     spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
   else
     spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
 
+  startupOption <- spark_gateway_startup_options()[["Default"]]
+  if (!spark_config_value(config, "sparklyr.monitoring.enabled", TRUE))
+    startupOption <- spark_gateway_startup_options()[["Monitoring"]]
+
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
   writeInt(gateway, if (isStarting) waitSeconds else 0)
+  writeInt(gateway, startupOption)
 
   backendSessionId <- NULL
   redirectGatewayPort <- NULL
@@ -60,8 +72,7 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
 
   if (length(backendSessionId) == 0 ||
       length(redirectGatewayPort) == 0 ||
-      length(backendPort) == 0 ||
-      length(monitoringPort) == 0) {
+      length(backendPort) == 0) {
     if (isStarting)
       stop("Sparklyr gateway did not respond while retrieving ports information after ", waitSeconds, " seconds")
     else

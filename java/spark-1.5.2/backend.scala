@@ -88,8 +88,12 @@ class Backend() {
     defaultTracker = Option(tracker)
   }
 
-  object GatewayOperattions extends Enumeration {
+  object GatewayOperations extends Enumeration {
     val GetPorts, RegisterInstance, UnregisterInstance = Value
+  }
+
+  object GatewayStartupOptions extends Enumeration {
+    val Default, Monitoring = Value
   }
 
   def getOrCreateHiveContext(sc: SparkContext): HiveContext = {
@@ -274,10 +278,11 @@ class Backend() {
 
           logger.log("received command " + commandId)
 
-          GatewayOperattions(commandId) match {
-            case GatewayOperattions.GetPorts => {
+          GatewayOperations(commandId) match {
+            case GatewayOperations.GetPorts => {
               val requestedSessionId = dis.readInt()
               val startupTimeout = dis.readInt()
+              val startupOptions = dis.readInt()
 
               val dos = new DataOutputStream(gatewaySocket.getOutputStream())
 
@@ -290,14 +295,20 @@ class Backend() {
 
                 val backendChannel = new BackendChannel(logger, terminate, new Serializer(tracker), tracker)
                 backendChannel.setHostContext(hostContext)
-
-                val monitoringChannel = new BackendChannel(logger, null, new Serializer(tracker), tracker)
-                monitoringChannel.setHostContext(hostContext)
-
                 val backendPort: Int = backendChannel.init(isRemote)
-                val monitoringPort: Int = monitoringChannel.init(isRemote)
 
                 logger.log("created the backend")
+
+                var monitoringPort = 0
+                var monitoringChannel: BackendChannel = null
+                if ((GatewayStartupOptions.Monitoring.id & startupOptions) > 0)
+                {
+                  logger.log("is creating monitoring channel")
+
+                  monitoringChannel = new BackendChannel(logger, null, new Serializer(tracker), tracker)
+                  monitoringChannel.setHostContext(hostContext)
+                  monitoringPort = monitoringChannel.init(isRemote)
+                }
 
                 dos.writeInt(sessionId)
                 dos.writeInt(gatewaySocket.getLocalPort())
@@ -306,7 +317,11 @@ class Backend() {
 
                 try {
                   startChannel("run backend", backendChannel)
-                  startChannel("run monitor", monitoringChannel)
+
+                  if ((GatewayStartupOptions.Monitoring.id & startupOptions) > 0)
+                  {
+                    startChannel("run monitor", monitoringChannel)
+                  }
 
                   logger.log("is waiting for r process to end")
 
@@ -368,7 +383,7 @@ class Backend() {
 
               dos.close()
             }
-            case GatewayOperattions.RegisterInstance => {
+            case GatewayOperations.RegisterInstance => {
               val registerSessionId = dis.readInt()
               val registerGatewayPort = dis.readInt()
 
@@ -381,7 +396,7 @@ class Backend() {
               dos.flush()
               dos.close()
             }
-            case GatewayOperattions.UnregisterInstance => {
+            case GatewayOperations.UnregisterInstance => {
               val unregisterSessionId = dis.readInt()
 
               logger.log("received session " + unregisterSessionId + " unregistration request")
@@ -415,7 +430,7 @@ class Backend() {
     val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
     val dos = new DataOutputStream(s.getOutputStream())
-    dos.writeInt(GatewayOperattions.RegisterInstance.id)
+    dos.writeInt(GatewayOperations.RegisterInstance.id)
     dos.writeInt(sessionId)
     dos.writeInt(port)
 
@@ -451,7 +466,7 @@ class Backend() {
       val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
       val dos = new DataOutputStream(s.getOutputStream())
-      dos.writeInt(GatewayOperattions.UnregisterInstance.id)
+      dos.writeInt(GatewayOperations.UnregisterInstance.id)
       dos.writeInt(sessionId)
 
       logger.log("is waiting for unregistration in gateway")

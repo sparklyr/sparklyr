@@ -42,12 +42,16 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
                                 blocking = FALSE,
                                 open = "wb",
                                 timeout = timeout)
-    monitoring <- socketConnection(host = gatewayAddress,
-                                   port = gatewayInfo$monitoringPort,
-                                   server = FALSE,
-                                   blocking = FALSE,
-                                   open = "wb",
-                                   timeout = timeout)
+
+    if (gatewayInfo$monitoringPort > 0)
+    {
+      monitoring <- socketConnection(host = gatewayAddress,
+                                     port = gatewayInfo$monitoringPort,
+                                     server = FALSE,
+                                     blocking = FALSE,
+                                     open = "wb",
+                                     timeout = timeout)
+    }
   }, error = function(err) {
     close(gatewayInfo$gateway)
     stop("Failed to open connection to backend:", err$message)
