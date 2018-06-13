@@ -39,8 +39,13 @@ readTypedObject <- function(con, type) {
 
 readString <- function(con) {
   stringLen <- readInt(con)
-  raw <- readBinWait(con, raw(), stringLen, endian = "big")
-  string <- rawToChar(raw)
+  string <- ""
+
+  if (stringLen > 0) {
+    raw <- readBinWait(con, raw(), stringLen, endian = "big")
+    string <- rawToChar(raw)
+  }
+
   Encoding(string) <- "UTF-8"
   string
 }
