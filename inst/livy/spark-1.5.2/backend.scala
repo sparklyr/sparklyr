@@ -239,6 +239,25 @@ class Backend() {
     }.start()
   }
 
+  def startChannel(name: String, channel: BackendChannel): Unit = {
+    new Thread(name) {
+      setDaemon(true)
+      override def run(): Unit = {
+        try {
+          channel.run()
+        }
+        catch {
+          case e: IOException =>
+            logger.logError("failed with exception ", e)
+
+          if (!isService) System.exit(1)
+
+          terminate()
+        }
+      }
+    }.start()
+  }
+
   def bind(): Unit = {
     logger.log("is waiting for sparklyr client to connect to port " + port)
     val gatewaySocket = gatewayServerSocket.accept()
@@ -271,36 +290,26 @@ class Backend() {
                 logger.log("is creating backend and allocating system resources")
 
                 val tracker = if (defaultTracker.isDefined) defaultTracker.get else new JVMObjectTracker();
-                val serializer = new Serializer(tracker);
-                val backendChannel = new BackendChannel(logger, terminate, serializer, tracker)
+
+                val backendChannel = new BackendChannel(logger, terminate, new Serializer(tracker), tracker)
                 backendChannel.setHostContext(hostContext)
 
+                val monitoringChannel = new BackendChannel(logger, null, new Serializer(tracker), tracker)
+                monitoringChannel.setHostContext(hostContext)
+
                 val backendPort: Int = backendChannel.init(isRemote)
+                val monitoringPort: Int = monitoringChannel.init(isRemote)
 
                 logger.log("created the backend")
 
+                dos.writeInt(sessionId)
+                dos.writeInt(gatewaySocket.getLocalPort())
+                dos.writeInt(backendPort)
+                dos.writeInt(monitoringPort)
+
                 try {
-                  // wait for the end of stdin, then exit
-                  new Thread("run backend") {
-                    setDaemon(true)
-                    override def run(): Unit = {
-                      try {
-                        dos.writeInt(sessionId)
-                        dos.writeInt(gatewaySocket.getLocalPort())
-                        dos.writeInt(backendPort)
-
-                        backendChannel.run()
-                      }
-                      catch {
-                        case e: IOException =>
-                          logger.logError("failed with exception ", e)
-
-                        if (!isService) System.exit(1)
-
-                        terminate()
-                      }
-                    }
-                  }.start()
+                  startChannel("run backend", backendChannel)
+                  startChannel("run monitor", monitoringChannel)
 
                   logger.log("is waiting for r process to end")
 
@@ -347,12 +356,14 @@ class Backend() {
                   dos.writeInt(requestedSessionId)
                   dos.writeInt(portForSession.get)
                   dos.writeInt(0)
+                  dos.writeInt(0)
                 }
                 else
                 {
                   logger.log("found no mapping for session " + requestedSessionId)
 
                   dos.writeInt(requestedSessionId)
+                  dos.writeInt(0)
                   dos.writeInt(0)
                   dos.writeInt(0)
                 }

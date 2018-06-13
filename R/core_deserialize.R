@@ -3,11 +3,24 @@ readBinWait <- function(con, what, n, endian = NULL) {
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
+  waitInterval <- 0.01
   commandStart <- Sys.time()
   while(length(result) == 0 && commandStart + timeout > Sys.time()) {
-    Sys.sleep(0.01)
+    Sys.sleep(waitInterval)
+    waitInterval <- min(1, waitInterval + 0.1)
 
     result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+  }
+
+  if (commandStart + timeout <= Sys.time()) {
+    calls <- ""
+    for (i in seq_len(sys.nframe()))
+      calls <- paste(
+        calls,
+        paste(deparse(sys.function(i)), collapse = "\n"),
+        sep = "\n\n")
+
+    message("Operation timed out, increase config option sparklyr.backend.timeout if needed.\n\n", calls)
   }
 
   result
