@@ -155,9 +155,9 @@ start_shell <- function(master,
   isRemote <- remote
 
   sessionId <- if (isService)
-      spark_session_id(app_name, master)
+    spark_session_id(app_name, master)
   else
-      spark_session_random()
+    spark_session_random()
 
   # attempt to connect into an existing gateway
   gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
@@ -382,7 +382,9 @@ start_shell <- function(master,
     spark_home = spark_home,
     backend = backend,
     monitor = gatewayInfo$gateway,
-    output_file = output_file
+    output_file = output_file,
+    sessionId = sessionId,
+    state = new.env()
   ))
 
   # stop shell on R exit

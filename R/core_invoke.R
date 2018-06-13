@@ -1,14 +1,43 @@
+core_invoke_sync_socket <- function(sc)
+{
+  flush <- c(1)
+  while(length(flush) > 0)
+    flush <- readBin(sc$backend, integer(), 1)
+}
+
+core_invoke_synced <- function(sc)
+{
+  identical(
+    invoke_static(sc, "Handler", "echo", sc$app_name, is_syncing = TRUE),
+    sc$app_name
+  )
+}
+
+core_invoke_sync <- function(sc)
+{
+  core_invoke_sync_socket(sc)
+
+  # sleep until connection clears is back on valid state
+  while (!core_invoke_synced(sc)) {
+    Sys.sleep(1)
+    core_invoke_sync_socket(sc)
+  }
+}
+
 core_invoke_method <- function(sc, static, object, method, ...)
 {
-  if (is.null(sc)) {
+  if (is.null(sc))
     stop("The connection is no longer valid.")
-  }
 
-  # flush in case restart has left us in invalid state
-  flush <- c(1)
-  while(length(flush) > 0) {
-    flush <- readBin(sc$backend, integer(), 1)
-  }
+  args <- list(...)
+  is_syncing <- identical(args$is_syncing, TRUE)
+  args$is_syncing <- NULL
+
+  # if connection still running, sync to valid state
+  if (!is_syncing && identical(sc$state$status[[1]], "running"))
+    core_invoke_sync(sc)
+
+  if (!is_syncing) sc$state$status <- "running"
 
   # if the object is a jobj then get it's id
   if (inherits(object, "spark_jobj"))
@@ -19,7 +48,6 @@ core_invoke_method <- function(sc, static, object, method, ...)
   writeBoolean(rc, static)
   writeString(rc, method)
 
-  args <- list(...)
   writeInt(rc, length(args))
   writeArgs(rc, args)
   bytes <- rawConnectionValue(rc)
@@ -51,7 +79,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
       warning.length = 8000
     ), {
       stop(
-        "Unexpected state in sparklyr backend, terminating connection: ",
+        "Unexpected state in sparklyr backend: ",
         msg,
         call. = FALSE)
     })
@@ -78,6 +106,9 @@ core_invoke_method <- function(sc, static, object, method, ...)
   class(backend) <- c(class(backend), "shell_backend")
 
   object <- readObject(backend)
+
+  if (!is_syncing) sc$state$status <- "ready"
+
   attach_connection(object, sc)
 }
 
