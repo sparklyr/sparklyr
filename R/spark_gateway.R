@@ -39,13 +39,13 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = TRUE,
+                                blocking = FALSE,
                                 open = "wb",
                                 timeout = timeout)
     monitoring <- socketConnection(host = gatewayAddress,
                                    port = gatewayInfo$monitoringPort,
                                    server = FALSE,
-                                   blocking = TRUE,
+                                   blocking = FALSE,
                                    open = "wb",
                                    timeout = timeout)
   }, error = function(err) {

@@ -31,7 +31,9 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   args <- list(...)
   is_syncing <- identical(args$is_syncing, TRUE)
+  use_monitoring <- identical(args$use_monitoring, TRUE)
   args$is_syncing <- NULL
+  args$use_monitoring <- NULL
 
   # if connection still running, sync to valid state
   if (!is_syncing && identical(sc$state$status[[1]], "running"))
@@ -59,7 +61,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   con <- rawConnectionValue(rc)
   close(rc)
 
-  backend <- sc$backend
+  backend <- if (use_monitoring) sc$monitoring else sc$backend
   writeBin(con, backend)
 
   if (identical(object, "Handler") &&
