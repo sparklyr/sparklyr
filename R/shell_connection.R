@@ -359,6 +359,12 @@ start_shell <- function(master,
                                 blocking = FALSE,
                                 open = "wb",
                                 timeout = timeout)
+    monitoring <- socketConnection(host = gatewayAddress,
+                                   port = gatewayInfo$monitoringPort,
+                                   server = FALSE,
+                                   blocking = FALSE,
+                                   open = "wb",
+                                   timeout = timeout)
   }, error = function(err) {
     close(gatewayInfo$gateway)
 
@@ -381,6 +387,7 @@ start_shell <- function(master,
     # spark_shell_connection
     spark_home = spark_home,
     backend = backend,
+    monitoring = monitoring,
     gateway = gatewayInfo$gateway,
     output_file = output_file,
     sessionId = sessionId,
