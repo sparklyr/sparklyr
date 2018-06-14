@@ -91,7 +91,7 @@ class Backend() {
     defaultTracker = Option(tracker)
   }
 
-  object GatewayOperattions extends Enumeration {
+  object GatewayOperations extends Enumeration {
     val GetPorts, RegisterInstance, UnregisterInstance = Value
   }
 
@@ -239,25 +239,6 @@ class Backend() {
     }.start()
   }
 
-  def startChannel(name: String, channel: BackendChannel): Unit = {
-    new Thread(name) {
-      setDaemon(true)
-      override def run(): Unit = {
-        try {
-          channel.run()
-        }
-        catch {
-          case e: IOException =>
-            logger.logError("failed with exception ", e)
-
-          if (!isService) System.exit(1)
-
-          terminate()
-        }
-      }
-    }.start()
-  }
-
   def bind(): Unit = {
     logger.log("is waiting for sparklyr client to connect to port " + port)
     val gatewaySocket = gatewayServerSocket.accept()
@@ -277,8 +258,8 @@ class Backend() {
 
           logger.log("received command " + commandId)
 
-          GatewayOperattions(commandId) match {
-            case GatewayOperattions.GetPorts => {
+          GatewayOperations(commandId) match {
+            case GatewayOperations.GetPorts => {
               val requestedSessionId = dis.readInt()
               val startupTimeout = dis.readInt()
 
@@ -290,26 +271,36 @@ class Backend() {
                 logger.log("is creating backend and allocating system resources")
 
                 val tracker = if (defaultTracker.isDefined) defaultTracker.get else new JVMObjectTracker();
-
-                val backendChannel = new BackendChannel(logger, terminate, new Serializer(tracker), tracker)
+                val serializer = new Serializer(tracker);
+                val backendChannel = new BackendChannel(logger, terminate, serializer, tracker)
                 backendChannel.setHostContext(hostContext)
 
-                val monitoringChannel = new BackendChannel(logger, null, new Serializer(tracker), tracker)
-                monitoringChannel.setHostContext(hostContext)
-
                 val backendPort: Int = backendChannel.init(isRemote)
-                val monitoringPort: Int = monitoringChannel.init(isRemote)
 
                 logger.log("created the backend")
 
-                dos.writeInt(sessionId)
-                dos.writeInt(gatewaySocket.getLocalPort())
-                dos.writeInt(backendPort)
-                dos.writeInt(monitoringPort)
-
                 try {
-                  startChannel("run backend", backendChannel)
-                  startChannel("run monitor", monitoringChannel)
+                  // wait for the end of stdin, then exit
+                  new Thread("run backend") {
+                    setDaemon(true)
+                    override def run(): Unit = {
+                      try {
+                        dos.writeInt(sessionId)
+                        dos.writeInt(gatewaySocket.getLocalPort())
+                        dos.writeInt(backendPort)
+
+                        backendChannel.run()
+                      }
+                      catch {
+                        case e: IOException =>
+                          logger.logError("failed with exception ", e)
+
+                        if (!isService) System.exit(1)
+
+                        terminate()
+                      }
+                    }
+                  }.start()
 
                   logger.log("is waiting for r process to end")
 
@@ -356,7 +347,6 @@ class Backend() {
                   dos.writeInt(requestedSessionId)
                   dos.writeInt(portForSession.get)
                   dos.writeInt(0)
-                  dos.writeInt(0)
                 }
                 else
                 {
@@ -365,13 +355,12 @@ class Backend() {
                   dos.writeInt(requestedSessionId)
                   dos.writeInt(0)
                   dos.writeInt(0)
-                  dos.writeInt(0)
                 }
               }
 
               dos.close()
             }
-            case GatewayOperattions.RegisterInstance => {
+            case GatewayOperations.RegisterInstance => {
               val registerSessionId = dis.readInt()
               val registerGatewayPort = dis.readInt()
 
@@ -384,7 +373,7 @@ class Backend() {
               dos.flush()
               dos.close()
             }
-            case GatewayOperattions.UnregisterInstance => {
+            case GatewayOperations.UnregisterInstance => {
               val unregisterSessionId = dis.readInt()
 
               logger.log("received session " + unregisterSessionId + " unregistration request")
@@ -418,7 +407,7 @@ class Backend() {
     val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
     val dos = new DataOutputStream(s.getOutputStream())
-    dos.writeInt(GatewayOperattions.RegisterInstance.id)
+    dos.writeInt(GatewayOperations.RegisterInstance.id)
     dos.writeInt(sessionId)
     dos.writeInt(port)
 
@@ -454,7 +443,7 @@ class Backend() {
       val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
       val dos = new DataOutputStream(s.getOutputStream())
-      dos.writeInt(GatewayOperattions.UnregisterInstance.id)
+      dos.writeInt(GatewayOperations.UnregisterInstance.id)
       dos.writeInt(sessionId)
 
       logger.log("is waiting for unregistration in gateway")

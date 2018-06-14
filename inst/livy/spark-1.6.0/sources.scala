@@ -27,7 +27,7 @@ connection_is_open <- function(sc) {
   UseMethod("connection_is_open")
 }
 readBinWait <- function(con, what, n, endian = NULL) {
-  timeout <- 10 # spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+  timeout <- 60 # spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 

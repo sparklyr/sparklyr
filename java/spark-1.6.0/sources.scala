@@ -24,7 +24,7 @@ connection_is_open <- function(sc) {
   UseMethod("connection_is_open")
 }
 readBinWait <- function(con, what, n, endian = NULL) {
-  timeout <- 60 # spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+  timeout <- spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
@@ -218,7 +218,10 @@ readStruct <- function(con) {
 
 readRaw <- function(con) {
   dataLen <- readInt(con)
-  readBinWait(con, raw(), as.integer(dataLen), endian = "big")
+  if (dataLen == 0)
+    raw()
+  else
+    readBinWait(con, raw(), as.integer(dataLen), endian = "big")
 }
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
   waitSeconds <- if (isStarting)
@@ -232,7 +235,7 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
   while (is.null(gateway) && Sys.time() < commandStart + waitSeconds) {
     tryCatch({
       suppressWarnings({
-        timeout <- spark_config_value(config, "sparklyr.monitor.timeout", 1)
+        timeout <- spark_config_value(config, "sparklyr.gateway.interval", 1)
         gateway <- socketConnection(host = gatewayAddress,
                                     port = gatewayPort,
                                     server = FALSE,
@@ -278,12 +281,8 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
 
   redirectGatewayPort <- readInt(gateway)
   backendPort <- readInt(gateway)
-  monitoringPort <- readInt(gateway)
 
-  if (length(backendSessionId) == 0 ||
-      length(redirectGatewayPort) == 0 ||
-      length(backendPort) == 0 ||
-      length(monitoringPort) == 0) {
+  if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
     if (isStarting)
       stop("Sparklyr gateway did not respond while retrieving ports information after ", waitSeconds, " seconds")
     else
@@ -293,7 +292,6 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   list(
     gateway = gateway,
     backendPort = backendPort,
-    monitoringPort = monitoringPort,
     redirectGatewayPort = redirectGatewayPort
   )
 }
@@ -326,7 +324,6 @@ spark_connect_gateway <- function(
 
     redirectGatewayPort <- gatewayPortsQuery$redirectGatewayPort
     backendPort <- gatewayPortsQuery$backendPort
-    monitoringPort <- gatewayPortsQuery$monitoringPort
 
     worker_log("found redirect gateway port ", redirectGatewayPort)
 
@@ -345,8 +342,7 @@ spark_connect_gateway <- function(
     else {
       list(
         gateway = gateway,
-        backendPort = backendPort,
-        monitoringPort = monitoringPort
+        backendPort = backendPort
       )
     }
   }
@@ -384,13 +380,29 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   args <- list(...)
   is_syncing <- identical(args$is_syncing, TRUE)
+  use_monitoring <- identical(args$use_monitoring, TRUE)
   args$is_syncing <- NULL
+  args$use_monitoring <- NULL
+
+  # initialize status if needed
+  if (is.null(sc$state$status))
+    sc$state$status <- list()
+
+  # choose connection socket
+  if (use_monitoring) {
+    backend <- sc$monitoring
+    connection_name <- "monitoring"
+  }
+  else {
+    backend <- sc$backend
+    connection_name <- "backend"
+  }
 
   # if connection still running, sync to valid state
-  if (!is_syncing && identical(sc$state$status[[1]], "running"))
+  if (!is_syncing && identical(sc$state$status[[connection_name]], "running"))
     core_invoke_sync(sc)
 
-  if (!is_syncing) sc$state$status <- "running"
+  if (!is_syncing) sc$state$status[[connection_name]] <- "running"
 
   # if the object is a jobj then get it's id
   if (inherits(object, "spark_jobj"))
@@ -412,7 +424,6 @@ core_invoke_method <- function(sc, static, object, method, ...)
   con <- rawConnectionValue(rc)
   close(rc)
 
-  backend <- sc$backend
   writeBin(con, backend)
 
   if (identical(object, "Handler") &&
@@ -426,8 +437,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   if (length(returnStatus) == 0) {
     # read the spark log
     msg <- core_read_spark_log_error(sc)
-    close(sc$backend)
-    close(sc$monitor)
+
     withr::with_options(list(
       warning.length = 8000
     ), {
@@ -460,7 +470,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   object <- readObject(backend)
 
-  if (!is_syncing) sc$state$status <- "ready"
+  if (!is_syncing) sc$state$status[[connection_name]] <- "ready"
 
   attach_connection(object, sc)
 }
@@ -1143,7 +1153,7 @@ spark_worker_connect <- function(
     backend <- socketConnection(host = "localhost",
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = TRUE,
+                                blocking = FALSE,
                                 open = "wb",
                                 timeout = timeout)
   }, error = function(err) {
@@ -1165,7 +1175,7 @@ spark_worker_connect <- function(
     # spark_shell_connection
     spark_home = NULL,
     backend = backend,
-    monitor = gatewayInfo$gateway,
+    gateway = gatewayInfo$gateway,
     output_file = NULL
   ))
 
@@ -1178,7 +1188,7 @@ connection_is_open.spark_worker_connection <- function(sc) {
   bothOpen <- FALSE
   if (!identical(sc, NULL)) {
     tryCatch({
-      bothOpen <- isOpen(sc$backend) && isOpen(sc$monitor)
+      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
     }, error = function(e) {
     })
   }
