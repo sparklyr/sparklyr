@@ -7,8 +7,8 @@
   
 ### Livy
 
-- Added support for logging `sparklyr` server events available in the
-  Livy UI.
+- Added support for logging `sparklyr` server events and logging sparklyr
+  invokes as comments in the Livy UI.
 
 - Added support to open the Livy UI from the connections viewer while
   using RStudio.

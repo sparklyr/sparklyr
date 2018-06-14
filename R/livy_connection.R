@@ -454,12 +454,25 @@ livy_invoke_statement <- function(sc, statement) {
   result
 }
 
+livy_invoke_statement_command <- function(sc, static, jobj, method, ...) {
+  if (identical(method, "<init>"))
+    paste0("// invoke_new(sc, '", jobj, "', ...)")
+  else if (is.character(jobj))
+    paste0("// invoke_static(sc, '", jobj, "', '", method, "', ...)")
+  else
+    paste0("// invoke(sc, <jobj>, '", method, "', ...)")
+}
+
 livy_invoke_statement_fetch <- function(sc, static, jobj, method, ...) {
   statement <- livy_statement_compose(sc, static, jobj, method, ...)
 
   # Note: Spark 2.0 requires magic to be present in the statement with the definition.
   statement$code <- paste(
-    statement$code,
+    paste(
+      livy_invoke_statement_command(sc, static, jobj, method, ...),
+      statement$code,
+      sep = "\n"
+    ),
     livy_statement_compose_magic(statement$lobj, "json")$code,
     sep = "\n")
 
