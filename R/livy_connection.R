@@ -543,7 +543,8 @@ livy_connection <- function(master,
     sessionId = session$id,
     config = config,
     code = new.env(),
-    log = tempfile(fileext = ".log")
+    log = tempfile(fileext = ".log"),
+    method = "livy"
   ))
 
   sc$code$totalReturnVars <- 0

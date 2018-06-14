@@ -7,6 +7,12 @@
   
 ### Livy
 
+- Added support for logging `sparklyr` server events available in the
+  Livy UI.
+
+- Added support to open the Livy UI from the connections viewer while
+  using RStudio.
+
 - Improve performance in Livy for long execution queries, fixed
   `livy.session.command.timeout` and support for 
   `livy.session.command.interval` to control max polling while waiting
