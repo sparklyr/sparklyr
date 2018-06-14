@@ -172,7 +172,7 @@ spark_apply <- function(x,
                         context = NULL,
                         ...) {
   args <- list(...)
-  assert_that(is.function(f))
+  assert_that(is.function(f) || is.raw(f))
 
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -207,7 +207,7 @@ spark_apply <- function(x,
   if (spark_master_is_local(sc$master)) packages <- FALSE
 
   # create closure for the given function
-  closure <- serialize(f, NULL)
+  closure <- if (is.function(f)) serialize(f, NULL) else f
   context_serialize <- serialize(context, NULL)
 
   # create rlang closure
