@@ -48,9 +48,9 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   else
     spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
 
-  startupOption <- spark_gateway_startup_options()[["Default"]]
+  startupOption <- spark_gateway_startup_options()[["Monitoring"]]
   if (!spark_config_value(config, "sparklyr.monitoring.enabled", TRUE))
-    startupOption <- spark_gateway_startup_options()[["Monitoring"]]
+    startupOption <- spark_gateway_startup_options()[["Default"]]
 
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
