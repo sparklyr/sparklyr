@@ -3,11 +3,11 @@ readBinWait <- function(con, what, n, endian = NULL) {
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
-  waitInterval <- 0.01
+  waitInterval <- 0
   commandStart <- Sys.time()
   while(length(result) == 0 && commandStart + timeout > Sys.time()) {
     Sys.sleep(waitInterval)
-    waitInterval <- min(1, waitInterval + 0.1)
+    waitInterval <- min(0.1, waitInterval + 0.01)
 
     result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
   }
