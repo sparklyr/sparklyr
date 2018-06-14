@@ -1,5 +1,5 @@
 class Logger(role: String, id: Int) {
-  def logLevel(level: String, message: String) = {
+  def logLevel(level: String, message: String): Unit = {
     var line = ""
     val format = new java.text.SimpleDateFormat("yy/MM/dd HH:mm:ss")
     line += format.format(new java.util.Date())
@@ -12,27 +12,27 @@ class Logger(role: String, id: Int) {
     line += ") "
     line += message
 
-    Console.println(line)
+    scala.Console.println(line)
   }
 
-  def log(message: String) = {
+  def log(message: String): Unit = {
     logLevel("INFO", message)
   }
 
-  def log(message: String, e: Exception) = {
+  def log(message: String, e: Exception): Unit = {
     log(message + ": " + e.getMessage())
     e.printStackTrace()
   }
 
-  def logError(message: String) = {
+  def logError(message: String): Unit = {
     logLevel("INFO", message)
   }
 
-  def logError(message: String, e: Exception) = {
+  def logError(message: String, e: Exception): Unit = {
     logLevel("ERROR", message)
   }
 
-  def logWarning(message: String) = {
+  def logWarning(message: String): Unit = {
     logLevel("WARN", message)
   }
 }
