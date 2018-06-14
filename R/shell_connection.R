@@ -359,17 +359,12 @@ start_shell <- function(master,
                                 blocking = FALSE,
                                 open = "wb",
                                 timeout = timeout)
-
-    monitoring <- NULL
-    if (gatewayInfo$monitoringPort > 0)
-    {
-      monitoring <- socketConnection(host = gatewayAddress,
-                                     port = gatewayInfo$monitoringPort,
-                                     server = FALSE,
-                                     blocking = FALSE,
-                                     open = "wb",
-                                     timeout = timeout)
-    }
+    monitoring <- socketConnection(host = gatewayAddress,
+                                   port = gatewayInfo$backendPort,
+                                   server = FALSE,
+                                   blocking = FALSE,
+                                   open = "wb",
+                                   timeout = timeout)
   }, error = function(err) {
     close(gatewayInfo$gateway)
 

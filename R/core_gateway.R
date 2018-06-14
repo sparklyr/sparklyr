@@ -35,27 +35,15 @@ spark_gateway_commands <- function() {
   )
 }
 
-spark_gateway_startup_options <- function() {
-  list(
-    "Default" = 0,
-    "Monitoring" = 1
-  )
-}
-
 query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   waitSeconds <- if (isStarting)
     spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
   else
     spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
 
-  startupOption <- spark_gateway_startup_options()[["Monitoring"]]
-  if (!spark_config_value(config, "sparklyr.monitoring.enabled", TRUE))
-    startupOption <- spark_gateway_startup_options()[["Default"]]
-
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
   writeInt(gateway, if (isStarting) waitSeconds else 0)
-  writeInt(gateway, startupOption)
 
   backendSessionId <- NULL
   redirectGatewayPort <- NULL
@@ -68,11 +56,8 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
 
   redirectGatewayPort <- readInt(gateway)
   backendPort <- readInt(gateway)
-  monitoringPort <- readInt(gateway)
 
-  if (length(backendSessionId) == 0 ||
-      length(redirectGatewayPort) == 0 ||
-      length(backendPort) == 0) {
+  if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
     if (isStarting)
       stop("Sparklyr gateway did not respond while retrieving ports information after ", waitSeconds, " seconds")
     else
@@ -82,7 +67,6 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   list(
     gateway = gateway,
     backendPort = backendPort,
-    monitoringPort = monitoringPort,
     redirectGatewayPort = redirectGatewayPort
   )
 }
@@ -115,7 +99,6 @@ spark_connect_gateway <- function(
 
     redirectGatewayPort <- gatewayPortsQuery$redirectGatewayPort
     backendPort <- gatewayPortsQuery$backendPort
-    monitoringPort <- gatewayPortsQuery$monitoringPort
 
     worker_log("found redirect gateway port ", redirectGatewayPort)
 
@@ -134,8 +117,7 @@ spark_connect_gateway <- function(
     else {
       list(
         gateway = gateway,
-        backendPort = backendPort,
-        monitoringPort = monitoringPort
+        backendPort = backendPort
       )
     }
   }
