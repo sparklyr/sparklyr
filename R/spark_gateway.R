@@ -35,19 +35,19 @@ gateway_connection <- function(master, config) {
 spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
   tryCatch({
     # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+    interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = FALSE,
+                                blocking = TRUE,
                                 open = "wb",
-                                timeout = timeout)
+                                timeout = interval)
     monitoring <- socketConnection(host = gatewayAddress,
                                    port = gatewayInfo$backendPort,
                                    server = FALSE,
-                                   blocking = FALSE,
+                                   blocking = TRUE,
                                    open = "wb",
-                                   timeout = timeout)
+                                   timeout = interval)
   }, error = function(err) {
     close(gatewayInfo$gateway)
     stop("Failed to open connection to backend:", err$message)
