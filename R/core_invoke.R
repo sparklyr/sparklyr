@@ -35,11 +35,25 @@ core_invoke_method <- function(sc, static, object, method, ...)
   args$is_syncing <- NULL
   args$use_monitoring <- NULL
 
+  # initialize status if needed
+  if (is.null(sc$state$status))
+    sc$state$status <- list()
+
+  # choose connection socket
+  if (use_monitoring) {
+    backend <- sc$monitoring
+    connection_name <- "monitoring"
+  }
+  else {
+    backend <- sc$backend
+    connection_name <- "backend"
+  }
+
   # if connection still running, sync to valid state
-  if (!is_syncing && identical(sc$state$status[[1]], "running"))
+  if (!is_syncing && identical(sc$state$status[[connection_name]], "running"))
     core_invoke_sync(sc)
 
-  if (!is_syncing) sc$state$status <- "running"
+  if (!is_syncing) sc$state$status[[connection_name]] <- "running"
 
   # if the object is a jobj then get it's id
   if (inherits(object, "spark_jobj"))
@@ -61,7 +75,6 @@ core_invoke_method <- function(sc, static, object, method, ...)
   con <- rawConnectionValue(rc)
   close(rc)
 
-  backend <- if (use_monitoring) sc$monitoring else sc$backend
   writeBin(con, backend)
 
   if (identical(object, "Handler") &&
@@ -108,7 +121,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   object <- readObject(backend)
 
-  if (!is_syncing) sc$state$status <- "ready"
+  if (!is_syncing) sc$state$status[[connection_name]] <- "ready"
 
   attach_connection(object, sc)
 }
