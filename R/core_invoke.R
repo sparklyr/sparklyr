@@ -31,9 +31,8 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   args <- list(...)
   is_syncing <- identical(args$is_syncing, TRUE)
-  use_monitoring <- identical(args$use_monitoring, TRUE)
+  use_monitoring <- identical(sc$use_monitoring, TRUE)
   args$is_syncing <- NULL
-  args$use_monitoring <- NULL
 
   # initialize status if needed
   if (is.null(sc$state$status))
