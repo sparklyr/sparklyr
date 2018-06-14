@@ -3,20 +3,44 @@
 # connection-specific actions possible with Spark connections
 spark_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
+
   actions <- list(
-    SparkUI = list(
-        icon = file.path(icons, "spark-ui.png"),
-        callback = function() {
-          utils::browseURL(spark_web(scon))
-        }
-    ),
-    Log = list(
-        icon = file.path(icons, "spark-log.png"),
-        callback = function() {
-          file.edit(spark_log_file(scon))
-        }
+    "Spark UI" = list(
+      icon = file.path(icons, "spark-ui.png"),
+      callback = function() {
+        utils::browseURL(spark_web(scon))
+      }
     )
   )
+
+  if (identical(tolower(scon$method), "livy"))
+  {
+    actions <- c(
+      actions,
+      list(
+        "Livy UI" = list(
+          icon = file.path(icons, "livy-ui.png"),
+          callback = function() {
+            utils::browseURL(file.path(scon$master, "ui"))
+          }
+        )
+      )
+    )
+  }
+  else
+  {
+    actions <- c(
+      actions,
+      list(
+        Log = list(
+            icon = file.path(icons, "spark-log.png"),
+            callback = function() {
+              file.edit(spark_log_file(scon))
+            }
+        )
+      )
+    )
+  }
 
   if (exists(".rs.api.documentNew")) {
     documentNew <- get(".rs.api.documentNew")
