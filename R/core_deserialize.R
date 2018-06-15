@@ -3,6 +3,9 @@ readBinWait <- function(con, what, n, endian = NULL) {
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
+  progressTimeout <- Sys.time() + 3
+  progressEnv <- new.env()
+
   waitInterval <- 0
   commandStart <- Sys.time()
   while(length(result) == 0 && commandStart + timeout > Sys.time()) {
@@ -10,6 +13,11 @@ readBinWait <- function(con, what, n, endian = NULL) {
     waitInterval <- min(0.1, waitInterval + 0.01)
 
     result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+
+    if (Sys.time() > progressTimeout) {
+      progressTimeout <- Sys.time() + 3
+      if (exists("connection_progress")) connection_progress(sc, progressEnv)
+    }
   }
 
   if (commandStart + timeout <= Sys.time()) {
