@@ -34,7 +34,9 @@ connection_progress <- function(sc, env)
         if (invoke(jobInfoOption, "nonEmpty"))
         {
           jobInfo <- invoke(jobInfoOption, "get")
-          .rs.api.setJobStatus(env$jobs[[jobId]], invoke(jobInfo, "status"))
+          jobStatus <- invoke(invoke(jobInfo, "status"), "toString")
+
+          .rs.api.setJobStatus(env$jobs[[jobId]], jobStatus)
           stages <- invoke(jobInfo, "stageIds")
 
           # add new stages
@@ -54,17 +56,16 @@ connection_progress <- function(sc, env)
               {
                 stageInfo <- invoke(stageInfoOption, "get")
 
-                stageStatus <- invoke(stageInfo, "name")
                 stageTasks <- invoke(stageInfo, "numTasks")
                 stageCompleted <- invoke(stageInfo, "numCompletedTasks")
-                stageStatusText <- paste0(stageStatus, " (", stageCompleted, "/", stageTasks, ")")
+                stageStatusText <- paste0(stageCompleted, "/", stageTasks, " completed")
 
-                .rs.api.setJobStatus(env$jobs[[jobId]], stageStatusText)
+                .rs.api.setJobStatus(env$stages[[stageId]], stageStatusText)
                 .rs.api.addJobProgress(env$stages[[stageId]], 1L)
               }
             } else {
               .rs.api.addJobProgress(env$stages[[stageId]], 100)
-              env$jobs[[jobId]] <- NULL
+              env$stages[[stageId]] <- NULL
             }
           }
         }
