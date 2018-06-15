@@ -20,6 +20,8 @@ readBinWait <- function(con, what, n, endian = NULL) {
     }
   }
 
+  if (exists("connection_progress")) connection_progress(sc, progressEnv, terminated = TRUE)
+
   if (commandStart + timeout <= Sys.time()) {
     calls <- ""
     for (i in seq_len(sys.nframe()))
