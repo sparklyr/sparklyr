@@ -412,6 +412,13 @@ spark_disconnect.spark_shell_connection <- function(sc, ...) {
 # Stop the Spark R Shell
 stop_shell <- function(sc, terminate = FALSE) {
   terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
+
+  # if execution is in progress use monitoring connection to terminate
+  if (sc$state$use_monitoring) {
+    sc$state$use_monitoring <- TRUE
+    on.exit(sc$state$use_monitoring <- FALSE)
+  }
+
   invoke_method(sc,
                 FALSE,
                 "Handler",
