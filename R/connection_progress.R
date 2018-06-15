@@ -8,23 +8,18 @@ connection_progress_update <- function(jobName, progressUnits)
 
 connection_progress <- function(sc, env, terminated = FALSE)
 {
+  if (!exists(".rs.api.addJob"))
+    return()
+
   if (is.null(env$jobs))
     env$jobs <- list()
 
   if (is.null(env$stages))
     env$stages <- list()
 
-  if (terminated) {
-    for (jobId in names(env$jobs))
-      .rs.api.addJobProgress(env$jobs[[jobId]], 100L)
-    for (stageId in names(env$stages))
-      .rs.api.addJobProgress(env$stages[[stageId]], 100L)
-    return()
-  }
-
-  if (exists(".rs.api.addJob")) {
+  if (!terminated || length(env$jobs) > 0) {
     connection_progress_context(sc, function() {
-      tracker <- tracker <- invoke(sc$spark_context, "statusTracker")
+      tracker <- invoke(sc$spark_context, "statusTracker")
       active <- invoke(tracker, "getActiveJobIds")
 
       # add new jobs
@@ -86,6 +81,13 @@ connection_progress <- function(sc, env, terminated = FALSE)
         }
       }
     })
+  }
+
+  if (terminated) {
+    for (jobId in names(env$jobs))
+      .rs.api.addJobProgress(env$jobs[[jobId]], 100L)
+    for (stageId in names(env$stages))
+      .rs.api.addJobProgress(env$stages[[stageId]], 100L)
   }
 }
 
