@@ -15,8 +15,6 @@ core_invoke_synced <- function(sc)
 
 core_invoke_sync <- function(sc)
 {
-  core_invoke_sync_socket(sc)
-
   # sleep until connection clears is back on valid state
   while (!core_invoke_synced(sc)) {
     Sys.sleep(1)
@@ -26,8 +24,6 @@ core_invoke_sync <- function(sc)
 
 core_invoke_cancel_running <- function(sc)
 {
-  message("Cancelling Spark jobs")
-
   if (is.null(sc$spark_context) || !is.null(sc$state$cancelling))
     return()
 
