@@ -6,7 +6,7 @@ read_bin.default <- function(con, what, n, endian = NULL) {
   if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 }
 
-read_bin.spark_connection <- function(con, what, n, endian = NULL) {
+read_bin_wait <- function(con, what, n, endian = NULL) {
   sc <- con
   con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) sc$monitoring else sc$backend
 
@@ -43,6 +43,14 @@ read_bin.spark_connection <- function(con, what, n, endian = NULL) {
   }
 
   result
+}
+
+read_bin.spark_connection <- function(con, what, n, endian = NULL) {
+  read_bin_wait(con, what, n, endian)
+}
+
+read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
+  read_bin_wait(con, what, n, endian)
 }
 
 readObject <- function(con) {

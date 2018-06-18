@@ -64,7 +64,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
     connection_name <- "backend"
   }
 
-  if (!is_syncing) {
+  if (!is_syncing && !identical(object, "Handler")) {
     # if connection still running, sync to valid state
     if (identical(sc$state$status[[connection_name]], "running"))
       core_invoke_sync(sc)
@@ -152,6 +152,10 @@ jobj_subclass.shell_backend <- function(con) {
 }
 
 jobj_subclass.spark_connection <- function(con) {
+  "shell_jobj"
+}
+
+jobj_subclass.spark_worker_connection <- function(con) {
   "shell_jobj"
 }
 
