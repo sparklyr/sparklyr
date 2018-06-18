@@ -39,14 +39,7 @@ read_bin.spark_connection <- function(con, what, n, endian = NULL) {
   if (progressUpdated) connection_progress_terminated(sc)
 
   if (commandStart + timeout <= Sys.time()) {
-    calls <- ""
-    for (i in seq_len(sys.nframe()))
-      calls <- paste(
-        calls,
-        paste(deparse(sys.function(i)), collapse = "\n"),
-        sep = "\n\n")
-
-    message("Operation timed out, increase config option sparklyr.backend.timeout if needed.\n\n", calls)
+    stop("Operation timed out, increase config option sparklyr.backend.timeout if needed.")
   }
 
   result
