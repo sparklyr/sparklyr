@@ -39,7 +39,6 @@ Imports:
     methods,
     openssl (>= 0.8),
     rappdirs,
-    readr (>= 1.1.0),
     rlang (>= 0.1.4),
     rprojroot,
     rstudioapi,

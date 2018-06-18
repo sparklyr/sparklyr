@@ -56,7 +56,7 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
 
   tempFile <- tempfile(fileext = ".csv")
   write.table(df, tempFile, sep = separator$plain, col.names = FALSE, row.names = FALSE, quote = FALSE)
-  textData <- as.list(readr::read_lines(tempFile))
+  textData <- as.list(readLines(tempFile))
 
   rdd <- invoke_static(
     sc,
