@@ -23,32 +23,59 @@ spark_config_value <- function(config, name, default = NULL) {
 connection_is_open <- function(sc) {
   UseMethod("connection_is_open")
 }
-readBinWait <- function(con, what, n, endian = NULL) {
+read_bin <- function(con, what, n, endian = NULL) {
+  UseMethod("read_bin")
+}
+
+read_bin.default <- function(con, what, n, endian = NULL) {
+  if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+}
+
+read_bin_wait <- function(con, what, n, endian = NULL) {
+  sc <- con
+  con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) sc$monitoring else sc$backend
+
   timeout <- spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
-  waitInterval <- 0.01
+  progressTimeout <- Sys.time() + 3
+  if (is.null(sc$state$progress))
+    sc$state$progress <- new.env()
+  progressUpdated <- FALSE
+
+  waitInterval <- 0
   commandStart <- Sys.time()
   while(length(result) == 0 && commandStart + timeout > Sys.time()) {
     Sys.sleep(waitInterval)
-    waitInterval <- min(1, waitInterval + 0.1)
+    waitInterval <- min(0.1, waitInterval + 0.01)
 
     result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+
+    if (Sys.time() > progressTimeout) {
+      progressTimeout <- Sys.time() + 3
+      if (exists("connection_progress")) {
+        connection_progress(sc)
+        progressUpdated <- TRUE
+      }
+    }
   }
 
-  if (commandStart + timeout <= Sys.time()) {
-    calls <- ""
-    for (i in seq_len(sys.nframe()))
-      calls <- paste(
-        calls,
-        paste(deparse(sys.function(i)), collapse = "\n"),
-        sep = "\n\n")
+  if (progressUpdated) connection_progress_terminated(sc)
 
-    message("Operation timed out, increase config option sparklyr.backend.timeout if needed.\n\n", calls)
+  if (commandStart + timeout <= Sys.time()) {
+    stop("Operation timed out, increase config option sparklyr.backend.timeout if needed.")
   }
 
   result
+}
+
+read_bin.spark_connection <- function(con, what, n, endian = NULL) {
+  read_bin_wait(con, what, n, endian)
+}
+
+read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
+  read_bin_wait(con, what, n, endian)
 }
 
 readObject <- function(con) {
@@ -80,7 +107,7 @@ readString <- function(con) {
   string <- ""
 
   if (stringLen > 0) {
-    raw <- readBinWait(con, raw(), stringLen, endian = "big")
+    raw <- read_bin(con, raw(), stringLen, endian = "big")
     string <- rawToChar(raw)
   }
 
@@ -97,14 +124,14 @@ readInt <- function(con, n = 1) {
   if (n == 0)
     integer(0)
   else
-    readBinWait(con, integer(), n = n, endian = "big")
+    read_bin(con, integer(), n = n, endian = "big")
 }
 
 readDouble <- function(con, n = 1) {
   if (n == 0)
     double(0)
   else
-    readBinWait(con, double(), n = n, endian = "big")
+    read_bin(con, double(), n = n, endian = "big")
 }
 
 readBoolean <- function(con, n = 1) {
@@ -115,7 +142,7 @@ readBoolean <- function(con, n = 1) {
 }
 
 readType <- function(con) {
-  rawToChar(readBinWait(con, "raw", n = 1L))
+  rawToChar(read_bin(con, "raw", n = 1L))
 }
 
 readDate <- function(con) {
@@ -221,7 +248,7 @@ readRaw <- function(con) {
   if (dataLen == 0)
     raw()
   else
-    readBinWait(con, raw(), as.integer(dataLen), endian = "big")
+    read_bin(con, raw(), as.integer(dataLen), endian = "big")
 }
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
   waitSeconds <- if (isStarting)
@@ -373,6 +400,22 @@ core_invoke_sync <- function(sc)
   }
 }
 
+core_invoke_cancel_running <- function(sc)
+{
+  message("Cancelling Spark jobs")
+
+  if (is.null(sc$spark_context) || !is.null(sc$state$cancelling))
+    return()
+
+  sc$state$cancelling <- TRUE
+
+  connection_progress_context(sc, function() {
+    invoke(sc$spark_context, "cancelAllJobs")
+  })
+
+  if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
+}
+
 core_invoke_method <- function(sc, static, object, method, ...)
 {
   if (is.null(sc))
@@ -380,9 +423,8 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   args <- list(...)
   is_syncing <- identical(args$is_syncing, TRUE)
-  use_monitoring <- identical(args$use_monitoring, TRUE)
+  use_monitoring <- identical(sc$state$use_monitoring, TRUE)
   args$is_syncing <- NULL
-  args$use_monitoring <- NULL
 
   # initialize status if needed
   if (is.null(sc$state$status))
@@ -398,11 +440,16 @@ core_invoke_method <- function(sc, static, object, method, ...)
     connection_name <- "backend"
   }
 
-  # if connection still running, sync to valid state
-  if (!is_syncing && identical(sc$state$status[[connection_name]], "running"))
-    core_invoke_sync(sc)
+  if (!is_syncing && !identical(object, "Handler")) {
+    # if connection still running, sync to valid state
+    if (identical(sc$state$status[[connection_name]], "running"))
+      core_invoke_sync(sc)
 
-  if (!is_syncing) sc$state$status[[connection_name]] <- "running"
+    # while exiting this function, if interrupted (still running), cancel server job
+    on.exit(core_invoke_cancel_running(sc))
+
+    sc$state$status[[connection_name]] <- "running"
+  }
 
   # if the object is a jobj then get it's id
   if (inherits(object, "spark_jobj"))
@@ -432,7 +479,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
     return(NULL)
   }
 
-  returnStatus <- readInt(backend)
+  returnStatus <- readInt(sc)
 
   if (length(returnStatus) == 0) {
     # read the spark log
@@ -450,7 +497,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   if (returnStatus != 0) {
     # get error message from backend and report to R
-    msg <- readString(backend)
+    msg <- readString(sc)
     withr::with_options(list(
       warning.length = 8000
     ), {
@@ -466,16 +513,25 @@ core_invoke_method <- function(sc, static, object, method, ...)
     })
   }
 
-  class(backend) <- c(class(backend), "shell_backend")
+  object <- readObject(sc)
 
-  object <- readObject(backend)
-
-  if (!is_syncing) sc$state$status[[connection_name]] <- "ready"
+  if (!is_syncing) {
+    sc$state$status[[connection_name]] <- "ready"
+    on.exit(NULL)
+  }
 
   attach_connection(object, sc)
 }
 
 jobj_subclass.shell_backend <- function(con) {
+  "shell_jobj"
+}
+
+jobj_subclass.spark_connection <- function(con) {
+  "shell_jobj"
+}
+
+jobj_subclass.spark_worker_connection <- function(con) {
   "shell_jobj"
 }
 
@@ -1148,14 +1204,16 @@ spark_worker_connect <- function(
   worker_log("is connecting to backend session")
 
   tryCatch({
-    # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+    interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+
     backend <- socketConnection(host = "localhost",
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = FALSE,
+                                blocking = interval > 0,
                                 open = "wb",
-                                timeout = timeout)
+                                timeout = interval)
+
+    class(backend) <- c(class(backend), "shell_backend")
   }, error = function(err) {
     close(gatewayInfo$gateway)
 
