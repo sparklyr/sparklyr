@@ -25,9 +25,11 @@ spark_worker_connect <- function(
     backend <- socketConnection(host = "localhost",
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = FALSE,
+                                blocking = TRUE,
                                 open = "wb",
                                 timeout = timeout)
+
+    class(backend) <- c(class(backend), "shell_backend")
   }, error = function(err) {
     close(gatewayInfo$gateway)
 

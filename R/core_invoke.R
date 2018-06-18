@@ -24,6 +24,22 @@ core_invoke_sync <- function(sc)
   }
 }
 
+core_invoke_cancel_running <- function(sc)
+{
+  message("Cancelling Spark jobs")
+
+  if (is.null(sc$spark_context) || !is.null(sc$state$cancelling))
+    return()
+
+  sc$state$cancelling <- TRUE
+
+  connection_progress_context(sc, function() {
+    invoke(sc$spark_context, "cancelAllJobs")
+  })
+
+  if (exists("connection_progress")) connection_progress(sc, terminated = TRUE)
+}
+
 core_invoke_method <- function(sc, static, object, method, ...)
 {
   if (is.null(sc))
@@ -51,6 +67,9 @@ core_invoke_method <- function(sc, static, object, method, ...)
   # if connection still running, sync to valid state
   if (!is_syncing && identical(sc$state$status[[connection_name]], "running"))
     core_invoke_sync(sc)
+
+  # while exiting this function, if interrupted (still running), cancel server job
+  # on.exit(core_invoke_cancel_running(sc))
 
   if (!is_syncing) sc$state$status[[connection_name]] <- "running"
 
@@ -82,7 +101,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
     return(NULL)
   }
 
-  returnStatus <- readInt(backend)
+  returnStatus <- readInt(sc)
 
   if (length(returnStatus) == 0) {
     # read the spark log
@@ -100,7 +119,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   if (returnStatus != 0) {
     # get error message from backend and report to R
-    msg <- readString(backend)
+    msg <- readString(sc)
     withr::with_options(list(
       warning.length = 8000
     ), {
@@ -116,16 +135,21 @@ core_invoke_method <- function(sc, static, object, method, ...)
     })
   }
 
-  class(backend) <- c(class(backend), "shell_backend")
+  object <- readObject(sc)
 
-  object <- readObject(backend)
-
-  if (!is_syncing) sc$state$status[[connection_name]] <- "ready"
+  if (!is_syncing) {
+    sc$state$status[[connection_name]] <- "ready"
+    on.exit(NULL)
+  }
 
   attach_connection(object, sc)
 }
 
 jobj_subclass.shell_backend <- function(con) {
+  "shell_jobj"
+}
+
+jobj_subclass.spark_connection <- function(con) {
   "shell_jobj"
 }
 

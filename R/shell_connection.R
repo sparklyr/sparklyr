@@ -353,18 +353,22 @@ start_shell <- function(master,
   tryCatch({
     # set timeout for socket connection
     timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = FALSE,
+                                blocking = TRUE,
                                 open = "wb",
                                 timeout = timeout)
+    class(backend) <- c(class(backend), "shell_backend")
+
     monitoring <- socketConnection(host = gatewayAddress,
                                    port = gatewayInfo$backendPort,
                                    server = FALSE,
                                    blocking = FALSE,
                                    open = "wb",
                                    timeout = timeout)
+    class(monitoring) <- c(class(monitoring), "shell_backend")
   }, error = function(err) {
     close(gatewayInfo$gateway)
 
@@ -413,11 +417,8 @@ spark_disconnect.spark_shell_connection <- function(sc, ...) {
 stop_shell <- function(sc, terminate = FALSE) {
   terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
 
-  # if execution is in progress use monitoring connection to terminate
-  if (sc$state$use_monitoring) {
-    sc$state$use_monitoring <- TRUE
-    on.exit(sc$state$use_monitoring <- FALSE)
-  }
+  # use monitoring connection to terminate
+  sc$state$use_monitoring <- TRUE
 
   invoke_method(sc,
                 FALSE,

@@ -6,8 +6,10 @@ connection_progress_update <- function(jobName, progressUnits)
     .rs.api.addJob(jobName, progressUnits = progressUnits, autoRemove = FALSE)
 }
 
-connection_progress <- function(sc, env, terminated = FALSE)
+connection_progress <- function(sc, terminated = FALSE)
 {
+  env <- sc$state$progress
+
   if (!exists(".rs.api.addJob"))
     return()
 

@@ -1,10 +1,20 @@
-readBinWait <- function(con, what, n, endian = NULL) {
+read_bin <- function(con, what, n, endian = NULL) {
+  UseMethod("read_bin")
+}
+
+read_bin.default <- function(con, what, n, endian = NULL) {
+  if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+}
+
+read_bin.spark_connection <- function(con, what, n, endian = NULL) {
+  sc <- con
+  con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) sc$monitoring else sc$backend
+
   timeout <- spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
   progressTimeout <- Sys.time() + 3
-  progressEnv <- new.env()
 
   waitInterval <- 0
   commandStart <- Sys.time()
@@ -16,11 +26,11 @@ readBinWait <- function(con, what, n, endian = NULL) {
 
     if (Sys.time() > progressTimeout) {
       progressTimeout <- Sys.time() + 3
-      if (exists("connection_progress")) connection_progress(sc, progressEnv)
+      if (exists("connection_progress")) connection_progress(sc)
     }
   }
 
-  if (exists("connection_progress")) connection_progress(sc, progressEnv, terminated = TRUE)
+  if (exists("connection_progress")) connection_progress(sc, terminated = TRUE)
 
   if (commandStart + timeout <= Sys.time()) {
     calls <- ""
@@ -65,7 +75,7 @@ readString <- function(con) {
   string <- ""
 
   if (stringLen > 0) {
-    raw <- readBinWait(con, raw(), stringLen, endian = "big")
+    raw <- read_bin(con, raw(), stringLen, endian = "big")
     string <- rawToChar(raw)
   }
 
@@ -82,14 +92,14 @@ readInt <- function(con, n = 1) {
   if (n == 0)
     integer(0)
   else
-    readBinWait(con, integer(), n = n, endian = "big")
+    read_bin(con, integer(), n = n, endian = "big")
 }
 
 readDouble <- function(con, n = 1) {
   if (n == 0)
     double(0)
   else
-    readBinWait(con, double(), n = n, endian = "big")
+    read_bin(con, double(), n = n, endian = "big")
 }
 
 readBoolean <- function(con, n = 1) {
@@ -100,7 +110,7 @@ readBoolean <- function(con, n = 1) {
 }
 
 readType <- function(con) {
-  rawToChar(readBinWait(con, "raw", n = 1L))
+  rawToChar(read_bin(con, "raw", n = 1L))
 }
 
 readDate <- function(con) {
@@ -206,5 +216,5 @@ readRaw <- function(con) {
   if (dataLen == 0)
     raw()
   else
-    readBinWait(con, raw(), as.integer(dataLen), endian = "big")
+    read_bin(con, raw(), as.integer(dataLen), endian = "big")
 }
