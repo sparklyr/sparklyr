@@ -100,3 +100,9 @@ connection_progress_context <- function(sc, f)
 
   f()
 }
+
+
+connection_progress_terminated <- function(sc)
+{
+  connection_progress(sc, terminated = TRUE)
+}

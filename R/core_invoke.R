@@ -37,7 +37,7 @@ core_invoke_cancel_running <- function(sc)
     invoke(sc$spark_context, "cancelAllJobs")
   })
 
-  if (exists("connection_progress")) connection_progress(sc, terminated = TRUE)
+  if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
 }
 
 core_invoke_method <- function(sc, static, object, method, ...)
@@ -64,14 +64,16 @@ core_invoke_method <- function(sc, static, object, method, ...)
     connection_name <- "backend"
   }
 
-  # if connection still running, sync to valid state
-  if (!is_syncing && identical(sc$state$status[[connection_name]], "running"))
-    core_invoke_sync(sc)
+  if (!is_syncing) {
+    # if connection still running, sync to valid state
+    if (identical(sc$state$status[[connection_name]], "running"))
+      core_invoke_sync(sc)
 
-  # while exiting this function, if interrupted (still running), cancel server job
-  # on.exit(core_invoke_cancel_running(sc))
+    # while exiting this function, if interrupted (still running), cancel server job
+    on.exit(core_invoke_cancel_running(sc))
 
-  if (!is_syncing) sc$state$status[[connection_name]] <- "running"
+    sc$state$status[[connection_name]] <- "running"
+  }
 
   # if the object is a jobj then get it's id
   if (inherits(object, "spark_jobj"))

@@ -15,6 +15,9 @@ read_bin.spark_connection <- function(con, what, n, endian = NULL) {
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
   progressTimeout <- Sys.time() + 3
+  if (is.null(sc$state$progress))
+    sc$state$progress <- new.env()
+  progressUpdated <- FALSE
 
   waitInterval <- 0
   commandStart <- Sys.time()
@@ -26,11 +29,14 @@ read_bin.spark_connection <- function(con, what, n, endian = NULL) {
 
     if (Sys.time() > progressTimeout) {
       progressTimeout <- Sys.time() + 3
-      if (exists("connection_progress")) connection_progress(sc)
+      if (exists("connection_progress")) {
+        connection_progress(sc)
+        progressUpdated <- TRUE
+      }
     }
   }
 
-  if (exists("connection_progress")) connection_progress(sc, terminated = TRUE)
+  if (progressUpdated) connection_progress_terminated(sc)
 
   if (commandStart + timeout <= Sys.time()) {
     calls <- ""

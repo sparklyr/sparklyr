@@ -357,7 +357,7 @@ start_shell <- function(master,
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = TRUE,
+                                blocking = FALSE,
                                 open = "wb",
                                 timeout = timeout)
     class(backend) <- c(class(backend), "shell_backend")
