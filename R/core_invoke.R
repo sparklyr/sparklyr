@@ -89,8 +89,6 @@ core_invoke_method <- function(sc, static, object, method, ...)
     stop("The connection is no longer valid.")
 
   args <- list(...)
-  is_syncing <- identical(args$is_syncing, TRUE)
-  args$is_syncing <- NULL
 
   # initialize status if needed
   if (is.null(sc$state$status))
@@ -100,7 +98,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   backend <- core_invoke_socket(sc)
   connection_name <- core_invoke_socket_name(sc)
 
-  if (!is_syncing && !identical(object, "Handler")) {
+  if (!identical(object, "Handler")) {
     # if connection still running, sync to valid state
     if (identical(sc$state$status[[connection_name]], "running"))
       core_invoke_sync(sc)
@@ -159,10 +157,8 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   object <- readObject(sc)
 
-  if (!is_syncing) {
-    sc$state$status[[connection_name]] <- "ready"
-    on.exit(NULL)
-  }
+  sc$state$status[[connection_name]] <- "ready"
+  on.exit(NULL)
 
   attach_connection(object, sc)
 }
