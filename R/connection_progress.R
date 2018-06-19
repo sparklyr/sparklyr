@@ -1,17 +1,32 @@
+connection_progress_api_available <- function() {
+  exists(".rs.api.addJob")
+}
+
+connection_progress_api <- function() {
+  list(
+    add_job = get(".rs.api.addJob"),
+    set_job_status = get(".rs.api.setJobStatus"),
+    add_job_progress = get(".rs.api.addJobProgress")
+  )
+}
+
 connection_progress_update <- function(jobName, progressUnits)
 {
-  if ("show" %in% names(formals(.rs.api.addJob)))
-    .rs.api.addJob(jobName, progressUnits = progressUnits, show = FALSE, autoRemove = FALSE)
+  api <- connection_progress_api()
+  if ("show" %in% names(formals(api$add_job)))
+    api$add_job(jobName, progressUnits = progressUnits, show = FALSE, autoRemove = FALSE)
   else
-    .rs.api.addJob(jobName, progressUnits = progressUnits, autoRemove = FALSE)
+    api$add_job(jobName, progressUnits = progressUnits, autoRemove = FALSE)
 }
 
 connection_progress <- function(sc, terminated = FALSE)
 {
   env <- sc$state$progress
 
-  if (!exists(".rs.api.addJob"))
+  if (!connection_progress_api_available())
     return()
+
+  api <- connection_progress_api()
 
   if (is.null(env$jobs))
     env$jobs <- list()
@@ -51,7 +66,7 @@ connection_progress <- function(sc, terminated = FALSE)
           jobInfo <- invoke(jobInfoOption, "get")
           jobStatus <- invoke(invoke(jobInfo, "status"), "toString")
 
-          .rs.api.setJobStatus(env$jobs[[jobId]], jobStatus)
+          api$set_job_status(env$jobs[[jobId]], jobStatus)
           stages <- invoke(jobInfo, "stageIds")
 
           # add new stages
@@ -84,20 +99,20 @@ connection_progress <- function(sc, terminated = FALSE)
                 stageCompleted <- invoke(stageInfo, "numCompletedTasks")
                 stageStatusText <- paste0(stageCompleted, "/", stageTasks, " completed")
 
-                .rs.api.setJobStatus(env$stages[[stageId]], stageStatusText)
-                .rs.api.addJobProgress(env$stages[[stageId]], 1L)
+                api$set_job_status(env$stages[[stageId]], stageStatusText)
+                api$add_job_progress(env$stages[[stageId]], 1L)
               }
             } else {
-              .rs.api.addJobProgress(env$stages[[stageId]], 100)
+              api$add_job_progress(env$stages[[stageId]], 100)
               env$stages[[stageId]] <- NULL
             }
           }
         }
 
         if (as.numeric(jobId) %in% active) {
-          .rs.api.addJobProgress(env$jobs[[jobId]], 1L)
+          api$add_job_progress(env$jobs[[jobId]], 1L)
         } else {
-          .rs.api.addJobProgress(env$jobs[[jobId]], 100)
+          api$add_job_progress(env$jobs[[jobId]], 100)
           env$jobs[[jobId]] <- NULL
         }
       }
@@ -106,9 +121,9 @@ connection_progress <- function(sc, terminated = FALSE)
 
   if (terminated) {
     for (jobId in names(env$jobs))
-      .rs.api.addJobProgress(env$jobs[[jobId]], 100L)
+      api$add_job_progress(env$jobs[[jobId]], 100L)
     for (stageId in names(env$stages))
-      .rs.api.addJobProgress(env$stages[[stageId]], 100L)
+      api$add_job_progress(env$stages[[stageId]], 100L)
   }
 }
 
