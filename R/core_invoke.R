@@ -2,15 +2,7 @@ core_invoke_sync_socket <- function(sc)
 {
   flush <- c(1)
   while(length(flush) > 0)
-    flush <- readBin(sc$backend, integer(), 1)
-}
-
-core_invoke_synced <- function(sc)
-{
-  identical(
-    invoke_static(sc, "Handler", "echo", sc$app_name, is_syncing = TRUE),
-    sc$app_name
-  )
+    flush <- readBin(sc$backend, raw(), 1000)
 }
 
 core_invoke_sync <- function(sc)
@@ -36,45 +28,7 @@ core_invoke_cancel_running <- function(sc)
   if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
 }
 
-core_invoke_method <- function(sc, static, object, method, ...)
-{
-  if (is.null(sc))
-    stop("The connection is no longer valid.")
-
-  args <- list(...)
-  is_syncing <- identical(args$is_syncing, TRUE)
-  use_monitoring <- identical(sc$state$use_monitoring, TRUE)
-  args$is_syncing <- NULL
-
-  # initialize status if needed
-  if (is.null(sc$state$status))
-    sc$state$status <- list()
-
-  # choose connection socket
-  if (use_monitoring) {
-    backend <- sc$monitoring
-    connection_name <- "monitoring"
-  }
-  else {
-    backend <- sc$backend
-    connection_name <- "backend"
-  }
-
-  if (!is_syncing && !identical(object, "Handler")) {
-    # if connection still running, sync to valid state
-    if (identical(sc$state$status[[connection_name]], "running"))
-      core_invoke_sync(sc)
-
-    # while exiting this function, if interrupted (still running), cancel server job
-    on.exit(core_invoke_cancel_running(sc))
-
-    sc$state$status[[connection_name]] <- "running"
-  }
-
-  # if the object is a jobj then get it's id
-  if (inherits(object, "spark_jobj"))
-    object <- object$id
-
+write_bin_args <- function(backend, object, static, method, args) {
   rc <- rawConnection(raw(), "r+")
   writeString(rc, object)
   writeBoolean(rc, static)
@@ -92,6 +46,76 @@ core_invoke_method <- function(sc, static, object, method, ...)
   close(rc)
 
   writeBin(con, backend)
+}
+
+core_invoke_synced <- function(sc)
+{
+  if (is.null(sc))
+    stop("The connection is no longer valid.")
+
+  backend <- core_invoke_socket(sc)
+  echo_id <- "sparklyr"
+
+  write_bin_args(backend, "Handler", TRUE, "echo", echo_id)
+
+  returnStatus <- readInt(backend)
+
+  if (length(returnStatus) == 0 || returnStatus != 0) {
+    FALSE
+  }
+  else {
+    object <- readObject(sc)
+    identical(object, echo_id)
+  }
+}
+
+core_invoke_socket <- function(sc) {
+  if (identical(sc$state$use_monitoring, TRUE))
+    sc$monitoring
+  else
+    sc$backend
+}
+
+core_invoke_socket_name <- function(sc) {
+  if (identical(sc$state$use_monitoring, TRUE))
+    "monitoring"
+  else
+    "backend"
+}
+
+core_invoke_method <- function(sc, static, object, method, ...)
+{
+  if (is.null(sc))
+    stop("The connection is no longer valid.")
+
+  args <- list(...)
+  is_syncing <- identical(args$is_syncing, TRUE)
+  args$is_syncing <- NULL
+
+  # initialize status if needed
+  if (is.null(sc$state$status))
+    sc$state$status <- list()
+
+  # choose connection socket
+  backend <- core_invoke_socket(sc)
+  connection_name <- core_invoke_socket_name(sc)
+
+  if (!is_syncing && !identical(object, "Handler")) {
+    # if connection still running, sync to valid state
+    if (identical(sc$state$status[[connection_name]], "running"))
+      core_invoke_sync(sc)
+
+    # while exiting this function, if interrupted (still running), cancel server job
+    on.exit(core_invoke_cancel_running(sc))
+
+    sc$state$status[[connection_name]] <- "running"
+  }
+
+  # if the object is a jobj then get it's id
+  if (inherits(object, "spark_jobj"))
+    object <- object$id
+
+  write_bin_args(backend, object, static, method, args)
 
   if (identical(object, "Handler") &&
       (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
