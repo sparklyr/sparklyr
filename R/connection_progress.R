@@ -28,7 +28,16 @@ connection_progress <- function(sc, terminated = FALSE)
       for (jobId in active) {
         jobId <- as.character(jobId)
         if (!jobId %in% names(env$jobs)) {
-          jobName <- paste("Spark Job (", jobId, ")", sep = "")
+          jobIdText <- ""
+          jobInfoOption <- invoke(tracker, "getJobInfo", as.integer(jobId))
+          if (invoke(jobInfoOption, "nonEmpty"))
+          {
+            jobInfo <- invoke(jobInfoOption, "get")
+            jobSparkId <- invoke(jobInfo, "jobId")
+            jobIdText <- paste("(", jobSparkId, ")", sep = "")
+          }
+
+          jobName <- paste("Spark Job", jobIdText)
           env$jobs[[jobId]] <- connection_progress_update(jobName, 101L)
         }
       }
@@ -48,7 +57,16 @@ connection_progress <- function(sc, terminated = FALSE)
           for (stageId in stages) {
             stageId <- as.character(stageId)
             if (!stageId %in% names(env$stages)) {
-              stageName <- paste("Spark Stage (", stageId, ")", sep = "")
+              stageIdText <- ""
+              stageInfoOption <- invoke(tracker, "getStageInfo", as.integer(stageId))
+              if (invoke(stageInfoOption, "nonEmpty"))
+              {
+                stageInfo <- invoke(stageInfoOption, "get")
+                stageSparkId <- invoke(stageInfo, "stageId")
+                stageIdText <- paste0("(", stageSparkId, ")", sep = "")
+              }
+
+              stageName <- paste("Spark Stage", stageIdText)
               env$stages[[stageId]] <- connection_progress_update(stageName, 101L)
             }
           }
