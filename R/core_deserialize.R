@@ -10,8 +10,8 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
   sc <- con
   con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) sc$monitoring else sc$backend
 
-  timeout <- spark_config_value(sc, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
-  progressInterval <- spark_config_value(sc, "sparklyr.progress.interval", 3)
+  timeout <- spark_config_value(sc$config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+  progressInterval <- spark_config_value(sc$config, "sparklyr.progress.interval", 3)
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 

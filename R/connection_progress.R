@@ -54,7 +54,10 @@ connection_progress <- function(sc, terminated = FALSE)
           }
 
           jobName <- paste("Spark Job", jobIdText)
-          env$jobs[[jobId]] <- connection_progress_update(jobName, 101L)
+          env$jobs[[jobId]] <- list(
+            ref = connection_progress_update(jobName, 101L),
+            units = 1
+          )
         }
       }
 
@@ -66,7 +69,7 @@ connection_progress <- function(sc, terminated = FALSE)
           jobInfo <- invoke(jobInfoOption, "get")
           jobStatus <- invoke(invoke(jobInfo, "status"), "toString")
 
-          api$set_job_status(env$jobs[[jobId]], jobStatus)
+          api$set_job_status(env$jobs[[jobId]]$ref, jobStatus)
           stages <- invoke(jobInfo, "stageIds")
 
           # add new stages
@@ -83,7 +86,10 @@ connection_progress <- function(sc, terminated = FALSE)
               }
 
               stageName <- paste("Spark Stage", stageIdText)
-              env$stages[[stageId]] <- connection_progress_update(stageName, 101L)
+              env$stages[[stageId]] <- list(
+                ref = connection_progress_update(stageName, 101L),
+                units = 1
+              )
             }
           }
 
@@ -99,20 +105,26 @@ connection_progress <- function(sc, terminated = FALSE)
                 stageCompleted <- invoke(stageInfo, "numCompletedTasks")
                 stageStatusText <- paste0(stageCompleted, "/", stageTasks, " completed")
 
-                api$set_job_status(env$stages[[stageId]], stageStatusText)
-                api$add_job_progress(env$stages[[stageId]], 1L)
+                api$set_job_status(env$stages[[stageId]]$ref, stageStatusText)
+                if (env$stages[[stageId]]$units < 100) {
+                  api$add_job_progress(env$stages[[stageId]]$ref, 1L)
+                  env$stages[[stageId]]$units <- env$stages[[stageId]]$units + 1
+                }
               }
             } else {
-              api$add_job_progress(env$stages[[stageId]], 100)
+              api$add_job_progress(env$stages[[stageId]]$ref, 100)
               env$stages[[stageId]] <- NULL
             }
           }
         }
 
         if (as.numeric(jobId) %in% active) {
-          api$add_job_progress(env$jobs[[jobId]], 1L)
+          if (env$jobs[[jobId]]$units < 100) {
+            api$add_job_progress(env$jobs[[jobId]]$ref, 1L)
+            env$jobs[[jobId]]$units <- env$jobs[[jobId]]$units + 1
+          }
         } else {
-          api$add_job_progress(env$jobs[[jobId]], 100)
+          api$add_job_progress(env$jobs[[jobId]]$ref, 100)
           env$jobs[[jobId]] <- NULL
         }
       }
@@ -121,9 +133,9 @@ connection_progress <- function(sc, terminated = FALSE)
 
   if (terminated) {
     for (jobId in names(env$jobs))
-      api$add_job_progress(env$jobs[[jobId]], 100L)
+      api$add_job_progress(env$jobs[[jobId]]$ref, 100L)
     for (stageId in names(env$stages))
-      api$add_job_progress(env$stages[[stageId]], 100L)
+      api$add_job_progress(env$stages[[stageId]]$ref, 100L)
   }
 }
 
