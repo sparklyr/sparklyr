@@ -19,7 +19,8 @@ connection_progress <- function(sc, terminated = FALSE)
   if (is.null(env$stages))
     env$stages <- list()
 
-  if (!terminated || length(env$jobs) > 0) {
+  if ((!terminated || length(env$jobs) > 0) &&
+      !is.null(sc$spark_context)) {
     connection_progress_context(sc, function() {
       tracker <- invoke(sc$spark_context, "statusTracker")
       active <- invoke(tracker, "getActiveJobIds")
