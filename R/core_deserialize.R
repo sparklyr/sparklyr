@@ -10,11 +10,12 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
   sc <- con
   con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) sc$monitoring else sc$backend
 
-  timeout <- spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+  timeout <- spark_config_value(sc, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+  progressInterval <- spark_config_value(sc, "sparklyr.progress.interval", 3)
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
-  progressTimeout <- Sys.time() + 3
+  progressTimeout <- Sys.time() + progressInterval
   if (is.null(sc$state$progress))
     sc$state$progress <- new.env()
   progressUpdated <- FALSE
@@ -28,7 +29,7 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
     result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
     if (Sys.time() > progressTimeout) {
-      progressTimeout <- Sys.time() + 3
+      progressTimeout <- Sys.time() + progressInterval
       if (exists("connection_progress")) {
         connection_progress(sc)
         progressUpdated <- TRUE
