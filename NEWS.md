@@ -1,5 +1,14 @@
 # Sparklyr 0.9.0 (unreleased)
 
+### Monitoring
+
+- Support for interrupting long running operations and recover gracefully
+  using the same connection.
+  
+- Support cancelling Spark jobs by interrupting R session.
+
+- Support for monitoring job progress within RStudio, required RStudio 1.2.
+
 ### Data
 
 - Added support to read and write ORC files using `spark_read_orc()` and

@@ -19,7 +19,7 @@ connection_progress_update <- function(jobName, progressUnits)
     api$add_job(jobName, progressUnits = progressUnits, autoRemove = FALSE)
 }
 
-connection_progress <- function(sc, terminated = FALSE)
+connection_progress_base <- function(sc, terminated = FALSE)
 {
   env <- sc$state$progress
 
@@ -144,9 +144,19 @@ connection_progress_context <- function(sc, f)
   sc$state$use_monitoring <- TRUE
   on.exit(sc$state$use_monitoring <- FALSE)
 
+  sc$config$sparklyr.backend.timeout <- 1
+
   f()
 }
 
+connection_progress <- function(sc, terminated = FALSE)
+{
+  tryCatch({
+    connection_progress_base(sc, terminated)
+  }, error = function(e) {
+    # ignore all connection progress errors
+  })
+}
 
 connection_progress_terminated <- function(sc)
 {
