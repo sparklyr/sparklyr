@@ -1,4 +1,4 @@
-stream_read_generic <- function(sc, path, type, schema = NULL)
+stream_read_generic <- function(sc, path, type, name, schema = NULL)
 {
   session <- spark_session(sc)
 
@@ -10,7 +10,10 @@ stream_read_generic <- function(sc, path, type, schema = NULL)
 
   invoke(session, "readStream") %>%
     invoke("schema", schema) %>%
-    invoke(type, path)
+    invoke(type, path) %>%
+    invoke("createOrReplaceTempView", name)
+
+  tbl(sc, name)
 }
 
 stream_write_generic <- function(x, path, type)
@@ -41,7 +44,7 @@ stream_write_generic <- function(x, path, type)
 #' @export
 stream_read_csv <- function(sc, name, path)
 {
-  stream_read_generic(sc, path = path, type = "csv")
+  stream_read_generic(sc, path = path, type = "csv", name = name)
 }
 
 #' Write a Spark DataFrame to a CSV stream
