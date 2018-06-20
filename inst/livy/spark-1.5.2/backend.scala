@@ -91,7 +91,7 @@ class Backend() {
     defaultTracker = Option(tracker)
   }
 
-  object GatewayOperattions extends Enumeration {
+  object GatewayOperations extends Enumeration {
     val GetPorts, RegisterInstance, UnregisterInstance = Value
   }
 
@@ -258,8 +258,8 @@ class Backend() {
 
           logger.log("received command " + commandId)
 
-          GatewayOperattions(commandId) match {
-            case GatewayOperattions.GetPorts => {
+          GatewayOperations(commandId) match {
+            case GatewayOperations.GetPorts => {
               val requestedSessionId = dis.readInt()
               val startupTimeout = dis.readInt()
 
@@ -360,7 +360,7 @@ class Backend() {
 
               dos.close()
             }
-            case GatewayOperattions.RegisterInstance => {
+            case GatewayOperations.RegisterInstance => {
               val registerSessionId = dis.readInt()
               val registerGatewayPort = dis.readInt()
 
@@ -373,7 +373,7 @@ class Backend() {
               dos.flush()
               dos.close()
             }
-            case GatewayOperattions.UnregisterInstance => {
+            case GatewayOperations.UnregisterInstance => {
               val unregisterSessionId = dis.readInt()
 
               logger.log("received session " + unregisterSessionId + " unregistration request")
@@ -407,7 +407,7 @@ class Backend() {
     val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
     val dos = new DataOutputStream(s.getOutputStream())
-    dos.writeInt(GatewayOperattions.RegisterInstance.id)
+    dos.writeInt(GatewayOperations.RegisterInstance.id)
     dos.writeInt(sessionId)
     dos.writeInt(port)
 
@@ -443,7 +443,7 @@ class Backend() {
       val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
       val dos = new DataOutputStream(s.getOutputStream())
-      dos.writeInt(GatewayOperattions.UnregisterInstance.id)
+      dos.writeInt(GatewayOperations.UnregisterInstance.id)
       dos.writeInt(sessionId)
 
       logger.log("is waiting for unregistration in gateway")

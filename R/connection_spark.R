@@ -220,7 +220,7 @@ spark_connect <- function(master,
 spark_log.spark_connection <- function(sc, n = 100, filter = NULL, ...) {
   if (.Platform$OS.type == "windows") {
     log <- file("logs/log4j.spark.log")
-    lines <- readr::read_lines(log)
+    lines <- readLines(log)
 
     tryCatch(function() {
       close(log)

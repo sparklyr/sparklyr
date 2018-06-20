@@ -155,9 +155,9 @@ start_shell <- function(master,
   isRemote <- remote
 
   sessionId <- if (isService)
-      spark_session_id(app_name, master)
+    spark_session_id(app_name, master)
   else
-      spark_session_random()
+    spark_session_random()
 
   # attempt to connect into an existing gateway
   gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
@@ -351,14 +351,23 @@ start_shell <- function(master,
   }
 
   tryCatch({
-    # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+    interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = TRUE,
+                                blocking = interval > 0,
                                 open = "wb",
-                                timeout = timeout)
+                                timeout = interval)
+    class(backend) <- c(class(backend), "shell_backend")
+
+    monitoring <- socketConnection(host = gatewayAddress,
+                                   port = gatewayInfo$backendPort,
+                                   server = FALSE,
+                                   blocking = interval > 0,
+                                   open = "wb",
+                                   timeout = interval)
+    class(monitoring) <- c(class(monitoring), "shell_backend")
   }, error = function(err) {
     close(gatewayInfo$gateway)
 
@@ -381,8 +390,11 @@ start_shell <- function(master,
     # spark_shell_connection
     spark_home = spark_home,
     backend = backend,
-    monitor = gatewayInfo$gateway,
-    output_file = output_file
+    monitoring = monitoring,
+    gateway = gatewayInfo$gateway,
+    output_file = output_file,
+    sessionId = sessionId,
+    state = new.env()
   ))
 
   # stop shell on R exit
@@ -403,13 +415,17 @@ spark_disconnect.spark_shell_connection <- function(sc, ...) {
 # Stop the Spark R Shell
 stop_shell <- function(sc, terminate = FALSE) {
   terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
+
+  # use monitoring connection to terminate
+  sc$state$use_monitoring <- TRUE
+
   invoke_method(sc,
                 FALSE,
                 "Handler",
                 terminationMode)
 
   close(sc$backend)
-  close(sc$monitor)
+  close(sc$gateway)
 }
 
 #' @export
@@ -417,7 +433,7 @@ connection_is_open.spark_shell_connection <- function(sc) {
   bothOpen <- FALSE
   if (!identical(sc, NULL)) {
     tryCatch({
-      bothOpen <- isOpen(sc$backend) && isOpen(sc$monitor)
+      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
     }, error = function(e) {
     })
   }

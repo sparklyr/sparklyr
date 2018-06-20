@@ -1,19 +1,39 @@
-core_invoke_method <- function(sc, static, object, method, ...)
+core_invoke_sync_socket <- function(sc)
 {
-  if (is.null(sc)) {
-    stop("The connection is no longer valid.")
+  flush <- c(1)
+  while(length(flush) > 0)
+    flush <- readBin(sc$backend, raw(), 1000)
+}
+
+core_invoke_sync <- function(sc)
+{
+  # sleep until connection clears is back on valid state
+  while (!core_invoke_synced(sc)) {
+    Sys.sleep(1)
+    core_invoke_sync_socket(sc)
   }
+}
 
-  # if the object is a jobj then get it's id
-  if (inherits(object, "spark_jobj"))
-    object <- object$id
+core_invoke_cancel_running <- function(sc)
+{
+  if (is.null(sc$spark_context) || !is.null(sc$state$cancelling))
+    return()
 
+  sc$state$cancelling <- TRUE
+
+  connection_progress_context(sc, function() {
+    invoke(sc$spark_context, "cancelAllJobs")
+  })
+
+  if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
+}
+
+write_bin_args <- function(backend, object, static, method, args) {
   rc <- rawConnection(raw(), "r+")
   writeString(rc, object)
   writeBoolean(rc, static)
   writeString(rc, method)
 
-  args <- list(...)
   writeInt(rc, length(args))
   writeArgs(rc, args)
   bytes <- rawConnectionValue(rc)
@@ -25,8 +45,75 @@ core_invoke_method <- function(sc, static, object, method, ...)
   con <- rawConnectionValue(rc)
   close(rc)
 
-  backend <- sc$backend
   writeBin(con, backend)
+}
+
+core_invoke_synced <- function(sc)
+{
+  if (is.null(sc))
+    stop("The connection is no longer valid.")
+
+  backend <- core_invoke_socket(sc)
+  echo_id <- "sparklyr"
+
+  write_bin_args(backend, "Handler", TRUE, "echo", echo_id)
+
+  returnStatus <- readInt(backend)
+
+  if (length(returnStatus) == 0 || returnStatus != 0) {
+    FALSE
+  }
+  else {
+    object <- readObject(sc)
+    identical(object, echo_id)
+  }
+}
+
+core_invoke_socket <- function(sc) {
+  if (identical(sc$state$use_monitoring, TRUE))
+    sc$monitoring
+  else
+    sc$backend
+}
+
+core_invoke_socket_name <- function(sc) {
+  if (identical(sc$state$use_monitoring, TRUE))
+    "monitoring"
+  else
+    "backend"
+}
+
+core_invoke_method <- function(sc, static, object, method, ...)
+{
+  if (is.null(sc))
+    stop("The connection is no longer valid.")
+
+  args <- list(...)
+
+  # initialize status if needed
+  if (is.null(sc$state$status))
+    sc$state$status <- list()
+
+  # choose connection socket
+  backend <- core_invoke_socket(sc)
+  connection_name <- core_invoke_socket_name(sc)
+
+  if (!identical(object, "Handler")) {
+    # if connection still running, sync to valid state
+    if (identical(sc$state$status[[connection_name]], "running"))
+      core_invoke_sync(sc)
+
+    # while exiting this function, if interrupted (still running), cancel server job
+    on.exit(core_invoke_cancel_running(sc))
+
+    sc$state$status[[connection_name]] <- "running"
+  }
+
+  # if the object is a jobj then get it's id
+  if (inherits(object, "spark_jobj"))
+    object <- object$id
+
+  write_bin_args(backend, object, static, method, args)
 
   if (identical(object, "Handler") &&
       (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
@@ -34,18 +121,17 @@ core_invoke_method <- function(sc, static, object, method, ...)
     return(NULL)
   }
 
-  returnStatus <- readInt(backend)
+  returnStatus <- readInt(sc)
 
   if (length(returnStatus) == 0) {
     # read the spark log
     msg <- core_read_spark_log_error(sc)
-    close(sc$backend)
-    close(sc$monitor)
+
     withr::with_options(list(
       warning.length = 8000
     ), {
       stop(
-        "Unexpected state in sparklyr backend, terminating connection: ",
+        "Unexpected state in sparklyr backend: ",
         msg,
         call. = FALSE)
     })
@@ -53,7 +139,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   if (returnStatus != 0) {
     # get error message from backend and report to R
-    msg <- readString(backend)
+    msg <- readString(sc)
     withr::with_options(list(
       warning.length = 8000
     ), {
@@ -69,13 +155,23 @@ core_invoke_method <- function(sc, static, object, method, ...)
     })
   }
 
-  class(backend) <- c(class(backend), "shell_backend")
+  object <- readObject(sc)
 
-  object <- readObject(backend)
+  sc$state$status[[connection_name]] <- "ready"
+  on.exit(NULL)
+
   attach_connection(object, sc)
 }
 
 jobj_subclass.shell_backend <- function(con) {
+  "shell_jobj"
+}
+
+jobj_subclass.spark_connection <- function(con) {
+  "shell_jobj"
+}
+
+jobj_subclass.spark_worker_connection <- function(con) {
   "shell_jobj"
 }
 

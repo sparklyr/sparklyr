@@ -1,3 +1,59 @@
+read_bin <- function(con, what, n, endian = NULL) {
+  UseMethod("read_bin")
+}
+
+read_bin.default <- function(con, what, n, endian = NULL) {
+  if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+}
+
+read_bin_wait <- function(con, what, n, endian = NULL) {
+  sc <- con
+  con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) sc$monitoring else sc$backend
+
+  timeout <- spark_config_value(sc$config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+  progressInterval <- spark_config_value(sc$config, "sparklyr.progress.interval", 3)
+
+  result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+
+  progressTimeout <- Sys.time() + progressInterval
+  if (is.null(sc$state$progress))
+    sc$state$progress <- new.env()
+  progressUpdated <- FALSE
+
+  waitInterval <- 0
+  commandStart <- Sys.time()
+  while(length(result) == 0 && commandStart + timeout > Sys.time()) {
+    Sys.sleep(waitInterval)
+    waitInterval <- min(0.1, waitInterval + 0.01)
+
+    result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+
+    if (Sys.time() > progressTimeout) {
+      progressTimeout <- Sys.time() + progressInterval
+      if (exists("connection_progress")) {
+        connection_progress(sc)
+        progressUpdated <- TRUE
+      }
+    }
+  }
+
+  if (progressUpdated) connection_progress_terminated(sc)
+
+  if (commandStart + timeout <= Sys.time()) {
+    stop("Operation timed out, increase config option sparklyr.backend.timeout if needed.")
+  }
+
+  result
+}
+
+read_bin.spark_connection <- function(con, what, n, endian = NULL) {
+  read_bin_wait(con, what, n, endian)
+}
+
+read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
+  read_bin_wait(con, what, n, endian)
+}
+
 readObject <- function(con) {
   # Read type first
   type <- readType(con)
@@ -24,8 +80,13 @@ readTypedObject <- function(con, type) {
 
 readString <- function(con) {
   stringLen <- readInt(con)
-  raw <- readBin(con, raw(), stringLen, endian = "big")
-  string <- rawToChar(raw)
+  string <- ""
+
+  if (stringLen > 0) {
+    raw <- read_bin(con, raw(), stringLen, endian = "big")
+    string <- rawToChar(raw)
+  }
+
   Encoding(string) <- "UTF-8"
   string
 }
@@ -36,19 +97,28 @@ readDateArray <- function(con, n = 1) {
 }
 
 readInt <- function(con, n = 1) {
-  readBin(con, integer(), n = n, endian = "big")
+  if (n == 0)
+    integer(0)
+  else
+    read_bin(con, integer(), n = n, endian = "big")
 }
 
 readDouble <- function(con, n = 1) {
-  readBin(con, double(), n = n, endian = "big")
+  if (n == 0)
+    double(0)
+  else
+    read_bin(con, double(), n = n, endian = "big")
 }
 
 readBoolean <- function(con, n = 1) {
-  as.logical(readInt(con, n = n))
+  if (n == 0)
+    logical(0)
+  else
+    as.logical(readInt(con, n = n))
 }
 
 readType <- function(con) {
-  rawToChar(readBin(con, "raw", n = 1L))
+  rawToChar(read_bin(con, "raw", n = 1L))
 }
 
 readDate <- function(con) {
@@ -56,13 +126,19 @@ readDate <- function(con) {
 }
 
 readTime <- function(con, n = 1) {
-  t <- readDouble(con, n)
-  timeNA <- as.POSIXct(0, origin = "1970-01-01", tz = "UTC")
+  if (identical(n, 0))
+    as.POSIXct(character(0))
+  else {
+    t <- readDouble(con, n)
+    timeNA <- as.POSIXct(0, origin = "1970-01-01", tz = "UTC")
 
-  r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
-  if (getOption("sparklyr.collect.datechars", FALSE)) as.character(r) else {
-    r[r == timeNA] <- as.POSIXct(NA)
-    r
+    r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
+    if (getOption("sparklyr.collect.datechars", FALSE))
+      as.character(r)
+    else {
+      r[r == timeNA] <- as.POSIXct(NA)
+      r
+    }
   }
 }
 
@@ -145,5 +221,8 @@ readStruct <- function(con) {
 
 readRaw <- function(con) {
   dataLen <- readInt(con)
-  readBin(con, raw(), as.integer(dataLen), endian = "big")
+  if (dataLen == 0)
+    raw()
+  else
+    read_bin(con, raw(), as.integer(dataLen), endian = "big")
 }

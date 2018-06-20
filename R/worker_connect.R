@@ -20,14 +20,16 @@ spark_worker_connect <- function(
   worker_log("is connecting to backend session")
 
   tryCatch({
-    # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+    interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+
     backend <- socketConnection(host = "localhost",
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = TRUE,
+                                blocking = interval > 0,
                                 open = "wb",
-                                timeout = timeout)
+                                timeout = interval)
+
+    class(backend) <- c(class(backend), "shell_backend")
   }, error = function(err) {
     close(gatewayInfo$gateway)
 
@@ -47,7 +49,7 @@ spark_worker_connect <- function(
     # spark_shell_connection
     spark_home = NULL,
     backend = backend,
-    monitor = gatewayInfo$gateway,
+    gateway = gatewayInfo$gateway,
     output_file = NULL
   ))
 
