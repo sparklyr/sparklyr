@@ -144,6 +144,8 @@ connection_progress_context <- function(sc, f)
   sc$state$use_monitoring <- TRUE
   on.exit(sc$state$use_monitoring <- FALSE)
 
+  sc$config$sparklyr.backend.timeout <- 1
+
   f()
 }
 
