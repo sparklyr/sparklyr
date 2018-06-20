@@ -19,7 +19,7 @@ connection_progress_update <- function(jobName, progressUnits)
     api$add_job(jobName, progressUnits = progressUnits, autoRemove = FALSE)
 }
 
-connection_progress <- function(sc, terminated = FALSE)
+connection_progress_base <- function(sc, terminated = FALSE)
 {
   env <- sc$state$progress
 
@@ -149,6 +149,14 @@ connection_progress_context <- function(sc, f)
   f()
 }
 
+connection_progress <- function(sc, terminated = FALSE)
+{
+  tryCatch({
+    connection_progress_base(sc, terminated)
+  }, error = function(e) {
+    # ignore all connection progress errors
+  })
+}
 
 connection_progress_terminated <- function(sc)
 {
