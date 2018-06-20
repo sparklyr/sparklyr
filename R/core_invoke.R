@@ -20,7 +20,7 @@ core_invoke_cancel_running <- function(sc)
     return()
 
   # if something fails while using a monitored connection we don't cancel jobs
-  if (!identical(sc$use_monitoring, TRUE))
+  if (identical(sc$use_monitoring, TRUE))
     return()
 
   connection_progress_context(sc, function() {
