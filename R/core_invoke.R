@@ -16,10 +16,8 @@ core_invoke_sync <- function(sc)
 
 core_invoke_cancel_running <- function(sc)
 {
-  if (is.null(sc$spark_context) || !is.null(sc$state$cancelling))
+  if (is.null(sc$spark_context))
     return()
-
-  sc$state$cancelling <- TRUE
 
   connection_progress_context(sc, function() {
     invoke(sc$spark_context, "cancelAllJobs")
