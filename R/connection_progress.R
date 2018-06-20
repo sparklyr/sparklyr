@@ -10,13 +10,16 @@ connection_progress_api <- function() {
   )
 }
 
-connection_progress_update <- function(jobName, progressUnits)
+connection_progress_update <- function(jobName, progressUnits, url)
 {
   api <- connection_progress_api()
-  if ("show" %in% names(formals(api$add_job)))
+  if ("url" %in% names(formals(api$add_job)) && nchar(url) > 0) {
+    api$add_job(jobName, progressUnits = progressUnits, show = FALSE, autoRemove = FALSE, url = url)
+  } else if ("show" %in% names(formals(api$add_job))) {
     api$add_job(jobName, progressUnits = progressUnits, show = FALSE, autoRemove = FALSE)
-  else
+  } else {
     api$add_job(jobName, progressUnits = progressUnits, autoRemove = FALSE)
+  }
 }
 
 connection_progress_base <- function(sc, terminated = FALSE)
@@ -33,6 +36,16 @@ connection_progress_base <- function(sc, terminated = FALSE)
 
   if (is.null(env$stages))
     env$stages <- list()
+
+  if (is.null(env$web_url)) {
+    env$web_url <- tryCatch({
+      spark_context(sc) %>%
+        invoke("uiWebUrl") %>%
+        invoke("get")
+    }, error = function(e) {
+      ""
+    })
+  }
 
   if ((!terminated || length(env$jobs) > 0) &&
       !is.null(sc$spark_context)) {
@@ -54,8 +67,10 @@ connection_progress_base <- function(sc, terminated = FALSE)
           }
 
           jobName <- paste("Spark Job", jobIdText)
+          jobUrl <- file.path(env$web_url, "jobs", "job", paste0("?id=", jobSparkId))
+          jobUrlParam <- if (nchar(jobUrl) > 0) jobUrl else ""
           env$jobs[[jobId]] <- list(
-            ref = connection_progress_update(jobName, 101L),
+            ref = connection_progress_update(jobName, 101L, jobUrlParam),
             units = 1
           )
         }
@@ -86,8 +101,10 @@ connection_progress_base <- function(sc, terminated = FALSE)
               }
 
               stageName <- paste("Spark Stage", stageIdText)
+              stageUrl <- file.path(env$web_url, "stages", "stage", paste0("?id=", jobSparkId, "&attempt=0"))
+              stageUrlParam <- if (nchar(env$web_url) > 0) stageUrl else ""
               env$stages[[stageId]] <- list(
-                ref = connection_progress_update(stageName, 101L),
+                ref = connection_progress_update(stageName, 101L, stageUrlParam),
                 units = 1
               )
             }
