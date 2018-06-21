@@ -4,7 +4,7 @@ sc <- testthat_spark_connection()
 
 test_that("csv stream can be filtered with dplyr", {
   dir.create("iris-in")
-  write.csv(iris, "iris-in/iris.csv")
+  write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
 
   stream_read_csv(sc, "stream", "iris-in") %>%
     filter(stream._c3 == "virginica") %>%

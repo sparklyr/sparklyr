@@ -65,10 +65,33 @@ spark_csv_read <- function(sc,
     optionSchema <- invoke(options, "schema", columnDefs)
   }
 
-  invoke(
+  df <- invoke(
     optionSchema,
     spark_csv_load_name(sc),
     path)
+
+  columnsHaveTypes <- !identical(columns, NULL) && length(names(columns)) > 0
+  if ((identical(columns, NULL) && identical(csvOptions$header, "false")) ||
+      (!identical(columns, NULL) && !columnsHaveTypes)) {
+    if (!identical(columns, NULL)) {
+      newNames <- columns
+    }
+    else {
+      # create normalized column names when header = FALSE and a columns specification is not supplied
+      columns <- invoke(df, "columns")
+      n <- length(columns)
+      newNames <- sprintf("V%s", seq_len(n))
+    }
+    df <- invoke(df, "toDF", as.list(newNames))
+  } else {
+    # sanitize column names
+    colNames <- as.character(invoke(df, "columns"))
+    sanitized <- spark_sanitize_names(colNames)
+    if (!identical(colNames, sanitized))
+      df <- invoke(df, "toDF", as.list(sanitized))
+  }
+
+  df
 }
 
 spark_csv_write <- function(df, path, csvOptions, mode, partition_by) {
