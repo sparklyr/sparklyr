@@ -10,7 +10,8 @@ stream_read_generic_type <- function(sc,
                                      escape = "\\",
                                      charset = "UTF-8",
                                      null_value = NULL,
-                                     options = list()) {
+                                     options = list())
+{
   switch(type,
     csv = {
       options <- spark_csv_options(header, infer_schema, delimiter, quote, escape, charset, null_value, options)
@@ -72,6 +73,7 @@ stream_write_generic <- function(x, path, type)
 #' @export
 stream_read_csv <- function(sc, name, path)
 {
+  spark_require_version(sc, "2.0.0")
   stream_read_generic(sc, path = path, type = "csv", name = name)
 }
 
@@ -88,5 +90,6 @@ stream_read_csv <- function(sc, name, path)
 #' @export
 stream_write_csv <- function(x, path)
 {
+  spark_require_version(sc, "2.0.0")
   stream_write_generic(x, path = path, type = "csv")
 }
