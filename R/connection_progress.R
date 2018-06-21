@@ -20,7 +20,17 @@ connection_progress_update <- function(jobName, progressUnits, url)
                 autoRemove = FALSE,
                 actions = list(
                   default = function(id) {
-                    browseURL(url)
+                    if (!is.null(getOption("page_viewer")) &&
+                        grepl("http://localhost|https://localhost", url) &&
+                        exists(".rs.isDesktop") &&
+                        !get(".rs.isDesktop")())
+                    {
+                      getOption("page_viewer")(url)
+                    }
+                    else
+                    {
+                      browseURL(url)
+                    }
                   }
                 ))
   } else if ("show" %in% names(formals(api$add_job))) {
