@@ -33,6 +33,9 @@
 
 ### Distributed R
 
+- Fix to support retrieving empty data frames in grouped
+  `spark_apply()` operations (#1505).
+
 - Added support for `sparklyr.apply.packages` to configure default
   behavior for `spark_apply()` parameters (#1530).
 
