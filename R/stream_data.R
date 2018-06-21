@@ -23,8 +23,8 @@ stream_read_generic_type <- function(sc,
     },
     default = {
       spark_session(sc) %>%
-        invoke(session, "read") %>%
-        invoke(read_obj, type, path)
+        invoke("read") %>%
+        invoke(type, path)
     }
   )
 }
@@ -90,6 +90,6 @@ stream_read_csv <- function(sc, name, path)
 #' @export
 stream_write_csv <- function(x, path)
 {
-  spark_require_version(sc, "2.0.0")
+  spark_require_version(spark_connection(x), "2.0.0")
   stream_write_generic(x, path = path, type = "csv")
 }
