@@ -1,8 +1,12 @@
 core_invoke_sync_socket <- function(sc)
 {
   flush <- c(1)
-  while(length(flush) > 0)
+  while(length(flush) > 0) {
     flush <- readBin(sc$backend, raw(), 1000)
+
+    # while flushing monitored connections we don't want to hang forever
+    if (sc$state$use_monitoring) break;
+  }
 }
 
 core_invoke_sync <- function(sc)

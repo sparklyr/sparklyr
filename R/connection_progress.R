@@ -50,19 +50,19 @@ connection_progress_base <- function(sc, terminated = FALSE)
   if (is.null(env$stages))
     env$stages <- list()
 
-  if (is.null(env$web_url)) {
-    env$web_url <- tryCatch({
-      spark_context(sc) %>%
-        invoke("uiWebUrl") %>%
-        invoke("get")
-    }, error = function(e) {
-      ""
-    })
-  }
-
   if ((!terminated || length(env$jobs) > 0) &&
       !is.null(sc$spark_context)) {
     connection_progress_context(sc, function() {
+      if (is.null(env$web_url)) {
+        env$web_url <- tryCatch({
+          spark_context(sc) %>%
+            invoke("uiWebUrl") %>%
+            invoke("get")
+        }, error = function(e) {
+          ""
+        })
+      }
+
       tracker <- invoke(sc$spark_context, "statusTracker")
       active <- invoke(tracker, "getActiveJobIds")
 
