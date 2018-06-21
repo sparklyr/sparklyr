@@ -1,14 +1,42 @@
+stream_read_generic_type <- function(sc,
+                                     path,
+                                     type,
+                                     name,
+                                     columns = NULL,
+                                     header = TRUE,
+                                     infer_schema = TRUE,
+                                     delimiter = ",",
+                                     quote = "\"",
+                                     escape = "\\",
+                                     charset = "UTF-8",
+                                     null_value = NULL,
+                                     options = list()) {
+  switch(type,
+    csv = {
+      options <- spark_csv_options(header, infer_schema, delimiter, quote, escape, charset, null_value, options)
+      spark_csv_read(
+        sc,
+        spark_normalize_path(path),
+        options,
+        columns)
+    },
+    default = {
+      spark_session(sc) %>%
+        invoke(session, "read") %>%
+        invoke(read_obj, type, path)
+    }
+  )
+}
+
 stream_read_generic <- function(sc, path, type, name, schema = NULL)
 {
-  session <- spark_session(sc)
-
   if (is.null(schema)) {
-    read_obj <- invoke(session, "read")
-    read_sdf <- invoke(read_obj, type, path)
-    schema <- invoke(read_sdf, "schema")
+    reader <- stream_read_generic_type(sc, path, type, name)
+    schema <- invoke(reader, "schema")
   }
 
-  invoke(session, "readStream") %>%
+  spark_session(sc) %>%
+    invoke("readStream") %>%
     invoke("schema", schema) %>%
     invoke(type, path) %>%
     invoke("createOrReplaceTempView", name)
