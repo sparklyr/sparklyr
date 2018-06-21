@@ -126,10 +126,14 @@ spark_worker_apply <- function(sc) {
     }
 
     if (grouped) {
-      new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
-      names(new_column_values) <- grouped_by
-
-      result <- do.call("cbind", list(new_column_values, result))
+      if (nrow(result) > 0) {
+        new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
+        names(new_column_values) <- grouped_by
+        result <- do.call("cbind", list(new_column_values, result))
+      }
+      else {
+        result <- NULL
+      }
     }
 
     all_results <- rbind(all_results, result)
