@@ -13,12 +13,25 @@ connection_progress_api <- function() {
 connection_progress_update <- function(jobName, progressUnits, url)
 {
   api <- connection_progress_api()
-  if ("url" %in% names(formals(api$add_job)) && nchar(url) > 0) {
-    api$add_job(jobName, progressUnits = progressUnits, show = FALSE, autoRemove = FALSE, url = url)
+  if ("actions" %in% names(formals(api$add_job)) && nchar(url) > 0) {
+    api$add_job(jobName,
+                progressUnits = progressUnits,
+                show = FALSE,
+                autoRemove = FALSE,
+                actions = list(
+                  default = function(id) {
+                    browseURL(url)
+                  }
+                ))
   } else if ("show" %in% names(formals(api$add_job))) {
-    api$add_job(jobName, progressUnits = progressUnits, show = FALSE, autoRemove = FALSE)
+    api$add_job(jobName,
+                progressUnits = progressUnits,
+                show = FALSE,
+                autoRemove = FALSE)
   } else {
-    api$add_job(jobName, progressUnits = progressUnits, autoRemove = FALSE)
+    api$add_job(jobName,
+                progressUnits = progressUnits,
+                autoRemove = FALSE)
   }
 }
 
