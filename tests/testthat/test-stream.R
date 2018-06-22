@@ -17,8 +17,7 @@ test_that("csv stream can be filtered with dplyr", {
     filter(Species == "virginica") %>%
     stream_write_csv(iris_out)
 
-  invoke(stream, "stop")
-
+  stream_stop(stream)
   succeed()
 })
 
@@ -30,7 +29,6 @@ test_that("csv stream can use custom options", {
   stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
     stream_write_csv(iris_out, delimiter = "|")
 
-  invoke(stream, "stop")
-
+  stream_stop(stream)
   succeed()
 })
