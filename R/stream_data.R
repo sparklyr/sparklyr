@@ -3,22 +3,14 @@ stream_read_generic_type <- function(sc,
                                      type,
                                      name,
                                      columns = NULL,
-                                     header = TRUE,
-                                     infer_schema = TRUE,
-                                     delimiter = ",",
-                                     quote = "\"",
-                                     escape = "\\",
-                                     charset = "UTF-8",
-                                     null_value = NULL,
-                                     options = list())
+                                     stream_options = list())
 {
   switch(type,
     csv = {
-      options <- spark_csv_options(header, infer_schema, delimiter, quote, escape, charset, null_value, options)
       spark_csv_read(
         sc,
         spark_normalize_path(path),
-        options,
+        stream_options,
         columns)
     },
     default = {
@@ -29,10 +21,21 @@ stream_read_generic_type <- function(sc,
   )
 }
 
-stream_read_generic <- function(sc, path, type, name, schema = NULL)
+stream_read_generic <- function(sc,
+                                path,
+                                type,
+                                name,
+                                columns,
+                                stream_options)
 {
+  schema <- NULL
   if (is.null(schema)) {
-    reader <- stream_read_generic_type(sc, path, type, name)
+    reader <- stream_read_generic_type(sc,
+                                       path,
+                                       type,
+                                       name,
+                                       columns = columns,
+                                       stream_options = stream_options)
     schema <- invoke(reader, "schema")
   }
 
@@ -45,7 +48,7 @@ stream_read_generic <- function(sc, path, type, name, schema = NULL)
   tbl(sc, name)
 }
 
-stream_write_generic <- function(x, path, type)
+stream_write_generic <- function(x, path, type, stream_options)
 {
   sdf <- spark_dataframe(x)
   if (!invoke(sdf, "isStreaming"))
@@ -62,34 +65,82 @@ stream_write_generic <- function(x, path, type)
 #'
 #' Read a tabular data stream into a Spark DataFrame.
 #'
-#' @param sc A \code{spark_connection}.
-#' @param name The name to assign to the newly generated table.
-#' @param path The path to the file. Needs to be accessible from the cluster.
-#'   Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.
-#' @param ... Optional arguments; currently unused.
+#' @inheritParams spark_read_csv
+#' @param name The name to assign to the newly generated stream.
 #'
 #' @family Spark stream serialization
 #'
 #' @export
-stream_read_csv <- function(sc, name, path)
+stream_read_csv <- function(sc,
+                            path,
+                            name = NULL,
+                            header = TRUE,
+                            columns = NULL,
+                            infer_schema = TRUE,
+                            delimiter = ",",
+                            quote = "\"",
+                            escape = "\\",
+                            charset = "UTF-8",
+                            null_value = NULL,
+                            options = list(),
+                            ...)
 {
   spark_require_version(sc, "2.0.0")
-  stream_read_generic(sc, path = path, type = "csv", name = name)
+
+  name <- name %||% random_string("sparklyr_tmp_")
+
+  streamOptions <- spark_csv_options(header,
+                                     infer_schema,
+                                     delimiter,
+                                     quote,
+                                     escape,
+                                     charset,
+                                     null_value,
+                                     options)
+
+  stream_read_generic(sc,
+                      path = path,
+                      type = "csv",
+                      name = name,
+                      columns = columns,
+                      stream_options = streamOptions)
 }
 
 #' Write a Spark DataFrame to a CSV stream
 #'
-#' Write a Spark DataFrame to a tabular (typically, comma-separated) stream
+#' Write a Spark DataFrame to a tabular (typically, comma-separated) stream.
 #'
-#' @inheritParams stream_read_csv
-#' @param x A Spark DataFrame or dplyr operation
-#' @param ... Optional arguments; currently unused.
+#' @inheritParams spark_write_csv
 #'
 #' @family Spark stream serialization
 #'
 #' @export
-stream_write_csv <- function(x, path)
+stream_write_csv <- function(x,
+                             path,
+                             header = TRUE,
+                             columns = NULL,
+                             infer_schema = TRUE,
+                             delimiter = ",",
+                             quote = "\"",
+                             escape = "\\",
+                             charset = "UTF-8",
+                             null_value = NULL,
+                             options = list(),
+                             ...)
 {
   spark_require_version(spark_connection(x), "2.0.0")
-  stream_write_generic(x, path = path, type = "csv")
+
+  streamOptions <- spark_csv_options(header,
+                                     infer_schema,
+                                     delimiter,
+                                     quote,
+                                     escape,
+                                     charset,
+                                     null_value,
+                                     options)
+
+  stream_write_generic(x,
+                       path = path,
+                       type = "csv",
+                       stream_options = streamOptions)
 }

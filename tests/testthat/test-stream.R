@@ -12,7 +12,7 @@ test_that("csv stream can be filtered with dplyr", {
   source <- paste0("file://", file.path(getwd(), "iris-in"))
   destination <- paste0("file://", file.path(getwd(), "iris-out"))
 
-  stream_read_csv(sc, "stream", source) %>%
+  stream_read_csv(sc, source) %>%
     filter(Species == "virginica") %>%
     stream_write_csv(destination)
 
