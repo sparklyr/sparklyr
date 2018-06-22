@@ -19,7 +19,7 @@ connection_progress_update <- function(jobName, progressUnits, url)
                 show = FALSE,
                 autoRemove = FALSE,
                 actions = list(
-                  default = function(id) {
+                  info = function(id) {
                     if (!is.null(getOption("page_viewer")) &&
                         grepl("http://localhost|https://localhost", url) &&
                         exists(".rs.isDesktop") &&
