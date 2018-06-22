@@ -35,11 +35,12 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
   sc <- con
   con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) sc$monitoring else sc$backend
 
-  timeout <- spark_config_value(list(), "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+  timeout <- spark_config_value(sc$config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+  progressInterval <- spark_config_value(sc$config, "sparklyr.progress.interval", 3)
 
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
-  progressTimeout <- Sys.time() + 3
+  progressTimeout <- Sys.time() + progressInterval
   if (is.null(sc$state$progress))
     sc$state$progress <- new.env()
   progressUpdated <- FALSE
@@ -53,7 +54,7 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
     result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
     if (Sys.time() > progressTimeout) {
-      progressTimeout <- Sys.time() + 3
+      progressTimeout <- Sys.time() + progressInterval
       if (exists("connection_progress")) {
         connection_progress(sc)
         progressUpdated <- TRUE
@@ -378,21 +379,11 @@ core_invoke_sync_socket <- function(sc)
 {
   flush <- c(1)
   while(length(flush) > 0)
-    flush <- readBin(sc$backend, integer(), 1)
-}
-
-core_invoke_synced <- function(sc)
-{
-  identical(
-    invoke_static(sc, "Handler", "echo", sc$app_name, is_syncing = TRUE),
-    sc$app_name
-  )
+    flush <- readBin(sc$backend, raw(), 1000)
 }
 
 core_invoke_sync <- function(sc)
 {
-  core_invoke_sync_socket(sc)
-
   # sleep until connection clears is back on valid state
   while (!core_invoke_synced(sc)) {
     Sys.sleep(1)
@@ -402,12 +393,12 @@ core_invoke_sync <- function(sc)
 
 core_invoke_cancel_running <- function(sc)
 {
-  message("Cancelling Spark jobs")
-
-  if (is.null(sc$spark_context) || !is.null(sc$state$cancelling))
+  if (is.null(sc$spark_context))
     return()
 
-  sc$state$cancelling <- TRUE
+  # if something fails while using a monitored connection we don't cancel jobs
+  if (identical(sc$use_monitoring, TRUE))
+    return()
 
   connection_progress_context(sc, function() {
     invoke(sc$spark_context, "cancelAllJobs")
@@ -416,45 +407,7 @@ core_invoke_cancel_running <- function(sc)
   if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
 }
 
-core_invoke_method <- function(sc, static, object, method, ...)
-{
-  if (is.null(sc))
-    stop("The connection is no longer valid.")
-
-  args <- list(...)
-  is_syncing <- identical(args$is_syncing, TRUE)
-  use_monitoring <- identical(sc$state$use_monitoring, TRUE)
-  args$is_syncing <- NULL
-
-  # initialize status if needed
-  if (is.null(sc$state$status))
-    sc$state$status <- list()
-
-  # choose connection socket
-  if (use_monitoring) {
-    backend <- sc$monitoring
-    connection_name <- "monitoring"
-  }
-  else {
-    backend <- sc$backend
-    connection_name <- "backend"
-  }
-
-  if (!is_syncing && !identical(object, "Handler")) {
-    # if connection still running, sync to valid state
-    if (identical(sc$state$status[[connection_name]], "running"))
-      core_invoke_sync(sc)
-
-    # while exiting this function, if interrupted (still running), cancel server job
-    on.exit(core_invoke_cancel_running(sc))
-
-    sc$state$status[[connection_name]] <- "running"
-  }
-
-  # if the object is a jobj then get it's id
-  if (inherits(object, "spark_jobj"))
-    object <- object$id
-
+write_bin_args <- function(backend, object, static, method, args) {
   rc <- rawConnection(raw(), "r+")
   writeString(rc, object)
   writeBoolean(rc, static)
@@ -472,6 +425,74 @@ core_invoke_method <- function(sc, static, object, method, ...)
   close(rc)
 
   writeBin(con, backend)
+}
+
+core_invoke_synced <- function(sc)
+{
+  if (is.null(sc))
+    stop("The connection is no longer valid.")
+
+  backend <- core_invoke_socket(sc)
+  echo_id <- "sparklyr"
+
+  write_bin_args(backend, "Handler", TRUE, "echo", echo_id)
+
+  returnStatus <- readInt(backend)
+
+  if (length(returnStatus) == 0 || returnStatus != 0) {
+    FALSE
+  }
+  else {
+    object <- readObject(sc)
+    identical(object, echo_id)
+  }
+}
+
+core_invoke_socket <- function(sc) {
+  if (identical(sc$state$use_monitoring, TRUE))
+    sc$monitoring
+  else
+    sc$backend
+}
+
+core_invoke_socket_name <- function(sc) {
+  if (identical(sc$state$use_monitoring, TRUE))
+    "monitoring"
+  else
+    "backend"
+}
+
+core_invoke_method <- function(sc, static, object, method, ...)
+{
+  if (is.null(sc))
+    stop("The connection is no longer valid.")
+
+  args <- list(...)
+
+  # initialize status if needed
+  if (is.null(sc$state$status))
+    sc$state$status <- list()
+
+  # choose connection socket
+  backend <- core_invoke_socket(sc)
+  connection_name <- core_invoke_socket_name(sc)
+
+  if (!identical(object, "Handler")) {
+    # if connection still running, sync to valid state
+    if (identical(sc$state$status[[connection_name]], "running"))
+      core_invoke_sync(sc)
+
+    # while exiting this function, if interrupted (still running), cancel server job
+    on.exit(core_invoke_cancel_running(sc))
+
+    sc$state$status[[connection_name]] <- "running"
+  }
+
+  # if the object is a jobj then get it's id
+  if (inherits(object, "spark_jobj"))
+    object <- object$id
+
+  write_bin_args(backend, object, static, method, args)
 
   if (identical(object, "Handler") &&
       (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
@@ -515,10 +536,8 @@ core_invoke_method <- function(sc, static, object, method, ...)
 
   object <- readObject(sc)
 
-  if (!is_syncing) {
-    sc$state$status[[connection_name]] <- "ready"
-    on.exit(NULL)
-  }
+  sc$state$status[[connection_name]] <- "ready"
+  on.exit(NULL)
 
   attach_connection(object, sc)
 }
@@ -1117,10 +1136,14 @@ spark_worker_apply <- function(sc) {
     }
 
     if (grouped) {
-      new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
-      names(new_column_values) <- grouped_by
-
-      result <- do.call("cbind", list(new_column_values, result))
+      if (nrow(result) > 0) {
+        new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
+        names(new_column_values) <- grouped_by
+        result <- do.call("cbind", list(new_column_values, result))
+      }
+      else {
+        result <- NULL
+      }
     }
 
     all_results <- rbind(all_results, result)
