@@ -10,13 +10,29 @@ connection_progress_api <- function() {
   )
 }
 
-connection_progress_update <- function(jobName, progressUnits)
+connection_progress_update <- function(jobName, progressUnits, url)
 {
   api <- connection_progress_api()
-  if ("show" %in% names(formals(api$add_job)))
-    api$add_job(jobName, progressUnits = progressUnits, show = FALSE, autoRemove = FALSE)
-  else
-    api$add_job(jobName, progressUnits = progressUnits, autoRemove = FALSE)
+  if ("actions" %in% names(formals(api$add_job)) && nchar(url) > 0) {
+    api$add_job(jobName,
+                progressUnits = progressUnits,
+                show = FALSE,
+                autoRemove = FALSE,
+                actions = list(
+                  info = function(id) {
+                    browseURL(url)
+                  }
+                ))
+  } else if ("show" %in% names(formals(api$add_job))) {
+    api$add_job(jobName,
+                progressUnits = progressUnits,
+                show = FALSE,
+                autoRemove = FALSE)
+  } else {
+    api$add_job(jobName,
+                progressUnits = progressUnits,
+                autoRemove = FALSE)
+  }
 }
 
 connection_progress_base <- function(sc, terminated = FALSE)
@@ -37,6 +53,16 @@ connection_progress_base <- function(sc, terminated = FALSE)
   if ((!terminated || length(env$jobs) > 0) &&
       !is.null(sc$spark_context)) {
     connection_progress_context(sc, function() {
+      if (is.null(env$web_url)) {
+        env$web_url <- tryCatch({
+          spark_context(sc) %>%
+            invoke("uiWebUrl") %>%
+            invoke("get")
+        }, error = function(e) {
+          ""
+        })
+      }
+
       tracker <- invoke(sc$spark_context, "statusTracker")
       active <- invoke(tracker, "getActiveJobIds")
 
@@ -54,8 +80,10 @@ connection_progress_base <- function(sc, terminated = FALSE)
           }
 
           jobName <- paste("Spark Job", jobIdText)
+          jobUrl <- file.path(env$web_url, "jobs", "job", paste0("?id=", jobSparkId))
+          jobUrlParam <- if (nchar(jobUrl) > 0) jobUrl else ""
           env$jobs[[jobId]] <- list(
-            ref = connection_progress_update(jobName, 101L),
+            ref = connection_progress_update(jobName, 101L, jobUrlParam),
             units = 1
           )
         }
@@ -86,8 +114,10 @@ connection_progress_base <- function(sc, terminated = FALSE)
               }
 
               stageName <- paste("Spark Stage", stageIdText)
+              stageUrl <- file.path(env$web_url, "stages", "stage", paste0("?id=", jobSparkId, "&attempt=0"))
+              stageUrlParam <- if (nchar(env$web_url) > 0) stageUrl else ""
               env$stages[[stageId]] <- list(
-                ref = connection_progress_update(stageName, 101L),
+                ref = connection_progress_update(stageName, 101L, stageUrlParam),
                 units = 1
               )
             }
