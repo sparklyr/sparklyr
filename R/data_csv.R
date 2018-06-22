@@ -53,9 +53,9 @@ spark_csv_read <- function(sc,
     }
   }
 
-  lapply(names(csvOptions), function(csvOptionName) {
-    options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
-  })
+  for (csvOptionName in names(csvOptions)) {
+    options <- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+  }
 
   if (identical(columns, NULL)) {
     optionSchema <- options
@@ -100,9 +100,9 @@ spark_csv_write <- function(df, path, csvOptions, mode, partition_by) {
   write <- invoke(df, "write")
   options <- spark_csv_format_if_needed(write, sc)
 
-  lapply(names(csvOptions), function(csvOptionName) {
-    options <<- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
-  })
+  for (csvOptionName in names(csvOptions)) {
+    options <- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+  }
 
   if (!is.null(partition_by))
     options <- invoke(options, "partitionBy", as.list(partition_by))

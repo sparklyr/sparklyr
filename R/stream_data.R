@@ -29,7 +29,11 @@ stream_read_generic <- function(sc,
                                 stream_options)
 {
   schema <- NULL
-  if (is.null(schema)) {
+
+  streamOptions <- spark_session(sc) %>%
+    invoke("readStream")
+
+  if (identical(columns, NULL)) {
     reader <- stream_read_generic_type(sc,
                                        path,
                                        type,
@@ -38,9 +42,15 @@ stream_read_generic <- function(sc,
                                        stream_options = stream_options)
     schema <- invoke(reader, "schema")
   }
+  else {
+    schema <- spark_data_build_types(sc, columns)
+  }
 
-  spark_session(sc) %>%
-    invoke("readStream") %>%
+  for (optionName in names(stream_options)) {
+    streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
+  }
+
+  streamOptions %>%
     invoke("schema", schema) %>%
     invoke(type, path) %>%
     invoke("createOrReplaceTempView", name)
@@ -54,10 +64,19 @@ stream_write_generic <- function(x, path, type, stream_options)
   if (!invoke(sdf, "isStreaming"))
     stop("DataFrame requires streaming context. Use `stream_read_*()` to read from streams.")
 
-  invoke(sdf, "writeStream") %>%
-    invoke("format", type) %>%
-    invoke("option", "checkpointLocation", file.path(path, "checkpoint")) %>%
-    invoke("option", "path", path) %>%
+  streamOptions <- invoke(sdf, "writeStream") %>%
+    invoke("format", type)
+
+  stream_options$path <- path
+
+  if (is.null(stream_options$checkpointLocation))
+    stream_options$checkpointLocation <- file.path(path, "checkpoint")
+
+  for (optionName in names(stream_options)) {
+    streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
+  }
+
+  streamOptions %>%
     invoke("start")
 }
 
