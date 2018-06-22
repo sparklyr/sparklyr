@@ -23,3 +23,25 @@ or an \R function that is invoked on the grouped dataset.}
 Construct a pivot table over a Spark Dataframe, using a syntax similar to
 that from \code{reshape2::dcast}.
 }
+\examples{
+\dontrun{
+library(sparklyr)
+library(dplyr)
+
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+# aggregating by mean
+iris_tbl \%>\%
+  mutate(Petal_Width = ifelse(Petal_Width > 1.5, "High", "Low" )) \%>\%
+  sdf_pivot(Petal_Width ~ Species,
+            fun.aggregate = list(Petal_Length = "mean"))
+
+# aggregating all observations in a list
+iris_tbl \%>\%
+  mutate(Petal_Width = ifelse(Petal_Width > 1.5, "High", "Low" )) \%>\%
+  sdf_pivot(Petal_Width ~ Species,
+            fun.aggregate = list(Petal_Length = "collect_list"))
+}
+
+}
