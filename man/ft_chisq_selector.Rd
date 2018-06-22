@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_chisq_selector.R
 \name{ft_chisq_selector}
 \alias{ft_chisq_selector}
-\title{Feature Tranformation -- ChiSqSelector (Estimator)}
+\title{Feature Transformation -- ChiSqSelector (Estimator)}
 \usage{
 ft_chisq_selector(x, features_col, output_col, label_col,
   selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,

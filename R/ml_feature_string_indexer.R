@@ -1,4 +1,4 @@
-#' Feature Tranformation -- StringIndexer (Estimator)
+#' Feature Transformation -- StringIndexer (Estimator)
 #'
 #' A label indexer that maps a string column of labels to an ML column of
 #'   label indices. If the input column is numeric, we cast it to string and

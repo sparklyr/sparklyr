@@ -5,7 +5,7 @@
 \alias{ft_string_indexer}
 \alias{ml_labels}
 \alias{ft_string_indexer_model}
-\title{Feature Tranformation -- StringIndexer (Estimator)}
+\title{Feature Transformation -- StringIndexer (Estimator)}
 \usage{
 ft_string_indexer(x, input_col, output_col, handle_invalid = "error",
   string_order_type = "frequencyDesc", dataset = NULL,

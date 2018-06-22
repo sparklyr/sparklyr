@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_ngram.R
 \name{ft_ngram}
 \alias{ft_ngram}
-\title{Feature Tranformation -- NGram (Transformer)}
+\title{Feature Transformation -- NGram (Transformer)}
 \usage{
 ft_ngram(x, input_col, output_col, n = 2L, uid = random_string("ngram_"),
   ...)

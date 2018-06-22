@@ -3,7 +3,7 @@
 \name{ft_count_vectorizer}
 \alias{ft_count_vectorizer}
 \alias{ml_vocabulary}
-\title{Feature Tranformation -- CountVectorizer (Estimator)}
+\title{Feature Transformation -- CountVectorizer (Estimator)}
 \usage{
 ft_count_vectorizer(x, input_col, output_col, binary = FALSE, min_df = 1,
   min_tf = 1, vocab_size = as.integer(2^18), dataset = NULL,

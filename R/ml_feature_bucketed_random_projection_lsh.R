@@ -1,4 +1,4 @@
-#' Feature Tranformation -- LSH (Estimator)
+#' Feature Transformation -- LSH (Estimator)
 #'
 #' Locality Sensitive Hashing functions for Euclidean distance
 #'   (Bucketed Random Projection) and Jaccard distance (MinHash).

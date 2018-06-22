@@ -3,7 +3,7 @@
 \name{ft_word2vec}
 \alias{ft_word2vec}
 \alias{ml_find_synonyms}
-\title{Feature Tranformation -- Word2Vec (Estimator)}
+\title{Feature Transformation -- Word2Vec (Estimator)}
 \usage{
 ft_word2vec(x, input_col, output_col, vector_size = 100L, min_count = 5L,
   max_sentence_length = 1000L, num_partitions = 1L, step_size = 0.025,

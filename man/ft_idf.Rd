@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_idf.R
 \name{ft_idf}
 \alias{ft_idf}
-\title{Feature Tranformation -- IDF (Estimator)}
+\title{Feature Transformation -- IDF (Estimator)}
 \usage{
 ft_idf(x, input_col, output_col, min_doc_freq = 0L, dataset = NULL,
   uid = random_string("idf_"), ...)

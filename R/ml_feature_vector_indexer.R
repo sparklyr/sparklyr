@@ -1,4 +1,4 @@
-#' Feature Tranformation -- VectorIndexer (Estimator)
+#' Feature Transformation -- VectorIndexer (Estimator)
 #'
 #' Indexing categorical feature columns in a dataset of Vector.
 #'

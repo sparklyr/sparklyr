@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_r_formula.R
 \name{ft_r_formula}
 \alias{ft_r_formula}
-\title{Feature Tranformation -- RFormula (Estimator)}
+\title{Feature Transformation -- RFormula (Estimator)}
 \usage{
 ft_r_formula(x, formula, features_col = "features", label_col = "label",
   force_index_label = FALSE, dataset = NULL,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_vector_indexer.R
 \name{ft_vector_indexer}
 \alias{ft_vector_indexer}
-\title{Feature Tranformation -- VectorIndexer (Estimator)}
+\title{Feature Transformation -- VectorIndexer (Estimator)}
 \usage{
 ft_vector_indexer(x, input_col, output_col, max_categories = 20L,
   dataset = NULL, uid = random_string("vector_indexer_"), ...)

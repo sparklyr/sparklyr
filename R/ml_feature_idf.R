@@ -1,4 +1,4 @@
-#' Feature Tranformation -- IDF (Estimator)
+#' Feature Transformation -- IDF (Estimator)
 #'
 #' Compute the Inverse Document Frequency (IDF) given a collection of documents.
 #'

@@ -1,4 +1,4 @@
-#' Feature Tranformation -- RFormula (Estimator)
+#' Feature Transformation -- RFormula (Estimator)
 #'
 #' Implements the transforms required for fitting a dataset against an R model
 #'   formula. Currently we support a limited subset of the R operators,

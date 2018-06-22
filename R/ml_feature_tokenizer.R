@@ -1,4 +1,4 @@
-#' Feature Tranformation -- Tokenizer (Transformer)
+#' Feature Transformation -- Tokenizer (Transformer)
 #'
 #' A tokenizer that converts the input string to lowercase and then splits it
 #' by white spaces.

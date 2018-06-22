@@ -1,4 +1,4 @@
-#' Feature Tranformation -- ChiSqSelector (Estimator)
+#' Feature Transformation -- ChiSqSelector (Estimator)
 #'
 #' Chi-Squared feature selection, which selects categorical features to use for predicting a categorical label
 #'
