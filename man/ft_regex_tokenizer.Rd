@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_regex_tokenizer.R
 \name{ft_regex_tokenizer}
 \alias{ft_regex_tokenizer}
-\title{Feature Tranformation -- RegexTokenizer (Transformer)}
+\title{Feature Transformation -- RegexTokenizer (Transformer)}
 \usage{
 ft_regex_tokenizer(x, input_col, output_col, gaps = TRUE,
   min_token_length = 1L, pattern = "\\\\s+", to_lower_case = TRUE,

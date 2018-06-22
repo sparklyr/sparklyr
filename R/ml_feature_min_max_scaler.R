@@ -1,4 +1,4 @@
-#' Feature Tranformation -- MinMaxScaler (Estimator)
+#' Feature Transformation -- MinMaxScaler (Estimator)
 #'
 #' Rescale each feature individually to a common range [min, max] linearly using
 #'   column summary statistics, which is also known as min-max normalization or

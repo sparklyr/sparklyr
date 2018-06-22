@@ -1,4 +1,4 @@
-#' Feature Tranformation -- NGram (Transformer)
+#' Feature Transformation -- NGram (Transformer)
 #'
 #' A feature transformer that converts the input array of strings into an array of n-grams. Null values in the input array are ignored. It returns an array of n-grams where each n-gram is represented by a space-separated string of words.
 #'

@@ -1,4 +1,4 @@
-#' Feature Tranformation -- Word2Vec (Estimator)
+#' Feature Transformation -- Word2Vec (Estimator)
 #'
 #' Word2Vec transforms a word into a code for further natural language processing or machine learning process.
 #'

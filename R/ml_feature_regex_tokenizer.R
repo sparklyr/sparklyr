@@ -1,4 +1,4 @@
-#' Feature Tranformation -- RegexTokenizer (Transformer)
+#' Feature Transformation -- RegexTokenizer (Transformer)
 #'
 #' A regex based tokenizer that extracts tokens either by using the provided
 #' regex pattern to split the text (default) or repeatedly matching the regex

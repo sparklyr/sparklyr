@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_max_abs_scaler.R
 \name{ft_max_abs_scaler}
 \alias{ft_max_abs_scaler}
-\title{Feature Tranformation -- MaxAbsScaler (Estimator)}
+\title{Feature Transformation -- MaxAbsScaler (Estimator)}
 \usage{
 ft_max_abs_scaler(x, input_col, output_col, dataset = NULL,
   uid = random_string("max_abs_scaler_"), ...)

@@ -1,4 +1,4 @@
-#' Feature Tranformation -- PCA (Estimator)
+#' Feature Transformation -- PCA (Estimator)
 #'
 #' PCA trains a model to project vectors to a lower dimensional space of the top k principal components.
 #'

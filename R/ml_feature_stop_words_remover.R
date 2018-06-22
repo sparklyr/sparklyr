@@ -25,7 +25,7 @@ ml_default_stop_words <- function(
                 "loadDefaultStopWords", language)
 }
 
-#' Feature Tranformation -- StopWordsRemover (Transformer)
+#' Feature Transformation -- StopWordsRemover (Transformer)
 #'
 #' A feature transformer that filters out stop words from input.
 #'

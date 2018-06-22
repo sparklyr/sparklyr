@@ -2,7 +2,7 @@
 % Please edit documentation in R/ml_feature_min_max_scaler.R
 \name{ft_min_max_scaler}
 \alias{ft_min_max_scaler}
-\title{Feature Tranformation -- MinMaxScaler (Estimator)}
+\title{Feature Transformation -- MinMaxScaler (Estimator)}
 \usage{
 ft_min_max_scaler(x, input_col, output_col, min = 0, max = 1,
   dataset = NULL, uid = random_string("min_max_scaler_"), ...)

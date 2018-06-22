@@ -1,4 +1,4 @@
-#' Feature Tranformation -- StandardScaler (Estimator)
+#' Feature Transformation -- StandardScaler (Estimator)
 #'
 #' Standardizes features by removing the mean and scaling to unit variance using
 #'   column summary statistics on the samples in the training set. The "unit std"

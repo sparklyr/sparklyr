@@ -3,7 +3,7 @@
 \name{ft_pca}
 \alias{ft_pca}
 \alias{ml_pca}
-\title{Feature Tranformation -- PCA (Estimator)}
+\title{Feature Transformation -- PCA (Estimator)}
 \usage{
 ft_pca(x, input_col, output_col, k, dataset = NULL,
   uid = random_string("pca_"), ...)

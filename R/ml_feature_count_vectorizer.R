@@ -1,4 +1,4 @@
-#' Feature Tranformation -- CountVectorizer (Estimator)
+#' Feature Transformation -- CountVectorizer (Estimator)
 #'
 #' Extracts a vocabulary from document collections.
 #'

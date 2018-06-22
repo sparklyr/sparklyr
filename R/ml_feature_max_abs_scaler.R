@@ -1,4 +1,4 @@
-#' Feature Tranformation -- MaxAbsScaler (Estimator)
+#' Feature Transformation -- MaxAbsScaler (Estimator)
 #'
 #' Rescale each feature individually to range [-1, 1] by dividing through the
 #'   largest maximum absolute value in each feature. It does not shift/center the
