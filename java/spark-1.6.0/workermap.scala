@@ -2,7 +2,7 @@ package sparklyr
 
 import org.apache.spark._
 
-class WorkerMap() {
+object WorkerMap {
 
   import org.apache.spark.sql._
   import org.apache.spark.sql.types._
