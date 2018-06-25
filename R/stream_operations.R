@@ -36,3 +36,14 @@ stream_stop <- function(stream)
   invoke(stream, "stop") %>%
     invisible()
 }
+
+stream_validate <- function(stream)
+{
+  exception <- invoke(stream, "exception")
+  if (!invoke(exception, "isEmpty")) {
+    cause <- invoke(exception, "get") %>%
+      invoke("cause") %>%
+      invoke("getMessage")
+    stop(cause)
+  }
+}
