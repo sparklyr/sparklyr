@@ -78,7 +78,8 @@ stream_write_generic <- function(x, path, type, stream_options)
 
   streamOptions %>%
     invoke("start") %>%
-    stream_class()
+    stream_class() %>%
+    stream_validate()
 }
 
 #' Read a CSV stream into a Spark DataFrame
