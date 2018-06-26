@@ -177,7 +177,7 @@ spark_apply <- function(x,
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
-  if (args$rdd) rdd_base <- invoke(sdf, "rdd")
+  if (identical(args$rdd, TRUE)) rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
   rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
@@ -284,7 +284,7 @@ spark_apply <- function(x,
     as.character
   )
 
-  if (args$rdd) {
+  if (identical(args$rdd, TRUE)) {
     rdd <- invoke_static(
       sc,
       "sparklyr.WorkerHelper",
@@ -317,7 +317,7 @@ spark_apply <- function(x,
     transformed <- invoke_static(
       sc,
       "sparklyr.WorkerMap",
-      "mapPartitions",
+      "computeSdf",
       sdf,
       schema,
       closure,
