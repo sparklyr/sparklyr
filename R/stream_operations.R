@@ -46,4 +46,6 @@ stream_validate <- function(stream)
       invoke("getMessage")
     stop(cause)
   }
+
+  stream
 }
