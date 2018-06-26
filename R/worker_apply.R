@@ -67,6 +67,10 @@ spark_worker_apply <- function(sc, config) {
     }
   }
 
+  if (identical(config$schema, TRUE)) {
+    worker_log("is running to compute schema")
+  }
+
   columnNames <- worker_invoke(context, "getColumns")
 
   if (!grouped) groups <- list(list(groups))
@@ -117,9 +121,9 @@ spark_worker_apply <- function(sc, config) {
       result <- do.call(closure, closure_args)
       worker_log("computed closure")
 
-      if (!identical(class(result), "data.frame")) {
+      if (!"data.frame" %in% class(result)) {
         worker_log("data.frame expected but ", class(result), " found")
-        result <- data.frame(result)
+        result <- as.data.frame(result)
       }
 
       if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
@@ -136,20 +140,19 @@ spark_worker_apply <- function(sc, config) {
       }
     }
 
+    if (identical(config$schema, TRUE)) {
+      worker_log("updating schema")
+      result <- data.frame(
+        names = paste(names(result), collapse = "|"),
+        types = paste(lapply(result, class), collapse = "|")
+      )
+    }
+
     all_results <- rbind(all_results, result)
   }
 
   if (!is.null(all_results) && nrow(all_results) > 0) {
-    if (identical(config$schema, TRUE)) {
-      worker_log("updating schema")
-      all_results <- data.frame(
-        names = paste(names(all_results), collapse = "|"),
-        types = paste(lapply(all_results, class), collapse = "|")
-      )
-    }
-    else {
-      worker_log("updating ", nrow(all_results), " rows")
-    }
+    worker_log("updating ", nrow(all_results), " rows")
 
     all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
 
