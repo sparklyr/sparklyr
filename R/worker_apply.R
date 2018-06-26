@@ -143,7 +143,7 @@ spark_worker_apply <- function(sc, config) {
     worker_log("updating ", nrow(all_results), " rows")
     all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
 
-    if (idential(config$schema, TRUE)) {
+    if (identical(config$schema, TRUE)) {
       schema <- lapply(all_results, class)
       worker_invoke(context, "setResultArraySeq", schema)
       worker_log("updated ", length(schema), " schema columns")
