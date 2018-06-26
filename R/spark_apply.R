@@ -100,6 +100,19 @@ spark_apply_packages_is_bundle <- function(packages) {
   is.character(packages) && length(packages) == 1 && grepl("\\.tar$", packages)
 }
 
+spark_apply_worker_config <- function(debug, profile, schema = FALSE) {
+  worker_config_serialize(
+    c(
+      list(
+        debug = isTRUE(debug),
+        profile = isTRUE(profile),
+        schema = isTRUE(schema)
+      ),
+      sc$config
+    )
+  )
+}
+
 #' Apply an R Function in Spark
 #'
 #' Applies an R function to a Spark object (typically, a Spark DataFrame).
@@ -214,17 +227,6 @@ spark_apply <- function(x,
   rlang_serialize <- spark_apply_rlang_serialize()
   closure_rlang <- if (rlang && !is.null(rlang_serialize)) rlang_serialize(f) else raw()
 
-  # create a configuration string to initialize each worker
-  worker_config <- worker_config_serialize(
-    c(
-      list(
-        debug = isTRUE(args$debug),
-        profile = isTRUE(args$profile)
-      ),
-      sc$config
-    )
-  )
-
   # add debug connection message
   if (isTRUE(args$debug)) {
     message("Debugging spark_apply(), connect to worker debugging session as follows:")
@@ -291,7 +293,7 @@ spark_apply <- function(x,
       "computeRdd",
       rdd_base,
       closure,
-      worker_config,
+      spark_apply_worker_config(args$debug, args$profile),
       as.integer(worker_port),
       as.list(sdf_columns),
       as.list(group_by),
@@ -321,7 +323,7 @@ spark_apply <- function(x,
       sdf,
       schema,
       closure,
-      worker_config,
+      spark_apply_worker_config(args$debug, args$profile),
       as.integer(worker_port),
       as.list(sdf_columns),
       as.list(group_by),
