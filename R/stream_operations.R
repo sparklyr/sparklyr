@@ -11,11 +11,13 @@ print.spark_stream <- function(stream)
   status <- invoke(stream, "status") %>%
     invoke("json") %>%
     jsonlite::fromJSON()
+  active <- invoke(stream, "isActive")
 
   cat(
     paste(
       paste("Stream:", id),
       paste("Status:", status$message),
+      paste("Active: ", active),
       paste("Data Available:", status$isDataAvailable),
       paste("Trigger Active:", status$isTriggerActive),
       "",
