@@ -314,6 +314,45 @@ spark_apply <- function(x,
   }
   else {
     sdf <- spark_dataframe(x)
+
+    if (identical(columns, NULL)) {
+      columns_schema <- spark_data_build_types(
+        sc,
+        list(
+          names = "character",
+          types = "character"
+        )
+      )
+
+      sdf_limit <- invoke(
+        sdf,
+        "limit",
+        spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+      )
+
+      columns_query <- invoke_static(
+        sc,
+        "sparklyr.WorkerHelper",
+        "computeSdf",
+        sdf_limit,
+        columns_schema,
+        closure,
+        spark_apply_worker_config(args$debug, args$profile, schema = TRUE),
+        as.integer(worker_port),
+        as.list(sdf_columns),
+        as.list(group_by),
+        closure_rlang,
+        bundle_path,
+        as.environment(proc_env),
+        as.integer(60),
+        context_serialize,
+        as.environment(spark_apply_options)
+      ) %>% sdf_collect()
+
+      columns <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
+      names(columns) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
+    }
+
     schema <- spark_data_build_types(sc, columns)
 
     transformed <- invoke_static(
