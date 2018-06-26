@@ -87,22 +87,22 @@ object WorkerHelper {
 
     val encoder = RowEncoder(schema)
 
-    val workerApply: WorkerApply = new WorkerApply(
-      closure,
-      columns,
-      config,
-      port,
-      groupBy,
-      closureRLang,
-      bundlePath,
-      customEnvImmMap,
-      connectionTimeout,
-      context,
-      optionsImmMap
-    )
+    sdf.mapPartitions(rows => {
+      val workerApply: WorkerApply = new WorkerApply(
+        closure,
+        columns,
+        config,
+        port,
+        groupBy,
+        closureRLang,
+        bundlePath,
+        customEnvImmMap,
+        connectionTimeout,
+        context,
+        optionsImmMap
+      )
 
-    sdf.mapPartitions(lines => {
-      workerApply.apply(lines)
+      workerApply.apply(rows)
     })(encoder)
   }
 }
