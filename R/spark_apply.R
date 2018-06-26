@@ -177,7 +177,7 @@ spark_apply <- function(x,
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
-  rdd_base <- invoke(sdf, "rdd")
+  if (args$rdd) rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
   rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
@@ -284,30 +284,55 @@ spark_apply <- function(x,
     as.character
   )
 
-  rdd <- invoke_static(
-    sc,
-    "sparklyr.WorkerHelper",
-    "computeRdd",
-    rdd_base,
-    closure,
-    worker_config,
-    as.integer(worker_port),
-    as.list(sdf_columns),
-    as.list(group_by),
-    closure_rlang,
-    bundle_path,
-    as.environment(proc_env),
-    as.integer(60),
-    context_serialize,
-    as.environment(spark_apply_options)
-  )
+  if (args$rdd) {
+    rdd <- invoke_static(
+      sc,
+      "sparklyr.WorkerHelper",
+      "computeRdd",
+      rdd_base,
+      closure,
+      worker_config,
+      as.integer(worker_port),
+      as.list(sdf_columns),
+      as.list(group_by),
+      closure_rlang,
+      bundle_path,
+      as.environment(proc_env),
+      as.integer(60),
+      context_serialize,
+      as.environment(spark_apply_options)
+    )
 
-  # while workers need to relaunch sparklyr backends, cache by default
-  if (memory) rdd <- invoke(rdd, "cache")
+    # while workers need to relaunch sparklyr backends, cache by default
+    if (memory) rdd <- invoke(rdd, "cache")
 
-  schema <- spark_schema_from_rdd(sc, rdd, columns)
+    schema <- spark_schema_from_rdd(sc, rdd, columns)
 
-  transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
+    transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
+  }
+  else {
+    sdf <- spark_dataframe(x)
+    schema <- spark_data_build_types(sc, columns)
+
+    transformed <- invoke_static(
+      sc,
+      "sparklyr.WorkerMap",
+      "mapPartitions",
+      sdf,
+      schema,
+      closure,
+      worker_config,
+      as.integer(worker_port),
+      as.list(sdf_columns),
+      as.list(group_by),
+      closure_rlang,
+      bundle_path,
+      as.environment(proc_env),
+      as.integer(60),
+      context_serialize,
+      as.environment(spark_apply_options)
+    )
+  }
 
   sdf_register(transformed)
 }
