@@ -1,4 +1,4 @@
-spark_worker_apply <- function(sc) {
+spark_worker_apply <- function(sc, config) {
   hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
 
@@ -143,8 +143,15 @@ spark_worker_apply <- function(sc) {
     worker_log("updating ", nrow(all_results), " rows")
     all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
 
-    worker_invoke(context, "setResultArraySeq", all_data)
-    worker_log("updated ", nrow(all_results), " rows")
+    if (idential(config$schema, TRUE)) {
+      schema <- lapply(all_results, class)
+      worker_invoke(context, "setResultArraySeq", schema)
+      worker_log("updated ", length(schema), " schema columns")
+    }
+    else {
+      worker_invoke(context, "setResultArraySeq", all_data)
+      worker_log("updated ", nrow(all_results), " rows")
+    }
   } else {
     worker_log("found no rows in closure result")
   }
