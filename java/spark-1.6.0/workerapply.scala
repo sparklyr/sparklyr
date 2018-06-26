@@ -1,7 +1,5 @@
 package sparklyr
 
-import org.apache.spark._
-
 class WorkerApply(
   closure: Array[Byte],
   columns: Array[String],

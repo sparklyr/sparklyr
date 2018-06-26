@@ -3,6 +3,8 @@ package sparklyr
 object WorkerHelper {
   import org.apache.spark.rdd.RDD
   import org.apache.spark.sql._
+  import org.apache.spark.sql.catalyst.encoders.RowEncoder
+  import org.apache.spark.sql.types._
   import scala.collection.JavaConversions._
 
   def computeRdd(
@@ -53,7 +55,7 @@ object WorkerHelper {
   }
 
   def computeSdf(
-    sdf: org.apache.spark.sql.DataFrame,
+    sdf: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row],
     schema: StructType,
     closure: Array[Byte],
     config: String,
@@ -66,7 +68,7 @@ object WorkerHelper {
     connectionTimeout: Int,
     context: Array[Byte],
     options: java.util.Map[Object, Object]
-  ): org.apache.spark.sql.DataFrame = {
+  ): org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
     customEnv.foreach(kv => customEnvMap.put(
@@ -86,20 +88,20 @@ object WorkerHelper {
     val encoder = RowEncoder(schema)
 
     val workerApply: WorkerApply = new WorkerApply(
-      closure: Array[Byte],
-      columns: Array[String],
-      config: String,
-      port: Int,
-      groupBy: Array[String],
-      closureRLang: Array[Byte],
-      bundlePath: String,
-      customEnv: Map[String, String],
-      connectionTimeout: Int,
-      context: Array[Byte],
-      options: Map[String, String]
+      closure,
+      columns,
+      config,
+      port,
+      groupBy,
+      closureRLang,
+      bundlePath,
+      customEnvImmMap,
+      connectionTimeout,
+      context,
+      optionsImmMap
     )
 
-    input.mapPartitions(lines => {
+    sdf.mapPartitions(lines => {
       workerApply.apply(lines)
     })(encoder)
   }
