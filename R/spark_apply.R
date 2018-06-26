@@ -8,7 +8,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 
   sampleRows <- rdd %>% invoke(
     "take",
-    sparklyr::ensure_scalar_integer(
+    ensure_scalar_integer(
       spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
     )
   )
@@ -125,8 +125,10 @@ spark_apply_worker_config <- function(debug, profile, schema = FALSE) {
 #'   \code{groupN} contain the values of the \code{group_by} values. When
 #'   \code{group_by} is not specified, \code{f} takes only one argument.
 #' @param columns A vector of column names or a named vector of column types for
-#'   the transformed object. Defaults to the names from the original object and
-#'   adds indexed column names when not enough columns are specified.
+#'   the transformed object. When not specified, a sample of 10 rows is taken to
+#'   infer out the output columns automatically, to avoid this performance penalty,
+#'   specify the the column types. The sample size is confgirable using the
+#'   \code{sparklyr.apply.schema.infer} configuration option.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
 #' @param packages Boolean to distribute \code{.libPaths()} packages to each node,
@@ -178,7 +180,7 @@ spark_apply_worker_config <- function(debug, profile, schema = FALSE) {
 #' @export
 spark_apply <- function(x,
                         f,
-                        columns = colnames(x),
+                        columns = NULL,
                         memory = TRUE,
                         group_by = NULL,
                         packages = NULL,
@@ -327,7 +329,9 @@ spark_apply <- function(x,
       sdf_limit <- invoke(
         sdf,
         "limit",
-        spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+        ensure_scalar_integer(
+          spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+        )
       )
 
       columns_query <- invoke_static(
