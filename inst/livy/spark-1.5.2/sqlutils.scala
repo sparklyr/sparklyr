@@ -33,6 +33,7 @@ object SQLUtils {
       case "numeric" => org.apache.spark.sql.types.DoubleType
       case "long" => org.apache.spark.sql.types.LongType
       case "character" => org.apache.spark.sql.types.StringType
+      case "factor" => org.apache.spark.sql.types.StringType
       case "string" => org.apache.spark.sql.types.StringType
       case "binary" => org.apache.spark.sql.types.BinaryType
       case "raw" => org.apache.spark.sql.types.BinaryType

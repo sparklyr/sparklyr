@@ -1001,6 +1001,7 @@ worker_config_serialize <- function(config) {
     spark_config_value(config, "sparklyr.worker.gateway.port", "8880"),
     spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
     if (isTRUE(config$profile)) "TRUE" else "FALSE",
+    if (isTRUE(config$schema)) "TRUE" else "FALSE",
     sep = ";"
   )
 }
@@ -1012,10 +1013,11 @@ worker_config_deserialize <- function(raw) {
     debug = as.logical(parts[[1]]),
     sparklyr.gateway.port = as.integer(parts[[2]]),
     sparklyr.gateway.address = parts[[3]],
-    profile = as.logical(parts[[4]])
+    profile = as.logical(parts[[4]]),
+    schema = as.logical(parts[[5]])
   )
 }
-spark_worker_apply <- function(sc) {
+spark_worker_apply <- function(sc, config) {
   hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
 
@@ -1084,6 +1086,10 @@ spark_worker_apply <- function(sc) {
     }
   }
 
+  if (identical(config$schema, TRUE)) {
+    worker_log("is running to compute schema")
+  }
+
   columnNames <- worker_invoke(context, "getColumns")
 
   if (!grouped) groups <- list(list(groups))
@@ -1134,9 +1140,9 @@ spark_worker_apply <- function(sc) {
       result <- do.call(closure, closure_args)
       worker_log("computed closure")
 
-      if (!identical(class(result), "data.frame")) {
+      if (!"data.frame" %in% class(result)) {
         worker_log("data.frame expected but ", class(result), " found")
-        result <- data.frame(result)
+        result <- as.data.frame(result)
       }
 
       if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
@@ -1153,11 +1159,20 @@ spark_worker_apply <- function(sc) {
       }
     }
 
+    if (identical(config$schema, TRUE)) {
+      worker_log("updating schema")
+      result <- data.frame(
+        names = paste(names(result), collapse = "|"),
+        types = paste(lapply(result, class), collapse = "|")
+      )
+    }
+
     all_results <- rbind(all_results, result)
   }
 
   if (!is.null(all_results) && nrow(all_results) > 0) {
     worker_log("updating ", nrow(all_results), " rows")
+
     all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
 
     worker_invoke(context, "setResultArraySeq", all_data)
@@ -1385,7 +1400,7 @@ spark_worker_main <- function(
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
-    spark_worker_apply(sc)
+    spark_worker_apply(sc, config)
 
     if (identical(config$profile, TRUE)) {
       # utils::Rprof(NULL)
