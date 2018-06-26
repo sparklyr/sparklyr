@@ -8,17 +8,39 @@ object WorkerMap {
   import org.apache.spark.sql.types._
   import org.apache.spark.sql.catalyst.encoders.RowEncoder
 
-  def mapPartitions(input: Dataset[Row]): Dataset[Row] = {
-    val schema = StructType(Seq(
-      StructField("A", IntegerType),
-      StructField("B", IntegerType),
-      StructField("C", IntegerType)
-    ))
-
+  def mapPartitions(
+    input: Dataset[Row],
+    closure: Array[Byte],
+    columns: Array[String],
+    config: String,
+    port: Int,
+    groupBy: Array[String],
+    closureRLang: Array[Byte],
+    bundlePath: String,
+    customEnv: Map[String, String],
+    connectionTimeout: Int,
+    context: Array[Byte],
+    options: Map[String, String],
+    schema: StructType
+  ): Dataset[Row] = {
     val encoder = RowEncoder(schema)
 
+    val workerApply: WorkerApply = new WorkerApply(
+      closure: Array[Byte],
+      columns: Array[String],
+      config: String,
+      port: Int,
+      groupBy: Array[String],
+      closureRLang: Array[Byte],
+      bundlePath: String,
+      customEnv: Map[String, String],
+      connectionTimeout: Int,
+      context: Array[Byte],
+      options: Map[String, String]
+    )
+
     input.mapPartitions(lines => {
-      Iterator(Row(1,2,3), Row(10,20,30))
+      workerApply.apply(lines)
     })(encoder)
   }
 }
