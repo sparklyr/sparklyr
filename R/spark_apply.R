@@ -316,7 +316,7 @@ spark_apply <- function(x,
 
     transformed <- invoke_static(
       sc,
-      "sparklyr.WorkerMap",
+      "sparklyr.WorkerHelper",
       "computeSdf",
       sdf,
       schema,
