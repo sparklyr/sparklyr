@@ -103,3 +103,45 @@ stream_trigger_create.stream_trigger_continuous <- function(trigger, sc)
 {
   invoke_static(sc, "org.apache.spark.sql.streaming.Trigger", "Continuous", as.integer(trigger$interval))
 }
+
+#' Spark Stream's Name
+#'
+#' Retrieves the name of the Spark stream if available.
+#'
+#' @param stream The spark stream object.
+#'
+#' @export
+stream_name <- function(stream)
+{
+  invoke(stream, "name")
+}
+
+#' Collect a Spark Stream
+#'
+#' Collects the given Spark stream by writting snapshot to memory.
+#'
+#' @param stream The spark stream object to collect.
+#'
+#' @export
+stream_collect <- function(stream)
+{
+  sc <- spark_connection(stream)
+  memory <- stream_write_memory(stream, trigger = stream_trigger_interval(interval = 0))
+
+  data <- data.frame()
+
+  waitSeconds <- ensure_scalar_integer(spark_config_value(config, "sparklyr.stream.collect.timeout", 5))
+
+  commandStart <- Sys.time()
+  while (nrow(data) == 0 && commandStart + waitSeconds > Sys.time()) {
+    data <- tbl(sc, stream_name(memory)) %>%
+      spark_dataframe() %>%
+      sdf_collect()
+
+    Sys.sleep(0.1)
+  }
+
+  stream_stop(memory)
+
+  data
+}
