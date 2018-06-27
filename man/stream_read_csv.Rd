@@ -2,7 +2,7 @@
 % Please edit documentation in R/stream_data.R
 \name{stream_read_csv}
 \alias{stream_read_csv}
-\title{Read a CSV stream into a Spark DataFrame}
+\title{Read a CSV Stream into a Spark DataFrame}
 \usage{
 stream_read_csv(sc, path, name = NULL, header = TRUE, columns = NULL,
   infer_schema = TRUE, delimiter = ",", quote = "\\"", escape = "\\\\",
@@ -42,5 +42,6 @@ Requires one extra pass over the data. Defaults to \code{TRUE}.}
 Read a tabular data stream into a Spark DataFrame.
 }
 \seealso{
-Other Spark stream serialization: \code{\link{stream_write_csv}}
+Other Spark stream serialization: \code{\link{stream_write_csv}},
+  \code{\link{stream_write_memory}}
 }
