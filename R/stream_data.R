@@ -80,6 +80,8 @@ stream_write_generic <- function(x, path, type, trigger, stream_options)
 
   trigger <- stream_trigger_create(trigger, sc)
 
+  if (identical(type, "memory")) streamOptions <- invoke(streamOptions, "queryName", path)
+
   streamOptions %>%
     invoke("trigger", trigger) %>%
     invoke("start") %>%
@@ -87,7 +89,7 @@ stream_write_generic <- function(x, path, type, trigger, stream_options)
     stream_validate()
 }
 
-#' Read a CSV stream into a Spark DataFrame
+#' Read a CSV Stream into a Spark DataFrame
 #'
 #' Read a tabular data stream into a Spark DataFrame.
 #'
@@ -132,9 +134,9 @@ stream_read_csv <- function(sc,
                       stream_options = streamOptions)
 }
 
-#' Write a Spark DataFrame to a CSV stream
+#' Write a Spark DataFrame into CSV Stream
 #'
-#' Write a Spark DataFrame to a tabular (typically, comma-separated) stream.
+#' Writes a Spark DataFrame to a tabular (typically, comma-separated) stream.
 #'
 #' @inheritParams spark_write_csv
 #'
@@ -171,4 +173,31 @@ stream_write_csv <- function(x,
                        type = "csv",
                        trigger = trigger,
                        stream_options = streamOptions)
+}
+
+#' Write a Spark DataFrame into Memory
+#'
+#' Writes a Spark DataFrame into memory.
+#'
+#' @inheritParams spark_write_csv
+#'
+#' @family Spark stream serialization
+#'
+#' @export
+stream_write_memory <- function(x,
+                                name = random_string("sparklyr_tmp_"),
+                                trigger = stream_trigger_interval(interval = 5000),
+                                infer_schema = TRUE,
+                                options = list(),
+                                ...)
+{
+  spark_require_version(spark_connection(x), "2.0.0")
+
+  sc <- spark_connection(x)
+
+  stream_write_generic(x,
+                       path = name,
+                       type = "memory",
+                       trigger = trigger,
+                       stream_options = options)
 }
