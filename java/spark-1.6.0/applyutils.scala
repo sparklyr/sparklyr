@@ -14,19 +14,4 @@ object ApplyUtils {
       r => Row(r._2.toSeq)
     )
   }
-
-  def groupBy(
-    data: org.apache.spark.sql.Dataset[Row],
-    colPosition: Array[Int]): org.apache.spark.sql.Dataset[Row] = {
-
-    val schema: StructType = data.schema
-    val encoder = RowEncoder(schema)
-
-    data.groupBy(
-      r => colPosition.map(p => r.get(p)).mkString("|")
-    )(org.apache.spark.sql.Encoders.STRING).mapGroups(
-      (k, r) => Row(r.toSeq)
-    )(encoder)
-
-  }
 }
