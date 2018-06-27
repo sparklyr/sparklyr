@@ -328,13 +328,18 @@ spark_apply <- function(x,
         )
       )
 
-      sdf_limit <- invoke(
-        sdf,
-        "limit",
-        ensure_scalar_integer(
-          spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+      if (sdf_is_streaming(sdf)) {
+        sdf_limit <- sdf
+      }
+      else {
+        sdf_limit <- invoke(
+          sdf,
+          "limit",
+          ensure_scalar_integer(
+            spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+          )
         )
-      )
+      }
 
       columns_op <- invoke_static(
         sc,
@@ -356,7 +361,7 @@ spark_apply <- function(x,
       )
 
       if (sdf_is_streaming(sdf)) {
-        stop("Infering schema from stream is unsupported, please specify the 'columns' parameter.")
+        columns_query <- columns_op %>% stream_collect()
       }
       else {
         columns_query <- columns_op %>% sdf_collect()
@@ -388,7 +393,10 @@ spark_apply <- function(x,
     )
   }
 
-  sdf_register(transformed)
+  if (sdf_is_streaming(sdf))
+    transformed
+  else
+    sdf_register(transformed)
 }
 
 spark_apply_rlang_serialize <- function() {
