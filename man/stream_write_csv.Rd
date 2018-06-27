@@ -4,9 +4,10 @@
 \alias{stream_write_csv}
 \title{Write a Spark DataFrame to a CSV stream}
 \usage{
-stream_write_csv(x, path, header = TRUE, columns = NULL,
-  infer_schema = TRUE, delimiter = ",", quote = "\\"", escape = "\\\\",
-  charset = "UTF-8", null_value = NULL, options = list(), ...)
+stream_write_csv(x, path, trigger = stream_trigger(interval = 5000),
+  header = TRUE, columns = NULL, infer_schema = TRUE, delimiter = ",",
+  quote = "\\"", escape = "\\\\", charset = "UTF-8", null_value = NULL,
+  options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}

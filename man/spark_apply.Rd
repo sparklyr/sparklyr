@@ -4,7 +4,7 @@
 \alias{spark_apply}
 \title{Apply an R Function in Spark}
 \usage{
-spark_apply(x, f, columns = colnames(x), memory = TRUE, group_by = NULL,
+spark_apply(x, f, columns = NULL, memory = TRUE, group_by = NULL,
   packages = NULL, context = NULL, ...)
 }
 \arguments{
@@ -18,8 +18,10 @@ is an optional object passed as the \code{context} parameter and \code{group1} t
 \code{group_by} is not specified, \code{f} takes only one argument.}
 
 \item{columns}{A vector of column names or a named vector of column types for
-the transformed object. Defaults to the names from the original object and
-adds indexed column names when not enough columns are specified.}
+the transformed object. When not specified, a sample of 10 rows is taken to
+infer out the output columns automatically, to avoid this performance penalty,
+specify the the column types. The sample size is confgirable using the
+\code{sparklyr.apply.schema.infer} configuration option.}
 
 \item{memory}{Boolean; should the table be cached into memory?}
 
