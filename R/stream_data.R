@@ -58,7 +58,7 @@ stream_read_generic <- function(sc,
   tbl(sc, name)
 }
 
-stream_write_generic <- function(x, path, type, trigger, stream_options)
+stream_write_generic <- function(x, path, type, trigger, checkpoint, stream_options)
 {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
@@ -71,8 +71,7 @@ stream_write_generic <- function(x, path, type, trigger, stream_options)
 
   stream_options$path <- path
 
-  if (is.null(stream_options$checkpointLocation))
-    stream_options$checkpointLocation <- file.path(path, "checkpoint")
+  stream_options$checkpointLocation <- checkpoint
 
   for (optionName in names(stream_options)) {
     streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
@@ -140,12 +139,16 @@ stream_read_csv <- function(sc,
 #'
 #' @inheritParams spark_write_csv
 #'
+#' @param checkpoint The location where the system will write all the checkpoint
+#' information to guarantee end-to-end fault-tolerance.
+#'
 #' @family Spark stream serialization
 #'
 #' @export
 stream_write_csv <- function(x,
                              path,
                              trigger = stream_trigger_interval(interval = 5000),
+                             checkpoint = file.path(path, "checkpoint"),
                              header = TRUE,
                              columns = NULL,
                              infer_schema = TRUE,
@@ -172,6 +175,7 @@ stream_write_csv <- function(x,
                        path = path,
                        type = "csv",
                        trigger = trigger,
+                       checkpoint = checkpoint,
                        stream_options = streamOptions)
 }
 
@@ -179,14 +183,29 @@ stream_write_csv <- function(x,
 #'
 #' Writes a Spark DataFrame into memory.
 #'
-#' @inheritParams spark_write_csv
+#' @inheritParams stream_write_csv
 #'
 #' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' dir.crate("iris-in")
+#' write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
+#'
+#' stream <- stream_read_csv(sc, "iris-in") %>% stream_write_memory()
+#'
+#' stop_stream(stream)
+#'
+#' }
 #'
 #' @export
 stream_write_memory <- function(x,
                                 name = random_string("sparklyr_tmp_"),
                                 trigger = stream_trigger_interval(interval = 5000),
+                                checkpoint = file.path("checkpoints", name),
                                 infer_schema = TRUE,
                                 options = list(),
                                 ...)
@@ -199,5 +218,6 @@ stream_write_memory <- function(x,
                        path = name,
                        type = "memory",
                        trigger = trigger,
+                       checkpoint = checkpoint,
                        stream_options = options)
 }
