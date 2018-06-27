@@ -6,5 +6,5 @@
 #' @export
 sdf_is_streaming <- function(x)
 {
-  invoke(sdf, "isStreaming")
+  invoke(x, "isStreaming")
 }
