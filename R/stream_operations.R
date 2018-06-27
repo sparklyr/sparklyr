@@ -66,7 +66,7 @@ stream_trigger_interval <- function(
 )
 {
   structure(class = c("stream_trigger_interval"), list(
-    interval = interval,
+    interval = interval
   ))
 }
 
@@ -85,7 +85,7 @@ stream_trigger_continuous <- function(
 )
 {
   structure(class = c("stream_trigger_continuous"), list(
-    interval = checkpoint,
+    interval = checkpoint
   ))
 }
 
