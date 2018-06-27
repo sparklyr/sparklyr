@@ -15,17 +15,4 @@ object ApplyUtils {
       r => Row(r._2.toSeq)
     )
   }
-
-  def groupBySchema(df: DataFrame): types.StructType = {
-    types.StructType(
-      Array(
-        types.StructField(
-          "aggregate",
-          types.ArrayType(
-            df.schema
-          )
-        )
-      )
-    )
-  }
 }

@@ -1152,7 +1152,11 @@ spark_worker_apply <- function(sc, config) {
       if (nrow(result) > 0) {
         new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
         names(new_column_values) <- grouped_by
+
+        if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
         result <- do.call("cbind", list(new_column_values, result))
+
+        names(result) <- gsub("\\.", "_", make.unique(names(result)))
       }
       else {
         result <- NULL
