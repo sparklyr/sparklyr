@@ -2,11 +2,12 @@
 % Please edit documentation in R/stream_data.R
 \name{stream_write_csv}
 \alias{stream_write_csv}
-\title{Write a Spark DataFrame to a CSV stream}
+\title{Write a Spark DataFrame into CSV Stream}
 \usage{
-stream_write_csv(x, path, trigger = stream_trigger(interval = 5000),
-  header = TRUE, columns = NULL, infer_schema = TRUE, delimiter = ",",
-  quote = "\\"", escape = "\\\\", charset = "UTF-8", null_value = NULL,
+stream_write_csv(x, path, trigger = stream_trigger_interval(interval = 5000),
+  checkpoint = file.path(path, "checkpoint"), header = TRUE,
+  columns = NULL, infer_schema = TRUE, delimiter = ",", quote = "\\"",
+  escape = "\\\\", charset = "UTF-8", null_value = NULL,
   options = list(), ...)
 }
 \arguments{
@@ -14,6 +15,9 @@ stream_write_csv(x, path, trigger = stream_trigger(interval = 5000),
 
 \item{path}{The path to the file. Needs to be accessible from the cluster.
 Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
+
+\item{checkpoint}{The location where the system will write all the checkpoint
+information to guarantee end-to-end fault-tolerance.}
 
 \item{header}{Should the first row of data be used as a header? Defaults to \code{TRUE}.}
 
@@ -32,8 +36,9 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Write a Spark DataFrame to a tabular (typically, comma-separated) stream.
+Writes a Spark DataFrame to a tabular (typically, comma-separated) stream.
 }
 \seealso{
-Other Spark stream serialization: \code{\link{stream_read_csv}}
+Other Spark stream serialization: \code{\link{stream_read_csv}},
+  \code{\link{stream_write_memory}}
 }
