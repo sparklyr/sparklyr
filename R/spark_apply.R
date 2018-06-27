@@ -192,6 +192,7 @@ spark_apply <- function(x,
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
+  if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
   if (identical(args$rdd, TRUE)) rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
   args <- list(...)
