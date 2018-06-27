@@ -48,6 +48,10 @@
 
 - Avoid preparing windows environment in non-local connections.
 
+### Extensions
+
+- Support to invoke methods with `char` types using single character strings (@lawremi, #1395).
+
 # Sparklyr 0.8.4
 
 - Added support for `spark_session_config()` to modify spark session settings.
