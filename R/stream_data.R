@@ -58,9 +58,11 @@ stream_read_generic <- function(sc,
   tbl(sc, name)
 }
 
-stream_write_generic <- function(x, path, type, stream_options)
+stream_write_generic <- function(x, path, type, trigger, stream_options)
 {
   sdf <- spark_dataframe(x)
+  sc <- spark_connection(x)
+
   if (!invoke(sdf, "isStreaming"))
     stop("DataFrame requires streaming context. Use `stream_read_*()` to read from streams.")
 
@@ -76,7 +78,10 @@ stream_write_generic <- function(x, path, type, stream_options)
     streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
   }
 
+  trigger <- stream_trigger_create(trigger, sc)
+
   streamOptions %>%
+    invoke("trigger", trigger) %>%
     invoke("start") %>%
     stream_class() %>%
     stream_validate()
@@ -138,6 +143,7 @@ stream_read_csv <- function(sc,
 #' @export
 stream_write_csv <- function(x,
                              path,
+                             trigger = stream_trigger_interval(interval = 5000),
                              header = TRUE,
                              columns = NULL,
                              infer_schema = TRUE,
@@ -163,5 +169,6 @@ stream_write_csv <- function(x,
   stream_write_generic(x,
                        path = path,
                        type = "csv",
+                       trigger = trigger,
                        stream_options = streamOptions)
 }

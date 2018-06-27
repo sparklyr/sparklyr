@@ -336,7 +336,7 @@ spark_apply <- function(x,
         )
       )
 
-      columns_query <- invoke_static(
+      columns_op <- invoke_static(
         sc,
         "sparklyr.WorkerHelper",
         "computeSdf",
@@ -353,7 +353,14 @@ spark_apply <- function(x,
         as.integer(60),
         context_serialize,
         as.environment(spark_apply_options)
-      ) %>% sdf_collect()
+      )
+
+      if (sdf_is_streaming(sdf)) {
+        stop("Infering schema from stream is unsupported, please specify the 'columns' parameter.")
+      }
+      else {
+        columns_query <- columns_op %>% sdf_collect()
+      }
 
       columns <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
       names(columns) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]

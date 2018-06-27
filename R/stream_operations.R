@@ -51,3 +51,55 @@ stream_validate <- function(stream)
 
   stream
 }
+
+#' Spark Stream Interval Trigger
+#'
+#' Creates a Spark structured streaming trigger to execute
+#' over the specified interval.
+#'
+#' @param interval The execution interval specified in milliseconds.
+#'
+#' @seealso \code{\link{stream_trigger_continuous}}
+#' @export
+stream_trigger_interval <- function(
+  interval = 5000
+)
+{
+  structure(class = c("stream_trigger_interval"), list(
+    interval = interval,
+  ))
+}
+
+#' Spark Stream Continuous Trigger
+#'
+#' Creates a Spark structured streaming trigger to execute
+#' continuously. This mode is the most performant but not all operations
+#' are supported.
+#'
+#' @param checkpoint The checkpoint interval specified in milliseconds.
+#'
+#' @seealso \code{\link{stream_trigger_interval}}
+#' @export
+stream_trigger_continuous <- function(
+  checkpoint = 5000
+)
+{
+  structure(class = c("stream_trigger_continuous"), list(
+    interval = checkpoint,
+  ))
+}
+
+stream_trigger_create <- function(trigger, sc)
+{
+  UseMethod("stream_trigger_create")
+}
+
+stream_trigger_create.stream_trigger_interval <- function(trigger, sc)
+{
+  invoke_static(sc, "org.apache.spark.sql.streaming.Trigger", "ProcessingTime", as.integer(trigger$interval))
+}
+
+stream_trigger_create.stream_trigger_continuous <- function(trigger, sc)
+{
+  invoke_static(sc, "org.apache.spark.sql.streaming.Trigger", "Continuous", as.integer(trigger$interval))
+}
