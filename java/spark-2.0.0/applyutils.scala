@@ -19,7 +19,12 @@ object ApplyUtils {
     data: org.apache.spark.sql.Dataset[Row],
     colPosition: Array[Int]): org.apache.spark.sql.Dataset[Row] = {
 
-    val schema: StructType = data.schema
+    val schema: StructType = StructType(
+      List(
+        StructField("array", ArrayType(data.schema))
+      )
+    )
+
     val encoder = RowEncoder(schema)
 
     data.groupByKey(
