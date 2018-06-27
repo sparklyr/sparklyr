@@ -22,7 +22,7 @@ object ApplyUtils {
     val schema: StructType = data.schema
     val encoder = RowEncoder(schema)
 
-    data.groupBy(
+    data.groupByKey(
       r => colPosition.map(p => r.get(p)).mkString("|")
     )(org.apache.spark.sql.Encoders.STRING).mapGroups(
       (k, r) => Row(r.toSeq)
