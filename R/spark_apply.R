@@ -246,12 +246,15 @@ spark_apply <- function(x,
 
     group_by_list <- as.list(as.integer(colpos - 1))
 
-    grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
+    if (identical(args$rdd, TRUE)) {
+      rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
 
-    rdd_base <- grouped_rdd
-
-    if (!columns_typed) {
-      columns <- c(group_by, columns)
+      if (!columns_typed) {
+        columns <- c(group_by, columns)
+      }
+    }
+    else {
+      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
     }
   }
 
@@ -315,8 +318,6 @@ spark_apply <- function(x,
     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   }
   else {
-    sdf <- spark_dataframe(x)
-
     if (identical(columns, NULL)) {
       columns_schema <- spark_data_build_types(
         sc,
