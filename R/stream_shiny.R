@@ -7,23 +7,33 @@
 #' @param intervalMillis Approximate number of milliseconds to wait to retrieve
 #'   updated data frame. This can be a numeric value, or a function that returns
 #'   a numeric value.
+#' @param session The user session to associate this file reader with, or NULL if
+#'   none. If non-null, the reader will automatically stop when the session ends.
 #'
 #' @importFrom shiny reactivePoll
+#' @importFrom dplyr select
+#' @importFrom dplyr filter
+#' @importFrom dplyr distinct
+#' @importFrom dplyr puill
+#'
 #' @export
-reactiveSpark <- function(x, intervalMillis = 100)
+reactiveSpark <- function(x, intervalMillis = 1000, session = NULL)
 {
+  sc <- spark_connection(x)
+
   traceable <- x %>%
     mutate(reactive_timestamp = current_timestamp())
 
-  name <- random_string("sparklyr_tmp")
+  name <- random_string("sparklyr_tmp_")
 
   stream <- traceable %>% stream_write_memory(name)
 
   reactivePoll(
     intervalMillis = intervalMillis,
+    session = session,
     checkFunc = function() {
       progress <- invoke(stream, "lastProgress")
-      if (is.null(progress) || identical(invoke(progress, "numInputRows", 0L))) {
+      if (is.null(progress) || identical(invoke(progress, "numInputRows"), 0L)) {
         ""
       } else {
         tbl(sc, name) %>%
