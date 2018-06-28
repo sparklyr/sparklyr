@@ -8,19 +8,36 @@
 #'   updated data frame. This can be a numeric value, or a function that returns
 #'   a numeric value.
 #'
+#' @importFrom shiny reactivePoll
 #' @export
 reactiveSpark <- function(x, intervalMillis = 100)
 {
-  name <- random_string("sparklyr_tmp")
-  sdf <- tbl(sc, name) %>% spark_dataframe()
-  stream <- x %>% stream_write_memory(name)
+  traceable <- x %>%
+    mutate(reactive_timestamp = current_timestamp())
 
-  shiny::reactivePoll(
+  name <- random_string("sparklyr_tmp")
+
+  stream <- traceable %>% stream_write_memory(name)
+
+  reactivePoll(
     intervalMillis = intervalMillis,
     checkFunc = function() {
-      TRUE
+      progress <- invoke(stream, "lastProgress")
+      if (is.null(progress) || identical(invoke(progress, "numInputRows", 0L))) {
+        ""
+      } else {
+        tbl(sc, name) %>%
+          mutate(reactive_timestamp = current_timestamp()) %>%
+          select(reactive_timestamp) %>%
+          filter(reactive_timestamp == max(reactive_timestamp, na.rm = TRUE)) %>%
+          distinct() %>%
+          pull()
+      }
     },
     valueFunc = function() {
-      sdf_collect(sdf)
+      tbl(sc, name) %>%
+        select(-reactive_timestamp) %>%
+        spark_dataframe() %>%
+        sdf_collect()
     })
 }
