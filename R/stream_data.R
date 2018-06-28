@@ -205,7 +205,7 @@ stream_write_csv <- function(x,
 stream_write_memory <- function(x,
                                 name = random_string("sparklyr_tmp_"),
                                 trigger = stream_trigger_interval(interval = 5000),
-                                checkpoint = file.path("checkpoints", name),
+                                checkpoint = file.path("checkpoints", name, random_string("")),
                                 infer_schema = TRUE,
                                 options = list(),
                                 ...)
