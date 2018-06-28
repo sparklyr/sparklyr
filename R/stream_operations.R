@@ -7,7 +7,9 @@ stream_class <- function(stream)
 #' @export
 print.spark_stream <- function(stream)
 {
-  id <- invoke(invoke(stream, "id"), "toString")
+  id <- stream_name(stream)
+  if (is.null(id) || nchar(id) == 0) id <- invoke(invoke(stream, "id"), "toString")
+
   status <- invoke(stream, "status") %>%
     invoke("json") %>%
     jsonlite::fromJSON()
@@ -17,9 +19,7 @@ print.spark_stream <- function(stream)
     paste(
       paste("Stream:", id),
       paste("Status:", status$message),
-      paste("Active: ", active),
-      paste("Data Available:", status$isDataAvailable),
-      paste("Trigger Active:", status$isTriggerActive),
+      paste("Active:", active),
       "",
       sep = "\n"
     )
