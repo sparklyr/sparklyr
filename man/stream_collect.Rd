@@ -4,10 +4,10 @@
 \alias{stream_collect}
 \title{Collect a Spark Stream}
 \usage{
-stream_collect(stream)
+stream_collect(x)
 }
 \arguments{
-\item{stream}{The spark stream object to collect.}
+\item{x}{The spark stream object to collect.}
 }
 \description{
 Collects the given Spark stream by writting snapshot to memory.
