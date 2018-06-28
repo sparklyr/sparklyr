@@ -120,13 +120,26 @@ stream_name <- function(stream)
 #'
 #' Collects the given Spark stream by writting snapshot to memory.
 #'
-#' @param stream The spark stream object to collect.
+#' @param x The spark stream object to collect.
 #'
 #' @export
-stream_collect <- function(stream)
+stream_collect <- function(x)
 {
-  sc <- spark_connection(stream)
-  memory <- stream_write_memory(stream, trigger = stream_trigger_interval(interval = 0))
+  UseMethod("stream_collect")
+}
+
+#' @export
+stream_collect.spark_stream <- function(x)
+{
+  sc <- spark_connection(x)
+  stream_collect(tbl(sc, stream_name(x)))
+}
+
+#' @export
+stream_collect.tbl_spark <- function(x)
+{
+  sc <- spark_connection(x)
+  memory <- stream_write_memory(x, trigger = stream_trigger_interval(interval = 0))
 
   data <- data.frame()
 
