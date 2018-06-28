@@ -53,7 +53,7 @@ head.tbl_spark <- function(x, n = 6L, ...) {
   sdf <- spark_dataframe(x)
 
   if (sdf_is_streaming(sdf)) {
-    # head operations not supported over streams but used in tibble pring
+    # head operations not supported over streams but used in tibble print
     x
   } else {
     add_op_single("head", x, args = list(n = n))
