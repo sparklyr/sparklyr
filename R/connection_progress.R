@@ -181,6 +181,8 @@ connection_progress_context <- function(sc, f)
 
 connection_progress <- function(sc, terminated = FALSE)
 {
+  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE)) return()
+
   tryCatch({
     connection_progress_base(sc, terminated)
   }, error = function(e) {
@@ -190,5 +192,7 @@ connection_progress <- function(sc, terminated = FALSE)
 
 connection_progress_terminated <- function(sc)
 {
+  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE)) return()
+
   connection_progress(sc, terminated = TRUE)
 }
