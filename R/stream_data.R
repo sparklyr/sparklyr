@@ -58,10 +58,11 @@ stream_read_generic <- function(sc,
   tbl(sc, name)
 }
 
-stream_write_generic <- function(x, path, type, trigger, checkpoint, stream_options)
+stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, stream_options)
 {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
+  mode <- match.arg(as.character(mode), choices = c("append", "complete", "update"))
 
   if (!invoke(sdf, "isStreaming"))
     stop("DataFrame requires streaming context. Use `stream_read_*()` to read from streams.")
@@ -82,6 +83,7 @@ stream_write_generic <- function(x, path, type, trigger, checkpoint, stream_opti
   if (identical(type, "memory")) streamOptions <- invoke(streamOptions, "queryName", path)
 
   streamOptions %>%
+    invoke("outputMode", mode) %>%
     invoke("trigger", trigger) %>%
     invoke("start") %>%
     stream_class() %>%
@@ -139,7 +141,9 @@ stream_read_csv <- function(sc,
 #'
 #' @inheritParams spark_write_csv
 #'
-#' @param checkpoint The location where the system will write all the checkpoint
+#' @param mode Specifies how data is written to a streaming sink.
+#' @param trigger The trigger for the stream query, defaults to micro-batch.intervals.
+#' @param checkpoint The location where the system will write all the checkpoint.
 #' information to guarantee end-to-end fault-tolerance.
 #'
 #' @family Spark stream serialization
@@ -147,6 +151,7 @@ stream_read_csv <- function(sc,
 #' @export
 stream_write_csv <- function(x,
                              path,
+                             mode = c("append", "complete", "update"),
                              trigger = stream_trigger_interval(interval = 5000),
                              checkpoint = file.path(path, "checkpoint"),
                              header = TRUE,
@@ -174,6 +179,7 @@ stream_write_csv <- function(x,
   stream_write_generic(x,
                        path = path,
                        type = "csv",
+                       mode = mode,
                        trigger = trigger,
                        checkpoint = checkpoint,
                        stream_options = streamOptions)
@@ -204,6 +210,7 @@ stream_write_csv <- function(x,
 #' @export
 stream_write_memory <- function(x,
                                 name = random_string("sparklyr_tmp_"),
+                                mode = c("append", "complete", "update"),
                                 trigger = stream_trigger_interval(interval = 5000),
                                 checkpoint = file.path("checkpoints", name, random_string("")),
                                 infer_schema = TRUE,
@@ -217,6 +224,7 @@ stream_write_memory <- function(x,
   stream_write_generic(x,
                        path = name,
                        type = "memory",
+                       mode = mode,
                        trigger = trigger,
                        checkpoint = checkpoint,
                        stream_options = options)
