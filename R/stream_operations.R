@@ -116,9 +116,16 @@ stream_name <- function(stream)
   invoke(stream, "name")
 }
 
-sdf_collect_stream <- function(x)
+sdf_collect_stream <- function(x, ...)
 {
   sc <- spark_connection(x)
+  args <- list(...)
+  n <- args$n
+
+  # collection is mostly used to print to console using tibble, otherwise, reactiveSpark
+  # or a proper sink makes more sense.
+  if (is.null(n)) n <- getOption("dplyr.print_min", getOption("tibble.print_min", 10))
+
   memory <- stream_write_memory(x, trigger = stream_trigger_interval(interval = 0))
 
   data <- data.frame()
@@ -127,7 +134,11 @@ sdf_collect_stream <- function(x)
 
   commandStart <- Sys.time()
   while (nrow(data) == 0 && commandStart + waitSeconds > Sys.time()) {
-    data <- tbl(sc, stream_name(memory)) %>%
+    data <- tbl(sc, stream_name(memory))
+
+    if (!identical(n, Inf)) data <- data %>% head(n)
+
+    data <- data %>%
       spark_dataframe() %>%
       sdf_collect()
 

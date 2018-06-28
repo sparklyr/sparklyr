@@ -88,17 +88,20 @@ sdf_read_column <- function(x, column) {
 #'
 #' Collects a Spark dataframe into R.
 #'
+#' @param Spark Spark dataframe to collect
+#' @param ... Additional options.
+#'
 #' @export
-sdf_collect <- function(object) {
+sdf_collect <- function(object, ...) {
   if (sdf_is_streaming(object))
-    sdf_collect_stream(object)
+    sdf_collect_stream(object, ...)
   else
-    sdf_collect_static(object)
+    sdf_collect_static(object, ...)
 }
 
 # Read a Spark Dataset into R.
 #' @importFrom dplyr as_data_frame
-sdf_collect_static <- function(object) {
+sdf_collect_static <- function(object, ...) {
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
 
