@@ -9,6 +9,9 @@
 
 - Support for monitoring job progress within RStudio, required RStudio 1.2.
 
+- Progress reports can be turned off by setting `sparklyr.progress` to `FALSE`
+  in `spark_config()`.
+
 ### Data
 
 - Added support to read and write ORC files using `spark_read_orc()` and

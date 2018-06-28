@@ -9,3 +9,11 @@
 spark_config_value <- function(config, name, default = NULL) {
   if (!name %in% names(config)) default else config[[name]]
 }
+
+spark_config_integer <- function(config, name, default = NULL) {
+  as.integer(spark_config_value(config, name, default))
+}
+
+spark_config_logical <- function(config, name, default = NULL) {
+  as.logical(spark_config_value(config, name, default))
+}

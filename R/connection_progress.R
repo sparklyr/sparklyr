@@ -14,15 +14,20 @@ connection_progress_update <- function(jobName, progressUnits, url)
 {
   api <- connection_progress_api()
   if ("actions" %in% names(formals(api$add_job)) && nchar(url) > 0) {
+    jobActions <- NULL
+    if (nchar(url) > 0) {
+      jobActions <- list(
+        info = function(id) {
+          browseURL(url)
+        }
+      )
+    }
+
     api$add_job(jobName,
                 progressUnits = progressUnits,
                 show = FALSE,
                 autoRemove = FALSE,
-                actions = list(
-                  info = function(id) {
-                    browseURL(url)
-                  }
-                ))
+                actions = jobActions)
   } else if ("show" %in% names(formals(api$add_job))) {
     api$add_job(jobName,
                 progressUnits = progressUnits,
@@ -55,9 +60,7 @@ connection_progress_base <- function(sc, terminated = FALSE)
     connection_progress_context(sc, function() {
       if (is.null(env$web_url)) {
         env$web_url <- tryCatch({
-          spark_context(sc) %>%
-            invoke("uiWebUrl") %>%
-            invoke("get")
+          spark_web(sc)
         }, error = function(e) {
           ""
         })
@@ -181,6 +184,8 @@ connection_progress_context <- function(sc, f)
 
 connection_progress <- function(sc, terminated = FALSE)
 {
+  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE)) return()
+
   tryCatch({
     connection_progress_base(sc, terminated)
   }, error = function(e) {
@@ -190,5 +195,7 @@ connection_progress <- function(sc, terminated = FALSE)
 
 connection_progress_terminated <- function(sc)
 {
+  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE)) return()
+
   connection_progress(sc, terminated = TRUE)
 }
