@@ -148,7 +148,7 @@ spark_worker_apply <- function(sc, config) {
       worker_log("updating schema")
       result <- data.frame(
         names = paste(names(result), collapse = "|"),
-        types = paste(lapply(result, class), collapse = "|")
+        types = paste(lapply(result, class), collapse = "|"),
       )
     }
 

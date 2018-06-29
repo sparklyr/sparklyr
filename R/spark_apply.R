@@ -100,7 +100,7 @@ spark_apply_packages_is_bundle <- function(packages) {
   is.character(packages) && length(packages) == 1 && grepl("\\.tar$", packages)
 }
 
-spark_apply_worker_config <- function(debug, profile, schema = FALSE) {
+spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE) {
   worker_config_serialize(
     c(
       list(
@@ -299,7 +299,7 @@ spark_apply <- function(x,
       "computeRdd",
       rdd_base,
       closure,
-      spark_apply_worker_config(args$debug, args$profile),
+      spark_apply_worker_config(sc, args$debug, args$profile),
       as.integer(worker_port),
       as.list(sdf_columns),
       as.list(group_by),
@@ -319,7 +319,7 @@ spark_apply <- function(x,
     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   }
   else {
-    if (identical(columns, NULL)) {
+    if (identical(columns, NULL) || is.character(columns)) {
       columns_schema <- spark_data_build_types(
         sc,
         list(
@@ -348,7 +348,7 @@ spark_apply <- function(x,
         sdf_limit,
         columns_schema,
         closure,
-        spark_apply_worker_config(args$debug, args$profile, schema = TRUE),
+        spark_apply_worker_config(sc, args$debug, args$profile, schema = TRUE),
         as.integer(worker_port),
         as.list(sdf_columns),
         as.list(group_by),
@@ -360,15 +360,19 @@ spark_apply <- function(x,
         as.environment(spark_apply_options)
       )
 
-      if (sdf_is_streaming(sdf)) {
-        columns_query <- columns_op %>% stream_collect()
+      columns_query <- columns_op %>% sdf_collect()
+
+      columns_infer <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
+      names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
+
+      if (is.character(columns)) {
+        names(columns_infer) <- columns
       }
       else {
-        columns_query <- columns_op %>% sdf_collect()
+        names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
       }
 
-      columns <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
-      names(columns) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
+      columns <- columns_infer
     }
 
     schema <- spark_data_build_types(sc, columns)
@@ -380,7 +384,7 @@ spark_apply <- function(x,
       sdf,
       schema,
       closure,
-      spark_apply_worker_config(args$debug, args$profile),
+      spark_apply_worker_config(sc, args$debug, args$profile),
       as.integer(worker_port),
       as.list(sdf_columns),
       as.list(group_by),
