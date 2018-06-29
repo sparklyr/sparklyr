@@ -4,29 +4,34 @@
 #' of the spark object. This function is most Useful to read Spark streams.
 #'
 #' @param x An object coercable to a Spark DataFrame.
+#' @param session The user session to associate this file reader with, or NULL if
+#'   none. If non-null, the reader will automatically stop when the session ends.
+#' @param mode Specifies how data is written to a streaming sink.
 #' @param intervalMillis Approximate number of milliseconds to wait to retrieve
 #'   updated data frame. This can be a numeric value, or a function that returns
 #'   a numeric value.
-#' @param session The user session to associate this file reader with, or NULL if
-#'   none. If non-null, the reader will automatically stop when the session ends.
 #'
 #' @importFrom shiny reactivePoll
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr distinct
-#' @importFrom dplyr puill
+#' @importFrom dplyr pull
 #'
 #' @export
-reactiveSpark <- function(x, intervalMillis = 1000, session = NULL)
+reactiveSpark <- function(x,
+                          session = NULL,
+                          mode = c("append", "complete", "update"),
+                          intervalMillis = 1000)
 {
   sc <- spark_connection(x)
 
-  traceable <- x %>%
-    mutate(reactive_timestamp = current_timestamp())
-
   name <- random_string("sparklyr_tmp_")
 
-  stream <- traceable %>% stream_write_memory(name)
+  stream <- traceable %>% stream_write_memory(
+    name,
+    mode = mode,
+    trigger = stream_trigger_interval(intervalMillis)
+  )
 
   reactivePoll(
     intervalMillis = intervalMillis,
@@ -37,16 +42,13 @@ reactiveSpark <- function(x, intervalMillis = 1000, session = NULL)
         ""
       } else {
         tbl(sc, name) %>%
-          mutate(reactive_timestamp = current_timestamp()) %>%
-          select(reactive_timestamp) %>%
-          filter(reactive_timestamp == max(reactive_timestamp, na.rm = TRUE)) %>%
+          select(timestamp) %>%
           distinct() %>%
           pull()
       }
     },
     valueFunc = function() {
       tbl(sc, name) %>%
-        select(-reactive_timestamp) %>%
         spark_dataframe() %>%
         sdf_collect()
     })
