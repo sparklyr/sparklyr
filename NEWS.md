@@ -55,6 +55,13 @@
 
 - Support to invoke methods with `char` types using single character strings (@lawremi, #1395).
 
+### Documentation
+
+- Many new examples for `ml_kmeans()`, `ml_pca()`, `ml_naive_bayes()`, `ml_bisecting_kmeans()`,
+  `ml_decision_tree()`, `ml_random_forest()`, `ml_evaluator()`, `ml_multilayer_perceptron()`,
+  `ml_linear_regression()`, `ml_logistic_regression()`, `ml_cross_validator()`, 
+  `ft_binarizer()`, `ft_bucketrizer()`, `sdf_pivot()`, `ml_als()` (@samuelmacedo83).
+
 # Sparklyr 0.8.4
 
 - Added support for `spark_session_config()` to modify spark session settings.

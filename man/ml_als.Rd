@@ -98,3 +98,22 @@ Perform recommendation using Alternating Least Squares (ALS) matrix factorizatio
 
 \code{ml_als_factorization()} is an alias for \code{ml_als()} for backwards compatibility.
 }
+\examples{
+\dontrun{
+
+library(sparklyr)
+sc <- spark_connect(master = "local")
+
+movies <- data.frame(
+  user   = c(1, 2, 0, 1, 2, 0),
+  item   = c(1, 1, 1, 2, 2, 0),
+  rating = c(3, 1, 2, 4, 5, 4)
+)
+movies_tbl <- sdf_copy_to(sc, movies)
+
+model <- ml_als(movies_tbl)
+
+ml_predict(model, movies_tbl)
+}
+
+}
