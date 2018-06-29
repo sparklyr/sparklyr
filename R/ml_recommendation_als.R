@@ -57,6 +57,8 @@
 #' model <- ml_als(movies_tbl)
 #'
 #' ml_predict(model, movies_tbl)
+#'
+#' ml_recommend(model, type = "item", 1)
 #' }
 #'
 #' @export
