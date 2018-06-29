@@ -42,6 +42,9 @@ stream_read_generic <- function(sc,
                                        stream_options = stream_options)
     schema <- invoke(reader, "schema")
   }
+  else if ("spark_jobj" %in% class(columnd)) {
+    schema <- columns
+  }
   else {
     schema <- spark_data_build_types(sc, columns)
   }
@@ -229,4 +232,37 @@ stream_write_memory <- function(x,
                        trigger = trigger,
                        checkpoint = checkpoint,
                        stream_options = options)
+}
+
+#' @export
+#' Read a Spark DataFrame Memory Stream
+#'
+#' Read a memory data stream into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param source The name of the memory stream to read from.
+#' @param name The name to assign to the newly generated stream.
+#'
+#' @family Spark stream serialization
+#'
+#' @export
+stream_read_memory <- function(sc,
+                               source = NULL,
+                               name = NULL,
+                               header = TRUE,
+                               options = list(),
+                               ...)
+{
+  spark_require_version(sc, "2.0.0")
+
+  columns <- spark_session(sc) %>%
+    invoke("table", source) %>%
+    invoke("schema")
+
+  stream_read_generic(sc,
+                      path = name,
+                      type = "memory",
+                      name = name,
+                      columns = columns,
+                      stream_options = options)
 }
