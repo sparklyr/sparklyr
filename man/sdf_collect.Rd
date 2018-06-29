@@ -4,7 +4,12 @@
 \alias{sdf_collect}
 \title{Collect a Spark DataFrame into R.}
 \usage{
-sdf_collect(object)
+sdf_collect(object, ...)
+}
+\arguments{
+\item{...}{Additional options.}
+
+\item{Spark}{Spark dataframe to collect}
 }
 \description{
 Collects a Spark dataframe into R.

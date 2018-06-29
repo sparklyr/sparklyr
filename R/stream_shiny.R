@@ -14,7 +14,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr distinct
-#' @importFrom dplyr puill
+#' @importFrom dplyr pull
 #'
 #' @export
 reactiveSpark <- function(x, intervalMillis = 1000, session = NULL)

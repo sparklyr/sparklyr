@@ -5,14 +5,19 @@
 \title{Write a Spark DataFrame into Memory}
 \usage{
 stream_write_memory(x, name = random_string("sparklyr_tmp_"),
+  mode = c("append", "complete", "update"),
   trigger = stream_trigger_interval(interval = 5000),
-  checkpoint = file.path("checkpoints", name), infer_schema = TRUE,
-  options = list(), ...)
+  checkpoint = file.path("checkpoints", name, random_string("")),
+  infer_schema = TRUE, options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
-\item{checkpoint}{The location where the system will write all the checkpoint
+\item{mode}{Specifies how data is written to a streaming sink.}
+
+\item{trigger}{The trigger for the stream query, defaults to micro-batch.intervals.}
+
+\item{checkpoint}{The location where the system will write all the checkpoint.
 information to guarantee end-to-end fault-tolerance.}
 
 \item{options}{A list of strings with additional options.}
