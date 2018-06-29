@@ -75,7 +75,7 @@ stream_write_generic <- function(x,
   if (!invoke(sdf, "isStreaming"))
     stop("DataFrame requires streaming context. Use `stream_read_*()` to read from streams.")
 
-  invoke(sdf, "timestamp", paste(watermark, "seconds"))
+  sdf <- invoke(sdf, "withWatermark", "timestamp", paste(watermark, "seconds"))
 
   streamOptions <- invoke(sdf, "writeStream") %>%
     invoke("format", type)
