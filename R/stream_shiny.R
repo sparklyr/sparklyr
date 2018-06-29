@@ -17,7 +17,9 @@
 #' @importFrom dplyr pull
 #'
 #' @export
-reactiveSpark <- function(x, intervalMillis = 1000, session = NULL)
+reactiveSpark <- function(x,
+                          intervalMillis = 1000,
+                          session = NULL)
 {
   sc <- spark_connection(x)
 
@@ -26,7 +28,7 @@ reactiveSpark <- function(x, intervalMillis = 1000, session = NULL)
 
   name <- random_string("sparklyr_tmp_")
 
-  stream <- traceable %>% stream_write_memory(name)
+  stream <- traceable %>% stream_write_memory(name, mode = "complete")
 
   reactivePoll(
     intervalMillis = intervalMillis,

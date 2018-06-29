@@ -141,7 +141,8 @@ stream_read_csv <- function(sc,
 #'
 #' @inheritParams spark_write_csv
 #'
-#' @param mode Specifies how data is written to a streaming sink.
+#' @param mode Specifies how data is written to a streaming sink. Valid values are
+#'   \code{"append"}, \code{"complete"} or \code{"update"}.
 #' @param trigger The trigger for the stream query, defaults to micro-batch.intervals.
 #' @param checkpoint The location where the system will write all the checkpoint.
 #' information to guarantee end-to-end fault-tolerance.

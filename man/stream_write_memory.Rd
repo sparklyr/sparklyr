@@ -13,7 +13,8 @@ stream_write_memory(x, name = random_string("sparklyr_tmp_"),
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
-\item{mode}{Specifies how data is written to a streaming sink.}
+\item{mode}{Specifies how data is written to a streaming sink. Valid values are
+\code{"append"}, \code{"complete"} or \code{"update"}.}
 
 \item{trigger}{The trigger for the stream query, defaults to micro-batch.intervals.}
 
