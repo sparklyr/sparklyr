@@ -1,5 +1,16 @@
 # Sparklyr 0.9.0 (unreleased)
 
+## Streaming
+
+- Support for `stream_read_*()` and `stream_write_*()` to read from and
+  to Spark structured streams.
+  
+- Support to apply `dplyr`, `sdf_sql()`, `spark_apply()` or scoring
+  pipeline transformations to Spark streams.
+  
+- Support for `reactiveSpark()` to create a `shiny` reactive over a Spark
+  stream.
+
 ### Monitoring
 
 - Support for interrupting long running operations and recover gracefully
@@ -35,6 +46,12 @@
 - Removed `install` column from `livy_available_versions()`.
 
 ### Distributed R
+
+- Breaking Change: `spark_apply()` no longer defaults to the input
+  column names when the `columns` parameter is nos specified.
+
+- Support for reading column names from the R data frame
+  returned by `spark_apply()`.
 
 - Fix to support retrieving empty data frames in grouped
   `spark_apply()` operations (#1505).
