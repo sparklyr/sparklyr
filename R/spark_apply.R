@@ -247,12 +247,12 @@ spark_apply <- function(x,
 
     group_by_list <- as.list(as.integer(colpos - 1))
 
+    if (!columns_typed) {
+      columns <- c(group_by, columns)
+    }
+
     if (identical(args$rdd, TRUE)) {
       rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
-
-      if (!columns_typed) {
-        columns <- c(group_by, columns)
-      }
     }
     else {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
@@ -366,10 +366,7 @@ spark_apply <- function(x,
       names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
 
       if (is.character(columns)) {
-        names(columns_infer) <- columns
-      }
-      else {
-        names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
+        names(columns_infer)[seq_along(columns)] <- columns
       }
 
       columns <- columns_infer
