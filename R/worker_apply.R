@@ -144,11 +144,13 @@ spark_worker_apply <- function(sc, config) {
       }
     }
 
+    firstClass <- function(e) class(e)[[1]]
+
     if (identical(config$schema, TRUE)) {
       worker_log("updating schema")
       result <- data.frame(
         names = paste(names(result), collapse = "|"),
-        types = paste(lapply(result, class), collapse = "|")
+        types = paste(lapply(result, firstClass), collapse = "|")
       )
     }
 

@@ -36,7 +36,10 @@ object SQLUtils {
       case "raw" => org.apache.spark.sql.types.BinaryType
       case "logical" => org.apache.spark.sql.types.BooleanType
       case "boolean" => org.apache.spark.sql.types.BooleanType
+      case "POSIXct" => org.apache.spark.sql.types.TimestampType
+      case "POSIXlt" => org.apache.spark.sql.types.TimestampType
       case "timestamp" => org.apache.spark.sql.types.TimestampType
+      case "Date" => org.apache.spark.sql.types.DateType
       case "date" => org.apache.spark.sql.types.DateType
       case RegexArray(elemType) =>
         org.apache.spark.sql.types.ArrayType(getSQLDataType(elemType))

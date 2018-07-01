@@ -370,6 +370,8 @@ spark_apply <- function(x,
       }
 
       columns <- columns_infer
+
+      if (identical(args$schema, TRUE)) return(columns)
     }
 
     schema <- spark_data_build_types(sc, columns)

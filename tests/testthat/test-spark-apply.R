@@ -175,7 +175,7 @@ test_that("'spark_apply' can roundtrip dates", {
       spark_apply(function(e) as.Date(e[[1]], origin = "1970-01-01")) %>%
       spark_apply(function(e) e) %>%
       collect() %>%
-      pull(dates) %>%
+      pull(result) %>%
       class(),
     "Date"
   )
@@ -187,7 +187,7 @@ test_that("'spark_apply' can roundtrip Date-Time", {
       spark_apply(function(e) as.POSIXct(e[[1]], origin = "1970-01-01")) %>%
       spark_apply(function(e) e) %>%
       collect() %>%
-      pull(dates) %>%
+      pull(result) %>%
       class() %>%
       first(),
     "POSIXct"
