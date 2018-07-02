@@ -7,9 +7,9 @@
 sdf_collect(object, ...)
 }
 \arguments{
-\item{...}{Additional options.}
+\item{object}{Spark dataframe to collect}
 
-\item{Spark}{Spark dataframe to collect}
+\item{...}{Additional options.}
 }
 \description{
 Collects a Spark dataframe into R.

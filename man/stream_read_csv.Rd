@@ -42,6 +42,7 @@ Requires one extra pass over the data. Defaults to \code{TRUE}.}
 Read a tabular data stream into a Spark DataFrame.
 }
 \seealso{
-Other Spark stream serialization: \code{\link{stream_write_csv}},
+Other Spark stream serialization: \code{\link{stream_read_memory}},
+  \code{\link{stream_write_csv}},
   \code{\link{stream_write_memory}}
 }

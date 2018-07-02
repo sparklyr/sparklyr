@@ -7,9 +7,8 @@
 stream_write_csv(x, path, mode = c("append", "complete", "update"),
   trigger = stream_trigger_interval(interval = 5000),
   checkpoint = file.path(path, "checkpoint"), header = TRUE,
-  columns = NULL, infer_schema = TRUE, delimiter = ",", quote = "\\"",
-  escape = "\\\\", charset = "UTF-8", null_value = NULL,
-  options = list(), ...)
+  delimiter = ",", quote = "\\"", escape = "\\\\", charset = "UTF-8",
+  null_value = NULL, options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -20,7 +19,9 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \item{mode}{Specifies how data is written to a streaming sink. Valid values are
 \code{"append"}, \code{"complete"} or \code{"update"}.}
 
-\item{trigger}{The trigger for the stream query, defaults to micro-batch.intervals.}
+\item{trigger}{The trigger for the stream query, defaults to micro-batches runnnig
+every 5 seconds. See \code{\link{stream_trigger_interval}} and
+\code{\link{stream_trigger_continuous}}.}
 
 \item{checkpoint}{The location where the system will write all the checkpoint.
 information to guarantee end-to-end fault-tolerance.}
@@ -46,5 +47,6 @@ Writes a Spark DataFrame to a tabular (typically, comma-separated) stream.
 }
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
+  \code{\link{stream_read_memory}},
   \code{\link{stream_write_memory}}
 }

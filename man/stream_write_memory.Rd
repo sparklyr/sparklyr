@@ -8,15 +8,19 @@ stream_write_memory(x, name = random_string("sparklyr_tmp_"),
   mode = c("append", "complete", "update"),
   trigger = stream_trigger_interval(interval = 5000),
   checkpoint = file.path("checkpoints", name, random_string("")),
-  infer_schema = TRUE, options = list(), ...)
+  options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
+\item{name}{The name to use to register this stream.}
+
 \item{mode}{Specifies how data is written to a streaming sink. Valid values are
 \code{"append"}, \code{"complete"} or \code{"update"}.}
 
-\item{trigger}{The trigger for the stream query, defaults to micro-batch.intervals.}
+\item{trigger}{The trigger for the stream query, defaults to micro-batches runnnig
+every 5 seconds. See \code{\link{stream_trigger_interval}} and
+\code{\link{stream_trigger_continuous}}.}
 
 \item{checkpoint}{The location where the system will write all the checkpoint.
 information to guarantee end-to-end fault-tolerance.}
@@ -45,5 +49,6 @@ stop_stream(stream)
 }
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
+  \code{\link{stream_read_memory}},
   \code{\link{stream_write_csv}}
 }
