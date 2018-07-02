@@ -93,7 +93,9 @@ sdf_read_column <- function(x, column) {
 #'
 #' @export
 sdf_collect <- function(object, ...) {
-  if (sdf_is_streaming(object))
+  sc <- spark_connection(object)
+
+  if (spark_version(sc) >= "2.0.0" && sdf_is_streaming(object))
     sdf_collect_stream(object, ...)
   else
     sdf_collect_static(object, ...)
