@@ -4,15 +4,20 @@ stream_class <- function(stream)
   stream
 }
 
+stream_status <- function(stream)
+{
+  invoke(stream, "status") %>%
+    invoke("json") %>%
+    jsonlite::fromJSON()
+}
+
 #' @export
 print.spark_stream <- function(stream, ...)
 {
   id <- stream_name(stream)
   if (is.null(id) || nchar(id) == 0) id <- invoke(invoke(stream, "id"), "toString")
 
-  status <- invoke(stream, "status") %>%
-    invoke("json") %>%
-    jsonlite::fromJSON()
+  status <- stream_status(stream)
   active <- invoke(stream, "isActive")
 
   cat(
@@ -41,12 +46,11 @@ stream_stop <- function(stream)
 
 stream_validate <- function(stream)
 {
-  waitSeconds <- ensure_scalar_integer(spark_config_value(config, "sparklyr.stream.validate.timeout", 5))
+  waitSeconds <- ensure_scalar_integer(spark_config_value(config, "sparklyr.stream.validate.timeout", 3))
 
   commandStart <- Sys.time()
-  while (nrow(data) == 0 &&
-         commandStart + waitSeconds > Sys.time() &&
-         !invoke(stream, "isActive")) {
+  while (!grepl("waiting", stream_status(stream)$message) &&
+         commandStart + waitSeconds > Sys.time()) {
     Sys.sleep(0.1)
   }
 
@@ -57,8 +61,6 @@ stream_validate <- function(stream)
       invoke("getMessage")
     stop(cause)
   }
-
-  if (!invoke(stream, "isActive")) warning("Stream not active after ", waitSeconds, " seconds.")
 
   stream
 }
