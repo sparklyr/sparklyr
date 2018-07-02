@@ -55,6 +55,10 @@
 
 - Support to invoke methods with `char` types using single character strings (@lawremi, #1395).
 
+### Serialization
+
+- Fixed collection of `Date` types to support correct local JVM timezone to UTC ().
+
 ### Documentation
 
 - Many new examples for `ml_kmeans()`, `ml_pca()`, `ml_naive_bayes()`, `ml_bisecting_kmeans()`,
