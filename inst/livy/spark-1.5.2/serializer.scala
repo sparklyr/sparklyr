@@ -7,6 +7,7 @@ class Serializer(tracker: JVMObjectTracker) {
   import java.io.{DataInputStream, DataOutputStream}
   import java.nio.charset.StandardCharsets
   import java.sql.{Date, Time, Timestamp}
+  import java.util.Calendar
 
   import scala.collection.JavaConverters._
   import scala.collection.mutable.WrappedArray
@@ -412,10 +413,28 @@ class Serializer(tracker: JVMObjectTracker) {
     value.foreach(v => writeTime(out, v))
   }
 
+  def timestampToUTC(millis: Long): Timestamp = {
+    millis match {
+      case 0 => new java.sql.Timestamp(0)
+      case _ => new java.sql.Timestamp(
+        millis +
+        Calendar.getInstance.get(Calendar.ZONE_OFFSET) +
+        Calendar.getInstance.get(Calendar.DST_OFFSET)
+      )
+    }
+  }
+
   def writeDateArr(out: DataOutputStream, value: Array[java.sql.Date]): Unit = {
     writeType(out, "date")
     out.writeInt(value.length)
-    value.foreach(v => writeTime(out, new java.sql.Timestamp(v.getTime())))
+
+    // Dates are created in the local JVM time zone, so we need to convert to UTC here
+    // See: https://docs.oracle.com/javase/7/docs/api/java/util/Date.html#getTimezoneOffset()
+
+    value.foreach(v => writeTime(
+      out,
+      timestampToUTC(v.getTime())
+    ))
   }
 
   def writeStringArr(out: DataOutputStream, value: Array[String]): Unit = {
