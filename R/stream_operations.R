@@ -5,7 +5,7 @@ stream_class <- function(stream)
 }
 
 #' @export
-print.spark_stream <- function(stream)
+print.spark_stream <- function(stream, ...)
 {
   id <- stream_name(stream)
   if (is.null(id) || nchar(id) == 0) id <- invoke(invoke(stream, "id"), "toString")

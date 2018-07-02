@@ -88,7 +88,7 @@ sdf_read_column <- function(x, column) {
 #'
 #' Collects a Spark dataframe into R.
 #'
-#' @param Spark Spark dataframe to collect
+#' @param object Spark dataframe to collect
 #' @param ... Additional options.
 #'
 #' @export

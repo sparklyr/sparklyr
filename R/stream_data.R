@@ -121,14 +121,14 @@ stream_read_csv <- function(sc,
 
   name <- name %||% random_string("sparklyr_tmp_")
 
-  streamOptions <- spark_csv_options(header,
-                                     infer_schema,
-                                     delimiter,
-                                     quote,
-                                     escape,
-                                     charset,
-                                     null_value,
-                                     options)
+  streamOptions <- spark_csv_options(header = header,
+                                     inferSchema = infer_schema,
+                                     delimiter = delimiter,
+                                     quote = quote,
+                                     escape = escape,
+                                     charset = charset,
+                                     nullValue = null_value,
+                                     options = options)
 
   stream_read_generic(sc,
                       path = path,
@@ -159,8 +159,6 @@ stream_write_csv <- function(x,
                              trigger = stream_trigger_interval(interval = 5000),
                              checkpoint = file.path(path, "checkpoint"),
                              header = TRUE,
-                             columns = NULL,
-                             infer_schema = TRUE,
                              delimiter = ",",
                              quote = "\"",
                              escape = "\\",
@@ -171,14 +169,14 @@ stream_write_csv <- function(x,
 {
   spark_require_version(spark_connection(x), "2.0.0")
 
-  streamOptions <- spark_csv_options(header,
-                                     infer_schema,
-                                     delimiter,
-                                     quote,
-                                     escape,
-                                     charset,
-                                     null_value,
-                                     options)
+  streamOptions <- spark_csv_options(header = header,
+                                     inferSchema = NULL,
+                                     delimiter = delimiter,
+                                     quote = quote,
+                                     escape = escape,
+                                     charset = charset,
+                                     nullValue = null_value,
+                                     options = options)
 
   stream_write_generic(x,
                        path = path,
@@ -194,6 +192,8 @@ stream_write_csv <- function(x,
 #' Writes a Spark DataFrame into memory.
 #'
 #' @inheritParams stream_write_csv
+#'
+#' @param name The name to use to register this stream.
 #'
 #' @family Spark stream serialization
 #'
@@ -217,7 +217,6 @@ stream_write_memory <- function(x,
                                 mode = c("append", "complete", "update"),
                                 trigger = stream_trigger_interval(interval = 5000),
                                 checkpoint = file.path("checkpoints", name, random_string("")),
-                                infer_schema = TRUE,
                                 options = list(),
                                 ...)
 {
