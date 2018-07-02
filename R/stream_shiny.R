@@ -23,8 +23,13 @@ reactiveSpark <- function(x,
 {
   sc <- spark_connection(x)
 
-  traceable <- x %>%
-    mutate(reactive_timestamp = current_timestamp())
+  sdf <- spark_dataframe(x)
+  traceable <- invoke(
+    sdf,
+    "withColumn",
+    "reactive_timestamp",
+    invoke_static(sc, "org.apache.spark.sql.functions", "expr", "current_timestamp()")
+  )
 
   name <- random_string("sparklyr_tmp_")
 
@@ -38,18 +43,25 @@ reactiveSpark <- function(x,
       if (is.null(progress) || identical(invoke(progress, "numInputRows"), 0L)) {
         ""
       } else {
-        tbl(sc, name) %>%
-          mutate(reactive_timestamp = current_timestamp()) %>%
-          select(reactive_timestamp) %>%
-          filter(reactive_timestamp == max(reactive_timestamp, na.rm = TRUE)) %>%
-          distinct() %>%
-          pull()
+        spark_session(sc) %>%
+          invoke("table", name) %>%
+          invoke(
+            "agg",
+            invoke_static(
+              sc,
+              "org.apache.spark.sql.functions",
+              "expr",
+              "max(reactive_timestamp)"
+            ),
+            list()
+          ) %>%
+          sdf_collect()
       }
     },
     valueFunc = function() {
-      tbl(sc, name) %>%
-        select(-reactive_timestamp) %>%
-        spark_dataframe() %>%
+      spark_session(sc) %>%
+        invoke("table", name) %>%
+        invoke("drop", "reactive_timestamp") %>%
         sdf_collect()
     })
 }

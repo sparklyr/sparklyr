@@ -12,13 +12,13 @@ stream_status <- function(stream)
 }
 
 #' @export
-print.spark_stream <- function(stream, ...)
+print.spark_stream <- function(x, ...)
 {
-  id <- stream_name(stream)
-  if (is.null(id) || nchar(id) == 0) id <- invoke(invoke(stream, "id"), "toString")
+  id <- stream_name(x)
+  if (is.null(id) || nchar(id) == 0) id <- invoke(invoke(x, "id"), "toString")
 
-  status <- stream_status(stream)
-  active <- invoke(stream, "isActive")
+  status <- stream_status(x)
+  active <- invoke(x, "isActive")
 
   cat(
     paste(
