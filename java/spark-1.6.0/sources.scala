@@ -13,6 +13,14 @@ class Sources {
 spark_config_value <- function(config, name, default = NULL) {
   if (!name %in% names(config)) default else config[[name]]
 }
+
+spark_config_integer <- function(config, name, default = NULL) {
+  as.integer(spark_config_value(config, name, default))
+}
+
+spark_config_logical <- function(config, name, default = NULL) {
+  as.logical(spark_config_value(config, name, default))
+}
 #' Check whether the connection is open
 #'
 #' @param sc \code{spark_connection}
@@ -378,8 +386,12 @@ spark_connect_gateway <- function(
 core_invoke_sync_socket <- function(sc)
 {
   flush <- c(1)
-  while(length(flush) > 0)
+  while(length(flush) > 0) {
     flush <- readBin(sc$backend, raw(), 1000)
+
+    # while flushing monitored connections we don't want to hang forever
+    if (sc$state$use_monitoring) break;
+  }
 }
 
 core_invoke_sync <- function(sc)
