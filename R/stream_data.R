@@ -146,7 +146,9 @@ stream_read_csv <- function(sc,
 #'
 #' @param mode Specifies how data is written to a streaming sink. Valid values are
 #'   \code{"append"}, \code{"complete"} or \code{"update"}.
-#' @param trigger The trigger for the stream query, defaults to micro-batch.intervals.
+#' @param trigger The trigger for the stream query, defaults to micro-batches runnnig
+#'   every 5 seconds. See \code{\link{stream_trigger_interval()}} and
+#'   \code{\link{stream_trigger_continuous()}}.
 #' @param checkpoint The location where the system will write all the checkpoint.
 #' information to guarantee end-to-end fault-tolerance.
 #'

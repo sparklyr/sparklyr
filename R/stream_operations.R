@@ -41,6 +41,15 @@ stream_stop <- function(stream)
 
 stream_validate <- function(stream)
 {
+  waitSeconds <- ensure_scalar_integer(spark_config_value(config, "sparklyr.stream.validate.timeout", 5))
+
+  commandStart <- Sys.time()
+  while (nrow(data) == 0 &&
+         commandStart + waitSeconds > Sys.time() &&
+         !invoke(stream, "isActive")) {
+    Sys.sleep(0.1)
+  }
+
   exception <- invoke(stream, "exception")
   if (!invoke(exception, "isEmpty")) {
     cause <- invoke(exception, "get") %>%
@@ -48,6 +57,8 @@ stream_validate <- function(stream)
       invoke("getMessage")
     stop(cause)
   }
+
+  if (!invoke(stream, "isActive")) warning("Stream not active after ", waitSeconds, " seconds.")
 
   stream
 }

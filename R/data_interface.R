@@ -9,8 +9,8 @@ spark_csv_options <- function(header,
   c(
     options,
     list(
-      header = ifelse(header, "true", "false"),
-      inferSchema = ifelse(inferSchema, "true", "false"),
+      header = ifelse(identical(header, TRUE), "true", "false"),
+      inferSchema = ifelse(identical(inferSchema, TRUE), "true", "false"),
       delimiter = toString(delimiter),
       quote = toString(quote),
       escape = toString(escape),
