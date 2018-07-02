@@ -410,6 +410,17 @@ class Serializer(tracker: JVMObjectTracker) {
     value.foreach(v => writeTime(out, v))
   }
 
+  def timestampToUTC(millis: Long): Timestamp = {
+    millis match {
+      case 0 => new java.sql.Timestamp(0)
+      case _ => new java.sql.Timestamp(
+        millis +
+        Calendar.getInstance.get(Calendar.ZONE_OFFSET) +
+        Calendar.getInstance.get(Calendar.DST_OFFSET)
+      )
+    }
+  }
+
   def writeDateArr(out: DataOutputStream, value: Array[java.sql.Date]): Unit = {
     writeType(out, "date")
     out.writeInt(value.length)
@@ -419,11 +430,7 @@ class Serializer(tracker: JVMObjectTracker) {
 
     value.foreach(v => writeTime(
       out,
-      new java.sql.Timestamp(
-        v.getTime() +
-        Calendar.getInstance.get(Calendar.ZONE_OFFSET) +
-        Calendar.getInstance.get(Calendar.DST_OFFSET)
-      )
+      timestampToUTC(v.getTime())
     ))
   }
 
