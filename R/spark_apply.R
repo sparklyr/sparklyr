@@ -191,7 +191,10 @@ spark_apply <- function(x,
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
   if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
-  if (identical(args$rdd, TRUE)) rdd_base <- invoke(sdf, "rdd")
+  if (identical(args$rdd, TRUE)) {
+    rdd_base <- invoke(sdf, "rdd")
+    if (identical(columns, NULL)) columns <- colnames(x)
+  }
   grouped <- !is.null(group_by)
 
   rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
