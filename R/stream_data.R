@@ -28,7 +28,7 @@ stream_read_generic <- function(sc,
                                 columns,
                                 stream_options)
 {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+  spark_require_version(sc, "2.0.0", "Spark streaming")
 
   schema <- NULL
 
@@ -120,7 +120,7 @@ stream_read_csv <- function(sc,
                             options = list(),
                             ...)
 {
-  spark_require_version(sc, "2.0.0")
+  spark_require_version(sc, "2.0.0", "Spark streaming")
 
   name <- name %||% random_string("sparklyr_tmp_")
 
@@ -174,7 +174,7 @@ stream_write_csv <- function(x,
                              options = list(),
                              ...)
 {
-  spark_require_version(spark_connection(x), "2.0.0")
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
   streamOptions <- spark_csv_options(header = header,
                                      inferSchema = NULL,
@@ -227,7 +227,7 @@ stream_write_memory <- function(x,
                                 options = list(),
                                 ...)
 {
-  spark_require_version(spark_connection(x), "2.0.0")
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
   sc <- spark_connection(x)
 
@@ -260,7 +260,7 @@ stream_read_memory <- function(sc,
                                options = list(),
                                ...)
 {
-  spark_require_version(sc, "2.0.0")
+  spark_require_version(sc, "2.0.0", "Spark streaming")
 
   name <- name %||% random_string("sparklyr_tmp_")
 
