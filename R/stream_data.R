@@ -632,3 +632,75 @@ stream_write_kafka <- function(x,
                        checkpoint = checkpoint,
                        stream_options = options)
 }
+
+#' Read JDBC Stream
+#'
+#' Reads a JDBC stream as a Spark dataframe stream.
+#'
+#' @inheritParams spark_read_csv
+#' @param name The name to assign to the newly generated stream.
+#'
+#' @family Spark stream serialization
+#'
+#' @export
+stream_read_jdbc <- function(sc,
+                             path,
+                             name = NULL,
+                             columns = NULL,
+                             options = list(),
+                             ...)
+{
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  name <- name %||% random_string("sparklyr_tmp_")
+
+  stream_read_generic(sc,
+                      path = path,
+                      type = "jdbc",
+                      name = name,
+                      columns = columns,
+                      stream_options = options)
+}
+
+#' Write JDBC Stream
+#'
+#' Writes a Spark dataframe stream into an JDBC stream.
+#'
+#' @inheritParams stream_write_csv
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' sdf_len(sc, 10) %>% spark_write_orc("orc-in")
+#'
+#' stream <- stream_read_parquet(sc, "orc-in") %>% stream_write_parquet("orc-out")
+#'
+#' stop_stream(stream)
+#'
+#' }
+#'
+#' @export
+stream_write_jdbc <- function(x,
+                              name = random_string("sparklyr_tmp_"),
+                              mode = c("append", "complete", "update"),
+                              trigger = stream_trigger_interval(interval = 5000),
+                              checkpoint = file.path("checkpoints", name, random_string("")),
+                              options = list(),
+                              ...)
+{
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
+  sc <- spark_connection(x)
+
+  stream_write_generic(x,
+                       path = name,
+                       type = "jdbc",
+                       mode = mode,
+                       trigger = trigger,
+                       checkpoint = checkpoint,
+                       stream_options = options)
+}
