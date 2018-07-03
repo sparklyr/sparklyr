@@ -6,5 +6,6 @@
 #' @export
 sdf_is_streaming <- function(x)
 {
-  invoke(x, "isStreaming")
+  sc <- spark_connection(x)
+  spark_version(sc) >= "2.0.0" && invoke(x, "isStreaming")
 }

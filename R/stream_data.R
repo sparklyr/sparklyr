@@ -28,6 +28,8 @@ stream_read_generic <- function(sc,
                                 columns,
                                 stream_options)
 {
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
   schema <- NULL
 
   streamOptions <- spark_session(sc) %>%
@@ -63,11 +65,13 @@ stream_read_generic <- function(sc,
 
 stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, stream_options)
 {
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
   mode <- match.arg(as.character(mode), choices = c("append", "complete", "update"))
 
-  if (!invoke(sdf, "isStreaming"))
+  if (!sdf_is_streaming(sdf))
     stop("DataFrame requires streaming context. Use `stream_read_*()` to read from streams.")
 
   streamOptions <- invoke(sdf, "writeStream") %>%
@@ -108,7 +112,6 @@ stream_read_csv <- function(sc,
                             name = NULL,
                             header = TRUE,
                             columns = NULL,
-                            infer_schema = TRUE,
                             delimiter = ",",
                             quote = "\"",
                             escape = "\\",
@@ -120,6 +123,8 @@ stream_read_csv <- function(sc,
   spark_require_version(sc, "2.0.0")
 
   name <- name %||% random_string("sparklyr_tmp_")
+
+  infer_schema <- identical(columns, NULL) || is.character(columns)
 
   streamOptions <- spark_csv_options(header = header,
                                      inferSchema = infer_schema,
@@ -249,15 +254,15 @@ stream_write_memory <- function(x,
 stream_read_memory <- function(sc,
                                source = NULL,
                                name = NULL,
-                               header = TRUE,
+                               columns = NULL,
+                               infer_schema = TRUE,
+                               charset = "UTF-8",
                                options = list(),
                                ...)
 {
   spark_require_version(sc, "2.0.0")
 
-  columns <- spark_session(sc) %>%
-    invoke("table", source) %>%
-    invoke("schema")
+  name <- name %||% random_string("sparklyr_tmp_")
 
   stream_read_generic(sc,
                       path = name,
