@@ -97,9 +97,9 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, strea
     stream_validate()
 }
 
-#' Read a CSV Stream into a Spark DataFrame
+#' Read CSV Stream
 #'
-#' Read a tabular data stream into a Spark DataFrame.
+#' Reads a CSV stream as a Spark dataframe stream.
 #'
 #' @inheritParams spark_read_csv
 #' @param name The name to assign to the newly generated stream.
@@ -143,9 +143,9 @@ stream_read_csv <- function(sc,
                       stream_options = streamOptions)
 }
 
-#' Write a Spark DataFrame into CSV Stream
+#' Write a Spark CSV Stream
 #'
-#' Writes a Spark DataFrame to a tabular (typically, comma-separated) stream.
+#' Writes a Spark dataframe stream into a tabular (typically, comma-separated) stream.
 #'
 #' @inheritParams spark_write_csv
 #'
@@ -194,9 +194,9 @@ stream_write_csv <- function(x,
                        stream_options = streamOptions)
 }
 
-#' Write a Spark DataFrame into Memory
+#' Write a Spark Memory Stream
 #'
-#' Writes a Spark DataFrame into memory.
+#' Writes a Spark dataframe stream into a memory stream.
 #'
 #' @inheritParams stream_write_csv
 #'
@@ -240,9 +240,9 @@ stream_write_memory <- function(x,
                        stream_options = options)
 }
 
-#' Read a Spark DataFrame Memory Stream
+#' Read Memory Stream
 #'
-#' Read a memory data stream into a Spark DataFrame.
+#' Reads a memory stream as a Spark dataframe stream.
 #'
 #' @inheritParams spark_read_csv
 #' @param source The name of the memory stream to read from.
@@ -272,9 +272,9 @@ stream_read_memory <- function(sc,
                       stream_options = options)
 }
 
-#' Read a Spark DataFrame Text Stream
+#' Read Text Stream
 #'
-#' Read a text data stream into a Spark DataFrame.
+#' Reads a text stream as a Spark dataframe stream.
 #'
 #' @inheritParams spark_read_csv
 #' @param name The name to assign to the newly generated stream.
@@ -300,9 +300,9 @@ stream_read_text <- function(sc,
                       stream_options = options)
 }
 
-#' Write a Spark DataFrame into Text
+#' Write a Spark Text Stream
 #'
-#' Writes a Spark DataFrame into text.
+#' Writes a Spark dataframe stream into a text stream.
 #'
 #' @inheritParams stream_write_csv
 #'
@@ -344,9 +344,9 @@ stream_write_text <- function(x,
                        stream_options = options)
 }
 
-#' Read a Spark DataFrame JSON Stream
+#' Read JSON Stream
 #'
-#' Read a JSON data stream into a Spark DataFrame.
+#' Reads a JSON stream as a Spark dataframe stream.
 #'
 #' @inheritParams spark_read_csv
 #' @param name The name to assign to the newly generated stream.
@@ -373,9 +373,9 @@ stream_read_json <- function(sc,
                       stream_options = options)
 }
 
-#' Write a Spark DataFrame into JSON
+#' Write a Spark JSON Stream
 #'
-#' Writes a Spark DataFrame into JSON.
+#' Writes a Spark dataframe stream into a JSON stream.
 #'
 #' @inheritParams stream_write_csv
 #'
@@ -417,9 +417,9 @@ stream_write_json <- function(x,
                        stream_options = options)
 }
 
-#' Read a Spark DataFrame Parquet Stream
+#' Read Parquet Stream
 #'
-#' Read a Parquet data stream into a Spark DataFrame.
+#' Reads a parquet stream as a Spark dataframe stream.
 #'
 #' @inheritParams spark_read_csv
 #' @param name The name to assign to the newly generated stream.
@@ -446,9 +446,9 @@ stream_read_parquet <- function(sc,
                       stream_options = options)
 }
 
-#' Write a Spark DataFrame into Parquet
+#' Write a Spark Parquet Stream
 #'
-#' Writes a Spark DataFrame into Parquet
+#' Writes a Spark dataframe stream into a parquet stream.
 #'
 #' @inheritParams stream_write_parquet
 #'
@@ -483,6 +483,78 @@ stream_write_parquet <- function(x,
   stream_write_generic(x,
                        path = name,
                        type = "parquet",
+                       mode = mode,
+                       trigger = trigger,
+                       checkpoint = checkpoint,
+                       stream_options = options)
+}
+
+#' Read ORC Stream
+#'
+#' Reads an \href{https://orc.apache.org/}{ORC} stream as a Spark dataframe stream.
+#'
+#' @inheritParams spark_read_csv
+#' @param name The name to assign to the newly generated stream.
+#'
+#' @family Spark stream serialization
+#'
+#' @export
+stream_read_orc <- function(sc,
+                            path,
+                            name = NULL,
+                            columns = NULL,
+                            options = list(),
+                            ...)
+{
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  name <- name %||% random_string("sparklyr_tmp_")
+
+  stream_read_generic(sc,
+                      path = path,
+                      type = "orc",
+                      name = name,
+                      columns = columns,
+                      stream_options = options)
+}
+
+#' Write a Spark ORC Stream
+#'
+#' Writes a Spark dataframe stream into an \href{https://orc.apache.org/}{ORC} stream.
+#'
+#' @inheritParams stream_write_parquet
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' sdf_len(sc, 10) %>% spark_write_orc("orc-in")
+#'
+#' stream <- stream_read_parquet(sc, "orc-in") %>% stream_write_parquet("orc-out")
+#'
+#' stop_stream(stream)
+#'
+#' }
+#'
+#' @export
+stream_write_orc <- function(x,
+                             name = random_string("sparklyr_tmp_"),
+                             mode = c("append", "complete", "update"),
+                             trigger = stream_trigger_interval(interval = 5000),
+                             checkpoint = file.path("checkpoints", name, random_string("")),
+                             options = list(),
+                             ...)
+{
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
+  sc <- spark_connection(x)
+
+  stream_write_generic(x,
+                       path = name,
+                       type = "orc",
                        mode = mode,
                        trigger = trigger,
                        checkpoint = checkpoint,
