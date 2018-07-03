@@ -41,9 +41,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
     stop("Failed to infer column types, please use explicit types.")
 
   fields <- lapply(seq_along(colTypes), function(idx) {
-    name <- if (is.null(column_names))
-      as.character(idx)
-    else if (idx <= length(column_names))
+    name <- if (idx <= length(column_names))
       column_names[[idx]]
     else
       paste0("X", idx)
@@ -195,7 +193,7 @@ spark_apply <- function(x,
   if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
   if (identical(args$rdd, TRUE)) rdd_base <- invoke(sdf, "rdd")
   grouped <- !is.null(group_by)
-  args <- list(...)
+
   rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
   proc_env <- connection_config(sc, "sparklyr.apply.env.")
