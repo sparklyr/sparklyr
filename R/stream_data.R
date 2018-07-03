@@ -209,7 +209,7 @@ stream_write_csv <- function(x,
 #'
 #' sc <- spark_connect(master = "local")
 #'
-#' dir.crate("iris-in")
+#' dir.create("iris-in")
 #' write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
 #'
 #' stream <- stream_read_csv(sc, "iris-in") %>% stream_write_memory()
@@ -270,4 +270,76 @@ stream_read_memory <- function(sc,
                       name = name,
                       columns = columns,
                       stream_options = options)
+}
+
+#' Read a Spark DataFrame Text Stream
+#'
+#' Read a text data stream into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param name The name to assign to the newly generated stream.
+#'
+#' @family Spark stream serialization
+#'
+#' @export
+stream_read_text <- function(sc,
+                             path,
+                             name = NULL,
+                             options = list(),
+                             ...)
+{
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  name <- name %||% random_string("sparklyr_tmp_")
+
+  stream_read_generic(sc,
+                      path = path,
+                      type = "text",
+                      name = name,
+                      columns = list(text = "character"),
+                      stream_options = options)
+}
+
+#' Write a Spark DataFrame into Text
+#'
+#' Writes a Spark DataFrame into text.
+#'
+#' @inheritParams stream_write_csv
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' dir.create("text-in")
+#' write.csv("A text entry", "text-in/text.txt", row.names = FALSE)
+#'
+#' stream <- stream_read_text(sc, "text-in") %>% stream_write_text("text-out")
+#'
+#' stop_stream(stream)
+#'
+#' }
+#'
+#' @export
+stream_write_text <- function(x,
+                              name = random_string("sparklyr_tmp_"),
+                              mode = c("append", "complete", "update"),
+                              trigger = stream_trigger_interval(interval = 5000),
+                              checkpoint = file.path("checkpoints", name, random_string("")),
+                              options = list(),
+                              ...)
+{
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
+  sc <- spark_connection(x)
+
+  stream_write_generic(x,
+                       path = name,
+                       type = "text",
+                       mode = mode,
+                       trigger = trigger,
+                       checkpoint = checkpoint,
+                       stream_options = options)
 }
