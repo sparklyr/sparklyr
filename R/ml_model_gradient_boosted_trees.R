@@ -1,6 +1,6 @@
 #' Spark ML -- Gradient Boosted Trees
 #'
-#' Perform classification and regression using gradient boosted trees.
+#' Perform binary classification and regression using gradient boosted trees. Multiclass classification is not supported yet.
 #'
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-decision-trees-base-params
@@ -18,6 +18,26 @@ NULL
 #' @template roxlate-ml-decision-trees-type
 #' @details \code{ml_gradient_boosted_trees} is a wrapper around \code{ml_gbt_regressor.tbl_spark} and \code{ml_gbt_classifier.tbl_spark} and calls the appropriate method based on model type.
 #' @template roxlate-ml-old-feature-response
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' partitions <- iris_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' iris_training <- partitions$training
+#' iris_test <- partitions$test
+#'
+#' gbt_model <- iris_training %>%
+#'   ml_gradient_boosted_trees(Sepal_Length ~ Petal_Length + Petal_Width)
+#'
+#' pred <- sdf_predict(iris_test, gbt_model)
+#'
+#' ml_regression_evaluator(pred, label_col = "Sepal_Length")
+#' }
+#'
 #' @export
 ml_gradient_boosted_trees <- function(
   x,
