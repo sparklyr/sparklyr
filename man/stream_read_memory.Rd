@@ -16,9 +16,6 @@ stream_read_memory(sc, source = NULL, name = NULL, columns = NULL,
 
 \item{columns}{A vector of column names or a named vector of column types.}
 
-\item{infer_schema}{Boolean; should column types be automatically inferred?
-Requires one extra pass over the data. Defaults to \code{TRUE}.}
-
 \item{charset}{The character set. Defaults to \samp{"UTF-8"}.}
 
 \item{options}{A list of strings with additional options.}

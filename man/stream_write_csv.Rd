@@ -41,6 +41,8 @@ information to guarantee end-to-end fault-tolerance.}
 \item{options}{A list of strings with additional options.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{name}{The name to assign to the newly generated stream.}
 }
 \description{
 Writes a Spark dataframe stream into a tabular (typically, comma-separated) stream.

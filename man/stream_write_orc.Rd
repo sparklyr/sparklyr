@@ -13,6 +13,8 @@ stream_write_orc(x, name = random_string("sparklyr_tmp_"),
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
+\item{name}{The name to assign to the newly generated stream.}
+
 \item{mode}{Specifies how data is written to a streaming sink. Valid values are
 \code{"append"}, \code{"complete"} or \code{"update"}.}
 

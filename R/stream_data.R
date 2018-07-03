@@ -200,7 +200,7 @@ stream_write_csv <- function(x,
 #'
 #' @inheritParams stream_write_csv
 #'
-#' @param name The name to use to register this stream.
+#' @param name The name to assign to the newly generated stream.
 #'
 #' @family Spark stream serialization
 #'
@@ -244,9 +244,8 @@ stream_write_memory <- function(x,
 #'
 #' Reads a memory stream as a Spark dataframe stream.
 #'
-#' @inheritParams spark_read_csv
+#' @inheritParams stream_read_csv
 #' @param source The name of the memory stream to read from.
-#' @param name The name to assign to the newly generated stream.
 #'
 #' @family Spark stream serialization
 #'
@@ -255,7 +254,6 @@ stream_read_memory <- function(sc,
                                source = NULL,
                                name = NULL,
                                columns = NULL,
-                               infer_schema = TRUE,
                                charset = "UTF-8",
                                options = list(),
                                ...)
@@ -276,8 +274,7 @@ stream_read_memory <- function(sc,
 #'
 #' Reads a text stream as a Spark dataframe stream.
 #'
-#' @inheritParams spark_read_csv
-#' @param name The name to assign to the newly generated stream.
+#' @inheritParams stream_read_csv
 #'
 #' @family Spark stream serialization
 #'
@@ -304,7 +301,7 @@ stream_read_text <- function(sc,
 #'
 #' Writes a Spark dataframe stream into a text stream.
 #'
-#' @inheritParams stream_write_csv
+#' @inheritParams stream_write_memory
 #'
 #' @family Spark stream serialization
 #'
@@ -348,8 +345,7 @@ stream_write_text <- function(x,
 #'
 #' Reads a JSON stream as a Spark dataframe stream.
 #'
-#' @inheritParams spark_read_csv
-#' @param name The name to assign to the newly generated stream.
+#' @inheritParams stream_read_csv
 #'
 #' @family Spark stream serialization
 #'
@@ -377,7 +373,7 @@ stream_read_json <- function(sc,
 #'
 #' Writes a Spark dataframe stream into a JSON stream.
 #'
-#' @inheritParams stream_write_csv
+#' @inheritParams stream_write_memory
 #'
 #' @family Spark stream serialization
 #'
@@ -421,8 +417,7 @@ stream_write_json <- function(x,
 #'
 #' Reads a parquet stream as a Spark dataframe stream.
 #'
-#' @inheritParams spark_read_csv
-#' @param name The name to assign to the newly generated stream.
+#' @inheritParams stream_read_csv
 #'
 #' @family Spark stream serialization
 #'
@@ -450,7 +445,7 @@ stream_read_parquet <- function(sc,
 #'
 #' Writes a Spark dataframe stream into a parquet stream.
 #'
-#' @inheritParams stream_write_csv
+#' @inheritParams stream_write_memory
 #'
 #' @family Spark stream serialization
 #'
@@ -493,8 +488,7 @@ stream_write_parquet <- function(x,
 #'
 #' Reads an \href{https://orc.apache.org/}{ORC} stream as a Spark dataframe stream.
 #'
-#' @inheritParams spark_read_csv
-#' @param name The name to assign to the newly generated stream.
+#' @inheritParams stream_read_csv
 #'
 #' @family Spark stream serialization
 #'
@@ -522,7 +516,7 @@ stream_read_orc <- function(sc,
 #'
 #' Writes a Spark dataframe stream into an \href{https://orc.apache.org/}{ORC} stream.
 #'
-#' @inheritParams stream_write_csv
+#' @inheritParams stream_write_memory
 #'
 #' @family Spark stream serialization
 #'
@@ -565,8 +559,7 @@ stream_write_orc <- function(x,
 #'
 #' Reads a Kafka stream as a Spark dataframe stream.
 #'
-#' @inheritParams spark_read_csv
-#' @param name The name to assign to the newly generated stream.
+#' @inheritParams stream_read_csv
 #'
 #' @family Spark stream serialization
 #'
@@ -594,7 +587,7 @@ stream_read_kafka <- function(sc,
 #'
 #' Writes a Spark dataframe stream into an kafka stream.
 #'
-#' @inheritParams stream_write_csv
+#' @inheritParams stream_write_memory
 #'
 #' @family Spark stream serialization
 #'
@@ -637,8 +630,7 @@ stream_write_kafka <- function(x,
 #'
 #' Reads a JDBC stream as a Spark dataframe stream.
 #'
-#' @inheritParams spark_read_csv
-#' @param name The name to assign to the newly generated stream.
+#' @inheritParams stream_read_csv
 #'
 #' @family Spark stream serialization
 #'
@@ -666,7 +658,7 @@ stream_read_jdbc <- function(sc,
 #'
 #' Writes a Spark dataframe stream into an JDBC stream.
 #'
-#' @inheritParams stream_write_csv
+#' @inheritParams stream_write_memory
 #'
 #' @family Spark stream serialization
 #'
