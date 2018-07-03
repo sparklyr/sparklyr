@@ -240,36 +240,6 @@ stream_write_memory <- function(x,
                        stream_options = options)
 }
 
-#' Read Memory Stream
-#'
-#' Reads a memory stream as a Spark dataframe stream.
-#'
-#' @inheritParams stream_read_csv
-#' @param source The name of the memory stream to read from.
-#'
-#' @family Spark stream serialization
-#'
-#' @export
-stream_read_memory <- function(sc,
-                               source = NULL,
-                               name = NULL,
-                               columns = NULL,
-                               charset = "UTF-8",
-                               options = list(),
-                               ...)
-{
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
-                      path = name,
-                      type = "memory",
-                      name = name,
-                      columns = columns,
-                      stream_options = options)
-}
-
 #' Read Text Stream
 #'
 #' Reads a text stream as a Spark dataframe stream.
