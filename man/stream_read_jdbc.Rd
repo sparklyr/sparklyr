@@ -28,7 +28,6 @@ Reads a JDBC stream as a Spark dataframe stream.
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_json}},
   \code{\link{stream_read_kafka}},
-  \code{\link{stream_read_memory}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
   \code{\link{stream_read_text}},

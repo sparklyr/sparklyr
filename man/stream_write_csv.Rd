@@ -41,8 +41,6 @@ information to guarantee end-to-end fault-tolerance.}
 \item{options}{A list of strings with additional options.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{name}{The name to assign to the newly generated stream.}
 }
 \description{
 Writes a Spark dataframe stream into a tabular (typically, comma-separated) stream.
@@ -52,7 +50,6 @@ Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_jdbc}},
   \code{\link{stream_read_json}},
   \code{\link{stream_read_kafka}},
-  \code{\link{stream_read_memory}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
   \code{\link{stream_read_text}},

@@ -13,7 +13,7 @@ stream_write_memory(x, name = random_string("sparklyr_tmp_"),
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
-\item{name}{The name to use to register this stream.}
+\item{name}{The name to assign to the newly generated stream.}
 
 \item{mode}{Specifies how data is written to a streaming sink. Valid values are
 \code{"append"}, \code{"complete"} or \code{"update"}.}
@@ -52,7 +52,6 @@ Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_jdbc}},
   \code{\link{stream_read_json}},
   \code{\link{stream_read_kafka}},
-  \code{\link{stream_read_memory}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
   \code{\link{stream_read_text}},
