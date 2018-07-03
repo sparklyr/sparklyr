@@ -13,7 +13,7 @@ stream_read_generic_type <- function(sc,
         stream_options,
         columns)
     },
-    default = {
+    {
       spark_session(sc) %>%
         invoke("read") %>%
         invoke(type, path)
@@ -338,6 +338,79 @@ stream_write_text <- function(x,
   stream_write_generic(x,
                        path = name,
                        type = "text",
+                       mode = mode,
+                       trigger = trigger,
+                       checkpoint = checkpoint,
+                       stream_options = options)
+}
+
+#' Read a Spark DataFrame JSON Stream
+#'
+#' Read a JSON data stream into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param name The name to assign to the newly generated stream.
+#'
+#' @family Spark stream serialization
+#'
+#' @export
+stream_read_json <- function(sc,
+                             path,
+                             name = NULL,
+                             columns = NULL,
+                             options = list(),
+                             ...)
+{
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  name <- name %||% random_string("sparklyr_tmp_")
+
+  stream_read_generic(sc,
+                      path = path,
+                      type = "json",
+                      name = name,
+                      columns = columns,
+                      stream_options = options)
+}
+
+#' Write a Spark DataFrame into JSON
+#'
+#' Writes a Spark DataFrame into JSON.
+#'
+#' @inheritParams stream_write_csv
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' dir.create("json-in")
+#' jsonlite::write_json(list(a = c(1,2), b = c(10,20)), "../streaming/json-in/data.json")
+#'
+#' stream <- stream_read_json(sc, "json-in") %>% stream_write_json("json-out")
+#'
+#' stop_stream(stream)
+#'
+#' }
+#'
+#' @export
+stream_write_json <- function(x,
+                              name = random_string("sparklyr_tmp_"),
+                              mode = c("append", "complete", "update"),
+                              trigger = stream_trigger_interval(interval = 5000),
+                              checkpoint = file.path("checkpoints", name, random_string("")),
+                              options = list(),
+                              ...)
+{
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
+  sc <- spark_connection(x)
+
+  stream_write_generic(x,
+                       path = name,
+                       type = "json",
                        mode = mode,
                        trigger = trigger,
                        checkpoint = checkpoint,
