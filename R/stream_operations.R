@@ -162,3 +162,24 @@ sdf_collect_stream <- function(x, ...)
 
   data
 }
+
+stream_generate_random <- function(df = iris, path = "iris-stream", interval = 5)
+{
+  if (!"knitr" %in% installed.packages()) {
+    stop("'stream_generate_random()' requires the 'later' package.")
+  }
+
+  if (!dir.exists(path)) dir.create(path)
+
+  later <- get("later", envir = asNamespace("later"))
+
+  min <- floor(runif(1, 1, length(df)))
+  max <- floor(runif(1, min, length(df)))
+
+  write.csv(df[min:max, ], paste(file.path(path, random_string("rand_")), "csv", sep = "."), row.names = FALSE)
+
+  later(function() {
+    stream_generate_random(df, path, interval)
+  }, interval)
+
+}
