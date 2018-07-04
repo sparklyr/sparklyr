@@ -4,8 +4,8 @@ sc <- testthat_spark_connection()
 
 dir.create("iris-in")
 
-iris_in <- paste0("file://", file.path(getwd(), "iris-in"))
-iris_out <- paste0("file://", file.path(getwd(), "iris-out"))
+iris_in <- paste0("file:///", file.path(getwd(), "iris-in"))
+iris_out <- paste0("file:///", file.path(getwd(), "iris-out"))
 
 write.table(iris, file.path("iris-in", "iris.csv"), row.names = FALSE, sep = ";")
 
