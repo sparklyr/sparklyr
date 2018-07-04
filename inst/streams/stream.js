@@ -76,11 +76,17 @@ function StreamRenderer(stats) {
       .enter()
         .append("rect")
       .merge(dataIn)
-        .attr("width", barWidth)
+        .attr("width", barWidth - 2)
         .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxIn();})
-        .attr("x", function(d, i) { return margin + i * barWidth; })
+        .attr("x", function(d, i) { return margin + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return remotesHeight + chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
         .attr("class", "barIn");
+
+    barsIn
+      .transition()
+        .ease(d3.easeLinear)
+        .duration(900)
+        .attr("x", function(d, i) { return margin + i * barWidth; });
 
     var dataOut = chartOut.selectAll("rect")
       .data(stats.rpmOut());
@@ -89,11 +95,17 @@ function StreamRenderer(stats) {
       enter()
         .append("rect")
       .merge(dataOut)
-        .attr("width", barWidth)
+        .attr("width", barWidth - 2)
         .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxOut();})
-        .attr("x", function(d, i) { return margin + i * barWidth; })
+        .attr("x", function(d, i) { return margin + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return remotesHeight + chartHeight / 2; })
         .attr("class", "barOut");
+
+    barsOut
+      .transition()
+        .ease(d3.easeLinear)
+        .duration(900)
+        .attr("x", function(d, i) { return margin + i * barWidth; });
   };
 
   this.render = function() {
