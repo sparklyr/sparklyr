@@ -12,27 +12,27 @@ svg {
 }
 
 .barIn {
-  fill: orange;
+  fill: #667292;
 }
 
 .barOut {
-  fill: steelblue;
+  fill: #8d9db6;
 }
 
 .source {
-  fill: orange;
-  stroke: white;
+  fill: #667292;
+  stroke: none;
 }
 
-.soruceSelected {
-  stroke: orange;
+.source .selected {
+  stroke: #667292;
 }
 
 .sink {
-  fill: steelblue;
-  stroke: white;
+  fill: #8d9db6;
+  stroke: none;
 }
 
-.sinkSelected {
-  stroke: steelblue;
+.sink .selected {
+  stroke: #8d9db6;
 }

@@ -118,12 +118,12 @@ function StreamRenderer(stats) {
 
     sourceCircles.attr("cx", "0").attr("cy", "0").attr("r", "10")
       .attr("class", function (d, i) {
-        (i == data.sinks.length - 1) ? "source sourceSelected" : "source";
+        return (i == data.sources.length - 1) ? "source selected" : "source";
       })
       .attr("stroke-width", "2")
       .on("mouseover", function (d, i) {
         sourceCircles.attr("class", "source");
-        d3.select(this).attr("class", "source sourceSelected");
+        d3.select(this).attr("class", "source selected");
         sourceText.text(d);
       });
 
@@ -152,12 +152,12 @@ function StreamRenderer(stats) {
 
     sinkCircles.attr("cx", "0").attr("cy", "0").attr("r", "10")
       .attr("class", function (d, i) {
-        (i == data.sinks.length - 1) ? "sink sinkSelected" : "sink";
+        return (i == data.sinks.length - 1) ? "sink selected" : "sink";
       })
       .attr("stroke-width", "2")
       .on("mouseover", function (d, i) {
         sinkCircles.attr("class", "sink");
-        d3.select(this).attr("class", "sink sinkSelected");
+        d3.select(this).attr("class", "sink selected");
         sinkText.text(d);
       });
 
