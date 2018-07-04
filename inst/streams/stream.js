@@ -69,31 +69,31 @@ function StreamRenderer(stats) {
 
     var chartHeight = height - 2 * remotesHeight;
 
-    var dataIn = chartIn.selectAll('rect')
+    var dataIn = chartIn.selectAll("rect")
       .data(stats.rpmIn());
 
-    dataIn
+    var barsIn = dataIn
       .enter()
-        .append('rect')
+        .append("rect")
       .merge(dataIn)
-        .attr('width', barWidth)
-        .attr('height', function(d, i) { return chartHeight / 2 * d / stats.maxIn();})
-        .attr('x', function(d, i) { return margin + i * barWidth; })
-        .attr('y', function(d, i) { return remotesHeight + chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
-        .attr('class', 'barIn');
+        .attr("width", barWidth)
+        .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxIn();})
+        .attr("x", function(d, i) { return margin + i * barWidth; })
+        .attr("y", function(d, i) { return remotesHeight + chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
+        .attr("class", "barIn");
 
-    var dataOut = chartOut.selectAll('rect')
+    var dataOut = chartOut.selectAll("rect")
       .data(stats.rpmOut());
 
-    dataOut.
+    var barsOut = dataOut.
       enter()
-        .append('rect')
+        .append("rect")
       .merge(dataOut)
-        .attr('width', barWidth)
-        .attr('height', function(d, i) { return chartHeight / 2 * d / stats.maxOut();})
-        .attr('x', function(d, i) { return margin + i * barWidth; })
-        .attr('y', function(d, i) { return remotesHeight + chartHeight / 2; })
-        .attr('class', 'barOut');
+        .attr("width", barWidth)
+        .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxOut();})
+        .attr("x", function(d, i) { return margin + i * barWidth; })
+        .attr("y", function(d, i) { return remotesHeight + chartHeight / 2; })
+        .attr("class", "barOut");
   };
 
   this.render = function() {
