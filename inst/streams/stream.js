@@ -1,4 +1,4 @@
-// !preview r2d3 data=list(sources = list("FileStreamSource[file]", "Other[file]"), sinks = list("FileSink[file]")), options = list(demo = TRUE)
+// !preview r2d3 data=list(sources = list("FileStreamSource[file]", "Other[file]"), sinks = list("FileSink[file]")), options = list(demo = TRUE), container = "div"
 
 function StreamStats() {
   var rpmIn = [0];
@@ -17,7 +17,7 @@ function StreamStats() {
     rpmOut.unshift(rps.out);
 
     rpmIn = rpmIn.slice(0, Math.min(rpmIn.length, maxStats - 1));
-    rpmOut = rpmIn.slice(0, Math.min(rpmOut.length, maxStats - 1));
+    rpmOut = rpmOut.slice(0, Math.min(rpmOut.length, maxStats - 1));
   };
 
   this.rpmIn = function() {
@@ -51,7 +51,12 @@ function StreamRenderer(stats) {
   var width = 0;
   var height = 0;
 
-  var root;
+  var svg = div.append("svg");
+  var chart = div.append("svg")
+    .attr("class", "chart")
+    .style("top", 0)
+    .style("left", 0);
+
   var chartIn;
   var chartOut;
   var rowsPerSecondIn;
@@ -64,11 +69,19 @@ function StreamRenderer(stats) {
   var remotesHeight = 80;
 
   this.setSize = function(newWidth, newHeight) {
+    svg.attr("width", newWidth).attr("height", newHeight);
+    chart.attr("width", newWidth).attr("height", newHeight);
+
     width = newWidth;
     height =  newHeight;
   };
 
   this.update = function() {
+    chart.attr("class", "chart");
+    setTimeout(function() {
+      chart.attr("class", "chart animate");
+    }, 50);
+
     rowsPerSecondIn.text(stats.latestRpsIn() + " rps");
     rowsPerSecondOut.text(stats.latestRpsOut() + " rps");
 
@@ -87,12 +100,6 @@ function StreamRenderer(stats) {
         .attr("y", function(d, i) { return remotesHeight + chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
         .attr("class", "barIn");
 
-    barsIn
-      .transition()
-        .ease(d3.easeLinear)
-        .duration(900)
-        .attr("x", function(d, i) { return margin + i * barWidth; });
-
     var dataOut = chartOut.selectAll("rect")
       .data(stats.rpmOut());
 
@@ -105,25 +112,20 @@ function StreamRenderer(stats) {
         .attr("x", function(d, i) { return margin + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return remotesHeight + chartHeight / 2; })
         .attr("class", "barOut");
-
-    barsOut
-      .transition()
-        .ease(d3.easeLinear)
-        .duration(900)
-        .attr("x", function(d, i) { return margin + i * barWidth; });
   };
 
   this.render = function() {
     svg.selectAll("g").remove();
-    root = svg.append("g");
+    svg.selectAll("text").remove();
+    chart.selectAll("rect").remove();
 
-    chartIn = root.append("g");
-    chartOut = root.append("g");
+    chartIn = chart.append("g");
+    chartOut = chart.append("g");
 
-    rowsPerSecondIn = root.append("text");
-    rowsPerSecondOut = root.append("text");
+    rowsPerSecondIn = svg.append("text");
+    rowsPerSecondOut = svg.append("text");
 
-    var sourceCircles = root.selectAll(".source")
+    var sourceCircles = svg.selectAll(".source")
       .data(data.sources)
       .enter()
       .append("g")
@@ -144,7 +146,7 @@ function StreamRenderer(stats) {
         sourceText.text(d);
       });
 
-    var sourceText = root
+    var sourceText = svg
       .append("text")
         .attr("y", 35).attr("x", 24 + data.sources.length * 24)
         .attr("class", "label")
@@ -157,7 +159,7 @@ function StreamRenderer(stats) {
 
     rowsPerSecondIn.append("title").text("rows per second");
 
-    var sinkCircles = root.selectAll(".sink")
+    var sinkCircles = svg.selectAll(".sink")
       .data(data.sinks)
       .enter()
       .append("g")
@@ -178,7 +180,7 @@ function StreamRenderer(stats) {
         sinkText.text(d);
       });
 
-    var sinkText = root
+    var sinkText = svg
       .append("text")
         .attr("y", height - 25).attr("x", 24 + data.sinks.length * 24)
         .attr("class", "label sinkText")

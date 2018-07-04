@@ -11,6 +11,36 @@ svg {
   font: 20px sans-serif;
 }
 
+@-webkit-keyframes svgTranslate {
+    0% {
+        transform: translateX(0px);
+    }
+    100% {
+        transform: translateX(100px);
+    }
+}
+
+@-webkit-keyframes svgReset {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(0px); }
+}
+
+@keyframes svgTranslate {
+    0%   { transform: translateX(0px) }
+    100% { transform: translateX(100px) }
+}
+
+.chart {
+  position: absolute;
+}
+
+.chart.animate {
+  animation-name: svgTranslate;
+  animation-duration: 10s;
+  animation-timing-function: linear;
+  animation-delay: 0s;
+}
+
 .barIn {
   fill: #667292;
 }
