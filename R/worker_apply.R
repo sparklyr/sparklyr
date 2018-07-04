@@ -53,9 +53,11 @@ spark_worker_apply <- function(sc, config) {
 
   closureRaw <- worker_invoke(context, "getClosure")
   closure <- unserialize(closureRaw)
+  worker_log("retrieved Closure")
 
   funcContextRaw <- worker_invoke(context, "getContext")
   funcContext <- unserialize(funcContextRaw)
+  worker_log("retrieved Context")
 
   closureRLangRaw <- worker_invoke(context, "getClosureRLang")
   if (length(closureRLangRaw) > 0) {
@@ -72,12 +74,15 @@ spark_worker_apply <- function(sc, config) {
   }
 
   columnNames <- worker_invoke(context, "getColumns")
+  worker_log("retrieved columns")
 
   if (!grouped) groups <- list(list(groups))
 
   all_results <- NULL
 
   for (group_entry in groups) {
+    worker_log("iterating over group")
+
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
 
