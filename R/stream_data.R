@@ -272,6 +272,8 @@ stream_read_text <- function(sc,
 #' Writes a Spark dataframe stream into a text stream.
 #'
 #' @inheritParams stream_write_memory
+#' @param path The destination path. Needs to be accessible from the cluster.
+#'   Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.
 #'
 #' @family Spark stream serialization
 #'
@@ -343,7 +345,7 @@ stream_read_json <- function(sc,
 #'
 #' Writes a Spark dataframe stream into a JSON stream.
 #'
-#' @inheritParams stream_write_memory
+#' @inheritParams stream_write_text
 #'
 #' @family Spark stream serialization
 #'
@@ -415,7 +417,7 @@ stream_read_parquet <- function(sc,
 #'
 #' Writes a Spark dataframe stream into a parquet stream.
 #'
-#' @inheritParams stream_write_memory
+#' @inheritParams stream_write_text
 #'
 #' @family Spark stream serialization
 #'
@@ -486,7 +488,7 @@ stream_read_orc <- function(sc,
 #'
 #' Writes a Spark dataframe stream into an \href{https://orc.apache.org/}{ORC} stream.
 #'
-#' @inheritParams stream_write_memory
+#' @inheritParams stream_write_text
 #'
 #' @family Spark stream serialization
 #'

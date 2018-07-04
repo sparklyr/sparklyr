@@ -12,6 +12,9 @@ stream_write_parquet(x, path, mode = c("append", "complete", "update"),
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
+\item{path}{The destination path. Needs to be accessible from the cluster.
+Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
+
 \item{mode}{Specifies how data is written to a streaming sink. Valid values are
 \code{"append"}, \code{"complete"} or \code{"update"}.}
 
