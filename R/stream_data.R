@@ -291,10 +291,10 @@ stream_read_text <- function(sc,
 #'
 #' @export
 stream_write_text <- function(x,
-                              name = random_string("sparklyr_tmp_"),
+                              path,
                               mode = c("append", "complete", "update"),
                               trigger = stream_trigger_interval(interval = 5000),
-                              checkpoint = file.path("checkpoints", name, random_string("")),
+                              checkpoint = file.path(path, "checkpoints", random_string("")),
                               options = list(),
                               ...)
 {
@@ -303,7 +303,7 @@ stream_write_text <- function(x,
   sc <- spark_connection(x)
 
   stream_write_generic(x,
-                       path = name,
+                       path = path,
                        type = "text",
                        mode = mode,
                        trigger = trigger,
@@ -363,10 +363,10 @@ stream_read_json <- function(sc,
 #'
 #' @export
 stream_write_json <- function(x,
-                              name = random_string("sparklyr_tmp_"),
+                              path,
                               mode = c("append", "complete", "update"),
                               trigger = stream_trigger_interval(interval = 5000),
-                              checkpoint = file.path("checkpoints", name, random_string("")),
+                              checkpoint = file.path(path, "checkpoints", random_string("")),
                               options = list(),
                               ...)
 {
@@ -375,7 +375,7 @@ stream_write_json <- function(x,
   sc <- spark_connection(x)
 
   stream_write_generic(x,
-                       path = name,
+                       path = path,
                        type = "json",
                        mode = mode,
                        trigger = trigger,
@@ -434,10 +434,10 @@ stream_read_parquet <- function(sc,
 #'
 #' @export
 stream_write_parquet <- function(x,
-                                 name = random_string("sparklyr_tmp_"),
+                                 path,
                                  mode = c("append", "complete", "update"),
                                  trigger = stream_trigger_interval(interval = 5000),
-                                 checkpoint = file.path("checkpoints", name, random_string("")),
+                                 checkpoint = file.path(path, "checkpoints", random_string("")),
                                  options = list(),
                                  ...)
 {
@@ -446,7 +446,7 @@ stream_write_parquet <- function(x,
   sc <- spark_connection(x)
 
   stream_write_generic(x,
-                       path = name,
+                       path = path,
                        type = "parquet",
                        mode = mode,
                        trigger = trigger,
@@ -505,10 +505,10 @@ stream_read_orc <- function(sc,
 #'
 #' @export
 stream_write_orc <- function(x,
-                             name = random_string("sparklyr_tmp_"),
+                             path,
                              mode = c("append", "complete", "update"),
                              trigger = stream_trigger_interval(interval = 5000),
-                             checkpoint = file.path("checkpoints", name, random_string("")),
+                             checkpoint = file.path(path, "checkpoints", random_string("")),
                              options = list(),
                              ...)
 {
@@ -517,7 +517,7 @@ stream_write_orc <- function(x,
   sc <- spark_connection(x)
 
   stream_write_generic(x,
-                       path = name,
+                       path = path,
                        type = "orc",
                        mode = mode,
                        trigger = trigger,
@@ -576,10 +576,9 @@ stream_read_kafka <- function(sc,
 #'
 #' @export
 stream_write_kafka <- function(x,
-                               name = random_string("sparklyr_tmp_"),
                                mode = c("append", "complete", "update"),
                                trigger = stream_trigger_interval(interval = 5000),
-                               checkpoint = file.path("checkpoints", name, random_string("")),
+                               checkpoint = file.path("checkpoints", random_string("")),
                                options = list(),
                                ...)
 {
@@ -588,7 +587,6 @@ stream_write_kafka <- function(x,
   sc <- spark_connection(x)
 
   stream_write_generic(x,
-                       path = name,
                        type = "kafka",
                        mode = mode,
                        trigger = trigger,
@@ -647,10 +645,9 @@ stream_read_jdbc <- function(sc,
 #'
 #' @export
 stream_write_jdbc <- function(x,
-                              name = random_string("sparklyr_tmp_"),
                               mode = c("append", "complete", "update"),
                               trigger = stream_trigger_interval(interval = 5000),
-                              checkpoint = file.path("checkpoints", name, random_string("")),
+                              checkpoint = file.path("checkpoints", random_string("")),
                               options = list(),
                               ...)
 {
@@ -659,7 +656,6 @@ stream_write_jdbc <- function(x,
   sc <- spark_connection(x)
 
   stream_write_generic(x,
-                       path = name,
                        type = "jdbc",
                        mode = mode,
                        trigger = trigger,

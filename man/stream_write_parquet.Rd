@@ -4,16 +4,13 @@
 \alias{stream_write_parquet}
 \title{Write Parquet Stream}
 \usage{
-stream_write_parquet(x, name = random_string("sparklyr_tmp_"),
-  mode = c("append", "complete", "update"),
+stream_write_parquet(x, path, mode = c("append", "complete", "update"),
   trigger = stream_trigger_interval(interval = 5000),
-  checkpoint = file.path("checkpoints", name, random_string("")),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
   options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
-
-\item{name}{The name to assign to the newly generated stream.}
 
 \item{mode}{Specifies how data is written to a streaming sink. Valid values are
 \code{"append"}, \code{"complete"} or \code{"update"}.}
