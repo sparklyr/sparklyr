@@ -5,3 +5,8 @@ svg {
 .label {
   fill: #666;
 }
+
+.rps {
+  fill: #777;
+  font: 20px sans-serif;
+}
