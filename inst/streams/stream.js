@@ -7,12 +7,17 @@ function StreamStats() {
   var maxIn = 100;
   var maxOut = 100;
 
+  var maxStats = 100;
+
   this.add = function(rps) {
     if (maxIn < rps.in) maxIn = rps.in;
     if (maxOut < rps.out) maxOut = rps.out;
 
     rpmIn.unshift(rps.in);
     rpmOut.unshift(rps.out);
+
+    rpmIn = rpmIn.slice(0, Math.min(rpmIn.length, maxStats - 1));
+    rpmOut = rpmIn.slice(0, Math.min(rpmOut.length, maxStats - 1));
   };
 
   this.rpmIn = function() {
