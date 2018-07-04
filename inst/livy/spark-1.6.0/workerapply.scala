@@ -28,8 +28,13 @@ class WorkerApply(
     val logger = new Logger("Worker", sessionId)
     val lock: AnyRef = new Object()
 
+    val data = iterator.toArray;
+
+    // No point in starting up R process to not process anything
+    if (data.length == 0) return Array[org.apache.spark.sql.Row]().iterator
+
     val workerContext = new WorkerContext(
-      iterator.toArray,
+      data,
       lock,
       closure,
       columns,
