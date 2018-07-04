@@ -10,3 +10,29 @@ svg {
   fill: #777;
   font: 20px sans-serif;
 }
+
+.barIn {
+  fill: orange;
+}
+
+.barOut {
+  fill: steelblue;
+}
+
+.source {
+  fill: orange;
+  stroke: white;
+}
+
+.soruceSelected {
+  stroke: orange;
+}
+
+.sink {
+  fill: steelblue;
+  stroke: white;
+}
+
+.sinkSelected {
+  stroke: steelblue;
+}

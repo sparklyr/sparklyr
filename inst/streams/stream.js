@@ -80,7 +80,7 @@ function StreamRenderer(stats) {
         .attr('height', function(d, i) { return chartHeight / 2 * d / stats.maxIn();})
         .attr('x', function(d, i) { return margin + i * barWidth; })
         .attr('y', function(d, i) { return remotesHeight + chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
-        .attr('fill', 'orange');
+        .attr('class', 'barIn');
 
     var dataOut = chartOut.selectAll('rect')
       .data(stats.rpmOut());
@@ -93,7 +93,7 @@ function StreamRenderer(stats) {
         .attr('height', function(d, i) { return chartHeight / 2 * d / stats.maxOut();})
         .attr('x', function(d, i) { return margin + i * barWidth; })
         .attr('y', function(d, i) { return remotesHeight + chartHeight / 2; })
-        .attr('fill', 'steelblue');
+        .attr('class', 'barOut');
   };
 
   this.render = function() {
@@ -117,14 +117,13 @@ function StreamRenderer(stats) {
         .append("circle");
 
     sourceCircles.attr("cx", "0").attr("cy", "0").attr("r", "10")
-      .attr("stroke", function (d, i) {
-        return (i == data.sources.length - 1) ? "orange" : "white";
+      .attr("class", function (d, i) {
+        (i == data.sinks.length - 1) ? "source sourceSelected" : "source";
       })
       .attr("stroke-width", "2")
-      .attr("fill", "orange")
       .on("mouseover", function (d, i) {
-        sourceCircles.attr("stroke", "white");
-        d3.select(this).attr("stroke", "orange");
+        sourceCircles.attr("class", "source");
+        d3.select(this).attr("class", "source sourceSelected");
         sourceText.text(d);
       });
 
@@ -152,14 +151,13 @@ function StreamRenderer(stats) {
         .append("circle");
 
     sinkCircles.attr("cx", "0").attr("cy", "0").attr("r", "10")
-      .attr("stroke", function (d, i) {
-        return (i == data.sinks.length - 1) ? "steelblue" : "white";
+      .attr("class", function (d, i) {
+        (i == data.sinks.length - 1) ? "sink sinkSelected" : "sink";
       })
       .attr("stroke-width", "2")
-      .attr("fill", "steelblue")
       .on("mouseover", function (d, i) {
-        sinkCircles.attr("stroke", "white");
-        d3.select(this).attr("stroke", "steelblue");
+        sinkCircles.attr("class", "sink");
+        d3.select(this).attr("class", "sink sinkSelected");
         sinkText.text(d);
       });
 
