@@ -1,3 +1,5 @@
+# nocov start
+
 connection_progress_api_available <- function() {
   exists(".rs.api.addJob")
 }
@@ -202,3 +204,5 @@ connection_progress_terminated <- function(sc)
 
   connection_progress(sc, terminated = TRUE)
 }
+
+# nocov end
