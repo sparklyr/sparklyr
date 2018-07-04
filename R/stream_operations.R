@@ -163,7 +163,8 @@ sdf_collect_stream <- function(x, ...)
   data
 }
 
-stream_generate_random <- function(df = iris, path = "iris-stream", interval = 5)
+#' @importFrom stats runif
+stream_generate_random <- function(df, path = "streams-random", interval = 5)
 {
   if (!"knitr" %in% installed.packages()) {
     stop("'stream_generate_random()' requires the 'later' package.")
