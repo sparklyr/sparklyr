@@ -11,7 +11,6 @@ stream_progress <- function(stream)
 #' Opens a Shiny gadget to visualize the given stream.
 #'
 #' @param stream The stream to visualize.
-#' @param invalidate The invalidation interval in milliseconds.
 #'
 #' #' @examples
 #'
@@ -26,8 +25,7 @@ stream_progress <- function(stream)
 #' @import r2d3
 #' @export
 stream_view <- function(
-  stream,
-  interval = 1000
+  stream
 ) {
   ui <- d3Output("plot")
 
@@ -42,14 +40,16 @@ stream_view <- function(
     )
 
     observe({
-      invalidateLater(interval, session)
+      invalidateLater(1000, session)
 
       data <- stream_progress(stream)
 
       session$sendCustomMessage(type = "sparklyr_stream_view", list(
         timestamp = data$timestamp,
-        sources = data$inputRowsPerSecond,
-        sinks = data$processedRowsPerSecond
+        rps = list(
+          "in" = data$inputRowsPerSecond,
+          "out" = data$processedRowsPerSecond
+        )
       ))
     })
   }

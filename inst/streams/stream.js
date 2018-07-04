@@ -1,6 +1,10 @@
-// !preview r2d3 data=list(sources = list("FileStreamSource[file]", "Other[file]"), sinks = list("FileSink[file]", "x"), demo = TRUE)
+// !preview r2d3 data=list(sources = list("FileStreamSource[file]", "Other[file]"), sinks = list("FileSink[file]"), demo = TRUE)
 
-var barHeight = Math.ceil(height / data.length);
+var barWidth = 10;
+var margin = 20;
+var remotesCircle = 10;
+var remotesMargin = margin + remotesCircle;
+var remotesHeight = 80;
 
 var sourceCircles = svg.selectAll(".source")
   .data(data.sources)
@@ -8,7 +12,7 @@ var sourceCircles = svg.selectAll(".source")
   .append("g")
     .attr("class", "source")
     .attr("transform", function(d, i) {
-      return "translate(" + (30 + i * 24) + ", 30)";
+      return "translate(" + (remotesMargin + i * 24) + ", " + remotesMargin + ")";
     })
     .append("circle");
 
@@ -44,7 +48,7 @@ var sinkCircles = svg.selectAll(".sink")
   .append("g")
     .attr("class", "sink")
     .attr("transform", function(d, i) {
-      return "translate(" + (30 + i * 24) + ","  + (height - 30) + ")";
+      return "translate(" + (remotesMargin + i * 24) + ","  + (height - remotesMargin) + ")";
     })
     .append("circle");
 
@@ -68,15 +72,86 @@ var sinkText = svg
 
 var rowsPerSecondOut = svg
   .append("text")
-    .attr("y", height - 50).attr("x", 24 + data.sources.length * 24)
+    .attr("y", height - 50).attr("x", 24 + data.sinks.length * 24)
     .attr("class", "rps")
     .text("0 rps");
 
 rowsPerSecondOut.append("title").text("rows per second");
 
+function StreamStats() {
+  var rpmIn = [];
+  var rpmOut = [];
+
+  var maxIn = 100;
+  var maxOut = 100;
+
+  this.add = function(rps) {
+    if (maxIn < rps.in) maxIn = rps.in;
+    if (maxOut < rps.out) maxOut = rps.out;
+
+    rpmIn.unshift(rps.in);
+    rpmOut.unshift(rps.out);
+  };
+
+  this.rpmIn = function() {
+    return rpmIn;
+  };
+
+  this.rpmOut = function() {
+    return rpmOut;
+  };
+
+  this.maxIn = function() {
+    return maxIn;
+  };
+
+  this.maxOut = function() {
+    return maxOut;
+  };
+}
+
+var chartIn = svg.append("g");
+var chartOut = svg.append("g");
+
+function udpateChart(stats) {
+  var chartHeight = height - 2 * remotesHeight;
+
+  var dataIn = chartIn.selectAll('rect')
+    .data(stats.rpmIn());
+
+  dataIn
+    .enter()
+      .append('rect')
+    .merge(dataIn)
+      .attr('width', barWidth)
+      .attr('height', function(d, i) { return chartHeight / 2 * d / stats.maxIn();})
+      .attr('x', function(d, i) { return margin + i * barWidth; })
+      .attr('y', function(d, i) { return remotesHeight + chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
+      .attr('fill', 'orange');
+
+  var dataOut = chartOut.selectAll('rect')
+    .data(stats.rpmOut());
+
+  dataOut.
+    enter()
+      .append('rect')
+    .merge(dataOut)
+      .attr('width', barWidth)
+      .attr('height', function(d, i) { return chartHeight / 2 * d / stats.maxOut();})
+      .attr('x', function(d, i) { return margin + i * barWidth; })
+      .attr('y', function(d, i) { return remotesHeight + chartHeight / 2; })
+      .attr('fill', 'steelblue');
+}
+
+var stats = new StreamStats();
+
 function updateStats(data) {
+  stats.add(data.rps);
+
   rowsPerSecondIn.text(data.rps.in + " rps");
   rowsPerSecondOut.text(data.rps.out + " rps");
+
+  udpateChart(stats);
 }
 
 if (typeof(Shiny) !== "undefined") {
@@ -87,8 +162,8 @@ if (data.demo) {
   setInterval(function() {
     var stats = {
       rps: {
-        in: Math.floor(Math.random() * 1000),
-        out: Math.floor(Math.random() * 1000)
+        in: Math.floor(Math.random() * 100),
+        out: Math.floor(Math.random() * 100)
       }
     };
 
