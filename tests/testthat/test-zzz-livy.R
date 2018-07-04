@@ -2,8 +2,6 @@ context("livy")
 test_requires("dplyr")
 
 test_that("'spark_version()' works under Livy connections", {
-  skip("Temporary skip")
-
   if (.Platform$OS.type == "windows")
     skip("Livy service unsupported in Windows")
 
@@ -16,8 +14,6 @@ test_that("'spark_version()' works under Livy connections", {
 })
 
 test_that("'copy_to()' works under Livy connections", {
-  skip("Temporary skip")
-
   if (.Platform$OS.type == "windows")
     skip("Livy service unsupported in Windows")
 
@@ -30,8 +26,6 @@ test_that("'copy_to()' works under Livy connections", {
 })
 
 test_that("'livy_config()' works with extended parameters", {
-  skip("Temporary skip")
-
   if (.Platform$OS.type == "windows")
     skip("Livy service unsupported in Windows")
 
@@ -41,8 +35,6 @@ test_that("'livy_config()' works with extended parameters", {
 })
 
 test_that("'livy_config()' works with authentication", {
-  skip("Temporary skip")
-
   if (.Platform$OS.type == "windows")
     skip("Livy service unsupported in Windows")
 
@@ -62,8 +54,6 @@ test_that("'livy_config()' works with authentication", {
 })
 
 test_that("'spark_apply()' works under Livy connections", {
-  skip("Temporary skip")
-
   if (.Platform$OS.type == "windows")
     skip("Livy service unsupported in Windows")
 
