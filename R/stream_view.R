@@ -11,6 +11,7 @@ stream_progress <- function(stream)
 #' Opens a Shiny gadget to visualize the given stream.
 #'
 #' @param stream The stream to visualize.
+#' @param invalidate The invalidation interval in milliseconds.
 #'
 #' #' @examples
 #'
@@ -25,7 +26,8 @@ stream_progress <- function(stream)
 #' @import r2d3
 #' @export
 stream_view <- function(
-  stream
+  stream,
+  interval = 1000
 ) {
   ui <- d3Output("plot")
 
@@ -40,7 +42,7 @@ stream_view <- function(
     )
 
     observe({
-      invalidateLater(1000, session)
+      invalidateLater(interval, session)
 
       data <- stream_progress(stream)
 
@@ -55,4 +57,6 @@ stream_view <- function(
   }
 
   runGadget(ui, server)
+
+  stream
 }
