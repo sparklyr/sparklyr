@@ -33,7 +33,7 @@ script:
 
 after_failure:
   - |
-    grep -B 10 -A 20 ERROR /tmp/sparklyr.log
+    grep -B 50 -A 50 ERROR /tmp/sparklyr.log
     cd tests
     export NOT_CRAN=true
     travis_wait 35 Rscript ../.travis.R --testthat

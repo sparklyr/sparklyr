@@ -7,14 +7,6 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 
 object ApplyUtils {
-  def groupBy(rdd: RDD[Row], colPosition: Array[Int]): RDD[Row] = {
-    rdd.groupBy(
-      r => colPosition.map(p => r.get(p)).mkString("|")
-    ).map(
-      r => Row(r._2.toSeq)
-    )
-  }
-
   def groupBy(
     data: org.apache.spark.sql.Dataset[Row],
     colPosition: Array[Int]): org.apache.spark.sql.Dataset[Row] = {
