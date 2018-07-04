@@ -2,7 +2,9 @@ context("serialization")
 sc <- testthat_spark_connection()
 
 test_requires("nycflights13")
-flights_tbl <- testthat_tbl("flights")
+
+flights_small <- flights %>% dplyr::sample_n(10000)
+flights_tbl <- testthat_tbl("flights_small")
 
 ensure_round_trip <- function(sc, data) {
   # round-trip data through Spark
