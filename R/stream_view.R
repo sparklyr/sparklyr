@@ -16,6 +16,7 @@
 #'
 #' @import shiny
 #' @import r2d3
+#' @importFrom jsonlite fromJSON
 #' @export
 stream_view <- function(
   stream,
@@ -26,13 +27,17 @@ stream_view <- function(
   server <- function(input, output, session) {
     output$plot <- renderD3(
       r2d3(
-        data = c (0.3, 0.6, 0.8, 0.95, 0.40, 0.20),
-        script = system.file("examples/barchart.js", package = "r2d3")
+        data = list(sources = list("FileStreamSource[file]"), sinks = list("FileSink[file]")),
+        script = system.file("streams/stream.js", package = "sparklyr")
       )
     )
 
     observe({
       invalidateLater(interval, session)
+
+      data <- invoke(stream, "lastProgress") %>%
+        invoke("toString") %>%
+        fromJSON()
     })
   }
 
