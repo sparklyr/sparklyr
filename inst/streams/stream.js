@@ -13,7 +13,9 @@ var sourceCircles = svg.selectAll(".source")
     .append("circle");
 
 sourceCircles.attr("cx", "0").attr("cy", "0").attr("r", "10")
-  .attr("stroke", "white")
+  .attr("stroke", function (d, i) {
+    return (i == data.sources.length - 1) ? "orange" : "white";
+  })
   .attr("stroke-width", "2")
   .attr("fill", "orange")
   .on("mouseover", function (d, i) {
@@ -39,7 +41,9 @@ var sinkCircles = svg.selectAll(".sink")
     .append("circle");
 
 sinkCircles.attr("cx", "0").attr("cy", "0").attr("r", "10")
-  .attr("stroke", "white")
+  .attr("stroke", function (d, i) {
+    return (i == data.sinks.length - 1) ? "steelblue" : "white";
+  })
   .attr("stroke-width", "2")
   .attr("fill", "steelblue")
   .on("mouseover", function (d, i) {

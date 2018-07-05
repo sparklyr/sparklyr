@@ -1,3 +1,11 @@
+#' @importFrom jsonlite fromJSON
+stream_progress <- function(stream)
+{
+  invoke(stream, "lastProgress") %>%
+    invoke("toString") %>%
+    fromJSON()
+}
+
 #' View Stream
 #'
 #' Opens a Shiny gadget to visualize the given stream.
@@ -16,7 +24,6 @@
 #'
 #' @import shiny
 #' @import r2d3
-#' @importFrom jsonlite fromJSON
 #' @export
 stream_view <- function(
   stream,
@@ -25,9 +32,11 @@ stream_view <- function(
   ui <- d3Output("plot")
 
   server <- function(input, output, session) {
+    first <- stream_progress(stream)
+
     output$plot <- renderD3(
       r2d3(
-        data = list(sources = list("FileStreamSource[file]"), sinks = list("FileSink[file]")),
+        data = list(sources = first$sources$description, sinks = first$sink$description),
         script = system.file("streams/stream.js", package = "sparklyr")
       )
     )
@@ -35,9 +44,13 @@ stream_view <- function(
     observe({
       invalidateLater(interval, session)
 
-      data <- invoke(stream, "lastProgress") %>%
-        invoke("toString") %>%
-        fromJSON()
+      data <- stream_progress(stream)
+
+      session$sendCustomMessage(type = "sparklyr_stream_view", list(
+        timestamp = data$timestamp,
+        sources = data$inputRowsPerSecond,
+        sinks = data$processedRowsPerSecond
+      ))
     })
   }
 
