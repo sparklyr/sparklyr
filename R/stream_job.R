@@ -7,7 +7,7 @@ stream_register_job <- function(stream)
 
     jobActions <- list(
       info = function(id) {
-        .rs.api.sendToConsole(
+        sendToConsole(
           paste0("stream_view(\"", id, "\")")
         )
       },
