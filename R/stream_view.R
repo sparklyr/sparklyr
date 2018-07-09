@@ -36,8 +36,12 @@ stream_view <- function(
 
     output$plot <- renderD3(
       r2d3(
-        data = list(sources = first$sources$description, sinks = first$sink$description),
-        script = system.file("streams/stream.js", package = "sparklyr")
+        data = list(
+          sources = as.list(first$sources$description),
+          sinks = as.list(first$sink$description)
+        ),
+        script = system.file("streams/stream.js", package = "sparklyr"),
+        container = "div"
       )
     )
 

@@ -214,7 +214,7 @@ r2d3.onResize(function(width, height) {
   renderer.render();
 });
 
-if (options.demo) {
+if (options !== null && "demo" in options) {
   setInterval(function() {
     var data = {
       rps: {
@@ -224,7 +224,14 @@ if (options.demo) {
     };
 
     stats.add(data.rps);
-
     renderer.update();
   }, 1000);
+}
+
+if (typeof(Shiny) !== "undefined") {
+  Shiny.addCustomMessageHandler("sparklyr_stream_view", function(data) {
+      stats.add(data.rps);
+      renderer.update();
+    }
+  );
 }
