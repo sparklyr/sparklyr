@@ -48,6 +48,7 @@ function StreamStats() {
 var stats = new StreamStats();
 
 function StreamRenderer(stats) {
+  var self = this;
   var width = 0;
   var height = 0;
 
@@ -69,6 +70,10 @@ function StreamRenderer(stats) {
   var remotesHeight = 80;
   var chartHeight = 0;
 
+  this.formatRps = function(num) {
+    return d3.format(",.2r")(num);
+  };
+
   this.setSize = function(newWidth, newHeight) {
     chartHeight = newHeight - 2 * remotesHeight;
 
@@ -87,8 +92,8 @@ function StreamRenderer(stats) {
       chart.attr("class", "chart animate");
     }, 50);
 
-    rowsPerSecondIn.text(stats.latestRpsIn() + " rps");
-    rowsPerSecondOut.text(stats.latestRpsOut() + " rps");
+    rowsPerSecondIn.text(self.formatRps(stats.latestRpsIn()) + " rps");
+    rowsPerSecondOut.text(self.formatRps(stats.latestRpsOut()) + " rps");
 
     var chartHeight = height - 2 * remotesHeight;
 
@@ -160,7 +165,7 @@ function StreamRenderer(stats) {
     rowsPerSecondIn
       .attr("y", 60).attr("x", margin + data.sources.length * 24)
       .attr("class", "rps")
-      .text(stats.latestRpsIn() + " rps");
+      .text(self.formatRps(stats.latestRpsIn()) + " rps");
 
     rowsPerSecondIn.append("title").text("rows per second");
 
@@ -194,7 +199,7 @@ function StreamRenderer(stats) {
     rowsPerSecondOut
       .attr("y", height - 50).attr("x", margin + data.sinks.length * 24)
       .attr("class", "rps")
-      .text(stats.latestRpsOut() + " rps");
+      .text(self.formatRps(stats.latestRpsOut()) + " rps");
 
     rowsPerSecondOut.append("title").text("rows per second");
 
@@ -214,6 +219,12 @@ r2d3.onResize(function(width, height) {
   renderer.render();
 });
 
+function debug(msg) {
+  if (options !== null && "debug" in options) {
+    console.log(msg);
+  }
+}
+
 if (options !== null && "demo" in options) {
   setInterval(function() {
     var data = {
@@ -223,6 +234,7 @@ if (options !== null && "demo" in options) {
       }
     };
 
+    debug(JSON.stringify(data));
     stats.add(data.rps);
     renderer.update();
   }, 1000);
@@ -230,6 +242,7 @@ if (options !== null && "demo" in options) {
 
 if (typeof(Shiny) !== "undefined") {
   Shiny.addCustomMessageHandler("sparklyr_stream_view", function(data) {
+      debug(JSON.stringify(data));
       stats.add(data.rps);
       renderer.update();
     }

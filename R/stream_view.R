@@ -12,6 +12,7 @@ stream_progress <- function(stream)
 #'
 #' @param stream The stream to visualize.
 #' @param invalidate The invalidation interval in milliseconds.
+#' @param ... Additional optional arguments.
 #'
 #' #' @examples
 #'
@@ -27,9 +28,11 @@ stream_progress <- function(stream)
 #' @export
 stream_view <- function(
   stream,
-  interval = 1000
+  interval = 1000,
+  ...
 ) {
   ui <- d3Output("plot")
+  options <- list(...)
 
   server <- function(input, output, session) {
     first <- stream_progress(stream)
@@ -41,7 +44,8 @@ stream_view <- function(
           sinks = as.list(first$sink$description)
         ),
         script = system.file("streams/stream.js", package = "sparklyr"),
-        container = "div"
+        container = "div",
+        options = options
       )
     )
 
@@ -53,8 +57,8 @@ stream_view <- function(
       session$sendCustomMessage(type = "sparklyr_stream_view", list(
         timestamp = data$timestamp,
         rps = list(
-          "in" = data$inputRowsPerSecond,
-          "out" = data$processedRowsPerSecond
+          "in" = floor(data$inputRowsPerSecond),
+          "out" = floor(data$processedRowsPerSecond)
         )
       ))
     })
