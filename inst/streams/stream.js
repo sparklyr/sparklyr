@@ -71,7 +71,7 @@ function StreamRenderer(stats) {
   var chartHeight = 0;
 
   this.formatRps = function(num) {
-    return d3.format(",.2r")(num);
+    return d3.format(",.0f")(num);
   };
 
   this.setSize = function(newWidth, newHeight) {
