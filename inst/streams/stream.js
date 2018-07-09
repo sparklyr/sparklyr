@@ -109,6 +109,10 @@ function StreamRenderer(stats) {
     stopped = true;
   };
 
+  this.stopped = function() {
+    return stopped;
+  };
+
   this.annotate = function(x, text) {
     ticks.append("line")
       .attr("class", "horizon")
@@ -155,7 +159,12 @@ function StreamRenderer(stats) {
         .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxIn();})
         .attr("x", function(d, i) { return marginLeft + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
-        .attr("class", "barIn");
+        .attr("class", "barIn")
+        .on("mouseover", function (d, i) {
+          rowsPerSecondIn.text(self.formatRps(d) + " rps");
+          d3.select(this.parentNode).selectAll("rect").attr("class", "barIn");
+          d3.select(this).attr("class", "barIn selected");
+        });
 
     var dataOut = chartOut.selectAll("rect")
       .data(stats.rpmOut());
@@ -168,7 +177,12 @@ function StreamRenderer(stats) {
         .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxOut();})
         .attr("x", function(d, i) { return marginLeft + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return chartHeight / 2; })
-        .attr("class", "barOut");
+        .attr("class", "barOut")
+        .on("mouseover", function (d, i) {
+          rowsPerSecondOut.text(self.formatRps(d) + " rps");
+          d3.select(this.parentNode).selectAll("rect").attr("class", "barOut");
+          d3.select(this).attr("class", "barOut selected");
+        });
 
     ticks.selectAll("*").remove();
     ticks.append("line")
@@ -319,8 +333,9 @@ if (data !== null && "stats" in data) {
   setInterval(function(data) {
     return function() {
       if (statsIdx >= data.stats.length) {
+        var stopped = renderer.stopped();
         renderer.stop();
-        renderer.update();
+        if (!stopped) renderer.update();
         return;
       }
 

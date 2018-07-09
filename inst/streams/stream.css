@@ -49,8 +49,16 @@ svg {
   fill: #667292;
 }
 
+.barIn.selected {
+  fill: #263252;
+}
+
 .barOut {
   fill: #8d9db6;
+}
+
+.barOut.selected {
+  fill: #4a5d76;
 }
 
 .source {
