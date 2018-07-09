@@ -89,6 +89,10 @@ function StreamRenderer(stats) {
     height =  newHeight;
   };
 
+  this.stop = function() {
+    chart.attr("class", "chart stop");
+  };
+
   this.update = function() {
     chart.attr("class", "chart");
     setTimeout(function() {
@@ -128,6 +132,14 @@ function StreamRenderer(stats) {
         .attr("x", function(d, i) { return margin + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return chartHeight / 2; })
         .attr("class", "barOut");
+
+    ticks.selectAll("line").remove();
+    ticks.append("line")
+      .attr("class", "horizon")
+      .attr("x1", 0)
+      .attr("y1", chartHeight / 2)
+      .attr("x2", width)
+      .attr("y2", chartHeight / 2);
   };
 
   this.render = function() {
@@ -236,12 +248,12 @@ function debug(msg) {
   }
 }
 
-if (options !== null && "demo" in options) {
+if (options !== null && "demo" in options && options.demo === true) {
   setInterval(function() {
     var data = {
       rps: {
-        in: Math.floor(Math.random() * 100),
-        out: Math.floor(Math.random() * 100)
+        in: Math.random() * 100,
+        out: Math.random() * 100
       }
     };
 
