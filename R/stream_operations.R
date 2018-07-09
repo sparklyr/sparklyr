@@ -129,6 +129,18 @@ stream_name <- function(stream)
   invoke(stream, "name")
 }
 
+#' Spark Stream's Identifier
+#'
+#' Retrieves the identifier of the Spark stream.
+#'
+#' @param stream The spark stream object.
+#'
+#' @export
+stream_id <- function(stream)
+{
+  invoke(stream, "id")
+}
+
 sdf_collect_stream <- function(x, ...)
 {
   sc <- spark_connection(x)
@@ -184,3 +196,9 @@ stream_generate_random <- function(df, path = "streams-random", interval = 5)
   }, interval)
 
 }
+
+stream_find <- function(sc, id)
+{
+  spark_session(sc) %>% invoke("streams") %>% invoke("get", id)
+}
+

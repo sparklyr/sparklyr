@@ -87,7 +87,15 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, strea
 
   trigger <- stream_trigger_create(trigger, sc)
 
-  if (identical(type, "memory")) streamOptions <- invoke(streamOptions, "queryName", path)
+  streamOptions <- invoke(
+    streamOptions,
+    "queryName",
+    ifelse(
+      identical(type, "memory"),
+      path,
+      random_string("stream_")
+    )
+  )
 
   streamOptions %>%
     invoke("outputMode", mode) %>%

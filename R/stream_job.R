@@ -1,14 +1,18 @@
+#' @importFrom rstudioapi sendToConsole
 stream_register_job <- function(stream)
 {
   if (rstudio_jobs_api_available()) {
     api <- rstudio_jobs_api()
-    name <- stream_name(stream)
+    id <- stream_id(stream)
 
     jobActions <- list(
       info = function(id) {
-        stream_view(stream)
+        .rs.api.sendToConsole(
+          paste0("stream_view(\"", id, "\")")
+        )
       },
       stop = function(id) {
+        api$add_job_progress(job, 100L)
         stream_stop(stream)
       }
     )

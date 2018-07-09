@@ -31,6 +31,27 @@ stream_view <- function(
   interval = 1000,
   ...
 ) {
+  UseMethod("stream_view")
+}
+
+#' @export
+stream_view.character <- function(
+  stream,
+  interval = 1000,
+  ...
+) {
+  stream <- stream_find(stream)
+  stream_view(stream)
+}
+
+#' @export
+stream_view.spark_stream <- function(
+  stream,
+  interval = 1000,
+  ...
+) {
+  validate <- stream_progress(stream)
+
   ui <- d3Output("plot")
   options <- list(...)
 
