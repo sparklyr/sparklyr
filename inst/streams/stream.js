@@ -43,6 +43,10 @@ function StreamStats() {
   this.latestRpsOut = function() {
     return rpmOut[0];
   };
+
+  this.count = function() {
+    return rpmIn.length;
+  };
 }
 
 var stats = new StreamStats();
@@ -58,6 +62,16 @@ function StreamRenderer(stats) {
     .style("top", 0)
     .style("left", 0);
 
+  chart.append("marker")
+    .attr("id", "circle")
+    .attr("markerWidth", "4").attr("markerHeight", "4")
+    .attr("refX", "2").attr("refY", "2")
+    .append("circle")
+      .attr("cx", "2").attr("cy", "2").attr("r", "2")
+      .attr("class", "tick");
+
+  var ticks = chart.append("g");
+
   var chartIn;
   var chartOut;
   var rowsPerSecondIn;
@@ -65,10 +79,12 @@ function StreamRenderer(stats) {
 
   var barWidth = 10;
   var margin = 15;
+  var marginLeft = margin + 20;
   var remotesCircle = 10;
   var remotesMargin = margin;
   var remotesHeight = 0;
   var chartHeight = 0;
+  var stopped = false;
 
   this.formatRps = function(num) {
     return d3.format(",.0f")(num);
@@ -90,14 +106,35 @@ function StreamRenderer(stats) {
   };
 
   this.stop = function() {
-    chart.attr("class", "chart stop");
+    stopped = true;
+  };
+
+  this.annotate = function(x, text) {
+    ticks.append("line")
+      .attr("class", "horizon")
+      .attr("x1", x)
+      .attr("y1", 10)
+      .attr("x2", x)
+      .attr("y2", chartHeight / 2)
+      .attr("marker-start", "url(#circle)")
+      .attr("marker-end", "url(#circle)");
+
+    ticks.append("text")
+      .attr("y", 13).attr("x", x + 4)
+      .attr("class", "annotation")
+      .text(text);
   };
 
   this.update = function() {
     chart.attr("class", "chart");
-    setTimeout(function() {
-      chart.attr("class", "chart animate");
-    }, 50);
+    if (!stopped) {
+      setTimeout(function() {
+        chart.attr("class", "chart animate");
+      }, 50);
+    }
+    else {
+      chart.attr("class", "chart stop");
+    }
 
     rowsPerSecondIn.text(self.formatRps(stats.latestRpsIn()) + " rps");
     rowsPerSecondOut.text(self.formatRps(stats.latestRpsOut()) + " rps");
@@ -116,7 +153,7 @@ function StreamRenderer(stats) {
       .merge(dataIn)
         .attr("width", barWidth - 2)
         .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxIn();})
-        .attr("x", function(d, i) { return margin + i * barWidth - barWidth; })
+        .attr("x", function(d, i) { return marginLeft + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
         .attr("class", "barIn");
 
@@ -129,17 +166,22 @@ function StreamRenderer(stats) {
       .merge(dataOut)
         .attr("width", barWidth - 2)
         .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxOut();})
-        .attr("x", function(d, i) { return margin + i * barWidth - barWidth; })
+        .attr("x", function(d, i) { return marginLeft + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return chartHeight / 2; })
         .attr("class", "barOut");
 
-    ticks.selectAll("line").remove();
+    ticks.selectAll("*").remove();
     ticks.append("line")
       .attr("class", "horizon")
       .attr("x1", 0)
       .attr("y1", chartHeight / 2)
       .attr("x2", width)
       .attr("y2", chartHeight / 2);
+
+    this.annotate(marginLeft + barWidth * (stats.count() - 1) - 4, "Start");
+    if (stopped) {
+      this.annotate(marginLeft - barWidth - 8, "End");
+    }
   };
 
   this.render = function() {
@@ -164,7 +206,7 @@ function StreamRenderer(stats) {
       .append("g")
         .attr("class", "source")
         .attr("transform", function(d, i) {
-          return "translate(" + (margin + i * 24) + ", " + remotesMargin + ")";
+          return "translate(" + (marginLeft + i * 24) + ", " + remotesMargin + ")";
         })
         .append("circle");
 
@@ -181,12 +223,12 @@ function StreamRenderer(stats) {
 
     var sourceText = svg
       .append("text")
-        .attr("y", margin + 3).attr("x", margin + data.sources.length * 24)
+        .attr("y", margin + 3).attr("x", marginLeft + data.sources.length * 24)
         .attr("class", "label")
         .text(function(d) { return data.sources[data.sources.length - 1]; });
 
     rowsPerSecondIn
-      .attr("y", margin + rpsTextSize + 5).attr("x", margin + data.sources.length * 24)
+      .attr("y", margin + rpsTextSize + 5).attr("x", marginLeft + data.sources.length * 24)
       .attr("class", "rps")
       .text(self.formatRps(stats.latestRpsIn()) + " rps");
 
@@ -198,7 +240,7 @@ function StreamRenderer(stats) {
       .append("g")
         .attr("class", "sink")
         .attr("transform", function(d, i) {
-          return "translate(" + (margin + i * 24) + ","  + (height - remotesMargin) + ")";
+          return "translate(" + (marginLeft + i * 24) + ","  + (height - remotesMargin) + ")";
         })
         .append("circle");
 
@@ -215,12 +257,12 @@ function StreamRenderer(stats) {
 
     var sinkText = svg
       .append("text")
-        .attr("y", height - margin + 3).attr("x", margin + data.sinks.length * 24)
+        .attr("y", height - margin + 3).attr("x", marginLeft + data.sinks.length * 24)
         .attr("class", "label sinkText")
         .text(function(d) { return data.sinks[data.sinks.length - 1]; });
 
     rowsPerSecondOut
-      .attr("y", height - margin - 15).attr("x", margin + data.sinks.length * 24)
+      .attr("y", height - margin - 15).attr("x", marginLeft + data.sinks.length * 24)
       .attr("class", "rps")
       .text(self.formatRps(stats.latestRpsOut()) + " rps");
 
@@ -278,6 +320,7 @@ if (data !== null && "stats" in data) {
     return function() {
       if (statsIdx >= data.stats.length) {
         renderer.stop();
+        renderer.update();
         return;
       }
 

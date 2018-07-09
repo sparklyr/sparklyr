@@ -41,6 +41,10 @@ svg {
   animation-delay: 0s;
 }
 
+.chart.stop{
+  transform: translateX(10px);
+}
+
 .barIn {
   fill: #667292;
 }
@@ -65,4 +69,19 @@ svg {
 
 .sink .selected {
   stroke: #8d9db6;
+}
+
+.tick {
+  stroke: none;
+  fill: #CDCDE6;
+}
+
+.horizon {
+  stroke: #CdCdE6;
+  stroke-width: 1;
+  stroke-dasharray: 2,2;
+}
+
+.annotation {
+  fill: #CdCdE6;
 }
