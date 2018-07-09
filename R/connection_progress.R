@@ -1,55 +1,31 @@
 # nocov start
 
-connection_progress_api_available <- function() {
-  exists(".rs.api.addJob")
-}
-
-connection_progress_api <- function() {
-  list(
-    add_job = get(".rs.api.addJob"),
-    set_job_status = get(".rs.api.setJobStatus"),
-    add_job_progress = get(".rs.api.addJobProgress")
-  )
-}
-
 connection_progress_update <- function(jobName, progressUnits, url)
 {
-  api <- connection_progress_api()
-  if ("actions" %in% names(formals(api$add_job)) && nchar(url) > 0) {
-    jobActions <- NULL
-    if (nchar(url) > 0) {
-      jobActions <- list(
-        info = function(id) {
-          browseURL(url)
-        }
-      )
-    }
-
-    api$add_job(jobName,
-                progressUnits = progressUnits,
-                show = FALSE,
-                autoRemove = FALSE,
-                actions = jobActions)
-  } else if ("show" %in% names(formals(api$add_job))) {
-    api$add_job(jobName,
-                progressUnits = progressUnits,
-                show = FALSE,
-                autoRemove = FALSE)
-  } else {
-    api$add_job(jobName,
-                progressUnits = progressUnits,
-                autoRemove = FALSE)
+  jobActions <- NULL
+  if (nchar(url) > 0) {
+    jobActions <- list(
+      info = function(id) {
+        browseURL(url)
+      }
+    )
   }
+
+  rstudio_jobs_api_new(
+    jobName,
+    progressUnits,
+    jobActions
+  )
 }
 
 connection_progress_base <- function(sc, terminated = FALSE)
 {
   env <- sc$state$progress
 
-  if (!connection_progress_api_available())
+  if (!rstudio_jobs_api_available())
     return()
 
-  api <- connection_progress_api()
+  api <- rstudio_jobs_api()
 
   if (is.null(env$jobs))
     env$jobs <- list()
