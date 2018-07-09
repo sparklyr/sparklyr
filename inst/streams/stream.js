@@ -64,10 +64,10 @@ function StreamRenderer(stats) {
   var rowsPerSecondOut;
 
   var barWidth = 10;
-  var margin = 20;
+  var margin = 15;
   var remotesCircle = 10;
-  var remotesMargin = margin + remotesCircle;
-  var remotesHeight = 80;
+  var remotesMargin = margin;
+  var remotesHeight = 0;
   var chartHeight = 0;
 
   this.formatRps = function(num) {
@@ -75,12 +75,15 @@ function StreamRenderer(stats) {
   };
 
   this.setSize = function(newWidth, newHeight) {
+    remotesHeight = Math.min(50, newHeight / 3);
     chartHeight = newHeight - 2 * remotesHeight;
 
     svg.attr("width", newWidth).attr("height", newHeight);
 
     chart.attr("width", newWidth).attr("height", chartHeight);
     chart.style("top", remotesHeight + "px");
+
+    chart.style("display", newHeight < 120 ? "none" : "block");
 
     width = newWidth;
     height =  newHeight;
@@ -94,6 +97,9 @@ function StreamRenderer(stats) {
 
     rowsPerSecondIn.text(self.formatRps(stats.latestRpsIn()) + " rps");
     rowsPerSecondOut.text(self.formatRps(stats.latestRpsOut()) + " rps");
+
+    rowsPerSecondIn.style("display", height < 60 ? "none" : "block");
+    rowsPerSecondOut.style("display", height < 60 ? "none" : "block");
 
     var chartHeight = height - 2 * remotesHeight;
 
@@ -132,8 +138,13 @@ function StreamRenderer(stats) {
     chartIn = chart.append("g");
     chartOut = chart.append("g");
 
+    rpsTextSize = Math.min(10 + height / 40, 20);
+
     rowsPerSecondIn = svg.append("text");
+    rowsPerSecondIn.style("font-size", rpsTextSize + "px");
+
     rowsPerSecondOut = svg.append("text");
+    rowsPerSecondOut.style("font-size", rpsTextSize + "px");
 
     var sourceCircles = svg.selectAll(".source")
       .data(data.sources)
@@ -158,12 +169,12 @@ function StreamRenderer(stats) {
 
     var sourceText = svg
       .append("text")
-        .attr("y", 35).attr("x", margin + data.sources.length * 24)
+        .attr("y", margin + 3).attr("x", margin + data.sources.length * 24)
         .attr("class", "label")
         .text(function(d) { return data.sources[data.sources.length - 1]; });
 
     rowsPerSecondIn
-      .attr("y", 60).attr("x", margin + data.sources.length * 24)
+      .attr("y", margin + rpsTextSize + 5).attr("x", margin + data.sources.length * 24)
       .attr("class", "rps")
       .text(self.formatRps(stats.latestRpsIn()) + " rps");
 
@@ -192,12 +203,12 @@ function StreamRenderer(stats) {
 
     var sinkText = svg
       .append("text")
-        .attr("y", height - 25).attr("x", margin + data.sinks.length * 24)
+        .attr("y", height - margin + 3).attr("x", margin + data.sinks.length * 24)
         .attr("class", "label sinkText")
         .text(function(d) { return data.sinks[data.sinks.length - 1]; });
 
     rowsPerSecondOut
-      .attr("y", height - 50).attr("x", margin + data.sinks.length * 24)
+      .attr("y", height - margin - 15).attr("x", margin + data.sinks.length * 24)
       .attr("class", "rps")
       .text(self.formatRps(stats.latestRpsOut()) + " rps");
 
