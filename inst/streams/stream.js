@@ -1,11 +1,11 @@
-// !preview r2d3 data=list(sources = list("FileStreamSource[file]", "Other[file]"), sinks = list("FileSink[file]")), options = list(demo = TRUE), container = "div"
+// !preview r2d3 data=list(sources = list("FileStreamSource[file]"), sinks = list("FileSink[file]"), stats = list(list(rps = list("in" = 1, out = 2)), list(rps = list("in" = 5, out = 10)), list(rps = list("in" = 1, out = 10)))), options = list(demo = FALSE), container = "div"
 
 function StreamStats() {
   var rpmIn = [0];
   var rpmOut = [0];
 
-  var maxIn = 100;
-  var maxOut = 100;
+  var maxIn = 10;
+  var maxOut = 10;
 
   var maxStats = 100;
 
@@ -258,4 +258,24 @@ if (typeof(Shiny) !== "undefined") {
       renderer.update();
     }
   );
+}
+
+if (data !== null && "stats" in data) {
+  var statsIdx = 0;
+  setInterval(function(data) {
+    return function() {
+      if (statsIdx >= data.stats.length) {
+        renderer.stop();
+        return;
+      }
+
+      var d = data.stats[statsIdx];
+
+      debug(JSON.stringify(d));
+      stats.add(d.rps);
+      renderer.update();
+
+      statsIdx += 1;
+    };
+  }(data), 1000);
 }
