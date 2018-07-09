@@ -40,7 +40,9 @@ stream_view.character <- function(
   interval = 1000,
   ...
 ) {
-  stream <- stream_find(stream)
+  sc <- list(...)$sc
+
+  stream <- stream_find(sc, stream)
   stream_view(stream)
 }
 

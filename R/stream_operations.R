@@ -14,9 +14,7 @@ stream_status <- function(stream)
 #' @export
 print.spark_stream <- function(x, ...)
 {
-  id <- stream_name(x)
-  if (is.null(id) || nchar(id) == 0) id <- invoke(invoke(x, "id"), "toString")
-
+  id <- stream_id(x)
   status <- stream_status(x)
   active <- invoke(x, "isActive")
 
@@ -138,7 +136,7 @@ stream_name <- function(stream)
 #' @export
 stream_id <- function(stream)
 {
-  invoke(stream, "id")
+  invoke(stream, "id") %>% invoke("toString")
 }
 
 sdf_collect_stream <- function(x, ...)
@@ -197,8 +195,15 @@ stream_generate_random <- function(df, path = "streams-random", interval = 5)
 
 }
 
+#' Find Stream
+#'
+#' Finds and returns a stream based on the stream's itentifier.
+#'
+#' @param id The stream identifier to find.
+#'
+#' @export
 stream_find <- function(sc, id)
 {
-  spark_session(sc) %>% invoke("streams") %>% invoke("get", id)
+  spark_session(sc) %>% invoke("streams") %>% invoke("get", id) %>% stream_class()
 }
 

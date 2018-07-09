@@ -8,7 +8,8 @@ rstudio_jobs_api <- function() {
   list(
     add_job = get(".rs.api.addJob"),
     set_job_status = get(".rs.api.setJobStatus"),
-    add_job_progress = get(".rs.api.addJobProgress")
+    add_job_progress = get(".rs.api.addJobProgress"),
+    remove_job = get(".rs.api.removeJob")
   )
 }
 

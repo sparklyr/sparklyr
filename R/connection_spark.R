@@ -36,8 +36,10 @@ spark_default_app_jar <- function(version) {
 #'   \code{SPARK_HOME} is defined, it will be always be used unless the
 #'   \code{version} parameter is specified to force the use of a locally
 #'   installed version.
-#' @param method The method used to connect to Spark. Currently, only
-#'   \code{"shell"} is supported.
+#' @param method The method used to connect to Spark. Default connection method
+#'   is \code{"shell"} to connect using spark-submit, use \code{"livy"} to
+#'   perform remote connections using HTTP, or \code{"databricks"} when using a
+#'   Databricks clusters.
 #' @param app_name The application name to be used while running in the Spark
 #'   cluster.
 #' @param version The version of Spark to use. Only applicable to
@@ -96,13 +98,7 @@ spark_connect <- function(master,
     master <- paste("local[", cores, "]", sep = "")
 
   # look for existing connection with the same method, master, and app_name
-  filter <- function(e) {
-    connection_is_open(e) &&
-      identical(e$method, method) &&
-      identical(e$master, master) &&
-      identical(e$app_name, app_name)
-  }
-  sconFound <- spark_connection_find_scon(filter)
+  sconFound <- spark_connection_find(method, master, app_name)
   if (length(sconFound) == 1) {
     message("Re-using existing Spark connection to ", passedMaster)
     return(sconFound[[1]])

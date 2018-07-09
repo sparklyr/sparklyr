@@ -81,12 +81,6 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, strea
 
   stream_options$checkpointLocation <- checkpoint
 
-  for (optionName in names(stream_options)) {
-    streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
-  }
-
-  trigger <- stream_trigger_create(trigger, sc)
-
   streamOptions <- invoke(
     streamOptions,
     "queryName",
@@ -96,6 +90,12 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, strea
       random_string("stream_")
     )
   )
+
+  for (optionName in names(stream_options)) {
+    streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
+  }
+
+  trigger <- stream_trigger_create(trigger, sc)
 
   streamOptions %>%
     invoke("outputMode", mode) %>%
