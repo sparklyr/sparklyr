@@ -3,7 +3,7 @@ stream_progress <- function(stream)
 {
   invoke(stream, "lastProgress") %>%
     invoke("toString") %>%
-    fromJSON()
+    fromJSON(simplifyDataFrame = F)
 }
 
 #' View Stream
@@ -13,9 +13,10 @@ stream_progress <- function(stream)
 #' @param stream The stream to visualize.
 #' @param ... Additional optional arguments.
 #'
-#' #' @examples
+#' @examples
 #'
 #' library(sparklyr)
+#' sc <- spark_connect(master = "local")
 #'
 #' dir.create("iris-in")
 #' write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
@@ -74,6 +75,38 @@ stream_view <- function(
   stream
 }
 
+#' Stream Statistics
+#'
+#' Collects streaming statistics, usually, to be used with \code{stream_render()}
+#' to render streaming statistics.
+#'
+#' @param stream The stream to collect statistics from.
+#' @param stats An optional stats object generated using \code{stream_stats()}.
+#'
+#' @return A stats object containing streaming statistics that can be passed
+#'   back to the \code{stats} parameter to continue aggregating streaming stats.
+#'
+#' @export
+stream_stats <- function(stream, stats = list()) {
+  data <- stream_progress(stream)
+
+  if (is.null(stats$stats)) {
+    stats$sources <- data$sources
+    stats$sink <- data$sink
+    stats$stats <- list()
+  }
+
+  stats$stats[[length(stats$stats) + 1]] <- list(
+    timestamp = data$timestamp,
+    rps = list(
+      "in" = if (is.numeric(data$inputRowsPerSecond)) floor(data$inputRowsPerSecond) else 0,
+      "out" = if (is.numeric(data$processedRowsPerSecond)) floor(data$processedRowsPerSecond) else 0
+    )
+  )
+
+  stats
+}
+
 #' Render Stream
 #'
 #' Collects streaming statistics to render the stream as an 'htmlwidget'.
@@ -81,12 +114,14 @@ stream_view <- function(
 #' @param stream The stream to render
 #' @param collect The interval in seconds to collect data before rendering the
 #'   'htmlwidget'.
+#' @param stats Optional stream statistics collected using \code{stream_stats()},
+#'   when specified, \code{stream} should be omitted.
 #' @param ... Additional optional arguments.
 #'
 #' #' @examples
 #'
 #' library(sparklyr)
-#'
+#' sc <- spark_connect(master = "local")
 #'
 #' dir.create("iris-in")
 #' write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
@@ -100,33 +135,26 @@ stream_view <- function(
 #' @import r2d3
 #' @export
 stream_render <- function(
-  stream,
+  stream = NULL,
   collect = 10,
+  stats = NULL,
   ...
 )
 {
-  stats <- list()
-  first <- stream_progress(stream)
+  if (is.null(stats)) {
+    stats <- stream_stats(stream)
 
-  for (i in seq_len(collect)) {
-    data <- stream_progress(stream)
-
-    stats[[length(stats) + 1]] <- list(
-      timestamp = data$timestamp,
-      rps = list(
-        "in" = if (is.numeric(data$inputRowsPerSecond)) floor(data$inputRowsPerSecond) else 0,
-        "out" = if (is.numeric(data$processedRowsPerSecond)) floor(data$processedRowsPerSecond) else 0
-      )
-    )
-
-    Sys.sleep(1)
+    for (i in seq_len(collect)) {
+      Sys.sleep(1)
+      stats <- stream_stats(stream, stats)
+    }
   }
 
   r2d3(
     data = list(
-      sources = as.list(first$sources$description),
-      sinks = as.list(first$sink$description),
-      stats = stats
+      sources = as.list(stats$sources),
+      sinks = as.list(stats$sink),
+      stats = stats$stats
     ),
     script = system.file("streams/stream.js", package = "sparklyr"),
     container = "div",
