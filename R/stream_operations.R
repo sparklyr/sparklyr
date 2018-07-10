@@ -38,8 +38,13 @@ print.spark_stream <- function(x, ...)
 #' @export
 stream_stop <- function(stream)
 {
-  invoke(stream, "stop") %>%
-    invisible()
+  if (!is.null(stream$job)) rstudio_jobs_api()$add_job_progress(stream$job, 100L)
+
+  stopped <- invoke(stream, "stop")
+
+  if (!is.null(stream$job)) rstudio_jobs_api()$remove_job(stream$job)
+
+  invisible(stopped)
 }
 
 stream_validate <- function(stream)
