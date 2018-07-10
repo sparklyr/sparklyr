@@ -73,7 +73,7 @@ stream_validate <- function(stream)
 #' @seealso \code{\link{stream_trigger_continuous}}
 #' @export
 stream_trigger_interval <- function(
-  interval = 5000
+  interval = 1000
 )
 {
   structure(class = c("stream_trigger_interval"), list(
