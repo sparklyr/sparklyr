@@ -3,7 +3,7 @@ stream_progress <- function(stream)
 {
   invoke(stream, "lastProgress") %>%
     invoke("toString") %>%
-    fromJSON(simplifyDataFrame = F)
+    fromJSON()
 }
 
 #' View Stream
@@ -91,8 +91,8 @@ stream_stats <- function(stream, stats = list()) {
   data <- stream_progress(stream)
 
   if (is.null(stats$stats)) {
-    stats$sources <- data$sources
-    stats$sink <- data$sink
+    stats$sources <- data$sources$description
+    stats$sink <- data$sink$description
     stats$stats <- list()
   }
 
