@@ -111,8 +111,6 @@ stream_render <- function(
   for (i in seq_len(collect)) {
     data <- stream_progress(stream)
 
-    message("stream_render: ", data$timestamp, " [", data$inputRowsPerSecond, ":", data$processedRowsPerSecond, "] ", Sys.time())
-
     stats[[length(stats) + 1]] <- list(
       timestamp = data$timestamp,
       rps = list(
