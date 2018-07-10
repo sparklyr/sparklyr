@@ -130,11 +130,16 @@ function StreamRenderer(stats) {
       .text(text);
   };
 
+  var animateClass = "animate";
+  this.setAnimateClass = function(name) {
+    animateClass = name;
+  };
+
   this.update = function() {
     chart.attr("class", "chart");
     if (!stopped) {
       setTimeout(function() {
-        chart.attr("class", "chart animate");
+        chart.attr("class", "chart " + self.animateClass);
       }, 50);
     }
     else {
@@ -317,8 +322,7 @@ if (options !== null && "demo" in options && options.demo === true) {
     renderer.update();
   }, 1000);
 }
-
-if (typeof(Shiny) !== "undefined") {
+else if (typeof(Shiny) !== "undefined") {
   Shiny.addCustomMessageHandler("sparklyr_stream_view", function(data) {
       debug(JSON.stringify(data));
       stats.add(data.rps);
@@ -326,8 +330,7 @@ if (typeof(Shiny) !== "undefined") {
     }
   );
 }
-
-if (data !== null && "stats" in data) {
+else if (data !== null && "stats" in data) {
   var statsIdx = 0;
   setInterval(function(data) {
     return function() {
@@ -342,9 +345,11 @@ if (data !== null && "stats" in data) {
 
       debug(JSON.stringify(d));
       stats.add(d.rps);
+
+      renderer.setAnimateClass("animateFast");
       renderer.update();
 
       statsIdx += 1;
     };
-  }(data), 1000);
+  }(data), 100);
 }
