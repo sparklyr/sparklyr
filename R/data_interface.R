@@ -9,8 +9,8 @@ spark_csv_options <- function(header,
   c(
     options,
     list(
-      header = ifelse(header, "true", "false"),
-      inferSchema = ifelse(inferSchema, "true", "false"),
+      header = ifelse(identical(header, TRUE), "true", "false"),
+      inferSchema = ifelse(identical(inferSchema, TRUE), "true", "false"),
       delimiter = toString(delimiter),
       quote = toString(quote),
       escape = toString(escape),
@@ -94,26 +94,6 @@ spark_read_csv <- function(sc,
     spark_normalize_path(path),
     options,
     if (columnsHaveTypes) columns else NULL)
-
-  if ((identical(columns, NULL) & identical(header, FALSE)) |
-      (!identical(columns, NULL) & !columnsHaveTypes)) {
-    newNames <- if (!identical(columns, NULL)) {
-      columns
-    }
-    else {
-      # create normalized column names when header = FALSE and a columns specification is not supplied
-      columns <- invoke(df, "columns")
-      n <- length(columns)
-      sprintf("V%s", seq_len(n))
-    }
-    df <- invoke(df, "toDF", as.list(newNames))
-  } else {
-    # sanitize column names
-    colNames <- as.character(invoke(df, "columns"))
-    sanitized <- spark_sanitize_names(colNames)
-    if (!identical(colNames, sanitized))
-      df <- invoke(df, "toDF", as.list(sanitized))
-  }
 
   spark_partition_register_df(sc, df, name, repartition, memory)
 }

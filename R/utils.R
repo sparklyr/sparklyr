@@ -137,7 +137,7 @@ spark_require_version <- function(sc, required, module = NULL) {
   # check and report version requirements
   version <- spark_version(sc)
   if (version < required) {
-    fmt <- "'%s' requires Spark %s but you are using Spark %s"
+    fmt <- "%s requires Spark %s or higher."
     msg <- sprintf(fmt, module, required, version)
     stop(msg, call. = FALSE)
   }

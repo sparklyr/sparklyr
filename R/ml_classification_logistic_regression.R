@@ -347,7 +347,7 @@ new_ml_model_logistic_regression <- function(
   # extract coefficients (can be either a vector or matrix, depending
   # on binomial vs. multinomial)
   coefficients <- if (is_multinomial) {
-    if (spark_version(sc) < "2.1.0") stop("Multinomial regression requires Spark 2.1.0 or higher.")
+    spark_require_version(sc, "2.1.0", "Multinomial regression")
 
     # multinomial
     coefficients <- model$coefficient_matrix

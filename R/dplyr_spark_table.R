@@ -47,3 +47,15 @@ sample_frac.tbl_spark <- function(tbl,
 slice_.tbl_spark <- function(x, ...) {
   stop("Slice is not supported in this version of sparklyr")
 }
+
+#' @export
+head.tbl_spark <- function(x, n = 6L, ...) {
+  sdf <- spark_dataframe(x)
+
+  if (sdf_is_streaming(sdf)) {
+    # head operations not supported over streams but used in tibble print
+    x
+  } else {
+    add_op_single("head", x, args = list(n = n))
+  }
+}

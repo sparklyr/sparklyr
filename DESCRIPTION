@@ -38,6 +38,7 @@ Imports:
     lazyeval (>= 0.2.0),
     methods,
     openssl (>= 0.8),
+    r2d3,
     rappdirs,
     rlang (>= 0.1.4),
     rprojroot,

@@ -9,8 +9,8 @@
 #' @return A correlation matrix organized as a data frame.
 #' @export
 ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
-  if (spark_version(spark_connection(x)) < "2.2.0")
-    stop("`ml_corr()` requires Spark 2.2.0+")
+  spark_require_version(spark_connection(x), "2.2.0")
+
   method <- match.arg(method)
 
   columns <- if (rlang::is_null(columns)) colnames(x) else {
@@ -77,8 +77,8 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
 #'   degrees of freedom, and test statistics.
 #' @export
 ml_chisquare_test <- function(x, features, label) {
-  if (spark_version(spark_connection(x)) < "2.2.0")
-    stop("`ml_chisquare_test()` requires Spark 2.2.0+")
+  spark_require_version(spark_connection(x), "2.2.0")
+
   schema <- sdf_schema(x)
 
   columns <- c(features, label)

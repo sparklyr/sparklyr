@@ -34,8 +34,10 @@ provided by the \code{SPARK_HOME} environment variable. If
 \code{version} parameter is specified to force the use of a locally
 installed version.}
 
-\item{method}{The method used to connect to Spark. Currently, only
-\code{"shell"} is supported.}
+\item{method}{The method used to connect to Spark. Default connection method
+is \code{"shell"} to connect using spark-submit, use \code{"livy"} to
+perform remote connections using HTTP, or \code{"databricks"} when using a
+Databricks clusters.}
 
 \item{app_name}{The application name to be used while running in the Spark
 cluster.}

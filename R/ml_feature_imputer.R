@@ -30,8 +30,7 @@ ft_imputer.spark_connection <- function(
   dataset = NULL,
   uid = random_string("imputer_"), ...
 ) {
-
-  if (spark_version(x) < "2.2.0") stop("ft_imputer() requires Spark 2.2.0+")
+  spark_require_version(x, "2.2.0", "ft_imputer()")
 
   ml_ratify_args()
   jobj <- invoke_new(x, "org.apache.spark.ml.feature.Imputer", uid) %>%

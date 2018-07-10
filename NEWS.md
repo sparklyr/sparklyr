@@ -1,5 +1,19 @@
 # Sparklyr 0.9.0 (unreleased)
 
+## Streaming
+
+- Support for `stream_read_*()` and `stream_write_*()` to read from and
+  to Spark structured streams.
+  
+- Support for `dplyr`, `sdf_sql()`, `spark_apply()` and scoring pipeline 
+  in Spark streams.
+  
+- Support for `reactiveSpark()` to create a `shiny` reactive over a Spark
+  stream.
+  
+- Support for convenience functions `stream_*()` to stop, change triggers,
+  print, etc.
+
 ### Monitoring
 
 - Support for interrupting long running operations and recover gracefully
@@ -36,6 +50,12 @@
 
 ### Distributed R
 
+- Breaking Change: `spark_apply()` no longer defaults to the input
+  column names when the `columns` parameter is nos specified.
+
+- Support for reading column names from the R data frame
+  returned by `spark_apply()`.
+
 - Fix to support retrieving empty data frames in grouped
   `spark_apply()` operations (#1505).
 
@@ -64,7 +84,8 @@
 - Many new examples for `ml_kmeans()`, `ml_pca()`, `ml_naive_bayes()`, `ml_bisecting_kmeans()`,
   `ml_decision_tree()`, `ml_random_forest()`, `ml_evaluator()`, `ml_multilayer_perceptron()`,
   `ml_linear_regression()`, `ml_logistic_regression()`, `ml_cross_validator()`, 
-  `ft_binarizer()`, `ft_bucketrizer()`, `sdf_pivot()`, `ml_als()` (@samuelmacedo83).
+  `ft_binarizer()`, `ft_bucketrizer()`, `sdf_pivot()`, `ml_als()`,
+  `ml_gradient_boosted_trees()` (@samuelmacedo83).
 
 # Sparklyr 0.8.4
 

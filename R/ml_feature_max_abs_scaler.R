@@ -21,8 +21,7 @@ ft_max_abs_scaler.spark_connection <- function(
   dataset = NULL,
   uid = random_string("max_abs_scaler_"), ...) {
 
-  if (spark_version(x) < "2.0.0")
-    stop("ft_max_abs_scaler() requires Spark 2.0.0+")
+  spark_require_version(x, "2.0.0", "ft_max_abs_scaler()")
 
   ml_ratify_args()
 

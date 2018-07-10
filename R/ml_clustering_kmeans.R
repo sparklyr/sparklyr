@@ -208,8 +208,8 @@ print.ml_model_kmeans <- function(x, ...) {
 #'   on the given data.
 #' @export
 ml_compute_cost <- function(model, dataset) {
-  version <- spark_version(spark_connection(spark_jobj(model)))
-  if (version < "2.0.0") stop("'ml_compute_cost()' requires Spark 2.0+")
+  spark_require_version(spark_connection(spark_jobj(model)), "2.0.0")
+
   if (inherits(model, "ml_model_kmeans")) {
     model$pipeline_model %>%
       ml_stage(1) %>%
