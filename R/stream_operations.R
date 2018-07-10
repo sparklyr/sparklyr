@@ -199,6 +199,7 @@ stream_generate_random <- function(df, path = "streams-random", interval = 5)
 #'
 #' Finds and returns a stream based on the stream's itentifier.
 #'
+#' @param sc The associated Spark connection.
 #' @param id The stream identifier to find.
 #'
 #' @export

@@ -7,6 +7,8 @@
 stream_find(sc, id)
 }
 \arguments{
+\item{sc}{The associated Spark connection.}
+
 \item{id}{The stream identifier to find.}
 }
 \description{

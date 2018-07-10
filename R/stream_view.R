@@ -34,6 +34,7 @@ stream_view <- function(
 )
 {
   validate <- stream_progress(stream)
+  interval <- 1000
 
   ui <- d3Output("plot")
   options <- list(...)
@@ -109,6 +110,8 @@ stream_render <- function(
 
   for (i in seq_len(collect)) {
     data <- stream_progress(stream)
+
+    message("stream_render: ", data$timestamp, " [", data$inputRowsPerSecond, ":", data$processedRowsPerSecond, "] ", Sys.time())
 
     stats[[length(stats) + 1]] <- list(
       timestamp = data$timestamp,
