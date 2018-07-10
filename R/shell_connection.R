@@ -27,7 +27,7 @@ shell_connection <- function(master,
       installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, hint = TRUE)
       spark_home <- installInfo$sparkVersionDir
 
-      if (is.null(version))
+      if (is.null(version) && interactive())
         message("* Using Spark: ", installInfo$sparkVersion)
     }
   }
