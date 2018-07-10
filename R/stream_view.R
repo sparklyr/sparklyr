@@ -62,8 +62,8 @@ stream_view <- function(
       session$sendCustomMessage(type = "sparklyr_stream_view", list(
         timestamp = data$timestamp,
         rps = list(
-          "in" = floor(data$inputRowsPerSecond),
-          "out" = floor(data$processedRowsPerSecond)
+          "in" = if (is.numeric(data$inputRowsPerSecond)) floor(data$inputRowsPerSecond) else 0,
+          "out" = if (is.numeric(data$processedRowsPerSecond)) floor(data$processedRowsPerSecond) else 0
         )
       ))
     })
