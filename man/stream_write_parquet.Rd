@@ -5,9 +5,8 @@
 \title{Write Parquet Stream}
 \usage{
 stream_write_parquet(x, path, mode = c("append", "complete", "update"),
-  trigger = stream_trigger_interval(interval = 5000),
-  checkpoint = file.path(path, "checkpoints", random_string("")),
-  options = list(), ...)
+  trigger = stream_trigger_interval(), checkpoint = file.path(path,
+  "checkpoints", random_string("")), options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}

@@ -4,7 +4,7 @@
 \alias{stream_render}
 \title{Render Stream}
 \usage{
-stream_render(stream, collect = 10, ...)
+stream_render(stream = NULL, collect = 10, stats = NULL, ...)
 }
 \arguments{
 \item{stream}{The stream to render}
@@ -12,12 +12,15 @@ stream_render(stream, collect = 10, ...)
 \item{collect}{The interval in seconds to collect data before rendering the
 'htmlwidget'.}
 
+\item{stats}{Optional stream statistics collected using \code{stream_stats()},
+when specified, \code{stream} should be omitted.}
+
 \item{...}{Additional optional arguments.
 
 #' @examples
 
 library(sparklyr)
-
+sc <- spark_connect(master = "local")
 
 dir.create("iris-in")
 write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
