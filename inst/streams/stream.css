@@ -1,5 +1,6 @@
 svg {
   font: 12px sans-serif;
+  position: absolute;
 }
 
 .label {

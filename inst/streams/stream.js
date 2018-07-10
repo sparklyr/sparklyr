@@ -58,9 +58,7 @@ function StreamRenderer(stats) {
 
   var svg = div.append("svg");
   var chart = div.append("svg")
-    .attr("class", "chart")
-    .style("top", 0)
-    .style("left", 0);
+    .attr("class", "chart");
 
   chart.append("marker")
     .attr("id", "circle")
@@ -97,7 +95,7 @@ function StreamRenderer(stats) {
     svg.attr("width", newWidth).attr("height", newHeight);
 
     chart.attr("width", newWidth).attr("height", chartHeight);
-    chart.style("top", remotesHeight + "px");
+    chart.style("margin-top", remotesHeight + "px");
 
     chart.style("display", newHeight < 120 ? "none" : "block");
 
