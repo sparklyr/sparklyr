@@ -10,6 +10,20 @@
 #' @param max Upper bound after transformation, shared by all features Default: 1.0
 #' @param min Lower bound after transformation, shared by all features Default: 0.0
 #'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
+#'
+#' iris_tbl %>%
+#'   ft_vector_assembler(input_col = features,
+#'                       output_col = "features_temp") %>%
+#'   ft_min_max_scaler(input_col = "features_temp",
+#'                      output_col = "features")
+#' }
+#'
 #' @export
 ft_min_max_scaler <- function(
   x, input_col, output_col,
