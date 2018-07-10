@@ -4,6 +4,20 @@
 #'   largest maximum absolute value in each feature. It does not shift/center the
 #'   data, and thus does not destroy any sparsity.
 #'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
+#'
+#' iris_tbl %>%
+#'   ft_vector_assembler(input_col = features,
+#'                       output_col = "features_temp") %>%
+#'   ft_max_abs_scaler(input_col = "features_temp",
+#'                      output_col = "features")
+#' }
+#'
 #' @template roxlate-ml-feature-input-output-col
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-estimator-transformer

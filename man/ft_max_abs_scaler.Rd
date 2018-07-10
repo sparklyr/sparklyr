@@ -54,6 +54,21 @@ When \code{dataset} is provided for an estimator transformer, the function
   in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
   to obtain a transformer, which is then immediately used to transform \code{x}.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
+
+iris_tbl \%>\%
+  ft_vector_assembler(input_col = features,
+                      output_col = "features_temp") \%>\%
+  ft_max_abs_scaler(input_col = "features_temp",
+                     output_col = "features")
+}
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
