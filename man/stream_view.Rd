@@ -4,7 +4,7 @@
 \alias{stream_view}
 \title{View Stream}
 \usage{
-stream_view(stream, interval = 1000, ...)
+stream_view(stream, ...)
 }
 \arguments{
 \item{stream}{The stream to visualize.}
@@ -15,12 +15,13 @@ stream_view(stream, interval = 1000, ...)
 
 library(sparklyr)
 
-stream_read_csv() %>%
-  stream_write_csv() %>%
-  stream_view(stream) %>%
-  stream_stop()}
+dir.create("iris-in")
+write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
 
-\item{invalidate}{The invalidation interval in milliseconds.}
+stream_read_csv("iris-in/") %>%
+  stream_write_csv("iris-out/") %>%
+  stream_view() %>%
+  stream_stop()}
 }
 \description{
 Opens a Shiny gadget to visualize the given stream.
