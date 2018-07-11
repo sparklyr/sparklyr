@@ -230,6 +230,7 @@ stream_find <- function(sc, id)
 stream_watermark <- function(x, column = "timestamp", threshold = "10 minutes")
 {
   sdf <- spark_dataframe(x)
+  sc <- spark_connection(x)
 
   if (!column %in% invoke(sdf, "columns")) {
     sdf <- sdf %>%
