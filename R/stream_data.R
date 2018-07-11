@@ -239,8 +239,6 @@ stream_write_memory <- function(x,
   sc <- spark_connection(x)
   spark_require_version(sc, "2.0.0", "Spark streaming")
 
-  mode <- match.arg(as.character(mode), choices = c("append", "complete", "update"))
-
   if (missing(mode)) {
     mode <- "append"
     tryCatch({

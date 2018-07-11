@@ -215,3 +215,32 @@ stream_find <- function(sc, id)
   spark_session(sc) %>% invoke("streams") %>% invoke("get", id) %>% stream_class()
 }
 
+#' Watermark Stream
+#'
+#' Ensures a stream has a watermark defined, which is required for some
+#' operations over streams.
+#'
+#' @param x An object coercable to a Spark Streaming DataFrame.
+#' @param column The name of the column that contains the event time of the row,
+#'   if the column is missing, a column with the current time will be added.
+#' @param threshold The minimum delay to wait to data to arrive late, defaults
+#'   to ten minutes.
+#'
+#' @export
+stream_watermark <- function(x, column = "timestamp", threshold = "10 minutes")
+{
+  sdf <- spark_dataframe(x)
+
+  if (!column %in% invoke(sdf, "columns")) {
+    sdf <- sdf %>%
+      invoke(
+        "withColumn",
+        column,
+        invoke_static(sc, "org.apache.spark.sql.functions", "expr", "current_timestamp()")
+      )
+  }
+
+  sdf %>%
+    invoke("withWatermark", "timestamp", threshold) %>%
+    sdf_register()
+}

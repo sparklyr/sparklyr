@@ -18,5 +18,5 @@ none. If non-null, the reader will automatically stop when the session ends.}
 }
 \description{
 Given a spark object, returns a reactive data source for the contents
-of the spark object. This function is most Useful to read Spark streams.
+of the spark object. This function is most useful to read Spark streams.
 }
