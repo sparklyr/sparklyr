@@ -236,9 +236,29 @@ stream_write_memory <- function(x,
                                 options = list(),
                                 ...)
 {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
   sc <- spark_connection(x)
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  mode <- match.arg(as.character(mode), choices = c("append", "complete", "update"))
+
+  if (missing(mode)) {
+    mode <- "append"
+    tryCatch({
+      queryPlan <- spark_dataframe(x) %>% invoke("queryExecution") %>% invoke("analyzed")
+      tryMode <- invoke_static(sc, "org.apache.spark.sql.streaming.OutputMode", "Complete")
+      invoke_static(
+        sc,
+        "org.apache.spark.sql.catalyst.analysis.UnsupportedOperationChecker",
+        "checkForStreaming",
+        queryPlan,
+        tryMode
+      )
+
+      mode <- "complete"
+    }, error = function(e){
+
+    })
+  }
 
   stream_write_generic(x,
                        path = name,

@@ -154,27 +154,9 @@ sdf_collect_stream <- function(x, ...)
   # or a proper sink makes more sense.
   if (is.null(n)) n <- getOption("dplyr.print_min", getOption("tibble.print_min", 10))
 
-  mode <- "append"
-  tryCatch({
-    queryPlan <- spark_dataframe(x) %>% invoke("queryExecution") %>% invoke("analyzed")
-    tryMode <- invoke_static(sc, "org.apache.spark.sql.streaming.OutputMode", "Complete")
-    invoke_static(
-      sc,
-      "org.apache.spark.sql.catalyst.analysis.UnsupportedOperationChecker",
-      "checkForStreaming",
-      queryPlan,
-      tryMode
-    )
-
-    mode <- "complete"
-  }, error = function(e){
-
-  })
-
   memory <- stream_write_memory(
     x,
-    trigger = stream_trigger_interval(interval = 0),
-    mode = mode
+    trigger = stream_trigger_interval(interval = 0)
   )
 
   data <- data.frame()

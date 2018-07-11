@@ -33,7 +33,7 @@ reactiveSpark <- function(x,
 
   name <- random_string("sparklyr_tmp_")
 
-  stream <- traceable %>% stream_write_memory(name, mode = "complete")
+  stream <- traceable %>% stream_write_memory(name)
 
   reactivePoll(
     intervalMillis = intervalMillis,
