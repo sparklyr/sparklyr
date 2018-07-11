@@ -397,10 +397,7 @@ spark_apply <- function(x,
     )
   }
 
-  if (sdf_is_streaming(sdf))
-    transformed
-  else
-    sdf_register(transformed)
+  sdf_register(transformed)
 }
 
 spark_apply_rlang_serialize <- function() {
