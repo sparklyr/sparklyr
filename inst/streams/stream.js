@@ -56,6 +56,7 @@ function StreamRenderer(stats) {
   var width = 0;
   var height = 0;
 
+  div.attr("class", "root");
   var svg = div.append("svg");
   var chart = div.append("svg")
     .attr("class", "chart");
