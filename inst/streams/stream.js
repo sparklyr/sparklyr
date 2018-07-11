@@ -1,4 +1,4 @@
-// !preview r2d3 data=list(sources = list("FileStreamSource[file]"), sinks = list("FileSink[file]"), stats = list(list(rps = list("in" = 1, out = 2)), list(rps = list("in" = 5, out = 10)), list(rps = list("in" = 1, out = 10)))), options = list(demo = FALSE), container = "div"
+// !preview r2d3 data=list(sources = list("FileStreamSource[file]"), sinks = list("FileSink[file]"), stats = list(list(rps = list("in" = 3, out = 2)), list(rps = list("in" = 5, out = 10)), list(rps = list("in" = 10, out = 10)), list(rps = list("in" = 10, out = 10)), list(rps = list("in" = 10, out = 10)), list(rps = list("in" = 10, out = 10)), list(rps = list("in" = 10, out = 10)), list(rps = list("in" = 10, out = 10)), list(rps = list("in" = 10, out = 10)), list(rps = list("in" = 10, out = 10)))), options = list(demo = FALSE), container = "div"
 
 function StreamStats() {
   var rpmIn = [0];
@@ -56,6 +56,7 @@ function StreamRenderer(stats) {
   var width = 0;
   var height = 0;
 
+  div.attr("class", "root");
   var svg = div.append("svg");
   var chart = div.append("svg")
     .attr("class", "chart");
@@ -76,12 +77,14 @@ function StreamRenderer(stats) {
   var rowsPerSecondOut;
 
   var barWidth = 10;
-  var margin = 15;
+  var margin = 25;
   var marginLeft = margin + 20;
   var remotesCircle = 10;
   var remotesMargin = margin;
   var remotesHeight = 0;
   var chartHeight = 0;
+  var barsHeight = 0;
+  var annotationHeight = 20;
   var stopped = false;
 
   this.formatRps = function(num) {
@@ -89,13 +92,14 @@ function StreamRenderer(stats) {
   };
 
   this.setSize = function(newWidth, newHeight) {
-    remotesHeight = Math.min(50, newHeight / 3);
-    chartHeight = newHeight - 2 * remotesHeight;
+    remotesHeight = Math.min(40, newHeight / 3);
+    chartHeight = newHeight - 2 * remotesHeight - 2 * margin;
+    barsHeight = chartHeight - 2 * annotationHeight;
 
     svg.attr("width", newWidth).attr("height", newHeight);
 
     chart.attr("width", newWidth).attr("height", chartHeight);
-    chart.style("margin-top", remotesHeight + "px");
+    chart.style("margin-top", margin + remotesHeight + "px");
 
     chart.style("display", newHeight < 120 ? "none" : "block");
 
@@ -127,11 +131,16 @@ function StreamRenderer(stats) {
       .text(text);
   };
 
+  var animateClass = "animate";
+  this.setAnimateClass = function(name) {
+    animateClass = name;
+  };
+
   this.update = function() {
     chart.attr("class", "chart");
     if (!stopped) {
       setTimeout(function() {
-        chart.attr("class", "chart animate");
+        chart.attr("class", "chart " + self.animateClass);
       }, 50);
     }
     else {
@@ -144,8 +153,6 @@ function StreamRenderer(stats) {
     rowsPerSecondIn.style("display", height < 60 ? "none" : "block");
     rowsPerSecondOut.style("display", height < 60 ? "none" : "block");
 
-    var chartHeight = height - 2 * remotesHeight;
-
     var dataIn = chartIn.selectAll("rect")
       .data(stats.rpmIn());
 
@@ -154,9 +161,9 @@ function StreamRenderer(stats) {
         .append("rect")
       .merge(dataIn)
         .attr("width", barWidth - 2)
-        .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxIn();})
+        .attr("height", function(d, i) { return barsHeight / 2 * d / stats.maxIn();})
         .attr("x", function(d, i) { return marginLeft + i * barWidth - barWidth; })
-        .attr("y", function(d, i) { return chartHeight / 2 - chartHeight / 2 * d / stats.maxIn(); })
+        .attr("y", function(d, i) { return chartHeight / 2 - barsHeight / 2 * d / stats.maxIn(); })
         .attr("class", "barIn")
         .on("mouseover", function (d, i) {
           rowsPerSecondIn.text(self.formatRps(d) + " rps");
@@ -172,7 +179,7 @@ function StreamRenderer(stats) {
         .append("rect")
       .merge(dataOut)
         .attr("width", barWidth - 2)
-        .attr("height", function(d, i) { return chartHeight / 2 * d / stats.maxOut();})
+        .attr("height", function(d, i) { return barsHeight / 2 * d / stats.maxOut();})
         .attr("x", function(d, i) { return marginLeft + i * barWidth - barWidth; })
         .attr("y", function(d, i) { return chartHeight / 2; })
         .attr("class", "barOut")
@@ -187,7 +194,7 @@ function StreamRenderer(stats) {
       .attr("class", "horizon")
       .attr("x1", 0)
       .attr("y1", chartHeight / 2)
-      .attr("x2", width)
+      .attr("x2", width - margin / 2)
       .attr("y2", chartHeight / 2);
 
     this.annotate(marginLeft + barWidth * (stats.count() - 1) - 4, "Start");
@@ -316,8 +323,7 @@ if (options !== null && "demo" in options && options.demo === true) {
     renderer.update();
   }, 1000);
 }
-
-if (typeof(Shiny) !== "undefined") {
+else if (typeof(Shiny) !== "undefined") {
   Shiny.addCustomMessageHandler("sparklyr_stream_view", function(data) {
       debug(JSON.stringify(data));
       stats.add(data.rps);
@@ -325,8 +331,7 @@ if (typeof(Shiny) !== "undefined") {
     }
   );
 }
-
-if (data !== null && "stats" in data) {
+else if (data !== null && "stats" in data) {
   var statsIdx = 0;
   setInterval(function(data) {
     return function() {
@@ -341,9 +346,11 @@ if (data !== null && "stats" in data) {
 
       debug(JSON.stringify(d));
       stats.add(d.rps);
+
+      renderer.setAnimateClass("animateFast");
       renderer.update();
 
       statsIdx += 1;
     };
-  }(data), 1000);
+  }(data), 100);
 }

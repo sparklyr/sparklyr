@@ -172,7 +172,7 @@ stream_read_csv <- function(sc,
 stream_write_csv <- function(x,
                              path,
                              mode = c("append", "complete", "update"),
-                             trigger = stream_trigger_interval(interval = 5000),
+                             trigger = stream_trigger_interval(),
                              checkpoint = file.path(path, "checkpoint"),
                              header = TRUE,
                              delimiter = ",",
@@ -231,14 +231,32 @@ stream_write_csv <- function(x,
 stream_write_memory <- function(x,
                                 name = random_string("sparklyr_tmp_"),
                                 mode = c("append", "complete", "update"),
-                                trigger = stream_trigger_interval(interval = 5000),
+                                trigger = stream_trigger_interval(),
                                 checkpoint = file.path("checkpoints", name, random_string("")),
                                 options = list(),
                                 ...)
 {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
   sc <- spark_connection(x)
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  if (missing(mode)) {
+    mode <- "append"
+    tryCatch({
+      queryPlan <- spark_dataframe(x) %>% invoke("queryExecution") %>% invoke("analyzed")
+      tryMode <- invoke_static(sc, "org.apache.spark.sql.streaming.OutputMode", "Complete")
+      invoke_static(
+        sc,
+        "org.apache.spark.sql.catalyst.analysis.UnsupportedOperationChecker",
+        "checkForStreaming",
+        queryPlan,
+        tryMode
+      )
+
+      mode <- "complete"
+    }, error = function(e){
+
+    })
+  }
 
   stream_write_generic(x,
                        path = name,
@@ -304,7 +322,7 @@ stream_read_text <- function(sc,
 stream_write_text <- function(x,
                               path,
                               mode = c("append", "complete", "update"),
-                              trigger = stream_trigger_interval(interval = 5000),
+                              trigger = stream_trigger_interval(),
                               checkpoint = file.path(path, "checkpoints", random_string("")),
                               options = list(),
                               ...)
@@ -376,7 +394,7 @@ stream_read_json <- function(sc,
 stream_write_json <- function(x,
                               path,
                               mode = c("append", "complete", "update"),
-                              trigger = stream_trigger_interval(interval = 5000),
+                              trigger = stream_trigger_interval(),
                               checkpoint = file.path(path, "checkpoints", random_string("")),
                               options = list(),
                               ...)
@@ -447,7 +465,7 @@ stream_read_parquet <- function(sc,
 stream_write_parquet <- function(x,
                                  path,
                                  mode = c("append", "complete", "update"),
-                                 trigger = stream_trigger_interval(interval = 5000),
+                                 trigger = stream_trigger_interval(),
                                  checkpoint = file.path(path, "checkpoints", random_string("")),
                                  options = list(),
                                  ...)
@@ -518,7 +536,7 @@ stream_read_orc <- function(sc,
 stream_write_orc <- function(x,
                              path,
                              mode = c("append", "complete", "update"),
-                             trigger = stream_trigger_interval(interval = 5000),
+                             trigger = stream_trigger_interval(),
                              checkpoint = file.path(path, "checkpoints", random_string("")),
                              options = list(),
                              ...)
@@ -588,7 +606,7 @@ stream_read_kafka <- function(sc,
 #' @export
 stream_write_kafka <- function(x,
                                mode = c("append", "complete", "update"),
-                               trigger = stream_trigger_interval(interval = 5000),
+                               trigger = stream_trigger_interval(),
                                checkpoint = file.path("checkpoints", random_string("")),
                                options = list(),
                                ...)
@@ -657,7 +675,7 @@ stream_read_jdbc <- function(sc,
 #' @export
 stream_write_jdbc <- function(x,
                               mode = c("append", "complete", "update"),
-                              trigger = stream_trigger_interval(interval = 5000),
+                              trigger = stream_trigger_interval(),
                               checkpoint = file.path("checkpoints", random_string("")),
                               options = list(),
                               ...)

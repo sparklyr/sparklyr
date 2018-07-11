@@ -5,9 +5,8 @@
 \title{Write JDBC Stream}
 \usage{
 stream_write_jdbc(x, mode = c("append", "complete", "update"),
-  trigger = stream_trigger_interval(interval = 5000),
-  checkpoint = file.path("checkpoints", random_string("")),
-  options = list(), ...)
+  trigger = stream_trigger_interval(), checkpoint = file.path("checkpoints",
+  random_string("")), options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}

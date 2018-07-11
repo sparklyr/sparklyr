@@ -6,9 +6,8 @@
 \usage{
 stream_write_memory(x, name = random_string("sparklyr_tmp_"),
   mode = c("append", "complete", "update"),
-  trigger = stream_trigger_interval(interval = 5000),
-  checkpoint = file.path("checkpoints", name, random_string("")),
-  options = list(), ...)
+  trigger = stream_trigger_interval(), checkpoint = file.path("checkpoints",
+  name, random_string("")), options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}

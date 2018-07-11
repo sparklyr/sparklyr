@@ -5,10 +5,10 @@
 \title{Write CSV Stream}
 \usage{
 stream_write_csv(x, path, mode = c("append", "complete", "update"),
-  trigger = stream_trigger_interval(interval = 5000),
-  checkpoint = file.path(path, "checkpoint"), header = TRUE,
-  delimiter = ",", quote = "\\"", escape = "\\\\", charset = "UTF-8",
-  null_value = NULL, options = list(), ...)
+  trigger = stream_trigger_interval(), checkpoint = file.path(path,
+  "checkpoint"), header = TRUE, delimiter = ",", quote = "\\"",
+  escape = "\\\\", charset = "UTF-8", null_value = NULL,
+  options = list(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}

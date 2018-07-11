@@ -9,20 +9,22 @@ stream_view(stream, ...)
 \arguments{
 \item{stream}{The stream to visualize.}
 
-\item{...}{Additional optional arguments.
-
-#' @examples
-
+\item{...}{Additional optional arguments.}
+}
+\description{
+Opens a Shiny gadget to visualize the given stream.
+}
+\examples{
+\dontrun{
 library(sparklyr)
+sc <- spark_connect(master = "local")
 
 dir.create("iris-in")
 write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
 
-stream_read_csv("iris-in/") %>%
-  stream_write_csv("iris-out/") %>%
-  stream_view() %>%
-  stream_stop()}
+stream_read_csv("iris-in/") \%>\%
+  stream_write_csv("iris-out/") \%>\%
+  stream_view() \%>\%
+  stream_stop()
 }
-\description{
-Opens a Shiny gadget to visualize the given stream.
 }

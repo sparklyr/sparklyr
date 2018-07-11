@@ -4,7 +4,7 @@
 \alias{stream_trigger_interval}
 \title{Spark Stream Interval Trigger}
 \usage{
-stream_trigger_interval(interval = 5000)
+stream_trigger_interval(interval = 1000)
 }
 \arguments{
 \item{interval}{The execution interval specified in milliseconds.}

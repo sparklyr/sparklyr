@@ -28,19 +28,17 @@ stream_register_job <- function(stream)
         )
       },
       stop = function(id) {
-        api$add_job_progress(id, 100L)
         stream_stop(stream)
-        api$remove_job(id)
       }
     )
 
-    job <- rstudio_jobs_api_new(
+    stream$job <- rstudio_jobs_api_new(
       paste("Spark Stream", streamId),
       100L,
       jobActions
     )
 
-    api$add_job_progress(job, 10L)
+    api$add_job_progress(stream$job, 10L)
   }
 
   stream

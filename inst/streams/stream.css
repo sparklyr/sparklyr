@@ -1,3 +1,7 @@
+.root {
+  position: absolute;
+}
+
 svg {
   font: 12px sans-serif;
   position: absolute;
@@ -31,11 +35,23 @@ svg {
     100% { transform: translateX(100px) }
 }
 
+@keyframes svgTranslateFast {
+    0%   { transform: translateX(0px) }
+    100% { transform: translateX(1000px) }
+}
+
 .chart {
   position: absolute;
 }
 
 .chart.animate {
+  animation-name: svgTranslate;
+  animation-duration: 10s;
+  animation-timing-function: linear;
+  animation-delay: 0s;
+}
+
+.chart.animate-fast {
   animation-name: svgTranslate;
   animation-duration: 10s;
   animation-timing-function: linear;

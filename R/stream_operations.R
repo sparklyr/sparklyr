@@ -38,8 +38,13 @@ print.spark_stream <- function(x, ...)
 #' @export
 stream_stop <- function(stream)
 {
-  invoke(stream, "stop") %>%
-    invisible()
+  if (!is.null(stream$job)) rstudio_jobs_api()$add_job_progress(stream$job, 100L)
+
+  stopped <- invoke(stream, "stop")
+
+  if (!is.null(stream$job)) rstudio_jobs_api()$remove_job(stream$job)
+
+  invisible(stopped)
 }
 
 stream_validate <- function(stream)
@@ -73,7 +78,7 @@ stream_validate <- function(stream)
 #' @seealso \code{\link{stream_trigger_continuous}}
 #' @export
 stream_trigger_interval <- function(
-  interval = 5000
+  interval = 1000
 )
 {
   structure(class = c("stream_trigger_interval"), list(
@@ -149,7 +154,10 @@ sdf_collect_stream <- function(x, ...)
   # or a proper sink makes more sense.
   if (is.null(n)) n <- getOption("dplyr.print_min", getOption("tibble.print_min", 10))
 
-  memory <- stream_write_memory(x, trigger = stream_trigger_interval(interval = 0))
+  memory <- stream_write_memory(
+    x,
+    trigger = stream_trigger_interval(interval = 0)
+  )
 
   data <- data.frame()
 
@@ -207,3 +215,33 @@ stream_find <- function(sc, id)
   spark_session(sc) %>% invoke("streams") %>% invoke("get", id) %>% stream_class()
 }
 
+#' Watermark Stream
+#'
+#' Ensures a stream has a watermark defined, which is required for some
+#' operations over streams.
+#'
+#' @param x An object coercable to a Spark Streaming DataFrame.
+#' @param column The name of the column that contains the event time of the row,
+#'   if the column is missing, a column with the current time will be added.
+#' @param threshold The minimum delay to wait to data to arrive late, defaults
+#'   to ten minutes.
+#'
+#' @export
+stream_watermark <- function(x, column = "timestamp", threshold = "10 minutes")
+{
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(x)
+
+  if (!column %in% invoke(sdf, "columns")) {
+    sdf <- sdf %>%
+      invoke(
+        "withColumn",
+        column,
+        invoke_static(sc, "org.apache.spark.sql.functions", "expr", "current_timestamp()")
+      )
+  }
+
+  sdf %>%
+    invoke("withWatermark", "timestamp", threshold) %>%
+    sdf_register()
+}
