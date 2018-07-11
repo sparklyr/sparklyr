@@ -15,22 +15,23 @@ stream_render(stream = NULL, collect = 10, stats = NULL, ...)
 \item{stats}{Optional stream statistics collected using \code{stream_stats()},
 when specified, \code{stream} should be omitted.}
 
-\item{...}{Additional optional arguments.
-
-#' @examples
-
+\item{...}{Additional optional arguments.}
+}
+\description{
+Collects streaming statistics to render the stream as an 'htmlwidget'.
+}
+\examples{
+\dontrun{
 library(sparklyr)
 sc <- spark_connect(master = "local")
 
 dir.create("iris-in")
 write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
 
-stream <- stream_read_csv("iris-in/") %>%
+stream <- stream_read_csv("iris-in/") \%>\%
   stream_write_csv("iris-out/")
 
 stream_render(stream)
-stream_stop(stream)}
+stream_stop(stream)
 }
-\description{
-Collects streaming statistics to render the stream as an 'htmlwidget'.
 }

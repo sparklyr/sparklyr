@@ -14,7 +14,7 @@ stream_progress <- function(stream)
 #' @param ... Additional optional arguments.
 #'
 #' @examples
-#'
+#' \dontrun{
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local")
 #'
@@ -25,7 +25,7 @@ stream_progress <- function(stream)
 #'   stream_write_csv("iris-out/") %>%
 #'   stream_view() %>%
 #'   stream_stop()
-#'
+#' }
 #' @import shiny
 #' @import r2d3
 #' @export
@@ -118,8 +118,8 @@ stream_stats <- function(stream, stats = list()) {
 #'   when specified, \code{stream} should be omitted.
 #' @param ... Additional optional arguments.
 #'
-#' #' @examples
-#'
+#' @examples
+#' \dontrun{
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local")
 #'
@@ -131,7 +131,7 @@ stream_stats <- function(stream, stats = list()) {
 #'
 #' stream_render(stream)
 #' stream_stop(stream)
-#'
+#' }
 #' @import r2d3
 #' @export
 stream_render <- function(

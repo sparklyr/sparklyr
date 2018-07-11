@@ -15,7 +15,7 @@ stream_view(stream, ...)
 Opens a Shiny gadget to visualize the given stream.
 }
 \examples{
-
+\dontrun{
 library(sparklyr)
 sc <- spark_connect(master = "local")
 
@@ -26,5 +26,5 @@ stream_read_csv("iris-in/") \%>\%
   stream_write_csv("iris-out/") \%>\%
   stream_view() \%>\%
   stream_stop()
-
+}
 }
