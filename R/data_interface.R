@@ -93,7 +93,7 @@ spark_read_csv <- function(sc,
     sc,
     spark_normalize_path(path),
     options,
-    if (columnsHaveTypes) columns else NULL)
+    columns)
 
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
