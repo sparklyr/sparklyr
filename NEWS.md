@@ -33,6 +33,9 @@
   
 ### Livy
 
+- Fixed `must share the same src` error for `sdf_broadcast()` and other 
+  functions when using Livy connections.
+
 - Added support for logging `sparklyr` server events and logging sparklyr
   invokes as comments in the Livy UI.
 
