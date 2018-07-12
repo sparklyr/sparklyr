@@ -7,7 +7,15 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   livy_version <- Sys.getenv("LIVY_VERSION")
   if (nchar(livy_version) > 0) {
-    test_filter <- "^dplyr$|^dbi$|^copy-to$"
+    livy_tests <- c(
+      "^dplyr$",
+      "^dbi$",
+      "^copy-to$",
+      "^spark-apply$",
+      "^ml-clustering-kmeans$"
+    )
+
+    test_filter <- paste(livy_tests, sep = "|")
   }
 
   test_check("sparklyr", filter = test_filter)
