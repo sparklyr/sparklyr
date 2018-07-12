@@ -147,6 +147,7 @@ db_analyze.spark_connection <- function(con, table, ...) {
 }
 
 #' @export
+#' @importFrom dplyr same_src
 same_src.src_spark <- function(x, y) {
   if (!inherits(y, "src_spark")) return(FALSE)
 
