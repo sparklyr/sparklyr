@@ -57,7 +57,9 @@ spark_csv_read <- function(sc,
     options <- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
   }
 
-  if (identical(columns, NULL)) {
+  columnsHaveTypes <- !identical(columns, NULL) && length(names(columns)) > 0
+
+  if (identical(columns, NULL) || !columnsHaveTypes) {
     optionSchema <- options
   }
   else {
@@ -70,7 +72,6 @@ spark_csv_read <- function(sc,
     spark_csv_load_name(sc),
     path)
 
-  columnsHaveTypes <- !identical(columns, NULL) && length(names(columns)) > 0
   if ((identical(columns, NULL) && identical(csvOptions$header, "false")) ||
       (!identical(columns, NULL) && !columnsHaveTypes)) {
     if (!identical(columns, NULL)) {
