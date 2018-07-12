@@ -3,6 +3,14 @@ library(testthat)
 library(sparklyr)
 
 if (identical(Sys.getenv("NOT_CRAN"), "true")) {
-  test_check("sparklyr")
+  test_filter <- NULL
+
+  livy_version <- Sys.getenv("LIVY_VERSION")
+  if (nchar(livy_version) > 0) {
+    test_filter <- "^dplyr$|^dbi$|^copy-to$"
+  }
+
+  test_check("sparklyr", filter = test_filter)
+
   on.exit({ spark_disconnect_all() ; livy_service_stop() })
 }
