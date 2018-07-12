@@ -108,7 +108,7 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
 })
 
 test_that("spark_write_table() can append data", {
-  if (spark_version(sc) < "2.2.0") skip("svc not supported before 2.2.0")
+  if (spark_version(sc) < "2.2.0") skip("tables not supported before 2.2.0")
   test_requires("dplyr")
 
   iris_tbl <- testthat_tbl("iris")
@@ -127,7 +127,7 @@ test_that("spark_write_table() can append data", {
 })
 
 test_that("spark_write_table() can write data", {
-  if (spark_version(sc) < "2.2.0") skip("svc not supported before 2.2.0")
+  if (spark_version(sc) < "2.2.0") skip("tables not supported before 2.2.0")
   test_requires("dplyr")
 
   df <- copy_to(sc, data.frame(id = 1L))
@@ -137,4 +137,19 @@ test_that("spark_write_table() can write data", {
   append_table <- tbl(sc, "test_write_table_new")
 
   expect_equal(sdf_nrow(append_table), 1)
+})
+
+test_that("spark_read_csv() can rename columns", {
+  csv <- file("test.csv", "w+")
+  cat("a,b,c\n1,2,3", file = csv)
+  close(csv)
+
+  df <- spark_read_csv(
+    sc,
+    name = "test_column_rename",
+    path = "test.csv",
+    columns = c("AA", "BB", "CC")
+  ) %>% collect()
+
+  expect_equal(names(df), c("AA", "BB", "CC"))
 })
