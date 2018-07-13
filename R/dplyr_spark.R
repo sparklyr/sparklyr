@@ -145,3 +145,17 @@ db_analyze.spark_connection <- function(con, table, ...) {
     dbExecute(con, build_sql("ANALYZE TABLE", table, "COMPUTE STATISTICS", con = con))
   }
 }
+
+#' @export
+#' @importFrom dplyr same_src
+same_src.src_spark <- function(x, y) {
+  if (!inherits(y, "src_spark")) return(FALSE)
+
+  # By default, dplyr uses identical(x$con, y$con); however,
+  # sparklyr connection might slightly change due to the state
+  # it manages.
+
+  identical(x$con$master, y$con$master) &&
+    identical(x$con$app_name, y$con$app_name) &&
+    identical(x$con$method, y$con$method)
+}

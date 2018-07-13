@@ -1,7 +1,7 @@
 context("dbi")
 sc <- testthat_spark_connection()
 
-dbi_df <- data_frame(a = 1:3, b = letters[1:3])
+dbi_df <- data.frame(a = 1:3, b = letters[1:3])
 
 test_that("dbWriteTable can write a table", {
   test_requires("dbi")

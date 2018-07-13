@@ -22,6 +22,14 @@ spark_install_winutils <- function(version) {
 }
 
 testthat_spark_connection <- function() {
+  livy_version <- Sys.getenv("LIVY_VERSION")
+  if (nchar(livy_version) > 0)
+    testthat_livy_connection()
+  else
+    testthat_shell_connection()
+}
+
+testthat_shell_connection <- function() {
   version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
 
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
@@ -131,7 +139,8 @@ sdf_query_plan <- function(x) {
 }
 
 testthat_livy_connection <- function() {
-  version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
+  version <- Sys.getenv("SPARK_VERSION", unset = "2.3.0")
+  livy_version <- Sys.getenv("LIVY_VERSION", "0.5.0")
 
   if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
@@ -145,7 +154,7 @@ testthat_livy_connection <- function() {
   }
 
   if (nrow(livy_installed_versions()) == 0) {
-    livy_install("0.5.0", spark_version = version)
+    livy_install(livy_version, spark_version = version)
   }
 
   expect_gt(nrow(livy_installed_versions()), 0)
@@ -163,7 +172,7 @@ testthat_livy_connection <- function() {
 
   if (!connected) {
     livy_service_start(
-      version = "0.5.0",
+      version = livy_version,
       spark_version = version,
       stdout = FALSE,
       stderr = FALSE)
@@ -206,3 +215,8 @@ param_add_version <- function(args, min_version, ...) {
 }
 
 output_file <- function(filename) file.path("output", filename)
+
+skip_livy <- function() {
+  livy_version <- Sys.getenv("LIVY_VERSION")
+  if (nchar(livy_version) > 0) skip("Test unsupported under Livy.")
+}
