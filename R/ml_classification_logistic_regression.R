@@ -369,7 +369,7 @@ new_ml_model_logistic_regression <- function(
         c("(Intercept)", feature_names)
       )
     else
-      rlang::set_names(coefficients, feature_names)
+      rlang::set_names(model$coefficients, feature_names)
     coefficients
   }
 
