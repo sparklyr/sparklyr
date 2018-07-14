@@ -37,13 +37,13 @@ class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializ
       val anyInetAddress = InetAddress.getByAddress(anyIpAddress)
 
       val channelPort = Utils.nextPort(port, anyInetAddress)
-      logger.log("is using port " + " for backend channel")
+      logger.log("is using port " + channelPort + " for backend channel")
 
       inetAddress = new InetSocketAddress(anyInetAddress, channelPort)
     }
     else {
       val channelPort = Utils.nextPort(port, InetAddress.getLoopbackAddress())
-      logger.log("is using port " + " for backend channel")
+      logger.log("is using port " + channelPort + " for backend channel")
 
       inetAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), channelPort)
     }
