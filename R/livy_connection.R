@@ -511,15 +511,13 @@ livy_validate_master <- function(master, config) {
       retriesErr <- err
     })
 
+    if (is.null(retriesErr)) return(NULL)
+
     retries <- retries - 1;
     Sys.sleep(1)
   }
 
-  if (!is.null(retriesErr)) {
-    stop("Failed to connect to Livy service at ", master, ". ", retriesErr$message)
-  }
-
-  NULL
+  stop("Failed to connect to Livy service at ", master, ". ", retriesErr$message)
 }
 
 livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(substitute(value))) {
