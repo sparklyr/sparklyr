@@ -115,24 +115,6 @@ class Backend() {
     sc = nsc
   }
 
-  def portIsAvailable(port: Int, inetAddress: InetAddress) = {
-    var ss: ServerSocket = null
-    var available = false
-
-    Try {
-        ss = new ServerSocket(port, 1, inetAddress)
-        available = true
-    }
-
-    if (ss != null) {
-        Try {
-            ss.close();
-        }
-    }
-
-    available
-  }
-
   def setType(isServiceParam: Boolean,
               isRemoteParam: Boolean,
               isWorkerParam: Boolean) = {
@@ -172,7 +154,7 @@ class Backend() {
         gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
         port = gatewayServerSocket.getLocalPort()
       }
-      else if (portIsAvailable(port, inetAddress))
+      else if (Utils.portIsAvailable(port, inetAddress))
       {
         logger.log("found port " + port + " is available")
         logger = new Logger("Gateway", sessionId)
@@ -185,7 +167,10 @@ class Backend() {
         logger = new Logger("Backend", sessionId)
         if (isWorker) logger = new Logger("Worker", sessionId)
 
-        gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
+        val newPort = Utils.nextPort(port, inetAddress)
+        logger.log("found port " + newPort + " is available")
+
+        gatewayServerSocket = new ServerSocket(newPort, 1, inetAddress)
         gatewayPort = port
         port = gatewayServerSocket.getLocalPort()
 
@@ -275,7 +260,7 @@ class Backend() {
                 val backendChannel = new BackendChannel(logger, terminate, serializer, tracker)
                 backendChannel.setHostContext(hostContext)
 
-                val backendPort: Int = backendChannel.init(isRemote)
+                val backendPort: Int = backendChannel.init(isRemote, port)
 
                 logger.log("created the backend")
 
