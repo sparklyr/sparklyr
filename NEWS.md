@@ -26,6 +26,12 @@
 - Progress reports can be turned off by setting `sparklyr.progress` to `FALSE`
   in `spark_config()`.
   
+## Kubernetes
+
+- Change backend ports to be choosen deterministically by searching for
+  free ports starting on `sparklyr.gateway.port` which default to `8880`. This
+  allows users to enable port forwarding with `kubectl port-forward`.
+  
 ### Spark ML
 
 - Fix retrieval of coefficients in `ml_logistic_regression()` (@shabbybanks, #1596).
