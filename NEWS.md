@@ -25,6 +25,10 @@
 
 - Progress reports can be turned off by setting `sparklyr.progress` to `FALSE`
   in `spark_config()`.
+  
+### Spark ML
+
+- Fix retrieval of coefficients in `ml_logistic_regression()` (@shabbybanks, #1596).
 
 ### Data
 
