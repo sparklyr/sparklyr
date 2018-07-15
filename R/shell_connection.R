@@ -311,8 +311,7 @@ start_shell <- function(master,
     })
 
     # support custom operations after spark-submit useful to enable port forwarding
-    afterSubmit <- config[["sparklyr.events.aftersubmit"]]
-    if (!is.null(afterSubmit) && is.function(afterSubmit)) afterSubmit()
+    spark_config_value(config, "sparklyr.events.aftersubmit")
 
     # for yarn-cluster
     if (spark_master_is_yarn_cluster(master, config) && is.null(config[["sparklyr.gateway.address"]])) {
