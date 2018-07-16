@@ -91,7 +91,7 @@ spark_connect <- function(master,
     }
   }
 
-  if (nchar(spark_home) == 0) spark_home <- spark_config_value(config, "spark.home")
+  if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 
   # determine whether we need cores in master
   passedMaster <- master

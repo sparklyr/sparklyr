@@ -450,11 +450,11 @@ object Utils {
 
   def nextPort(port: Int, inetAddress: InetAddress) = {
     var freePort = port + 1
-    while (!portIsAvailable(freePort, inetAddress) && freePort - port > 100)
+    while (!portIsAvailable(freePort, inetAddress) && freePort - port < 100)
       freePort += 1
 
     // give up after 100 port searches
-    if (freePort - port > 100) 0 else freePort;
+    if (freePort - port < 100) freePort else 0;
   }
 }
 
