@@ -505,6 +505,8 @@ livy_validate_master <- function(master, config) {
   retries <- 5
   retriesErr <- NULL
   while (retries >= 0) {
+    if (!is.null(retriesErr)) Sys.sleep(1)
+
     tryCatch({
       livy_get_sessions(master, config)
     }, error = function(err) {
@@ -514,7 +516,6 @@ livy_validate_master <- function(master, config) {
     if (is.null(retriesErr)) return(NULL)
 
     retries <- retries - 1;
-    Sys.sleep(1)
   }
 
   stop("Failed to connect to Livy service at ", master, ". ", retriesErr$message)
