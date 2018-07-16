@@ -260,7 +260,7 @@ class Backend() {
                 val backendChannel = new BackendChannel(logger, terminate, serializer, tracker)
                 backendChannel.setHostContext(hostContext)
 
-                val backendPort: Int = backendChannel.init(isRemote, port)
+                val backendPort: Int = backendChannel.init(isRemote, port, !isWorker)
 
                 logger.log("created the backend")
 
