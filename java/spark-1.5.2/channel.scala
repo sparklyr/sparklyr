@@ -31,18 +31,18 @@ class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializ
     hostContext = hostContextParam
   }
 
-  def init(remote: Boolean, port: Int): Int = {
+  def init(remote: Boolean, port: Int, deterministicPort: Boolean): Int = {
     if (remote) {
       val anyIpAddress = Array[Byte](0, 0, 0, 0)
       val anyInetAddress = InetAddress.getByAddress(anyIpAddress)
 
-      val channelPort = Utils.nextPort(port, anyInetAddress)
+      val channelPort = if (deterministicPort) Utils.nextPort(port, anyInetAddress) else 0
       logger.log("is using port " + channelPort + " for backend channel")
 
       inetAddress = new InetSocketAddress(anyInetAddress, channelPort)
     }
     else {
-      val channelPort = Utils.nextPort(port, InetAddress.getLoopbackAddress())
+      val channelPort = if (deterministicPort) Utils.nextPort(port, InetAddress.getLoopbackAddress()) else 0
       logger.log("is using port " + channelPort + " for backend channel")
 
       inetAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), channelPort)
