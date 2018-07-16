@@ -1,11 +1,12 @@
 spark_config_kubernetes_forward <- function(
+  driver,
   ports = c("8880:8880", "8881:8881", "4040:4040")
 )
 {
   Sys.sleep(15)
   system2(
     "kubectl",
-    c("port-forward", "spark-driver", ports),
+    c("port-forward", driver, ports),
     wait = FALSE
   )
 }
@@ -33,13 +34,17 @@ spark_config_kubernetes_forward <- function(
 spark_config_kubernetes <- function(
   master,
   image = "spark:sparklyr",
-  driver = random_string("sparklyr_"),
+  driver = random_string("sparklyr-"),
   account = "spark",
   jar = "local:///opt/sparklyr/sparklyr-2.3-2.11.jar",
   forward = TRUE,
   ...
 ) {
-  forward_function <- if (forward) spark_config_kubernetes_forward else NULL
+  forward_function <- NULL
+  if (forward) {
+    forward_function <- function() spark_config_kubernetes_forward(driver)
+  }
+
   list(
     spark.master = master,
     sparklyr.shell.master = master,
