@@ -222,3 +222,10 @@ test_that("'spark_apply' supports grouped empty results", {
     data %>% group_by(grp) %>% do(process_data(., exclude = "grp"))
   )
 })
+
+test_that("'spark_apply' can use anonymous functions", {
+  expect_equal(
+    sdf_len(sc, 3) %>% spark_apply(~ .x + 1) %>% collect(),
+    2:4
+  )
+})
