@@ -122,6 +122,9 @@ spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE) {
 #'   is an optional object passed as the \code{context} parameter and \code{group1} to
 #'   \code{groupN} contain the values of the \code{group_by} values. When
 #'   \code{group_by} is not specified, \code{f} takes only one argument.
+#'
+#'   Can also be an \code{rlang} anonymous function. For example, as \code{~ .x + 1}
+#'   to define an expression that adds one to the given \code{.x} data frame.
 #' @param columns A vector of column names or a named vector of column types for
 #'   the transformed object. When not specified, a sample of 10 rows is taken to
 #'   infer out the output columns automatically, to avoid this performance penalty,
@@ -185,7 +188,8 @@ spark_apply <- function(x,
                         context = NULL,
                         ...) {
   args <- list(...)
-  assert_that(is.function(f) || is.raw(f))
+  assert_that(is.function(f) || is.raw(f) || is.language(f))
+  if (is.language(f)) f <- rlang::as_closure(f)
 
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
