@@ -12,7 +12,7 @@
   stream.
   
 - Support for convenience functions `stream_*()` to stop, change triggers,
-  print, etc.
+  print, generate test streams, etc.
 
 ### Monitoring
 
