@@ -226,6 +226,6 @@ test_that("'spark_apply' supports grouped empty results", {
 test_that("'spark_apply' can use anonymous functions", {
   expect_equal(
     sdf_len(sc, 3) %>% spark_apply(~ .x + 1) %>% collect(),
-    2:4
+    data_frame(id = c(2, 3, 4))
   )
 })
