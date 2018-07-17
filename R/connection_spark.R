@@ -100,7 +100,7 @@ spark_connect <- function(master,
     master <- paste("local[", cores, "]", sep = "")
 
   # look for existing connection with the same method, master, and app_name
-  sconFound <- spark_connection_find(method, master, app_name)
+  sconFound <- spark_connection_find(master, app_name, method)
   if (length(sconFound) == 1) {
     message("Re-using existing Spark connection to ", passedMaster)
     return(sconFound[[1]])
