@@ -509,10 +509,11 @@ livy_validate_master <- function(master, config) {
   while (retries >= 0) {
     if (!is.null(retriesErr)) Sys.sleep(1)
 
-    tryCatch({
+    retriesErr <- tryCatch({
       livy_get_sessions(master, config)
+      NULL
     }, error = function(err) {
-      retriesErr <- err
+      err
     })
 
     if (is.null(retriesErr)) return(NULL)
