@@ -24,7 +24,8 @@ set.seed(42)
 iris_weighted <- iris %>%
   dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
                 ones = rep(1, nrow(iris)),
-                versicolor = ifelse(Species == "versicolor", 1L, 0L))
+                versicolor = ifelse(Species == "versicolor", 1L, 0L),
+                not_versicolor = ifelse(Species == "versicolor", 0L, 1L))
 
 iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
@@ -98,6 +99,27 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
                               weight_col = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
+
+test_that("ml_logistic_regression() agrees with stats::glm() for reversed categories", {
+
+  r <- glm(not_versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+           family = binomial(logit), weights = weights,
+           data = iris_weighted)
+  s <- ml_logistic_regression(iris_weighted_tbl,
+                              formula = "not_versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                              reg_param = 0L,
+                              weight_col = "weights")
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+
+  r <- glm(not_versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+           family = binomial(logit), data = iris_weighted)
+  s <- ml_logistic_regression(iris_weighted_tbl,
+                              formula = "not_versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                              reg_param = 0L,
+                              weight_col = "ones")
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+})
+
 
 test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted formulas", {
 
