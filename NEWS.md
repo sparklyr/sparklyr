@@ -26,6 +26,16 @@
 - Progress reports can be turned off by setting `sparklyr.progress` to `FALSE`
   in `spark_config()`.
   
+## Kubernetes
+
+- Change backend ports to be choosen deterministically by searching for
+  free ports starting on `sparklyr.gateway.port` which default to `8880`. This
+  allows users to enable port forwarding with `kubectl port-forward`.
+  
+- Added support to set config `sparklyr.events.aftersubmit` to a function
+  that is called after `spark-submit` which can be used to automatically
+  configure port forwarding.
+  
 ### Spark ML
 
 - Fix retrieval of coefficients in `ml_logistic_regression()` (@shabbybanks, #1596).
@@ -96,6 +106,11 @@
   `ml_linear_regression()`, `ml_logistic_regression()`, `ml_cross_validator()`, 
   `ft_binarizer()`, `ft_bucketrizer()`, `sdf_pivot()`, `ml_als()`,
   `ml_gradient_boosted_trees()` (@samuelmacedo83).
+
+### Configuration
+
+- Support for functions as values in entries to `spark_config()` to enable advanced
+  configuration workflows.
 
 # Sparklyr 0.8.4
 

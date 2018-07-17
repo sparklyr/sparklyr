@@ -14,7 +14,13 @@ class Sources {
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
-  if (!name %in% names(config)) default else config[[name]]
+  if (!name %in% names(config))
+    default
+  else {
+    value <- config[[name]]
+    if (is.function(value)) value <- value()
+    value
+  }
 }
 
 spark_config_integer <- function(config, name, default = NULL) {
