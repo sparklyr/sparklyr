@@ -1,3 +1,5 @@
+# nocov start
+
 #' @import base64enc
 livy_invoke_serialize <- function(sc, static, object, method, ...)
 {
@@ -53,3 +55,4 @@ jobj_subclass.livy_backend <- function(con) {
   "livy_jobj"
 }
 
+# nocov end

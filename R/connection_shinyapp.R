@@ -1,3 +1,5 @@
+# nocov start
+
 rsApiUpdateDialog <- function(code) {
   if (exists(".rs.api.updateDialog")) {
     updateDialog <- get(".rs.api.updateDialog")
@@ -465,3 +467,5 @@ connection_spark_server <- function(input, output, session) {
 connection_spark_shinyapp <- function() {
   shinyApp(connection_spark_ui, connection_spark_server)
 }
+
+# nocov end

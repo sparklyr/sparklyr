@@ -1,3 +1,5 @@
+# nocov start
+
 #' Start Livy
 #'
 #' Starts the livy service.
@@ -60,3 +62,5 @@ livy_service_stop <- function() {
     system2("kill", c("-9", "`jps | grep \"LivyServer\" | cut -d \" \" -f 1`"), wait = TRUE)
   }
 }
+
+# nocov end
