@@ -251,7 +251,7 @@ stream_generate_test_entry <- function(
 stream_generate_test <- function(
   df = rep(1:1000),
   path = "source",
-  distribution = floor(10 + 1e5 * dbinom(1:20, 20, 0.5)),
+  distribution = floor(10 + 1e5 * stats::dbinom(1:20, 20, 0.5)),
   iterations = 50,
   interval = 1
 )

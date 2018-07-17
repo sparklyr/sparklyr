@@ -5,8 +5,8 @@
 \title{Generate Test Stream}
 \usage{
 stream_generate_test(df = rep(1:1000), path = "source",
-  distribution = floor(10 + 1e+05 * dbinom(1:20, 20, 0.5)), iterations = 50,
-  interval = 1)
+  distribution = floor(10 + 1e+05 * stats::dbinom(1:20, 20, 0.5)),
+  iterations = 50, interval = 1)
 }
 \arguments{
 \item{df}{The data frame used as a source of rows to the stream, will
