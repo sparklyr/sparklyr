@@ -33,21 +33,9 @@ ml_generate_ml_model <- function(
   classification <- identical(type, "classification")
 
   pipeline <- if (classification) {
-    if (spark_version(sc) >= "2.1.0") {
-      r_formula <- ft_r_formula(sc, formula, features_col, label_col,
-                                force_index_label = TRUE)
-      pipeline <- ml_pipeline(r_formula, predictor)
-    } else {
-      r_formula <- ft_r_formula(sc, formula, features_col, random_string(label_col))
-      response_col <- formula %>%
-        strsplit("~", fixed = TRUE) %>%
-        rlang::flatten_chr() %>%
-        head(1) %>%
-        trimws()
-      string_indexer <- ft_string_indexer(sc, response_col, label_col)
-      pipeline <- ml_pipeline(r_formula, string_indexer, predictor)
-    }
-    pipeline
+    r_formula <- ft_r_formula(sc, formula, features_col, label_col,
+                              force_index_label = FALSE)
+    ml_pipeline(r_formula, predictor)
   } else if (identical(type, "clustering") && spark_version(sc) < "2.0.0") {
     # one-sided formulas not supported prior to Spark 2.0
     rdf <- sdf_schema(x) %>%
