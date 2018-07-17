@@ -12,7 +12,7 @@
   stream.
   
 - Support for convenience functions `stream_*()` to stop, change triggers,
-  print, etc.
+  print, generate test streams, etc.
 
 ### Monitoring
 
@@ -66,6 +66,9 @@
 - Removed `install` column from `livy_available_versions()`.
 
 ### Distributed R
+
+- `spark_apply()` now supports `rlang` anonymous functions. For example,
+  `sdf_len(sc, 3) %>% spark_apply(~.x+1)`.
 
 - Breaking Change: `spark_apply()` no longer defaults to the input
   column names when the `columns` parameter is nos specified.

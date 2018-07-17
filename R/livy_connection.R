@@ -1,3 +1,5 @@
+# nocov start
+
 create_hive_context.livy_connection <- function(sc) {
   if (spark_version(sc) >= "2.0.0")
     create_hive_context_v2(sc)
@@ -784,3 +786,4 @@ initialize_connection.livy_connection <- function(sc) {
   })
 }
 
+# nocov end

@@ -1,3 +1,5 @@
+# nocov start
+
 #' Install Livy
 #'
 #' Automatically download and install \href{http://livy.io/}{\samp{livy}}.
@@ -233,3 +235,5 @@ livy_home_dir <- function(version = NULL) {
     NULL
   })
 }
+
+# nocov end

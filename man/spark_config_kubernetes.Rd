@@ -5,7 +5,7 @@
 \title{Kubernetes Configuration}
 \usage{
 spark_config_kubernetes(master, image = "spark:sparklyr",
-  driver = random_string("sparklyr_"), account = "spark",
+  driver = random_string("sparklyr-"), account = "spark",
   jar = "local:///opt/sparklyr/sparklyr-2.3-2.11.jar", forward = TRUE, ...)
 }
 \arguments{
