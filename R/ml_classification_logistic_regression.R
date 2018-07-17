@@ -95,14 +95,6 @@ ml_logistic_regression.spark_connection <- function(
   ...) {
 
   .args <- c(as.list(environment()), list(...)) %>%
-    ml_backwards_compatibility(list(
-      intercept = "fit_intercept",
-      alpha = "elastic_net_param",
-      lambda = "reg_param",
-      weights.column = "weight_col",
-      iter.max = "max_iter",
-      max.iter = "max_iter"
-    )) %>%
     ml_validator_logistic_regression()
 
   jobj <- ml_new_classifier(
@@ -290,6 +282,16 @@ ensure_matrix_double <- function(mat) {
 }
 
 ml_validator_logistic_regression <- function(.args) {
+  .args <- ml_backwards_compatibility(
+    .args, list(
+    intercept = "fit_intercept",
+    alpha = "elastic_net_param",
+    lambda = "reg_param",
+    weights.column = "weight_col",
+    iter.max = "max_iter",
+    max.iter = "max_iter"
+  ))
+
   .args$elastic_net_param <- ensure_scalar_double(.args$elastic_net_param)
   .args$reg_param <- ensure_scalar_double(.args$reg_param)
   .args$max_iter <- ensure_scalar_integer(.args$max_iter)
