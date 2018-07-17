@@ -104,7 +104,7 @@ test_that("ml_logistic_regression can fit without intercept",{
     iris_weighted_tbl,
     formula = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
     fit_intercept=FALSE),NA)
-  r <- glm(versicolor ~ Sepal_Width + Petal_Length + Petal_Width - 1, family=binomial(logit), data=iris_weighted)
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width - 1, family=binomial(logit), data=iris_weighted)
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
 
