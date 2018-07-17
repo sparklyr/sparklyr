@@ -100,10 +100,12 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
 })
 
 test_that("ml_logistic_regression can fit without intercept",{
-  expect_error(ml_logistic_regression(
+  expect_error(s <- ml_logistic_regression(
     iris_weighted_tbl,
     formula = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
     fit_intercept=FALSE),NA)
+  r <- glm(versicolor ~ Sepal_Width + Petal_Length + Petal_Width - 1, family=binomial(logit), data=iris_weighted)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
 
 test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted formulas", {
