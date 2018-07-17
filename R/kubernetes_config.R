@@ -30,6 +30,10 @@ spark_config_kubernetes_forward <- function(
 #'   image with the sparklyr jars copied when the image was created or, a path
 #'   accesible by the container where the sparklyr jars were copied. You can find
 #'   a path to the sparklyr jars by running \code{system.file("java/", package = "sparklyr")}.
+#' @param forward Should ports used in sparklyr be forwarded automatically through Kubernetes?
+#'   Default to \code{TRUE} which runs \code{kubectl port-forward}.
+#' @param ... Additional parameters, currently not in use.
+#'
 #' @export
 spark_config_kubernetes <- function(
   master,

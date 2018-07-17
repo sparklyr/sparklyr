@@ -26,6 +26,11 @@ server. Also known as \code{spark.kubernetes.authenticate.driver.serviceAccountN
 image with the sparklyr jars copied when the image was created or, a path
 accesible by the container where the sparklyr jars were copied. You can find
 a path to the sparklyr jars by running \code{system.file("java/", package = "sparklyr")}.}
+
+\item{forward}{Should ports used in sparklyr be forwarded automatically through Kubernetes?
+Default to \code{TRUE} which runs \code{kubectl port-forward}.}
+
+\item{...}{Additional parameters, currently not in use.}
 }
 \description{
 Convenience function to initialize a Kubernetes configuration instead

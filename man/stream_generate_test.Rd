@@ -5,7 +5,7 @@
 \title{Generate Test Stream}
 \usage{
 stream_generate_test(df = rep(1:1000), path = "source",
-  distribution = floor(20 + 1000 * dbinom(1:50, 50, 0.3)), iterations = 20,
+  distribution = floor(10 + 1e+05 * dbinom(1:20, 20, 0.5)), iterations = 50,
   interval = 1)
 }
 \arguments{
@@ -20,7 +20,7 @@ defaults to a binomial distribution. The stream will cycle through the
 distribution if needed.}
 
 \item{iterations}{Number of iterations to execute before stopping, defaults
-to twenty.}
+to fifty.}
 
 \item{interval}{The inverval in seconds use to write the stream, defaults
 to one second.}

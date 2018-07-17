@@ -11,11 +11,14 @@ spark_apply(x, f, columns = NULL, memory = TRUE, group_by = NULL,
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
 
 \item{f}{A function that transforms a data frame partition into a data frame.
-The function \code{f} has signature \code{f(df, context, group1, group2, ...)} where
-\code{df} is a data frame with the data to be processed, \code{context}
-is an optional object passed as the \code{context} parameter and \code{group1} to
-\code{groupN} contain the values of the \code{group_by} values. When
-\code{group_by} is not specified, \code{f} takes only one argument.}
+  The function \code{f} has signature \code{f(df, context, group1, group2, ...)} where
+  \code{df} is a data frame with the data to be processed, \code{context}
+  is an optional object passed as the \code{context} parameter and \code{group1} to
+  \code{groupN} contain the values of the \code{group_by} values. When
+  \code{group_by} is not specified, \code{f} takes only one argument.
+
+  Can also be an \code{rlang} anonymous function. For example, as \code{~ .x + 1}
+  to define an expression that adds one to the given \code{.x} data frame.}
 
 \item{columns}{A vector of column names or a named vector of column types for
 the transformed object. When not specified, a sample of 10 rows is taken to
