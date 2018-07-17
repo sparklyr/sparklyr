@@ -20,7 +20,7 @@ environment:
     WARNINGS_ARE_ERRORS: 1
     NOT_CRAN: true
     INSTALL_WINUTILS: true
-    R_VERSION: 3.5.1
+    R_VERSION: release
 
   matrix:
   - SPARK_VERSION: "1.6.3"
