@@ -25,9 +25,9 @@ ml_new_transformer <- function(sc, class, input_col, output_col, uid) {
 
 validate_args_transformer <- function(.args) {
   .args <- ml_backwards_compatibility(.args)
-  .args[["input_col"]] <- camp::mold_scalar_character(.args[["input_col"]])
-  .args[["output_col"]] <- camp::mold_scalar_character(.args[["output_col"]])
-  .args[["uid"]] <- camp::mold_scalar_character(.args[["uid"]])
+  .args[["input_col"]] <- forge::cast_scalar_character(.args[["input_col"]])
+  .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]])
+  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
   .args
 }
 

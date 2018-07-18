@@ -295,47 +295,6 @@ ml_logistic_regression.tbl_spark <- function(
   }
 }
 
-# Validator
-
-ensure_matrix_double <- function(mat) {
-  mat %>%
-    purrr::map_dbl(camp::mold_scalar_double) %>%
-    matrix(nrow = nrow(mat))
-}
-
-ml_validator_logistic_regression <- function(.args) {
-  .args <- ml_backwards_compatibility(
-    .args, list(
-    intercept = "fit_intercept",
-    alpha = "elastic_net_param",
-    lambda = "reg_param",
-    weights.column = "weight_col",
-    iter.max = "max_iter",
-    max.iter = "max_iter"
-  )) %>%
-    validate_args_classifier()
-
-  .args[["elastic_net_param"]] <- camp::mold_scalar_double(.args[["elastic_net_param"]])
-  .args[["reg_param"]] <- camp::mold_scalar_double(.args[["reg_param"]])
-  .args[["max_iter"]] <- camp::mold_scalar_integer(.args[["max_iter"]])
-  .args[["family"]] <- camp::mold_choice(.args[["family"]], c("auto", "binomial", "multinomial"))
-  .args[["fit_intercept"]] <- camp::mold_scalar_boolean(.args[["fit_intercept"]])
-  .args[["threshold"]] <- camp::mold_scalar_double(.args[["threshold"]])
-  if (!is.null(.args[["weight_col"]]))
-    .args[["weight_col"]] <- camp::mold_scalar_character(.args[["weight_col"]])
-  .args[["aggregation_depth"]] <- camp::mold_scalar_integer(.args[["aggregation_depth"]])
-  if (!is.null(.args[["lower_bounds_on_coefficients"]]))
-    .args[["lower_bounds_on_coefficients"]] <- ensure_matrix_double(
-      .args[["lower_bounds_on_coefficients"]])
-  if (!is.null(.args[["upper_bounds_on_coefficients"]]))
-    .args[["upper_bounds_on_coefficients"]] <- ensure_matrix_double(
-      .args[["upper_bounds_on_coefficients"]])
-  if (!is.null(.args[["lower_bounds_on_intercepts"]]))
-    .args[["lower_bounds_on_intercepts"]] <- camp::mold_double(.args[["lower_bounds_on_intercepts"]])
-  if (!is.null(.args[["upper_bounds_on_intercepts"]]))
-    .args[["upper_bounds_on_intercepts"]] <- camp::mold_double(.args[["upper_bounds_on_intercepts"]])
-  .args
-}
 
 # Constructors
 
@@ -400,4 +359,46 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
     roc = try_null(invoke(jobj, "roc") %>% collect()),
     total_iterations = invoke(jobj, "totalIterations"),
     subclass = "ml_summary_logistic_regression")
+}
+
+# Validator
+
+ensure_matrix_double <- function(mat) {
+  mat %>%
+    purrr::map_dbl(forge::cast_scalar_double) %>%
+    matrix(nrow = nrow(mat))
+}
+
+ml_validator_logistic_regression <- function(.args) {
+  .args <- ml_backwards_compatibility(
+    .args, list(
+    intercept = "fit_intercept",
+    alpha = "elastic_net_param",
+    lambda = "reg_param",
+    weights.column = "weight_col",
+    iter.max = "max_iter",
+    max.iter = "max_iter"
+  )) %>%
+    validate_args_classifier()
+
+  .args[["elastic_net_param"]] <- forge::cast_scalar_double(.args[["elastic_net_param"]])
+  .args[["reg_param"]] <- forge::cast_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
+  .args[["family"]] <- forge::cast_choice(.args[["family"]], c("auto", "binomial", "multinomial"))
+  .args[["fit_intercept"]] <- forge::cast_scalar_boolean(.args[["fit_intercept"]])
+  .args[["threshold"]] <- forge::cast_scalar_double(.args[["threshold"]])
+  if (!is.null(.args[["weight_col"]]))
+    .args[["weight_col"]] <- forge::cast_scalar_character(.args[["weight_col"]])
+  .args[["aggregation_depth"]] <- forge::cast_scalar_integer(.args[["aggregation_depth"]])
+  if (!is.null(.args[["lower_bounds_on_coefficients"]]))
+    .args[["lower_bounds_on_coefficients"]] <- ensure_matrix_double(
+      .args[["lower_bounds_on_coefficients"]])
+  if (!is.null(.args[["upper_bounds_on_coefficients"]]))
+    .args[["upper_bounds_on_coefficients"]] <- ensure_matrix_double(
+      .args[["upper_bounds_on_coefficients"]])
+  if (!is.null(.args[["lower_bounds_on_intercepts"]]))
+    .args[["lower_bounds_on_intercepts"]] <- forge::cast_double(.args[["lower_bounds_on_intercepts"]])
+  if (!is.null(.args[["upper_bounds_on_intercepts"]]))
+    .args[["upper_bounds_on_intercepts"]] <- forge::cast_double(.args[["upper_bounds_on_intercepts"]])
+  .args
 }

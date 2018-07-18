@@ -42,7 +42,7 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(
     seed = seed,
     uid = uid
   ) %>%
-    c(rlang::dots(...)) %>%
+    c(rlang::dots_list(...)) %>%
     ml_validator_bucketed_random_projection_lsh()
 
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
@@ -122,9 +122,9 @@ new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
 
 ml_validator_bucketed_random_projection_lsh <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["bucket_length"]] <- camp::mold_scalar_double(.args[["bucket_length"]])
-  .args[["num_hash_tables"]] <- camp::mold_scalar_integer(.args[["num_hash_tables"]])
+  .args[["bucket_length"]] <- forge::cast_scalar_double(.args[["bucket_length"]])
+  .args[["num_hash_tables"]] <- forge::cast_scalar_integer(.args[["num_hash_tables"]])
   if (!is.null(.args[["seed"]]))
-    .args[["seed"]] <- camp::mold_scalar_integer(.args[["seed"]])
+    .args[["seed"]] <- forge::cast_scalar_integer(.args[["seed"]])
   .args
 }

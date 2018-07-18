@@ -43,7 +43,7 @@ ft_chisq_selector.spark_connection <- function(
     percentile = percentile,
     uid = uid
   ) %>%
-    c(rlang::dots(...)) %>%
+    c(rlang::dots_list(...)) %>%
     ml_validator_chisq_selector()
 
   estimator <- invoke_new(x, "org.apache.spark.ml.feature.ChiSqSelector", .args[["uid"]]) %>%
@@ -129,16 +129,16 @@ new_ml_chisq_selector_model <- function(jobj) {
 }
 
 ml_validator_chisq_selector <- function(.args) {
-  .args[["features_col"]] <- camp::mold_scalar_character(.args[["features_col"]])
-  .args[["label_col"]] <- camp::mold_scalar_character(.args[["label_col"]])
-  .args[["output_col"]] <- camp::mold_scalar_character(.args[["output_col"]])
-  .args[["fdr"]] <- camp::mold_scalar_double(.args[["fdr"]])
-  .args[["fpr"]] <- camp::mold_scalar_double(.args[["fpr"]])
-  .args[["fwe"]] <- camp::mold_scalar_double(.args[["fwe"]])
-  .args[["num_top_features"]] <- camp::mold_scalar_integer(.args[["num_top_features"]])
-  .args[["percentile"]] <- camp::mold_scalar_double(.args[["percentile"]])
-  .args[["selector_type"]] <- camp::mold_choice(.args[["selector_type"]],
+  .args[["features_col"]] <- forge::cast_scalar_character(.args[["features_col"]])
+  .args[["label_col"]] <- forge::cast_scalar_character(.args[["label_col"]])
+  .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]])
+  .args[["fdr"]] <- forge::cast_scalar_double(.args[["fdr"]])
+  .args[["fpr"]] <- forge::cast_scalar_double(.args[["fpr"]])
+  .args[["fwe"]] <- forge::cast_scalar_double(.args[["fwe"]])
+  .args[["num_top_features"]] <- forge::cast_scalar_integer(.args[["num_top_features"]])
+  .args[["percentile"]] <- forge::cast_scalar_double(.args[["percentile"]])
+  .args[["selector_type"]] <- forge::cast_choice(.args[["selector_type"]],
                                                 c("numTopFeatures", "percentile", "fpr", "fdr", "fwe"))
-  .args[["uid"]] <- camp::mold_scalar_character(.args[["uid"]])
+  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
   .args
 }

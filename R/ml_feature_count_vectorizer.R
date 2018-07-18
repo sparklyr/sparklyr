@@ -141,8 +141,9 @@ ml_validator_count_vectorizer <- function(.args) {
            vocab.size = "vocab_size")
     )
 
-  .args[["binary"]] <- camp::mold_scalar_boolean(.args[["binary"]])
-  .args[["min_df"]] <- camp::mold_scalar_double(.args[["min_df"]])
-  .args[["min_tf"]] <- camp::mold_scalar_double(.args[["min_tf"]])
-  .args[["vocab_size"]] <- camp::mold_scalar_integer(.args[["vocab_size"]])
+  .args[["binary"]] <- forge::cast_scalar_boolean(.args[["binary"]])
+  .args[["min_df"]] <- forge::cast_scalar_double(.args[["min_df"]])
+  .args[["min_tf"]] <- forge::cast_scalar_double(.args[["min_tf"]])
+  .args[["vocab_size"]] <- forge::cast_scalar_integer(.args[["vocab_size"]])
+  .args
 }

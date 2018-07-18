@@ -6,7 +6,7 @@
 \title{Feature Transformation -- CountVectorizer (Estimator)}
 \usage{
 ft_count_vectorizer(x, input_col, output_col, binary = FALSE, min_df = 1,
-  min_tf = 1, vocab_size = as.integer(2^18), dataset = NULL,
+  min_tf = 1, vocab_size = 2^18, dataset = NULL,
   uid = random_string("count_vectorizer_"), ...)
 
 ml_vocabulary(model)
