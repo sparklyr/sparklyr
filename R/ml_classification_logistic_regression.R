@@ -112,33 +112,33 @@ ml_logistic_regression.spark_connection <- function(
     jobj_set_param("setFamily", .args$family, "auto", "2.1.0") %>%
     jobj_set_param("setAggregationDepth", .args$aggregation_depth, 2L, "2.1.0")
 
-  if (!rlang::is_null(.args$thresholds))
+  if (!is.null(.args$thresholds))
     jobj <- invoke(jobj, "setThresholds", .args$thresholds)
-  if (!rlang::is_null(.args$weight_col))
+  if (!is.null(.args$weight_col))
     jobj <- invoke(jobj, "setWeightCol", .args$weight_col)
 
-  if (!rlang::is_null(.args$lower_bounds_on_coefficients)) {
+  if (!is.null(.args$lower_bounds_on_coefficients)) {
     lower_bounds_on_coefficients <- spark_dense_matrix(x, .args$lower_bounds_on_coefficients)
     jobj <- jobj_set_param(jobj, "setLowerBoundsOnCoefficients",
                            lower_bounds_on_coefficients,
                            NULL, "2.2.0")
   }
 
-  if (!rlang::is_null(.args$upper_bounds_on_coefficients)) {
+  if (!is.null(.args$upper_bounds_on_coefficients)) {
     upper_bounds_on_coefficients <- spark_dense_matrix(x, .args$upper_bounds_on_coefficients)
     jobj <- jobj_set_param(jobj, "setUpperBoundsOnCoefficients",
                            upper_bounds_on_coefficients,
                            NULL, "2.2.0")
   }
 
-  if (!rlang::is_null(.args$lower_bounds_on_intercepts)) {
+  if (!is.null(.args$lower_bounds_on_intercepts)) {
     lower_bounds_on_intercepts <- spark_dense_vector(x, .args$lower_bounds_on_intercepts)
     jobj <- jobj_set_param(jobj, "setLowerBoundsOnIntercepts",
                            lower_bounds_on_intercepts,
                            NULL, "2.2.0")
   }
 
-  if (!rlang::is_null(.args$upper_bounds_on_intercepts)) {
+  if (!is.null(.args$upper_bounds_on_intercepts)) {
     upper_bounds_on_intercepts <- spark_dense_vector(x, .args$upper_bounds_on_intercepts)
     jobj <- jobj_set_param(jobj, "setUpperBoundsOnIntercepts",
                            upper_bounds_on_intercepts,
