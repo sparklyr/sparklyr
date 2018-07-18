@@ -1,3 +1,5 @@
+# nocov start
+
 create_hive_context.livy_connection <- function(sc) {
   if (spark_version(sc) >= "2.0.0")
     create_hive_context_v2(sc)
@@ -505,21 +507,21 @@ livy_validate_master <- function(master, config) {
   retries <- 5
   retriesErr <- NULL
   while (retries >= 0) {
-    tryCatch({
+    if (!is.null(retriesErr)) Sys.sleep(1)
+
+    retriesErr <- tryCatch({
       livy_get_sessions(master, config)
+      NULL
     }, error = function(err) {
-      retriesErr <- err
+      err
     })
 
+    if (is.null(retriesErr)) return(NULL)
+
     retries <- retries - 1;
-    Sys.sleep(1)
   }
 
-  if (!is.null(retriesErr)) {
-    stop("Failed to connect to Livy service at ", master, ". ", retriesErr$message)
-  }
-
-  NULL
+  stop("Failed to connect to Livy service at ", master, ". ", retriesErr$message)
 }
 
 livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(substitute(value))) {
@@ -785,3 +787,4 @@ initialize_connection.livy_connection <- function(sc) {
   })
 }
 
+# nocov end

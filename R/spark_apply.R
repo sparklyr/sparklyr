@@ -1,69 +1,3 @@
-spark_schema_from_rdd <- function(sc, rdd, column_names) {
-  columns_typed <- length(names(column_names)) > 0
-
-  if (columns_typed) {
-    schema <- spark_data_build_types(sc, column_names)
-    return(schema)
-  }
-
-  sampleRows <- rdd %>% invoke(
-    "take",
-    ensure_scalar_integer(
-      spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
-    )
-  )
-
-  map_special_types <- list(
-    date = "date",
-    posixct = "timestamp",
-    posixt = "timestamp"
-  )
-
-  colTypes <- NULL
-  lapply(sampleRows, function(r) {
-    row <- r %>% invoke("toSeq")
-
-    if (is.null(colTypes))
-      colTypes <<- replicate(length(row), "character")
-
-    lapply(seq_along(row), function(colIdx) {
-      colVal <- row[[colIdx]]
-      lowerClass <- tolower(class(colVal)[[1]])
-      if (lowerClass %in% names(map_special_types)) {
-        colTypes[[colIdx]] <<- map_special_types[[lowerClass]]
-      } else if (!is.na(colVal) && !is.null(colVal)) {
-        colTypes[[colIdx]] <<- typeof(colVal)
-      }
-    })
-  })
-
-  if (any(sapply(colTypes, is.null)))
-    stop("Failed to infer column types, please use explicit types.")
-
-  fields <- lapply(seq_along(colTypes), function(idx) {
-    name <- if (idx <= length(column_names))
-      column_names[[idx]]
-    else
-      paste0("X", idx)
-
-    invoke_static(
-      sc,
-      "sparklyr.SQLUtils",
-      "createStructField",
-      name,
-      colTypes[[idx]],
-      TRUE
-    )
-  })
-
-  invoke_static(
-    sc,
-    "sparklyr.SQLUtils",
-    "createStructType",
-    fields
-  )
-}
-
 spark_apply_packages <- function(packages) {
   db <- Sys.getenv("sparklyr.apply.packagesdb")
   if (nchar(db) == 0) {
@@ -122,6 +56,9 @@ spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE) {
 #'   is an optional object passed as the \code{context} parameter and \code{group1} to
 #'   \code{groupN} contain the values of the \code{group_by} values. When
 #'   \code{group_by} is not specified, \code{f} takes only one argument.
+#'
+#'   Can also be an \code{rlang} anonymous function. For example, as \code{~ .x + 1}
+#'   to define an expression that adds one to the given \code{.x} data frame.
 #' @param columns A vector of column names or a named vector of column types for
 #'   the transformed object. When not specified, a sample of 10 rows is taken to
 #'   infer out the output columns automatically, to avoid this performance penalty,
@@ -185,7 +122,8 @@ spark_apply <- function(x,
                         context = NULL,
                         ...) {
   args <- list(...)
-  assert_that(is.function(f) || is.raw(f))
+  assert_that(is.function(f) || is.raw(f) || is.language(f))
+  if (is.language(f)) f <- rlang::as_closure(f)
 
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)

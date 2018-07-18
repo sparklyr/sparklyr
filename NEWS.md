@@ -12,7 +12,7 @@
   stream.
   
 - Support for convenience functions `stream_*()` to stop, change triggers,
-  print, etc.
+  print, generate test streams, etc.
 
 ### Monitoring
 
@@ -25,6 +25,16 @@
 
 - Progress reports can be turned off by setting `sparklyr.progress` to `FALSE`
   in `spark_config()`.
+  
+## Kubernetes
+
+- Change backend ports to be choosen deterministically by searching for
+  free ports starting on `sparklyr.gateway.port` which default to `8880`. This
+  allows users to enable port forwarding with `kubectl port-forward`.
+  
+- Added support to set config `sparklyr.events.aftersubmit` to a function
+  that is called after `spark-submit` which can be used to automatically
+  configure port forwarding.
   
 ### Spark ML
 
@@ -56,6 +66,9 @@
 - Removed `install` column from `livy_available_versions()`.
 
 ### Distributed R
+
+- `spark_apply()` now supports `rlang` anonymous functions. For example,
+  `sdf_len(sc, 3) %>% spark_apply(~.x+1)`.
 
 - Breaking Change: `spark_apply()` no longer defaults to the input
   column names when the `columns` parameter is nos specified.
@@ -93,6 +106,11 @@
   `ml_linear_regression()`, `ml_logistic_regression()`, `ml_cross_validator()`, 
   `ft_binarizer()`, `ft_bucketrizer()`, `sdf_pivot()`, `ml_als()`,
   `ml_gradient_boosted_trees()` (@samuelmacedo83).
+
+### Configuration
+
+- Support for functions as values in entries to `spark_config()` to enable advanced
+  configuration workflows.
 
 # Sparklyr 0.8.4
 

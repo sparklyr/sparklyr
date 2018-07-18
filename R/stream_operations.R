@@ -181,25 +181,89 @@ sdf_collect_stream <- function(x, ...)
   data
 }
 
-#' @importFrom stats runif
-stream_generate_random <- function(df, path = "streams-random", interval = 5)
+stream_generate_test_entry <- function(
+  df,
+  path,
+  distribution,
+  iterations,
+  interval,
+  idxDataStart = 1,
+  idxDataEnd = 1,
+  idxDist = 1,
+  idxFile = 1
+)
 {
-  if (!"later" %in% installed.packages()) {
-    stop("'stream_generate_random()' requires the 'later' package.")
-  }
-
-  if (!dir.exists(path)) dir.create(path)
-
   later <- get("later", envir = asNamespace("later"))
 
-  min <- floor(runif(1, 1, length(df)))
-  max <- floor(runif(1, min, length(df)))
+  if (idxFile > iterations) return();
 
-  write.csv(df[min:max, ], paste(file.path(path, random_string("rand_")), "csv", sep = "."), row.names = FALSE)
+  if (idxDist > length(distribution)) idxDist <- 1
+
+  idxDataStart <- idxDataEnd %% nrow(df)
+  idxDataEnd <- idxDataStart + distribution[idxDist]
+
+  dfCycle <- df
+  while(nrow(dfCycle) < idxDataEnd) {
+    dfCycle <- rbind(dfCycle, df)
+  }
+
+  rows <- dfCycle[idxDataStart:idxDataEnd, ]
+
+  write.csv(rows, file.path(path, paste0("stream_", idxFile, ".csv")), row.names = FALSE)
+  Sys.sleep(interval)
+
+  idxDist <- idxDist + 1
+  idxFile <- idxFile + 1
 
   later(function() {
-    stream_generate_random(df, path, interval)
+    stream_generate_test_entry(df,
+                               path,
+                               distribution,
+                               iterations,
+                               interval,
+                               idxDataStart,
+                               idxDataEnd,
+                               idxDist,
+                               idxFile)
   }, interval)
+}
+
+#' Generate Test Stream
+#'
+#' Generates a local test stream, useful when testing streams locally.
+#'
+#' @param df The data frame used as a source of rows to the stream, will
+#'   be cast to data frame if needed. Defaults to a sequence of one thousand
+#'   entries.
+#' @param path Path to save stream of files to, defaults to \code{"source"}.
+#' @param distribution The distribution of rows to use over each iteration,
+#'   defaults to a binomial distribution. The stream will cycle through the
+#'   distribution if needed.
+#' @param iterations Number of iterations to execute before stopping, defaults
+#'   to fifty.
+#' @param interval The inverval in seconds use to write the stream, defaults
+#'   to one second.
+#'
+#' @details This function requires the \code{callr} package to be installed.
+#'
+#' @importFrom stats runif
+#' @export
+stream_generate_test <- function(
+  df = rep(1:1000),
+  path = "source",
+  distribution = floor(10 + 1e5 * stats::dbinom(1:20, 20, 0.5)),
+  iterations = 50,
+  interval = 1
+)
+{
+  if (!"later" %in% installed.packages()) {
+    stop("'stream_generate_test()' requires the 'later' package.")
+  }
+
+  if (!is.data.frame(df)) df <- as.data.frame(df)
+  if (!dir.exists(path)) dir.create(path, recursive = TRUE)
+
+  stream_generate_test_entry(df, path, distribution, iterations, interval)
 }
 
 #' Find Stream
