@@ -18,9 +18,6 @@ ml_add_stage <- function(x, transformer) {
 }
 
 ml_new_transformer <- function(sc, class, input_col, output_col, uid) {
-  ensure_scalar_character(input_col)
-  ensure_scalar_character(output_col)
-  ensure_scalar_character(uid)
   invoke_new(sc, class, uid) %>%
     invoke("setInputCol", input_col) %>%
     invoke("setOutputCol", output_col)
