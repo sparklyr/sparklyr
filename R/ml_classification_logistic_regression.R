@@ -293,15 +293,15 @@ ml_validator_logistic_regression <- function(.args) {
   )) %>%
     validate_args_classifier()
 
-  .args[["elastic_net_param"]] <- ensure_scalar_double(.args[["elastic_net_param"]])
-  .args[["reg_param"]] <- ensure_scalar_double(.args[["reg_param"]])
-  .args[["max_iter"]] <- ensure_scalar_integer(.args[["max_iter"]])
+  .args[["elastic_net_param"]] <- camp::mold_scalar_double(.args[["elastic_net_param"]])
+  .args[["reg_param"]] <- camp::mold_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- camp::mold_scalar_integer(.args[["max_iter"]])
   .args[["family"]] <- ensure_valid_option(.args[["family"]], c("auto", "binomial", "multinomial"))
   .args[["fit_intercept"]] <- ensure_scalar_boolean(.args[["fit_intercept"]])
-  .args[["threshold"]] <- ensure_scalar_double(.args[["threshold"]])
+  .args[["threshold"]] <- camp::mold_scalar_double(.args[["threshold"]])
   if (!is.null(.args[["weight_col"]]))
     .args[["weight_col"]] <- ensure_scalar_character(.args[["weight_col"]])
-  .args[["aggregation_depth"]] <- ensure_scalar_integer(.args[["aggregation_depth"]])
+  .args[["aggregation_depth"]] <- camp::mold_scalar_integer(.args[["aggregation_depth"]])
   if (!is.null(.args[["lower_bounds_on_coefficients"]]))
     .args[["lower_bounds_on_coefficients"]] <- ensure_matrix_double(
       .args[["lower_bounds_on_coefficients"]])
@@ -310,10 +310,10 @@ ml_validator_logistic_regression <- function(.args) {
       .args[["upper_bounds_on_coefficients"]])
   if (!is.null(.args[["lower_bounds_on_intercepts"]]))
     .args[["lower_bounds_on_intercepts"]] <- purrr::map_dbl(
-      .args[["lower_bounds_on_intercepts"]], ensure_scalar_double)
+      .args[["lower_bounds_on_intercepts"]], camp::mold_scalar_double)
   if (!is.null(.args[["upper_bounds_on_intercepts"]]))
     .args[["upper_bounds_on_intercepts"]] <- purrr::map_dbl(
-      .args[["upper_bounds_on_intercepts"]], ensure_scalar_double)
+      .args[["upper_bounds_on_intercepts"]], camp::mold_scalar_double)
   .args
 }
 
