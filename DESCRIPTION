@@ -47,7 +47,8 @@ Imports:
     withr,
     xml2,
     tidyr,
-    purrr
+    purrr,
+    camp
 Suggests:
     ggplot2,
     glmnet,
@@ -60,3 +61,4 @@ Suggests:
     reshape2,
     testthat,
     tibble
+Remotes: kevinykuo/camp
