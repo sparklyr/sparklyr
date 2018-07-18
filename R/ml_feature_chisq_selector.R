@@ -31,18 +31,19 @@ ft_chisq_selector.spark_connection <- function(
   dataset = NULL,
   uid = random_string("chisq_selector_"), ...) {
 
-  ml_ratify_args()
+  .args <- c(as.list(environment()), list(...)) %>%
+    ml_validator_chisq_selector()
 
-  estimator <- invoke_new(x, "org.apache.spark.ml.feature.ChiSqSelector", uid) %>%
-    jobj_set_param("setFdr", fdr, 0.05, "2.2.0") %>%
-    invoke("setFeaturesCol", features_col) %>%
-    jobj_set_param("setFpr", fpr, 0.05, "2.1.0") %>%
-    jobj_set_param("setFwe", fwe, 0.05, "2.2.0") %>%
-    invoke("setLabelCol", label_col) %>%
-    invoke("setNumTopFeatures", num_top_features) %>%
-    invoke("setOutputCol", output_col) %>%
-    jobj_set_param("setPercentile", percentile, 0.1, "2.1.0") %>%
-    jobj_set_param("setSelectorType", selector_type, "numTopFeatures", "2.1.0") %>%
+  estimator <- invoke_new(x, "org.apache.spark.ml.feature.ChiSqSelector", .args[["uid"]]) %>%
+    jobj_set_param("setFdr", .args[["fdr"]], 0.05, "2.2.0") %>%
+    invoke("setFeaturesCol", .args[["features_col"]]) %>%
+    jobj_set_param("setFpr", .args[["fpr"]], 0.05, "2.1.0") %>%
+    jobj_set_param("setFwe", .args[["fwe"]], 0.05, "2.2.0") %>%
+    invoke("setLabelCol", .args[["label_col"]]) %>%
+    invoke("setNumTopFeatures", .args[["num_top_features"]]) %>%
+    invoke("setOutputCol", .args[["output_col"]]) %>%
+    jobj_set_param("setPercentile", .args[["percentile"]], 0.1, "2.1.0") %>%
+    jobj_set_param("setSelectorType", .args[["selector_type"]], "numTopFeatures", "2.1.0") %>%
     new_ml_chisq_selector()
 
   if (is.null(dataset))
@@ -59,9 +60,22 @@ ft_chisq_selector.ml_pipeline <- function(
   uid = random_string("chisq_selector_"), ...
 ) {
 
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_chisq_selector.spark_connection(
+    x = spark_connection(x),
+    features_col = features_col,
+    output_col = output_col,
+    label_col = label_col,
+    select_type = selector_type,
+    fdr = fdr,
+    fpr = fpr,
+    fwe = fwe,
+    num_top_features = num_top_features,
+    percentile = percentile,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
@@ -71,9 +85,22 @@ ft_chisq_selector.tbl_spark <- function(
   dataset = NULL,
   uid = random_string("chisq_selector_"), ...
 ) {
-  dots <- rlang::dots_list(...)
 
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_chisq_selector.spark_connection(
+    x = spark_connection(x),
+    features_col = features_col,
+    output_col = output_col,
+    label_col = label_col,
+    select_type = selector_type,
+    fdr = fdr,
+    fpr = fpr,
+    fwe = fwe,
+    num_top_features = num_top_features,
+    percentile = percentile,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -89,21 +116,17 @@ new_ml_chisq_selector_model <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_chisq_selector_model")
 }
 
-ml_validator_chisq_selector <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      features_col <- ensure_scalar_character(features_col)
-      label_col <- ensure_scalar_character(label_col)
-      output_col <- ensure_scalar_character(output_col)
-      fdr <- ensure_scalar_double(fdr)
-      fpr <- ensure_scalar_double(fpr)
-      fwe <- ensure_scalar_double(fwe)
-      num_top_features <- ensure_scalar_integer(num_top_features)
-      percentile <- ensure_scalar_double(percentile)
-      selector_type <- rlang::arg_match(
-        selector_type,
-        c("numTopFeatures", "percentile", "fpr", "fdr", "fwe"))
-      uid <- ensure_scalar_character(uid)
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_chisq_selector <- function(.args) {
+  .args[["features_col"]] <- camp::mold_scalar_character(.args[["features_col"]])
+  .args[["label_col"]] <- camp::mold_scalar_character(.args[["label_col"]])
+  .args[["output_col"]] <- camp::mold_scalar_character(.args[["output_col"]])
+  .args[["fdr"]] <- camp::mold_scalar_double(.args[["fdr"]])
+  .args[["fpr"]] <- camp::mold_scalar_double(.args[["fpr"]])
+  .args[["fwe"]] <- camp::mold_scalar_double(.args[["fwe"]])
+  .args[["num_top_features"]] <- camp::mold_scalar_integer(.args[["num_top_features"]])
+  .args[["percentile"]] <- camp::mold_scalar_double(.args[["percentile"]])
+  .args[["selector_type"]] <- camp::mold_choice(.args[["selector_type"]],
+                                                c("numTopFeatures", "percentile", "fpr", "fdr", "fwe"))
+  .args[["uid"]] <- camp::mold_scalar_character(.args[["uid"]])
+  .args
 }
