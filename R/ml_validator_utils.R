@@ -175,3 +175,17 @@ ml_validate_decision_tree_args <- function(args) {
       max_memory_in_mb <- ensure_scalar_integer(max_memory_in_mb)
     }, ml_tree_param_mapping())
 }
+
+validate_args_predictor <- function(.args) {
+  .args[["features_col"]] <- ensure_scalar_character(.args[["features_col"]])
+  .args[["label_col"]] <- ensure_scalar_character(.args[["label_col"]])
+  .args[["prediction_col"]] <- ensure_scalar_character(.args[["prediction_col"]])
+  .args
+}
+
+validate_args_classifier <- function(.args) {
+  .args <- validate_args_predictor(.args)
+  .args[["probability_col"]] <- ensure_scalar_character(.args[["probability_col"]])
+  .args[["raw_prediction_col"]] <- ensure_scalar_character(.args[["raw_prediction_col"]])
+  .args
+}
