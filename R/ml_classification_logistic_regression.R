@@ -277,7 +277,7 @@ ml_logistic_regression.tbl_spark <- function(
 
 ensure_matrix_double <- function(mat) {
   mat %>%
-    purrr::map_dbl(ensure_scalar_double) %>%
+    purrr::map_dbl(camp::mold_scalar_double) %>%
     matrix(nrow = nrow(mat))
 }
 
@@ -449,4 +449,3 @@ print.ml_model_logistic_regression <- function(x, ...) {
 summary.ml_model_logistic_regression <- function(object, ...) {
   ml_model_print_coefficients(object)
   print_newline()
-}
