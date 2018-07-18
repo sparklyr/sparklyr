@@ -33,7 +33,13 @@ ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_s
 ft_binarizer.spark_connection <- function(x, input_col, output_col, threshold = 0,
                                           uid = random_string("binarizer_"), ...) {
 
-  .args <- c(as.list(environment()), list(...)) %>%
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    threshold = threshold,
+    uid = uid
+  ) %>%
+    c(rlang::dots(...)) %>%
     ml_validator_binarizer()
 
   jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Binarizer",

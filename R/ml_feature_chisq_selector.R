@@ -31,7 +31,19 @@ ft_chisq_selector.spark_connection <- function(
   dataset = NULL,
   uid = random_string("chisq_selector_"), ...) {
 
-  .args <- c(as.list(environment()), list(...)) %>%
+  .args <- list(
+    features_col = features_col,
+    output_col = output_col,
+    label_col = label_col,
+    selector_type = selector_type,
+    fdr = fdr,
+    fpr = fpr,
+    fwe = fwe,
+    num_top_features = num_top_features,
+    percentile = percentile,
+    uid = uid
+  ) %>%
+    c(rlang::dots(...)) %>%
     ml_validator_chisq_selector()
 
   estimator <- invoke_new(x, "org.apache.spark.ml.feature.ChiSqSelector", .args[["uid"]]) %>%
