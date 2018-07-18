@@ -277,7 +277,7 @@ ml_logistic_regression.tbl_spark <- function(
 
 ensure_matrix_double <- function(mat) {
   mat %>%
-    sapply(ensure_scalar_double) %>%
+    purrr::map_dbl(ensure_scalar_double) %>%
     matrix(nrow = nrow(mat))
 }
 
@@ -309,10 +309,10 @@ ml_validator_logistic_regression <- function(.args) {
     .args[["upper_bounds_on_coefficients"]] <- ensure_matrix_double(
       .args[["upper_bounds_on_coefficients"]])
   if (!is.null(.args[["lower_bounds_on_intercepts"]]))
-    .args[["lower_bounds_on_intercepts"]] <- sapply(
+    .args[["lower_bounds_on_intercepts"]] <- purrr::map_dbl(
       .args[["lower_bounds_on_intercepts"]], ensure_scalar_double)
   if (!is.null(.args[["upper_bounds_on_intercepts"]]))
-    .args[["upper_bounds_on_intercepts"]] <- sapply(
+    .args[["upper_bounds_on_intercepts"]] <- purrr::map_dbl(
       .args[["upper_bounds_on_intercepts"]], ensure_scalar_double)
   .args
 }
