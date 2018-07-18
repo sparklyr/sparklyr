@@ -15,12 +15,23 @@ ft_dct <- function(x, input_col, output_col, inverse = FALSE, uid = random_strin
 }
 
 #' @export
-ft_dct.spark_connection <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+ft_dct.spark_connection <- function(
+  x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...
+) {
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.DCT",
-                             input_col, output_col, uid) %>%
-    invoke("setInverse", inverse)
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    inverse = inverse,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_dct()
+
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.DCT",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setInverse", .args[["inverse"]])
 
   new_ml_dct(jobj)
 }
@@ -28,13 +39,25 @@ ft_dct.spark_connection <- function(x, input_col, output_col, inverse = FALSE, u
 #' @export
 ft_dct.ml_pipeline <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
+  transformer <- ft_dct.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    inverse = inverse,
+    uid = uid
+  )
   ml_add_stage(x, transformer)
 }
 
 #' @export
 ft_dct.tbl_spark <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
-  transformer <- ml_new_stage_modified_args()
+  transformer <- ft_dct.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    inverse = inverse,
+    uid = uid
+  )
   ml_transform(transformer, x)
 }
 
@@ -49,3 +72,8 @@ ft_discrete_cosine_transform <- function(x, input_col, output_col, inverse = FAL
   UseMethod("ft_dct")
 }
 
+ml_validator_dct <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["inverse"]] <- forge::cast_scalar_boolean(.args[["inverse"]])
+  .args
+}

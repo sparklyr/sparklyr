@@ -46,15 +46,6 @@ ml_validator_tokenizer <- function(args, nms) {
     ml_extract_args(nms)
 }
 
-# DCT
-ml_validator_dct <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      inverse <- ensure_scalar_boolean(inverse)
-    }) %>%
-    ml_extract_args(nms)
-}
-
 # IndexToString
 ml_validator_index_to_string <- function(args, nms) {
   args %>%
