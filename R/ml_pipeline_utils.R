@@ -26,6 +26,13 @@ ml_new_transformer <- function(sc, class, input_col, output_col, uid) {
     invoke("setOutputCol", output_col)
 }
 
+validate_args_transformer <- function(.args) {
+  .args[["input_col"]] <- camp::mold_scalar_character(.args[["input_col"]])
+  .args[["output_col"]] <- camp::mold_scalar_character(.args[["output_col"]])
+  .args[["uid"]] <- camp::mold_scalar_character(.args[["uid"]])
+  .args
+}
+
 
 ml_wrap_in_pipeline <- function(jobj) {
   sc <- spark_connection(jobj)

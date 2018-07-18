@@ -13,15 +13,6 @@ ml_validator_hashing_tf <- function(args, nms) {
     ml_extract_args(nms)
 }
 
-# Binarizer
-ml_validator_binarizer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      threshold <- ensure_scalar_double(threshold)
-    }) %>%
-    ml_extract_args(nms)
-}
-
 # OneHotEncoder
 ml_validator_one_hot_encoder <- function(args, nms) {
   old_new_mapping <- c(input_output_mapping, list(drop.last = "drop_last"))
