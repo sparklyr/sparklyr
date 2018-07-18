@@ -73,8 +73,6 @@ ft_bucketed_random_projection_lsh.tbl_spark <- function(
   dataset = NULL,
   uid = random_string("bucketed_random_projection_lsh_"), ...
 ) {
-  dots <- rlang::dots_list(...)
-
   stage <- ml_new_stage_modified_args()
 
   if (is_ml_transformer(stage))
