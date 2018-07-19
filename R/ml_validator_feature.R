@@ -26,19 +26,6 @@ ml_validator_tokenizer <- function(args, nms) {
     ml_extract_args(nms)
 }
 
-# RegexTokenizer
-ml_validator_regex_tokenizer <- function(args, nms) {
-  args %>%
-    ml_validate_args(
-    {
-      gaps <- ensure_scalar_boolean(gaps)
-      min_token_length <- ensure_scalar_integer(min_token_length)
-      pattern <- ensure_scalar_character(pattern)
-      to_lower_case <- ensure_scalar_boolean(to_lower_case)
-    }) %>%
-    ml_extract_args(nms)
-}
-
 # StopWordsRemover
 ml_validator_stop_words_remover <- function(args, nms) {
   args %>%
