@@ -3,18 +3,6 @@ input_output_mapping <- list(
   output.col = "output_col"
 )
 
-
-
-# OneHotEncoder
-ml_validator_one_hot_encoder <- function(args, nms) {
-  old_new_mapping <- c(input_output_mapping, list(drop.last = "drop_last"))
-  args %>%
-    ml_validate_args({
-      drop_last <- ensure_scalar_boolean(drop_last)
-    }) %>%
-    ml_extract_args(nms)
-}
-
 # VectorAssembler
 ml_validator_vector_assembler <- function(args, nms) {
   old_new_mapping <- list(

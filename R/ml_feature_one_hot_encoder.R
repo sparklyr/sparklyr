@@ -22,11 +22,19 @@ ft_one_hot_encoder.spark_connection <- function(
   x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    drop_last = drop_last,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_one_hot_encoder()
 
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.OneHotEncoder",
-                             input_col, output_col, uid) %>%
-    invoke("setDropLast", drop_last)
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.OneHotEncoder",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setDropLast", .args[["drop_last"]])
 
   new_ml_one_hot_encoder(jobj)
 }
@@ -36,8 +44,15 @@ ft_one_hot_encoder.ml_pipeline <- function(
   x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_one_hot_encoder.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    drop_last = drop_last,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
@@ -45,10 +60,24 @@ ft_one_hot_encoder.tbl_spark <- function(
   x, input_col, output_col, drop_last = TRUE,
   uid = random_string("one_hot_encoder_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+  stage <- ft_one_hot_encoder.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    drop_last = drop_last,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_one_hot_encoder <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_one_hot_encoder")
+}
+
+ml_validator_one_hot_encoder <- function(.args) {
+  .args <- validate_args_transformer(.args) %>%
+    ml_backwards_compatibility(list(drop.last = "drop_last"))
+  .args[["drop_last"]] <- forge::cast_scalar_boolean(.args[["drop_last"]])
+  .args
 }

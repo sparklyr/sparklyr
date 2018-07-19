@@ -5,6 +5,7 @@ sc <- testthat_spark_connection()
 iris_tbl <- testthat_tbl("iris")
 
 test_that("r formula works as expected", {
+  test_requires("dplyr")
   pipeline <- ml_pipeline(sc) %>%
     ft_string_indexer("Species", "species_idx") %>%
     ft_one_hot_encoder("species_idx", "species_dummy") %>%
@@ -47,6 +48,7 @@ test_that("r formula works as expected", {
 })
 
 test_that("ft_r_formula takes formula", {
+  test_requires("dplyr")
   iris_tbl <- testthat_tbl("iris")
   v1 <- ft_r_formula(iris_tbl, "Species ~ Sepal_Length + Petal_Length") %>% pull(features)
   v2 <- ft_r_formula(iris_tbl, Species ~ Sepal_Length + Petal_Length) %>% pull(features)
