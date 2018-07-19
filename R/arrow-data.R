@@ -10,5 +10,5 @@ arrow_copy_to <- function(sc, df, parallelism = 8L)
   batches <- list(bytes)
 
   # load arrow file in scala
-  spark_context(sc) %>% invoke("parallelize", batches, parallelism)
+  invoke_static(sc, "ArrowUtils", spark_context(sc), batches, parallelism)
 }
