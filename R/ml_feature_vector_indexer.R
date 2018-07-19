@@ -21,11 +21,19 @@ ft_vector_indexer.spark_connection <- function(
   max_categories = 20L, dataset = NULL,
   uid = random_string("vector_indexer_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    max_categories = max_categories,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_vector_indexer()
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.VectorIndexer",
-                                  input_col, output_col, uid) %>%
-    invoke("setMaxCategories", max_categories) %>%
+  estimator <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.VectorIndexer",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setMaxCategories", .args[["max_categories"]]) %>%
     new_ml_vector_indexer()
 
   if (is.null(dataset))
@@ -41,7 +49,15 @@ ft_vector_indexer.ml_pipeline <- function(
   uid = random_string("vector_indexer_"), ...
 ) {
 
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_vector_indexer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    max_categories = max_categories,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
 
 }
@@ -52,9 +68,15 @@ ft_vector_indexer.tbl_spark <- function(
   max_categories = 20L, dataset = NULL,
   uid = random_string("vector_indexer_"), ...
 ) {
-  dots <- rlang::dots_list(...)
-
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_vector_indexer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    max_categories = max_categories,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -70,10 +92,8 @@ new_ml_vector_indexer_model <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_vector_indexer_model")
 }
 
-ml_validator_vector_indexer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      max_categories <- ensure_scalar_integer(max_categories)
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_vector_indexer <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["max_categories"]] <- forge::cast_scalar_integer(.args[["max_categories"]])
+  .args
 }
