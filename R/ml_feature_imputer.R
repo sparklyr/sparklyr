@@ -30,16 +30,25 @@ ft_imputer.spark_connection <- function(
   dataset = NULL,
   uid = random_string("imputer_"), ...
 ) {
-  spark_require_version(x, "2.2.0", "ft_imputer()")
+  spark_require_version(x, "2.2.0", "Imputer")
 
-  ml_ratify_args()
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.Imputer", uid) %>%
-    invoke("setInputCols", input_cols) %>%
-    invoke("setOutputCols", output_cols) %>%
-    invoke("setStrategy", strategy)
+  .args <- list(
+    input_cols = input_cols,
+    output_cols = output_cols,
+    missing_value = missing_value,
+    strategy = strategy,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_imputer()
 
-  if (!rlang::is_null(missing_value))
-    jobj <- invoke(jobj, "setMissingValue", missing_value)
+  jobj <- invoke_new(x, "org.apache.spark.ml.feature.Imputer", .args[["uid"]]) %>%
+    invoke("setInputCols", .args[["input_cols"]]) %>%
+    invoke("setOutputCols", .args[["output_cols"]]) %>%
+    invoke("setStrategy", .args[["strategy"]])
+
+  if (!is.null(.args[["missing_value"]]))
+    jobj <- invoke(jobj, "setMissingValue", .args[["missing_value"]])
 
   estimator <- new_ml_imputer(jobj)
 
@@ -55,7 +64,16 @@ ft_imputer.ml_pipeline <- function(
   dataset = NULL,
   uid = random_string("imputer_"), ...
 ) {
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_imputer.spark_connection(
+    x = spark_connection(x),
+    input_cols = input_cols,
+    output_cols = output_cols,
+    missing_value = missing_value,
+    strategy = strategy,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
 }
 
@@ -65,25 +83,31 @@ ft_imputer.tbl_spark <- function(
   dataset = NULL,
   uid = random_string("imputer_"), ...
 ) {
-  stage <- ml_new_stage_modified_args()
-
+  stage <- ft_imputer.spark_connection(
+    x = spark_connection(x),
+    input_cols = input_cols,
+    output_cols = output_cols,
+    missing_value = missing_value,
+    strategy = strategy,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
   else
     ml_fit_and_transform(stage, x)
 }
 
-ml_validator_imputer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      strategy <- rlang::arg_match(strategy, c("mean", "median"))
-      if (!rlang::is_null(missing_value))
-        missing_value <- ensure_scalar_double(missing_value)
-      input_cols <- input_cols %>%
-        lapply(ensure_scalar_character)
-      output_cols <- lapply(output_cols, ensure_scalar_character)
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_imputer <- function(.args) {
+  .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]]) %>%
+    as.list()
+  .args[["output_cols"]] <- forge::cast_character(.args[["output_cols"]]) %>%
+    as.list()
+  .args[["strategy"]] <- forge::cast_choice(.args[["strategy"]], c("mean", "median"))
+  if (!is.null(.args[["missing_value"]]))
+    .args[["missing_value"]] <- forge::cast_scalar_double(.args[["missing_value"]])
+  .args
 }
 
 new_ml_imputer <- function(jobj) {
