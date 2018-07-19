@@ -38,5 +38,5 @@ test_that("ft_normalizer works properly", {
 test_that("ft_normalizer errors for bad p", {
   expect_error(
     ft_normalizer(sc, "features", "normFeatures", p = 0.5),
-    "'p' must be greater than or equal to 1")
+    "`p` must be at least 1\\.")
 })

@@ -11,7 +11,7 @@
 ft_normalizer <- function(
   x, input_col, output_col, p = 2,
   uid = random_string("normalizer_"), ...
-  ) {
+) {
   UseMethod("ft_normalizer")
 }
 
@@ -19,12 +19,21 @@ ft_normalizer <- function(
 ft_normalizer.spark_connection <- function(
   x, input_col, output_col, p = 2,
   uid = random_string("normalizer_"), ...
-  ) {
+) {
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Normalizer",
-                             input_col, output_col, uid) %>%
-    invoke("setP", p)
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    p = p,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_normalizer()
+
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.Normalizer",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setP", .args[["p"]])
 
   new_ml_normalizer(jobj)
 }
@@ -33,29 +42,41 @@ ft_normalizer.spark_connection <- function(
 ft_normalizer.ml_pipeline <- function(
   x, input_col, output_col, p = 2,
   uid = random_string("normalizer_"), ...
-  ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+) {
+  stage <- ft_normalizer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    p = p,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
 ft_normalizer.tbl_spark <- function(
   x, input_col, output_col, p = 2,
   uid = random_string("normalizer_"), ...
-  ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+) {
+  stage <- ft_normalizer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    p = p,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_normalizer <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_normalizer")
 }
 
-ml_validator_normalizer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      p <- ensure_scalar_double(p)
-      if (p < 1) stop("'p' must be greater than or equal to 1")
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_normalizer <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["p"]] <- forge::cast_scalar_double(.args[["p"]])
+  if (.args[["p"]] < 1) stop("`p` must be at least 1.")
+  .args
 }
