@@ -59,13 +59,21 @@ ft_r_formula.spark_connection <- function(
   force_index_label = FALSE, dataset = NULL,
   uid = random_string("r_formula_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    formula = formula,
+    features_col = features_col,
+    label_col = label_col,
+    force_index_label = force_index_label,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_r_formula()
 
-  estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", uid) %>%
-    invoke("setFeaturesCol", features_col) %>%
-    invoke("setFormula", formula) %>%
-    invoke("setLabelCol", label_col) %>%
-    jobj_set_param("setForceIndexLabel", force_index_label, FALSE, "2.1.0") %>%
+  estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", .args[["uid"]]) %>%
+    invoke("setFeaturesCol", .args[["features_col"]]) %>%
+    invoke("setFormula", .args[["formula"]]) %>%
+    invoke("setLabelCol", .args[["label_col"]]) %>%
+    jobj_set_param("setForceIndexLabel", .args[["force_index_label"]], FALSE, "2.1.0") %>%
     new_ml_r_formula()
 
   if (is.null(dataset))
@@ -81,7 +89,16 @@ ft_r_formula.ml_pipeline <- function(
   uid = random_string("r_formula_"), ...
 ) {
 
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_r_formula.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    features_col = features_col,
+    label_col = label_col,
+    force_index_label = force_index_label,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
 
 }
@@ -92,7 +109,17 @@ ft_r_formula.tbl_spark <- function(
   force_index_label = FALSE, dataset = NULL,
   uid = random_string("r_formula_"), ...
 ) {
-  stage <- ml_new_stage_modified_args()
+
+  stage <- ft_r_formula.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    features_col = features_col,
+    label_col = label_col,
+    force_index_label = force_index_label,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -114,15 +141,12 @@ new_ml_r_formula_model <- function(jobj) {
 
 # Validator
 
-ml_validator_r_formula <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      if (rlang::is_formula(formula))
-        formula <- rlang::expr_text(args$formula, width = 500L)
-      formula <- ensure_scalar_character(formula)
-      features_col <- ensure_scalar_character(features_col)
-      label_col <- ensure_scalar_character(label_col)
-      force_index_label <- ensure_scalar_boolean(force_index_label)
-    }, list(sql = "statement")) %>%
-    ml_extract_args(nms, list(sql = "statement"))
+ml_validator_r_formula <- function(.args) {
+  if (rlang::is_formula(.args[["formula"]]))
+    .args[["formula"]] <- rlang::expr_text(.args[["formula"]], width = 500L)
+  .args[["formula"]] <- forge::cast_scalar_character(.args[["formula"]])
+  .args[["features_col"]] <- forge::cast_scalar_character(.args[["features_col"]])
+  .args[["label_col"]] <- forge::cast_scalar_character(.args[["label_col"]])
+  .args[["force_index_label"]] <- forge::cast_scalar_boolean(.args[["force_index_label"]])
+  .args
 }
