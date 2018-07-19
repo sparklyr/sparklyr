@@ -23,6 +23,8 @@ spark_install_winutils <- function(version) {
 }
 
 testthat_spark_connection <- function() {
+  if (!exists(".testthat_latest_spark", envir = .GlobalEnv))
+    assign(".testthat_latest_spark", "2.3.0", envir = .GlobalEnv)
   livy_version <- Sys.getenv("LIVY_VERSION")
   if (nchar(livy_version) > 0)
     testthat_livy_connection()
@@ -30,8 +32,10 @@ testthat_spark_connection <- function() {
     testthat_shell_connection()
 }
 
+testthat_latest_spark <- function() get(".testthat_latest_spark", envir = .GlobalEnv)
+
 testthat_shell_connection <- function() {
-  version <- Sys.getenv("SPARK_VERSION", unset = "2.3.0")
+  version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
 
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
@@ -140,7 +144,7 @@ sdf_query_plan <- function(x) {
 }
 
 testthat_livy_connection <- function() {
-  version <- Sys.getenv("SPARK_VERSION", unset = "2.3.0")
+  version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
   livy_version <- Sys.getenv("LIVY_VERSION", "0.5.0")
 
   if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
@@ -198,6 +202,10 @@ test_requires_version <- function(min_version, comment = NULL) {
       msg <- paste0(msg, ": ", comment)
     skip(msg)
   }
+}
+
+test_requires_latest_spark <- function() {
+  test_requires_version(testthat_latest_spark())
 }
 
 param_filter_version <- function(args, min_version, params) {
