@@ -18,10 +18,3 @@ ml_validator_vector_assembler <- function(args, nms) {
     }, old_new_mapping) %>%
     ml_extract_args(nms, old_new_mapping)
 }
-
-# Tokenizer
-ml_validator_tokenizer <- function(args, nms) {
-  args %>%
-    ml_validate_args() %>%
-    ml_extract_args(nms)
-}
