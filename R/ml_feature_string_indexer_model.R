@@ -14,12 +14,21 @@ ft_string_indexer_model.spark_connection <- function(
   handle_invalid = "error",
   uid = random_string("string_indexer_model_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    labels = labels,
+    handle_invalid = handle_invalid,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_string_indexer_model()
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.StringIndexerModel",
-                     uid, labels) %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col)
+  jobj <- invoke_new(
+    x, "org.apache.spark.ml.feature.StringIndexerModel",
+    .args[["uid"]], .args[["labels"]]) %>%
+    invoke("setInputCol", .args[["input_col"]]) %>%
+    invoke("setOutputCol", .args[["output_col"]])
 
   new_ml_string_indexer_model(jobj)
 }
@@ -30,8 +39,16 @@ ft_string_indexer_model.ml_pipeline <- function(
   handle_invalid = "error",
   uid = random_string("string_indexer_model_"), ...
 ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_string_indexer_model.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    labels = labels,
+    handle_invalid = handle_invalid,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
@@ -40,16 +57,25 @@ ft_string_indexer_model.tbl_spark <- function(
   handle_invalid = "error",
   uid = random_string("string_indexer_model_"), ...
 ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+
+  stage <- ft_string_indexer_model.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    labels = labels,
+    handle_invalid = handle_invalid,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
-ml_validator_string_indexer_model <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      labels <- lapply(labels, ensure_scalar_character)
-      handle_invalid <- rlang::arg_match(
-        handle_invalid, c("error", "skip", "keep"))
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_string_indexer_model <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["labels"]] <- forge::cast_character(.args[["labels"]]) %>% as.list()
+  .args[["handle_invalid"]] <- forge::cast_choice(
+    .args[["handle_invalid"]],
+    c("error", "skip", "keep")
+  )
+  .args
 }
