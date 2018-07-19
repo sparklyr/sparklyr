@@ -56,16 +56,6 @@ ml_validator_index_to_string <- function(args, nms) {
     ml_extract_args(nms)
 }
 
-
-# ElementwiseProduct
-ml_validator_elementwise_product <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      scaling_vec <- lapply(scaling_vec, ensure_scalar_double)
-    }) %>%
-    ml_extract_args(nms)
-}
-
 # RegexTokenizer
 ml_validator_regex_tokenizer <- function(args, nms) {
   args %>%
