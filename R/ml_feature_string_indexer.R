@@ -28,9 +28,9 @@ ft_string_indexer <- function(
 ml_validator_string_indexer <- function(.args) {
   .args$input_col <- ensure_scalar_character(.args$input_col)
   .args$output_col <- ensure_scalar_character(.args$output_col)
-  .args$handle_invalid <- ensure_valid_option(
+  .args$handle_invalid <- forge::cast_choice(
     .args$handle_invalid, c("error", "skip", "keep"))
-  .args$string_order_type <- ensure_valid_option(
+  .args$string_order_type <- forge::cast_choice(
     .args$string_order_type,
     c("frequencyDesc", "frequencyAsc", "alphabetDesc", "alphabetAsc")
   )

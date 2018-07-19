@@ -136,14 +136,3 @@ ensure_directory <- function(path) {
   invisible(path)
 
 }
-
-#' @rdname ensure
-#' @name ensure
-#' @param options Vector of valid options.
-#' @export
-ensure_valid_option <- function(object, options, allow.na = FALSE, allow.null = FALSE) {
-  if (object %in% options)
-    object
-  else
-    stop("object must be one of ", paste(options, ", "))
-}
