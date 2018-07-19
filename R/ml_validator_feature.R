@@ -3,15 +3,7 @@ input_output_mapping <- list(
   output.col = "output_col"
 )
 
-# HashingTF
-ml_validator_hashing_tf <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      binary <- ensure_scalar_boolean(binary)
-      num_features <- ensure_scalar_integer(num_features)
-    }) %>%
-    ml_extract_args(nms)
-}
+
 
 # OneHotEncoder
 ml_validator_one_hot_encoder <- function(args, nms) {
