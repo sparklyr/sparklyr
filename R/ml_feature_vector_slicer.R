@@ -20,10 +20,20 @@ ft_vector_slicer.spark_connection <- function(
   uid = random_string("vector_slicer_"), ...
 ) {
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.VectorSlicer",
-                             input_col, output_col, uid) %>%
-    invoke("setIndices", indices)
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    indices = indices,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_vector_slicer()
+
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.VectorSlicer",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setIndices", .args[["indices"]]
+    )
 
   new_ml_vector_slicer(jobj)
 }
@@ -33,16 +43,15 @@ ft_vector_slicer.ml_pipeline <- function(
   x, input_col, output_col, indices,
   uid = random_string("vector_slicer_"), ...
 ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
-}
-
-ml_validator_vector_slicer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      indices <- lapply(indices, ensure_scalar_integer)
-    }) %>%
-    ml_extract_args(nms)
+  stage <- ft_vector_slicer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    indices = indices,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
@@ -50,10 +59,23 @@ ft_vector_slicer.tbl_spark <- function(
   x, input_col, output_col, indices,
   uid = random_string("vector_slicer_"), ...
 ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+  stage <- ft_vector_slicer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    indices = indices,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_vector_slicer <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_vector_slicer")
+}
+
+ml_validator_vector_slicer <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["indices"]] <- forge::cast_integer(.args[["indices"]]) %>% as.list()
+  .args
 }
