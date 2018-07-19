@@ -40,7 +40,7 @@
 #' @export
 ft_feature_hasher <- function(
   x, input_cols, output_col,
-  num_features = as.integer(2^18),
+  num_features = 2^18,
   categorical_cols = NULL,
   uid = random_string("feature_hasher_"), ...
   ) {
@@ -50,19 +50,28 @@ ft_feature_hasher <- function(
 #' @export
 ft_feature_hasher.spark_connection <- function(
   x, input_cols, output_col,
-  num_features = as.integer(2^18),
+  num_features = 2^18,
   categorical_cols = NULL,
   uid = random_string("feature_hasher_"), ...
   ) {
 
-  ml_ratify_args()
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.FeatureHasher", uid) %>%
-    invoke("setInputCols", input_cols) %>%
-    invoke("setOutputCol", output_col) %>%
-    invoke("setNumFeatures", num_features)
+  .args <- list(
+    input_cols = input_cols,
+    output_col = output_col,
+    num_features = num_features,
+    categorical_cols = categorical_cols,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_feature_hasher()
 
-  if (!is.null(categorical_cols))
-    jobj <- invoke("setCategoricalCols", categorical_cols)
+  jobj <- invoke_new(x, "org.apache.spark.ml.feature.FeatureHasher", .args[["uid"]]) %>%
+    invoke("setInputCols", .args[["input_cols"]]) %>%
+    invoke("setOutputCol", .args[["output_col"]]) %>%
+    invoke("setNumFeatures", .args[["num_features"]])
+
+  if (!is.null(.args[["categorical_cols"]]))
+    jobj <- invoke("setCategoricalCols", .args[["categorical_cols"]])
 
   new_ml_feature_hasher(jobj)
 }
@@ -70,38 +79,53 @@ ft_feature_hasher.spark_connection <- function(
 #' @export
 ft_feature_hasher.ml_pipeline <- function(
   x, input_cols, output_col,
-  num_features = as.integer(2^18),
+  num_features = 2^18,
   categorical_cols = NULL,
   uid = random_string("feature_hasher_"), ...
   ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_feature_hasher.spark_connection(
+    x = spark_connection(x),
+    input_cols = input_cols,
+    output_col = output_col,
+    num_features = num_features,
+    categorical_cols = categorical_cols,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
 ft_feature_hasher.tbl_spark <- function(
   x, input_cols, output_col,
-  num_features = as.integer(2^18),
+  num_features = 2^18,
   categorical_cols = NULL,
   uid = random_string("feature_hasher_"), ...
   ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+  stage <- ft_feature_hasher.spark_connection(
+    x = spark_connection(x),
+    input_cols = input_cols,
+    output_col = output_col,
+    num_features = num_features,
+    categorical_cols = categorical_cols,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_feature_hasher <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_feature_hasher")
 }
 
-ml_validator_feature_hasher <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      input_cols <- lapply(input_cols, ensure_scalar_character)
-      output_col <- ensure_scalar_character(output_col)
-      if (!is.null(categorical_cols))
-        categorical_cols <- lapply(categorical_cols, ensure_scalar_character)
-      num_features <- ensure_scalar_integer(num_features)
-      uid <- ensure_scalar_character(uid)
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_feature_hasher <- function(.args) {
+  .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]]) %>%
+    as.list()
+  .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]])
+  if (!is.null(.args[["categorical_cols"]]))
+    .args[["categorical_cols"]] <- forge::cast_character(.args[["categorical_cols"]]) %>%
+    as.list()
+  .args[["num_features"]] <- forge::cast_scalar_integer(.args[["num_features"]])
+  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
+  .args
 }
