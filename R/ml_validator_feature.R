@@ -25,14 +25,3 @@ ml_validator_tokenizer <- function(args, nms) {
     ml_validate_args() %>%
     ml_extract_args(nms)
 }
-
-# StopWordsRemover
-ml_validator_stop_words_remover <- function(args, nms) {
-  args %>%
-    ml_validate_args(
-    {
-      case_sensitive <- ensure_scalar_boolean(case_sensitive)
-      stop_words <- lapply(stop_words, ensure_scalar_character)
-    }) %>%
-    ml_extract_args(nms)
-}

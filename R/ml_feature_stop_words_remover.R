@@ -51,11 +51,21 @@ ft_stop_words_remover.spark_connection <- function(
   stop_words = ml_default_stop_words(spark_connection(x), "english"),
   uid = random_string("stop_words_remover_"), ...) {
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.StopWordsRemover",
-                             input_col, output_col, uid) %>%
-    invoke("setCaseSensitive", case_sensitive) %>%
-    invoke("setStopWords", stop_words)
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    case_sensitive = case_sensitive,
+    stop_words = stop_words,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_stop_words_remover()
+
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.StopWordsRemover",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setCaseSensitive", .args[["case_sensitive"]]) %>%
+    invoke("setStopWords", .args[["stop_words"]])
 
   new_ml_stop_words_remover(jobj)
 }
@@ -66,8 +76,16 @@ ft_stop_words_remover.ml_pipeline <- function(
   stop_words = ml_default_stop_words(spark_connection(x), "english"),
   uid = random_string("stop_words_remover_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_stop_words_remover.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    case_sensitive = case_sensitive,
+    stop_words = stop_words,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
@@ -76,10 +94,26 @@ ft_stop_words_remover.tbl_spark <- function(
   stop_words = ml_default_stop_words(spark_connection(x), "english"),
   uid = random_string("stop_words_remover_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+  stage <- ft_stop_words_remover.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    case_sensitive = case_sensitive,
+    stop_words = stop_words,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_stop_words_remover <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_stop_words_remover")
+}
+
+ml_validator_stop_words_remover <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["case_sensitive"]] <- forge::cast_scalar_boolean(.args[["case_sensitive"]])
+  .args[["stop_words"]] <- forge::cast_character(.args[["stop_words"]]) %>%
+    as.list()
+  .args
 }
