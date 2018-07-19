@@ -3,6 +3,7 @@ context("ml feature - sql transformer")
 sc <- testthat_spark_connection()
 
 test_that("ft_sql/dplyr_transformer() works", {
+  test_requires("dplyr")
   iris_tbl <- testthat_tbl("iris")
   transformed <- iris_tbl %>%
     mutate(pw2 = Petal_Width * 2)
@@ -41,6 +42,7 @@ test_that("ft_sql/dplyr_transformer() works", {
 
 test_that("ft_dplyr_transformer() handles cases where table name isn't quoted (#1249)", {
   test_requires_version("2.0.0", "sample_frac() requires Spark 2.0+")
+  test_requires("dplyr")
   iris_tbl <- testthat_tbl("iris")
   sampled <- iris_tbl %>%
     sample_frac(0.01)

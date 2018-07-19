@@ -36,13 +36,3 @@ ml_validator_stop_words_remover <- function(args, nms) {
     }) %>%
     ml_extract_args(nms)
 }
-
-# SQLTransformer
-ml_validator_sql_transformer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      statement <- ensure_scalar_character(statement)
-    }, list(sql = "statement")) %>%
-    ml_extract_args(nms, list(sql = "statement"))
-}
-

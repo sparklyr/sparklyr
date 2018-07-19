@@ -24,9 +24,17 @@ ft_sql_transformer.spark_connection <- function(
   x, statement,
   uid = random_string("sql_transformer_"), ...) {
 
-  ml_ratify_args()
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.SQLTransformer", uid) %>%
-    invoke("setStatement", statement)
+  .args <- list(
+    statement = statement,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_sql_transformer()
+
+  jobj <- invoke_new(
+    x, "org.apache.spark.ml.feature.SQLTransformer",
+    .args[["uid"]]) %>%
+    invoke("setStatement", .args[["statement"]])
 
   new_ml_sql_transformer(jobj)
 }
@@ -36,16 +44,27 @@ ft_sql_transformer.ml_pipeline <- function(
   x, statement,
   uid = random_string("sql_transformer_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_sql_transformer.spark_connection(
+    x = spark_connection(x),
+    statement = statement,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
 ft_sql_transformer.tbl_spark <- function(
   x, statement,
   uid = random_string("sql_transformer_"), ...) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+
+  stage <- ft_sql_transformer.spark_connection(
+    x = spark_connection(x),
+    statement = statement,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_sql_transformer <- function(jobj) {
@@ -96,8 +115,13 @@ ft_dplyr_transformer.ml_pipeline <- function(
   x, tbl,
   uid = random_string("dplyr_transformer_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_dplyr_transformer.spark_connection(
+    x = spark_connection(x),
+    tbl = tbl,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
@@ -105,6 +129,20 @@ ft_dplyr_transformer.tbl_spark <- function(
   x, tbl,
   uid = random_string("dplyr_transformer_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+  stage <- ft_dplyr_transformer.spark_connection(
+    x = spark_connection(x),
+    tbl = tbl,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
+}
+
+ml_validator_sql_transformer <- function(.args) {
+  .args <- ml_backwards_compatibility(.args, list(
+    sql = "statement"
+  ))
+  .args[["statement"]] <- forge::cast_scalar_character(.args[["statement"]])
+  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
+  .args
 }
