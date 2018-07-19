@@ -2,11 +2,11 @@ ml_add_stage <- function(x, transformer) {
   sc <- spark_connection(x)
   stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(transformer)) else {
     tryCatch(spark_jobj(x) %>%
-      invoke("getStages") %>%
-      c(spark_jobj(transformer)),
-      error = function(e) spark_jobj(x) %>%
-        invoke("stages") %>%
-        c(spark_jobj(transformer))
+               invoke("getStages") %>%
+               c(spark_jobj(transformer)),
+             error = function(e) spark_jobj(x) %>%
+               invoke("stages") %>%
+               c(spark_jobj(transformer))
     )
   }
 
@@ -17,16 +17,29 @@ ml_add_stage <- function(x, transformer) {
   new_ml_pipeline(jobj)
 }
 
-ml_new_transformer <- function(sc, class, input_col, output_col, uid) {
-  invoke_new(sc, class, uid) %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col)
+ml_new_transformer <- function(
+  sc, class,
+  input_col = NULL, output_col = NULL,
+  input_cols = NULL, output_cols = NULL,
+  uid) {
+  jobj <- invoke_new(sc, class, uid)
+  if (!is.null(input_col))
+    jobj <- invoke(jobj, "setInputCol", input_col)
+  if (!is.null(input_cols))
+    jobj <- invoke(jobj, "setInputCols", as.list(input_cols))
+  if (!is.null(output_col))
+    jobj <- invoke(jobj, "setOutputCol", output_col)
+  if (!is.null(output_cols))
+    jobj <- invoke(jobj, "setOutputCols", as.list(output_cols))
+  jobj
 }
 
 validate_args_transformer <- function(.args) {
   .args <- ml_backwards_compatibility(.args)
-  .args[["input_col"]] <- forge::cast_scalar_character(.args[["input_col"]])
-  .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]])
+  .args[["input_col"]] <- forge::cast_scalar_character(.args[["input_col"]], allow_null = TRUE)
+  .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]], allow_null = TRUE)
+  .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]], allow_null = TRUE)
+  .args[["output_cols"]] <- forge::cast_character(.args[["output_cols"]], allow_null = TRUE)
   .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
   .args
 }
@@ -87,7 +100,7 @@ ml_stage <- function(x, stage) {
          "0" = stop("stage not found"),
          "1" = x$stages[[matched_index]],
          stop("multiple stages found")
-         )
+  )
 }
 
 #' @rdname ml_stage
