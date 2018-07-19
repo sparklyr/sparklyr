@@ -38,16 +38,6 @@ ml_validator_tokenizer <- function(args, nms) {
     ml_extract_args(nms)
 }
 
-# IndexToString
-ml_validator_index_to_string <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      if (!rlang::is_null(labels))
-        labels <- lapply(labels, ensure_scalar_character)
-    }) %>%
-    ml_extract_args(nms)
-}
-
 # RegexTokenizer
 ml_validator_regex_tokenizer <- function(args, nms) {
   args %>%
