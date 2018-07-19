@@ -1,4 +1,5 @@
 library(sparklyr)
+library(dplyr)
 
 spark_install_winutils <- function(version) {
   hadoop_version <- if (version < "2.0.0") "2.6" else "2.7"
@@ -219,4 +220,34 @@ output_file <- function(filename) file.path("output", filename)
 skip_livy <- function() {
   livy_version <- Sys.getenv("LIVY_VERSION")
   if (nchar(livy_version) > 0) skip("Test unsupported under Livy.")
+}
+
+check_params <- function(test_args, params) {
+  purrr::iwalk(
+    test_args,
+    ~ expect_identical(params[[.y]], .x)
+  )
+}
+
+test_param_setting <- function(sc, fn, test_args) {
+
+  params <- do.call(fn, c(list(x = sc), test_args)) %>%
+    ml_params()
+  check_params(test_args, params)
+
+  params <- do.call(fn, c(list(x = ml_pipeline(sc)), test_args)) %>%
+    ml_stage(1) %>%
+    ml_params()
+  check_params(test_args, params)
+}
+
+test_default_args <- function(sc, fn) {
+  default_args <- rlang::fn_fmls(fn) %>%
+    as.list() %>%
+    purrr::discard(~is.symbol(.x)) %>%
+    rlang::modify(uid = NULL)
+
+  params <- do.call(fn, list(x = sc)) %>%
+    ml_params()
+  check_params(default_args, params)
 }

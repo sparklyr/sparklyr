@@ -1,16 +1,23 @@
 context("ml feature binarizer")
 
-sc <- testthat_spark_connection()
-
-test_that("ft_binarizer() returns params of transformer", {
-  binarizer <- ft_binarizer(sc, "x", "y", threshold = 0.5)
-  params <- list("x", "y", threshold = 0.5)
-  expect_true(dplyr::setequal(ml_param_map(binarizer), params))
+test_that("ft_binarizer() default params", {
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_binarizer)
 })
 
-test_that("ft_binarizer.tbl_spark() works as expected", {
-  test_requires("dplyr")
-  df <- data.frame(id = 0:2L, feature = c(0.1, 0.8, 0.2))
+test_that("ft_binarizer() param setting", {
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "x",
+    output_col = "y",
+    threshold = 0.5
+  )
+  test_param_setting(sc, ft_binarizer, test_args)
+})
+
+test_that("ft_binarizer.tbl_spark() works", {
+  sc <- testthat_spark_connection()
+  df <- data_frame(id = 0:2L, feature = c(0.1, 0.8, 0.2))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
   expect_equal(
     df_tbl %>%
@@ -21,21 +28,8 @@ test_that("ft_binarizer.tbl_spark() works as expected", {
   )
 })
 
-test_that("ft_binarizer() threshold defaults to 0", {
-  expect_identical(ft_binarizer(sc, "in", "out") %>%
-                     ml_param("threshold"),
-                   0)
-})
-
-test_that("ft_binarizer() input checking works", {
-  expect_identical(ft_binarizer(sc, "in", "out", 1L) %>%
-                     ml_param("threshold") %>%
-                     class(),
-                   "numeric")
-  expect_error(ft_binarizer(sc, "in", "out", "foo"),
-               "length-one numeric vector")
-
-  bin <- ft_binarizer(sc, "in", "out", threshold = 10)
-  expect_equal(ml_params(bin, list("input_col", "output_col", "threshold")),
-               list(input_col = "in", output_col = "out", threshold = 10))
+test_that("ft_binarizer() input checking", {
+  sc <- testthat_spark_connection()
+  expect_error(ft_binarizer(sc, threshold = "foo"),
+               "Can't convert a string to a double vector")
 })
