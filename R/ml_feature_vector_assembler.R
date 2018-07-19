@@ -21,11 +21,17 @@ ft_vector_assembler.spark_connection <- function(
   x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    input_cols = input_cols,
+    output_col = output_col,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_vector_assembler()
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.VectorAssembler", uid) %>%
-    invoke("setInputCols", input_cols) %>%
-    invoke("setOutputCol", output_col)
+  jobj <- invoke_new(x, "org.apache.spark.ml.feature.VectorAssembler", .args[["uid"]]) %>%
+    invoke("setInputCols", .args[["input_cols"]]) %>%
+    invoke("setOutputCol", .args[["output_col"]])
 
   new_ml_vector_assembler(jobj)
 }
@@ -35,8 +41,14 @@ ft_vector_assembler.ml_pipeline <- function(
   x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_vector_assembler.spark_connection(
+    x = spark_connection(x),
+    input_cols = input_cols,
+    output_col = output_col,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
@@ -44,10 +56,27 @@ ft_vector_assembler.tbl_spark <- function(
   x, input_cols, output_col,
   uid = random_string("vector_assembler_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+  stage <- ft_vector_assembler.spark_connection(
+    x = spark_connection(x),
+    input_cols = input_cols,
+    output_col = output_col,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_vector_assembler <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_vector_assembler")
+}
+
+ml_validator_vector_assembler <- function(.args) {
+  .args <- ml_backwards_compatibility(.args, list(
+    input.col = "input_cols",
+    output.col = "output_col"
+  ))
+
+  .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]]) %>% as.list()
+  .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]])
+  .args
 }
