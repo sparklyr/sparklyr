@@ -6,7 +6,7 @@ sentence_df <- data.frame(
   sentence = c("Hi I heard about Spark",
                "I wish Java could use case classes",
                "Logistic regression models are neat"))
-tokenized_tbl <- copy_to(sc, sentence_df, overwrite = TRUE) %>%
+tokenized_tbl <- sdf_copy_to(sc, sentence_df, overwrite = TRUE) %>%
   ft_tokenizer("sentence", "words")
 
 test_that("ft_word2vec() returns result with correct length", {
