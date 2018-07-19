@@ -30,7 +30,7 @@ testthat_spark_connection <- function() {
 }
 
 testthat_shell_connection <- function() {
-  version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
+  version <- Sys.getenv("SPARK_VERSION", unset = "2.3.0")
 
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
