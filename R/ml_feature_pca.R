@@ -20,11 +20,19 @@ ft_pca.spark_connection <- function(
   x, input_col, output_col, k, dataset = NULL,
   uid = random_string("pca_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    k = k,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_pca()
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.PCA",
-                                  input_col, output_col, uid) %>%
-    invoke("setK", k) %>%
+  estimator <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.PCA",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setK", .args[["k"]]) %>%
     new_ml_pca()
 
   if (is.null(dataset))
@@ -39,7 +47,15 @@ ft_pca.ml_pipeline <- function(
   uid = random_string("pca_"), ...
 ) {
 
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_pca.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    k = k,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
 
 }
@@ -49,27 +65,23 @@ ft_pca.tbl_spark <- function(
   x, input_col, output_col, k, dataset = NULL,
   uid = random_string("pca_"), ...
 ) {
-  stage <- ml_new_stage_modified_args()
+
+  stage <- ft_pca.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    k = k,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
   else
     ml_fit_and_transform(stage, x)
 }
-# Validator
 
-ml_validator_pca <- function(args, nms) {
-  args %>%
-    ml_validate_args(
-      {
-        k <- ensure_scalar_integer(k)
-      }) %>%
-    ml_extract_args(nms)
-}
-
-
-# Constructors
-#
 new_ml_pca <- function(jobj) {
   new_ml_estimator(jobj, subclass = "ml_pca")
 }
@@ -81,6 +93,13 @@ new_ml_pca_model <- function(jobj) {
     pc = try_null(read_spark_matrix(jobj, "pc")),
     subclass = "ml_pca_model")
 }
+
+ml_validator_pca <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["k"]] <- forge::cast_scalar_integer(.args[["k"]])
+  .args
+}
+
 
 #' @rdname ft_pca
 #' @param features The columns to use in the principal components
