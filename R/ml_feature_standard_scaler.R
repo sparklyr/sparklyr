@@ -41,12 +41,21 @@ ft_standard_scaler.spark_connection <- function(
   with_mean = FALSE, with_std = TRUE, dataset = NULL,
   uid = random_string("standard_scaler_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_standard_scaler()
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StandardScaler",
-                                  input_col, output_col, uid) %>%
-    invoke("setWithMean", with_mean) %>%
-    invoke("setWithStd", with_std) %>%
+  estimator <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.StandardScaler",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setWithMean", .args[["with_mean"]]) %>%
+    invoke("setWithStd", .args[["with_std"]]) %>%
     new_ml_standard_scaler()
 
   if (is.null(dataset))
@@ -62,7 +71,16 @@ ft_standard_scaler.ml_pipeline <- function(
   uid = random_string("standard_scaler_"), ...
 ) {
 
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_standard_scaler.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
 
 }
@@ -73,9 +91,16 @@ ft_standard_scaler.tbl_spark <- function(
   with_mean = FALSE, with_std = TRUE, dataset = NULL,
   uid = random_string("standard_scaler_"), ...
 ) {
-  dots <- rlang::dots_list(...)
-
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_standard_scaler.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -95,11 +120,9 @@ new_ml_standard_scaler_model <- function(jobj) {
     subclass = "ml_standard_scaler_model")
 }
 
-ml_validator_standard_scaler <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      with_mean <- ensure_scalar_boolean(with_mean)
-      with_std <- ensure_scalar_boolean(with_std)
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_standard_scaler <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["with_mean"]] <- forge::cast_scalar_boolean(.args[["with_mean"]])
+  .args[["with_std"]] <- forge::cast_scalar_boolean(.args[["with_std"]])
+  .args
 }
