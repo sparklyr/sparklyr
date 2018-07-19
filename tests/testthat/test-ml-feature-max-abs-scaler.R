@@ -1,8 +1,7 @@
 context("ml feature max abs scaler")
 
-sc <- testthat_spark_connection()
-
 test_that("ft_max_abs_scaler() works properly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "ft_max_abs_scaler requires Spark 2.0.0+")
   df <- data.frame(
     id = 0:2,
