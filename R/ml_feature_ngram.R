@@ -18,10 +18,19 @@ ft_ngram <- function(x, input_col, output_col, n = 2L,
 ft_ngram.spark_connection <- function(x, input_col, output_col, n = 2L,
                                       uid = random_string("ngram_"), ...) {
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.NGram",
-                             input_col, output_col, uid) %>%
-    invoke("setN", n)
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    n = n,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_ngram()
+
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.NGram",
+    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    invoke("setN", .args[["n"]])
 
   new_ml_ngram(jobj)
 }
@@ -30,25 +39,37 @@ ft_ngram.spark_connection <- function(x, input_col, output_col, n = 2L,
 ft_ngram.ml_pipeline <- function(x, input_col, output_col, n = 2L,
                                  uid = random_string("ngram_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_ngram.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    n = n,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
 ft_ngram.tbl_spark <- function(x, input_col, output_col, n = 2L,
                                uid = random_string("ngram_"), ...) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
-}
-
-ml_validator_ngram <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      n <- ensure_scalar_integer(n)
-    }) %>%
-    ml_extract_args(nms)
+  stage <- ft_ngram.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    n = n,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_ngram <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_ngram")
+}
+
+ml_validator_ngram <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["n"]] <- forge::cast_scalar_integer(.args[["n"]])
+  .args
 }
