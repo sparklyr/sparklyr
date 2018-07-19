@@ -68,3 +68,22 @@ test_that("ft_string_indexer_model works", {
     c(1, 0, 1, 1)
   )
 })
+
+test_that("ft_string_indexer works", {
+
+  args <- list(
+    x = sc,
+    input_col = "in",
+    output_col = "out")
+
+  if (spark_version(sc) >= "2.1.0")
+    args <- c(args, handle_invalid = "skip")
+
+  si <- do.call(ft_string_indexer, args)
+
+  expect_equal(
+    ml_params(si, names(args)[-1]),
+    args[-1])
+
+  expect_true(is_ml_estimator(si))
+})

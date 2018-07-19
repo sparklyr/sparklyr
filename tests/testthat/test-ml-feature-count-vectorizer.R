@@ -1,4 +1,4 @@
-context("ml feature (estimators)")
+context("ml feature count vectorizer")
 
 sc <- testthat_spark_connection()
 
@@ -48,23 +48,4 @@ test_that("ft_count_vectorizer() works", {
        min_tf = 2L,
        vocab_size = 1024L)
   )
-})
-
-test_that("ft_string_indexer works", {
-
-  args <- list(
-    x = sc,
-    input_col = "in",
-    output_col = "out")
-
-  if (spark_version(sc) >= "2.1.0")
-    args <- c(args, handle_invalid = "skip")
-
-  si <- do.call(ft_string_indexer, args)
-
-  expect_equal(
-    ml_params(si, names(args)[-1]),
-    args[-1])
-
-  expect_true(is_ml_estimator(si))
 })
