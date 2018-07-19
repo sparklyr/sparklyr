@@ -46,7 +46,7 @@ testthat_shell_connection <- function() {
     spark_install(version)
   }
 
-  expect_gt(nrow(spark_installed_versions()), 0)
+  stopifnot(nrow(spark_installed_versions()) > 0)
 
   # generate connection if none yet exists
   connected <- FALSE
