@@ -10,17 +10,14 @@
 #' @template roxlate-ml-feature-transformer
 #'
 #' @export
-ft_interaction <- function(
-  x, input_cols, output_col,
-  uid = random_string("interaction_"), ...) {
+ft_interaction <- function(x, input_cols = NULL, output_col = NULL,
+                           uid = random_string("interaction_"), ...) {
   UseMethod("ft_interaction")
 }
 
 #' @export
-ft_interaction.spark_connection <- function(
-  x, input_cols, output_col,
-  uid = random_string("interaction_"), ...) {
-
+ft_interaction.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
+                                            uid = random_string("interaction_"), ...) {
   .args <- list(
     input_cols = input_cols,
     output_col = output_col,
@@ -29,17 +26,16 @@ ft_interaction.spark_connection <- function(
     c(rlang::dots_list(...)) %>%
     ml_validator_interaction()
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.Interaction", .args[["uid"]]) %>%
-    invoke("setInputCols", .args[["input_cols"]]) %>%
-    invoke("setOutputCol", .args[["output_col"]])
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.Interaction",
+    input_cols = .args[["input_cols"]], output_col = .args[["output_col"]], uid = .args[["uid"]])
 
   new_ml_interaction(jobj)
 }
 
 #' @export
-ft_interaction.ml_pipeline <- function(
-  x, input_cols, output_col,
-  uid = random_string("interaction_"), ...) {
+ft_interaction.ml_pipeline <- function(x, input_cols = NULL, output_col = NULL,
+                                       uid = random_string("interaction_"), ...) {
 
   stage <- ft_interaction.spark_connection(
     x = spark_connection(x),
@@ -52,9 +48,8 @@ ft_interaction.ml_pipeline <- function(
 }
 
 #' @export
-ft_interaction.tbl_spark <- function(
-  x, input_cols, output_col,
-  uid = random_string("interaction_"), ...) {
+ft_interaction.tbl_spark <- function(x, input_cols = NULL, output_col = NULL,
+                                     uid = random_string("interaction_"), ...) {
 
   stage <- ft_interaction.spark_connection(
     x = spark_connection(x),
@@ -75,8 +70,7 @@ ml_validator_interaction <- function(.args) {
     input.col = "input_cols",
     output.col = "output_col"
   ))
-  .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]]) %>%
-    as.list()
-  .args[["output_col"]] <- forge::cast_character(.args[["output_col"]])
+  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
   .args
 }
