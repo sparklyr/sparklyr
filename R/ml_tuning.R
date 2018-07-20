@@ -34,23 +34,7 @@ NULL
 
 ml_expand_params <- function(param_grid) {
   param_grid %>%
-    lapply(function(stage) {
-      params <- names(stage)
-      lapply(params, function(param) {
-        param_values <- stage[[param]]
-        param_values %>%
-          lapply(function(value) {
-            rlang::set_names(list(value = value), param)
-          })
-      }) %>%
-        # compute param-value combinations within each stage
-        expand.grid(stringsAsFactors = FALSE) %>%
-        apply(1, list) %>%
-        rlang::flatten() %>%
-        lapply(. %>%
-                 unname() %>%
-                 rlang::flatten())
-    })
+    purrr::map(purrr::cross)
 }
 
 ml_validate_params <- function(stages_params, uid_stages, current_param_list) {
