@@ -17,21 +17,18 @@
 #' @name ft_lsh
 #' @seealso ft_lsh_utils
 #' @export
-ft_bucketed_random_projection_lsh <- function(
-  x, input_col, output_col,
-  bucket_length, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...) {
+ft_bucketed_random_projection_lsh <- function(x, input_col, output_col,
+                                              bucket_length, num_hash_tables = 1, seed = NULL,
+                                              dataset = NULL,
+                                              uid = random_string("bucketed_random_projection_lsh_"), ...) {
   UseMethod("ft_bucketed_random_projection_lsh")
 }
 
 #' @export
-ft_bucketed_random_projection_lsh.spark_connection <- function(
-  x, input_col, output_col,
-  bucket_length, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...) {
-
+ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col, output_col,
+                                                               bucket_length, num_hash_tables = 1, seed = NULL,
+                                                               dataset = NULL,
+                                                               uid = random_string("bucketed_random_projection_lsh_"), ...) {
   spark_require_version(x, "2.1.0", "LSH")
 
   .args <- list(
@@ -62,13 +59,10 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(
 }
 
 #' @export
-ft_bucketed_random_projection_lsh.ml_pipeline <- function(
-  x, input_col, output_col,
-  bucket_length, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...
-) {
-
+ft_bucketed_random_projection_lsh.ml_pipeline <- function(x, input_col, output_col,
+                                                          bucket_length, num_hash_tables = 1, seed = NULL,
+                                                          dataset = NULL,
+                                                          uid = random_string("bucketed_random_projection_lsh_"), ...) {
   stage <- ft_bucketed_random_projection_lsh.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -84,12 +78,10 @@ ft_bucketed_random_projection_lsh.ml_pipeline <- function(
 }
 
 #' @export
-ft_bucketed_random_projection_lsh.tbl_spark <- function(
-  x, input_col, output_col,
-  bucket_length, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...
-) {
+ft_bucketed_random_projection_lsh.tbl_spark <- function(x, input_col, output_col,
+                                                        bucket_length, num_hash_tables = 1, seed = NULL,
+                                                        dataset = NULL,
+                                                        uid = random_string("bucketed_random_projection_lsh_"), ...) {
   stage <- ft_bucketed_random_projection_lsh.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
