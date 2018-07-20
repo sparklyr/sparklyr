@@ -8,19 +8,14 @@
 #' @param min_doc_freq The minimum number of documents in which a term should appear. Default: 0
 #'
 #' @export
-ft_idf <- function(
-  x, input_col, output_col,
-  min_doc_freq = 0L, dataset = NULL,
-  uid = random_string("idf_"), ...) {
+ft_idf <- function(x, input_col = NULL, output_col = NULL,
+                   min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
   UseMethod("ft_idf")
 }
 
 #' @export
-ft_idf.spark_connection <- function(
-  x, input_col, output_col,
-  min_doc_freq = 0L, dataset = NULL,
-  uid = random_string("idf_"), ...) {
-
+ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                    min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -32,7 +27,7 @@ ft_idf.spark_connection <- function(
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.IDF",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setMinDocFreq", .args[["min_doc_freq"]]) %>%
     new_ml_idf()
 
@@ -43,11 +38,8 @@ ft_idf.spark_connection <- function(
 }
 
 #' @export
-ft_idf.ml_pipeline <- function(
-  x, input_col, output_col,
-  min_doc_freq = 0L, dataset = NULL,
-  uid = random_string("idf_"), ...
-) {
+ft_idf.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                               min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
 
   stage <- ft_idf.spark_connection(
     x = spark_connection(x),
@@ -62,11 +54,8 @@ ft_idf.ml_pipeline <- function(
 }
 
 #' @export
-ft_idf.tbl_spark <- function(
-  x, input_col, output_col,
-  min_doc_freq = 0L, dataset = NULL,
-  uid = random_string("idf_"), ...
-) {
+ft_idf.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                             min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
   stage <- ft_idf.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
