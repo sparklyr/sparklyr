@@ -9,15 +9,14 @@
 #' @param n Minimum n-gram length, greater than or equal to 1. Default: 2, bigram features
 #'
 #' @export
-ft_ngram <- function(x, input_col, output_col, n = 2L,
+ft_ngram <- function(x, input_col = NULL, output_col = NULL, n = 2,
                      uid = random_string("ngram_"), ...) {
   UseMethod("ft_ngram")
 }
 
 #' @export
-ft_ngram.spark_connection <- function(x, input_col, output_col, n = 2L,
+ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n = 2,
                                       uid = random_string("ngram_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -29,14 +28,15 @@ ft_ngram.spark_connection <- function(x, input_col, output_col, n = 2L,
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.NGram",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setN", .args[["n"]])
 
   new_ml_ngram(jobj)
 }
 
 #' @export
-ft_ngram.ml_pipeline <- function(x, input_col, output_col, n = 2L,
+ft_ngram.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, n = 2,
                                  uid = random_string("ngram_"), ...) {
 
   stage <- ft_ngram.spark_connection(
@@ -51,7 +51,7 @@ ft_ngram.ml_pipeline <- function(x, input_col, output_col, n = 2L,
 }
 
 #' @export
-ft_ngram.tbl_spark <- function(x, input_col, output_col, n = 2L,
+ft_ngram.tbl_spark <- function(x, input_col = NULL, output_col = NULL, n = 2,
                                uid = random_string("ngram_"), ...) {
   stage <- ft_ngram.spark_connection(
     x = spark_connection(x),
