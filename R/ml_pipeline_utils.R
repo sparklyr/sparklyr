@@ -45,7 +45,7 @@ maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = N
       spark_version()
 
     if (ver < min_version) {
-      if (!identical(param, default)) {
+      if (!all.equal(param, default)) {
         # if user does not have required version, and tries to set parameter, throw error
         stop(paste0("Parameter '", deparse(substitute(param)),
                     "' is only available for Spark ", min_version, " and later."))
