@@ -1,19 +1,15 @@
 #' @rdname ft_lsh
 #' @export
-ft_minhash_lsh <- function(
-  x, input_col, output_col,
-  num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("minhash_lsh_"), ...) {
+ft_minhash_lsh <- function(x, input_col = NULL, output_col = NULL,
+                           num_hash_tables = 1L, seed = NULL, dataset = NULL,
+                           uid = random_string("minhash_lsh_"), ...) {
   UseMethod("ft_minhash_lsh")
 }
 
 #' @export
-ft_minhash_lsh.spark_connection <- function(
-  x, input_col, output_col,
-  num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("minhash_lsh_"), ...) {
+ft_minhash_lsh.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                            num_hash_tables = 1L, seed = NULL, dataset = NULL,
+                                            uid = random_string("minhash_lsh_"), ...) {
 
   spark_require_version(x, "2.1.0", "MinHashLSH")
 
@@ -29,11 +25,10 @@ ft_minhash_lsh.spark_connection <- function(
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.MinHashLSH",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
-    invoke("setNumHashTables", .args[["num_hash_tables"]])
-
-  if (!is.null(seed))
-    jobj <- invoke(jobj, "setSeed", .args[["seed"]])
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    invoke("setNumHashTables", .args[["num_hash_tables"]]) %>%
+    maybe_set_param("setSeed", .args[["seed"]])
 
   estimator <- new_ml_minhash_lsh(jobj)
 
@@ -44,12 +39,9 @@ ft_minhash_lsh.spark_connection <- function(
 }
 
 #' @export
-ft_minhash_lsh.ml_pipeline <- function(
-  x, input_col, output_col,
-  num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("minhash_lsh_"), ...
-) {
+ft_minhash_lsh.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                       num_hash_tables = 1L, seed = NULL, dataset = NULL,
+                                       uid = random_string("minhash_lsh_"), ...) {
 
   stage <- ft_minhash_lsh.spark_connection(
     x = spark_connection(x),
@@ -66,12 +58,9 @@ ft_minhash_lsh.ml_pipeline <- function(
 }
 
 #' @export
-ft_minhash_lsh.tbl_spark <- function(
-  x, input_col, output_col,
-  num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("minhash_lsh_"), ...
-) {
+ft_minhash_lsh.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                     num_hash_tables = 1L, seed = NULL, dataset = NULL,
+                                     uid = random_string("minhash_lsh_"), ...) {
   stage <- ft_minhash_lsh.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -104,7 +93,6 @@ new_ml_minhash_lsh_model <- function(jobj) {
 ml_validator_minhash_lsh <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["num_hash_tables"]] <- forge::cast_scalar_integer(.args[["num_hash_tables"]])
-  if (!is.null(.args[["seed"]]))
-    .args[["seed"]] <- forge::cast_scalar_integer(.args[["seed"]])
+  .args[["seed"]] <- forge::cast_nullable_scalar_integer(.args[["seed"]])
   .args
 }

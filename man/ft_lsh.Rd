@@ -12,8 +12,9 @@ ft_bucketed_random_projection_lsh(x, input_col = NULL, output_col = NULL,
   dataset = NULL, uid = random_string("bucketed_random_projection_lsh_"),
   ...)
 
-ft_minhash_lsh(x, input_col, output_col, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL, uid = random_string("minhash_lsh_"), ...)
+ft_minhash_lsh(x, input_col = NULL, output_col = NULL,
+  num_hash_tables = 1L, seed = NULL, dataset = NULL,
+  uid = random_string("minhash_lsh_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
