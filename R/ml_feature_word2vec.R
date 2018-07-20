@@ -17,18 +17,16 @@
 #' @param vector_size The dimension of the code that you want to transform from words. Default: 100
 #'
 #' @export
-ft_word2vec <- function(
-  x, input_col, output_col, vector_size = 100L, min_count = 5L,
-  max_sentence_length = 1000L, num_partitions = 1L, step_size = 0.025, max_iter = 1L,
-  seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...) {
+ft_word2vec <- function(x, input_col = NULL, output_col = NULL, vector_size = 100, min_count = 5,
+                        max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
+                        seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...) {
   UseMethod("ft_word2vec")
 }
 
 #' @export
-ft_word2vec.spark_connection <- function(
-  x, input_col, output_col, vector_size = 100L, min_count = 5L,
-  max_sentence_length = 1000L, num_partitions = 1L, step_size = 0.025, max_iter = 1L,
-  seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...) {
+ft_word2vec.spark_connection <- function(x, input_col = NULL, output_col = NULL, vector_size = 100, min_count = 5,
+                                         max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
+                                         seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...) {
 
   .args <- list(
     input_col = input_col,
@@ -47,13 +45,14 @@ ft_word2vec.spark_connection <- function(
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Word2Vec",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setVectorSize", .args[["vector_size"]]) %>%
     invoke("setMinCount", .args[["min_count"]]) %>%
     invoke("setNumPartitions", .args[["num_partitions"]]) %>%
     invoke("setStepSize", .args[["step_size"]]) %>%
     invoke("setMaxIter", .args[["max_iter"]]) %>%
-    jobj_set_param("setMaxSentenceLength", .args[["max_sentence_length"]], 1000L, "2.0.0")
+    maybe_set_param("setMaxSentenceLength", .args[["max_sentence_length"]], "2.0.0", 1000)
 
   if (!is.null(.args[["seed"]]))
     jobj <- invoke(jobj, "setSeed", .args[["seed"]])
@@ -67,11 +66,9 @@ ft_word2vec.spark_connection <- function(
 }
 
 #' @export
-ft_word2vec.ml_pipeline <- function(
-  x, input_col, output_col, vector_size = 100L, min_count = 5L,
-  max_sentence_length = 1000L, num_partitions = 1L, step_size = 0.025, max_iter = 1L,
-  seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...
-) {
+ft_word2vec.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, vector_size = 100, min_count = 5,
+                                    max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
+                                    seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...) {
 
   stage <- ft_word2vec.spark_connection(
     x = spark_connection(x),
@@ -92,11 +89,9 @@ ft_word2vec.ml_pipeline <- function(
 }
 
 #' @export
-ft_word2vec.tbl_spark <- function(
-  x, input_col, output_col, vector_size = 100L, min_count = 5L,
-  max_sentence_length = 1000L, num_partitions = 1L, step_size = 0.025, max_iter = 1L,
-  seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...
-) {
+ft_word2vec.tbl_spark <- function(x, input_col = NULL, output_col = NULL, vector_size = 100, min_count = 5,
+                                  max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
+                                  seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...) {
   stage <- ft_word2vec.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -147,8 +142,7 @@ ml_validator_word2vec <- function(.args) {
   .args[["num_partitions"]] <- forge::cast_scalar_integer(.args[["num_partitions"]])
   .args[["step_size"]] <- forge::cast_scalar_double(.args[["step_size"]])
   .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  if (!is.null(.args[["seed"]]))
-    .args[["seed"]] <- forge::cast_scalar_integer(.args[["seed"]])
+  .args[["seed"]] <- forge::cast_nullable_scalar_integer(.args[["seed"]])
   .args
 }
 
