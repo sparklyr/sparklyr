@@ -177,15 +177,15 @@ ml_validate_decision_tree_args <- function(args) {
 }
 
 validate_args_predictor <- function(.args) {
-  .args[["features_col"]] <- ensure_scalar_character(.args[["features_col"]])
-  .args[["label_col"]] <- ensure_scalar_character(.args[["label_col"]])
-  .args[["prediction_col"]] <- ensure_scalar_character(.args[["prediction_col"]])
+  .args[["features_col"]] <- forge::cast_string(.args[["features_col"]])
+  .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
+  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
   .args
 }
 
 validate_args_classifier <- function(.args) {
   .args <- validate_args_predictor(.args)
-  .args[["probability_col"]] <- ensure_scalar_character(.args[["probability_col"]])
-  .args[["raw_prediction_col"]] <- ensure_scalar_character(.args[["raw_prediction_col"]])
+  .args[["probability_col"]] <- forge::cast_string(.args[["probability_col"]])
+  .args[["raw_prediction_col"]] <- forge::cast_string(.args[["raw_prediction_col"]])
   .args
 }
