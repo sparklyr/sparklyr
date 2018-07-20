@@ -26,7 +26,7 @@ ft_tokenizer.spark_connection <- function(
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Tokenizer",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
     )
 
   new_ml_tokenizer(jobj)

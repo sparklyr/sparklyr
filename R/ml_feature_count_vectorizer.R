@@ -26,19 +26,18 @@
 #'   Default: \code{2^18}.
 #'
 #' @export
-ft_count_vectorizer <- function(
-  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
-  vocab_size = 2^18, dataset = NULL,
-  uid = random_string("count_vectorizer_"), ...) {
+ft_count_vectorizer <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
+                                min_df = 1, min_tf = 1,
+                                vocab_size = 2^18, dataset = NULL,
+                                uid = random_string("count_vectorizer_"), ...) {
   UseMethod("ft_count_vectorizer")
 }
 
 #' @export
-ft_count_vectorizer.spark_connection <- function(
-  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
-  vocab_size = 2^18, dataset = NULL,
-  uid = random_string("count_vectorizer_"), ...) {
-
+ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                                 binary = FALSE, min_df = 1, min_tf = 1,
+                                                 vocab_size = 2^18, dataset = NULL,
+                                                 uid = random_string("count_vectorizer_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -51,9 +50,11 @@ ft_count_vectorizer.spark_connection <- function(
     c(rlang::dots_list(...)) %>%
     ml_validator_count_vectorizer()
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.CountVectorizer",
-                                  .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
-    jobj_set_param("setBinary", .args[["binary"]], FALSE, "2.0.0") %>%
+  estimator <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.CountVectorizer",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    maybe_set_param("setBinary", .args[["binary"]], "2.0.0", FALSE) %>%
     invoke("setMinDF", .args[["min_df"]]) %>%
     invoke("setMinTF", .args[["min_tf"]]) %>%
     invoke("setVocabSize", .args[["vocab_size"]]) %>%
@@ -66,12 +67,10 @@ ft_count_vectorizer.spark_connection <- function(
 }
 
 #' @export
-ft_count_vectorizer.ml_pipeline <- function(
-  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
-  vocab_size = 2^18, dataset = NULL,
-  uid = random_string("count_vectorizer_"), ...
-) {
-
+ft_count_vectorizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                            binary = FALSE, min_df = 1, min_tf = 1,
+                                            vocab_size = 2^18, dataset = NULL,
+                                            uid = random_string("count_vectorizer_"), ...) {
   stage <- ft_count_vectorizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -89,11 +88,10 @@ ft_count_vectorizer.ml_pipeline <- function(
 }
 
 #' @export
-ft_count_vectorizer.tbl_spark <- function(
-  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
-  vocab_size = 2^18, dataset = NULL,
-  uid = random_string("count_vectorizer_"), ...
-) {
+ft_count_vectorizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                          binary = FALSE, min_df = 1, min_tf = 1,
+                                          vocab_size = 2^18, dataset = NULL,
+                                          uid = random_string("count_vectorizer_"), ...) {
   stage <- ft_count_vectorizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -141,7 +139,7 @@ ml_validator_count_vectorizer <- function(.args) {
            vocab.size = "vocab_size")
     )
 
-  .args[["binary"]] <- forge::cast_scalar_boolean(.args[["binary"]])
+  .args[["binary"]] <- forge::cast_scalar_logical(.args[["binary"]])
   .args[["min_df"]] <- forge::cast_scalar_double(.args[["min_df"]])
   .args[["min_tf"]] <- forge::cast_scalar_double(.args[["min_tf"]])
   .args[["vocab_size"]] <- forge::cast_scalar_integer(.args[["vocab_size"]])
