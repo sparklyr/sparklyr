@@ -233,7 +233,7 @@ skip_livy <- function() {
 check_params <- function(test_args, params) {
   purrr::iwalk(
     test_args,
-    ~ expect_equal(params[[.y]], .x)
+    ~ expect_equal(params[[.y]], .x, info = .y)
   )
 }
 
