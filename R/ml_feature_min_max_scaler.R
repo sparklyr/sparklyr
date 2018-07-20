@@ -25,18 +25,16 @@
 #' }
 #'
 #' @export
-ft_min_max_scaler <- function(
-  x, input_col, output_col,
-  min = 0, max = 1, dataset = NULL,
-  uid = random_string("min_max_scaler_"), ...) {
+ft_min_max_scaler <- function(x, input_col = NULL, output_col = NULL,
+                              min = 0, max = 1, dataset = NULL,
+                              uid = random_string("min_max_scaler_"), ...) {
   UseMethod("ft_min_max_scaler")
 }
 
 #' @export
-ft_min_max_scaler.spark_connection <- function(
-  x, input_col, output_col,
-  min = 0, max = 1, dataset = NULL,
-  uid = random_string("min_max_scaler_"), ...) {
+ft_min_max_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                               min = 0, max = 1, dataset = NULL,
+                                               uid = random_string("min_max_scaler_"), ...) {
 
   .args <- list(
     input_col = input_col,
@@ -50,7 +48,8 @@ ft_min_max_scaler.spark_connection <- function(
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.MinMaxScaler",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setMin", .args[["min"]]) %>%
     invoke("setMax", .args[["max"]]) %>%
     new_ml_min_max_scaler()
@@ -62,11 +61,9 @@ ft_min_max_scaler.spark_connection <- function(
 }
 
 #' @export
-ft_min_max_scaler.ml_pipeline <- function(
-  x, input_col, output_col,
-  min = 0, max = 1, dataset = NULL,
-  uid = random_string("min_max_scaler_"), ...
-) {
+ft_min_max_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                          min = 0, max = 1, dataset = NULL,
+                                          uid = random_string("min_max_scaler_"), ...) {
 
   stage <- ft_min_max_scaler.spark_connection(
     x = spark_connection(x),
@@ -83,11 +80,9 @@ ft_min_max_scaler.ml_pipeline <- function(
 }
 
 #' @export
-ft_min_max_scaler.tbl_spark <- function(
-  x, input_col, output_col,
-  min = 0, max = 1, dataset = NULL,
-  uid = random_string("min_max_scaler_"), ...
-) {
+ft_min_max_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                        min = 0, max = 1, dataset = NULL,
+                                        uid = random_string("min_max_scaler_"), ...) {
 
   stage <- ft_min_max_scaler.spark_connection(
     x = spark_connection(x),

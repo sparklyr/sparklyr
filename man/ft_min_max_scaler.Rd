@@ -4,8 +4,8 @@
 \alias{ft_min_max_scaler}
 \title{Feature Transformation -- MinMaxScaler (Estimator)}
 \usage{
-ft_min_max_scaler(x, input_col, output_col, min = 0, max = 1,
-  dataset = NULL, uid = random_string("min_max_scaler_"), ...)
+ft_min_max_scaler(x, input_col = NULL, output_col = NULL, min = 0,
+  max = 1, dataset = NULL, uid = random_string("min_max_scaler_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
