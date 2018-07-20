@@ -10,15 +10,14 @@
 #'
 #' @param inverse Indicates whether to perform the inverse DCT (TRUE) or forward DCT (FALSE).
 #' @export
-ft_dct <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+ft_dct <- function(x, input_col = NULL, output_col = NULL,
+                   inverse = FALSE, uid = random_string("dct_"), ...) {
   UseMethod("ft_dct")
 }
 
 #' @export
-ft_dct.spark_connection <- function(
-  x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...
-) {
-
+ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                    inverse = FALSE, uid = random_string("dct_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -30,15 +29,15 @@ ft_dct.spark_connection <- function(
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.DCT",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setInverse", .args[["inverse"]])
 
   new_ml_dct(jobj)
 }
 
 #' @export
-ft_dct.ml_pipeline <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
-
+ft_dct.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                               inverse = FALSE, uid = random_string("dct_"), ...) {
   transformer <- ft_dct.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -50,7 +49,8 @@ ft_dct.ml_pipeline <- function(x, input_col, output_col, inverse = FALSE, uid = 
 }
 
 #' @export
-ft_dct.tbl_spark <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+ft_dct.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                             inverse = FALSE, uid = random_string("dct_"), ...) {
   transformer <- ft_dct.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -74,6 +74,6 @@ ft_discrete_cosine_transform <- function(x, input_col, output_col, inverse = FAL
 
 ml_validator_dct <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["inverse"]] <- forge::cast_scalar_boolean(.args[["inverse"]])
+  .args[["inverse"]] <- forge::cast_scalar_logical(.args[["inverse"]])
   .args
 }
