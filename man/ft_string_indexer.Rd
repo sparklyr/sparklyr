@@ -13,7 +13,7 @@ ft_string_indexer(x, input_col = NULL, output_col = NULL,
 
 ml_labels(model)
 
-ft_string_indexer_model(x, input_col, output_col, labels,
+ft_string_indexer_model(x, input_col = NULL, output_col = NULL, labels,
   handle_invalid = "error", uid = random_string("string_indexer_model_"),
   ...)
 }

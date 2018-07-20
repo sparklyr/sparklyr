@@ -1,19 +1,16 @@
 #' @rdname ft_string_indexer
 #' @param labels Vector of labels, corresponding to indices to be assigned.
 #' @export
-ft_string_indexer_model <- function(
-  x, input_col, output_col, labels,
-  handle_invalid = "error",
-  uid = random_string("string_indexer_model_"), ...) {
+ft_string_indexer_model <- function(x, input_col = NULL, output_col = NULL, labels,
+                                    handle_invalid = "error",
+                                    uid = random_string("string_indexer_model_"), ...) {
   UseMethod("ft_string_indexer_model")
 }
 
 #' @export
-ft_string_indexer_model.spark_connection <- function(
-  x, input_col, output_col, labels,
-  handle_invalid = "error",
-  uid = random_string("string_indexer_model_"), ...) {
-
+ft_string_indexer_model.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels,
+                                                     handle_invalid = "error",
+                                                     uid = random_string("string_indexer_model_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -26,19 +23,18 @@ ft_string_indexer_model.spark_connection <- function(
 
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.StringIndexerModel",
-    .args[["uid"]], .args[["labels"]]) %>%
-    invoke("setInputCol", .args[["input_col"]]) %>%
-    invoke("setOutputCol", .args[["output_col"]])
+    .args[["uid"]], .args[["labels"]]
+  ) %>%
+    maybe_set_param("setInputCol", .args[["input_col"]]) %>%
+    maybe_set_param("setOutputCol", .args[["output_col"]])
 
   new_ml_string_indexer_model(jobj)
 }
 
 #' @export
-ft_string_indexer_model.ml_pipeline <- function(
-  x, input_col, output_col, labels,
-  handle_invalid = "error",
-  uid = random_string("string_indexer_model_"), ...
-) {
+ft_string_indexer_model.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, labels,
+                                                handle_invalid = "error",
+                                                uid = random_string("string_indexer_model_"), ...) {
   stage <- ft_string_indexer_model.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -52,12 +48,9 @@ ft_string_indexer_model.ml_pipeline <- function(
 }
 
 #' @export
-ft_string_indexer_model.tbl_spark <- function(
-  x, input_col, output_col, labels,
-  handle_invalid = "error",
-  uid = random_string("string_indexer_model_"), ...
-) {
-
+ft_string_indexer_model.tbl_spark <- function(x, input_col = NULL, output_col = NULL, labels,
+                                              handle_invalid = "error",
+                                              uid = random_string("string_indexer_model_"), ...) {
   stage <- ft_string_indexer_model.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -72,7 +65,7 @@ ft_string_indexer_model.tbl_spark <- function(
 
 ml_validator_string_indexer_model <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["labels"]] <- forge::cast_character(.args[["labels"]]) %>% as.list()
+  .args[["labels"]] <- forge::cast_character_list(.args[["labels"]])
   .args[["handle_invalid"]] <- forge::cast_choice(
     .args[["handle_invalid"]],
     c("error", "skip", "keep")
