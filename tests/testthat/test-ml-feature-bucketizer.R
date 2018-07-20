@@ -16,6 +16,14 @@ test_that("ft_bucketizer() param setting", {
     handle_invalid = "keep"
   )
   test_param_setting(sc, ft_bucketizer, test_args)
+
+  test_args2 <- list(
+    input_cols = c("x1", "x2"),
+    output_cols = c("y1", "y2"),
+    splits_array = list(c(-1, 34, 100), c(-5, 0, 2)),
+    handle_invalid = "keep"
+  )
+  test_param_setting(sc, ft_bucketizer, test_args2)
 })
 
 test_that("ft_bucketizer() works properly", {
