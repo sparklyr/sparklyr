@@ -62,6 +62,7 @@ maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = N
 ml_new_transformer <- function(sc, class, uid,
                                input_col = NULL, output_col = NULL,
                                input_cols = NULL, output_cols = NULL) {
+  uid <- forge::cast_string(uid)
   invoke_new(sc, class, uid) %>%
     maybe_set_param("setInputCol", input_col) %>%
     maybe_set_param("setInputCols", input_cols) %>%
@@ -75,7 +76,6 @@ validate_args_transformer <- function(.args) {
   .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
   .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
   .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
-  .args[["uid"]] <- forge::cast_string(.args[["uid"]])
   .args
 }
 
