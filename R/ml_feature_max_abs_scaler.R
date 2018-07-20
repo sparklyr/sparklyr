@@ -22,19 +22,14 @@
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-estimator-transformer
 #' @export
-ft_max_abs_scaler <- function(
-  x, input_col, output_col,
-  dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...) {
+ft_max_abs_scaler <- function(x, input_col = NULL, output_col = NULL,
+                              dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {
   UseMethod("ft_max_abs_scaler")
 }
 
 #' @export
-ft_max_abs_scaler.spark_connection <- function(
-  x, input_col, output_col,
-  dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...) {
-
+ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                               dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {
   spark_require_version(x, "2.0.0", "MaxAbsScaler")
 
   .args <- list(
@@ -47,7 +42,8 @@ ft_max_abs_scaler.spark_connection <- function(
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.MaxAbsScaler",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     new_ml_max_abs_scaler()
 
   if (is.null(dataset))
@@ -57,11 +53,8 @@ ft_max_abs_scaler.spark_connection <- function(
 }
 
 #' @export
-ft_max_abs_scaler.ml_pipeline <- function(
-  x, input_col, output_col,
-  dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...
-) {
+ft_max_abs_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                          dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {
 
   stage <- ft_max_abs_scaler.spark_connection(
     x = spark_connection(x),
@@ -76,11 +69,8 @@ ft_max_abs_scaler.ml_pipeline <- function(
 }
 
 #' @export
-ft_max_abs_scaler.tbl_spark <- function(
-  x, input_col, output_col,
-  dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...
-) {
+ft_max_abs_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                        dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {
 
   stage <- ft_max_abs_scaler.spark_connection(
     x = spark_connection(x),
