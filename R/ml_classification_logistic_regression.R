@@ -223,9 +223,6 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
   }
 }
 
-
-# Constructors
-
 new_ml_logistic_regression <- function(jobj) {
   new_ml_predictor(jobj, subclass = "ml_logistic_regression")
 }
@@ -288,8 +285,6 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
     total_iterations = invoke(jobj, "totalIterations"),
     subclass = "ml_summary_logistic_regression")
 }
-
-# Validator
 
 cast_double_matrix <- function(mat) {
   if (is.null(mat)) return(mat)
