@@ -17,30 +17,29 @@ ml_add_stage <- function(x, transformer) {
   new_ml_pipeline(jobj)
 }
 
-ml_new_transformer <- function(
-  sc, class,
-  input_col = NULL, output_col = NULL,
-  input_cols = NULL, output_cols = NULL,
-  uid) {
-  jobj <- invoke_new(sc, class, uid)
-  if (!is.null(input_col))
-    jobj <- invoke(jobj, "setInputCol", input_col)
-  if (!is.null(input_cols))
-    jobj <- invoke(jobj, "setInputCols", as.list(input_cols))
-  if (!is.null(output_col))
-    jobj <- invoke(jobj, "setOutputCol", output_col)
-  if (!is.null(output_cols))
-    jobj <- invoke(jobj, "setOutputCols", as.list(output_cols))
-  jobj
+maybe_set_param <- function(jobj, setter, value) {
+  if (is.null(value)) return(jobj)
+  invoke(jobj, setter, value)
+}
+
+ml_new_transformer <- function(sc, class,
+                               input_col = NULL, output_col = NULL,
+                               input_cols = NULL, output_cols = NULL,
+                               uid) {
+  invoke_new(sc, class, uid) %>%
+    maybe_set_param("setInputCol", input_col) %>%
+    maybe_set_param("setInputCols", input_cols) %>%
+    maybe_set_param("setOutputCol", output_col) %>%
+    maybe_set_param("setOutputCols", output_cols)
 }
 
 validate_args_transformer <- function(.args) {
   .args <- ml_backwards_compatibility(.args)
-  .args[["input_col"]] <- forge::cast_scalar_character(.args[["input_col"]], allow_null = TRUE)
-  .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]], allow_null = TRUE)
-  .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]], allow_null = TRUE)
-  .args[["output_cols"]] <- forge::cast_character(.args[["output_cols"]], allow_null = TRUE)
-  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
+  .args[["input_col"]] <- forge::cast_nullable_string(.args[["input_col"]])
+  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
+  .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
+  .args[["uid"]] <- forge::cast_string(.args[["uid"]])
   .args
 }
 
