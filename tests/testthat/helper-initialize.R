@@ -257,7 +257,7 @@ test_param_setting <- function(sc, fn, test_args) {
 test_default_args <- function(sc, fn) {
   default_args <- rlang::fn_fmls(fn) %>%
     as.list() %>%
-    purrr::discard(~is.symbol(.x)) %>%
+    purrr::discard(~ is.symbol(.x) || is.language(.x)) %>%
     rlang::modify(uid = NULL) %>%
     purrr::compact()
 
