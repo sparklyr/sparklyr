@@ -7,14 +7,14 @@
 #' @template roxlate-ml-feature-transformer
 #'
 #' @export
-ft_tokenizer <- function(x, input_col, output_col, uid = random_string("tokenizer_"), ...) {
+ft_tokenizer <- function(x, input_col = NULL, output_col = NULL,
+                         uid = random_string("tokenizer_"), ...) {
   UseMethod("ft_tokenizer")
 }
 
 #' @export
-ft_tokenizer.spark_connection <- function(
-  x, input_col, output_col, uid = random_string("tokenizer_"), ...
-) {
+ft_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                          uid = random_string("tokenizer_"), ...) {
 
   .args <- list(
     input_col = input_col,
@@ -33,9 +33,8 @@ ft_tokenizer.spark_connection <- function(
 }
 
 #' @export
-ft_tokenizer.ml_pipeline <- function(
-  x, input_col, output_col, uid = random_string("tokenizer_"), ...
-  ) {
+ft_tokenizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                     uid = random_string("tokenizer_"), ...) {
 
   stage <- ft_tokenizer.spark_connection(
     x = spark_connection(x),
@@ -48,9 +47,8 @@ ft_tokenizer.ml_pipeline <- function(
 }
 
 #' @export
-ft_tokenizer.tbl_spark <- function(
-  x, input_col, output_col, uid = random_string("tokenizer_"), ...
-  ) {
+ft_tokenizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                   uid = random_string("tokenizer_"), ...) {
   stage <- ft_tokenizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
