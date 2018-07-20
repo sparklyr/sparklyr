@@ -16,38 +16,32 @@
 #'  Defaults to \code{"frequencyDesc"}.
 #' @seealso \code{\link{ft_index_to_string}}
 #' @export
-ft_string_indexer <- function(
-  x, input_col, output_col,
-  handle_invalid = "error",
-  string_order_type = "frequencyDesc",
-  dataset = NULL,
-  uid = random_string("string_indexer_"), ...) {
+ft_string_indexer <- function(x, input_col = NULL, output_col = NULL,
+                              handle_invalid = "error", string_order_type = "frequencyDesc",
+                              dataset = NULL, uid = random_string("string_indexer_"), ...) {
   UseMethod("ft_string_indexer")
 }
 
 
 #' @export
-ft_string_indexer.spark_connection <- function(
-  x, input_col, output_col,
-  handle_invalid = "error",
-  string_order_type = "frequencyDesc",
-  dataset = NULL,
-  uid = random_string("string_indexer_"), ...) {
-
+ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                               handle_invalid = "error", string_order_type = "frequencyDesc",
+                                               dataset = NULL, uid = random_string("string_indexer_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
     handle_invalid = handle_invalid,
     string_order_type = string_order_type,
     uid = uid
-    ) %>%
+  ) %>%
     ml_validator_string_indexer()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.StringIndexer",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
-    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "error", "2.1.0") %>%
-    jobj_set_param("setStringOrderType", .args[["string_order_type"]], "frequencyDesc", "2.3.0") %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    maybe_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
+    maybe_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0",  "frequencyDesc") %>%
     new_ml_string_indexer()
 
   if (is.null(dataset))
@@ -57,13 +51,9 @@ ft_string_indexer.spark_connection <- function(
 }
 
 #' @export
-ft_string_indexer.ml_pipeline <- function(
-  x, input_col, output_col,
-  handle_invalid = "error",
-  string_order_type = "frequencyDesc",
-  dataset = NULL,
-  uid = random_string("string_indexer_"), ...
-) {
+ft_string_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                          handle_invalid = "error", string_order_type = "frequencyDesc",
+                                          dataset = NULL, uid = random_string("string_indexer_"), ...) {
 
   stage <- ft_string_indexer.spark_connection(
     x = spark_connection(x),
@@ -79,13 +69,9 @@ ft_string_indexer.ml_pipeline <- function(
 }
 
 #' @export
-ft_string_indexer.tbl_spark <- function(
-  x, input_col, output_col,
-  handle_invalid = "error",
-  string_order_type = "frequencyDesc",
-  dataset = NULL,
-  uid = random_string("string_indexer_"), ...
-) {
+ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                        handle_invalid = "error", string_order_type = "frequencyDesc",
+                                        dataset = NULL, uid = random_string("string_indexer_"), ...) {
   stage <- ft_string_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -137,7 +123,7 @@ ml_validator_string_indexer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["handle_invalid"]] <- forge::cast_choice(
     .args[["handle_invalid"]], c("error", "skip", "keep")
-    )
+  )
   .args[["string_order_type"]] <- forge::cast_choice(
     .args[["string_order_type"]],
     c("frequencyDesc", "frequencyAsc", "alphabetDesc", "alphabetAsc")

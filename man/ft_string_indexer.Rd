@@ -7,9 +7,9 @@
 \alias{ft_string_indexer_model}
 \title{Feature Transformation -- StringIndexer (Estimator)}
 \usage{
-ft_string_indexer(x, input_col, output_col, handle_invalid = "error",
-  string_order_type = "frequencyDesc", dataset = NULL,
-  uid = random_string("string_indexer_"), ...)
+ft_string_indexer(x, input_col = NULL, output_col = NULL,
+  handle_invalid = "error", string_order_type = "frequencyDesc",
+  dataset = NULL, uid = random_string("string_indexer_"), ...)
 
 ml_labels(model)
 

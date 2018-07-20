@@ -4,7 +4,7 @@
 \alias{ft_index_to_string}
 \title{Feature Transformation -- IndexToString (Transformer)}
 \usage{
-ft_index_to_string(x, input_col, output_col, labels = NULL,
+ft_index_to_string(x, input_col = NULL, output_col = NULL, labels = NULL,
   uid = random_string("index_to_string_"), ...)
 }
 \arguments{

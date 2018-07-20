@@ -12,14 +12,14 @@
 #' @param labels Optional param for array of labels specifying index-string mapping.
 #' @seealso \code{\link{ft_string_indexer}}
 #' @export
-ft_index_to_string <- function(x, input_col, output_col, labels = NULL,
+ft_index_to_string <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
                                uid = random_string("index_to_string_"), ...) {
   UseMethod("ft_index_to_string")
 }
 
 #' @export
-ft_index_to_string.spark_connection <- function(
-  x, input_col, output_col, labels = NULL, uid = random_string("index_to_string_"), ...) {
+ft_index_to_string.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
+                                                uid = random_string("index_to_string_"), ...) {
 
   .args <- list(
     input_col = input_col,
@@ -32,18 +32,16 @@ ft_index_to_string.spark_connection <- function(
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.IndexToString",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]])
-
-  if (!is.null(.args[["labels"]]))
-    jobj <- invoke(jobj, "setLabels", .args[["labels"]])
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    maybe_set_param("setLabels", .args[["labels"]])
 
   new_ml_index_to_string(jobj)
 }
 
 #' @export
-ft_index_to_string.ml_pipeline <- function(
-  x, input_col, output_col, labels = NULL,
-  uid = random_string("index_to_string_"), ...) {
+ft_index_to_string.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
+                                           uid = random_string("index_to_string_"), ...) {
 
   stage <- ft_index_to_string.spark_connection(
     x = spark_connection(x),
@@ -57,9 +55,8 @@ ft_index_to_string.ml_pipeline <- function(
 }
 
 #' @export
-ft_index_to_string.tbl_spark <- function(
-  x, input_col, output_col, labels = NULL,
-  uid = random_string("index_to_string_"), ...) {
+ft_index_to_string.tbl_spark <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
+                                         uid = random_string("index_to_string_"), ...) {
 
   stage <- ft_index_to_string.spark_connection(
     x = spark_connection(x),
@@ -78,8 +75,6 @@ new_ml_index_to_string <- function(jobj) {
 
 ml_validator_index_to_string <- function(.args) {
   .args <- validate_args_transformer(.args)
-  if (!is.null(.args[["labels"]]))
-      .args[["labels"]] <- forge::cast_character(.args[["labels"]]) %>%
-    as.list()
+  .args[["labels"]] <- forge::cast_nullable_string_list(.args[["labels"]])
   .args
 }
