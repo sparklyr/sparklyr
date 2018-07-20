@@ -1,6 +1,5 @@
 context("ml feature bucketed random projection lsh")
 
-
 test_that("ft_bucketed_random_projection_lsh() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
@@ -19,8 +18,6 @@ test_that("ft_bucketed_random_projection_lsh() param setting", {
   )
   test_param_setting(sc, ft_bucketed_random_projection_lsh, test_args)
 })
-
-
 
 test_that("ft_bucketed_random_projection_lsh() works properly", {
   test_requires_version("2.1.0", "LSH requires 2.1+")
