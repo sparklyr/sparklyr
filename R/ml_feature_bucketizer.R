@@ -52,9 +52,10 @@ ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NUL
     c(rlang::dots_list(...)) %>%
     ml_validator_bucketizer()
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.Bucketizer", .args[["uid"]]) %>%
-    maybe_set_param("setInputCol", .args[["input_col"]]) %>%
-    maybe_set_param("setOutputCol", .args[["output_col"]]) %>%
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.Bucketizer", .args[["uid"]],
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]]
+  ) %>%
     maybe_set_param("setSplits", .args[["splits"]]) %>%
     maybe_set_param("setInputCols", .args[["input_cols"]], "2.3.0") %>%
     maybe_set_param("setOutputCols", .args[["output_cols"]], "2.3.0") %>%
@@ -122,10 +123,10 @@ ml_validator_bucketizer <- function(.args) {
   .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
   .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
   if (!is.null(.args[["splits_array"]]))
-  .args[["splits_array"]] <- purrr::map(
-    .args[["splits_array"]],
-    ~ forge::cast_double_list(.x)
-  )
+    .args[["splits_array"]] <- purrr::map(
+      .args[["splits_array"]],
+      ~ forge::cast_double_list(.x)
+    )
   .args[["handle_invalid"]] <- forge::cast_choice(
     .args[["handle_invalid"]], c("error", "skip", "keep")
   )
