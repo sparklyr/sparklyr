@@ -30,10 +30,8 @@ ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_s
 }
 
 #' @export
-ft_binarizer.spark_connection <- function(
-  x, input_col = NULL, output_col = NULL, threshold = 0,
-  uid = random_string("binarizer_"), ...) {
-
+ft_binarizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
+                                          uid = random_string("binarizer_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -55,9 +53,8 @@ ft_binarizer.spark_connection <- function(
 }
 
 #' @export
-ft_binarizer.ml_pipeline <- function(
-  x, input_col = NULL, output_col = NULL, threshold = 0,
-  uid = random_string("binarizer_"), ...) {
+ft_binarizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
+                                     uid = random_string("binarizer_"), ...) {
   stage <- ft_binarizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -70,9 +67,8 @@ ft_binarizer.ml_pipeline <- function(
 }
 
 #' @export
-ft_binarizer.tbl_spark <- function(
-  x, input_col = NULL, output_col = NULL, threshold = 0,
-  uid = random_string("binarizer_"), ...) {
+ft_binarizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
+                                   uid = random_string("binarizer_"), ...) {
   stage <- ft_binarizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
