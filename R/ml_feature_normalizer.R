@@ -8,19 +8,14 @@
 #' @param p Normalization in L^p space. Must be >= 1. Defaults to 2.
 #'
 #' @export
-ft_normalizer <- function(
-  x, input_col, output_col, p = 2,
-  uid = random_string("normalizer_"), ...
-) {
+ft_normalizer <- function(x, input_col = NULL, output_col = NULL,
+                          p = 2, uid = random_string("normalizer_"), ...) {
   UseMethod("ft_normalizer")
 }
 
 #' @export
-ft_normalizer.spark_connection <- function(
-  x, input_col, output_col, p = 2,
-  uid = random_string("normalizer_"), ...
-) {
-
+ft_normalizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                           p = 2, uid = random_string("normalizer_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -32,17 +27,16 @@ ft_normalizer.spark_connection <- function(
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Normalizer",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setP", .args[["p"]])
 
   new_ml_normalizer(jobj)
 }
 
 #' @export
-ft_normalizer.ml_pipeline <- function(
-  x, input_col, output_col, p = 2,
-  uid = random_string("normalizer_"), ...
-) {
+ft_normalizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                      p = 2, uid = random_string("normalizer_"), ...) {
   stage <- ft_normalizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -55,10 +49,8 @@ ft_normalizer.ml_pipeline <- function(
 }
 
 #' @export
-ft_normalizer.tbl_spark <- function(
-  x, input_col, output_col, p = 2,
-  uid = random_string("normalizer_"), ...
-) {
+ft_normalizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                    p = 2, uid = random_string("normalizer_"), ...) {
   stage <- ft_normalizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
