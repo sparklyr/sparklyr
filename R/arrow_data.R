@@ -12,5 +12,5 @@ arrow_copy_to <- function(sc, df, parallelism = 8L)
   # load arrow file in scala
   rdd <- invoke_static(sc, "sparklyr.ArrowHelper", "javaRddFromBinaryBatches", spark_context(sc), batches, parallelism)
   schema <- spark_data_build_types(sc, lapply(df, class))
-  sdf <- invoke_static(sc, "sparklyr.ArrowRowIterator", "toDataFrame", rdd, schema, spark_session(sc))
+  sdf <- invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
 }
