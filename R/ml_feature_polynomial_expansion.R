@@ -10,15 +10,14 @@
 #' @param degree The polynomial degree to expand, which should be greater
 #'   than equal to 1. A value of 1 means no expansion. Default: 2
 #' @export
-ft_polynomial_expansion <- function(x, input_col, output_col, degree = 2L, uid = random_string("polynomial_expansion_"), ...) {
+ft_polynomial_expansion <- function(x, input_col = NULL, output_col = NULL,
+                                    degree = 2, uid = random_string("polynomial_expansion_"), ...) {
   UseMethod("ft_polynomial_expansion")
 }
 
 #' @export
-ft_polynomial_expansion.spark_connection <- function(
-  x, input_col, output_col, degree = 2L,
-  uid = random_string("polynomial_expansion_"), ...
-) {
+ft_polynomial_expansion.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                                     degree = 2, uid = random_string("polynomial_expansion_"), ...) {
 
   .args <- list(
     input_col = input_col,
@@ -31,17 +30,15 @@ ft_polynomial_expansion.spark_connection <- function(
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.PolynomialExpansion",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setDegree", .args[["degree"]])
 
   new_ml_polynomial_expansion(jobj)
 }
 
 #' @export
-ft_polynomial_expansion.ml_pipeline <- function(
-  x, input_col, output_col, degree = 2L,
-  uid = random_string("polynomial_expansion_"), ...
-) {
+ft_polynomial_expansion.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                                degree = 2, uid = random_string("polynomial_expansion_"), ...) {
   stage <- ft_polynomial_expansion.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -54,10 +51,8 @@ ft_polynomial_expansion.ml_pipeline <- function(
 }
 
 #' @export
-ft_polynomial_expansion.tbl_spark <- function(
-  x, input_col, output_col, degree = 2L,
-  uid = random_string("polynomial_expansion_"), ...
-) {
+ft_polynomial_expansion.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                              degree = 2, uid = random_string("polynomial_expansion_"), ...) {
   stage <- ft_polynomial_expansion.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

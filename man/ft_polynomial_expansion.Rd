@@ -4,8 +4,8 @@
 \alias{ft_polynomial_expansion}
 \title{Feature Transformation -- PolynomialExpansion (Transformer)}
 \usage{
-ft_polynomial_expansion(x, input_col, output_col, degree = 2L,
-  uid = random_string("polynomial_expansion_"), ...)
+ft_polynomial_expansion(x, input_col = NULL, output_col = NULL,
+  degree = 2, uid = random_string("polynomial_expansion_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
