@@ -7,9 +7,10 @@
 \alias{ft_minhash_lsh}
 \title{Feature Transformation -- LSH (Estimator)}
 \usage{
-ft_bucketed_random_projection_lsh(x, input_col, output_col, bucket_length,
-  num_hash_tables = 1, seed = NULL, dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...)
+ft_bucketed_random_projection_lsh(x, input_col = NULL, output_col = NULL,
+  bucket_length = NULL, num_hash_tables = 1, seed = NULL,
+  dataset = NULL, uid = random_string("bucketed_random_projection_lsh_"),
+  ...)
 
 ft_minhash_lsh(x, input_col, output_col, num_hash_tables = 1L, seed = NULL,
   dataset = NULL, uid = random_string("minhash_lsh_"), ...)
