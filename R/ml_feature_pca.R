@@ -9,16 +9,14 @@
 #' @param k The number of principal components
 #'
 #' @export
-ft_pca <- function(
-  x, input_col, output_col, k, dataset = NULL,
-  uid = random_string("pca_"), ...) {
+ft_pca <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
+                   uid = random_string("pca_"), ...) {
   UseMethod("ft_pca")
 }
 
 #' @export
-ft_pca.spark_connection <- function(
-  x, input_col, output_col, k, dataset = NULL,
-  uid = random_string("pca_"), ...) {
+ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
+                                    uid = random_string("pca_"), ...) {
 
   .args <- list(
     input_col = input_col,
@@ -31,8 +29,9 @@ ft_pca.spark_connection <- function(
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.PCA",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
-    invoke("setK", .args[["k"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    maybe_set_param("setK", .args[["k"]]) %>%
     new_ml_pca()
 
   if (is.null(dataset))
@@ -42,10 +41,8 @@ ft_pca.spark_connection <- function(
 }
 
 #' @export
-ft_pca.ml_pipeline <- function(
-  x, input_col, output_col, k, dataset = NULL,
-  uid = random_string("pca_"), ...
-) {
+ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
+                               uid = random_string("pca_"), ...) {
 
   stage <- ft_pca.spark_connection(
     x = spark_connection(x),
@@ -61,10 +58,8 @@ ft_pca.ml_pipeline <- function(
 }
 
 #' @export
-ft_pca.tbl_spark <- function(
-  x, input_col, output_col, k, dataset = NULL,
-  uid = random_string("pca_"), ...
-) {
+ft_pca.tbl_spark <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
+                             uid = random_string("pca_"), ...) {
 
   stage <- ft_pca.spark_connection(
     x = spark_connection(x),
@@ -96,7 +91,7 @@ new_ml_pca_model <- function(jobj) {
 
 ml_validator_pca <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["k"]] <- forge::cast_scalar_integer(.args[["k"]])
+  .args[["k"]] <- forge::cast_nullable_scalar_integer(.args[["k"]])
   .args
 }
 
