@@ -14,15 +14,14 @@
 #'
 #' @rdname sql-transformer
 #' @export
-ft_sql_transformer <- function(x, statement,
+ft_sql_transformer <- function(x, statement = NULL,
                                uid = random_string("sql_transformer_"), ...) {
   UseMethod("ft_sql_transformer")
 }
 
 #' @export
-ft_sql_transformer.spark_connection <- function(
-  x, statement,
-  uid = random_string("sql_transformer_"), ...) {
+ft_sql_transformer.spark_connection <- function(x, statement = NULL,
+                                                uid = random_string("sql_transformer_"), ...) {
 
   .args <- list(
     statement = statement,
@@ -34,15 +33,14 @@ ft_sql_transformer.spark_connection <- function(
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.SQLTransformer",
     .args[["uid"]]) %>%
-    invoke("setStatement", .args[["statement"]])
+    maybe_set_param("setStatement", .args[["statement"]])
 
   new_ml_sql_transformer(jobj)
 }
 
 #' @export
-ft_sql_transformer.ml_pipeline <- function(
-  x, statement,
-  uid = random_string("sql_transformer_"), ...) {
+ft_sql_transformer.ml_pipeline <- function(x, statement = NULL,
+                                           uid = random_string("sql_transformer_"), ...) {
 
   stage <- ft_sql_transformer.spark_connection(
     x = spark_connection(x),
@@ -54,9 +52,8 @@ ft_sql_transformer.ml_pipeline <- function(
 }
 
 #' @export
-ft_sql_transformer.tbl_spark <- function(
-  x, statement,
-  uid = random_string("sql_transformer_"), ...) {
+ft_sql_transformer.tbl_spark <- function(x, statement = NULL,
+                                         uid = random_string("sql_transformer_"), ...) {
 
   stage <- ft_sql_transformer.spark_connection(
     x = spark_connection(x),
@@ -95,25 +92,22 @@ ft_extract_sql <- function(x) {
 #'
 #' @param tbl A \code{tbl_spark} generated using \code{dplyr} transformations.
 #' @export
-ft_dplyr_transformer <- function(
-  x, tbl,
-  uid = random_string("dplyr_transformer_"), ...) {
+ft_dplyr_transformer <- function(x, tbl,
+                                 uid = random_string("dplyr_transformer_"), ...) {
   UseMethod("ft_dplyr_transformer")
 }
 
 #' @export
-ft_dplyr_transformer.spark_connection <- function(
-  x, tbl,
-  uid = random_string("dplyr_transformer_"), ...) {
+ft_dplyr_transformer.spark_connection <- function(x, tbl,
+                                                  uid = random_string("dplyr_transformer_"), ...) {
 
   if (!identical(class(tbl)[1], "tbl_spark")) stop("'tbl' must be a Spark table")
   ft_sql_transformer(x, ft_extract_sql(tbl), uid = uid)
 }
 
 #' @export
-ft_dplyr_transformer.ml_pipeline <- function(
-  x, tbl,
-  uid = random_string("dplyr_transformer_"), ...) {
+ft_dplyr_transformer.ml_pipeline <- function(x, tbl,
+                                             uid = random_string("dplyr_transformer_"), ...) {
 
   stage <- ft_dplyr_transformer.spark_connection(
     x = spark_connection(x),
@@ -125,9 +119,8 @@ ft_dplyr_transformer.ml_pipeline <- function(
 }
 
 #' @export
-ft_dplyr_transformer.tbl_spark <- function(
-  x, tbl,
-  uid = random_string("dplyr_transformer_"), ...) {
+ft_dplyr_transformer.tbl_spark <- function(x, tbl,
+                                           uid = random_string("dplyr_transformer_"), ...) {
 
   stage <- ft_dplyr_transformer.spark_connection(
     x = spark_connection(x),
@@ -142,7 +135,7 @@ ml_validator_sql_transformer <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     sql = "statement"
   ))
-  .args[["statement"]] <- forge::cast_scalar_character(.args[["statement"]])
-  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
+  .args[["statement"]] <- forge::cast_nullable_string(.args[["statement"]])
+  .args[["uid"]] <- forge::cast_string(.args[["uid"]])
   .args
 }
