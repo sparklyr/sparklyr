@@ -4,8 +4,9 @@
 \alias{ft_vector_indexer}
 \title{Feature Transformation -- VectorIndexer (Estimator)}
 \usage{
-ft_vector_indexer(x, input_col, output_col, max_categories = 20L,
-  dataset = NULL, uid = random_string("vector_indexer_"), ...)
+ft_vector_indexer(x, input_col = NULL, output_col = NULL,
+  max_categories = 20, dataset = NULL,
+  uid = random_string("vector_indexer_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

@@ -8,18 +8,16 @@
 #' @param max_categories Threshold for the number of values a categorical feature can take. If a feature is found to have > \code{max_categories} values, then it is declared continuous. Must be greater than or equal to 2. Defaults to 20.
 #'
 #' @export
-ft_vector_indexer <- function(
-  x, input_col, output_col,
-  max_categories = 20L, dataset = NULL,
-  uid = random_string("vector_indexer_"), ...) {
+ft_vector_indexer <- function(x, input_col = NULL, output_col = NULL,
+                              max_categories = 20, dataset = NULL,
+                              uid = random_string("vector_indexer_"), ...) {
   UseMethod("ft_vector_indexer")
 }
 
 #' @export
-ft_vector_indexer.spark_connection <- function(
-  x, input_col, output_col,
-  max_categories = 20L, dataset = NULL,
-  uid = random_string("vector_indexer_"), ...) {
+ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                               max_categories = 20, dataset = NULL,
+                                               uid = random_string("vector_indexer_"), ...) {
 
   .args <- list(
     input_col = input_col,
@@ -32,7 +30,7 @@ ft_vector_indexer.spark_connection <- function(
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.VectorIndexer",
-    .args[["input_col"]], .args[["output_col"]], .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setMaxCategories", .args[["max_categories"]]) %>%
     new_ml_vector_indexer()
 
@@ -43,11 +41,9 @@ ft_vector_indexer.spark_connection <- function(
 }
 
 #' @export
-ft_vector_indexer.ml_pipeline <- function(
-  x, input_col, output_col,
-  max_categories = 20L, dataset = NULL,
-  uid = random_string("vector_indexer_"), ...
-) {
+ft_vector_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                          max_categories = 20, dataset = NULL,
+                                          uid = random_string("vector_indexer_"), ...) {
 
   stage <- ft_vector_indexer.spark_connection(
     x = spark_connection(x),
@@ -63,11 +59,9 @@ ft_vector_indexer.ml_pipeline <- function(
 }
 
 #' @export
-ft_vector_indexer.tbl_spark <- function(
-  x, input_col, output_col,
-  max_categories = 20L, dataset = NULL,
-  uid = random_string("vector_indexer_"), ...
-) {
+ft_vector_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                        max_categories = 20, dataset = NULL,
+                                        uid = random_string("vector_indexer_"), ...) {
   stage <- ft_vector_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
