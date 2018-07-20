@@ -59,10 +59,9 @@ maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = N
   invoke(jobj, setter, value)
 }
 
-ml_new_transformer <- function(sc, class,
+ml_new_transformer <- function(sc, class, uid,
                                input_col = NULL, output_col = NULL,
-                               input_cols = NULL, output_cols = NULL,
-                               uid) {
+                               input_cols = NULL, output_cols = NULL) {
   invoke_new(sc, class, uid) %>%
     maybe_set_param("setInputCol", input_col) %>%
     maybe_set_param("setInputCols", input_cols) %>%
