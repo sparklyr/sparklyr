@@ -42,21 +42,19 @@ object ArrowConverters {
    */
   def fromPayloadIterator(
       payloadIter: Iterator[Array[Byte]],
-      context: TaskContext): ArrowRowIterator = {
+      context: TaskContext,
+      schema: StructType): ArrowRowIterator = {
     val allocator =
       ArrowUtils.rootAllocator.newChildAllocator("fromPayloadIterator", 0, Long.MaxValue)
 
     new ArrowRowIterator {
       private var reader: ArrowFileReader = null
-      private var schemaRead = StructType(Seq.empty)
       private var rowIter = if (payloadIter.hasNext) nextBatch() else Iterator.empty
 
       context.addTaskCompletionListener { _ =>
         closeReader()
         allocator.close()
       }
-
-      override def schema: StructType = schemaRead
 
       override def hasNext: Boolean = rowIter.hasNext || {
         closeReader()
@@ -78,14 +76,13 @@ object ArrowConverters {
         }
       }
 
-      private val encoder = RowEncoder(schemaRead)
+      private val encoder = RowEncoder(schema)
 
       private def nextBatch(): Iterator[Row] = {
         val in = new ByteArrayReadableSeekableByteChannel(payloadIter.next())
         reader = new ArrowFileReader(in, allocator)
         reader.loadNextBatch()  // throws IOException
         val root = reader.getVectorSchemaRoot  // throws IOException
-        schemaRead = ArrowUtils.fromArrowSchema(root.getSchema)
 
         val columns = root.getFieldVectors.asScala.map { vector =>
           new ArrowColumnVector(vector).asInstanceOf[ColumnVector]
@@ -93,7 +90,7 @@ object ArrowConverters {
 
         val batch = new ColumnarBatch(columns)
         batch.setNumRows(root.getRowCount)
-        batch.rowIterator().asScala.map(x => Row(x.toSeq(schemaRead)))
+        batch.rowIterator().asScala.map(x => Row(x.toSeq(schema)))
       }
     }
   }
@@ -104,7 +101,7 @@ object ArrowConverters {
       sparkSession: SparkSession): DataFrame = {
     val rdd = payloadRDD.rdd.mapPartitions { iter =>
       val context = TaskContext.get()
-      ArrowConverters.fromPayloadIterator(iter, context)
+      ArrowConverters.fromPayloadIterator(iter, context, schema)
     }
     sparkSession.createDataFrame(rdd, schema)
   }
