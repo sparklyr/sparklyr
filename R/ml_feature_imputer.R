@@ -16,20 +16,16 @@
 #'   feature. If "median", then replace missing values using the approximate median
 #'   value of the feature. Default: mean
 #' @export
-ft_imputer <- function(
-  x, input_cols, output_cols, missing_value = NULL, strategy = "mean",
-  dataset = NULL,
-  uid = random_string("imputer_"), ...
-) {
+ft_imputer <- function(x, input_cols = NULL, output_cols = NULL,
+                       missing_value = NULL, strategy = "mean", dataset = NULL,
+                       uid = random_string("imputer_"), ...) {
   UseMethod("ft_imputer")
 }
 
 #' @export
-ft_imputer.spark_connection <- function(
-  x, input_cols, output_cols, missing_value = NULL, strategy = "mean",
-  dataset = NULL,
-  uid = random_string("imputer_"), ...
-) {
+ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL,
+                                        missing_value = NULL, strategy = "mean", dataset = NULL,
+                                        uid = random_string("imputer_"), ...) {
   spark_require_version(x, "2.2.0", "Imputer")
 
   .args <- list(
@@ -42,13 +38,11 @@ ft_imputer.spark_connection <- function(
     c(rlang::dots_list(...)) %>%
     ml_validator_imputer()
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.Imputer", .args[["uid"]]) %>%
-    invoke("setInputCols", .args[["input_cols"]]) %>%
-    invoke("setOutputCols", .args[["output_cols"]]) %>%
-    invoke("setStrategy", .args[["strategy"]])
-
-  if (!is.null(.args[["missing_value"]]))
-    jobj <- invoke(jobj, "setMissingValue", .args[["missing_value"]])
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.Imputer",
+    input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]], uid = .args[["uid"]]) %>%
+    invoke("setStrategy", .args[["strategy"]]) %>%
+    maybe_set_param("setMissingValue", .args[["missing_value"]])
 
   estimator <- new_ml_imputer(jobj)
 
@@ -59,11 +53,9 @@ ft_imputer.spark_connection <- function(
 }
 
 #' @export
-ft_imputer.ml_pipeline <- function(
-  x, input_cols, output_cols, missing_value = NULL, strategy = "mean",
-  dataset = NULL,
-  uid = random_string("imputer_"), ...
-) {
+ft_imputer.ml_pipeline <- function(x, input_cols = NULL, output_cols = NULL,
+                                   missing_value = NULL, strategy = "mean", dataset = NULL,
+                                   uid = random_string("imputer_"), ...) {
   stage <- ft_imputer.spark_connection(
     x = spark_connection(x),
     input_cols = input_cols,
@@ -78,11 +70,9 @@ ft_imputer.ml_pipeline <- function(
 }
 
 #' @export
-ft_imputer.tbl_spark <- function(
-  x, input_cols, output_cols, missing_value = NULL, strategy = "mean",
-  dataset = NULL,
-  uid = random_string("imputer_"), ...
-) {
+ft_imputer.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL,
+                                 missing_value = NULL, strategy = "mean", dataset = NULL,
+                                 uid = random_string("imputer_"), ...) {
   stage <- ft_imputer.spark_connection(
     x = spark_connection(x),
     input_cols = input_cols,
@@ -100,13 +90,10 @@ ft_imputer.tbl_spark <- function(
 }
 
 ml_validator_imputer <- function(.args) {
-  .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]]) %>%
-    as.list()
-  .args[["output_cols"]] <- forge::cast_character(.args[["output_cols"]]) %>%
-    as.list()
+  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
   .args[["strategy"]] <- forge::cast_choice(.args[["strategy"]], c("mean", "median"))
-  if (!is.null(.args[["missing_value"]]))
-    .args[["missing_value"]] <- forge::cast_scalar_double(.args[["missing_value"]])
+  .args[["missing_value"]] <- forge::cast_nullable_scalar_double(.args[["missing_value"]])
   .args
 }
 

@@ -4,7 +4,7 @@
 \alias{ft_imputer}
 \title{Feature Transformation -- Imputer (Estimator)}
 \usage{
-ft_imputer(x, input_cols, output_cols, missing_value = NULL,
+ft_imputer(x, input_cols = NULL, output_cols = NULL, missing_value = NULL,
   strategy = "mean", dataset = NULL, uid = random_string("imputer_"), ...)
 }
 \arguments{
