@@ -1,8 +1,25 @@
 context("ml feature standard scaler")
 
-sc <- testthat_spark_connection()
+test_that("ft_standard_scaler() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_standard_scaler)
+})
+
+test_that("ft_standard_scaler() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "foo",
+    output_col = "bar",
+    with_mean = TRUE,
+    with_std = TRUE
+  )
+  test_param_setting(sc, ft_standard_scaler, test_args)
+})
 
 test_that("ft_standard_scaler() works properly", {
+  sc <- testthat_spark_connection()
   sample_data_path <- dir(getwd(), recursive = TRUE,
                           pattern = "sample_libsvm_data.txt", full.names = TRUE)
   sample_data <- spark_read_libsvm(sc, "sample_data",
