@@ -5,7 +5,7 @@
 \title{Feature Transformation -- QuantileDiscretizer (Estimator)}
 \usage{
 ft_quantile_discretizer(x, input_col = NULL, output_col = NULL,
-  num_buckets = 2L, input_cols = NULL, output_cols = NULL,
+  num_buckets = 2, input_cols = NULL, output_cols = NULL,
   num_buckets_array = NULL, handle_invalid = "error",
   relative_error = 0.001, dataset = NULL,
   uid = random_string("quantile_discretizer_"), ...)

@@ -44,21 +44,18 @@
 #'
 #' @seealso \code{\link{ft_bucketizer}}
 #' @export
-ft_quantile_discretizer <- function(
-  x, input_col = NULL, output_col = NULL, num_buckets = 2L,
-  input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
-  handle_invalid = "error", relative_error = 0.001, dataset = NULL,
-  uid = random_string("quantile_discretizer_"), ...) {
+ft_quantile_discretizer <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
+                                    input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
+                                    handle_invalid = "error", relative_error = 0.001, dataset = NULL,
+                                    uid = random_string("quantile_discretizer_"), ...) {
   UseMethod("ft_quantile_discretizer")
 }
 
 #' @export
-ft_quantile_discretizer.spark_connection <- function(
-  x, input_col = NULL, output_col = NULL, num_buckets = 2L,
-  input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
-  handle_invalid = "error", relative_error = 0.001, dataset = NULL,
-  uid = random_string("quantile_discretizer_"), ...) {
-
+ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
+                                                     input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
+                                                     handle_invalid = "error", relative_error = 0.001, dataset = NULL,
+                                                     uid = random_string("quantile_discretizer_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -73,21 +70,16 @@ ft_quantile_discretizer.spark_connection <- function(
     c(rlang::dots_list(...)) %>%
     ml_validator_quantile_discretizer()
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.QuantileDiscretizer", .args[["uid"]]) %>%
-    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "error", "2.1.0") %>%
-    jobj_set_param("setRelativeError", .args[["relative_error"]], 0.001, "2.0.0")
-
-  if (is.null(.args[["num_buckets_array"]])) {
-    jobj <- jobj %>%
-      invoke("setInputCol", .args[["input_col"]]) %>%
-      invoke("setOutputCol", .args[["output_col"]]) %>%
-      invoke("setNumBuckets", .args[["num_buckets"]])
-  } else {
-    jobj <- jobj %>%
-      invoke("setInputCols", .args[["input_cols"]]) %>%
-      invoke("setOutputCols", .args[["output_cols"]]) %>%
-      invoke("setNumBucketsArray", .args[["num_buckets_array"]])
-  }
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.QuantileDiscretizer",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]],
+    input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]],
+    uid = .args[["uid"]]
+  ) %>%
+    maybe_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
+    maybe_set_param("setRelativeError", .args[["relative_error"]], "2.0.0", 0.001) %>%
+    maybe_set_param("setNumBuckets", .args[["num_buckets"]]) %>%
+    maybe_set_param("setNumBucketsArray", .args[["num_buckets_array"]], "2.3.0")
 
   estimator <- jobj %>%
     new_ml_quantile_discretizer()
@@ -99,12 +91,10 @@ ft_quantile_discretizer.spark_connection <- function(
 }
 
 #' @export
-ft_quantile_discretizer.ml_pipeline <- function(
-  x, input_col = NULL, output_col = NULL, num_buckets = 2L,
-  input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
-  handle_invalid = "error", relative_error = 0.001, dataset = NULL,
-  uid = random_string("quantile_discretizer_"), ...) {
-
+ft_quantile_discretizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
+                                                input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
+                                                handle_invalid = "error", relative_error = 0.001, dataset = NULL,
+                                                uid = random_string("quantile_discretizer_"), ...) {
   stage <- ft_quantile_discretizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -123,12 +113,10 @@ ft_quantile_discretizer.ml_pipeline <- function(
 }
 
 #' @export
-ft_quantile_discretizer.tbl_spark <- function(
-  x, input_col = NULL, output_col = NULL, num_buckets = 2L,
-  input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
-  handle_invalid = "error", relative_error = 0.001, dataset = NULL,
-  uid = random_string("quantile_discretizer_"), ...) {
-
+ft_quantile_discretizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
+                                              input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
+                                              handle_invalid = "error", relative_error = 0.001, dataset = NULL,
+                                              uid = random_string("quantile_discretizer_"), ...) {
   stage <- ft_quantile_discretizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -162,19 +150,14 @@ ml_validator_quantile_discretizer <- function(.args) {
 
   .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
 
-  if (!is.null(.args[["input_col"]])) {
-    if (!is.null(.args[["input_cols"]]))
-      stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
-    .args[["input_col"]] <- forge::cast_scalar_character(.args[["input_col"]])
-    .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]])
-    .args[["num_buckets"]] <- forge::cast_scalar_integer(.args[["num_buckets"]])
-  } else if (!is.null(.args[["input_cols"]])) {
-    .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]]) %>% as.list()
-    .args[["output_cols"]] <- forge::cast_character(.args[["output_cols"]]) %>% as.list()
-    .args[["num_buckets_array"]] <- forge::cast_integer(.args[["num_buckets_array"]]) %>% as.list()
-  } else {
-    stop("One of `input_col` or `input_cols` must be specified.", call. = FALSE)
-  }
+  if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]]))
+    stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
+  .args[["input_col"]] <- forge::cast_nullable_string(.args[["input_col"]])
+  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
+  .args[["num_buckets"]] <- forge::cast_scalar_integer(.args[["num_buckets"]])
+  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
+  .args[["num_buckets_array"]] <- forge::cast_nullable_integer_list(.args[["num_buckets_array"]])
   .args[["handle_invalid"]] <- forge::cast_choice(
     .args[["handle_invalid"]],
     c("error", "skip", "keep")
