@@ -47,17 +47,16 @@
 #'   Default: \code{FALSE}.
 #'
 #' @export
-ft_r_formula <- function(x, formula, features_col = "features", label_col = "label",
+ft_r_formula <- function(x, formula = NULL, features_col = "features", label_col = "label",
                          force_index_label = FALSE, dataset = NULL,
                          uid = random_string("r_formula_"), ...) {
   UseMethod("ft_r_formula")
 }
 
 #' @export
-ft_r_formula.spark_connection <- function(
-  x, formula, features_col = "features", label_col = "label",
-  force_index_label = FALSE, dataset = NULL,
-  uid = random_string("r_formula_"), ...) {
+ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "features", label_col = "label",
+                                          force_index_label = FALSE, dataset = NULL,
+                                          uid = random_string("r_formula_"), ...) {
 
   .args <- list(
     formula = formula,
@@ -71,9 +70,9 @@ ft_r_formula.spark_connection <- function(
 
   estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", .args[["uid"]]) %>%
     invoke("setFeaturesCol", .args[["features_col"]]) %>%
-    invoke("setFormula", .args[["formula"]]) %>%
+    maybe_set_param("setFormula", .args[["formula"]]) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
-    jobj_set_param("setForceIndexLabel", .args[["force_index_label"]], FALSE, "2.1.0") %>%
+    maybe_set_param("setForceIndexLabel", .args[["force_index_label"]], "2.1.0", FALSE) %>%
     new_ml_r_formula()
 
   if (is.null(dataset))
@@ -83,11 +82,9 @@ ft_r_formula.spark_connection <- function(
 }
 
 #' @export
-ft_r_formula.ml_pipeline <- function(
-  x, formula, features_col = "features", label_col = "label",
-  force_index_label = FALSE, dataset = NULL,
-  uid = random_string("r_formula_"), ...
-) {
+ft_r_formula.ml_pipeline <- function(x, formula = NULL, features_col = "features", label_col = "label",
+                                     force_index_label = FALSE, dataset = NULL,
+                                     uid = random_string("r_formula_"), ...) {
 
   stage <- ft_r_formula.spark_connection(
     x = spark_connection(x),
@@ -104,11 +101,9 @@ ft_r_formula.ml_pipeline <- function(
 }
 
 #' @export
-ft_r_formula.tbl_spark <- function(
-  x, formula, features_col = "features", label_col = "label",
-  force_index_label = FALSE, dataset = NULL,
-  uid = random_string("r_formula_"), ...
-) {
+ft_r_formula.tbl_spark <- function(x, formula = NULL, features_col = "features", label_col = "label",
+                                   force_index_label = FALSE, dataset = NULL,
+                                   uid = random_string("r_formula_"), ...) {
 
   stage <- ft_r_formula.spark_connection(
     x = spark_connection(x),
@@ -144,9 +139,9 @@ new_ml_r_formula_model <- function(jobj) {
 ml_validator_r_formula <- function(.args) {
   if (rlang::is_formula(.args[["formula"]]))
     .args[["formula"]] <- rlang::expr_text(.args[["formula"]], width = 500L)
-  .args[["formula"]] <- forge::cast_scalar_character(.args[["formula"]])
-  .args[["features_col"]] <- forge::cast_scalar_character(.args[["features_col"]])
-  .args[["label_col"]] <- forge::cast_scalar_character(.args[["label_col"]])
-  .args[["force_index_label"]] <- forge::cast_scalar_boolean(.args[["force_index_label"]])
+  .args[["formula"]] <- forge::cast_nullable_string(.args[["formula"]])
+  .args[["features_col"]] <- forge::cast_string(.args[["features_col"]])
+  .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
+  .args[["force_index_label"]] <- forge::cast_scalar_logical(.args[["force_index_label"]])
   .args
 }

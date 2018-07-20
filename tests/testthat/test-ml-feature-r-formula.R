@@ -1,11 +1,23 @@
 context("ml feature - r formula")
 
-sc <- testthat_spark_connection()
+test_that("ft_r_formula() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_r_formula)
+})
 
-iris_tbl <- testthat_tbl("iris")
+test_that("ft_r_formula() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    formula = "foo ~ bar"
+  )
+  test_param_setting(sc, ft_r_formula, test_args)
+})
 
 test_that("r formula works as expected", {
-  test_requires("dplyr")
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   pipeline <- ml_pipeline(sc) %>%
     ft_string_indexer("Species", "species_idx") %>%
     ft_one_hot_encoder("species_idx", "species_dummy") %>%
@@ -48,7 +60,6 @@ test_that("r formula works as expected", {
 })
 
 test_that("ft_r_formula takes formula", {
-  test_requires("dplyr")
   iris_tbl <- testthat_tbl("iris")
   v1 <- ft_r_formula(iris_tbl, "Species ~ Sepal_Length + Petal_Length") %>% pull(features)
   v2 <- ft_r_formula(iris_tbl, Species ~ Sepal_Length + Petal_Length) %>% pull(features)
