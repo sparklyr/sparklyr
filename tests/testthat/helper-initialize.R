@@ -253,7 +253,8 @@ test_default_args <- function(sc, fn) {
   default_args <- rlang::fn_fmls(fn) %>%
     as.list() %>%
     purrr::discard(~is.symbol(.x)) %>%
-    rlang::modify(uid = NULL)
+    rlang::modify(uid = NULL) %>%
+    purrr::compact()
 
   params <- do.call(fn, list(x = sc)) %>%
     ml_params()

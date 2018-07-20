@@ -13,8 +13,7 @@ test_that("ft_bucketizer() param setting", {
     input_col = "x",
     output_col = "y",
     splits = c(-1, 34, 100),
-    handle_invalid = "keep",
-    uid = "foo"
+    handle_invalid = "keep"
   )
   test_param_setting(sc, ft_bucketizer, test_args)
 })
