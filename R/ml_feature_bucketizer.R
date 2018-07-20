@@ -29,19 +29,16 @@
 #' }
 #'
 #' @export
-ft_bucketizer <- function(
-  x, input_col = NULL, output_col = NULL, splits = NULL,
-  input_cols = NULL, output_cols = NULL, splits_array = NULL,
-  handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
+ft_bucketizer <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
+                          input_cols = NULL, output_cols = NULL, splits_array = NULL,
+                          handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
   UseMethod("ft_bucketizer")
 }
 
 #' @export
-ft_bucketizer.spark_connection <- function(
-  x, input_col = NULL, output_col = NULL, splits = NULL,
-  input_cols = NULL, output_cols = NULL, splits_array = NULL,
-  handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
-
+ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
+                                           input_cols = NULL, output_cols = NULL, splits_array = NULL,
+                                           handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -55,31 +52,24 @@ ft_bucketizer.spark_connection <- function(
     c(rlang::dots_list(...)) %>%
     ml_validator_bucketizer()
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.feature.Bucketizer", .args[["uid"]])
-  if (is.null(.args[["splits_array"]])) {
-    jobj <- jobj %>%
-      invoke("setInputCol", .args[["input_col"]]) %>%
-      invoke("setOutputCol", .args[["output_col"]]) %>%
-      invoke("setSplits", .args[["splits"]])
-  } else {
-    jobj <- jobj %>%
-      invoke("setInputCols", .args[["input_cols"]]) %>%
-      invoke("setOutputCols", .args[["output_cols"]])
+  jobj <- invoke_new(x, "org.apache.spark.ml.feature.Bucketizer", .args[["uid"]]) %>%
+    maybe_set_param("setInputCol", .args[["input_col"]]) %>%
+    maybe_set_param("setOutputCol", .args[["output_col"]]) %>%
+    maybe_set_param("setSplits", .args[["splits"]]) %>%
+    maybe_set_param("setInputCols", .args[["input_cols"]]) %>%
+    maybe_set_param("setOutputCols", .args[["output_cols"]]) %>%
+    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "error", "2.1.0")
+  if (!is.null(.args[["splits_array"]]))
     jobj <- invoke_static(x, "sparklyr.BucketizerUtils", "setSplitsArrayParam",
                           jobj, .args[["splits_array"]])
-  }
-  jobj <- jobj %>%
-    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "error", "2.1.0")
 
   new_ml_bucketizer(jobj)
 }
 
 #' @export
-ft_bucketizer.ml_pipeline <- function(
-  x, input_col = NULL, output_col = NULL, splits = NULL,
-  input_cols = NULL, output_cols = NULL, splits_array = NULL,
-  handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
-
+ft_bucketizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
+                                      input_cols = NULL, output_cols = NULL, splits_array = NULL,
+                                      handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
   stage <- ft_bucketizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -96,11 +86,9 @@ ft_bucketizer.ml_pipeline <- function(
 }
 
 #' @export
-ft_bucketizer.tbl_spark <- function(
-  x, input_col = NULL, output_col = NULL, splits = NULL,
-  input_cols = NULL, output_cols = NULL, splits_array = NULL,
-  handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
-
+ft_bucketizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
+                                    input_cols = NULL, output_cols = NULL, splits_array = NULL,
+                                    handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
   stage <- ft_bucketizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -124,25 +112,20 @@ new_ml_bucketizer <- function(jobj) {
 ml_validator_bucketizer <- function(.args) {
   .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
 
-  if (!is.null(.args[["input_col"]])) {
-    if (!is.null(.args[["input_cols"]]))
-      stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
-    .args[["input_col"]] <- forge::cast_scalar_character(.args[["input_col"]])
-    .args[["output_col"]] <- forge::cast_scalar_character(.args[["output_col"]])
-    if (length(.args[["splits"]]) < 3)
-      stop("`splits` must be at least length 3.", call. = FALSE)
-    .args[["splits"]] <- forge::cast_double(.args[["splits"]]) %>% as.list()
-  } else if (!is.null(.args[["input_cols"]])) {
-    .args[["input_cols"]] <- forge::cast_character(.args[["input_cols"]]) %>% as.list()
-    .args[["output_cols"]] <- forge::cast_character(.args[["output_cols"]]) %>% as.list()
-    .args[["splits_array"]] <- purrr::map(
-      .args[["splits_array"]],
-      ~ forge::cast_double(.x) %>% as.list()
-    )
-  } else {
-    stop("One of `input_col` or `input_cols` must be specified.", call. = FALSE)
-  }
-
+  if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]]))
+    stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
+  .args[["input_col"]] <- forge::cast_nullable_string(.args[["input_col"]])
+  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
+  if (!is.null(.args[["splits"]]) && length(.args[["splits"]]) < 3)
+    stop("`splits` must be at least length 3.", call. = FALSE)
+  .args[["splits"]] <- forge::cast_nullable_double_list(.args[["splits"]])
+  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
+  if (!is.null(.args[["splits_array"]]))
+  .args[["splits_array"]] <- purrr::map(
+    .args[["splits_array"]],
+    ~ forge::cast_double_list(.x)
+  )
   .args[["handle_invalid"]] <- forge::cast_choice(
     .args[["handle_invalid"]], c("error", "skip", "keep")
   )
