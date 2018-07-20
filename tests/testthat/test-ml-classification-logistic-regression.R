@@ -1,6 +1,38 @@
 context("ml classification - logistic regression")
 
+test_that("ml_logistic_regression() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_logistic_regression)
+})
 
+test_that("ml_logistic_regression() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    fit_intercept = FALSE,
+    elastic_net_param = 1e-4,
+    reg_param = 1e-5,
+    max_iter = 50,
+    # `threshold` can't seem to be set when `thresholds` is
+    thresholds = c(0.3, 0.7),
+    tol = 1e-04,
+    weight_col = "wow",
+    aggregation_depth = 3,
+    # We'll want to enable this, see #1616
+    # upper_bounds_on_coefficients = matrix(rep(1, 6), nrow = 3),
+    # lower_bounds_on_coefficients = matrix(rep(-1, 6), nrow = 3),
+    # upper_bounds_on_intercepts = c(1, 1, 1),
+    # lower_bounds_on_intercepts = c(-1, -1, -1),
+    features_col = "foo",
+    label_col = "bar",
+    family = "multinomial",
+    prediction_col = "pppppp",
+    probability_col = "apweiof",
+    raw_prediction_col = "rparprpr"
+  )
+  test_param_setting(sc, ml_logistic_regression, test_args)
+})
 
 test_that("ml_logistic_regression.tbl_spark() works properly", {
   sc <- testthat_spark_connection()
