@@ -1,9 +1,27 @@
 context("ml feature regex tokenizer")
 
-sc <- testthat_spark_connection()
+test_that("ft_regex_tokenizer() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_regex_tokenizer)
+})
+
+test_that("ft_regex_tokenizer() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "foo",
+    output_col = "bar",
+    gaps = FALSE,
+    min_token_length = 2,
+    pattern = "foo",
+    to_lower_case = FALSE
+  )
+  test_param_setting(sc, ft_regex_tokenizer, test_args)
+})
 
 test_that("ft_regex_tokenizer() works", {
-  test_requires("dplyr")
+  sc <- testthat_spark_connection()
   sentence_df <- data_frame(
     id = c(0, 1, 2),
     sentence = c("Hi I heard about Spark",
@@ -35,5 +53,4 @@ test_that("ft_regex_tokenizer() works", {
          pattern = "\\W",
          to_lower_case = FALSE)
   )
-
 })
