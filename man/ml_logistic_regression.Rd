@@ -5,9 +5,9 @@
 \title{Spark ML -- Logistic Regression}
 \usage{
 ml_logistic_regression(x, formula = NULL, fit_intercept = TRUE,
-  elastic_net_param = 0, reg_param = 0, max_iter = 100L,
-  threshold = 0.5, thresholds = NULL, tol = 1e-06, weight_col = NULL,
-  aggregation_depth = 2L, lower_bounds_on_coefficients = NULL,
+  elastic_net_param = 0, reg_param = 0, max_iter = 100, threshold = 0.5,
+  thresholds = NULL, tol = 1e-06, weight_col = NULL,
+  aggregation_depth = 2, lower_bounds_on_coefficients = NULL,
   lower_bounds_on_intercepts = NULL, upper_bounds_on_coefficients = NULL,
   upper_bounds_on_intercepts = NULL, features_col = "features",
   label_col = "label", family = "auto", prediction_col = "prediction",

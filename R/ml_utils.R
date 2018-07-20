@@ -78,12 +78,14 @@ ml_short_type <- function(x) {
 }
 
 spark_dense_matrix <- function(sc, mat) {
+  if (is.null(mat)) return(mat)
   invoke_new(
     sc, "org.apache.spark.ml.linalg.DenseMatrix", dim(mat)[1L], dim(mat)[2L],
     as.list(mat))
 }
 
 spark_dense_vector <- function(sc, vec) {
+  if (is.null(vec)) return(vec)
   invoke_static(sc,  "org.apache.spark.ml.linalg.Vectors", "dense",
                 as.list(vec))
 }
