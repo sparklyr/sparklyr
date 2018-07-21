@@ -39,7 +39,7 @@ test_that("ml_cross_validator() works correctly", {
 
   expected_param_maps <- param_grid_full_stage_names %>%
     sparklyr:::ml_expand_params() %>%
-    sparklyr:::ml_build_param_maps()
+    purrr::cross()
 
   list_sorter <- function(l) {
     l[sort(names(l))]

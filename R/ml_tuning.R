@@ -50,9 +50,9 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
         which()
 
       # Error if we find more than one or no stage in the pipeline with the name.
-      if (length(matched) > 1) stop("The name ", user_input_name, " matched more than one stage in the pipeline.",
+      if (length(matched) > 1) stop("The name ", user_input_name, " matches more than one stage in the pipeline.",
                                     call. = FALSE)
-      if (length(matched) == 0) stop("The name ", user_input_name, " matched no stages in the pipeline.",
+      if (length(matched) == 0) stop("The name ", user_input_name, " matches no stages in the pipeline.",
                                      call. = FALSE)
 
       # Save the index of the matched stage, this will be used for naming later.
@@ -95,14 +95,6 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
       })
     })  %>%
     rlang::set_names(stage_uids[stage_indices])
-}
-
-ml_build_param_maps <- function(param_list) {
-  # computes combinations at the stages level
-  param_list %>%
-    expand.grid(stringsAsFactors = FALSE) %>%
-    apply(1, list) %>%
-    rlang::flatten()
 }
 
 ml_spark_param_map <- function(param_map, sc, stage_jobjs) {
@@ -190,7 +182,7 @@ ml_new_validator <- function(
   param_maps <- estimator_param_maps %>%
     ml_expand_params() %>%
     ml_validate_params(stage_jobjs, current_param_list) %>%
-    ml_build_param_maps() %>%
+    purrr::cross() %>%
     lapply(ml_spark_param_map, sc, stage_jobjs)
 
   jobj <- invoke_new(sc, class, uid) %>%
