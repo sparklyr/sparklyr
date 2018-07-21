@@ -11,7 +11,7 @@ as_arrow_feather <- function(df)
   readBin(con, "raw", n = 1e10)
 }
 
-as_arrow_python <- function(df)
+as_arrow_buffers <- function(df)
 {
   pa <- reticulate::import("pyarrow")
 
@@ -22,10 +22,36 @@ as_arrow_python <- function(df)
   builtins$bytearray(buf)
 }
 
+arrow_schema <- function(df)
+{
+  pdf <- pa$Table$from_pandas(df)
+  pdf$schema
+}
+
+as_arrow_python <- function(df)
+{
+  io <- reticulate::import("io")
+  pa <- reticulate::import("pyarrow")
+
+  pdCols <- lapply(df, function(col) pa$Array$from_pandas(col))
+  batch <- pa$RecordBatch$from_arrays(
+    lapply(1:length(pdCols), function(i) pdCols[[i]]),
+    as.list(names(df))
+  )
+
+  sink <- io$BytesIO()
+  schema <- arrow_schema(df)
+  writer <- pa$RecordBatchFileWriter(sink, schema)
+  writer$write_batch(batch)
+  writer$close()
+  builtins$bytearray(sink$getvalue())
+}
+
 arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "python")
 {
   serializers <- list(
     feather = as_arrow_feather,
+    buffers = as_arrow_buffers,
     python = as_arrow_python
   )
 
@@ -35,9 +61,11 @@ arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "python")
   # create batches data frame
   batches <- list(bytes)
 
+  # build schema
+  schema <- sparklyr:::spark_data_build_types(sc, lapply(df, class))
+
   # load arrow file in scala
   rdd <- invoke_static(sc, "sparklyr.ArrowHelper", "javaRddFromBinaryBatches", spark_context(sc), batches, parallelism)
-  schema <- sparklyr:::spark_data_build_types(sc, lapply(df, class))
   sdf <- invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
 
   sdf_register(sdf)
