@@ -167,19 +167,25 @@ ml_new_validator <- function(
   if (!is_ml_estimator(estimator))
     stop("estimator must be a 'ml_estimator'")
 
-  stage_jobjs <- if (inherits(estimator, "ml_pipeline"))
-    invoke_static(sc,
-                  "sparklyr.MLUtils",
-                  "uidStagesMapping",
-                  spark_jobj(estimator)) else
-                    rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
+  stage_jobjs <- if (inherits(estimator, "ml_pipeline")) {
+    invoke_static(
+      sc,
+      "sparklyr.MLUtils",
+      "uidStagesMapping",
+      spark_jobj(estimator)
+    )
+  } else {
+    rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
+  }
 
   current_param_list <- stage_jobjs %>%
     lapply(invoke, "extractParamMap") %>%
-    lapply(function(x) invoke_static(sc,
-                                     "sparklyr.MLUtils",
-                                     "paramMapToList",
-                                     x))
+    lapply(function(x) invoke_static(
+      sc,
+      "sparklyr.MLUtils",
+      "paramMapToList",
+      x
+    ))
 
   param_maps <- estimator_param_maps %>%
     ml_expand_params() %>%
@@ -200,14 +206,15 @@ ml_new_validator <- function(
 }
 
 new_ml_tuning <- function(jobj, ..., subclass = NULL) {
-  new_ml_estimator(jobj,
-                   estimator = invoke(jobj, "getEstimator") %>%
-                     ml_constructor_dispatch(),
-                   evaluator = invoke(jobj, "getEvaluator") %>%
-                     ml_constructor_dispatch(),
-                   estimator_param_maps = ml_get_estimator_param_maps(jobj),
-                   ...,
-                   subclass = c(subclass, "ml_tuning"))
+  new_ml_estimator(
+    jobj,
+    estimator = invoke(jobj, "getEstimator") %>%
+      ml_constructor_dispatch(),
+    evaluator = invoke(jobj, "getEvaluator") %>%
+      ml_constructor_dispatch(),
+    estimator_param_maps = ml_get_estimator_param_maps(jobj),
+    ...,
+    subclass = c(subclass, "ml_tuning"))
 }
 
 new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
