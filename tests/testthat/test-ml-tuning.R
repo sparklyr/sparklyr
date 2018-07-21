@@ -82,7 +82,7 @@ test_that("we can cross validate a logistic regression with xval", {
       iris_tbl, estimator = pipeline, estimator_param_maps = bad_grid,
       evaluator = ml_multiclass_classification_evaluator(sc),
       seed = 1, uid = "cv_1"),
-    "The name logistic matches no stages in pipeline"
+    "The name logistic matches no stages in the pipeline"
   )
 
   grid <- list(

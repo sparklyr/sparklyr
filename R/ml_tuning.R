@@ -37,49 +37,64 @@ ml_expand_params <- function(param_grid) {
     purrr::map(purrr::cross)
 }
 
-ml_validate_params <- function(stages_params, uid_stages, current_param_list) {
-  stage_names <- names(stages_params)
-  matched_indices <- stage_names %>%
-    sapply(function(x) {
-      matched_index <- grepl(paste0("^", x), names(uid_stages)) %>% which()
-      if (length(matched_index) > 1)
-        stop(paste0("The name ", x,
-                    " matches more than 1 stage in pipeline"))
-      if (length(matched_index) == 0)
-        stop(paste0("The name ", x, " matches no stages in pipeline"))
-      matched_index
-    })
+ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list) {
+  stage_uids <- names(stage_jobjs)
+  stage_indices <- integer(0)
 
-  # match stage names
-  stage_uids <- names(uid_stages)[matched_indices] %>%
-    rlang::set_names(stage_names)
-  stage_names %>%
-    lapply(function(stage_name) {
-      stage_jobj <- uid_stages %>%
-        `[[`(stage_uids[stage_name])
-      lapply(stages_params[[stage_name]], function(params) {
-        args_to_validate <- ml_args_to_validate(
-          args = params,
-          # current param list parsed from the pipeline jobj
-          current_args = current_param_list %>%
-            `[[`(stage_uids[stage_name]) %>%
-            ml_map_param_list_names(),
-          # default args from the stage constructor, excluding args with no default
-          #   and `uid`
-          default_args = Filter(
-            Negate(rlang::is_symbol),
-            stage_jobj %>%
-              ml_get_stage_constructor() %>%
-              rlang::fn_fmls() %>%
-              rlang::modify(uid = NULL)
-          ))
-        # calls the appropriate validator and returns a list
-        rlang::invoke(ml_get_stage_validator(stage_jobj),
-                      .args = list(args_to_validate)) %>%
-          `[`(names(params))
+  expanded_params %>%
+    purrr::imap(function(param_sets, user_input_name) {
+
+      # Determine the pipeline stage based on the user specified name.
+      matched <- paste0("^", user_input_name) %>%
+        grepl(stage_uids) %>%
+        which()
+
+      # Error if we find more than one or no stage in the pipeline with the name.
+      if (length(matched) > 1) stop("The name ", user_input_name, " matched more than one stage in the pipeline.",
+                                    call. = FALSE)
+      if (length(matched) == 0) stop("The name ", user_input_name, " matched no stages in the pipeline.",
+                                     call. = FALSE)
+
+      # Save the index of the matched stage, this will be used for naming later.
+      stage_indices[[user_input_name]] <<- matched
+
+      stage_jobj <- stage_jobjs[[matched]]
+
+      purrr::map(param_sets, function(params) {
+        # Parameters currently specified in the pipeline object.
+        current_params <- current_param_list[[matched]] %>%
+          ml_map_param_list_names()
+
+        # Default arguments based on function formals.
+        default_params <- stage_jobj %>%
+          ml_get_stage_constructor() %>%
+          rlang::fn_fmls() %>%
+          as.list() %>%
+          purrr::discard(~ is.symbol(.x) || is.language(.x)) %>%
+          purrr::compact()
+
+        # Create a list of arguments to be validated. The precedence is as follows:
+        #   1. User specified values in `estimator_param_maps`
+        #   2. Values already set in pipeline `estimator`
+        #   3. Default arguments based on constructor function
+        input_param_names <- names(params)
+        current_param_names <- names(current_params)
+        default_param_names <- names(default_params)
+
+        current_params_keep <- setdiff(current_param_names, input_param_names)
+        default_params_keep <- setdiff(default_param_names, current_params_keep)
+
+        args_to_validate <- c(
+          params, current_params[current_params_keep], default_params[default_params_keep]
+        )
+
+        # Call the validator associated with the stage, and return the (validated)
+        #   parameters the user specified.
+        do.call(ml_get_stage_validator(stage_jobj), list(.args = args_to_validate)) %>%
+          `[`(input_param_names)
       })
-    }) %>%
-    rlang::set_names(stage_uids)
+    })  %>%
+    rlang::set_names(stage_uids[stage_indices])
 }
 
 ml_build_param_maps <- function(param_list) {
@@ -90,7 +105,7 @@ ml_build_param_maps <- function(param_list) {
     rlang::flatten()
 }
 
-ml_spark_param_map <- function(param_map, sc, uid_stages) {
+ml_spark_param_map <- function(param_map, sc, stage_jobjs) {
   stage_uids <- names(param_map)
   param_jobj_value_list <- stage_uids %>%
     lapply(function(stage_uid) {
@@ -100,7 +115,7 @@ ml_spark_param_map <- function(param_map, sc, uid_stages) {
              names(params) %>%
                lapply(function(param_name) {
                  # get the Param object by calling `[stage].[param]` in Scala
-                 list(param_jobj = uid_stages[[stage_uid]] %>%
+                 list(param_jobj = stage_jobjs[[stage_uid]] %>%
                         invoke(ml_map_param_names(param_name, "rs")),
                       value = params[[param_name]]
                  )
@@ -152,14 +167,14 @@ ml_new_validator <- function(
   if (!is_ml_estimator(estimator))
     stop("estimator must be a 'ml_estimator'")
 
-  uid_stages <- if (inherits(estimator, "ml_pipeline"))
+  stage_jobjs <- if (inherits(estimator, "ml_pipeline"))
     invoke_static(sc,
                   "sparklyr.MLUtils",
                   "uidStagesMapping",
                   spark_jobj(estimator)) else
                     rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
 
-  current_param_list <- uid_stages %>%
+  current_param_list <- stage_jobjs %>%
     lapply(invoke, "extractParamMap") %>%
     lapply(function(x) invoke_static(sc,
                                      "sparklyr.MLUtils",
@@ -168,9 +183,9 @@ ml_new_validator <- function(
 
   param_maps <- estimator_param_maps %>%
     ml_expand_params() %>%
-    ml_validate_params(uid_stages, current_param_list) %>%
+    ml_validate_params(stage_jobjs, current_param_list) %>%
     ml_build_param_maps() %>%
-    lapply(ml_spark_param_map, sc, uid_stages)
+    lapply(ml_spark_param_map, sc, stage_jobjs)
 
   jobj <- invoke_new(sc, class, uid) %>%
     invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
