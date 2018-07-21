@@ -106,6 +106,13 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
 })
 
 test_that("ml_logistic_regression can fit without intercept",{
+  sc <- testthat_spark_connection()
+  set.seed(42)
+  iris_weighted <- iris %>%
+    mutate(weights = rpois(nrow(iris), 1) + 1,
+           ones = rep(1, nrow(iris)),
+           versicolor = ifelse(Species == "versicolor", 1L, 0L))
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
   expect_error(s <- ml_logistic_regression(
     iris_weighted_tbl,
     formula = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
