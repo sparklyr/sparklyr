@@ -110,79 +110,45 @@ ml_spark_param_map <- function(param_map, sc, stage_jobjs) {
     )
 }
 
-param_maps_to_df <- function(param_maps) {
-  param_maps %>%
-    lapply(function(param_map) {
-      param_map %>%
-        lapply(data.frame, stringsAsFactors = FALSE) %>%
-        (function(x) lapply(seq_along(x), function(n) {
-          fn <- function(x) paste(x, n, sep = "_")
-          dplyr::rename_all(x[[n]], fn)
-        })) %>% dplyr::bind_cols()
-    }) %>%
-    dplyr::bind_rows()
-}
-
 ml_get_estimator_param_maps <- function(jobj) {
   sc <- spark_connection(jobj)
   jobj %>%
     invoke("getEstimatorParamMaps") %>%
-    lapply(function(x)
-      invoke_static(sc,
-                    "sparklyr.MLUtils",
-                    "paramMapToNestedList",
-                    x)) %>%
-    lapply(function(x)
-      lapply(x, ml_map_param_list_names))
+    purrr::map(~ invoke_static(sc, "sparklyr.MLUtils", "paramMapToNestedList", .x)) %>%
+    purrr::map(~ lapply(.x, ml_map_param_list_names))
 }
 
-ml_new_validator <- function(
-  sc, class, uid, estimator, evaluator, estimator_param_maps, seed) {
-  seed <- ensure_scalar_integer(seed, allow.null = TRUE)
-
-  uid <- ensure_scalar_character(uid)
+ml_new_validator <- function(sc, class, uid, estimator, evaluator,
+                             estimator_param_maps, seed) {
+  seed <- forge::cast_nullable_scalar_integer(seed)
+  uid <- forge::cast_string(uid)
 
   if (!inherits(evaluator, "ml_evaluator"))
     stop("evaluator must be a 'ml_evaluator'")
   if (!is_ml_estimator(estimator))
     stop("estimator must be a 'ml_estimator'")
 
-  stage_jobjs <- if (inherits(estimator, "ml_pipeline")) {
-    invoke_static(
-      sc,
-      "sparklyr.MLUtils",
-      "uidStagesMapping",
-      spark_jobj(estimator)
-    )
-  } else {
+  stage_jobjs <- if (inherits(estimator, "ml_pipeline"))
+    invoke_static(sc, "sparklyr.MLUtils", "uidStagesMapping", spark_jobj(estimator))
+  else
     rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
-  }
 
   current_param_list <- stage_jobjs %>%
-    lapply(invoke, "extractParamMap") %>%
-    lapply(function(x) invoke_static(
-      sc,
-      "sparklyr.MLUtils",
-      "paramMapToList",
-      x
-    ))
+    purrr::map(invoke, "extractParamMap") %>%
+    purrr::map(~ invoke_static(sc, "sparklyr.MLUtils", "paramMapToList", .x))
 
   param_maps <- estimator_param_maps %>%
     purrr::map(purrr::cross) %>%
     ml_validate_params(stage_jobjs, current_param_list) %>%
     purrr::cross() %>%
-    lapply(ml_spark_param_map, sc, stage_jobjs)
+    purrr::map(ml_spark_param_map, sc, stage_jobjs)
 
-  jobj <- invoke_new(sc, class, uid) %>%
+  invoke_new(sc, class, uid) %>%
     invoke_static(sc, "sparklyr.MLUtils", "setParamMaps",
                   ., param_maps) %>%
     invoke("setEstimator", spark_jobj(estimator)) %>%
-    invoke("setEvaluator", spark_jobj(evaluator))
-
-  if (!rlang::is_null(seed))
-    jobj <- invoke(jobj, "setSeed", seed)
-
-  jobj
+    invoke("setEvaluator", spark_jobj(evaluator)) %>%
+    maybe_set_param("setSeed", seed)
 }
 
 new_ml_tuning <- function(jobj, ..., subclass = NULL) {
@@ -336,4 +302,17 @@ ml_validation_metrics <- function(model) {
   else
     stop("ml_validation_metrics() must be called on `ml_cross_validator_model` ",
          "or `ml_train_validation_split_model`.", call. = FALSE)
+}
+
+param_maps_to_df <- function(param_maps) {
+  param_maps %>%
+    lapply(function(param_map) {
+      param_map %>%
+        lapply(data.frame, stringsAsFactors = FALSE) %>%
+        (function(x) lapply(seq_along(x), function(n) {
+          fn <- function(x) paste(x, n, sep = "_")
+          dplyr::rename_all(x[[n]], fn)
+        })) %>% dplyr::bind_cols()
+    }) %>%
+    dplyr::bind_rows()
 }
