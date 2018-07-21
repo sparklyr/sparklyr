@@ -176,7 +176,13 @@ ml_validate_decision_tree_args <- function(args) {
     }, ml_tree_param_mapping())
 }
 
+validate_no_formula <- function(.args) {
+  if (!is.null(.args[["formula"]])) stop("`formula` may only be specified when `x` is a `tbl_spark`.")
+  .args
+}
+
 validate_args_predictor <- function(.args) {
+  .args <- validate_no_formula(.args)
   .args[["features_col"]] <- forge::cast_string(.args[["features_col"]])
   .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
   .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])

@@ -65,6 +65,7 @@ ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_inter
                                                     raw_prediction_col = "rawPrediction",
                                                     uid = random_string("logistic_regression_"), ...) {
   .args <- list(
+    formula = formula,
     fit_intercept = fit_intercept,
     elastic_net_param = elastic_net_param,
     reg_param = reg_param,
@@ -186,7 +187,7 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
 
   predictor <- ml_logistic_regression.spark_connection(
     x = spark_connection(x),
-    formula = formula,
+    formula = NULL,
     fit_intercept = fit_intercept,
     elastic_net_param = elastic_net_param,
     reg_param = reg_param,
