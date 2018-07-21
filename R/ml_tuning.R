@@ -32,11 +32,6 @@
 #' @name ml-tuning
 NULL
 
-ml_expand_params <- function(param_grid) {
-  param_grid %>%
-    purrr::map(purrr::cross)
-}
-
 ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list) {
   stage_uids <- names(stage_jobjs)
   stage_indices <- integer(0)
@@ -180,7 +175,7 @@ ml_new_validator <- function(
     ))
 
   param_maps <- estimator_param_maps %>%
-    ml_expand_params() %>%
+    purrr::map(purrr::cross) %>%
     ml_validate_params(stage_jobjs, current_param_list) %>%
     purrr::cross() %>%
     lapply(ml_spark_param_map, sc, stage_jobjs)

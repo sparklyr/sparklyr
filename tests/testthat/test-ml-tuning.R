@@ -38,7 +38,7 @@ test_that("ml_cross_validator() works correctly", {
   expect_identical(ml_param(cv, "parallelism"), 2L)
 
   expected_param_maps <- param_grid_full_stage_names %>%
-    sparklyr:::ml_expand_params() %>%
+    purrr::map(purrr::cross) %>%
     purrr::cross()
 
   list_sorter <- function(l) {
