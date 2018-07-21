@@ -57,6 +57,16 @@ The object returned depends on the class of \code{x}.
 \description{
 This class performs expectation maximization for multivariate Gaussian Mixture Models (GMMs). A GMM represents a composite distribution of independent Gaussian distributions with associated "mixing" weights specifying each's contribution to the composite. Given a set of sample points, this class will maximize the log-likelihood for a mixture of k Gaussians, iterating until the log-likelihood changes by less than \code{tol}, or until it has reached the max number of iterations. While this process is generally guaranteed to converge, it is not guaranteed to find a global optimum.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+gmm_model <- ml_gaussian_mixture(iris_tbl, Species ~ .)
+pred <- sdf_predict(iris_tbl, gmm_model)
+ml_clustering_evaluator(pred)
+}
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
