@@ -93,29 +93,22 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
 }
 
 ml_spark_param_map <- function(param_map, sc, stage_jobjs) {
-  stage_uids <- names(param_map)
-  param_jobj_value_list <- stage_uids %>%
-    lapply(function(stage_uid) {
-      params <- param_map[[stage_uid]]
-      Filter(function(x) !rlang::is_null(x$value),
-             # only create param_map with non-null values
-             names(params) %>%
-               lapply(function(param_name) {
-                 # get the Param object by calling `[stage].[param]` in Scala
-                 list(param_jobj = stage_jobjs[[stage_uid]] %>%
-                        invoke(ml_map_param_names(param_name, "rs")),
-                      value = params[[param_name]]
-                 )
-               }))
+  purrr::imap(param_map, function(param_set, stage_uid) {
+    purrr::imap(param_set, function(value, param_name) {
+      # Get the Param object by calling `[stage].[param]` in Scala
+      list(param_jobj = stage_jobjs[[stage_uid]] %>%
+             invoke(ml_map_param_names(param_name, "rs")),
+           value = value)
     }) %>%
-    rlang::flatten()
-
-  # put the param pairs into a ParamMap
-  Reduce(function(x, pair) invoke(x, "put", pair$param_jobj, pair$value),
-         param_jobj_value_list,
-         invoke_new(sc, "org.apache.spark.ml.param.ParamMap"))
+      purrr::discard(~ is.null(.x[["value"]]))
+  }) %>%
+    unname() %>%
+    rlang::flatten() %>%
+    purrr::reduce(
+      function(x, pair) invoke(x, "put", pair$param_jobj, pair$value),
+      .init = invoke_new(sc, "org.apache.spark.ml.param.ParamMap")
+    )
 }
-
 
 param_maps_to_df <- function(param_maps) {
   param_maps %>%
