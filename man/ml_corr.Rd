@@ -21,3 +21,13 @@ A correlation matrix organized as a data frame.
 \description{
 Compute correlation matrix
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+features <- c("Petal_Width", "Petal_Length", "Sepal_Length", "Sepal_Width")
+
+ml_corr(iris_tbl, columns = features , method = "pearson")
+}
+}

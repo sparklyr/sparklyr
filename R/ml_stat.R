@@ -7,6 +7,16 @@
 #' @param method The method to use, either \code{"pearson"} or \code{"spearman"}.
 #'
 #' @return A correlation matrix organized as a data frame.
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' features <- c("Petal_Width", "Petal_Length", "Sepal_Length", "Sepal_Width")
+#'
+#' ml_corr(iris_tbl, columns = features , method = "pearson")
+#' }
 #' @export
 ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
   spark_require_version(spark_connection(x), "2.2.0")
@@ -75,6 +85,16 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
 #' @param label The name of the label column.
 #' @return A data frame with one row for each (feature, label) pair with p-values,
 #'   degrees of freedom, and test statistics.
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' features <- c("Petal_Width", "Petal_Length", "Sepal_Length", "Sepal_Width")
+#'
+#' ml_chisquare_test(iris_tbl, features = features, label = "Species")
+#' }
 #' @export
 ml_chisquare_test <- function(x, features, label) {
   spark_require_version(spark_connection(x), "2.2.0")

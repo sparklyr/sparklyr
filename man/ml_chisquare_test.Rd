@@ -24,3 +24,13 @@ Conduct Pearson's independence test for every feature against the
   into a contingency matrix for which the Chi-squared statistic is
   computed. All label and feature values must be categorical.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+features <- c("Petal_Width", "Petal_Length", "Sepal_Length", "Sepal_Width")
+
+ml_chisquare_test(iris_tbl, features = features, label = "Species")
+}
+}
