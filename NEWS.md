@@ -101,11 +101,7 @@
 
 ### Documentation
 
-- Many new examples for `ml_kmeans()`, `ml_pca()`, `ml_naive_bayes()`, `ml_bisecting_kmeans()`,
-  `ml_decision_tree()`, `ml_random_forest()`, `ml_evaluator()`, `ml_multilayer_perceptron()`,
-  `ml_linear_regression()`, `ml_logistic_regression()`, `ml_cross_validator()`, 
-  `ft_binarizer()`, `ft_bucketrizer()`, `sdf_pivot()`, `ml_als()`,
-  `ml_gradient_boosted_trees()` (@samuelmacedo83).
+- Many new examples for `ft_binarizer()`, `ft_bucketrizer()`, `ft_min_max_scaler`, `ft_max_abs_scaler()`, `ft_standard_scaler()`, `ml_kmeans()`, `ml_pca()`, `ml_bisecting_kmeans()`, `ml_gaussian_mixture()`, `ml_naive_bayes()`, `ml_decision_tree()`, `ml_random_forest()`, `ml_multilayer_perceptron()`, `ml_linear_regression()`, `ml_logistic_regression()`, `ml_gradient_boosted_trees()`, `ml_generalized_linear_regression()`, `ml_cross_validator()`, `ml_evaluator()`, `ml_clustering_evaluator()`, `ml_corr()`, `ml_chisquare_test()`, `sdf_pivot()` (@samuelmacedo83).
 
 ### Configuration
 
