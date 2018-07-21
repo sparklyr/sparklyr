@@ -8,6 +8,18 @@
 #' @template roxlate-ml-prediction-col
 #' @template roxlate-ml-formula-params
 #' @param probability_col Column name for predicted class conditional probabilities. Note: Not all models output well-calibrated probability estimates! These probabilities should be treated as confidences, not precise probabilities.
+#'
+#'@examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' gmm_model <- ml_gaussian_mixture(iris_tbl, Species ~ .)
+#' pred <- sdf_predict(iris_tbl, gmm_model)
+#' ml_clustering_evaluator(pred)
+#' }
+
+
 #' @export
 ml_gaussian_mixture <- function(
   x,
