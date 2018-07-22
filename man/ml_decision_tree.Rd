@@ -8,11 +8,11 @@
 \alias{ml_decision_tree_regressor}
 \title{Spark ML -- Decision Trees}
 \usage{
-ml_decision_tree_classifier(x, formula = NULL, max_depth = 5L,
-  max_bins = 32L, min_instances_per_node = 1L, min_info_gain = 0,
+ml_decision_tree_classifier(x, formula = NULL, max_depth = 5,
+  max_bins = 32, min_instances_per_node = 1, min_info_gain = 0,
   impurity = "gini", seed = NULL, thresholds = NULL,
-  cache_node_ids = FALSE, checkpoint_interval = 10L,
-  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
+  cache_node_ids = FALSE, checkpoint_interval = 10,
+  max_memory_in_mb = 256, features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("decision_tree_classifier_"), ...)
@@ -27,10 +27,10 @@ ml_decision_tree(x, formula = NULL, type = c("auto", "regression",
   max_memory_in_mb = 256L, uid = random_string("decision_tree_"),
   response = NULL, features = NULL, ...)
 
-ml_decision_tree_regressor(x, formula = NULL, max_depth = 5L,
-  max_bins = 32L, min_instances_per_node = 1L, min_info_gain = 0,
+ml_decision_tree_regressor(x, formula = NULL, max_depth = 5,
+  max_bins = 32, min_instances_per_node = 1, min_info_gain = 0,
   impurity = "variance", seed = NULL, cache_node_ids = FALSE,
-  checkpoint_interval = 10L, max_memory_in_mb = 256L, variance_col = NULL,
+  checkpoint_interval = 10, max_memory_in_mb = 256, variance_col = NULL,
   features_col = "features", label_col = "label",
   prediction_col = "prediction",
   uid = random_string("decision_tree_regressor_"), ...)
