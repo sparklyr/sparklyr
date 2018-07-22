@@ -62,14 +62,14 @@ test_that("error for bad impurity specification", {
     iris_tbl %>%
       ml_decision_tree(Species ~ Sepal_Width, type = "classification",
                        impurity = "variance"),
-    "'impurity' must be 'gini' or 'entropy' for classification"
+    "`impurity` must be \"gini\" or \"entropy\" for classification\\."
   )
 
   expect_error(
     iris_tbl %>%
       ml_decision_tree(Sepal_Length ~ Sepal_Width, type = "regression",
                        impurity = "gini"),
-    "'impurity' must be 'variance' for regression"
+    "`impurity` must be \"variance\" for regression\\."
   )
 })
 

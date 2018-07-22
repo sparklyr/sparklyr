@@ -38,31 +38,14 @@ NULL
 #' }
 #'
 #' @export
-ml_decision_tree <- function(
-  x,
-  formula = NULL,
-  type = c("auto", "regression", "classification"),
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  variance_col = NULL,
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  impurity = "auto",
-  max_bins = 32L,
-  max_depth = 5L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_"),
-  response = NULL,
-  features = NULL, ...
-) {
-
+ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "classification"),
+                             features_col = "features", label_col = "label",
+                             prediction_col = "prediction", variance_col = NULL, probability_col = "probability",
+                             raw_prediction_col = "rawPrediction", checkpoint_interval = 10L,
+                             impurity = "auto", max_bins = 32L, max_depth = 5L, min_info_gain = 0,
+                             min_instances_per_node = 1L, seed = NULL, thresholds = NULL,
+                             cache_node_ids = FALSE, max_memory_in_mb = 256L, uid = random_string("decision_tree_"),
+                             response = NULL, features = NULL, ...) {
   ml_formula_transformation()
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
@@ -79,19 +62,21 @@ ml_decision_tree <- function(
       "classification"
   }
 
-  routine <- switch(model_type,
-                    regression = ml_decision_tree_regressor,
-                    classification = ml_decision_tree_classifier)
+  routine <- switch(
+    model_type,
+    regression = ml_decision_tree_regressor,
+    classification = ml_decision_tree_classifier
+  )
 
   impurity <- if (identical(impurity, "auto")) {
     if (identical(model_type, "regression")) "variance" else "gini"
   } else if (identical(model_type, "classification")) {
     if (!impurity %in% c("gini", "entropy"))
-      stop("'impurity' must be 'gini' or 'entropy' for classification")
+      stop("`impurity`` must be \"gini\" or \"entropy\" for classification.", call. = FALSE)
     impurity
   } else {
     if (!identical(impurity, "variance"))
-      stop("'impurity' must be 'variance' for regression")
+      stop("`impurity` must be \"variance\" for regression.", call. = FALSE)
     impurity
   }
 
@@ -112,9 +97,8 @@ new_ml_model_decision_tree_classification <- function(pipeline, pipeline_model,
   )
 }
 
-new_ml_model_decision_tree_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
-
+new_ml_model_decision_tree_regression <- function(pipeline, pipeline_model, model, dataset,
+                                                  formula, feature_names, call) {
   new_ml_model_regression(
     pipeline, pipeline_model, model, dataset, formula,
     subclass = "ml_model_decision_tree_regression",
