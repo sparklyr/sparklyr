@@ -100,3 +100,24 @@ ml_decision_tree <- function(
   args$features <- NULL
   do.call(routine, args)
 }
+
+new_ml_model_decision_tree_classification <- function(pipeline, pipeline_model,
+                                                      model, dataset, formula, feature_names,
+                                                      index_labels, call) {
+  new_ml_model_classification(
+    pipeline, pipeline_model, model, dataset, formula,
+    subclass = "ml_model_decision_tree_classification",
+    .features = feature_names,
+    .index_labels = index_labels
+  )
+}
+
+new_ml_model_decision_tree_regression <- function(
+  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
+
+  new_ml_model_regression(
+    pipeline, pipeline_model, model, dataset, formula,
+    subclass = "ml_model_decision_tree_regression",
+    .features = feature_names
+  )
+}

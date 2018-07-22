@@ -157,7 +157,6 @@ new_ml_decision_tree_classifier <- function(jobj) {
 }
 
 new_ml_decision_tree_classification_model <- function(jobj) {
-
   new_ml_prediction_model(
     jobj,
     depth = invoke(jobj, "depth"),
@@ -171,16 +170,4 @@ new_ml_decision_tree_classification_model <- function(jobj) {
     raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
     thresholds = try_null(invoke(jobj, "getThresholds")),
     subclass = "ml_decision_tree_classification_model")
-}
-
-new_ml_model_decision_tree_classification <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names,
-  index_labels, call) {
-
-  new_ml_model_classification(
-    pipeline, pipeline_model, model, dataset, formula,
-    subclass = "ml_model_decision_tree_classification",
-    .features = feature_names,
-    .index_labels = index_labels
-  )
 }
