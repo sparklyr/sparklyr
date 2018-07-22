@@ -1,5 +1,6 @@
 ml_new_predictor <- function(sc, class, uid, features_col, label_col,
                              prediction_col) {
+  uid <- forge::cast_string(uid)
   invoke_new(sc, class, uid) %>%
     invoke("setFeaturesCol", features_col) %>%
     invoke("setLabelCol", label_col) %>%
