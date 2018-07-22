@@ -72,7 +72,7 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
     if (identical(model_type, "regression")) "variance" else "gini"
   } else if (identical(model_type, "classification")) {
     if (!impurity %in% c("gini", "entropy"))
-      stop("`impurity`` must be \"gini\" or \"entropy\" for classification.", call. = FALSE)
+      stop("`impurity` must be \"gini\" or \"entropy\" for classification.", call. = FALSE)
     impurity
   } else {
     if (!identical(impurity, "variance"))
