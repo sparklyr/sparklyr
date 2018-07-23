@@ -47,7 +47,7 @@ test_that("informative error when using Spark version that doesn't support thres
       filter(Species != "setosa") %>%
       ml_gradient_boosted_trees(Species ~ Sepal_Width, type = "classification",
                                 thresholds = c(0, 1)),
-    "thresholds is only supported for GBT in Spark 2.2.0\\+"
+    "`thresholds` is only supported for GBT in Spark 2.2.0\\+"
   )
 })
 
