@@ -32,7 +32,7 @@ ml_gradient_boosted_trees(x, formula = NULL, type = c("auto", "regression",
 
 ml_gbt_regressor(x, formula = NULL, max_iter = 20, max_depth = 5,
   step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
-  min_instances_per_node = 1L, max_bins = 32, min_info_gain = 0,
+  min_instances_per_node = 1, max_bins = 32, min_info_gain = 0,
   loss_type = "squared", seed = NULL, checkpoint_interval = 10,
   cache_node_ids = FALSE, max_memory_in_mb = 256,
   features_col = "features", label_col = "label",
