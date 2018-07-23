@@ -26,12 +26,7 @@ import org.apache.spark.util.Utils
 /**
  * Iterator interface to iterate over Arrow record batches and return rows
  */
-trait ArrowRowIterator extends Iterator[Row] {
-
-  /**
-   * Return the schema loaded from the Arrow record batch being iterated over
-   */
-  def schema: StructType
+trait ArrowRowIterator extends Iterator[org.apache.spark.sql.catalyst.InternalRow] {
 }
 
 object ArrowConverters {
@@ -67,7 +62,7 @@ object ArrowConverters {
         }
       }
 
-      override def next(): Row = rowIter.next()
+      override def next(): org.apache.spark.sql.catalyst.InternalRow = rowIter.next()
 
       private def closeReader(): Unit = {
         if (reader != null) {
@@ -78,7 +73,7 @@ object ArrowConverters {
 
       private val encoder = RowEncoder(schema)
 
-      private def nextBatch(): Iterator[Row] = {
+      private def nextBatch(): Iterator[org.apache.spark.sql.catalyst.InternalRow] = {
         val in = new ByteArrayReadableSeekableByteChannel(payloadIter.next())
         reader = new ArrowFileReader(in, allocator)
         reader.loadNextBatch()  // throws IOException
@@ -90,7 +85,7 @@ object ArrowConverters {
 
         val batch = new ColumnarBatch(columns)
         batch.setNumRows(root.getRowCount)
-        batch.rowIterator().asScala.map(x => Row(x.toSeq(schema)))
+        batch.rowIterator().asScala
       }
     }
   }
@@ -103,6 +98,10 @@ object ArrowConverters {
       val context = TaskContext.get()
       ArrowConverters.fromPayloadIterator(iter, context, schema)
     }
-    sparkSession.createDataFrame(rdd, schema)
+
+    val methods = sparkSession.sqlContext.getClass.getMethods
+    val method = methods.find(_.getName == "internalCreateDataFrame")
+    method.get.setAccessible(true)
+    method.get.invoke(sparkSession.sqlContext, Array(rdd, schema, false)).asInstanceOf[DataFrame]
   }
 }
