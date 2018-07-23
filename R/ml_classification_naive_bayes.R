@@ -149,7 +149,7 @@ ml_validator_naive_bayes <- function(.args) {
 }
 
 new_ml_naive_bayes <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_naive_bayes")
+  new_ml_classifier(jobj, subclass = "ml_naive_bayes")
 }
 
 new_ml_naive_bayes_model <- function(jobj) {

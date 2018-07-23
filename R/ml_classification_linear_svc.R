@@ -148,7 +148,7 @@ ml_validator_linear_svc <- function(.args) {
 # Constructors
 
 new_ml_linear_svc <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_linear_svc")
+  new_ml_classifier(jobj, subclass = "ml_linear_svc")
 }
 
 new_ml_linear_svc_model <- function(jobj) {

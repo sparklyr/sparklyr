@@ -194,7 +194,7 @@ ml_validator_gbt_classifier <- function(.args) {
 }
 
 new_ml_gbt_classifier <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_gbt_classifier")
+  new_ml_classifier(jobj, subclass = "ml_gbt_classifier")
 }
 
 new_ml_gbt_classification_model <- function(jobj) {

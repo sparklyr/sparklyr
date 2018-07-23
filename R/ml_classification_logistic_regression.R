@@ -225,7 +225,7 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
 }
 
 new_ml_logistic_regression <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_logistic_regression")
+  new_ml_classifier(jobj, subclass = "ml_logistic_regression")
 }
 
 new_ml_logistic_regression_model <- function(jobj) {

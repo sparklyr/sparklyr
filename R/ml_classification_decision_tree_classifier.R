@@ -153,7 +153,7 @@ ml_validator_decision_tree_classifier <- function(.args) {
 }
 
 new_ml_decision_tree_classifier <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_decision_tree_classifier")
+  new_ml_classifier(jobj, subclass = "ml_decision_tree_classifier")
 }
 
 new_ml_decision_tree_classification_model <- function(jobj) {

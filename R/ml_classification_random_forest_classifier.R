@@ -175,7 +175,7 @@ ml_validator_random_forest_classifier <- function(.args) {
 # Constructors
 
 new_ml_random_forest_classifier <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_random_forest_classifier")
+  new_ml_classifier(jobj, subclass = "ml_random_forest_classifier")
 }
 
 new_ml_random_forest_classification_model <- function(jobj) {
