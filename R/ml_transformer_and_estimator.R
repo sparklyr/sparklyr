@@ -44,3 +44,8 @@ new_ml_predictor <- function(jobj, ..., subclass = NULL) {
                    subclass = c(subclass, "ml_predictor"))
 }
 
+new_ml_classifier <- function(jobj, ..., subclass = NULL) {
+  new_ml_predictor(jobj,
+                   ...,
+                   subclass = c(subclass, "ml_classifier"))
+}
