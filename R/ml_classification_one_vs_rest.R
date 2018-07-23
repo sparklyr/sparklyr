@@ -69,7 +69,11 @@ ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, featu
 
 ml_validator_one_vs_rest <- function(.args) {
   .args <- validate_args_predictor(.args)
-  if (!is.null(.args[["classifier"]]) && !rlang::inherits_any(.args[["classifier"]], "ml_classifier"))
+  .args[["classifier"]] <- if (inherits(.args[["classifier"]], "spark_jobj"))
+    ml_constructor_dispatch(.args[["classifier"]])
+  else
+    .args[["classifier"]]
+  if (!is.null(.args[["classifier"]]) && !inherits(.args[["classifier"]], "ml_classifier"))
     stop("`classifier` must be an `ml_classifier`.", call. = FALSE)
   .args
 }
