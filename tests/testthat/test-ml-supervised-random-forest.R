@@ -90,7 +90,7 @@ test_that("error for col.sample.rate value out of range", {
     iris_tbl %>%
       ml_random_forest(Species ~ Sepal_Width, type = "classification",
                        col.sample.rate = 1.01),
-    "`col.sample.rate` must be in (0, 1]\\."
+    "`col.sample.rate` must be in \\(0, 1]\\."
   )
 })
 
