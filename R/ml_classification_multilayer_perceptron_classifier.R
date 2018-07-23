@@ -165,6 +165,7 @@ ml_multilayer_perceptron <- function(x, formula = NULL, layers, max_iter = 100, 
                                      prediction_col = "prediction",
                                      uid = random_string("multilayer_perceptron_classifier_"),
                                      response = NULL, features = NULL, ...) {
+  .Deprecated("ml_multilayer_perceptron_classifier")
   UseMethod("ml_multilayer_perceptron_classifier")
 }
 
