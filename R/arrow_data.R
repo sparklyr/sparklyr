@@ -32,9 +32,10 @@ arrow_type <- function(object, colname)
 {
   type <- switch(
     typeof(object),
-    logical =   pa$bool_(),
-    integer =   pa$int32(),
-    double =    pa$float64(),
+    logical   = pa$bool_(),
+    integer   = pa$int32(),
+    double    = pa$float64(),
+    numeric   = pa$float64(),
     character = pa$string()
   )
 
@@ -45,6 +46,7 @@ as_arrow_python <- function(df)
 {
   io <- reticulate::import("io")
   pa <- reticulate::import("pyarrow")
+  builtins <- reticulate::import_builtins()
 
   pdCols <- lapply(df, function(col) pa$Array$from_pandas(col))
   batch <- pa$RecordBatch$from_arrays(
