@@ -1,4 +1,4 @@
-context("ml classification gbt regressor")
+context("ml regression gbt regressor")
 
 test_that("ml_gbt_regressor() default params", {
   test_requires_latest_spark()
