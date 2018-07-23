@@ -28,6 +28,19 @@ arrow_schema <- function(df)
   pdf$schema
 }
 
+arrow_type <- function(object, colname)
+{
+  type <- switch(
+    typeof(object),
+    logical =   pa$bool_(),
+    integer =   pa$int32(),
+    double =    pa$float64(),
+    character = pa$string()
+  )
+
+  pa$field(colname, type = type)
+}
+
 as_arrow_python <- function(df)
 {
   io <- reticulate::import("io")
@@ -40,7 +53,9 @@ as_arrow_python <- function(df)
   )
 
   sink <- io$BytesIO()
-  schema <- arrow_schema(df)
+  schema <- pa$schema(
+    lapply(colnames(df), function(colname) arrow_type(df[[colname]], colname))
+  )
   writer <- pa$RecordBatchFileWriter(sink, schema)
   writer$write_batch(batch)
   writer$close()
