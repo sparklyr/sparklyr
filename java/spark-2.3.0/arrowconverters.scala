@@ -99,9 +99,17 @@ object ArrowConverters {
       ArrowConverters.fromPayloadIterator(iter, context, schema)
     }
 
-    val methods = sparkSession.sqlContext.getClass.getMethods
-    val method = methods.find(_.getName == "internalCreateDataFrame")
-    method.get.setAccessible(true)
-    method.get.invoke(sparkSession.sqlContext, Array(rdd, schema, false)).asInstanceOf[DataFrame]
+    val logger = new Logger("Arrow", 0)
+    val invoke = new Invoke()
+    var streaming: Boolean = false
+
+    invoke.invoke(
+      sparkSession.sqlContext.getClass,
+      "",
+      sparkSession.sqlContext,
+      "internalCreateDataFrame",
+      Array(rdd, schema, streaming.asInstanceOf[Object]),
+      logger
+    ).asInstanceOf[DataFrame]
   }
 }
