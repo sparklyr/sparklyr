@@ -76,7 +76,7 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
     invoke("setStepSize", .args[["step_size"]]) %>%
     invoke("setSubsamplingRate", .args[["subsampling_rate"]]) %>%
     maybe_set_param("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]], "2.3.0", "auto") %>%
-    maybe_set_param("setThresholds", .args[["thresholds"]], "2.3.0") %>%
+    maybe_set_param("setThresholds", .args[["thresholds"]]) %>%
     maybe_set_param("setSeed", .args[["seed"]])
 
   new_ml_gbt_classifier(jobj)
