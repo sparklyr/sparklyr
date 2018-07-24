@@ -232,8 +232,6 @@ ml_validator_generalized_linear_regression <- function(.args) {
   .args[["link_prediction_col"]] <- forge::cast_nullable_string(.args[["link_prediction_col"]])
 }
 
-# Constructors
-
 new_ml_generalized_linear_regression <- function(jobj) {
   new_ml_predictor(jobj, subclass = "ml_generalized_linear_regression")
 }
@@ -245,7 +243,7 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     new_ml_summary_generalized_linear_regression_model(
       invoke(jobj, "summary"), fit_intercept
     )
-  } else NA
+  } else NULL
 
   new_ml_prediction_model(
     jobj,
