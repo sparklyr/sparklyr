@@ -230,6 +230,8 @@ ml_validator_generalized_linear_regression <- function(.args) {
   .args[["solver"]] <- forge::cast_choice(.args[["solver"]], "irls")
   .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
   .args[["offset_col"]] <- forge::cast_nullable_string(.args[["offset_col"]])
+  .args[["link_power"]] <- forge::cast_nullable_scalar_double(.args[["link_power"]])
+  .args[["variance_power"]] <- forge::cast_nullable_scalar_double(.args[["variance_power"]])
   .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
   .args[["link_prediction_col"]] <- forge::cast_nullable_string(.args[["link_prediction_col"]])
 }
