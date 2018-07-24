@@ -201,7 +201,6 @@ ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family
   }
 }
 
-# Validator
 ml_validator_generalized_linear_regression <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     intercept = "fit_intercept",

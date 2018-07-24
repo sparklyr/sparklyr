@@ -1,5 +1,5 @@
-new_ml_model_generalized_linear_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
+new_ml_model_generalized_linear_regression <- function(pipeline, pipeline_model, model,
+                                                       dataset, formula, feature_names, call) {
 
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
@@ -23,8 +23,6 @@ new_ml_model_generalized_linear_regression <- function(
   )
 }
 
-# Generic implementations
-
 #' @export
 print.ml_model_generalized_linear_regression <-
   function(x, digits = max(3L, getOption("digits") - 3L), ...)
@@ -45,29 +43,29 @@ print.ml_model_generalized_linear_regression <-
   }
 
 #' @export
-summary.ml_model_generalized_linear_regression <-
-  function(object, digits = max(3L, getOption("digits") - 3L), ...)
-  {
-    ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
-    print_newline()
-    ml_model_print_coefficients_detailed(object)
-    print_newline()
+summary.ml_model_generalized_linear_regression <- function(object,
+                                                           digits = max(3L, getOption("digits") - 3L),
+                                                           ...) {
+  ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
+  print_newline()
+  ml_model_print_coefficients_detailed(object)
+  print_newline()
 
-    printf("(Dispersion paramter for %s family taken to be %s)\n\n",
-           ml_param(ml_stage(object$pipeline_model, 2), "family"),
-           signif(object$summary$dispersion, digits + 3))
+  printf("(Dispersion paramter for %s family taken to be %s)\n\n",
+         ml_param(ml_stage(object$pipeline_model, 2), "family"),
+         signif(object$summary$dispersion, digits + 3))
 
-    printf("   Null  deviance: %s on %s degress of freedom\n",
-           signif(object$summary$null_deviance, digits + 2),
-           signif(object$summary$residual_degree_of_freedom_null, digits))
+  printf("   Null  deviance: %s on %s degress of freedom\n",
+         signif(object$summary$null_deviance, digits + 2),
+         signif(object$summary$residual_degree_of_freedom_null, digits))
 
-    printf("Residual deviance: %s on %s degrees of freedom\n",
-           signif(object$summary$deviance, digits + 2),
-           signif(object$summary$degrees_of_freedom, digits))
-    printf("AIC: %s\n", signif(object$summary$aic, digits + 1))
+  printf("Residual deviance: %s on %s degrees of freedom\n",
+         signif(object$summary$deviance, digits + 2),
+         signif(object$summary$degrees_of_freedom, digits))
+  printf("AIC: %s\n", signif(object$summary$aic, digits + 1))
 
-    invisible(object)
-  }
+  invisible(object)
+}
 
 #' @export
 residuals.ml_model_generalized_linear_regression <- function(
@@ -89,11 +87,9 @@ residuals.ml_model_generalized_linear_regression <- function(
 #' @rdname sdf_residuals
 #' @param type type of residuals which should be returned.
 #' @export
-sdf_residuals.ml_model_generalized_linear_regression <- function(
-  object,
-  type = c("deviance", "pearson", "working", "response"),
-  ...) {
-
+sdf_residuals.ml_model_generalized_linear_regression <- function(object,
+                                                                 type = c("deviance", "pearson", "working", "response"),
+                                                                 ...) {
   type <- rlang::arg_match(type)
   ensure_scalar_character(type)
 
