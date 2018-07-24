@@ -30,6 +30,8 @@ arrow_schema <- function(df)
 
 arrow_type <- function(object, colname)
 {
+  pa <- reticulate::import("pyarrow")
+
   type <- switch(
     typeof(object),
     logical   = pa$bool_(),
