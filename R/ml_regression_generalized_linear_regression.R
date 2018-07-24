@@ -234,6 +234,7 @@ ml_validator_generalized_linear_regression <- function(.args) {
   .args[["variance_power"]] <- forge::cast_nullable_scalar_double(.args[["variance_power"]])
   .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
   .args[["link_prediction_col"]] <- forge::cast_nullable_string(.args[["link_prediction_col"]])
+  .args
 }
 
 new_ml_generalized_linear_regression <- function(jobj) {
