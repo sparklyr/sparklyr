@@ -1,40 +1,35 @@
 context("ml clustering - lda")
 
-sc <- testthat_spark_connection()
-
-test_that("ml_lda param setting", {
-  args <- list(
-    x = sc, k = 9, max_iter = 11, doc_concentration = 1.2,
-    topic_concentration = 1.3, subsampling_rate = 0.04,
-    optimizer = "em", checkpoint_interval = 8,
-    learning_decay = 0.52,
-    learning_offset = 1000, optimize_doc_concentration = FALSE,
-    seed = 89, features_col = "fcol"
-  ) %>%
-    param_add_version("2.0.0", keep_last_checkpoint = FALSE,
-                      topic_distribution_col = "tdcol")
-  predictor <- do.call(ml_lda, args)
-  expect_equal(ml_params(predictor, names(args)[-1]), args[-1])
+test_that("ml_lda() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_lda)
 })
 
-test_that("ml_lda() default params are correct", {
-
-  predictor <- ml_pipeline(sc) %>%
-    ml_lda() %>%
-    ml_stage(1)
-
-  args <- get_default_args(
-    ml_lda,
-    c("x", "uid", "...", "doc_concentration", "topic_distribution_col", "seed",
-      "topic_concentration")) %>%
-    param_filter_version("2.0.0", "keep_last_checkpoint")
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
+test_that("ml_lda() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    k = 20,
+    max_iter = 40,
+    doc_concentration = 1.2,
+    topic_concentration = 1.4,
+    subsampling_rate = 0.10,
+    optimizer = "em",
+    checkpoint_interval = 20,
+    keep_last_checkpoint = FALSE,
+    learning_decay = 0.58,
+    learning_offset = 2046,
+    optimize_doc_concentration = FALSE,
+    seed = 234234,
+    features_col = "wwaefa",
+    topic_distribution_col = "eifjaewif"
+  )
+  test_param_setting(sc, ml_lda, test_args)
 })
 
 test_that("ml_lda() works properly", {
+  sc <- testthat_spark_connection()
   sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_lda_libsvm_data.txt", full.names = TRUE)
   sample_data <- spark_read_libsvm(sc, "sample_data",
                                    sample_data_path, overwrite = TRUE)
@@ -59,6 +54,7 @@ test_that("ml_lda() works properly", {
 })
 
 test_that("ml_lda/ft_count_vectorizer helper functions (#1353)", {
+  sc <- testthat_spark_connection()
   fake_data <- data.frame(a = c(1, 2, 3, 4),
                           b = c("the groggy", "frog was", "a very groggy", "frog"))
   fake_tbl <- sdf_copy_to(sc, fake_data, overwrite = TRUE)
