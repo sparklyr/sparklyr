@@ -261,9 +261,6 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_interce
   version <- jobj %>%
     spark_connection() %>%
     spark_version()
-  resid <- function(x) invoke(jobj, "residuals", x) %>%
-    sdf_register()
-
   arrange_stats <- make_stats_arranger(fit_intercept)
 
   new_ml_summary(
