@@ -7,7 +7,7 @@
 ml_generalized_linear_regression(x, formula = NULL, family = "gaussian",
   link = NULL, fit_intercept = TRUE, offset_col = NULL,
   link_power = NULL, link_prediction_col = NULL, reg_param = 0,
-  max_iter = 25L, weight_col = NULL, solver = "irls", tol = 1e-06,
+  max_iter = 25, weight_col = NULL, solver = "irls", tol = 1e-06,
   variance_power = 0, features_col = "features", label_col = "label",
   prediction_col = "prediction",
   uid = random_string("generalized_linear_regression_"), ...)
