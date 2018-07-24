@@ -118,7 +118,9 @@ ml_validator_kmeans <- function(.args) {
     centers = "k",
     tolerance = "tol",
     iter.max = "max_iter"
-  ))
+  )) %>%
+    validate_args_clustering()
+
   .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
   .args[["init_steps"]] <- forge::cast_scalar_integer(.args[["init_steps"]])
   .args[["init_mode"]] <- forge::cast_choice(.args[["init_mode"]], c("random", "k-means||"))
