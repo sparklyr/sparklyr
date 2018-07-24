@@ -43,8 +43,17 @@ ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL
 ml_one_vs_rest.ml_pipeline <- function(x, formula = NULL, classifier = NULL, features_col = "features",
                                        label_col = "label", prediction_col = "prediction",
                                        uid = random_string("one_vs_rest_"), ...) {
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ml_one_vs_rest.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    classifier = classifier,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
@@ -52,15 +61,24 @@ ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, featu
                                      label_col = "label", prediction_col = "prediction",
                                      uid = random_string("one_vs_rest_"), response = NULL,
                                      features = NULL, predicted_label_col = "predicted_label", ...) {
-  predictor <- ml_new_stage_modified_args()
-
   ml_formula_transformation()
 
+  stage <- ml_one_vs_rest.spark_connection(
+    x = spark_connection(x),
+    formula = NULL,
+    classifier = classifier,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    ...
+  )
+
   if (is.null(formula)) {
-    predictor %>%
+    stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, predictor, formula, features_col, label_col,
+    ml_generate_ml_model(x, stage, formula, features_col, label_col,
                          "classification",
                          new_ml_model_one_vs_rest,
                          predicted_label_col)
