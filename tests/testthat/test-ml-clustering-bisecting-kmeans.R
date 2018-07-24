@@ -245,7 +245,7 @@ test_that("ml_bisecting_kmeans() works properly", {
                                   49.9268292682927, 47.9268292682927, 33.8048780487805, 20.1463414634146,
                                   16, 8.90243902439024, 2.65853658536585))
 
-  expect_equal(bkm$cluster_centers, cluster_centers)
+  expect_equal(bkm$cluster_centers(), cluster_centers)
 })
 
 test_that("ml_bisecting_kmeans() works properly", {
