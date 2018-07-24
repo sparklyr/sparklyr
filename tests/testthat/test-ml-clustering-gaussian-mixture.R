@@ -1,9 +1,28 @@
 context("ml gaussian mixture")
 
-sc <- testthat_spark_connection()
-test_requires("dplyr")
+test_that("ml_gaussian_mixture() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_gaussian_mixture)
+})
+
+test_that("ml_gaussian_mixture() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    k = 5,
+    max_iter = 80,
+    tol = 0.05,
+    seed = 345345,
+    features_col = "wefwef",
+    prediction_col = "awefawef",
+    probability_col = "ewfiuwje"
+  )
+  test_param_setting(sc, ml_gaussian_mixture, test_args)
+})
 
 test_that("ml_gaussian_mixture param setting", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "gaussian mixture requires 2.0+")
   args <- list(
     x = sc, k = 9, max_iter = 120, tol = 0.02,
@@ -16,6 +35,7 @@ test_that("ml_gaussian_mixture param setting", {
 })
 
 test_that("ml_gaussian_mixture() default params are correct", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "gaussian mixture requires 2.0+")
   predictor <- ml_pipeline(sc) %>%
     ml_gaussian_mixture() %>%
@@ -31,6 +51,7 @@ test_that("ml_gaussian_mixture() default params are correct", {
 })
 
 test_that("ml_gaussian_mixture() works properly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "gaussian mixture requires 2.0+")
   sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_kmeans_data.txt", full.names = TRUE)
   sample_data <- spark_read_libsvm(sc, "sample_data",
@@ -39,9 +60,9 @@ test_that("ml_gaussian_mixture() works properly", {
   gmm <- ml_gaussian_mixture(sample_data, k = 2, seed = 1)
 
   expect_equal(gmm$weights, c(0.5, 0.5))
-  expect_equal(gmm$gaussians_df %>% pull(mean),
+  expect_equal(gmm$gaussians_df() %>% pull(mean),
                list(c(0.1, 0.1, 0.1), c(9.1, 9.1, 9.1)))
-  expect_equal(gmm$gaussians_df %>% pull(cov),
+  expect_equal(gmm$gaussians_df() %>% pull(cov),
                list(matrix(rep(0.00666666667, 9), nrow = 3),
                     matrix(rep(0.00666666667, 9), nrow = 3))
   )
