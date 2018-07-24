@@ -1,73 +1,35 @@
 context("ml regression - linear regression")
-sc <- testthat_spark_connection()
 
-expect_coef_equal <- function(lhs, rhs) {
-  nm <- names(lhs)
-  lhs <- lhs[nm]
-  rhs <- rhs[nm]
-
-  # print(data.frame(lhs = lhs, rhs = rhs))
-
-  expect_true(all.equal(lhs, rhs, tolerance = 0.01))
-}
-
-test_that("ml_linear_regression param setting works", {
-  lr <- ml_linear_regression(
-    sc,
-    features_col = "fcol",
-    label_col = "lcol",
-    fit_intercept = FALSE,
-    elastic_net_param = 0.1,
-    reg_param = 0.2,
-    max_iter = 50L,
-    weight_col = "wcol",
-    prediction_col = "pcol",
-    solver = "l-bfgs",
-    standardization = FALSE,
-    tol = 1e-5)
-  expect_equal(
-    ml_params(lr, list(
-      "features_col", "label_col", "fit_intercept", "elastic_net_param",
-      "reg_param", "max_iter", "weight_col", "prediction_col", "solver",
-      "standardization", "tol"
-    )),
-    list(
-      features_col = "fcol",
-      label_col = "lcol",
-      fit_intercept = FALSE,
-      elastic_net_param = 0.1,
-      reg_param = 0.2,
-      max_iter = 50L,
-      weight_col = "wcol",
-      prediction_col = "pcol",
-      solver = "l-bfgs",
-      standardization = FALSE,
-      tol = 1e-5
-    )
-  )
-
-  lr2 <- ml_linear_regression(sc, alpha = 0.2, lambda = 0.1)
-  expect_equal(ml_params(lr2, c("elastic_net_param", "reg_param")),
-               list(elastic_net_param = 0.2, reg_param = 0.1))
+test_that("ml_linear_regression() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_linear_regression)
 })
 
-test_that("ml_linear_regression() default params are correct", {
-  predictor <- ml_pipeline(sc) %>%
-    ml_linear_regression() %>%
-    ml_stage(1)
-
-  args <- get_default_args(ml_linear_regression,
-                           exclude = c("x", "uid", "...", "weight_col", "loss"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
+test_that("ml_linear_regression() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    fit_intercept = FALSE,
+    elastic_net_param = 0.1,
+    reg_param = 0.1,
+    max_iter = 40,
+    weight_col = "wcol",
+    loss = "huber",
+    solver = "normal",
+    standardization = FALSE,
+    tol = 1e-04,
+    features_col = "fcol",
+    label_col = "lcol",
+    prediction_col = "pcol"
+  )
+  test_param_setting(sc, ml_linear_regression, test_args)
 })
 
 test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   skip_on_cran()
   test_requires("glmnet")
-
+  sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
   values <- seq(0, 0.5, by = 0.1)
@@ -102,6 +64,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
 })
 
 test_that("weights column works for lm", {
+  sc <- testthat_spark_connection()
   set.seed(42)
   iris_weighted <- iris %>%
     dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
@@ -129,6 +92,7 @@ test_that("weights column works for lm", {
 })
 
 test_that("ml_linear_regression print methods work", {
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   linear_model <- ml_linear_regression(
     iris_tbl, Petal_Length ~ Petal_Width)
@@ -147,6 +111,7 @@ test_that("ml_linear_regression print methods work", {
 })
 
 test_that("fitted() works for linear regression", {
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   m <- ml_linear_regression(iris_tbl, Petal_Width ~ Petal_Length)
   expect_equal(

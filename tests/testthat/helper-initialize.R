@@ -265,3 +265,11 @@ test_default_args <- function(sc, fn) {
     ml_params()
   check_params(default_args, params)
 }
+
+expect_coef_equal <- function(lhs, rhs) {
+  nm <- names(lhs)
+  lhs <- lhs[nm]
+  rhs <- rhs[nm]
+
+  expect_true(all.equal(lhs, rhs, tolerance = 0.01))
+}

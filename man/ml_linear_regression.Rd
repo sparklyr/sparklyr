@@ -5,7 +5,7 @@
 \title{Spark ML -- Linear Regression}
 \usage{
 ml_linear_regression(x, formula = NULL, fit_intercept = TRUE,
-  elastic_net_param = 0, reg_param = 0, max_iter = 100L,
+  elastic_net_param = 0, reg_param = 0, max_iter = 100,
   weight_col = NULL, loss = "squaredError", solver = "auto",
   standardization = TRUE, tol = 1e-06, features_col = "features",
   label_col = "label", prediction_col = "prediction",

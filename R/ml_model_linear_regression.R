@@ -1,9 +1,7 @@
-new_ml_model_linear_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
-
+new_ml_model_linear_regression <- function(pipeline, pipeline_model, model,
+                                           dataset, formula, feature_names, call) {
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
-
 
   coefficients <- model$coefficients
   names(coefficients) <- feature_names
@@ -47,18 +45,13 @@ summary.ml_model_linear_regression <- function(object, ...) {
 
 #' @export
 residuals.ml_model_linear_regression <- function(object, ...) {
-
   residuals <- object$summary$residuals
-
   sdf_read_column(residuals, "residuals")
-
 }
 
 #' @export
 #' @rdname sdf_residuals
-sdf_residuals.ml_model_linear_regression <- function(
-  object, ...) {
-
+sdf_residuals.ml_model_linear_regression <- function(object, ...) {
   residuals <- object$summary$residuals
 
   ml_model_data(object) %>%
