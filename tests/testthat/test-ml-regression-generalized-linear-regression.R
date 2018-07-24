@@ -21,7 +21,7 @@ test_that("ml_generalized_linear_regression() param setting", {
     weight_col = "wcol",
     solver = "irls",
     tol = 1e-03,
-    variance_power = 0.2,
+    variance_power = 200,
     features_col = "fcol",
     label_col = "lcol",
     prediction_col = "pcol"
