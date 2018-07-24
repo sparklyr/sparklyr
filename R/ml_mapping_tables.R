@@ -133,7 +133,9 @@ ml_create_mapping_tables <- function() { # nocov start
          # evaluators
          "metric_name" = "metricName",
          # tuning
-         "collect_sub_models" = "collectSubModels")
+         "collect_sub_models" = "collectSubModels",
+         "num_folds" = "numFolds",
+         "train_ratio" = "trainRatio")
 
   param_mapping_r_to_s <- new.env(parent = emptyenv(),
                                   size = length(param_mapping_list))
