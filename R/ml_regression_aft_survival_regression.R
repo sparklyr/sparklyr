@@ -185,5 +185,6 @@ ml_survival_regression <- function(x, formula = NULL, censor_col = "censor",
                                    prediction_col = "prediction",
                                    uid = random_string("aft_survival_regression_"),
                                    response = NULL, features = NULL, ...) {
+  .Deprecated("ml_aft_survival_regression")
   UseMethod("ml_aft_survival_regression")
 }
