@@ -32,14 +32,14 @@ print.ml_model_generalized_linear_regression <-
 
     cat(
       sprintf("Degress of Freedom:  %s Total (i.e. Null);  %s Residual",
-              x$summary$residual_degree_of_freedom_null,
-              x$summary$residual_degree_of_freedom),
+              x$summary$residual_degree_of_freedom_null(),
+              x$summary$residual_degree_of_freedom()),
       sep = "\n"
     )
-    cat(sprintf("Null Deviance:       %s", signif(x$summary$null_deviance, digits)), sep = "\n")
+    cat(sprintf("Null Deviance:       %s", signif(x$summary$null_deviance(), digits)), sep = "\n")
     cat(sprintf("Residual Deviance:   %s\tAIC: %s",
-                signif(x$summary$deviance, digits),
-                signif(x$summary$aic, digits)), sep = "\n")
+                signif(x$summary$deviance(), digits),
+                signif(x$summary$aic(), digits)), sep = "\n")
   }
 
 #' @export
