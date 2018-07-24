@@ -224,7 +224,7 @@ ml_validator_generalized_linear_regression <- function(.args) {
     .args[["family"]] <- forge::cast_string(fam$family)
   } else {
     .args[["family"]] <- forge::cast_choice(fam, c("gaussian", "binomial", "poisson", "gamma", "tweedie"))
-    .args[["link"]] <- forge::cast_string(.args[["link"]])
+    .args[["link"]] <- forge::cast_nullable_string(.args[["link"]])
   }
   .args[["fit_intercept"]] <- forge::cast_scalar_logical(.args[["fit_intercept"]])
   .args[["solver"]] <- forge::cast_choice(.args[["solver"]], "irls")
