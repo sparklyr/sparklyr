@@ -53,16 +53,16 @@ summary.ml_model_generalized_linear_regression <- function(object,
 
   printf("(Dispersion paramter for %s family taken to be %s)\n\n",
          ml_param(ml_stage(object$pipeline_model, 2), "family"),
-         signif(object$summary$dispersion, digits + 3))
+         signif(object$summary$dispersion(), digits + 3))
 
   printf("   Null  deviance: %s on %s degress of freedom\n",
-         signif(object$summary$null_deviance, digits + 2),
-         signif(object$summary$residual_degree_of_freedom_null, digits))
+         signif(object$summary$null_deviance(), digits + 2),
+         signif(object$summary$residual_degree_of_freedom_null(), digits))
 
   printf("Residual deviance: %s on %s degrees of freedom\n",
-         signif(object$summary$deviance, digits + 2),
-         signif(object$summary$degrees_of_freedom, digits))
-  printf("AIC: %s\n", signif(object$summary$aic, digits + 1))
+         signif(object$summary$deviance(), digits + 2),
+         signif(object$summary$degrees_of_freedom(), digits))
+  printf("AIC: %s\n", signif(object$summary$aic(), digits + 1))
 
   invisible(object)
 }
