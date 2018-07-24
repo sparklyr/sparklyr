@@ -66,7 +66,6 @@ ml_generalized_linear_regression <- function(x, formula = NULL, family = "gaussi
                                              prediction_col = "prediction",
                                              uid = random_string("generalized_linear_regression_"),
                                              ...) {
-  spark_require_version(spark_connection(x), "2.0.0")
   UseMethod("ml_generalized_linear_regression")
 }
 
@@ -80,6 +79,8 @@ ml_generalized_linear_regression.spark_connection <- function(x, formula = NULL,
                                                               prediction_col = "prediction",
                                                               uid = random_string("generalized_linear_regression_"),
                                                               ...) {
+  spark_require_version(x, "2.0.0", "GeneralizedLinearRegression")
+
   .args <- list(
     family = family,
     link = link,
@@ -96,7 +97,9 @@ ml_generalized_linear_regression.spark_connection <- function(x, formula = NULL,
     features_col = features_col,
     label_col = label_col,
     prediction_col = prediction_col
-  )
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_generalized_linear_regression()
 
   jobj <- ml_new_regressor(
     x, "org.apache.spark.ml.regression.GeneralizedLinearRegression", uid,
