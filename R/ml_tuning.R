@@ -316,3 +316,16 @@ param_maps_to_df <- function(param_maps) {
     }) %>%
     dplyr::bind_rows()
 }
+
+validate_args_tuning <- function(.args) {
+  .args[["collect_sub_models"]] <- forge::cast_scalar_logical(.args[["collect_sub_models"]])
+  .args[["parallelism"]] <- forge::cast_scalar_integer(.args[["parallelism"]])
+  .args[["seed"]] <- forge::cast_nullable_scalar_integer(.args[["seed"]])
+  if (!is.null(.args[["estimator"]]) && !inherits(.args[["estimator"]], "ml_estimator"))
+    stop("`estimator` must be an `ml_estimator`.")
+  if (!is.null(.args[["estimator_param_maps"]]) && !rlang::is_bare_list(.args[["estimator_param_maps"]]))
+    stop("`estimator_param_maps` must be a list.")
+  if (!is.null(.args[["evaluator"]]) && !inherits(.args[["evaluator"]], "ml_evaluator"))
+    stop("`evaluator` must be an `ml_evaluator`.")
+  .args
+}

@@ -1,8 +1,7 @@
 context("ml tuning")
 
-sc <- testthat_spark_connection()
-
 test_that("ml_cross_validator() works correctly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   pipeline <- ml_pipeline(sc) %>%
     ft_tokenizer("text", "words", uid = "tokenizer_1") %>%
@@ -62,6 +61,7 @@ test_that("ml_cross_validator() works correctly", {
 })
 
 test_that("we can cross validate a logistic regression with xval", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
 
@@ -112,6 +112,7 @@ test_that("we can cross validate a logistic regression with xval", {
 })
 
 test_that("we can train a regression with train-validation-split", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
 
@@ -146,6 +147,7 @@ test_that("we can train a regression with train-validation-split", {
 })
 
 test_that("ml_validation_metrics() works properly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
 
