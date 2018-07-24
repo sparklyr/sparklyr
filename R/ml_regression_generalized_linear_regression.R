@@ -284,8 +284,8 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_interce
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     rank = invoke(jobj, "rank"), # lazy val
-    residual_degree_of_freedom = invoke(jobj, "residualDegreeOfFreedom"), # lazy val
-    residual_degree_of_freedom_null = invoke(jobj, "residualDegreeOfFreedomNull"), # lazy val
+    residual_degree_of_freedom = function() invoke(jobj, "residualDegreeOfFreedom"), # lazy val
+    residual_degree_of_freedom_null = function() invoke(jobj, "residualDegreeOfFreedomNull"), # lazy val
     residuals = function(type = "deviance") (invoke(jobj, "residuals", type) %>% sdf_register()),
     solver = try_null(invoke(jobj, "solver")),
     t_values = function() try_null(invoke(jobj, "tValues")) %>% # lazy val
