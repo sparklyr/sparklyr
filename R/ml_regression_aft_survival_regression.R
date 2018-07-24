@@ -108,7 +108,7 @@ ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col =
 
   stage <- ml_aft_survival_regression.spark_connection(
     x = spark_connection(x),
-    formula = formula,
+    formula = NULL,
     censor_col = censor_col,
     quantile_probabilities = quantile_probabilities,
     fit_intercept = fit_intercept,
