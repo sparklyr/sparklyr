@@ -64,7 +64,8 @@ tidy.ml_model_linear_regression <- function(x,
 
   coefficients <- list(x$coefficients)
   statistics <- stats %>%
-    lapply(function(x) ml_summary(model, x, allow_null = TRUE))
+    purrr::map(~ ml_summary(model, .x, allow_null = TRUE)) %>%
+    purrr::map_if(is.function, ~ .x())
   c(coefficients, statistics) %>%
     as.data.frame() %>%
     broom::fix_data_frame(newnames = new_names) %>%
