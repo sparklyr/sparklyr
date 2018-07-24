@@ -1,5 +1,23 @@
 context("ml tuning cross validator")
 
+test_that("ml_cross_validator() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_cross_validator)
+})
+
+test_that("ml_cross_validator() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    num_folds = 10,
+    collect_sub_models = TRUE,
+    parallelism = 2,
+    seed = 6543
+  )
+  test_param_setting(sc, ml_cross_validator, test_args)
+})
+
 test_that("ml_cross_validator() works correctly", {
   sc <- testthat_spark_connection()
   test_requires_version("2.3.0")

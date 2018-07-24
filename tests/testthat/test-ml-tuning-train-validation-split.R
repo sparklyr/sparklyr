@@ -1,5 +1,23 @@
 context("ml tuning train validation split")
 
+test_that("ml_train_validation_split() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_train_validation_split)
+})
+
+test_that("ml_train_validation_split() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    train_ratio = 0.5,
+    collect_sub_models = TRUE,
+    parallelism = 2,
+    seed = 34535
+  )
+  test_param_setting(sc, ml_train_validation_split, test_args)
+})
+
 test_that("we can train a regression with train-validation-split", {
   sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
