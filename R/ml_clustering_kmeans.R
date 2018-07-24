@@ -19,126 +19,124 @@
 #'}
 #'
 #' @export
-ml_kmeans <- function(
-  x,
-  formula = NULL,
-  k = 2L,
-  max_iter = 20L,
-  tol = 1e-4,
-  init_steps = 2L,
-  init_mode = "k-means||",
-  seed = NULL,
-  features_col = "features",
-  prediction_col = "prediction",
-  uid = random_string("kmeans_"), ...
-) {
+ml_kmeans <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
+                      init_steps = 2, init_mode = "k-means||", seed = NULL,
+                      features_col = "features", prediction_col = "prediction",
+                      uid = random_string("kmeans_"), ...) {
   UseMethod("ml_kmeans")
 }
 
 #' @export
-ml_kmeans.spark_connection <- function(
-  x,
-  formula = NULL,
-  k = 2L,
-  max_iter = 20L,
-  tol = 1e-4,
-  init_steps = 2L,
-  init_mode = "k-means||",
-  seed = NULL,
-  features_col = "features",
-  prediction_col = "prediction",
-  uid = random_string("kmeans_"), ...) {
+ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
+                                       init_steps = 2, init_mode = "k-means||", seed = NULL,
+                                       features_col = "features", prediction_col = "prediction",
+                                       uid = random_string("kmeans_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    k = k,
+    max_iter = max_iter,
+    tol = tol,
+    init_steps = init_steps,
+    init_mode = init_mode,
+    seed = seed,
+    features_col = features_col,
+    prediction_col = prediction_col
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_kmeans()
 
-  jobj <- ml_new_clustering(x, "org.apache.spark.ml.clustering.KMeans", uid,
-                            features_col, k, max_iter, seed) %>%
-    invoke("setTol", tol) %>%
-    invoke("setInitSteps", init_steps) %>%
-    invoke("setInitMode" , init_mode) %>%
-    invoke("setPredictionCol", prediction_col)
+  jobj <- ml_new_clustering(
+    x, "org.apache.spark.ml.clustering.KMeans", uid,
+    .args[["features_col"]], .args[["k"]], .args[["max_iter"]], .args[["seed"]]
+  ) %>%
+    invoke("setTol", .args[["tol"]]) %>%
+    invoke("setInitSteps", .args[["init_steps"]]) %>%
+    invoke("setInitMode" , .args[["init_mode"]]) %>%
+    invoke("setPredictionCol", .args[["prediction_col"]])
 
   new_ml_kmeans(jobj)
 }
 
 #' @export
-ml_kmeans.ml_pipeline <- function(
-  x,
-  formula = NULL,
-  k = 2L,
-  max_iter = 20L,
-  tol = 1e-4,
-  init_steps = 2L,
-  init_mode = "k-means||",
-  seed = NULL,
-  features_col = "features",
-  prediction_col = "prediction",
-  uid = random_string("kmeans_"), ...) {
-
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+ml_kmeans.ml_pipeline <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
+                                  init_steps = 2, init_mode = "k-means||", seed = NULL,
+                                  features_col = "features", prediction_col = "prediction",
+                                  uid = random_string("kmeans_"), ...) {
+  stage <- ml_kmeans.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    k = k,
+    max_iter = max_iter,
+    tol = tol,
+    init_steps = init_steps,
+    init_mode = init_mode,
+    seed = seed,
+    features_col = features_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ml_kmeans.tbl_spark <- function(
-  x,
-  formula = NULL,
-  k = 2L,
-  max_iter = 20L,
-  tol = 1e-4,
-  init_steps = 2L,
-  init_mode = "k-means||",
-  seed = NULL,
-  features_col = "features",
-  prediction_col = "prediction",
-  uid = random_string("kmeans_"),
-  features = NULL, ...) {
-
-  predictor <- ml_new_stage_modified_args()
-
+ml_kmeans.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
+                                init_steps = 2, init_mode = "k-means||", seed = NULL,
+                                features_col = "features", prediction_col = "prediction",
+                                uid = random_string("kmeans_"), features = NULL, ...) {
   ml_formula_transformation()
 
+  stage <- ml_kmeans.spark_connection(
+    x = spark_connection(x),
+    formula = NULL,
+    k = k,
+    max_iter = max_iter,
+    tol = tol,
+    init_steps = init_steps,
+    init_mode = init_mode,
+    seed = seed,
+    features_col = features_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    ...
+  )
+
   if (is.null(formula)) {
-    predictor %>%
+    stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, predictor = predictor, formula = formula, features_col = features_col,
-                         type = "clustering", constructor = new_ml_model_kmeans)
+    ml_generate_ml_model(
+      x, predictor = stage, formula = formula, features_col = features_col,
+      type = "clustering", constructor = new_ml_model_kmeans
+    )
   }
 }
 
 # Validator
-ml_validator_kmeans <- function(args, nms) {
-  old_new_mapping <- list(
-      centers = "k",
-      tolerance = "tol",
-      iter.max = "max_iter"
-    )
-
-  args %>%
-    ml_validate_args({
-      tol <- ensure_scalar_double(tol)
-      init_steps <- ensure_scalar_integer(init_steps)
-      init_mode <- rlang::arg_match(init_mode, c("random", "k-means||"))
-      prediction_col <- ensure_scalar_character(prediction_col)
-    }, old_new_mapping) %>%
-    ml_extract_args(nms, old_new_mapping)
+ml_validator_kmeans <- function(.args) {
+  .args <- ml_backwards_compatibility(.args, list(
+    centers = "k",
+    tolerance = "tol",
+    iter.max = "max_iter"
+  ))
+  .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
+  .args[["init_steps"]] <- forge::cast_scalar_integer(.args[["init_steps"]])
+  .args[["init_mode"]] <- forge::cast_choice(.args[["init_mode"]], c("random", "k-means||"))
+  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
+  .args
 }
-
-# Constructors
 
 new_ml_kmeans <- function(jobj) {
   new_ml_predictor(jobj, subclass = "ml_kmeans")
 }
 
 new_ml_kmeans_model <- function(jobj) {
-
   summary <- try_null(new_ml_summary_kmeans_model(invoke(jobj, "summary")))
-
   new_ml_clustering_model(
     jobj,
-    cluster_centers = try_null(invoke(jobj, "clusterCenters")) %>%
-      lapply(invoke, "toArray"),
+    # `def clusterCenters`
+    cluster_centers = function() try_null(invoke(jobj, "clusterCenters")) %>%
+      purrr::map(invoke, "toArray"),
     compute_cost = function(dataset) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },
@@ -150,71 +148,4 @@ new_ml_summary_kmeans_model <- function(jobj) {
   new_ml_summary_clustering(
     jobj,
     subclass = "ml_summary_kmeans")
-}
-
-new_ml_model_kmeans <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names,
-  call) {
-
-  summary <- model$summary
-
-  centers <- model$cluster_centers %>%
-    do.call(rbind, .) %>%
-    as.data.frame() %>%
-    rlang::set_names(feature_names)
-
-  cost <- try_null(
-    pipeline_model %>%
-      ml_stage(1) %>%
-      ml_transform(dataset) %>%
-      model$compute_cost()
-  )
-  new_ml_model_clustering(
-    pipeline, pipeline_model,
-    model, dataset, formula,
-    centers = centers,
-    cost = cost,
-    summary = summary,
-    subclass = "ml_model_kmeans",
-    .features = feature_names
-  )
-}
-
-# Generic implementations
-
-#' @export
-print.ml_model_kmeans <- function(x, ...) {
-  preamble <- sprintf(
-    "K-means clustering with %s %s",
-    nrow(x$centers),
-    if (nrow(x$centers) == 1) "cluster" else "clusters"
-  )
-
-  cat(preamble, sep = "\n")
-  print_newline()
-  ml_model_print_centers(x)
-
-  print_newline()
-  cat("Within Set Sum of Squared Errors = ",
-      if (is.null(x$cost)) "not computed." else x$cost
-  )
-}
-
-#' @rdname ml_kmeans
-#' @param model A fitted K-means model returned by \code{ml_kmeans()}
-#' @param dataset Dataset on which to calculate K-means cost
-#' @return \code{ml_compute_cost()} returns the K-means cost (sum of
-#'   squared distances of points to their nearest center) for the model
-#'   on the given data.
-#' @export
-ml_compute_cost <- function(model, dataset) {
-  spark_require_version(spark_connection(spark_jobj(model)), "2.0.0")
-
-  if (inherits(model, "ml_model_kmeans")) {
-    model$pipeline_model %>%
-      ml_stage(1) %>%
-      ml_transform(dataset) %>%
-      model$model$compute_cost()
-  } else
-    model$compute_cost(dataset)
 }
