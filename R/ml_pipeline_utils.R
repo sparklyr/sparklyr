@@ -62,14 +62,13 @@ validate_args_transformer <- function(.args) {
   .args
 }
 
-
-ml_wrap_in_pipeline <- function(jobj) {
-  sc <- spark_connection(jobj)
-  invoke_static(sc,
-                "sparklyr.MLUtils",
-                "wrapInPipeline",
-                jobj)
-}
+# ml_wrap_in_pipeline <- function(jobj) {
+#   sc <- spark_connection(jobj)
+#   invoke_static(sc,
+#                 "sparklyr.MLUtils",
+#                 "wrapInPipeline",
+#                 jobj)
+# }
 
 #' Spark ML -- UID
 #'
