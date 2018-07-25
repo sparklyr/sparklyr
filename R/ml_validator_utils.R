@@ -56,35 +56,6 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   assign("formula", formula, caller_frame$env)
 }
 
-ml_validate_args <- function(
-  args, expr = NULL,
-  mapping_list = list(
-    input.col = "input_col",
-    output.col = "output_col"
-  )) {
-  validations <- rlang::enexpr(expr)
-
-  data <- names(args) %>%
-    setdiff(mapping_list[intersect(names(mapping_list), .)]) %>%
-    args[.] %>%
-    rlang::set_names(
-      mapply(`%||%`, mapping_list[names(.)], names(.))
-    )
-
-  rlang::invoke(within,
-                data = data,
-                expr = validations,
-                .bury = NULL)
-}
-
-ml_extract_args <- function(
-  args, nms, mapping_list = list(
-    input.col = "input_col",
-    output.col = "output_col"
-  )) {
-  args[mapply(`%||%`, mapping_list[nms], nms)]
-}
-
 ml_tree_param_mapping <- function() {
   list(
     max.bins = "max_bins",
