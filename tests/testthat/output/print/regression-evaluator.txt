@@ -1,7 +1,7 @@
 RegressionEvaluator (Evaluator) 
-<regression_evaluator_176a04681ab66> 
+<foo> 
  (Parameters -- Column Names)
-  label_col: foo
+  label_col: label
   prediction_col: prediction
  (Evaluation Metric)
   metric_name: rmse

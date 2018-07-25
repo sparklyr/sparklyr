@@ -1,7 +1,7 @@
 BinaryClassificationEvaluator (Evaluator) 
-<binary_classification_evaluator_176a07170555c> 
+<foo> 
  (Parameters -- Column Names)
-  label_col: foo
+  label_col: label
   raw_prediction_col: rawPrediction
  (Evaluation Metric)
   metric_name: areaUnderROC
