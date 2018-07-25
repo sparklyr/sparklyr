@@ -7,9 +7,9 @@
 \title{Spark ML -- ALS}
 \usage{
 ml_als(x, rating_col = "rating", user_col = "user", item_col = "item",
-  rank = 10L, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
-  nonnegative = FALSE, max_iter = 10L, num_user_blocks = 10L,
-  num_item_blocks = 10L, checkpoint_interval = 10L,
+  rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
+  nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
+  num_item_blocks = 10, checkpoint_interval = 10,
   cold_start_strategy = "nan",
   intermediate_storage_level = "MEMORY_AND_DISK",
   final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...)
@@ -17,10 +17,10 @@ ml_als(x, rating_col = "rating", user_col = "user", item_col = "item",
 ml_recommend(model, type = c("items", "users"), n = 1)
 
 ml_als_factorization(x, rating_col = "rating", user_col = "user",
-  item_col = "item", rank = 10L, reg_param = 0.1,
-  implicit_prefs = FALSE, alpha = 1, nonnegative = FALSE,
-  max_iter = 10L, num_user_blocks = 10L, num_item_blocks = 10L,
-  checkpoint_interval = 10L, cold_start_strategy = "nan",
+  item_col = "item", rank = 10, reg_param = 0.1, implicit_prefs = FALSE,
+  alpha = 1, nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
+  num_item_blocks = 10, checkpoint_interval = 10,
+  cold_start_strategy = "nan",
   intermediate_storage_level = "MEMORY_AND_DISK",
   final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...)
 }

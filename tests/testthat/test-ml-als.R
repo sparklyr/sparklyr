@@ -1,41 +1,37 @@
 context("ml recommendation - als")
 
-sc <- testthat_spark_connection()
-
-test_that("ml_als param setting", {
-  args <- list(
-    x = sc, rating_col = "rcol", user_col = "ucol", item_col = "icol",
-    rank = 9, reg_param = 0.2, implicit_prefs = TRUE, alpha = 1.1,
-    nonnegative = TRUE, max_iter = 7, num_user_blocks = 11,
-    num_item_blocks = 11, checkpoint_interval = 9
-  ) %>%
-    param_add_version("2.0.0", intermediate_storage_level = "MEMORY_ONLY",
-                      final_storage_level = "MEMORY_ONLY") %>%
-    param_add_version("2.2.0", cold_start_strategy = "drop")
-
-  predictor <- do.call(ml_als, args)
-  expect_equal(ml_params(predictor, names(args)[-1]), args[-1])
+test_that("ml_als() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_als)
 })
 
-test_that("ml_als() default params are correct", {
-
-  predictor <- ml_pipeline(sc) %>%
-    ml_als() %>%
-    ml_stage(1)
-
-  args <- get_default_args(ml_als,
-                           c("x", "uid", "...")) %>%
-    param_filter_version("2.2.0", "cold_start_strategy") %>%
-    param_filter_version("2.0.0", c("intermediate_storage_level",
-                                    "final_storage_level"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
+test_that("ml_als() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    rating_col = "awef",
+    user_col = "qqqq",
+    item_col = "ffffffff",
+    rank = 11,
+    reg_param = 0.2,
+    implicit_prefs = TRUE,
+    alpha = 2,
+    nonnegative = TRUE,
+    max_iter = 20,
+    num_user_blocks = 15,
+    num_item_blocks = 16,
+    checkpoint_interval = 12,
+    cold_start_strategy = "drop",
+    intermediate_storage_level = "MEMORY_ONLY",
+    final_storage_level = "MEMORY_ONLY_SER"
+  )
+  test_param_setting(sc, ml_als, test_args)
 })
 
 test_that("ml_recommend() works", {
-  if (spark_version(sc) < "2.2.0") skip("")
+  sc <- testthat_spark_connection()
+  test_requires_version("2.2.0")
 
   user <- c(0, 0, 1, 1, 2, 2)
   item <- c(0, 1, 1, 2, 1, 2)
