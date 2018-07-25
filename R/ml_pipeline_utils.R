@@ -88,25 +88,6 @@ ml_wrap_in_pipeline <- function(jobj) {
                 jobj)
 }
 
-
-
-ml_new_stage_modified_args <- function(envir = rlang::caller_env(2)) {
-  caller_frame <- rlang::caller_frame()
-  modified_args <- caller_frame %>%
-    rlang::lang_standardise() %>%
-    rlang::lang_args() %>%
-    lapply(rlang::new_quosure, env = envir) %>%
-    rlang::modify(
-      x = rlang::new_quosure(rlang::parse_expr("spark_connection(x)"), env = caller_frame$env)
-    ) %>%
-    # filter `features` so it doesn't get partial matched to `features_col`
-    (function(x) x[setdiff(names(x), "features")])
-
-  stage_constructor <- sub("\\..*$", ".spark_connection", rlang::lang_name(caller_frame))
-  rlang::lang(stage_constructor, !!!modified_args) %>%
-    rlang::eval_tidy()
-}
-
 #' Spark ML -- UID
 #'
 #' Extracts the UID of an ML object.
