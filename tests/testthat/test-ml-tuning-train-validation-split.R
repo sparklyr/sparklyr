@@ -52,3 +52,51 @@ test_that("we can train a regression with train-validation-split", {
   expect_identical(length(sub_models), 4L)
   expect_identical(class(sub_models[[1]])[[1]], "ml_pipeline_model")
 })
+
+
+test_that("train validation split print methods", {
+  sc <- testthat_spark_connection()
+  lr <- ml_logistic_regression(sc, uid = "logistic")
+  param_maps <- list(
+    logistic = list(
+      reg_param = c(0.1, 0.01),
+      elastic_net_param = c(0.1, 0.2)
+    )
+  )
+  evaluator <- ml_binary_classification_evaluator(sc, uid = "bineval")
+
+  tvs1 <- ml_train_validation_split(sc, uid = "tvs")
+
+  tvs2 <- ml_train_validation_split(
+    sc,
+    estimator = lr,
+    estimator_param_maps = param_maps,
+    evaluator = evaluator,
+    uid = "tvs"
+  )
+
+  tvs3 <- ml_cross_validator(
+    sc,
+    estimator = lr,
+    estimator_param_maps = param_maps,
+    uid = "tvs"
+  )
+
+  expect_known_output(
+    tvs1,
+    output_file("print/tvs1.txt"),
+    print = TRUE
+  )
+
+  expect_known_output(
+    tvs2,
+    output_file("print/tvs2.txt"),
+    print = TRUE
+  )
+
+  expect_known_output(
+    tvs3,
+    output_file("print/tvs3.txt"),
+    print = TRUE
+  )
+})

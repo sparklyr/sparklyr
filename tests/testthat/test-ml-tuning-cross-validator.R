@@ -179,3 +179,51 @@ test_that("ml_validation_metrics() works properly", {
 
   expect_identical(nrow(tvs_metrics), 4L)
 })
+
+test_that("cross validator print methods", {
+  sc <- testthat_spark_connection()
+  lr <- ml_logistic_regression(sc, uid = "logistic")
+  param_maps <- list(
+    logistic = list(
+      reg_param = c(0.1, 0.01),
+      elastic_net_param = c(0.1, 0.2)
+    )
+  )
+  evaluator <- ml_binary_classification_evaluator(sc, uid = "bineval")
+
+  cv1 <- ml_cross_validator(sc, uid = "cv")
+
+  cv2 <- ml_cross_validator(
+    sc,
+    estimator = lr,
+    estimator_param_maps = param_maps,
+    evaluator = evaluator,
+    uid = "cv"
+  )
+
+  cv3 <- ml_cross_validator(
+    sc,
+    estimator = lr,
+    estimator_param_maps = param_maps,
+    uid = "cv"
+  )
+
+  expect_known_output(
+    cv1,
+    output_file("print/cv1.txt"),
+    print = TRUE
+  )
+
+  expect_known_output(
+    cv2,
+    output_file("print/cv2.txt"),
+    print = TRUE
+  )
+
+  expect_known_output(
+    cv3,
+    output_file("print/cv3.txt"),
+    print = TRUE
+  )
+
+})
