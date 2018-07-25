@@ -6,6 +6,17 @@ test_that("ml_one_vs_rest() default params", {
   test_default_args(sc, ml_one_vs_rest)
 })
 
+test_that("ml_one_vs_rest() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    features_col = "wefaef",
+    label_col = "weijfw",
+    prediction_col = "weifjwifj"
+  )
+  test_param_setting(sc, ml_one_vs_rest, test_args)
+})
+
 test_that("ml_one_vs_rest with two classes agrees with logistic regression", {
   sc <- testthat_spark_connection()
   iris_tbl2 <- testthat_tbl("iris") %>%
