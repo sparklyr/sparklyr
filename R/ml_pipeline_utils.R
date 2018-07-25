@@ -17,23 +17,6 @@ ml_add_stage <- function(x, transformer) {
   new_ml_pipeline(jobj)
 }
 
-jobj_set_param <- function(jobj, method, param, default, min_version) {
-  ver <- jobj %>%
-    spark_connection() %>%
-    spark_version()
-
-  if (ver < min_version) {
-    if (!identical(param, default))
-      stop(paste0("Param '", deparse(substitute(param)),
-                  "' is only available for Spark ", min_version, " and later"))
-    else
-      jobj
-  } else {
-    jobj %>%
-      invoke(method, param)
-  }
-}
-
 maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
   # if value is NULL, don't set
   if (is.null(value)) return(jobj)
