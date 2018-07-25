@@ -195,13 +195,21 @@ print_tuning_info <- function(x, type = c("cv", "tvs")) {
   if (!num_sets) return(invisible(NULL))
 
   cat(" (Parameters -- Tuning)\n")
-  cat(paste0("  estimator: ", ml_short_type(x$estimator), "\n"))
-  cat(paste0("             "))
-  ml_print_uid(x$estimator)
-  cat(paste0("  evaluator: ", ml_short_type(x$evaluator), "\n"))
-  cat(paste0("             "))
-  ml_print_uid(x$evaluator)
-  cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
+
+  if (!is.null(x$estimator)) {
+    cat(paste0("  estimator: ", ml_short_type(x$estimator), "\n"))
+    cat(paste0("             "))
+    ml_print_uid(x$estimator)
+  }
+
+  if (!is.null(x$evaluator)) {
+    cat(paste0("  evaluator: ", ml_short_type(x$evaluator), "\n"))
+    cat(paste0("             "))
+    ml_print_uid(x$evaluator)
+    cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
+  }
+
+
   if (identical(type, "cv"))
     cat("  num_folds:", x$num_folds, "\n")
   else
