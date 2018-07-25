@@ -284,6 +284,6 @@ ml_als_factorization <- function(x, rating_col = "rating", user_col = "user", it
                                  num_item_blocks = 10, checkpoint_interval = 10,
                                  cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
                                  final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
-
+  .Deprecated("ml_als")
   UseMethod("ml_als")
 }
