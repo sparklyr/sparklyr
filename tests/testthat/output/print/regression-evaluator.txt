@@ -1,0 +1,7 @@
+RegressionEvaluator (Evaluator) 
+<regression_evaluator_176a04681ab66> 
+ (Parameters -- Column Names)
+  label_col: foo
+  prediction_col: prediction
+ (Evaluation Metric)
+  metric_name: rmse

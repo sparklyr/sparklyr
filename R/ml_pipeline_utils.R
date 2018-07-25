@@ -180,7 +180,7 @@ ml_summary <- function(x, metric = NULL, allow_null = FALSE) {
 }
 
 ml_new_identifiable <- function(sc, class, uid) {
-  uid <- ensure_scalar_character(uid)
+  uid <- forge::cast_string(uid)
   invoke_new(sc, class, uid)
 }
 

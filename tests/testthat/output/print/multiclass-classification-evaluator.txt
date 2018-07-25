@@ -1,0 +1,7 @@
+MulticlassClassificationEvaluator (Evaluator) 
+<multiclass_classification_evaluator_176a067eb1a52> 
+ (Parameters -- Column Names)
+  label_col: foo
+  prediction_col: prediction
+ (Evaluation Metric)
+  metric_name: f1

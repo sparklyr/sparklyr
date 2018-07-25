@@ -43,57 +43,52 @@
 #' ml_clustering_evaluator(pred_gmm)
 #' }
 #' @export
-ml_clustering_evaluator <- function(
-  x, features_col = "features", prediction_col = "prediction",
-  metric_name = "silhouette",
-  uid = random_string("clustering_evaluator_"),
-  ...
-) {
+ml_clustering_evaluator <- function(x, features_col = "features", prediction_col = "prediction",
+                                    metric_name = "silhouette", uid = random_string("clustering_evaluator_"),
+                                    ...) {
   UseMethod("ml_clustering_evaluator")
 }
 
 #' @export
-ml_clustering_evaluator.spark_connection <- function(
-  x, features_col = "features", prediction_col = "prediction",
-  metric_name = "silhouette",
-  uid = random_string("clustering_evaluator_"),
-  ...) {
+ml_clustering_evaluator.spark_connection <- function(x, features_col = "features", prediction_col = "prediction",
+                                                     metric_name = "silhouette", uid = random_string("clustering_evaluator_"),
+                                                     ...) {
+  .args <- list(
+    features_col = features_col,
+    prediction_col = prediction_col,
+    metric_name = metric_name
+  ) %>%
+    ml_validator_clustering_evaluator()
 
-  ml_ratify_args()
-
-  evaluator <- ml_new_identifiable(x, "org.apache.spark.ml.evaluation.ClusteringEvaluator",
-                                   uid) %>%
-    invoke("setFeaturesCol", features_col) %>%
-    invoke("setPredictionCol", prediction_col) %>%
-    invoke("setMetricName", metric_name) %>%
+  evaluator <- ml_new_identifiable(x, "org.apache.spark.ml.evaluation.ClusteringEvaluator", uid) %>%
+    invoke("setFeaturesCol", .args[["features_col"]]) %>%
+    invoke("setPredictionCol", .args[["prediction_col"]]) %>%
+    invoke("setMetricName", .args[["metric_name"]]) %>%
     new_ml_evaluator()
 
   evaluator
 }
 
 #' @export
-ml_clustering_evaluator.tbl_spark <- function(
-  x, features_col = "features", prediction_col = "prediction",
-  metric_name = "silhouette",
-  uid = random_string("clustering_evaluator_"),
-  ...){
-
-  sc <- spark_connection(x)
-
-  evaluator <- ml_clustering_evaluator(
-    sc, features_col, prediction_col, metric_name)
+ml_clustering_evaluator.tbl_spark <- function(x, features_col = "features", prediction_col = "prediction",
+                                              metric_name = "silhouette", uid = random_string("clustering_evaluator_"),
+                                              ...) {
+  evaluator <- ml_clustering_evaluator.spark_connection(
+    x = spark_connection(x),
+    features_col = features_col,
+    prediction_col = prediction_col,
+    metric_name = metric_name,
+    uid = uid
+  )
 
   evaluator %>%
     ml_evaluate(x)
 }
 
 # Validator
-ml_validator_clustering_evaluator <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      features_col <- ensure_scalar_character(features_col)
-      prediction_col <- ensure_scalar_character(prediction_col)
-      metric_name <- rlang::arg_match(metric_name, c("silhouette"))
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_clustering_evaluator <- function(.args) {
+  .args[["features_col"]] <- forge::cast_string(.args[["features_col"]])
+  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
+  .args[["metric_name"]] <- forge::cast_choice(.args[["metric_name"]], "silhouette")
+  .args
 }
