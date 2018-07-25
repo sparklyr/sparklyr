@@ -56,8 +56,8 @@ ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   assign("formula", formula, caller_frame$env)
 }
 
-ml_tree_param_mapping <- function() {
-  list(
+ml_validate_decision_tree_args <- function(.args) {
+  .args <- ml_backwards_compatibility(.args, list(
     max.bins = "max_bins",
     max.depth = "max_depth",
     min.info.gain = "min_info_gain",
@@ -65,11 +65,7 @@ ml_tree_param_mapping <- function() {
     checkpoint.interval = "checkpoint_interval",
     cache.node.ids = "cache_node_ids",
     max.memory = "max_memory_in_mb"
-  )
-}
-
-ml_validate_decision_tree_args <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, ml_tree_param_mapping())
+  ))
   .args[["max_bins"]] <- forge::cast_scalar_integer(.args[["max_bins"]])
   .args[["max_depth"]] <- forge::cast_scalar_integer(.args[["max_depth"]])
   .args[["min_info_gain"]] <- forge::cast_scalar_double(.args[["min_info_gain"]])
