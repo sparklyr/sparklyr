@@ -126,7 +126,7 @@ stream_stats <- function(stream, stats = list()) {
 #' dir.create("iris-in")
 #' write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
 #'
-#' stream <- stream_read_csv("iris-in/") %>%
+#' stream <- stream_read_csv(sc, "iris-in/") %>%
 #'   stream_write_csv("iris-out/")
 #'
 #' stream_render(stream)
