@@ -144,6 +144,7 @@ stream_read_csv <- function(sc,
                                      nullValue = null_value,
                                      options = options)
 
+
   stream_read_generic(sc,
                       path = path,
                       type = "csv",
@@ -457,7 +458,7 @@ stream_read_parquet <- function(sc,
 #'
 #' stream <- stream_read_parquet(sc, "parquet-in") %>% stream_write_parquet("parquet-out")
 #'
-#' stop_stream(stream)
+#' stream_stop(stream)
 #'
 #' }
 #'
