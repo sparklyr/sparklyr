@@ -61,6 +61,7 @@ spark_config_kubernetes <- function(
       paste("spark.kubernetes.driver.pod.name", driver, sep = "="),
       paste("spark.kubernetes.authenticate.driver.serviceAccountName", account, sep = "=")
     ),
+    sparklyr.gateway.routing = FALSE,
     sparklyr.app.jar = "local:///opt/sparklyr/sparklyr-2.3-2.11.jar",
     sparklyr.events.aftersubmit = forward_function,
     spark.home = spark_home_dir()
