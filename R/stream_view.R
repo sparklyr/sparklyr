@@ -86,6 +86,18 @@ stream_view <- function(
 #' @return A stats object containing streaming statistics that can be passed
 #'   back to the \code{stats} parameter to continue aggregating streaming stats.
 #'
+#' @examples
+#'\dontrun{
+#' sc <- spark_connect(master = "local")
+#' sdf_len(sc, 10) %>%
+#'   spark_write_parquet(path = "parquet-in")
+#'
+#' stream <- stream_read_parquet(sc, "parquet-in") %>%
+#'  stream_write_parquet("parquet-out")
+#'
+#' stream_stats(stream)
+#' }
+#'
 #' @export
 stream_stats <- function(stream, stats = list()) {
   data <- stream_progress(stream)
