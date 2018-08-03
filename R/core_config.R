@@ -16,6 +16,28 @@ spark_config_value <- function(config, name, default = NULL) {
   }
 }
 
+spark_config_value_retries <- function(config, name, default, retries) {
+  success <- FALSE
+  value <- default
+
+  while (!success && retries > 0) {
+    tryCatch({
+      value <<- spark_config_value(config, name, default)
+      success <<- TRUE
+    }, error = function(e) {
+      if (sparklyr_boolean_option("sparklyr.verbose")) {
+        message("Reading ", name, " failed with error: ", e$message)
+      }
+    })
+  }
+
+  if (!success) {
+    stop("Failed after ", retries, " attempts while reading conf value ", name)
+  }
+
+  value
+}
+
 spark_config_integer <- function(config, name, default = NULL) {
   as.integer(spark_config_value(config, name, default))
 }

@@ -28,6 +28,9 @@
   
 ## Kubernetes
 
+- Added config `sparklyr.gateway.routing` to avoid routing to ports since
+  Kubernetes clusters have unique spark masters.
+
 - Change backend ports to be choosen deterministically by searching for
   free ports starting on `sparklyr.gateway.port` which default to `8880`. This
   allows users to enable port forwarding with `kubectl port-forward`.
