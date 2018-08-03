@@ -268,10 +268,23 @@ stream_generate_test <- function(
 
 #' Find Stream
 #'
-#' Finds and returns a stream based on the stream's itentifier.
+#' Finds and returns a stream based on the stream's identifier.
 #'
 #' @param sc The associated Spark connection.
 #' @param id The stream identifier to find.
+#'
+#' @examples
+#'\dontrun{
+#' sc <- spark_connect(master = "local")
+#' sdf_len(sc, 10) %>%
+#'   spark_write_parquet(path = "parquet-in", mode = "overwrite")
+#'
+#' stream <- stream_read_parquet(sc, "parquet-in") %>%
+#'  stream_write_parquet("parquet-out")
+#'
+#' stream_id <- stream_id(stream)
+#' stream_find(sc, stream_id)
+#' }
 #'
 #' @export
 stream_find <- function(sc, id)

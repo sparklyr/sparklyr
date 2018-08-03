@@ -12,5 +12,19 @@ stream_find(sc, id)
 \item{id}{The stream identifier to find.}
 }
 \description{
-Finds and returns a stream based on the stream's itentifier.
+Finds and returns a stream based on the stream's identifier.
+}
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+sdf_len(sc, 10) \%>\%
+  spark_write_parquet(path = "parquet-in", mode = "overwrite")
+
+stream <- stream_read_parquet(sc, "parquet-in") \%>\%
+ stream_write_parquet("parquet-out")
+
+stream_id <- stream_id(stream)
+stream_find(sc, stream_id)
+}
+
 }
