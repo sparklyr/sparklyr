@@ -160,10 +160,13 @@ start_shell <- function(master,
     spark_session_random()
 
   # attempt to connect into an existing gateway
-  gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
-                                       gatewayPort = gatewayPort,
-                                       sessionId = sessionId,
-                                       config = config)
+  gatewayInfo <- NULL
+  if (spark_config_value(config, "sparklyr.gateway.routing", TRUE)) {
+    gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
+                                         gatewayPort = gatewayPort,
+                                         sessionId = sessionId,
+                                         config = config)
+  }
 
   output_file <- NULL
   error_file <- NULL
@@ -318,6 +321,11 @@ start_shell <- function(master,
       gatewayAddress <- config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway(config, start_time)
     }
 
+    # reload port and address to let kubernetes hooks find the right container
+    gatewayConfigRetries <- spark_config_value(config, "sparklyr.gateway.config.retries", 10)
+    gatewayPort <- as.integer(spark_config_value_retries(config, "sparklyr.gateway.port", "8880", gatewayConfigRetries))
+    gatewayAddress <- spark_config_value_retries(config, "sparklyr.gateway.address", "localhost", gatewayConfigRetries)
+
     tryCatch({
       # connect and wait for the service to start
       gatewayInfo <- spark_connect_gateway(gatewayAddress,
@@ -333,7 +341,7 @@ start_shell <- function(master,
           if (spark_master_is_yarn_cluster(master, config)) {
             paste0(
               ") and address (",
-              config[["sparklyr.gateway.address"]]
+              gatewayAddress
             )
           }
           else {
