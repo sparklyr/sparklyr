@@ -23,16 +23,26 @@ spark_config_value_retries <- function(config, name, default, retries) {
   while (!success && retries > 0) {
     retries <- retries - 1
 
-    tryCatch({
-      value <<- spark_config_value(config, name, default)
-      success <<- TRUE
+    result <- tryCatch({
+      list(
+        value = spark_config_value(config, name, default),
+        success = TRUE
+      )
     }, error = function(e) {
       if (sparklyr_boolean_option("sparklyr.verbose")) {
         message("Reading ", name, " failed with error: ", e$message)
       }
 
       if (retries > 0) Sys.sleep(1)
+
+      list(
+        success = FALSE
+      )
     })
+
+    success <- result$success
+    value <- result$value
+
   }
 
   if (!success) {

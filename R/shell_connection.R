@@ -322,7 +322,7 @@ start_shell <- function(master,
     }
 
     # reload port and address to let kubernetes hooks find the right container
-    gatewayConfigRetries <- spark_config_value_retries(config, "sparklyr.gateway.config.retries", 10)
+    gatewayConfigRetries <- spark_config_value(config, "sparklyr.gateway.config.retries", 10)
     gatewayPort <- as.integer(spark_config_value_retries(config, "sparklyr.gateway.port", "8880", gatewayConfigRetries))
     gatewayAddress <- spark_config_value_retries(config, "sparklyr.gateway.address", "localhost", gatewayConfigRetries)
 
