@@ -39,6 +39,17 @@
 ### Spark ML
 
 - Fix retrieval of coefficients in `ml_logistic_regression()` (@shabbybanks, #1596).
+- **(Breaking change)** For model objects, `lazy val` and `def` attributes have been converted to closures, so they are not evaluated at object instantiation (#1453).
+- Input and output column names are no longer required to construct pipeline objects to be consistent with Spark (#1513).
+- Vector attributes of pipeline stages are now printed correctly (#1618).
+- Deprecate various aliases favoring method names in Spark.
+  - `ml_binary_classification_eval()`
+  - `ml_classification_eval()`
+  - `ml_multilayer_perceptron()`
+  - `ml_survival_regression()`
+  - `ml_als_factorization()`
+- Deprecate incompatible signatures for `sdf_transform()` and `ml_transform()` families of methods; the former should take a `tbl_spark` as the first argument while the latter should take a model object as the first argument.
+- Input and output column names are no longer required to construct pipeline objects to be consistent with Spark (#1513).
 
 ### Data
 
