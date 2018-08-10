@@ -26,8 +26,9 @@ tidy.ml_model_kmeans <- function(x,
 }
 
 #' @rdname ml_unsupervised_tidiers
-#' @param x a ml_kmeans model
 #' @param newdata a tbl_spark of new data to use for prediction.
+#'
+#' @importFrom rlang sym
 #'
 #' @export
 augment.ml_model_kmeans <- function(x, newdata = NULL,
@@ -40,9 +41,10 @@ augment.ml_model_kmeans <- function(x, newdata = NULL,
   }
 
   ml_predict(x, newdata) %>%
-    dplyr::select(-label, -features) %>%
-    dplyr::mutate(prediction = prediction + 1) %>%
+    dplyr::select(-!!sym("label"), -!!sym("features")) %>%
+    dplyr::mutate(prediction = !!sym("prediction") + 1) %>%
     dplyr::rename(.cluster = !!"prediction")
+
 }
 
 #' @rdname ml_unsupervised_tidiers
@@ -54,7 +56,7 @@ glance.ml_model_kmeans <- function(x,
   tol <- x$pipeline_model$stages[[2]]$param_map$tol
   wssse <- x$cost
 
-  tibble(wssse = wssse,
+  dplyr::tibble(wssse = wssse,
          max.iter = max.iter,
          tol = tol)
 }
