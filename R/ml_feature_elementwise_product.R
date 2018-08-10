@@ -9,47 +9,69 @@
 #' @param scaling_vec the vector to multiply with input vectors
 #'
 #' @export
-ft_elementwise_product <- function(
-  x, input_col, output_col, scaling_vec,
+ft_elementwise_product <- function(x, input_col = NULL, output_col = NULL, scaling_vec = NULL,
   uid = random_string("elementwise_product_"), ...) {
-  if (spark_version(spark_connection(x)) < "2.0.0")
-    stop("'ft_elementwise_product()' is only supported for Spark 2.0+")
   UseMethod("ft_elementwise_product")
 }
 
 #' @export
-ft_elementwise_product.spark_connection <- function(
-  x, input_col, output_col, scaling_vec,
-  uid = random_string("elementwise_product_"), ...) {
+ft_elementwise_product.spark_connection <- function(x, input_col = NULL, output_col = NULL, scaling_vec = NULL,
+                                                    uid = random_string("elementwise_product_"), ...) {
+  spark_require_version(x, "2.0.0", "ElementwiseProduct")
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.ElementwiseProduct",
-                             input_col, output_col, uid) %>%
-    (function(jobj) invoke_static(x,
-                                  "sparklyr.MLUtils2",
-                                  "setScalingVec",
-                                  jobj, scaling_vec))
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    scaling_vec = scaling_vec,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_elementwise_product()
+
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.ElementwiseProduct",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]])
+  if (!is.null(.args[["scaling_vec"]]))
+    jobj <- invoke_static(x, "sparklyr.MLUtils2", "setScalingVec", jobj, .args[["scaling_vec"]])
 
   new_ml_elementwise_product(jobj)
 }
 
 #' @export
-ft_elementwise_product.ml_pipeline <- function(
-  x, input_col, output_col, scaling_vec,
-  uid = random_string("elementwise_product_"), ...) {
-
-  transformer <- ml_new_stage_modified_args()
+ft_elementwise_product.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, scaling_vec = NULL,
+                                               uid = random_string("elementwise_product_"), ...) {
+  transformer <- ft_elementwise_product.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    scaling_vec = scaling_vec,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, transformer)
 }
 
 #' @export
-ft_elementwise_product.tbl_spark <- function(
-  x, input_col, output_col, scaling_vec,
-  uid = random_string("elementwise_product_"), ...) {
-  transformer <- ml_new_stage_modified_args()
+ft_elementwise_product.tbl_spark <- function(x, input_col = NULL, output_col = NULL, scaling_vec = NULL,
+                                             uid = random_string("elementwise_product_"), ...) {
+  transformer <- ft_elementwise_product.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    scaling_vec = scaling_vec,
+    uid = uid,
+    ...
+  )
   ml_transform(transformer, x)
 }
 
 new_ml_elementwise_product <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_elementwise_product")
+}
+
+# ElementwiseProduct
+ml_validator_elementwise_product <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["scaling_vec"]] <- cast_nullable_double_list(.args[["scaling_vec"]])
+  .args
 }

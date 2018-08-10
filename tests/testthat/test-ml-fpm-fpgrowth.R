@@ -1,10 +1,26 @@
 context("ml fpm fpgrowth")
 
-sc <- testthat_spark_connection()
+test_that("ml_fpgrowth() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_fpgrowth)
+})
+
+test_that("ml_fpgrowth() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    items_col = "wefwef",
+    min_confidence = 0.7,
+    min_support = 0.4,
+    prediction_col = "waef"
+  )
+  test_param_setting(sc, ml_fpgrowth, test_args)
+})
 
 test_that("ml_fpgrowth() works properly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.2.0", "fpgrowth requires spark 2.2.0+")
-  test_requires("dplyr")
 
   df <- data.frame(items = c("1 2 5", "1 2 3 5", "1 2"))
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
@@ -27,6 +43,4 @@ test_that("ml_fpgrowth() works properly", {
       pull(prediction),
     list(list(), list(), list("5"))
   )
-
-
 })

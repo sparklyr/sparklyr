@@ -1,8 +1,17 @@
 context("ml feature - sql transformer")
 
-sc <- testthat_spark_connection()
+test_that("ft_sql_transformer() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    statement = "lalallalalal"
+  )
+  test_param_setting(sc, ft_sql_transformer, test_args)
+})
 
 test_that("ft_sql/dplyr_transformer() works", {
+  sc <- testthat_spark_connection()
+  test_requires("dplyr")
   iris_tbl <- testthat_tbl("iris")
   transformed <- iris_tbl %>%
     mutate(pw2 = Petal_Width * 2)
@@ -40,6 +49,7 @@ test_that("ft_sql/dplyr_transformer() works", {
 })
 
 test_that("ft_dplyr_transformer() handles cases where table name isn't quoted (#1249)", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "sample_frac() requires Spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
   sampled <- iris_tbl %>%

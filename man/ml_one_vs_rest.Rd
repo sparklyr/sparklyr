@@ -4,9 +4,9 @@
 \alias{ml_one_vs_rest}
 \title{Spark ML -- OneVsRest}
 \usage{
-ml_one_vs_rest(x, formula = NULL, classifier, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
-  uid = random_string("one_vs_rest_"), ...)
+ml_one_vs_rest(x, formula = NULL, classifier = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction", uid = random_string("one_vs_rest_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

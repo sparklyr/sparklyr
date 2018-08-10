@@ -11,145 +11,144 @@
 #' @param threshold in binary classification prediction, in range [0, 1].
 #' @param raw_prediction_col Raw prediction (a.k.a. confidence) column name.
 #' @export
-ml_linear_svc <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  reg_param = 0,
-  max_iter = 100L,
-  standardization = TRUE,
-  weight_col = NULL,
-  tol = 1e-6,
-  threshold = 0,
-  aggregation_depth = 2L,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  raw_prediction_col = "rawPrediction",
-  uid = random_string("linear_svc_"), ...
-) {
+ml_linear_svc <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
+                          max_iter = 100, standardization = TRUE, weight_col = NULL,
+                          tol = 1e-6, threshold = 0, aggregation_depth = 2,
+                          features_col = "features", label_col = "label",
+                          prediction_col = "prediction", raw_prediction_col = "rawPrediction",
+                          uid = random_string("linear_svc_"), ...) {
   UseMethod("ml_linear_svc")
 }
 
 #' @export
-ml_linear_svc.spark_connection <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  reg_param = 0,
-  max_iter = 100L,
-  standardization = TRUE,
-  weight_col = NULL,
-  tol = 1e-6,
-  threshold = 0,
-  aggregation_depth = 2L,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  raw_prediction_col = "rawPrediction",
-  uid = random_string("linear_svc_"), ...) {
+ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
+                                           max_iter = 100, standardization = TRUE, weight_col = NULL,
+                                           tol = 1e-6, threshold = 0, aggregation_depth = 2,
+                                           features_col = "features", label_col = "label",
+                                           prediction_col = "prediction", raw_prediction_col = "rawPrediction",
+                                           uid = random_string("linear_svc_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    fit_intercept = fit_intercept,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    standardization = standardization,
+    weight_col = weight_col,
+    tol = tol,
+    threshold = threshold,
+    aggregation_depth = aggregation_depth,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    raw_prediction_col = raw_prediction_col
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_linear_svc()
 
   jobj <- ml_new_predictor(
     x, "org.apache.spark.ml.classification.LinearSVC", uid,
-    features_col, label_col, prediction_col
+    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
   ) %>%
-    invoke("setRawPredictionCol", raw_prediction_col) %>%
-    invoke("setFitIntercept", fit_intercept) %>%
-    invoke("setRegParam", reg_param) %>%
-    invoke("setMaxIter", max_iter) %>%
-    invoke("setStandardization", standardization) %>%
-    invoke("setTol", tol) %>%
-    invoke("setAggregationDepth", aggregation_depth) %>%
-    invoke("setThreshold", threshold)
-
-  if (!rlang::is_null(weight_col))
-    jobj <- invoke(jobj, "setWeightCol", weight_col)
+    invoke("setRawPredictionCol", .args[["raw_prediction_col"]]) %>%
+    invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
+    invoke("setRegParam", .args[["reg_param"]]) %>%
+    invoke("setMaxIter", .args[["max_iter"]]) %>%
+    invoke("setStandardization", .args[["standardization"]]) %>%
+    invoke("setTol", .args[["tol"]]) %>%
+    invoke("setAggregationDepth", .args[["aggregation_depth"]]) %>%
+    invoke("setThreshold", .args[["threshold"]]) %>%
+    maybe_set_param("setWeightCol", .args[["weight_col"]])
 
   new_ml_linear_svc(jobj)
 }
 
 #' @export
-ml_linear_svc.ml_pipeline <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  reg_param = 0,
-  max_iter = 100L,
-  standardization = TRUE,
-  weight_col = NULL,
-  tol = 1e-6,
-  threshold = 0,
-  aggregation_depth = 2L,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  raw_prediction_col = "rawPrediction",
-  uid = random_string("linear_svc_"), ...) {
+ml_linear_svc.ml_pipeline <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
+                                      max_iter = 100, standardization = TRUE, weight_col = NULL,
+                                      tol = 1e-6, threshold = 0, aggregation_depth = 2,
+                                      features_col = "features", label_col = "label",
+                                      prediction_col = "prediction", raw_prediction_col = "rawPrediction",
+                                      uid = random_string("linear_svc_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ml_linear_svc.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    fit_intercept = fit_intercept,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    standardization = standardization,
+    weight_col = weight_col,
+    tol = tol,
+    threshold = threshold,
+    aggregation_depth = aggregation_depth,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    raw_prediction_col = raw_prediction_col,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ml_linear_svc.tbl_spark <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  reg_param = 0,
-  max_iter = 100L,
-  standardization = TRUE,
-  weight_col = NULL,
-  tol = 1e-6,
-  threshold = 0,
-  aggregation_depth = 2L,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  raw_prediction_col = "rawPrediction",
-  uid = random_string("linear_svc_"),
-  response = NULL,
-  features = NULL,
-  predicted_label_col = "predicted_label", ...) {
-
-  predictor <- ml_new_stage_modified_args()
-
+ml_linear_svc.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
+                                    max_iter = 100, standardization = TRUE, weight_col = NULL,
+                                    tol = 1e-6, threshold = 0, aggregation_depth = 2,
+                                    features_col = "features", label_col = "label",
+                                    prediction_col = "prediction", raw_prediction_col = "rawPrediction",
+                                    uid = random_string("linear_svc_"), response = NULL,
+                                    features = NULL, predicted_label_col = "predicted_label", ...) {
   ml_formula_transformation()
 
+  stage <- ml_linear_svc.spark_connection(
+    x = spark_connection(x),
+    formula = NULL,
+    fit_intercept = fit_intercept,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    standardization = standardization,
+    weight_col = weight_col,
+    tol = tol,
+    threshold = threshold,
+    aggregation_depth = aggregation_depth,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    raw_prediction_col = raw_prediction_col,
+    uid = uid,
+    ...
+  )
+
   if (is.null(formula)) {
-    predictor %>%
+    stage %>%
       ml_fit(x)
   } else {
     ml_generate_ml_model(
-      x, predictor, formula, features_col, label_col,
+      x, stage, formula, features_col, label_col,
       "classification", new_ml_model_linear_svc, predicted_label_col
     )
   }
 }
 
 # Validator
-ml_validator_linear_svc <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      reg_param <- ensure_scalar_double(reg_param)
-      max_iter <- ensure_scalar_integer(max_iter)
-      fit_intercept <- ensure_scalar_boolean(fit_intercept)
-      standardization <- ensure_scalar_boolean(standardization)
-      tol <- ensure_scalar_double(tol)
-      aggregation_depth <- ensure_scalar_integer(aggregation_depth)
-      raw_prediction_col <- ensure_scalar_character(raw_prediction_col)
-      threshold <- ensure_scalar_double(threshold)
-      if (!is.null(weight_col))
-        weight_col <- ensure_scalar_character(weight_col)
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_linear_svc <- function(.args) {
+  .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
+  .args[["standardization"]] <- cast_scalar_logical(.args[["standardization"]])
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["aggregation_depth"]] <- cast_scalar_integer(.args[["aggregation_depth"]])
+  .args[["raw_prediction_col"]] <- cast_string(.args[["raw_prediction_col"]])
+  .args[["threshold"]] <- cast_scalar_double(.args[["threshold"]])
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
+  .args
 }
 
 # Constructors
 
 new_ml_linear_svc <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_linear_svc")
+  new_ml_classifier(jobj, subclass = "ml_linear_svc")
 }
 
 new_ml_linear_svc_model <- function(jobj) {
@@ -165,37 +164,4 @@ new_ml_linear_svc_model <- function(jobj) {
     prediction_col = invoke(jobj, "getPredictionCol"),
     raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
     subclass = "ml_linear_svc_model")
-}
-
-new_ml_model_linear_svc <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names,
-  index_labels, call) {
-
-  jobj <- spark_jobj(model)
-  sc <- spark_connection(model)
-
-  coefficients <- model$coefficients
-  names(coefficients) <- feature_names
-
-  coefficients <- if (ml_param(model, "fit_intercept"))
-    rlang::set_names(
-      c(invoke(jobj, "intercept"), model$coefficients),
-      c("(Intercept)", feature_names))
-
-  new_ml_model_classification(
-    pipeline, pipeline_model, model, dataset, formula,
-    coefficients = coefficients,
-    subclass = "ml_model_linear_svc",
-    .features = feature_names,
-    .index_labels = index_labels
-  )
-}
-
-# Generic implementations
-
-#' @export
-print.ml_model_linear_svc <- function(x, ...) {
-  cat("Formula: ", x$formula, "\n\n", sep = "")
-  cat("Coefficients:", sep = "\n")
-  print(x$coefficients)
 }

@@ -4,8 +4,8 @@
 \alias{ft_idf}
 \title{Feature Transformation -- IDF (Estimator)}
 \usage{
-ft_idf(x, input_col, output_col, min_doc_freq = 0L, dataset = NULL,
-  uid = random_string("idf_"), ...)
+ft_idf(x, input_col = NULL, output_col = NULL, min_doc_freq = 0,
+  dataset = NULL, uid = random_string("idf_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

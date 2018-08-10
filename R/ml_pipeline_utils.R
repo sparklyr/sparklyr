@@ -2,11 +2,11 @@ ml_add_stage <- function(x, transformer) {
   sc <- spark_connection(x)
   stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(transformer)) else {
     tryCatch(spark_jobj(x) %>%
-      invoke("getStages") %>%
-      c(spark_jobj(transformer)),
-      error = function(e) spark_jobj(x) %>%
-        invoke("stages") %>%
-        c(spark_jobj(transformer))
+               invoke("getStages") %>%
+               c(spark_jobj(transformer)),
+             error = function(e) spark_jobj(x) %>%
+               invoke("stages") %>%
+               c(spark_jobj(transformer))
     )
   }
 
@@ -17,42 +17,58 @@ ml_add_stage <- function(x, transformer) {
   new_ml_pipeline(jobj)
 }
 
-ml_new_transformer <- function(sc, class, input_col, output_col, uid) {
-  ensure_scalar_character(input_col)
-  ensure_scalar_character(output_col)
-  ensure_scalar_character(uid)
+maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
+  # if value is NULL, don't set
+  if (is.null(value)) return(jobj)
+
+  if (!is.null(min_version)) {
+    # if min_version specified, check Spark version
+    ver <- jobj %>%
+      spark_connection() %>%
+      spark_version()
+
+    if (ver < min_version) {
+      if (!isTRUE(all.equal(value, default))) {
+        # if user does not have required version, and tries to set parameter, throw error
+        stop(paste0("Parameter '", deparse(substitute(value)),
+                    "' is only available for Spark ", min_version, " and later."))
+      } else {
+        # otherwise, return jobj untouched
+        return(jobj)
+      }
+    }
+  }
+
+  invoke(jobj, setter, value)
+}
+
+ml_new_transformer <- function(sc, class, uid,
+                               input_col = NULL, output_col = NULL,
+                               input_cols = NULL, output_cols = NULL) {
+  uid <- cast_string(uid)
   invoke_new(sc, class, uid) %>%
-    invoke("setInputCol", input_col) %>%
-    invoke("setOutputCol", output_col)
+    maybe_set_param("setInputCol", input_col) %>%
+    maybe_set_param("setInputCols", input_cols) %>%
+    maybe_set_param("setOutputCol", output_col) %>%
+    maybe_set_param("setOutputCols", output_cols)
 }
 
-
-ml_wrap_in_pipeline <- function(jobj) {
-  sc <- spark_connection(jobj)
-  invoke_static(sc,
-                "sparklyr.MLUtils",
-                "wrapInPipeline",
-                jobj)
+validate_args_transformer <- function(.args) {
+  .args <- ml_backwards_compatibility(.args)
+  .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
+  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
+  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
+  .args
 }
 
-
-
-ml_new_stage_modified_args <- function(envir = rlang::caller_env(2)) {
-  caller_frame <- rlang::caller_frame()
-  modified_args <- caller_frame %>%
-    rlang::lang_standardise() %>%
-    rlang::lang_args() %>%
-    lapply(rlang::new_quosure, env = envir) %>%
-    rlang::modify(
-      x = rlang::new_quosure(rlang::parse_expr("spark_connection(x)"), env = caller_frame$env)
-    ) %>%
-    # filter `features` so it doesn't get partial matched to `features_col`
-    (function(x) x[setdiff(names(x), "features")])
-
-  stage_constructor <- sub("\\..*$", ".spark_connection", rlang::lang_name(caller_frame))
-  rlang::lang(stage_constructor, !!!modified_args) %>%
-    rlang::eval_tidy()
-}
+# ml_wrap_in_pipeline <- function(jobj) {
+#   sc <- spark_connection(jobj)
+#   invoke_static(sc,
+#                 "sparklyr.MLUtils",
+#                 "wrapInPipeline",
+#                 jobj)
+# }
 
 #' Spark ML -- UID
 #'
@@ -82,7 +98,7 @@ ml_stage <- function(x, stage) {
          "0" = stop("stage not found"),
          "1" = x$stages[[matched_index]],
          stop("multiple stages found")
-         )
+  )
 }
 
 #' @rdname ml_stage
@@ -146,6 +162,25 @@ ml_summary <- function(x, metric = NULL, allow_null = FALSE) {
 }
 
 ml_new_identifiable <- function(sc, class, uid) {
-  uid <- ensure_scalar_character(uid)
+  uid <- cast_string(uid)
   invoke_new(sc, class, uid)
+}
+
+ml_backwards_compatibility <- function(.args, mapping_list = NULL) {
+  mapping_list <- mapping_list %||%
+    c(input.col = "input_col",
+      output.col = "output_col")
+
+  purrr::iwalk(
+    mapping_list,
+    ~ if (!is.null(.args[[.y]])) {
+      .args[[.x]] <<- .args[[.y]]
+      warning("The parameter `", .y,
+              "` is deprecated and will be removed in a future release. Please use `",
+              .x, "` instead.",
+              call. = FALSE)
+    }
+  )
+
+  .args
 }

@@ -1,33 +1,24 @@
 context("ml classification - one vs rest")
 
-sc <- testthat_spark_connection()
-
-test_that("ml_one_vs_rest param setting", {
-  lr <- ml_logistic_regression(sc)
-  args <- list(
-    x = sc, classifier = lr,
-    label_col = "col", features_col = "fcol", prediction_col = "pcol"
-  )
-  ovr <- do.call(ml_one_vs_rest, args)
-  expect_equal(ml_params(ovr, names(args)[-1:-2]), args[-1:-2])
+test_that("ml_one_vs_rest() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_one_vs_rest)
 })
 
-test_that("ml_one_vs_rest() default params are correct", {
-  lr <- ml_logistic_regression(sc)
-  predictor <- ml_pipeline(sc) %>%
-    ml_one_vs_rest(classifier = lr) %>%
-    ml_stage(1)
-
-  args <- get_default_args(ml_one_vs_rest,
-                           c("x", "uid", "...", "classifier"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
+test_that("ml_one_vs_rest() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    features_col = "wefaef",
+    label_col = "weijfw",
+    prediction_col = "weifjwifj"
+  )
+  test_param_setting(sc, ml_one_vs_rest, test_args)
 })
 
 test_that("ml_one_vs_rest with two classes agrees with logistic regression", {
-  test_requires("dplyr")
+  sc <- testthat_spark_connection()
   iris_tbl2 <- testthat_tbl("iris") %>%
     mutate(is_versicolor = ifelse(
       Species == "versicolor", "versicolor", "other")) %>%
@@ -44,11 +35,19 @@ test_that("ml_one_vs_rest with two classes agrees with logistic regression", {
 })
 
 test_that("ml_one_vs_rest fits the right number of estimators", {
-  test_requires("dplyr")
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   lr <- ml_logistic_regression(sc)
 
   ovr_model <- ml_one_vs_rest(iris_tbl, Species ~ ., classifier = lr)
 
   expect_equal(length(ovr_model$model$models), 3)
+})
+
+test_that("ml_one_vs_rest() errors when not given classifier", {
+  sc <- testthat_spark_connection()
+  expect_error(
+    ml_one_vs_rest(sc, classifier = ml_random_forest_regressor(sc)),
+    "`classifier` must be an `ml_classifier`\\."
+  )
 })

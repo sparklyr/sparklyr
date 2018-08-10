@@ -5,8 +5,8 @@
 \title{Spark ML -- LinearSVC}
 \usage{
 ml_linear_svc(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
-  max_iter = 100L, standardization = TRUE, weight_col = NULL,
-  tol = 1e-06, threshold = 0, aggregation_depth = 2L,
+  max_iter = 100, standardization = TRUE, weight_col = NULL,
+  tol = 1e-06, threshold = 0, aggregation_depth = 2,
   features_col = "features", label_col = "label",
   prediction_col = "prediction", raw_prediction_col = "rawPrediction",
   uid = random_string("linear_svc_"), ...)

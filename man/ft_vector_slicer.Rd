@@ -4,7 +4,7 @@
 \alias{ft_vector_slicer}
 \title{Feature Transformation -- VectorSlicer (Transformer)}
 \usage{
-ft_vector_slicer(x, input_col, output_col, indices,
+ft_vector_slicer(x, input_col = NULL, output_col = NULL, indices = NULL,
   uid = random_string("vector_slicer_"), ...)
 }
 \arguments{

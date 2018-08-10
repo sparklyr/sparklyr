@@ -1,44 +1,31 @@
 context("ml regression - aft survival regression")
 
-sc <- testthat_spark_connection()
-
-test_that("ml_aft_survival_regression param setting", {
-  args <- list(
-    x = sc, censor_col = "ccol",
-    quantile_probabilities = c(0.01, 0.25, 0.5, 0.75, 0.95),
-    fit_intercept = FALSE, max_iter = 50, tol = 1e-04,
-    quantiles_col = "qcol",
-    label_col = "col", features_col = "fcol", prediction_col = "pcol"
-  )
-  if (spark_version(sc) >= "2.1.0")
-    args <- c(args, aggregation_depth = 3)
-
-  ovr <- do.call(ml_aft_survival_regression, args)
-  expect_equal(ml_params(ovr, names(args)[-1]), args[-1])
+test_that("ml_aft_survival_regression() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_aft_survival_regression)
 })
 
-test_that("ml_aft_survival_regression() default params are correct", {
-
-  predictor <- ml_pipeline(sc) %>%
-    ml_aft_survival_regression() %>%
-    ml_stage(1)
-
-  args <- get_default_args(ml_aft_survival_regression,
-                           c("x", "uid", "...", "quantiles_col"))
-
-  if (spark_version(sc) < "2.1.0")
-    args <- rlang::modify(args, aggregation_depth = NULL, family = NULL)
-
-  args <- lapply(Filter(length, args), eval)
-
-  expect_equal(
-    within(ml_params(predictor, names(args)),
-           quantile_probabilities <- as.list(quantile_probabilities)),
-    args)
+test_that("ml_aft_survival_regression() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    censor_col = "ccol",
+    quantile_probabilities = c(0.02, 0.5, 0.98),
+    fit_intercept = FALSE,
+    max_iter = 42,
+    tol = 1e-04,
+    aggregation_depth = 3,
+    quantiles_col = "qcol",
+    features_col = "fcol",
+    label_col = "lcol",
+    prediction_col = "pcol"
+  )
+  test_param_setting(sc, ml_aft_survival_regression, test_args)
 })
 
 test_that("ml_aft_survival_regression() works properly", {
-
+  sc <- testthat_spark_connection()
   training <- data.frame(
     label = c(1.218, 2.949, 3.627, 0.273, 4.199),
     censor = c(1.0, 0.0, 0.0, 1.0, 0.0),

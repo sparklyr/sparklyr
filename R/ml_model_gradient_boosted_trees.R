@@ -39,34 +39,18 @@ NULL
 #' }
 #'
 #' @export
-ml_gradient_boosted_trees <- function(
-  x,
-  formula = NULL,
-  type = c("auto", "regression", "classification"),
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L,
-  loss_type = c("auto", "logistic", "squared", "absolute"),
-  max_bins = 32L,
-  max_depth = 5L,
-  max_iter = 20L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  step_size = 0.1,
-  subsampling_rate = 1,
-  feature_subset_strategy = "auto",
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("gradient_boosted_trees_"),
-  response = NULL,
-  features = NULL,...
-) {
-
+ml_gradient_boosted_trees <- function(x, formula = NULL,
+                                      type = c("auto", "regression", "classification"),
+                                      features_col = "features", label_col = "label",
+                                      prediction_col = "prediction", probability_col = "probability",
+                                      raw_prediction_col = "rawPrediction", checkpoint_interval = 10,
+                                      loss_type = c("auto", "logistic", "squared", "absolute"),
+                                      max_bins = 32, max_depth = 5, max_iter = 20L,
+                                      min_info_gain = 0, min_instances_per_node = 1,
+                                      step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
+                                      seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
+                                      max_memory_in_mb = 256, uid = random_string("gradient_boosted_trees_"),
+                                      response = NULL, features = NULL, ...) {
   ml_formula_transformation()
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
@@ -88,16 +72,16 @@ ml_gradient_boosted_trees <- function(
     if (identical(model_type, "classification")) "logistic" else "squared"
   } else if (identical(model_type, "regression")) {
     if (!loss_type %in% c("squared", "absolute"))
-      stop("'loss_type' must be 'squared' or 'absolute' for regression")
+      stop("`loss_type` must be \"squared\" or \"absolute\" for regression.")
     loss_type
   } else {
     if (!identical(loss_type, "logistic"))
-      stop("'loss_type' must be 'logistic' for classification")
+      stop("`loss_type` must be \"logistic\" for classification.")
     loss_type
   }
 
   if (spark_version(spark_connection(x)) < "2.2.0" && !is.null(thresholds))
-    stop("thresholds is only supported for GBT in Spark 2.2.0+")
+    stop("`thresholds` is only supported for GBT in Spark 2.2.0+.")
 
   routine <- switch(model_type,
                     regression = ml_gbt_regressor,
@@ -107,4 +91,27 @@ ml_gradient_boosted_trees <- function(
   args$response <- NULL
   args$features <- NULL
   do.call(routine, args)
+}
+
+new_ml_model_gbt_classification <- function(pipeline, pipeline_model, model,
+                                            dataset, formula, feature_names,
+                                            index_labels, call) {
+  jobj <- spark_jobj(model)
+  sc <- spark_connection(model)
+
+  new_ml_model_classification(
+    pipeline, pipeline_model, model, dataset, formula,
+    subclass = "ml_model_gbt_classification",
+    .features = feature_names,
+    .index_labels = index_labels
+  )
+}
+
+new_ml_model_gbt_regression <- function(pipeline, pipeline_model, model,
+                                        dataset, formula, feature_names, call) {
+  new_ml_model_regression(
+    pipeline, pipeline_model, model, dataset, formula,
+    subclass = "ml_model_gbt_regression",
+    .features = feature_names
+  )
 }

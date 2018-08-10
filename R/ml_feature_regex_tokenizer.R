@@ -14,49 +14,84 @@
 #' @param to_lower_case Indicates whether to convert all characters to lowercase before tokenizing.
 #'
 #' @export
-ft_regex_tokenizer <- function(
-  x, input_col, output_col, gaps = TRUE,
-  min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
-  uid = random_string("regex_tokenizer_"), ...) {
+ft_regex_tokenizer <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
+                               min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
+                               uid = random_string("regex_tokenizer_"), ...) {
   UseMethod("ft_regex_tokenizer")
 }
 
 #' @export
-ft_regex_tokenizer.spark_connection <- function(
-  x, input_col, output_col, gaps = TRUE,
-  min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
-  uid = random_string("regex_tokenizer_"), ...) {
+ft_regex_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
+                                                min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
+                                                uid = random_string("regex_tokenizer_"), ...) {
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    gaps = gaps,
+    min_token_length = min_token_length,
+    pattern = pattern,
+    to_lower_case = to_lower_case,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_regex_tokenizer()
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.RegexTokenizer",
-                             input_col, output_col, uid) %>%
-    invoke("setGaps", gaps) %>%
-    invoke("setMinTokenLength", min_token_length) %>%
-    invoke("setPattern", pattern) %>%
-    invoke("setToLowercase", to_lower_case)
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.RegexTokenizer",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
+    invoke("setGaps", .args[["gaps"]]) %>%
+    invoke("setMinTokenLength", .args[["min_token_length"]]) %>%
+    invoke("setPattern", .args[["pattern"]]) %>%
+    invoke("setToLowercase", .args[["to_lower_case"]])
 
   new_ml_regex_tokenizer(jobj)
 }
 
 #' @export
-ft_regex_tokenizer.ml_pipeline <- function(
-  x, input_col, output_col, gaps = TRUE,
-  min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
-  uid = random_string("regex_tokenizer_"), ...) {
-
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+ft_regex_tokenizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
+                                           min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
+                                           uid = random_string("regex_tokenizer_"), ...) {
+  stage <-ft_regex_tokenizer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    gaps = gaps,
+    min_token_length = min_token_length,
+    pattern = pattern,
+    to_lower_case = to_lower_case,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_regex_tokenizer.tbl_spark <- function(
-  x, input_col, output_col, gaps = TRUE,
-  min_token_length = 1L, pattern = "\\s+", to_lower_case = TRUE,
-  uid = random_string("regex_tokenizer_"), ...) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+ft_regex_tokenizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
+                                         min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
+                                         uid = random_string("regex_tokenizer_"), ...) {
+  stage <-ft_regex_tokenizer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    gaps = gaps,
+    min_token_length = min_token_length,
+    pattern = pattern,
+    to_lower_case = to_lower_case,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_regex_tokenizer <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_regex_tokenizer")
+}
+
+ml_validator_regex_tokenizer <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["gaps"]] <- cast_scalar_logical(.args[["gaps"]])
+  .args[["min_token_length"]] <- cast_scalar_integer(.args[["min_token_length"]])
+  .args[["pattern"]] <- cast_string(.args[["pattern"]])
+  .args[["to_lower_case"]] <- cast_scalar_logical(.args[["to_lower_case"]])
+  .args
 }

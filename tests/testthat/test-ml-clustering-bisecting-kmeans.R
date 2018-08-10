@@ -1,38 +1,27 @@
 context("ml clustering - bisecting kmeans")
 
-sc <- testthat_spark_connection()
-test_requires("dplyr")
-data(iris)
-
-test_that("ml_bisecting_kmeans param setting", {
-  test_requires_version("2.0.0", "bisecting kmeans support")
-  args <- list(
-    x = sc, k = 9, max_iter = 11, min_divisible_cluster_size = 3,
-    seed = 98, features_col = "fcol",
-    prediction_col = "pcol"
-  )
-  predictor <- do.call(ml_bisecting_kmeans, args)
-  args_to_check <- setdiff(names(args), "x")
-
-  expect_equal(ml_params(predictor, args_to_check), args[args_to_check])
+test_that("ml_bisecting_kmeans() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_bisecting_kmeans)
 })
 
-test_that("ml_bisecting_kmeans() default params are correct", {
-  test_requires_version("2.0.0", "bisecting kmeans support")
-  predictor <- ml_pipeline(sc) %>%
-    ml_bisecting_kmeans() %>%
-    ml_stage(1)
-
-  args <- get_default_args(
-    ml_bisecting_kmeans,
-    c("x", "uid", "...", "seed"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
+test_that("ml_bisecting_kmeans() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    k = 5,
+    max_iter = 10,
+    seed = 32932,
+    min_divisible_cluster_size = 3,
+    features_col = "fwefw",
+    prediction_col = "ewfwef"
+  )
+  test_param_setting(sc, ml_bisecting_kmeans, test_args)
 })
 
 test_that("ml_bisecting_kmeans() works properly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "bisecting kmeans support")
   sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_libsvm_data.txt", full.names = TRUE)
 
@@ -256,11 +245,11 @@ test_that("ml_bisecting_kmeans() works properly", {
                                   49.9268292682927, 47.9268292682927, 33.8048780487805, 20.1463414634146,
                                   16, 8.90243902439024, 2.65853658536585))
 
-  expect_equal(bkm$cluster_centers, cluster_centers)
+  expect_equal(bkm$cluster_centers(), cluster_centers)
 })
 
-
 test_that("ml_bisecting_kmeans() works properly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "ml_bisecting_kmeans() requires Spark 2.0.0+")
   iris_tbl <- testthat_tbl("iris")
   expect_output_file(

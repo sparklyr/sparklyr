@@ -4,7 +4,7 @@
 \alias{ft_max_abs_scaler}
 \title{Feature Transformation -- MaxAbsScaler (Estimator)}
 \usage{
-ft_max_abs_scaler(x, input_col, output_col, dataset = NULL,
+ft_max_abs_scaler(x, input_col = NULL, output_col = NULL, dataset = NULL,
   uid = random_string("max_abs_scaler_"), ...)
 }
 \arguments{

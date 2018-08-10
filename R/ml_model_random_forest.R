@@ -39,33 +39,14 @@ NULL
 #' ml_multiclass_classification_evaluator(pred)
 #' }
 #' @export
-ml_random_forest <- function(
-  x,
-  formula = NULL,
-  type = c("auto", "regression", "classification"),
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
-  feature_subset_strategy = "auto",
-  impurity = "auto",
-  checkpoint_interval = 10L,
-  max_bins = 32L,
-  max_depth = 5L,
-  num_trees = 20L,
-  min_info_gain = 0,
-  min_instances_per_node = 1L,
-  subsampling_rate = 1,
-  seed = NULL,
-  thresholds = NULL,
-  cache_node_ids = FALSE,
-  max_memory_in_mb = 256L,
-  uid = random_string("random_forest_"),
-  response = NULL,
-  features = NULL, ...
-) {
-
+ml_random_forest <- function(x, formula = NULL, type = c("auto", "regression", "classification"),
+                             features_col = "features", label_col = "label", prediction_col = "prediction",
+                             probability_col = "probability", raw_prediction_col = "rawPrediction",
+                             feature_subset_strategy = "auto", impurity = "auto", checkpoint_interval = 10,
+                             max_bins = 32, max_depth = 5, num_trees = 20, min_info_gain = 0,
+                             min_instances_per_node = 1, subsampling_rate = 1, seed = NULL,
+                             thresholds = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256,
+                             uid = random_string("random_forest_"), response = NULL, features = NULL, ...) {
   ml_formula_transformation()
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
@@ -73,7 +54,7 @@ ml_random_forest <- function(
   # choose classification vs. regression model based on column type
   schema <- sdf_schema(sdf)
   if (!response_col %in% names(schema))
-    stop(paste0(response_col, " is not a column in the input dataset"))
+    stop(paste0("`", response_col, "` is not a column in the input dataset."))
 
   response_type <- schema[[response_col]]$type
 
@@ -89,11 +70,11 @@ ml_random_forest <- function(
     if (identical(model_type, "regression")) "variance" else "gini"
   } else if (identical(model_type, "classification")) {
     if (!impurity %in% c("gini", "entropy"))
-      stop("'impurity' must be 'gini' or 'entropy' for classification")
+      stop("`impurity` must be \"gini\" or \"entropy\" for classification.")
     impurity
   } else {
     if (!identical(impurity, "variance"))
-      stop("'impurity' must be 'variance' for regression")
+      stop("`impurity` must be \"variance\" for regression.")
     impurity
   }
 
@@ -101,7 +82,7 @@ ml_random_forest <- function(
     col.sample.rate <- rlang::dots_list(...)[["col.sample.rate"]]
     sc <- spark_connection(x)
     if (!(col.sample.rate > 0 && col.sample.rate <= 1))
-      stop("'col.sample.rate' must be in (0, 1]")
+      stop("`col.sample.rate` must be in (0, 1].")
     col.sample.rate <- if (spark_version(sc) < "2.0.0") {
       if (col.sample.rate == 1) # nocov start
         "all"
@@ -124,7 +105,7 @@ ml_random_forest <- function(
         strategy
       } # nocov end
     } else {
-      ensure_scalar_character(format(col.sample.rate, nsmall = 1L))
+      ensure_scalar_character(format(col.sample.rate, nsmall = 1))
     }
     assign("col.sample.rate", col.sample.rate, envir = parent.frame())
   }
@@ -137,4 +118,23 @@ ml_random_forest <- function(
   args$response <- NULL
   args$features <- NULL
   do.call(routine, args)
+}
+
+new_ml_model_random_forest_classification <- function(pipeline, pipeline_model, model, dataset,
+                                                      formula, feature_names, index_labels, call) {
+  new_ml_model_classification(
+    pipeline, pipeline_model, model, dataset, formula,
+    subclass = "ml_model_random_forest_classification",
+    .features = feature_names,
+    .index_labels = index_labels
+  )
+}
+
+new_ml_model_random_forest_regression <- function(pipeline, pipeline_model, model, dataset, formula,
+                                                  feature_names, call) {
+  new_ml_model_regression(
+    pipeline, pipeline_model, model, dataset, formula,
+    subclass = "ml_model_random_forest_regression",
+    .features = feature_names
+  )
 }

@@ -4,7 +4,8 @@
 \alias{ft_stop_words_remover}
 \title{Feature Transformation -- StopWordsRemover (Transformer)}
 \usage{
-ft_stop_words_remover(x, input_col, output_col, case_sensitive = FALSE,
+ft_stop_words_remover(x, input_col = NULL, output_col = NULL,
+  case_sensitive = FALSE,
   stop_words = ml_default_stop_words(spark_connection(x), "english"),
   uid = random_string("stop_words_remover_"), ...)
 }

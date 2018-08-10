@@ -5,7 +5,8 @@
 \alias{ft_dplyr_transformer}
 \title{Feature Transformation -- SQLTransformer}
 \usage{
-ft_sql_transformer(x, statement, uid = random_string("sql_transformer_"), ...)
+ft_sql_transformer(x, statement = NULL,
+  uid = random_string("sql_transformer_"), ...)
 
 ft_dplyr_transformer(x, tbl, uid = random_string("dplyr_transformer_"), ...)
 }

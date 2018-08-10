@@ -1,8 +1,7 @@
 context("broom")
-test_requires("dplyr")
-sc <- testthat_spark_connection()
 
 test_that("tidy.{glm type models} works", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   mtcars_tbl <- testthat_tbl("mtcars")
 
@@ -42,6 +41,7 @@ test_that("tidy.{glm type models} works", {
 
 test_that("augment.{glm type models} works", {
   test_requires_version("2.0.0")
+  sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
   glmfit <- ml_generalized_linear_regression(mtcars_tbl, response = "mpg",
@@ -62,6 +62,7 @@ test_that("augment.{glm type models} works", {
 
 test_that("augment (ml glm) working residuals agree with residuals()", {
   test_requires_version("2.0.0")
+  sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
   glmfit <- ml_generalized_linear_regression(mtcars_tbl, response = "mpg",
@@ -73,6 +74,7 @@ features = "wt")
 
 test_that("glance.{glm type models} works", {
   test_requires_version("2.0.0")
+  sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
   glmfit <- ml_generalized_linear_regression(mtcars_tbl, response = "mpg",

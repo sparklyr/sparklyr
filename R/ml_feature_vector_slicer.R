@@ -7,53 +7,66 @@
 #' @param indices An vector of indices to select features from a vector column.
 #'   Note that the indices are 0-based.
 #' @export
-ft_vector_slicer <- function(
-  x, input_col, output_col, indices,
-  uid = random_string("vector_slicer_"), ...
-) {
+ft_vector_slicer <- function(x, input_col = NULL, output_col = NULL, indices = NULL,
+                             uid = random_string("vector_slicer_"), ...) {
   UseMethod("ft_vector_slicer")
 }
 
 #' @export
-ft_vector_slicer.spark_connection <- function(
-  x, input_col, output_col, indices,
-  uid = random_string("vector_slicer_"), ...
-) {
+ft_vector_slicer.spark_connection <- function(x, input_col = NULL, output_col = NULL, indices = NULL,
+                                              uid = random_string("vector_slicer_"), ...) {
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    indices = indices,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_vector_slicer()
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.VectorSlicer",
-                             input_col, output_col, uid) %>%
-    invoke("setIndices", indices)
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.VectorSlicer",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    maybe_set_param("setIndices", .args[["indices"]])
 
   new_ml_vector_slicer(jobj)
 }
 
 #' @export
-ft_vector_slicer.ml_pipeline <- function(
-  x, input_col, output_col, indices,
-  uid = random_string("vector_slicer_"), ...
-) {
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
-}
-
-ml_validator_vector_slicer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      indices <- lapply(indices, ensure_scalar_integer)
-    }) %>%
-    ml_extract_args(nms)
+ft_vector_slicer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, indices = NULL,
+                                         uid = random_string("vector_slicer_"), ...) {
+  stage <- ft_vector_slicer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    indices = indices,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_vector_slicer.tbl_spark <- function(
-  x, input_col, output_col, indices,
-  uid = random_string("vector_slicer_"), ...
-) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+ft_vector_slicer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, indices = NULL,
+                                       uid = random_string("vector_slicer_"), ...) {
+  stage <- ft_vector_slicer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    indices = indices,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_vector_slicer <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_vector_slicer")
+}
+
+ml_validator_vector_slicer <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["indices"]] <- cast_nullable_integer_list(.args[["indices"]])
+  .args
 }

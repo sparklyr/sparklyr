@@ -5,7 +5,7 @@
 \alias{ft_discrete_cosine_transform}
 \title{Feature Transformation -- Discrete Cosine Transform (DCT) (Transformer)}
 \usage{
-ft_dct(x, input_col, output_col, inverse = FALSE,
+ft_dct(x, input_col = NULL, output_col = NULL, inverse = FALSE,
   uid = random_string("dct_"), ...)
 
 ft_discrete_cosine_transform(x, input_col, output_col, inverse = FALSE,

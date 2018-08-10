@@ -4,8 +4,8 @@
 \alias{ft_ngram}
 \title{Feature Transformation -- NGram (Transformer)}
 \usage{
-ft_ngram(x, input_col, output_col, n = 2L, uid = random_string("ngram_"),
-  ...)
+ft_ngram(x, input_col = NULL, output_col = NULL, n = 2,
+  uid = random_string("ngram_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

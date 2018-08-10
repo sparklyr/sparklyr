@@ -21,109 +21,109 @@
 
 
 #' @export
-ml_gaussian_mixture <- function(
-  x,
-  formula = NULL,
-  k = 2L,
-  max_iter = 100L,
-  tol = 0.01,
-  seed = NULL,
-  features_col = "features",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  uid = random_string("gaussian_mixture_"), ...
-) {
-  spark_require_version(spark_connection(x), "2.0.0", "Gaussian mixture")
+ml_gaussian_mixture <- function(x, formula = NULL, k = 2, max_iter = 100,
+                                tol = 0.01, seed = NULL, features_col = "features",
+                                prediction_col = "prediction", probability_col = "probability",
+                                uid = random_string("gaussian_mixture_"), ...) {
+
   UseMethod("ml_gaussian_mixture")
 }
 
 #' @export
-ml_gaussian_mixture.spark_connection <- function(
-  x,
-  formula = NULL,
-  k = 2L,
-  max_iter = 100L,
-  tol = 0.01,
-  seed = NULL,
-  features_col = "features",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  uid = random_string("gaussian_mixture_"), ...) {
+ml_gaussian_mixture.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 100,
+                                                 tol = 0.01, seed = NULL, features_col = "features",
+                                                 prediction_col = "prediction", probability_col = "probability",
+                                                 uid = random_string("gaussian_mixture_"), ...) {
+  spark_require_version(spark_connection(x), "2.0.0", "GaussianMixture")
 
-  ml_ratify_args()
+  .args <- list(
+    k = k,
+    max_iter = max_iter,
+    tol = tol,
+    seed = seed,
+    features_col = features_col,
+    prediction_col = prediction_col,
+    probability_col = probability_col
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_gaussian_mixture()
 
-  jobj <- ml_new_clustering(x, "org.apache.spark.ml.clustering.GaussianMixture", uid,
-                            features_col, k, max_iter, seed) %>%
-    invoke("setTol", tol) %>%
-    invoke("setPredictionCol", prediction_col) %>%
-    invoke("setProbabilityCol", probability_col)
+  jobj <- ml_new_clustering(
+    x, "org.apache.spark.ml.clustering.GaussianMixture", uid,
+    .args[["features_col"]], .args[["k"]], .args[["max_iter"]], .args[["seed"]]
+  ) %>%
+    invoke("setTol", .args[["tol"]]) %>%
+    invoke("setPredictionCol", .args[["prediction_col"]]) %>%
+    invoke("setProbabilityCol", .args[["probability_col"]])
 
   new_ml_gaussian_mixture(jobj)
 }
 
 #' @export
-ml_gaussian_mixture.ml_pipeline <- function(
-  x,
-  formula = NULL,
-  k = 2L,
-  max_iter = 100L,
-  tol = 0.01,
-  seed = NULL,
-  features_col = "features",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  uid = random_string("gaussian_mixture_"), ...) {
+ml_gaussian_mixture.ml_pipeline <- function(x, formula = NULL, k = 2, max_iter = 100,
+                                            tol = 0.01, seed = NULL, features_col = "features",
+                                            prediction_col = "prediction", probability_col = "probability",
+                                            uid = random_string("gaussian_mixture_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ml_gaussian_mixture.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    k = k,
+    max_iter = max_iter,
+    tol = tol,
+    seed = seed,
+    features_col = features_col,
+    prediction_col = prediction_col,
+    probability_col = probability_col,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ml_gaussian_mixture.tbl_spark <- function(
-  x,
-  formula = NULL,
-  k = 2L,
-  max_iter = 100L,
-  tol = 0.01,
-  seed = NULL,
-  features_col = "features",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  uid = random_string("gaussian_mixture_"),
-  features = NULL, ...) {
-
-  predictor <- ml_new_stage_modified_args()
-
+ml_gaussian_mixture.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 100,
+                                          tol = 0.01, seed = NULL, features_col = "features",
+                                          prediction_col = "prediction", probability_col = "probability",
+                                          uid = random_string("gaussian_mixture_"), features = NULL, ...) {
   ml_formula_transformation()
 
+  stage <- ml_gaussian_mixture.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    k = k,
+    max_iter = max_iter,
+    tol = tol,
+    seed = seed,
+    features_col = features_col,
+    prediction_col = prediction_col,
+    probability_col = probability_col,
+    uid = uid,
+    ...
+  )
+
   if (is.null(formula)) {
-    predictor %>%
+    stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, predictor = predictor, formula = formula, features_col = features_col,
+    ml_generate_ml_model(x, predictor = stage, formula = formula, features_col = features_col,
                          type = "clustering", constructor = new_ml_model_gaussian_mixture)
   }
 }
 
-# Validator
-ml_validator_gaussian_mixture <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      tol <- ensure_scalar_double(tol)
-      prediction_col <- ensure_scalar_character(prediction_col)
-      probability_col <- ensure_scalar_character(probability_col)
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_gaussian_mixture <- function(.args) {
+  .args <- validate_args_clustering(.args)
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
+  .args[["probability_col"]] <- cast_string(.args[["probability_col"]])
+  .args
 }
-
-# Constructors
 
 new_ml_gaussian_mixture <- function(jobj) {
   new_ml_predictor(jobj, subclass = "ml_gaussian_mixture")
 }
 
 new_ml_gaussian_mixture_model <- function(jobj) {
-
   summary <- if (invoke(jobj, "hasSummary"))
     new_ml_summary_gaussian_mixture_model(invoke(jobj, "summary"))
   else NULL
@@ -131,7 +131,7 @@ new_ml_gaussian_mixture_model <- function(jobj) {
   new_ml_clustering_model(
     jobj,
     gaussians = invoke(jobj, "gaussians"),
-    gaussians_df = invoke(jobj, "gaussiansDF") %>%
+    gaussians_df = function() invoke(jobj, "gaussiansDF") %>% # def
       sdf_register() %>%
       collect() %>%
       dplyr::mutate(!!rlang::sym("cov") := lapply(!!rlang::sym("cov"), read_spark_matrix)),
@@ -147,21 +147,4 @@ new_ml_summary_gaussian_mixture_model <- function(jobj) {
     probability = invoke(jobj, "probability") %>% sdf_register(),
     probability_col = invoke(jobj, "probabilityCol"),
     subclass = "ml_summary_gaussian_mixture")
-}
-
-new_ml_model_gaussian_mixture <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names,
-  call) {
-
-  summary <- model$summary
-
-  new_ml_model_clustering(
-    pipeline, pipeline_model,
-    model, dataset, formula,
-    weights = model$weights,
-    gaussians_df = model$gaussians_df,
-    summary = summary,
-    subclass = "ml_model_gaussian_mixture",
-    .features = feature_names
-  )
 }

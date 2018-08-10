@@ -26,7 +26,7 @@ ml_feature_importances.ml_prediction_model <- function(model, ...) {
     stop("Cannot extract feature importances from ", model_class,
          call. = FALSE)
   }
-  model$feature_importances
+  model$feature_importances()
 }
 
 #' @export
@@ -57,7 +57,7 @@ ml_feature_importances.ml_model <- function(model, ...) {
 
   data.frame(
     feature = model$.features,
-    importance = model$model$feature_importances,
+    importance = model$model$feature_importances(),
     stringsAsFactors = FALSE
   ) %>%
     rlang::set_names(c("feature", "importance")) %>%

@@ -1,8 +1,25 @@
-context("ml tuning")
+context("ml tuning cross validator")
 
-sc <- testthat_spark_connection()
+test_that("ml_cross_validator() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_cross_validator)
+})
+
+test_that("ml_cross_validator() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    num_folds = 10,
+    collect_sub_models = TRUE,
+    parallelism = 2,
+    seed = 6543
+  )
+  test_param_setting(sc, ml_cross_validator, test_args)
+})
 
 test_that("ml_cross_validator() works correctly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   pipeline <- ml_pipeline(sc) %>%
     ft_tokenizer("text", "words", uid = "tokenizer_1") %>%
@@ -38,8 +55,8 @@ test_that("ml_cross_validator() works correctly", {
   expect_identical(ml_param(cv, "parallelism"), 2L)
 
   expected_param_maps <- param_grid_full_stage_names %>%
-    sparklyr:::ml_expand_params() %>%
-    sparklyr:::ml_build_param_maps()
+    purrr::map(purrr::cross) %>%
+    purrr::cross()
 
   list_sorter <- function(l) {
     l[sort(names(l))]
@@ -62,6 +79,7 @@ test_that("ml_cross_validator() works correctly", {
 })
 
 test_that("we can cross validate a logistic regression with xval", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
 
@@ -82,7 +100,7 @@ test_that("we can cross validate a logistic regression with xval", {
       iris_tbl, estimator = pipeline, estimator_param_maps = bad_grid,
       evaluator = ml_multiclass_classification_evaluator(sc),
       seed = 1, uid = "cv_1"),
-    "The name logistic matches no stages in pipeline"
+    "The name logistic matches no stages in the pipeline"
   )
 
   grid <- list(
@@ -111,41 +129,8 @@ test_that("we can cross validate a logistic regression with xval", {
   expect_identical(length(unlist(sub_models, recursive = FALSE)), 12L)
 })
 
-test_that("we can train a regression with train-validation-split", {
-  test_requires_version("2.3.0")
-  iris_tbl <- testthat_tbl("iris")
-
-  pipeline <- ml_pipeline(sc) %>%
-    ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl) %>%
-    ml_logistic_regression()
-
-  grid <- list(
-    logistic = list(
-      reg_param = c(0, 0.01),
-      elastic_net_param = c(0, 0.01)
-    )
-  )
-  tvsm <- ml_train_validation_split(
-    iris_tbl, estimator = pipeline, estimator_param_maps = grid,
-    evaluator = ml_multiclass_classification_evaluator(sc),
-    collect_sub_models = TRUE,
-    seed = 1)
-
-  expect_identical(names(tvsm$validation_metrics_df),
-                   c("f1", "elastic_net_param_1", "reg_param_1"))
-  expect_identical(nrow(tvsm$validation_metrics_df), 4L)
-  summary_string <- capture.output(summary(tvsm)) %>%
-    paste0(collapse = "\n")
-
-  expect_match(summary_string,
-               "0\\.75/0\\.25 train-validation split")
-
-  sub_models <- ml_sub_models(tvsm)
-  expect_identical(length(sub_models), 4L)
-  expect_identical(class(sub_models[[1]])[[1]], "ml_pipeline_model")
-})
-
 test_that("ml_validation_metrics() works properly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
 
@@ -193,4 +178,52 @@ test_that("ml_validation_metrics() works properly", {
   )
 
   expect_identical(nrow(tvs_metrics), 4L)
+})
+
+test_that("cross validator print methods", {
+  sc <- testthat_spark_connection()
+  lr <- ml_logistic_regression(sc, uid = "logistic")
+  param_maps <- list(
+    logistic = list(
+      reg_param = c(0.1, 0.01),
+      elastic_net_param = c(0.1, 0.2)
+    )
+  )
+  evaluator <- ml_binary_classification_evaluator(sc, uid = "bineval")
+
+  cv1 <- ml_cross_validator(sc, uid = "cv")
+
+  cv2 <- ml_cross_validator(
+    sc,
+    estimator = lr,
+    estimator_param_maps = param_maps,
+    evaluator = evaluator,
+    uid = "cv"
+  )
+
+  cv3 <- ml_cross_validator(
+    sc,
+    estimator = lr,
+    estimator_param_maps = param_maps,
+    uid = "cv"
+  )
+
+  expect_known_output(
+    cv1,
+    output_file("print/cv1.txt"),
+    print = TRUE
+  )
+
+  expect_known_output(
+    cv2,
+    output_file("print/cv2.txt"),
+    print = TRUE
+  )
+
+  expect_known_output(
+    cv3,
+    output_file("print/cv3.txt"),
+    print = TRUE
+  )
+
 })

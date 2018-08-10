@@ -4,8 +4,8 @@
 \alias{ft_regex_tokenizer}
 \title{Feature Transformation -- RegexTokenizer (Transformer)}
 \usage{
-ft_regex_tokenizer(x, input_col, output_col, gaps = TRUE,
-  min_token_length = 1L, pattern = "\\\\s+", to_lower_case = TRUE,
+ft_regex_tokenizer(x, input_col = NULL, output_col = NULL, gaps = TRUE,
+  min_token_length = 1, pattern = "\\\\s+", to_lower_case = TRUE,
   uid = random_string("regex_tokenizer_"), ...)
 }
 \arguments{

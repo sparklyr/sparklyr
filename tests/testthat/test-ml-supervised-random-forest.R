@@ -1,63 +1,8 @@
 context("ml supervised - random forest")
-sc <- testthat_spark_connection()
-
-iris_tbl <- testthat_tbl("iris")
-
-test_that("ml_random_forest_classifier() parses params correctly", {
-  args <- list(
-    x = sc, label_col = "col", features_col = "fcol", prediction_col = "pcol",
-    probability_col = "prcol", raw_prediction_col = "rpcol", impurity = "entropy",
-    feature_subset_strategy = "onethird",
-    checkpoint_interval = 9, max_bins = 30, max_depth = 6,
-    num_trees = 19, min_info_gain = 0.01, min_instances_per_node = 2,
-    subsampling_rate = 0.9, seed = 42,
-    thresholds = c(0.1, 0.3, 0.6), cache_node_ids = TRUE,
-    max_memory_in_mb = 128
-  )
-  rfc <- do.call(ml_random_forest_classifier, args)
-  expect_equal(ml_params(rfc, names(args)[-1]), args[-1])
-})
-
-test_that("ml_random_forest_regressor() parses params correctly", {
-  args <- list(
-    x = sc, label_col = "col", features_col = "fcol", prediction_col = "pcol",
-    impurity = "variance", feature_subset_strategy = "onethird",
-    checkpoint_interval = 9, max_bins = 30, max_depth = 6,
-    num_trees = 19, min_info_gain = 0.01, min_instances_per_node = 2,
-    subsampling_rate = 0.9, seed = 42, cache_node_ids = TRUE,
-    max_memory_in_mb = 128
-  )
-  rfr <- do.call(ml_random_forest_regressor, args)
-  expect_equal(ml_params(rfr, names(args)[-1]), args[-1])
-})
-
-test_that("ml_random_forest_classifier() default params are correct", {
-  predictor <- ml_pipeline(sc) %>%
-    ml_random_forest_classifier() %>%
-    ml_stage(1)
-
-  args <- get_default_args(ml_random_forest_classifier,
-                           c("x", "uid", "...", "thresholds", "seed"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
-})
-
-test_that("ml_random_forest_regressor() default params are correct", {
-  predictor <- ml_pipeline(sc) %>%
-    ml_random_forest_regressor() %>%
-    ml_stage(1)
-
-  args <- get_default_args(ml_random_forest_regressor,
-                           c("x", "uid", "...", "seed"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
-})
 
 test_that("rf runs successfully when all args specified", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   expect_error(
     iris_tbl %>%
       ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
@@ -69,6 +14,8 @@ test_that("rf runs successfully when all args specified", {
 })
 
 test_that("col.sample.rate maps to correct strategy", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   if (spark_version(sc) >= "2.0.0") skip("not applicable to 2.0+")
   expect_message(
     iris_tbl %>%
@@ -86,6 +33,8 @@ test_that("col.sample.rate maps to correct strategy", {
 })
 
 test_that("col.sample.rate argument is respected", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   if (spark_version(sc) < "2.0") skip("not applicable to <2.0")
   rf <- ml_random_forest(iris_tbl, Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
                          col.sample.rate = 0.001)
@@ -95,7 +44,8 @@ test_that("col.sample.rate argument is respected", {
 })
 
 test_that("thresholds parameter behaves as expected", {
-  test_requires("dplyr")
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   most_predicted_label <- function(x) x %>%
     count(prediction) %>%
     arrange(desc(n)) %>%
@@ -122,6 +72,8 @@ test_that("thresholds parameter behaves as expected", {
 })
 
 test_that("error for thresholds with wrong length", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   if (spark_version(sc) < "2.1.0") skip("threshold length checking implemented in 2.1.0")
   expect_error(
     iris_tbl %>%
@@ -132,31 +84,37 @@ test_that("error for thresholds with wrong length", {
 })
 
 test_that("error for col.sample.rate value out of range", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   expect_error(
     iris_tbl %>%
       ml_random_forest(Species ~ Sepal_Width, type = "classification",
                        col.sample.rate = 1.01),
-    "'col.sample.rate' must be in \\(0, 1]"
+    "`col.sample.rate` must be in \\(0, 1]\\."
   )
 })
 
 test_that("error for bad impurity specification", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   expect_error(
     iris_tbl %>%
       ml_random_forest(Species ~ Sepal_Width, type = "classification",
                        impurity = "variance"),
-    "'impurity' must be 'gini' or 'entropy' for classification"
+    "`impurity` must be \"gini\" or \"entropy\" for classification\\."
   )
 
   expect_error(
     iris_tbl %>%
       ml_random_forest(Sepal_Length ~ Sepal_Width, type = "regression",
                        impurity = "gini"),
-    "'impurity' must be 'variance' for regression"
+    "`impurity` must be \"variance\" for regression\\."
   )
 })
 
 test_that("random seed setting works", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   model_string <- function(x) spark_jobj(x$model) %>%
     invoke("toDebugString") %>%
     strsplit("\n") %>%
@@ -175,6 +133,8 @@ test_that("random seed setting works", {
 })
 
 test_that("one-tree forest agrees with ml_decision_tree()", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   rf <- iris_tbl %>%
     ml_random_forest(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                               type = "regression",
@@ -193,6 +153,8 @@ test_that("one-tree forest agrees with ml_decision_tree()", {
 })
 
 test_that("checkpointing works for rf", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   spark_set_checkpoint_dir(sc, tempdir())
   expect_error(
     iris_tbl %>%
@@ -204,12 +166,16 @@ test_that("checkpointing works for rf", {
 })
 
 test_that("ml_random_forest() provides informative error for bad response_col", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   expect_error(
     ml_random_forest(iris_tbl, Sepal.Length ~ Sepal.Width),
-    "Sepal.Length is not a column in the input dataset")
+    "`Sepal.Length` is not a column in the input dataset\\.")
 })
 
 test_that("residuals() call on ml_model_random_forest_regression errors", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
   expect_error(
     ml_random_forest(iris_tbl, Sepal_Length ~ Sepal_Width) %>% residuals(),
     "'residuals\\(\\)' not supported for ml_model_random_forest_regression"
@@ -217,6 +183,7 @@ test_that("residuals() call on ml_model_random_forest_regression errors", {
 })
 
 test_that("ml_random_forest() supports response-features syntax", {
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   expect_error(
     ml_random_forest(iris_tbl,

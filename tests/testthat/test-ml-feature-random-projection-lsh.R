@@ -1,26 +1,45 @@
 context("ml feature bucketed random projection lsh")
 
-sc <- testthat_spark_connection()
+test_that("ft_bucketed_random_projection_lsh() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_bucketed_random_projection_lsh)
+})
 
-dfA <- data.frame(
-  id = 0:3,
-  V1 = c(1, 1, -1, -1),
-  V2 = c(1, -1, -1, 1)
-)
-
-dfB <- data.frame(
-  id = 4:7,
-  V1 = c(1, -1, 0, 0),
-  V2 = c(0, 0, 1, -1)
-)
-
-dfA_tbl <- sdf_copy_to(sc, dfA, overwrite = TRUE) %>%
-  ft_vector_assembler(c("V1", "V2"), "features")
-dfB_tbl <- sdf_copy_to(sc, dfB, overwrite = TRUE) %>%
-  ft_vector_assembler(c("V1", "V2"), "features")
+test_that("ft_bucketed_random_projection_lsh() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "x",
+    output_col = "y",
+    bucket_length = 4,
+    num_hash_tables = 2,
+    seed = 42
+  )
+  test_param_setting(sc, ft_bucketed_random_projection_lsh, test_args)
+})
 
 test_that("ft_bucketed_random_projection_lsh() works properly", {
   test_requires_version("2.1.0", "LSH requires 2.1+")
+  sc <- testthat_spark_connection()
+
+  dfA <- data.frame(
+    id = 0:3,
+    V1 = c(1, 1, -1, -1),
+    V2 = c(1, -1, -1, 1)
+  )
+
+  dfB <- data.frame(
+    id = 4:7,
+    V1 = c(1, -1, 0, 0),
+    V2 = c(0, 0, 1, -1)
+  )
+
+  dfA_tbl <- sdf_copy_to(sc, dfA, overwrite = TRUE) %>%
+    ft_vector_assembler(c("V1", "V2"), "features")
+  dfB_tbl <- sdf_copy_to(sc, dfB, overwrite = TRUE) %>%
+    ft_vector_assembler(c("V1", "V2"), "features")
+
   lsh <- ft_bucketed_random_projection_lsh(
     sc, input_col = "features", output_col = "hashes",
     bucket_length = 2, num_hash_tables = 3, dataset = dfA_tbl, seed = 666)
@@ -47,15 +66,4 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
       dplyr::pull(joined_pairs),
     list(c(0, 4), c(0, 6), c(1, 4), c(1, 7), c(2, 5), c(2, 7), c(3, 5), c(3, 6))
   )
-})
-
-
-test_that("ft_bucketed_random_projection_lsh() param setting", {
-  test_requires_version("2.1.0", "LSH requires 2.1+")
-  args <- list(
-    x = sc, input_col = "input", output_col = "output",
-    bucket_length = 3, num_hash_tables = 2, seed = 56
-  )
-  estimator <- do.call(ft_bucketed_random_projection_lsh, args)
-  expect_equal(ml_params(estimator, names(args)[-1]), args[-1])
 })

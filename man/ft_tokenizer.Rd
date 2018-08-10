@@ -4,7 +4,8 @@
 \alias{ft_tokenizer}
 \title{Feature Transformation -- Tokenizer (Transformer)}
 \usage{
-ft_tokenizer(x, input_col, output_col, uid = random_string("tokenizer_"), ...)
+ft_tokenizer(x, input_col = NULL, output_col = NULL,
+  uid = random_string("tokenizer_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

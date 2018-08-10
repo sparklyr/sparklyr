@@ -1,9 +1,28 @@
-context("ml feature (estimators)")
+context("ml feature count vectorizer")
 
-sc <- testthat_spark_connection()
+test_that("ft_count_vectorizer() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_count_vectorizer)
+})
+
+test_that("ft_count_vectorizer() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "foo",
+    output_col = "bar",
+    binary = TRUE,
+    min_df = 2,
+    min_tf = 2,
+    vocab_size = 2^10
+  )
+  test_param_setting(sc, ft_count_vectorizer, test_args)
+})
 
 test_that("ft_count_vectorizer() works", {
   test_requires_version("2.0.0", "features require Spark 2.0+")
+  sc <- testthat_spark_connection()
   df <- data_frame(text = c("a b c", "a a a b b c"))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
@@ -48,23 +67,4 @@ test_that("ft_count_vectorizer() works", {
        min_tf = 2L,
        vocab_size = 1024L)
   )
-})
-
-test_that("ft_string_indexer works", {
-
-  args <- list(
-    x = sc,
-    input_col = "in",
-    output_col = "out")
-
-  if (spark_version(sc) >= "2.1.0")
-    args <- c(args, handle_invalid = "skip")
-
-  si <- do.call(ft_string_indexer, args)
-
-  expect_equal(
-    ml_params(si, names(args)[-1]),
-    args[-1])
-
-  expect_true(is_ml_estimator(si))
 })

@@ -10,51 +10,67 @@
 #' @param degree The polynomial degree to expand, which should be greater
 #'   than equal to 1. A value of 1 means no expansion. Default: 2
 #' @export
-ft_polynomial_expansion <- function(x, input_col, output_col, degree = 2L, uid = random_string("polynomial_expansion_"), ...) {
+ft_polynomial_expansion <- function(x, input_col = NULL, output_col = NULL,
+                                    degree = 2, uid = random_string("polynomial_expansion_"), ...) {
   UseMethod("ft_polynomial_expansion")
 }
 
 #' @export
-ft_polynomial_expansion.spark_connection <- function(
-  x, input_col, output_col, degree = 2L,
-  uid = random_string("polynomial_expansion_"), ...
-) {
+ft_polynomial_expansion.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                                     degree = 2, uid = random_string("polynomial_expansion_"), ...) {
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.PolynomialExpansion",
-                             input_col, output_col, uid) %>%
-    invoke("setDegree", degree)
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    degree = degree,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_polynomial_expansion()
+
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.PolynomialExpansion",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
+    invoke("setDegree", .args[["degree"]])
 
   new_ml_polynomial_expansion(jobj)
 }
 
 #' @export
-ft_polynomial_expansion.ml_pipeline <- function(
-  x, input_col, output_col, degree = 2L,
-  uid = random_string("polynomial_expansion_"), ...
-  ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+ft_polynomial_expansion.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                                degree = 2, uid = random_string("polynomial_expansion_"), ...) {
+  stage <- ft_polynomial_expansion.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    degree = degree,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_polynomial_expansion.tbl_spark <- function(
-  x, input_col, output_col, degree = 2L,
-  uid = random_string("polynomial_expansion_"), ...
-  ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+ft_polynomial_expansion.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                              degree = 2, uid = random_string("polynomial_expansion_"), ...) {
+  stage <- ft_polynomial_expansion.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    degree = degree,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_polynomial_expansion <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_polynomial_expansion")
 }
 
-ml_validator_polynomial_expansion <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      degree <- ensure_scalar_integer(degree)
-      if (degree < 1) stop("degree should be greater than 1")
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_polynomial_expansion <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["degree"]] <- cast_scalar_integer(.args[["degree"]])
+  if (.args[["degree"]] < 1) stop("`degree` must be greater than 1.", call. = FALSE)
+  .args
 }

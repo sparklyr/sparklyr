@@ -1,32 +1,27 @@
 context("ml regression - isotonic regression")
 
-sc <- testthat_spark_connection()
-
-test_that("ml_isotonic_regression param setting", {
-  args <- list(
-    x = sc, feature_index = 1, isotonic = FALSE, weight_col = "wcol",
-    label_col = "col", features_col = "fcol", prediction_col = "pcol"
-  )
-  predictor <- do.call(ml_isotonic_regression, args)
-  expect_equal(ml_params(predictor, names(args)[-1]), args[-1])
+test_that("ml_isotonic_regression() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_isotonic_regression)
 })
 
-test_that("ml_isotonic_regression() default params are correct", {
-
-  predictor <- ml_pipeline(sc) %>%
-    ml_isotonic_regression() %>%
-    ml_stage(1)
-
-  args <- get_default_args(ml_isotonic_regression,
-                           c("x", "uid", "...", "weight_col"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
+test_that("ml_isotonic_regression() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    feature_index = 1,
+    isotonic = FALSE,
+    weight_col = "wcol",
+    features_col = "fcol",
+    label_col = "lalefa",
+    prediction_col = "wefwef"
+  )
+  test_param_setting(sc, ml_isotonic_regression, test_args)
 })
 
 test_that("ml_isotonic_regression() works properly", {
-  test_requires("dplyr")
+  sc <- testthat_spark_connection()
   df <- data.frame(
     x = 1:9,
     y = c(1, 2, 3, 1, 6, 17, 16, 17, 18)
@@ -39,12 +34,12 @@ test_that("ml_isotonic_regression() works properly", {
   )
 
   expect_equal(
-    ir$model$boundaries,
+    ir$model$boundaries(),
     c(1, 2, 4, 5, 6, 7, 8, 9)
   )
 
   expect_equal(
-    ir$model$predictions,
+    ir$model$predictions(),
     c(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0)
   )
 })

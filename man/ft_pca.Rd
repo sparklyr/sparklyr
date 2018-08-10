@@ -5,7 +5,7 @@
 \alias{ml_pca}
 \title{Feature Transformation -- PCA (Estimator)}
 \usage{
-ft_pca(x, input_col, output_col, k, dataset = NULL,
+ft_pca(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
   uid = random_string("pca_"), ...)
 
 ml_pca(x, features = tbl_vars(x), k = length(features), pc_prefix = "PC",

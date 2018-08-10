@@ -28,25 +28,32 @@
 #' }
 #'
 #' @export
-ft_standard_scaler <- function(
-  x, input_col, output_col,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
-  uid = random_string("standard_scaler_"), ...) {
+ft_standard_scaler <- function(x, input_col = NULL, output_col = NULL,
+                               with_mean = FALSE, with_std = TRUE, dataset = NULL,
+                               uid = random_string("standard_scaler_"), ...) {
   UseMethod("ft_standard_scaler")
 }
 
 #' @export
-ft_standard_scaler.spark_connection <- function(
-  x, input_col, output_col,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
-  uid = random_string("standard_scaler_"), ...) {
+ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                                with_mean = FALSE, with_std = TRUE, dataset = NULL,
+                                                uid = random_string("standard_scaler_"), ...) {
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_standard_scaler()
 
-  ml_ratify_args()
-
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StandardScaler",
-                                  input_col, output_col, uid) %>%
-    invoke("setWithMean", with_mean) %>%
-    invoke("setWithStd", with_std) %>%
+  estimator <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.StandardScaler",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    invoke("setWithMean", .args[["with_mean"]]) %>%
+    invoke("setWithStd", .args[["with_std"]]) %>%
     new_ml_standard_scaler()
 
   if (is.null(dataset))
@@ -56,26 +63,37 @@ ft_standard_scaler.spark_connection <- function(
 }
 
 #' @export
-ft_standard_scaler.ml_pipeline <- function(
-  x, input_col, output_col,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
-  uid = random_string("standard_scaler_"), ...
-) {
-
-  stage <- ml_new_stage_modified_args()
+ft_standard_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                           with_mean = FALSE, with_std = TRUE, dataset = NULL,
+                                           uid = random_string("standard_scaler_"), ...) {
+  stage <- ft_standard_scaler.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
 
 }
 
 #' @export
-ft_standard_scaler.tbl_spark <- function(
-  x, input_col, output_col,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
-  uid = random_string("standard_scaler_"), ...
-) {
-  dots <- rlang::dots_list(...)
-
-  stage <- ml_new_stage_modified_args()
+ft_standard_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                         with_mean = FALSE, with_std = TRUE, dataset = NULL,
+                                         uid = random_string("standard_scaler_"), ...) {
+  stage <- ft_standard_scaler.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    dataset = dataset,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -95,11 +113,9 @@ new_ml_standard_scaler_model <- function(jobj) {
     subclass = "ml_standard_scaler_model")
 }
 
-ml_validator_standard_scaler <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      with_mean <- ensure_scalar_boolean(with_mean)
-      with_std <- ensure_scalar_boolean(with_std)
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_standard_scaler <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["with_mean"]] <- cast_scalar_logical(.args[["with_mean"]])
+  .args[["with_std"]] <- cast_scalar_logical(.args[["with_std"]])
+  .args
 }

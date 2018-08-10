@@ -31,150 +31,154 @@
 #' ml_regression_evaluator(pred, label_col = "mpg")
 #' }
 #' @export
-ml_linear_regression <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  elastic_net_param = 0,
-  reg_param = 0,
-  max_iter = 100L,
-  weight_col = NULL,
-  loss = "squaredError",
-  solver = "auto",
-  standardization = TRUE,
-  tol = 1e-6,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  uid = random_string("linear_regression_"), ...
-) {
+ml_linear_regression <- function(x, formula = NULL, fit_intercept = TRUE,
+                                 elastic_net_param = 0, reg_param = 0,
+                                 max_iter = 100, weight_col = NULL,
+                                 loss = "squaredError", solver = "auto",
+                                 standardization = TRUE, tol = 1e-6,
+                                 features_col = "features", label_col = "label",
+                                 prediction_col = "prediction",
+                                 uid = random_string("linear_regression_"), ...) {
   UseMethod("ml_linear_regression")
 }
 
 #' @export
-ml_linear_regression.spark_connection <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  elastic_net_param = 0,
-  reg_param = 0,
-  max_iter = 100L,
-  weight_col = NULL,
-  loss = "squaredError",
-  solver = "auto",
-  standardization = TRUE,
-  tol = 1e-6,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  uid = random_string("linear_regression_"), ...) {
+ml_linear_regression.spark_connection <- function(x, formula = NULL, fit_intercept = TRUE,
+                                                  elastic_net_param = 0, reg_param = 0,
+                                                  max_iter = 100, weight_col = NULL,
+                                                  loss = "squaredError", solver = "auto",
+                                                  standardization = TRUE, tol = 1e-6,
+                                                  features_col = "features", label_col = "label",
+                                                  prediction_col = "prediction",
+                                                  uid = random_string("linear_regression_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    fit_intercept = fit_intercept,
+    elastic_net_param = elastic_net_param,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    weight_col = weight_col,
+    loss = loss,
+    solver = solver,
+    standardization = standardization,
+    tol = tol,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_linear_regression()
 
   jobj <- ml_new_regressor(
     x, "org.apache.spark.ml.regression.LinearRegression", uid,
-    features_col, label_col, prediction_col
+    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
   ) %>%
-    invoke("setElasticNetParam", elastic_net_param) %>%
-    invoke("setFitIntercept", fit_intercept) %>%
-    invoke("setRegParam", reg_param) %>%
-    invoke("setMaxIter", max_iter) %>%
-    invoke("setSolver", solver) %>%
-    invoke("setStandardization", standardization) %>%
-    invoke("setTol", tol) %>%
-    jobj_set_param("setLoss", loss,
-                   "squaredError", "2.3.0")
-
-  if (!is.null(weight_col))
-    jobj <- invoke(jobj, "setWeightCol", weight_col)
+    invoke("setElasticNetParam", .args[["elastic_net_param"]]) %>%
+    invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
+    invoke("setRegParam", .args[["reg_param"]]) %>%
+    invoke("setMaxIter", .args[["max_iter"]]) %>%
+    invoke("setSolver", .args[["solver"]]) %>%
+    invoke("setStandardization", .args[["standardization"]]) %>%
+    invoke("setTol", .args[["tol"]]) %>%
+    maybe_set_param("setLoss", .args[["loss"]], "2.3.0", "squaredError") %>%
+    maybe_set_param("setWeightCol", .args[["weight_col"]])
 
   new_ml_linear_regression(jobj)
 }
 
 #' @export
-ml_linear_regression.ml_pipeline <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  elastic_net_param = 0,
-  reg_param = 0,
-  max_iter = 100L,
-  weight_col = NULL,
-  loss = "squaredError",
-  solver = "auto",
-  standardization = TRUE,
-  tol = 1e-6,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  uid = random_string("linear_regression_"), ...) {
-
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+ml_linear_regression.ml_pipeline <- function(x, formula = NULL, fit_intercept = TRUE,
+                                             elastic_net_param = 0, reg_param = 0,
+                                             max_iter = 100, weight_col = NULL,
+                                             loss = "squaredError", solver = "auto",
+                                             standardization = TRUE, tol = 1e-6,
+                                             features_col = "features", label_col = "label",
+                                             prediction_col = "prediction",
+                                             uid = random_string("linear_regression_"), ...) {
+  stage <- ml_linear_regression.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    fit_intercept = fit_intercept,
+    elastic_net_param = elastic_net_param,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    weight_col = weight_col,
+    loss = loss,
+    solver = solver,
+    standardization = standardization,
+    tol = tol,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ml_linear_regression.tbl_spark <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  elastic_net_param = 0,
-  reg_param = 0,
-  max_iter = 100L,
-  weight_col = NULL,
-  loss = "squaredError",
-  solver = "auto",
-  standardization = TRUE,
-  tol = 1e-6,
-  features_col = "features",
-  label_col = "label",
-  prediction_col = "prediction",
-  uid = random_string("linear_regression_"),
-  response = NULL,
-  features = NULL,...) {
-
-  predictor <- ml_new_stage_modified_args()
-
+ml_linear_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE,
+                                           elastic_net_param = 0, reg_param = 0,
+                                           max_iter = 100, weight_col = NULL,
+                                           loss = "squaredError", solver = "auto",
+                                           standardization = TRUE, tol = 1e-6,
+                                           features_col = "features", label_col = "label",
+                                           prediction_col = "prediction",
+                                           uid = random_string("linear_regression_"),
+                                           response = NULL, features = NULL, ...) {
   ml_formula_transformation()
 
+  stage <- ml_linear_regression.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    fit_intercept = fit_intercept,
+    elastic_net_param = elastic_net_param,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    weight_col = weight_col,
+    loss = loss,
+    solver = solver,
+    standardization = standardization,
+    tol = tol,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    ...
+  )
+
   if (is.null(formula)) {
-    predictor %>%
+    stage %>%
       ml_fit(x)
   } else {
     ml_generate_ml_model(
-      x, predictor, formula, features_col, label_col,
+      x, stage, formula, features_col, label_col,
       "regression", new_ml_model_linear_regression
     )
   }
 }
 
 # Validator
-ml_validator_linear_regression <- function(args, nms) {
-  old_new_mapping <- list(
+ml_validator_linear_regression <- function(.args) {
+  .args <- ml_backwards_compatibility(.args, list(
     intercept = "fit_intercept",
     alpha = "elastic_net_param",
     lambda = "reg_param",
     weights.column = "weight_col",
     iter.max = "max_iter",
     max.iter = "max_iter"
-  )
+  ))
 
-  args %>%
-    ml_validate_args({
-      elastic_net_param <- ensure_scalar_double(elastic_net_param)
-      reg_param <- ensure_scalar_double(reg_param)
-      max_iter <- ensure_scalar_integer(max_iter)
-      fit_intercept <- ensure_scalar_boolean(fit_intercept)
-      standardization <- ensure_scalar_boolean(standardization)
-      tol <- ensure_scalar_double(tol)
-      solver <- rlang::arg_match(solver, c("auto", "l-bfgs", "normal"))
-      if (!is.null(weight_col))
-        weight_col <- ensure_scalar_character(weight_col)
-    }, old_new_mapping) %>%
-    ml_extract_args(nms, old_new_mapping)
+  .args[["elastic_net_param"]] <- cast_scalar_double(.args[["elastic_net_param"]])
+  .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
+  .args[["standardization"]] <- cast_scalar_logical(.args[["standardization"]])
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["solver"]] <- cast_choice(.args[["solver"]], c("auto", "l-bfgs", "normal"))
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
+  .args
 }
-
-# Constructors
 
 new_ml_linear_regression <- function(jobj) {
   new_ml_predictor(jobj, subclass = "ml_linear_regression")
@@ -198,99 +202,36 @@ new_ml_linear_regression_model <- function(jobj) {
     subclass = "ml_linear_regression_model")
 }
 
-new_ml_summary_linear_regression_model <- function(
-  jobj, fit_intercept) {
+new_ml_summary_linear_regression_model <- function(jobj, fit_intercept) {
   arrange_stats <- make_stats_arranger(fit_intercept)
 
   new_ml_summary(
     jobj,
-    coefficient_standard_errors = try_null(invoke(jobj, "coefficientStandardErrors")) %>%
+    # `lazy val coefficientStandardErrors`
+    coefficient_standard_errors = function() try_null(invoke(jobj, "coefficientStandardErrors")) %>%
       arrange_stats(),
     degrees_of_freedom = if (spark_version(spark_connection(jobj)) >= "2.2.0")
       invoke(jobj, "degreesOfFreedom") else NULL,
-    deviance_residuals = invoke(jobj, "devianceResiduals"),
+    # `lazy val devianceResiduals`
+    deviance_residuals = function() invoke(jobj, "devianceResiduals"),
     explained_variance = invoke(jobj, "explainedVariance"),
     features_col = invoke(jobj, "featuresCol"),
     label_col = invoke(jobj, "labelCol"),
     mean_absolute_error = invoke(jobj, "meanAbsoluteError"),
     mean_squared_error = invoke(jobj, "meanSquaredError"),
-    num_instances = invoke(jobj, "numInstances"),
+    # `lazy val numInstances`
+    num_instances = function() invoke(jobj, "numInstances"),
+    # `lazy val pValues`
     p_values = try_null(invoke(jobj, "pValues")) %>%
       arrange_stats(),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     r2 = invoke(jobj, "r2"),
+    # `lazy val residuals`
     residuals = invoke(jobj, "residuals") %>% sdf_register(),
     root_mean_squared_error = invoke(jobj, "rootMeanSquaredError"),
+    # `lazy val tValues`
     t_values = try_null(invoke(jobj, "tValues")) %>%
       arrange_stats(),
     subclass = "ml_summary_linear_regression")
 }
-
-new_ml_model_linear_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
-
-  jobj <- spark_jobj(model)
-  sc <- spark_connection(model)
-
-
-  coefficients <- model$coefficients
-  names(coefficients) <- feature_names
-
-  coefficients <- if (ml_param(model, "fit_intercept"))
-    rlang::set_names(
-      c(invoke(jobj, "intercept"), model$coefficients),
-      c("(Intercept)", feature_names))
-
-  summary <- model$summary
-
-  new_ml_model_regression(
-    pipeline, pipeline_model, model, dataset, formula,
-    coefficients = coefficients,
-    summary = summary,
-    subclass = "ml_model_linear_regression",
-    .features = feature_names
-  )
-}
-
-# Generic implementations
-
-#' @export
-print.ml_model_linear_regression <- function(x, ...) {
-  cat("Formula: ", x$formula, "\n\n", sep = "")
-  cat("Coefficients:", sep = "\n")
-  print(x$coefficients)
-}
-
-#' @export
-summary.ml_model_linear_regression <- function(object, ...) {
-  ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
-  print_newline()
-  ml_model_print_coefficients_detailed(object)
-  print_newline()
-
-  cat(paste("R-Squared:", signif(object$summary$r2, 4)), sep = "\n")
-  cat(paste("Root Mean Squared Error:",
-            signif(object$summary$root_mean_squared_error, 4)), sep = "\n")
-}
-
-#' @export
-residuals.ml_model_linear_regression <- function(object, ...) {
-
-  residuals <- object$summary$residuals
-
-  sdf_read_column(residuals, "residuals")
-
-}
-
-#' @export
-#' @rdname sdf_residuals
-sdf_residuals.ml_model_linear_regression <- function(
-  object, ...) {
-
-  residuals <- object$summary$residuals
-
-  ml_model_data(object) %>%
-    sdf_fast_bind_cols(residuals)
-}
-

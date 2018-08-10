@@ -77,30 +77,15 @@ ml_short_type <- function(x) {
   jobj_class(spark_jobj(x))[1]
 }
 
-jobj_set_param <- function(jobj, method, param, default, min_version) {
-  ver <- jobj %>%
-    spark_connection() %>%
-    spark_version()
-
-  if (ver < min_version) {
-    if (!identical(param, default))
-      stop(paste0("Param '", deparse(substitute(param)),
-                  "' is only available for Spark ", min_version, " and later"))
-    else
-      jobj
-  } else {
-    jobj %>%
-      invoke(method, param)
-  }
-}
-
 spark_dense_matrix <- function(sc, mat) {
+  if (is.null(mat)) return(mat)
   invoke_new(
     sc, "org.apache.spark.ml.linalg.DenseMatrix", dim(mat)[1L], dim(mat)[2L],
     as.list(mat))
 }
 
 spark_dense_vector <- function(sc, vec) {
+  if (is.null(vec)) return(vec)
   invoke_static(sc,  "org.apache.spark.ml.linalg.Vectors", "dense",
                 as.list(vec))
 }

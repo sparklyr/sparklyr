@@ -8,12 +8,12 @@
 \alias{ml_gbt_regressor}
 \title{Spark ML -- Gradient Boosted Trees}
 \usage{
-ml_gbt_classifier(x, formula = NULL, max_iter = 20L, max_depth = 5L,
+ml_gbt_classifier(x, formula = NULL, max_iter = 20, max_depth = 5,
   step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
-  min_instances_per_node = 1L, max_bins = 32L, min_info_gain = 0,
+  min_instances_per_node = 1L, max_bins = 32, min_info_gain = 0,
   loss_type = "logistic", seed = NULL, thresholds = NULL,
-  checkpoint_interval = 10L, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
+  checkpoint_interval = 10, cache_node_ids = FALSE,
+  max_memory_in_mb = 256, features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("gbt_classifier_"), ...)
@@ -21,20 +21,20 @@ ml_gbt_classifier(x, formula = NULL, max_iter = 20L, max_depth = 5L,
 ml_gradient_boosted_trees(x, formula = NULL, type = c("auto", "regression",
   "classification"), features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
-  raw_prediction_col = "rawPrediction", checkpoint_interval = 10L,
-  loss_type = c("auto", "logistic", "squared", "absolute"), max_bins = 32L,
-  max_depth = 5L, max_iter = 20L, min_info_gain = 0,
-  min_instances_per_node = 1L, step_size = 0.1, subsampling_rate = 1,
+  raw_prediction_col = "rawPrediction", checkpoint_interval = 10,
+  loss_type = c("auto", "logistic", "squared", "absolute"), max_bins = 32,
+  max_depth = 5, max_iter = 20L, min_info_gain = 0,
+  min_instances_per_node = 1, step_size = 0.1, subsampling_rate = 1,
   feature_subset_strategy = "auto", seed = NULL, thresholds = NULL,
-  cache_node_ids = FALSE, max_memory_in_mb = 256L,
+  cache_node_ids = FALSE, max_memory_in_mb = 256,
   uid = random_string("gradient_boosted_trees_"), response = NULL,
   features = NULL, ...)
 
-ml_gbt_regressor(x, formula = NULL, max_iter = 20L, max_depth = 5L,
+ml_gbt_regressor(x, formula = NULL, max_iter = 20, max_depth = 5,
   step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
-  min_instances_per_node = 1L, max_bins = 32L, min_info_gain = 0,
-  loss_type = "squared", seed = NULL, checkpoint_interval = 10L,
-  cache_node_ids = FALSE, max_memory_in_mb = 256L,
+  min_instances_per_node = 1, max_bins = 32, min_info_gain = 0,
+  loss_type = "squared", seed = NULL, checkpoint_interval = 10,
+  cache_node_ids = FALSE, max_memory_in_mb = 256,
   features_col = "features", label_col = "label",
   prediction_col = "prediction", uid = random_string("gbt_regressor_"), ...)
 }

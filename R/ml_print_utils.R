@@ -26,8 +26,15 @@ ml_print_params <- function(x) {
   out_names <- ml_param_map(x) %>%
     names() %>%
     grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
-  for (param in sort(out_names))
-    cat(paste0("  ", param, ": ", ml_param(x, param), "\n"))
+  for (param_name in sort(out_names)) {
+    value <- ml_param(x, param_name)
+    param_output <- switch(
+      class(value)[[1]],
+      spark_jobj = paste0("jobj of class ", jobj_class(value)[[1]]),
+      paste0(value, collapse = ", ")
+    )
+    cat(paste0("  ", param_name, ": ", param_output, "\n"))
+  }
 }
 
 ml_print_transformer_info <- function(x) {

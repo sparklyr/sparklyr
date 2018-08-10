@@ -1,70 +1,37 @@
 context("ml regression - glm")
 
-sc <- testthat_spark_connection()
-
-test_that("ml_generalized_linear_regression() sets params correctly", {
-  test_requires_version("2.3.0", "offset supported in spark 2.3+")
-  glr <- ml_generalized_linear_regression(
-    sc,
-    family = "binomial",
-    link = "logit",
-    features_col = "fcol",
-    label_col = "lcol",
-    fit_intercept = FALSE,
-    link_prediction_col = "lpcol",
-    reg_param = 0.1,
-    max_iter = 50L,
-    weight_col = "wcol",
-    prediction_col = "pcol",
-    offset_col = "ocol",
-    tol = 1e-5
-  )
-  expect_equal(
-    ml_params(glr, list(
-      "family", "link", "features_col", "label_col", "fit_intercept",
-      "link_prediction_col", "reg_param", "max_iter", "weight_col",
-      "prediction_col", "offset_col", "tol"
-    )),
-    list(
-      family = "binomial",
-      link = "logit",
-      features_col = "fcol",
-      label_col = "lcol",
-      fit_intercept = FALSE,
-      link_prediction_col = "lpcol",
-      reg_param = 0.1,
-      max_iter = 50L,
-      weight_col = "wcol",
-      prediction_col = "pcol",
-      offset_col = "ocol",
-      tol = 1e-5
-    )
-  )
+test_that("ml_generalized_linear_regression() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_generalized_linear_regression)
 })
 
-test_that("ml_generalized_linear_regression() default params are correct", {
-  test_requires_version("2.0.0", "glm requires spark 2.0+")
-  predictor <- ml_pipeline(sc) %>%
-    ml_generalized_linear_regression() %>%
-    ml_stage(1)
-
-  args <- get_default_args(ml_generalized_linear_regression,
-                           c("x", "uid", "...", "weight_col", "link", "link_power", "link_prediction_col",
-                             "variance_power", "offset_col"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
+test_that("ml_generalized_linear_regression() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    family = "poisson",
+    link = "sqrt",
+    fit_intercept = FALSE,
+    offset_col = "ocol",
+    link_power = 0.5,
+    link_prediction_col = "lpcol",
+    reg_param = 0.01,
+    max_iter = 40,
+    weight_col = "wcol",
+    solver = "irls",
+    tol = 1e-03,
+    variance_power = 200,
+    features_col = "fcol",
+    label_col = "lcol",
+    prediction_col = "pcol"
+  )
+  test_param_setting(sc, ml_generalized_linear_regression, test_args)
 })
 
 test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and residuals", {
   test_requires_version("2.0.0", "glm requires spark 2.0+")
-  skip_on_cran()
-  test_requires("dplyr")
-
-  if (spark_version(sc) < "2.0.0")
-    skip("requires Spark 2.0.0")
-
+  sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
   r <- glm(mpg ~ cyl + wt, data = mtcars, family = gaussian(link = "identity"))
@@ -96,6 +63,7 @@ test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and
 
 test_that("weights column works for glm", {
   test_requires_version("2.0.0", "glm requires spark 2.0+")
+  sc <- testthat_spark_connection()
   set.seed(42)
   iris_weighted <- iris %>%
     dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
@@ -122,6 +90,7 @@ test_that("weights column works for glm", {
 
 test_that("ml_generalized_linear_regression print methods work", {
   test_requires_version("2.0.0", "glm requires spark 2.0+")
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   glm_model <- ml_generalized_linear_regression(
     iris_tbl, Petal_Length ~ Petal_Width)

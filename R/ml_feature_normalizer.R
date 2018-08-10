@@ -8,54 +8,67 @@
 #' @param p Normalization in L^p space. Must be >= 1. Defaults to 2.
 #'
 #' @export
-ft_normalizer <- function(
-  x, input_col, output_col, p = 2,
-  uid = random_string("normalizer_"), ...
-  ) {
+ft_normalizer <- function(x, input_col = NULL, output_col = NULL,
+                          p = 2, uid = random_string("normalizer_"), ...) {
   UseMethod("ft_normalizer")
 }
 
 #' @export
-ft_normalizer.spark_connection <- function(
-  x, input_col, output_col, p = 2,
-  uid = random_string("normalizer_"), ...
-  ) {
+ft_normalizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                           p = 2, uid = random_string("normalizer_"), ...) {
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    p = p,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    ml_validator_normalizer()
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.Normalizer",
-                             input_col, output_col, uid) %>%
-    invoke("setP", p)
+  jobj <- ml_new_transformer(
+    x, "org.apache.spark.ml.feature.Normalizer",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    invoke("setP", .args[["p"]])
 
   new_ml_normalizer(jobj)
 }
 
 #' @export
-ft_normalizer.ml_pipeline <- function(
-  x, input_col, output_col, p = 2,
-  uid = random_string("normalizer_"), ...
-  ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+ft_normalizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                      p = 2, uid = random_string("normalizer_"), ...) {
+  stage <- ft_normalizer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    p = p,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_normalizer.tbl_spark <- function(
-  x, input_col, output_col, p = 2,
-  uid = random_string("normalizer_"), ...
-  ) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+ft_normalizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                    p = 2, uid = random_string("normalizer_"), ...) {
+  stage <- ft_normalizer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    p = p,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_normalizer <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_normalizer")
 }
 
-ml_validator_normalizer <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      p <- ensure_scalar_double(p)
-      if (p < 1) stop("'p' must be greater than or equal to 1")
-    }) %>%
-    ml_extract_args(nms)
+ml_validator_normalizer <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["p"]] <- cast_scalar_double(.args[["p"]])
+  if (.args[["p"]] < 1) stop("`p` must be at least 1.")
+  .args
 }

@@ -1,42 +1,29 @@
 context("ml clustering - kmeans")
 
-sc <- testthat_spark_connection()
-test_requires("dplyr")
-data(iris)
-
-test_that("ml_kmeans param setting", {
-  args <- list(
-    x = sc, k = 9, max_iter = 11, tol = 1e-5,
-    init_steps = 3L, init_mode = "random",
-    seed = 98, features_col = "fcol",
-    prediction_col = "pcol"
-  )
-  predictor <- do.call(ml_kmeans, args)
-  args_to_check <- setdiff(names(args), "x")
-
-  expect_equal(ml_params(predictor, args_to_check), args[args_to_check])
+test_that("ml_kmeans() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_kmeans)
 })
 
-test_that("ml_kmeans() default params are correct", {
-  predictor <- ml_pipeline(sc) %>%
-    ml_kmeans() %>%
-    ml_stage(1)
-
-  args <- get_default_args(
-    ml_kmeans,
-    c("x", "uid", "...", "seed"))
-
-  expect_equal(
-    ml_params(predictor, names(args)),
-    args)
+test_that("ml_kmeans() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    k = 3,
+    max_iter = 30,
+    init_steps = 4,
+    init_mode = "random",
+    seed = 234,
+    features_col = "wfaaefa",
+    prediction_col = "awiefjaw"
+  )
+  test_param_setting(sc, ml_kmeans, test_args)
 })
 
 test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "ml_kmeans() requires Spark 2.0.0+")
-  skip_on_cran()
-
-  if (spark_version(sc) < "2.0.0")
-    skip("requires Spark 2.0.0")
 
   iris_tbl <- testthat_tbl("iris")
 
@@ -65,7 +52,7 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
 })
 
 test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)", {
-
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
 
   set.seed(123)
@@ -93,6 +80,7 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 })
 
 test_that("ml_kmeans() works properly", {
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5, seed = 11)
   expect_equal(ml_predict(iris_kmeans, iris_tbl) %>%
@@ -103,6 +91,7 @@ test_that("ml_kmeans() works properly", {
 })
 
 test_that("ml_compute_cost() for kmeans works properly", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "ml_compute_cost() requires Spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5, seed = 11)

@@ -18,3 +18,6 @@ broom::augment
 #' @importFrom broom glance
 #' @export
 broom::glance
+
+#' @import forge
+NULL

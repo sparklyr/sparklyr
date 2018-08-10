@@ -1,20 +1,3 @@
-ml_is_instance_of <- function(jobj, type) {
-  sc <- spark_connection(jobj)
-  tryCatch(
-    invoke_static(sc, "java.lang.Class", "forName",
-                  paste0("org.apache.spark.ml.", type)) %>%
-      invoke("isInstance", jobj),
-    error = function(e) FALSE
-  )
-}
-
-ml_package <- function(jobj) {
-  jobj_info(jobj)$class %>%
-    strsplit("\\.") %>%
-    rlang::flatten_chr() %>%
-    dplyr::nth(-2L)
-}
-
 ml_get_constructor <- function(jobj) {
   jobj %>%
     jobj_class() %>%

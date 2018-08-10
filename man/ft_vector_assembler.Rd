@@ -4,7 +4,7 @@
 \alias{ft_vector_assembler}
 \title{Feature Transformation -- VectorAssembler (Transformer)}
 \usage{
-ft_vector_assembler(x, input_cols, output_col,
+ft_vector_assembler(x, input_cols = NULL, output_col = NULL,
   uid = random_string("vector_assembler_"), ...)
 }
 \arguments{

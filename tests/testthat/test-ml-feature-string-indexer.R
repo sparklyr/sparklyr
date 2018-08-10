@@ -1,13 +1,46 @@
-context("ml feature string indexer")
+context("ml feature string indexer + index to string")
 
-sc <- testthat_spark_connection()
+test_that("ft_index_to_string() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_index_to_string)
+})
 
-df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
-df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
+test_that("ft_index_to_string() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "foo",
+    output_col = "bar",
+    labels = c("rawr", "baz")
+  )
+  test_param_setting(sc, ft_index_to_string, test_args)
+})
+
+test_that("ft_string_indexer() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_string_indexer)
+})
+
+test_that("ft_string_indexer() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "foo",
+    output_col = "bar",
+    handle_invalid = "keep",
+    string_order_type = "frequencyAsc"
+  )
+  test_param_setting(sc, ft_string_indexer, test_args)
+})
 
 test_that("ft_string_indexer() works", {
-  indexer <- ft_string_indexer(sc, "string", "indexed", dataset = df_tbl)
+  sc <- testthat_spark_connection()
+  df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
+  df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
 
+  indexer <- ft_string_indexer(sc, "string", "indexed", dataset = df_tbl)
   expect_identical(ml_labels(indexer), c("foo", "bar"))
 
   # backwards compat
@@ -19,7 +52,8 @@ test_that("ft_string_indexer() works", {
 
 test_that("ft_index_to_string() works", {
 
-
+  sc <- testthat_spark_connection()
+  df_tbl <- testthat_tbl("df")
   s1 <- df_tbl %>%
     ft_string_indexer("string", "indexed") %>%
     ft_index_to_string("indexed", "string2") %>%
@@ -46,6 +80,8 @@ test_that("ft_index_to_string() works", {
 
 test_that("ft_string_indexer respects `string_order_type`", {
   test_requires_version("2.3.0", "string_order_type supported in Spark 2.3")
+  sc <- testthat_spark_connection()
+  df_tbl <- testthat_tbl("df")
   expect_identical(df_tbl %>%
     ft_string_indexer("string", "indexed", string_order_type = "alphabetAsc") %>%
     dplyr::pull(indexed),
@@ -54,6 +90,8 @@ test_that("ft_string_indexer respects `string_order_type`", {
 })
 
 test_that("ft_string_indexer_model works", {
+  sc <- testthat_spark_connection()
+  df_tbl <- testthat_tbl("df")
   expect_identical(
     ft_string_indexer_model(sc, "string", "indexed", labels = c("foo", "bar")) %>%
       ml_transform(df_tbl) %>%

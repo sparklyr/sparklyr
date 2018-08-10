@@ -46,7 +46,9 @@ Imports:
     shiny (>= 1.0.1),
     withr,
     xml2,
-    tidyr
+    tidyr,
+    purrr,
+    forge
 Suggests:
     ggplot2,
     glmnet,
@@ -59,3 +61,4 @@ Suggests:
     reshape2,
     testthat,
     tibble
+Remotes: kevinykuo/forge

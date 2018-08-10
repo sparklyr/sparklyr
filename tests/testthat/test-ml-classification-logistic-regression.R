@@ -1,55 +1,54 @@
 context("ml classification - logistic regression")
-test_requires("dplyr")
 
-sc <- testthat_spark_connection()
-
-training <- data_frame(
-  id = 0:3L,
-  text = c("a b c d e spark",
-           "b d",
-           "spark f g h",
-           "hadoop mapreduce"),
-  label = c(1, 0, 1, 0)
-)
-
-training_tbl <- testthat_tbl("training")
-
-test <- data_frame(
-  id = 4:7L,
-  text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
-)
-test_tbl <- testthat_tbl("test")
-
-set.seed(42)
-iris_weighted <- iris %>%
-  dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
-                ones = rep(1, nrow(iris)),
-                versicolor = ifelse(Species == "versicolor", 1L, 0L))
-
-iris_weighted_tbl <- testthat_tbl("iris_weighted")
-
-test_that("ml_logistic_regression interprets params apporpriately", {
-  lr <- ml_logistic_regression(sc, intercept = TRUE, elastic_net_param = 0)
-  expected_params <- list(intercept = TRUE, elastic_net_param = 0)
-  params <- ml_param_map(lr)
-  expect_equal(setdiff(expected_params, params), list())
+test_that("ml_logistic_regression() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ml_logistic_regression)
 })
 
-test_that("ml_logistic_regression.spark_connect() returns object with correct class", {
-  lr <- ml_logistic_regression(sc, intercept = TRUE, elastic_net_param = 0)
-  expect_equal(class(lr), c("ml_logistic_regression", "ml_predictor", "ml_estimator",
-                            "ml_pipeline_stage"))
-})
-
-test_that("ml_logistic_regression() does input checking", {
-  expect_error(ml_logistic_regression(sc, elastic_net_param = "foo"),
-               "length-one numeric vector")
-  expect_equal(ml_logistic_regression(sc, max_iter = 25) %>%
-                 ml_param("max_iter"),
-               25L)
+test_that("ml_logistic_regression() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    fit_intercept = FALSE,
+    elastic_net_param = 1e-4,
+    reg_param = 1e-5,
+    max_iter = 50,
+    # `threshold` can't seem to be set when `thresholds` is
+    thresholds = c(0.3, 0.7),
+    tol = 1e-04,
+    weight_col = "wow",
+    aggregation_depth = 3,
+    # We'll want to enable this, see #1616
+    # upper_bounds_on_coefficients = matrix(rep(1, 6), nrow = 3),
+    # lower_bounds_on_coefficients = matrix(rep(-1, 6), nrow = 3),
+    # upper_bounds_on_intercepts = c(1, 1, 1),
+    # lower_bounds_on_intercepts = c(-1, -1, -1),
+    features_col = "foo",
+    label_col = "bar",
+    family = "multinomial",
+    prediction_col = "pppppp",
+    probability_col = "apweiof",
+    raw_prediction_col = "rparprpr"
+  )
+  test_param_setting(sc, ml_logistic_regression, test_args)
 })
 
 test_that("ml_logistic_regression.tbl_spark() works properly", {
+  sc <- testthat_spark_connection()
+
+  training <- data_frame(
+    id = 0:3L,
+    text = c("a b c d e spark",
+             "b d",
+             "spark f g h",
+             "hadoop mapreduce"),
+    label = c(1, 0, 1, 0)
+  )
+  test <- data_frame(
+    id = 4:7L,
+    text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
+  )
   training_tbl <- testthat_tbl("training")
   test_tbl <- testthat_tbl("test")
 
@@ -62,7 +61,7 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
     ml_fit(training_tbl)
   m1_predictions <- m1 %>%
     ml_transform(test_tbl) %>%
-    dplyr::pull(probability)
+    pull(probability)
 
   m2 <- training_tbl %>%
     ft_tokenizer("text", "words") %>%
@@ -72,7 +71,7 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
     ml_transform(test_tbl %>%
                    ft_tokenizer("text", "words") %>%
                    ft_hashing_tf("words", "features", num_features = 1000)) %>%
-    dplyr::pull(probability)
+    pull(probability)
 
   expect_equal(m1_predictions, m2_predictions)
   expect_identical(class(m2), c("ml_logistic_regression_model", "ml_prediction_model",
@@ -80,6 +79,13 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
 })
 
 test_that("ml_logistic_regression() agrees with stats::glm()", {
+  sc <- testthat_spark_connection()
+  set.seed(42)
+  iris_weighted <- iris %>%
+    mutate(weights = rpois(nrow(iris), 1) + 1,
+           ones = rep(1, nrow(iris)),
+           versicolor = ifelse(Species == "versicolor", 1L, 0L))
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
            family = binomial(logit), weights = weights,
@@ -100,6 +106,13 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
 })
 
 test_that("ml_logistic_regression can fit without intercept",{
+  sc <- testthat_spark_connection()
+  set.seed(42)
+  iris_weighted <- iris %>%
+    mutate(weights = rpois(nrow(iris), 1) + 1,
+           ones = rep(1, nrow(iris)),
+           versicolor = ifelse(Species == "versicolor", 1L, 0L))
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
   expect_error(s <- ml_logistic_regression(
     iris_weighted_tbl,
     formula = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
@@ -109,7 +122,8 @@ test_that("ml_logistic_regression can fit without intercept",{
 })
 
 test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted formulas", {
-
+  sc <- testthat_spark_connection()
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
   m1 <- ml_logistic_regression(
     iris_weighted_tbl,
     formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width"
@@ -123,95 +137,53 @@ test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted for
   expect_identical(m1$formula, m2$formula)
 })
 
-test_that("ml_logistic_regression.tbl_spark() takes 'response' and 'features'
-          columns instead of formula for backwards compatibility", {
-            m1 <- ml_logistic_regression(
-              iris_weighted_tbl,
-              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width"
-            )
+test_that("ml_logistic_regression.tbl_spark() takes 'response' and 'features' columns instead of formula for backwards compatibility", {
+  sc <- testthat_spark_connection()
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+  m1 <- ml_logistic_regression(
+    iris_weighted_tbl,
+    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width"
+  )
 
-            m2 <- ml_logistic_regression(
-              iris_weighted_tbl,
-              response = "versicolor",
-              features = c("Sepal_Width", "Petal_Length", "Petal_Width")
-            )
+  m2 <- ml_logistic_regression(
+    iris_weighted_tbl,
+    response = "versicolor",
+    features = c("Sepal_Width", "Petal_Length", "Petal_Width")
+  )
 
-            expect_identical(m1$formula, m2$formula)
-          })
-
-test_that("ml_logistic_regression.tbl_spark() warns when 'response' is a formula and
-          'features' is specified", {
-            expect_warning(
-              ml_logistic_regression(iris_weighted_tbl, response = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
-                                     features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
-              "'features' is ignored when a formula is specified"
-            )
-          })
-
-test_that("ml_logistic_regression.tbl_spark() errors if 'formula' is specified and either
-          'response' or 'features' is specified", {
-            expect_error(
-              ml_logistic_regression(iris_weighted_tbl,
-                                     "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                                     response = "versicolor"),
-              "only one of 'formula' or 'response'-'features' should be specified"
-            )
-            expect_error(
-              ml_logistic_regression(iris_weighted_tbl,
-                                     "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                                     features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
-              "only one of 'formula' or 'response'-'features' should be specified"
-            )
-          })
-
-
-test_that("ml_logistic_regression parameter setting/getting works", {
-  args <- list(
-    x = sc,
-    elastic_net_param = 0.1,
-    features_col = "fcol",
-    fit_intercept = FALSE,
-    label_col = "lcol",
-    max_iter = 50L,
-    threshold = 0.4,
-    tol = 1e-05,
-    weight_col = "wcol",
-    prediction_col = "pcol",
-    probability_col = "probcol",
-    raw_prediction_col = "rpcol")
-
-  if (spark_version(sc) >= "2.1.0")
-    args <- c(args, aggregation_depth = 3, family = "binomial")
-
-  lr <- do.call(ml_logistic_regression, args)
-
-  expect_equal(
-    ml_params(lr, names(args)[-1]),
-    args[-1])
+  expect_identical(m1$formula, m2$formula)
 })
 
-test_that("logistic regression default params are correct", {
-  lr <- ml_pipeline(sc) %>%
-    ml_logistic_regression() %>%
-    ml_stage(1)
+test_that("ml_logistic_regression.tbl_spark() warns when 'response' is a formula and 'features' is specified", {
+  sc <- testthat_spark_connection()
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+  expect_warning(
+    ml_logistic_regression(iris_weighted_tbl, response = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
+                           features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
+    "'features' is ignored when a formula is specified"
+  )
+})
 
-  args <- get_default_args(
-    ml_logistic_regression,
-    c("x", "uid", "...", "thresholds", "weight_col",
-      "lower_bounds_on_coefficients", "upper_bounds_on_coefficients",
-      "lower_bounds_on_intercepts", "upper_bounds_on_intercepts"))
-
-  if (spark_version(sc) < "2.1.0")
-    args <- rlang::modify(args, aggregation_depth = NULL, family = NULL)
-
-  expect_equal(
-    ml_params(lr, names(args)),
-    args)
+test_that("ml_logistic_regression.tbl_spark() errors if 'formula' is specified and either 'response' or 'features' is specified", {
+  sc <- testthat_spark_connection()
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+  expect_error(
+    ml_logistic_regression(iris_weighted_tbl,
+                           "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                           response = "versicolor"),
+    "only one of 'formula' or 'response'-'features' should be specified"
+  )
+  expect_error(
+    ml_logistic_regression(iris_weighted_tbl,
+                           "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                           features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
+    "only one of 'formula' or 'response'-'features' should be specified"
+  )
 })
 
 test_that("we can fit multinomial models", {
-  if (spark_version(sc) < "2.1.0") skip("multinomial models not supported < 2.1.0")
-  test_requires("nnet", "dplyr")
+  sc <- testthat_spark_connection()
+  test_requires_version("2.1.0", "multinomial models not supported < 2.1.0")
 
   n <- 200
   data <- data.frame(
@@ -240,11 +212,12 @@ test_that("we can fit multinomial models", {
 })
 
 test_that("weights column works for logistic regression", {
+  sc <- testthat_spark_connection()
   set.seed(42)
   iris_weighted <- iris %>%
-    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
-                  ones = rep(1, nrow(iris)),
-                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+    mutate(weights = rpois(nrow(iris), 1) + 1,
+           ones = rep(1, nrow(iris)),
+           versicolor = ifelse(Species == "versicolor", 1L, 0L))
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
@@ -268,6 +241,7 @@ test_that("weights column works for logistic regression", {
 })
 
 test_that("logistic regression bounds on coefficients", {
+  sc <- testthat_spark_connection()
   test_requires_version("2.2.0", "coefficient bounds require 2.2+")
 
   iris_tbl <- testthat_tbl("iris")

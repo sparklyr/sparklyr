@@ -12,8 +12,8 @@ new_ml_summary <- function(jobj, ..., subclass = NULL) {
 new_ml_summary_clustering <- function(jobj, ..., subclass = NULL) {
   new_ml_summary(
     jobj,
-    cluster = invoke(jobj, "cluster") %>% sdf_register(),
-    cluster_sizes = invoke(jobj, "clusterSizes"),
+    cluster = function() invoke(jobj, "cluster") %>% sdf_register(), # lazy val
+    cluster_sizes = function() invoke(jobj, "clusterSizes"), # lazy val
     features_col = invoke(jobj, "featuresCol"),
     k = invoke(jobj, "k"),
     prediction_col = invoke(jobj, "predictionCol"),
