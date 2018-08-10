@@ -19,8 +19,6 @@
 \item{...}{extra arguments (not used.)}
 
 \item{newdata}{a tbl_spark of new data to use for prediction.}
-
-\item{x}{a ml_kmeans model}
 }
 \description{
 These methods summarize the results of Spark ML models into tidy forms.
