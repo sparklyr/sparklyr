@@ -1,6 +1,6 @@
 # Sparklyr 0.9.0 (unreleased)
 
-## Streaming
+### Streaming
 
 - Support for `stream_read_*()` and `stream_write_*()` to read from and
   to Spark structured streams.
@@ -26,7 +26,7 @@
 - Progress reports can be turned off by setting `sparklyr.progress` to `FALSE`
   in `spark_config()`.
   
-## Kubernetes
+### Kubernetes
 
 - Change backend ports to be choosen deterministically by searching for
   free ports starting on `sparklyr.gateway.port` which default to `8880`. This
