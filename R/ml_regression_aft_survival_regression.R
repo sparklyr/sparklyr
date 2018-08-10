@@ -142,14 +142,14 @@ ml_validator_aft_survival_regression <- function(.args) {
     max.iter = "max_iter"
   ))
 
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  .args[["fit_intercept"]] <- forge::cast_scalar_logical(.args[["fit_intercept"]])
-  .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
-  .args[["censor_col"]] <- forge::cast_string(.args[["censor_col"]])
-  .args[["quantile_probabilities"]] <- forge::cast_double_list(.args[["quantile_probabilities"]])
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  .args[["aggregation_depth"]] <- forge::cast_scalar_integer(.args[["aggregation_depth"]])
-  .args[["quantiles_col"]] <- forge::cast_nullable_string(.args[["quantiles_col"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["censor_col"]] <- cast_string(.args[["censor_col"]])
+  .args[["quantile_probabilities"]] <- cast_double_list(.args[["quantile_probabilities"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["aggregation_depth"]] <- cast_scalar_integer(.args[["aggregation_depth"]])
+  .args[["quantiles_col"]] <- cast_nullable_string(.args[["quantiles_col"]])
   .args
 }
 

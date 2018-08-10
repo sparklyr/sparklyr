@@ -89,9 +89,9 @@ new_ml_regex_tokenizer <- function(jobj) {
 
 ml_validator_regex_tokenizer <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["gaps"]] <- forge::cast_scalar_logical(.args[["gaps"]])
-  .args[["min_token_length"]] <- forge::cast_scalar_integer(.args[["min_token_length"]])
-  .args[["pattern"]] <- forge::cast_string(.args[["pattern"]])
-  .args[["to_lower_case"]] <- forge::cast_scalar_logical(.args[["to_lower_case"]])
+  .args[["gaps"]] <- cast_scalar_logical(.args[["gaps"]])
+  .args[["min_token_length"]] <- cast_scalar_integer(.args[["min_token_length"]])
+  .args[["pattern"]] <- cast_string(.args[["pattern"]])
+  .args[["to_lower_case"]] <- cast_scalar_logical(.args[["to_lower_case"]])
   .args
 }

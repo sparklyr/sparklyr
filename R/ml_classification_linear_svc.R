@@ -133,15 +133,15 @@ ml_linear_svc.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE, reg
 
 # Validator
 ml_validator_linear_svc <- function(.args) {
-  .args[["reg_param"]] <- forge::cast_scalar_double(.args[["reg_param"]])
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  .args[["fit_intercept"]] <- forge::cast_scalar_logical(.args[["fit_intercept"]])
-  .args[["standardization"]] <- forge::cast_scalar_logical(.args[["standardization"]])
-  .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
-  .args[["aggregation_depth"]] <- forge::cast_scalar_integer(.args[["aggregation_depth"]])
-  .args[["raw_prediction_col"]] <- forge::cast_string(.args[["raw_prediction_col"]])
-  .args[["threshold"]] <- forge::cast_scalar_double(.args[["threshold"]])
-  .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
+  .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
+  .args[["standardization"]] <- cast_scalar_logical(.args[["standardization"]])
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["aggregation_depth"]] <- cast_scalar_integer(.args[["aggregation_depth"]])
+  .args[["raw_prediction_col"]] <- cast_string(.args[["raw_prediction_col"]])
+  .args[["threshold"]] <- cast_scalar_double(.args[["threshold"]])
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
   .args
 }
 

@@ -67,6 +67,6 @@ new_ml_vector_slicer <- function(jobj) {
 
 ml_validator_vector_slicer <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["indices"]] <- forge::cast_nullable_integer_list(.args[["indices"]])
+  .args[["indices"]] <- cast_nullable_integer_list(.args[["indices"]])
   .args
 }

@@ -81,6 +81,6 @@ new_ml_idf_model <- function(jobj) {
 
 ml_validator_idf <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["min_doc_freq"]] <- forge::cast_scalar_integer(.args[["min_doc_freq"]])
+  .args[["min_doc_freq"]] <- cast_scalar_integer(.args[["min_doc_freq"]])
   .args
 }

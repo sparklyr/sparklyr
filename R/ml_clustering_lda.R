@@ -118,7 +118,7 @@ ml_lda.spark_connection <- function(x, k = 10, max_iter = 20, doc_concentration 
     c(rlang::dots_list(...)) %>%
     ml_validator_lda()
 
-  uid <- forge::cast_string(uid)
+  uid <- cast_string(uid)
 
   jobj <- invoke_new(x, "org.apache.spark.ml.clustering.LDA", uid) %>%
     invoke("setK", .args[["k"]]) %>%
@@ -207,16 +207,16 @@ ml_validator_lda <- function(.args) {
   )) %>%
     validate_args_clustering()
 
-  .args[["doc_concentration"]] <- forge::cast_nullable_scalar_double(.args[["doc_concentration"]])
-  .args[["topic_concentration"]] <- forge::cast_nullable_scalar_double(.args[["topic_concentration"]])
-  .args[["subsampling_rate"]] <- forge::cast_scalar_double(.args[["subsampling_rate"]])
-  .args[["optimizer"]] <- forge::cast_choice(.args[["optimizer"]], c("online", "em"))
-  .args[["checkpoint_interval"]] <- forge::cast_scalar_integer(.args[["checkpoint_interval"]])
-  .args[["keep_last_checkpoint"]] <- forge::cast_scalar_logical(.args[["keep_last_checkpoint"]])
-  .args[["learning_decay"]] <- forge::cast_scalar_double(.args[["learning_decay"]])
-  .args[["learning_offset"]] <- forge::cast_scalar_double(.args[["learning_offset"]])
-  .args[["optimize_doc_concentration"]] <- forge::cast_scalar_logical(.args[["optimize_doc_concentration"]])
-  .args[["topic_distribution_col"]] <- forge::cast_string( .args[["topic_distribution_col"]])
+  .args[["doc_concentration"]] <- cast_nullable_scalar_double(.args[["doc_concentration"]])
+  .args[["topic_concentration"]] <- cast_nullable_scalar_double(.args[["topic_concentration"]])
+  .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])
+  .args[["optimizer"]] <- cast_choice(.args[["optimizer"]], c("online", "em"))
+  .args[["checkpoint_interval"]] <- cast_scalar_integer(.args[["checkpoint_interval"]])
+  .args[["keep_last_checkpoint"]] <- cast_scalar_logical(.args[["keep_last_checkpoint"]])
+  .args[["learning_decay"]] <- cast_scalar_double(.args[["learning_decay"]])
+  .args[["learning_offset"]] <- cast_scalar_double(.args[["learning_offset"]])
+  .args[["optimize_doc_concentration"]] <- cast_scalar_logical(.args[["optimize_doc_concentration"]])
+  .args[["topic_distribution_col"]] <- cast_string( .args[["topic_distribution_col"]])
   .args
 }
 
@@ -229,7 +229,7 @@ new_ml_lda_model <- function(jobj) {
     jobj,
     is_distributed = invoke(jobj, "isDistributed"),
     describe_topics = function(max_terms_per_topic = 10) {
-      max_terms_per_topic <- forge::cast_nullable_scalar_integer(max_terms_per_topic)
+      max_terms_per_topic <- cast_nullable_scalar_integer(max_terms_per_topic)
       invoke(jobj, "describeTopics", max_terms_per_topic) %>%
         sdf_register()
     },

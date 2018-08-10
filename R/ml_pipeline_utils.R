@@ -45,7 +45,7 @@ maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = N
 ml_new_transformer <- function(sc, class, uid,
                                input_col = NULL, output_col = NULL,
                                input_cols = NULL, output_cols = NULL) {
-  uid <- forge::cast_string(uid)
+  uid <- cast_string(uid)
   invoke_new(sc, class, uid) %>%
     maybe_set_param("setInputCol", input_col) %>%
     maybe_set_param("setInputCols", input_cols) %>%
@@ -55,10 +55,10 @@ ml_new_transformer <- function(sc, class, uid,
 
 validate_args_transformer <- function(.args) {
   .args <- ml_backwards_compatibility(.args)
-  .args[["input_col"]] <- forge::cast_nullable_string(.args[["input_col"]])
-  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
-  .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
+  .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
+  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
+  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
   .args
 }
 
@@ -162,7 +162,7 @@ ml_summary <- function(x, metric = NULL, allow_null = FALSE) {
 }
 
 ml_new_identifiable <- function(sc, class, uid) {
-  uid <- forge::cast_string(uid)
+  uid <- cast_string(uid)
   invoke_new(sc, class, uid)
 }
 

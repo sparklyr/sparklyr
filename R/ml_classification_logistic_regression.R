@@ -293,7 +293,7 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
 cast_double_matrix <- function(mat) {
   if (is.null(mat)) return(mat)
   mat %>%
-    forge::cast_double() %>%
+    cast_double() %>%
     matrix(nrow = nrow(mat))
 }
 
@@ -309,19 +309,19 @@ ml_validator_logistic_regression <- function(.args) {
     )) %>%
     validate_args_classifier()
 
-  .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
-  .args[["elastic_net_param"]] <- forge::cast_scalar_double(.args[["elastic_net_param"]])
-  .args[["reg_param"]] <- forge::cast_scalar_double(.args[["reg_param"]])
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  .args[["family"]] <- forge::cast_choice(.args[["family"]], c("auto", "binomial", "multinomial"))
-  .args[["fit_intercept"]] <- forge::cast_scalar_logical(.args[["fit_intercept"]])
-  .args[["threshold"]] <- forge::cast_scalar_double(.args[["threshold"]])
-  .args[["thresholds"]] <- forge::cast_nullable_double_list(.args[["thresholds"]])
-  .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
-  .args[["aggregation_depth"]] <- forge::cast_scalar_integer(.args[["aggregation_depth"]])
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
+  .args[["elastic_net_param"]] <- cast_scalar_double(.args[["elastic_net_param"]])
+  .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["family"]] <- cast_choice(.args[["family"]], c("auto", "binomial", "multinomial"))
+  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
+  .args[["threshold"]] <- cast_scalar_double(.args[["threshold"]])
+  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
+  .args[["aggregation_depth"]] <- cast_scalar_integer(.args[["aggregation_depth"]])
   .args[["lower_bounds_on_coefficients"]] <- cast_double_matrix(.args[["lower_bounds_on_coefficients"]])
   .args[["upper_bounds_on_coefficients"]] <- cast_double_matrix(.args[["upper_bounds_on_coefficients"]])
-  .args[["lower_bounds_on_intercepts"]] <- forge::cast_nullable_double_list(.args[["lower_bounds_on_intercepts"]])
-  .args[["upper_bounds_on_intercepts"]] <- forge::cast_nullable_double_list(.args[["upper_bounds_on_intercepts"]])
+  .args[["lower_bounds_on_intercepts"]] <- cast_nullable_double_list(.args[["lower_bounds_on_intercepts"]])
+  .args[["upper_bounds_on_intercepts"]] <- cast_nullable_double_list(.args[["upper_bounds_on_intercepts"]])
   .args
 }

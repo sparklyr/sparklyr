@@ -74,6 +74,6 @@ ft_discrete_cosine_transform <- function(x, input_col, output_col, inverse = FAL
 
 ml_validator_dct <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["inverse"]] <- forge::cast_scalar_logical(.args[["inverse"]])
+  .args[["inverse"]] <- cast_scalar_logical(.args[["inverse"]])
   .args
 }

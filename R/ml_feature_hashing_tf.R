@@ -75,7 +75,7 @@ new_ml_hashing_tf <- function(jobj) {
 
 ml_validator_hashing_tf <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["binary"]] <- forge::cast_scalar_logical(.args[["binary"]])
-  .args[["num_features"]] <- forge::cast_scalar_integer(.args[["num_features"]])
+  .args[["binary"]] <- cast_scalar_logical(.args[["binary"]])
+  .args[["num_features"]] <- cast_scalar_integer(.args[["num_features"]])
   .args
 }

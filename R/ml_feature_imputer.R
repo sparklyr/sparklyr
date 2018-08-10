@@ -90,10 +90,10 @@ ft_imputer.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL,
 }
 
 ml_validator_imputer <- function(.args) {
-  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
-  .args[["strategy"]] <- forge::cast_choice(.args[["strategy"]], c("mean", "median"))
-  .args[["missing_value"]] <- forge::cast_nullable_scalar_double(.args[["missing_value"]])
+  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
+  .args[["strategy"]] <- cast_choice(.args[["strategy"]], c("mean", "median"))
+  .args[["missing_value"]] <- cast_nullable_scalar_double(.args[["missing_value"]])
   .args
 }
 

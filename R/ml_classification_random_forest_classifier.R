@@ -165,10 +165,10 @@ ml_validator_random_forest_classifier <- function(.args) {
       col.sample.rate = "feature_subset_strategy"
     )) %>%
     ml_validate_decision_tree_args()
-  .args[["thresholds"]] <- forge::cast_nullable_double_list(.args[["thresholds"]])
-  .args[["num_trees"]] <- forge::cast_scalar_integer(.args[["num_trees"]])
-  .args[["subsampling_rate"]] <- forge::cast_scalar_double(.args[["subsampling_rate"]])
-  .args[["impurity"]] <- forge::cast_choice(.args[["impurity"]], c("gini", "entropy"))
+  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["num_trees"]] <- cast_scalar_integer(.args[["num_trees"]])
+  .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])
+  .args[["impurity"]] <- cast_choice(.args[["impurity"]], c("gini", "entropy"))
   .args
 }
 

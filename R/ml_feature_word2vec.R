@@ -136,13 +136,13 @@ new_ml_word2vec_model <- function(jobj) {
 
 ml_validator_word2vec <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["vector_size"]] <- forge::cast_scalar_integer(.args[["vector_size"]])
-  .args[["min_count"]] <- forge::cast_scalar_integer(.args[["min_count"]])
-  .args[["max_sentence_length"]] <- forge::cast_scalar_integer(.args[["max_sentence_length"]])
-  .args[["num_partitions"]] <- forge::cast_scalar_integer(.args[["num_partitions"]])
-  .args[["step_size"]] <- forge::cast_scalar_double(.args[["step_size"]])
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  .args[["seed"]] <- forge::cast_nullable_scalar_integer(.args[["seed"]])
+  .args[["vector_size"]] <- cast_scalar_integer(.args[["vector_size"]])
+  .args[["min_count"]] <- cast_scalar_integer(.args[["min_count"]])
+  .args[["max_sentence_length"]] <- cast_scalar_integer(.args[["max_sentence_length"]])
+  .args[["num_partitions"]] <- cast_scalar_integer(.args[["num_partitions"]])
+  .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
   .args
 }
 

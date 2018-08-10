@@ -130,8 +130,8 @@ ml_decision_tree_regressor.tbl_spark <- function(x, formula = NULL, max_depth = 
 # Validator
 ml_validator_decision_tree_regressor <- function(.args) {
   .args <- ml_validate_decision_tree_args(.args)
-  .args[["impurity"]] <- forge::cast_choice(.args[["impurity"]], c("variance"))
-  .args[["variance_col"]] <- forge::cast_nullable_string(.args[["variance_col"]])
+  .args[["impurity"]] <- cast_choice(.args[["impurity"]], c("variance"))
+  .args[["variance_col"]] <- cast_nullable_string(.args[["variance_col"]])
   .args
 }
 

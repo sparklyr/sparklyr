@@ -88,6 +88,6 @@ new_ml_vector_indexer_model <- function(jobj) {
 
 ml_validator_vector_indexer <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["max_categories"]] <- forge::cast_scalar_integer(.args[["max_categories"]])
+  .args[["max_categories"]] <- cast_scalar_integer(.args[["max_categories"]])
   .args
 }

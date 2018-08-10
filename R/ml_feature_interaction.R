@@ -70,7 +70,7 @@ ml_validator_interaction <- function(.args) {
     input.col = "input_cols",
     output.col = "output_col"
   ))
-  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
+  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   .args
 }

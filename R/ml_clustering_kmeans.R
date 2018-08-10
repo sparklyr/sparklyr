@@ -121,10 +121,10 @@ ml_validator_kmeans <- function(.args) {
   )) %>%
     validate_args_clustering()
 
-  .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
-  .args[["init_steps"]] <- forge::cast_scalar_integer(.args[["init_steps"]])
-  .args[["init_mode"]] <- forge::cast_choice(.args[["init_mode"]], c("random", "k-means||"))
-  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["init_steps"]] <- cast_scalar_integer(.args[["init_steps"]])
+  .args[["init_mode"]] <- cast_choice(.args[["init_mode"]], c("random", "k-means||"))
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
   .args
 }
 

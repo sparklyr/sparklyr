@@ -141,10 +141,10 @@ ml_naive_bayes.tbl_spark <- function(x, formula = NULL, model_type = "multinomia
 # Validator
 ml_validator_naive_bayes <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(lambda = "smoothing"))
-  .args[["thresholds"]] <- forge::cast_nullable_double_list(.args[["thresholds"]])
-  .args[["smoothing"]] <- forge::cast_scalar_double(.args[["smoothing"]])
-  .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
-  .args[["model_type"]] <- forge::cast_choice(.args[["model_type"]], c("multinomial", "bernoulli"))
+  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["smoothing"]] <- cast_scalar_double(.args[["smoothing"]])
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
+  .args[["model_type"]] <- cast_choice(.args[["model_type"]], c("multinomial", "bernoulli"))
   .args
 }
 

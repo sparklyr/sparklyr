@@ -72,6 +72,6 @@ new_ml_one_hot_encoder <- function(jobj) {
 ml_validator_one_hot_encoder <- function(.args) {
   .args <- validate_args_transformer(.args) %>%
     ml_backwards_compatibility(list(drop.last = "drop_last"))
-  .args[["drop_last"]] <- forge::cast_scalar_logical(.args[["drop_last"]])
+  .args[["drop_last"]] <- cast_scalar_logical(.args[["drop_last"]])
   .args
 }

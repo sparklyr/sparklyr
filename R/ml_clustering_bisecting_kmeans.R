@@ -109,8 +109,8 @@ ml_bisecting_kmeans.tbl_spark <- function(x, formula = NULL, k = 4, max_iter = 2
 
 ml_validator_bisecting_kmeans <- function(.args) {
   .args <- validate_args_clustering(.args)
-  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
-  .args[["min_divisible_cluster_size"]] <- forge::cast_scalar_double(.args[["min_divisible_cluster_size"]])
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
+  .args[["min_divisible_cluster_size"]] <- cast_scalar_double(.args[["min_divisible_cluster_size"]])
   .args
 }
 

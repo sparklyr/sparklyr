@@ -92,7 +92,7 @@ new_ml_minhash_lsh_model <- function(jobj) {
 
 ml_validator_minhash_lsh <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["num_hash_tables"]] <- forge::cast_scalar_integer(.args[["num_hash_tables"]])
-  .args[["seed"]] <- forge::cast_nullable_scalar_integer(.args[["seed"]])
+  .args[["num_hash_tables"]] <- cast_scalar_integer(.args[["num_hash_tables"]])
+  .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
   .args
 }

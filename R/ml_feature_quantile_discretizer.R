@@ -148,20 +148,20 @@ ml_validator_quantile_discretizer <- function(.args) {
   )) %>%
     ml_backwards_compatibility()
 
-  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
+  .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]]))
     stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
-  .args[["input_col"]] <- forge::cast_nullable_string(.args[["input_col"]])
-  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
-  .args[["num_buckets"]] <- forge::cast_scalar_integer(.args[["num_buckets"]])
-  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
-  .args[["num_buckets_array"]] <- forge::cast_nullable_integer_list(.args[["num_buckets_array"]])
-  .args[["handle_invalid"]] <- forge::cast_choice(
+  .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
+  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
+  .args[["num_buckets"]] <- cast_scalar_integer(.args[["num_buckets"]])
+  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
+  .args[["num_buckets_array"]] <- cast_nullable_integer_list(.args[["num_buckets_array"]])
+  .args[["handle_invalid"]] <- cast_choice(
     .args[["handle_invalid"]],
     c("error", "skip", "keep")
   )
-  .args[["relative_error"]] <- forge::cast_scalar_double(.args[["relative_error"]])
+  .args[["relative_error"]] <- cast_scalar_double(.args[["relative_error"]])
   .args
 }

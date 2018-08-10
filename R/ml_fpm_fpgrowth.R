@@ -35,7 +35,7 @@ ml_fpgrowth.spark_connection <- function(x, items_col = "items", min_confidence 
     c(rlang::dots_list(...)) %>%
     ml_validator_fpgrowth()
 
-  uid <- forge::cast_string(uid)
+  uid <- cast_string(uid)
   jobj <- invoke_new(x, "org.apache.spark.ml.fpm.FPGrowth", uid) %>%
     invoke("setItemsCol", .args[["items_col"]]) %>%
     invoke("setMinConfidence", .args[["min_confidence"]]) %>%
@@ -81,10 +81,10 @@ ml_fpgrowth.tbl_spark <- function(x, items_col = "items", min_confidence = 0.8,
 
 # Validator
 ml_validator_fpgrowth <- function(.args) {
-  .args[["items_col"]] <- forge::cast_string(.args[["items_col"]])
-  .args[["min_confidence"]] <- forge::cast_scalar_double(.args[["min_confidence"]])
-  .args[["min_support"]] <- forge::cast_scalar_double(.args[["min_support"]])
-  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
+  .args[["items_col"]] <- cast_string(.args[["items_col"]])
+  .args[["min_confidence"]] <- cast_scalar_double(.args[["min_confidence"]])
+  .args[["min_support"]] <- cast_scalar_double(.args[["min_support"]])
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
   .args
 }
 

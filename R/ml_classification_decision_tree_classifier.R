@@ -147,8 +147,8 @@ ml_decision_tree_classifier.tbl_spark <- function(x, formula = NULL, max_depth =
 
 ml_validator_decision_tree_classifier <- function(.args) {
   .args <- ml_validate_decision_tree_args(.args)
-  .args[["thresholds"]] <- forge::cast_nullable_double_list(.args[["thresholds"]])
-  .args[["impurity"]] <- forge::cast_choice(.args[["impurity"]], c("gini", "entropy"))
+  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["impurity"]] <- cast_choice(.args[["impurity"]], c("gini", "entropy"))
   .args
 }
 

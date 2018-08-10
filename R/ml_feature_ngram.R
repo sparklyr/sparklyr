@@ -70,6 +70,6 @@ new_ml_ngram <- function(jobj) {
 
 ml_validator_ngram <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["n"]] <- forge::cast_scalar_integer(.args[["n"]])
+  .args[["n"]] <- cast_scalar_integer(.args[["n"]])
   .args
 }

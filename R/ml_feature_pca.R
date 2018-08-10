@@ -91,7 +91,7 @@ new_ml_pca_model <- function(jobj) {
 
 ml_validator_pca <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["k"]] <- forge::cast_nullable_scalar_integer(.args[["k"]])
+  .args[["k"]] <- cast_nullable_scalar_integer(.args[["k"]])
   .args
 }
 

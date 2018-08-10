@@ -78,7 +78,7 @@ ml_cross_validator.tbl_spark <- function(x, estimator = NULL, estimator_param_ma
 
 ml_validator_cross_validator <- function(.args) {
   .args <- validate_args_tuning(.args)
-  .args[["num_folds"]] <- forge::cast_scalar_integer(.args[["num_folds"]])
+  .args[["num_folds"]] <- cast_scalar_integer(.args[["num_folds"]])
   .args
 }
 

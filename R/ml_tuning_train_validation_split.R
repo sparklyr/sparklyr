@@ -81,7 +81,7 @@ ml_train_validation_split.tbl_spark <- function(x, estimator = NULL, estimator_p
 
 ml_validator_train_validation_split <- function(.args) {
   .args <- validate_args_tuning(.args)
-  .args[["train_ratio"]] <- forge::cast_scalar_double(.args[["train_ratio"]])
+  .args[["train_ratio"]] <- cast_scalar_double(.args[["train_ratio"]])
   .args
 }
 

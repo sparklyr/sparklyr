@@ -121,18 +121,18 @@ new_ml_chisq_selector_model <- function(jobj) {
 }
 
 ml_validator_chisq_selector <- function(.args) {
-  .args[["features_col"]] <- forge::cast_string(.args[["features_col"]])
-  .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
-  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
-  .args[["fdr"]] <- forge::cast_scalar_double(.args[["fdr"]])
-  .args[["fpr"]] <- forge::cast_scalar_double(.args[["fpr"]])
-  .args[["fwe"]] <- forge::cast_scalar_double(.args[["fwe"]])
-  .args[["num_top_features"]] <- forge::cast_scalar_integer(.args[["num_top_features"]])
-  .args[["percentile"]] <- forge::cast_scalar_double(.args[["percentile"]])
-  .args[["selector_type"]] <- forge::cast_choice(
+  .args[["features_col"]] <- cast_string(.args[["features_col"]])
+  .args[["label_col"]] <- cast_string(.args[["label_col"]])
+  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
+  .args[["fdr"]] <- cast_scalar_double(.args[["fdr"]])
+  .args[["fpr"]] <- cast_scalar_double(.args[["fpr"]])
+  .args[["fwe"]] <- cast_scalar_double(.args[["fwe"]])
+  .args[["num_top_features"]] <- cast_scalar_integer(.args[["num_top_features"]])
+  .args[["percentile"]] <- cast_scalar_double(.args[["percentile"]])
+  .args[["selector_type"]] <- cast_choice(
     .args[["selector_type"]],
     c("numTopFeatures", "percentile", "fpr", "fdr", "fwe")
   )
-  .args[["uid"]] <- forge::cast_string(.args[["uid"]])
+  .args[["uid"]] <- cast_string(.args[["uid"]])
   .args
 }

@@ -66,14 +66,14 @@ ml_validate_decision_tree_args <- function(.args) {
     cache.node.ids = "cache_node_ids",
     max.memory = "max_memory_in_mb"
   ))
-  .args[["max_bins"]] <- forge::cast_scalar_integer(.args[["max_bins"]])
-  .args[["max_depth"]] <- forge::cast_scalar_integer(.args[["max_depth"]])
-  .args[["min_info_gain"]] <- forge::cast_scalar_double(.args[["min_info_gain"]])
-  .args[["min_instances_per_node"]] <- forge::cast_scalar_integer(.args[["min_instances_per_node"]])
-  .args[["seed"]] <- forge::cast_nullable_scalar_integer(.args[["seed"]])
-  .args[["checkpoint_interval"]] <- forge::cast_scalar_integer(.args[["checkpoint_interval"]])
-  .args[["cache_node_ids"]] <- forge::cast_scalar_logical(.args[["cache_node_ids"]])
-  .args[["max_memory_in_mb"]] <- forge::cast_scalar_integer(.args[["max_memory_in_mb"]])
+  .args[["max_bins"]] <- cast_scalar_integer(.args[["max_bins"]])
+  .args[["max_depth"]] <- cast_scalar_integer(.args[["max_depth"]])
+  .args[["min_info_gain"]] <- cast_scalar_double(.args[["min_info_gain"]])
+  .args[["min_instances_per_node"]] <- cast_scalar_integer(.args[["min_instances_per_node"]])
+  .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
+  .args[["checkpoint_interval"]] <- cast_scalar_integer(.args[["checkpoint_interval"]])
+  .args[["cache_node_ids"]] <- cast_scalar_logical(.args[["cache_node_ids"]])
+  .args[["max_memory_in_mb"]] <- cast_scalar_integer(.args[["max_memory_in_mb"]])
   .args
 }
 
@@ -84,15 +84,15 @@ validate_no_formula <- function(.args) {
 
 validate_args_predictor <- function(.args) {
   .args <- validate_no_formula(.args)
-  .args[["features_col"]] <- forge::cast_string(.args[["features_col"]])
-  .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
-  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
+  .args[["features_col"]] <- cast_string(.args[["features_col"]])
+  .args[["label_col"]] <- cast_string(.args[["label_col"]])
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
   .args
 }
 
 validate_args_classifier <- function(.args) {
   .args <- validate_args_predictor(.args)
-  .args[["probability_col"]] <- forge::cast_string(.args[["probability_col"]])
-  .args[["raw_prediction_col"]] <- forge::cast_string(.args[["raw_prediction_col"]])
+  .args[["probability_col"]] <- cast_string(.args[["probability_col"]])
+  .args[["raw_prediction_col"]] <- cast_string(.args[["raw_prediction_col"]])
   .args
 }

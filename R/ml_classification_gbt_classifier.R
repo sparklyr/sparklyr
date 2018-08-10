@@ -184,12 +184,12 @@ ml_validator_gbt_classifier <- function(.args) {
   ) %>%
     ml_validate_decision_tree_args()
 
-  .args[["thresholds"]] <- forge::cast_nullable_double_list(.args[["thresholds"]])
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  .args[["step_size"]] <- forge::cast_scalar_double(.args[["step_size"]])
-  .args[["subsampling_rate"]] <- forge::cast_scalar_double(.args[["subsampling_rate"]])
-  .args[["loss_type"]] <- forge::cast_choice(.args[["loss_type"]], "logistic")
-  .args[["feature_subset_strategy"]] <- forge::cast_string(.args[["feature_subset_strategy"]])
+  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])
+  .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])
+  .args[["loss_type"]] <- cast_choice(.args[["loss_type"]], "logistic")
+  .args[["feature_subset_strategy"]] <- cast_string(.args[["feature_subset_strategy"]])
   .args
 }
 

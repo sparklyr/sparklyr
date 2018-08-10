@@ -135,7 +135,7 @@ ml_validator_sql_transformer <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     sql = "statement"
   ))
-  .args[["statement"]] <- forge::cast_nullable_string(.args[["statement"]])
-  .args[["uid"]] <- forge::cast_string(.args[["uid"]])
+  .args[["statement"]] <- cast_nullable_string(.args[["statement"]])
+  .args[["uid"]] <- cast_string(.args[["uid"]])
   .args
 }

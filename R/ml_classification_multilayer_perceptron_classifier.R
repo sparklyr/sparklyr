@@ -171,14 +171,14 @@ ml_multilayer_perceptron <- function(x, formula = NULL, layers, max_iter = 100, 
 
 ml_validator_multilayer_perceptron_classifier <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(iter.max = "max_iter"))
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  .args[["step_size"]] <- forge::cast_scalar_double(.args[["step_size"]])
-  .args[["layers"]] <- forge::cast_nullable_integer_list(.args[["layers"]])
-  .args[["seed"]] <- forge::cast_nullable_scalar_integer(.args[["seed"]])
-  .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
-  .args[["block_size"]] <- forge::cast_scalar_integer(.args[["block_size"]])
-  .args[["initial_weights"]] <- forge::cast_nullable_double_list(.args[["initial_weights"]])
-  .args[["solver"]] <- forge::cast_choice(.args[["solver"]], c("l-bfgs", "gd"))
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])
+  .args[["layers"]] <- cast_nullable_integer_list(.args[["layers"]])
+  .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["block_size"]] <- cast_scalar_integer(.args[["block_size"]])
+  .args[["initial_weights"]] <- cast_nullable_double_list(.args[["initial_weights"]])
+  .args[["solver"]] <- cast_choice(.args[["solver"]], c("l-bfgs", "gd"))
   .args
 }
 

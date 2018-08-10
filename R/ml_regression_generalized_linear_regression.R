@@ -211,29 +211,29 @@ ml_validator_generalized_linear_regression <- function(.args) {
     iter.max = "max_iter",
     max.iter = "max_iter"
   ))
-  .args[["reg_param"]] <- forge::cast_scalar_double(.args[["reg_param"]])
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
+  .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   fam <- .args[["family"]]
   if (is.function(fam)) {
     warning("Specifying a function for `family` is deprecated; please specify strings for `family` and `link`.")
     fam <- fam()
-    .args[["link"]] <- forge::cast_string(fam$link)
-    .args[["family"]] <- forge::cast_string(fam$family)
+    .args[["link"]] <- cast_string(fam$link)
+    .args[["family"]] <- cast_string(fam$family)
   } else if (inherits(fam, "family")) {
-    .args[["link"]] <- forge::cast_string(fam$link)
-    .args[["family"]] <- forge::cast_string(fam$family)
+    .args[["link"]] <- cast_string(fam$link)
+    .args[["family"]] <- cast_string(fam$family)
   } else {
-    .args[["family"]] <- forge::cast_choice(fam, c("gaussian", "binomial", "poisson", "gamma", "tweedie"))
-    .args[["link"]] <- forge::cast_nullable_string(.args[["link"]])
+    .args[["family"]] <- cast_choice(fam, c("gaussian", "binomial", "poisson", "gamma", "tweedie"))
+    .args[["link"]] <- cast_nullable_string(.args[["link"]])
   }
-  .args[["fit_intercept"]] <- forge::cast_scalar_logical(.args[["fit_intercept"]])
-  .args[["solver"]] <- forge::cast_choice(.args[["solver"]], "irls")
-  .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
-  .args[["offset_col"]] <- forge::cast_nullable_string(.args[["offset_col"]])
-  .args[["link_power"]] <- forge::cast_nullable_scalar_double(.args[["link_power"]])
-  .args[["variance_power"]] <- forge::cast_nullable_scalar_double(.args[["variance_power"]])
-  .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
-  .args[["link_prediction_col"]] <- forge::cast_nullable_string(.args[["link_prediction_col"]])
+  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
+  .args[["solver"]] <- cast_choice(.args[["solver"]], "irls")
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["offset_col"]] <- cast_nullable_string(.args[["offset_col"]])
+  .args[["link_power"]] <- cast_nullable_scalar_double(.args[["link_power"]])
+  .args[["variance_power"]] <- cast_nullable_scalar_double(.args[["variance_power"]])
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
+  .args[["link_prediction_col"]] <- cast_nullable_string(.args[["link_prediction_col"]])
   .args
 }
 

@@ -120,7 +120,7 @@ ml_get_estimator_param_maps <- function(jobj) {
 
 ml_new_validator <- function(sc, class, uid, estimator, evaluator,
                              estimator_param_maps, seed) {
-  uid <- forge::cast_string(uid)
+  uid <- cast_string(uid)
 
   possibly_spark_jobj <- purrr::possibly(spark_jobj, NULL)
 
@@ -338,9 +338,9 @@ param_maps_to_df <- function(param_maps) {
 }
 
 validate_args_tuning <- function(.args) {
-  .args[["collect_sub_models"]] <- forge::cast_scalar_logical(.args[["collect_sub_models"]])
-  .args[["parallelism"]] <- forge::cast_scalar_integer(.args[["parallelism"]])
-  .args[["seed"]] <- forge::cast_nullable_scalar_integer(.args[["seed"]])
+  .args[["collect_sub_models"]] <- cast_scalar_logical(.args[["collect_sub_models"]])
+  .args[["parallelism"]] <- cast_scalar_integer(.args[["parallelism"]])
+  .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
   if (!is.null(.args[["estimator"]]) && !inherits(.args[["estimator"]], "ml_estimator"))
     stop("`estimator` must be an `ml_estimator`.")
   if (!is.null(.args[["estimator_param_maps"]]) && !rlang::is_bare_list(.args[["estimator_param_maps"]]))

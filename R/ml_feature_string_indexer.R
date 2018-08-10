@@ -121,10 +121,10 @@ ml_labels <- function(model) model$labels
 
 ml_validator_string_indexer <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["handle_invalid"]] <- forge::cast_choice(
+  .args[["handle_invalid"]] <- cast_choice(
     .args[["handle_invalid"]], c("error", "skip", "keep")
   )
-  .args[["string_order_type"]] <- forge::cast_choice(
+  .args[["string_order_type"]] <- cast_choice(
     .args[["string_order_type"]],
     c("frequencyDesc", "frequencyAsc", "alphabetDesc", "alphabetAsc")
   )

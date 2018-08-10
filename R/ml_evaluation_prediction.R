@@ -113,9 +113,9 @@ ml_validator_binary_classification_evaluator <- function(.args) {
     metric = "metric_name"
   ))
 
-  .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
-  .args[["raw_prediction_col"]] <- forge::cast_string(.args[["raw_prediction_col"]])
-  .args[["metric_name"]] <- forge::cast_choice(.args[["metric_name"]], c("areaUnderROC", "areaUnderPR"))
+  .args[["label_col"]] <- cast_string(.args[["label_col"]])
+  .args[["raw_prediction_col"]] <- cast_string(.args[["raw_prediction_col"]])
+  .args[["metric_name"]] <- cast_choice(.args[["metric_name"]], c("areaUnderROC", "areaUnderPR"))
   .args
 }
 
@@ -192,9 +192,9 @@ ml_validator_multiclass_classification_evaluator <- function(.args) {
     metric = "metric_name"
   ))
 
-  .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
-  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
-  .args[["metric_name"]] <- forge::cast_choice(
+  .args[["label_col"]] <- cast_string(.args[["label_col"]])
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
+  .args[["metric_name"]] <- cast_choice(
     .args[["metric_name"]],
     c("f1", "precision", "recall", "weightedPrecision", "weightedRecall", "accuracy")
   )
@@ -250,9 +250,9 @@ ml_regression_evaluator.tbl_spark <- function(x, label_col = "label", prediction
 }
 
 ml_validator_regression_evaluator <- function(.args) {
-  .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
-  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
-  .args[["metric_name"]] <- forge::cast_choice(.args[["metric_name"]], c("rmse", "mse", "r2", "mae"))
+  .args[["label_col"]] <- cast_string(.args[["label_col"]])
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
+  .args[["metric_name"]] <- cast_choice(.args[["metric_name"]], c("rmse", "mse", "r2", "mae"))
   .args
 }
 

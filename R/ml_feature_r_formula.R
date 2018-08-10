@@ -139,9 +139,9 @@ new_ml_r_formula_model <- function(jobj) {
 ml_validator_r_formula <- function(.args) {
   if (rlang::is_formula(.args[["formula"]]))
     .args[["formula"]] <- rlang::expr_text(.args[["formula"]], width = 500L)
-  .args[["formula"]] <- forge::cast_nullable_string(.args[["formula"]])
-  .args[["features_col"]] <- forge::cast_string(.args[["features_col"]])
-  .args[["label_col"]] <- forge::cast_string(.args[["label_col"]])
-  .args[["force_index_label"]] <- forge::cast_scalar_logical(.args[["force_index_label"]])
+  .args[["formula"]] <- cast_nullable_string(.args[["formula"]])
+  .args[["features_col"]] <- cast_string(.args[["features_col"]])
+  .args[["label_col"]] <- cast_string(.args[["label_col"]])
+  .args[["force_index_label"]] <- cast_scalar_logical(.args[["force_index_label"]])
   .args
 }

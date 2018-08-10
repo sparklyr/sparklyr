@@ -68,7 +68,7 @@ new_ml_normalizer <- function(jobj) {
 
 ml_validator_normalizer <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["p"]] <- forge::cast_scalar_double(.args[["p"]])
+  .args[["p"]] <- cast_scalar_double(.args[["p"]])
   if (.args[["p"]] < 1) stop("`p` must be at least 1.")
   .args
 }

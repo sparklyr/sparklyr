@@ -1,6 +1,6 @@
 ml_new_predictor <- function(sc, class, uid, features_col, label_col,
                              prediction_col) {
-  uid <- forge::cast_string(uid)
+  uid <- cast_string(uid)
   invoke_new(sc, class, uid) %>%
     invoke("setFeaturesCol", features_col) %>%
     invoke("setLabelCol", label_col) %>%
@@ -28,7 +28,7 @@ ml_new_regressor <- function(sc, class, uid,
 
 ml_new_clustering <- function(sc, class, uid,
                               features_col, k, max_iter, seed = NULL, ...) {
-  uid <- forge::cast_string(uid)
+  uid <- cast_string(uid)
   jobj <- invoke_new(sc, class, uid) %>%
     invoke("setFeaturesCol", features_col) %>%
     invoke("setK", k) %>%

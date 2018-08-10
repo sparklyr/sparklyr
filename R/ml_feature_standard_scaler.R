@@ -115,7 +115,7 @@ new_ml_standard_scaler_model <- function(jobj) {
 
 ml_validator_standard_scaler <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["with_mean"]] <- forge::cast_scalar_logical(.args[["with_mean"]])
-  .args[["with_std"]] <- forge::cast_scalar_logical(.args[["with_std"]])
+  .args[["with_mean"]] <- cast_scalar_logical(.args[["with_mean"]])
+  .args[["with_std"]] <- cast_scalar_logical(.args[["with_std"]])
   .args
 }

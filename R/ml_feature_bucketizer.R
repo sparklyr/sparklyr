@@ -111,23 +111,23 @@ new_ml_bucketizer <- function(jobj) {
 
 # Validator
 ml_validator_bucketizer <- function(.args) {
-  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
+  .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]]))
     stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
-  .args[["input_col"]] <- forge::cast_nullable_string(.args[["input_col"]])
-  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
+  .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
+  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   if (!is.null(.args[["splits"]]) && length(.args[["splits"]]) < 3)
     stop("`splits` must be at least length 3.", call. = FALSE)
-  .args[["splits"]] <- forge::cast_nullable_double_list(.args[["splits"]])
-  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_cols"]] <- forge::cast_nullable_string_list(.args[["output_cols"]])
+  .args[["splits"]] <- cast_nullable_double_list(.args[["splits"]])
+  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
   if (!is.null(.args[["splits_array"]]))
     .args[["splits_array"]] <- purrr::map(
       .args[["splits_array"]],
-      ~ forge::cast_double_list(.x)
+      ~ cast_double_list(.x)
     )
-  .args[["handle_invalid"]] <- forge::cast_choice(
+  .args[["handle_invalid"]] <- cast_choice(
     .args[["handle_invalid"]], c("error", "skip", "keep")
   )
   .args

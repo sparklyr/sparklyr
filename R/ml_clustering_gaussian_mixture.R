@@ -113,9 +113,9 @@ ml_gaussian_mixture.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 1
 
 ml_validator_gaussian_mixture <- function(.args) {
   .args <- validate_args_clustering(.args)
-  .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
-  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
-  .args[["probability_col"]] <- forge::cast_string(.args[["probability_col"]])
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
+  .args[["probability_col"]] <- cast_string(.args[["probability_col"]])
   .args
 }
 

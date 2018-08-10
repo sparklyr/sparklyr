@@ -137,10 +137,10 @@ ml_validator_random_forest_regressor <- function(.args) {
     )) %>%
     ml_validate_decision_tree_args()
 
-  .args[["num_trees"]] <- forge::cast_scalar_integer(.args[["num_trees"]])
-  .args[["subsampling_rate"]] <- forge::cast_scalar_double(.args[["subsampling_rate"]])
-  .args[["feature_subset_strategy"]] <- forge::cast_string(.args[["feature_subset_strategy"]])
-  .args[["impurity"]] <- forge::cast_choice(.args[["impurity"]], "variance")
+  .args[["num_trees"]] <- cast_scalar_integer(.args[["num_trees"]])
+  .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])
+  .args[["feature_subset_strategy"]] <- cast_string(.args[["feature_subset_strategy"]])
+  .args[["impurity"]] <- cast_choice(.args[["impurity"]], "variance")
   .args
 }
 

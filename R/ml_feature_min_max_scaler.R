@@ -111,7 +111,7 @@ new_ml_min_max_scaler_model <- function(jobj) {
 
 ml_validator_min_max_scaler <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["min"]] <- forge::cast_scalar_double(.args[["min"]])
-  .args[["max"]] <- forge::cast_scalar_double(.args[["max"]])
+  .args[["min"]] <- cast_scalar_double(.args[["min"]])
+  .args[["max"]] <- cast_scalar_double(.args[["max"]])
   .args
 }

@@ -70,7 +70,7 @@ new_ml_polynomial_expansion <- function(jobj) {
 
 ml_validator_polynomial_expansion <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["degree"]] <- forge::cast_scalar_integer(.args[["degree"]])
+  .args[["degree"]] <- cast_scalar_integer(.args[["degree"]])
   if (.args[["degree"]] < 1) stop("`degree` must be greater than 1.", call. = FALSE)
   .args
 }

@@ -86,6 +86,6 @@ new_ml_binarizer <- function(jobj) {
 
 ml_validator_binarizer <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["threshold"]] <- forge::cast_scalar_double(.args[["threshold"]])
+  .args[["threshold"]] <- cast_scalar_double(.args[["threshold"]])
   .args
 }

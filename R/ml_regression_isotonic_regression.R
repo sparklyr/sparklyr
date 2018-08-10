@@ -97,9 +97,9 @@ ml_isotonic_regression.tbl_spark <- function(x, formula = NULL, feature_index = 
 
 # Validator
 ml_validator_isotonic_regression <- function(.args) {
-  .args[["feature_index"]] <- forge::cast_scalar_integer(.args[["feature_index"]])
-  .args[["isotonic"]] <- forge::cast_scalar_logical(.args[["isotonic"]])
-  .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
+  .args[["feature_index"]] <- cast_scalar_integer(.args[["feature_index"]])
+  .args[["isotonic"]] <- cast_scalar_logical(.args[["isotonic"]])
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
   .args
 }
 

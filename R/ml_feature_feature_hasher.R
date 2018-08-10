@@ -104,10 +104,10 @@ new_ml_feature_hasher <- function(jobj) {
 }
 
 ml_validator_feature_hasher <- function(.args) {
-  .args[["input_cols"]] <- forge::cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_col"]] <- forge::cast_nullable_string(.args[["output_col"]])
-  .args[["categorical_cols"]] <- forge::cast_nullable_string_list(.args[["categorical_cols"]])
-  .args[["num_features"]] <- forge::cast_scalar_integer(.args[["num_features"]])
-  .args[["uid"]] <- forge::cast_scalar_character(.args[["uid"]])
+  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
+  .args[["categorical_cols"]] <- cast_nullable_string_list(.args[["categorical_cols"]])
+  .args[["num_features"]] <- cast_scalar_integer(.args[["num_features"]])
+  .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
   .args
 }

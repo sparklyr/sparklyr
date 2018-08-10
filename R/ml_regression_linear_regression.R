@@ -169,14 +169,14 @@ ml_validator_linear_regression <- function(.args) {
     max.iter = "max_iter"
   ))
 
-  .args[["elastic_net_param"]] <- forge::cast_scalar_double(.args[["elastic_net_param"]])
-  .args[["reg_param"]] <- forge::cast_scalar_double(.args[["reg_param"]])
-  .args[["max_iter"]] <- forge::cast_scalar_integer(.args[["max_iter"]])
-  .args[["fit_intercept"]] <- forge::cast_scalar_logical(.args[["fit_intercept"]])
-  .args[["standardization"]] <- forge::cast_scalar_logical(.args[["standardization"]])
-  .args[["tol"]] <- forge::cast_scalar_double(.args[["tol"]])
-  .args[["solver"]] <- forge::cast_choice(.args[["solver"]], c("auto", "l-bfgs", "normal"))
-  .args[["weight_col"]] <- forge::cast_nullable_string(.args[["weight_col"]])
+  .args[["elastic_net_param"]] <- cast_scalar_double(.args[["elastic_net_param"]])
+  .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
+  .args[["standardization"]] <- cast_scalar_logical(.args[["standardization"]])
+  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
+  .args[["solver"]] <- cast_choice(.args[["solver"]], c("auto", "l-bfgs", "normal"))
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
   .args
 }
 

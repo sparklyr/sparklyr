@@ -87,8 +87,8 @@ ml_clustering_evaluator.tbl_spark <- function(x, features_col = "features", pred
 
 # Validator
 ml_validator_clustering_evaluator <- function(.args) {
-  .args[["features_col"]] <- forge::cast_string(.args[["features_col"]])
-  .args[["prediction_col"]] <- forge::cast_string(.args[["prediction_col"]])
-  .args[["metric_name"]] <- forge::cast_choice(.args[["metric_name"]], "silhouette")
+  .args[["features_col"]] <- cast_string(.args[["features_col"]])
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
+  .args[["metric_name"]] <- cast_choice(.args[["metric_name"]], "silhouette")
   .args
 }
