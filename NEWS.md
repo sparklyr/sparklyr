@@ -117,6 +117,10 @@
 
 - Many new examples for `ft_binarizer()`, `ft_bucketrizer()`, `ft_min_max_scaler`, `ft_max_abs_scaler()`, `ft_standard_scaler()`, `ml_kmeans()`, `ml_pca()`, `ml_bisecting_kmeans()`, `ml_gaussian_mixture()`, `ml_naive_bayes()`, `ml_decision_tree()`, `ml_random_forest()`, `ml_multilayer_perceptron()`, `ml_linear_regression()`, `ml_logistic_regression()`, `ml_gradient_boosted_trees()`, `ml_generalized_linear_regression()`, `ml_cross_validator()`, `ml_evaluator()`, `ml_clustering_evaluator()`, `ml_corr()`, `ml_chisquare_test()`, `sdf_pivot()` (@samuelmacedo83).
 
+### Broom
+  
+- Implemented `tidy()`, `augment()`, and `glance()` for `ml_kmeans()` models (@samuelmacedo83)
+
 ### Configuration
 
 - Support for functions as values in entries to `spark_config()` to enable advanced
