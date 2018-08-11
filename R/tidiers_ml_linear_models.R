@@ -99,7 +99,7 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   # We calculate working residuals on training data via SparkSQL directly
   # instead of calling the MLlib API.
   if (type.residuals == "working") {
-    predictions <- sdf_predict(x, newdata) %>%
+    predictions <- ml_predict(x, newdata) %>%
       rename(fitted = !!"prediction")
     return(predictions %>%
              mutate(resid = `-`(!!sym(x$.response), !!sym("fitted")))
@@ -110,7 +110,7 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   # training data. We call 'sdf_residuals()' first and then 'sdf_predict()' in
   # order to guarantee row order presevation.
   residuals <- sdf_residuals(x, type = type.residuals)
-  sdf_predict(x, newdata = residuals) %>%
+  ml_predict(x, newdata = residuals) %>%
     # Two calls to 'rename': https://github.com/rstudio/sparklyr/issues/678
     rename(fitted = !!"prediction") %>%
     rename(resid = !!"residuals")
