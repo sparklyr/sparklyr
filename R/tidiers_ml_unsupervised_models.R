@@ -14,21 +14,19 @@ tidy.ml_model_kmeans <- function(x,
                                  ...){
   model <- x$model
   center <- x$centers
-
-  stats <- c("cluster_sizes", "k")
-  statistics <- stats %>%
-    lapply(function(x) ml_summary(model, x, allow_null = TRUE))
+  size <- x$summary$cluster_sizes()
+  k <- x$summary$k
 
   cbind(center,
-        sizes = statistics[[1]],
-        cluster = 1:statistics[[2]]) %>%
+        size = size,
+        cluster = 0:(k - 1) ) %>%
     dplyr::as_tibble()
 }
 
 #' @rdname ml_unsupervised_tidiers
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
-#' @importFrom rlang sym
+#' @importFrom rlang syms
 #'
 #' @export
 augment.ml_model_kmeans <- function(x, newdata = NULL,
@@ -39,12 +37,11 @@ augment.ml_model_kmeans <- function(x, newdata = NULL,
   if (is.null(newdata)){
     newdata <- x$dataset
   }
+  vars <- c(dplyr::tbl_vars(newdata), "prediction")
 
   ml_predict(x, newdata) %>%
-    dplyr::select(-!!sym("label"), -!!sym("features")) %>%
-    dplyr::mutate(prediction = !!sym("prediction") + 1) %>%
+    dplyr::select(!!!syms(vars)) %>%
     dplyr::rename(.cluster = !!"prediction")
-
 }
 
 #' @rdname ml_unsupervised_tidiers
@@ -52,11 +49,9 @@ augment.ml_model_kmeans <- function(x, newdata = NULL,
 glance.ml_model_kmeans <- function(x,
                                    ...) {
 
-  max.iter <- x$pipeline_model$stages[[2]]$param_map$max_iter
-  tol <- x$pipeline_model$stages[[2]]$param_map$tol
+  # max.iter <- x$pipeline_model$stages[[2]]$param_map$max_iter
+  # tol <- x$pipeline_model$stages[[2]]$param_map$tol
   wssse <- x$cost
 
-  dplyr::tibble(wssse = wssse,
-         max.iter = max.iter,
-         tol = tol)
+  dplyr::tibble(wssse = wssse)
 }
