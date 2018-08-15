@@ -605,17 +605,17 @@ invoke_new.spark_shell_connection <- function(sc, class, ...) {
 
 #' @export
 hive_context.spark_shell_connection <- function(sc) {
-  if (is.null(sc$hive_context))
-    sc$hive_context <- create_hive_context(sc)
+  if (is.null(sc$state$hive_context))
+    sc$state$hive_context <- create_hive_context(sc)
 
-  sc$hive_context
+  sc$state$hive_context
 }
 
 #' @export
 spark_session.spark_shell_connection <- function(sc) {
-  if (is.null(sc$hive_context))
-    sc$hive_context <- create_hive_context(sc)
+  if (is.null(sc$state$hive_context))
+    sc$state$hive_context <- create_hive_context(sc)
 
-  sc$hive_context
+  sc$state$hive_context
 }
 
