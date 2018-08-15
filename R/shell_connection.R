@@ -398,14 +398,14 @@ start_shell <- function(master,
     method = "shell",
     app_name = app_name,
     config = config,
+    state = new.env(),
     # spark_shell_connection
     spark_home = spark_home,
     backend = backend,
     monitoring = monitoring,
     gateway = gatewayInfo$gateway,
     output_file = output_file,
-    sessionId = sessionId,
-    state = new.env()
+    sessionId = sessionId
   ))
 
   # stop shell on R exit

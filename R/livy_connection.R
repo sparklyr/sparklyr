@@ -554,12 +554,16 @@ livy_connection <- function(master,
   session <- livy_create_session(master, config)
 
   sc <- structure(class = c("spark_connection", "livy_connection", "DBIConnection"), list(
+    # spark_connection
     master = master,
-    sessionId = session$id,
+    method = "livy",
+    app_name = app_name,
     config = config,
+    state = new.env(),
+    # livy_connection
+    sessionId = session$id,
     code = new.env(),
-    log = tempfile(fileext = ".log"),
-    method = "livy"
+    log = tempfile(fileext = ".log")
   ))
 
   sc$code$totalReturnVars <- 0

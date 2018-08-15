@@ -8,10 +8,13 @@ test_connection <- function(master = master,
   state$open <- TRUE
 
   structure(class = c("spark_connection", "test_connection"), list(
+    # spark_connection
     master = master,
     config = config,
     state = state,
-    spark_context = test_jobj_create(list())
+    spark_context = test_jobj_create(list()),
+    state = new.env()
+    # test_connection
   ))
 }
 
