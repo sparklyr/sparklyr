@@ -791,4 +791,20 @@ initialize_connection.livy_connection <- function(sc) {
   })
 }
 
+#' @export
+hive_context.livy_connection <- function(sc) {
+  if (is.null(sc$hive_context))
+    sc$hive_context <- create_hive_context(sc)
+
+  sc$hive_context
+}
+
+#' @export
+spark_session.livy_connection <- function(sc) {
+  if (is.null(sc$hive_context))
+    sc$hive_context <- create_hive_context(sc)
+
+  sc$hive_context
+}
+
 # nocov end

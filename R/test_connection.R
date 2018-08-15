@@ -94,3 +94,19 @@ sdf_copy_to.test_connection <- function(sc, x, ...) {
 create_hive_context.test_connection <- function(sc) {
   test_jobj_create(sc)
 }
+
+#' @export
+hive_context.test_connection <- function(sc) {
+  if (is.null(sc$hive_context))
+    sc$hive_context <- create_hive_context(sc)
+
+  sc$hive_context
+}
+
+#' @export
+spark_session.test_connection <- function(sc) {
+  if (is.null(sc$hive_context))
+    sc$hive_context <- create_hive_context(sc)
+
+  sc$hive_context
+}
