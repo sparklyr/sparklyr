@@ -87,7 +87,7 @@ It may be useful to provide some simple definitions for the Spark nomenclature:
 
 Using Spark and R inside a Hadoop based *Data Lake* is becoming a common practice at companies. Currently, *there is no good way to manage user connections to the Spark service centrally*. There are some caps and settings that can be applied, but in most cases there are configurations that the R user will need to customize.  
 
-The [Running on YARN](https://spark.apache.org/docs/latest/running-on-yarn.html) page in Spark's official website is the best place to start for configuration settings reference, please bookmark it.  Cluster administrators and users can benefit from this document.  If Spark is new to the company, the [YARN tunning](https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/) article, courtesy of Cloudera, does a great job at explaining how the Spark/YARN architecture works. 
+The [Running on YARN](https://spark.apache.org/docs/latest/running-on-yarn.html) page in Spark's official website is the best place to start for configuration settings reference, please bookmark it.  Cluster administrators and users can benefit from this document.  If Spark is new to the company, the [YARN tuning](https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/) article, courtesy of Cloudera, does a great job at explaining how the Spark/YARN architecture works. 
 
 ### Recommended properties
 
