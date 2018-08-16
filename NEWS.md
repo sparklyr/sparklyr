@@ -107,6 +107,9 @@
 
 ### Extensions
 
+- Support for `sparklyr.invoke.trace` and `sparklyr.invoke.trace.callstack` configuration
+  options to trace all `invoke()` calls.
+
 - Support to invoke methods with `char` types using single character strings (@lawremi, #1395).
 
 ### Serialization

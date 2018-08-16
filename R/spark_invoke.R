@@ -30,22 +30,25 @@ NULL
 #'
 #' @export
 invoke <- function(jobj, method, ...) {
+  invoke_trace(spark_connection(jobj), "Invoking", method)
   UseMethod("invoke")
 }
 
 #' @name invoke
 #' @export
 invoke_static <- function(sc, class, method, ...) {
+  invoke_trace(sc, "Invoking", class, method)
   UseMethod("invoke_static")
 }
 
 #' @name invoke
 #' @export
 invoke_new <- function(sc, class, ...) {
+  invoke_trace(sc, "Invoking", class)
   UseMethod("invoke_new")
 }
 
-#' Generic call interface for spark shell
+#' Generic Call Interface
 #'
 #' @param sc \code{spark_connection}
 #' @param static Is this a static method call (including a constructor). If so
@@ -62,3 +65,22 @@ invoke_method <- function(sc, static, object, method, ...) {
   UseMethod("invoke_method")
 }
 
+invoke_trace <- function(sc, ...) {
+  if (spark_config_value(sc$config, "sparklyr.invoke.trace", FALSE)) {
+    args <- list(...)
+    trace_message <- paste(args, collapse = " ")
+
+    message(trace_message)
+
+    if (spark_config_value(sc$config, "sparklyr.invoke.trace.callstack", FALSE)) {
+      frame_names <- list()
+      for (i in 1:sys.nframe()) {
+        current_call <- sys.call(i)
+        frame_names[[i]] <- paste(i, ": ", paste(head(deparse(current_call), 5), collapse = "\n"), sep = "")
+      }
+
+      message(paste(frame_names, collapse = "\n"))
+      message()
+    }
+  }
+}
