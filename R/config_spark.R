@@ -34,6 +34,10 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
     mergedConfig$spark.sql.shuffle.partitions.local <- parallel::detectCores()
   }
 
+  if (is.null(mergedConfig$spark.serializer)) {
+    mergedConfig$spark.serializer <- "org.apache.spark.serializer.KryoSerializer"
+  }
+
   mergedConfig
 }
 
