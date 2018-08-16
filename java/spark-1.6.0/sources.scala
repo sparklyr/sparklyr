@@ -415,10 +415,17 @@ core_invoke_cancel_running <- function(sc)
     return()
 
   # if something fails while using a monitored connection we don't cancel jobs
-  if (identical(sc$use_monitoring, TRUE))
+  if (identical(sc$state$use_monitoring, TRUE))
+    return()
+
+  # if something fails while cancelling jobs we don't cancel jobs, this can
+  # happen in OutOfMemory errors that shut down the spark context
+  if (identical(sc$state$cancelling_all_jobs, TRUE))
     return()
 
   connection_progress_context(sc, function() {
+    sc$state$cancelling_all_jobs <- TRUE
+    on.exit(sc$state$cancelling_all_jobs <- FALSE)
     invoke(sc$spark_context, "cancelAllJobs")
   })
 
@@ -888,25 +895,6 @@ writeDouble <- function(con, value) {
 writeBoolean <- function(con, value) {
   # TRUE becomes 1, FALSE becomes 0
   writeInt(con, as.integer(value))
-}
-
-writeRawSerialize <- function(outputCon, batch) {
-  outputSer <- serialize(batch, ascii = FALSE, connection = NULL)
-  writeRaw(outputCon, outputSer)
-}
-
-writeRowSerialize <- function(outputCon, rows) {
-  invisible(lapply(rows, function(r) {
-    bytes <- serializeRow(r)
-    writeRaw(outputCon, bytes)
-  }))
-}
-
-serializeRow <- function(row) {
-  rawObj <- rawConnection(raw(0), "wb")
-  on.exit(close(rawObj))
-  writeList(rawObj, row)
-  rawConnectionValue(rawObj)
 }
 
 writeRaw <- function(con, batch) {
