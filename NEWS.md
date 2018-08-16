@@ -123,6 +123,8 @@
 
 ### Configuration
 
+- `spark_config()` values can now also be specified as `options()`.
+
 - Support for functions as values in entries to `spark_config()` to enable advanced
   configuration workflows.
 

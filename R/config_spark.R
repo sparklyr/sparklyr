@@ -17,6 +17,11 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
     baseConfig <- config::get(file = localConfigFile)
   }
 
+  # allow options to specify sparklyr configuration settings
+  optionsConfigCheck <- grepl("^spark\\.|^sparklyr\\.|^livy\\.", names(options()))
+  optionsConfig <- options()[optionsConfigCheck]
+  baseConfig <- merge_lists(optionsConfig, baseConfig)
+
   userConfig <- tryCatch(config::get(file = file), error = function(e) NULL)
 
   mergedConfig <- merge_lists(baseConfig, userConfig)
