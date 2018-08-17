@@ -98,3 +98,27 @@ glance.ml_model_bisecting_kmeans <- function(x,
   wssse <- x$cost
   dplyr::tibble(wssse = wssse)
 }
+
+#' @rdname ml_unsupervised_tidiers
+#' @export
+tidy.ml_model_gaussian_mixture <- function(x,
+                                           ...){
+
+  center <- x$gaussians_df$mean %>%
+    as.data.frame() %>%
+    t() %>%
+    broom::fix_data_frame() %>%
+    dplyr::select(-!!"term")
+
+  names(center) <- x$.features
+
+  weight <- x$weights
+  size <- x$summary$cluster_sizes()
+  k <- x$summary$k
+
+  cbind(center,
+        weight = weight,
+        size = size,
+        cluster = 0:(k - 1) ) %>%
+    dplyr::as_tibble()
+}
