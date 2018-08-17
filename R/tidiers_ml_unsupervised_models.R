@@ -55,3 +55,19 @@ glance.ml_model_kmeans <- function(x,
 
   dplyr::tibble(wssse = wssse)
 }
+
+#' @rdname ml_unsupervised_tidiers
+#'
+#' @export
+tidy.ml_model_bisecting_kmeans <- function(x,
+                                 ...){
+
+  center <- x$centers
+  size <- x$summary$cluster_sizes()
+  k <- x$summary$k
+
+  cbind(center,
+        size = size,
+        cluster = 0:(k - 1) ) %>%
+    dplyr::as_tibble()
+}
