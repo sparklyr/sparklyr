@@ -11,7 +11,7 @@ NULL
 #' @export
 tidy.ml_model_kmeans <- function(x,
                                  ...){
-  model <- x$model
+
   center <- x$centers
   size <- x$summary$cluster_sizes()
   k <- x$summary$k
