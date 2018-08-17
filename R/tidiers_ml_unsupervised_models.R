@@ -50,9 +50,14 @@ glance.ml_model_kmeans <- function(x,
 
   # max.iter <- x$pipeline_model$stages[[2]]$param_map$max_iter
   # tol <- x$pipeline_model$stages[[2]]$param_map$tol
-  wssse <- x$cost
 
-  dplyr::tibble(wssse = wssse)
+  k <- x$summary$k
+  wssse <- x$cost
+  silhouette <- ml_clustering_evaluator(x$summary$predictions)
+
+  dplyr::tibble(k = k,
+                wssse = wssse,
+                silhouette = silhouette)
 }
 
 #' @rdname ml_unsupervised_tidiers
@@ -94,9 +99,12 @@ augment.ml_model_bisecting_kmeans <- function(x, newdata = NULL,
 #' @export
 glance.ml_model_bisecting_kmeans <- function(x,
                                    ...) {
-
+  k <- x$summary$k
   wssse <- x$cost
-  dplyr::tibble(wssse = wssse)
+  silhouette <- ml_clustering_evaluator(x$summary$predictions)
+  dplyr::tibble(k = k,
+                wssse = wssse,
+                silhouette = silhouette)
 }
 
 #' @rdname ml_unsupervised_tidiers
