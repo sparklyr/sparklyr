@@ -142,3 +142,14 @@ augment.ml_model_gaussian_mixture <- function(x, newdata = NULL,
     dplyr::select(!!!syms(vars)) %>%
     dplyr::rename(.cluster = !!"prediction")
 }
+
+#' @rdname ml_unsupervised_tidiers
+#' @export
+glance.ml_model_gaussian_mixture <- function(x,
+                                             ...) {
+
+  k <- x$summary$k
+  silhouette <- ml_clustering_evaluator(x$summary$predictions)
+  dplyr::tibble(k = k,
+                silhouette = silhouette)
+}
