@@ -8,7 +8,6 @@
 NULL
 
 #' @rdname ml_unsupervised_tidiers
-#'
 #' @export
 tidy.ml_model_kmeans <- function(x,
                                  ...){
@@ -57,7 +56,6 @@ glance.ml_model_kmeans <- function(x,
 }
 
 #' @rdname ml_unsupervised_tidiers
-#'
 #' @export
 tidy.ml_model_bisecting_kmeans <- function(x,
                                  ...){
@@ -92,3 +90,11 @@ augment.ml_model_bisecting_kmeans <- function(x, newdata = NULL,
     dplyr::rename(.cluster = !!"prediction")
 }
 
+#' @rdname ml_unsupervised_tidiers
+#' @export
+glance.ml_model_bisecting_kmeans <- function(x,
+                                   ...) {
+
+  wssse <- x$cost
+  dplyr::tibble(wssse = wssse)
+}
