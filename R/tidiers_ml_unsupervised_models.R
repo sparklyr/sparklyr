@@ -122,3 +122,23 @@ tidy.ml_model_gaussian_mixture <- function(x,
         cluster = 0:(k - 1) ) %>%
     dplyr::as_tibble()
 }
+
+#' @rdname ml_unsupervised_tidiers
+#'
+#' @importFrom rlang syms
+#'
+#' @export
+augment.ml_model_gaussian_mixture <- function(x, newdata = NULL,
+                                              ...){
+
+  # if the user doesn't provide a new data, this funcion will
+  # use the training set
+  if (is.null(newdata)){
+    newdata <- x$dataset
+  }
+  vars <- c(dplyr::tbl_vars(newdata), "prediction")
+
+  ml_predict(x, newdata) %>%
+    dplyr::select(!!!syms(vars)) %>%
+    dplyr::rename(.cluster = !!"prediction")
+}
