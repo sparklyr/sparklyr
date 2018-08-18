@@ -47,5 +47,5 @@ test_that("kmeans.glance() works", {
     glance()
 
   check_tidy(gl1, exp.row = 1,
-             exp.names = c("wssse"))
+             exp.names = c("k", "wssse", "silhouette"))
 })
