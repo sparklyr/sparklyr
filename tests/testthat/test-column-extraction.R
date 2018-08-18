@@ -20,7 +20,7 @@ test_that("we can interact with vector columns", {
   )
 
   # get predicted values
-  fitted <- sdf_predict(model)
+  fitted <- ml_predict(model)
 
   # extract first element from 'probability' vector
   extracted <- sdf_separate_column(
