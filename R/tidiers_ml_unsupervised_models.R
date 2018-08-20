@@ -48,16 +48,14 @@ augment.ml_model_kmeans <- function(x, newdata = NULL,
 glance.ml_model_kmeans <- function(x,
                                    ...) {
 
-  # max.iter <- x$pipeline_model$stages[[2]]$param_map$max_iter
-  # tol <- x$pipeline_model$stages[[2]]$param_map$tol
-
   k <- x$summary$k
   wssse <- x$cost
-  silhouette <- ml_clustering_evaluator(x$summary$predictions)
 
-  dplyr::tibble(k = k,
-                wssse = wssse,
-                silhouette = silhouette)
+  glance_tbl <- dplyr::tibble(k = k,
+                              wssse = wssse)
+
+  add_silhouette(x, glance_tbl)
+
 }
 
 #' @rdname ml_unsupervised_tidiers
@@ -99,12 +97,14 @@ augment.ml_model_bisecting_kmeans <- function(x, newdata = NULL,
 #' @export
 glance.ml_model_bisecting_kmeans <- function(x,
                                    ...) {
+
   k <- x$summary$k
   wssse <- x$cost
-  silhouette <- ml_clustering_evaluator(x$summary$predictions)
-  dplyr::tibble(k = k,
-                wssse = wssse,
-                silhouette = silhouette)
+
+  glance_tbl <- dplyr::tibble(k = k,
+                              wssse = wssse)
+
+  add_silhouette(x, glance_tbl)
 }
 
 #' @rdname ml_unsupervised_tidiers
@@ -157,7 +157,23 @@ glance.ml_model_gaussian_mixture <- function(x,
                                              ...) {
 
   k <- x$summary$k
-  silhouette <- ml_clustering_evaluator(x$summary$predictions)
-  dplyr::tibble(k = k,
-                silhouette = silhouette)
+  glance_tbl <- dplyr::tibble(k = k)
+  add_silhouette(x, glance_tbl)
+}
+
+# this function add silhouette to glance if
+# spark version is even or greater than 2.3.0
+add_silhouette <- function(x, glance_tbl){
+
+  connection <- spark_connection_find()
+  version <- spark_version_from_home(connection[[1]]$spark_home)
+  version <- numeric_version(version)
+
+  if (version >= "2.3.0") {
+
+    silhouette <- ml_clustering_evaluator(x$summary$predictions)
+    glance_tbl <- dplyr::bind_cols(glance_tbl,
+                                   silhouette = silhouette)
+  }
+  glance_tbl
 }
