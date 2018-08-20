@@ -42,9 +42,7 @@ test_that("gaussian_mixture.glance() works", {
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
-  connection <- spark_connection_find()
-  version <- spark_version_from_home(connection[[1]]$spark_home)
-  version <- numeric_version(version)
+  version <- spark_version(sc)
 
   gl1 <- mtcars_tbl %>%
     ml_gaussian_mixture(~ mpg + cyl, k = 4L, seed = 123) %>%
@@ -58,6 +56,4 @@ test_that("gaussian_mixture.glance() works", {
                exp.names = "k")
   }
 
-  check_tidy(gl1, exp.row = 1,
-             exp.names = c("k", "silhouette"))
 })

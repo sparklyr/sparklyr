@@ -165,9 +165,8 @@ glance.ml_model_gaussian_mixture <- function(x,
 # spark version is even or greater than 2.3.0
 add_silhouette <- function(x, glance_tbl){
 
-  connection <- spark_connection_find()
-  version <- spark_version_from_home(connection[[1]]$spark_home)
-  version <- numeric_version(version)
+  sc <- spark_connection(x$dataset)
+  version <- spark_version(sc)
 
   if (version >= "2.3.0") {
 
