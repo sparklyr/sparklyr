@@ -42,10 +42,19 @@ test_that("bisecting_kmeans.glance() works", {
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
+  connection <- spark_connection_find()
+  version <- spark_version_from_home(connection[[1]]$spark_home)
+  version <- numeric_version(version)
+
   gl1 <- mtcars_tbl %>%
     ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
     glance()
 
-  check_tidy(gl1, exp.row = 1,
-             exp.names = c("k", "wssse", "silhouette"))
+  if (version >= "2.3.0"){
+    check_tidy(gl1, exp.row = 1,
+               exp.names = c("k", "wssse", "silhouette"))
+  } else {
+    check_tidy(gl1, exp.row = 1,
+               exp.names = c("k", "wssse"))
+  }
 })
