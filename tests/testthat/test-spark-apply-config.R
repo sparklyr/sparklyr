@@ -3,6 +3,8 @@ test_requires("dplyr")
 sc <- testthat_spark_connection()
 
 test_that("'spark_apply' can pass environemnt variables from config", {
+  skip_on_travis()
+
   sc$config$sparklyr.apply.env.foo <- "env-test"
 
   expect_equal(
