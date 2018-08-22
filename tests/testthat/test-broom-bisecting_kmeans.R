@@ -1,27 +1,27 @@
-context("broom-kmeans")
+context("broom-bisecting_kmeans")
 
-test_that("kmeans.tidy() works", {
+test_that("bisecting_kmeans.tidy() works", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   mtcars_tbl <- testthat_tbl("mtcars")
 
   td1 <- mtcars_tbl %>%
-    ml_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
+    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
     tidy()
 
   check_tidy(td1, exp.row = 4,
              exp.names = c("mpg", "cyl", "size", "cluster"))
-  expect_equal(td1$size, c(14, 2, 6 , 10))
+  expect_equal(td1$size, c(11, 9, 7, 5))
 
 })
 
-test_that("kmeans.augment() works", {
+test_that("bisecting_kmeans.augment() works", {
   test_requires_version("2.0.0")
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
   au1 <- mtcars_tbl %>%
-    ml_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
+    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
     augment() %>%
     dplyr::collect()
 
@@ -29,7 +29,7 @@ test_that("kmeans.augment() works", {
              exp.name = c(names(mtcars), ".cluster"))
 
   au2 <- mtcars_tbl %>%
-    ml_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
+    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
     augment(newdata = head(mtcars_tbl, 25)) %>%
     dplyr::collect()
 
@@ -37,7 +37,7 @@ test_that("kmeans.augment() works", {
              exp.name = c(names(mtcars), ".cluster"))
 })
 
-test_that("kmeans.glance() works", {
+test_that("bisecting_kmeans.glance() works", {
   test_requires_version("2.0.0")
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
@@ -45,7 +45,7 @@ test_that("kmeans.glance() works", {
   version <- spark_version(sc)
 
   gl1 <- mtcars_tbl %>%
-    ml_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
+    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
     glance()
 
   if (version >= "2.3.0"){
