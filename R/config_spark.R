@@ -17,6 +17,11 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
     baseConfig <- config::get(file = localConfigFile)
   }
 
+  # allow options to specify sparklyr configuration settings
+  optionsConfigCheck <- grepl("^spark\\.|^sparklyr\\.|^livy\\.", names(options()))
+  optionsConfig <- options()[optionsConfigCheck]
+  baseConfig <- merge_lists(optionsConfig, baseConfig)
+
   userConfig <- tryCatch(config::get(file = file), error = function(e) NULL)
 
   mergedConfig <- merge_lists(baseConfig, userConfig)
@@ -72,4 +77,40 @@ merge_lists <- function (base_list, overlay_list, recursive = TRUE) {
     }
     merged_list
   }
+}
+
+spark_config_value_retries <- function(config, name, default, retries) {
+  success <- FALSE
+  value <- default
+
+  while (!success && retries > 0) {
+    retries <- retries - 1
+
+    result <- tryCatch({
+      list(
+        value = spark_config_value(config, name, default),
+        success = TRUE
+      )
+    }, error = function(e) {
+      if (sparklyr_boolean_option("sparklyr.verbose")) {
+        message("Reading ", name, " failed with error: ", e$message)
+      }
+
+      if (retries > 0) Sys.sleep(1)
+
+      list(
+        success = FALSE
+      )
+    })
+
+    success <- result$success
+    value <- result$value
+
+  }
+
+  if (!success) {
+    stop("Failed after ", retries, " attempts while reading conf value ", name)
+  }
+
+  value
 }

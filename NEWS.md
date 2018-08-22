@@ -107,6 +107,9 @@
 
 ### Extensions
 
+- Support for `sparklyr.invoke.trace` and `sparklyr.invoke.trace.callstack` configuration
+  options to trace all `invoke()` calls.
+
 - Support to invoke methods with `char` types using single character strings (@lawremi, #1395).
 
 ### Serialization
@@ -122,6 +125,8 @@
 - Implemented `tidy()`, `augment()`, and `glance()` for `ml_bisecting_kmeans()`, `ml_kmeans()`and `ml_gaussian_mixture()` models (@samuelmacedo83)
 
 ### Configuration
+
+- `spark_config()` values can now also be specified as `options()`.
 
 - Support for functions as values in entries to `spark_config()` to enable advanced
   configuration workflows.

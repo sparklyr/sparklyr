@@ -398,14 +398,14 @@ start_shell <- function(master,
     method = "shell",
     app_name = app_name,
     config = config,
+    state = new.env(),
     # spark_shell_connection
     spark_home = spark_home,
     backend = backend,
     monitoring = monitoring,
     gateway = gatewayInfo$gateway,
     output_file = output_file,
-    sessionId = sessionId,
-    state = new.env()
+    sessionId = sessionId
   ))
 
   # stop shell on R exit
@@ -601,5 +601,21 @@ invoke_static.spark_shell_connection <- function(sc, class, method, ...) {
 #' @export
 invoke_new.spark_shell_connection <- function(sc, class, ...) {
   invoke_method(sc, TRUE, class, "<init>", ...)
+}
+
+#' @export
+hive_context.spark_shell_connection <- function(sc) {
+  if (is.null(sc$state$hive_context))
+    sc$state$hive_context <- create_hive_context(sc)
+
+  sc$state$hive_context
+}
+
+#' @export
+spark_session.spark_shell_connection <- function(sc) {
+  if (is.null(sc$state$hive_context))
+    sc$state$hive_context <- create_hive_context(sc)
+
+  sc$state$hive_context
 }
 

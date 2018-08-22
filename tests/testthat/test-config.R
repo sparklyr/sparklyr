@@ -43,3 +43,13 @@ test_that("spark_config_value function works as expected", {
     spark_config_value(list(sparklyr.something = 2), "sparklyr.something", 1)
   )
 })
+
+test_that("spark_config() can load from options", {
+  options(sparklyr.test.entry = 10)
+
+  config <- spark_config()
+  expect_equal(
+    config$sparklyr.test.entry,
+    10
+  )
+})
