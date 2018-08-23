@@ -307,10 +307,10 @@ start_shell <- function(master,
     env <- unlist(as.list(environment))
     withr::with_envvar(env, {
       system2(spark_submit_path,
-        args = shell_args,
-        stdout = stdout_param,
-        stderr = stderr_param,
-        wait = FALSE)
+              args = shell_args,
+              stdout = stdout_param,
+              stderr = stderr_param,
+              wait = FALSE)
     })
 
     # support custom operations after spark-submit useful to enable port forwarding
@@ -554,12 +554,40 @@ initialize_connection.spark_shell_connection <- function(sc) {
       apply_config(default_config, conf, "set", "spark.")
 
       # create the spark context and assign the connection to it
-      sc$spark_context <- invoke_static(
-        sc,
-        "org.apache.spark.SparkContext",
-        "getOrCreate",
-        conf
-      )
+
+      sc$spark_context <- if (spark_version(sc) >= "2.0") {
+
+        # For Spark 2.0+, we create a `SparkSession`.
+        builder <- invoke_static(
+          sc,
+          "org.apache.spark.sql.SparkSession",
+          "builder"
+        ) %>%
+          invoke("config", conf)
+
+        builder <- invoke(builder, "config", conf)
+
+        sql_config <- connection_config(sc, "spark.sql.")
+        builder <- apply_config(sql_config, builder, "config", "spark.sql.")
+
+        session <- invoke(
+          builder,
+          "getOrCreate"
+        )
+
+        # Cache the session as the "hive context".
+        sc$state$hive_context <- session
+
+        # Return the `SparkContext`.
+        invoke(session, "sparkContext")
+      } else {
+        invoke_static(
+          sc,
+          "org.apache.spark.SparkContext",
+          "getOrCreate",
+          conf
+        )
+      }
 
       invoke(backend, "setSparkContext", sc$spark_context)
     }
