@@ -564,8 +564,6 @@ initialize_connection.spark_shell_connection <- function(sc) {
       invoke(backend, "setSparkContext", sc$spark_context)
     }
 
-    sc$spark_context$connection <- sc
-
     # create the java spark context and assign the connection to it
     sc$java_context <- invoke_static(
       sc,
@@ -573,7 +571,6 @@ initialize_connection.spark_shell_connection <- function(sc) {
       "fromSparkContext",
       sc$spark_context
     )
-    sc$java_context$connection <- sc
 
     # return the modified connection
     sc
