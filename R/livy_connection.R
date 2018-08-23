@@ -4,7 +4,7 @@ create_hive_context.livy_connection <- function(sc) {
   invoke_new(
     sc,
     "org.apache.spark.sql.hive.HiveContext",
-    sc$spark_context
+    spark_context(sc)
   )
 }
 
@@ -759,7 +759,7 @@ initialize_connection.livy_connection <- function(sc) {
     livy_load_scala_sources(sc)
 
     session <- NULL
-    sc$spark_context <- tryCatch({
+    sc$state$spark_context <- tryCatch({
       session <<- invoke_static(
         sc,
         "org.apache.spark.sql.SparkSession",
@@ -777,15 +777,15 @@ initialize_connection.livy_connection <- function(sc) {
       )
     })
 
-    sc$java_context <- invoke_static(
+    sc$state$java_context <- invoke_static(
       sc,
       "org.apache.spark.api.java.JavaSparkContext",
       "fromSparkContext",
-      sc$spark_context
+      spark_context(sc)
     )
 
     # cache spark version
-    sc$spark_version <- spark_version(sc)
+    sc$state$spark_version <- spark_version(sc)
 
     sc$state$hive_context <- session %||% create_hive_context(sc)
 

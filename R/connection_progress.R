@@ -34,7 +34,7 @@ connection_progress_base <- function(sc, terminated = FALSE)
     env$stages <- list()
 
   if ((!terminated || length(env$jobs) > 0) &&
-      !is.null(sc$spark_context)) {
+      !is.null(spark_context(sc))) {
     connection_progress_context(sc, function() {
       if (is.null(env$web_url)) {
         env$web_url <- tryCatch({
@@ -44,7 +44,7 @@ connection_progress_base <- function(sc, terminated = FALSE)
         })
       }
 
-      tracker <- invoke(sc$spark_context, "statusTracker")
+      tracker <- invoke(spark_context(sc), "statusTracker")
       active <- invoke(tracker, "getActiveJobIds")
 
       # add new jobs

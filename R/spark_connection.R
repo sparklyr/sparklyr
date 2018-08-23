@@ -44,13 +44,13 @@ NULL
 #' @name spark-api
 #' @export
 spark_context <- function(sc) {
-  sc$spark_context
+  sc$state$spark_context
 }
 
 #' @name spark-api
 #' @export
 java_context <- function(sc) {
-  sc$java_context
+  sc$state$java_context
 }
 
 #' @name spark-api

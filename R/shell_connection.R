@@ -531,9 +531,9 @@ initialize_connection.spark_shell_connection <- function(sc) {
   # initialize and return the connection
   tryCatch({
     backend <- invoke_static(sc, "sparklyr.Shell", "getBackend")
-    sc$spark_context <- invoke(backend, "getSparkContext")
+    sc$state$spark_context <- invoke(backend, "getSparkContext")
 
-    if (is.null(sc$spark_context)) {
+    if (is.null(spark_context(sc))) {
       # create the spark config
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
@@ -556,7 +556,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
 
       # create the spark context and assign the connection to it
 
-      sc$spark_context <- if (spark_version(sc) >= "2.0") {
+      sc$state$spark_context <- if (spark_version(sc) >= "2.0") {
 
         # For Spark 2.0+, we create a `SparkSession`.
         session <- invoke_static(
@@ -613,15 +613,15 @@ initialize_connection.spark_shell_connection <- function(sc) {
         ctx
       }
 
-      invoke(backend, "setSparkContext", sc$spark_context)
+      invoke(backend, "setSparkContext", spark_context(sc))
     }
 
     # create the java spark context and assign the connection to it
-    sc$java_context <- invoke_static(
+    sc$state$java_context <- invoke_static(
       sc,
       "org.apache.spark.api.java.JavaSparkContext",
       "fromSparkContext",
-      sc$spark_context
+      spark_context(sc)
     )
 
     # return the modified connection
