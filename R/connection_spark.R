@@ -8,6 +8,7 @@ NULL
 
 methods::setOldClass(c("livy_connection", "spark_connection"))
 methods::setOldClass(c("spark_gateway_connection", "spark_shell_connection", "spark_connection"))
+methods::setOldClass(c("test_connection", "spark_connection"))
 
 #' spark_jobj class
 #'

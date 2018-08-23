@@ -7,13 +7,12 @@ test_connection <- function(master = master,
   state <- new.env()
   state$open <- TRUE
 
-  structure(class = c("spark_connection", "test_connection"), list(
+  new_test_connection(list(
     # spark_connection
     master = master,
     config = config,
-    state = state,
-    spark_context = test_jobj_create(list()),
-    state = new.env()
+    spark_context = test_jobj_create(new_test_connection(list())),
+    state = state
     # test_connection
   ))
 }
@@ -54,7 +53,7 @@ test_jobj_create <- function(sc) {
     list(
       connection = sc
     ),
-    class = c("spark_jobj", "test_jobj")
+    class = c("test_jobj", "spark_jobj")
   )
 }
 
@@ -109,4 +108,8 @@ spark_session.test_connection <- function(sc) {
     sc$hive_context <- create_hive_context(sc)
 
   sc$hive_context
+}
+
+new_test_connection <- function(scon) {
+  new_spark_connection(scon, subclass = "test_connection")
 }
