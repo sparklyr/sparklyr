@@ -2,7 +2,7 @@ create_hive_context <- function(sc) {
   UseMethod("create_hive_context")
 }
 
-apply_config <- function(params, object, method, prefix) {
+apply_config <- function(object, params, method, prefix) {
   if (!length(params)) return(object)
 
   params %>%

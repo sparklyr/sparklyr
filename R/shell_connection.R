@@ -546,12 +546,12 @@ initialize_connection.spark_shell_connection <- function(sc) {
       }
 
       context_config <- connection_config(sc, "spark.", c("spark.sql."))
-      apply_config(context_config, conf, "set", "spark.")
+      apply_config(conf, context_config, "set", "spark.")
 
       default_config <- shell_connection_config_defaults()
       default_config_remove <- Filter(function(e) e %in% names(context_config), names(default_config))
       default_config[default_config_remove] <- NULL
-      apply_config(default_config, conf, "set", "spark.")
+      apply_config(conf, default_config, "set", "spark.")
 
       # create the spark context and assign the connection to it
 
@@ -568,7 +568,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
         builder <- invoke(builder, "config", conf)
 
         sql_config <- connection_config(sc, "spark.sql.")
-        builder <- apply_config(sql_config, builder, "config", "spark.sql.")
+        builder <- apply_config(builder, sql_config, "config", "spark.sql.")
 
         session <- invoke(
           builder,

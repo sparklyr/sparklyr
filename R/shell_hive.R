@@ -44,7 +44,7 @@ shell_create_hive_context_v1 <- function(sc) {
 
   # apply configuration
   params <- connection_config(sc, "spark.sql.")
-  apply_config(params, hive_context, "setConf", "spark.sql.")
+  apply_config(hive_context, params, "setConf", "spark.sql.")
 
   # return hive_context
   hive_context

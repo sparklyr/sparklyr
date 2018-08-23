@@ -782,7 +782,7 @@ initialize_connection.livy_connection <- function(sc) {
 
     if (spark_version(sc) < "2.0.0") {
       params <- connection_config(sc, "spark.sql.")
-      apply_config(params, hive_context, "setConf", "spark.sql.")
+      apply_config(hive_context, params, "setConf", "spark.sql.")
     }
 
     sc
