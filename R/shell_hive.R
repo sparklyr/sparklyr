@@ -1,7 +1,4 @@
 create_hive_context.spark_shell_connection <- function(sc) {
-  if (spark_version(sc) >= "2.0.0")
-    create_hive_context_v2(sc)
-  else
     shell_create_hive_context_v1(sc)
 }
 
