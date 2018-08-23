@@ -558,22 +558,14 @@ initialize_connection.spark_shell_connection <- function(sc) {
       sc$spark_context <- if (spark_version(sc) >= "2.0") {
 
         # For Spark 2.0+, we create a `SparkSession`.
-        builder <- invoke_static(
+        session <- invoke_static(
           sc,
           "org.apache.spark.sql.SparkSession",
           "builder"
         ) %>%
-          invoke("config", conf)
-
-        builder <- invoke(builder, "config", conf)
-
-        sql_config <- connection_config(sc, "spark.sql.")
-        builder <- apply_config(builder, sql_config, "config", "spark.sql.")
-
-        session <- invoke(
-          builder,
-          "getOrCreate"
-        )
+          invoke("config", conf) %>%
+          apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql") %>%
+          invoke("getOrCreate")
 
         # Cache the session as the "hive context".
         sc$state$hive_context <- session
