@@ -5,6 +5,12 @@
 \alias{tidy.ml_model_kmeans}
 \alias{augment.ml_model_kmeans}
 \alias{glance.ml_model_kmeans}
+\alias{tidy.ml_model_bisecting_kmeans}
+\alias{augment.ml_model_bisecting_kmeans}
+\alias{glance.ml_model_bisecting_kmeans}
+\alias{tidy.ml_model_gaussian_mixture}
+\alias{augment.ml_model_gaussian_mixture}
+\alias{glance.ml_model_gaussian_mixture}
 \title{Tidying methods for Spark ML unsupervised models}
 \usage{
 \method{tidy}{ml_model_kmeans}(x, ...)
@@ -12,6 +18,18 @@
 \method{augment}{ml_model_kmeans}(x, newdata = NULL, ...)
 
 \method{glance}{ml_model_kmeans}(x, ...)
+
+\method{tidy}{ml_model_bisecting_kmeans}(x, ...)
+
+\method{augment}{ml_model_bisecting_kmeans}(x, newdata = NULL, ...)
+
+\method{glance}{ml_model_bisecting_kmeans}(x, ...)
+
+\method{tidy}{ml_model_gaussian_mixture}(x, ...)
+
+\method{augment}{ml_model_gaussian_mixture}(x, newdata = NULL, ...)
+
+\method{glance}{ml_model_gaussian_mixture}(x, ...)
 }
 \arguments{
 \item{x}{a Spark ML model.}
