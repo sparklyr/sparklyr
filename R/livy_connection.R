@@ -800,14 +800,4 @@ initialize_connection.livy_connection <- function(sc) {
   })
 }
 
-#' @export
-hive_context.livy_connection <- function(sc) {
-  sc$hive_context
-}
-
-#' @export
-spark_session.livy_connection <- function(sc) {
-  sc$hive_context
-}
-
 # nocov end

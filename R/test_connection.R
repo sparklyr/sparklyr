@@ -94,22 +94,6 @@ create_hive_context.test_connection <- function(sc) {
   test_jobj_create(sc)
 }
 
-#' @export
-hive_context.test_connection <- function(sc) {
-  if (is.null(sc$hive_context))
-    sc$hive_context <- create_hive_context(sc)
-
-  sc$hive_context
-}
-
-#' @export
-spark_session.test_connection <- function(sc) {
-  if (is.null(sc$hive_context))
-    sc$hive_context <- create_hive_context(sc)
-
-  sc$hive_context
-}
-
 new_test_connection <- function(scon) {
   new_spark_connection(scon, subclass = "test_connection")
 }

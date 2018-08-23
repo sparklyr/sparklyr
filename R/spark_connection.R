@@ -65,6 +65,17 @@ spark_session <- function(sc) {
   UseMethod("spark_session")
 }
 
+
+#' @export
+hive_context.spark_connection <- function(sc) {
+  sc$state$hive_context
+}
+
+#' @export
+spark_session.spark_connection <- function(sc) {
+  sc$state$hive_context
+}
+
 #' Retrieve the Spark Connection Associated with an R Object
 #'
 #' Retrieve the \code{spark_connection} associated with an \R object.

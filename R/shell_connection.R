@@ -651,14 +651,3 @@ invoke_static.spark_shell_connection <- function(sc, class, method, ...) {
 invoke_new.spark_shell_connection <- function(sc, class, ...) {
   invoke_method(sc, TRUE, class, "<init>", ...)
 }
-
-#' @export
-hive_context.spark_shell_connection <- function(sc) {
-  sc$state$hive_context
-}
-
-#' @export
-spark_session.spark_shell_connection <- function(sc) {
-  sc$state$hive_context
-}
-
