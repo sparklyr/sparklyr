@@ -759,8 +759,7 @@ initialize_connection.livy_connection <- function(sc) {
     livy_load_scala_sources(sc)
 
     session <- NULL
-    sc$spark_context <- if (spark_version(sc) >= "2.0") {
-      # For Spark 2.0+, we create a `SparkSession`.
+    sc$spark_context <- tryCatch({
       session <<- invoke_static(
         sc,
         "org.apache.spark.sql.SparkSession",
@@ -769,13 +768,14 @@ initialize_connection.livy_connection <- function(sc) {
         invoke("getOrCreate")
 
       invoke(session, "sparkContext")
-    } else {
+    },
+    error = function(e) {
       invoke_static(
         sc,
         "org.apache.spark.SparkContext",
         "getOrCreate"
       )
-    }
+    })
 
     sc$java_context <- invoke_static(
       sc,
