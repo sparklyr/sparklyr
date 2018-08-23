@@ -453,26 +453,27 @@ connection_is_open.spark_shell_connection <- function(sc) {
 
 #' @export
 spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
-  if (!is.null(sc$output_file) && file.exists(sc$output_file)) {
-    log <- file(sc$output_file)
+  log <- if (.Platform$OS.type == "windows")
+    file("logs/log4j.spark.log")
+  else
+    tryCatch(file(sc$output_file), error = function(e) NULL)
+
+  if (is.null(log)) {
+    return("Spark log is not available.")
+  } else {
     lines <- readLines(log)
     close(log)
-
-    if (!is.null(filter)) {
-      lines <- lines[grepl(filter, lines)]
-    }
-
-    if (!is.null(n))
-      linesLog <- utils::tail(lines, n = n)
-    else
-      linesLog <- lines
-  }
-  else {
-    linesLog <- "spark log is not available"
   }
 
-  attr(linesLog, "class") <- "spark_log"
-  linesLog
+  if (!is.null(filter))
+    lines <- lines[grepl(filter, lines)]
+
+  linesLog <- if (!is.null(n))
+    utils::tail(lines, n = n)
+  else
+    lines
+
+  structure(linesLog, class = "spark_log")
 }
 
 #' @export

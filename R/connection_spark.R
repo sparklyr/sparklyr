@@ -212,40 +212,6 @@ spark_connect <- function(master,
   scon
 }
 
-#' @export
-spark_log.spark_connection <- function(sc, n = 100, filter = NULL, ...) {
-  if (.Platform$OS.type == "windows") {
-    log <- file("logs/log4j.spark.log")
-    lines <- readLines(log)
-
-    tryCatch(function() {
-      close(log)
-    })
-
-    if (!is.null(filter)) {
-      lines <- lines[grepl(filter, lines)]
-    }
-
-    if (!is.null(n))
-      linesLog <- utils::tail(lines, n = n)
-    else
-      linesLog <- lines
-
-    attr(linesLog, "class") <- "sparklyr_log"
-
-    linesLog
-  }
-  else {
-    spark_log.spark_shell_connection(sc, n = n, filter, ...)
-  }
-}
-
-#' @export
-print.sparklyr_log <- function(x, ...) {
-  cat(x, sep = "\n")
-  cat("\n")
-}
-
 #' @name spark-connections
 #' @export
 spark_connection_is_open <- function(sc) {
