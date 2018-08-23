@@ -176,9 +176,6 @@ spark_connect <- function(master,
 
   scon <- initialize_connection(scon)
 
-  # mark the connection as a DBIConnection class to allow DBI to use defaults
-  attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
-
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
   libs <- vapply(libs,
