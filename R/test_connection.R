@@ -4,17 +4,18 @@ test_connection <- function(master = master,
                 version,
                 hadoop_version ,
                 extensions) {
-  state <- new.env()
-  state$open <- TRUE
-
-  new_test_connection(list(
+  sc <- new_test_connection(list(
     # spark_connection
     master = master,
     config = config,
-    spark_context = test_jobj_create(new_test_connection(list())),
-    state = state
+    state = new.env()
     # test_connection
   ))
+
+  sc$state$spark_context <- test_jobj_create(sc)
+  sc$state$hive_context <- test_jobj_create(sc)
+  sc$state$open <- TRUE
+  sc
 }
 
 #' @export
