@@ -21,6 +21,10 @@ spark_version <- function(sc) {
   if (!is.null(sc$spark_version))
     return(sc$spark_version)
 
+  # if `SPARK_HOME` is specified, infer version from it
+  if (!is.null(sc$spark_home))
+    return(spark_version_from_home(sc$spark_home))
+
   # get the version
   version <- invoke(spark_context(sc), "version")
 
