@@ -4,7 +4,10 @@
 #'
 #' @name spark_connection-class
 #' @exportClass spark_connection
-methods::setOldClass("spark_connection")
+NULL
+
+methods::setOldClass(c("livy_connection", "spark_connection"))
+methods::setOldClass(c("spark_gateway_connection", "spark_shell_connection", "spark_connection"))
 
 #' spark_jobj class
 #'
