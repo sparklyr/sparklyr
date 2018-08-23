@@ -392,7 +392,7 @@ start_shell <- function(master,
   })
 
   # create the shell connection
-  sc <- structure(class = c("spark_connection", "spark_shell_connection"), list(
+  sc <- new_spark_shell_connection(list(
     # spark_connection
     master = master,
     method = "shell",

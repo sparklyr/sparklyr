@@ -553,7 +553,7 @@ livy_connection <- function(master,
 
   session <- livy_create_session(master, config)
 
-  sc <- structure(class = c("spark_connection", "livy_connection", "DBIConnection"), list(
+  sc <- new_livy_connection(list(
     # spark_connection
     master = master,
     method = "livy",
