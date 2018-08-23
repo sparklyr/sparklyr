@@ -1,14 +1,11 @@
 # nocov start
 
 create_hive_context.livy_connection <- function(sc) {
-  if (spark_version(sc) >= "2.0.0")
-    create_hive_context_v2(sc)
-  else
-    invoke_new(
-      sc,
-      "org.apache.spark.sql.hive.HiveContext",
-      sc$spark_context
-    )
+  invoke_new(
+    sc,
+    "org.apache.spark.sql.hive.HiveContext",
+    spark_context(sc)
+  )
 }
 
 #' @import httr
@@ -86,7 +83,7 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
 
   #Params need to be restrictued or livy will complain about unknown parameters
   allowed_params <- c("proxy_user", "jars", "py_files", "files", "driver_memory", "driver_cores", "executor_memory",
-    "executor_cores", "num_executors", "archives", "queue", "name", "heartbeat_timeout")
+                      "executor_cores", "num_executors", "archives", "queue", "name", "heartbeat_timeout")
 
   additional_params <- list(...)
 
@@ -553,7 +550,7 @@ livy_connection <- function(master,
 
   session <- livy_create_session(master, config)
 
-  sc <- structure(class = c("spark_connection", "livy_connection", "DBIConnection"), list(
+  sc <- new_livy_connection(list(
     # spark_connection
     master = master,
     method = "livy",
@@ -761,44 +758,46 @@ initialize_connection.livy_connection <- function(sc) {
   tryCatch({
     livy_load_scala_sources(sc)
 
-    sc$spark_context <- invoke_static(
-      sc,
-      "org.apache.spark.SparkContext",
-      "getOrCreate"
-    )
+    session <- NULL
+    sc$state$spark_context <- tryCatch({
+      session <<- invoke_static(
+        sc,
+        "org.apache.spark.sql.SparkSession",
+        "builder"
+      ) %>%
+        invoke("getOrCreate")
 
-    sc$java_context <- invoke_static(
+      invoke(session, "sparkContext")
+    },
+    error = function(e) {
+      invoke_static(
+        sc,
+        "org.apache.spark.SparkContext",
+        "getOrCreate"
+      )
+    })
+
+    sc$state$java_context <- invoke_static(
       sc,
       "org.apache.spark.api.java.JavaSparkContext",
       "fromSparkContext",
-      sc$spark_context
+      spark_context(sc)
     )
 
     # cache spark version
-    sc$spark_version <- spark_version(sc)
+    sc$state$spark_version <- spark_version(sc)
 
-    sc$hive_context <- create_hive_context(sc)
-    sc$hive_context$connection <- sc
+    sc$state$hive_context <- session %||% create_hive_context(sc)
 
     if (spark_version(sc) < "2.0.0") {
       params <- connection_config(sc, "spark.sql.")
-      apply_config(params, hive_context, "setConf", "spark.sql.")
+      apply_config(hive_context, params, "setConf", "spark.sql.")
     }
 
     sc
   }, error = function(err) {
     stop("Failed to initialize livy connection: ", err$message)
   })
-}
-
-#' @export
-hive_context.livy_connection <- function(sc) {
-  sc$hive_context
-}
-
-#' @export
-spark_session.livy_connection <- function(sc) {
-  sc$hive_context
 }
 
 # nocov end

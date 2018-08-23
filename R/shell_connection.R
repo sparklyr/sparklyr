@@ -307,10 +307,10 @@ start_shell <- function(master,
     env <- unlist(as.list(environment))
     withr::with_envvar(env, {
       system2(spark_submit_path,
-        args = shell_args,
-        stdout = stdout_param,
-        stderr = stderr_param,
-        wait = FALSE)
+              args = shell_args,
+              stdout = stdout_param,
+              stderr = stderr_param,
+              wait = FALSE)
     })
 
     # support custom operations after spark-submit useful to enable port forwarding
@@ -392,7 +392,7 @@ start_shell <- function(master,
   })
 
   # create the shell connection
-  sc <- structure(class = c("spark_connection", "spark_shell_connection"), list(
+  sc <- new_spark_shell_connection(list(
     # spark_connection
     master = master,
     method = "shell",
@@ -453,26 +453,27 @@ connection_is_open.spark_shell_connection <- function(sc) {
 
 #' @export
 spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
-  if (!is.null(sc$output_file) && file.exists(sc$output_file)) {
-    log <- file(sc$output_file)
+  log <- if (.Platform$OS.type == "windows")
+    file("logs/log4j.spark.log")
+  else
+    tryCatch(file(sc$output_file), error = function(e) NULL)
+
+  if (is.null(log)) {
+    return("Spark log is not available.")
+  } else {
     lines <- readLines(log)
     close(log)
-
-    if (!is.null(filter)) {
-      lines <- lines[grepl(filter, lines)]
-    }
-
-    if (!is.null(n))
-      linesLog <- utils::tail(lines, n = n)
-    else
-      linesLog <- lines
-  }
-  else {
-    linesLog <- "spark log is not available"
   }
 
-  attr(linesLog, "class") <- "spark_log"
-  linesLog
+  if (!is.null(filter))
+    lines <- lines[grepl(filter, lines)]
+
+  linesLog <- if (!is.null(n))
+    utils::tail(lines, n = n)
+  else
+    lines
+
+  structure(linesLog, class = "spark_log")
 }
 
 #' @export
@@ -530,9 +531,9 @@ initialize_connection.spark_shell_connection <- function(sc) {
   # initialize and return the connection
   tryCatch({
     backend <- invoke_static(sc, "sparklyr.Shell", "getBackend")
-    sc$spark_context <- invoke(backend, "getSparkContext")
+    sc$state$spark_context <- invoke(backend, "getSparkContext")
 
-    if (is.null(sc$spark_context)) {
+    if (is.null(spark_context(sc))) {
       # create the spark config
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
@@ -546,34 +547,82 @@ initialize_connection.spark_shell_connection <- function(sc) {
       }
 
       context_config <- connection_config(sc, "spark.", c("spark.sql."))
-      apply_config(context_config, conf, "set", "spark.")
+      apply_config(conf, context_config, "set", "spark.")
 
       default_config <- shell_connection_config_defaults()
       default_config_remove <- Filter(function(e) e %in% names(context_config), names(default_config))
       default_config[default_config_remove] <- NULL
-      apply_config(default_config, conf, "set", "spark.")
+      apply_config(conf, default_config, "set", "spark.")
 
       # create the spark context and assign the connection to it
-      sc$spark_context <- invoke_static(
-        sc,
-        "org.apache.spark.SparkContext",
-        "getOrCreate",
-        conf
-      )
 
-      invoke(backend, "setSparkContext", sc$spark_context)
+      sc$state$spark_context <- if (spark_version(sc) >= "2.0") {
+
+        # For Spark 2.0+, we create a `SparkSession`.
+        session <- invoke_static(
+          sc,
+          "org.apache.spark.sql.SparkSession",
+          "builder"
+        ) %>%
+          invoke("config", conf) %>%
+          apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.") %>%
+          invoke("getOrCreate")
+
+        # Cache the session as the "hive context".
+        sc$state$hive_context <- session
+
+        # Return the `SparkContext`.
+        invoke(session, "sparkContext")
+      } else {
+        ctx <- invoke_static(
+          sc,
+          "org.apache.spark.SparkContext",
+          "getOrCreate",
+          conf
+        )
+
+        sc$state$hive_context <- tryCatch(
+          invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", ctx),
+          error = function(e) {
+            warning(e$message)
+            warning("Failed to create Hive context, falling back to SQL. Some operations, ",
+                    "like window-functions, will not work")
+
+            jsc <- invoke_static(
+              sc,
+              "org.apache.spark.api.java.JavaSparkContext",
+              "fromSparkContext",
+              ctx
+            )
+
+            hive_context <- invoke_static(
+              sc,
+              "org.apache.spark.sql.api.r.SQLUtils",
+              "createSQLContext",
+              jsc
+            )
+
+            params <- connection_config(sc, "spark.sql.")
+            apply_config(hive_context, params, "setConf", "spark.sql.")
+
+            # return hive_context
+            hive_context
+          }
+        )
+
+        ctx
+      }
+
+      invoke(backend, "setSparkContext", spark_context(sc))
     }
 
-    sc$spark_context$connection <- sc
-
     # create the java spark context and assign the connection to it
-    sc$java_context <- invoke_static(
+    sc$state$java_context <- invoke_static(
       sc,
       "org.apache.spark.api.java.JavaSparkContext",
       "fromSparkContext",
-      sc$spark_context
+      spark_context(sc)
     )
-    sc$java_context$connection <- sc
 
     # return the modified connection
     sc
@@ -602,20 +651,3 @@ invoke_static.spark_shell_connection <- function(sc, class, method, ...) {
 invoke_new.spark_shell_connection <- function(sc, class, ...) {
   invoke_method(sc, TRUE, class, "<init>", ...)
 }
-
-#' @export
-hive_context.spark_shell_connection <- function(sc) {
-  if (is.null(sc$state$hive_context))
-    sc$state$hive_context <- create_hive_context(sc)
-
-  sc$state$hive_context
-}
-
-#' @export
-spark_session.spark_shell_connection <- function(sc) {
-  if (is.null(sc$state$hive_context))
-    sc$state$hive_context <- create_hive_context(sc)
-
-  sc$state$hive_context
-}
-

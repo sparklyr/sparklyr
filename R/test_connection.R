@@ -4,18 +4,18 @@ test_connection <- function(master = master,
                 version,
                 hadoop_version ,
                 extensions) {
-  state <- new.env()
-  state$open <- TRUE
-
-  structure(class = c("spark_connection", "test_connection"), list(
+  sc <- new_test_connection(list(
     # spark_connection
     master = master,
     config = config,
-    state = state,
-    spark_context = test_jobj_create(list()),
     state = new.env()
     # test_connection
   ))
+
+  sc$state$spark_context <- test_jobj_create(sc)
+  sc$state$hive_context <- test_jobj_create(sc)
+  sc$state$open <- TRUE
+  sc
 }
 
 #' @export
@@ -54,7 +54,7 @@ test_jobj_create <- function(sc) {
     list(
       connection = sc
     ),
-    class = c("spark_jobj", "test_jobj")
+    class = c("test_jobj", "spark_jobj")
   )
 }
 
@@ -95,18 +95,6 @@ create_hive_context.test_connection <- function(sc) {
   test_jobj_create(sc)
 }
 
-#' @export
-hive_context.test_connection <- function(sc) {
-  if (is.null(sc$hive_context))
-    sc$hive_context <- create_hive_context(sc)
-
-  sc$hive_context
-}
-
-#' @export
-spark_session.test_connection <- function(sc) {
-  if (is.null(sc$hive_context))
-    sc$hive_context <- create_hive_context(sc)
-
-  sc$hive_context
+new_test_connection <- function(scon) {
+  new_spark_connection(scon, subclass = "test_connection")
 }

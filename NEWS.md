@@ -126,6 +126,8 @@
 
 ### Configuration
 
+- Static SQL configuration properties are now respected for Spark 2.3, and `spark.sql.catalogImplementation` defaults to `hive` to maintain Hive support (#1496, #415).
+
 - `spark_config()` values can now also be specified as `options()`.
 
 - Support for functions as values in entries to `spark_config()` to enable advanced

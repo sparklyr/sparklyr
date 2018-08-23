@@ -57,7 +57,7 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
   })
 
   # create the shell connection
-  sc <- structure(class = c("spark_connection", "spark_gateway_connection", "spark_shell_connection"), list(
+  sc <- new_spark_gateway_connection(list(
     # spark_connection
     master = master,
     method = "gateway",

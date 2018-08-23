@@ -4,7 +4,11 @@
 #'
 #' @name spark_connection-class
 #' @exportClass spark_connection
-methods::setOldClass("spark_connection")
+NULL
+
+methods::setOldClass(c("livy_connection", "spark_connection"))
+methods::setOldClass(c("spark_gateway_connection", "spark_shell_connection", "spark_connection"))
+methods::setOldClass(c("test_connection", "spark_connection"))
 
 #' spark_jobj class
 #'
@@ -176,12 +180,6 @@ spark_connect <- function(master,
 
   scon <- initialize_connection(scon)
 
-  # mark the connection as a DBIConnection class to allow DBI to use defaults
-  attr(scon, "class") <- c(attr(scon, "class"), "DBIConnection")
-
-  # update spark_context and hive_context connections with DBIConnection
-  scon$spark_context$connection <- scon
-
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
   libs <- vapply(libs,
@@ -212,40 +210,6 @@ spark_connect <- function(master,
 
   # return scon
   scon
-}
-
-#' @export
-spark_log.spark_connection <- function(sc, n = 100, filter = NULL, ...) {
-  if (.Platform$OS.type == "windows") {
-    log <- file("logs/log4j.spark.log")
-    lines <- readLines(log)
-
-    tryCatch(function() {
-      close(log)
-    })
-
-    if (!is.null(filter)) {
-      lines <- lines[grepl(filter, lines)]
-    }
-
-    if (!is.null(n))
-      linesLog <- utils::tail(lines, n = n)
-    else
-      linesLog <- lines
-
-    attr(linesLog, "class") <- "sparklyr_log"
-
-    linesLog
-  }
-  else {
-    spark_log.spark_shell_connection(sc, n = n, filter, ...)
-  }
-}
-
-#' @export
-print.sparklyr_log <- function(x, ...) {
-  cat(x, sep = "\n")
-  cat("\n")
 }
 
 #' @name spark-connections
