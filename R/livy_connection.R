@@ -1,14 +1,11 @@
 # nocov start
 
 create_hive_context.livy_connection <- function(sc) {
-  if (spark_version(sc) >= "2.0.0")
-    create_hive_context_v2(sc)
-  else
-    invoke_new(
-      sc,
-      "org.apache.spark.sql.hive.HiveContext",
-      sc$spark_context
-    )
+  invoke_new(
+    sc,
+    "org.apache.spark.sql.hive.HiveContext",
+    sc$spark_context
+  )
 }
 
 #' @import httr
@@ -86,7 +83,7 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
 
   #Params need to be restrictued or livy will complain about unknown parameters
   allowed_params <- c("proxy_user", "jars", "py_files", "files", "driver_memory", "driver_cores", "executor_memory",
-    "executor_cores", "num_executors", "archives", "queue", "name", "heartbeat_timeout")
+                      "executor_cores", "num_executors", "archives", "queue", "name", "heartbeat_timeout")
 
   additional_params <- list(...)
 
@@ -761,11 +758,24 @@ initialize_connection.livy_connection <- function(sc) {
   tryCatch({
     livy_load_scala_sources(sc)
 
-    sc$spark_context <- invoke_static(
-      sc,
-      "org.apache.spark.SparkContext",
-      "getOrCreate"
-    )
+    session <- NULL
+    sc$spark_context <- if (spark_version(sc) >= "2.0") {
+      # For Spark 2.0+, we create a `SparkSession`.
+      session <<- invoke_static(
+        sc,
+        "org.apache.spark.sql.SparkSession",
+        "builder"
+      ) %>%
+        invoke("getOrCreate")
+
+      invoke(session, "sparkContext")
+    } else {
+      invoke_static(
+        sc,
+        "org.apache.spark.SparkContext",
+        "getOrCreate"
+      )
+    }
 
     sc$java_context <- invoke_static(
       sc,
@@ -777,8 +787,7 @@ initialize_connection.livy_connection <- function(sc) {
     # cache spark version
     sc$spark_version <- spark_version(sc)
 
-    sc$hive_context <- create_hive_context(sc)
-    sc$hive_context$connection <- sc
+    sc$hive_context <- session %||% create_hive_context(sc)
 
     if (spark_version(sc) < "2.0.0") {
       params <- connection_config(sc, "spark.sql.")
