@@ -4,16 +4,32 @@
 \alias{ml_tree_tidiers}
 \alias{tidy.ml_model_decision_tree_classification}
 \alias{tidy.ml_model_decision_tree_regression}
+\alias{augment.ml_model_decision_tree_classification}
+\alias{augment.ml_model_decision_tree_regression}
+\alias{glance.ml_model_decision_tree_classification}
+\alias{glance.ml_model_decision_tree_regression}
 \title{Tidying methods for Spark ML tree models}
 \usage{
 \method{tidy}{ml_model_decision_tree_classification}(x, ...)
 
 \method{tidy}{ml_model_decision_tree_regression}(x, ...)
+
+\method{augment}{ml_model_decision_tree_classification}(x,
+  newdata = NULL, ...)
+
+\method{augment}{ml_model_decision_tree_regression}(x, newdata = NULL,
+  ...)
+
+\method{glance}{ml_model_decision_tree_classification}(x, ...)
+
+\method{glance}{ml_model_decision_tree_regression}(x, ...)
 }
 \arguments{
 \item{x}{a Spark ML model.}
 
 \item{...}{extra arguments (not used.)}
+
+\item{newdata}{a tbl_spark of new data to use for prediction.}
 }
 \description{
 These methods summarize the results of Spark ML models into tidy forms.

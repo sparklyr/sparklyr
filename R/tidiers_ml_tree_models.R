@@ -63,3 +63,31 @@ augment.ml_model_decision_tree_regression <- function(x, newdata = NULL,
     dplyr::select(!!!syms(vars)) %>%
     dplyr::rename(.prediction = !!"prediction")
 }
+
+#' @rdname ml_tree_tidiers
+#' @export
+glance.ml_model_decision_tree_classification <- function(x,
+                                             ...) {
+
+  num_nodes <- x$model$num_nodes()
+  depth <- x$model$depth()
+  impurity <- x$model$param_map$impurity
+
+  dplyr::tibble(num_nodes = num_nodes,
+                depth = depth,
+                impurity = impurity)
+}
+
+#' @rdname ml_tree_tidiers
+#' @export
+glance.ml_model_decision_tree_regression <- function(x,
+                                             ...) {
+
+  num_nodes <- x$model$num_nodes()
+  depth <- x$model$depth()
+  impurity <- x$model$param_map$impurity
+
+  dplyr::tibble(num_nodes = num_nodes,
+                depth = depth,
+                impurity = impurity)
+}
