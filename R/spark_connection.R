@@ -248,6 +248,13 @@ new_spark_gateway_connection <- function(scon, ..., subclass = NULL) {
   )
 }
 
+new_databricks_connection <- function(scon) {
+  new_spark_gateway_connection(
+    scon,
+    subclass = "databricks_connection"
+  )
+}
+
 new_livy_connection <- function(scon) {
   new_spark_connection(scon, subclass = "livy_connection")
 }

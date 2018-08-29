@@ -11,9 +11,12 @@ databricks_connection <- function(config, extensions) {
     stop(paste("Failed to start sparklyr backend:", err$message))
   })
 
-  gateway_connection(
-    paste("sparklyr://localhost:", gatewayPort, "/", gatewayPort, sep = ""),
-    config = config)
+  new_databricks_connection(
+    gateway_connection(
+      paste("sparklyr://localhost:", gatewayPort, "/", gatewayPort, sep = ""),
+      config = config
+    )
+  )
 }
 
 
