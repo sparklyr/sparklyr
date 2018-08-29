@@ -24,3 +24,22 @@ glance.ml_model <- function(x, ...) {
               setdiff(class(x), "ml_model"))
   )
 }
+
+# this function provides broom::augment() for
+# supervised models
+#' @importFrom rlang syms
+broom_augment_supervised <- function(x, newdata = NULL,
+                                     ...){
+
+  # if the user doesn't provide a new data, this funcion will
+  # use the training set
+  if (is.null(newdata)){
+    newdata <- x$dataset
+  }
+
+  vars <- c(dplyr::tbl_vars(newdata), "predicted_label")
+
+  ml_predict(x, newdata) %>%
+    dplyr::select(!!!syms(vars)) %>%
+    dplyr::rename(.predicted_label = !!"predicted_label")
+}
