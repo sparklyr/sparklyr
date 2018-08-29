@@ -78,13 +78,6 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
     }
   }, onexit = TRUE)
 
-  # initialize and return the connection
-  tryCatch({
-    sc <- initialize_connection(sc)
-  }, error = function(e) {
-    stop("Failed during initialize_connection:", e$message)
-  })
-
   sc
 }
 

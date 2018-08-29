@@ -16,6 +16,24 @@ spark_version_clean <- function(version) {
 #'
 #' @export
 spark_version <- function(sc) {
+  UseMethod("spark_version")
+}
+
+#' @export
+spark_version.databricks_connection <- function(sc) {
+  if (!is.null(sc$state$spark_version))
+    return(sc$state$spark_version)
+
+  version <- eval(rlang::parse_expr("SparkR::sparkR.version()"))
+
+  sc$state$spark_version <- numeric_version(version)
+
+  # return to caller
+  sc$state$spark_version
+}
+
+#' @export
+spark_version.default <- function(sc) {
 
   # use cached value if available
   if (!is.null(sc$state$spark_version))

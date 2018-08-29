@@ -574,47 +574,45 @@ initialize_connection.spark_shell_connection <- function(sc) {
         # Return the `SparkContext`.
         invoke(session, "sparkContext")
       } else {
-        ctx <- invoke_static(
+        invoke_static(
           sc,
           "org.apache.spark.SparkContext",
           "getOrCreate",
           conf
         )
-
-        sc$state$hive_context <- tryCatch(
-          invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", ctx),
-          error = function(e) {
-            warning(e$message)
-            warning("Failed to create Hive context, falling back to SQL. Some operations, ",
-                    "like window-functions, will not work")
-
-            jsc <- invoke_static(
-              sc,
-              "org.apache.spark.api.java.JavaSparkContext",
-              "fromSparkContext",
-              ctx
-            )
-
-            hive_context <- invoke_static(
-              sc,
-              "org.apache.spark.sql.api.r.SQLUtils",
-              "createSQLContext",
-              jsc
-            )
-
-            params <- connection_config(sc, "spark.sql.")
-            apply_config(hive_context, params, "setConf", "spark.sql.")
-
-            # return hive_context
-            hive_context
-          }
-        )
-
-        ctx
       }
 
       invoke(backend, "setSparkContext", spark_context(sc))
     }
+
+    sc$state$hive_context <- sc$state$hive_context %||% tryCatch(
+      invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context),
+      error = function(e) {
+        warning(e$message)
+        warning("Failed to create Hive context, falling back to SQL. Some operations, ",
+                "like window-functions, will not work")
+
+        jsc <- invoke_static(
+          sc,
+          "org.apache.spark.api.java.JavaSparkContext",
+          "fromSparkContext",
+          sc$state$spark_context
+        )
+
+        hive_context <- invoke_static(
+          sc,
+          "org.apache.spark.sql.api.r.SQLUtils",
+          "createSQLContext",
+          jsc
+        )
+
+        params <- connection_config(sc, "spark.sql.")
+        apply_config(hive_context, params, "setConf", "spark.sql.")
+
+        # return hive_context
+        hive_context
+      }
+    )
 
     # create the java spark context and assign the connection to it
     sc$state$java_context <- invoke_static(
