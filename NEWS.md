@@ -123,7 +123,7 @@
 ### Broom
   
 - Implemented `tidy()`, `augment()`, and `glance()` for
-`ml_decision_tree()`, `ml_bisecting_kmeans()`, `ml_kmeans()`and `ml_gaussian_mixture()` models (@samuelmacedo83)
+`ml_naive_bayes()`, `ml_logistic_regression()`, `ml_decision_tree()`, `ml_bisecting_kmeans()`, `ml_kmeans()`and `ml_gaussian_mixture()` models (@samuelmacedo83)
 
 ### Configuration
 
