@@ -37,9 +37,21 @@ broom_augment_supervised <- function(x, newdata = NULL,
     newdata <- x$dataset
   }
 
-  vars <- c(dplyr::tbl_vars(newdata), "predicted_label")
+  if(any(class(x) == "ml_model_classification")){
+    # for classification
+    vars <- c(dplyr::tbl_vars(newdata), "predicted_label")
 
-  ml_predict(x, newdata) %>%
-    dplyr::select(!!!syms(vars)) %>%
-    dplyr::rename(.predicted_label = !!"predicted_label")
+    ml_predict(x, newdata) %>%
+      dplyr::select(!!!syms(vars)) %>%
+      dplyr::rename(.predicted_label = !!"predicted_label")
+
+  } else {
+    # for regression
+    vars <- c(dplyr::tbl_vars(newdata), "prediction")
+
+    ml_predict(x, newdata) %>%
+      dplyr::select(!!!syms(vars)) %>%
+      dplyr::rename(.prediction = !!"prediction")
+  }
+
 }
