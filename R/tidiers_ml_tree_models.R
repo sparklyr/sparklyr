@@ -31,17 +31,8 @@ tidy.ml_model_decision_tree_regression <- function(x,
 augment.ml_model_decision_tree_classification <- function(x, newdata = NULL,
                                               ...){
 
-  # if the user doesn't provide a new data, this funcion will
-  # use the training set
-  if (is.null(newdata)){
-    newdata <- x$dataset
-  }
+  broom_augment_supervised(x, newdata = newdata)
 
-  vars <- c(dplyr::tbl_vars(newdata), "predicted_label")
-
-  ml_predict(x, newdata) %>%
-    dplyr::select(!!!syms(vars)) %>%
-    dplyr::rename(.predicted_label = !!"predicted_label")
 }
 
 #' @rdname ml_tree_tidiers
@@ -50,18 +41,8 @@ augment.ml_model_decision_tree_classification <- function(x, newdata = NULL,
 #' @export
 augment.ml_model_decision_tree_regression <- function(x, newdata = NULL,
                                                           ...){
+  broom_augment_supervised(x, newdata = newdata)
 
-  # if the user doesn't provide a new data, this funcion will
-  # use the training set
-  if (is.null(newdata)){
-    newdata <- x$dataset
-  }
-
-  vars <- c(dplyr::tbl_vars(newdata), "prediction")
-
-  ml_predict(x, newdata) %>%
-    dplyr::select(!!!syms(vars)) %>%
-    dplyr::rename(.prediction = !!"prediction")
 }
 
 #' @rdname ml_tree_tidiers
