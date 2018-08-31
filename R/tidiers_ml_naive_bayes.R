@@ -29,7 +29,7 @@ tidy.ml_model_naive_bayes <- function(x,
 augment.ml_model_naive_bayes <- function(x, newdata = NULL,
                                               ...){
 
-  broom_augment_supervised(x, newdata = NULL)
+  broom_augment_supervised(x, newdata = newdata)
 }
 
 #' @rdname ml_naive_bayes_tidiers
