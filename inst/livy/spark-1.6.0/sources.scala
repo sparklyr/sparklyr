@@ -414,7 +414,7 @@ core_invoke_sync <- function(sc)
 
 core_invoke_cancel_running <- function(sc)
 {
-  if (is.null(sc$spark_context))
+  if (is.null(spark_context(sc)))
     return()
 
   # if something fails while using a monitored connection we don't cancel jobs
@@ -429,7 +429,7 @@ core_invoke_cancel_running <- function(sc)
   connection_progress_context(sc, function() {
     sc$state$cancelling_all_jobs <- TRUE
     on.exit(sc$state$cancelling_all_jobs <- FALSE)
-    invoke(sc$spark_context, "cancelAllJobs")
+    invoke(spark_context(sc), "cancelAllJobs")
   })
 
   if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
