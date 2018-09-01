@@ -56,6 +56,8 @@
 
 ### Data
 
+- Fixed for `timestamp` fields when using `copy_to()` (#1312, @yutannihilation).
+
 - Added support to read and write ORC files using `spark_read_orc()` and
   `spark_write_orc()` (#1548).
   

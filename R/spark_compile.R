@@ -321,7 +321,10 @@ download_scalac <- function(dest_path = NULL) {
   lapply(download_urls, function(download_url) {
     dest_file <- file.path(dest_path, basename(download_url))
 
-    dir.create(dirname(dest_file), recursive = TRUE)
+    if (!dir.exists(dirname(dest_file))) {
+      dir.create(dirname(dest_file), recursive = TRUE)
+    }
+
     download.file(download_url, destfile = dest_file)
 
     if (ext == "zip")
@@ -382,6 +385,7 @@ scalac_default_locations <- function() {
     )
   } else {
     c(
+      path.expand("~/scala"),
       "/usr/local/scala",
       "/opt/local/scala",
       "/opt/scala"
