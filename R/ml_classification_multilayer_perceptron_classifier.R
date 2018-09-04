@@ -25,7 +25,7 @@
 #' iris_test <- partitions$test
 #'
 #' mlp_model <- iris_training %>%
-#'   ml_multilayer_perceptron(Species ~ ., layers = c(4,3,3))
+#'   ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4,3,3))
 #'
 #' pred <- sdf_predict(iris_test, mlp_model)
 #'
