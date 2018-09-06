@@ -61,9 +61,13 @@ livy_validate_http_response <- function(message, req) {
 #'   \item{\code{num_executors}}{Number of executors to launch for this session}
 #'   \item{\code{archives}}{Archives to be used in this session}
 #'   \item{\code{queue}}{The name of the YARN queue to which submitted}
-#'   \item{\code{queue}}{The name of this session}
+#'   \item{\code{name}}{The name of this session}
 #'   \item{\code{heartbeat_timeout}}{Timeout in seconds to which session be orphaned}
 #' }
+#'
+#' Note that \code{queue} is supported only by version 0.4.0 of Livy or newer.
+#' If you are using the older one, specify queue via \code{config} (e.g.
+#' \code{config = spark_config(spark.yarn.queue = "my_queue")}).
 #'
 #' @return Named list with configuration data
 livy_config <- function(config = spark_config(), username = NULL, password = NULL, negotiate = FALSE,
