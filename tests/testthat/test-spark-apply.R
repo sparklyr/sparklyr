@@ -236,11 +236,16 @@ test_that("'spark_apply' can use anonymous functions", {
 test_that("'spark_apply' can apply function with 'NA's column", {
   expect_equal(
     colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% spark_apply(~ class(.x[[2]])) %>% pull(),
-    "logical"
+    "integer"
   )
 
   expect_equal(
-    colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% spark_apply(~ dplyr::mutate(.x, c1 = base::tolower(c1))),
-    colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% mutate(.x, c1 = base::tolower(c1))
+    colnas_tbl %>%
+      mutate(c2 = as.integer(c2)) %>%
+      spark_apply(~ dplyr::mutate(.x, c1 = tolower(c1))) %>%
+      collect(),
+    colnas_tbl %>%
+      mutate(c2 = as.integer(c2)) %>%
+      mutate(c1 = tolower(c1))
   )
 })
