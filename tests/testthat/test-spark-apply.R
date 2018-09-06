@@ -7,6 +7,9 @@ iris_tbl <- testthat_tbl("iris")
 dates <- data.frame(dates = c(as.Date("2015/12/19"), as.Date(NA), as.Date("2015/12/19")))
 dates_tbl <- testthat_tbl("dates")
 
+colnas <- data.frame(c1 = c("A", "B"), c2 = c(NA, NA))
+colnas_tbl <- testthat_tbl("colnas")
+
 test_that("'spark_apply' can apply identity function", {
   expect_equal(
     iris_tbl %>% spark_apply(function(e) e) %>% collect(),
@@ -227,5 +230,17 @@ test_that("'spark_apply' can use anonymous functions", {
   expect_equal(
     sdf_len(sc, 3) %>% spark_apply(~ .x + 1) %>% collect(),
     data_frame(id = c(2, 3, 4))
+  )
+})
+
+test_that("'spark_apply' can apply function with 'NA's column", {
+  expect_equal(
+    colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% spark_apply(~ class(.x[[2]])) %>% pull(),
+    "logical"
+  )
+
+  expect_equal(
+    colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% spark_apply(~ dplyr::mutate(.x, c1 = base::tolower(c1))),
+    colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% mutate(.x, c1 = base::tolower(c1))
   )
 })
