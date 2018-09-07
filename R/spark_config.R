@@ -1,4 +1,9 @@
-spark_config_settings <- function(name = NULL) {
+#' Retrieve Available Settings
+#'
+#' Retrieves available sparklyr settings that can be used in configuration files or \code{spark_config()}.
+#'
+#' @export
+spark_config_settings <- function() {
   settings <- list(
     sparklyr.apply.packages = "Configures default value for packages parameter in spark_apply().",
     sparklyr.apply.rlang = "Experimental feature. Turns on improved serialization for spark_apply().",
@@ -36,10 +41,6 @@ spark_config_settings <- function(name = NULL) {
     sparklyr.yarn.cluster.lookup.username = "The user name used to filter yarn cluster jobs while searching for submitted one.",
     sparklyr.yarn.cluster.start.timeout = "Total seconds before giving up waiting for yarn cluster application to get registered."
   )
-
-  if (!is.null(name) && !name %in% names(settings) && getOption("sparklyr.test.enforce.config")) {
-    stop("Config value '", name, "' not described in spark_config_description()")
-  }
 
   data.frame(
     name = names(settings),

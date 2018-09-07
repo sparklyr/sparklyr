@@ -131,6 +131,10 @@
 
 ### Configuration
 
+- Added `spark_config_settings()` to list all `sparklyr` configuration settings and
+  describe them, cleaned all settings and grouped by area while maintaining support
+  for previous settings.
+
 - Static SQL configuration properties are now respected for Spark 2.3, and `spark.sql.catalogImplementation` defaults to `hive` to maintain Hive support (#1496, #415).
 
 - `spark_config()` values can now also be specified as `options()`.

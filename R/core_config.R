@@ -7,8 +7,11 @@
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
-  if (exists("spark_config_settings")) {
-    get("spark_config_settings")(name[[1]])
+  if (getOption("sparklyr.test.enforce.config")) {
+    settings <- get("spark_config_settings")()
+    if (!name %in% names(settings)) {
+      stop("Config value '", name, "' not described in spark_config_settings()")
+    }
   }
 
   name_exists <- name %in% names(config)
