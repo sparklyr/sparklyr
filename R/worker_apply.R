@@ -100,7 +100,7 @@ spark_worker_apply <- function(sc, config) {
 
       # cast column to correct type, for instance, when dealing with NAs.
       for (i in 1:ncol(df)) {
-        target_type <- funcContext$`.column_types`[[i]]
+        target_type <- funcContext$column_types[[i]]
         if (!is.null(target_type) && class(df[[i]]) != target_type) {
         df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
         }
@@ -118,7 +118,7 @@ spark_worker_apply <- function(sc, config) {
       closure_params <- length(formals(closure))
       closure_args <- c(
         list(df),
-        if (!is.null(funcContext$context)) list(funcContext$context) else NULL,
+        if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
         as.list(
           if (nrow(df) > 0)
             lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
