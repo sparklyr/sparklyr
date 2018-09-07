@@ -7,6 +7,10 @@
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
+  if (exists("spark_config_settings")) {
+    get("spark_config_settings")(name)
+  }
+
   if (!name %in% names(config))
     default
   else {
