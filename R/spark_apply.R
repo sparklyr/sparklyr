@@ -152,7 +152,7 @@ spark_apply <- function(x,
   }
   grouped <- !is.null(group_by)
 
-  rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
+  rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
   proc_env <- connection_config(sc, "sparklyr.apply.env.")
 
