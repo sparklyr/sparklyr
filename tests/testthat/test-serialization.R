@@ -269,7 +269,7 @@ test_that("collect() can retrieve as.POSIXct fields with timezones", {
   )
 
   collected <- sdf_len(sc, 1) %>%
-    spark_apply(function(e, c) c, context = list(tzs = tz_entries)) %>%
+    spark_apply(function(e, c) c$tzs, context = list(tzs = tz_entries)) %>%
     collect() %>%
     as.list() %>%
     unname()

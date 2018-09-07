@@ -45,6 +45,23 @@ spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE) {
   )
 }
 
+spark_apply_colum_types <- function(sdf) {
+  type_map <- list(
+    IntegerType = "integer",
+    FloatType = "numeric",
+    DoubleType = "numeric",
+    LongType = "numeric",
+    StringType = "character",
+    BinaryType = "raw",
+    BooleanType = "logical",
+    TimestampType = "POSIXct",
+    DateType = "Date",
+    DateType = "date"
+  )
+
+  lapply(sdf_schema(sdf), function(e) type_map[[e$type]])
+}
+
 #' Apply an R Function in Spark
 #'
 #' Applies an R function to a Spark object (typically, a Spark DataFrame).
@@ -160,6 +177,12 @@ spark_apply <- function(x,
 
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) packages <- FALSE
+
+  # inject column types to context
+  context <- list(
+    column_types = spark_apply_colum_types(x),
+    user_context = context
+  )
 
   # create closure for the given function
   closure <- if (is.function(f)) serialize(f, NULL) else f
