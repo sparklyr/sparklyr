@@ -234,6 +234,8 @@ test_that("'spark_apply' can use anonymous functions", {
 })
 
 test_that("'spark_apply' can apply function with 'NA's column", {
+  if (spark_version(sc) < "2.0.0") skip("automatic column types supported in Spark 2.0+")
+
   expect_equal(
     colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% spark_apply(~ class(.x[[2]])) %>% pull(),
     "integer"
