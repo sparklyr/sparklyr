@@ -14,7 +14,7 @@ spark_config_settings <- function() {
     sparklyr.connect.app.jar = "The path to the sparklyr jar used in spark_connect().",
     sparklyr.connect.cores.local = "Number of cores to use in spark_connect(master = \"local\"), defaults to parallel::detectCores().",
     sparklyr.connect.csv.embedded = "Regular expression to match against versions of Spark that require package extension to support CSVs.",
-    sparklyr.connect.jars = "",
+    sparklyr.connect.jars = "Additional JARs to include while submitting application to Spark.",
     sparklyr.connect.packages = "Spark packages to include when connecting to Spark.",
     sparklyr.connect.sparksubmit = "Command executed instead of spark-submit when connecting.",
     sparklyr.gateway.address = "The address of the driver machine.",
