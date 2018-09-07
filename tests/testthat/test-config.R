@@ -23,24 +23,29 @@ test_that("spark_config_exists function works as expected", {
 })
 
 test_that("spark_config_value function works as expected", {
-  expect_equal(
-    "1",
-    spark_config_value(list(), "sparklyr.nothing", "1")
-  )
+  withr::with_options(
+    list(sparklyr.test.enforce.config = FALSE),
+    {
+      expect_equal(
+        "1",
+        spark_config_value(list(), "sparklyr.nothing", "1")
+      )
 
-  expect_equal(
-    2,
-    spark_config_value(list(sparklyr.something = 2), "sparklyr.something", "1")
-  )
+      expect_equal(
+        2,
+        spark_config_value(list(sparklyr.something = 2), "sparklyr.something", "1")
+      )
 
-  expect_equal(
-    1,
-    spark_config_value(list(), "sparklyr.nothing", 1)
-  )
+      expect_equal(
+        1,
+        spark_config_value(list(), "sparklyr.nothing", 1)
+      )
 
-  expect_equal(
-    2,
-    spark_config_value(list(sparklyr.something = 2), "sparklyr.something", 1)
+      expect_equal(
+        2,
+        spark_config_value(list(sparklyr.something = 2), "sparklyr.something", 1)
+      )
+    }
   )
 })
 
