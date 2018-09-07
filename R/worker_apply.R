@@ -118,7 +118,7 @@ spark_worker_apply <- function(sc, config) {
       closure_params <- length(formals(closure))
       closure_args <- c(
         list(df),
-        if (!is.null(funcContext)) list(funcContext) else NULL,
+        if (!is.null(funcContext$context)) list(funcContext$context) else NULL,
         as.list(
           if (nrow(df) > 0)
             lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])

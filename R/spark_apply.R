@@ -179,7 +179,10 @@ spark_apply <- function(x,
   if (spark_master_is_local(sc$master)) packages <- FALSE
 
   # inject column types to context
-  context$`.column_types` <- spark_apply_colum_types(x)
+  context <- list(
+    column_types = spark_apply_colum_types(x),
+    user_context = context
+  )
 
   # create closure for the given function
   closure <- if (is.function(f)) serialize(f, NULL) else f
