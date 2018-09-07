@@ -1,4 +1,4 @@
-spark_config_settings <- function(name) {
+spark_config_settings <- function(name = NULL) {
   settings <- list(
     sparklyr.app.jar = "",
     sparklyr.apply.packages = "",
@@ -49,7 +49,12 @@ spark_config_settings <- function(name) {
     sparklyr.yarn.cluster.start.timeout = ""
   )
 
-  if (!name %in% names(settings) && getOption("sparklyr.test.enforce.config")) {
+  if (!is.null(name) && !name %in% names(settings) && getOption("sparklyr.test.enforce.config")) {
     stop("Config value '", name, "' not described in spark_config_description()")
   }
+
+  data.frame(
+    name = names(settings),
+    description = unlist(unname(settings))
+  )
 }
