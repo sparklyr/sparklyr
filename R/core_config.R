@@ -9,8 +9,8 @@
 spark_config_value <- function(config, name, default = NULL) {
   if (getOption("sparklyr.test.enforce.config", FALSE)) {
     settings <- get("spark_config_settings")()
-    if (!name %in% names(settings)) {
-      stop("Config value '", name, "' not described in spark_config_settings()")
+    if (!any(name %in% names(settings))) {
+      stop("Config value '", name[[1]], "' not described in spark_config_settings()")
     }
   }
 
