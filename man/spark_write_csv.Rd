@@ -4,9 +4,10 @@
 \alias{spark_write_csv}
 \title{Write a Spark DataFrame to a CSV}
 \usage{
-spark_write_csv(x, path, header = TRUE, delimiter = ",", quote = "\\"",
-  escape = "\\\\", charset = "UTF-8", null_value = NULL,
-  options = list(), mode = NULL, partition_by = NULL, ...)
+spark_write_csv(x, path, header = TRUE, delimiter = ",",
+  quote = "\\"", escape = "\\\\", charset = "UTF-8",
+  null_value = NULL, options = list(), mode = NULL,
+  partition_by = NULL, ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -62,3 +63,4 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
+\concept{Spark serialization routines}

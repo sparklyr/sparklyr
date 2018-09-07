@@ -2,7 +2,6 @@
 % Please edit documentation in R/sdf_interface.R
 \name{sdf_copy_to}
 \alias{sdf_copy_to}
-\alias{sdf_copy_to}
 \alias{sdf_import}
 \title{Copy an Object into Spark}
 \usage{
@@ -52,3 +51,4 @@ Other Spark data frames: \code{\link{sdf_partition}},
   \code{\link{sdf_register}}, \code{\link{sdf_sample}},
   \code{\link{sdf_sort}}
 }
+\concept{Spark data frames}

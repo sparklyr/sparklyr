@@ -5,8 +5,8 @@
 \title{Read CSV Stream}
 \usage{
 stream_read_csv(sc, path, name = NULL, header = TRUE, columns = NULL,
-  delimiter = ",", quote = "\\"", escape = "\\\\", charset = "UTF-8",
-  null_value = NULL, options = list(), ...)
+  delimiter = ",", quote = "\\"", escape = "\\\\",
+  charset = "UTF-8", null_value = NULL, options = list(), ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -54,3 +54,4 @@ Other Spark stream serialization: \code{\link{stream_read_jdbc}},
   \code{\link{stream_write_parquet}},
   \code{\link{stream_write_text}}
 }
+\concept{Spark stream serialization}
