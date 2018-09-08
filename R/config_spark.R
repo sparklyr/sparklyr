@@ -31,11 +31,11 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
     mergedConfig$master$`sparklyr.shell.driver-class-path` <- Sys.getenv("SPARK_DRIVER_CLASSPATH")
   }
 
-  if (is.null(mergedConfig$sparklyr.cores.local)) {
-    mergedConfig$sparklyr.cores.local <- parallel::detectCores()
+  if (is.null(spark_config_value(mergedConfig, c("sparklyr.connect.cores.local", "sparklyr.cores.local")))) {
+    mergedConfig$sparklyr.connect.cores.local <- parallel::detectCores()
   }
 
-  if (is.null(mergedConfig$spark.sql.shuffle.partitions.local)) {
+  if (is.null(spark_config_value(mergedConfig, "spark.sql.shuffle.partitions.local"))) {
     mergedConfig$spark.sql.shuffle.partitions.local <- parallel::detectCores()
   }
 

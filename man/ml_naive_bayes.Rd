@@ -8,8 +8,8 @@ ml_naive_bayes(x, formula = NULL, model_type = "multinomial",
   smoothing = 1, thresholds = NULL, weight_col = NULL,
   features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
-  raw_prediction_col = "rawPrediction", uid = random_string("naive_bayes_"),
-  ...)
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("naive_bayes_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -102,3 +102,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

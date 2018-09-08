@@ -5,9 +5,10 @@
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
 spark_read_csv(sc, name, path, header = TRUE, columns = NULL,
-  infer_schema = TRUE, delimiter = ",", quote = "\\"", escape = "\\\\",
-  charset = "UTF-8", null_value = NULL, options = list(),
-  repartition = 0, memory = TRUE, overwrite = TRUE, ...)
+  infer_schema = TRUE, delimiter = ",", quote = "\\"",
+  escape = "\\\\", charset = "UTF-8", null_value = NULL,
+  options = list(), repartition = 0, memory = TRUE,
+  overwrite = TRUE, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -87,3 +88,4 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
+\concept{Spark serialization routines}

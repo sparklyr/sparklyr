@@ -5,11 +5,11 @@
 \alias{ml_pca}
 \title{Feature Transformation -- PCA (Estimator)}
 \usage{
-ft_pca(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
-  uid = random_string("pca_"), ...)
+ft_pca(x, input_col = NULL, output_col = NULL, k = NULL,
+  dataset = NULL, uid = random_string("pca_"), ...)
 
-ml_pca(x, features = tbl_vars(x), k = length(features), pc_prefix = "PC",
-  ...)
+ml_pca(x, features = tbl_vars(x), k = length(features),
+  pc_prefix = "PC", ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -111,3 +111,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

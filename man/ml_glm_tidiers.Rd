@@ -10,13 +10,14 @@
 \alias{glance.ml_model_linear_regression}
 \title{Tidying methods for Spark ML linear models}
 \usage{
-\method{tidy}{ml_model_generalized_linear_regression}(x, exponentiate = FALSE,
-  ...)
+\method{tidy}{ml_model_generalized_linear_regression}(x,
+  exponentiate = FALSE, ...)
 
 \method{tidy}{ml_model_linear_regression}(x, ...)
 
-\method{augment}{ml_model_generalized_linear_regression}(x, newdata = NULL,
-  type.residuals = c("working", "deviance", "pearson", "response"), ...)
+\method{augment}{ml_model_generalized_linear_regression}(x,
+  newdata = NULL, type.residuals = c("working", "deviance", "pearson",
+  "response"), ...)
 
 \method{augment}{ml_model_linear_regression}(x, newdata = NULL,
   type.residuals = c("working", "deviance", "pearson", "response"), ...)

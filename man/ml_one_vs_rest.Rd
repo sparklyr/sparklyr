@@ -6,7 +6,8 @@
 \usage{
 ml_one_vs_rest(x, formula = NULL, classifier = NULL,
   features_col = "features", label_col = "label",
-  prediction_col = "prediction", uid = random_string("one_vs_rest_"), ...)
+  prediction_col = "prediction", uid = random_string("one_vs_rest_"),
+  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -68,3 +69,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

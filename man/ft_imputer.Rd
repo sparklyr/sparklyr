@@ -4,8 +4,9 @@
 \alias{ft_imputer}
 \title{Feature Transformation -- Imputer (Estimator)}
 \usage{
-ft_imputer(x, input_cols = NULL, output_cols = NULL, missing_value = NULL,
-  strategy = "mean", dataset = NULL, uid = random_string("imputer_"), ...)
+ft_imputer(x, input_cols = NULL, output_cols = NULL,
+  missing_value = NULL, strategy = "mean", dataset = NULL,
+  uid = random_string("imputer_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -94,3 +95,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

@@ -7,10 +7,19 @@
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
-  if (!name %in% names(config))
+  if (getOption("sparklyr.test.enforce.config", FALSE) && any(startsWith(name, "sparklyr."))) {
+    settings <- get("spark_config_settings")()
+    if (!any(name %in% settings$name)) {
+      stop("Config value '", name[[1]], "' not described in spark_config_settings()")
+    }
+  }
+
+  name_exists <- name %in% names(config)
+  if (!any(name_exists))
     default
   else {
-    value <- config[[name]]
+    name_primary <- name[name_exists][[1]]
+    value <- config[[name_primary]]
     if (is.function(value)) value <- value()
     value
   }

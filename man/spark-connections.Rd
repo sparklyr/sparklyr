@@ -2,19 +2,16 @@
 % Please edit documentation in R/connection_spark.R
 \name{spark-connections}
 \alias{spark-connections}
-\alias{spark-connections}
 \alias{spark_connect}
-\alias{spark-connections}
 \alias{spark_connection_is_open}
-\alias{spark-connections}
 \alias{spark_disconnect}
-\alias{spark-connections}
 \alias{spark_disconnect_all}
 \title{Manage Spark Connections}
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
-  method = c("shell", "livy", "databricks", "test"), app_name = "sparklyr",
-  version = NULL, hadoop_version = NULL, config = spark_config(),
+  method = c("shell", "livy", "databricks", "test"),
+  app_name = "sparklyr", version = NULL, hadoop_version = NULL,
+  config = spark_config(),
   extensions = sparklyr::registered_extensions(), ...)
 
 spark_connection_is_open(sc)

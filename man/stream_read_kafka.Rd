@@ -4,8 +4,8 @@
 \alias{stream_read_kafka}
 \title{Read Kafka Stream}
 \usage{
-stream_read_kafka(sc, path, name = NULL, columns = NULL, options = list(),
-  ...)
+stream_read_kafka(sc, path, name = NULL, columns = NULL,
+  options = list(), ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -40,3 +40,4 @@ Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_write_parquet}},
   \code{\link{stream_write_text}}
 }
+\concept{Spark stream serialization}

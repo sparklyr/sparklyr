@@ -4,8 +4,8 @@
 \alias{sdf_partition}
 \title{Partition a Spark Dataframe}
 \usage{
-sdf_partition(x, ..., weights = NULL, seed = sample(.Machine$integer.max,
-  1))
+sdf_partition(x, ..., weights = NULL,
+  seed = sample(.Machine$integer.max, 1))
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame.}
@@ -71,3 +71,4 @@ Other Spark data frames: \code{\link{sdf_copy_to}},
   \code{\link{sdf_register}}, \code{\link{sdf_sample}},
   \code{\link{sdf_sort}}
 }
+\concept{Spark data frames}

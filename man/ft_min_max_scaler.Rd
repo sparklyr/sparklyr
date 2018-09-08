@@ -5,7 +5,8 @@
 \title{Feature Transformation -- MinMaxScaler (Estimator)}
 \usage{
 ft_min_max_scaler(x, input_col = NULL, output_col = NULL, min = 0,
-  max = 1, dataset = NULL, uid = random_string("min_max_scaler_"), ...)
+  max = 1, dataset = NULL, uid = random_string("min_max_scaler_"),
+  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -104,3 +105,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

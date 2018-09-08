@@ -71,8 +71,8 @@ shell_connection <- function(master,
     spark_version = version,
     app_name = app_name,
     config = config,
-    jars = spark_config_value(config, "sparklyr.jars.default", list()),
-    packages = spark_config_value(config, "sparklyr.defaultPackages"),
+    jars = spark_config_value(config, c("sparklyr.connect.jars", "sparklyr.jars.default"), list()),
+    packages = spark_config_value(config, c("sparklyr.connect.packages", "sparklyr.defaultPackages")),
     extensions = extensions,
     environment = environment,
     shell_args = shell_args,
@@ -177,7 +177,7 @@ start_shell <- function(master,
   if (is.null(gatewayInfo) || gatewayInfo$backendPort == 0)
   {
     # read app jar through config, this allows "sparkr-shell" to test sparkr backend
-    app_jar <- spark_config_value(config, "sparklyr.app.jar", NULL)
+    app_jar <- spark_config_value(config, c("sparklyr.connect.app.jar", "sparklyr.app.jar"), NULL)
     if (is.null(app_jar)) {
       versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
 
@@ -216,7 +216,7 @@ start_shell <- function(master,
                            windows = "spark-submit2.cmd")
 
     # allow users to override spark-submit if needed
-    spark_submit <- spark_config_value(config, "sparklyr.spark-submit", spark_submit)
+    spark_submit <- spark_config_value(config, c("sparklyr.connect.sparksubmit", "sparklyr.spark-submit"), spark_submit)
 
     spark_submit_paths <- unlist(lapply(
       spark_submit,
@@ -249,8 +249,9 @@ start_shell <- function(master,
     packages <- unique(c(packages, extensions$packages))
 
     # include embedded jars, if needed
-    if (!is.null(config[["sparklyr.csv.embedded"]]) &&
-        length(grep(config[["sparklyr.csv.embedded"]], spark_version)) > 0) {
+    csv_config_value <- spark_config_value(config, c("sparklyr.connect.csv.embedded", "sparklyr.csv.embedded"))
+    if (!is.null(csv_config_value) &&
+        length(grep(csv_config_value, spark_version)) > 0) {
       jars <- c(
         jars,
         normalizePath(system.file(file.path("java", "spark-csv_2.11-1.5.0.jar"), package = "sparklyr")),
@@ -314,7 +315,7 @@ start_shell <- function(master,
     })
 
     # support custom operations after spark-submit useful to enable port forwarding
-    spark_config_value(config, "sparklyr.events.aftersubmit")
+    spark_config_value(config, c("sparklyr.connect.aftersubmit", "sparklyr.events.aftersubmit"))
 
     # for yarn-cluster
     if (spark_master_is_yarn_cluster(master, config) && is.null(config[["sparklyr.gateway.address"]])) {

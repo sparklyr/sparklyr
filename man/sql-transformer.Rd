@@ -8,7 +8,8 @@
 ft_sql_transformer(x, statement = NULL,
   uid = random_string("sql_transformer_"), ...)
 
-ft_dplyr_transformer(x, tbl, uid = random_string("dplyr_transformer_"), ...)
+ft_dplyr_transformer(x, tbl, uid = random_string("dplyr_transformer_"),
+  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -83,3 +84,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

@@ -4,38 +4,39 @@
 \name{ml_random_forest_classifier}
 \alias{ml_random_forest_classifier}
 \alias{ml_random_forest}
-\alias{ml_random_forest}
 \alias{ml_random_forest_regressor}
 \title{Spark ML -- Random Forest}
 \usage{
 ml_random_forest_classifier(x, formula = NULL, num_trees = 20,
   subsampling_rate = 1, max_depth = 5, min_instances_per_node = 1,
-  feature_subset_strategy = "auto", impurity = "gini", min_info_gain = 0,
-  max_bins = 32, seed = NULL, thresholds = NULL,
+  feature_subset_strategy = "auto", impurity = "gini",
+  min_info_gain = 0, max_bins = 32, seed = NULL, thresholds = NULL,
   checkpoint_interval = 10, cache_node_ids = FALSE,
-  max_memory_in_mb = 256, features_col = "features", label_col = "label",
-  prediction_col = "prediction", probability_col = "probability",
+  max_memory_in_mb = 256, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("random_forest_classifier_"), ...)
 
 ml_random_forest(x, formula = NULL, type = c("auto", "regression",
   "classification"), features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
-  raw_prediction_col = "rawPrediction", feature_subset_strategy = "auto",
-  impurity = "auto", checkpoint_interval = 10, max_bins = 32,
-  max_depth = 5, num_trees = 20, min_info_gain = 0,
-  min_instances_per_node = 1, subsampling_rate = 1, seed = NULL,
-  thresholds = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256,
-  uid = random_string("random_forest_"), response = NULL, features = NULL,
-  ...)
+  raw_prediction_col = "rawPrediction",
+  feature_subset_strategy = "auto", impurity = "auto",
+  checkpoint_interval = 10, max_bins = 32, max_depth = 5,
+  num_trees = 20, min_info_gain = 0, min_instances_per_node = 1,
+  subsampling_rate = 1, seed = NULL, thresholds = NULL,
+  cache_node_ids = FALSE, max_memory_in_mb = 256,
+  uid = random_string("random_forest_"), response = NULL,
+  features = NULL, ...)
 
 ml_random_forest_regressor(x, formula = NULL, num_trees = 20,
   subsampling_rate = 1, max_depth = 5, min_instances_per_node = 1,
   feature_subset_strategy = "auto", impurity = "variance",
   min_info_gain = 0, max_bins = 32, seed = NULL,
   checkpoint_interval = 10, cache_node_ids = FALSE,
-  max_memory_in_mb = 256, features_col = "features", label_col = "label",
-  prediction_col = "prediction",
+  max_memory_in_mb = 256, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
   uid = random_string("random_forest_regressor_"), ...)
 }
 \arguments{
@@ -180,3 +181,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_one_vs_rest}}
 }
+\concept{ml algorithms}

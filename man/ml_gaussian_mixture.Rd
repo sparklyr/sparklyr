@@ -74,3 +74,4 @@ See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
 Other ml clustering algorithms: \code{\link{ml_bisecting_kmeans}},
   \code{\link{ml_kmeans}}, \code{\link{ml_lda}}
 }
+\concept{ml clustering algorithms}
