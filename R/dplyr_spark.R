@@ -31,7 +31,9 @@ db_desc.src_spark <- function(x) {
 #' @export
 #' @importFrom dplyr db_explain
 db_explain.spark_connection <- function(con, sql, ...) {
-  ""
+  explained <- DBI::dbGetQuery(con, paste("EXPLAIN", sql))
+
+  message(explained$plan)
 }
 
 #' @export

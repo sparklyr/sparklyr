@@ -56,6 +56,8 @@
 
 ### Data
 
+- Implemented support for `DBI::db_explain()` (#1623).
+
 - Fixed for `timestamp` fields when using `copy_to()` (#1312, @yutannihilation).
 
 - Added support to read and write ORC files using `spark_read_orc()` and
