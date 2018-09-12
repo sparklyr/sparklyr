@@ -273,7 +273,7 @@ spark_apply <- function(x,
       as.environment(spark_apply_options)
     )
 
-    # while workers need to relaunch sparklyr backends, cache by default
+    # cache by default
     if (memory) rdd <- invoke(rdd, "cache")
 
     schema <- spark_schema_from_rdd(sc, rdd, columns)
@@ -356,6 +356,9 @@ spark_apply <- function(x,
       context_serialize,
       as.environment(spark_apply_options)
     )
+
+    # cache by default
+    if (memory) transformed <- invoke(transformed, "cache")
   }
 
   sdf_register(transformed)
