@@ -105,6 +105,7 @@ spark_apply_colum_types <- function(sdf) {
 #'   the \code{spark.r.libpaths} config entry can be set in \code{spark_config()}
 #'   to the local packages library.
 #' @param context Optional object to be serialized and passed back to \code{f()}.
+#' @param name Optional table name while registering the resulting data frame.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @section Configuration:
@@ -137,6 +138,7 @@ spark_apply <- function(x,
                         group_by = NULL,
                         packages = NULL,
                         context = NULL,
+                        name = NULL,
                         ...) {
   args <- list(...)
   assert_that(is.function(f) || is.raw(f) || is.language(f))
@@ -356,12 +358,14 @@ spark_apply <- function(x,
       context_serialize,
       as.environment(spark_apply_options)
     )
-
-    # cache by default
-    if (memory) transformed <- invoke(transformed, "cache")
   }
 
-  sdf_register(transformed)
+  name <- name %||% random_string("sparklyr_tmp_")
+  registered <- sdf_register(transformed, name = name)
+
+  if (memory && !identical(args$rdd, TRUE)) tbl_cache(sc, name, force = FALSE)
+
+  registered
 }
 
 spark_apply_rlang_serialize <- function() {
