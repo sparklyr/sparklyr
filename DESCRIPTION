@@ -61,4 +61,3 @@ Suggests:
     reshape2,
     testthat,
     tibble
-Remotes: kevinykuo/forge
