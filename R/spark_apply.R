@@ -363,7 +363,7 @@ spark_apply <- function(x,
   name <- name %||% random_string("sparklyr_tmp_")
   registered <- sdf_register(transformed, name = name)
 
-  if (memory && !identical(args$rdd, TRUE)) tbl_cache(sc, name, force = FALSE)
+  if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
 
   registered
 }
