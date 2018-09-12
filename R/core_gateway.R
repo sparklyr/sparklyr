@@ -1,8 +1,8 @@
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
   waitSeconds <- if (isStarting)
-    spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+    spark_config_value(config, "sparklyr.connect.timeout", 60)
   else
-    spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
+    spark_config_value(config, "sparklyr.gateway.timeout", 1)
 
   gateway <- NULL
   commandStart <- Sys.time()
@@ -21,7 +21,7 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
     }, error = function(err) {
     })
 
-    startWait <- spark_config_value(config, "sparklyr.gateway.start.wait", 50 / 1000)
+    startWait <- spark_config_value(config, "sparklyr.gateway.wait", 50 / 1000)
     Sys.sleep(startWait)
   }
 
@@ -37,9 +37,9 @@ spark_gateway_commands <- function() {
 
 query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   waitSeconds <- if (isStarting)
-    spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+    spark_config_value(config, "sparklyr.connect.timeout", 60)
   else
-    spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
+    spark_config_value(config, "sparklyr.gateway.timeout", 1)
 
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
