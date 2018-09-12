@@ -85,6 +85,9 @@
 
 ### Distributed R
 
+- Added `name` parameter to `spark_apply()` to optionally name resulting
+  table.
+
 - Fix to `spark_apply()` to retain column types when NAs are present (#1665).
 
 - `spark_apply()` now supports `rlang` anonymous functions. For example,
