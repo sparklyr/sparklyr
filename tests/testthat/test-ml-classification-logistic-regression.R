@@ -121,6 +121,15 @@ test_that("ml_logistic_regression can fit without intercept",{
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
 
+test_that("ml_logistic_regression can fit intercept-only model",{
+  expect_error(s <- ml_logistic_regression(
+    iris_weighted_tbl,
+    formula = versicolor ~ 1,
+    fit_intercept=TRUE),NA)
+  r <- glm(versicolor ~ 1, family=binomial(logit), data=iris_weighted)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+})
+
 test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted formulas", {
   sc <- testthat_spark_connection()
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
