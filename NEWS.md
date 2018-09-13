@@ -41,6 +41,7 @@
   
 ### Spark ML
 
+- **(Breaking change)** The formula API for ML classification algorithms no longer indexes numeric labels, to avoid the confusion of `0` being mapped to `"1"` and vice versa. This means that if the largest numeric label is `N`, Spark will fit a `N+1`-class classification model, regardless of how many distinct labels there are in the provided training set (#1591).
 - Fix retrieval of coefficients in `ml_logistic_regression()` (@shabbybanks, #1596).
 - **(Breaking change)** For model objects, `lazy val` and `def` attributes have been converted to closures, so they are not evaluated at object instantiation (#1453).
 - Input and output column names are no longer required to construct pipeline objects to be consistent with Spark (#1513).

@@ -28,26 +28,15 @@ ml_feature_names_metadata <- function(pipeline_model, dataset, features_col) {
 ml_generate_ml_model <- function(
   x, predictor, formula, features_col = "features",
   label_col = "label", type,
-  constructor, predicted_label_col = NULL) {
+  constructor, predicted_label_col = NULL
+) {
   sc <- spark_connection(x)
   classification <- identical(type, "classification")
 
   pipeline <- if (classification) {
-    if (spark_version(sc) >= "2.1.0") {
-      r_formula <- ft_r_formula(sc, formula, features_col, label_col,
-                                force_index_label = TRUE)
-      pipeline <- ml_pipeline(r_formula, predictor)
-    } else {
-      r_formula <- ft_r_formula(sc, formula, features_col, random_string(label_col))
-      response_col <- formula %>%
-        strsplit("~", fixed = TRUE) %>%
-        rlang::flatten_chr() %>%
-        head(1) %>%
-        trimws()
-      string_indexer <- ft_string_indexer(sc, response_col, label_col)
-      pipeline <- ml_pipeline(r_formula, string_indexer, predictor)
-    }
-    pipeline
+    r_formula <- ft_r_formula(sc, formula, features_col, label_col,
+                              force_index_label = FALSE)
+    ml_pipeline(r_formula, predictor)
   } else if (identical(type, "clustering") && spark_version(sc) < "2.0.0") {
     # one-sided formulas not supported prior to Spark 2.0
     rdf <- sdf_schema(x) %>%
@@ -80,16 +69,18 @@ ml_generate_ml_model <- function(
     label_indexer_model <- ml_stages(pipeline_model) %>%
       dplyr::nth(-2) # second from last, either RFormulaModel or StringIndexerModel
     index_labels <- ml_index_labels_metadata(label_indexer_model, x, label_col)
-    index_to_string <- ft_index_to_string(
-      sc, ml_param(predictor, "prediction_col"), predicted_label_col, index_labels)
-    pipeline <- pipeline %>%
-      ml_add_stage(index_to_string)
-    pipeline_model <- pipeline_model %>%
-      ml_add_stage(index_to_string) %>%
-      # ml_fit() here doesn't do any actual computation but simply
-      #   returns a PipelineModel since ml_add_stage() returns a
-      #   Pipeline (Estimator)
-      ml_fit(x)
+    if (!is.null(index_labels)) {
+      index_to_string <- ft_index_to_string(
+        sc, ml_param(predictor, "prediction_col"), predicted_label_col, index_labels)
+      pipeline <- pipeline %>%
+        ml_add_stage(index_to_string)
+      pipeline_model <- pipeline_model %>%
+        ml_add_stage(index_to_string) %>%
+        # ml_fit() here doesn't do any actual computation but simply
+        #   returns a PipelineModel since ml_add_stage() returns a
+        #   Pipeline (Estimator)
+        ml_fit(x)
+    }
   }
 
   # workaround for https://issues.apache.org/jira/browse/SPARK-19953
