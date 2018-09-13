@@ -130,19 +130,19 @@ test_that("ml_logistic_regression() agrees with stats::glm() for reversed catego
            versicolor = ifelse(Species == "versicolor", 1L, 0L))
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
-  r <- glm(not_versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
            family = binomial(logit), weights = weights,
            data = iris_weighted)
   s <- ml_logistic_regression(iris_weighted_tbl,
-                              formula = "not_versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
                               reg_param = 0L,
                               weight_col = "weights")
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 
-  r <- glm(not_versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
            family = binomial(logit), data = iris_weighted)
   s <- ml_logistic_regression(iris_weighted_tbl,
-                              formula = "not_versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
                               reg_param = 0L,
                               weight_col = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
