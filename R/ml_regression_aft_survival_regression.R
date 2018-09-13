@@ -12,6 +12,29 @@
 #' @param censor_col Censor column name. The value of this column could be 0 or 1. If the value is 1, it means the event has occurred i.e. uncensored; otherwise censored.
 #' @param quantile_probabilities Quantile probabilities array. Values of the quantile probabilities array should be in the range (0, 1) and the array should be non-empty.
 #' @param quantiles_col Quantiles column name. This column will output quantiles of corresponding quantileProbabilities if it is set.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' library(survival)
+#' library(sparklyr)
+#'
+#' sc <- spark_connect(master = "local")
+#' ovarian_tbl <- sdf_copy_to(sc, ovarian, name = "ovarian_tbl", overwrite = TRUE)
+#'
+#' partitions <- ovarian_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' ovarian_training <- partitions$training
+#' ovarian_test <- partitions$test
+#'
+#' sur_reg <- ovarian_training %>%
+#'   ml_aft_survival_regression(futime ~ ecog_ps + rx + age + resid_ds, censor_col = "fustat")
+#'
+#' pred <- ml_predict(sur_reg, ovarian_test)
+#' pred
+#' }
+#'
 #' @export
 ml_aft_survival_regression <- function(x, formula = NULL, censor_col = "censor",
                                        quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5,
