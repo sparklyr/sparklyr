@@ -1,8 +1,9 @@
 #' @importFrom rstudioapi sendToConsole
 stream_register_job <- function(stream)
 {
-  if (rstudio_jobs_api_available()) {
-    sc <- spark_connection(stream)
+  sc <- spark_connection(stream)
+
+  if (spark_config_logical(sc$config, "sparklyr.progress", TRUE) && rstudio_jobs_api_available()) {
     api <- rstudio_jobs_api()
     streamId <- stream_id(stream)
 
