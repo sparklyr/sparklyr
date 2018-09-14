@@ -3,8 +3,8 @@ make_approx_nearest_neighbors <- function(jobj) {
   function(dataset, key, num_nearest_neighbors, dist_col = "distCol") {
     dataset <- spark_dataframe(dataset)
     key <- spark_dense_vector(spark_connection(jobj), key)
-    num_nearest_neighbors <- ensure_scalar_integer(num_nearest_neighbors)
-    dist_col <- ensure_scalar_character(dist_col)
+    num_nearest_neighbors <- cast_scalar_integer(num_nearest_neighbors)
+    dist_col <- cast_string(dist_col)
     jobj %>%
       invoke("approxNearestNeighbors",
              dataset, key, num_nearest_neighbors, dist_col) %>%
@@ -17,8 +17,8 @@ make_approx_similarity_join <- function(jobj) {
     sc <- spark_connection(jobj)
     dataset_a <- spark_dataframe(dataset_a)
     dataset_b <- spark_dataframe(dataset_b)
-    threshold <- ensure_scalar_double(threshold)
-    dist_col <- ensure_scalar_character(dist_col)
+    threshold <- cast_scalar_double(threshold)
+    dist_col <- cast_string(dist_col)
     jobj %>%
       invoke("approxSimilarityJoin",
              dataset_a, dataset_b, threshold, dist_col) %>%

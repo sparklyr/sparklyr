@@ -73,8 +73,8 @@ residuals.ml_model_generalized_linear_regression <- function(
   type = c("deviance", "pearson", "working", "response"),
   ...) {
 
-  type <- rlang::arg_match(type)
-  ensure_scalar_character(type)
+  type <- rlang::arg_match(type) %>%
+    cast_string()
 
   residuals <- object %>%
     `[[`("summary") %>%
@@ -90,8 +90,8 @@ residuals.ml_model_generalized_linear_regression <- function(
 sdf_residuals.ml_model_generalized_linear_regression <- function(object,
                                                                  type = c("deviance", "pearson", "working", "response"),
                                                                  ...) {
-  type <- rlang::arg_match(type)
-  ensure_scalar_character(type)
+  type <- rlang::arg_match(type) %>%
+    cast_string()
 
   residuals <- object %>%
     `[[`("summary") %>%

@@ -8,17 +8,17 @@ test_that("we can invoke_static with 0 arguments", {
 
 test_that("we can invoke_static with 1 scalar argument", {
     expect_equal(invoke_static(sc, "sparklyr.Test", "unaryPrimitiveInt",
-                               ensure_scalar_integer(5)), 25)
+                               5L), 25)
 
     expect_error(invoke_static(sc, "sparklyr.Test", "unaryPrimitiveInt", NULL))
 
     expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger",
-                               ensure_scalar_integer(5)), 25)
+                               5L), 25)
 
     expect_error(invoke_static(sc, "sparklyr.Test", "unaryInteger", NULL))
 
     expect_equal(invoke_static(sc, "sparklyr.Test", "unaryNullableInteger",
-                               ensure_scalar_integer(5)), 25)
+                               5L), 25)
 
     expect_equal(invoke_static(sc, "sparklyr.Test", "unaryNullableInteger", NULL), -1)
 })

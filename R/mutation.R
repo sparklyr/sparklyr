@@ -70,7 +70,7 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 #' @importFrom rlang :=
 #' @rdname sdf_bind
 sdf_bind_rows <- function(..., id = NULL) {
-  id <- ensure_scalar_character(id, allow.null = TRUE)
+  id <- cast_nullable_string(id)
   dots <- Filter(length, rlang::dots_splice(...))
   if (! all(sapply(dots, is.tbl_spark)))
     stop("all inputs must be tbl_spark")

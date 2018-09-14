@@ -23,9 +23,9 @@ ml_save <- function(x, path, overwrite = FALSE, ...) {
 
 #' @export
 ml_save.default <- function(x, path, overwrite = FALSE, ...) {
-  path <- ensure_scalar_character(path) %>%
+  path <- cast_string(path) %>%
     spark_normalize_path()
-  overwrite <- ensure_scalar_boolean(overwrite)
+  overwrite <- cast_scalar_logical(overwrite)
 
   ml_writer <- spark_jobj(x) %>%
     invoke("write")
@@ -57,9 +57,9 @@ ml_save.ml_model <- function(x, path, overwrite = FALSE,
   if (version < "2.0.0")
     stop("Saving of 'ml_model' is supported in Spark 2.0.0+")
 
-  path <- ensure_scalar_character(path) %>%
+  path <- cast_string(path) %>%
     spark_normalize_path()
-  overwrite <- ensure_scalar_boolean(overwrite)
+  overwrite <- cast_scalar_logical(overwrite)
   type <- match.arg(type)
 
   ml_writer <- (
@@ -88,7 +88,7 @@ ml_load <- function(sc, path) {
     invoke("isLocal")
 
   if (is_local) {
-    path <- ensure_scalar_character(path) %>%
+    path <- cast_string(path) %>%
       spark_normalize_path()
   }
 

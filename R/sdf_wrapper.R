@@ -273,13 +273,13 @@ sdf_separate_column <- function(x,
                                 column,
                                 into = NULL)
 {
-  column <- ensure_scalar_character(column)
+  column <- cast_string(column)
 
   # extract spark dataframe reference, connection
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
 
-  into_is_set <- ensure_scalar_boolean(!is.null(into))
+  into_is_set <- cast_scalar_logical(!is.null(into))
 
   # when 'into' is NULL, we auto-generate a names -> index map
   if (is.null(into)) {

@@ -105,7 +105,7 @@ ml_random_forest <- function(x, formula = NULL, type = c("auto", "regression", "
         strategy
       } # nocov end
     } else {
-      ensure_scalar_character(format(col.sample.rate, nsmall = 1))
+      cast_string(format(col.sample.rate, nsmall = 1))
     }
     assign("col.sample.rate", col.sample.rate, envir = parent.frame())
   }

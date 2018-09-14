@@ -24,12 +24,12 @@ sdf_len <- function(sc, length, repartition = NULL) {
 #'
 #' @export
 sdf_seq <- function(sc, from = 1L, to = 1L, by = 1L, repartition = NULL) {
-  from <- ensure_scalar_integer(from)
-  to <- ensure_scalar_integer(to + 1)
-  by <- ensure_scalar_integer(by)
+  from <- cast_scalar_integer(from)
+  to <- cast_scalar_integer(to + 1)
+  by <- cast_scalar_integer(by)
 
   if (is.null(repartition)) repartition <- invoke(spark_context(sc), "defaultMinPartitions")
-  repartition <- ensure_scalar_integer(repartition)
+  repartition <- cast_scalar_integer(repartition)
 
   rdd <- invoke(spark_context(sc), "range", from, to, by, repartition)
   rdd <- invoke_static(sc, "sparklyr.WorkerUtils", "mapRddLongToRddRow", rdd)

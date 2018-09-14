@@ -53,6 +53,6 @@ jobj_class <- function(jobj, simple_name = TRUE) {
                 "sparklyr.Utils",
                 "getAncestry",
                 jobj,
-                ensure_scalar_boolean(simple_name)) %>%
+                cast_scalar_logical(simple_name)) %>%
     unlist()
 }

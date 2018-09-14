@@ -124,7 +124,7 @@ ml_pca <- function(x,
                    pc_prefix = "PC",
                    ...)
 {
-  k <- ensure_scalar_integer(k)
+  k <- cast_scalar_integer(k)
 
   sc <- spark_connection(x)
 

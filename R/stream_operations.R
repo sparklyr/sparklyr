@@ -49,7 +49,7 @@ stream_stop <- function(stream)
 
 stream_validate <- function(stream)
 {
-  waitSeconds <- ensure_scalar_integer(spark_config_value(config, "sparklyr.stream.validate.timeout", 3))
+  waitSeconds <- cast_scalar_integer(spark_config_value(config, "sparklyr.stream.validate.timeout", 3))
 
   commandStart <- Sys.time()
   while (!grepl("waiting", stream_status(stream)$message) &&
@@ -161,7 +161,7 @@ sdf_collect_stream <- function(x, ...)
 
   data <- data.frame()
 
-  waitSeconds <- ensure_scalar_integer(spark_config_value(config, "sparklyr.stream.collect.timeout", 5))
+  waitSeconds <- cast_scalar_integer(spark_config_value(config, "sparklyr.stream.collect.timeout", 5))
 
   commandStart <- Sys.time()
   while (nrow(data) == 0 && commandStart + waitSeconds > Sys.time()) {

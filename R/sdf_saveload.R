@@ -19,7 +19,7 @@ sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
   .Deprecated("spark_write_table")
 
   sdf <- spark_dataframe(x)
-  name <- ensure_scalar_character(name)
+  name <- cast_string(name)
 
   writer <- invoke(sdf, "write")
   if (overwrite) writer <- invoke(writer, "mode", "overwrite")
@@ -44,7 +44,7 @@ sdf_load_table <- function(sc, name) {
   .Deprecated("spark_read_table")
 
   session <- spark_session(sc)
-  name <- ensure_scalar_character(name)
+  name <- cast_string(name)
 
   # NOTE: need to explicitly provide path to metastore for
   # Spark < 2.0.0
@@ -67,7 +67,7 @@ sdf_save_parquet <- function(x, path, overwrite = FALSE, append = FALSE) {
   .Deprecated("spark_write_parquet")
 
   sdf <- spark_dataframe(x)
-  path <- ensure_scalar_character(path)
+  path <- cast_string(path)
 
   write <- invoke(sdf, "write")
   if (overwrite) write <- invoke(write, "mode", "overwrite")
