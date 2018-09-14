@@ -40,6 +40,8 @@ make_ensure_scalar_impl <- function(checker,
                  allow.null = FALSE,
                  default = NULL)
   {
+    warning("`ensure_*` functions are deprecated and will be removed in a future release. Please use package 'forge' instead.",
+            call. = FALSE)
     object <- object %||% default
 
     if (allow.null && is.null(object)) return(object)

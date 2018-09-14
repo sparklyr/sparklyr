@@ -24,7 +24,7 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
   method <- match.arg(method)
 
   columns <- if (rlang::is_null(columns)) colnames(x) else {
-    sapply(columns, ensure_scalar_character)
+    sapply(columns, cast_string)
   }
 
   col_in_df <- columns %in% colnames(x)

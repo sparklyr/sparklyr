@@ -110,11 +110,6 @@ test_that("'sdf_bind_rows' -- 'id' argument works as expected", {
                bind_rows(x = df1a, df4a, .id = "source"))
 })
 
-test_that("'sdf_bind_rows' errs for invalid ID", {
-  expect_error(sdf_bind_rows(df1a_tbl, df4a_tbl, id = 5),
-               "'5' is not a length-one character vector")
-})
-
 test_that("'sdf_bind_rows' ignores NULL", {
   expect_equal(sdf_bind_rows(list(df1a_tbl, NULL, df4a_tbl)) %>% collect(),
                sdf_bind_rows(list(df1a_tbl, df4a_tbl)) %>% collect())

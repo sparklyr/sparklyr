@@ -22,7 +22,7 @@ get_stats <- function(stats, model) {
 tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
                                                         ...) {
   model <- x$model
-  ensure_scalar_boolean(exponentiate)
+  exponentiate <- cast_scalar_logical(exponentiate)
 
   stats <- c("coefficient_standard_errors", "t_values", "p_values")
   new_names <- c("estimate", "std.error", "statistic", "p.value")
@@ -89,7 +89,7 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
                                                            type.residuals = c("working", "deviance", "pearson", "response"),
                                                            ...) {
   type.residuals <- rlang::arg_match(type.residuals) %>%
-    ensure_scalar_character()
+    cast_string()
 
   if (!is.null(newdata) && !identical(type.residuals, "working"))
     stop("'type.residuals' must be set to 'working' when 'newdata' is supplied")

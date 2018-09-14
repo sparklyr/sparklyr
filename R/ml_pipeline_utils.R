@@ -137,7 +137,7 @@ ml_column_metadata <- function(tbl, column) {
     invoke("apply", sdf %>%
              invoke("schema") %>%
              invoke("fieldIndex", column) %>%
-             ensure_scalar_integer()) %>%
+             cast_scalar_integer()) %>%
     invoke("metadata") %>%
     invoke("json") %>%
     jsonlite::fromJSON() %>%

@@ -15,7 +15,7 @@ ml_pipeline <- function(x, ..., uid = random_string("pipeline_")) {
 #' @export
 ml_pipeline.spark_connection <-
   function(x, ..., uid = random_string("pipeline_")) {
-    ensure_scalar_character(uid)
+    uid <- cast_string(uid)
     jobj <- invoke_new(x, "org.apache.spark.ml.Pipeline", uid)
     new_ml_pipeline(jobj)
   }
@@ -23,7 +23,7 @@ ml_pipeline.spark_connection <-
 #' @export
 ml_pipeline.ml_pipeline_stage <-
   function(x, ..., uid = random_string("pipeline_")) {
-    ensure_scalar_character(uid)
+    uid <- cast_string(uid)
     sc <- spark_connection(x)
     dots <- list(...) %>%
       lapply(function(x)

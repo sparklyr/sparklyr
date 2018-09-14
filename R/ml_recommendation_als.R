@@ -230,12 +230,12 @@ new_ml_als_model <- function(jobj) {
     jobj,
     rank = invoke(jobj, "rank"),
     recommend_for_all_items = function(num_users) {
-      num_users <- ensure_scalar_integer(num_users)
+      num_users <- cast_scalar_integer(num_users)
       invoke(jobj, "recommendForAllItems", num_users) %>%
         sdf_register()
     },
     recommend_for_all_users = function(num_items) {
-      num_items <- ensure_scalar_integer(num_items)
+      num_items <- cast_scalar_integer(num_items)
       invoke(jobj, "recommendForAllUsers", num_items) %>%
         sdf_register()
     },
@@ -267,7 +267,7 @@ ml_recommend <- function(model, type = c("items", "users"), n = 1) {
     stop("`ml_recommend()`` is only support for Spark 2.2+.")
 
   type <- match.arg(type)
-  n <- ensure_scalar_integer(n)
+  n <- cast_scalar_integer(n)
   (switch(type,
           items = model$recommend_for_all_users,
           users = model$recommend_for_all_items))(n) %>%

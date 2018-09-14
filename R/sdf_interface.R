@@ -302,7 +302,7 @@ sdf_with_unique_id <- function(x, id = "id") {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  ensure_scalar_character(id)
+  id <- cast_string(id)
 
   mii <- invoke_static(
     sc,
@@ -335,8 +335,8 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
 
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
-  ensure_scalar_character(id)
-  ensure_scalar_integer(from)
+  id <- cast_string(id)
+  from <- cast_scalar_integer(from)
 
   transformed <- invoke_static(sc,
                                "sparklyr.Utils",
@@ -366,7 +366,7 @@ sdf_last_index <- function(x, id = "id") {
     dplyr::transmute(!!sym(id) := as.numeric(!!sym(id))) %>%
     spark_dataframe()
   sc <- spark_connection(sdf)
-  ensure_scalar_character(id)
+  id <- cast_string(id)
 
   invoke_static(sc,
                 "sparklyr.Utils",
@@ -399,9 +399,9 @@ sdf_quantile <- function(x,
     names(probabilities) %||%
     paste(signif(probabilities * 100, 3), "%", sep = "")
 
-  column <- ensure_scalar_character(column)
+  column <- cast_string(column)
   probabilities <- as.list(as.numeric(probabilities))
-  relative.error <- ensure_scalar_double(relative.error)
+  relative.error <- cast_scalar_double(relative.error)
 
   stat <- invoke(sdf, "stat")
   quantiles <- invoke(stat, "approxQuantile", column, probabilities, relative.error)
@@ -435,7 +435,7 @@ sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  storage.level <- ensure_scalar_character(storage.level)
+  storage.level <- cast_string(storage.level)
 
   sl <- invoke_static(
     sc,
@@ -454,7 +454,7 @@ sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
 #' @param eager whether to truncate the lineage of the DataFrame
 #' @export
 sdf_checkpoint <- function(x, eager = TRUE) {
-  ensure_scalar_boolean(eager)
+  eager <- cast_scalar_logical(eager)
 
   x %>%
     spark_dataframe() %>%
@@ -492,11 +492,10 @@ sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
   sc <- spark_connection(sdf)
 
   partitions <- partitions %||% 0L %>%
-    ensure_scalar_integer()
+    cast_scalar_integer()
 
   if (spark_version(sc) >= "2.0.0") {
-    partition_by <- as.list(partition_by) %>%
-      lapply(ensure_scalar_character)
+    partition_by <- cast_nullable_character_list(partition_by) %||% list()
 
     return(
       invoke_static(sc, "sparklyr.Repartition", "repartition", sdf, partitions, partition_by) %>%
@@ -531,7 +530,7 @@ sdf_coalesce <- function(x, partitions) {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  partitions <- ensure_scalar_integer(partitions)
+  partitions <- cast_scalar_integer(partitions)
 
   if (partitions < 1)
     stop("number of partitions must be positive")
@@ -553,7 +552,7 @@ sdf_describe <- function(x, cols = colnames(x)) {
                   paste0(cols[which(!in_df)], collapse = ", "))
     stop(msg)
   }
-  cols <- lapply(cols, ensure_scalar_character)
+  cols <- cast_character_list(cols)
 
   x %>%
     spark_dataframe() %>%

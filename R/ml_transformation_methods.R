@@ -113,8 +113,9 @@ ml_predict.ml_model_regression <- function(x, dataset, ...) {
 #' @export
 ml_predict.ml_model_classification <- function(
   x, dataset,
-  probability_prefix = "probability_", ...) {
-  ensure_scalar_character(probability_prefix)
+  probability_prefix = "probability_", ...
+) {
+  probability_prefix <- cast_string(probability_prefix)
 
   if (missing(dataset) || rlang::is_null(dataset))
     dataset <- x$dataset

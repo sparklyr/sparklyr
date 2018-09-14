@@ -117,6 +117,8 @@
 
 ### Extensions
 
+- The `ensure_*` family of functions is deprecated in favor of [forge](https://github.com/rstudio/forge) which doesn't use NSE and provides more informative errors messages for debugging (#1514).
+
 - Support for `sparklyr.invoke.trace` and `sparklyr.invoke.trace.callstack` configuration
   options to trace all `invoke()` calls.
 

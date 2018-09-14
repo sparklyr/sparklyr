@@ -299,7 +299,7 @@ spark_apply <- function(x,
         sdf_limit <- invoke(
           sdf,
           "limit",
-          ensure_scalar_integer(
+          cast_scalar_integer(
             spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
           )
         )
