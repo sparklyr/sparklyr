@@ -1,9 +1,18 @@
 #' @importFrom jsonlite fromJSON
 stream_progress <- function(stream)
 {
-  invoke(stream, "lastProgress") %>%
-    invoke("toString") %>%
-    fromJSON()
+  return(NULL)
+
+  lastProgress <- invoke(stream, "lastProgress")
+
+  if (is.null(lastProgress)) {
+    NULL
+  }
+  else {
+    lastProgress %>%
+      invoke("toString") %>%
+      fromJSON()
+  }
 }
 
 #' View Stream

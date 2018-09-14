@@ -2,7 +2,6 @@
 % Please edit documentation in R/sdf_dim.R
 \name{sdf_dim}
 \alias{sdf_dim}
-\alias{sdf_dim}
 \alias{sdf_nrow}
 \alias{sdf_ncol}
 \title{Support for Dimension Operations}

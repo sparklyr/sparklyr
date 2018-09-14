@@ -63,7 +63,7 @@ spark_config_kubernetes <- function(
     ),
     sparklyr.gateway.routing = FALSE,
     sparklyr.app.jar = "local:///opt/sparklyr/sparklyr-2.3-2.11.jar",
-    sparklyr.events.aftersubmit = forward_function,
+    sparklyr.connect.aftersubmit = forward_function,
     spark.home = spark_home_dir()
   )
 }

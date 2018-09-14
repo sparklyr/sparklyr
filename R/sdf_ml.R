@@ -78,7 +78,7 @@ sdf_project <- function(object, newdata,
     assign("feature_prefix", dots$feature.prefix)
 
 
-  ensure_scalar_character(feature_prefix, allow.null = TRUE)
+  feature_prefix <- cast_nullable_string(feature_prefix)
 
   # when newdata is not supplied, attempt to use original dataset
   if (missing(newdata) || is.null(newdata))

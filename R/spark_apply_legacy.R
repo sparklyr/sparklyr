@@ -10,7 +10,7 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
 
   sampleRows <- rdd %>% invoke(
     "take",
-    ensure_scalar_integer(
+    cast_scalar_integer(
       spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
     )
   )

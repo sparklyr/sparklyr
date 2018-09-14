@@ -66,13 +66,13 @@ invoke_method <- function(sc, static, object, method, ...) {
 }
 
 invoke_trace <- function(sc, ...) {
-  if (spark_config_value(sc$config, "sparklyr.invoke.trace", FALSE)) {
+  if (spark_config_value(sc$config, "sparklyr.log.invoke", FALSE) %in% c(TRUE, "callstack")) {
     args <- list(...)
     trace_message <- paste(args, collapse = " ")
 
     message(trace_message)
 
-    if (spark_config_value(sc$config, "sparklyr.invoke.trace.callstack", FALSE)) {
+    if (identical(spark_config_value(sc$config, "sparklyr.log.invoke", FALSE), "callstack")) {
       frame_names <- list()
       for (i in 1:sys.nframe()) {
         current_call <- sys.call(i)

@@ -73,3 +73,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

@@ -28,7 +28,7 @@ livy_service_start <- function(version = NULL,
 
   # warn if the user attempts to use livy 0.2.0 with Spark >= 2.0.0
   if (!identical(spark_version, NULL)) {
-    spark_version <- ensure_scalar_character(spark_version)
+    spark_version <- cast_string(spark_version)
     if (version == "0.2.0" &&
         numeric_version(spark_version) >= "2.0.0") {
       stopf("livy %s is not compatible with Spark (>= %s)", version, "2.0.0")

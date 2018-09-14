@@ -5,10 +5,10 @@
 \alias{ml_find_synonyms}
 \title{Feature Transformation -- Word2Vec (Estimator)}
 \usage{
-ft_word2vec(x, input_col = NULL, output_col = NULL, vector_size = 100,
-  min_count = 5, max_sentence_length = 1000, num_partitions = 1,
-  step_size = 0.025, max_iter = 1, seed = NULL, dataset = NULL,
-  uid = random_string("word2vec_"), ...)
+ft_word2vec(x, input_col = NULL, output_col = NULL,
+  vector_size = 100, min_count = 5, max_sentence_length = 1000,
+  num_partitions = 1, step_size = 0.025, max_iter = 1, seed = NULL,
+  dataset = NULL, uid = random_string("word2vec_"), ...)
 
 ml_find_synonyms(model, word, num)
 }
@@ -115,3 +115,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}
 }
+\concept{feature transformers}

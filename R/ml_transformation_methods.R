@@ -113,8 +113,9 @@ ml_predict.ml_model_regression <- function(x, dataset, ...) {
 #' @export
 ml_predict.ml_model_classification <- function(
   x, dataset,
-  probability_prefix = "probability_", ...) {
-  ensure_scalar_character(probability_prefix)
+  probability_prefix = "probability_", ...
+) {
+  probability_prefix <- cast_string(probability_prefix)
 
   if (missing(dataset) || rlang::is_null(dataset))
     dataset <- x$dataset
@@ -123,13 +124,17 @@ ml_predict.ml_model_classification <- function(
     ml_transform(dataset)
 
   probability_col <- ml_param(x$model, "probability_col", allow_null = TRUE)
-  if (rlang::is_null(probability_col))
+  if (rlang::is_null(probability_col)) {
     predictions
-  else
+  } else {
+    index_labels <- spark_sanitize_names(
+      x$.index_labebls %||% seq_len(x$model$num_classes) - 1L
+    )
     sdf_separate_column(
       predictions, probability_col,
-      paste0(probability_prefix, spark_sanitize_names(x$.index_labels))
+      paste0(probability_prefix, index_labels)
     )
+  }
 }
 
 #' @export

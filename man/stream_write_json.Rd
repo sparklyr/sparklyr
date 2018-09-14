@@ -62,3 +62,4 @@ Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_write_parquet}},
   \code{\link{stream_write_text}}
 }
+\concept{Spark stream serialization}

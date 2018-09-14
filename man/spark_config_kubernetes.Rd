@@ -6,7 +6,8 @@
 \usage{
 spark_config_kubernetes(master, image = "spark:sparklyr",
   driver = random_string("sparklyr-"), account = "spark",
-  jar = "local:///opt/sparklyr/sparklyr-2.3-2.11.jar", forward = TRUE, ...)
+  jar = "local:///opt/sparklyr/sparklyr-2.3-2.11.jar", forward = TRUE,
+  ...)
 }
 \arguments{
 \item{master}{Kubernetes url to connect to, found by running \code{kubectl cluster-info}.}

@@ -45,6 +45,23 @@ spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE) {
   )
 }
 
+spark_apply_colum_types <- function(sdf) {
+  type_map <- list(
+    IntegerType = "integer",
+    FloatType = "numeric",
+    DoubleType = "numeric",
+    LongType = "numeric",
+    StringType = "character",
+    BinaryType = "raw",
+    BooleanType = "logical",
+    TimestampType = "POSIXct",
+    DateType = "Date",
+    DateType = "date"
+  )
+
+  lapply(sdf_schema(sdf), function(e) type_map[[e$type]])
+}
+
 #' Apply an R Function in Spark
 #'
 #' Applies an R function to a Spark object (typically, a Spark DataFrame).
@@ -88,6 +105,7 @@ spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE) {
 #'   the \code{spark.r.libpaths} config entry can be set in \code{spark_config()}
 #'   to the local packages library.
 #' @param context Optional object to be serialized and passed back to \code{f()}.
+#' @param name Optional table name while registering the resulting data frame.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @section Configuration:
@@ -120,6 +138,7 @@ spark_apply <- function(x,
                         group_by = NULL,
                         packages = NULL,
                         context = NULL,
+                        name = NULL,
                         ...) {
   args <- list(...)
   assert_that(is.function(f) || is.raw(f) || is.language(f))
@@ -135,7 +154,7 @@ spark_apply <- function(x,
   }
   grouped <- !is.null(group_by)
 
-  rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
+  rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
   proc_env <- connection_config(sc, "sparklyr.apply.env.")
 
@@ -160,6 +179,12 @@ spark_apply <- function(x,
 
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) packages <- FALSE
+
+  # inject column types to context
+  context <- list(
+    column_types = spark_apply_colum_types(x),
+    user_context = context
+  )
 
   # create closure for the given function
   closure <- if (is.function(f)) serialize(f, NULL) else f
@@ -250,7 +275,7 @@ spark_apply <- function(x,
       as.environment(spark_apply_options)
     )
 
-    # while workers need to relaunch sparklyr backends, cache by default
+    # cache by default
     if (memory) rdd <- invoke(rdd, "cache")
 
     schema <- spark_schema_from_rdd(sc, rdd, columns)
@@ -274,7 +299,7 @@ spark_apply <- function(x,
         sdf_limit <- invoke(
           sdf,
           "limit",
-          ensure_scalar_integer(
+          cast_scalar_integer(
             spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
           )
         )
@@ -335,7 +360,12 @@ spark_apply <- function(x,
     )
   }
 
-  sdf_register(transformed)
+  name <- name %||% random_string("sparklyr_tmp_")
+  registered <- sdf_register(transformed, name = name)
+
+  if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
+
+  registered
 }
 
 spark_apply_rlang_serialize <- function() {

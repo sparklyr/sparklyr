@@ -2,13 +2,9 @@
 % Please edit documentation in R/spark_connection.R
 \name{spark-api}
 \alias{spark-api}
-\alias{spark-api}
 \alias{spark_context}
-\alias{spark-api}
 \alias{java_context}
-\alias{spark-api}
 \alias{hive_context}
-\alias{spark-api}
 \alias{spark_session}
 \title{Access the Spark API}
 \usage{

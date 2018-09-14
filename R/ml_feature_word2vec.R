@@ -120,14 +120,14 @@ new_ml_word2vec <- function(jobj) {
 new_ml_word2vec_model <- function(jobj) {
   new_ml_transformer(jobj,
                      find_synonyms = function(word, num) {
-                       word <- ensure_scalar_character(word)
-                       num <- ensure_scalar_integer(num)
+                       word <- cast_string(word)
+                       num <- cast_scalar_integer(num)
                        invoke(jobj, "findSynonyms", word, num) %>%
                          sdf_register()
                      },
                      find_synonyms_array = function(word, num) {
-                       word <- ensure_scalar_character(word)
-                       num <- ensure_scalar_integer(num)
+                       word <- cast_string(word)
+                       num <- cast_scalar_integer(num)
                        invoke(jobj, "findSynonymsArray", word, num)
                      },
                      vectors = invoke(jobj, "getVectors"),

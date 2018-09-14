@@ -121,6 +121,33 @@ test_that("ml_logistic_regression can fit without intercept",{
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
 
+test_that("ml_logistic_regression() agrees with stats::glm() for reversed categories", {
+  sc <- testthat_spark_connection()
+  set.seed(42)
+  iris_weighted <- iris %>%
+    mutate(weights = rpois(nrow(iris), 1) + 1,
+           ones = rep(1, nrow(iris)),
+           versicolor = ifelse(Species == "versicolor", 1L, 0L))
+  iris_weighted_tbl <- testthat_tbl("iris_weighted")
+
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+           family = binomial(logit), weights = weights,
+           data = iris_weighted)
+  s <- ml_logistic_regression(iris_weighted_tbl,
+                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                              reg_param = 0L,
+                              weight_col = "weights")
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
+           family = binomial(logit), data = iris_weighted)
+  s <- ml_logistic_regression(iris_weighted_tbl,
+                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+                              reg_param = 0L,
+                              weight_col = "ones")
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+})
+
 test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted formulas", {
   sc <- testthat_spark_connection()
   iris_weighted_tbl <- testthat_tbl("iris_weighted")

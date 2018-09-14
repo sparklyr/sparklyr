@@ -4,8 +4,8 @@
 \alias{ft_max_abs_scaler}
 \title{Feature Transformation -- MaxAbsScaler (Estimator)}
 \usage{
-ft_max_abs_scaler(x, input_col = NULL, output_col = NULL, dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...)
+ft_max_abs_scaler(x, input_col = NULL, output_col = NULL,
+  dataset = NULL, uid = random_string("max_abs_scaler_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -100,3 +100,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

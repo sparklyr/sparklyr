@@ -17,7 +17,7 @@ test_that("spark_kubernetes_config can generate correct config", {
       ),
       sparklyr.gateway.routing = FALSE,
       sparklyr.app.jar = "local:///opt/sparklyr/sparklyr-2.3-2.11.jar",
-      sparklyr.events.aftersubmit = NULL,
+      sparklyr.connect.aftersubmit = NULL,
       spark.home = spark_home_dir()
     )
   )

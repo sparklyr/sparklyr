@@ -99,7 +99,7 @@ spark_connect <- function(master,
 
   # determine whether we need cores in master
   passedMaster <- master
-  cores <- spark_config_value(config, "sparklyr.cores.local")
+  cores <- spark_config_value(config, "sparklyr.connect.cores.local")
   if (master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
 
@@ -296,11 +296,6 @@ spark_master_is_yarn_cluster <- function(master, config) {
 
 spark_master_is_gateway <- function(master) {
   grepl("sparklyr://.*", master)
-}
-
-# Number of cores available in the local install
-spark_connection_local_cores <- function(sc) {
-  spark_config_value(sc$config, "sparklyr.cores")
 }
 
 #' @name spark-connections

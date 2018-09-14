@@ -5,7 +5,8 @@
 \title{Read a ORC file into a Spark DataFrame}
 \usage{
 spark_read_orc(sc, name, path, options = list(), repartition = 0,
-  memory = TRUE, overwrite = TRUE, columns = NULL, schema = NULL, ...)
+  memory = TRUE, overwrite = TRUE, columns = NULL, schema = NULL,
+  ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -60,3 +61,4 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_write_table}},
   \code{\link{spark_write_text}}
 }
+\concept{Spark serialization routines}

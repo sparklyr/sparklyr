@@ -21,10 +21,6 @@ connection_progress_update <- function(jobName, progressUnits, url)
 connection_progress_base <- function(sc, terminated = FALSE)
 {
   env <- sc$state$progress
-
-  if (!rstudio_jobs_api_available())
-    return()
-
   api <- rstudio_jobs_api()
 
   if (is.null(env$jobs))
@@ -165,7 +161,8 @@ connection_progress_context <- function(sc, f)
 
 connection_progress <- function(sc, terminated = FALSE)
 {
-  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE)) return()
+  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE) || !rstudio_jobs_api_available())
+    return()
 
   tryCatch({
     connection_progress_base(sc, terminated)
@@ -176,8 +173,6 @@ connection_progress <- function(sc, terminated = FALSE)
 
 connection_progress_terminated <- function(sc)
 {
-  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE)) return()
-
   connection_progress(sc, terminated = TRUE)
 }
 

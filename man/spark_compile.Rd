@@ -4,8 +4,8 @@
 \alias{spark_compile}
 \title{Compile Scala sources into a Java Archive}
 \usage{
-spark_compile(jar_name, spark_home = NULL, filter = NULL, scalac = NULL,
-  jar = NULL, jar_dep = NULL)
+spark_compile(jar_name, spark_home = NULL, filter = NULL,
+  scalac = NULL, jar = NULL, jar_dep = NULL)
 }
 \arguments{
 \item{spark_home}{The path to the Spark sources to be used

@@ -14,11 +14,12 @@ ml_multilayer_perceptron_classifier(x, formula = NULL, layers = NULL,
   uid = random_string("multilayer_perceptron_classifier_"), ...)
 
 ml_multilayer_perceptron(x, formula = NULL, layers, max_iter = 100,
-  step_size = 0.03, tol = 1e-06, block_size = 128, solver = "l-bfgs",
-  seed = NULL, initial_weights = NULL, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
-  uid = random_string("multilayer_perceptron_classifier_"), response = NULL,
-  features = NULL, ...)
+  step_size = 0.03, tol = 1e-06, block_size = 128,
+  solver = "l-bfgs", seed = NULL, initial_weights = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("multilayer_perceptron_classifier_"),
+  response = NULL, features = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -97,7 +98,7 @@ iris_training <- partitions$training
 iris_test <- partitions$test
 
 mlp_model <- iris_training \%>\%
-  ml_multilayer_perceptron(Species ~ ., layers = c(4,3,3))
+  ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4,3,3))
 
 pred <- sdf_predict(iris_test, mlp_model)
 
@@ -120,3 +121,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}
