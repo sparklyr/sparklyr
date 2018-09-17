@@ -1,8 +1,6 @@
 #' @importFrom jsonlite fromJSON
 stream_progress <- function(stream)
 {
-  return(NULL)
-
   lastProgress <- invoke(stream, "lastProgress")
 
   if (is.null(lastProgress)) {
