@@ -163,6 +163,10 @@ spark_apply <- function(x,
     columns <- args$names
   }
 
+  if (!is.null(group_by) && sdf_is_streaming(sdf)) {
+    stop("'group_by' is unsupported with streams.")
+  }
+
   # set default value for packages based on config
   if (identical(packages, NULL)) {
     if (identical(packages_config, NULL)) {
