@@ -236,7 +236,7 @@ new_spark_shell_connection <- function(scon, ..., subclass = NULL) {
   new_spark_connection(
     scon,
     ...,
-    subclass = c(subclass, "spark_shell_connection")
+    subclass = c(subclass, "spark_connection", "spark_shell_connection")
   )
 }
 
