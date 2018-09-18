@@ -9,17 +9,21 @@ cache:
 
 warnings_are_errors: true
 
-jdk:
-  - oraclejdk8
+
 
 r_packages:
   - covr
 
-env:
-  - SPARK_VERSION="1.6.3"
-  - SPARK_VERSION="2.2.1"
-  - SPARK_VERSION="2.3.0"
-  - LIVY_VERSION="0.5.0"
+matrix:
+  include:
+    - env: SPARK_VERSION="1.6.3"
+      jdk: oraclejdk7
+    - env: SPARK_VERSION="2.2.1"
+      jdk: oraclejdk8
+    - env: SPARK_VERSION="2.3.0"
+      jdk: oraclejdk8
+    - env: SPARK_VERSION="2.3.0"
+      jdk: oraclejdk8
 
 script:
   - |
