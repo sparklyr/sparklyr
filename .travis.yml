@@ -34,6 +34,7 @@ matrix:
 before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
+  - scala -version
 
 script:
   - |
