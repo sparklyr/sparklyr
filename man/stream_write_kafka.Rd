@@ -19,7 +19,7 @@ stream_write_kafka(x, mode = c("append", "complete", "update"),
 every 5 seconds. See \code{\link{stream_trigger_interval}} and
 \code{\link{stream_trigger_continuous}}.}
 
-\item{checkpoint}{The location where the system will write all the checkpoint.
+\item{checkpoint}{The location where the system will write all the checkpoint
 information to guarantee end-to-end fault-tolerance.}
 
 \item{options}{A list of strings with additional options.}

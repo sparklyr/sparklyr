@@ -77,8 +77,8 @@ function StreamRenderer(stats) {
   var rowsPerSecondOut;
 
   var barWidth = 10;
-  var margin = 25;
-  var marginLeft = margin + 20;
+  var margin = 30;
+  var marginLeft = margin + 10;
   var remotesCircle = 10;
   var remotesMargin = margin;
   var remotesHeight = 0;
