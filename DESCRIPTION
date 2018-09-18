@@ -8,6 +8,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-7803-7901")),
     person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
     person("JJ", "Allaire", role = "aut", email = "jj@rstudio.com"),
+    person("Samuel", "Macêdo", role = "ctb", email = "samuelmacedo@recife.ifpe.edu.br"),
     person(family = "RStudio", role = c("cph")),
     person(family = "The Apache Software Foundation", role = c("aut", "cph"))
     )
