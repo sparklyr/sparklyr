@@ -14,18 +14,22 @@ r_packages:
 
 matrix:
   include:
-    - env:
-      - SPARK_VERSION="1.6.3"
-      - JAVA_VERSION=openjdk7
-    - env:
-      - SPARK_VERSION="2.2.1"
-      - JAVA_VERSION=oraclejdk8
-    - env:
-      - SPARK_VERSION="2.3.1"
-      - JAVA_VERSION=openjdk8
-    - env:
-      - LIVY_VERSION="0.5.0"
-      - JAVA_VERSION=openjdk8
+    - name: "Spark 1.6.3 (openjdk7)"
+      env:
+        - SPARK_VERSION="1.6.3"
+        - JAVA_VERSION=openjdk7
+    - name: "Spark 2.2.1 (oraclejdk8)"
+      env:
+        - SPARK_VERSION="2.2.1"
+        - JAVA_VERSION=oraclejdk8
+    - name: "Spark 2.3.1 (openjdk8)"
+      env:
+        - SPARK_VERSION="2.3.1"
+        - JAVA_VERSION=openjdk8
+    - name: "Livy 0.5.0 (openjdk8)"
+      env:
+        - LIVY_VERSION="0.5.0"
+        - JAVA_VERSION=openjdk8
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
