@@ -1,7 +1,7 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
-
+dist: trusty
 sudo: false
 
 cache:
@@ -25,6 +25,7 @@ matrix:
 
 script:
   - |
+    echo $JAVA_HOME
     R CMD build .
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
     if [[ $SPARK_VERSION == "2.3.0" ]]; then
