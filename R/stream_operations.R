@@ -42,7 +42,7 @@ stream_stop <- function(stream)
 
   stopped <- invoke(stream, "stop")
 
-  if (!is.null(stream$job)) rstudio_jobs_api()$remove_job(stream$job)
+  stream_unregister(stream)
 
   invisible(stopped)
 }
