@@ -363,7 +363,7 @@ spark_connect_gateway <- function(
   if (is.null(gateway)) {
     if (isStarting)
       stop(
-        "Gateway in port (", gatewayPort, ") did not respond.")
+        "Gateway in ", gatewayAddress, ":", gatewayPort, " did not respond.")
 
     NULL
   }
@@ -385,7 +385,7 @@ spark_connect_gateway <- function(
       close(gateway)
 
       if (isStarting)
-        stop("Gateway in port (", gatewayPort, ") does not have the requested session registered")
+        stop("Gateway in ", gatewayAddress, ":", gatewayPort, " does not have the requested session registered")
 
       NULL
     } else if(redirectGatewayPort != gatewayPort) {
