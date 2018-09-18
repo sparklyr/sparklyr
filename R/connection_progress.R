@@ -26,9 +26,6 @@ connection_progress_base <- function(sc, terminated = FALSE)
   if (is.null(env$jobs))
     env$jobs <- list()
 
-  if (is.null(env$stages))
-    env$stages <- list()
-
   if ((!terminated || length(env$jobs) > 0) &&
       !is.null(spark_context(sc))) {
     connection_progress_context(sc, function() {
@@ -75,57 +72,6 @@ connection_progress_base <- function(sc, terminated = FALSE)
           jobStatus <- invoke(invoke(jobInfo, "status"), "toString")
 
           api$set_job_status(env$jobs[[jobId]]$ref, jobStatus)
-          stages <- invoke(jobInfo, "stageIds")
-
-          # add new stages
-          if (spark_config_logical(sc$config, "sparklyr.progress.stages", FALSE)) {
-            for (stageId in stages) {
-              stageId <- as.character(stageId)
-              if (!stageId %in% names(env$stages)) {
-                stageIdText <- ""
-                stageInfoOption <- invoke(tracker, "getStageInfo", as.integer(stageId))
-                if (invoke(stageInfoOption, "nonEmpty"))
-                {
-                  stageInfo <- invoke(stageInfoOption, "get")
-                  stageSparkId <- invoke(stageInfo, "stageId")
-                  stageIdText <- paste0("(", stageSparkId, ")", sep = "")
-                }
-
-                stageName <- paste("Spark Stage", stageIdText)
-                stageUrl <- file.path(env$web_url, "stages", "stage", paste0("?id=", jobSparkId, "&attempt=0"))
-                stageUrlParam <- if (nchar(env$web_url) > 0) stageUrl else ""
-                env$stages[[stageId]] <- list(
-                  ref = connection_progress_update(stageName, 101L, stageUrlParam),
-                  units = 1
-                )
-              }
-            }
-
-
-            # remove or update stages
-            for (stageId in names(env$stages)) {
-              if (as.numeric(stageId) %in% stages) {
-                stageInfoOption <- invoke(tracker, "getStageInfo", as.integer(stageId))
-                if (invoke(stageInfoOption, "nonEmpty"))
-                {
-                  stageInfo <- invoke(stageInfoOption, "get")
-
-                  stageTasks <- invoke(stageInfo, "numTasks")
-                  stageCompleted <- invoke(stageInfo, "numCompletedTasks")
-                  stageStatusText <- paste0(stageCompleted, "/", stageTasks, " completed")
-
-                  api$set_job_status(env$stages[[stageId]]$ref, stageStatusText)
-                  if (env$stages[[stageId]]$units < 100) {
-                    api$add_job_progress(env$stages[[stageId]]$ref, 1L)
-                    env$stages[[stageId]]$units <- env$stages[[stageId]]$units + 1
-                  }
-                }
-              } else {
-                api$add_job_progress(env$stages[[stageId]]$ref, 100)
-                env$stages[[stageId]] <- NULL
-              }
-            }
-          }
         }
 
         if (as.numeric(jobId) %in% active) {
@@ -144,8 +90,6 @@ connection_progress_base <- function(sc, terminated = FALSE)
   if (terminated) {
     for (jobId in names(env$jobs))
       api$add_job_progress(env$jobs[[jobId]]$ref, 100L)
-    for (stageId in names(env$stages))
-      api$add_job_progress(env$stages[[stageId]]$ref, 100L)
   }
 }
 

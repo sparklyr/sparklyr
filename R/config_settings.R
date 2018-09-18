@@ -32,7 +32,6 @@ spark_config_settings <- function() {
     sparklyr.log.console = "Should driver logs be printed in the console?",
     sparklyr.progress = "Should job progress be reported to RStudio?",
     sparklyr.progress.interval = "Total of seconds to wait before attempting to retrieve job progress in Spark.",
-    sparklyr.progress.stages = "Should job stages be added as children to each active Spark job?",
     sparklyr.stream.collect.timeout = "Total seconds before stoping collecting a stream sample in sdf_collect_stream().",
     sparklyr.stream.validate.timeout = "Total seconds before stoping to check if stream has errors while being created.",
     sparklyr.worker.gateway.address = "The address of the worker machine, most likely localhost.",
