@@ -11,10 +11,19 @@ class Sources {
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
-  if (!name %in% names(config))
+  if (getOption("sparklyr.test.enforce.config", FALSE) && any(startsWith(name, "sparklyr."))) {
+    settings <- get("spark_config_settings")()
+    if (!any(name %in% settings$name)) {
+      stop("Config value '", name[[1]], "' not described in spark_config_settings()")
+    }
+  }
+
+  name_exists <- name %in% names(config)
+  if (!any(name_exists))
     default
   else {
-    value <- config[[name]]
+    name_primary <- name[name_exists][[1]]
+    value <- config[[name_primary]]
     if (is.function(value)) value <- value()
     value
   }
@@ -267,9 +276,9 @@ readRaw <- function(con) {
 }
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
   waitSeconds <- if (isStarting)
-    spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+    spark_config_value(config, "sparklyr.connect.timeout", 60)
   else
-    spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
+    spark_config_value(config, "sparklyr.gateway.timeout", 1)
 
   gateway <- NULL
   commandStart <- Sys.time()
@@ -288,7 +297,7 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
     }, error = function(err) {
     })
 
-    startWait <- spark_config_value(config, "sparklyr.gateway.start.wait", 50 / 1000)
+    startWait <- spark_config_value(config, "sparklyr.gateway.wait", 50 / 1000)
     Sys.sleep(startWait)
   }
 
@@ -304,9 +313,9 @@ spark_gateway_commands <- function() {
 
 query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   waitSeconds <- if (isStarting)
-    spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+    spark_config_value(config, "sparklyr.connect.timeout", 60)
   else
-    spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
+    spark_config_value(config, "sparklyr.gateway.timeout", 1)
 
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
@@ -396,7 +405,7 @@ core_invoke_sync_socket <- function(sc)
     flush <- readBin(sc$backend, raw(), 1000)
 
     # while flushing monitored connections we don't want to hang forever
-    if (sc$state$use_monitoring) break;
+    if (identical(sc$state$use_monitoring, TRUE)) break;
   }
 }
 

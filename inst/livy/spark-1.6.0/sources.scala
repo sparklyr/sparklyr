@@ -1105,15 +1105,25 @@ spark_worker_apply <- function(sc, config) {
     df <- do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
 
     # rbind removes Date classes so we re-assign them here
-    if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0 &&
-        any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
-      first_row <- data[[1]]
-      for (idx in seq_along(first_row)) {
-        first_class <- class(first_row[[idx]])[[1]]
-        if (identical(first_class, "Date")) {
-          df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
-        } else if (identical(first_class, "POSIXct")) {
-          df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
+    if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0) {
+
+      if (any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
+        first_row <- data[[1]]
+        for (idx in seq_along(first_row)) {
+          first_class <- class(first_row[[idx]])[[1]]
+          if (identical(first_class, "Date")) {
+            df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
+          } else if (identical(first_class, "POSIXct")) {
+            df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
+          }
+        }
+      }
+
+      # cast column to correct type, for instance, when dealing with NAs.
+      for (i in 1:ncol(df)) {
+        target_type <- funcContext$column_types[[i]]
+        if (!is.null(target_type) && class(df[[i]]) != target_type) {
+        df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
         }
       }
     }
@@ -1129,7 +1139,7 @@ spark_worker_apply <- function(sc, config) {
       closure_params <- length(formals(closure))
       closure_args <- c(
         list(df),
-        if (!is.null(funcContext)) list(funcContext) else NULL,
+        if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
         as.list(
           if (nrow(df) > 0)
             lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
