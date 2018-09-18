@@ -49,9 +49,11 @@ stream_register <- function(stream)
 }
 
 stream_unregister <- function(stream) {
+  if (is.null(stream)) return()
+
   sc <- spark_connection(stream)
 
-  if (!is.null(sc$state$streams) && !is.null(stream)) {
+  if (!is.null(sc$state$streams)) {
     stream_id <- spark_jobj_id(stream)
     stream_ref <- sc$state$streams[[stream_id]]
     if (!is.null(stream_ref)) {
