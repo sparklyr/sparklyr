@@ -252,7 +252,7 @@ start_shell <- function(master,
     csv_config_value <- spark_config_value(config, c("sparklyr.connect.csv.embedded", "sparklyr.csv.embedded"))
     if (!is.null(csv_config_value) &&
         length(grep(csv_config_value, spark_version)) > 0) {
-      if (spark_config_value(config, c("sparklyr.connect.csv.scala11", FALSE))) {
+      if (spark_config_value(config, c("sparklyr.connect.csv.scala11"), FALSE)) {
         jars <- c(
           jars,
           normalizePath(system.file(file.path("java", "spark-csv_2.11-1.5.0.jar"), package = "sparklyr")),
