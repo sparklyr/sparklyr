@@ -28,7 +28,7 @@ stream_progress <- function(stream)
 #' dir.create("iris-in")
 #' write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
 #'
-#' stream_read_csv("iris-in/") %>%
+#' stream_read_csv(sc, "iris-in/") %>%
 #'   stream_write_csv("iris-out/") %>%
 #'   stream_view() %>%
 #'   stream_stop()
@@ -44,7 +44,21 @@ stream_view <- function(
   validate <- stream_progress(stream)
   interval <- 1000
 
-  ui <- d3Output("plot")
+  ui <- shinyUI(
+    div(
+      tags$head(
+        tags$style(HTML("
+          html, body, body > div {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+          }
+        "))
+      ),
+      d3Output("plot", width = "100%", height = "100%")
+    )
+  )
+
   options <- list(...)
 
   server <- function(input, output, session) {
