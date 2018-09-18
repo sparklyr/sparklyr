@@ -23,9 +23,11 @@ matrix:
     - env: LIVY_VERSION="0.5.0"
       jdk: openjdk8
 
+before_install:
+  - echo $JAVA_HOME
+
 script:
   - |
-    echo $JAVA_HOME
     R CMD build .
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
     if [[ $SPARK_VERSION == "2.3.0" ]]; then
