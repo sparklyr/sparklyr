@@ -133,14 +133,21 @@ spark_versions <- function(latest = TRUE) {
       notCurrentRow <- mergedData[mergedData$spark != row$spark | mergedData$hadoop != row$hadoop, ]
 
       newRow <- c(row, installed = TRUE)
-      newRow$base <- if (NROW(currentRow) > 0) currentRow$base else ""
-      newRow$pattern <- if (NROW(currentRow) > 0) currentRow$pattern else ""
-      newRow$download <- if (NROW(currentRow) > 0) currentRow$download else ""
-      newRow$default <- identical(currentRow$spark, "2.3.1")
-      newRow$hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0)
-          identical(currentRow$hadoop, "2.7")
-        else
-          identical(currentRow$hadoop, "2.6")
+      newRow$base <- ""
+      newRow$pattern <- ""
+      newRow$download <- ""
+      newRow$default <- FALSE
+      newRow$hadoop_default <- FALSE
+
+      if (NROW(currentRow) > 0) {
+        hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0) "2.7" else "2.6"
+
+        newRow$base <- currentRow$base
+        newRow$pattern <- currentRow$pattern
+        newRow$download <- currentRow$download
+        newRow$default <- identical(currentRow$spark, "2.3.1")
+        newRow$hadoop_default <- identical(currentRow$hadoop, hadoop_default)
+      }
 
       mergedData <<- rbind(notCurrentRow, newRow)
     }
@@ -150,8 +157,8 @@ spark_versions <- function(latest = TRUE) {
 }
 
 # Retrieves component information for the given Spark and Hadoop versions
-spark_versions_info <- function(version, hadoop_version) {
-  versions <- spark_versions()
+spark_versions_info <- function(version, hadoop_version, latest = TRUE) {
+  versions <- spark_versions(latest = latest)
 
   versions <- versions[versions$spark == version, ]
   if (NROW(versions) == 0) {
