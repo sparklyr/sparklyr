@@ -217,7 +217,20 @@ class Backend() {
       override def run(): Unit = {
         Thread.sleep(connectionTimeout * 1000)
         if (!oneConnection && !isService) {
-          logger.log("is terminating backend since no client has connected after " + connectionTimeout + " seconds")
+          val hostAddress: String = try {
+            " to " + InetAddress.getLocalHost.getHostAddress.toString + "/" + getPort()
+          } catch {
+            case e: java.net.UnknownHostException => "unknown host"
+          }
+
+          logger.log(
+            "is terminating backend since no client has connected after " +
+            connectionTimeout +
+            " seconds" +
+            hostAddress +
+            "."
+          )
+
           System.exit(1)
         }
       }

@@ -103,7 +103,7 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, strea
     invoke("start") %>%
     stream_class() %>%
     stream_validate() %>%
-    stream_register_job()
+    stream_register()
 }
 
 #' Read CSV Stream

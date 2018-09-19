@@ -1,7 +1,7 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
-
+dist: trusty
 sudo: false
 
 cache:
@@ -9,17 +9,31 @@ cache:
 
 warnings_are_errors: true
 
-jdk:
-  - oraclejdk8
-
 r_packages:
   - covr
 
-env:
-  - SPARK_VERSION="1.6.3"
-  - SPARK_VERSION="2.2.1"
-  - SPARK_VERSION="2.3.0"
-  - LIVY_VERSION="0.5.0"
+matrix:
+  include:
+    - name: "Spark 1.6.3 (openjdk7)"
+      env:
+        - SPARK_VERSION="1.6.3"
+        - JAVA_VERSION=openjdk7
+    - name: "Spark 2.2.1 (oraclejdk8)"
+      env:
+        - SPARK_VERSION="2.2.1"
+        - JAVA_VERSION=oraclejdk8
+    - name: "Spark 2.3.1 (openjdk8)"
+      env:
+        - SPARK_VERSION="2.3.1"
+        - JAVA_VERSION=openjdk8
+    - name: "Livy 0.5.0 (openjdk8)"
+      env:
+        - LIVY_VERSION="0.5.0"
+        - JAVA_VERSION=openjdk8
+
+before_install:
+  - jdk_switcher use $JAVA_VERSION
+  - echo $JAVA_HOME
 
 script:
   - |

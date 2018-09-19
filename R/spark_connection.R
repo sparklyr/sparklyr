@@ -236,7 +236,7 @@ new_spark_shell_connection <- function(scon, ..., subclass = NULL) {
   new_spark_connection(
     scon,
     ...,
-    subclass = c(subclass, "spark_shell_connection")
+    subclass = c(subclass, "spark_connection", "spark_shell_connection")
   )
 }
 
@@ -245,13 +245,6 @@ new_spark_gateway_connection <- function(scon, ..., subclass = NULL) {
     scon,
     ...,
     subclass = c(subclass, "spark_gateway_connection")
-  )
-}
-
-new_databricks_connection <- function(scon) {
-  new_spark_gateway_connection(
-    scon,
-    subclass = "databricks_connection"
   )
 }
 

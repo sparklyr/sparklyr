@@ -19,4 +19,22 @@ databricks_connection <- function(config, extensions) {
   )
 }
 
+#' @export
+spark_version.databricks_connection <- function(sc) {
+  if (!is.null(sc$state$spark_version))
+    return(sc$state$spark_version)
 
+  version <- eval(rlang::parse_expr("SparkR::sparkR.version()"))
+
+  sc$state$spark_version <- numeric_version(version)
+
+  # return to caller
+  sc$state$spark_version
+}
+
+new_databricks_connection <- function(scon) {
+  new_spark_gateway_connection(
+    scon,
+    subclass = "databricks_connection"
+  )
+}

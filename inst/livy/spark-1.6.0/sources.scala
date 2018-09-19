@@ -14,10 +14,19 @@ class Sources {
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
-  if (!name %in% names(config))
+  if (getOption("sparklyr.test.enforce.config", FALSE) && any(startsWith(name, "sparklyr."))) {
+    settings <- get("spark_config_settings")()
+    if (!any(name %in% settings$name)) {
+      stop("Config value '", name[[1]], "' not described in spark_config_settings()")
+    }
+  }
+
+  name_exists <- name %in% names(config)
+  if (!any(name_exists))
     default
   else {
-    value <- config[[name]]
+    name_primary <- name[name_exists][[1]]
+    value <- config[[name_primary]]
     if (is.function(value)) value <- value()
     value
   }
@@ -270,9 +279,9 @@ readRaw <- function(con) {
 }
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
   waitSeconds <- if (isStarting)
-    spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+    spark_config_value(config, "sparklyr.connect.timeout", 60)
   else
-    spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
+    spark_config_value(config, "sparklyr.gateway.timeout", 1)
 
   gateway <- NULL
   commandStart <- Sys.time()
@@ -291,7 +300,7 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
     }, error = function(err) {
     })
 
-    startWait <- spark_config_value(config, "sparklyr.gateway.start.wait", 50 / 1000)
+    startWait <- spark_config_value(config, "sparklyr.gateway.wait", 50 / 1000)
     Sys.sleep(startWait)
   }
 
@@ -307,9 +316,9 @@ spark_gateway_commands <- function() {
 
 query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   waitSeconds <- if (isStarting)
-    spark_config_value(config, "sparklyr.gateway.start.timeout", 60)
+    spark_config_value(config, "sparklyr.connect.timeout", 60)
   else
-    spark_config_value(config, "sparklyr.gateway.connect.timeout", 1)
+    spark_config_value(config, "sparklyr.gateway.timeout", 1)
 
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
@@ -354,7 +363,7 @@ spark_connect_gateway <- function(
   if (is.null(gateway)) {
     if (isStarting)
       stop(
-        "Gateway in port (", gatewayPort, ") did not respond.")
+        "Gateway in ", gatewayAddress, ":", gatewayPort, " did not respond.")
 
     NULL
   }
@@ -376,7 +385,7 @@ spark_connect_gateway <- function(
       close(gateway)
 
       if (isStarting)
-        stop("Gateway in port (", gatewayPort, ") does not have the requested session registered")
+        stop("Gateway in ", gatewayAddress, ":", gatewayPort, " does not have the requested session registered")
 
       NULL
     } else if(redirectGatewayPort != gatewayPort) {
@@ -399,7 +408,7 @@ core_invoke_sync_socket <- function(sc)
     flush <- readBin(sc$backend, raw(), 1000)
 
     # while flushing monitored connections we don't want to hang forever
-    if (sc$state$use_monitoring) break;
+    if (identical(sc$state$use_monitoring, TRUE)) break;
   }
 }
 
@@ -1105,15 +1114,25 @@ spark_worker_apply <- function(sc, config) {
     df <- do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
 
     # rbind removes Date classes so we re-assign them here
-    if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0 &&
-        any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
-      first_row <- data[[1]]
-      for (idx in seq_along(first_row)) {
-        first_class <- class(first_row[[idx]])[[1]]
-        if (identical(first_class, "Date")) {
-          df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
-        } else if (identical(first_class, "POSIXct")) {
-          df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
+    if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0) {
+
+      if (any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
+        first_row <- data[[1]]
+        for (idx in seq_along(first_row)) {
+          first_class <- class(first_row[[idx]])[[1]]
+          if (identical(first_class, "Date")) {
+            df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
+          } else if (identical(first_class, "POSIXct")) {
+            df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
+          }
+        }
+      }
+
+      # cast column to correct type, for instance, when dealing with NAs.
+      for (i in 1:ncol(df)) {
+        target_type <- funcContext$column_types[[i]]
+        if (!is.null(target_type) && class(df[[i]]) != target_type) {
+        df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
         }
       }
     }
@@ -1129,7 +1148,7 @@ spark_worker_apply <- function(sc, config) {
       closure_params <- length(formals(closure))
       closure_args <- c(
         list(df),
-        if (!is.null(funcContext)) list(funcContext) else NULL,
+        if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
         as.list(
           if (nrow(df) > 0)
             lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])

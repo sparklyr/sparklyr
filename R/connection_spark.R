@@ -235,6 +235,8 @@ spark_disconnect.spark_connection <- function(sc, ...) {
   spark_connections_remove(sc)
 
   on_connection_closed(sc)
+
+  stream_unregister_all(sc)
 }
 
 #' @export
