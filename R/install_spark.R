@@ -51,7 +51,7 @@ spark_install_find <- function(version = NULL,
   }
 
   versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
-  spark_install_info(as.character(versions[1,]$spark), as.character(versions[1,]$hadoop))
+  spark_install_info(as.character(versions[1,]$spark), as.character(versions[1,]$hadoop), latest = latest)
 }
 
 #' determine the version that will be used by default if version is NULL
@@ -79,8 +79,8 @@ spark_default_version <- function() {
        hadoop = hadoop)
 }
 
-spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
-  versionInfo <- spark_versions_info(sparkVersion, hadoopVersion)
+spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL, latest = TRUE) {
+  versionInfo <- spark_versions_info(sparkVersion, hadoopVersion, latest = latest)
 
   componentName <- versionInfo$componentName
   packageName <- versionInfo$packageName

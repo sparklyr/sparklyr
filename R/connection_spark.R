@@ -99,7 +99,7 @@ spark_connect <- function(master,
 
   # determine whether we need cores in master
   passedMaster <- master
-  cores <- spark_config_value(config, "sparklyr.connect.cores.local")
+  cores <- spark_config_value(config, c("sparklyr.connect.cores.local", "sparklyr.cores.local"))
   if (master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
 
