@@ -27,9 +27,10 @@ object Shell {
 
     val isService = args.contains("--service")
     val isRemote = args.contains("--remote")
+    val isBatch = args.contains("--batch")
 
     backend = new Backend()
-    backend.setType(isService, isRemote, false)
+    backend.setType(isService, isRemote, false, isBatch)
     backend.init(port, sessionId, connectionTimeout)
   }
 

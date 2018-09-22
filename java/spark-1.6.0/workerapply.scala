@@ -56,7 +56,8 @@ class WorkerApply(
     backend.setType(
       true,   /* isService */
       false,  /* isRemote */
-      true    /* isWorker */
+      true,   /* isWorker */
+      false,  /* isBatch */
     )
 
     backend.setHostContext(

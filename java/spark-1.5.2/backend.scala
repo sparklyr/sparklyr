@@ -59,6 +59,7 @@ class Backend() {
   private[this] var isService: Boolean = false
   private[this] var isRemote: Boolean = false
   private[this] var isWorker: Boolean = false
+  private[this] var isBatch: Boolean = false
 
   private[this] var hostContext: String = null
 
@@ -92,14 +93,6 @@ class Backend() {
     val GetPorts, RegisterInstance, UnregisterInstance = Value
   }
 
-  def getOrCreateHiveContext(sc: SparkContext): HiveContext = {
-    if (hc == null) {
-      hc = new HiveContext(sc)
-    }
-
-    hc
-  }
-
   def getSparkContext(): SparkContext = {
     sc
   }
@@ -114,10 +107,12 @@ class Backend() {
 
   def setType(isServiceParam: Boolean,
               isRemoteParam: Boolean,
-              isWorkerParam: Boolean) = {
+              isWorkerParam: Boolean,
+              isBatchParam: Boolean) = {
     isService = isServiceParam
     isRemote = isRemoteParam
     isWorker = isWorkerParam
+    isBatch = isBatchParam
   }
 
   def setHostContext(hostContextParam: String) = {
@@ -195,6 +190,11 @@ class Backend() {
 
   def run(): Unit = {
     try {
+
+      if (isBatch) {
+
+      }
+
       initMonitor()
       while(isRunning) {
         bind()
