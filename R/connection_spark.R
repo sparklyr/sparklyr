@@ -60,6 +60,28 @@ spark_default_app_jar <- function(version) {
 #' @name spark-connections
 NULL
 
+spark_master_local_cores <- function(master) {
+  cores <- spark_config_value(config, c("sparklyr.connect.cores.local", "sparklyr.cores.local"))
+  if (master == "local" && !identical(cores, NULL))
+    master <- paste("local[", cores, "]", sep = "")
+
+  master
+}
+
+spark_config_shell_args <- function(config, master) {
+  # determine shell_args (use fake connection b/c we don't yet
+  # have a real connection)
+  config_sc <- list(config = config, master = master)
+  shell_args <- connection_config(config_sc, "sparklyr.shell.")
+
+  # flatten shell_args to make them compatible with sparklyr
+  unlist(lapply(names(shell_args), function(name) {
+    lapply(shell_args[[name]], function(value) {
+      list(paste0("--", name), value)
+    })
+  }))
+}
+
 #' @name spark-connections
 #'
 #' @examples
@@ -99,9 +121,7 @@ spark_connect <- function(master,
 
   # determine whether we need cores in master
   passedMaster <- master
-  cores <- spark_config_value(config, c("sparklyr.connect.cores.local", "sparklyr.cores.local"))
-  if (master == "local" && !identical(cores, NULL))
-    master <- paste("local[", cores, "]", sep = "")
+  master <- spark_master_local_cores(master)
 
   # look for existing connection with the same method, master, and app_name
   sconFound <- spark_connection_find(master, app_name, method)
@@ -110,17 +130,7 @@ spark_connect <- function(master,
     return(sconFound[[1]])
   }
 
-  # determine shell_args (use fake connection b/c we don't yet
-  # have a real connection)
-  config_sc <- list(config = config, master = master)
-  shell_args <- connection_config(config_sc, "sparklyr.shell.")
-
-  # flatten shell_args to make them compatible with sparklyr
-  shell_args <- unlist(lapply(names(shell_args), function(name) {
-    lapply(shell_args[[name]], function(value) {
-      list(paste0("--", name), value)
-    })
-  }))
+  shell_args <- spark_config_shell_args(config, master)
 
   # clean spark_apply per-connection cache
   if (dir.exists(spark_apply_bundle_path()))

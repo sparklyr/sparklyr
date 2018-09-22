@@ -17,7 +17,8 @@ shell_connection <- function(master,
                              config,
                              service,
                              remote,
-                             extensions) {
+                             extensions,
+                             batch) {
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
@@ -77,7 +78,8 @@ shell_connection <- function(master,
     environment = environment,
     shell_args = shell_args,
     service = service,
-    remote = remote
+    remote = remote,
+    batch = batch
   )
 }
 
@@ -147,12 +149,14 @@ start_shell <- function(master,
                         environment = NULL,
                         shell_args = NULL,
                         service = FALSE,
-                        remote = FALSE) {
+                        remote = FALSE,
+                        batch = FALSE) {
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
   isService <- service
   isRemote <- remote
+  isBatch <- batch
 
   sessionId <- if (isService)
     spark_session_id(app_name, master)
@@ -301,6 +305,10 @@ start_shell <- function(master,
 
     if (isRemote) {
       shell_args <- c(shell_args, "--remote")
+    }
+
+    if (isBatch) {
+      shell_args <- c(shell_args, "--batch")
     }
 
     # create temp file for stdout and stderr
