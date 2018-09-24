@@ -11,10 +11,6 @@
 #'   none. If non-null, the reader will automatically stop when the session ends.
 #'
 #' @importFrom shiny reactivePoll
-#' @importFrom dplyr select
-#' @importFrom dplyr filter
-#' @importFrom dplyr distinct
-#' @importFrom dplyr pull
 #'
 #' @export
 reactiveSpark <- function(x,
