@@ -196,13 +196,19 @@ class Backend() {
 
           val rscript = new Rscript(logger)
 
+          val sparklyrGateway = "sparklyr://localhost:" + port.toString() + "/" + sessionId
+          logger.log("will be using rscript gateway: " + sparklyrGateway)
+
           val sourceFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
+          val sourceLines = scala.io.Source.fromFile(sourceFile).getLines
 
           val modifiedFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch-mod.R")
           val outStream: FileWriter = new FileWriter(modifiedFile)
-          outStream.write("options(spark.master = \"sparklyr://localhost:" + port.toString() + "/" + sessionId + "\")")
-          outStream.write("\n\n")
-          // outStream.write(sourceFile)
+          outStream.write("options(sparklyr.connect.master = \"" + sparklyrGateway + "\")")
+          outStream.write("\n\n");
+          for (line <- sourceLines) {
+            outStream.write(line + "\n")
+          }
           outStream.flush()
 
           logger.log("wrote modified batch rscript: " + modifiedFile.getAbsolutePath())
@@ -217,8 +223,21 @@ class Backend() {
             options
           )
         } catch {
-          case e: Exception =>
+          case e: java.lang.reflect.InvocationTargetException =>
+            e.getCause() match {
+              case cause: Exception => {
+                logger.logError("failed to invoke batch rscript: ", cause)
+                System.exit(1)
+              }
+              case _ => {
+                logger.logError("failed to invoke batch rscript: ", e)
+                System.exit(1)
+              }
+            }
+          case e: Exception => {
             logger.logError("failed to run batch rscript: ", e)
+            System.exit(1)
+          }
         }
       }
     }.start()
