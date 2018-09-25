@@ -4,7 +4,7 @@
 //
 
 class Rscript(logger: Logger) {
-  import java.io.{File, FileWriter}
+  import java.io.File
   import java.util.Arrays
 
   import org.apache.spark._
@@ -43,18 +43,6 @@ class Rscript(logger: Logger) {
     sparkConfMethods(0).invoke(sparkConf, "spark.r.command", "Rscript").asInstanceOf[String]
   }
 
-  def workerSourceFile(): String = {
-    val rsources = new Sources()
-    val source = rsources.sources
-
-    val tempFile: File = new File(getScratchDir() + File.separator + "sparkworker.R")
-    val outStream: FileWriter = new FileWriter(tempFile)
-    outStream.write(source)
-    outStream.flush()
-
-    tempFile.getAbsolutePath()
-  }
-
   def run(commands: String) = {
     val processBuilder: ProcessBuilder = new ProcessBuilder(commands.split(" ").toList.asJava)
 
@@ -74,15 +62,13 @@ class Rscript(logger: Logger) {
   }
 
   def init(
-    sessionId: Int,
-    backendPort: Int,
-    config: String,
+    params: List[String],
+    sourceFilePath: String,
     customEnv: Map[String, String],
     options: Map[String, String]) = {
 
     val command: String = getCommand()
 
-    val sourceFilePath: String = workerSourceFile()
     logger.log("using source file " + sourceFilePath)
 
     if (options.contains("rscript.before")) {
@@ -91,14 +77,11 @@ class Rscript(logger: Logger) {
 
     val vanilla = options.getOrElse("vanilla", "true") == "true"
 
-    val commandParams = List(
+    val commandParams = (List(
       command,
       if (vanilla) "--vanilla" else "",
-      sourceFilePath,
-      sessionId.toString,
-      backendPort.toString,
-      config
-    ).filter(_.nonEmpty)
+      sourceFilePath
+    ) ++ params).filter(_.nonEmpty)
 
     logger.log("launching command " + commandParams.mkString(" "))
 

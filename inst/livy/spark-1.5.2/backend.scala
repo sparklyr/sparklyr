@@ -49,7 +49,7 @@
 
 class Backend() {
   import java.io.{DataInputStream, DataOutputStream}
-  import java.io.{File, FileOutputStream, IOException}
+  import java.io.{File, FileOutputStream, IOException, FileWriter}
   import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
   import java.util.concurrent.TimeUnit
 
@@ -62,6 +62,7 @@ class Backend() {
   private[this] var isService: Boolean = false
   private[this] var isRemote: Boolean = false
   private[this] var isWorker: Boolean = false
+  private[this] var isBatch: Boolean = false
 
   private[this] var hostContext: String = null
 
@@ -95,14 +96,6 @@ class Backend() {
     val GetPorts, RegisterInstance, UnregisterInstance = Value
   }
 
-  def getOrCreateHiveContext(sc: SparkContext): HiveContext = {
-    if (hc == null) {
-      hc = new HiveContext(sc)
-    }
-
-    hc
-  }
-
   def getSparkContext(): SparkContext = {
     sc
   }
@@ -117,10 +110,12 @@ class Backend() {
 
   def setType(isServiceParam: Boolean,
               isRemoteParam: Boolean,
-              isWorkerParam: Boolean) = {
+              isWorkerParam: Boolean,
+              isBatchParam: Boolean) = {
     isService = isServiceParam
     isRemote = isRemoteParam
     isWorker = isWorkerParam
+    isBatch = isBatchParam
   }
 
   def setHostContext(hostContextParam: String) = {
@@ -196,8 +191,49 @@ class Backend() {
     if (!isService) System.exit(0)
   }
 
+  def batch(): Unit = {
+    new Thread("starting batch rscript thread") {
+      override def run(): Unit = {
+        try {
+          logger.log("is starting batch rscript")
+
+          val rscript = new Rscript(logger)
+
+          val sourceFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
+
+          val modifiedFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch-mod.R")
+          val outStream: FileWriter = new FileWriter(modifiedFile)
+          outStream.write("options(spark.master = \"sparklyr://localhost:" + port.toString() + "/" + sessionId + "\")")
+          outStream.write("\n\n")
+          // outStream.write(sourceFile)
+          outStream.flush()
+
+          logger.log("wrote modified batch rscript: " + modifiedFile.getAbsolutePath())
+
+          val customEnv: Map[String, String] = Map()
+          val options: Map[String, String] = Map()
+
+          rscript.init(
+            List(),
+            modifiedFile.getAbsolutePath(),
+            customEnv,
+            options
+          )
+        } catch {
+          case e: Exception =>
+            logger.logError("failed to run batch rscript: ", e)
+        }
+      }
+    }.start()
+  }
+
   def run(): Unit = {
     try {
+
+      if (isBatch) {
+        batch()
+      }
+
       initMonitor()
       while(isRunning) {
         bind()
