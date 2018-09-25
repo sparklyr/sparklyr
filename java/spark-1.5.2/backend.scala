@@ -199,7 +199,11 @@ class Backend() {
           val sparklyrGateway = "sparklyr://localhost:" + port.toString() + "/" + sessionId
           logger.log("will be using rscript gateway: " + sparklyrGateway)
 
-          val sourceFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
+          val sourceFile: = new java.io.File("sparklyr-batch.R")
+          if (!sourceFile.exists) {
+            sourceFile = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
+          }
+
           val sourceLines = scala.io.Source.fromFile(sourceFile).getLines
 
           val modifiedFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch-mod.R")
