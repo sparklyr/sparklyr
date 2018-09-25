@@ -6,10 +6,4 @@ set_option_default <- function(...) {
   })
 }
 
-.onLoad <- function(...) {
-  set_option_default(
-    sparklyr.na.action.verbose = TRUE
-  )
-}
-
 utils::globalVariables(".")

@@ -42,7 +42,7 @@ spark_csv_read <- function(sc,
 
   options <- spark_csv_format_if_needed(read, sc)
 
-  if (sparklyr_boolean_option("sparklyr.verbose") && !identical(columns, NULL)) {
+  if (spark_config_value(sc$config, "sparklyr.verbose", FALSE) && !identical(columns, NULL)) {
     ncol_ds <- options %>%
       invoke(spark_csv_load_name(sc), path) %>%
       invoke("schema") %>%
@@ -87,7 +87,7 @@ spark_csv_read <- function(sc,
   } else {
     # sanitize column names
     colNames <- as.character(invoke(df, "columns"))
-    sanitized <- spark_sanitize_names(colNames)
+    sanitized <- spark_sanitize_names(colNames, sc$config)
     if (!identical(colNames, sanitized))
       df <- invoke(df, "toDF", as.list(sanitized))
   }

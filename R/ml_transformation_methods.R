@@ -115,6 +115,7 @@ ml_predict.ml_model_classification <- function(
   x, dataset,
   probability_prefix = "probability_", ...
 ) {
+  sc <- spark_connection(x)
   probability_prefix <- cast_string(probability_prefix)
 
   if (missing(dataset) || rlang::is_null(dataset))
@@ -128,7 +129,8 @@ ml_predict.ml_model_classification <- function(
     predictions
   } else {
     index_labels <- spark_sanitize_names(
-      x$.index_labebls %||% seq_len(x$model$num_classes) - 1L
+      x$.index_labebls %||% seq_len(x$model$num_classes) - 1L,
+      sc$config
     )
     sdf_separate_column(
       predictions, probability_col,

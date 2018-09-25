@@ -92,7 +92,7 @@ spark_config_value_retries <- function(config, name, default, retries) {
         success = TRUE
       )
     }, error = function(e) {
-      if (sparklyr_boolean_option("sparklyr.verbose")) {
+      if (spark_config_value(config, "sparklyr.verbose", FALSE)) {
         message("Reading ", name, " failed with error: ", e$message)
       }
 
