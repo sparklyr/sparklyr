@@ -13,19 +13,19 @@ spark_submit <- function(master,
                          extensions = sparklyr::registered_extensions(),
                          ...) {
 
-  master <- spark_master_local_cores(master, config)
-  shell_args <- spark_config_shell_args(config, master)
-  if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
-
   temp_path <- tempfile()
   dir.create(temp_path)
-  batch_fie <- file.path(temp_path, "sparklyr-batch.R")
-  file.copy(file, batch_fie)
-  config$sparklyr.shell.files <- c(batch_fie, config$sparklyr.shell.files)
+  batch_file <- file.path(temp_path, "sparklyr-batch.R")
+  file.copy(file, batch_file)
+  config$sparklyr.shell.files <- c(batch_file, config$sparklyr.shell.files)
 
   # spark_submit() is designed for non-interactive jobs, so we can log to console
   if (is.null(config$sparklyr.verbose)) config$sparklyr.verbose <- TRUE
   if (is.null(config$sparklyr.log.console)) config$sparklyr.log.console <- TRUE
+
+  master <- spark_master_local_cores(master, config)
+  shell_args <- spark_config_shell_args(config, master)
+  if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 
   shell_connection(master = master,
                    spark_home = spark_home,
