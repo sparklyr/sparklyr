@@ -115,7 +115,7 @@ ml_predict.ml_model_classification <- function(
   x, dataset,
   probability_prefix = "probability_", ...
 ) {
-  sc <- spark_connection(x)
+  sc <- spark_connection(x$model)
   probability_prefix <- cast_string(probability_prefix)
 
   if (missing(dataset) || rlang::is_null(dataset))

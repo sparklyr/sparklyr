@@ -36,7 +36,7 @@ na.omit.tbl_spark <- function(object, columns = NULL, ...) {
 
 #' @export
 na.omit.spark_jobj <- function(object, columns = NULL, ...) {
-  sc <- spark_connect(object)
+  sc <- spark_connection(object)
 
   # report number of rows dropped if requested
   verbose <- spark_config_value(sc$config, c(
