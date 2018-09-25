@@ -228,6 +228,9 @@ class Backend() {
     try {
 
       if (isBatch) {
+        // spark context needs to be created for spark.files to be accessible
+        org.apache.spark.SparkContext.getOrCreate()
+
         batch()
       }
 
