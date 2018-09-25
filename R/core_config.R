@@ -21,7 +21,7 @@ spark_config_value <- function(config, name, default = NULL) {
       value <- default
     } else {
       name_primary <- name[name_exists][[1]]
-      value <- getOptions(name_primary)
+      value <- getOption(name_primary)
     }
   } else {
     name_primary <- name[name_exists][[1]]

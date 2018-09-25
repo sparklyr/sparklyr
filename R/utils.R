@@ -191,7 +191,7 @@ spark_sanitize_names <- function(names, config) {
   newNames <- make.unique(newNames, sep = "_")
 
   # report translations
-  verbose <- sparklyr_config_value(
+  verbose <- spark_config_value(
     config,
     c("sparklyr.verbose.sanitize", "sparklyr.sanitize.column.names.verbose", "sparklyr.verbose"),
     TRUE
