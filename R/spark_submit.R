@@ -23,6 +23,9 @@ spark_submit <- function(master,
   file.copy(file, batch_fie)
   config$sparklyr.shell.files <- c(batch_fie, config$sparklyr.shell.files)
 
+  # spark_submit() is designed for non-interactive jobs, so we can log to console
+  if (is.null(config$sparklyr.log.console)) config$sparklyr.log.console <- TRUE
+
   shell_connection(master = master,
                    spark_home = spark_home,
                    app_name = app_name,
@@ -35,5 +38,5 @@ spark_submit <- function(master,
                    extensions = extensions,
                    batch = TRUE)
 
-  spark_disconnect(sc)
+  invisible(NULL)
 }
