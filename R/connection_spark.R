@@ -105,6 +105,9 @@ spark_connect <- function(master,
   # validate method
   method <- match.arg(method)
 
+  master_override <- spark_config_value(config, "sparklyr.connect.master", NULL)
+  if (!is.null(master_override)) master <- master_override
+
   # master can be missing if it's specified in the config file
   if (missing(master)) {
     if (identical(method, "databricks")) {
