@@ -13,7 +13,7 @@ spark_submit <- function(master,
                          extensions = sparklyr::registered_extensions(),
                          ...) {
 
-  master <- spark_master_local_cores(master)
+  master <- spark_master_local_cores(master, config)
   shell_args <- spark_config_shell_args(config, master)
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 

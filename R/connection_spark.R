@@ -60,7 +60,7 @@ spark_default_app_jar <- function(version) {
 #' @name spark-connections
 NULL
 
-spark_master_local_cores <- function(master) {
+spark_master_local_cores <- function(master, config) {
   cores <- spark_config_value(config, c("sparklyr.connect.cores.local", "sparklyr.cores.local"))
   if (master == "local" && !identical(cores, NULL))
     master <- paste("local[", cores, "]", sep = "")
@@ -121,7 +121,7 @@ spark_connect <- function(master,
 
   # determine whether we need cores in master
   passedMaster <- master
-  master <- spark_master_local_cores(master)
+  master <- spark_master_local_cores(master, config)
 
   # look for existing connection with the same method, master, and app_name
   sconFound <- spark_connection_find(master, app_name, method)
