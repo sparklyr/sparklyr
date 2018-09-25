@@ -322,6 +322,10 @@ start_shell <- function(master,
 
     start_time <- floor(as.numeric(Sys.time()) * 1000)
 
+    if (spark_config_value(config, "sparklyr.verbose", FALSE)) {
+      message(spark_submit_path, " ", paste(shell_args, collapse = " "))
+    }
+
     # start the shell (w/ specified additional environment variables)
     env <- unlist(as.list(environment))
     withr::with_envvar(env, {
@@ -334,6 +338,9 @@ start_shell <- function(master,
 
     # support custom operations after spark-submit useful to enable port forwarding
     spark_config_value(config, c("sparklyr.connect.aftersubmit", "sparklyr.events.aftersubmit"))
+
+    # batch connections only use the shell to submit an application, not to connect.
+    if (identical(batch, TRUE)) return(NULL)
 
     # for yarn-cluster
     if (spark_master_is_yarn_cluster(master, config) && is.null(config[["sparklyr.gateway.address"]])) {
