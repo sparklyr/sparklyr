@@ -380,6 +380,9 @@ start_shell <- function(master,
     })
   }
 
+  # batch connections only use the shell to submit an application, not to connect.
+  if (identical(batch, TRUE)) return(NULL)
+
   tryCatch({
     interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
 
