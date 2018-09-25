@@ -110,7 +110,7 @@ spark_connect <- function(master,
     if (identical(method, "databricks")) {
       master <- "databricks"
     } else {
-      master <- config$spark.master
+      master <- spark_config_value(config, "spark.master", NULL)
       if (is.null(master))
         stop("You must either pass a value for master or include a spark.master ",
              "entry in your config.yml")
@@ -162,7 +162,8 @@ spark_connect <- function(master,
                                config,
                                "sparklyr.gateway.remote",
                                spark_master_is_yarn_cluster(master, config)),
-                             extensions = extensions)
+                             extensions = extensions,
+                             batch = FALSE)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
                             config = config,
