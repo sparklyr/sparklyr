@@ -1,4 +1,4 @@
-# Sparklyr 0.9.0 (unreleased)
+# Sparklyr 0.9.0
 
 ### Streaming
 
