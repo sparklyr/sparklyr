@@ -146,6 +146,8 @@
 
 ### Configuration
 
+- Deprecated configuration option `sparklyr.dplyr.compute.nocache`.
+
 - Added `spark_config_settings()` to list all `sparklyr` configuration settings and
   describe them, cleaned all settings and grouped by area while maintaining support
   for previous settings.

@@ -33,3 +33,4 @@
 ^_blogdown.yml$
 ^config.toml$
 ^appveyor.yml$
+^checkpoints$
