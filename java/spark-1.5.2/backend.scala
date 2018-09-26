@@ -71,6 +71,7 @@ class Backend() {
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
   private[this] var connectionTimeout: Int = 60
+  private[this] var batchFile: String = ""
 
   private[this] var sc: SparkContext = null
   private[this] var hc: HiveContext = null
@@ -122,10 +123,18 @@ class Backend() {
   def init(portParam: Int,
            sessionIdParam: Int,
            connectionTimeoutParam: Int): Unit = {
+      init(portParam, sessionIdParam, connectionTimeoutParam, "")
+  }
+
+  def init(portParam: Int,
+           sessionIdParam: Int,
+           connectionTimeoutParam: Int,
+           batchFilePath: String): Unit = {
 
     port = portParam
     sessionId = sessionIdParam
     connectionTimeout = connectionTimeoutParam
+    batchFile = batchFilePath
 
     logger = new Logger("Session", sessionId)
 
@@ -210,17 +219,7 @@ class Backend() {
               logger.log("tried to find source under scratch folder: " + rscript.getScratchDir().getAbsolutePath())
               logger.log("tried to find source under scratch files: " + rscript.getScratchDir().listFiles.mkString(","))
 
-              var staging = sys.env.get("SPARK_YARN_STAGING_DIR")
-              if (staging.isEmpty) {
-                logger.log("tried to find source under undefined SPARK_YARN_STAGING_DIR.")
-              }
-              else {
-                sourceFile = new File(staging.get + File.separator + "sparklyr-batch.R")
-                if (!sourceFile.exists) {
-                  logger.log("tried to find source under staging folder: " + new File(staging.get).getAbsolutePath())
-                  logger.log("tried to find source under staging files: " + new File(staging.get).listFiles.mkString(","))
-                }
-              }
+              sourceFile = new File(batchFile)
             }
           }
 

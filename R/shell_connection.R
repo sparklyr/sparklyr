@@ -150,13 +150,13 @@ start_shell <- function(master,
                         shell_args = NULL,
                         service = FALSE,
                         remote = FALSE,
-                        batch = FALSE) {
+                        batch = NULL) {
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
   isService <- service
   isRemote <- remote
-  isBatch <- batch
+  isBatch <- !is.null(batch)
 
   sessionId <- if (isService)
     spark_session_id(app_name, master)
@@ -308,7 +308,7 @@ start_shell <- function(master,
     }
 
     if (isBatch) {
-      shell_args <- c(shell_args, "--batch")
+      shell_args <- c(shell_args, "--batch", batch)
     }
 
     # create temp file for stdout and stderr

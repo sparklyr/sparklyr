@@ -20,7 +20,7 @@ spark_submit <- function(master,
   config$sparklyr.shell.files <- c(batch_file, config$sparklyr.shell.files)
 
   # spark_submit() is designed for non-interactive jobs, so we can log to console
-  if (is.null(spark_consig_value(config, "sparklyr.verbose", NULL))) config$sparklyr.verbose <- TRUE
+  if (is.null(spark_config_value(config, "sparklyr.verbose", NULL))) config$sparklyr.verbose <- TRUE
   if (is.null(spark_config_value(config, "sparklyr.log.console", NULL))) config$sparklyr.log.console <- TRUE
 
   master <- spark_master_local_cores(master, config)
@@ -37,7 +37,7 @@ spark_submit <- function(master,
                    service = FALSE,
                    remote = FALSE,
                    extensions = extensions,
-                   batch = TRUE)
+                   batch = file)
 
   invisible(NULL)
 }

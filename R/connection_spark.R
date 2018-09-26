@@ -166,7 +166,7 @@ spark_connect <- function(master,
                                "sparklyr.gateway.remote",
                                spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions,
-                             batch = FALSE)
+                             batch = NULL)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
                             config = config,
