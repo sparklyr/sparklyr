@@ -1,3 +1,7 @@
+# Sparklyr 0.9.1
+
+- Fix to `stream_write_kafka()` and `stream_write_jdbc()`.
+
 # Sparklyr 0.9.0
 
 ### Streaming
