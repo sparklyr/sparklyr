@@ -208,7 +208,7 @@ class Backend() {
           val sparklyrGateway = "sparklyr://localhost:" + port.toString() + "/" + sessionId
           logger.log("will be using rscript gateway: " + sparklyrGateway)
 
-          val sourceFile: = new java.io.File("sparklyr-batch.R")
+          var sourceFile: File = new java.io.File("sparklyr-batch.R")
           if (!sourceFile.exists) {
             logger.log("tried to find source under working folder: " + (new File(".").getAbsolutePath()))
             logger.log("tried to find source under working files: " + (new File(".")).listFiles.mkString(","))

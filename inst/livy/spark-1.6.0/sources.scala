@@ -25,10 +25,10 @@ spark_config_value <- function(config, name, default = NULL) {
   if (!any(name_exists)) {
     name_exists <- name %in% names(options())
     if (!any(name_exists)) {
-      valut <- default
+      value <- default
     } else {
       name_primary <- name[name_exists][[1]]
-      value <- getOptions(name_primary)
+      value <- getOption(name_primary)
     }
   } else {
     name_primary <- name[name_exists][[1]]

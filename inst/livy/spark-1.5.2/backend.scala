@@ -74,6 +74,7 @@ class Backend() {
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
   private[this] var connectionTimeout: Int = 60
+  private[this] var batchFile: String = ""
 
   private[this] var sc: SparkContext = null
   private[this] var hc: HiveContext = null
@@ -125,10 +126,18 @@ class Backend() {
   def init(portParam: Int,
            sessionIdParam: Int,
            connectionTimeoutParam: Int): Unit = {
+      init(portParam, sessionIdParam, connectionTimeoutParam, "")
+  }
+
+  def init(portParam: Int,
+           sessionIdParam: Int,
+           connectionTimeoutParam: Int,
+           batchFilePath: String): Unit = {
 
     port = portParam
     sessionId = sessionIdParam
     connectionTimeout = connectionTimeoutParam
+    batchFile = batchFilePath
 
     logger = new Logger("Session", sessionId)
 
@@ -199,13 +208,33 @@ class Backend() {
 
           val rscript = new Rscript(logger)
 
-          val sourceFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
+          val sparklyrGateway = "sparklyr://localhost:" + port.toString() + "/" + sessionId
+          logger.log("will be using rscript gateway: " + sparklyrGateway)
+
+          var sourceFile: File = new java.io.File("sparklyr-batch.R")
+          if (!sourceFile.exists) {
+            logger.log("tried to find source under working folder: " + (new File(".").getAbsolutePath()))
+            logger.log("tried to find source under working files: " + (new File(".")).listFiles.mkString(","))
+
+            sourceFile = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
+            if (!sourceFile.exists) {
+
+              logger.log("tried to find source under scratch folder: " + rscript.getScratchDir().getAbsolutePath())
+              logger.log("tried to find source under scratch files: " + rscript.getScratchDir().listFiles.mkString(","))
+
+              sourceFile = new File(batchFile)
+            }
+          }
+
+          val sourceLines = scala.io.Source.fromFile(sourceFile).getLines
 
           val modifiedFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch-mod.R")
           val outStream: FileWriter = new FileWriter(modifiedFile)
-          outStream.write("options(spark.master = \"sparklyr://localhost:" + port.toString() + "/" + sessionId + "\")")
-          outStream.write("\n\n")
-          // outStream.write(sourceFile)
+          outStream.write("options(sparklyr.connect.master = \"" + sparklyrGateway + "\")")
+          outStream.write("\n\n");
+          for (line <- sourceLines) {
+            outStream.write(line + "\n")
+          }
           outStream.flush()
 
           logger.log("wrote modified batch rscript: " + modifiedFile.getAbsolutePath())
@@ -220,8 +249,21 @@ class Backend() {
             options
           )
         } catch {
-          case e: Exception =>
+          case e: java.lang.reflect.InvocationTargetException =>
+            e.getCause() match {
+              case cause: Exception => {
+                logger.logError("failed to invoke batch rscript: ", cause)
+                System.exit(1)
+              }
+              case _ => {
+                logger.logError("failed to invoke batch rscript: ", e)
+                System.exit(1)
+              }
+            }
+          case e: Exception => {
             logger.logError("failed to run batch rscript: ", e)
+            System.exit(1)
+          }
         }
       }
     }.start()
@@ -231,6 +273,9 @@ class Backend() {
     try {
 
       if (isBatch) {
+        // spark context needs to be created for spark.files to be accessible
+        org.apache.spark.SparkContext.getOrCreate()
+
         batch()
       }
 
