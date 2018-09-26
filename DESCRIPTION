@@ -47,6 +47,7 @@ Imports:
     shiny (>= 1.0.1),
     withr,
     xml2,
+    tibble,
     tidyr,
     purrr,
     forge
@@ -60,5 +61,4 @@ Suggests:
     nycflights13,
     RCurl,
     reshape2,
-    testthat,
-    tibble
+    testthat
