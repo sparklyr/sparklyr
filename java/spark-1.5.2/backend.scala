@@ -201,12 +201,26 @@ class Backend() {
 
           val sourceFile: = new java.io.File("sparklyr-batch.R")
           if (!sourceFile.exists) {
+            logger.log("tried to find source under working folder: " + (new File(".").getAbsolutePath()))
+            logger.log("tried to find source under working files: " + (new File(".")).listFiles.mkString(","))
+
             sourceFile = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
             if (!sourceFile.exists) {
-              logger.log("tried to find source under working folder: " + (new File(".").getAbsolutePath()))
-              logger.log("tried to find source under working files: " + (new File(".")).listFiles.mkString(","))
+
               logger.log("tried to find source under scratch folder: " + rscript.getScratchDir().getAbsolutePath())
               logger.log("tried to find source under scratch files: " + rscript.getScratchDir().listFiles.mkString(","))
+
+              var staging = sys.env.get("SPARK_YARN_STAGING_DIR")
+              if (staging.isEmpty) {
+                logger.log("tried to find source under undefined SPARK_YARN_STAGING_DIR.")
+              }
+              else {
+                sourceFile = new File(staging.get + File.separator + "sparklyr-batch.R")
+                if (!sourceFile.exists) {
+                  logger.log("tried to find source under staging folder: " + new File(staging.get).getAbsolutePath())
+                  logger.log("tried to find source under staging files: " + new File(staging.get).listFiles.mkString(","))
+                }
+              }
             }
           }
 
