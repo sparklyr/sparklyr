@@ -1,6 +1,9 @@
 context("submit")
 
 test_that("spark_submit() can submit batch jobs", {
+  if (.Platform$OS.type == "windows")
+    skip("spark_submit() not yet implemented for windows")
+
   batch_file <- dir(getwd(), recursive = TRUE, pattern = "batch.R", full.names = TRUE)
 
   if (dir.exists("batch.csv")) unlink("batch.csv", recursive = TRUE)
