@@ -228,7 +228,7 @@ new_spark_connection <- function(scon, ..., subclass = NULL) {
   structure(
     scon,
     ...,
-    class = c(subclass, "spark_connection", "DBIConnection")
+    class = c("spark_connection", subclass, "DBIConnection")
   )
 }
 
@@ -236,7 +236,7 @@ new_spark_shell_connection <- function(scon, ..., subclass = NULL) {
   new_spark_connection(
     scon,
     ...,
-    subclass = c(subclass, "spark_connection", "spark_shell_connection")
+    subclass = c(subclass, "spark_shell_connection")
   )
 }
 
@@ -249,5 +249,8 @@ new_spark_gateway_connection <- function(scon, ..., subclass = NULL) {
 }
 
 new_livy_connection <- function(scon) {
-  new_spark_connection(scon, subclass = "livy_connection")
+  new_spark_connection(
+    scon,
+    subclass = "livy_connection"
+  )
 }

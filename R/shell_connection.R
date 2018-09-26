@@ -17,7 +17,8 @@ shell_connection <- function(master,
                              config,
                              service,
                              remote,
-                             extensions) {
+                             extensions,
+                             batch) {
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
@@ -77,7 +78,8 @@ shell_connection <- function(master,
     environment = environment,
     shell_args = shell_args,
     service = service,
-    remote = remote
+    remote = remote,
+    batch = batch
   )
 }
 
@@ -147,12 +149,14 @@ start_shell <- function(master,
                         environment = NULL,
                         shell_args = NULL,
                         service = FALSE,
-                        remote = FALSE) {
+                        remote = FALSE,
+                        batch = NULL) {
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
   isService <- service
   isRemote <- remote
+  isBatch <- !is.null(batch)
 
   sessionId <- if (isService)
     spark_session_id(app_name, master)
@@ -303,6 +307,10 @@ start_shell <- function(master,
       shell_args <- c(shell_args, "--remote")
     }
 
+    if (isBatch) {
+      shell_args <- c(shell_args, "--batch", batch)
+    }
+
     # create temp file for stdout and stderr
     output_file <- Sys.getenv("SPARKLYR_LOG_FILE", tempfile(fileext = "_spark.log"))
     error_file <- Sys.getenv("SPARKLYR_LOG_FILE", tempfile(fileext = "_spark.err"))
@@ -313,6 +321,10 @@ start_shell <- function(master,
     stderr_param <- if (console_log) "" else output_file
 
     start_time <- floor(as.numeric(Sys.time()) * 1000)
+
+    if (spark_config_value(config, "sparklyr.verbose", FALSE)) {
+      message(spark_submit_path, " ", paste(shell_args, collapse = " "))
+    }
 
     # start the shell (w/ specified additional environment variables)
     env <- unlist(as.list(environment))
@@ -326,6 +338,9 @@ start_shell <- function(master,
 
     # support custom operations after spark-submit useful to enable port forwarding
     spark_config_value(config, c("sparklyr.connect.aftersubmit", "sparklyr.events.aftersubmit"))
+
+    # batch connections only use the shell to submit an application, not to connect.
+    if (identical(batch, TRUE)) return(NULL)
 
     # for yarn-cluster
     if (spark_master_is_yarn_cluster(master, config) && is.null(config[["sparklyr.gateway.address"]])) {
@@ -371,6 +386,9 @@ start_shell <- function(master,
       )
     })
   }
+
+  # batch connections only use the shell to submit an application, not to connect.
+  if (identical(batch, TRUE)) return(NULL)
 
   tryCatch({
     interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
@@ -567,8 +585,14 @@ initialize_connection.spark_shell_connection <- function(sc) {
 
       # create the spark context and assign the connection to it
 
-      sc$state$spark_context <- if (spark_version(sc) >= "2.0") {
+      sc$state$spark_context <- invoke_static(
+        sc,
+        "org.apache.spark.SparkContext",
+        "getOrCreate",
+        conf
+      )
 
+      if (spark_version(sc) >= "2.0") {
         # For Spark 2.0+, we create a `SparkSession`.
         session <- invoke_static(
           sc,
@@ -582,15 +606,8 @@ initialize_connection.spark_shell_connection <- function(sc) {
         # Cache the session as the "hive context".
         sc$state$hive_context <- session
 
-        # Return the `SparkContext`.
-        invoke(session, "sparkContext")
-      } else {
-        invoke_static(
-          sc,
-          "org.apache.spark.SparkContext",
-          "getOrCreate",
-          conf
-        )
+        # Set the `SparkContext`.
+        sc$state$spark_context <- invoke(session, "sparkContext")
       }
 
       invoke(backend, "setSparkContext", spark_context(sc))

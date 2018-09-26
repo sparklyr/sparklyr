@@ -153,10 +153,10 @@ regex_replace <- function(string, ...) {
   string
 }
 
-spark_sanitize_names <- function(names) {
+spark_sanitize_names <- function(names, config) {
 
   # sanitize names by default, but opt out with global option
-  if (!isTRUE(getOption("sparklyr.sanitize.column.names", TRUE)))
+  if (!isTRUE(spark_config_value(config, "sparklyr.sanitize.column.names", TRUE)))
     return(names)
 
   # begin transforming names
@@ -191,9 +191,10 @@ spark_sanitize_names <- function(names) {
   newNames <- make.unique(newNames, sep = "_")
 
   # report translations
-  verbose <- sparklyr_boolean_option(
-    "sparklyr.sanitize.column.names.verbose",
-    "sparklyr.verbose"
+  verbose <- spark_config_value(
+    config,
+    c("sparklyr.verbose.sanitize", "sparklyr.sanitize.column.names.verbose", "sparklyr.verbose"),
+    TRUE
   )
 
   if (verbose) {
@@ -301,25 +302,9 @@ remove_class <- function(object, class) {
   object
 }
 
-sparklyr_boolean_option <- function(...) {
-
-  for (name in list(...)) {
-    value <- getOption(name) %||% FALSE
-    if (length(value) == 1 && isTRUE(as.logical(value)))
-      return(TRUE)
-  }
-
-  FALSE
-}
-
-sparklyr_verbose <- function(...) {
-  sparklyr_boolean_option(..., "sparklyr.verbose")
-}
-
 trim_whitespace <- function(strings) {
   gsub("^[[:space:]]*|[[:space:]]*$", "", strings)
 }
-
 
 split_separator <- function(sc) {
   if (inherits(sc, "livy_connection"))

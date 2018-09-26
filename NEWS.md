@@ -39,6 +39,11 @@
   that is called after `spark-submit` which can be used to automatically
   configure port forwarding.
   
+## Batches
+
+- Added support for `spark_submit()` to assist submitting non-interactive
+  Spark jobs.
+  
 ### Spark ML
 
 - **(Breaking change)** The formula API for ML classification algorithms no longer indexes numeric labels, to avoid the confusion of `0` being mapped to `"1"` and vice versa. This means that if the largest numeric label is `N`, Spark will fit a `N+1`-class classification model, regardless of how many distinct labels there are in the provided training set (#1591).
@@ -140,6 +145,8 @@
 `ml_naive_bayes()`, `ml_logistic_regression()`, `ml_decision_tree()`, `ml_random_forest()`, `ml_gradient_boosted_trees()`, `ml_bisecting_kmeans()`, `ml_kmeans()`and `ml_gaussian_mixture()` models (@samuelmacedo83)
 
 ### Configuration
+
+- Deprecated configuration option `sparklyr.dplyr.compute.nocache`.
 
 - Added `spark_config_settings()` to list all `sparklyr` configuration settings and
   describe them, cleaned all settings and grouped by area while maintaining support

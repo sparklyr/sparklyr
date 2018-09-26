@@ -4,15 +4,14 @@
 \alias{spark_home_set}
 \title{Set the SPARK_HOME environment variable}
 \usage{
-spark_home_set(path = NULL, verbose = getOption("sparklyr.verbose",
-  is.null(path)))
+spark_home_set(path = NULL, ...)
 }
 \arguments{
 \item{path}{A string containing the path to the installation location of
 Spark. If \code{NULL}, the path to the most latest Spark/Hadoop versions is
 used.}
 
-\item{verbose}{Logical. Should the function explain what is it doing?}
+\item{...}{Additional parameters not currently used.}
 }
 \value{
 The function is mostly invoked for the side-effect of setting the

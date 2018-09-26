@@ -14,10 +14,23 @@ class WorkerApply(
   options: Map[String, String]
   ) {
 
+  import java.io.{File, FileWriter}
   import org.apache.spark._;
 
   private[this] var exception: Option[Exception] = None
   private[this] var backendPort: Int = 0
+
+  def workerSourceFile(rscript: Rscript): String = {
+    val rsources = new Sources()
+    val source = rsources.sources
+
+    val tempFile: File = new File(rscript.getScratchDir() + File.separator + "sparkworker.R")
+    val outStream: FileWriter = new FileWriter(tempFile)
+    outStream.write(source)
+    outStream.flush()
+
+    tempFile.getAbsolutePath()
+  }
 
   def apply(iterator: Iterator[org.apache.spark.sql.Row]): Iterator[org.apache.spark.sql.Row] = {
 
@@ -56,7 +69,8 @@ class WorkerApply(
     backend.setType(
       true,   /* isService */
       false,  /* isRemote */
-      true    /* isWorker */
+      true,   /* isWorker */
+      false   /* isBatch */
     )
 
     backend.setHostContext(
@@ -94,10 +108,15 @@ class WorkerApply(
           logger.log("is starting rscript")
 
           val rscript = new Rscript(logger)
+          val sourceFilePath: String = workerSourceFile(rscript)
+
           rscript.init(
-            sessionId,
-            backendPort,
-            config,
+            List(
+              sessionId.toString,
+              backendPort.toString,
+              config
+            ),
+            sourceFilePath,
             customEnv,
             options
           )

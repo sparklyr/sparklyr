@@ -60,6 +60,28 @@ spark_default_app_jar <- function(version) {
 #' @name spark-connections
 NULL
 
+spark_master_local_cores <- function(master, config) {
+  cores <- spark_config_value(config, c("sparklyr.connect.cores.local", "sparklyr.cores.local"))
+  if (master == "local" && !identical(cores, NULL))
+    master <- paste("local[", cores, "]", sep = "")
+
+  master
+}
+
+spark_config_shell_args <- function(config, master) {
+  # determine shell_args (use fake connection b/c we don't yet
+  # have a real connection)
+  config_sc <- list(config = config, master = master)
+  shell_args <- connection_config(config_sc, "sparklyr.shell.")
+
+  # flatten shell_args to make them compatible with sparklyr
+  unlist(lapply(names(shell_args), function(name) {
+    lapply(shell_args[[name]], function(value) {
+      list(paste0("--", name), value)
+    })
+  }))
+}
+
 #' @name spark-connections
 #'
 #' @examples
@@ -83,12 +105,15 @@ spark_connect <- function(master,
   # validate method
   method <- match.arg(method)
 
+  master_override <- spark_config_value(config, "sparklyr.connect.master", NULL)
+  if (!is.null(master_override)) master <- master_override
+
   # master can be missing if it's specified in the config file
   if (missing(master)) {
     if (identical(method, "databricks")) {
       master <- "databricks"
     } else {
-      master <- config$spark.master
+      master <- spark_config_value(config, "spark.master", NULL)
       if (is.null(master))
         stop("You must either pass a value for master or include a spark.master ",
              "entry in your config.yml")
@@ -99,9 +124,7 @@ spark_connect <- function(master,
 
   # determine whether we need cores in master
   passedMaster <- master
-  cores <- spark_config_value(config, c("sparklyr.connect.cores.local", "sparklyr.cores.local"))
-  if (master == "local" && !identical(cores, NULL))
-    master <- paste("local[", cores, "]", sep = "")
+  master <- spark_master_local_cores(master, config)
 
   # look for existing connection with the same method, master, and app_name
   sconFound <- spark_connection_find(master, app_name, method)
@@ -110,17 +133,7 @@ spark_connect <- function(master,
     return(sconFound[[1]])
   }
 
-  # determine shell_args (use fake connection b/c we don't yet
-  # have a real connection)
-  config_sc <- list(config = config, master = master)
-  shell_args <- connection_config(config_sc, "sparklyr.shell.")
-
-  # flatten shell_args to make them compatible with sparklyr
-  shell_args <- unlist(lapply(names(shell_args), function(name) {
-    lapply(shell_args[[name]], function(value) {
-      list(paste0("--", name), value)
-    })
-  }))
+  shell_args <- spark_config_shell_args(config, master)
 
   # clean spark_apply per-connection cache
   if (dir.exists(spark_apply_bundle_path()))
@@ -152,7 +165,8 @@ spark_connect <- function(master,
                                config,
                                "sparklyr.gateway.remote",
                                spark_master_is_yarn_cluster(master, config)),
-                             extensions = extensions)
+                             extensions = extensions,
+                             batch = NULL)
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
                             config = config,

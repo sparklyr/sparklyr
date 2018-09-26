@@ -36,13 +36,15 @@ na.omit.tbl_spark <- function(object, columns = NULL, ...) {
 
 #' @export
 na.omit.spark_jobj <- function(object, columns = NULL, ...) {
+  sc <- spark_connection(object)
 
   # report number of rows dropped if requested
-  verbose <- sparklyr_boolean_option(
-    "sparklyr.na.omit.verbose",
-    "sparklyr.na.action.verbose",
-    "sparklyr.verbose"
-  )
+  verbose <- spark_config_value(sc$config, c(
+      "sparklyr.verbose.na",
+      "sparklyr.na.omit.verbose",
+      "sparklyr.na.action.verbose",
+      "sparklyr.verbose"
+    ), TRUE)
 
   n_before <- invoke(object, "count")
   dropped  <- sdf_na_omit(object, columns)

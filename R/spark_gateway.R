@@ -63,6 +63,7 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
     method = "gateway",
     app_name = "sparklyr",
     config = config,
+    state = new.env(),
     # spark_gateway_connection : spark_shell_connection
     spark_home = NULL,
     backend = backend,

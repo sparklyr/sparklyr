@@ -15,14 +15,21 @@ spark_config_value <- function(config, name, default = NULL) {
   }
 
   name_exists <- name %in% names(config)
-  if (!any(name_exists))
-    default
-  else {
+  if (!any(name_exists)) {
+    name_exists <- name %in% names(options())
+    if (!any(name_exists)) {
+      value <- default
+    } else {
+      name_primary <- name[name_exists][[1]]
+      value <- getOption(name_primary)
+    }
+  } else {
     name_primary <- name[name_exists][[1]]
     value <- config[[name_primary]]
-    if (is.function(value)) value <- value()
-    value
   }
+
+  if (is.function(value)) value <- value()
+  value
 }
 
 spark_config_integer <- function(config, name, default = NULL) {
