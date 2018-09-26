@@ -202,6 +202,12 @@ class Backend() {
           val sourceFile: = new java.io.File("sparklyr-batch.R")
           if (!sourceFile.exists) {
             sourceFile = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
+            if (!sourceFile.exists) {
+              logger.log("tried to find source under working folder: " + (new File(".").getAbsolutePath()))
+              logger.log("tried to find source under working files: " + (new File(".")).listFiles.mkString(","))
+              logger.log("tried to find source under scratch folder: " + rscript.getScratchDir().getAbsolutePath())
+              logger.log("tried to find source under scratch files: " + rscript.getScratchDir().listFiles.mkString(","))
+            }
           }
 
           val sourceLines = scala.io.Source.fromFile(sourceFile).getLines
