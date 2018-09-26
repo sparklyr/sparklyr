@@ -617,6 +617,7 @@ stream_write_kafka <- function(x,
   sc <- spark_connection(x)
 
   stream_write_generic(x,
+                       path = NULL,
                        type = "kafka",
                        mode = mode,
                        trigger = trigger,
@@ -686,6 +687,7 @@ stream_write_jdbc <- function(x,
   sc <- spark_connection(x)
 
   stream_write_generic(x,
+                       path = NULL,
                        type = "jdbc",
                        mode = mode,
                        trigger = trigger,
