@@ -194,7 +194,7 @@ spark_sanitize_names <- function(names, config) {
   verbose <- spark_config_value(
     config,
     c("sparklyr.verbose.sanitize", "sparklyr.sanitize.column.names.verbose", "sparklyr.verbose"),
-    TRUE
+    FALSE
   )
 
   if (verbose) {

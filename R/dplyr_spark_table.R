@@ -49,13 +49,78 @@ slice_.tbl_spark <- function(x, ...) {
 }
 
 #' @export
-head.tbl_spark <- function(x, n = 6L, ...) {
+head.tbl_spark_print <- function(x, ...) {
+  head(as.data.frame(x), ...)
+}
+
+#' @export
+dim.tbl_spark_print <- function(x) {
+  attributes(x)$spark_dims
+}
+
+#' @importFrom tibble tbl_sum
+#' @export
+tbl_sum.tbl_spark_print <- function (x)
+{
+  attributes(x)$spark_summary
+}
+
+#' @export
+print.tbl_spark <- function(x, ...) {
   sdf <- spark_dataframe(x)
 
-  if (sdf_is_streaming(sdf)) {
-    # head operations not supported over streams but used in tibble print
-    x
-  } else {
-    add_op_single("head", x, args = list(n = n))
+  if (exists(".rs.S3Overrides")) {
+    # if RStudio is overriding the print functions do not attempt to custom print tibble
+    if (exists("print.tbl_sql", envir = get(".rs.S3Overrides"))) {
+      if (sdf_is_streaming(sdf)) {
+        rows <- getOption("max.print", 1000)
+        data <- sdf_collect(sdf, n = rows)
+      } else {
+        data <- x
+        class(data) <- class(data)[-match("tbl_spark", class(data))]
+      }
+
+      print(data)
+      return(invisible(x))
+    }
   }
+
+  rows <- getOption("tibble.print_min", getOption("dplyr.print_min", 10))
+
+  grps <- dbplyr::op_grps(x$ops)
+  sort <- dbplyr::op_sort(x$ops) %>%
+    purrr::map_if(rlang::is_formula, rlang::f_rhs) %>%
+    purrr::map_chr(rlang::expr_text, width = 500L)
+
+  mark <- if (identical(getOption("OutDec"), ","))  "." else ","
+  cols_fmt <- formatC(dim(x)[2], big.mark = mark)
+
+  if (sdf_is_streaming(sdf)) {
+    rows_fmt <- "inf"
+    data <- sdf_collect(sdf, n = rows)
+  } else {
+    rows_fmt <- "??"
+    data <- dplyr::collect(head(x, n = rows))
+  }
+
+  attributes(data)$spark_dims <- c(NA_real_, sdf_ncol(x))
+
+  remote_name <- dbplyr::remote_name(x)
+  remote_name <- if(is.null(remote_name) || startsWith(remote_name, "sparklyr_tmp_")) "?" else remote_name
+
+  attributes(data)$spark_summary <- c(
+    Source = paste0(
+      "spark<",
+      remote_name,
+      "> [", rows_fmt, " x ", cols_fmt, "]"
+    ),
+    if (length(grps) > 0) c(Groups = paste0(grps, collapse = ", ")),
+    if (length(sort) > 0) c(`Ordered by` = paste0(sort, collapse = ", "))
+  )
+
+  class(data) <- c("tbl_spark_print", class(data))
+
+  data <- tibble::as.tibble(data)
+
+  print(data)
 }

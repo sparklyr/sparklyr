@@ -1,7 +1,7 @@
 Package: sparklyr
 Type: Package
 Title: R Interface to Apache Spark
-Version: 0.8.4.9013
+Version: 0.9.1
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("Kevin", "Kuo", role = "aut", email = "kevin.kuo@rstudio.com",
@@ -47,6 +47,7 @@ Imports:
     shiny (>= 1.0.1),
     withr,
     xml2,
+    tibble,
     tidyr,
     purrr,
     forge
@@ -60,5 +61,4 @@ Suggests:
     nycflights13,
     RCurl,
     reshape2,
-    testthat,
-    tibble
+    testthat

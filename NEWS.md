@@ -1,4 +1,15 @@
-# Sparklyr 0.9.0 (unreleased)
+# Sparklyr 0.9.1
+
+- Terminate streams when Shiny app terminates.
+
+- Fix `dplyr::collect()` with Spark streams and improve printing.
+
+- Fix regression in `sparklyr.sanitize.column.names.verbose` setting
+  which would cause verbose column renames.
+  
+- Fix to `stream_write_kafka()` and `stream_write_jdbc()`.
+
+# Sparklyr 0.9.0
 
 ### Streaming
 
