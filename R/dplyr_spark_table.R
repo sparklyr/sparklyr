@@ -69,6 +69,22 @@ tbl_sum.tbl_spark_print <- function (x)
 print.tbl_spark <- function(x, ...) {
   sdf <- spark_dataframe(x)
 
+  if (exists(".rs.S3Overrides")) {
+    # if RStudio is overriding the print functions do not attempt to custom print tibble
+    if (exists("print.tbl_sql", envir = get(".rs.S3Overrides"))) {
+      if (sdf_is_streaming(sdf)) {
+        rows <- getOption("max.print", 1000)
+        data <- sdf_collect(sdf, n = rows)
+      } else {
+        data <- x
+        class(data) <- class(data)[-match("tbl_spark", class(data))]
+      }
+
+      print(data)
+      return(invisible(x))
+    }
+  }
+
   rows <- getOption("tibble.print_min", getOption("dplyr.print_min", 10))
 
   grps <- dbplyr::op_grps(x$ops)
