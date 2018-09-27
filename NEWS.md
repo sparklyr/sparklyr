@@ -1,5 +1,7 @@
 # Sparklyr 0.9.1
 
+- Terminate streams when Shiny app terminates.
+
 - Fix `dplyr::collect()` with Spark streams and improve printing.
 
 - Fix regression in `sparklyr.sanitize.column.names.verbose` setting
