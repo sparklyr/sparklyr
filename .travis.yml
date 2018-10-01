@@ -14,8 +14,8 @@ r_packages:
 
 matrix:
   include:
-    - name: "Spark 1.6.3 (R 3.0.3, openjdk7)"
-      r: 3.0.3
+    - name: "Spark 1.6.3 (R 3.1.2, openjdk7)"
+      r: 3.1.2
       env:
         - SPARK_VERSION="1.6.3"
         - JAVA_VERSION=openjdk7
