@@ -12,7 +12,9 @@ get_java <- function(throws = FALSE) {
     if (!file.exists(java)) {
       if (throws) {
         stop("Java is required to connect to Spark. ",
-             "JAVA_HOME is set but does not point to a valid version. ",
+             "JAVA_HOME is set to '",
+             java_home,
+             "' but does not point to a valid version. ",
              "Please fix JAVA_HOME or reinstall from: ",
              java_install_url())
       }
