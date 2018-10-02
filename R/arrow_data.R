@@ -1,14 +1,10 @@
-arrow_enabled <- function() {
-  "package:arrow" %in% search()
+arrow_enabled <- function(sc) {
+  spark_config_value(sc, "sparklyr.arrow", "package:arrow" %in% search())
 }
 
 arrow_batch <- function(df)
 {
-  if (!arrow_enabled()) {
-    stop("The 'arrow' package is not available, use 'library(arrow)' to enable the arrow serializer.")
-  }
-
-  record_batch <- get("record_batch", envir = as.environment("package:arrow"))
+  record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
 
   file <- tempfile(fileext = ".arrow")
   record <- record_batch(df)
@@ -32,5 +28,5 @@ arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
   rdd <- invoke_static(sc, "sparklyr.ArrowHelper", "javaRddFromBinaryBatches", spark_context(sc), batches, parallelism)
   sdf <- invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
 
-  sdf_register(sdf)
+  sdf
 }
