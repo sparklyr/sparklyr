@@ -14,7 +14,7 @@ class Sources {
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
-  if (getOption("sparklyr.test.enforce.config", FALSE) && any(startsWith(name, "sparklyr."))) {
+  if (getOption("sparklyr.test.enforce.config", FALSE) && any(grepl("^sparklyr.", name))) {
     settings <- get("spark_config_settings")()
     if (!any(name %in% settings$name)) {
       stop("Config value '", name[[1]], "' not described in spark_config_settings()")
