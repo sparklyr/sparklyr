@@ -26,6 +26,7 @@ RoxygenNote: 6.1.0
 Depends:
     R (>= 3.2)
 Imports:
+    arrow,
     assertthat,
     base64enc,
     broom,
@@ -62,3 +63,5 @@ Suggests:
     RCurl,
     reshape2,
     testthat
+Remotes:
+    apache/arrow/r
