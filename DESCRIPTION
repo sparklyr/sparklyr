@@ -24,7 +24,7 @@ BugReports: https://github.com/rstudio/sparklyr/issues
 LazyData: TRUE
 RoxygenNote: 6.1.0
 Depends:
-    R (>= 3.1.2)
+    R (>= 3.2)
 Imports:
     assertthat,
     base64enc,
