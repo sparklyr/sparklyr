@@ -1,4 +1,10 @@
-# Sparklyr 0.9.1 (unreleased)
+# Sparklyr 0.9.2 (unreleased)
+
+- Removed `overwrite` parameter in `spark_read_table()` (#1698).
+
+- Fix regression preventing using R 3.2 (#1695).
+
+- Additional jar search paths under Spark 2.3.1 (#1694)
 
 # Sparklyr 0.9.1
 

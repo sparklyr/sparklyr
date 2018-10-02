@@ -457,12 +457,8 @@ spark_read_table <- function(sc,
                              options = list(),
                              repartition = 0,
                              memory = TRUE,
-                             overwrite = TRUE,
                              columns = NULL,
                              ...) {
-
-  if (overwrite) spark_remove_table_if_exists(sc, name)
-
   df <- spark_data_read_generic(sc, name, "table", options, columns)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
