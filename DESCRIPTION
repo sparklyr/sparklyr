@@ -26,7 +26,6 @@ RoxygenNote: 6.1.0
 Depends:
     R (>= 3.2)
 Imports:
-    arrow,
     assertthat,
     base64enc,
     broom,
@@ -53,6 +52,7 @@ Imports:
     purrr,
     forge
 Suggests:
+    arrow,
     ggplot2,
     glmnet,
     janeaustenr,
