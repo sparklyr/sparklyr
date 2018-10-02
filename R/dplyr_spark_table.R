@@ -106,7 +106,7 @@ print.tbl_spark <- function(x, ...) {
   attributes(data)$spark_dims <- c(NA_real_, sdf_ncol(x))
 
   remote_name <- dbplyr::remote_name(x)
-  remote_name <- if(is.null(remote_name) || startsWith(remote_name, "sparklyr_tmp_")) "?" else remote_name
+  remote_name <- if(is.null(remote_name) || grepl("^sparklyr_tmp_", remote_name)) "?" else remote_name
 
   attributes(data)$spark_summary <- c(
     Source = paste0(

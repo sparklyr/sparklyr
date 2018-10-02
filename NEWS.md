@@ -1,3 +1,5 @@
+# Sparklyr 0.9.1 (unreleased)
+
 # Sparklyr 0.9.1
 
 - Terminate streams when Shiny app terminates.

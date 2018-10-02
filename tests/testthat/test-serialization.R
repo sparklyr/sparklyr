@@ -278,3 +278,30 @@ test_that("collect() can retrieve as.POSIXct fields with timezones", {
     all.equal(tz_entries, collected)
   )
 })
+
+test_that("collect() can retrieve specific dates without timezones", {
+  data_tbl <- sdf_copy_to(
+    sc,
+    data_frame(
+      t = c(1419126103)
+    )
+  )
+
+  expect_equal(
+    data_tbl %>%
+      mutate(date_alt = from_utc_timestamp(timestamp(t) ,'UTC')) %>%
+      pull(date_alt),
+    as.POSIXct("2014-12-21 01:41:43 UTC", tz = "UTC")
+  )
+
+  expect_equal(
+    data_tbl %>%
+      mutate(date_alt = to_date(from_utc_timestamp(timestamp(t) ,'UTC'))) %>%
+      pull(date_alt),
+    as.Date(
+      data_tbl %>%
+        mutate(date_alt = as.character(to_date(from_utc_timestamp(timestamp(t) ,'UTC')))) %>%
+        pull(date_alt)
+    )
+  )
+})
