@@ -52,7 +52,6 @@ Imports:
     purrr,
     forge
 Suggests:
-    arrow,
     ggplot2,
     glmnet,
     janeaustenr,
@@ -63,5 +62,3 @@ Suggests:
     RCurl,
     reshape2,
     testthat
-Remotes:
-    apache/arrow/r
