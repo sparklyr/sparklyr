@@ -1,91 +1,26 @@
-arrow_python_install <- function()
-{
-  reticulate::py_install("pyarrow")
+arrow_enabled <- function() {
+  "package:arrow" %in% search()
 }
 
-as_arrow_feather <- function(df)
+arrow_batch <- function(df)
 {
-  featherFile <- tempfile(fileext = ".feather")
-  feather::write_feather(df, featherFile)
-  con = file(featherFile, "rb")
-  readBin(con, "raw", n = 1e10)
-}
+  if (!arrow_enabled()) {
+    stop("The 'arrow' package is not available, use 'library(arrow)' to enable the arrow serializer.")
+  }
 
-as_arrow_buffers <- function(df)
-{
-  pa <- reticulate::import("pyarrow")
+  record_batch <- get("record_batch", envir = as.environment("package:arrow"))
 
-  buf <- pa$serialize(df)$to_buffer()
-  reader <- pa$BufferReader(buf)
-
-  builtins <- reticulate::import_builtins()
-  builtins$bytearray(buf)
-}
-
-arrow_schema <- function(df)
-{
-  pdf <- pa$Table$from_pandas(df)
-  pdf$schema
-}
-
-arrow_type <- function(object, colname)
-{
-  pa <- reticulate::import("pyarrow")
-
-  type <- switch(
-    typeof(object),
-    logical   = pa$bool_(),
-    integer   = pa$int32(),
-    double    = pa$float64(),
-    numeric   = pa$float64(),
-    character = pa$string()
-  )
-
-  pa$field(colname, type = type)
-}
-
-as_arrow_python <- function(df)
-{
-  io <- reticulate::import("io")
-  pa <- reticulate::import("pyarrow")
-  builtins <- reticulate::import_builtins()
-
-  pdCols <- lapply(df, function(col) pa$Array$from_pandas(col))
-  batch <- pa$RecordBatch$from_arrays(
-    lapply(1:length(pdCols), function(i) pdCols[[i]]),
-    as.list(names(df))
-  )
-
-  sink <- io$BytesIO()
-  schema <- pa$schema(
-    lapply(colnames(df), function(colname) arrow_type(df[[colname]], colname))
-  )
-  writer <- pa$RecordBatchFileWriter(sink, schema)
-  writer$write_batch(batch)
-  writer$close()
-  builtins$bytearray(sink$getvalue())
-}
-
-as_arrow_package <- function(df)
-{
   file <- tempfile(fileext = ".arrow")
-  record <- arrow::record_batch(df)
+  record <- record_batch(df)
   record$to_file(file)
 
-  readBin(con = file, "raw", n = 10000)
+  readBin(con = file, "raw", n = 10^6)
 }
 
 arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
 {
-  serializers <- list(
-    arrow = as_arrow_package,
-    feather = as_arrow_feather,
-    buffers = as_arrow_buffers,
-    python = as_arrow_python
-  )
-
   # serialize to arrow
-  bytes <- serializers[[serializer]](df)
+  bytes <- arrow_batch(df)
 
   # create batches data frame
   batches <- list(bytes)
