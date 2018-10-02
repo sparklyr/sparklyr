@@ -66,9 +66,19 @@ as_arrow_python <- function(df)
   builtins$bytearray(sink$getvalue())
 }
 
-arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "python")
+as_arrow_package <- function(df)
+{
+  file <- tempfile(fileext = ".arrow")
+  record <- arrow::record_batch(df)
+  record$to_file(file)
+
+  readBin(con = file, "raw", n = 10000)
+}
+
+arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
 {
   serializers <- list(
+    arrow = as_arrow_package,
     feather = as_arrow_feather,
     buffers = as_arrow_buffers,
     python = as_arrow_python
