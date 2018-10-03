@@ -5,7 +5,7 @@
 \title{Reads from a Spark Table into a Spark DataFrame.}
 \usage{
 spark_read_table(sc, name, options = list(), repartition = 0,
-  memory = TRUE, overwrite = TRUE, columns = NULL, ...)
+  memory = TRUE, columns = NULL, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -19,9 +19,6 @@ generated table. Use 0 (the default) to avoid partitioning.}
 
 \item{memory}{Boolean; should the data be loaded eagerly into memory? (That
 is, should the table be cached?)}
-
-\item{overwrite}{Boolean; overwrite the table with the given name if it
-already exists?}
 
 \item{columns}{A vector of column names or a named vector of column types.}
 
