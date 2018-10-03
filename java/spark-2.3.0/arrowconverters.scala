@@ -8,7 +8,8 @@ import scala.collection.JavaConverters._
 import org.apache.arrow.memory.BufferAllocator
 import org.apache.arrow.vector._
 import org.apache.arrow.vector.ipc.{ArrowFileReader, ArrowFileWriter}
-import org.apache.arrow.vector.ipc.message.ArrowRecordBatch
+import org.apache.arrow.vector.ipc.message.{ArrowRecordBatch, MessageSerializer}
+import org.apache.arrow.vector.ipc.WriteChannel
 import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
 
 import org.apache.spark.TaskContext
@@ -19,6 +20,7 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.execution.LogicalRDD
 import org.apache.spark.sql.execution.arrow.ArrowUtils
+import org.apache.spark.sql.execution.arrow.ArrowWriter
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
 import org.apache.spark.util.Utils
@@ -30,6 +32,82 @@ trait ArrowRowIterator extends Iterator[org.apache.spark.sql.catalyst.InternalRo
 }
 
 object ArrowConverters {
+  def tryWithSafeFinally[T](block: => T)(finallyBlock: => Unit): T = {
+    var originalThrowable: Throwable = null
+    try {
+      block
+    } catch {
+      case t: Throwable =>
+        // Purposefully not using NonFatal, because even fatal exceptions
+        // we don't want to have our finallyBlock suppress
+        originalThrowable = t
+        throw originalThrowable
+    } finally {
+      try {
+        finallyBlock
+      } catch {
+        case t: Throwable if (originalThrowable != null && originalThrowable != t) =>
+          originalThrowable.addSuppressed(t)
+          throw originalThrowable
+      }
+    }
+  }
+
+  /**
+   * Maps Iterator from InternalRow to serialized ArrowRecordBatches. Limit ArrowRecordBatch size
+   * in a batch by setting maxRecordsPerBatch or use 0 to fully consume rowIter.
+   */
+  def toBatchIterator(
+      rowIter: Iterator[org.apache.spark.sql.catalyst.InternalRow],
+      schema: StructType,
+      maxRecordsPerBatch: Int,
+      timeZoneId: String,
+      context: TaskContext): Iterator[Array[Byte]] = {
+
+    val arrowSchema = ArrowUtils.toArrowSchema(schema, timeZoneId)
+    val allocator =
+      ArrowUtils.rootAllocator.newChildAllocator("toBatchIterator", 0, Long.MaxValue)
+
+    val root = VectorSchemaRoot.create(arrowSchema, allocator)
+    val unloader = new VectorUnloader(root)
+    val arrowWriter = ArrowWriter.create(root)
+
+    context.addTaskCompletionListener { _ =>
+      root.close()
+      allocator.close()
+    }
+
+    new Iterator[Array[Byte]] {
+
+      override def hasNext: Boolean = rowIter.hasNext || {
+        root.close()
+        allocator.close()
+        false
+      }
+
+      override def next(): Array[Byte] = {
+        val out = new ByteArrayOutputStream()
+        val writeChannel = new WriteChannel(Channels.newChannel(out))
+
+        tryWithSafeFinally {
+          var rowCount = 0
+          while (rowIter.hasNext && (maxRecordsPerBatch <= 0 || rowCount < maxRecordsPerBatch)) {
+            val row = rowIter.next()
+            arrowWriter.write(row)
+            rowCount += 1
+          }
+          arrowWriter.finish()
+          val batch = unloader.getRecordBatch()
+          MessageSerializer.serialize(writeChannel, batch)
+          batch.close()
+        } {
+          arrowWriter.reset()
+        }
+
+        out.toByteArray
+      }
+    }
+  }
 
   /**
    * Maps Iterator from ArrowPayload to Row. Returns a pair containing the row iterator
