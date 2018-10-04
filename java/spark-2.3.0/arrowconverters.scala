@@ -1,13 +1,13 @@
 package sparklyr
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileInputStream, OutputStream}
 import java.nio.channels.Channels
 
 import scala.collection.JavaConverters._
 
 import org.apache.arrow.memory.BufferAllocator
 import org.apache.arrow.vector._
-import org.apache.arrow.vector.ipc.{ArrowFileReader, ArrowFileWriter}
+import org.apache.arrow.vector.ipc.{ArrowStreamWriter, ArrowFileReader, ArrowFileWriter}
 import org.apache.arrow.vector.ipc.message.{ArrowRecordBatch, MessageSerializer}
 import org.apache.arrow.vector.ipc.WriteChannel
 import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
@@ -29,6 +29,32 @@ import org.apache.spark.util.Utils
  * Iterator interface to iterate over Arrow record batches and return rows
  */
 trait ArrowRowIterator extends Iterator[org.apache.spark.sql.catalyst.InternalRow] {
+}
+
+private class ArrowBatchStreamWriter(
+    schema: StructType,
+    out: OutputStream,
+    timeZoneId: String) {
+
+  val arrowSchema = ArrowUtils.toArrowSchema(schema, timeZoneId)
+  val writeChannel = new WriteChannel(Channels.newChannel(out))
+
+  // Write the Arrow schema first, before batches
+  MessageSerializer.serialize(writeChannel, arrowSchema)
+
+  /**
+   * Consume iterator to write each serialized ArrowRecordBatch to the stream.
+   */
+  def writeBatches(arrowBatchIter: Iterator[Array[Byte]]): Unit = {
+    arrowBatchIter.foreach(writeChannel.write)
+  }
+
+  /**
+   * End the Arrow stream, does not close output stream.
+   */
+  def end(): Unit = {
+    writeChannel.writeIntLittleEndian(0);
+  }
 }
 
 object ArrowConverters {
@@ -173,16 +199,24 @@ object ArrowConverters {
 
   def toArrowBatchRdd(
       df: DataFrame,
-      sparkSession: SparkSession): Array[Array[Byte]] = {
-    val schemaCaptured = df.schema
+      sparkSession: SparkSession): Array[Byte] = {
+
+    val schema = df.schema
     val maxRecordsPerBatch = sparkSession.sessionState.conf.arrowMaxRecordsPerBatch
     val timeZoneId = sparkSession.sessionState.conf.sessionLocalTimeZone
 
     val encoder = org.apache.spark.sql.Encoders.BINARY
 
-    df.mapPartitions(
-      iter => toBatchIterator(iter, schemaCaptured, maxRecordsPerBatch, timeZoneId, TaskContext.get())
+    val batches: Array[Array[Byte]] = df.mapPartitions(
+      iter => toBatchIterator(iter, schema, maxRecordsPerBatch, timeZoneId, TaskContext.get())
     )(encoder).collect()
+
+    val out = new ByteArrayOutputStream()
+    val batchWriter = new ArrowBatchStreamWriter(schema, out, timeZoneId)
+    batchWriter.writeBatches(batches.iterator)
+    batchWriter.end()
+
+    out.toByteArray()
   }
 
   def toDataFrame(
