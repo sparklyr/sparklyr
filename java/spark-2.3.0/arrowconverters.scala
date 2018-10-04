@@ -58,7 +58,7 @@ object ArrowConverters {
    * in a batch by setting maxRecordsPerBatch or use 0 to fully consume rowIter.
    */
   def toBatchIterator(
-      rowIter: Iterator[org.apache.spark.sql.catalyst.InternalRow],
+      rowIter: Iterator[org.apache.spark.sql.Row],
       schema: StructType,
       maxRecordsPerBatch: Int,
       timeZoneId: String,
@@ -77,6 +77,8 @@ object ArrowConverters {
       allocator.close()
     }
 
+    val encoder = RowEncoder(schema)
+
     new Iterator[Array[Byte]] {
 
       override def hasNext: Boolean = rowIter.hasNext || {
@@ -92,8 +94,9 @@ object ArrowConverters {
         tryWithSafeFinally {
           var rowCount = 0
           while (rowIter.hasNext && (maxRecordsPerBatch <= 0 || rowCount < maxRecordsPerBatch)) {
-            val row = rowIter.next()
-            arrowWriter.write(row)
+            val row: org.apache.spark.sql.Row = rowIter.next()
+            val internalRow: org.apache.spark.sql.catalyst.InternalRow = encoder.toRow(row)
+            arrowWriter.write(internalRow)
             rowCount += 1
           }
           arrowWriter.finish()
@@ -166,6 +169,20 @@ object ArrowConverters {
         batch.rowIterator().asScala
       }
     }
+  }
+
+  def toArrowBatchRdd(
+      df: DataFrame,
+      sparkSession: SparkSession): Array[Array[Byte]] = {
+    val schemaCaptured = df.schema
+    val maxRecordsPerBatch = sparkSession.sessionState.conf.arrowMaxRecordsPerBatch
+    val timeZoneId = sparkSession.sessionState.conf.sessionLocalTimeZone
+
+    val encoder = org.apache.spark.sql.Encoders.BINARY
+
+    df.mapPartitions(
+      iter => toBatchIterator(iter, schemaCaptured, maxRecordsPerBatch, timeZoneId, TaskContext.get())
+    )(encoder).collect()
   }
 
   def toDataFrame(
