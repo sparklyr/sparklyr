@@ -12,7 +12,8 @@ NULL
 tidy.ml_model_isotonic_regression <- function(x,
                                                   ...){
 
- stop("tidy() is not suported for Isotonic Regression")
+  tibble::data_frame(boundaries = x$model$boundaries(),
+                     predictions = x$model$predictions())
 
 }
 

@@ -5,11 +5,12 @@ test_that("isotonic_regression.tidy() works", {
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
 
-  expect_error(
-    iris_tbl %>%
-      ml_isotonic_regression(Petal_Length ~ Petal_Width) %>%
-      tidy()
-  )
+  td1 <- iris_tbl %>%
+    ml_isotonic_regression(Petal_Length ~ Petal_Width) %>%
+    tidy()
+
+  check_tidy(td1, exp.row = 44,
+             exp.names = c("boundaries", "predictions"))
 
 })
 
