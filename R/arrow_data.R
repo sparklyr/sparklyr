@@ -10,6 +10,13 @@ arrow_batch <- function(df)
   record$to_stream()
 }
 
+arrow_read_stream <- function(stream)
+{
+  read_record_batch_stream <- get("read_record_batch_stream", envir = as.environment(asNamespace("arrow")))
+
+  read_record_batch_stream(stream)
+}
+
 arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
 {
   # serialize to arrow
@@ -26,4 +33,15 @@ arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
   sdf <- invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
 
   sdf
+}
+
+arrow_collect <- function(tbl)
+{
+  sc <- spark_connection(tbl)
+  sdf <- spark_dataframe(tbl)
+  session <- spark_session(sc)
+
+  invoke_static(sc, "sparklyr.ArrowConverters", "toArrowBatchRdd", sdf, session) %>%
+    arrow_read_stream() %>%
+    dplyr::bind_rows()
 }
