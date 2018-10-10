@@ -97,6 +97,8 @@ sdf_collect <- function(object, ...) {
 
   if (sdf_is_streaming(object))
     sdf_collect_stream(object, ...)
+  else if (arrow_enabled(sc))
+    arrow_collect(object, ...)
   else
     sdf_collect_static(object, ...)
 }
