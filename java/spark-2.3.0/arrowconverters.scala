@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 import org.apache.arrow.memory.BufferAllocator
 import org.apache.arrow.vector._
-import org.apache.arrow.vector.ipc.{ArrowStreamWriter, ArrowFileReader, ArrowFileWriter}
+import org.apache.arrow.vector.ipc.{ArrowFileReader, ArrowStreamReader}
 import org.apache.arrow.vector.ipc.message.{ArrowRecordBatch, MessageSerializer}
 import org.apache.arrow.vector.ipc.WriteChannel
 import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
@@ -150,7 +150,7 @@ object ArrowConverters {
       ArrowUtils.rootAllocator.newChildAllocator("fromPayloadIterator", 0, Long.MaxValue)
 
     new ArrowRowIterator {
-      private var reader: ArrowFileReader = null
+      private var reader: ArrowStreamReader = null
       private var rowIter = if (payloadIter.hasNext) nextBatch() else Iterator.empty
 
       context.addTaskCompletionListener { _ =>
@@ -182,7 +182,7 @@ object ArrowConverters {
 
       private def nextBatch(): Iterator[org.apache.spark.sql.catalyst.InternalRow] = {
         val in = new ByteArrayReadableSeekableByteChannel(payloadIter.next())
-        reader = new ArrowFileReader(in, allocator)
+        reader = new ArrowStreamReader(in, allocator)
         reader.loadNextBatch()  // throws IOException
         val root = reader.getVectorSchemaRoot  // throws IOException
 

@@ -6,11 +6,8 @@ arrow_batch <- function(df)
 {
   record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
 
-  file <- tempfile(fileext = ".arrow")
   record <- record_batch(df)
-  record$to_file(file)
-
-  readBin(con = file, "raw", n = 10^6)
+  record$to_stream()
 }
 
 arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
