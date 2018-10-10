@@ -119,6 +119,10 @@ connection_spark_ui <- function() {
             margin-top: 7px;
           }
 
+          select {
+            background: #FFF;
+          }
+
           .shiny-input-container {
             min-width: 100%;
             margin-bottom: ", elementSpacing, "px;
