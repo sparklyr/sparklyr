@@ -35,7 +35,7 @@ arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
   sdf
 }
 
-arrow_collect <- function(tbl)
+arrow_collect <- function(tbl, ...)
 {
   sc <- spark_connection(tbl)
   sdf <- spark_dataframe(tbl)
