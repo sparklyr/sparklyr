@@ -1,5 +1,7 @@
 # Sparklyr 0.9.2 (unreleased)
 
+- Fix regression in `sdf_collect()` failing to collect tables.
+
 - Fix new connection RStudio selectors colors when running
   under OS X Mojave.
 
