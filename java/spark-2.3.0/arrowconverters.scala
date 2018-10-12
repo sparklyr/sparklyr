@@ -79,6 +79,24 @@ object ArrowConverters {
     }
   }
 
+  def toBatchIterator(
+      rowIter: Iterator[org.apache.spark.sql.Row],
+      schema: StructType,
+      maxRecordsPerBatch: Int,
+      timeZoneId: String,
+      context: TaskContext): Iterator[Array[Byte]] = {
+
+      toBatchIterator(rowIter, schema, maxRecordsPerBatch, timeZoneId, Option(context))
+  }
+
+  def toBatchIterator(
+      rowIter: Iterator[org.apache.spark.sql.Row],
+      schema: StructType,
+      timeZoneId: String) : Iterator[Array[Byte]] = {
+
+      toBatchIterator(rowIter, schema, 100000, timeZoneId, Option.empty)
+  }
+
   /**
    * Maps Iterator from InternalRow to serialized ArrowRecordBatches. Limit ArrowRecordBatch size
    * in a batch by setting maxRecordsPerBatch or use 0 to fully consume rowIter.
@@ -88,7 +106,7 @@ object ArrowConverters {
       schema: StructType,
       maxRecordsPerBatch: Int,
       timeZoneId: String,
-      context: TaskContext): Iterator[Array[Byte]] = {
+      context: Option[TaskContext]): Iterator[Array[Byte]] = {
 
     val arrowSchema = ArrowUtils.toArrowSchema(schema, timeZoneId)
     val allocator =
@@ -98,9 +116,11 @@ object ArrowConverters {
     val unloader = new VectorUnloader(root)
     val arrowWriter = ArrowWriter.create(root)
 
-    context.addTaskCompletionListener { _ =>
-      root.close()
-      allocator.close()
+    if (!context.isEmpty) {
+      context.get.addTaskCompletionListener { _ =>
+        root.close()
+        allocator.close()
+      }
     }
 
     val encoder = RowEncoder(schema)
@@ -199,11 +219,11 @@ object ArrowConverters {
 
   def toArrowBatchRdd(
       df: DataFrame,
-      sparkSession: SparkSession): Array[Byte] = {
+      sparkSession: SparkSession,
+      timeZoneId: String): Array[Byte] = {
 
     val schema = df.schema
     val maxRecordsPerBatch = sparkSession.sessionState.conf.arrowMaxRecordsPerBatch
-    val timeZoneId = sparkSession.sessionState.conf.sessionLocalTimeZone
 
     val encoder = org.apache.spark.sql.Encoders.BINARY
 

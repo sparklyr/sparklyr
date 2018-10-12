@@ -11,7 +11,9 @@ class WorkerApply(
   customEnv: Map[String, String],
   connectionTimeout: Int,
   context: Array[Byte],
-  options: Map[String, String]
+  options: Map[String, String],
+  timeZoneId: String,
+  schema: org.apache.spark.sql.types.StructType
   ) {
 
   import java.io.{File, FileWriter}
@@ -38,20 +40,20 @@ class WorkerApply(
     val logger = new Logger("Worker", sessionId)
     val lock: AnyRef = new Object()
 
-    val data = iterator.toArray;
-
     // No point in starting up R process to not process anything
-    if (data.length == 0) return Array[org.apache.spark.sql.Row]().iterator
+    if (iterator.hasNext) return Array[org.apache.spark.sql.Row]().iterator
 
     val workerContext = new WorkerContext(
-      data,
+      iterator,
       lock,
       closure,
       columns,
       groupBy,
       closureRLang,
       bundlePath,
-      context
+      context,
+      timeZoneId,
+      schema
     )
 
     val tracker = new JVMObjectTracker()
