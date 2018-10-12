@@ -1053,9 +1053,13 @@ worker_config_deserialize <- function(raw) {
     schema = as.logical(parts[[5]])
   )
 }
+<<<<<<< HEAD
 # nocov start
 
 spark_worker_apply <- function(sc, config) {
+=======
+spark_worker_context <- function(sc) {
+>>>>>>> 49a91824... rebuild docs and sources
   hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
 
@@ -1068,8 +1072,11 @@ spark_worker_apply <- function(sc, config) {
   )
 
   worker_log("retrieved worker context")
+}
 
+spark_worker_init_packages <- function(context) {
   bundlePath <- worker_invoke(context, "getBundlePath")
+
   if (nchar(bundlePath) > 0) {
     bundleName <- basename(bundlePath)
     worker_log("using bundle name ", bundleName)
@@ -1097,6 +1104,100 @@ spark_worker_apply <- function(sc, config) {
     spark_libpaths <- worker_invoke(worker_invoke(spark_env, "conf"), "get", "spark.r.libpaths", NULL)
     if (!is.null(spark_libpaths)) .libPaths(spark_libpaths)
   }
+}
+
+spark_worker_execute_closure <- function(closure, df, funcContext, group_by) {
+  if (nrow(df) == 0) {
+    worker_log("found that source has no rows to be proceesed")
+    return(NULL)
+  }
+
+  colnames(df) <- columnNames[1: length(colnames(df))]
+
+  closure_params <- length(formals(closure))
+  closure_args <- c(
+    list(df),
+    if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
+    lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
+  )[0:closure_params]
+
+  worker_log("computing closure")
+  result <- do.call(closure, closure_args)
+  worker_log("computed closure")
+
+  if (!"data.frame" %in% class(result)) {
+    worker_log("data.frame expected but ", class(result), " found")
+    result <- as.data.frame(result)
+  }
+
+  if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
+
+  result
+}
+
+worker_apply_maybe_schema <- function(result, config) {
+  firstClass <- function(e) class(e)[[1]]
+
+  if (identical(config$schema, TRUE)) {
+    worker_log("updating schema")
+    result <- data.frame(
+      names = paste(names(result), collapse = "|"),
+      types = paste(lapply(result, firstClass), collapse = "|")
+    )
+  }
+
+  result
+}
+
+spark_worker_apply_arrow <- function(sc, config) {
+  context <- spark_worker_context(sc)
+  spark_worker_init_packages(context)
+
+  closure <- unserialize(worker_invoke(context, "getClosure"))
+  funcContext <- unserialize(worker_invoke(context, "getContext"))
+  grouped_by <- worker_invoke(context, "getGroupBy")
+
+  row_iterator <- worker_invoke(context, "getIterator")
+  record_iterator <- worker_invoke_static(
+    sc,
+    "sparklyr.ArrowConverters",
+    "toBatchIterator",
+    row_iterator,
+    invoke(context, "getTimeZoneId"),
+    invoke(context, "getSchema")
+  )
+
+  all_results <- NULL
+
+  while (invoke(record_iterator, "hasNext")) {
+    record <- invoke(record_iterator, "next")
+
+    data <- arrow::read_record_batch_stream(record)
+
+    result <- spark_worker_execute_closure(closure, data[[1]], funcContext, grouped_by)
+
+    result <- worker_apply_maybe_schema(result, config)
+
+    all_results <- rbind(all_results, result)
+  }
+
+  if (!is.null(all_results) && nrow(all_results) > 0) {
+    worker_log("updating ", nrow(all_results), " rows")
+
+    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
+
+    worker_invoke(context, "setResultArraySeq", all_data)
+    worker_log("updated ", nrow(all_results), " rows")
+  } else {
+    worker_log("found no rows in closure result")
+  }
+
+  worker_log("finished apply")
+}
+
+spark_worker_apply <- function(sc, config) {
+  context <- spark_worker_context(sc)
+  spark_worker_init_packages(context)
 
   grouped_by <- worker_invoke(context, "getGroupBy")
   grouped <- !is.null(grouped_by) && length(grouped_by) > 0
@@ -1164,37 +1265,7 @@ spark_worker_apply <- function(sc, config) {
       }
     }
 
-    result <- NULL
-
-    if (nrow(df) == 0) {
-      worker_log("found that source has no rows to be proceesed")
-    }
-    else {
-      colnames(df) <- columnNames[1: length(colnames(df))]
-
-      closure_params <- length(formals(closure))
-      closure_args <- c(
-        list(df),
-        if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
-        as.list(
-          if (nrow(df) > 0)
-            lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
-          else
-            NULL
-        )
-      )[0:closure_params]
-
-      worker_log("computing closure")
-      result <- do.call(closure, closure_args)
-      worker_log("computed closure")
-
-      if (!"data.frame" %in% class(result)) {
-        worker_log("data.frame expected but ", class(result), " found")
-        result <- as.data.frame(result)
-      }
-
-      if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
-    }
+    result <- spark_worker_execute_closure(closure, df, funcContext, group_by)
 
     if (grouped) {
       if (nrow(result) > 0) {
@@ -1211,15 +1282,7 @@ spark_worker_apply <- function(sc, config) {
       }
     }
 
-    firstClass <- function(e) class(e)[[1]]
-
-    if (identical(config$schema, TRUE)) {
-      worker_log("updating schema")
-      result <- data.frame(
-        names = paste(names(result), collapse = "|"),
-        types = paste(lapply(result, firstClass), collapse = "|")
-      )
-    }
+    result <- worker_apply_maybe_schema(result, config)
 
     all_results <- rbind(all_results, result)
   }
