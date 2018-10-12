@@ -32,13 +32,14 @@ spark_apply_packages_is_bundle <- function(packages) {
   is.character(packages) && length(packages) == 1 && grepl("\\.tar$", packages)
 }
 
-spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE) {
+spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE, arrow = FALSE) {
   worker_config_serialize(
     c(
       list(
         debug = isTRUE(debug),
         profile = isTRUE(profile),
-        schema = isTRUE(schema)
+        schema = isTRUE(schema),
+        arrow =isTRUE(arrow)
       ),
       sc$config
     )
@@ -261,7 +262,8 @@ spark_apply <- function(x,
   )
 
   time_zone <- ""
-  if (arrow_enabled(sc)) {
+  arrow <- arrow_enabled(sc)
+  if (arrow) {
     time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
   }
 
@@ -272,7 +274,7 @@ spark_apply <- function(x,
       "computeRdd",
       rdd_base,
       closure,
-      spark_apply_worker_config(sc, args$debug, args$profile),
+      spark_apply_worker_config(sc, args$debug, args$profile, arrow),
       as.integer(worker_port),
       as.list(sdf_columns),
       as.list(group_by),
@@ -321,7 +323,7 @@ spark_apply <- function(x,
         sdf_limit,
         columns_schema,
         closure,
-        spark_apply_worker_config(sc, FALSE, FALSE, schema = TRUE),
+        spark_apply_worker_config(sc, FALSE, FALSE, schema = TRUE, arrow = arrow),
         as.integer(worker_port),
         as.list(sdf_columns),
         as.list(group_by),
@@ -358,7 +360,7 @@ spark_apply <- function(x,
       sdf,
       schema,
       closure,
-      spark_apply_worker_config(sc, args$debug, args$profile),
+      spark_apply_worker_config(sc, args$debug, args$profile, arrow),
       as.integer(worker_port),
       as.list(sdf_columns),
       as.list(group_by),
