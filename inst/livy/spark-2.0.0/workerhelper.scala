@@ -92,6 +92,7 @@ object WorkerHelper {
     val optionsImmMap = (Map() ++ optionsMap).toMap
 
     val encoder = RowEncoder(schema)
+    var sourceSchema = sdf.schema
 
     sdf.mapPartitions(rows => {
       val workerApply: WorkerApply = new WorkerApply(
@@ -107,7 +108,7 @@ object WorkerHelper {
         context,
         optionsImmMap,
         timeZoneId,
-        sdf.schema
+        sourceSchema
       )
 
       workerApply.apply(rows)

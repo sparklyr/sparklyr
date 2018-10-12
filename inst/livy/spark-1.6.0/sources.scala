@@ -1051,9 +1051,11 @@ spark_worker_context <- function(sc) {
   )
 
   worker_log("retrieved worker context")
+
+  context
 }
 
-spark_worker_init_packages <- function(context) {
+spark_worker_init_packages <- function(sc, context) {
   bundlePath <- worker_invoke(context, "getBundlePath")
 
   if (nchar(bundlePath) > 0) {
@@ -1085,13 +1087,11 @@ spark_worker_init_packages <- function(context) {
   }
 }
 
-spark_worker_execute_closure <- function(closure, df, funcContext, group_by) {
+spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
   if (nrow(df) == 0) {
     worker_log("found that source has no rows to be proceesed")
     return(NULL)
   }
-
-  colnames(df) <- columnNames[1: length(colnames(df))]
 
   closure_params <- length(formals(closure))
   closure_args <- c(
@@ -1130,11 +1130,12 @@ worker_apply_maybe_schema <- function(result, config) {
 
 spark_worker_apply_arrow <- function(sc, config) {
   context <- spark_worker_context(sc)
-  spark_worker_init_packages(context)
+  spark_worker_init_packages(sc, context)
 
   closure <- unserialize(worker_invoke(context, "getClosure"))
   funcContext <- unserialize(worker_invoke(context, "getContext"))
   grouped_by <- worker_invoke(context, "getGroupBy")
+  columnNames <- worker_invoke(context, "getColumns")
 
   row_iterator <- worker_invoke(context, "getIterator")
   record_iterator <- worker_invoke_static(
@@ -1151,9 +1152,10 @@ spark_worker_apply_arrow <- function(sc, config) {
   while (invoke(record_iterator, "hasNext")) {
     record <- invoke(record_iterator, "next")
 
-    data <- arrow::read_record_batch_stream(record)
+    df <- arrow::read_record_batch_stream(record)[[1]]
+    colnames(df) <- columnNames[1: length(colnames(df))]
 
-    result <- spark_worker_execute_closure(closure, data[[1]], funcContext, grouped_by)
+    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
     result <- worker_apply_maybe_schema(result, config)
 
@@ -1176,7 +1178,7 @@ spark_worker_apply_arrow <- function(sc, config) {
 
 spark_worker_apply <- function(sc, config) {
   context <- spark_worker_context(sc)
-  spark_worker_init_packages(context)
+  spark_worker_init_packages(sc, context)
 
   grouped_by <- worker_invoke(context, "getGroupBy")
   grouped <- !is.null(grouped_by) && length(grouped_by) > 0
@@ -1243,6 +1245,8 @@ spark_worker_apply <- function(sc, config) {
         }
       }
     }
+
+    colnames(df) <- columnNames[1: length(colnames(df))]
 
     result <- spark_worker_execute_closure(closure, df, funcContext, group_by)
 
