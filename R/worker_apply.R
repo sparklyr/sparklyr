@@ -13,6 +13,8 @@ spark_worker_context <- function(sc) {
   )
 
   worker_log("retrieved worker context")
+
+  context
 }
 
 spark_worker_init_packages <- function(context) {
