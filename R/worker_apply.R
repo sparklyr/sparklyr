@@ -17,7 +17,7 @@ spark_worker_context <- function(sc) {
   context
 }
 
-spark_worker_init_packages <- function(context) {
+spark_worker_init_packages <- function(sc, context) {
   bundlePath <- worker_invoke(context, "getBundlePath")
 
   if (nchar(bundlePath) > 0) {
@@ -94,7 +94,7 @@ worker_apply_maybe_schema <- function(result, config) {
 
 spark_worker_apply_arrow <- function(sc, config) {
   context <- spark_worker_context(sc)
-  spark_worker_init_packages(context)
+  spark_worker_init_packages(sc, context)
 
   closure <- unserialize(worker_invoke(context, "getClosure"))
   funcContext <- unserialize(worker_invoke(context, "getContext"))
@@ -140,7 +140,7 @@ spark_worker_apply_arrow <- function(sc, config) {
 
 spark_worker_apply <- function(sc, config) {
   context <- spark_worker_context(sc)
-  spark_worker_init_packages(context)
+  spark_worker_init_packages(sc, context)
 
   grouped_by <- worker_invoke(context, "getGroupBy")
   grouped <- !is.null(grouped_by) && length(grouped_by) > 0
