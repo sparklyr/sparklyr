@@ -89,6 +89,8 @@ worker_apply_maybe_schema <- function(result, config) {
 }
 
 spark_worker_apply_arrow <- function(sc, config) {
+  worker_log("using arrow serializer")
+
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)
 
@@ -103,14 +105,14 @@ spark_worker_apply_arrow <- function(sc, config) {
     "sparklyr.ArrowConverters",
     "toBatchIterator",
     row_iterator,
-    invoke(context, "getTimeZoneId"),
-    invoke(context, "getSchema")
+    worker_invoke(context, "getTimeZoneId"),
+    worker_invoke(context, "getSchema")
   )
 
   all_results <- NULL
 
-  while (invoke(record_iterator, "hasNext")) {
-    record <- invoke(record_iterator, "next")
+  while (worker_invoke(record_iterator, "hasNext")) {
+    record <- worker_invoke(record_iterator, "next")
 
     df <- arrow::read_record_batch_stream(record)[[1]]
     colnames(df) <- columnNames[1: length(colnames(df))]
