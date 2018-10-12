@@ -260,6 +260,11 @@ spark_apply <- function(x,
     as.character
   )
 
+  time_zone <- ""
+  if (arrow_enabled(sc)) {
+    time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
+  }
+
   if (identical(args$rdd, TRUE)) {
     rdd <- invoke_static(
       sc,
@@ -327,11 +332,7 @@ spark_apply <- function(x,
         context_serialize,
         as.environment(spark_apply_options),
         spark_session(sc),
-        ifelse(
-          arrow_enabled(sc),
-          spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone"),
-          ""
-        )
+        time_zone
       )
 
       columns_query <- columns_op %>% sdf_collect()
@@ -366,7 +367,9 @@ spark_apply <- function(x,
       as.environment(proc_env),
       as.integer(60),
       context_serialize,
-      as.environment(spark_apply_options)
+      as.environment(spark_apply_options),
+      spark_session(sc),
+      time_zone
     )
   }
 
