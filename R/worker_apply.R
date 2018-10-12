@@ -107,8 +107,8 @@ spark_worker_apply_arrow <- function(sc, config) {
     "sparklyr.ArrowConverters",
     "toBatchIterator",
     row_iterator,
-    worker_invoke(context, "getTimeZoneId"),
-    worker_invoke(context, "getSchema")
+    worker_invoke(context, "getSchema"),
+    worker_invoke(context, "getTimeZoneId")
   )
 
   all_results <- NULL
