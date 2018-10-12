@@ -41,7 +41,9 @@ arrow_collect <- function(tbl, ...)
   sdf <- spark_dataframe(tbl)
   session <- spark_session(sc)
 
-  invoke_static(sc, "sparklyr.ArrowConverters", "toArrowBatchRdd", sdf, session) %>%
+  time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
+
+  invoke_static(sc, "sparklyr.ArrowConverters", "toArrowBatchRdd", sdf, session, time_zone) %>%
     arrow_read_stream() %>%
     dplyr::bind_rows()
 }
