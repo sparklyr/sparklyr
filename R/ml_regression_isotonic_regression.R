@@ -8,6 +8,26 @@
 #' @param feature_index Index of the feature if \code{features_col} is a vector column (default: 0), no effect otherwise.
 #' @param isotonic Whether the output sequence should be isotonic/increasing (true) or antitonic/decreasing (false). Default: true
 #' @template roxlate-ml-weight-col
+#'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' partitions <- iris_tbl %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' iris_training <- partitions$training
+#' iris_test <- partitions$test
+#'
+#' iso_res <- iris_tbl %>%
+#'   ml_isotonic_regression(Petal_Length ~ Petal_Width)
+#'
+#' pred <- sdf_predict(iris_test, iso_res)
+#'
+#' pred
+#' }
+#'
 #' @export
 ml_isotonic_regression <- function(x, formula = NULL, feature_index = 0, isotonic = TRUE,
                                    weight_col = NULL, features_col = "features",

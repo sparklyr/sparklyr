@@ -165,8 +165,7 @@
 
 ### Broom
   
-- Implemented `tidy()`, `augment()`, and `glance()` for
-`ml_naive_bayes()`, `ml_logistic_regression()`, `ml_decision_tree()`, `ml_random_forest()`, `ml_gradient_boosted_trees()`, `ml_bisecting_kmeans()`, `ml_kmeans()`and `ml_gaussian_mixture()` models (@samuelmacedo83)
+- Implemented `tidy()`, `augment()`, and `glance()` for `ml_aft_survival_regression()`, `ml_isotonic_regression()`, `ml_naive_bayes()`, `ml_logistic_regression()`, `ml_decision_tree()`, `ml_random_forest()`, `ml_gradient_boosted_trees()`, `ml_bisecting_kmeans()`, `ml_kmeans()`and `ml_gaussian_mixture()` models (@samuelmacedo83)
 
 ### Configuration
 
