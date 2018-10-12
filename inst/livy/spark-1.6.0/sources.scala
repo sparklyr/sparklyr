@@ -1023,6 +1023,7 @@ worker_config_serialize <- function(config) {
     spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
     if (isTRUE(config$profile)) "TRUE" else "FALSE",
     if (isTRUE(config$schema)) "TRUE" else "FALSE",
+    if (isTRUE(config$arrow)) "TRUE" else "FALSE",
     sep = ";"
   )
 }
@@ -1035,7 +1036,8 @@ worker_config_deserialize <- function(raw) {
     sparklyr.gateway.port = as.integer(parts[[2]]),
     sparklyr.gateway.address = parts[[3]],
     profile = as.logical(parts[[4]]),
-    schema = as.logical(parts[[5]])
+    schema = as.logical(parts[[5]]),
+    arrow = as.logical(parts[[6]])
   )
 }
 spark_worker_context <- function(sc) {
@@ -1129,6 +1131,8 @@ worker_apply_maybe_schema <- function(result, config) {
 }
 
 spark_worker_apply_arrow <- function(sc, config) {
+  worker_log("using arrow serializer")
+
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)
 
@@ -1248,7 +1252,7 @@ spark_worker_apply <- function(sc, config) {
 
     colnames(df) <- columnNames[1: length(colnames(df))]
 
-    result <- spark_worker_execute_closure(closure, df, funcContext, group_by)
+    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
     if (grouped) {
       if (nrow(result) > 0) {
@@ -1500,7 +1504,12 @@ spark_worker_main <- function(
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
-    spark_worker_apply(sc, config)
+    if (config$arrow) {
+      spark_worker_apply_arrow(sc, config)
+    }
+    else {
+      spark_worker_apply(sc, config)
+    }
 
     if (identical(config$profile, TRUE)) {
       # utils::Rprof(NULL)
