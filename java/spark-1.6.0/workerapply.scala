@@ -41,7 +41,7 @@ class WorkerApply(
     val lock: AnyRef = new Object()
 
     // No point in starting up R process to not process anything
-    if (iterator.hasNext) return Array[org.apache.spark.sql.Row]().iterator
+    if (!iterator.hasNext) return Array[org.apache.spark.sql.Row]().iterator
 
     val workerContext = new WorkerContext(
       iterator,
