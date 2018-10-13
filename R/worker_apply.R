@@ -116,6 +116,8 @@ spark_worker_apply_arrow <- function(sc, config) {
   all_results <- NULL
 
   for (i in 1:length(dfs)) {
+    worker_log("is processing batch ", i)
+
     df <- dfs[[i]]
     colnames(df) <- columnNames[1: length(colnames(df))]
 
