@@ -1140,30 +1140,40 @@ spark_worker_apply_arrow <- function(sc, config) {
   funcContext <- unserialize(worker_invoke(context, "getContext"))
   grouped_by <- worker_invoke(context, "getGroupBy")
   columnNames <- worker_invoke(context, "getColumns")
+  schema <- worker_invoke(context, "getSchema")
+  time_zone <- worker_invoke(context, "getTimeZoneId")
 
   row_iterator <- worker_invoke(context, "getIterator")
-  record_iterator <- worker_invoke_static(
+  record_batch_raw <- worker_invoke_static(
     sc,
     "sparklyr.ArrowConverters",
-    "toBatchIterator",
+    "toBatchArray",
     row_iterator,
-    invoke(context, "getTimeZoneId"),
-    invoke(context, "getSchema")
+    schema,
+    time_zone
   )
+
+  dfs <- arrow::read_record_batch_stream(record_batch_raw)
+
+  worker_log("retrieved record batch with class ", class(dfs)[[1]])
+  worker_log("retrieved record batch with length ", length(dfs))
 
   all_results <- NULL
 
-  while (invoke(record_iterator, "hasNext")) {
-    record <- invoke(record_iterator, "next")
+  for (i in 1:length(dfs)) {
+    worker_log("is processing batch ", i)
 
-    df <- arrow::read_record_batch_stream(record)[[1]]
+    df <- dfs[[i]]
     colnames(df) <- columnNames[1: length(colnames(df))]
 
+    worker_log("is processing data frame with ", nrow(df), " rows")
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
     result <- worker_apply_maybe_schema(result, config)
 
     all_results <- rbind(all_results, result)
+
+    worker_log("processed batch ", i)
   }
 
   if (!is.null(all_results) && nrow(all_results) > 0) {
