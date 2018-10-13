@@ -98,23 +98,25 @@ spark_worker_apply_arrow <- function(sc, config) {
   funcContext <- unserialize(worker_invoke(context, "getContext"))
   grouped_by <- worker_invoke(context, "getGroupBy")
   columnNames <- worker_invoke(context, "getColumns")
+  schema <- worker_invoke(context, "getSchema")
+  time_zone <- worker_invoke(context, "getTimeZoneId")
 
   row_iterator <- worker_invoke(context, "getIterator")
-  record_iterator <- worker_invoke_static(
+  record_batch_raw <- worker_invoke_static(
     sc,
     "sparklyr.ArrowConverters",
-    "toBatchIterator",
+    "toBatchArray",
     row_iterator,
-    worker_invoke(context, "getSchema"),
-    worker_invoke(context, "getTimeZoneId")
+    schema,
+    time_zone
   )
+
+  dfs <- arrow::read_record_batch_stream(record_batch_raw)
 
   all_results <- NULL
 
-  while (worker_invoke(record_iterator, "hasNext")) {
-    record <- worker_invoke(record_iterator, "next")
-
-    df <- arrow::read_record_batch_stream(record)[[1]]
+  for (i in 1:length(dfs)) {
+    df <- dfs[[i]]
     colnames(df) <- columnNames[1: length(colnames(df))]
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
