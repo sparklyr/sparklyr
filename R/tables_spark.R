@@ -25,7 +25,7 @@ tbl_cache_sql <- function(sc, name, force) {
   if (force) {
     sql <- paste("SELECT count(*) FROM ", tbl_quote_name(name))
     sdf <- invoke(hive_context(sc), "sql", sql)
-    sdf_collect(sdf)
+    sdf_collect(sdf, arrow = FALSE)
   }
 }
 
