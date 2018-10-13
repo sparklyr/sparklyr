@@ -89,12 +89,25 @@ object ArrowConverters {
       toBatchIterator(rowIter, schema, maxRecordsPerBatch, timeZoneId, Option(context))
   }
 
-  def toBatchIterator(
+  def toBatchArray(
       rowIter: Iterator[org.apache.spark.sql.Row],
       schema: StructType,
-      timeZoneId: String) : Iterator[Array[Byte]] = {
+      timeZoneId: String) : Array[Byte] = {
 
-      toBatchIterator(rowIter, schema, 100000, timeZoneId, Option.empty)
+    val batches: Iterator[Array[Byte]] = toBatchIterator(
+      rowIter,
+      schema,
+      100000,
+      timeZoneId,
+      Option.empty
+    )
+
+    val out = new ByteArrayOutputStream()
+    val batchWriter = new ArrowBatchStreamWriter(schema, out, timeZoneId)
+    batchWriter.writeBatches(batches)
+    batchWriter.end()
+
+    out.toByteArray()
   }
 
   /**
