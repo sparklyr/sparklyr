@@ -30,6 +30,8 @@ spark_worker_main <- function(
 
     worker_log("is starting")
 
+    options(sparklyr.connection.cancellable = FALSE)
+
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
