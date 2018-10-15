@@ -42,7 +42,7 @@ spark_worker_main <- function(
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)
-    if (exists(".stopLastError", envir = .GlobalEnv)) {
+    if (exists(".stopLastError", envir = .worker_globals)) {
       worker_log_error("collected callstack: \n", get(".stopLastError", envir = .worker_globals))
     }
     quit(status = -1)
