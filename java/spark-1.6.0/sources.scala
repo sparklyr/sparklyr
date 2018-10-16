@@ -518,7 +518,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   backend <- core_invoke_socket(sc)
   connection_name <- core_invoke_socket_name(sc)
 
-  if (!identical(object, "Handler")) {
+  if (!identical(object, "Handler") && getOption("sparklyr.connection.cancellable", TRUE)) {
     # if connection still running, sync to valid state
     if (identical(sc$state$status[[connection_name]], "running"))
       core_invoke_sync(sc)
@@ -1127,6 +1127,15 @@ worker_apply_maybe_schema <- function(result, config) {
   result
 }
 
+spark_worker_build_types <- function(sc, columns) {
+  names <- names(columns)
+  fields <- lapply(names, function(name) {
+    worker_invoke_static(sc, "sparklyr.SQLUtils", "createStructField", name, columns[[name]][[1]], TRUE)
+  })
+
+  worker_invoke_static(sc, "sparklyr.SQLUtils", "createStructType", fields)
+}
+
 spark_worker_apply_arrow <- function(sc, config) {
   worker_log("using arrow serializer")
 
@@ -1137,7 +1146,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   funcContext <- unserialize(worker_invoke(context, "getContext"))
   grouped_by <- worker_invoke(context, "getGroupBy")
   columnNames <- worker_invoke(context, "getColumns")
-  schema <- worker_invoke(context, "getSchema")
+  schema_input <- worker_invoke(context, "getSchema")
   time_zone <- worker_invoke(context, "getTimeZoneId")
 
   row_iterator <- worker_invoke(context, "getIterator")
@@ -1146,13 +1155,16 @@ spark_worker_apply_arrow <- function(sc, config) {
     "sparklyr.ArrowConverters",
     "toBatchArray",
     row_iterator,
-    schema,
+    schema_input,
     time_zone
   )
 
   dfs <- arrow::read_record_batch_stream(record_batch_raw)
 
-  all_results <- NULL
+  all_batches <- list()
+  total_rows <- 0
+
+  schema_output <- NULL
 
   for (i in 1:length(dfs)) {
     worker_log("is processing batch ", i)
@@ -1164,16 +1176,24 @@ spark_worker_apply_arrow <- function(sc, config) {
 
     result <- worker_apply_maybe_schema(result, config)
 
-    all_results <- rbind(all_results, result)
+    if (is.null(schema_output)) {
+      schema_output <- spark_worker_build_types(sc, lapply(result, class))
+    }
+
+    record <- arrow::record_batch(result)
+    raw_batch <- record$to_stream()
+
+    all_batches[[i]] <- raw_batch
+    total_rows <- total_rows + nrow(result)
   }
 
-  if (!is.null(all_results) && nrow(all_results) > 0) {
-    worker_log("updating ", nrow(all_results), " rows")
+  if (length(all_batches) > 0) {
+    worker_log("updating ", total_rows, " rows using ", length(all_batches), " row batches")
 
-    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
+    row_iter <- worker_invoke_static(sc, "sparklyr.ArrowConverters", "fromPayloadArray", all_batches, schema_output)
 
-    worker_invoke(context, "setResultArraySeq", all_data)
-    worker_log("updated ", nrow(all_results), " rows")
+    worker_invoke(context, "setResultIter", row_iter)
+    worker_log("updated ", total_rows, " rows using ", length(all_batches), " row batches")
   } else {
     worker_log("found no rows in closure result")
   }
@@ -1428,7 +1448,7 @@ worker_invoke_static <- function(sc, class, method, ...) {
 }
 
 worker_invoke_new <- function(sc, class, ...) {
-  invoke_method(sc, TRUE, class, "<init>", ...)
+  worker_invoke_method(sc, TRUE, class, "<init>", ...)
 }
 worker_log_env <- new.env()
 
@@ -1502,6 +1522,8 @@ spark_worker_main <- function(
 
     worker_log("is starting")
 
+    options(sparklyr.connection.cancellable = FALSE)
+
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
@@ -1519,7 +1541,7 @@ spark_worker_main <- function(
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)
-    if (exists(".stopLastError", envir = .GlobalEnv)) {
+    if (exists(".stopLastError", envir = .worker_globals)) {
       worker_log_error("collected callstack: \n", get(".stopLastError", envir = .worker_globals))
     }
     quit(status = -1)
