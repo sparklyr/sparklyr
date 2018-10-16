@@ -1,5 +1,8 @@
 # Sparklyr 0.9.2 (unreleased)
 
+- Fix missing callstack and error case while logging in
+  `spark_apply()`.
+
 - Fix regression in `sdf_collect()` failing to collect tables.
 
 - Fix new connection RStudio selectors colors when running
