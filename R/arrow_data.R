@@ -26,7 +26,7 @@ arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
   batches <- list(bytes)
 
   # build schema
-  schema <- sparklyr:::spark_data_build_types(sc, lapply(df, class))
+  schema <- spark_data_build_types(sc, lapply(df, class))
 
   # load arrow file in scala
   rdd <- invoke_static(sc, "sparklyr.ArrowHelper", "javaRddFromBinaryBatches", spark_context(sc), batches, parallelism)
