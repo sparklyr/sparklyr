@@ -122,7 +122,8 @@ spark_worker_apply_arrow <- function(sc, config) {
     time_zone
   )
 
-  dfs <- arrow::read_record_batch_stream(record_batch_raw)
+  read_record_batch_stream <- get("read_record_batch_stream", envir = as.environment(asNamespace("arrow")))
+  dfs <- read_record_batch_stream(record_batch_raw)
 
   all_batches <- list()
   total_rows <- 0
@@ -143,7 +144,8 @@ spark_worker_apply_arrow <- function(sc, config) {
       schema_output <- spark_worker_build_types(sc, lapply(result, class))
     }
 
-    record <- arrow::record_batch(result)
+    record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+    record <- record_batch(result)
     raw_batch <- record$to_stream()
 
     all_batches[[i]] <- raw_batch
