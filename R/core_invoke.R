@@ -111,7 +111,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   backend <- core_invoke_socket(sc)
   connection_name <- core_invoke_socket_name(sc)
 
-  if (!identical(object, "Handler")) {
+  if (!identical(object, "Handler") && getOption("sparklyr.connection.cancellable", TRUE)) {
     # if connection still running, sync to valid state
     if (identical(sc$state$status[[connection_name]], "running"))
       core_invoke_sync(sc)

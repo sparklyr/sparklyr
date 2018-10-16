@@ -4,6 +4,10 @@ language: r
 dist: trusty
 sudo: false
 
+branches:
+  only:
+    - master
+
 cache:
   packages: true
 
