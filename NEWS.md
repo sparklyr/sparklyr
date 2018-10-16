@@ -2,6 +2,8 @@
 
 - Support for Spark 2.3.2.
 
+- Fix installation error with older versions of `rstudioapi` (#1716).
+
 - Fix missing callstack and error case while logging in
   `spark_apply()`.
 
