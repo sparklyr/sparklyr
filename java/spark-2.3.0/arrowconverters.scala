@@ -171,14 +171,33 @@ object ArrowConverters {
     }
   }
 
+  def fromPayloadArray(
+    records: Array[Array[Byte]],
+    schema: StructType): Iterator[org.apache.spark.sql.Row] = {
+
+    val context = TaskContext.get()
+    val singleRecords: Iterator[Array[Byte]] = records.map(record => {record}).iterator
+
+    val iter: ArrowRowIterator = ArrowConverters.fromPayloadIterator(singleRecords, Option.empty)
+
+    val converter = org.apache.spark.sql.catalyst.CatalystTypeConverters.createToScalaConverter(schema)
+    iter.map(converter(_).asInstanceOf[org.apache.spark.sql.Row])
+  }
+
+  def fromPayloadIterator(
+      payloadIter: Iterator[Array[Byte]],
+      context: TaskContext): ArrowRowIterator = {
+
+    fromPayloadIterator(payloadIter, Option(context))
+  }
+
   /**
    * Maps Iterator from ArrowPayload to Row. Returns a pair containing the row iterator
    * and the schema from the first batch of Arrow data read.
    */
   def fromPayloadIterator(
       payloadIter: Iterator[Array[Byte]],
-      context: TaskContext,
-      schema: StructType): ArrowRowIterator = {
+      context: Option[TaskContext]): ArrowRowIterator = {
     val allocator =
       ArrowUtils.rootAllocator.newChildAllocator("fromPayloadIterator", 0, Long.MaxValue)
 
@@ -186,9 +205,11 @@ object ArrowConverters {
       private var reader: ArrowStreamReader = null
       private var rowIter = if (payloadIter.hasNext) nextBatch() else Iterator.empty
 
-      context.addTaskCompletionListener { _ =>
-        closeReader()
-        allocator.close()
+      if (!context.isEmpty) {
+        context.get.addTaskCompletionListener { _ =>
+          closeReader()
+          allocator.close()
+        }
       }
 
       override def hasNext: Boolean = rowIter.hasNext || {
@@ -210,8 +231,6 @@ object ArrowConverters {
           reader = null
         }
       }
-
-      private val encoder = RowEncoder(schema)
 
       private def nextBatch(): Iterator[org.apache.spark.sql.catalyst.InternalRow] = {
         val in = new ByteArrayReadableSeekableByteChannel(payloadIter.next())
@@ -258,7 +277,7 @@ object ArrowConverters {
       sparkSession: SparkSession): DataFrame = {
     val rdd = payloadRDD.rdd.mapPartitions { iter =>
       val context = TaskContext.get()
-      ArrowConverters.fromPayloadIterator(iter, context, schema)
+      ArrowConverters.fromPayloadIterator(iter, context)
     }
 
     val logger = new Logger("Arrow", 0)

@@ -65,6 +65,10 @@ class WorkerContext(
     result = resultParam.map(x => Row.fromSeq(x.asInstanceOf[Array[_]].toSeq))
   }
 
+  def setResultIter(resultParam: Iterator[Row]) = {
+    result = resultParam.toArray
+  }
+
   def getResultArray(): Array[Row] = {
     result
   }
