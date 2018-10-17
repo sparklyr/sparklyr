@@ -124,7 +124,7 @@ spark_versions <- function(latest = TRUE) {
              if (dir.exists(maybeDir)) {
                fileName <- basename(maybeDir)
                m <- regmatches(fileName, regexec(spark_versions_file_pattern(), fileName))[[1]]
-               if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]]) else NULL
+               if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]], pattern = fileName) else NULL
              }
            })
     ),
@@ -134,7 +134,6 @@ spark_versions <- function(latest = TRUE) {
 
       newRow <- c(row, installed = TRUE)
       newRow$base <- ""
-      newRow$pattern <- ""
       newRow$download <- ""
       newRow$default <- FALSE
       newRow$hadoop_default <- FALSE
