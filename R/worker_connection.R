@@ -1,3 +1,5 @@
+# nocov start
+
 connection_is_open.spark_worker_connection <- function(sc) {
   bothOpen <- FALSE
   if (!identical(sc, NULL)) {
@@ -16,3 +18,5 @@ worker_connection <- function(x, ...) {
 worker_connection.spark_jobj <- function(x, ...) {
   x$connection
 }
+
+# nocov end

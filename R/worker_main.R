@@ -1,3 +1,5 @@
+# nocov start
+
 .worker_globals <- new.env(parent = emptyenv())
 
 spark_worker_main <- function(
@@ -72,3 +74,5 @@ spark_worker_hooks <- function() {
   }, as.environment("package:base"))
   lock("stop",  as.environment("package:base"))
 }
+
+# nocov end

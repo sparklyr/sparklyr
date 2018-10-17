@@ -1,3 +1,5 @@
+# nocov start
+
 spark_worker_apply <- function(sc, config) {
   hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
@@ -224,3 +226,5 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
 
   extractPath
 }
+
+# nocov end
