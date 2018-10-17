@@ -11,7 +11,7 @@ class Sources {
 #' @keywords internal
 #' @export
 spark_config_value <- function(config, name, default = NULL) {
-  if (getOption("sparklyr.test.enforce.config", FALSE) && any(startsWith(name, "sparklyr."))) {
+  if (getOption("sparklyr.test.enforce.config", FALSE) && any(grepl("^sparklyr.", name))) {
     settings <- get("spark_config_settings")()
     if (!any(name %in% settings$name)) {
       stop("Config value '", name[[1]], "' not described in spark_config_settings()")
@@ -518,7 +518,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   backend <- core_invoke_socket(sc)
   connection_name <- core_invoke_socket_name(sc)
 
-  if (!identical(object, "Handler")) {
+  if (!identical(object, "Handler") && getOption("sparklyr.connection.cancellable", TRUE)) {
     # if connection still running, sync to valid state
     if (identical(sc$state$status[[connection_name]], "running"))
       core_invoke_sync(sc)
@@ -1357,7 +1357,7 @@ worker_invoke_static <- function(sc, class, method, ...) {
 }
 
 worker_invoke_new <- function(sc, class, ...) {
-  invoke_method(sc, TRUE, class, "<init>", ...)
+  worker_invoke_method(sc, TRUE, class, "<init>", ...)
 }
 worker_log_env <- new.env()
 
@@ -1431,6 +1431,8 @@ spark_worker_main <- function(
 
     worker_log("is starting")
 
+    options(sparklyr.connection.cancellable = FALSE)
+
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
@@ -1443,7 +1445,7 @@ spark_worker_main <- function(
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)
-    if (exists(".stopLastError", envir = .GlobalEnv)) {
+    if (exists(".stopLastError", envir = .worker_globals)) {
       worker_log_error("collected callstack: \n", get(".stopLastError", envir = .worker_globals))
     }
     quit(status = -1)
