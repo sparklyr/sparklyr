@@ -1,4 +1,4 @@
-# Sparklyr 0.9.2 (unreleased)
+# Sparklyr 0.9.2
 
 - Support for Spark 2.3.2.
 
