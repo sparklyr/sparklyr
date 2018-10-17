@@ -157,7 +157,7 @@ spark_apply <- function(x,
 
   rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
-  proc_env <- connection_config(sc, "sparklyr.apply.env.")
+  proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
 
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
@@ -262,7 +262,7 @@ spark_apply <- function(x,
   )
 
   time_zone <- ""
-  arrow <- arrow_enabled(sc)
+  arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc)
   if (arrow) {
     time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
   }
