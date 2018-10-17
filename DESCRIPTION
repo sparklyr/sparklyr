@@ -63,5 +63,4 @@ Suggests:
     reshape2,
     testthat
 Remotes:
-    romainfrancois/arrow@ARROW-3490/stream-2
     r-lib/withr
