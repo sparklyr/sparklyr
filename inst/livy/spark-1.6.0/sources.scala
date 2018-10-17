@@ -1040,6 +1040,9 @@ worker_config_deserialize <- function(raw) {
     arrow = as.logical(parts[[6]])
   )
 }
+require(compiler)
+enableJIT(0)
+
 spark_worker_context <- function(sc) {
   hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
@@ -1162,17 +1165,27 @@ spark_worker_apply_arrow <- function(sc, config) {
     time_zone
   )
 
-  dfs <- arrow::read_record_batch_stream(record_batch_raw)
+  # record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
+  # read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
+  # write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
+  # record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+
+  library(arrow)
+
+  reader <- record_batch_stream_reader(record_batch_raw)
+  record_entry <- read_record_batch(reader)
 
   all_batches <- list()
   total_rows <- 0
 
   schema_output <- NULL
 
-  for (i in 1:length(dfs)) {
-    worker_log("is processing batch ", i)
+  batch_idx <- 0
+  while (!record_entry$is_null()) {
+    batch_idx <- batch_idx + 1
+    worker_log("is processing batch ", batch_idx)
 
-    df <- dfs[[i]]
+    df <- tibble::as_tibble(record_entry)
     colnames(df) <- columnNames[1: length(colnames(df))]
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
@@ -1183,11 +1196,13 @@ spark_worker_apply_arrow <- function(sc, config) {
       schema_output <- spark_worker_build_types(sc, lapply(result, class))
     }
 
-    record <- arrow::record_batch(result)
-    raw_batch <- record$to_stream()
+    record <- record_batch(result)
+    raw_batch <- write_record_batch(record, raw())
 
-    all_batches[[i]] <- raw_batch
+    all_batches[[length(all_batches) + 1]] <- raw_batch
     total_rows <- total_rows + nrow(result)
+
+    record_entry <- read_record_batch(reader)
   }
 
   if (length(all_batches) > 0) {
