@@ -45,7 +45,7 @@ Imports:
     rprojroot,
     rstudioapi (>= 0.6),
     shiny (>= 1.0.1),
-    withr,
+    withr (> 2.1.2),
     xml2,
     tibble,
     tidyr,
@@ -62,3 +62,6 @@ Suggests:
     RCurl,
     reshape2,
     testthat
+Remotes:
+    romainfrancois/arrow@ARROW-3490/stream-2
+    r-lib/withr

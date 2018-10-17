@@ -7,14 +7,24 @@ arrow_batch <- function(df)
   record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
 
   record <- record_batch(df)
-  record$to_stream()
+  write_record_batch(record, raw())
 }
 
 arrow_read_stream <- function(stream)
 {
-  read_record_batch_stream <- get("read_record_batch_stream", envir = as.environment(asNamespace("arrow")))
+  record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
+  read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
 
-  read_record_batch_stream(stream)
+  reader <- record_batch_stream_reader(stream)
+  record_entry <- read_record_batch(reader)
+
+  entries <- list()
+  while (!record_entry$is_null()) {
+    entries[[length(entries) + 1]] <- tibble::as_tibble(record_entry)
+    record_entry <- read_record_batch(reader)
+  }
+
+  entries
 }
 
 arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
