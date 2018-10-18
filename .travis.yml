@@ -38,10 +38,29 @@ matrix:
       env:
         - LIVY_VERSION="0.5.0"
         - JAVA_VERSION=openjdk8
+    - name: "Arrow (R release, openjdk8)"
+      r: release
+      env:
+        - R_ARROW="true"
+        - JAVA_VERSION=openjdk8
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
+  - |
+    if [[ R_ARROW == "true" ]]; then
+      sudo apt install -y -V apt-transport-https
+      sudo apt install -y -V lsb-release
+      sudo wget -O /usr/share/keyrings/red-data-tools-keyring.gpg https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-keyring.gpg
+      sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
+      deb [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) universe
+      deb-src [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) universe
+      APT_LINE
+      sudo apt update
+      sudo apt install -y -V libarrow-dev # For C++
+      sudo apt install -y -V libarrow-glib-dev # For GLib (C)
+    fi
+  - Rscript .travis.R --arrow
 
 script:
   - |
