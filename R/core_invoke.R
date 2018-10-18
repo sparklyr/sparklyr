@@ -96,6 +96,10 @@ core_invoke_socket_name <- function(sc) {
     "backend"
 }
 
+core_remove_jobj <- function(sc, id) {
+  core_invoke_method(sc, static = TRUE, "Handler", "rm", id)
+}
+
 core_invoke_method <- function(sc, static, object, method, ...)
 {
   if (is.null(sc))
@@ -110,6 +114,17 @@ core_invoke_method <- function(sc, static, object, method, ...)
   # choose connection socket
   backend <- core_invoke_socket(sc)
   connection_name <- core_invoke_socket_name(sc)
+
+  if (!identical(object, "Handler")) {
+    objsToRemove <- ls(.toRemoveJobjs)
+    if (length(objsToRemove) > 0) {
+      sapply(objsToRemove,
+             function(e) {
+               core_remove_jobj(sc, e)
+             })
+      rm(list = objsToRemove, envir = .toRemoveJobjs)
+    }
+  }
 
   if (!identical(object, "Handler") && getOption("sparklyr.connection.cancellable", TRUE)) {
     # if connection still running, sync to valid state
