@@ -503,6 +503,10 @@ core_invoke_socket_name <- function(sc) {
     "backend"
 }
 
+core_remove_jobj <- function(sc, id) {
+  core_invoke_method(sc, static = TRUE, "Handler", "rm", id)
+}
+
 core_invoke_method <- function(sc, static, object, method, ...)
 {
   if (is.null(sc))
@@ -517,6 +521,17 @@ core_invoke_method <- function(sc, static, object, method, ...)
   # choose connection socket
   backend <- core_invoke_socket(sc)
   connection_name <- core_invoke_socket_name(sc)
+
+  if (!identical(object, "Handler")) {
+    objsToRemove <- ls(.toRemoveJobjs)
+    if (length(objsToRemove) > 0) {
+      sapply(objsToRemove,
+             function(e) {
+               core_remove_jobj(sc, e)
+             })
+      rm(list = objsToRemove, envir = .toRemoveJobjs)
+    }
+  }
 
   if (!identical(object, "Handler") && getOption("sparklyr.connection.cancellable", TRUE)) {
     # if connection still running, sync to valid state
@@ -782,7 +797,7 @@ cleanup.jobj <- function(jobj) {
   }
 }
 
-clearJobjs <- function() {
+clear_jobjs <- function() {
   valid <- ls(.validJobjs)
   rm(list = valid, envir = .validJobjs)
 
@@ -1035,6 +1050,8 @@ worker_config_deserialize <- function(raw) {
     schema = as.logical(parts[[5]])
   )
 }
+# nocov start
+
 spark_worker_apply <- function(sc, config) {
   hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
@@ -1261,6 +1278,10 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
 
   extractPath
 }
+
+# nocov end
+# nocov start
+
 spark_worker_connect <- function(
   sessionId,
   backendPort = 8880,
@@ -1321,6 +1342,9 @@ spark_worker_connect <- function(
   sc
 }
 
+# nocov end
+# nocov start
+
 connection_is_open.spark_worker_connection <- function(sc) {
   bothOpen <- FALSE
   if (!identical(sc, NULL)) {
@@ -1339,6 +1363,10 @@ worker_connection <- function(x, ...) {
 worker_connection.spark_jobj <- function(x, ...) {
   x$connection
 }
+
+# nocov end
+# nocov start
+
 worker_invoke_method <- function(sc, static, object, method, ...)
 {
   core_invoke_method(sc, static, object, method, ...)
@@ -1359,6 +1387,10 @@ worker_invoke_static <- function(sc, class, method, ...) {
 worker_invoke_new <- function(sc, class, ...) {
   worker_invoke_method(sc, TRUE, class, "<init>", ...)
 }
+
+# nocov end
+# nocov start
+
 worker_log_env <- new.env()
 
 worker_log_session <- function(sessionId) {
@@ -1399,6 +1431,10 @@ worker_log_warning<- function(...) {
 worker_log_error <- function(...) {
   worker_log_level(..., level = "ERROR")
 }
+
+# nocov end
+# nocov start
+
 .worker_globals <- new.env(parent = emptyenv())
 
 spark_worker_main <- function(
@@ -1473,6 +1509,8 @@ spark_worker_hooks <- function() {
   }, as.environment("package:base"))
   lock("stop",  as.environment("package:base"))
 }
+
+# nocov end
 do.call(spark_worker_main, as.list(commandArgs(trailingOnly = TRUE)))
     """
 }
