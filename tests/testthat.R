@@ -9,7 +9,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   test_filter <- NULL
 
   livy_version <- Sys.getenv("LIVY_VERSION")
-  if (nchar(livy_version) > 0) {
+  r_arrow <- Sys.getenv("R_ARROW")
+  if (nchar(livy_version) > 0 || isTRUE(as.logical(r_arrow))) {
     livy_tests <- c(
       "^dplyr$",
       "^dbi$",
