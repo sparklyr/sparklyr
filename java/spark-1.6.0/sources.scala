@@ -1103,12 +1103,21 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
   result <- do.call(closure, closure_args)
   worker_log("computed closure")
 
+  as_factors <- getOption("stringsAsFactors")
+  on.exit(options(stringsAsFactors = as_factors))
+  options(stringsAsFactors = F)
+
   if (!"data.frame" %in% class(result)) {
     worker_log("data.frame expected but ", class(result), " found")
+
     result <- as.data.frame(result)
   }
 
   if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
+
+  if (any(isTRUE(sapply(result, is.factor)))) {
+    result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x))
+  }
 
   result
 }
@@ -1120,7 +1129,8 @@ worker_apply_maybe_schema <- function(result, config) {
     worker_log("updating schema")
     result <- data.frame(
       names = paste(names(result), collapse = "|"),
-      types = paste(lapply(result, firstClass), collapse = "|")
+      types = paste(lapply(result, firstClass), collapse = "|"),
+      stringsAsFactors = F
     )
   }
 
