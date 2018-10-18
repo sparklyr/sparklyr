@@ -159,6 +159,12 @@ spark_apply <- function(x,
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
   proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
 
+  time_zone <- ""
+  arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc)
+  if (arrow) {
+    time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
+  }
+
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
     columns <- args$names
@@ -223,6 +229,9 @@ spark_apply <- function(x,
     if (identical(args$rdd, TRUE)) {
       rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
     }
+    else if (arrow) {
+      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone)
+    }
     else {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
     }
@@ -260,12 +269,6 @@ spark_apply <- function(x,
     connection_config(sc, "sparklyr.apply.options."),
     as.character
   )
-
-  time_zone <- ""
-  arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc)
-  if (arrow) {
-    time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
-  }
 
   if (identical(args$rdd, TRUE)) {
     rdd <- invoke_static(
