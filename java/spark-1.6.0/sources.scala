@@ -1138,7 +1138,11 @@ spark_worker_build_types <- function(sc, columns) {
 
 spark_worker_apply_arrow <- function(sc, config) {
   worker_log("using arrow serializer")
-  if (!require(arrow)) stop("Package 'arrow' not available in worker node.")
+
+  write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
+  record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
+  read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
+  record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
 
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)

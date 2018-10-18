@@ -1040,9 +1040,6 @@ worker_config_deserialize <- function(raw) {
     arrow = as.logical(parts[[6]])
   )
 }
-require(compiler)
-enableJIT(0)
-
 spark_worker_context <- function(sc) {
   hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
@@ -1144,6 +1141,7 @@ spark_worker_build_types <- function(sc, columns) {
 
 spark_worker_apply_arrow <- function(sc, config) {
   worker_log("using arrow serializer")
+  if (!require(arrow)) stop("Package 'arrow' not available in worker node.")
 
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)
@@ -1164,13 +1162,6 @@ spark_worker_apply_arrow <- function(sc, config) {
     schema_input,
     time_zone
   )
-
-  # record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
-  # read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
-  # write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
-  # record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
-
-  library(arrow)
 
   reader <- record_batch_stream_reader(record_batch_raw)
   record_entry <- read_record_batch(reader)
