@@ -150,7 +150,7 @@ cleanup.jobj <- function(jobj) {
   }
 }
 
-clearJobjs <- function() {
+clear_jobjs <- function() {
   valid <- ls(.validJobjs)
   rm(list = valid, envir = .validJobjs)
 
