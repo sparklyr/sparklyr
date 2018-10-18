@@ -1,3 +1,7 @@
+# Sparklyr 0.9.3 (unreleased)
+
+- Proactevely clean JVM objects when R object is deallocated.
+
 # Sparklyr 0.9.2
 
 - Support for Spark 2.3.2.
