@@ -34,4 +34,26 @@ object ApplyUtils {
     )(encoder)
 
   }
+
+  def groupByArrow(
+    data: org.apache.spark.sql.Dataset[Row],
+    colPosition: Array[Int],
+    timeZoneId: String): org.apache.spark.sql.Dataset[Row] = {
+
+    val schema: StructType = StructType(
+      List(
+        StructField("array", ArrayType(BinaryType))
+      )
+    )
+
+    val encoder = RowEncoder(schema)
+    val sourceSchema = data.schema
+
+    data.groupByKey(
+      r => colPosition.map(p => r.get(p)).mkString("|")
+    )(org.apache.spark.sql.Encoders.STRING).mapGroups(
+      (k, r) => Row(ArrowConverters.toBatchArray(r, sourceSchema, timeZoneId))
+    )(encoder)
+
+  }
 }
