@@ -5,6 +5,7 @@ arrow_enabled <- function(sc) {
 arrow_batch <- function(df)
 {
   record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+  write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
 
   record <- record_batch(df)
   write_record_batch(record, raw())
