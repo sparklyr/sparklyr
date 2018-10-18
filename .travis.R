@@ -10,6 +10,8 @@ if (length(args) == 0) {
   source("testthat.R")
 } else if (args[[1]] == "--coverage") {
   covr::codecov()
+} else if (args[[1]] == "--arrow") {
+  devtools::install_github("apache/arrow", subdir = "r")
 } else {
   stop("Unsupported arguments")
 }
