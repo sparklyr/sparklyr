@@ -116,6 +116,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
   read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
   record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+  as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
 
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)
@@ -123,19 +124,26 @@ spark_worker_apply_arrow <- function(sc, config) {
   closure <- unserialize(worker_invoke(context, "getClosure"))
   funcContext <- unserialize(worker_invoke(context, "getContext"))
   grouped_by <- worker_invoke(context, "getGroupBy")
+  grouped <- !is.null(grouped_by) && length(grouped_by) > 0
   columnNames <- worker_invoke(context, "getColumns")
   schema_input <- worker_invoke(context, "getSchema")
   time_zone <- worker_invoke(context, "getTimeZoneId")
 
-  row_iterator <- worker_invoke(context, "getIterator")
-  record_batch_raw <- worker_invoke_static(
-    sc,
-    "sparklyr.ArrowConverters",
-    "toBatchArray",
-    row_iterator,
-    schema_input,
-    time_zone
-  )
+  if (grouped) {
+    record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
+    record_batch_raw_groups_idx <- 1
+    record_batch_raw <- worker_invoke(record_batch_raw_groups[[record_batch_raw_groups_idx]], "get", 0L)
+  } else {
+    row_iterator <- worker_invoke(context, "getIterator")
+    record_batch_raw <- worker_invoke_static(
+      sc,
+      "sparklyr.ArrowConverters",
+      "toBatchArray",
+      row_iterator,
+      schema_input,
+      time_zone
+    )
+  }
 
   reader <- record_batch_stream_reader(record_batch_raw)
   record_entry <- read_record_batch(reader)
@@ -150,7 +158,7 @@ spark_worker_apply_arrow <- function(sc, config) {
     batch_idx <- batch_idx + 1
     worker_log("is processing batch ", batch_idx)
 
-    df <- tibble::as_tibble(record_entry)
+    df <- as_tibble(record_entry)
     colnames(df) <- columnNames[1: length(colnames(df))]
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
@@ -168,6 +176,14 @@ spark_worker_apply_arrow <- function(sc, config) {
     total_rows <- total_rows + nrow(result)
 
     record_entry <- read_record_batch(reader)
+
+    if (grouped && record_entry$is_null() && record_batch_raw_groups_idx < length(record_batch_raw_groups)) {
+      record_batch_raw_groups_idx <- record_batch_raw_groups_idx + 1
+      record_batch_raw <- worker_invoke(record_batch_raw_groups[[record_batch_raw_groups_idx]], "get", 0L)
+
+      reader <- record_batch_stream_reader(record_batch_raw)
+      record_entry <- read_record_batch(reader)
+    }
   }
 
   if (length(all_batches) > 0) {
