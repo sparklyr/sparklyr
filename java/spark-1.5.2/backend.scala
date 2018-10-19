@@ -168,7 +168,7 @@ class Backend() {
         logger = new Logger("Backend", sessionId)
         if (isWorker) logger = new Logger("Worker", sessionId)
 
-        val newPort = Utils.nextPort(port, inetAddress)
+        val newPort = sparklyr.Utils.nextPort(port, inetAddress)
         logger.log("found port " + newPort + " is available")
 
         gatewayServerSocket = new ServerSocket(newPort, 1, inetAddress)
