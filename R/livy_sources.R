@@ -11,6 +11,8 @@ livy_sources_included <- function() {
     "/repartition\\.scala",
     "/tracker\\.scala",
     "/livyutils\\.scala",
+    "/arrowhelper\\.scala",
+    "/arrowconverters\\.scala",
     "/applyutils\\.scala",
     "/classutils\\.scala",
     "/fileutils\\.scala",
