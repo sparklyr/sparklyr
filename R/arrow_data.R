@@ -31,7 +31,7 @@ arrow_read_stream <- function(stream)
 arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
 {
   # replace factors with characters
-  if (any(isTRUE(sapply(df, is.factor)))) {
+  if (any(sapply(df, is.factor))) {
     df <- dplyr::as_data_frame(lapply(df, function(x) if(is.factor(x)) as.character(x) else x))
   }
 

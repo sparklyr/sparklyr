@@ -76,7 +76,7 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
 
   if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
 
-  if (any(isTRUE(sapply(result, is.factor)))) {
+  if (any(sapply(result, is.factor))) {
     result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x))
   }
 
