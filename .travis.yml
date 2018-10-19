@@ -14,49 +14,28 @@ r_packages:
 
 matrix:
   include:
-    - name: "Spark 1.6.3 (R 3.2, openjdk7)"
-      r: 3.2
-      env:
-        - SPARK_VERSION="1.6.3"
-        - JAVA_VERSION=openjdk7
-    - name: "Spark 2.2.1 (R oldrel, oraclejdk8)"
-      r: oldrel
-      env:
-        - SPARK_VERSION="2.2.1"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Spark 2.3.1 (R release, openjdk8)"
-      r: release
-      env:
-        - SPARK_VERSION="2.3.1"
-        - JAVA_VERSION=openjdk8
-    - name: "Livy 0.5.0 (R release, openjdk8)"
-      r: release
-      env:
-        - LIVY_VERSION="0.5.0"
-        - JAVA_VERSION=openjdk8
     - name: "Arrow (R release, openjdk8)"
       r: release
       env:
         - R_ARROW="true"
         - JAVA_VERSION=openjdk8
+      addons:
+        apt:
+          packages:
+            - apt-transport-https
+            - lsb-release
+            - libarrow-dev
+            - libarrow-glib-dev
+          sources:
+            - sourceline: deb https://packages.red-data-tools.org/ubuntu/ trusty/ universe
+              key_url: https://packages.red-data-tools.org/ubuntu/red-data-tools-keyring.gpg
+      after_intall:
+        - Rscript .travis.R --arrow
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
-  - |
-    if [[ R_ARROW == "true" ]]; then
-      sudo apt install -y -V apt-transport-https
-      sudo apt install -y -V lsb-release
-      sudo wget -O /usr/share/keyrings/red-data-tools-keyring.gpg https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-keyring.gpg
-      sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
-      deb [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) universe
-      deb-src [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) universe
-      APT_LINE
-      sudo apt update
-      sudo apt install -y -V libarrow-dev # For C++
-      sudo apt install -y -V libarrow-glib-dev # For GLib (C)
-    fi
-  - Rscript .travis.R --arrow
+  - if [[ R_ARROW == "true" ]]; then;  Rscript .travis.R --arrow; fi
 
 script:
   - |
