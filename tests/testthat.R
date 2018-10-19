@@ -11,6 +11,10 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   livy_version <- Sys.getenv("LIVY_VERSION")
   r_arrow <- Sys.getenv("R_ARROW")
   if (nchar(livy_version) > 0 || isTRUE(as.logical(r_arrow))) {
+    if (isTRUE(as.logical(r_arrow))) {
+      library(arrow)
+    }
+
     livy_tests <- c(
       "^dplyr$",
       "^dbi$",
