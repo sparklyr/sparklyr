@@ -449,6 +449,8 @@ start_shell <- function(master,
 
 #' @export
 spark_disconnect.spark_shell_connection <- function(sc, ...) {
+  clear_jobjs()
+
   stop_shell(sc, ...)
 }
 
