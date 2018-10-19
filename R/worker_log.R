@@ -1,3 +1,5 @@
+# nocov start
+
 worker_log_env <- new.env()
 
 worker_log_session <- function(sessionId) {
@@ -38,3 +40,5 @@ worker_log_warning<- function(...) {
 worker_log_error <- function(...) {
   worker_log_level(..., level = "ERROR")
 }
+
+# nocov end

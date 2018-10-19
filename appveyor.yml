@@ -21,6 +21,7 @@ environment:
     NOT_CRAN: true
     INSTALL_WINUTILS: true
     R_VERSION: release
+    USE_RTOOLS: true
 
   matrix:
   - SPARK_VERSION: "1.6.3"

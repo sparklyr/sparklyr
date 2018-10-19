@@ -1,3 +1,5 @@
+# nocov start
+
 spark_worker_connect <- function(
   sessionId,
   backendPort = 8880,
@@ -58,3 +60,4 @@ spark_worker_connect <- function(
   sc
 }
 
+# nocov end

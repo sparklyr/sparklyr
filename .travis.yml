@@ -4,6 +4,10 @@ language: r
 dist: trusty
 sudo: false
 
+branches:
+  only:
+    - master
+
 cache:
   packages: true
 
@@ -24,10 +28,10 @@ matrix:
       env:
         - SPARK_VERSION="2.2.1"
         - JAVA_VERSION=oraclejdk8
-    - name: "Spark 2.3.1 (R release, openjdk8)"
+    - name: "Spark 2.3.2 (R release, openjdk8)"
       r: release
       env:
-        - SPARK_VERSION="2.3.1"
+        - SPARK_VERSION="2.3.2"
         - JAVA_VERSION=openjdk8
     - name: "Livy 0.5.0 (R release, openjdk8)"
       r: release
