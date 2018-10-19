@@ -10,6 +10,29 @@
 #' @template roxlate-ml-standardization
 #' @param threshold in binary classification prediction, in range [0, 1].
 #' @param raw_prediction_col Raw prediction (a.k.a. confidence) column name.
+#' @examples
+#' \dontrun{
+#' library(dplyr)
+#'
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' partitions <- iris_tbl %>%
+#'   filter(Species != "setosa") %>%
+#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'
+#' iris_training <- partitions$training
+#' iris_test <- partitions$test
+#'
+#' svc_model <- iris_training %>%
+#'   ml_linear_svc(Species ~ .)
+#'
+#' pred <- sdf_predict(iris_test, svc_model)
+#'
+#' ml_binary_classification_evaluator(pred)
+#' }
+
+
 #' @export
 ml_linear_svc <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
                           max_iter = 100, standardization = TRUE, weight_col = NULL,

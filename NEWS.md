@@ -2,6 +2,10 @@
 
 - Proactevely clean JVM objects when R object is deallocated.
 
+### Broom
+  
+- Implemented `tidy()`, `augment()`, and `glance()` for `ml_linear_svc()`and `ml_pca()` models (@samuelmacedo83)
+
 # Sparklyr 0.9.2
 
 - Support for Spark 2.3.2.
@@ -32,7 +36,6 @@
   which would cause verbose column renames.
   
 - Fix to `stream_write_kafka()` and `stream_write_jdbc()`.
-
 # Sparklyr 0.9.0
 
 ### Streaming
