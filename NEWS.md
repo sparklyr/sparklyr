@@ -1,4 +1,19 @@
-# Sparklyr 0.9.2 (unreleased)
+# Sparklyr 0.9.3 (unreleased)
+
+- Proactevely clean JVM objects when R object is deallocated.
+
+### Broom
+  
+- Implemented `tidy()`, `augment()`, and `glance()` for `ml_linear_svc()`and `ml_pca()` models (@samuelmacedo83)
+
+# Sparklyr 0.9.2
+
+- Support for Spark 2.3.2.
+
+- Fix installation error with older versions of `rstudioapi` (#1716).
+
+- Fix missing callstack and error case while logging in
+  `spark_apply()`.
 
 - Fix regression in `sdf_collect()` failing to collect tables.
 
@@ -21,7 +36,6 @@
   which would cause verbose column renames.
   
 - Fix to `stream_write_kafka()` and `stream_write_jdbc()`.
-
 # Sparklyr 0.9.0
 
 ### Streaming
@@ -165,7 +179,7 @@
 
 ### Broom
   
-- Implemented `tidy()`, `augment()`, and `glance()` for `ml_aft_survival_regression()`, `ml_isotonic_regression()`, `ml_naive_bayes()`, `ml_logistic_regression()`, `ml_decision_tree()`, `ml_random_forest()`, `ml_gradient_boosted_trees()`, `ml_linear_svc()`, `ml_bisecting_kmeans()`, `ml_kmeans()`and `ml_gaussian_mixture()` models (@samuelmacedo83)
+- Implemented `tidy()`, `augment()`, and `glance()` for `ml_aft_survival_regression()`, `ml_isotonic_regression()`, `ml_naive_bayes()`, `ml_logistic_regression()`, `ml_decision_tree()`, `ml_random_forest()`, `ml_gradient_boosted_trees()`, `ml_bisecting_kmeans()`, `ml_kmeans()`and `ml_gaussian_mixture()` models (@samuelmacedo83)
 
 ### Configuration
 
