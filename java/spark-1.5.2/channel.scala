@@ -36,13 +36,13 @@ class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializ
       val anyIpAddress = Array[Byte](0, 0, 0, 0)
       val anyInetAddress = InetAddress.getByAddress(anyIpAddress)
 
-      val channelPort = if (deterministicPort) Utils.nextPort(port, anyInetAddress) else 0
+      val channelPort = if (deterministicPort) sparklyr.Utils.nextPort(port, anyInetAddress) else 0
       logger.log("is using port " + channelPort + " for backend channel")
 
       inetAddress = new InetSocketAddress(anyInetAddress, channelPort)
     }
     else {
-      val channelPort = if (deterministicPort) Utils.nextPort(port, InetAddress.getLoopbackAddress()) else 0
+      val channelPort = if (deterministicPort) sparklyr.Utils.nextPort(port, InetAddress.getLoopbackAddress()) else 0
       logger.log("is using port " + channelPort + " for backend channel")
 
       inetAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), channelPort)
