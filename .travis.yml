@@ -53,7 +53,7 @@ matrix:
 before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
-  - if [[ R_ARROW == "true" ]]; then;  Rscript .travis.R --arrow; fi
+  - if [[ R_ARROW == "true" ]]; then Rscript .travis.R --arrow; fi
 
 script:
   - |
