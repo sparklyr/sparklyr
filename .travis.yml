@@ -41,16 +41,14 @@ matrix:
         - JAVA_VERSION=openjdk8
       addons:
         apt:
+          sources:
+            - sourceline: deb https://packages.red-data-tools.org/ubuntu/trusty universe
+              key_url: https://packages.red-data-tools.org/ubuntu/red-data-tools-keyring.gpg
           packages:
             - apt-transport-https
             - lsb-release
             - libarrow-dev
             - libarrow-glib-dev
-          sources:
-            - sourceline: deb https://packages.red-data-tools.org/ubuntu/ trusty/ universe
-              key_url: https://packages.red-data-tools.org/ubuntu/red-data-tools-keyring.gpg
-      after_intall:
-        - Rscript .travis.R --arrow
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
