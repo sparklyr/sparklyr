@@ -31,7 +31,7 @@ import org.apache.spark.util.Utils
 trait ArrowRowIterator extends Iterator[org.apache.spark.sql.catalyst.InternalRow] {
 }
 
-private class ArrowBatchStreamWriter(
+class ArrowBatchStreamWriter(
     schema: StructType,
     out: OutputStream,
     timeZoneId: String) {
