@@ -698,6 +698,7 @@ livy_load_scala_sources <- function(sc) {
     "stream.scala",
     "repartition.scala",
     "arrowhelper.scala",
+    "arrowbatchstreamwriter.scala",
     "arrowconverters.scala",
     "applyutils.scala",
     "classutils.scala",

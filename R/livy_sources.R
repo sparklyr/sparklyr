@@ -12,6 +12,7 @@ livy_sources_included <- function() {
     "/tracker\\.scala",
     "/livyutils\\.scala",
     "/arrowhelper\\.scala",
+    "/arrowbatchstreamwriter\\.scala",
     "/arrowconverters\\.scala",
     "/applyutils\\.scala",
     "/classutils\\.scala",
