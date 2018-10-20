@@ -3,64 +3,36 @@
 // Changes to this file will be reverted.
 //
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileInputStream, OutputStream}
-import java.nio.channels.Channels
-
-import scala.collection.JavaConverters._
-
-import org.apache.arrow.memory.BufferAllocator
-import org.apache.arrow.vector._
-import org.apache.arrow.vector.ipc.{ArrowFileReader, ArrowStreamReader}
-import org.apache.arrow.vector.ipc.message.{ArrowRecordBatch, MessageSerializer}
-import org.apache.arrow.vector.ipc.WriteChannel
-import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
-
-import org.apache.spark.TaskContext
-import org.apache.spark.api.java.JavaRDD
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.execution.LogicalRDD
-import org.apache.spark.sql.execution.arrow.ArrowUtils
-import org.apache.spark.sql.execution.arrow.ArrowWriter
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
-import org.apache.spark.util.Utils
-
 /**
  * Iterator interface to iterate over Arrow record batches and return rows
  */
 trait ArrowRowIterator extends Iterator[org.apache.spark.sql.catalyst.InternalRow] {
 }
 
-class ArrowBatchStreamWriter(
-    schema: StructType,
-    out: OutputStream,
-    timeZoneId: String) {
-
-  val arrowSchema = ArrowUtils.toArrowSchema(schema, timeZoneId)
-  val writeChannel = new WriteChannel(Channels.newChannel(out))
-
-  // Write the Arrow schema first, before batches
-  MessageSerializer.serialize(writeChannel, arrowSchema)
-
-  /**
-   * Consume iterator to write each serialized ArrowRecordBatch to the stream.
-   */
-  def writeBatches(arrowBatchIter: Iterator[Array[Byte]]): Unit = {
-    arrowBatchIter.foreach(writeChannel.write)
-  }
-
-  /**
-   * End the Arrow stream, does not close output stream.
-   */
-  def end(): Unit = {
-    writeChannel.writeIntLittleEndian(0);
-  }
-}
-
 object ArrowConverters {
+  import java.io.{ByteArrayOutputStream, OutputStream}
+  import java.nio.channels.Channels
+
+  import scala.collection.JavaConverters._
+
+  import org.apache.arrow.vector._
+  import org.apache.arrow.vector.ipc.ArrowStreamReader
+  import org.apache.arrow.vector.ipc.message.MessageSerializer
+  import org.apache.arrow.vector.ipc.WriteChannel
+  import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
+
+  import org.apache.spark.TaskContext
+  import org.apache.spark.api.java.JavaRDD
+  import org.apache.spark.rdd.RDD
+  import org.apache.spark.sql.catalyst.encoders.RowEncoder
+  import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
+  import org.apache.spark.sql.types._
+  import org.apache.spark.sql.execution.LogicalRDD
+  import org.apache.spark.sql.execution.arrow.ArrowUtils
+  import org.apache.spark.sql.execution.arrow.ArrowWriter
+  import org.apache.spark.sql.SparkSession
+  import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
+
   def tryWithSafeFinally[T](block: => T)(finallyBlock: => Unit): T = {
     var originalThrowable: Throwable = null
     try {
