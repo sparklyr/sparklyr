@@ -33,10 +33,11 @@ matrix:
       env:
         - SPARK_VERSION="2.3.2"
         - JAVA_VERSION=openjdk8
-    - name: "Livy 0.5.0 (R release, openjdk8)"
+    - name: "Livy 0.5.0 (R release, openjdk8, Spark 2.3.0)"
       r: release
       env:
         - LIVY_VERSION="0.5.0"
+        - SPARK_VERSION="2.3.0"
         - JAVA_VERSION=openjdk8
     - name: "Arrow (R release, openjdk8)"
       r: release
