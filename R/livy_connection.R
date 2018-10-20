@@ -765,15 +765,19 @@ initialize_connection.livy_connection <- function(sc) {
   tryCatch({
     livy_load_scala_sources(sc)
 
-    session <- NULL
-    sc$state$spark_context <- tryCatch({
-      session <<- invoke_static(
+    session <- tryCatch({
+      invoke_static(
         sc,
         "org.apache.spark.sql.SparkSession",
         "builder"
       ) %>%
         invoke("getOrCreate")
+    },
+    error = function(e) {
+      NULL
+    })
 
+    sc$state$spark_context <- tryCatch({
       invoke(session, "sparkContext")
     },
     error = function(e) {
