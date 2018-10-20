@@ -9,6 +9,8 @@ object LivyUtils {
     "SQLUtils" -> SQLUtils,
     "Utils" -> Utils,
     "Repartition" -> Repartition,
+    "ArrowHelper" -> ArrowHelper,
+    "ArrowConverters" -> ArrowConverters,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
     "WorkerUtils" -> WorkerUtils,
