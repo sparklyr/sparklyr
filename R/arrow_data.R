@@ -20,7 +20,7 @@ arrow_read_stream <- function(stream)
   record_entry <- read_record_batch(reader)
 
   entries <- list()
-  while (!record_entry$is_null()) {
+  while (!is.null(record_entry)) {
     entries[[length(entries) + 1]] <- tibble::as_tibble(record_entry)
     record_entry <- read_record_batch(reader)
   }
