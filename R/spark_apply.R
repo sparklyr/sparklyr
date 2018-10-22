@@ -191,6 +191,9 @@ spark_apply <- function(x,
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) packages <- FALSE
 
+  # disable package distribution for livy connections and no package spec
+  if (identical(tolower(sc$method), "livy") && identical(packages, TRUE)) packages <- FALSE
+
   # inject column types to context
   context <- list(
     column_types = spark_apply_colum_types(x),
