@@ -23,6 +23,12 @@ spark_actions <- function(scon) {
           callback = function() {
             utils::browseURL(file.path(scon$master, "ui"))
           }
+        ),
+        "Log" = list(
+          icon = file.path(icons, "spark-log.png"),
+          callback = function() {
+            utils::browseURL(file.path(scon$master, "ui", "session", scon$sessionId, "log"))
+          }
         )
       )
     )
