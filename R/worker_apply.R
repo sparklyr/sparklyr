@@ -98,13 +98,14 @@ worker_apply_maybe_schema <- function(result, config) {
   result
 }
 
-spark_worker_build_types <- function(sc, columns) {
+spark_worker_build_types <- function(context, columns) {
   names <- names(columns)
+  sqlutils <- worker_invoke(context, "getSqlUtils")
   fields <- lapply(names, function(name) {
-    worker_invoke_static(sc, "sparklyr.SQLUtils", "createStructField", name, columns[[name]][[1]], TRUE)
+    worker_invoke(sqlutils, "createStructField", name, columns[[name]][[1]], TRUE)
   })
 
-  worker_invoke_static(sc, "sparklyr.SQLUtils", "createStructType", fields)
+  worker_invoke(sqlutils, "createStructType", fields)
 }
 
 spark_worker_apply_arrow <- function(sc, config) {
@@ -133,9 +134,9 @@ spark_worker_apply_arrow <- function(sc, config) {
     record_batch_raw <- worker_invoke(record_batch_raw_groups[[record_batch_raw_groups_idx]], "get", 0L)
   } else {
     row_iterator <- worker_invoke(context, "getIterator")
-    record_batch_raw <- worker_invoke_static(
-      sc,
-      "sparklyr.ArrowConverters",
+    arrow_converter_impl <- worker_invoke(context, "getArrowConvertersImpl")
+    record_batch_raw <- worker_invoke(
+      arrow_converter_impl,
       "toBatchArray",
       row_iterator,
       schema_input,
@@ -164,7 +165,7 @@ spark_worker_apply_arrow <- function(sc, config) {
     result <- worker_apply_maybe_schema(result, config)
 
     if (is.null(schema_output)) {
-      schema_output <- spark_worker_build_types(sc, lapply(result, class))
+      schema_output <- spark_worker_build_types(context, lapply(result, class))
     }
 
     record <- record_batch(result)
@@ -187,7 +188,8 @@ spark_worker_apply_arrow <- function(sc, config) {
   if (length(all_batches) > 0) {
     worker_log("updating ", total_rows, " rows using ", length(all_batches), " row batches")
 
-    row_iter <- worker_invoke_static(sc, "sparklyr.ArrowConverters", "fromPayloadArray", all_batches, schema_output)
+    arrow_converter <- worker_invoke(context, "getArrowConverters")
+    row_iter <- worker_invoke(arrow_converter, "fromPayloadArray", all_batches, schema_output)
 
     worker_invoke(context, "setResultIter", row_iter)
     worker_log("updated ", total_rows, " rows using ", length(all_batches), " row batches")
