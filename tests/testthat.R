@@ -9,12 +9,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   test_filter <- NULL
 
   livy_version <- Sys.getenv("LIVY_VERSION")
-  r_arrow <- Sys.getenv("R_ARROW")
-  if (nchar(livy_version) > 0 || isTRUE(as.logical(r_arrow))) {
-    if (isTRUE(as.logical(r_arrow))) {
-      get("library")("arrow")
-    }
-
+  if (nchar(livy_version) > 0) {
     livy_tests <- c(
       "^dplyr$",
       "^dbi$",
@@ -24,6 +19,11 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     )
 
     test_filter <- paste(livy_tests, sep = "|")
+  }
+
+  r_arrow <- Sys.getenv("R_ARROW")
+  if (isTRUE(as.logical(r_arrow))) {
+    get("library")("arrow")
   }
 
   test_check("sparklyr", filter = test_filter)
