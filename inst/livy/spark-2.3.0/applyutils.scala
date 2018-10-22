@@ -55,7 +55,7 @@ object ApplyUtils {
       data.groupByKey(
         r => colPosition.map(p => r.get(p)).mkString("|")
       )(org.apache.spark.sql.Encoders.STRING).mapGroups(
-        (k, r) => Row(ArrowConverters.toBatchArray(r, sourceSchema, timeZoneId))
+        (k, r) => Row((new ArrowConvertersImpl()).toBatchArray(r, sourceSchema, timeZoneId))
       )(encoder)
 
     }
