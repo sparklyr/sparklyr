@@ -1,5 +1,7 @@
 # Sparklyr 0.9.2 (unreleased)
 
+- Support for launching Livy logs from connection pane.
+
 - Removed `overwrite` parameter in `spark_read_table()` (#1698).
 
 - Fix regression preventing using R 3.2 (#1695).
