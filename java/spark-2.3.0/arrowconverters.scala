@@ -6,7 +6,7 @@ package sparklyr
 trait ArrowRowIterator extends Iterator[org.apache.spark.sql.catalyst.InternalRow] {
 }
 
-object ArrowConverters {
+class ArrowConvertersImpl {
   import java.io.{ByteArrayOutputStream, OutputStream}
   import java.nio.channels.Channels
 
@@ -58,7 +58,7 @@ object ArrowConverters {
       timeZoneId: String,
       context: TaskContext): Iterator[Array[Byte]] = {
 
-      toBatchIterator(rowIter, schema, maxRecordsPerBatch, timeZoneId, Option(context))
+      (new ArrowConvertersImpl()).toBatchIterator(rowIter, schema, maxRecordsPerBatch, timeZoneId, Option(context))
   }
 
   def toBatchArray(
@@ -143,19 +143,6 @@ object ArrowConverters {
     }
   }
 
-  def fromPayloadArray(
-    records: Array[Array[Byte]],
-    schema: StructType): Iterator[org.apache.spark.sql.Row] = {
-
-    val context = TaskContext.get()
-    val singleRecords: Iterator[Array[Byte]] = records.map(record => {record}).iterator
-
-    val iter: ArrowRowIterator = ArrowConverters.fromPayloadIterator(singleRecords, Option.empty)
-
-    val converter = org.apache.spark.sql.catalyst.CatalystTypeConverters.createToScalaConverter(schema)
-    iter.map(converter(_).asInstanceOf[org.apache.spark.sql.Row])
-  }
-
   def fromPayloadIterator(
       payloadIter: Iterator[Array[Byte]],
       context: TaskContext): ArrowRowIterator = {
@@ -220,6 +207,46 @@ object ArrowConverters {
       }
     }
   }
+}
+
+object ArrowConverters {
+  import java.io.{ByteArrayOutputStream, OutputStream}
+  import java.nio.channels.Channels
+
+  import scala.collection.JavaConverters._
+
+  import org.apache.arrow.vector._
+  import org.apache.arrow.vector.ipc.ArrowStreamReader
+  import org.apache.arrow.vector.ipc.message.MessageSerializer
+  import org.apache.arrow.vector.ipc.WriteChannel
+  import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
+
+  import org.apache.spark.TaskContext
+  import org.apache.spark.api.java.JavaRDD
+  import org.apache.spark.rdd.RDD
+  import org.apache.spark.sql.catalyst.encoders.RowEncoder
+  import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
+  import org.apache.spark.sql.types._
+  import org.apache.spark.sql.execution.LogicalRDD
+  import org.apache.spark.sql.execution.arrow.ArrowUtils
+  import org.apache.spark.sql.execution.arrow.ArrowWriter
+  import org.apache.spark.sql.SparkSession
+  import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
+
+  def fromPayloadArray(
+    records: Array[Array[Byte]],
+    schema: StructType): Iterator[org.apache.spark.sql.Row] = {
+
+    val context = TaskContext.get()
+    val singleRecords: Iterator[Array[Byte]] = records.map(record => {record}).iterator
+
+    val iter: ArrowRowIterator = (new ArrowConvertersImpl()).fromPayloadIterator(singleRecords, Option.empty)
+
+    iter.map({
+      val converter = org.apache.spark.sql.catalyst.CatalystTypeConverters.createToScalaConverter(schema)
+      converter(_).asInstanceOf[org.apache.spark.sql.Row]
+    })
+  }
 
   def toArrowBatchRdd(
       df: DataFrame,
@@ -232,7 +259,7 @@ object ArrowConverters {
     val encoder = org.apache.spark.sql.Encoders.BINARY
 
     val batches: Array[Array[Byte]] = df.mapPartitions(
-      iter => toBatchIterator(iter, schema, maxRecordsPerBatch, timeZoneId, TaskContext.get())
+      iter => (new ArrowConvertersImpl()).toBatchIterator(iter, schema, maxRecordsPerBatch, timeZoneId, TaskContext.get())
     )(encoder).collect()
 
     val out = new ByteArrayOutputStream()
@@ -248,8 +275,9 @@ object ArrowConverters {
       schema: StructType,
       sparkSession: SparkSession): DataFrame = {
     val rdd = payloadRDD.rdd.mapPartitions { iter =>
+      val converters = new ArrowConvertersImpl()
       val context = TaskContext.get()
-      ArrowConverters.fromPayloadIterator(iter, context)
+      converters.fromPayloadIterator(iter, context)
     }
 
     val logger = new Logger("Arrow", 0)
