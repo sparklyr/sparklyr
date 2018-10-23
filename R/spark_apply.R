@@ -165,6 +165,20 @@ spark_apply <- function(x,
     time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
   }
 
+  # build reduced size query plan in case schema needs to be inferred
+  if (sdf_is_streaming(sdf)) {
+    sdf_limit <- sdf
+  }
+  else {
+    sdf_limit <- invoke(
+      sdf,
+      "limit",
+      cast_scalar_integer(
+        spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+      )
+    )
+  }
+
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
     columns <- args$names
@@ -234,9 +248,11 @@ spark_apply <- function(x,
     }
     else if (arrow) {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone)
     }
     else {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
     }
   }
 
@@ -308,19 +324,6 @@ spark_apply <- function(x,
           types = "character"
         )
       )
-
-      if (sdf_is_streaming(sdf)) {
-        sdf_limit <- sdf
-      }
-      else {
-        sdf_limit <- invoke(
-          sdf,
-          "limit",
-          cast_scalar_integer(
-            spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
-          )
-        )
-      }
 
       columns_op <- invoke_static(
         sc,
