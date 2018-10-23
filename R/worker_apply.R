@@ -81,7 +81,7 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
 
 spark_worker_clean_factors <- function(result) {
   if (any(sapply(result, is.factor))) {
-    result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x))
+    result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x), stringsAsFactors = F)
   }
 
   result
