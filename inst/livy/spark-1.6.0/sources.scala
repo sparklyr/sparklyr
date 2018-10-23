@@ -1118,6 +1118,10 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
 
   if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
 
+  result
+}
+
+spark_worker_clean_factors <- function(result) {
   if (any(sapply(result, is.factor))) {
     result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x))
   }
@@ -1125,7 +1129,7 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
   result
 }
 
-worker_apply_maybe_schema <- function(result, config) {
+spark_worker_apply_maybe_schema <- function(result, config) {
   firstClass <- function(e) class(e)[[1]]
 
   if (identical(config$schema, TRUE)) {
@@ -1148,6 +1152,31 @@ spark_worker_build_types <- function(context, columns) {
   })
 
   worker_invoke(sqlutils, "createStructType", fields)
+}
+
+spark_worker_get_group_batch <- function(batch) {
+  worker_invoke(
+    batch, "get", 0L
+  )
+}
+
+spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
+  if (grouped) {
+    if (nrow(result) > 0) {
+      new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
+      names(new_column_values) <- grouped_by
+
+      if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
+      result <- do.call("cbind", list(new_column_values, result))
+
+      names(result) <- gsub("\\.", "_", make.unique(names(result)))
+    }
+    else {
+      result <- NULL
+    }
+  }
+
+  result
 }
 
 spark_worker_apply_arrow <- function(sc, config) {
@@ -1173,7 +1202,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   if (grouped) {
     record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
     record_batch_raw_groups_idx <- 1
-    record_batch_raw <- worker_invoke(record_batch_raw_groups[[record_batch_raw_groups_idx]], "get", 0L)
+    record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
   } else {
     row_iterator <- worker_invoke(context, "getIterator")
     arrow_converter_impl <- worker_invoke(context, "getArrowConvertersImpl")
@@ -1195,7 +1224,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   schema_output <- NULL
 
   batch_idx <- 0
-  while (!record_entry$is_null()) {
+  while (!is.null(record_entry)) {
     batch_idx <- batch_idx + 1
     worker_log("is processing batch ", batch_idx)
 
@@ -1204,7 +1233,11 @@ spark_worker_apply_arrow <- function(sc, config) {
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    result <- worker_apply_maybe_schema(result, config)
+    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+
+    result <- spark_worker_clean_factors(result)
+
+    result <- spark_worker_apply_maybe_schema(result, config)
 
     if (is.null(schema_output)) {
       schema_output <- spark_worker_build_types(context, lapply(result, class))
@@ -1218,9 +1251,9 @@ spark_worker_apply_arrow <- function(sc, config) {
 
     record_entry <- read_record_batch(reader)
 
-    if (grouped && record_entry$is_null() && record_batch_raw_groups_idx < length(record_batch_raw_groups)) {
+    if (grouped && is.null(record_entry) && record_batch_raw_groups_idx < length(record_batch_raw_groups)) {
       record_batch_raw_groups_idx <- record_batch_raw_groups_idx + 1
-      record_batch_raw <- worker_invoke(record_batch_raw_groups[[record_batch_raw_groups_idx]], "get", 0L)
+      record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
 
       reader <- record_batch_stream_reader(record_batch_raw)
       record_entry <- read_record_batch(reader)
@@ -1316,22 +1349,11 @@ spark_worker_apply <- function(sc, config) {
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    if (grouped) {
-      if (nrow(result) > 0) {
-        new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
-        names(new_column_values) <- grouped_by
+    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
-        if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
-        result <- do.call("cbind", list(new_column_values, result))
+    result <- spark_worker_clean_factors(result)
 
-        names(result) <- gsub("\\.", "_", make.unique(names(result)))
-      }
-      else {
-        result <- NULL
-      }
-    }
-
-    result <- worker_apply_maybe_schema(result, config)
+    result <- spark_worker_apply_maybe_schema(result, config)
 
     all_results <- rbind(all_results, result)
   }
