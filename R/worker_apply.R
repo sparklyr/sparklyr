@@ -83,7 +83,7 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
   result
 }
 
-worker_apply_maybe_schema <- function(result, config) {
+spark_worker_apply_maybe_schema <- function(result, config) {
   firstClass <- function(e) class(e)[[1]]
 
   if (identical(config$schema, TRUE)) {
@@ -114,7 +114,7 @@ spark_worker_get_group_batch <- function(batch) {
   )
 }
 
-worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
+spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
   if (grouped) {
     if (nrow(result) > 0) {
       new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
@@ -187,9 +187,9 @@ spark_worker_apply_arrow <- function(sc, config) {
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    result <- worker_add_group_by_column(df, result, grouped, grouped_by)
+    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
-    result <- worker_apply_maybe_schema(result, config)
+    result <- spark_worker_apply_maybe_schema(result, config)
 
     if (is.null(schema_output)) {
       schema_output <- spark_worker_build_types(context, lapply(result, class))
@@ -301,9 +301,9 @@ spark_worker_apply <- function(sc, config) {
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    result <- worker_add_group_by_column(df, result, grouped, grouped_by)
+    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
-    result <- worker_apply_maybe_schema(result, config)
+    result <- spark_worker_apply_maybe_schema(result, config)
 
     all_results <- rbind(all_results, result)
   }
