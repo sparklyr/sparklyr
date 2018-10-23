@@ -108,6 +108,12 @@ spark_worker_build_types <- function(context, columns) {
   worker_invoke(sqlutils, "createStructType", fields)
 }
 
+spark_worker_get_group_batch <- function(batch) {
+  worker_invoke(
+    batch, "get", 0L
+  )
+}
+
 spark_worker_apply_arrow <- function(sc, config) {
   worker_log("using arrow serializer")
 
@@ -131,7 +137,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   if (grouped) {
     record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
     record_batch_raw_groups_idx <- 1
-    record_batch_raw <- worker_invoke(record_batch_raw_groups[[record_batch_raw_groups_idx]], "get", 0L)
+    record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
   } else {
     row_iterator <- worker_invoke(context, "getIterator")
     arrow_converter_impl <- worker_invoke(context, "getArrowConvertersImpl")
@@ -178,7 +184,7 @@ spark_worker_apply_arrow <- function(sc, config) {
 
     if (grouped && is.null(record_entry) && record_batch_raw_groups_idx < length(record_batch_raw_groups)) {
       record_batch_raw_groups_idx <- record_batch_raw_groups_idx + 1
-      record_batch_raw <- worker_invoke(record_batch_raw_groups[[record_batch_raw_groups_idx]], "get", 0L)
+      record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
 
       reader <- record_batch_stream_reader(record_batch_raw)
       record_entry <- read_record_batch(reader)
