@@ -116,6 +116,25 @@ spark_worker_get_group_batch <- function(batch) {
   )
 }
 
+worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
+  if (grouped) {
+    if (nrow(result) > 0) {
+      new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
+      names(new_column_values) <- grouped_by
+
+      if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
+      result <- do.call("cbind", list(new_column_values, result))
+
+      names(result) <- gsub("\\.", "_", make.unique(names(result)))
+    }
+    else {
+      result <- NULL
+    }
+  }
+
+  result
+}
+
 spark_worker_apply_arrow <- function(sc, config) {
   worker_log("using arrow serializer")
 
@@ -169,6 +188,8 @@ spark_worker_apply_arrow <- function(sc, config) {
     colnames(df) <- columnNames[1: length(colnames(df))]
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
+
+    result <- worker_add_group_by_column(df, result, grouped, grouped_by)
 
     result <- worker_apply_maybe_schema(result, config)
 
@@ -282,20 +303,7 @@ spark_worker_apply <- function(sc, config) {
 
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    if (grouped) {
-      if (nrow(result) > 0) {
-        new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
-        names(new_column_values) <- grouped_by
-
-        if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
-        result <- do.call("cbind", list(new_column_values, result))
-
-        names(result) <- gsub("\\.", "_", make.unique(names(result)))
-      }
-      else {
-        result <- NULL
-      }
-    }
+    result <- worker_add_group_by_column(df, result, grouped, grouped_by)
 
     result <- worker_apply_maybe_schema(result, config)
 
