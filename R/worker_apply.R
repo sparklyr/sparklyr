@@ -76,6 +76,10 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
 
   if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
 
+  result
+}
+
+spark_worker_clean_factors <- function(result) {
   if (any(sapply(result, is.factor))) {
     result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x))
   }
@@ -188,6 +192,8 @@ spark_worker_apply_arrow <- function(sc, config) {
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
     result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+
+    result <- spark_worker_clean_factors(result)
 
     result <- spark_worker_apply_maybe_schema(result, config)
 
@@ -302,6 +308,8 @@ spark_worker_apply <- function(sc, config) {
     result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
     result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+
+    result <- spark_worker_clean_factors(result)
 
     result <- spark_worker_apply_maybe_schema(result, config)
 
