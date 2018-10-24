@@ -28,6 +28,7 @@ object SQLUtils {
     dataType match {
       case "byte" => org.apache.spark.sql.types.ByteType
       case "integer" => org.apache.spark.sql.types.IntegerType
+      case "integer64" => org.apache.spark.sql.types.LongType
       case "float" => org.apache.spark.sql.types.FloatType
       case "double" => org.apache.spark.sql.types.DoubleType
       case "numeric" => org.apache.spark.sql.types.DoubleType
