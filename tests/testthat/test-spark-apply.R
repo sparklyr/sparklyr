@@ -118,17 +118,17 @@ test_that("'spark_apply' works over empty partitions", {
 
 test_that("'spark_apply' works over 'tryCatch'", {
   expect_equal(
-    sdf_len(sc, 3, repartition = 3) %>%
+    sdf_len(sc, 1) %>%
       spark_apply(function(e) {
         tryCatch({
-          if (e == "2") stop("x") else e
+          stop("x")
         }, error = function(e) {
           100
         })
       }) %>%
-      collect() %>%
-      as.data.frame(),
-    data.frame(id = c(1, 100, 3))
+      pull() %>%
+      as.integer(),
+    100
   )
 })
 
