@@ -6,6 +6,9 @@ test_requires("nycflights13")
 flights_small <- flights %>% dplyr::sample_n(10000)
 flights_tbl <- testthat_tbl("flights_small")
 
+logical_nas <- data_frame(bools = c(T, NA, F))
+logical_nas_tbl <- testthat_tbl("logical_nas")
+
 ensure_round_trip <- function(sc, data) {
   # round-trip data through Spark
   copied <- copy_to(sc, data, overwrite = TRUE)
@@ -307,17 +310,8 @@ test_that("collect() can retrieve specific dates without timezones", {
 })
 
 test_that("collect() can retrieve logical columns with NAs", {
-  data <- data_frame(
-    bools = c(T, NA, F)
-  )
-
-  data_tbl <- sdf_copy_to(
-    sc,
-    data
-  )
-
   expect_equal(
-    data,
-    data_tbl
+    logical_nas,
+    logical_nas_tbl %>% dplyr::collect()
   )
 })
