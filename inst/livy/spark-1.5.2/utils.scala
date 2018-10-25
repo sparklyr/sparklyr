@@ -64,7 +64,10 @@ object Utils {
   }
 
   def collectImplBoolean(local: Array[Row], idx: Integer) = {
-    local.map{row => row(idx).asInstanceOf[Boolean]}
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Boolean]) if(el.asInstanceOf[Boolean]) 1 else 0 else scala.Int.MinValue
+    }}
   }
 
   def collectImplInteger(local: Array[Row], idx: Integer) = {
