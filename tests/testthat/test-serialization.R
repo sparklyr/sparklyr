@@ -305,3 +305,19 @@ test_that("collect() can retrieve specific dates without timezones", {
     )
   )
 })
+
+test_that("collect() can retrieve logical columns with NAs", {
+  data <- data_frame(
+    bools = c(T, NA, F)
+  )
+
+  data_tbl <- sdf_copy_to(
+    sc,
+    data
+  )
+
+  expect_equal(
+    data,
+    data_tbl
+  )
+})
