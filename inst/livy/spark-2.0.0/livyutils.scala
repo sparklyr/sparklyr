@@ -11,7 +11,6 @@ object LivyUtils {
     "Repartition" -> Repartition,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
-    "WorkerUtils" -> WorkerUtils,
     "MLUtils" -> MLUtils,
     "MLUtils2" -> MLUtils2
    )

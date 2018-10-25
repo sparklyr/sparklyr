@@ -1,5 +1,8 @@
 # Sparklyr 0.9.3 (unreleased)
 
+ - `sdf_len()`, `sdf_along()` and `sdf_seq()` default to 32 bit integers
+   but allow support for 64 bits through `bits` parameter.
+
 - Removed `stream_read_jdbc()` and `stream_write_jdbc()` since they are 
   not yet implemented in Spark.
   
@@ -26,6 +29,8 @@
   under OS X Mojave.
 
 - Support for launching Livy logs from connection pane.
+
+# Sparklyr 0.9.2
 
 - Removed `overwrite` parameter in `spark_read_table()` (#1698).
 

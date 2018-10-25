@@ -713,7 +713,6 @@ livy_load_scala_sources <- function(sc) {
     "workerapply.scala",
     "workerrdd.scala",
     "workerhelper.scala",
-    "workerutils.scala",
     "mlutils.scala",
     "mlutils2.scala",
     "bucketizerutils.scala",
