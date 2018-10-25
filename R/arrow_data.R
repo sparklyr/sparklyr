@@ -18,7 +18,7 @@ arrow_enabled_object.tbl_spark <- function(object) {
 }
 
 arrow_enabled_object.spark_jobj <- function(object) {
-  unsupported_expr <- ".Vector|ArrayType|TimestampType"
+  unsupported_expr <- ".Vector|ArrayType|TimestampType|StructType"
   unsupported <- object %>%
     sdf_schema() %>%
     Filter(function(x) grepl(unsupported_expr, x$type), .)
