@@ -155,7 +155,17 @@ sdf_collect_static <- function(object, ...) {
   # set column names and return dataframe
   colNames <- invoke(sdf, "columns")
   names(fixed) <- as.character(colNames)
-  as_data_frame(fixed, stringsAsFactors = FALSE, optional = TRUE)
+  fixed <- as_data_frame(fixed, stringsAsFactors = FALSE, optional = TRUE)
+
+  # fix booleans
+  schema <- sdf_schema(sdf)
+  for (field in schema) {
+    if (field$type == "BooleanType" && field$name %in% names(fixed)) {
+      fixed[[field$name]] <- as.logical(fixed[[field$name]])
+    }
+  }
+
+  fixed
 }
 
 # Split a Spark DataFrame
