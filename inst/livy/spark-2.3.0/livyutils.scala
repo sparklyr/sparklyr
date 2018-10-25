@@ -13,7 +13,6 @@ object LivyUtils {
     "ArrowConverters" -> ArrowConverters,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
-    "WorkerUtils" -> WorkerUtils,
     "MLUtils" -> MLUtils,
     "MLUtils2" -> MLUtils2,
     "BucketizerUtils" -> BucketizerUtils

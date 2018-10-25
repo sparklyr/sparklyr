@@ -26,7 +26,6 @@ livy_sources_included <- function() {
     "/workerhelper\\.scala",
     "/workerapply\\.scala",
     "/workerrdd\\.scala",
-    "/workerutils\\.scala",
     "/mlutils\\.scala",
     "/mlutils2\\.scala",
     "/bucketizerutils\\.scala"

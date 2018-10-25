@@ -457,6 +457,24 @@ object Utils {
     // give up after 100 port searches
     if (freePort - port < 100) freePort else 0;
   }
+
+  def buildStructTypeForIntegerField(): StructType = {
+    val fields = Array(StructField("id", IntegerType, false))
+    StructType(fields)
+  }
+
+  def buildStructTypeForLongField(): StructType = {
+    val fields = Array(StructField("id", LongType, false))
+    StructType(fields)
+  }
+
+  def mapRddLongToRddRow(rdd: RDD[Long]): RDD[Row] = {
+    rdd.map(x => org.apache.spark.sql.Row(x))
+  }
+
+  def mapRddIntegerToRddRow(rdd: RDD[Integer]): RDD[Row] = {
+    rdd.map(x => org.apache.spark.sql.Row(x))
+  }
 }
 
 
