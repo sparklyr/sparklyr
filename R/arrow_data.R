@@ -4,7 +4,7 @@ arrow_enabled <- function(sc, object = NULL) {
     enabled
   }
   else {
-    unsupported_expr <- ".Vector"
+    unsupported_expr <- ".Vector|ArrayType"
     unsupported <- object %>%
       sdf_schema() %>%
       Filter(function(x) grepl(unsupported_expr, x$type), .)
