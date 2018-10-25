@@ -1,5 +1,7 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Support for collecting NA values from logical columns (#1729).
+
 - Proactevely clean JVM objects when R object is deallocated.
 
 ### Broom
