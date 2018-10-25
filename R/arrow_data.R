@@ -1,5 +1,18 @@
-arrow_enabled <- function(sc) {
-  spark_config_value(sc, "sparklyr.arrow", "package:arrow" %in% search())
+arrow_enabled <- function(sc, object = NULL) {
+  enabled <- spark_config_value(sc, "sparklyr.arrow", "package:arrow" %in% search())
+  if (is.null(object) || !enabled) {
+    enabled
+  }
+  else {
+    unsupported_expr <- ".Vector"
+    unsupported <- object %>%
+      sdf_schema() %>%
+      Filter(function(x) grepl(unsupported_expr, x$type), .)
+    enabled <- length(unsupported) == 0
+    if (!enabled) warning("Arrow disabled due to columns: ", paste(names(unsupported), collapse = ", "))
+
+    enabled
+  }
 }
 
 arrow_batch <- function(df)
