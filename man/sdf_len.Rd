@@ -4,7 +4,8 @@
 \alias{sdf_len}
 \title{Create DataFrame for Length}
 \usage{
-sdf_len(sc, length, repartition = NULL)
+sdf_len(sc, length, repartition = NULL, type = c("integer",
+  "integer64"))
 }
 \arguments{
 \item{sc}{The associated Spark connection.}
@@ -13,6 +14,8 @@ sdf_len(sc, length, repartition = NULL)
 
 \item{repartition}{The number of partitions to use when distributing the
 data across the Spark cluster.}
+
+\item{type}{The data type to use for the index, either \code{"integer"} or \code{"integer64"}.}
 }
 \description{
 Creates a DataFrame for the given length.
