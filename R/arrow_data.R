@@ -1,18 +1,41 @@
-arrow_enabled <- function(sc, object = NULL) {
+arrow_enabled <- function(sc, object) {
   enabled <- spark_config_value(sc, "sparklyr.arrow", "package:arrow" %in% search())
-  if (is.null(object) || !enabled) {
+  if (!enabled) {
     enabled
   }
   else {
-    unsupported_expr <- ".Vector|ArrayType"
-    unsupported <- object %>%
-      sdf_schema() %>%
-      Filter(function(x) grepl(unsupported_expr, x$type), .)
-    enabled <- length(unsupported) == 0
-    if (!enabled) warning("Arrow disabled due to columns: ", paste(names(unsupported), collapse = ", "))
-
-    enabled
+    arrow_enabled_object(object)
   }
+}
+
+arrow_enabled_object <- function(object) {
+  UseMethod("arrow_enabled_object")
+}
+
+arrow_enabled_object.tbl_spark <- function(object) {
+  sdf <- spark_dataframe(object)
+  arrow_enabled_object(sdf)
+}
+
+arrow_enabled_object.spark_jobj <- function(object) {
+  unsupported_expr <- ".Vector|ArrayType|TimestampType"
+  unsupported <- object %>%
+    sdf_schema() %>%
+    Filter(function(x) grepl(unsupported_expr, x$type), .)
+  enabled <- length(unsupported) == 0
+  if (!enabled) warning("Arrow disabled due to columns: ", paste(names(unsupported), collapse = ", "))
+
+  enabled
+}
+
+arrow_enabled_object.data.frame <- function(object) {
+  unsupported_expr <- "POSIXct"
+  unsupported <- Filter(function(e) grepl(unsupported_expr , e), sapply(object, function(e) class(e)[[1]]))
+
+  enabled <- length(unsupported) == 0
+  if (!enabled) warning("Arrow disabled due to columns: ", paste(names(unsupported), collapse = ", "))
+
+  enabled
 }
 
 arrow_batch <- function(df)

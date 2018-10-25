@@ -137,7 +137,7 @@ spark_data_copy <- function(
   serializer <- ifelse(
                   is.null(serializer),
                   ifelse(
-                    arrow_enabled(sc),
+                    arrow_enabled(sc, df),
                     "arrow",
                     ifelse(
                       spark_connection_is_local(sc) || spark_connection_is_yarn_client(sc),
