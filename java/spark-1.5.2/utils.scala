@@ -475,8 +475,8 @@ object Utils {
     rdd.map(x => org.apache.spark.sql.Row(x))
   }
 
-  def mapRddIntegerToRddRow(rdd: RDD[Integer]): RDD[Row] = {
-    rdd.map(x => org.apache.spark.sql.Row(x))
+  def mapRddIntegerToRddRow(rdd: RDD[Long]): RDD[Row] = {
+    rdd.map(x => org.apache.spark.sql.Row(x.toInt))
   }
 }
 
