@@ -26,7 +26,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     get("library")("arrow")
   }
 
-  test_check("sparklyr", filter = test_filter)
-
   on.exit({ spark_disconnect_all() ; livy_service_stop() })
+
+  test_check("sparklyr", filter = test_filter)
 }
