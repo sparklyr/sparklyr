@@ -248,12 +248,13 @@ test_that("ml_bisecting_kmeans() works properly", {
   expect_equal(bkm$cluster_centers(), cluster_centers)
 })
 
-test_that("ml_bisecting_kmeans() works properly", {
+test_that("ml_bisecting_kmeans() works properly with iris", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "ml_bisecting_kmeans() requires Spark 2.0.0+")
   iris_tbl <- testthat_tbl("iris")
   expect_output_file(
     print(ml_bisecting_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11)),
-    output_file("print/bisecting-kmeans.txt")
+    output_file("print/bisecting-kmeans.txt"),
+    tolerance = 0.5
   )
 })
