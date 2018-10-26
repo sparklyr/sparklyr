@@ -263,6 +263,9 @@ test_that("invoke() can roundtrip collect fields", {
 })
 
 test_that("collect() can retrieve as.POSIXct fields with timezones", {
+  # Disabled in arrow while #1737 is investigated
+  skip_on_arrow()
+
   tz_entries <- list(
     as.POSIXct("2018-01-01", tz = "UTC"),
     as.POSIXct("2018-01-01", tz = "GMT"),
