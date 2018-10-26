@@ -28,6 +28,5 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   on.exit({ spark_disconnect_all() ; livy_service_stop() })
 
-  test_filter <- "^config$"
   test_check("sparklyr", filter = test_filter)
 }
