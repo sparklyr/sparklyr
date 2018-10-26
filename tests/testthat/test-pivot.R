@@ -21,7 +21,7 @@ test_that("we can construct a simple pivot table", {
 
   expect_equal(
     lapply(unname(s)[-1], as.numeric),
-    lapply(unname(r)[-1], as.numeric),
+    lapply(unname(r)[-1], as.numeric)
   )
 
 })
