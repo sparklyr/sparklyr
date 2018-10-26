@@ -5,13 +5,14 @@ test_that("kmeans.tidy() works", {
   test_requires_version("2.0.0")
   mtcars_tbl <- testthat_tbl("mtcars")
 
-  td1 <- mtcars_tbl %>%
-    ml_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
-    tidy()
+  model <- mtcars_tbl %>%
+    ml_kmeans(~ mpg + cyl, k = 4L, seed = 123)
+
+  td1 <- model %>% tidy()
 
   check_tidy(td1, exp.row = 4,
              exp.names = c("mpg", "cyl", "size", "cluster"))
-  expect_equal(td1$size, c(14, 2, 6 , 10))
+  expect_equal(td1$size, model$summary$cluster_sizes())
 
 })
 
