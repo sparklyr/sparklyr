@@ -28,14 +28,18 @@ arrow_enabled_object.spark_jobj <- function(object) {
   enabled
 }
 
-arrow_enabled_object.data.frame <- function(object) {
+arrow_enabled_dataframe_schema <- function(types) {
   unsupported_expr <- "POSIXct"
-  unsupported <- Filter(function(e) grepl(unsupported_expr , e), sapply(object, function(e) class(e)[[1]]))
+  unsupported <- Filter(function(e) grepl(unsupported_expr , e), types)
 
   enabled <- length(unsupported) == 0
   if (!enabled) warning("Arrow disabled due to columns: ", paste(names(unsupported), collapse = ", "))
 
   enabled
+}
+
+arrow_enabled_object.data.frame <- function(object) {
+  arrow_enabled_dataframe_schema(sapply(object, function(e) class(e)[[1]]))
 }
 
 arrow_batch <- function(df)

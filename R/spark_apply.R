@@ -347,6 +347,9 @@ spark_apply <- function(x,
       )
 
       columns_query <- columns_op %>% sdf_collect()
+      if (arrow && !arrow_enabled_dataframe_schema(columns_query$types)) {
+        arrow <- FALSE
+      }
 
       columns_infer <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
       names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
