@@ -2,6 +2,8 @@ context("dplyr top_n")
 sc <- testthat_spark_connection()
 
 test_that("top_n works as expected", {
+  skip_on_arrow()
+
   test_requires_version("2.0.0", "bug in spark-csv")
   test_requires("dplyr")
 
