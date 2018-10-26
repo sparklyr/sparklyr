@@ -121,6 +121,9 @@ test_that("'sdf_bind_rows' err for non-tbl_spark", {
 })
 
 test_that("'sdf_bind_rows' handles column type upcasting (#804)", {
+  # Need support for NaN ARROW-3615
+  skip_on_arrow()
+
   test_requires("dplyr")
 
   df5a <- data_frame(year = as.double(2005:2006),
