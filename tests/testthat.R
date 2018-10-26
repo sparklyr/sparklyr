@@ -21,6 +21,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     test_filter <- paste(livy_tests, sep = "|")
   }
 
+  test_filter <- "broom-random|dplyr-top-n|ml-clustering-bisecting-kmeans|pivot|serialization|spark-apply"
+
   r_arrow <- isTRUE(as.logical(Sys.getenv("R_ARROW")))
   if (r_arrow) {
     get("library")("arrow")
