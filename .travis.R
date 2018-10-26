@@ -7,6 +7,8 @@ if (length(args) == 0) {
   sparklyr_package <- parent_dir[grepl("sparklyr_", parent_dir)]
   install.packages(sparklyr_package, repos = NULL, type = "source")
 
+  on.exit(setwd(".."))
+  setwd("tests")
   source("testthat.R")
 } else if (args[[1]] == "--coverage") {
   covr::codecov()

@@ -18,9 +18,10 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
       "^ml-clustering-kmeans$"
     )
 
-    test_filter <- paste(livy_tests, sep = "|")
+    test_filter <- paste(livy_tests, collapse = "|")
   }
 
+  test_filter <- "^config$"
   r_arrow <- isTRUE(as.logical(Sys.getenv("R_ARROW")))
   if (r_arrow) {
     get("library")("arrow")
