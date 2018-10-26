@@ -21,8 +21,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     test_filter <- paste(livy_tests, sep = "|")
   }
 
-  r_arrow <- Sys.getenv("R_ARROW")
-  if (isTRUE(as.logical(r_arrow))) {
+  r_arrow <- isTRUE(as.logical(Sys.getenv("R_ARROW")))
+  if (r_arrow) {
     get("library")("arrow")
   }
 
