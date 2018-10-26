@@ -69,7 +69,7 @@ script:
       travis_wait 45 Rscript .travis.R --coverage
     else
       travis_wait 35 R CMD check --no-build-vignettes --no-tests --no-manual sparklyr*tar.gz
-      travis_wait 35 Rscript .travis.R --testthat
+      Rscript .travis.R --testthat
     fi
 
 after_failure:
