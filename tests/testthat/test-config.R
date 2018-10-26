@@ -1,7 +1,7 @@
 context("config")
 
 test_that("spark_config_exists function works as expected", {
-  expect_false(
+  expect_true(
     spark_config_exists(list(), "sparklyr.log.console", FALSE)
   )
 
