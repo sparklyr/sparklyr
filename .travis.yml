@@ -66,7 +66,7 @@ script:
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
     if [[ $SPARK_VERSION == "2.3.0" ]]; then
       R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
-      travis_wait 45 Rscript .travis.R --coverage
+      Rscript .travis.R --coverage
     else
       travis_wait 35 R CMD check --no-build-vignettes --no-tests --no-manual sparklyr*tar.gz
       Rscript .travis.R --testthat
