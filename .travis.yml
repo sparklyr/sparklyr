@@ -68,13 +68,10 @@ script:
       R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
       travis_wait 45 Rscript .travis.R --coverage
     else
-      travis_wait 35 R CMD check --no-build-vignettes --no-manual sparklyr*tar.gz
+      travis_wait 35 R CMD check --no-build-vignettes --no-tests --no-manual sparklyr*tar.gz
+      travis_wait 35 Rscript .travis.R --testthat
     fi
 
 after_failure:
   - |
     grep -B 10 -A 20 ERROR /tmp/sparklyr.log
-    cd tests
-    export NOT_CRAN=true
-    travis_wait 35 Rscript ../.travis.R --testthat
-    sleep 2
