@@ -20,5 +20,5 @@ test_that("top_n works as expected", {
   tn2 <- tn2 %>% arrange(X)
   tn1 <- tn1 %>% mutate(n = as.integer(n)) %>% arrange(X)
 
-  testthat::expect_true(all(tn1 == tn2))
+  expect_equal(tn1, tn2)
 })
