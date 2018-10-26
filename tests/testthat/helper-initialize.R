@@ -273,3 +273,8 @@ expect_coef_equal <- function(lhs, rhs) {
 
   expect_true(all.equal(lhs, rhs, tolerance = 0.01))
 }
+
+skip_on_arrow <- function() {
+  r_arrow <- Sys.getenv("R_ARROW")
+  if (r_arrow) skip("Test unsupported in Apache Arrow")
+}
