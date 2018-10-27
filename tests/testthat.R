@@ -5,10 +5,14 @@ library(sparklyr)
 PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                    inherit = Reporter,
                                    public = list(
-                                     results = list(),
+                                     results = list(
+                                       context = character(0),
+                                       time = numeric(0)
+                                     ),
                                      last_context = NA_character_,
                                      last_test = NA_character_,
                                      last_time = Sys.time(),
+                                     last_test_time = 0,
                                      n_ok = 0,
                                      n_skip = 0,
                                      n_warn = 0,
@@ -38,21 +42,18 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        }
 
                                        if (identical(self$last_test, test)) {
-                                         total_time <- self$results[[length(self$results)]]$time + elapsed_time
-                                         self$results[[length(self$results)]]$time <- total_time
+                                         elapsed_time <- self$last_test_time + elapsed_time
+                                         self$results$time[length(self$results$time)] <- elapsed_time
+                                         self$last_test_time <- elapsed_time
                                        }
                                        else {
-                                         if (length(self$results) >= 1) {
-                                           previous_result <- self$results[[length(self$results)]]
-                                           cat(paste0(previous_result$test, ": ", previous_result$time, "\n"))
+                                         if (length(self$results$time) >= 1) {
+                                           cat(paste0(self$last_test, ": ", self$last_test_time, "\n"))
                                          }
 
-                                         self$results[[length(self$results) + 1]] <- list(
-                                           context = self$last_context,
-                                           test = test,
-                                           success = inherits(result, "expectation_success"),
-                                           time = elapsed_time
-                                         )
+                                         self$results$context[length(self$results$context) + 1] <- self$last_context
+                                         self$results$time[length(self$results$time) + 1] <- elapsed_time
+                                         self$last_test_time <- elapsed_time
                                        }
 
                                        self$last_test <- test
@@ -60,17 +61,29 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                      },
 
                                      end_reporter = function() {
-                                       cat("\n")
-                                       data <- dplyr::bind_rows(self$results)
+                                       cat(paste0(self$last_test, ": ", self$last_test_time, "\n"))
 
-                                       summary <- dplyr::bind_rows(self$results) %>%
+                                       cat("\n")
+                                       data <- data.frame(
+                                          context = self$results$context,
+                                          time = self$results$time
+                                        )
+
+                                       summary <- data %>%
                                          dplyr::group_by(context) %>%
                                          dplyr::summarise(time = sum(time)) %>%
-                                         dplyr::mutate(time = format(time, width = "13"))
+                                         dplyr::mutate(time = format(time, width = "9", digits = "3", scientific = F))
+
+                                       total <- data %>%
+                                         dplyr::summarise(time = sum(time)) %>%
+                                         dplyr::mutate(time = format(time, digits = "3", scientific = F)) %>%
+                                         dplyr::pull()
 
                                        cat("\n")
                                        cat("--- Performance Summary  ----\n\n")
                                        print(as.data.frame(summary), row.names = FALSE)
+
+                                       cat(paste0("\nTotal: ", total, "s\n"))
 
                                        cat("\n")
                                        cat("------- Tests Summary -------\n\n")
