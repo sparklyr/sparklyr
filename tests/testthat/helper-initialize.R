@@ -185,7 +185,10 @@ testthat_livy_connection <- function() {
     sc <- spark_connect(
       master = "http://localhost:8998",
       method = "livy",
-      config = list(sparklyr.connect.timeout = 120)
+      config = list(
+        sparklyr.verbose = TRUE,
+        sparklyr.connect.timeout = 120
+      )
     )
 
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
