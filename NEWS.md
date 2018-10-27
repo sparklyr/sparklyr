@@ -1,5 +1,8 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Improved memory use in Livy by using string builders and avoid print
+  backs.
+
 - `sdf_len()`, `sdf_along()` and `sdf_seq()` default to 32 bit integers
   but allow support for 64 bits through `bits` parameter.
 

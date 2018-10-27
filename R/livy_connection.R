@@ -278,26 +278,21 @@ livy_serialized_chunks <- function(serialized, n) {
 
 livy_statement_compose <- function(sc, static, class, method, ...) {
   serialized <- livy_invoke_serialize(sc = sc, static = static, object = class, method = method, ...)
-  chunks <- livy_serialized_chunks(serialized, 1000)
+  chunks <- livy_serialized_chunks(serialized, 10000)
 
   chunk_vars <- list()
   last_var <- NULL
-  for (i in 1:length(chunks)) {
-    if (is.null(last_var)) {
-      var_name <- paste("\"", chunks[i], "\"", sep = "")
-    }
-    else {
-      if (length(chunk_vars) == 0) {
-        var_name <- livy_code_new_return_var(sc)
-        chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, sep = ""))
-        last_var <- var_name
-      }
+  var_name <- "sparklyr_return"
 
-      var_name <- livy_code_new_return_var(sc)
-      chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, " + \"", chunks[i], "\"", sep = ""))
+  if (length(chunks) == 1) {
+    last_var <- paste("\"", chunks[1], "\"", sep = "")
+  }
+  else {
+    last_var <- "builder.toString"
+    chunk_vars <- c(chunk_vars, "val builder = StringBuilder.newBuilder")
+    for (i in 1:length(chunks)) {
+      chunk_vars <- c(chunk_vars, paste("builder.append(\"", chunks[i], "\") == \"\"", sep = ""))
     }
-
-    last_var <- var_name
   }
 
   var_name <- livy_code_new_return_var(sc)
