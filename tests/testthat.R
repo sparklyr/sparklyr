@@ -19,6 +19,10 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                      add_result = function(context, test, result) {
                                        elapsed_time <- as.numeric(Sys.time() - self$last_time)
 
+                                       if (inherits(result, "expectation_failure")) {
+                                         cat("Failure:", result$message)
+                                       }
+
                                        if (identical(self$last_test, test)) {
                                          total_time <- self$results[[length(self$results)]]$time + elapsed_time
                                          self$results[[length(self$results)]]$time <- total_time
@@ -32,7 +36,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                          self$results[[length(self$results) + 1]] <- list(
                                            context = self$last_context,
                                            test = test,
-                                           result = result,
+                                           success = inherits(result, "expectation_success"),
                                            time = elapsed_time
                                          )
                                        }
@@ -43,8 +47,14 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
 
                                      end_reporter = function() {
                                        cat("\n")
-                                       data <- do.call("rbind", args = self$results)[, c("context", "test", "time")]
-                                       print(as.data.frame(data, row.names = F))
+                                       data <- dplyr::bind_rows(self$results)
+
+                                       summary <- dplyr::bind_rows(self$results) %>%
+                                         dplyr::group_by(context) %>%
+                                         dplyr::summarise(time = sum(time))
+
+                                       cat("\n")
+                                       print(summary)
                                      }
                                    )
 )
