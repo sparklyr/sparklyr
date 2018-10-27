@@ -18,13 +18,8 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                      n_warn = 0,
                                      n_fail = 0,
 
-                                     print_last_test = function() {
-                                       if (!is.na(self$last_test)) cat(paste0(self$last_test, ": ", self$last_test_time, "\n"))
-                                       self$last_test <- NA_character_
-                                     },
-
                                      start_context = function(context) {
-                                       self$print_last_test()
+                                       private$print_last_test()
 
                                        self$last_context <- context
                                        self$last_time <- Sys.time()
@@ -54,7 +49,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                          self$last_test_time <- elapsed_time
                                        }
                                        else {
-                                         self$print_last_test()
+                                         private$print_last_test()
 
                                          self$results$context[length(self$results$context) + 1] <- self$last_context
                                          self$results$time[length(self$results$time) + 1] <- elapsed_time
@@ -66,7 +61,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                      },
 
                                      end_reporter = function() {
-                                       self$print_last_test()
+                                       private$print_last_test()
 
                                        cat("\n")
                                        data <- data.frame(
@@ -97,6 +92,17 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        self$cat_line("Warnings: ", format(self$n_warn, width = 5))
                                        self$cat_line("Skipped:  ", format(self$n_skip, width = 5))
                                        cat("\n")
+                                     }
+                                   ),
+                                   private = list(
+                                     print_last_test = function() {
+                                       if (!is.na(self$last_test) &&
+                                           length(self$last_test) > 0 &&
+                                           length(self$last_test_time) > 0) {
+                                         cat(paste0(self$last_test, ": ", self$last_test_time, "\n"))
+                                       }
+
+                                       self$last_test <- NA_character_
                                      }
                                    )
 )
