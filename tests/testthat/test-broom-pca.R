@@ -10,11 +10,16 @@ test_that("pca.tidy() works", {
     ml_pca(k = 3) %>%
     tidy()
 
+  model <- iris %>%
+    dplyr::select(-Species) %>%
+    stats::prcomp()
+
   check_tidy(td1, exp.row = 4, exp.col = 4,
              exp.names = c("features", "PC1", "PC2", "PC3"))
+
   expect_equal(td1$PC1,
-               c(-0.361, 0.0845, -0.857, -0.358),
-                 tolerance = 0.001)
+               -as.vector(model$rotation[,1]),
+               tolerance = 0.001)
 
 })
 
