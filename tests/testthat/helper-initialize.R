@@ -159,7 +159,9 @@ testthat_livy_connection <- function() {
   }
 
   if (nrow(livy_installed_versions()) == 0) {
-    livy_install(livy_version, spark_version = version)
+    cat("Installing Livy.")
+    livy_install(livy_version, spark_version = version, )
+    cat("Livy installed.")
   }
 
   expect_gt(nrow(livy_installed_versions()), 0)
