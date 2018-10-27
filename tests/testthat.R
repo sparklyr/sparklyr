@@ -9,6 +9,10 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                      last_context = NA_character_,
                                      last_test = NA_character_,
                                      last_time = Sys.time(),
+                                     n_ok = 0,
+                                     n_skip = 0,
+                                     n_warn = 0,
+                                     n_fail = 0,
 
                                      start_context = function(context) {
                                        self$last_context <- context
@@ -20,7 +24,17 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        elapsed_time <- as.numeric(Sys.time() - self$last_time)
 
                                        if (inherits(result, "expectation_failure")) {
-                                         cat("Failure:", result$message)
+                                         self$n_fail <- self$n_fail + 1
+                                       } else if (inherits(result, "expectation_skip")) {
+                                         self$n_skip <- self$n_skip + 1
+                                       } else if (inherits(result, "expectation_warning")) {
+                                         self$n_warn <- self$n_warn + 1
+                                       } else {
+                                         self$n_ok <- self$n_ok + 1
+                                       }
+
+                                       if (inherits(result, "expectation_failure")) {
+                                         cat("Failure:", result$message, "\n")
                                        }
 
                                        if (identical(self$last_test, test)) {
@@ -51,10 +65,20 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
 
                                        summary <- dplyr::bind_rows(self$results) %>%
                                          dplyr::group_by(context) %>%
-                                         dplyr::summarise(time = sum(time))
+                                         dplyr::summarise(time = sum(time)) %>%
+                                         dplyr::mutate(time = format(time, width = "13"))
 
                                        cat("\n")
-                                       print(summary)
+                                       cat("--- Performance Summary  ----\n\n")
+                                       print(as.data.frame(summary), row.names = FALSE)
+
+                                       cat("\n")
+                                       cat("------- Tests Summary -------\n\n")
+                                       self$cat_line("OK:       ", format(self$n_ok, width = 5))
+                                       self$cat_line("Failed:   ", format(self$n_fail, width = 5))
+                                       self$cat_line("Warnings: ", format(self$n_warn, width = 5))
+                                       self$cat_line("Skipped:  ", format(self$n_skip, width = 5))
+                                       cat("\n")
                                      }
                                    )
 )
