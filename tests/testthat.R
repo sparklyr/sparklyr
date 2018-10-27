@@ -27,7 +27,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                      },
 
                                      add_result = function(context, test, result) {
-                                       elapsed_time <- as.numeric(Sys.time() - self$last_time)
+                                       elapsed_time <- as.numeric(Sys.time()) - as.numeric(self$last_time)
 
                                        if (inherits(result, "expectation_failure")) {
                                          self$n_fail <- self$n_fail + 1
