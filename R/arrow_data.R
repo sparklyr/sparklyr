@@ -68,7 +68,7 @@ arrow_read_stream <- function(stream)
   entries
 }
 
-arrow_copy_to <- function(sc, df, parallelism = 8L, serializer = "arrow")
+arrow_copy_to <- function(sc, df, parallelism)
 {
   # replace factors with characters
   if (any(sapply(df, is.factor))) {
