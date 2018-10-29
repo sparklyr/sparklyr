@@ -39,14 +39,12 @@ Defaults to \code{TRUE}.}
 Reads a CSV stream as a Spark dataframe stream.
 }
 \seealso{
-Other Spark stream serialization: \code{\link{stream_read_jdbc}},
-  \code{\link{stream_read_json}},
+Other Spark stream serialization: \code{\link{stream_read_json}},
   \code{\link{stream_read_kafka}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
   \code{\link{stream_read_text}},
   \code{\link{stream_write_csv}},
-  \code{\link{stream_write_jdbc}},
   \code{\link{stream_write_json}},
   \code{\link{stream_write_kafka}},
   \code{\link{stream_write_memory}},
