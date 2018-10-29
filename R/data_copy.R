@@ -116,7 +116,11 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
 }
 
 spark_serialize_arrow <- function(sc, df, columns, repartition) {
-  arrow_copy_to(sc, df)
+  arrow_copy_to(
+    sc,
+    df,
+    as.integer(if (repartition <= 0) 1 else repartition)
+  )
 }
 
 spark_data_copy <- function(
