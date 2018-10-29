@@ -1,5 +1,8 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Removed `stream_read_jdbc()` and `stream_write_jdbc()` since they are 
+  not yet implemented in Spark.
+  
 - Support for collecting NA values from logical columns (#1729).
 
 - Proactevely clean JVM objects when R object is deallocated.
