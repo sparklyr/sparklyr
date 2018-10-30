@@ -63,3 +63,5 @@ Suggests:
     RCurl,
     reshape2,
     testthat
+Remotes:
+    javierluraschi:javierluraschi/arrow/r@bugfix/arrow-bit64-deps
