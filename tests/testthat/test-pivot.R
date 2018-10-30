@@ -6,9 +6,6 @@ sc <- testthat_spark_connection()
 diamonds_tbl <- testthat_tbl("diamonds")
 
 test_that("we can construct a simple pivot table", {
-  # skip while #1736 is investigated
-  skip_on_arrow()
-
   s <- diamonds_tbl %>%
     sdf_pivot(cut ~ color) %>%
     arrange(cut) %>%
