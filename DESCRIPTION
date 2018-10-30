@@ -64,4 +64,4 @@ Suggests:
     reshape2,
     testthat
 Remotes:
-    javierluraschi:javierluraschi/arrow/r@bugfix/arrow-bit64-deps
+    javierluraschi/arrow/r@bugfix/arrow-bit64-deps
