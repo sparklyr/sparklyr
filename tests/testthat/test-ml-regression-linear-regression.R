@@ -31,7 +31,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
-  values <- seq(0, 0.5, by = 0.1)
+  values <- seq(0, 0.4, by = 0.4)
   parMatrix <- expand.grid(values, values, KEEP.OUT.ATTRS = FALSE)
 
   for (i in seq_len(nrow(parMatrix))) {
