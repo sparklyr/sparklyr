@@ -15,7 +15,7 @@
 #' @export
 reactiveSpark <- function(x,
                           intervalMillis = 1000,
-                          session = NULL)
+                          session = shiny::getDefaultReactiveDomain())
 {
   sc <- spark_connection(x)
 
@@ -32,7 +32,7 @@ reactiveSpark <- function(x,
   stream <- traceable %>% stream_write_memory(name)
 
   shiny::onStop(function() {
-    stream_stop(stream)
+
   }, session = session)
 
   reactivePoll(
