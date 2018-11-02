@@ -39,9 +39,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                          self$n_ok <- self$n_ok + 1
                                        }
 
-                                       if (inherits(result, "expectation_failure")) {
-                                         cat("Failure:", result$message, "\n")
-                                       }
+                                       cat(paste(class(result), collapse = ", "), ":", result$message, "\n")
 
                                        if (identical(self$last_test, test)) {
                                          elapsed_time <- self$last_test_time + elapsed_time
