@@ -14,7 +14,7 @@ if (length(args) == 0) {
   covr::codecov()
 } else if (args[[1]] == "--arrow") {
   install.packages("devtools")
-  devtools::install_github("javierluraschi/arrow", subdir = "r", ref = "bugfix/arrow-bit64-deps")
+  devtools::install_github("apache/arrow", subdir = "r")
 } else {
   stop("Unsupported arguments")
 }
