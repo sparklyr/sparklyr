@@ -145,14 +145,14 @@ test_that("ml_validation_metrics() works properly", {
 
   grid <- list(
     logistic = list(
-      elastic_net_param = c(0.25, 0.75),
-      reg_param = c(1e-3, 1e-4)
+      elastic_net_param = c(0.25),
+      reg_param = c(1e-3)
     )
   )
   cv <- ml_cross_validator(
     sc, estimator = pipeline, estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc),
-    num_folds = 3, parallelism = 4
+    num_folds = 2, parallelism = 4
   )
   cv_model <- ml_fit(cv, iris_tbl)
   cv_metrics <- ml_validation_metrics(cv_model)
