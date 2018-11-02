@@ -27,7 +27,6 @@ test_that("ml_linear_regression() param setting", {
 })
 
 test_that("ml_linear_regression and 'penalized' produce similar model fits", {
-  skip_on_cran()
   test_requires("glmnet")
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")

@@ -24,16 +24,12 @@ ensure_round_trip <- function(sc, data) {
 }
 
 test_that("objects survive Spark roundtrips", {
-  skip_on_cran()
-
   datasets <- list(mtcars = mtcars)
   for (dataset in datasets)
     ensure_round_trip(sc, dataset)
 })
 
 test_that("primitive values survive Spark roundtrips", {
-  skip_on_cran()
-
   n <- 10
   df <- data.frame(
     int = as.integer(1:n),
@@ -48,8 +44,6 @@ test_that("primitive values survive Spark roundtrips", {
 })
 
 test_that("NA values survive Spark roundtrips", {
-  skip_on_cran()
-
   n <- 10
   df <- data.frame(
     int = as.integer(1:n),
@@ -65,8 +59,6 @@ test_that("NA values survive Spark roundtrips", {
 })
 
 test_that("data.frames with '|' can be copied", {
-  skip_on_cran()
-
   pipes <- data.frame(
     x = c("|||", "|||", "|||"),
     y = c(1, 2, 3),
@@ -77,8 +69,6 @@ test_that("data.frames with '|' can be copied", {
 })
 
 test_that("data.frames with many columns survive roundtrip", {
-  skip_on_cran()
-
   n <- 1E3
   data <- as.data.frame(replicate(n, 1L, simplify = FALSE))
   names(data) <- paste("X", 1:n, sep = "")
@@ -87,8 +77,6 @@ test_that("data.frames with many columns survive roundtrip", {
 })
 
 test_that("data.frames with many columns don't cause Java StackOverflows", {
-  skip_on_cran()
-
   version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
 
   n <- if (version >= "2.0.0") 500 else 5000
