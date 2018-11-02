@@ -71,6 +71,8 @@ testthat_shell_connection <- function() {
     options(sparklyr.na.omit.verbose = TRUE)
     options(sparklyr.na.action.verbose = TRUE)
 
+    config[["sparklyr.shell.driver-memory"]] <- "3G"
+
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version, config = config)
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
