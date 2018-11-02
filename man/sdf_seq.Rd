@@ -4,7 +4,8 @@
 \alias{sdf_seq}
 \title{Create DataFrame for Range}
 \usage{
-sdf_seq(sc, from = 1L, to = 1L, by = 1L, repartition = NULL)
+sdf_seq(sc, from = 1L, to = 1L, by = 1L, repartition = type,
+  type = c("integer", "integer64"))
 }
 \arguments{
 \item{sc}{The associated Spark connection.}
@@ -15,6 +16,8 @@ sdf_seq(sc, from = 1L, to = 1L, by = 1L, repartition = NULL)
 
 \item{repartition}{The number of partitions to use when distributing the
 data across the Spark cluster.}
+
+\item{type}{The data type to use for the index, either \code{"integer"} or \code{"integer64"}.}
 }
 \description{
 Creates a DataFrame for the given range
