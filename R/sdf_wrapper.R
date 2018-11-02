@@ -93,10 +93,13 @@ sdf_read_column <- function(x, column) {
 #'
 #' @export
 sdf_collect <- function(object, ...) {
+  args <- list(...)
   sc <- spark_connection(object)
 
   if (sdf_is_streaming(object))
     sdf_collect_stream(object, ...)
+  else if (arrow_enabled(sc, object) && !identical(args$arrow, FALSE))
+    arrow_collect(object, ...)
   else
     sdf_collect_static(object, ...)
 }

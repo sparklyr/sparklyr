@@ -11,6 +11,9 @@ livy_sources_included <- function() {
     "/repartition\\.scala",
     "/tracker\\.scala",
     "/livyutils\\.scala",
+    "/arrowhelper\\.scala",
+    "/arrowbatchstreamwriter\\.scala",
+    "/arrowconverters\\.scala",
     "/applyutils\\.scala",
     "/classutils\\.scala",
     "/fileutils\\.scala",
@@ -23,7 +26,6 @@ livy_sources_included <- function() {
     "/workerhelper\\.scala",
     "/workerapply\\.scala",
     "/workerrdd\\.scala",
-    "/workerutils\\.scala",
     "/mlutils\\.scala",
     "/mlutils2\\.scala",
     "/bucketizerutils\\.scala"

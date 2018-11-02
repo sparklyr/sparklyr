@@ -32,13 +32,14 @@ spark_apply_packages_is_bundle <- function(packages) {
   is.character(packages) && length(packages) == 1 && grepl("\\.tar$", packages)
 }
 
-spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE) {
+spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE, arrow = FALSE) {
   worker_config_serialize(
     c(
       list(
         debug = isTRUE(debug),
         profile = isTRUE(profile),
-        schema = isTRUE(schema)
+        schema = isTRUE(schema),
+        arrow =isTRUE(arrow)
       ),
       sc$config
     )
@@ -156,7 +157,27 @@ spark_apply <- function(x,
 
   rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
-  proc_env <- connection_config(sc, "sparklyr.apply.env.")
+  proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
+
+  time_zone <- ""
+  arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
+  if (arrow) {
+    time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
+  }
+
+  # build reduced size query plan in case schema needs to be inferred
+  if (sdf_is_streaming(sdf)) {
+    sdf_limit <- sdf
+  }
+  else {
+    sdf_limit <- invoke(
+      sdf,
+      "limit",
+      cast_scalar_integer(
+        spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+      )
+    )
+  }
 
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
@@ -183,6 +204,9 @@ spark_apply <- function(x,
 
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) packages <- FALSE
+
+  # disable package distribution for livy connections and no package spec
+  if (identical(tolower(sc$method), "livy") && identical(packages, TRUE)) packages <- FALSE
 
   # inject column types to context
   context <- list(
@@ -222,8 +246,13 @@ spark_apply <- function(x,
     if (identical(args$rdd, TRUE)) {
       rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
     }
+    else if (arrow) {
+      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone)
+    }
     else {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
     }
   }
 
@@ -296,19 +325,6 @@ spark_apply <- function(x,
         )
       )
 
-      if (sdf_is_streaming(sdf)) {
-        sdf_limit <- sdf
-      }
-      else {
-        sdf_limit <- invoke(
-          sdf,
-          "limit",
-          cast_scalar_integer(
-            spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
-          )
-        )
-      }
-
       columns_op <- invoke_static(
         sc,
         "sparklyr.WorkerHelper",
@@ -316,7 +332,7 @@ spark_apply <- function(x,
         sdf_limit,
         columns_schema,
         closure,
-        spark_apply_worker_config(sc, FALSE, FALSE, schema = TRUE),
+        spark_apply_worker_config(sc, args$debug, args$profile, schema = TRUE, arrow = arrow),
         as.integer(worker_port),
         as.list(sdf_columns),
         as.list(group_by),
@@ -325,10 +341,15 @@ spark_apply <- function(x,
         as.environment(proc_env),
         as.integer(60),
         context_serialize,
-        as.environment(spark_apply_options)
+        as.environment(spark_apply_options),
+        spark_session(sc),
+        time_zone
       )
 
       columns_query <- columns_op %>% sdf_collect()
+      if (arrow && !arrow_enabled_dataframe_schema(columns_query$types)) {
+        arrow <- FALSE
+      }
 
       columns_infer <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
       names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
@@ -351,7 +372,7 @@ spark_apply <- function(x,
       sdf,
       schema,
       closure,
-      spark_apply_worker_config(sc, args$debug, args$profile),
+      spark_apply_worker_config(sc, args$debug, args$profile, arrow = arrow),
       as.integer(worker_port),
       as.list(sdf_columns),
       as.list(group_by),
@@ -360,7 +381,9 @@ spark_apply <- function(x,
       as.environment(proc_env),
       as.integer(60),
       context_serialize,
-      as.environment(spark_apply_options)
+      as.environment(spark_apply_options),
+      spark_session(sc),
+      time_zone
     )
   }
 

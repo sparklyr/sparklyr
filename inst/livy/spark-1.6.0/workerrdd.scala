@@ -37,7 +37,9 @@ class WorkerRDD(
       customEnv: Map[String, String],
       connectionTimeout: Int,
       context: Array[Byte],
-      options: Map[String, String]
+      options: Map[String, String],
+      "",
+      org.apache.spark.sql.types.StructType(Nil)
     )
 
     return workerApply.apply(firstParent.iterator(split, task))

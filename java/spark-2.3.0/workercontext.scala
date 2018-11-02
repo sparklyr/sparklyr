@@ -1,7 +1,4 @@
-//
-// This file was automatically generated using livy_sources_refresh()
-// Changes to this file will be reverted.
-//
+package sparklyr
 
 class WorkerContext(
   iterator: Iterator[org.apache.spark.sql.Row],
@@ -96,5 +93,17 @@ class WorkerContext(
 
   def getSchema() : StructType = {
     schema
+  }
+
+  def getArrowConvertersImpl() : ArrowConvertersImpl = {
+    new ArrowConvertersImpl()
+  }
+
+  def getArrowConverters() : Any = {
+    ArrowConverters
+  }
+
+  def getSqlUtils() : Any = {
+    SQLUtils
   }
 }

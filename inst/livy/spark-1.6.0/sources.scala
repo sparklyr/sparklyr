@@ -1038,6 +1038,7 @@ worker_config_serialize <- function(config) {
     spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
     if (isTRUE(config$profile)) "TRUE" else "FALSE",
     if (isTRUE(config$schema)) "TRUE" else "FALSE",
+    if (isTRUE(config$arrow)) "TRUE" else "FALSE",
     sep = ";"
   )
 }
@@ -1050,12 +1051,13 @@ worker_config_deserialize <- function(raw) {
     sparklyr.gateway.port = as.integer(parts[[2]]),
     sparklyr.gateway.address = parts[[3]],
     profile = as.logical(parts[[4]]),
-    schema = as.logical(parts[[5]])
+    schema = as.logical(parts[[5]]),
+    arrow = as.logical(parts[[6]])
   )
 }
 # nocov start
 
-spark_worker_apply <- function(sc, config) {
+spark_worker_context <- function(sc) {
   hostContextId <- worker_invoke_method(sc, FALSE, "Handler", "getHostContext")
   worker_log("retrieved worker context id ", hostContextId)
 
@@ -1069,7 +1071,12 @@ spark_worker_apply <- function(sc, config) {
 
   worker_log("retrieved worker context")
 
+  context
+}
+
+spark_worker_init_packages <- function(sc, context) {
   bundlePath <- worker_invoke(context, "getBundlePath")
+
   if (nchar(bundlePath) > 0) {
     bundleName <- basename(bundlePath)
     worker_log("using bundle name ", bundleName)
@@ -1097,6 +1104,197 @@ spark_worker_apply <- function(sc, config) {
     spark_libpaths <- worker_invoke(worker_invoke(spark_env, "conf"), "get", "spark.r.libpaths", NULL)
     if (!is.null(spark_libpaths)) .libPaths(spark_libpaths)
   }
+}
+
+spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
+  if (nrow(df) == 0) {
+    worker_log("found that source has no rows to be proceesed")
+    return(NULL)
+  }
+
+  closure_params <- length(formals(closure))
+  closure_args <- c(
+    list(df),
+    if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
+    lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
+  )[0:closure_params]
+
+  worker_log("computing closure")
+  result <- do.call(closure, closure_args)
+  worker_log("computed closure")
+
+  as_factors <- getOption("stringsAsFactors")
+  on.exit(options(stringsAsFactors = as_factors))
+  options(stringsAsFactors = F)
+
+  if (!"data.frame" %in% class(result)) {
+    worker_log("data.frame expected but ", class(result), " found")
+
+    result <- as.data.frame(result)
+  }
+
+  if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
+
+  result
+}
+
+spark_worker_clean_factors <- function(result) {
+  if (any(sapply(result, is.factor))) {
+    result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x), stringsAsFactors = F)
+  }
+
+  result
+}
+
+spark_worker_apply_maybe_schema <- function(result, config) {
+  firstClass <- function(e) class(e)[[1]]
+
+  if (identical(config$schema, TRUE)) {
+    worker_log("updating schema")
+    result <- data.frame(
+      names = paste(names(result), collapse = "|"),
+      types = paste(lapply(result, firstClass), collapse = "|"),
+      stringsAsFactors = F
+    )
+  }
+
+  result
+}
+
+spark_worker_build_types <- function(context, columns) {
+  names <- names(columns)
+  sqlutils <- worker_invoke(context, "getSqlUtils")
+  fields <- lapply(names, function(name) {
+    worker_invoke(sqlutils, "createStructField", name, columns[[name]][[1]], TRUE)
+  })
+
+  worker_invoke(sqlutils, "createStructType", fields)
+}
+
+spark_worker_get_group_batch <- function(batch) {
+  worker_invoke(
+    batch, "get", 0L
+  )
+}
+
+spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
+  if (grouped) {
+    if (nrow(result) > 0) {
+      new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
+      names(new_column_values) <- grouped_by
+
+      if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
+      result <- do.call("cbind", list(new_column_values, result))
+
+      names(result) <- gsub("\\.", "_", make.unique(names(result)))
+    }
+    else {
+      result <- NULL
+    }
+  }
+
+  result
+}
+
+spark_worker_apply_arrow <- function(sc, config) {
+  worker_log("using arrow serializer")
+
+  write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
+  record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
+  read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
+  record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+  as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
+
+  context <- spark_worker_context(sc)
+  spark_worker_init_packages(sc, context)
+
+  closure <- unserialize(worker_invoke(context, "getClosure"))
+  funcContext <- unserialize(worker_invoke(context, "getContext"))
+  grouped_by <- worker_invoke(context, "getGroupBy")
+  grouped <- !is.null(grouped_by) && length(grouped_by) > 0
+  columnNames <- worker_invoke(context, "getColumns")
+  schema_input <- worker_invoke(context, "getSchema")
+  time_zone <- worker_invoke(context, "getTimeZoneId")
+
+  if (grouped) {
+    record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
+    record_batch_raw_groups_idx <- 1
+    record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
+  } else {
+    row_iterator <- worker_invoke(context, "getIterator")
+    arrow_converter_impl <- worker_invoke(context, "getArrowConvertersImpl")
+    record_batch_raw <- worker_invoke(
+      arrow_converter_impl,
+      "toBatchArray",
+      row_iterator,
+      schema_input,
+      time_zone
+    )
+  }
+
+  reader <- record_batch_stream_reader(record_batch_raw)
+  record_entry <- read_record_batch(reader)
+
+  all_batches <- list()
+  total_rows <- 0
+
+  schema_output <- NULL
+
+  batch_idx <- 0
+  while (!is.null(record_entry)) {
+    batch_idx <- batch_idx + 1
+    worker_log("is processing batch ", batch_idx)
+
+    df <- as_tibble(record_entry)
+    colnames(df) <- columnNames[1: length(colnames(df))]
+
+    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
+
+    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+
+    result <- spark_worker_clean_factors(result)
+
+    result <- spark_worker_apply_maybe_schema(result, config)
+
+    if (is.null(schema_output)) {
+      schema_output <- spark_worker_build_types(context, lapply(result, class))
+    }
+
+    record <- record_batch(result)
+    raw_batch <- write_record_batch(record, raw())
+
+    all_batches[[length(all_batches) + 1]] <- raw_batch
+    total_rows <- total_rows + nrow(result)
+
+    record_entry <- read_record_batch(reader)
+
+    if (grouped && is.null(record_entry) && record_batch_raw_groups_idx < length(record_batch_raw_groups)) {
+      record_batch_raw_groups_idx <- record_batch_raw_groups_idx + 1
+      record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
+
+      reader <- record_batch_stream_reader(record_batch_raw)
+      record_entry <- read_record_batch(reader)
+    }
+  }
+
+  if (length(all_batches) > 0) {
+    worker_log("updating ", total_rows, " rows using ", length(all_batches), " row batches")
+
+    arrow_converter <- worker_invoke(context, "getArrowConverters")
+    row_iter <- worker_invoke(arrow_converter, "fromPayloadArray", all_batches, schema_output)
+
+    worker_invoke(context, "setResultIter", row_iter)
+    worker_log("updated ", total_rows, " rows using ", length(all_batches), " row batches")
+  } else {
+    worker_log("found no rows in closure result")
+  }
+
+  worker_log("finished apply")
+}
+
+spark_worker_apply <- function(sc, config) {
+  context <- spark_worker_context(sc)
+  spark_worker_init_packages(sc, context)
 
   grouped_by <- worker_invoke(context, "getGroupBy")
   grouped <- !is.null(grouped_by) && length(grouped_by) > 0
@@ -1164,62 +1362,15 @@ spark_worker_apply <- function(sc, config) {
       }
     }
 
-    result <- NULL
+    colnames(df) <- columnNames[1: length(colnames(df))]
 
-    if (nrow(df) == 0) {
-      worker_log("found that source has no rows to be proceesed")
-    }
-    else {
-      colnames(df) <- columnNames[1: length(colnames(df))]
+    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-      closure_params <- length(formals(closure))
-      closure_args <- c(
-        list(df),
-        if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
-        as.list(
-          if (nrow(df) > 0)
-            lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
-          else
-            NULL
-        )
-      )[0:closure_params]
+    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
-      worker_log("computing closure")
-      result <- do.call(closure, closure_args)
-      worker_log("computed closure")
+    result <- spark_worker_clean_factors(result)
 
-      if (!"data.frame" %in% class(result)) {
-        worker_log("data.frame expected but ", class(result), " found")
-        result <- as.data.frame(result)
-      }
-
-      if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
-    }
-
-    if (grouped) {
-      if (nrow(result) > 0) {
-        new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
-        names(new_column_values) <- grouped_by
-
-        if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
-        result <- do.call("cbind", list(new_column_values, result))
-
-        names(result) <- gsub("\\.", "_", make.unique(names(result)))
-      }
-      else {
-        result <- NULL
-      }
-    }
-
-    firstClass <- function(e) class(e)[[1]]
-
-    if (identical(config$schema, TRUE)) {
-      worker_log("updating schema")
-      result <- data.frame(
-        names = paste(names(result), collapse = "|"),
-        types = paste(lapply(result, firstClass), collapse = "|")
-      )
-    }
+    result <- spark_worker_apply_maybe_schema(result, config)
 
     all_results <- rbind(all_results, result)
   }
@@ -1475,7 +1626,12 @@ spark_worker_main <- function(
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
-    spark_worker_apply(sc, config)
+    if (config$arrow) {
+      spark_worker_apply_arrow(sc, config)
+    }
+    else {
+      spark_worker_apply(sc, config)
+    }
 
     if (identical(config$profile, TRUE)) {
       # utils::Rprof(NULL)

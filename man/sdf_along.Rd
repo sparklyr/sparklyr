@@ -4,7 +4,8 @@
 \alias{sdf_along}
 \title{Create DataFrame for along Object}
 \usage{
-sdf_along(sc, along, repartition = NULL)
+sdf_along(sc, along, repartition = NULL, type = c("integer",
+  "integer64"))
 }
 \arguments{
 \item{sc}{The associated Spark connection.}
@@ -13,6 +14,8 @@ sdf_along(sc, along, repartition = NULL)
 
 \item{repartition}{The number of partitions to use when distributing the
 data across the Spark cluster.}
+
+\item{type}{The data type to use for the index, either \code{"integer"} or \code{"integer64"}.}
 }
 \description{
 Creates a DataFrame along the given object.

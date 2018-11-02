@@ -33,31 +33,45 @@ matrix:
       env:
         - SPARK_VERSION="2.3.2"
         - JAVA_VERSION=openjdk8
-    - name: "Livy 0.5.0 (R release, openjdk8)"
+    - name: "Livy 0.5.0 (R release, openjdk8, Spark 2.3.0)"
       r: release
       env:
         - LIVY_VERSION="0.5.0"
+        - SPARK_VERSION="2.3.0"
         - JAVA_VERSION=openjdk8
+    - name: "Arrow (R release, openjdk8)"
+      r: release
+      env:
+        - R_ARROW="true"
+        - JAVA_VERSION=openjdk8
+      addons:
+        apt:
+          sources:
+            - sourceline: deb https://packages.red-data-tools.org/ubuntu/ trusty universe
+              key_url: https://packages.red-data-tools.org/ubuntu/red-data-tools-keyring.gpg
+          packages:
+            - apt-transport-https
+            - lsb-release
+            - libarrow-dev
+            - libarrow-glib-dev
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
+  - if [[ $R_ARROW == "true" ]]; then Rscript .travis.R --arrow; fi
 
 script:
   - |
     R CMD build .
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
-    if [[ $SPARK_VERSION == "2.3.0" ]]; then
+    if [[ $CODE_COVERAGE == "true" ]]; then
       R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
-      travis_wait 45 Rscript .travis.R --coverage
+      Rscript .travis.R --coverage
     else
-      travis_wait 35 R CMD check --no-build-vignettes --no-manual sparklyr*tar.gz
+      travis_wait 35 R CMD check --no-build-vignettes --no-tests --no-manual sparklyr*tar.gz
+      Rscript .travis.R --testthat
     fi
 
 after_failure:
   - |
     grep -B 10 -A 20 ERROR /tmp/sparklyr.log
-    cd tests
-    export NOT_CRAN=true
-    travis_wait 35 Rscript ../.travis.R --testthat
-    sleep 2

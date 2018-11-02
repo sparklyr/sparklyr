@@ -10,7 +10,6 @@ object LivyUtils {
     "Utils" -> Utils,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
-    "WorkerUtils" -> WorkerUtils,
     "MLUtils" -> MLUtils,
     "Shell" -> Shell
    )

@@ -97,4 +97,16 @@ class WorkerContext(
   def getSchema() : StructType = {
     schema
   }
+
+  def getArrowConvertersImpl() : ArrowConvertersImpl = {
+    new ArrowConvertersImpl()
+  }
+
+  def getArrowConverters() : Any = {
+    ArrowConverters
+  }
+
+  def getSqlUtils() : Any = {
+    SQLUtils
+  }
 }

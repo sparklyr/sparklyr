@@ -6,7 +6,6 @@ sc <- testthat_spark_connection()
 diamonds_tbl <- testthat_tbl("diamonds")
 
 test_that("we can construct a simple pivot table", {
-
   s <- diamonds_tbl %>%
     sdf_pivot(cut ~ color) %>%
     arrange(cut) %>%
@@ -19,7 +18,10 @@ test_that("we can construct a simple pivot table", {
     arrange(cut) %>%
     as.list()
 
-  expect_equal(unname(s), unname(r))
+  expect_equal(
+    lapply(unname(s)[-1], as.numeric),
+    lapply(unname(r)[-1], as.numeric)
+  )
 
 })
 

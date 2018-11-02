@@ -159,7 +159,9 @@ testthat_livy_connection <- function() {
   }
 
   if (nrow(livy_installed_versions()) == 0) {
-    livy_install(livy_version, spark_version = version)
+    cat("Installing Livy.")
+    livy_install(livy_version, spark_version = version, )
+    cat("Livy installed.")
   }
 
   expect_gt(nrow(livy_installed_versions()), 0)
@@ -182,7 +184,15 @@ testthat_livy_connection <- function() {
       stdout = FALSE,
       stderr = FALSE)
 
-    sc <- spark_connect(master = "http://localhost:8998", method = "livy")
+    sc <- spark_connect(
+      master = "http://localhost:8998",
+      method = "livy",
+      config = list(
+        sparklyr.verbose = TRUE,
+        sparklyr.connect.timeout = 120
+      )
+    )
+
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
   }
 
@@ -272,4 +282,9 @@ expect_coef_equal <- function(lhs, rhs) {
   rhs <- rhs[nm]
 
   expect_true(all.equal(lhs, rhs, tolerance = 0.01))
+}
+
+skip_on_arrow <- function() {
+  r_arrow <- isTRUE(as.logical(Sys.getenv("R_ARROW")))
+  if (r_arrow) skip("Test unsupported in Apache Arrow")
 }

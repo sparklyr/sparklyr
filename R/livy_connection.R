@@ -278,26 +278,21 @@ livy_serialized_chunks <- function(serialized, n) {
 
 livy_statement_compose <- function(sc, static, class, method, ...) {
   serialized <- livy_invoke_serialize(sc = sc, static = static, object = class, method = method, ...)
-  chunks <- livy_serialized_chunks(serialized, 1000)
+  chunks <- livy_serialized_chunks(serialized, 10000)
 
   chunk_vars <- list()
   last_var <- NULL
-  for (i in 1:length(chunks)) {
-    if (is.null(last_var)) {
-      var_name <- paste("\"", chunks[i], "\"", sep = "")
-    }
-    else {
-      if (length(chunk_vars) == 0) {
-        var_name <- livy_code_new_return_var(sc)
-        chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, sep = ""))
-        last_var <- var_name
-      }
+  var_name <- "sparklyr_return"
 
-      var_name <- livy_code_new_return_var(sc)
-      chunk_vars <- c(chunk_vars, paste("var ", var_name, " = ", last_var, " + \"", chunks[i], "\"", sep = ""))
+  if (length(chunks) == 1) {
+    last_var <- paste("\"", chunks[1], "\"", sep = "")
+  }
+  else {
+    last_var <- "builder.toString"
+    chunk_vars <- c(chunk_vars, "val builder = StringBuilder.newBuilder")
+    for (i in 1:length(chunks)) {
+      chunk_vars <- c(chunk_vars, paste("builder.append(\"", chunks[i], "\") == \"\"", sep = ""))
     }
-
-    last_var <- var_name
   }
 
   var_name <- livy_code_new_return_var(sc)
@@ -569,7 +564,7 @@ livy_connection <- function(master,
 
   sc$code$totalReturnVars <- 0
 
-  waitStartTimeout <- spark_config_value(config, "livy.session.start.timeout", 60)
+  waitStartTimeout <- spark_config_value(config, c("sparklyr.connect.timeout", "livy.session.start.timeout"), 60)
   waitStartReties <- waitStartTimeout * 10
   while (session$state == "starting" &&
          session$state != "dead" &&
@@ -697,6 +692,9 @@ livy_load_scala_sources <- function(sc) {
     "serializer.scala",
     "stream.scala",
     "repartition.scala",
+    "arrowhelper.scala",
+    "arrowbatchstreamwriter.scala",
+    "arrowconverters.scala",
     "applyutils.scala",
     "classutils.scala",
     "fileutils.scala",
@@ -710,7 +708,6 @@ livy_load_scala_sources <- function(sc) {
     "workerapply.scala",
     "workerrdd.scala",
     "workerhelper.scala",
-    "workerutils.scala",
     "mlutils.scala",
     "mlutils2.scala",
     "bucketizerutils.scala",
@@ -762,15 +759,19 @@ initialize_connection.livy_connection <- function(sc) {
   tryCatch({
     livy_load_scala_sources(sc)
 
-    session <- NULL
-    sc$state$spark_context <- tryCatch({
-      session <<- invoke_static(
+    session <- tryCatch({
+      invoke_static(
         sc,
         "org.apache.spark.sql.SparkSession",
         "builder"
       ) %>%
         invoke("getOrCreate")
+    },
+    error = function(e) {
+      NULL
+    })
 
+    sc$state$spark_context <- tryCatch({
       invoke(session, "sparkContext")
     },
     error = function(e) {

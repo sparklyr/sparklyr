@@ -37,7 +37,12 @@ spark_worker_main <- function(
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
-    spark_worker_apply(sc, config)
+    if (config$arrow) {
+      spark_worker_apply_arrow(sc, config)
+    }
+    else {
+      spark_worker_apply(sc, config)
+    }
 
     if (identical(config$profile, TRUE)) {
       # utils::Rprof(NULL)
