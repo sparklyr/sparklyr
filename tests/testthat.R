@@ -29,17 +29,22 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                      add_result = function(context, test, result) {
                                        elapsed_time <- as.numeric(Sys.time()) - as.numeric(self$last_time)
 
-                                       if (inherits(result, "expectation_failure")) {
+                                       print_message = TRUE
+                                       if (inherits(result, "expectation_failure") ||
+                                           inherits(result, "expectation_error")) {
                                          self$n_fail <- self$n_fail + 1
                                        } else if (inherits(result, "expectation_skip")) {
                                          self$n_skip <- self$n_skip + 1
                                        } else if (inherits(result, "expectation_warning")) {
                                          self$n_warn <- self$n_warn + 1
                                        } else {
+                                         print_message = FALSE
                                          self$n_ok <- self$n_ok + 1
                                        }
 
-                                       cat(paste(class(result), collapse = ", "), ":", result$message, "\n")
+                                       if (print_message) {
+                                        cat(paste0(private$expectation_type(result), ":"), result$message, "\n")
+                                       }
 
                                        if (identical(self$last_test, test)) {
                                          elapsed_time <- self$last_test_time + elapsed_time
@@ -101,6 +106,10 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        }
 
                                        self$last_test <- NA_character_
+                                     },
+                                     expectation_type = function(exp) {
+                                       stopifnot(is.expectation(exp))
+                                       gsub("^expectation_", "", class(exp)[[1]])
                                      }
                                    )
 )
