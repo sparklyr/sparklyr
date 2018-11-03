@@ -65,11 +65,11 @@ script:
   - |
     R CMD build .
     export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
+    R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
+
     if [[ $CODE_COVERAGE == "true" ]]; then
-      R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
-      travis_wait 45 Rscript .travis.R --coverage
+      Rscript .travis.R --coverage
     else
-      travis_wait 35 R CMD check --no-build-vignettes --no-tests --no-manual sparklyr*tar.gz
       Rscript .travis.R --testthat
     fi
 
