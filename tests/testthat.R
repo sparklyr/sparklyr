@@ -43,7 +43,10 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        }
 
                                        if (print_message) {
-                                        cat(paste0(private$expectation_type(result), ":"), result$message, "\n")
+                                        cat(
+                                          paste0(test, ": ", private$expectation_type(result), ": ", result$message),
+                                          "\n"
+                                        )
                                        }
 
                                        if (identical(self$last_test, test)) {
