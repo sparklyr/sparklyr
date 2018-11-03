@@ -170,14 +170,14 @@ test_that("ml_validation_metrics() works properly", {
     c("f1", "elastic_net_param_1", "reg_param_1")
   )
 
-  expect_identical(nrow(cv_metrics), 4L)
+  expect_identical(nrow(cv_metrics), 1L)
 
   expect_identical(
     names(tvs_metrics),
     c("f1", "elastic_net_param_1", "reg_param_1")
   )
 
-  expect_identical(nrow(tvs_metrics), 4L)
+  expect_identical(nrow(tvs_metrics), 1L)
 })
 
 test_that("cross validator print methods", {
