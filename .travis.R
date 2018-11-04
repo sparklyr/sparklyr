@@ -11,7 +11,7 @@ if (length(args) == 0) {
   setwd("tests")
   source("testthat.R")
 } else if (args[[1]] == "--coverage") {
-  covr::codecov(quiet = FALSE)
+  covr::codecov(quiet = FALSE, type = "none", code = "setwd('tests'); source('testthat.R')")
 } else if (args[[1]] == "--arrow") {
   install.packages("devtools")
   devtools::install_github("javierluraschi/arrow", subdir = "r", ref = "bugfix/r-empty-character")
