@@ -187,10 +187,11 @@ new_ml_multilayer_perceptron_classifier <- function(jobj) {
 }
 
 new_ml_multilayer_perceptron_classification_model <- function(jobj) {
-  new_ml_prediction_model(
+    new_ml_prediction_model(
     jobj,
     layers = invoke(jobj, "layers"),
     num_features = invoke(jobj, "numFeatures"),
+    num_classes = invoke(jobj, "numClasses"),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
     weights = read_spark_vector(jobj, "weights"),
