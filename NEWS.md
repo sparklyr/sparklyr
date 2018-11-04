@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sparklyr 0.9.3 (unreleased)
 
 - Improved memory use in Livy by using string builders and avoid print
@@ -10,6 +11,27 @@
   not yet implemented in Spark.
   
 - Support for collecting NA values from logical columns (#1729).
+||||||| merged common ancestors
+<<<<<<<<< Temporary merge branch 1
+# Sparklyr 0.9.3 (unreleased)
+
+- Proactevely clean JVM objects when R object is deallocated.
+
+# Sparklyr 0.9.2
+
+- Support for Spark 2.3.2.
+
+- Fix installation error with older versions of `rstudioapi` (#1716).
+
+- Fix missing callstack and error case while logging in
+  `spark_apply()`.
+||||||||| merged common ancestors
+# Sparklyr 0.9.2 (unreleased)
+=========
+# Sparklyr 0.9.3 (unreleased)
+=======
+# Sparklyr 0.9.3 (unreleased)
+>>>>>>> 9eb66531aa503f1d2451d13726cac60bbd3737fa
 
 - Proactevely clean JVM objects when R object is deallocated.
 
