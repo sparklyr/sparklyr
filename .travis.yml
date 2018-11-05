@@ -13,9 +13,6 @@ cache:
 
 warnings_are_errors: true
 
-r_packages:
-  - covr
-
 matrix:
   include:
     - name: "Spark 1.6.3 (R 3.2, openjdk7)"
