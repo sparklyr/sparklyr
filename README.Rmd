@@ -39,6 +39,7 @@ spark_install(version = "2.1.0")
 To upgrade to the latest version of sparklyr, run the following command and restart your r session:
 
 ```{r, eval=FALSE}
+install.packages("devtools")
 devtools::install_github("rstudio/sparklyr")
 ```
 

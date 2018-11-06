@@ -44,7 +44,7 @@ and restart your r session:
 
 ``` r
 install.packages("devtools")
-devtools::install_github("rstudio/sparklyr", force=TRUE)
+devtools::install_github("rstudio/sparklyr")
 ```
 
 If you use the RStudio IDE, you should also download the latest [preview
