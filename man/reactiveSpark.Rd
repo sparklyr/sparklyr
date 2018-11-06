@@ -4,7 +4,8 @@
 \alias{reactiveSpark}
 \title{Reactive spark reader}
 \usage{
-reactiveSpark(x, intervalMillis = 1000, session = NULL)
+reactiveSpark(x, intervalMillis = 1000,
+  session = shiny::getDefaultReactiveDomain())
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame.}
