@@ -290,3 +290,8 @@ skip_on_arrow <- function() {
   r_arrow <- isTRUE(as.logical(Sys.getenv("R_ARROW")))
   if (r_arrow) skip("Test unsupported in Apache Arrow")
 }
+
+skip_covr <- function(message) {
+  is_covr <- identical(Sys.getenv("CODE_COVERAGE"), "true")
+  if (is_covr) skip(message)
+}
