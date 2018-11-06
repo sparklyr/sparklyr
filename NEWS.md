@@ -1,5 +1,10 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Tables with periods are now supported; however, this is a 
+  **breaking change** for users referencing tables as `database.table` 
+  since now they will have to set the `sparklyr.dplyr.period.splits`
+  to `TRUE`.
+
 - Fix requirement to specify `SPARK_HOME_VERSION` when `version`
   parameter is set in `spark_connect()`.
 
