@@ -26,7 +26,7 @@ livy_install <- function(version       = "0.5.0",
 
     # if spark_home is set, then infer spark version based on that
     if (!is.null(spark_home)) {
-      spark_version <- spark_version_from_home(spark_home)
+      spark_version <- spark_version_from_home(spark_home, default = spark_version)
     } else {
       spark_version <- switch(
         version,
