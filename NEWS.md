@@ -1,5 +1,10 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Fix requirement to specify `SPARK_HOME_VERSION` when `version`
+  parameter is set in `spark_connect()`.
+
+- Cloudera autodetect Spark version improvements.
+
 - Fixed default for `session` in `reactiveSpark()`.
 
 - Improved memory use in Livy by using string builders and avoid print
