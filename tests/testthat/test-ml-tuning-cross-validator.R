@@ -79,6 +79,7 @@ test_that("ml_cross_validator() works correctly", {
 })
 
 test_that("we can cross validate a logistic regression with xval", {
+  skip_covr("takes too long to measure coverage")
   sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
@@ -130,6 +131,7 @@ test_that("we can cross validate a logistic regression with xval", {
 })
 
 test_that("ml_validation_metrics() works properly", {
+  skip_covr("takes too long to measure coverage")
   sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
@@ -145,14 +147,14 @@ test_that("ml_validation_metrics() works properly", {
 
   grid <- list(
     logistic = list(
-      elastic_net_param = c(0.25, 0.75),
-      reg_param = c(1e-3, 1e-4)
+      elastic_net_param = c(0.25),
+      reg_param = c(1e-3)
     )
   )
   cv <- ml_cross_validator(
     sc, estimator = pipeline, estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc),
-    num_folds = 3, parallelism = 4
+    num_folds = 2, parallelism = 4
   )
   cv_model <- ml_fit(cv, iris_tbl)
   cv_metrics <- ml_validation_metrics(cv_model)
@@ -170,14 +172,14 @@ test_that("ml_validation_metrics() works properly", {
     c("f1", "elastic_net_param_1", "reg_param_1")
   )
 
-  expect_identical(nrow(cv_metrics), 4L)
+  expect_identical(nrow(cv_metrics), 1L)
 
   expect_identical(
     names(tvs_metrics),
     c("f1", "elastic_net_param_1", "reg_param_1")
   )
 
-  expect_identical(nrow(tvs_metrics), 4L)
+  expect_identical(nrow(tvs_metrics), 1L)
 })
 
 test_that("cross validator print methods", {

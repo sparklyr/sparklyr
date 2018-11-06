@@ -71,6 +71,8 @@ testthat_shell_connection <- function() {
     options(sparklyr.na.omit.verbose = TRUE)
     options(sparklyr.na.action.verbose = TRUE)
 
+    config[["sparklyr.shell.driver-memory"]] <- "3G"
+
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version, config = config)
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
@@ -287,4 +289,9 @@ expect_coef_equal <- function(lhs, rhs) {
 skip_on_arrow <- function() {
   r_arrow <- isTRUE(as.logical(Sys.getenv("R_ARROW")))
   if (r_arrow) skip("Test unsupported in Apache Arrow")
+}
+
+skip_covr <- function(message) {
+  is_covr <- identical(Sys.getenv("CODE_COVERAGE"), "true")
+  if (is_covr) skip(message)
 }

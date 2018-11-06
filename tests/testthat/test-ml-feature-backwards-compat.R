@@ -11,8 +11,6 @@ austen     <- austen_books()
 austen_tbl <- testthat_tbl("austen")
 
 test_that("ft_binarizer() works as expected", {
-  skip_on_cran()
-
   threshold <- 3.5
   mutated <- mtcars_tbl %>%
     sdf_mutate(drat_binary = ft_binarizer(drat, threshold = threshold))
@@ -25,8 +23,6 @@ test_that("ft_binarizer() works as expected", {
 })
 
 test_that("ft_bucketizer() works as expected", {
-  skip_on_cran()
-
   splits <- c(-Inf, 2, 4, Inf)
   mutated <- mtcars_tbl %>%
     sdf_mutate(buckets = ft_bucketizer(drat, splits))
@@ -38,8 +34,6 @@ test_that("ft_bucketizer() works as expected", {
 })
 
 test_that("ft_tokenizer() works as expected", {
-  skip_on_cran()
-
   # NOTE: to my surprise, the ft_tokenizer does not
   # split on '\\s+', rather, just plain old '\\s'
   spark_tokens <- austen_tbl %>%
@@ -62,8 +56,6 @@ test_that("ft_tokenizer() works as expected", {
 })
 
 test_that("ft_regex_tokenizer() works as expected", {
-  skip_on_cran()
-
   spark_tokens <- austen_tbl %>%
     na.omit() %>%
     filter(length(text) > 0) %>%
@@ -85,7 +77,6 @@ test_that("ft_regex_tokenizer() works as expected", {
 
 test_that("ft_quantile_discretizer() works with basic input", {
   test_requires_version("2.0.0", "unidentified bug affecting <2.0.0")
-  skip_on_cran()
 
   # Fails in 1.6.x
   # > iris_tbl %>% ft_quantile_discretizer(input.col = "Sepal_Length", output.col = "Group", n.buckets = 2) %>% group_by(Group) %>% summarize(count = n())

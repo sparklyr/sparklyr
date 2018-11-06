@@ -8,10 +8,12 @@ test_that("the (serial) implementation of 'do' functions as expected", {
   test_requires("dplyr")
 
   R <- diamonds %>%
+    filter(color == "E" | color == "I", clarity == "SI1") %>%
     group_by(color, clarity) %>%
     do(model = lm(price ~ x + y + z, data = .))
 
   S <- diamonds_tbl %>%
+    filter(color == "E" | color == "I", clarity == "SI1") %>%
     group_by(color, clarity) %>%
     do(model = ml_linear_regression(., price ~ x + y + z))
 

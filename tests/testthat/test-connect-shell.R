@@ -55,8 +55,6 @@ test_that("'spark_session_random' generates different ids even with seeds", {
 })
 
 test_that("'spark_inspect' can enumerate information from the context", {
-  skip_on_cran()
-
   result <- capture.output({
     sparklyr:::spark_inspect(spark_context(sc))
   })

@@ -108,7 +108,7 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
 })
 
 test_that("spark_write_table() can append data", {
-  if (spark_version(sc) < "2.2.0") skip("tables not supported before 2.2.0")
+  if (spark_version(sc) < "2.0.0") skip("tables not supported before 2.0.0")
   test_requires("dplyr")
 
   iris_tbl <- testthat_tbl("iris")
@@ -127,7 +127,7 @@ test_that("spark_write_table() can append data", {
 })
 
 test_that("spark_write_table() can write data", {
-  if (spark_version(sc) < "2.2.0") skip("tables not supported before 2.2.0")
+  if (spark_version(sc) < "2.0.0") skip("tables not supported before 2.0.0")
   test_requires("dplyr")
 
   df <- copy_to(sc, data.frame(id = 1L))

@@ -79,6 +79,7 @@ test_that("'spark_apply' works with 'group_by' over multiple columns", {
 })
 
 test_that("'spark_apply' works over empty partitions", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 2, repartition = 4) %>%
       spark_apply(function(e) e) %>%
@@ -89,6 +90,7 @@ test_that("'spark_apply' works over empty partitions", {
 })
 
 test_that("'spark_apply' works over 'tryCatch'", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 1) %>%
       spark_apply(function(e) {
@@ -105,6 +107,7 @@ test_that("'spark_apply' works over 'tryCatch'", {
 })
 
 test_that("'spark_apply' can filter data.frame", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 10) %>%
       spark_apply(function(e) as.data.frame(e[e$id > 1,])) %>%
@@ -115,6 +118,7 @@ test_that("'spark_apply' can filter data.frame", {
 })
 
 test_that("'spark_apply' can filter using dplyr", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 10) %>%
       spark_apply(function(e) dplyr::filter(e, id > 1)) %>%
@@ -125,6 +129,7 @@ test_that("'spark_apply' can filter using dplyr", {
 })
 
 test_that("'spark_apply' can return 'NA's", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     dates_tbl %>%
       spark_apply(function(e) e) %>%
@@ -135,6 +140,7 @@ test_that("'spark_apply' can return 'NA's", {
 })
 
 test_that("'spark_apply' can return 'NA's for dates", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 1) %>%
       spark_apply(function(e) data.frame(dates = c(as.Date("2001/1/1"), NA))) %>%
@@ -145,6 +151,7 @@ test_that("'spark_apply' can return 'NA's for dates", {
 })
 
 test_that("'spark_apply' can roundtrip dates", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     dates_tbl %>%
       spark_apply(function(e) as.Date(e[[1]], origin = "1970-01-01")) %>%
@@ -157,6 +164,7 @@ test_that("'spark_apply' can roundtrip dates", {
 })
 
 test_that("'spark_apply' can roundtrip Date-Time", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     dates_tbl %>%
       spark_apply(function(e) as.POSIXct(e[[1]], origin = "1970-01-01")) %>%
@@ -170,6 +178,7 @@ test_that("'spark_apply' can roundtrip Date-Time", {
 })
 
 test_that("'spark_apply' supports grouped empty results", {
+  skip_covr("takes too long to measure coverage")
   process_data <- function(DF, exclude) {
     DF <- subset(DF, select = colnames(DF)[!colnames(DF) %in% exclude])
     DF[complete.cases(DF),]
@@ -199,6 +208,7 @@ test_that("'spark_apply' supports grouped empty results", {
 })
 
 test_that("'spark_apply' can use anonymous functions", {
+  skip_covr("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 3) %>% spark_apply(~ .x + 1) %>% collect(),
     data_frame(id = c(2, 3, 4))
@@ -206,6 +216,7 @@ test_that("'spark_apply' can use anonymous functions", {
 })
 
 test_that("'spark_apply' can apply function with 'NA's column", {
+  skip_covr("takes too long to measure coverage")
   if (spark_version(sc) < "2.0.0") skip("automatic column types supported in Spark 2.0+")
 
   expect_equal(
