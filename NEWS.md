@@ -1,5 +1,7 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Cloudera autodetect Spark version improvements.
+
 - Fixed default for `session` in `reactiveSpark()`.
 
 - Improved memory use in Livy by using string builders and avoid print

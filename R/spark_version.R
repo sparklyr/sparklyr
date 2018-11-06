@@ -82,7 +82,8 @@ spark_version_from_home <- function(spark_home, default = NULL) {
         list(path = "yarn", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
         list(path = "yarn", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar"),
         list(path = "lib", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
-        list(path = "lib", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar")
+        list(path = "lib", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar"),
+        list(path = "lib", pattern = "spark-assembly-([0-9\\.]*)-cdh[0-9\\.]*-hadoop.[0-9\\.]*\\.jar")
       )
 
       candidateFiles <- lapply(candidateVersions, function(e) {
