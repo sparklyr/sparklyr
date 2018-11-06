@@ -69,6 +69,8 @@ test_that("data.frames with '|' can be copied", {
 })
 
 test_that("data.frames with many columns survive roundtrip", {
+  skip_covr("takes too long to measure coverage")
+
   n <- 1E3
   data <- as.data.frame(replicate(n, 1L, simplify = FALSE))
   names(data) <- paste("X", 1:n, sep = "")
