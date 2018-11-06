@@ -43,7 +43,8 @@ To upgrade to the latest version of sparklyr, run the following command
 and restart your r session:
 
 ``` r
-devtools::install_github("rstudio/sparklyr")
+install.packages("devtools")
+devtools::install_github("rstudio/sparklyr", force=TRUE)
 ```
 
 If you use the RStudio IDE, you should also download the latest [preview
