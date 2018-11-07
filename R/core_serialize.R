@@ -42,6 +42,10 @@ getSerdeType <- function(object) {
 }
 
 writeArrowDataFrame <- function(con, object) {
+  if (is.function(object)) {
+    object <- object()
+  }
+
   if (!is.data.frame(object)) {
     stop("Stream not a list of data frames.")
   }
