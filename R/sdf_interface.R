@@ -64,6 +64,15 @@ sdf_import <- function(x,
   UseMethod("sdf_import")
 }
 
+sdf_prepare_daraframe <- function(x) {
+  as.data.frame(
+    x,
+    stringsAsFactors = FALSE,
+    row.names = FALSE,
+    optional = TRUE
+  )
+}
+
 #' @export
 #' @importFrom dplyr tbl
 sdf_import.default <- function(x,
@@ -75,13 +84,8 @@ sdf_import.default <- function(x,
                                ...)
 {
   # ensure data.frame
-  if (!is.data.frame(x)) {
-    x <- as.data.frame(
-      x,
-      stringsAsFactors = FALSE,
-      row.names = FALSE,
-      optional = TRUE
-    )
+  if (!is.data.frame(x) && !arrow_enabled(sc, x)) {
+    x <- sdf_prepare_daraframe(x)
   }
 
   if (overwrite)

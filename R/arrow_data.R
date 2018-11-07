@@ -12,6 +12,10 @@ arrow_enabled_object <- function(object) {
   UseMethod("arrow_enabled_object")
 }
 
+arrow_enabled_object.default <- function(object) {
+  TRUE
+}
+
 arrow_enabled_object.tbl_spark <- function(object) {
   sdf <- spark_dataframe(object)
   arrow_enabled_object(sdf)
@@ -70,22 +74,15 @@ arrow_read_stream <- function(stream)
 
 arrow_copy_to <- function(sc, df, parallelism)
 {
-  # replace factors with characters
-  if (any(sapply(df, is.factor))) {
-    df <- dplyr::as_data_frame(lapply(df, function(x) if(is.factor(x)) as.character(x) else x))
-  }
-
-  # serialize to arrow
-  bytes <- arrow_batch(df)
-
-  # create batches data frame
-  batches <- list(bytes)
-
   # build schema
-  schema <- spark_data_build_types(sc, lapply(df, class))
+  first_df <- if (identical(class(df), "list")) df[[1]] else df
+  schema <- spark_data_build_types(sc, lapply(first_df, class))
+
+  # mark as arrow stream
+  class(df) <- c("arrow_stream", class(df))
 
   # load arrow file in scala
-  rdd <- invoke_static(sc, "sparklyr.ArrowHelper", "javaRddFromBinaryBatches", spark_context(sc), batches, parallelism)
+  rdd <- invoke_static(sc, "sparklyr.ArrowHelper", "javaRddFromBinaryBatches", spark_context(sc), df, parallelism)
   sdf <- invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
 
   sdf
