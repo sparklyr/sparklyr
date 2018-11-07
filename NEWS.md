@@ -1,5 +1,7 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Deprecate `sdf_mutate()` (#1754).
+
 - Fix requirement to specify `SPARK_HOME_VERSION` when `version`
   parameter is set in `spark_connect()`.
 
