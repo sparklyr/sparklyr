@@ -15,7 +15,7 @@
 #' @export
 reactiveSpark <- function(x,
                           intervalMillis = 1000,
-                          session = NULL)
+                          session = shiny::getDefaultReactiveDomain())
 {
   sc <- spark_connection(x)
 
