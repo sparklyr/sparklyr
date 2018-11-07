@@ -26,10 +26,6 @@ spark_version.default <- function(sc) {
   if (!is.null(sc$state$spark_version))
     return(sc$state$spark_version)
 
-  # if `SPARK_HOME` is specified, infer version from it
-  if (!is.null(sc$spark_home))
-    return(spark_version_from_home(sc$spark_home))
-
   # get the version
   version <- invoke(spark_context(sc), "version")
 
@@ -82,7 +78,8 @@ spark_version_from_home <- function(spark_home, default = NULL) {
         list(path = "yarn", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
         list(path = "yarn", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar"),
         list(path = "lib", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
-        list(path = "lib", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar")
+        list(path = "lib", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar"),
+        list(path = "lib", pattern = "spark-assembly-([0-9\\.]*)-cdh[0-9\\.]*-hadoop.[0-9\\.]*\\.jar")
       )
 
       candidateFiles <- lapply(candidateVersions, function(e) {
