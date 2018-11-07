@@ -32,9 +32,14 @@ setMethod("dbReadTable", c("spark_connection", "character"),
 setMethod("dbListTables", "spark_connection", function(conn) {
   df <- df_from_sql(conn, "SHOW TABLES")
 
-  tableNames <- df$tableName
-  filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
-  sort(filtered)
+  if (nrow(df) <= 0) {
+    character(0)
+  }
+  else {
+    tableNames <- df$tableName
+    filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
+    sort(filtered)
+  }
 })
 
 
