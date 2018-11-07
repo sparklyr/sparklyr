@@ -243,6 +243,11 @@ sdf_mutate <- function(.data, ...) {
 #' @export
 #' @importFrom lazyeval all_dots
 sdf_mutate_ <- function(.data, ..., .dots) {
+  warning(
+    "`sdf_mutate()` is deprecated and will be removed in a future release. Please use the feature transformer directly.",
+    call. = FALSE
+  )
+
   dots <- all_dots(.dots, ..., all_named = TRUE)
   data <- .data
 
