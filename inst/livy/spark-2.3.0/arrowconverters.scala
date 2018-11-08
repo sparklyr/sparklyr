@@ -277,7 +277,14 @@ object ArrowConverters {
       payloadRDD: JavaRDD[Array[Byte]],
       schema: StructType,
       sparkSession: SparkSession): DataFrame = {
-    val rdd = payloadRDD.rdd.mapPartitions { iter =>
+    toDataFrame(payloadRDD.rdd, schema, sparkSession)
+  }
+
+  def toDataFrame(
+      payloadRDD: RDD[Array[Byte]],
+      schema: StructType,
+      sparkSession: SparkSession): DataFrame = {
+    val rdd = payloadRDD.mapPartitions { iter =>
       val converters = new ArrowConvertersImpl()
       val context = TaskContext.get()
       converters.fromPayloadIterator(iter, context)
