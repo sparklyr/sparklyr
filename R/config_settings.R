@@ -21,6 +21,7 @@ spark_config_settings <- function() {
     sparklyr.connect.packages = "Spark packages to include when connecting to Spark.",
     sparklyr.connect.sparksubmit = "Command executed instead of spark-submit when connecting.",
     sparklyr.connect.timeout = "Total seconds before giving up connecting to the sparklyr gateway while initializing.",
+    sparklyr.dplyr.period.splits = "Should 'dplyr' split column names into database and table?",
     sparklyr.gateway.address = "The address of the driver machine.",
     sparklyr.gateway.config.retries = "Number of retries to retrieve port and address from config, useful when using functions to query port or address in kubernetes.",
     sparklyr.gateway.interval = "Total of seconds sparkyr wil check on a gateway connection.",

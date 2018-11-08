@@ -4,7 +4,7 @@
 sql_escape_ident.spark_connection <- function(con, x) {
   # Assuming it might include database name like: `dbname.tableName`
   if (length(x) == 1)
-    tbl_quote_name(x)
+    tbl_quote_name(con, x)
   else
     dbplyr::sql_quote(x, '`')
 }
