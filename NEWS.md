@@ -4,6 +4,8 @@
   `dbplyr::in_schema()` or, for backwards compatibility set
   `sparklyr.dplyr.period.splits` to `TRUE`.
 
+- Deprecate `sdf_mutate()` (#1754).
+
 - Fix requirement to specify `SPARK_HOME_VERSION` when `version`
   parameter is set in `spark_connect()`.
 

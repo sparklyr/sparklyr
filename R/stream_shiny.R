@@ -32,7 +32,7 @@ reactiveSpark <- function(x,
   stream <- traceable %>% stream_write_memory(name)
 
   shiny::onStop(function() {
-
+    stream_stop(stream)
   }, session = session)
 
   reactivePoll(
