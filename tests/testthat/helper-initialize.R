@@ -192,7 +192,7 @@ testthat_livy_connection <- function() {
       config = list(
         sparklyr.verbose = TRUE,
         sparklyr.connect.timeout = 120,
-        sparklyr.log.invoke = TRUE
+        sparklyr.log.invoke = "cat"
       )
     )
 
