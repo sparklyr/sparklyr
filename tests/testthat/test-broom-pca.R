@@ -32,7 +32,8 @@ test_that("pca.augment() works", {
   au1 <- iris_tbl %>%
     dplyr::select(-Species) %>%
     ml_pca(k = 3) %>%
-    augment(head(iris_tbl, 25)) %>%
+    head(iris_tbl, 25) %>%
+    augment() %>%
     dplyr::collect()
 
   check_tidy(au1, exp.row = 25,
