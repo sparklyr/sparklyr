@@ -86,15 +86,18 @@ arrow_copy_to <- function(sc, df, parallelism)
   for (i in seq_along(df_list)) {
     df_chunk <- df_list[[i]]
 
-    # mark as arrow stream
-    class(df_chunk) <- c("arrow_stream", class(df_chunk))
+    # replace factors with characters
+    df_chunk <- core_remove_factors(df_chunk)
+
+    # serialize to arrow
+    batches <- list(arrow_batch(df_chunk))
 
     rdd_list[[i]] <- invoke_static(
       sc,
       "sparklyr.ArrowHelper",
       "javaRddFromBinaryBatches",
       spark_context(sc),
-      df_chunk,
+      batches,
       parallelism)
   }
 
