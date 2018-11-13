@@ -866,38 +866,6 @@ getSerdeType <- function(object) {
   }
 }
 
-writeArrowDataFrame <- function(con, object) {
-  if (is.function(object)) {
-    object <- object()
-  }
-
-  if (!is.data.frame(object)) {
-    stop("Stream not a list of data frames.")
-  }
-
-  # replace factors with characters
-  object <- core_remove_factors(object)
-
-  # serialize to arrow
-  bytes <- arrow_batch(object)
-
-  # create batches data frame
-  writeObject(con, bytes)
-}
-
-writeArrowStream <- function(con, object) {
-  if (identical(class(object), c("arrow_stream", "list"))) {
-    writeInt(con, length(object))
-    for (idx in seq_along(object)) {
-      writeArrowDataFrame(con, object[[idx]])
-    }
-  }
-  else {
-    writeInt(con, 1L)
-    writeArrowDataFrame(con, object)
-  }
-}
-
 writeObject <- function(con, object, writeType = TRUE) {
   type <- class(object)[[1]]
 
@@ -930,7 +898,6 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
-         arrow_stream = writeArrowStream(con, object),
          stop(paste("Unsupported type for serialization", type)))
 }
 
@@ -988,7 +955,6 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
-                 arrow_stream = "l",
                  stop(paste("Unsupported type for serialization", class)))
   writeBin(charToRaw(type), con)
 }
@@ -1254,6 +1220,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   columnNames <- worker_invoke(context, "getColumns")
   schema_input <- worker_invoke(context, "getSchema")
   time_zone <- worker_invoke(context, "getTimeZoneId")
+  options_map <- worker_invoke(context, "getOptions")
 
   if (grouped) {
     record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
@@ -1267,7 +1234,8 @@ spark_worker_apply_arrow <- function(sc, config) {
       "toBatchArray",
       row_iterator,
       schema_input,
-      time_zone
+      time_zone,
+      as.integer(options_map[["maxRecordsPerBatch"]])
     )
   }
 

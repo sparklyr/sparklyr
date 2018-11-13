@@ -67,12 +67,13 @@ class ArrowConvertersImpl {
   def toBatchArray(
       rowIter: Iterator[org.apache.spark.sql.Row],
       schema: StructType,
-      timeZoneId: String) : Array[Byte] = {
+      timeZoneId: String,
+      recordsPerBatch: Int) : Array[Byte] = {
 
     val batches: Iterator[Array[Byte]] = toBatchIterator(
       rowIter,
       schema,
-      100000,
+      recordsPerBatch,
       timeZoneId,
       Option.empty
     )
