@@ -28,12 +28,10 @@ test_that("pca.augment() works", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
 
-
   au1 <- iris_tbl %>%
     dplyr::select(-Species) %>%
     ml_pca(k = 3) %>%
-    head(iris_tbl, 25) %>%
-    augment() %>%
+    augment(newdata = head(iris_tbl, 25)) %>%
     dplyr::collect()
 
   check_tidy(au1, exp.row = 25,
