@@ -61,13 +61,11 @@ glance.ml_model_multilayer_perceptron_classification <- function(x, ...) {
   hidden <- x$model$layers[c(-1,-num_layers)]
 
   names(hidden) <- purrr::map_chr(1:(num_layers - 2), function(e){
-    paste0("hidden_", e)
+    paste0("hidden_", e, "_units")
   })
 
-  c(input = input,
+  c(input_units = input,
     hidden,
-    output = output) %>%
+    output_units = output) %>%
     dplyr::data_frame_()
 }
-
-

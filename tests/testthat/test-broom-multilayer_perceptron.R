@@ -46,5 +46,7 @@ test_that("multilayer_perceptron.glance() works", {
     glance()
 
   check_tidy(gl1, exp.row = 1,
-             exp.names = c("input", "hidden_1", "hidden_2", "output"))
+             exp.names = c("input_units",
+                           "hidden_1_units", "hidden_2_units",
+                           "output_units"))
 })
