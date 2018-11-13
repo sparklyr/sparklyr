@@ -160,6 +160,7 @@ spark_apply <- function(x,
   proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
 
   time_zone <- ""
+  records_per_batch <- NULL
   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
   if (arrow) {
     time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
