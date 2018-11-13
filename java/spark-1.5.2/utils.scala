@@ -478,6 +478,11 @@ object Utils {
   def mapRddIntegerToRddRow(rdd: RDD[Long]): RDD[Row] = {
     rdd.map(x => org.apache.spark.sql.Row(x.toInt))
   }
+
+  def unionRdd(context: org.apache.spark.SparkContext, rdds: Seq[org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]]):
+    org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
+    context.union(rdds)
+  }
 }
 
 

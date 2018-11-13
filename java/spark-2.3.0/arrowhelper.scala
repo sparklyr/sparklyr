@@ -13,9 +13,4 @@ object ArrowHelper {
     val rdd = rddFromBinaryBatches(sc, batches, parallelism)
     org.apache.spark.api.java.JavaRDD.fromRDD(rdd)
   }
-
-  def javaRddUnion(context: org.apache.spark.SparkContext, rdds: Seq[org.apache.spark.api.java.JavaRDD[Array[Byte]]]):
-    org.apache.spark.rdd.RDD[Array[Byte]] = {
-    context.union(rdds.map(x => x.rdd))
-  }
 }

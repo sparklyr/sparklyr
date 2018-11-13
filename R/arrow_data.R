@@ -74,41 +74,24 @@ arrow_read_stream <- function(stream)
 
 arrow_copy_to <- function(sc, df, parallelism)
 {
-  df_list <- df
-  if (!identical(class(df), "list")) df_list <- list(df)
-
   # build schema
-  first_df <- df_list[[1]]
-  schema <- spark_data_build_types(sc, lapply(first_df, class))
+  schema <- spark_data_build_types(sc, lapply(df, class))
 
-  # load arrow file in scala
-  rdd_list <- list()
-  for (i in seq_along(df_list)) {
-    df_chunk <- df_list[[i]]
+  # replace factors with characters
+  df <- core_remove_factors(df)
 
-    # replace factors with characters
-    df_chunk <- core_remove_factors(df_chunk)
+  # serialize to arrow
+  batches <- list(arrow_batch(df))
 
-    # serialize to arrow
-    batches <- list(arrow_batch(df_chunk))
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.ArrowHelper",
+    "javaRddFromBinaryBatches",
+    spark_context(sc),
+    batches,
+    parallelism)
 
-    rdd_list[[i]] <- invoke_static(
-      sc,
-      "sparklyr.ArrowHelper",
-      "javaRddFromBinaryBatches",
-      spark_context(sc),
-      batches,
-      parallelism)
-  }
-
-  rdd <- rdd_list[[1]]
-  if (length(rdd_list) > 1) {
-    rdd <- invoke_static(sc, "sparklyr.ArrowHelper", "javaRddUnion", spark_context(sc), rdd_list)
-  }
-
-  sdf <- invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
-
-  sdf
+  invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
 }
 
 arrow_collect <- function(tbl, ...)

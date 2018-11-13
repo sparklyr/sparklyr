@@ -64,7 +64,7 @@ sdf_import <- function(x,
   UseMethod("sdf_import")
 }
 
-sdf_prepare_daraframe <- function(x) {
+sdf_prepare_dataframe <- function(x) {
   as.data.frame(
     x,
     stringsAsFactors = FALSE,
@@ -83,11 +83,6 @@ sdf_import.default <- function(x,
                                overwrite = FALSE,
                                ...)
 {
-  # ensure data.frame
-  if (!is.data.frame(x) && !arrow_enabled(sc, x)) {
-    x <- sdf_prepare_daraframe(x)
-  }
-
   if (overwrite)
     spark_remove_table_if_exists(sc, name)
   else if (name %in% src_tbls(sc))

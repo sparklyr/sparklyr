@@ -123,6 +123,67 @@ spark_serialize_arrow <- function(sc, df, columns, repartition) {
   )
 }
 
+spark_data_translate_columns <- function(df) {
+  lapply(df, function(e) {
+    if (is.factor(e))
+      "character"
+    else if ("POSIXct" %in% class(e))
+      "timestamp"
+    else
+      typeof(e)
+  })
+}
+
+spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
+  if (identical(class(df_data), "iterator")) {
+    df <- df_data()
+  }
+  else {
+    df_list <- df_data
+    if (!identical(class(df_data), "list")) {
+      df_list <- list(df_data)
+    }
+    df <- df_list[[1]]
+  }
+
+  # load arrow file in scala
+  sdf_list <- list()
+  i <- 1
+  while (!is.null(df)) {
+    if (is.function(df)) df <- df()
+    if (is.language(df)) df <- rlang::as_closure(df)()
+
+    # ensure data.frame
+    if (!is.data.frame(df)) df <- sdf_prepare_dataframe(df)
+
+    names(df) <- spark_sanitize_names(names(df), sc$config)
+    columns <- spark_data_translate_columns(df)
+    sdf_list[[i]] <- serializer(sc, df, columns, repartition)
+
+    i <- i + 1
+    if (identical(class(df_data), "iterator")) {
+      df <- df_data()
+    }
+    else {
+      df <- if (i <= length(df_list)) df_list[[i]] else NULL
+    }
+  }
+
+  sdf <- sdf_list[[1]]
+  if (length(sdf_list) > 1) {
+    rdd_list <- NULL
+    for (i in seq_along(sdf_list)) {
+      rdd_list[[i]] <- invoke(sdf_list[[i]], "rdd")
+    }
+
+    rdd <- invoke_static(sc, "sparklyr.Utils", "unionRdd", spark_context(sc), rdd_list)
+    schema <- invoke(sdf_list[[1]], "schema")
+    sdf <- invoke(hive_context(sc),  "createDataFrame", rdd, schema)
+  }
+
+  sdf
+}
+
 spark_data_copy <- function(
   sc,
   df,
@@ -152,25 +213,6 @@ spark_data_copy <- function(
                   serializer
                 )
 
-  # Spark unfortunately has a number of issues with '.'s in column names, e.g.
-  #
-  #    https://issues.apache.org/jira/browse/SPARK-5632
-  #    https://issues.apache.org/jira/browse/SPARK-13455
-  #
-  # Many of these issues are marked as resolved, but it appears this is
-  # a common regression in Spark and the handling is not uniform across
-  # the Spark API.
-  names(df) <- spark_sanitize_names(names(df), sc$config)
-
-  columns <- lapply(df, function(e) {
-    if (is.factor(e))
-      "character"
-    else if ("POSIXct" %in% class(e))
-      "timestamp"
-    else
-      typeof(e)
-  })
-
   serializers <- list(
     "csv_file" = spark_serialize_csv_file,
     "csv_string" = spark_serialize_csv_string,
@@ -178,7 +220,7 @@ spark_data_copy <- function(
     "arrow" = spark_serialize_arrow
   )
 
-  df <- serializers[[serializer]](sc, df, columns, repartition)
+  df <- spark_data_perform_copy(sc, serializers[[serializer]], df, repartition)
 
   invoke(df, "registerTempTable", name)
 }
