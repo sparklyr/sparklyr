@@ -869,6 +869,38 @@ getSerdeType <- function(object) {
   }
 }
 
+writeArrowDataFrame <- function(con, object) {
+  if (is.function(object)) {
+    object <- object()
+  }
+
+  if (!is.data.frame(object)) {
+    stop("Stream not a list of data frames.")
+  }
+
+  # replace factors with characters
+  object <- core_remove_factors(object)
+
+  # serialize to arrow
+  bytes <- arrow_batch(object)
+
+  # create batches data frame
+  writeObject(con, bytes)
+}
+
+writeArrowStream <- function(con, object) {
+  if (identical(class(object), c("arrow_stream", "list"))) {
+    writeInt(con, length(object))
+    for (idx in seq_along(object)) {
+      writeArrowDataFrame(con, object[[idx]])
+    }
+  }
+  else {
+    writeInt(con, 1L)
+    writeArrowDataFrame(con, object)
+  }
+}
+
 writeObject <- function(con, object, writeType = TRUE) {
   type <- class(object)[[1]]
 
@@ -901,6 +933,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
+         arrow_stream = writeArrowStream(con, object),
          stop(paste("Unsupported type for serialization", type)))
 }
 
@@ -958,6 +991,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
+                 arrow_stream = "l",
                  stop(paste("Unsupported type for serialization", class)))
   writeBin(charToRaw(type), con)
 }
@@ -1030,6 +1064,14 @@ core_get_package_function <- function(packageName, functionName) {
     get(functionName, envir = asNamespace(packageName))
   else
     NULL
+}
+
+core_remove_factors <- function(df) {
+  if (any(sapply(df, is.factor))) {
+    df <- as.data.frame(lapply(df, function(x) if(is.factor(x)) as.character(x) else x), stringsAsFactors = FALSE)
+  }
+
+  df
 }
 worker_config_serialize <- function(config) {
   paste(
