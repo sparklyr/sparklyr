@@ -128,25 +128,28 @@ test_that("collect() can retrieve all data types correctly", {
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
   library(dplyr)
 
+  stamp <- "unix_timestamp('01-01-2010' , 'dd-MM-yyyy')"
   sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
   rdate <- as.Date("01-01-2010", "%d-%m-%Y") %>% as.character()
   rtime <- as.POSIXct(1, origin = "1970-01-01", tz = "UTC") %>% as.character()
 
+  arrow <- "package:arrow" %in% search()
+
   hive_type <- tibble::frame_data(
-    ~stype,     ~svalue,       ~rtype,   ~rvalue,
-    "tinyint",       "1",   "integer",       "1",
-    "smallint",      "1",   "integer",       "1",
-    "integer",       "1",   "integer",       "1",
-    "bigint",        "1",   "numeric",       "1",
-    "float",         "1",   "numeric",       "1",
-    "double",        "1",   "numeric",       "1",
-    "decimal",       "1",   "numeric",       "1",
-    "timestamp",     "1",   "POSIXct",     rtime,
-    "date",        sdate,      "Date",     rdate,
-    "string",          1, "character",       "1",
-    "varchar(10)",     1, "character",       "1",
-    "char(10)",        1, "character",       "1",
-    "boolean",    "true",   "logical",    "TRUE"
+    ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,   ~avalue,
+    "tinyint",       "1",   "integer",       "1",       "raw",       "01",
+    "smallint",      "1",   "integer",       "1",   "integer",        "1",
+    "integer",       "1",   "integer",       "1",   "integer",        "1",
+    "bigint",        "1",   "numeric",       "1", "integer64",        "1",
+    "float",         "1",   "numeric",       "1",   "numeric",        "1",
+    "double",        "1",   "numeric",       "1",   "numeric",        "1",
+    "decimal",       "1",   "numeric",       "1",   "numeric",        "1",
+    "timestamp",     "1",   "POSIXct",     rtime,   "POSIXct",      rtime,
+    "date",        sdate,      "Date",     rdate,      "Date",      rdate,
+    "string",          1, "character",       "1", "character",        "1",
+    "varchar(10)",     1, "character",       "1", "character",        "1",
+    "char(10)",        1, "character",       "1", "character",        "1",
+    "boolean",    "true",   "logical",    "TRUE",   "logical",     "TRUE",
   )
 
   if (spark_version(sc) < "2.2.0") {
@@ -167,7 +170,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_types,
-    hive_type %>% pull(rtype)
+    hive_type %>% pull(!! if(arrow) "rtype" else "atype")
   )
 
   spark_results <- DBI::dbGetQuery(sc, spark_query) %>%
@@ -177,7 +180,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_results,
-    hive_type %>% pull(rvalue)
+    hive_type %>% pull(!! if(arrow) "rvalue" else "avalue")
   )
 })
 
