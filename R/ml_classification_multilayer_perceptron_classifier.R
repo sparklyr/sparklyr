@@ -187,11 +187,16 @@ new_ml_multilayer_perceptron_classifier <- function(jobj) {
 }
 
 new_ml_multilayer_perceptron_classification_model <- function(jobj) {
+    # In spark 2.2.1 and below, there is not the method numClasses, so
+    # I take the last value of invoke(jobj, "layers")
+    layers = invoke(jobj, "layers")
+    num_classes = dplyr::last(layers)
+
     new_ml_prediction_model(
     jobj,
-    layers = invoke(jobj, "layers"),
+    layers = layers,
     num_features = invoke(jobj, "numFeatures"),
-    num_classes = invoke(jobj, "numClasses"),
+    num_classes = num_classes,
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
     weights = read_spark_vector(jobj, "weights"),
