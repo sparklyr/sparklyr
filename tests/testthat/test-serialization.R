@@ -128,15 +128,17 @@ test_that("collect() can retrieve all data types correctly", {
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
   library(dplyr)
 
-  stamp <- "unix_timestamp('01-01-2010' , 'dd-MM-yyyy')"
+  utime <- as.numeric(as.POSIXct("2010-01-01 01:01:10", origin = "1970-01-01", tz = "UTC"))
   sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
   rdate <- as.Date("01-01-2010", "%d-%m-%Y") %>% as.character()
-  rtime <- as.POSIXct(1, origin = "1970-01-01", tz = "UTC") %>% as.character()
+  stime <- paste0("to_utc_timestamp(from_unixtime(", utime, "), 'UTC')")
+  rtime <- "2010-01-01 01:01:10"
+  atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
   arrow <- "package:arrow" %in% search()
 
   hive_type <- tibble::frame_data(
-    ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,   ~avalue,
+    ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,    ~avalue,
     "tinyint",       "1",   "integer",       "1",       "raw",       "01",
     "smallint",      "1",   "integer",       "1",   "integer",        "1",
     "integer",       "1",   "integer",       "1",   "integer",        "1",
@@ -144,7 +146,7 @@ test_that("collect() can retrieve all data types correctly", {
     "float",         "1",   "numeric",       "1",   "numeric",        "1",
     "double",        "1",   "numeric",       "1",   "numeric",        "1",
     "decimal",       "1",   "numeric",       "1",   "numeric",        "1",
-    "timestamp",     "1",   "POSIXct",     rtime,   "POSIXct",      rtime,
+    "timestamp",   stime,   "POSIXct",     rtime,   "POSIXct",      atime,
     "date",        sdate,      "Date",     rdate,      "Date",      rdate,
     "string",          1, "character",       "1", "character",        "1",
     "varchar(10)",     1, "character",       "1", "character",        "1",
@@ -170,17 +172,16 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_types,
-    hive_type %>% pull(!! if(arrow) "rtype" else "atype")
+    hive_type %>% pull(!! if(arrow) "atype" else "rtype")
   )
 
-  spark_results <- DBI::dbGetQuery(sc, spark_query) %>%
-    lapply(as.character)
+  spark_results <- DBI::dbGetQuery(sc, spark_query)
   names(spark_results) <- NULL
-  spark_results <- spark_results %>% unlist()
+  spark_results <- sapply(spark_results, as.character)
 
   expect_equal(
     spark_results,
-    hive_type %>% pull(!! if(arrow) "rvalue" else "avalue")
+    hive_type %>% pull(!! if(arrow) "avalue" else "rvalue")
   )
 })
 
