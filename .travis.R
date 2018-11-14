@@ -15,7 +15,7 @@ if (length(args) == 0) {
   covr::codecov(type = "none", code = "setwd('tests'); source('testthat.R')", batch = FALSE)
 } else if (args[[1]] == "--arrow") {
   install.packages("devtools")
-  devtools::install_github("javierluraschi/arrow", subdir = "r", ref = "bugfix/timestamp")
+  devtools::install_github("javierluraschi/arrow", subdir = "r")
 } else {
   stop("Unsupported arguments")
 }
