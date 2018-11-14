@@ -83,7 +83,7 @@ spark_actions <- function(scon) {
               sep = "\n"
             )
 
-            documentNew("sql", contents, row = 2, column = 15, execute = TRUE)
+            documentNew("sql", contents, row = 2, column = 15, execute = FALSE)
           }
         )
       )
