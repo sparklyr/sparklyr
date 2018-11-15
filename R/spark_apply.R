@@ -164,7 +164,7 @@ spark_apply <- function(x,
   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
   if (arrow) {
     time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
-    records_per_batch <- as.numeric(spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||% 10000)
+    records_per_batch <- as.integer(spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||% 10000)
   }
 
   # build reduced size query plan in case schema needs to be inferred
