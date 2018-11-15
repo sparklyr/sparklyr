@@ -205,6 +205,9 @@ test_that("collect() can retrieve NULL data types as NAs", {
   if (using_arrow()) {
     # Disable while tracking fix for ARROW-3794
     hive_type <- hive_type %>% filter(stype != "tinyint")
+
+    # Disable while tracking fix for ARROW-3795
+    hive_type <- hive_type %>% filter(stype != "bigint")
   }
 
   if (spark_version(sc) < "2.2.0") {
