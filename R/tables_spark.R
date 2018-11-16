@@ -1,6 +1,10 @@
 tbl_quote_name <- function(sc, name) {
-  if (!spark_config_value(sc$config, "sparklyr.dplyr.period.splits", FALSE)) {
+  if (!spark_config_value(sc$config, "sparklyr.dplyr.period.splits", TRUE)) {
     return(dbplyr::sql_quote(name, '`'))
+  }
+
+  if (grepl("\\.", name)) {
+    warning("Using periods to split database and tables is being deprecated, use dbplyr::in_schema() instead.")
   }
 
   y <- gsub("`", "``", name, fixed = TRUE)
