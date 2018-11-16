@@ -296,3 +296,7 @@ skip_covr <- function(message) {
   is_covr <- identical(Sys.getenv("CODE_COVERAGE"), "true")
   if (is_covr) skip(message)
 }
+
+using_arrow <- function() {
+  "package:arrow" %in% search()
+}

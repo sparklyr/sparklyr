@@ -18,7 +18,7 @@ arrow_enabled_object.tbl_spark <- function(object) {
 }
 
 arrow_enabled_object.spark_jobj <- function(object) {
-  unsupported_expr <- ".Vector|ArrayType|TimestampType|StructType"
+  unsupported_expr <- ".Vector|ArrayType|StructType"
   unsupported <- object %>%
     sdf_schema() %>%
     Filter(function(x) grepl(unsupported_expr, x$type), .)
@@ -29,7 +29,7 @@ arrow_enabled_object.spark_jobj <- function(object) {
 }
 
 arrow_enabled_dataframe_schema <- function(types) {
-  unsupported_expr <- "POSIXct"
+  unsupported_expr <- "^$"
   unsupported <- Filter(function(e) grepl(unsupported_expr , e), types)
 
   enabled <- length(unsupported) == 0
