@@ -1,8 +1,7 @@
 # Sparklyr 0.9.3 (unreleased)
 
-- Tables with periods are now supported by setting
-  `sparklyr.dplyr.period.splits` to `FALSE`. `database.name` is being
-   deprecated in future releases, please use instead `dbplyr::in_schema()`.
+- Tables with periods supported by setting
+  `sparklyr.dplyr.period.splits` to `FALSE`.
 
 - Deprecate `sdf_mutate()` (#1754).
 
