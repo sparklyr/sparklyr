@@ -62,5 +62,4 @@ Suggests:
     R6,
     RCurl,
     reshape2,
-    sparklyr.nested,
     testthat
