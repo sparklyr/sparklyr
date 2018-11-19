@@ -24,7 +24,9 @@ ml_create_mapping_tables <- function() { # nocov start
 
   ml_class_mapping <- as.environment(ml_class_mapping_list)
 
-  rlang::ll(param_mapping_r_to_s = param_mapping_r_to_s,
-            param_mapping_s_to_r = param_mapping_s_to_r,
-            ml_class_mapping = ml_class_mapping)
+  rlang::ll(
+    param_mapping_r_to_s = param_mapping_r_to_s,
+    param_mapping_s_to_r = param_mapping_s_to_r,
+    ml_class_mapping = ml_class_mapping
+  )
 } # nocov end
