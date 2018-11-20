@@ -3,19 +3,13 @@ ml_map_class <- function(x) {
 }
 
 ml_get_stage_validator <- function(jobj) {
-  paste0("ml_validator_",
-         ml_map_class(jobj_class(jobj)[1]))
+  paste0("validator_", ml_get_stage_constructor(jobj))
 }
 
 ml_get_stage_constructor <- function(jobj) {
-  package <- jobj %>%
-    jobj_class(simple_name = FALSE) %>%
-    head(1) %>%
-    strsplit("\\.") %>%
-    rlang::flatten_chr() %>%
-    dplyr::nth(-2)
-  prefix <- if (identical(package, "feature")) "ft_" else "ml_"
-  paste0(prefix, ml_map_class(jobj_class(jobj)[1]))
+  ml_map_class(
+    jobj_class(jobj, simple_name = FALSE)[[1]]
+  )
 }
 
 ml_formula_transformation <- function(env = rlang::caller_env(2)) {
