@@ -95,7 +95,6 @@ validator_ml_pca <- function(.args) {
   .args
 }
 
-
 #' @rdname ft_pca
 #' @param features The columns to use in the principal components
 #'   analysis. Defaults to all columns in \code{x}.
@@ -124,6 +123,11 @@ ml_pca <- function(x,
                    pc_prefix = "PC",
                    ...)
 {
+  # If being used as a constructor alias for `ft_pca()`:
+  if (inherits(x, "spark_connection")) return(
+    rlang::exec("ft_pca.spark_connection", !!!rlang::dots_list(x = x, ...))
+  )
+
   k <- cast_scalar_integer(k)
 
   sc <- spark_connection(x)

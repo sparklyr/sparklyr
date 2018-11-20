@@ -14,6 +14,8 @@ ft_vector_indexer <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_vector_indexer")
 }
 
+ml_vector_indexer <- ft_vector_indexer
+
 #' @export
 ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                max_categories = 20, dataset = NULL,

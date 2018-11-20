@@ -14,6 +14,8 @@ ft_elementwise_product <- function(x, input_col = NULL, output_col = NULL, scali
   UseMethod("ft_elementwise_product")
 }
 
+ml_elementwise_product <- ft_elementwise_product
+
 #' @export
 ft_elementwise_product.spark_connection <- function(x, input_col = NULL, output_col = NULL, scaling_vec = NULL,
                                                     uid = random_string("elementwise_product_"), ...) {

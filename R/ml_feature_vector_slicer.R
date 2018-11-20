@@ -12,6 +12,8 @@ ft_vector_slicer <- function(x, input_col = NULL, output_col = NULL, indices = N
   UseMethod("ft_vector_slicer")
 }
 
+ml_vector_slicer <- ft_vector_slicer
+
 #' @export
 ft_vector_slicer.spark_connection <- function(x, input_col = NULL, output_col = NULL, indices = NULL,
                                               uid = random_string("vector_slicer_"), ...) {

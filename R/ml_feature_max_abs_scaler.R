@@ -27,6 +27,8 @@ ft_max_abs_scaler <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_max_abs_scaler")
 }
 
+ml_max_abs_scaler <- ft_max_abs_scaler
+
 #' @export
 ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {

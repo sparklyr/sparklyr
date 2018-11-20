@@ -53,6 +53,8 @@ ft_r_formula <- function(x, formula = NULL, features_col = "features", label_col
   UseMethod("ft_r_formula")
 }
 
+ml_r_formula <- ft_r_formula
+
 #' @export
 ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "features", label_col = "label",
                                           force_index_label = FALSE, dataset = NULL,

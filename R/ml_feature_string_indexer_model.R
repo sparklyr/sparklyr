@@ -7,6 +7,8 @@ ft_string_indexer_model <- function(x, input_col = NULL, output_col = NULL, labe
   UseMethod("ft_string_indexer_model")
 }
 
+ml_string_indexer_model <- ft_string_indexer_model
+
 #' @export
 ft_string_indexer_model.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels,
                                                      handle_invalid = "error",

@@ -15,6 +15,8 @@ ft_vector_assembler <- function(x, input_cols = NULL, output_col = NULL,
   UseMethod("ft_vector_assembler")
 }
 
+ml_vector_assembler <- ft_vector_assembler
+
 #' @export
 ft_vector_assembler.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
                                                  uid = random_string("vector_assembler_"), ...) {

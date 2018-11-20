@@ -6,6 +6,8 @@ ft_minhash_lsh <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_minhash_lsh")
 }
 
+ml_minhash_lsh <- ft_minhash_lsh
+
 #' @export
 ft_minhash_lsh.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                             num_hash_tables = 1L, seed = NULL, dataset = NULL,

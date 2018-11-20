@@ -22,6 +22,7 @@ ft_string_indexer <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_string_indexer")
 }
 
+ml_string_indexer <- ft_string_indexer
 
 #' @export
 ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,

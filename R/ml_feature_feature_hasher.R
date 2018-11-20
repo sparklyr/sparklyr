@@ -44,6 +44,8 @@ ft_feature_hasher <- function(x, input_cols = NULL, output_col = NULL,
   UseMethod("ft_feature_hasher")
 }
 
+ml_feature_hasher <- ft_feature_hasher
+
 #' @export
 ft_feature_hasher.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
                                                num_features = 2^18, categorical_cols = NULL,

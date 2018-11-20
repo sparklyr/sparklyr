@@ -16,6 +16,8 @@ ft_one_hot_encoder <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_one_hot_encoder")
 }
 
+ml_one_hot_encoder <- ft_one_hot_encoder
+
 #' @export
 ft_one_hot_encoder.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                 drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {

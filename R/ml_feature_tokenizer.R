@@ -12,6 +12,8 @@ ft_tokenizer <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_tokenizer")
 }
 
+ml_tokenizer <- ft_tokenizer
+
 #' @export
 ft_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                           uid = random_string("tokenizer_"), ...) {

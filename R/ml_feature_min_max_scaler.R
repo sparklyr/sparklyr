@@ -31,6 +31,8 @@ ft_min_max_scaler <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_min_max_scaler")
 }
 
+ml_min_max_scaler <- ft_min_max_scaler
+
 #' @export
 ft_min_max_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                min = 0, max = 1, dataset = NULL,

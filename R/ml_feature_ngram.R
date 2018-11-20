@@ -14,6 +14,8 @@ ft_ngram <- function(x, input_col = NULL, output_col = NULL, n = 2,
   UseMethod("ft_ngram")
 }
 
+ml_ngram <- ft_ngram
+
 #' @export
 ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n = 2,
                                       uid = random_string("ngram_"), ...) {

@@ -43,6 +43,8 @@ ft_stop_words_remover <- function(x, input_col = NULL, output_col = NULL, case_s
   UseMethod("ft_stop_words_remover")
 }
 
+ml_stop_words_remover <- ft_stop_words_remover
+
 #' @export
 ft_stop_words_remover.spark_connection <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
                                                    stop_words = ml_default_stop_words(spark_connection(x), "english"),

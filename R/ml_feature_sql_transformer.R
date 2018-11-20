@@ -19,6 +19,8 @@ ft_sql_transformer <- function(x, statement = NULL,
   UseMethod("ft_sql_transformer")
 }
 
+ml_sql_transformer <- ft_sql_transformer
+
 #' @export
 ft_sql_transformer.spark_connection <- function(x, statement = NULL,
                                                 uid = random_string("sql_transformer_"), ...) {

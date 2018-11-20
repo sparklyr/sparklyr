@@ -15,6 +15,8 @@ ft_polynomial_expansion <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_polynomial_expansion")
 }
 
+ml_polynomial_expansion <- ft_polynomial_expansion
+
 #' @export
 ft_polynomial_expansion.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                      degree = 2, uid = random_string("polynomial_expansion_"), ...) {

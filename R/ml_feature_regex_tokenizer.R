@@ -20,6 +20,8 @@ ft_regex_tokenizer <- function(x, input_col = NULL, output_col = NULL, gaps = TR
   UseMethod("ft_regex_tokenizer")
 }
 
+ml_regex_tokenizer <- ft_regex_tokenizer
+
 #' @export
 ft_regex_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
                                                 min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,

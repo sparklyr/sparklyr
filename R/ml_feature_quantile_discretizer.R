@@ -51,6 +51,8 @@ ft_quantile_discretizer <- function(x, input_col = NULL, output_col = NULL, num_
   UseMethod("ft_quantile_discretizer")
 }
 
+ml_quantile_discretizer <- ft_quantile_discretizer
+
 #' @export
 ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
                                                      input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,

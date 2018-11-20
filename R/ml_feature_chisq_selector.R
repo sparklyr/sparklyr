@@ -23,6 +23,8 @@ ft_chisq_selector <- function(x, features_col = "features", output_col = NULL, l
   UseMethod("ft_chisq_selector")
 }
 
+ml_chisq_selector <- ft_chisq_selector
+
 #' @export
 ft_chisq_selector.spark_connection <- function(x, features_col = "features", output_col = NULL, label_col = "label",
                                                selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,

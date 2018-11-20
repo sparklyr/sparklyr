@@ -34,6 +34,8 @@ ft_standard_scaler <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_standard_scaler")
 }
 
+ml_standard_scaler <- ft_standard_scaler
+
 #' @export
 ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                 with_mean = FALSE, with_std = TRUE, dataset = NULL,

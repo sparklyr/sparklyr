@@ -33,6 +33,8 @@ ft_count_vectorizer <- function(x, input_col = NULL, output_col = NULL, binary =
   UseMethod("ft_count_vectorizer")
 }
 
+ml_count_vectorizer <- ft_count_vectorizer
+
 #' @export
 ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                  binary = FALSE, min_df = 1, min_tf = 1,

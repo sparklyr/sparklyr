@@ -13,6 +13,8 @@ ft_normalizer <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_normalizer")
 }
 
+ml_normalizer <- ft_normalizer
+
 #' @export
 ft_normalizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                            p = 2, uid = random_string("normalizer_"), ...) {

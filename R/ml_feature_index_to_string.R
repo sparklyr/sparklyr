@@ -17,6 +17,8 @@ ft_index_to_string <- function(x, input_col = NULL, output_col = NULL, labels = 
   UseMethod("ft_index_to_string")
 }
 
+ml_index_to_string <- ft_index_to_string
+
 #' @export
 ft_index_to_string.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
                                                 uid = random_string("index_to_string_"), ...) {

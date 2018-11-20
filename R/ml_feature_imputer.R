@@ -22,6 +22,8 @@ ft_imputer <- function(x, input_cols = NULL, output_cols = NULL,
   UseMethod("ft_imputer")
 }
 
+ml_imputer <- ft_imputer
+
 #' @export
 ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL,
                                         missing_value = NULL, strategy = "mean", dataset = NULL,

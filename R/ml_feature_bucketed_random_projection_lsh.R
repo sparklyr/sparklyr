@@ -24,6 +24,8 @@ ft_bucketed_random_projection_lsh <- function(x, input_col = NULL, output_col = 
   UseMethod("ft_bucketed_random_projection_lsh")
 }
 
+ml_bucketed_random_projection_lsh <- ft_bucketed_random_projection_lsh
+
 #' @export
 ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                                bucket_length = NULL, num_hash_tables = 1, seed = NULL,

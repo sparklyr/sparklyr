@@ -13,6 +13,8 @@ ft_idf <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_idf")
 }
 
+ml_idf <- ft_idf
+
 #' @export
 ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                     min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {

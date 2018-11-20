@@ -29,6 +29,8 @@ ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_s
   UseMethod("ft_binarizer")
 }
 
+ml_binarizer <- ft_binarizer
+
 #' @export
 ft_binarizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
                                           uid = random_string("binarizer_"), ...) {

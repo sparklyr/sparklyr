@@ -15,6 +15,8 @@ ft_interaction <- function(x, input_cols = NULL, output_col = NULL,
   UseMethod("ft_interaction")
 }
 
+ml_interaction <- ft_interaction
+
 #' @export
 ft_interaction.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
                                             uid = random_string("interaction_"), ...) {

@@ -35,6 +35,8 @@ ft_bucketizer <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
   UseMethod("ft_bucketizer")
 }
 
+ml_bucketizer <- ft_bucketizer
+
 #' @export
 ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
                                            input_cols = NULL, output_cols = NULL, splits_array = NULL,
