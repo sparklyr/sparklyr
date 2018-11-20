@@ -1,5 +1,5 @@
 ml_map_class <- function(x) {
-  ml_class_mapping[[x]]
+  .globals$ml_class_mapping[[x]]
 }
 
 ml_get_stage_validator <- function(jobj) {

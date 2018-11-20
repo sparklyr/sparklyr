@@ -83,9 +83,9 @@ ml_get_param_map <- function(jobj) {
 ml_map_param_list_names <- function(x, direction = c("sr", "rs"), ...) {
   direction <- rlang::arg_match(direction)
   mapping <- if (identical(direction, "sr"))
-    param_mapping_s_to_r
+    .globals$param_mapping_s_to_r
   else
-    param_mapping_r_to_s
+    .globals$param_mapping_r_to_s
 
   rlang::set_names(x, unname(sapply(names(x), function(nm) mapping[[nm]] %||% nm)))
 }
@@ -93,9 +93,9 @@ ml_map_param_list_names <- function(x, direction = c("sr", "rs"), ...) {
 ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
   direction <- rlang::arg_match(direction)
   mapping <- if (identical(direction, "sr"))
-    param_mapping_s_to_r
+    .globals$param_mapping_s_to_r
   else
-    param_mapping_r_to_s
+    .globals$param_mapping_r_to_s
 
   unname(sapply(x, function(nm) mapping[[nm]] %||% nm))
 }

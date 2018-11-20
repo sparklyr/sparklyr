@@ -194,6 +194,10 @@ spark_connect <- function(master,
 
   scon <- initialize_connection(scon)
 
+  # register mapping tables for spark.ml
+
+  register_mapping_tables()
+
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
   libs <- vapply(libs,
