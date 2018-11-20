@@ -1,11 +1,10 @@
 ml_get_constructor <- function(jobj) {
   jobj %>%
-    jobj_class() %>%
-    lapply(ml_map_class) %>%
-    Filter(length, .) %>%
-    lapply(function(x) paste0("new_ml_", x)) %>%
-    Filter(function(fn) exists(fn, where = asNamespace("sparklyr"),
-                               mode = "function"), .) %>%
+    jobj_class(simple_name = FALSE) %>%
+    purrr::map(ml_map_class) %>%
+    purrr::compact() %>%
+    purrr::map(~ paste0("new_", .x)) %>%
+    purrr::keep(~ exists(.x, where = asNamespace("sparklyr"), mode = "function")) %>%
     rlang::flatten_chr() %>%
     head(1)
 }
