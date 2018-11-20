@@ -22,7 +22,7 @@ ft_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_tokenizer()
+    validator_ml_tokenizer()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Tokenizer",
@@ -63,6 +63,6 @@ new_ml_tokenizer <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_tokenizer")
 }
 
-ml_validator_tokenizer <- function(.args) {
+validator_ml_tokenizer <- function(.args) {
   validate_args_transformer(.args)
 }

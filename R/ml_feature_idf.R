@@ -23,7 +23,7 @@ ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_idf()
+    validator_ml_idf()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.IDF",
@@ -79,7 +79,7 @@ new_ml_idf_model <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_idf_model")
 }
 
-ml_validator_idf <- function(.args) {
+validator_ml_idf <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["min_doc_freq"]] <- cast_scalar_integer(.args[["min_doc_freq"]])
   .args

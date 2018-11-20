@@ -24,7 +24,7 @@ ft_interaction.spark_connection <- function(x, input_cols = NULL, output_col = N
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_interaction()
+    validator_ml_interaction()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Interaction",
@@ -65,7 +65,7 @@ new_ml_interaction <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_interaction")
 }
 
-ml_validator_interaction <- function(.args) {
+validator_ml_interaction <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     input.col = "input_cols",
     output.col = "output_col"

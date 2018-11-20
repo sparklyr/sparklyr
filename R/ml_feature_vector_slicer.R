@@ -22,7 +22,7 @@ ft_vector_slicer.spark_connection <- function(x, input_col = NULL, output_col = 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_vector_slicer()
+    validator_ml_vector_slicer()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.VectorSlicer",
@@ -65,7 +65,7 @@ new_ml_vector_slicer <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_vector_slicer")
 }
 
-ml_validator_vector_slicer <- function(.args) {
+validator_ml_vector_slicer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["indices"]] <- cast_nullable_integer_list(.args[["indices"]])
   .args

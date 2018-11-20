@@ -24,7 +24,7 @@ ft_vector_assembler.spark_connection <- function(x, input_cols = NULL, output_co
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_vector_assembler()
+    validator_ml_vector_assembler()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.VectorAssembler",
@@ -64,7 +64,7 @@ new_ml_vector_assembler <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_vector_assembler")
 }
 
-ml_validator_vector_assembler <- function(.args) {
+validator_ml_vector_assembler <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     input.col = "input_cols",
     output.col = "output_col"

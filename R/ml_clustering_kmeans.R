@@ -43,7 +43,7 @@ ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, 
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_kmeans()
+    validator_ml_kmeans()
 
   jobj <- ml_new_clustering(
     x, "org.apache.spark.ml.clustering.KMeans", uid,
@@ -113,7 +113,7 @@ ml_kmeans.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1
 }
 
 # Validator
-ml_validator_kmeans <- function(.args) {
+validator_ml_kmeans <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     centers = "k",
     tolerance = "tol",

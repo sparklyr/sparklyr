@@ -24,7 +24,7 @@ ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_one_vs_rest()
+    validator_ml_one_vs_rest()
 
   jobj <- ml_new_predictor(
     x, "org.apache.spark.ml.classification.OneVsRest", uid,
@@ -85,7 +85,7 @@ ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, featu
   }
 }
 
-ml_validator_one_vs_rest <- function(.args) {
+validator_ml_one_vs_rest <- function(.args) {
   .args <- validate_args_predictor(.args)
   .args[["classifier"]] <- if (inherits(.args[["classifier"]], "spark_jobj"))
     ml_constructor_dispatch(.args[["classifier"]])

@@ -36,7 +36,7 @@ ml_decision_tree_regressor.spark_connection <- function(x, formula = NULL, max_d
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_decision_tree_regressor()
+    validator_ml_decision_tree_regressor()
 
   jobj <- ml_new_regressor(
     x, "org.apache.spark.ml.regression.DecisionTreeRegressor", uid,
@@ -128,7 +128,7 @@ ml_decision_tree_regressor.tbl_spark <- function(x, formula = NULL, max_depth = 
 }
 
 # Validator
-ml_validator_decision_tree_regressor <- function(.args) {
+validator_ml_decision_tree_regressor <- function(.args) {
   .args <- ml_validate_decision_tree_args(.args)
   .args[["impurity"]] <- cast_choice(.args[["impurity"]], c("variance"))
   .args[["variance_col"]] <- cast_nullable_string(.args[["variance_col"]])

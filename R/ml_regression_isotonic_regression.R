@@ -51,7 +51,7 @@ ml_isotonic_regression.spark_connection <- function(x, formula = NULL, feature_i
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_isotonic_regression()
+    validator_ml_isotonic_regression()
 
   jobj <- ml_new_predictor(
     x, "org.apache.spark.ml.regression.IsotonicRegression", uid,
@@ -116,7 +116,7 @@ ml_isotonic_regression.tbl_spark <- function(x, formula = NULL, feature_index = 
 }
 
 # Validator
-ml_validator_isotonic_regression <- function(.args) {
+validator_ml_isotonic_regression <- function(.args) {
   .args[["feature_index"]] <- cast_scalar_integer(.args[["feature_index"]])
   .args[["isotonic"]] <- cast_scalar_logical(.args[["isotonic"]])
   .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])

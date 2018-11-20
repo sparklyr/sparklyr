@@ -42,7 +42,7 @@ ml_gbt_regressor.spark_connection <- function(x, formula = NULL, max_iter = 20, 
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_gbt_regressor()
+    validator_ml_gbt_regressor()
 
   jobj <- ml_new_predictor(
     x, "org.apache.spark.ml.regression.GBTRegressor", uid,
@@ -146,7 +146,7 @@ ml_gbt_regressor.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_dep
 }
 
 # Validator
-ml_validator_gbt_regressor <- function(.args) {
+validator_ml_gbt_regressor <- function(.args) {
   .args <- .args %>%
     ml_backwards_compatibility(
       list(num.trees = "max_iter",

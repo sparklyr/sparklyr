@@ -25,7 +25,7 @@ ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_pca()
+    validator_ml_pca()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.PCA",
@@ -89,7 +89,7 @@ new_ml_pca_model <- function(jobj) {
     subclass = "ml_pca_model")
 }
 
-ml_validator_pca <- function(.args) {
+validator_ml_pca <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["k"]] <- cast_nullable_scalar_integer(.args[["k"]])
   .args

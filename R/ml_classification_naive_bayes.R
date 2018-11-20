@@ -60,7 +60,7 @@ ml_naive_bayes.spark_connection <- function(x, formula = NULL, model_type = "mul
     raw_prediction_col = raw_prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_naive_bayes()
+    validator_ml_naive_bayes()
 
   jobj <- ml_new_classifier(
     x, "org.apache.spark.ml.classification.NaiveBayes", uid,
@@ -139,7 +139,7 @@ ml_naive_bayes.tbl_spark <- function(x, formula = NULL, model_type = "multinomia
 }
 
 # Validator
-ml_validator_naive_bayes <- function(.args) {
+validator_ml_naive_bayes <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(lambda = "smoothing"))
   .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
   .args[["smoothing"]] <- cast_scalar_double(.args[["smoothing"]])

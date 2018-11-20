@@ -56,7 +56,7 @@ ft_feature_hasher.spark_connection <- function(x, input_cols = NULL, output_col 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_feature_hasher()
+    validator_ml_feature_hasher()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.FeatureHasher",
@@ -103,7 +103,7 @@ new_ml_feature_hasher <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_feature_hasher")
 }
 
-ml_validator_feature_hasher <- function(.args) {
+validator_ml_feature_hasher <- function(.args) {
   .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   .args[["categorical_cols"]] <- cast_nullable_string_list(.args[["categorical_cols"]])

@@ -40,7 +40,7 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NU
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_bucketed_random_projection_lsh()
+    validator_ml_bucketed_random_projection_lsh()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
@@ -112,7 +112,7 @@ new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
     subclass = "ml_bucketed_random_projection_lsh_model")
 }
 
-ml_validator_bucketed_random_projection_lsh <- function(.args) {
+validator_ml_bucketed_random_projection_lsh <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["bucket_length"]] <- cast_nullable_scalar_double(.args[["bucket_length"]])
   .args[["num_hash_tables"]] <- cast_scalar_integer(.args[["num_hash_tables"]])

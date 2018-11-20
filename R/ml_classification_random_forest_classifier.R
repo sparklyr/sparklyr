@@ -45,7 +45,7 @@ ml_random_forest_classifier.spark_connection <- function(x, formula = NULL, num_
     raw_prediction_col = raw_prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_random_forest_classifier()
+    validator_ml_random_forest_classifier()
 
   jobj <- ml_new_classifier(
     x, "org.apache.spark.ml.classification.RandomForestClassifier", uid,
@@ -157,7 +157,7 @@ ml_random_forest_classifier.tbl_spark <- function(x, formula = NULL, num_trees =
 }
 
 # Validator
-ml_validator_random_forest_classifier <- function(.args) {
+validator_ml_random_forest_classifier <- function(.args) {
   .args <- .args %>%
     ml_backwards_compatibility(list(
       sample.rate = "subsampling_rate",

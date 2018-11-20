@@ -41,7 +41,7 @@ ft_word2vec.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_word2vec()
+    validator_ml_word2vec()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Word2Vec",
@@ -134,7 +134,7 @@ new_ml_word2vec_model <- function(jobj) {
                      subclass = "ml_word2vec_model")
 }
 
-ml_validator_word2vec <- function(.args) {
+validator_ml_word2vec <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["vector_size"]] <- cast_scalar_integer(.args[["vector_size"]])
   .args[["min_count"]] <- cast_scalar_integer(.args[["min_count"]])

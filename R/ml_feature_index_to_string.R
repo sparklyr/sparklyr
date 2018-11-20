@@ -28,7 +28,7 @@ ft_index_to_string.spark_connection <- function(x, input_col = NULL, output_col 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_index_to_string()
+    validator_ml_index_to_string()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.IndexToString",
@@ -73,7 +73,7 @@ new_ml_index_to_string <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_index_to_string")
 }
 
-ml_validator_index_to_string <- function(.args) {
+validator_ml_index_to_string <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["labels"]] <- cast_nullable_string_list(.args[["labels"]])
   .args

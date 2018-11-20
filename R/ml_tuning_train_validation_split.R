@@ -24,7 +24,7 @@ ml_train_validation_split.spark_connection <- function(x, estimator = NULL, esti
     parallelism = parallelism,
     seed = seed
   ) %>%
-    ml_validator_train_validation_split()
+    validator_ml_train_validation_split()
 
   ml_new_validator(
     x, "org.apache.spark.ml.tuning.TrainValidationSplit", uid,
@@ -79,7 +79,7 @@ ml_train_validation_split.tbl_spark <- function(x, estimator = NULL, estimator_p
     ml_fit(x)
 }
 
-ml_validator_train_validation_split <- function(.args) {
+validator_ml_train_validation_split <- function(.args) {
   .args <- validate_args_tuning(.args)
   .args[["train_ratio"]] <- cast_scalar_double(.args[["train_ratio"]])
   .args

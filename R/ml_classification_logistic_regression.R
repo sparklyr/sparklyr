@@ -88,7 +88,7 @@ ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_inter
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_logistic_regression()
+    validator_ml_logistic_regression()
 
   jobj <- ml_new_classifier(
     x, "org.apache.spark.ml.classification.LogisticRegression", .args[["uid"]],
@@ -297,7 +297,7 @@ cast_double_matrix <- function(mat) {
     matrix(nrow = nrow(mat))
 }
 
-ml_validator_logistic_regression <- function(.args) {
+validator_ml_logistic_regression <- function(.args) {
   .args <- ml_backwards_compatibility(
     .args, list(
       intercept = "fit_intercept",

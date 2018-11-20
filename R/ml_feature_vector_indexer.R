@@ -26,7 +26,7 @@ ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col =
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_vector_indexer()
+    validator_ml_vector_indexer()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.VectorIndexer",
@@ -86,7 +86,7 @@ new_ml_vector_indexer_model <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_vector_indexer_model")
 }
 
-ml_validator_vector_indexer <- function(.args) {
+validator_ml_vector_indexer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["max_categories"]] <- cast_scalar_integer(.args[["max_categories"]])
   .args

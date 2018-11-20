@@ -65,7 +65,7 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(x, formula = NU
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_multilayer_perceptron_classifier()
+    validator_ml_multilayer_perceptron_classifier()
 
   jobj <- ml_new_predictor(
     x, "org.apache.spark.ml.classification.MultilayerPerceptronClassifier", uid,
@@ -169,7 +169,7 @@ ml_multilayer_perceptron <- function(x, formula = NULL, layers, max_iter = 100, 
   UseMethod("ml_multilayer_perceptron_classifier")
 }
 
-ml_validator_multilayer_perceptron_classifier <- function(.args) {
+validator_ml_multilayer_perceptron_classifier <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(iter.max = "max_iter"))
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])

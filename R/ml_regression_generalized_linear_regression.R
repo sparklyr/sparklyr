@@ -99,7 +99,7 @@ ml_generalized_linear_regression.spark_connection <- function(x, formula = NULL,
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_generalized_linear_regression()
+    validator_ml_generalized_linear_regression()
 
   jobj <- ml_new_regressor(
     x, "org.apache.spark.ml.regression.GeneralizedLinearRegression", uid,
@@ -204,7 +204,7 @@ ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family
   }
 }
 
-ml_validator_generalized_linear_regression <- function(.args) {
+validator_ml_generalized_linear_regression <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     intercept = "fit_intercept",
     weights.column = "weight_col",

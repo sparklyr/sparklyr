@@ -28,7 +28,7 @@ ft_sql_transformer.spark_connection <- function(x, statement = NULL,
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_sql_transformer()
+    validator_ml_sql_transformer()
 
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.SQLTransformer",
@@ -131,7 +131,7 @@ ft_dplyr_transformer.tbl_spark <- function(x, tbl,
   ml_transform(stage, x)
 }
 
-ml_validator_sql_transformer <- function(.args) {
+validator_ml_sql_transformer <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     sql = "statement"
   ))

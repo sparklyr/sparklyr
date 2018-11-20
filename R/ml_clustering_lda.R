@@ -116,7 +116,7 @@ ml_lda.spark_connection <- function(x, k = 10, max_iter = 20, doc_concentration 
     topic_distribution_col = topic_distribution_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_lda()
+    validator_ml_lda()
 
   uid <- cast_string(uid)
 
@@ -199,7 +199,7 @@ ml_lda.tbl_spark <- function(x, k = 10, max_iter = 20, doc_concentration = NULL,
 }
 
 # Validator
-ml_validator_lda <- function(.args) {
+validator_ml_lda <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     alpha = "doc_concentration",
     beta = "topic_concentration",

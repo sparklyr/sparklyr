@@ -22,7 +22,7 @@ ml_cross_validator.spark_connection <- function(x, estimator = NULL, estimator_p
     parallelism = parallelism,
     seed = seed
   ) %>%
-    ml_validator_cross_validator()
+    validator_ml_cross_validator()
 
   ml_new_validator(
     x, "org.apache.spark.ml.tuning.CrossValidator", uid,
@@ -76,7 +76,7 @@ ml_cross_validator.tbl_spark <- function(x, estimator = NULL, estimator_param_ma
     ml_fit(x)
 }
 
-ml_validator_cross_validator <- function(.args) {
+validator_ml_cross_validator <- function(.args) {
   .args <- validate_args_tuning(.args)
   .args[["num_folds"]] <- cast_scalar_integer(.args[["num_folds"]])
   .args

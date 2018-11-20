@@ -46,7 +46,7 @@ ml_gaussian_mixture.spark_connection <- function(x, formula = NULL, k = 2, max_i
     probability_col = probability_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_gaussian_mixture()
+    validator_ml_gaussian_mixture()
 
   jobj <- ml_new_clustering(
     x, "org.apache.spark.ml.clustering.GaussianMixture", uid,
@@ -111,7 +111,7 @@ ml_gaussian_mixture.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 1
   }
 }
 
-ml_validator_gaussian_mixture <- function(.args) {
+validator_ml_gaussian_mixture <- function(.args) {
   .args <- validate_args_clustering(.args)
   .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
   .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])

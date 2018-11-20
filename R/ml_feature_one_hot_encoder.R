@@ -26,7 +26,7 @@ ft_one_hot_encoder.spark_connection <- function(x, input_col = NULL, output_col 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_one_hot_encoder()
+    validator_ml_one_hot_encoder()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.OneHotEncoder",
@@ -69,7 +69,7 @@ new_ml_one_hot_encoder <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_one_hot_encoder")
 }
 
-ml_validator_one_hot_encoder <- function(.args) {
+validator_ml_one_hot_encoder <- function(.args) {
   .args <- validate_args_transformer(.args) %>%
     ml_backwards_compatibility(list(drop.last = "drop_last"))
   .args[["drop_last"]] <- cast_scalar_logical(.args[["drop_last"]])

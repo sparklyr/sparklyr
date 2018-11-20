@@ -19,7 +19,7 @@ ft_string_indexer_model.spark_connection <- function(x, input_col = NULL, output
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_string_indexer_model()
+    validator_ml_string_indexer_model()
 
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.StringIndexerModel",
@@ -63,7 +63,7 @@ ft_string_indexer_model.tbl_spark <- function(x, input_col = NULL, output_col = 
   ml_transform(stage, x)
 }
 
-ml_validator_string_indexer_model <- function(.args) {
+validator_ml_string_indexer_model <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["labels"]] <- cast_character_list(.args[["labels"]])
   .args[["handle_invalid"]] <- cast_choice(

@@ -48,7 +48,7 @@ ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_count_vectorizer()
+    validator_ml_count_vectorizer()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.CountVectorizer",
@@ -131,7 +131,7 @@ ml_vocabulary <- function(model) {
   unlist(model$vocabulary)
 }
 
-ml_validator_count_vectorizer <- function(.args) {
+validator_ml_count_vectorizer <- function(.args) {
   .args <- validate_args_transformer(.args) %>%
     ml_backwards_compatibility(
       list(min.df = "min_df",

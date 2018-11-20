@@ -28,7 +28,7 @@ ft_hashing_tf.spark_connection <- function(x, input_col = NULL, output_col = NUL
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_hashing_tf()
+    validator_ml_hashing_tf()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.HashingTF",
@@ -73,7 +73,7 @@ new_ml_hashing_tf <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_hashing_tf")
 }
 
-ml_validator_hashing_tf <- function(.args) {
+validator_ml_hashing_tf <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["binary"]] <- cast_scalar_logical(.args[["binary"]])
   .args[["num_features"]] <- cast_scalar_integer(.args[["num_features"]])

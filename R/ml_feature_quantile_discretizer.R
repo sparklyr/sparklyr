@@ -68,7 +68,7 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_quantile_discretizer()
+    validator_ml_quantile_discretizer()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.QuantileDiscretizer",
@@ -142,7 +142,7 @@ new_ml_quantile_discretizer <- function(jobj) {
   new_ml_estimator(jobj, subclass = "ml_quantile_discretizer")
 }
 
-ml_validator_quantile_discretizer <- function(.args) {
+validator_ml_quantile_discretizer <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     n.buckets = "num_buckets"
   )) %>%

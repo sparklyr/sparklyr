@@ -96,7 +96,7 @@ ml_als.spark_connection <- function(x, rating_col = "rating", user_col = "user",
     intermediate_storage_level = intermediate_storage_level,
     final_storage_level = final_storage_level
   ) %>%
-    ml_validator_als()
+    validator_ml_als()
 
   jobj <- invoke_new(x, "org.apache.spark.ml.recommendation.ALS", uid) %>%
     invoke("setRatingCol", .args[["rating_col"]]) %>%
@@ -191,7 +191,7 @@ ml_als.tbl_spark <- function(x, rating_col = "rating", user_col = "user", item_c
 }
 
 # Validator
-ml_validator_als <- function(.args) {
+validator_ml_als <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     rating.column = "rating_col",
     user.column = "user_col",

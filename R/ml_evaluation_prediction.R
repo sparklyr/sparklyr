@@ -78,7 +78,7 @@ ml_binary_classification_evaluator.spark_connection <- function(x, label_col = "
     raw_prediction_col = raw_prediction_col,
     metric_name = metric_name
   ) %>%
-    ml_validator_binary_classification_evaluator()
+    validator_ml_binary_classification_evaluator()
 
   ml_new_identifiable(x, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator", uid) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
@@ -105,7 +105,7 @@ ml_binary_classification_evaluator.tbl_spark <- function(x, label_col = "label",
 }
 
 # Validator
-ml_validator_binary_classification_evaluator <- function(.args) {
+validator_ml_binary_classification_evaluator <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     predicted_tbl_spark = "x",
     label = "label_col",
@@ -147,7 +147,7 @@ ml_multiclass_classification_evaluator.spark_connection <- function(x, label_col
     prediction_col = prediction_col,
     metric_name = metric_name
   ) %>%
-    ml_validator_multiclass_classification_evaluator()
+    validator_ml_multiclass_classification_evaluator()
 
   spark_metric = list(
     "1.6" = c("f1", "precision", "recall", "weightedPrecision", "weightedRecall"),
@@ -184,7 +184,7 @@ ml_multiclass_classification_evaluator.tbl_spark <- function(x, label_col = "lab
     ml_evaluate(x)
 }
 
-ml_validator_multiclass_classification_evaluator <- function(.args) {
+validator_ml_multiclass_classification_evaluator <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     predicted_tbl_spark = "x",
     label = "label_col",
@@ -224,7 +224,7 @@ ml_regression_evaluator.spark_connection <- function(x, label_col = "label", pre
     prediction_col = prediction_col,
     metric_name = metric_name
   ) %>%
-    ml_validator_regression_evaluator()
+    validator_ml_regression_evaluator()
 
   evaluator <- ml_new_identifiable(x, "org.apache.spark.ml.evaluation.RegressionEvaluator", uid) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
@@ -249,7 +249,7 @@ ml_regression_evaluator.tbl_spark <- function(x, label_col = "label", prediction
     ml_evaluate(x)
 }
 
-ml_validator_regression_evaluator <- function(.args) {
+validator_ml_regression_evaluator <- function(.args) {
   .args[["label_col"]] <- cast_string(.args[["label_col"]])
   .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
   .args[["metric_name"]] <- cast_choice(.args[["metric_name"]], c("rmse", "mse", "r2", "mae"))

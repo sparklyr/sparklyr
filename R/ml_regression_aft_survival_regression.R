@@ -70,7 +70,7 @@ ml_aft_survival_regression.spark_connection <- function(x, formula = NULL, censo
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_aft_survival_regression()
+    validator_ml_aft_survival_regression()
 
   jobj <- ml_new_regressor(
     x, "org.apache.spark.ml.regression.AFTSurvivalRegression", uid,
@@ -158,7 +158,7 @@ ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col =
 }
 
 # Validator
-ml_validator_aft_survival_regression <- function(.args) {
+validator_ml_aft_survival_regression <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     intercept = "fit_intercept",
     iter.max = "max_iter",

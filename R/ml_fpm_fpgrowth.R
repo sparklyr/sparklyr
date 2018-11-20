@@ -33,7 +33,7 @@ ml_fpgrowth.spark_connection <- function(x, items_col = "items", min_confidence 
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_fpgrowth()
+    validator_ml_fpgrowth()
 
   uid <- cast_string(uid)
   jobj <- invoke_new(x, "org.apache.spark.ml.fpm.FPGrowth", uid) %>%
@@ -80,7 +80,7 @@ ml_fpgrowth.tbl_spark <- function(x, items_col = "items", min_confidence = 0.8,
 }
 
 # Validator
-ml_validator_fpgrowth <- function(.args) {
+validator_ml_fpgrowth <- function(.args) {
   .args[["items_col"]] <- cast_string(.args[["items_col"]])
   .args[["min_confidence"]] <- cast_scalar_double(.args[["min_confidence"]])
   .args[["min_support"]] <- cast_scalar_double(.args[["min_support"]])

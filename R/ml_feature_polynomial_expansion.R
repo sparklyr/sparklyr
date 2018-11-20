@@ -26,7 +26,7 @@ ft_polynomial_expansion.spark_connection <- function(x, input_col = NULL, output
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_polynomial_expansion()
+    validator_ml_polynomial_expansion()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.PolynomialExpansion",
@@ -68,7 +68,7 @@ new_ml_polynomial_expansion <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_polynomial_expansion")
 }
 
-ml_validator_polynomial_expansion <- function(.args) {
+validator_ml_polynomial_expansion <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["degree"]] <- cast_scalar_integer(.args[["degree"]])
   if (.args[["degree"]] < 1) stop("`degree` must be greater than 1.", call. = FALSE)

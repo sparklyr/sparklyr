@@ -23,7 +23,7 @@ ft_normalizer.spark_connection <- function(x, input_col = NULL, output_col = NUL
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_normalizer()
+    validator_ml_normalizer()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Normalizer",
@@ -66,7 +66,7 @@ new_ml_normalizer <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_normalizer")
 }
 
-ml_validator_normalizer <- function(.args) {
+validator_ml_normalizer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["p"]] <- cast_scalar_double(.args[["p"]])
   if (.args[["p"]] < 1) stop("`p` must be at least 1.")

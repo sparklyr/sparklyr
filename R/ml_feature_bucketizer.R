@@ -50,7 +50,7 @@ ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NUL
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_bucketizer()
+    validator_ml_bucketizer()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Bucketizer", .args[["uid"]],
@@ -110,7 +110,7 @@ new_ml_bucketizer <- function(jobj) {
 }
 
 # Validator
-ml_validator_bucketizer <- function(.args) {
+validator_ml_bucketizer <- function(.args) {
   .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]]))

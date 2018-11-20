@@ -67,7 +67,7 @@ ml_linear_regression.spark_connection <- function(x, formula = NULL, fit_interce
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_linear_regression()
+    validator_ml_linear_regression()
 
   jobj <- ml_new_regressor(
     x, "org.apache.spark.ml.regression.LinearRegression", uid,
@@ -159,7 +159,7 @@ ml_linear_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = TR
 }
 
 # Validator
-ml_validator_linear_regression <- function(.args) {
+validator_ml_linear_regression <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     intercept = "fit_intercept",
     alpha = "elastic_net_param",

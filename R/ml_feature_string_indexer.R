@@ -34,7 +34,7 @@ ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col =
     string_order_type = string_order_type,
     uid = uid
   ) %>%
-    ml_validator_string_indexer()
+    validator_ml_string_indexer()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.StringIndexer",
@@ -119,7 +119,7 @@ new_ml_string_indexer_model <- function(jobj) {
 #' @export
 ml_labels <- function(model) model$labels
 
-ml_validator_string_indexer <- function(.args) {
+validator_ml_string_indexer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["handle_invalid"]] <- cast_choice(
     .args[["handle_invalid"]], c("error", "skip", "keep")

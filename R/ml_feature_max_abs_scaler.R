@@ -38,7 +38,7 @@ ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col =
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_max_abs_scaler()
+    validator_ml_max_abs_scaler()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.MaxAbsScaler",
@@ -95,6 +95,6 @@ new_ml_max_abs_scaler_model <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_max_abs_scaler_model")
 }
 
-ml_validator_max_abs_scaler <- function(.args) {
+validator_ml_max_abs_scaler <- function(.args) {
   validate_args_transformer(.args)
 }

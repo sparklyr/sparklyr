@@ -21,7 +21,7 @@ ft_minhash_lsh.spark_connection <- function(x, input_col = NULL, output_col = NU
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_minhash_lsh()
+    validator_ml_minhash_lsh()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.MinHashLSH",
@@ -90,7 +90,7 @@ new_ml_minhash_lsh_model <- function(jobj) {
     subclass = "ml_minhash_lsh_model")
 }
 
-ml_validator_minhash_lsh <- function(.args) {
+validator_ml_minhash_lsh <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["num_hash_tables"]] <- cast_scalar_integer(.args[["num_hash_tables"]])
   .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])

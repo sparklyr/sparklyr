@@ -48,7 +48,7 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
     raw_prediction_col = raw_prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_gbt_classifier()
+    validator_ml_gbt_classifier()
 
   stage_class <- "org.apache.spark.ml.classification.GBTClassifier"
 
@@ -173,7 +173,7 @@ ml_gbt_classifier.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_de
 }
 
 # Validator
-ml_validator_gbt_classifier <- function(.args) {
+validator_ml_gbt_classifier <- function(.args) {
   .args <- ml_backwards_compatibility(
     .args,
     list(

@@ -34,7 +34,7 @@ ml_random_forest_regressor.spark_connection <- function(x, formula = NULL, num_t
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_random_forest_regressor()
+    validator_ml_random_forest_regressor()
 
   jobj <- ml_new_predictor(
     x, "org.apache.spark.ml.regression.RandomForestRegressor", uid,
@@ -128,7 +128,7 @@ ml_random_forest_regressor.tbl_spark <- function(x, formula = NULL, num_trees = 
   }
 }
 
-ml_validator_random_forest_regressor <- function(.args) {
+validator_ml_random_forest_regressor <- function(.args) {
   .args <- .args %>%
     ml_backwards_compatibility(  list(
       sample.rate = "subsampling_rate",

@@ -26,7 +26,7 @@ ft_elementwise_product.spark_connection <- function(x, input_col = NULL, output_
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_elementwise_product()
+    validator_ml_elementwise_product()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.ElementwiseProduct",
@@ -70,7 +70,7 @@ new_ml_elementwise_product <- function(jobj) {
 }
 
 # ElementwiseProduct
-ml_validator_elementwise_product <- function(.args) {
+validator_ml_elementwise_product <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["scaling_vec"]] <- cast_nullable_double_list(.args[["scaling_vec"]])
   .args

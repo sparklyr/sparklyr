@@ -66,7 +66,7 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
     raw_prediction_col = raw_prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_linear_svc()
+    validator_ml_linear_svc()
 
   jobj <- ml_new_predictor(
     x, "org.apache.spark.ml.classification.LinearSVC", uid,
@@ -155,7 +155,7 @@ ml_linear_svc.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE, reg
 }
 
 # Validator
-ml_validator_linear_svc <- function(.args) {
+validator_ml_linear_svc <- function(.args) {
   .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])

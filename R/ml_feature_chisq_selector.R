@@ -41,7 +41,7 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_chisq_selector()
+    validator_ml_chisq_selector()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.ChiSqSelector", output_col = .args[["output_col"]],
@@ -120,7 +120,7 @@ new_ml_chisq_selector_model <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_chisq_selector_model")
 }
 
-ml_validator_chisq_selector <- function(.args) {
+validator_ml_chisq_selector <- function(.args) {
   .args[["features_col"]] <- cast_string(.args[["features_col"]])
   .args[["label_col"]] <- cast_string(.args[["label_col"]])
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])

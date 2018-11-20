@@ -55,7 +55,7 @@ ft_stop_words_remover.spark_connection <- function(x, input_col = NULL, output_c
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_stop_words_remover()
+    validator_ml_stop_words_remover()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.StopWordsRemover",
@@ -103,7 +103,7 @@ new_ml_stop_words_remover <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_stop_words_remover")
 }
 
-ml_validator_stop_words_remover <- function(.args) {
+validator_ml_stop_words_remover <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["case_sensitive"]] <- cast_scalar_logical(.args[["case_sensitive"]])
   .args[["stop_words"]] <- cast_character_list(.args[["stop_words"]])

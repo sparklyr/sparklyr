@@ -46,7 +46,7 @@ ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_standard_scaler()
+    validator_ml_standard_scaler()
 
   estimator <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.StandardScaler",
@@ -113,7 +113,7 @@ new_ml_standard_scaler_model <- function(jobj) {
     subclass = "ml_standard_scaler_model")
 }
 
-ml_validator_standard_scaler <- function(.args) {
+validator_ml_standard_scaler <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["with_mean"]] <- cast_scalar_logical(.args[["with_mean"]])
   .args[["with_std"]] <- cast_scalar_logical(.args[["with_std"]])

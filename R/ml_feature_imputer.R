@@ -36,7 +36,7 @@ ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_imputer()
+    validator_ml_imputer()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.Imputer",
@@ -89,7 +89,7 @@ ft_imputer.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL,
     ml_fit_and_transform(stage, x)
 }
 
-ml_validator_imputer <- function(.args) {
+validator_ml_imputer <- function(.args) {
   .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
   .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
   .args[["strategy"]] <- cast_choice(.args[["strategy"]], c("mean", "median"))

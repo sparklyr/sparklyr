@@ -24,7 +24,7 @@ ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_ngram()
+    validator_ml_ngram()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.NGram",
@@ -68,7 +68,7 @@ new_ml_ngram <- function(jobj) {
   new_ml_transformer(jobj, subclass = "ml_ngram")
 }
 
-ml_validator_ngram <- function(.args) {
+validator_ml_ngram <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["n"]] <- cast_scalar_integer(.args[["n"]])
   .args

@@ -66,7 +66,7 @@ ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "fea
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_r_formula()
+    validator_ml_r_formula()
 
   estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", .args[["uid"]]) %>%
     invoke("setFeaturesCol", .args[["features_col"]]) %>%
@@ -136,7 +136,7 @@ new_ml_r_formula_model <- function(jobj) {
 
 # Validator
 
-ml_validator_r_formula <- function(.args) {
+validator_ml_r_formula <- function(.args) {
   if (rlang::is_formula(.args[["formula"]]))
     .args[["formula"]] <- rlang::expr_text(.args[["formula"]], width = 500L)
   .args[["formula"]] <- cast_nullable_string(.args[["formula"]])

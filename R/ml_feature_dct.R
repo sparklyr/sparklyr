@@ -25,7 +25,7 @@ ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_dct()
+    validator_ml_dct()
 
   jobj <- ml_new_transformer(
     x, "org.apache.spark.ml.feature.DCT",
@@ -72,7 +72,7 @@ ft_discrete_cosine_transform <- function(x, input_col, output_col, inverse = FAL
   UseMethod("ft_dct")
 }
 
-ml_validator_dct <- function(.args) {
+validator_ml_dct <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["inverse"]] <- cast_scalar_logical(.args[["inverse"]])
   .args
