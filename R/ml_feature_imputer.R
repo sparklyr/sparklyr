@@ -40,7 +40,7 @@ ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL
     c(rlang::dots_list(...)) %>%
     validator_ml_imputer()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Imputer",
     input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]], uid = .args[["uid"]]) %>%
     invoke("setStrategy", .args[["strategy"]]) %>%

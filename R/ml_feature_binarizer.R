@@ -43,7 +43,7 @@ ft_binarizer.spark_connection <- function(x, input_col = NULL, output_col = NULL
     c(rlang::dots_list(...)) %>%
     validator_ml_binarizer()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Binarizer",
     input_col = .args[["input_col"]],
     output_col = .args[["output_col"]],

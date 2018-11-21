@@ -30,7 +30,7 @@ ft_polynomial_expansion.spark_connection <- function(x, input_col = NULL, output
     c(rlang::dots_list(...)) %>%
     validator_ml_polynomial_expansion()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.PolynomialExpansion",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setDegree", .args[["degree"]])

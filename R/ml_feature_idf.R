@@ -27,7 +27,7 @@ ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     c(rlang::dots_list(...)) %>%
     validator_ml_idf()
 
-  estimator <- ml_new_transformer(
+  estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.IDF",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setMinDocFreq", .args[["min_doc_freq"]]) %>%

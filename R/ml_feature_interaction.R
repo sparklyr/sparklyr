@@ -28,7 +28,7 @@ ft_interaction.spark_connection <- function(x, input_cols = NULL, output_col = N
     c(rlang::dots_list(...)) %>%
     validator_ml_interaction()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Interaction",
     input_cols = .args[["input_cols"]], output_col = .args[["output_col"]], uid = .args[["uid"]])
 

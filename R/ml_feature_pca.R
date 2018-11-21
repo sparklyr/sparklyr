@@ -27,7 +27,7 @@ ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = 
     c(rlang::dots_list(...)) %>%
     validator_ml_pca()
 
-  estimator <- ml_new_transformer(
+  estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.PCA",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%

@@ -72,7 +72,7 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
     c(rlang::dots_list(...)) %>%
     validator_ml_quantile_discretizer()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.QuantileDiscretizer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]],
     input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]],

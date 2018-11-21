@@ -32,7 +32,7 @@ ft_hashing_tf.spark_connection <- function(x, input_col = NULL, output_col = NUL
     c(rlang::dots_list(...)) %>%
     validator_ml_hashing_tf()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.HashingTF",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     maybe_set_param("setBinary", .args[["binary"]], "2.0.0", FALSE) %>%

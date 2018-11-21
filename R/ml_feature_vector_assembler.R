@@ -28,7 +28,7 @@ ft_vector_assembler.spark_connection <- function(x, input_cols = NULL, output_co
     c(rlang::dots_list(...)) %>%
     validator_ml_vector_assembler()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.VectorAssembler",
     input_cols = .args[["input_cols"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   )

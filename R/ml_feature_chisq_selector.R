@@ -45,7 +45,7 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
     c(rlang::dots_list(...)) %>%
     validator_ml_chisq_selector()
 
-  estimator <- ml_new_transformer(
+  estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.ChiSqSelector", output_col = .args[["output_col"]],
     uid = .args[["uid"]]) %>%
     maybe_set_param("setFdr", .args[["fdr"]], "2.2.0", 0.05) %>%

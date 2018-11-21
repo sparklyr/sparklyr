@@ -59,7 +59,7 @@ ft_stop_words_remover.spark_connection <- function(x, input_col = NULL, output_c
     c(rlang::dots_list(...)) %>%
     validator_ml_stop_words_remover()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.StopWordsRemover",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%

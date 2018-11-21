@@ -28,7 +28,7 @@ ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n 
     c(rlang::dots_list(...)) %>%
     validator_ml_ngram()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.NGram",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%

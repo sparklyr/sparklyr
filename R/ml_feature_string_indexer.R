@@ -37,7 +37,7 @@ ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col =
   ) %>%
     validator_ml_string_indexer()
 
-  estimator <- ml_new_transformer(
+  estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.StringIndexer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
