@@ -161,6 +161,7 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
     sdf_list[[i]] <- serializer(sc, df, columns, repartition)
 
     # force parallelize to execute
+    invoke(sdf_list[[i]], "cache")
     sdf_count <- invoke(sdf_list[[i]], "count")
     if (spark_config_value(sc$config, "sparklyr.verbose", FALSE)) {
       message("Copied ", sdf_count, " rows to Spark.")
