@@ -46,9 +46,10 @@ ml_bisecting_kmeans.spark_connection <- function(x, formula = NULL, k = 4, max_i
     c(rlang::dots_list(...)) %>%
     validator_ml_bisecting_kmeans()
 
-  jobj <- ml_new_clustering(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.clustering.BisectingKMeans", uid,
-    .args[["features_col"]], .args[["k"]], .args[["max_iter"]], .args[["seed"]]
+    features_col = .args[["features_col"]],
+    k = .args[["k"]], max_iter = .args[["max_iter"]], seed = .args[["seed"]]
   ) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%
     invoke("setMinDivisibleClusterSize", .args[["min_divisible_cluster_size"]])

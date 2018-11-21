@@ -90,7 +90,7 @@ ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_inter
     c(rlang::dots_list(...)) %>%
     validator_ml_logistic_regression()
 
-  jobj <- ml_new_classifier(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.LogisticRegression", .args[["uid"]],
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]], probability_col = .args[["probability_col"]],

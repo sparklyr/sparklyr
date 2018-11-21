@@ -38,9 +38,11 @@ ml_decision_tree_regressor.spark_connection <- function(x, formula = NULL, max_d
     c(rlang::dots_list(...)) %>%
     validator_ml_decision_tree_regressor()
 
-  jobj <- ml_new_regressor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.regression.DecisionTreeRegressor", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
+    features_col = .args[["features_col"]],
+    label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]]
   ) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
     invoke("setImpurity", .args[["impurity"]]) %>%

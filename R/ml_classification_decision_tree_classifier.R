@@ -42,10 +42,12 @@ ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_
     c(rlang::dots_list(...)) %>%
     validator_ml_decision_tree_classifier()
 
-  jobj <- ml_new_classifier(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.DecisionTreeClassifier", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]],
-    .args[["probability_col"]], .args[["raw_prediction_col"]]
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]],
+    probability_col = .args[["probability_col"]],
+    raw_prediction_col = .args[["raw_prediction_col"]]
   ) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
     invoke("setImpurity", .args[["impurity"]]) %>%

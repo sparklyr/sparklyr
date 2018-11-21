@@ -48,9 +48,10 @@ ml_gaussian_mixture.spark_connection <- function(x, formula = NULL, k = 2, max_i
     c(rlang::dots_list(...)) %>%
     validator_ml_gaussian_mixture()
 
-  jobj <- ml_new_clustering(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.clustering.GaussianMixture", uid,
-    .args[["features_col"]], .args[["k"]], .args[["max_iter"]], .args[["seed"]]
+    features_col = .args[["features_col"]],
+    k = .args[["k"]], max_iter = .args[["max_iter"]], seed = .args[["seed"]]
   ) %>%
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%

@@ -45,9 +45,10 @@ ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, 
     c(rlang::dots_list(...)) %>%
     validator_ml_kmeans()
 
-  jobj <- ml_new_clustering(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.clustering.KMeans", uid,
-    .args[["features_col"]], .args[["k"]], .args[["max_iter"]], .args[["seed"]]
+    features_col = .args[["features_col"]], k = .args[["k"]],
+    max_iter = .args[["max_iter"]], seed = .args[["seed"]]
   ) %>%
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setInitSteps", .args[["init_steps"]]) %>%

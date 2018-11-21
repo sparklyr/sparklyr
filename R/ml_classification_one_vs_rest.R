@@ -26,7 +26,7 @@ ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL
     c(rlang::dots_list(...)) %>%
     validator_ml_one_vs_rest()
 
-  jobj <- ml_new_predictor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.OneVsRest", uid,
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]]

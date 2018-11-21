@@ -101,9 +101,10 @@ ml_generalized_linear_regression.spark_connection <- function(x, formula = NULL,
     c(rlang::dots_list(...)) %>%
     validator_ml_generalized_linear_regression()
 
-  jobj <- ml_new_regressor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.regression.GeneralizedLinearRegression", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]]
   ) %>%
     invoke("setFamily", .args[["family"]]) %>%
     invoke("setFitIntercept", .args[["fit_intercept"]]) %>%

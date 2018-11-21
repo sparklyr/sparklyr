@@ -62,10 +62,12 @@ ml_naive_bayes.spark_connection <- function(x, formula = NULL, model_type = "mul
     c(rlang::dots_list(...)) %>%
     validator_ml_naive_bayes()
 
-  jobj <- ml_new_classifier(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.NaiveBayes", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]],
-    .args[["probability_col"]], .args[["raw_prediction_col"]]
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]],
+    probability_col = .args[["probability_col"]],
+    raw_prediction_col = .args[["raw_prediction_col"]]
   ) %>%
     invoke("setSmoothing", .args[["smoothing"]]) %>%
     invoke("setModelType", .args[["model_type"]]) %>%

@@ -67,9 +67,11 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(x, formula = NU
     c(rlang::dots_list(...)) %>%
     validator_ml_multilayer_perceptron_classifier()
 
-  jobj <- ml_new_predictor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.MultilayerPerceptronClassifier", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]) %>%
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]]
+  ) %>%
     maybe_set_param("setLayers", .args[["layers"]]) %>%
     invoke("setMaxIter", .args[["max_iter"]]) %>%
     maybe_set_param("setStepSize", .args[["step_size"]], "2.0.0", 0.03) %>%
@@ -187,12 +189,12 @@ new_ml_multilayer_perceptron_classifier <- function(jobj) {
 }
 
 new_ml_multilayer_perceptron_classification_model <- function(jobj) {
-    # In spark 2.2.1 and below, there is not the method numClasses, so
-    # I take the last value of invoke(jobj, "layers")
-    layers = invoke(jobj, "layers")
-    num_classes = dplyr::last(layers)
+  # In spark 2.2.1 and below, there is not the method numClasses, so
+  # I take the last value of invoke(jobj, "layers")
+  layers = invoke(jobj, "layers")
+  num_classes = dplyr::last(layers)
 
-    new_ml_prediction_model(
+  new_ml_prediction_model(
     jobj,
     layers = layers,
     num_features = invoke(jobj, "numFeatures"),

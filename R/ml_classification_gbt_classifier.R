@@ -54,14 +54,17 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
 
   jobj <- (
     if (spark_version(x) < "2.2.0")
-      ml_new_predictor(
-        x, stage_class, uid, .args[["features_col"]],
-        .args[["label_col"]], .args[["prediction_col"]]
+      spark_pipeline_stage(
+        x, stage_class, uid, features_col = .args[["features_col"]],
+        label_col = .args[["label_col"]], prediction_col = .args[["prediction_col"]]
       )
     else
-      ml_new_classifier(
-        x, stage_class, uid, .args[["features_col"]], .args[["label_col"]],
-        .args[["prediction_col"]], .args[["probability_col"]], .args[["raw_prediction_col"]]
+      spark_pipeline_stage(
+        x, stage_class, uid, features_col = .args[["features_col"]],
+        label_col = .args[["label_col"]],
+        prediction_col = .args[["prediction_col"]],
+        probability_col = .args[["probability_col"]],
+        raw_prediction_col = .args[["raw_prediction_col"]]
       )
   ) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%

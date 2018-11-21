@@ -53,9 +53,10 @@ ml_isotonic_regression.spark_connection <- function(x, formula = NULL, feature_i
     c(rlang::dots_list(...)) %>%
     validator_ml_isotonic_regression()
 
-  jobj <- ml_new_predictor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.regression.IsotonicRegression", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]]
   ) %>%
     invoke("setFeatureIndex", .args[["feature_index"]]) %>%
     invoke("setIsotonic", .args[["isotonic"]]) %>%
