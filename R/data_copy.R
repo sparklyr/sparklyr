@@ -160,6 +160,12 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
     columns <- spark_data_translate_columns(df)
     sdf_list[[i]] <- serializer(sc, df, columns, repartition)
 
+    # force parallelize to execute
+    sdf_count <- invoke(sdf_list[[i]], "count")
+    if (spark_config_value(sc$config, "sparklyr.verbose", FALSE)) {
+      message("Copied ", sdf_count, " rows to Spark.")
+    }
+
     i <- i + 1
     if (identical(class(df_data), "iterator")) {
       df <- df_data()
