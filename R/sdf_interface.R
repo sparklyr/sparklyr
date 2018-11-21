@@ -92,7 +92,7 @@ sdf_import.default <- function(x,
   serializer <- dots$serializer
   spark_data_copy(sc, x, name = name, repartition = repartition, serializer = serializer)
 
-  if (memory)
+  if (memory && !identical(class(x), "list"))
     tbl_cache(sc, name)
 
   on_connection_updated(sc, name)

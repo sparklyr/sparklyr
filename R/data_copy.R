@@ -158,14 +158,8 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
 
     names(df) <- spark_sanitize_names(names(df), sc$config)
     columns <- spark_data_translate_columns(df)
-    sdf_list[[i]] <- serializer(sc, df, columns, repartition)
-
-    # force parallelize to execute
-    invoke(sdf_list[[i]], "cache")
-    sdf_count <- invoke(sdf_list[[i]], "count")
-    if (spark_config_value(sc$config, "sparklyr.verbose", FALSE)) {
-      message("Copied ", sdf_count, " rows to Spark.")
-    }
+    sdf_current <- serializer(sc, df, columns, repartition)
+    sdf_list[[i]] <- sdf_current
 
     i <- i + 1
     if (identical(class(df_data), "iterator")) {
@@ -173,6 +167,15 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
     }
     else {
       df <- if (i <= length(df_list)) df_list[[i]] else NULL
+    }
+
+    # if more than one batch, partially cache results
+    if (!is.null(df)) {
+      invoke(sdf_current, "cache")
+      sdf_count <- invoke(sdf_current, "count")
+      if (spark_config_value(sc$config, "sparklyr.verbose", FALSE)) {
+        message("Copied batch with ", sdf_count, " rows to Spark.")
+      }
     }
   }
 
