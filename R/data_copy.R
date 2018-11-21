@@ -170,7 +170,7 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
     }
 
     # if more than one batch, partially cache results
-    if (!is.null(df)) {
+    if (i > 2 || !is.null(df)) {
       invoke(sdf_current, "cache")
       sdf_count <- invoke(sdf_current, "count")
       if (spark_config_value(sc$config, "sparklyr.verbose", FALSE)) {
