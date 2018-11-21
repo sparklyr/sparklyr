@@ -191,11 +191,6 @@ ml_summary <- function(x, metric = NULL, allow_null = FALSE) {
     x$summary[[metric]] %||% stop("metric ", metric, " not found")
 }
 
-ml_new_identifiable <- function(sc, class, uid) {
-  uid <- cast_string(uid)
-  invoke_new(sc, class, uid)
-}
-
 ml_backwards_compatibility <- function(.args, mapping_list = NULL) {
   mapping_list <- mapping_list %||%
     c(input.col = "input_col",

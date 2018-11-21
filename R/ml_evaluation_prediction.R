@@ -80,7 +80,7 @@ ml_binary_classification_evaluator.spark_connection <- function(x, label_col = "
   ) %>%
     validator_ml_binary_classification_evaluator()
 
-  ml_new_identifiable(x, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator", uid) %>%
+  spark_pipeline_stage(x, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator", uid) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
     invoke("setRawPredictionCol", .args[["raw_prediction_col"]]) %>%
     invoke("setMetricName", .args[["metric_name"]]) %>%
@@ -159,7 +159,7 @@ ml_multiclass_classification_evaluator.spark_connection <- function(x, label_col
     stop("Metric `", metric_name, "` is unsupported in Spark ", spark_version(x), ".")
   }
 
-  ml_new_identifiable(x, "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator", uid) %>%
+  spark_pipeline_stage(x, "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator", uid) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%
     invoke("setMetricName", .args[["metric_name"]]) %>%
@@ -226,7 +226,7 @@ ml_regression_evaluator.spark_connection <- function(x, label_col = "label", pre
   ) %>%
     validator_ml_regression_evaluator()
 
-  evaluator <- ml_new_identifiable(x, "org.apache.spark.ml.evaluation.RegressionEvaluator", uid) %>%
+  evaluator <- spark_pipeline_stage(x, "org.apache.spark.ml.evaluation.RegressionEvaluator", uid) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%
     invoke("setMetricName", .args[["metric_name"]])  %>%

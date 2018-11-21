@@ -60,7 +60,7 @@ ml_clustering_evaluator.spark_connection <- function(x, features_col = "features
   ) %>%
     validator_ml_clustering_evaluator()
 
-  evaluator <- ml_new_identifiable(x, "org.apache.spark.ml.evaluation.ClusteringEvaluator", uid) %>%
+  evaluator <- spark_pipeline_stage(x, "org.apache.spark.ml.evaluation.ClusteringEvaluator", uid) %>%
     invoke("setFeaturesCol", .args[["features_col"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%
     invoke("setMetricName", .args[["metric_name"]]) %>%
