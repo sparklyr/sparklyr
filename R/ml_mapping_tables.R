@@ -2,7 +2,7 @@ register_mapping_tables <- function() {
 
   flip_named_list <- function(x) setNames(as.list(names(x)), unlist(x))
   create_env_from_mappings <- function(x) purrr::reduce(
-    purrr::map(x, as.environment), rlang::env_poke_parent
+    purrr::map(x, ~ list2env(.x, parent = emptyenv())), rlang::env_poke_parent
   )
 
   read_extension_mappings <- function(file_name) {
