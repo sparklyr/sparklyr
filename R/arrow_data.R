@@ -81,15 +81,31 @@ arrow_copy_to <- function(sc, df, parallelism)
   df <- core_remove_factors(df)
 
   # serialize to arrow
-  batches <- list(arrow_batch(df))
+  if (spark_connection_in_driver(sc) &&
+      !identical(spark_config_value(sc$config, "sparklyr.arrow.file"), FALSE)) {
+    arrow_temp <- tempfile(fileext = ".batch")
+    batch <- arrow_batch(df)
 
-  rdd <- invoke_static(
-    sc,
-    "sparklyr.ArrowHelper",
-    "javaRddFromBinaryBatches",
-    spark_context(sc),
-    batches,
-    parallelism)
+    on.exit(unlink(arrow_temp))
+    writeBin(batch, arrow_temp)
+
+    rdd <- invoke_static(
+      sc,
+      "sparklyr.ArrowHelper",
+      "javaRddFromBinaryBatchFile",
+      spark_context(sc),
+      arrow_temp,
+      parallelism)
+  } else {
+    batches <- list(arrow_batch(df))
+    rdd <- invoke_static(
+      sc,
+      "sparklyr.ArrowHelper",
+      "javaRddFromBinaryBatches",
+      spark_context(sc),
+      batches,
+      parallelism)
+  }
 
   invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
 }
