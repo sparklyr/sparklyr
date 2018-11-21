@@ -17,7 +17,7 @@ ml_add_stage <- function(x, transformer) {
   new_ml_pipeline(jobj)
 }
 
-maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
+jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
   # if value is NULL, don't set
   if (is.null(value)) return(jobj)
 
@@ -69,18 +69,18 @@ jobj_set_ml_params <- function(jobj, features_col, label_col, prediction_col,
                                k, max_iter, seed, input_col, input_cols,
                                output_col, output_cols) {
   jobj %>%
-    maybe_set_param("setFeaturesCol", features_col) %>%
-    maybe_set_param("setLabelCol", label_col) %>%
-    maybe_set_param("setPredictionCol", prediction_col) %>%
-    maybe_set_param("setProbabilityCol", probability_col) %>%
-    maybe_set_param("setRawPredictionCol", raw_prediction_col) %>%
-    maybe_set_param("setK", k) %>%
-    maybe_set_param("setMaxIter", max_iter) %>%
-    maybe_set_param("setSeed", seed) %>%
-    maybe_set_param("setInputCol", input_col) %>%
-    maybe_set_param("setInputCols", input_cols) %>%
-    maybe_set_param("setOutputCol", output_col) %>%
-    maybe_set_param("setOutputCols", output_cols)
+    jobj_set_param("setFeaturesCol", features_col) %>%
+    jobj_set_param("setLabelCol", label_col) %>%
+    jobj_set_param("setPredictionCol", prediction_col) %>%
+    jobj_set_param("setProbabilityCol", probability_col) %>%
+    jobj_set_param("setRawPredictionCol", raw_prediction_col) %>%
+    jobj_set_param("setK", k) %>%
+    jobj_set_param("setMaxIter", max_iter) %>%
+    jobj_set_param("setSeed", seed) %>%
+    jobj_set_param("setInputCol", input_col) %>%
+    jobj_set_param("setInputCols", input_cols) %>%
+    jobj_set_param("setOutputCol", output_col) %>%
+    jobj_set_param("setOutputCols", output_cols)
 }
 
 validate_args_transformer <- function(.args) {

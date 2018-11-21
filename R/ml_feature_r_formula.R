@@ -72,9 +72,9 @@ ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "fea
 
   estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", .args[["uid"]]) %>%
     invoke("setFeaturesCol", .args[["features_col"]]) %>%
-    maybe_set_param("setFormula", .args[["formula"]]) %>%
+    jobj_set_param("setFormula", .args[["formula"]]) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
-    maybe_set_param("setForceIndexLabel", .args[["force_index_label"]], "2.1.0", FALSE) %>%
+    jobj_set_param("setForceIndexLabel", .args[["force_index_label"]], "2.1.0", FALSE) %>%
     new_ml_r_formula()
 
   if (is.null(dataset))

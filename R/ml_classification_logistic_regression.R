@@ -102,26 +102,26 @@ ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_inter
     invoke("setMaxIter", .args[["max_iter"]]) %>%
     invoke("setThreshold", .args[["threshold"]]) %>%
     invoke("setTol", .args[["tol"]]) %>%
-    maybe_set_param("setFamily", .args[["family"]], "2.1.0", "auto") %>%
-    maybe_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
-    maybe_set_param("setThresholds", .args[["thresholds"]]) %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]]) %>%
-    maybe_set_param(
+    jobj_set_param("setFamily", .args[["family"]], "2.1.0", "auto") %>%
+    jobj_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
+    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
+    jobj_set_param("setWeightCol", .args[["weight_col"]]) %>%
+    jobj_set_param(
       "setLowerBoundsOnCoefficients",
       spark_dense_matrix(x, .args[["lower_bounds_on_coefficients"]]),
       "2.2.0"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setUpperBoundsOnCoefficients",
       spark_dense_matrix(x, .args[["upper_bounds_on_coefficients"]]),
       "2.2.0"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setLowerBoundsOnIntercepts",
       spark_dense_vector(x, .args[["lower_bounds_on_intercepts"]]),
       "2.2.0"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setUpperBoundsOnIntercepts",
       spark_dense_vector(x, .args[["upper_bounds_on_intercepts"]]),
       "2.2.0"

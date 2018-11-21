@@ -31,8 +31,8 @@ ml_train_validation_split.spark_connection <- function(x, estimator = NULL, esti
     .args[["estimator"]], .args[["evaluator"]], .args[["estimator_param_maps"]], .args[["seed"]]
   ) %>%
     invoke("setTrainRatio", .args[["train_ratio"]]) %>%
-    maybe_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
-    maybe_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
+    jobj_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
+    jobj_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
     new_ml_train_validation_split()
 }
 

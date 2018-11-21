@@ -57,8 +57,8 @@ ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_
     invoke("setMinInstancesPerNode", .args[["min_instances_per_node"]]) %>%
     invoke("setCacheNodeIds", .args[["cache_node_ids"]]) %>%
     invoke("setMaxMemoryInMB", .args[["max_memory_in_mb"]]) %>%
-    maybe_set_param("setThresholds", .args[["thresholds"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_decision_tree_classifier(jobj)
 }

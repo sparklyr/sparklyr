@@ -30,7 +30,7 @@ ft_minhash_lsh.spark_connection <- function(x, input_col = NULL, output_col = NU
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
     invoke("setNumHashTables", .args[["num_hash_tables"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setSeed", .args[["seed"]])
 
   estimator <- new_ml_minhash_lsh(jobj)
 

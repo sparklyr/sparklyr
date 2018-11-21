@@ -35,7 +35,7 @@ ft_sql_transformer.spark_connection <- function(x, statement = NULL,
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.SQLTransformer",
     .args[["uid"]]) %>%
-    maybe_set_param("setStatement", .args[["statement"]])
+    jobj_set_param("setStatement", .args[["statement"]])
 
   new_ml_sql_transformer(jobj)
 }

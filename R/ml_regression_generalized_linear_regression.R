@@ -112,12 +112,12 @@ ml_generalized_linear_regression.spark_connection <- function(x, formula = NULL,
     invoke("setMaxIter", .args[["max_iter"]]) %>%
     invoke("setSolver", .args[["solver"]]) %>%
     invoke("setTol", .args[["tol"]]) %>%
-    maybe_set_param("setLinkPower", .args[["link_power"]]) %>%
-    maybe_set_param("setVariancePower", .args[["variance_power"]]) %>%
-    maybe_set_param("setLink", .args[["link"]]) %>%
-    maybe_set_param("setLinkPredictionCol", .args[["link_prediction_col"]]) %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]]) %>%
-    maybe_set_param("setOffsetCol", .args[["offset_col"]], "2.3.0")
+    jobj_set_param("setLinkPower", .args[["link_power"]]) %>%
+    jobj_set_param("setVariancePower", .args[["variance_power"]]) %>%
+    jobj_set_param("setLink", .args[["link"]]) %>%
+    jobj_set_param("setLinkPredictionCol", .args[["link_prediction_col"]]) %>%
+    jobj_set_param("setWeightCol", .args[["weight_col"]]) %>%
+    jobj_set_param("setOffsetCol", .args[["offset_col"]], "2.3.0")
 
   new_ml_generalized_linear_regression(jobj)
 }

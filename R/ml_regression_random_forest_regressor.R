@@ -52,7 +52,7 @@ ml_random_forest_regressor.spark_connection <- function(x, formula = NULL, num_t
     invoke("setSubsamplingRate", .args[["subsampling_rate"]]) %>%
     invoke("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]]) %>%
     invoke("setImpurity", .args[["impurity"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_random_forest_regressor(jobj)
 }

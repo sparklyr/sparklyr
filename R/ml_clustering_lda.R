@@ -126,15 +126,15 @@ ml_lda.spark_connection <- function(x, k = 10, max_iter = 20, doc_concentration 
     invoke("setSubsamplingRate", .args[["subsampling_rate"]]) %>%
     invoke("setOptimizer", .args[["optimizer"]]) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
-    maybe_set_param("setKeepLastCheckpoint", .args[["keep_last_checkpoint"]], "2.0.0", TRUE) %>%
+    jobj_set_param("setKeepLastCheckpoint", .args[["keep_last_checkpoint"]], "2.0.0", TRUE) %>%
     invoke("setLearningDecay", .args[["learning_decay"]]) %>%
     invoke("setLearningOffset", .args[["learning_offset"]]) %>%
     invoke("setOptimizeDocConcentration", .args[["optimize_doc_concentration"]]) %>%
     invoke("setFeaturesCol", .args[["features_col"]]) %>%
     invoke("setTopicDistributionCol", .args[["topic_distribution_col"]]) %>%
-    maybe_set_param("setDocConcentration", .args[["doc_concentration"]]) %>%
-    maybe_set_param("setTopicConcentration", .args[["topic_concentration"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setDocConcentration", .args[["doc_concentration"]]) %>%
+    jobj_set_param("setTopicConcentration", .args[["topic_concentration"]]) %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_lda(jobj)
 }

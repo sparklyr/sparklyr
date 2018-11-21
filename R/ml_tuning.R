@@ -142,9 +142,9 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
   }
 
   jobj <- invoke_new(sc, class, uid) %>%
-    maybe_set_param("setEstimator", possibly_spark_jobj(estimator)) %>%
-    maybe_set_param("setEvaluator", possibly_spark_jobj(evaluator)) %>%
-    maybe_set_param("setSeed", seed)
+    jobj_set_param("setEstimator", possibly_spark_jobj(estimator)) %>%
+    jobj_set_param("setEvaluator", possibly_spark_jobj(evaluator)) %>%
+    jobj_set_param("setSeed", seed)
 
   if (!is.null(param_maps))
     invoke_static(

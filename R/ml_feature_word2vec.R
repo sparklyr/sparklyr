@@ -54,7 +54,7 @@ ft_word2vec.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     invoke("setNumPartitions", .args[["num_partitions"]]) %>%
     invoke("setStepSize", .args[["step_size"]]) %>%
     invoke("setMaxIter", .args[["max_iter"]]) %>%
-    maybe_set_param("setMaxSentenceLength", .args[["max_sentence_length"]], "2.0.0", 1000)
+    jobj_set_param("setMaxSentenceLength", .args[["max_sentence_length"]], "2.0.0", 1000)
 
   if (!is.null(.args[["seed"]]))
     jobj <- invoke(jobj, "setSeed", .args[["seed"]])

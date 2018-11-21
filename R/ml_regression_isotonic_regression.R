@@ -60,7 +60,7 @@ ml_isotonic_regression.spark_connection <- function(x, formula = NULL, feature_i
   ) %>%
     invoke("setFeatureIndex", .args[["feature_index"]]) %>%
     invoke("setIsotonic", .args[["isotonic"]]) %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]])
+    jobj_set_param("setWeightCol", .args[["weight_col"]])
 
   new_ml_isotonic_regression(jobj)
 }

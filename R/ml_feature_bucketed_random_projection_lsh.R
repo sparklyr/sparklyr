@@ -48,9 +48,9 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NU
     x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    maybe_set_param("setBucketLength", .args[["bucket_length"]]) %>%
+    jobj_set_param("setBucketLength", .args[["bucket_length"]]) %>%
     invoke("setNumHashTables", .args[["num_hash_tables"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setSeed", .args[["seed"]])
 
   estimator <- new_ml_bucketed_random_projection_lsh(jobj)
 

@@ -111,15 +111,15 @@ ml_als.spark_connection <- function(x, rating_col = "rating", user_col = "user",
     invoke("setNumUserBlocks", .args[["num_user_blocks"]]) %>%
     invoke("setNumItemBlocks", .args[["num_item_blocks"]]) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setIntermediateStorageLevel", .args[["intermediate_storage_level"]],
       "2.0.0", "MEMORY_AND_DISK"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setFinalStorageLevel", .args[["final_storage_level"]],
       "2.0.0","MEMORY_AND_DISK"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setColdStartStrategy", .args[["cold_start_strategy"]],
       "2.2.0", "nan"
     )

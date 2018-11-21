@@ -52,8 +52,8 @@ ml_decision_tree_regressor.spark_connection <- function(x, formula = NULL, max_d
     invoke("setMinInstancesPerNode", .args[["min_instances_per_node"]]) %>%
     invoke("setCacheNodeIds", .args[["cache_node_ids"]]) %>%
     invoke("setMaxMemoryInMB", .args[["max_memory_in_mb"]]) %>%
-    maybe_set_param("setVarianceCol", .args[["variance_col"]], "2.0.0") %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setVarianceCol", .args[["variance_col"]], "2.0.0") %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_decision_tree_regressor(jobj)
 }

@@ -44,7 +44,7 @@ ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL
     x, "org.apache.spark.ml.feature.Imputer",
     input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]], uid = .args[["uid"]]) %>%
     invoke("setStrategy", .args[["strategy"]]) %>%
-    maybe_set_param("setMissingValue", .args[["missing_value"]])
+    jobj_set_param("setMissingValue", .args[["missing_value"]])
 
   estimator <- new_ml_imputer(jobj)
 

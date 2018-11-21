@@ -36,7 +36,7 @@ ft_index_to_string.spark_connection <- function(x, input_col = NULL, output_col 
     x, "org.apache.spark.ml.feature.IndexToString",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    maybe_set_param("setLabels", .args[["labels"]])
+    jobj_set_param("setLabels", .args[["labels"]])
 
   new_ml_index_to_string(jobj)
 }

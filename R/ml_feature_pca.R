@@ -31,7 +31,7 @@ ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = 
     x, "org.apache.spark.ml.feature.PCA",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    maybe_set_param("setK", .args[["k"]]) %>%
+    jobj_set_param("setK", .args[["k"]]) %>%
     new_ml_pca()
 
   if (is.null(dataset))

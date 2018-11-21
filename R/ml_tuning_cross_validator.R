@@ -30,8 +30,8 @@ ml_cross_validator.spark_connection <- function(x, estimator = NULL, estimator_p
     .args[["seed"]]
   ) %>%
     invoke("setNumFolds", .args[["num_folds"]]) %>%
-    maybe_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
-    maybe_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
+    jobj_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
+    jobj_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
     new_ml_cross_validator()
 }
 

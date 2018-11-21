@@ -83,8 +83,8 @@ ml_aft_survival_regression.spark_connection <- function(x, formula = NULL, censo
     invoke("setCensorCol", .args[["censor_col"]]) %>%
     invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
     invoke("setQuantileProbabilities", .args[["quantile_probabilities"]]) %>%
-    maybe_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
-    maybe_set_param("setQuantilesCol", .args[["quantiles_col"]])
+    jobj_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
+    jobj_set_param("setQuantilesCol", .args[["quantiles_col"]])
 
   new_ml_aft_survival_regression(jobj)
 }

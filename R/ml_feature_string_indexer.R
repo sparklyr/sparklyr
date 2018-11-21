@@ -41,8 +41,8 @@ ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col =
     x, "org.apache.spark.ml.feature.StringIndexer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    maybe_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
-    maybe_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0",  "frequencyDesc") %>%
+    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
+    jobj_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0",  "frequencyDesc") %>%
     new_ml_string_indexer()
 
   if (is.null(dataset))

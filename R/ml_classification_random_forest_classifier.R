@@ -64,8 +64,8 @@ ml_random_forest_classifier.spark_connection <- function(x, formula = NULL, num_
     invoke("setSubsamplingRate", .args[["subsampling_rate"]]) %>%
     invoke("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]]) %>%
     invoke("setImpurity", .args[["impurity"]]) %>%
-    maybe_set_param("setThresholds", .args[["thresholds"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_random_forest_classifier(jobj)
 }

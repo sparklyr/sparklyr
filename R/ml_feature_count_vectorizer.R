@@ -56,7 +56,7 @@ ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col
     x, "org.apache.spark.ml.feature.CountVectorizer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    maybe_set_param("setBinary", .args[["binary"]], "2.0.0", FALSE) %>%
+    jobj_set_param("setBinary", .args[["binary"]], "2.0.0", FALSE) %>%
     invoke("setMinDF", .args[["min_df"]]) %>%
     invoke("setMinTF", .args[["min_tf"]]) %>%
     invoke("setVocabSize", .args[["vocab_size"]]) %>%

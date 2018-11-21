@@ -82,8 +82,8 @@ ml_linear_regression.spark_connection <- function(x, formula = NULL, fit_interce
     invoke("setSolver", .args[["solver"]]) %>%
     invoke("setStandardization", .args[["standardization"]]) %>%
     invoke("setTol", .args[["tol"]]) %>%
-    maybe_set_param("setLoss", .args[["loss"]], "2.3.0", "squaredError") %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]])
+    jobj_set_param("setLoss", .args[["loss"]], "2.3.0", "squaredError") %>%
+    jobj_set_param("setWeightCol", .args[["weight_col"]])
 
   new_ml_linear_regression(jobj)
 }

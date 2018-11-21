@@ -72,13 +72,13 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(x, formula = NU
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]]
   ) %>%
-    maybe_set_param("setLayers", .args[["layers"]]) %>%
+    jobj_set_param("setLayers", .args[["layers"]]) %>%
     invoke("setMaxIter", .args[["max_iter"]]) %>%
-    maybe_set_param("setStepSize", .args[["step_size"]], "2.0.0", 0.03) %>%
+    jobj_set_param("setStepSize", .args[["step_size"]], "2.0.0", 0.03) %>%
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setBlockSize", .args[["block_size"]]) %>%
-    maybe_set_param("setSolver", .args[["solver"]], "2.0.0", "l-bfgs") %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setSolver", .args[["solver"]], "2.0.0", "l-bfgs") %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
 
   if(!is.null(initial_weights) && spark_version(x) >= "2.0.0")

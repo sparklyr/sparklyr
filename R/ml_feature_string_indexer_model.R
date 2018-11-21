@@ -27,8 +27,8 @@ ft_string_indexer_model.spark_connection <- function(x, input_col = NULL, output
     x, "org.apache.spark.ml.feature.StringIndexerModel",
     .args[["uid"]], .args[["labels"]]
   ) %>%
-    maybe_set_param("setInputCol", .args[["input_col"]]) %>%
-    maybe_set_param("setOutputCol", .args[["output_col"]])
+    jobj_set_param("setInputCol", .args[["input_col"]]) %>%
+    jobj_set_param("setOutputCol", .args[["output_col"]])
 
   new_ml_string_indexer_model(jobj)
 }

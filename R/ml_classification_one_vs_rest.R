@@ -31,7 +31,7 @@ ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]]
   ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setClassifier",
       purrr::possibly(spark_jobj, NULL)(.args[["classifier"]])
     )

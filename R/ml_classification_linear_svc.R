@@ -81,7 +81,7 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setAggregationDepth", .args[["aggregation_depth"]]) %>%
     invoke("setThreshold", .args[["threshold"]]) %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]])
+    jobj_set_param("setWeightCol", .args[["weight_col"]])
 
   new_ml_linear_svc(jobj)
 }

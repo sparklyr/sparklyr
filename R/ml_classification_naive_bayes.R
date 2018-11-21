@@ -71,8 +71,8 @@ ml_naive_bayes.spark_connection <- function(x, formula = NULL, model_type = "mul
   ) %>%
     invoke("setSmoothing", .args[["smoothing"]]) %>%
     invoke("setModelType", .args[["model_type"]]) %>%
-    maybe_set_param("setThresholds", .args[["thresholds"]]) %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]], "2.1.0")
+    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
+    jobj_set_param("setWeightCol", .args[["weight_col"]], "2.1.0")
 
   new_ml_naive_bayes(jobj)
 }
