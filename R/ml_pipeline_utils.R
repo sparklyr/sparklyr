@@ -42,17 +42,6 @@ maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = N
   invoke(jobj, setter, value)
 }
 
-ml_new_transformer <- function(sc, class, uid,
-                               input_col = NULL, output_col = NULL,
-                               input_cols = NULL, output_cols = NULL) {
-  uid <- cast_string(uid)
-  invoke_new(sc, class, uid) %>%
-    maybe_set_param("setInputCol", input_col) %>%
-    maybe_set_param("setInputCols", input_cols) %>%
-    maybe_set_param("setOutputCol", output_col) %>%
-    maybe_set_param("setOutputCols", output_cols)
-}
-
 validate_args_transformer <- function(.args) {
   .args <- ml_backwards_compatibility(.args)
   .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
