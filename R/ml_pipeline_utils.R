@@ -17,6 +17,21 @@ ml_add_stage <- function(x, transformer) {
   new_ml_pipeline(jobj)
 }
 
+#' Parameter Setting for JVM Objects
+#'
+#' Sets a parameter value for a pipeline stage object.
+#'
+#' @param jobj A pipeline stage jobj.
+#' @param setter The name of the setter method as a string.
+#' @param value The value to be set.
+#' @param min_version The minimum required Spark version for this parameter to be valid.
+#' @param default The default value of the parameter, to be used together with `min_version`.
+#'   An error is thrown if the user's Spark version is older than `min_version` and `value`
+#'   differs from `default`.
+#'
+#' @keywords internal
+#'
+#' @export
 jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
   # if value is NULL, don't set
   if (is.null(value)) return(jobj)
@@ -30,8 +45,8 @@ jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NU
     if (ver < min_version) {
       if (!isTRUE(all.equal(value, default))) {
         # if user does not have required version, and tries to set parameter, throw error
-        stop("Parameter '", deparse(substitute(value)),
-             "' is only available for Spark ", min_version, " and later.")
+        stop(paste0("Parameter `", deparse(substitute(value)),
+                    "` is only available for Spark ", min_version, " and later."))
       } else {
         # otherwise, return jobj untouched
         return(jobj)
