@@ -57,6 +57,26 @@ jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NU
   invoke(jobj, setter, value)
 }
 
+
+#' Create a Pipeline Stage Object
+#'
+#' Helper function to create pipeline stage objects with common parameter setters.
+#'
+#' @param sc A `spark_connection` object.
+#' @param class Class name for the pipeline stage.
+#' @template roxlate-ml-uid
+#' @template roxlate-ml-features-col
+#' @template roxlate-ml-label-col
+#' @template roxlate-ml-prediction-col
+#' @template roxlate-ml-probabilistic-classifier-params
+#' @template roxlate-ml-clustering-params
+#' @template roxlate-ml-feature-input-output-col
+#' @param input_cols Names of input columns.
+#' @param input_cols Names of output columns.
+#'
+#' @keywords internal
+#'
+#' @export
 spark_pipeline_stage <- function(sc, class, uid, features_col = NULL, label_col = NULL, prediction_col = NULL,
                                  probability_col = NULL, raw_prediction_col = NULL,
                                  k = NULL, max_iter = NULL, seed = NULL, input_col = NULL, input_cols = NULL,
