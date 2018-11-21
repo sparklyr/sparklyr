@@ -294,15 +294,16 @@ spark_master_is_local <- function(master) {
   grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
 }
 
-spark_connection_is_yarn_client <- function(sc) {
-  spark_master_is_yarn_client(sc$master)
+spark_connection_in_driver <- function(sc) {
+  # is the current connection running inside the driver node?
+  spark_connection_is_local(sc) || spark_connection_is_yarn_client(sc)
 }
 
-spark_master_is_yarn_client <- function(master) {
-  grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE) ||
+spark_connection_is_yarn_client <- function(sc) {
+  grepl("^yarn-client$", sc$master, ignore.case = TRUE, perl = TRUE) ||
     (
-      grepl("^yarn$", master, ignore.case = TRUE, perl = TRUE) &&
-      !identical(sc$config$`sparklyr.shell.deploy-mode`, "cluster")
+      grepl("^yarn$", sc$master, ignore.case = TRUE, perl = TRUE) &&
+        !identical(sc$config$`sparklyr.shell.deploy-mode`, "cluster")
     )
 }
 

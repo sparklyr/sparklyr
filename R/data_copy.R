@@ -215,7 +215,7 @@ spark_data_copy <- function(
                     arrow_enabled(sc, df),
                     "arrow",
                     ifelse(
-                      spark_connection_is_local(sc) || spark_connection_is_yarn_client(sc),
+                      spark_connection_in_driver(sc),
                       "csv_file_scala",
                       getOption("sparklyr.copy.serializer", "csv_string")
                     )
