@@ -299,7 +299,11 @@ spark_connection_is_yarn_client <- function(sc) {
 }
 
 spark_master_is_yarn_client <- function(master) {
-  grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE)
+  grepl("^yarn-client$", master, ignore.case = TRUE, perl = TRUE) ||
+    (
+      grepl("^yarn$", master, ignore.case = TRUE, perl = TRUE) &&
+      !identical(sc$config$`sparklyr.shell.deploy-mode`, "cluster")
+    )
 }
 
 spark_master_is_yarn_cluster <- function(master, config) {
