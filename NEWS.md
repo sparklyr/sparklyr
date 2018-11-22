@@ -1,5 +1,8 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- `copy_to()` defaults `memory` parameter to `FALSE` since data is
+  already cached in driver node when updloaded.
+
 - Tables with periods are now supported; for `database.name` use instead
   `dbplyr::in_schema()` or, for backwards compatibility set
   `sparklyr.dplyr.period.splits` to `TRUE`.
