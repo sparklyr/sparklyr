@@ -44,7 +44,7 @@ sdf_copy_to <- function(sc,
 sdf_copy_to.default <- function(sc,
                                 x,
                                 name = spark_table_name(substitute(x)),
-                                memory = TRUE,
+                                memory = FALSE,
                                 repartition = 0L,
                                 overwrite = FALSE,
                                 ...
@@ -78,7 +78,7 @@ sdf_prepare_dataframe <- function(x) {
 sdf_import.default <- function(x,
                                sc,
                                name = random_string("sparklyr_tmp_"),
-                               memory = TRUE,
+                               memory = FALSE,
                                repartition = 0L,
                                overwrite = FALSE,
                                ...)
