@@ -6,7 +6,7 @@
 \usage{
 \method{copy_to}{spark_connection}(dest, df,
   name = spark_table_name(substitute(df)), overwrite = FALSE,
-  memory = TRUE, repartition = 0L, ...)
+  memory = FALSE, repartition = 0L, ...)
 }
 \arguments{
 \item{dest}{A \code{spark_connection}.}
