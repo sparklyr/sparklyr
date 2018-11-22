@@ -82,7 +82,7 @@ arrow_copy_to <- function(sc, df, parallelism)
 
   # serialize to arrow
   if (spark_connection_in_driver(sc) &&
-      !identical(spark_config_value(sc$config, "sparklyr.arrow.file"), FALSE)) {
+      identical(spark_config_value(sc$config, "sparklyr.arrow.file", FALSE), TRUE)) {
     arrow_temp <- tempfile(fileext = ".batch")
     batch <- arrow_batch(df)
 
