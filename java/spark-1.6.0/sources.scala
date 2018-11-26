@@ -130,7 +130,7 @@ readTypedObject <- function(con, type) {
           "s" = readStruct(con),
           "n" = NULL,
           "j" = getJobj(con, readString(con)),
-          stop(paste("Unsupported type for deserialization", type)))
+          stop("Unsupported type for deserialization '", type, "'"))
 }
 
 readString <- function(con) {
@@ -955,7 +955,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
-                 stop(paste("Unsupported type for serialization", class)))
+                 stop("Unsupported type for serialization '", class, "'"))
   writeBin(charToRaw(type), con)
 }
 
