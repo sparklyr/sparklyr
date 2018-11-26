@@ -40,7 +40,7 @@ spark_apply_bundle <- function(packages = TRUE, base_path = getwd()) {
     dir.create(spark_apply_bundle_path(), recursive = TRUE)
 
   args <- c(
-    "-cf",
+    "-chf",
     packagesTar,
     if (isTRUE(packages)) {
       lapply(.libPaths(), function(e) {
