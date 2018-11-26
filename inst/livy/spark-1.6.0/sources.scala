@@ -133,7 +133,7 @@ readTypedObject <- function(con, type) {
           "s" = readStruct(con),
           "n" = NULL,
           "j" = getJobj(con, readString(con)),
-          stop("Unsupported type for deserialization '", type, "'"))
+          stop("Unsupported type '", type, "' for deserialization"))
 }
 
 readString <- function(con) {
@@ -901,7 +901,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
-         stop("Unsupported type for serialization '", type, "'"))
+         stop("Unsupported type '", type, "' for serialization"))
 }
 
 writeVoid <- function(con) {
@@ -958,7 +958,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
-                 stop(paste("Unsupported type for serialization", class)))
+                 stop("Unsupported type '", class, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
 
