@@ -1,5 +1,8 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- `spark_apply()` and `spark_apply_bundle()` properly dereference
+  symlinks when creating package bundle (@awblocker, #1785)
+
 - Tables with periods supported by setting
   `sparklyr.dplyr.period.splits` to `FALSE`.
 
