@@ -345,13 +345,9 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
   class <- invoke(jobj, "getClass")
   className <- invoke(class, "getName")
   if (!identical(className, expectedClassName)) {
-    stop(paste(
-      "This operation is only supported on",
-      expectedClassName,
-      "jobjs but found",
-      className,
-      "instead.")
-    )
+    stop("This operation is only supported on ",
+         expectedClassName, " jobjs but found ",
+         className, " instead.")
   }
 }
 

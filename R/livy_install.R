@@ -206,7 +206,7 @@ livy_install_find <- function(livyVersion = NULL) {
     livyInstall <- quote(livy_install(version = ""))
     livyInstall$version <- livyVersion
 
-    stop(paste("Livy version not installed. To install, use", deparse(livyInstall)))
+    stop("Livy version not installed. To install, use ", deparse(livyInstall))
   }
 
   tail(versions, n = 1)

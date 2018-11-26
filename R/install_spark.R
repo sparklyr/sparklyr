@@ -44,7 +44,7 @@ spark_install_find <- function(version = NULL,
       sparkInstall$version <- sparkVersion
       sparkInstall$hadoop_version <- hadoopVersion
 
-      stop(paste("Spark version not installed. To install, use", deparse(sparkInstall)))
+      stop("Spark version not installed. To install, use", deparse(sparkInstall))
     } else {
       stop("Spark version not available. Find available versions, using spark_available_versions()")
     }
@@ -296,14 +296,14 @@ spark_install_old_dir <- function() {
 #' @export
 spark_install_tar <- function(tarfile) {
   if (!file.exists(tarfile)) {
-    stop(paste0("The file \"", tarfile, "\", does not exist."))
+    stop("The file \"", tarfile, "\", does not exist.")
   }
 
   filePattern <- spark_versions_file_pattern();
   fileName <- basename(tarfile)
   if (length(grep(filePattern, fileName)) == 0) {
-    stop(paste(
-      "The given file does not conform with the following pattern: ", filePattern))
+    stop(
+      "The given file does not conform with the following pattern: ", filePattern)
   }
 
   untar(tarfile = tarfile,
