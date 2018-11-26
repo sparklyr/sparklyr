@@ -1,5 +1,8 @@
 # Sparklyr 0.9.3
 
+- `spark_apply()` and `spark_apply_bundle()` properly dereference
+  symlinks when creating package bundle (@awblocker, #1785)
+
 - Fix `tableName` warning triggered while connecting.
 
 - Deprecate `sdf_mutate()` (#1754).
