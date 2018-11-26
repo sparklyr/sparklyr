@@ -8,7 +8,7 @@ databricks_connection <- function(config, extensions) {
                                          # startSparklyr will search & find proper JAR file
                                          system.file("java/", package = "sparklyr")))
   }, error = function(err) {
-    stop(paste("Failed to start sparklyr backend:", err$message))
+    stop("Failed to start sparklyr backend: ", err$message)
   })
 
   new_databricks_connection(

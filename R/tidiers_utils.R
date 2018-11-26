@@ -6,23 +6,20 @@ extract_model_metrics <- function(object, metric_names, new_names) {
 
 #' @export
 tidy.ml_model <- function(x, ...) {
-  stop(paste0("'tidy()' not yet supported for ",
-              setdiff(class(x), "ml_model"))
-  )
+  stop("'tidy()' not yet supported for ",
+       setdiff(class(x), "ml_model"))
 }
 
 #' @export
 augment.ml_model <- function(x, ...) {
-  stop(paste0("'augment()' not yet supported for ",
-              setdiff(class(x), "ml_model"))
-  )
+  stop("'augment()' not yet supported for ",
+       setdiff(class(x), "ml_model"))
 }
 
 #' @export
 glance.ml_model <- function(x, ...) {
-  stop(paste0("'glance()' not yet supported for ",
-              setdiff(class(x), "ml_model"))
-  )
+  stop("'glance()' not yet supported for ",
+       setdiff(class(x), "ml_model"))
 }
 
 # this function provides broom::augment() for
