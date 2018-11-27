@@ -3,6 +3,12 @@
 - Fix to make `spark_config_kubernetes()` work with variable `jar`
   parameters.
 
+- Improvements and fixes to `spark_config_kubernetes()`
+  parameters.
+
+- Support for `sparklyr.connect.ondisconnect` config setting to
+  allow cleanup of resources when using kubernetes.
+
 - `spark_apply()` and `spark_apply_bundle()` properly dereference
   symlinks when creating package bundle (@awblocker, #1785)
 
