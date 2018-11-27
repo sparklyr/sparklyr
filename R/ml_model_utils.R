@@ -50,7 +50,15 @@ ml_generate_ml_model <- function(
     )
     ml_pipeline(vector_assembler, predictor)
 
-  } else {
+  } else if (grepl("lda", predictor$uid)){
+      ml_pipeline(sc) %>%
+        ft_tokenizer(input_col = gsub("~", "", formula),
+                     output_col = "token") %>%
+        ft_count_vectorizer(input_col = "token",
+                            output_col = "word_count") %>%
+        ft_r_formula("~word_count") %>%
+        ml_add_stage(predictor)
+    } else {
     r_formula <- ft_r_formula(sc, formula, features_col, label_col)
     ml_pipeline(r_formula, predictor)
   }
@@ -92,6 +100,11 @@ ml_generate_ml_model <- function(
   else
     ml_uid(predictor)
 
+# ml_features_names_metadata() just verifies the first stage (ml_stage(pipeline_model, 1)
+# and ml_lda() has more than one preprocessor
+if (grepl("lda", predictor$uid)) {
+  feature_names <- gsub("~", "", formula) # LDA just uses one feature
+} else
   feature_names <- ml_feature_names_metadata(pipeline_model, x, features_col)
 
   args <- list(
