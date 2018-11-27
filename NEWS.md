@@ -1,5 +1,8 @@
 # Sparklyr 0.9.3
 
+- Fix to make `spark_config_kubernetes()` work with variable `jar`
+  parameters.
+
 - `spark_apply()` and `spark_apply_bundle()` properly dereference
   symlinks when creating package bundle (@awblocker, #1785)
 
