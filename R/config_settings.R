@@ -18,6 +18,7 @@ spark_config_settings <- function() {
     sparklyr.connect.jars = "Additional JARs to include while submitting application to Spark.",
     sparklyr.connect.master = "The cluster master as spark_connect() master parameter, notice that the 'spark.master' setting is usually preferred.",
     sparklyr.connect.packages = "Spark packages to include when connecting to Spark.",
+    sparklyr.connect.ondisconnect = "R function to call after spark_disconnect().",
     sparklyr.connect.sparksubmit = "Command executed instead of spark-submit when connecting.",
     sparklyr.connect.timeout = "Total seconds before giving up connecting to the sparklyr gateway while initializing.",
     sparklyr.gateway.address = "The address of the driver machine.",
