@@ -1,5 +1,11 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Improvements and fixes to `spark_config_kubernetes()`
+  parameters.
+
+- Support for `sparklyr.connect.ondisconnect` config setting to
+  allow cleanup of resources when using kubernetes.
+
 - `spark_apply()` and `spark_apply_bundle()` properly dereference
   symlinks when creating package bundle (@awblocker, #1785)
 
