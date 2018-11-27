@@ -97,7 +97,7 @@ spark_config_kubernetes <- function(
       if (!identical(conf, NULL)) paste(names(conf), conf, sep = "=") else NULL
     ),
     sparklyr.gateway.routing = FALSE,
-    sparklyr.app.jar = "local:///opt/sparklyr/sparklyr-2.3-2.11.jar",
+    sparklyr.app.jar = jar,
     sparklyr.connect.aftersubmit = submit_function,
     sparklyr.connect.ondisconnect = disconnect_function,
     spark.home = spark_home_dir()
