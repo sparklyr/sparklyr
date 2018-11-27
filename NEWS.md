@@ -1,5 +1,11 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Improvements and fixes to `spark_config_kubernetes()`
+  parameters.
+
+- Support for `sparklyr.connect.ondisconnect` config setting to
+  allow cleanup of resources when using kubernetes.
+
 - Fix to make `spark_config_kubernetes()` work with variable `jar`
   parameters.
 
