@@ -251,6 +251,9 @@ spark_disconnect.spark_connection <- function(sc, ...) {
   on_connection_closed(sc)
 
   stream_unregister_all(sc)
+
+  # support custom operations after spark-submit useful to do custom cleanup in k8s
+  spark_config_value(sc$config, c("sparklyr.connect.ondisconnect"))
 }
 
 #' @export
