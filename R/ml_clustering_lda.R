@@ -70,6 +70,7 @@
 #'
 #'
 #' @template roxlate-ml-clustering-algo
+#' @template roxlate-ml-formula-params
 #' @template roxlate-ml-clustering-params
 #' @param doc_concentration Concentration parameter (commonly named "alpha") for the prior placed on documents' distributions over topics ("theta"). See details.
 #' @param topic_concentration Concentration parameter (commonly named "beta" or "eta") for the prior placed on topics' distributions over terms.
@@ -83,8 +84,25 @@
 #'
 #' @param keep_last_checkpoint (Spark 2.0.0+) (For EM optimizer only) If using checkpointing, this indicates whether to keep the last checkpoint. If \code{FALSE}, then the checkpoint will be deleted. Deleting the checkpoint can cause failures if a data partition is lost, so set this bit with care. Note that checkpoints will be cleaned up via reference counting, regardless.
 #'
+#' @examples
+#' \dontrun{
+#' library(janeaustenr)
+#' sc <-  spark_connect(master = "local")
+#'
+#' lines_tbl <- sdf_copy_to(sc,
+#'                          austen_books()[c(1:30),],
+#'                          name = "lines_tbl",
+#'                          overwrite = TRUE)
+#'
+#' lda_model <- lines_tbl %>%
+#'   ml_lda(~text, k =4)
+#'
+#' # vocabulary and topics
+#' augment(lda_model)
+#' }
+#'
 #' @export
-ml_lda <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
+ml_lda <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
                    subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
                    keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                    optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
@@ -93,7 +111,7 @@ ml_lda <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_con
 }
 
 #' @export
-ml_lda.spark_connection <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
+ml_lda.spark_connection <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
                                     subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
                                     keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                                     optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
@@ -140,7 +158,7 @@ ml_lda.spark_connection <- function(x, k = 10, max_iter = 20, doc_concentration 
 }
 
 #' @export
-ml_lda.ml_pipeline <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
+ml_lda.ml_pipeline <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
                                subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
                                keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                                optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
@@ -148,6 +166,7 @@ ml_lda.ml_pipeline <- function(x, k = 10, max_iter = 20, doc_concentration = NUL
 
   stage <- ml_lda.spark_connection(
     x = spark_connection(x),
+    formula = formula,
     k = k,
     max_iter = max_iter,
     doc_concentration = doc_concentration,
@@ -169,13 +188,17 @@ ml_lda.ml_pipeline <- function(x, k = 10, max_iter = 20, doc_concentration = NUL
 }
 
 #' @export
-ml_lda.tbl_spark <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
+ml_lda.tbl_spark <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
                              subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
                              keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                              optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
                              topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
-  stage <- ml_lda.spark_connection(
+
+  ml_formula_transformation()
+
+   stage <- ml_lda.spark_connection(
     x = spark_connection(x),
+    formula = NULL,
     k = k,
     max_iter = max_iter,
     doc_concentration = doc_concentration,
@@ -194,8 +217,15 @@ ml_lda.tbl_spark <- function(x, k = 10, max_iter = 20, doc_concentration = NULL,
     ...
   )
 
+  if (is.null(formula)) {
   stage %>%
     ml_fit(x)
+   } else {
+     ml_generate_ml_model(
+       x, predictor = stage, formula = formula, features_col = features_col,
+       type = "clustering", constructor = new_ml_model_lda
+     )
+   }
 }
 
 # Validator

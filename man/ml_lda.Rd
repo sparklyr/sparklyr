@@ -8,12 +8,13 @@
 \alias{ml_topics_matrix}
 \title{Spark ML -- Latent Dirichlet Allocation}
 \usage{
-ml_lda(x, k = 10, max_iter = 20, doc_concentration = NULL,
-  topic_concentration = NULL, subsampling_rate = 0.05,
-  optimizer = "online", checkpoint_interval = 10,
-  keep_last_checkpoint = TRUE, learning_decay = 0.51,
-  learning_offset = 1024, optimize_doc_concentration = TRUE,
-  seed = NULL, features_col = "features",
+ml_lda(x, formula = NULL, k = 10, max_iter = 20,
+  doc_concentration = NULL, topic_concentration = NULL,
+  subsampling_rate = 0.05, optimizer = "online",
+  checkpoint_interval = 10, keep_last_checkpoint = TRUE,
+  learning_decay = 0.51, learning_offset = 1024,
+  optimize_doc_concentration = TRUE, seed = NULL,
+  features_col = "features",
   topic_distribution_col = "topicDistribution",
   uid = random_string("lda_"), ...)
 
@@ -27,6 +28,8 @@ ml_topics_matrix(model)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
 \item{k}{The number of clusters to create}
 
@@ -164,6 +167,24 @@ Online
 }
 }
 
+\examples{
+\dontrun{
+library(janeaustenr)
+sc <-  spark_connect(master = "local")
+
+lines_tbl <- sdf_copy_to(sc,
+                         austen_books()[c(1:30),],
+                         name = "lines_tbl",
+                         overwrite = TRUE)
+
+lda_model <- lines_tbl \%>\%
+  ml_lda(~text, k =4)
+
+# vocabulary and topics
+augment(lda_model)
+}
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
