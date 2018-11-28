@@ -172,7 +172,13 @@ spark_versions_info <- function(version, hadoop_version, latest = TRUE) {
 
   version <- versions[1,]
 
-  componentName <- sub("\\.tgz", "", sprintf(versions$pattern, version$spark, version$hadoop))
+  if (nchar(versions$pattern) > 0) {
+    componentName <- sub("\\.tgz", "", sprintf(versions$pattern, version$spark, version$hadoop))
+  }
+  else {
+    componentName <- sprintf("spark-%s-bin-hadoop%s", version$spark, version$hadoop)
+  }
+
   packageName <- paste0(componentName, ".tgz")
   packageRemotePath <- version$download
 
