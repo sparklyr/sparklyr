@@ -66,6 +66,7 @@ new_ml_model <- function(pipeline_model, formula, ..., class = character()) {
   structure(
     list(
       pipeline_model = pipeline_model,
+      formula = formula,
       pipeline = pipeline,
       model = model,
       ...
