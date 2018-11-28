@@ -3,6 +3,8 @@
 - Fix to make `spark_config_kubernetes()` work with variable `jar`
   parameters.
 
+- Support to install and use Spark 2.4.0.
+
 - Improvements and fixes to `spark_config_kubernetes()`
   parameters.
 
