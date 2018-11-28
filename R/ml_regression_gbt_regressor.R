@@ -139,17 +139,13 @@ ml_gbt_regressor.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_dep
     stage %>%
       ml_fit(x)
   } else {
-    pipeline_model <- ml_supervised_pipeline(
+    ml_model_supervised(
+      new_ml_model_gbt_regression,
       predictor = stage,
-      dataset = x,
       formula = formula,
+      dataset = x,
       features_col = features_col,
       label_col = label_col
-    )
-
-    new_ml_model_gbt_regression(
-      pipeline_model, dataset = x, label_col = label_col,
-      features_col = features_col
     )
   }
 }
