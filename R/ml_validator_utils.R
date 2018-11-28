@@ -15,8 +15,8 @@ ml_get_stage_constructor <- function(jobj) {
 ml_formula_transformation <- function(env = rlang::caller_env(2)) {
   caller_frame <- rlang::caller_frame()
   args <- caller_frame$expr %>%
-    rlang::lang_standardise() %>%
-    rlang::lang_args() %>%
+    rlang::call_standardise() %>%
+    rlang::call_args() %>%
     `[`(c("formula", "response", "features")) %>%
     lapply(rlang::eval_tidy, env = env)
 
