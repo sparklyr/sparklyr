@@ -1,3 +1,12 @@
+#' Constructors for `ml_model` Objects
+#'
+#' Functions for developers writing extensions for Spark ML. These functions are constructors
+#'   for `ml_model` objects that are returned when using the formula interface.
+#'
+#' @name ml-model-constructors
+#'
+#' @export
+#' @keywords internal
 new_ml_model <- function(
   pipeline, pipeline_model, model, ..., subclass = NULL) {
 
