@@ -129,7 +129,7 @@ ml_predict.ml_model_classification <- function(
     predictions
   } else {
     index_labels <- spark_sanitize_names(
-      x$.index_labebls %||% seq_len(x$model$num_classes) - 1L,
+      x$index_labels %||% seq_len(x$model$num_classes) - 1L,
       sc$config
     )
     sdf_separate_column(

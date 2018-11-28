@@ -169,16 +169,26 @@ ml_gbt_classifier.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_de
     stage %>%
       ml_fit(x)
   } else {
-    pipeline_model <- ml_model_classification_pipeline(
-      predictor = stage,
-      dataset = x,
-      formula = formula,
-      features_col = features_col,
-      label_col = label_col
-    )
+    # pipeline_model <- ml_supervised_pipeline(
+    #   predictor = stage,
+    #   dataset = x,
+    #   formula = formula,
+    #   features_col = features_col,
+    #   label_col = label_col
+    # )
+    #
+    # new_ml_model_gbt_classification(
+    #   pipeline_model, formula = formula, dataset = x, label_col = label_col, features_col = features_col,
+    #   predicted_label_col = predicted_label_col
+    # )
 
-    new_ml_model_gbt_classification(
-      pipeline_model, dataset = x, label_col = label_col, features_col = features_col,
+    ml_model_supervised(
+      new_ml_model_gbt_classification,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col,
       predicted_label_col = predicted_label_col
     )
   }
