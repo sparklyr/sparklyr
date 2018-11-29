@@ -1,5 +1,7 @@
 # Sparklyr 0.9.3 (unreleased)
 
+- Support to install and use Spark 2.4.0.
+
 - Improvements and fixes to `spark_config_kubernetes()`
   parameters.
 
