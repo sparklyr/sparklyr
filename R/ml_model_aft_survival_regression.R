@@ -6,15 +6,16 @@ new_ml_model_aft_survival_regression <- function(pipeline_model, formula, datase
     class = "ml_model_aft_survival_regression"
   )
 
-  coefficients <- m$model$coefficients
+  model <- m$model
+  jobj <- spark_jobj(model)
+
+  coefficients <- model$coefficients
   names(coefficients) <- m$feature_names
 
-  coefficients <- if (ml_param(m$model, "fit_intercept"))
+  m$coefficients <- if (ml_param(model, "fit_intercept"))
     rlang::set_names(
-      c(invoke(jobj, "intercept"), m$model$coefficients),
+      c(invoke(jobj, "intercept"), model$coefficients),
       c("(Intercept)", m$feature_names))
-
-  m$coefficients <- coefficients
 
   m
 }
