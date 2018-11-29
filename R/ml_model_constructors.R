@@ -99,8 +99,13 @@ new_ml_model_classification <- function(pipeline_model, formula, dataset, label_
   index_labels <- ml_index_labels_metadata(label_indexer_model, dataset, label_col)
 
   if (!is.null(index_labels)) {
+    sc <- spark_connection(pipeline_model)
     index_to_string <- ft_index_to_string(
-      sc, ml_param(m$model, "prediction_col"), predicted_label_col, index_labels)
+      sc,
+      ml_param(m$model, "prediction_col"),
+      predicted_label_col,
+      index_labels
+    )
     m$pipeline <- pipeline %>%
       ml_add_stage(index_to_string)
     m$pipeline_model <- pipeline_model %>%
