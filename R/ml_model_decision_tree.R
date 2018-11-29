@@ -86,22 +86,21 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
   do.call(routine, args)
 }
 
-new_ml_model_decision_tree_classification <- function(pipeline, pipeline_model,
-                                                      model, dataset, formula, feature_names,
-                                                      index_labels, call) {
+new_ml_model_decision_tree_classification <- function(pipeline_model, formula, dataset, label_col,
+                                            features_col, predicted_label_col) {
   new_ml_model_classification(
-    pipeline, pipeline_model, model, dataset, formula,
-    subclass = "ml_model_decision_tree_classification",
-    .features = feature_names,
-    .index_labels = index_labels
+    pipeline_model, formula, dataset = dataset,
+    label_col = label_col, features_col = features_col,
+    predicted_label_col = predicted_label_col,
+    class = "ml_model_decision_tree_classification"
   )
 }
 
-new_ml_model_decision_tree_regression <- function(pipeline, pipeline_model, model, dataset,
-                                                  formula, feature_names, call) {
+new_ml_model_decision_tree_regression <- function(pipeline_model, formula, dataset, label_col,
+                                        features_col) {
   new_ml_model_regression(
-    pipeline, pipeline_model, model, dataset, formula,
-    subclass = "ml_model_decision_tree_regression",
-    .features = feature_names
+    pipeline_model, formula, dataset = dataset,
+    label_col = label_col, features_col = features_col,
+    class = "ml_model_decision_tree_regression"
   )
 }
