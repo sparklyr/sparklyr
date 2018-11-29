@@ -67,6 +67,7 @@ new_ml_model <- function(pipeline_model, formula, dataset, ..., class = characte
     list(
       pipeline_model = pipeline_model,
       formula = formula,
+      dataset = dataset,
       pipeline = pipeline,
       model = model,
       ...
@@ -113,7 +114,7 @@ new_ml_model_classification <- function(pipeline_model, formula, dataset, label_
       # ml_fit() here doesn't do any actual computation but simply
       #   returns a PipelineModel since ml_add_stage() returns a
       #   Pipeline (Estimator)
-      ml_fit(x)
+      ml_fit(dataset)
     m$index_labels <- index_labels
   }
 
