@@ -87,7 +87,7 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
 }
 
 new_ml_model_decision_tree_classification <- function(pipeline_model, formula, dataset, label_col,
-                                            features_col, predicted_label_col) {
+                                                      features_col, predicted_label_col) {
   new_ml_model_classification(
     pipeline_model, formula, dataset = dataset,
     label_col = label_col, features_col = features_col,
@@ -97,7 +97,7 @@ new_ml_model_decision_tree_classification <- function(pipeline_model, formula, d
 }
 
 new_ml_model_decision_tree_regression <- function(pipeline_model, formula, dataset, label_col,
-                                        features_col) {
+                                                  features_col) {
   new_ml_model_regression(
     pipeline_model, formula, dataset = dataset,
     label_col = label_col, features_col = features_col,
