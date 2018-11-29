@@ -50,7 +50,7 @@ ml_generate_ml_model <- function(
     )
     ml_pipeline(vector_assembler, predictor)
 
-  } else if (grepl("lda", predictor$uid)){
+  } else if (inherits(predictor, "ml_lda")){
       ml_pipeline(sc) %>%
         ft_tokenizer(input_col = gsub("~", "", formula),
                      output_col = "token") %>%
@@ -102,7 +102,7 @@ ml_generate_ml_model <- function(
 
 # ml_features_names_metadata() just verifies the first stage (ml_stage(pipeline_model, 1)
 # and ml_lda() has more than one preprocessor
-if (grepl("lda", predictor$uid)) {
+if (inherits(predictor, "ml_lda")) {
   feature_names <- gsub("~", "", formula) # LDA just uses one feature
 } else
   feature_names <- ml_feature_names_metadata(pipeline_model, x, features_col)
