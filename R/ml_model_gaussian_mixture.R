@@ -11,7 +11,7 @@ new_ml_model_gaussian_mixture <- function(pipeline_model, formula, dataset,
   model <- m$model
 
   m$weights <- model$weights
-  m$gaussian_df <- model$gaussian_df()
+  m$gaussian_df <- model$gaussians_df()
   m$summary <- model$summary
 
   m
