@@ -100,9 +100,9 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   # instead of calling the MLlib API.
   if (type.residuals == "working") {
     predictions <- ml_predict(x, newdata) %>%
-      rename(fitted = !!"prediction")
+      rename(fitted = !!rlang::sym("prediction"))
     return(predictions %>%
-             mutate(resid = `-`(!!sym(x$.response), !!sym("fitted")))
+             mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
     )
   }
 

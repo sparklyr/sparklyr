@@ -39,7 +39,7 @@ broom_augment_supervised <- function(x, newdata = NULL, ...) {
 
     ml_predict(x, newdata) %>%
       dplyr::select(!!!syms(vars)) %>%
-      dplyr::rename(.predicted_label = .data$predicted_label)
+      dplyr::rename(.predicted_label = !!rlang::sym("predicted_label"))
 
   } else {
     # for regression
@@ -47,7 +47,7 @@ broom_augment_supervised <- function(x, newdata = NULL, ...) {
 
     ml_predict(x, newdata) %>%
       dplyr::select(!!!syms(vars)) %>%
-      dplyr::rename(.prediction = .data$prediction)
+      dplyr::rename(.prediction = !!rlang::sym("prediction"))
   }
 
 }
