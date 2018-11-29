@@ -40,7 +40,7 @@ new_ml_model_logistic_regression <- function(pipeline_model, formula, dataset, l
         c("(Intercept)", m$feature_names)
       )
     } else {
-      rlang::set_names(model$coefficients, feature_names)
+      rlang::set_names(model$coefficients, m$feature_names)
     }
   }
 
