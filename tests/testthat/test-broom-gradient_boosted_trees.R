@@ -38,7 +38,7 @@ test_that("gradient_boosted_trees.augment() works", {
     augment() %>%
     dplyr::collect()
 
-  check_tidy(au1, exp.row = 50, # iris without setosa
+  check_tidy(au1, exp.row = 100, # iris without setosa
              exp.name = c(dplyr::tbl_vars(iris_tbl),
                           ".predicted_label"))
 
