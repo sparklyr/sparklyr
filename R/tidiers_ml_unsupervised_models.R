@@ -111,7 +111,7 @@ glance.ml_model_bisecting_kmeans <- function(x,
 #' @export
 tidy.ml_model_gaussian_mixture <- function(x, ...) {
 
-  center <- x$gaussians_df$mean %>%
+  center <- x$gaussians_df()$mean %>%
     as.data.frame() %>%
     t() %>%
     broom::fix_data_frame() %>%
