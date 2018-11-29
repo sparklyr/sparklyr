@@ -1,4 +1,4 @@
-new_ml_model_naives_bayes <- function(pipeline_model, formula, dataset, label_col,
+new_ml_model_naive_bayes <- function(pipeline_model, formula, dataset, label_col,
                                       features_col, predicted_label_col) {
   m <- new_ml_model_classification(
     pipeline_model, formula, dataset = dataset,
