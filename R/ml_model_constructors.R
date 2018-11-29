@@ -19,6 +19,7 @@ new_ml_model_prediction <- function(pipeline_model, formula, dataset, label_col,
                                     ..., class = character()) {
 
   feature_names <- ml_feature_names_metadata(pipeline_model, dataset, features_col)
+  response <- gsub("~.+$", "", formula) %>% trimws()
 
   new_ml_model(
     pipeline_model,
@@ -27,6 +28,7 @@ new_ml_model_prediction <- function(pipeline_model, formula, dataset, label_col,
     label_col = label_col,
     features_col = features_col,
     feature_names = feature_names,
+    response = response,
     ...,
     class = c(class, "ml_model_prediction")
   )
