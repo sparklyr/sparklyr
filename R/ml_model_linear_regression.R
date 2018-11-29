@@ -10,7 +10,7 @@ new_ml_model_linear_regression <- function(pipeline_model, formula, dataset, lab
   jobj <- spark_jobj(model)
 
   coefficients <- model$coefficients
-  names(coefficients) <- feature_names
+  names(coefficients) <- m$feature_names
 
   m$coefficients <- if (ml_param(model, "fit_intercept"))
     rlang::set_names(

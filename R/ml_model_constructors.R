@@ -99,7 +99,7 @@ new_ml_model_classification <- function(pipeline_model, formula, dataset, label_
     dplyr::nth(-2) # second from last, either RFormulaModel or StringIndexerModel
   index_labels <- ml_index_labels_metadata(label_indexer_model, dataset, label_col)
 
-  if (!is.null(index_labels)) {
+  if (!is.null(m$index_labels)) {
     sc <- spark_connection(pipeline_model)
     index_to_string <- ft_index_to_string(
       sc,

@@ -22,8 +22,8 @@ new_ml_model_logistic_regression <- function(pipeline_model, formula, dataset, l
 
     # multinomial
     coefficients <- model$coefficient_matrix
-    colnames(coefficients) <- feature_names
-    rownames(coefficients) <- index_labels
+    colnames(coefficients) <- m$feature_names
+    rownames(coefficients) <- m$index_labels
 
     if (ml_param(model, "fit_intercept")) {
       intercept <- model$intercept_vector
