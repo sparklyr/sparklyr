@@ -56,7 +56,7 @@ ml_feature_importances.ml_model <- function(model, ...) {
     spark_require_version(spark_connection(spark_jobj(model)), "2.0.0")
 
   data.frame(
-    feature = model$.features,
+    feature = model$feature_names,
     importance = model$model$feature_importances(),
     stringsAsFactors = FALSE
   ) %>%
