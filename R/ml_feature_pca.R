@@ -142,8 +142,14 @@ ml_pca <- function(x,
   pipeline_model <- pipeline %>%
     ml_fit(x)
 
-  model <- pipeline_model %>%
-    ml_stage(2)
+  m <- new_ml_model(
+    pipeline_model = pipeline_model,
+    formula = formula,
+    dataset = x,
+    class = "ml_model_pca"
+  )
+
+  model <- m$model
 
   pc <- model$pc
   pc_names <- paste0(pc_prefix, seq_len(ncol(pc)))
@@ -152,19 +158,15 @@ ml_pca <- function(x,
 
   explained_variance <- model$explained_variance
 
-  if (!is.null(explained_variance))
+  if (!is.null(explained_variance)) {
     names(explained_variance) <- pc_names
+  }
 
-  new_ml_model(
-    pipeline = pipeline,
-    pipeline_model = pipeline_model,
-    model = model,
-    k = k,
-    pc = pc,
-    explained_variance = explained_variance,
-    dataset = x,
-    subclass = "ml_model_pca"
-  )
+  m$k <- k
+  m$pc <- pc
+  m$explained_variance <- explained_variance
+
+  m
 }
 
 #' @export
