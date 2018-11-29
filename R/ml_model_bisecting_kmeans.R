@@ -12,18 +12,19 @@ new_ml_model_bisecting_kmeans <- function(pipeline_model, formula, dataset,
 
   m$summary <- model$summary
 
-  centers <- model$cluster_centers() %>%
+  m$centers <- model$cluster_centers() %>%
     do.call(rbind, .) %>%
     as.data.frame() %>%
     rlang::set_names(m$feature_names)
 
-  cost <- try_null(
+  m$cost <- try_null(
     pipeline_model %>%
       ml_stage(1) %>%
       ml_transform(dataset) %>%
       model$compute_cost()
   )
 
+  m
 }
 
 #' @export
