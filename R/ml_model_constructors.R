@@ -104,11 +104,11 @@ new_ml_model_classification <- function(pipeline_model, formula, dataset, label_
       sc,
       ml_param(m$model, "prediction_col"),
       predicted_label_col,
-      index_labels
+      m$index_labels
     )
-    m$pipeline <- pipeline %>%
+    m$pipeline <- m$pipeline %>%
       ml_add_stage(index_to_string)
-    m$pipeline_model <- pipeline_model %>%
+    m$pipeline_model <- m$pipeline_model %>%
       ml_add_stage(index_to_string) %>%
       # ml_fit() here doesn't do any actual computation but simply
       #   returns a PipelineModel since ml_add_stage() returns a
