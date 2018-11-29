@@ -36,7 +36,7 @@ new_ml_model_prediction <- function(pipeline_model, formula, dataset, label_col,
 #' @rdname ml-model-constructors
 ml_model_prediction <- new_ml_model_prediction
 
-new_ml_model <- function(pipeline_model, formula, ..., class = character()) {
+new_ml_model <- function(pipeline_model, formula, dataset, ..., class = character()) {
 
   sc <- spark_connection(pipeline_model)
 
@@ -78,15 +78,6 @@ new_ml_model <- function(pipeline_model, formula, ..., class = character()) {
 #' @export
 #' @rdname ml-model-constructors
 ml_model <- new_ml_model
-
-#' @export
-#' @rdname ml-model-constructors
-ml_supervised_pipeline <- function(predictor, dataset, formula, features_col, label_col) {
-  sc <- spark_connection(predictor)
-  r_formula <- ft_r_formula(sc, formula, features_col, label_col)
-  pipeline_model <- ml_pipeline(r_formula, predictor) %>%
-    ml_fit(dataset)
-}
 
 new_ml_model_classification <- function(pipeline_model, formula, dataset, label_col,
                                         features_col, predicted_label_col, ...,
@@ -147,25 +138,21 @@ new_ml_model_regression <- function(pipeline_model, formula, dataset, label_col,
 #' @rdname ml-model-constructors
 ml_model_regression <- new_ml_model_regression
 
-ml_model_supervised <- function(constructor, predictor, formula, dataset, features_col, label_col, ...) {
-  pipeline_model <- ml_supervised_pipeline(
-    predictor = predictor,
-    dataset = dataset,
-    formula = formula,
-    features_col = features_col,
-    label_col = label_col
-  )
+new_ml_model_clustering <- function(pipeline_model, formula, dataset,
+                                    features_col, ...,
+                                    class = character()) {
 
-  .args <- list(
-    pipeline_model = pipeline_model,
-    formula = formula,
+  feature_names <- ml_feature_names_metadata(pipeline_model, dataset, features_col)
+
+  new_ml_model(
+    pipeline_model,
+    formula,
     dataset = dataset,
     features_col = features_col,
-    label_col = label_col,
-    ...
+    feature_names = feature_names,
+    ...,
+    class = c(class, "ml_model_clustering")
   )
-
-  rlang::exec(constructor, !!!.args)
 }
 
 #' @export
