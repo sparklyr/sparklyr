@@ -24,7 +24,7 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
     )
     ml_pipeline(vector_assembler, predictor)
   } else {
-    r_formula <- ft_r_formula(sc, formula, features_col, label_col)
+    r_formula <- ft_r_formula(sc, formula = formula, features_col = features_col)
     ml_pipeline(r_formula, predictor)
   }
 
