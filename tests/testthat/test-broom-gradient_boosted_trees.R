@@ -33,7 +33,7 @@ test_that("gradient_boosted_trees.augment() works", {
 
   # for classification without newdata
   au1 <- iris_tbl %>%
-    dplyr::filter(!!rlang::sym("Species") == "setosa") %>%
+    dplyr::filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Length + Petal_Length, seed = 123) %>%
     augment() %>%
     dplyr::collect()

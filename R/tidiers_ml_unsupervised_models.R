@@ -109,16 +109,15 @@ glance.ml_model_bisecting_kmeans <- function(x,
 
 #' @rdname ml_unsupervised_tidiers
 #' @export
-tidy.ml_model_gaussian_mixture <- function(x,
-                                           ...){
+tidy.ml_model_gaussian_mixture <- function(x, ...) {
 
   center <- x$gaussians_df$mean %>%
     as.data.frame() %>%
     t() %>%
     broom::fix_data_frame() %>%
-    dplyr::select(-!!"term")
+    dplyr::select(-.data$term)
 
-  names(center) <- x$.features
+  names(center) <- x$feature_names
 
   weight <- x$weights
   size <- x$summary$cluster_sizes()

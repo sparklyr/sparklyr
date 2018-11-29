@@ -23,11 +23,13 @@ test_that("linear_svc.augment() works", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
 
+  iris_tbl2 <- iris_tbl %>%
+    filter(Species != "setosa")
+
   # with newdata
-  au1 <- iris_tbl %>%
-    dplyr::filter(Species != "setosa") %>%
+  au1 <- iris_tbl2 %>%
     ml_linear_svc(Species ~ .) %>%
-    augment(head(iris_tbl, 25)) %>%
+    augment(head(iris_tbl2, 25)) %>%
     dplyr::collect()
 
   check_tidy(au1, exp.row = 25,

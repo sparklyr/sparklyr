@@ -25,8 +25,7 @@ glance.ml_model <- function(x, ...) {
 # this function provides broom::augment() for
 # supervised models
 #' @importFrom rlang syms
-broom_augment_supervised <- function(x, newdata = NULL,
-                                     ...){
+broom_augment_supervised <- function(x, newdata = NULL, ...) {
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
@@ -34,13 +33,13 @@ broom_augment_supervised <- function(x, newdata = NULL,
     newdata <- x$dataset
   }
 
-  if(any(class(x) == "ml_model_classification")){
+  if(inherits(x, "ml_model_classification")) {
     # for classification
     vars <- c(dplyr::tbl_vars(newdata), "predicted_label")
 
     ml_predict(x, newdata) %>%
       dplyr::select(!!!syms(vars)) %>%
-      dplyr::rename(.predicted_label = !!"predicted_label")
+      dplyr::rename(.predicted_label = .data$predicted_label)
 
   } else {
     # for regression
@@ -48,7 +47,7 @@ broom_augment_supervised <- function(x, newdata = NULL,
 
     ml_predict(x, newdata) %>%
       dplyr::select(!!!syms(vars)) %>%
-      dplyr::rename(.prediction = !!"prediction")
+      dplyr::rename(.prediction = .data$prediction)
   }
 
 }
