@@ -8,6 +8,6 @@ new_ml_model_lda <- function(pipeline, pipeline_model, model,
     pipeline, pipeline_model,
     model, dataset, formula,
     vocabulary = vocabulary,
-    subclass = "ml_lda_model"
+    subclass = "ml_model_lda"
   )
 }
