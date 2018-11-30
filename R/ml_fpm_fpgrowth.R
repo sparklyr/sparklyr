@@ -89,7 +89,7 @@ validator_ml_fpgrowth <- function(.args) {
 }
 
 new_ml_fpgrowth <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_fpgrowth")
+  new_ml_predictor(jobj, class = "ml_fpgrowth")
 }
 
 new_ml_fpgrowth_model <- function(jobj) {
@@ -100,7 +100,7 @@ new_ml_fpgrowth_model <- function(jobj) {
       sdf_register(),
     freq_itemsets = invoke(jobj, "freqItemsets") %>%
       sdf_register(),
-    subclass = "ml_fpgrowth_model")
+    class = "ml_fpgrowth_model")
 }
 
 #' @rdname ml_fpgrowth

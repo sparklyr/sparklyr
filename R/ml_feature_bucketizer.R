@@ -108,7 +108,7 @@ ft_bucketizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, spli
 }
 
 new_ml_bucketizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_bucketizer")
+  new_ml_transformer(jobj, class = "ml_bucketizer")
 }
 
 # Validator

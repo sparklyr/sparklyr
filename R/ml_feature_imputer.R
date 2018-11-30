@@ -100,9 +100,9 @@ validator_ml_imputer <- function(.args) {
 }
 
 new_ml_imputer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_imputer")
+  new_ml_estimator(jobj, class = "ml_imputer")
 }
 
 new_ml_imputer_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_imputer_model")
+  new_ml_transformer(jobj, class = "ml_imputer_model")
 }

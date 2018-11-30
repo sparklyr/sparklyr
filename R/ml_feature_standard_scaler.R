@@ -104,7 +104,7 @@ ft_standard_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_standard_scaler <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_standard_scaler")
+  new_ml_estimator(jobj, class = "ml_standard_scaler")
 }
 
 new_ml_standard_scaler_model <- function(jobj) {
@@ -112,7 +112,7 @@ new_ml_standard_scaler_model <- function(jobj) {
     jobj,
     mean = try_null(read_spark_vector(jobj, "mean")),
     std = try_null(read_spark_vector(jobj, "std")),
-    subclass = "ml_standard_scaler_model")
+    class = "ml_standard_scaler_model")
 }
 
 validator_ml_standard_scaler <- function(.args) {

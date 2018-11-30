@@ -222,7 +222,7 @@ validator_ml_als <- function(.args) {
 # Constructors
 
 new_ml_als <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_als")
+  new_ml_predictor(jobj, class = "ml_als")
 }
 
 new_ml_als_model <- function(jobj) {
@@ -248,7 +248,7 @@ new_ml_als_model <- function(jobj) {
     user_col = invoke(jobj, "getUserCol"),
     item_col = invoke(jobj, "getItemCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
-    subclass = "ml_als_model")
+    class = "ml_als_model")
 }
 
 # Hideous hack

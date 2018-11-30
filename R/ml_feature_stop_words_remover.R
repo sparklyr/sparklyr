@@ -102,7 +102,7 @@ ft_stop_words_remover.tbl_spark <- function(x, input_col = NULL, output_col = NU
 }
 
 new_ml_stop_words_remover <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_stop_words_remover")
+  new_ml_transformer(jobj, class = "ml_stop_words_remover")
 }
 
 validator_ml_stop_words_remover <- function(.args) {

@@ -13,7 +13,7 @@ ml_constructor_dispatch <- function(jobj) {
   do.call(ml_get_constructor(jobj), list(jobj = jobj))
 }
 
-new_ml_pipeline_stage <- function(jobj, ..., subclass = NULL) {
+new_ml_pipeline_stage <- function(jobj, ..., class = character()) {
   structure(
     list(
       uid = invoke(jobj, "uid"),
@@ -21,6 +21,6 @@ new_ml_pipeline_stage <- function(jobj, ..., subclass = NULL) {
       ...,
       .jobj = jobj
     ),
-    class = c(subclass, "ml_pipeline_stage")
+    class = c(class, "ml_pipeline_stage")
   )
 }

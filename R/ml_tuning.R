@@ -155,7 +155,7 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
     jobj
 }
 
-new_ml_tuning <- function(jobj, ..., subclass = NULL) {
+new_ml_tuning <- function(jobj, ..., class = character()) {
   new_ml_estimator(
     jobj,
     estimator = purrr::possibly(
@@ -168,10 +168,10 @@ new_ml_tuning <- function(jobj, ..., subclass = NULL) {
     )(jobj),
     estimator_param_maps = purrr::possibly(ml_get_estimator_param_maps, NULL)(jobj),
     ...,
-    subclass = c(subclass, "ml_tuning"))
+    class = c(class, "ml_tuning"))
 }
 
-new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
+new_ml_tuning_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
     jobj,
     estimator = invoke(jobj, "getEstimator") %>%
@@ -181,7 +181,7 @@ new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
     estimator_param_maps = ml_get_estimator_param_maps(jobj),
     best_model = ml_constructor_dispatch(invoke(jobj, "bestModel")),
     ...,
-    subclass = c(subclass, "ml_tuning_model"))
+    class = c(class, "ml_tuning_model"))
 }
 
 print_tuning_info <- function(x, type = c("cv", "tvs")) {

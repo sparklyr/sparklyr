@@ -68,7 +68,7 @@ ft_elementwise_product.tbl_spark <- function(x, input_col = NULL, output_col = N
 }
 
 new_ml_elementwise_product <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_elementwise_product")
+  new_ml_transformer(jobj, class = "ml_elementwise_product")
 }
 
 # ElementwiseProduct

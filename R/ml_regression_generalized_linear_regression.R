@@ -243,7 +243,7 @@ validator_ml_generalized_linear_regression <- function(.args) {
 }
 
 new_ml_generalized_linear_regression <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_generalized_linear_regression")
+  new_ml_predictor(jobj, class = "ml_generalized_linear_regression")
 }
 
 new_ml_generalized_linear_regression_model <- function(jobj) {
@@ -264,7 +264,7 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     prediction_col = invoke(jobj, "getPredictionCol"),
     link_prediction_col = if (invoke(jobj, "isSet", invoke(jobj, "linkPredictionCol"))) invoke(jobj, "getLinkPredictionCol") else NULL,
     summary = summary,
-    subclass = "ml_generalized_linear_regression_model")
+    class = "ml_generalized_linear_regression_model")
 }
 
 new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_intercept) {
@@ -295,5 +295,5 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_interce
     solver = try_null(invoke(jobj, "solver")),
     t_values = function() try_null(invoke(jobj, "tValues")) %>% # lazy val
       arrange_stats(),
-    subclass = "ml_summary_generalized_linear_regression")
+    class = "ml_summary_generalized_linear_regression")
 }

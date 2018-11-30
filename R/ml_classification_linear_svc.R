@@ -177,7 +177,7 @@ validator_ml_linear_svc <- function(.args) {
 # Constructors
 
 new_ml_linear_svc <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_linear_svc")
+  new_ml_classifier(jobj, class = "ml_linear_svc")
 }
 
 new_ml_linear_svc_model <- function(jobj) {
@@ -192,5 +192,5 @@ new_ml_linear_svc_model <- function(jobj) {
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
     raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
-    subclass = "ml_linear_svc_model")
+    class = "ml_linear_svc_model")
 }

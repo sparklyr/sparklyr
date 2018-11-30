@@ -155,7 +155,7 @@ validator_ml_naive_bayes <- function(.args) {
 }
 
 new_ml_naive_bayes <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_naive_bayes")
+  new_ml_classifier(jobj, class = "ml_naive_bayes")
 }
 
 new_ml_naive_bayes_model <- function(jobj) {
@@ -170,5 +170,5 @@ new_ml_naive_bayes_model <- function(jobj) {
     probability_col = invoke(jobj, "getProbabilityCol"),
     raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
     thresholds = try_null(invoke(jobj, "getThresholds")),
-    subclass = "ml_naive_bayes_model")
+    class = "ml_naive_bayes_model")
 }

@@ -39,7 +39,7 @@ ml_pipeline.ml_pipeline_stage <-
 
 # Constructors
 
-new_ml_pipeline <- function(jobj, ..., subclass = NULL) {
+new_ml_pipeline <- function(jobj, ..., class = character()) {
   stages <- tryCatch({
     jobj %>%
       invoke("getStages") %>%
@@ -57,11 +57,11 @@ new_ml_pipeline <- function(jobj, ..., subclass = NULL) {
       sapply(stages, function(x)
         x$uid),
     ...,
-    subclass = c(subclass, "ml_pipeline")
+    class = c(class, "ml_pipeline")
   )
 }
 
-new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
+new_ml_pipeline_model <- function(jobj, ..., class = character()) {
   stages <- tryCatch({
     jobj %>%
       invoke("stages")
@@ -82,7 +82,7 @@ new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
       sapply(stages, function(x)
         x$uid),
     ...,
-    subclass = c(subclass, "ml_pipeline_model")
+    class = c(class, "ml_pipeline_model")
   )
 }
 

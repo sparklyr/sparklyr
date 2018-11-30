@@ -116,13 +116,13 @@ ft_count_vectorizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL
 # Constructors
 
 new_ml_count_vectorizer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_count_vectorizer")
+  new_ml_estimator(jobj, class = "ml_count_vectorizer")
 }
 
 new_ml_count_vectorizer_model <- function(jobj) {
   new_ml_transformer(jobj,
                      vocabulary = invoke(jobj, "vocabulary"),
-                     subclass = "ml_count_vectorizer_model")
+                     class = "ml_count_vectorizer_model")
 }
 
 #' @rdname ft_count_vectorizer

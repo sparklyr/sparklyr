@@ -64,7 +64,7 @@ ft_interaction.tbl_spark <- function(x, input_cols = NULL, output_col = NULL,
 }
 
 new_ml_interaction <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_interaction")
+  new_ml_transformer(jobj, class = "ml_interaction")
 }
 
 validator_ml_interaction <- function(.args) {

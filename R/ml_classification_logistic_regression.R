@@ -228,7 +228,7 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
 }
 
 new_ml_logistic_regression <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_logistic_regression")
+  new_ml_classifier(jobj, class = "ml_logistic_regression")
 }
 
 new_ml_logistic_regression_model <- function(jobj) {
@@ -258,7 +258,7 @@ new_ml_logistic_regression_model <- function(jobj) {
     threshold = if (ml_is_set(jobj, "threshold")) invoke(jobj, "getThreshold") else NULL,
     thresholds = if (ml_is_set(jobj, "thresholds")) invoke(jobj, "getThresholds") else NULL,
     summary = summary,
-    subclass = "ml_logistic_regression_model")
+    class = "ml_logistic_regression_model")
 }
 
 new_ml_summary_logistic_regression_model <- function(jobj) {
@@ -289,7 +289,7 @@ new_ml_summary_logistic_regression_model <- function(jobj) {
     recall_by_threshold = function() try_null(invoke(jobj, "recallByThreshold") %>% collect()),
     roc = function() try_null(invoke(jobj, "roc") %>% collect()),
     total_iterations = function() invoke(jobj, "totalIterations"),
-    subclass = "ml_summary_logistic_regression"
+    class = "ml_summary_logistic_regression"
   )
 }
 

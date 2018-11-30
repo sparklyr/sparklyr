@@ -158,7 +158,7 @@ validator_ml_decision_tree_classifier <- function(.args) {
 }
 
 new_ml_decision_tree_classifier <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_decision_tree_classifier")
+  new_ml_classifier(jobj, class = "ml_decision_tree_classifier")
 }
 
 new_ml_decision_tree_classification_model <- function(jobj) {
@@ -176,5 +176,5 @@ new_ml_decision_tree_classification_model <- function(jobj) {
     probability_col = invoke(jobj, "getProbabilityCol"),
     raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
     thresholds = try_null(invoke(jobj, "getThresholds")),
-    subclass = "ml_decision_tree_classification_model")
+    class = "ml_decision_tree_classification_model")
 }

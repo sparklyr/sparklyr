@@ -72,7 +72,7 @@ ft_hashing_tf.tbl_spark <- function(x, input_col = NULL, output_col = NULL, bina
 }
 
 new_ml_hashing_tf <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_hashing_tf")
+  new_ml_transformer(jobj, class = "ml_hashing_tf")
 }
 
 validator_ml_hashing_tf <- function(.args) {

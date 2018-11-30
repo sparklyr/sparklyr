@@ -104,14 +104,14 @@ ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_string_indexer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_string_indexer")
+  new_ml_estimator(jobj, class = "ml_string_indexer")
 }
 
 new_ml_string_indexer_model <- function(jobj) {
   new_ml_transformer(jobj,
                      labels = invoke(jobj, "labels") %>%
                        as.character(),
-                     subclass = "ml_string_indexer_model")
+                     class = "ml_string_indexer_model")
 }
 
 #' @rdname ft_string_indexer

@@ -126,7 +126,7 @@ validator_ml_gaussian_mixture <- function(.args) {
 }
 
 new_ml_gaussian_mixture <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_gaussian_mixture")
+  new_ml_predictor(jobj, class = "ml_gaussian_mixture")
 }
 
 new_ml_gaussian_mixture_model <- function(jobj) {
@@ -143,7 +143,7 @@ new_ml_gaussian_mixture_model <- function(jobj) {
       dplyr::mutate(!!rlang::sym("cov") := lapply(!!rlang::sym("cov"), read_spark_matrix)),
     weights = invoke(jobj, "weights"),
     summary = summary,
-    subclass = "ml_gaussian_mixture_model")
+    class = "ml_gaussian_mixture_model")
 }
 
 new_ml_summary_gaussian_mixture_model <- function(jobj) {
@@ -152,5 +152,5 @@ new_ml_summary_gaussian_mixture_model <- function(jobj) {
     log_likelihood = invoke(jobj, "logLikelihood"),
     probability = invoke(jobj, "probability") %>% sdf_register(),
     probability_col = invoke(jobj, "probabilityCol"),
-    subclass = "ml_summary_gaussian_mixture")
+    class = "ml_summary_gaussian_mixture")
 }

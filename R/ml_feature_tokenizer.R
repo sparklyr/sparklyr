@@ -62,7 +62,7 @@ ft_tokenizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_tokenizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_tokenizer")
+  new_ml_transformer(jobj, class = "ml_tokenizer")
 }
 
 validator_ml_tokenizer <- function(.args) {

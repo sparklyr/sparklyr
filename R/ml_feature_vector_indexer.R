@@ -81,11 +81,11 @@ ft_vector_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_vector_indexer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_vector_indexer")
+  new_ml_estimator(jobj, class = "ml_vector_indexer")
 }
 
 new_ml_vector_indexer_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_vector_indexer_model")
+  new_ml_transformer(jobj, class = "ml_vector_indexer_model")
 }
 
 validator_ml_vector_indexer <- function(.args) {

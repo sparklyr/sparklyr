@@ -121,7 +121,7 @@ validator_ml_bisecting_kmeans <- function(.args) {
 }
 
 new_ml_bisecting_kmeans <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_bisecting_kmeans")
+  new_ml_predictor(jobj, class = "ml_bisecting_kmeans")
 }
 
 new_ml_bisecting_kmeans_model <- function(jobj) {
@@ -138,11 +138,11 @@ new_ml_bisecting_kmeans_model <- function(jobj) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },
     summary = summary,
-    subclass = "ml_bisecting_kmeans_model")
+    class = "ml_bisecting_kmeans_model")
 }
 
 new_ml_summary_bisecting_kmeans_model <- function(jobj) {
   new_ml_summary_clustering(
     jobj,
-    subclass = "ml_summary_bisecting_kmeans")
+    class = "ml_summary_bisecting_kmeans")
 }

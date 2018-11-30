@@ -86,7 +86,7 @@ ft_regex_tokenizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_regex_tokenizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_regex_tokenizer")
+  new_ml_transformer(jobj, class = "ml_regex_tokenizer")
 }
 
 validator_ml_regex_tokenizer <- function(.args) {

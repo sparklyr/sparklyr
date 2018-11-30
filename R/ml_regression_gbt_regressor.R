@@ -171,7 +171,7 @@ validator_ml_gbt_regressor <- function(.args) {
 # Constructors
 
 new_ml_gbt_regressor <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_gbt_regressor")
+  new_ml_predictor(jobj, class = "ml_gbt_regressor")
 }
 
 new_ml_gbt_regression_model <- function(jobj) {
@@ -189,5 +189,5 @@ new_ml_gbt_regression_model <- function(jobj) {
       purrr::map(new_ml_decision_tree_regression_model),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
-    subclass = "ml_gbt_regression_model")
+    class = "ml_gbt_regression_model")
 }

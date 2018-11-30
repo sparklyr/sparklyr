@@ -65,7 +65,7 @@ ft_normalizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_normalizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_normalizer")
+  new_ml_transformer(jobj, class = "ml_normalizer")
 }
 
 validator_ml_normalizer <- function(.args) {

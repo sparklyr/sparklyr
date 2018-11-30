@@ -81,7 +81,7 @@ ft_minhash_lsh.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_minhash_lsh <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_minhash_lsh")
+  new_ml_estimator(jobj, class = "ml_minhash_lsh")
 }
 
 new_ml_minhash_lsh_model <- function(jobj) {
@@ -89,7 +89,7 @@ new_ml_minhash_lsh_model <- function(jobj) {
     jobj,
     approx_nearest_neighbors = make_approx_nearest_neighbors(jobj),
     approx_similarity_join = make_approx_similarity_join(jobj),
-    subclass = "ml_minhash_lsh_model")
+    class = "ml_minhash_lsh_model")
 }
 
 validator_ml_minhash_lsh <- function(.args) {

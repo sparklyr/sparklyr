@@ -68,7 +68,7 @@ ft_one_hot_encoder.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_one_hot_encoder <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_one_hot_encoder")
+  new_ml_transformer(jobj, class = "ml_one_hot_encoder")
 }
 
 validator_ml_one_hot_encoder <- function(.args) {

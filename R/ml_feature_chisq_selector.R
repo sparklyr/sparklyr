@@ -115,11 +115,11 @@ ft_chisq_selector.tbl_spark <- function(x, features_col = "features", output_col
 }
 
 new_ml_chisq_selector <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_chisq_selector")
+  new_ml_estimator(jobj, class = "ml_chisq_selector")
 }
 
 new_ml_chisq_selector_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_chisq_selector_model")
+  new_ml_transformer(jobj, class = "ml_chisq_selector_model")
 }
 
 validator_ml_chisq_selector <- function(.args) {

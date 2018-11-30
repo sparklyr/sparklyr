@@ -83,7 +83,7 @@ ft_binarizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, thres
 }
 
 new_ml_binarizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_binarizer")
+  new_ml_transformer(jobj, class = "ml_binarizer")
 }
 
 validator_ml_binarizer <- function(.args) {

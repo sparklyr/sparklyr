@@ -67,7 +67,7 @@ ft_polynomial_expansion.tbl_spark <- function(x, input_col = NULL, output_col = 
 }
 
 new_ml_polynomial_expansion <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_polynomial_expansion")
+  new_ml_transformer(jobj, class = "ml_polynomial_expansion")
 }
 
 validator_ml_polynomial_expansion <- function(.args) {

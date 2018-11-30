@@ -64,7 +64,7 @@ ft_vector_slicer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, i
 }
 
 new_ml_vector_slicer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_vector_slicer")
+  new_ml_transformer(jobj, class = "ml_vector_slicer")
 }
 
 validator_ml_vector_slicer <- function(.args) {

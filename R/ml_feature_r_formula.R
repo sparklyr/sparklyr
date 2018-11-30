@@ -125,7 +125,7 @@ ft_r_formula.tbl_spark <- function(x, formula = NULL, features_col = "features",
 }
 
 new_ml_r_formula <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_r_formula")
+  new_ml_estimator(jobj, class = "ml_r_formula")
 }
 
 new_ml_r_formula_model <- function(jobj) {
@@ -133,7 +133,7 @@ new_ml_r_formula_model <- function(jobj) {
                      formula = try_null(jobj %>%
                                           invoke("parent") %>%
                                           invoke("getFormula")),
-                     subclass = "ml_r_formula_model")
+                     class = "ml_r_formula_model")
 }
 
 # Validator

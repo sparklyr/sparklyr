@@ -133,7 +133,7 @@ validator_ml_kmeans <- function(.args) {
 }
 
 new_ml_kmeans <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_kmeans")
+  new_ml_predictor(jobj, class = "ml_kmeans")
 }
 
 new_ml_kmeans_model <- function(jobj) {
@@ -147,11 +147,11 @@ new_ml_kmeans_model <- function(jobj) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },
     summary = summary,
-    subclass = "ml_kmeans_model")
+    class = "ml_kmeans_model")
 }
 
 new_ml_summary_kmeans_model <- function(jobj) {
   new_ml_summary_clustering(
     jobj,
-    subclass = "ml_summary_kmeans")
+    class = "ml_summary_kmeans")
 }

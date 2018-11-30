@@ -64,7 +64,7 @@ ft_dct.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_dct <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_dct")
+  new_ml_transformer(jobj, class = "ml_dct")
 }
 
 #' @rdname ft_dct

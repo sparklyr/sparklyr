@@ -180,7 +180,7 @@ validator_ml_random_forest_classifier <- function(.args) {
 # Constructors
 
 new_ml_random_forest_classifier <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_random_forest_classifier")
+  new_ml_classifier(jobj, class = "ml_random_forest_classifier")
 }
 
 new_ml_random_forest_classification_model <- function(jobj) {
@@ -201,5 +201,5 @@ new_ml_random_forest_classification_model <- function(jobj) {
     probability_col = try_null(invoke(jobj, "getProbabilityCol")),
     raw_prediction_col = try_null(invoke(jobj, "getRawPredictionCol")),
     thresholds = try_null(invoke(jobj, "getThresholds")),
-    subclass = "ml_random_forest_classification_model")
+    class = "ml_random_forest_classification_model")
 }

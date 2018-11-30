@@ -63,7 +63,7 @@ ft_vector_assembler.tbl_spark <- function(x, input_cols = NULL, output_col = NUL
 }
 
 new_ml_vector_assembler <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_vector_assembler")
+  new_ml_transformer(jobj, class = "ml_vector_assembler")
 }
 
 validator_ml_vector_assembler <- function(.args) {

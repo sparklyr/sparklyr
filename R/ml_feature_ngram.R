@@ -67,7 +67,7 @@ ft_ngram.tbl_spark <- function(x, input_col = NULL, output_col = NULL, n = 2,
 }
 
 new_ml_ngram <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_ngram")
+  new_ml_transformer(jobj, class = "ml_ngram")
 }
 
 validator_ml_ngram <- function(.args) {

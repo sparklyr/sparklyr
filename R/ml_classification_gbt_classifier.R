@@ -203,7 +203,7 @@ validator_ml_gbt_classifier <- function(.args) {
 }
 
 new_ml_gbt_classifier <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_gbt_classifier")
+  new_ml_classifier(jobj, class = "ml_gbt_classifier")
 }
 
 new_ml_gbt_classification_model <- function(jobj) {
@@ -224,5 +224,5 @@ new_ml_gbt_classification_model <- function(jobj) {
     probability_col = try_null(invoke(jobj, "getProbabilityCol")),
     raw_prediction_col = try_null(invoke(jobj, "getRawPredictionCol")),
     thresholds = try_null(invoke(jobj, "getThresholds")),
-    subclass = "ml_gbt_classification_model")
+    class = "ml_gbt_classification_model")
 }

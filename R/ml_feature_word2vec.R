@@ -116,7 +116,7 @@ ft_word2vec.tbl_spark <- function(x, input_col = NULL, output_col = NULL, vector
 }
 
 new_ml_word2vec <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_word2vec")
+  new_ml_estimator(jobj, class = "ml_word2vec")
 }
 
 new_ml_word2vec_model <- function(jobj) {
@@ -133,7 +133,7 @@ new_ml_word2vec_model <- function(jobj) {
                        invoke(jobj, "findSynonymsArray", word, num)
                      },
                      vectors = invoke(jobj, "getVectors"),
-                     subclass = "ml_word2vec_model")
+                     class = "ml_word2vec_model")
 }
 
 validator_ml_word2vec <- function(.args) {

@@ -90,11 +90,11 @@ ft_max_abs_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_max_abs_scaler <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_max_abs_scaler")
+  new_ml_estimator(jobj, class = "ml_max_abs_scaler")
 }
 
 new_ml_max_abs_scaler_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_max_abs_scaler_model")
+  new_ml_transformer(jobj, class = "ml_max_abs_scaler_model")
 }
 
 validator_ml_max_abs_scaler <- function(.args) {

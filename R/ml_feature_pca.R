@@ -78,7 +78,7 @@ ft_pca.tbl_spark <- function(x, input_col = NULL, output_col = NULL, k = NULL, d
 }
 
 new_ml_pca <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_pca")
+  new_ml_estimator(jobj, class = "ml_pca")
 }
 
 new_ml_pca_model <- function(jobj) {
@@ -86,7 +86,7 @@ new_ml_pca_model <- function(jobj) {
     jobj,
     explained_variance = try_null(read_spark_vector(jobj, "explainedVariance")),
     pc = try_null(read_spark_matrix(jobj, "pc")),
-    subclass = "ml_pca_model")
+    class = "ml_pca_model")
 }
 
 validator_ml_pca <- function(.args) {

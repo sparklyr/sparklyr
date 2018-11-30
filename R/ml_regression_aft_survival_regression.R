@@ -184,7 +184,7 @@ validator_ml_aft_survival_regression <- function(.args) {
 # Constructors
 
 new_ml_aft_survival_regression <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_aft_survival_regression")
+  new_ml_predictor(jobj, class = "ml_aft_survival_regression")
 }
 
 new_ml_aft_survival_regression_model <- function(jobj) {
@@ -197,7 +197,7 @@ new_ml_aft_survival_regression_model <- function(jobj) {
     prediction_col = invoke(jobj, "getPredictionCol"),
     quantile_probabilities = invoke(jobj, "getQuantileProbabilities"),
     quantiles_col = try_null(invoke(jobj, "getQuantilesCol")),
-    subclass = "ml_aft_survival_regression_model")
+    class = "ml_aft_survival_regression_model")
 }
 
 #' @rdname ml_aft_survival_regression

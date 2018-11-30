@@ -14,11 +14,11 @@ print.ml_estimator <- function(x, ...) {
   ml_print_params(x)
 }
 
-new_ml_transformer <- function(jobj, ..., subclass = NULL) {
+new_ml_transformer <- function(jobj, ..., class = character()) {
   new_ml_pipeline_stage(
     jobj,
     ...,
-    subclass = c(subclass, "ml_transformer")
+    class = c(class, "ml_transformer")
   )
 }
 
@@ -36,11 +36,11 @@ new_ml_transformer <- function(jobj, ..., subclass = NULL) {
 #' @keywords internal
 ml_transformer <- new_ml_transformer
 
-new_ml_prediction_model <- function(jobj, ..., subclass = NULL) {
+new_ml_prediction_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
     jobj,
     ...,
-    subclass = c(subclass, "ml_prediction_model")
+    class = c(class, "ml_prediction_model")
   )
 }
 
@@ -49,11 +49,11 @@ new_ml_prediction_model <- function(jobj, ..., subclass = NULL) {
 #' @keywords internal
 ml_prediction_model <- new_ml_prediction_model
 
-new_ml_clustering_model <- function(jobj, ..., subclass = NULL) {
+new_ml_clustering_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
     jobj,
     ...,
-    subclass = c(subclass, "ml_clustering_model")
+    class = c(class, "ml_clustering_model")
   )
 }
 
@@ -62,11 +62,11 @@ new_ml_clustering_model <- function(jobj, ..., subclass = NULL) {
 #' @keywords internal
 ml_clustering_model <- new_ml_clustering_model
 
-new_ml_estimator <- function(jobj, ..., subclass = NULL) {
+new_ml_estimator <- function(jobj, ..., class = character()) {
   new_ml_pipeline_stage(
     jobj,
     ...,
-    subclass = c(subclass, "ml_estimator")
+    class = c(class, "ml_estimator")
   )
 }
 
@@ -75,11 +75,11 @@ new_ml_estimator <- function(jobj, ..., subclass = NULL) {
 #' @keywords internal
 ml_estimator <- new_ml_estimator
 
-new_ml_predictor <- function(jobj, ..., subclass = NULL) {
+new_ml_predictor <- function(jobj, ..., class = character()) {
   new_ml_estimator(
     jobj,
     ...,
-    subclass = c(subclass, "ml_predictor")
+    class = c(class, "ml_predictor")
   )
 }
 
@@ -88,11 +88,11 @@ new_ml_predictor <- function(jobj, ..., subclass = NULL) {
 #' @keywords internal
 ml_predictor <- new_ml_predictor
 
-new_ml_classifier <- function(jobj, ..., subclass = NULL) {
+new_ml_classifier <- function(jobj, ..., class = character()) {
   new_ml_predictor(
     jobj,
     ...,
-    subclass = c(subclass, "ml_classifier")
+    class = c(class, "ml_classifier")
   )
 }
 

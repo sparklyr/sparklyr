@@ -102,7 +102,7 @@ ft_feature_hasher.tbl_spark <- function(x, input_cols = NULL, output_col = NULL,
 }
 
 new_ml_feature_hasher <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_feature_hasher")
+  new_ml_transformer(jobj, class = "ml_feature_hasher")
 }
 
 validator_ml_feature_hasher <- function(.args) {

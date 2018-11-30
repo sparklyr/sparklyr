@@ -221,7 +221,7 @@ validator_ml_lda <- function(.args) {
 }
 
 new_ml_lda <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_lda")
+  new_ml_predictor(jobj, class = "ml_lda")
 }
 
 new_ml_lda_model <- function(jobj) {
@@ -243,7 +243,7 @@ new_ml_lda_model <- function(jobj) {
     },
     topics_matrix = function() try_null(read_spark_matrix(jobj, "topicsMatrix")), # def
     vocab_size = invoke(jobj, "vocabSize"),
-    subclass = "ml_lda_model")
+    class = "ml_lda_model")
 }
 
 #' @rdname ml_lda

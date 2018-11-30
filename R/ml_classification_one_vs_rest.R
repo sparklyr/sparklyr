@@ -102,7 +102,7 @@ validator_ml_one_vs_rest <- function(.args) {
 }
 
 new_ml_one_vs_rest <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_one_vs_rest")
+  new_ml_predictor(jobj, class = "ml_one_vs_rest")
 }
 
 new_ml_one_vs_rest_model <- function(jobj) {
@@ -110,5 +110,5 @@ new_ml_one_vs_rest_model <- function(jobj) {
     jobj,
     models = invoke(jobj, "models") %>%
       purrr::map(ml_constructor_dispatch),
-    subclass = "ml_one_vs_rest_model")
+    class = "ml_one_vs_rest_model")
 }

@@ -187,7 +187,7 @@ validator_ml_linear_regression <- function(.args) {
 }
 
 new_ml_linear_regression <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_linear_regression")
+  new_ml_predictor(jobj, class = "ml_linear_regression")
 }
 
 new_ml_linear_regression_model <- function(jobj) {
@@ -205,7 +205,7 @@ new_ml_linear_regression_model <- function(jobj) {
     prediction_col = invoke(jobj, "getPredictionCol"),
     scale = if (spark_version(spark_connection(jobj)) >= "2.3.0") invoke(jobj, "scale"),
     summary = summary,
-    subclass = "ml_linear_regression_model")
+    class = "ml_linear_regression_model")
 }
 
 new_ml_summary_linear_regression_model <- function(jobj, fit_intercept) {
@@ -239,5 +239,5 @@ new_ml_summary_linear_regression_model <- function(jobj, fit_intercept) {
     # `lazy val tValues`
     t_values = try_null(invoke(jobj, "tValues")) %>%
       arrange_stats(),
-    subclass = "ml_summary_linear_regression")
+    class = "ml_summary_linear_regression")
 }

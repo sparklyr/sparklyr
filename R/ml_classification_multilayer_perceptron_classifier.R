@@ -190,7 +190,7 @@ validator_ml_multilayer_perceptron_classifier <- function(.args) {
 }
 
 new_ml_multilayer_perceptron_classifier <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_multilayer_perceptron_classifier")
+  new_ml_classifier(jobj, class = "ml_multilayer_perceptron_classifier")
 }
 
 new_ml_multilayer_perceptron_classification_model <- function(jobj) {
@@ -207,5 +207,5 @@ new_ml_multilayer_perceptron_classification_model <- function(jobj) {
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
     weights = read_spark_vector(jobj, "weights"),
-    subclass = "ml_multilayer_perceptron_classification_model")
+    class = "ml_multilayer_perceptron_classification_model")
 }

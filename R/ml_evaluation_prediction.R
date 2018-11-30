@@ -257,13 +257,13 @@ validator_ml_regression_evaluator <- function(.args) {
 }
 
 new_ml_binary_classification_evaluator <- function(jobj) {
-  new_ml_evaluator(jobj, subclass = "ml_binary_classification_evaluator")
+  new_ml_evaluator(jobj, class = "ml_binary_classification_evaluator")
 }
 
 new_ml_multiclass_classification_evaluator <- function(jobj) {
-  new_ml_evaluator(jobj, subclass = "ml_multiclass_classification_evaluator")
+  new_ml_evaluator(jobj, class = "ml_multiclass_classification_evaluator")
 }
 
 new_ml_regression_evaluator <- function(jobj) {
-  new_ml_evaluator(jobj, subclass = "ml_regression_evaluator")
+  new_ml_evaluator(jobj, class = "ml_regression_evaluator")
 }

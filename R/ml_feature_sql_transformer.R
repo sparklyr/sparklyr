@@ -67,7 +67,7 @@ ft_sql_transformer.tbl_spark <- function(x, statement = NULL,
 }
 
 new_ml_sql_transformer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_sql_transformer")
+  new_ml_transformer(jobj, class = "ml_sql_transformer")
 }
 
 # dplyr transformer

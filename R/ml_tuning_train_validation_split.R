@@ -89,7 +89,7 @@ new_ml_train_validation_split <- function(jobj) {
   new_ml_tuning(
     jobj,
     train_ratio = invoke(jobj, "getTrainRatio"),
-    subclass = "ml_train_validation_split"
+    class = "ml_train_validation_split"
   )
 }
 
@@ -114,7 +114,7 @@ new_ml_train_validation_split_model <- function(jobj) {
                  purrr::map(ml_constructor_dispatch)
       )
     },
-    subclass = "ml_train_validation_split_model")
+    class = "ml_train_validation_split_model")
 }
 
 #' @export

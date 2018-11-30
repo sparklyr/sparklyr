@@ -72,7 +72,7 @@ ft_index_to_string.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_index_to_string <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_index_to_string")
+  new_ml_transformer(jobj, class = "ml_index_to_string")
 }
 
 validator_ml_index_to_string <- function(.args) {

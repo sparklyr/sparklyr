@@ -86,7 +86,7 @@ new_ml_cross_validator <- function(jobj) {
   new_ml_tuning(
     jobj,
     num_folds = invoke(jobj, "getNumFolds"),
-    subclass = "ml_cross_validator"
+    class = "ml_cross_validator"
   )
 }
 
@@ -112,7 +112,7 @@ new_ml_cross_validator_model <- function(jobj) {
                  purrr::map(~ purrr::map(.x, ml_constructor_dispatch))
       )
     },
-    subclass = "ml_cross_validator_model")
+    class = "ml_cross_validator_model")
 }
 
 #' @export

@@ -131,7 +131,7 @@ validator_ml_isotonic_regression <- function(.args) {
 }
 
 new_ml_isotonic_regression <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_isotonic_regression")
+  new_ml_predictor(jobj, class = "ml_isotonic_regression")
 }
 
 new_ml_isotonic_regression_model <- function(jobj) {
@@ -142,5 +142,5 @@ new_ml_isotonic_regression_model <- function(jobj) {
     feature_index = invoke(jobj, "getFeatureIndex"),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
-    subclass = "ml_isotonic_regression_model")
+    class = "ml_isotonic_regression_model")
 }
