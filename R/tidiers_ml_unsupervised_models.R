@@ -108,6 +108,7 @@ glance.ml_model_bisecting_kmeans <- function(x,
 }
 
 #' @rdname ml_unsupervised_tidiers
+#' @importFrom dplyr .data
 #' @export
 tidy.ml_model_gaussian_mixture <- function(x, ...) {
 
