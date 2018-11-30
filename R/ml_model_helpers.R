@@ -31,7 +31,11 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
   pipeline %>% ml_fit(dataset)
 }
 
-ml_model_supervised <- function(constructor, predictor, formula, dataset, features_col, label_col, ...) {
+#' @export
+#' @rdname ml-model-constructors
+#' @param constructor The constructor function for the `ml_model`.
+ml_model_supervised <- function(constructor, predictor, formula, dataset,
+                                features_col, label_col, ...) {
   pipeline_model <- ml_supervised_pipeline(
     predictor = predictor,
     dataset = dataset,
@@ -52,6 +56,8 @@ ml_model_supervised <- function(constructor, predictor, formula, dataset, featur
   rlang::exec(constructor, !!!.args)
 }
 
+#' @export
+#' @rdname ml-model-constructors
 ml_model_clustering <- function(constructor, predictor, formula, dataset, features_col, ...) {
   pipeline_model <- ml_clustering_pipeline(
     predictor = predictor,
