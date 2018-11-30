@@ -63,7 +63,7 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
         # Default arguments based on function formals.
         default_params <- stage_jobj %>%
           ml_get_stage_constructor() %>%
-          rlang::fn_fmls() %>%
+          formals() %>%
           as.list() %>%
           purrr::discard(~ is.symbol(.x) || is.language(.x)) %>%
           purrr::compact()
