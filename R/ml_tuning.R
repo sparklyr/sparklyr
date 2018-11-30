@@ -125,10 +125,11 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
   possibly_spark_jobj <- purrr::possibly(spark_jobj, NULL)
 
   param_maps <- if (!is.null(estimator) && !is.null(estimator_param_maps)) {
-    stage_jobjs <- if (inherits(estimator, "ml_pipeline"))
+    stage_jobjs <- if (inherits(estimator, "ml_pipeline")) {
       invoke_static(sc, "sparklyr.MLUtils", "uidStagesMapping", spark_jobj(estimator))
-    else
+    } else {
       rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
+    }
 
     current_param_list <- stage_jobjs %>%
       purrr::map(invoke, "extractParamMap") %>%
@@ -146,13 +147,14 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
     jobj_set_param("setEvaluator", possibly_spark_jobj(evaluator)) %>%
     jobj_set_param("setSeed", seed)
 
-  if (!is.null(param_maps))
+  if (!is.null(param_maps)) {
     invoke_static(
       sc, "sparklyr.MLUtils", "setParamMaps",
       jobj, param_maps
     )
-  else
+  } else {
     jobj
+  }
 }
 
 new_ml_tuning <- function(jobj, ..., class = character()) {
