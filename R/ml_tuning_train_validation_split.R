@@ -111,7 +111,7 @@ new_ml_train_validation_split_model <- function(jobj) {
     sub_models = function() {
       try_null(jobj %>%
                  invoke("subModels") %>%
-                 purrr::map(ml_constructor_dispatch)
+                 purrr::map(ml_call_constructor)
       )
     },
     class = "ml_train_validation_split_model")

@@ -29,7 +29,7 @@ ml_fit <- function(x, dataset, ...) {
 
   spark_jobj(x) %>%
     invoke("fit", spark_dataframe(dataset)) %>%
-    ml_constructor_dispatch()
+    ml_call_constructor()
 }
 
 #' @rdname ml-transform-methods

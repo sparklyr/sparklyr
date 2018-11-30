@@ -63,7 +63,7 @@ ml_set_param <- function(x, param, value, ...) {
            substr(., 2, nchar(.)))}
   spark_jobj(x) %>%
     invoke(setter, value) %>%
-    ml_constructor_dispatch()
+    ml_call_constructor()
 }
 
 ml_get_param_map <- function(jobj) {

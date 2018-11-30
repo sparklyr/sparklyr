@@ -161,11 +161,11 @@ new_ml_tuning <- function(jobj, ..., class = character()) {
   new_ml_estimator(
     jobj,
     estimator = purrr::possibly(
-      ~ invoke(.x, "getEstimator") %>% ml_constructor_dispatch(),
+      ~ invoke(.x, "getEstimator") %>% ml_call_constructor(),
       NULL
     )(jobj),
     evaluator = purrr::possibly(
-      ~ invoke(.x, "getEvaluator") %>% ml_constructor_dispatch(),
+      ~ invoke(.x, "getEvaluator") %>% ml_call_constructor(),
       NULL
     )(jobj),
     estimator_param_maps = purrr::possibly(ml_get_estimator_param_maps, NULL)(jobj),
@@ -177,11 +177,11 @@ new_ml_tuning_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
     jobj,
     estimator = invoke(jobj, "getEstimator") %>%
-      ml_constructor_dispatch(),
+      ml_call_constructor(),
     evaluator = invoke(jobj, "getEvaluator") %>%
-      ml_constructor_dispatch(),
+      ml_call_constructor(),
     estimator_param_maps = ml_get_estimator_param_maps(jobj),
-    best_model = ml_constructor_dispatch(invoke(jobj, "bestModel")),
+    best_model = ml_call_constructor(invoke(jobj, "bestModel")),
     ...,
     class = c(class, "ml_tuning_model"))
 }
