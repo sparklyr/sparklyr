@@ -2,21 +2,23 @@
 % Please edit documentation in R/tidiers_ml_lda.R
 \name{ml_lda_tidiers}
 \alias{ml_lda_tidiers}
-\alias{tidy.ml_lda_model}
-\alias{augment.ml_lda_model}
-\alias{glance.ml_lda_model}
+\alias{tidy.ml_model_lda}
+\alias{augment.ml_model_lda}
+\alias{glance.ml_model_lda}
 \title{Tidying methods for Spark ML LDA models}
 \usage{
-\method{tidy}{ml_lda_model}(x, ...)
+\method{tidy}{ml_model_lda}(x, ...)
 
-\method{augment}{ml_lda_model}(x, ...)
+\method{augment}{ml_model_lda}(x, newdata = NULL, ...)
 
-\method{glance}{ml_lda_model}(x, ...)
+\method{glance}{ml_model_lda}(x, ...)
 }
 \arguments{
 \item{x}{a Spark ML model.}
 
 \item{...}{extra arguments (not used.)}
+
+\item{newdata}{a tbl_spark of new data to use for prediction.}
 }
 \description{
 These methods summarize the results of Spark ML models into tidy forms.
