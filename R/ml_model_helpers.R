@@ -13,7 +13,7 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
   sc <- spark_connection(predictor)
 
   pipeline <- if (spark_version(sc) < "2.0.0") {
-    rdf <- sdf_schema(x) %>%
+    rdf <- sdf_schema(dataset) %>%
       lapply(`[[`, "name") %>%
       as.data.frame(stringsAsFactors = FALSE)
     features <- stats::terms(as.formula(formula), data = rdf) %>%
