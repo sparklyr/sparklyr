@@ -27,7 +27,7 @@ new_ml_transformer <- function(jobj, ..., class = character()) {
 #' Functions for developers writing extensions for Spark ML.
 #'
 #' @param jobj Pointer to the pipeline stage object.
-#' @param subclass Name of class.
+#' @param class Name of class.
 #' @param ... (Optional) additional attributes of the object.
 #'
 #' @name ml-constructors

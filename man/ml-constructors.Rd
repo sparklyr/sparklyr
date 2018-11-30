@@ -10,24 +10,24 @@
 \alias{ml_classifier}
 \title{Constructors for Pipeline Stages}
 \usage{
-ml_transformer(jobj, ..., subclass = NULL)
+ml_transformer(jobj, ..., class = character())
 
-ml_prediction_model(jobj, ..., subclass = NULL)
+ml_prediction_model(jobj, ..., class = character())
 
-ml_clustering_model(jobj, ..., subclass = NULL)
+ml_clustering_model(jobj, ..., class = character())
 
-ml_estimator(jobj, ..., subclass = NULL)
+ml_estimator(jobj, ..., class = character())
 
-ml_predictor(jobj, ..., subclass = NULL)
+ml_predictor(jobj, ..., class = character())
 
-ml_classifier(jobj, ..., subclass = NULL)
+ml_classifier(jobj, ..., class = character())
 }
 \arguments{
 \item{jobj}{Pointer to the pipeline stage object.}
 
 \item{...}{(Optional) additional attributes of the object.}
 
-\item{subclass}{Name of class.}
+\item{class}{Name of class.}
 }
 \description{
 Functions for developers writing extensions for Spark ML.
