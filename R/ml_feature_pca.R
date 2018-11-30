@@ -144,7 +144,7 @@ ml_pca <- function(x,
 
   m <- new_ml_model(
     pipeline_model = pipeline_model,
-    formula = formula,
+    formula = paste0("~ ", paste0(features, collapse = " + ")),
     dataset = x,
     class = "ml_model_pca"
   )
