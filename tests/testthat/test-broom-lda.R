@@ -16,12 +16,11 @@ test_that("lda.tidy() works", {
     ml_lda(~text, k = 3) %>%
     tidy()
 
-  check_tidy(td1, exp.row = 3, exp.col = 4,
-             exp.names = c("topic", "termIndices",
-                           "termWeights", "doc_concentrarion"))
+  check_tidy(td1, exp.row = 27, exp.col = 3,
+             exp.names = c("topic", "term", "beta"))
 
-  expect_equal(td1$doc_concentrarion,
-               c(0.3269, 0.3392, 0.3271),
+  expect_equal(td1$beta[1:3],
+               c(0.879, 0.946, 1.150),
                tolerance = 0.001)
 })
 
@@ -39,11 +38,11 @@ test_that("lda.augment() works", {
 
   au1 <- lines_tbl %>%
     ml_lda(~text, k = 3) %>%
-    augment()
+    augment() %>%
+    dplyr::collect()
 
-  check_tidy(au1, exp.row = 9, exp.col = 4,
-             exp.name = c("vocabulary", "topic_0",
-                          "topic_1", "topic_2"))
+  check_tidy(au1, exp.col = 2,
+             exp.name = c("text", ".topic"))
 })
 
 test_that("lda.glance() works", {
