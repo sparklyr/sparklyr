@@ -170,6 +170,7 @@ Online
 \examples{
 \dontrun{
 library(janeaustenr)
+library(dplyr)
 sc <-  spark_connect(master = "local")
 
 lines_tbl <- sdf_copy_to(sc,
@@ -177,11 +178,21 @@ lines_tbl <- sdf_copy_to(sc,
                          name = "lines_tbl",
                          overwrite = TRUE)
 
-lda_model <- lines_tbl \%>\%
-  ml_lda(~text, k =4)
+# transform the data in a tidy form
+lines_tbl_tidy <- lines_tbl \%>\%
+  ft_tokenizer(input_col = "text",
+               output_col = "word_list") \%>\%
+  ft_stop_words_remover(input_col = "word_list",
+                        output_col = "wo_stop_words") \%>\%
+  mutate(text = explode(wo_stop_words)) \%>\%
+  filter(text != "") \%>\%
+  select(text, book)
+
+lda_model <- lines_tbl_tidy \%>\%
+  ml_lda(~text, k = 4)
 
 # vocabulary and topics
-augment(lda_model)
+tidy(lda_model)
 }
 
 }

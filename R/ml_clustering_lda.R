@@ -81,12 +81,12 @@
 #' @param learning_decay (For Online optimizer only) Learning rate, set as an exponential decay rate. This should be between (0.5, 1.0] to guarantee asymptotic convergence. This is called "kappa" in the Online LDA paper (Hoffman et al., 2010). Default: 0.51, based on Hoffman et al.
 #' @param learning_offset (For Online optimizer only) A (positive) learning parameter that downweights early iterations. Larger values make early iterations count less. This is called "tau0" in the Online LDA paper (Hoffman et al., 2010) Default: 1024, following Hoffman et al.
 #' @param optimize_doc_concentration (For Online optimizer only) Indicates whether the \code{doc_concentration} (Dirichlet parameter for document-topic distribution) will be optimized during training. Setting this to true will make the model more expressive and fit the training data better. Default: \code{FALSE}
-#'
 #' @param keep_last_checkpoint (Spark 2.0.0+) (For EM optimizer only) If using checkpointing, this indicates whether to keep the last checkpoint. If \code{FALSE}, then the checkpoint will be deleted. Deleting the checkpoint can cause failures if a data partition is lost, so set this bit with care. Note that checkpoints will be cleaned up via reference counting, regardless.
 #'
 #' @examples
 #' \dontrun{
 #' library(janeaustenr)
+#' library(dplyr)
 #' sc <-  spark_connect(master = "local")
 #'
 #' lines_tbl <- sdf_copy_to(sc,
@@ -94,11 +94,21 @@
 #'                          name = "lines_tbl",
 #'                          overwrite = TRUE)
 #'
-#' lda_model <- lines_tbl %>%
-#'   ml_lda(~text, k =4)
+#' # transform the data in a tidy form
+#' lines_tbl_tidy <- lines_tbl %>%
+#'   ft_tokenizer(input_col = "text",
+#'                output_col = "word_list") %>%
+#'   ft_stop_words_remover(input_col = "word_list",
+#'                         output_col = "wo_stop_words") %>%
+#'   mutate(text = explode(wo_stop_words)) %>%
+#'   filter(text != "") %>%
+#'   select(text, book)
+#'
+#' lda_model <- lines_tbl_tidy %>%
+#'   ml_lda(~text, k = 4)
 #'
 #' # vocabulary and topics
-#' augment(lda_model)
+#' tidy(lda_model)
 #' }
 #'
 #' @export
