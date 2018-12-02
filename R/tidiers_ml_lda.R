@@ -8,6 +8,7 @@
 NULL
 
 #' @rdname ml_lda_tidiers
+#' @importFrom rlang !!
 #' @export
 tidy.ml_model_lda <- function(x,
                               ...){
@@ -20,9 +21,10 @@ tidy.ml_model_lda <- function(x,
   names(topics_matrix) <- 0:(k - 1)
 
   dplyr::bind_cols(term = term, topics_matrix) %>%
-    tidyr::gather(topic, beta, -term) %>%
-    dplyr::select(topic, term, beta) %>%
-    dplyr::mutate(topic = as.integer(topic))
+    tidyr::gather(!!"topic", beta, -term) %>%
+    dplyr::select(!!"topic", term, beta) %>%
+    dplyr::mutate(topic = as.integer(!!"topic"))
+
 }
 
 #' @rdname ml_lda_tidiers
