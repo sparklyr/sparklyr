@@ -1,12 +1,21 @@
-ml_add_stage <- function(x, transformer) {
+
+#' Add a Stage to a Pipeline
+#'
+#' Adds a stage to a pipeline.
+#'
+#' @param x A pipeline or a pipeline stage.
+#' @param stage A pipeline stage.
+#' @keywords internal
+#' @export
+ml_add_stage <- function(x, stage) {
   sc <- spark_connection(x)
-  stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(transformer)) else {
+  stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(stage)) else {
     tryCatch(spark_jobj(x) %>%
                invoke("getStages") %>%
-               c(spark_jobj(transformer)),
+               c(spark_jobj(stage)),
              error = function(e) spark_jobj(x) %>%
                invoke("stages") %>%
-               c(spark_jobj(transformer))
+               c(spark_jobj(stage))
     )
   }
 
