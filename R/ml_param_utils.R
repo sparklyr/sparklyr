@@ -42,8 +42,8 @@ ml_param_map <- function(x, ...) {
 #' @rdname ml-params
 #' @export
 ml_param <- function(x, param, allow_null = FALSE, ...) {
-  ml_param_map(x)[[param]] %||% if (allow_null) NULL else
-    stop("param ", param, " not found")
+  ml_param_map(x)[[param]] %||%
+    (if (allow_null) NULL else stop("param ", param, " not found"))
 }
 
 #' @rdname ml-params
@@ -59,8 +59,8 @@ ml_set_param <- function(x, param, value, ...) {
   setter <- param %>%
     ml_map_param_names(direction = "rs") %>%
     {paste0("set",
-           toupper(substr(., 1, 1)),
-           substr(., 2, nchar(.)))}
+            toupper(substr(., 1, 1)),
+            substr(., 2, nchar(.)))}
   spark_jobj(x) %>%
     invoke(setter, value) %>%
     ml_call_constructor()
@@ -87,7 +87,14 @@ ml_map_param_list_names <- function(x, direction = c("sr", "rs"), ...) {
   else
     .globals$param_mapping_r_to_s
 
-  rlang::set_names(x, unname(sapply(names(x), function(nm) mapping[[nm]] %||% nm)))
+  rlang::set_names(
+    x,
+    unname(
+      sapply(
+        names(x),
+        function(nm) rlang::env_get(mapping, nm, default = NULL, inherit = TRUE) %||% nm)
+    )
+  )
 }
 
 ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
@@ -97,5 +104,10 @@ ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
   else
     .globals$param_mapping_r_to_s
 
-  unname(sapply(x, function(nm) mapping[[nm]] %||% nm))
+  unname(
+    sapply(
+      x,
+      function(nm) rlang::env_get(mapping, nm, default = NULL, inherit = TRUE) %||% nm
+    )
+  )
 }

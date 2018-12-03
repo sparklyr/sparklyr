@@ -1,5 +1,5 @@
 ml_map_class <- function(x) {
-  .globals$ml_class_mapping[[x]]
+  rlang::env_get(.globals$ml_class_mapping, x, default = NULL, inherit = TRUE)
 }
 
 ml_get_stage_validator <- function(jobj) {
