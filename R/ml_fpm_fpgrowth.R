@@ -89,7 +89,7 @@ validator_ml_fpgrowth <- function(.args) {
 }
 
 new_ml_fpgrowth <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_fpgrowth")
+  new_ml_estimator(jobj, class = "ml_fpgrowth")
 }
 
 new_ml_fpgrowth_model <- function(jobj) {

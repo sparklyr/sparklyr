@@ -61,7 +61,7 @@ ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, featu
                                      label_col = "label", prediction_col = "prediction",
                                      uid = random_string("one_vs_rest_"), response = NULL,
                                      features = NULL, predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_one_vs_rest.spark_connection(
     x = spark_connection(x),
@@ -102,7 +102,7 @@ validator_ml_one_vs_rest <- function(.args) {
 }
 
 new_ml_one_vs_rest <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_one_vs_rest")
+  new_ml_estimator(jobj, class = "ml_one_vs_rest")
 }
 
 new_ml_one_vs_rest_model <- function(jobj) {

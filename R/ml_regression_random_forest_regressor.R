@@ -96,7 +96,7 @@ ml_random_forest_regressor.tbl_spark <- function(x, formula = NULL, num_trees = 
                                                  max_memory_in_mb = 256, features_col = "features", label_col = "label",
                                                  prediction_col = "prediction",  uid = random_string("random_forest_regressor_"),
                                                  response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_random_forest_regressor.spark_connection(
     x = spark_connection(x),
@@ -152,7 +152,7 @@ validator_ml_random_forest_regressor <- function(.args) {
 }
 
 new_ml_random_forest_regressor <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_random_forest_regressor")
+  new_ml_estimator(jobj, class = "ml_random_forest_regressor")
 }
 
 new_ml_random_forest_regression_model <- function(jobj) {

@@ -46,7 +46,7 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
                              min_instances_per_node = 1L, seed = NULL, thresholds = NULL,
                              cache_node_ids = FALSE, max_memory_in_mb = 256L, uid = random_string("decision_tree_"),
                              response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
   sdf <- spark_dataframe(x)

@@ -123,7 +123,7 @@ ml_linear_svc.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE, reg
                                     prediction_col = "prediction", raw_prediction_col = "rawPrediction",
                                     uid = random_string("linear_svc_"), response = NULL,
                                     features = NULL, predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_linear_svc.spark_connection(
     x = spark_connection(x),

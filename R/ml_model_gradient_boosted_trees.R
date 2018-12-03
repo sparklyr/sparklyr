@@ -51,7 +51,7 @@ ml_gradient_boosted_trees <- function(x, formula = NULL,
                                       seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
                                       max_memory_in_mb = 256, uid = random_string("gradient_boosted_trees_"),
                                       response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
   sdf <- spark_dataframe(x)

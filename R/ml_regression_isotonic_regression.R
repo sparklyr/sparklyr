@@ -92,7 +92,7 @@ ml_isotonic_regression.tbl_spark <- function(x, formula = NULL, feature_index = 
                                              label_col = "label", prediction_col = "prediction",
                                              uid = random_string("isotonic_regression_"),
                                              response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_isotonic_regression.spark_connection(
     x = spark_connection(x),
@@ -131,7 +131,7 @@ validator_ml_isotonic_regression <- function(.args) {
 }
 
 new_ml_isotonic_regression <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_isotonic_regression")
+  new_ml_estimator(jobj, class = "ml_isotonic_regression")
 }
 
 new_ml_isotonic_regression_model <- function(jobj) {

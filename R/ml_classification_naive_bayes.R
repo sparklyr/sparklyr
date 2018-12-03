@@ -110,7 +110,7 @@ ml_naive_bayes.tbl_spark <- function(x, formula = NULL, model_type = "multinomia
                                      raw_prediction_col = "rawPrediction",
                                      uid = random_string("naive_bayes_"), response = NULL,
                                      features = NULL, predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_naive_bayes.spark_connection(
     x = spark_connection(x),

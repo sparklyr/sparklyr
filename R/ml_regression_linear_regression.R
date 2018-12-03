@@ -128,7 +128,7 @@ ml_linear_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = TR
                                            prediction_col = "prediction",
                                            uid = random_string("linear_regression_"),
                                            response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_linear_regression.spark_connection(
     x = spark_connection(x),
@@ -187,7 +187,7 @@ validator_ml_linear_regression <- function(.args) {
 }
 
 new_ml_linear_regression <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_linear_regression")
+  new_ml_estimator(jobj, class = "ml_linear_regression")
 }
 
 new_ml_linear_regression_model <- function(jobj) {

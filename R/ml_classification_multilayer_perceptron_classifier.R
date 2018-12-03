@@ -126,7 +126,7 @@ ml_multilayer_perceptron_classifier.tbl_spark <- function(x, formula = NULL, lay
                                                           uid = random_string("multilayer_perceptron_classifier_"),
                                                           response = NULL, features = NULL,
                                                           predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_multilayer_perceptron_classifier.spark_connection(
     x = spark_connection(x),

@@ -87,7 +87,7 @@ ml_gaussian_mixture.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 1
                                           tol = 0.01, seed = NULL, features_col = "features",
                                           prediction_col = "prediction", probability_col = "probability",
                                           uid = random_string("gaussian_mixture_"), features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, features = features)
 
   stage <- ml_gaussian_mixture.spark_connection(
     x = spark_connection(x),
@@ -126,7 +126,7 @@ validator_ml_gaussian_mixture <- function(.args) {
 }
 
 new_ml_gaussian_mixture <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_gaussian_mixture")
+  new_ml_estimator(jobj, class = "ml_gaussian_mixture")
 }
 
 new_ml_gaussian_mixture_model <- function(jobj) {

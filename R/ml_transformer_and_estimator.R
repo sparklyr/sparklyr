@@ -75,21 +75,8 @@ new_ml_estimator <- function(jobj, ..., class = character()) {
 #' @keywords internal
 ml_estimator <- new_ml_estimator
 
-new_ml_predictor <- function(jobj, ..., class = character()) {
-  new_ml_estimator(
-    jobj,
-    ...,
-    class = c(class, "ml_predictor")
-  )
-}
-
-#' @rdname ml-constructors
-#' @export
-#' @keywords internal
-ml_predictor <- new_ml_predictor
-
 new_ml_classifier <- function(jobj, ..., class = character()) {
-  new_ml_predictor(
+  new_ml_estimator(
     jobj,
     ...,
     class = c(class, "ml_classifier")

@@ -183,7 +183,7 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
                                              uid = random_string("logistic_regression_"),
                                              response = NULL, features = NULL,
                                              predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_logistic_regression.spark_connection(
     x = spark_connection(x),

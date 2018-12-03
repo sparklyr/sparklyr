@@ -12,42 +12,42 @@ ml_get_stage_constructor <- function(jobj) {
   )
 }
 
-ml_formula_transformation <- function(env = rlang::caller_env(2)) {
-  caller_frame <- rlang::caller_frame()
-  args <- caller_frame$expr %>%
-    rlang::call_standardise() %>%
-    rlang::call_args() %>%
-    `[`(c("formula", "response", "features")) %>%
-    lapply(rlang::eval_tidy, env = env)
-
-  formula <- if (is.null(args$formula) && !is.null(args$response)) {
+#' Standardize Formula Input for `ml_model`
+#'
+#' Generates a formula string from user inputs, to be used in `ml_model` constructor.
+#'
+#' @param formula The `formula` argument.
+#' @param response The `response` argument.
+#' @param features The `features` argument.
+#' @export
+#' @keywords internal
+ml_standardize_formula <- function(formula = NULL, response = NULL, features = NULL) {
+  if (is.null(formula) && !is.null(response)) {
     # if 'formula' isn't specified but 'response' is...
-    if (rlang::is_formula(args$response)) {
+    if (rlang::is_formula(response)) {
       # if 'response' is a formula, warn if 'features' is also specified
-      if (!is.null(args$features)) warning("'features' is ignored when a formula is specified")
+      if (!is.null(features)) warning("'features' is ignored when a formula is specified")
       # convert formula to string
-      rlang::expr_text(args$response, width = 500L)
+      rlang::expr_text(response, width = 500L)
     } else
       # otherwise, if both 'response' and 'features' are specified, treat them as
       #   variable names, and construct formula string
-      paste0(args$response, " ~ ", paste(args$features, collapse = " + "))
-  } else if (is.null(args$formula) && is.null(args$response) && !is.null(args$features)) {
+      paste0(response, " ~ ", paste(features, collapse = " + "))
+  } else if (is.null(formula) && is.null(response) && !is.null(features)) {
     # if only 'features' is specified, e.g. in clustering algorithms
-    paste0("~ ", paste(args$features, collapse = " + "))
-  } else if (!is.null(args$formula)) {
+    paste0("~ ", paste(features, collapse = " + "))
+  } else if (!is.null(formula)) {
     # now if 'formula' is specified, check to see that 'response' and 'features' are not
-    if (!is.null(args$response) || !is.null(args$features))
+    if (!is.null(response) || !is.null(features))
       stop("only one of 'formula' or 'response'-'features' should be specified")
-    if (rlang::is_formula(args$formula))
+    if (rlang::is_formula(formula))
       # if user inputs a formula, convert it to string
-      rlang::expr_text(args$formula, width = 500L)
+      rlang::expr_text(formula, width = 500L)
     else
       # otherwise just returns as is
-      args$formula
+      formula
   } else
-    args$formula
-
-  assign("formula", formula, caller_frame$env)
+    formula
 }
 
 ml_validate_decision_tree_args <- function(.args) {

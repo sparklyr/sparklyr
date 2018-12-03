@@ -222,7 +222,7 @@ validator_ml_als <- function(.args) {
 # Constructors
 
 new_ml_als <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_als")
+  new_ml_estimator(jobj, class = "ml_als")
 }
 
 new_ml_als_model <- function(jobj) {

@@ -10,7 +10,7 @@
 #' @return The object returned depends on the class of \code{x}.
 #'
 #' \itemize{
-#'   \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+#'   \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
 #'   a Spark \code{Predictor} object and can be used to compose
 #'   \code{Pipeline} objects.
 #'

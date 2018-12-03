@@ -110,7 +110,7 @@ ml_decision_tree_classifier.tbl_spark <- function(x, formula = NULL, max_depth =
                                                   response = NULL, features = NULL,
                                                   predicted_label_col = "predicted_label", ...) {
 
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_decision_tree_classifier.spark_connection(
     x = spark_connection(x),

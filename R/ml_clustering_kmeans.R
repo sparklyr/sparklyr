@@ -85,7 +85,7 @@ ml_kmeans.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1
                                 init_steps = 2, init_mode = "k-means||", seed = NULL,
                                 features_col = "features", prediction_col = "prediction",
                                 uid = random_string("kmeans_"), features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, features = features)
 
   stage <- ml_kmeans.spark_connection(
     x = spark_connection(x),
@@ -133,7 +133,7 @@ validator_ml_kmeans <- function(.args) {
 }
 
 new_ml_kmeans <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_kmeans")
+  new_ml_estimator(jobj, class = "ml_kmeans")
 }
 
 new_ml_kmeans_model <- function(jobj) {

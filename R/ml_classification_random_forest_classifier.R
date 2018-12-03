@@ -118,7 +118,7 @@ ml_random_forest_classifier.tbl_spark <- function(x, formula = NULL, num_trees =
                                                   probability_col = "probability", raw_prediction_col = "rawPrediction",
                                                   uid = random_string("random_forest_classifier_"), response = NULL,
                                                   features = NULL, predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_random_forest_classifier.spark_connection(
     x = spark_connection(x),

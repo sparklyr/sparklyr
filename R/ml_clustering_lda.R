@@ -221,7 +221,7 @@ validator_ml_lda <- function(.args) {
 }
 
 new_ml_lda <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_lda")
+  new_ml_estimator(jobj, class = "ml_lda")
 }
 
 new_ml_lda_model <- function(jobj) {

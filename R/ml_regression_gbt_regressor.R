@@ -110,7 +110,7 @@ ml_gbt_regressor.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_dep
                                        label_col = "label", prediction_col = "prediction",
                                        uid = random_string("gbt_regressor_"), response = NULL,
                                        features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_gbt_regressor.spark_connection(
     x = spark_connection(x),
@@ -171,7 +171,7 @@ validator_ml_gbt_regressor <- function(.args) {
 # Constructors
 
 new_ml_gbt_regressor <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_gbt_regressor")
+  new_ml_estimator(jobj, class = "ml_gbt_regressor")
 }
 
 new_ml_gbt_regression_model <- function(jobj) {

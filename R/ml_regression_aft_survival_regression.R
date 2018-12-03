@@ -128,7 +128,7 @@ ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col =
                                                  prediction_col = "prediction",
                                                  uid = random_string("aft_survival_regression_"),
                                                  response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_aft_survival_regression.spark_connection(
     x = spark_connection(x),
@@ -184,7 +184,7 @@ validator_ml_aft_survival_regression <- function(.args) {
 # Constructors
 
 new_ml_aft_survival_regression <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_aft_survival_regression")
+  new_ml_estimator(jobj, class = "ml_aft_survival_regression")
 }
 
 new_ml_aft_survival_regression_model <- function(jobj) {

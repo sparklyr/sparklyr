@@ -170,7 +170,7 @@ ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family
 
 
 
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_generalized_linear_regression(
     x = spark_connection(x),
@@ -243,7 +243,7 @@ validator_ml_generalized_linear_regression <- function(.args) {
 }
 
 new_ml_generalized_linear_regression <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_generalized_linear_regression")
+  new_ml_estimator(jobj, class = "ml_generalized_linear_regression")
 }
 
 new_ml_generalized_linear_regression_model <- function(jobj) {

@@ -84,7 +84,7 @@ ml_bisecting_kmeans.tbl_spark <- function(x, formula = NULL, k = 4, max_iter = 2
                                           features_col = "features", prediction_col = "prediction",
                                           uid = random_string("bisecting_bisecting_kmeans_"),
                                           features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, features = features)
 
   stage <- ml_bisecting_kmeans.spark_connection(
     x = spark_connection(x),
@@ -121,7 +121,7 @@ validator_ml_bisecting_kmeans <- function(.args) {
 }
 
 new_ml_bisecting_kmeans <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_bisecting_kmeans")
+  new_ml_estimator(jobj, class = "ml_bisecting_kmeans")
 }
 
 new_ml_bisecting_kmeans_model <- function(jobj) {

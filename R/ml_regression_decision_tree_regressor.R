@@ -96,7 +96,7 @@ ml_decision_tree_regressor.tbl_spark <- function(x, formula = NULL, max_depth = 
                                                  variance_col = NULL, features_col = "features", label_col = "label",
                                                  prediction_col = "prediction", uid = random_string("decision_tree_regressor_"),
                                                  response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_decision_tree_regressor.spark_connection(
     x = spark_connection(x),
@@ -142,7 +142,7 @@ validator_ml_decision_tree_regressor <- function(.args) {
 }
 
 new_ml_decision_tree_regressor <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_decision_tree_regressor")
+  new_ml_estimator(jobj, class = "ml_decision_tree_regressor")
 }
 
 new_ml_decision_tree_regression_model <- function(jobj) {
