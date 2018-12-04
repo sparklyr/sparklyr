@@ -187,8 +187,8 @@ new_ml_random_forest_classification_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     # `lazy val featureImportances`
-    feature_importances = function() try_null(read_spark_vector(jobj, "featureImportances")),
-    num_classes = try_null(invoke(jobj, "numClasses")),
+    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
+    num_classes = possibly_null(invoke)(jobj, "numClasses"),
     num_features = invoke(jobj, "numFeatures"),
     # `lazy val totalNumNodes`
     total_num_nodes = function() invoke(jobj, "totalNumNodes"),
@@ -198,8 +198,8 @@ new_ml_random_forest_classification_model <- function(jobj) {
       purrr::map(new_ml_decision_tree_regression_model),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = try_null(invoke(jobj, "getProbabilityCol")),
-    raw_prediction_col = try_null(invoke(jobj, "getRawPredictionCol")),
-    thresholds = try_null(invoke(jobj, "getThresholds")),
+    probability_col = possibly_null(invoke)(jobj, "getProbabilityCol"),
+    raw_prediction_col = possibly_null(invoke)(jobj, "getRawPredictionCol"),
+    thresholds = possibly_null(invoke)(jobj, "getThresholds"),
     class = "ml_random_forest_classification_model")
 }

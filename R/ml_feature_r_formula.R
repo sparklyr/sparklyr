@@ -130,9 +130,11 @@ new_ml_r_formula <- function(jobj) {
 
 new_ml_r_formula_model <- function(jobj) {
   new_ml_transformer(jobj,
-                     formula = try_null(jobj %>%
-                                          invoke("parent") %>%
-                                          invoke("getFormula")),
+                     formula = possibly_null(
+                       ~ jobj %>%
+                         invoke("parent") %>%
+                         invoke("getFormula")
+                     )(),
                      class = "ml_r_formula_model")
 }
 

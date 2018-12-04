@@ -108,12 +108,11 @@ new_ml_train_validation_split_model <- function(jobj) {
       param_maps_to_df() %>%
       dplyr::mutate(!!metric_name := validation_metrics) %>%
       dplyr::select(!!metric_name, dplyr::everything()),
-    sub_models = function() {
-      try_null(jobj %>%
-                 invoke("subModels") %>%
-                 purrr::map(ml_call_constructor)
-      )
-    },
+    sub_models = possibly_null(
+      ~ jobj %>%
+        invoke("subModels") %>%
+        purrr::map(ml_call_constructor)
+    ),
     class = "ml_train_validation_split_model")
 }
 

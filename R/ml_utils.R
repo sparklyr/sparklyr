@@ -7,9 +7,7 @@ ml_model_data <- function(object) {
   sdf_register(object$data)
 }
 
-try_null <- function(expr) {
-  tryCatch(expr, error = function(e) NULL)
-}
+possibly_null <- function(.f) purrr::possibly(.f, otherwise = NULL)
 
 #' @export
 predict.ml_model_classification <- function(object,

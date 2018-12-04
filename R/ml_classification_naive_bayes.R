@@ -169,6 +169,6 @@ new_ml_naive_bayes_model <- function(jobj) {
     prediction_col = invoke(jobj, "getPredictionCol"),
     probability_col = invoke(jobj, "getProbabilityCol"),
     raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
-    thresholds = try_null(invoke(jobj, "getThresholds")),
+    thresholds = possibly_null(~ invoke(jobj, "getThresholds"))(),
     class = "ml_naive_bayes_model")
 }

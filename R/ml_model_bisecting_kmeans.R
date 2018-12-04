@@ -17,12 +17,12 @@ new_ml_model_bisecting_kmeans <- function(pipeline_model, formula, dataset,
     as.data.frame() %>%
     rlang::set_names(m$feature_names)
 
-  m$cost <- try_null(
-    pipeline_model %>%
+  m$cost <- possibly_null(
+    ~ pipeline_model %>%
       ml_stage(1) %>%
       ml_transform(dataset) %>%
       model$compute_cost()
-  )
+  )()
 
   m
 }

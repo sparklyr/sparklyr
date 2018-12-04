@@ -84,8 +84,8 @@ new_ml_pca <- function(jobj) {
 new_ml_pca_model <- function(jobj) {
   new_ml_transformer(
     jobj,
-    explained_variance = try_null(read_spark_vector(jobj, "explainedVariance")),
-    pc = try_null(read_spark_matrix(jobj, "pc")),
+    explained_variance = possibly_null(~ read_spark_vector(jobj, "explainedVariance"))(),
+    pc = possibly_null(~ read_spark_matrix(jobj, "pc"))(),
     class = "ml_pca_model")
 }
 

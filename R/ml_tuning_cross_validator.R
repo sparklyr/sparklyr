@@ -106,12 +106,11 @@ new_ml_cross_validator_model <- function(jobj) {
       param_maps_to_df() %>%
       dplyr::mutate(!!metric_name := avg_metrics) %>%
       dplyr::select(!!metric_name, dplyr::everything()),
-    sub_models = function() {
-      try_null(jobj %>%
-                 invoke("subModels") %>%
-                 purrr::map(~ purrr::map(.x, ml_call_constructor))
-      )
-    },
+    sub_models = possibly_null(
+      ~ jobj %>%
+        invoke("subModels") %>%
+        purrr::map(~ purrr::map(.x, ml_call_constructor))
+    ),
     class = "ml_cross_validator_model")
 }
 

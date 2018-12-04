@@ -122,7 +122,7 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
                              estimator_param_maps, seed) {
   uid <- cast_string(uid)
 
-  possibly_spark_jobj <- purrr::possibly(spark_jobj, NULL)
+  possibly_spark_jobj <- possibly_null(spark_jobj)
 
   param_maps <- if (!is.null(estimator) && !is.null(estimator_param_maps)) {
     stage_jobjs <- if (inherits(estimator, "ml_pipeline")) {
@@ -160,15 +160,13 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
 new_ml_tuning <- function(jobj, ..., class = character()) {
   new_ml_estimator(
     jobj,
-    estimator = purrr::possibly(
-      ~ invoke(.x, "getEstimator") %>% ml_call_constructor(),
-      NULL
-    )(jobj),
-    evaluator = purrr::possibly(
-      ~ invoke(.x, "getEvaluator") %>% ml_call_constructor(),
-      NULL
-    )(jobj),
-    estimator_param_maps = purrr::possibly(ml_get_estimator_param_maps, NULL)(jobj),
+    estimator = possibly_null(
+      ~ invoke(jobj, "getEstimator") %>% ml_call_constructor()
+    )(),
+    evaluator = possibly_null(
+      ~ invoke(jobj, "getEvaluator") %>% ml_call_constructor()
+    )(),
+    estimator_param_maps = possibly_null(ml_get_estimator_param_maps)(jobj),
     ...,
     class = c(class, "ml_tuning"))
 }

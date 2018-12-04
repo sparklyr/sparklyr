@@ -110,8 +110,8 @@ new_ml_standard_scaler <- function(jobj) {
 new_ml_standard_scaler_model <- function(jobj) {
   new_ml_transformer(
     jobj,
-    mean = try_null(read_spark_vector(jobj, "mean")),
-    std = try_null(read_spark_vector(jobj, "std")),
+    mean = possibly_null(read_spark_vector)(jobj, "mean"),
+    std = possibly_null(read_spark_vector)(jobj, "std"),
     class = "ml_standard_scaler_model")
 }
 

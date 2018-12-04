@@ -233,15 +233,15 @@ new_ml_lda_model <- function(jobj) {
       invoke(jobj, "describeTopics", max_terms_per_topic) %>%
         sdf_register()
     },
-    estimated_doc_concentration = function() try_null(invoke(jobj, "estimatedDocConcentration")), # def
+    estimated_doc_concentration = possibly_null(~ invoke(jobj, "estimatedDocConcentration")), # def
     log_likelihood = function(dataset) invoke(jobj, "logLikelihood", spark_dataframe(dataset)),
     log_perplexity = function(dataset) invoke(jobj, "logPerplexity", spark_dataframe(dataset)),
     # topicsMatrix deprecated
     topicsMatrix = function() {
       warning("`topicMatrix()` is deprecated; please use `topics_matrix()` instead.")
-      try_null(read_spark_matrix(jobj, "topicsMatrix")) # def
+      possibly_null(read_spark_matrix)(jobj, "topicsMatrix") # def
     },
-    topics_matrix = function() try_null(read_spark_matrix(jobj, "topicsMatrix")), # def
+    topics_matrix = possibly_null(~ read_spark_matrix(jobj, "topicsMatrix")), # def
     vocab_size = invoke(jobj, "vocabSize"),
     class = "ml_lda_model")
 }

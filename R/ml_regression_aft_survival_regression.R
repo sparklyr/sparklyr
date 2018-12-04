@@ -191,12 +191,12 @@ new_ml_aft_survival_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
-    intercept = try_null(invoke(jobj, "intercept")),
+    intercept = possibly_null(invoke)(jobj, "intercept"),
     scale = invoke(jobj, "scale"),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
     quantile_probabilities = invoke(jobj, "getQuantileProbabilities"),
-    quantiles_col = try_null(invoke(jobj, "getQuantilesCol")),
+    quantiles_col = possibly_null(invoke)(jobj, "getQuantilesCol"),
     class = "ml_aft_survival_regression_model")
 }
 

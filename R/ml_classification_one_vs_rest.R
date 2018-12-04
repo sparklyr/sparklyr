@@ -33,7 +33,7 @@ ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL
   ) %>%
     jobj_set_param(
       "setClassifier",
-      purrr::possibly(spark_jobj, NULL)(.args[["classifier"]])
+      possibly_null(spark_jobj)(.args[["classifier"]])
     )
 
   new_ml_one_vs_rest(jobj)

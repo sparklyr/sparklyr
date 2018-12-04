@@ -188,7 +188,7 @@ new_ml_linear_svc_model <- function(jobj) {
     num_classes = invoke(jobj, "numClasses"),
     num_features = invoke(jobj, "numFeatures"),
     threshold = invoke(jobj, "threshold"),
-    weight_col = try_null(invoke(jobj, "weightCol")),
+    weight_col = possibly_null(~ invoke(jobj, "weightCol"))(),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
     raw_prediction_col = invoke(jobj, "getRawPredictionCol"),

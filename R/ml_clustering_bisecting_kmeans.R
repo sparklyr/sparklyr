@@ -132,8 +132,10 @@ new_ml_bisecting_kmeans_model <- function(jobj) {
 
   new_ml_clustering_model(
     jobj,
-    cluster_centers = function() try_null(invoke(jobj, "clusterCenters")) %>%
-      lapply(invoke, "toArray"),
+    cluster_centers = possibly_null(
+      ~ invoke(jobj, "clusterCenters") %>%
+        lapply(invoke, "toArray")
+    ),
     compute_cost = function(dataset) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },

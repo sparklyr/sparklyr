@@ -151,12 +151,12 @@ new_ml_decision_tree_regression_model <- function(jobj) {
     jobj,
     # `depth` and `featureImportances` are lazy vals in Spark.
     depth = function() invoke(jobj, "depth"),
-    feature_importances = function() try_null(read_spark_vector(jobj, "featureImportances")),
+    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
     num_features = invoke(jobj, "numFeatures"),
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
     features_col = invoke(jobj, "getFeaturesCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
-    variance_col = try_null(invoke(jobj, "getVarianceCol")),
+    variance_col = possibly_null(invoke)(jobj, "getVarianceCol"),
     class = "ml_decision_tree_regression_model")
 }

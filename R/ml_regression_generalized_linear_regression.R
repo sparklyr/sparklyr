@@ -276,24 +276,30 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_interce
   new_ml_summary(
     jobj,
     aic = function() invoke(jobj, "aic"), # lazy val
-    coefficient_standard_errors = function() try_null(invoke(jobj, "coefficientStandardErrors")) %>%
-      arrange_stats(), # lazy val
+    coefficient_standard_errors = possibly_null(
+      ~ invoke(jobj, "coefficientStandardErrors") %>%
+        arrange_stats()
+    ), # lazy val
     degrees_of_freedom = function() invoke(jobj, "degreesOfFreedom"), # lazy val
     deviance = function()invoke(jobj, "deviance"), # lazy val
     dispersion = function() invoke(jobj, "dispersion"), # lazy val
     null_deviance = function() invoke(jobj, "nullDeviance"), # lazy val
     num_instances = if (version > "2.2.0") function() invoke(jobj, "numInstances") else NULL, # lazy val
-    num_iterations = try_null(invoke(jobj, "numIterations")),
-    p_values = function() try_null(invoke(jobj, "pValues")) %>% # lazy val
-      arrange_stats(),
+    num_iterations = possibly_null(invoke)(jobj, "numIterations"),
+    p_values = possibly_null(
+      ~ invoke(jobj, "pValues") %>% # lazy val
+        arrange_stats()
+    ),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     rank = invoke(jobj, "rank"), # lazy val
     residual_degree_of_freedom = function() invoke(jobj, "residualDegreeOfFreedom"), # lazy val
     residual_degree_of_freedom_null = function() invoke(jobj, "residualDegreeOfFreedomNull"), # lazy val
     residuals = function(type = "deviance") (invoke(jobj, "residuals", type) %>% sdf_register()),
-    solver = try_null(invoke(jobj, "solver")),
-    t_values = function() try_null(invoke(jobj, "tValues")) %>% # lazy val
-      arrange_stats(),
+    solver = possibly_null(invoke)(jobj, "solver"),
+    t_values = possibly_null(
+      ~ invoke(jobj, "tValues") %>% # lazy val
+        arrange_stats()
+    ),
     class = "ml_summary_generalized_linear_regression")
 }
