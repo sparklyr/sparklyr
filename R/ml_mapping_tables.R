@@ -7,8 +7,13 @@ register_mapping_tables <- function() {
 
   read_extension_mappings <- function(file_name) {
     registered_extensions() %>%
-      purrr::map_chr(~ system.file("sparkml", file_name, package = .x)) %>%
-      purrr::keep(~ nchar(.x) > 0L) %>%
+      purrr::map_chr(function(pkg) {
+        if (nzchar(devtools_file <- system.file("inst", "sparkml", file_name, package = pkg))) {
+          return(devtools_file)
+        }
+        system.file("sparkml", file_name, package = .x)
+      }) %>%
+      purrr::keep(nzchar) %>%
       purrr::map(jsonlite::fromJSON)
   }
 
