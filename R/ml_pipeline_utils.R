@@ -52,7 +52,7 @@ jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NU
       spark_version()
 
     if (ver < min_version) {
-      if (!isTRUE(all.equal(value, default, check.attributes = FALSE))) {
+      if (!isTRUE(identical(c(value), default))) {
         # if user does not have required version, and tries to set parameter, throw error
         stop(paste0("Parameter `", deparse(substitute(value)),
                     "` is only available for Spark ", min_version, " and later."))
