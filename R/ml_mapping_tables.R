@@ -11,7 +11,7 @@ register_mapping_tables <- function() {
         if (nzchar(devtools_file <- system.file("inst", "sparkml", file_name, package = pkg))) {
           return(devtools_file)
         }
-        system.file("sparkml", file_name, package = .x)
+        system.file("sparkml", file_name, package = pkg)
       }) %>%
       purrr::keep(nzchar) %>%
       purrr::map(jsonlite::fromJSON)
