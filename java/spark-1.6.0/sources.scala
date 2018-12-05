@@ -130,7 +130,7 @@ readTypedObject <- function(con, type) {
           "s" = readStruct(con),
           "n" = NULL,
           "j" = getJobj(con, readString(con)),
-          stop("Unsupported type for deserialization '", type, "'"))
+          stop(paste("Unsupported type for deserialization", type)))
 }
 
 readString <- function(con) {
@@ -842,8 +842,21 @@ attach_connection <- function(jobj, connection) {
 # jobj -> Object, where jobj is an object created in the backend
 # nolint end
 
+get_type <- function(object, types = NULL) {
+  if (is.null(object)) return("NULL")
+  types <- types %||%
+    c("integer", "character", "logical", "double", "numeric", "raw", "array",
+      "list", "struct", "spark_jobj", "environment", "Date", "POSIXlt",
+      "POSIXct", "factor", "data.frame")
+  if (!length(types))
+    stop("Unsupported type '", class(object)[[1]], "' for serialization")
+  if (inherits(object, type <- types[[1]]))
+    return(type)
+  Recall(object, tail(types, -1))
+}
+
 getSerdeType <- function(object) {
-  type <- class(object)[[1]]
+  type <- get_type(object)
 
   if (type != "list") {
     type
@@ -867,7 +880,7 @@ getSerdeType <- function(object) {
 }
 
 writeObject <- function(con, object, writeType = TRUE) {
-  type <- class(object)[[1]]
+  type <- get_type(object)
 
   if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
     if (is.na(object)) {
@@ -898,7 +911,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
-         stop(paste("Unsupported type for serialization", type)))
+         stop("Unsupported type '", type, "' for serialization"))
 }
 
 writeVoid <- function(con) {
@@ -915,7 +928,7 @@ writeJobj <- function(con, value) {
 writeString <- function(con, value) {
   utfVal <- enc2utf8(value)
   writeInt(con, as.integer(nchar(utfVal, type = "bytes") + 1))
-  writeBin(utfVal, con, endian = "big", useBytes = TRUE)
+  writeBin(as.character(utfVal), con, endian = "big", useBytes = TRUE)
 }
 
 writeInt <- function(con, value) {
@@ -923,7 +936,7 @@ writeInt <- function(con, value) {
 }
 
 writeDouble <- function(con, value) {
-  writeBin(value, con, endian = "big")
+  writeBin(as.double(value), con, endian = "big")
 }
 
 writeBoolean <- function(con, value) {
@@ -955,7 +968,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
-                 stop("Unsupported type for serialization '", class, "'"))
+                 stop("Unsupported type '", type, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
 
