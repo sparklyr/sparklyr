@@ -249,8 +249,6 @@ new_ml_logistic_regression_model <- function(jobj) {
     coefficient_matrix = possibly_null(~ read_spark_matrix(jobj, "coefficientMatrix"))(),
     intercept = if (is_multinomial) NULL else invoke(jobj, "intercept"),
     intercept_vector = possibly_null(~ read_spark_vector(jobj, "interceptVector"))(),
-    num_classes = invoke(jobj, "numClasses"),
-    num_features = invoke(jobj, "numFeatures"),
     threshold = if (ml_is_set(jobj, "threshold")) invoke(jobj, "getThreshold") else NULL,
     summary = summary,
     class = "ml_logistic_regression_model")

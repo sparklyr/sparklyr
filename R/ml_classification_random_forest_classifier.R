@@ -188,8 +188,6 @@ new_ml_random_forest_classification_model <- function(jobj) {
     jobj,
     # `lazy val featureImportances`
     feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
-    num_classes = possibly_null(invoke)(jobj, "numClasses"),
-    num_features = invoke(jobj, "numFeatures"),
     # `lazy val totalNumNodes`
     total_num_nodes = function() invoke(jobj, "totalNumNodes"),
     # `def treeWeights`, `def trees`

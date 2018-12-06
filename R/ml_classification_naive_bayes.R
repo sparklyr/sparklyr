@@ -161,8 +161,6 @@ new_ml_naive_bayes <- function(jobj) {
 new_ml_naive_bayes_model <- function(jobj) {
   new_ml_probabilistic_classification_model(
     jobj,
-    num_features = invoke(jobj, "numFeatures"),
-    num_classes = invoke(jobj, "numClasses"),
     pi = read_spark_vector(jobj, "pi"),
     theta = read_spark_matrix(jobj, "theta"),
     class = "ml_naive_bayes_model")

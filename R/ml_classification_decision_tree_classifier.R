@@ -167,8 +167,6 @@ new_ml_decision_tree_classification_model <- function(jobj) {
     # `depth` and `featureImportances` are lazy vals in Spark.
     depth = function() invoke(jobj, "depth"),
     feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
-    num_features = invoke(jobj, "numFeatures"),
-    num_classes = possibly_null(~ invoke(jobj, "numClasses"))(),
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
     class = "ml_decision_tree_classification_model")

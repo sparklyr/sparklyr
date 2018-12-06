@@ -200,7 +200,6 @@ new_ml_linear_regression_model <- function(jobj) {
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
-    num_features = invoke(jobj, "numFeatures"),
     scale = if (spark_version(spark_connection(jobj)) >= "2.3.0") invoke(jobj, "scale"),
     summary = summary,
     class = "ml_linear_regression_model")

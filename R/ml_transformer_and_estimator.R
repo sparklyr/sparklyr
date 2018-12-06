@@ -42,6 +42,7 @@ new_ml_prediction_model <- function(jobj, ..., class = character()) {
     features_col = invoke(jobj, "getFeaturesCol"),
     label_col = invoke(jobj, "getLabelCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
+    num_features = invoke(jobj, "numFeatures"),
     ...,
     class = c(class, "ml_prediction_model")
   )
@@ -56,6 +57,7 @@ new_ml_classification_model <- function(jobj, ..., class = character()) {
   new_ml_prediction_model(
     jobj,
     raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
+    num_classes = possibly_null(invoke)(jobj, "numClasses"),
     ...,
     class = c(class, "ml_classification_model")
   )

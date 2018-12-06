@@ -259,7 +259,6 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
-    num_features = invoke(jobj, "numFeatures"),
     link_prediction_col = if (invoke(jobj, "isSet", invoke(jobj, "linkPredictionCol"))) invoke(jobj, "getLinkPredictionCol") else NULL,
     summary = summary,
     class = "ml_generalized_linear_regression_model")

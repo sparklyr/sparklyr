@@ -185,8 +185,6 @@ new_ml_linear_svc_model <- function(jobj) {
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
-    num_classes = invoke(jobj, "numClasses"),
-    num_features = invoke(jobj, "numFeatures"),
     threshold = invoke(jobj, "threshold"),
     weight_col = possibly_null(~ invoke(jobj, "weightCol"))(),
     class = "ml_linear_svc_model")
