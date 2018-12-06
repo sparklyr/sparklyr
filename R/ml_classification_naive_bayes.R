@@ -155,20 +155,15 @@ validator_ml_naive_bayes <- function(.args) {
 }
 
 new_ml_naive_bayes <- function(jobj) {
-  new_ml_classifier(jobj, class = "ml_naive_bayes")
+  new_ml_probabilistic_classifier(jobj, class = "ml_naive_bayes")
 }
 
 new_ml_naive_bayes_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_probabilistic_classification_model(
     jobj,
     num_features = invoke(jobj, "numFeatures"),
     num_classes = invoke(jobj, "numClasses"),
     pi = read_spark_vector(jobj, "pi"),
     theta = read_spark_matrix(jobj, "theta"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = invoke(jobj, "getProbabilityCol"),
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
-    thresholds = possibly_null(~ invoke(jobj, "getThresholds"))(),
     class = "ml_naive_bayes_model")
 }

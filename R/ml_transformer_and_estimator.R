@@ -39,6 +39,9 @@ ml_transformer <- new_ml_transformer
 new_ml_prediction_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
     jobj,
+    features_col = invoke(jobj, "getFeaturesCol"),
+    label_col = invoke(jobj, "getLabelCol"),
+    prediction_col = invoke(jobj, "getPredictionCol"),
     ...,
     class = c(class, "ml_prediction_model")
   )
@@ -48,6 +51,35 @@ new_ml_prediction_model <- function(jobj, ..., class = character()) {
 #' @export
 #' @keywords internal
 ml_prediction_model <- new_ml_prediction_model
+
+new_ml_classification_model <- function(jobj, ..., class = character()) {
+  new_ml_prediction_model(
+    jobj,
+    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
+    ...,
+    class = c(class, "ml_classification_model")
+  )
+}
+
+#' @rdname ml-constructors
+#' @export
+#' @keywords internal
+ml_classification_model <- new_ml_classification_model
+
+new_ml_probabilistic_classification_model <- function(jobj, ..., class = character()) {
+  new_ml_classification_model(
+    jobj,
+    probabilitiy_col = invoke(jobj, "getProbabilityCol"),
+    thresholds = possibly_null(invoke)(jobj, "getThresholds"),
+    ...,
+    class = c(class, "ml_probabilistic_classification_model")
+  )
+}
+
+#' @rdname ml-constructors
+#' @export
+#' @keywords internal
+ml_probabilistic_classification_model <- new_ml_probabilistic_classification_model
 
 new_ml_clustering_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
@@ -75,9 +107,26 @@ new_ml_estimator <- function(jobj, ..., class = character()) {
 #' @keywords internal
 ml_estimator <- new_ml_estimator
 
-new_ml_classifier <- function(jobj, ..., class = character()) {
+new_ml_predictor <- function(jobj, ..., class = character()) {
   new_ml_estimator(
     jobj,
+    features_col = invoke(jobj, "getFeaturesCol"),
+    label_col = invoke(jobj, "getLabelCol"),
+    prediction_col = invoke(jobj, "getPredictionCol"),
+    ...,
+    class = c(class, "ml_predictor")
+  )
+}
+
+#' @rdname ml-constructors
+#' @export
+#' @keywords internal
+ml_predictor <- new_ml_predictor
+
+new_ml_classifier <- function(jobj, ..., class = character()) {
+  new_ml_predictor(
+    jobj,
+    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
     ...,
     class = c(class, "ml_classifier")
   )
@@ -87,3 +136,18 @@ new_ml_classifier <- function(jobj, ..., class = character()) {
 #' @export
 #' @keywords internal
 ml_classifier <- new_ml_classifier
+
+new_ml_probabilistic_classifier <- function(jobj, ..., class = character()) {
+  new_ml_classifier(
+    jobj,
+    probability_col = invoke(jobj, "getProbabilityCol"),
+    thresholds = possibly_null(invoke)(jobj, "getThresholds"),
+    ...,
+    class = c(class, "ml_probabilistic_classifier")
+  )
+}
+
+#' @rdname ml-constructors
+#' @export
+#' @keywords internal
+ml_probabilistic_classifier <- new_ml_probabilistic_classifier

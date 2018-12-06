@@ -158,11 +158,11 @@ validator_ml_decision_tree_classifier <- function(.args) {
 }
 
 new_ml_decision_tree_classifier <- function(jobj) {
-  new_ml_classifier(jobj, class = "ml_decision_tree_classifier")
+  new_ml_probabilistic_classifier(jobj, class = "ml_decision_tree_classifier")
 }
 
 new_ml_decision_tree_classification_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_probabilistic_classification_model(
     jobj,
     # `depth` and `featureImportances` are lazy vals in Spark.
     depth = function() invoke(jobj, "depth"),
@@ -171,10 +171,5 @@ new_ml_decision_tree_classification_model <- function(jobj) {
     num_classes = possibly_null(~ invoke(jobj, "numClasses"))(),
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = invoke(jobj, "getProbabilityCol"),
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
-    thresholds = possibly_null(~ invoke(jobj, "getThresholds"))(),
     class = "ml_decision_tree_classification_model")
 }

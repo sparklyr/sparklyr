@@ -106,7 +106,7 @@ new_ml_one_vs_rest <- function(jobj) {
 }
 
 new_ml_one_vs_rest_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_transformer(
     jobj,
     models = invoke(jobj, "models") %>%
       purrr::map(ml_call_constructor),

@@ -152,7 +152,7 @@ validator_ml_random_forest_regressor <- function(.args) {
 }
 
 new_ml_random_forest_regressor <- function(jobj) {
-  new_ml_estimator(jobj, class = "ml_random_forest_regressor")
+  new_ml_predictor(jobj, class = "ml_random_forest_regressor")
 }
 
 new_ml_random_forest_regression_model <- function(jobj) {
@@ -167,7 +167,5 @@ new_ml_random_forest_regression_model <- function(jobj) {
     tree_weights = function() invoke(jobj, "treeWeights"),
     trees = function() invoke(jobj, "trees") %>%
       purrr::map(new_ml_decision_tree_regression_model),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
     class = "ml_random_forest_regression_model")
 }

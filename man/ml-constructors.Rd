@@ -4,20 +4,32 @@
 \alias{ml-constructors}
 \alias{ml_transformer}
 \alias{ml_prediction_model}
+\alias{ml_classification_model}
+\alias{ml_probabilistic_classification_model}
 \alias{ml_clustering_model}
 \alias{ml_estimator}
+\alias{ml_predictor}
 \alias{ml_classifier}
+\alias{ml_probabilistic_classifier}
 \title{Constructors for Pipeline Stages}
 \usage{
 ml_transformer(jobj, ..., class = character())
 
 ml_prediction_model(jobj, ..., class = character())
 
+ml_classification_model(jobj, ..., class = character())
+
+ml_probabilistic_classification_model(jobj, ..., class = character())
+
 ml_clustering_model(jobj, ..., class = character())
 
 ml_estimator(jobj, ..., class = character())
 
+ml_predictor(jobj, ..., class = character())
+
 ml_classifier(jobj, ..., class = character())
+
+ml_probabilistic_classifier(jobj, ..., class = character())
 }
 \arguments{
 \item{jobj}{Pointer to the pipeline stage object.}

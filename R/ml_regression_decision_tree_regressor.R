@@ -142,11 +142,10 @@ validator_ml_decision_tree_regressor <- function(.args) {
 }
 
 new_ml_decision_tree_regressor <- function(jobj) {
-  new_ml_estimator(jobj, class = "ml_decision_tree_regressor")
+  new_ml_predictor(jobj, class = "ml_decision_tree_regressor")
 }
 
 new_ml_decision_tree_regression_model <- function(jobj) {
-
   new_ml_prediction_model(
     jobj,
     # `depth` and `featureImportances` are lazy vals in Spark.
@@ -155,8 +154,6 @@ new_ml_decision_tree_regression_model <- function(jobj) {
     num_features = invoke(jobj, "numFeatures"),
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
     variance_col = possibly_null(invoke)(jobj, "getVarianceCol"),
     class = "ml_decision_tree_regression_model")
 }

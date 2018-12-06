@@ -228,7 +228,7 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
 }
 
 new_ml_logistic_regression <- function(jobj) {
-  new_ml_classifier(jobj, class = "ml_logistic_regression")
+  new_ml_probabilistic_classifier(jobj, class = "ml_logistic_regression")
 }
 
 new_ml_logistic_regression_model <- function(jobj) {
@@ -243,7 +243,7 @@ new_ml_logistic_regression_model <- function(jobj) {
     new_ml_summary_logistic_regression_model(invoke(jobj, "summary"))
   }
 
-  new_ml_prediction_model(
+  new_ml_probabilistic_classification_model(
     jobj,
     coefficients = if (is_multinomial) NULL else read_spark_vector(jobj, "coefficients"),
     coefficient_matrix = possibly_null(~ read_spark_matrix(jobj, "coefficientMatrix"))(),
@@ -251,12 +251,7 @@ new_ml_logistic_regression_model <- function(jobj) {
     intercept_vector = possibly_null(~ read_spark_vector(jobj, "interceptVector"))(),
     num_classes = invoke(jobj, "numClasses"),
     num_features = invoke(jobj, "numFeatures"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = invoke(jobj, "getProbabilityCol"),
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
     threshold = if (ml_is_set(jobj, "threshold")) invoke(jobj, "getThreshold") else NULL,
-    thresholds = if (ml_is_set(jobj, "thresholds")) invoke(jobj, "getThresholds") else NULL,
     summary = summary,
     class = "ml_logistic_regression_model")
 }

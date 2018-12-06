@@ -187,7 +187,7 @@ validator_ml_linear_regression <- function(.args) {
 }
 
 new_ml_linear_regression <- function(jobj) {
-  new_ml_estimator(jobj, class = "ml_linear_regression")
+  new_ml_predictor(jobj, class = "ml_linear_regression")
 }
 
 new_ml_linear_regression_model <- function(jobj) {
@@ -201,8 +201,6 @@ new_ml_linear_regression_model <- function(jobj) {
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
     num_features = invoke(jobj, "numFeatures"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
     scale = if (spark_version(spark_connection(jobj)) >= "2.3.0") invoke(jobj, "scale"),
     summary = summary,
     class = "ml_linear_regression_model")

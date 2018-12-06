@@ -226,7 +226,7 @@ new_ml_als <- function(jobj) {
 }
 
 new_ml_als_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_transformer(
     jobj,
     rank = invoke(jobj, "rank"),
     recommend_for_all_items = function(num_users) {

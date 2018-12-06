@@ -243,7 +243,7 @@ validator_ml_generalized_linear_regression <- function(.args) {
 }
 
 new_ml_generalized_linear_regression <- function(jobj) {
-  new_ml_estimator(jobj, class = "ml_generalized_linear_regression")
+  new_ml_predictor(jobj, class = "ml_generalized_linear_regression")
 }
 
 new_ml_generalized_linear_regression_model <- function(jobj) {
@@ -260,8 +260,6 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
     num_features = invoke(jobj, "numFeatures"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
     link_prediction_col = if (invoke(jobj, "isSet", invoke(jobj, "linkPredictionCol"))) invoke(jobj, "getLinkPredictionCol") else NULL,
     summary = summary,
     class = "ml_generalized_linear_regression_model")

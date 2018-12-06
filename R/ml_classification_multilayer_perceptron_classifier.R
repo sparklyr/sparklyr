@@ -190,7 +190,7 @@ validator_ml_multilayer_perceptron_classifier <- function(.args) {
 }
 
 new_ml_multilayer_perceptron_classifier <- function(jobj) {
-  new_ml_classifier(jobj, class = "ml_multilayer_perceptron_classifier")
+  new_ml_probabilistic_classifier(jobj, class = "ml_multilayer_perceptron_classifier")
 }
 
 new_ml_multilayer_perceptron_classification_model <- function(jobj) {
@@ -199,13 +199,11 @@ new_ml_multilayer_perceptron_classification_model <- function(jobj) {
   layers = invoke(jobj, "layers")
   num_classes = dplyr::last(layers)
 
-  new_ml_prediction_model(
+  new_ml_probabilistic_classification_model(
     jobj,
     layers = layers,
     num_features = invoke(jobj, "numFeatures"),
     num_classes = num_classes,
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
     weights = read_spark_vector(jobj, "weights"),
     class = "ml_multilayer_perceptron_classification_model")
 }

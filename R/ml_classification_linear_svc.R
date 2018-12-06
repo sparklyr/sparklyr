@@ -181,7 +181,7 @@ new_ml_linear_svc <- function(jobj) {
 }
 
 new_ml_linear_svc_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_classification_model(
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
@@ -189,8 +189,5 @@ new_ml_linear_svc_model <- function(jobj) {
     num_features = invoke(jobj, "numFeatures"),
     threshold = invoke(jobj, "threshold"),
     weight_col = possibly_null(~ invoke(jobj, "weightCol"))(),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
     class = "ml_linear_svc_model")
 }

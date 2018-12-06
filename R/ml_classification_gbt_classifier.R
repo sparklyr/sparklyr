@@ -203,11 +203,11 @@ validator_ml_gbt_classifier <- function(.args) {
 }
 
 new_ml_gbt_classifier <- function(jobj) {
-  new_ml_classifier(jobj, class = "ml_gbt_classifier")
+  new_ml_probabilistic_classifier(jobj, class = "ml_gbt_classifier")
 }
 
 new_ml_gbt_classification_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_probabilistic_classification_model(
     jobj,
     # `lazy val featureImportances`
     feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
@@ -219,10 +219,5 @@ new_ml_gbt_classification_model <- function(jobj) {
     # `def trees`
     trees = function() invoke(jobj, "trees") %>%
       purrr::map(new_ml_decision_tree_regression_model),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = possibly_null(~ invoke(jobj, "getProbabilityCol"))(),
-    raw_prediction_col = possibly_null(~ invoke(jobj, "getRawPredictionCol"))(),
-    thresholds = possibly_null(~ invoke(jobj, "getThresholds"))(),
     class = "ml_gbt_classification_model")
 }
