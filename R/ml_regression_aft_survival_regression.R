@@ -184,11 +184,11 @@ validator_ml_aft_survival_regression <- function(.args) {
 # Constructors
 
 new_ml_aft_survival_regression <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_aft_survival_regression")
+  new_ml_estimator(jobj, class = "ml_aft_survival_regression")
 }
 
 new_ml_aft_survival_regression_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_transformer(
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = possibly_null(invoke)(jobj, "intercept"),

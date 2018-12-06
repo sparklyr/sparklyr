@@ -131,11 +131,11 @@ validator_ml_isotonic_regression <- function(.args) {
 }
 
 new_ml_isotonic_regression <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_isotonic_regression")
+  new_ml_estimator(jobj, class = "ml_isotonic_regression")
 }
 
 new_ml_isotonic_regression_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_transformer(
     jobj,
     boundaries = function() read_spark_vector(jobj, "boundaries"), # lazy val
     predictions = function() read_spark_vector(jobj, "predictions"), # lazy val
