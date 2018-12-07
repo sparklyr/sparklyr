@@ -23,10 +23,10 @@ register_mapping_tables <- function() {
   }
 
   param_mapping_r_to_s <- read_base_mapping("param_mapping.json") %>%
+    flip_named_list() %>%
     as.environment()
 
   param_mapping_s_to_r <- read_base_mapping("param_mapping.json") %>%
-    flip_named_list() %>%
     as.environment()
 
   extension_param_mappings <- read_extension_mappings(file_name = "param_mapping.json")
