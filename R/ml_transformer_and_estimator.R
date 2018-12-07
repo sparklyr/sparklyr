@@ -56,7 +56,8 @@ ml_prediction_model <- new_ml_prediction_model
 new_ml_classification_model <- function(jobj, ..., class = character()) {
   new_ml_prediction_model(
     jobj,
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
+    # `possibly_null` because older versions of Spark might not have this method
+    raw_prediction_col = possibly_null(invoke)(jobj, "getRawPredictionCol"),
     num_classes = possibly_null(invoke)(jobj, "numClasses"),
     ...,
     class = c(class, "ml_classification_model")
