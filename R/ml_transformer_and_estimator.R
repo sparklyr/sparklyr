@@ -127,8 +127,7 @@ ml_predictor <- new_ml_predictor
 new_ml_classifier <- function(jobj, ..., class = character()) {
   new_ml_predictor(
     jobj,
-    # `possibly_null` because older versions of Spark might not have this method
-    raw_prediction_col = possibly_null(invoke)(jobj, "getRawPredictionCol"),
+    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
     ...,
     class = c(class, "ml_classifier")
   )
