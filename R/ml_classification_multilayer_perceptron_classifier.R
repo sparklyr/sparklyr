@@ -190,19 +190,33 @@ validator_ml_multilayer_perceptron_classifier <- function(.args) {
 }
 
 new_ml_multilayer_perceptron_classifier <- function(jobj) {
-  new_ml_probabilistic_classifier(jobj, class = "ml_multilayer_perceptron_classifier")
+  v <- jobj %>%
+    spark_connection() %>%
+    spark_version()
+  if (v < "2.3.0") {
+    new_predictor(jobj, class = "ml_multilayer_perceptron_classifier")
+  } else {
+    new_ml_probabilistic_classifier(jobj, class = "ml_multilayer_perceptron_classifier")
+  }
 }
 
 new_ml_multilayer_perceptron_classification_model <- function(jobj) {
-  # In spark 2.2.1 and below, there is not the method numClasses, so
-  # I take the last value of invoke(jobj, "layers")
-  layers = invoke(jobj, "layers")
-  num_classes = dplyr::last(layers)
-
-  new_ml_probabilistic_classification_model(
-    jobj,
-    layers = layers,
-    num_classes = num_classes,
-    weights = read_spark_vector(jobj, "weights"),
-    class = "ml_multilayer_perceptron_classification_model")
+  v <- jobj %>%
+    spark_connection() %>%
+    spark_version()
+  if (v < "2.3.0") {
+    layers <- invoke(jobj, "layers")
+    num_classes <- dplyr::last(layers)
+    new_ml_prediction_model(
+      jobj,
+      layers = layers,
+      num_classes = num_classes,
+      weights = read_spark_vector(jobj, "weights"),
+      class = "ml_multilayer_perceptron_classification_model")
+  } else {
+    new_ml_probabilistic_classification_model(
+      jobj,
+      weights = read_spark_vector(jobj, "weights"),
+      class = "ml_multilayer_perceptron_classification_model")
+  }
 }
