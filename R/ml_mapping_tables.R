@@ -33,10 +33,10 @@ register_mapping_tables <- function() {
 
   if (length(extension_param_mappings)) {
     extension_param_mappings_r_to_s <- extension_param_mappings %>%
+      purrr::map(flip_named_list) %>%
       create_env_from_mappings()
 
     extension_param_mappings_s_to_r <- extension_param_mappings %>%
-      purrr::map(flip_named_list) %>%
       create_env_from_mappings()
 
     rlang::env_poke_parent(param_mapping_r_to_s, extension_param_mappings_r_to_s)
