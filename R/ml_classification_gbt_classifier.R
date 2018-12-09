@@ -203,20 +203,50 @@ validator_ml_gbt_classifier <- function(.args) {
 }
 
 new_ml_gbt_classifier <- function(jobj) {
-  new_ml_probabilistic_classifier(jobj, class = "ml_gbt_classifier")
+  v <- jobj %>%
+    spark_connection() %>%
+    spark_version()
+
+  if (v < "2.2.0") {
+    new_ml_predictor(jobj, class = "ml_gbt_classifier")
+  } else {
+    new_ml_probabilistic_classifier(jobj, class = "ml_gbt_classifier")
+  }
 }
 
 new_ml_gbt_classification_model <- function(jobj) {
-  new_ml_probabilistic_classification_model(
-    jobj,
-    # `lazy val featureImportances`
-    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
-    num_classes = possibly_null(~ invoke(jobj, "numClasses"))(),
-    # `lazy val totalNumNodes`
-    total_num_nodes = function() invoke(jobj, "totalNumNodes"),
-    tree_weights = invoke(jobj, "treeWeights"),
-    # `def trees`
-    trees = function() invoke(jobj, "trees") %>%
-      purrr::map(new_ml_decision_tree_regression_model),
-    class = "ml_gbt_classification_model")
+
+  v <- jobj %>%
+    spark_connection() %>%
+    spark_version()
+
+  if (v < "2.2.0") {
+    new_ml_prediction_model(
+      jobj,
+      # `lazy val featureImportances`
+      feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
+      num_classes = possibly_null(~ invoke(jobj, "numClasses"))(),
+      # `lazy val totalNumNodes`
+      total_num_nodes = function() invoke(jobj, "totalNumNodes"),
+      tree_weights = invoke(jobj, "treeWeights"),
+      # `def trees`
+      trees = function() invoke(jobj, "trees") %>%
+        purrr::map(new_ml_decision_tree_regression_model),
+      class = "ml_multilayer_perceptron_classification_model"
+    )
+  } else {
+    new_ml_probabilistic_classification_model(
+      jobj,
+      # `lazy val featureImportances`
+      feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
+      num_classes = possibly_null(~ invoke(jobj, "numClasses"))(),
+      # `lazy val totalNumNodes`
+      total_num_nodes = function() invoke(jobj, "totalNumNodes"),
+      tree_weights = invoke(jobj, "treeWeights"),
+      # `def trees`
+      trees = function() invoke(jobj, "trees") %>%
+        purrr::map(new_ml_decision_tree_regression_model),
+      class = "ml_gbt_classification_model"
+    )
+  }
 }
