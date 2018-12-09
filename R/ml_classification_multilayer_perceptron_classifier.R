@@ -217,6 +217,7 @@ new_ml_multilayer_perceptron_classification_model <- function(jobj) {
     new_ml_probabilistic_classification_model(
       jobj,
       weights = read_spark_vector(jobj, "weights"),
+      layers = invoke(jobj, "layers"),
       class = "ml_multilayer_perceptron_classification_model")
   }
 }
