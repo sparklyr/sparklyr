@@ -194,7 +194,7 @@ new_ml_multilayer_perceptron_classifier <- function(jobj) {
     spark_connection() %>%
     spark_version()
   if (v < "2.3.0") {
-    new_predictor(jobj, class = "ml_multilayer_perceptron_classifier")
+    new_ml_predictor(jobj, class = "ml_multilayer_perceptron_classifier")
   } else {
     new_ml_probabilistic_classifier(jobj, class = "ml_multilayer_perceptron_classifier")
   }
