@@ -40,12 +40,14 @@ ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_
     raw_prediction_col = raw_prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_decision_tree_classifier()
+    validator_ml_decision_tree_classifier()
 
-  jobj <- ml_new_classifier(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.DecisionTreeClassifier", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]],
-    .args[["probability_col"]], .args[["raw_prediction_col"]]
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]],
+    probability_col = .args[["probability_col"]],
+    raw_prediction_col = .args[["raw_prediction_col"]]
   ) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
     invoke("setImpurity", .args[["impurity"]]) %>%
@@ -55,8 +57,8 @@ ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_
     invoke("setMinInstancesPerNode", .args[["min_instances_per_node"]]) %>%
     invoke("setCacheNodeIds", .args[["cache_node_ids"]]) %>%
     invoke("setMaxMemoryInMB", .args[["max_memory_in_mb"]]) %>%
-    maybe_set_param("setThresholds", .args[["thresholds"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_decision_tree_classifier(jobj)
 }
@@ -108,7 +110,7 @@ ml_decision_tree_classifier.tbl_spark <- function(x, formula = NULL, max_depth =
                                                   response = NULL, features = NULL,
                                                   predicted_label_col = "predicted_label", ...) {
 
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_decision_tree_classifier.spark_connection(
     x = spark_connection(x),
@@ -136,16 +138,19 @@ ml_decision_tree_classifier.tbl_spark <- function(x, formula = NULL, max_depth =
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(
-      x, stage, formula, features_col, label_col,
-      "classification",
+    ml_model_supervised(
       new_ml_model_decision_tree_classification,
-      predicted_label_col
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col,
+      predicted_label_col = predicted_label_col
     )
   }
 }
 
-ml_validator_decision_tree_classifier <- function(.args) {
+validator_ml_decision_tree_classifier <- function(.args) {
   .args <- ml_validate_decision_tree_args(.args)
   .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
   .args[["impurity"]] <- cast_choice(.args[["impurity"]], c("gini", "entropy"))
@@ -153,23 +158,16 @@ ml_validator_decision_tree_classifier <- function(.args) {
 }
 
 new_ml_decision_tree_classifier <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_decision_tree_classifier")
+  new_ml_probabilistic_classifier(jobj, class = "ml_decision_tree_classifier")
 }
 
 new_ml_decision_tree_classification_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_probabilistic_classification_model(
     jobj,
     # `depth` and `featureImportances` are lazy vals in Spark.
     depth = function() invoke(jobj, "depth"),
-    feature_importances = function() try_null(read_spark_vector(jobj, "featureImportances")),
-    num_features = invoke(jobj, "numFeatures"),
-    num_classes = try_null(invoke(jobj, "numClasses")),
+    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = invoke(jobj, "getProbabilityCol"),
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
-    thresholds = try_null(invoke(jobj, "getThresholds")),
-    subclass = "ml_decision_tree_classification_model")
+    class = "ml_decision_tree_classification_model")
 }

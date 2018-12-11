@@ -16,6 +16,8 @@ ft_one_hot_encoder <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_one_hot_encoder")
 }
 
+ml_one_hot_encoder <- ft_one_hot_encoder
+
 #' @export
 ft_one_hot_encoder.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                 drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {
@@ -26,9 +28,9 @@ ft_one_hot_encoder.spark_connection <- function(x, input_col = NULL, output_col 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_one_hot_encoder()
+    validator_ml_one_hot_encoder()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.OneHotEncoder",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
@@ -66,10 +68,10 @@ ft_one_hot_encoder.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_one_hot_encoder <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_one_hot_encoder")
+  new_ml_transformer(jobj, class = "ml_one_hot_encoder")
 }
 
-ml_validator_one_hot_encoder <- function(.args) {
+validator_ml_one_hot_encoder <- function(.args) {
   .args <- validate_args_transformer(.args) %>%
     ml_backwards_compatibility(list(drop.last = "drop_last"))
   .args[["drop_last"]] <- cast_scalar_logical(.args[["drop_last"]])

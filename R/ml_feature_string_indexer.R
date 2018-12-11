@@ -22,6 +22,7 @@ ft_string_indexer <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_string_indexer")
 }
 
+ml_string_indexer <- ft_string_indexer
 
 #' @export
 ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
@@ -34,14 +35,14 @@ ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col =
     string_order_type = string_order_type,
     uid = uid
   ) %>%
-    ml_validator_string_indexer()
+    validator_ml_string_indexer()
 
-  estimator <- ml_new_transformer(
+  estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.StringIndexer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    maybe_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
-    maybe_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0",  "frequencyDesc") %>%
+    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
+    jobj_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0",  "frequencyDesc") %>%
     new_ml_string_indexer()
 
   if (is.null(dataset))
@@ -103,14 +104,14 @@ ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_string_indexer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_string_indexer")
+  new_ml_estimator(jobj, class = "ml_string_indexer")
 }
 
 new_ml_string_indexer_model <- function(jobj) {
   new_ml_transformer(jobj,
                      labels = invoke(jobj, "labels") %>%
                        as.character(),
-                     subclass = "ml_string_indexer_model")
+                     class = "ml_string_indexer_model")
 }
 
 #' @rdname ft_string_indexer
@@ -119,7 +120,7 @@ new_ml_string_indexer_model <- function(jobj) {
 #' @export
 ml_labels <- function(model) model$labels
 
-ml_validator_string_indexer <- function(.args) {
+validator_ml_string_indexer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["handle_invalid"]] <- cast_choice(
     .args[["handle_invalid"]], c("error", "skip", "keep")

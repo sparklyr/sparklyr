@@ -88,9 +88,9 @@ ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_inter
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_logistic_regression()
+    validator_ml_logistic_regression()
 
-  jobj <- ml_new_classifier(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.LogisticRegression", .args[["uid"]],
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]], probability_col = .args[["probability_col"]],
@@ -102,26 +102,26 @@ ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_inter
     invoke("setMaxIter", .args[["max_iter"]]) %>%
     invoke("setThreshold", .args[["threshold"]]) %>%
     invoke("setTol", .args[["tol"]]) %>%
-    maybe_set_param("setFamily", .args[["family"]], "2.1.0", "auto") %>%
-    maybe_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
-    maybe_set_param("setThresholds", .args[["thresholds"]]) %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]]) %>%
-    maybe_set_param(
+    jobj_set_param("setFamily", .args[["family"]], "2.1.0", "auto") %>%
+    jobj_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
+    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
+    jobj_set_param("setWeightCol", .args[["weight_col"]]) %>%
+    jobj_set_param(
       "setLowerBoundsOnCoefficients",
       spark_dense_matrix(x, .args[["lower_bounds_on_coefficients"]]),
       "2.2.0"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setUpperBoundsOnCoefficients",
       spark_dense_matrix(x, .args[["upper_bounds_on_coefficients"]]),
       "2.2.0"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setLowerBoundsOnIntercepts",
       spark_dense_vector(x, .args[["lower_bounds_on_intercepts"]]),
       "2.2.0"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setUpperBoundsOnIntercepts",
       spark_dense_vector(x, .args[["upper_bounds_on_intercepts"]]),
       "2.2.0"
@@ -183,9 +183,9 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
                                              uid = random_string("logistic_regression_"),
                                              response = NULL, features = NULL,
                                              predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
-  predictor <- ml_logistic_regression.spark_connection(
+  stage <- ml_logistic_regression.spark_connection(
     x = spark_connection(x),
     formula = NULL,
     fit_intercept = fit_intercept,
@@ -212,20 +212,23 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
   )
 
   if (is.null(formula)) {
-    predictor %>%
+    stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(
-      x, predictor = predictor, formula = formula,
-      features_col = features_col, label_col = label_col,
-      type = "classification",
-      constructor = new_ml_model_logistic_regression,
-      predicted_label_col)
+    ml_model_supervised(
+      new_ml_model_logistic_regression,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col,
+      predicted_label_col = predicted_label_col
+    )
   }
 }
 
 new_ml_logistic_regression <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_logistic_regression")
+  new_ml_probabilistic_classifier(jobj, class = "ml_logistic_regression")
 }
 
 new_ml_logistic_regression_model <- function(jobj) {
@@ -240,53 +243,46 @@ new_ml_logistic_regression_model <- function(jobj) {
     new_ml_summary_logistic_regression_model(invoke(jobj, "summary"))
   }
 
-  new_ml_prediction_model(
+  new_ml_probabilistic_classification_model(
     jobj,
     coefficients = if (is_multinomial) NULL else read_spark_vector(jobj, "coefficients"),
-    coefficient_matrix = try_null(read_spark_matrix(jobj, "coefficientMatrix")),
+    coefficient_matrix = possibly_null(~ read_spark_matrix(jobj, "coefficientMatrix"))(),
     intercept = if (is_multinomial) NULL else invoke(jobj, "intercept"),
-    intercept_vector = try_null(read_spark_vector(jobj, "interceptVector")),
-    num_classes = invoke(jobj, "numClasses"),
-    num_features = invoke(jobj, "numFeatures"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = invoke(jobj, "getProbabilityCol"),
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
+    intercept_vector = possibly_null(~ read_spark_vector(jobj, "interceptVector"))(),
     threshold = if (ml_is_set(jobj, "threshold")) invoke(jobj, "getThreshold") else NULL,
-    thresholds = if (ml_is_set(jobj, "thresholds")) invoke(jobj, "getThresholds") else NULL,
     summary = summary,
-    subclass = "ml_logistic_regression_model")
+    class = "ml_logistic_regression_model")
 }
 
 new_ml_summary_logistic_regression_model <- function(jobj) {
   new_ml_summary(
     jobj,
-    area_under_roc = function() try_null(invoke(jobj, "areaUnderROC")),
-    f_measure_by_threshold = function() try_null(
-      invoke(jobj, "fMeasureByThreshold") %>%
-        invoke("withColumnRenamed", "F-Measure", "F_Measure") %>%
-        collect()
+    area_under_roc = possibly_null(~ invoke(jobj, "areaUnderROC")),
+    f_measure_by_threshold = possibly_null(
+      ~ invoke(jobj, "fMeasureByThreshold") %>%
+          invoke("withColumnRenamed", "F-Measure", "F_Measure") %>%
+          collect()
     ),
-    false_positive_rate_by_label = function() try_null(invoke(jobj, "falsePositiveRateByLabel")),
-    precision_by_label = function() try_null(invoke(jobj, "precisionByLabel")),
-    recall_by_label = function() try_null(invoke(jobj, "recallByLabel")),
-    true_positive_rate_by_label = function() try_null(invoke(jobj, "truePositiveRateByLabel")),
-    weighted_f_measure = function() try_null(invoke(jobj, "weightedFMeasure")),
-    weighted_false_positive_rate = function() try_null(invoke(jobj, "weightedFalsePositiveRate")),
-    weighted_precision = function() try_null(invoke(jobj, "weightedPrecision")),
-    weighted_recall = function() try_null(invoke(jobj, "weightedRecall")),
-    weighted_true_positive_rate = function() try_null(invoke(jobj, "weightedTruePositiveRate")),
+    false_positive_rate_by_label = possibly_null(~ invoke(jobj, "falsePositiveRateByLabel")),
+    precision_by_label = possibly_null(~ invoke(jobj, "precisionByLabel")),
+    recall_by_label = possibly_null(~ invoke(jobj, "recallByLabel")),
+    true_positive_rate_by_label = possibly_null(~ invoke(jobj, "truePositiveRateByLabel")),
+    weighted_f_measure = possibly_null(~ invoke(jobj, "weightedFMeasure")),
+    weighted_false_positive_rate = possibly_null(~ invoke(jobj, "weightedFalsePositiveRate")),
+    weighted_precision = possibly_null(~ invoke(jobj, "weightedPrecision")),
+    weighted_recall = possibly_null(~ invoke(jobj, "weightedRecall")),
+    weighted_true_positive_rate = possibly_null(~ invoke(jobj, "weightedTruePositiveRate")),
     features_col = function() invoke(jobj, "featuresCol"),
     label_col = function() invoke(jobj, "labelCol"),
     objective_history = function() invoke(jobj, "objectiveHistory"),
-    pr = function() try_null(invoke(jobj, "pr") %>% collect()),
-    precision_by_threshold = function() try_null(invoke(jobj, "precisionByThreshold") %>% collect()),
+    pr = function() possibly_null(~ invoke(jobj, "pr") %>% collect()),
+    precision_by_threshold = possibly_null(~ invoke(jobj, "precisionByThreshold") %>% collect()),
     predictions = function() invoke(jobj, "predictions") %>% sdf_register(),
     probability_col = function() invoke(jobj, "probabilityCol"),
-    recall_by_threshold = function() try_null(invoke(jobj, "recallByThreshold") %>% collect()),
-    roc = function() try_null(invoke(jobj, "roc") %>% collect()),
+    recall_by_threshold = possibly_null(~ invoke(jobj, "recallByThreshold") %>% collect()),
+    roc = possibly_null(~ invoke(jobj, "roc") %>% collect()),
     total_iterations = function() invoke(jobj, "totalIterations"),
-    subclass = "ml_summary_logistic_regression"
+    class = "ml_summary_logistic_regression"
   )
 }
 
@@ -297,7 +293,7 @@ cast_double_matrix <- function(mat) {
     matrix(nrow = nrow(mat))
 }
 
-ml_validator_logistic_regression <- function(.args) {
+validator_ml_logistic_regression <- function(.args) {
   .args <- ml_backwards_compatibility(
     .args, list(
       intercept = "fit_intercept",

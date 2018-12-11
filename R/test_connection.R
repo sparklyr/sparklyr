@@ -96,5 +96,5 @@ create_hive_context.test_connection <- function(sc) {
 }
 
 new_test_connection <- function(scon) {
-  new_spark_connection(scon, subclass = "test_connection")
+  new_spark_connection(scon, class = "test_connection")
 }

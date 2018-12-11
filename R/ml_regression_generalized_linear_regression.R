@@ -99,11 +99,12 @@ ml_generalized_linear_regression.spark_connection <- function(x, formula = NULL,
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_generalized_linear_regression()
+    validator_ml_generalized_linear_regression()
 
-  jobj <- ml_new_regressor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.regression.GeneralizedLinearRegression", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]]
   ) %>%
     invoke("setFamily", .args[["family"]]) %>%
     invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
@@ -111,12 +112,12 @@ ml_generalized_linear_regression.spark_connection <- function(x, formula = NULL,
     invoke("setMaxIter", .args[["max_iter"]]) %>%
     invoke("setSolver", .args[["solver"]]) %>%
     invoke("setTol", .args[["tol"]]) %>%
-    maybe_set_param("setLinkPower", .args[["link_power"]]) %>%
-    maybe_set_param("setVariancePower", .args[["variance_power"]]) %>%
-    maybe_set_param("setLink", .args[["link"]]) %>%
-    maybe_set_param("setLinkPredictionCol", .args[["link_prediction_col"]]) %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]]) %>%
-    maybe_set_param("setOffsetCol", .args[["offset_col"]], "2.3.0")
+    jobj_set_param("setLinkPower", .args[["link_power"]]) %>%
+    jobj_set_param("setVariancePower", .args[["variance_power"]]) %>%
+    jobj_set_param("setLink", .args[["link"]]) %>%
+    jobj_set_param("setLinkPredictionCol", .args[["link_prediction_col"]]) %>%
+    jobj_set_param("setWeightCol", .args[["weight_col"]]) %>%
+    jobj_set_param("setOffsetCol", .args[["offset_col"]], "2.3.0")
 
   new_ml_generalized_linear_regression(jobj)
 }
@@ -169,7 +170,7 @@ ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family
 
 
 
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_generalized_linear_regression(
     x = spark_connection(x),
@@ -197,14 +198,18 @@ ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(
-      x, stage, formula, features_col, label_col,
-      "regression", new_ml_model_generalized_linear_regression
+    ml_model_supervised(
+      new_ml_model_generalized_linear_regression,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col
     )
   }
 }
 
-ml_validator_generalized_linear_regression <- function(.args) {
+validator_ml_generalized_linear_regression <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     intercept = "fit_intercept",
     weights.column = "weight_col",
@@ -238,7 +243,7 @@ ml_validator_generalized_linear_regression <- function(.args) {
 }
 
 new_ml_generalized_linear_regression <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_generalized_linear_regression")
+  new_ml_predictor(jobj, class = "ml_generalized_linear_regression")
 }
 
 new_ml_generalized_linear_regression_model <- function(jobj) {
@@ -254,12 +259,9 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
-    num_features = invoke(jobj, "numFeatures"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
     link_prediction_col = if (invoke(jobj, "isSet", invoke(jobj, "linkPredictionCol"))) invoke(jobj, "getLinkPredictionCol") else NULL,
     summary = summary,
-    subclass = "ml_generalized_linear_regression_model")
+    class = "ml_generalized_linear_regression_model")
 }
 
 new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_intercept) {
@@ -271,24 +273,30 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_interce
   new_ml_summary(
     jobj,
     aic = function() invoke(jobj, "aic"), # lazy val
-    coefficient_standard_errors = function() try_null(invoke(jobj, "coefficientStandardErrors")) %>%
-      arrange_stats(), # lazy val
+    coefficient_standard_errors = possibly_null(
+      ~ invoke(jobj, "coefficientStandardErrors") %>%
+        arrange_stats()
+    ), # lazy val
     degrees_of_freedom = function() invoke(jobj, "degreesOfFreedom"), # lazy val
     deviance = function()invoke(jobj, "deviance"), # lazy val
     dispersion = function() invoke(jobj, "dispersion"), # lazy val
     null_deviance = function() invoke(jobj, "nullDeviance"), # lazy val
     num_instances = if (version > "2.2.0") function() invoke(jobj, "numInstances") else NULL, # lazy val
-    num_iterations = try_null(invoke(jobj, "numIterations")),
-    p_values = function() try_null(invoke(jobj, "pValues")) %>% # lazy val
-      arrange_stats(),
+    num_iterations = possibly_null(invoke)(jobj, "numIterations"),
+    p_values = possibly_null(
+      ~ invoke(jobj, "pValues") %>% # lazy val
+        arrange_stats()
+    ),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     rank = invoke(jobj, "rank"), # lazy val
     residual_degree_of_freedom = function() invoke(jobj, "residualDegreeOfFreedom"), # lazy val
     residual_degree_of_freedom_null = function() invoke(jobj, "residualDegreeOfFreedomNull"), # lazy val
     residuals = function(type = "deviance") (invoke(jobj, "residuals", type) %>% sdf_register()),
-    solver = try_null(invoke(jobj, "solver")),
-    t_values = function() try_null(invoke(jobj, "tValues")) %>% # lazy val
-      arrange_stats(),
-    subclass = "ml_summary_generalized_linear_regression")
+    solver = possibly_null(invoke)(jobj, "solver"),
+    t_values = possibly_null(
+      ~ invoke(jobj, "tValues") %>% # lazy val
+        arrange_stats()
+    ),
+    class = "ml_summary_generalized_linear_regression")
 }

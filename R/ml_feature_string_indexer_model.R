@@ -7,6 +7,8 @@ ft_string_indexer_model <- function(x, input_col = NULL, output_col = NULL, labe
   UseMethod("ft_string_indexer_model")
 }
 
+ml_string_indexer_model <- ft_string_indexer_model
+
 #' @export
 ft_string_indexer_model.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels,
                                                      handle_invalid = "error",
@@ -19,14 +21,14 @@ ft_string_indexer_model.spark_connection <- function(x, input_col = NULL, output
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_string_indexer_model()
+    validator_ml_string_indexer_model()
 
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.StringIndexerModel",
     .args[["uid"]], .args[["labels"]]
   ) %>%
-    maybe_set_param("setInputCol", .args[["input_col"]]) %>%
-    maybe_set_param("setOutputCol", .args[["output_col"]])
+    jobj_set_param("setInputCol", .args[["input_col"]]) %>%
+    jobj_set_param("setOutputCol", .args[["output_col"]])
 
   new_ml_string_indexer_model(jobj)
 }
@@ -63,7 +65,7 @@ ft_string_indexer_model.tbl_spark <- function(x, input_col = NULL, output_col = 
   ml_transform(stage, x)
 }
 
-ml_validator_string_indexer_model <- function(.args) {
+validator_ml_string_indexer_model <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["labels"]] <- cast_character_list(.args[["labels"]])
   .args[["handle_invalid"]] <- cast_choice(

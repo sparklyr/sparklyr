@@ -1,28 +1,30 @@
-new_ml_model_kmeans <- function(pipeline, pipeline_model, model,
-                                dataset, formula, feature_names,
-                                call) {
-  summary <- model$summary
+new_ml_model_kmeans <- function(pipeline_model, formula, dataset,
+                                features_col) {
+  m <- new_ml_model_clustering(
+    pipeline_model = pipeline_model,
+    formula = formula,
+    dataset = dataset,
+    features_col = features_col,
+    class = "ml_model_kmeans"
+  )
 
-  centers <- model$cluster_centers() %>%
+  model <- m$model
+
+  m$summary <- model$summary
+
+  m$centers <- model$cluster_centers() %>%
     do.call(rbind, .) %>%
     as.data.frame() %>%
-    rlang::set_names(feature_names)
+    rlang::set_names(m$feature_names)
 
-  cost <- try_null(
-    pipeline_model %>%
+  m$cost <- possibly_null(
+    ~ pipeline_model %>%
       ml_stage(1) %>%
       ml_transform(dataset) %>%
       model$compute_cost()
-  )
-  new_ml_model_clustering(
-    pipeline, pipeline_model,
-    model, dataset, formula,
-    centers = centers,
-    cost = cost,
-    summary = summary,
-    subclass = "ml_model_kmeans",
-    .features = feature_names
-  )
+  )()
+
+  m
 }
 
 #' @export

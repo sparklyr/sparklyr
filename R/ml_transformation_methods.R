@@ -29,7 +29,7 @@ ml_fit <- function(x, dataset, ...) {
 
   spark_jobj(x) %>%
     invoke("fit", spark_dataframe(dataset)) %>%
-    ml_constructor_dispatch()
+    ml_call_constructor()
 }
 
 #' @rdname ml-transform-methods
@@ -129,7 +129,7 @@ ml_predict.ml_model_classification <- function(
     predictions
   } else {
     index_labels <- spark_sanitize_names(
-      x$.index_labebls %||% seq_len(x$model$num_classes) - 1L,
+      x$index_labels %||% (seq_len(x$model$num_classes) - 1L),
       sc$config
     )
     sdf_separate_column(

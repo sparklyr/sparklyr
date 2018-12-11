@@ -91,7 +91,7 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   type.residuals <- rlang::arg_match(type.residuals) %>%
     cast_string()
 
-  if (!is.null(newdata) && !identical(type.residuals, "working"))
+  if (!is.null(newdata) && !(type.residuals == "working"))
     stop("'type.residuals' must be set to 'working' when 'newdata' is supplied")
 
   newdata <- newdata %||% ml_model_data(x)
@@ -100,9 +100,9 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   # instead of calling the MLlib API.
   if (type.residuals == "working") {
     predictions <- ml_predict(x, newdata) %>%
-      rename(fitted = !!"prediction")
+      rename(fitted = !!rlang::sym("prediction"))
     return(predictions %>%
-             mutate(resid = `-`(!!sym(x$.response), !!sym("fitted")))
+             mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
     )
   }
 

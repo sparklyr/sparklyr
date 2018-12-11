@@ -27,10 +27,11 @@ ml_print_params <- function(x) {
     names() %>%
     grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
   for (param_name in sort(out_names)) {
-    value <- ml_param(x, param_name)
+    value <- ml_param(x, param_name, allow_null = TRUE)
     param_output <- switch(
       class(value)[[1]],
       spark_jobj = paste0("jobj of class ", jobj_class(value)[[1]]),
+      NULL = "null",
       paste0(value, collapse = ", ")
     )
     cat(paste0("  ", param_name, ": ", param_output, "\n"))

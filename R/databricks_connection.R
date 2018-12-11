@@ -35,6 +35,6 @@ spark_version.databricks_connection <- function(sc) {
 new_databricks_connection <- function(scon) {
   new_spark_gateway_connection(
     scon,
-    subclass = "databricks_connection"
+    class = "databricks_connection"
   )
 }

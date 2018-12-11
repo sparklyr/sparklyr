@@ -36,11 +36,13 @@ ml_decision_tree_regressor.spark_connection <- function(x, formula = NULL, max_d
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_decision_tree_regressor()
+    validator_ml_decision_tree_regressor()
 
-  jobj <- ml_new_regressor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.regression.DecisionTreeRegressor", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
+    features_col = .args[["features_col"]],
+    label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]]
   ) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
     invoke("setImpurity", .args[["impurity"]]) %>%
@@ -50,8 +52,8 @@ ml_decision_tree_regressor.spark_connection <- function(x, formula = NULL, max_d
     invoke("setMinInstancesPerNode", .args[["min_instances_per_node"]]) %>%
     invoke("setCacheNodeIds", .args[["cache_node_ids"]]) %>%
     invoke("setMaxMemoryInMB", .args[["max_memory_in_mb"]]) %>%
-    maybe_set_param("setVarianceCol", .args[["variance_col"]], "2.0.0") %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setVarianceCol", .args[["variance_col"]], "2.0.0") %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_decision_tree_regressor(jobj)
 }
@@ -94,7 +96,7 @@ ml_decision_tree_regressor.tbl_spark <- function(x, formula = NULL, max_depth = 
                                                  variance_col = NULL, features_col = "features", label_col = "label",
                                                  prediction_col = "prediction", uid = random_string("decision_tree_regressor_"),
                                                  response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_decision_tree_regressor.spark_connection(
     x = spark_connection(x),
@@ -120,15 +122,19 @@ ml_decision_tree_regressor.tbl_spark <- function(x, formula = NULL, max_depth = 
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(
-      x, stage, formula, features_col, label_col,
-      "regression", new_ml_model_decision_tree_regression
+    ml_model_supervised(
+      new_ml_model_decision_tree_regression,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col
     )
   }
 }
 
 # Validator
-ml_validator_decision_tree_regressor <- function(.args) {
+validator_ml_decision_tree_regressor <- function(.args) {
   .args <- ml_validate_decision_tree_args(.args)
   .args[["impurity"]] <- cast_choice(.args[["impurity"]], c("variance"))
   .args[["variance_col"]] <- cast_nullable_string(.args[["variance_col"]])
@@ -136,21 +142,17 @@ ml_validator_decision_tree_regressor <- function(.args) {
 }
 
 new_ml_decision_tree_regressor <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_decision_tree_regressor")
+  new_ml_predictor(jobj, class = "ml_decision_tree_regressor")
 }
 
 new_ml_decision_tree_regression_model <- function(jobj) {
-
   new_ml_prediction_model(
     jobj,
     # `depth` and `featureImportances` are lazy vals in Spark.
     depth = function() invoke(jobj, "depth"),
-    feature_importances = function() try_null(read_spark_vector(jobj, "featureImportances")),
-    num_features = invoke(jobj, "numFeatures"),
+    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    variance_col = try_null(invoke(jobj, "getVarianceCol")),
-    subclass = "ml_decision_tree_regression_model")
+    variance_col = possibly_null(invoke)(jobj, "getVarianceCol"),
+    class = "ml_decision_tree_regression_model")
 }

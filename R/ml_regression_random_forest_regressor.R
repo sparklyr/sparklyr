@@ -34,11 +34,12 @@ ml_random_forest_regressor.spark_connection <- function(x, formula = NULL, num_t
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_random_forest_regressor()
+    validator_ml_random_forest_regressor()
 
-  jobj <- ml_new_predictor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.regression.RandomForestRegressor", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
+    features_col = .args[["features_col"]],
+    label_col = .args[["label_col"]], prediction_col = .args[["prediction_col"]]
   ) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
     invoke("setMaxBins", .args[["max_bins"]]) %>%
@@ -51,7 +52,7 @@ ml_random_forest_regressor.spark_connection <- function(x, formula = NULL, num_t
     invoke("setSubsamplingRate", .args[["subsampling_rate"]]) %>%
     invoke("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]]) %>%
     invoke("setImpurity", .args[["impurity"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_random_forest_regressor(jobj)
 }
@@ -95,7 +96,7 @@ ml_random_forest_regressor.tbl_spark <- function(x, formula = NULL, num_trees = 
                                                  max_memory_in_mb = 256, features_col = "features", label_col = "label",
                                                  prediction_col = "prediction",  uid = random_string("random_forest_regressor_"),
                                                  response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_random_forest_regressor.spark_connection(
     x = spark_connection(x),
@@ -123,12 +124,18 @@ ml_random_forest_regressor.tbl_spark <- function(x, formula = NULL, num_trees = 
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, stage, formula, features_col, label_col,
-                         "regression", new_ml_model_random_forest_regression)
+    ml_model_supervised(
+      new_ml_model_random_forest_regression,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col
+    )
   }
 }
 
-ml_validator_random_forest_regressor <- function(.args) {
+validator_ml_random_forest_regressor <- function(.args) {
   .args <- .args %>%
     ml_backwards_compatibility(  list(
       sample.rate = "subsampling_rate",
@@ -145,22 +152,19 @@ ml_validator_random_forest_regressor <- function(.args) {
 }
 
 new_ml_random_forest_regressor <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_random_forest_regressor")
+  new_ml_predictor(jobj, class = "ml_random_forest_regressor")
 }
 
 new_ml_random_forest_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     # `lazy val featureImportances`
-    feature_importances = function() try_null(read_spark_vector(jobj, "featureImportances")),
-    num_features = invoke(jobj, "numFeatures"),
+    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
     # `lazy val totalNumNodes`
     total_num_nodes = function() invoke(jobj, "totalNumNodes"),
     # `def treeWeights`, `def trees`
     tree_weights = function() invoke(jobj, "treeWeights"),
     trees = function() invoke(jobj, "trees") %>%
       purrr::map(new_ml_decision_tree_regression_model),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    subclass = "ml_random_forest_regression_model")
+    class = "ml_random_forest_regression_model")
 }

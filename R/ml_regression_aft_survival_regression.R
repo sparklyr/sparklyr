@@ -70,11 +70,12 @@ ml_aft_survival_regression.spark_connection <- function(x, formula = NULL, censo
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_aft_survival_regression()
+    validator_ml_aft_survival_regression()
 
-  jobj <- ml_new_regressor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.regression.AFTSurvivalRegression", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]]
   ) %>%
     invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
     invoke("setMaxIter", .args[["max_iter"]]) %>%
@@ -82,8 +83,8 @@ ml_aft_survival_regression.spark_connection <- function(x, formula = NULL, censo
     invoke("setCensorCol", .args[["censor_col"]]) %>%
     invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
     invoke("setQuantileProbabilities", .args[["quantile_probabilities"]]) %>%
-    maybe_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
-    maybe_set_param("setQuantilesCol", .args[["quantiles_col"]])
+    jobj_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
+    jobj_set_param("setQuantilesCol", .args[["quantiles_col"]])
 
   new_ml_aft_survival_regression(jobj)
 }
@@ -127,7 +128,7 @@ ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col =
                                                  prediction_col = "prediction",
                                                  uid = random_string("aft_survival_regression_"),
                                                  response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_aft_survival_regression.spark_connection(
     x = spark_connection(x),
@@ -150,15 +151,19 @@ ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col =
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(
-      x, stage, formula, features_col, label_col,
-      "regression", new_ml_model_aft_survival_regression
+    ml_model_supervised(
+      new_ml_model_aft_survival_regression,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col
     )
   }
 }
 
 # Validator
-ml_validator_aft_survival_regression <- function(.args) {
+validator_ml_aft_survival_regression <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     intercept = "fit_intercept",
     iter.max = "max_iter",
@@ -179,20 +184,18 @@ ml_validator_aft_survival_regression <- function(.args) {
 # Constructors
 
 new_ml_aft_survival_regression <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_aft_survival_regression")
+  new_ml_estimator(jobj, class = "ml_aft_survival_regression")
 }
 
 new_ml_aft_survival_regression_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_transformer(
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
-    intercept = try_null(invoke(jobj, "intercept")),
+    intercept = possibly_null(invoke)(jobj, "intercept"),
     scale = invoke(jobj, "scale"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
     quantile_probabilities = invoke(jobj, "getQuantileProbabilities"),
-    quantiles_col = try_null(invoke(jobj, "getQuantilesCol")),
-    subclass = "ml_aft_survival_regression_model")
+    quantiles_col = possibly_null(invoke)(jobj, "getQuantilesCol"),
+    class = "ml_aft_survival_regression_model")
 }
 
 #' @rdname ml_aft_survival_regression

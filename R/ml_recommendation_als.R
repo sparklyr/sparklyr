@@ -96,7 +96,7 @@ ml_als.spark_connection <- function(x, rating_col = "rating", user_col = "user",
     intermediate_storage_level = intermediate_storage_level,
     final_storage_level = final_storage_level
   ) %>%
-    ml_validator_als()
+    validator_ml_als()
 
   jobj <- invoke_new(x, "org.apache.spark.ml.recommendation.ALS", uid) %>%
     invoke("setRatingCol", .args[["rating_col"]]) %>%
@@ -111,15 +111,15 @@ ml_als.spark_connection <- function(x, rating_col = "rating", user_col = "user",
     invoke("setNumUserBlocks", .args[["num_user_blocks"]]) %>%
     invoke("setNumItemBlocks", .args[["num_item_blocks"]]) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setIntermediateStorageLevel", .args[["intermediate_storage_level"]],
       "2.0.0", "MEMORY_AND_DISK"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setFinalStorageLevel", .args[["final_storage_level"]],
       "2.0.0","MEMORY_AND_DISK"
     ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setColdStartStrategy", .args[["cold_start_strategy"]],
       "2.2.0", "nan"
     )
@@ -191,7 +191,7 @@ ml_als.tbl_spark <- function(x, rating_col = "rating", user_col = "user", item_c
 }
 
 # Validator
-ml_validator_als <- function(.args) {
+validator_ml_als <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     rating.column = "rating_col",
     user.column = "user_col",
@@ -222,11 +222,11 @@ ml_validator_als <- function(.args) {
 # Constructors
 
 new_ml_als <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_als")
+  new_ml_estimator(jobj, class = "ml_als")
 }
 
 new_ml_als_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_transformer(
     jobj,
     rank = invoke(jobj, "rank"),
     recommend_for_all_items = function(num_users) {
@@ -248,7 +248,7 @@ new_ml_als_model <- function(jobj) {
     user_col = invoke(jobj, "getUserCol"),
     item_col = invoke(jobj, "getItemCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
-    subclass = "ml_als_model")
+    class = "ml_als_model")
 }
 
 # Hideous hack

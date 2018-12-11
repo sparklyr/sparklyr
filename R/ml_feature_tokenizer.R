@@ -12,6 +12,8 @@ ft_tokenizer <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_tokenizer")
 }
 
+ml_tokenizer <- ft_tokenizer
+
 #' @export
 ft_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                           uid = random_string("tokenizer_"), ...) {
@@ -22,9 +24,9 @@ ft_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_tokenizer()
+    validator_ml_tokenizer()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Tokenizer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
     )
@@ -60,9 +62,9 @@ ft_tokenizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_tokenizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_tokenizer")
+  new_ml_transformer(jobj, class = "ml_tokenizer")
 }
 
-ml_validator_tokenizer <- function(.args) {
+validator_ml_tokenizer <- function(.args) {
   validate_args_transformer(.args)
 }

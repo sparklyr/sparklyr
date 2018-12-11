@@ -48,20 +48,23 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
     raw_prediction_col = raw_prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_gbt_classifier()
+    validator_ml_gbt_classifier()
 
   stage_class <- "org.apache.spark.ml.classification.GBTClassifier"
 
   jobj <- (
     if (spark_version(x) < "2.2.0")
-      ml_new_predictor(
-        x, stage_class, uid, .args[["features_col"]],
-        .args[["label_col"]], .args[["prediction_col"]]
+      spark_pipeline_stage(
+        x, stage_class, uid, features_col = .args[["features_col"]],
+        label_col = .args[["label_col"]], prediction_col = .args[["prediction_col"]]
       )
     else
-      ml_new_classifier(
-        x, stage_class, uid, .args[["features_col"]], .args[["label_col"]],
-        .args[["prediction_col"]], .args[["probability_col"]], .args[["raw_prediction_col"]]
+      spark_pipeline_stage(
+        x, stage_class, uid, features_col = .args[["features_col"]],
+        label_col = .args[["label_col"]],
+        prediction_col = .args[["prediction_col"]],
+        probability_col = .args[["probability_col"]],
+        raw_prediction_col = .args[["raw_prediction_col"]]
       )
   ) %>%
     invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
@@ -75,9 +78,9 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
     invoke("setMaxIter", .args[["max_iter"]]) %>%
     invoke("setStepSize", .args[["step_size"]]) %>%
     invoke("setSubsamplingRate", .args[["subsampling_rate"]]) %>%
-    maybe_set_param("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]], "2.3.0", "auto") %>%
-    maybe_set_param("setThresholds", .args[["thresholds"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]], "2.3.0", "auto") %>%
+    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
   new_ml_gbt_classifier(jobj)
 }
@@ -134,7 +137,7 @@ ml_gbt_classifier.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_de
                                         uid = random_string("gbt_classifier_"),
                                         response = NULL, features = NULL,
                                         predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_gbt_classifier.spark_connection(
     x = spark_connection(x),
@@ -166,14 +169,20 @@ ml_gbt_classifier.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_de
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, stage, formula, features_col, label_col,
-                         "classification", new_ml_model_gbt_classification,
-                         predicted_label_col)
+    ml_model_supervised(
+      new_ml_model_gbt_classification,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col,
+      predicted_label_col = predicted_label_col
+    )
   }
 }
 
 # Validator
-ml_validator_gbt_classifier <- function(.args) {
+validator_ml_gbt_classifier <- function(.args) {
   .args <- ml_backwards_compatibility(
     .args,
     list(
@@ -194,26 +203,50 @@ ml_validator_gbt_classifier <- function(.args) {
 }
 
 new_ml_gbt_classifier <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_gbt_classifier")
+  v <- jobj %>%
+    spark_connection() %>%
+    spark_version()
+
+  if (v < "2.2.0") {
+    new_ml_predictor(jobj, class = "ml_gbt_classifier")
+  } else {
+    new_ml_probabilistic_classifier(jobj, class = "ml_gbt_classifier")
+  }
 }
 
 new_ml_gbt_classification_model <- function(jobj) {
-  new_ml_prediction_model(
-    jobj,
-    # `lazy val featureImportances`
-    feature_importances = function() try_null(read_spark_vector(jobj, "featureImportances")),
-    num_classes = try_null(invoke(jobj, "numClasses")),
-    num_features = invoke(jobj, "numFeatures"),
-    # `lazy val totalNumNodes`
-    total_num_nodes = function() invoke(jobj, "totalNumNodes"),
-    tree_weights = invoke(jobj, "treeWeights"),
-    # `def trees`
-    trees = function() invoke(jobj, "trees") %>%
-      purrr::map(new_ml_decision_tree_regression_model),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = try_null(invoke(jobj, "getProbabilityCol")),
-    raw_prediction_col = try_null(invoke(jobj, "getRawPredictionCol")),
-    thresholds = try_null(invoke(jobj, "getThresholds")),
-    subclass = "ml_gbt_classification_model")
+
+  v <- jobj %>%
+    spark_connection() %>%
+    spark_version()
+
+  if (v < "2.2.0") {
+    new_ml_prediction_model(
+      jobj,
+      # `lazy val featureImportances`
+      feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
+      num_classes = possibly_null(~ invoke(jobj, "numClasses"))(),
+      # `lazy val totalNumNodes`
+      total_num_nodes = function() invoke(jobj, "totalNumNodes"),
+      tree_weights = invoke(jobj, "treeWeights"),
+      # `def trees`
+      trees = function() invoke(jobj, "trees") %>%
+        purrr::map(new_ml_decision_tree_regression_model),
+      class = "ml_multilayer_perceptron_classification_model"
+    )
+  } else {
+    new_ml_probabilistic_classification_model(
+      jobj,
+      # `lazy val featureImportances`
+      feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
+      num_classes = possibly_null(~ invoke(jobj, "numClasses"))(),
+      # `lazy val totalNumNodes`
+      total_num_nodes = function() invoke(jobj, "totalNumNodes"),
+      tree_weights = invoke(jobj, "treeWeights"),
+      # `def trees`
+      trees = function() invoke(jobj, "trees") %>%
+        purrr::map(new_ml_decision_tree_regression_model),
+      class = "ml_gbt_classification_model"
+    )
+  }
 }

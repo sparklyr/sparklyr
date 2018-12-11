@@ -66,11 +66,12 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
     raw_prediction_col = raw_prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_linear_svc()
+    validator_ml_linear_svc()
 
-  jobj <- ml_new_predictor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.LinearSVC", uid,
-    .args[["features_col"]], .args[["label_col"]], .args[["prediction_col"]]
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]]
   ) %>%
     invoke("setRawPredictionCol", .args[["raw_prediction_col"]]) %>%
     invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
@@ -80,7 +81,7 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setAggregationDepth", .args[["aggregation_depth"]]) %>%
     invoke("setThreshold", .args[["threshold"]]) %>%
-    maybe_set_param("setWeightCol", .args[["weight_col"]])
+    jobj_set_param("setWeightCol", .args[["weight_col"]])
 
   new_ml_linear_svc(jobj)
 }
@@ -122,7 +123,7 @@ ml_linear_svc.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE, reg
                                     prediction_col = "prediction", raw_prediction_col = "rawPrediction",
                                     uid = random_string("linear_svc_"), response = NULL,
                                     features = NULL, predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_linear_svc.spark_connection(
     x = spark_connection(x),
@@ -147,15 +148,20 @@ ml_linear_svc.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE, reg
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(
-      x, stage, formula, features_col, label_col,
-      "classification", new_ml_model_linear_svc, predicted_label_col
+    ml_model_supervised(
+      new_ml_model_linear_svc,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col,
+      predicted_label_col = predicted_label_col
     )
   }
 }
 
 # Validator
-ml_validator_linear_svc <- function(.args) {
+validator_ml_linear_svc <- function(.args) {
   .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
@@ -171,20 +177,15 @@ ml_validator_linear_svc <- function(.args) {
 # Constructors
 
 new_ml_linear_svc <- function(jobj) {
-  new_ml_classifier(jobj, subclass = "ml_linear_svc")
+  new_ml_classifier(jobj, class = "ml_linear_svc")
 }
 
 new_ml_linear_svc_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_classification_model(
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
-    num_classes = invoke(jobj, "numClasses"),
-    num_features = invoke(jobj, "numFeatures"),
     threshold = invoke(jobj, "threshold"),
-    weight_col = try_null(invoke(jobj, "weightCol")),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
-    subclass = "ml_linear_svc_model")
+    weight_col = possibly_null(~ invoke(jobj, "weightCol"))(),
+    class = "ml_linear_svc_model")
 }

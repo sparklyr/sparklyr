@@ -24,6 +24,8 @@ ft_bucketed_random_projection_lsh <- function(x, input_col = NULL, output_col = 
   UseMethod("ft_bucketed_random_projection_lsh")
 }
 
+ml_bucketed_random_projection_lsh <- ft_bucketed_random_projection_lsh
+
 #' @export
 ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                                bucket_length = NULL, num_hash_tables = 1, seed = NULL,
@@ -40,15 +42,15 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NU
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_bucketed_random_projection_lsh()
+    validator_ml_bucketed_random_projection_lsh()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    maybe_set_param("setBucketLength", .args[["bucket_length"]]) %>%
+    jobj_set_param("setBucketLength", .args[["bucket_length"]]) %>%
     invoke("setNumHashTables", .args[["num_hash_tables"]]) %>%
-    maybe_set_param("setSeed", .args[["seed"]])
+    jobj_set_param("setSeed", .args[["seed"]])
 
   estimator <- new_ml_bucketed_random_projection_lsh(jobj)
 
@@ -101,7 +103,7 @@ ft_bucketed_random_projection_lsh.tbl_spark <- function(x, input_col = NULL, out
 }
 
 new_ml_bucketed_random_projection_lsh <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_bucketed_random_projection_lsh")
+  new_ml_estimator(jobj, class = "ml_bucketed_random_projection_lsh")
 }
 
 new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
@@ -109,10 +111,10 @@ new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
     jobj,
     approx_nearest_neighbors = make_approx_nearest_neighbors(jobj),
     approx_similarity_join = make_approx_similarity_join(jobj),
-    subclass = "ml_bucketed_random_projection_lsh_model")
+    class = "ml_bucketed_random_projection_lsh_model")
 }
 
-ml_validator_bucketed_random_projection_lsh <- function(.args) {
+validator_ml_bucketed_random_projection_lsh <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["bucket_length"]] <- cast_nullable_scalar_double(.args[["bucket_length"]])
   .args[["num_hash_tables"]] <- cast_scalar_integer(.args[["num_hash_tables"]])
