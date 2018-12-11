@@ -133,7 +133,7 @@ readTypedObject <- function(con, type) {
           "s" = readStruct(con),
           "n" = NULL,
           "j" = getJobj(con, readString(con)),
-          stop("Unsupported type '", type, "' for deserialization"))
+          stop(paste("Unsupported type for deserialization", type)))
 }
 
 readString <- function(con) {
@@ -958,7 +958,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
-                 stop("Unsupported type '", class, "' for serialization"))
+                 stop("Unsupported type '", type, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
 
@@ -1256,15 +1256,17 @@ spark_worker_apply_arrow <- function(sc, config) {
 
     result <- spark_worker_apply_maybe_schema(result, config)
 
-    if (is.null(schema_output)) {
-      schema_output <- spark_worker_build_types(context, lapply(result, class))
+    if (!is.null(result)) {
+      if (is.null(schema_output)) {
+        schema_output <- spark_worker_build_types(context, lapply(result, class))
+      }
+
+      record <- record_batch(result)
+      raw_batch <- write_record_batch(record, raw())
+
+      all_batches[[length(all_batches) + 1]] <- raw_batch
+      total_rows <- total_rows + nrow(result)
     }
-
-    record <- record_batch(result)
-    raw_batch <- write_record_batch(record, raw())
-
-    all_batches[[length(all_batches) + 1]] <- raw_batch
-    total_rows <- total_rows + nrow(result)
 
     record_entry <- read_record_batch(reader)
 
