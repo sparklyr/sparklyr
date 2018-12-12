@@ -85,7 +85,7 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
 
         # Call the validator associated with the stage, and return the (validated)
         #   parameters the user specified.
-        do.call(ml_get_stage_validator(stage_jobj), list(.args = args_to_validate)) %>%
+        do.call(ml_get_stage_validator(stage_jobj), list(args_to_validate)) %>%
           `[`(input_param_names)
       })
     })  %>%
