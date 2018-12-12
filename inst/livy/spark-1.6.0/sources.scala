@@ -846,17 +846,20 @@ attach_connection <- function(jobj, connection) {
 # nolint end
 
 get_type <- function(object, types = NULL) {
-  types <- types %||%
-    c("integer", "character", "logical", "double", "numeric", "raw", "array",
+  if (is.null(object)) return("NULL")
+  if (is.null(types))
+    types <- c("integer", "character", "logical", "double", "numeric", "raw", "array",
       "list", "struct", "spark_jobj", "environment", "Date", "POSIXlt",
       "POSIXct", "factor", "data.frame")
+
   if (!length(types))
     stop("Unsupported type '", class(object)[[1]], "' for serialization")
+
   if (inherits(object, type <- types[[1]]))
     return(type)
-  Recall(object, tail(types, -1))
-}
 
+  get_type(object, tail(types, -1))
+}
 
 getSerdeType <- function(object) {
   type <- get_type(object)
@@ -1259,15 +1262,19 @@ spark_worker_apply_arrow <- function(sc, config) {
     worker_log("is processing batch ", batch_idx)
 
     df <- as_tibble(record_entry)
-    colnames(df) <- columnNames[1: length(colnames(df))]
+    result <- NULL
 
-    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
+    if (!is.null(df)) {
+      colnames(df) <- columnNames[1: length(colnames(df))]
 
-    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+      result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    result <- spark_worker_clean_factors(result)
+      result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
-    result <- spark_worker_apply_maybe_schema(result, config)
+      result <- spark_worker_clean_factors(result)
+
+      result <- spark_worker_apply_maybe_schema(result, config)
+    }
 
     if (!is.null(result)) {
       if (is.null(schema_output)) {

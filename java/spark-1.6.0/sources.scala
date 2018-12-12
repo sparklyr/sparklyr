@@ -844,15 +844,18 @@ attach_connection <- function(jobj, connection) {
 
 get_type <- function(object, types = NULL) {
   if (is.null(object)) return("NULL")
-  types <- types %||%
-    c("integer", "character", "logical", "double", "numeric", "raw", "array",
+  if (is.null(types))
+    types <- c("integer", "character", "logical", "double", "numeric", "raw", "array",
       "list", "struct", "spark_jobj", "environment", "Date", "POSIXlt",
       "POSIXct", "factor", "data.frame")
+
   if (!length(types))
     stop("Unsupported type '", class(object)[[1]], "' for serialization")
+
   if (inherits(object, type <- types[[1]]))
     return(type)
-  Recall(object, tail(types, -1))
+
+  get_type(object, tail(types, -1))
 }
 
 getSerdeType <- function(object) {
