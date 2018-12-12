@@ -10,7 +10,8 @@ ml_get_stage_validator <- function(jobj) {
   cl <- jobj_class(jobj, simple_name = FALSE)[[1]]
   get(
     paste0("validator_", ml_map_class(cl)),
-    envir = asNamespace(ml_map_package(cl))
+    envir = asNamespace(ml_map_package(cl)),
+    mode = "function"
   )
 }
 
@@ -18,7 +19,8 @@ ml_get_stage_constructor <- function(jobj) {
   cl <- jobj_class(jobj, simple_name = FALSE)[[1]]
   get(
     ml_map_class(cl),
-    envir = asNamespace(ml_map_package(cl))
+    envir = asNamespace(ml_map_package(cl)),
+    mode = "function"
   )
 }
 
