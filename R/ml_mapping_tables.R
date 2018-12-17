@@ -14,14 +14,11 @@ register_mapping_tables <- function() {
         }
         system.file("sparkml", file_name, package = pkg)
       }) %>%
+      purrr::set_names(pkgs) %>%
       purrr::keep(nzchar) %>%
       purrr::map(jsonlite::fromJSON)
 
-    if (length(mappings)) {
-      purrr::set_names(mappings, pkgs)
-    } else {
-      NULL
-    }
+    if (length(mappings)) mappings else NULL
   }
 
   read_base_mapping <- function(file_name) {
