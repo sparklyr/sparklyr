@@ -169,7 +169,7 @@ ml_gbt_classifier.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_de
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_gbt_classification,
       predictor = stage,
       formula = formula,

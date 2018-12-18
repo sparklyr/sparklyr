@@ -148,7 +148,7 @@ ml_linear_svc.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE, reg
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_linear_svc,
       predictor = stage,
       formula = formula,

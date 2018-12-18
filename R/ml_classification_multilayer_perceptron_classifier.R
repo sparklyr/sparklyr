@@ -150,7 +150,7 @@ ml_multilayer_perceptron_classifier.tbl_spark <- function(x, formula = NULL, lay
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_multilayer_perceptron_classification,
       predictor = stage,
       formula = formula,

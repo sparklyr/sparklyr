@@ -215,7 +215,7 @@ ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = 
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_logistic_regression,
       predictor = stage,
       formula = formula,

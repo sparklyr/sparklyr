@@ -139,7 +139,7 @@ ml_gbt_regressor.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_dep
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_gbt_regression,
       predictor = stage,
       formula = formula,

@@ -78,7 +78,7 @@ ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, featu
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_one_vs_rest,
       predictor = stage,
       formula = formula,

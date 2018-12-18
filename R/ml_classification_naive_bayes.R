@@ -132,7 +132,7 @@ ml_naive_bayes.tbl_spark <- function(x, formula = NULL, model_type = "multinomia
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_naive_bayes,
       predictor = stage,
       formula = formula,

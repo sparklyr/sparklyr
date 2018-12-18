@@ -198,7 +198,7 @@ ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_generalized_linear_regression,
       predictor = stage,
       formula = formula,
