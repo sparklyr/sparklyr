@@ -138,7 +138,7 @@ ml_decision_tree_classifier.tbl_spark <- function(x, formula = NULL, max_depth =
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_decision_tree_classification,
       predictor = stage,
       formula = formula,

@@ -103,7 +103,7 @@ ml_bisecting_kmeans.tbl_spark <- function(x, formula = NULL, k = 4, max_iter = 2
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_clustering(
+    ml_construct_model_clustering(
       new_ml_model_bisecting_kmeans,
       predictor = stage,
       dataset = x,

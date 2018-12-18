@@ -153,7 +153,7 @@ ml_linear_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = TR
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_linear_regression,
       predictor = stage,
       formula = formula,

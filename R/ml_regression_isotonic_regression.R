@@ -111,7 +111,7 @@ ml_isotonic_regression.tbl_spark <- function(x, formula = NULL, feature_index = 
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_isotonic_regression,
       predictor = stage,
       formula = formula,

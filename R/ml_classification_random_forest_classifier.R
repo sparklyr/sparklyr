@@ -149,7 +149,7 @@ ml_random_forest_classifier.tbl_spark <- function(x, formula = NULL, num_trees =
     stage %>%
       ml_fit(x)
   } else {
-    ml_model_supervised(
+    ml_construct_model_supervised(
       new_ml_model_random_forest_classification,
       predictor = stage,
       formula = formula,
