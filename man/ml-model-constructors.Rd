@@ -6,6 +6,7 @@
 \alias{ml_model}
 \alias{ml_model_classification}
 \alias{ml_model_regression}
+\alias{ml_model_clustering}
 \alias{ml_supervised_pipeline}
 \alias{ml_clustering_pipeline}
 \alias{ml_construct_model_supervised}
@@ -22,6 +23,9 @@ ml_model_classification(pipeline_model, formula, dataset, label_col,
 
 ml_model_regression(pipeline_model, formula, dataset, label_col,
   features_col, ..., class = character())
+
+ml_model_clustering(pipeline_model, formula, dataset, features_col, ...,
+  class = character())
 
 ml_supervised_pipeline(predictor, dataset, formula, features_col,
   label_col)
