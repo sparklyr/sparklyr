@@ -7,16 +7,18 @@ register_mapping_tables <- function() {
 
   read_extension_mappings <- function(file_name) {
     pkgs <- registered_extensions()
-    pkgs %>%
+    mappings <- pkgs %>%
       purrr::map_chr(function(pkg) {
         if (nzchar(devtools_file <- system.file("inst", "sparkml", file_name, package = pkg))) {
           return(devtools_file)
         }
         system.file("sparkml", file_name, package = pkg)
       }) %>%
+      purrr::set_names(pkgs) %>%
       purrr::keep(nzchar) %>%
-      purrr::map(jsonlite::fromJSON) %>%
-      purrr::set_names(pkgs)
+      purrr::map(jsonlite::fromJSON)
+
+    if (length(mappings)) mappings else NULL
   }
 
   read_base_mapping <- function(file_name) {
@@ -33,7 +35,7 @@ register_mapping_tables <- function() {
 
   extension_param_mappings <- read_extension_mappings(file_name = "param_mapping.json")
 
-  if (length(extension_param_mappings)) {
+  if (!is.null(extension_param_mappings)) {
     extension_param_mappings_r_to_s <- extension_param_mappings %>%
       purrr::map(flip_named_list) %>%
       create_env_from_mappings()
@@ -62,7 +64,7 @@ register_mapping_tables <- function() {
 
 
 
-  if (length(extension_class_mappings)) {
+  if (!is.null(extension_class_mappings)) {
     extension_class_mappings <- create_env_from_mappings(extension_class_mappings)
     rlang::env_poke_parent(ml_class_mapping, extension_class_mappings)
 
