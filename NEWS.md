@@ -14,6 +14,8 @@
   
  - `sdf_len()`, `sdf_along()` and `sdf_seq()` default to 32 bit integers
    but allow support for 64 bits through `bits` parameter.
+   
+ - Support for detecting Spark version using `spark-submit`.
 
 # Sparklyr 0.9.3
 
