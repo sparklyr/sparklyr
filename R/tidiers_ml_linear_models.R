@@ -132,7 +132,6 @@ glance.ml_model_generalized_linear_regression <- function(x, ...) {
 #' @rdname ml_glm_tidiers
 #' @export
 glance.ml_model_linear_regression <- function(x, ...) {
-  # browser()
   metric_names <- c("explained_variance", "mean_absolute_error",
                     "mean_squared_error",
                     "r2", "root_mean_squared_error")
