@@ -481,6 +481,13 @@ object Utils {
   def mapRddIntegerToRddRow(rdd: RDD[Long]): RDD[Row] = {
     rdd.map(x => org.apache.spark.sql.Row(x.toInt))
   }
+
+  def readWholeFiles(sc: SparkContext, inputPath: String): RDD[Row] = {
+    case class TextFile(path: String, lines: String)
+    sc.wholeTextFiles(inputPath).map {
+      l => TextFile(l._1, l._2)
+    }
+  }
 }
 
 
