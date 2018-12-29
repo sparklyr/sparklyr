@@ -4,6 +4,11 @@
 
 - Support for Apache Arrow.
 
+### Data
+
+- Support for `whole` parameter for `spark_read_text()` to read an
+  entire text file without splitting contents by line.
+
 ## Other
 
 - Tables with periods supported by setting
