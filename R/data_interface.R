@@ -747,6 +747,7 @@ spark_read_text <- function(sc,
                             repartition = 0,
                             memory = TRUE,
                             overwrite = TRUE,
+                            options = list(),
                             ...) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
