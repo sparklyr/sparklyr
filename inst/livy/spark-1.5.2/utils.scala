@@ -483,9 +483,8 @@ object Utils {
   }
 
   def readWholeFiles(sc: SparkContext, inputPath: String): RDD[Row] = {
-    case class TextFile(path: String, lines: String)
     sc.wholeTextFiles(inputPath).map {
-      l => TextFile(l._1, l._2)
+      l => Row(l._1, l._2)
     }
   }
 }
