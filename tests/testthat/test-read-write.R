@@ -161,7 +161,7 @@ test_that("spark_read_text() can read a whole file", {
   cat("1\n2\n3", file = text_file)
   close(text_file)
 
-  whole_tbl <- spark_read_text(sc, "whole", "test.txt", overwrite = T, whole = TRUE)
+  whole_tbl <- spark_read_text(sc, "whole", normalizePath("test.txt"), overwrite = T, whole = TRUE)
 
   expect_equal(
     whole_tbl %>% collect() %>% nrow(),
