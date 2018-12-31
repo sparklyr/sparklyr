@@ -44,7 +44,7 @@ spark_install_find <- function(version = NULL,
       sparkInstall$version <- sparkVersion
       sparkInstall$hadoop_version <- hadoopVersion
 
-      stop("Spark version not installed. To install, use", deparse(sparkInstall))
+      stop("Spark version not installed. To install, use ", deparse(sparkInstall))
     } else {
       stop("Spark version not available. Find available versions, using spark_available_versions()")
     }
