@@ -725,6 +725,7 @@ spark_write_source.spark_jobj <- function(x,
 #' Read a text file into a Spark DataFrame.
 #'
 #' @inheritParams spark_read_csv
+#' @param whole Read the entire text file as a single entry? Defaults to \code{FALSE}.
 #'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
 #'   the local file system (\code{file://}).
@@ -747,13 +748,26 @@ spark_read_text <- function(sc,
                             repartition = 0,
                             memory = TRUE,
                             overwrite = TRUE,
+                            options = list(),
+                            whole = FALSE,
                             ...) {
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   columns = list(line = "character")
 
-  df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "text", options, columns)
+  if (identical(whole, TRUE)) {
+    path_field <- invoke_static(sc, "sparklyr.SQLUtils", "createStructField", "path", "character", TRUE)
+    contents_field <- invoke_static(sc, "sparklyr.SQLUtils", "createStructField", "contents", "character", TRUE)
+    schema <- invoke_static(sc, "sparklyr.SQLUtils", "createStructType", list(path_field, contents_field))
+
+    rdd <- invoke_static(sc, "sparklyr.Utils", "readWholeFiles", spark_context(sc), path)
+    df <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
+  }
+  else {
+    df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "text", options, columns)
+  }
+
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
