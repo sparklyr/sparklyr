@@ -189,25 +189,31 @@ spark_worker_apply_arrow <- function(sc, config) {
     worker_log("is processing batch ", batch_idx)
 
     df <- as_tibble(record_entry)
-    colnames(df) <- columnNames[1: length(colnames(df))]
+    result <- NULL
 
-    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
+    if (!is.null(df)) {
+      colnames(df) <- columnNames[1: length(colnames(df))]
 
-    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+      result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    result <- spark_worker_clean_factors(result)
+      result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
-    result <- spark_worker_apply_maybe_schema(result, config)
+      result <- spark_worker_clean_factors(result)
 
-    if (is.null(schema_output)) {
-      schema_output <- spark_worker_build_types(context, lapply(result, class))
+      result <- spark_worker_apply_maybe_schema(result, config)
     }
 
-    record <- record_batch(result)
-    raw_batch <- write_record_batch(record, raw())
+    if (!is.null(result)) {
+      if (is.null(schema_output)) {
+        schema_output <- spark_worker_build_types(context, lapply(result, class))
+      }
 
-    all_batches[[length(all_batches) + 1]] <- raw_batch
-    total_rows <- total_rows + nrow(result)
+      record <- record_batch(result)
+      raw_batch <- write_record_batch(record, raw())
+
+      all_batches[[length(all_batches) + 1]] <- raw_batch
+      total_rows <- total_rows + nrow(result)
+    }
 
     record_entry <- read_record_batch(reader)
 

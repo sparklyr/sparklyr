@@ -22,7 +22,7 @@ ml_cross_validator.spark_connection <- function(x, estimator = NULL, estimator_p
     parallelism = parallelism,
     seed = seed
   ) %>%
-    ml_validator_cross_validator()
+    validator_ml_cross_validator()
 
   ml_new_validator(
     x, "org.apache.spark.ml.tuning.CrossValidator", uid,
@@ -30,8 +30,8 @@ ml_cross_validator.spark_connection <- function(x, estimator = NULL, estimator_p
     .args[["seed"]]
   ) %>%
     invoke("setNumFolds", .args[["num_folds"]]) %>%
-    maybe_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
-    maybe_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
+    jobj_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
+    jobj_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
     new_ml_cross_validator()
 }
 
@@ -76,7 +76,7 @@ ml_cross_validator.tbl_spark <- function(x, estimator = NULL, estimator_param_ma
     ml_fit(x)
 }
 
-ml_validator_cross_validator <- function(.args) {
+validator_ml_cross_validator <- function(.args) {
   .args <- validate_args_tuning(.args)
   .args[["num_folds"]] <- cast_scalar_integer(.args[["num_folds"]])
   .args
@@ -86,7 +86,7 @@ new_ml_cross_validator <- function(jobj) {
   new_ml_tuning(
     jobj,
     num_folds = invoke(jobj, "getNumFolds"),
-    subclass = "ml_cross_validator"
+    class = "ml_cross_validator"
   )
 }
 
@@ -106,13 +106,12 @@ new_ml_cross_validator_model <- function(jobj) {
       param_maps_to_df() %>%
       dplyr::mutate(!!metric_name := avg_metrics) %>%
       dplyr::select(!!metric_name, dplyr::everything()),
-    sub_models = function() {
-      try_null(jobj %>%
-                 invoke("subModels") %>%
-                 purrr::map(~ purrr::map(.x, ml_constructor_dispatch))
-      )
-    },
-    subclass = "ml_cross_validator_model")
+    sub_models = possibly_null(
+      ~ jobj %>%
+        invoke("subModels") %>%
+        purrr::map(~ purrr::map(.x, ml_call_constructor))
+    ),
+    class = "ml_cross_validator_model")
 }
 
 #' @export

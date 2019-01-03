@@ -224,33 +224,33 @@ initialize_connection <- function(sc) {
   UseMethod("initialize_connection")
 }
 
-new_spark_connection <- function(scon, ..., subclass = NULL) {
+new_spark_connection <- function(scon, ..., class = character()) {
   structure(
     scon,
     ...,
-    class = c("spark_connection", subclass, "DBIConnection")
+    class = c("spark_connection", class, "DBIConnection")
   )
 }
 
-new_spark_shell_connection <- function(scon, ..., subclass = NULL) {
+new_spark_shell_connection <- function(scon, ..., class = character()) {
   new_spark_connection(
     scon,
     ...,
-    subclass = c(subclass, "spark_shell_connection")
+    class = c(class, "spark_shell_connection")
   )
 }
 
-new_spark_gateway_connection <- function(scon, ..., subclass = NULL) {
+new_spark_gateway_connection <- function(scon, ..., class = character()) {
   new_spark_shell_connection(
     scon,
     ...,
-    subclass = c(subclass, "spark_gateway_connection")
+    class = c(class, "spark_gateway_connection")
   )
 }
 
 new_livy_connection <- function(scon) {
   new_spark_connection(
     scon,
-    subclass = "livy_connection"
+    class = "livy_connection"
   )
 }

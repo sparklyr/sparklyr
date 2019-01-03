@@ -20,6 +20,8 @@ ft_regex_tokenizer <- function(x, input_col = NULL, output_col = NULL, gaps = TR
   UseMethod("ft_regex_tokenizer")
 }
 
+ml_regex_tokenizer <- ft_regex_tokenizer
+
 #' @export
 ft_regex_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
                                                 min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
@@ -34,9 +36,9 @@ ft_regex_tokenizer.spark_connection <- function(x, input_col = NULL, output_col 
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_regex_tokenizer()
+    validator_ml_regex_tokenizer()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.RegexTokenizer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setGaps", .args[["gaps"]]) %>%
@@ -84,10 +86,10 @@ ft_regex_tokenizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_regex_tokenizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_regex_tokenizer")
+  new_ml_transformer(jobj, class = "ml_regex_tokenizer")
 }
 
-ml_validator_regex_tokenizer <- function(.args) {
+validator_ml_regex_tokenizer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["gaps"]] <- cast_scalar_logical(.args[["gaps"]])
   .args[["min_token_length"]] <- cast_scalar_integer(.args[["min_token_length"]])

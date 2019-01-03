@@ -1,24 +1,25 @@
-new_ml_model_linear_svc <- function(pipeline, pipeline_model, model,
-                                    dataset, formula, feature_names,
-                                    index_labels, call) {
+new_ml_model_linear_svc <- function(pipeline_model, formula, dataset, label_col,
+                                    features_col, predicted_label_col) {
+  m <- new_ml_model_classification(
+    pipeline_model, formula, dataset = dataset,
+    label_col = label_col, features_col = features_col,
+    predicted_label_col = predicted_label_col,
+    class = "ml_model_linear_svc"
+  )
+
+  model <- m$model
   jobj <- spark_jobj(model)
-  sc <- spark_connection(model)
 
   coefficients <- model$coefficients
-  names(coefficients) <- feature_names
+  names(coefficients) <- m$feature_names
 
-  coefficients <- if (ml_param(model, "fit_intercept"))
+  m$coefficients <- if (ml_param(model, "fit_intercept"))
     rlang::set_names(
       c(invoke(jobj, "intercept"), model$coefficients),
-      c("(Intercept)", feature_names))
+      c("(Intercept)", m$feature_names)
+    )
 
-  new_ml_model_classification(
-    pipeline, pipeline_model, model, dataset, formula,
-    coefficients = coefficients,
-    subclass = "ml_model_linear_svc",
-    .features = feature_names,
-    .index_labels = index_labels
-  )
+  m
 }
 
 #' @export

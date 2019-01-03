@@ -1,4 +1,4 @@
-new_ml_evaluator <- function(jobj, ..., subclass = NULL) {
+new_ml_evaluator <- function(jobj, ..., class = character()) {
   structure(
     list(
       uid = invoke(jobj, "uid"),
@@ -7,7 +7,7 @@ new_ml_evaluator <- function(jobj, ..., subclass = NULL) {
       ...,
       .jobj = jobj
     ),
-    class = c(subclass, "ml_evaluator")
+    class = c(class, "ml_evaluator")
   )
 }
 

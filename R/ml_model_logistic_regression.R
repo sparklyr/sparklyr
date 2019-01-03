@@ -1,7 +1,13 @@
-new_ml_model_logistic_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, index_labels,
-  call) {
+new_ml_model_logistic_regression <- function(pipeline_model, formula, dataset, label_col,
+                                             features_col, predicted_label_col) {
+  m <- new_ml_model_classification(
+    pipeline_model, formula, dataset = dataset,
+    label_col = label_col, features_col = features_col,
+    predicted_label_col = predicted_label_col,
+    class = "ml_model_logistic_regression"
+  )
 
+  model <- m$model
   jobj <- spark_jobj(model)
   sc <- spark_connection(model)
 
@@ -11,46 +17,37 @@ new_ml_model_logistic_regression <- function(
 
   # extract coefficients (can be either a vector or matrix, depending
   # on binomial vs. multinomial)
-  coefficients <- if (is_multinomial) {
+  m$coefficients <- if (is_multinomial) {
     spark_require_version(sc, "2.1.0", "Multinomial regression")
 
     # multinomial
     coefficients <- model$coefficient_matrix
-    colnames(coefficients) <- feature_names
-    rownames(coefficients) <- index_labels
+    colnames(coefficients) <- m$feature_names
+    rownames(coefficients) <- m$index_labels
 
     if (ml_param(model, "fit_intercept")) {
       intercept <- model$intercept_vector
       coefficients <- cbind(intercept, coefficients)
-      colnames(coefficients) <- c("(Intercept)", feature_names)
+      colnames(coefficients) <- c("(Intercept)", m$feature_names)
     }
     coefficients
   } else {
     # binomial
 
-    coefficients <- if (ml_param(model, "fit_intercept"))
+    if (ml_param(model, "fit_intercept")) {
       rlang::set_names(
         c(invoke(jobj, "intercept"), model$coefficients),
-        c("(Intercept)", feature_names)
+        c("(Intercept)", m$feature_names)
       )
-    else
-      rlang::set_names(model$coefficients, feature_names)
-    coefficients
+    } else {
+      rlang::set_names(model$coefficients, m$feature_names)
+    }
   }
 
-  summary <- model$summary
+  m$summary <- model$summary
 
-  new_ml_model_classification(
-    pipeline, pipeline_model,
-    model, dataset, formula,
-    coefficients = coefficients,
-    summary = summary,
-    subclass = "ml_model_logistic_regression",
-    .features = feature_names,
-    .index_labels = index_labels
-  )
+  m
 }
-
 
 # Generic implementations
 

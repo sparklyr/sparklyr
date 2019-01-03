@@ -35,6 +35,8 @@ ft_bucketizer <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
   UseMethod("ft_bucketizer")
 }
 
+ml_bucketizer <- ft_bucketizer
+
 #' @export
 ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
                                            input_cols = NULL, output_cols = NULL, splits_array = NULL,
@@ -50,16 +52,16 @@ ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NUL
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_bucketizer()
+    validator_ml_bucketizer()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Bucketizer", .args[["uid"]],
     input_col = .args[["input_col"]], output_col = .args[["output_col"]]
   ) %>%
-    maybe_set_param("setSplits", .args[["splits"]]) %>%
-    maybe_set_param("setInputCols", .args[["input_cols"]], "2.3.0") %>%
-    maybe_set_param("setOutputCols", .args[["output_cols"]], "2.3.0") %>%
-    maybe_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error")
+    jobj_set_param("setSplits", .args[["splits"]]) %>%
+    jobj_set_param("setInputCols", .args[["input_cols"]], "2.3.0") %>%
+    jobj_set_param("setOutputCols", .args[["output_cols"]], "2.3.0") %>%
+    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error")
   if (!is.null(.args[["splits_array"]]))
     jobj <- invoke_static(x, "sparklyr.BucketizerUtils", "setSplitsArrayParam",
                           jobj, .args[["splits_array"]])
@@ -106,11 +108,11 @@ ft_bucketizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, spli
 }
 
 new_ml_bucketizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_bucketizer")
+  new_ml_transformer(jobj, class = "ml_bucketizer")
 }
 
 # Validator
-ml_validator_bucketizer <- function(.args) {
+validator_ml_bucketizer <- function(.args) {
   .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]]))

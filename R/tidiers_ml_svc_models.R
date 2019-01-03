@@ -20,8 +20,7 @@ tidy.ml_model_linear_svc <- function(x, ...){
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_model_linear_svc <- function(x, newdata = NULL,
-                                                 ...){
+augment.ml_model_linear_svc <- function(x, newdata = NULL, ...) {
 
   broom_augment_supervised(x, newdata = newdata)
 }

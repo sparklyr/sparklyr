@@ -105,5 +105,5 @@ ml_load <- function(sc, path) {
   }
 
   invoke_static(sc, class, "load", path) %>%
-    ml_constructor_dispatch()
+    ml_call_constructor()
 }

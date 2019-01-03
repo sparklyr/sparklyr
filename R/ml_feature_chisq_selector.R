@@ -23,6 +23,8 @@ ft_chisq_selector <- function(x, features_col = "features", output_col = NULL, l
   UseMethod("ft_chisq_selector")
 }
 
+ml_chisq_selector <- ft_chisq_selector
+
 #' @export
 ft_chisq_selector.spark_connection <- function(x, features_col = "features", output_col = NULL, label_col = "label",
                                                selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
@@ -41,19 +43,19 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_chisq_selector()
+    validator_ml_chisq_selector()
 
-  estimator <- ml_new_transformer(
+  estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.ChiSqSelector", output_col = .args[["output_col"]],
     uid = .args[["uid"]]) %>%
-    maybe_set_param("setFdr", .args[["fdr"]], "2.2.0", 0.05) %>%
+    jobj_set_param("setFdr", .args[["fdr"]], "2.2.0", 0.05) %>%
     invoke("setFeaturesCol", .args[["features_col"]]) %>%
-    maybe_set_param("setFpr", .args[["fpr"]], "2.1.0", 0.05) %>%
-    maybe_set_param("setFwe", .args[["fwe"]], "2.2.0", 0.05) %>%
+    jobj_set_param("setFpr", .args[["fpr"]], "2.1.0", 0.05) %>%
+    jobj_set_param("setFwe", .args[["fwe"]], "2.2.0", 0.05) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
     invoke("setNumTopFeatures", .args[["num_top_features"]]) %>%
-    maybe_set_param("setPercentile", .args[["percentile"]], "2.1.0", 0.1) %>%
-    maybe_set_param("setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures") %>%
+    jobj_set_param("setPercentile", .args[["percentile"]], "2.1.0", 0.1) %>%
+    jobj_set_param("setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures") %>%
     new_ml_chisq_selector()
 
   if (is.null(dataset))
@@ -113,14 +115,14 @@ ft_chisq_selector.tbl_spark <- function(x, features_col = "features", output_col
 }
 
 new_ml_chisq_selector <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_chisq_selector")
+  new_ml_estimator(jobj, class = "ml_chisq_selector")
 }
 
 new_ml_chisq_selector_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_chisq_selector_model")
+  new_ml_transformer(jobj, class = "ml_chisq_selector_model")
 }
 
-ml_validator_chisq_selector <- function(.args) {
+validator_ml_chisq_selector <- function(.args) {
   .args[["features_col"]] <- cast_string(.args[["features_col"]])
   .args[["label_col"]] <- cast_string(.args[["label_col"]])
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])

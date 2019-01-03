@@ -43,11 +43,12 @@ ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, 
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_kmeans()
+    validator_ml_kmeans()
 
-  jobj <- ml_new_clustering(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.clustering.KMeans", uid,
-    .args[["features_col"]], .args[["k"]], .args[["max_iter"]], .args[["seed"]]
+    features_col = .args[["features_col"]], k = .args[["k"]],
+    max_iter = .args[["max_iter"]], seed = .args[["seed"]]
   ) %>%
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setInitSteps", .args[["init_steps"]]) %>%
@@ -84,7 +85,7 @@ ml_kmeans.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1
                                 init_steps = 2, init_mode = "k-means||", seed = NULL,
                                 features_col = "features", prediction_col = "prediction",
                                 uid = random_string("kmeans_"), features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, features = features)
 
   stage <- ml_kmeans.spark_connection(
     x = spark_connection(x),
@@ -105,15 +106,18 @@ ml_kmeans.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(
-      x, predictor = stage, formula = formula, features_col = features_col,
-      type = "clustering", constructor = new_ml_model_kmeans
+    ml_construct_model_clustering(
+      new_ml_model_kmeans,
+      predictor = stage,
+      dataset = x,
+      formula = formula,
+      features_col = features_col
     )
   }
 }
 
 # Validator
-ml_validator_kmeans <- function(.args) {
+validator_ml_kmeans <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     centers = "k",
     tolerance = "tol",
@@ -129,25 +133,27 @@ ml_validator_kmeans <- function(.args) {
 }
 
 new_ml_kmeans <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_kmeans")
+  new_ml_estimator(jobj, class = "ml_kmeans")
 }
 
 new_ml_kmeans_model <- function(jobj) {
-  summary <- try_null(new_ml_summary_kmeans_model(invoke(jobj, "summary")))
+  summary <- possibly_null(~ new_ml_summary_kmeans_model(invoke(jobj, "summary")))()
   new_ml_clustering_model(
     jobj,
     # `def clusterCenters`
-    cluster_centers = function() try_null(invoke(jobj, "clusterCenters")) %>%
-      purrr::map(invoke, "toArray"),
+    cluster_centers = possibly_null(
+      ~ invoke(jobj, "clusterCenters") %>%
+        purrr::map(invoke, "toArray")
+    ),
     compute_cost = function(dataset) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },
     summary = summary,
-    subclass = "ml_kmeans_model")
+    class = "ml_kmeans_model")
 }
 
 new_ml_summary_kmeans_model <- function(jobj) {
   new_ml_summary_clustering(
     jobj,
-    subclass = "ml_summary_kmeans")
+    class = "ml_summary_kmeans")
 }

@@ -24,15 +24,15 @@ ml_train_validation_split.spark_connection <- function(x, estimator = NULL, esti
     parallelism = parallelism,
     seed = seed
   ) %>%
-    ml_validator_train_validation_split()
+    validator_ml_train_validation_split()
 
   ml_new_validator(
     x, "org.apache.spark.ml.tuning.TrainValidationSplit", uid,
     .args[["estimator"]], .args[["evaluator"]], .args[["estimator_param_maps"]], .args[["seed"]]
   ) %>%
     invoke("setTrainRatio", .args[["train_ratio"]]) %>%
-    maybe_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
-    maybe_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
+    jobj_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
+    jobj_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
     new_ml_train_validation_split()
 }
 
@@ -79,7 +79,7 @@ ml_train_validation_split.tbl_spark <- function(x, estimator = NULL, estimator_p
     ml_fit(x)
 }
 
-ml_validator_train_validation_split <- function(.args) {
+validator_ml_train_validation_split <- function(.args) {
   .args <- validate_args_tuning(.args)
   .args[["train_ratio"]] <- cast_scalar_double(.args[["train_ratio"]])
   .args
@@ -89,7 +89,7 @@ new_ml_train_validation_split <- function(jobj) {
   new_ml_tuning(
     jobj,
     train_ratio = invoke(jobj, "getTrainRatio"),
-    subclass = "ml_train_validation_split"
+    class = "ml_train_validation_split"
   )
 }
 
@@ -108,13 +108,12 @@ new_ml_train_validation_split_model <- function(jobj) {
       param_maps_to_df() %>%
       dplyr::mutate(!!metric_name := validation_metrics) %>%
       dplyr::select(!!metric_name, dplyr::everything()),
-    sub_models = function() {
-      try_null(jobj %>%
-                 invoke("subModels") %>%
-                 purrr::map(ml_constructor_dispatch)
-      )
-    },
-    subclass = "ml_train_validation_split_model")
+    sub_models = possibly_null(
+      ~ jobj %>%
+        invoke("subModels") %>%
+        purrr::map(ml_call_constructor)
+    ),
+    class = "ml_train_validation_split_model")
 }
 
 #' @export

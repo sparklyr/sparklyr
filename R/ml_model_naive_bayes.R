@@ -1,23 +1,24 @@
-new_ml_model_naive_bayes <- function(pipeline, pipeline_model, model,
-                                     dataset, formula, feature_names,
-                                     index_labels, call) {
+new_ml_model_naive_bayes <- function(pipeline_model, formula, dataset, label_col,
+                                      features_col, predicted_label_col) {
+  m <- new_ml_model_classification(
+    pipeline_model, formula, dataset = dataset,
+    label_col = label_col, features_col = features_col,
+    predicted_label_col = predicted_label_col,
+    class = "ml_model_naive_bayes"
+  )
+
+  model <- m$model
 
   pi <- model$pi
-  names(pi) <- index_labels
+  names(pi) <- m$index_labels
+  m$pi <- pi
 
   theta <- model$theta
-  rownames(theta) <- index_labels
-  colnames(theta) <- feature_names
+  rownames(theta) <- m$index_labels
+  colnames(theta) <- m$feature_names
+  m$theta <- theta
 
-
-  new_ml_model_classification(
-    pipeline, pipeline_model, model, dataset, formula,
-    subclass = "ml_model_naive_bayes",
-    !!!list(pi = pi,
-            theta = theta,
-            .features = feature_names,
-            .index_labels = index_labels)
-  )
+  m
 }
 
 # Generic implementations

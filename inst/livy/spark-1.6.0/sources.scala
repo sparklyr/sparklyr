@@ -845,8 +845,24 @@ attach_connection <- function(jobj, connection) {
 # jobj -> Object, where jobj is an object created in the backend
 # nolint end
 
+get_type <- function(object, types = NULL) {
+  if (is.null(object)) return("NULL")
+  if (is.null(types))
+    types <- c("integer", "character", "logical", "double", "numeric", "raw", "array",
+      "list", "struct", "spark_jobj", "environment", "Date", "POSIXlt",
+      "POSIXct", "factor", "data.frame")
+
+  if (!length(types))
+    stop("Unsupported type '", class(object)[[1]], "' for serialization")
+
+  if (inherits(object, type <- types[[1]]))
+    return(type)
+
+  get_type(object, tail(types, -1))
+}
+
 getSerdeType <- function(object) {
-  type <- class(object)[[1]]
+  type <- get_type(object)
 
   if (type != "list") {
     type
@@ -870,7 +886,7 @@ getSerdeType <- function(object) {
 }
 
 writeObject <- function(con, object, writeType = TRUE) {
-  type <- class(object)[[1]]
+  type <- get_type(object)
 
   if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
     if (is.na(object)) {
@@ -901,7 +917,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
-         stop(paste("Unsupported type for serialization", type)))
+         stop("Unsupported type '", type, "' for serialization"))
 }
 
 writeVoid <- function(con) {
@@ -918,7 +934,7 @@ writeJobj <- function(con, value) {
 writeString <- function(con, value) {
   utfVal <- enc2utf8(value)
   writeInt(con, as.integer(nchar(utfVal, type = "bytes") + 1))
-  writeBin(utfVal, con, endian = "big", useBytes = TRUE)
+  writeBin(as.character(utfVal), con, endian = "big", useBytes = TRUE)
 }
 
 writeInt <- function(con, value) {
@@ -926,7 +942,7 @@ writeInt <- function(con, value) {
 }
 
 writeDouble <- function(con, value) {
-  writeBin(value, con, endian = "big")
+  writeBin(as.double(value), con, endian = "big")
 }
 
 writeBoolean <- function(con, value) {
@@ -958,7 +974,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
-                 stop(paste("Unsupported type for serialization", class)))
+                 stop("Unsupported type '", type, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
 
@@ -1246,25 +1262,31 @@ spark_worker_apply_arrow <- function(sc, config) {
     worker_log("is processing batch ", batch_idx)
 
     df <- as_tibble(record_entry)
-    colnames(df) <- columnNames[1: length(colnames(df))]
+    result <- NULL
 
-    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
+    if (!is.null(df)) {
+      colnames(df) <- columnNames[1: length(colnames(df))]
 
-    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+      result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    result <- spark_worker_clean_factors(result)
+      result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
-    result <- spark_worker_apply_maybe_schema(result, config)
+      result <- spark_worker_clean_factors(result)
 
-    if (is.null(schema_output)) {
-      schema_output <- spark_worker_build_types(context, lapply(result, class))
+      result <- spark_worker_apply_maybe_schema(result, config)
     }
 
-    record <- record_batch(result)
-    raw_batch <- write_record_batch(record, raw())
+    if (!is.null(result)) {
+      if (is.null(schema_output)) {
+        schema_output <- spark_worker_build_types(context, lapply(result, class))
+      }
 
-    all_batches[[length(all_batches) + 1]] <- raw_batch
-    total_rows <- total_rows + nrow(result)
+      record <- record_batch(result)
+      raw_batch <- write_record_batch(record, raw())
+
+      all_batches[[length(all_batches) + 1]] <- raw_batch
+      total_rows <- total_rows + nrow(result)
+    }
 
     record_entry <- read_record_batch(reader)
 

@@ -13,6 +13,8 @@ ft_idf <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_idf")
 }
 
+ml_idf <- ft_idf
+
 #' @export
 ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                     min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
@@ -23,9 +25,9 @@ ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_idf()
+    validator_ml_idf()
 
-  estimator <- ml_new_transformer(
+  estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.IDF",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setMinDocFreq", .args[["min_doc_freq"]]) %>%
@@ -72,14 +74,14 @@ ft_idf.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_idf <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_idf")
+  new_ml_estimator(jobj, class = "ml_idf")
 }
 
 new_ml_idf_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_idf_model")
+  new_ml_transformer(jobj, class = "ml_idf_model")
 }
 
-ml_validator_idf <- function(.args) {
+validator_ml_idf <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["min_doc_freq"]] <- cast_scalar_integer(.args[["min_doc_freq"]])
   .args

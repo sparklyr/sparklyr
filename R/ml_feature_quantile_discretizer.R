@@ -51,6 +51,8 @@ ft_quantile_discretizer <- function(x, input_col = NULL, output_col = NULL, num_
   UseMethod("ft_quantile_discretizer")
 }
 
+ml_quantile_discretizer <- ft_quantile_discretizer
+
 #' @export
 ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
                                                      input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
@@ -68,18 +70,18 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_quantile_discretizer()
+    validator_ml_quantile_discretizer()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.QuantileDiscretizer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]],
     input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]],
     uid = .args[["uid"]]
   ) %>%
-    maybe_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
-    maybe_set_param("setRelativeError", .args[["relative_error"]], "2.0.0", 0.001) %>%
-    maybe_set_param("setNumBuckets", .args[["num_buckets"]]) %>%
-    maybe_set_param("setNumBucketsArray", .args[["num_buckets_array"]], "2.3.0")
+    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
+    jobj_set_param("setRelativeError", .args[["relative_error"]], "2.0.0", 0.001) %>%
+    jobj_set_param("setNumBuckets", .args[["num_buckets"]]) %>%
+    jobj_set_param("setNumBucketsArray", .args[["num_buckets_array"]], "2.3.0")
 
   estimator <- jobj %>%
     new_ml_quantile_discretizer()
@@ -139,10 +141,10 @@ ft_quantile_discretizer.tbl_spark <- function(x, input_col = NULL, output_col = 
 }
 
 new_ml_quantile_discretizer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_quantile_discretizer")
+  new_ml_estimator(jobj, class = "ml_quantile_discretizer")
 }
 
-ml_validator_quantile_discretizer <- function(.args) {
+validator_ml_quantile_discretizer <- function(.args) {
   .args <- ml_backwards_compatibility(.args, list(
     n.buckets = "num_buckets"
   )) %>%
