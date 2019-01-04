@@ -632,3 +632,30 @@ stream_write_kafka <- function(x,
                        checkpoint = checkpoint,
                        stream_options = options)
 }
+
+#' Read Socket Stream
+#'
+#' Reads a Socket stream as a Spark dataframe stream.
+#'
+#' @inheritParams stream_read_csv
+#'
+#' @family Spark stream serialization
+#'
+#' @export
+stream_read_scoket <- function(sc,
+                               name = NULL,
+                               columns = NULL,
+                               options = list(),
+                               ...)
+{
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  name <- name %||% random_string("sparklyr_tmp_")
+
+  stream_read_generic(sc,
+                      path = NULL,
+                      type = "socket",
+                      name = name,
+                      columns = columns,
+                      stream_options = options)
+}

@@ -1,5 +1,7 @@
 # Sparklyr 0.9.4
 
+- Support for `stream_read_scoket()` to read socket streams.
+
 - Fix to `spark_read_kafka()` to remove unused `path`.
 
 # Sparklyr 0.9.3
