@@ -55,10 +55,19 @@ stream_read_generic <- function(sc,
     streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
   }
 
-  streamOptions %>%
-    invoke("schema", schema) %>%
-    invoke(type, path) %>%
-    invoke("createOrReplaceTempView", name)
+  if (is.null(path)) {
+    streamOptions %>%
+      invoke("schema", schema) %>%
+      invoke("format", type) %>%
+      invoke("load") %>%
+      invoke("createOrReplaceTempView", name)
+  }
+  else {
+    streamOptions %>%
+      invoke("schema", schema) %>%
+      invoke(type, path) %>%
+      invoke("createOrReplaceTempView", name)
+  }
 
   tbl(sc, name)
 }
@@ -565,7 +574,6 @@ stream_write_orc <- function(x,
 #'
 #' @export
 stream_read_kafka <- function(sc,
-                              path,
                               name = NULL,
                               columns = NULL,
                               options = list(),
@@ -576,7 +584,7 @@ stream_read_kafka <- function(sc,
   name <- name %||% random_string("sparklyr_tmp_")
 
   stream_read_generic(sc,
-                      path = path,
+                      path = NULL,
                       type = "kafka",
                       name = name,
                       columns = columns,

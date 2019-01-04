@@ -4,14 +4,11 @@
 \alias{stream_read_kafka}
 \title{Read Kafka Stream}
 \usage{
-stream_read_kafka(sc, path, name = NULL, columns = NULL,
-  options = list(), ...)
+stream_read_kafka(sc, name = NULL, columns = NULL, options = list(),
+  ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
-
-\item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 
 \item{name}{The name to assign to the newly generated stream.}
 
