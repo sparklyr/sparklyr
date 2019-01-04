@@ -659,3 +659,43 @@ stream_read_scoket <- function(sc,
                       columns = columns,
                       stream_options = options)
 }
+
+#' Write Console Stream
+#'
+#' Writes a Spark dataframe stream into console logs.
+#'
+#' @inheritParams stream_write_memory
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' sdf_len(sc, 10) %>% dplyr::transmute(text = as.character(id)) %>% spark_write_text("text-in")
+#'
+#' stream <- stream_read_text(sc, "text-in") %>% stream_write_console()
+#'
+#' stop_stream(stream)
+#'
+#' }
+#'
+#' @export
+stream_write_console <- function(x,
+                                 options = list(),
+                                 trigger = stream_trigger_interval(),
+                                 ...)
+{
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
+  sc <- spark_connection(x)
+
+  stream_write_generic(x,
+                       path = NULL,
+                       type = "console",
+                       mode = "append",
+                       trigger = trigger,
+                       checkpoint = NULL,
+                       stream_options = options)
+}
