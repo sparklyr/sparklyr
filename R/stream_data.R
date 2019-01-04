@@ -236,10 +236,12 @@ stream_write_csv <- function(x,
 #'
 #' sc <- spark_connect(master = "local")
 #'
-#' dir.create("iris-in")
-#' write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
+#' dir.create("csv-in")
+#' write.csv(iris, "csv-in/data.csv", row.names = FALSE)
 #'
-#' stream <- stream_read_csv(sc, "iris-in") %>% stream_write_memory()
+#' csv_path <- file.path("file://", getwd(), "csv-in")
+#'
+#' stream <- stream_read_csv(sc, csv_path) %>% stream_write_memory("csv-out")
 #'
 #' stream_stop(stream)
 #'
@@ -328,9 +330,11 @@ stream_read_text <- function(sc,
 #' sc <- spark_connect(master = "local")
 #'
 #' dir.create("text-in")
-#' write.csv("A text entry", "text-in/text.txt", row.names = FALSE)
+#' writeLines("A text entry", "text-in/text.txt")
 #'
-#' stream <- stream_read_text(sc, "text-in") %>% stream_write_text("text-out")
+#' text_path <- file.path("file://", getwd(), "text-in")
+#'
+#' stream <- stream_read_text(sc, text_path) %>% stream_write_text("text-out")
 #'
 #' stream_stop(stream)
 #'
@@ -400,9 +404,11 @@ stream_read_json <- function(sc,
 #' sc <- spark_connect(master = "local")
 #'
 #' dir.create("json-in")
-#' jsonlite::write_json(list(a = c(1,2), b = c(10,20)), "../streaming/json-in/data.json")
+#' jsonlite::write_json(list(a = c(1,2), b = c(10,20)), "json-in/data.json")
 #'
-#' stream <- stream_read_json(sc, "json-in") %>% stream_write_json("json-out")
+#' json_path <- file.path("file://", getwd(), "json-in")
+#'
+#' stream <- stream_read_json(sc, json_path) %>% stream_write_json("json-out")
 #'
 #' stream_stop(stream)
 #'
