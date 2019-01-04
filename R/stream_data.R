@@ -47,6 +47,9 @@ stream_read_generic <- function(sc,
   else if ("spark_jobj" %in% class(columns)) {
     schema <- columns
   }
+  else if (identical(columns, FALSE)) {
+    schema <- NULL
+  }
   else {
     schema <- spark_data_build_types(sc, columns)
   }
@@ -55,16 +58,19 @@ stream_read_generic <- function(sc,
     streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
   }
 
+  if (!identical(columns, FALSE)) {
+    schema <- streamOptions %>%
+      invoke("schema", schema)
+  }
+
   if (is.null(path)) {
-    streamOptions %>%
-      invoke("schema", schema) %>%
+    schema %>%
       invoke("format", type) %>%
       invoke("load") %>%
       invoke("createOrReplaceTempView", name)
   }
   else {
-    streamOptions %>%
-      invoke("schema", schema) %>%
+    schema %>%
       invoke(type, path) %>%
       invoke("createOrReplaceTempView", name)
   }
@@ -575,7 +581,6 @@ stream_write_orc <- function(x,
 #' @export
 stream_read_kafka <- function(sc,
                               name = NULL,
-                              columns = NULL,
                               options = list(),
                               ...)
 {
@@ -587,7 +592,7 @@ stream_read_kafka <- function(sc,
                       path = NULL,
                       type = "kafka",
                       name = name,
-                      columns = columns,
+                      columns = FALSE,
                       stream_options = options)
 }
 
