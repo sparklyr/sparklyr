@@ -648,6 +648,17 @@ stream_write_kafka <- function(x,
 #'
 #' @family Spark stream serialization
 #'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' # Start socket server from terminal, example: nc -lk 9999
+#' stream <- stream_read_scoket(sc, options = list(host = "localhost", port = 9999))
+#' stream
+#'
+#' }
+#'
 #' @export
 stream_read_scoket <- function(sc,
                                name = NULL,
