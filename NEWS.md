@@ -1,5 +1,7 @@
 # Sparklyr 0.9.4
 
+- Fix issue while printing Spark data frames under `tibble` 2.0.0 (#1829).
+
 - Support for `stream_write_console()` to write to console log.
 
 - Support for `stream_read_scoket()` to read socket streams.
