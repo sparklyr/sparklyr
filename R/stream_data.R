@@ -58,7 +58,9 @@ stream_read_generic <- function(sc,
     streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
   }
 
-  if (!identical(columns, FALSE)) {
+  if (identical(schema, NULL)) {
+    schema <- streamOptions
+  } else {
     schema <- streamOptions %>%
       invoke("schema", schema)
   }
@@ -661,7 +663,7 @@ stream_read_scoket <- function(sc,
                       path = NULL,
                       type = "socket",
                       name = name,
-                      columns = columns,
+                      columns = FALSE,
                       stream_options = options)
 }
 
@@ -688,6 +690,7 @@ stream_read_scoket <- function(sc,
 #'
 #' @export
 stream_write_console <- function(x,
+                                 mode = c("append", "complete", "update"),
                                  options = list(),
                                  trigger = stream_trigger_interval(),
                                  ...)
@@ -699,7 +702,7 @@ stream_write_console <- function(x,
   stream_write_generic(x,
                        path = NULL,
                        type = "console",
-                       mode = "append",
+                       mode = mode,
                        trigger = trigger,
                        checkpoint = NULL,
                        stream_options = options)
