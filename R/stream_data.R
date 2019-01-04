@@ -241,7 +241,7 @@ stream_write_csv <- function(x,
 #'
 #' stream <- stream_read_csv(sc, "iris-in") %>% stream_write_memory()
 #'
-#' stop_stream(stream)
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -332,7 +332,7 @@ stream_read_text <- function(sc,
 #'
 #' stream <- stream_read_text(sc, "text-in") %>% stream_write_text("text-out")
 #'
-#' stop_stream(stream)
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -404,7 +404,7 @@ stream_read_json <- function(sc,
 #'
 #' stream <- stream_read_json(sc, "json-in") %>% stream_write_json("json-out")
 #'
-#' stop_stream(stream)
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -546,7 +546,7 @@ stream_read_orc <- function(sc,
 #'
 #' stream <- stream_read_parquet(sc, "orc-in") %>% stream_write_parquet("orc-out")
 #'
-#' stop_stream(stream)
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -615,7 +615,7 @@ stream_read_kafka <- function(sc,
 #'
 #' stream <- stream_read_parquet(sc, "orc-in") %>% stream_write_parquet("orc-out")
 #'
-#' stop_stream(stream)
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -695,7 +695,7 @@ stream_read_scoket <- function(sc,
 #'
 #' stream <- stream_read_text(sc, "text-in") %>% stream_write_console()
 #'
-#' stop_stream(stream)
+#' stream_stop(stream)
 #'
 #' }
 #'
