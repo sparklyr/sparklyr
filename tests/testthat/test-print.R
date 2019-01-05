@@ -6,13 +6,10 @@ test_that("print supports spark tables", {
   printed <- capture.output(print(sdf_len(sc, 2)))
 
   expect_equal(
-    printed,
+    printed[1:2],
     c(
       "# Source: spark<?> [?? x 1]",
-      "     id",
-      "* <dbl>",
-      "1     1",
-      "2     2"
+      "     id"
     )
   )
 })
