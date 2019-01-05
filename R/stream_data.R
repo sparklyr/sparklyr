@@ -550,7 +550,7 @@ stream_read_orc <- function(sc,
 #'
 #' sdf_len(sc, 10) %>% spark_write_orc("orc-in")
 #'
-#' stream <- stream_read_parquet(sc, "orc-in") %>% stream_write_parquet("orc-out")
+#' stream <- stream_read_orc(sc, "orc-in") %>% stream_write_orc("orc-out")
 #'
 #' stream_stop(stream)
 #'
@@ -584,6 +584,10 @@ stream_write_orc <- function(x,
 #'
 #' @inheritParams stream_read_csv
 #'
+#' @details Please note that Kafka requires installing the appropriate
+#'  package by conneting with a config setting where \code{sparklyr.shell.packages}
+#'  is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+#'
 #' @family Spark stream serialization
 #'
 #' @export
@@ -610,16 +614,34 @@ stream_read_kafka <- function(sc,
 #'
 #' @inheritParams stream_write_memory
 #'
+#' @details Please note that Kafka requires installing the appropriate
+#'  package by conneting with a config setting where \code{sparklyr.shell.packages}
+#'  is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+#'
 #' @family Spark stream serialization
 #'
 #' @examples
 #' \dontrun{
 #'
-#' sc <- spark_connect(master = "local")
+#' config <- spark_config()
 #'
-#' sdf_len(sc, 10) %>% spark_write_orc("orc-in")
+#' # The following package is dependent to Spark version, for Spark 2.3.2:
+#' config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
 #'
-#' stream <- stream_read_parquet(sc, "orc-in") %>% stream_write_parquet("orc-out")
+#' sc <- spark_connect(master = "local", config = config)
+#'
+#' read_options <- list(
+#'   kafka.bootstrap.servers = "localhost:9092",
+#'   subscribe = "topic1")
+#'
+#' write_options <- list(
+#'   kafka.bootstrap.servers = "localhost:9092",
+#'   topic = "topic2")
+#'
+#' stream <- stream_read_kafka(sc, options = kafka_options) %>%
+#'   stream_write_kafka(options = write_options)
+#'
+#' stream <- stream_read_kafka(sc, options = c(kafka.bootstrap.servers = "localhost:9092", subscribe = "test4")) %>% dplyr::transmute(value = as.character(value)) %>% stream_write_kafka(options = list(kafka.bootstrap.servers = "localhost:9092", topic = "test5"))
 #'
 #' stream_stop(stream)
 #'
