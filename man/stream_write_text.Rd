@@ -37,11 +37,13 @@ Writes a Spark dataframe stream into a text stream.
 sc <- spark_connect(master = "local")
 
 dir.create("text-in")
-write.csv("A text entry", "text-in/text.txt", row.names = FALSE)
+writeLines("A text entry", "text-in/text.txt")
 
-stream <- stream_read_text(sc, "text-in") \%>\% stream_write_text("text-out")
+text_path <- file.path("file://", getwd(), "text-in")
 
-stop_stream(stream)
+stream <- stream_read_text(sc, text_path) \%>\% stream_write_text("text-out")
+
+stream_stop(stream)
 
 }
 

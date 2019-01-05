@@ -21,6 +21,18 @@ stream_read_scoket(sc, name = NULL, columns = NULL, options = list(),
 \description{
 Reads a Socket stream as a Spark dataframe stream.
 }
+\examples{
+\dontrun{
+
+sc <- spark_connect(master = "local")
+
+# Start socket server from terminal, example: nc -lk 9999
+stream <- stream_read_scoket(sc, options = list(host = "localhost", port = 9999))
+stream
+
+}
+
+}
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_json}},

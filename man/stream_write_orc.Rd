@@ -38,9 +38,9 @@ sc <- spark_connect(master = "local")
 
 sdf_len(sc, 10) \%>\% spark_write_orc("orc-in")
 
-stream <- stream_read_parquet(sc, "orc-in") \%>\% stream_write_parquet("orc-out")
+stream <- stream_read_orc(sc, "orc-in") \%>\% stream_write_orc("orc-out")
 
-stop_stream(stream)
+stream_stop(stream)
 
 }
 

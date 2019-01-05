@@ -4,15 +4,12 @@
 \alias{stream_read_kafka}
 \title{Read Kafka Stream}
 \usage{
-stream_read_kafka(sc, name = NULL, columns = NULL, options = list(),
-  ...)
+stream_read_kafka(sc, name = NULL, options = list(), ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
 
 \item{name}{The name to assign to the newly generated stream.}
-
-\item{columns}{A vector of column names or a named vector of column types.}
 
 \item{options}{A list of strings with additional options.}
 
@@ -20,6 +17,11 @@ stream_read_kafka(sc, name = NULL, columns = NULL, options = list(),
 }
 \description{
 Reads a Kafka stream as a Spark dataframe stream.
+}
+\details{
+Please note that Kafka requires installing the appropriate
+ package by conneting with a config setting where \code{sparklyr.shell.packages}
+ is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
 }
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},

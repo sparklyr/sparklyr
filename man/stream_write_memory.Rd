@@ -37,12 +37,14 @@ Writes a Spark dataframe stream into a memory stream.
 
 sc <- spark_connect(master = "local")
 
-dir.create("iris-in")
-write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
+dir.create("csv-in")
+write.csv(iris, "csv-in/data.csv", row.names = FALSE)
 
-stream <- stream_read_csv(sc, "iris-in") \%>\% stream_write_memory()
+csv_path <- file.path("file://", getwd(), "csv-in")
 
-stop_stream(stream)
+stream <- stream_read_csv(sc, csv_path) \%>\% stream_write_memory("csv-out")
+
+stream_stop(stream)
 
 }
 

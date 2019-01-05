@@ -4,12 +4,20 @@
 \alias{stream_write_console}
 \title{Write Console Stream}
 \usage{
-stream_write_console(x, options = list(), ...)
+stream_write_console(x, mode = c("append", "complete", "update"),
+  options = list(), trigger = stream_trigger_interval(), ...)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
+\item{mode}{Specifies how data is written to a streaming sink. Valid values are
+\code{"append"}, \code{"complete"} or \code{"update"}.}
+
 \item{options}{A list of strings with additional options.}
+
+\item{trigger}{The trigger for the stream query, defaults to micro-batches runnnig
+every 5 seconds. See \code{\link{stream_trigger_interval}} and
+\code{\link{stream_trigger_continuous}}.}
 
 \item{...}{Optional arguments; currently unused.}
 }
@@ -21,11 +29,11 @@ Writes a Spark dataframe stream into console logs.
 
 sc <- spark_connect(master = "local")
 
-sdf_len(sc, 10) \%>\% spark_write_text("text-in")
+sdf_len(sc, 10) \%>\% dplyr::transmute(text = as.character(id)) \%>\% spark_write_text("text-in")
 
 stream <- stream_read_text(sc, "text-in") \%>\% stream_write_console()
 
-stop_stream(stream)
+stream_stop(stream)
 
 }
 
