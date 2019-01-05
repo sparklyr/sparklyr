@@ -203,8 +203,7 @@ ml_lda.tbl_spark <- function(x, formula = NULL, k = 10, max_iter = 20, doc_conce
                              keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                              optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
                              topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
-
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula)
 
    stage <- ml_lda.spark_connection(
     x = spark_connection(x),
@@ -231,9 +230,12 @@ ml_lda.tbl_spark <- function(x, formula = NULL, k = 10, max_iter = 20, doc_conce
   stage %>%
     ml_fit(x)
    } else {
-     ml_generate_ml_model(
-       x, predictor = stage, formula = formula, features_col = features_col,
-       type = "clustering", constructor = new_ml_model_lda
+     ml_construct_model_clustering(
+       new_ml_model_lda,
+       predictor = stage,
+       dataset = x,
+       formula = formula,
+       features_col = features_col
      )
    }
 }
