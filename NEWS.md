@@ -24,6 +24,8 @@
 
 # Sparklyr 0.9.4
 
+- Improved multiple streaming documentation examples (#1801, #1805, #1806).
+
 - Fix issue while printing Spark data frames under `tibble` 2.0.0 (#1829).
 
 - Support for `stream_write_console()` to write to console log.
