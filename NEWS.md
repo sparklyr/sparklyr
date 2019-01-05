@@ -1,4 +1,4 @@
-# Sparklyr 0.9.4 (unreleased)
+# Sparklyr 0.9.5 (unreleased)
 
 ### Arrow
 
@@ -21,6 +21,18 @@
    but allow support for 64 bits through `bits` parameter.
    
  - Support for detecting Spark version using `spark-submit`.
+
+# Sparklyr 0.9.4
+
+- Improved multiple streaming documentation examples (#1801, #1805, #1806).
+
+- Fix issue while printing Spark data frames under `tibble` 2.0.0 (#1829).
+
+- Support for `stream_write_console()` to write to console log.
+
+- Support for `stream_read_scoket()` to read socket streams.
+
+- Fix to `spark_read_kafka()` to remove unused `path`.
 
 # Sparklyr 0.9.3
 
