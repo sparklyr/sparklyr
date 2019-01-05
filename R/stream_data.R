@@ -630,18 +630,11 @@ stream_read_kafka <- function(sc,
 #'
 #' sc <- spark_connect(master = "local", config = config)
 #'
-#' read_options <- list(
-#'   kafka.bootstrap.servers = "localhost:9092",
-#'   subscribe = "topic1")
-#'
-#' write_options <- list(
-#'   kafka.bootstrap.servers = "localhost:9092",
-#'   topic = "topic2")
+#' read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
+#' write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
 #'
 #' stream <- stream_read_kafka(sc, options = kafka_options) %>%
 #'   stream_write_kafka(options = write_options)
-#'
-#' stream <- stream_read_kafka(sc, options = c(kafka.bootstrap.servers = "localhost:9092", subscribe = "test4")) %>% dplyr::transmute(value = as.character(value)) %>% stream_write_kafka(options = list(kafka.bootstrap.servers = "localhost:9092", topic = "test5"))
 #'
 #' stream_stop(stream)
 #'
