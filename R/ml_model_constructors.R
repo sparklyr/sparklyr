@@ -150,7 +150,15 @@ new_ml_model_clustering <- function(pipeline_model, formula, dataset,
                                     features_col, ...,
                                     class = character()) {
 
-  feature_names <- ml_feature_names_metadata(pipeline_model, dataset, features_col)
+  predictor <- dplyr::last(pipeline_model$stages)
+
+  # LDA uses more than one preprocessor and ml_feature_names_metadata()
+  # considers just one: ml_stage(pipeline_model, 1)
+  if (inherits(predictor, "ml_lda_model")) {
+    feature_names <- gsub("~", "", formula) # LDA uses just one feature
+  } else{
+    feature_names <- ml_feature_names_metadata(pipeline_model, dataset, features_col)
+  }
 
   new_ml_model(
     pipeline_model,
