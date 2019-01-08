@@ -74,7 +74,9 @@ print.tbl_spark <- function(x, ...) {
     if (exists("print.tbl_sql", envir = get(".rs.S3Overrides"))) {
       if (sdf_is_streaming(sdf)) {
         rows <- getOption("max.print", 1000)
-        data <- sdf_collect(sdf, n = rows)
+
+        # collect rows + 1 to ensure that tibble knows there is more data to collect
+        data <- sdf_collect(sdf, n = rows + 1)
       } else {
         data <- x
         class(data) <- class(data)[-match("tbl_spark", class(data))]
