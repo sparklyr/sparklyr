@@ -24,6 +24,20 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \description{
 Reads a parquet stream as a Spark dataframe stream.
 }
+\examples{
+\dontrun{
+
+sc <- spark_connect(master = "local")
+
+sdf_len(sc, 10) \%>\% spark_write_parquet("parquet-in")
+
+stream <- stream_read_parquet(sc, "parquet-in") \%>\% stream_write_parquet("parquet-out")
+
+stream_stop(stream)
+
+}
+
+}
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_json}},

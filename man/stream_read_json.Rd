@@ -24,6 +24,23 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \description{
 Reads a JSON stream as a Spark dataframe stream.
 }
+\examples{
+\dontrun{
+
+sc <- spark_connect(master = "local")
+
+dir.create("json-in")
+jsonlite::write_json(list(a = c(1,2), b = c(10,20)), "json-in/data.json")
+
+json_path <- file.path("file://", getwd(), "json-in")
+
+stream <- stream_read_json(sc, json_path) \%>\% stream_write_json("json-out")
+
+stream_stop(stream)
+
+}
+
+}
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_kafka}},
