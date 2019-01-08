@@ -21,6 +21,23 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \description{
 Reads a text stream as a Spark dataframe stream.
 }
+\examples{
+\dontrun{
+
+sc <- spark_connect(master = "local")
+
+dir.create("text-in")
+writeLines("A text entry", "text-in/text.txt")
+
+text_path <- file.path("file://", getwd(), "text-in")
+
+stream <- stream_read_text(sc, text_path) \%>\% stream_write_text("text-out")
+
+stream_stop(stream)
+
+}
+
+}
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_json}},

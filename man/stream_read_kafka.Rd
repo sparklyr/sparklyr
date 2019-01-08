@@ -23,6 +23,27 @@ Please note that Kafka requires installing the appropriate
  package by conneting with a config setting where \code{sparklyr.shell.packages}
  is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
 }
+\examples{
+\dontrun{
+
+config <- spark_config()
+
+# The following package is dependent to Spark version, for Spark 2.3.2:
+config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
+
+sc <- spark_connect(master = "local", config = config)
+
+read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
+write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
+
+stream <- stream_read_kafka(sc, options = read_options) \%>\%
+  stream_write_kafka(options = write_options)
+
+stream_stop(stream)
+
+}
+
+}
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_json}},
