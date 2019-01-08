@@ -63,13 +63,13 @@ stream_validate <- function(stream)
       invoke("cause") %>%
       invoke("getMessage")
 
-    if (!identical(cause, NULL)) {
-      stop(cause)
-    } else {
-      invoke(exception, "get") %>%
+    if (identical(cause, NULL)) {
+      cause <- invoke(exception, "get") %>%
         invoke("cause") %>%
         invoke("toString")
     }
+
+    stop(cause)
   }
 
   stream
