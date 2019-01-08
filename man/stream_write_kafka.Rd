@@ -47,7 +47,7 @@ sc <- spark_connect(master = "local", config = config)
 read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
 write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
 
-stream <- stream_read_kafka(sc, options = kafka_options) \%>\%
+stream <- stream_read_kafka(sc, options = read_options) \%>\%
   stream_write_kafka(options = write_options)
 
 stream_stop(stream)
