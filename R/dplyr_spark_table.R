@@ -74,9 +74,7 @@ print.tbl_spark <- function(x, ...) {
     if (exists("print.tbl_sql", envir = get(".rs.S3Overrides"))) {
       if (sdf_is_streaming(sdf)) {
         rows <- getOption("max.print", 1000)
-
-        # collect rows + 1 to ensure that tibble knows there is more data to collect
-        data <- sdf_collect(sdf, n = rows + 1)
+        data <- sdf_collect(sdf, n = rows)
       } else {
         data <- x
         class(data) <- class(data)[-match("tbl_spark", class(data))]
@@ -97,12 +95,13 @@ print.tbl_spark <- function(x, ...) {
   mark <- if (identical(getOption("OutDec"), ","))  "." else ","
   cols_fmt <- formatC(dim(x)[2], big.mark = mark)
 
+  # collect rows + 1 to ensure that tibble knows there is more data to collect
   if (sdf_is_streaming(sdf)) {
     rows_fmt <- "inf"
-    data <- sdf_collect(sdf, n = rows)
+    data <- sdf_collect(sdf, n = rows + 1)
   } else {
     rows_fmt <- "??"
-    data <- dplyr::collect(head(x, n = rows))
+    data <- dplyr::collect(head(x, n = rows + 1))
   }
 
   attributes(data)$spark_dims <- c(NA_real_, sdf_ncol(x))
