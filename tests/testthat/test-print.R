@@ -13,10 +13,5 @@ test_that("print supports spark tables", {
     )
   )
 
-  expect_equal(
-    printed[14],
-    c(
-      "# … with more rows"
-    )
-  )
+  expect_true(grepl("with more rows", printed[14]))
 })
