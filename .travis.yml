@@ -52,6 +52,13 @@ matrix:
             - lsb-release
             - libarrow-dev
             - libarrow-glib-dev
+  allow_failures:
+    - name: "Devel"
+      r_github_packages:
+        - tidiverse/dplyr
+        - tidyverse/tibble
+        - r-lib/rlang
+        - rstudio/forge
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
