@@ -53,10 +53,9 @@ matrix:
             - libarrow-dev
             - libarrow-glib-dev
     - name: "Devel (tidyverse, r-lib, forge)"
-      env:
-        - R_DEVEL_PACKAGES="true"
+      env: R_DEVEL_PACKAGES="true"
       r_github_packages:
-        - tidiverse/dplyr
+        - tidyverse/dplyr
         - tidyverse/tibble
         - r-lib/rlang
         - rstudio/forge
