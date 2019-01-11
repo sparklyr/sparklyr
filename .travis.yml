@@ -52,6 +52,15 @@ matrix:
             - lsb-release
             - libarrow-dev
             - libarrow-glib-dev
+    - name: "Devel (tidyverse, r-lib, forge)"
+      env: R_DEVEL_PACKAGES="true"
+      r_github_packages:
+        - tidyverse/dplyr
+        - tidyverse/tibble
+        - r-lib/rlang
+        - rstudio/forge
+  allow_failures:
+    - env: R_DEVEL_PACKAGES="true"
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
