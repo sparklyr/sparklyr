@@ -1,3 +1,7 @@
+# Sparklyr 0.9.5
+
+- Fix unique SqlContext per Databricks connection.
+
 # Sparklyr 0.9.4
 
 - Improved multiple streaming documentation examples (#1801, #1805, #1806).
