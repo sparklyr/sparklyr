@@ -105,13 +105,18 @@ connection_progress_context <- function(sc, f)
 
 connection_progress <- function(sc, terminated = FALSE)
 {
-  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE) || !rstudio_jobs_api_available())
+  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE) ||
+      !rstudio_jobs_api_available() ||
+      identical(sc$state$use_monitoring, TRUE))
     return()
 
   tryCatch({
     connection_progress_base(sc, terminated)
   }, error = function(e) {
     # ignore all connection progress errors
+    if (spark_config_value(sc$config, "sparklyr.verbose", FALSE)) {
+      warning("Error while checking job progress: ", e$message)
+    }
   })
 }
 
