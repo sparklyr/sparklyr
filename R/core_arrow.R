@@ -2,23 +2,8 @@ arrow_write_record_batch <- function(df) {
   record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
   record <- record_batch(df)
 
-  record_writer <- get("BufferOutputStream", envir = as.environment(asNamespace("arrow")))()
-  write_record_batch_inst <- get("RecordBatchStreamWriter", envir = as.environment(asNamespace("arrow")))(record_writer, record$schema)
-
-  write_record_batch_inst$write_batch(record)
-  write_record_batch_inst$close()
-
-  data <- record_writer$getvalue()
-
-  bytes <- raw(data$size)
-  buffer <- get("buffer", envir = as.environment(asNamespace("arrow")))
-  fixed_writer <- get("FixedSizeBufferWriter", envir = as.environment(asNamespace("arrow")))(buffer(bytes))
-  write_record_batch_inst <- get("RecordBatchStreamWriter", envir = as.environment(asNamespace("arrow")))(fixed_writer, record$schema)
-
-  write_record_batch_inst$write_batch(record)
-  write_record_batch_inst$close()
-
-  bytes
+  write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
+  write_arrow(record, raw())
 }
 
 arrow_read_record_batch <- function(batch) {
