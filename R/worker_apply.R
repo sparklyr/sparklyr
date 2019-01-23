@@ -169,7 +169,8 @@ spark_worker_apply_arrow <- function(sc, config) {
     )
   }
 
-  record_entry <- arrow_read_record_batch(record_batch_raw)
+  reader <- arrow_record_stream_reader(record_batch_raw)
+  record_entry <- arrow_read_record_batch(reader)
 
   all_batches <- list()
   total_rows <- 0
@@ -213,7 +214,8 @@ spark_worker_apply_arrow <- function(sc, config) {
       record_batch_raw_groups_idx <- record_batch_raw_groups_idx + 1
       record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
 
-      record_entry <- arrow_read_record_batch(record_batch_raw)
+      reader <- arrow_record_stream_reader(record_batch_raw)
+      record_entry <- arrow_read_record_batch(reader)
     }
   }
 

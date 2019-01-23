@@ -44,16 +44,13 @@ arrow_enabled_object.data.frame <- function(object) {
 
 arrow_read_stream <- function(stream)
 {
-  record_batch_stream_reader <- get("RecordBatchStreamReader", envir = as.environment(asNamespace("arrow")))
-  read_record_batch <- function(reader) reader$read_next_batch()
-
-  reader <- record_batch_stream_reader(stream)
-  record_entry <- read_record_batch(reader)
+  reader <- arrow_record_stream_reader(stream)
+  record_entry <- arrow_read_record_batch(reader)
 
   entries <- list()
   while (!is.null(record_entry)) {
     entries[[length(entries) + 1]] <- tibble::as_tibble(record_entry)
-    record_entry <- read_record_batch(reader)
+    record_entry <- arrow_read_record_batch(reader)
   }
 
   entries
