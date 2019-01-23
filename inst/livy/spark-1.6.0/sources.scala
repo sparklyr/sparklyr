@@ -5,6 +5,51 @@
 
 class Sources {
   def sources: String = """
+arrow_write_record_batch <- function(df) {
+  if (packageVersion("arrow") < "0.12") {
+    record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+    write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
+
+    record <- record_batch(df)
+    write_record_batch(record, raw())
+  }
+  else {
+    record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+    record <- record_batch(df)
+
+    write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
+    write_arrow(record, raw())
+
+  }
+}
+
+arrow_record_stream_reader <- function(stream) {
+  if (packageVersion("arrow") < "0.12") {
+    record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
+  }
+  else {
+    record_batch_stream_reader <- get("RecordBatchStreamReader", envir = as.environment(asNamespace("arrow")))
+  }
+
+  record_batch_stream_reader(stream)
+}
+
+arrow_read_record_batch <- function(reader) {
+  if (packageVersion("arrow") < "0.12") {
+    read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
+  }
+  else {
+    read_record_batch <- function(reader) reader$read_next_batch()
+  }
+
+  read_record_batch(reader)
+}
+
+arrow_as_tibble <- function(record) {
+  as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
+
+  as_tibble(record)
+}
 #' A helper function to retrieve values from \code{spark_config()}
 #'
 #' @param config The configuration list from \code{spark_config()}
@@ -1215,12 +1260,6 @@ spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
 spark_worker_apply_arrow <- function(sc, config) {
   worker_log("using arrow serializer")
 
-  write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
-  record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
-  read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
-  record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
-  as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
-
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)
 
@@ -1248,8 +1287,8 @@ spark_worker_apply_arrow <- function(sc, config) {
     )
   }
 
-  reader <- record_batch_stream_reader(record_batch_raw)
-  record_entry <- read_record_batch(reader)
+  reader <- arrow_record_stream_reader(record_batch_raw)
+  record_entry <- arrow_read_record_batch(reader)
 
   all_batches <- list()
   total_rows <- 0
@@ -1261,7 +1300,7 @@ spark_worker_apply_arrow <- function(sc, config) {
     batch_idx <- batch_idx + 1
     worker_log("is processing batch ", batch_idx)
 
-    df <- as_tibble(record_entry)
+    df <- arrow_as_tibble(record_entry)
     result <- NULL
 
     if (!is.null(df)) {
@@ -1281,21 +1320,20 @@ spark_worker_apply_arrow <- function(sc, config) {
         schema_output <- spark_worker_build_types(context, lapply(result, class))
       }
 
-      record <- record_batch(result)
-      raw_batch <- write_record_batch(record, raw())
+      raw_batch <- arrow_write_record_batch(result)
 
       all_batches[[length(all_batches) + 1]] <- raw_batch
       total_rows <- total_rows + nrow(result)
     }
 
-    record_entry <- read_record_batch(reader)
+    record_entry <- arrow_read_record_batch(reader)
 
     if (grouped && is.null(record_entry) && record_batch_raw_groups_idx < length(record_batch_raw_groups)) {
       record_batch_raw_groups_idx <- record_batch_raw_groups_idx + 1
       record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
 
-      reader <- record_batch_stream_reader(record_batch_raw)
-      record_entry <- read_record_batch(reader)
+      reader <- arrow_record_stream_reader(record_batch_raw)
+      record_entry <- arrow_read_record_batch(reader)
     }
   }
 
