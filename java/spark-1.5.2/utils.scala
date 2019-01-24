@@ -338,7 +338,7 @@ object Utils {
           case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
           case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _           => if (value == "NA") null.asInstanceOf[String] else value
+          case _ => if (value == "NA") null.asInstanceOf[String] else value
         }
       })
 
@@ -373,7 +373,7 @@ object Utils {
           case "double"    => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
           case "logical"   => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _           => if (value == "NA") null.asInstanceOf[String] else value
+          case _ => if (value == "NA") null.asInstanceOf[String] else value
         }
       })
 
