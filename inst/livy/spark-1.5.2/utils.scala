@@ -341,8 +341,7 @@ object Utils {
           case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
           case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _ => value
-        }
+          case _           => if (value == "NA") null.asInstanceOf[String] else value        }
       })
 
       org.apache.spark.sql.Row.fromSeq(typed)
@@ -376,7 +375,7 @@ object Utils {
           case "double"    => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
           case "logical"   => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _ => value
+          case _           => if (value == "NA") null.asInstanceOf[String] else value
         }
       })
 
