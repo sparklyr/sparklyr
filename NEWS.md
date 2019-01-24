@@ -1,5 +1,7 @@
 # Sparklyr 0.9.5
 
+- Fix reentrancy job progress issue when running RStudio 1.2.
+
 - Fix unique SqlContext per Databricks connection.
 
 # Sparklyr 0.9.4
