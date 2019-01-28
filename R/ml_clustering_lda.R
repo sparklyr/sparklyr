@@ -70,6 +70,7 @@
 #'
 #'
 #' @template roxlate-ml-clustering-algo
+#' @template roxlate-ml-formula-params
 #' @template roxlate-ml-clustering-params
 #' @param doc_concentration Concentration parameter (commonly named "alpha") for the prior placed on documents' distributions over topics ("theta"). See details.
 #' @param topic_concentration Concentration parameter (commonly named "beta" or "eta") for the prior placed on topics' distributions over terms.
@@ -80,11 +81,38 @@
 #' @param learning_decay (For Online optimizer only) Learning rate, set as an exponential decay rate. This should be between (0.5, 1.0] to guarantee asymptotic convergence. This is called "kappa" in the Online LDA paper (Hoffman et al., 2010). Default: 0.51, based on Hoffman et al.
 #' @param learning_offset (For Online optimizer only) A (positive) learning parameter that downweights early iterations. Larger values make early iterations count less. This is called "tau0" in the Online LDA paper (Hoffman et al., 2010) Default: 1024, following Hoffman et al.
 #' @param optimize_doc_concentration (For Online optimizer only) Indicates whether the \code{doc_concentration} (Dirichlet parameter for document-topic distribution) will be optimized during training. Setting this to true will make the model more expressive and fit the training data better. Default: \code{FALSE}
-#'
 #' @param keep_last_checkpoint (Spark 2.0.0+) (For EM optimizer only) If using checkpointing, this indicates whether to keep the last checkpoint. If \code{FALSE}, then the checkpoint will be deleted. Deleting the checkpoint can cause failures if a data partition is lost, so set this bit with care. Note that checkpoints will be cleaned up via reference counting, regardless.
 #'
+#' @examples
+#' \dontrun{
+#' library(janeaustenr)
+#' library(dplyr)
+#' sc <-  spark_connect(master = "local")
+#'
+#' lines_tbl <- sdf_copy_to(sc,
+#'                          austen_books()[c(1:30),],
+#'                          name = "lines_tbl",
+#'                          overwrite = TRUE)
+#'
+#' # transform the data in a tidy form
+#' lines_tbl_tidy <- lines_tbl %>%
+#'   ft_tokenizer(input_col = "text",
+#'                output_col = "word_list") %>%
+#'   ft_stop_words_remover(input_col = "word_list",
+#'                         output_col = "wo_stop_words") %>%
+#'   mutate(text = explode(wo_stop_words)) %>%
+#'   filter(text != "") %>%
+#'   select(text, book)
+#'
+#' lda_model <- lines_tbl_tidy %>%
+#'   ml_lda(~text, k = 4)
+#'
+#' # vocabulary and topics
+#' tidy(lda_model)
+#' }
+#'
 #' @export
-ml_lda <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
+ml_lda <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
                    subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
                    keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                    optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
@@ -93,7 +121,7 @@ ml_lda <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_con
 }
 
 #' @export
-ml_lda.spark_connection <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
+ml_lda.spark_connection <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
                                     subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
                                     keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                                     optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
@@ -140,7 +168,7 @@ ml_lda.spark_connection <- function(x, k = 10, max_iter = 20, doc_concentration 
 }
 
 #' @export
-ml_lda.ml_pipeline <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
+ml_lda.ml_pipeline <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
                                subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
                                keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                                optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
@@ -148,6 +176,7 @@ ml_lda.ml_pipeline <- function(x, k = 10, max_iter = 20, doc_concentration = NUL
 
   stage <- ml_lda.spark_connection(
     x = spark_connection(x),
+    formula = formula,
     k = k,
     max_iter = max_iter,
     doc_concentration = doc_concentration,
@@ -169,13 +198,16 @@ ml_lda.ml_pipeline <- function(x, k = 10, max_iter = 20, doc_concentration = NUL
 }
 
 #' @export
-ml_lda.tbl_spark <- function(x, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
+ml_lda.tbl_spark <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
                              subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
                              keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                              optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
                              topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
-  stage <- ml_lda.spark_connection(
+  formula <- ml_standardize_formula(formula)
+
+   stage <- ml_lda.spark_connection(
     x = spark_connection(x),
+    formula = NULL,
     k = k,
     max_iter = max_iter,
     doc_concentration = doc_concentration,
@@ -194,8 +226,18 @@ ml_lda.tbl_spark <- function(x, k = 10, max_iter = 20, doc_concentration = NULL,
     ...
   )
 
+  if (is.null(formula)) {
   stage %>%
     ml_fit(x)
+   } else {
+     ml_construct_model_clustering(
+       new_ml_model_lda,
+       predictor = stage,
+       dataset = x,
+       formula = formula,
+       features_col = features_col
+     )
+   }
 }
 
 # Validator
