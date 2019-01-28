@@ -50,7 +50,7 @@ Imports:
     tibble,
     tidyr,
     purrr,
-    forge (>= 0.1.9002)
+    forge
 Suggests:
     ggplot2,
     glmnet,
@@ -63,5 +63,3 @@ Suggests:
     RCurl,
     reshape2,
     testthat
-Remotes:
-    rstudio/forge
