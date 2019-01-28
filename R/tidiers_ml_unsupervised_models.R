@@ -115,7 +115,7 @@ tidy.ml_model_gaussian_mixture <- function(x, ...) {
   center <- x$gaussians_df()$mean %>%
     as.data.frame() %>%
     t() %>%
-    broom::fix_data_frame() %>%
+    fix_data_frame() %>%
     dplyr::select(-.data$term)
 
   names(center) <- x$feature_names
