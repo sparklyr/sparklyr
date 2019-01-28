@@ -11,6 +11,8 @@
 
 ## Other
 
+- Remove dependency on broom.
+
 - Fixed re-entrancy job progress issues when running RStudio 1.2.
 
 - Tables with periods supported by setting
