@@ -56,6 +56,7 @@ matrix:
       env: R_DEVEL_PACKAGES="true"
       r_github_packages:
         - tidyverse/dplyr
+        - tidyverse/dbplyr
         - tidyverse/tibble
         - r-lib/rlang
         - rstudio/forge
