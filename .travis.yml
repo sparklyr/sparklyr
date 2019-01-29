@@ -45,8 +45,8 @@ matrix:
       addons:
         apt:
           sources:
-            - sourceline: deb https://s3-us-west-2.amazonaws.com/arrowlib/ubuntu/ trusty universe
-              key_url: https://s3-us-west-2.amazonaws.com/arrowlib/ubuntu/red-data-tools-keyring.gpg
+            - sourceline: deb https://arrowlib.rstudio.com/ubuntu/ trusty universe
+              key_url: https://arrowlib.rstudio.com/ubuntu/red-data-tools-keyring.gpg
           packages:
             - apt-transport-https
             - lsb-release
