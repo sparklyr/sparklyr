@@ -1,7 +1,7 @@
 extract_model_metrics <- function(object, metric_names, new_names) {
   sapply(metric_names, function(x) ml_summary(object, x, allow_null = TRUE)) %>%
     t() %>%
-    broom::fix_data_frame(newnames = new_names)
+    fix_data_frame(newnames = new_names)
 }
 
 #' @export
@@ -50,4 +50,38 @@ broom_augment_supervised <- function(x, newdata = NULL, ...) {
       dplyr::rename(.prediction = !!rlang::sym("prediction"))
   }
 
+}
+
+# copied from broom to remove dependency
+
+# strip rownames from a data frame
+unrowname <- function(x) {
+  rownames(x) <- NULL
+  x
+}
+
+fix_data_frame <- function(x, newnames = NULL, newcol = "term") {
+  if (!is.null(newnames) && length(newnames) != ncol(x)) {
+    stop("newnames must be NULL or have length equal to number of columns")
+  }
+
+  if (all(rownames(x) == seq_len(nrow(x)))) {
+    # don't need to move rownames into a new column
+    ret <- data.frame(x, stringsAsFactors = FALSE)
+    if (!is.null(newnames)) {
+      colnames(ret) <- newnames
+    }
+  }
+  else {
+    ret <- data.frame(
+      ...new.col... = rownames(x),
+      unrowname(x),
+      stringsAsFactors = FALSE
+    )
+    colnames(ret)[1] <- newcol
+    if (!is.null(newnames)) {
+      colnames(ret)[-1] <- newnames
+    }
+  }
+  tibble::as_tibble(ret)
 }

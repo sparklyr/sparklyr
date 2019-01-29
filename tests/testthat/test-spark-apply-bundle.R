@@ -28,14 +28,14 @@ test_that("'spark_apply_packages' uses different names for different packages", 
   with_mock(
     `available.packages` = available_packages_mock,
     expect_true(
-      length(spark_apply_packages("broom")) > 0
+      length(spark_apply_packages("purrr")) > 0
     )
   )
 })
 
 test_that("'spark_apply_bundle_file' uses different names for different packages", {
-  broom_file <- spark_apply_bundle_file(spark_apply_packages("broom"), tempdir())
+  purrr_file <- spark_apply_bundle_file(spark_apply_packages("purrr"), tempdir())
   tidyr_file <- spark_apply_bundle_file(spark_apply_packages("tidyr"), tempdir())
 
-  expect_true(broom_file != tidyr_file)
+  expect_true(purrr_file != tidyr_file)
 })
