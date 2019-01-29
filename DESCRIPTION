@@ -52,6 +52,7 @@ Imports:
     withr,
     xml2,
 Suggests:
+    broom,
     ggplot2,
     glmnet,
     janeaustenr,
