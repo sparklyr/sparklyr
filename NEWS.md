@@ -2,6 +2,12 @@
 
 - Support for Apache Arrow.
 
+### Livy
+
+- Significant performance improvements by using `spark_version` in
+  `livy_config()` which enables using the sparklyr JAR rather than
+  sources.
+
 ### Data
 
 - Support for `whole` parameter for `spark_read_text()` to read an
