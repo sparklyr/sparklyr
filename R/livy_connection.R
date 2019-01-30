@@ -299,7 +299,10 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
 
   invoke_var <- paste(
     "var ", var_name, " = ",
-    "LivyUtils.invokeFromBase64(",
+    paste0(
+      livy_map_class(sc, "sparklyr.LivyUtils.invokeFromBase64"),
+      "("
+    ),
     last_var,
     ")",
     sep = ""
@@ -643,8 +646,14 @@ spark_disconnect.livy_connection <- function(sc, ...) {
   }
 }
 
-livy_map_class <- function(class) {
-  gsub("sparklyr.", "", class)
+livy_map_class <- function(sc, class) {
+  if (spark_config_value(sc$config, "sparklyr.livy.sources", TRUE)) {
+    gsub("sparklyr.", "", class)
+  }
+  else {
+    # if sources are provided as a jar, sources contain spakrlyr as proper package
+    class
+  }
 }
 
 #' @export
@@ -666,14 +675,14 @@ invoke.livy_jobj <- function(jobj, method, ...) {
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
-  classMapped <- livy_map_class(class)
+  classMapped <- livy_map_class(sc, class)
 
   livy_invoke_statement_fetch(sc, TRUE, classMapped, method, ...)
 }
 
 #' @export
 invoke_new.livy_connection <- function(sc, class, ...) {
-  class <- livy_map_class(class)
+  class <- livy_map_class(sc, class)
 
   livy_invoke_statement_fetch(sc, TRUE, class, "<init>", ...)
 }
@@ -757,7 +766,10 @@ livy_load_scala_sources <- function(sc) {
 #' @export
 initialize_connection.livy_connection <- function(sc) {
   tryCatch({
-    livy_load_scala_sources(sc)
+
+    if (spark_config_value(sc$config, "sparklyr.livy.sources", TRUE)) {
+      livy_load_scala_sources(sc)
+    }
 
     session <- tryCatch({
       invoke_static(
