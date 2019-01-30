@@ -25,6 +25,13 @@ livy_validate_http_response <- function(message, req) {
   }
 }
 
+livy_available_jars <- function() {
+  system.file("java", package = "sparklyr") %>%
+    dir(pattern = "sparklyr") %>%
+    gsub("^sparklyr-|-.*\\.jar", "", .) %>%
+    numeric_version()
+}
+
 #' Create a Spark Configuration for Livy
 #'
 #' @export
@@ -37,6 +44,7 @@ livy_validate_http_response <- function(message, req) {
 #' @param password The password to use in the Authorization header
 #' @param negotiate Whether to use gssnegotiate method or not
 #' @param custom_headers List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.
+#' @param sources Should sparklyr sources be uploaded? Otherwise, the sparklyr JAR will be downloaded from GitHub or from the \code{jars} location.
 #' @param ... additional Livy session parameters
 #'
 #' @details
@@ -70,8 +78,16 @@ livy_validate_http_response <- function(message, req) {
 #' \code{config = spark_config(spark.yarn.queue = "my_queue")}).
 #'
 #' @return Named list with configuration data
-livy_config <- function(config = spark_config(), username = NULL, password = NULL, negotiate = FALSE,
-                        custom_headers = list("X-Requested-By" = "sparklyr"), ...) {
+livy_config <- function(config = spark_config(),
+                        username = NULL,
+                        password = NULL,
+                        negotiate = FALSE,
+                        custom_headers = list("X-Requested-By" = "sparklyr"),
+                        spark_version = NULL,
+                        sources = is.null(spark_version),
+                        ...) {
+  additional_params <- list(...)
+
   if (negotiate) {
     config[["sparklyr.livy.auth"]] <- httr::authenticate("", "", type = "gssnegotiate")
   } else if (!is.null(username) || !is.null(password)) {
@@ -85,11 +101,37 @@ livy_config <- function(config = spark_config(), username = NULL, password = NUL
     }
   }
 
-  #Params need to be restrictued or livy will complain about unknown parameters
-  allowed_params <- c("proxy_user", "jars", "py_files", "files", "driver_memory", "driver_cores", "executor_memory",
-                      "executor_cores", "num_executors", "archives", "queue", "name", "heartbeat_timeout")
+  config[["sparklyr.livy.sources"]] <- sources
+  if (identical(sources, FALSE) && identical(additional_params$jars, NULL)) {
+    if (is.null(spark_version)) stop("'spark_version' or 'jars' required when 'source' parameter set to 'FALSE'.")
 
-  additional_params <- list(...)
+    major_version <- gsub("\\.$", "", spark_version)
+    previouis_versions <- Filter(function(maybe_version) maybe_version <= major_version, livy_available_jars())
+    target_version <- previouis_versions[length(previouis_versions)]
+
+    target_jar <- dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", target_version))
+
+    additional_params$jars <- paste0(
+      "https://github.com/rstudio/sparklyr/blob/bugfix/livy-jars/inst/java/",
+      target_jar,
+      "?raw=true"
+    )
+  }
+
+  #Params need to be restrictued or livy will complain about unknown parameters
+  allowed_params <- c("proxy_user",
+                      "jars",
+                      "py_files",
+                      "files",
+                      "driver_memory",
+                      "driver_cores",
+                      "executor_memory",
+                      "executor_cores",
+                      "num_executors",
+                      "archives",
+                      "queue",
+                      "name",
+                      "heartbeat_timeout")
 
   if (length(additional_params) > 0) {
     valid_params <- names(additional_params) %in% allowed_params
