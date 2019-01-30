@@ -126,7 +126,8 @@ core_invoke_method <- function(sc, static, object, method, ...)
     }
   }
 
-  if (!identical(object, "Handler") && getOption("sparklyr.connection.cancellable", TRUE)) {
+  if (!identical(object, "Handler") &&
+      spark_config_value(sc$config, c("sparklyr.cancellable", "sparklyr.connection.cancellable"), TRUE)) {
     # if connection still running, sync to valid state
     if (identical(sc$state$status[[connection_name]], "running"))
       core_invoke_sync(sc)
