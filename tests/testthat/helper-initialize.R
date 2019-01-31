@@ -193,7 +193,8 @@ testthat_livy_connection <- function() {
         sparklyr.verbose = TRUE,
         sparklyr.connect.timeout = 120,
         sparklyr.log.invoke = "cat"
-      )
+      ),
+      sources = TRUE
     )
 
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)

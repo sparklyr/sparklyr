@@ -1,7 +1,4 @@
-//
-// This file was automatically generated using livy_sources_refresh()
-// Changes to this file will be reverted.
-//
+package sparklyr
 
 import javax.xml.bind.DatatypeConverter
 
@@ -14,13 +11,10 @@ object LivyUtils {
     "SQLUtils" -> SQLUtils,
     "Utils" -> Utils,
     "Repartition" -> Repartition,
-    "ArrowHelper" -> ArrowHelper,
-    "ArrowConverters" -> ArrowConverters,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
     "MLUtils" -> MLUtils,
-    "MLUtils2" -> MLUtils2,
-    "BucketizerUtils" -> BucketizerUtils
+    "MLUtils2" -> MLUtils2
    )
 
   val tracker = new JVMObjectTracker()
