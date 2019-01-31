@@ -6,7 +6,8 @@
 \usage{
 livy_config(config = spark_config(), username = NULL,
   password = NULL, negotiate = FALSE,
-  custom_headers = list(`X-Requested-By` = "sparklyr"), ...)
+  custom_headers = list(`X-Requested-By` = "sparklyr"),
+  spark_version = NULL, sources = is.null(spark_version), ...)
 }
 \arguments{
 \item{config}{Optional base configuration}
@@ -18,6 +19,8 @@ livy_config(config = spark_config(), username = NULL,
 \item{negotiate}{Whether to use gssnegotiate method or not}
 
 \item{custom_headers}{List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.}
+
+\item{sources}{Should sparklyr sources be uploaded? Otherwise, the sparklyr JAR will be downloaded from GitHub or from the \code{jars} location.}
 
 \item{...}{additional Livy session parameters}
 }
