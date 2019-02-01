@@ -4,13 +4,17 @@
 \alias{spark_read_source}
 \title{Read from a generic source into a Spark DataFrame.}
 \usage{
-spark_read_source(sc, name, source, options = list(), repartition = 0,
-  memory = TRUE, overwrite = TRUE, columns = NULL, ...)
+spark_read_source(sc, name, path = NULL, source, options = list(),
+  repartition = 0, memory = TRUE, overwrite = TRUE, columns = NULL,
+  ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
 
 \item{name}{The name to assign to the newly generated table.}
+
+\item{path}{The path to the file. Needs to be accessible from the cluster.
+Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 
 \item{source}{A data source capable of reading data.}
 
