@@ -434,7 +434,8 @@ start_shell <- function(master,
     monitoring = monitoring,
     gateway = gatewayInfo$gateway,
     output_file = output_file,
-    sessionId = sessionId
+    sessionId = sessionId,
+    home_version = versionSparkHome
   ))
 
   # stop shell on R exit
@@ -586,8 +587,8 @@ initialize_connection.spark_shell_connection <- function(sc) {
       apply_config(conf, default_config, "set", "spark.")
 
       # create the spark context and assign the connection to it
-
-      if (spark_version(sc) >= "2.0") {
+      # use spark home version since spark context not yet initialized
+      if (sc$home_version >= "2.0") {
         # For Spark 2.0+, we create a `SparkSession`.
         session <- invoke_static(
           sc,
