@@ -111,13 +111,27 @@ arrow_copy_to <- function(sc, df, parallelism)
 
 arrow_collect <- function(tbl, ...)
 {
+  args <- list(...)
+
   sc <- spark_connection(tbl)
   sdf <- spark_dataframe(tbl)
   session <- spark_session(sc)
 
   time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
 
-  invoke_static(sc, "sparklyr.ArrowConverters", "toArrowBatchRdd", sdf, session, time_zone) %>%
-    arrow_read_stream() %>%
-    dplyr::bind_rows()
+  if (!identical(args$callback, NULL)) {
+    arrow_df <- invoke_static(sc, "sparklyr.ArrowConverters", "toArrowDataset", sdf, session, time_zone)
+    arrow_iter <- invoke(arrow_df, "toLocalIterator")
+
+    while (invoke(arrow_iter, "hasNext")) {
+      invoke_static(sc, "sparklyr.ArrowConverters", "toArrowStream", sdf, time_zone, arrow_iter) %>%
+        arrow_read_stream() %>%
+        args$callback()
+    }
+  }
+  else {
+    invoke_static(sc, "sparklyr.ArrowConverters", "toArrowBatchRdd", sdf, session, time_zone) %>%
+      arrow_read_stream() %>%
+      dplyr::bind_rows()
+  }
 }
