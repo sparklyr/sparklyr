@@ -14,6 +14,10 @@
 
 - Support for `whole` parameter for `spark_read_text()` to read an
   entire text file without splitting contents by line.
+  
+### Broom
+  
+- Implemented `tidy()`, `augment()`, and `glance()` for `ml_lda()`and `ml_als()` models (@samuelmacedo83)
 
 ## Other
 
