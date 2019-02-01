@@ -12,6 +12,8 @@
 
 ### Data
 
+- `spark_read_source()` now has a `path` parameter for specifying file path.
+
 - Support for `whole` parameter for `spark_read_text()` to read an
   entire text file without splitting contents by line.
 
