@@ -13,7 +13,7 @@ find_in_extensions <- function(what) {
   })(what, namespaces)
 }
 
-find_constructor <- function(candidates) {
+find_constructor <- function(candidates, jobj) {
   if (!length(candidates)) stop("Constructor not found for `", jobj_class(jobj)[[1]], "`.", call. = FALSE)
 
   # For each candidate function, look in extension namespaces, and return the first one found
@@ -26,7 +26,7 @@ ml_get_constructor <- function(jobj) {
     purrr::map(ml_map_class) %>%
     purrr::compact() %>%
     purrr::map(~ paste0("new_", .x)) %>%
-    find_constructor()
+    find_constructor(jobj)
 }
 
 #' Wrap a Spark ML JVM object
