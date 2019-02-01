@@ -587,13 +587,6 @@ initialize_connection.spark_shell_connection <- function(sc) {
 
       # create the spark context and assign the connection to it
 
-      sc$state$spark_context <- invoke_static(
-        sc,
-        "org.apache.spark.SparkContext",
-        "getOrCreate",
-        conf
-      )
-
       if (spark_version(sc) >= "2.0") {
         # For Spark 2.0+, we create a `SparkSession`.
         session <- invoke_static(
@@ -610,6 +603,14 @@ initialize_connection.spark_shell_connection <- function(sc) {
 
         # Set the `SparkContext`.
         sc$state$spark_context <- invoke(session, "sparkContext")
+      }
+      else {
+        sc$state$spark_context <- invoke_static(
+          sc,
+          "org.apache.spark.SparkContext",
+          "getOrCreate",
+          conf
+        )
       }
 
       invoke(backend, "setSparkContext", spark_context(sc))
