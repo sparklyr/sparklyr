@@ -1,5 +1,7 @@
 # Sparklyr 0.9.9000 (unreleased)
 
+### Arrow
+
 - Support for Apache Arrow.
 
 ### Livy
