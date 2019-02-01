@@ -1,12 +1,32 @@
+find_in_extensions <- function(what) {
+
+  # Get package namespaces for sparkly and extensions.
+  namespaces <- c("sparklyr", .globals$extension_packages) %>%
+    purrr::map(asNamespace)
+
+  (function(what, namespaces) {
+    if (!length(namespaces)) return(NULL)
+
+    # Look in `namespaces` one at a time for the function
+    purrr::possibly(get, NULL)(what, envir = namespaces[[1]], mode = "function") %||%
+      Recall(what, namespaces[-1])
+  })(what, namespaces)
+}
+
+find_constructor <- function(candidates) {
+  if (!length(candidates)) stop("Constructor not found for `", jobj_class(jobj)[[1]], "`.", call. = FALSE)
+
+  # For each candidate function, look in extension namespaces, and return the first one found
+  find_in_extensions(candidates[[1]]) %||% Recall(candidates[-1])
+}
+
 ml_get_constructor <- function(jobj) {
   jobj %>%
     jobj_class(simple_name = FALSE) %>%
     purrr::map(ml_map_class) %>%
     purrr::compact() %>%
     purrr::map(~ paste0("new_", .x)) %>%
-    purrr::keep(~ exists(.x, where = asNamespace("sparklyr"), mode = "function")) %>%
-    rlang::flatten_chr() %>%
-    head(1)
+    find_constructor()
 }
 
 #' Wrap a Spark ML JVM object
