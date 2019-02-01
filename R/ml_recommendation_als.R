@@ -187,8 +187,11 @@ ml_als.tbl_spark <- function(x, rating_col = "rating", user_col = "user", item_c
     ...
   )
 
-  stage %>%
+  model_als <- stage %>%
     ml_fit(x)
+
+  model_als$dataset <- x
+  model_als
 }
 
 # Validator
