@@ -482,16 +482,15 @@ object Utils {
     rdd.map(x => org.apache.spark.sql.Row(x.toInt))
   }
 
-<<<<<<< HEAD
-  def unionRdd(context: org.apache.spark.SparkContext, rdds: Seq[org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]]):
-    org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
-    context.union(rdds)
-=======
   def readWholeFiles(sc: SparkContext, inputPath: String): RDD[Row] = {
     sc.wholeTextFiles(inputPath).map {
       l => Row(l._1, l._2)
     }
->>>>>>> master
+  }
+
+  def unionRdd(context: org.apache.spark.SparkContext, rdds: Seq[org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]]):
+    org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
+    context.union(rdds)
   }
 }
 
