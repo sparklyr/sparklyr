@@ -12,11 +12,11 @@ NULL
 tidy.ml_als_model <- function(x, ...){
 
   user_factors <- x$user_factors %>%
-    dplyr::select(id, features) %>%
+    dplyr::select(!!"id", !!"features") %>%
     dplyr::rename(user_factors = !!"features")
 
   item_factors <- x$item_factors %>%
-    dplyr::select(id, features) %>%
+    dplyr::select(!!"id", !!"features") %>%
     dplyr::rename(item_factors = !!"features")
 
   dplyr::full_join(user_factors, item_factors, by = "id")
