@@ -28,6 +28,10 @@ class ArrowBatchStreamWriter(
     arrowBatchIter.foreach(writeChannel.write)
   }
 
+  def writeOneBatch(arrowBatchIter: Iterator[Array[Byte]]): Unit = {
+    writeChannel.write(arrowBatchIter.next)
+  }
+
   /**
    * End the Arrow stream, does not close output stream.
    */
