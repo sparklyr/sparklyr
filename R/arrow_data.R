@@ -124,9 +124,9 @@ arrow_collect <- function(tbl, ...)
     arrow_iter <- invoke(arrow_df, "toLocalIterator")
 
     while (invoke(arrow_iter, "hasNext")) {
-      invoke_static(sc, "sparklyr.ArrowConverters", "toArrowStream", sdf, time_zone, arrow_iter) %>%
+      invoke_static(sc, "sparklyr.ArrowConverters", "toArrowStream", sdf, time_zone, invoke(arrow_iter, "underlying")) %>%
         arrow_read_stream() %>%
-        args$callback()
+        lapply(args$callback)
     }
   }
   else {
