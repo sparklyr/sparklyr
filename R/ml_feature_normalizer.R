@@ -13,6 +13,8 @@ ft_normalizer <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_normalizer")
 }
 
+ml_normalizer <- ft_normalizer
+
 #' @export
 ft_normalizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                            p = 2, uid = random_string("normalizer_"), ...) {
@@ -23,9 +25,9 @@ ft_normalizer.spark_connection <- function(x, input_col = NULL, output_col = NUL
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_normalizer()
+    validator_ml_normalizer()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Normalizer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
@@ -63,10 +65,10 @@ ft_normalizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_normalizer <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_normalizer")
+  new_ml_transformer(jobj, class = "ml_normalizer")
 }
 
-ml_validator_normalizer <- function(.args) {
+validator_ml_normalizer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["p"]] <- cast_scalar_double(.args[["p"]])
   if (.args[["p"]] < 1) stop("`p` must be at least 1.")

@@ -46,27 +46,15 @@ arrow_enabled_object.data.frame <- function(object) {
   arrow_enabled_dataframe_schema(sapply(object, function(e) class(e)[[1]]))
 }
 
-arrow_batch <- function(df)
-{
-  record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
-  write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
-
-  record <- record_batch(df)
-  write_record_batch(record, raw())
-}
-
 arrow_read_stream <- function(stream)
 {
-  record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
-  read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
-
-  reader <- record_batch_stream_reader(stream)
-  record_entry <- read_record_batch(reader)
+  reader <- arrow_record_stream_reader(stream)
+  record_entry <- arrow_read_record_batch(reader)
 
   entries <- list()
   while (!is.null(record_entry)) {
     entries[[length(entries) + 1]] <- tibble::as_tibble(record_entry)
-    record_entry <- read_record_batch(reader)
+    record_entry <- arrow_read_record_batch(reader)
   }
 
   entries
@@ -74,6 +62,17 @@ arrow_read_stream <- function(stream)
 
 arrow_copy_to <- function(sc, df, parallelism)
 {
+  # replace factors with characters
+  if (any(sapply(df, is.factor))) {
+    df <- dplyr::as_data_frame(lapply(df, function(x) if(is.factor(x)) as.character(x) else x))
+  }
+
+  # serialize to arrow
+  bytes <- arrow_write_record_batch(df)
+
+  # create batches data frame
+  batches <- list(bytes)
+
   # build schema
   schema <- spark_data_build_types(sc, lapply(df, class))
 

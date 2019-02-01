@@ -1,12 +1,21 @@
-ml_add_stage <- function(x, transformer) {
+
+#' Add a Stage to a Pipeline
+#'
+#' Adds a stage to a pipeline.
+#'
+#' @param x A pipeline or a pipeline stage.
+#' @param stage A pipeline stage.
+#' @keywords internal
+#' @export
+ml_add_stage <- function(x, stage) {
   sc <- spark_connection(x)
-  stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(transformer)) else {
+  stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(stage)) else {
     tryCatch(spark_jobj(x) %>%
                invoke("getStages") %>%
-               c(spark_jobj(transformer)),
+               c(spark_jobj(stage)),
              error = function(e) spark_jobj(x) %>%
                invoke("stages") %>%
-               c(spark_jobj(transformer))
+               c(spark_jobj(stage))
     )
   }
 
@@ -17,7 +26,22 @@ ml_add_stage <- function(x, transformer) {
   new_ml_pipeline(jobj)
 }
 
-maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
+#' Parameter Setting for JVM Objects
+#'
+#' Sets a parameter value for a pipeline stage object.
+#'
+#' @param jobj A pipeline stage jobj.
+#' @param setter The name of the setter method as a string.
+#' @param value The value to be set.
+#' @param min_version The minimum required Spark version for this parameter to be valid.
+#' @param default The default value of the parameter, to be used together with `min_version`.
+#'   An error is thrown if the user's Spark version is older than `min_version` and `value`
+#'   differs from `default`.
+#'
+#' @keywords internal
+#'
+#' @export
+jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
   # if value is NULL, don't set
   if (is.null(value)) return(jobj)
 
@@ -28,10 +52,10 @@ maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = N
       spark_version()
 
     if (ver < min_version) {
-      if (!isTRUE(all.equal(value, default))) {
+      if (!isTRUE(all.equal(c(value), default))) {
         # if user does not have required version, and tries to set parameter, throw error
-        stop(paste0("Parameter '", deparse(substitute(value)),
-                    "' is only available for Spark ", min_version, " and later."))
+        stop(paste0("Parameter `", deparse(substitute(value)),
+                    "` is only available for Spark ", min_version, " and later."))
       } else {
         # otherwise, return jobj untouched
         return(jobj)
@@ -42,15 +66,65 @@ maybe_set_param <- function(jobj, setter, value, min_version = NULL, default = N
   invoke(jobj, setter, value)
 }
 
-ml_new_transformer <- function(sc, class, uid,
-                               input_col = NULL, output_col = NULL,
-                               input_cols = NULL, output_cols = NULL) {
+
+#' Create a Pipeline Stage Object
+#'
+#' Helper function to create pipeline stage objects with common parameter setters.
+#'
+#' @param sc A `spark_connection` object.
+#' @param class Class name for the pipeline stage.
+#' @template roxlate-ml-uid
+#' @template roxlate-ml-features-col
+#' @template roxlate-ml-label-col
+#' @template roxlate-ml-prediction-col
+#' @template roxlate-ml-probabilistic-classifier-params
+#' @template roxlate-ml-clustering-params
+#' @template roxlate-ml-feature-input-output-col
+#' @param input_cols Names of input columns.
+#' @param input_cols Names of output columns.
+#'
+#' @keywords internal
+#'
+#' @export
+spark_pipeline_stage <- function(sc, class, uid, features_col = NULL, label_col = NULL, prediction_col = NULL,
+                                 probability_col = NULL, raw_prediction_col = NULL,
+                                 k = NULL, max_iter = NULL, seed = NULL, input_col = NULL, input_cols = NULL,
+                                 output_col = NULL, output_cols = NULL) {
   uid <- cast_string(uid)
   invoke_new(sc, class, uid) %>%
-    maybe_set_param("setInputCol", input_col) %>%
-    maybe_set_param("setInputCols", input_cols) %>%
-    maybe_set_param("setOutputCol", output_col) %>%
-    maybe_set_param("setOutputCols", output_cols)
+    jobj_set_ml_params(
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      probability_col = probability_col,
+      raw_prediction_col = raw_prediction_col,
+      k = k,
+      max_iter = max_iter,
+      seed = seed,
+      input_col = input_col,
+      input_cols = input_cols,
+      output_col = output_col,
+      output_cols = output_cols
+    )
+}
+
+jobj_set_ml_params <- function(jobj, features_col, label_col, prediction_col,
+                               probability_col, raw_prediction_col,
+                               k, max_iter, seed, input_col, input_cols,
+                               output_col, output_cols) {
+  jobj %>%
+    jobj_set_param("setFeaturesCol", features_col) %>%
+    jobj_set_param("setLabelCol", label_col) %>%
+    jobj_set_param("setPredictionCol", prediction_col) %>%
+    jobj_set_param("setProbabilityCol", probability_col) %>%
+    jobj_set_param("setRawPredictionCol", raw_prediction_col) %>%
+    jobj_set_param("setK", k) %>%
+    jobj_set_param("setMaxIter", max_iter) %>%
+    jobj_set_param("setSeed", seed) %>%
+    jobj_set_param("setInputCol", input_col) %>%
+    jobj_set_param("setInputCols", input_cols) %>%
+    jobj_set_param("setOutputCol", output_col) %>%
+    jobj_set_param("setOutputCols", output_cols)
 }
 
 validate_args_transformer <- function(.args) {
@@ -159,11 +233,6 @@ ml_summary <- function(x, metric = NULL, allow_null = FALSE) {
     x$summary[[metric]]
   else
     x$summary[[metric]] %||% stop("metric ", metric, " not found")
-}
-
-ml_new_identifiable <- function(sc, class, uid) {
-  uid <- cast_string(uid)
-  invoke_new(sc, class, uid)
 }
 
 ml_backwards_compatibility <- function(.args, mapping_list = NULL) {

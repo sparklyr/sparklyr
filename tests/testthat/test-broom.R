@@ -2,6 +2,7 @@ context("broom")
 
 test_that("tidy.{glm type models} works", {
   sc <- testthat_spark_connection()
+  test_requires("broom")
   test_requires_version("2.0.0")
   mtcars_tbl <- testthat_tbl("mtcars")
 
@@ -21,7 +22,7 @@ test_that("tidy.{glm type models} works", {
   expect_equal(td2$term, c("(Intercept)", "wt", "disp"))
 
   glmfit1_r <- glm(mpg ~ wt, mtcars, family = "gaussian")
-  expect_equal(as.data.frame(broom::tidy(glmfit1_r)), as.data.frame(broom::tidy(glmfit1)))
+  expect_equal(as.data.frame(tidy(glmfit1_r)), as.data.frame(tidy(glmfit1)))
 
   lmfit1 <- ml_linear_regression(mtcars_tbl, "mpg ~ wt")
   td1 <- tidy(lmfit1)
@@ -36,7 +37,7 @@ test_that("tidy.{glm type models} works", {
   expect_equal(td2$term, c("(Intercept)", "wt", "disp"))
 
   lmfit1_r <- lm(mpg ~ wt, mtcars)
-  expect_equal(as.data.frame(broom::tidy(lmfit1_r)), as.data.frame(broom::tidy(lmfit1)))
+  expect_equal(as.data.frame(tidy(lmfit1_r)), as.data.frame(tidy(lmfit1)))
 })
 
 test_that("augment.{glm type models} works", {

@@ -1,24 +1,23 @@
-new_ml_model_aft_survival_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, call) {
+new_ml_model_aft_survival_regression <- function(pipeline_model, formula, dataset, label_col,
+                                                 features_col) {
+  m <- new_ml_model_regression(
+    pipeline_model, formula = formula, dataset = dataset,
+    label_col = label_col, features_col = features_col,
+    class = "ml_model_aft_survival_regression"
+  )
 
+  model <- m$model
   jobj <- spark_jobj(model)
-  sc <- spark_connection(model)
-
 
   coefficients <- model$coefficients
-  names(coefficients) <- feature_names
+  names(coefficients) <- m$feature_names
 
-  coefficients <- if (ml_param(model, "fit_intercept"))
+  m$coefficients <- if (ml_param(model, "fit_intercept"))
     rlang::set_names(
       c(invoke(jobj, "intercept"), model$coefficients),
-      c("(Intercept)", feature_names))
+      c("(Intercept)", m$feature_names))
 
-  new_ml_model_regression(
-    pipeline, pipeline_model, model, dataset, formula,
-    coefficients = coefficients,
-    subclass = "ml_model_aft_survival_regression",
-    .features = feature_names
-  )
+  m
 }
 
 #' @export

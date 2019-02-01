@@ -30,6 +30,5 @@ test_that("ft_binarizer.tbl_spark() works", {
 
 test_that("ft_binarizer() input checking", {
   sc <- testthat_spark_connection()
-  expect_error(ft_binarizer(sc, threshold = "foo"),
-               "Can't convert a .* to a double vector")
+  expect_error(ft_binarizer(sc, threshold = "foo"), "")
 })

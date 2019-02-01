@@ -24,12 +24,28 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \description{
 Reads an \href{https://orc.apache.org/}{ORC} stream as a Spark dataframe stream.
 }
+\examples{
+\dontrun{
+
+sc <- spark_connect(master = "local")
+
+sdf_len(sc, 10) \%>\% spark_write_orc("orc-in")
+
+stream <- stream_read_orc(sc, "orc-in") \%>\% stream_write_orc("orc-out")
+
+stream_stop(stream)
+
+}
+
+}
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_json}},
   \code{\link{stream_read_kafka}},
   \code{\link{stream_read_parquet}},
+  \code{\link{stream_read_scoket}},
   \code{\link{stream_read_text}},
+  \code{\link{stream_write_console}},
   \code{\link{stream_write_csv}},
   \code{\link{stream_write_json}},
   \code{\link{stream_write_kafka}},

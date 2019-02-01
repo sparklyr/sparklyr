@@ -341,7 +341,7 @@ object Utils {
           case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
           case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _ => value
+          case _ => if (value == "NA") null.asInstanceOf[String] else value
         }
       })
 
@@ -376,7 +376,7 @@ object Utils {
           case "double"    => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
           case "logical"   => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _ => value
+          case _ => if (value == "NA") null.asInstanceOf[String] else value
         }
       })
 
@@ -482,9 +482,16 @@ object Utils {
     rdd.map(x => org.apache.spark.sql.Row(x.toInt))
   }
 
+<<<<<<< HEAD
   def unionRdd(context: org.apache.spark.SparkContext, rdds: Seq[org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]]):
     org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
     context.union(rdds)
+=======
+  def readWholeFiles(sc: SparkContext, inputPath: String): RDD[Row] = {
+    sc.wholeTextFiles(inputPath).map {
+      l => Row(l._1, l._2)
+    }
+>>>>>>> master
   }
 }
 

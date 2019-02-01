@@ -47,14 +47,14 @@ ml_random_forest <- function(x, formula = NULL, type = c("auto", "regression", "
                              min_instances_per_node = 1, subsampling_rate = 1, seed = NULL,
                              thresholds = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256,
                              uid = random_string("random_forest_"), response = NULL, features = NULL, ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
   sdf <- spark_dataframe(x)
   # choose classification vs. regression model based on column type
   schema <- sdf_schema(sdf)
   if (!response_col %in% names(schema))
-    stop(paste0("`", response_col, "` is not a column in the input dataset."))
+    stop("`", response_col, "` is not a column in the input dataset.")
 
   response_type <- schema[[response_col]]$type
 
@@ -120,21 +120,21 @@ ml_random_forest <- function(x, formula = NULL, type = c("auto", "regression", "
   do.call(routine, args)
 }
 
-new_ml_model_random_forest_classification <- function(pipeline, pipeline_model, model, dataset,
-                                                      formula, feature_names, index_labels, call) {
+new_ml_model_random_forest_classification <- function(pipeline_model, formula, dataset, label_col,
+                                            features_col, predicted_label_col) {
   new_ml_model_classification(
-    pipeline, pipeline_model, model, dataset, formula,
-    subclass = "ml_model_random_forest_classification",
-    .features = feature_names,
-    .index_labels = index_labels
+    pipeline_model, formula, dataset = dataset,
+    label_col = label_col, features_col = features_col,
+    predicted_label_col = predicted_label_col,
+    class = "ml_model_random_forest_classification"
   )
 }
 
-new_ml_model_random_forest_regression <- function(pipeline, pipeline_model, model, dataset, formula,
-                                                  feature_names, call) {
+new_ml_model_random_forest_regression <- function(pipeline_model, formula, dataset, label_col,
+                                        features_col) {
   new_ml_model_regression(
-    pipeline, pipeline_model, model, dataset, formula,
-    subclass = "ml_model_random_forest_regression",
-    .features = feature_names
+    pipeline_model, formula, dataset = dataset,
+    label_col = label_col, features_col = features_col,
+    class = "ml_model_random_forest_regression"
   )
 }

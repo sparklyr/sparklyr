@@ -95,12 +95,13 @@ print.tbl_spark <- function(x, ...) {
   mark <- if (identical(getOption("OutDec"), ","))  "." else ","
   cols_fmt <- formatC(dim(x)[2], big.mark = mark)
 
+  # collect rows + 1 to ensure that tibble knows there is more data to collect
   if (sdf_is_streaming(sdf)) {
     rows_fmt <- "inf"
-    data <- sdf_collect(sdf, n = rows)
+    data <- sdf_collect(sdf, n = rows + 1)
   } else {
     rows_fmt <- "??"
-    data <- dplyr::collect(head(x, n = rows))
+    data <- dplyr::collect(head(x, n = rows + 1))
   }
 
   attributes(data)$spark_dims <- c(NA_real_, sdf_ncol(x))
@@ -118,9 +119,8 @@ print.tbl_spark <- function(x, ...) {
     if (length(sort) > 0) c(`Ordered by` = paste0(sort, collapse = ", "))
   )
 
+  data <- tibble::as.tibble(as.data.frame(data))
   class(data) <- c("tbl_spark_print", class(data))
-
-  data <- tibble::as.tibble(data)
 
   print(data)
 }

@@ -1,11 +1,58 @@
-# Sparklyr 0.9.3 (unreleased)
+# Sparklyr 0.9.9000 (unreleased)
 
-- `copy_to()` defaults `memory` parameter to `FALSE` since data is
-  already cached in driver node when updloaded.
+- Support for Apache Arrow.
 
-- Tables with periods are now supported; for `database.name` use instead
-  `dbplyr::in_schema()` or, for backwards compatibility set
-  `sparklyr.dplyr.period.splits` to `TRUE`.
+### Data
+
+- Support for `whole` parameter for `spark_read_text()` to read an
+  entire text file without splitting contents by line.
+
+## Other
+
+- Remove dependency on broom.
+
+- Fixed re-entrancy job progress issues when running RStudio 1.2.
+
+- Tables with periods supported by setting
+  `sparklyr.dplyr.period.splits` to `FALSE`.
+
+- Improved memory use in Livy by using string builders and avoid print
+  backs.
+  
+ - `sdf_len()`, `sdf_along()` and `sdf_seq()` default to 32 bit integers
+   but allow support for 64 bits through `bits` parameter.
+   
+ - Support for detecting Spark version using `spark-submit`.
+
+# Sparklyr 0.9.4
+
+- Improved multiple streaming documentation examples (#1801, #1805, #1806).
+
+- Fix issue while printing Spark data frames under `tibble` 2.0.0 (#1829).
+
+- Support for `stream_write_console()` to write to console log.
+
+- Support for `stream_read_scoket()` to read socket streams.
+
+- Fix to `spark_read_kafka()` to remove unused `path`.
+
+# Sparklyr 0.9.3
+
+- Fix to make `spark_config_kubernetes()` work with variable `jar`
+  parameters.
+
+- Support to install and use Spark 2.4.0.
+
+- Improvements and fixes to `spark_config_kubernetes()`
+  parameters.
+
+- Support for `sparklyr.connect.ondisconnect` config setting to
+  allow cleanup of resources when using kubernetes.
+
+- `spark_apply()` and `spark_apply_bundle()` properly dereference
+  symlinks when creating package bundle (@awblocker, #1785)
+
+- Fix `tableName` warning triggered while connecting.
 
 - Deprecate `sdf_mutate()` (#1754).
 
@@ -16,16 +63,21 @@
 
 - Fixed default for `session` in `reactiveSpark()`.
 
-- Improved memory use in Livy by using string builders and avoid print
-  backs.
-  
- - `sdf_len()`, `sdf_along()` and `sdf_seq()` default to 32 bit integers
-   but allow support for 64 bits through `bits` parameter.
-
 - Removed `stream_read_jdbc()` and `stream_write_jdbc()` since they are 
   not yet implemented in Spark.
-  
+
 - Support for collecting NA values from logical columns (#1729).
+
+- Proactevely clean JVM objects when R object is deallocated.
+
+# Sparklyr 0.9.2
+
+- Support for Spark 2.3.2.
+
+- Fix installation error with older versions of `rstudioapi` (#1716).
+
+- Fix missing callstack and error case while logging in
+  `spark_apply()`.
 
 - Proactevely clean JVM objects when R object is deallocated.
 

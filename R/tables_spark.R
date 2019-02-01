@@ -1,5 +1,5 @@
 tbl_quote_name <- function(sc, name) {
-  if (!spark_config_value(sc$config, "sparklyr.dplyr.period.splits", FALSE)) {
+  if (!spark_config_value(sc$config, "sparklyr.dplyr.period.splits", TRUE)) {
     return(dbplyr::sql_quote(name, '`'))
   }
 

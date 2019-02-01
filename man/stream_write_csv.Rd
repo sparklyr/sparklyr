@@ -45,13 +45,32 @@ information to guarantee end-to-end fault-tolerance.}
 \description{
 Writes a Spark dataframe stream into a tabular (typically, comma-separated) stream.
 }
+\examples{
+\dontrun{
+
+sc <- spark_connect(master = "local")
+
+dir.create("csv-in")
+write.csv(iris, "csv-in/data.csv", row.names = FALSE)
+
+csv_path <- file.path("file://", getwd(), "csv-in")
+
+stream <- stream_read_csv(sc, csv_path) \%>\% stream_write_csv("csv-out")
+
+stream_stop(stream)
+
+}
+
+}
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_json}},
   \code{\link{stream_read_kafka}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
+  \code{\link{stream_read_scoket}},
   \code{\link{stream_read_text}},
+  \code{\link{stream_write_console}},
   \code{\link{stream_write_json}},
   \code{\link{stream_write_kafka}},
   \code{\link{stream_write_memory}},

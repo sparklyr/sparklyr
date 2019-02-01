@@ -2,6 +2,51 @@ package sparklyr
 
 class Sources {
   def sources: String = """
+arrow_write_record_batch <- function(df) {
+  if (packageVersion("arrow") < "0.12") {
+    record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+    write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
+
+    record <- record_batch(df)
+    write_record_batch(record, raw())
+  }
+  else {
+    record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+    record <- record_batch(df)
+
+    write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
+    write_arrow(record, raw())
+
+  }
+}
+
+arrow_record_stream_reader <- function(stream) {
+  if (packageVersion("arrow") < "0.12") {
+    record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
+  }
+  else {
+    record_batch_stream_reader <- get("RecordBatchStreamReader", envir = as.environment(asNamespace("arrow")))
+  }
+
+  record_batch_stream_reader(stream)
+}
+
+arrow_read_record_batch <- function(reader) {
+  if (packageVersion("arrow") < "0.12") {
+    read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
+  }
+  else {
+    read_record_batch <- function(reader) reader$read_next_batch()
+  }
+
+  read_record_batch(reader)
+}
+
+arrow_as_tibble <- function(record) {
+  as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
+
+  as_tibble(record)
+}
 #' A helper function to retrieve values from \code{spark_config()}
 #'
 #' @param config The configuration list from \code{spark_config()}
@@ -842,8 +887,24 @@ attach_connection <- function(jobj, connection) {
 # jobj -> Object, where jobj is an object created in the backend
 # nolint end
 
+get_type <- function(object, types = NULL) {
+  if (is.null(object)) return("NULL")
+  if (is.null(types))
+    types <- c("integer", "character", "logical", "double", "numeric", "raw", "array",
+      "list", "struct", "spark_jobj", "environment", "Date", "POSIXlt",
+      "POSIXct", "factor", "data.frame")
+
+  if (!length(types))
+    stop("Unsupported type '", class(object)[[1]], "' for serialization")
+
+  if (inherits(object, type <- types[[1]]))
+    return(type)
+
+  get_type(object, tail(types, -1))
+}
+
 getSerdeType <- function(object) {
-  type <- class(object)[[1]]
+  type <- get_type(object)
 
   if (type != "list") {
     type
@@ -867,7 +928,7 @@ getSerdeType <- function(object) {
 }
 
 writeObject <- function(con, object, writeType = TRUE) {
-  type <- class(object)[[1]]
+  type <- get_type(object)
 
   if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
     if (is.na(object)) {
@@ -898,7 +959,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
-         stop(paste("Unsupported type for serialization", type)))
+         stop("Unsupported type '", type, "' for serialization"))
 }
 
 writeVoid <- function(con) {
@@ -915,7 +976,7 @@ writeJobj <- function(con, value) {
 writeString <- function(con, value) {
   utfVal <- enc2utf8(value)
   writeInt(con, as.integer(nchar(utfVal, type = "bytes") + 1))
-  writeBin(utfVal, con, endian = "big", useBytes = TRUE)
+  writeBin(as.character(utfVal), con, endian = "big", useBytes = TRUE)
 }
 
 writeInt <- function(con, value) {
@@ -923,7 +984,7 @@ writeInt <- function(con, value) {
 }
 
 writeDouble <- function(con, value) {
-  writeBin(value, con, endian = "big")
+  writeBin(as.double(value), con, endian = "big")
 }
 
 writeBoolean <- function(con, value) {
@@ -955,7 +1016,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
-                 stop(paste("Unsupported type for serialization", class)))
+                 stop("Unsupported type '", type, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
 
@@ -1204,12 +1265,6 @@ spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
 spark_worker_apply_arrow <- function(sc, config) {
   worker_log("using arrow serializer")
 
-  write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
-  record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
-  read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
-  record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
-  as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
-
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)
 
@@ -1239,8 +1294,8 @@ spark_worker_apply_arrow <- function(sc, config) {
     )
   }
 
-  reader <- record_batch_stream_reader(record_batch_raw)
-  record_entry <- read_record_batch(reader)
+  reader <- arrow_record_stream_reader(record_batch_raw)
+  record_entry <- arrow_read_record_batch(reader)
 
   all_batches <- list()
   total_rows <- 0
@@ -1252,35 +1307,40 @@ spark_worker_apply_arrow <- function(sc, config) {
     batch_idx <- batch_idx + 1
     worker_log("is processing batch ", batch_idx)
 
-    df <- as_tibble(record_entry)
-    colnames(df) <- columnNames[1: length(colnames(df))]
+    df <- arrow_as_tibble(record_entry)
+    result <- NULL
 
-    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
+    if (!is.null(df)) {
+      colnames(df) <- columnNames[1: length(colnames(df))]
 
-    result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+      result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
 
-    result <- spark_worker_clean_factors(result)
+      result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
-    result <- spark_worker_apply_maybe_schema(result, config)
+      result <- spark_worker_clean_factors(result)
 
-    if (is.null(schema_output)) {
-      schema_output <- spark_worker_build_types(context, lapply(result, class))
+      result <- spark_worker_apply_maybe_schema(result, config)
     }
 
-    record <- record_batch(result)
-    raw_batch <- write_record_batch(record, raw())
+    if (!is.null(result)) {
+      if (is.null(schema_output)) {
+        schema_output <- spark_worker_build_types(context, lapply(result, class))
+      }
 
-    all_batches[[length(all_batches) + 1]] <- raw_batch
-    total_rows <- total_rows + nrow(result)
+      raw_batch <- arrow_write_record_batch(result)
 
-    record_entry <- read_record_batch(reader)
+      all_batches[[length(all_batches) + 1]] <- raw_batch
+      total_rows <- total_rows + nrow(result)
+    }
+
+    record_entry <- arrow_read_record_batch(reader)
 
     if (grouped && is.null(record_entry) && record_batch_raw_groups_idx < length(record_batch_raw_groups)) {
       record_batch_raw_groups_idx <- record_batch_raw_groups_idx + 1
       record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
 
-      reader <- record_batch_stream_reader(record_batch_raw)
-      record_entry <- read_record_batch(reader)
+      reader <- arrow_record_stream_reader(record_batch_raw)
+      record_entry <- arrow_read_record_batch(reader)
     }
   }
 

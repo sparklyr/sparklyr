@@ -153,3 +153,18 @@ test_that("spark_read_csv() can rename columns", {
 
   expect_equal(names(df), c("AA", "BB", "CC"))
 })
+
+test_that("spark_read_text() can read a whole file", {
+  test_requires("dplyr")
+
+  text_file <- file("test.txt", "w+")
+  cat("1\n2\n3", file = text_file)
+  close(text_file)
+
+  whole_tbl <- spark_read_text(sc, "whole", normalizePath("test.txt"), overwrite = T, whole = TRUE)
+
+  expect_equal(
+    whole_tbl %>% collect() %>% nrow(),
+    1L
+  )
+})

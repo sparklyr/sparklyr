@@ -47,6 +47,9 @@ stream_read_generic <- function(sc,
   else if ("spark_jobj" %in% class(columns)) {
     schema <- columns
   }
+  else if (identical(columns, FALSE)) {
+    schema <- NULL
+  }
   else {
     schema <- spark_data_build_types(sc, columns)
   }
@@ -55,10 +58,24 @@ stream_read_generic <- function(sc,
     streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
   }
 
-  streamOptions %>%
-    invoke("schema", schema) %>%
-    invoke(type, path) %>%
-    invoke("createOrReplaceTempView", name)
+  if (identical(schema, NULL)) {
+    schema <- streamOptions
+  } else {
+    schema <- streamOptions %>%
+      invoke("schema", schema)
+  }
+
+  if (is.null(path)) {
+    schema %>%
+      invoke("format", type) %>%
+      invoke("load") %>%
+      invoke("createOrReplaceTempView", name)
+  }
+  else {
+    schema %>%
+      invoke(type, path) %>%
+      invoke("createOrReplaceTempView", name)
+  }
 
   tbl(sc, name)
 }
@@ -115,6 +132,22 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, strea
 #'
 #' @family Spark stream serialization
 #'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' dir.create("csv-in")
+#' write.csv(iris, "csv-in/data.csv", row.names = FALSE)
+#'
+#' csv_path <- file.path("file://", getwd(), "csv-in")
+#'
+#' stream <- stream_read_csv(sc, csv_path) %>% stream_write_csv("csv-out")
+#'
+#' stream_stop(stream)
+#'
+#' }
+#'
 #' @export
 stream_read_csv <- function(sc,
                             path,
@@ -169,6 +202,22 @@ stream_read_csv <- function(sc,
 #'
 #' @family Spark stream serialization
 #'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' dir.create("csv-in")
+#' write.csv(iris, "csv-in/data.csv", row.names = FALSE)
+#'
+#' csv_path <- file.path("file://", getwd(), "csv-in")
+#'
+#' stream <- stream_read_csv(sc, csv_path) %>% stream_write_csv("csv-out")
+#'
+#' stream_stop(stream)
+#'
+#' }
+#'
 #' @export
 stream_write_csv <- function(x,
                              path,
@@ -219,12 +268,14 @@ stream_write_csv <- function(x,
 #'
 #' sc <- spark_connect(master = "local")
 #'
-#' dir.create("iris-in")
-#' write.csv(iris, "iris-in/iris.csv", row.names = FALSE)
+#' dir.create("csv-in")
+#' write.csv(iris, "csv-in/data.csv", row.names = FALSE)
 #'
-#' stream <- stream_read_csv(sc, "iris-in") %>% stream_write_memory()
+#' csv_path <- file.path("file://", getwd(), "csv-in")
 #'
-#' stop_stream(stream)
+#' stream <- stream_read_csv(sc, csv_path) %>% stream_write_memory("csv-out")
+#'
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -276,6 +327,22 @@ stream_write_memory <- function(x,
 #'
 #' @family Spark stream serialization
 #'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' dir.create("text-in")
+#' writeLines("A text entry", "text-in/text.txt")
+#'
+#' text_path <- file.path("file://", getwd(), "text-in")
+#'
+#' stream <- stream_read_text(sc, text_path) %>% stream_write_text("text-out")
+#'
+#' stream_stop(stream)
+#'
+#' }
+#'
 #' @export
 stream_read_text <- function(sc,
                              path,
@@ -311,11 +378,13 @@ stream_read_text <- function(sc,
 #' sc <- spark_connect(master = "local")
 #'
 #' dir.create("text-in")
-#' write.csv("A text entry", "text-in/text.txt", row.names = FALSE)
+#' writeLines("A text entry", "text-in/text.txt")
 #'
-#' stream <- stream_read_text(sc, "text-in") %>% stream_write_text("text-out")
+#' text_path <- file.path("file://", getwd(), "text-in")
 #'
-#' stop_stream(stream)
+#' stream <- stream_read_text(sc, text_path) %>% stream_write_text("text-out")
+#'
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -348,6 +417,22 @@ stream_write_text <- function(x,
 #' @inheritParams stream_read_csv
 #'
 #' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' dir.create("json-in")
+#' jsonlite::write_json(list(a = c(1,2), b = c(10,20)), "json-in/data.json")
+#'
+#' json_path <- file.path("file://", getwd(), "json-in")
+#'
+#' stream <- stream_read_json(sc, json_path) %>% stream_write_json("json-out")
+#'
+#' stream_stop(stream)
+#'
+#' }
 #'
 #' @export
 stream_read_json <- function(sc,
@@ -383,11 +468,13 @@ stream_read_json <- function(sc,
 #' sc <- spark_connect(master = "local")
 #'
 #' dir.create("json-in")
-#' jsonlite::write_json(list(a = c(1,2), b = c(10,20)), "../streaming/json-in/data.json")
+#' jsonlite::write_json(list(a = c(1,2), b = c(10,20)), "json-in/data.json")
 #'
-#' stream <- stream_read_json(sc, "json-in") %>% stream_write_json("json-out")
+#' json_path <- file.path("file://", getwd(), "json-in")
 #'
-#' stop_stream(stream)
+#' stream <- stream_read_json(sc, json_path) %>% stream_write_json("json-out")
+#'
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -420,6 +507,19 @@ stream_write_json <- function(x,
 #' @inheritParams stream_read_csv
 #'
 #' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' sdf_len(sc, 10) %>% spark_write_parquet("parquet-in")
+#'
+#' stream <- stream_read_parquet(sc, "parquet-in") %>% stream_write_parquet("parquet-out")
+#'
+#' stream_stop(stream)
+#'
+#' }
 #'
 #' @export
 stream_read_parquet <- function(sc,
@@ -492,6 +592,19 @@ stream_write_parquet <- function(x,
 #'
 #' @family Spark stream serialization
 #'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' sdf_len(sc, 10) %>% spark_write_orc("orc-in")
+#'
+#' stream <- stream_read_orc(sc, "orc-in") %>% stream_write_orc("orc-out")
+#'
+#' stream_stop(stream)
+#'
+#' }
+#'
 #' @export
 stream_read_orc <- function(sc,
                             path,
@@ -527,9 +640,9 @@ stream_read_orc <- function(sc,
 #'
 #' sdf_len(sc, 10) %>% spark_write_orc("orc-in")
 #'
-#' stream <- stream_read_parquet(sc, "orc-in") %>% stream_write_parquet("orc-out")
+#' stream <- stream_read_orc(sc, "orc-in") %>% stream_write_orc("orc-out")
 #'
-#' stop_stream(stream)
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -561,13 +674,35 @@ stream_write_orc <- function(x,
 #'
 #' @inheritParams stream_read_csv
 #'
+#' @details Please note that Kafka requires installing the appropriate
+#'  package by conneting with a config setting where \code{sparklyr.shell.packages}
+#'  is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+#'
 #' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' config <- spark_config()
+#'
+#' # The following package is dependent to Spark version, for Spark 2.3.2:
+#' config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
+#'
+#' sc <- spark_connect(master = "local", config = config)
+#'
+#' read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
+#' write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
+#'
+#' stream <- stream_read_kafka(sc, options = read_options) %>%
+#'   stream_write_kafka(options = write_options)
+#'
+#' stream_stop(stream)
+#'
+#' }
 #'
 #' @export
 stream_read_kafka <- function(sc,
-                              path,
                               name = NULL,
-                              columns = NULL,
                               options = list(),
                               ...)
 {
@@ -576,10 +711,10 @@ stream_read_kafka <- function(sc,
   name <- name %||% random_string("sparklyr_tmp_")
 
   stream_read_generic(sc,
-                      path = path,
+                      path = NULL,
                       type = "kafka",
                       name = name,
-                      columns = columns,
+                      columns = FALSE,
                       stream_options = options)
 }
 
@@ -589,18 +724,29 @@ stream_read_kafka <- function(sc,
 #'
 #' @inheritParams stream_write_memory
 #'
+#' @details Please note that Kafka requires installing the appropriate
+#'  package by conneting with a config setting where \code{sparklyr.shell.packages}
+#'  is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+#'
 #' @family Spark stream serialization
 #'
 #' @examples
 #' \dontrun{
 #'
-#' sc <- spark_connect(master = "local")
+#' config <- spark_config()
 #'
-#' sdf_len(sc, 10) %>% spark_write_orc("orc-in")
+#' # The following package is dependent to Spark version, for Spark 2.3.2:
+#' config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
 #'
-#' stream <- stream_read_parquet(sc, "orc-in") %>% stream_write_parquet("orc-out")
+#' sc <- spark_connect(master = "local", config = config)
 #'
-#' stop_stream(stream)
+#' read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
+#' write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
+#'
+#' stream <- stream_read_kafka(sc, options = read_options) %>%
+#'   stream_write_kafka(options = write_options)
+#'
+#' stream_stop(stream)
 #'
 #' }
 #'
@@ -622,5 +768,84 @@ stream_write_kafka <- function(x,
                        mode = mode,
                        trigger = trigger,
                        checkpoint = checkpoint,
+                       stream_options = options)
+}
+
+#' Read Socket Stream
+#'
+#' Reads a Socket stream as a Spark dataframe stream.
+#'
+#' @inheritParams stream_read_csv
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' # Start socket server from terminal, example: nc -lk 9999
+#' stream <- stream_read_scoket(sc, options = list(host = "localhost", port = 9999))
+#' stream
+#'
+#' }
+#'
+#' @export
+stream_read_scoket <- function(sc,
+                               name = NULL,
+                               columns = NULL,
+                               options = list(),
+                               ...)
+{
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  name <- name %||% random_string("sparklyr_tmp_")
+
+  stream_read_generic(sc,
+                      path = NULL,
+                      type = "socket",
+                      name = name,
+                      columns = FALSE,
+                      stream_options = options)
+}
+
+#' Write Console Stream
+#'
+#' Writes a Spark dataframe stream into console logs.
+#'
+#' @inheritParams stream_write_memory
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sc <- spark_connect(master = "local")
+#'
+#' sdf_len(sc, 10) %>% dplyr::transmute(text = as.character(id)) %>% spark_write_text("text-in")
+#'
+#' stream <- stream_read_text(sc, "text-in") %>% stream_write_console()
+#'
+#' stream_stop(stream)
+#'
+#' }
+#'
+#' @export
+stream_write_console <- function(x,
+                                 mode = c("append", "complete", "update"),
+                                 options = list(),
+                                 trigger = stream_trigger_interval(),
+                                 ...)
+{
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
+  sc <- spark_connection(x)
+
+  stream_write_generic(x,
+                       path = NULL,
+                       type = "console",
+                       mode = mode,
+                       trigger = trigger,
+                       checkpoint = NULL,
                        stream_options = options)
 }

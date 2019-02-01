@@ -15,6 +15,8 @@ ft_dct <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_dct")
 }
 
+ml_dct <- ft_dct
+
 #' @export
 ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                     inverse = FALSE, uid = random_string("dct_"), ...) {
@@ -25,9 +27,9 @@ ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     uid = uid
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_dct()
+    validator_ml_dct()
 
-  jobj <- ml_new_transformer(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.DCT",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
     invoke("setInverse", .args[["inverse"]])
@@ -62,7 +64,7 @@ ft_dct.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
 }
 
 new_ml_dct <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_dct")
+  new_ml_transformer(jobj, class = "ml_dct")
 }
 
 #' @rdname ft_dct
@@ -72,7 +74,7 @@ ft_discrete_cosine_transform <- function(x, input_col, output_col, inverse = FAL
   UseMethod("ft_dct")
 }
 
-ml_validator_dct <- function(.args) {
+validator_ml_dct <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["inverse"]] <- cast_scalar_logical(.args[["inverse"]])
   .args

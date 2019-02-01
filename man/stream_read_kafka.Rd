@@ -4,18 +4,12 @@
 \alias{stream_read_kafka}
 \title{Read Kafka Stream}
 \usage{
-stream_read_kafka(sc, path, name = NULL, columns = NULL,
-  options = list(), ...)
+stream_read_kafka(sc, name = NULL, options = list(), ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
 
-\item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
-
 \item{name}{The name to assign to the newly generated stream.}
-
-\item{columns}{A vector of column names or a named vector of column types.}
 
 \item{options}{A list of strings with additional options.}
 
@@ -24,12 +18,40 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \description{
 Reads a Kafka stream as a Spark dataframe stream.
 }
+\details{
+Please note that Kafka requires installing the appropriate
+ package by conneting with a config setting where \code{sparklyr.shell.packages}
+ is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+}
+\examples{
+\dontrun{
+
+config <- spark_config()
+
+# The following package is dependent to Spark version, for Spark 2.3.2:
+config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
+
+sc <- spark_connect(master = "local", config = config)
+
+read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
+write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
+
+stream <- stream_read_kafka(sc, options = read_options) \%>\%
+  stream_write_kafka(options = write_options)
+
+stream_stop(stream)
+
+}
+
+}
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_json}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
+  \code{\link{stream_read_scoket}},
   \code{\link{stream_read_text}},
+  \code{\link{stream_write_console}},
   \code{\link{stream_write_csv}},
   \code{\link{stream_write_json}},
   \code{\link{stream_write_kafka}},

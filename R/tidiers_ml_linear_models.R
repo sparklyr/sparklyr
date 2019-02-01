@@ -52,7 +52,7 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
     get_stats(model)
   c(coefficients, statistics) %>%
     as.data.frame() %>%
-    broom::fix_data_frame(newnames = new_names) %>%
+    fix_data_frame(newnames = new_names) %>%
     dplyr::mutate(estimate = trans(!!sym("estimate"))) %>%
     dplyr::select(!!!syms(vars))
 
@@ -71,7 +71,7 @@ tidy.ml_model_linear_regression <- function(x, ...) {
     get_stats(model)
   c(coefficients, statistics) %>%
     as.data.frame() %>%
-    broom::fix_data_frame(newnames = new_names) %>%
+    fix_data_frame(newnames = new_names) %>%
     select(!!!syms(vars))
 }
 
@@ -91,7 +91,7 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   type.residuals <- rlang::arg_match(type.residuals) %>%
     cast_string()
 
-  if (!is.null(newdata) && !identical(type.residuals, "working"))
+  if (!is.null(newdata) && !(type.residuals == "working"))
     stop("'type.residuals' must be set to 'working' when 'newdata' is supplied")
 
   newdata <- newdata %||% ml_model_data(x)
@@ -100,9 +100,9 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   # instead of calling the MLlib API.
   if (type.residuals == "working") {
     predictions <- ml_predict(x, newdata) %>%
-      rename(fitted = !!"prediction")
+      rename(fitted = !!rlang::sym("prediction"))
     return(predictions %>%
-             mutate(resid = `-`(!!sym(x$.response), !!sym("fitted")))
+             mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
     )
   }
 
@@ -132,7 +132,6 @@ glance.ml_model_generalized_linear_regression <- function(x, ...) {
 #' @rdname ml_glm_tidiers
 #' @export
 glance.ml_model_linear_regression <- function(x, ...) {
-  # browser()
   metric_names <- c("explained_variance", "mean_absolute_error",
                     "mean_squared_error",
                     "r2", "root_mean_squared_error")

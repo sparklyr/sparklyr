@@ -12,7 +12,7 @@ NULL
 tidy.ml_model_naive_bayes <- function(x,
                                  ...){
 
-  theta <- broom::fix_data_frame(x$theta) %>%
+  theta <- fix_data_frame(x$theta) %>%
     dplyr::rename(.label = !!"term")
 
   pi <- as.data.frame(x$pi) %>%

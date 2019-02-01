@@ -103,6 +103,17 @@ spark_version_from_home <- function(spark_home, default = NULL) {
           return(match[[1]][[2]])
         }
       }
+    },
+    useSparkSubmit = function() {
+      version_output <- system2(
+        file.path(spark_home, "bin", "spark-submit"),
+        "--version", stderr = TRUE, stdout = TRUE)
+
+      version_matches <- regmatches(version_output, regexec("   version (.*)$", version_output))
+      if (any(sapply(version_matches, length) > 0)) {
+        version_row <- which(sapply(version_matches, length) > 0)
+        return(version_matches[[version_row]][2])
+      }
     }
   )
 

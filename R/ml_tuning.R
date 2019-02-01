@@ -63,7 +63,7 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
         # Default arguments based on function formals.
         default_params <- stage_jobj %>%
           ml_get_stage_constructor() %>%
-          rlang::fn_fmls() %>%
+          formals() %>%
           as.list() %>%
           purrr::discard(~ is.symbol(.x) || is.language(.x)) %>%
           purrr::compact()
@@ -85,7 +85,7 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
 
         # Call the validator associated with the stage, and return the (validated)
         #   parameters the user specified.
-        do.call(ml_get_stage_validator(stage_jobj), list(.args = args_to_validate)) %>%
+        do.call(ml_get_stage_validator(stage_jobj), list(args_to_validate)) %>%
           `[`(input_param_names)
       })
     })  %>%
@@ -122,13 +122,14 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
                              estimator_param_maps, seed) {
   uid <- cast_string(uid)
 
-  possibly_spark_jobj <- purrr::possibly(spark_jobj, NULL)
+  possibly_spark_jobj <- possibly_null(spark_jobj)
 
   param_maps <- if (!is.null(estimator) && !is.null(estimator_param_maps)) {
-    stage_jobjs <- if (inherits(estimator, "ml_pipeline"))
+    stage_jobjs <- if (inherits(estimator, "ml_pipeline")) {
       invoke_static(sc, "sparklyr.MLUtils", "uidStagesMapping", spark_jobj(estimator))
-    else
+    } else {
       rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
+    }
 
     current_param_list <- stage_jobjs %>%
       purrr::map(invoke, "extractParamMap") %>%
@@ -142,46 +143,45 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
   }
 
   jobj <- invoke_new(sc, class, uid) %>%
-    maybe_set_param("setEstimator", possibly_spark_jobj(estimator)) %>%
-    maybe_set_param("setEvaluator", possibly_spark_jobj(evaluator)) %>%
-    maybe_set_param("setSeed", seed)
+    jobj_set_param("setEstimator", possibly_spark_jobj(estimator)) %>%
+    jobj_set_param("setEvaluator", possibly_spark_jobj(evaluator)) %>%
+    jobj_set_param("setSeed", seed)
 
-  if (!is.null(param_maps))
+  if (!is.null(param_maps)) {
     invoke_static(
       sc, "sparklyr.MLUtils", "setParamMaps",
       jobj, param_maps
     )
-  else
+  } else {
     jobj
+  }
 }
 
-new_ml_tuning <- function(jobj, ..., subclass = NULL) {
+new_ml_tuning <- function(jobj, ..., class = character()) {
   new_ml_estimator(
     jobj,
-    estimator = purrr::possibly(
-      ~ invoke(.x, "getEstimator") %>% ml_constructor_dispatch(),
-      NULL
-    )(jobj),
-    evaluator = purrr::possibly(
-      ~ invoke(.x, "getEvaluator") %>% ml_constructor_dispatch(),
-      NULL
-    )(jobj),
-    estimator_param_maps = purrr::possibly(ml_get_estimator_param_maps, NULL)(jobj),
+    estimator = possibly_null(
+      ~ invoke(jobj, "getEstimator") %>% ml_call_constructor()
+    )(),
+    evaluator = possibly_null(
+      ~ invoke(jobj, "getEvaluator") %>% ml_call_constructor()
+    )(),
+    estimator_param_maps = possibly_null(ml_get_estimator_param_maps)(jobj),
     ...,
-    subclass = c(subclass, "ml_tuning"))
+    class = c(class, "ml_tuning"))
 }
 
-new_ml_tuning_model <- function(jobj, ..., subclass = NULL) {
+new_ml_tuning_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
     jobj,
     estimator = invoke(jobj, "getEstimator") %>%
-      ml_constructor_dispatch(),
+      ml_call_constructor(),
     evaluator = invoke(jobj, "getEvaluator") %>%
-      ml_constructor_dispatch(),
+      ml_call_constructor(),
     estimator_param_maps = ml_get_estimator_param_maps(jobj),
-    best_model = ml_constructor_dispatch(invoke(jobj, "bestModel")),
+    best_model = ml_call_constructor(invoke(jobj, "bestModel")),
     ...,
-    subclass = c(subclass, "ml_tuning_model"))
+    class = c(class, "ml_tuning_model"))
 }
 
 print_tuning_info <- function(x, type = c("cv", "tvs")) {

@@ -74,8 +74,6 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
     pull(probability)
 
   expect_equal(m1_predictions, m2_predictions)
-  expect_identical(class(m2), c("ml_logistic_regression_model", "ml_prediction_model",
-                                "ml_transformer", "ml_pipeline_stage"))
 })
 
 test_that("ml_logistic_regression() agrees with stats::glm()", {

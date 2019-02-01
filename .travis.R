@@ -3,6 +3,10 @@ args <- commandArgs(trailingOnly=TRUE)
 if (length(args) == 0) {
   stop("Missing arguments")
 } else if (args[[1]] == "--testthat") {
+  if (package_version(paste(R.Version()$major, R.Version()$minor, sep = ".")) >= "3.3") {
+    install.packages("sparklyr.nested")
+  }
+
   parent_dir <- dir(".", full.names = TRUE)
   sparklyr_package <- parent_dir[grepl("sparklyr_", parent_dir)]
   install.packages(sparklyr_package, repos = NULL, type = "source")

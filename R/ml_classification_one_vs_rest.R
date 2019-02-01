@@ -24,16 +24,16 @@ ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL
     prediction_col = prediction_col
   ) %>%
     c(rlang::dots_list(...)) %>%
-    ml_validator_one_vs_rest()
+    validator_ml_one_vs_rest()
 
-  jobj <- ml_new_predictor(
+  jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.OneVsRest", uid,
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]]
   ) %>%
-    maybe_set_param(
+    jobj_set_param(
       "setClassifier",
-      purrr::possibly(spark_jobj, NULL)(.args[["classifier"]])
+      possibly_null(spark_jobj)(.args[["classifier"]])
     )
 
   new_ml_one_vs_rest(jobj)
@@ -61,7 +61,7 @@ ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, featu
                                      label_col = "label", prediction_col = "prediction",
                                      uid = random_string("one_vs_rest_"), response = NULL,
                                      features = NULL, predicted_label_col = "predicted_label", ...) {
-  ml_formula_transformation()
+  formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_one_vs_rest.spark_connection(
     x = spark_connection(x),
@@ -78,17 +78,22 @@ ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, featu
     stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, stage, formula, features_col, label_col,
-                         "classification",
-                         new_ml_model_one_vs_rest,
-                         predicted_label_col)
+    ml_construct_model_supervised(
+      new_ml_model_one_vs_rest,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col,
+      predicted_label_col = predicted_label_col
+    )
   }
 }
 
-ml_validator_one_vs_rest <- function(.args) {
+validator_ml_one_vs_rest <- function(.args) {
   .args <- validate_args_predictor(.args)
   .args[["classifier"]] <- if (inherits(.args[["classifier"]], "spark_jobj"))
-    ml_constructor_dispatch(.args[["classifier"]])
+    ml_call_constructor(.args[["classifier"]])
   else
     .args[["classifier"]]
   if (!is.null(.args[["classifier"]]) && !inherits(.args[["classifier"]], "ml_classifier"))
@@ -97,13 +102,13 @@ ml_validator_one_vs_rest <- function(.args) {
 }
 
 new_ml_one_vs_rest <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_one_vs_rest")
+  new_ml_estimator(jobj, class = "ml_one_vs_rest")
 }
 
 new_ml_one_vs_rest_model <- function(jobj) {
-  new_ml_prediction_model(
+  new_ml_transformer(
     jobj,
     models = invoke(jobj, "models") %>%
-      purrr::map(ml_constructor_dispatch),
-    subclass = "ml_one_vs_rest_model")
+      purrr::map(ml_call_constructor),
+    class = "ml_one_vs_rest_model")
 }

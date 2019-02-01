@@ -37,11 +37,13 @@ Writes a Spark dataframe stream into a text stream.
 sc <- spark_connect(master = "local")
 
 dir.create("text-in")
-write.csv("A text entry", "text-in/text.txt", row.names = FALSE)
+writeLines("A text entry", "text-in/text.txt")
 
-stream <- stream_read_text(sc, "text-in") \%>\% stream_write_text("text-out")
+text_path <- file.path("file://", getwd(), "text-in")
 
-stop_stream(stream)
+stream <- stream_read_text(sc, text_path) \%>\% stream_write_text("text-out")
+
+stream_stop(stream)
 
 }
 
@@ -52,7 +54,9 @@ Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_kafka}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
+  \code{\link{stream_read_scoket}},
   \code{\link{stream_read_text}},
+  \code{\link{stream_write_console}},
   \code{\link{stream_write_csv}},
   \code{\link{stream_write_json}},
   \code{\link{stream_write_kafka}},

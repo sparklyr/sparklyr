@@ -29,16 +29,28 @@ information to guarantee end-to-end fault-tolerance.}
 \description{
 Writes a Spark dataframe stream into an kafka stream.
 }
+\details{
+Please note that Kafka requires installing the appropriate
+ package by conneting with a config setting where \code{sparklyr.shell.packages}
+ is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+}
 \examples{
 \dontrun{
 
-sc <- spark_connect(master = "local")
+config <- spark_config()
 
-sdf_len(sc, 10) \%>\% spark_write_orc("orc-in")
+# The following package is dependent to Spark version, for Spark 2.3.2:
+config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
 
-stream <- stream_read_parquet(sc, "orc-in") \%>\% stream_write_parquet("orc-out")
+sc <- spark_connect(master = "local", config = config)
 
-stop_stream(stream)
+read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
+write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
+
+stream <- stream_read_kafka(sc, options = read_options) \%>\%
+  stream_write_kafka(options = write_options)
+
+stream_stop(stream)
 
 }
 
@@ -49,7 +61,9 @@ Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_kafka}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
+  \code{\link{stream_read_scoket}},
   \code{\link{stream_read_text}},
+  \code{\link{stream_write_console}},
   \code{\link{stream_write_csv}},
   \code{\link{stream_write_json}},
   \code{\link{stream_write_memory}},
