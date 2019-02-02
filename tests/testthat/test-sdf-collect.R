@@ -10,7 +10,7 @@ test_that("sdf_collect() works properly", {
 })
 
 test_that("sdf_collect() supports callback", {
-  df <- matrix(0, ncol = 5, nrow = 2) %>% dplyr::as_data_frame()
+  if (!"arrow" %in% .packages()) skip("Only arrow supported")
 
   batch_count <- 0
   row_count <- 0
