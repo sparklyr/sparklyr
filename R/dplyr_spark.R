@@ -100,7 +100,7 @@ copy_to.spark_connection <- function(dest,
                                      df,
                                      name = spark_table_name(substitute(df)),
                                      overwrite = FALSE,
-                                     memory = FALSE,
+                                     memory = TRUE,
                                      repartition = 0L,
                                      ...)
 {
