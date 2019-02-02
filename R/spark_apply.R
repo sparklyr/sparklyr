@@ -349,7 +349,7 @@ spark_apply <- function(x,
         time_zone
       )
 
-      columns_query <- columns_op %>% sdf_collect(arrow = FALSE)
+      columns_query <- columns_op %>% sdf_collect()
       if (arrow && !arrow_enabled_dataframe_schema(columns_query$types)) {
         arrow <- FALSE
       }

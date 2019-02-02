@@ -9,7 +9,6 @@ spark_config_settings <- function() {
     sparklyr.apply.rlang = "Experimental feature. Turns on improved serialization for spark_apply().",
     sparklyr.apply.schema.infer = "Number of rows collected to infer schema when column types specified in spark_apply().",
     sparklyr.arrow = "Use Apache Arrow to serialize data?",
-    sparklyr.arrow.file = "Use temp files to serialize Apache Arrow data?",
     sparklyr.backend.interval = "Total seconds sparklyr will check on a backend operation.",
     sparklyr.backend.timeout = "Total seconds before sparklyr will give up waiting for a backend operation to complete.",
     sparklyr.connect.aftersubmit = "R function to call after spark-submit executes.",
