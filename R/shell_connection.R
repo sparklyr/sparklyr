@@ -587,8 +587,10 @@ initialize_connection.spark_shell_connection <- function(sc) {
       apply_config(conf, default_config, "set", "spark.")
 
       # create the spark context and assign the connection to it
-      # use spark home version since spark context not yet initialized
-      if (sc$home_version >= "2.0") {
+      # use spark home version since spark context is not yet initialized in shell connection
+      # but spark_home might not be initialized in submit_batch while spark context is available
+      if ((!identical(sc$home_version, NULL) && sc$home_version >= "2.0") ||
+          (!identical(spark_context(sc), NULL) && spark_version(sc) >= "2.0")) {
         # For Spark 2.0+, we create a `SparkSession`.
         session <- invoke_static(
           sc,
