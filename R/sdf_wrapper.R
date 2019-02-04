@@ -107,6 +107,7 @@ sdf_collect <- function(object, ...) {
 # Read a Spark Dataset into R.
 #' @importFrom dplyr as_data_frame
 sdf_collect_static <- function(object, ...) {
+  args <- list(...)
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
 
@@ -118,7 +119,18 @@ sdf_collect_static <- function(object, ...) {
   # collect the data set in chunks, and then join those chunks.
   # note that this issue should be resolved with Spark >2.0.0
   collected <- if (spark_version(sc) > "2.0.0") {
-    invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
+    if (!identical(args$callback, NULL)) {
+      sdf_iter <- invoke(sdf, "toLocalIterator") %>% invoke("underlying")
+
+      while (invoke(sdf_iter, "hasNext")) {
+        sdf_subset <- invoke(sdf_iter, "take", 10)
+        df <- invoke_static(sc, "sparklyr.Utils", "collect", sdf_subset, separator$regexp)
+        args$callback(df)
+      }
+    }
+    else {
+      invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
+    }
   } else {
     columns <- invoke(sdf, "columns") %>% as.character()
     chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
