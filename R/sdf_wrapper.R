@@ -106,6 +106,7 @@ sdf_collect <- function(object, ...) {
 
 sdf_collect_data_frame <- function(sdf, collected) {
   if (identical(collected, NULL)) return(invisible(NULL))
+  sc <- spark_connection(sdf)
 
   # deserialize columns as needed (string columns will enter as
   # a single newline-delimited string)
