@@ -196,10 +196,14 @@ object Utils {
     }
   }
 
+  def collectArray(local: Array[Row], dtypes: Array[(String, String)], separator: String): Array[_] = {
+    (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
+  }
+
   def collect(df: DataFrame, separator: String): Array[_] = {
     val local : Array[Row] = df.collect()
     val dtypes = df.dtypes
-    (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
+    collectArray(local, dtypes, separator)
   }
 
   def separateColumnArray(df: DataFrame,
@@ -488,6 +492,12 @@ object Utils {
   def unionRdd(context: org.apache.spark.SparkContext, rdds: Seq[org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]]):
     org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
     context.union(rdds)
+  }
+
+  def collectIter(iter: Iterator[Row], size: Integer, df: DataFrame, separator: String): Array[_] = {
+    val local = iter.take(size).toArray
+    val dtypes = df.dtypes
+    collectArray(local, dtypes, separator)
   }
 }
 

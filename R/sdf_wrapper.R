@@ -120,11 +120,10 @@ sdf_collect_static <- function(object, ...) {
   # note that this issue should be resolved with Spark >2.0.0
   collected <- if (spark_version(sc) > "2.0.0") {
     if (!identical(args$callback, NULL)) {
-      sdf_iter <- invoke(sdf, "toLocalIterator") %>% invoke("underlying")
+      sdf_iter <- invoke(sdf, "toLocalIterator")
 
       while (invoke(sdf_iter, "hasNext")) {
-        sdf_subset <- invoke(sdf_iter, "take", 10)
-        df <- invoke_static(sc, "sparklyr.Utils", "collect", sdf_subset, separator$regexp)
+        df <- invoke_static(sc, "sparklyr.Utils", "collectIter", invoke(sdf_iter, "underlying"), 10L, sdf, separator$regexp)
         args$callback(df)
       }
     }
