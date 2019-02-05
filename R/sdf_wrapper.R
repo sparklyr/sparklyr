@@ -165,10 +165,11 @@ sdf_collect_static <- function(object, ...) {
   # note that this issue should be resolved with Spark >2.0.0
   collected <- if (spark_version(sc) > "2.0.0") {
     if (!identical(args$callback, NULL)) {
+      batch_size <- spark_config_value(sc$config, "sparklyr.collect.batch", as.integer(10^5L))
       sdf_iter <- invoke(sdf, "toLocalIterator")
 
       while (invoke(sdf_iter, "hasNext")) {
-        raw_df <- invoke_static(sc, "sparklyr.Utils", "collectIter", invoke(sdf_iter, "underlying"), 10L, sdf, separator$regexp)
+        raw_df <- invoke_static(sc, "sparklyr.Utils", "collectIter", invoke(sdf_iter, "underlying"), batch_size, sdf, separator$regexp)
         df <- sdf_collect_data_frame(sdf, raw_df)
         args$callback(df)
       }
