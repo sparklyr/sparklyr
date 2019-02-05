@@ -10,8 +10,6 @@ test_that("sdf_collect() works properly", {
 })
 
 test_that("sdf_collect() supports callback", {
-  if (!"arrow" %in% .packages()) skip("Only arrow supported")
-
   batch_count <- 0
   row_count <- 0
 
@@ -23,7 +21,7 @@ test_that("sdf_collect() supports callback", {
 
   expect_equal(
     batch_count,
-    2
+    ifelse("arrow" %in% .packages(), 2, 1)
   )
 
   expect_equal(
@@ -31,3 +29,4 @@ test_that("sdf_collect() supports callback", {
     10
   )
 })
+
