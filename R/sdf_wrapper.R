@@ -180,6 +180,8 @@ sdf_collect_static <- function(object, ...) {
       invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
     }
   } else {
+    if (!identical(args$callback, NULL)) stop("Parameter 'callback' requires Spark 2.0+")
+
     columns <- invoke(sdf, "columns") %>% as.character()
     chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
     chunks <- split_chunks(columns, as.integer(chunk_size))

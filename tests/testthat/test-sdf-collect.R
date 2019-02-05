@@ -13,6 +13,11 @@ test_that("sdf_collect() supports callback", {
   batch_count <- 0
   row_count <- 0
 
+  if (spark_version(sc) < "2.0") {
+    testthat::expect_error()
+    return()
+  }
+
   sdf_len(sc, 10, repartition = 2) %>%
     sdf_collect(callback = function(df) {
       batch_count <<- batch_count + 1
