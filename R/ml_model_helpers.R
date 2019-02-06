@@ -29,7 +29,7 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
                    output_col = "token") %>%
       ft_count_vectorizer(input_col = "token",
                           output_col = "word_count") %>%
-      ft_r_formula("~word_count") %>%
+      ft_r_formula("~word_count", features_col = features_col) %>%
       ml_add_stage(predictor)
   } else{
     r_formula <- ft_r_formula(sc, formula = formula, features_col = features_col)
