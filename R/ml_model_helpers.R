@@ -31,7 +31,7 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
     count_vectorizer_out <- random_string("count_vectorizer_out_")
 
     ml_pipeline(sc) %>%
-      ft_tokenizer(input_col = gsub("~", "", formula),
+      ft_regex_tokenizer(input_col = gsub("~", "", formula),
                    output_col = tokenizer_out) %>%
       ft_stop_words_remover(tokenizer_out, stop_words_remover_out) %>%
       ft_count_vectorizer(input_col = stop_words_remover_out,
