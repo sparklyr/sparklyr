@@ -17,6 +17,9 @@
 
 ## Other
 
+- Fixed missing Hive tables not rendering under some Spark
+  distributions (#1823).
+
 - Remove dependency on broom.
 
 - Fixed re-entrancy job progress issues when running RStudio 1.2.
