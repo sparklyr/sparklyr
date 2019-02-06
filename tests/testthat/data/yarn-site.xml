@@ -46,6 +46,28 @@
     <name>yarn.resourcemanager.cluster-id</name>
     <value>yarnRM</value>
   </property>
+
+  <property>
+    <name>yarn.resourcemanager.empty</name>
+    <value></value>
+  </property>
+  <property>
+    <name>yarn.resourcemanager.port</name>
+    <value>8032</value>
+  </property>
+    <property>
+    <name>yarn.resourcemanager.host</name>
+    <value>invalidhost123.com</value>
+  </property>
+  <property>
+    <name>yarn.resourcemanager.hostname</name>
+    <value>${yarn.resourcemanager.host}</value>
+  </property>
+  <property>
+    <name>yarn.resourcemanager.address</name>
+    <value>${yarn.resourcemanager.hostname}:${yarn.resourcemanager.port}</value>
+  </property>
+
   <property>
     <name>yarn.resourcemanager.address.rm15</name>
     <value>invalidhost123.com:8032</value>
