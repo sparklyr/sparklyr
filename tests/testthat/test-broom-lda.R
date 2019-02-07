@@ -8,19 +8,19 @@ test_that("lda.tidy() works", {
                                   "The dog ate my homework."))
 
   lines_tbl <- sdf_copy_to(sc,
-                         samples,
-                         name = "lines_tbl",
-                         overwrite = TRUE)
+                           samples,
+                           name = "lines_tbl",
+                           overwrite = TRUE)
 
   td1 <- lines_tbl %>%
     ml_lda(~text, k = 3) %>%
     tidy()
 
-  check_tidy(td1, exp.row = 27, exp.col = 3,
+  check_tidy(td1, exp.row = 18, exp.col = 3,
              exp.names = c("topic", "term", "beta"))
 
   expect_equal(td1$beta[1:3],
-               c(0.879, 0.946, 1.150),
+               c(0.8773, 0.9466, 1.2075),
                tolerance = 0.001)
 })
 
