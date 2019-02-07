@@ -2,7 +2,7 @@
 
 ### Arrow
 
-- Support for Apache Arrow.
+- Support for Apache Arrow using the `arrow` package.
 
 ### Livy
 
@@ -12,12 +12,22 @@
 
 ### Data
 
+- Support for batches in `sdf_collect()` and `dplyr::collect()` to retrieve
+  data incrementally using a callback function provided through a
+  `callback` parameter. Useful when retrieving larger datasets.
+
+- Support for batches in `sdf_copy_to()` and `dplyr::copy_to()` by passing
+  a list of callbacks that retrieve data frames. Useful when uploading
+  larger datasets.
+
 - `spark_read_source()` now has a `path` parameter for specifying file path.
 
 - Support for `whole` parameter for `spark_read_text()` to read an
   entire text file without splitting contents by line.
 
 ## Other
+
+- Support for property expansion in `yarn-site.xml` (@lgongmsft, #1876).
 
 - Fixed missing Hive tables not rendering under some Spark
   distributions (#1823).
