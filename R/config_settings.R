@@ -11,6 +11,7 @@ spark_config_settings <- function() {
     sparklyr.arrow = "Use Apache Arrow to serialize data?",
     sparklyr.backend.interval = "Total seconds sparklyr will check on a backend operation.",
     sparklyr.backend.timeout = "Total seconds before sparklyr will give up waiting for a backend operation to complete.",
+    sparklyr.collect.batch = "Total rows to collect when using batch collection, defaults to 100,000.",
     sparklyr.connect.aftersubmit = "R function to call after spark-submit executes.",
     sparklyr.connect.app.jar = "The path to the sparklyr jar used in spark_connect().",
     sparklyr.cancellable = "Cancel spark jobs when the R session is interrupted?",

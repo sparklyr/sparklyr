@@ -45,3 +45,13 @@ test_that("spark_table_name() doesn't warn for multiline expression (#1386)", {
     NA
   )
 })
+
+test_that("sdf_copy_to supports list of callbacks", {
+  df <- matrix(0, ncol = 5, nrow = 2) %>% dplyr::as_data_frame()
+  df_tbl <- sdf_copy_to(sc, list(~df, ~df), overwrite = TRUE)
+
+  expect_equal(
+    sdf_nrow(df_tbl),
+    4
+  )
+})

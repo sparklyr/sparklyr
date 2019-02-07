@@ -578,7 +578,8 @@ core_invoke_method <- function(sc, static, object, method, ...)
     }
   }
 
-  if (!identical(object, "Handler") && getOption("sparklyr.connection.cancellable", TRUE)) {
+  if (!identical(object, "Handler") &&
+      spark_config_value(sc$config, c("sparklyr.cancellable", "sparklyr.connection.cancellable"), TRUE)) {
     # if connection still running, sync to valid state
     if (identical(sc$state$status[[connection_name]], "running"))
       core_invoke_sync(sc)
@@ -1267,6 +1268,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   columnNames <- worker_invoke(context, "getColumns")
   schema_input <- worker_invoke(context, "getSchema")
   time_zone <- worker_invoke(context, "getTimeZoneId")
+  options_map <- worker_invoke(context, "getOptions")
 
   if (grouped) {
     record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
@@ -1280,7 +1282,8 @@ spark_worker_apply_arrow <- function(sc, config) {
       "toBatchArray",
       row_iterator,
       schema_input,
-      time_zone
+      time_zone,
+      as.integer(options_map[["maxRecordsPerBatch"]])
     )
   }
 
