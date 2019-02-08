@@ -24,7 +24,7 @@ matrix:
         apt:
           sources:
             - sourceline: deb https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/ trusty main
-              key_url: https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/apache2-arrow-keyring.gpg.asc
+              key_url: https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/apache-arrow-keyring.gpg.asc
           packages:
             - apt-transport-https
             - lsb-release
@@ -35,8 +35,6 @@ before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
   - if [[ $R_ARROW == "true" ]]; then Rscript .travis.R --arrow; fi
-  - sudo apt-get update
-  - sudo apt-get install ca-certificates-java
 
 script:
   - |
