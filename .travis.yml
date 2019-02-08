@@ -45,8 +45,8 @@ matrix:
       addons:
         apt:
           sources:
-            - sourceline: deb https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/ trusty main
-              key_url: https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/apache-arrow-keyring.gpg
+            - sourceline: deb https://dl.bintray.com/apache/arrow/ubuntu/ trusty main
+              key_url: https://dl.bintray.com/apache/arrow/ubuntu/apache-arrow-keyring.gpg
           packages:
             - apt-transport-https
             - lsb-release
