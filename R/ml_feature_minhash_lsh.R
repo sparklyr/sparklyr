@@ -15,6 +15,8 @@ ft_minhash_lsh.spark_connection <- function(x, input_col = NULL, output_col = NU
 
   spark_require_version(x, "2.1.0", "MinHashLSH")
 
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,
