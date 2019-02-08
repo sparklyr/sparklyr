@@ -14,14 +14,6 @@ print.ml_estimator <- function(x, ...) {
   ml_print_params(x)
 }
 
-new_ml_transformer <- function(jobj, ..., class = character()) {
-  new_ml_pipeline_stage(
-    jobj,
-    ...,
-    class = c(class, "ml_transformer")
-  )
-}
-
 #' Constructors for Pipeline Stages
 #'
 #' Functions for developers writing extensions for Spark ML.
@@ -34,8 +26,17 @@ new_ml_transformer <- function(jobj, ..., class = character()) {
 #'
 #' @export
 #' @keywords internal
-ml_transformer <- new_ml_transformer
+new_ml_transformer <- function(jobj, ..., class = character()) {
+  new_ml_pipeline_stage(
+    jobj,
+    ...,
+    class = c(class, "ml_transformer")
+  )
+}
 
+#' @rdname ml-constructors
+#' @export
+#' @keywords internal
 new_ml_prediction_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
     jobj,
@@ -51,8 +52,6 @@ new_ml_prediction_model <- function(jobj, ..., class = character()) {
 #' @rdname ml-constructors
 #' @export
 #' @keywords internal
-ml_prediction_model <- new_ml_prediction_model
-
 new_ml_classification_model <- function(jobj, ..., class = character()) {
   new_ml_prediction_model(
     jobj,
@@ -65,8 +64,6 @@ new_ml_classification_model <- function(jobj, ..., class = character()) {
 #' @rdname ml-constructors
 #' @export
 #' @keywords internal
-ml_classification_model <- new_ml_classification_model
-
 new_ml_probabilistic_classification_model <- function(jobj, ..., class = character()) {
   new_ml_classification_model(
     jobj,
@@ -80,8 +77,6 @@ new_ml_probabilistic_classification_model <- function(jobj, ..., class = charact
 #' @rdname ml-constructors
 #' @export
 #' @keywords internal
-ml_probabilistic_classification_model <- new_ml_probabilistic_classification_model
-
 new_ml_clustering_model <- function(jobj, ..., class = character()) {
   new_ml_transformer(
     jobj,
@@ -93,8 +88,6 @@ new_ml_clustering_model <- function(jobj, ..., class = character()) {
 #' @rdname ml-constructors
 #' @export
 #' @keywords internal
-ml_clustering_model <- new_ml_clustering_model
-
 new_ml_estimator <- function(jobj, ..., class = character()) {
   new_ml_pipeline_stage(
     jobj,
@@ -106,8 +99,6 @@ new_ml_estimator <- function(jobj, ..., class = character()) {
 #' @rdname ml-constructors
 #' @export
 #' @keywords internal
-ml_estimator <- new_ml_estimator
-
 new_ml_predictor <- function(jobj, ..., class = character()) {
   new_ml_estimator(
     jobj,
@@ -122,8 +113,6 @@ new_ml_predictor <- function(jobj, ..., class = character()) {
 #' @rdname ml-constructors
 #' @export
 #' @keywords internal
-ml_predictor <- new_ml_predictor
-
 new_ml_classifier <- function(jobj, ..., class = character()) {
   new_ml_predictor(
     jobj,
@@ -136,8 +125,6 @@ new_ml_classifier <- function(jobj, ..., class = character()) {
 #' @rdname ml-constructors
 #' @export
 #' @keywords internal
-ml_classifier <- new_ml_classifier
-
 new_ml_probabilistic_classifier <- function(jobj, ..., class = character()) {
   new_ml_classifier(
     jobj,
@@ -147,8 +134,3 @@ new_ml_probabilistic_classifier <- function(jobj, ..., class = character()) {
     class = c(class, "ml_probabilistic_classifier")
   )
 }
-
-#' @rdname ml-constructors
-#' @export
-#' @keywords internal
-ml_probabilistic_classifier <- new_ml_probabilistic_classifier
