@@ -26,10 +26,9 @@ matrix:
             - sourceline: deb https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/ trusty main
               key_url: https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/apache-arrow-keyring.gpg.asc
           packages:
-            - apt-transport-https
-            - lsb-release
-            - libarrow-dev
-            - libarrow-glib-dev
+            - epel-release
+            - arrow-devel
+            - arrow-glib-devel
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
