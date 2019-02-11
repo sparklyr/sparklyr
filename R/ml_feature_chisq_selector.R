@@ -30,6 +30,8 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
                                                selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
                                                num_top_features = 50, percentile = 0.1, dataset = NULL,
                                                uid = random_string("chisq_selector_"), ...) {
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     features_col = features_col,
     output_col = output_col,

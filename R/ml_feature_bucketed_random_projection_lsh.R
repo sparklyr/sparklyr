@@ -33,6 +33,8 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NU
                                                                uid = random_string("bucketed_random_projection_lsh_"), ...) {
   spark_require_version(x, "2.1.0", "LSH")
 
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,

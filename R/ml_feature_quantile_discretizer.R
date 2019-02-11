@@ -58,6 +58,9 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
                                                      input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
                                                      handle_invalid = "error", relative_error = 0.001, dataset = NULL,
                                                      uid = random_string("quantile_discretizer_"), ...) {
+
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,

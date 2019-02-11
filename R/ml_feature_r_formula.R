@@ -60,6 +60,8 @@ ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "fea
                                           force_index_label = FALSE, dataset = NULL,
                                           uid = random_string("r_formula_"), ...) {
 
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     formula = formula,
     features_col = features_col,

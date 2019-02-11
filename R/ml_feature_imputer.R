@@ -30,6 +30,8 @@ ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL
                                         uid = random_string("imputer_"), ...) {
   spark_require_version(x, "2.2.0", "Imputer")
 
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_cols = input_cols,
     output_cols = output_cols,

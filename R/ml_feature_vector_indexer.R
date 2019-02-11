@@ -21,6 +21,8 @@ ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col =
                                                max_categories = 20, dataset = NULL,
                                                uid = random_string("vector_indexer_"), ...) {
 
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,

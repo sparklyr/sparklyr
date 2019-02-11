@@ -4,6 +4,10 @@
 
 - Support for Apache Arrow using the `arrow` package.
 
+### ML
+
+- The `dataset` parameter for estimator feature transformers has been deprecated (#1891).
+
 ### Livy
 
 - Significant performance improvements by using `spark_version` in

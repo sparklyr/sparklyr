@@ -30,6 +30,8 @@ ft_word2vec.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                          max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
                                          seed = NULL, dataset = NULL, uid = random_string("word2vec_"), ...) {
 
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,
