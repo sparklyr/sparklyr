@@ -24,11 +24,9 @@ matrix:
         apt:
           sources:
             - sourceline: deb https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/ trusty main
-              key_url: https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/apache-arrow-keyring.gpg.asc
+              key_url: https://dist.apache.org/repos/dist/dev/arrow/KEYS
           update: true
           packages:
-            - apt-transport-https
-            - lsb-release
             - libarrow-dev
             - libarrow-glib-dev
 
