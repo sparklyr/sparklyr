@@ -7,6 +7,7 @@
 ### ML
 
 - The `dataset` parameter for estimator feature transformers has been deprecated (#1891).
+- `ml_multilayer_perceptron_classifier()` gains probabilistic classifier parameters (#1798).
 
 ### Livy
 
