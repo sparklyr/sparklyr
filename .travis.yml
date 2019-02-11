@@ -20,15 +20,6 @@ matrix:
       env:
         - R_ARROW="true"
         - JAVA_VERSION=oraclejdk8
-      addons:
-        apt:
-          sources:
-            - sourceline: deb https://arrowlib.rstudio.com/arrow-0.12.0/ubuntu/ trusty main
-              key_url: https://dist.apache.org/repos/dist/dev/arrow/KEYS
-          update: true
-          packages:
-            - libarrow-dev
-            - libarrow-glib-dev
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
@@ -46,6 +37,8 @@ script:
     else
       Rscript .travis.R --testthat
     fi
+  - chmod +x ./ci/arrow.sh
+  - "./ci/arrow.sh"
 
 after_failure:
   - |
