@@ -118,11 +118,11 @@ livy_config <- function(config = spark_config(),
 
     target_jar <- dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", target_version))
 
-    additional_params$jars <- paste0(
+    additional_params$jars <- list(paste0(
       "https://github.com/rstudio/sparklyr/blob/bugfix/livy-jars/inst/java/",
       target_jar,
       "?raw=true"
-    )
+    ))
   }
 
   #Params need to be restrictued or livy will complain about unknown parameters
