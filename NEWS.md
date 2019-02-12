@@ -32,6 +32,8 @@
 
 ## Other
 
+- Support for installing and connecting to Spark 2.4.
+
 - Support for property expansion in `yarn-site.xml` (@lgongmsft, #1876).
 
 - Fixed missing Hive tables not rendering under some Spark
