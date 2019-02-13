@@ -40,6 +40,8 @@ ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col
                                                  binary = FALSE, min_df = 1, min_tf = 1,
                                                  vocab_size = 2^18, dataset = NULL,
                                                  uid = random_string("count_vectorizer_"), ...) {
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,

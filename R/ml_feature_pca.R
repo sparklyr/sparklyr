@@ -18,6 +18,8 @@ ft_pca <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = N
 ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
                                     uid = random_string("pca_"), ...) {
 
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,

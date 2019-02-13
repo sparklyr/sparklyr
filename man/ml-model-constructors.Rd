@@ -2,30 +2,30 @@
 % Please edit documentation in R/ml_model_constructors.R, R/ml_model_helpers.R
 \name{ml-model-constructors}
 \alias{ml-model-constructors}
-\alias{ml_model_prediction}
-\alias{ml_model}
-\alias{ml_model_classification}
-\alias{ml_model_regression}
-\alias{ml_model_clustering}
+\alias{new_ml_model_prediction}
+\alias{new_ml_model}
+\alias{new_ml_model_classification}
+\alias{new_ml_model_regression}
+\alias{new_ml_model_clustering}
 \alias{ml_supervised_pipeline}
 \alias{ml_clustering_pipeline}
 \alias{ml_construct_model_supervised}
 \alias{ml_construct_model_clustering}
 \title{Constructors for `ml_model` Objects}
 \usage{
-ml_model_prediction(pipeline_model, formula, dataset, label_col,
+new_ml_model_prediction(pipeline_model, formula, dataset, label_col,
   features_col, ..., class = character())
 
-ml_model(pipeline_model, formula, dataset, ..., class = character())
+new_ml_model(pipeline_model, formula, dataset, ..., class = character())
 
-ml_model_classification(pipeline_model, formula, dataset, label_col,
+new_ml_model_classification(pipeline_model, formula, dataset, label_col,
   features_col, predicted_label_col, ..., class = character())
 
-ml_model_regression(pipeline_model, formula, dataset, label_col,
+new_ml_model_regression(pipeline_model, formula, dataset, label_col,
   features_col, ..., class = character())
 
-ml_model_clustering(pipeline_model, formula, dataset, features_col, ...,
-  class = character())
+new_ml_model_clustering(pipeline_model, formula, dataset, features_col,
+  ..., class = character())
 
 ml_supervised_pipeline(predictor, dataset, formula, features_col,
   label_col)

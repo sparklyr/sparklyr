@@ -40,6 +40,9 @@ ml_standard_scaler <- ft_standard_scaler
 ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                 with_mean = FALSE, with_std = TRUE, dataset = NULL,
                                                 uid = random_string("standard_scaler_"), ...) {
+
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,
