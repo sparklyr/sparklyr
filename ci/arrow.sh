@@ -13,7 +13,7 @@ tar -xvzf apache-arrow-$ARROW_VERSION.tar.gz
 cd apache-arrow-$ARROW_VERSION/cpp
 mkdir release
 cd release
-cmake -DARROW_BUILD_TESTS=ON ..
+cmake -DARROW_BUILD_TESTS=ON -DARROW_PARQUET=ON ..
 make arrow
 sudo make install
 
