@@ -19,7 +19,7 @@ if (length(args) == 0) {
   covr::codecov(type = "none", code = "setwd('tests'); source('testthat.R')", batch = FALSE)
 } else if (args[[1]] == "--arrow") {
   install.packages("devtools")
-  devtools::install_github("apache/arrow", subdir = "r", ref = "apache-arrow-0.12.0")
+  devtools::install_github("apache/arrow", subdir = "r", ref = "apache-arrow-0.12.0", force = TRUE)
 } else {
   stop("Unsupported arguments")
 }
