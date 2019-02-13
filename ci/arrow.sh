@@ -15,6 +15,6 @@ mkdir release
 cd release
 cmake -DARROW_BUILD_TESTS=ON ..
 make arrow
-make install
+sudo make install
 
 popd
