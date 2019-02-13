@@ -1,20 +1,3 @@
-#' Save / Load a Spark DataFrame
-#'
-#' Routines for saving and loading Spark DataFrames.
-#'
-#' @param sc A \code{spark_connection} object.
-#' @template roxlate-ml-x
-#' @param path The path where the Spark DataFrame should be saved.
-#' @param name The table name to assign to the saved Spark DataFrame.
-#' @param overwrite Boolean; overwrite a pre-existing table of the same name?
-#' @param append Boolean; append to a pre-existing table of the same name?
-#'
-#' @rdname sdf-saveload
-#' @name sdf-saveload
-NULL
-
-#' @rdname sdf-saveload
-#' @export
 sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
   .Deprecated("spark_write_table")
 
@@ -38,8 +21,6 @@ sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
   }
 }
 
-#' @rdname sdf-saveload
-#' @export
 sdf_load_table <- function(sc, name) {
   .Deprecated("spark_read_table")
 
@@ -61,8 +42,6 @@ sdf_load_table <- function(sc, name) {
   sdf_register(sdf)
 }
 
-#' @rdname sdf-saveload
-#' @export
 sdf_save_parquet <- function(x, path, overwrite = FALSE, append = FALSE) {
   .Deprecated("spark_write_parquet")
 
@@ -76,8 +55,6 @@ sdf_save_parquet <- function(x, path, overwrite = FALSE, append = FALSE) {
   invoke(write, "parquet", path)
 }
 
-#' @rdname sdf-saveload
-#' @export
 sdf_load_parquet <- function(sc, path) {
   .Deprecated("spark_read_parquet")
 
