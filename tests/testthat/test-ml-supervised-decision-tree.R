@@ -75,20 +75,20 @@ test_that("error for bad impurity specification", {
 
 test_that("ml_decision_tree print outputs are correct", {
   sc <- testthat_spark_connection()
-  file_version <- if (spark_version(sc) >= "2.4") "2.4" else ""
-
   iris_tbl <- testthat_tbl("iris")
-  expect_output_file(
-    print(ml_decision_tree(iris_tbl, Species ~ Petal_Length + Sepal_Width,
-                           seed = 24, uid = "dt1")),
-    output_file(sprintf("print/decision-tree%s.txt", file_version))
-  )
-
-  expect_output_file(
-    print(ml_decision_tree_classifier(iris_tbl, Species ~ Petal_Length + Sepal_Width,
-                                      seed = 54, uid = "dt2")),
-    output_file(sprintf("print/decision_tree_classifier&s.txt", file_version))
-  )
+  if (spark_version(sc) >= "2.4") {
+    expect_output_file(
+      print(ml_decision_tree(iris_tbl, Species ~ Petal_Length + Sepal_Width,
+                             seed = 24, uid = "dt1")),
+      output_file("print/decision-tree-new.txt")
+    )
+  } else {
+    expect_output_file(
+      print(ml_decision_tree_classifier(iris_tbl, Species ~ Petal_Length + Sepal_Width,
+                                        seed = 24, uid = "dt2")),
+      output_file("print/decision-tree-old.txt")
+    )
+  }
 })
 
 test_that("ml_decision_tree() supports response-features syntax (#1302)", {
