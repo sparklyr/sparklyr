@@ -459,16 +459,6 @@ spark_read_table <- function(sc,
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
-#' Reads from a Spark Table into a Spark DataFrame.
-#'
-#' Reads from a Spark Table into a Spark DataFrame.
-#'
-#' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
-#'
-#' @family Spark serialization routines
-#'
-#' @export
 spark_load_table <- function(sc,
                              name,
                              path,
@@ -507,15 +497,6 @@ spark_write_table <- function(x,
   UseMethod("spark_write_table")
 }
 
-#' Saves a Spark DataFrame as a Spark table
-#'
-#' Saves a Spark DataFrame and as a Spark table.
-#'
-#' @inheritParams spark_write_csv
-#'
-#' @family Spark serialization routines
-#'
-#' @export
 spark_save_table <- function(x, path, mode = NULL, options = list()) {
   .Deprecated("spark_write_table")
   spark_write_table(x, path, mode, options)
