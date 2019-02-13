@@ -1,4 +1,4 @@
-$ARROW_VERSION="0.12.0"
+ARROW_VERSION="0.12.0"
 
 pushd .
 
