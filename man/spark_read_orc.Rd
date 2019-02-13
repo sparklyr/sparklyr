@@ -42,8 +42,7 @@ You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
   the local file system (\code{file://}).
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_load_table}},
-  \code{\link{spark_read_csv}},
+Other Spark serialization routines: \code{\link{spark_read_csv}},
   \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_json}},
   \code{\link{spark_read_libsvm}},
@@ -51,7 +50,6 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_read_source}},
   \code{\link{spark_read_table}},
   \code{\link{spark_read_text}},
-  \code{\link{spark_save_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_jdbc}},
   \code{\link{spark_write_json}},

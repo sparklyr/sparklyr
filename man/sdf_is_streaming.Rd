@@ -10,5 +10,5 @@ sdf_is_streaming(x)
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 }
 \description{
-Is the given Spark DataFrame a streaming data?
+Is the given Spark DataFrame a Streaming DataFrame?
 }

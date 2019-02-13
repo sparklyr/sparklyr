@@ -69,8 +69,7 @@ When \code{header} is \code{FALSE}, the column names are generated with a
 \code{V} prefix; e.g. \code{V1, V2, ...}.
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_load_table}},
-  \code{\link{spark_read_jdbc}},
+Other Spark serialization routines: \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_json}},
   \code{\link{spark_read_libsvm}},
   \code{\link{spark_read_orc}},
@@ -78,7 +77,6 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_read_source}},
   \code{\link{spark_read_table}},
   \code{\link{spark_read_text}},
-  \code{\link{spark_save_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_jdbc}},
   \code{\link{spark_write_json}},

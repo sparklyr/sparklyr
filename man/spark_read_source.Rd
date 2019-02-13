@@ -37,8 +37,7 @@ already exists?}
 Read from a generic source into a Spark DataFrame.
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_load_table}},
-  \code{\link{spark_read_csv}},
+Other Spark serialization routines: \code{\link{spark_read_csv}},
   \code{\link{spark_read_jdbc}},
   \code{\link{spark_read_json}},
   \code{\link{spark_read_libsvm}},
@@ -46,7 +45,6 @@ Other Spark serialization routines: \code{\link{spark_load_table}},
   \code{\link{spark_read_parquet}},
   \code{\link{spark_read_table}},
   \code{\link{spark_read_text}},
-  \code{\link{spark_save_table}},
   \code{\link{spark_write_csv}},
   \code{\link{spark_write_jdbc}},
   \code{\link{spark_write_json}},
