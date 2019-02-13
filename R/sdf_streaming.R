@@ -1,6 +1,6 @@
 #' Spark DataFrame is Streaming
 #'
-#' Is the given Spark DataFrame a streaming data?
+#' Is the given Spark DataFrame a Streaming DataFrame?
 #'
 #' @template roxlate-ml-x
 #' @export
