@@ -20,7 +20,8 @@ cmake -DARROW_BUILD_TESTS=FALSE \
       -DARROW_WITH_BROTLI=FALSE \
       -DARROW_USE_GLOG=FALSE \
       -DARROW_BUILD_UTILITIES=FALSE \
-      -DARROW_PARQUET=ON
+      -DARROW_PARQUET=ON \
+      ..
       
 make arrow
 sudo make install
