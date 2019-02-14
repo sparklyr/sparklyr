@@ -2,16 +2,16 @@
 % Please edit documentation in R/tidiers_ml_als.R
 \name{ml_als_tidiers}
 \alias{ml_als_tidiers}
-\alias{tidy.ml_als_model}
-\alias{augment.ml_als_model}
-\alias{glance.ml_als_model}
+\alias{tidy.ml_model_als}
+\alias{augment.ml_model_als}
+\alias{glance.ml_model_als}
 \title{Tidying methods for Spark ML ALS}
 \usage{
-\method{tidy}{ml_als_model}(x, ...)
+\method{tidy}{ml_model_als}(x, ...)
 
-\method{augment}{ml_als_model}(x, newdata = NULL, ...)
+\method{augment}{ml_model_als}(x, newdata = NULL, ...)
 
-\method{glance}{ml_als_model}(x, ...)
+\method{glance}{ml_model_als}(x, ...)
 }
 \arguments{
 \item{x}{a Spark ML model.}

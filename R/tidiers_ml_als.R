@@ -9,13 +9,13 @@ NULL
 
 #' @rdname ml_als_tidiers
 #' @export
-tidy.ml_als_model <- function(x, ...){
+tidy.ml_model_als <- function(x, ...){
 
-  user_factors <- x$user_factors %>%
+  user_factors <- x$model$user_factors %>%
     dplyr::select(!!"id", !!"features") %>%
     dplyr::rename(user_factors = !!"features")
 
-  item_factors <- x$item_factors %>%
+  item_factors <- x$model$item_factors %>%
     dplyr::select(!!"id", !!"features") %>%
     dplyr::rename(item_factors = !!"features")
 
@@ -26,7 +26,7 @@ tidy.ml_als_model <- function(x, ...){
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_als_model <- function(x, newdata = NULL, ...){
+augment.ml_model_als <- function(x, newdata = NULL, ...){
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
@@ -39,10 +39,10 @@ augment.ml_als_model <- function(x, newdata = NULL, ...){
 
 #' @rdname ml_als_tidiers
 #' @export
-glance.ml_als_model <- function(x, ...) {
+glance.ml_model_als <- function(x, ...) {
 
-  rank <- x$rank
-  cold_start_strategy <- x$param_map$cold_start_strategy
+  rank <- x$model$rank
+  cold_start_strategy <- x$model$param_map$cold_start_strategy
 
   dplyr::tibble(rank = rank,
                 cold_start_strategy = cold_start_strategy)
