@@ -10,10 +10,11 @@ test_that("als.tidy() works", {
 
   movies_tbl <- sdf_copy_to(sc,
                             movies,
-                            name = "moves_tbl",
+                            name = "movies_tbl",
                             overwrite = TRUE)
 
-  td1 <- ml_als(movies_tbl) %>%
+  td1 <- movies_tbl %>%
+    ml_als(rating ~ user + item) %>%
     tidy() %>%
     dplyr::collect()
 
@@ -33,10 +34,11 @@ test_that("als.augment() works", {
 
   movies_tbl <- sdf_copy_to(sc,
                             movies,
-                            name = "moves_tbl",
+                            name = "movies_tbl",
                             overwrite = TRUE)
 
-  au1 <- ml_als(movies_tbl) %>%
+  au1 <- movies_tbl %>%
+    ml_als(rating ~ user + item) %>%
     augment() %>%
     dplyr::collect()
 
@@ -54,10 +56,11 @@ test_that("als.glance() works", {
 
   movies_tbl <- sdf_copy_to(sc,
                             movies,
-                            name = "moves_tbl",
+                            name = "movies_tbl",
                             overwrite = TRUE)
 
-  gl1 <- ml_als(movies_tbl) %>%
+  gl1 <- movies_tbl %>%
+    ml_als(rating ~ user + item) %>%
     glance()
 
   check_tidy(gl1, exp.row = 1,
