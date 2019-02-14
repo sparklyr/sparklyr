@@ -3,6 +3,9 @@
 #' Perform recommendation using Alternating Least Squares (ALS) matrix factorization.
 #'
 #' @template roxlate-ml-x
+#' @param formula Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula.
+#' This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.
+#' The ALS model requires a specific formula format, please use \code{rating_col ~ user_col + item_col}.
 #' @param rating_col Column name for ratings. Default: "rating"
 #' @param user_col Column name for user ids. Ids must be integers. Other numeric types are supported for this column, but will be cast to integers as long as they fall within the integer value range. Default: "user"
 #' @param item_col Column name for item ids. Ids must be integers. Other numeric types are supported for this column, but will be cast to integers as long as they fall within the integer value range. Default: "item"
@@ -54,7 +57,7 @@
 #' )
 #' movies_tbl <- sdf_copy_to(sc, movies)
 #'
-#' model <- ml_als(movies_tbl)
+#' model <- ml_als(movies_tbl, rating ~ user + item)
 #'
 #' ml_predict(model, movies_tbl)
 #'
@@ -62,7 +65,7 @@
 #' }
 #'
 #' @export
-ml_als <- function(x, rating_col = "rating", user_col = "user", item_col = "item",
+ml_als <- function(x, formula = NULL, rating_col = "rating", user_col = "user", item_col = "item",
                    rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
                    nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
                    num_item_blocks = 10, checkpoint_interval = 10,
@@ -72,7 +75,7 @@ ml_als <- function(x, rating_col = "rating", user_col = "user", item_col = "item
 }
 
 #' @export
-ml_als.spark_connection <- function(x, rating_col = "rating", user_col = "user", item_col = "item",
+ml_als.spark_connection <- function(x, formula = NULL, rating_col = "rating", user_col = "user", item_col = "item",
                                     rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
                                     nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
                                     num_item_blocks = 10, checkpoint_interval = 10,
@@ -128,7 +131,7 @@ ml_als.spark_connection <- function(x, rating_col = "rating", user_col = "user",
 }
 
 #' @export
-ml_als.ml_pipeline <- function(x, rating_col = "rating", user_col = "user", item_col = "item",
+ml_als.ml_pipeline <- function(x, formula = NULL, rating_col = "rating", user_col = "user", item_col = "item",
                                rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
                                nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
                                num_item_blocks = 10, checkpoint_interval = 10,
@@ -137,6 +140,7 @@ ml_als.ml_pipeline <- function(x, rating_col = "rating", user_col = "user", item
 
   stage <- ml_als.spark_connection(
     x = spark_connection(x),
+    formula = formula,
     rating_col = rating_col,
     user_col = user_col,
     item_col = item_col,
@@ -159,14 +163,18 @@ ml_als.ml_pipeline <- function(x, rating_col = "rating", user_col = "user", item
 }
 
 #' @export
-ml_als.tbl_spark <- function(x, rating_col = "rating", user_col = "user", item_col = "item",
+ml_als.tbl_spark <- function(x, formula = NULL, rating_col = "rating", user_col = "user", item_col = "item",
                              rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
                              nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
                              num_item_blocks = 10, checkpoint_interval = 10,
                              cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
                              final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
+
+  formula <- ml_standardize_formula(formula)
+
   stage <- ml_als.spark_connection(
     x = spark_connection(x),
+    formula = formula,
     rating_col = rating_col,
     user_col = user_col,
     item_col = item_col,
@@ -186,11 +194,19 @@ ml_als.tbl_spark <- function(x, rating_col = "rating", user_col = "user", item_c
     ...
   )
 
-  model_als <- stage %>%
-    ml_fit(x)
-
-  model_als$dataset <- x
-  model_als
+  if (is.null(formula)) {
+    model_als <- stage %>%
+      ml_fit(x)
+  } else {
+    ml_construct_model_supervised(
+      new_ml_model_als,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = "features",
+      label_col = "label"
+    )
+  }
 }
 
 # Validator
@@ -266,7 +282,16 @@ utils::globalVariables("explode")
 #'
 #' @export
 ml_recommend <- function(model, type = c("items", "users"), n = 1) {
-  if (spark_version(spark_connection(model)) < "2.2.0")
+
+  if(inherits(model, "ml_model_als")){
+    connection <- model$.jobj$connection
+
+    if (spark_version(spark_connection(connection)) < "2.2.0")
+      stop("`ml_recommend()`` is only support for Spark 2.2+.")
+
+    # the recommendation functions are in the second level
+    model <- model$model
+  } else if (spark_version(spark_connection(model)) < "2.2.0")
     stop("`ml_recommend()`` is only support for Spark 2.2+.")
 
   type <- match.arg(type)

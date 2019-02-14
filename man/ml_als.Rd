@@ -6,7 +6,7 @@
 \alias{ml_als_factorization}
 \title{Spark ML -- ALS}
 \usage{
-ml_als(x, rating_col = "rating", user_col = "user",
+ml_als(x, formula = NULL, rating_col = "rating", user_col = "user",
   item_col = "item", rank = 10, reg_param = 0.1,
   implicit_prefs = FALSE, alpha = 1, nonnegative = FALSE,
   max_iter = 10, num_user_blocks = 10, num_item_blocks = 10,
@@ -28,6 +28,10 @@ ml_als_factorization(x, rating_col = "rating", user_col = "user",
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula.
+This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.
+The ALS model requires a specific formula format, please use \code{rating_col ~ user_col + item_col}.}
 
 \item{rating_col}{Column name for ratings. Default: "rating"}
 
@@ -113,7 +117,7 @@ movies <- data.frame(
 )
 movies_tbl <- sdf_copy_to(sc, movies)
 
-model <- ml_als(movies_tbl)
+model <- ml_als(movies_tbl, rating ~ user + item)
 
 ml_predict(model, movies_tbl)
 
