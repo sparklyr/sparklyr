@@ -22,7 +22,7 @@ cmake -DARROW_BUILD_TESTS=FALSE \
       -DARROW_BUILD_UTILITIES=FALSE \
       -DARROW_PARQUET=ON \
       ..
-      
+
 make arrow
 sudo make install
 
