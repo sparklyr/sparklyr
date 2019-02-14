@@ -1,4 +1,4 @@
-ARROW_VERSION="0.12.0"
+ARROW_VERSION=$1
 
 pushd .
 
@@ -6,9 +6,15 @@ sudo apt install -y -V cmake
 sudo apt install -y -V libboost-all-dev
 sudo apt install -y -V autoconf
 
-wget https://arrowlib.rstudio.com/dist/arrow/arrow-$ARROW_VERSION/apache-arrow-$ARROW_VERSION.tar.gz
-tar -xvzf apache-arrow-$ARROW_VERSION.tar.gz
-cd apache-arrow-$ARROW_VERSION/cpp
+if [[ $ARROW_VERSION == "devel"]]; then
+  git clone https://github.com/apache/arrow
+  cd arrow/cpp
+else
+  wget https://arrowlib.rstudio.com/dist/arrow/arrow-$ARROW_VERSION/apache-arrow-$ARROW_VERSION.tar.gz
+  tar -xvzf apache-arrow-$ARROW_VERSION.tar.gz
+  cd apache-arrow-$ARROW_VERSION/cpp
+fi
+
 mkdir release
 cd release
 cmake -DARROW_BUILD_TESTS=FALSE \

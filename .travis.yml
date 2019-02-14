@@ -40,7 +40,7 @@ matrix:
     - name: "Arrow 0.11 (R release, oraclejdk8)"
       r: release
       env:
-        - R_ARROW="true"
+        - $ARROW_PACKAGE="true"
         - JAVA_VERSION=oraclejdk8
       addons:
         apt:
@@ -56,10 +56,17 @@ matrix:
       r: release
       sudo: true
       env:
-        - R_ARROW="true"
-        - R_ARROW_COMPILE="true"
+        - $ARROW_PACKAGE="true"
+        - ARROW_VERSION="0.12.0"
         - JAVA_VERSION=oraclejdk8
-    - name: "Devel (tidyverse, r-lib, forge)"
+    - name: "Arrow Devel (R release, oraclejdk8)"
+      r: release
+      sudo: true
+      env:
+        - $ARROW_PACKAGE="true"
+        - ARROW_VERSION="devel"
+        - JAVA_VERSION=oraclejdk8
+    - name: "Deps Devel (tidyverse, r-lib, forge)"
       env: R_DEVEL_PACKAGES="true"
       r_github_packages:
         - tidyverse/dplyr
@@ -69,13 +76,17 @@ matrix:
         - rstudio/forge
   allow_failures:
     - env: R_DEVEL_PACKAGES="true"
+    - env:
+        - $ARROW_PACKAGE="true"
+        - ARROW_VERSION="devel"
+        - JAVA_VERSION=oraclejdk8
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
   - chmod +x ./ci/arrow.sh
-  - if [[ $R_ARROW_COMPILE == "true" ]]; then "./ci/arrow.sh"; fi
-  - if [[ $R_ARROW == "true" ]]; then Rscript .travis.R --arrow; fi
+  - if [[ ! -z "$ARROW_VERSION" ]]; then "./ci/arrow.sh $ARROW_VERSION"; fi
+  - if [[ $ARROW_PACKAGE == "true" ]]; then Rscript .travis.R --arrow; fi
 
 script:
   - |
