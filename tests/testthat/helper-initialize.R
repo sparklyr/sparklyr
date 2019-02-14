@@ -301,3 +301,13 @@ skip_covr <- function(message) {
 using_arrow <- function() {
   "package:arrow" %in% search()
 }
+
+skip_arrow_devel <- function(message) {
+  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
+  if (is_arrow_devel) skip(message)
+}
+
+skip_slow <- function(message) {
+  skip_covr(message)
+  skip_arrow_devel(message)
+}

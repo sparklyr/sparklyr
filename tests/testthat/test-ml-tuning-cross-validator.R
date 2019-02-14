@@ -79,7 +79,7 @@ test_that("ml_cross_validator() works correctly", {
 })
 
 test_that("we can cross validate a logistic regression with xval", {
-  skip_covr("takes too long to measure coverage")
+  skip_slow("takes too long to measure coverage")
   sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
@@ -131,7 +131,7 @@ test_that("we can cross validate a logistic regression with xval", {
 })
 
 test_that("ml_validation_metrics() works properly", {
-  skip_covr("takes too long to measure coverage")
+  skip_slow("takes too long to measure coverage")
   sc <- testthat_spark_connection()
   test_requires_version("2.3.0")
   iris_tbl <- testthat_tbl("iris")
