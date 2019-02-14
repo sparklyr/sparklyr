@@ -45,7 +45,7 @@ matrix:
     - name: "Arrow 0.11.0 (ref = 'dc5df8f')"
       r: release
       env:
-        - ARROW_PACKAGE="true"
+        - ARROW_ENABLED="true"
         - ARROW_BRANCH="dc5df8f"
         - JAVA_VERSION=oraclejdk8
       addons:
@@ -62,7 +62,7 @@ matrix:
       r: release
       sudo: true
       env:
-        - ARROW_PACKAGE="true"
+        - ARROW_ENABLED="true"
         - ARROW_VERSION="0.12.0"
         - ARROW_BRANCH="apache-arrow-0.12.0"
         - ARROW_SOURCE="install"
@@ -71,7 +71,7 @@ matrix:
       r: release
       sudo: true
       env:
-        - ARROW_PACKAGE="true"
+        - ARROW_ENABLED="true"
         - ARROW_VERSION="devel"
         - ARROW_SOURCE="build"
         - JAVA_VERSION=oraclejdk8
@@ -88,7 +88,7 @@ matrix:
     - r: release
       sudo: true
       env:
-        - ARROW_PACKAGE="true"
+        - ARROW_ENABLED="true"
         - ARROW_VERSION="devel"
         - ARROW_SOURCE="build"
         - JAVA_VERSION=oraclejdk8
@@ -97,7 +97,7 @@ before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
   - if [[ ! -z "$ARROW_VERSION" ]]; then chmod +x ./ci/arrow-$ARROW_SOURCE.sh ; "./ci/arrow-$ARROW_SOURCE.sh" $ARROW_VERSION; fi
-  - if [[ $ARROW_PACKAGE == "true" ]]; then Rscript ci/.travis.R --arrow $ARROW_BRANCH; fi
+  - if [[ ARROW_ENABLED == "true" ]]; then Rscript ci/.travis.R --arrow $ARROW_BRANCH; fi
 
 script:
   - |
