@@ -6,7 +6,7 @@ sudo apt install -y -V cmake
 sudo apt install -y -V libboost-all-dev
 sudo apt install -y -V autoconf
 
-if [[ $ARROW_VERSION == "devel"]]; then
+if [[ $ARROW_VERSION == "devel" ]]; then
   git clone https://github.com/apache/arrow
   cd arrow/cpp
 else
