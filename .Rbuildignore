@@ -34,3 +34,4 @@
 ^config.toml$
 ^appveyor.yml$
 ^checkpoints$
+^ci$
