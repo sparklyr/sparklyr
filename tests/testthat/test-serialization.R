@@ -135,6 +135,8 @@ test_that("collect() can retrieve all data types correctly", {
   rtime <- "2010-01-01 01:01:10"
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
+  arrow_compat <- using_arrow() && packageVersion("arrow") < "0.12.0"
+
   hive_type <- tibble::frame_data(
     ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,    ~avalue,
     "tinyint",       "1",   "integer",       "1",       "raw",       "01",
@@ -170,7 +172,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_types,
-    hive_type %>% pull(!! if(using_arrow()) "atype" else "rtype")
+    hive_type %>% pull(!! if(arrow_compat) "atype" else "rtype")
   )
 
   spark_results <- DBI::dbGetQuery(sc, spark_query)
@@ -179,7 +181,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_results,
-    hive_type %>% pull(!! if(using_arrow()) "avalue" else "rvalue")
+    hive_type %>% pull(!! if(arrow_compat) "avalue" else "rvalue")
   )
 })
 
