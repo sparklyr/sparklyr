@@ -23,6 +23,12 @@ arrow_enabled_object.tbl_spark <- function(object) {
 
 arrow_enabled_object.spark_jobj <- function(object) {
   unsupported_expr <- ".Vector|ArrayType|StructType"
+
+  if (packageVersion("arrow") >= "0.12" && packageVersion("arrow") < "0.13") {
+    # Workaround for ARROW-4565
+    unsupported_expr <- ".Vector|ArrayType|StructType|DecimalType"
+  }
+
   unsupported <- object %>%
     sdf_schema() %>%
     Filter(function(x) grepl(unsupported_expr, x$type), .)
