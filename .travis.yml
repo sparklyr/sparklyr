@@ -83,8 +83,10 @@ matrix:
         - rstudio/forge
   allow_failures:
     - env: R_DEVEL_PACKAGES="true"
-    - env:
-        - $ARROW_PACKAGE="true"
+    - r: release
+      sudo: true
+      env:
+        - ARROW_PACKAGE="true"
         - ARROW_VERSION="devel"
         - JAVA_VERSION=oraclejdk8
 
