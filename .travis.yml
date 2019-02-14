@@ -65,6 +65,7 @@ matrix:
         - ARROW_PACKAGE="true"
         - ARROW_VERSION="0.12.0"
         - ARROW_BRANCH="apache-arrow-0.12.0"
+        - ARROW_SOURCE="install"
         - JAVA_VERSION=oraclejdk8
     - name: "Arrow Devel (ref = '')"
       r: release
@@ -72,6 +73,7 @@ matrix:
       env:
         - ARROW_PACKAGE="true"
         - ARROW_VERSION="devel"
+        - ARROW_SOURCE="build"
         - JAVA_VERSION=oraclejdk8
     - name: "Deps Devel (tidyverse, r-lib, forge)"
       env: R_DEVEL_PACKAGES="true"
@@ -88,13 +90,14 @@ matrix:
       env:
         - ARROW_PACKAGE="true"
         - ARROW_VERSION="devel"
+        - ARROW_SOURCE="build"
         - JAVA_VERSION=oraclejdk8
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
   - chmod +x ./ci/arrow.sh
-  - if [[ ! -z "$ARROW_VERSION" ]]; then "./ci/arrow.sh" $ARROW_VERSION; fi
+  - if [[ ! -z "$ARROW_VERSION" ]]; then "./ci/arrow-$ARROW_SOURCE.sh" $ARROW_VERSION; fi
   - if [[ $ARROW_PACKAGE == "true" ]]; then Rscript ci/.travis.R --arrow $ARROW_BRANCH; fi
 
 script:
