@@ -137,7 +137,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   }
 
   is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
-  if (nchar(is_arrow_devel) > 0) {
+  if (is_arrow_devel) {
     arrow_devel_tests <- c(
       "^dplyr$",
       "^dbi$",
