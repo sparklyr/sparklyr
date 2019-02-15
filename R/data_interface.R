@@ -1,3 +1,21 @@
+# This function handles backward compatibility to support
+# unnamed datasets while not breaking sparklyr 0.9 param
+# signature. Returns a c(name, path) tuple.
+spark_read_compat_param <- function(name, path) {
+  if (is.null(name) && is.null(path)) {
+    stop("The 'path' parameter must be specified.")
+  }
+  else if (!is.null(name) && is.null(path)) {
+    # This is an invalid use case, for 'spark_read_*(cs, "hello")';
+    # however, for convenience and backwards compatibility we allow
+    # to use the second parameter as the path.
+    c(random_string("sparklyr_tmp_"), name)
+  }
+  else {
+    c(name, path)
+  }
+}
+
 spark_csv_options <- function(header,
                               inferSchema,
                               delimiter,
@@ -66,8 +84,8 @@ spark_csv_options <- function(header,
 #'
 #' @export
 spark_read_csv <- function(sc,
-                           path,
-                           name = random_string("sparklyr_tmp_"),
+                           name = NULL,
+                           path = NULL,
                            header = TRUE,
                            columns = NULL,
                            infer_schema = TRUE,
@@ -81,6 +99,8 @@ spark_read_csv <- function(sc,
                            memory = TRUE,
                            overwrite = TRUE,
                            ...) {
+  c(name, path) %<-% spark_read_compat_param(name, path)
+
   columnsHaveTypes <- length(names(columns)) > 0
   if (!identical(columns, NULL) & isTRUE(infer_schema) & columnsHaveTypes) {
     stop("'infer_schema' must be set to FALSE when 'columns' specifies column types")
@@ -201,8 +221,8 @@ spark_write_csv.spark_jobj <- function(x,
 #'
 #' @export
 spark_read_parquet <- function(sc,
-                               name,
-                               path,
+                               name = NULL,
+                               path = NULL,
                                options = list(),
                                repartition = 0,
                                memory = TRUE,
@@ -210,7 +230,7 @@ spark_read_parquet <- function(sc,
                                columns = NULL,
                                schema = NULL,
                                ...) {
-
+  c(name, path) %<-% spark_read_compat_param(name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "parquet", options, columns, schema)
@@ -284,15 +304,15 @@ spark_write_parquet.spark_jobj <- function(x,
 #'
 #' @export
 spark_read_json <- function(sc,
-                            name,
-                            path,
+                            name = NULL,
+                            path = NULL,
                             options = list(),
                             repartition = 0,
                             memory = TRUE,
                             overwrite = TRUE,
                             columns = NULL,
                             ...) {
-
+  c(name, path) %<-% spark_read_compat_param(name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, spark_normalize_path(path), "json", options, columns)
@@ -591,13 +611,13 @@ spark_read_jdbc <- function(sc,
 #'
 #' @export
 spark_read_libsvm <- function(sc,
-                            name,
-                            path,
+                            name = NULL,
+                            path = NULL,
                             repartition = 0,
                             memory = TRUE,
                             overwrite = TRUE,
                             ...) {
-
+  c(name, path) %<-% spark_read_compat_param(name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, "libsvm", "format") %>%
@@ -617,7 +637,7 @@ spark_read_libsvm <- function(sc,
 #'
 #' @export
 spark_read_source <- function(sc,
-                            name,
+                            name = NULL,
                             path = NULL,
                             source,
                             options = list(),
@@ -626,7 +646,7 @@ spark_read_source <- function(sc,
                             overwrite = TRUE,
                             columns = NULL,
                             ...) {
-
+  c(name, path) %<-% spark_read_compat_param(name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df_reader <- spark_data_read_generic(sc, source, "format", options, columns)
@@ -745,15 +765,15 @@ spark_write_source.spark_jobj <- function(x,
 #'
 #' @export
 spark_read_text <- function(sc,
-                            name,
-                            path,
+                            name = NULL,
+                            path = NULL,
                             repartition = 0,
                             memory = TRUE,
                             overwrite = TRUE,
                             options = list(),
                             whole = FALSE,
                             ...) {
-
+  c(name, path) %<-% spark_read_compat_param(name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   columns = list(line = "character")
@@ -830,8 +850,8 @@ spark_write_text.spark_jobj <- function(x,
 #'
 #' @export
 spark_read_orc <- function(sc,
-                           name,
-                           path,
+                           name = NULL,
+                           path = NULL,
                            options = list(),
                            repartition = 0,
                            memory = TRUE,
@@ -839,7 +859,7 @@ spark_read_orc <- function(sc,
                            columns = NULL,
                            schema = NULL,
                            ...) {
-
+  c(name, path) %<-% spark_read_compat_param(name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, list(spark_normalize_path(path)), "orc", options, columns, schema)
