@@ -7,7 +7,7 @@
 ft_chisq_selector(x, features_col = "features", output_col = NULL,
   label_col = "label", selector_type = "numTopFeatures", fdr = 0.05,
   fpr = 0.05, fwe = 0.05, num_top_features = 50, percentile = 0.1,
-  dataset = NULL, uid = random_string("chisq_selector_"), ...)
+  uid = random_string("chisq_selector_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -30,12 +30,12 @@ ft_chisq_selector(x, features_col = "features", output_col = NULL,
 
 \item{percentile}{(Spark 2.1.0+) Percentile of features that selector will select, ordered by statistics value descending. Only applicable when selector_type = "percentile". Default value is 0.1.}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

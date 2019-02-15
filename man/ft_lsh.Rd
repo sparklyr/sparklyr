@@ -9,11 +9,11 @@
 \usage{
 ft_bucketed_random_projection_lsh(x, input_col = NULL,
   output_col = NULL, bucket_length = NULL, num_hash_tables = 1,
-  seed = NULL, dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...)
+  seed = NULL, uid = random_string("bucketed_random_projection_lsh_"),
+  ...)
 
 ft_minhash_lsh(x, input_col = NULL, output_col = NULL,
-  num_hash_tables = 1L, seed = NULL, dataset = NULL,
+  num_hash_tables = 1L, seed = NULL,
   uid = random_string("minhash_lsh_"), ...)
 }
 \arguments{
@@ -35,12 +35,12 @@ for this param lead to a reduced false negative rate, at the expense of added
 \item{seed}{A random seed. Set this value if you need your results to be
 reproducible across repeated calls.}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

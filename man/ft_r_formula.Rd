@@ -5,7 +5,7 @@
 \title{Feature Transformation -- RFormula (Estimator)}
 \usage{
 ft_r_formula(x, formula = NULL, features_col = "features",
-  label_col = "label", force_index_label = FALSE, dataset = NULL,
+  label_col = "label", force_index_label = FALSE,
   uid = random_string("r_formula_"), ...)
 }
 \arguments{
@@ -24,12 +24,12 @@ the formula was used by classification algorithms, we can force to index
 label even it is numeric type by setting this param with true.
 Default: \code{FALSE}.}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

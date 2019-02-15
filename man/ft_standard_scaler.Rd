@@ -5,7 +5,7 @@
 \title{Feature Transformation -- StandardScaler (Estimator)}
 \usage{
 ft_standard_scaler(x, input_col = NULL, output_col = NULL,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
+  with_mean = FALSE, with_std = TRUE,
   uid = random_string("standard_scaler_"), ...)
 }
 \arguments{
@@ -20,12 +20,12 @@ build a dense output, so take care when applying to sparse input. Default: FALSE
 
 \item{with_std}{Whether to scale the data to unit standard deviation. Default: TRUE}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

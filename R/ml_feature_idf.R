@@ -9,7 +9,7 @@
 #'
 #' @export
 ft_idf <- function(x, input_col = NULL, output_col = NULL,
-                   min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
+                   min_doc_freq = 0, uid = random_string("idf_"), ...) {
   UseMethod("ft_idf")
 }
 
@@ -17,9 +17,7 @@ ml_idf <- ft_idf
 
 #' @export
 ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                    min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
-  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
-
+                                    min_doc_freq = 0, uid = random_string("idf_"), ...) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -35,17 +33,14 @@ ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     invoke("setMinDocFreq", .args[["min_doc_freq"]]) %>%
     new_ml_idf()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
 ft_idf.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                               min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
+                               min_doc_freq = 0, uid = random_string("idf_"), ...) {
 
-  stage <- ft_idf.spark_connection(
+ stage <- ft_idf.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
     output_col = output_col,
@@ -59,7 +54,7 @@ ft_idf.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
 
 #' @export
 ft_idf.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                             min_doc_freq = 0, dataset = NULL, uid = random_string("idf_"), ...) {
+                             min_doc_freq = 0, uid = random_string("idf_"), ...) {
   stage <- ft_idf.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

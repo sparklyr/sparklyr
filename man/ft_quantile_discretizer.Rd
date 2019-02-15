@@ -7,8 +7,8 @@
 ft_quantile_discretizer(x, input_col = NULL, output_col = NULL,
   num_buckets = 2, input_cols = NULL, output_cols = NULL,
   num_buckets_array = NULL, handle_invalid = "error",
-  relative_error = 0.001, dataset = NULL,
-  uid = random_string("quantile_discretizer_"), ...)
+  relative_error = 0.001, uid = random_string("quantile_discretizer_"),
+  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -36,12 +36,12 @@ org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
 \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here}
 for description). Must be in the range [0, 1]. default: 0.001}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

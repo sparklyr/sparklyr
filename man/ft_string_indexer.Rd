@@ -9,7 +9,7 @@
 \usage{
 ft_string_indexer(x, input_col = NULL, output_col = NULL,
   handle_invalid = "error", string_order_type = "frequencyDesc",
-  dataset = NULL, uid = random_string("string_indexer_"), ...)
+  uid = random_string("string_indexer_"), ...)
 
 ml_labels(model)
 
@@ -33,9 +33,6 @@ The first label after ordering is assigned an index of 0. Options are
 \code{"frequencyDesc"}, \code{"frequencyAsc"}, \code{"alphabetDesc"}, and \code{"alphabetAsc"}.
 Defaults to \code{"frequencyDesc"}.}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
@@ -43,6 +40,9 @@ feature "transformer" against \code{dataset}. See details.}
 \item{model}{A fitted StringIndexer model returned by \code{ft_string_indexer()}}
 
 \item{labels}{Vector of labels, corresponding to indices to be assigned.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

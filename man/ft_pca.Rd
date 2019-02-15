@@ -6,7 +6,7 @@
 \title{Feature Transformation -- PCA (Estimator)}
 \usage{
 ft_pca(x, input_col = NULL, output_col = NULL, k = NULL,
-  dataset = NULL, uid = random_string("pca_"), ...)
+  uid = random_string("pca_"), ...)
 
 ml_pca(x, features = tbl_vars(x), k = length(features),
   pc_prefix = "PC", ...)
@@ -20,9 +20,6 @@ ml_pca(x, features = tbl_vars(x), k = length(features),
 
 \item{k}{The number of principal components}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
@@ -31,6 +28,9 @@ feature "transformer" against \code{dataset}. See details.}
 analysis. Defaults to all columns in \code{x}.}
 
 \item{pc_prefix}{Length-one character vector used to prepend names of components.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

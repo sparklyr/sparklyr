@@ -5,7 +5,7 @@
 \title{Feature Transformation -- MaxAbsScaler (Estimator)}
 \usage{
 ft_max_abs_scaler(x, input_col = NULL, output_col = NULL,
-  dataset = NULL, uid = random_string("max_abs_scaler_"), ...)
+  uid = random_string("max_abs_scaler_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -14,12 +14,12 @@ ft_max_abs_scaler(x, input_col = NULL, output_col = NULL,
 
 \item{output_col}{The name of the output column.}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

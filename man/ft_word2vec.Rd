@@ -8,7 +8,7 @@
 ft_word2vec(x, input_col = NULL, output_col = NULL,
   vector_size = 100, min_count = 5, max_sentence_length = 1000,
   num_partitions = 1, step_size = 0.025, max_iter = 1, seed = NULL,
-  dataset = NULL, uid = random_string("word2vec_"), ...)
+  uid = random_string("word2vec_"), ...)
 
 ml_find_synonyms(model, word, num)
 }
@@ -37,9 +37,6 @@ chunks of up to \code{max_sentence_length} size. Default: 1000}
 \item{seed}{A random seed. Set this value if you need your results to be
 reproducible across repeated calls.}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
@@ -49,6 +46,9 @@ feature "transformer" against \code{dataset}. See details.}
 \item{word}{A word, as a length-one character vector.}
 
 \item{num}{Number of words closest in similarity to the given word to find.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

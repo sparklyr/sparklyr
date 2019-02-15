@@ -5,7 +5,7 @@
 \title{Feature Transformation -- Imputer (Estimator)}
 \usage{
 ft_imputer(x, input_cols = NULL, output_cols = NULL,
-  missing_value = NULL, strategy = "mean", dataset = NULL,
+  missing_value = NULL, strategy = "mean",
   uid = random_string("imputer_"), ...)
 }
 \arguments{
@@ -24,12 +24,12 @@ supported. If "mean", then replace missing values using the mean value of the
 feature. If "median", then replace missing values using the approximate median
 value of the feature. Default: mean}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

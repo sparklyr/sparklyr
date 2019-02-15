@@ -17,7 +17,7 @@
 #'   value of the feature. Default: mean
 #' @export
 ft_imputer <- function(x, input_cols = NULL, output_cols = NULL,
-                       missing_value = NULL, strategy = "mean", dataset = NULL,
+                       missing_value = NULL, strategy = "mean",
                        uid = random_string("imputer_"), ...) {
   UseMethod("ft_imputer")
 }
@@ -26,11 +26,9 @@ ml_imputer <- ft_imputer
 
 #' @export
 ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL,
-                                        missing_value = NULL, strategy = "mean", dataset = NULL,
+                                        missing_value = NULL, strategy = "mean",
                                         uid = random_string("imputer_"), ...) {
   spark_require_version(x, "2.2.0", "Imputer")
-
-  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
 
   .args <- list(
     input_cols = input_cols,
@@ -50,15 +48,12 @@ ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL
 
   estimator <- new_ml_imputer(jobj)
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
 ft_imputer.ml_pipeline <- function(x, input_cols = NULL, output_cols = NULL,
-                                   missing_value = NULL, strategy = "mean", dataset = NULL,
+                                   missing_value = NULL, strategy = "mean",
                                    uid = random_string("imputer_"), ...) {
   stage <- ft_imputer.spark_connection(
     x = spark_connection(x),
@@ -66,7 +61,6 @@ ft_imputer.ml_pipeline <- function(x, input_cols = NULL, output_cols = NULL,
     output_cols = output_cols,
     missing_value = missing_value,
     strategy = strategy,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -75,7 +69,7 @@ ft_imputer.ml_pipeline <- function(x, input_cols = NULL, output_cols = NULL,
 
 #' @export
 ft_imputer.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL,
-                                 missing_value = NULL, strategy = "mean", dataset = NULL,
+                                 missing_value = NULL, strategy = "mean",
                                  uid = random_string("imputer_"), ...) {
   stage <- ft_imputer.spark_connection(
     x = spark_connection(x),
@@ -83,7 +77,6 @@ ft_imputer.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL,
     output_cols = output_cols,
     missing_value = missing_value,
     strategy = strategy,
-    dataset = dataset,
     uid = uid,
     ...
   )

@@ -5,8 +5,7 @@
 \title{Feature Transformation -- MinMaxScaler (Estimator)}
 \usage{
 ft_min_max_scaler(x, input_col = NULL, output_col = NULL, min = 0,
-  max = 1, dataset = NULL, uid = random_string("min_max_scaler_"),
-  ...)
+  max = 1, uid = random_string("min_max_scaler_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -19,12 +18,12 @@ ft_min_max_scaler(x, input_col = NULL, output_col = NULL, min = 0,
 
 \item{max}{Upper bound after transformation, shared by all features Default: 1.0}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

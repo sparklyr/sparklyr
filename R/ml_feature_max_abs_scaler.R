@@ -23,7 +23,7 @@
 #' @template roxlate-ml-feature-estimator-transformer
 #' @export
 ft_max_abs_scaler <- function(x, input_col = NULL, output_col = NULL,
-                              dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {
+                              uid = random_string("max_abs_scaler_"), ...) {
   UseMethod("ft_max_abs_scaler")
 }
 
@@ -31,10 +31,8 @@ ml_max_abs_scaler <- ft_max_abs_scaler
 
 #' @export
 ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                               dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {
+                                               uid = random_string("max_abs_scaler_"), ...) {
   spark_require_version(x, "2.0.0", "MaxAbsScaler")
-
-  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
 
   .args <- list(
     input_col = input_col,
@@ -50,21 +48,18 @@ ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col =
   ) %>%
     new_ml_max_abs_scaler()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+
+  estimator
 }
 
 #' @export
 ft_max_abs_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                          dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {
+                                          uid = random_string("max_abs_scaler_"), ...) {
 
   stage <- ft_max_abs_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
     output_col = output_col,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -74,13 +69,12 @@ ft_max_abs_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
 
 #' @export
 ft_max_abs_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                        dataset = NULL,uid = random_string("max_abs_scaler_"), ...) {
+                                        uid = random_string("max_abs_scaler_"), ...) {
 
   stage <- ft_max_abs_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
     output_col = output_col,
-    dataset = dataset,
     uid = uid,
     ...
   )

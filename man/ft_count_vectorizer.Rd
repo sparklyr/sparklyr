@@ -7,7 +7,7 @@
 \usage{
 ft_count_vectorizer(x, input_col = NULL, output_col = NULL,
   binary = FALSE, min_df = 1, min_tf = 1, vocab_size = 2^18,
-  dataset = NULL, uid = random_string("count_vectorizer_"), ...)
+  uid = random_string("count_vectorizer_"), ...)
 
 ml_vocabulary(model)
 }
@@ -40,14 +40,14 @@ the document's token count). Default: 1.}
 \code{vocab_size} terms ordered by term frequency across the corpus.
 Default: \code{2^18}.}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
 
 \item{model}{A \code{ml_count_vectorizer_model}.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

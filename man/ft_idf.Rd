@@ -5,7 +5,7 @@
 \title{Feature Transformation -- IDF (Estimator)}
 \usage{
 ft_idf(x, input_col = NULL, output_col = NULL, min_doc_freq = 0,
-  dataset = NULL, uid = random_string("idf_"), ...)
+  uid = random_string("idf_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -16,12 +16,12 @@ ft_idf(x, input_col = NULL, output_col = NULL, min_doc_freq = 0,
 
 \item{min_doc_freq}{The minimum number of documents in which a term should appear. Default: 0}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
+feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.
