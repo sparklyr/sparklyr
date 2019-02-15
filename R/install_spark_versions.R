@@ -70,6 +70,7 @@ spark_installed_versions <- function() {
 }
 
 #' @param show_hadoop Show Hadoop distributions?
+#' @param show_minor Show minor Spark versions?
 #'
 #' @rdname spark_install
 #'
