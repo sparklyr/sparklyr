@@ -24,7 +24,7 @@ spark_install_tar(tarfile)
 
 spark_installed_versions()
 
-spark_available_versions(show_hadoop = FALSE)
+spark_available_versions(show_hadoop = FALSE, show_minor = FALSE)
 }
 \arguments{
 \item{version}{Version of Spark to install. See \code{spark_available_versions} for a list of supported versions}
@@ -47,6 +47,8 @@ spark_available_versions(show_hadoop = FALSE)
 reference spark and hadoop versions respectively.}
 
 \item{show_hadoop}{Show Hadoop distributions?}
+
+\item{show_minor}{Show minor Spark versions?}
 }
 \value{
 List with information about the installed version.
