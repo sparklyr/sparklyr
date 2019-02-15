@@ -73,6 +73,7 @@ readTypedObject <- function(con, type) {
           "l" = readList(con),
           "e" = readEnv(con),
           "s" = readStruct(con),
+          "f" = readFastStringArray(con),
           "n" = NULL,
           "j" = getJobj(con, readString(con)),
           stop(paste("Unsupported type for deserialization", type)))
@@ -89,6 +90,11 @@ readString <- function(con) {
 
   Encoding(string) <- "UTF-8"
   string
+}
+
+readFastStringArray <- function(con) {
+  joined <- readString(con)
+  as.list(strsplit(joined, "\u0019")[[1]])
 }
 
 readDateArray <- function(con, n = 1) {
