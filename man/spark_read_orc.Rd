@@ -4,7 +4,7 @@
 \alias{spark_read_orc}
 \title{Read a ORC file into a Spark DataFrame}
 \usage{
-spark_read_orc(sc, name = NULL, path = NULL, options = list(),
+spark_read_orc(sc, name = NULL, path = name, options = list(),
   repartition = 0, memory = TRUE, overwrite = TRUE, columns = NULL,
   schema = NULL, ...)
 }

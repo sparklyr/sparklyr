@@ -4,7 +4,7 @@
 \alias{spark_read_csv}
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
-spark_read_csv(sc, name = NULL, path = NULL, header = TRUE,
+spark_read_csv(sc, name = NULL, path = name, header = TRUE,
   columns = NULL, infer_schema = TRUE, delimiter = ",",
   quote = "\\"", escape = "\\\\", charset = "UTF-8",
   null_value = NULL, options = list(), repartition = 0,

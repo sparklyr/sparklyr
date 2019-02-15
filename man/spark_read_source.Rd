@@ -4,7 +4,7 @@
 \alias{spark_read_source}
 \title{Read from a generic source into a Spark DataFrame.}
 \usage{
-spark_read_source(sc, name = NULL, path = NULL, source,
+spark_read_source(sc, name = NULL, path = name, source,
   options = list(), repartition = 0, memory = TRUE,
   overwrite = TRUE, columns = NULL, ...)
 }
