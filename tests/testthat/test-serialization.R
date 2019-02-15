@@ -158,6 +158,10 @@ test_that("collect() can retrieve all data types correctly", {
     hive_type <- hive_type %>% filter(stype != "integer")
   }
 
+  if (packageVersion("arrow") < "0.12.0") {
+    hive_type <- hive_type %>% filter(stype != "smallint", stype != "float")
+  }
+
   spark_query <- hive_type %>%
     mutate(
       query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col")
