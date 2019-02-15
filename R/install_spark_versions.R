@@ -86,7 +86,10 @@ spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE) {
 
   if (!show_minor) versions$spark <- gsub("\\.[0-9]+$", "", versions$spark)
 
-  unique(versions)
+  versions <- unique(versions)
+  rownames(versions) <- NULL
+
+  versions
 }
 
 #' Retrieves a dataframe available Spark versions that van be installed.
