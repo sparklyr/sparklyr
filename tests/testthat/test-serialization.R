@@ -158,7 +158,7 @@ test_that("collect() can retrieve all data types correctly", {
     hive_type <- hive_type %>% filter(stype != "integer")
   }
 
-  if (packageVersion("arrow") < "0.12.0") {
+  if ("arrow" %in% installed.packages() && packageVersion("arrow") < "0.12.0") {
     hive_type <- hive_type %>% filter(stype != "smallint", stype != "float")
   }
 
