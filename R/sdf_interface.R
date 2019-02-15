@@ -213,7 +213,6 @@ sdf_sort <- function(x, columns) {
 #' @param .dots A named list, mapping output names to transformations.
 #'
 #' @name sdf_mutate
-#' @export
 #'
 #' @family feature transformation routines
 #'
@@ -239,7 +238,6 @@ sdf_mutate <- function(.data, ...) {
 }
 
 #' @name sdf_mutate
-#' @export
 #' @importFrom lazyeval all_dots
 sdf_mutate_ <- function(.data, ..., .dots) {
   warning(
