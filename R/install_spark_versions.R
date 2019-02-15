@@ -74,7 +74,7 @@ spark_installed_versions <- function() {
 #' @rdname spark_install
 #'
 #' @export
-spark_available_versions <- function(show_hadoop = FALSE) {
+spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE) {
   versions <- read_spark_versions_json(latest = TRUE)
   versions <- versions[versions$spark >= "1.6.0", 1:2]
   selection <- if (show_hadoop) c("spark", "hadoop") else "spark"
@@ -83,7 +83,9 @@ spark_available_versions <- function(show_hadoop = FALSE) {
 
   rownames(versions) <- 1:nrow(versions)
 
-  versions
+  if (!show_minor) versions$spark <- gsub("\\.[0-9]+$", "", versions$spark)
+
+  unique(versions)
 }
 
 #' Retrieves a dataframe available Spark versions that van be installed.
