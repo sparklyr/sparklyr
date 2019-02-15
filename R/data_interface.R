@@ -66,8 +66,8 @@ spark_csv_options <- function(header,
 #'
 #' @export
 spark_read_csv <- function(sc,
-                           name,
                            path,
+                           name = random_string("sparklyr_tmp_"),
                            header = TRUE,
                            columns = NULL,
                            infer_schema = TRUE,
