@@ -62,8 +62,8 @@ test_that("ml_lda/ft_count_vectorizer helper functions (#1353)", {
   fake_tokenized <- fake_tbl %>%
     ft_tokenizer(input_col = 'b', output_col = 'tokens')
 
-  count_vectorizer_model <- ft_count_vectorizer(sc, input_col = "tokens", output_col = "features",
-                                                dataset = fake_tokenized)
+  count_vectorizer_model <- ft_count_vectorizer(sc, input_col = "tokens", output_col = "features") %>%
+    ml_fit(fake_tokenized)
 
   fake_model <- count_vectorizer_model %>%
     ml_transform(fake_tokenized) %>%

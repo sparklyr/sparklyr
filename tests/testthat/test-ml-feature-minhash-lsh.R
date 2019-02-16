@@ -42,7 +42,9 @@ test_that("ft_minhash_lsh() works properly", {
     ft_vector_assembler(paste0("V", 0:5), "features")
   lsh <- ft_minhash_lsh(
     sc, input_col = "features", output_col = "hashes",
-    num_hash_tables = 5, dataset = dfA_tbl, seed = 666)
+    num_hash_tables = 5, seed = 666
+  ) %>%
+    ml_fit(dfA_tbl)
   transformed <- lsh %>%
     ml_transform(dfA_tbl) %>%
     collect()

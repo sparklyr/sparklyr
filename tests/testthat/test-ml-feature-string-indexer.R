@@ -40,7 +40,8 @@ test_that("ft_string_indexer() works", {
   df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
 
-  indexer <- ft_string_indexer(sc, "string", "indexed", dataset = df_tbl)
+  indexer <- ft_string_indexer(sc, "string", "indexed") %>%
+    ml_fit(df_tbl)
   expect_identical(ml_labels(indexer), c("foo", "bar"))
 
   # backwards compat
