@@ -198,13 +198,11 @@ ml_als.tbl_spark <- function(x, formula = NULL, rating_col = "rating", user_col 
     model_als <- stage %>%
       ml_fit(x)
   } else {
-    ml_construct_model_supervised(
+    ml_construct_model_recommendation(
       new_ml_model_als,
       predictor = stage,
       formula = formula,
-      dataset = x,
-      features_col = "features",
-      label_col = "label"
+      dataset = x
     )
   }
 }
