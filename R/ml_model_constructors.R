@@ -175,6 +175,22 @@ new_ml_model_clustering <- function(pipeline_model, formula, dataset,
 #' @rdname ml-model-constructors
 ml_model_clustering <- new_ml_model_clustering
 
+new_ml_model_recommendation <- function(pipeline_model, formula, dataset, ...,
+                                        class = character()) {
+
+  new_ml_model(
+    pipeline_model,
+    formula,
+    dataset = dataset,
+    ...,
+    class = c(class, "ml_model_recommendation")
+  )
+}
+
+#' @export
+#' @rdname ml-model-constructors
+ml_model_recommendation <- new_ml_model_recommendation
+
 #' @export
 spark_jobj.ml_model <- function(x, ...) {
   spark_jobj(x$pipeline_model)
