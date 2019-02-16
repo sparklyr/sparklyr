@@ -330,3 +330,14 @@ resolve_fn <- function(fn, ...) {
 is.tbl_spark <- function(x) {
   inherits(x, "tbl_spark")
 }
+
+`%<-%` <- function(x, y) {
+  dest <- as.character(as.list(substitute(x))[-1])
+  if (length(dest) != length(y)) stop("Assignment must contain same number of elements")
+
+  for (i in seq_along(dest)) {
+    assign(dest[i], y[i], envir = sys.frame(which =sys.parent(n = 1)))
+  }
+
+  invisible(NULL)
+}

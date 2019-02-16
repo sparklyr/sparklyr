@@ -4,8 +4,8 @@
 \alias{spark_read_libsvm}
 \title{Read libsvm file into a Spark DataFrame.}
 \usage{
-spark_read_libsvm(sc, name, path, repartition = 0, memory = TRUE,
-  overwrite = TRUE, ...)
+spark_read_libsvm(sc, name = NULL, path = name, repartition = 0,
+  memory = TRUE, overwrite = TRUE, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}

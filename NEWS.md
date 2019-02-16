@@ -17,6 +17,9 @@
 
 ### Data
 
+- Support for reading `path` as the second parameter in `spark_read_*()`
+  when no name is specified (e.g. `spark_read_csv(sc, "data.csv")`).
+
 - Support for batches in `sdf_collect()` and `dplyr::collect()` to retrieve
   data incrementally using a callback function provided through a
   `callback` parameter. Useful when retrieving larger datasets.

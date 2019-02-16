@@ -4,8 +4,9 @@
 \alias{spark_read_json}
 \title{Read a JSON file into a Spark DataFrame}
 \usage{
-spark_read_json(sc, name, path, options = list(), repartition = 0,
-  memory = TRUE, overwrite = TRUE, columns = NULL, ...)
+spark_read_json(sc, name = NULL, path = name, options = list(),
+  repartition = 0, memory = TRUE, overwrite = TRUE, columns = NULL,
+  ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}

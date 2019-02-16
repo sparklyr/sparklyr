@@ -4,9 +4,9 @@
 \alias{spark_read_source}
 \title{Read from a generic source into a Spark DataFrame.}
 \usage{
-spark_read_source(sc, name, path = NULL, source, options = list(),
-  repartition = 0, memory = TRUE, overwrite = TRUE, columns = NULL,
-  ...)
+spark_read_source(sc, name = NULL, path = name, source,
+  options = list(), repartition = 0, memory = TRUE,
+  overwrite = TRUE, columns = NULL, ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
