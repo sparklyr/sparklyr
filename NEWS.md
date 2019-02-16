@@ -39,6 +39,9 @@
 - `copy_to()` and `collect()` are not re-exported since they are commonly
   used even when using `DBI` or outside data analysis use cases.
 
+- Support to install and connect based on major Spark versions, for
+  instance: `spark_connect(master = "local", version = "2.4")`.
+
 - Faster retrieval of string arrays.
 
 - Support for installing and connecting to Spark 2.4.
