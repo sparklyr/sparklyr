@@ -51,6 +51,7 @@ Imports:
     tidyr,
     withr,
     xml2,
+    ellipsis
 Suggests:
     broom,
     ggplot2,
