@@ -48,6 +48,7 @@ ft_quantile_discretizer <- function(x, input_col = NULL, output_col = NULL, num_
                                     input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
                                     handle_invalid = "error", relative_error = 0.001,
                                     uid = random_string("quantile_discretizer_"), ...) {
+  check_dots_used()
   UseMethod("ft_quantile_discretizer")
 }
 
@@ -141,11 +142,6 @@ new_ml_quantile_discretizer <- function(jobj) {
 }
 
 validator_ml_quantile_discretizer <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    n.buckets = "num_buckets"
-  )) %>%
-    ml_backwards_compatibility()
-
   .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]]))

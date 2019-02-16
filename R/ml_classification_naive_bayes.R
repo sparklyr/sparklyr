@@ -37,6 +37,7 @@ ml_naive_bayes <- function(x, formula = NULL, model_type = "multinomial",
                            prediction_col = "prediction", probability_col = "probability",
                            raw_prediction_col = "rawPrediction",
                            uid = random_string("naive_bayes_"), ...) {
+  check_dots_used()
   UseMethod("ml_naive_bayes")
 }
 
@@ -146,7 +147,6 @@ ml_naive_bayes.tbl_spark <- function(x, formula = NULL, model_type = "multinomia
 
 # Validator
 validator_ml_naive_bayes <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(lambda = "smoothing"))
   .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
   .args[["smoothing"]] <- cast_scalar_double(.args[["smoothing"]])
   .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])

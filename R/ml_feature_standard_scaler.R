@@ -31,6 +31,7 @@
 ft_standard_scaler <- function(x, input_col = NULL, output_col = NULL,
                                with_mean = FALSE, with_std = TRUE,
                                uid = random_string("standard_scaler_"), ...) {
+  check_dots_used()
   UseMethod("ft_standard_scaler")
 }
 

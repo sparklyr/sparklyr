@@ -19,6 +19,7 @@
 ft_string_indexer <- function(x, input_col = NULL, output_col = NULL,
                               handle_invalid = "error", string_order_type = "frequencyDesc",
                               uid = random_string("string_indexer_"), ...) {
+  check_dots_used()
   UseMethod("ft_string_indexer")
 }
 
@@ -83,6 +84,7 @@ ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
   # backwards compatibility for params argument
   dots <- rlang::dots_list(...)
   if (rlang::has_name(dots, "params") && rlang::is_env(dots$params)) {
+    warning("`params` has been deprecated and will be removed in a future release.", call. = FALSE)
     transformer <- if (is_ml_transformer(stage))
       stage
     else

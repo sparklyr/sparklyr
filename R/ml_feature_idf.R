@@ -10,6 +10,7 @@
 #' @export
 ft_idf <- function(x, input_col = NULL, output_col = NULL,
                    min_doc_freq = 0, uid = random_string("idf_"), ...) {
+  check_dots_used()
   UseMethod("ft_idf")
 }
 

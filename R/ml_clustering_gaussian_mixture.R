@@ -25,7 +25,7 @@ ml_gaussian_mixture <- function(x, formula = NULL, k = 2, max_iter = 100,
                                 tol = 0.01, seed = NULL, features_col = "features",
                                 prediction_col = "prediction", probability_col = "probability",
                                 uid = random_string("gaussian_mixture_"), ...) {
-
+  check_dots_used()
   UseMethod("ml_gaussian_mixture")
 }
 

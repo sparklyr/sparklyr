@@ -20,6 +20,7 @@
 ft_word2vec <- function(x, input_col = NULL, output_col = NULL, vector_size = 100, min_count = 5,
                         max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
                         seed = NULL, uid = random_string("word2vec_"), ...) {
+  check_dots_used()
   UseMethod("ft_word2vec")
 }
 

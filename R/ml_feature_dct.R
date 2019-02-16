@@ -12,6 +12,7 @@
 #' @export
 ft_dct <- function(x, input_col = NULL, output_col = NULL,
                    inverse = FALSE, uid = random_string("dct_"), ...) {
+  check_dots_used()
   UseMethod("ft_dct")
 }
 

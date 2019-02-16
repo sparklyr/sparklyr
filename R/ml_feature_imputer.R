@@ -19,6 +19,7 @@
 ft_imputer <- function(x, input_cols = NULL, output_cols = NULL,
                        missing_value = NULL, strategy = "mean",
                        uid = random_string("imputer_"), ...) {
+  check_dots_used()
   UseMethod("ft_imputer")
 }
 

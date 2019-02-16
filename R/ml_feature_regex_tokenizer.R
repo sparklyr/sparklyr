@@ -17,6 +17,7 @@
 ft_regex_tokenizer <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
                                min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
                                uid = random_string("regex_tokenizer_"), ...) {
+  check_dots_used()
   UseMethod("ft_regex_tokenizer")
 }
 

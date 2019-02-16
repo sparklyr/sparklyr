@@ -106,13 +106,6 @@ ml_binary_classification_evaluator.tbl_spark <- function(x, label_col = "label",
 
 # Validator
 validator_ml_binary_classification_evaluator <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    predicted_tbl_spark = "x",
-    label = "label_col",
-    score = "raw_prediction_col",
-    metric = "metric_name"
-  ))
-
   .args[["label_col"]] <- cast_string(.args[["label_col"]])
   .args[["raw_prediction_col"]] <- cast_string(.args[["raw_prediction_col"]])
   .args[["metric_name"]] <- cast_choice(.args[["metric_name"]], c("areaUnderROC", "areaUnderPR"))
@@ -185,13 +178,6 @@ ml_multiclass_classification_evaluator.tbl_spark <- function(x, label_col = "lab
 }
 
 validator_ml_multiclass_classification_evaluator <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    predicted_tbl_spark = "x",
-    label = "label_col",
-    predicted_lbl = "prediction_col",
-    metric = "metric_name"
-  ))
-
   .args[["label_col"]] <- cast_string(.args[["label_col"]])
   .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
   .args[["metric_name"]] <- cast_choice(

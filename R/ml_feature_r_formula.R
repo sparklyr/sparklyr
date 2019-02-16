@@ -50,6 +50,7 @@
 ft_r_formula <- function(x, formula = NULL, features_col = "features", label_col = "label",
                          force_index_label = FALSE,
                          uid = random_string("r_formula_"), ...) {
+  check_dots_used()
   UseMethod("ft_r_formula")
 }
 

@@ -26,6 +26,7 @@ ml_bisecting_kmeans <- function(x, formula = NULL, k = 4, max_iter = 20,
                                 features_col = "features", prediction_col = "prediction",
                                 uid = random_string("bisecting_bisecting_kmeans_"),
                                 ...) {
+  check_dots_used()
   UseMethod("ml_bisecting_kmeans")
 }
 

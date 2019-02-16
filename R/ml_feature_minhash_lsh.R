@@ -3,6 +3,7 @@
 ft_minhash_lsh <- function(x, input_col = NULL, output_col = NULL,
                            num_hash_tables = 1L, seed = NULL,
                            uid = random_string("minhash_lsh_"), ...) {
+  check_dots_used()
   UseMethod("ft_minhash_lsh")
 }
 

@@ -33,6 +33,7 @@ ml_isotonic_regression <- function(x, formula = NULL, feature_index = 0, isotoni
                                    weight_col = NULL, features_col = "features",
                                    label_col = "label", prediction_col = "prediction",
                                    uid = random_string("isotonic_regression_"), ...) {
+  check_dots_used()
   UseMethod("ml_isotonic_regression")
 }
 

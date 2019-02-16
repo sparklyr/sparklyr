@@ -20,6 +20,7 @@ ft_chisq_selector <- function(x, features_col = "features", output_col = NULL, l
                               selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
                               num_top_features = 50, percentile = 0.1,
                               uid = random_string("chisq_selector_"), ...) {
+  check_dots_used()
   UseMethod("ft_chisq_selector")
 }
 

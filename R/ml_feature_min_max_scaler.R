@@ -28,6 +28,7 @@
 ft_min_max_scaler <- function(x, input_col = NULL, output_col = NULL,
                               min = 0, max = 1,
                               uid = random_string("min_max_scaler_"), ...) {
+  check_dots_used()
   UseMethod("ft_min_max_scaler")
 }
 

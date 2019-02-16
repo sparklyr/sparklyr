@@ -12,6 +12,7 @@
 #' @export
 ft_polynomial_expansion <- function(x, input_col = NULL, output_col = NULL,
                                     degree = 2, uid = random_string("polynomial_expansion_"), ...) {
+  check_dots_used()
   UseMethod("ft_polynomial_expansion")
 }
 
@@ -20,7 +21,6 @@ ml_polynomial_expansion <- ft_polynomial_expansion
 #' @export
 ft_polynomial_expansion.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                      degree = 2, uid = random_string("polynomial_expansion_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -32,7 +32,8 @@ ft_polynomial_expansion.spark_connection <- function(x, input_col = NULL, output
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.PolynomialExpansion",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setDegree", .args[["degree"]])
 
   new_ml_polynomial_expansion(jobj)

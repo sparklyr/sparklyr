@@ -130,12 +130,7 @@ ml_vocabulary <- function(model) {
 }
 
 validator_ml_count_vectorizer <- function(.args) {
-  .args <- validate_args_transformer(.args) %>%
-    ml_backwards_compatibility(
-      list(min.df = "min_df",
-           min.tf = "min_tf",
-           vocab.size = "vocab_size")
-    )
+  .args <- validate_args_transformer(.args)
 
   .args[["binary"]] <- cast_scalar_logical(.args[["binary"]])
   .args[["min_df"]] <- cast_scalar_double(.args[["min_df"]])

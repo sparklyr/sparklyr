@@ -16,6 +16,7 @@
 #' @export
 ft_sql_transformer <- function(x, statement = NULL,
                                uid = random_string("sql_transformer_"), ...) {
+  check_dots_used()
   UseMethod("ft_sql_transformer")
 }
 
@@ -134,9 +135,6 @@ ft_dplyr_transformer.tbl_spark <- function(x, tbl,
 }
 
 validator_ml_sql_transformer <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    sql = "statement"
-  ))
   .args[["statement"]] <- cast_nullable_string(.args[["statement"]])
   .args[["uid"]] <- cast_string(.args[["uid"]])
   .args

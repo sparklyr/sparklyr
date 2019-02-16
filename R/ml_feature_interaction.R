@@ -12,6 +12,7 @@
 #' @export
 ft_interaction <- function(x, input_cols = NULL, output_col = NULL,
                            uid = random_string("interaction_"), ...) {
+  check_dots_used()
   UseMethod("ft_interaction")
 }
 
@@ -68,10 +69,6 @@ new_ml_interaction <- function(jobj) {
 }
 
 validator_ml_interaction <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    input.col = "input_cols",
-    output.col = "output_col"
-  ))
   .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   .args

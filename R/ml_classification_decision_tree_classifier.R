@@ -9,6 +9,7 @@ ml_decision_tree_classifier <- function(x, formula = NULL, max_depth = 5, max_bi
                                         label_col = "label", prediction_col = "prediction",
                                         probability_col = "probability", raw_prediction_col = "rawPrediction",
                                         uid = random_string("decision_tree_classifier_"), ...) {
+  check_dots_used()
   UseMethod("ml_decision_tree_classifier")
 }
 

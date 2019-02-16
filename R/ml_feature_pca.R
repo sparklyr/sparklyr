@@ -11,6 +11,7 @@
 #' @export
 ft_pca <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                    uid = random_string("pca_"), ...) {
+  check_dots_used()
   UseMethod("ft_pca")
 }
 

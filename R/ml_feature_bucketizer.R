@@ -32,6 +32,7 @@
 ft_bucketizer <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
                           input_cols = NULL, output_cols = NULL, splits_array = NULL,
                           handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
+  check_dots_used()
   UseMethod("ft_bucketizer")
 }
 

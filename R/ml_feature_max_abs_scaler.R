@@ -24,6 +24,7 @@
 #' @export
 ft_max_abs_scaler <- function(x, input_col = NULL, output_col = NULL,
                               uid = random_string("max_abs_scaler_"), ...) {
+  check_dots_used()
   UseMethod("ft_max_abs_scaler")
 }
 

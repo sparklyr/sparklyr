@@ -6,6 +6,7 @@ ml_train_validation_split <- function(x, estimator = NULL, estimator_param_maps 
                                       collect_sub_models = FALSE, parallelism = 1,
                                       seed = NULL, uid = random_string("train_validation_split_"),
                                       ...) {
+  check_dots_used()
   UseMethod("ml_train_validation_split")
 }
 

@@ -20,6 +20,7 @@
 ft_bucketed_random_projection_lsh <- function(x, input_col = NULL, output_col = NULL,
                                               bucket_length = NULL, num_hash_tables = 1, seed = NULL,
                                               uid = random_string("bucketed_random_projection_lsh_"), ...) {
+  check_dots_used()
   UseMethod("ft_bucketed_random_projection_lsh")
 }
 

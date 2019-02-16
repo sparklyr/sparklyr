@@ -11,6 +11,7 @@
 ft_vector_indexer <- function(x, input_col = NULL, output_col = NULL,
                               max_categories = 20,
                               uid = random_string("vector_indexer_"), ...) {
+  check_dots_used()
   UseMethod("ft_vector_indexer")
 }
 
