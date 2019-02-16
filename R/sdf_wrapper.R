@@ -104,31 +104,9 @@ sdf_collect <- function(object, ...) {
     sdf_collect_static(object, ...)
 }
 
-# Read a Spark Dataset into R.
-#' @importFrom dplyr as_data_frame
-sdf_collect_static <- function(object, ...) {
-  sc <- spark_connection(object)
-  sdf <- spark_dataframe(object)
-
-  separator <- split_separator(sc)
-
-  # for some reason, we appear to receive invalid results when
-  # collecting Spark DataFrames with many columns. empirically,
-  # having more than 50 columns seems to trigger the buggy behavior
-  # collect the data set in chunks, and then join those chunks.
-  # note that this issue should be resolved with Spark >2.0.0
-  collected <- if (spark_version(sc) > "2.0.0") {
-    invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
-  } else {
-    columns <- invoke(sdf, "columns") %>% as.character()
-    chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
-    chunks <- split_chunks(columns, as.integer(chunk_size))
-    pieces <- lapply(chunks, function(chunk) {
-      subset <- sdf %>% invoke("selectExpr", as.list(chunk))
-      invoke_static(sc, "sparklyr.Utils", "collect", subset, separator$regexp)
-    })
-    do.call(c, pieces)
-  }
+sdf_collect_data_frame <- function(sdf, collected) {
+  if (identical(collected, NULL)) return(invisible(NULL))
+  sc <- spark_connection(sdf)
 
   # deserialize columns as needed (string columns will enter as
   # a single newline-delimited string)
@@ -169,6 +147,52 @@ sdf_collect_static <- function(object, ...) {
   }
 
   fixed
+}
+
+# Read a Spark Dataset into R.
+#' @importFrom dplyr as_data_frame
+sdf_collect_static <- function(object, ...) {
+  args <- list(...)
+  sc <- spark_connection(object)
+  sdf <- spark_dataframe(object)
+
+  separator <- split_separator(sc)
+
+  # for some reason, we appear to receive invalid results when
+  # collecting Spark DataFrames with many columns. empirically,
+  # having more than 50 columns seems to trigger the buggy behavior
+  # collect the data set in chunks, and then join those chunks.
+  # note that this issue should be resolved with Spark >2.0.0
+  collected <- if (spark_version(sc) > "2.0.0") {
+    if (!identical(args$callback, NULL)) {
+      batch_size <- spark_config_value(sc$config, "sparklyr.collect.batch", as.integer(10^5L))
+      sdf_iter <- invoke(sdf, "toLocalIterator")
+
+      while (invoke(sdf_iter, "hasNext")) {
+        raw_df <- invoke_static(sc, "sparklyr.Utils", "collectIter", invoke(sdf_iter, "underlying"), batch_size, sdf, separator$regexp)
+        df <- sdf_collect_data_frame(sdf, raw_df)
+        args$callback(df)
+      }
+
+      NULL
+    }
+    else {
+      invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
+    }
+  } else {
+    if (!identical(args$callback, NULL)) stop("Parameter 'callback' requires Spark 2.0+")
+
+    columns <- invoke(sdf, "columns") %>% as.character()
+    chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
+    chunks <- split_chunks(columns, as.integer(chunk_size))
+    pieces <- lapply(chunks, function(chunk) {
+      subset <- sdf %>% invoke("selectExpr", as.list(chunk))
+      invoke_static(sc, "sparklyr.Utils", "collect", subset, separator$regexp)
+    })
+    do.call(c, pieces)
+  }
+
+  sdf_collect_data_frame(sdf, collected)
 }
 
 # Split a Spark DataFrame

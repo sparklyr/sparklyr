@@ -13,7 +13,7 @@ test_that("gradient_boosted_trees.tidy() works", {
 
   check_tidy(td1, exp.row = 2,
              exp.names = c("feature", "importance"))
-  expect_equal(td1$importance, c(0.594, 0.406), tolerance = 0.001)
+  expect_equal(td1$importance, c(0.594, 0.406), tolerance = 0.05)
 
   # for regression
   td2 <- iris_tbl %>%

@@ -618,6 +618,7 @@ spark_read_libsvm <- function(sc,
 #' @export
 spark_read_source <- function(sc,
                             name,
+                            path = NULL,
                             source,
                             options = list(),
                             repartition = 0,
@@ -628,7 +629,8 @@ spark_read_source <- function(sc,
 
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, source, "format", options, columns) %>% invoke("load")
+  df_reader <- spark_data_read_generic(sc, source, "format", options, columns)
+  df <- if (is.null(path)) invoke(df_reader, "load") else invoke(df_reader, "load", spark_normalize_path(path))
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 

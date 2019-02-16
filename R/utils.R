@@ -156,6 +156,14 @@ regex_replace <- function(string, ...) {
 }
 
 spark_sanitize_names <- function(names, config) {
+  # Spark 1.6.X has a number of issues with '.'s in column names, e.g.
+  #
+  #    https://issues.apache.org/jira/browse/SPARK-5632
+  #    https://issues.apache.org/jira/browse/SPARK-13455
+  #
+  # Many of these issues are marked as resolved, but it appears this is
+  # a common regression in Spark and the handling is not uniform across
+  # the Spark API.
 
   # sanitize names by default, but opt out with global option
   if (!isTRUE(spark_config_value(config, "sparklyr.sanitize.column.names", TRUE)))

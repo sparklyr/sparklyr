@@ -13,7 +13,8 @@ class WorkerContext(
   bundlePath: String,
   context: Array[Byte],
   timeZoneId: String,
-  schema: org.apache.spark.sql.types.StructType) {
+  schema: org.apache.spark.sql.types.StructType,
+  options: Map[String, String]) {
 
   import org.apache.spark._
   import org.apache.spark.rdd.RDD
@@ -96,5 +97,9 @@ class WorkerContext(
 
   def getSchema() : StructType = {
     schema
+  }
+
+  def getOptions() : Map[String, String] = {
+    options
   }
 }

@@ -67,12 +67,13 @@ class ArrowConvertersImpl {
   def toBatchArray(
       rowIter: Iterator[org.apache.spark.sql.Row],
       schema: StructType,
-      timeZoneId: String) : Array[Byte] = {
+      timeZoneId: String,
+      recordsPerBatch: Int) : Array[Byte] = {
 
     val batches: Iterator[Array[Byte]] = toBatchIterator(
       rowIter,
       schema,
-      100000,
+      recordsPerBatch,
       timeZoneId,
       Option.empty
     )
@@ -251,22 +252,42 @@ object ArrowConverters {
     })
   }
 
-  def toArrowBatchRdd(
+  def toArrowDataset(
       df: DataFrame,
       sparkSession: SparkSession,
-      timeZoneId: String): Array[Byte] = {
-
+      timeZoneId: String): Dataset[Array[Byte]] = {
     val schema = df.schema
     val maxRecordsPerBatch = sparkSession.sessionState.conf.arrowMaxRecordsPerBatch
 
     val encoder = org.apache.spark.sql.Encoders.BINARY
 
-    val batches: Array[Array[Byte]] = df.mapPartitions(
+    df.mapPartitions(
       iter => (new ArrowConvertersImpl()).toBatchIterator(iter, schema, maxRecordsPerBatch, timeZoneId, TaskContext.get())
-    )(encoder).collect()
+    )(encoder)
+  }
+
+  def toArrowStream(
+    df: DataFrame,
+    timeZoneId: String,
+    batchIter: Iterator[Array[Byte]]) : Array[Byte] = {
 
     val out = new ByteArrayOutputStream()
-    val batchWriter = new ArrowBatchStreamWriter(schema, out, timeZoneId)
+    val batchWriter = new ArrowBatchStreamWriter(df.schema, out, timeZoneId)
+    batchWriter.writeOneBatch(batchIter)
+    batchWriter.end()
+
+    out.toByteArray()
+  }
+
+  def toArrowBatchRdd(
+      df: DataFrame,
+      sparkSession: SparkSession,
+      timeZoneId: String): Array[Byte] = {
+
+    val batches: Array[Array[Byte]] = toArrowDataset(df, sparkSession, timeZoneId).collect()
+
+    val out = new ByteArrayOutputStream()
+    val batchWriter = new ArrowBatchStreamWriter(df.schema, out, timeZoneId)
     batchWriter.writeBatches(batches.iterator)
     batchWriter.end()
 
@@ -277,7 +298,14 @@ object ArrowConverters {
       payloadRDD: JavaRDD[Array[Byte]],
       schema: StructType,
       sparkSession: SparkSession): DataFrame = {
-    val rdd = payloadRDD.rdd.mapPartitions { iter =>
+    toDataFrame(payloadRDD.rdd, schema, sparkSession)
+  }
+
+  def toDataFrame(
+      payloadRDD: RDD[Array[Byte]],
+      schema: StructType,
+      sparkSession: SparkSession): DataFrame = {
+    val rdd = payloadRDD.mapPartitions { iter =>
       val converters = new ArrowConvertersImpl()
       val context = TaskContext.get()
       converters.fromPayloadIterator(iter, context)
