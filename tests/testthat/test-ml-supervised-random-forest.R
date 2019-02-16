@@ -44,7 +44,7 @@ test_that("col.sample.rate argument is respected", {
 })
 
 test_that("thresholds parameter behaves as expected", {
-  skip_covr("takes too long to measure coverage")
+  skip_slow("takes too long to measure coverage")
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   most_predicted_label <- function(x) x %>%
@@ -114,7 +114,7 @@ test_that("error for bad impurity specification", {
 })
 
 test_that("random seed setting works", {
-  skip_covr("takes too long to measure coverage")
+  skip_slow("takes too long to measure coverage")
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   model_string <- function(x) spark_jobj(x$model) %>%

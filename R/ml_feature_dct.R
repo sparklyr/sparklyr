@@ -20,6 +20,7 @@ ml_dct <- ft_dct
 #' @export
 ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                     inverse = FALSE, uid = random_string("dct_"), ...) {
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,

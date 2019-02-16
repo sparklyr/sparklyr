@@ -37,6 +37,7 @@ ml_min_max_scaler <- ft_min_max_scaler
 ft_min_max_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                min = 0, max = 1, dataset = NULL,
                                                uid = random_string("min_max_scaler_"), ...) {
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
 
   .args <- list(
     input_col = input_col,

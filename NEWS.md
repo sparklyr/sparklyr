@@ -4,6 +4,11 @@
 
 - Support for Apache Arrow using the `arrow` package.
 
+### ML
+
+- The `dataset` parameter for estimator feature transformers has been deprecated (#1891).
+- `ml_multilayer_perceptron_classifier()` gains probabilistic classifier parameters (#1798).
+
 ### Livy
 
 - Significant performance improvements by using `spark_version` in
@@ -30,6 +35,10 @@
 - Implemented `tidy()`, `augment()`, and `glance()` for `ml_lda()`and `ml_als()` models (@samuelmacedo83)
 
 ## Other
+
+- Faster retrieval of string arrays.
+
+- Support for installing and connecting to Spark 2.4.
 
 - Support for property expansion in `yarn-site.xml` (@lgongmsft, #1876).
 

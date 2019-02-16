@@ -2,34 +2,34 @@
 % Please edit documentation in R/ml_transformer_and_estimator.R
 \name{ml-constructors}
 \alias{ml-constructors}
-\alias{ml_transformer}
-\alias{ml_prediction_model}
-\alias{ml_classification_model}
-\alias{ml_probabilistic_classification_model}
-\alias{ml_clustering_model}
-\alias{ml_estimator}
-\alias{ml_predictor}
-\alias{ml_classifier}
-\alias{ml_probabilistic_classifier}
+\alias{new_ml_transformer}
+\alias{new_ml_prediction_model}
+\alias{new_ml_classification_model}
+\alias{new_ml_probabilistic_classification_model}
+\alias{new_ml_clustering_model}
+\alias{new_ml_estimator}
+\alias{new_ml_predictor}
+\alias{new_ml_classifier}
+\alias{new_ml_probabilistic_classifier}
 \title{Constructors for Pipeline Stages}
 \usage{
-ml_transformer(jobj, ..., class = character())
+new_ml_transformer(jobj, ..., class = character())
 
-ml_prediction_model(jobj, ..., class = character())
+new_ml_prediction_model(jobj, ..., class = character())
 
-ml_classification_model(jobj, ..., class = character())
+new_ml_classification_model(jobj, ..., class = character())
 
-ml_probabilistic_classification_model(jobj, ..., class = character())
+new_ml_probabilistic_classification_model(jobj, ..., class = character())
 
-ml_clustering_model(jobj, ..., class = character())
+new_ml_clustering_model(jobj, ..., class = character())
 
-ml_estimator(jobj, ..., class = character())
+new_ml_estimator(jobj, ..., class = character())
 
-ml_predictor(jobj, ..., class = character())
+new_ml_predictor(jobj, ..., class = character())
 
-ml_classifier(jobj, ..., class = character())
+new_ml_classifier(jobj, ..., class = character())
 
-ml_probabilistic_classifier(jobj, ..., class = character())
+new_ml_probabilistic_classifier(jobj, ..., class = character())
 }
 \arguments{
 \item{jobj}{Pointer to the pipeline stage object.}

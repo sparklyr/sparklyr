@@ -28,6 +28,9 @@ ml_string_indexer <- ft_string_indexer
 ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                handle_invalid = "error", string_order_type = "frequencyDesc",
                                                dataset = NULL, uid = random_string("string_indexer_"), ...) {
+
+  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,

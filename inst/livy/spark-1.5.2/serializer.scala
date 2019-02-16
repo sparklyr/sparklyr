@@ -211,6 +211,7 @@ class Serializer(tracker: JVMObjectTracker) {
       case "list"      => dos.writeByte('l')
       case "map"       => dos.writeByte('e')
       case "jobj"      => dos.writeByte('j')
+      case "strarray"  => dos.writeByte('f')
       case _ => throw new IllegalArgumentException(s"Invalid type $typeStr")
     }
   }
@@ -310,6 +311,9 @@ class Serializer(tracker: JVMObjectTracker) {
         case v: Array[Date] =>
           writeType(dos, "array")
           writeDateArr(dos, v)
+        case v: Array[String] =>
+          writeType(dos, "strarray")
+          writeFastStringArr(dos, v)
         case v: Array[Object] =>
           writeType(dos, "list")
           writeInt(dos, v.length)
@@ -441,5 +445,10 @@ class Serializer(tracker: JVMObjectTracker) {
     writeType(out, "character")
     out.writeInt(value.length)
     value.foreach(v => writeString(out, v))
+  }
+
+  def writeFastStringArr(out: DataOutputStream, value: Array[String]): Unit = {
+    val all = value.mkString("\u0019")
+    writeString(out, all)
   }
 }
