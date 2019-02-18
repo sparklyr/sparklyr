@@ -60,43 +60,92 @@ ml_gradient_boosted_trees <- function(x, formula = NULL,
   response_type <- schema[[response_col]]$type
 
   type <- rlang::arg_match(type)
-  model_type <- if (!identical(type, "auto")) type else {
-    if (response_type %in% c("DoubleType", "IntegerType"))
+  model_type <- if (!identical(type, "auto")) {
+    type
+  } else {
+    if (response_type %in% c("DoubleType", "IntegerType")) {
       "regression"
-    else
+    } else {
       "classification"
+    }
   }
 
   loss_type <- rlang::arg_match(loss_type)
   loss_type <- if (identical(loss_type, "auto")) {
     if (identical(model_type, "classification")) "logistic" else "squared"
   } else if (identical(model_type, "regression")) {
-    if (!loss_type %in% c("squared", "absolute"))
+    if (!loss_type %in% c("squared", "absolute")) {
       stop("`loss_type` must be \"squared\" or \"absolute\" for regression.")
+    }
     loss_type
   } else {
-    if (!identical(loss_type, "logistic"))
+    if (!identical(loss_type, "logistic")) {
       stop("`loss_type` must be \"logistic\" for classification.")
+    }
     loss_type
   }
 
-  if (spark_version(spark_connection(x)) < "2.2.0" && !is.null(thresholds))
+  if (spark_version(spark_connection(x)) < "2.2.0" && !is.null(thresholds)) {
     stop("`thresholds` is only supported for GBT in Spark 2.2.0+.")
+  }
 
-  routine <- switch(model_type,
-                    regression = ml_gbt_regressor,
-                    classification = ml_gbt_classifier)
-
-  args <- c(as.list(environment()), list(...))
-  args$response <- NULL
-  args$features <- NULL
-  do.call(routine, args)
+  switch(
+    model_type,
+    regression = ml_gbt_regressor(
+      x = x,
+      formula = formula,
+      max_iter = max_iter,
+      max_depth = max_depth,
+      step_size = step_size,
+      subsampling_rate = subsampling_rate,
+      feature_subset_strategy = feature_subset_strategy,
+      min_instances_per_node = min_instances_per_node,
+      max_bins = max_bins,
+      min_info_gain = min_info_gain,
+      loss_type = loss_type,
+      seed = seed,
+      checkpoint_interval = checkpoint_interval,
+      cache_node_ids = cache_node_ids,
+      max_memory_in_mb = max_memory_in_mb,
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      uid = uid,
+      ...
+    ),
+    classification = ml_gbt_classifier(
+      x = x,
+      formula = formula,
+      max_iter = max_iter,
+      max_depth = max_depth,
+      step_size = step_size,
+      subsampling_rate = subsampling_rate,
+      feature_subset_strategy = feature_subset_strategy,
+      min_instances_per_node = min_instances_per_node,
+      max_bins = max_bins,
+      min_info_gain = min_info_gain,
+      loss_type = loss_type,
+      seed = seed,
+      thresholds = thresholds,
+      checkpoint_interval = checkpoint_interval,
+      cache_node_ids = cache_node_ids,
+      max_memory_in_mb = max_memory_in_mb,
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      probability_col = probability_col,
+      raw_prediction_col = raw_prediction_col,
+      uid = uid,
+      ...
+    )
+  )
 }
 
 new_ml_model_gbt_classification <- function(pipeline_model, formula, dataset, label_col,
                                             features_col, predicted_label_col) {
   new_ml_model_classification(
-    pipeline_model, formula, dataset = dataset,
+    pipeline_model, formula,
+    dataset = dataset,
     label_col = label_col, features_col = features_col,
     predicted_label_col = predicted_label_col,
     class = "ml_model_gbt_classification"
@@ -106,7 +155,8 @@ new_ml_model_gbt_classification <- function(pipeline_model, formula, dataset, la
 new_ml_model_gbt_regression <- function(pipeline_model, formula, dataset, label_col,
                                         features_col) {
   new_ml_model_regression(
-    pipeline_model, formula, dataset = dataset,
+    pipeline_model, formula,
+    dataset = dataset,
     label_col = label_col, features_col = features_col,
     class = "ml_model_gbt_regression"
   )
