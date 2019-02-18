@@ -5,7 +5,7 @@ spark_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
 
   actions <- list(
-    "Spark" = list(
+    "Spark UI" = list(
       icon = file.path(icons, "spark-ui.png"),
       callback = function() {
         utils::browseURL(spark_web(scon))
@@ -13,27 +13,12 @@ spark_actions <- function(scon) {
     )
   )
 
-  if (sparklyr:::spark_connection_is_yarn_client(scon))
-  {
-    actions <- c(
-      actions,
-      list(
-        "YARN" = list(
-          icon = file.path(icons, "yarn-ui.png"),
-          callback = function() {
-            utils::browseURL(spark_connection_yarn_ui(scon))
-          }
-        )
-      )
-    )
-  }
-
   if (identical(tolower(scon$method), "livy"))
   {
     actions <- c(
       actions,
       list(
-        "Livy" = list(
+        "Livy UI" = list(
           icon = file.path(icons, "livy-ui.png"),
           callback = function() {
             utils::browseURL(file.path(scon$master, "ui"))

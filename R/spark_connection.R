@@ -193,12 +193,8 @@ print.spark_log <- function(x, ...) {
 #'
 #' @export
 spark_web <- function(sc, ...) {
-  sparkui_url <- spark_config_value(
-    sc$config, c("sparklyr.web.spark", "sparklyr.sparkui.url")
-  )
-
-  if (!is.null(sparkui_url)) {
-    structure(sparkui_url, class = "spark_web_url")
+  if (!is.null(sc$config$sparklyr.sparkui.url)) {
+    structure(sc$config$sparklyr.sparkui.url, class = "spark_web_url")
   }
   else if (spark_version(sc) >= "2.0.0" &&
            !spark_context(sc) %>% invoke("uiWebUrl") %>% invoke("isEmpty")) {
