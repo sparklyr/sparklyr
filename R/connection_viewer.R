@@ -13,7 +13,7 @@ spark_actions <- function(scon) {
     )
   )
 
-  if (sparklyr:::spark_connection_is_yarn(scon))
+  if (spark_connection_is_yarn(scon))
   {
     actions <- c(
       actions,

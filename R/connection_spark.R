@@ -307,7 +307,7 @@ spark_connection_in_driver <- function(sc) {
 }
 
 spark_connection_is_yarn <- function(sc) {
-  grepl("^yarn(-client|-ccluster)?$", sc$master, ignore.case = TRUE, perl = TRUE)
+  grepl("^yarn(-client|-cluster)?$", sc$master, ignore.case = TRUE, perl = TRUE)
 }
 
 spark_connection_is_yarn_client <- function(sc) {
