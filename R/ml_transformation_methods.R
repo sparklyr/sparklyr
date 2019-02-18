@@ -167,6 +167,7 @@ NULL
 #' @rdname sdf-transform-methods
 #' @export
 sdf_predict <- function(x, model, ...) {
+  .Deprecated("ml_predict")
   UseMethod("sdf_predict")
 }
 
@@ -178,18 +179,21 @@ sdf_predict.default <- function(x, model, ...) {
 #' @rdname sdf-transform-methods
 #' @export
 sdf_transform <- function(x, transformer, ...) {
+  .Deprecated("ml_transform")
   ml_transform(transformer, sdf_register(x))
 }
 
 #' @rdname sdf-transform-methods
 #' @export
 sdf_fit <- function(x, estimator, ...) {
+  .Deprecated("ml_fit")
   ml_fit(estimator, sdf_register(x))
 }
 
 #' @rdname sdf-transform-methods
 #' @export
 sdf_fit_and_transform <- function(x, estimator, ...) {
+  .Deprecated("ml_fit_and_transform")
   ml_fit_and_transform(estimator, sdf_register(x))
 }
 
