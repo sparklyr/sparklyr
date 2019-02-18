@@ -29,8 +29,8 @@ test_that("ml_one_vs_rest with two classes agrees with logistic regression", {
   ovr_model <- ml_one_vs_rest(iris_tbl2, is_versicolor ~ ., classifier = lr)
 
   expect_equal(
-    sdf_predict(ovr_model, iris_tbl2) %>% pull(predicted_label),
-    sdf_predict(lr_model, iris_tbl2) %>% pull(predicted_label)
+    ml_predict(ovr_model, iris_tbl2) %>% pull(predicted_label),
+    ml_predict(lr_model, iris_tbl2) %>% pull(predicted_label)
   )
 })
 

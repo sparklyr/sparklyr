@@ -27,19 +27,19 @@ test_that("thresholds parameter behaves as expected", {
   dt_predictions <- iris_tbl %>%
     ml_decision_tree(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(0, 1, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(dt_predictions), 0)
 
   dt_predictions <- iris_tbl %>%
     ml_decision_tree(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 0, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(dt_predictions), 1)
 
   dt_predictions <- iris_tbl %>%
     ml_decision_tree(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 1, 0)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(dt_predictions), 2)
 })
 

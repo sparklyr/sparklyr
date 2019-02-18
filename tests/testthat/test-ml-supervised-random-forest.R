@@ -56,19 +56,19 @@ test_that("thresholds parameter behaves as expected", {
   rf_predictions <- iris_tbl %>%
     ml_random_forest(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(0, 1, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(rf_predictions), 0)
 
   rf_predictions <- iris_tbl %>%
     ml_random_forest(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 0, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(rf_predictions), 1)
 
   rf_predictions <- iris_tbl %>%
     ml_random_forest(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 1, 0)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(rf_predictions), 2)
 })
 
@@ -147,10 +147,10 @@ test_that("one-tree forest agrees with ml_decision_tree()", {
                      type = "regression")
 
   expect_equal(rf %>%
-                 sdf_predict(iris_tbl) %>%
+                 ml_predict(iris_tbl) %>%
                  collect(),
                dt %>%
-                 sdf_predict(iris_tbl) %>%
+                 ml_predict(iris_tbl) %>%
                  collect())
 })
 

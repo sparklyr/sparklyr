@@ -27,14 +27,14 @@ test_that("thresholds parameter behaves as expected", {
     filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(0, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(gbt_predictions), 0)
 
   gbt_predictions <- iris_tbl %>%
     filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 0)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(gbt_predictions), 1)
 })
 
@@ -64,10 +64,10 @@ test_that("one-tree ensemble agrees with ml_decision_tree()", {
                      type = "regression")
 
   expect_equal(gbt %>%
-                 sdf_predict(iris_tbl) %>%
+                 ml_predict(iris_tbl) %>%
                  collect(),
                dt %>%
-                 sdf_predict(iris_tbl) %>%
+                 ml_predict(iris_tbl) %>%
                  collect())
 })
 
