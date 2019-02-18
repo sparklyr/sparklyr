@@ -15,8 +15,18 @@
   `livy_config()` which enables using the sparklyr JAR rather than
   sources.
 
+- Improved memory use in Livy by using string builders and avoid print
+  backs.
+  
 ### Data
 
+- `copy_to()` names tables `sparklyr_tmp_` instead of `sparklyr_` for
+  consistency with other temp tables and to avoid rendering them under
+  the connections pane.
+
+- `copy_to()` and `collect()` are not re-exported since they are commonly
+  used even when using `DBI` or outside data analysis use cases.
+  
 - Support for reading `path` as the second parameter in `spark_read_*()`
   when no name is specified (e.g. `spark_read_csv(sc, "data.csv")`).
 
@@ -33,23 +43,25 @@
 - Support for `whole` parameter for `spark_read_text()` to read an
   entire text file without splitting contents by line.
 
-## Other
-
-- `copy_to()` names tables `sparklyr_tmp_` instead of `sparklyr_` for
-  consistency with other temp tables and to avoid rendering them under
-  the connections pane.
-
-- `copy_to()` and `collect()` are not re-exported since they are commonly
-  used even when using `DBI` or outside data analysis use cases.
+### Connections
 
 - Support to install and connect based on major Spark versions, for
   instance: `spark_connect(master = "local", version = "2.4")`.
 
-- Faster retrieval of string arrays.
-
 - Support for installing and connecting to Spark 2.4.
 
+### Serialization
+
+- Faster retrieval of string arrays.
+
+### YARN
+
+- New YARN action under RStudio connection pane extension to launch YARN
+  UI. Configurable through the `sparklyr.web.yarn` configuration setting.
+
 - Support for property expansion in `yarn-site.xml` (@lgongmsft, #1876).
+
+## Other
 
 - Fixed missing Hive tables not rendering under some Spark
   distributions (#1823).
@@ -60,9 +72,6 @@
 
 - Tables with periods supported by setting
   `sparklyr.dplyr.period.splits` to `FALSE`.
-
-- Improved memory use in Livy by using string builders and avoid print
-  backs.
   
  - `sdf_len()`, `sdf_along()` and `sdf_seq()` default to 32 bit integers
    but allow support for 64 bits through `bits` parameter.
