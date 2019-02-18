@@ -35,7 +35,7 @@
 #' rf_model <- mtcars_training %>%
 #'   ml_random_forest(cyl ~ ., type = "classification")
 #'
-#' pred <- sdf_predict(mtcars_test, rf_model)
+#' pred <- ml_predict(rf_model, mtcars_test)
 #'
 #' ml_multiclass_classification_evaluator(pred)
 #'
@@ -43,7 +43,7 @@
 #' rf_model <- mtcars_training %>%
 #'   ml_random_forest(cyl ~ ., type = "regression")
 #'
-#' pred <- sdf_predict(mtcars_test, rf_model)
+#' pred <- ml_predict(rf_model, mtcars_test)
 #'
 #' ml_regression_evaluator(pred, label_col = "cyl")
 #'
@@ -51,7 +51,7 @@
 #' rf_model <- mtcars_training %>%
 #'   ml_random_forest(am ~ gear + carb, type = "classification")
 #'
-#' pred <- sdf_predict(mtcars_test, rf_model)
+#' pred <- ml_predict(rf_model, mtcars_test)
 #'
 #' ml_binary_classification_evaluator(pred)
 #' }

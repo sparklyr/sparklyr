@@ -31,5 +31,5 @@ sdf_fit_and_transform(x, estimator, ...)
 \code{sdf_predict()}, \code{sdf_transform()}, and \code{sdf_fit_and_transform()} return a transformed dataframe whereas \code{sdf_fit()} returns a \code{ml_transformer}.
 }
 \description{
-Methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
+Deprecated methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
 }

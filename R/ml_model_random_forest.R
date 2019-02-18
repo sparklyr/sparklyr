@@ -34,7 +34,7 @@ NULL
 #' rf_model <- iris_training %>%
 #'   ml_random_forest(Species ~ ., type = "classification")
 #'
-#' pred <- sdf_predict(iris_test, rf_model)
+#' pred <- ml_predict(rf_model, iris_test)
 #'
 #' ml_multiclass_classification_evaluator(pred)
 #' }

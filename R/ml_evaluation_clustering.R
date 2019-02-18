@@ -33,9 +33,9 @@
 #' gmm_model <- ml_gaussian_mixture(iris_training, formula = formula)
 #'
 #' # Predict
-#' pred_kmeans <- sdf_predict(iris_test, kmeans_model)
-#' pred_b_kmeans <- sdf_predict(iris_test, b_kmeans_model)
-#' pred_gmm <- sdf_predict(iris_test, gmm_model)
+#' pred_kmeans <- ml_predict(kmeans_model, iris_test)
+#' pred_b_kmeans <- ml_predict(b_kmeans_model, iris_test)
+#' pred_gmm <- ml_predict(gmm_model, iris_test)
 #'
 #' # Evaluate
 #' ml_clustering_evaluator(pred_kmeans)

@@ -28,7 +28,7 @@
 #' mlp_model <- iris_training %>%
 #'   ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4,3,3))
 #'
-#' pred <- sdf_predict(iris_test, mlp_model)
+#' pred <- ml_predict(mlp_model, iris_test)
 #'
 #' ml_multiclass_classification_evaluator(pred)
 #' }

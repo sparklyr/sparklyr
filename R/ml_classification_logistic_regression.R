@@ -34,7 +34,7 @@
 #' lr_model <- mtcars_training %>%
 #'   ml_logistic_regression(am ~ gear + carb)
 #'
-#' pred <- sdf_predict(mtcars_test, lr_model)
+#' pred <- ml_predict(lr_model, mtcars_test)
 #'
 #' ml_binary_classification_evaluator(pred)
 #' }

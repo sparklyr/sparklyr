@@ -33,7 +33,7 @@ NULL
 #' gbt_model <- iris_training %>%
 #'   ml_gradient_boosted_trees(Sepal_Length ~ Petal_Length + Petal_Width)
 #'
-#' pred <- sdf_predict(iris_test, gbt_model)
+#' pred <- ml_predict(gbt_model, iris_test)
 #'
 #' ml_regression_evaluator(pred, label_col = "Sepal_Length")
 #' }

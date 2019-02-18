@@ -27,7 +27,7 @@
 #' svc_model <- iris_training %>%
 #'   ml_linear_svc(Species ~ .)
 #'
-#' pred <- sdf_predict(iris_test, svc_model)
+#' pred <- ml_predict(svc_model, iris_test)
 #'
 #' ml_binary_classification_evaluator(pred)
 #' }

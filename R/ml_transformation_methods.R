@@ -151,7 +151,7 @@ ml_predict.ml_model_clustering <- function(x, dataset, ...) {
 
 #' Spark ML -- Transform, fit, and predict methods (sdf_ interface)
 #'
-#' Methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
+#' Deprecated methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
 #'
 #' @param x A \code{tbl_spark}.
 #' @param model A \code{ml_transformer} or a \code{ml_model} object.

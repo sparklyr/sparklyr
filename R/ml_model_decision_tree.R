@@ -32,7 +32,7 @@ NULL
 #' dt_model <- iris_training %>%
 #'   ml_decision_tree(Species ~ .)
 #'
-#' pred <- sdf_predict(iris_test, dt_model)
+#' pred <- ml_predict(dt_model, iris_test)
 #'
 #' ml_multiclass_classification_evaluator(pred)
 #' }

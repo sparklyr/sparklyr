@@ -23,7 +23,7 @@
 #' iso_res <- iris_tbl %>%
 #'   ml_isotonic_regression(Petal_Length ~ Petal_Width)
 #'
-#' pred <- sdf_predict(iris_test, iso_res)
+#' pred <- ml_predict(iso_res, iris_test)
 #'
 #' pred
 #' }
