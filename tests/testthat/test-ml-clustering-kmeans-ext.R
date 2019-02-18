@@ -28,11 +28,11 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
 
   R <- iris %>%
     select(Sepal_Length, Petal_Length) %>%
-    kmeans(centers = 3)
+    kmeans(k = 3)
 
   S <- iris_tbl %>%
     select(Sepal_Length, Petal_Length) %>%
-    ml_kmeans(~ ., centers = 3L)
+    ml_kmeans(~ ., k = 3L)
 
   lhs <- as.matrix(R$centers)
   rhs <- as.matrix(S$centers)
@@ -56,11 +56,11 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 
   R <- iris %>%
     select(Sepal_Length, Petal_Length) %>%
-    kmeans(centers = 3)
+    kmeans(k = 3)
 
   S <- iris_tbl %>%
     select(Sepal_Length, Petal_Length) %>%
-    ml_kmeans(centers = 3L, features = c("Sepal_Length", "Petal_Length"))
+    ml_kmeans(k = 3L, features = c("Sepal_Length", "Petal_Length"))
 
   lhs <- as.matrix(R$centers)
   rhs <- as.matrix(S$centers)
@@ -76,7 +76,7 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 test_that("ml_kmeans() works properly", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
-  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5, seed = 11)
+  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11)
   expect_equal(ml_predict(iris_kmeans, iris_tbl) %>%
                  dplyr::distinct(prediction) %>%
                  dplyr::arrange(prediction) %>%
@@ -88,7 +88,7 @@ test_that("ml_compute_cost() for kmeans works properly", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "ml_compute_cost() requires Spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
-  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, centers = 5, seed = 11)
+  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11)
   expect_equal(
     ml_compute_cost(iris_kmeans, iris_tbl),
     46.7123, tolerance = 0.01
