@@ -171,20 +171,6 @@ sdf_predict <- function(x, model, ...) {
 }
 
 #' @export
-sdf_predict.ml_model <- function(x, model, ...) {
-  msg <- "The signature sdf_predict(model, dataset) is deprecated and will be removed in a future version. Use sdf_predict(dataset, model) or ml_predict(model, dataset) instead."
-  warning(msg)
-  ml_predict(x, dataset = model, ...)
-}
-
-#' @export
-sdf_predict.ml_transformer <- function(x, model, ...) {
-  msg <- "The signature sdf_predict(transformer, dataset) is deprecated and will be removed in a future version. Use sdf_predict(dataset, transformer) or ml_predict(transformer, dataset) instead."
-  warning(msg)
-  ml_transform(x, dataset = model, ...)
-}
-
-#' @export
 sdf_predict.default <- function(x, model, ...) {
   ml_predict(model, sdf_register(x), ...)
 }
