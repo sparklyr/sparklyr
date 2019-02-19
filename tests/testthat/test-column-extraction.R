@@ -62,7 +62,7 @@ test_that("we can separate array<string> columns", {
     na.omit() %>%
     filter(length(text) > 0) %>%
     head(5) %>%
-    sdf_mutate(tokens = ft_regex_tokenizer(text, pattern = "\\s+"))
+    ft_regex_tokenizer("text", "tokens")
 
   separated <- sdf_separate_column(
     tokens,

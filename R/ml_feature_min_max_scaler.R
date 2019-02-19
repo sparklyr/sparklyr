@@ -26,8 +26,9 @@
 #'
 #' @export
 ft_min_max_scaler <- function(x, input_col = NULL, output_col = NULL,
-                              min = 0, max = 1, dataset = NULL,
+                              min = 0, max = 1,
                               uid = random_string("min_max_scaler_"), ...) {
+  check_dots_used()
   UseMethod("ft_min_max_scaler")
 }
 
@@ -35,10 +36,8 @@ ml_min_max_scaler <- ft_min_max_scaler
 
 #' @export
 ft_min_max_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                               min = 0, max = 1, dataset = NULL,
+                                               min = 0, max = 1,
                                                uid = random_string("min_max_scaler_"), ...) {
-  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -57,15 +56,13 @@ ft_min_max_scaler.spark_connection <- function(x, input_col = NULL, output_col =
     invoke("setMax", .args[["max"]]) %>%
     new_ml_min_max_scaler()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
+
 }
 
 #' @export
 ft_min_max_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                          min = 0, max = 1, dataset = NULL,
+                                          min = 0, max = 1,
                                           uid = random_string("min_max_scaler_"), ...) {
 
   stage <- ft_min_max_scaler.spark_connection(
@@ -74,7 +71,6 @@ ft_min_max_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
     output_col = output_col,
     min = min,
     max = max,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -84,7 +80,7 @@ ft_min_max_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
 
 #' @export
 ft_min_max_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                        min = 0, max = 1, dataset = NULL,
+                                        min = 0, max = 1,
                                         uid = random_string("min_max_scaler_"), ...) {
 
   stage <- ft_min_max_scaler.spark_connection(
@@ -93,7 +89,6 @@ ft_min_max_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     output_col = output_col,
     min = min,
     max = max,
-    dataset = dataset,
     uid = uid,
     ...
   )

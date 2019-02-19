@@ -7,9 +7,9 @@ test_that("decision tree runs successfully when all args specified", {
     iris_tbl %>%
       ml_decision_tree(Species ~ Sepal_Width + Sepal_Length + Petal_Width,
                        type = "classification",
-                       impurity = "entropy", max.bins = 16L,
-                       max.depth = 3L, min.info.gain = 1e-5, min.rows = 2L,
-                       thresholds = c(1/2, 1/3, 1/4), seed = 42L),
+                       impurity = "entropy", max_bins = 16,
+                       max_depth = 3, min_info_gain = 1e-5, min_instances_per_node = 2,
+                       thresholds = c(1/2, 1/3, 1/4), seed = 42),
     NA
   )
 })
@@ -27,19 +27,19 @@ test_that("thresholds parameter behaves as expected", {
   dt_predictions <- iris_tbl %>%
     ml_decision_tree(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(0, 1, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(dt_predictions), 0)
 
   dt_predictions <- iris_tbl %>%
     ml_decision_tree(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 0, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(dt_predictions), 1)
 
   dt_predictions <- iris_tbl %>%
     ml_decision_tree(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 1, 0)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(dt_predictions), 2)
 })
 

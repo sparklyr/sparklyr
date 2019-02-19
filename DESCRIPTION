@@ -37,7 +37,6 @@ Imports:
     generics,
     httr (>= 1.2.1),
     jsonlite (>= 1.4),
-    lazyeval (>= 0.2.0),
     methods,
     openssl (>= 0.8),
     purrr,
@@ -51,6 +50,7 @@ Imports:
     tidyr,
     withr,
     xml2,
+    ellipsis (>= 0.0.2.9000)
 Suggests:
     broom,
     ggplot2,
@@ -64,3 +64,5 @@ Suggests:
     RCurl,
     reshape2,
     testthat
+Remotes:
+    hadley/ellipsis

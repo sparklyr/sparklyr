@@ -85,8 +85,7 @@ test_that("we can cross validate a logistic regression with xval", {
   iris_tbl <- testthat_tbl("iris")
 
   pipeline <- ml_pipeline(sc, uid = "pipeline_1") %>%
-    ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl,
-                 uid = "r_formula_1") %>%
+    ft_r_formula(Species ~ Petal_Width + Petal_Length, uid = "r_formula_1") %>%
     ml_logistic_regression(uid = "logreg_1")
 
   bad_grid <- list(

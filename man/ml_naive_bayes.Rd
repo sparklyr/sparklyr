@@ -80,7 +80,7 @@ iris_test <- partitions$test
 nb_model <- iris_training \%>\%
   ml_naive_bayes(Species ~ .)
 
-pred <- sdf_predict(iris_test, nb_model)
+pred <- ml_predict(nb_model, iris_test)
 
 ml_multiclass_classification_evaluator(pred)
 }

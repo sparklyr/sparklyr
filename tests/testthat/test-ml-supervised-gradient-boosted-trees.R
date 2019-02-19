@@ -7,9 +7,9 @@ test_that("gbt runs successfully when all args specified", {
     filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width + Sepal_Length + Petal_Width,
                               type = "classification",
-                              max.bins = 16L,
-                              max.depth = 3L, min.info.gain = 1e-5, min.rows = 2L,
-                              seed = 42L)
+                              max_bins = 16,
+                              max_depth = 3, min_info_gain = 1e-5, min_instances_per_node = 2,
+                              seed = 42)
   expect_equal(class(model)[1], "ml_model_gbt_classification")
 })
 
@@ -27,14 +27,14 @@ test_that("thresholds parameter behaves as expected", {
     filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(0, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(gbt_predictions), 0)
 
   gbt_predictions <- iris_tbl %>%
     filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 0)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(gbt_predictions), 1)
 })
 
@@ -57,17 +57,17 @@ test_that("one-tree ensemble agrees with ml_decision_tree()", {
   gbt <- iris_tbl %>%
     ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression",
-                     sample.rate = 1,
-                     num.trees = 1L)
+                     subsampling_rate = 1,
+                     max_iter = 1)
   dt <- iris_tbl %>%
     ml_decision_tree(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression")
 
   expect_equal(gbt %>%
-                 sdf_predict(iris_tbl) %>%
+                 ml_predict(iris_tbl) %>%
                  collect(),
                dt %>%
-                 sdf_predict(iris_tbl) %>%
+                 ml_predict(iris_tbl) %>%
                  collect())
 })
 
@@ -79,8 +79,8 @@ test_that("checkpointing works for gbt", {
     iris_tbl %>%
       ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                                 type = "regression",
-                                cache.node.ids = TRUE,
-                                checkpoint.interval = 5L),
+                                cache_node_ids = TRUE,
+                                checkpoint_interval = 5),
     NA
   )
 })
@@ -88,7 +88,10 @@ test_that("checkpointing works for gbt", {
 test_that('ml_gradient_boosted_trees() supports response-features syntax', {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
-  ml_gradient_boosted_trees(iris_tbl,
+  expect_error(
+    ml_gradient_boosted_trees(iris_tbl,
                             response = 'Sepal_Length',
-                            features = c('Sepal_Width', 'Petal_Length'))
+                            features = c('Sepal_Width', 'Petal_Length')),
+    NA
+  )
 })

@@ -9,6 +9,7 @@
 #' @export
 ft_vector_slicer <- function(x, input_col = NULL, output_col = NULL, indices = NULL,
                              uid = random_string("vector_slicer_"), ...) {
+  check_dots_used()
   UseMethod("ft_vector_slicer")
 }
 

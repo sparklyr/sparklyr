@@ -18,6 +18,7 @@
 ml_fpgrowth <- function(x, items_col = "items", min_confidence = 0.8,
                         min_support = 0.3, prediction_col = "prediction",
                         uid = random_string("fpgrowth_"), ...) {
+  check_dots_used()
   UseMethod("ml_fpgrowth")
 }
 

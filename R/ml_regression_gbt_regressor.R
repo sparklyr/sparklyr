@@ -9,6 +9,7 @@ ml_gbt_regressor <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
                              max_memory_in_mb = 256, features_col = "features",
                              label_col = "label", prediction_col = "prediction",
                              uid = random_string("gbt_regressor_"), ...) {
+  check_dots_used()
   UseMethod("ml_gbt_regressor")
 }
 
@@ -152,13 +153,7 @@ ml_gbt_regressor.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_dep
 
 # Validator
 validator_ml_gbt_regressor <- function(.args) {
-  .args <- .args %>%
-    ml_backwards_compatibility(
-      list(num.trees = "max_iter",
-           loss.type = "loss_type",
-           sample.rate = "subsampling_rate")
-    ) %>%
-    ml_validate_decision_tree_args()
+  .args <- ml_validate_decision_tree_args(.args)
 
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])

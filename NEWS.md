@@ -7,7 +7,16 @@
 ### ML
 
 - The `dataset` parameter for estimator feature transformers has been deprecated (#1891).
+
 - `ml_multilayer_perceptron_classifier()` gains probabilistic classifier parameters (#1798).
+
+- Removed support for all undocumented/deprecated parameters. These are mostly dot case parameters from pre-0.7. 
+
+- Remove support for deprecated `function(pipeline_stage, data)` signature in `sdf_predict/transform/fit` functions.
+
+- Soft deprecate `sdf_predict/transform/fit` functions. Users are advised to use `ml_predict/transform/fit` functions instead.
+
+- Utilize the ellipsis package to provide warnings when unsupported arguments are specified in ML functions.
 
 ### Livy
 
@@ -62,6 +71,10 @@
 - Support for property expansion in `yarn-site.xml` (@lgongmsft, #1876).
 
 ## Other
+
+- Removed dreprecated `sdf_mutate()`.
+
+- Remove exported `ensure_` functions which were deprecated.
 
 - Fixed missing Hive tables not rendering under some Spark
   distributions (#1823).

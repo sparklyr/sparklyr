@@ -29,8 +29,9 @@
 #'
 #' @export
 ft_standard_scaler <- function(x, input_col = NULL, output_col = NULL,
-                               with_mean = FALSE, with_std = TRUE, dataset = NULL,
+                               with_mean = FALSE, with_std = TRUE,
                                uid = random_string("standard_scaler_"), ...) {
+  check_dots_used()
   UseMethod("ft_standard_scaler")
 }
 
@@ -38,10 +39,8 @@ ml_standard_scaler <- ft_standard_scaler
 
 #' @export
 ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                                with_mean = FALSE, with_std = TRUE, dataset = NULL,
+                                                with_mean = FALSE, with_std = TRUE,
                                                 uid = random_string("standard_scaler_"), ...) {
-
-  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
 
   .args <- list(
     input_col = input_col,
@@ -61,15 +60,12 @@ ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col 
     invoke("setWithStd", .args[["with_std"]]) %>%
     new_ml_standard_scaler()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
 ft_standard_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                           with_mean = FALSE, with_std = TRUE, dataset = NULL,
+                                           with_mean = FALSE, with_std = TRUE,
                                            uid = random_string("standard_scaler_"), ...) {
   stage <- ft_standard_scaler.spark_connection(
     x = spark_connection(x),
@@ -77,7 +73,6 @@ ft_standard_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NUL
     output_col = output_col,
     with_mean = with_mean,
     with_std = with_std,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -87,7 +82,7 @@ ft_standard_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NUL
 
 #' @export
 ft_standard_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                         with_mean = FALSE, with_std = TRUE, dataset = NULL,
+                                         with_mean = FALSE, with_std = TRUE,
                                          uid = random_string("standard_scaler_"), ...) {
   stage <- ft_standard_scaler.spark_connection(
     x = spark_connection(x),
@@ -95,7 +90,6 @@ ft_standard_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     output_col = output_col,
     with_mean = with_mean,
     with_std = with_std,
-    dataset = dataset,
     uid = uid,
     ...
   )

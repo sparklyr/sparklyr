@@ -9,6 +9,7 @@
 #' @export
 ft_tokenizer <- function(x, input_col = NULL, output_col = NULL,
                          uid = random_string("tokenizer_"), ...) {
+  check_dots_used()
   UseMethod("ft_tokenizer")
 }
 

@@ -34,7 +34,7 @@ test_that("r formula works as expected", {
     collect()
 
   df3 <- iris_tbl %>%
-    ft_r_formula(., "Sepal_Length ~ Petal_Width + Species", dataset = .) %>%
+    ft_r_formula("Sepal_Length ~ Petal_Width + Species") %>%
     select(features, label) %>%
     collect()
 

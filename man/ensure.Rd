@@ -2,24 +2,7 @@
 % Please edit documentation in R/precondition.R
 \name{ensure}
 \alias{ensure}
-\alias{ensure_scalar_integer}
-\alias{ensure_scalar_double}
-\alias{ensure_scalar_boolean}
-\alias{ensure_scalar_character}
 \title{Enforce Specific Structure for R Objects}
-\usage{
-ensure_scalar_integer(object, allow.na = FALSE, allow.null = FALSE,
-  default = NULL)
-
-ensure_scalar_double(object, allow.na = FALSE, allow.null = FALSE,
-  default = NULL)
-
-ensure_scalar_boolean(object, allow.na = FALSE, allow.null = FALSE,
-  default = NULL)
-
-ensure_scalar_character(object, allow.na = FALSE, allow.null = FALSE,
-  default = NULL)
-}
 \arguments{
 \item{object}{An \R object.}
 

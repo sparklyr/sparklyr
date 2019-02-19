@@ -70,7 +70,8 @@ test_that("ml_is_set works", {
 test_that("ml_transform take list of transformers (#1444)", {
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
-  string_indexer <- ft_string_indexer(sc, "Species", "label", dataset = iris_tbl)
+  string_indexer <- ft_string_indexer(sc, "Species", "label") %>%
+    ml_fit(iris_tbl)
   pipeline <- ml_pipeline(string_indexer) %>%
     ft_vector_assembler(c("Petal_Width", "Petal_Length"), "features") %>%
     ml_logistic_regression() %>%
@@ -82,7 +83,7 @@ test_that("ml_transform take list of transformers (#1444)", {
 
   transformed1 <- ml_transform(stages, iris_tbl) %>%
     dplyr::pull(prediction)
-  transformed2 <- Reduce(sdf_transform, stages, init = iris_tbl) %>%
+  transformed2 <- Reduce(function(transformer, data) ml_transform(data, transformer), stages, init = iris_tbl) %>%
     dplyr::pull(prediction)
   expect_equal(transformed1, transformed2)
 })

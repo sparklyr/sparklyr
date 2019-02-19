@@ -63,15 +63,6 @@ ml_standardize_formula <- function(formula = NULL, response = NULL, features = N
 }
 
 ml_validate_decision_tree_args <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    max.bins = "max_bins",
-    max.depth = "max_depth",
-    min.info.gain = "min_info_gain",
-    min.rows = "min_instances_per_node",
-    checkpoint.interval = "checkpoint_interval",
-    cache.node.ids = "cache_node_ids",
-    max.memory = "max_memory_in_mb"
-  ))
   .args[["max_bins"]] <- cast_scalar_integer(.args[["max_bins"]])
   .args[["max_depth"]] <- cast_scalar_integer(.args[["max_depth"]])
   .args[["min_info_gain"]] <- cast_scalar_double(.args[["min_info_gain"]])

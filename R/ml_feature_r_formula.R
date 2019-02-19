@@ -48,8 +48,9 @@
 #'
 #' @export
 ft_r_formula <- function(x, formula = NULL, features_col = "features", label_col = "label",
-                         force_index_label = FALSE, dataset = NULL,
+                         force_index_label = FALSE,
                          uid = random_string("r_formula_"), ...) {
+  check_dots_used()
   UseMethod("ft_r_formula")
 }
 
@@ -57,10 +58,8 @@ ml_r_formula <- ft_r_formula
 
 #' @export
 ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "features", label_col = "label",
-                                          force_index_label = FALSE, dataset = NULL,
+                                          force_index_label = FALSE,
                                           uid = random_string("r_formula_"), ...) {
-
-  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
 
   .args <- list(
     formula = formula,
@@ -79,15 +78,12 @@ ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "fea
     jobj_set_param("setForceIndexLabel", .args[["force_index_label"]], "2.1.0", FALSE) %>%
     new_ml_r_formula()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
 ft_r_formula.ml_pipeline <- function(x, formula = NULL, features_col = "features", label_col = "label",
-                                     force_index_label = FALSE, dataset = NULL,
+                                     force_index_label = FALSE,
                                      uid = random_string("r_formula_"), ...) {
 
   stage <- ft_r_formula.spark_connection(
@@ -96,7 +92,6 @@ ft_r_formula.ml_pipeline <- function(x, formula = NULL, features_col = "features
     features_col = features_col,
     label_col = label_col,
     force_index_label = force_index_label,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -106,7 +101,7 @@ ft_r_formula.ml_pipeline <- function(x, formula = NULL, features_col = "features
 
 #' @export
 ft_r_formula.tbl_spark <- function(x, formula = NULL, features_col = "features", label_col = "label",
-                                   force_index_label = FALSE, dataset = NULL,
+                                   force_index_label = FALSE,
                                    uid = random_string("r_formula_"), ...) {
 
   stage <- ft_r_formula.spark_connection(
@@ -115,7 +110,6 @@ ft_r_formula.tbl_spark <- function(x, formula = NULL, features_col = "features",
     features_col = features_col,
     label_col = label_col,
     force_index_label = force_index_label,
-    dataset = dataset,
     uid = uid,
     ...
   )

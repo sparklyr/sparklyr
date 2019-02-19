@@ -151,7 +151,7 @@ ml_predict.ml_model_clustering <- function(x, dataset, ...) {
 
 #' Spark ML -- Transform, fit, and predict methods (sdf_ interface)
 #'
-#' Methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
+#' Deprecated methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
 #'
 #' @param x A \code{tbl_spark}.
 #' @param model A \code{ml_transformer} or a \code{ml_model} object.
@@ -167,21 +167,8 @@ NULL
 #' @rdname sdf-transform-methods
 #' @export
 sdf_predict <- function(x, model, ...) {
+  .Deprecated("ml_predict")
   UseMethod("sdf_predict")
-}
-
-#' @export
-sdf_predict.ml_model <- function(x, model, ...) {
-  msg <- "The signature sdf_predict(model, dataset) is deprecated and will be removed in a future version. Use sdf_predict(dataset, model) or ml_predict(model, dataset) instead."
-  warning(msg)
-  ml_predict(x, dataset = model, ...)
-}
-
-#' @export
-sdf_predict.ml_transformer <- function(x, model, ...) {
-  msg <- "The signature sdf_predict(transformer, dataset) is deprecated and will be removed in a future version. Use sdf_predict(dataset, transformer) or ml_predict(transformer, dataset) instead."
-  warning(msg)
-  ml_transform(x, dataset = model, ...)
 }
 
 #' @export
@@ -192,18 +179,21 @@ sdf_predict.default <- function(x, model, ...) {
 #' @rdname sdf-transform-methods
 #' @export
 sdf_transform <- function(x, transformer, ...) {
+  .Deprecated("ml_transform")
   ml_transform(transformer, sdf_register(x))
 }
 
 #' @rdname sdf-transform-methods
 #' @export
 sdf_fit <- function(x, estimator, ...) {
+  .Deprecated("ml_fit")
   ml_fit(estimator, sdf_register(x))
 }
 
 #' @rdname sdf-transform-methods
 #' @export
 sdf_fit_and_transform <- function(x, estimator, ...) {
+  .Deprecated("ml_fit_and_transform")
   ml_fit_and_transform(estimator, sdf_register(x))
 }
 

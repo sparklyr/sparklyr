@@ -26,6 +26,7 @@
 #'
 #' @export
 ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_string("binarizer_"), ...) {
+  check_dots_used()
   UseMethod("ft_binarizer")
 }
 

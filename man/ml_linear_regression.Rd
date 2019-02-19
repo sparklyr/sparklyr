@@ -86,7 +86,7 @@ mtcars_test <- partitions$test
 lm_model <- mtcars_training \%>\%
   ml_linear_regression(mpg ~ .)
 
-pred <- sdf_predict(mtcars_test, lm_model)
+pred <- ml_predict(lm_model, mtcars_test)
 
 ml_regression_evaluator(pred, label_col = "mpg")
 }

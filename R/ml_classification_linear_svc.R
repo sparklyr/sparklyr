@@ -27,7 +27,7 @@
 #' svc_model <- iris_training %>%
 #'   ml_linear_svc(Species ~ .)
 #'
-#' pred <- sdf_predict(iris_test, svc_model)
+#' pred <- ml_predict(svc_model, iris_test)
 #'
 #' ml_binary_classification_evaluator(pred)
 #' }
@@ -40,6 +40,7 @@ ml_linear_svc <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0
                           features_col = "features", label_col = "label",
                           prediction_col = "prediction", raw_prediction_col = "rawPrediction",
                           uid = random_string("linear_svc_"), ...) {
+  check_dots_used()
   UseMethod("ml_linear_svc")
 }
 

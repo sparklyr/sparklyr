@@ -23,7 +23,7 @@
 #' iso_res <- iris_tbl %>%
 #'   ml_isotonic_regression(Petal_Length ~ Petal_Width)
 #'
-#' pred <- sdf_predict(iris_test, iso_res)
+#' pred <- ml_predict(iso_res, iris_test)
 #'
 #' pred
 #' }
@@ -33,6 +33,7 @@ ml_isotonic_regression <- function(x, formula = NULL, feature_index = 0, isotoni
                                    weight_col = NULL, features_col = "features",
                                    label_col = "label", prediction_col = "prediction",
                                    uid = random_string("isotonic_regression_"), ...) {
+  check_dots_used()
   UseMethod("ml_isotonic_regression")
 }
 

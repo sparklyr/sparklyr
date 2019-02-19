@@ -11,6 +11,7 @@ ml_gbt_classifier <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
                               prediction_col = "prediction", probability_col = "probability",
                               raw_prediction_col = "rawPrediction",
                               uid = random_string("gbt_classifier_"), ...) {
+  check_dots_used()
   UseMethod("ml_gbt_classifier")
 }
 
@@ -183,15 +184,7 @@ ml_gbt_classifier.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_de
 
 # Validator
 validator_ml_gbt_classifier <- function(.args) {
-  .args <- ml_backwards_compatibility(
-    .args,
-    list(
-      num.trees = "max_iter",
-      loss.type = "loss_type",
-      sample.rate = "subsampling_rate"
-    )
-  ) %>%
-    ml_validate_decision_tree_args()
+  .args <- ml_validate_decision_tree_args(.args)
 
   .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])

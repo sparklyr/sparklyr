@@ -1,11 +1,5 @@
 context("ml feature vector assembler")
 
-test_that("ft_vector_assembler() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_vector_assembler)
-})
-
 test_that("ft_vector_assembler() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
