@@ -97,14 +97,16 @@ sparklyr_jar_path <- function(spark_version) {
   spark_major_minor <- spark_version[1, 1:2]
 
   exact_jar <- sprintf("sparklyr-%s-%s.jar", spark_major_minor, scala_version)
-  all_jars <- dir(system.file("java",package = "sparklyr"), pattern = "sparklyr")
+  all_jars <- dir(system.file("java", package = "sparklyr"), pattern = "sparklyr")
 
   if (exact_jar %in% all_jars) {
     system.file(file.path("java", exact_jar), package = "sparklyr")
   } else if (spark_version > "1.6") {
     # Spark is backwards compatible so we can use a new version with the latest jar
-    latest_jar <- sort(all_jars, decreasing = T)[[1]]
-    system.file(file.path("java", latest_jar), package = "sparklyr")
+    all_versions <- sort(gsub("^sparklyr-|-[0-9]+\\.[0-9]+\\.jar$", "", all_jars), decreasing = T)
+    prev_versions <- all_versions[all_versions <= spark_version]
+
+    dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", prev_versions))
   } else {
     ""
   }
