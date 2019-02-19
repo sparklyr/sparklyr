@@ -1,8 +1,9 @@
 #' @rdname ft_lsh
 #' @export
 ft_minhash_lsh <- function(x, input_col = NULL, output_col = NULL,
-                           num_hash_tables = 1L, seed = NULL, dataset = NULL,
+                           num_hash_tables = 1L, seed = NULL,
                            uid = random_string("minhash_lsh_"), ...) {
+  check_dots_used()
   UseMethod("ft_minhash_lsh")
 }
 
@@ -10,12 +11,10 @@ ml_minhash_lsh <- ft_minhash_lsh
 
 #' @export
 ft_minhash_lsh.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                            num_hash_tables = 1L, seed = NULL, dataset = NULL,
+                                            num_hash_tables = 1L, seed = NULL,
                                             uid = random_string("minhash_lsh_"), ...) {
 
   spark_require_version(x, "2.1.0", "MinHashLSH")
-
-  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
 
   .args <- list(
     input_col = input_col,
@@ -36,15 +35,12 @@ ft_minhash_lsh.spark_connection <- function(x, input_col = NULL, output_col = NU
 
   estimator <- new_ml_minhash_lsh(jobj)
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
 ft_minhash_lsh.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                       num_hash_tables = 1L, seed = NULL, dataset = NULL,
+                                       num_hash_tables = 1L, seed = NULL,
                                        uid = random_string("minhash_lsh_"), ...) {
 
   stage <- ft_minhash_lsh.spark_connection(
@@ -53,7 +49,6 @@ ft_minhash_lsh.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
     output_col = output_col,
     num_hash_tables = num_hash_tables,
     seed = seed,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -63,7 +58,7 @@ ft_minhash_lsh.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
 
 #' @export
 ft_minhash_lsh.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                     num_hash_tables = 1L, seed = NULL, dataset = NULL,
+                                     num_hash_tables = 1L, seed = NULL,
                                      uid = random_string("minhash_lsh_"), ...) {
   stage <- ft_minhash_lsh.spark_connection(
     x = spark_connection(x),
@@ -71,7 +66,6 @@ ft_minhash_lsh.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     output_col = output_col,
     num_hash_tables = num_hash_tables,
     seed = seed,
-    dataset = dataset,
     uid = uid,
     ...
   )

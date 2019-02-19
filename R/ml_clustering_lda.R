@@ -117,6 +117,7 @@ ml_lda <- function(x, formula = NULL, k = 10, max_iter = 20, doc_concentration =
                    keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                    optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
                    topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
+  check_dots_used()
   UseMethod("ml_lda")
 }
 
@@ -242,12 +243,7 @@ ml_lda.tbl_spark <- function(x, formula = NULL, k = 10, max_iter = 20, doc_conce
 
 # Validator
 validator_ml_lda <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    alpha = "doc_concentration",
-    beta = "topic_concentration",
-    max.iterations = "max_iter"
-  )) %>%
-    validate_args_clustering()
+  .args <- validate_args_clustering(.args)
 
   .args[["doc_concentration"]] <- cast_nullable_scalar_double(.args[["doc_concentration"]])
   .args[["topic_concentration"]] <- cast_nullable_scalar_double(.args[["topic_concentration"]])

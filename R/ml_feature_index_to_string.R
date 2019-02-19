@@ -14,6 +14,7 @@
 #' @export
 ft_index_to_string <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
                                uid = random_string("index_to_string_"), ...) {
+  check_dots_used()
   UseMethod("ft_index_to_string")
 }
 

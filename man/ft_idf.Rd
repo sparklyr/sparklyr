@@ -5,7 +5,7 @@
 \title{Feature Transformation -- IDF (Estimator)}
 \usage{
 ft_idf(x, input_col = NULL, output_col = NULL, min_doc_freq = 0,
-  dataset = NULL, uid = random_string("idf_"), ...)
+  uid = random_string("idf_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -15,9 +15,6 @@ ft_idf(x, input_col = NULL, output_col = NULL, min_doc_freq = 0,
 \item{output_col}{The name of the output column.}
 
 \item{min_doc_freq}{The minimum number of documents in which a term should appear. Default: 0}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -43,16 +40,8 @@ The object returned depends on the class of \code{x}.
 Compute the Inverse Document Frequency (IDF) given a collection of documents.
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for

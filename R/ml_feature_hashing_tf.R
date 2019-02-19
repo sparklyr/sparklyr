@@ -13,6 +13,7 @@
 #' @export
 ft_hashing_tf <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
                           num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+  check_dots_used()
   UseMethod("ft_hashing_tf")
 }
 

@@ -24,7 +24,7 @@ test_that("we can train a regression with train-validation-split", {
   iris_tbl <- testthat_tbl("iris")
 
   pipeline <- ml_pipeline(sc) %>%
-    ft_r_formula(Species ~ Petal_Width + Petal_Length, dataset = iris_tbl) %>%
+    ft_r_formula(Species ~ Petal_Width + Petal_Length) %>%
     ml_logistic_regression()
 
   grid <- list(

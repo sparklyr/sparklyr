@@ -40,6 +40,7 @@ ml_default_stop_words <- function(sc, language = c("english", "danish", "dutch",
 ft_stop_words_remover <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
                                   stop_words = ml_default_stop_words(spark_connection(x), "english"),
                                   uid = random_string("stop_words_remover_"), ...) {
+  check_dots_used()
   UseMethod("ft_stop_words_remover")
 }
 

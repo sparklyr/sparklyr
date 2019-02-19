@@ -41,6 +41,7 @@
 ft_feature_hasher <- function(x, input_cols = NULL, output_col = NULL,
                               num_features = 2^18, categorical_cols = NULL,
                               uid = random_string("feature_hasher_"), ...) {
+  check_dots_used()
   UseMethod("ft_feature_hasher")
 }
 

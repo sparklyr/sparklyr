@@ -47,6 +47,8 @@ spark_config_settings <- function() {
     sparklyr.verbose = "Use verbose logging across all sparklyr operations?",
     sparklyr.verbose.na = "Use verbose logging when dealing with NAs?",
     sparklyr.verbose.sanitize = "Use verbose logging while sanitizing columns and other objects?",
+    sparklyr.web.spark = "The URL to Spark's web interface.",
+    sparklyr.web.yarn = "The URL to YARN's web interface.",
     sparklyr.worker.gateway.address = "The address of the worker machine, most likely localhost.",
     sparklyr.worker.gateway.port = "The port the sparklyr gateway uses in the driver machine.",
     sparklyr.yarn.cluster.accepted.timeout = "Total seconds before giving up waiting for cluster resources in yarn cluster mode.",

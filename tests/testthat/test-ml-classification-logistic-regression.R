@@ -251,8 +251,8 @@ test_that("weights column works for logistic regression", {
   s <- ml_logistic_regression(iris_weighted_tbl,
                               response = "versicolor",
                               features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                              lambda = 0L,
-                              weights.column = "weights")
+                              reg_param = 0L,
+                              weight_col = "weights")
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
@@ -260,8 +260,8 @@ test_that("weights column works for logistic regression", {
   s <- ml_logistic_regression(iris_weighted_tbl,
                               response = "versicolor",
                               features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                              lambda = 0L,
-                              weights.column = "ones")
+                              reg_param = 0L,
+                              weight_col = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
 })
 

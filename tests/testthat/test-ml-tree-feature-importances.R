@@ -7,8 +7,8 @@ test_that("ml_tree_feature_importance() works properly", {
   rf <- iris_tbl %>%
     ml_random_forest(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression",
-                     sample.rate = 1, col.sample.rate = 1,
-                     num.trees = 1L)
+                     subsampling_rate = 1, feature_subset_strategy = "all",
+                     num_trees = 1)
   dt <- iris_tbl %>%
     ml_decision_tree(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression")

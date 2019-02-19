@@ -8,6 +8,7 @@ ml_decision_tree_regressor <- function(x, formula = NULL, max_depth = 5, max_bin
                                        variance_col = NULL, features_col = "features", label_col = "label",
                                        prediction_col = "prediction", uid = random_string("decision_tree_regressor_"),
                                        ...) {
+  check_dots_used()
   UseMethod("ml_decision_tree_regressor")
 }
 

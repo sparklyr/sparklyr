@@ -1,7 +1,13 @@
 #' @export
 #' @importFrom dplyr collect
 collect.spark_jobj <- function(x, ...) {
-  sdf_collect(x)
+  sdf_collect(x, ...)
+}
+
+#' @export
+#' @importFrom dplyr collect
+collect.tbl_spark <- function(x, ...) {
+  sdf_collect(x, ...)
 }
 
 #' @export

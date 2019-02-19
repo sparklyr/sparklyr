@@ -1,11 +1,5 @@
 context("ml feature - feature hasher")
 
-test_that("ft_feature_hasher() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_feature_hasher)
-})
-
 test_that("ft_feature_hasher() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
