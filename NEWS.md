@@ -7,7 +7,16 @@
 ### ML
 
 - The `dataset` parameter for estimator feature transformers has been deprecated (#1891).
+
 - `ml_multilayer_perceptron_classifier()` gains probabilistic classifier parameters (#1798).
+
+- Removed support for all undocumented/deprecated parameters. These are mostly dot case parameters from pre-0.7. 
+
+- Remove support for deprecated `function(pipeline_stage, data)` signature in `sdf_predict/transform/fit` functions.
+
+- Soft deprecate `sdf_predict/transform/fit` functions. Users are advised to use `ml_predict/transform/fit` functions instead.
+
+- Utilize the ellipsis package to provide warnings when unsupported arguments are specified in ML functions.
 
 ### Livy
 
@@ -34,6 +43,10 @@
   entire text file without splitting contents by line.
 
 ## Other
+
+- Removed dreprecated `sdf_mutate()`.
+
+- Remove exported `ensure_` functions which were deprecated.
 
 - `copy_to()` names tables `sparklyr_tmp_` instead of `sparklyr_` for
   consistency with other temp tables and to avoid rendering them under
