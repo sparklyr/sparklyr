@@ -1,5 +1,29 @@
+databricks_expand_jars <- function() {
+  jars_path <- system.file("java/", package = "sparklyr")
+
+  missing_versions <- c(
+    "2.4",
+    "2.2",
+    "2.1"
+  )
+
+  for (missing in missing_versions) {
+    compatible_jar <- sparklyr:::spark_default_app_jar(paste0(missing, ".0"))
+    target_jar <- paste0("sparklyr-", missing, "-2.11.jar")
+
+    if (!file.exists(file.path(jars_path, target_jar))) {
+      file.copy(
+        file.path(jars_path, compatible_jar),
+        file.path(jars_path, target_jar)
+      )
+    }
+  }
+}
+
 databricks_connection <- function(config, extensions) {
   tryCatch({
+    databricks_expand_jars()
+
     callSparkR <- get("callJStatic", envir = asNamespace("SparkR"))
     # In Databricks environments (notebooks & rstudio) DATABRICKS_GUID is in the default namespace
     guid <- get("DATABRICKS_GUID", envir = .GlobalEnv)
