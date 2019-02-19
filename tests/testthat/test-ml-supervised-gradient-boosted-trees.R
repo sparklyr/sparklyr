@@ -7,9 +7,9 @@ test_that("gbt runs successfully when all args specified", {
     filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width + Sepal_Length + Petal_Width,
                               type = "classification",
-                              max.bins = 16L,
-                              max.depth = 3L, min.info.gain = 1e-5, min.rows = 2L,
-                              seed = 42L)
+                              max_bins = 16,
+                              max_depth = 3, min_info_gain = 1e-5, min_instances_per_node = 2,
+                              seed = 42)
   expect_equal(class(model)[1], "ml_model_gbt_classification")
 })
 

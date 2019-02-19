@@ -6,41 +6,11 @@ test_that("rf runs successfully when all args specified", {
   expect_error(
     iris_tbl %>%
       ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
-                       col.sample.rate = 1/3, impurity = "entropy", max.bins = 16L,
-                       max.depth = 3L, min.info.gain = 1e-5, min.rows = 2L,
-                       num.trees = 25L, thresholds = c(1/2, 1/3, 1/4), seed = 42L),
+                       feature_subset_strategy = "onethird", impurity = "entropy", max_bins = 16,
+                       max_depth = 3, min_info_gain = 1e-5, min_instances_per_node = 2L,
+                       num_trees = 25L, thresholds = c(1/2, 1/3, 1/4), seed = 42L),
     NA
   )
-})
-
-test_that("col.sample.rate maps to correct strategy", {
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
-  if (spark_version(sc) >= "2.0.0") skip("not applicable to 2.0+")
-  expect_message(
-    iris_tbl %>%
-      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
-                       col.sample.rate = 1/3),
-    "Using feature subsetting strategy: onethird"
-  )
-
-  expect_message(
-    iris_tbl %>%
-      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width + Petal_Length, type = "classification",
-                       col.sample.rate = 1/2),
-    "Using feature subsetting strategy: log2"
-  )
-})
-
-test_that("col.sample.rate argument is respected", {
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
-  if (spark_version(sc) < "2.0") skip("not applicable to <2.0")
-  rf <- ml_random_forest(iris_tbl, Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
-                         col.sample.rate = 0.001)
-
-  expect_equal(ml_param(rf$model, "feature_subset_strategy"),
-               "0.001")
 })
 
 test_that("thresholds parameter behaves as expected", {
