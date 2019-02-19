@@ -40,9 +40,6 @@ Defaults to \code{"frequencyDesc"}.}
 \item{model}{A fitted StringIndexer model returned by \code{ft_string_indexer()}}
 
 \item{labels}{Vector of labels, corresponding to indices to be assigned.}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -70,16 +67,8 @@ A label indexer that maps a string column of labels to an ML column of
   is the inverse of \code{\link{ft_index_to_string}}.
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
