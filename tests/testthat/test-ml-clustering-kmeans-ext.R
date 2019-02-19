@@ -28,7 +28,7 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
 
   R <- iris %>%
     select(Sepal_Length, Petal_Length) %>%
-    kmeans(k = 3)
+    kmeans(centers = 3)
 
   S <- iris_tbl %>%
     select(Sepal_Length, Petal_Length) %>%
@@ -56,7 +56,7 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 
   R <- iris %>%
     select(Sepal_Length, Petal_Length) %>%
-    kmeans(k = 3)
+    kmeans(centers = 3)
 
   S <- iris_tbl %>%
     select(Sepal_Length, Petal_Length) %>%
