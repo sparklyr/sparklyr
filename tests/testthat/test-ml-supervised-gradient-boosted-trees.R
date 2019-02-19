@@ -58,7 +58,7 @@ test_that("one-tree ensemble agrees with ml_decision_tree()", {
     ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression",
                      subsampling_rate = 1,
-                     num_trees = 1)
+                     max_iter = 1)
   dt <- iris_tbl %>%
     ml_decision_tree(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression")
