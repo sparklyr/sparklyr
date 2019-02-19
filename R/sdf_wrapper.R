@@ -175,7 +175,7 @@ sdf_collect_static <- function(object, ...) {
         cb <- args$callback
         if (is.language(cb)) cb <- rlang::as_closure(cb)
 
-        if (length(formals(cb)) > 2) cb(df, iter) else cb(df)
+        if (length(formals(cb)) >= 2) cb(df, iter) else cb(df)
         iter <- iter + 1
       }
 
