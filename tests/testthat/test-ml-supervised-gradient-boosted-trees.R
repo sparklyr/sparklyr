@@ -88,7 +88,10 @@ test_that("checkpointing works for gbt", {
 test_that('ml_gradient_boosted_trees() supports response-features syntax', {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
-  ml_gradient_boosted_trees(iris_tbl,
+  expect_error(
+    ml_gradient_boosted_trees(iris_tbl,
                             response = 'Sepal_Length',
-                            features = c('Sepal_Width', 'Petal_Length'))
+                            features = c('Sepal_Width', 'Petal_Length')),
+    NA
+  )
 })
