@@ -5,7 +5,7 @@ spark_yarn_get_conf_property <- function(property, fails = TRUE) {
     # some systems don't set YARN_CONF_DIR but do set HADOOP_CONF_DIR
     confDir <- Sys.getenv("HADOOP_CONF_DIR")
     if (nchar(confDir) == 0) {
-      if (fals) stop("Yarn Cluster mode requires YARN_CONF_DIR or HADOOP_CONF_DIR to be set.") else return(NULL)
+      if (fails) stop("Yarn Cluster mode requires YARN_CONF_DIR or HADOOP_CONF_DIR to be set.") else return(NULL)
     }
   }
 
