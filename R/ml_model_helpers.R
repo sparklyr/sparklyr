@@ -101,8 +101,6 @@ ml_construct_model_clustering <- function(constructor, predictor, formula, datas
   rlang::exec(constructor, !!!.args)
 }
 
-#' @export
-#' @rdname ml-model-constructors
 ml_construct_model_recommendation <- function(constructor, predictor, formula,
                                               dataset, ...) {
 

@@ -12,7 +12,6 @@
 \alias{ml_recommendation_pipeline}
 \alias{ml_construct_model_supervised}
 \alias{ml_construct_model_clustering}
-\alias{ml_construct_model_recommendation}
 \title{Constructors for `ml_model` Objects}
 \usage{
 new_ml_model_prediction(pipeline_model, formula, dataset, label_col,
@@ -41,9 +40,6 @@ ml_construct_model_supervised(constructor, predictor, formula, dataset,
 
 ml_construct_model_clustering(constructor, predictor, formula, dataset,
   features_col, ...)
-
-ml_construct_model_recommendation(constructor, predictor, formula, dataset,
-  ...)
 }
 \arguments{
 \item{pipeline_model}{The pipeline model object returned by `ml_supervised_pipeline()`.}
