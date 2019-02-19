@@ -8,7 +8,7 @@ databricks_expand_jars <- function() {
   )
 
   for (missing in missing_versions) {
-    compatible_jar <- sparklyr:::spark_default_app_jar(paste0(missing, ".0"))
+    compatible_jar <- spark_default_app_jar(paste0(missing, ".0"))
     target_jar <- paste0("sparklyr-", missing, "-2.11.jar")
 
     if (!file.exists(file.path(jars_path, target_jar))) {
