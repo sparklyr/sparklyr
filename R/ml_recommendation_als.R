@@ -289,16 +289,3 @@ ml_recommend <- function(model, type = c("items", "users"), n = 1) {
     mutate(recommendations = explode(!!as.name("recommendations"))) %>%
     sdf_separate_column("recommendations")
 }
-
-#' @rdname ml_als
-#' @details \code{ml_als_factorization()} is an alias for \code{ml_als()} for backwards compatibility.
-#' @export
-ml_als_factorization <- function(x, rating_col = "rating", user_col = "user", item_col = "item",
-                                 rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
-                                 nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
-                                 num_item_blocks = 10, checkpoint_interval = 10,
-                                 cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
-                                 final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
-  .Deprecated("ml_als")
-  UseMethod("ml_als")
-}
