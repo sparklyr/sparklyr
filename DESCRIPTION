@@ -50,7 +50,7 @@ Imports:
     tidyr,
     withr,
     xml2,
-    ellipsis
+    ellipsis (>= 0.0.2.9000)
 Suggests:
     broom,
     ggplot2,
@@ -64,3 +64,5 @@ Suggests:
     RCurl,
     reshape2,
     testthat
+Remotes:
+    hadley/ellipsis
