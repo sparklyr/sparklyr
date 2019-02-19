@@ -33,5 +33,16 @@ test_that("sdf_collect() supports callback", {
     row_count,
     10
   )
+
+  last_idx <- 0
+  sdf_len(sc, 10, repartition = 2) %>%
+    sdf_collect(callback = function(df, idx) {
+      last_idx <<- idx
+    })
+
+  expect_equal(
+    last_idx,
+    ifelse("arrow" %in% .packages(), 2, 1)
+  )
 })
 
