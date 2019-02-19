@@ -168,10 +168,15 @@ sdf_collect_static <- function(object, ...) {
       batch_size <- spark_config_value(sc$config, "sparklyr.collect.batch", as.integer(10^5L))
       sdf_iter <- invoke(sdf, "toLocalIterator")
 
+      iter <- 1
       while (invoke(sdf_iter, "hasNext")) {
         raw_df <- invoke_static(sc, "sparklyr.Utils", "collectIter", invoke(sdf_iter, "underlying"), batch_size, sdf, separator$regexp)
         df <- sdf_collect_data_frame(sdf, raw_df)
-        args$callback(df)
+        cb <- args$callback
+        if (is.language(cb)) cb <- rlang::as_closure(cb)
+
+        if (length(formals(cb)) > 2) cb(df, iter) else cb(df)
+        iter <- iter + 1
       }
 
       NULL
