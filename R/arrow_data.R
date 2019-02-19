@@ -105,13 +105,21 @@ arrow_collect <- function(tbl, ...)
   time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
 
   if (!identical(args$callback, NULL)) {
+    cb <- args$callback
+    if (is.language(cb)) cb <- rlang::as_closure(cb)
+
     arrow_df <- invoke_static(sc, "sparklyr.ArrowConverters", "toArrowDataset", sdf, session, time_zone)
     arrow_iter <- invoke(arrow_df, "toLocalIterator")
 
+    iter <- 1
     while (invoke(arrow_iter, "hasNext")) {
-      invoke_static(sc, "sparklyr.ArrowConverters", "toArrowStream", sdf, time_zone, invoke(arrow_iter, "underlying")) %>%
-        arrow_read_stream() %>%
-        lapply(args$callback)
+      batches <- invoke_static(sc, "sparklyr.ArrowConverters", "toArrowStream", sdf, time_zone, invoke(arrow_iter, "underlying")) %>%
+        arrow_read_stream()
+
+      for (batch in batches) {
+        if (length(formals(cb)) >= 2) cb(batch, iter) else cb(batch)
+        iter <- iter + 1
+      }
     }
   }
   else {
