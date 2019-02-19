@@ -84,41 +84,6 @@ ml_random_forest <- function(x, formula = NULL, type = c("auto", "regression", "
     impurity
   }
 
-  if (rlang::has_name(rlang::dots_list(...), "col.sample.rate")) {
-    col.sample.rate <- rlang::dots_list(...)[["col.sample.rate"]]
-    sc <- spark_connection(x)
-    if (!(col.sample.rate > 0 && col.sample.rate <= 1)) {
-      stop("`col.sample.rate` must be in (0, 1].")
-    }
-    col.sample.rate <- if (spark_version(sc) < "2.0.0") {
-      if (col.sample.rate == 1) { # nocov start
-        "all"
-      } else {
-        # Prior to Spark 2.0.0, random forest does not support arbitrary
-        #   column sampling rates. So we map the input to one of the supported
-        #   strategies: "onethird", "sqrt", or "log2".
-        k <- gsub("^.+~", "", formula) %>%
-          trimws() %>%
-          strsplit("\\+") %>%
-          rlang::flatten_chr() %>%
-          length()
-        strategies <- dplyr::data_frame(
-          strategy = c("onethird", "sqrt", "log2"),
-          rate = c(1 / 3, sqrt(k) / k, log2(k) / k)
-        ) %>%
-          dplyr::arrange(!!rlang::sym("rate"))
-        strategy <- strategies %>%
-          dplyr::pull("strategy") %>%
-          `[[`(max(findInterval(col.sample.rate, strategies[["rate"]]), 1))
-        message("* Using feature subsetting strategy: ", strategy)
-        strategy
-      } # nocov end
-    } else {
-      cast_string(format(col.sample.rate, nsmall = 1))
-    }
-    assign("col.sample.rate", col.sample.rate, envir = parent.frame())
-  }
-
   switch(
     model_type,
     regression = ml_random_forest_regressor(
