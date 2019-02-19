@@ -46,8 +46,6 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
   pipeline %>% ml_fit(dataset)
 }
 
-#' @export
-#' @rdname ml-model-constructors
 ml_recommendation_pipeline <- function(predictor, dataset, formula) {
   sc <- spark_connection(predictor)
   r_formula <- ft_r_formula(sc, formula)

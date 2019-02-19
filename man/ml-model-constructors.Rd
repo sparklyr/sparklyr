@@ -9,7 +9,6 @@
 \alias{new_ml_model_clustering}
 \alias{ml_supervised_pipeline}
 \alias{ml_clustering_pipeline}
-\alias{ml_recommendation_pipeline}
 \alias{ml_construct_model_supervised}
 \alias{ml_construct_model_clustering}
 \title{Constructors for `ml_model` Objects}
@@ -32,8 +31,6 @@ ml_supervised_pipeline(predictor, dataset, formula, features_col,
   label_col)
 
 ml_clustering_pipeline(predictor, dataset, formula, features_col)
-
-ml_recommendation_pipeline(predictor, dataset, formula)
 
 ml_construct_model_supervised(constructor, predictor, formula, dataset,
   features_col, label_col, ...)
