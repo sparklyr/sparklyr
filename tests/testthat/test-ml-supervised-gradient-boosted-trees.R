@@ -57,8 +57,8 @@ test_that("one-tree ensemble agrees with ml_decision_tree()", {
   gbt <- iris_tbl %>%
     ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression",
-                     sample.rate = 1,
-                     num.trees = 1L)
+                     subsampling_rate = 1,
+                     num_trees = 1)
   dt <- iris_tbl %>%
     ml_decision_tree(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression")
@@ -79,8 +79,8 @@ test_that("checkpointing works for gbt", {
     iris_tbl %>%
       ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                                 type = "regression",
-                                cache.node.ids = TRUE,
-                                checkpoint.interval = 5L),
+                                cache_node_ids = TRUE,
+                                checkpoint_interval = 5),
     NA
   )
 })

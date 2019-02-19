@@ -54,17 +54,6 @@ test_that("error for thresholds with wrong length", {
   )
 })
 
-test_that("error for col.sample.rate value out of range", {
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
-  expect_error(
-    iris_tbl %>%
-      ml_random_forest(Species ~ Sepal_Width, type = "classification",
-                       col.sample.rate = 1.01),
-    "`col.sample.rate` must be in \\(0, 1]\\."
-  )
-})
-
 test_that("error for bad impurity specification", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
