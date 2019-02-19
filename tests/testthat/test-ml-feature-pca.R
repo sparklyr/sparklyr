@@ -1,11 +1,5 @@
 context("ml feature - pca")
 
-test_that("ft_pca() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_pca)
-})
-
 test_that("ft_pca() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

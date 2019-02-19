@@ -1,11 +1,5 @@
 context("ml feature string indexer + index to string")
 
-test_that("ft_index_to_string() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_index_to_string)
-})
-
 test_that("ft_index_to_string() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
