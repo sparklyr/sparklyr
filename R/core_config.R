@@ -28,6 +28,7 @@ spark_config_value <- function(config, name, default = NULL) {
     value <- config[[name_primary]]
   }
 
+  if (is.language(value)) value <- rlang::as_closure(value)
   if (is.function(value)) value <- value()
   value
 }
