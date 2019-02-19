@@ -106,7 +106,9 @@ sparklyr_jar_path <- function(spark_version) {
     all_versions <- sort(gsub("^sparklyr-|-[0-9]+\\.[0-9]+\\.jar$", "", all_jars), decreasing = T)
     prev_versions <- all_versions[all_versions <= spark_version]
 
-    dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", prev_versions[1]))
+    dir(system.file("java", package = "sparklyr"),
+        pattern = paste0("sparklyr-", prev_versions[1]),
+        full.names = T)
   } else {
     ""
   }

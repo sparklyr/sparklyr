@@ -13,7 +13,7 @@ databricks_expand_jars <- function() {
 
     if (!file.exists(file.path(jars_path, target_jar))) {
       file.copy(
-        file.path(jars_path, compatible_jar),
+        compatible_jar,
         file.path(jars_path, target_jar)
       )
     }
