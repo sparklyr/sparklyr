@@ -14,12 +14,12 @@ spark_connection_yarn_ui <- function(sc) {
     port <- "8088"
     webapp_address <- paste0(domain_protocol, domain, ":", port)
 
-    rm_hostname <- spark_yarn_get_conf_property("yarn.resourcemanager.hostname")
+    rm_hostname <- spark_yarn_get_conf_property("yarn.resourcemanager.hostname", fails = FALSE)
     if (length(rm_hostname)) {
       webapp_address <- paste0(domain_protocol, rm_hostname, port)
     }
 
-    rm_address <- spark_yarn_get_conf_property("yarn.resourcemanager.address")
+    rm_address <- spark_yarn_get_conf_property("yarn.resourcemanager.address", fails = FALSE)
     if (length(rm_address)) {
       webapp_address <- paste0(domain_protocol, gsub(":[0-9]+$", "", rm_address), ":", port)
     }

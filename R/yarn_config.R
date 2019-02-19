@@ -1,17 +1,17 @@
-spark_yarn_get_conf_property <- function(property) {
+spark_yarn_get_conf_property <- function(property, fails = TRUE) {
   confDir <- Sys.getenv("YARN_CONF_DIR")
   if (nchar(confDir) == 0) {
 
     # some systems don't set YARN_CONF_DIR but do set HADOOP_CONF_DIR
     confDir <- Sys.getenv("HADOOP_CONF_DIR")
     if (nchar(confDir) == 0) {
-      stop("Yarn Cluster mode requires YARN_CONF_DIR or HADOOP_CONF_DIR to be set.")
+      if (fals) stop("Yarn Cluster mode requires YARN_CONF_DIR or HADOOP_CONF_DIR to be set.") else return(NULL)
     }
   }
 
   yarnSite <- file.path(confDir, "yarn-site.xml")
   if (!file.exists(yarnSite)) {
-    stop("Yarn Cluster mode requires yarn-site.xml to exist under YARN_CONF_DIR")
+    if (fails) stop("Yarn Cluster mode requires yarn-site.xml to exist under YARN_CONF_DIR") else return(NULL)
   }
 
   yarnSiteXml <- xml2::read_xml(yarnSite)
