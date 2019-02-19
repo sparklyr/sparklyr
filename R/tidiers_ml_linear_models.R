@@ -107,7 +107,7 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   }
 
   # If the code reaches here, user didn't supply 'newdata' so we're dealing with
-  # training data. We call 'sdf_residuals()' first and then 'sdf_predict()' in
+  # training data. We call 'sdf_residuals()' first and then 'ml_predict()' in
   # order to guarantee row order presevation.
   residuals <- sdf_residuals(x, type = type.residuals)
   ml_predict(x, newdata = residuals) %>%

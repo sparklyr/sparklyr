@@ -5,6 +5,7 @@ ml_cross_validator <- function(x, estimator = NULL, estimator_param_maps = NULL,
                                evaluator = NULL, num_folds = 3, collect_sub_models = FALSE,
                                parallelism = 1, seed = NULL,
                                uid = random_string("cross_validator_"), ...) {
+  check_dots_used()
   UseMethod("ml_cross_validator")
 }
 

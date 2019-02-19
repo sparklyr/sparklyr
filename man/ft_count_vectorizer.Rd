@@ -7,7 +7,7 @@
 \usage{
 ft_count_vectorizer(x, input_col = NULL, output_col = NULL,
   binary = FALSE, min_df = 1, min_tf = 1, vocab_size = 2^18,
-  dataset = NULL, uid = random_string("count_vectorizer_"), ...)
+  uid = random_string("count_vectorizer_"), ...)
 
 ml_vocabulary(model)
 }
@@ -40,9 +40,6 @@ the document's token count). Default: 1.}
 \code{vocab_size} terms ordered by term frequency across the corpus.
 Default: \code{2^18}.}
 
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
-
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
@@ -71,16 +68,8 @@ The object returned depends on the class of \code{x}.
 Extracts a vocabulary from document collections.
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for

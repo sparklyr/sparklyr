@@ -1,11 +1,5 @@
 context("ml feature tokenizer")
 
-test_that("ft_tokenizer() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_tokenizer)
-})
-
 test_that("ft_tokenizer() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

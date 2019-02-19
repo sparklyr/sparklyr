@@ -10,6 +10,7 @@
 ml_one_vs_rest <- function(x, formula = NULL, classifier = NULL, features_col = "features",
                            label_col = "label", prediction_col = "prediction",
                            uid = random_string("one_vs_rest_"), ...) {
+  check_dots_used()
   UseMethod("ml_one_vs_rest")
 }
 

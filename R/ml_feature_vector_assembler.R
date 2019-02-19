@@ -12,6 +12,7 @@
 #' @export
 ft_vector_assembler <- function(x, input_cols = NULL, output_col = NULL,
                                 uid = random_string("vector_assembler_"), ...) {
+  check_dots_used()
   UseMethod("ft_vector_assembler")
 }
 
@@ -67,10 +68,6 @@ new_ml_vector_assembler <- function(jobj) {
 }
 
 validator_ml_vector_assembler <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    input.col = "input_cols",
-    output.col = "output_col"
-  )) %>%
-    validate_args_transformer()
+  .args <- validate_args_transformer(.args)
   .args
 }

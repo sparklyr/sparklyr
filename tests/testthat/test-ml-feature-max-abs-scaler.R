@@ -1,11 +1,5 @@
 context("ml feature max abs scaler")
 
-test_that("ft_max_abs_scaler() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_max_abs_scaler)
-})
-
 test_that("ft_max_abs_scaler() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

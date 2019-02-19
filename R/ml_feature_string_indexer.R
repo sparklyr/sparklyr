@@ -18,7 +18,8 @@
 #' @export
 ft_string_indexer <- function(x, input_col = NULL, output_col = NULL,
                               handle_invalid = "error", string_order_type = "frequencyDesc",
-                              dataset = NULL, uid = random_string("string_indexer_"), ...) {
+                              uid = random_string("string_indexer_"), ...) {
+  check_dots_used()
   UseMethod("ft_string_indexer")
 }
 
@@ -27,9 +28,7 @@ ml_string_indexer <- ft_string_indexer
 #' @export
 ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                handle_invalid = "error", string_order_type = "frequencyDesc",
-                                               dataset = NULL, uid = random_string("string_indexer_"), ...) {
-
-  if (!is.null(dataset)) warning("The `dataset` parameter is deprecated and will be removed in a future version.", call. = FALSE)
+                                               uid = random_string("string_indexer_"), ...) {
 
   .args <- list(
     input_col = input_col,
@@ -48,16 +47,14 @@ ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col =
     jobj_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0",  "frequencyDesc") %>%
     new_ml_string_indexer()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
+
 }
 
 #' @export
 ft_string_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
                                           handle_invalid = "error", string_order_type = "frequencyDesc",
-                                          dataset = NULL, uid = random_string("string_indexer_"), ...) {
+                                          uid = random_string("string_indexer_"), ...) {
 
   stage <- ft_string_indexer.spark_connection(
     x = spark_connection(x),
@@ -65,7 +62,6 @@ ft_string_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
     output_col = output_col,
     handle_invalid = handle_invalid,
     string_order_type = string_order_type,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -75,20 +71,20 @@ ft_string_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
 #' @export
 ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
                                         handle_invalid = "error", string_order_type = "frequencyDesc",
-                                        dataset = NULL, uid = random_string("string_indexer_"), ...) {
+                                        uid = random_string("string_indexer_"), ...) {
   stage <- ft_string_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
     output_col = output_col,
     handle_invalid = handle_invalid,
     string_order_type = string_order_type,
-    dataset = dataset,
     uid = uid,
     ...
   )
   # backwards compatibility for params argument
   dots <- rlang::dots_list(...)
   if (rlang::has_name(dots, "params") && rlang::is_env(dots$params)) {
+    warning("`params` has been deprecated and will be removed in a future release.", call. = FALSE)
     transformer <- if (is_ml_transformer(stage))
       stage
     else

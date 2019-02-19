@@ -28,7 +28,7 @@
 #' mlp_model <- iris_training %>%
 #'   ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4,3,3))
 #'
-#' pred <- sdf_predict(iris_test, mlp_model)
+#' pred <- ml_predict(mlp_model, iris_test)
 #'
 #' ml_multiclass_classification_evaluator(pred)
 #' }
@@ -43,6 +43,7 @@ ml_multilayer_perceptron_classifier <- function(x, formula = NULL, layers = NULL
                                                 prediction_col = "prediction", probability_col = "probability",
                                                 raw_prediction_col = "rawPrediction",
                                                 uid = random_string("multilayer_perceptron_classifier_"), ...) {
+  check_dots_used()
   UseMethod("ml_multilayer_perceptron_classifier")
 }
 
@@ -194,7 +195,6 @@ ml_multilayer_perceptron <- function(x, formula = NULL, layers, max_iter = 100, 
 }
 
 validator_ml_multilayer_perceptron_classifier <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(iter.max = "max_iter"))
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])
   .args[["layers"]] <- cast_nullable_integer_list(.args[["layers"]])

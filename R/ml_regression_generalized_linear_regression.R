@@ -49,7 +49,7 @@
 #'                                     family = family_link[i, 1],
 #'                                     link = family_link[i, 2])
 #'
-#'   pred <- sdf_predict(mtcars_test, glm_model)
+#'   pred <- ml_predict(glm_model, mtcars_test)
 #'   family_link[i,3] <- ml_regression_evaluator(pred, label_col = "mpg")
 #' }
 #'
@@ -66,6 +66,7 @@ ml_generalized_linear_regression <- function(x, formula = NULL, family = "gaussi
                                              prediction_col = "prediction",
                                              uid = random_string("generalized_linear_regression_"),
                                              ...) {
+  check_dots_used()
   UseMethod("ml_generalized_linear_regression")
 }
 
@@ -210,12 +211,6 @@ ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family
 }
 
 validator_ml_generalized_linear_regression <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    intercept = "fit_intercept",
-    weights.column = "weight_col",
-    iter.max = "max_iter",
-    max.iter = "max_iter"
-  ))
   .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   fam <- .args[["family"]]

@@ -40,12 +40,7 @@ test_that("ft_quantile_discretizer works", {
     ft_quantile_discretizer("hour", "result", num_buckets = 3) %>%
     pull(result)
 
-  result2 <- df_tbl %>%
-    ft_quantile_discretizer(., "hour", "result", num_buckets = 3, dataset = .) %>%
-    pull(result)
-
   expect_identical(result, c(2, 2, 1, 1, 0))
-  expect_identical(result2, c(2, 2, 1, 1, 0))
 })
 
 test_that("ft_quantile_discretizer works on multiple columns", {

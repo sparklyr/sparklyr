@@ -113,7 +113,7 @@ for(i in 1:nrow(family_link)){
                                     family = family_link[i, 1],
                                     link = family_link[i, 2])
 
-  pred <- sdf_predict(mtcars_test, glm_model)
+  pred <- ml_predict(glm_model, mtcars_test)
   family_link[i,3] <- ml_regression_evaluator(pred, label_col = "mpg")
 }
 

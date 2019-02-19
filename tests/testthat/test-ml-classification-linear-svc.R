@@ -37,7 +37,7 @@ test_that("ml_linear_svc() runs", {
 
   expect_error(
     ml_linear_svc(iris_tbl2, is_versicolor ~ .) %>%
-      sdf_predict(iris_tbl2) %>%
+      ml_predict(iris_tbl2) %>%
       pull(predicted_label),
     NA
   )

@@ -6,6 +6,7 @@ ml_random_forest_regressor <- function(x, formula = NULL, num_trees = 20, subsam
                                        seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
                                        max_memory_in_mb = 256, features_col = "features", label_col = "label",
                                        prediction_col = "prediction",  uid = random_string("random_forest_regressor_"), ...) {
+  check_dots_used()
   UseMethod("ml_random_forest_regressor")
 }
 
@@ -136,13 +137,7 @@ ml_random_forest_regressor.tbl_spark <- function(x, formula = NULL, num_trees = 
 }
 
 validator_ml_random_forest_regressor <- function(.args) {
-  .args <- .args %>%
-    ml_backwards_compatibility(  list(
-      sample.rate = "subsampling_rate",
-      num.trees = "num_trees",
-      col.sample.rate = "feature_subset_strategy"
-    )) %>%
-    ml_validate_decision_tree_args()
+  .args <- ml_validate_decision_tree_args(.args)
 
   .args[["num_trees"]] <- cast_scalar_integer(.args[["num_trees"]])
   .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])

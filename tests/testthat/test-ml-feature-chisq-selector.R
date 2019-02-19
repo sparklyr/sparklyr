@@ -38,7 +38,7 @@ test_that("ft_chisq_select() works properly", {
 
   result <- ft_chisq_selector(
     df_tbl, "features", "selectedFeatures", "clicked",
-    num_top_features = 1, dataset = df_tbl
+    num_top_features = 1
   )
   expect_equal(pull(result, selectedFeatures), list(18, 12, 15))
 })

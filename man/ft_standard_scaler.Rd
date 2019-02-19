@@ -5,7 +5,7 @@
 \title{Feature Transformation -- StandardScaler (Estimator)}
 \usage{
 ft_standard_scaler(x, input_col = NULL, output_col = NULL,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
+  with_mean = FALSE, with_std = TRUE,
   uid = random_string("standard_scaler_"), ...)
 }
 \arguments{
@@ -19,9 +19,6 @@ ft_standard_scaler(x, input_col = NULL, output_col = NULL,
 build a dense output, so take care when applying to sparse input. Default: FALSE}
 
 \item{with_std}{Whether to scale the data to unit standard deviation. Default: TRUE}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -50,16 +47,8 @@ Standardizes features by removing the mean and scaling to unit variance using
    as the square root of the unbiased sample variance.
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \examples{
 \dontrun{

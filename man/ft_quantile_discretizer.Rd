@@ -7,8 +7,8 @@
 ft_quantile_discretizer(x, input_col = NULL, output_col = NULL,
   num_buckets = 2, input_cols = NULL, output_cols = NULL,
   num_buckets_array = NULL, handle_invalid = "error",
-  relative_error = 0.001, dataset = NULL,
-  uid = random_string("quantile_discretizer_"), ...)
+  relative_error = 0.001, uid = random_string("quantile_discretizer_"),
+  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -35,9 +35,6 @@ into which data points are grouped. Each value must be greater than or equal to 
 org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
 \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here}
 for description). Must be in the range [0, 1]. default: 0.001}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -87,16 +84,8 @@ Algorithm: The bin ranges are chosen using an approximate algorithm (see
 Note that the result may be different every time you run it, since the sample
   strategy behind it is non-deterministic.
 
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for

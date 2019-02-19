@@ -68,6 +68,7 @@ ml_als <- function(x, rating_col = "rating", user_col = "user", item_col = "item
                    num_item_blocks = 10, checkpoint_interval = 10,
                    cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
                    final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
+  check_dots_used()
   UseMethod("ml_als")
 }
 
@@ -192,15 +193,6 @@ ml_als.tbl_spark <- function(x, rating_col = "rating", user_col = "user", item_c
 
 # Validator
 validator_ml_als <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    rating.column = "rating_col",
-    user.column = "user_col",
-    item.column = "item_col",
-    regularization.parameter = "reg_param",
-    implicit.preferences = "implicit_prefs",
-    iter.max = "max_iter"
-  ))
-
   .args[["rating_col"]] <- cast_string(.args[["rating_col"]])
   .args[["user_col"]] <- cast_string(.args[["user_col"]])
   .args[["item_col"]] <- cast_string(.args[["item_col"]])

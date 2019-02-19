@@ -1,11 +1,5 @@
 context("ml feature - elementwise product")
 
-test_that("ft_elementwise_product() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_elementwise_product)
-})
-
 test_that("ft_elementwise_product() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

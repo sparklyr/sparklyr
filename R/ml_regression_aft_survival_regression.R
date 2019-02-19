@@ -44,6 +44,7 @@ ml_aft_survival_regression <- function(x, formula = NULL, censor_col = "censor",
                                        features_col = "features", label_col = "label",
                                        prediction_col = "prediction",
                                        uid = random_string("aft_survival_regression_"), ...) {
+  check_dots_used()
   UseMethod("ml_aft_survival_regression")
 }
 
@@ -164,12 +165,6 @@ ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col =
 
 # Validator
 validator_ml_aft_survival_regression <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    intercept = "fit_intercept",
-    iter.max = "max_iter",
-    max.iter = "max_iter"
-  ))
-
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
   .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
