@@ -20,8 +20,6 @@ test_that("als.tidy() works", {
 
   check_tidy(td1, exp.row = 3, exp.col = 3,
              exp.names = c("id", "user_factors", "item_factors"))
-
-  expect_equal(td1$id, c(2, 0 , 1))
 })
 
 test_that("als.augment() works", {
