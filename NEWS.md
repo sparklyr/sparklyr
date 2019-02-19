@@ -29,6 +29,9 @@
   
 ### Data
 
+- Fix for `DBI::sqlInterpolate()` and related methods to properly
+  quote parameterized queries.
+  
 - `copy_to()` names tables `sparklyr_tmp_` instead of `sparklyr_` for
   consistency with other temp tables and to avoid rendering them under
   the connections pane.

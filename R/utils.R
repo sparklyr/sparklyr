@@ -120,10 +120,6 @@ random_string <- function(prefix = "table") {
   basename(tempfile(prefix))
 }
 
-is_spark_v2 <- function(scon) {
-  spark_version(scon) >= "2.0.0"
-}
-
 printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }

@@ -1,6 +1,7 @@
 context("dbi")
 sc <- testthat_spark_connection()
 
+iris_tbl <- testthat_tbl("iris")
 dbi_df <- data.frame(a = 1:3, b = letters[1:3])
 
 test_that("dbWriteTable can write a table", {
@@ -22,4 +23,12 @@ test_that("dbWriteTable can write a table", {
     tables[tables$tableName == "dbi_temporary", ]$isTemporary,
     TRUE
   )
+})
+
+test_that("dbGetQuery works with parameterized queries", {
+  setosa <- dbGetQuery(sc, "SELECT * FROM iris WHERE species = ?", "setosa")
+  expect_equal(nrow(setosa), 50)
+
+  virginica <- dbGetQuery(sc, "SELECT * FROM iris WHERE species = ?virginica", virginica = "virginica")
+  expect_equal(nrow(virginica), 50)
 })
