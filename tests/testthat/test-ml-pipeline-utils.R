@@ -83,7 +83,7 @@ test_that("ml_transform take list of transformers (#1444)", {
 
   transformed1 <- ml_transform(stages, iris_tbl) %>%
     dplyr::pull(prediction)
-  transformed2 <- Reduce(function(data, transformer) ml_transform(data, transformer), stages, init = iris_tbl) %>%
+  transformed2 <- Reduce(function(transformer, data) ml_transform(data, transformer), stages, init = iris_tbl) %>%
     dplyr::pull(prediction)
   expect_equal(transformed1, transformed2)
 })
