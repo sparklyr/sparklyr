@@ -273,16 +273,13 @@ utils::globalVariables("explode")
 #' @export
 ml_recommend <- function(model, type = c("items", "users"), n = 1) {
 
-  if(inherits(model, "ml_model_als")){
-    connection <- model$.jobj$connection
+  version <- spark_jobj(model) %>%
+    spark_connection() %>%
+    spark_version()
 
-    if (spark_version(spark_connection(connection)) < "2.2.0")
-      stop("`ml_recommend()`` is only support for Spark 2.2+.")
+  if (version < " 2.2.0") stop("`ml_recommend()`` is only support for Spark 2.2+.", call. = FALSE)
 
-    # the recommendation functions are in the second level
-    model <- model$model
-  } else if (spark_version(spark_connection(model)) < "2.2.0")
-    stop("`ml_recommend()`` is only support for Spark 2.2+.")
+  model <-  if (inherits(model, "ml_model_als")) model$model else model
 
   type <- match.arg(type)
   n <- cast_scalar_integer(n)
