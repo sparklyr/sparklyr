@@ -27,7 +27,7 @@ setMethod("sqlParseVariables", "spark_connection", function(conn, sql, ...) {
 
 setMethod("sqlInterpolate", "spark_connection", function(conn, sql, ..., .dots = list()) {
   method <- getMethod("sqlInterpolate", "DBIConnection")
-  method(conn, sql, ..., .dots)
+  method(conn, sql, ..., .dots = .dots)
 })
 
 get_data_type <- function(obj) {

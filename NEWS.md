@@ -17,6 +17,9 @@
 
 ### Data
 
+- Fix for `DBI::sqlInterpolate()` and related methods to properly
+  quote parameterized queries.
+
 - Support for reading `path` as the second parameter in `spark_read_*()`
   when no name is specified (e.g. `spark_read_csv(sc, "data.csv")`).
 
