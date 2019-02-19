@@ -37,7 +37,6 @@ Imports:
     generics,
     httr (>= 1.2.1),
     jsonlite (>= 1.4),
-    lazyeval (>= 0.2.0),
     methods,
     openssl (>= 0.8),
     purrr,
