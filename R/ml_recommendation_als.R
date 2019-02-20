@@ -277,7 +277,7 @@ ml_recommend <- function(model, type = c("items", "users"), n = 1) {
     spark_connection() %>%
     spark_version()
 
-  if (version < " 2.2.0") stop("`ml_recommend()`` is only support for Spark 2.2+.", call. = FALSE)
+  if (version < "2.2.0") stop("`ml_recommend()`` is only supported for Spark 2.2+.", call. = FALSE)
 
   model <-  if (inherits(model, "ml_model_als")) model$model else model
 
