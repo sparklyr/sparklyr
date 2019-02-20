@@ -66,7 +66,10 @@ new_databricks_connection <- function(scon, guid) {
   # In databricks, sparklyr should use the SqlContext associated with the RDriverLocal instance for
   # this guid.
   r_driver_local <- "com.databricks.backend.daemon.driver.RDriverLocal"
-  hive_context <- invoke_static(sc, r_driver_local, "getDriver", guid) %>% invoke("sqlContext")
-  sc$state$hive_context <- hive_context
+  session <- invoke_static(sc, r_driver_local, "getDriver", guid) %>%
+    invoke("sqlContext") %>%
+    invoke("sparkSession")
+  # This is called hive_context but for spark > 2.0, it should actually be a spark session
+  sc$state$hive_context <- session
   sc
 }
