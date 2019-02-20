@@ -46,6 +46,13 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
   pipeline %>% ml_fit(dataset)
 }
 
+ml_recommendation_pipeline <- function(predictor, dataset, formula) {
+  sc <- spark_connection(predictor)
+  r_formula <- ft_r_formula(sc, formula)
+  pipeline_model <- ml_pipeline(r_formula, predictor) %>%
+    ml_fit(dataset)
+}
+
 #' @export
 #' @rdname ml-model-constructors
 #' @param constructor The constructor function for the `ml_model`.
@@ -86,6 +93,25 @@ ml_construct_model_clustering <- function(constructor, predictor, formula, datas
     formula = formula,
     dataset = dataset,
     features_col = features_col,
+    ...
+  )
+
+  rlang::exec(constructor, !!!.args)
+}
+
+ml_construct_model_recommendation <- function(constructor, predictor, formula,
+                                              dataset, ...) {
+
+  pipeline_model <- ml_recommendation_pipeline(
+    predictor = predictor,
+    dataset = dataset,
+    formula = formula
+    )
+
+  .args <- list(
+    pipeline_model = pipeline_model,
+    formula = formula,
+    dataset = dataset,
     ...
   )
 
