@@ -10,6 +10,7 @@ ml_random_forest_classifier <- function(x, formula = NULL, num_trees = 20, subsa
                                         label_col = "label", prediction_col = "prediction",
                                         probability_col = "probability", raw_prediction_col = "rawPrediction",
                                         uid = random_string("random_forest_classifier_"), ...) {
+  check_dots_used()
   UseMethod("ml_random_forest_classifier")
 }
 
@@ -163,13 +164,7 @@ ml_random_forest_classifier.tbl_spark <- function(x, formula = NULL, num_trees =
 
 # Validator
 validator_ml_random_forest_classifier <- function(.args) {
-  .args <- .args %>%
-    ml_backwards_compatibility(list(
-      sample.rate = "subsampling_rate",
-      num.trees = "num_trees",
-      col.sample.rate = "feature_subset_strategy"
-    )) %>%
-    ml_validate_decision_tree_args()
+  .args <- .args %>% ml_validate_decision_tree_args()
   .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
   .args[["num_trees"]] <- cast_scalar_integer(.args[["num_trees"]])
   .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])

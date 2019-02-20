@@ -120,10 +120,6 @@ random_string <- function(prefix = "table") {
   basename(tempfile(prefix))
 }
 
-is_spark_v2 <- function(scon) {
-  spark_version(scon) >= "2.0.0"
-}
-
 printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }
@@ -156,6 +152,14 @@ regex_replace <- function(string, ...) {
 }
 
 spark_sanitize_names <- function(names, config) {
+  # Spark 1.6.X has a number of issues with '.'s in column names, e.g.
+  #
+  #    https://issues.apache.org/jira/browse/SPARK-5632
+  #    https://issues.apache.org/jira/browse/SPARK-13455
+  #
+  # Many of these issues are marked as resolved, but it appears this is
+  # a common regression in Spark and the handling is not uniform across
+  # the Spark API.
 
   # sanitize names by default, but opt out with global option
   if (!isTRUE(spark_config_value(config, "sparklyr.sanitize.column.names", TRUE)))
@@ -321,4 +325,15 @@ resolve_fn <- function(fn, ...) {
 
 is.tbl_spark <- function(x) {
   inherits(x, "tbl_spark")
+}
+
+`%<-%` <- function(x, value) {
+  dest <- as.character(as.list(substitute(x))[-1])
+  if (length(dest) != length(value)) stop("Assignment must contain same number of elements")
+
+  for (i in seq_along(dest)) {
+    assign(dest[i], value[i], envir = sys.frame(which =sys.parent(n = 1)))
+  }
+
+  invisible(NULL)
 }

@@ -69,7 +69,7 @@ test_that("data.frames with '|' can be copied", {
 })
 
 test_that("data.frames with many columns survive roundtrip", {
-  skip_covr("takes too long to measure coverage")
+  skip_slow("takes too long to measure coverage")
 
   n <- 1E3
   data <- as.data.frame(replicate(n, 1L, simplify = FALSE))
@@ -89,14 +89,14 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
   expect_true(TRUE, info = "no Java StackOverflow on copy of large dataset")
 })
 
-test_that("'sdf_predict()', 'predict()' return same results", {
+test_that("'ml_predict()', 'predict()' return same results", {
   test_requires("dplyr")
 
   model <- flights_tbl %>%
     na.omit() %>%
     ml_decision_tree(sched_dep_time ~ dep_time)
 
-  predictions <- sdf_predict(model)
+  predictions <- ml_predict(model)
   n1 <- spark_dataframe(predictions) %>% invoke("count")
   n2 <- length(predict(model))
 
@@ -135,6 +135,8 @@ test_that("collect() can retrieve all data types correctly", {
   rtime <- "2010-01-01 01:01:10"
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
+  arrow_compat <- using_arrow() && packageVersion("arrow") < "0.12.0"
+
   hive_type <- tibble::frame_data(
     ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,    ~avalue,
     "tinyint",       "1",   "integer",       "1",       "raw",       "01",
@@ -156,6 +158,10 @@ test_that("collect() can retrieve all data types correctly", {
     hive_type <- hive_type %>% filter(stype != "integer")
   }
 
+  if ("arrow" %in% installed.packages() && packageVersion("arrow") < "0.12.0") {
+    hive_type <- hive_type %>% filter(stype != "smallint", stype != "float")
+  }
+
   spark_query <- hive_type %>%
     mutate(
       query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col")
@@ -170,7 +176,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_types,
-    hive_type %>% pull(!! if(using_arrow()) "atype" else "rtype")
+    hive_type %>% pull(!! if(arrow_compat) "atype" else "rtype")
   )
 
   spark_results <- DBI::dbGetQuery(sc, spark_query)
@@ -179,7 +185,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_results,
-    hive_type %>% pull(!! if(using_arrow()) "avalue" else "rvalue")
+    hive_type %>% pull(!! if(arrow_compat) "avalue" else "rvalue")
   )
 })
 

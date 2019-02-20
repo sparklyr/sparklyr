@@ -136,7 +136,22 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     test_filter <- paste(livy_tests, collapse = "|")
   }
 
-  r_arrow <- isTRUE(as.logical(Sys.getenv("R_ARROW")))
+  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
+  if (is_arrow_devel) {
+    arrow_devel_tests <- c(
+      "^dplyr$",
+      "^dbi$",
+      "^copy-to$",
+      "^sdf-collect$",
+      "^serialization$",
+      "^spark-apply.",
+      "^ml-clustering-kmeans$"
+    )
+
+    test_filter <- paste(arrow_devel_tests, collapse = "|")
+  }
+
+  r_arrow <- isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))
   if (r_arrow) {
     get("library")("arrow")
   }

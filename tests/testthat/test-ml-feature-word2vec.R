@@ -43,8 +43,8 @@ test_that("ml_find_synonyms works properly", {
   test_requires_version("2.0.0", "spark computation different in 1.6.x")
   sc <- testthat_spark_connection()
   tokenized_tbl <- testthat_tbl("tokenized")
-  model <- ft_word2vec(sc, "words", "result", vector_size= 3, min_count = 0,
-                       dataset = tokenized_tbl)
+  model <- ft_word2vec(sc, "words", "result", vector_size= 3, min_count = 0) %>%
+    ml_fit(tokenized_tbl)
 
   synonyms <- ml_find_synonyms(model, "java", 2) %>% pull(word)
 

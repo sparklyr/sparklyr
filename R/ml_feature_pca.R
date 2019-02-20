@@ -9,13 +9,14 @@
 #' @param k The number of principal components
 #'
 #' @export
-ft_pca <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
+ft_pca <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                    uid = random_string("pca_"), ...) {
+  check_dots_used()
   UseMethod("ft_pca")
 }
 
 #' @export
-ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
+ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                                     uid = random_string("pca_"), ...) {
 
   .args <- list(
@@ -34,14 +35,11 @@ ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = 
     jobj_set_param("setK", .args[["k"]]) %>%
     new_ml_pca()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
-ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
+ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                                uid = random_string("pca_"), ...) {
 
   stage <- ft_pca.spark_connection(
@@ -49,7 +47,6 @@ ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL,
     input_col = input_col,
     output_col = output_col,
     k = k,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -58,7 +55,7 @@ ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL,
 }
 
 #' @export
-ft_pca.tbl_spark <- function(x, input_col = NULL, output_col = NULL, k = NULL, dataset = NULL,
+ft_pca.tbl_spark <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                              uid = random_string("pca_"), ...) {
 
   stage <- ft_pca.spark_connection(
@@ -66,7 +63,6 @@ ft_pca.tbl_spark <- function(x, input_col = NULL, output_col = NULL, k = NULL, d
     input_col = input_col,
     output_col = output_col,
     k = k,
-    dataset = dataset,
     uid = uid,
     ...
   )

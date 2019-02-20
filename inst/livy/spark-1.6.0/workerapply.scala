@@ -56,7 +56,8 @@ class WorkerApply(
       bundlePath,
       context,
       timeZoneId,
-      schema
+      schema,
+      options
     )
 
     val tracker = new JVMObjectTracker()

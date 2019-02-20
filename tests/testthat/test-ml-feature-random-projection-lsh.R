@@ -42,7 +42,8 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
 
   lsh <- ft_bucketed_random_projection_lsh(
     sc, input_col = "features", output_col = "hashes",
-    bucket_length = 2, num_hash_tables = 3, dataset = dfA_tbl, seed = 666)
+    bucket_length = 2, num_hash_tables = 3, seed = 666) %>%
+    ml_fit(dfA_tbl)
   transformed <- lsh %>%
     ml_transform(dfA_tbl) %>%
     dplyr::collect()

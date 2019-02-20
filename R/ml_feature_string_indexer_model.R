@@ -4,6 +4,7 @@
 ft_string_indexer_model <- function(x, input_col = NULL, output_col = NULL, labels,
                                     handle_invalid = "error",
                                     uid = random_string("string_indexer_model_"), ...) {
+  check_dots_used()
   UseMethod("ft_string_indexer_model")
 }
 

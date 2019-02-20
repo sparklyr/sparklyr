@@ -32,7 +32,7 @@ NULL
 #' dt_model <- iris_training %>%
 #'   ml_decision_tree(Species ~ .)
 #'
-#' pred <- sdf_predict(iris_test, dt_model)
+#' pred <- ml_predict(dt_model, iris_test)
 #'
 #' ml_multiclass_classification_evaluator(pred)
 #' }
@@ -62,12 +62,6 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
       "classification"
   }
 
-  routine <- switch(
-    model_type,
-    regression = ml_decision_tree_regressor,
-    classification = ml_decision_tree_classifier
-  )
-
   impurity <- if (identical(impurity, "auto")) {
     if (identical(model_type, "regression")) "variance" else "gini"
   } else if (identical(model_type, "classification")) {
@@ -80,10 +74,49 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
     impurity
   }
 
-  args <- c(as.list(environment()), list(...))
-  args$response <- NULL
-  args$features <- NULL
-  do.call(routine, args)
+  switch(
+    model_type,
+    regression = ml_decision_tree_regressor(
+      x = x,
+      formula = formula,
+      max_depth = max_depth,
+      max_bins = max_bins,
+      min_instances_per_node = min_instances_per_node,
+      min_info_gain = min_info_gain,
+      impurity = impurity,
+      seed = seed,
+      cache_node_ids = cache_node_ids,
+      checkpoint_interval = checkpoint_interval,
+      max_memory_in_mb = max_memory_in_mb,
+      variance_col = variance_col,
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      uid = uid,
+      ...
+    ),
+    classification = ml_decision_tree_classifier(
+      x = x,
+      formula = formula,
+      max_depth = max_depth,
+      max_bins = max_bins,
+      min_instances_per_node = min_instances_per_node,
+      min_info_gain = min_info_gain,
+      impurity = impurity,
+      seed = seed,
+      thresholds = thresholds,
+      cache_node_ids = cache_node_ids,
+      checkpoint_interval = checkpoint_interval,
+      max_memory_in_mb = max_memory_in_mb,
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      probability_col = probability_col,
+      raw_prediction_col = raw_prediction_col,
+      uid = uid,
+      ...
+    )
+  )
 }
 
 new_ml_model_decision_tree_classification <- function(pipeline_model, formula, dataset, label_col,

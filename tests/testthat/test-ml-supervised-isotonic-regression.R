@@ -29,7 +29,7 @@ test_that("ml_isotonic_regression() works properly", {
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
   ir <- ml_isotonic_regression(df_tbl, y ~ x)
   expect_equal(
-    sdf_predict(ir, df_tbl) %>% pull(prediction),
+    ml_predict(ir, df_tbl) %>% pull(prediction),
     c(1, 2, 2, 2, 6, 16.5, 16.5, 17, 18)
   )
 

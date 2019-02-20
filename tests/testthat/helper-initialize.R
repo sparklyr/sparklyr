@@ -72,6 +72,7 @@ testthat_shell_connection <- function() {
     options(sparklyr.na.action.verbose = TRUE)
 
     config[["sparklyr.shell.driver-memory"]] <- "3G"
+    config[["sparklyr.apply.env.foo"]] <- "env-test"
 
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version, config = config)
@@ -300,4 +301,14 @@ skip_covr <- function(message) {
 
 using_arrow <- function() {
   "package:arrow" %in% search()
+}
+
+skip_arrow_devel <- function(message) {
+  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
+  if (is_arrow_devel) skip(message)
+}
+
+skip_slow <- function(message) {
+  skip_covr(message)
+  skip_arrow_devel(message)
 }

@@ -34,7 +34,7 @@
 #' lr_model <- mtcars_training %>%
 #'   ml_logistic_regression(am ~ gear + carb)
 #'
-#' pred <- sdf_predict(mtcars_test, lr_model)
+#' pred <- ml_predict(lr_model, mtcars_test)
 #'
 #' ml_binary_classification_evaluator(pred)
 #' }
@@ -50,6 +50,7 @@ ml_logistic_regression <- function(x, formula = NULL, fit_intercept = TRUE,
                                    prediction_col = "prediction", probability_col = "probability",
                                    raw_prediction_col = "rawPrediction",
                                    uid = random_string("logistic_regression_"), ...) {
+  check_dots_used()
   UseMethod("ml_logistic_regression")
 }
 
@@ -294,16 +295,7 @@ cast_double_matrix <- function(mat) {
 }
 
 validator_ml_logistic_regression <- function(.args) {
-  .args <- ml_backwards_compatibility(
-    .args, list(
-      intercept = "fit_intercept",
-      alpha = "elastic_net_param",
-      lambda = "reg_param",
-      weights.column = "weight_col",
-      iter.max = "max_iter",
-      max.iter = "max_iter"
-    )) %>%
-    validate_args_classifier()
+  .args <- validate_args_classifier(.args)
 
   .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
   .args[["elastic_net_param"]] <- cast_scalar_double(.args[["elastic_net_param"]])

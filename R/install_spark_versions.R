@@ -70,11 +70,12 @@ spark_installed_versions <- function() {
 }
 
 #' @param show_hadoop Show Hadoop distributions?
+#' @param show_minor Show minor Spark versions?
 #'
 #' @rdname spark_install
 #'
 #' @export
-spark_available_versions <- function(show_hadoop = FALSE) {
+spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE) {
   versions <- read_spark_versions_json(latest = TRUE)
   versions <- versions[versions$spark >= "1.6.0", 1:2]
   selection <- if (show_hadoop) c("spark", "hadoop") else "spark"
@@ -82,6 +83,11 @@ spark_available_versions <- function(show_hadoop = FALSE) {
   versions <- unique(subset(versions, select = selection))
 
   rownames(versions) <- 1:nrow(versions)
+
+  if (!show_minor) versions$spark <- gsub("\\.[0-9]+$", "", versions$spark)
+
+  versions <- unique(versions)
+  rownames(versions) <- NULL
 
   versions
 }
@@ -109,7 +115,7 @@ spark_versions <- function(latest = TRUE) {
   downloadData$hadoop_default <- rep(FALSE, NROW(downloadData))
 
   # apply spark and hadoop versions
-  downloadData[downloadData$spark == "2.3.2" & downloadData$hadoop == "2.7", ]$default <- TRUE
+  downloadData[downloadData$spark == "2.4.0" & downloadData$hadoop == "2.7", ]$default <- TRUE
   lapply(unique(downloadData$spark), function(version) {
     validVersions <- downloadData[grepl("2", downloadData$hadoop) & downloadData$spark == version, ]
     maxHadoop <- validVersions[with(validVersions, order(hadoop, decreasing = TRUE)), ]$hadoop[[1]]
@@ -144,7 +150,7 @@ spark_versions <- function(latest = TRUE) {
         newRow$base <- currentRow$base
         newRow$pattern <- currentRow$pattern
         newRow$download <- currentRow$download
-        newRow$default <- identical(currentRow$spark, "2.3.2")
+        newRow$default <- identical(currentRow$spark, "2.4.0")
         newRow$hadoop_default <- identical(currentRow$hadoop, hadoop_default)
       }
 

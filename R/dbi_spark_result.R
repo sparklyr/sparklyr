@@ -42,10 +42,9 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 })
 
 setMethod("dbSendQuery",
-          # c("spark_connection", "character"),
           "spark_connection",
-          function(conn, statement, params = NULL, ...) {
-  sql <- as.character(statement)
+          function(conn, statement, ...) {
+  sql <- as.character(DBI::sqlInterpolate(conn, statement, ...))
 
   sdf <- invoke(hive_context(conn), "sql", sql)
   rs <- new("DBISparkResult",

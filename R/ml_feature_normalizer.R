@@ -10,6 +10,7 @@
 #' @export
 ft_normalizer <- function(x, input_col = NULL, output_col = NULL,
                           p = 2, uid = random_string("normalizer_"), ...) {
+  check_dots_used()
   UseMethod("ft_normalizer")
 }
 

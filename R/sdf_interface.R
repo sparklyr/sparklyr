@@ -64,6 +64,15 @@ sdf_import <- function(x,
   UseMethod("sdf_import")
 }
 
+sdf_prepare_dataframe <- function(x) {
+  as.data.frame(
+    x,
+    stringsAsFactors = FALSE,
+    row.names = FALSE,
+    optional = TRUE
+  )
+}
+
 #' @export
 #' @importFrom dplyr tbl
 sdf_import.default <- function(x,
@@ -74,16 +83,6 @@ sdf_import.default <- function(x,
                                overwrite = FALSE,
                                ...)
 {
-  # ensure data.frame
-  if (!is.data.frame(x)) {
-    x <- as.data.frame(
-      x,
-      stringsAsFactors = FALSE,
-      row.names = FALSE,
-      optional = TRUE
-    )
-  }
-
   if (overwrite)
     spark_remove_table_if_exists(sc, name)
   else if (name %in% src_tbls(sc))
@@ -93,7 +92,7 @@ sdf_import.default <- function(x,
   serializer <- dots$serializer
   spark_data_copy(sc, x, name = name, repartition = repartition, serializer = serializer)
 
-  if (memory)
+  if (memory && !class(x) %in% c("iterator", "list"))
     tbl_cache(sc, name)
 
   on_connection_updated(sc, name)
@@ -199,95 +198,6 @@ sdf_sort <- function(x, columns) {
   }
 
   sdf_register(sorted)
-}
-
-#' Mutate a Spark DataFrame
-#'
-#' Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}
-#' to mutate a Spark DataFrame.
-#'
-#' @template roxlate-sdf
-#'
-#' @param .data A \code{spark_tbl}.
-#' @param ... Named arguments, mapping new column names to the transformation to
-#'   be applied.
-#' @param .dots A named list, mapping output names to transformations.
-#'
-#' @name sdf_mutate
-#' @export
-#'
-#' @family feature transformation routines
-#'
-#' @examples
-#' \dontrun{
-#' # using the 'beaver1' dataset, binarize the 'temp' column
-#' data(beavers, package = "datasets")
-#' beaver_tbl <- copy_to(sc, beaver1, "beaver")
-#' beaver_tbl %>%
-#'   mutate(squared = temp ^ 2) %>%
-#'   sdf_mutate(warm = ft_binarizer(squared, 1000)) %>%
-#'   sdf_register("mutated")
-#'
-#' # view our newly constructed tbl
-#' head(beaver_tbl)
-#'
-#' # note that we have two separate tbls registered
-#' dplyr::src_tbls(sc)
-#' }
-#' @importFrom lazyeval lazy_dots
-sdf_mutate <- function(.data, ...) {
-  sdf_mutate_(.data, .dots = lazy_dots(...))
-}
-
-#' @name sdf_mutate
-#' @export
-#' @importFrom lazyeval all_dots
-sdf_mutate_ <- function(.data, ..., .dots) {
-  warning(
-    "`sdf_mutate()` is deprecated and will be removed in a future release. Please use the feature transformer directly.",
-    call. = FALSE
-  )
-
-  dots <- all_dots(.dots, ..., all_named = TRUE)
-  data <- .data
-
-  for (i in seq_along(dots)) {
-
-    # extract expression to be evaluated
-    lazy_expr <- dots[[i]]$expr
-    lazy_env  <- dots[[i]]$env
-
-    # figure out the input column -- we aren't being very
-    # principled about non-standard evaluation here
-    el <- lazy_expr[[2]]
-    input_col <- if (is.call(el)) {
-      eval(el, envir = lazy_env)
-    } else {
-      as.character(el)
-    }
-
-    output_col <- as.character(names(dots)[[i]])
-
-    # construct a new call with the input variable injected
-    # for evaluation
-    preamble <- list(
-      lazy_expr[[1]], # function
-      data,           # data
-      input_col,      # input column
-      output_col      # output column
-    )
-
-    call <- as.call(c(
-      preamble,
-      as.list(lazy_expr[-c(1, 2)])
-    ))
-
-    # evaluate call
-    data <- eval(call, envir = lazy_env)
-  }
-
-  # return mutated dataset
-  sdf_register(data)
 }
 
 #' Add a Unique ID Column to a Spark DataFrame

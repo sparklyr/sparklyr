@@ -13,6 +13,7 @@
 #' @export
 ft_one_hot_encoder <- function(x, input_col = NULL, output_col = NULL,
                                drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {
+  check_dots_used()
   UseMethod("ft_one_hot_encoder")
 }
 
@@ -72,8 +73,7 @@ new_ml_one_hot_encoder <- function(jobj) {
 }
 
 validator_ml_one_hot_encoder <- function(.args) {
-  .args <- validate_args_transformer(.args) %>%
-    ml_backwards_compatibility(list(drop.last = "drop_last"))
+  .args <- validate_args_transformer(.args)
   .args[["drop_last"]] <- cast_scalar_logical(.args[["drop_last"]])
   .args
 }

@@ -23,6 +23,7 @@ ml_kmeans <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
                       init_steps = 2, init_mode = "k-means||", seed = NULL,
                       features_col = "features", prediction_col = "prediction",
                       uid = random_string("kmeans_"), ...) {
+  check_dots_used()
   UseMethod("ml_kmeans")
 }
 
@@ -118,13 +119,7 @@ ml_kmeans.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1
 
 # Validator
 validator_ml_kmeans <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    centers = "k",
-    tolerance = "tol",
-    iter.max = "max_iter"
-  )) %>%
-    validate_args_clustering()
-
+  .args <- validate_args_clustering(.args)
   .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
   .args[["init_steps"]] <- cast_scalar_integer(.args[["init_steps"]])
   .args[["init_mode"]] <- cast_choice(.args[["init_mode"]], c("random", "k-means||"))

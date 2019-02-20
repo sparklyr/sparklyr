@@ -27,7 +27,7 @@ setMethod("sqlParseVariables", "spark_connection", function(conn, sql, ...) {
 
 setMethod("sqlInterpolate", "spark_connection", function(conn, sql, ..., .dots = list()) {
   method <- getMethod("sqlInterpolate", "DBIConnection")
-  method(conn, sql, ..., .dots)
+  method(conn, sql, ..., .dots = .dots)
 })
 
 get_data_type <- function(obj) {
@@ -43,9 +43,12 @@ get_data_type <- function(obj) {
   )
 }
 
+dbi_ensure_no_backtick <- function(x) {
+  if (regexpr("`", x)[[1]] >= 0) stop("Can't escape back tick from string")
+}
+
 setMethod("dbQuoteIdentifier", c("spark_connection", "character"), function(conn, x, ...) {
-  if (regexpr("`", x)[[1]] >= 0)
-    stop("Can't scape back tick from string")
+  dbi_ensure_no_backtick(x)
 
   y <- paste("`", x, "`", sep = "")
 

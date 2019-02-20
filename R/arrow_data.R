@@ -12,6 +12,10 @@ arrow_enabled_object <- function(object) {
   UseMethod("arrow_enabled_object")
 }
 
+arrow_enabled_object.default <- function(object) {
+  TRUE
+}
+
 arrow_enabled_object.tbl_spark <- function(object) {
   sdf <- spark_dataframe(object)
   arrow_enabled_object(sdf)
@@ -19,6 +23,17 @@ arrow_enabled_object.tbl_spark <- function(object) {
 
 arrow_enabled_object.spark_jobj <- function(object) {
   unsupported_expr <- ".Vector|ArrayType|StructType"
+
+  if (packageVersion("arrow") >= "0.12" && packageVersion("arrow") < "0.13") {
+    # Workaround for ARROW-4565
+    unsupported_expr <- paste0(unsupported_expr, "|DecimalType")
+  }
+
+  if (packageVersion("arrow") < "0.12") {
+    # Workaround for ARROW-3741
+    unsupported_expr <- paste0(unsupported_expr, "|FloatType|ShortType")
+  }
+
   unsupported <- object %>%
     sdf_schema() %>%
     Filter(function(x) grepl(unsupported_expr, x$type), .)
@@ -81,13 +96,35 @@ arrow_copy_to <- function(sc, df, parallelism)
 
 arrow_collect <- function(tbl, ...)
 {
+  args <- list(...)
+
   sc <- spark_connection(tbl)
   sdf <- spark_dataframe(tbl)
   session <- spark_session(sc)
 
   time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
 
-  invoke_static(sc, "sparklyr.ArrowConverters", "toArrowBatchRdd", sdf, session, time_zone) %>%
-    arrow_read_stream() %>%
-    dplyr::bind_rows()
+  if (!identical(args$callback, NULL)) {
+    cb <- args$callback
+    if (is.language(cb)) cb <- rlang::as_closure(cb)
+
+    arrow_df <- invoke_static(sc, "sparklyr.ArrowConverters", "toArrowDataset", sdf, session, time_zone)
+    arrow_iter <- invoke(arrow_df, "toLocalIterator")
+
+    iter <- 1
+    while (invoke(arrow_iter, "hasNext")) {
+      batches <- invoke_static(sc, "sparklyr.ArrowConverters", "toArrowStream", sdf, time_zone, invoke(arrow_iter, "underlying")) %>%
+        arrow_read_stream()
+
+      for (batch in batches) {
+        if (length(formals(cb)) >= 2) cb(batch, iter) else cb(batch)
+        iter <- iter + 1
+      }
+    }
+  }
+  else {
+    invoke_static(sc, "sparklyr.ArrowConverters", "toArrowBatchRdd", sdf, session, time_zone) %>%
+      arrow_read_stream() %>%
+      dplyr::bind_rows()
+  }
 }

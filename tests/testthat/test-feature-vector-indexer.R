@@ -23,7 +23,8 @@ test_that("ft_vector_indexer() works properly", {
   sample_data <- spark_read_libsvm(sc, "sample_data",
                                    sample_data_path, overwrite = TRUE)
   indexer <- ft_vector_indexer(sc, input_col = "features", output_col = "indexed",
-                               max_categories = 10, dataset = sample_data)
+                               max_categories = 10) %>%
+    ml_fit(sample_data)
   expect_identical(indexer %>%
     ml_transform(sample_data) %>%
     head(1) %>%

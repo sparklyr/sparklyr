@@ -6,45 +6,15 @@ test_that("rf runs successfully when all args specified", {
   expect_error(
     iris_tbl %>%
       ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
-                       col.sample.rate = 1/3, impurity = "entropy", max.bins = 16L,
-                       max.depth = 3L, min.info.gain = 1e-5, min.rows = 2L,
-                       num.trees = 25L, thresholds = c(1/2, 1/3, 1/4), seed = 42L),
+                       feature_subset_strategy = "onethird", impurity = "entropy", max_bins = 16,
+                       max_depth = 3, min_info_gain = 1e-5, min_instances_per_node = 2L,
+                       num_trees = 25L, thresholds = c(1/2, 1/3, 1/4), seed = 42L),
     NA
   )
 })
 
-test_that("col.sample.rate maps to correct strategy", {
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
-  if (spark_version(sc) >= "2.0.0") skip("not applicable to 2.0+")
-  expect_message(
-    iris_tbl %>%
-      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
-                       col.sample.rate = 1/3),
-    "Using feature subsetting strategy: onethird"
-  )
-
-  expect_message(
-    iris_tbl %>%
-      ml_random_forest(Species ~ Sepal_Width + Sepal_Length + Petal_Width + Petal_Length, type = "classification",
-                       col.sample.rate = 1/2),
-    "Using feature subsetting strategy: log2"
-  )
-})
-
-test_that("col.sample.rate argument is respected", {
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
-  if (spark_version(sc) < "2.0") skip("not applicable to <2.0")
-  rf <- ml_random_forest(iris_tbl, Species ~ Sepal_Width + Sepal_Length + Petal_Width, type = "classification",
-                         col.sample.rate = 0.001)
-
-  expect_equal(ml_param(rf$model, "feature_subset_strategy"),
-               "0.001")
-})
-
 test_that("thresholds parameter behaves as expected", {
-  skip_covr("takes too long to measure coverage")
+  skip_slow("takes too long to measure coverage")
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   most_predicted_label <- function(x) x %>%
@@ -56,19 +26,19 @@ test_that("thresholds parameter behaves as expected", {
   rf_predictions <- iris_tbl %>%
     ml_random_forest(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(0, 1, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(rf_predictions), 0)
 
   rf_predictions <- iris_tbl %>%
     ml_random_forest(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 0, 1)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(rf_predictions), 1)
 
   rf_predictions <- iris_tbl %>%
     ml_random_forest(Species ~ Sepal_Width, type = "classification",
                      thresholds = c(1, 1, 0)) %>%
-    sdf_predict(iris_tbl)
+    ml_predict(iris_tbl)
   expect_equal(most_predicted_label(rf_predictions), 2)
 })
 
@@ -81,17 +51,6 @@ test_that("error for thresholds with wrong length", {
       ml_random_forest(Species ~ Sepal_Width, type = "classification",
                        thresholds = c(0, 1)),
     "non-matching numClasses and thresholds.length"
-  )
-})
-
-test_that("error for col.sample.rate value out of range", {
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
-  expect_error(
-    iris_tbl %>%
-      ml_random_forest(Species ~ Sepal_Width, type = "classification",
-                       col.sample.rate = 1.01),
-    "`col.sample.rate` must be in \\(0, 1]\\."
   )
 })
 
@@ -114,7 +73,7 @@ test_that("error for bad impurity specification", {
 })
 
 test_that("random seed setting works", {
-  skip_covr("takes too long to measure coverage")
+  skip_slow("takes too long to measure coverage")
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   model_string <- function(x) spark_jobj(x$model) %>%
@@ -140,17 +99,17 @@ test_that("one-tree forest agrees with ml_decision_tree()", {
   rf <- iris_tbl %>%
     ml_random_forest(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                               type = "regression",
-                              sample.rate = 1, col.sample.rate = 1,
-                              num.trees = 1L)
+                              subsampling_rate = 1, feature_subset_strategy = "all",
+                              num_trees = 1)
   dt <- iris_tbl %>%
     ml_decision_tree(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                      type = "regression")
 
   expect_equal(rf %>%
-                 sdf_predict(iris_tbl) %>%
+                 ml_predict(iris_tbl) %>%
                  collect(),
                dt %>%
-                 sdf_predict(iris_tbl) %>%
+                 ml_predict(iris_tbl) %>%
                  collect())
 })
 
@@ -162,8 +121,8 @@ test_that("checkpointing works for rf", {
     iris_tbl %>%
       ml_random_forest(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
                        type = "regression",
-                       cache.node.ids = TRUE,
-                       checkpoint.interval = 5L),
+                       cache_node_ids = TRUE,
+                       checkpoint_interval = 5),
   NA)
 })
 

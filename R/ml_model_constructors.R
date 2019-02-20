@@ -15,6 +15,8 @@
 #' @keywords internal
 NULL
 
+#' @export
+#' @rdname ml-model-constructors
 new_ml_model_prediction <- function(pipeline_model, formula, dataset, label_col, features_col,
                                     ..., class = character()) {
 
@@ -36,8 +38,6 @@ new_ml_model_prediction <- function(pipeline_model, formula, dataset, label_col,
 
 #' @export
 #' @rdname ml-model-constructors
-ml_model_prediction <- new_ml_model_prediction
-
 new_ml_model <- function(pipeline_model, formula, dataset, ..., class = character()) {
 
   sc <- spark_connection(pipeline_model)
@@ -80,8 +80,6 @@ new_ml_model <- function(pipeline_model, formula, dataset, ..., class = characte
 
 #' @export
 #' @rdname ml-model-constructors
-ml_model <- new_ml_model
-
 new_ml_model_classification <- function(pipeline_model, formula, dataset, label_col,
                                         features_col, predicted_label_col, ...,
                                         class = character()) {
@@ -125,8 +123,6 @@ new_ml_model_classification <- function(pipeline_model, formula, dataset, label_
 
 #' @export
 #' @rdname ml-model-constructors
-ml_model_classification <- new_ml_model_classification
-
 new_ml_model_regression <- function(pipeline_model, formula, dataset, label_col,
                                     features_col, ...,
                                     class = character()) {
@@ -144,8 +140,6 @@ new_ml_model_regression <- function(pipeline_model, formula, dataset, label_col,
 
 #' @export
 #' @rdname ml-model-constructors
-ml_model_regression <- new_ml_model_regression
-
 new_ml_model_clustering <- function(pipeline_model, formula, dataset,
                                     features_col, ...,
                                     class = character()) {
@@ -171,9 +165,16 @@ new_ml_model_clustering <- function(pipeline_model, formula, dataset,
   )
 }
 
-#' @export
-#' @rdname ml-model-constructors
-ml_model_clustering <- new_ml_model_clustering
+new_ml_model_recommendation <- function(pipeline_model, formula, dataset, ...,
+                                        class = character()) {
+  new_ml_model(
+    pipeline_model,
+    formula,
+    dataset = dataset,
+    ...,
+    class = c(class, "ml_model_recommendation")
+  )
+}
 
 #' @export
 spark_jobj.ml_model <- function(x, ...) {

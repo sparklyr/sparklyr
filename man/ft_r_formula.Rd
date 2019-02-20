@@ -5,7 +5,7 @@
 \title{Feature Transformation -- RFormula (Estimator)}
 \usage{
 ft_r_formula(x, formula = NULL, features_col = "features",
-  label_col = "label", force_index_label = FALSE, dataset = NULL,
+  label_col = "label", force_index_label = FALSE,
   uid = random_string("r_formula_"), ...)
 }
 \arguments{
@@ -23,9 +23,6 @@ string type. Usually we index label only when it is string type. If
 the formula was used by classification algorithms, we can force to index
 label even it is numeric type by setting this param with true.
 Default: \code{FALSE}.}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -82,16 +79,8 @@ The basic operators in the formula are:
  DataFrame, the output label column will be created from the specified
  response variable in the formula.
 
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for

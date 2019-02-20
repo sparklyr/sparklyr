@@ -26,7 +26,7 @@
 #' lm_model <- mtcars_training %>%
 #'   ml_linear_regression(mpg ~ .)
 #'
-#' pred <- sdf_predict(mtcars_test, lm_model)
+#' pred <- ml_predict(lm_model, mtcars_test)
 #'
 #' ml_regression_evaluator(pred, label_col = "mpg")
 #' }
@@ -39,6 +39,7 @@ ml_linear_regression <- function(x, formula = NULL, fit_intercept = TRUE,
                                  features_col = "features", label_col = "label",
                                  prediction_col = "prediction",
                                  uid = random_string("linear_regression_"), ...) {
+  check_dots_used()
   UseMethod("ml_linear_regression")
 }
 
@@ -166,15 +167,6 @@ ml_linear_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = TR
 
 # Validator
 validator_ml_linear_regression <- function(.args) {
-  .args <- ml_backwards_compatibility(.args, list(
-    intercept = "fit_intercept",
-    alpha = "elastic_net_param",
-    lambda = "reg_param",
-    weights.column = "weight_col",
-    iter.max = "max_iter",
-    max.iter = "max_iter"
-  ))
-
   .args[["elastic_net_param"]] <- cast_scalar_double(.args[["elastic_net_param"]])
   .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])

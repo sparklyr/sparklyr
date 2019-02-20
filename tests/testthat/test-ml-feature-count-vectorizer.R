@@ -33,7 +33,7 @@ test_that("ft_count_vectorizer() works", {
 
   counts2 <- df_tbl %>%
     ft_tokenizer("text", "words") %>%
-    ft_count_vectorizer(., "words", "features", dataset = .) %>%
+    ft_count_vectorizer("words", "features") %>%
     pull(features)
 
   expect_identical(counts, list(c(1, 1, 1), c(3, 2, 1)))

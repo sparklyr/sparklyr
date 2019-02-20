@@ -13,6 +13,13 @@ spark_install_available <- function(version, hadoop_version) {
   dir.exists(installInfo$sparkVersionDir)
 }
 
+spark_install_version_expand <- function(version) {
+  versions <- spark_available_versions(show_minor = T)$spark
+  versions <- versions[grepl(version, spark_available_versions(show_minor = T)$spark)]
+
+  sort(versions, decreasing = TRUE)[1]
+}
+
 #' Find a given Spark installation by version.
 #'
 #' @rdname spark_install
@@ -28,6 +35,10 @@ spark_install_find <- function(version = NULL,
                                installed_only = TRUE,
                                latest = FALSE,
                                hint = FALSE) {
+  if (identical(grepl("^[0-9]+\\.[0-9]+$", version), TRUE)) {
+    version <- spark_install_version_expand(version)
+  }
+
   sparkVersion <- version
   hadoopVersion <- hadoop_version
   installedOnly <- installed_only

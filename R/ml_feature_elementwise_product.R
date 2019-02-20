@@ -11,6 +11,7 @@
 #' @export
 ft_elementwise_product <- function(x, input_col = NULL, output_col = NULL, scaling_vec = NULL,
   uid = random_string("elementwise_product_"), ...) {
+  check_dots_used()
   UseMethod("ft_elementwise_product")
 }
 

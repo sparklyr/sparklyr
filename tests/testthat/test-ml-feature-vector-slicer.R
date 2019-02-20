@@ -1,11 +1,5 @@
 context("ml feature vector slicer")
 
-test_that("ft_vector_slicer() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_vector_slicer)
-})
-
 test_that("ft_vector_slicer() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

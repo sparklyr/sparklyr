@@ -9,15 +9,17 @@
 ml_multilayer_perceptron_classifier(x, formula = NULL, layers = NULL,
   max_iter = 100, step_size = 0.03, tol = 1e-06, block_size = 128,
   solver = "l-bfgs", seed = NULL, initial_weights = NULL,
-  features_col = "features", label_col = "label",
-  prediction_col = "prediction",
+  thresholds = NULL, features_col = "features", label_col = "label",
+  prediction_col = "prediction", probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   uid = random_string("multilayer_perceptron_classifier_"), ...)
 
 ml_multilayer_perceptron(x, formula = NULL, layers, max_iter = 100,
   step_size = 0.03, tol = 1e-06, block_size = 128,
   solver = "l-bfgs", seed = NULL, initial_weights = NULL,
-  features_col = "features", label_col = "label",
-  prediction_col = "prediction",
+  features_col = "features", label_col = "label", thresholds = NULL,
+  prediction_col = "prediction", probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   uid = random_string("multilayer_perceptron_classifier_"),
   response = NULL, features = NULL, ...)
 }
@@ -43,11 +45,17 @@ reproducible across repeated calls.}
 
 \item{initial_weights}{The initial weights of the model.}
 
+\item{thresholds}{Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value \code{p/t} is predicted, where \code{p} is the original probability of that class and \code{t} is the class's threshold.}
+
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 
 \item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
 
 \item{prediction_col}{Prediction column name.}
+
+\item{probability_col}{Column name for predicted class conditional probabilities.}
+
+\item{raw_prediction_col}{Raw prediction (a.k.a. confidence) column name.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
@@ -100,7 +108,7 @@ iris_test <- partitions$test
 mlp_model <- iris_training \%>\%
   ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4,3,3))
 
-pred <- sdf_predict(iris_test, mlp_model)
+pred <- ml_predict(mlp_model, iris_test)
 
 ml_multiclass_classification_evaluator(pred)
 }

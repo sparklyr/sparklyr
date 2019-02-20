@@ -28,7 +28,7 @@
 #' @export
 ft_count_vectorizer <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
                                 min_df = 1, min_tf = 1,
-                                vocab_size = 2^18, dataset = NULL,
+                                vocab_size = 2^18,
                                 uid = random_string("count_vectorizer_"), ...) {
   UseMethod("ft_count_vectorizer")
 }
@@ -38,8 +38,9 @@ ml_count_vectorizer <- ft_count_vectorizer
 #' @export
 ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                  binary = FALSE, min_df = 1, min_tf = 1,
-                                                 vocab_size = 2^18, dataset = NULL,
+                                                 vocab_size = 2^18,
                                                  uid = random_string("count_vectorizer_"), ...) {
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -62,16 +63,13 @@ ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col
     invoke("setVocabSize", .args[["vocab_size"]]) %>%
     new_ml_count_vectorizer()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
 ft_count_vectorizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
                                             binary = FALSE, min_df = 1, min_tf = 1,
-                                            vocab_size = 2^18, dataset = NULL,
+                                            vocab_size = 2^18,
                                             uid = random_string("count_vectorizer_"), ...) {
   stage <- ft_count_vectorizer.spark_connection(
     x = spark_connection(x),
@@ -81,7 +79,6 @@ ft_count_vectorizer.ml_pipeline <- function(x, input_col = NULL, output_col = NU
     min_df = min_df,
     min_tf = min_tf,
     vocab_size = vocab_size,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -92,7 +89,7 @@ ft_count_vectorizer.ml_pipeline <- function(x, input_col = NULL, output_col = NU
 #' @export
 ft_count_vectorizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
                                           binary = FALSE, min_df = 1, min_tf = 1,
-                                          vocab_size = 2^18, dataset = NULL,
+                                          vocab_size = 2^18,
                                           uid = random_string("count_vectorizer_"), ...) {
   stage <- ft_count_vectorizer.spark_connection(
     x = spark_connection(x),
@@ -102,7 +99,6 @@ ft_count_vectorizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL
     min_df = min_df,
     min_tf = min_tf,
     vocab_size = vocab_size,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -134,12 +130,7 @@ ml_vocabulary <- function(model) {
 }
 
 validator_ml_count_vectorizer <- function(.args) {
-  .args <- validate_args_transformer(.args) %>%
-    ml_backwards_compatibility(
-      list(min.df = "min_df",
-           min.tf = "min_tf",
-           vocab.size = "vocab_size")
-    )
+  .args <- validate_args_transformer(.args)
 
   .args[["binary"]] <- cast_scalar_logical(.args[["binary"]])
   .args[["min_df"]] <- cast_scalar_double(.args[["min_df"]])

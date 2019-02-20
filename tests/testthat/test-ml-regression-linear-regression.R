@@ -50,8 +50,8 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
       mtcars_tbl,
       response = "mpg",
       features = c("cyl", "disp"),
-      alpha = alpha,
-      lambda = lambda
+      elastic_net_param = alpha,
+      reg_param = lambda
     )
 
     gCoef <- coefficients(gFit)[, 1]
@@ -76,8 +76,8 @@ test_that("weights column works for lm", {
   s <- ml_linear_regression(iris_weighted_tbl,
                             response = "Sepal_Length",
                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                            lambda = 0L,
-                            weights.column = "weights")
+                            reg_param = 0L,
+                            weight_col = "weights")
   expect_equal(unname(coef(r)), unname(coef(s)))
 
   r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
@@ -85,8 +85,8 @@ test_that("weights column works for lm", {
   s <- ml_linear_regression(iris_weighted_tbl,
                             response = "Sepal_Length",
                             features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                            lambda = 0L,
-                            weights.column = "ones")
+                            reg_param = 0L,
+                            weight_col = "ones")
   expect_equal(unname(coef(r)), unname(coef(s)))
 })
 

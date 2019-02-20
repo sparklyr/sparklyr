@@ -1,11 +1,5 @@
 context("ml feature interaction")
 
-test_that("ft_interaction() default params", {
-  test_requires_latest_spark()
-  sc <- testthat_spark_connection()
-  test_default_args(sc, ft_interaction)
-})
-
 test_that("ft_interaction() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

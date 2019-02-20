@@ -160,9 +160,11 @@ spark_apply <- function(x,
   proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
 
   time_zone <- ""
+  records_per_batch <- NULL
   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
   if (arrow) {
     time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
+    records_per_batch <- as.integer(spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||% 10000)
   }
 
   # build reduced size query plan in case schema needs to be inferred
@@ -247,8 +249,8 @@ spark_apply <- function(x,
       rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
     }
     else if (arrow) {
-      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone)
-      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone)
+      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
     }
     else {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
@@ -288,6 +290,7 @@ spark_apply <- function(x,
     connection_config(sc, "sparklyr.apply.options."),
     as.character
   )
+  if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
 
   if (identical(args$rdd, TRUE)) {
     rdd <- invoke_static(

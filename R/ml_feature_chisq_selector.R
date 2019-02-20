@@ -18,8 +18,9 @@
 #' @export
 ft_chisq_selector <- function(x, features_col = "features", output_col = NULL, label_col = "label",
                               selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-                              num_top_features = 50, percentile = 0.1, dataset = NULL,
+                              num_top_features = 50, percentile = 0.1,
                               uid = random_string("chisq_selector_"), ...) {
+  check_dots_used()
   UseMethod("ft_chisq_selector")
 }
 
@@ -28,8 +29,9 @@ ml_chisq_selector <- ft_chisq_selector
 #' @export
 ft_chisq_selector.spark_connection <- function(x, features_col = "features", output_col = NULL, label_col = "label",
                                                selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-                                               num_top_features = 50, percentile = 0.1, dataset = NULL,
+                                               num_top_features = 50, percentile = 0.1,
                                                uid = random_string("chisq_selector_"), ...) {
+
   .args <- list(
     features_col = features_col,
     output_col = output_col,
@@ -58,16 +60,13 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
     jobj_set_param("setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures") %>%
     new_ml_chisq_selector()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
 ft_chisq_selector.ml_pipeline <- function(x, features_col = "features", output_col = NULL, label_col = "label",
                                           selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-                                          num_top_features = 50, percentile = 0.1, dataset = NULL,
+                                          num_top_features = 50, percentile = 0.1,
                                           uid = random_string("chisq_selector_"), ...) {
   stage <- ft_chisq_selector.spark_connection(
     x = spark_connection(x),
@@ -80,7 +79,6 @@ ft_chisq_selector.ml_pipeline <- function(x, features_col = "features", output_c
     fwe = fwe,
     num_top_features = num_top_features,
     percentile = percentile,
-    dataset = dataset,
     uid = uid,
     ...
   )
@@ -90,7 +88,7 @@ ft_chisq_selector.ml_pipeline <- function(x, features_col = "features", output_c
 #' @export
 ft_chisq_selector.tbl_spark <- function(x, features_col = "features", output_col = NULL, label_col = "label",
                                         selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-                                        num_top_features = 50, percentile = 0.1, dataset = NULL,
+                                        num_top_features = 50, percentile = 0.1,
                                         uid = random_string("chisq_selector_"), ...) {
   stage <- ft_chisq_selector.spark_connection(
     x = spark_connection(x),
@@ -103,7 +101,6 @@ ft_chisq_selector.tbl_spark <- function(x, features_col = "features", output_col
     fwe = fwe,
     num_top_features = num_top_features,
     percentile = percentile,
-    dataset = dataset,
     uid = uid,
     ...
   )

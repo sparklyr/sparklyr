@@ -11,6 +11,7 @@
 #' @export
 ft_ngram <- function(x, input_col = NULL, output_col = NULL, n = 2,
                      uid = random_string("ngram_"), ...) {
+  check_dots_used()
   UseMethod("ft_ngram")
 }
 

@@ -3,10 +3,9 @@
 \name{ml_als}
 \alias{ml_als}
 \alias{ml_recommend}
-\alias{ml_als_factorization}
 \title{Spark ML -- ALS}
 \usage{
-ml_als(x, rating_col = "rating", user_col = "user",
+ml_als(x, formula = NULL, rating_col = "rating", user_col = "user",
   item_col = "item", rank = 10, reg_param = 0.1,
   implicit_prefs = FALSE, alpha = 1, nonnegative = FALSE,
   max_iter = 10, num_user_blocks = 10, num_item_blocks = 10,
@@ -16,18 +15,13 @@ ml_als(x, rating_col = "rating", user_col = "user",
   ...)
 
 ml_recommend(model, type = c("items", "users"), n = 1)
-
-ml_als_factorization(x, rating_col = "rating", user_col = "user",
-  item_col = "item", rank = 10, reg_param = 0.1,
-  implicit_prefs = FALSE, alpha = 1, nonnegative = FALSE,
-  max_iter = 10, num_user_blocks = 10, num_item_blocks = 10,
-  checkpoint_interval = 10, cold_start_strategy = "nan",
-  intermediate_storage_level = "MEMORY_AND_DISK",
-  final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"),
-  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula.
+This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.
+The ALS model requires a specific formula format, please use \code{rating_col ~ user_col + item_col}.}
 
 \item{rating_col}{Column name for ratings. Default: "rating"}
 
@@ -97,8 +91,6 @@ Perform recommendation using Alternating Least Squares (ALS) matrix factorizatio
 }
 \details{
 \code{ml_recommend()} returns the top \code{n} users/items recommended for each item/user, for all items/users. The output has been transformed (exploded and separated) from the default Spark outputs to be more user friendly.
-
-\code{ml_als_factorization()} is an alias for \code{ml_als()} for backwards compatibility.
 }
 \examples{
 \dontrun{
@@ -113,7 +105,7 @@ movies <- data.frame(
 )
 movies_tbl <- sdf_copy_to(sc, movies)
 
-model <- ml_als(movies_tbl)
+model <- ml_als(movies_tbl, rating ~ user + item)
 
 ml_predict(model, movies_tbl)
 

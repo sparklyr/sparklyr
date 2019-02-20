@@ -8,7 +8,7 @@
 ft_word2vec(x, input_col = NULL, output_col = NULL,
   vector_size = 100, min_count = 5, max_sentence_length = 1000,
   num_partitions = 1, step_size = 0.025, max_iter = 1, seed = NULL,
-  dataset = NULL, uid = random_string("word2vec_"), ...)
+  uid = random_string("word2vec_"), ...)
 
 ml_find_synonyms(model, word, num)
 }
@@ -36,9 +36,6 @@ chunks of up to \code{max_sentence_length} size. Default: 1000}
 
 \item{seed}{A random seed. Set this value if you need your results to be
 reproducible across repeated calls.}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -72,16 +69,8 @@ The object returned depends on the class of \code{x}.
 Word2Vec transforms a word into a code for further natural language processing or machine learning process.
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
