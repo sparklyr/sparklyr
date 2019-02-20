@@ -61,6 +61,8 @@
 
 ### Connections
 
+- Local connection defaults now to 2GB.
+
 - Support to install and connect based on major Spark versions, for
   instance: `spark_connect(master = "local", version = "2.4")`.
 
@@ -76,6 +78,11 @@
   UI. Configurable through the `sparklyr.web.yarn` configuration setting.
 
 - Support for property expansion in `yarn-site.xml` (@lgongmsft, #1876).
+
+## Distributed R
+
+- The `memory` parameter in `spark_apply()` now defaults to `FALSE` when
+  the `name` parameter is not specified.
 
 ## Other
 
