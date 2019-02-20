@@ -122,6 +122,12 @@ spark_connect <- function(master,
 
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 
+  # increase default memory
+  if (spark_master_is_local(master) &&
+      identical(spark_config_value(config, "sparklyr.shell.driver-memory"), NULL)) {
+    config$`sparklyr.shell.driver-memory` <- "2g"
+  }
+
   # determine whether we need cores in master
   passedMaster <- master
   master <- spark_master_local_cores(master, config)
