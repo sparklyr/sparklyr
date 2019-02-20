@@ -8,6 +8,9 @@ default:
   # Enable Hive support by default.
   spark.sql.catalogImplementation: "hive"
 
+  # increase default allocated memory
+  sparklyr.shell.driver-memory.local: "2g"
+
   # default spark packages to load
   # sparklyr.defaultPackages:
 
