@@ -135,12 +135,13 @@ spark_apply_colum_types <- function(sdf) {
 spark_apply <- function(x,
                         f,
                         columns = NULL,
-                        memory = TRUE,
+                        memory = !is.null(name),
                         group_by = NULL,
                         packages = NULL,
                         context = NULL,
                         name = NULL,
                         ...) {
+  memory <- force(memory)
   args <- list(...)
   assert_that(is.function(f) || is.raw(f) || is.language(f))
   if (is.language(f)) f <- rlang::as_closure(f)
