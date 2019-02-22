@@ -1,8 +1,6 @@
 sparklyr: R interface for Apache Spark
 ================
 
-<script async defer src="https://buttons.github.io/buttons.js"></script>
-
 [![Build
 Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr)
 [![AppVeyor Build
@@ -12,7 +10,6 @@ Status](https://ci.appveyor.com/api/projects/status/github/rstudio/sparklyr?bran
 [![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr)
 [![Join the chat at
 https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-<a class="github-button" href="https://github.com/rstudio/sparklyr" data-icon="octicon-star" data-show-count="true" aria-label="Star rstudio/sparklyr on GitHub">Star</a>
 
 <img src="tools/readme/sparklyr-illustration.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
 
