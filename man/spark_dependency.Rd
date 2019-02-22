@@ -4,12 +4,14 @@
 \alias{spark_dependency}
 \title{Define a Spark dependency}
 \usage{
-spark_dependency(jars = NULL, packages = NULL)
+spark_dependency(jars = NULL, packages = NULL, ...)
 }
 \arguments{
-\item{jars}{Character vector of full paths to JAR files}
+\item{jars}{Character vector of full paths to JAR files.}
 
-\item{packages}{Character vector of Spark packages names}
+\item{packages}{Character vector of Spark packages names.}
+
+\item{...}{Additional optional arguments.}
 }
 \value{
 An object of type `spark_dependency`
