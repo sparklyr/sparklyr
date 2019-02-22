@@ -48,8 +48,6 @@ spark_default_app_jar <- function(version) {
 #'   cluster.
 #' @param version The version of Spark to use. Only applicable to
 #'   \code{"local"} Spark connections.
-#' @param hadoop_version The version of Hadoop to use. Only applicable to
-#'   \code{"local"} Spark connections.
 #' @param extensions Extension packages to enable for this connection. By
 #'   default, all packages enabled through the use of
 #'   \code{\link[=register_extension]{sparklyr::register_extension}} will be passed here.
@@ -91,19 +89,27 @@ spark_config_shell_args <- function(config, master) {
 #'
 #' spark_disconnect(sc)
 #'
+#' @details
+#'
+#' When using \code{method = "livy"}, it is recommended to specify \code{version}
+#' parameter to improve performance by using precompiled code rather than uploading
+#' sources. By default, jars are downloaded from GitHub but the path to the correct
+#' \code{sparklyr} JAR can also be specified through the \code{livy.jars} setting.
+#'
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
                           method = c("shell", "livy", "databricks", "test"),
                           app_name = "sparklyr",
                           version = NULL,
-                          hadoop_version = NULL,
                           config = spark_config(),
                           extensions = sparklyr::registered_extensions(),
                           ...)
 {
   # validate method
   method <- match.arg(method)
+
+  hadoop_version <- list(...)$hadoop_version
 
   master_override <- spark_config_value(config, "sparklyr.connect.master", NULL)
   if (!is.null(master_override)) master <- master_override
@@ -199,6 +205,13 @@ spark_connect <- function(master,
   }
 
   scon <- initialize_connection(scon)
+
+  # initialize extensions
+  if (!identical(scon$extensions, NULL)) {
+    for (initializer in scon$extensions$initializers) {
+      if (is.function(initializer)) initializer(scon)
+    }
+  }
 
   # register mapping tables for spark.ml
 
