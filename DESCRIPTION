@@ -13,11 +13,11 @@ Authors@R: c(
     person(family = "The Apache Software Foundation", role = c("aut", "cph"))
     )
 Maintainer: Javier Luraschi <javier@rstudio.com>
-Description: R interface to Apache Spark, a fast and general engine for big data
-    processing, see <http://spark.apache.org>. This package supports connecting to
-    local and remote Apache Spark clusters and provides suppport for 'dplyr', 'broom, 
-    Spark's built-in machine learning algorithms to process large datasets and realtime
-    streams.
+Description: R interface to Apache Spark, a unified analytics engine for large-scale
+    data processing, see <http://spark.apache.org>. This package supports connecting to
+    local and remote Apache Spark clusters, provides a 'dplyr' and 'broom' back-ends,
+    an interface to Spark's built-in machine learning algorithms, structured streaming
+    and enables extensions through Spark's API, Scala code or distributed R code.
 License: Apache License 2.0 | file LICENSE
 SystemRequirements: Spark: 1.6.x or 2.x
 URL: http://spark.rstudio.com
