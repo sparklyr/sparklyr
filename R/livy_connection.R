@@ -594,7 +594,7 @@ livy_connection <- function(master,
   livy_validate_master(master, config)
 
   if (!is.null(version) && !spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
-    extensions <- spark_dependencies_from_extensions(version, extensions)
+    extensions <- spark_dependencies_from_extensions(version, extensions, config)
 
     config$livy.jars <- as.character(c(livy_connection_jars(config, version), extensions$catalog_jars))
 

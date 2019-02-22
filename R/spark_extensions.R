@@ -50,7 +50,7 @@ spark_dependency <- function(jars = NULL,
   ))
 }
 
-spark_dependencies_from_extensions <- function(spark_version, extensions) {
+spark_dependencies_from_extensions <- function(spark_version, extensions, config) {
   if (spark_version < "2.0")
     scala_version <- numeric_version("2.10")
   else
@@ -68,12 +68,16 @@ spark_dependencies_from_extensions <- function(spark_version, extensions) {
       packages <- c(packages, dependency$packages)
       initializers <- c(initializers, dependency$initializer)
 
-      if (!grepl("%s", dependency$catalog)) dependency$catalog <- paste0(dependency$catalog, "%s")
+      config_catalog <- spark_config_value(config, "sparklyr.extensions.catalog", TRUE)
+      if (!identical(dependency$catalog, NULL) && !identical(config_catalog, FALSE)) {
+        catalog_path <- dependency$catalog
+        if (is.character(config_catalog)) catalog_path <- config_catalog
 
-      if (!identical(dependency$web_jars, NULL)) {
+        if (!grepl("%s", config_catalog)) config_catalog <- paste0(config_catalog, "%s")
+
         catalog_jars <- c(
           catalog_jars,
-          sprintf(dependency$catalog, basename(jars))
+          sprintf(config_catalog, basename(jars))
         )
       }
     }

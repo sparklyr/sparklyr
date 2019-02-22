@@ -241,7 +241,7 @@ start_shell <- function(master,
              gsub("[-_a-zA-Z]", "", spark_version)
       )
     )
-    extensions <- spark_dependencies_from_extensions(spark_version, extensions)
+    extensions <- spark_dependencies_from_extensions(spark_version, extensions, config)
 
     # combine passed jars and packages with extensions
     all_jars <- c(jars, extensions$jars)
