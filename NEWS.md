@@ -20,8 +20,10 @@
 
 ### Livy
 
-- Significant performance improvements by using `spark_version` in
-  `livy_config()` which enables using the sparklyr JAR rather than
+- Support for sparklyr extensions when using Livy.
+
+- Significant performance improvements by using `version` in
+  `spark_connect()` which enables using the sparklyr JAR rather than
   sources.
 
 - Improved memory use in Livy by using string builders and avoid print

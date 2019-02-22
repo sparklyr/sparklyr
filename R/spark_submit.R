@@ -8,11 +8,10 @@ spark_submit <- function(master,
                          spark_home = Sys.getenv("SPARK_HOME"),
                          app_name = "sparklyr",
                          version = NULL,
-                         hadoop_version = NULL,
                          config = spark_config(),
                          extensions = sparklyr::registered_extensions(),
                          ...) {
-
+  hadoop_version <- list(...)$hadoop_version
   temp_path <- tempfile()
   dir.create(temp_path)
   batch_file <- file.path(temp_path, "sparklyr-batch.R")
