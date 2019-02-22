@@ -32,7 +32,6 @@ registered_extensions <- function() {
 #' @param packages Character vector of Spark packages names.
 #' @param initializer Optional callback function called when initializing a connection.
 #' @param catalog Optional location where extension JAR files can be downloaded for Livy.
-#'   The string might contain a \code{%s} to be replaced by names from \code{jars}.
 #' @param ... Additional optional arguments.
 #'
 #' @return An object of type `spark_dependency`
