@@ -207,7 +207,7 @@ spark_connect <- function(master,
   scon <- initialize_connection(scon)
 
   # initialize extensions
-  if (!identical(scon$extensions, NULL)) {
+  if (length(scon$extensions) > 0) {
     for (initializer in scon$extensions$initializers) {
       if (is.function(initializer)) initializer(scon)
     }
