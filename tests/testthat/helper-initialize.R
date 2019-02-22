@@ -195,8 +195,7 @@ testthat_livy_connection <- function() {
         sparklyr.connect.timeout = 120,
         sparklyr.log.invoke = "cat"
       ),
-      sources = TRUE,
-      version = if (identical(Sys.getenv("LIVY_SOURCES"), "FALSE")) version else NULL
+      sources = TRUE
     )
 
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)

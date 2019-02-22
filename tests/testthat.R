@@ -159,10 +159,4 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   on.exit({ spark_disconnect_all() ; livy_service_stop() })
 
   test_check("sparklyr", filter = test_filter, reporter = "performance")
-
-  if (nchar(livy_version) > 0) {
-    # rerun livy tests using binaries
-    Sys.setenv(LIVY_SOURCES = FALSE)
-    test_check("sparklyr", filter = test_filter, reporter = "performance")
-  }
 }
