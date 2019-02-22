@@ -596,7 +596,7 @@ livy_connection <- function(master,
   if (!is.null(version) && !spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
     extensions <- spark_dependencies_from_extensions(version, extensions)
 
-    config$livy.jars <- as.character(c(livy_connection_jars(config, version), extensions$web_jars))
+    config$livy.jars <- as.character(c(livy_connection_jars(config, version), extensions$catalog_jars))
 
     config[["sparklyr.livy.sources"]] <- FALSE
     config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")

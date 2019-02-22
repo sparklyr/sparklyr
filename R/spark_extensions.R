@@ -31,8 +31,7 @@ registered_extensions <- function() {
 #' @param jars Character vector of full paths to JAR files.
 #' @param packages Character vector of Spark packages names.
 #' @param initializer Optional callback function called when initializing a connection.
-#' @param web_jars Optional http(s) location where the JAR files can be downloaded from,
-#'   used in Livy connections.
+#' @param catalog Optional location where extension JAR files can be downloaded for Livy.
 #' @param ... Additional optional arguments.
 #'
 #' @return An object of type `spark_dependency`
@@ -41,13 +40,13 @@ registered_extensions <- function() {
 spark_dependency <- function(jars = NULL,
                              packages = NULL,
                              initializer = NULL,
-                             web_jars = NULL,
+                             catalog = NULL,
                              ...) {
   structure(class = "spark_dependency", list(
     jars = jars,
     packages = packages,
     initializer = initializer,
-    web_jars = web_jars
+    catalog = catalog
   ))
 }
 
@@ -60,7 +59,7 @@ spark_dependencies_from_extensions <- function(spark_version, extensions) {
   jars <- character()
   packages <- character()
   initializers <- list()
-  web_jars <- character()
+  catalog_jars <- character()
 
   for (extension in extensions) {
     dependencies <- spark_dependencies_from_extension(spark_version, scala_version, extension)
@@ -70,9 +69,9 @@ spark_dependencies_from_extensions <- function(spark_version, extensions) {
       initializers <- c(initializers, dependency$initializer)
 
       if (!identical(dependency$web_jars, NULL)) {
-        web_jars <- c(
-          web_jars,
-          sprintf(dependency$web_jars, basename(jars))
+        catalog_jars <- c(
+          catalog_jars,
+          sprintf(dependency$catalog, basename(jars))
         )
       }
     }
@@ -82,7 +81,7 @@ spark_dependencies_from_extensions <- function(spark_version, extensions) {
     jars = jars,
     packages = packages,
     initializers = initializers,
-    web_jars = web_jars
+    catalog_jars = catalog_jars
   )
 }
 
