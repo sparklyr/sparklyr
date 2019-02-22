@@ -21,8 +21,7 @@ spark_disconnect(sc, ...)
 spark_disconnect_all()
 
 spark_submit(master, file, spark_home = Sys.getenv("SPARK_HOME"),
-  app_name = "sparklyr", version = NULL, hadoop_version = NULL,
-  config = spark_config(),
+  app_name = "sparklyr", version = NULL, config = spark_config(),
   extensions = sparklyr::registered_extensions(), ...)
 }
 \arguments{

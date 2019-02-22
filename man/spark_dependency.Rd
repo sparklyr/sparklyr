@@ -14,6 +14,8 @@ spark_dependency(jars = NULL, packages = NULL, initializer = NULL,
 
 \item{initializer}{Optional callback function called when initializing a connection.}
 
+\item{catalog}{Optional location where extension JAR files can be downloaded for Livy.}
+
 \item{...}{Additional optional arguments.}
 }
 \value{
