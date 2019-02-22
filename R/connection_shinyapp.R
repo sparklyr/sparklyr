@@ -49,7 +49,7 @@ rsApiWritePreference <- function(name, value) {
 
 spark_ui_avaliable_versions <- function() {
   tryCatch({
-    spark_available_versions(show_hadoop = TRUE)
+    spark_available_versions(show_hadoop = TRUE, show_minor = TRUE)
   }, error = function(e) {
     warning(e)
     spark_installed_versions()[,c("spark","hadoop")]
