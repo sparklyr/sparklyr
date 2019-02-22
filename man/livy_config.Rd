@@ -6,8 +6,7 @@
 \usage{
 livy_config(config = spark_config(), username = NULL,
   password = NULL, negotiate = FALSE,
-  custom_headers = list(`X-Requested-By` = "sparklyr"),
-  spark_version = NULL, sources = is.null(spark_version), ...)
+  custom_headers = list(`X-Requested-By` = "sparklyr"), ...)
 }
 \arguments{
 \item{config}{Optional base configuration}
@@ -19,10 +18,6 @@ livy_config(config = spark_config(), username = NULL,
 \item{negotiate}{Whether to use gssnegotiate method or not}
 
 \item{custom_headers}{List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.}
-
-\item{spark_version}{The version of Spark to use, setting this value improves performance by using sparklyr jars.}
-
-\item{sources}{Should sparklyr sources be uploaded? Otherwise, the sparklyr JAR will be downloaded from GitHub or from the \code{jars} location.}
 
 \item{...}{additional Livy session parameters}
 }
@@ -36,12 +31,6 @@ Create a Spark Configuration for Livy
 Extends a Spark \code{spark_config()} configuration with settings
 for Livy. For instance, \code{username} and \code{password}
 define the basic authentication settings for a Livy session.
-
-It is recommended to specify \code{spark_version} to improve
-performance by using precompiled code rather than uploading
-sources. By default, jars are downloaded from GitHub but the
-path to the correct \code{sparklyr} JAR can also be specified
-through the \code{jars} parameter.
 
 The default value of \code{"custom_headers"} is set to \code{list("X-Requested-By" = "sparklyr")}
 in order to facilitate connection to Livy servers with CSRF protection enabled.
