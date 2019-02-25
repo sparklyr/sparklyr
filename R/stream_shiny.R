@@ -10,13 +10,17 @@
 #' @param session The user session to associate this file reader with, or NULL if
 #'   none. If non-null, the reader will automatically stop when the session ends.
 #'
-#' @importFrom shiny reactivePoll
-#'
 #' @export
 reactiveSpark <- function(x,
                           intervalMillis = 1000,
-                          session = shiny::getDefaultReactiveDomain())
+                          session = NULL)
 {
+  if (!"shiny" %in% installed.packages()) stop("The 'shiny' package is required for this operation.")
+
+  getDefaultReactiveDomain <- get("getDefaultReactiveDomain", envir = asNamespace("shiny"))
+  reactivePoll <- get("reactivePoll", envir = asNamespace("shiny"))
+  if (identical(session, NULL)) session <- getDefaultReactiveDomain()
+
   sc <- spark_connection(x)
 
   sdf <- spark_dataframe(x)
@@ -31,7 +35,8 @@ reactiveSpark <- function(x,
 
   stream <- traceable %>% stream_write_memory(name)
 
-  shiny::onStop(function() {
+  onStop <- get("onStop", envir = asNamespace("shiny"))
+  onStop(function() {
     stream_stop(stream)
   }, session = session)
 
