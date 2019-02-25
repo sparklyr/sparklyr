@@ -35,4 +35,4 @@
 ^appveyor.yml$
 ^checkpoints$
 ^ci$
-^tests/testthat/test-extensions-nested.R$
+^tests/testthat/test-extension-nested.R$
