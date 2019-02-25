@@ -45,7 +45,6 @@ Imports:
     rlang (>= 0.1.4),
     rprojroot,
     rstudioapi (>= 0.6),
-    shiny (>= 1.0.1),
     tibble,
     tidyr,
     withr,
@@ -63,4 +62,5 @@ Suggests:
     R6,
     RCurl,
     reshape2,
+    shiny (>= 1.0.1),
     testthat
