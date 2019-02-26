@@ -130,7 +130,8 @@ spark_connect <- function(master,
 
   # increase default memory
   if (spark_master_is_local(master) &&
-      identical(spark_config_value(config, "sparklyr.shell.driver-memory"), NULL)) {
+      identical(spark_config_value(config, "sparklyr.shell.driver-memory"), NULL) &&
+      java_is_x64()) {
     config$`sparklyr.shell.driver-memory` <- "2g"
   }
 

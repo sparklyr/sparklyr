@@ -50,6 +50,14 @@ validate_java_version <- function(master, spark_home) {
   TRUE
 }
 
+java_is_x64 <- function() {
+  java <- spark_get_java(throws = TRUE)
+  if (!nzchar(java)) return(FALSE)
+
+  version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
+  any(grepl("64-Bit", version))
+}
+
 java_install_url <- function() {
   "https://www.java.com/en/"
 }
