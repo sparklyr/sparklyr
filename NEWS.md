@@ -1,4 +1,10 @@
-# Sparklyr 0.9.9000 (unreleased)
+# Sparklyr 1.0.9000 (unreleased)
+
+### Connections
+
+- Reduced default memory for local connections when Java x64 is not installed (#1931).
+
+# Sparklyr 1.0.0
 
 ### Arrow
 
