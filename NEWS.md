@@ -1,5 +1,9 @@
 # Sparklyr 1.0.9000 (unreleased)
 
+### Misc
+
+- Added `sdf_crosstab()` to create contingency tables.
+
 ### Connections
 
 - Reduced default memory for local connections when Java x64 is not installed (#1931).
