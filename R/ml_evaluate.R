@@ -1,8 +1,8 @@
 #' Evaluate the Model on a Validation Set
 #'
-#' Create an \code{ml_summary} object with performance metrics.
+#' Compute performance metrics.
 #'
-#' @param x An ML model object.
+#' @param x An ML model object or an evaluator object.
 #' @param dataset The dataset to be validate the model on.
 #' @export
 ml_evaluate <- function(x, dataset) {

@@ -24,3 +24,11 @@ print.ml_evaluator <- function(x, ...) {
   cat(" (Evaluation Metric)\n")
   cat(paste0("  ", "metric_name: ", ml_param(x, "metric_name")))
 }
+
+#' @rdname ml_evaluator
+#' @export
+ml_evaluate.ml_evaluator <- function(x, dataset) {
+  x %>%
+    spark_jobj() %>%
+    invoke("evaluate", spark_dataframe(dataset))
+}

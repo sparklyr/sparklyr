@@ -25,10 +25,10 @@ ml_evaluate(x, dataset)
 \method{ml_evaluate}{ml_generalized_linear_regression_model}(x, dataset)
 }
 \arguments{
-\item{x}{An ML model object.}
+\item{x}{An ML model object or an evaluator object.}
 
 \item{dataset}{The dataset to be validate the model on.}
 }
 \description{
-Create an \code{ml_summary} object with performance metrics.
+Compute performance metrics.
 }
