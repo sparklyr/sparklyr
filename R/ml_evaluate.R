@@ -56,14 +56,11 @@ ml_evaluate.ml_generalized_linear_regression_model <- function(x, dataset) {
 }
 
 evaluate_ml_model <- function(x, dataset) {
-  sdf <- x$pipeline_model %>%
+  dataset <- x$pipeline_model %>%
     ml_stage(1) %>%
-    ml_transform(dataset) %>%
-    spark_dataframe()
+    ml_transform(dataset)
 
-  x$model %>%
-    spark_jobj() %>%
-    invoke("evaluate", sdf)
+  evaluate_ml_transformer(x, dataset)
 }
 
 evaluate_ml_transformer <- function(x, dataset) {
