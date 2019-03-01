@@ -271,7 +271,7 @@ new_ml_logistic_regression_summary <- function(jobj, ..., class = character()) {
       beta <- cast_nullable_scalar_double(beta)
       if (is.null(beta)) invoke(jobj, "fMeasureByLabel") else invoke(jobj, "fMeasureByLabel", beta)
     }
-    s$false_positive_by_label <- function() invoke(jobj, "falsePositiveByLabel")
+    s$false_positive_rate_by_label <- function() invoke(jobj, "falsePositiveRateByLabel")
     s$labels <- function() invoke(jobj, "labels")
     s$precision_by_label <- function() invoke(jobj, "precisionByLabel")
     s$recall_by_label <- function() invoke(jobj, "recallByLabel")
