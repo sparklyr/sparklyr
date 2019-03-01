@@ -4,7 +4,14 @@
 #'
 #' @param x An ML model object.
 #' @param dataset The dataset to be validate the model on.
-#' @name ml_evaluate
+#' @export
+ml_evaluate <- function(x, dataset) {
+  UseMethod("ml_evaluate")
+}
+
+ml_evaluate.default <- function(x, dataset) {
+  stop("`ml_evaluate()` is not supported for `", class(x)[[1]], "`.", call. = FALSE)
+}
 
 #' @rdname ml_evaluate
 #' @export
