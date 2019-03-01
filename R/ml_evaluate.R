@@ -10,14 +10,14 @@
 #' @export
 ml_evaluate.ml_model_logistic_regression <- function(x, dataset) {
   evaluate_ml_model(x, dataset) %>%
-    new_ml_summary_logistic_regression_model()
+    logreg_summary()
 }
 
 #' @rdname ml_evaluate
 #' @export
 ml_evaluate.ml_logistic_regression_model <- function(x, dataset) {
   evaluate_ml_transformer(x, dataset) %>%
-    new_ml_summary_logistic_regression_model()
+    logreg_summary()
 }
 
 #' @rdname ml_evaluate
@@ -64,3 +64,8 @@ evaluate_ml_transformer <- function(x, dataset) {
     spark_jobj() %>%
     invoke("evaluate", spark_dataframe(dataset))
 }
+
+logreg_summary <- function(jobj) tryCatch(
+  new_ml_binary_logistic_regression_summary(invoke(jobj, "asBinary")),
+  error = function(e) new_ml_logistic_regression_summary(jobj)
+)

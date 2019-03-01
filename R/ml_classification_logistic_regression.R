@@ -236,12 +236,10 @@ new_ml_logistic_regression_model <- function(jobj) {
   is_multinomial <- invoke(jobj, "numClasses") > 2
 
   summary <- if (invoke(jobj, "hasSummary")) {
-    summary_jobj <- if (spark_version(spark_connection(jobj)) >= "2.3.0" &&
-                        !is_multinomial)
-      invoke(jobj, "binarySummary")
+    if (!is_multinomial)
+      new_ml_binary_logistic_regression_summary(invoke(jobj, "binarySummary"))
     else
-      jobj
-    new_ml_summary_logistic_regression_model(invoke(jobj, "summary"))
+      new_ml_logistic_regression_summary(invoke(jobj, "summary"))
   }
 
   new_ml_probabilistic_classification_model(
@@ -255,35 +253,51 @@ new_ml_logistic_regression_model <- function(jobj) {
     class = "ml_logistic_regression_model")
 }
 
-new_ml_summary_logistic_regression_model <- function(jobj) {
-  new_ml_summary(
+new_ml_logistic_regression_summary <- function(jobj, ..., class = character()) {
+  s <- new_ml_summary(
     jobj,
-    area_under_roc = possibly_null(~ invoke(jobj, "areaUnderROC")),
-    f_measure_by_threshold = possibly_null(
-      ~ invoke(jobj, "fMeasureByThreshold") %>%
-          invoke("withColumnRenamed", "F-Measure", "F_Measure") %>%
-          collect()
-    ),
-    false_positive_rate_by_label = possibly_null(~ invoke(jobj, "falsePositiveRateByLabel")),
-    precision_by_label = possibly_null(~ invoke(jobj, "precisionByLabel")),
-    recall_by_label = possibly_null(~ invoke(jobj, "recallByLabel")),
-    true_positive_rate_by_label = possibly_null(~ invoke(jobj, "truePositiveRateByLabel")),
-    weighted_f_measure = possibly_null(~ invoke(jobj, "weightedFMeasure")),
-    weighted_false_positive_rate = possibly_null(~ invoke(jobj, "weightedFalsePositiveRate")),
-    weighted_precision = possibly_null(~ invoke(jobj, "weightedPrecision")),
-    weighted_recall = possibly_null(~ invoke(jobj, "weightedRecall")),
-    weighted_true_positive_rate = possibly_null(~ invoke(jobj, "weightedTruePositiveRate")),
     features_col = function() invoke(jobj, "featuresCol"),
     label_col = function() invoke(jobj, "labelCol"),
-    objective_history = function() invoke(jobj, "objectiveHistory"),
-    pr = function() possibly_null(~ invoke(jobj, "pr") %>% collect()),
-    precision_by_threshold = possibly_null(~ invoke(jobj, "precisionByThreshold") %>% collect()),
-    predictions = function() invoke(jobj, "predictions") %>% sdf_register(),
+    predictions = function() invoke(jobj, "predictions"),
     probability_col = function() invoke(jobj, "probabilityCol"),
-    recall_by_threshold = possibly_null(~ invoke(jobj, "recallByThreshold") %>% collect()),
-    roc = possibly_null(~ invoke(jobj, "roc") %>% collect()),
-    total_iterations = function() invoke(jobj, "totalIterations"),
-    class = "ml_summary_logistic_regression"
+    class = c(class, "ml_logistic_regression_summary")
+  )
+
+  if (spark_version(spark_connection(jobj)) >= "2.3.0") {
+    s$prediction_col <- function() invoke(jobj, "predictionCol")
+    s$accuracy <- function() invoke(jobj, "accuracy")
+    s$f_measure_by_label <- function(beta = NULL) {
+      beta <- cast_nullable_scalar_double(beta)
+      if (is.null(beta)) invoke(jobj, "fMeasureByLabel") else invoke(jobj, "fMeasureByLabel", beta)
+    }
+    s$false_positive_by_label <- function() invoke(jobj, "falsePositiveByLabel")
+    s$labels <- function() invoke(jobj, "labels")
+    s$precision_by_label <- function() invoke(jobj, "precisionByLabel")
+    s$recall_by_label <- function() invoke(jobj, "recallByLabel")
+    s$true_positive_rate_by_label <- function() invoke(jobj, "truePositiveRateByLabel")
+    s$weighted_f_measure <- function(beta = NULL) {
+      beta <- cast_nullable_scalar_double(beta)
+      if (is.null(beta)) invoke(jobj, "weightedFMeasure") else invoke(jobj, "weightedFMeasure", beta)
+    }
+    s$weighted_false_positive_rate <- function() invoke(jobj, "weightedFalsePositiveRate")
+    s$weighted_precision <- function() invoke(jobj, "weightedPrecision")
+    s$weighted_recall <- function() invoke(jobj, "weightedRecall")
+    s$weighted_true_positive_rate <- function() invoke(jobj, "weightedTruePositiveRate")
+  }
+
+  s
+}
+
+new_ml_binary_logistic_regression_summary <- function(jobj) {
+  new_ml_logistic_regression_summary(
+    jobj,
+    area_under_roc = function() invoke(jobj, "areaUnderROC"),
+    f_measure_by_threshold = function() invoke(jobj, "fMeasureByThreshold"),
+    pr = function() invoke(jobj, "pr"),
+    precision_by_threshold = function() invoke(jobj, "precisionByThreshold"),
+    recall_by_threshold = function() invoke(jobj, "recallByThreshold"),
+    roc = function() invoke(jobj, "roc"),
+    class = "ml_binary_logistic_regression_summary"
   )
 }
 
