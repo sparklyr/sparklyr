@@ -24,16 +24,3 @@ print.ml_evaluator <- function(x, ...) {
   cat(" (Evaluation Metric)\n")
   cat(paste0("  ", "metric_name: ", ml_param(x, "metric_name")))
 }
-
-#' Spark ML -- Evaluate prediction frames with evaluators
-#'
-#' Evaluate a prediction dataset with a Spark ML evaluator
-#'
-#' @param x A \code{ml_evaluator} object.
-#' @param dataset A \code{spark_tbl} with columns as specified in the evaluator object.
-#' @export
-ml_evaluate <- function(x, dataset) {
-  x %>%
-    spark_jobj() %>%
-    invoke("evaluate", spark_dataframe(dataset))
-}
