@@ -60,7 +60,7 @@ evaluate_ml_model <- function(x, dataset) {
     ml_stage(1) %>%
     ml_transform(dataset)
 
-  evaluate_ml_transformer(x, dataset)
+  evaluate_ml_transformer(x$model, dataset)
 }
 
 evaluate_ml_transformer <- function(x, dataset) {
