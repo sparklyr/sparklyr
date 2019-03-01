@@ -132,7 +132,7 @@ new_ml_kmeans <- function(jobj) {
 }
 
 new_ml_kmeans_model <- function(jobj) {
-  summary <- possibly_null(~ new_ml_summary_kmeans_model(invoke(jobj, "summary")))()
+  summary <- possibly_null(~ new_ml_kmeans_summary(invoke(jobj, "summary")))()
   new_ml_clustering_model(
     jobj,
     # `def clusterCenters`
@@ -147,8 +147,8 @@ new_ml_kmeans_model <- function(jobj) {
     class = "ml_kmeans_model")
 }
 
-new_ml_summary_kmeans_model <- function(jobj) {
-  new_ml_summary_clustering(
+new_ml_kmeans_summary <- function(jobj) {
+  new_ml_clustering_summary(
     jobj,
-    class = "ml_summary_kmeans")
+    class = "ml_kmeans_summary")
 }

@@ -23,7 +23,7 @@ print.ml_summary <- function(x, ...) {
   }
 }
 
-new_ml_summary_clustering <- function(jobj, ..., class = character()) {
+new_ml_clustering_summary <- function(jobj, ..., class = character()) {
   new_ml_summary(
     jobj,
     cluster = function() invoke(jobj, "cluster") %>% sdf_register(), # lazy val
@@ -32,6 +32,6 @@ new_ml_summary_clustering <- function(jobj, ..., class = character()) {
     k = invoke(jobj, "k"),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
-    class = c(class, "ml_summary_clustering")
+    class = c(class, "ml_clustering_summary")
   )
 }
