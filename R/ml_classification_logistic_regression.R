@@ -293,11 +293,16 @@ new_ml_binary_logistic_regression_summary <- function(jobj) {
   new_ml_logistic_regression_summary(
     jobj,
     area_under_roc = function() invoke(jobj, "areaUnderROC"),
-    f_measure_by_threshold = function() invoke(jobj, "fMeasureByThreshold"),
-    pr = function() invoke(jobj, "pr"),
-    precision_by_threshold = function() invoke(jobj, "precisionByThreshold"),
-    recall_by_threshold = function() invoke(jobj, "recallByThreshold"),
-    roc = function() invoke(jobj, "roc"),
+    f_measure_by_threshold = function() invoke(jobj, "fMeasureByThreshold") %>%
+      sdf_register(),
+    pr = function() invoke(jobj, "pr") %>%
+      sdf_register(),
+    precision_by_threshold = function() invoke(jobj, "precisionByThreshold") %>%
+      sdf_register(),
+    recall_by_threshold = function() invoke(jobj, "recallByThreshold") %>%
+      sdf_register(),
+    roc = function() invoke(jobj, "roc") %>%
+      sdf_register(),
     class = "ml_binary_logistic_regression_summary"
   )
 }
