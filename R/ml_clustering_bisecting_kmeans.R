@@ -138,6 +138,8 @@ new_ml_bisecting_kmeans_model <- function(jobj) {
         lapply(invoke, "toArray")
     ),
     compute_cost = function(dataset) {
+      if (spark_version(spark_connection(jobj)) >= "2.4.0")
+        warning("`compute_cost()` has been deprecated since Spark 2.4.0.", call. = FALSE)
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },
     summary = summary,
