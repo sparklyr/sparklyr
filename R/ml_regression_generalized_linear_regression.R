@@ -244,7 +244,7 @@ new_ml_generalized_linear_regression <- function(jobj) {
 new_ml_generalized_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary")) {
     fit_intercept <- ml_get_param_map(jobj)$fit_intercept
-    new_ml_summary_generalized_linear_regression_model(
+    new_ml_generalized_linear_regression_summary(
       invoke(jobj, "summary"), fit_intercept
     )
   } else
@@ -259,7 +259,7 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     class = "ml_generalized_linear_regression_model")
 }
 
-new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_intercept) {
+new_ml_generalized_linear_regression_summary <- function(jobj, fit_intercept) {
   version <- jobj %>%
     spark_connection() %>%
     spark_version()
@@ -293,5 +293,5 @@ new_ml_summary_generalized_linear_regression_model <- function(jobj, fit_interce
       ~ invoke(jobj, "tValues") %>% # lazy val
         arrange_stats()
     ),
-    class = "ml_summary_generalized_linear_regression")
+    class = "ml_generalized_linear_regression_summary")
 }
