@@ -30,29 +30,33 @@ ml_evaluate.ml_logistic_regression_model <- function(x, dataset) {
 #' @rdname ml_evaluate
 #' @export
 ml_evaluate.ml_model_linear_regression <- function(x, dataset) {
+  fit_intercept <- ml_param(x$model, "fit_intercept")
   evaluate_ml_model(x, dataset) %>%
-    new_ml_linear_regression_summary()
+    new_ml_linear_regression_summary(fit_intercept = fit_intercept)
 }
 
 #' @rdname ml_evaluate
 #' @export
 ml_evaluate.ml_linear_regression_model <- function(x, dataset) {
+  fit_intercept <- ml_param(x, "fit_intercept")
   evaluate_ml_transformer(x, dataset) %>%
-    new_ml_linear_regression_summary()
+    new_ml_linear_regression_summary(fit_intercept = fit_intercept)
 }
 
 #' @rdname ml_evaluate
 #' @export
 ml_evaluate.ml_model_generalized_linear_regression <- function(x, dataset) {
+  fit_intercept <- ml_param(x$model, "fit_intercept")
   evaluate_ml_model(x, dataset) %>%
-    new_ml_generalized_linear_regression_summary()
+    new_ml_generalized_linear_regression_summary(fit_intercept = fit_intercept)
 }
 
 #' @rdname ml_evaluate
 #' @export
 ml_evaluate.ml_generalized_linear_regression_model <- function(x, dataset) {
+  fit_intercept <- ml_param(x, "fit_intercept")
   evaluate_ml_transformer(x, dataset) %>%
-    new_ml_generalized_linear_regression_summary()
+    new_ml_generalized_linear_regression_summary(fit_intercept = fit_intercept)
 }
 
 evaluate_ml_model <- function(x, dataset) {
