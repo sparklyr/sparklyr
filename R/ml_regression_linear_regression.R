@@ -185,7 +185,7 @@ new_ml_linear_regression <- function(jobj) {
 new_ml_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary")) {
     fit_intercept <- ml_get_param_map(jobj)$fit_intercept
-    new_ml_summary_linear_regression_model(invoke(jobj, "summary"), fit_intercept)
+    new_ml_linear_regression_summary(invoke(jobj, "summary"), fit_intercept)
   } else NULL
 
   new_ml_prediction_model(
@@ -197,18 +197,16 @@ new_ml_linear_regression_model <- function(jobj) {
     class = "ml_linear_regression_model")
 }
 
-new_ml_summary_linear_regression_model <- function(jobj, fit_intercept) {
+new_ml_linear_regression_summary <- function(jobj, fit_intercept) {
   arrange_stats <- make_stats_arranger(fit_intercept)
 
-  new_ml_summary(
+  s <- new_ml_summary(
     jobj,
-    # `lazy val coefficientStandardErrors`
+        # `lazy val coefficientStandardErrors`
     coefficient_standard_errors = possibly_null(
       ~ invoke(jobj, "coefficientStandardErrors") %>%
         arrange_stats()
     ),
-    degrees_of_freedom = if (spark_version(spark_connection(jobj)) >= "2.2.0")
-      invoke(jobj, "degreesOfFreedom") else NULL,
     # `lazy val devianceResiduals`
     deviance_residuals = function() invoke(jobj, "devianceResiduals"),
     explained_variance = invoke(jobj, "explainedVariance"),
@@ -235,4 +233,11 @@ new_ml_summary_linear_regression_model <- function(jobj, fit_intercept) {
         arrange_stats()
     ),
     class = "ml_summary_linear_regression")
+
+  if (spark_version(spark_connection(jobj)) >= "2.2.0") {
+    s$degrees_of_freedom <- invoke(jobj, "degreesOfFreedom")
+    s$r2adj <- invoke(jobj, "r2adj")
+  }
+
+  s
 }

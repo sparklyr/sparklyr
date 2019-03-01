@@ -24,14 +24,14 @@ ml_evaluate.ml_logistic_regression_model <- function(x, dataset) {
 #' @export
 ml_evaluate.ml_model_linear_regression <- function(x, dataset) {
   evaluate_ml_model(x, dataset) %>%
-    new_ml_summary_linear_regression_model()
+    new_ml_linear_regression_summary()
 }
 
 #' @rdname ml_evaluate
 #' @export
 ml_evaluate.ml_linear_regression_model <- function(x, dataset) {
   evaluate_ml_transformer(x, dataset) %>%
-    new_ml_summary_linear_regression_model()
+    new_ml_linear_regression_summary()
 }
 
 #' @rdname ml_evaluate
