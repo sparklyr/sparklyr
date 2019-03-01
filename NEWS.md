@@ -1,4 +1,10 @@
-# Sparklyr 1.0.9000 (unreleased)
+# Sparklyr 1.0.9002 (unreleased)
+
+### ML
+
+- Implemented `ml_evaluate()` for logistic regression, linear regression, and GLM models.
+- Implemented `print()` method for `ml_summary` objects.
+- Deprecated `compute_cost()` for KMeans in Spark 2.4 (#1772).
 
 ### Misc
 
