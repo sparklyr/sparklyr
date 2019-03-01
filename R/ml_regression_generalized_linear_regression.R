@@ -277,21 +277,11 @@ new_ml_generalized_linear_regression_summary <- function(jobj, fit_intercept) {
     dispersion = function() invoke(jobj, "dispersion"), # lazy val
     null_deviance = function() invoke(jobj, "nullDeviance"), # lazy val
     num_instances = if (version > "2.2.0") function() invoke(jobj, "numInstances") else NULL, # lazy val
-    num_iterations = possibly_null(invoke)(jobj, "numIterations"),
-    p_values = possibly_null(
-      ~ invoke(jobj, "pValues") %>% # lazy val
-        arrange_stats()
-    ),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
     rank = invoke(jobj, "rank"), # lazy val
     residual_degree_of_freedom = function() invoke(jobj, "residualDegreeOfFreedom"), # lazy val
     residual_degree_of_freedom_null = function() invoke(jobj, "residualDegreeOfFreedomNull"), # lazy val
     residuals = function(type = "deviance") (invoke(jobj, "residuals", type) %>% sdf_register()),
-    solver = possibly_null(invoke)(jobj, "solver"),
-    t_values = possibly_null(
-      ~ invoke(jobj, "tValues") %>% # lazy val
-        arrange_stats()
-    ),
     class = "ml_generalized_linear_regression_summary")
 }
