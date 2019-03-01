@@ -32,6 +32,7 @@ new_ml_clustering_summary <- function(jobj, ..., class = character()) {
     k = invoke(jobj, "k"),
     prediction_col = invoke(jobj, "predictionCol"),
     predictions = invoke(jobj, "predictions") %>% sdf_register(),
+    ...,
     class = c(class, "ml_clustering_summary")
   )
 }

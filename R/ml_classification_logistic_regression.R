@@ -261,6 +261,7 @@ new_ml_logistic_regression_summary <- function(jobj, ..., class = character()) {
     predictions = function() invoke(jobj, "predictions") %>%
       sdf_register(),
     probability_col = function() invoke(jobj, "probabilityCol"),
+    ...,
     class = c(class, "ml_logistic_regression_summary")
   )
 
