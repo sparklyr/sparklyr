@@ -232,7 +232,7 @@ new_ml_linear_regression_summary <- function(jobj, fit_intercept) {
       ~ invoke(jobj, "tValues") %>%
         arrange_stats()
     ),
-    class = "ml_summary_linear_regression")
+    class = "ml_linear_regression_summary")
 
   if (spark_version(spark_connection(jobj)) >= "2.2.0") {
     s$degrees_of_freedom <- invoke(jobj, "degreesOfFreedom")
