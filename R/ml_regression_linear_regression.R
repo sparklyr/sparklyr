@@ -236,6 +236,9 @@ new_ml_linear_regression_summary <- function(jobj, fit_intercept) {
 
   if (spark_version(spark_connection(jobj)) >= "2.2.0") {
     s$degrees_of_freedom <- invoke(jobj, "degreesOfFreedom")
+  }
+
+  if (spark_version(spark_connection(jobj)) >= "2.3.0") {
     s$r2adj <- invoke(jobj, "r2adj")
   }
 
