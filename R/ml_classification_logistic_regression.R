@@ -236,7 +236,7 @@ new_ml_logistic_regression_model <- function(jobj) {
   is_multinomial <- invoke(jobj, "numClasses") > 2
 
   summary <- if (invoke(jobj, "hasSummary")) {
-    if (!is_multinomial)
+    if (!is_multinomial && spark_version(spark_connection(jobj)) >= "2.3.0")
       new_ml_binary_logistic_regression_summary(invoke(jobj, "binarySummary"))
     else
       new_ml_logistic_regression_summary(invoke(jobj, "summary"))
