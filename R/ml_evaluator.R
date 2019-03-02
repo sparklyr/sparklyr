@@ -25,7 +25,7 @@ print.ml_evaluator <- function(x, ...) {
   cat(paste0("  ", "metric_name: ", ml_param(x, "metric_name")))
 }
 
-#' @rdname ml_evaluator
+#' @rdname ml_evaluate
 #' @export
 ml_evaluate.ml_evaluator <- function(x, dataset) {
   x %>%
