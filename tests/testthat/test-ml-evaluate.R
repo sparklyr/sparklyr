@@ -1,6 +1,7 @@
 context("ml - evaluate")
 
 test_that("ml_evaluate() works for logistic regression", {
+  test_requires_version("2.0.0", "multiclass logreg requires spark 2+")
   iris_tbl <- testthat_tbl("iris")
   model <- ml_logistic_regression(iris_tbl, Species ~ .)
   s <- ml_evaluate(model, iris_tbl)
@@ -95,6 +96,7 @@ test_that("ml_evaluate() works for linear regression", {
 })
 
 test_that("ml_evaluate() works for generalized linear regression", {
+  test_requires_version("2.0.0", "glm requires spark 2+")
   mtcars_tbl <- testthat_tbl("mtcars")
   model <- ml_generalized_linear_regression(mtcars_tbl, mpg ~ .)
   s <- ml_evaluate(model, mtcars_tbl)
