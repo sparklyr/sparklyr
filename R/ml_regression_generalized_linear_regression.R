@@ -23,8 +23,8 @@
 #'     \item tweedie: power link function specified through \code{link_power}. The default link power in the tweedie family is \code{1 - variance_power}.
 #'     }
 #'
-#'@examples
-#'\dontrun{
+#' @examples
+#' \dontrun{
 #' library(sparklyr)
 #'
 #' sc <- spark_connect(master = "local")
@@ -43,18 +43,19 @@
 #' family_link <- data.frame(family_link, rmse = 0)
 #'
 #' # Train the models
-#' for(i in 1:nrow(family_link)){
+#' for (i in 1:nrow(family_link)) {
 #'   glm_model <- mtcars_training %>%
 #'     ml_generalized_linear_regression(mpg ~ .,
-#'                                     family = family_link[i, 1],
-#'                                     link = family_link[i, 2])
+#'       family = family_link[i, 1],
+#'       link = family_link[i, 2]
+#'     )
 #'
 #'   pred <- ml_predict(glm_model, mtcars_test)
-#'   family_link[i,3] <- ml_regression_evaluator(pred, label_col = "mpg")
+#'   family_link[i, 3] <- ml_regression_evaluator(pred, label_col = "mpg")
 #' }
 #'
 #' family_link
-#'}
+#' }
 #'
 #' @export
 ml_generalized_linear_regression <- function(x, formula = NULL, family = "gaussian",
@@ -133,7 +134,6 @@ ml_generalized_linear_regression.ml_pipeline <- function(x, formula = NULL, fami
                                                          prediction_col = "prediction",
                                                          uid = random_string("generalized_linear_regression_"),
                                                          ...) {
-
   stage <- ml_generalized_linear_regression(
     x = spark_connection(x),
     formula = formula,
@@ -168,9 +168,6 @@ ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family
                                                        prediction_col = "prediction",
                                                        uid = random_string("generalized_linear_regression_"),
                                                        response = NULL, features = NULL, ...) {
-
-
-
   formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_generalized_linear_regression(
@@ -244,11 +241,12 @@ new_ml_generalized_linear_regression <- function(jobj) {
 new_ml_generalized_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary")) {
     fit_intercept <- ml_get_param_map(jobj)$fit_intercept
-    new_ml_generalized_linear_regression_summary(
+    new_ml_generalized_linear_regression_training_summary(
       invoke(jobj, "summary"), fit_intercept
     )
-  } else
+  } else {
     NULL
+  }
 
   new_ml_prediction_model(
     jobj,
@@ -256,10 +254,11 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     intercept = invoke(jobj, "intercept"),
     link_prediction_col = if (invoke(jobj, "isSet", invoke(jobj, "linkPredictionCol"))) invoke(jobj, "getLinkPredictionCol") else NULL,
     summary = summary,
-    class = "ml_generalized_linear_regression_model")
+    class = "ml_generalized_linear_regression_model"
+  )
 }
 
-new_ml_generalized_linear_regression_summary <- function(jobj, fit_intercept) {
+new_ml_generalized_linear_regression_summary <- function(jobj, fit_intercept, ..., class = character()) {
   version <- jobj %>%
     spark_connection() %>%
     spark_version()
@@ -268,12 +267,9 @@ new_ml_generalized_linear_regression_summary <- function(jobj, fit_intercept) {
   new_ml_summary(
     jobj,
     aic = function() invoke(jobj, "aic"), # lazy val
-    coefficient_standard_errors = possibly_null(
-      ~ invoke(jobj, "coefficientStandardErrors") %>%
-        arrange_stats()
-    ), # lazy val
+
     degrees_of_freedom = function() invoke(jobj, "degreesOfFreedom"), # lazy val
-    deviance = function()invoke(jobj, "deviance"), # lazy val
+    deviance = function() invoke(jobj, "deviance"), # lazy val
     dispersion = function() invoke(jobj, "dispersion"), # lazy val
     null_deviance = function() invoke(jobj, "nullDeviance"), # lazy val
     num_instances = if (version > "2.2.0") function() invoke(jobj, "numInstances") else NULL, # lazy val
@@ -283,5 +279,23 @@ new_ml_generalized_linear_regression_summary <- function(jobj, fit_intercept) {
     residual_degree_of_freedom = function() invoke(jobj, "residualDegreeOfFreedom"), # lazy val
     residual_degree_of_freedom_null = function() invoke(jobj, "residualDegreeOfFreedomNull"), # lazy val
     residuals = function(type = "deviance") (invoke(jobj, "residuals", type) %>% sdf_register()),
-    class = "ml_generalized_linear_regression_summary")
+    ...,
+    class = "ml_generalized_linear_regression_summary"
+  )
+}
+
+new_ml_generalized_linear_regression_training_summary <- function(jobj, fit_intercept) {
+  arrange_stats <- make_stats_arranger(fit_intercept)
+
+  s <- new_ml_generalized_linear_regression_summary(
+    jobj, fit_intercept,
+    coefficient_standard_errors = possibly_null(~ invoke(jobj, "coefficientStandardErrors") %>% arrange_stats()),
+    num_iterations = invoke(jobj, "numIterations"),
+    solver = invoke(jobj, "solver"),
+    p_values = possibly_null(~ invoke(jobj, "pValues") %>% arrange_stats()),
+    t_values = possibly_null(~ invoke(jobj, "tValues") %>% arrange_stats()),
+    class = "ml_generalized_linear_regression_training_summary"
+  )
+
+  s
 }
