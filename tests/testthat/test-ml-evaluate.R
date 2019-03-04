@@ -104,7 +104,6 @@ test_that("ml_evaluate() works for generalized linear regression", {
 
   expect_error({
     s$aic()
-    s$coefficient_standard_errors()
     s$degrees_of_freedom()
     s$deviance()
     s$dispersion()
