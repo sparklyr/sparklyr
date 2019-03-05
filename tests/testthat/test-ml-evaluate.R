@@ -2,6 +2,7 @@ context("ml - evaluate")
 
 test_that("ml_evaluate() works for logistic regression", {
   test_requires_version("2.0.0", "multiclass logreg requires spark 2+")
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   model <- ml_logistic_regression(iris_tbl, Species ~ .)
   s <- ml_evaluate(model, iris_tbl)
@@ -14,21 +15,29 @@ test_that("ml_evaluate() works for logistic regression", {
     s$predictions()
     s$probability_col()
     s$prediction_col()
-    s$accuracy()
-    s$f_measure_by_label()
-    s$false_positive_rate_by_label()
-    s$labels()
-    s$precision_by_label()
-    s$recall_by_label()
-    s$true_positive_rate_by_label()
-    s$weighted_f_measure(0.1)
-    s$weighted_f_measure()
-    s$weighted_false_positive_rate()
-    s$weighted_precision()
-    s$weighted_recall()
-    s$weighted_true_positive_rate()
   },
-  NA)
+  NA
+  )
+
+  if (spark_version(sc) >= "2.3.0") {
+    expect_error({
+      s$accuracy()
+      s$f_measure_by_label()
+      s$false_positive_rate_by_label()
+      s$labels()
+      s$precision_by_label()
+      s$recall_by_label()
+      s$true_positive_rate_by_label()
+      s$weighted_f_measure(0.1)
+      s$weighted_f_measure()
+      s$weighted_false_positive_rate()
+      s$weighted_precision()
+      s$weighted_recall()
+      s$weighted_true_positive_rate()
+    },
+    NA
+  )
+  }
 })
 
 test_that("ml_evaluate() works for logistic regression (binary)", {
@@ -50,27 +59,33 @@ test_that("ml_evaluate() works for logistic regression (binary)", {
     s$predictions()
     s$probability_col()
     s$prediction_col()
-    s$accuracy()
-    s$f_measure_by_label()
-    s$false_positive_rate_by_label()
-    s$labels()
-    s$precision_by_label()
-    s$recall_by_label()
-    s$true_positive_rate_by_label()
-    s$weighted_f_measure(0.1)
-    s$weighted_f_measure()
-    s$weighted_false_positive_rate()
-    s$weighted_precision()
-    s$weighted_recall()
-    s$weighted_true_positive_rate()
-    s$area_under_roc()
-    s$f_measure_by_threshold()
-    s$pr()
-    s$precision_by_threshold()
-    s$recall_by_threshold()
-    s$roc()
   },
   NA)
+
+  if (spark_version(sc) >= "2.3.0") {
+    expect_error({
+      s$accuracy()
+      s$f_measure_by_label()
+      s$false_positive_rate_by_label()
+      s$labels()
+      s$precision_by_label()
+      s$recall_by_label()
+      s$true_positive_rate_by_label()
+      s$weighted_f_measure(0.1)
+      s$weighted_f_measure()
+      s$weighted_false_positive_rate()
+      s$weighted_precision()
+      s$weighted_recall()
+      s$weighted_true_positive_rate()
+      s$area_under_roc()
+      s$f_measure_by_threshold()
+      s$pr()
+      s$precision_by_threshold()
+      s$recall_by_threshold()
+      s$roc()
+    },
+    NA)
+  }
 })
 
 test_that("ml_evaluate() works for linear regression", {
