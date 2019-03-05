@@ -15,3 +15,37 @@ test_that("ml_clustering_evaluator() works", {
   )
 })
 
+test_that("ml_clustering_evalator() can be used in a CV pipeline", {
+  test_requires_version("2.3.0", "ml clustering evaluator requires spark 2.3+")
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+  pipeline_cv <- ml_pipeline(sc) %>%
+    ft_vector_assembler(
+      input_cols = c("Sepal_Width", "Sepal_Length", "Petal_Width", "Petal_Length"),
+      output_col = "features"
+    ) %>%
+    ml_kmeans(uid = "kmeans")
+
+  # Specify hyperparameter grid
+  grid <- list(
+    kmeans = list(
+      k = c(2, 3, 4)
+    )
+  )
+
+  # Create the cross validator object
+  cv <- ml_cross_validator(
+    sc,
+    estimator = pipeline_cv,
+    estimator_param_maps = grid,
+    evaluator = ml_clustering_evaluator(sc),
+    num_folds = 3,
+    parallelism = 1
+  )
+
+  # Train the models
+  expect_error(
+    ml_fit(cv, iris_tbl),
+    NA
+  )
+})
