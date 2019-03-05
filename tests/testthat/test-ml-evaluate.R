@@ -43,7 +43,7 @@ test_that("ml_evaluate() works for logistic regression", {
 test_that("ml_evaluate() works for logistic regression (binary)", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris") %>%
-    mutate(is_setosa = ifelse(Species == "Setosa", 1, 0))
+    mutate(is_setosa = ifelse(Species == "setosa", 1, 0))
   model <- ml_logistic_regression(iris_tbl, is_setosa ~ Petal_Width)
   s <- ml_evaluate(model, iris_tbl)
 
