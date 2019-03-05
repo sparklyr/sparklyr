@@ -237,9 +237,9 @@ new_ml_logistic_regression_model <- function(jobj) {
 
   summary <- if (invoke(jobj, "hasSummary")) {
     if (!is_multinomial && spark_version(spark_connection(jobj)) >= "2.3.0")
-      new_ml_binary_logistic_regression_summary(invoke(jobj, "binarySummary"))
+      new_ml_binary_logistic_regression_training_summary(invoke(jobj, "binarySummary"))
     else
-      new_ml_logistic_regression_summary(invoke(jobj, "summary"))
+      new_ml_logistic_regression_training_summary(invoke(jobj, "summary"))
   }
 
   new_ml_probabilistic_classification_model(
@@ -290,7 +290,16 @@ new_ml_logistic_regression_summary <- function(jobj, ..., class = character()) {
   s
 }
 
-new_ml_binary_logistic_regression_summary <- function(jobj) {
+new_ml_logistic_regression_training_summary <- function(jobj) {
+  new_ml_logistic_regression_summary(
+    jobj,
+    objective_history = function() invoke(jobj, "objectiveHistory"),
+    total_iterations = function() invoke(jobj, "totalIterations"),
+    class = "ml_logistic_regression_training_summary"
+  )
+}
+
+new_ml_binary_logistic_regression_summary <- function(jobj, ..., class = character()) {
   new_ml_logistic_regression_summary(
     jobj,
     area_under_roc = function() invoke(jobj, "areaUnderROC"),
@@ -304,7 +313,16 @@ new_ml_binary_logistic_regression_summary <- function(jobj) {
       sdf_register(),
     roc = function() invoke(jobj, "roc") %>%
       sdf_register(),
-    class = "ml_binary_logistic_regression_summary"
+    class = c(class, "ml_binary_logistic_regression_summary")
+  )
+}
+
+new_ml_binary_logistic_regression_training_summary <- function(jobj) {
+  new_ml_binary_logistic_regression_summary(
+    jobj,
+    objective_history = function() invoke(jobj, "objectiveHistory"),
+    total_iterations = function() invoke(jobj, "totalIterations"),
+    class = "ml_binary_logistic_regression_training_summary"
   )
 }
 
