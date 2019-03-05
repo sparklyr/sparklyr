@@ -17,12 +17,14 @@ new_ml_model_bisecting_kmeans <- function(pipeline_model, formula, dataset,
     as.data.frame() %>%
     rlang::set_names(m$feature_names)
 
-  m$cost <- possibly_null(
-    ~ pipeline_model %>%
-      ml_stage(1) %>%
-      ml_transform(dataset) %>%
-      model$compute_cost()
-  )()
+  m$cost <- suppressWarnings(
+    possibly_null(
+      ~ pipeline_model %>%
+        ml_stage(1) %>%
+        ml_transform(dataset) %>%
+        model$compute_cost()
+    )()
+  )
 
   m
 }
@@ -40,7 +42,8 @@ print.ml_model_bisecting_kmeans <- function(x, ...) {
   ml_model_print_centers(x)
 
   print_newline()
-  cat("Within Set Sum of Squared Errors = ",
-      if (is.null(x$cost)) "not computed." else x$cost
+  cat(
+    "Within Set Sum of Squared Errors = ",
+    if (is.null(x$cost)) "not computed." else x$cost
   )
 }

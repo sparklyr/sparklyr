@@ -129,7 +129,7 @@ new_ml_bisecting_kmeans_model <- function(jobj) {
   has_summary <- tryCatch(invoke(jobj, "hasSummary"),
                           error = function(e) FALSE)
   summary <- if (has_summary)
-    new_ml_summary_bisecting_kmeans_model(invoke(jobj, "summary"))
+    new_ml_bisecting_kmeans_summary(invoke(jobj, "summary"))
 
   new_ml_clustering_model(
     jobj,
@@ -138,14 +138,16 @@ new_ml_bisecting_kmeans_model <- function(jobj) {
         lapply(invoke, "toArray")
     ),
     compute_cost = function(dataset) {
+      if (spark_version(spark_connection(jobj)) >= "2.4.0")
+        warning("`compute_cost()` has been deprecated since Spark 2.4.0.", call. = FALSE)
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },
     summary = summary,
     class = "ml_bisecting_kmeans_model")
 }
 
-new_ml_summary_bisecting_kmeans_model <- function(jobj) {
-  new_ml_summary_clustering(
+new_ml_bisecting_kmeans_summary <- function(jobj) {
+  new_ml_clustering_summary(
     jobj,
-    class = "ml_summary_bisecting_kmeans")
+    class = "ml_bisecting_kmeans_summary")
 }

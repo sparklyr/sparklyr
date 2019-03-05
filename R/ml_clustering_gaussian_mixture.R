@@ -131,7 +131,7 @@ new_ml_gaussian_mixture <- function(jobj) {
 
 new_ml_gaussian_mixture_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary"))
-    new_ml_summary_gaussian_mixture_model(invoke(jobj, "summary"))
+    new_ml_gaussian_mixture_summary(invoke(jobj, "summary"))
   else NULL
 
   new_ml_clustering_model(
@@ -146,11 +146,11 @@ new_ml_gaussian_mixture_model <- function(jobj) {
     class = "ml_gaussian_mixture_model")
 }
 
-new_ml_summary_gaussian_mixture_model <- function(jobj) {
-  new_ml_summary_clustering(
+new_ml_gaussian_mixture_summary <- function(jobj) {
+  new_ml_clustering_summary(
     jobj,
     log_likelihood = invoke(jobj, "logLikelihood"),
     probability = invoke(jobj, "probability") %>% sdf_register(),
     probability_col = invoke(jobj, "probabilityCol"),
-    class = "ml_summary_gaussian_mixture")
+    class = "ml_gaussian_mixture_summary")
 }
