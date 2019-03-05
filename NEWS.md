@@ -8,6 +8,10 @@
 
 - Reduced default memory for local connections when Java x64 is not installed (#1931).
 
+### ML
+
+- Added missing internal constructor for clustering evaluator (#1936).
+
 # Sparklyr 1.0.0
 
 ### Arrow
