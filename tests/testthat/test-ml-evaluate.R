@@ -5,6 +5,7 @@ test_that("ml_evaluate() works for logistic regression", {
   iris_tbl <- testthat_tbl("iris")
   model <- ml_logistic_regression(iris_tbl, Species ~ .)
   s <- ml_evaluate(model, iris_tbl)
+
   expect_identical(class(s)[[1]], "ml_logistic_regression_summary")
 
   expect_error({
@@ -31,11 +32,17 @@ test_that("ml_evaluate() works for logistic regression", {
 })
 
 test_that("ml_evaluate() works for logistic regression (binary)", {
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris") %>%
     mutate(is_setosa = ifelse(Species == "Setosa", 1, 0))
   model <- ml_logistic_regression(iris_tbl, is_setosa ~ Petal_Width)
   s <- ml_evaluate(model, iris_tbl)
-  expect_identical(class(s)[[1]], "ml_binary_logistic_regression_summary")
+
+  if (spark_version(sc) >= "2.3.0") {
+    expect_identical(class(s)[[1]], "ml_binary_logistic_regression_summary")
+  } else {
+    expect_identical(class(s)[[1]], "ml_logistic_regression_summary")
+  }
 
   expect_error({
     s$features_col()
