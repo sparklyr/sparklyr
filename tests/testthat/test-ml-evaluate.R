@@ -58,12 +58,12 @@ test_that("ml_evaluate() works for logistic regression (binary)", {
     s$label_col()
     s$predictions()
     s$probability_col()
-    s$prediction_col()
   },
   NA)
 
   if (spark_version(sc) >= "2.3.0") {
     expect_error({
+      s$prediction_col()
       s$accuracy()
       s$f_measure_by_label()
       s$false_positive_rate_by_label()
