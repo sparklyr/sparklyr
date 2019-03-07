@@ -23,22 +23,7 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
       sc, input_cols = features, output_col = features_col
     )
     ml_pipeline(vector_assembler, predictor)
-  } else if (inherits(predictor, "ml_lda")){
-
-    # Temporary column names to prevent clashes
-    tokenizer_out <- random_string("tokenizer_out_")
-    stop_words_remover_out <- random_string("stop_words_remover_out_")
-    count_vectorizer_out <- random_string("count_vectorizer_out_")
-
-    ml_pipeline(sc) %>%
-      ft_regex_tokenizer(input_col = gsub("~", "", formula),
-                   output_col = tokenizer_out) %>%
-      ft_stop_words_remover(tokenizer_out, stop_words_remover_out) %>%
-      ft_count_vectorizer(input_col = stop_words_remover_out,
-                          output_col = count_vectorizer_out) %>%
-      ft_r_formula(paste0("~", count_vectorizer_out), features_col = features_col) %>%
-      ml_add_stage(predictor)
-  } else{
+  } else {
     r_formula <- ft_r_formula(sc, formula = formula, features_col = features_col)
     ml_pipeline(r_formula, predictor)
   }
