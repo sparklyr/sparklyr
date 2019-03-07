@@ -36,7 +36,7 @@ reproducible across repeated calls.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Optional arguments, see Details.}
 
 \item{model}{A fitted K-means model returned by \code{ml_kmeans()}}
 

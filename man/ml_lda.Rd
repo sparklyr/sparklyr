@@ -63,7 +63,7 @@ reproducible across repeated calls.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Optional arguments, see Details.}
 
 \item{model}{A fitted LDA model returned by \code{ml_lda()}.}
 
@@ -101,6 +101,10 @@ The object returned depends on the class of \code{x}.
 Latent Dirichlet Allocation (LDA), a topic model designed for text documents.
 }
 \details{
+For `ml_lda.tbl_spark` with the formula interface, you can specify named arguments in `...` that will
+  be passed `ft_regex_tokenizer()`, `ft_stop_words_remover()`, and `ft_count_vectorizer()`. For example, to increase the
+  default `min_token_length`, you can use `ml_lda(dataset, ~ text, min_token_length = 4)`.
+
 Terminology for LDA:
 \itemize{
   \item "term" = "word": an element of the vocabulary
@@ -171,19 +175,24 @@ Online
 \dontrun{
 library(janeaustenr)
 library(dplyr)
-sc <-  spark_connect(master = "local")
+sc <- spark_connect(master = "local")
 
 lines_tbl <- sdf_copy_to(sc,
-                         austen_books()[c(1:30),],
-                         name = "lines_tbl",
-                         overwrite = TRUE)
+  austen_books()[c(1:30), ],
+  name = "lines_tbl",
+  overwrite = TRUE
+)
 
 # transform the data in a tidy form
 lines_tbl_tidy <- lines_tbl \%>\%
-  ft_tokenizer(input_col = "text",
-               output_col = "word_list") \%>\%
-  ft_stop_words_remover(input_col = "word_list",
-                        output_col = "wo_stop_words") \%>\%
+  ft_tokenizer(
+    input_col = "text",
+    output_col = "word_list"
+  ) \%>\%
+  ft_stop_words_remover(
+    input_col = "word_list",
+    output_col = "wo_stop_words"
+  ) \%>\%
   mutate(text = explode(wo_stop_words)) \%>\%
   filter(text != "") \%>\%
   select(text, book)

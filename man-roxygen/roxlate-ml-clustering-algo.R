@@ -1,6 +1,6 @@
 #' @param x A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.
 #' @param uid A character string used to uniquely identify the ML estimator.
-#' @param ... Optional arguments; currently unused.
+#' @param ... Optional arguments, see Details.
 #'
 #' @seealso See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
 #'   more information on the set of clustering algorithms.
