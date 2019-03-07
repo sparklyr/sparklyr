@@ -211,8 +211,6 @@ ml_lda.tbl_spark <- function(x, formula = NULL, k = 10, max_iter = 20, doc_conce
                              keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                              optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
                              topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
-
-  browser()
   formula <- ml_standardize_formula(formula)
 
   stage <- ml_lda.spark_connection(
