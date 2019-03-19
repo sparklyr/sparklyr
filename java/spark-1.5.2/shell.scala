@@ -35,6 +35,7 @@ object Shell {
 
     backend = new Backend()
     backend.setType(isService, isRemote, false, isBatch)
+    backend.setArgs(args)
     backend.init(port, sessionId, connectionTimeout, batchFile)
   }
 
