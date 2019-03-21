@@ -6,7 +6,11 @@ object Shell {
   private[this] var backend: Backend = null
 
   def main(args: Array[String]): Unit = {
-    if (args.length > 4 || args.length < 2) {
+    val isService = args.contains("--service")
+    val isRemote = args.contains("--remote")
+    val isBatch = args.contains("--batch")
+
+    if ((!isBatch && args.length > 4) || args.length < 2) {
       System.err.println(
         "Usage: Backend port id [--service] [--remote] [--batch file.R]\n" +
         "  port:      port the gateway will listen to\n" +
@@ -26,15 +30,12 @@ object Shell {
       case _ => 60
     }
 
-    val isService = args.contains("--service")
-    val isRemote = args.contains("--remote")
-    val isBatch = args.contains("--batch")
-
     var batchFile = ""
     if (isBatch) batchFile = args(args.indexOf("--batch") + 1)
 
     backend = new Backend()
     backend.setType(isService, isRemote, false, isBatch)
+    backend.setArgs(args)
     backend.init(port, sessionId, connectionTimeout, batchFile)
   }
 

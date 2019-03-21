@@ -1,4 +1,4 @@
-# Sparklyr 1.0.9004 (unreleased)
+# Sparklyr 1.0.9005 (unreleased)
 
 ### ML
 
@@ -6,6 +6,7 @@
 - Implemented `ml_evaluate()` for logistic regression, linear regression, and GLM models.
 - Implemented `print()` method for `ml_summary` objects.
 - Deprecated `compute_cost()` for KMeans in Spark 2.4 (#1772).
+- Added missing internal constructor for clustering evaluator (#1936).
 
 ### Misc
 
@@ -15,9 +16,9 @@
 
 - Reduced default memory for local connections when Java x64 is not installed (#1931).
 
-### ML
+### Batches
 
-- Added missing internal constructor for clustering evaluator (#1936).
+- Add support in `spark-submit` with R file to pass additional arguments to R file (#1942).
 
 # Sparklyr 1.0.0
 
