@@ -45,7 +45,10 @@ spark_worker_init_packages <- function(sc, context) {
   else {
     spark_env <- worker_invoke_static(sc, "org.apache.spark.SparkEnv", "get")
     spark_libpaths <- worker_invoke(worker_invoke(spark_env, "conf"), "get", "spark.r.libpaths", NULL)
-    if (!is.null(spark_libpaths)) .libPaths(spark_libpaths)
+    if (!is.null(spark_libpaths)) {
+      spark_libpaths <- unlist(strsplit(spark_libpaths, split = ","))
+      .libPaths(spark_libpaths)
+    }
   }
 }
 
