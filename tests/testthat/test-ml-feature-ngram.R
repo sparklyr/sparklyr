@@ -1,9 +1,24 @@
 context("ml feature - ngram")
 
-sc <- testthat_spark_connection()
+test_that("ft_ngram() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_ngram)
+})
+
+test_that("ft_ngram() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "foo",
+    output_col = "bar",
+    n = 3
+  )
+  test_param_setting(sc, ft_ngram, test_args)
+})
 
 test_that("ft_ngram() works properly", {
-  test_requires("dplyr")
+  sc <- testthat_spark_connection()
   sentence_df <- data.frame(sentence = "The purrrers on the bus go map map map")
   sentence_tbl <- copy_to(sc, sentence_df, overwrite = TRUE)
   bigrams <- sentence_tbl %>%

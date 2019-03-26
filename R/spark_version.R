@@ -16,10 +16,15 @@ spark_version_clean <- function(version) {
 #'
 #' @export
 spark_version <- function(sc) {
+  UseMethod("spark_version")
+}
+
+#' @export
+spark_version.default <- function(sc) {
 
   # use cached value if available
-  if (!is.null(sc$spark_version))
-    return(sc$spark_version)
+  if (!is.null(sc$state$spark_version))
+    return(sc$state$spark_version)
 
   # get the version
   version <- invoke(spark_context(sc), "version")
@@ -28,10 +33,10 @@ spark_version <- function(sc) {
   version <- spark_version_clean(version)
 
   # cache as numeric version
-  sc$spark_version <- numeric_version(version)
+  sc$state$spark_version <- numeric_version(version)
 
   # return to caller
-  sc$spark_version
+  sc$state$spark_version
 }
 
 spark_version_from_home_version <- function() {
@@ -71,7 +76,10 @@ spark_version_from_home <- function(spark_home, default = NULL) {
       candidateVersions <- list(
         list(path = "lib", pattern = "spark-assembly-([0-9\\.]*)-hadoop.[0-9\\.]*\\.jar"),
         list(path = "yarn", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
-        list(path = "yarn", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar")
+        list(path = "yarn", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar"),
+        list(path = "lib", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
+        list(path = "lib", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar"),
+        list(path = "lib", pattern = "spark-assembly-([0-9\\.]*)-cdh[0-9\\.]*-hadoop.[0-9\\.]*\\.jar")
       )
 
       candidateFiles <- lapply(candidateVersions, function(e) {
@@ -79,7 +87,8 @@ spark_version_from_home <- function(spark_home, default = NULL) {
           list(
             files = list.files(
               file.path(spark_home, e$path),
-              pattern = e$pattern
+              pattern = e$pattern,
+              recursive = TRUE
             )
           )
         )
@@ -93,6 +102,17 @@ spark_version_from_home <- function(spark_home, default = NULL) {
         if (length(match) > 0 && length(match[[1]]) > 1) {
           return(match[[1]][[2]])
         }
+      }
+    },
+    useSparkSubmit = function() {
+      version_output <- system2(
+        file.path(spark_home, "bin", "spark-submit"),
+        "--version", stderr = TRUE, stdout = TRUE)
+
+      version_matches <- regmatches(version_output, regexec("   version (.*)$", version_output))
+      if (any(sapply(version_matches, length) > 0)) {
+        version_row <- which(sapply(version_matches, length) > 0)
+        return(version_matches[[version_row]][2])
       }
     }
   )

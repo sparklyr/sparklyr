@@ -50,8 +50,7 @@ spark_session_config <- function(sc, config = TRUE, value = NULL) {
       `[`(config)
   }
   else {
-    if (spark_version(sc) < "2.0.0")
-      stop("spark_set_config() requires Spark 2.0.0+")
+    spark_require_version(sc, "2.0.0")
 
     if (is.numeric(value))
       value <- as.integer(value)

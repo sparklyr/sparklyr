@@ -7,6 +7,12 @@
 #' @name ml_glm_tidiers
 NULL
 
+get_stats <- function(stats, model) {
+  stats %>%
+    purrr::map(~ ml_summary(model, .x, allow_null = TRUE)) %>%
+    purrr::map_if(is.function, ~ .x())
+}
+
 #' @rdname ml_glm_tidiers
 #' @param exponentiate For GLM, whether to exponentiate the coefficient estimates (typical for logistic regression.)
 #'
@@ -16,7 +22,7 @@ NULL
 tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
                                                         ...) {
   model <- x$model
-  ensure_scalar_boolean(exponentiate)
+  exponentiate <- cast_scalar_logical(exponentiate)
 
   stats <- c("coefficient_standard_errors", "t_values", "p_values")
   new_names <- c("estimate", "std.error", "statistic", "p.value")
@@ -43,10 +49,10 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
 
   coefficients <- list(x$coefficients)
   statistics <- stats %>%
-    lapply(function(x) ml_summary(model, x, allow_null = TRUE))
+    get_stats(model)
   c(coefficients, statistics) %>%
     as.data.frame() %>%
-    broom::fix_data_frame(newnames = new_names) %>%
+    fix_data_frame(newnames = new_names) %>%
     dplyr::mutate(estimate = trans(!!sym("estimate"))) %>%
     dplyr::select(!!!syms(vars))
 
@@ -54,9 +60,7 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
 
 #' @rdname ml_glm_tidiers
 #' @export
-tidy.ml_model_linear_regression <- function(x,
-                                            ...) {
-
+tidy.ml_model_linear_regression <- function(x, ...) {
   model <- x$model
   stats <- c("coefficient_standard_errors", "t_values", "p_values")
   new_names <- c("estimate", "std.error", "statistic", "p.value")
@@ -64,10 +68,10 @@ tidy.ml_model_linear_regression <- function(x,
 
   coefficients <- list(x$coefficients)
   statistics <- stats %>%
-    lapply(function(x) ml_summary(model, x, allow_null = TRUE))
+    get_stats(model)
   c(coefficients, statistics) %>%
     as.data.frame() %>%
-    broom::fix_data_frame(newnames = new_names) %>%
+    fix_data_frame(newnames = new_names) %>%
     select(!!!syms(vars))
 }
 
@@ -81,37 +85,36 @@ tidy.ml_model_linear_regression <- function(x,
 #' @importFrom rlang := sym
 #' @importFrom dplyr rename mutate
 #' @export
-augment.ml_model_generalized_linear_regression <-
-  function(x, newdata = NULL,
-           type.residuals = c("working", "deviance", "pearson", "response"),
-           ...) {
-    type.residuals <- rlang::arg_match(type.residuals) %>%
-      ensure_scalar_character()
+augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
+                                                           type.residuals = c("working", "deviance", "pearson", "response"),
+                                                           ...) {
+  type.residuals <- rlang::arg_match(type.residuals) %>%
+    cast_string()
 
-    if (!is.null(newdata) && !identical(type.residuals, "working"))
-      stop("'type.residuals' must be set to 'working' when 'newdata' is supplied")
+  if (!is.null(newdata) && !(type.residuals == "working"))
+    stop("'type.residuals' must be set to 'working' when 'newdata' is supplied")
 
-    newdata <- newdata %||% ml_model_data(x)
+  newdata <- newdata %||% ml_model_data(x)
 
-    # We calculate working residuals on training data via SparkSQL directly
-    # instead of calling the MLlib API.
-    if (type.residuals == "working") {
-      predictions <- sdf_predict(x, newdata) %>%
-        rename(fitted = !!"prediction")
-      return(predictions %>%
-               mutate(resid = `-`(!!sym(x$.response), !!sym("fitted")))
-      )
-    }
-
-    # If the code reaches here, user didn't supply 'newdata' so we're dealing with
-    # training data. We call 'sdf_residuals()' first and then 'sdf_predict()' in
-    # order to guarantee row order presevation.
-    residuals <- sdf_residuals(x, type = type.residuals)
-    sdf_predict(x, newdata = residuals) %>%
-      # Two calls to 'rename': https://github.com/rstudio/sparklyr/issues/678
-      rename(fitted = !!"prediction") %>%
-      rename(resid = !!"residuals")
+  # We calculate working residuals on training data via SparkSQL directly
+  # instead of calling the MLlib API.
+  if (type.residuals == "working") {
+    predictions <- ml_predict(x, newdata) %>%
+      rename(fitted = !!rlang::sym("prediction"))
+    return(predictions %>%
+             mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
+    )
   }
+
+  # If the code reaches here, user didn't supply 'newdata' so we're dealing with
+  # training data. We call 'sdf_residuals()' first and then 'ml_predict()' in
+  # order to guarantee row order presevation.
+  residuals <- sdf_residuals(x, type = type.residuals)
+  ml_predict(x, newdata = residuals) %>%
+    # Two calls to 'rename': https://github.com/rstudio/sparklyr/issues/678
+    rename(fitted = !!"prediction") %>%
+    rename(resid = !!"residuals")
+}
 
 #' @rdname ml_glm_tidiers
 #' @export
@@ -129,7 +132,6 @@ glance.ml_model_generalized_linear_regression <- function(x, ...) {
 #' @rdname ml_glm_tidiers
 #' @export
 glance.ml_model_linear_regression <- function(x, ...) {
-  # browser()
   metric_names <- c("explained_variance", "mean_absolute_error",
                     "mean_squared_error",
                     "r2", "root_mean_squared_error")

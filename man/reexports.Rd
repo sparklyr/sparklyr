@@ -4,9 +4,7 @@
 \name{reexports}
 \alias{reexports}
 \alias{tidy}
-\alias{reexports}
 \alias{augment}
-\alias{reexports}
 \alias{glance}
 \title{Objects exported from other packages}
 \keyword{internal}
@@ -15,6 +13,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{broom}{\code{\link[broom]{tidy}}, \code{\link[broom]{augment}}, \code{\link[broom]{glance}}}
+  \item{generics}{\code{\link[generics]{tidy}}, \code{\link[generics]{augment}}, \code{\link[generics]{glance}}}
 }}
 

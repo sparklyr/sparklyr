@@ -2,9 +2,10 @@
 % Please edit documentation in R/ml_feature_stop_words_remover.R
 \name{ft_stop_words_remover}
 \alias{ft_stop_words_remover}
-\title{Feature Tranformation -- StopWordsRemover (Transformer)}
+\title{Feature Transformation -- StopWordsRemover (Transformer)}
 \usage{
-ft_stop_words_remover(x, input_col, output_col, case_sensitive = FALSE,
+ft_stop_words_remover(x, input_col = NULL, output_col = NULL,
+  case_sensitive = FALSE,
   stop_words = ml_default_stop_words(spark_connection(x), "english"),
   uid = random_string("stop_words_remover_"), ...)
 }
@@ -75,3 +76,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

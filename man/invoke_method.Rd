@@ -2,7 +2,7 @@
 % Please edit documentation in R/spark_invoke.R
 \name{invoke_method}
 \alias{invoke_method}
-\title{Generic call interface for spark shell}
+\title{Generic Call Interface}
 \usage{
 invoke_method(sc, static, object, method, ...)
 }
@@ -20,6 +20,6 @@ it should be a spark_jobj instance).}
 \item{...}{Call parameters}
 }
 \description{
-Generic call interface for spark shell
+Generic Call Interface
 }
 \keyword{internal}

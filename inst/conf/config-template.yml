@@ -3,7 +3,10 @@ default:
   spark.env.SPARK_LOCAL_IP.local: 127.0.0.1
 
   # include the embedded csv package for spark 1.x
-  sparklyr.csv.embedded: "^1.*"
+  sparklyr.connect.csv.embedded: "^1.*"
+
+  # Enable Hive support by default.
+  spark.sql.catalogImplementation: "hive"
 
   # default spark packages to load
   # sparklyr.defaultPackages:

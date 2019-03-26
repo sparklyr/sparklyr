@@ -2,10 +2,10 @@
 % Please edit documentation in R/ml_feature_ngram.R
 \name{ft_ngram}
 \alias{ft_ngram}
-\title{Feature Tranformation -- NGram (Transformer)}
+\title{Feature Transformation -- NGram (Transformer)}
 \usage{
-ft_ngram(x, input_col, output_col, n = 2L, uid = random_string("ngram_"),
-  ...)
+ft_ngram(x, input_col = NULL, output_col = NULL, n = 2,
+  uid = random_string("ngram_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -74,3 +74,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

@@ -3,29 +3,25 @@
 \name{ml_als}
 \alias{ml_als}
 \alias{ml_recommend}
-\alias{ml_als_factorization}
 \title{Spark ML -- ALS}
 \usage{
-ml_als(x, rating_col = "rating", user_col = "user", item_col = "item",
-  rank = 10L, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
-  nonnegative = FALSE, max_iter = 10L, num_user_blocks = 10L,
-  num_item_blocks = 10L, checkpoint_interval = 10L,
-  cold_start_strategy = "nan",
+ml_als(x, formula = NULL, rating_col = "rating", user_col = "user",
+  item_col = "item", rank = 10, reg_param = 0.1,
+  implicit_prefs = FALSE, alpha = 1, nonnegative = FALSE,
+  max_iter = 10, num_user_blocks = 10, num_item_blocks = 10,
+  checkpoint_interval = 10, cold_start_strategy = "nan",
   intermediate_storage_level = "MEMORY_AND_DISK",
-  final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...)
+  final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"),
+  ...)
 
 ml_recommend(model, type = c("items", "users"), n = 1)
-
-ml_als_factorization(x, rating_col = "rating", user_col = "user",
-  item_col = "item", rank = 10L, reg_param = 0.1,
-  implicit_prefs = FALSE, alpha = 1, nonnegative = FALSE,
-  max_iter = 10L, num_user_blocks = 10L, num_item_blocks = 10L,
-  checkpoint_interval = 10L, cold_start_strategy = "nan",
-  intermediate_storage_level = "MEMORY_AND_DISK",
-  final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+
+\item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula.
+This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.
+The ALS model requires a specific formula format, please use \code{rating_col ~ user_col + item_col}.}
 
 \item{rating_col}{Column name for ratings. Default: "rating"}
 
@@ -73,7 +69,7 @@ ALS attempts to estimate the ratings matrix R as the product of two lower-rank m
 
 This is a blocked implementation of the ALS factorization algorithm that groups the two sets of factors (referred to as "users" and "products") into blocks and reduces communication by only sending one copy of each user vector to each product block on each iteration, and only for the product blocks that need that user's feature vector. This is achieved by pre-computing some information about the ratings matrix to determine the "out-links" of each user (which blocks of products it will contribute to) and "in-link" information for each product (which of the feature vectors it receives from each user block it will depend on). This allows us to send only an array of feature vectors between each user block and product block, and have the product block find the users' ratings and update the products based on these messages.
 
-For implicit preference data, the algorithm used is based on "Collaborative Filtering for Implicit Feedback Datasets", available at \url{http://dx.doi.org/10.1109/ICDM.2008.22}, adapted for the blocked approach used here.
+For implicit preference data, the algorithm used is based on "Collaborative Filtering for Implicit Feedback Datasets", available at \url{https://doi.org/10.1109/ICDM.2008.22}, adapted for the blocked approach used here.
 
 Essentially instead of finding the low-rank approximations to the rating matrix R, this finds the approximations for a preference matrix P where the elements of P are 1 if r is greater than 0 and 0 if r is less than or equal to 0. The ratings then act as 'confidence' values related to strength of indicated user preferences rather than explicit ratings given to items.
 
@@ -95,6 +91,25 @@ Perform recommendation using Alternating Least Squares (ALS) matrix factorizatio
 }
 \details{
 \code{ml_recommend()} returns the top \code{n} users/items recommended for each item/user, for all items/users. The output has been transformed (exploded and separated) from the default Spark outputs to be more user friendly.
+}
+\examples{
+\dontrun{
 
-\code{ml_als_factorization()} is an alias for \code{ml_als()} for backwards compatibility.
+library(sparklyr)
+sc <- spark_connect(master = "local")
+
+movies <- data.frame(
+  user   = c(1, 2, 0, 1, 2, 0),
+  item   = c(1, 1, 1, 2, 2, 0),
+  rating = c(3, 1, 2, 4, 5, 4)
+)
+movies_tbl <- sdf_copy_to(sc, movies)
+
+model <- ml_als(movies_tbl, rating ~ user + item)
+
+ml_predict(model, movies_tbl)
+
+ml_recommend(model, type = "item", 1)
+}
+
 }

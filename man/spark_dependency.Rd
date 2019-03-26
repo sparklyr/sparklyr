@@ -4,12 +4,19 @@
 \alias{spark_dependency}
 \title{Define a Spark dependency}
 \usage{
-spark_dependency(jars = NULL, packages = NULL)
+spark_dependency(jars = NULL, packages = NULL, initializer = NULL,
+  catalog = NULL, ...)
 }
 \arguments{
-\item{jars}{Character vector of full paths to JAR files}
+\item{jars}{Character vector of full paths to JAR files.}
 
-\item{packages}{Character vector of Spark packages names}
+\item{packages}{Character vector of Spark packages names.}
+
+\item{initializer}{Optional callback function called when initializing a connection.}
+
+\item{catalog}{Optional location where extension JAR files can be downloaded for Livy.}
+
+\item{...}{Additional optional arguments.}
 }
 \value{
 An object of type `spark_dependency`

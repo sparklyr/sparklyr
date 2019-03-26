@@ -47,3 +47,9 @@ h2ologs/*
 flights_model
 flights_pipeline
 new_flights_model
+/checkpoints
+tests/testthat/test.csv
+tests/testthat/test.json
+tests/testthat/batch.csv/
+tests/testthat/iris-in/
+tests/testthat/iris-out/

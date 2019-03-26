@@ -3,13 +3,13 @@
 \name{ft_pca}
 \alias{ft_pca}
 \alias{ml_pca}
-\title{Feature Tranformation -- PCA (Estimator)}
+\title{Feature Transformation -- PCA (Estimator)}
 \usage{
-ft_pca(x, input_col, output_col, k, dataset = NULL,
+ft_pca(x, input_col = NULL, output_col = NULL, k = NULL,
   uid = random_string("pca_"), ...)
 
-ml_pca(x, features = tbl_vars(x), k = length(features), pc_prefix = "PC",
-  ...)
+ml_pca(x, features = tbl_vars(x), k = length(features),
+  pc_prefix = "PC", ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -19,9 +19,6 @@ ml_pca(x, features = tbl_vars(x), k = length(features), pc_prefix = "PC",
 \item{output_col}{The name of the output column.}
 
 \item{k}{The number of principal components}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -52,16 +49,8 @@ The object returned depends on the class of \code{x}.
 PCA trains a model to project vectors to a lower dimensional space of the top k principal components.
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 
 \code{ml_pca()} is a wrapper around \code{ft_pca()} that returns a
   \code{ml_model}.
@@ -111,3 +100,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

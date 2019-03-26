@@ -5,7 +5,7 @@
 \title{Spark ML -- Linear Regression}
 \usage{
 ml_linear_regression(x, formula = NULL, fit_intercept = TRUE,
-  elastic_net_param = 0, reg_param = 0, max_iter = 100L,
+  elastic_net_param = 0, reg_param = 0, max_iter = 100,
   weight_col = NULL, loss = "squaredError", solver = "auto",
   standardization = TRUE, tol = 1e-06, features_col = "features",
   label_col = "label", prediction_col = "prediction",
@@ -49,7 +49,7 @@ and "huber". Default: "squaredError"}
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -86,7 +86,7 @@ mtcars_test <- partitions$test
 lm_model <- mtcars_training \%>\%
   ml_linear_regression(mpg ~ .)
 
-pred <- sdf_predict(mtcars_test, lm_model)
+pred <- ml_predict(lm_model, mtcars_test)
 
 ml_regression_evaluator(pred, label_col = "mpg")
 }
@@ -107,3 +107,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

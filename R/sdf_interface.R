@@ -64,6 +64,15 @@ sdf_import <- function(x,
   UseMethod("sdf_import")
 }
 
+sdf_prepare_dataframe <- function(x) {
+  as.data.frame(
+    x,
+    stringsAsFactors = FALSE,
+    row.names = FALSE,
+    optional = TRUE
+  )
+}
+
 #' @export
 #' @importFrom dplyr tbl
 sdf_import.default <- function(x,
@@ -74,16 +83,6 @@ sdf_import.default <- function(x,
                                overwrite = FALSE,
                                ...)
 {
-  # ensure data.frame
-  if (!is.data.frame(x)) {
-    x <- as.data.frame(
-      x,
-      stringsAsFactors = FALSE,
-      row.names = FALSE,
-      optional = TRUE
-    )
-  }
-
   if (overwrite)
     spark_remove_table_if_exists(sc, name)
   else if (name %in% src_tbls(sc))
@@ -93,7 +92,7 @@ sdf_import.default <- function(x,
   serializer <- dots$serializer
   spark_data_copy(sc, x, name = name, repartition = repartition, serializer = serializer)
 
-  if (memory)
+  if (memory && !class(x) %in% c("iterator", "list"))
     tbl_cache(sc, name)
 
   on_connection_updated(sc, name)
@@ -201,92 +200,6 @@ sdf_sort <- function(x, columns) {
   sdf_register(sorted)
 }
 
-#' Mutate a Spark DataFrame
-#'
-#' Use Spark's \href{http://spark.apache.org/docs/latest/ml-features.html}{feature transformers}
-#' to mutate a Spark DataFrame.
-#'
-#' @template roxlate-sdf
-#'
-#' @param .data A \code{spark_tbl}.
-#' @param ... Named arguments, mapping new column names to the transformation to
-#'   be applied.
-#' @param .dots A named list, mapping output names to transformations.
-#'
-#' @name sdf_mutate
-#' @export
-#'
-#' @family feature transformation routines
-#'
-#' @examples
-#' \dontrun{
-#' # using the 'beaver1' dataset, binarize the 'temp' column
-#' data(beavers, package = "datasets")
-#' beaver_tbl <- copy_to(sc, beaver1, "beaver")
-#' beaver_tbl %>%
-#'   mutate(squared = temp ^ 2) %>%
-#'   sdf_mutate(warm = ft_binarizer(squared, 1000)) %>%
-#'   sdf_register("mutated")
-#'
-#' # view our newly constructed tbl
-#' head(beaver_tbl)
-#'
-#' # note that we have two separate tbls registered
-#' dplyr::src_tbls(sc)
-#' }
-#' @importFrom lazyeval lazy_dots
-sdf_mutate <- function(.data, ...) {
-  sdf_mutate_(.data, .dots = lazy_dots(...))
-}
-
-#' @name sdf_mutate
-#' @export
-#' @importFrom lazyeval all_dots is_atomic
-sdf_mutate_ <- function(.data, ..., .dots) {
-  dots <- all_dots(.dots, ..., all_named = TRUE)
-  data <- .data
-
-  for (i in seq_along(dots)) {
-
-    # extract expression to be evaluated
-    lazy_expr <- dots[[i]]$expr
-    lazy_env  <- dots[[i]]$env
-
-    # parse inputs now since some may need to be evaluated in
-    # the local R environment and others maybe spark DataFrame
-    # column names
-    inputs <- as.list(lazy_expr[-1])
-    inputs <- lapply(inputs,
-                     function(el) {
-                       if (is.call(el)) {
-                         eval(el, envir = lazy_env)
-                       } else if (is_atomic(el))
-                         el
-                       else {
-                         as.character(el)
-                       }
-                     })
-
-    output_col <- as.character(names(dots)[[i]])
-
-    # construct a new call with the input variable injected
-    # for evaluation
-    preamble <- c(list(
-      lazy_expr[[1]],        # function
-      data,                  # data,
-      output_col=output_col  # output column
-    ), inputs)               # inputs
-
-    call <- as.call(preamble)
-
-    # evaluate call
-    data <- eval(call, envir = lazy_env)
-  }
-
-  # return mutated dataset
-  sdf_register(data)
-}
-
 #' Add a Unique ID Column to a Spark DataFrame
 #'
 #' Add a unique ID column to a Spark DataFrame. The Spark
@@ -304,7 +217,7 @@ sdf_with_unique_id <- function(x, id = "id") {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  ensure_scalar_character(id)
+  id <- cast_string(id)
 
   mii <- invoke_static(
     sc,
@@ -337,8 +250,8 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
 
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
-  ensure_scalar_character(id)
-  ensure_scalar_integer(from)
+  id <- cast_string(id)
+  from <- cast_scalar_integer(from)
 
   transformed <- invoke_static(sc,
                                "sparklyr.Utils",
@@ -368,7 +281,7 @@ sdf_last_index <- function(x, id = "id") {
     dplyr::transmute(!!sym(id) := as.numeric(!!sym(id))) %>%
     spark_dataframe()
   sc <- spark_connection(sdf)
-  ensure_scalar_character(id)
+  id <- cast_string(id)
 
   invoke_static(sc,
                 "sparklyr.Utils",
@@ -401,9 +314,9 @@ sdf_quantile <- function(x,
     names(probabilities) %||%
     paste(signif(probabilities * 100, 3), "%", sep = "")
 
-  column <- ensure_scalar_character(column)
+  column <- cast_string(column)
   probabilities <- as.list(as.numeric(probabilities))
-  relative.error <- ensure_scalar_double(relative.error)
+  relative.error <- cast_scalar_double(relative.error)
 
   stat <- invoke(sdf, "stat")
   quantiles <- invoke(stat, "approxQuantile", column, probabilities, relative.error)
@@ -437,7 +350,7 @@ sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  storage.level <- ensure_scalar_character(storage.level)
+  storage.level <- cast_string(storage.level)
 
   sl <- invoke_static(
     sc,
@@ -456,7 +369,7 @@ sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
 #' @param eager whether to truncate the lineage of the DataFrame
 #' @export
 sdf_checkpoint <- function(x, eager = TRUE) {
-  ensure_scalar_boolean(eager)
+  eager <- cast_scalar_logical(eager)
 
   x %>%
     spark_dataframe() %>%
@@ -494,11 +407,10 @@ sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
   sc <- spark_connection(sdf)
 
   partitions <- partitions %||% 0L %>%
-    ensure_scalar_integer()
+    cast_scalar_integer()
 
   if (spark_version(sc) >= "2.0.0") {
-    partition_by <- as.list(partition_by) %>%
-      lapply(ensure_scalar_character)
+    partition_by <- cast_nullable_character_list(partition_by) %||% list()
 
     return(
       invoke_static(sc, "sparklyr.Repartition", "repartition", sdf, partitions, partition_by) %>%
@@ -533,7 +445,7 @@ sdf_coalesce <- function(x, partitions) {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  partitions <- ensure_scalar_integer(partitions)
+  partitions <- cast_scalar_integer(partitions)
 
   if (partitions < 1)
     stop("number of partitions must be positive")
@@ -555,7 +467,7 @@ sdf_describe <- function(x, cols = colnames(x)) {
                   paste0(cols[which(!in_df)], collapse = ", "))
     stop(msg)
   }
-  cols <- lapply(cols, ensure_scalar_character)
+  cols <- cast_character_list(cols)
 
   x %>%
     spark_dataframe() %>%

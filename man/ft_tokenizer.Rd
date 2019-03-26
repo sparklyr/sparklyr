@@ -2,9 +2,10 @@
 % Please edit documentation in R/ml_feature_tokenizer.R
 \name{ft_tokenizer}
 \alias{ft_tokenizer}
-\title{Feature Tranformation -- Tokenizer (Transformer)}
+\title{Feature Transformation -- Tokenizer (Transformer)}
 \usage{
-ft_tokenizer(x, input_col, output_col, uid = random_string("tokenizer_"), ...)
+ft_tokenizer(x, input_col = NULL, output_col = NULL,
+  uid = random_string("tokenizer_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -68,3 +69,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

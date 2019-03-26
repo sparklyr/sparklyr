@@ -73,7 +73,7 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
-         stop(paste("Unsupported type for serialization", type)))
+         stop("Unsupported type '", type, "' for serialization"))
 }
 
 writeVoid <- function(con) {
@@ -106,25 +106,6 @@ writeBoolean <- function(con, value) {
   writeInt(con, as.integer(value))
 }
 
-writeRawSerialize <- function(outputCon, batch) {
-  outputSer <- serialize(batch, ascii = FALSE, connection = NULL)
-  writeRaw(outputCon, outputSer)
-}
-
-writeRowSerialize <- function(outputCon, rows) {
-  invisible(lapply(rows, function(r) {
-    bytes <- serializeRow(r)
-    writeRaw(outputCon, bytes)
-  }))
-}
-
-serializeRow <- function(row) {
-  rawObj <- rawConnection(raw(0), "wb")
-  on.exit(close(rawObj))
-  writeList(rawObj, row)
-  rawConnectionValue(rawObj)
-}
-
 writeRaw <- function(con, batch) {
   writeInt(con, length(batch))
   writeBin(batch, con, endian = "big")
@@ -149,7 +130,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
-                 stop(paste("Unsupported type for serialization", class)))
+                 stop("Unsupported type '", type, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
 

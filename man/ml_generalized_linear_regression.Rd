@@ -4,12 +4,12 @@
 \alias{ml_generalized_linear_regression}
 \title{Spark ML -- Generalized Linear Regression}
 \usage{
-ml_generalized_linear_regression(x, formula = NULL, family = "gaussian",
-  link = NULL, fit_intercept = TRUE, offset_col = NULL,
-  link_power = NULL, link_prediction_col = NULL, reg_param = 0,
-  max_iter = 25L, weight_col = NULL, solver = "irls", tol = 1e-06,
-  variance_power = 0, features_col = "features", label_col = "label",
-  prediction_col = "prediction",
+ml_generalized_linear_regression(x, formula = NULL,
+  family = "gaussian", link = NULL, fit_intercept = TRUE,
+  offset_col = NULL, link_power = NULL, link_prediction_col = NULL,
+  reg_param = 0, max_iter = 25, weight_col = NULL, solver = "irls",
+  tol = 1e-06, variance_power = 0, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
   uid = random_string("generalized_linear_regression_"), ...)
 }
 \arguments{
@@ -55,7 +55,7 @@ ml_generalized_linear_regression(x, formula = NULL, family = "gaussian",
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -87,6 +87,41 @@ Valid link functions for each family is listed below. The first link function of
     \item tweedie: power link function specified through \code{link_power}. The default link power in the tweedie family is \code{1 - variance_power}.
     }
 }
+\examples{
+\dontrun{
+library(sparklyr)
+
+sc <- spark_connect(master = "local")
+mtcars_tbl <- sdf_copy_to(sc, mtcars, name = "mtcars_tbl", overwrite = TRUE)
+
+partitions <- mtcars_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+mtcars_training <- partitions$training
+mtcars_test <- partitions$test
+
+# Specify the grid
+family <- c("gaussian", "gamma", "poisson")
+link <- c("identity", "log")
+family_link <- expand.grid(family = family, link = link, stringsAsFactors = FALSE)
+family_link <- data.frame(family_link, rmse = 0)
+
+# Train the models
+for (i in 1:nrow(family_link)) {
+  glm_model <- mtcars_training \%>\%
+    ml_generalized_linear_regression(mpg ~ .,
+      family = family_link[i, 1],
+      link = family_link[i, 2]
+    )
+
+  pred <- ml_predict(glm_model, mtcars_test)
+  family_link[i, 3] <- ml_regression_evaluator(pred, label_col = "mpg")
+}
+
+family_link
+}
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
@@ -103,3 +138,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

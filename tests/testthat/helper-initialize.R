@@ -1,4 +1,5 @@
 library(sparklyr)
+library(dplyr)
 
 spark_install_winutils <- function(version) {
   hadoop_version <- if (version < "2.0.0") "2.6" else "2.7"
@@ -22,7 +23,19 @@ spark_install_winutils <- function(version) {
 }
 
 testthat_spark_connection <- function() {
-  version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
+  if (!exists(".testthat_latest_spark", envir = .GlobalEnv))
+    assign(".testthat_latest_spark", "2.3.0", envir = .GlobalEnv)
+  livy_version <- Sys.getenv("LIVY_VERSION")
+  if (nchar(livy_version) > 0)
+    testthat_livy_connection()
+  else
+    testthat_shell_connection()
+}
+
+testthat_latest_spark <- function() get(".testthat_latest_spark", envir = .GlobalEnv)
+
+testthat_shell_connection <- function() {
+  version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
 
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
@@ -37,7 +50,7 @@ testthat_spark_connection <- function() {
     spark_install(version)
   }
 
-  expect_gt(nrow(spark_installed_versions()), 0)
+  stopifnot(nrow(spark_installed_versions()) > 0)
 
   # generate connection if none yet exists
   connected <- FALSE
@@ -57,6 +70,9 @@ testthat_spark_connection <- function() {
     options(sparklyr.verbose = TRUE)
     options(sparklyr.na.omit.verbose = TRUE)
     options(sparklyr.na.action.verbose = TRUE)
+
+    config[["sparklyr.shell.driver-memory"]] <- "3G"
+    config[["sparklyr.apply.env.foo"]] <- "env-test"
 
     setwd(tempdir())
     sc <- spark_connect(master = "local", version = version, config = config)
@@ -131,7 +147,8 @@ sdf_query_plan <- function(x) {
 }
 
 testthat_livy_connection <- function() {
-  version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
+  version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+  livy_version <- Sys.getenv("LIVY_VERSION", "0.5.0")
 
   if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
@@ -145,7 +162,9 @@ testthat_livy_connection <- function() {
   }
 
   if (nrow(livy_installed_versions()) == 0) {
-    livy_install("0.5.0", spark_version = version)
+    cat("Installing Livy.")
+    livy_install(livy_version, spark_version = version, )
+    cat("Livy installed.")
   }
 
   expect_gt(nrow(livy_installed_versions()), 0)
@@ -163,12 +182,22 @@ testthat_livy_connection <- function() {
 
   if (!connected) {
     livy_service_start(
-      version = "0.5.0",
+      version = livy_version,
       spark_version = version,
       stdout = FALSE,
       stderr = FALSE)
 
-    sc <- spark_connect(master = "http://localhost:8998", method = "livy")
+    sc <- spark_connect(
+      master = "http://localhost:8998",
+      method = "livy",
+      config = list(
+        sparklyr.verbose = TRUE,
+        sparklyr.connect.timeout = 120,
+        sparklyr.log.invoke = "cat"
+      ),
+      sources = TRUE
+    )
+
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
   }
 
@@ -190,6 +219,10 @@ test_requires_version <- function(min_version, comment = NULL) {
   }
 }
 
+test_requires_latest_spark <- function() {
+  test_requires_version(testthat_latest_spark())
+}
+
 param_filter_version <- function(args, min_version, params) {
   sc <- testthat_spark_connection()
   if (spark_version(sc) < min_version)
@@ -206,3 +239,76 @@ param_add_version <- function(args, min_version, ...) {
 }
 
 output_file <- function(filename) file.path("output", filename)
+
+skip_livy <- function() {
+  livy_version <- Sys.getenv("LIVY_VERSION")
+  if (nchar(livy_version) > 0) skip("Test unsupported under Livy.")
+}
+
+check_params <- function(test_args, params) {
+  purrr::iwalk(
+    test_args,
+    ~ expect_equal(params[[.y]], .x, info = .y)
+  )
+}
+
+test_param_setting <- function(sc, fn, test_args) {
+  collapse_sublists <- function(x) purrr::map_if(x, rlang::is_bare_list, unlist)
+
+  params1 <- do.call(fn, c(list(x = sc), test_args)) %>%
+    ml_params() %>%
+    collapse_sublists()
+
+  params2 <- do.call(fn, c(list(x = ml_pipeline(sc)), test_args)) %>%
+    ml_stage(1) %>%
+    ml_params() %>%
+    collapse_sublists()
+
+  test_args <- collapse_sublists(test_args)
+  check_params(test_args, params1)
+  check_params(test_args, params2)
+}
+
+test_default_args <- function(sc, fn) {
+  default_args <- rlang::fn_fmls(fn) %>%
+    as.list() %>%
+    purrr::discard(~ is.symbol(.x) || is.language(.x)) %>%
+    rlang::modify(uid = NULL) %>%
+    purrr::compact()
+
+  params <- do.call(fn, list(x = sc)) %>%
+    ml_params()
+  check_params(default_args, params)
+}
+
+expect_coef_equal <- function(lhs, rhs) {
+  nm <- names(lhs)
+  lhs <- lhs[nm]
+  rhs <- rhs[nm]
+
+  expect_true(all.equal(lhs, rhs, tolerance = 0.01))
+}
+
+skip_on_arrow <- function() {
+  r_arrow <- isTRUE(as.logical(Sys.getenv("R_ARROW")))
+  if (r_arrow) skip("Test unsupported in Apache Arrow")
+}
+
+skip_covr <- function(message) {
+  is_covr <- identical(Sys.getenv("CODE_COVERAGE"), "true")
+  if (is_covr) skip(message)
+}
+
+using_arrow <- function() {
+  "package:arrow" %in% search()
+}
+
+skip_arrow_devel <- function(message) {
+  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
+  if (is_arrow_devel) skip(message)
+}
+
+skip_slow <- function(message) {
+  skip_covr(message)
+  skip_arrow_devel(message)
+}

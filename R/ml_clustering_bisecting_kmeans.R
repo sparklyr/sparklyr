@@ -21,171 +21,133 @@
 #' }
 #'
 #' @export
-ml_bisecting_kmeans <- function(
-  x,
-  formula = NULL,
-  k = 4L,
-  max_iter = 20L,
-  seed = NULL,
-  min_divisible_cluster_size = 1,
-  features_col = "features",
-  prediction_col = "prediction",
-  uid = random_string("bisecting_bisecting_kmeans_"), ...
-) {
+ml_bisecting_kmeans <- function(x, formula = NULL, k = 4, max_iter = 20,
+                                seed = NULL, min_divisible_cluster_size = 1,
+                                features_col = "features", prediction_col = "prediction",
+                                uid = random_string("bisecting_bisecting_kmeans_"),
+                                ...) {
+  check_dots_used()
   UseMethod("ml_bisecting_kmeans")
 }
 
 #' @export
-ml_bisecting_kmeans.spark_connection <- function(
-  x,
-  formula = NULL,
-  k = 4L,
-  max_iter = 20L,
-  seed = NULL,
-  min_divisible_cluster_size = 1,
-  features_col = "features",
-  prediction_col = "prediction",
-  uid = random_string("bisecting_kmeans_"), ...) {
+ml_bisecting_kmeans.spark_connection <- function(x, formula = NULL, k = 4, max_iter = 20,
+                                                 seed = NULL, min_divisible_cluster_size = 1,
+                                                 features_col = "features", prediction_col = "prediction",
+                                                 uid = random_string("bisecting_bisecting_kmeans_"),
+                                                 ...) {
+  .args <- list(
+    k = k,
+    max_iter = max_iter,
+    seed = seed,
+    min_divisible_cluster_size = min_divisible_cluster_size,
+    features_col = features_col,
+    prediction_col = prediction_col
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    validator_ml_bisecting_kmeans()
 
-  ml_ratify_args()
-
-  jobj <- ml_new_clustering(x, "org.apache.spark.ml.clustering.BisectingKMeans", uid,
-                            features_col, k, max_iter, seed) %>%
-    invoke("setPredictionCol", prediction_col) %>%
-    invoke("setMinDivisibleClusterSize", min_divisible_cluster_size)
+  jobj <- spark_pipeline_stage(
+    x, "org.apache.spark.ml.clustering.BisectingKMeans", uid,
+    features_col = .args[["features_col"]],
+    k = .args[["k"]], max_iter = .args[["max_iter"]], seed = .args[["seed"]]
+  ) %>%
+    invoke("setPredictionCol", .args[["prediction_col"]]) %>%
+    invoke("setMinDivisibleClusterSize", .args[["min_divisible_cluster_size"]])
 
   new_ml_bisecting_kmeans(jobj)
 }
 
 #' @export
-ml_bisecting_kmeans.ml_pipeline <- function(
-  x,
-  formula = NULL,
-  k = 4L,
-  max_iter = 20L,
-  seed = NULL,
-  min_divisible_cluster_size = 1,
-  features_col = "features",
-  prediction_col = "prediction",
-  uid = random_string("bisecting_kmeans_"), ...) {
-
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+ml_bisecting_kmeans.ml_pipeline <- function(x, formula = NULL, k = 4, max_iter = 20,
+                                            seed = NULL, min_divisible_cluster_size = 1,
+                                            features_col = "features", prediction_col = "prediction",
+                                            uid = random_string("bisecting_bisecting_kmeans_"),
+                                            ...) {
+  stage <- ml_bisecting_kmeans.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    k = k,
+    max_iter = max_iter,
+    seed = seed,
+    min_divisible_cluster_size = min_divisible_cluster_size,
+    features_col = features_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ml_bisecting_kmeans.tbl_spark <- function(
-  x,
-  formula = NULL,
-  k = 4L,
-  max_iter = 20L,
-  seed = NULL,
-  min_divisible_cluster_size = 1,
-  features_col = "features",
-  prediction_col = "prediction",
-  uid = random_string("bisecting_kmeans_"),
-  features = NULL, ...) {
+ml_bisecting_kmeans.tbl_spark <- function(x, formula = NULL, k = 4, max_iter = 20,
+                                          seed = NULL, min_divisible_cluster_size = 1,
+                                          features_col = "features", prediction_col = "prediction",
+                                          uid = random_string("bisecting_bisecting_kmeans_"),
+                                          features = NULL, ...) {
+  formula <- ml_standardize_formula(formula, features = features)
 
-  predictor <- ml_new_stage_modified_args()
-
-  ml_formula_transformation()
+  stage <- ml_bisecting_kmeans.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    k = k,
+    max_iter = max_iter,
+    seed = seed,
+    min_divisible_cluster_size = min_divisible_cluster_size,
+    features_col = features_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    ...
+  )
 
   if (is.null(formula)) {
-    predictor %>%
+    stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(x, predictor = predictor, formula = formula, features_col = features_col,
-                         type = "clustering", constructor = new_ml_model_bisecting_kmeans)
+    ml_construct_model_clustering(
+      new_ml_model_bisecting_kmeans,
+      predictor = stage,
+      dataset = x,
+      formula = formula,
+      features_col = features_col
+    )
   }
 }
 
-# Validator
-ml_validator_bisecting_kmeans <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      prediction_col <- ensure_scalar_character(prediction_col)
-      min_divisible_cluster_size <- ensure_scalar_double(min_divisible_cluster_size)
-    }) %>%
-    ml_extract_args(nms)
+validator_ml_bisecting_kmeans <- function(.args) {
+  .args <- validate_args_clustering(.args)
+  .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
+  .args[["min_divisible_cluster_size"]] <- cast_scalar_double(.args[["min_divisible_cluster_size"]])
+  .args
 }
 
-# Constructors
-
 new_ml_bisecting_kmeans <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_bisecting_kmeans")
+  new_ml_estimator(jobj, class = "ml_bisecting_kmeans")
 }
 
 new_ml_bisecting_kmeans_model <- function(jobj) {
-
   has_summary <- tryCatch(invoke(jobj, "hasSummary"),
                           error = function(e) FALSE)
   summary <- if (has_summary)
-    new_ml_summary_bisecting_kmeans_model(invoke(jobj, "summary"))
+    new_ml_bisecting_kmeans_summary(invoke(jobj, "summary"))
 
   new_ml_clustering_model(
     jobj,
-    cluster_centers = try_null(invoke(jobj, "clusterCenters")) %>%
-      lapply(invoke, "toArray"),
+    cluster_centers = possibly_null(
+      ~ invoke(jobj, "clusterCenters") %>%
+        lapply(invoke, "toArray")
+    ),
     compute_cost = function(dataset) {
+      if (spark_version(spark_connection(jobj)) >= "2.4.0")
+        warning("`compute_cost()` has been deprecated since Spark 2.4.0.", call. = FALSE)
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     },
     summary = summary,
-    subclass = "ml_bisecting_kmeans_model")
+    class = "ml_bisecting_kmeans_model")
 }
 
-new_ml_summary_bisecting_kmeans_model <- function(jobj) {
-  new_ml_summary_clustering(
+new_ml_bisecting_kmeans_summary <- function(jobj) {
+  new_ml_clustering_summary(
     jobj,
-    subclass = "ml_summary_bisecting_kmeans")
-}
-
-new_ml_model_bisecting_kmeans <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names,
-  call) {
-
-  summary <- model$summary
-
-  centers <- model$cluster_centers %>%
-    do.call(rbind, .) %>%
-    as.data.frame() %>%
-    rlang::set_names(feature_names)
-
-  cost <- try_null(
-    pipeline_model %>%
-      ml_stage(1) %>%
-      ml_transform(dataset) %>%
-      model$compute_cost()
-  )
-  new_ml_model_clustering(
-    pipeline, pipeline_model,
-    model, dataset, formula,
-    centers = centers,
-    cost = cost,
-    summary = summary,
-    subclass = "ml_model_bisecting_kmeans",
-    .features = feature_names
-  )
-}
-
-# Generic implementations
-
-
-#' @export
-print.ml_model_bisecting_kmeans <- function(x, ...) {
-
-  preamble <- sprintf(
-    "K-means clustering with %s %s",
-    nrow(x$centers),
-    if (nrow(x$centers) == 1) "cluster" else "clusters"
-  )
-
-  cat(preamble, sep = "\n")
-  print_newline()
-  ml_model_print_centers(x)
-
-  print_newline()
-  cat("Within Set Sum of Squared Errors = ",
-      if (is.null(x$cost)) "not computed." else x$cost
-  )
-
+    class = "ml_bisecting_kmeans_summary")
 }

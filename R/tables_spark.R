@@ -1,4 +1,8 @@
-tbl_quote_name <- function(name) {
+tbl_quote_name <- function(sc, name) {
+  if (!spark_config_value(sc$config, "sparklyr.dplyr.period.splits", TRUE)) {
+    return(dbplyr::sql_quote(name, '`'))
+  }
+
   y <- gsub("`", "``", name, fixed = TRUE)
   y <- strsplit(y, "\\.")[[1]]
   y <- paste(y, collapse = "`.`")
@@ -19,11 +23,11 @@ tbl_cache_sdf <- function(sc, name, force) {
 }
 
 tbl_cache_sql <- function(sc, name, force) {
-  sql <- paste("CACHE TABLE", tbl_quote_name(name))
+  sql <- paste("CACHE TABLE", tbl_quote_name(sc, name))
   invoke(hive_context(sc), "sql", sql)
 
   if (force) {
-    sql <- paste("SELECT count(*) FROM ", tbl_quote_name(name))
+    sql <- paste("SELECT count(*) FROM ", tbl_quote_name(sc, name))
     sdf <- invoke(hive_context(sc), "sql", sql)
     sdf_collect(sdf)
   }
@@ -44,7 +48,7 @@ tbl_cache_sql <- function(sc, name, force) {
 #' @export
 tbl_cache <- function(sc, name, force = TRUE) {
   countColumns <- function(sc, name) {
-    sql <- paste("SELECT * FROM ", tbl_quote_name(name))
+    sql <- paste("SELECT * FROM ", tbl_quote_name(sc, name))
     sdf <- invoke(hive_context(sc), "sql", sql)
 
     length(invoke(sdf, "columns"))
@@ -72,7 +76,7 @@ tbl_cache <- function(sc, name, force = TRUE) {
 #'
 #' @export
 tbl_uncache <- function(sc, name) {
-  sql <- paste("UNCACHE TABLE", tbl_quote_name(name))
+  sql <- paste("UNCACHE TABLE", tbl_quote_name(sc, name))
   invoke(hive_context(sc), "sql", sql)
 
   invisible(NULL)
@@ -85,7 +89,7 @@ tbl_uncache <- function(sc, name) {
 #'
 #' @export
 tbl_change_db <- function(sc, name) {
-  sql <- paste("USE ", tbl_quote_name(name))
+  sql <- paste("USE ", tbl_quote_name(sc, name))
   invoke(hive_context(sc), "sql", sql)
 
   invisible(NULL)

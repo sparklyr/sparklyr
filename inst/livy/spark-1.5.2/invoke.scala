@@ -36,8 +36,9 @@ class Invoke {
               // The case that the parameter type is a Scala Seq and the argument
               // is a Java array is considered matching. The array will be converted
               // to a Seq later if this method is matched.
-            } else if (parameterType == classOf[Char] && args(i) != null &&
-                       args(i).isInstanceOf[String]) {
+            } else if ((parameterType == classOf[Char] ||
+                        parameterType == classOf[java.lang.Character]) &&
+                       args(i) != null && args(i).isInstanceOf[String]) {
               // Pparameter type is Char and argument is String.
               // Check that the string has length 1.
               if (args(i).asInstanceOf[String].length != 1) argMatched = false
@@ -79,7 +80,8 @@ class Invoke {
                   args(i) != null && args(i).getClass.isArray) {
                 // Convert a Java array to scala Seq
                 args(i) = args(i).asInstanceOf[Array[_]].toSeq
-              } else if (parameterTypes(i) == classOf[Char] &&
+              } else if ((parameterTypes(i) == classOf[Char] ||
+                          parameterTypes(i) == classOf[java.lang.Character]) &&
                          args(i) != null && args(i).isInstanceOf[String]) {
                 // Convert String to Char
                 args(i) = new java.lang.Character(args(i).asInstanceOf[String](0))

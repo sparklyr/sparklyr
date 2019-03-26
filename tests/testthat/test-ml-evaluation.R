@@ -1,20 +1,7 @@
 context("ml evaluator")
-sc <- testthat_spark_connection()
-
-iris_tbl <- testthat_tbl("iris")
-#
-# test_that("basic classification evaluation works", {
-#   setosa_tbl <- iris_tbl %>% dplyr::mutate(Is_Setosa = ifelse(Species == "setosa", 1, 0))
-#
-#   ml_fit <- ml_logistic_regression(setosa_tbl, Is_Setosa ~ .)
-#   ml_pred <- sdf_predict(ml_fit, setosa_tbl)
-#   ml_pred <- dplyr::mutate(ml_pred, actual = ifelse(Species == "setosa", 1, 0))
-#   accuracy <- ml_classification_eval(ml_pred, "actual", "prediction", "accuracy")
-#
-#   expect_equal(accuracy, 1)
-# })
 
 test_that("basic binary classification evaluation works", {
+  sc <- testthat_spark_connection()
   df <- data.frame(label = c(1, 1, 0, 0), features1 = c(1, 1, 0, 0))
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
   model <- df_tbl %>%
@@ -28,6 +15,7 @@ test_that("basic binary classification evaluation works", {
 })
 
 test_that("basic regression evaluation works", {
+  sc <- testthat_spark_connection()
   df <- data.frame(label = c(1.2, 4.5, 6.7),
                    prediction = c(3, 5, 7))
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
@@ -39,4 +27,26 @@ test_that("basic regression evaluation works", {
     df_tbl, label_col = "label", prediction_col = "prediction", metric_name = "mse")
 
   expect_equal(mse_r, mse_s)
+})
+
+test_that("ml evaluator print methods work", {
+  sc <- testthat_spark_connection()
+
+  expect_known_output(
+    ml_binary_classification_evaluator(sc, uid = "foo"),
+    output_file("print/binary-classification-evaluator.txt"),
+    print = TRUE
+  )
+
+  expect_known_output(
+   ml_multiclass_classification_evaluator(sc, uid = "foo"),
+    output_file("print/multiclass-classification-evaluator.txt"),
+    print = TRUE
+  )
+
+  expect_known_output(
+    ml_regression_evaluator(sc, uid = "foo"),
+    output_file("print/regression-evaluator.txt"),
+    print = TRUE
+  )
 })

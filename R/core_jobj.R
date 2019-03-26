@@ -16,6 +16,9 @@ spark_jobj <- function(x, ...) {
   UseMethod("spark_jobj")
 }
 
+spark_jobj_id <- function(x) {
+  x$id
+}
 
 #' @export
 spark_jobj.default <- function(x, ...) {
@@ -147,7 +150,7 @@ cleanup.jobj <- function(jobj) {
   }
 }
 
-clearJobjs <- function() {
+clear_jobjs <- function() {
   valid <- ls(.validJobjs)
   rm(list = valid, envir = .validJobjs)
 

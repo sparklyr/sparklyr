@@ -1,80 +1,94 @@
 #' @rdname ml-tuning
 #' @param num_folds Number of folds for cross validation. Must be >= 2. Default: 3
 #' @export
-ml_cross_validator <- function(
-  x, estimator, estimator_param_maps,
-  evaluator,
-  num_folds = 3L,
-  collect_sub_models = FALSE,
-  parallelism = 1L,
-  seed = NULL,
-  uid = random_string("cross_validator_"),
-  ...
-) {
+ml_cross_validator <- function(x, estimator = NULL, estimator_param_maps = NULL,
+                               evaluator = NULL, num_folds = 3, collect_sub_models = FALSE,
+                               parallelism = 1, seed = NULL,
+                               uid = random_string("cross_validator_"), ...) {
+  check_dots_used()
   UseMethod("ml_cross_validator")
 }
 
 #' @export
-ml_cross_validator.spark_connection <- function(
-  x, estimator, estimator_param_maps,
-  evaluator,
-  num_folds = 3L,
-  collect_sub_models = FALSE,
-  parallelism = 1L,
-  seed = NULL,
-  uid = random_string("cross_validator_"),
-  ...
-) {
+ml_cross_validator.spark_connection <- function(x, estimator = NULL, estimator_param_maps = NULL,
+                                                evaluator = NULL, num_folds = 3, collect_sub_models = FALSE,
+                                                parallelism = 1, seed = NULL,
+                                                uid = random_string("cross_validator_"), ...) {
+  .args <- list(
+    estimator = estimator,
+    estimator_param_maps = estimator_param_maps,
+    evaluator = evaluator,
+    num_folds = num_folds,
+    collect_sub_models = collect_sub_models,
+    parallelism = parallelism,
+    seed = seed
+  ) %>%
+    validator_ml_cross_validator()
 
-  num_folds <- ensure_scalar_integer(num_folds)
-  collect_sub_models <- ensure_scalar_boolean(collect_sub_models)
-  parallelism <- ensure_scalar_integer(parallelism)
-
-  ml_new_validator(x, "org.apache.spark.ml.tuning.CrossValidator", uid,
-                   estimator, evaluator, estimator_param_maps, seed) %>%
-    invoke("setNumFolds", num_folds) %>%
-    jobj_set_param("setCollectSubModels", collect_sub_models, FALSE, "2.3.0") %>%
-    jobj_set_param("setParallelism", parallelism, 1L, "2.3.0") %>%
+  ml_new_validator(
+    x, "org.apache.spark.ml.tuning.CrossValidator", uid,
+    .args[["estimator"]], .args[["evaluator"]], .args[["estimator_param_maps"]],
+    .args[["seed"]]
+  ) %>%
+    invoke("setNumFolds", .args[["num_folds"]]) %>%
+    jobj_set_param("setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE) %>%
+    jobj_set_param("setParallelism", .args[["parallelism"]], "2.3.0", 1) %>%
     new_ml_cross_validator()
 }
 
 #' @export
-ml_cross_validator.ml_pipeline <- function(
-  x, estimator, estimator_param_maps,
-  evaluator,
-  num_folds = 3L,
-  collect_sub_models = FALSE,
-  parallelism = 1L,
-  seed = NULL,
-  uid = random_string("cross_validator_"),
-  ...
-) {
-  cv <- ml_new_stage_modified_args()
-  ml_add_stage(x, cv)
+ml_cross_validator.ml_pipeline <- function(x, estimator = NULL, estimator_param_maps = NULL,
+                                           evaluator = NULL, num_folds = 3, collect_sub_models = FALSE,
+                                           parallelism = 1, seed = NULL,
+                                           uid = random_string("cross_validator_"), ...) {
+  stage <- ml_cross_validator.spark_connection(
+    x = spark_connection(x),
+    estimator = estimator,
+    estimator_param_maps = estimator_param_maps,
+    evaluator = evaluator,
+    num_folds = num_folds,
+    collect_sub_models = collect_sub_models,
+    parallelism = parallelism,
+    seed = seed,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ml_cross_validator.tbl_spark <- function(
-  x, estimator, estimator_param_maps,
-  evaluator,
-  num_folds = 3L,
-  collect_sub_models = FALSE,
-  parallelism = 1L,
-  seed = NULL,
-  uid = random_string("cross_validator_"),
-  ...
-) {
-  cv <- ml_new_stage_modified_args()
-  cv %>%
+ml_cross_validator.tbl_spark <- function(x, estimator = NULL, estimator_param_maps = NULL,
+                                         evaluator = NULL, num_folds = 3, collect_sub_models = FALSE,
+                                         parallelism = 1, seed = NULL,
+                                         uid = random_string("cross_validator_"), ...) {
+  stage <- ml_cross_validator.spark_connection(
+    x = spark_connection(x),
+    estimator = estimator,
+    estimator_param_maps = estimator_param_maps,
+    evaluator = evaluator,
+    num_folds = num_folds,
+    collect_sub_models = collect_sub_models,
+    parallelism = parallelism,
+    seed = seed,
+    uid = uid,
+    ...
+  )
+  stage %>%
     ml_fit(x)
 }
 
-# Constructors
-#
+validator_ml_cross_validator <- function(.args) {
+  .args <- validate_args_tuning(.args)
+  .args[["num_folds"]] <- cast_scalar_integer(.args[["num_folds"]])
+  .args
+}
+
 new_ml_cross_validator <- function(jobj) {
-  new_ml_tuning(jobj,
-                num_folds = invoke(jobj, "getNumFolds"),
-                subclass = "ml_cross_validator")
+  new_ml_tuning(
+    jobj,
+    num_folds = invoke(jobj, "getNumFolds"),
+    class = "ml_cross_validator"
+  )
 }
 
 new_ml_cross_validator_model <- function(jobj) {
@@ -93,16 +107,13 @@ new_ml_cross_validator_model <- function(jobj) {
       param_maps_to_df() %>%
       dplyr::mutate(!!metric_name := avg_metrics) %>%
       dplyr::select(!!metric_name, dplyr::everything()),
-    sub_models = function() {
-      try_null(jobj %>%
-                 invoke("subModels") %>%
-                 lapply(function(fold) lapply(fold, ml_constructor_dispatch))
-      )
-    },
-    subclass = "ml_cross_validator_model")
+    sub_models = possibly_null(
+      ~ jobj %>%
+        invoke("subModels") %>%
+        purrr::map(~ purrr::map(.x, ml_call_constructor))
+    ),
+    class = "ml_cross_validator_model")
 }
-
-# Generic implementations
 
 #' @export
 print.ml_cross_validator <- function(x, ...) {

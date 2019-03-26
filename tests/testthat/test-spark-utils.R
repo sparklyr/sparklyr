@@ -32,8 +32,8 @@ test_that("jobj_class() works", {
   )
 })
 
-test_that("debug_string works", {
-  spk_iris <- copy_to(sc, iris, overwrite = TRUE)
-  debug <- sdf_debug_string(spk_iris, print=FALSE)
-  expect_true(grepl("^\\(1\\)", debug[1]))
+test_that("debug_string() works", {
+  iris_tbl <- copy_to(sc, iris, overwrite = TRUE)
+  debug <- sdf_debug_string(iris_tbl, print=FALSE)
+  expect_true(grepl("^\\([0-9]+\\)", debug[1]))
 })

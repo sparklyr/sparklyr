@@ -1,21 +1,26 @@
 package sparklyr
 
 class WorkerContext(
-  sourceArray: Array[org.apache.spark.sql.Row],
+  iterator: Iterator[org.apache.spark.sql.Row],
   lock: AnyRef,
   closure: Array[Byte],
   columns: Array[String],
   groupBy: Array[String],
   closureRLang: Array[Byte],
   bundlePath: String,
-  context: Array[Byte]) {
+  context: Array[Byte],
+  timeZoneId: String,
+  schema: org.apache.spark.sql.types.StructType,
+  options: Map[String, String]) {
 
   import org.apache.spark._
   import org.apache.spark.rdd.RDD
   import org.apache.spark.sql._
+  import org.apache.spark.sql.types.StructType
   import scala.collection.JavaConversions._
 
   private var result: Array[Row] = Array[Row]()
+  private var sourceArray: Option[Array[Row]] = None
 
   def getClosure(): Array[Byte] = {
     closure
@@ -33,8 +38,16 @@ class WorkerContext(
     groupBy
   }
 
+  def getIterator(): Iterator[Row] = {
+    iterator
+  }
+
   def getSourceArray(): Array[Row] = {
-    sourceArray
+    if (sourceArray.isEmpty) {
+      sourceArray = Option(iterator.toArray)
+    }
+
+    sourceArray.get
   }
 
   def getSourceArrayLength(): Int = {
@@ -53,6 +66,10 @@ class WorkerContext(
     result = resultParam.map(x => Row.fromSeq(x.asInstanceOf[Array[_]].toSeq))
   }
 
+  def setResultIter(resultParam: Iterator[Row]) = {
+    result = resultParam.toArray
+  }
+
   def getResultArray(): Array[Row] = {
     result
   }
@@ -69,5 +86,17 @@ class WorkerContext(
 
   def getContext(): Array[Byte] = {
     context
+  }
+
+  def getTimeZoneId(): String = {
+    timeZoneId
+  }
+
+  def getSchema() : StructType = {
+    schema
+  }
+
+  def getOptions() : Map[String, String] = {
+    options
   }
 }

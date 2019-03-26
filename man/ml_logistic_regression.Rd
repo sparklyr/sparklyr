@@ -5,13 +5,16 @@
 \title{Spark ML -- Logistic Regression}
 \usage{
 ml_logistic_regression(x, formula = NULL, fit_intercept = TRUE,
-  elastic_net_param = 0, reg_param = 0, max_iter = 100L,
-  threshold = 0.5, thresholds = NULL, tol = 1e-06, weight_col = NULL,
-  aggregation_depth = 2L, lower_bounds_on_coefficients = NULL,
-  lower_bounds_on_intercepts = NULL, upper_bounds_on_coefficients = NULL,
+  elastic_net_param = 0, reg_param = 0, max_iter = 100,
+  threshold = 0.5, thresholds = NULL, tol = 1e-06,
+  weight_col = NULL, aggregation_depth = 2,
+  lower_bounds_on_coefficients = NULL,
+  lower_bounds_on_intercepts = NULL,
+  upper_bounds_on_coefficients = NULL,
   upper_bounds_on_intercepts = NULL, features_col = "features",
-  label_col = "label", family = "auto", prediction_col = "prediction",
-  probability_col = "probability", raw_prediction_col = "rawPrediction",
+  label_col = "label", family = "auto",
+  prediction_col = "prediction", probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
   uid = random_string("logistic_regression_"), ...)
 }
 \arguments{
@@ -69,7 +72,7 @@ The bounds vector size must be equal with 1 for binomial regression, or the numb
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -106,7 +109,7 @@ mtcars_test <- partitions$test
 lr_model <- mtcars_training \%>\%
   ml_logistic_regression(am ~ gear + carb)
 
-pred <- sdf_predict(mtcars_test, lr_model)
+pred <- ml_predict(lr_model, mtcars_test)
 
 ml_binary_classification_evaluator(pred)
 }
@@ -128,3 +131,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

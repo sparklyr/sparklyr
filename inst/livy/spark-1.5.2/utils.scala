@@ -4,6 +4,7 @@
 //
 
 import java.io._
+import java.net.{InetAddress, ServerSocket}
 import java.util.Arrays
 
 import scala.util.Try
@@ -63,7 +64,10 @@ object Utils {
   }
 
   def collectImplBoolean(local: Array[Row], idx: Integer) = {
-    local.map{row => row(idx).asInstanceOf[Boolean]}
+    local.map{row => {
+      val el = row(idx)
+      if (el.isInstanceOf[Boolean]) if(el.asInstanceOf[Boolean]) 1 else 0 else scala.Int.MinValue
+    }}
   }
 
   def collectImplInteger(local: Array[Row], idx: Integer) = {
@@ -195,10 +199,14 @@ object Utils {
     }
   }
 
+  def collectArray(local: Array[Row], dtypes: Array[(String, String)], separator: String): Array[_] = {
+    (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
+  }
+
   def collect(df: DataFrame, separator: String): Array[_] = {
     val local : Array[Row] = df.collect()
     val dtypes = df.dtypes
-    (0 until dtypes.length).map{i => collectImpl(local, i, dtypes(i)._2, separator)}.toArray
+    collectArray(local, dtypes, separator)
   }
 
   def separateColumnArray(df: DataFrame,
@@ -336,7 +344,8 @@ object Utils {
           case "integer"  => if (Try(value.toInt).isSuccess) value.toInt else null.asInstanceOf[Int]
           case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
           case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
-          case _ => value
+          case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
+          case _ => if (value == "NA") null.asInstanceOf[String] else value
         }
       })
 
@@ -371,7 +380,7 @@ object Utils {
           case "double"    => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
           case "logical"   => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _ => value
+          case _ => if (value == "NA") null.asInstanceOf[String] else value
         }
       })
 
@@ -430,6 +439,68 @@ object Utils {
       if (cl == null) Nil else cl :: supers(cl.getSuperclass)
     }
   supers(obj.getClass).map(if (simpleName) _.getSimpleName else _.getName).toArray
+  }
+
+  def portIsAvailable(port: Int, inetAddress: InetAddress) = {
+    var ss: ServerSocket = null
+    var available = false
+
+    Try {
+        ss = new ServerSocket(port, 1, inetAddress)
+        available = true
+    }
+
+    if (ss != null) {
+        Try {
+            ss.close();
+        }
+    }
+
+    available
+  }
+
+  def nextPort(port: Int, inetAddress: InetAddress) = {
+    var freePort = port + 1
+    while (!portIsAvailable(freePort, inetAddress) && freePort - port < 100)
+      freePort += 1
+
+    // give up after 100 port searches
+    if (freePort - port < 100) freePort else 0;
+  }
+
+  def buildStructTypeForIntegerField(): StructType = {
+    val fields = Array(StructField("id", IntegerType, false))
+    StructType(fields)
+  }
+
+  def buildStructTypeForLongField(): StructType = {
+    val fields = Array(StructField("id", LongType, false))
+    StructType(fields)
+  }
+
+  def mapRddLongToRddRow(rdd: RDD[Long]): RDD[Row] = {
+    rdd.map(x => org.apache.spark.sql.Row(x))
+  }
+
+  def mapRddIntegerToRddRow(rdd: RDD[Long]): RDD[Row] = {
+    rdd.map(x => org.apache.spark.sql.Row(x.toInt))
+  }
+
+  def readWholeFiles(sc: SparkContext, inputPath: String): RDD[Row] = {
+    sc.wholeTextFiles(inputPath).map {
+      l => Row(l._1, l._2)
+    }
+  }
+
+  def unionRdd(context: org.apache.spark.SparkContext, rdds: Seq[org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]]):
+    org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
+    context.union(rdds)
+  }
+
+  def collectIter(iter: Iterator[Row], size: Integer, df: DataFrame, separator: String): Array[_] = {
+    val local = iter.take(size).toArray
+    val dtypes = df.dtypes
+    collectArray(local, dtypes, separator)
   }
 }
 

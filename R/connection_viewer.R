@@ -3,20 +3,65 @@
 # connection-specific actions possible with Spark connections
 spark_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
+
   actions <- list(
-    SparkUI = list(
-        icon = file.path(icons, "spark-ui.png"),
-        callback = function() {
-          utils::browseURL(spark_web(scon))
-        }
-    ),
-    Log = list(
-        icon = file.path(icons, "spark-log.png"),
-        callback = function() {
-          file.edit(spark_log_file(scon))
-        }
+    "Spark" = list(
+      icon = file.path(icons, "spark-ui.png"),
+      callback = function() {
+        utils::browseURL(spark_web(scon))
+      }
     )
   )
+
+  if (spark_connection_is_yarn(scon))
+  {
+    actions <- c(
+      actions,
+      list(
+        "YARN" = list(
+          icon = file.path(icons, "yarn-ui.png"),
+          callback = function() {
+            utils::browseURL(spark_connection_yarn_ui(scon))
+          }
+        )
+      )
+    )
+  }
+
+  if (identical(tolower(scon$method), "livy"))
+  {
+    actions <- c(
+      actions,
+      list(
+        "Livy" = list(
+          icon = file.path(icons, "livy-ui.png"),
+          callback = function() {
+            utils::browseURL(file.path(scon$master, "ui"))
+          }
+        ),
+        "Log" = list(
+          icon = file.path(icons, "spark-log.png"),
+          callback = function() {
+            utils::browseURL(file.path(scon$master, "ui", "session", scon$sessionId, "log"))
+          }
+        )
+      )
+    )
+  }
+  else
+  {
+    actions <- c(
+      actions,
+      list(
+        Log = list(
+            icon = file.path(icons, "spark-log.png"),
+            callback = function() {
+              file.edit(spark_log_file(scon))
+            }
+        )
+      )
+    )
+  }
 
   if (exists(".rs.api.documentNew")) {
     documentNew <- get(".rs.api.documentNew")
@@ -53,7 +98,7 @@ spark_actions <- function(scon) {
               sep = "\n"
             )
 
-            documentNew("sql", contents, row = 2, column = 15, execute = TRUE)
+            documentNew("sql", contents, row = 2, column = 15, execute = FALSE)
           }
         )
       )

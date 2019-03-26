@@ -1,4 +1,4 @@
-#' Feature Tranformation -- LSH (Estimator)
+#' Feature Transformation -- LSH (Estimator)
 #'
 #' Locality Sensitive Hashing functions for Euclidean distance
 #'   (Bucketed Random Projection) and Jaccard distance (MinHash).
@@ -17,65 +17,76 @@
 #' @name ft_lsh
 #' @seealso ft_lsh_utils
 #' @export
-ft_bucketed_random_projection_lsh <- function(
-  x, input_col, output_col,
-  bucket_length, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...) {
+ft_bucketed_random_projection_lsh <- function(x, input_col = NULL, output_col = NULL,
+                                              bucket_length = NULL, num_hash_tables = 1, seed = NULL,
+                                              uid = random_string("bucketed_random_projection_lsh_"), ...) {
+  check_dots_used()
   UseMethod("ft_bucketed_random_projection_lsh")
 }
 
+ml_bucketed_random_projection_lsh <- ft_bucketed_random_projection_lsh
+
 #' @export
-ft_bucketed_random_projection_lsh.spark_connection <- function(
-  x, input_col, output_col,
-  bucket_length, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...) {
+ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                                               bucket_length = NULL, num_hash_tables = 1, seed = NULL,
+                                                               uid = random_string("bucketed_random_projection_lsh_"), ...) {
+  spark_require_version(x, "2.1.0", "LSH")
 
-  if (spark_version(x) < "2.1.0")
-    stop("LSH is supported in Spark 2.1.0+")
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    bucket_length = bucket_length,
+    num_hash_tables = num_hash_tables,
+    seed = seed,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    validator_ml_bucketed_random_projection_lsh()
 
-  ml_ratify_args()
-
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
-                             input_col, output_col, uid) %>%
-    invoke("setBucketLength", bucket_length) %>%
-    invoke("setNumHashTables", num_hash_tables)
-
-  if (!rlang::is_null(seed))
-    jobj <- invoke(jobj, "setSeed", seed)
+  jobj <- spark_pipeline_stage(
+    x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    jobj_set_param("setBucketLength", .args[["bucket_length"]]) %>%
+    invoke("setNumHashTables", .args[["num_hash_tables"]]) %>%
+    jobj_set_param("setSeed", .args[["seed"]])
 
   estimator <- new_ml_bucketed_random_projection_lsh(jobj)
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
-ft_bucketed_random_projection_lsh.ml_pipeline <- function(
-  x, input_col, output_col,
-  bucket_length, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...
-) {
-
-  stage <- ml_new_stage_modified_args()
+ft_bucketed_random_projection_lsh.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                                          bucket_length = NULL, num_hash_tables = 1, seed = NULL,
+                                                          uid = random_string("bucketed_random_projection_lsh_"), ...) {
+  stage <- ft_bucketed_random_projection_lsh.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    bucket_length = bucket_length,
+    num_hash_tables = num_hash_tables,
+    seed = seed,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
-ft_bucketed_random_projection_lsh.tbl_spark <- function(
-  x, input_col, output_col,
-  bucket_length, num_hash_tables = 1L, seed = NULL,
-  dataset = NULL,
-  uid = random_string("bucketed_random_projection_lsh_"), ...
-) {
-  dots <- rlang::dots_list(...)
-
-  stage <- ml_new_stage_modified_args()
+ft_bucketed_random_projection_lsh.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                                        bucket_length = NULL, num_hash_tables = 1, seed = NULL,
+                                                        uid = random_string("bucketed_random_projection_lsh_"), ...) {
+  stage <- ft_bucketed_random_projection_lsh.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    bucket_length = bucket_length,
+    num_hash_tables = num_hash_tables,
+    seed = seed,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -83,19 +94,8 @@ ft_bucketed_random_projection_lsh.tbl_spark <- function(
     ml_fit_and_transform(stage, x)
 }
 
-ml_validator_bucketed_random_projection_lsh <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      bucket_length <- ensure_scalar_double(bucket_length)
-      num_hash_tables <- ensure_scalar_integer(num_hash_tables)
-      if (!rlang::is_null(seed))
-        seed <- ensure_scalar_integer(seed)
-    }) %>%
-    ml_extract_args(nms)
-}
-
 new_ml_bucketed_random_projection_lsh <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_bucketed_random_projection_lsh")
+  new_ml_estimator(jobj, class = "ml_bucketed_random_projection_lsh")
 }
 
 new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
@@ -103,5 +103,13 @@ new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
     jobj,
     approx_nearest_neighbors = make_approx_nearest_neighbors(jobj),
     approx_similarity_join = make_approx_similarity_join(jobj),
-    subclass = "ml_bucketed_random_projection_lsh_model")
+    class = "ml_bucketed_random_projection_lsh_model")
+}
+
+validator_ml_bucketed_random_projection_lsh <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["bucket_length"]] <- cast_nullable_scalar_double(.args[["bucket_length"]])
+  .args[["num_hash_tables"]] <- cast_scalar_integer(.args[["num_hash_tables"]])
+  .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
+  .args
 }

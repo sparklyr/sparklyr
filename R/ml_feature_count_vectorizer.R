@@ -1,4 +1,4 @@
-#' Feature Tranformation -- CountVectorizer (Estimator)
+#' Feature Transformation -- CountVectorizer (Estimator)
 #'
 #' Extracts a vocabulary from document collections.
 #'
@@ -26,54 +26,82 @@
 #'   Default: \code{2^18}.
 #'
 #' @export
-ft_count_vectorizer <- function(
-  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
-  vocab_size = as.integer(2^18), dataset = NULL,
-  uid = random_string("count_vectorizer_"), ...) {
+ft_count_vectorizer <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
+                                min_df = 1, min_tf = 1,
+                                vocab_size = 2^18,
+                                uid = random_string("count_vectorizer_"), ...) {
   UseMethod("ft_count_vectorizer")
 }
 
+ml_count_vectorizer <- ft_count_vectorizer
+
 #' @export
-ft_count_vectorizer.spark_connection <- function(
-  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
-  vocab_size = as.integer(2^18), dataset = NULL,
-  uid = random_string("count_vectorizer_"), ...) {
+ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                                 binary = FALSE, min_df = 1, min_tf = 1,
+                                                 vocab_size = 2^18,
+                                                 uid = random_string("count_vectorizer_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    binary = binary,
+    min_df = min_df,
+    min_tf = min_tf,
+    vocab_size = vocab_size,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    validator_ml_count_vectorizer()
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.CountVectorizer",
-                                  input_col, output_col, uid) %>%
-    jobj_set_param("setBinary", binary, FALSE, "2.0.0") %>%
-    invoke("setMinDF", min_df) %>%
-    invoke("setMinTF", min_tf) %>%
-    invoke("setVocabSize", vocab_size) %>%
+  estimator <- spark_pipeline_stage(
+    x, "org.apache.spark.ml.feature.CountVectorizer",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    jobj_set_param("setBinary", .args[["binary"]], "2.0.0", FALSE) %>%
+    invoke("setMinDF", .args[["min_df"]]) %>%
+    invoke("setMinTF", .args[["min_tf"]]) %>%
+    invoke("setVocabSize", .args[["vocab_size"]]) %>%
     new_ml_count_vectorizer()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
-ft_count_vectorizer.ml_pipeline <- function(
-  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
-  vocab_size = as.integer(2^18), dataset = NULL,
-  uid = random_string("count_vectorizer_"), ...
-) {
+ft_count_vectorizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                            binary = FALSE, min_df = 1, min_tf = 1,
+                                            vocab_size = 2^18,
+                                            uid = random_string("count_vectorizer_"), ...) {
+  stage <- ft_count_vectorizer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    binary = binary,
+    min_df = min_df,
+    min_tf = min_tf,
+    vocab_size = vocab_size,
+    uid = uid,
+    ...
+  )
 
-  stage <- ml_new_stage_modified_args()
   ml_add_stage(x, stage)
-
 }
 
 #' @export
-ft_count_vectorizer.tbl_spark <- function(
-  x, input_col, output_col, binary = FALSE, min_df = 1, min_tf = 1,
-  vocab_size = as.integer(2^18), dataset = NULL,
-  uid = random_string("count_vectorizer_"), ...
-) {
-  stage <- ml_new_stage_modified_args()
+ft_count_vectorizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                          binary = FALSE, min_df = 1, min_tf = 1,
+                                          vocab_size = 2^18,
+                                          uid = random_string("count_vectorizer_"), ...) {
+  stage <- ft_count_vectorizer.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    binary = binary,
+    min_df = min_df,
+    min_tf = min_tf,
+    vocab_size = vocab_size,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -81,38 +109,16 @@ ft_count_vectorizer.tbl_spark <- function(
     ml_fit_and_transform(stage, x)
 }
 
-# Validator
-
-ml_validator_count_vectorizer <- function(args, nms) {
-  old_new_mapping <- c(
-    list(
-      min.df = "min_df",
-      min.tf = "min_tf",
-      vocab.size = "vocab_size"
-    ), input_output_mapping
-  )
-
-  args %>%
-    ml_validate_args(
-      {
-        binary <- ensure_scalar_boolean(binary)
-        min_df <- ensure_scalar_double(min_df)
-        min_tf <- ensure_scalar_double(min_tf)
-        vocab_size <- ensure_scalar_integer(vocab_size)
-      }, old_new_mapping) %>%
-    ml_extract_args(nms, old_new_mapping)
-}
-
 # Constructors
 
 new_ml_count_vectorizer <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_count_vectorizer")
+  new_ml_estimator(jobj, class = "ml_count_vectorizer")
 }
 
 new_ml_count_vectorizer_model <- function(jobj) {
   new_ml_transformer(jobj,
                      vocabulary = invoke(jobj, "vocabulary"),
-                     subclass = "ml_count_vectorizer_model")
+                     class = "ml_count_vectorizer_model")
 }
 
 #' @rdname ft_count_vectorizer
@@ -121,4 +127,14 @@ new_ml_count_vectorizer_model <- function(jobj) {
 #' @export
 ml_vocabulary <- function(model) {
   unlist(model$vocabulary)
+}
+
+validator_ml_count_vectorizer <- function(.args) {
+  .args <- validate_args_transformer(.args)
+
+  .args[["binary"]] <- cast_scalar_logical(.args[["binary"]])
+  .args[["min_df"]] <- cast_scalar_double(.args[["min_df"]])
+  .args[["min_tf"]] <- cast_scalar_double(.args[["min_tf"]])
+  .args[["vocab_size"]] <- cast_scalar_integer(.args[["vocab_size"]])
+  .args
 }

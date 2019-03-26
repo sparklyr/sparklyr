@@ -32,9 +32,14 @@ setMethod("dbReadTable", c("spark_connection", "character"),
 setMethod("dbListTables", "spark_connection", function(conn) {
   df <- df_from_sql(conn, "SHOW TABLES")
 
-  tableNames <- df$tableName
-  filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
-  sort(filtered)
+  if (nrow(df) <= 0) {
+    character(0)
+  }
+  else {
+    tableNames <- df$tableName
+    filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
+    sort(filtered)
+  }
 })
 
 
@@ -45,11 +50,9 @@ setMethod("dbExistsTable", c("spark_connection", "character"), function(conn, na
 
 setMethod("dbRemoveTable", c("spark_connection", "character"),
   function(conn, name) {
-    hive <- hive_context(conn)
-    if (is_spark_v2(conn)) {
-      hive <- invoke(hive, "sqlContext")
-    }
-    invoke(hive, "dropTempTable", name)
+    dbi_ensure_no_backtick(name)
+
+    dbSendQuery(conn, paste0("DROP TABLE `", name, "`"))
     invisible(TRUE)
   }
 )

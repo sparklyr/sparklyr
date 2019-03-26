@@ -1,3 +1,5 @@
+# nocov start
+
 #' Install Livy
 #'
 #' Automatically download and install \href{http://livy.io/}{\samp{livy}}.
@@ -17,14 +19,14 @@ livy_install <- function(version       = "0.5.0",
                          spark_home    = NULL,
                          spark_version = NULL)
 {
-  version <- ensure_scalar_character(version)
+  version <- cast_string(version)
 
   # determine an appropriate spark version
   if (is.null(spark_version)) {
 
     # if spark_home is set, then infer spark version based on that
     if (!is.null(spark_home)) {
-      spark_version <- spark_version_from_home(spark_home)
+      spark_version <- spark_version_from_home(spark_home, default = spark_version)
     } else {
       spark_version <- switch(
         version,
@@ -40,7 +42,7 @@ livy_install <- function(version       = "0.5.0",
   }
 
   # warn if the user attempts to use livy 0.2.0 with Spark >= 2.0.0
-  spark_version <- ensure_scalar_character(spark_version)
+  spark_version <- cast_string(spark_version)
   if (version == "0.2.0" &&
       numeric_version(spark_version) >= "2.0.0")
   {
@@ -204,7 +206,7 @@ livy_install_find <- function(livyVersion = NULL) {
     livyInstall <- quote(livy_install(version = ""))
     livyInstall$version <- livyVersion
 
-    stop(paste("Livy version not installed. To install, use", deparse(livyInstall)))
+    stop("Livy version not installed. To install, use ", deparse(livyInstall))
   }
 
   tail(versions, n = 1)
@@ -233,3 +235,5 @@ livy_home_dir <- function(version = NULL) {
     NULL
   })
 }
+
+# nocov end

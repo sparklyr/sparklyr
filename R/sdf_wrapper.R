@@ -84,31 +84,29 @@ sdf_read_column <- function(x, column) {
   column
 }
 
-# Read a Spark Dataset into R.
-#' @importFrom dplyr as_data_frame
-sdf_collect <- function(object) {
+#' Collect a Spark DataFrame into R.
+#'
+#' Collects a Spark dataframe into R.
+#'
+#' @param object Spark dataframe to collect
+#' @param ... Additional options.
+#'
+#' @export
+sdf_collect <- function(object, ...) {
+  args <- list(...)
   sc <- spark_connection(object)
-  sdf <- spark_dataframe(object)
 
-  separator <- split_separator(sc)
+  if (sdf_is_streaming(object))
+    sdf_collect_stream(object, ...)
+  else if (arrow_enabled(sc, object) && !identical(args$arrow, FALSE))
+    arrow_collect(object, ...)
+  else
+    sdf_collect_static(object, ...)
+}
 
-  # for some reason, we appear to receive invalid results when
-  # collecting Spark DataFrames with many columns. empirically,
-  # having more than 50 columns seems to trigger the buggy behavior
-  # collect the data set in chunks, and then join those chunks.
-  # note that this issue should be resolved with Spark >2.0.0
-  collected <- if (spark_version(sc) > "2.0.0") {
-    invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
-  } else {
-    columns <- invoke(sdf, "columns") %>% as.character()
-    chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
-    chunks <- split_chunks(columns, as.integer(chunk_size))
-    pieces <- lapply(chunks, function(chunk) {
-      subset <- sdf %>% invoke("selectExpr", as.list(chunk))
-      invoke_static(sc, "sparklyr.Utils", "collect", subset, separator$regexp)
-    })
-    do.call(c, pieces)
-  }
+sdf_collect_data_frame <- function(sdf, collected) {
+  if (identical(collected, NULL)) return(invisible(NULL))
+  sc <- spark_connection(sdf)
 
   # deserialize columns as needed (string columns will enter as
   # a single newline-delimited string)
@@ -138,7 +136,68 @@ sdf_collect <- function(object) {
   # set column names and return dataframe
   colNames <- invoke(sdf, "columns")
   names(fixed) <- as.character(colNames)
-  as_data_frame(fixed, stringsAsFactors = FALSE, optional = TRUE)
+  fixed <- as_data_frame(fixed, stringsAsFactors = FALSE, optional = TRUE)
+
+  # fix booleans
+  schema <- sdf_schema(sdf)
+  for (field in schema) {
+    if (field$type == "BooleanType" && field$name %in% names(fixed)) {
+      fixed[[field$name]] <- as.logical(fixed[[field$name]])
+    }
+  }
+
+  fixed
+}
+
+# Read a Spark Dataset into R.
+#' @importFrom dplyr as_data_frame
+sdf_collect_static <- function(object, ...) {
+  args <- list(...)
+  sc <- spark_connection(object)
+  sdf <- spark_dataframe(object)
+
+  separator <- split_separator(sc)
+
+  # for some reason, we appear to receive invalid results when
+  # collecting Spark DataFrames with many columns. empirically,
+  # having more than 50 columns seems to trigger the buggy behavior
+  # collect the data set in chunks, and then join those chunks.
+  # note that this issue should be resolved with Spark >2.0.0
+  collected <- if (spark_version(sc) > "2.0.0") {
+    if (!identical(args$callback, NULL)) {
+      batch_size <- spark_config_value(sc$config, "sparklyr.collect.batch", as.integer(10^5L))
+      sdf_iter <- invoke(sdf, "toLocalIterator")
+
+      iter <- 1
+      while (invoke(sdf_iter, "hasNext")) {
+        raw_df <- invoke_static(sc, "sparklyr.Utils", "collectIter", invoke(sdf_iter, "underlying"), batch_size, sdf, separator$regexp)
+        df <- sdf_collect_data_frame(sdf, raw_df)
+        cb <- args$callback
+        if (is.language(cb)) cb <- rlang::as_closure(cb)
+
+        if (length(formals(cb)) >= 2) cb(df, iter) else cb(df)
+        iter <- iter + 1
+      }
+
+      NULL
+    }
+    else {
+      invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
+    }
+  } else {
+    if (!identical(args$callback, NULL)) stop("Parameter 'callback' requires Spark 2.0+")
+
+    columns <- invoke(sdf, "columns") %>% as.character()
+    chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
+    chunks <- split_chunks(columns, as.integer(chunk_size))
+    pieces <- lapply(chunks, function(chunk) {
+      subset <- sdf %>% invoke("selectExpr", as.list(chunk))
+      invoke_static(sc, "sparklyr.Utils", "collect", subset, separator$regexp)
+    })
+    do.call(c, pieces)
+  }
+
+  sdf_collect_data_frame(sdf, collected)
 }
 
 # Split a Spark DataFrame
@@ -164,6 +223,28 @@ sdf_split <- function(object,
 #'   a length-one character vector, giving the name of a Spark aggregation function
 #'   to be called; a named \R list mapping column names to an aggregation method,
 #'   or an \R function that is invoked on the grouped dataset.
+#'
+#'@examples
+#'\dontrun{
+#' library(sparklyr)
+#' library(dplyr)
+#'
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' # aggregating by mean
+#' iris_tbl %>%
+#'   mutate(Petal_Width = ifelse(Petal_Width > 1.5, "High", "Low" )) %>%
+#'   sdf_pivot(Petal_Width ~ Species,
+#'             fun.aggregate = list(Petal_Length = "mean"))
+#'
+#' # aggregating all observations in a list
+#' iris_tbl %>%
+#'   mutate(Petal_Width = ifelse(Petal_Width > 1.5, "High", "Low" )) %>%
+#'   sdf_pivot(Petal_Width ~ Species,
+#'             fun.aggregate = list(Petal_Length = "collect_list"))
+#'}
+#'
 #' @export
 sdf_pivot <- function(x, formula, fun.aggregate = "count") {
   sdf <- spark_dataframe(x)
@@ -234,13 +315,13 @@ sdf_separate_column <- function(x,
                                 column,
                                 into = NULL)
 {
-  column <- ensure_scalar_character(column)
+  column <- cast_string(column)
 
   # extract spark dataframe reference, connection
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
 
-  into_is_set <- ensure_scalar_boolean(!is.null(into))
+  into_is_set <- cast_scalar_logical(!is.null(into))
 
   # when 'into' is NULL, we auto-generate a names -> index map
   if (is.null(into)) {

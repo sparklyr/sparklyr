@@ -87,11 +87,11 @@ test_that("Error when specifying formula without tbl_spark for ml_ routines", {
   expect_error(
     ml_pipeline(sc) %>%
       ml_logistic_regression(Species ~ Petal_Length),
-    "formula should only be specified when calling ml_logistic_regression on a tbl_spark"
+    "`formula` may only be specified when `x` is a `tbl_spark`\\."
   )
 
   expect_error(
     ml_logistic_regression(sc, Species ~ Petal_Length),
-    "formula should only be specified when calling ml_logistic_regression on a tbl_spark"
+    "`formula` may only be specified when `x` is a `tbl_spark`\\."
   )
 })

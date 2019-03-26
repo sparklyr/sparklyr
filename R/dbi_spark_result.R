@@ -41,8 +41,10 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
   ""
 })
 
-setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, statement, params = NULL, ...) {
-  sql <- as.character(statement)
+setMethod("dbSendQuery",
+          "spark_connection",
+          function(conn, statement, ...) {
+  sql <- as.character(DBI::sqlInterpolate(conn, statement, ...))
 
   sdf <- invoke(hive_context(conn), "sql", sql)
   rs <- new("DBISparkResult",
@@ -53,7 +55,10 @@ setMethod("dbSendQuery", c("spark_connection", "character"), function(conn, stat
   rs
 })
 
-setMethod("dbGetQuery", c("spark_connection", "character"), function(conn, statement, ...) {
+setMethod("dbGetQuery",
+          # c("spark_connection", "character"),
+          "spark_connection",
+          function(conn, statement, ...) {
   rs <- dbSendQuery(conn, statement, ...)
   on.exit(dbClearResult(rs))
 

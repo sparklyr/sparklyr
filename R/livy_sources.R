@@ -1,3 +1,5 @@
+# nocov start
+
 livy_sources_included <- function() {
   c(
     "/invoke\\.scala",
@@ -9,6 +11,9 @@ livy_sources_included <- function() {
     "/repartition\\.scala",
     "/tracker\\.scala",
     "/livyutils\\.scala",
+    "/arrowhelper\\.scala",
+    "/arrowbatchstreamwriter\\.scala",
+    "/arrowconverters\\.scala",
     "/applyutils\\.scala",
     "/classutils\\.scala",
     "/fileutils\\.scala",
@@ -19,11 +24,12 @@ livy_sources_included <- function() {
     "/handler\\.scala",
     "/backend\\.scala",
     "/workerhelper\\.scala",
+    "/workerapply\\.scala",
     "/workerrdd\\.scala",
-    "/workerutils\\.scala",
     "/mlutils\\.scala",
     "/mlutils2\\.scala",
-    "/bucketizerutils\\.scala"
+    "/bucketizerutils\\.scala",
+    "/livyutils\\.scala"
     # New files might require entries to livy_load_scala_sources and globalClassMap
   )
 }
@@ -68,3 +74,5 @@ livy_sources_refresh <- function() {
 
   invisible(NULL)
 }
+
+# nocov end

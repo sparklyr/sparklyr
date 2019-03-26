@@ -31,3 +31,32 @@ Evaluator for clustering results. The metric computes the Silhouette measure usi
     points in a cluster are close to the other points in the same cluster and far from the
     points of the other clusters.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+partitions <- iris_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+iris_training <- partitions$training
+iris_test <- partitions$test
+
+formula <- Species ~ .
+
+# Train the models
+kmeans_model <- ml_kmeans(iris_training, formula = formula)
+b_kmeans_model <- ml_bisecting_kmeans(iris_training, formula = formula)
+gmm_model <- ml_gaussian_mixture(iris_training, formula = formula)
+
+# Predict
+pred_kmeans <- ml_predict(kmeans_model, iris_test)
+pred_b_kmeans <- ml_predict(b_kmeans_model, iris_test)
+pred_gmm <- ml_predict(gmm_model, iris_test)
+
+# Evaluate
+ml_clustering_evaluator(pred_kmeans)
+ml_clustering_evaluator(pred_b_kmeans)
+ml_clustering_evaluator(pred_gmm)
+}
+}

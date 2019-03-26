@@ -1,3 +1,5 @@
+# nocov start
+
 .worker_globals <- new.env(parent = emptyenv())
 
 spark_worker_main <- function(
@@ -30,10 +32,17 @@ spark_worker_main <- function(
 
     worker_log("is starting")
 
+    options(sparklyr.connection.cancellable = FALSE)
+
     sc <- spark_worker_connect(sessionId, backendPort, config)
     worker_log("is connected")
 
-    spark_worker_apply(sc)
+    if (config$arrow) {
+      spark_worker_apply_arrow(sc, config)
+    }
+    else {
+      spark_worker_apply(sc, config)
+    }
 
     if (identical(config$profile, TRUE)) {
       # utils::Rprof(NULL)
@@ -42,7 +51,7 @@ spark_worker_main <- function(
 
   }, error = function(e) {
     worker_log_error("terminated unexpectedly: ", e$message)
-    if (exists(".stopLastError", envir = .GlobalEnv)) {
+    if (exists(".stopLastError", envir = .worker_globals)) {
       worker_log_error("collected callstack: \n", get(".stopLastError", envir = .worker_globals))
     }
     quit(status = -1)
@@ -70,3 +79,5 @@ spark_worker_hooks <- function() {
   }, as.environment("package:base"))
   lock("stop",  as.environment("package:base"))
 }
+
+# nocov end

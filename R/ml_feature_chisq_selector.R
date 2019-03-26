@@ -1,4 +1,4 @@
-#' Feature Tranformation -- ChiSqSelector (Estimator)
+#' Feature Transformation -- ChiSqSelector (Estimator)
 #'
 #' Chi-Squared feature selection, which selects categorical features to use for predicting a categorical label
 #'
@@ -16,64 +16,94 @@
 #'
 #'
 #' @export
-ft_chisq_selector <- function(
-  x, features_col, output_col, label_col, selector_type = "numTopFeatures",
-  fdr = 0.05, fpr = 0.05, fwe = 0.05, num_top_features = 50L, percentile = 0.1,
-  dataset = NULL,
-  uid = random_string("chisq_selector_"), ...) {
+ft_chisq_selector <- function(x, features_col = "features", output_col = NULL, label_col = "label",
+                              selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
+                              num_top_features = 50, percentile = 0.1,
+                              uid = random_string("chisq_selector_"), ...) {
+  check_dots_used()
   UseMethod("ft_chisq_selector")
 }
 
+ml_chisq_selector <- ft_chisq_selector
+
 #' @export
-ft_chisq_selector.spark_connection <- function(
-  x, features_col, output_col, label_col, selector_type = "numTopFeatures",
-  fdr = 0.05, fpr = 0.05, fwe = 0.05, num_top_features = 50L, percentile = 0.1,
-  dataset = NULL,
-  uid = random_string("chisq_selector_"), ...) {
+ft_chisq_selector.spark_connection <- function(x, features_col = "features", output_col = NULL, label_col = "label",
+                                               selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
+                                               num_top_features = 50, percentile = 0.1,
+                                               uid = random_string("chisq_selector_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    features_col = features_col,
+    output_col = output_col,
+    label_col = label_col,
+    selector_type = selector_type,
+    fdr = fdr,
+    fpr = fpr,
+    fwe = fwe,
+    num_top_features = num_top_features,
+    percentile = percentile,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    validator_ml_chisq_selector()
 
-  estimator <- invoke_new(x, "org.apache.spark.ml.feature.ChiSqSelector", uid) %>%
-    jobj_set_param("setFdr", fdr, 0.05, "2.2.0") %>%
-    invoke("setFeaturesCol", features_col) %>%
-    jobj_set_param("setFpr", fpr, 0.05, "2.1.0") %>%
-    jobj_set_param("setFwe", fwe, 0.05, "2.2.0") %>%
-    invoke("setLabelCol", label_col) %>%
-    invoke("setNumTopFeatures", num_top_features) %>%
-    invoke("setOutputCol", output_col) %>%
-    jobj_set_param("setPercentile", percentile, 0.1, "2.1.0") %>%
-    jobj_set_param("setSelectorType", selector_type, "numTopFeatures", "2.1.0") %>%
+  estimator <- spark_pipeline_stage(
+    x, "org.apache.spark.ml.feature.ChiSqSelector", output_col = .args[["output_col"]],
+    uid = .args[["uid"]]) %>%
+    jobj_set_param("setFdr", .args[["fdr"]], "2.2.0", 0.05) %>%
+    invoke("setFeaturesCol", .args[["features_col"]]) %>%
+    jobj_set_param("setFpr", .args[["fpr"]], "2.1.0", 0.05) %>%
+    jobj_set_param("setFwe", .args[["fwe"]], "2.2.0", 0.05) %>%
+    invoke("setLabelCol", .args[["label_col"]]) %>%
+    invoke("setNumTopFeatures", .args[["num_top_features"]]) %>%
+    jobj_set_param("setPercentile", .args[["percentile"]], "2.1.0", 0.1) %>%
+    jobj_set_param("setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures") %>%
     new_ml_chisq_selector()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
-ft_chisq_selector.ml_pipeline <- function(
-  x, features_col, output_col, label_col, selector_type = "numTopFeatures",
-  fdr = 0.05, fpr = 0.05, fwe = 0.05, num_top_features = 50L, percentile = 0.1,
-  dataset = NULL,
-  uid = random_string("chisq_selector_"), ...
-) {
-
-  stage <- ml_new_stage_modified_args()
+ft_chisq_selector.ml_pipeline <- function(x, features_col = "features", output_col = NULL, label_col = "label",
+                                          selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
+                                          num_top_features = 50, percentile = 0.1,
+                                          uid = random_string("chisq_selector_"), ...) {
+  stage <- ft_chisq_selector.spark_connection(
+    x = spark_connection(x),
+    features_col = features_col,
+    output_col = output_col,
+    label_col = label_col,
+    selector_type = selector_type,
+    fdr = fdr,
+    fpr = fpr,
+    fwe = fwe,
+    num_top_features = num_top_features,
+    percentile = percentile,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
-ft_chisq_selector.tbl_spark <- function(
-  x, features_col, output_col, label_col, selector_type = "num_top_features",
-  fdr = 0.05, fpr = 0.05, fwe = 0.05, num_top_features = 50L, percentile = 0.1,
-  dataset = NULL,
-  uid = random_string("chisq_selector_"), ...
-) {
-  dots <- rlang::dots_list(...)
-
-  stage <- ml_new_stage_modified_args()
+ft_chisq_selector.tbl_spark <- function(x, features_col = "features", output_col = NULL, label_col = "label",
+                                        selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
+                                        num_top_features = 50, percentile = 0.1,
+                                        uid = random_string("chisq_selector_"), ...) {
+  stage <- ft_chisq_selector.spark_connection(
+    x = spark_connection(x),
+    features_col = features_col,
+    output_col = output_col,
+    label_col = label_col,
+    selector_type = selector_type,
+    fdr = fdr,
+    fpr = fpr,
+    fwe = fwe,
+    num_top_features = num_top_features,
+    percentile = percentile,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -82,28 +112,26 @@ ft_chisq_selector.tbl_spark <- function(
 }
 
 new_ml_chisq_selector <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_chisq_selector")
+  new_ml_estimator(jobj, class = "ml_chisq_selector")
 }
 
 new_ml_chisq_selector_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_chisq_selector_model")
+  new_ml_transformer(jobj, class = "ml_chisq_selector_model")
 }
 
-ml_validator_chisq_selector <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      features_col <- ensure_scalar_character(features_col)
-      label_col <- ensure_scalar_character(label_col)
-      output_col <- ensure_scalar_character(output_col)
-      fdr <- ensure_scalar_double(fdr)
-      fpr <- ensure_scalar_double(fpr)
-      fwe <- ensure_scalar_double(fwe)
-      num_top_features <- ensure_scalar_integer(num_top_features)
-      percentile <- ensure_scalar_double(percentile)
-      selector_type <- rlang::arg_match(
-        selector_type,
-        c("numTopFeatures", "percentile", "fpr", "fdr", "fwe"))
-      uid <- ensure_scalar_character(uid)
-    }) %>%
-    ml_extract_args(nms)
+validator_ml_chisq_selector <- function(.args) {
+  .args[["features_col"]] <- cast_string(.args[["features_col"]])
+  .args[["label_col"]] <- cast_string(.args[["label_col"]])
+  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
+  .args[["fdr"]] <- cast_scalar_double(.args[["fdr"]])
+  .args[["fpr"]] <- cast_scalar_double(.args[["fpr"]])
+  .args[["fwe"]] <- cast_scalar_double(.args[["fwe"]])
+  .args[["num_top_features"]] <- cast_scalar_integer(.args[["num_top_features"]])
+  .args[["percentile"]] <- cast_scalar_double(.args[["percentile"]])
+  .args[["selector_type"]] <- cast_choice(
+    .args[["selector_type"]],
+    c("numTopFeatures", "percentile", "fpr", "fdr", "fwe")
+  )
+  .args[["uid"]] <- cast_string(.args[["uid"]])
+  .args
 }

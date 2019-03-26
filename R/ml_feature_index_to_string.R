@@ -12,42 +12,72 @@
 #' @param labels Optional param for array of labels specifying index-string mapping.
 #' @seealso \code{\link{ft_string_indexer}}
 #' @export
-ft_index_to_string <- function(x, input_col, output_col, labels = NULL,
+ft_index_to_string <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
                                uid = random_string("index_to_string_"), ...) {
+  check_dots_used()
   UseMethod("ft_index_to_string")
 }
 
+ml_index_to_string <- ft_index_to_string
+
 #' @export
-ft_index_to_string.spark_connection <- function(
-  x, input_col, output_col, labels = NULL, uid = random_string("index_to_string_"), ...) {
+ft_index_to_string.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
+                                                uid = random_string("index_to_string_"), ...) {
 
-  ml_ratify_args()
-  jobj <- ml_new_transformer(x, "org.apache.spark.ml.feature.IndexToString",
-                             input_col, output_col, uid)
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    labels = labels,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    validator_ml_index_to_string()
 
-  if (!rlang::is_null(labels))
-    jobj <- invoke(jobj, "setLabels", labels)
+  jobj <- spark_pipeline_stage(
+    x, "org.apache.spark.ml.feature.IndexToString",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    jobj_set_param("setLabels", .args[["labels"]])
 
   new_ml_index_to_string(jobj)
 }
 
 #' @export
-ft_index_to_string.ml_pipeline <- function(
-  x, input_col, output_col, labels = NULL,
-  uid = random_string("index_to_string_"), ...) {
+ft_index_to_string.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
+                                           uid = random_string("index_to_string_"), ...) {
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  stage <- ft_index_to_string.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    labels = labels,
+    uid = uid,
+    ...
+  )
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_index_to_string.tbl_spark <- function(
-  x, input_col, output_col, labels = NULL,
-  uid = random_string("index_to_string_"), ...) {
-  transformer <- ml_new_stage_modified_args()
-  ml_transform(transformer, x)
+ft_index_to_string.tbl_spark <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
+                                         uid = random_string("index_to_string_"), ...) {
+
+  stage <- ft_index_to_string.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    labels = labels,
+    uid = uid,
+    ...
+  )
+  ml_transform(stage, x)
 }
 
 new_ml_index_to_string <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_index_to_string")
+  new_ml_transformer(jobj, class = "ml_index_to_string")
+}
+
+validator_ml_index_to_string <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["labels"]] <- cast_nullable_string_list(.args[["labels"]])
+  .args
 }

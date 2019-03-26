@@ -4,7 +4,7 @@
 \alias{ml_isotonic_regression}
 \title{Spark ML -- Isotonic Regression}
 \usage{
-ml_isotonic_regression(x, formula = NULL, feature_index = 0L,
+ml_isotonic_regression(x, formula = NULL, feature_index = 0,
   isotonic = TRUE, weight_col = NULL, features_col = "features",
   label_col = "label", prediction_col = "prediction",
   uid = random_string("isotonic_regression_"), ...)
@@ -34,7 +34,7 @@ ml_isotonic_regression(x, formula = NULL, feature_index = 0L,
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -57,6 +57,26 @@ Currently implemented using parallelized pool adjacent violators algorithm. Only
 \details{
 When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{response} and \code{features}) is specified, the function returns a \code{ml_model} object wrapping a \code{ml_pipeline_model} which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument \code{predicted_label_col} (defaults to \code{"predicted_label"}) can be used to specify the name of the predicted label column. In addition to the fitted \code{ml_pipeline_model}, \code{ml_model} objects also contain a \code{ml_pipeline} object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by \code{\link{ml_save}} with \code{type = "pipeline"} to faciliate model refresh workflows.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+partitions <- iris_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+iris_training <- partitions$training
+iris_test <- partitions$test
+
+iso_res <- iris_tbl \%>\%
+  ml_isotonic_regression(Petal_Length ~ Petal_Width)
+
+pred <- ml_predict(iso_res, iris_test)
+
+pred
+}
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
@@ -73,3 +93,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

@@ -2,10 +2,10 @@
 % Please edit documentation in R/ml_feature_min_max_scaler.R
 \name{ft_min_max_scaler}
 \alias{ft_min_max_scaler}
-\title{Feature Tranformation -- MinMaxScaler (Estimator)}
+\title{Feature Transformation -- MinMaxScaler (Estimator)}
 \usage{
-ft_min_max_scaler(x, input_col, output_col, min = 0, max = 1,
-  dataset = NULL, uid = random_string("min_max_scaler_"), ...)
+ft_min_max_scaler(x, input_col = NULL, output_col = NULL, min = 0,
+  max = 1, uid = random_string("min_max_scaler_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -17,9 +17,6 @@ ft_min_max_scaler(x, input_col, output_col, min = 0, max = 1,
 \item{min}{Lower bound after transformation, shared by all features Default: 0.0}
 
 \item{max}{Upper bound after transformation, shared by all features Default: 1.0}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -47,16 +44,23 @@ Rescale each feature individually to a common range [min, max] linearly using
   Rescaling
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+}
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
+
+iris_tbl \%>\%
+  ft_vector_assembler(input_col = features,
+                      output_col = "features_temp") \%>\%
+  ft_min_max_scaler(input_col = "features_temp",
+                     output_col = "features")
+}
+
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
@@ -89,3 +93,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

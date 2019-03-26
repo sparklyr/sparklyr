@@ -129,11 +129,12 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
         serializer.writeObject(dos, res.asInstanceOf[AnyRef])
       } catch {
         case e: Exception =>
-          logger.logError(s"failed calling $methodName on $objId")
-          serializer.writeInt(dos, -1)
-          serializer.writeString(dos, exceptionString(
+          val cause = exceptionString(
             if (e.getCause == null) e else e.getCause
-          ))
+          )
+          logger.logError(s"failed calling $methodName on $objId: " + cause)
+          serializer.writeInt(dos, -1)
+          serializer.writeString(dos, cause)
         case e: NoClassDefFoundError =>
           logger.logError(s"failed calling $methodName on $objId with no class found error")
           serializer.writeInt(dos, -1)

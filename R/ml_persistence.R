@@ -23,9 +23,9 @@ ml_save <- function(x, path, overwrite = FALSE, ...) {
 
 #' @export
 ml_save.default <- function(x, path, overwrite = FALSE, ...) {
-  path <- ensure_scalar_character(path) %>%
+  path <- cast_string(path) %>%
     spark_normalize_path()
-  overwrite <- ensure_scalar_boolean(overwrite)
+  overwrite <- cast_scalar_logical(overwrite)
 
   ml_writer <- spark_jobj(x) %>%
     invoke("write")
@@ -57,14 +57,14 @@ ml_save.ml_model <- function(x, path, overwrite = FALSE,
   if (version < "2.0.0")
     stop("Saving of 'ml_model' is supported in Spark 2.0.0+")
 
-  path <- ensure_scalar_character(path) %>%
+  path <- cast_string(path) %>%
     spark_normalize_path()
-  overwrite <- ensure_scalar_boolean(overwrite)
+  overwrite <- cast_scalar_logical(overwrite)
   type <- match.arg(type)
 
   ml_writer <- (
     if (identical(type, "pipeline_model")) x$pipeline_model else x$pipeline
-    ) %>%
+  ) %>%
     spark_jobj() %>%
     invoke("write")
 
@@ -88,17 +88,22 @@ ml_load <- function(sc, path) {
     invoke("isLocal")
 
   if (is_local) {
-    path <- ensure_scalar_character(path) %>%
+    path <- cast_string(path) %>%
       spark_normalize_path()
-    class <- paste0(path, "/metadata/part-00000") %>%
-      jsonlite::read_json() %>%
-      `[[`("class")
-  } else {
-    class <- spark_read_json(sc, random_string("ml_load_metadata"),
-                             paste0(path, "/metadata/part-00000")) %>%
-      dplyr::pull(!!rlang::sym("class"))
+  }
+
+  metadata_table_name <- random_string("ml_load_metadata")
+  class <- spark_read_json(sc, metadata_table_name,
+                           paste0(path, "/metadata/part-00000")) %>%
+    dplyr::pull(!!rlang::sym("class"))
+
+  # Drop temp view
+  if (spark_version(sc) > "2.0.0") {
+    spark_session(sc) %>%
+      invoke("catalog") %>%
+      invoke("dropTempView", metadata_table_name)
   }
 
   invoke_static(sc, class, "load", path) %>%
-    ml_constructor_dispatch()
+    ml_call_constructor()
 }

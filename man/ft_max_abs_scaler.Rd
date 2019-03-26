@@ -2,9 +2,9 @@
 % Please edit documentation in R/ml_feature_max_abs_scaler.R
 \name{ft_max_abs_scaler}
 \alias{ft_max_abs_scaler}
-\title{Feature Tranformation -- MaxAbsScaler (Estimator)}
+\title{Feature Transformation -- MaxAbsScaler (Estimator)}
 \usage{
-ft_max_abs_scaler(x, input_col, output_col, dataset = NULL,
+ft_max_abs_scaler(x, input_col = NULL, output_col = NULL,
   uid = random_string("max_abs_scaler_"), ...)
 }
 \arguments{
@@ -13,9 +13,6 @@ ft_max_abs_scaler(x, input_col, output_col, dataset = NULL,
 \item{input_col}{The name of the input column.}
 
 \item{output_col}{The name of the output column.}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -43,16 +40,23 @@ Rescale each feature individually to range [-1, 1] by dividing through the
   data, and thus does not destroy any sparsity.
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+}
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
+
+iris_tbl \%>\%
+  ft_vector_assembler(input_col = features,
+                      output_col = "features_temp") \%>\%
+  ft_max_abs_scaler(input_col = "features_temp",
+                     output_col = "features")
+}
+
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
@@ -85,3 +89,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

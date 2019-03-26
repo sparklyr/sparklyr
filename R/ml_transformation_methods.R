@@ -29,7 +29,7 @@ ml_fit <- function(x, dataset, ...) {
 
   spark_jobj(x) %>%
     invoke("fit", spark_dataframe(dataset)) %>%
-    ml_constructor_dispatch()
+    ml_call_constructor()
 }
 
 #' @rdname ml-transform-methods
@@ -113,8 +113,10 @@ ml_predict.ml_model_regression <- function(x, dataset, ...) {
 #' @export
 ml_predict.ml_model_classification <- function(
   x, dataset,
-  probability_prefix = "probability_", ...) {
-  ensure_scalar_character(probability_prefix)
+  probability_prefix = "probability_", ...
+) {
+  sc <- spark_connection(x$model)
+  probability_prefix <- cast_string(probability_prefix)
 
   if (missing(dataset) || rlang::is_null(dataset))
     dataset <- x$dataset
@@ -123,13 +125,18 @@ ml_predict.ml_model_classification <- function(
     ml_transform(dataset)
 
   probability_col <- ml_param(x$model, "probability_col", allow_null = TRUE)
-  if (rlang::is_null(probability_col))
+  if (rlang::is_null(probability_col)) {
     predictions
-  else
+  } else {
+    index_labels <- spark_sanitize_names(
+      x$index_labels %||% (seq_len(x$model$num_classes) - 1L),
+      sc$config
+    )
     sdf_separate_column(
       predictions, probability_col,
-      paste0(probability_prefix, spark_sanitize_names(x$.index_labels))
+      paste0(probability_prefix, index_labels)
     )
+  }
 }
 
 #' @export
@@ -142,9 +149,19 @@ ml_predict.ml_model_clustering <- function(x, dataset, ...) {
     ml_transform(dataset)
 }
 
+#' @export
+ml_predict.ml_model_recommendation <- function(x, dataset, ...) {
+  # when dataset is not supplied, attempt to use original dataset
+  if (missing(dataset) || rlang::is_null(dataset))
+    dataset <- x$dataset
+
+  x$pipeline_model %>%
+    ml_transform(dataset)
+}
+
 #' Spark ML -- Transform, fit, and predict methods (sdf_ interface)
 #'
-#' Methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
+#' Deprecated methods for transformation, fit, and prediction. These are mirrors of the corresponding \link{ml-transform-methods}.
 #'
 #' @param x A \code{tbl_spark}.
 #' @param model A \code{ml_transformer} or a \code{ml_model} object.
@@ -160,21 +177,8 @@ NULL
 #' @rdname sdf-transform-methods
 #' @export
 sdf_predict <- function(x, model, ...) {
+  .Deprecated("ml_predict")
   UseMethod("sdf_predict")
-}
-
-#' @export
-sdf_predict.ml_model <- function(x, model, ...) {
-  msg <- "The signature sdf_predict(model, dataset) is deprecated and will be removed in a future version. Use sdf_predict(dataset, model) or ml_predict(model, dataset) instead."
-  warning(msg)
-  ml_predict(x, dataset = model, ...)
-}
-
-#' @export
-sdf_predict.ml_transformer <- function(x, model, ...) {
-  msg <- "The signature sdf_predict(transformer, dataset) is deprecated and will be removed in a future version. Use sdf_predict(dataset, transformer) or ml_predict(transformer, dataset) instead."
-  warning(msg)
-  ml_transform(x, dataset = model, ...)
 }
 
 #' @export
@@ -185,18 +189,21 @@ sdf_predict.default <- function(x, model, ...) {
 #' @rdname sdf-transform-methods
 #' @export
 sdf_transform <- function(x, transformer, ...) {
+  .Deprecated("ml_transform")
   ml_transform(transformer, sdf_register(x))
 }
 
 #' @rdname sdf-transform-methods
 #' @export
 sdf_fit <- function(x, estimator, ...) {
+  .Deprecated("ml_fit")
   ml_fit(estimator, sdf_register(x))
 }
 
 #' @rdname sdf-transform-methods
 #' @export
 sdf_fit_and_transform <- function(x, estimator, ...) {
+  .Deprecated("ml_fit_and_transform")
   ml_fit_and_transform(estimator, sdf_register(x))
 }
 

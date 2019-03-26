@@ -4,8 +4,8 @@
 \alias{ft_vector_slicer}
 \title{Feature Transformation -- VectorSlicer (Transformer)}
 \usage{
-ft_vector_slicer(x, input_col, output_col, indices,
-  uid = random_string("vector_slicer_"), ...)
+ft_vector_slicer(x, input_col = NULL, output_col = NULL,
+  indices = NULL, uid = random_string("vector_slicer_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -72,3 +72,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

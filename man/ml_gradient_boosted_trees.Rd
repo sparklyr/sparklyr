@@ -4,39 +4,41 @@
 \name{ml_gbt_classifier}
 \alias{ml_gbt_classifier}
 \alias{ml_gradient_boosted_trees}
-\alias{ml_gradient_boosted_trees}
 \alias{ml_gbt_regressor}
 \title{Spark ML -- Gradient Boosted Trees}
 \usage{
-ml_gbt_classifier(x, formula = NULL, max_iter = 20L, max_depth = 5L,
-  step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
-  min_instances_per_node = 1L, max_bins = 32L, min_info_gain = 0,
-  loss_type = "logistic", seed = NULL, thresholds = NULL,
-  checkpoint_interval = 10L, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
+ml_gbt_classifier(x, formula = NULL, max_iter = 20, max_depth = 5,
+  step_size = 0.1, subsampling_rate = 1,
+  feature_subset_strategy = "auto", min_instances_per_node = 1L,
+  max_bins = 32, min_info_gain = 0, loss_type = "logistic",
+  seed = NULL, thresholds = NULL, checkpoint_interval = 10,
+  cache_node_ids = FALSE, max_memory_in_mb = 256,
+  features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("gbt_classifier_"), ...)
 
-ml_gradient_boosted_trees(x, formula = NULL, type = c("auto", "regression",
-  "classification"), features_col = "features", label_col = "label",
-  prediction_col = "prediction", probability_col = "probability",
-  raw_prediction_col = "rawPrediction", checkpoint_interval = 10L,
-  loss_type = c("auto", "logistic", "squared", "absolute"), max_bins = 32L,
-  max_depth = 5L, max_iter = 20L, min_info_gain = 0,
-  min_instances_per_node = 1L, step_size = 0.1, subsampling_rate = 1,
+ml_gradient_boosted_trees(x, formula = NULL, type = c("auto",
+  "regression", "classification"), features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction", checkpoint_interval = 10,
+  loss_type = c("auto", "logistic", "squared", "absolute"),
+  max_bins = 32, max_depth = 5, max_iter = 20L, min_info_gain = 0,
+  min_instances_per_node = 1, step_size = 0.1, subsampling_rate = 1,
   feature_subset_strategy = "auto", seed = NULL, thresholds = NULL,
-  cache_node_ids = FALSE, max_memory_in_mb = 256L,
+  cache_node_ids = FALSE, max_memory_in_mb = 256,
   uid = random_string("gradient_boosted_trees_"), response = NULL,
   features = NULL, ...)
 
-ml_gbt_regressor(x, formula = NULL, max_iter = 20L, max_depth = 5L,
-  step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
-  min_instances_per_node = 1L, max_bins = 32L, min_info_gain = 0,
-  loss_type = "squared", seed = NULL, checkpoint_interval = 10L,
-  cache_node_ids = FALSE, max_memory_in_mb = 256L,
-  features_col = "features", label_col = "label",
-  prediction_col = "prediction", uid = random_string("gbt_regressor_"), ...)
+ml_gbt_regressor(x, formula = NULL, max_iter = 20, max_depth = 5,
+  step_size = 0.1, subsampling_rate = 1,
+  feature_subset_strategy = "auto", min_instances_per_node = 1,
+  max_bins = 32, min_info_gain = 0, loss_type = "squared",
+  seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
+  max_memory_in_mb = 256, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  uid = random_string("gbt_regressor_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -110,7 +112,7 @@ then regression is used; classification otherwise.}
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -128,7 +130,7 @@ The object returned depends on the class of \code{x}.
 }
 }
 \description{
-Perform classification and regression using gradient boosted trees.
+Perform binary classification and regression using gradient boosted trees. Multiclass classification is not supported yet.
 }
 \details{
 When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{response} and \code{features}) is specified, the function returns a \code{ml_model} object wrapping a \code{ml_pipeline_model} which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument \code{predicted_label_col} (defaults to \code{"predicted_label"}) can be used to specify the name of the predicted label column. In addition to the fitted \code{ml_pipeline_model}, \code{ml_model} objects also contain a \code{ml_pipeline} object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by \code{\link{ml_save}} with \code{type = "pipeline"} to faciliate model refresh workflows.
@@ -144,6 +146,26 @@ The supported options for \code{feature_subset_strategy} are
     }
 
 \code{ml_gradient_boosted_trees} is a wrapper around \code{ml_gbt_regressor.tbl_spark} and \code{ml_gbt_classifier.tbl_spark} and calls the appropriate method based on model type.
+}
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+partitions <- iris_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+iris_training <- partitions$training
+iris_test <- partitions$test
+
+gbt_model <- iris_training \%>\%
+  ml_gradient_boosted_trees(Sepal_Length ~ Petal_Length + Petal_Width)
+
+pred <- ml_predict(gbt_model, iris_test)
+
+ml_regression_evaluator(pred, label_col = "Sepal_Length")
+}
+
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
@@ -161,3 +183,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

@@ -4,9 +4,9 @@
 \alias{ml_bisecting_kmeans}
 \title{Spark ML -- Bisecting K-Means Clustering}
 \usage{
-ml_bisecting_kmeans(x, formula = NULL, k = 4L, max_iter = 20L,
-  seed = NULL, min_divisible_cluster_size = 1, features_col = "features",
-  prediction_col = "prediction",
+ml_bisecting_kmeans(x, formula = NULL, k = 4, max_iter = 20,
+  seed = NULL, min_divisible_cluster_size = 1,
+  features_col = "features", prediction_col = "prediction",
   uid = random_string("bisecting_bisecting_kmeans_"), ...)
 }
 \arguments{
@@ -29,7 +29,7 @@ reproducible across repeated calls.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Optional arguments, see Details.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -75,3 +75,4 @@ See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
 Other ml clustering algorithms: \code{\link{ml_gaussian_mixture}},
   \code{\link{ml_kmeans}}, \code{\link{ml_lda}}
 }
+\concept{ml clustering algorithms}

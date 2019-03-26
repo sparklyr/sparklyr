@@ -13,13 +13,15 @@ ml_sub_models(model)
 
 ml_validation_metrics(model)
 
-ml_cross_validator(x, estimator, estimator_param_maps, evaluator,
-  num_folds = 3L, collect_sub_models = FALSE, parallelism = 1L,
-  seed = NULL, uid = random_string("cross_validator_"), ...)
+ml_cross_validator(x, estimator = NULL, estimator_param_maps = NULL,
+  evaluator = NULL, num_folds = 3, collect_sub_models = FALSE,
+  parallelism = 1, seed = NULL,
+  uid = random_string("cross_validator_"), ...)
 
-ml_train_validation_split(x, estimator, estimator_param_maps, evaluator,
-  train_ratio = 0.75, collect_sub_models = FALSE, parallelism = 1L,
-  seed = NULL, uid = random_string("train_validation_split_"), ...)
+ml_train_validation_split(x, estimator = NULL,
+  estimator_param_maps = NULL, evaluator = NULL, train_ratio = 0.75,
+  collect_sub_models = FALSE, parallelism = 1, seed = NULL,
+  uid = random_string("train_validation_split_"), ...)
 }
 \arguments{
 \item{model}{A cross validation or train-validation-split model.}
@@ -78,4 +80,40 @@ Perform hyper-parameter tuning using either K-fold cross validation or train-val
 }
 \details{
 \code{ml_cross_validator()} performs k-fold cross validation while \code{ml_train_validation_split()} performs tuning on one pair of train and validation datasets.
+}
+\examples{
+\dontrun{
+sc <- spark_connect(master = "local")
+iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+
+# Create a pipeline
+pipeline <- ml_pipeline(sc) \%>\%
+  ft_r_formula(Species ~ . ) \%>\%
+  ml_random_forest_classifier()
+
+# Specify hyperparameter grid
+grid <- list(
+  random_forest = list(
+    num_trees = c(5,10),
+    max_depth = c(5,10),
+    impurity = c("entropy", "gini")
+  )
+)
+
+# Create the cross validator object
+cv <- ml_cross_validator(
+  sc, estimator = pipeline, estimator_param_maps = grid,
+  evaluator = ml_multiclass_classification_evaluator(sc),
+  num_folds = 3,
+  parallelism = 4
+)
+
+# Train the models
+cv_model <- ml_fit(cv, iris_tbl)
+
+# Print the metrics
+ml_validation_metrics(cv_model)
+
+}
+
 }

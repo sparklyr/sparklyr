@@ -4,7 +4,7 @@
 \alias{ft_normalizer}
 \title{Feature Transformation -- Normalizer (Transformer)}
 \usage{
-ft_normalizer(x, input_col, output_col, p = 2,
+ft_normalizer(x, input_col = NULL, output_col = NULL, p = 2,
   uid = random_string("normalizer_"), ...)
 }
 \arguments{
@@ -70,3 +70,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

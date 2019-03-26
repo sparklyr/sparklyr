@@ -4,35 +4,36 @@
 \name{ml_decision_tree_classifier}
 \alias{ml_decision_tree_classifier}
 \alias{ml_decision_tree}
-\alias{ml_decision_tree}
 \alias{ml_decision_tree_regressor}
 \title{Spark ML -- Decision Trees}
 \usage{
-ml_decision_tree_classifier(x, formula = NULL, max_depth = 5L,
-  max_bins = 32L, min_instances_per_node = 1L, min_info_gain = 0,
+ml_decision_tree_classifier(x, formula = NULL, max_depth = 5,
+  max_bins = 32, min_instances_per_node = 1, min_info_gain = 0,
   impurity = "gini", seed = NULL, thresholds = NULL,
-  cache_node_ids = FALSE, checkpoint_interval = 10L,
-  max_memory_in_mb = 256L, features_col = "features", label_col = "label",
-  prediction_col = "prediction", probability_col = "probability",
+  cache_node_ids = FALSE, checkpoint_interval = 10,
+  max_memory_in_mb = 256, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
+  probability_col = "probability",
   raw_prediction_col = "rawPrediction",
   uid = random_string("decision_tree_classifier_"), ...)
 
 ml_decision_tree(x, formula = NULL, type = c("auto", "regression",
   "classification"), features_col = "features", label_col = "label",
   prediction_col = "prediction", variance_col = NULL,
-  probability_col = "probability", raw_prediction_col = "rawPrediction",
-  checkpoint_interval = 10L, impurity = "auto", max_bins = 32L,
-  max_depth = 5L, min_info_gain = 0, min_instances_per_node = 1L,
-  seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
-  max_memory_in_mb = 256L, uid = random_string("decision_tree_"),
-  response = NULL, features = NULL, ...)
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction", checkpoint_interval = 10L,
+  impurity = "auto", max_bins = 32L, max_depth = 5L,
+  min_info_gain = 0, min_instances_per_node = 1L, seed = NULL,
+  thresholds = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256L,
+  uid = random_string("decision_tree_"), response = NULL,
+  features = NULL, ...)
 
-ml_decision_tree_regressor(x, formula = NULL, max_depth = 5L,
-  max_bins = 32L, min_instances_per_node = 1L, min_info_gain = 0,
+ml_decision_tree_regressor(x, formula = NULL, max_depth = 5,
+  max_bins = 32, min_instances_per_node = 1, min_info_gain = 0,
   impurity = "variance", seed = NULL, cache_node_ids = FALSE,
-  checkpoint_interval = 10L, max_memory_in_mb = 256L, variance_col = NULL,
-  features_col = "features", label_col = "label",
-  prediction_col = "prediction",
+  checkpoint_interval = 10, max_memory_in_mb = 256,
+  variance_col = NULL, features_col = "features",
+  label_col = "label", prediction_col = "prediction",
   uid = random_string("decision_tree_regressor_"), ...)
 }
 \arguments{
@@ -103,7 +104,7 @@ then regression is used; classification otherwise.}
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -142,7 +143,7 @@ iris_test <- partitions$test
 dt_model <- iris_training \%>\%
   ml_decision_tree(Species ~ .)
 
-pred <- sdf_predict(iris_test, dt_model)
+pred <- ml_predict(dt_model, iris_test)
 
 ml_multiclass_classification_evaluator(pred)
 }
@@ -164,3 +165,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

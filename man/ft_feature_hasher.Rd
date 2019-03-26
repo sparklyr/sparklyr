@@ -4,8 +4,9 @@
 \alias{ft_feature_hasher}
 \title{Feature Transformation -- FeatureHasher (Transformer)}
 \usage{
-ft_feature_hasher(x, input_cols, output_col, num_features = as.integer(2^18),
-  categorical_cols = NULL, uid = random_string("feature_hasher_"), ...)
+ft_feature_hasher(x, input_cols = NULL, output_col = NULL,
+  num_features = 2^18, categorical_cols = NULL,
+  uid = random_string("feature_hasher_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -104,3 +105,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

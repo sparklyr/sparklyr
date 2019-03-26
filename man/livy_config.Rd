@@ -4,9 +4,9 @@
 \alias{livy_config}
 \title{Create a Spark Configuration for Livy}
 \usage{
-livy_config(config = spark_config(), username = NULL, password = NULL,
-  negotiate = FALSE, custom_headers = list(`X-Requested-By` = "sparklyr"),
-  ...)
+livy_config(config = spark_config(), username = NULL,
+  password = NULL, negotiate = FALSE,
+  custom_headers = list(`X-Requested-By` = "sparklyr"), ...)
 }
 \arguments{
 \item{config}{Optional base configuration}
@@ -28,8 +28,8 @@ Named list with configuration data
 Create a Spark Configuration for Livy
 }
 \details{
-Extends a Spark \code{"spark_config"} configuration with settings
-for Livy. For instance, \code{"username"} and \code{"password"}
+Extends a Spark \code{spark_config()} configuration with settings
+for Livy. For instance, \code{username} and \code{password}
 define the basic authentication settings for a Livy session.
 
 The default value of \code{"custom_headers"} is set to \code{list("X-Requested-By" = "sparklyr")}
@@ -48,7 +48,11 @@ Additional parameters for Livy sessions are:
   \item{\code{num_executors}}{Number of executors to launch for this session}
   \item{\code{archives}}{Archives to be used in this session}
   \item{\code{queue}}{The name of the YARN queue to which submitted}
-  \item{\code{queue}}{The name of this session}
+  \item{\code{name}}{The name of this session}
   \item{\code{heartbeat_timeout}}{Timeout in seconds to which session be orphaned}
 }
+
+Note that \code{queue} is supported only by version 0.4.0 of Livy or newer.
+If you are using the older one, specify queue via \code{config} (e.g.
+\code{config = spark_config(spark.yarn.queue = "my_queue")}).
 }

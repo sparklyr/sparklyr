@@ -1,31 +1,42 @@
 sparklyr: R interface for Apache Spark
 ================
 
-<img src="tools/readme/sparklyr-package.png" width=200 align="right" style="margin-left: 20px; margin-right: 20px"/>
-
 [![Build
 Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr)
 [![AppVeyor Build
 Status](https://ci.appveyor.com/api/projects/status/github/rstudio/sparklyr?branch=master&svg=true)](https://ci.appveyor.com/project/JavierLuraschi/sparklyr)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
+<a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a>
 [![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr)
 [![Join the chat at
 https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-  - Connect to [Spark](http://spark.apache.org/) from R. The sparklyr
-    package provides a complete [dplyr](https://github.com/hadley/dplyr)
-    backend.
-  - Filter and aggregate Spark datasets then bring them into R for
-    analysis and visualization.
-  - Use Spark’s distributed [machine
-    learning](http://spark.apache.org/docs/latest/mllib-guide.html)
-    library from R.
+<img src="tools/readme/sparklyr-illustration.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
+
+  - Install and connect to [Spark](http://spark.apache.org/) using YARN,
+    Mesos, Livy or Kubernetes.
+  - Use [dplyr](https://spark.rstudio.com/dplyr/) to filter and
+    aggregate Spark datasets and
+    [streams](https://spark.rstudio.com/guides/streaming/) then bring
+    them into R for analysis and visualization.
+  - Use [MLlib](http://spark.apache.org/docs/latest/mllib-guide.html),
+    [H2O](https://spark.rstudio.com/guides/h2o/),
+    [XGBoost](https://github.com/rstudio/sparkxgb) and
+    [GraphFrames](https://github.com/rstudio/graphframes) to train
+    models at scale in Spark.
+  - Create interoperable machine learning
+    [pipelines](https://spark.rstudio.com/guides/pipelines/) and
+    productionize them with
+    [MLeap](https://spark.rstudio.com/guides/mleap/).
   - Create [extensions](http://spark.rstudio.com/extensions.html) that
-    call the full Spark API and provide interfaces to Spark packages.
+    call the full Spark API or run [distributed
+    R](https://spark.rstudio.com/guides/distributed-r/) code to support
+    new functionality.
 
 ## Installation
 
-You can install the **sparklyr** package from CRAN as follows:
+You can install the **sparklyr** package from
+[CRAN](https://CRAN.r-project.org) as follows:
 
 ``` r
 install.packages("sparklyr")
@@ -36,13 +47,14 @@ purposes:
 
 ``` r
 library(sparklyr)
-spark_install(version = "2.1.0")
+spark_install()
 ```
 
 To upgrade to the latest version of sparklyr, run the following command
 and restart your r session:
 
 ``` r
+install.packages("devtools")
 devtools::install_github("rstudio/sparklyr")
 ```
 
@@ -100,8 +112,7 @@ To start with here’s a simple filtering example:
 flights_tbl %>% filter(dep_delay == 2)
 ```
 
-    ## # Source:   lazy query [?? x 19]
-    ## # Database: spark_connection
+    ## # Source: spark<?> [?? x 19]
     ##     year month   day dep_time sched_dep_time dep_delay arr_time
     ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
     ##  1  2013     1     1      517            515         2      830
@@ -114,7 +125,7 @@ flights_tbl %>% filter(dep_delay == 2)
     ##  8  2013     1     1     1028           1026         2     1350
     ##  9  2013     1     1     1042           1040         2     1325
     ## 10  2013     1     1     1231           1229         2     1523
-    ## # ... with more rows, and 12 more variables: sched_arr_time <int>,
+    ## # … with more rows, and 12 more variables: sched_arr_time <int>,
     ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
     ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
     ## #   minute <dbl>, time_hour <dttm>
@@ -138,9 +149,9 @@ ggplot(delay, aes(dist, delay)) +
   scale_size_area(max_size = 2)
 ```
 
-    ## `geom_smooth()` using method = 'gam'
+    ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](tools/readme/ggplot2-1.png)<!-- -->
+![](tools/readme/dplyr-ggplot2-1.png)<!-- -->
 
 ### Window Functions
 
@@ -155,23 +166,22 @@ batting_tbl %>%
   filter(min_rank(desc(H)) <= 2 & H > 0)
 ```
 
-    ## # Source:     lazy query [?? x 7]
-    ## # Database:   spark_connection
+    ## # Source:     spark<?> [?? x 7]
     ## # Groups:     playerID
     ## # Ordered by: playerID, yearID, teamID
     ##    playerID  yearID teamID     G    AB     R     H
     ##    <chr>      <int> <chr>  <int> <int> <int> <int>
     ##  1 aaronha01   1959 ML1      154   629   116   223
     ##  2 aaronha01   1963 ML1      161   631   121   201
-    ##  3 abbotji01   1999 MIL       20    21     0     2
-    ##  4 abnersh01   1992 CHA       97   208    21    58
-    ##  5 abnersh01   1990 SDN       91   184    17    45
-    ##  6 acklefr01   1963 CHA        2     5     0     1
-    ##  7 acklefr01   1964 CHA        3     1     0     1
-    ##  8 adamecr01   2016 COL      121   225    25    49
-    ##  9 adamecr01   2015 COL       26    53     4    13
-    ## 10 adamsac01   1943 NY1       70    32     3     4
-    ## # ... with more rows
+    ##  3 abadfe01    2012 HOU       37     7     0     1
+    ##  4 abbated01   1905 BSN      153   610    70   170
+    ##  5 abbated01   1904 BSN      154   579    76   148
+    ##  6 abbeych01   1894 WAS      129   523    95   164
+    ##  7 abbeych01   1895 WAS      132   511   102   141
+    ##  8 abbotji01   1999 MIL       20    21     0     2
+    ##  9 abnersh01   1992 CHA       97   208    21    58
+    ## 10 abnersh01   1990 SDN       91   184    17    45
+    ## # … with more rows
 
 For additional documentation on using dplyr with Spark see the
 [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr
@@ -303,21 +313,20 @@ spark_apply(iris_tbl, function(data) {
 })
 ```
 
-    ## # Source:   table<sparklyr_tmp_d1564a7b34a4> [?? x 4]
-    ## # Database: spark_connection
+    ## # Source: spark<?> [?? x 4]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1         8.47        6.87         4.77        3.57
-    ##  2         8.27        6.37         4.77        3.57
-    ##  3         8.07        6.57         4.67        3.57
-    ##  4         7.97        6.47         4.87        3.57
-    ##  5         8.37        6.97         4.77        3.57
-    ##  6         8.77        7.27         5.07        3.77
-    ##  7         7.97        6.77         4.77        3.67
-    ##  8         8.37        6.77         4.87        3.57
-    ##  9         7.77        6.27         4.77        3.57
-    ## 10         8.27        6.47         4.87        3.47
-    ## # ... with more rows
+    ##  1         6.90        5.30         3.20        2.00
+    ##  2         6.70        4.80         3.20        2.00
+    ##  3         6.50        5.00         3.10        2.00
+    ##  4         6.40        4.90         3.30        2.00
+    ##  5         6.80        5.40         3.20        2.00
+    ##  6         7.20        5.70         3.50        2.20
+    ##  7         6.40        5.20         3.20        2.10
+    ##  8         6.80        5.20         3.30        2.00
+    ##  9         6.20        4.70         3.20        2.00
+    ## 10         6.70        4.90         3.30        1.90
+    ## # … with more rows
 
 You can also group by columns to perform an operation over each group of
 rows and make use of any package within the closure:
@@ -326,13 +335,12 @@ rows and make use of any package within the closure:
 spark_apply(
   iris_tbl,
   function(e) broom::tidy(lm(Petal_Width ~ Petal_Length, e)),
-  names = c("term", "estimate", "std.error", "statistic", "p.value"),
+  columns = c("term", "estimate", "std.error", "statistic", "p.value"),
   group_by = "Species"
 )
 ```
 
-    ## # Source:   table<sparklyr_tmp_d15652cdc540> [?? x 6]
-    ## # Database: spark_connection
+    ## # Source: spark<?> [?? x 6]
     ##   Species    term         estimate std.error statistic  p.value
     ##   <chr>      <chr>           <dbl>     <dbl>     <dbl>    <dbl>
     ## 1 versicolor (Intercept)   -0.0843    0.161     -0.525 6.02e- 1
@@ -403,22 +411,24 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2135
-    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2136
-    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2146
-    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2138
-    ## 18/05/25 09:19:44 INFO ContextCleaner: Cleaned accumulator 2126
-    ## 18/05/25 09:19:44 INFO Executor: Finished task 0.0 in stage 69.0 (TID 115). 918 bytes result sent to driver
-    ## 18/05/25 09:19:44 INFO TaskSetManager: Finished task 0.0 in stage 69.0 (TID 115) in 177 ms on localhost (executor driver) (1/1)
-    ## 18/05/25 09:19:44 INFO TaskSchedulerImpl: Removed TaskSet 69.0, whose tasks have all completed, from pool 
-    ## 18/05/25 09:19:44 INFO DAGScheduler: ResultStage 69 (count at NativeMethodAccessorImpl.java:0) finished in 0.180 s
-    ## 18/05/25 09:19:44 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.183200 s
+    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned shuffle 18
+    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1860
+    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1907
+    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 613
+    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1626
+    ## 19/02/22 14:13:08 INFO Executor: Finished task 0.0 in stage 70.0 (TID 94). 875 bytes result sent to driver
+    ## 19/02/22 14:13:08 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 94) in 209 ms on localhost (executor driver) (1/1)
+    ## 19/02/22 14:13:08 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool 
+    ## 19/02/22 14:13:08 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.215 s
+    ## 19/02/22 14:13:08 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.220383 s
 
 Finally, we disconnect from Spark:
 
 ``` r
-spark_disconnect(sc)
+  spark_disconnect(sc)
 ```
+
+    ## NULL
 
 ## RStudio IDE
 
@@ -474,7 +484,7 @@ library(sparklyr)
 library(dplyr)
 library(h2o)
 
-sc <- spark_connect(master = "local", version = "2.1.0")
+sc <- spark_connect(master = "local", version = "2.3.2")
 mtcars_tbl <- copy_to(sc, mtcars, "mtcars")
 
 mtcars_h2o <- as_h2o_frame(sc, mtcars_tbl, strict_version_check = FALSE)
@@ -541,7 +551,7 @@ an existing service running Livy. Otherwise, to test `livy` in your
 local environment, you can install it and run it locally as follows:
 
 ``` r
-livy_install()
+livy_install(version = "2.4.0")
 ```
 
 ``` r
@@ -550,15 +560,15 @@ livy_service_start()
 
 To connect, use the Livy service address as `master` and `method =
 "livy"` in `spark_connect`. Once connection completes, use `sparklyr` as
-usual, for instance:
+usual, for
+instance:
 
 ``` r
-sc <- spark_connect(master = "http://localhost:8998", method = "livy")
+sc <- spark_connect(master = "http://localhost:8998", method = "livy", version = "2.4.0")
 copy_to(sc, iris)
 ```
 
-    ## # Source:   table<iris> [?? x 5]
-    ## # Database: spark_connection
+    ## # Source: spark<iris> [?? x 5]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
     ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
     ##  1          5.1         3.5          1.4         0.2 setosa 
@@ -571,11 +581,13 @@ copy_to(sc, iris)
     ##  8          5           3.4          1.5         0.2 setosa 
     ##  9          4.4         2.9          1.4         0.2 setosa 
     ## 10          4.9         3.1          1.5         0.1 setosa 
-    ## # ... with more rows
+    ## # … with more rows
 
 ``` r
 spark_disconnect(sc)
 ```
+
+    ## NULL
 
 Once you are done using `livy` locally, you should stop this service
 with:
@@ -588,7 +600,7 @@ To connect to remote `livy` clusters that support basic authentication
 connect as:
 
 ``` r
-config <- livy_config(username="<username>", password="<password">)
+config <- livy_config(username="<username>", password="<password>")
 sc <- spark_connect(master = "<address>", method = "livy", config = config)
 spark_disconnect(sc)
 ```

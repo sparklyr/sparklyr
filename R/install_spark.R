@@ -13,6 +13,19 @@ spark_install_available <- function(version, hadoop_version) {
   dir.exists(installInfo$sparkVersionDir)
 }
 
+spark_install_version_expand <- function(version, installed_only) {
+  if (installed_only) {
+    versions <- spark_installed_versions()$spark
+  }
+  else {
+    versions <- spark_available_versions(show_minor = T)$spark
+  }
+
+  versions <- versions[grepl(version, versions)]
+
+  sort(versions, decreasing = TRUE)[1]
+}
+
 #' Find a given Spark installation by version.
 #'
 #' @rdname spark_install
@@ -28,6 +41,10 @@ spark_install_find <- function(version = NULL,
                                installed_only = TRUE,
                                latest = FALSE,
                                hint = FALSE) {
+  if (identical(grepl("^[0-9]+\\.[0-9]+$", version), TRUE)) {
+    version <- spark_install_version_expand(version, installed_only)
+  }
+
   sparkVersion <- version
   hadoopVersion <- hadoop_version
   installedOnly <- installed_only
@@ -44,14 +61,14 @@ spark_install_find <- function(version = NULL,
       sparkInstall$version <- sparkVersion
       sparkInstall$hadoop_version <- hadoopVersion
 
-      stop(paste("Spark version not installed. To install, use", deparse(sparkInstall)))
+      stop("Spark version not installed. To install, use ", deparse(sparkInstall))
     } else {
       stop("Spark version not available. Find available versions, using spark_available_versions()")
     }
   }
 
   versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
-  spark_install_info(as.character(versions[1,]$spark), as.character(versions[1,]$hadoop))
+  spark_install_info(as.character(versions[1,]$spark), as.character(versions[1,]$hadoop), latest = latest)
 }
 
 #' determine the version that will be used by default if version is NULL
@@ -79,8 +96,8 @@ spark_default_version <- function() {
        hadoop = hadoop)
 }
 
-spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL) {
-  versionInfo <- spark_versions_info(sparkVersion, hadoopVersion)
+spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL, latest = TRUE) {
+  versionInfo <- spark_versions_info(sparkVersion, hadoopVersion, latest = latest)
 
   componentName <- versionInfo$componentName
   packageName <- versionInfo$packageName
@@ -296,14 +313,14 @@ spark_install_old_dir <- function() {
 #' @export
 spark_install_tar <- function(tarfile) {
   if (!file.exists(tarfile)) {
-    stop(paste0("The file \"", tarfile, "\", does not exist."))
+    stop("The file \"", tarfile, "\", does not exist.")
   }
 
   filePattern <- spark_versions_file_pattern();
   fileName <- basename(tarfile)
   if (length(grep(filePattern, fileName)) == 0) {
-    stop(paste(
-      "The given file does not conform with the following pattern: ", filePattern))
+    stop(
+      "The given file does not conform with the following pattern: ", filePattern)
   }
 
   untar(tarfile = tarfile,

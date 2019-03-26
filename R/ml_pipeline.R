@@ -15,7 +15,7 @@ ml_pipeline <- function(x, ..., uid = random_string("pipeline_")) {
 #' @export
 ml_pipeline.spark_connection <-
   function(x, ..., uid = random_string("pipeline_")) {
-    ensure_scalar_character(uid)
+    uid <- cast_string(uid)
     jobj <- invoke_new(x, "org.apache.spark.ml.Pipeline", uid)
     new_ml_pipeline(jobj)
   }
@@ -23,7 +23,7 @@ ml_pipeline.spark_connection <-
 #' @export
 ml_pipeline.ml_pipeline_stage <-
   function(x, ..., uid = random_string("pipeline_")) {
-    ensure_scalar_character(uid)
+    uid <- cast_string(uid)
     sc <- spark_connection(x)
     dots <- list(...) %>%
       lapply(function(x)
@@ -39,11 +39,11 @@ ml_pipeline.ml_pipeline_stage <-
 
 # Constructors
 
-new_ml_pipeline <- function(jobj, ..., subclass = NULL) {
+new_ml_pipeline <- function(jobj, ..., class = character()) {
   stages <- tryCatch({
     jobj %>%
       invoke("getStages") %>%
-      lapply(ml_constructor_dispatch)
+      lapply(ml_call_constructor)
   },
   error = function(e) {
     NULL
@@ -57,11 +57,11 @@ new_ml_pipeline <- function(jobj, ..., subclass = NULL) {
       sapply(stages, function(x)
         x$uid),
     ...,
-    subclass = c(subclass, "ml_pipeline")
+    class = c(class, "ml_pipeline")
   )
 }
 
-new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
+new_ml_pipeline_model <- function(jobj, ..., class = character()) {
   stages <- tryCatch({
     jobj %>%
       invoke("stages")
@@ -71,7 +71,7 @@ new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
   })
 
   if (!rlang::is_na(stages))
-    stages <- lapply(stages, ml_constructor_dispatch)
+    stages <- lapply(stages, ml_call_constructor)
 
   new_ml_transformer(
     jobj,
@@ -82,7 +82,7 @@ new_ml_pipeline_model <- function(jobj, ..., subclass = NULL) {
       sapply(stages, function(x)
         x$uid),
     ...,
-    subclass = c(subclass, "ml_pipeline_model")
+    class = c(class, "ml_pipeline_model")
   )
 }
 

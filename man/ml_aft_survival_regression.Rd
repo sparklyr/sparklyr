@@ -6,17 +6,19 @@
 \title{Spark ML -- Survival Regression}
 \usage{
 ml_aft_survival_regression(x, formula = NULL, censor_col = "censor",
-  quantile_probabilities = list(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95,
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95,
   0.99), fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-  aggregation_depth = 2L, quantiles_col = NULL, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
+  aggregation_depth = 2, quantiles_col = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("aft_survival_regression_"), ...)
 
 ml_survival_regression(x, formula = NULL, censor_col = "censor",
-  quantile_probabilities = list(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95,
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95,
   0.99), fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-  aggregation_depth = 2L, quantiles_col = NULL, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
+  aggregation_depth = 2, quantiles_col = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
   uid = random_string("aft_survival_regression_"), response = NULL,
   features = NULL, ...)
 }
@@ -57,7 +59,7 @@ ml_survival_regression(x, formula = NULL, censor_col = "censor",
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -82,6 +84,29 @@ When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{res
 
 \code{ml_survival_regression()} is an alias for \code{ml_aft_survival_regression()} for backwards compatibility.
 }
+\examples{
+\dontrun{
+
+library(survival)
+library(sparklyr)
+
+sc <- spark_connect(master = "local")
+ovarian_tbl <- sdf_copy_to(sc, ovarian, name = "ovarian_tbl", overwrite = TRUE)
+
+partitions <- ovarian_tbl \%>\%
+  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+
+ovarian_training <- partitions$training
+ovarian_test <- partitions$test
+
+sur_reg <- ovarian_training \%>\%
+  ml_aft_survival_regression(futime ~ ecog_ps + rx + age + resid_ds, censor_col = "fustat")
+
+pred <- ml_predict(sur_reg, ovarian_test)
+pred
+}
+
+}
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
@@ -98,3 +123,4 @@ Other ml algorithms: \code{\link{ml_decision_tree_classifier}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

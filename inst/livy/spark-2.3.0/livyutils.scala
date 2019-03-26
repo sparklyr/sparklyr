@@ -1,3 +1,8 @@
+//
+// This file was automatically generated using livy_sources_refresh()
+// Changes to this file will be reverted.
+//
+
 import javax.xml.bind.DatatypeConverter
 
 object LivyUtils {
@@ -9,9 +14,10 @@ object LivyUtils {
     "SQLUtils" -> SQLUtils,
     "Utils" -> Utils,
     "Repartition" -> Repartition,
+    "ArrowHelper" -> ArrowHelper,
+    "ArrowConverters" -> ArrowConverters,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
-    "WorkerUtils" -> WorkerUtils,
     "MLUtils" -> MLUtils,
     "MLUtils2" -> MLUtils2,
     "BucketizerUtils" -> BucketizerUtils

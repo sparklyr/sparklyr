@@ -4,9 +4,10 @@
 \alias{ml_one_vs_rest}
 \title{Spark ML -- OneVsRest}
 \usage{
-ml_one_vs_rest(x, formula = NULL, classifier, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
-  uid = random_string("one_vs_rest_"), ...)
+ml_one_vs_rest(x, formula = NULL, classifier = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction", uid = random_string("one_vs_rest_"),
+  ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -29,7 +30,7 @@ ml_one_vs_rest(x, formula = NULL, classifier, features_col = "features",
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -68,3 +69,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_naive_bayes}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

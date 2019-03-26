@@ -1,0 +1,7 @@
+CrossValidator (Estimator)
+<cv> 
+ (Parameters -- Tuning)
+  estimator: LogisticRegression
+             <logistic> 
+  num_folds: 3 
+  [Tuned over 4 hyperparameter sets]

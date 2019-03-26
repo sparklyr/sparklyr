@@ -1,62 +1,84 @@
-#' Feature Tranformation -- MaxAbsScaler (Estimator)
+#' Feature Transformation -- MaxAbsScaler (Estimator)
 #'
 #' Rescale each feature individually to range [-1, 1] by dividing through the
 #'   largest maximum absolute value in each feature. It does not shift/center the
 #'   data, and thus does not destroy any sparsity.
 #'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
+#'
+#' iris_tbl %>%
+#'   ft_vector_assembler(input_col = features,
+#'                       output_col = "features_temp") %>%
+#'   ft_max_abs_scaler(input_col = "features_temp",
+#'                      output_col = "features")
+#' }
+#'
 #' @template roxlate-ml-feature-input-output-col
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-estimator-transformer
 #' @export
-ft_max_abs_scaler <- function(
-  x, input_col, output_col,
-  dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...) {
+ft_max_abs_scaler <- function(x, input_col = NULL, output_col = NULL,
+                              uid = random_string("max_abs_scaler_"), ...) {
+  check_dots_used()
   UseMethod("ft_max_abs_scaler")
 }
 
+ml_max_abs_scaler <- ft_max_abs_scaler
+
 #' @export
-ft_max_abs_scaler.spark_connection <- function(
-  x, input_col, output_col,
-  dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...) {
+ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                               uid = random_string("max_abs_scaler_"), ...) {
+  spark_require_version(x, "2.0.0", "MaxAbsScaler")
 
-  if (spark_version(x) < "2.0.0")
-    stop("ft_max_abs_scaler() requires Spark 2.0.0+")
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    validator_ml_max_abs_scaler()
 
-  ml_ratify_args()
-
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.MaxAbsScaler",
-                                  input_col, output_col, uid) %>%
+  estimator <- spark_pipeline_stage(
+    x, "org.apache.spark.ml.feature.MaxAbsScaler",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     new_ml_max_abs_scaler()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+
+  estimator
 }
 
 #' @export
-ft_max_abs_scaler.ml_pipeline <- function(
-  x, input_col, output_col,
-  dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...
-) {
+ft_max_abs_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                          uid = random_string("max_abs_scaler_"), ...) {
 
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_max_abs_scaler.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
 
 }
 
 #' @export
-ft_max_abs_scaler.tbl_spark <- function(
-  x, input_col, output_col,
-  dataset = NULL,
-  uid = random_string("max_abs_scaler_"), ...
-) {
-  dots <- rlang::dots_list(...)
+ft_max_abs_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                        uid = random_string("max_abs_scaler_"), ...) {
 
-  stage <- ml_new_stage_modified_args()
+  stage <- ft_max_abs_scaler.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -65,14 +87,13 @@ ft_max_abs_scaler.tbl_spark <- function(
 }
 
 new_ml_max_abs_scaler <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_max_abs_scaler")
+  new_ml_estimator(jobj, class = "ml_max_abs_scaler")
 }
 
 new_ml_max_abs_scaler_model <- function(jobj) {
-  new_ml_transformer(jobj, subclass = "ml_max_abs_scaler_model")
+  new_ml_transformer(jobj, class = "ml_max_abs_scaler_model")
 }
 
-ml_validator_max_abs_scaler <- function(args, nms) {
-  args %>%
-    ml_extract_args(nms)
+validator_ml_max_abs_scaler <- function(.args) {
+  validate_args_transformer(.args)
 }

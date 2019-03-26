@@ -34,30 +34,41 @@ gateway_connection <- function(master, config) {
 
 spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
   tryCatch({
-    # set timeout for socket connection
-    timeout <- spark_config_value(config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
+    interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+
     backend <- socketConnection(host = gatewayAddress,
                                 port = gatewayInfo$backendPort,
                                 server = FALSE,
-                                blocking = TRUE,
+                                blocking = interval > 0,
                                 open = "wb",
-                                timeout = timeout)
+                                timeout = interval)
+    class(backend) <- c(class(backend), "shell_backend")
+
+    monitoring <- socketConnection(host = gatewayAddress,
+                                   port = gatewayInfo$backendPort,
+                                   server = FALSE,
+                                   blocking = interval > 0,
+                                   open = "wb",
+                                   timeout = interval)
+    class(monitoring) <- c(class(monitoring), "shell_backend")
   }, error = function(err) {
     close(gatewayInfo$gateway)
     stop("Failed to open connection to backend:", err$message)
   })
 
   # create the shell connection
-  sc <- structure(class = c("spark_connection", "spark_gateway_connection", "spark_shell_connection"), list(
+  sc <- new_spark_gateway_connection(list(
     # spark_connection
     master = master,
     method = "gateway",
     app_name = "sparklyr",
     config = config,
+    state = new.env(),
     # spark_gateway_connection : spark_shell_connection
     spark_home = NULL,
     backend = backend,
-    monitor = gatewayInfo$gateway,
+    monitoring = monitoring,
+    gateway = gatewayInfo$gateway,
     output_file = NULL
   ))
 
@@ -67,13 +78,6 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
       stop_shell(sc)
     }
   }, onexit = TRUE)
-
-  # initialize and return the connection
-  tryCatch({
-    sc <- initialize_connection(sc)
-  }, error = function(e) {
-    stop("Failed during initialize_connection:", e$message)
-  })
 
   sc
 }

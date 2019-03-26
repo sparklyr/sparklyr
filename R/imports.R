@@ -3,18 +3,23 @@
 #' @import utils
 #' @importFrom stats as.formula coefficients gaussian na.fail na.omit predict quantile
 #' @importFrom dplyr type_sum
-#' @importFrom broom fix_data_frame
 #' @importFrom rlang %||%
 NULL
 
-#' @importFrom broom tidy
+#' @importFrom generics tidy
 #' @export
-broom::tidy
+generics::tidy
 
-#' @importFrom broom augment
+#' @importFrom generics augment
 #' @export
-broom::augment
+generics::augment
 
-#' @importFrom broom glance
+#' @importFrom generics glance
 #' @export
-broom::glance
+generics::glance
+
+#' @import forge
+NULL
+
+#' @importFrom ellipsis check_dots_used
+NULL

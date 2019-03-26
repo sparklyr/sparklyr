@@ -2,7 +2,7 @@
 spark_data_build_types <- function(sc, columns) {
   names <- names(columns)
   fields <- lapply(names, function(name) {
-    invoke_static(sc, "sparklyr.SQLUtils", "createStructField", name, columns[[name]], TRUE)
+    invoke_static(sc, "sparklyr.SQLUtils", "createStructField", name, columns[[name]][[1]], TRUE)
   })
 
   invoke_static(sc, "sparklyr.SQLUtils", "createStructType", fields)
@@ -56,7 +56,7 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
 
   tempFile <- tempfile(fileext = ".csv")
   write.table(df, tempFile, sep = separator$plain, col.names = FALSE, row.names = FALSE, quote = FALSE)
-  textData <- as.list(readr::read_lines(tempFile))
+  textData <- as.list(readLines(tempFile))
 
   rdd <- invoke_static(
     sc,
@@ -115,12 +115,91 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
   invoke(hive_context(sc), "createDataFrame", rdd, structType)
 }
 
+spark_serialize_arrow <- function(sc, df, columns, repartition) {
+  arrow_copy_to(
+    sc,
+    df,
+    as.integer(if (repartition <= 0) 1 else repartition)
+  )
+}
+
+spark_data_translate_columns <- function(df) {
+  lapply(df, function(e) {
+    if (is.factor(e))
+      "character"
+    else if ("POSIXct" %in% class(e))
+      "timestamp"
+    else
+      typeof(e)
+  })
+}
+
+spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
+  if (identical(class(df_data), "iterator")) {
+    df <- df_data()
+  }
+  else {
+    df_list <- df_data
+    if (!identical(class(df_data), "list")) {
+      df_list <- list(df_data)
+    }
+    df <- df_list[[1]]
+  }
+
+  # load arrow file in scala
+  sdf_list <- list()
+  i <- 1
+  while (!is.null(df)) {
+    if (is.function(df)) df <- df()
+    if (is.language(df)) df <- rlang::as_closure(df)()
+
+    # ensure data.frame
+    if (!is.data.frame(df)) df <- sdf_prepare_dataframe(df)
+
+    names(df) <- spark_sanitize_names(names(df), sc$config)
+    columns <- spark_data_translate_columns(df)
+    sdf_current <- serializer(sc, df, columns, repartition)
+    sdf_list[[i]] <- sdf_current
+
+    i <- i + 1
+    if (identical(class(df_data), "iterator")) {
+      df <- df_data()
+    }
+    else {
+      df <- if (i <= length(df_list)) df_list[[i]] else NULL
+    }
+
+    # if more than one batch, partially cache results
+    if (i > 2 || !is.null(df)) {
+      invoke(sdf_current, "cache")
+      sdf_count <- invoke(sdf_current, "count")
+      if (spark_config_value(sc$config, "sparklyr.verbose", FALSE)) {
+        message("Copied batch with ", sdf_count, " rows to Spark.")
+      }
+    }
+  }
+
+  sdf <- sdf_list[[1]]
+  if (length(sdf_list) > 1) {
+    rdd_list <- NULL
+    for (i in seq_along(sdf_list)) {
+      rdd_list[[i]] <- invoke(sdf_list[[i]], "rdd")
+    }
+
+    rdd <- invoke_static(sc, "sparklyr.Utils", "unionRdd", spark_context(sc), rdd_list)
+    schema <- invoke(sdf_list[[1]], "schema")
+    sdf <- invoke(hive_context(sc),  "createDataFrame", rdd, schema)
+  }
+
+  sdf
+}
+
 spark_data_copy <- function(
   sc,
   df,
   name,
   repartition,
-  serializer = getOption("sparklyr.copy.serializer", "csv_file")) {
+  serializer = NULL) {
 
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
@@ -130,39 +209,28 @@ spark_data_copy <- function(
     stop("Using a local file to copy data is not supported for remote clusters")
   }
 
-  serializer <- ifelse(is.null(serializer),
-                       ifelse(spark_connection_is_local(sc) ||
-                              spark_connection_is_yarn_client(sc),
-                              "csv_file_scala",
-                              "csv_string"),
-                       serializer)
-
-  # Spark unfortunately has a number of issues with '.'s in column names, e.g.
-  #
-  #    https://issues.apache.org/jira/browse/SPARK-5632
-  #    https://issues.apache.org/jira/browse/SPARK-13455
-  #
-  # Many of these issues are marked as resolved, but it appears this is
-  # a common regression in Spark and the handling is not uniform across
-  # the Spark API.
-  names(df) <- spark_sanitize_names(names(df))
-
-  columns <- lapply(df, function(e) {
-    if (is.factor(e))
-      "character"
-    else if ("POSIXct" %in% class(e))
-      "timestamp"
-    else
-      typeof(e)
-  })
+  serializer <- ifelse(
+                  is.null(serializer),
+                  ifelse(
+                    arrow_enabled(sc, df),
+                    "arrow",
+                    ifelse(
+                      spark_connection_in_driver(sc),
+                      "csv_file_scala",
+                      getOption("sparklyr.copy.serializer", "csv_string")
+                    )
+                  ),
+                  serializer
+                )
 
   serializers <- list(
     "csv_file" = spark_serialize_csv_file,
     "csv_string" = spark_serialize_csv_string,
-    "csv_file_scala" = spark_serialize_csv_scala
+    "csv_file_scala" = spark_serialize_csv_scala,
+    "arrow" = spark_serialize_arrow
   )
 
-  df <- serializers[[serializer]](sc, df, columns, repartition)
+  df <- spark_data_perform_copy(sc, serializers[[serializer]], df, repartition)
 
   invoke(df, "registerTempTable", name)
 }

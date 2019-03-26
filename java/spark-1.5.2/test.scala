@@ -25,6 +25,10 @@ object Test {
   def roundtrip(data: Array[_]): Array[_] = data
 
   def unaryArrayToClass(array: Array[_]): String = array.getClass.getName
+
+  var number: Int = 0
+  def setNumber(x: Int): Unit = { number = x }
+  def getNumber(): Int = number
 }
 
 package object test {

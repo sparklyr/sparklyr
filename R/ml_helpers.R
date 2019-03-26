@@ -26,7 +26,7 @@ ml_feature_importances.ml_prediction_model <- function(model, ...) {
     stop("Cannot extract feature importances from ", model_class,
          call. = FALSE)
   }
-  model$feature_importances
+  model$feature_importances()
 }
 
 #' @export
@@ -56,8 +56,8 @@ ml_feature_importances.ml_model <- function(model, ...) {
     spark_require_version(spark_connection(spark_jobj(model)), "2.0.0")
 
   data.frame(
-    feature = model$.features,
-    importance = model$model$feature_importances,
+    feature = model$feature_names,
+    importance = model$model$feature_importances(),
     stringsAsFactors = FALSE
   ) %>%
     rlang::set_names(c("feature", "importance")) %>%

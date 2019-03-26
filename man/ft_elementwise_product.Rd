@@ -4,8 +4,8 @@
 \alias{ft_elementwise_product}
 \title{Feature Transformation -- ElementwiseProduct (Transformer)}
 \usage{
-ft_elementwise_product(x, input_col, output_col, scaling_vec,
-  uid = random_string("elementwise_product_"), ...)
+ft_elementwise_product(x, input_col = NULL, output_col = NULL,
+  scaling_vec = NULL, uid = random_string("elementwise_product_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -72,3 +72,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

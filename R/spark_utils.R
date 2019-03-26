@@ -37,7 +37,7 @@ spark_table_name <- function(expr) {
   table_name <- deparse(expr)
   if (identical(length(table_name), 1L) &&
       grepl("^[a-zA-Z][a-zA-Z0-9_]*$", table_name[[1]])
-  ) table_name else random_string(prefix = "sparklyr_")
+  ) table_name else random_string(prefix = "sparklyr_tmp_")
 }
 
 #' Superclasses of object
@@ -53,6 +53,6 @@ jobj_class <- function(jobj, simple_name = TRUE) {
                 "sparklyr.Utils",
                 "getAncestry",
                 jobj,
-                ensure_scalar_boolean(simple_name)) %>%
+                cast_scalar_logical(simple_name)) %>%
     unlist()
 }

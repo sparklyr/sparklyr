@@ -1,71 +1,3 @@
-spark_schema_from_rdd <- function(sc, rdd, column_names) {
-  columns_typed <- length(names(column_names)) > 0
-
-  if (columns_typed) {
-    schema <- spark_data_build_types(sc, column_names)
-    return(schema)
-  }
-
-  sampleRows <- rdd %>% invoke(
-    "take",
-    sparklyr::ensure_scalar_integer(
-      spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
-    )
-  )
-
-  map_special_types <- list(
-    date = "date",
-    posixct = "timestamp",
-    posixt = "timestamp"
-  )
-
-  colTypes <- NULL
-  lapply(sampleRows, function(r) {
-    row <- r %>% invoke("toSeq")
-
-    if (is.null(colTypes))
-      colTypes <<- replicate(length(row), "character")
-
-    lapply(seq_along(row), function(colIdx) {
-      colVal <- row[[colIdx]]
-      lowerClass <- tolower(class(colVal)[[1]])
-      if (lowerClass %in% names(map_special_types)) {
-        colTypes[[colIdx]] <<- map_special_types[[lowerClass]]
-      } else if (!is.na(colVal) && !is.null(colVal)) {
-        colTypes[[colIdx]] <<- typeof(colVal)
-      }
-    })
-  })
-
-  if (any(sapply(colTypes, is.null)))
-    stop("Failed to infer column types, please use explicit types.")
-
-  fields <- lapply(seq_along(colTypes), function(idx) {
-    name <- if (is.null(column_names))
-      as.character(idx)
-    else if (idx <= length(column_names))
-      column_names[[idx]]
-    else
-      paste0("X", idx)
-
-    invoke_static(
-      sc,
-      "sparklyr.SQLUtils",
-      "createStructField",
-      name,
-      colTypes[[idx]],
-      TRUE
-    )
-  })
-
-  invoke_static(
-    sc,
-    "sparklyr.SQLUtils",
-    "createStructType",
-    fields
-  )
-}
-
 spark_apply_packages <- function(packages) {
   db <- Sys.getenv("sparklyr.apply.packagesdb")
   if (nchar(db) == 0) {
@@ -100,6 +32,37 @@ spark_apply_packages_is_bundle <- function(packages) {
   is.character(packages) && length(packages) == 1 && grepl("\\.tar$", packages)
 }
 
+spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE, arrow = FALSE) {
+  worker_config_serialize(
+    c(
+      list(
+        debug = isTRUE(debug),
+        profile = isTRUE(profile),
+        schema = isTRUE(schema),
+        arrow =isTRUE(arrow)
+      ),
+      sc$config
+    )
+  )
+}
+
+spark_apply_colum_types <- function(sdf) {
+  type_map <- list(
+    IntegerType = "integer",
+    FloatType = "numeric",
+    DoubleType = "numeric",
+    LongType = "numeric",
+    StringType = "character",
+    BinaryType = "raw",
+    BooleanType = "logical",
+    TimestampType = "POSIXct",
+    DateType = "Date",
+    DateType = "date"
+  )
+
+  lapply(sdf_schema(sdf), function(e) type_map[[e$type]])
+}
+
 #' Apply an R Function in Spark
 #'
 #' Applies an R function to a Spark object (typically, a Spark DataFrame).
@@ -111,14 +74,22 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'   is an optional object passed as the \code{context} parameter and \code{group1} to
 #'   \code{groupN} contain the values of the \code{group_by} values. When
 #'   \code{group_by} is not specified, \code{f} takes only one argument.
+#'
+#'   Can also be an \code{rlang} anonymous function. For example, as \code{~ .x + 1}
+#'   to define an expression that adds one to the given \code{.x} data frame.
 #' @param columns A vector of column names or a named vector of column types for
-#'   the transformed object. Defaults to the names from the original object and
-#'   adds indexed column names when not enough columns are specified.
+#'   the transformed object. When not specified, a sample of 10 rows is taken to
+#'   infer out the output columns automatically, to avoid this performance penalty,
+#'   specify the the column types. The sample size is confgirable using the
+#'   \code{sparklyr.apply.schema.infer} configuration option.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
 #' @param packages Boolean to distribute \code{.libPaths()} packages to each node,
 #'   a list of packages to distribute, or a package bundle created with
 #'   \code{spark_apply_bundle()}.
+#'
+#'   Defaults to \code{TRUE} or the \code{sparklyr.apply.packages} value set in
+#'   \code{spark_config()}.
 #'
 #'   For clusters using Yarn cluster mode, \code{packages} can point to a package
 #'   bundle created using \code{spark_apply_bundle()} and made available as a Spark
@@ -130,7 +101,12 @@ spark_apply_packages_is_bundle <- function(packages) {
 #'  https://cran.r-project.org/web/packages/packages.rds and set
 #'   \code{Sys.setenv(sparklyr.apply.packagesdb = "<pathl-to-rds>")}. Otherwise,
 #'   all packages will be used by default.
+#'
+#'   For clusters where R packages already installed in every worker node,
+#'   the \code{spark.r.libpaths} config entry can be set in \code{spark_config()}
+#'   to the local packages library.
 #' @param context Optional object to be serialized and passed back to \code{f()}.
+#' @param name Optional table name while registering the resulting data frame.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @section Configuration:
@@ -158,27 +134,71 @@ spark_apply_packages_is_bundle <- function(packages) {
 #' @export
 spark_apply <- function(x,
                         f,
-                        columns = colnames(x),
-                        memory = TRUE,
+                        columns = NULL,
+                        memory = !is.null(name),
                         group_by = NULL,
-                        packages = TRUE,
+                        packages = NULL,
                         context = NULL,
+                        name = NULL,
                         ...) {
+  memory <- force(memory)
   args <- list(...)
-  assert_that(is.function(f))
+  assert_that(is.function(f) || is.raw(f) || is.language(f))
+  if (is.language(f)) f <- rlang::as_closure(f)
 
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
-  rdd_base <- invoke(sdf, "rdd")
+  if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
+  if (identical(args$rdd, TRUE)) {
+    rdd_base <- invoke(sdf, "rdd")
+    if (identical(columns, NULL)) columns <- colnames(x)
+  }
   grouped <- !is.null(group_by)
-  args <- list(...)
-  rlang <- spark_config_value(sc$config, "sparklyr.closures.rlang", FALSE)
-  proc_env <- connection_config(sc, "sparklyr.apply.env.")
+
+  rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
+  packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
+  proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
+
+  time_zone <- ""
+  records_per_batch <- NULL
+  arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
+  if (arrow) {
+    time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
+    records_per_batch <- as.integer(spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||% 10000)
+  }
+
+  # build reduced size query plan in case schema needs to be inferred
+  if (sdf_is_streaming(sdf)) {
+    sdf_limit <- sdf
+  }
+  else {
+    sdf_limit <- invoke(
+      sdf,
+      "limit",
+      cast_scalar_integer(
+        spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+      )
+    )
+  }
 
   # backward compatible support for names argument from 0.6
   if (!is.null(args$names)) {
     columns <- args$names
+  }
+
+  if (!is.null(group_by) && sdf_is_streaming(sdf)) {
+    stop("'group_by' is unsupported with streams.")
+  }
+
+  # set default value for packages based on config
+  if (identical(packages, NULL)) {
+    if (identical(packages_config, NULL)) {
+      packages <- TRUE
+    }
+    else {
+      packages <- packages_config
+    }
   }
 
   columns_typed <- length(names(columns)) > 0
@@ -188,24 +208,22 @@ spark_apply <- function(x,
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) packages <- FALSE
 
+  # disable package distribution for livy connections and no package spec
+  if (identical(tolower(sc$method), "livy") && identical(packages, TRUE)) packages <- FALSE
+
+  # inject column types to context
+  context <- list(
+    column_types = spark_apply_colum_types(x),
+    user_context = context
+  )
+
   # create closure for the given function
-  closure <- serialize(f, NULL)
+  closure <- if (is.function(f)) serialize(f, NULL) else f
   context_serialize <- serialize(context, NULL)
 
   # create rlang closure
   rlang_serialize <- spark_apply_rlang_serialize()
   closure_rlang <- if (rlang && !is.null(rlang_serialize)) rlang_serialize(f) else raw()
-
-  # create a configuration string to initialize each worker
-  worker_config <- worker_config_serialize(
-    c(
-      list(
-        debug = isTRUE(args$debug),
-        profile = isTRUE(args$profile)
-      ),
-      sc$config
-    )
-  )
 
   # add debug connection message
   if (isTRUE(args$debug)) {
@@ -224,12 +242,20 @@ spark_apply <- function(x,
 
     group_by_list <- as.list(as.integer(colpos - 1))
 
-    grouped_rdd <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
-
-    rdd_base <- grouped_rdd
-
     if (!columns_typed) {
       columns <- c(group_by, columns)
+    }
+
+    if (identical(args$rdd, TRUE)) {
+      rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
+    }
+    else if (arrow) {
+      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
+    }
+    else {
+      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
     }
   }
 
@@ -265,33 +291,112 @@ spark_apply <- function(x,
     connection_config(sc, "sparklyr.apply.options."),
     as.character
   )
+  if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
 
-  rdd <- invoke_static(
-    sc,
-    "sparklyr.WorkerHelper",
-    "computeRdd",
-    rdd_base,
-    closure,
-    worker_config,
-    as.integer(worker_port),
-    as.list(sdf_columns),
-    as.list(group_by),
-    closure_rlang,
-    bundle_path,
-    as.environment(proc_env),
-    as.integer(60),
-    context_serialize,
-    as.environment(spark_apply_options)
-  )
+  if (identical(args$rdd, TRUE)) {
+    rdd <- invoke_static(
+      sc,
+      "sparklyr.WorkerHelper",
+      "computeRdd",
+      rdd_base,
+      closure,
+      spark_apply_worker_config(sc, args$debug, args$profile),
+      as.integer(worker_port),
+      as.list(sdf_columns),
+      as.list(group_by),
+      closure_rlang,
+      bundle_path,
+      as.environment(proc_env),
+      as.integer(60),
+      context_serialize,
+      as.environment(spark_apply_options)
+    )
 
-  # while workers need to relaunch sparklyr backends, cache by default
-  if (memory) rdd <- invoke(rdd, "cache")
+    # cache by default
+    if (memory) rdd <- invoke(rdd, "cache")
 
-  schema <- spark_schema_from_rdd(sc, rdd, columns)
+    schema <- spark_schema_from_rdd(sc, rdd, columns)
 
-  transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
+    transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
+  }
+  else {
+    if (identical(columns, NULL) || is.character(columns)) {
+      columns_schema <- spark_data_build_types(
+        sc,
+        list(
+          names = "character",
+          types = "character"
+        )
+      )
 
-  sdf_register(transformed)
+      columns_op <- invoke_static(
+        sc,
+        "sparklyr.WorkerHelper",
+        "computeSdf",
+        sdf_limit,
+        columns_schema,
+        closure,
+        spark_apply_worker_config(sc, args$debug, args$profile, schema = TRUE, arrow = arrow),
+        as.integer(worker_port),
+        as.list(sdf_columns),
+        as.list(group_by),
+        closure_rlang,
+        bundle_path,
+        as.environment(proc_env),
+        as.integer(60),
+        context_serialize,
+        as.environment(spark_apply_options),
+        spark_session(sc),
+        time_zone
+      )
+
+      columns_query <- columns_op %>% sdf_collect()
+      if (arrow && !arrow_enabled_dataframe_schema(columns_query$types)) {
+        arrow <- FALSE
+      }
+
+      columns_infer <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
+      names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
+
+      if (is.character(columns)) {
+        names(columns_infer)[seq_along(columns)] <- columns
+      }
+
+      columns <- columns_infer
+
+      if (identical(args$schema, TRUE)) return(columns)
+    }
+
+    schema <- spark_data_build_types(sc, columns)
+
+    transformed <- invoke_static(
+      sc,
+      "sparklyr.WorkerHelper",
+      "computeSdf",
+      sdf,
+      schema,
+      closure,
+      spark_apply_worker_config(sc, args$debug, args$profile, arrow = arrow),
+      as.integer(worker_port),
+      as.list(sdf_columns),
+      as.list(group_by),
+      closure_rlang,
+      bundle_path,
+      as.environment(proc_env),
+      as.integer(60),
+      context_serialize,
+      as.environment(spark_apply_options),
+      spark_session(sc),
+      time_zone
+    )
+  }
+
+  name <- name %||% random_string("sparklyr_tmp_")
+  registered <- sdf_register(transformed, name = name)
+
+  if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
+
+  registered
 }
 
 spark_apply_rlang_serialize <- function() {

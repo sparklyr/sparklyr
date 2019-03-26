@@ -49,7 +49,7 @@
 
 class Backend() {
   import java.io.{DataInputStream, DataOutputStream}
-  import java.io.{File, FileOutputStream, IOException}
+  import java.io.{File, FileOutputStream, IOException, FileWriter}
   import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
   import java.util.concurrent.TimeUnit
 
@@ -62,6 +62,9 @@ class Backend() {
   private[this] var isService: Boolean = false
   private[this] var isRemote: Boolean = false
   private[this] var isWorker: Boolean = false
+  private[this] var isBatch: Boolean = false
+
+  private[this] var args: Array[String] = Array[String]()
 
   private[this] var hostContext: String = null
 
@@ -73,6 +76,7 @@ class Backend() {
   private[this] var port: Int = 0
   private[this] var sessionId: Int = 0
   private[this] var connectionTimeout: Int = 60
+  private[this] var batchFile: String = ""
 
   private[this] var sc: SparkContext = null
   private[this] var hc: HiveContext = null
@@ -91,16 +95,8 @@ class Backend() {
     defaultTracker = Option(tracker)
   }
 
-  object GatewayOperattions extends Enumeration {
+  object GatewayOperations extends Enumeration {
     val GetPorts, RegisterInstance, UnregisterInstance = Value
-  }
-
-  def getOrCreateHiveContext(sc: SparkContext): HiveContext = {
-    if (hc == null) {
-      hc = new HiveContext(sc)
-    }
-
-    hc
   }
 
   def getSparkContext(): SparkContext = {
@@ -115,30 +111,18 @@ class Backend() {
     sc = nsc
   }
 
-  def portIsAvailable(port: Int, inetAddress: InetAddress) = {
-    var ss: ServerSocket = null
-    var available = false
-
-    Try {
-        ss = new ServerSocket(port, 1, inetAddress)
-        available = true
-    }
-
-    if (ss != null) {
-        Try {
-            ss.close();
-        }
-    }
-
-    available
+  def setArgs(argsParam: Array[String]): Unit = {
+    args = argsParam
   }
 
   def setType(isServiceParam: Boolean,
               isRemoteParam: Boolean,
-              isWorkerParam: Boolean) = {
+              isWorkerParam: Boolean,
+              isBatchParam: Boolean) = {
     isService = isServiceParam
     isRemote = isRemoteParam
     isWorker = isWorkerParam
+    isBatch = isBatchParam
   }
 
   def setHostContext(hostContextParam: String) = {
@@ -148,10 +132,18 @@ class Backend() {
   def init(portParam: Int,
            sessionIdParam: Int,
            connectionTimeoutParam: Int): Unit = {
+      init(portParam, sessionIdParam, connectionTimeoutParam, "")
+  }
+
+  def init(portParam: Int,
+           sessionIdParam: Int,
+           connectionTimeoutParam: Int,
+           batchFilePath: String): Unit = {
 
     port = portParam
     sessionId = sessionIdParam
     connectionTimeout = connectionTimeoutParam
+    batchFile = batchFilePath
 
     logger = new Logger("Session", sessionId)
 
@@ -172,7 +164,7 @@ class Backend() {
         gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
         port = gatewayServerSocket.getLocalPort()
       }
-      else if (portIsAvailable(port, inetAddress))
+      else if (Utils.portIsAvailable(port, inetAddress))
       {
         logger.log("found port " + port + " is available")
         logger = new Logger("Gateway", sessionId)
@@ -185,7 +177,10 @@ class Backend() {
         logger = new Logger("Backend", sessionId)
         if (isWorker) logger = new Logger("Worker", sessionId)
 
-        gatewayServerSocket = new ServerSocket(0, 1, inetAddress)
+        val newPort = Utils.nextPort(port, inetAddress)
+        logger.log("found port " + newPort + " is available")
+
+        gatewayServerSocket = new ServerSocket(newPort, 1, inetAddress)
         gatewayPort = port
         port = gatewayServerSocket.getLocalPort()
 
@@ -211,8 +206,85 @@ class Backend() {
     if (!isService) System.exit(0)
   }
 
+  def batch(): Unit = {
+    new Thread("starting batch rscript thread") {
+      override def run(): Unit = {
+        try {
+          logger.log("is starting batch rscript")
+
+          val rscript = new Rscript(logger)
+
+          val sparklyrGateway = "sparklyr://localhost:" + port.toString() + "/" + sessionId
+          logger.log("will be using rscript gateway: " + sparklyrGateway)
+
+          var sourceFile: File = new java.io.File("sparklyr-batch.R")
+          if (!sourceFile.exists) {
+            logger.log("tried to find source under working folder: " + (new File(".").getAbsolutePath()))
+            logger.log("tried to find source under working files: " + (new File(".")).listFiles.mkString(","))
+
+            sourceFile = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch.R")
+            if (!sourceFile.exists) {
+
+              logger.log("tried to find source under scratch folder: " + rscript.getScratchDir().getAbsolutePath())
+              logger.log("tried to find source under scratch files: " + rscript.getScratchDir().listFiles.mkString(","))
+
+              sourceFile = new File(batchFile)
+            }
+          }
+
+          val sourceLines = scala.io.Source.fromFile(sourceFile).getLines
+
+          val modifiedFile: File = new File(rscript.getScratchDir() + File.separator + "sparklyr-batch-mod.R")
+          val outStream: FileWriter = new FileWriter(modifiedFile)
+          outStream.write("options(sparklyr.connect.master = \"" + sparklyrGateway + "\")")
+          outStream.write("\n\n");
+          for (line <- sourceLines) {
+            outStream.write(line + "\n")
+          }
+          outStream.flush()
+
+          logger.log("wrote modified batch rscript: " + modifiedFile.getAbsolutePath())
+
+          val customEnv: Map[String, String] = Map()
+          val options: Map[String, String] = Map()
+
+          rscript.init(
+            args.toList,
+            modifiedFile.getAbsolutePath(),
+            customEnv,
+            options
+          )
+        } catch {
+          case e: java.lang.reflect.InvocationTargetException =>
+            e.getCause() match {
+              case cause: Exception => {
+                logger.logError("failed to invoke batch rscript: ", cause)
+                System.exit(1)
+              }
+              case _ => {
+                logger.logError("failed to invoke batch rscript: ", e)
+                System.exit(1)
+              }
+            }
+          case e: Exception => {
+            logger.logError("failed to run batch rscript: ", e)
+            System.exit(1)
+          }
+        }
+      }
+    }.start()
+  }
+
   def run(): Unit = {
     try {
+
+      if (isBatch) {
+        // spark context needs to be created for spark.files to be accessible
+        org.apache.spark.SparkContext.getOrCreate()
+
+        batch()
+      }
+
       initMonitor()
       while(isRunning) {
         bind()
@@ -232,7 +304,20 @@ class Backend() {
       override def run(): Unit = {
         Thread.sleep(connectionTimeout * 1000)
         if (!oneConnection && !isService) {
-          logger.log("is terminating backend since no client has connected after " + connectionTimeout + " seconds")
+          val hostAddress: String = try {
+            " to " + InetAddress.getLocalHost.getHostAddress.toString + "/" + getPort()
+          } catch {
+            case e: java.net.UnknownHostException => "unknown host"
+          }
+
+          logger.log(
+            "is terminating backend since no client has connected after " +
+            connectionTimeout +
+            " seconds" +
+            hostAddress +
+            "."
+          )
+
           System.exit(1)
         }
       }
@@ -258,8 +343,8 @@ class Backend() {
 
           logger.log("received command " + commandId)
 
-          GatewayOperattions(commandId) match {
-            case GatewayOperattions.GetPorts => {
+          GatewayOperations(commandId) match {
+            case GatewayOperations.GetPorts => {
               val requestedSessionId = dis.readInt()
               val startupTimeout = dis.readInt()
 
@@ -275,7 +360,7 @@ class Backend() {
                 val backendChannel = new BackendChannel(logger, terminate, serializer, tracker)
                 backendChannel.setHostContext(hostContext)
 
-                val backendPort: Int = backendChannel.init(isRemote)
+                val backendPort: Int = backendChannel.init(isRemote, port, !isWorker)
 
                 logger.log("created the backend")
 
@@ -360,7 +445,7 @@ class Backend() {
 
               dos.close()
             }
-            case GatewayOperattions.RegisterInstance => {
+            case GatewayOperations.RegisterInstance => {
               val registerSessionId = dis.readInt()
               val registerGatewayPort = dis.readInt()
 
@@ -373,7 +458,7 @@ class Backend() {
               dos.flush()
               dos.close()
             }
-            case GatewayOperattions.UnregisterInstance => {
+            case GatewayOperations.UnregisterInstance => {
               val unregisterSessionId = dis.readInt()
 
               logger.log("received session " + unregisterSessionId + " unregistration request")
@@ -407,7 +492,7 @@ class Backend() {
     val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
     val dos = new DataOutputStream(s.getOutputStream())
-    dos.writeInt(GatewayOperattions.RegisterInstance.id)
+    dos.writeInt(GatewayOperations.RegisterInstance.id)
     dos.writeInt(sessionId)
     dos.writeInt(port)
 
@@ -443,7 +528,7 @@ class Backend() {
       val s = new Socket(InetAddress.getLoopbackAddress(), gatewayPort)
 
       val dos = new DataOutputStream(s.getOutputStream())
-      dos.writeInt(GatewayOperattions.UnregisterInstance.id)
+      dos.writeInt(GatewayOperations.UnregisterInstance.id)
       dos.writeInt(sessionId)
 
       logger.log("is waiting for unregistration in gateway")

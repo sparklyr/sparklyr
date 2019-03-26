@@ -1,4 +1,4 @@
-#' Feature Tranformation -- StandardScaler (Estimator)
+#' Feature Transformation -- StandardScaler (Estimator)
 #'
 #' Standardizes features by removing the mean and scaling to unit variance using
 #'   column summary statistics on the samples in the training set. The "unit std"
@@ -12,55 +12,87 @@
 #'   build a dense output, so take care when applying to sparse input. Default: FALSE
 #' @param with_std Whether to scale the data to unit standard deviation. Default: TRUE
 #'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
+#'
+#' iris_tbl %>%
+#'   ft_vector_assembler(input_col = features,
+#'                       output_col = "features_temp") %>%
+#'   ft_standard_scaler(input_col = "features_temp",
+#'                      output_col = "features",
+#'                      with_mean = TRUE)
+#' }
+#'
 #' @export
-ft_standard_scaler <- function(
-  x, input_col, output_col,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
-  uid = random_string("standard_scaler_"), ...) {
+ft_standard_scaler <- function(x, input_col = NULL, output_col = NULL,
+                               with_mean = FALSE, with_std = TRUE,
+                               uid = random_string("standard_scaler_"), ...) {
+  check_dots_used()
   UseMethod("ft_standard_scaler")
 }
 
+ml_standard_scaler <- ft_standard_scaler
+
 #' @export
-ft_standard_scaler.spark_connection <- function(
-  x, input_col, output_col,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
-  uid = random_string("standard_scaler_"), ...) {
+ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
+                                                with_mean = FALSE, with_std = TRUE,
+                                                uid = random_string("standard_scaler_"), ...) {
 
-  ml_ratify_args()
+  .args <- list(
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    uid = uid
+  ) %>%
+    c(rlang::dots_list(...)) %>%
+    validator_ml_standard_scaler()
 
-  estimator <- ml_new_transformer(x, "org.apache.spark.ml.feature.StandardScaler",
-                                  input_col, output_col, uid) %>%
-    invoke("setWithMean", with_mean) %>%
-    invoke("setWithStd", with_std) %>%
+  estimator <- spark_pipeline_stage(
+    x, "org.apache.spark.ml.feature.StandardScaler",
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
+    invoke("setWithMean", .args[["with_mean"]]) %>%
+    invoke("setWithStd", .args[["with_std"]]) %>%
     new_ml_standard_scaler()
 
-  if (is.null(dataset))
-    estimator
-  else
-    ml_fit(estimator, dataset)
+  estimator
 }
 
 #' @export
-ft_standard_scaler.ml_pipeline <- function(
-  x, input_col, output_col,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
-  uid = random_string("standard_scaler_"), ...
-) {
-
-  stage <- ml_new_stage_modified_args()
+ft_standard_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                           with_mean = FALSE, with_std = TRUE,
+                                           uid = random_string("standard_scaler_"), ...) {
+  stage <- ft_standard_scaler.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    uid = uid,
+    ...
+  )
   ml_add_stage(x, stage)
 
 }
 
 #' @export
-ft_standard_scaler.tbl_spark <- function(
-  x, input_col, output_col,
-  with_mean = FALSE, with_std = TRUE, dataset = NULL,
-  uid = random_string("standard_scaler_"), ...
-) {
-  dots <- rlang::dots_list(...)
-
-  stage <- ml_new_stage_modified_args()
+ft_standard_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                         with_mean = FALSE, with_std = TRUE,
+                                         uid = random_string("standard_scaler_"), ...) {
+  stage <- ft_standard_scaler.spark_connection(
+    x = spark_connection(x),
+    input_col = input_col,
+    output_col = output_col,
+    with_mean = with_mean,
+    with_std = with_std,
+    uid = uid,
+    ...
+  )
 
   if (is_ml_transformer(stage))
     ml_transform(stage, x)
@@ -69,22 +101,20 @@ ft_standard_scaler.tbl_spark <- function(
 }
 
 new_ml_standard_scaler <- function(jobj) {
-  new_ml_estimator(jobj, subclass = "ml_standard_scaler")
+  new_ml_estimator(jobj, class = "ml_standard_scaler")
 }
 
 new_ml_standard_scaler_model <- function(jobj) {
   new_ml_transformer(
     jobj,
-    mean = try_null(read_spark_vector(jobj, "mean")),
-    std = try_null(read_spark_vector(jobj, "std")),
-    subclass = "ml_standard_scaler_model")
+    mean = possibly_null(read_spark_vector)(jobj, "mean"),
+    std = possibly_null(read_spark_vector)(jobj, "std"),
+    class = "ml_standard_scaler_model")
 }
 
-ml_validator_standard_scaler <- function(args, nms) {
-  args %>%
-    ml_validate_args({
-      with_mean <- ensure_scalar_boolean(with_mean)
-      with_std <- ensure_scalar_boolean(with_std)
-    }) %>%
-    ml_extract_args(nms)
+validator_ml_standard_scaler <- function(.args) {
+  .args <- validate_args_transformer(.args)
+  .args[["with_mean"]] <- cast_scalar_logical(.args[["with_mean"]])
+  .args[["with_std"]] <- cast_scalar_logical(.args[["with_std"]])
+  .args
 }

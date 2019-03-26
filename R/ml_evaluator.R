@@ -1,4 +1,4 @@
-new_ml_evaluator <- function(jobj, ..., subclass = NULL) {
+new_ml_evaluator <- function(jobj, ..., class = character()) {
   structure(
     list(
       uid = invoke(jobj, "uid"),
@@ -7,7 +7,7 @@ new_ml_evaluator <- function(jobj, ..., subclass = NULL) {
       ...,
       .jobj = jobj
     ),
-    class = c(subclass, "ml_evaluator")
+    class = c(class, "ml_evaluator")
   )
 }
 
@@ -25,14 +25,9 @@ print.ml_evaluator <- function(x, ...) {
   cat(paste0("  ", "metric_name: ", ml_param(x, "metric_name")))
 }
 
-#' Spark ML -- Evaluate prediction frames with evaluators
-#'
-#' Evaluate a prediction dataset with a Spark ML evaluator
-#'
-#' @param x A \code{ml_evaluator} object.
-#' @param dataset A \code{spark_tbl} with columns as specified in the evaluator object.
+#' @rdname ml_evaluate
 #' @export
-ml_evaluate <- function(x, dataset) {
+ml_evaluate.ml_evaluator <- function(x, dataset) {
   x %>%
     spark_jobj() %>%
     invoke("evaluate", spark_dataframe(dataset))

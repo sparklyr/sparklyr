@@ -70,11 +70,12 @@ spark_installed_versions <- function() {
 }
 
 #' @param show_hadoop Show Hadoop distributions?
+#' @param show_minor Show minor Spark versions?
 #'
 #' @rdname spark_install
 #'
 #' @export
-spark_available_versions <- function(show_hadoop = FALSE) {
+spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE) {
   versions <- read_spark_versions_json(latest = TRUE)
   versions <- versions[versions$spark >= "1.6.0", 1:2]
   selection <- if (show_hadoop) c("spark", "hadoop") else "spark"
@@ -82,6 +83,11 @@ spark_available_versions <- function(show_hadoop = FALSE) {
   versions <- unique(subset(versions, select = selection))
 
   rownames(versions) <- 1:nrow(versions)
+
+  if (!show_minor) versions$spark <- gsub("\\.[0-9]+$", "", versions$spark)
+
+  versions <- unique(versions)
+  rownames(versions) <- NULL
 
   versions
 }
@@ -109,7 +115,7 @@ spark_versions <- function(latest = TRUE) {
   downloadData$hadoop_default <- rep(FALSE, NROW(downloadData))
 
   # apply spark and hadoop versions
-  downloadData[downloadData$spark == "2.3.0" & downloadData$hadoop == "2.7", ]$default <- TRUE
+  downloadData[downloadData$spark == "2.4.0" & downloadData$hadoop == "2.7", ]$default <- TRUE
   lapply(unique(downloadData$spark), function(version) {
     validVersions <- downloadData[grepl("2", downloadData$hadoop) & downloadData$spark == version, ]
     maxHadoop <- validVersions[with(validVersions, order(hadoop, decreasing = TRUE)), ]$hadoop[[1]]
@@ -124,7 +130,7 @@ spark_versions <- function(latest = TRUE) {
              if (dir.exists(maybeDir)) {
                fileName <- basename(maybeDir)
                m <- regmatches(fileName, regexec(spark_versions_file_pattern(), fileName))[[1]]
-               if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]]) else NULL
+               if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]], pattern = fileName) else NULL
              }
            })
     ),
@@ -133,14 +139,20 @@ spark_versions <- function(latest = TRUE) {
       notCurrentRow <- mergedData[mergedData$spark != row$spark | mergedData$hadoop != row$hadoop, ]
 
       newRow <- c(row, installed = TRUE)
-      newRow$base <- if (NROW(currentRow) > 0) currentRow$base else ""
-      newRow$pattern <- if (NROW(currentRow) > 0) currentRow$pattern else ""
-      newRow$download <- if (NROW(currentRow) > 0) currentRow$download else ""
-      newRow$default <- identical(currentRow$spark, "2.3.0")
-      newRow$hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0)
-          identical(currentRow$hadoop, "2.7")
-        else
-          identical(currentRow$hadoop, "2.6")
+      newRow$base <- ""
+      newRow$download <- ""
+      newRow$default <- FALSE
+      newRow$hadoop_default <- FALSE
+
+      if (NROW(currentRow) > 0) {
+        hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0) "2.7" else "2.6"
+
+        newRow$base <- currentRow$base
+        newRow$pattern <- currentRow$pattern
+        newRow$download <- currentRow$download
+        newRow$default <- identical(currentRow$spark, "2.4.0")
+        newRow$hadoop_default <- identical(currentRow$hadoop, hadoop_default)
+      }
 
       mergedData <<- rbind(notCurrentRow, newRow)
     }
@@ -150,8 +162,8 @@ spark_versions <- function(latest = TRUE) {
 }
 
 # Retrieves component information for the given Spark and Hadoop versions
-spark_versions_info <- function(version, hadoop_version) {
-  versions <- spark_versions()
+spark_versions_info <- function(version, hadoop_version, latest = TRUE) {
+  versions <- spark_versions(latest = latest)
 
   versions <- versions[versions$spark == version, ]
   if (NROW(versions) == 0) {
@@ -165,7 +177,13 @@ spark_versions_info <- function(version, hadoop_version) {
 
   version <- versions[1,]
 
-  componentName <- sub("\\.tgz", "", sprintf(versions$pattern, version$spark, version$hadoop))
+  if (nchar(versions$pattern) > 0) {
+    componentName <- sub("\\.tgz", "", sprintf(versions$pattern, version$spark, version$hadoop))
+  }
+  else {
+    componentName <- sprintf("spark-%s-bin-hadoop%s", version$spark, version$hadoop)
+  }
+
   packageName <- paste0(componentName, ".tgz")
   packageRemotePath <- version$download
 

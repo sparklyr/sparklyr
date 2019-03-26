@@ -34,370 +34,321 @@
 #' lr_model <- mtcars_training %>%
 #'   ml_logistic_regression(am ~ gear + carb)
 #'
-#' pred <- sdf_predict(mtcars_test, lr_model)
+#' pred <- ml_predict(lr_model, mtcars_test)
 #'
 #' ml_binary_classification_evaluator(pred)
 #' }
 #'
 #' @export
-ml_logistic_regression <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  elastic_net_param = 0,
-  reg_param = 0,
-  max_iter = 100L,
-  threshold = 0.5,
-  thresholds = NULL,
-  tol = 1e-06,
-  weight_col = NULL,
-  aggregation_depth = 2L,
-  lower_bounds_on_coefficients = NULL,
-  lower_bounds_on_intercepts = NULL,
-  upper_bounds_on_coefficients = NULL,
-  upper_bounds_on_intercepts = NULL,
-  features_col = "features",
-  label_col = "label",
-  family = "auto",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
-  uid = random_string("logistic_regression_"),
-  ...
-) {
+ml_logistic_regression <- function(x, formula = NULL, fit_intercept = TRUE,
+                                   elastic_net_param = 0, reg_param = 0, max_iter = 100,
+                                   threshold = 0.5, thresholds = NULL, tol = 1e-06,
+                                   weight_col = NULL, aggregation_depth = 2,
+                                   lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
+                                   upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
+                                   features_col = "features", label_col = "label", family = "auto",
+                                   prediction_col = "prediction", probability_col = "probability",
+                                   raw_prediction_col = "rawPrediction",
+                                   uid = random_string("logistic_regression_"), ...) {
+  check_dots_used()
   UseMethod("ml_logistic_regression")
 }
 
 #' @export
-ml_logistic_regression.spark_connection <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  elastic_net_param = 0,
-  reg_param = 0,
-  max_iter = 100L,
-  threshold = 0.5,
-  thresholds = NULL,
-  tol = 1e-06,
-  weight_col = NULL,
-  aggregation_depth = 2L,
-  lower_bounds_on_coefficients = NULL,
-  lower_bounds_on_intercepts = NULL,
-  upper_bounds_on_coefficients = NULL,
-  upper_bounds_on_intercepts = NULL,
-  features_col = "features",
-  label_col = "label",
-  family = "auto",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
-  uid = random_string("logistic_regression_"),
-  ...) {
-
-  ml_ratify_args()
-
-  jobj <- ml_new_classifier(
-    x, "org.apache.spark.ml.classification.LogisticRegression", uid,
-    features_col = features_col, label_col = label_col,
-    prediction_col = prediction_col, probability_col = probability_col,
-    raw_prediction_col = raw_prediction_col
+ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_intercept = TRUE,
+                                                    elastic_net_param = 0, reg_param = 0, max_iter = 100,
+                                                    threshold = 0.5, thresholds = NULL, tol = 1e-06,
+                                                    weight_col = NULL, aggregation_depth = 2,
+                                                    lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
+                                                    upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
+                                                    features_col = "features", label_col = "label", family = "auto",
+                                                    prediction_col = "prediction", probability_col = "probability",
+                                                    raw_prediction_col = "rawPrediction",
+                                                    uid = random_string("logistic_regression_"), ...) {
+  .args <- list(
+    formula = formula,
+    fit_intercept = fit_intercept,
+    elastic_net_param = elastic_net_param,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    threshold = threshold,
+    thresholds = thresholds,
+    tol = tol,
+    weight_col = weight_col,
+    aggregation_depth = aggregation_depth,
+    lower_bounds_on_coefficients = lower_bounds_on_coefficients,
+    lower_bounds_on_intercepts = lower_bounds_on_intercepts,
+    upper_bounds_on_coefficients = upper_bounds_on_coefficients,
+    upper_bounds_on_intercepts = upper_bounds_on_intercepts,
+    features_col = features_col,
+    label_col = label_col,
+    family = family,
+    prediction_col = prediction_col,
+    probability_col = probability_col,
+    raw_prediction_col = raw_prediction_col,
+    uid = uid
   ) %>%
-    invoke("setFitIntercept", fit_intercept) %>%
-    invoke("setElasticNetParam", elastic_net_param) %>%
-    invoke("setRegParam", reg_param) %>%
-    invoke("setMaxIter", max_iter) %>%
-    invoke("setThreshold", threshold) %>%
-    invoke("setTol", tol) %>%
-    jobj_set_param("setFamily", family, "auto", "2.1.0") %>%
-    jobj_set_param("setAggregationDepth", aggregation_depth, 2L, "2.1.0")
+    c(rlang::dots_list(...)) %>%
+    validator_ml_logistic_regression()
 
-  if (!rlang::is_null(thresholds))
-    jobj <- invoke(jobj, "setThresholds", thresholds)
-  if (!rlang::is_null(weight_col))
-    jobj <- invoke(jobj, "setWeightCol", weight_col)
-
-  if (!rlang::is_null(lower_bounds_on_coefficients)) {
-    lower_bounds_on_coefficients <- spark_dense_matrix(x, lower_bounds_on_coefficients)
-    jobj <- jobj_set_param(jobj, "setLowerBoundsOnCoefficients",
-                           lower_bounds_on_coefficients,
-                           NULL, "2.2.0")
-  }
-
-  if (!rlang::is_null(upper_bounds_on_coefficients)) {
-    upper_bounds_on_coefficients <- spark_dense_matrix(x, upper_bounds_on_coefficients)
-    jobj <- jobj_set_param(jobj, "setUpperBoundsOnCoefficients",
-                           upper_bounds_on_coefficients,
-                           NULL, "2.2.0")
-  }
-
-  if (!rlang::is_null(lower_bounds_on_intercepts)) {
-    lower_bounds_on_intercepts <- spark_dense_vector(x, lower_bounds_on_intercepts)
-    jobj <- jobj_set_param(jobj, "setLowerBoundsOnIntercepts",
-                           lower_bounds_on_intercepts,
-                           NULL, "2.2.0")
-  }
-
-  if (!rlang::is_null(upper_bounds_on_intercepts)) {
-    upper_bounds_on_intercepts <- spark_dense_vector(x, upper_bounds_on_intercepts)
-    jobj <- jobj_set_param(jobj, "setUpperBoundsOnIntercepts",
-                           upper_bounds_on_intercepts,
-                           NULL, "2.2.0")
-  }
-
+  jobj <- spark_pipeline_stage(
+    x, "org.apache.spark.ml.classification.LogisticRegression", .args[["uid"]],
+    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    prediction_col = .args[["prediction_col"]], probability_col = .args[["probability_col"]],
+    raw_prediction_col = .args[["raw_prediction_col"]]
+  ) %>%
+    invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
+    invoke("setElasticNetParam", .args[["elastic_net_param"]]) %>%
+    invoke("setRegParam", .args[["reg_param"]]) %>%
+    invoke("setMaxIter", .args[["max_iter"]]) %>%
+    invoke("setThreshold", .args[["threshold"]]) %>%
+    invoke("setTol", .args[["tol"]]) %>%
+    jobj_set_param("setFamily", .args[["family"]], "2.1.0", "auto") %>%
+    jobj_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
+    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
+    jobj_set_param("setWeightCol", .args[["weight_col"]]) %>%
+    jobj_set_param(
+      "setLowerBoundsOnCoefficients",
+      spark_dense_matrix(x, .args[["lower_bounds_on_coefficients"]]),
+      "2.2.0"
+    ) %>%
+    jobj_set_param(
+      "setUpperBoundsOnCoefficients",
+      spark_dense_matrix(x, .args[["upper_bounds_on_coefficients"]]),
+      "2.2.0"
+    ) %>%
+    jobj_set_param(
+      "setLowerBoundsOnIntercepts",
+      spark_dense_vector(x, .args[["lower_bounds_on_intercepts"]]),
+      "2.2.0"
+    ) %>%
+    jobj_set_param(
+      "setUpperBoundsOnIntercepts",
+      spark_dense_vector(x, .args[["upper_bounds_on_intercepts"]]),
+      "2.2.0"
+    )
 
   new_ml_logistic_regression(jobj)
 }
 
 #' @export
-ml_logistic_regression.ml_pipeline <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  elastic_net_param = 0,
-  reg_param = 0,
-  max_iter = 100L,
-  threshold = 0.5,
-  thresholds = NULL,
-  tol = 1e-06,
-  weight_col = NULL,
-  aggregation_depth = 2L,
-  lower_bounds_on_coefficients = NULL,
-  lower_bounds_on_intercepts = NULL,
-  upper_bounds_on_coefficients = NULL,
-  upper_bounds_on_intercepts = NULL,
-  features_col = "features",
-  label_col = "label",
-  family = "auto",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
-  uid = random_string("logistic_regression_"),
-  ...) {
+ml_logistic_regression.ml_pipeline <- function(x, formula = NULL, fit_intercept = TRUE,
+                                               elastic_net_param = 0, reg_param = 0, max_iter = 100,
+                                               threshold = 0.5, thresholds = NULL, tol = 1e-06,
+                                               weight_col = NULL, aggregation_depth = 2,
+                                               lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
+                                               upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
+                                               features_col = "features", label_col = "label", family = "auto",
+                                               prediction_col = "prediction", probability_col = "probability",
+                                               raw_prediction_col = "rawPrediction",
+                                               uid = random_string("logistic_regression_"), ...) {
+  stage <- ml_logistic_regression.spark_connection(
+    x = spark_connection(x),
+    formula = formula,
+    fit_intercept = fit_intercept,
+    elastic_net_param = elastic_net_param,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    threshold = threshold,
+    thresholds = thresholds,
+    tol = tol,
+    weight_col = weight_col,
+    aggregation_depth = aggregation_depth,
+    lower_bounds_on_coefficients = lower_bounds_on_coefficients,
+    lower_bounds_on_intercepts = lower_bounds_on_intercepts,
+    upper_bounds_on_coefficients = upper_bounds_on_coefficients,
+    upper_bounds_on_intercepts = upper_bounds_on_intercepts,
+    features_col = features_col,
+    label_col = label_col,
+    family = family,
+    prediction_col = prediction_col,
+    probability_col = probability_col,
+    raw_prediction_col = raw_prediction_col,
+    uid = uid,
+    ...
+  )
 
-  transformer <- ml_new_stage_modified_args()
-  ml_add_stage(x, transformer)
+  ml_add_stage(x, stage)
 }
 
 #' @export
-ml_logistic_regression.tbl_spark <- function(
-  x,
-  formula = NULL,
-  fit_intercept = TRUE,
-  elastic_net_param = 0,
-  reg_param = 0,
-  max_iter = 100L,
-  threshold = 0.5,
-  thresholds = NULL,
-  tol = 1e-06,
-  weight_col = NULL,
-  aggregation_depth = 2L,
-  lower_bounds_on_coefficients = NULL,
-  lower_bounds_on_intercepts = NULL,
-  upper_bounds_on_coefficients = NULL,
-  upper_bounds_on_intercepts = NULL,
-  features_col = "features",
-  label_col = "label",
-  family = "auto",
-  prediction_col = "prediction",
-  probability_col = "probability",
-  raw_prediction_col = "rawPrediction",
-  uid = random_string("logistic_regression_"),
-  response = NULL,
-  features = NULL,
-  predicted_label_col = "predicted_label", ...) {
+ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE,
+                                             elastic_net_param = 0, reg_param = 0, max_iter = 100,
+                                             threshold = 0.5, thresholds = NULL, tol = 1e-06,
+                                             weight_col = NULL, aggregation_depth = 2,
+                                             lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
+                                             upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
+                                             features_col = "features", label_col = "label", family = "auto",
+                                             prediction_col = "prediction", probability_col = "probability",
+                                             raw_prediction_col = "rawPrediction",
+                                             uid = random_string("logistic_regression_"),
+                                             response = NULL, features = NULL,
+                                             predicted_label_col = "predicted_label", ...) {
+  formula <- ml_standardize_formula(formula, response, features)
 
-  predictor <- ml_new_stage_modified_args()
-
-  ml_formula_transformation()
+  stage <- ml_logistic_regression.spark_connection(
+    x = spark_connection(x),
+    formula = NULL,
+    fit_intercept = fit_intercept,
+    elastic_net_param = elastic_net_param,
+    reg_param = reg_param,
+    max_iter = max_iter,
+    threshold = threshold,
+    thresholds = thresholds,
+    tol = tol,
+    weight_col = weight_col,
+    aggregation_depth = aggregation_depth,
+    lower_bounds_on_coefficients = lower_bounds_on_coefficients,
+    lower_bounds_on_intercepts = lower_bounds_on_intercepts,
+    upper_bounds_on_coefficients = upper_bounds_on_coefficients,
+    upper_bounds_on_intercepts = upper_bounds_on_intercepts,
+    features_col = features_col,
+    label_col = label_col,
+    family = family,
+    prediction_col = prediction_col,
+    probability_col = probability_col,
+    raw_prediction_col = raw_prediction_col,
+    uid = uid,
+    ...
+  )
 
   if (is.null(formula)) {
-    predictor %>%
+    stage %>%
       ml_fit(x)
   } else {
-    ml_generate_ml_model(
-      x, predictor = predictor, formula = formula,
-      features_col = features_col, label_col = label_col,
-      type = "classification",
-      constructor = new_ml_model_logistic_regression,
-      predicted_label_col)
+    ml_construct_model_supervised(
+      new_ml_model_logistic_regression,
+      predictor = stage,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col,
+      predicted_label_col = predicted_label_col
+    )
   }
 }
 
-# Validator
-
-ensure_matrix_double <- function(mat) {
-  mat %>%
-    sapply(ensure_scalar_double) %>%
-    matrix(nrow = nrow(mat))
-}
-
-ml_validator_logistic_regression <- function(args, nms) {
-  old_new_mapping <- list(
-    intercept = "fit_intercept",
-    alpha = "elastic_net_param",
-    lambda = "reg_param",
-    weights.column = "weight_col",
-    iter.max = "max_iter",
-    max.iter = "max_iter"
-  )
-
-  args %>%
-    ml_validate_args({
-      elastic_net_param <- ensure_scalar_double(elastic_net_param)
-      reg_param <- ensure_scalar_double(reg_param)
-      max_iter <- ensure_scalar_integer(max_iter)
-      family <- rlang::arg_match(family, c("auto", "binomial", "multinomial"))
-      fit_intercept <- ensure_scalar_boolean(fit_intercept)
-      threshold <- ensure_scalar_double(threshold)
-      if (!is.null(weight_col))
-        weight_col <- ensure_scalar_character(weight_col)
-      aggregation_depth <- ensure_scalar_integer(aggregation_depth)
-      if (!is.null(lower_bounds_on_coefficients))
-        lower_bounds_on_coefficients <- ensure_matrix_double(
-          lower_bounds_on_coefficients)
-      if (!is.null(upper_bounds_on_coefficients))
-        upper_bounds_on_coefficients <- ensure_matrix_double(
-          upper_bounds_on_coefficients)
-      if (!is.null(lower_bounds_on_intercepts))
-        lower_bounds_on_intercepts <- sapply(
-          lower_bounds_on_intercepts, ensure_scalar_double)
-      if (!is.null(upper_bounds_on_intercepts))
-        upper_bounds_on_intercepts <- sapply(
-          upper_bounds_on_intercepts, ensure_scalar_double)
-    }, old_new_mapping) %>%
-    ml_extract_args(nms, old_new_mapping)
-}
-
-# Constructors
-
 new_ml_logistic_regression <- function(jobj) {
-  new_ml_predictor(jobj, subclass = "ml_logistic_regression")
+  new_ml_probabilistic_classifier(jobj, class = "ml_logistic_regression")
 }
 
 new_ml_logistic_regression_model <- function(jobj) {
   is_multinomial <- invoke(jobj, "numClasses") > 2
 
   summary <- if (invoke(jobj, "hasSummary")) {
-    summary_jobj <- if (spark_version(spark_connection(jobj)) >= "2.3.0" &&
-                        !is_multinomial)
-      invoke(jobj, "binarySummary")
+    if (!is_multinomial && spark_version(spark_connection(jobj)) >= "2.3.0")
+      new_ml_binary_logistic_regression_training_summary(invoke(jobj, "binarySummary"))
     else
-      jobj
-    new_ml_summary_logistic_regression_model(invoke(jobj, "summary"))
+      new_ml_logistic_regression_training_summary(invoke(jobj, "summary"))
   }
 
-  new_ml_prediction_model(
+  new_ml_probabilistic_classification_model(
     jobj,
     coefficients = if (is_multinomial) NULL else read_spark_vector(jobj, "coefficients"),
-    coefficient_matrix = try_null(read_spark_matrix(jobj, "coefficientMatrix")),
+    coefficient_matrix = possibly_null(~ read_spark_matrix(jobj, "coefficientMatrix"))(),
     intercept = if (is_multinomial) NULL else invoke(jobj, "intercept"),
-    intercept_vector = try_null(read_spark_vector(jobj, "interceptVector")),
-    num_classes = invoke(jobj, "numClasses"),
-    num_features = invoke(jobj, "numFeatures"),
-    features_col = invoke(jobj, "getFeaturesCol"),
-    prediction_col = invoke(jobj, "getPredictionCol"),
-    probability_col = invoke(jobj, "getProbabilityCol"),
-    raw_prediction_col = invoke(jobj, "getRawPredictionCol"),
+    intercept_vector = possibly_null(~ read_spark_vector(jobj, "interceptVector"))(),
     threshold = if (ml_is_set(jobj, "threshold")) invoke(jobj, "getThreshold") else NULL,
-    thresholds = if (ml_is_set(jobj, "thresholds")) invoke(jobj, "getThresholds") else NULL,
     summary = summary,
-    subclass = "ml_logistic_regression_model")
+    class = "ml_logistic_regression_model")
 }
 
-new_ml_summary_logistic_regression_model <- function(jobj) {
-  new_ml_summary(
+new_ml_logistic_regression_summary <- function(jobj, ..., class = character()) {
+  s <- new_ml_summary(
     jobj,
-    area_under_roc = try_null(invoke(jobj, "areaUnderROC")),
-    f_measure_by_threshold = try_null(invoke(jobj, "fMeasureByThreshold") %>%
-      invoke("withColumnRenamed", "F-Measure", "F_Measure") %>%
-      collect()),
-    false_positive_rate_by_label = try_null(invoke(jobj, "falsePositiveRateByLabel")),
-    precision_by_label = try_null(invoke(jobj, "precisionByLabel")),
-    recall_by_label = try_null(invoke(jobj, "recallByLabel")),
-    true_positive_rate_by_label = try_null(invoke(jobj, "truePositiveRateByLabel")),
-    weighted_f_measure = try_null(invoke(jobj, "weightedFMeasure")),
-    weighted_false_positive_rate = try_null(invoke(jobj, "weightedFalsePositiveRate")),
-    weighted_precision = try_null(invoke(jobj, "weightedPrecision")),
-    weighted_recall = try_null(invoke(jobj, "weightedRecall")),
-    weighted_true_positive_rate = try_null(invoke(jobj, "weightedTruePositiveRate")),
-    features_col = invoke(jobj, "featuresCol"),
-    label_col = invoke(jobj, "labelCol"),
-    objective_history = invoke(jobj, "objectiveHistory"),
-    pr = try_null(invoke(jobj, "pr") %>% collect()),
-    precision_by_threshold = try_null(invoke(jobj, "precisionByThreshold") %>% collect()),
-    predictions = invoke(jobj, "predictions") %>% sdf_register(),
-    probability_col = invoke(jobj, "probabilityCol"),
-    recall_by_threshold = try_null(invoke(jobj, "recallByThreshold") %>% collect()),
-    roc = try_null(invoke(jobj, "roc") %>% collect()),
-    total_iterations = invoke(jobj, "totalIterations"),
-    subclass = "ml_summary_logistic_regression")
-}
+    features_col = function() invoke(jobj, "featuresCol"),
+    label_col = function() invoke(jobj, "labelCol"),
+    predictions = function() invoke(jobj, "predictions") %>%
+      sdf_register(),
+    probability_col = function() invoke(jobj, "probabilityCol"),
+    ...,
+    class = c(class, "ml_logistic_regression_summary")
+  )
 
-new_ml_model_logistic_regression <- function(
-  pipeline, pipeline_model, model, dataset, formula, feature_names, index_labels,
-  call) {
-
-  jobj <- spark_jobj(model)
-  sc <- spark_connection(model)
-
-  # multinomial vs. binomial models have separate APIs for
-  # retrieving results
-  is_multinomial <- invoke(jobj, "numClasses") > 2
-
-  # extract coefficients (can be either a vector or matrix, depending
-  # on binomial vs. multinomial)
-  coefficients <- if (is_multinomial) {
-    if (spark_version(sc) < "2.1.0") stop("Multinomial regression requires Spark 2.1.0 or higher.")
-
-    # multinomial
-    coefficients <- model$coefficient_matrix
-    colnames(coefficients) <- feature_names
-    rownames(coefficients) <- index_labels
-
-    if (ml_param(model, "fit_intercept")) {
-      intercept <- model$intercept_vector
-      coefficients <- cbind(intercept, coefficients)
-      colnames(coefficients) <- c("(Intercept)", feature_names)
+  if (spark_version(spark_connection(jobj)) >= "2.3.0") {
+    s$prediction_col <- function() invoke(jobj, "predictionCol")
+    s$accuracy <- function() invoke(jobj, "accuracy")
+    s$f_measure_by_label <- function(beta = NULL) {
+      beta <- cast_nullable_scalar_double(beta)
+      if (is.null(beta)) invoke(jobj, "fMeasureByLabel") else invoke(jobj, "fMeasureByLabel", beta)
     }
-    coefficients
-  } else {
-    # binomial
-
-    coefficients <- if (ml_param(model, "fit_intercept"))
-      rlang::set_names(
-        c(invoke(jobj, "intercept"), model$coefficients),
-        c("(Intercept)", feature_names)
-      )
-    else
-      rlang::set_names(coefficients, feature_names)
-    coefficients
+    s$false_positive_rate_by_label <- function() invoke(jobj, "falsePositiveRateByLabel")
+    s$labels <- function() invoke(jobj, "labels")
+    s$precision_by_label <- function() invoke(jobj, "precisionByLabel")
+    s$recall_by_label <- function() invoke(jobj, "recallByLabel")
+    s$true_positive_rate_by_label <- function() invoke(jobj, "truePositiveRateByLabel")
+    s$weighted_f_measure <- function(beta = NULL) {
+      beta <- cast_nullable_scalar_double(beta)
+      if (is.null(beta)) invoke(jobj, "weightedFMeasure") else invoke(jobj, "weightedFMeasure", beta)
+    }
+    s$weighted_false_positive_rate <- function() invoke(jobj, "weightedFalsePositiveRate")
+    s$weighted_precision <- function() invoke(jobj, "weightedPrecision")
+    s$weighted_recall <- function() invoke(jobj, "weightedRecall")
+    s$weighted_true_positive_rate <- function() invoke(jobj, "weightedTruePositiveRate")
   }
 
-  summary <- model$summary
+  s
+}
 
-  new_ml_model_classification(
-    pipeline, pipeline_model,
-    model, dataset, formula,
-    coefficients = coefficients,
-    summary = summary,
-    subclass = "ml_model_logistic_regression",
-    .features = feature_names,
-    .index_labels = index_labels
+new_ml_logistic_regression_training_summary <- function(jobj) {
+  new_ml_logistic_regression_summary(
+    jobj,
+    objective_history = function() invoke(jobj, "objectiveHistory"),
+    total_iterations = function() invoke(jobj, "totalIterations"),
+    class = "ml_logistic_regression_training_summary"
   )
 }
 
-
-# Generic implementations
-
-#' @export
-print.ml_model_logistic_regression <- function(x, ...) {
-  cat("Formula: ", x$formula, "\n\n", sep = "")
-  cat("Coefficients:", sep = "\n")
-  print(x$coefficients)
+new_ml_binary_logistic_regression_summary <- function(jobj, ..., class = character()) {
+  new_ml_logistic_regression_summary(
+    jobj,
+    area_under_roc = function() invoke(jobj, "areaUnderROC"),
+    f_measure_by_threshold = function() invoke(jobj, "fMeasureByThreshold") %>%
+      sdf_register(),
+    pr = function() invoke(jobj, "pr") %>%
+      sdf_register(),
+    precision_by_threshold = function() invoke(jobj, "precisionByThreshold") %>%
+      sdf_register(),
+    recall_by_threshold = function() invoke(jobj, "recallByThreshold") %>%
+      sdf_register(),
+    roc = function() invoke(jobj, "roc") %>%
+      sdf_register(),
+    class = c(class, "ml_binary_logistic_regression_summary")
+  )
 }
 
-#' @export
-summary.ml_model_logistic_regression <- function(object, ...) {
-  ml_model_print_coefficients(object)
-  print_newline()
+new_ml_binary_logistic_regression_training_summary <- function(jobj) {
+  new_ml_binary_logistic_regression_summary(
+    jobj,
+    objective_history = function() invoke(jobj, "objectiveHistory"),
+    total_iterations = function() invoke(jobj, "totalIterations"),
+    class = "ml_binary_logistic_regression_training_summary"
+  )
+}
+
+cast_double_matrix <- function(mat) {
+  if (is.null(mat)) return(mat)
+  mat %>%
+    cast_double() %>%
+    matrix(nrow = nrow(mat))
+}
+
+validator_ml_logistic_regression <- function(.args) {
+  .args <- validate_args_classifier(.args)
+
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
+  .args[["elastic_net_param"]] <- cast_scalar_double(.args[["elastic_net_param"]])
+  .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
+  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
+  .args[["family"]] <- cast_choice(.args[["family"]], c("auto", "binomial", "multinomial"))
+  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
+  .args[["threshold"]] <- cast_scalar_double(.args[["threshold"]])
+  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
+  .args[["aggregation_depth"]] <- cast_scalar_integer(.args[["aggregation_depth"]])
+  .args[["lower_bounds_on_coefficients"]] <- cast_double_matrix(.args[["lower_bounds_on_coefficients"]])
+  .args[["upper_bounds_on_coefficients"]] <- cast_double_matrix(.args[["upper_bounds_on_coefficients"]])
+  .args[["lower_bounds_on_intercepts"]] <- cast_nullable_double_list(.args[["lower_bounds_on_intercepts"]])
+  .args[["upper_bounds_on_intercepts"]] <- cast_nullable_double_list(.args[["upper_bounds_on_intercepts"]])
+  .args
 }

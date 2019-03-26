@@ -251,7 +251,7 @@ spark_default_compilation_spec <- function(
       scala_filter = make_version_filter("1.5.2")
     ),
     spark_compilation_spec(
-      spark_version = "1.6.1",
+      spark_version = "1.6.0",
       scalac_path = find_scalac("2.10", locations),
       jar_name = sprintf("%s-1.6-2.10.jar", pkg),
       jar_path = find_jar(),
@@ -263,20 +263,6 @@ spark_default_compilation_spec <- function(
       jar_name = sprintf("%s-2.0-2.11.jar", pkg),
       jar_path = find_jar(),
       scala_filter = make_version_filter("2.0.0")
-    ),
-    spark_compilation_spec(
-      spark_version = "2.1.0",
-      scalac_path = find_scalac("2.11", locations),
-      jar_name = sprintf("%s-2.1-2.11.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("2.1.0")
-    ),
-    spark_compilation_spec(
-      spark_version = "2.2.0",
-      scalac_path = find_scalac("2.11", locations),
-      jar_name = sprintf("%s-2.2-2.11.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("2.2.0")
     ),
     spark_compilation_spec(
       spark_version = "2.3.0",
@@ -321,7 +307,10 @@ download_scalac <- function(dest_path = NULL) {
   lapply(download_urls, function(download_url) {
     dest_file <- file.path(dest_path, basename(download_url))
 
-    dir.create(dirname(dest_file), recursive = TRUE)
+    if (!dir.exists(dirname(dest_file))) {
+      dir.create(dirname(dest_file), recursive = TRUE)
+    }
+
     download.file(download_url, destfile = dest_file)
 
     if (ext == "zip")
@@ -382,6 +371,7 @@ scalac_default_locations <- function() {
     )
   } else {
     c(
+      path.expand("~/scala"),
       "/usr/local/scala",
       "/opt/local/scala",
       "/opt/scala"

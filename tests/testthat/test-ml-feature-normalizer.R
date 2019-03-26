@@ -1,9 +1,25 @@
 context("ml feature normalizer")
 
-sc <- testthat_spark_connection()
+test_that("ft_normalizer() default params", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_default_args(sc, ft_normalizer)
+})
+
+test_that("ft_normalizer() param setting", {
+  test_requires_latest_spark()
+  sc <- testthat_spark_connection()
+  test_args <- list(
+    input_col = "foo",
+    output_col = "bar",
+    p = 2
+  )
+  test_param_setting(sc, ft_normalizer, test_args)
+})
 
 test_that("ft_normalizer works properly", {
-  df <- dplyr::tribble(
+  sc <- testthat_spark_connection()
+  df <- tribble(
     ~id, ~V1, ~V2, ~V3,
     0,   1,   0.5, -1,
     1,   2,   1,   1,
@@ -14,7 +30,7 @@ test_that("ft_normalizer works properly", {
 
   norm_data1 <- df_tbl %>%
     ft_normalizer("features", "normFeatures", p = 1) %>%
-    dplyr::pull(normFeatures)
+    pull(normFeatures)
 
   expect_equal(
     norm_data1,
@@ -25,7 +41,7 @@ test_that("ft_normalizer works properly", {
 
   norm_data2 <- df_tbl %>%
     ft_normalizer("features", "normFeatures", p = Inf) %>%
-    dplyr::pull(normFeatures)
+    pull(normFeatures)
 
   expect_equal(
     norm_data2,
@@ -36,7 +52,8 @@ test_that("ft_normalizer works properly", {
 })
 
 test_that("ft_normalizer errors for bad p", {
+  sc <- testthat_spark_connection()
   expect_error(
     ft_normalizer(sc, "features", "normFeatures", p = 0.5),
-    "'p' must be greater than or equal to 1")
+    "`p` must be at least 1\\.")
 })

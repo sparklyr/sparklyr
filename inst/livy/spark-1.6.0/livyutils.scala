@@ -1,3 +1,8 @@
+//
+// This file was automatically generated using livy_sources_refresh()
+// Changes to this file will be reverted.
+//
+
 import javax.xml.bind.DatatypeConverter
 
 object LivyUtils {
@@ -10,7 +15,6 @@ object LivyUtils {
     "Utils" -> Utils,
     "ApplyUtils" -> ApplyUtils,
     "WorkerHelper" -> WorkerHelper,
-    "WorkerUtils" -> WorkerUtils,
     "MLUtils" -> MLUtils,
     "Shell" -> Shell
    )

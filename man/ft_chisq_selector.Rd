@@ -2,11 +2,11 @@
 % Please edit documentation in R/ml_feature_chisq_selector.R
 \name{ft_chisq_selector}
 \alias{ft_chisq_selector}
-\title{Feature Tranformation -- ChiSqSelector (Estimator)}
+\title{Feature Transformation -- ChiSqSelector (Estimator)}
 \usage{
-ft_chisq_selector(x, features_col, output_col, label_col,
-  selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-  num_top_features = 50L, percentile = 0.1, dataset = NULL,
+ft_chisq_selector(x, features_col = "features", output_col = NULL,
+  label_col = "label", selector_type = "numTopFeatures", fdr = 0.05,
+  fpr = 0.05, fwe = 0.05, num_top_features = 50, percentile = 0.1,
   uid = random_string("chisq_selector_"), ...)
 }
 \arguments{
@@ -29,9 +29,6 @@ ft_chisq_selector(x, features_col, output_col, label_col,
 \item{num_top_features}{Number of features that selector will select, ordered by ascending p-value. If the number of features is less than \code{num_top_features}, then this will select all features. Only applicable when selector_type = "numTopFeatures". The default value of \code{num_top_features} is 50.}
 
 \item{percentile}{(Spark 2.1.0+) Percentile of features that selector will select, ordered by statistics value descending. Only applicable when selector_type = "percentile". Default value is 0.1.}
-
-\item{dataset}{(Optional) A \code{tbl_spark}. If provided, eagerly fit the (estimator)
-feature "transformer" against \code{dataset}. See details.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -57,16 +54,8 @@ The object returned depends on the class of \code{x}.
 Chi-Squared feature selection, which selects categorical features to use for predicting a categorical label
 }
 \details{
-When \code{dataset} is provided for an estimator transformer, the function
-  internally calls \code{ml_fit()} against \code{dataset}. Hence, the methods for
-  \code{spark_connection} and \code{ml_pipeline} will then return a \code{ml_transformer}
-  and a \code{ml_pipeline} with a \code{ml_transformer} appended, respectively. When
-  \code{x} is a \code{tbl_spark}, the estimator will be fit against \code{dataset} before
-  transforming \code{x}.
-
-  When \code{dataset} is not specified, the constructor returns a \code{ml_estimator}, and,
-  in the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x} then
-  to obtain a transformer, which is then immediately used to transform \code{x}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
+  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-features.html} for
@@ -99,3 +88,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

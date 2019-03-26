@@ -20,10 +20,13 @@ environment:
     WARNINGS_ARE_ERRORS: 1
     NOT_CRAN: true
     INSTALL_WINUTILS: true
+    R_VERSION: release
+    USE_RTOOLS: true
 
   matrix:
   - SPARK_VERSION: "1.6.3"
-  - SPARK_VERSION: "2.3.0"
+  - SPARK_VERSION: "2.3.1"
+  - SPARK_VERSION: "2.4.0"
 
 build_script:
   - travis-tool.sh install_deps

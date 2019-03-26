@@ -31,7 +31,9 @@ db_desc.src_spark <- function(x) {
 #' @export
 #' @importFrom dplyr db_explain
 db_explain.spark_connection <- function(con, sql, ...) {
-  ""
+  explained <- DBI::dbGetQuery(con, paste("EXPLAIN", sql))
+
+  message(explained$plan)
 }
 
 #' @export
@@ -128,8 +130,7 @@ db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...
   sdf_register(df, name)
 
   # compute() is expected to preserve the query, cache as the closest mapping.
-  if (!sparklyr_boolean_option("sparklyr.dplyr.compute.nocache"))
-    tbl_cache(con, name)
+  tbl_cache(con, name)
 
   # dbplyr expects db_save_query to retrieve the table name
   name
@@ -144,4 +145,18 @@ db_analyze.spark_connection <- function(con, table, ...) {
   if (nrow(info) > 0 && identical(info$isTemporary, FALSE)) {
     dbExecute(con, build_sql("ANALYZE TABLE", table, "COMPUTE STATISTICS", con = con))
   }
+}
+
+#' @export
+#' @importFrom dplyr same_src
+same_src.src_spark <- function(x, y) {
+  if (!inherits(y, "src_spark")) return(FALSE)
+
+  # By default, dplyr uses identical(x$con, y$con); however,
+  # sparklyr connection might slightly change due to the state
+  # it manages.
+
+  identical(x$con$master, y$con$master) &&
+    identical(x$con$app_name, y$con$app_name) &&
+    identical(x$con$method, y$con$method)
 }

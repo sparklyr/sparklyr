@@ -4,8 +4,8 @@
 \alias{ft_one_hot_encoder}
 \title{Feature Transformation -- OneHotEncoder (Transformer)}
 \usage{
-ft_one_hot_encoder(x, input_col, output_col, drop_last = TRUE,
-  uid = random_string("one_hot_encoder_"), ...)
+ft_one_hot_encoder(x, input_col = NULL, output_col = NULL,
+  drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -74,3 +74,4 @@ Other feature transformers: \code{\link{ft_binarizer}},
   \code{\link{ft_vector_indexer}},
   \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
 }
+\concept{feature transformers}

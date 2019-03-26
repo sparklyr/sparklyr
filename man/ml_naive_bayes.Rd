@@ -8,8 +8,8 @@ ml_naive_bayes(x, formula = NULL, model_type = "multinomial",
   smoothing = 1, thresholds = NULL, weight_col = NULL,
   features_col = "features", label_col = "label",
   prediction_col = "prediction", probability_col = "probability",
-  raw_prediction_col = "rawPrediction", uid = random_string("naive_bayes_"),
-  ...)
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("naive_bayes_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -43,7 +43,7 @@ and \code{"bernoulli"}. (default = \code{multinomial})}
 The object returned depends on the class of \code{x}.
 
 \itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_predictor} object. The object contains a pointer to
+  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
   a Spark \code{Predictor} object and can be used to compose
   \code{Pipeline} objects.
 
@@ -80,7 +80,7 @@ iris_test <- partitions$test
 nb_model <- iris_training \%>\%
   ml_naive_bayes(Species ~ .)
 
-pred <- sdf_predict(iris_test, nb_model)
+pred <- ml_predict(nb_model, iris_test)
 
 ml_multiclass_classification_evaluator(pred)
 }
@@ -102,3 +102,4 @@ Other ml algorithms: \code{\link{ml_aft_survival_regression}},
   \code{\link{ml_one_vs_rest}},
   \code{\link{ml_random_forest_classifier}}
 }
+\concept{ml algorithms}

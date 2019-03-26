@@ -1,0 +1,112 @@
+.root {
+  position: absolute;
+}
+
+svg {
+  font: 12px sans-serif;
+  position: absolute;
+}
+
+.label {
+  fill: #666;
+}
+
+.rps {
+  fill: #777;
+  font: 20px sans-serif;
+}
+
+@-webkit-keyframes svgTranslate {
+    0% {
+        transform: translateX(0px);
+    }
+    100% {
+        transform: translateX(100px);
+    }
+}
+
+@-webkit-keyframes svgReset {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(0px); }
+}
+
+@keyframes svgTranslate {
+    0%   { transform: translateX(0px) }
+    100% { transform: translateX(100px) }
+}
+
+@keyframes svgTranslateFast {
+    0%   { transform: translateX(0px) }
+    100% { transform: translateX(1000px) }
+}
+
+.chart {
+  position: absolute;
+}
+
+.chart.animate {
+  animation-name: svgTranslate;
+  animation-duration: 10s;
+  animation-timing-function: linear;
+  animation-delay: 0s;
+}
+
+.chart.animate-fast {
+  animation-name: svgTranslate;
+  animation-duration: 10s;
+  animation-timing-function: linear;
+  animation-delay: 0s;
+}
+
+.chart.stop{
+  transform: translateX(10px);
+}
+
+.barIn {
+  fill: #667292;
+}
+
+.barIn.selected {
+  fill: #263252;
+}
+
+.barOut {
+  fill: #8d9db6;
+}
+
+.barOut.selected {
+  fill: #4a5d76;
+}
+
+.source {
+  fill: #667292;
+  stroke: none;
+}
+
+.source .selected {
+  stroke: #667292;
+}
+
+.sink {
+  fill: #8d9db6;
+  stroke: none;
+}
+
+.sink .selected {
+  stroke: #8d9db6;
+}
+
+.tick {
+  stroke: none;
+  fill: #CDCDE6;
+}
+
+.horizon {
+  stroke: #CdCdE6;
+  stroke-width: 1;
+  stroke-dasharray: 2,2;
+}
+
+.annotation {
+  fill: #CdCdE6;
+}
