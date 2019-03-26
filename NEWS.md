@@ -20,6 +20,10 @@
 
 - Add support in `spark-submit` with R file to pass additional arguments to R file (#1942).
 
+### Distributed R
+
+- Fix support for multiple library paths when using `spark.r.libpaths` (@mattpollock, #1956).
+
 # Sparklyr 1.0.0
 
 ### Arrow
