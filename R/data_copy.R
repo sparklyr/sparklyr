@@ -232,5 +232,5 @@ spark_data_copy <- function(
 
   df <- spark_data_perform_copy(sc, serializers[[serializer]], df, repartition)
 
-  invoke(df, "registerTempTable", name)
+  invoke(df, "createOrReplaceTempView", name)
 }
