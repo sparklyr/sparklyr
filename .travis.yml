@@ -83,6 +83,7 @@ matrix:
         - tidyverse/tibble
         - r-lib/rlang
         - rstudio/forge
+        - r-lib/ellipsis
   allow_failures:
     - env: R_DEVEL_PACKAGES="true"
     - r: release
