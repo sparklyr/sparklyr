@@ -28,13 +28,14 @@ test_that("the implementation of 'filter' functions as expected", {
       filter(`Sepal.Width` == 3.5) %>%
       filter(`Petal.Length` == 1.4) %>%
       filter(`Petal.Width` == 0.2) %>%
-      select(`Species`),
-    iris %>%
-      filter(`Sepal.Length` == 5.1) %>%
-      filter(`Sepal.Width` == 3.5) %>%
-      filter(`Petal.Length` == 1.4) %>%
-      filter(`Petal.Width` == 0.2) %>%
-      select(`Species`)
+      nrow(),
+    iris_tbl %>%
+      filter(`Sepal_Length` == 5.1) %>%
+      filter(`Sepal_Width` == 3.5) %>%
+      filter(`Petal_Length` == 1.4) %>%
+      filter(`Petal_Width` == 0.2) %>%
+      collect() %>%
+      nrow()
   )
 })
 
