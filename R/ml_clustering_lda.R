@@ -261,7 +261,7 @@ ml_construct_model_lda <- function(constructor, predictor, formula, dataset, fea
 
   # stop words remover parameters
   case_sensitive <- dots$case_sensitive %||% FALSE
-  stop_words <- dots$stop_words <- ml_default_stop_words(sc, "english")
+  stop_words <- dots$stop_words %||% ml_default_stop_words(sc, "english")
 
   # count vectorizer parameters
   binary <- dots$binary %||% FALSE
