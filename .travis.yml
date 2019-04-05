@@ -34,7 +34,7 @@ matrix:
       r: release
       env:
         - SPARK_VERSION="2.4.0"
-        - JAVA_VERSION=oraclejdk8
+        - JAVA_VERSION=oraclejdk9
         - CODE_COVERAGE="true"
     - name: "Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)"
       r: release
