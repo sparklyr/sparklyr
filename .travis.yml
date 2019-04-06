@@ -95,6 +95,7 @@ matrix:
         - JAVA_VERSION=oraclejdk8
 
 before_install:
+  - if [[ $ARROW_ENABLED == "true" ]]; then sudo apt-get install openjdk-9-jdk-headless; fi
   - jdk_switcher use $JAVA_VERSION
   - echo $JAVA_HOME
   - if [[ ! -z "$ARROW_VERSION" ]]; then chmod +x ./ci/arrow-$ARROW_SOURCE.sh ; "./ci/arrow-$ARROW_SOURCE.sh" $ARROW_VERSION; fi
