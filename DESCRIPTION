@@ -22,7 +22,7 @@ SystemRequirements: Spark: 1.6.x or 2.x
 URL: http://spark.rstudio.com
 BugReports: https://github.com/rstudio/sparklyr/issues
 LazyData: TRUE
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Depends:
     R (>= 3.2)
 Imports:
