@@ -24,6 +24,10 @@
 
 - Fix support for multiple library paths when using `spark.r.libpaths` (@mattpollock, #1956).
 
+### Extensions
+
+- Support for creating an Spark extension package using `spark_extension()`.
+
 # Sparklyr 1.0.0
 
 ### Arrow
