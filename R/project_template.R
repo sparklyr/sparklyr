@@ -1,3 +1,14 @@
+#' Create Spark Extension
+#'
+#' Creates an R package ready to be used as an Spark extension.
+#'
+#' @param path Location where the extension will be created.
+#'
+#' @export
+spark_extension <- function(path) {
+  project_template(path)
+}
+
 project_template <- function(path, ...) {
   project_name <- tolower(basename(path))
 
