@@ -24,6 +24,10 @@
 
 - Fix support for multiple library paths when using `spark.r.libpaths` (@mattpollock, #1956).
 
+### Extensions
+
+- Add support for repositories in `spark_dependency()`.
+
 # Sparklyr 1.0.0
 
 ### Arrow
