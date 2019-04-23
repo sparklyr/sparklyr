@@ -32,6 +32,7 @@ registered_extensions <- function() {
 #' @param packages Character vector of Spark packages names.
 #' @param initializer Optional callback function called when initializing a connection.
 #' @param catalog Optional location where extension JAR files can be downloaded for Livy.
+#' @param repositories Character vector of Spark package repositories.
 #' @param ... Additional optional arguments.
 #'
 #' @return An object of type `spark_dependency`
@@ -41,12 +42,14 @@ spark_dependency <- function(jars = NULL,
                              packages = NULL,
                              initializer = NULL,
                              catalog = NULL,
+                             repositories = NULL,
                              ...) {
   structure(class = "spark_dependency", list(
     jars = jars,
     packages = packages,
     initializer = initializer,
-    catalog = catalog
+    catalog = catalog,
+    repositories = repositories
   ))
 }
 
@@ -60,6 +63,7 @@ spark_dependencies_from_extensions <- function(spark_version, extensions, config
   packages <- character()
   initializers <- list()
   catalog_jars <- character()
+  repositories <- character()
 
   for (extension in extensions) {
     dependencies <- spark_dependencies_from_extension(spark_version, scala_version, extension)
@@ -67,6 +71,7 @@ spark_dependencies_from_extensions <- function(spark_version, extensions, config
       jars <- c(jars, dependency$jars)
       packages <- c(packages, dependency$packages)
       initializers <- c(initializers, dependency$initializer)
+      repositories <- c(repositories, dependency$repositories)
 
       config_catalog <- spark_config_value(config, "sparklyr.extensions.catalog", TRUE)
       if (!identical(dependency$catalog, NULL) && !identical(config_catalog, FALSE)) {

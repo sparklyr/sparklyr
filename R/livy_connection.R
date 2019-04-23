@@ -600,6 +600,7 @@ livy_connection <- function(master,
 
     config[["sparklyr.livy.sources"]] <- FALSE
     config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")
+    config[["spark.jars.repositories"]] <- paste(c(config[["spark.jars.repositories"]], extensions$repositories), collapse = ",")
   }
 
   session <- livy_create_session(master, config)

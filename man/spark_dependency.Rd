@@ -5,7 +5,7 @@
 \title{Define a Spark dependency}
 \usage{
 spark_dependency(jars = NULL, packages = NULL, initializer = NULL,
-  catalog = NULL, ...)
+  catalog = NULL, repositories = NULL, ...)
 }
 \arguments{
 \item{jars}{Character vector of full paths to JAR files.}
@@ -15,6 +15,8 @@ spark_dependency(jars = NULL, packages = NULL, initializer = NULL,
 \item{initializer}{Optional callback function called when initializing a connection.}
 
 \item{catalog}{Optional location where extension JAR files can be downloaded for Livy.}
+
+\item{repositories}{Character vector of Spark package repositories.}
 
 \item{...}{Additional optional arguments.}
 }
