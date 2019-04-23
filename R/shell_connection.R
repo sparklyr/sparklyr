@@ -247,6 +247,7 @@ start_shell <- function(master,
     all_jars <- c(jars, extensions$jars)
     jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
     packages <- unique(c(packages, extensions$packages))
+    repositories <- extensions$repositories
 
     # include embedded jars, if needed
     csv_config_value <- spark_config_value(config, c("sparklyr.connect.csv.embedded", "sparklyr.csv.embedded"))
@@ -278,6 +279,11 @@ start_shell <- function(master,
     # add packages to arguments
     if (length(packages) > 0) {
       shell_args <- c(shell_args, "--packages", paste(shQuote(packages, type = shQuoteType), collapse=","))
+    }
+
+    # add repositories to arguments
+    if (length(repositories) > 0) {
+      shell_args <- c(shell_args, "--repositories", paste(repositories, collapse=","))
     }
 
     # add environment parameters to arguments
