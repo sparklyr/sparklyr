@@ -107,14 +107,15 @@ family_link <- expand.grid(family = family, link = link, stringsAsFactors = FALS
 family_link <- data.frame(family_link, rmse = 0)
 
 # Train the models
-for(i in 1:nrow(family_link)){
+for (i in 1:nrow(family_link)) {
   glm_model <- mtcars_training \%>\%
     ml_generalized_linear_regression(mpg ~ .,
-                                    family = family_link[i, 1],
-                                    link = family_link[i, 2])
+      family = family_link[i, 1],
+      link = family_link[i, 2]
+    )
 
   pred <- ml_predict(glm_model, mtcars_test)
-  family_link[i,3] <- ml_regression_evaluator(pred, label_col = "mpg")
+  family_link[i, 3] <- ml_regression_evaluator(pred, label_col = "mpg")
 }
 
 family_link

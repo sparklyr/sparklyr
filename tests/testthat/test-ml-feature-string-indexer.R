@@ -37,12 +37,6 @@ test_that("ft_string_indexer() works", {
   indexer <- ft_string_indexer(sc, "string", "indexed") %>%
     ml_fit(df_tbl)
   expect_identical(ml_labels(indexer), c("foo", "bar"))
-
-  # backwards compat
-  my_env <- new.env(emptyenv())
-  transformed <- df_tbl %>%
-    ft_string_indexer("string", "indexed", params = my_env)
-  expect_identical(my_env$labels, c("foo", "bar"))
 })
 
 test_that("ft_index_to_string() works", {

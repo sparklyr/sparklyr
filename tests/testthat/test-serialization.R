@@ -135,7 +135,7 @@ test_that("collect() can retrieve all data types correctly", {
   rtime <- "2010-01-01 01:01:10"
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
-  arrow_compat <- using_arrow() && packageVersion("arrow") < "0.12.0"
+  arrow_compat <- using_arrow() && packageVersion("arrow") < "0.14.0"
 
   hive_type <- tibble::frame_data(
     ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,    ~avalue,
@@ -212,8 +212,10 @@ test_that("collect() can retrieve NULL data types as NAs", {
     # Disable while tracking fix for ARROW-3794
     hive_type <- hive_type %>% filter(stype != "tinyint")
 
-    # Disable while tracking fix for ARROW-3795
-    hive_type <- hive_type %>% filter(stype != "bigint")
+    if (packageVersion("arrow") < "0.12.0") {
+      # Disable while tracking fix for ARROW-3795
+      hive_type <- hive_type %>% filter(stype != "bigint")
+    }
   }
 
   if (spark_version(sc) < "2.2.0") {

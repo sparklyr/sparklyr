@@ -64,6 +64,8 @@ class Backend() {
   private[this] var isWorker: Boolean = false
   private[this] var isBatch: Boolean = false
 
+  private[this] var args: Array[String] = Array[String]()
+
   private[this] var hostContext: String = null
 
   private[this] var isRunning: Boolean = true
@@ -107,6 +109,10 @@ class Backend() {
 
   def setSparkContext(nsc: SparkContext): Unit = {
     sc = nsc
+  }
+
+  def setArgs(argsParam: Array[String]): Unit = {
+    args = argsParam
   }
 
   def setType(isServiceParam: Boolean,
@@ -243,7 +249,7 @@ class Backend() {
           val options: Map[String, String] = Map()
 
           rscript.init(
-            List(),
+            args.toList,
             modifiedFile.getAbsolutePath(),
             customEnv,
             options

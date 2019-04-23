@@ -61,7 +61,8 @@ arrow_as_tibble <- function(record) {
 spark_config_value <- function(config, name, default = NULL) {
   if (getOption("sparklyr.test.enforce.config", FALSE) && any(grepl("^sparklyr.", name))) {
     settings <- get("spark_config_settings")()
-    if (!any(name %in% settings$name)) {
+    if (!any(name %in% settings$name) &&
+        !grepl("^sparklyr\\.shell\\.", name)) {
       stop("Config value '", name[[1]], "' not described in spark_config_settings()")
     }
   }
@@ -80,6 +81,7 @@ spark_config_value <- function(config, name, default = NULL) {
     value <- config[[name_primary]]
   }
 
+  if (is.language(value)) value <- rlang::as_closure(value)
   if (is.function(value)) value <- value()
   value
 }
@@ -897,24 +899,8 @@ attach_connection <- function(jobj, connection) {
 # jobj -> Object, where jobj is an object created in the backend
 # nolint end
 
-get_type <- function(object, types = NULL) {
-  if (is.null(object)) return("NULL")
-  if (is.null(types))
-    types <- c("integer", "character", "logical", "double", "numeric", "raw", "array",
-      "list", "struct", "spark_jobj", "environment", "Date", "POSIXlt",
-      "POSIXct", "factor", "data.frame")
-
-  if (!length(types))
-    stop("Unsupported type '", class(object)[[1]], "' for serialization")
-
-  if (inherits(object, type <- types[[1]]))
-    return(type)
-
-  get_type(object, tail(types, -1))
-}
-
 getSerdeType <- function(object) {
-  type <- get_type(object)
+  type <- class(object)[[1]]
 
   if (type != "list") {
     type
@@ -938,7 +924,7 @@ getSerdeType <- function(object) {
 }
 
 writeObject <- function(con, object, writeType = TRUE) {
-  type <- get_type(object)
+  type <- class(object)[[1]]
 
   if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
     if (is.na(object)) {
@@ -986,7 +972,7 @@ writeJobj <- function(con, value) {
 writeString <- function(con, value) {
   utfVal <- enc2utf8(value)
   writeInt(con, as.integer(nchar(utfVal, type = "bytes") + 1))
-  writeBin(as.character(utfVal), con, endian = "big", useBytes = TRUE)
+  writeBin(utfVal, con, endian = "big", useBytes = TRUE)
 }
 
 writeInt <- function(con, value) {
@@ -994,7 +980,7 @@ writeInt <- function(con, value) {
 }
 
 writeDouble <- function(con, value) {
-  writeBin(as.double(value), con, endian = "big")
+  writeBin(value, con, endian = "big")
 }
 
 writeBoolean <- function(con, value) {

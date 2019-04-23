@@ -185,7 +185,7 @@ new_ml_linear_regression <- function(jobj) {
 new_ml_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary")) {
     fit_intercept <- ml_get_param_map(jobj)$fit_intercept
-    new_ml_summary_linear_regression_model(invoke(jobj, "summary"), fit_intercept)
+    new_ml_linear_regression_training_summary(invoke(jobj, "summary"), fit_intercept)
   } else NULL
 
   new_ml_prediction_model(
@@ -197,22 +197,20 @@ new_ml_linear_regression_model <- function(jobj) {
     class = "ml_linear_regression_model")
 }
 
-new_ml_summary_linear_regression_model <- function(jobj, fit_intercept) {
+new_ml_linear_regression_summary <- function(jobj, fit_intercept, ..., class = character()) {
   arrange_stats <- make_stats_arranger(fit_intercept)
 
-  new_ml_summary(
+  s <- new_ml_summary(
     jobj,
-    # `lazy val coefficientStandardErrors`
+        # `lazy val coefficientStandardErrors`
     coefficient_standard_errors = possibly_null(
       ~ invoke(jobj, "coefficientStandardErrors") %>%
         arrange_stats()
     ),
-    degrees_of_freedom = if (spark_version(spark_connection(jobj)) >= "2.2.0")
-      invoke(jobj, "degreesOfFreedom") else NULL,
     # `lazy val devianceResiduals`
     deviance_residuals = function() invoke(jobj, "devianceResiduals"),
     explained_variance = invoke(jobj, "explainedVariance"),
-    features_col = invoke(jobj, "featuresCol"),
+    features_col = if (spark_version(spark_connection(jobj)) >= "2.0.0") invoke(jobj, "featuresCol") else NULL,
     label_col = invoke(jobj, "labelCol"),
     mean_absolute_error = invoke(jobj, "meanAbsoluteError"),
     mean_squared_error = invoke(jobj, "meanSquaredError"),
@@ -234,5 +232,32 @@ new_ml_summary_linear_regression_model <- function(jobj, fit_intercept) {
       ~ invoke(jobj, "tValues") %>%
         arrange_stats()
     ),
-    class = "ml_summary_linear_regression")
+    ...,
+    class = "ml_linear_regression_summary"
+  )
+
+  if (spark_version(spark_connection(jobj)) >= "2.2.0") {
+    s$degrees_of_freedom <- invoke(jobj, "degreesOfFreedom")
+  }
+
+  if (spark_version(spark_connection(jobj)) >= "2.3.0") {
+    s$r2adj <- invoke(jobj, "r2adj")
+  }
+
+  s
+}
+
+new_ml_linear_regression_training_summary <- function(jobj, fit_intercept) {
+  s <- new_ml_linear_regression_summary(
+    jobj, fit_intercept,
+    objective_history = invoke(jobj, "objectiveHistory"),
+    total_iterations = invoke(jobj, "totalIterations"),
+    class = "ml_linear_regression_training_summary"
+  )
+
+  if (is.null(s$features_col)) {
+    s$features_col <- invoke(jobj, "featuresCol")
+  }
+
+  s
 }

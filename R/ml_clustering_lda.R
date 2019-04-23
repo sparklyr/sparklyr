@@ -4,6 +4,10 @@
 #'
 #' @details
 #'
+#' For `ml_lda.tbl_spark` with the formula interface, you can specify named arguments in `...` that will
+#'   be passed `ft_regex_tokenizer()`, `ft_stop_words_remover()`, and `ft_count_vectorizer()`. For example, to increase the
+#'   default `min_token_length`, you can use `ml_lda(dataset, ~ text, min_token_length = 4)`.
+#'
 #' Terminology for LDA:
 #' \itemize{
 #'   \item "term" = "word": an element of the vocabulary
@@ -87,19 +91,24 @@
 #' \dontrun{
 #' library(janeaustenr)
 #' library(dplyr)
-#' sc <-  spark_connect(master = "local")
+#' sc <- spark_connect(master = "local")
 #'
 #' lines_tbl <- sdf_copy_to(sc,
-#'                          austen_books()[c(1:30),],
-#'                          name = "lines_tbl",
-#'                          overwrite = TRUE)
+#'   austen_books()[c(1:30), ],
+#'   name = "lines_tbl",
+#'   overwrite = TRUE
+#' )
 #'
 #' # transform the data in a tidy form
 #' lines_tbl_tidy <- lines_tbl %>%
-#'   ft_tokenizer(input_col = "text",
-#'                output_col = "word_list") %>%
-#'   ft_stop_words_remover(input_col = "word_list",
-#'                         output_col = "wo_stop_words") %>%
+#'   ft_tokenizer(
+#'     input_col = "text",
+#'     output_col = "word_list"
+#'   ) %>%
+#'   ft_stop_words_remover(
+#'     input_col = "word_list",
+#'     output_col = "wo_stop_words"
+#'   ) %>%
 #'   mutate(text = explode(wo_stop_words)) %>%
 #'   filter(text != "") %>%
 #'   select(text, book)
@@ -127,7 +136,6 @@ ml_lda.spark_connection <- function(x, formula = NULL, k = 10, max_iter = 20, do
                                     keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                                     optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
                                     topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
-
   .args <- list(
     k = k,
     max_iter = max_iter,
@@ -174,7 +182,6 @@ ml_lda.ml_pipeline <- function(x, formula = NULL, k = 10, max_iter = 20, doc_con
                                keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                                optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
                                topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
-
   stage <- ml_lda.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -206,7 +213,7 @@ ml_lda.tbl_spark <- function(x, formula = NULL, k = 10, max_iter = 20, doc_conce
                              topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
   formula <- ml_standardize_formula(formula)
 
-   stage <- ml_lda.spark_connection(
+  stage <- ml_lda.spark_connection(
     x = spark_connection(x),
     formula = NULL,
     k = k,
@@ -228,17 +235,109 @@ ml_lda.tbl_spark <- function(x, formula = NULL, k = 10, max_iter = 20, doc_conce
   )
 
   if (is.null(formula)) {
-  stage %>%
-    ml_fit(x)
-   } else {
-     ml_construct_model_clustering(
-       new_ml_model_lda,
-       predictor = stage,
-       dataset = x,
-       formula = formula,
-       features_col = features_col
-     )
-   }
+    stage %>%
+      ml_fit(x)
+  } else {
+    ml_construct_model_lda(
+      new_ml_model_lda,
+      predictor = stage,
+      dataset = x,
+      formula = formula,
+      features_col = features_col,
+      ...
+    )
+  }
+}
+
+ml_construct_model_lda <- function(constructor, predictor, formula, dataset, features_col, ...) {
+  sc <- spark_connection(predictor)
+  dots <- list(...)
+
+  # regex tokenizer parameters
+  gaps <- dots$gaps %||% TRUE
+  min_token_length <- dots$min_token_length %||% 1
+  pattern <- dots$pattern %||% "\\s+"
+  to_lower_case <- dots$to_lower_case %||% TRUE
+
+  # stop words remover parameters
+  case_sensitive <- dots$case_sensitive %||% FALSE
+  stop_words <- dots$stop_words %||% ml_default_stop_words(sc, "english")
+
+  # count vectorizer parameters
+  binary <- dots$binary %||% FALSE
+  min_df <- dots$min_df %||% 1
+  min_tf <- dots$min_tf %||% 1
+  vocab_size <- dots$vocab_size %||% 2^18
+
+  pipeline_model <- ml_lda_pipeline(
+    predictor = predictor,
+    dataset = dataset,
+    formula = formula,
+    features_col = features_col,
+    gaps = gaps,
+    min_token_length = min_token_length,
+    pattern = pattern,
+    to_lower_case = to_lower_case,
+    case_sensitive = case_sensitive,
+    stop_words = stop_words,
+    binary = binary,
+    min_df = min_df,
+    min_tf = min_tf,
+    vocab_size = vocab_size
+  )
+
+  .args <- list(
+    pipeline_model = pipeline_model,
+    formula = formula,
+    dataset = dataset,
+    features_col = features_col
+  )
+
+  rlang::exec(constructor, !!!.args)
+}
+
+ml_lda_pipeline <- function(predictor, dataset, formula, features_col,
+                            # regex tokenizer parameters
+                            gaps, min_token_length, pattern, to_lower_case,
+                            # stop words remover parameters
+                            case_sensitive, stop_words,
+                            # count vectorizer parameters
+                            binary, min_df, min_tf, vocab_size) {
+  sc <- spark_connection(predictor)
+
+  # Temporary column names to prevent clashes
+  tokenizer_out <- random_string("tokenizer_out_")
+  stop_words_remover_out <- random_string("stop_words_remover_out_")
+  count_vectorizer_out <- random_string("count_vectorizer_out_")
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_regex_tokenizer(
+      input_col = gsub("~", "", formula),
+      output_col = tokenizer_out,
+      gaps = gaps,
+      min_token_length = min_token_length,
+      pattern = pattern,
+      to_lower_case = to_lower_case
+    ) %>%
+    ft_stop_words_remover(
+      input_col = tokenizer_out,
+      output_col = stop_words_remover_out,
+      case_sensitive = case_sensitive,
+      stop_words = stop_words
+    ) %>%
+    ft_count_vectorizer(
+      input_col = stop_words_remover_out,
+      output_col = count_vectorizer_out,
+      binary = binary,
+      min_df = min_df,
+      min_tf = min_tf,
+      vocab_size = vocab_size
+    ) %>%
+    ft_r_formula(paste0("~", count_vectorizer_out), features_col = features_col) %>%
+    ml_add_stage(predictor)
+
+  pipeline %>%
+    ml_fit(dataset)
 }
 
 # Validator
@@ -254,7 +353,7 @@ validator_ml_lda <- function(.args) {
   .args[["learning_decay"]] <- cast_scalar_double(.args[["learning_decay"]])
   .args[["learning_offset"]] <- cast_scalar_double(.args[["learning_offset"]])
   .args[["optimize_doc_concentration"]] <- cast_scalar_logical(.args[["optimize_doc_concentration"]])
-  .args[["topic_distribution_col"]] <- cast_string( .args[["topic_distribution_col"]])
+  .args[["topic_distribution_col"]] <- cast_string(.args[["topic_distribution_col"]])
   .args
 }
 
@@ -281,7 +380,8 @@ new_ml_lda_model <- function(jobj) {
     },
     topics_matrix = possibly_null(~ read_spark_matrix(jobj, "topicsMatrix")), # def
     vocab_size = invoke(jobj, "vocabSize"),
-    class = "ml_lda_model")
+    class = "ml_lda_model"
+  )
 }
 
 #' @rdname ml_lda

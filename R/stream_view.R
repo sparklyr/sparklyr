@@ -33,7 +33,6 @@ stream_progress <- function(stream)
 #'   stream_view() %>%
 #'   stream_stop()
 #' }
-#' @import shiny
 #' @import r2d3
 #' @export
 stream_view <- function(
@@ -41,9 +40,15 @@ stream_view <- function(
   ...
 )
 {
+  if (!"shiny" %in% installed.packages()) stop("The 'shiny' package is required for this operation.")
+
   validate <- stream_progress(stream)
   interval <- 1000
 
+  shinyUI <- get("shinyUI", envir = asNamespace("shiny"))
+  tags <- get("tags", envir = asNamespace("shiny"))
+  div <- get("div", envir = asNamespace("shiny"))
+  HTML <- get("HTML", envir = asNamespace("shiny"))
   ui <- shinyUI(
     div(
       tags$head(
@@ -61,6 +66,8 @@ stream_view <- function(
 
   options <- list(...)
 
+  observe <- get("observe", envir = asNamespace("shiny"))
+  invalidateLater <- get("invalidateLater", envir = asNamespace("shiny"))
   server <- function(input, output, session) {
     first <- stream_progress(stream)
 
@@ -91,6 +98,7 @@ stream_view <- function(
     })
   }
 
+  runGadget <- get("runGadget", envir = asNamespace("shiny"))
   runGadget(ui, server)
 
   stream

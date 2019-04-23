@@ -1,4 +1,36 @@
-# Sparklyr 0.9.9000 (unreleased)
+# Sparklyr 1.0.9005 (unreleased)
+
+### ML
+
+- `ml_lda()`: Allow passing of optional arguments via `...` to regex tokenizer, stop words remover, and count vectorizer components in the formula API.
+- Implemented `ml_evaluate()` for logistic regression, linear regression, and GLM models.
+- Implemented `print()` method for `ml_summary` objects.
+- Deprecated `compute_cost()` for KMeans in Spark 2.4 (#1772).
+- Added missing internal constructor for clustering evaluator (#1936).
+
+### Misc
+
+- Added `sdf_crosstab()` to create contingency tables.
+
+### Connections
+
+- Reduced default memory for local connections when Java x64 is not installed (#1931).
+
+### Batches
+
+- Add support in `spark-submit` with R file to pass additional arguments to R file (#1942).
+
+### Distributed R
+
+- Fix support for multiple library paths when using `spark.r.libpaths` (@mattpollock, #1956).
+
+### Extensions
+
+- Support for creating an Spark extension package using `spark_extension()`.
+
+- Add support for repositories in `spark_dependency()`.
+
+# Sparklyr 1.0.0
 
 ### Arrow
 
@@ -20,8 +52,10 @@
 
 ### Livy
 
-- Significant performance improvements by using `spark_version` in
-  `livy_config()` which enables using the sparklyr JAR rather than
+- Support for sparklyr extensions when using Livy.
+
+- Significant performance improvements by using `version` in
+  `spark_connect()` which enables using the sparklyr JAR rather than
   sources.
 
 - Improved memory use in Livy by using string builders and avoid print
@@ -61,6 +95,8 @@
 
 ### Connections
 
+- Local connection defaults now to 2GB.
+
 - Support to install and connect based on major Spark versions, for
   instance: `spark_connect(master = "local", version = "2.4")`.
 
@@ -76,6 +112,11 @@
   UI. Configurable through the `sparklyr.web.yarn` configuration setting.
 
 - Support for property expansion in `yarn-site.xml` (@lgongmsft, #1876).
+
+## Distributed R
+
+- The `memory` parameter in `spark_apply()` now defaults to `FALSE` when
+  the `name` parameter is not specified.
 
 ## Other
 

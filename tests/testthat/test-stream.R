@@ -2,14 +2,21 @@ context("streaming")
 test_requires("dplyr")
 sc <- testthat_spark_connection()
 
-dir.create("iris-in")
-
 iris_in <- paste0("file:///", file.path(getwd(), "iris-in"))
 iris_out <- paste0("file:///", file.path(getwd(), "iris-out"))
 
-write.table(iris, file.path("iris-in", "iris.csv"), row.names = FALSE, sep = ";")
+test_stream <- function(description, test) {
+  if (!dir.exists("iris-in")) dir.create("iris-in")
+  if (dir.exists("iris-out")) unlink("iris-out", recursive = TRUE)
 
-test_that("csv stream can be filtered with dplyr", {
+  write.table(iris, file.path("iris-in", "iris.csv"), row.names = FALSE, sep = ";")
+
+  on.exit(unlink("iris-", recursive = TRUE))
+
+  test_that(description, test)
+}
+
+test_stream("csv stream can be filtered with dplyr", {
   if (spark_version(sc) < "2.0.0") skip("streams not supported before 2.0.0")
   test_requires("dplyr")
 
@@ -21,7 +28,7 @@ test_that("csv stream can be filtered with dplyr", {
   succeed()
 })
 
-test_that("csv stream can use custom options", {
+test_stream("csv stream can use custom options", {
   if (spark_version(sc) < "2.0.0") skip("streams not supported before 2.0.0")
 
   stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
@@ -31,7 +38,7 @@ test_that("csv stream can use custom options", {
   succeed()
 })
 
-test_that("stream can read and write from memory", {
+test_stream("stream can read and write from memory", {
   if (spark_version(sc) < "2.0.0") skip("streams not supported before 2.0.0")
 
   stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
@@ -42,7 +49,7 @@ test_that("stream can read and write from memory", {
   succeed()
 })
 
-test_that("stream can read and write from text", {
+test_stream("stream can read and write from text", {
   if (spark_version(sc) < "2.0.0") skip("streams not supported before 2.0.0")
 
   stream <- stream_read_text(sc, iris_in) %>%
@@ -52,7 +59,7 @@ test_that("stream can read and write from text", {
   succeed()
 })
 
-test_that("stream can read and write from json", {
+test_stream("stream can read and write from json", {
   if (spark_version(sc) < "2.0.0") skip("streams not supported before 2.0.0")
 
   stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
@@ -67,7 +74,7 @@ test_that("stream can read and write from json", {
   succeed()
 })
 
-test_that("stream can read and write from parquet", {
+test_stream("stream can read and write from parquet", {
   if (spark_version(sc) < "2.0.0") skip("streams not supported before 2.0.0")
 
   stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
@@ -82,7 +89,7 @@ test_that("stream can read and write from parquet", {
   succeed()
 })
 
-test_that("stream can read and write from orc", {
+test_stream("stream can read and write from orc", {
   if (spark_version(sc) < "2.0.0") skip("streams not supported before 2.0.0")
 
   stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%

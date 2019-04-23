@@ -11,8 +11,7 @@
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
   method = c("shell", "livy", "databricks", "test"),
-  app_name = "sparklyr", version = NULL, hadoop_version = NULL,
-  config = spark_config(),
+  app_name = "sparklyr", version = NULL, config = spark_config(),
   extensions = sparklyr::registered_extensions(), ...)
 
 spark_connection_is_open(sc)
@@ -22,8 +21,7 @@ spark_disconnect(sc, ...)
 spark_disconnect_all()
 
 spark_submit(master, file, spark_home = Sys.getenv("SPARK_HOME"),
-  app_name = "sparklyr", version = NULL, hadoop_version = NULL,
-  config = spark_config(),
+  app_name = "sparklyr", version = NULL, config = spark_config(),
   extensions = sparklyr::registered_extensions(), ...)
 }
 \arguments{
@@ -48,9 +46,6 @@ cluster.}
 \item{version}{The version of Spark to use. Only applicable to
 \code{"local"} Spark connections.}
 
-\item{hadoop_version}{The version of Hadoop to use. Only applicable to
-\code{"local"} Spark connections.}
-
 \item{config}{Custom configuration for the generated Spark connection. See
 \code{\link{spark_config}} for details.}
 
@@ -66,6 +61,12 @@ default, all packages enabled through the use of
 }
 \description{
 These routines allow you to manage your connections to Spark.
+}
+\details{
+When using \code{method = "livy"}, it is recommended to specify \code{version}
+parameter to improve performance by using precompiled code rather than uploading
+sources. By default, jars are downloaded from GitHub but the path to the correct
+\code{sparklyr} JAR can also be specified through the \code{livy.jars} setting.
 }
 \examples{
 

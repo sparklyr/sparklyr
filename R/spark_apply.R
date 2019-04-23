@@ -104,7 +104,8 @@ spark_apply_colum_types <- function(sdf) {
 #'
 #'   For clusters where R packages already installed in every worker node,
 #'   the \code{spark.r.libpaths} config entry can be set in \code{spark_config()}
-#'   to the local packages library.
+#'   to the local packages library. To specify multiple paths collapse them
+#'   (without spaces) with a comma delimiter (e.g., \code{"/lib/path/one,/lib/path/two"}).
 #' @param context Optional object to be serialized and passed back to \code{f()}.
 #' @param name Optional table name while registering the resulting data frame.
 #' @param ... Optional arguments; currently unused.
@@ -135,12 +136,13 @@ spark_apply_colum_types <- function(sdf) {
 spark_apply <- function(x,
                         f,
                         columns = NULL,
-                        memory = TRUE,
+                        memory = !is.null(name),
                         group_by = NULL,
                         packages = NULL,
                         context = NULL,
                         name = NULL,
                         ...) {
+  memory <- force(memory)
   args <- list(...)
   assert_that(is.function(f) || is.raw(f) || is.language(f))
   if (is.language(f)) f <- rlang::as_closure(f)
