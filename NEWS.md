@@ -26,6 +26,8 @@
 
 ### Extensions
 
+- Support for creating an Spark extension package using `spark_extension()`.
+
 - Add support for repositories in `spark_dependency()`.
 
 # Sparklyr 1.0.0
