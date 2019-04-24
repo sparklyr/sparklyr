@@ -19,7 +19,7 @@
 #'
 #' partitions <- iris_tbl %>%
 #'   filter(Species != "setosa") %>%
-#'   sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+#'   sdf_random_split(training = 0.7, test = 0.3, seed = 1111)
 #'
 #' iris_training <- partitions$training
 #' iris_test <- partitions$test

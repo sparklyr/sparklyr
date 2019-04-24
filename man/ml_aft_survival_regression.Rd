@@ -94,7 +94,7 @@ sc <- spark_connect(master = "local")
 ovarian_tbl <- sdf_copy_to(sc, ovarian, name = "ovarian_tbl", overwrite = TRUE)
 
 partitions <- ovarian_tbl \%>\%
-  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+  sdf_random_split(training = 0.7, test = 0.3, seed = 1111)
 
 ovarian_training <- partitions$training
 ovarian_test <- partitions$test

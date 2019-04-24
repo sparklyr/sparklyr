@@ -31,7 +31,7 @@ the \R level, these operations will only be executed when you explicitly
 
 \seealso{
 Other Spark data frames: \code{\link{sdf_copy_to}},
-  \code{\link{sdf_partition}}, \code{\link{sdf_sample}},
+  \code{\link{sdf_random_split}}, \code{\link{sdf_sample}},
   \code{\link{sdf_sort}}
 }
 \concept{Spark data frames}
