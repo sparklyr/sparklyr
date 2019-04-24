@@ -7,6 +7,7 @@
 - Implemented `print()` method for `ml_summary` objects.
 - Deprecated `compute_cost()` for KMeans in Spark 2.4 (#1772).
 - Added missing internal constructor for clustering evaluator (#1936).
+- `sdf_partition()` has been renamed to `sdf_random_split()`.
 
 ### Misc
 
