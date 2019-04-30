@@ -13,6 +13,8 @@
 
 - Added `sdf_crosstab()` to create contingency tables.
 
+- Fix `tibble::as.tibble()` deprecation warning.
+
 ### Connections
 
 - Reduced default memory for local connections when Java x64 is not installed (#1931).
