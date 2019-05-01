@@ -26,6 +26,7 @@ if (length(args) == 0) {
     devtools::install_github( "apache/arrow", subdir = "r", ref = args[2])
   }
   else {
+    Sys.setenv(PATH = paste(Sys.getenv("PATH"), "/usr/local/bin/", sep = ":"))
     devtools::install_github( "apache/arrow", subdir = "r")
   }
 } else {
