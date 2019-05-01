@@ -31,7 +31,7 @@ test_that("ml_naive_bayes() works properly", {
                                    sample_data_path, overwrite = TRUE)
 
   sample_data_partitioned <- sample_data %>%
-    sdf_partition(weights = c(train = 0.7, test = 0.3), seed = 1)
+    sdf_random_split(weights = c(train = 0.7, test = 0.3), seed = 1)
 
   model <- ml_naive_bayes(sample_data_partitioned$train)
 

@@ -69,7 +69,7 @@ sc <- spark_connect(master = "local")
 mtcars_tbl <- sdf_copy_to(sc, mtcars, name = "mtcars_tbl", overwrite = TRUE)
 
 partitions <- mtcars_tbl \%>\%
-  sdf_partition(training = 0.7, test = 0.3, seed = 1111)
+  sdf_random_split(training = 0.7, test = 0.3, seed = 1111)
 
 mtcars_training <- partitions$training
 mtcars_test <- partitions$test

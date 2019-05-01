@@ -7,7 +7,7 @@
 #' will be assigned to a particular partition, not the resulting size of the
 #' partition. This implies that partitioning a DataFrame with, for example,
 #'
-#' \code{sdf_partition(x, training = 0.5, test = 0.5)}
+#' \code{sdf_random_split(x, training = 0.5, test = 0.5)}
 #'
 #' is not guaranteed to produce \code{training} and \code{test} partitions
 #' of equal size.
@@ -36,14 +36,14 @@
 #' data(diamonds, package = "ggplot2")
 #' diamonds_tbl <- copy_to(sc, diamonds, "diamonds")
 #' partitions <- diamonds_tbl %>%
-#'   sdf_partition(training = 0.6, test = 0.4)
+#'   sdf_random_split(training = 0.6, test = 0.4)
 #' print(partitions)
 #'
 #' # alternate way of specifying weights
 #' weights <- c(training = 0.6, test = 0.4)
-#' diamonds_tbl %>% sdf_partition(weights = weights)
+#' diamonds_tbl %>% sdf_random_split(weights = weights)
 #' }
-sdf_partition <- function(x,
+sdf_random_split <- function(x,
                           ...,
                           weights = NULL,
                           seed = sample(.Machine$integer.max, 1))
@@ -57,6 +57,16 @@ sdf_partition <- function(x,
   registered <- sdf_register(partitions)
   names(registered) <- nm
   registered
+}
+
+#' @rdname sdf_random_split
+#' @export
+sdf_partition <- function(x,
+                          ...,
+                          weights = NULL,
+                          seed = sample(.Machine$integer.max, 1)) {
+  .Deprecated("sdf_random_split")
+  sdf_random_split(x = x, ..., weights = weights, seed = seed)
 }
 
 #' Project features onto principal components

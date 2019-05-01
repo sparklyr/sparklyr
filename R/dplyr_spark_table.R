@@ -125,7 +125,7 @@ print.tbl_spark <- function(x, ...) {
     if (length(sort) > 0) c(`Ordered by` = paste0(sort, collapse = ", "))
   )
 
-  data <- tibble::as.tibble(as.data.frame(data))
+  data <- tibble::as_tibble(as.data.frame(data))
   class(data) <- c("tbl_spark_print", class(data))
 
   print(data)
