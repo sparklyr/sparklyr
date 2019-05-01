@@ -115,3 +115,11 @@ script:
 after_failure:
   - |
     grep -B 10 -A 20 ERROR /tmp/sparklyr.log
+
+notifications:
+  email:
+    recipients:
+      - kevin.kuo@rstudio.com
+      - javier@rstudio.com
+    on_success: never
+    on_failure: always
