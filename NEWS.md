@@ -33,6 +33,10 @@
 
 - Add support for repositories in `spark_dependency()`.
 
+### DataFrames
+
+- Fix `sdf_bind_cols()` when using `dbplyr` 1.4.0. 
+
 # Sparklyr 1.0.0
 
 ### Arrow
