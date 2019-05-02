@@ -107,6 +107,8 @@ test_that("'sdf_bind_cols' supports programming", {
 })
 
 test_that("'sdf_bind_cols' works with overlapping columns'", {
+  if (spark_version(sc) < "2.0.0") skip("sdf_bind_cols() workaround not available in 1.6")
+
   df1a_tbl <- testthat_tbl("df1a")
   df4a_tbl <- testthat_tbl("df4a")
 
