@@ -106,6 +106,17 @@ test_that("'sdf_bind_cols' supports programming", {
                "All inputs must have the same number of rows.")
 })
 
+test_that("'sdf_bind_cols' works with overlapping columns'", {
+  df1a_tbl <- testthat_tbl("df1a")
+  df4a_tbl <- testthat_tbl("df4a")
+
+  spark_df <- sdf_bind_cols(df1a_tbl, df4a_tbl) %>% collect()
+  local_df <- cbind(df1a, df2a)
+
+  expect_equal(nrow(spark_df), nrow(local_df))
+  expect_equal(ncol(spark_df), ncol(local_df))
+})
+
 # rows -------------------------------------------------------
 
 test_that("'rbind.tbl_spark' agrees with local result ", {
