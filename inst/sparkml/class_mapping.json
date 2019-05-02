@@ -9,6 +9,8 @@
   "org.apache.spark.ml.feature.ElementwiseProduct": "ml_elementwise_product",
   "org.apache.spark.ml.feature.IndexToString": "ml_index_to_string",
   "org.apache.spark.ml.feature.OneHotEncoder": "ml_one_hot_encoder",
+  "org.apache.spark.ml.feature.OneHotEncoderEstimator": "ml_one_hot_encoder_estimator",
+  "org.apache.spark.ml.feature.OneHotEncoderModel": "ml_one_hot_encoder_model",
   "org.apache.spark.ml.feature.RegexTokenizer": "ml_regex_tokenizer",
   "org.apache.spark.ml.feature.SQLTransformer": "ml_sql_transformer",
   "org.apache.spark.ml.feature.StopWordsRemover": "ml_stop_words_remover",
