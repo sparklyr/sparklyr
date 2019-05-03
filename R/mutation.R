@@ -172,7 +172,9 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 
     Reduce(function(x, y) dplyr::inner_join(x, y, by = id),
            dots_with_ids) %>%
-    select(- !!rlang::sym(id))
+      spark_dataframe() %>%
+      invoke("drop", id) %>%
+      sdf_register()
 }
 
 #' @rdname sdf_bind
