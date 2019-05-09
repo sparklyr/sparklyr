@@ -4,5 +4,5 @@ HelpUrl: http://spark.rstudio.com
 Icon: icons/spark.png
 
 Name: Livy
-HelpUrl: http://spark.rstudio.com/deployment.html#livy_connections
+HelpUrl: https://spark.rstudio.com/deployment/#livy-connections
 Icon: icons/livy.png
