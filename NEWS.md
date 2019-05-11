@@ -38,6 +38,10 @@
 
 - Fix `sdf_bind_cols()` when using `dbplyr` 1.4.0. 
 
+### Kubernetes
+
+- Fix regression in `spark_config_kubernetes()` configuration helper.
+
 # Sparklyr 1.0.0
 
 ### Arrow

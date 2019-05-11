@@ -180,11 +180,11 @@ start_shell <- function(master,
 
   if (is.null(gatewayInfo) || gatewayInfo$backendPort == 0)
   {
+    versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
+
     # read app jar through config, this allows "sparkr-shell" to test sparkr backend
     app_jar <- spark_config_value(config, c("sparklyr.connect.app.jar", "sparklyr.app.jar"), NULL)
     if (is.null(app_jar)) {
-      versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
-
       app_jar <- spark_default_app_jar(versionSparkHome)
       if (typeof(app_jar) != "character" || nchar(app_jar) == 0) {
         stop("sparklyr does not support Spark version: ", versionSparkHome)

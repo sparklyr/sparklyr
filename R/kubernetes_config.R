@@ -68,12 +68,7 @@ spark_config_kubernetes <- function(
     jar_version <- paste(strsplit(version, "\\.")[[1]][1:2], collapse = ".")
     jar <- file.path(
       jars,
-      paste(
-        "sparklyr-",
-        jar_version,
-        "-2.11.jar",
-        sep = ""
-      )
+      basename(spark_default_app_jar(version))
     )
   }
 
