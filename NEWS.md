@@ -1,4 +1,4 @@
-# Sparklyr 1.0.0.9008 (unreleased)
+# Sparklyr 1.0.1
 
 ### ML
 

@@ -564,7 +564,7 @@ livy_connection_jars <- function(config, version) {
     target_jar <- dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", target_version))
 
     livy_jars <- list(paste0(
-      "https://github.com/rstudio/sparklyr/blob/bugfix/livy-jars/inst/java/",
+      "https://github.com/rstudio/sparklyr/blob/feature/sparklyr-1.0.1/inst/java/",
       target_jar,
       "?raw=true"
     ))
