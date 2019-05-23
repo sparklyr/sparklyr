@@ -67,7 +67,7 @@ the IDE which includes several enhancements for interacting with Spark
 
 You can connect to both local instances of Spark as well as remote Spark
 clusters. Here we’ll connect to a local instance of Spark via the
-[spark\_connect](http://spark.rstudio.com/reference/sparklyr/latest/spark_connect.html)
+[spark\_connect](https://spark.rstudio.com/reference/spark-connections/)
 function:
 
 ``` r
@@ -223,7 +223,7 @@ high-level APIs built on top of DataFrames that help you create and tune
 machine learning workflows.
 
 Here’s an example where we use
-[ml\_linear\_regression](http://spark.rstudio.com/reference/sparklyr/latest/ml_linear_regression.html)
+[ml\_linear\_regression](https://spark.rstudio.com/reference/ml_linear_regression/)
 to fit a linear regression model. We’ll use the built-in `mtcars`
 dataset, and see if we can predict a car’s fuel consumption (`mpg`)
 based on its weight (`wt`), and the number of cylinders the engine

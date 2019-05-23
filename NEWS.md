@@ -3,11 +3,17 @@
 ### ML
 
 - `ml_lda()`: Allow passing of optional arguments via `...` to regex tokenizer, stop words remover, and count vectorizer components in the formula API.
+
 - Implemented `ml_evaluate()` for logistic regression, linear regression, and GLM models.
+
 - Implemented `print()` method for `ml_summary` objects.
+
 - Deprecated `compute_cost()` for KMeans in Spark 2.4 (#1772).
+
 - Added missing internal constructor for clustering evaluator (#1936).
+
 - `sdf_partition()` has been renamed to `sdf_random_split()`.
+
 - Added `ft_one_hot_encoder_estimator()` (#1337).
 
 ### Misc
@@ -15,6 +21,8 @@
 - Added `sdf_crosstab()` to create contingency tables.
 
 - Fix `tibble::as.tibble()` deprecation warning.
+
+- Support for Spark 2.3.3 and 2.4.3.
 
 ### Connections
 
