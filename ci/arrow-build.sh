@@ -9,6 +9,9 @@ sudo apt install -y -V autoconf
 if [[ $ARROW_VERSION == "devel" ]]; then
   git clone https://github.com/apache/arrow
   cd arrow/cpp
+  # arrow@master has a broken R package, pending https://issues.apache.org/jira/browse/ARROW-5361
+  # Remove this version pin after that issue is resolved
+  git checkout 1ed608aa94f0d22cfa69c81687006b4ebaefa258
 else
   wget https://arrowlib.rstudio.com/dist/arrow/arrow-$ARROW_VERSION/apache-arrow-$ARROW_VERSION.tar.gz
   tar -xvzf apache-arrow-$ARROW_VERSION.tar.gz

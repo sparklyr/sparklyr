@@ -75,6 +75,7 @@ matrix:
         - ARROW_VERSION="devel"
         - ARROW_SOURCE="build"
         - JAVA_VERSION=oraclejdk8
+        - LD_LIBRARY_PATH="/usr/local/lib"
     - name: "Deps Devel (tidyverse, r-lib, forge)"
       env: R_DEVEL_PACKAGES="true"
       r_github_packages:
@@ -93,6 +94,7 @@ matrix:
         - ARROW_VERSION="devel"
         - ARROW_SOURCE="build"
         - JAVA_VERSION=oraclejdk8
+        - LD_LIBRARY_PATH="/usr/local/lib"
 
 before_install:
   - jdk_switcher use $JAVA_VERSION
