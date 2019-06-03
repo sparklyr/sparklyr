@@ -44,7 +44,7 @@ Imports:
     rappdirs,
     rlang (>= 0.1.4),
     rprojroot,
-    rstudioapi (>= 0.6),
+    rstudioapi (>= 0.10),
     tibble,
     tidyr,
     withr,
