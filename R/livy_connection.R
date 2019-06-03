@@ -409,7 +409,8 @@ livy_post_statement <- function(sc, code) {
   commandStart <- Sys.time()
 
   sleepTime <- 0.001
-  while ((statementReponse$state == "running" || statementReponse$state == "waiting" ) &&
+  while ((statementReponse$state == "running" || statementReponse$state == "waiting" ||
+         (statementReponse$state == "available" && is.null(statementReponse$output))) &&
          Sys.time() < commandStart + waitTimeout) {
     statementReponse <- livy_get_statement(sc, statementReponse$id)
 

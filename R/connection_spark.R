@@ -46,8 +46,8 @@ spark_default_app_jar <- function(version) {
 #'   Databricks clusters.
 #' @param app_name The application name to be used while running in the Spark
 #'   cluster.
-#' @param version The version of Spark to use. Only applicable to
-#'   \code{"local"} Spark connections.
+#' @param version The version of Spark to use. Required for \code{"local"} Spark
+#'   connections, optional otherwise.
 #' @param extensions Extension packages to enable for this connection. By
 #'   default, all packages enabled through the use of
 #'   \code{\link[=register_extension]{sparklyr::register_extension}} will be passed here.

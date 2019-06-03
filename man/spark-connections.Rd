@@ -43,8 +43,8 @@ Databricks clusters.}
 \item{app_name}{The application name to be used while running in the Spark
 cluster.}
 
-\item{version}{The version of Spark to use. Only applicable to
-\code{"local"} Spark connections.}
+\item{version}{The version of Spark to use. Required for \code{"local"} Spark
+connections, optional otherwise.}
 
 \item{config}{Custom configuration for the generated Spark connection. See
 \code{\link{spark_config}} for details.}
