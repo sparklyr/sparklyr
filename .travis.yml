@@ -75,6 +75,7 @@ matrix:
         - ARROW_ENABLED="true"
         - ARROW_VERSION="devel"
         - ARROW_SOURCE="build"
+        - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
         - LD_LIBRARY_PATH="/usr/local/lib"
       addons:
         apt:
@@ -98,7 +99,7 @@ matrix:
         - ARROW_ENABLED="true"
         - ARROW_VERSION="devel"
         - ARROW_SOURCE="build"
-        - JAVA_VERSION=oraclejdk8
+        - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
         - LD_LIBRARY_PATH="/usr/local/lib"
       addons:
         apt:
