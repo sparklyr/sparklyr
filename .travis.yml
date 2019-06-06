@@ -68,14 +68,18 @@ matrix:
         - ARROW_SOURCE="install"
         - JAVA_VERSION=oraclejdk8
     - name: "Arrow Devel (ref = '')"
-      dist: xenial
       r: release
+      dist: xenial
       sudo: true
       env:
         - ARROW_ENABLED="true"
         - ARROW_VERSION="devel"
         - ARROW_SOURCE="build"
         - LD_LIBRARY_PATH="/usr/local/lib"
+      addons:
+        apt:
+          packages:
+            - openjdk-8-jre
     - name: "Deps Devel (tidyverse, r-lib, forge)"
       env: R_DEVEL_PACKAGES="true"
       r_github_packages:
@@ -88,6 +92,7 @@ matrix:
   allow_failures:
     - env: R_DEVEL_PACKAGES="true"
     - r: release
+      dist: xenial
       sudo: true
       env:
         - ARROW_ENABLED="true"
@@ -95,6 +100,10 @@ matrix:
         - ARROW_SOURCE="build"
         - JAVA_VERSION=oraclejdk8
         - LD_LIBRARY_PATH="/usr/local/lib"
+      addons:
+        apt:
+          packages:
+            - openjdk-8-jre
 
 before_install:
   - if [[ ! -z "$JAVA_VERSION" ]]; then jdk_switcher use $JAVA_VERSION ; fi
