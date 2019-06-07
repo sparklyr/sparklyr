@@ -99,7 +99,7 @@ spark_config_shell_args <- function(config, master) {
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell", "livy", "databricks", "test"),
+                          method = c("shell", "livy", "databricks", "test", "qubole"),
                           app_name = "sparklyr",
                           version = NULL,
                           config = spark_config(),
@@ -118,6 +118,8 @@ spark_connect <- function(master,
   if (missing(master)) {
     if (identical(method, "databricks")) {
       master <- "databricks"
+    } else if(identical(method, "qubole")) {
+      master <- "shell"
     } else {
       master <- spark_config_value(config, "spark.master", NULL)
       if (is.null(master))
@@ -192,6 +194,25 @@ spark_connect <- function(master,
   } else if (method == "databricks") {
     scon <- databricks_connection(config = config,
                                   extensions)
+  } else if (method == "qubole") {
+    scon <- shell_connection(master = master,
+                             spark_home = spark_home,
+                             app_name = app_name,
+                             version = version,
+                             hadoop_version = hadoop_version,
+                             shell_args = shell_args,
+                             config = config,
+                             service = spark_config_value(
+                               config,
+                               "sparklyr.gateway.service",
+                               FALSE),
+                             remote = spark_config_value(
+                               config,
+                               "sparklyr.gateway.remote",
+                               spark_master_is_yarn_cluster(master, config)),
+                             extensions = extensions,
+                             batch = NULL)
+    sc$config$sparklyr.web.spark <- invoke(sc$state$spark_context, "getSparkUIURL")
   } else if (method == "test") {
     scon <- test_connection(master = master,
                             config = config,
