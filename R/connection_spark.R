@@ -119,7 +119,8 @@ spark_connect <- function(master,
     if (identical(method, "databricks")) {
       master <- "databricks"
     } else if(identical(method, "qubole")) {
-      master <- "shell"
+      master <- "yarn-client"
+      spark_home <- "/usr/lib/spark"
     } else {
       master <- spark_config_value(config, "spark.master", NULL)
       if (is.null(master))
