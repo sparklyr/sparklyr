@@ -237,6 +237,10 @@ spark_connect <- function(master,
   # register mapping tables for spark.ml
 
   register_mapping_tables()
+  
+  if (method == "qubole") {
+    scon$config$sparklyr.web.spark <- invoke(scon$state$spark_context, "getSparkUIURL")
+  }
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
@@ -267,9 +271,6 @@ spark_connect <- function(master,
   spark_connections_add(scon)
 
   # return scon
-  if (method == "qubole") {
-    scon$config$sparklyr.web.spark <- invoke(scon$state$spark_context, "getSparkUIURL")
-  }
   scon
 }
 
