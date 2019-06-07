@@ -212,7 +212,6 @@ spark_connect <- function(master,
                                spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions,
                              batch = NULL)
-    scon$config$sparklyr.web.spark <- invoke(scon$state$spark_context, "getSparkUIURL")
   } else if (method == "test") {
     scon <- test_connection(master = master,
                             config = config,
@@ -268,6 +267,9 @@ spark_connect <- function(master,
   spark_connections_add(scon)
 
   # return scon
+  if (method == "qubole") {
+    scon$config$sparklyr.web.spark <- invoke(scon$state$spark_context, "getSparkUIURL")
+  }
   scon
 }
 
