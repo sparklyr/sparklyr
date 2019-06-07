@@ -241,6 +241,7 @@ spark_connect <- function(master,
   
   if (method == "qubole") {
     scon$config$sparklyr.web.spark <- invoke(scon$state$spark_context, "getSparkUIURL")
+    scon$config$sparklyr.web.yarn <- invoke(scon$state$spark_context, "getSparkUIURL")
   }
 
   # notify connection viewer of connection
