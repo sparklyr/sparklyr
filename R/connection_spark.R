@@ -212,7 +212,7 @@ spark_connect <- function(master,
                                spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions,
                              batch = NULL)
-    sc$config$sparklyr.web.spark <- invoke(sc$state$spark_context, "getSparkUIURL")
+    scon$config$sparklyr.web.spark <- invoke(sc$state$spark_context, "getSparkUIURL")
   } else if (method == "test") {
     scon <- test_connection(master = master,
                             config = config,
