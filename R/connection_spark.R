@@ -165,7 +165,7 @@ spark_connect <- function(master,
     method <- "gateway"
 
   # spark-shell (local install of spark)
-  if (method == "shell") {
+  if (method == "shell" || method == "qubole") {
     scon <- shell_connection(master = master,
                              spark_home = spark_home,
                              app_name = app_name,
@@ -195,24 +195,6 @@ spark_connect <- function(master,
   } else if (method == "databricks") {
     scon <- databricks_connection(config = config,
                                   extensions)
-  } else if (method == "qubole") {
-    scon <- shell_connection(master = master,
-                             spark_home = spark_home,
-                             app_name = app_name,
-                             version = version,
-                             hadoop_version = hadoop_version,
-                             shell_args = shell_args,
-                             config = config,
-                             service = spark_config_value(
-                               config,
-                               "sparklyr.gateway.service",
-                               FALSE),
-                             remote = spark_config_value(
-                               config,
-                               "sparklyr.gateway.remote",
-                               spark_master_is_yarn_cluster(master, config)),
-                             extensions = extensions,
-                             batch = NULL)
   } else if (method == "test") {
     scon <- test_connection(master = master,
                             config = config,
@@ -239,12 +221,7 @@ spark_connect <- function(master,
 
   register_mapping_tables()
   
-  if (method == "qubole") {
-    scon$config$sparklyr.web.spark <- invoke(scon$state$spark_context,
-                                             "getSparkUIURL")
-    scon$config$sparklyr.web.yarn <- system("/usr/lib/zeppelin/bin/get_yarn_url.sh",
-                                            intern = TRUE)
-  }
+  scon <- initialize_method(structure(method, class = "qubole"), scon)
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
@@ -408,3 +385,10 @@ spark_inspect <- function(jobj) {
   jobj
 }
 
+initialize_method <- function(method, scon) {
+   UseMethod("initialize_method")
+}
+
+initialize_method.default <- function(method, scon) {
+   scon
+}
