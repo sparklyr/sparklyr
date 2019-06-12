@@ -1,6 +1,6 @@
 ARROW_VERSION=$1
 
-pushd .
+pushd ..
 
 sudo apt install -y -V cmake
 sudo apt install -y -V libboost-all-dev
