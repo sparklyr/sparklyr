@@ -99,7 +99,7 @@ spark_config_shell_args <- function(config, master) {
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell", "livy", "databricks", "test"),
+                          method = c("shell", "livy", "databricks", "test", "qubole"),
                           app_name = "sparklyr",
                           version = NULL,
                           config = spark_config(),
@@ -118,6 +118,9 @@ spark_connect <- function(master,
   if (missing(master)) {
     if (identical(method, "databricks")) {
       master <- "databricks"
+    } else if(identical(method, "qubole")) {
+      master <- "yarn-client"
+      spark_home <- "/usr/lib/spark"
     } else {
       master <- spark_config_value(config, "spark.master", NULL)
       if (is.null(master))
@@ -162,7 +165,7 @@ spark_connect <- function(master,
     method <- "gateway"
 
   # spark-shell (local install of spark)
-  if (method == "shell") {
+  if (method == "shell" || method == "qubole") {
     scon <- shell_connection(master = master,
                              spark_home = spark_home,
                              app_name = app_name,
@@ -217,6 +220,8 @@ spark_connect <- function(master,
   # register mapping tables for spark.ml
 
   register_mapping_tables()
+  
+  scon <- initialize_method(structure(scon, class = method), scon)
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
@@ -380,3 +385,10 @@ spark_inspect <- function(jobj) {
   jobj
 }
 
+initialize_method <- function(method, scon) {
+   UseMethod("initialize_method")
+}
+
+initialize_method.default <- function(method, scon) {
+   scon
+}
