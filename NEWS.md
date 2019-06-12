@@ -1,3 +1,9 @@
+# Sparklyr 1.0.1.9000
+
+### Connections
+
+- Support for Qubole connections using `mode = "quobole"` (@vipul1409, #2039).
+
 # Sparklyr 1.0.1
 
 ### ML
