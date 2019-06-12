@@ -221,7 +221,7 @@ spark_connect <- function(master,
 
   register_mapping_tables()
   
-  scon <- initialize_method(structure(method, class = "qubole"), scon)
+  scon <- initialize_method(structure(scon, class = method), scon)
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
