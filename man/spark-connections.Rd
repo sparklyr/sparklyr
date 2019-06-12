@@ -10,7 +10,7 @@
 \title{Manage Spark Connections}
 \usage{
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
-  method = c("shell", "livy", "databricks", "test"),
+  method = c("shell", "livy", "databricks", "test", "qubole"),
   app_name = "sparklyr", version = NULL, config = spark_config(),
   extensions = sparklyr::registered_extensions(), ...)
 
