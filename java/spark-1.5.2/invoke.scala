@@ -65,7 +65,7 @@ class Invoke {
                   !parameterWrapperType.isInstance(args(i))) {
                 argMatched = false
 
-                mismatches = mismatches ++ Array("method instance " + index + " with " + parameterTypes + " parameters for parameter " + i)
+                mismatches = mismatches ++ Array("method instance " + index + " with " + parameterTypes.length + " parameters for parameter " + i)
               }
             }
 
