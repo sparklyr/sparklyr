@@ -4,6 +4,10 @@
 
 - Support for Qubole connections using `mode = "quobole"` (@vipul1409, #2039).
 
+### Extensions
+
+- When `invoke()` fails due to mismatched parameters, warning with info is logged.
+
 # Sparklyr 1.0.1
 
 ### ML

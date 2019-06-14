@@ -10,7 +10,7 @@ targets <- c("1.5.2",
              "2.3.0")
 
 spec <- Filter(
-  function(e) !e$spark_version %in% targets,
+  function(e) e$spark_version %in% targets,
   sparklyr::spark_default_compilation_spec()
 )
 

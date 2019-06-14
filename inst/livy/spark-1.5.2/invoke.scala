@@ -19,8 +19,10 @@ class Invoke {
   // Returns an Option[Int] which is the index of the matched signature in the array.
   def findMatchedSignature(
     parameterTypesOfMethods: Array[Array[Class[_]]],
-    args: Array[Object]): Option[Int] = {
+    args: Array[Object],
+    logger: Logger): Option[Int] = {
       val numArgs = args.length
+      var mismatches = Array("")
 
       for (index <- 0 until parameterTypesOfMethods.length) {
         val parameterTypes = parameterTypesOfMethods(index)
@@ -65,6 +67,8 @@ class Invoke {
               if ((parameterType.isPrimitive || args(i) != null) &&
                   !parameterWrapperType.isInstance(args(i))) {
                 argMatched = false
+
+                mismatches = mismatches ++ Array("method instance " + index + " with " + parameterTypes.length + " parameters for parameter " + i)
               }
             }
 
@@ -111,6 +115,9 @@ class Invoke {
           }
         }
       }
+
+      logger.logWarning(s"Failed to match" + mismatches.mkString(", ") + ".")
+
       None
     }
 
@@ -127,7 +134,8 @@ class Invoke {
     if (selectedMethods.length > 0) {
       val index = findMatchedSignature(
         selectedMethods.map(_.getParameterTypes),
-        args)
+        args,
+        logger)
 
       if (index.isEmpty) {
         logger.logWarning(
@@ -145,7 +153,8 @@ class Invoke {
       val ctors = cls.getConstructors
       val index = findMatchedSignature(
         ctors.map(_.getParameterTypes),
-        args)
+        args,
+        logger)
 
       if (index.isEmpty) {
         logger.logWarning(
