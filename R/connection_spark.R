@@ -218,10 +218,13 @@ spark_connect <- function(master,
   }
 
   # register mapping tables for spark.ml
-
   register_mapping_tables()
-  
+
+  # custom initializers for connection methods
   scon <- initialize_method(structure(scon, class = method), scon)
+
+  # cache spark web
+  scon$state$spark_web <- tryCatch(spark_web(scon), error = function(e) NULL)
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)

@@ -193,6 +193,8 @@ print.spark_log <- function(x, ...) {
 #'
 #' @export
 spark_web <- function(sc, ...) {
+  if (!identical(sc$state, NULL) && !identical(sc$state$spark_web, NULL)) return(sc$state$spark_web)
+
   sparkui_url <- spark_config_value(
     sc$config, c("sparklyr.web.spark", "sparklyr.sparkui.url")
   )
