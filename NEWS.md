@@ -10,6 +10,10 @@
 
 # Sparklyr 1.0.1
 
+### RStudio
+
+- Spark UI path can now be accessed even when the R session and Spark are bussy.
+
 ### ML
 
 - `ml_lda()`: Allow passing of optional arguments via `...` to regex tokenizer, stop words remover, and count vectorizer components in the formula API.
