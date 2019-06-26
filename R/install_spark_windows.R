@@ -24,7 +24,7 @@ verify_msvcr100 <- function() {
     stop("Running Spark on Windows requires the ",
          "Microsoft Visual C++ 2010 SP1 Redistributable Package. ",
          "Please download and install from: \n\n  ", msvcr100Url, "\n\n",
-         "Restart your rsession after installation completes", "\n",
+         "Then restart R after the installation completes", "\n",
          call. = FALSE)
   }
 }
