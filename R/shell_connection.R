@@ -455,7 +455,7 @@ start_shell <- function(master,
 spark_disconnect.spark_shell_connection <- function(sc, ...) {
   clear_jobjs()
 
-  stop_shell(sc, ...)
+  invisible(stop_shell(sc, ...))
 }
 
 # Stop the Spark R Shell
