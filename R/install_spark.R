@@ -253,7 +253,7 @@ spark_install <- function(version = NULL,
   )
 
   if (!is.null(hivePath)) {
-    spark_conf[["spark.sql.warehouse.dir"]] <- paste0("spark.sql.warehouse.dir          ", hivePath)
+    spark_conf[["spark.sql.warehouse.dir"]] <- hivePath
   }
 
   tryCatch({
@@ -393,7 +393,7 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
   lines[[length(lines) + 1]] <- ""
 
   lapply(names(properties), function(property) {
-    value <- properties[[property]]
+    value <- paste0(property, "     ", properties[[property]])
     pattern <- paste(property, ".*", sep = "")
 
     if (length(grep(pattern, lines)) > 0) {
