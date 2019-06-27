@@ -27,6 +27,8 @@ print.spark_stream <- function(x, ...)
       sep = "\n"
     )
   )
+
+  invisible(x)
 }
 
 #' Stops a Spark Stream
