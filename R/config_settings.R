@@ -7,6 +7,7 @@ spark_config_settings <- function() {
   settings <- list(
     sparklyr.apply.packages = "Configures default value for packages parameter in spark_apply().",
     sparklyr.apply.rlang = "Experimental feature. Turns on improved serialization for spark_apply().",
+    sparklyr.apply.serializer = "Configures the version spark_apply() uses to serialize the closure.",
     sparklyr.apply.schema.infer = "Number of rows collected to infer schema when column types specified in spark_apply().",
     sparklyr.arrow = "Use Apache Arrow to serialize data?",
     sparklyr.backend.interval = "Total seconds sparklyr will check on a backend operation.",
