@@ -248,19 +248,23 @@ spark_install <- function(version = NULL,
     })
   }
 
+  spark_conf <- list(
+    "spark.local.dir" = normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "local"), mustWork = FALSE, winslash = "/")
+  )
+
   if (!is.null(hivePath)) {
-    tryCatch({
-      spark_conf_file_set_value(
-        installInfo,
-        list(
-          "spark.sql.warehouse.dir" = paste0("spark.sql.warehouse.dir          ", hivePath)
-        ),
-        reset
-      )
-    }, error = function(e) {
-      warning("Failed to set spark-defaults.conf settings")
-    })
+    spark_conf[["spark.sql.warehouse.dir"]] <- paste0("spark.sql.warehouse.dir          ", hivePath)
   }
+
+  tryCatch({
+    spark_conf_file_set_value(
+      installInfo,
+      spark_conf,
+      reset
+    )
+  }, error = function(e) {
+    warning("Failed to set spark-defaults.conf settings")
+  })
 
   invisible(installInfo)
 }
