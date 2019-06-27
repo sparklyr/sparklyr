@@ -219,7 +219,7 @@ spark_apply <- function(x,
   )
 
   # create closure for the given function
-  closure <- if (is.function(f)) serialize(f, NULL) else f
+  closure <- if (is.function(f)) suppressWarnings(serialize(f, NULL)) else f
   context_serialize <- serialize(context, NULL)
 
   # create rlang closure
