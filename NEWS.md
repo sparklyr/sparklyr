@@ -30,6 +30,8 @@
 
 - Added `ft_one_hot_encoder_estimator()` (#1337).
 
+- `ml_corr()` retrieve a `tibble` for better formatting.
+
 ### Misc
 
 - Added `sdf_crosstab()` to create contingency tables.
