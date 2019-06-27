@@ -248,9 +248,10 @@ spark_install <- function(version = NULL,
     })
   }
 
-  spark_conf <- list(
-    "spark.local.dir" = normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "local"), mustWork = FALSE, winslash = "/")
-  )
+  spark_conf <- list()
+  if (.Platform$OS.type == "windows") {
+    spark_conf[["spark.local.dir"]] <- normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "local"), mustWork = FALSE, winslash = "/")
+  }
 
   if (!is.null(hivePath)) {
     spark_conf[["spark.sql.warehouse.dir"]] <- hivePath
