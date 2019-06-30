@@ -168,3 +168,17 @@ test_that("spark_read_text() can read a whole file", {
     1L
   )
 })
+
+test_that("spark_read_csv() can read with no name", {
+  test_requires("dplyr")
+
+  text_file <- file("test.csv", "w+")
+  cat("a\n1\n2\n3", file = text_file)
+  close(text_file)
+
+  spark_read_csv(sc, "test.csv")
+
+  spark_read_csv(sc, "test", "test.csv")
+
+  spark_read_csv(sc, path = "test.csv")
+})
