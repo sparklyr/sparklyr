@@ -176,9 +176,9 @@ test_that("spark_read_csv() can read with no name", {
   cat("a\n1\n2\n3", file = text_file)
   close(text_file)
 
-  spark_read_csv(sc, "test.csv")
+  expect_equal(colnames(spark_read_csv(sc, "test.csv")), "a")
 
-  spark_read_csv(sc, "test", "test.csv")
+  expect_equal(colnames(spark_read_csv(sc, "test", "test.csv")), "a")
 
-  spark_read_csv(sc, path = "test.csv")
+  expect_equal(colnames(spark_read_csv(sc, path = "test.csv")), "a")
 })
