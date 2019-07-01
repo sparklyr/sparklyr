@@ -66,7 +66,7 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
     invoke("first") %>%
     sapply(invoke, "toArray") %>%
     matrix(nrow = num_features) %>%
-    as.data.frame() %>%
+    dplyr::as_tibble() %>%
     dplyr::rename(!!!rlang::set_names(paste0("V", seq_len(num_features)),
                                       feature_names)
                   )
