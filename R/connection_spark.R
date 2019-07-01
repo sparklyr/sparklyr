@@ -37,7 +37,7 @@ spark_default_app_jar <- function(version) {
 #'   \code{\link{spark_install}}.
 #' @param spark_home The path to a Spark installation. Defaults to the path
 #'   provided by the \code{SPARK_HOME} environment variable. If
-#'   \code{SPARK_HOME} is defined, it will be always be used unless the
+#'   \code{SPARK_HOME} is defined, it will always be used unless the
 #'   \code{version} parameter is specified to force the use of a locally
 #'   installed version.
 #' @param method The method used to connect to Spark. Default connection method
