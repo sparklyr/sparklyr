@@ -50,7 +50,7 @@ summary.ml_model_generalized_linear_regression <- function(object,
   ml_model_print_coefficients_detailed(object)
   print_newline()
 
-  printf("(Dispersion paramter for %s family taken to be %s)\n\n",
+  printf("(Dispersion parameter for %s family taken to be %s)\n\n",
          ml_param(ml_stage(object$pipeline_model, 2), "family"),
          signif(object$summary$dispersion(), digits + 3))
 
