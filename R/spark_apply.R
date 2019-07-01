@@ -160,6 +160,7 @@ spark_apply <- function(x,
   rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
   proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
+  serialize_version <- spark_config_value(sc$config, "sparklyr.apply.serializer", 2)
 
   time_zone <- ""
   records_per_batch <- NULL
@@ -219,7 +220,7 @@ spark_apply <- function(x,
   )
 
   # create closure for the given function
-  closure <- if (is.function(f)) serialize(f, NULL) else f
+  closure <- if (is.function(f)) suppressWarnings(serialize(f, NULL, version = serialize_version)) else f
   context_serialize <- serialize(context, NULL)
 
   # create rlang closure

@@ -14,6 +14,10 @@
 
 - Spark UI path can now be accessed even when the R session and Spark are bussy.
 
+### Distributed
+
+- Configuration setting `sparklyr.apply.serializer` can be used to select serializer version in `spark_apply()`.
+
 ### ML
 
 - `ml_lda()`: Allow passing of optional arguments via `...` to regex tokenizer, stop words remover, and count vectorizer components in the formula API.
