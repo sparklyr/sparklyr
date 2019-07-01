@@ -75,7 +75,7 @@ arrow_copy_to <- function(sc, df, parallelism)
 {
   # replace factors with characters
   if (any(sapply(df, is.factor))) {
-    df <- dplyr::as_data_frame(lapply(df, function(x) if(is.factor(x)) as.character(x) else x))
+    df <- dplyr::as_tibble(lapply(df, function(x) if(is.factor(x)) as.character(x) else x))
   }
 
   # serialize to arrow

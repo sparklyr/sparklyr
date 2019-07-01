@@ -15,7 +15,7 @@ test_that("lead and lag take numeric values for 'n' (#925)", {
       mutate(Numb2 = lead(Cat, 1)) %>%
       collect() %>%
       lapply(function(x) ifelse(is.nan(x), NA, x)) %>%
-      as_data_frame(),
+      as_tibble(),
     example_df %>%
       arrange(ID) %>%
       mutate(Numb1 = lag(Numb, 1)) %>%
