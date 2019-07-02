@@ -70,6 +70,13 @@
 
 - Fix regression in `spark_config_kubernetes()` configuration helper.
 
+### Data
+
+- The `infer_schema` parameter now defaults to `is.null(column)`.
+
+- The `spark_read_()` functions support loading dat with named `path`
+  but no explicit `name`.
+
 # Sparklyr 1.0.0
 
 ### Arrow

@@ -6,12 +6,18 @@ spark_read_compat_param <- function(sc, name, path) {
     stop("The 'path' parameter must be specified.")
   }
   else if (identical(name, path)) {
-    # This is an invalid use case, for 'spark_read_*(cs, "hello")';
+    # This is an invalid use case, for 'spark_read_*(sc, "hello")';
     # however, for convenience and backwards compatibility we allow
     # to use the second parameter as the path.
     c(
       spark_sanitize_names(tools::file_path_sans_ext(basename(name)), sc$config),
       name
+    )
+  }
+  else if (identical(name, NULL)) {
+    c(
+      spark_sanitize_names(tools::file_path_sans_ext(basename(path)), sc$config),
+      path
     )
   }
   else {
