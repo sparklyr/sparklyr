@@ -50,11 +50,11 @@ summary.ml_model_generalized_linear_regression <- function(object,
   ml_model_print_coefficients_detailed(object)
   print_newline()
 
-  printf("(Dispersion paramter for %s family taken to be %s)\n\n",
+  printf("(Dispersion parameter for %s family taken to be %s)\n\n",
          ml_param(ml_stage(object$pipeline_model, 2), "family"),
          signif(object$summary$dispersion(), digits + 3))
 
-  printf("   Null  deviance: %s on %s degress of freedom\n",
+  printf("   Null  deviance: %s on %s degrees of freedom\n",
          signif(object$summary$null_deviance(), digits + 2),
          signif(object$summary$residual_degree_of_freedom_null(), digits))
 

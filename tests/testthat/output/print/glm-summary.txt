@@ -6,8 +6,8 @@ Coefficients:
 (Intercept) Petal_Width 
    1.083558    2.229940 
 
-(Dispersion paramter for gaussian family taken to be 0.2286808)
+(Dispersion parameter for gaussian family taken to be 0.2286808)
 
-   Null  deviance: 464.325 on 149 degress of freedom
+   Null  deviance: 464.325 on 149 degrees of freedom
 Residual deviance: 33.8448 on 148 degrees of freedom
 AIC: 208.35
