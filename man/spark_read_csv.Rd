@@ -5,7 +5,7 @@
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
 spark_read_csv(sc, name = NULL, path = name, header = TRUE,
-  columns = NULL, infer_schema = TRUE, delimiter = ",",
+  columns = NULL, infer_schema = is.null(columns), delimiter = ",",
   quote = "\\"", escape = "\\\\", charset = "UTF-8",
   null_value = NULL, options = list(), repartition = 0,
   memory = TRUE, overwrite = TRUE, ...)
@@ -24,7 +24,7 @@ Defaults to \code{TRUE}.}
 \item{columns}{A vector of column names or a named vector of column types.}
 
 \item{infer_schema}{Boolean; should column types be automatically inferred?
-Requires one extra pass over the data. Defaults to \code{TRUE}.}
+Requires one extra pass over the data. Defaults to \code{is.null(columns)}.}
 
 \item{delimiter}{The character used to delimit each column. Defaults to \samp{','}.}
 
