@@ -79,7 +79,7 @@ The returned Spark connection (`sc`) provides a remote dplyr data source
 to the Spark cluster.
 
 For more information on connecting to remote Spark clusters see the
-[Deployment](http://spark.rstudio.com/deployment.html) section of the
+[Deployment](https://spark.rstudio.com/deployment/) section of the
 sparklyr website.
 
 ## Using dplyr
@@ -184,7 +184,7 @@ batting_tbl %>%
     ## # … with more rows
 
 For additional documentation on using dplyr with Spark see the
-[dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr
+[dplyr](https://spark.rstudio.com/dplyr/) section of the sparklyr
 website.
 
 ## Using SQL
@@ -274,7 +274,7 @@ summary(fit)
 Spark machine learning supports a wide array of algorithms and feature
 transformations and as illustrated above it’s easy to chain these
 functions together with dplyr pipelines. To learn more see the [machine
-learning](mllib.html) section.
+learning](https://spark.rstudio.com/mlib/) section.
 
 ## Reading and Writing Data
 
@@ -316,16 +316,16 @@ spark_apply(iris_tbl, function(data) {
     ## # Source: spark<?> [?? x 4]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1         6.90        5.30         3.20        2.00
-    ##  2         6.70        4.80         3.20        2.00
-    ##  3         6.50        5.00         3.10        2.00
-    ##  4         6.40        4.90         3.30        2.00
-    ##  5         6.80        5.40         3.20        2.00
-    ##  6         7.20        5.70         3.50        2.20
-    ##  7         6.40        5.20         3.20        2.10
-    ##  8         6.80        5.20         3.30        2.00
-    ##  9         6.20        4.70         3.20        2.00
-    ## 10         6.70        4.90         3.30        1.90
+    ##  1         6.59        4.99         2.89        1.69
+    ##  2         6.39        4.49         2.89        1.69
+    ##  3         6.19        4.69         2.79        1.69
+    ##  4         6.09        4.59         2.99        1.69
+    ##  5         6.49        5.09         2.89        1.69
+    ##  6         6.89        5.39         3.19        1.89
+    ##  7         6.09        4.89         2.89        1.79
+    ##  8         6.49        4.89         2.99        1.69
+    ##  9         5.89        4.39         2.89        1.69
+    ## 10         6.39        4.59         2.99        1.59
     ## # … with more rows
 
 You can also group by columns to perform an operation over each group of
@@ -380,7 +380,7 @@ count_lines(sc, tempfile)
     ## [1] 336777
 
 To learn more about creating extensions see the
-[Extensions](http://spark.rstudio.com/extensions.html) section of the
+[Extensions](https://spark.rstudio.com/extensions/) section of the
 sparklyr website.
 
 ## Table Utilities
@@ -411,16 +411,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned shuffle 18
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1860
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1907
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 613
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1626
-    ## 19/02/22 14:13:08 INFO Executor: Finished task 0.0 in stage 70.0 (TID 94). 875 bytes result sent to driver
-    ## 19/02/22 14:13:08 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 94) in 209 ms on localhost (executor driver) (1/1)
-    ## 19/02/22 14:13:08 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool 
-    ## 19/02/22 14:13:08 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.215 s
-    ## 19/02/22 14:13:08 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.220383 s
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2070
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2082
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2096
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2131
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2068
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2112
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2127
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2107
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2059
+    ## 19/07/03 09:30:13 INFO ContextCleaner: Cleaned accumulator 2049
 
 Finally, we disconnect from Spark:
 

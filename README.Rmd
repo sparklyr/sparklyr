@@ -57,7 +57,7 @@ sc <- spark_connect(master = "local")
 
 The returned Spark connection (`sc`) provides a remote dplyr data source to the Spark cluster.
 
-For more information on connecting to remote Spark clusters see the [Deployment](http://spark.rstudio.com/deployment.html) section of the sparklyr website.
+For more information on connecting to remote Spark clusters see the [Deployment](https://spark.rstudio.com/deployment/) section of the sparklyr website.
 
 ## Using dplyr
 
@@ -114,7 +114,7 @@ batting_tbl %>%
   filter(min_rank(desc(H)) <= 2 & H > 0)
 ```
 
-For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
+For additional documentation on using dplyr with Spark see the [dplyr](https://spark.rstudio.com/dplyr/) section of the sparklyr website.
 
 ## Using SQL
 
@@ -154,7 +154,7 @@ For linear regression models produced by Spark, we can use `summary()` to learn 
 summary(fit)
 ```
 
-Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [machine learning](mllib.html) section.
+Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [machine learning](https://spark.rstudio.com/mlib/) section.
 
 ## Reading and Writing Data
 
@@ -222,7 +222,7 @@ count_lines(sc, tempfile)
 ```
 
 
-To learn more about creating extensions see the [Extensions](http://spark.rstudio.com/extensions.html) section of the sparklyr website.
+To learn more about creating extensions see the [Extensions](https://spark.rstudio.com/extensions/) section of the sparklyr website.
 
 
 ## Table Utilities
