@@ -134,11 +134,13 @@ sdf_register.list <- function(x, name = NULL) {
 #' @importFrom dplyr tbl
 sdf_register.spark_jobj <- function(x, name = NULL) {
   name <- name %||% random_string("sparklyr_tmp_")
+  sc <- spark_connection(x)
+
   if (spark_version(sc) < "2.0.0")
     invoke(x, "registerTempTable", name)
   else
     invoke(x, "createOrReplaceTempView", name)
-  sc <- spark_connection(x)
+
   on_connection_updated(sc, name)
   tbl(sc, name)
 }
