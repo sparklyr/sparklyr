@@ -23,18 +23,24 @@ test_that("the implementation of 'filter' functions as expected", {
   test_requires("dplyr")
 
   expect_equal(
+    iris_tbl %>%
+      filter(Sepal_Length == 5.1) %>%
+      filter(Sepal_Width == 3.5) %>%
+      filter(Petal_Length == 1.4) %>%
+      filter(Petal_Width == 0.2) %>%
+      select(Species) %>%
+      collect(),
     iris %>%
-      filter(`Sepal.Length` == 5.1) %>%
-      filter(`Sepal.Width` == 3.5) %>%
-      filter(`Petal.Length` == 1.4) %>%
-      filter(`Petal.Width` == 0.2) %>%
-      select(`Species`),
-    iris %>%
-      filter(`Sepal.Length` == 5.1) %>%
-      filter(`Sepal.Width` == 3.5) %>%
-      filter(`Petal.Length` == 1.4) %>%
-      filter(`Petal.Width` == 0.2) %>%
-      select(`Species`)
+      transmute(Sepal_Length = `Sepal.Length`,
+                Sepal_Width = `Sepal.Width`,
+                Petal_Length = `Petal.Length`,
+                Petal_Width = `Petal.Width`,
+                Species = Species) %>%
+      filter(Sepal_Length == 5.1) %>%
+      filter(Sepal_Width == 3.5) %>%
+      filter(Petal_Length == 1.4) %>%
+      filter(Petal_Width == 0.2) %>%
+      transmute(Species = as.character(Species))
   )
 })
 
@@ -75,7 +81,7 @@ test_that("the implementation of 'left_join' functions as expected", {
 })
 
 test_that("the implementation of 'sample_n' functions as expected", {
-  test_requires("2.0.0", "sample_n() not supported")
+  test_requires_version("2.0.0", "sample_n() not supported")
   test_requires("dplyr")
 
   # As of Spark 2.1.0, sampling functions are not exact.
