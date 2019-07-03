@@ -48,7 +48,10 @@ arrow_read_record_batch <- function(reader) {
 }
 
 arrow_as_tibble <- function(record) {
-  as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
+  if (packageVersion("arrow") <= "0.13")
+    as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
+  else
+    as_tibble <- get("as.data.frame", envir = as.environment(asNamespace("arrow")))
 
   as_tibble(record)
 }
