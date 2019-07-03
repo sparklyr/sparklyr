@@ -11,7 +11,10 @@ spark_partition_register_df <- function(sc, df, name, repartition, memory) {
   }
 
   if (!name %in% dbListTables(sc)) {
-    invoke(df, "registerTempTable", name)
+    if (spark_version(sc) < "2.0.0")
+      invoke(df, "registerTempTable", name)
+    else
+      invoke(df, "createOrReplaceTempView", name)
   }
 
   if (memory) {
