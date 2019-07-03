@@ -139,7 +139,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   hive_type <- tibble::frame_data(
     ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,    ~avalue,
-    "tinyint",       "1",   "integer",       "1",       "raw",       "01",
+    "tinyint",       "1",   "integer",       "1",   "integer",        "1",
     "smallint",      "1",   "integer",       "1",   "integer",        "1",
     "integer",       "1",   "integer",       "1",   "integer",        "1",
     "bigint",        "1",   "numeric",       "1", "integer64",        "1",
@@ -160,6 +160,10 @@ test_that("collect() can retrieve all data types correctly", {
 
   if ("arrow" %in% installed.packages() && packageVersion("arrow") < "0.12.0") {
     hive_type <- hive_type %>% filter(stype != "smallint", stype != "float")
+  }
+
+  if ("arrow" %in% installed.packages() && packageVersion("arrow") <= "0.13.0") {
+    hive_type <- hive_type %>% filter(stype != "tinyint")
   }
 
   spark_query <- hive_type %>%
