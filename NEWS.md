@@ -1,4 +1,4 @@
-# Sparklyr 1.0.1.9000
+# Sparklyr 1.0.2
 
 ### Connections
 
