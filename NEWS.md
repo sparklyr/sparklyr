@@ -8,8 +8,6 @@
 
 - When `invoke()` fails due to mismatched parameters, warning with info is logged.
 
-# Sparklyr 1.0.1
-
 ### RStudio
 
 - Spark UI path can now be accessed even when the R session and Spark are bussy.
@@ -17,6 +15,23 @@
 ### Distributed
 
 - Configuration setting `sparklyr.apply.serializer` can be used to select serializer version in `spark_apply()`.
+
+### ML
+
+- `ml_corr()` retrieve a `tibble` for better formatting.
+
+### Misc
+
+- Support for Spark 2.3.3 and 2.4.3.
+
+### Data
+
+- The `infer_schema` parameter now defaults to `is.null(column)`.
+
+- The `spark_read_()` functions support loading data with named `path`
+  but no explicit `name`.
+
+# Sparklyr 1.0.1
 
 ### ML
 
@@ -34,15 +49,11 @@
 
 - Added `ft_one_hot_encoder_estimator()` (#1337).
 
-- `ml_corr()` retrieve a `tibble` for better formatting.
-
 ### Misc
 
 - Added `sdf_crosstab()` to create contingency tables.
 
 - Fix `tibble::as.tibble()` deprecation warning.
-
-- Support for Spark 2.3.3 and 2.4.3.
 
 ### Connections
 
@@ -69,13 +80,6 @@
 ### Kubernetes
 
 - Fix regression in `spark_config_kubernetes()` configuration helper.
-
-### Data
-
-- The `infer_schema` parameter now defaults to `is.null(column)`.
-
-- The `spark_read_()` functions support loading dat with named `path`
-  but no explicit `name`.
 
 # Sparklyr 1.0.0
 
