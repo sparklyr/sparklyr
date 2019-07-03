@@ -106,7 +106,7 @@ sdf_bind_rows <- function(..., id = NULL) {
     dplyr::slice(1)
 
   schema_complements <- schemas %>%
-    lapply(function(x) dplyr::as_data_frame(master_schema) %>%
+    lapply(function(x) dplyr::as_tibble(master_schema) %>%
              dplyr::select(!! rlang::sym("name")) %>%
              dplyr::setdiff(select(x, !!rlang::sym("name"))) %>%
              dplyr::left_join(master_schema, by = "name"))

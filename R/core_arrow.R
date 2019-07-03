@@ -1,18 +1,23 @@
 arrow_write_record_batch <- function(df) {
+  record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+
   if (packageVersion("arrow") < "0.12") {
-    record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
     write_record_batch <- get("write_record_batch", envir = as.environment(asNamespace("arrow")))
 
     record <- record_batch(df)
     write_record_batch(record, raw())
   }
-  else {
-    record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
+  if (packageVersion("arrow") <= "0.13") {
     record <- record_batch(df)
 
     write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
     write_arrow(record, raw())
+  }
+  else {
+    record <- record_batch(!!!df)
 
+    write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
+    write_arrow(record, raw())
   }
 }
 
@@ -39,7 +44,10 @@ arrow_read_record_batch <- function(reader) {
 }
 
 arrow_as_tibble <- function(record) {
-  as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
+  if (packageVersion("arrow") <= "0.13")
+    as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
+  else
+    as_tibble <- get("as.data.frame", envir = as.environment(asNamespace("arrow")))
 
   as_tibble(record)
 }

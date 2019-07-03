@@ -15,7 +15,7 @@ tidy.ml_model_lda <- function(x,
 
   term <- ml_vocabulary(x)
   topics_matrix <- x$model$topics_matrix() %>%
-    dplyr::as_data_frame()
+    dplyr::as_tibble()
 
   k <- x$model$param_map$k
   names(topics_matrix) <- 0:(k - 1)

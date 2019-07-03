@@ -136,7 +136,7 @@ sdf_collect_data_frame <- function(sdf, collected) {
   # set column names and return dataframe
   colNames <- invoke(sdf, "columns")
   names(fixed) <- as.character(colNames)
-  fixed <- as_data_frame(fixed, stringsAsFactors = FALSE, optional = TRUE)
+  fixed <- as_tibble(fixed, stringsAsFactors = FALSE, optional = TRUE)
 
   # fix booleans
   schema <- sdf_schema(sdf)
@@ -150,7 +150,7 @@ sdf_collect_data_frame <- function(sdf, collected) {
 }
 
 # Read a Spark Dataset into R.
-#' @importFrom dplyr as_data_frame
+#' @importFrom dplyr as_tibble
 sdf_collect_static <- function(object, ...) {
   args <- list(...)
   sc <- spark_connection(object)
