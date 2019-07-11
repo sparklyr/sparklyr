@@ -80,7 +80,7 @@ spark_apply_colum_types <- function(sdf) {
 #' @param columns A vector of column names or a named vector of column types for
 #'   the transformed object. When not specified, a sample of 10 rows is taken to
 #'   infer out the output columns automatically, to avoid this performance penalty,
-#'   specify the the column types. The sample size is confgirable using the
+#'   specify the column types. The sample size is configurable using the
 #'   \code{sparklyr.apply.schema.infer} configuration option.
 #' @param memory Boolean; should the table be cached into memory?
 #' @param group_by Column name used to group by data frame partitions.
