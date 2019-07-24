@@ -30,7 +30,7 @@ spark_config_settings <- function() {
     sparklyr.gateway.address = "The address of the driver machine.",
     sparklyr.gateway.config.retries = "Number of retries to retrieve port and address from config, useful when using functions to query port or address in kubernetes.",
     sparklyr.gateway.interval = "Total of seconds sparkyr will check on a gateway connection.",
-    sparklyr.gateway.port = "The port the sparklyr gateway uses in the driver machine.",
+    sparklyr.gateway.port = "The port the sparklyr gateway uses in the driver machine, defaults to 8880.",
     sparklyr.gateway.remote = "Should the sparklyr gateway allow remote connections? This is required in yarn cluster, etc.",
     sparklyr.gateway.routing = "Should the sparklyr gateway service route to other sessions? Consider disabling in kubernetes.",
     sparklyr.gateway.service = "Should the sparklyr gateway be run as a service without shutting down when the last connection disconnects?",
