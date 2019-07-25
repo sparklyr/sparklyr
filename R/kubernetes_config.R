@@ -11,6 +11,22 @@ spark_config_kubernetes_forward_init <- function(
   )
 }
 
+spark_config_kubernetes_terminal_id <- function() {
+  id <- NULL
+  for (terminal in rstudioapi::terminalList()) {
+    terminal <- rstudioapi::terminalContext(terminal)
+    if (identical(terminal$caption, "spark kubernetes")) {
+      id <- terminal$handle
+    }
+  }
+
+  if (identical(id, NULL)) {
+    id <- rstudioapi::terminalCreate("spark kubernetes")
+  }
+
+  id
+}
+
 spark_config_kubernetes_forward_init_message <- function(
   driver,
   timeout,
@@ -29,18 +45,7 @@ spark_config_kubernetes_forward_init_terminal <- function(
 ) {
   Sys.sleep(timeout)
 
-  id <- NULL
-  for (terminal in rstudioapi::terminalList()) {
-    terminal <- rstudioapi::terminalContext(terminal)
-    if (identical(terminal$caption, "spark kubernetes")) {
-      id <- terminal$handle
-    }
-  }
-
-  if (identical(id, NULL)) {
-    id <- rstudioapi::terminalCreate("spark kubernetes")
-  }
-
+  id <- spark_config_kubernetes_terminal_id()
   command <- paste("kubectl port-forward", driver, paste(ports, collapse = " "))
 
   rstudioapi::terminalSend(id, command)
@@ -51,7 +56,13 @@ spark_config_kubernetes_forward_cleanup <- function(
   driver
 ) {
   if (identical(.Platform$OS.type, "windows")) {
-    system2("taskkill", c("/F", "/IM", "kubectl.exe"))
+    if (rstudioapi::hasFun("terminalKill")) {
+      id <- spark_config_kubernetes_terminal_id
+      rstudioapi::terminalKill(id)
+    }
+    else {
+      message("Disconnected, please terminate 'kubectl port-forward'")
+    }
   }
   else {
     system2("pkill", "kubectl")
