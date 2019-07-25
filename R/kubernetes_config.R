@@ -17,7 +17,7 @@ spark_config_kubernetes_forward_init_message <- function(
   ports
 ) {
   message("Please enable port forwarding from your terminal:")
-  message(paste0("kubectl port-forward", driver, paste(ports, collapse = " ")))
+  message(paste("kubectl port-forward", driver, paste(ports, collapse = " ")))
 
   Sys.sleep(timeout)
 }
@@ -41,7 +41,7 @@ spark_config_kubernetes_forward_init_terminal <- function(
     id <- rstudioapi::terminalCreate("spark kubernetes")
   }
 
-  command <- paste0("kubectl port-forward", driver, paste(ports, collapse = " "))
+  command <- paste("kubectl port-forward", driver, paste(ports, collapse = " "))
 
   rstudioapi::terminalSend(id, command)
 }
