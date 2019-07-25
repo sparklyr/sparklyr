@@ -95,6 +95,7 @@ spark_config_kubernetes_forward_cleanup <- function(
 #' @param conf A named list of additional entries to add to \code{sparklyr.shell.conf}.
 #' @param timeout Total seconds to wait before giving up on connection.
 #' @param ports Ports to forward using kubectl.
+#' @param fix_config Should the spark-defaults.conf get fixed? \code{TRUE} for Windows.
 #' @param ... Additional parameters, currently not in use.
 #'
 #' @export
@@ -110,6 +111,7 @@ spark_config_kubernetes <- function(
   conf = NULL,
   timeout = 120,
   ports = c(8880, 8881, 4040),
+  fix_config = identical(.Platform$OS.type, "windows"),
   ...
 ) {
   args <- list(...)
@@ -126,6 +128,14 @@ spark_config_kubernetes <- function(
       jars,
       basename(spark_default_app_jar(version))
     )
+  }
+
+  if (fix_config) {
+    defaults <- file.path(spark_install_find("2.4")$sparkConfDir, "spark-defaults.conf")
+    lines <- readLines(defaults)
+    lines <- gsub("^spark.local.dir", "# spark.local.dir", lines)
+    lines <- gsub("^spark.sql.warehouse.dir", "# spark.sql.warehouse.dir", lines)
+    writeLines(lines, defaults)
   }
 
   if (forward) {
@@ -157,8 +167,6 @@ spark_config_kubernetes <- function(
       paste("spark.kubernetes.container.image", image, sep = "="),
       paste("spark.kubernetes.driver.pod.name", driver, sep = "="),
       paste("spark.kubernetes.authenticate.driver.serviceAccountName", account, sep = "="),
-      paste("spark.local.dir" = "/tmp"),
-      paste("spark.sql.warehouse.dir" = "/tmp"),
       if (!identical(executors, NULL)) paste("spark.executor.instances", executors, sep = "=") else NULL,
       if (!identical(conf, NULL)) paste(names(conf), conf, sep = "=") else NULL
     ),
