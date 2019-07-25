@@ -131,7 +131,7 @@ spark_config_kubernetes <- function(
   }
 
   if (fix_config) {
-    defaults <- file.path(spark_install_find("2.4")$sparkConfDir, "spark-defaults.conf")
+    defaults <- file.path(spark_install_find(version)$sparkConfDir, "spark-defaults.conf")
     lines <- readLines(defaults)
     lines <- gsub("^spark.local.dir", "# spark.local.dir", lines)
     lines <- gsub("^spark.sql.warehouse.dir", "# spark.sql.warehouse.dir", lines)
