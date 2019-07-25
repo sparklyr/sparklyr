@@ -24,7 +24,7 @@ spark_apply(x, f, columns = NULL, memory = !is.null(name),
 \item{columns}{A vector of column names or a named vector of column types for
 the transformed object. When not specified, a sample of 10 rows is taken to
 infer out the output columns automatically, to avoid this performance penalty,
-specify the the column types. The sample size is confgirable using the
+specify the column types. The sample size is configurable using the
 \code{sparklyr.apply.schema.infer} configuration option.}
 
 \item{memory}{Boolean; should the table be cached into memory?}

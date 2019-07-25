@@ -7,7 +7,8 @@
 spark_config_kubernetes(master, version = "2.3.2",
   image = "spark:sparklyr", driver = random_string("sparklyr-"),
   account = "spark", jars = "local:///opt/sparklyr", forward = TRUE,
-  executors = NULL, conf = NULL, ...)
+  executors = NULL, conf = NULL, timeout = 120, ports = c(8880,
+  8881, 4040), fix_config = identical(.Platform$OS.type, "windows"), ...)
 }
 \arguments{
 \item{master}{Kubernetes url to connect to, found by running \code{kubectl cluster-info}.}
@@ -37,6 +38,12 @@ on disconnection.}
 \item{executors}{Number of executors to request while connecting.}
 
 \item{conf}{A named list of additional entries to add to \code{sparklyr.shell.conf}.}
+
+\item{timeout}{Total seconds to wait before giving up on connection.}
+
+\item{ports}{Ports to forward using kubectl.}
+
+\item{fix_config}{Should the spark-defaults.conf get fixed? \code{TRUE} for Windows.}
 
 \item{...}{Additional parameters, currently not in use.}
 }
