@@ -1,8 +1,9 @@
 spark_config_kubernetes_forward_init <- function(
   driver,
-  ports = c("8880:8880", "8881:8881", "4040:4040")
+  timeout,
+  ports
 ) {
-  Sys.sleep(15)
+  Sys.sleep(timeout)
   system2(
     "kubectl",
     c("port-forward", driver, ports),
@@ -10,10 +11,51 @@ spark_config_kubernetes_forward_init <- function(
   )
 }
 
+spark_config_kubernetes_forward_init_message <- function(
+  driver,
+  timeout,
+  ports
+) {
+  message("Please enable port forwarding from your terminal:")
+  message(paste0("kubectl port-forward", driver, paste(ports, collapse = " ")))
+
+  Sys.sleep(timeout)
+}
+
+spark_config_kubernetes_forward_init_terminal <- function(
+  driver,
+  timeout,
+  ports
+) {
+  Sys.sleep(timeout)
+
+  id <- NULL
+  for (terminal in rstudioapi::terminalList()) {
+    terminal <- rstudioapi::terminalContext(terminal)
+    if (identical(terminal$caption, "spark kubernetes")) {
+      id <- terminal$handle
+    }
+  }
+
+  if (identical(id, NULL)) {
+    id <- rstudioapi::terminalCreate("spark kubernetes")
+  }
+
+  command <- paste0("kubectl port-forward", driver, paste(ports, collapse = " "))
+
+  rstudioapi::terminalSend(id, command)
+}
+
+
 spark_config_kubernetes_forward_cleanup <- function(
   driver
 ) {
-  system2("pkill", "kubectl")
+  if (identical(.Platform$OS.type, "windows")) {
+    system2("taskkill", c("/F", "/IM", "kubectl.exe"))
+  }
+  else {
+    system2("pkill", "kubectl")
+  }
 }
 
 #' Kubernetes Configuration
@@ -41,6 +83,8 @@ spark_config_kubernetes_forward_cleanup <- function(
 #'   on disconnection.
 #' @param executors Number of executors to request while connecting.
 #' @param conf A named list of additional entries to add to \code{sparklyr.shell.conf}.
+#' @param timeout Total seconds to wait before giving up on connection.
+#' @param ports Ports to forward in kuberenetes.
 #' @param ... Additional parameters, currently not in use.
 #'
 #' @export
@@ -54,6 +98,8 @@ spark_config_kubernetes <- function(
   forward = TRUE,
   executors = NULL,
   conf = NULL,
+  timeout = 120,
+  ports = c(8880, 8881, 4040),
   ...
 ) {
   args <- list(...)
@@ -73,7 +119,18 @@ spark_config_kubernetes <- function(
   }
 
   if (forward) {
-    submit_function <- function() spark_config_kubernetes_forward_init(driver)
+    ports <- paste(ports, ports, sep = ":")
+    if (identical(.Platform$OS.type, "windows")) {
+      if (rstudioapi::hasFun("terminalCreate")) {
+        submit_function <- function() spark_config_kubernetes_forward_init_terminal(driver, timeout / 2, ports)
+      }
+      else {
+        submit_function <- function() spark_config_kubernetes_forward_init_message(driver, timeout / 2, ports)
+      }
+    }
+    else {
+      submit_function <- function() spark_config_kubernetes_forward_init(driver, timeout / 2, ports)
+    }
     disconnect_function <- function() spark_config_kubernetes_forward_cleanup(driver)
   }
 
@@ -81,9 +138,11 @@ spark_config_kubernetes <- function(
     spark.master = master,
     sparklyr.shell.master = master,
     "sparklyr.shell.deploy-mode" = "cluster",
+    sparklyr.backend.timeout = 180,
     sparklyr.gateway.remote = TRUE,
     sparklyr.shell.name = "sparklyr",
     sparklyr.shell.class = "sparklyr.Shell",
+    sparklyr.connect.timeout = timeout,
     sparklyr.shell.conf = c(
       paste("spark.kubernetes.container.image", image, sep = "="),
       paste("spark.kubernetes.driver.pod.name", driver, sep = "="),

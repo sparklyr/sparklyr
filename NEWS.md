@@ -31,6 +31,10 @@
 - The `spark_read_()` functions support loading data with named `path`
   but no explicit `name`.
 
+### Kuberenetes
+
+- Support for port forwarding in Windows using RStudio terminal.
+
 # Sparklyr 1.0.1
 
 ### ML
