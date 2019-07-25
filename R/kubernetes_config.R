@@ -157,6 +157,8 @@ spark_config_kubernetes <- function(
       paste("spark.kubernetes.container.image", image, sep = "="),
       paste("spark.kubernetes.driver.pod.name", driver, sep = "="),
       paste("spark.kubernetes.authenticate.driver.serviceAccountName", account, sep = "="),
+      paste("spark.local.dir" = "/tmp"),
+      paste("spark.sql.warehouse.dir" = "/tmp"),
       if (!identical(executors, NULL)) paste("spark.executor.instances", executors, sep = "=") else NULL,
       if (!identical(conf, NULL)) paste(names(conf), conf, sep = "=") else NULL
     ),
