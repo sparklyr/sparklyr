@@ -46,18 +46,17 @@ spark_config_kubernetes_forward_init_terminal <- function(
   Sys.sleep(timeout)
 
   id <- spark_config_kubernetes_terminal_id()
-  command <- paste("kubectl port-forward", driver, paste(ports, collapse = " "))
+  command <- paste("kubectl port-forward", driver, paste(ports, collapse = " "), "\r\n")
 
   rstudioapi::terminalSend(id, command)
 }
-
 
 spark_config_kubernetes_forward_cleanup <- function(
   driver
 ) {
   if (identical(.Platform$OS.type, "windows")) {
     if (rstudioapi::hasFun("terminalKill")) {
-      id <- spark_config_kubernetes_terminal_id
+      id <- spark_config_kubernetes_terminal_id()
       rstudioapi::terminalKill(id)
     }
     else {
