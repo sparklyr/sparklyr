@@ -158,7 +158,6 @@ spark_config_kubernetes <- function(
     spark.master = master,
     sparklyr.shell.master = master,
     "sparklyr.shell.deploy-mode" = "cluster",
-    sparklyr.backend.timeout = 180,
     sparklyr.gateway.remote = TRUE,
     sparklyr.shell.name = "sparklyr",
     sparklyr.shell.class = "sparklyr.Shell",

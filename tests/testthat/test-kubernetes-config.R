@@ -10,6 +10,8 @@ test_that("spark_kubernetes_config can generate correct config", {
       sparklyr.gateway.remote = TRUE,
       sparklyr.shell.name = "sparklyr",
       sparklyr.shell.class = "sparklyr.Shell",
+      sparklyr.connect.timeout = 120,
+      sparklyr.web.spark = "http://localhost:4040",
       sparklyr.shell.conf = c(
         "spark.kubernetes.container.image=spark:sparklyr",
         "spark.kubernetes.driver.pod.name=spark-driver",
