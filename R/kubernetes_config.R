@@ -84,7 +84,7 @@ spark_config_kubernetes_forward_cleanup <- function(
 #' @param executors Number of executors to request while connecting.
 #' @param conf A named list of additional entries to add to \code{sparklyr.shell.conf}.
 #' @param timeout Total seconds to wait before giving up on connection.
-#' @param ports Ports to forward in kuberenetes.
+#' @param ports Ports to forward using kubectl.
 #' @param ... Additional parameters, currently not in use.
 #'
 #' @export
