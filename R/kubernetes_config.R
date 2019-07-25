@@ -163,6 +163,7 @@ spark_config_kubernetes <- function(
     sparklyr.shell.name = "sparklyr",
     sparklyr.shell.class = "sparklyr.Shell",
     sparklyr.connect.timeout = timeout,
+    sparklyr.web.spark = "http://localhost:4040",
     sparklyr.shell.conf = c(
       paste("spark.kubernetes.container.image", image, sep = "="),
       paste("spark.kubernetes.driver.pod.name", driver, sep = "="),
