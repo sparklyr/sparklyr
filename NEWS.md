@@ -1,4 +1,14 @@
-# Sparklyr 1.0.1.9000
+# Sparklyr 1.0.2.9000
+
+### Kuberenetes
+
+- Support for port forwarding in Windows using RStudio terminal.
+
+### dplyr
+
+- Fix support for `compute()` in Spark 1.6 (#2099)
+
+# Sparklyr 1.0.2
 
 ### Connections
 
@@ -30,10 +40,6 @@
 
 - The `spark_read_()` functions support loading data with named `path`
   but no explicit `name`.
-
-### Kuberenetes
-
-- Support for port forwarding in Windows using RStudio terminal.
 
 # Sparklyr 1.0.1
 
