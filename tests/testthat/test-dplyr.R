@@ -130,3 +130,11 @@ test_that("'sdf_broadcast' forces broadcast hash join", {
     invoke("toString")
   expect_match(query_plan, "B|broadcast")
 })
+
+test_that("can compute() over tables", {
+  test_requires("dplyr")
+
+  iris_tbl %>% compute()
+
+  succeed()
+})

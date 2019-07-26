@@ -141,6 +141,8 @@ db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...
 #' @importFrom dbplyr build_sql
 #' @importFrom DBI dbExecute
 db_analyze.spark_connection <- function(con, table, ...) {
+  if (spark_version(con) < "2.0.0") return(NULL)
+
   info <- dbGetQuery(con, build_sql("SHOW TABLES LIKE", table, con = con))
   if (nrow(info) > 0 && identical(info$isTemporary, FALSE)) {
     dbExecute(con, build_sql("ANALYZE TABLE", table, "COMPUTE STATISTICS", con = con))
