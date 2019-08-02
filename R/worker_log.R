@@ -6,7 +6,7 @@ worker_log_session <- function(sessionId) {
   assign('sessionId', sessionId, envir = worker_log_env)
 }
 
-worker_log_format <- function(message, level = "INFO", component = "RScript") {
+worker_log_format <- function(message, session, level = "INFO", component = "RScript") {
   paste(
     format(Sys.time(), "%y/%m/%d %H:%M:%S"),
     " ",
@@ -14,18 +14,24 @@ worker_log_format <- function(message, level = "INFO", component = "RScript") {
     " sparklyr: ",
     component,
     " (",
-    worker_log_env$sessionId,
+    session,
     ") ",
     message,
     sep = "")
 }
 
-worker_log_level <- function(..., level) {
-  if (is.null(worker_log_env$sessionId)) return()
+worker_log_level <- function(..., level, component = "RScript") {
+  if (is.null(worker_log_env$sessionId)) {
+    worker_log_env <- get0("worker_log_env", envir = .GlobalEnv)
+    if (is.null(worker_log_env$sessionId)) {
+      return()
+    }
+  }
 
   args = list(...)
   message <- paste(args, sep = "", collapse = "")
-  formatted <- worker_log_format(message, level)
+  formatted <- worker_log_format(message, worker_log_env$sessionId,
+                                 level = level, component = component)
   cat(formatted, "\n")
 }
 
