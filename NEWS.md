@@ -26,6 +26,8 @@
 
 - Configuration setting `sparklyr.apply.serializer` can be used to select serializer version in `spark_apply()`.
 
+- Fix for `spark_apply_log()` and use `RClosure` as logging component.
+
 ### ML
 
 - `ml_corr()` retrieve a `tibble` for better formatting.

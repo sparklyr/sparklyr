@@ -419,5 +419,5 @@ spark_apply_rlang_serialize <- function() {
 #'
 #' @export
 spark_apply_log <- function(..., level = "INFO") {
-  worker_log_level(..., level = level, component = "Closure")
+  worker_log_level(..., level = level, component = "RClosure")
 }
