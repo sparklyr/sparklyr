@@ -135,7 +135,7 @@ test_that("collect() can retrieve all data types correctly", {
   rtime <- "2010-01-01 01:01:10"
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
-  arrow_compat <- using_arrow() && packageVersion("arrow") < "0.14.0"
+  arrow_compat <- using_arrow()
 
   hive_type <- tibble::frame_data(
     ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,    ~avalue,
