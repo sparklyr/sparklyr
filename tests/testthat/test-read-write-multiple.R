@@ -4,6 +4,7 @@ sc <- testthat_spark_connection()
 
 test_readwrite <- function(sc, writer, reader, name = "testtable", ...) {
   path <- file.path(dirname(sc$output_file), c("batch_1", "batch_2"))
+  path_glob <- file.path(dirname(sc$output_file), "batch*")
   on.exit(unlink(path, recursive = TRUE, force = TRUE), add = TRUE)
 
   writer(sdf_copy_to(sc, data.frame(line = as.character(1L:3L))), path[1L])
@@ -13,16 +14,19 @@ test_readwrite <- function(sc, writer, reader, name = "testtable", ...) {
     res_1 <- reader(sc, name, path[1L], ...) %>% collect() %>% pull(contents) %>% strsplit("\n") %>% unlist() %>% sort()
     res_2 <- reader(sc, name, path[2L], ...) %>% collect() %>% pull(contents) %>% strsplit("\n") %>% unlist() %>% sort()
     res_3 <- reader(sc, name, path, ...) %>% collect() %>% pull(contents) %>% strsplit("\n") %>% unlist() %>% sort()
+    res_4 <- reader(sc, name, path_glob, ...) %>% collect() %>% pull(contents) %>% strsplit("\n") %>% unlist() %>% sort()
   } else {
     res_1 <- reader(sc, name, path[1L], ...) %>% collect() %>% pull(line) %>% sort()
     res_2 <- reader(sc, name, path[2L], ...) %>% collect() %>% pull(line) %>% sort()
     res_3 <- reader(sc, name, path, ...) %>% collect() %>% pull(line) %>% sort()
+    res_4 <- reader(sc, name, path_glob, ...) %>% collect() %>% pull(line) %>% sort()
   }
 
   list(
     all(res_1 == as.character(1:3)),
     all(res_2 == as.character(4:6)),
-    all(res_3 == as.character(1:6))
+    all(res_3 == as.character(1:6)),
+    all(res_4 == as.character(1:6))
   )
 }
 
@@ -30,7 +34,7 @@ test_that(
   "spark_read_parquet() reads multiple parquet files",
     expect_equal(
       test_readwrite(sc = sc, writer = spark_write_parquet, reader = spark_read_parquet),
-      list(TRUE, TRUE, TRUE)
+      list(TRUE, TRUE, TRUE, TRUE)
     )
 )
 
@@ -38,7 +42,7 @@ test_that(
   "spark_read_orc() reads multiple orc files",
   expect_equal(
     test_readwrite(sc = sc, writer = spark_write_orc, reader = spark_read_orc),
-    list(TRUE, TRUE, TRUE)
+    list(TRUE, TRUE, TRUE, TRUE)
   )
 )
 
@@ -46,7 +50,7 @@ test_that(
   "spark_read_json() reads multiple json files",
     expect_equal(
       test_readwrite(sc = sc, writer = spark_write_json, reader = spark_read_json),
-      list(TRUE, TRUE, TRUE)
+      list(TRUE, TRUE, TRUE, TRUE)
     )
 )
 
@@ -54,7 +58,7 @@ test_that(
   "spark_read_text() reads multiple text files",
   expect_equal(
       test_readwrite(sc = sc, writer = spark_write_text, reader = spark_read_text),
-      list(TRUE, TRUE, TRUE)
+      list(TRUE, TRUE, TRUE, TRUE)
     )
 )
 
