@@ -244,7 +244,7 @@ spark_read_parquet <- function(sc,
   path <- params[-1L]
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, lapply(path, spark_normalize_path), "parquet", options, columns, schema)
+  df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "parquet", options, columns, schema)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -328,7 +328,7 @@ spark_read_json <- function(sc,
   path <- params[-1L]
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, lapply(path, spark_normalize_path), "json", options, columns)
+  df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "json", options, columns)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -803,7 +803,7 @@ spark_read_text <- function(sc,
     df <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   }
   else {
-    df <- spark_data_read_generic(sc, lapply(path, spark_normalize_path), "text", options, columns)
+    df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "text", options, columns)
   }
 
   spark_partition_register_df(sc, df, name, repartition, memory)
@@ -880,7 +880,7 @@ spark_read_orc <- function(sc,
   path <- params[-1L]
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, lapply(path, spark_normalize_path), "orc", options, columns, schema)
+  df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "orc", options, columns, schema)
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 

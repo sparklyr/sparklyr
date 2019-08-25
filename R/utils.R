@@ -148,7 +148,7 @@ spark_sanitize_names <- function(names, config) {
 # that this will take care of path.expand ("~") as well as converting
 # relative paths to absolute (necessary since the path will be read by
 # another process that has a different current working directory)
-spark_normalize_path <- function(path) {
+spark_normalize_single_path <- function(path) {
   # don't normalize paths that are urls
   if (grepl("[a-zA-Z]+://", path)) {
     path
@@ -156,6 +156,10 @@ spark_normalize_path <- function(path) {
   else {
     normalizePath(path, mustWork = FALSE)
   }
+}
+
+spark_normalize_path <- function(paths) {
+  unname(sapply(paths, spark_normalize_single_path))
 }
 
 stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
