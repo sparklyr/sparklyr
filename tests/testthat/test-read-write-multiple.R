@@ -39,11 +39,13 @@ test_that(
 )
 
 test_that(
-  "spark_read_orc() reads multiple orc files",
-  expect_equal(
-    test_readwrite(sc = sc, writer = spark_write_orc, reader = spark_read_orc),
-    list(TRUE, TRUE, TRUE, TRUE)
-  )
+  "spark_read_orc() reads multiple orc files", {
+    test_requires_version("2.0.0")
+    expect_equal(
+      test_readwrite(sc = sc, writer = spark_write_orc, reader = spark_read_orc),
+      list(TRUE, TRUE, TRUE, TRUE)
+    )
+  }
 )
 
 test_that(

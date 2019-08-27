@@ -878,6 +878,11 @@ spark_read_orc <- function(sc,
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
   path <- params[-1L]
+
+  if (length(path) != 1L && (spark_version(sc) < "2.0.0")) {
+    stop("spark_read_orc is only suppored with path of length 1 for spark versions < 2.0.0")
+  }
+
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "orc", options, columns, schema)
