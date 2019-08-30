@@ -38,6 +38,8 @@
 
 ### Data
 
+- The `spark_read_()` functions now support multiple parameters (@jozefhajnala, #2118).
+
 - The `infer_schema` parameter now defaults to `is.null(column)`.
 
 - The `spark_read_()` functions support loading data with named `path`
