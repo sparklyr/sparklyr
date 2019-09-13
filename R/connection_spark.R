@@ -183,6 +183,9 @@ spark_connect <- function(master,
                                spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions,
                              batch = NULL)
+    if (method == "qubole") {
+      scon$method <- "qubole"
+    }
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
                             config = config,
