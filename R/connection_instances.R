@@ -9,8 +9,6 @@ spark_connection_instances <- function() {
 }
 
 spark_connections_add <- function(sc) {
-  print("Connection getting added to instances")
-  print(sc$method)
   instances <- spark_connection_instances()
   instances[[length(instances) + 1]] <- sc
   sparkConnectionsEnv$instances <- instances
