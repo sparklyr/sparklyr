@@ -184,7 +184,7 @@ spark_connect <- function(master,
                              extensions = extensions,
                              batch = NULL)
     if (method == "qubole") {
-      scon$master <- "qubole"
+      scon$method <- "qubole"
     }
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
