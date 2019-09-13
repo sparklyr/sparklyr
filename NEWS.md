@@ -1,4 +1,4 @@
-# Sparklyr 1.0.2.9000
+# Sparklyr 1.0.3
 
 ### Kuberenetes
 
