@@ -8,6 +8,14 @@
 
 - Fix support for `compute()` in Spark 1.6 (#2099)
 
+### Data
+
+- The `spark_read_()` functions now support multiple parameters (@jozefhajnala, #2118).
+
+### Connections
+
+- Fix for Qubole connections for single user and multiple sessions (@vipul1409, #2128).
+
 # Sparklyr 1.0.2
 
 ### Connections
@@ -37,8 +45,6 @@
 - Support for Spark 2.3.3 and 2.4.3.
 
 ### Data
-
-- The `spark_read_()` functions now support multiple parameters (@jozefhajnala, #2118).
 
 - The `infer_schema` parameter now defaults to `is.null(column)`.
 
