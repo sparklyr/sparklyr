@@ -27,6 +27,10 @@ arrow_record_stream_reader <- function(stream) {
   }
   else {
     record_batch_stream_reader <- get("RecordBatchStreamReader", envir = as.environment(asNamespace("arrow")))
+    if (inherits(record_batch_stream_reader, "R6ClassGenerator")) {
+      # Before, RecordBatchStreamReader was the constructor, now it's $create()
+      record_batch_stream_reader <- record_batch_stream_reader$create
+    }
   }
 
   record_batch_stream_reader(stream)
