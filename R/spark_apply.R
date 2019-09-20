@@ -159,7 +159,7 @@ spark_apply <- function(x,
 
   rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
-  proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
+  proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env, list(ARROW_PRE_0_15_IPC_FORMAT=1))
   serialize_version <- spark_config_value(sc$config, "sparklyr.apply.serializer", 2)
 
   time_zone <- ""
