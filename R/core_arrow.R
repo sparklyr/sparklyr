@@ -21,7 +21,7 @@ arrow_write_record_batch <- function(df) {
       environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
     }
 
-    withr::with_environment(list(environment), {
+    withr::with_environment(environment, {
       record <- record_batch(!!!df)
 
       write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
