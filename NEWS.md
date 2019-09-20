@@ -2,7 +2,7 @@
 
 ### Arrow
 
-- Support for Apache Arrow 0.14 (@nealrichardson, #2132).
+- Support for Apache Arrow 0.15 (@nealrichardson, #2132).
 
 # Sparklyr 1.0.3
 

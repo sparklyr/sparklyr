@@ -77,7 +77,6 @@ matrix:
         - ARROW_SOURCE="build"
         - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
         - LD_LIBRARY_PATH="/usr/local/lib"
-        - ARROW_PRE_0_15_IPC_FORMAT=1
       addons:
         apt:
           packages:
