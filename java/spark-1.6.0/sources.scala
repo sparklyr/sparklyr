@@ -2,6 +2,8 @@ package sparklyr
 
 class Sources {
   def sources: String = """
+# Changing this file requires running configure.R to rebuils sources and jars.
+
 arrow_write_record_batch <- function(df) {
   record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
 
