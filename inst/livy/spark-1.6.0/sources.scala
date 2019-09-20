@@ -1635,7 +1635,7 @@ worker_log_format <- function(message, session, level = "INFO", component = "RSc
     sep = "")
 }
 
-worker_log_level <- function(..., level, closure = "RScript") {
+worker_log_level <- function(..., level, component = "RScript") {
   if (is.null(worker_log_env$sessionId)) {
     worker_log_env <- get0("worker_log_env", envir = .GlobalEnv)
     if (is.null(worker_log_env$sessionId)) {
@@ -1645,7 +1645,8 @@ worker_log_level <- function(..., level, closure = "RScript") {
 
   args = list(...)
   message <- paste(args, sep = "", collapse = "")
-  formatted <- worker_log_format(message, worker_log_env$sessionId, level)
+  formatted <- worker_log_format(message, worker_log_env$sessionId,
+                                 level = level, component = component)
   cat(formatted, "\n")
 }
 
