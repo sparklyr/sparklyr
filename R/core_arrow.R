@@ -17,11 +17,11 @@ arrow_write_record_batch <- function(df) {
   }
   else {
     environment <- list()
-    if (packageVersion("arrow") >= "0.15") {
+    if (packageVersion("arrow") > "0.14") {
       environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
     }
 
-    withr::with_environment(environment, {
+    withr::with_envvar(environment, {
       record <- record_batch(!!!df)
 
       write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
@@ -40,11 +40,11 @@ arrow_record_stream_reader <- function(stream) {
     record_batch_stream_reader <- get("RecordBatchStreamReader", envir = as.environment(asNamespace("arrow")))
   }
 
-  if (packageVersion("arrow") >= "0.15") {
+  if (packageVersion("arrow") > "0.14") {
     environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
   }
 
-  withr::with_environment(environment, {
+  withr::with_envvar(environment, {
     record_batch_stream_reader(stream)
   })
 }
@@ -59,11 +59,11 @@ arrow_read_record_batch <- function(reader) {
     read_record_batch <- function(reader) reader$read_next_batch()
   }
 
-  if (packageVersion("arrow") >= "0.15") {
+  if (packageVersion("arrow") > "0.14") {
     environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
   }
 
-  withr::with_environment(environment, {
+  withr::with_envvar(environment, {
     read_record_batch(reader)
   })
 }
@@ -77,11 +77,11 @@ arrow_as_tibble <- function(record) {
     as_tibble <- get("as.data.frame", envir = as.environment(asNamespace("arrow")))
   }
 
-  if (packageVersion("arrow") >= "0.15") {
+  if (packageVersion("arrow") > "0.14") {
     environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
   }
 
-  withr::with_environment(environment, {
+  withr::with_envvar(environment, {
     as_tibble(record)
   })
 }
