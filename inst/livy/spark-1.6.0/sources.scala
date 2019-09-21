@@ -48,6 +48,7 @@ arrow_record_stream_reader <- function(stream) {
   }
 
   if (packageVersion("arrow") > "0.14") {
+    record_batch_stream_reader <- record_batch_stream_reader$create
     environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
   }
 
