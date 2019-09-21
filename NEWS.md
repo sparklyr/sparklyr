@@ -1,3 +1,9 @@
+# Sparklyr 1.0.3.9999
+
+### Arrow
+
+- Support for Apache Arrow 0.15 (@nealrichardson, #2132).
+
 # Sparklyr 1.0.3
 
 ### Kuberenetes

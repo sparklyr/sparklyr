@@ -5,6 +5,8 @@
 
 class Sources {
   def sources: String = """
+# Changing this file requires running configure.R to rebuild sources and jars.
+
 arrow_write_record_batch <- function(df) {
   record_batch <- get("record_batch", envir = as.environment(asNamespace("arrow")))
 
@@ -14,21 +16,30 @@ arrow_write_record_batch <- function(df) {
     record <- record_batch(df)
     write_record_batch(record, raw())
   }
-  if (packageVersion("arrow") <= "0.13") {
+  else if (packageVersion("arrow") <= "0.13") {
     record <- record_batch(df)
 
     write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
     write_arrow(record, raw())
   }
   else {
-    record <- record_batch(!!!df)
+    environment <- list()
+    if (packageVersion("arrow") > "0.14") {
+      environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
+    }
 
-    write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
-    write_arrow(record, raw())
+    withr::with_envvar(environment, {
+      record <- record_batch(!!!df)
+
+      write_arrow <- get("write_arrow", envir = as.environment(asNamespace("arrow")))
+      write_arrow(record, raw())
+    })
   }
 }
 
 arrow_record_stream_reader <- function(stream) {
+  environment <- list()
+
   if (packageVersion("arrow") < "0.12") {
     record_batch_stream_reader <- get("record_batch_stream_reader", envir = as.environment(asNamespace("arrow")))
   }
@@ -36,10 +47,19 @@ arrow_record_stream_reader <- function(stream) {
     record_batch_stream_reader <- get("RecordBatchStreamReader", envir = as.environment(asNamespace("arrow")))
   }
 
-  record_batch_stream_reader(stream)
+  if (packageVersion("arrow") > "0.14") {
+    record_batch_stream_reader <- record_batch_stream_reader$create
+    environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
+  }
+
+  withr::with_envvar(environment, {
+    record_batch_stream_reader(stream)
+  })
 }
 
 arrow_read_record_batch <- function(reader) {
+  environment <- list()
+
   if (packageVersion("arrow") < "0.12") {
     read_record_batch <- get("read_record_batch", envir = as.environment(asNamespace("arrow")))
   }
@@ -47,16 +67,31 @@ arrow_read_record_batch <- function(reader) {
     read_record_batch <- function(reader) reader$read_next_batch()
   }
 
-  read_record_batch(reader)
+  if (packageVersion("arrow") > "0.14") {
+    environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
+  }
+
+  withr::with_envvar(environment, {
+    read_record_batch(reader)
+  })
 }
 
 arrow_as_tibble <- function(record) {
+  environment <- list()
+
   if (packageVersion("arrow") <= "0.13")
     as_tibble <- get("as_tibble", envir = as.environment(asNamespace("arrow")))
-  else
+  else {
     as_tibble <- get("as.data.frame", envir = as.environment(asNamespace("arrow")))
+  }
 
-  as_tibble(record)
+  if (packageVersion("arrow") > "0.14") {
+    environment <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
+  }
+
+  withr::with_envvar(environment, {
+    as_tibble(record)
+  })
 }
 #' A helper function to retrieve values from \code{spark_config()}
 #'
@@ -1631,7 +1666,7 @@ worker_log_format <- function(message, session, level = "INFO", component = "RSc
     sep = "")
 }
 
-worker_log_level <- function(..., level, closure = "RScript") {
+worker_log_level <- function(..., level, component = "RScript") {
   if (is.null(worker_log_env$sessionId)) {
     worker_log_env <- get0("worker_log_env", envir = .GlobalEnv)
     if (is.null(worker_log_env$sessionId)) {
@@ -1641,7 +1676,8 @@ worker_log_level <- function(..., level, closure = "RScript") {
 
   args = list(...)
   message <- paste(args, sep = "", collapse = "")
-  formatted <- worker_log_format(message, worker_log_env$sessionId, level)
+  formatted <- worker_log_format(message, worker_log_env$sessionId,
+                                 level = level, component = component)
   cat(formatted, "\n")
 }
 
