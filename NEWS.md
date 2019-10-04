@@ -1,4 +1,4 @@
-# Sparklyr 1.0.3.9999
+# Sparklyr 1.0.4
 
 ### Arrow
 
