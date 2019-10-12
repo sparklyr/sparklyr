@@ -1,3 +1,7 @@
+# Sparklyr 1.0.4.9000
+
+- `spark_disconnect()` returns invisibly (#2028).
+
 # Sparklyr 1.0.4
 
 ### Arrow

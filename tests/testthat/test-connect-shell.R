@@ -11,6 +11,14 @@ test_that("'spark_connect' can create a secondary connection", {
   succeed()
 })
 
+test_that("`spark_connect()` returns invisibly", {
+  sc2 <- spark_connect(master = "local", app_name = "other")
+  expect_identical(
+    capture.output(spark_disconnect(sc2)),
+    character(0)
+  )
+})
+
 test_that("'spark_connect' can provide a 'spark_log'", {
   log <- capture.output({
     spark_log(sc)
