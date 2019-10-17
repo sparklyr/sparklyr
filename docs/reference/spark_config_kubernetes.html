@@ -1,0 +1,107 @@
+---
+title: "Kubernetes Configuration"
+aliases:
+  - reference/sparklyr/latest/spark_config_kubernetes.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Convenience function to initialize a Kubernetes configuration instead
+of <code><a href='spark_config.html'>spark_config()</a></code>, exposes common properties to set in Kubernetes
+clusters.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_config_kubernetes</span>(<span class='no'>master</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"2.3.2"</span>,
+  <span class='kw'>image</span> <span class='kw'>=</span> <span class='st'>"spark:sparklyr"</span>, <span class='kw'>driver</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"sparklyr-"</span>),
+  <span class='kw'>account</span> <span class='kw'>=</span> <span class='st'>"spark"</span>, <span class='kw'>jars</span> <span class='kw'>=</span> <span class='st'>"local:///opt/sparklyr"</span>, <span class='kw'>forward</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>executors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>conf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>120</span>, <span class='kw'>ports</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>8880</span>,
+  <span class='fl'>8881</span>, <span class='fl'>4040</span>), <span class='kw'>fix_config</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>.Platform</span>$<span class='no'>OS.type</span>, <span class='st'>"windows"</span>), <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>master</td>
+      <td><p>Kubernetes url to connect to, found by running <code>kubectl cluster-info</code>.</p></td>
+    </tr>
+    <tr>
+      <td>version</td>
+      <td><p>The version of Spark being used.</p></td>
+    </tr>
+    <tr>
+      <td>image</td>
+      <td><p>Container image to use to launch Spark and sparklyr. Also known
+as <code>spark.kubernetes.container.image</code>.</p></td>
+    </tr>
+    <tr>
+      <td>driver</td>
+      <td><p>Name of the driver pod. If not set, the driver pod name is set
+to "sparklyr" suffixed by id to avoid name conflicts. Also known as
+<code>spark.kubernetes.driver.pod.name</code>.</p></td>
+    </tr>
+    <tr>
+      <td>account</td>
+      <td><p>Service account that is used when running the driver pod. The driver
+pod uses this service account when requesting executor pods from the API
+server. Also known as <code>spark.kubernetes.authenticate.driver.serviceAccountName</code>.</p></td>
+    </tr>
+    <tr>
+      <td>jars</td>
+      <td><p>Path to the sparklyr jars; either, a local path inside the container
+image with the sparklyr jars copied when the image was created or, a path
+accesible by the container where the sparklyr jars were copied. You can find
+a path to the sparklyr jars by running <code><a href='https://rdrr.io/r/base/system.file.html'>system.file("java/", package = "sparklyr")</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>forward</td>
+      <td><p>Should ports used in sparklyr be forwarded automatically through Kubernetes?
+Default to <code>TRUE</code> which runs <code>kubectl port-forward</code> and <code>pkill kubectl</code>
+on disconnection.</p></td>
+    </tr>
+    <tr>
+      <td>executors</td>
+      <td><p>Number of executors to request while connecting.</p></td>
+    </tr>
+    <tr>
+      <td>conf</td>
+      <td><p>A named list of additional entries to add to <code>sparklyr.shell.conf</code>.</p></td>
+    </tr>
+    <tr>
+      <td>timeout</td>
+      <td><p>Total seconds to wait before giving up on connection.</p></td>
+    </tr>
+    <tr>
+      <td>ports</td>
+      <td><p>Ports to forward using kubectl.</p></td>
+    </tr>
+    <tr>
+      <td>fix_config</td>
+      <td><p>Should the spark-defaults.conf get fixed? <code>TRUE</code> for Windows.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Additional parameters, currently not in use.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

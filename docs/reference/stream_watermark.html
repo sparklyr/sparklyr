@@ -1,0 +1,54 @@
+---
+title: "Watermark Stream"
+aliases:
+  - reference/sparklyr/latest/stream_watermark.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Ensures a stream has a watermark defined, which is required for some
+operations over streams.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_watermark</span>(<span class='no'>x</span>, <span class='kw'>column</span> <span class='kw'>=</span> <span class='st'>"timestamp"</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='st'>"10 minutes"</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>An object coercable to a Spark Streaming DataFrame.</p></td>
+    </tr>
+    <tr>
+      <td>column</td>
+      <td><p>The name of the column that contains the event time of the row,
+if the column is missing, a column with the current time will be added.</p></td>
+    </tr>
+    <tr>
+      <td>threshold</td>
+      <td><p>The minimum delay to wait to data to arrive late, defaults
+to ten minutes.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

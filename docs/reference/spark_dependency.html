@@ -1,0 +1,68 @@
+---
+title: "Define a Spark dependency"
+aliases:
+  - reference/sparklyr/latest/spark_dependency.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Define a Spark dependency consisting of a set of custom JARs and Spark packages.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_dependency</span>(<span class='kw'>jars</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>packages</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>initializer</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>catalog</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>repositories</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>jars</td>
+      <td><p>Character vector of full paths to JAR files.</p></td>
+    </tr>
+    <tr>
+      <td>packages</td>
+      <td><p>Character vector of Spark packages names.</p></td>
+    </tr>
+    <tr>
+      <td>initializer</td>
+      <td><p>Optional callback function called when initializing a connection.</p></td>
+    </tr>
+    <tr>
+      <td>catalog</td>
+      <td><p>Optional location where extension JAR files can be downloaded for Livy.</p></td>
+    </tr>
+    <tr>
+      <td>repositories</td>
+      <td><p>Character vector of Spark package repositories.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Additional optional arguments.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>An object of type `spark_dependency`</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

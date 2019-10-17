@@ -1,0 +1,138 @@
+---
+title: "Spark ML -- K-Means Clustering"
+aliases:
+  - reference/sparklyr/latest/ml_kmeans.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#see-also">See also</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
+  Using `ml_kmeans()` with the formula interface requires Spark 2.0+.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_kmeans</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
+  <span class='kw'>init_steps</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>init_mode</span> <span class='kw'>=</span> <span class='st'>"k-means||"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"kmeans_"</span>), <span class='no'>...</span>)
+
+<span class='fu'>ml_compute_cost</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>formula</td>
+      <td><p>Used when <code>x</code> is a <code>tbl_spark</code>. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see <a href='ft_r_formula.html'>ft_r_formula</a> for details.</p></td>
+    </tr>
+    <tr>
+      <td>k</td>
+      <td><p>The number of clusters to create</p></td>
+    </tr>
+    <tr>
+      <td>max_iter</td>
+      <td><p>The maximum number of iterations to use.</p></td>
+    </tr>
+    <tr>
+      <td>tol</td>
+      <td><p>Param for the convergence tolerance for iterative algorithms.</p></td>
+    </tr>
+    <tr>
+      <td>init_steps</td>
+      <td><p>Number of steps for the k-means|| initialization mode. This is an advanced setting -- the default of 2 is almost always enough. Must be &gt; 0. Default: 2.</p></td>
+    </tr>
+    <tr>
+      <td>init_mode</td>
+      <td><p>Initialization algorithm. This can be either "random" to choose random points as initial cluster centers, or "k-means||" to use a parallel variant of k-means++ (Bahmani et al., Scalable K-Means++, VLDB 2012). Default: k-means||.</p></td>
+    </tr>
+    <tr>
+      <td>seed</td>
+      <td><p>A random seed. Set this value if you need your results to be
+reproducible across repeated calls.</p></td>
+    </tr>
+    <tr>
+      <td>features_col</td>
+      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>prediction_col</td>
+      <td><p>Prediction column name.</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the ML estimator.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments, see Details.</p></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td><p>A fitted K-means model returned by <code>ml_kmeans()</code></p></td>
+    </tr>
+    <tr>
+      <td>dataset</td>
+      <td><p>Dataset on which to calculate K-means cost</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>The object returned depends on the class of <code>x</code>.</p>
+<ul>
+<li><p><code>spark_connection</code>: When <code>x</code> is a <code>spark_connection</code>, the function returns an instance of a <code>ml_estimator</code> object. The object contains a pointer to
+  a Spark <code>Estimator</code> object and can be used to compose
+  <code>Pipeline</code> objects.</p></li>
+<li><p><code>ml_pipeline</code>: When <code>x</code> is a <code>ml_pipeline</code>, the function returns a <code>ml_pipeline</code> with
+  the clustering estimator appended to the pipeline.</p></li>
+<li><p><code>tbl_spark</code>: When <code>x</code> is a <code>tbl_spark</code>, an estimator is constructed then
+  immediately fit with the input <code>tbl_spark</code>, returning a clustering model.</p></li>
+<li><p><code>tbl_spark</code>, with <code>formula</code> or <code>features</code> specified: When <code>formula</code>
+    is specified, the input <code>tbl_spark</code> is first transformed using a
+    <code>RFormula</code> transformer before being fit by
+    the estimator. The object returned in this case is a <code>ml_model</code> which is a
+    wrapper of a <code>ml_pipeline_model</code>. This signature does not apply to <code><a href='ml_lda.html'>ml_lda()</a></code>.</p></li>
+</ul>
+
+<p><code>ml_compute_cost()</code> returns the K-means cost (sum of
+  squared distances of points to their nearest center) for the model
+  on the given data.</p>
+    <h2 id="see-also">See also</h2>
+
+    <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
+  more information on the set of clustering algorithms.</p>
+<p>Other ml clustering algorithms: <code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a></code>,
+  <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a></code>, <code><a href='ml_lda.html'>ml_lda</a></code></p></div>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+<span class='no'>iris_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span>(<span class='no'>sc</span>, <span class='no'>iris</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"iris_tbl"</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>ml_kmeans</span>(<span class='no'>iris_tbl</span>, <span class='no'>Species</span> ~ <span class='no'>.</span>)
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

@@ -1,0 +1,162 @@
+---
+title: "Spark ML -- Tuning"
+aliases:
+  - reference/sparklyr/latest/ml-tuning.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#details">Details</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Perform hyper-parameter tuning using either K-fold cross validation or train-validation split.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_sub_models</span>(<span class='no'>model</span>)
+
+<span class='fu'>ml_validation_metrics</span>(<span class='no'>model</span>)
+
+<span class='fu'>ml_cross_validator</span>(<span class='no'>x</span>, <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>estimator_param_maps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>evaluator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>num_folds</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>collect_sub_models</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>parallelism</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"cross_validator_"</span>), <span class='no'>...</span>)
+
+<span class='fu'>ml_train_validation_split</span>(<span class='no'>x</span>, <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>estimator_param_maps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>evaluator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>train_ratio</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
+  <span class='kw'>collect_sub_models</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>parallelism</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"train_validation_split_"</span>), <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>model</td>
+      <td><p>A cross validation or train-validation-split model.</p></td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>estimator</td>
+      <td><p>A <code>ml_estimator</code> object.</p></td>
+    </tr>
+    <tr>
+      <td>estimator_param_maps</td>
+      <td><p>A named list of stages and hyper-parameter sets to tune. See details.</p></td>
+    </tr>
+    <tr>
+      <td>evaluator</td>
+      <td><p>A <code>ml_evaluator</code> object, see <a href='ml_evaluator.html'>ml_evaluator</a>.</p></td>
+    </tr>
+    <tr>
+      <td>num_folds</td>
+      <td><p>Number of folds for cross validation. Must be &gt;= 2. Default: 3</p></td>
+    </tr>
+    <tr>
+      <td>collect_sub_models</td>
+      <td><p>Whether to collect a list of sub-models trained during tuning.
+If set to <code>FALSE</code>, then only the single best sub-model will be available after fitting.
+If set to true, then all sub-models will be available. Warning: For large models, collecting
+all sub-models can cause OOMs on the Spark driver.</p></td>
+    </tr>
+    <tr>
+      <td>parallelism</td>
+      <td><p>The number of threads to use when running parallel algorithms. Default is 1 for serial execution.</p></td>
+    </tr>
+    <tr>
+      <td>seed</td>
+      <td><p>A random seed. Set this value if you need your results to be
+reproducible across repeated calls.</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the ML estimator.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>train_ratio</td>
+      <td><p>Ratio between train and validation data. Must be between 0 and 1. Default: 0.75</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>The object returned depends on the class of <code>x</code>.</p>
+<ul>
+<li><p><code>spark_connection</code>: When <code>x</code> is a <code>spark_connection</code>, the function returns an instance of a <code>ml_cross_validator</code> or <code>ml_traing_validation_split</code> object.</p></li>
+<li><p><code>ml_pipeline</code>: When <code>x</code> is a <code>ml_pipeline</code>, the function returns a <code>ml_pipeline</code> with
+  the tuning estimator appended to the pipeline.</p></li>
+<li><p><code>tbl_spark</code>: When <code>x</code> is a <code>tbl_spark</code>, a tuning estimator is constructed then
+  immediately fit with the input <code>tbl_spark</code>, returning a <code>ml_cross_validation_model</code> or a
+  <code>ml_train_validation_split_model</code> object.</p></li>
+</ul>
+
+<p>For cross validation, <code>ml_sub_models()</code> returns a nested
+  list of models, where the first layer represents fold indices and the
+  second layer represents param maps. For train-validation split,
+  <code>ml_sub_models()</code> returns a list of models, corresponding to the
+  order of the estimator param maps.</p>
+<p><code>ml_validation_metrics()</code> returns a data frame of performance
+  metrics and hyperparameter combinations.</p>
+    <h2 id="details">Details</h2>
+
+    <p><code>ml_cross_validator()</code> performs k-fold cross validation while <code>ml_train_validation_split()</code> performs tuning on one pair of train and validation datasets.</p>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+<span class='no'>iris_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span>(<span class='no'>sc</span>, <span class='no'>iris</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"iris_tbl"</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># Create a pipeline</span>
+<span class='no'>pipeline</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml_pipeline.html'>ml_pipeline</a></span>(<span class='no'>sc</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='ft_r_formula.html'>ft_r_formula</a></span>(<span class='no'>Species</span> ~ <span class='no'>.</span> ) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='ml_random_forest.html'>ml_random_forest_classifier</a></span>()
+
+<span class='co'># Specify hyperparameter grid</span>
+<span class='no'>grid</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+  <span class='kw'>random_forest</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+    <span class='kw'>num_trees</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>,<span class='fl'>10</span>),
+    <span class='kw'>max_depth</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>,<span class='fl'>10</span>),
+    <span class='kw'>impurity</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"entropy"</span>, <span class='st'>"gini"</span>)
+  )
+)
+
+<span class='co'># Create the cross validator object</span>
+<span class='no'>cv</span> <span class='kw'>&lt;-</span> <span class='fu'>ml_cross_validator</span>(
+  <span class='no'>sc</span>, <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='no'>pipeline</span>, <span class='kw'>estimator_param_maps</span> <span class='kw'>=</span> <span class='no'>grid</span>,
+  <span class='kw'>evaluator</span> <span class='kw'>=</span> <span class='fu'><a href='ml_evaluator.html'>ml_multiclass_classification_evaluator</a></span>(<span class='no'>sc</span>),
+  <span class='kw'>num_folds</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>parallelism</span> <span class='kw'>=</span> <span class='fl'>4</span>
+)
+
+<span class='co'># Train the models</span>
+<span class='no'>cv_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml-transform-methods.html'>ml_fit</a></span>(<span class='no'>cv</span>, <span class='no'>iris_tbl</span>)
+
+<span class='co'># Print the metrics</span>
+<span class='fu'>ml_validation_metrics</span>(<span class='no'>cv_model</span>)
+
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

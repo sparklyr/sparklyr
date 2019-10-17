@@ -1,0 +1,80 @@
+---
+title: "Copy an R Data Frame to Spark"
+aliases:
+  - reference/sparklyr/latest/copy_to.spark_connection.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Copy an R <code>data.frame</code> to Spark, and return a reference to the
+generated Spark DataFrame as a <code>tbl_spark</code>. The returned object will
+act as a <code>dplyr</code>-compatible interface to the underlying Spark table.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for spark_connection</span>
+<span class='fu'><a href='copy_to.html'>copy_to</a></span>(<span class='no'>dest</span>, <span class='no'>df</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'><a href='spark_table_name.html'>spark_table_name</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>substitute</a></span>(<span class='no'>df</span>)), <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>memory</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>repartition</span> <span class='kw'>=</span> <span class='fl'>0L</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>dest</td>
+      <td><p>A <code>spark_connection</code>.</p></td>
+    </tr>
+    <tr>
+      <td>df</td>
+      <td><p>An <span style="R">R</span> <code>data.frame</code>.</p></td>
+    </tr>
+    <tr>
+      <td>name</td>
+      <td><p>The name to assign to the copied table in Spark.</p></td>
+    </tr>
+    <tr>
+      <td>overwrite</td>
+      <td><p>Boolean; overwrite a pre-existing table with the name <code>name</code>
+if one already exists?</p></td>
+    </tr>
+    <tr>
+      <td>memory</td>
+      <td><p>Boolean; should the table be cached into memory?</p></td>
+    </tr>
+    <tr>
+      <td>repartition</td>
+      <td><p>The number of partitions to use when distributing the
+table across the Spark cluster. The default (0) can be used to avoid
+partitioning.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>A <code>tbl_spark</code>, representing a <code>dplyr</code>-compatible interface
+  to a Spark DataFrame.</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

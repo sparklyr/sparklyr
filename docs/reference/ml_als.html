@@ -1,0 +1,180 @@
+---
+title: "Spark ML -- ALS"
+aliases:
+  - reference/sparklyr/latest/ml_als.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#details">Details</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Perform recommendation using Alternating Least Squares (ALS) matrix factorization.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_als</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>rating_col</span> <span class='kw'>=</span> <span class='st'>"rating"</span>, <span class='kw'>user_col</span> <span class='kw'>=</span> <span class='st'>"user"</span>,
+  <span class='kw'>item_col</span> <span class='kw'>=</span> <span class='st'>"item"</span>, <span class='kw'>rank</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>reg_param</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>implicit_prefs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>nonnegative</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>num_user_blocks</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>num_item_blocks</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>checkpoint_interval</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>cold_start_strategy</span> <span class='kw'>=</span> <span class='st'>"nan"</span>,
+  <span class='kw'>intermediate_storage_level</span> <span class='kw'>=</span> <span class='st'>"MEMORY_AND_DISK"</span>,
+  <span class='kw'>final_storage_level</span> <span class='kw'>=</span> <span class='st'>"MEMORY_AND_DISK"</span>, <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"als_"</span>),
+  <span class='no'>...</span>)
+
+<span class='fu'>ml_recommend</span>(<span class='no'>model</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"items"</span>, <span class='st'>"users"</span>), <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>formula</td>
+      <td><p>Used when <code>x</code> is a <code>tbl_spark</code>. R formula as a character string or a formula.
+This is used to transform the input dataframe before fitting, see <a href='ft_r_formula.html'>ft_r_formula</a> for details.
+The ALS model requires a specific formula format, please use <code>rating_col ~ user_col + item_col</code>.</p></td>
+    </tr>
+    <tr>
+      <td>rating_col</td>
+      <td><p>Column name for ratings. Default: "rating"</p></td>
+    </tr>
+    <tr>
+      <td>user_col</td>
+      <td><p>Column name for user ids. Ids must be integers. Other numeric types are supported for this column, but will be cast to integers as long as they fall within the integer value range. Default: "user"</p></td>
+    </tr>
+    <tr>
+      <td>item_col</td>
+      <td><p>Column name for item ids. Ids must be integers. Other numeric types are supported for this column, but will be cast to integers as long as they fall within the integer value range. Default: "item"</p></td>
+    </tr>
+    <tr>
+      <td>rank</td>
+      <td><p>Rank of the matrix factorization (positive). Default: 10</p></td>
+    </tr>
+    <tr>
+      <td>reg_param</td>
+      <td><p>Regularization parameter.</p></td>
+    </tr>
+    <tr>
+      <td>implicit_prefs</td>
+      <td><p>Whether to use implicit preference. Default: FALSE.</p></td>
+    </tr>
+    <tr>
+      <td>alpha</td>
+      <td><p>Alpha parameter in the implicit preference formulation (nonnegative).</p></td>
+    </tr>
+    <tr>
+      <td>nonnegative</td>
+      <td><p>Whether to apply nonnegativity constraints. Default: FALSE.</p></td>
+    </tr>
+    <tr>
+      <td>max_iter</td>
+      <td><p>Maximum number of iterations.</p></td>
+    </tr>
+    <tr>
+      <td>num_user_blocks</td>
+      <td><p>Number of user blocks (positive). Default: 10</p></td>
+    </tr>
+    <tr>
+      <td>num_item_blocks</td>
+      <td><p>Number of item blocks (positive). Default: 10</p></td>
+    </tr>
+    <tr>
+      <td>checkpoint_interval</td>
+      <td><p>Set checkpoint interval (&gt;= 1) or disable checkpoint (-1).
+E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.</p></td>
+    </tr>
+    <tr>
+      <td>cold_start_strategy</td>
+      <td><p>(Spark 2.2.0+) Strategy for dealing with unknown or new users/items at prediction time. This may be useful in cross-validation or production scenarios, for handling user/item ids the model has not seen in the training data. Supported values: - "nan": predicted value for unknown ids will be NaN. - "drop": rows in the input DataFrame containing unknown ids will be dropped from the output DataFrame containing predictions. Default: "nan".</p></td>
+    </tr>
+    <tr>
+      <td>intermediate_storage_level</td>
+      <td><p>(Spark 2.0.0+) StorageLevel for intermediate datasets. Pass in a string representation of <code>StorageLevel</code>. Cannot be "NONE". Default: "MEMORY_AND_DISK".</p></td>
+    </tr>
+    <tr>
+      <td>final_storage_level</td>
+      <td><p>(Spark 2.0.0+) StorageLevel for ALS model factors. Pass in a string representation of <code>StorageLevel</code>. Default: "MEMORY_AND_DISK".</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the ML estimator.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td><p>An ALS model object</p></td>
+    </tr>
+    <tr>
+      <td>type</td>
+      <td><p>What to recommend, one of <code>items</code> or <code>users</code></p></td>
+    </tr>
+    <tr>
+      <td>n</td>
+      <td><p>Maximum number of recommendations to return</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>ALS attempts to estimate the ratings matrix R as the product of two lower-rank matrices, X and Y, i.e. X * Yt = R. Typically these approximations are called 'factor' matrices. The general approach is iterative. During each iteration, one of the factor matrices is held constant, while the other is solved for using least squares. The newly-solved factor matrix is then held constant while solving for the other factor matrix.</p>
+<p>This is a blocked implementation of the ALS factorization algorithm that groups the two sets of factors (referred to as "users" and "products") into blocks and reduces communication by only sending one copy of each user vector to each product block on each iteration, and only for the product blocks that need that user's feature vector. This is achieved by pre-computing some information about the ratings matrix to determine the "out-links" of each user (which blocks of products it will contribute to) and "in-link" information for each product (which of the feature vectors it receives from each user block it will depend on). This allows us to send only an array of feature vectors between each user block and product block, and have the product block find the users' ratings and update the products based on these messages.</p>
+<p>For implicit preference data, the algorithm used is based on "Collaborative Filtering for Implicit Feedback Datasets", available at <a href='https://doi.org/10.1109/ICDM.2008.22'>https://doi.org/10.1109/ICDM.2008.22</a>, adapted for the blocked approach used here.</p>
+<p>Essentially instead of finding the low-rank approximations to the rating matrix R, this finds the approximations for a preference matrix P where the elements of P are 1 if r is greater than 0 and 0 if r is less than or equal to 0. The ratings then act as 'confidence' values related to strength of indicated user preferences rather than explicit ratings given to items.</p>
+<p>The object returned depends on the class of <code>x</code>.</p>
+<ul>
+<li><p><code>spark_connection</code>: When <code>x</code> is a <code>spark_connection</code>, the function returns an instance of a <code>ml_als</code> recommender object, which is an Estimator.</p></li>
+<li><p><code>ml_pipeline</code>: When <code>x</code> is a <code>ml_pipeline</code>, the function returns a <code>ml_pipeline</code> with
+  the recommender appended to the pipeline.</p></li>
+<li><p><code>tbl_spark</code>: When <code>x</code> is a <code>tbl_spark</code>, a recommender
+  estimator is constructed then immediately fit with the input
+  <code>tbl_spark</code>, returning a recommendation model, i.e. <code>ml_als_model</code>.</p></li>
+</ul>
+
+    <h2 id="details">Details</h2>
+
+    <p><code>ml_recommend()</code> returns the top <code>n</code> users/items recommended for each item/user, for all items/users. The output has been transformed (exploded and separated) from the default Spark outputs to be more user friendly.</p>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>sparklyr</span>)
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+
+<span class='no'>movies</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
+  <span class='kw'>user</span>   <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>0</span>),
+  <span class='kw'>item</span>   <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>0</span>),
+  <span class='kw'>rating</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>4</span>, <span class='fl'>5</span>, <span class='fl'>4</span>)
+)
+<span class='no'>movies_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span>(<span class='no'>sc</span>, <span class='no'>movies</span>)
+
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>ml_als</span>(<span class='no'>movies_tbl</span>, <span class='no'>rating</span> ~ <span class='no'>user</span> + <span class='no'>item</span>)
+
+<span class='fu'><a href='ml-transform-methods.html'>ml_predict</a></span>(<span class='no'>model</span>, <span class='no'>movies_tbl</span>)
+
+<span class='fu'>ml_recommend</span>(<span class='no'>model</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"item"</span>, <span class='fl'>1</span>)
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

@@ -1,0 +1,53 @@
+---
+title: "Runtime configuration interface for the Spark Session"
+aliases:
+  - reference/sparklyr/latest/spark_session_config.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Retrieves or sets runtime configuration entries for the Spark Session</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_session_config</span>(<span class='no'>sc</span>, <span class='kw'>config</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>value</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>sc</td>
+      <td><p>A <code>spark_connection</code>.</p></td>
+    </tr>
+    <tr>
+      <td>config</td>
+      <td><p>The configuration entry name(s) (e.g., <code>"spark.sql.shuffle.partitions"</code>).
+Defaults to <code>NULL</code> to retrieve all configuration entries.</p></td>
+    </tr>
+    <tr>
+      <td>value</td>
+      <td><p>The configuration value to be set. Defaults to <code>NULL</code> to retrieve
+configuration entries.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

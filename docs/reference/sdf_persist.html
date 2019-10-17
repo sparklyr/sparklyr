@@ -1,0 +1,62 @@
+---
+title: "Persist a Spark DataFrame"
+aliases:
+  - reference/sparklyr/latest/sdf_persist.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#details">Details</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Persist a Spark DataFrame, forcing any pending computations and (optionally)
+serializing the results to disk.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_persist</span>(<span class='no'>x</span>, <span class='kw'>storage.level</span> <span class='kw'>=</span> <span class='st'>"MEMORY_AND_DISK"</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>storage.level</td>
+      <td><p>The storage level to be used. Please view the
+<a href='http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence'>Spark Documentation</a>
+for information on what storage levels are accepted.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="details">Details</h2>
+
+    <p>Spark DataFrames invoke their operations lazily -- pending operations are
+deferred until their results are actually needed. Persisting a Spark
+DataFrame effectively 'forces' any pending computations, and then persists
+the generated Spark DataFrame as requested (to memory, to disk, or
+otherwise).</p>
+<p>Users of Spark should be careful to persist the results of any computations
+which are non-deterministic -- otherwise, one might see that the values
+within a column seem to 'change' as new operations are performed on that
+data set.</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

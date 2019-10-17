@@ -1,0 +1,194 @@
+---
+title: "Spark ML -- Multilayer Perceptron"
+aliases:
+  - reference/sparklyr/latest/ml_multilayer_perceptron_classifier.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#details">Details</a></li>
+    <li><a href="#see-also">See also</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Classification model based on the Multilayer Perceptron. Each layer has sigmoid activation function, output layer has softmax.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_multilayer_perceptron_classifier</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>layers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>step_size</span> <span class='kw'>=</span> <span class='fl'>0.03</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>, <span class='kw'>block_size</span> <span class='kw'>=</span> <span class='fl'>128</span>,
+  <span class='kw'>solver</span> <span class='kw'>=</span> <span class='st'>"l-bfgs"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>initial_weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
+  <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='st'>"rawPrediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"multilayer_perceptron_classifier_"</span>), <span class='no'>...</span>)
+
+<span class='fu'>ml_multilayer_perceptron</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>layers</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>step_size</span> <span class='kw'>=</span> <span class='fl'>0.03</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>, <span class='kw'>block_size</span> <span class='kw'>=</span> <span class='fl'>128</span>,
+  <span class='kw'>solver</span> <span class='kw'>=</span> <span class='st'>"l-bfgs"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>initial_weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>, <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
+  <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='st'>"rawPrediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"multilayer_perceptron_classifier_"</span>),
+  <span class='kw'>response</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>formula</td>
+      <td><p>Used when <code>x</code> is a <code>tbl_spark</code>. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see <a href='ft_r_formula.html'>ft_r_formula</a> for details.</p></td>
+    </tr>
+    <tr>
+      <td>layers</td>
+      <td><p>A numeric vector describing the layers -- each element in the vector gives the size of a layer. For example, <code><a href='https://rdrr.io/r/base/c.html'>c(4, 5, 2)</a></code> would imply three layers, with an input (feature) layer of size 4, an intermediate layer of size 5, and an output (class) layer of size 2.</p></td>
+    </tr>
+    <tr>
+      <td>max_iter</td>
+      <td><p>The maximum number of iterations to use.</p></td>
+    </tr>
+    <tr>
+      <td>step_size</td>
+      <td><p>Step size to be used for each iteration of optimization (&gt; 0).</p></td>
+    </tr>
+    <tr>
+      <td>tol</td>
+      <td><p>Param for the convergence tolerance for iterative algorithms.</p></td>
+    </tr>
+    <tr>
+      <td>block_size</td>
+      <td><p>Block size for stacking input data in matrices to speed up the computation. Data is stacked within partitions. If block size is more than remaining data in a partition then it is adjusted to the size of this data. Recommended size is between 10 and 1000. Default: 128</p></td>
+    </tr>
+    <tr>
+      <td>solver</td>
+      <td><p>The solver algorithm for optimization. Supported options: "gd" (minibatch gradient descent) or "l-bfgs". Default: "l-bfgs"</p></td>
+    </tr>
+    <tr>
+      <td>seed</td>
+      <td><p>A random seed. Set this value if you need your results to be
+reproducible across repeated calls.</p></td>
+    </tr>
+    <tr>
+      <td>initial_weights</td>
+      <td><p>The initial weights of the model.</p></td>
+    </tr>
+    <tr>
+      <td>thresholds</td>
+      <td><p>Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values &gt; 0 excepting that at most one value may be 0. The class with largest value <code>p/t</code> is predicted, where <code>p</code> is the original probability of that class and <code>t</code> is the class's threshold.</p></td>
+    </tr>
+    <tr>
+      <td>features_col</td>
+      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>label_col</td>
+      <td><p>Label column name. The column should be a numeric column. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>prediction_col</td>
+      <td><p>Prediction column name.</p></td>
+    </tr>
+    <tr>
+      <td>probability_col</td>
+      <td><p>Column name for predicted class conditional probabilities.</p></td>
+    </tr>
+    <tr>
+      <td>raw_prediction_col</td>
+      <td><p>Raw prediction (a.k.a. confidence) column name.</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the ML estimator.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; see Details.</p></td>
+    </tr>
+    <tr>
+      <td>response</td>
+      <td><p>(Deprecated) The name of the response column (as a length-one character vector.)</p></td>
+    </tr>
+    <tr>
+      <td>features</td>
+      <td><p>(Deprecated) The name of features (terms) to use for the model fit.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>The object returned depends on the class of <code>x</code>.</p>
+<ul>
+<li><p><code>spark_connection</code>: When <code>x</code> is a <code>spark_connection</code>, the function returns an instance of a <code>ml_estimator</code> object. The object contains a pointer to
+  a Spark <code>Predictor</code> object and can be used to compose
+  <code>Pipeline</code> objects.</p></li>
+<li><p><code>ml_pipeline</code>: When <code>x</code> is a <code>ml_pipeline</code>, the function returns a <code>ml_pipeline</code> with
+  the predictor appended to the pipeline.</p></li>
+<li><p><code>tbl_spark</code>: When <code>x</code> is a <code>tbl_spark</code>, a predictor is constructed then
+  immediately fit with the input <code>tbl_spark</code>, returning a prediction model.</p></li>
+<li><p><code>tbl_spark</code>, with <code>formula</code>: specified When <code>formula</code>
+    is specified, the input <code>tbl_spark</code> is first transformed using a
+    <code>RFormula</code> transformer before being fit by
+    the predictor. The object returned in this case is a <code>ml_model</code> which is a
+    wrapper of a <code>ml_pipeline_model</code>.</p></li>
+</ul>
+
+    <h2 id="details">Details</h2>
+
+    <p>When <code>x</code> is a <code>tbl_spark</code> and <code>formula</code> (alternatively, <code>response</code> and <code>features</code>) is specified, the function returns a <code>ml_model</code> object wrapping a <code>ml_pipeline_model</code> which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument <code>predicted_label_col</code> (defaults to <code>"predicted_label"</code>) can be used to specify the name of the predicted label column. In addition to the fitted <code>ml_pipeline_model</code>, <code>ml_model</code> objects also contain a <code>ml_pipeline</code> object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by <code><a href='ml-persistence.html'>ml_save</a></code> with <code>type = "pipeline"</code> to faciliate model refresh workflows.</p>
+<p><code>ml_multilayer_perceptron()</code> is an alias for <code>ml_multilayer_perceptron_classifier()</code> for backwards compatibility.</p>
+    <h2 id="see-also">See also</h2>
+
+    <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-classification-regression.html'>http://spark.apache.org/docs/latest/ml-classification-regression.html</a> for
+  more information on the set of supervised learning algorithms.</p>
+<p>Other ml algorithms: <code><a href='ml_aft_survival_regression.html'>ml_aft_survival_regression</a></code>,
+  <code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a></code>,
+  <code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a></code>,
+  <code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a></code>,
+  <code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a></code>,
+  <code><a href='ml_linear_regression.html'>ml_linear_regression</a></code>,
+  <code><a href='ml_linear_svc.html'>ml_linear_svc</a></code>,
+  <code><a href='ml_logistic_regression.html'>ml_logistic_regression</a></code>,
+  <code><a href='ml_naive_bayes.html'>ml_naive_bayes</a></code>,
+  <code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a></code>,
+  <code><a href='ml_random_forest.html'>ml_random_forest_classifier</a></code></p></div>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>sc</span> <span class='kw'>&lt;-</span>  <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+
+<span class='no'>iris_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span>(<span class='no'>sc</span>, <span class='no'>iris</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"iris_tbl"</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>partitions</span> <span class='kw'>&lt;-</span> <span class='no'>iris_tbl</span> <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='sdf_random_split.html'>sdf_random_split</a></span>(<span class='kw'>training</span> <span class='kw'>=</span> <span class='fl'>0.7</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='fl'>0.3</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>1111</span>)
+
+<span class='no'>iris_training</span> <span class='kw'>&lt;-</span> <span class='no'>partitions</span>$<span class='no'>training</span>
+<span class='no'>iris_test</span> <span class='kw'>&lt;-</span> <span class='no'>partitions</span>$<span class='no'>test</span>
+
+<span class='no'>mlp_model</span> <span class='kw'>&lt;-</span> <span class='no'>iris_training</span> <span class='kw'>%&gt;%</span>
+  <span class='fu'>ml_multilayer_perceptron_classifier</span>(<span class='no'>Species</span> ~ <span class='no'>.</span>, <span class='kw'>layers</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4</span>,<span class='fl'>3</span>,<span class='fl'>3</span>))
+
+<span class='no'>pred</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml-transform-methods.html'>ml_predict</a></span>(<span class='no'>mlp_model</span>, <span class='no'>iris_test</span>)
+
+<span class='fu'><a href='ml_evaluator.html'>ml_multiclass_classification_evaluator</a></span>(<span class='no'>pred</span>)
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

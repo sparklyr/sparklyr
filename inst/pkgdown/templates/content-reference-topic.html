@@ -1,0 +1,69 @@
+---
+title: "{{{title}}}"
+aliases:
+  - reference/sparklyr/latest/{{{name}}}.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    {{#has_args}}
+    <li><a href="#arguments">Arguments</a></li>
+    {{/has_args}}
+    {{#sections}}
+    <li><a href="#{{slug}}">{{title}}</a></li>
+    {{/sections}}
+    {{#examples}}
+    <li><a href="#examples">Examples</a></li>
+    {{/examples}}
+    </ul>
+    </div>
+
+    <div>
+
+    {{#description}}
+    {{#contents}}
+    {{{.}}}
+    {{/contents}}
+    {{/description}}
+
+    {{#usage}}
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">{{{.}}}</code></pre></div>
+    {{/usage}}
+
+    {{#has_args}}
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    {{#arguments}}
+    <tr>
+      <td>{{{name}}}</td>
+      <td>{{{description}}}</td>
+    </tr>
+    {{/arguments}}
+    </table>
+    {{/has_args}}
+
+    {{#sections}}
+    <h2 id="{{slug}}">{{title}}</h2>
+
+    {{#contents}}
+    {{{.}}}
+    {{/contents}}
+    {{/sections}}
+
+    {{#examples}}
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">{{{.}}}</code></pre></div>
+    {{/examples}}
+
+    </div>
+
+    </div>
+

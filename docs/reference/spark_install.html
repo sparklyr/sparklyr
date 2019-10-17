@@ -1,0 +1,103 @@
+---
+title: "Find a given Spark installation by version."
+aliases:
+  - reference/sparklyr/latest/spark_install_find.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Install versions of Spark for use with local Spark connections
+  (i.e. <code>spark_connect(master = "local"</code>)</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_install_find</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hadoop_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>installed_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>latest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>hint</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='fu'>spark_install</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hadoop_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reset</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>logging</span> <span class='kw'>=</span> <span class='st'>"INFO"</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>())
+
+<span class='fu'>spark_uninstall</span>(<span class='no'>version</span>, <span class='no'>hadoop_version</span>)
+
+<span class='fu'>spark_install_dir</span>()
+
+<span class='fu'>spark_install_tar</span>(<span class='no'>tarfile</span>)
+
+<span class='fu'>spark_installed_versions</span>()
+
+<span class='fu'>spark_available_versions</span>(<span class='kw'>show_hadoop</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show_minor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>version</td>
+      <td><p>Version of Spark to install. See <code>spark_available_versions</code> for a list of supported versions</p></td>
+    </tr>
+    <tr>
+      <td>hadoop_version</td>
+      <td><p>Version of Hadoop to install. See <code>spark_available_versions</code> for a list of supported versions</p></td>
+    </tr>
+    <tr>
+      <td>installed_only</td>
+      <td><p>Search only the locally installed versions?</p></td>
+    </tr>
+    <tr>
+      <td>latest</td>
+      <td><p>Check for latest version?</p></td>
+    </tr>
+    <tr>
+      <td>hint</td>
+      <td><p>On failure should the installation code be provided?</p></td>
+    </tr>
+    <tr>
+      <td>reset</td>
+      <td><p>Attempts to reset settings to defaults.</p></td>
+    </tr>
+    <tr>
+      <td>logging</td>
+      <td><p>Logging level to configure install. Supported options: "WARN", "INFO"</p></td>
+    </tr>
+    <tr>
+      <td>verbose</td>
+      <td><p>Report information as Spark is downloaded / installed</p></td>
+    </tr>
+    <tr>
+      <td>tarfile</td>
+      <td><p>Path to TAR file conforming to the pattern spark-###-bin-(hadoop)?### where ###
+reference spark and hadoop versions respectively.</p></td>
+    </tr>
+    <tr>
+      <td>show_hadoop</td>
+      <td><p>Show Hadoop distributions?</p></td>
+    </tr>
+    <tr>
+      <td>show_minor</td>
+      <td><p>Show minor Spark versions?</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>List with information about the installed version.</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

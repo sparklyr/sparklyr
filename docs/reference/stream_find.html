@@ -1,0 +1,60 @@
+---
+title: "Find Stream"
+aliases:
+  - reference/sparklyr/latest/stream_find.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Finds and returns a stream based on the stream's identifier.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_find</span>(<span class='no'>sc</span>, <span class='no'>id</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>sc</td>
+      <td><p>The associated Spark connection.</p></td>
+    </tr>
+    <tr>
+      <td>id</td>
+      <td><p>The stream identifier to find.</p></td>
+    </tr>
+    </table>
+
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+<span class='fu'><a href='sdf_len.html'>sdf_len</a></span>(<span class='no'>sc</span>, <span class='fl'>10</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='spark_write_parquet.html'>spark_write_parquet</a></span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"parquet-in"</span>)
+
+<span class='no'>stream</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='stream_read_parquet.html'>stream_read_parquet</a></span>(<span class='no'>sc</span>, <span class='st'>"parquet-in"</span>) <span class='kw'>%&gt;%</span>
+ <span class='fu'><a href='stream_write_parquet.html'>stream_write_parquet</a></span>(<span class='st'>"parquet-out"</span>)
+
+<span class='no'>stream_id</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='stream_id.html'>stream_id</a></span>(<span class='no'>stream</span>)
+<span class='fu'>stream_find</span>(<span class='no'>sc</span>, <span class='no'>stream_id</span>)
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

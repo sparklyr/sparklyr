@@ -1,0 +1,82 @@
+---
+title: "Invoke a Method on a JVM Object"
+aliases:
+  - reference/sparklyr/latest/invoke.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#details">Details</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Invoke methods on Java object references. These functions provide a
+mechanism for invoking various Java object methods directly from <span style="R">R</span>.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>invoke</span>(<span class='no'>jobj</span>, <span class='no'>method</span>, <span class='no'>...</span>)
+
+<span class='fu'>invoke_static</span>(<span class='no'>sc</span>, <span class='no'>class</span>, <span class='no'>method</span>, <span class='no'>...</span>)
+
+<span class='fu'>invoke_new</span>(<span class='no'>sc</span>, <span class='no'>class</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>jobj</td>
+      <td><p>An <span style="R">R</span> object acting as a Java object reference (typically, a <code>spark_jobj</code>).</p></td>
+    </tr>
+    <tr>
+      <td>method</td>
+      <td><p>The name of the method to be invoked.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments, currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>sc</td>
+      <td><p>A <code>spark_connection</code>.</p></td>
+    </tr>
+    <tr>
+      <td>class</td>
+      <td><p>The name of the Java class whose methods should be invoked.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="details">Details</h2>
+
+    <p>Use each of these functions in the following scenarios:</p>
+<table class='table'>
+<tr><td><code>invoke</code></td><td>Execute a method on a Java object reference (typically, a <code>spark_jobj</code>).</td><td><code>invoke_static</code></td></tr>
+<tr><td>Execute a static method associated with a Java class.</td><td><code>invoke_new</code></td><td>Invoke a constructor associated with a Java class.</td></tr>
+</table>
+
+
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"spark://HOST:PORT"</span>)
+<span class='fu'><a href='spark-api.html'>spark_context</a></span>(<span class='no'>sc</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'>invoke</span>(<span class='st'>"textFile"</span>, <span class='st'>"file.csv"</span>, <span class='fl'>1L</span>) <span class='kw'>%&gt;%</span>
+    <span class='fu'>invoke</span>(<span class='st'>"count"</span>)</div><div class='input'>
+</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

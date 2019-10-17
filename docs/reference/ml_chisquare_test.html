@@ -1,0 +1,70 @@
+---
+title: "Chi-square hypothesis testing for categorical data."
+aliases:
+  - reference/sparklyr/latest/ml_chisquare_test.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Conduct Pearson's independence test for every feature against the
+  label. For each feature, the (feature, label) pairs are converted
+  into a contingency matrix for which the Chi-squared statistic is
+  computed. All label and feature values must be categorical.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_chisquare_test</span>(<span class='no'>x</span>, <span class='no'>features</span>, <span class='no'>label</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>features</td>
+      <td><p>The name(s) of the feature columns. This can also be the name
+of a single vector column created using <code><a href='ft_vector_assembler.html'>ft_vector_assembler()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>label</td>
+      <td><p>The name of the label column.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>A data frame with one row for each (feature, label) pair with p-values,
+  degrees of freedom, and test statistics.</p>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+<span class='no'>iris_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span>(<span class='no'>sc</span>, <span class='no'>iris</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"iris_tbl"</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='no'>features</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Petal_Width"</span>, <span class='st'>"Petal_Length"</span>, <span class='st'>"Sepal_Length"</span>, <span class='st'>"Sepal_Width"</span>)
+
+<span class='fu'>ml_chisquare_test</span>(<span class='no'>iris_tbl</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='no'>features</span>, <span class='kw'>label</span> <span class='kw'>=</span> <span class='st'>"Species"</span>)
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

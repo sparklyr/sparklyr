@@ -1,0 +1,118 @@
+---
+title: "Feature Transformation -- HashingTF (Transformer)"
+aliases:
+  - reference/sparklyr/latest/ft_hashing_tf.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#see-also">See also</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Maps a sequence of terms to their term frequencies using the hashing trick.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_hashing_tf</span>(<span class='no'>x</span>, <span class='kw'>input_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>output_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>binary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>num_features</span> <span class='kw'>=</span> <span class='fl'>2</span>^<span class='fl'>18</span>, <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"hashing_tf_"</span>), <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>input_col</td>
+      <td><p>The name of the input column.</p></td>
+    </tr>
+    <tr>
+      <td>output_col</td>
+      <td><p>The name of the output column.</p></td>
+    </tr>
+    <tr>
+      <td>binary</td>
+      <td><p>Binary toggle to control term frequency counts.
+If true, all non-zero counts are set to 1. This is useful for discrete
+probabilistic models that model binary events rather than integer
+counts. (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <td>num_features</td>
+      <td><p>Number of features. Should be greater than 0. (default = <code>2^18</code>)</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the feature transformer.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>The object returned depends on the class of <code>x</code>.</p>
+<ul>
+<li><p><code>spark_connection</code>: When <code>x</code> is a <code>spark_connection</code>, the function returns a <code>ml_transformer</code>,
+  a <code>ml_estimator</code>, or one of their subclasses. The object contains a pointer to
+  a Spark <code>Transformer</code> or <code>Estimator</code> object and can be used to compose
+  <code>Pipeline</code> objects.</p></li>
+<li><p><code>ml_pipeline</code>: When <code>x</code> is a <code>ml_pipeline</code>, the function returns a <code>ml_pipeline</code> with
+  the transformer or estimator appended to the pipeline.</p></li>
+<li><p><code>tbl_spark</code>: When <code>x</code> is a <code>tbl_spark</code>, a transformer is constructed then
+  immediately applied to the input <code>tbl_spark</code>, returning a <code>tbl_spark</code></p></li>
+</ul>
+
+    <h2 id="see-also">See also</h2>
+
+    <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
+  more information on the set of transformations available for DataFrame
+  columns in Spark.</p>
+<p>Other feature transformers: <code><a href='ft_binarizer.html'>ft_binarizer</a></code>,
+  <code><a href='ft_bucketizer.html'>ft_bucketizer</a></code>,
+  <code><a href='ft_chisq_selector.html'>ft_chisq_selector</a></code>,
+  <code><a href='ft_count_vectorizer.html'>ft_count_vectorizer</a></code>, <code><a href='ft_dct.html'>ft_dct</a></code>,
+  <code><a href='ft_elementwise_product.html'>ft_elementwise_product</a></code>,
+  <code><a href='ft_feature_hasher.html'>ft_feature_hasher</a></code>, <code><a href='ft_idf.html'>ft_idf</a></code>,
+  <code><a href='ft_imputer.html'>ft_imputer</a></code>,
+  <code><a href='ft_index_to_string.html'>ft_index_to_string</a></code>,
+  <code><a href='ft_interaction.html'>ft_interaction</a></code>, <code><a href='ft_lsh.html'>ft_lsh</a></code>,
+  <code><a href='ft_max_abs_scaler.html'>ft_max_abs_scaler</a></code>,
+  <code><a href='ft_min_max_scaler.html'>ft_min_max_scaler</a></code>, <code><a href='ft_ngram.html'>ft_ngram</a></code>,
+  <code><a href='ft_normalizer.html'>ft_normalizer</a></code>,
+  <code><a href='ft_one_hot_encoder_estimator.html'>ft_one_hot_encoder_estimator</a></code>,
+  <code><a href='ft_one_hot_encoder.html'>ft_one_hot_encoder</a></code>, <code><a href='ft_pca.html'>ft_pca</a></code>,
+  <code><a href='ft_polynomial_expansion.html'>ft_polynomial_expansion</a></code>,
+  <code><a href='ft_quantile_discretizer.html'>ft_quantile_discretizer</a></code>,
+  <code><a href='ft_r_formula.html'>ft_r_formula</a></code>,
+  <code><a href='ft_regex_tokenizer.html'>ft_regex_tokenizer</a></code>,
+  <code><a href='sql-transformer.html'>ft_sql_transformer</a></code>,
+  <code><a href='ft_standard_scaler.html'>ft_standard_scaler</a></code>,
+  <code><a href='ft_stop_words_remover.html'>ft_stop_words_remover</a></code>,
+  <code><a href='ft_string_indexer.html'>ft_string_indexer</a></code>,
+  <code><a href='ft_tokenizer.html'>ft_tokenizer</a></code>,
+  <code><a href='ft_vector_assembler.html'>ft_vector_assembler</a></code>,
+  <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a></code>,
+  <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a></code>, <code><a href='ft_word2vec.html'>ft_word2vec</a></code></p></div>
+
+
+    </div>
+
+    </div>
+
+
+
+

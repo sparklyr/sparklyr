@@ -1,0 +1,65 @@
+---
+title: "Spark ML -- ML Params"
+aliases:
+  - reference/sparklyr/latest/ml-params.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Helper methods for working with parameters for ML objects.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_is_set</span>(<span class='no'>x</span>, <span class='no'>param</span>, <span class='no'>...</span>)
+
+<span class='fu'>ml_param_map</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='fu'>ml_param</span>(<span class='no'>x</span>, <span class='no'>param</span>, <span class='kw'>allow_null</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+
+<span class='fu'>ml_params</span>(<span class='no'>x</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>allow_null</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A Spark ML object, either a pipeline stage or an evaluator.</p></td>
+    </tr>
+    <tr>
+      <td>param</td>
+      <td><p>The parameter to extract or set.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>allow_null</td>
+      <td><p>Whether to allow <code>NULL</code> results when extracting parameters. If <code>FALSE</code>, an error will be thrown if the specified parameter is not found. Defaults to <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <td>params</td>
+      <td><p>A vector of parameters to extract.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

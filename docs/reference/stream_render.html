@@ -1,0 +1,72 @@
+---
+title: "Render Stream"
+aliases:
+  - reference/sparklyr/latest/stream_render.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Collects streaming statistics to render the stream as an 'htmlwidget'.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_render</span>(<span class='kw'>stream</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>collect</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>stats</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>stream</td>
+      <td><p>The stream to render</p></td>
+    </tr>
+    <tr>
+      <td>collect</td>
+      <td><p>The interval in seconds to collect data before rendering the
+'htmlwidget'.</p></td>
+    </tr>
+    <tr>
+      <td>stats</td>
+      <td><p>Optional stream statistics collected using <code><a href='stream_stats.html'>stream_stats()</a></code>,
+when specified, <code>stream</code> should be omitted.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Additional optional arguments.</p></td>
+    </tr>
+    </table>
+
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>sparklyr</span>)
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+
+<span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span>(<span class='st'>"iris-in"</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/write.table.html'>write.csv</a></span>(<span class='no'>iris</span>, <span class='st'>"iris-in/iris.csv"</span>, <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='no'>stream</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='stream_read_csv.html'>stream_read_csv</a></span>(<span class='no'>sc</span>, <span class='st'>"iris-in/"</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='stream_write_csv.html'>stream_write_csv</a></span>(<span class='st'>"iris-out/"</span>)
+
+<span class='fu'>stream_render</span>(<span class='no'>stream</span>)
+<span class='fu'><a href='stream_stop.html'>stream_stop</a></span>(<span class='no'>stream</span>)
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

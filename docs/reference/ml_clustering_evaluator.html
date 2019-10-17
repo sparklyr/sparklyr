@@ -1,0 +1,102 @@
+---
+title: "Spark ML - Clustering Evaluator"
+aliases:
+  - reference/sparklyr/latest/ml_clustering_evaluator.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Evaluator for clustering results. The metric computes the Silhouette measure using the squared
+  Euclidean distance. The Silhouette is a measure for the validation of the consistency
+   within clusters. It ranges between 1 and -1, where a value close to 1 means that the
+    points in a cluster are close to the other points in the same cluster and far from the
+    points of the other clusters.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_clustering_evaluator</span>(<span class='no'>x</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>metric_name</span> <span class='kw'>=</span> <span class='st'>"silhouette"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"clustering_evaluator_"</span>), <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code> object or a <code>tbl_spark</code> containing label and prediction columns. The latter should be the output of <code><a href='sdf-transform-methods.html'>sdf_predict</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>features_col</td>
+      <td><p>Name of features column.</p></td>
+    </tr>
+    <tr>
+      <td>prediction_col</td>
+      <td><p>Name of the prediction column.</p></td>
+    </tr>
+    <tr>
+      <td>metric_name</td>
+      <td><p>The performance metric. Currently supports "silhouette".</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the ML estimator.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>The calculated performance metric</p>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+<span class='no'>iris_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span>(<span class='no'>sc</span>, <span class='no'>iris</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"iris_tbl"</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='no'>partitions</span> <span class='kw'>&lt;-</span> <span class='no'>iris_tbl</span> <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='sdf_random_split.html'>sdf_random_split</a></span>(<span class='kw'>training</span> <span class='kw'>=</span> <span class='fl'>0.7</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='fl'>0.3</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>1111</span>)
+
+<span class='no'>iris_training</span> <span class='kw'>&lt;-</span> <span class='no'>partitions</span>$<span class='no'>training</span>
+<span class='no'>iris_test</span> <span class='kw'>&lt;-</span> <span class='no'>partitions</span>$<span class='no'>test</span>
+
+<span class='no'>formula</span> <span class='kw'>&lt;-</span> <span class='no'>Species</span> ~ <span class='no'>.</span>
+
+<span class='co'># Train the models</span>
+<span class='no'>kmeans_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml_kmeans.html'>ml_kmeans</a></span>(<span class='no'>iris_training</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='no'>formula</span>)
+<span class='no'>b_kmeans_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a></span>(<span class='no'>iris_training</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='no'>formula</span>)
+<span class='no'>gmm_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a></span>(<span class='no'>iris_training</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='no'>formula</span>)
+
+<span class='co'># Predict</span>
+<span class='no'>pred_kmeans</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml-transform-methods.html'>ml_predict</a></span>(<span class='no'>kmeans_model</span>, <span class='no'>iris_test</span>)
+<span class='no'>pred_b_kmeans</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml-transform-methods.html'>ml_predict</a></span>(<span class='no'>b_kmeans_model</span>, <span class='no'>iris_test</span>)
+<span class='no'>pred_gmm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ml-transform-methods.html'>ml_predict</a></span>(<span class='no'>gmm_model</span>, <span class='no'>iris_test</span>)
+
+<span class='co'># Evaluate</span>
+<span class='fu'>ml_clustering_evaluator</span>(<span class='no'>pred_kmeans</span>)
+<span class='fu'>ml_clustering_evaluator</span>(<span class='no'>pred_b_kmeans</span>)
+<span class='fu'>ml_clustering_evaluator</span>(<span class='no'>pred_gmm</span>)
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+
