@@ -136,7 +136,7 @@ spark_connect <- function(master,
   }
 
   # add packages to config
-  if (!is.null(packagese)) config <- spark_config_packages(config, packages)
+  if (!is.null(packages)) config <- spark_config_packages(config, packages)
 
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 
