@@ -53,8 +53,8 @@ spark_default_app_jar <- function(version) {
 #'   \code{\link[=register_extension]{sparklyr::register_extension}} will be passed here.
 #' @param config Custom configuration for the generated Spark connection. See
 #'   \code{\link{spark_config}} for details.
-#' @param packages A list of Spark packages to load. For example, \code{"kafka"} to
-#'   enable Delta Lake or Kafka. Also supports full versions like
+#' @param packages A list of Spark packages to load. For example, \code{"delta"} or
+#'   \code{"kafka"} to enable Delta Lake or Kafka. Also supports full versions like
 #'   \code{"io.delta:delta-core_2.11:0.4.0"}. This is similar to adding packages into the
 #'   \code{sparklyr.shell.packages} configuration option. Notice that the \code{version}
 #'   parameter is used to choose the correect package, otherwise assumes the latest version

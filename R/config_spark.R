@@ -128,6 +128,8 @@ spark_config_packages <- function(config, packages, version) {
   if ("kafka" %in% packages) {
     packages <- packages[-which(packages == "kafka")]
 
+    if (version < "2.0.0") stop("Kafka requires Spark 2.x")
+
     kafka_package <- "org.apache.spark:spark-sql-kafka-0-10_2.11:"
     if (version >= "2.4.1")
       kafka_package <- "org.apache.spark:spark-sql-kafka-0-10_2.12:"
@@ -135,6 +137,12 @@ spark_config_packages <- function(config, packages, version) {
     kafka_package <- paste0(kafka_package, version)
 
     config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, kafka_package)
+  }
+
+  if ("deelta" %in% packages) {
+    if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
+
+    config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, "io.delta:delta-core_2.11:0.4.0")
   }
 
   if (!is.null(packages)) {
