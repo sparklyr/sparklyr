@@ -1,5 +1,10 @@
 # Sparklyr 1.0.4.9000
 
+### Data
+
+- Support to read and write from Delta Lake using `spark_read_delta()`
+  and `spark_write_delta()`.
+
 ### Connections
 
 - `spark_connect()` supports new `package` parameter to easily
