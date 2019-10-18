@@ -23,7 +23,6 @@ reference:
     - spark_connection_find
     - spark_dependency_fallback
     - spark_extension
-    - spark_jobj-class
     - spark_load_table
     - spark_read_libsvm
   - title: Spark Data
@@ -248,15 +247,6 @@ reference:
     - spark_apply
     - spark_apply_bundle
     - spark_apply_log
-  - title: Programming
-    contents:
-    - invoke_method
-    - invoke_new
-    - invoke_static
-    - is_ml_estimator
-    - is_ml_transformer
-    - jobj_class
-    - jobj_set_param
   - title: Livy
     contents:
     - livy_available_versions
