@@ -9,6 +9,23 @@ reference:
     - spark_install
     - spark_log
     - spark_web
+    - connection_is_open
+    - connection_spark_shinyapp
+    - spark_session_config
+    - spark_set_checkpoint_dir
+    - spark_submit
+    - spark_table_name
+    - spark_uninstall
+    - spark_version_from_home
+    - spark_versions
+    - spark_config_kubernetes
+    - spark_config_settings
+    - spark_connection_find
+    - spark_dependency_fallback
+    - spark_extension
+    - spark_jobj-class
+    - spark_load_table
+    - spark_read_libsvm
   - title: Spark Data
     contents:
     - spark_read_csv
@@ -17,6 +34,11 @@ reference:
     - spark_read_parquet
     - spark_read_source
     - spark_read_table
+    - spark_read_orc
+    - spark_read_text
+    - spark_save_table
+    - spark_write_orc
+    - spark_write_text
     - spark_write_csv
     - spark_write_jdbc
     - spark_write_json
@@ -39,7 +61,6 @@ reference:
     - sdf_coalesce
     - sdf_copy_to
     - sdf_len
-    - sdf_mutate
     - sdf_num_partitions
     - sdf_partition
     - sdf_pivot
@@ -53,9 +74,32 @@ reference:
     - sdf_seq
     - sdf_sort
     - sdf_with_unique_id
+    - sdf_collect
+    - sdf_crosstab
+    - sdf_debug_string
+    - sdf_describe
+    - sdf_dim
+    - sdf_fit
+    - sdf_fit_and_transform
+    - sdf_import
+    - sdf_is_streaming
+    - sdf_last_index
+    - sdf_load_parquet
+    - sdf_load_table
+    - sdf_ncol
+    - sdf_nrow
+    - sdf_persist
+    - sdf_project
+    - sdf_quantile
+    - sdf_random_split
+    - sdf_save_parquet
+    - sdf_save_table
+    - sdf_schema
+    - sdf_sql
+    - sdf_transform
+    - sdf_with_sequential_id
   - title: Spark Machine Learning
     contents:
-    - ml_als_factorization
     - ml_decision_tree
     - ml_generalized_linear_regression
     - ml_gradient_boosted_trees
@@ -70,6 +114,68 @@ reference:
     - ml_pca
     - ml_random_forest
     - ml_survival_regression
+    - ml_add_stage
+    - ml_aft_survival_regression
+    - ml_als
+    - ml_approx_nearest_neighbors
+    - ml_approx_similarity_join
+    - ml_association_rules
+    - ml_binary_classification_evaluator
+    - ml_bisecting_kmeans
+    - ml_call_constructor
+    - ml_chisquare_test
+    - ml_clustering_evaluator
+    - ml_clustering_pipeline
+    - ml_compute_cost
+    - ml_construct_model_clustering
+    - ml_construct_model_supervised
+    - ml_corr
+    - ml_cross_validator
+    - ml_decision_tree_classifier
+    - ml_decision_tree_regressor
+    - ml_default_stop_words
+    - ml_describe_topics
+    - ml_evaluate
+    - ml_feature_importances
+    - ml_find_synonyms
+    - ml_fit
+    - ml_fit_and_transform
+    - ml_fpgrowth
+    - ml_freq_itemsets
+    - ml_gaussian_mixture
+    - ml_gbt_classifier
+    - ml_gbt_regressor
+    - ml_is_set
+    - ml_isotonic_regression
+    - ml_labels
+    - ml_linear_svc
+    - ml_load
+    - ml_log_likelihood
+    - ml_log_perplexity
+    - ml_multiclass_classification_evaluator
+    - ml_multilayer_perceptron_classifier
+    - ml_param
+    - ml_param_map
+    - ml_params
+    - ml_pipeline
+    - ml_predict
+    - ml_random_forest_classifier
+    - ml_random_forest_regressor
+    - ml_recommend
+    - ml_regression_evaluator
+    - ml_save
+    - ml_stage
+    - ml_stages
+    - ml_standardize_formula
+    - ml_sub_models
+    - ml_summary
+    - ml_supervised_pipeline
+    - ml_topics_matrix
+    - ml_train_validation_split
+    - ml_transform
+    - ml_uid
+    - ml_validation_metrics
+    - ml_vocabulary
   - title: Spark Feature Transformers
     contents:
     - ft_binarizer
@@ -86,6 +192,30 @@ reference:
     - ft_tokenizer
     - ft_regex_tokenizer
     - ft_count_vectorizer
+    - ft_bucketed_random_projection_lsh
+    - ft_chisq_selector
+    - ft_dct
+    - ft_dplyr_transformer
+    - ft_feature_hasher
+    - ft_hashing_tf
+    - ft_idf
+    - ft_imputer
+    - ft_interaction
+    - ft_max_abs_scaler
+    - ft_min_max_scaler
+    - ft_minhash_lsh
+    - ft_ngram
+    - ft_normalizer
+    - ft_one_hot_encoder_estimator
+    - ft_pca
+    - ft_polynomial_expansion
+    - ft_r_formula
+    - ft_standard_scaler
+    - ft_stop_words_remover
+    - ft_string_indexer_model
+    - ft_vector_indexer
+    - ft_vector_slicer
+    - ft_word2vec
   - title: Spark Machine Learning Utilities
     contents:
     - ml_binary_classification_eval
@@ -114,5 +244,55 @@ reference:
     - spark_session
     - spark_version
   - title: Distributed Computing
-    contents: spark_apply
-
+    contents:
+    - spark_apply
+    - spark_apply_bundle
+    - spark_apply_log
+  - title: Programming
+    contents:
+    - invoke_method
+    - invoke_new
+    - invoke_static
+    - is_ml_estimator
+    - is_ml_transformer
+    - jobj_class
+    - jobj_set_param
+  - title: Livy
+    contents:
+    - livy_available_versions
+    - livy_config
+    - livy_home_dir
+    - livy_install
+    - livy_install_dir
+    - livy_installed_versions
+    - livy_service_start
+    - livy_service_stop
+  - title: Streaming
+    contents:
+    - stream_find
+    - stream_generate_test
+    - stream_id
+    - stream_name
+    - stream_read_csv
+    - stream_read_json
+    - stream_read_kafka
+    - stream_read_orc
+    - stream_read_parquet
+    - stream_read_scoket
+    - stream_read_text
+    - stream_render
+    - stream_stats
+    - stream_stop
+    - stream_trigger_continuous
+    - stream_trigger_interval
+    - stream_view
+    - stream_watermark
+    - stream_write_console
+    - stream_write_csv
+    - stream_write_json
+    - stream_write_kafka
+    - stream_write_memory
+    - stream_write_orc
+    - stream_write_parquet
+    - stream_write_text
+    - reactiveSpark
