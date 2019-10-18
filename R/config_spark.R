@@ -123,6 +123,7 @@ spark_config_value_retries <- function(config, name, default, retries) {
 #' @keywords interenal
 #' @export
 spark_config_packages <- function(config, packages, version) {
+  version <- spark_version_latest(version)
 
   if ("kafka" %in% packages) {
     packages <- packages[-which(packages == "kafka")]

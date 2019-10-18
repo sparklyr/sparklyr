@@ -56,7 +56,9 @@ spark_default_app_jar <- function(version) {
 #' @param packages A list of Spark packages to load. For example, \code{"kafka"} to
 #'   enable Delta Lake or Kafka. Also supports full versions like
 #'   \code{"io.delta:delta-core_2.11:0.4.0"}. This is similar to adding packages into the
-#'   \code{sparklyr.shell.packages} configuration option.
+#'   \code{sparklyr.shell.packages} configuration option. Notice that the \code{version}
+#'   parameter is used to choose the correect package, otherwise assumes the latest version
+#'   is being used.
 #'
 #' @param ... Optional arguments; currently unused.
 #'
