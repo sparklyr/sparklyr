@@ -1,0 +1,112 @@
+---
+title: "Create a Pipeline Stage Object"
+aliases:
+  - reference/sparklyr/latest/spark_pipeline_stage.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Helper function to create pipeline stage objects with common parameter setters.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_pipeline_stage</span>(<span class='no'>sc</span>, <span class='no'>class</span>, <span class='no'>uid</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>input_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>input_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>output_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>output_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>sc</td>
+      <td><p>A `spark_connection` object.</p></td>
+    </tr>
+    <tr>
+      <td>class</td>
+      <td><p>Class name for the pipeline stage.</p></td>
+    </tr>
+    <tr>
+      <td>uid</td>
+      <td><p>A character string used to uniquely identify the ML estimator.</p></td>
+    </tr>
+    <tr>
+      <td>features_col</td>
+      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>label_col</td>
+      <td><p>Label column name. The column should be a numeric column. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>prediction_col</td>
+      <td><p>Prediction column name.</p></td>
+    </tr>
+    <tr>
+      <td>probability_col</td>
+      <td><p>Column name for predicted class conditional probabilities.</p></td>
+    </tr>
+    <tr>
+      <td>raw_prediction_col</td>
+      <td><p>Raw prediction (a.k.a. confidence) column name.</p></td>
+    </tr>
+    <tr>
+      <td>k</td>
+      <td><p>The number of clusters to create</p></td>
+    </tr>
+    <tr>
+      <td>max_iter</td>
+      <td><p>The maximum number of iterations to use.</p></td>
+    </tr>
+    <tr>
+      <td>seed</td>
+      <td><p>A random seed. Set this value if you need your results to be
+reproducible across repeated calls.</p></td>
+    </tr>
+    <tr>
+      <td>input_col</td>
+      <td><p>The name of the input column.</p></td>
+    </tr>
+    <tr>
+      <td>input_cols</td>
+      <td><p>Names of input columns.</p></td>
+    </tr>
+    <tr>
+      <td>output_col</td>
+      <td><p>The name of the output column.</p></td>
+    </tr>
+    <tr>
+      <td>thresholds</td>
+      <td><p>Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values &gt; 0 excepting that at most one value may be 0. The class with largest value <code>p/t</code> is predicted, where <code>p</code> is the original probability of that class and <code>t</code> is the class's threshold.</p></td>
+    </tr>
+    <tr>
+      <td>features_col</td>
+      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>input_cols</td>
+      <td><p>Names of output columns.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

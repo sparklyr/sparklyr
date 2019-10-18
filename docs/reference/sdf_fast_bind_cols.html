@@ -1,0 +1,47 @@
+---
+title: "Fast cbind for Spark DataFrames"
+aliases:
+  - reference/sparklyr/latest/sdf_fast_bind_cols.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>This is a version of `sdf_bind_cols` that works by zipping
+RDDs. From the API docs: "Assumes that the two RDDs have the
+*same number of partitions* and the *same number of elements
+in each partition* (e.g. one was made through a map on the
+other)."</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_fast_bind_cols</span>(<span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>...</td>
+      <td><p>Spark DataFrames to cbind</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

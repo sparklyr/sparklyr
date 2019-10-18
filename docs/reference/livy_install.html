@@ -1,0 +1,78 @@
+---
+title: "Install Livy"
+aliases:
+  - reference/sparklyr/latest/livy_install.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Automatically download and install <a href='http://livy.io/'><samp>livy</samp></a>.
+<samp>livy</samp> provides a REST API to Spark.</p>
+<p>Find the LIVY_HOME directory for a given version of Livy that
+was previously installed using <code>livy_install</code>.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>livy_install</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"0.5.0"</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>spark_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>livy_available_versions</span>()
+
+<span class='fu'>livy_install_dir</span>()
+
+<span class='fu'>livy_installed_versions</span>()
+
+<span class='fu'>livy_home_dir</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>version</td>
+      <td><p>The version of <samp>livy</samp> to be installed.</p></td>
+    </tr>
+    <tr>
+      <td>spark_home</td>
+      <td><p>The path to a Spark installation. The downloaded and
+installed version of <samp>livy</samp> will then be associated with this Spark
+installation. When unset (<samp>NULL</samp>), the value is inferred based on
+the value of <samp>spark_version</samp> supplied.</p></td>
+    </tr>
+    <tr>
+      <td>spark_version</td>
+      <td><p>The version of Spark to use. When unset (<samp>NULL</samp>),
+the value is inferred based on the value of <samp>livy_version</samp> supplied.
+A version of Spark known to be compatible with the requested version of
+<samp>livy</samp> is chosen when possible.</p></td>
+    </tr>
+    <tr>
+      <td>version</td>
+      <td><p>Version of Livy</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>Path to LIVY_HOME (or <code>NULL</code> if the specified version
+  was not found).</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

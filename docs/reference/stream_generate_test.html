@@ -1,0 +1,71 @@
+---
+title: "Generate Test Stream"
+aliases:
+  - reference/sparklyr/latest/stream_generate_test.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#details">Details</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Generates a local test stream, useful when testing streams locally.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_generate_test</span>(<span class='kw'>df</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>:<span class='fl'>1000</span>), <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"source"</span>,
+  <span class='kw'>distribution</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fl'>10</span> + <span class='fl'>1e+05</span> * <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>dbinom</a></span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='fl'>20</span>, <span class='fl'>0.5</span>)),
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>1</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>df</td>
+      <td><p>The data frame used as a source of rows to the stream, will
+be cast to data frame if needed. Defaults to a sequence of one thousand
+entries.</p></td>
+    </tr>
+    <tr>
+      <td>path</td>
+      <td><p>Path to save stream of files to, defaults to <code>"source"</code>.</p></td>
+    </tr>
+    <tr>
+      <td>distribution</td>
+      <td><p>The distribution of rows to use over each iteration,
+defaults to a binomial distribution. The stream will cycle through the
+distribution if needed.</p></td>
+    </tr>
+    <tr>
+      <td>iterations</td>
+      <td><p>Number of iterations to execute before stopping, defaults
+to fifty.</p></td>
+    </tr>
+    <tr>
+      <td>interval</td>
+      <td><p>The inverval in seconds use to write the stream, defaults
+to one second.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="details">Details</h2>
+
+    <p>This function requires the <code>callr</code> package to be installed.</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

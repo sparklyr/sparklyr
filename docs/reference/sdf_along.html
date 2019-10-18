@@ -1,0 +1,57 @@
+---
+title: "Create DataFrame for along Object"
+aliases:
+  - reference/sparklyr/latest/sdf_along.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Creates a DataFrame along the given object.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_along</span>(<span class='no'>sc</span>, <span class='no'>along</span>, <span class='kw'>repartition</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"integer"</span>,
+  <span class='st'>"integer64"</span>))</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>sc</td>
+      <td><p>The associated Spark connection.</p></td>
+    </tr>
+    <tr>
+      <td>along</td>
+      <td><p>Takes the length from the length of this argument.</p></td>
+    </tr>
+    <tr>
+      <td>repartition</td>
+      <td><p>The number of partitions to use when distributing the
+data across the Spark cluster.</p></td>
+    </tr>
+    <tr>
+      <td>type</td>
+      <td><p>The data type to use for the index, either <code>"integer"</code> or <code>"integer64"</code>.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

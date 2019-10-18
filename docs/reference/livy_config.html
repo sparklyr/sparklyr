@@ -1,0 +1,97 @@
+---
+title: "Create a Spark Configuration for Livy"
+aliases:
+  - reference/sparklyr/latest/livy_config.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#details">Details</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Create a Spark Configuration for Livy</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>livy_config</span>(<span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(), <span class='kw'>username</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>password</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>negotiate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>custom_headers</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>`X-Requested-By`</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>), <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>config</td>
+      <td><p>Optional base configuration</p></td>
+    </tr>
+    <tr>
+      <td>username</td>
+      <td><p>The username to use in the Authorization header</p></td>
+    </tr>
+    <tr>
+      <td>password</td>
+      <td><p>The password to use in the Authorization header</p></td>
+    </tr>
+    <tr>
+      <td>negotiate</td>
+      <td><p>Whether to use gssnegotiate method or not</p></td>
+    </tr>
+    <tr>
+      <td>custom_headers</td>
+      <td><p>List of custom headers to append to http requests. Defaults to <code><a href='https://rdrr.io/r/base/list.html'>list("X-Requested-By" = "sparklyr")</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>additional Livy session parameters</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>Named list with configuration data</p>
+    <h2 id="details">Details</h2>
+
+    <p>Extends a Spark <code><a href='spark_config.html'>spark_config()</a></code> configuration with settings
+for Livy. For instance, <code>username</code> and <code>password</code>
+define the basic authentication settings for a Livy session.</p>
+<p>The default value of <code>"custom_headers"</code> is set to <code><a href='https://rdrr.io/r/base/list.html'>list("X-Requested-By" = "sparklyr")</a></code>
+in order to facilitate connection to Livy servers with CSRF protection enabled.</p>
+<p>Additional parameters for Livy sessions are:</p><dl class='dl-horizontal'>
+  <dt><code>proxy_user</code></dt><dd><p>User to impersonate when starting the session</p></dd>
+  <dt><code>jars</code></dt><dd><p>jars to be used in this session</p></dd>
+  <dt><code>py_files</code></dt><dd><p>Python files to be used in this session</p></dd>
+  <dt><code>files</code></dt><dd><p>files to be used in this session</p></dd>
+  <dt><code>driver_memory</code></dt><dd><p>Amount of memory to use for the driver process</p></dd>
+  <dt><code>driver_cores</code></dt><dd><p>Number of cores to use for the driver process</p></dd>
+  <dt><code>executor_memory</code></dt><dd><p>Amount of memory to use per executor process</p></dd>
+  <dt><code>executor_cores</code></dt><dd><p>Number of cores to use for each executor</p></dd>
+  <dt><code>num_executors</code></dt><dd><p>Number of executors to launch for this session</p></dd>
+  <dt><code>archives</code></dt><dd><p>Archives to be used in this session</p></dd>
+  <dt><code>queue</code></dt><dd><p>The name of the YARN queue to which submitted</p></dd>
+  <dt><code>name</code></dt><dd><p>The name of this session</p></dd>
+  <dt><code>heartbeat_timeout</code></dt><dd><p>Timeout in seconds to which session be orphaned</p></dd>
+
+</dl>
+
+<p>Note that <code>queue</code> is supported only by version 0.4.0 of Livy or newer.
+If you are using the older one, specify queue via <code>config</code> (e.g.
+<code>config = spark_config(spark.yarn.queue = "my_queue")</code>).</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

@@ -1,0 +1,60 @@
+---
+title: "Start Livy"
+aliases:
+  - reference/sparklyr/latest/livy_service_start.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Starts the livy service.</p>
+<p>Stops the running instances of the livy service.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>livy_service_start</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>spark_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>stdout</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>stderr</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='no'>...</span>)
+
+<span class='fu'>livy_service_stop</span>()</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>version</td>
+      <td><p>The version of <samp>livy</samp> to use.</p></td>
+    </tr>
+    <tr>
+      <td>spark_version</td>
+      <td><p>The version of <samp>spark</samp> to connect to.</p></td>
+    </tr>
+    <tr>
+      <td>stdout, stderr</td>
+      <td><p>where output to 'stdout' or 'stderr' should
+be sent. Same options as <code>system2</code>.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

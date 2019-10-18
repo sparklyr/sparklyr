@@ -1,0 +1,62 @@
+---
+title: "Set the SPARK_HOME environment variable"
+aliases:
+  - reference/sparklyr/latest/spark_home_set.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Set the <code>SPARK_HOME</code> environment variable. This slightly speeds up some
+operations, including the connection time.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_home_set</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>path</td>
+      <td><p>A string containing the path to the installation location of
+Spark. If <code>NULL</code>, the path to the most latest Spark/Hadoop versions is
+used.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Additional parameters not currently used.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>The function is mostly invoked for the side-effect of setting the
+<code>SPARK_HOME</code> environment variable. It also returns <code>TRUE</code> if the
+environment was successfully set, and <code>FALSE</code> otherwise.</p>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='co'># Not run due to side-effects</span>
+<span class='fu'>spark_home_set</span>()
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

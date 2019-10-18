@@ -1,0 +1,75 @@
+---
+title: "Project features onto principal components"
+aliases:
+  - reference/sparklyr/latest/sdf_project.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#transforming-spark-dataframes">Transforming Spark DataFrames</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Project features onto principal components</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_project</span>(<span class='no'>object</span>, <span class='no'>newdata</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/dimnames.html'>dimnames</a></span>(<span class='no'>object</span>$<span class='no'>pc</span>)<span class='kw'>[[</span><span class='fl'>1</span>]],
+  <span class='kw'>feature_prefix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>object</td>
+      <td><p>A Spark PCA model object</p></td>
+    </tr>
+    <tr>
+      <td>newdata</td>
+      <td><p>An object coercible to a Spark DataFrame</p></td>
+    </tr>
+    <tr>
+      <td>features</td>
+      <td><p>A vector of names of columns to be projected</p></td>
+    </tr>
+    <tr>
+      <td>feature_prefix</td>
+      <td><p>The prefix used in naming the output features</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="transforming-spark-dataframes">Transforming Spark DataFrames</h2>
+
+    
+
+
+<p>The family of functions prefixed with <code>sdf_</code> generally access the Scala
+Spark DataFrame API directly, as opposed to the <code>dplyr</code> interface which
+uses Spark SQL. These functions will 'force' any pending SQL in a
+<code>dplyr</code> pipeline, such that the resulting <code>tbl_spark</code> object
+returned will no longer have the attached 'lazy' SQL operations. Note that
+the underlying Spark DataFrame <em>does</em> execute its operations lazily, so
+that even though the pending set of operations (currently) are not exposed at
+the <span style="R">R</span> level, these operations will only be executed when you explicitly
+<code><a href='collect.html'>collect()</a></code> the table.</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

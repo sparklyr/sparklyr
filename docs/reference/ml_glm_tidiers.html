@@ -1,0 +1,85 @@
+---
+title: "Tidying methods for Spark ML linear models"
+aliases:
+  - reference/sparklyr/latest/ml_glm_tidiers.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#details">Details</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>These methods summarize the results of Spark ML models into tidy forms.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for ml_model_generalized_linear_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/tidy.html'>tidy</a></span>(<span class='no'>x</span>,
+  <span class='kw'>exponentiate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model_linear_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/tidy.html'>tidy</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model_generalized_linear_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/augment.html'>augment</a></span>(<span class='no'>x</span>,
+  <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type.residuals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"working"</span>, <span class='st'>"deviance"</span>, <span class='st'>"pearson"</span>,
+  <span class='st'>"response"</span>), <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model_linear_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/augment.html'>augment</a></span>(<span class='no'>x</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>type.residuals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"working"</span>, <span class='st'>"deviance"</span>, <span class='st'>"pearson"</span>, <span class='st'>"response"</span>), <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model_generalized_linear_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/glance.html'>glance</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model_linear_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/glance.html'>glance</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>a Spark ML model.</p></td>
+    </tr>
+    <tr>
+      <td>exponentiate</td>
+      <td><p>For GLM, whether to exponentiate the coefficient estimates (typical for logistic regression.)</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>extra arguments (not used.)</p></td>
+    </tr>
+    <tr>
+      <td>newdata</td>
+      <td><p>a tbl_spark of new data to use for prediction.</p></td>
+    </tr>
+    <tr>
+      <td>type.residuals</td>
+      <td><p>type of residuals, defaults to <code>"working"</code>. Must be set to
+<code>"working"</code> when <code>newdata</code> is supplied.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="details">Details</h2>
+
+    <p>The residuals attached by <code>augment</code> are of type "working" by default,
+  which is different from the default of "deviance" for <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> or <code><a href='sdf_residuals.html'>sdf_residuals()</a></code>.</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

@@ -1,0 +1,74 @@
+---
+title: "Spark ML -- Model Persistence"
+aliases:
+  - reference/sparklyr/latest/ml-persistence.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Save/load Spark ML objects</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_save</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model</span>
+<span class='fu'>ml_save</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pipeline_model"</span>, <span class='st'>"pipeline"</span>), <span class='no'>...</span>)
+
+<span class='fu'>ml_load</span>(<span class='no'>sc</span>, <span class='no'>path</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A ML object, which could be a <code>ml_pipeline_stage</code> or a <code>ml_model</code></p></td>
+    </tr>
+    <tr>
+      <td>path</td>
+      <td><p>The path where the object is to be serialized/deserialized.</p></td>
+    </tr>
+    <tr>
+      <td>overwrite</td>
+      <td><p>Whether to overwrite the existing path, defaults to <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>type</td>
+      <td><p>Whether to save the pipeline model or the pipeline.</p></td>
+    </tr>
+    <tr>
+      <td>sc</td>
+      <td><p>A Spark connection.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p><code>ml_save()</code> serializes a Spark object into a format that can be read back into <code>sparklyr</code> or by the Scala or PySpark APIs. When called on <code>ml_model</code> objects, i.e. those that were created via the <code>tbl_spark - formula</code> signature, the associated pipeline model is serialized. In other words, the saved model contains both the data processing (<code>RFormulaModel</code>) stage and the machine learning stage.</p>
+<p><code>ml_load()</code> reads a saved Spark object into <code>sparklyr</code>. It calls the correct Scala <code>load</code> method based on parsing the saved metadata. Note that a <code>PipelineModel</code> object saved from a sparklyr <code>ml_model</code> via <code>ml_save()</code> will be read back in as an <code>ml_pipeline_model</code>, rather than the <code>ml_model</code> object.</p>
+
+
+    </div>
+
+    </div>
+
+
+
+

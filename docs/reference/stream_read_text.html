@@ -1,0 +1,93 @@
+---
+title: "Read Text Stream"
+aliases:
+  - reference/sparklyr/latest/stream_read_text.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#see-also">See also</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Reads a text stream as a Spark dataframe stream.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_read_text</span>(<span class='no'>sc</span>, <span class='no'>path</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>sc</td>
+      <td><p>A <code>spark_connection</code>.</p></td>
+    </tr>
+    <tr>
+      <td>path</td>
+      <td><p>The path to the file. Needs to be accessible from the cluster.
+Supports the <samp>"hdfs://"</samp>, <samp>"s3a://"</samp> and <samp>"file://"</samp> protocols.</p></td>
+    </tr>
+    <tr>
+      <td>name</td>
+      <td><p>The name to assign to the newly generated stream.</p></td>
+    </tr>
+    <tr>
+      <td>options</td>
+      <td><p>A list of strings with additional options.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="see-also">See also</h2>
+
+    <div class='dont-index'><p>Other Spark stream serialization: <code><a href='stream_read_csv.html'>stream_read_csv</a></code>,
+  <code><a href='stream_read_json.html'>stream_read_json</a></code>,
+  <code><a href='stream_read_kafka.html'>stream_read_kafka</a></code>,
+  <code><a href='stream_read_orc.html'>stream_read_orc</a></code>,
+  <code><a href='stream_read_parquet.html'>stream_read_parquet</a></code>,
+  <code><a href='stream_read_scoket.html'>stream_read_scoket</a></code>,
+  <code><a href='stream_write_console.html'>stream_write_console</a></code>,
+  <code><a href='stream_write_csv.html'>stream_write_csv</a></code>,
+  <code><a href='stream_write_json.html'>stream_write_json</a></code>,
+  <code><a href='stream_write_kafka.html'>stream_write_kafka</a></code>,
+  <code><a href='stream_write_memory.html'>stream_write_memory</a></code>,
+  <code><a href='stream_write_orc.html'>stream_write_orc</a></code>,
+  <code><a href='stream_write_parquet.html'>stream_write_parquet</a></code>,
+  <code><a href='stream_write_text.html'>stream_write_text</a></code></p></div>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+
+<span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span>(<span class='st'>"text-in"</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/writeLines.html'>writeLines</a></span>(<span class='st'>"A text entry"</span>, <span class='st'>"text-in/text.txt"</span>)
+
+<span class='no'>text_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"file://"</span>, <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span>(), <span class='st'>"text-in"</span>)
+
+<span class='no'>stream</span> <span class='kw'>&lt;-</span> <span class='fu'>stream_read_text</span>(<span class='no'>sc</span>, <span class='no'>text_path</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='stream_write_text.html'>stream_write_text</a></span>(<span class='st'>"text-out"</span>)
+
+<span class='fu'><a href='stream_stop.html'>stream_stop</a></span>(<span class='no'>stream</span>)
+
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

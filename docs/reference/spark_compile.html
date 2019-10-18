@@ -1,0 +1,70 @@
+---
+title: "Compile Scala sources into a Java Archive"
+aliases:
+  - reference/sparklyr/latest/spark_compile.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Given a set of <code>scala</code> source files, compile them
+into a Java Archive (<code>jar</code>).</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_compile</span>(<span class='no'>jar_name</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>scalac</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>jar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>jar_dep</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>spark_home</td>
+      <td><p>The path to the Spark sources to be used
+alongside compilation.</p></td>
+    </tr>
+    <tr>
+      <td>filter</td>
+      <td><p>An optional function, used to filter out discovered <code>scala</code>
+files during compilation. This can be used to ensure that e.g. certain files
+are only compiled with certain versions of Spark, and so on.</p></td>
+    </tr>
+    <tr>
+      <td>scalac</td>
+      <td><p>The path to the <code>scalac</code> program to be used, for
+compilation of <code>scala</code> files.</p></td>
+    </tr>
+    <tr>
+      <td>jar</td>
+      <td><p>The path to the <code>jar</code> program to be used, for
+generating of the resulting <code>jar</code>.</p></td>
+    </tr>
+    <tr>
+      <td>jar_dep</td>
+      <td><p>An optional list of additional <code>jar</code> dependencies.</p></td>
+    </tr>
+    <tr>
+      <td>name</td>
+      <td><p>The name to assign to the target <code>jar</code>.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

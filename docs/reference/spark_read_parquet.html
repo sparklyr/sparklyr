@@ -1,0 +1,120 @@
+---
+title: "Read a Parquet file into a Spark DataFrame"
+aliases:
+  - reference/sparklyr/latest/spark_read_parquet.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#details">Details</a></li>
+    <li><a href="#see-also">See also</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Read a <a href='https://parquet.apache.org/'>Parquet</a> file into a Spark
+DataFrame.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_read_parquet</span>(<span class='no'>sc</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>name</span>, <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>repartition</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>memory</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>schema</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>sc</td>
+      <td><p>A <code>spark_connection</code>.</p></td>
+    </tr>
+    <tr>
+      <td>name</td>
+      <td><p>The name to assign to the newly generated table.</p></td>
+    </tr>
+    <tr>
+      <td>path</td>
+      <td><p>The path to the file. Needs to be accessible from the cluster.
+Supports the <samp>"hdfs://"</samp>, <samp>"s3a://"</samp> and <samp>"file://"</samp> protocols.</p></td>
+    </tr>
+    <tr>
+      <td>options</td>
+      <td><p>A list of strings with additional options. See <a href='http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration'>http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration</a>.</p></td>
+    </tr>
+    <tr>
+      <td>repartition</td>
+      <td><p>The number of partitions used to distribute the
+generated table. Use 0 (the default) to avoid partitioning.</p></td>
+    </tr>
+    <tr>
+      <td>memory</td>
+      <td><p>Boolean; should the data be loaded eagerly into memory? (That
+is, should the table be cached?)</p></td>
+    </tr>
+    <tr>
+      <td>overwrite</td>
+      <td><p>Boolean; overwrite the table with the given name if it
+already exists?</p></td>
+    </tr>
+    <tr>
+      <td>columns</td>
+      <td><p>A vector of column names or a named vector of column types.</p></td>
+    </tr>
+    <tr>
+      <td>schema</td>
+      <td><p>A (java) read schema. Useful for optimizing read operation on nested data.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="details">Details</h2>
+
+    <p>You can read data from HDFS (<code>hdfs://</code>), S3 (<code>s3a://</code>), as well as
+  the local file system (<code>file://</code>).</p>
+<p>If you are reading from a secure S3 bucket be sure to set the following in your spark-defaults.conf
+<code>spark.hadoop.fs.s3a.access.key</code>, <code>spark.hadoop.fs.s3a.secret.key</code> or any of the methods outlined in the aws-sdk
+documentation <a href='http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html'>Working with AWS credentials</a>
+In order to work with the newer <code>s3a://</code> protocol also set the values for <code>spark.hadoop.fs.s3a.impl</code> and <code>spark.hadoop.fs.s3a.endpoint </code>.
+In addition, to support v4 of the S3 api be sure to pass the <code>-Dcom.amazonaws.services.s3.enableV4</code> driver options
+for the config key <code>spark.driver.extraJavaOptions </code>
+For instructions on how to configure <code>s3n://</code> check the hadoop documentation:
+<a href='https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html#Authentication_properties'>s3n authentication properties</a></p>
+    <h2 id="see-also">See also</h2>
+
+    <div class='dont-index'><p>Other Spark serialization routines: <code><a href='spark_load_table.html'>spark_load_table</a></code>,
+  <code><a href='spark_read_csv.html'>spark_read_csv</a></code>,
+  <code><a href='spark_read_jdbc.html'>spark_read_jdbc</a></code>,
+  <code><a href='spark_read_json.html'>spark_read_json</a></code>,
+  <code><a href='spark_read_libsvm.html'>spark_read_libsvm</a></code>,
+  <code><a href='spark_read_orc.html'>spark_read_orc</a></code>,
+  <code><a href='spark_read_source.html'>spark_read_source</a></code>,
+  <code><a href='spark_read_table.html'>spark_read_table</a></code>,
+  <code><a href='spark_read_text.html'>spark_read_text</a></code>,
+  <code><a href='spark_save_table.html'>spark_save_table</a></code>,
+  <code><a href='spark_write_csv.html'>spark_write_csv</a></code>,
+  <code><a href='spark_write_jdbc.html'>spark_write_jdbc</a></code>,
+  <code><a href='spark_write_json.html'>spark_write_json</a></code>,
+  <code><a href='spark_write_orc.html'>spark_write_orc</a></code>,
+  <code><a href='spark_write_parquet.html'>spark_write_parquet</a></code>,
+  <code><a href='spark_write_source.html'>spark_write_source</a></code>,
+  <code><a href='spark_write_table.html'>spark_write_table</a></code>,
+  <code><a href='spark_write_text.html'>spark_write_text</a></code></p></div>
+
+
+    </div>
+
+    </div>
+
+
+
+

@@ -1,0 +1,59 @@
+---
+title: "Tidying methods for Spark ML Survival Regression"
+aliases:
+  - reference/sparklyr/latest/ml_survival_regression_tidiers.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>These methods summarize the results of Spark ML models into tidy forms.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for ml_model_aft_survival_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/tidy.html'>tidy</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model_aft_survival_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/augment.html'>augment</a></span>(<span class='no'>x</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>)
+
+<span class='co'># S3 method for ml_model_aft_survival_regression</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/glance.html'>glance</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>a Spark ML model.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>extra arguments (not used.)</p></td>
+    </tr>
+    <tr>
+      <td>newdata</td>
+      <td><p>a tbl_spark of new data to use for prediction.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

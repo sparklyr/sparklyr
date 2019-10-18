@@ -1,0 +1,119 @@
+---
+title: "Manage Spark Connections"
+aliases:
+  - reference/sparklyr/latest/spark-connections.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#details">Details</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>These routines allow you to manage your connections to Spark.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_connect</span>(<span class='no'>master</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"SPARK_HOME"</span>),
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"shell"</span>, <span class='st'>"livy"</span>, <span class='st'>"databricks"</span>, <span class='st'>"test"</span>, <span class='st'>"qubole"</span>),
+  <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
+  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sparklyr/man/register_extension.html'>registered_extensions</a></span>(), <span class='no'>...</span>)
+
+<span class='fu'>spark_connection_is_open</span>(<span class='no'>sc</span>)
+
+<span class='fu'>spark_disconnect</span>(<span class='no'>sc</span>, <span class='no'>...</span>)
+
+<span class='fu'>spark_disconnect_all</span>()
+
+<span class='fu'>spark_submit</span>(<span class='no'>master</span>, <span class='no'>file</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"SPARK_HOME"</span>),
+  <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
+  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sparklyr/man/register_extension.html'>registered_extensions</a></span>(), <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>master</td>
+      <td><p>Spark cluster url to connect to. Use <code>"local"</code> to
+connect to a local instance of Spark installed via
+<code><a href='spark_install.html'>spark_install</a></code>.</p></td>
+    </tr>
+    <tr>
+      <td>spark_home</td>
+      <td><p>The path to a Spark installation. Defaults to the path
+provided by the <code>SPARK_HOME</code> environment variable. If
+<code>SPARK_HOME</code> is defined, it will always be used unless the
+<code>version</code> parameter is specified to force the use of a locally
+installed version.</p></td>
+    </tr>
+    <tr>
+      <td>method</td>
+      <td><p>The method used to connect to Spark. Default connection method
+is <code>"shell"</code> to connect using spark-submit, use <code>"livy"</code> to
+perform remote connections using HTTP, or <code>"databricks"</code> when using a
+Databricks clusters.</p></td>
+    </tr>
+    <tr>
+      <td>app_name</td>
+      <td><p>The application name to be used while running in the Spark
+cluster.</p></td>
+    </tr>
+    <tr>
+      <td>version</td>
+      <td><p>The version of Spark to use. Required for <code>"local"</code> Spark
+connections, optional otherwise.</p></td>
+    </tr>
+    <tr>
+      <td>config</td>
+      <td><p>Custom configuration for the generated Spark connection. See
+<code><a href='spark_config.html'>spark_config</a></code> for details.</p></td>
+    </tr>
+    <tr>
+      <td>extensions</td>
+      <td><p>Extension packages to enable for this connection. By
+default, all packages enabled through the use of
+<code><a href='register_extension.html'>sparklyr::register_extension</a></code> will be passed here.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Optional arguments; currently unused.</p></td>
+    </tr>
+    <tr>
+      <td>sc</td>
+      <td><p>A <code>spark_connection</code>.</p></td>
+    </tr>
+    <tr>
+      <td>file</td>
+      <td><p>Path to R source file to submit for batch execution.</p></td>
+    </tr>
+    </table>
+
+    <h2 id="details">Details</h2>
+
+    <p>When using <code>method = "livy"</code>, it is recommended to specify <code>version</code>
+parameter to improve performance by using precompiled code rather than uploading
+sources. By default, jars are downloaded from GitHub but the path to the correct
+<code>sparklyr</code> JAR can also be specified through the <code>livy.jars</code> setting.</p>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'>spark_connect</span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"spark://HOST:PORT"</span>)
+<span class='fu'><a href='connection_is_open.html'>connection_is_open</a></span>(<span class='no'>sc</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='fu'>spark_disconnect</span>(<span class='no'>sc</span>)</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+

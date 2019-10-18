@@ -1,0 +1,54 @@
+---
+title: "Add a Sequential ID Column to a Spark DataFrame"
+aliases:
+  - reference/sparklyr/latest/sdf_with_sequential_id.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Add a sequential ID column to a Spark DataFrame. The Spark
+<code>zipWithIndex</code> function is used to produce these. This differs from
+<code>sdf_with_unique_id</code> in that the IDs generated are independent of
+partitioning.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_with_sequential_id</span>(<span class='no'>x</span>, <span class='kw'>id</span> <span class='kw'>=</span> <span class='st'>"id"</span>, <span class='kw'>from</span> <span class='kw'>=</span> <span class='fl'>1L</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A <code>spark_connection</code>, <code>ml_pipeline</code>, or a <code>tbl_spark</code>.</p></td>
+    </tr>
+    <tr>
+      <td>id</td>
+      <td><p>The name of the column to host the generated IDs.</p></td>
+    </tr>
+    <tr>
+      <td>from</td>
+      <td><p>The starting value of the id column</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+
