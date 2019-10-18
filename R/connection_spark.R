@@ -48,11 +48,16 @@ spark_default_app_jar <- function(version) {
 #'   cluster.
 #' @param version The version of Spark to use. Required for \code{"local"} Spark
 #'   connections, optional otherwise.
-#' @param extensions Extension packages to enable for this connection. By
+#' @param extensions Extension R packages to enable for this connection. By
 #'   default, all packages enabled through the use of
 #'   \code{\link[=register_extension]{sparklyr::register_extension}} will be passed here.
 #' @param config Custom configuration for the generated Spark connection. See
 #'   \code{\link{spark_config}} for details.
+#' @param packages A list of Spark packages to load. For example, \code{"kafka"} to
+#'   enable Delta Lake or Kafka. Also supports full versions like
+#'   \code{"io.delta:delta-core_2.11:0.4.0"}. This is similar to adding packages into the
+#'   \code{sparklyr.shell.packages} configuration option.
+#'
 #' @param ... Optional arguments; currently unused.
 #'
 #' @name spark-connections
@@ -104,6 +109,7 @@ spark_connect <- function(master,
                           version = NULL,
                           config = spark_config(),
                           extensions = sparklyr::registered_extensions(),
+                          packages = NULL,
                           ...)
 {
   # validate method
@@ -128,6 +134,9 @@ spark_connect <- function(master,
              "entry in your config.yml")
     }
   }
+
+  # add packages to config
+  if (!is.null(packagese)) config <- spark_config_packages(config, packages)
 
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 

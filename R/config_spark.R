@@ -114,3 +114,31 @@ spark_config_value_retries <- function(config, name, default, retries) {
 
   value
 }
+
+#' Creates Spark Configuration
+#'
+#' @param config The Spark configuration object.
+#' @param packages A list of named packages or versionede packagese to add.
+#'
+#' @internal
+#' @export
+spark_config_packages <- function(config, packages, version) {
+
+  if ("kafka" %in% packages) {
+    packages$kafka <- NULL
+
+    kafka_package <- "org.apache.spark:spark-sql-kafka-0-10_2.11:"
+    if (version >= "2.4.1")
+      kafka_package <- "org.apache.spark:spark-sql-kafka-0-10_2.12:"
+
+    kafka_package <- paste0(kafka_package, version)
+
+    config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, kafka_package)
+  }
+
+  if (!is.null(packages)) {
+    config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, packages)
+  }
+
+  config
+}
