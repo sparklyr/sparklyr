@@ -140,6 +140,8 @@ spark_config_packages <- function(config, packages, version) {
   }
 
   if ("delta" %in% packages) {
+    packages <- packages[-which(packages == "delta")]
+
     if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
 
     config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, "io.delta:delta-core_2.11:0.4.0")
