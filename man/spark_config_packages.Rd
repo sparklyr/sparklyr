@@ -9,7 +9,9 @@ spark_config_packages(config, packages, version)
 \arguments{
 \item{config}{The Spark configuration object.}
 
-\item{packages}{A list of named packages or versionede packagese to add.}
+\item{packages}{A list of named packages or versioned packagese to add.}
+
+\item{version}{The version of Spark being used.}
 }
 \description{
 Creates Spark Configuration

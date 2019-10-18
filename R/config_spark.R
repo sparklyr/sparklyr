@@ -118,7 +118,8 @@ spark_config_value_retries <- function(config, name, default, retries) {
 #' Creates Spark Configuration
 #'
 #' @param config The Spark configuration object.
-#' @param packages A list of named packages or versionede packagese to add.
+#' @param packages A list of named packages or versioned packagese to add.
+#' @param version The version of Spark being used.
 #'
 #' @keywords interenal
 #' @export
