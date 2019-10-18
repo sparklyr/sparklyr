@@ -1,5 +1,10 @@
 # Sparklyr 1.0.4.9000
 
+### Connections
+
+- `spark_connect()` supports new `package` parameter to easily
+  enable `kafka`.
+
 - `spark_disconnect()` returns invisibly (#2028).
 
 # Sparklyr 1.0.4
