@@ -128,7 +128,7 @@ spark_version_from_home <- function(spark_home, default = NULL) {
     "Try passing the spark version explicitly.")
 }
 
-spark_version_latest <- function(version) {
+spark_version_latest <- function(version = NULL) {
   versions <- spark_available_versions(show_minor = TRUE)$spark
 
   if (is.null(version)) versions[length(versions)]
