@@ -931,3 +931,57 @@ spark_write_orc.spark_jobj <- function(x,
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   spark_data_write_generic(x, spark_normalize_path(path), "orc", mode, options, partition_by)
 }
+
+#' Writes a Spark DataFrame into Delta Lake
+#'
+#' Writes a Spark DataFrame into Delta Lake.
+#'
+#' @inheritParams spark_write_csv
+#' @param ... Optional arguments; currently unused.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_write_delta <- function(x,
+                              path,
+                              mode = NULL,
+                              options = list(),
+                              ...) {
+  options$path <- path
+  spark_write_source(x, "delta", mode = mode, options = options)
+}
+
+#' Read from Delta Lake into a Spark DataFrame.
+#'
+#' Read from Delta Lake into a Spark DataFrame.
+#'
+#' @inheritParams spark_read_csv
+#' @param version The version of the delta table to read.
+#' @param timestamp The timestamp of the delta table to read. For example,
+#'   \code{"2019-01-01"} or \code{"2019-01-01'T'00:00:00.000Z"}.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_delta <- function(sc,
+                             path,
+                             name = NULL,
+                             version = NULL,
+                             timestamp = NULL,
+                             options = list(),
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE,
+                             ...) {
+  if (!is.null(version)) options$versionAsOf <- version
+  if (!is.null(timestamp)) options$timestampAsOf <- timestamp
+
+  spark_read_source(sc,
+                    name = name,
+                    path = path,
+                    source = "delta",
+                    options = options,
+                    repartition = repartition,
+                    memory = memory,
+                    overwrite = overwrite)
+}
