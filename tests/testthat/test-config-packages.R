@@ -21,10 +21,10 @@ test_that("spark_config_packages() does not change config", {
   )
 })
 
-test_that("spark_config_packages() deefaults to latest veresion", {
+test_that("spark_config_packages() defaults to latest veresion", {
   expect_equal(
     3L,
     strsplit(spark_config_packages(list(), "kafka", "2.3")$sparklyr.shell.packages, ":")[[1]][3] %>%
-      strsplit("\\.")[1] %>% length()
+      strsplit("\\.") %>% `[[`(1) %>% length()
   )
 })
