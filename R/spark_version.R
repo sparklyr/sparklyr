@@ -127,3 +127,10 @@ spark_version_from_home <- function(spark_home, default = NULL) {
     "Failed to detect version from SPARK_HOME or SPARK_HOME_VERSION. ",
     "Try passing the spark version explicitly.")
 }
+
+spark_version_latest <- function(version = NULL) {
+  versions <- spark_available_versions(show_minor = TRUE)$spark
+
+  if (is.null(version)) versions[length(versions)]
+  else max(versions[grepl(version, versions, fixed = TRUE)])
+}

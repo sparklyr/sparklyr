@@ -12,7 +12,7 @@
 spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
   method = c("shell", "livy", "databricks", "test", "qubole"),
   app_name = "sparklyr", version = NULL, config = spark_config(),
-  extensions = sparklyr::registered_extensions(), ...)
+  extensions = sparklyr::registered_extensions(), packages = NULL, ...)
 
 spark_connection_is_open(sc)
 
@@ -49,9 +49,16 @@ connections, optional otherwise.}
 \item{config}{Custom configuration for the generated Spark connection. See
 \code{\link{spark_config}} for details.}
 
-\item{extensions}{Extension packages to enable for this connection. By
+\item{extensions}{Extension R packages to enable for this connection. By
 default, all packages enabled through the use of
 \code{\link[=register_extension]{sparklyr::register_extension}} will be passed here.}
+
+\item{packages}{A list of Spark packages to load. For example, \code{"delta"} or
+\code{"kafka"} to enable Delta Lake or Kafka. Also supports full versions like
+\code{"io.delta:delta-core_2.11:0.4.0"}. This is similar to adding packages into the
+\code{sparklyr.shell.packages} configuration option. Notice that the \code{version}
+parameter is used to choose the correect package, otherwise assumes the latest version
+is being used.}
 
 \item{...}{Optional arguments; currently unused.}
 
