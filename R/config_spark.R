@@ -22,7 +22,7 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   optionsConfig <- options()[optionsConfigCheck]
   baseConfig <- merge_lists(optionsConfig, baseConfig)
 
-  userEnvConfig <- tryCatch(config::get(file = Sys.getenv("SPARKLYR_CONFIG_FILE_PATH")), error = function(e) NULL)
+  userEnvConfig <- tryCatch(config::get(file = Sys.getenv("SPARKLYR_CONFIG_FILE")), error = function(e) NULL)
   baseEnvConfig <- merge_lists(baseConfig, userEnvConfig)
 
   userConfig <- tryCatch(config::get(file = file), error = function(e) NULL)
