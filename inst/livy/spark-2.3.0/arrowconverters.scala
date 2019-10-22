@@ -32,6 +32,7 @@ class ArrowConvertersImpl {
   import org.apache.spark.sql.execution.arrow.ArrowWriter
   import org.apache.spark.sql.SparkSession
   import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
+  import org.apache.spark.util.TaskCompletionListener
 
   def tryWithSafeFinally[T](block: => T)(finallyBlock: => Unit): T = {
     var originalThrowable: Throwable = null
@@ -106,10 +107,12 @@ class ArrowConvertersImpl {
     val arrowWriter = ArrowWriter.create(root)
 
     if (!context.isEmpty) {
-      context.get.addTaskCompletionListener { _ =>
-        root.close()
-        allocator.close()
-      }
+      context.get.addTaskCompletionListener(new TaskCompletionListener {
+        override def onTaskCompletion(context: TaskContext): Unit = {
+          root.close()
+          allocator.close()
+        }
+      })
     }
 
     val encoder = RowEncoder(schema)
@@ -169,10 +172,12 @@ class ArrowConvertersImpl {
       private var rowIter = if (payloadIter.hasNext) nextBatch() else Iterator.empty
 
       if (!context.isEmpty) {
-        context.get.addTaskCompletionListener { _ =>
-          closeReader()
-          allocator.close()
-        }
+        context.get.addTaskCompletionListener(new TaskCompletionListener {
+          override def onTaskCompletion(context: TaskContext): Unit = {
+            closeReader()
+            allocator.close()
+          }
+        })
       }
 
       override def hasNext: Boolean = rowIter.hasNext || {
