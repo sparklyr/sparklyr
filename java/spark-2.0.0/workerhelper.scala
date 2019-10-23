@@ -17,10 +17,10 @@ object WorkerHelper {
     groupBy: Array[String],
     closureRLang: Array[Byte],
     bundlePath: String,
-    customEnv: java.util.Map[Object, Object],
+    customEnv: Map[_, _],
     connectionTimeout: Int,
     context: Array[Byte],
-    options: java.util.Map[Object, Object]
+    options: Map[_, _]
   ): org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
@@ -65,10 +65,10 @@ object WorkerHelper {
     groupBy: Array[String],
     closureRLang: Array[Byte],
     bundlePath: String,
-    customEnv: java.util.Map[Object, Object],
+    customEnv: Map[_, _],
     connectionTimeout: Int,
     context: Array[Byte],
-    options: java.util.Map[Object, Object],
+    options: Map[_, _],
     sparkSession: SparkSession,
     timeZoneId: String
   ): org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] = {
