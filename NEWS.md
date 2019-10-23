@@ -1,4 +1,8 @@
-# Sparklyr 1.0.4.9000
+# Sparklyr 1.0.4.9002
+
+### Serialization
+
+- (Breaking change) R environments are now sent to Scala Maps rather than `java.util.Map[Object, Object]` (#1058).
 
 ### Data
 
