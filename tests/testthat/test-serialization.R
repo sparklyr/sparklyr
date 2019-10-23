@@ -330,3 +330,20 @@ test_that("collect() can retrieve logical columns with NAs", {
     logical_nas_tbl %>% dplyr::collect()
   )
 })
+
+test_that("environments are sent to Scala Maps (#1058)", {
+  expect_identical(
+    invoke_static(sc, "sparklyr.Test", "readMap", as.environment(list(foo = 5))),
+    list(foo = 5)
+  )
+
+  expect_identical(
+    invoke_static(sc, "sparklyr.Test", "readMap", as.environment(list(foo = 2L))),
+    list(foo = 2L)
+  )
+
+  expect_identical(
+    invoke_static(sc, "sparklyr.Test", "readMap", as.environment(list(foo = "bar"))),
+    list(foo = "bar")
+  )
+})

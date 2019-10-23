@@ -29,6 +29,8 @@ object Test {
   var number: Int = 0
   def setNumber(x: Int): Unit = { number = x }
   def getNumber(): Int = number
+
+  def readMap(x: Map[_, _]): Map[_, _] = x
 }
 
 package object test {
