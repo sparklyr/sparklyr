@@ -12,6 +12,15 @@
 
 - `spark_disconnect()` returns invisibly (#2028).
 
+### Configuration
+
+- Support to specify config file location using the
+  `SPARKLYR_CONFIG_FILE` environment variable (@AgrawalAmey, #2153).
+
+### Compilation
+
+- Support for Scala 12 (@lu-wang-dl, #2154).
+
 # Sparklyr 1.0.4
 
 ### Arrow
