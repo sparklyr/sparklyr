@@ -185,15 +185,15 @@ class Serializer(tracker: JVMObjectTracker) {
     (0 until len).map(_ => readObject(dis)).toArray
   }
 
-  def readMap(in: DataInputStream): java.util.Map[Object, Object] = {
+  def readMap(in: DataInputStream): Map[_, _] = {
     val len = readInt(in)
     if (len > 0) {
-      val keys = readArray(in).asInstanceOf[Array[Object]]
+      val keys = readArray(in)
       val values = readList(in)
 
-      keys.zip(values).toMap.asJava
+      keys.zip(values).toMap
     } else {
-      new java.util.HashMap[Object, Object]()
+      Map()
     }
   }
 
