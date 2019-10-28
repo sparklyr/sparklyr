@@ -25,6 +25,10 @@
 
 - Support for Scala 12 (@lu-wang-dl, #2154).
 
+### YARN
+
+- Fix `curl_fetch_memory` error when using YARN Cluster mode (#2157).
+
 # Sparklyr 1.0.4
 
 ### Arrow
