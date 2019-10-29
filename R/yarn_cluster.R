@@ -113,7 +113,7 @@ spark_yarn_cluster_resource_manager_is_online <- function(rm_webapp) {
   )
 
   tryCatch({
-    rmResult <- httr::GET(rmQuery)
+    rmResult <- httr::GET(paste0(spark_yarn_cluster_get_protocol(), "://", rmQuery))
     if (httr::http_error(rmResult)) {
       warning("Failed to open ", rmQuery, " with status ", httr::status_code(rmResult), ". ")
       FALSE
