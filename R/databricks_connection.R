@@ -2,7 +2,6 @@ databricks_expand_jars <- function() {
   jars_path <- system.file("java/", package = "sparklyr")
 
   missing_versions <- c(
-    "2.4",
     "2.2",
     "2.1"
   )
