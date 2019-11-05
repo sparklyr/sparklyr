@@ -1,12 +1,14 @@
 context("ml feature one hot encoder")
 
 test_that("ft_one_hot_encoder() default params", {
+  skip_on_spark_master()
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_one_hot_encoder)
 })
 
 test_that("ft_one_hot_encoder() param setting", {
+  skip_on_spark_master()
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
   test_args <- list(
@@ -18,6 +20,7 @@ test_that("ft_one_hot_encoder() param setting", {
 })
 
 test_that("ft_one_hot_encoder() works", {
+  skip_on_spark_master()
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   expect_equal(

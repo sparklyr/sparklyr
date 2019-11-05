@@ -15,6 +15,7 @@ test_that("we can invoke_static with 1 scalar argument", {
     expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger",
                                5L), 25)
 
+    skip_on_spark_master()
     expect_error(invoke_static(sc, "sparklyr.Test", "unaryInteger", NULL))
 
     expect_equal(invoke_static(sc, "sparklyr.Test", "unaryNullableInteger",

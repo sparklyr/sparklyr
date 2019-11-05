@@ -1,6 +1,7 @@
 context("submit")
 
 test_that("spark_submit() can submit batch jobs", {
+  skip_on_spark_master()
   if (.Platform$OS.type == "windows")
     skip("spark_submit() not yet implemented for windows")
 

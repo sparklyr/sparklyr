@@ -45,6 +45,12 @@ testthat_shell_connection <- function() {
   }
 
   spark_installed <- spark_installed_versions()
+  if (!is.null(version) && version == "master") {
+    assign(".test_on_spark_master", TRUE, envir = .GlobalEnv)
+    spark_installed <- spark_installed[with(spark_installed, order(spark, decreasing = TRUE)), ]
+    version <- spark_installed[1,]$spark
+  }
+
   if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
     options(sparkinstall.verbose = TRUE)
     spark_install(version)
@@ -313,4 +319,9 @@ skip_arrow_devel <- function(message) {
 skip_slow <- function(message) {
   skip_covr(message)
   skip_arrow_devel(message)
+}
+
+skip_on_spark_master <- function() {
+  is_on_master <- identical(Sys.getenv("SPARK_VERSION"), "master")
+  if (is_on_master) skip("Test skipped on spark master")
 }

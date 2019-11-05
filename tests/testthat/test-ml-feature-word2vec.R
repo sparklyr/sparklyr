@@ -40,6 +40,7 @@ test_that("ft_word2vec() returns result with correct length", {
 })
 
 test_that("ml_find_synonyms works properly", {
+  skip_on_spark_master()
   test_requires_version("2.0.0", "spark computation different in 1.6.x")
   sc <- testthat_spark_connection()
   tokenized_tbl <- testthat_tbl("tokenized")

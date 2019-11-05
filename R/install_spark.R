@@ -50,10 +50,15 @@ spark_install_find <- function(version = NULL,
   installedOnly <- installed_only
 
   versions <- spark_versions(latest = latest)
-  if (installedOnly)
+  if (!is.null(sparkVersion) && sparkVersion == "master") {
     versions <- versions[versions$installed, ]
-  versions <- if (is.null(sparkVersion)) versions else versions[versions$spark == sparkVersion, ]
-  versions <- if (is.null(hadoopVersion)) versions else versions[versions$hadoop == hadoopVersion, ]
+  } else {
+    if (installedOnly) {
+      versions <- versions[versions$installed, ]
+    }
+    versions <- if (is.null(sparkVersion)) versions else versions[versions$spark == sparkVersion, ]
+    versions <- if (is.null(hadoopVersion)) versions else versions[versions$hadoop == hadoopVersion, ]
+  }
 
   if(NROW(versions) == 0) {
     if (hint) {

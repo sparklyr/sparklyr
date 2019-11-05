@@ -19,6 +19,7 @@ test_that("ft_imputer() param setting", {
 })
 
 test_that("ft_imputer() works properly", {
+  skip_on_spark_master()
   sc <- testthat_spark_connection()
   test_requires_version("2.2.0", "imputer requires Spark 2.2.0+")
   df <- data.frame(id = 1:5, V1 = c(1, 2, NA, 4, 5))

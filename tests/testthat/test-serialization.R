@@ -44,6 +44,7 @@ test_that("primitive values survive Spark roundtrips", {
 })
 
 test_that("NA values survive Spark roundtrips", {
+  skip_on_spark_master()
   n <- 10
   df <- data.frame(
     int = as.integer(1:n),
@@ -125,6 +126,7 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
 })
 
 test_that("collect() can retrieve all data types correctly", {
+  skip_on_spark_master()
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
   library(dplyr)
 
@@ -298,6 +300,7 @@ test_that("collect() can retrieve as.POSIXct fields with timezones", {
 })
 
 test_that("collect() can retrieve specific dates without timezones", {
+  skip_on_spark_master()
   data_tbl <- sdf_copy_to(
     sc,
     data_frame(
@@ -325,6 +328,7 @@ test_that("collect() can retrieve specific dates without timezones", {
 })
 
 test_that("collect() can retrieve logical columns with NAs", {
+  skip_on_spark_master()
   expect_equal(
     logical_nas,
     logical_nas_tbl %>% dplyr::collect()
