@@ -24,7 +24,7 @@ test_that("linear_svc.augment() works", {
   iris_tbl <- testthat_tbl("iris")
 
   iris_tbl2 <- iris_tbl %>%
-    filter(Species != "setosa")
+    dplyr::filter(Species != "setosa")
 
   # with newdata
   au1 <- iris_tbl2 %>%
