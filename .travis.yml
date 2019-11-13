@@ -32,6 +32,8 @@ matrix:
         - JAVA_VERSION=oraclejdk8
     - name: "Spark 2.4.0 (R release, oraclejdk8)"
       r: release
+      r_packages:
+        - glmnet
       env:
         - SPARK_VERSION="2.4.0"
         - JAVA_VERSION=oraclejdk8

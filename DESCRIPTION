@@ -53,7 +53,6 @@ Imports:
 Suggests:
     broom,
     ggplot2,
-    glmnet,
     janeaustenr,
     Lahman,
     mlbench,
