@@ -19,6 +19,6 @@ df_from_sdf <- function(sc, sdf, take = -1) {
 #' @export
 sdf_sql <- function(sc, sql) {
   hive_context(sc) %>%
-    invoke("sql", sql) %>%
+    invoke("sql", as.character(sql)) %>%
     sdf_register()
 }
