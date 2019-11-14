@@ -1,4 +1,4 @@
-# Sparklyr 1.0.4.9002
+# Sparklyr 1.0.5
 
 ### Serialization
 
