@@ -6,13 +6,15 @@
 
 ### Data
 
+- Allow `sdf_sql()` to accept glue strings (@yutannihilation, #2171).
+
 - Support to read and write from Delta Lake using `spark_read_delta()`
-  and `spark_write_delta()`.
+  and `spark_write_delta()` (#2148).
 
 ### Connections
 
-- `spark_connect()` supports new `package` parameter to easily
-  enable `kafka`.
+- `spark_connect()` supports new `packages` parameter to easily
+  enable `kafka` and `delta` (#2148).
 
 - `spark_disconnect()` returns invisibly (#2028).
 
