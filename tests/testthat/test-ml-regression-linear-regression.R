@@ -28,6 +28,8 @@ test_that("ml_linear_regression() param setting", {
 
 test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   test_requires("glmnet")
+
+  glmnet <- get("glmnet", envir = asNamespace("glmnet"))
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
 
@@ -38,7 +40,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
     alpha  <- parMatrix[[1]][[i]]
     lambda <- parMatrix[[2]][[i]]
 
-    gFit <- glmnet::glmnet(
+    gFit <- glmnet(
       x = as.matrix(mtcars[, c("cyl", "disp")]),
       y = mtcars$mpg,
       family = "gaussian",
