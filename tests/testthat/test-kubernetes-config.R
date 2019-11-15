@@ -1,6 +1,7 @@
 context("kubernetes config")
 
 test_that("spark_kubernetes_config can generate correct config", {
+  skip_on_spark_master()
   expect_equal(
     spark_config_kubernetes("k8s://https://192.168.99.100:8443", driver = "spark-driver",
                             forward = FALSE, fix_config = FALSE),

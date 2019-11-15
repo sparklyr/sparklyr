@@ -39,6 +39,7 @@ test_that("kmeans.augment() works", {
 })
 
 test_that("kmeans.glance() works", {
+  skip_on_spark_master()
   test_requires_version("2.0.0")
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
