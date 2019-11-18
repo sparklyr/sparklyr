@@ -33,6 +33,7 @@ ft_one_hot_encoder.spark_connection <- function(x, input_col = NULL, output_col 
     drop_last = drop_last,
     uid = uid
   ) %>%
+    c(rlang::dots_list(...)) %>%
     validator_ml_one_hot_encoder()
   version <- spark_version(x)
   if(version < "3.0.0") {
@@ -124,8 +125,6 @@ ft_one_hot_encoder.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
   } else {
     ml_fit_and_transform(stage, x)
   }
-
-  # ml_transform(stage, x)
 }
 
 new_ml_one_hot_encoder <- function(jobj) {

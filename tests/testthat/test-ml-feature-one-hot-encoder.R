@@ -9,23 +9,13 @@ test_that("ft_one_hot_encoder() default params", {
 test_that("ft_one_hot_encoder() param setting", {
   test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
-  version <- spark_version(sc)
-  if (version < "3.0.0") {
-    test_args <- list(
-      input_col = "foo",
-      output_col = "bar",
-      drop_last = FALSE
-    )
-  } else {
-    test_args <- list(
-      input_col = "foo",
-      output_col = "bar",
-      input_cols = c("foo", "foo1"),
-      output_cols = c("bar", "bar1"),
-      drop_last = FALSE
-    )
-  }
-
+  test_args <- list(
+    input_col = "foo",
+    output_col = "bar",
+    input_cols = c("foo", "foo1"),
+    output_cols = c("bar", "bar1"),
+    drop_last = FALSE
+  )
   test_param_setting(sc, ft_one_hot_encoder, test_args)
 })
 
