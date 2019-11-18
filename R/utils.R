@@ -33,7 +33,7 @@ printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }
 
-spark_require_version <- function(sc, required, module = NULL) {
+spark_require_version <- function(sc, required, required_max = NULL, module = NULL) {
 
   # guess module based on calling function
   if (is.null(module)) {
@@ -46,6 +46,10 @@ spark_require_version <- function(sc, required, module = NULL) {
   if (version < required) {
     fmt <- "%s requires Spark %s or higher."
     msg <- sprintf(fmt, module, required, version)
+    stop(msg, call. = FALSE)
+  } else if (version >= required_max) {
+    fmt <- "%s is removed in Spark %s."
+    msg <- sprintf(fmt, module, required_max, version)
     stop(msg, call. = FALSE)
   }
 
