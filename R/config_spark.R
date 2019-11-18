@@ -157,3 +157,13 @@ spark_config_packages <- function(config, packages, version) {
 
   config
 }
+
+spark_config_fix <- function(config) {
+  # Mastering Spark with R contains typo and some users are using this setting, so fix it with warning.
+  if("sparklyr.executor.memory" %in% names(config) && !"spark.executor.memory" %in% names(config)) {
+    config["spark.executor.memory"] <- config["sparklyr.executor.memory"]
+    warning("Please use 'spark.executor.memory' instead of 'sparklyr.executor.memory'.")
+  }
+
+  config
+}

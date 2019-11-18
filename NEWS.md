@@ -1,3 +1,10 @@
+# Sparklyr 1.0.5.9000 (unreleased)
+
+### Configuration
+
+- Also support with warning `sparklyr.executor.memory` as `spark.executor.memory` to
+  fix reference in spark with R book.
+
 # Sparklyr 1.0.5
 
 ### Serialization
