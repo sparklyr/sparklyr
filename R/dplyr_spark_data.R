@@ -18,7 +18,7 @@ spark_partition_register_df <- function(sc, df, name, repartition, memory) {
   }
 
   if (memory) {
-    dbSendQuery(sc, paste("CACHE TABLE", escape(ident(name), con = sc)))
+    dbSendQuery(sc, paste("CACHE TABLE", escape(ident(unname(name)), con = sc)))
     dbGetQuery(sc, paste("SELECT count(*) FROM", escape(ident(name), con = sc)))
   }
 
