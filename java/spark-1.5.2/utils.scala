@@ -203,6 +203,7 @@ object Utils {
   def collect(df: DataFrame, separator: String): Array[_] = {
     val local : Array[Row] = df.collect()
     val dtypes = df.dtypes
+
     collectArray(local, dtypes, separator)
   }
 
