@@ -11,8 +11,7 @@
 #' @param drop_last Whether to drop the last category. Defaults to \code{TRUE}.
 #'
 #' @export
-ft_one_hot_encoder <- function(x, input_col = NULL, output_col = NULL,
-                               input_cols = NULL, output_cols = NULL, handle_invalid = NULL,
+ft_one_hot_encoder <- function(x, input_cols = NULL, output_cols = NULL, handle_invalid = NULL,
                                drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {
   check_dots_used()
   UseMethod("ft_one_hot_encoder")
@@ -21,12 +20,9 @@ ft_one_hot_encoder <- function(x, input_col = NULL, output_col = NULL,
 ml_one_hot_encoder <- ft_one_hot_encoder
 
 #' @export
-ft_one_hot_encoder.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                                input_cols = NULL, output_cols = NULL, handle_invalid = "error",
+ft_one_hot_encoder.spark_connection <- function(x, input_cols = NULL, output_cols = NULL, handle_invalid = "error",
                                                 drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {
   .args <- list(
-    input_col = input_col,
-    output_col = output_col,
     input_cols = input_cols,
     output_cols = output_cols,
     handle_invalid = handle_invalid,
@@ -35,53 +31,49 @@ ft_one_hot_encoder.spark_connection <- function(x, input_col = NULL, output_col 
   ) %>%
     c(rlang::dots_list(...)) %>%
     validator_ml_one_hot_encoder()
-  version <- spark_version(x)
-  if(version < "3.0.0") {
-    jobj <- spark_pipeline_stage(
-      x, "org.apache.spark.ml.feature.OneHotEncoder",
-      input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
-    ) %>%
-      invoke("setDropLast", .args[["drop_last"]])
-
-    estimator <- new_ml_one_hot_encoder(jobj)
-  } else {
+  if(is_spark_3(x)) {
     estimator <- spark_pipeline_stage(
       x, "org.apache.spark.ml.feature.OneHotEncoder",
-      input_col = .args[["input_col"]], output_col = .args[["output_col"]],
       input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]], uid = .args[["uid"]]
     ) %>%
       invoke("setHandleInvalid", .args[["handle_invalid"]]) %>%
       invoke("setDropLast", .args[["drop_last"]]) %>%
-      new_ml_one_hot_encoder_estimator()
+      new_ml_one_hot_encoder()
+  } else {
+    if (lengths(.args[["input_cols"]]) > 1 || lengths(.args[["output_cols"]]) > 1) {
+      stop("OneHotEncoder does not support encoding multiple columns", call. = FALSE)
+    }
+    .args[["input_cols"]] <- cast_nullable_string(.args[["input_cols"]])
+    .args[["output_cols"]] <- cast_nullable_string(.args[["output_cols"]])
+    estimator <- spark_pipeline_stage(
+      x, "org.apache.spark.ml.feature.OneHotEncoder",
+      input_col = .args[["input_cols"]], output_col = .args[["output_cols"]], uid = .args[["uid"]]
+    ) %>%
+      invoke("setDropLast", .args[["drop_last"]]) %>%
+      new_ml_one_hot_encoder()
   }
 
   estimator
 }
 
 #' @export
-ft_one_hot_encoder.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                           input_cols = NULL, output_cols = NULL, handle_invalid = "error",
+ft_one_hot_encoder.ml_pipeline <- function(x, input_cols = NULL, output_cols = NULL, handle_invalid = "error",
                                            drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {
-  sc <- spark_connection(x)
-  version <- spark_version(sc)
-  version <- "3.0.0"
-  if(version < "3.0.0") {
+  if(is_spark_3(spark_connection(x))) {
     stage <- ft_one_hot_encoder.spark_connection(
-      x = sc,
-      input_col = input_col,
-      output_col = output_col,
+      x = spark_connection(x),
+      input_cols = input_cols,
+      output_cols = output_cols,
+      handle_invalid = handle_invalid,
       drop_last = drop_last,
       uid = uid,
       ...
     )
   } else {
     stage <- ft_one_hot_encoder.spark_connection(
-      x = sc,
-      input_col = input_col,
-      output_col = output_col,
+      x = spark_connection(x),
       input_cols = input_cols,
       output_cols = output_cols,
-      handle_invalid = handle_invalid,
       drop_last = drop_last,
       uid = uid,
       ...
@@ -92,28 +84,23 @@ ft_one_hot_encoder.ml_pipeline <- function(x, input_col = NULL, output_col = NUL
 }
 
 #' @export
-ft_one_hot_encoder.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                         input_cols = NULL, output_cols = NULL, handle_invalid = "error",
+ft_one_hot_encoder.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL, handle_invalid = "error",
                                          drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {
-  sc <- spark_connection(x)
-  version <- spark_version(sc)
-  if(version < "3.0.0") {
+  if(is_spark_3(spark_connection(x))) {
     stage <- ft_one_hot_encoder.spark_connection(
-      x = sc,
-      input_col = input_col,
-      output_col = output_col,
+      x = spark_connection(x),
+      input_cols = input_cols,
+      output_cols = output_cols,
+      handle_invalid = handle_invalid,
       drop_last = drop_last,
       uid = uid,
       ...
     )
   } else {
     stage <- ft_one_hot_encoder.spark_connection(
-      x = sc,
-      input_col = input_col,
-      output_col = output_col,
+      x = spark_connection(x),
       input_cols = input_cols,
       output_cols = output_cols,
-      handle_invalid = handle_invalid,
       drop_last = drop_last,
       uid = uid,
       ...

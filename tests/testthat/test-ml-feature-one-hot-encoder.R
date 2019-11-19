@@ -10,8 +10,6 @@ test_that("ft_one_hot_encoder() param setting", {
   test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
-    input_col = "foo",
-    output_col = "bar",
     input_cols = c("foo", "foo1"),
     output_cols = c("bar", "bar1"),
     drop_last = FALSE

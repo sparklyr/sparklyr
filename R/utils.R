@@ -58,6 +58,11 @@ spark_require_version <- function(sc, required, module = NULL, required_max = NU
   TRUE
 }
 
+is_spark_3 <- function(sc) {
+  version <- spark_version(sc)
+  version >= "3.0.0"
+}
+
 regex_replace <- function(string, ...) {
   dots <- list(...)
   nm <- names(dots)
