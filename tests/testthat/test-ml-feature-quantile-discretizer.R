@@ -44,7 +44,6 @@ test_that("ft_quantile_discretizer works", {
 })
 
 test_that("ft_quantile_discretizer works on multiple columns", {
-  # skip_on_spark_master()
   test_requires_version("2.3.0", "multiple columns support requires spark 2.3+")
   sc <- testthat_spark_connection()
   df <- data_frame(
