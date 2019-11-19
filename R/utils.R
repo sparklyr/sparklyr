@@ -47,10 +47,12 @@ spark_require_version <- function(sc, required, required_max = NULL, module = NU
     fmt <- "%s requires Spark %s or higher."
     msg <- sprintf(fmt, module, required, version)
     stop(msg, call. = FALSE)
-  } else if (version >= required_max) {
-    fmt <- "%s is removed in Spark %s."
-    msg <- sprintf(fmt, module, required_max, version)
-    stop(msg, call. = FALSE)
+  } else if (!is.null(required_max)) {
+    if (version >= required_max) {
+      fmt <- "%s is removed in Spark %s."
+      msg <- sprintf(fmt, module, required_max, version)
+      stop(msg, call. = FALSE)
+    }
   }
 
   TRUE

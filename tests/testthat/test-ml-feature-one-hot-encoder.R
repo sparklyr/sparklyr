@@ -22,11 +22,22 @@ test_that("ft_one_hot_encoder() param setting", {
 test_that("ft_one_hot_encoder() works", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
-  expect_equal(
-    iris_tbl %>%
-      ft_string_indexer("Species", "indexed", string_order_type = "alphabetDesc") %>%
-      ft_one_hot_encoder("indexed", "encoded") %>%
-      pull(encoded) %>% unique(),
-    list(c(0, 0), c(0, 1), c(1, 0))
-  )
+  if (spark_version(sc) < "2.3.0") {
+    expect_equal(
+      iris_tbl %>%
+        ft_string_indexer("Species", "indexed") %>%
+        ft_one_hot_encoder("indexed", "encoded") %>%
+        pull(encoded) %>% unique(),
+      list(c(0, 0), c(1, 0), c(0, 1))
+    )
+  } else {
+    expect_equal(
+      iris_tbl %>%
+        ft_string_indexer("Species", "indexed", string_order_type = "alphabetDesc") %>%
+        ft_one_hot_encoder("indexed", "encoded") %>%
+        pull(encoded) %>% unique(),
+      list(c(0, 0), c(0, 1), c(1, 0))
+    )
+  }
+
 })
