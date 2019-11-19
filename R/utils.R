@@ -33,7 +33,7 @@ printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }
 
-spark_require_version <- function(sc, required, required_max = NULL, module = NULL) {
+spark_require_version <- function(sc, required, module = NULL, required_max = NULL) {
 
   # guess module based on calling function
   if (is.null(module)) {
