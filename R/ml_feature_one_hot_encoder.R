@@ -8,6 +8,7 @@
 #'
 #' @param input_cols The name of the input columns.
 #' @param output_cols The name of the output columns.
+#' @template roxlate-ml-feature-handle-invalid
 #' @template roxlate-ml-feature-transformer
 #' @param drop_last Whether to drop the last category. Defaults to \code{TRUE}.
 #'
