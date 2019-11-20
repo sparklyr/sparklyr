@@ -132,19 +132,27 @@ new_ml_kmeans <- function(jobj) {
 }
 
 new_ml_kmeans_model <- function(jobj) {
+  sc <- spark_connection(jobj)
+  version <- spark_version(sc)
+
   summary <- possibly_null(~ new_ml_kmeans_summary(invoke(jobj, "summary")))()
-  new_ml_clustering_model(
+  kmeans_model <- new_ml_clustering_model(
     jobj,
     # `def clusterCenters`
     cluster_centers = possibly_null(
       ~ invoke(jobj, "clusterCenters") %>%
         purrr::map(invoke, "toArray")
     ),
-    compute_cost = function(dataset) {
-      invoke(jobj, "computeCost", spark_dataframe(dataset))
-    },
     summary = summary,
     class = "ml_kmeans_model")
+
+  if (version < "3.0.0") {
+    kmeans_model[["compute_cost"]] <- function(dataset) {
+      invoke(jobj, "computeCost", spark_dataframe(dataset))
+    }
+  }
+
+  kmeans_model
 }
 
 new_ml_kmeans_summary <- function(jobj) {
