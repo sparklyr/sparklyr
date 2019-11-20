@@ -37,5 +37,27 @@ test_that("ft_one_hot_encoder() works", {
       list(c(0, 0), c(0, 1), c(1, 0))
     )
   }
+})
 
+test_that("ft_one_hot_encoder() with multiple columns", {
+  sc <- testthat_spark_connection()
+  df <- tibble(
+    id = 0:5L,
+    input1 = c(0, 1, 2, 0, 0, 2),
+    input2 = c(2, 3, 0, 1, 0, 2)
+  )
+  df_tbl <- copy_to(sc, df, overwrite = TRUE)
+
+  if (spark_version(sc) < "3.0.0") {
+    expect_error(df_tbl %>%
+                   ft_one_hot_encoder(c("input1", "input2"), c("output1", "output2")))
+  }
+  else {
+    expect_identical(
+      df_tbl %>%
+        ft_one_hot_encoder(c("input1", "input2"), c("output1", "output2")) %>%
+        colnames(),
+      c("id", "input1", "input2", "output1", "output2")
+    )
+  }
 })

@@ -115,11 +115,17 @@ ft_one_hot_encoder.tbl_spark <- function(x, input_cols = NULL, output_cols = NUL
 }
 
 new_ml_one_hot_encoder <- function(jobj) {
-  new_ml_transformer(jobj, class = "ml_one_hot_encoder")
+  if (is_spark_3(spark_connection(jobj))) {
+    one_hot_encoder <- new_ml_estimator(jobj, class = "ml_one_hot_encoder")
+  } else {
+    one_hot_encoder <- new_ml_transformer(jobj, class = "ml_one_hot_encoder")
+  }
+
+  one_hot_encoder
 }
 
 new_ml_one_hot_encoder_model <- function(jobj) {
-  spark_require_version(x, "3.0.0")
+  spark_require_version(spark_connection(jobj), "3.0.0")
   new_ml_transformer(
     jobj,
     category_size = invoke(jobj, "categorySize"),
