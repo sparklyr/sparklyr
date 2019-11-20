@@ -1,15 +1,13 @@
 context("ml feature one hot encoder estimator")
 
 test_that("ft_one_hot_encoder_estimator() default params", {
-  skip_on_spark_master()
-  test_requires_latest_spark()
+  test_requires_version(min_version="2.3.0", max_version="3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_one_hot_encoder_estimator)
 })
 
 test_that("ft_one_hot_encoder_estimator() param setting", {
-  skip_on_spark_master()
-  test_requires_latest_spark()
+  test_requires_version(min_version="2.3.0",max_version = "3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_cols = c("foo", "foo1"),
@@ -20,8 +18,7 @@ test_that("ft_one_hot_encoder_estimator() param setting", {
 })
 
 test_that("ft_one_hot_encoder_estimator() works", {
-  skip_on_spark_master()
-  test_requires_latest_spark()
+  test_requires_version(min_version="2.3.0",max_version = "3.0.0")
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   expect_equal(
