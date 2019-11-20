@@ -182,3 +182,14 @@ test_that("spark_read_csv() can read with no name", {
 
   expect_equal(colnames(spark_read_csv(sc, path = "test.csv")), "a")
 })
+
+test_that("spark_read_csv() can read with named character name", {
+  test_requires("dplyr")
+
+  text_file <- file("test.csv", "w+")
+  cat("a\n1\n2\n3", file = text_file)
+  close(text_file)
+
+  name <- c(name = "testname")
+  expect_equal(colnames(spark_read_csv(sc, name, "test.csv")), "a")
+})
