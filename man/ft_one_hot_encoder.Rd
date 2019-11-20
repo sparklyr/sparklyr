@@ -11,15 +11,15 @@ ft_one_hot_encoder(x, input_cols = NULL, output_cols = NULL,
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
+\item{input_cols}{The name of the input columns.}
+
+\item{output_cols}{The name of the output columns.}
+
 \item{drop_last}{Whether to drop the last category. Defaults to \code{TRUE}.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
-
-\item{input_col}{The name of the input column.}
-
-\item{output_col}{The name of the output column.}
 }
 \value{
 The object returned depends on the class of \code{x}.

@@ -6,7 +6,8 @@
 #' categorical features. Typically, used with  \code{ft_string_indexer()} to
 #' index a column first.
 #'
-#' @template roxlate-ml-feature-input-output-col
+#' @param input_cols The name of the input columns.
+#' @param output_cols The name of the output columns.
 #' @template roxlate-ml-feature-transformer
 #' @param drop_last Whether to drop the last category. Defaults to \code{TRUE}.
 #'
