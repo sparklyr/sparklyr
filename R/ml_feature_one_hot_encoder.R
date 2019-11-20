@@ -42,7 +42,7 @@ ft_one_hot_encoder.spark_connection <- function(x, input_cols = NULL, output_col
       invoke("setDropLast", .args[["drop_last"]]) %>%
       new_ml_one_hot_encoder()
   } else {
-    if (lengths(.args[["input_cols"]]) > 1 || lengths(.args[["output_cols"]]) > 1) {
+    if (length(.args[["input_cols"]]) > 1 || length(.args[["output_cols"]]) > 1) {
       stop("OneHotEncoder does not support encoding multiple columns", call. = FALSE)
     }
     .args[["input_cols"]] <- cast_nullable_string(.args[["input_cols"]])
