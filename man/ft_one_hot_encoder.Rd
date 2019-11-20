@@ -4,21 +4,22 @@
 \alias{ft_one_hot_encoder}
 \title{Feature Transformation -- OneHotEncoder (Transformer)}
 \usage{
-ft_one_hot_encoder(x, input_col = NULL, output_col = NULL,
-  drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...)
+ft_one_hot_encoder(x, input_cols = NULL, output_cols = NULL,
+  handle_invalid = NULL, drop_last = TRUE,
+  uid = random_string("one_hot_encoder_"), ...)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
-
-\item{input_col}{The name of the input column.}
-
-\item{output_col}{The name of the output column.}
 
 \item{drop_last}{Whether to drop the last category. Defaults to \code{TRUE}.}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{input_col}{The name of the input column.}
+
+\item{output_col}{The name of the output column.}
 }
 \value{
 The object returned depends on the class of \code{x}.
