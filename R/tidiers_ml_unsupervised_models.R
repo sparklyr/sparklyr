@@ -49,7 +49,7 @@ glance.ml_model_kmeans <- function(x,
                                    ...) {
 
   k <- x$summary$k
-  wssse <- x$cost
+  wssse <- compute_wssse(x)
 
   glance_tbl <- dplyr::tibble(k = k,
                               wssse = wssse)
@@ -99,7 +99,7 @@ glance.ml_model_bisecting_kmeans <- function(x,
                                    ...) {
 
   k <- x$summary$k
-  wssse <- x$cost
+  wssse <- compute_wssse(x)
 
   glance_tbl <- dplyr::tibble(k = k,
                               wssse = wssse)
@@ -175,4 +175,15 @@ add_silhouette <- function(x, glance_tbl){
                                    silhouette = silhouette)
   }
   glance_tbl
+}
+
+compute_wssse <- function(x) {
+  sc <- spark_connection(x$dataset)
+  version <- spark_version(sc)
+  if (version >= "2.4.0") {
+    wssse <- x$summary$training_cost
+  } else {
+    wssse <- x$cost
+  }
+  wssse
 }

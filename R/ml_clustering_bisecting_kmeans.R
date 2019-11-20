@@ -147,7 +147,16 @@ new_ml_bisecting_kmeans_model <- function(jobj) {
 }
 
 new_ml_bisecting_kmeans_summary <- function(jobj) {
-  new_ml_clustering_summary(
+  sc <- spark_connection(jobj)
+  version <- spark_version(sc)
+
+  bisecting_kmeans_summary <- new_ml_clustering_summary(
     jobj,
     class = "ml_bisecting_kmeans_summary")
+
+  if (version >= "2.4.0") {
+    bisecting_kmeans_summary[["training_cost"]] <- invoke(jobj, "trainingCost")
+  }
+
+  bisecting_kmeans_summary
 }
