@@ -81,9 +81,15 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
     uid = .args[["uid"]]
   ) %>%
     jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
-    jobj_set_param("setRelativeError", .args[["relative_error"]], "2.0.0", 0.001) %>%
-    jobj_set_param("setNumBuckets", .args[["num_buckets"]]) %>%
-    jobj_set_param("setNumBucketsArray", .args[["num_buckets_array"]], "2.3.0")
+    jobj_set_param("setRelativeError", .args[["relative_error"]], "2.0.0", 0.001)
+
+  if (!is.null(input_col) && !is.null(output_col)) {
+    jobj <- jobj %>%
+      jobj_set_param("setNumBuckets", .args[["num_buckets"]])
+  } else if (!is.null(input_cols) && !is.null(output_cols)) {
+    jobj <- jobj %>%
+      jobj_set_param("setNumBucketsArray", .args[["num_buckets_array"]], "2.3.0")
+  }
 
   estimator <- jobj %>%
     new_ml_quantile_discretizer()
