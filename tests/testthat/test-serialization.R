@@ -126,7 +126,6 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
 })
 
 test_that("collect() can retrieve all data types correctly", {
-  skip_on_spark_master()
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
   library(dplyr)
 
@@ -300,7 +299,6 @@ test_that("collect() can retrieve as.POSIXct fields with timezones", {
 })
 
 test_that("collect() can retrieve specific dates without timezones", {
-  skip_on_spark_master()
   data_tbl <- sdf_copy_to(
     sc,
     data_frame(
