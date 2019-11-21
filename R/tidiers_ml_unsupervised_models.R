@@ -178,9 +178,7 @@ add_silhouette <- function(x, glance_tbl){
 }
 
 compute_wssse <- function(x) {
-  sc <- spark_connection(x$dataset)
-  version <- spark_version(sc)
-  if (version >= "2.4.0") {
+  if (is_spark_3(spark_connection(x$dataset))) {
     wssse <- x$summary$training_cost
   } else {
     wssse <- x$cost

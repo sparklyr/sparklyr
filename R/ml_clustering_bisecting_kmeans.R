@@ -154,7 +154,7 @@ new_ml_bisecting_kmeans_summary <- function(jobj) {
     jobj,
     class = "ml_bisecting_kmeans_summary")
 
-  if (version >= "2.4.0") {
+  if (version >= "3.0.0") {
     bisecting_kmeans_summary[["training_cost"]] <- invoke(jobj, "trainingCost")
   }
 
