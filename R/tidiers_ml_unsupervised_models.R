@@ -178,7 +178,7 @@ add_silhouette <- function(x, glance_tbl){
 }
 
 compute_wssse <- function(x) {
-  if (is_spark_3(spark_connection(x$dataset))) {
+  if (is_required_spark(spark_connection(x$dataset), "3.0.0")) {
     wssse <- x$summary$training_cost
   } else {
     wssse <- x$cost

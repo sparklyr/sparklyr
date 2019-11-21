@@ -148,14 +148,11 @@ new_ml_kmeans_model <- function(jobj) {
 }
 
 new_ml_kmeans_summary <- function(jobj) {
-  sc <- spark_connection(jobj)
-  version <- spark_version(sc)
-
   kmeans_summary <- new_ml_clustering_summary(
     jobj,
     class = "ml_kmeans_summary")
 
-  if (version >= "2.4.0") {
+  if (is_required_spark(jobj, "2.4.0")) {
     kmeans_summary[["training_cost"]] <- invoke(jobj, "trainingCost")
   }
 

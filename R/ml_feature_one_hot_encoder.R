@@ -31,7 +31,7 @@ ft_one_hot_encoder.spark_connection <- function(x, input_cols = NULL, output_col
   ) %>%
     c(rlang::dots_list(...)) %>%
     validator_ml_one_hot_encoder()
-  if(is_spark_3(x)) {
+  if(is_required_spark(x, "3.0.0")) {
     estimator <- spark_pipeline_stage(
       x, "org.apache.spark.ml.feature.OneHotEncoder",
       input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]], uid = .args[["uid"]]
@@ -59,7 +59,7 @@ ft_one_hot_encoder.spark_connection <- function(x, input_cols = NULL, output_col
 #' @export
 ft_one_hot_encoder.ml_pipeline <- function(x, input_cols = NULL, output_cols = NULL, handle_invalid = "error",
                                            drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {
-  if(is_spark_3(spark_connection(x))) {
+  if(is_required_spark(spark_connection(x), "3.0.0")) {
     stage <- ft_one_hot_encoder.spark_connection(
       x = spark_connection(x),
       input_cols = input_cols,
@@ -86,7 +86,7 @@ ft_one_hot_encoder.ml_pipeline <- function(x, input_cols = NULL, output_cols = N
 #' @export
 ft_one_hot_encoder.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL, handle_invalid = "error",
                                          drop_last = TRUE, uid = random_string("one_hot_encoder_"), ...) {
-  if(is_spark_3(spark_connection(x))) {
+  if(is_required_spark(spark_connection(x), "3.0.0")) {
     stage <- ft_one_hot_encoder.spark_connection(
       x = spark_connection(x),
       input_cols = input_cols,
@@ -115,7 +115,7 @@ ft_one_hot_encoder.tbl_spark <- function(x, input_cols = NULL, output_cols = NUL
 }
 
 new_ml_one_hot_encoder <- function(jobj) {
-  if (is_spark_3(spark_connection(jobj))) {
+  if (is_required_spark(jobj, "3.0.0")) {
     one_hot_encoder <- new_ml_estimator(jobj, class = "ml_one_hot_encoder")
   } else {
     one_hot_encoder <- new_ml_transformer(jobj, class = "ml_one_hot_encoder")
