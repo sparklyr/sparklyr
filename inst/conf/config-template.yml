@@ -10,3 +10,6 @@ default:
 
   # command line arguments to spark-shell
   # sparklyr.shell.*
+
+  # Enable 'from_utc_timestamp' and 'to_utc_timestamp' for spark 3.0 and later
+  spark.sql.legacy.utcTimestampFunc.enabled: true
