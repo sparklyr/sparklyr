@@ -58,10 +58,20 @@ spark_require_version <- function(sc, required, module = NULL, required_max = NU
   TRUE
 }
 
-is_spark_3 <- function(sc) {
-  version <- spark_version(sc)
-  version >= "3.0.0"
+is_required_spark <- function(x, required_version) {
+  UseMethod("is_required_spark")
 }
+
+is_required_spark.spark_connection <- function(x, required_version) {
+  version <- spark_version(x)
+  version >= required_version
+}
+
+is_required_spark.spark_jobj <- function(x, required_version) {
+  sc <- spark_connection(x)
+  is_required_spark(sc, required_version)
+}
+
 
 regex_replace <- function(string, ...) {
   dots <- list(...)
