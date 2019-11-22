@@ -144,6 +144,7 @@ new_ml_kmeans_model <- function(jobj) {
     class = "ml_kmeans_model")
 
   if (!is_required_spark(jobj, "3.0.0")) {
+    spark_param_deprecated("compute_cost")
     kmeans_model[["compute_cost"]] <- function(dataset) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     }

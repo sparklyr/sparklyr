@@ -72,6 +72,9 @@ is_required_spark.spark_jobj <- function(x, required_version) {
   is_required_spark(sc, required_version)
 }
 
+spark_param_deprecated <- function(param, version = "3.x") {
+  warning("The '", param, "' parameter is deprecated in Spark ", version)
+}
 
 regex_replace <- function(string, ...) {
   dots <- list(...)
