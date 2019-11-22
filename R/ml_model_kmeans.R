@@ -1,8 +1,5 @@
 new_ml_model_kmeans <- function(pipeline_model, formula, dataset,
                                 features_col) {
-  sc <- spark_connection(dataset)
-  version <- spark_version(sc)
-
   m <- new_ml_model_clustering(
     pipeline_model = pipeline_model,
     formula = formula,
@@ -20,7 +17,7 @@ new_ml_model_kmeans <- function(pipeline_model, formula, dataset,
     as.data.frame() %>%
     rlang::set_names(m$feature_names)
 
-  if (version < "3.0.0") {
+  if (!is_required_spark(spark_connection(dataset), "3.0.0")) {
     m$cost <- suppressWarnings(
       possibly_null(
         ~ pipeline_model %>%

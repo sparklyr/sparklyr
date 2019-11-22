@@ -132,9 +132,6 @@ new_ml_kmeans <- function(jobj) {
 }
 
 new_ml_kmeans_model <- function(jobj) {
-  sc <- spark_connection(jobj)
-  version <- spark_version(sc)
-
   summary <- possibly_null(~ new_ml_kmeans_summary(invoke(jobj, "summary")))()
   kmeans_model <- new_ml_clustering_model(
     jobj,
@@ -146,7 +143,7 @@ new_ml_kmeans_model <- function(jobj) {
     summary = summary,
     class = "ml_kmeans_model")
 
-  if (version < "3.0.0") {
+  if (!is_required_spark(jobj, "3.0.0")) {
     kmeans_model[["compute_cost"]] <- function(dataset) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
     }
