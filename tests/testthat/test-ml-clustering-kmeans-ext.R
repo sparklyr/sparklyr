@@ -84,20 +84,26 @@ test_that("ml_kmeans() works properly", {
                0:4)
 })
 
-test_that("ml_compute_cost() for kmeans works properly", {
-  skip_on_spark_master()
+test_that("ml_compute_cost() for kmeans", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "ml_compute_cost() requires Spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11)
-  expect_equal(
-    ml_compute_cost(iris_kmeans, iris_tbl),
-    46.7123, tolerance = 0.01
-  )
-  expect_equal(
-    iris_tbl %>%
-      ft_r_formula(~ . - Species) %>%
-      ml_compute_cost(iris_kmeans$model, .),
-    46.7123, tolerance = 0.01
-  )
+
+  version <- spark_version(sc)
+
+  if (version >= "3.0.0"){
+    expect_error(ml_compute_cost(iris_kmeans, iris_tbl))
+  } else {
+    expect_equal(
+      ml_compute_cost(iris_kmeans, iris_tbl),
+      46.7123, tolerance = 0.01
+    )
+    expect_equal(
+      iris_tbl %>%
+        ft_r_formula(~ . - Species) %>%
+        ml_compute_cost(iris_kmeans$model, .),
+      46.7123, tolerance = 0.01
+    )
+  }
 })
