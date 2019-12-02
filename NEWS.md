@@ -1,3 +1,9 @@
+# Sparklyr 1.0.5.9000
+
+### Streaming
+
+- Fixed typo in `stream_read_socket()`.
+
 # Sparklyr 1.0.5
 
 ### Serialization
@@ -344,6 +350,7 @@
   which would cause verbose column renames.
   
 - Fix to `stream_write_kafka()` and `stream_write_jdbc()`.
+
 # Sparklyr 0.9.0
 
 ### Streaming
