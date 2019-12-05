@@ -2,7 +2,7 @@
 
 ## Committers
 
-| Name              |   Company    |              Email              |     GitHub ID       |
+| Name              |   Company    |              Email              | GitHub ID           |
 | ----------------- | :----------: | :-----------------------------: | ------------------- |
 | Javier Luraschi   |   RStudio    |      javiere@rstudio.com        |   javierluraschi    |
 | Kevin Kuo         |   RStudio    |     kevinykuo@rstudio.com       |     kevinykuo       |
@@ -14,6 +14,6 @@
 
 ## Maintainers
 
-| Name              |   Company    |           Email           |     GitHub ID       |
+| Name              |   Company    |           Email           | GitHub ID           |
 | ----------------- | :----------: | :-----------------------: | ------------------- |
 | Javier Luraschi   |   RStudio    |    javiere@rstudio.com    |   javierluraschi    |
