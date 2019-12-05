@@ -11,7 +11,7 @@
 | Edgar Ruiz        |   RStudio    |       edgar@rstudio.com         |     edgararuiz      |
 | Lu Wang           |  Databricks  |     lu.wang@databricks.com      |     lu-wang-dl      |
 
-## Commiters
+## Committer
 
 | Name              |   Company    |              Email              | GitHub ID           |
 | ----------------- | :----------: | :-----------------------------: | ------------------- |
