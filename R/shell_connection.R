@@ -10,6 +10,7 @@ shell_connection_validate_config <- function(config) {
 # create a shell connection
 shell_connection <- function(master,
                              spark_home,
+                             method,
                              app_name,
                              version,
                              hadoop_version,
@@ -23,7 +24,7 @@ shell_connection <- function(master,
   config <- shell_connection_validate_config(config)
 
   # for local mode we support SPARK_HOME via locally installed versions and version overrides SPARK_HOME
-  if (spark_master_is_local(master)) {
+  if (spark_master_is_local(master) && method != "databricks-connect") {
     if (!nzchar(spark_home) || !is.null(version)) {
       installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, hint = TRUE)
       spark_home <- installInfo$sparkVersionDir

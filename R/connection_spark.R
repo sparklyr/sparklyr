@@ -177,6 +177,7 @@ spark_connect <- function(master,
   if (method == "shell" || method == "qubole" || method == "databricks-connect") {
     scon <- shell_connection(master = master,
                              spark_home = spark_home,
+                             method = method,
                              app_name = app_name,
                              version = version,
                              hadoop_version = hadoop_version,

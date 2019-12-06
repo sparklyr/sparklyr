@@ -1,8 +1,13 @@
 context("databricks-connect")
 
-test_that("spark connection method is databricks-connect", {
+test_that("spark connection method is configured correctly", {
+  spark_home <- Sys.getenv("SPARK_HOME")
   sc <- testthat_spark_connection(method = "databricks-connect")
+
+  # test that the connection method is set correctly
   expect_equal(sc$method, "databricks-connect")
+  # test that the SPARK_HOME is the value specified in the environment variable, and is not overriden elsewhere
+  expect_equal(sc$spark_home, spark_home)
 })
 
 test_that("csv_file is disabled when using databricks-connect", {
