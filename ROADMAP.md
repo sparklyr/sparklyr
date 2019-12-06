@@ -7,4 +7,4 @@
 - Support for Databricks Connect
 - Support for Barrier Execution
 
-See also [sparklyr/projects](https://github.com/rstudio/sparklyr/projects/1).
+See also [sparklyr/projects](https://github.com/sparklyr/sparklyr/projects/1).
