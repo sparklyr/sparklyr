@@ -32,15 +32,18 @@ testthat_spark_connection <- function() {
   }
 
   livy_version <- Sys.getenv("LIVY_VERSION")
+  test_databricks_connect <- Sys.getenv("DATABRICKS_CONNECT")
   if (nchar(livy_version) > 0)
     testthat_livy_connection()
+  else if (test_databricks_connect == "TRUE")
+    testthat_shell_connection(method = "databricks-connect")
   else
     testthat_shell_connection()
 }
 
 testthat_latest_spark <- function() get(".testthat_latest_spark", envir = .GlobalEnv)
 
-testthat_shell_connection <- function() {
+testthat_shell_connection <- function(method = "shell") {
   version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
 
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
@@ -86,7 +89,7 @@ testthat_shell_connection <- function() {
     config[["sparklyr.shell.driver-memory"]] <- "3G"
     config[["sparklyr.apply.env.foo"]] <- "env-test"
 
-    sc <- spark_connect(master = "local", version = version, config = config)
+    sc <- spark_connect(master = "local", method = method, version = version, config = config)
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
   }
 

@@ -104,7 +104,7 @@ spark_config_shell_args <- function(config, master) {
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell", "livy", "databricks", "test", "qubole"),
+                          method = c("shell", "livy", "databricks", "test", "qubole", "databricks-connect"),
                           app_name = "sparklyr",
                           version = NULL,
                           config = spark_config(),
@@ -174,7 +174,7 @@ spark_connect <- function(master,
     method <- "gateway"
 
   # spark-shell (local install of spark)
-  if (method == "shell" || method == "qubole") {
+  if (method == "shell" || method == "qubole" || method == "databricks-connect") {
     scon <- shell_connection(master = master,
                              spark_home = spark_home,
                              app_name = app_name,
@@ -194,6 +194,9 @@ spark_connect <- function(master,
                              batch = NULL)
     if (method == "qubole") {
       scon$method <- "qubole"
+    }
+    if (method == "databricks-connect") {
+      scon$method <- "databricks-connect"
     }
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
