@@ -22,7 +22,7 @@ spark_install_winutils <- function(version) {
   }
 }
 
-testthat_spark_connection <- function() {
+testthat_spark_connection <- function(method = "shell") {
   if (!exists(".testthat_latest_spark", envir = .GlobalEnv))
     assign(".testthat_latest_spark", "2.3.0", envir = .GlobalEnv)
 
@@ -32,13 +32,10 @@ testthat_spark_connection <- function() {
   }
 
   livy_version <- Sys.getenv("LIVY_VERSION")
-  test_databricks_connect <- Sys.getenv("DATABRICKS_CONNECT")
   if (nchar(livy_version) > 0)
     testthat_livy_connection()
-  else if (test_databricks_connect == "TRUE")
-    testthat_shell_connection(method = "databricks-connect")
   else
-    testthat_shell_connection()
+    testthat_shell_connection(method)
 }
 
 testthat_latest_spark <- function() get(".testthat_latest_spark", envir = .GlobalEnv)

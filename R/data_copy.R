@@ -205,7 +205,7 @@ spark_data_copy <- function(
     stop("The repartition parameter must be an integer")
   }
 
-  if (!spark_connection_is_local(sc) && identical(serializer, "csv_file")) {
+  if ((!spark_connection_is_local(sc) || sc$method == "databricks-connect") && identical(serializer, "csv_file")) {
     stop("Using a local file to copy data is not supported for remote clusters")
   }
 
