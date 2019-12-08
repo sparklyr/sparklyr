@@ -154,9 +154,17 @@ spark_apply <- function(x,
   if (identical(args$barrier, TRUE)){
     if (spark_version(sc) < "2.4.0"){
       stop("Barries are only available for spark 2.4.0 or greater")
-    } else{
+    } else {
       # barrier works in rdd
       args$rdd <- TRUE
+
+      # logs
+      ips <- sdf %>%
+          invoke("rdd") %>%
+          invoke_static(sc, "sparklyr.RDDBarrier", "getAddress", .)  %>%
+          invoke("collect")
+        worker_log("Barrier")
+        worker_log("IPs: ", paste(ips[[1]] %>% unlist()), collapse = ",")
     }
   }
 
