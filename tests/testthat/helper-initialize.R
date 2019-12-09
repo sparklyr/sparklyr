@@ -202,6 +202,7 @@ testthat_livy_connection <- function() {
         sparklyr.connect.timeout = 120,
         sparklyr.log.invoke = "cat"
       ),
+      version = version,
       sources = TRUE
     )
 
