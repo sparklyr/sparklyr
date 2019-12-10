@@ -419,13 +419,6 @@ object Utils {
     }.collect().last.getDouble(0)
   }
 
-  def zipDataFrames(sc: SparkContext, df1: DataFrame, df2: DataFrame) : DataFrame = {
-    val spark = SparkSession.builder().getOrCreate()
-    spark.createDataFrame(
-      df1.rdd.zip(df2.rdd).map { case (r1, r2) => Row.merge(r1, r2) },
-      StructType(df1.schema ++ df2.schema))
-  }
-
   def unboxString(x: Option[String]) = x match {
     case Some(s) => s
     case None => ""

@@ -756,6 +756,7 @@ invoke_raw <- function(sc, code, ...) {
 livy_load_scala_sources <- function(sc) {
   livySources <- c(
     "utils.scala",
+    "dfutils.scala",
     "sqlutils.scala",
     "logger.scala",
     "invoke.scala",
