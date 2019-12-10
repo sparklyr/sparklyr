@@ -54,7 +54,8 @@ class WorkerApply(
       context,
       timeZoneId,
       schema,
-      options
+      options,
+      Map()
     )
 
     val tracker = new JVMObjectTracker()

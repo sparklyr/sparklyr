@@ -5,17 +5,6 @@ object RDDBarrier {
   import scala.collection.JavaConversions._
   import java.net._
 
-def getAddress(rdd: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]
-    ): org.apache.spark.rdd.RDD[Array[String]] = {
-
-  rdd.barrier().mapPartitions(iter => {
-    val context = BarrierTaskContext.get()
-    val result = context.getTaskInfos.map(e => e.address)
-    context.barrier()
-    Iterator(result)
-  })
-}
-
   def transformBarrier(
       rdd: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row],
       closure: Array[Byte],
@@ -87,7 +76,8 @@ def getAddress(rdd: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]
       context: Array[Byte],
       optionsImmMap: Map[String, String],
       "",
-      org.apache.spark.sql.types.StructType(Nil)
+      org.apache.spark.sql.types.StructType(Nil),
+      true
     )
 
     workerApply

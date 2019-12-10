@@ -52,17 +52,25 @@ spark_worker_init_packages <- function(sc, context) {
   }
 }
 
-spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by) {
+spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by, barrier_map) {
   if (nrow(df) == 0) {
     worker_log("found that source has no rows to be proceesed")
     return(NULL)
+  }
+
+  barrier_arg <- NULL
+  worker_log("barrier is ", as.character(barrier_map))
+  if (length(barrier_map) > 0) {
+    worker_log("found barrier execution context")
+    barrier_arg <- list(barrier = barrier_map)
   }
 
   closure_params <- length(formals(closure))
   closure_args <- c(
     list(df),
     if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
-    lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]])
+    lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]]),
+    barrier_arg
   )[0:closure_params]
 
   worker_log("computing closure")
@@ -156,6 +164,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   schema_input <- worker_invoke(context, "getSchema")
   time_zone <- worker_invoke(context, "getTimeZoneId")
   options_map <- worker_invoke(context, "getOptions")
+  barrier_map <- as.list(worker_invoke(context, "getBarrier"))
 
   if (grouped) {
     record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
@@ -193,7 +202,7 @@ spark_worker_apply_arrow <- function(sc, config) {
     if (!is.null(df)) {
       colnames(df) <- columnNames[1: length(colnames(df))]
 
-      result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
+      result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by, barrier_map)
 
       result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
@@ -274,6 +283,7 @@ spark_worker_apply <- function(sc, config) {
   }
 
   columnNames <- worker_invoke(context, "getColumns")
+  barrier_map <- as.list(worker_invoke(context, "getBarrier"))
 
   if (!grouped) groups <- list(list(groups))
 
@@ -311,7 +321,7 @@ spark_worker_apply <- function(sc, config) {
 
     colnames(df) <- columnNames[1: length(colnames(df))]
 
-    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by)
+    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by, barrier_map)
 
     result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 

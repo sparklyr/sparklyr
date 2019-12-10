@@ -13,7 +13,8 @@ class WorkerApply (
   context: Array[Byte],
   options: Map[String, String],
   timeZoneId: String,
-  schema: org.apache.spark.sql.types.StructType
+  schema: org.apache.spark.sql.types.StructType,
+  barrier: Boolean = false
   ) extends java.io.Serializable {
 
   import java.io.Serializable;
@@ -44,6 +45,13 @@ class WorkerApply (
     // No point in starting up R process to not process anything
     if (!iterator.hasNext) return Array[org.apache.spark.sql.Row]().iterator
 
+    var barrierMap = Map[String, Any]()
+
+    if (barrier) {
+      val address = org.apache.spark.BarrierTaskContext.get().getTaskInfos().map(e => e.address)
+      barrierMap = Map("address" -> address)
+    }
+
     val workerContext = new WorkerContext(
       iterator,
       lock,
@@ -55,7 +63,8 @@ class WorkerApply (
       context,
       timeZoneId,
       schema,
-      options
+      options,
+      barrierMap
     )
 
     val tracker = new JVMObjectTracker()

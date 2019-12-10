@@ -152,19 +152,15 @@ spark_apply <- function(x,
   sdf_columns <- colnames(x)
 
   if (identical(args$barrier, TRUE)){
-    if (spark_version(sc) < "2.4.0"){
-      stop("Barries are only available for spark 2.4.0 or greater")
-    } else {
-      # barrier works in rdd
-      args$rdd <- TRUE
+    # barrier works in rdd
+    args$rdd <- TRUE
 
-      # logs
-      ips <- sdf %>%
-          invoke("rdd") %>%
-          invoke_static(sc, "sparklyr.RDDBarrier", "getAddress", .)  %>%
-          invoke("collect")
-        worker_log("Barrier")
-        worker_log("IPs: ", paste(ips[[1]] %>% unlist()), collapse = ",")
+    if (spark_version(sc) < "2.4.0"){
+      stop("Barrier execution is only available for spark 2.4.0 or greater.")
+    }
+
+    if (is.null(columns)) {
+      stop("Barrier execution requires explicit columns names.")
     }
   }
 
