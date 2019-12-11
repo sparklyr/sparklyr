@@ -193,3 +193,51 @@ test_that("spark_read_csv() can read with named character name", {
   name <- c(name = "testname")
   expect_equal(colnames(spark_read_csv(sc, name, "test.csv")), "a")
 })
+
+
+test_that("spark_read_csv() can read column types", {
+  csv <- file("test.csv", "w+")
+  cat("a,b,c\n1,2,3", file = csv)
+  close(csv)
+
+  df_schema <- spark_read_csv(
+    sc,
+    name = "test_columns",
+    path = "test.csv"
+    , columns = c(a = "byte", b = "integer", c = "double")
+  ) %>%
+    sdf_schema()
+
+  expect_equal(
+    df_schema,
+    list(
+      a = list(name = "a", type = "ByteType"),
+      b = list(name = "b", type = "IntegerType"),
+      c = list(name = "c", type = "DoubleType")
+    )
+  )
+})
+
+test_that("spark_read_csv() can read verbatim column types", {
+  csv <- file("test.csv", "w+")
+  cat("a,b,c\n1,2,3", file = csv)
+  close(csv)
+
+  df_schema <- spark_read_csv(
+    sc,
+    name = "test_columns",
+    path = "test.csv"
+    , columns = c(a = "ByteType", b = "IntegerType", c = "DoubleType")
+  ) %>%
+    sdf_schema()
+
+  expect_equal(
+    df_schema,
+    list(
+      a = list(name = "a", type = "ByteType"),
+      b = list(name = "b", type = "IntegerType"),
+      c = list(name = "c", type = "DoubleType")
+    )
+  )
+
+})
