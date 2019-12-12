@@ -60,6 +60,11 @@ spark_csv_options <- function(header,
 #' @param header Boolean; should the first row of data be used as a header?
 #'   Defaults to \code{TRUE}.
 #' @param columns A vector of column names or a named vector of column types.
+#'   If specified, the elements can be \code{"binary"} for \code{BinaryType},
+#'   \code{"boolean"} for \code{BooleanType}, \code{"byte"} for \code{ByteType},
+#'   \code{"integer"} for \code{IntegerType}, \code{"integer64"} for \code{LongType},
+#'   \code{"double"} for \code{DoubleType}, \code{"character"} for \code{StringType},
+#'   \code{"timestamp"} for \code{TimestampType} and \code{"date"} for \code{DateType}.
 #' @param infer_schema Boolean; should column types be automatically inferred?
 #'   Requires one extra pass over the data. Defaults to \code{is.null(columns)}.
 #' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
