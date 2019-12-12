@@ -2,14 +2,14 @@ sparklyr: R interface for Apache Spark
 ================
 
 [![Build
-Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr)
+Status](https://travis-ci.org/sparklyr/sparklyr.svg?branch=master)](https://travis-ci.org/sparklyr/sparklyr)
 [![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/rstudio/sparklyr?branch=master&svg=true)](https://ci.appveyor.com/project/JavierLuraschi/sparklyr)
+Status](https://ci.appveyor.com/api/projects/status/2kj2rcyir4r3dhdw?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr-js0af)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
 <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a>
-[![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr)
+[![codecov](https://codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/sparklyr/sparklyr)
 [![Join the chat at
-https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.svg)](https://gitter.im/sparklyr/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img src="tools/readme/sparklyr-illustration.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
 
@@ -55,13 +55,8 @@ and restart your r session:
 
 ``` r
 install.packages("devtools")
-devtools::install_github("rstudio/sparklyr")
+devtools::install_github("sparklyr/sparklyr")
 ```
-
-If you use the RStudio IDE, you should also download the latest [preview
-release](https://www.rstudio.com/products/rstudio/download/preview/) of
-the IDE which includes several enhancements for interacting with Spark
-(see the [RStudio IDE](#rstudio-ide) section below for more details).
 
 ## Connecting to Spark
 
@@ -177,7 +172,7 @@ batting_tbl %>%
     ##  4 abbated01   1905 BSN      153   610    70   170
     ##  5 abbated01   1904 BSN      154   579    76   148
     ##  6 abbeych01   1894 WAS      129   523    95   164
-    ##  7 abbeych01   1895 WAS      132   511   102   141
+    ##  7 abbeych01   1895 WAS      133   516   102   142
     ##  8 abbotji01   1999 MIL       20    21     0     2
     ##  9 abnersh01   1992 CHA       97   208    21    58
     ## 10 abnersh01   1990 SDN       91   184    17    45
@@ -316,16 +311,16 @@ spark_apply(iris_tbl, function(data) {
     ## # Source: spark<?> [?? x 4]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1         6.90        5.30         3.20        2.00
-    ##  2         6.70        4.80         3.20        2.00
-    ##  3         6.50        5.00         3.10        2.00
-    ##  4         6.40        4.90         3.30        2.00
-    ##  5         6.80        5.40         3.20        2.00
-    ##  6         7.20        5.70         3.50        2.20
-    ##  7         6.40        5.20         3.20        2.10
-    ##  8         6.80        5.20         3.30        2.00
-    ##  9         6.20        4.70         3.20        2.00
-    ## 10         6.70        4.90         3.30        1.90
+    ##  1         6.49        4.89         2.79        1.59
+    ##  2         6.29        4.39         2.79        1.59
+    ##  3         6.09        4.59         2.69        1.59
+    ##  4         5.99        4.49         2.89        1.59
+    ##  5         6.39        4.99         2.79        1.59
+    ##  6         6.79        5.29         3.09        1.79
+    ##  7         5.99        4.79         2.79        1.69
+    ##  8         6.39        4.79         2.89        1.59
+    ##  9         5.79        4.29         2.79        1.59
+    ## 10         6.29        4.49         2.89        1.49
     ## # … with more rows
 
 You can also group by columns to perform an operation over each group of
@@ -405,30 +400,29 @@ You can view the Spark web console using the `spark_web` function:
 spark_web(sc)
 ```
 
-You can show the log using the `spark_log` function:
+You can show the log using the `spark_log`
+    function:
 
 ``` r
 spark_log(sc, n = 10)
 ```
 
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned shuffle 18
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1860
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1907
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 613
-    ## 19/02/22 14:13:08 INFO ContextCleaner: Cleaned accumulator 1626
-    ## 19/02/22 14:13:08 INFO Executor: Finished task 0.0 in stage 70.0 (TID 94). 875 bytes result sent to driver
-    ## 19/02/22 14:13:08 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 94) in 209 ms on localhost (executor driver) (1/1)
-    ## 19/02/22 14:13:08 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool 
-    ## 19/02/22 14:13:08 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.215 s
-    ## 19/02/22 14:13:08 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.220383 s
+    ## 19/12/09 12:42:58 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 70 (/var/folders/ks/wm_bx4cn70s6h0r5vgqpsldm0000gn/T//Rtmp5ypEuH/file1572146a43439.csv MapPartitionsRDD[336] at textFile at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+    ## 19/12/09 12:42:58 INFO TaskSchedulerImpl: Adding task set 70.0 with 1 tasks
+    ## 19/12/09 12:42:58 INFO TaskSetManager: Starting task 0.0 in stage 70.0 (TID 94, localhost, executor driver, partition 0, PROCESS_LOCAL, 7946 bytes)
+    ## 19/12/09 12:42:58 INFO Executor: Running task 0.0 in stage 70.0 (TID 94)
+    ## 19/12/09 12:42:58 INFO HadoopRDD: Input split: file:/var/folders/ks/wm_bx4cn70s6h0r5vgqpsldm0000gn/T/Rtmp5ypEuH/file1572146a43439.csv:0+33313106
+    ## 19/12/09 12:42:58 INFO Executor: Finished task 0.0 in stage 70.0 (TID 94). 832 bytes result sent to driver
+    ## 19/12/09 12:42:58 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 94) in 181 ms on localhost (executor driver) (1/1)
+    ## 19/12/09 12:42:58 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool 
+    ## 19/12/09 12:42:58 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.187 s
+    ## 19/12/09 12:42:58 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.199992 s
 
 Finally, we disconnect from Spark:
 
 ``` r
   spark_disconnect(sc)
 ```
-
-    ## NULL
 
 ## RStudio IDE
 
@@ -542,9 +536,8 @@ spark_disconnect(sc)
 ## Connecting through Livy
 
 [Livy](https://github.com/cloudera/livy) enables remote connections to
-Apache Spark clusters. Connecting to Spark clusters through Livy is
-**under experimental development** in `sparklyr`. Please post any
-feedback or questions as a GitHub issue as needed.
+Apache Spark clusters. However, please notice that connecting to Spark
+clusters through Livy is much slower than any other connection method.
 
 Before connecting to Livy, you will need the connection information to
 an existing service running Livy. Otherwise, to test `livy` in your
@@ -586,8 +579,6 @@ copy_to(sc, iris)
 ``` r
 spark_disconnect(sc)
 ```
-
-    ## NULL
 
 Once you are done using `livy` locally, you should stop this service
 with:
