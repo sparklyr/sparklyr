@@ -26,4 +26,15 @@ spec <- Filter(
   sparklyr::spark_default_compilation_spec()
 )
 
+spec <- c(
+  spec,
+  spark_compilation_spec(
+    spark_version = "master",
+    scalac_path = find_scalac("2.12", locations),
+    jar_name = sprintf("%s-master-2.12.jar", pkg),
+    jar_path = find_jar(),
+    scala_filter = make_version_filter("master")
+  )
+)
+
 sparklyr::compile_package_jars(spec = spec)
