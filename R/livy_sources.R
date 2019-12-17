@@ -8,6 +8,7 @@ livy_sources_included <- function() {
     "/stream\\.scala",
     "/sqlutils\\.scala",
     "/utils\\.scala",
+    "/dfutils\\.scala",
     "/repartition\\.scala",
     "/tracker\\.scala",
     "/livyutils\\.scala",
