@@ -108,6 +108,7 @@ spark_apply_colum_types <- function(sdf) {
 #'   (without spaces) with a comma delimiter (e.g., \code{"/lib/path/one,/lib/path/two"}).
 #' @param context Optional object to be serialized and passed back to \code{f()}.
 #' @param name Optional table name while registering the resulting data frame.
+#' @param barrier Optional to support Barrier Execution Mode in the scheduler.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @section Configuration:
@@ -125,11 +126,15 @@ spark_apply_colum_types <- function(sdf) {
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local")
+#' sc <- spark_connect(master = "local[3]")
 #'
 #' # creates an Spark data frame with 10 elements then multiply times 10 in R
 #' sdf_len(sc, 10) %>% spark_apply(function(df) df * 10)
 #'
+#' # using barrier mode
+#' sdf_len(sc, 3, repartition = 3) %>%
+#'   spark_apply(nrow, barrier = TRUE, columns = c(id = "integer")) %>%
+#'   collect()
 #' }
 #'
 #' @export
@@ -141,6 +146,7 @@ spark_apply <- function(x,
                         packages = NULL,
                         context = NULL,
                         name = NULL,
+                        barrier = NULL,
                         ...) {
   memory <- force(memory)
   args <- list(...)
@@ -151,7 +157,7 @@ spark_apply <- function(x,
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
 
-  if (identical(args$barrier, TRUE)){
+  if (identical(barrier, TRUE)){
     # barrier works in rdd
     args$rdd <- TRUE
 
@@ -311,7 +317,7 @@ spark_apply <- function(x,
   if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
 
   if (identical(args$rdd, TRUE)) {
-    if (identical(args$barrier, TRUE)){
+    if (identical(barrier, TRUE)){
       rdd <- invoke_static(
         sc,
         "sparklyr.RDDBarrier",
@@ -428,7 +434,7 @@ spark_apply <- function(x,
     )
   }
 
-  if (identical(args$barrier, TRUE)){
+  if (identical(barrier, TRUE)){
     registered <- transformed
   } else {
     name <- name %||% random_string("sparklyr_tmp_")
