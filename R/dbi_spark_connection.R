@@ -30,6 +30,11 @@ setMethod("sqlInterpolate", "spark_connection", function(conn, sql, ..., .dots =
   method(conn, sql, ..., .dots = .dots)
 })
 
+setMethod("dbQuoteLiteral", "spark_connection", function(conn, x, ...) {
+  method <- getMethod("dbQuoteLiteral", "DBIConnection")
+  method(conn, x, ...)
+})
+
 get_data_type <- function(obj) {
   if (is.factor(obj)) return("TEXT")
 
