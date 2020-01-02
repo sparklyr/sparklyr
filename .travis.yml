@@ -97,6 +97,7 @@ matrix:
         - r-lib/rlang
         - rstudio/forge
         - r-lib/ellipsis
+        - r-dbi/DBI
   allow_failures:
     - env: R_DEVEL_PACKAGES="true"
     - r: release
