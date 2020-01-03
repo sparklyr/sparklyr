@@ -1,7 +1,7 @@
 Package: sparklyr
 Type: Package
 Title: R Interface to Apache Spark
-Version: 1.0.5.9001
+Version: 1.0.5.9002
 Authors@R: c(
     person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("aut", "cre")),
     person("Kevin", "Kuo", role = "aut", email = "kevin.kuo@rstudio.com",
@@ -20,7 +20,7 @@ Description: R interface to Apache Spark, a fast and general engine for big data
 License: Apache License 2.0 | file LICENSE
 SystemRequirements: Spark: 1.6.x or 2.x
 URL: http://spark.rstudio.com
-BugReports: https://github.com/rstudio/sparklyr/issues
+BugReports: https://github.com/sparklyr/sparklyr/issues
 LazyData: TRUE
 RoxygenNote: 6.1.1
 Depends:

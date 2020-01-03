@@ -111,7 +111,7 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   # order to guarantee row order presevation.
   residuals <- sdf_residuals(x, type = type.residuals)
   ml_predict(x, newdata = residuals) %>%
-    # Two calls to 'rename': https://github.com/rstudio/sparklyr/issues/678
+    # Two calls to 'rename': https://github.com/sparklyr/sparklyr/issues/678
     rename(fitted = !!"prediction") %>%
     rename(resid = !!"residuals")
 }

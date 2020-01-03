@@ -28,8 +28,7 @@ livy_validate_http_response <- function(message, req) {
 livy_available_jars <- function() {
   system.file("java", package = "sparklyr") %>%
     dir(pattern = "sparklyr") %>%
-    gsub("^sparklyr-|-.*\\.jar", "", .) %>%
-    numeric_version()
+    gsub("^sparklyr-|-.*\\.jar", "", .)
 }
 
 #' Create a Spark Configuration for Livy
@@ -559,13 +558,21 @@ livy_connection_jars <- function(config, version) {
 
   if (!spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
     major_version <- gsub("\\.$", "", version)
-    previouis_versions <- Filter(function(maybe_version) maybe_version <= major_version, livy_available_jars())
+
+    livy_jars <- livy_available_jars()
+    livy_max_version <- max(numeric_version(livy_jars[livy_jars != "master"]))
+
+    previouis_versions <- Filter(
+      function(maybe_version) maybe_version <= major_version,
+      numeric_version(gsub("master", paste(livy_max_version, "1", sep = "."), livy_available_jars()))
+    )
+
     target_version <- previouis_versions[length(previouis_versions)]
 
     target_jar <- dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", target_version))
 
     livy_jars <- list(paste0(
-      "https://github.com/rstudio/sparklyr/blob/feature/sparklyr-1.0.5/inst/java/",
+      "https://github.com/sparklyr/sparklyr/blob/feature/sparklyr-1.0.5/inst/java/",
       target_jar,
       "?raw=true"
     ))

@@ -30,8 +30,10 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        elapsed_time <- as.numeric(Sys.time()) - as.numeric(self$last_time)
 
                                        print_message = TRUE
-                                       if (inherits(result, "expectation_failure") ||
-                                           inherits(result, "expectation_error")) {
+                                       is_error <- inherits(result, "expectation_failure") ||
+                                         inherits(result, "expectation_error")
+
+                                       if (is_error) {
                                          self$n_fail <- self$n_fail + 1
                                        } else if (inherits(result, "expectation_skip")) {
                                          self$n_skip <- self$n_skip + 1
@@ -47,6 +49,15 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                           paste0(test, ": ", private$expectation_type(result), ": ", result$message),
                                           "\n"
                                         )
+                                         if (is_error) {
+                                           cat(
+                                             paste(
+                                               "  callstack:\n    ",
+                                               paste0(utils::limitedLabels(result$call), collapse = "\n    "),
+                                               "\n"
+                                             )
+                                           )
+                                         }
                                        }
 
                                        if (identical(self$last_test, test)) {

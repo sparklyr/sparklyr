@@ -17,7 +17,7 @@ publishDir = "blogdown/public"
 [params]
     description = "An R interface to Spark"
     copyright = "Copyright 2017, RStudio, Inc."
-	  repo = "https://github.com/rstudio/sparklyr"
+	  repo = "https://github.com/sparklyr/sparklyr"
 
 [[menu.main]]
     weight = 10

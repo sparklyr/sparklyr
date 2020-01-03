@@ -12,7 +12,12 @@ stream_read_socket(sc, name = NULL, columns = NULL, options = list(),
 
 \item{name}{The name to assign to the newly generated stream.}
 
-\item{columns}{A vector of column names or a named vector of column types.}
+\item{columns}{A vector of column names or a named vector of column types.
+If specified, the elements can be \code{"binary"} for \code{BinaryType},
+\code{"boolean"} for \code{BooleanType}, \code{"byte"} for \code{ByteType},
+\code{"integer"} for \code{IntegerType}, \code{"integer64"} for \code{LongType},
+\code{"double"} for \code{DoubleType}, \code{"character"} for \code{StringType},
+\code{"timestamp"} for \code{TimestampType} and \code{"date"} for \code{DateType}.}
 
 \item{options}{A list of strings with additional options.}
 

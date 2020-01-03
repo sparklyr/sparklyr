@@ -9,7 +9,7 @@ spark_versions_url <- function() {
 }
 
 #' @importFrom jsonlite fromJSON
-read_spark_versions_json <- function(latest = TRUE) {
+read_spark_versions_json <- function(latest = TRUE, future = FALSE) {
   # see if we have a cached version
   if (!exists("sparkVersionsJson", envir = .globals))
   {
@@ -38,7 +38,15 @@ read_spark_versions_json <- function(latest = TRUE) {
     assign("sparkVersionsJson", versionsJson, envir = .globals)
   }
 
-  .globals$sparkVersionsJson
+  if (identical(future, TRUE)) {
+    # add future versions
+    futureVersionsPath <- system.file(file.path("extdata", "versions-next.json"), package = packageName())
+    futureVersionsJson <- fromJSON(futureVersionsPath, simplifyDataFrame = TRUE)
+    versionsJson <- rbind(.globals$sparkVersionsJson, futureVersionsJson)
+  }
+  else {
+    .globals$sparkVersionsJson
+  }
 }
 
 
@@ -71,12 +79,13 @@ spark_installed_versions <- function() {
 
 #' @param show_hadoop Show Hadoop distributions?
 #' @param show_minor Show minor Spark versions?
+#' @param show_future Should future versions which have not been released be shown?
 #'
 #' @rdname spark_install
 #'
 #' @export
-spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE) {
-  versions <- read_spark_versions_json(latest = TRUE)
+spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE, show_future = FALSE) {
+  versions <- read_spark_versions_json(latest = TRUE, future = show_future)
   versions <- versions[versions$spark >= "1.6.0", 1:2]
   selection <- if (show_hadoop) c("spark", "hadoop") else "spark"
 
@@ -100,7 +109,7 @@ spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE) {
 #' @export
 spark_versions <- function(latest = TRUE) {
 
-  downloadData <- read_spark_versions_json(latest)
+  downloadData <- read_spark_versions_json(latest, future = TRUE)
   downloadData$installed <- rep(FALSE, NROW(downloadData))
 
   downloadData$download <- paste(
@@ -145,6 +154,7 @@ spark_versions <- function(latest = TRUE) {
       newRow$hadoop_default <- FALSE
 
       if (NROW(currentRow) > 0) {
+        currentRow$spark <- gsub("-preview", "", currentRow$spark)
         hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0) "2.7" else "2.6"
 
         newRow$base <- currentRow$base

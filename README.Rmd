@@ -6,7 +6,7 @@ output:
     fig_height: 5
 ---
 
-[![Build Status](https://travis-ci.org/rstudio/sparklyr.svg?branch=master)](https://travis-ci.org/rstudio/sparklyr) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstudio/sparklyr?branch=master&svg=true)](https://ci.appveyor.com/project/JavierLuraschi/sparklyr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a> [![codecov](https://codecov.io/gh/rstudio/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/rstudio/sparklyr) [![Join the chat at https://gitter.im/rstudio/sparklyr](https://badges.gitter.im/rstudio/sparklyr.svg)](https://gitter.im/rstudio/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/sparklyr/sparklyr.svg?branch=master)](https://travis-ci.org/sparklyr/sparklyr) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/2kj2rcyir4r3dhdw?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr-js0af) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a> [![codecov](https://codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/sparklyr/sparklyr) [![Join the chat at https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.svg)](https://gitter.im/sparklyr/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img src="tools/readme/sparklyr-illustration.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
 
@@ -41,10 +41,8 @@ To upgrade to the latest version of sparklyr, run the following command and rest
 
 ```{r, eval=FALSE}
 install.packages("devtools")
-devtools::install_github("rstudio/sparklyr")
+devtools::install_github("sparklyr/sparklyr")
 ```
-
-If you use the RStudio IDE, you should also download the latest [preview release](https://www.rstudio.com/products/rstudio/download/preview/) of the IDE which includes several enhancements for interacting with Spark (see the [RStudio IDE] section below for more details).
 
 ## Connecting to Spark
 
@@ -352,7 +350,7 @@ spark_disconnect(sc)
 
 ## Connecting through Livy
 
-[Livy](https://github.com/cloudera/livy) enables remote connections to Apache Spark clusters. Connecting to Spark clusters through Livy is **under experimental development** in `sparklyr`. Please post any feedback or questions as a GitHub issue as needed.
+[Livy](https://github.com/cloudera/livy) enables remote connections to Apache Spark clusters. However, please notice that connecting to Spark clusters through Livy is much slower than any other connection method.
 
 Before connecting to Livy, you will need the connection information to an existing service running Livy. Otherwise, to test `livy` in your local environment, you can install it and run it locally as follows:
 
