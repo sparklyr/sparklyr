@@ -154,6 +154,7 @@ spark_versions <- function(latest = TRUE) {
       newRow$hadoop_default <- FALSE
 
       if (NROW(currentRow) > 0) {
+        currentRow$spark <- gsub("-preview", "", currentRow$spark)
         hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0) "2.7" else "2.6"
 
         newRow$base <- currentRow$base
