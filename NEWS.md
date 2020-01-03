@@ -4,6 +4,10 @@
 
 - Fixed typo in `stream_read_socket()`.
 
+### Data
+
+- Add support for `DBI 1.1` to implement missing `dbQuoteLiteral` signature (#2227).
+
 # Sparklyr 1.0.5
 
 ### Serialization
