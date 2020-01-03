@@ -160,7 +160,11 @@ sparklyr_jar_path <- function(spark_version) {
   } else if (spark_version > "1.6") {
     # Spark is backwards compatible so we can use a new version with the latest jar
     all_versions <- sort(gsub("^sparklyr-|-[0-9]+\\.[0-9]+\\.jar$", "", all_jars), decreasing = T)
+
+    # Support preview versions and master builds
     all_versions <- all_versions[all_versions != "master"]
+    all_versions <- gsub("-preview", "", all_versions)
+
     prev_versions <- all_versions[all_versions <= spark_version]
 
     dir(system.file("java", package = "sparklyr"),

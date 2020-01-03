@@ -22,7 +22,7 @@ sdf_fast_bind_cols <- function(...) {
     spark_connection()
 
   zip_sdf <- function(df1, df2) invoke_static(sc,
-                           "sparklyr.Utils",
+                           "sparklyr.DFUtils",
                            "zipDataFrames",
                            spark_context(sc),
                            df1, df2)
