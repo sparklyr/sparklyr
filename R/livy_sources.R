@@ -30,6 +30,7 @@ livy_sources_included <- function() {
     "/mlutils\\.scala",
     "/mlutils2\\.scala",
     "/bucketizerutils\\.scala",
+    "/rddbarrier\\.scala",
     "/livyutils\\.scala"
     # New files might require entries to livy_load_scala_sources and globalClassMap
   )

@@ -1,5 +1,9 @@
 # Sparklyr 1.0.5.9000
 
+### Distributed R
+
+- Add support for barrier execution mode with `barrier = TRUE` in `spark_apply()` (@samuelmacedo83, #2216).
+
 ### Streaming
 
 - Fixed typo in `stream_read_socket()`.

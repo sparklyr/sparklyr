@@ -6,7 +6,7 @@
 \usage{
 spark_apply(x, f, columns = NULL, memory = !is.null(name),
   group_by = NULL, packages = NULL, context = NULL, name = NULL,
-  ...)
+  barrier = NULL, ...)
 }
 \arguments{
 \item{x}{An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.}
@@ -58,6 +58,8 @@ specify the column types. The sample size is configurable using the
 
 \item{name}{Optional table name while registering the resulting data frame.}
 
+\item{barrier}{Optional to support Barrier Execution Mode in the scheduler.}
+
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
@@ -80,11 +82,15 @@ without \code{--vanilla} use \code{sparklyr.apply.options.vanilla} set to
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local")
+sc <- spark_connect(master = "local[3]")
 
 # creates an Spark data frame with 10 elements then multiply times 10 in R
 sdf_len(sc, 10) \%>\% spark_apply(function(df) df * 10)
 
+# using barrier mode
+sdf_len(sc, 3, repartition = 3) \%>\%
+  spark_apply(nrow, barrier = TRUE, columns = c(id = "integer")) \%>\%
+  collect()
 }
 
 }

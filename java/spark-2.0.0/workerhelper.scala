@@ -105,7 +105,8 @@ object WorkerHelper {
         context,
         optionsImmMap,
         timeZoneId,
-        sourceSchema
+        sourceSchema,
+        () => Map()
       )
 
       workerApply.apply(rows)

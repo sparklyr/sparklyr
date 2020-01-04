@@ -39,7 +39,8 @@ class WorkerRDD(
       context: Array[Byte],
       options: Map[String, String],
       "",
-      org.apache.spark.sql.types.StructType(Nil)
+      org.apache.spark.sql.types.StructType(Nil),
+      () => Map()
     )
 
     return workerApply.apply(firstParent.iterator(split, task))

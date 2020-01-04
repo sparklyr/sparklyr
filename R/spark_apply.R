@@ -108,6 +108,7 @@ spark_apply_colum_types <- function(sdf) {
 #'   (without spaces) with a comma delimiter (e.g., \code{"/lib/path/one,/lib/path/two"}).
 #' @param context Optional object to be serialized and passed back to \code{f()}.
 #' @param name Optional table name while registering the resulting data frame.
+#' @param barrier Optional to support Barrier Execution Mode in the scheduler.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @section Configuration:
@@ -125,11 +126,15 @@ spark_apply_colum_types <- function(sdf) {
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local")
+#' sc <- spark_connect(master = "local[3]")
 #'
 #' # creates an Spark data frame with 10 elements then multiply times 10 in R
 #' sdf_len(sc, 10) %>% spark_apply(function(df) df * 10)
 #'
+#' # using barrier mode
+#' sdf_len(sc, 3, repartition = 3) %>%
+#'   spark_apply(nrow, barrier = TRUE, columns = c(id = "integer")) %>%
+#'   collect()
 #' }
 #'
 #' @export
@@ -141,6 +146,7 @@ spark_apply <- function(x,
                         packages = NULL,
                         context = NULL,
                         name = NULL,
+                        barrier = NULL,
                         ...) {
   memory <- force(memory)
   args <- list(...)
@@ -150,11 +156,26 @@ spark_apply <- function(x,
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
+
+  if (identical(barrier, TRUE)){
+    # barrier works in rdd
+    args$rdd <- TRUE
+
+    if (spark_version(sc) < "2.4.0"){
+      stop("Barrier execution is only available for spark 2.4.0 or greater.")
+    }
+
+    if (is.null(columns)) {
+      stop("Barrier execution requires explicit columns names.")
+    }
+  }
+
   if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
   if (identical(args$rdd, TRUE)) {
     rdd_base <- invoke(sdf, "rdd")
     if (identical(columns, NULL)) columns <- colnames(x)
   }
+
   grouped <- !is.null(group_by)
 
   rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
@@ -296,23 +317,43 @@ spark_apply <- function(x,
   if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
 
   if (identical(args$rdd, TRUE)) {
-    rdd <- invoke_static(
-      sc,
-      "sparklyr.WorkerHelper",
-      "computeRdd",
-      rdd_base,
-      closure,
-      spark_apply_worker_config(sc, args$debug, args$profile),
-      as.integer(worker_port),
-      as.list(sdf_columns),
-      as.list(group_by),
-      closure_rlang,
-      bundle_path,
-      as.environment(proc_env),
-      as.integer(60),
-      context_serialize,
-      as.environment(spark_apply_options)
-    )
+    if (identical(barrier, TRUE)){
+      rdd <- invoke_static(
+        sc,
+        "sparklyr.RDDBarrier",
+        "transformBarrier",
+        rdd_base,
+        closure,
+        as.list(sdf_columns),
+        spark_apply_worker_config(sc, args$debug, args$profile),
+        as.integer(worker_port),
+        as.list(group_by),
+        closure_rlang,
+        bundle_path,
+        as.integer(60),
+        as.environment(proc_env),
+        context_serialize,
+        as.environment(spark_apply_options)
+      )
+    } else {
+      rdd <- invoke_static(
+        sc,
+        "sparklyr.WorkerHelper",
+        "computeRdd",
+        rdd_base,
+        closure,
+        spark_apply_worker_config(sc, args$debug, args$profile),
+        as.integer(worker_port),
+        as.list(sdf_columns),
+        as.list(group_by),
+        closure_rlang,
+        bundle_path,
+        as.environment(proc_env),
+        as.integer(60),
+        context_serialize,
+        as.environment(spark_apply_options)
+      )
+    }
 
     # cache by default
     if (memory) rdd <- invoke(rdd, "cache")
@@ -393,11 +434,15 @@ spark_apply <- function(x,
     )
   }
 
-  name <- name %||% random_string("sparklyr_tmp_")
-  registered <- sdf_register(transformed, name = name)
+  if (identical(barrier, TRUE)){
+    registered <- transformed
+  } else {
+    name <- name %||% random_string("sparklyr_tmp_")
+    registered <- sdf_register(transformed, name = name)
 
-  if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
+    if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
 
+  }
   registered
 }
 
