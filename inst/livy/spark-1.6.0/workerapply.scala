@@ -17,8 +17,8 @@ class WorkerApply(
   options: Map[String, String],
   timeZoneId: String,
   schema: org.apache.spark.sql.types.StructType,
-  barrier: Boolean = false
-  ) {
+  genBarrierMap: () => Map[String, Any]
+  ) extends java.io.Serializable {
 
   import java.io.{File, FileWriter}
   import org.apache.spark._;
@@ -59,7 +59,7 @@ class WorkerApply(
       timeZoneId,
       schema,
       options,
-      Map()
+      genBarrierMap()
     )
 
     val tracker = new JVMObjectTracker()
