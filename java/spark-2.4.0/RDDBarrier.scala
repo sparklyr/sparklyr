@@ -77,7 +77,7 @@ object RDDBarrier {
       optionsImmMap: Map[String, String],
       "",
       org.apache.spark.sql.types.StructType(Nil),
-      true
+      () => Map("address" -> org.apache.spark.BarrierTaskContext.get().getTaskInfos().map(e => e.address))
     )
 
     workerApply
