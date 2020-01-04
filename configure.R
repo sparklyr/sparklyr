@@ -7,13 +7,12 @@ if (length(args)==0) {
                "2.0.0",
                "2.3.0",
                "2.4.0",
-               "3.0.0-preview",
-               "master")
+               "3.0.0-preview")
 } else if (length(args)==1) {
   # default output file
   targets <- c(args[1])
 } else {
-  stop("Cannot take more than one arguments.n", call.=FALSE)
+  stop("Cannot take more than one argument.", call.=FALSE)
 }
 
 print(targets)
@@ -37,7 +36,8 @@ spec[[length(spec) + 1]] <- spark_compilation_spec(
     scala_filter = sparklyr:::make_version_filter("3.0.0")
   )
 
+sparklyr::compile_package_jars(spec = spec)
+
 # for now, spark master and spark 3.0.0-preview are equivalent
 file.copy("inst/java/sparklyr-3.0.0-preview-2.12.jar", "inst/java/sparklyr-master-2.12.jar", overwrite = TRUE)
 
-sparklyr::compile_package_jars(spec = spec)
