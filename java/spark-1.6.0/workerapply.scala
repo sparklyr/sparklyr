@@ -15,7 +15,7 @@ class WorkerApply(
   timeZoneId: String,
   schema: org.apache.spark.sql.types.StructType,
   genBarrierMap: () => Map[String, Any]
-  ) {
+  ) extends java.io.Serializable {
 
   import java.io.{File, FileWriter}
   import org.apache.spark._;
