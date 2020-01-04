@@ -13,7 +13,8 @@ class WorkerApply(
   context: Array[Byte],
   options: Map[String, String],
   timeZoneId: String,
-  schema: org.apache.spark.sql.types.StructType
+  schema: org.apache.spark.sql.types.StructType,
+  barrier: Boolean = false
   ) {
 
   import java.io.{File, FileWriter}
