@@ -3,8 +3,7 @@ sparklyr: R interface for Apache Spark
 
 [![Build
 Status](https://travis-ci.org/sparklyr/sparklyr.svg?branch=master)](https://travis-ci.org/sparklyr/sparklyr)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/2kj2rcyir4r3dhdw?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr-js0af)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/qjosuhlp55nwv42y?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
 <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a>
 [![codecov](https://codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/sparklyr/sparklyr)
