@@ -10,6 +10,9 @@
 
 ### Data
 
+- Allow using Scala types in schema specifications. For example, `StringType` in the
+  `columns` parameter for `spark_read_csv()` (@jozefhajnala, #2226)
+
 - Add support for `DBI 1.1` to implement missing `dbQuoteLiteral` signature (#2227).
 
 # Sparklyr 1.0.5
