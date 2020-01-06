@@ -32,8 +32,7 @@ object SQLUtils {
       case "StringType" => org.apache.spark.sql.types.StringType
       case "TimestampType" => org.apache.spark.sql.types.TimestampType
       case "DateType" => org.apache.spark.sql.types.DateType
-      case "BinaryType" => org.apache.spark.sql.types.BinaryType
-
+      case "BinaryType" => org.apache.spark.sql.types.BinaryTypes
       case "byte" => org.apache.spark.sql.types.ByteType
       case "integer" => org.apache.spark.sql.types.IntegerType
       case "integer64" => org.apache.spark.sql.types.LongType

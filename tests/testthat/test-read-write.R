@@ -203,8 +203,8 @@ test_that("spark_read_csv() can read column types", {
   df_schema <- spark_read_csv(
     sc,
     name = "test_columns",
-    path = "test.csv"
-    , columns = c(a = "byte", b = "integer", c = "double")
+    path = "test.csv",
+    columns = c(a = "byte", b = "integer", c = "double")
   ) %>%
     sdf_schema()
 
@@ -226,8 +226,8 @@ test_that("spark_read_csv() can read verbatim column types", {
   df_schema <- spark_read_csv(
     sc,
     name = "test_columns",
-    path = "test.csv"
-    , columns = c(a = "ByteType", b = "IntegerType", c = "DoubleType")
+    path = "test.csv",
+    columns = c(a = "ByteType", b = "IntegerType", c = "DoubleType")
   ) %>%
     sdf_schema()
 
