@@ -26,6 +26,16 @@ object SQLUtils {
     val RegexStructField = "\\A(.+):(.+)\\Z".r("fieldName", "fieldType")
 
     dataType match {
+      case "BooleanType" => org.apache.spark.sql.types.BooleanType
+      case "ByteType" => org.apache.spark.sql.types.ByteType
+      case "IntegerType" => org.apache.spark.sql.types.IntegerType
+      case "LongType" => org.apache.spark.sql.types.LongType
+      case "FloatType" => org.apache.spark.sql.types.FloatType
+      case "DoubleType" => org.apache.spark.sql.types.DoubleType
+      case "StringType" => org.apache.spark.sql.types.StringType
+      case "TimestampType" => org.apache.spark.sql.types.TimestampType
+      case "DateType" => org.apache.spark.sql.types.DateType
+      case "BinaryType" => org.apache.spark.sql.types.BinaryTypes
       case "byte" => org.apache.spark.sql.types.ByteType
       case "integer" => org.apache.spark.sql.types.IntegerType
       case "integer64" => org.apache.spark.sql.types.LongType
@@ -54,7 +64,7 @@ object SQLUtils {
         org.apache.spark.sql.types.MapType(getSQLDataType(keyType), getSQLDataType(valueType))
       case RegexStruct(fieldsStr) =>
         if (fieldsStr(fieldsStr.length - 1) == ',') {
-          throw new IllegalArgumentException(s"Invaid type $dataType")
+          throw new IllegalArgumentException(s"Invalid type $dataType")
         }
         val fields = fieldsStr.split(",")
         val structFields = fields.map { field =>
@@ -62,11 +72,11 @@ object SQLUtils {
             case RegexStructField(fieldName, fieldType) =>
               createStructField(fieldName, fieldType, true)
 
-            case _ => throw new IllegalArgumentException(s"Invaid type $dataType")
+            case _ => throw new IllegalArgumentException(s"Invalid type $dataType")
           }
         }
         createStructType(structFields)
-      case _ => throw new IllegalArgumentException(s"Invaid type $dataType")
+      case _ => throw new IllegalArgumentException(s"Invalid type $dataType")
     }
   }
 
