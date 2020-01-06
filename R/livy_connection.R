@@ -554,9 +554,10 @@ livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(
 }
 
 livy_connection_jars <- function(config, version) {
-  livy_jars <- list()
+  livy_jars <- spark_config_value(config, "sparklyr.livy.jar", NULL)
+  livy_jars <- if (is.null(livy_jars)) list() else list(livy_jars)
 
-  if (!spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
+  if (length(livy_jars) == 0 && !spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
     major_version <- gsub("\\.$", "", version)
 
     livy_jars <- livy_available_jars()
@@ -571,8 +572,12 @@ livy_connection_jars <- function(config, version) {
 
     target_jar <- dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", target_version))
 
+    livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "master")
+
     livy_jars <- list(paste0(
-      "https://github.com/sparklyr/sparklyr/blob/feature/sparklyr-1.0.5/inst/java/",
+      "https://github.com/sparklyr/sparklyr/blob/",
+      livy_branch,
+      "/inst/java/",
       target_jar,
       "?raw=true"
     ))
@@ -588,6 +593,10 @@ livy_connection <- function(master,
                             hadoop_version,
                             extensions) {
 
+  if (is.null(version)) {
+    stop("Livy connections now require a the Spark version to be specified.")
+  }
+
   livy_connection_not_used_warn(app_name, "sparklyr")
   livy_connection_not_used_warn(hadoop_version)
   livy_connection_not_used_warn(extensions, registered_extensions())
@@ -601,7 +610,7 @@ livy_connection <- function(master,
 
   livy_validate_master(master, config)
 
-  if (!is.null(version) && !spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
+  if (!spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
     extensions <- spark_dependencies_from_extensions(version, extensions, config)
 
     config$livy.jars <- as.character(c(livy_connection_jars(config, version), extensions$catalog_jars))

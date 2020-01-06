@@ -98,10 +98,8 @@ spark_config_shell_args <- function(config, master) {
 #'
 #' @details
 #'
-#' When using \code{method = "livy"}, it is recommended to specify \code{version}
-#' parameter to improve performance by using precompiled code rather than uploading
-#' sources. By default, jars are downloaded from GitHub but the path to the correct
-#' \code{sparklyr} JAR can also be specified through the \code{livy.jars} setting.
+#' When using \code{method = "livy"}, jars are downloaded from GitHub but the path
+#' to a local \code{sparklyr} JAR can also be specified through the \code{livy.jars} setting.
 #'
 #' @export
 spark_connect <- function(master,
