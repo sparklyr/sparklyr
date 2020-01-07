@@ -1,15 +1,16 @@
 package sparklyr
 
-object WorkerHelper {
-  import org.apache.spark.rdd.RDD
-  import org.apache.spark.sql._
-  import org.apache.spark.sql.catalyst.encoders.RowEncoder
-  import org.apache.spark.sql.SparkSession
-  import org.apache.spark.sql.types._
-  import scala.collection.JavaConversions._
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql._
+import org.apache.spark.sql.catalyst.encoders.RowEncoder
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types._
 
+import scala.collection.JavaConversions._
+
+object WorkerHelper {
   def computeRdd(
-    rdd: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row],
+    rdd: RDD[Row],
     closure: Array[Byte],
     config: String,
     port: Int,
@@ -21,7 +22,7 @@ object WorkerHelper {
     connectionTimeout: Int,
     context: Array[Byte],
     options: Map[_, _]
-  ): org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
+  ): RDD[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
     customEnv.foreach(kv => customEnvMap.put(
@@ -56,7 +57,7 @@ object WorkerHelper {
   }
 
   def computeSdf(
-    sdf: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row],
+    sdf: Dataset[Row],
     schema: StructType,
     closure: Array[Byte],
     config: String,
@@ -71,7 +72,7 @@ object WorkerHelper {
     options: Map[_, _],
     sparkSession: SparkSession,
     timeZoneId: String
-  ): org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] = {
+  ): Dataset[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
     customEnv.foreach(kv => customEnvMap.put(

@@ -1,12 +1,17 @@
 package sparklyr
 
-object RDDBarrier {
-  import org.apache.spark._
-  import scala.collection.JavaConversions._
-  import java.net._
+import java.net._
 
+import org.apache.spark._
+import org.apache.spark.BarrierTaskContext
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
+
+import scala.collection.JavaConversions._
+
+object RDDBarrier {
   def transformBarrier(
-      rdd: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row],
+      rdd: RDD[Row],
       closure: Array[Byte],
       columns: Array[String],
       config: String,
@@ -18,7 +23,7 @@ object RDDBarrier {
       customEnv: Map[Object, Object],
       context: Array[Byte],
       options: Map[Object, Object]
-      ): org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = {
+      ): RDD[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
     customEnv.foreach(kv => customEnvMap.put(
@@ -77,7 +82,7 @@ object RDDBarrier {
       optionsImmMap: Map[String, String],
       "",
       org.apache.spark.sql.types.StructType(Nil),
-      () => Map("address" -> org.apache.spark.BarrierTaskContext.get().getTaskInfos().map(e => e.address))
+      () => Map("address" -> BarrierTaskContext.get().getTaskInfos().map(e => e.address))
     )
 
     workerApply

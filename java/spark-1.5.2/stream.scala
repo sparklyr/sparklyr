@@ -1,15 +1,14 @@
 package sparklyr
 
+import java.io._
+
+import scala.collection.mutable.HashMap
+import scala.language.existentials
+
+import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
+import io.netty.channel.ChannelHandler.Sharable
+
 class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
-
-  import java.io._
-
-  import scala.collection.mutable.HashMap
-  import scala.language.existentials
-
-  import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
-  import io.netty.channel.ChannelHandler.Sharable
-
   val invoke = new Invoke()
 
   def classExists(name: String): Boolean = {

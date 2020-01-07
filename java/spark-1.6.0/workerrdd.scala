@@ -1,9 +1,12 @@
 package sparklyr
 
 import org.apache.spark._
+import org.apache.spark.rdd._
+import org.apache.spark.sql._
+import org.apache.spark.sql.types.StructType
 
 class WorkerRDD(
-  prev: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row],
+  prev: RDD[Row],
   closure: Array[Byte],
   columns: Array[String],
   config: String,
@@ -15,13 +18,11 @@ class WorkerRDD(
   connectionTimeout: Int,
   context: Array[Byte],
   options: Map[String, String]
-  ) extends org.apache.spark.rdd.RDD[org.apache.spark.sql.Row](prev) {
-
-  import org.apache.spark._;
+  ) extends RDD[Row](prev) {
 
   override def getPartitions = firstParent.partitions
 
-  override def compute(split: Partition, task: TaskContext): Iterator[org.apache.spark.sql.Row] = {
+  override def compute(split: Partition, task: TaskContext): Iterator[Row] = {
 
     val workerApply: WorkerApply = new WorkerApply(
       closure: Array[Byte],
@@ -36,7 +37,7 @@ class WorkerRDD(
       context: Array[Byte],
       options: Map[String, String],
       "",
-      org.apache.spark.sql.types.StructType(Nil),
+      StructType(Nil),
       () => Map()
     )
 

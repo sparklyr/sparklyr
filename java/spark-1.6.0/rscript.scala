@@ -1,14 +1,14 @@
 package sparklyr
 
+import java.io.File
+import java.util.Arrays
+
+import org.apache.spark._
+import org.apache.spark.sql._
+
+import scala.collection.JavaConverters._
+
 class Rscript(logger: Logger) {
-  import java.io.File
-  import java.util.Arrays
-
-  import org.apache.spark._
-  import org.apache.spark.sql._
-
-  import scala.collection.JavaConverters._
-
   def getScratchDir(): File = {
     val sparkFiles = Class.forName("org.apache.spark.SparkFiles")
     val selectedMethods = sparkFiles.getMethods.filter(m => m.getName == "getRootDirectory")

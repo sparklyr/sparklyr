@@ -1,6 +1,5 @@
 package sparklyr
 
-
 import org.apache.spark.ml.feature.ElementwiseProduct
 import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
 import org.apache.spark.ml.linalg._
