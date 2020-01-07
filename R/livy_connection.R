@@ -594,7 +594,7 @@ livy_connection <- function(master,
                             extensions) {
 
   if (is.null(version)) {
-    stop("Livy connections now require a the Spark version to be specified.")
+    stop("Livy connections now require a the Spark version to be specified.", call. = FALSE)
   }
 
   livy_connection_not_used_warn(app_name, "sparklyr")
