@@ -1,5 +1,13 @@
 package sparklyr
 
+import java.io.{File, FileWriter}
+
+import org.apache.spark._
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.StructType
+
+import scala.util.Random
+
 class WorkerApply(
   closure: Array[Byte],
   columns: Array[String],
@@ -13,12 +21,9 @@ class WorkerApply(
   context: Array[Byte],
   options: Map[String, String],
   timeZoneId: String,
-  schema: org.apache.spark.sql.types.StructType,
+  schema: StructType,
   genBarrierMap: () => Map[String, Any]
   ) extends java.io.Serializable {
-
-  import java.io.{File, FileWriter}
-  import org.apache.spark._;
 
   private[this] var exception: Option[Exception] = None
   private[this] var backendPort: Int = 0
@@ -35,14 +40,14 @@ class WorkerApply(
     tempFile.getAbsolutePath()
   }
 
-  def apply(iterator: Iterator[org.apache.spark.sql.Row]): Iterator[org.apache.spark.sql.Row] = {
+  def apply(iterator: Iterator[Row]): Iterator[Row] = {
 
-    val sessionId: Int = scala.util.Random.nextInt(10000)
+    val sessionId: Int = Random.nextInt(10000)
     val logger = new Logger("Worker", sessionId)
     val lock: AnyRef = new Object()
 
     // No point in starting up R process to not process anything
-    if (!iterator.hasNext) return Array[org.apache.spark.sql.Row]().iterator
+    if (!iterator.hasNext) return Array[Row]().iterator
 
     val workerContext = new WorkerContext(
       iterator,

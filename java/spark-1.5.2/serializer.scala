@@ -1,14 +1,14 @@
 package sparklyr
 
+import java.io.{DataInputStream, DataOutputStream}
+import java.nio.charset.StandardCharsets
+import java.sql.{Date, Time, Timestamp}
+import java.util.Calendar
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable.WrappedArray
+
 class Serializer(tracker: JVMObjectTracker) {
-  import java.io.{DataInputStream, DataOutputStream}
-  import java.nio.charset.StandardCharsets
-  import java.sql.{Date, Time, Timestamp}
-  import java.util.Calendar
-
-  import scala.collection.JavaConverters._
-  import scala.collection.mutable.WrappedArray
-
   type ReadObject = (DataInputStream, Char) => Object
   type WriteObject = (DataOutputStream, Object) => Boolean
 

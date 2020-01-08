@@ -1,43 +1,20 @@
 package sparklyr
 
+import java.io.File
+import java.util.Arrays
+
+import org.apache.spark._
+import org.apache.spark.sql._
+
+import scala.collection.JavaConverters._
+
 class Rscript(logger: Logger) {
-  import java.io.File
-  import java.util.Arrays
-
-  import org.apache.spark._
-  import org.apache.spark.sql._
-
-  import scala.collection.JavaConverters._
-
   def getScratchDir(): File = {
-    val sparkFiles = Class.forName("org.apache.spark.SparkFiles")
-    val selectedMethods = sparkFiles.getMethods.filter(m => m.getName == "getRootDirectory")
-    val rootDir = selectedMethods(0).invoke(sparkFiles).asInstanceOf[String]
-    new File(rootDir)
-  }
-
-  def getSparkConf(): SparkConf = {
-    // val sparkConf = SparkEnv.get.conf
-    val sparkEnvRoot = Class.forName("org.apache.spark.SparkEnv")
-    val selectedMethods = sparkEnvRoot.getMethods.filter(
-      m => m.getName == "get" && m.getParameterTypes.length == 0
-    )
-    val sparkEnv: SparkEnv= selectedMethods(0).invoke(sparkEnvRoot).asInstanceOf[SparkEnv]
-
-    val sparkEnvMethods = sparkEnv.getClass.getMethods.filter(
-      m => m.getName == "conf" && m.getParameterTypes.length == 0
-    )
-    sparkEnvMethods(0).invoke(sparkEnv).asInstanceOf[SparkConf]
+    new File(SparkFiles.getRootDirectory)
   }
 
   def getCommand(): String = {
-    val sparkConf: SparkConf = getSparkConf()
-
-    // val command: String = sparkConf.get("spark.r.command", "Rscript")
-    val sparkConfMethods = sparkConf.getClass.getMethods.filter(
-      m => m.getName == "get" && m.getParameterTypes.length == 2
-    )
-    sparkConfMethods(0).invoke(sparkConf, "spark.r.command", "Rscript").asInstanceOf[String]
+    SparkEnv.get.conf.get("spark.r.command", "Rscript")
   }
 
   def run(commands: String) = {

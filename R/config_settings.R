@@ -37,6 +37,8 @@ spark_config_settings <- function() {
     sparklyr.gateway.timeout = "Total seconds before giving up connecting to the sparklyr gateway after initialization.",
     sparklyr.gateway.wait = "Total seconds to wait before retrying to contact the sparklyr gateway.",
     sparklyr.livy.auth = "Authentication method for Livy connections.",
+    sparklyr.livy.branch = "GitHub branch to be used to deploy sparklyr JAR to Livy.",
+    sparklyr.livy.jar = "URL or path to the sparklyr JAR to be used by Livy.",
     sparklyr.livy.headers = "Additional HTTP headers for Livy connections.",
     sparklyr.livy.sources = "Should sparklyr sources be sourced when connecting? If false, manually register sparklyr jars.",
     sparklyr.log.invoke = "Should every call to invoke() be printed in the console? Can be set to 'callstack' to log call stack.",

@@ -1,36 +1,39 @@
 package sparklyr
 
+import java.io.{ByteArrayOutputStream, OutputStream}
+import java.nio.channels.Channels
+
+import scala.collection.JavaConverters._
+
+import org.apache.arrow.vector._
+import org.apache.arrow.vector.ipc.ArrowStreamReader
+import org.apache.arrow.vector.ipc.message.MessageSerializer
+import org.apache.arrow.vector.ipc.WriteChannel
+import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
+
+import org.apache.spark.TaskContext
+import org.apache.spark.api.java.JavaRDD
+import org.apache.spark.sql.catalyst.CatalystTypeConverters
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.catalyst.encoders.RowEncoder
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.execution.LogicalRDD
+import org.apache.spark.sql.execution.arrow.ArrowUtils
+import org.apache.spark.sql.execution.arrow.ArrowWriter
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
+import org.apache.spark.util.TaskCompletionListener
+
 /**
  * Iterator interface to iterate over Arrow record batches and return rows
  */
-trait ArrowRowIterator extends Iterator[org.apache.spark.sql.catalyst.InternalRow] {
+trait ArrowRowIterator extends Iterator[InternalRow] {
 }
 
 class ArrowConvertersImpl {
-  import java.io.{ByteArrayOutputStream, OutputStream}
-  import java.nio.channels.Channels
-
-  import scala.collection.JavaConverters._
-
-  import org.apache.arrow.vector._
-  import org.apache.arrow.vector.ipc.ArrowStreamReader
-  import org.apache.arrow.vector.ipc.message.MessageSerializer
-  import org.apache.arrow.vector.ipc.WriteChannel
-  import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
-
-  import org.apache.spark.TaskContext
-  import org.apache.spark.api.java.JavaRDD
-  import org.apache.spark.rdd.RDD
-  import org.apache.spark.sql.catalyst.encoders.RowEncoder
-  import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
-  import org.apache.spark.sql.types._
-  import org.apache.spark.sql.execution.LogicalRDD
-  import org.apache.spark.sql.execution.arrow.ArrowUtils
-  import org.apache.spark.sql.execution.arrow.ArrowWriter
-  import org.apache.spark.sql.SparkSession
-  import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
-  import org.apache.spark.util.TaskCompletionListener
-
   def tryWithSafeFinally[T](block: => T)(finallyBlock: => Unit): T = {
     var originalThrowable: Throwable = null
     try {
@@ -53,7 +56,7 @@ class ArrowConvertersImpl {
   }
 
   def toBatchIterator(
-      rowIter: Iterator[org.apache.spark.sql.Row],
+      rowIter: Iterator[Row],
       schema: StructType,
       maxRecordsPerBatch: Int,
       timeZoneId: String,
@@ -63,7 +66,7 @@ class ArrowConvertersImpl {
   }
 
   def toBatchArray(
-      rowIter: Iterator[org.apache.spark.sql.Row],
+      rowIter: Iterator[Row],
       schema: StructType,
       timeZoneId: String,
       recordsPerBatch: Int) : Array[Byte] = {
@@ -89,7 +92,7 @@ class ArrowConvertersImpl {
    * in a batch by setting maxRecordsPerBatch or use 0 to fully consume rowIter.
    */
   def toBatchIterator(
-      rowIter: Iterator[org.apache.spark.sql.Row],
+      rowIter: Iterator[Row],
       schema: StructType,
       maxRecordsPerBatch: Int,
       timeZoneId: String,
@@ -129,8 +132,8 @@ class ArrowConvertersImpl {
         tryWithSafeFinally {
           var rowCount = 0
           while (rowIter.hasNext && (maxRecordsPerBatch <= 0 || rowCount < maxRecordsPerBatch)) {
-            val row: org.apache.spark.sql.Row = rowIter.next()
-            val internalRow: org.apache.spark.sql.catalyst.InternalRow = encoder.toRow(row)
+            val row: Row = rowIter.next()
+            val internalRow: InternalRow = encoder.toRow(row)
             arrowWriter.write(internalRow)
             rowCount += 1
           }
@@ -188,7 +191,7 @@ class ArrowConvertersImpl {
         }
       }
 
-      override def next(): org.apache.spark.sql.catalyst.InternalRow = rowIter.next()
+      override def next(): InternalRow = rowIter.next()
 
       private def closeReader(): Unit = {
         if (reader != null) {
@@ -197,7 +200,7 @@ class ArrowConvertersImpl {
         }
       }
 
-      private def nextBatch(): Iterator[org.apache.spark.sql.catalyst.InternalRow] = {
+      private def nextBatch(): Iterator[InternalRow] = {
         val in = new ByteArrayReadableSeekableByteChannel(payloadIter.next())
         reader = new ArrowStreamReader(in, allocator)
         reader.loadNextBatch()  // throws IOException
@@ -216,32 +219,9 @@ class ArrowConvertersImpl {
 }
 
 object ArrowConverters {
-  import java.io.{ByteArrayOutputStream, OutputStream}
-  import java.nio.channels.Channels
-
-  import scala.collection.JavaConverters._
-
-  import org.apache.arrow.vector._
-  import org.apache.arrow.vector.ipc.ArrowStreamReader
-  import org.apache.arrow.vector.ipc.message.MessageSerializer
-  import org.apache.arrow.vector.ipc.WriteChannel
-  import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel
-
-  import org.apache.spark.TaskContext
-  import org.apache.spark.api.java.JavaRDD
-  import org.apache.spark.rdd.RDD
-  import org.apache.spark.sql.catalyst.encoders.RowEncoder
-  import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
-  import org.apache.spark.sql.types._
-  import org.apache.spark.sql.execution.LogicalRDD
-  import org.apache.spark.sql.execution.arrow.ArrowUtils
-  import org.apache.spark.sql.execution.arrow.ArrowWriter
-  import org.apache.spark.sql.SparkSession
-  import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
-
   def fromPayloadArray(
     records: Array[Array[Byte]],
-    schema: StructType): Iterator[org.apache.spark.sql.Row] = {
+    schema: StructType): Iterator[Row] = {
 
     val context = TaskContext.get()
     val singleRecords: Iterator[Array[Byte]] = records.map(record => {record}).iterator
@@ -249,8 +229,8 @@ object ArrowConverters {
     val iter: ArrowRowIterator = (new ArrowConvertersImpl()).fromPayloadIterator(singleRecords, Option.empty)
 
     iter.map({
-      val converter = org.apache.spark.sql.catalyst.CatalystTypeConverters.createToScalaConverter(schema)
-      converter(_).asInstanceOf[org.apache.spark.sql.Row]
+      val converter = CatalystTypeConverters.createToScalaConverter(schema)
+      converter(_).asInstanceOf[Row]
     })
   }
 

@@ -15,6 +15,15 @@
 
 - Add support for `DBI 1.1` to implement missing `dbQuoteLiteral` signature (#2227).
 
+### Livy
+
+- Deprecate uploading sources to Livy, a jar is now always used and the `version`
+  parameter in `spark_connect()` is always required.
+
+- Add config `sparklyr.livy.branch` to specify the branch used for the sparklyr JAR.
+
+- Add config `sparklyr.livy.jar` to configure path or URL to sparklyr JAR.
+
 # Sparklyr 1.0.5
 
 ### Serialization

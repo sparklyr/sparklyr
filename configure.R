@@ -18,7 +18,6 @@ if (length(args)==0) {
 print(targets)
 
 library(sparklyr)
-sparklyr:::livy_sources_refresh()
 
 sparklyr:::spark_compile_embedded_sources()
 

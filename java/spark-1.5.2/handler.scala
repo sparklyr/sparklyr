@@ -1,18 +1,20 @@
 package sparklyr
 
-@_root_.io.netty.channel.ChannelHandler.Sharable
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+
+import scala.language.existentials
+
+import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.ChannelHandler.Sharable
+import io.netty.channel.SimpleChannelInboundHandler
+
+@Sharable
 class BackendHandler(
   close: () => Unit,
   logger: Logger,
   hostContext: String,
   serializer: Serializer,
-  tracker: JVMObjectTracker) extends _root_.io.netty.channel.SimpleChannelInboundHandler[Array[Byte]] {
-
-  import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
-
-  import scala.language.existentials
-
-  import _root_.io.netty.channel.ChannelHandlerContext
+  tracker: JVMObjectTracker) extends SimpleChannelInboundHandler[Array[Byte]] {
 
   var streamHandler = new StreamHandler(serializer, tracker)
 

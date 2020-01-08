@@ -23,42 +23,42 @@ object SQLUtils {
     val RegexStructField = "\\A(.+):(.+)\\Z".r("fieldName", "fieldType")
 
     dataType match {
-      case "BooleanType" => org.apache.spark.sql.types.BooleanType
-      case "ByteType" => org.apache.spark.sql.types.ByteType
-      case "IntegerType" => org.apache.spark.sql.types.IntegerType
-      case "LongType" => org.apache.spark.sql.types.LongType
-      case "FloatType" => org.apache.spark.sql.types.FloatType
-      case "DoubleType" => org.apache.spark.sql.types.DoubleType
-      case "StringType" => org.apache.spark.sql.types.StringType
-      case "TimestampType" => org.apache.spark.sql.types.TimestampType
-      case "DateType" => org.apache.spark.sql.types.DateType
-      case "BinaryType" => org.apache.spark.sql.types.BinaryTypes
-      case "byte" => org.apache.spark.sql.types.ByteType
-      case "integer" => org.apache.spark.sql.types.IntegerType
-      case "integer64" => org.apache.spark.sql.types.LongType
-      case "float" => org.apache.spark.sql.types.FloatType
-      case "double" => org.apache.spark.sql.types.DoubleType
-      case "numeric" => org.apache.spark.sql.types.DoubleType
-      case "long" => org.apache.spark.sql.types.LongType
-      case "character" => org.apache.spark.sql.types.StringType
-      case "factor" => org.apache.spark.sql.types.StringType
-      case "string" => org.apache.spark.sql.types.StringType
-      case "binary" => org.apache.spark.sql.types.BinaryType
-      case "raw" => org.apache.spark.sql.types.BinaryType
-      case "logical" => org.apache.spark.sql.types.BooleanType
-      case "boolean" => org.apache.spark.sql.types.BooleanType
-      case "POSIXct" => org.apache.spark.sql.types.TimestampType
-      case "POSIXlt" => org.apache.spark.sql.types.TimestampType
-      case "timestamp" => org.apache.spark.sql.types.TimestampType
-      case "Date" => org.apache.spark.sql.types.DateType
-      case "date" => org.apache.spark.sql.types.DateType
+      case "BooleanType" => BooleanType
+      case "ByteType" => ByteType
+      case "IntegerType" => IntegerType
+      case "LongType" => LongType
+      case "FloatType" => FloatType
+      case "DoubleType" => DoubleType
+      case "StringType" => StringType
+      case "TimestampType" => TimestampType
+      case "DateType" => DateType
+      case "BinaryType" => BinaryType
+      case "byte" => ByteType
+      case "integer" => IntegerType
+      case "integer64" => LongType
+      case "float" => FloatType
+      case "double" => DoubleType
+      case "numeric" => DoubleType
+      case "long" => LongType
+      case "character" => StringType
+      case "factor" => StringType
+      case "string" => StringType
+      case "binary" => BinaryType
+      case "raw" => BinaryType
+      case "logical" => BooleanType
+      case "boolean" => BooleanType
+      case "POSIXct" => TimestampType
+      case "POSIXlt" => TimestampType
+      case "timestamp" => TimestampType
+      case "Date" => DateType
+      case "date" => DateType
       case RegexArray(elemType) =>
-        org.apache.spark.sql.types.ArrayType(getSQLDataType(elemType))
+        ArrayType(getSQLDataType(elemType))
       case RegexMap(keyType, valueType) =>
         if (keyType != "string" && keyType != "character") {
           throw new IllegalArgumentException("Key type of a map must be string or character")
         }
-        org.apache.spark.sql.types.MapType(getSQLDataType(keyType), getSQLDataType(valueType))
+        MapType(getSQLDataType(keyType), getSQLDataType(valueType))
       case RegexStruct(fieldsStr) =>
         if (fieldsStr(fieldsStr.length - 1) == ',') {
           throw new IllegalArgumentException(s"Invalid type $dataType")

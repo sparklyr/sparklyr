@@ -1,24 +1,24 @@
 package sparklyr
 
+import java.io.{DataInputStream, DataOutputStream}
+import java.io.{File, FileOutputStream, IOException}
+import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
+import java.util.concurrent.TimeUnit
+
+import io.netty.bootstrap.ServerBootstrap
+import io.netty.channel.{ChannelFuture, ChannelInitializer, EventLoopGroup}
+import io.netty.channel.nio.NioEventLoopGroup
+import io.netty.channel.socket.SocketChannel
+import io.netty.channel.socket.nio.NioServerSocketChannel
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder
+import io.netty.handler.codec.bytes.{ByteArrayDecoder, ByteArrayEncoder}
+
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+
+import scala.util.Try
+
 class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializer, tracker: JVMObjectTracker) {
-
-  import java.io.{DataInputStream, DataOutputStream}
-  import java.io.{File, FileOutputStream, IOException}
-  import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
-  import java.util.concurrent.TimeUnit
-
-  import _root_.io.netty.bootstrap.ServerBootstrap
-  import _root_.io.netty.channel.{ChannelFuture, ChannelInitializer, EventLoopGroup}
-  import _root_.io.netty.channel.nio.NioEventLoopGroup
-  import _root_.io.netty.channel.socket.SocketChannel
-  import _root_.io.netty.channel.socket.nio.NioServerSocketChannel
-  import _root_.io.netty.handler.codec.LengthFieldBasedFrameDecoder
-  import _root_.io.netty.handler.codec.bytes.{ByteArrayDecoder, ByteArrayEncoder}
-
-  import org.apache.spark.SparkConf
-  import org.apache.spark.SparkContext
-
-  import scala.util.Try
 
   private[this] var channelFuture: ChannelFuture = null
   private[this] var bootstrap: ServerBootstrap = null

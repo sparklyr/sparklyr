@@ -1,5 +1,16 @@
 package sparklyr
 
+import java.io.{DataInputStream, DataOutputStream}
+import java.io.{File, FileOutputStream, IOException, FileWriter}
+import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
+import java.util.concurrent.TimeUnit
+
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.hive.HiveContext
+
+import scala.util.Try
+
 /*
  * The Backend class is launched from Spark through spark-submit with the following
  * paramters: port, session and service.
@@ -45,17 +56,6 @@ package sparklyr
  */
 
 class Backend() {
-  import java.io.{DataInputStream, DataOutputStream}
-  import java.io.{File, FileOutputStream, IOException, FileWriter}
-  import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
-  import java.util.concurrent.TimeUnit
-
-  import org.apache.spark.SparkConf
-  import org.apache.spark.SparkContext
-  import org.apache.spark.sql.hive.HiveContext
-
-  import scala.util.Try
-
   private[this] var isService: Boolean = false
   private[this] var isRemote: Boolean = false
   private[this] var isWorker: Boolean = false

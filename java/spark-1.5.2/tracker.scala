@@ -1,9 +1,9 @@
 package sparklyr
 
-class JVMObjectTracker {
+import scala.collection.mutable.{Map, SynchronizedMap, HashMap}
+import scala.language.existentials
 
-  import scala.collection.mutable.{Map, SynchronizedMap, HashMap}
-  import scala.language.existentials
+class JVMObjectTracker {
 
   val objMap = new HashMap[String, Object] with
                              SynchronizedMap[String, Object]

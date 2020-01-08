@@ -4,14 +4,14 @@ import java.io._
 import java.net.{InetAddress, ServerSocket}
 import java.util.Arrays
 
-import scala.util.Try
-
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.{SparkEnv, SparkException}
+
+import scala.util.Try
 
 object Utils {
 
