@@ -1,4 +1,4 @@
-# Sparklyr 1.0.5.9000
+# Sparklyr 1.1.0
 
 ### Distributed R
 
