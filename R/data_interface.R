@@ -951,9 +951,10 @@ spark_write_delta <- function(x,
                               path,
                               mode = NULL,
                               options = list(),
+                              partition_by = NULL,
                               ...) {
   options$path <- path
-  spark_write_source(x, "delta", mode = mode, options = options)
+  spark_write_source(x, "delta", mode = mode, options = options, partition_by = partition_by)
 }
 
 #' Read from Delta Lake into a Spark DataFrame.
