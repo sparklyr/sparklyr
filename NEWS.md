@@ -19,6 +19,8 @@
 
 ### Livy
 
+- Add support for Livy 0.6.0.
+
 - Deprecate uploading sources to Livy, a jar is now always used and the `version`
   parameter in `spark_connect()` is always required.
 
