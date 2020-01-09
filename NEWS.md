@@ -24,6 +24,10 @@
 
 - Add config `sparklyr.livy.jar` to configure path or URL to sparklyr JAR.
 
+# Data
+
+- Add support for `partition_by` when using `spark_write_delta()` (#2228).
+
 # Sparklyr 1.0.5
 
 ### Serialization
