@@ -26,7 +26,8 @@ stream_read_generic <- function(sc,
                                 type,
                                 name,
                                 columns,
-                                stream_options)
+                                stream_options,
+                                load = FALSE)
 {
   spark_require_version(sc, "2.0.0", "Spark streaming")
 
@@ -65,10 +66,13 @@ stream_read_generic <- function(sc,
       invoke("schema", schema)
   }
 
-  if (is.null(path)) {
+  if (is.null(path) || load) {
+    schema <- schema %>%
+      invoke("format", type)
+
+    schema <- if (load) invoke(schema, "load", path) else invoke(schema, "load")
+
     schema %>%
-      invoke("format", type) %>%
-      invoke("load") %>%
       invoke("createOrReplaceTempView", name)
   }
   else {
@@ -112,11 +116,18 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, strea
     streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
   }
 
-  trigger <- stream_trigger_create(trigger, sc)
+  if (!identical(trigger, FALSE)) {
+    trigger <- stream_trigger_create(trigger, sc)
+  }
+
+  streamOptions <- streamOptions %>%
+    invoke("outputMode", mode)
+
+  if (!identical(trigger, FALSE)) {
+    streamOptions <- streamOptions %>% invoke("trigger", trigger)
+  }
 
   streamOptions %>%
-    invoke("outputMode", mode) %>%
-    invoke("trigger", trigger) %>%
     invoke("start") %>%
     stream_class() %>%
     stream_validate() %>%
@@ -675,20 +686,15 @@ stream_write_orc <- function(x,
 #' @inheritParams stream_read_csv
 #'
 #' @details Please note that Kafka requires installing the appropriate
-#'  package by conneting with a config setting where \code{sparklyr.shell.packages}
-#'  is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+#' package by setting the \code{packages} parameter to \code{"kafka"} in \code{spark_connect()}
 #'
 #' @family Spark stream serialization
 #'
 #' @examples
 #' \dontrun{
 #'
-#' config <- spark_config()
-#'
-#' # The following package is dependent to Spark version, for Spark 2.3.2:
-#' config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
-#'
-#' sc <- spark_connect(master = "local", config = config)
+#' library(sparklyr)
+#' sc <- spark_connect(master = "local", version = "2.3", packages = "kafka")
 #'
 #' read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
 #' write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
@@ -725,20 +731,15 @@ stream_read_kafka <- function(sc,
 #' @inheritParams stream_write_memory
 #'
 #' @details Please note that Kafka requires installing the appropriate
-#'  package by conneting with a config setting where \code{sparklyr.shell.packages}
-#'  is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+#'  package by setting the \code{packages} parameter to \code{"kafka"} in \code{spark_connect()}
 #'
 #' @family Spark stream serialization
 #'
 #' @examples
 #' \dontrun{
 #'
-#' config <- spark_config()
-#'
-#' # The following package is dependent to Spark version, for Spark 2.3.2:
-#' config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
-#'
-#' sc <- spark_connect(master = "local", config = config)
+#' library(sparklyr)
+#' sc <- spark_connect(master = "local", version = "2.3", packages = "kafka")
 #'
 #' read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
 #' write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
@@ -847,5 +848,100 @@ stream_write_console <- function(x,
                        mode = mode,
                        trigger = trigger,
                        checkpoint = NULL,
+                       stream_options = options)
+}
+
+#' Read Delta Stream
+#'
+#' Reads a Delta Lake table as a Spark dataframe stream.
+#'
+#' @inheritParams stream_read_csv
+#'
+#' @details Please note that Delta Lake requires installing the appropriate
+#' package by setting the \code{packages} parameter to \code{"delta"} in \code{spark_connect()}
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' library(sparklyr)
+#' sc <- spark_connect(master = "local", version = "2.4", packages = "delta")
+#'
+#' sdf_len(sc, 5) %>% spark_write_delta(path = "delta-test")
+#'
+#' stream <- stream_read_delta(sc, "delta-test") %>%
+#'   stream_write_json("json-out")
+#'
+#' stream_stop(stream)
+#'
+#' }
+#'
+#' @export
+stream_read_delta <- function(sc,
+                              path,
+                              name = NULL,
+                              options = list(),
+                              ...)
+{
+  spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  name <- name %||% random_string("sparklyr_tmp_")
+
+  stream_read_generic(sc,
+                      path = path,
+                      type = "delta",
+                      name = name,
+                      columns = FALSE,
+                      stream_options = options,
+                      load = TRUE)
+}
+
+#' Write Delta Stream
+#'
+#' Writes a Spark dataframe stream into a Delta Lake table.
+#'
+#' @inheritParams stream_write_csv
+#'
+#' @details Please note that Delta Lake requires installing the appropriate
+#' package by setting the \code{packages} parameter to \code{"delta"} in \code{spark_connect()}
+#'
+#' @family Spark stream serialization
+#'
+#' @examples
+#' \dontrun{
+#'
+#' library(sparklyr)
+#' sc <- spark_connect(master = "local", version = "2.4", packages = "delta")
+#'
+#' dir.create("text-in")
+#' writeLines("A text entry", "text-in/text.txt")
+#'
+#' text_path <- file.path("file://", getwd(), "text-in")
+#'
+#' stream <- stream_read_text(sc, text_path) %>% stream_write_delta(path = "delta-test")
+#'
+#' stream_stop(stream)
+#'
+#' }
+#'
+#' @export
+stream_write_delta <- function(x,
+                               path,
+                               mode = c("append", "complete", "update"),
+                               checkpoint = file.path("checkpoints", random_string("")),
+                               options = list(),
+                               ...)
+{
+  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
+
+  sc <- spark_connection(x)
+
+  stream_write_generic(x,
+                       path = path,
+                       type = "delta",
+                       mode = mode,
+                       trigger = FALSE,
+                       checkpoint = checkpoint,
                        stream_options = options)
 }

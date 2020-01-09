@@ -6,6 +6,8 @@
 
 ### Streaming
 
+- Add support for `stream_read_delta()` and `stream_write_delta()`.
+
 - Fixed typo in `stream_read_socket()`.
 
 ### Data

@@ -20,18 +20,13 @@ Reads a Kafka stream as a Spark dataframe stream.
 }
 \details{
 Please note that Kafka requires installing the appropriate
- package by conneting with a config setting where \code{sparklyr.shell.packages}
- is set to, for Spark 2.3.2, \code{"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"}.
+package by setting the \code{packages} parameter to \code{"kafka"} in \code{spark_connect()}
 }
 \examples{
 \dontrun{
 
-config <- spark_config()
-
-# The following package is dependent to Spark version, for Spark 2.3.2:
-config$sparklyr.shell.packages <- "org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"
-
-sc <- spark_connect(master = "local", config = config)
+library(sparklyr)
+sc <- spark_connect(master = "local", version = "2.3", packages = "kafka")
 
 read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
 write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
@@ -46,6 +41,7 @@ stream_stop(stream)
 }
 \seealso{
 Other Spark stream serialization: \code{\link{stream_read_csv}},
+  \code{\link{stream_read_delta}},
   \code{\link{stream_read_json}},
   \code{\link{stream_read_orc}},
   \code{\link{stream_read_parquet}},
@@ -53,6 +49,7 @@ Other Spark stream serialization: \code{\link{stream_read_csv}},
   \code{\link{stream_read_text}},
   \code{\link{stream_write_console}},
   \code{\link{stream_write_csv}},
+  \code{\link{stream_write_delta}},
   \code{\link{stream_write_json}},
   \code{\link{stream_write_kafka}},
   \code{\link{stream_write_memory}},
