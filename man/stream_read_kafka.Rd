@@ -26,7 +26,7 @@ package by setting the \code{packages} parameter to \code{"kafka"} in \code{spar
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local", config = config, packages = "kafka")
+sc <- spark_connect(master = "local", version = "2.3", packages = "kafka")
 
 read_options <- list(kafka.bootstrap.servers = "localhost:9092", subscribe = "topic1")
 write_options <- list(kafka.bootstrap.servers = "localhost:9092", topic = "topic2")
