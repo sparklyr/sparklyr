@@ -870,8 +870,8 @@ stream_write_console <- function(x,
 #'
 #' sdf_len(sc, 5) %>% spark_write_delta(path = "delta-test")
 #'
-#' stream <- stream_read_delta(sc, options = ) %>%
-#'   stream_write_kafka(options = write_options)
+#' stream <- stream_read_delta(sc, "delta-test") %>%
+#'   stream_write_json("json-out")
 #'
 #' stream_stop(stream)
 #'
