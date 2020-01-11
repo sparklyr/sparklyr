@@ -13,6 +13,9 @@ cache:
 
 warnings_are_errors: true
 
+r_github_packages:
+  - gagolews/stringi@v1.4.2
+
 matrix:
   include:
     - name: "Spark 1.6.3 (R 3.2, openjdk7)"

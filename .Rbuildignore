@@ -36,3 +36,7 @@
 ^checkpoints$
 ^ci$
 ^tests/testthat/test-extension-nested.R$
+^CODE_OF_CONDUCT.md$
+^CONTRIBUTORS.md$
+^ROADMAP.md$
+

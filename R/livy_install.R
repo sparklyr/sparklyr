@@ -15,7 +15,7 @@
 #'   A version of Spark known to be compatible with the requested version of
 #'   \samp{livy} is chosen when possible.
 #' @export
-livy_install <- function(version       = "0.5.0",
+livy_install <- function(version       = "0.6.0",
                          spark_home    = NULL,
                          spark_version = NULL)
 {
@@ -33,7 +33,8 @@ livy_install <- function(version       = "0.5.0",
         "0.2.0" = "1.6.2",
         "0.3.0" = "2.0.1",
         "0.4.0" = "2.1.0",
-        "0.5.0" = "2.2.0"
+        "0.5.0" = "2.2.0",
+        "0.6.0" = "2.4.4"
       )
     }
 
@@ -96,9 +97,11 @@ livy_install <- function(version       = "0.5.0",
       version
     )
   } else {
+    apache_prefix <- if (package_version(version) >= package_version("0.6.0")) "apache-" else ""
     url <- sprintf(
-      "http://archive.apache.org/dist/incubator/livy/%s-incubating/livy-%s-incubating-bin.zip",
+      "http://archive.apache.org/dist/incubator/livy/%s-incubating/%slivy-%s-incubating-bin.zip",
       version,
+      apache_prefix,
       version
     )
   }
@@ -154,7 +157,7 @@ livy_install <- function(version       = "0.5.0",
 #' @rdname livy_install
 #' @export
 livy_available_versions <- function() {
-  versions <- data.frame(livy = c("0.2.0", "0.3.0", "0.4.0", "0.5.0"))
+  versions <- data.frame(livy = c("0.2.0", "0.3.0", "0.4.0", "0.5.0", "0.6.0"))
 
   versions
 }

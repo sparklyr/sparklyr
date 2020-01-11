@@ -1,4 +1,4 @@
-# Sparklyr 1.0.5.9000
+# Sparklyr 1.1.0
 
 ### Distributed R
 
@@ -18,6 +18,8 @@
 - Add support for `DBI 1.1` to implement missing `dbQuoteLiteral` signature (#2227).
 
 ### Livy
+
+- Add support for Livy 0.6.0.
 
 - Deprecate uploading sources to Livy, a jar is now always used and the `version`
   parameter in `spark_connect()` is always required.

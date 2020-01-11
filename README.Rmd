@@ -355,7 +355,7 @@ spark_disconnect(sc)
 Before connecting to Livy, you will need the connection information to an existing service running Livy. Otherwise, to test `livy` in your local environment, you can install it and run it locally as follows:
 
 ```{r eval=FALSE}
-livy_install(version = "2.4.0")
+livy_install()
 ```
 
 ```{r livy-start}
