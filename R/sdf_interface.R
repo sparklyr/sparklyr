@@ -479,3 +479,29 @@ sdf_describe <- function(x, cols = colnames(x)) {
     invoke("describe", cols) %>%
     sdf_register()
 }
+
+#' Remove duplicates from a Spark DataFrame
+#'
+#' @param x An object coercible to a Spark DataFrame
+#' @param cols Subset of Columns to consider, given as a character vector
+#' @export
+sdf_drop_duplicates <- function(x, cols = NULL) {
+  in_df <- cols %in% colnames(x)
+
+  if (any(!in_df)) {
+    msg <- paste0("The following columns are not in the data frame: ",
+                  paste0(cols[which(!in_df)], collapse = ", "))
+    stop(msg)
+  }
+
+  cols <- cast_character_list(cols, allow_null=TRUE)
+  sdf <- spark_dataframe(x)
+
+  sdf_deduplicated <- if(is.null(cols)) {
+    invoke(sdf, "dropDuplicates")
+  } else {
+    invoke(sdf, "dropDuplicates", cols)
+  }
+
+  sdf_register(sdf_deduplicated)
+}
