@@ -1,9 +1,10 @@
 pipeline {
     agent any
     stages {
-        stage('Stage 1') {
+        stage('Set up Databricks CLI') {
             steps {
                 echo 'Hello world!'
+                pip install databricks-cli
             }
         }
     }
