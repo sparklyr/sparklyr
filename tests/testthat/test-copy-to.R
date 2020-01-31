@@ -55,3 +55,21 @@ test_that("sdf_copy_to supports list of callbacks", {
     4
   )
 })
+
+test_that("sdf_copy_to works for json serializer", {
+  dfjson <- tibble::tibble(
+    g = c(1, 2, 3),
+    data = list(
+      tibble::tibble(x = 1, y = 2),
+      tibble::tibble(x = 4:5, y = 6:7),
+      tibble::tibble(x = 10)
+    )
+  )
+
+  dfjson_tbl <- sdf_copy_to(sc, dfjson, overwrite = TRUE)
+
+  expect_equal(
+    sdf_nrow(dfjson_tbl),
+    3
+  )
+})
