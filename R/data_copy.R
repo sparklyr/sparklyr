@@ -209,11 +209,9 @@ spark_data_copy <- function(
     stop("Using a local file to copy data is not supported for remote clusters")
   }
 
-  json_column <- list()
-  if (!"data.frame" %in% class(df) || "list" %in% sapply(df, class)) {
+  if ("list" %in% sapply(df, class)) {
     for (column in colnames(df)) {
       if (class(df[[column]]) == "list") {
-        json_column <- list(json_column, column)
         df[[column]] <- sapply(df[[column]], function(e) jsonlite::toJSON(e))
       }
     }
