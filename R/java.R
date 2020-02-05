@@ -101,7 +101,7 @@ validate_java_version_line <- function(master, version) {
     stop("Java version", parsedVersion, " detected but 1.7+ is required. Please download and install Java from ",
          java_install_url())
 
-  if (compareVersion(parsedVersion, "1.9") == 1 &&
+  if (compareVersion(parsedVersion, "1.9") >= 0 &&
       compareVersion(parsedVersion, "11") == -1 &&
       spark_master_is_local(master)  && !getOption("sparklyr.java9", FALSE)) {
     stop(
