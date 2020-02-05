@@ -181,15 +181,13 @@ object Utils {
     if (text.length() > 0) text + separator else text
   }
 
-  def collectImplForceStringArrArr(local: Array[Row], idx: Integer, separator: String): Array[String] = {
+  def collectImplForceStringArrArr(local: Array[Row], idx: Integer, separator: String): Array[Array[String]] = {
     local.map{row => {
       val locale = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-      var text = locale.map{e => {
+      locale.map{e => {
         if (e != null) e.toString() else "<NA>"
-      }}.mkString(separator)
-
-      if (text.length() > 0) text + separator else text
+      }}.toArray
     }}
   }
 
@@ -202,15 +200,13 @@ object Utils {
     if (text.length() > 0) text + separator else text
   }
 
-  def collectImplStringArrArr(local: Array[Row], idx: Integer, separator: String): Array[String] = {
+  def collectImplStringArrArr(local: Array[Row], idx: Integer, separator: String): Array[Array[String]] = {
     local.map{row => {
       val locale = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-      var text = locale.map{e => {
+      locale.map{e => {
         if (e.isInstanceOf[String]) e.asInstanceOf[String] else "<NA>"
-      }}.mkString(separator)
-
-      if (text.length() > 0) text + separator else text
+      }}.toArray
     }}
   }
 
