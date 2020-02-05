@@ -46,6 +46,11 @@ matrix:
       env:
         - SPARK_VERSION="master"
         - JAVA_VERSION=oraclejdk8
+    - name: "Spark master (R release, openjdk11)"
+      r: release
+      env:
+        - SPARK_VERSION="master"
+        - JAVA_VERSION=openjdk11
     - name: "Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)"
       r: release
       env:
