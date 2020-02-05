@@ -93,11 +93,13 @@ validate_java_version_line <- function(master, version) {
     stop("Java version detected but couldn't parse version from: ", versionLine)
 
   # ensure Java 1.7 or higher
-  if (compareVersion(parsedVersion, "1.7") < 0)
+  if (compareVersion(parsedVersion, "1.7")  == -1)
     stop("Java version", parsedVersion, " detected but 1.7+ is required. Please download and install Java from ",
          java_install_url())
 
-  if (compareVersion(parsedVersion, "1.9") >= 0 && spark_master_is_local(master)  && !getOption("sparklyr.java9", FALSE)) {
+  if (compareVersion(parsedVersion, "1.9") == 1 &&
+      compareVersion(parsedVersion, "11") == -1 &&
+      spark_master_is_local(master)  && !getOption("sparklyr.java9", FALSE)) {
     stop(
       "Java 9 is currently unsupported in Spark distributions unless you manually install Hadoop 2.8 ",
       "and manually configure Spark. Please consider uninstalling Java 9 and reinstalling Java 8. ",
