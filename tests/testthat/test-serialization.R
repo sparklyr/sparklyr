@@ -362,5 +362,5 @@ test_that("collect() can retrieve nested list efficiently", {
 
   stats <- system.time(collected <- collect(nested))
 
-  expect_lt(stats[["elapsed"]], 2)
+  expect_lt(stats[["elapsed"]], 5)
 })
