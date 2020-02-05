@@ -1,3 +1,9 @@
+# Sparklyr 1.1.0.9000
+
+### Data
+
+- Add support in `copy_to()` for columns with nested lists.
+
 # Sparklyr 1.1.0
 
 ### Distributed R

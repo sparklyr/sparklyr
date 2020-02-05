@@ -209,6 +209,14 @@ spark_data_copy <- function(
     stop("Using a local file to copy data is not supported for remote clusters")
   }
 
+  if ("list" %in% sapply(df, class)) {
+    for (column in colnames(df)) {
+      if (class(df[[column]]) == "list") {
+        df[[column]] <- sapply(df[[column]], function(e) jsonlite::toJSON(e))
+      }
+    }
+  }
+
   serializer <- ifelse(
                   is.null(serializer),
                   ifelse(
@@ -229,6 +237,7 @@ spark_data_copy <- function(
     "csv_file_scala" = spark_serialize_csv_scala,
     "arrow" = spark_serialize_arrow
   )
+
 
   df <- spark_data_perform_copy(sc, serializers[[serializer]], df, repartition)
 
