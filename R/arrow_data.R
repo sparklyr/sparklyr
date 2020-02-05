@@ -22,7 +22,11 @@ arrow_enabled_object.tbl_spark <- function(object) {
 }
 
 arrow_enabled_object.spark_jobj <- function(object) {
-  unsupported_expr <- ".Vector|ArrayType|StructType"
+  unsupported_expr <- ".Vector|StructType"
+
+  if (packageVersion("arrow") < "0.15") {
+    unsupported_expr <- ".Vector|ArrayType|StructType"
+  }
 
   if (packageVersion("arrow") >= "0.12" && packageVersion("arrow") < "0.13") {
     # Workaround for ARROW-4565
