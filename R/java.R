@@ -72,10 +72,13 @@ validate_java_version_line <- function(master, version) {
   if (length(versionLine) != 1)
     stop("Java version detected but couldn't parse version from ", paste(version, collapse = " - "))
 
-  # transform to usable R version string
-  splat <- strsplit(versionLine, "\\s+", perl = TRUE)[[1]]
+  splatVersion <- if (grepl("openjdk version", versionLine)) {
+    strsplit(versionLine, "\"")[[1]][[2]]
+  } else {
+    splat <- strsplit(versionLine, "\\s+", perl = TRUE)[[1]]
+    splat[grepl("9|[0-9]+\\.[0-9]+\\.[0-9]+", splat)]
+  }
 
-  splatVersion <- splat[grepl("9|[0-9]+\\.[0-9]+\\.[0-9]+", splat)]
   if (length(splatVersion) != 1)
     stop("Java version detected but couldn't parse version from: ", versionLine)
 
