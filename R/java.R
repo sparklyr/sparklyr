@@ -45,7 +45,11 @@ validate_java_version <- function(master, spark_home) {
 
   # query its version
   version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
-  validate_java_version_line(master, version)
+  java_version <- validate_java_version_line(master, version)
+
+  spark_version <- spark_version_from_home(spark_home)
+  if (compareVersion(java_version, "11") >= 0 && compareVersion(spark_version, "3.0.0") < 0)
+    stop("Java 11 is only supported for Spark 3.0.0+", call. = FALSE)
 
   TRUE
 }
@@ -105,4 +109,6 @@ validate_java_version_line <- function(master, version) {
       "and manually configure Spark. Please consider uninstalling Java 9 and reinstalling Java 8. ",
       "To override this failure set 'options(sparklyr.java9 = TRUE)'.")
   }
+
+  parsedVersion
 }
