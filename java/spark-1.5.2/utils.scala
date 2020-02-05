@@ -285,6 +285,7 @@ object Utils {
   }
 
   def collectImpl(local: Array[Row], idx: Integer, colType: String, separator: String) = {
+    val ReDecimalType = "(DecimalType.*)".r
     val ReVectorType  = "(.*VectorUDT.*)".r
 
     colType match {
@@ -303,6 +304,7 @@ object Utils {
       case "CalendarIntervalType" => collectImplForceString(local, idx, separator)
       case "DateType"             => collectImplDate(local, idx)
 
+      case ReDecimalType(_)       => collectImplDecimal(local, idx)
       case ReVectorType(_)        => collectImplVector(local, idx)
 
       case "ArrayType(BooleanType,true)"           => collectImplBooleanArrArr(local, idx)
