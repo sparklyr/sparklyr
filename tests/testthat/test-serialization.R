@@ -349,3 +349,16 @@ test_that("environments are sent to Scala Maps (#1058)", {
     list(foo = "bar")
   )
 })
+
+test_that("collect() can retrieve nested list efficiently", {
+  if (spark_version(sc) < "2.0.0") skip("performance improvement not available")
+
+  temp_json <- tempfile(fileext = ".json")
+
+  list(list(g = 1, d = 1:1000), list(g = 2, d = 1:1000)) %>%
+    jsonlite::write_json(temp_json, auto_unbox = T)
+
+  nested <- spark_read_json(sc, temp_json, memory = FALSE)
+
+  expect_equal(nrow(collect(nested)), 2)
+})

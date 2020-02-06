@@ -67,10 +67,28 @@ object Utils {
     }}
   }
 
+  def collectImplBooleanArrArr(local: Array[Row], idx: Integer): Array[Array[Int]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e => {
+        if (e.isInstanceOf[Boolean]) if (el.asInstanceOf[Boolean]) 1 else 0 else scala.Int.MinValue
+      }).toArray
+    }}
+  }
+
   def collectImplInteger(local: Array[Row], idx: Integer) = {
     local.map{row => {
       val el = row(idx)
       if (el.isInstanceOf[Int]) el.asInstanceOf[Int] else scala.Int.MinValue
+    }}
+  }
+
+  def collectImplIntegerArrArr(local: Array[Row], idx: Integer): Array[Array[Int]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e =>
+        if (e.isInstanceOf[Int]) e.asInstanceOf[Int] else scala.Int.MinValue
+      ).toArray
     }}
   }
 
@@ -81,10 +99,28 @@ object Utils {
     }}
   }
 
+  def collectImplDoubleArrArr(local: Array[Row], idx: Integer): Array[Array[Double]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e =>
+        if (e.isInstanceOf[Double]) e.asInstanceOf[Double] else scala.Double.NaN
+      ).toArray
+    }}
+  }
+
   def collectImplFloat(local: Array[Row], idx: Integer): Array[Double]  = {
     local.map{row => {
       val el = row(idx)
       if (el.isInstanceOf[Float]) el.asInstanceOf[Float].toDouble else scala.Double.NaN
+    }}
+  }
+
+  def collectImplFloatArrArr(local: Array[Row], idx: Integer): Array[Array[Double]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e =>
+        if (e.isInstanceOf[Float]) e.asInstanceOf[Float].toDouble else scala.Double.NaN
+      ).toArray
     }}
   }
 
@@ -95,6 +131,15 @@ object Utils {
     }}
   }
 
+  def collectImplByteArrArr(local: Array[Row], idx: Integer): Array[Array[Int]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e =>
+        if (e.isInstanceOf[Byte]) e.asInstanceOf[Byte].toInt else scala.Int.MinValue
+      ).toArray
+    }}
+  }
+
   def collectImplShort(local: Array[Row], idx: Integer): Array[Int] = {
     local.map{row => {
       val el = row(idx)
@@ -102,10 +147,28 @@ object Utils {
     }}
   }
 
+  def collectImplShortArrArr(local: Array[Row], idx: Integer): Array[Array[Int]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e =>
+        if (e.isInstanceOf[Short]) e.asInstanceOf[Short].toInt else scala.Int.MinValue
+      ).toArray
+    }}
+  }
+
   def collectImplLong(local: Array[Row], idx: Integer) = {
     local.map{row => {
       val el = row(idx)
       if (el.isInstanceOf[Long]) el.asInstanceOf[Long].toDouble else scala.Double.NaN
+    }}
+  }
+
+  def collectImplLongArrArr(local: Array[Row], idx: Integer): Array[Array[Double]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e =>
+        if (e.isInstanceOf[Long]) e.asInstanceOf[Long].toDouble else scala.Double.NaN
+      ).toArray
     }}
   }
 
@@ -118,6 +181,16 @@ object Utils {
     if (text.length() > 0) text + separator else text
   }
 
+  def collectImplForceStringArrArr(local: Array[Row], idx: Integer, separator: String): Array[Array[String]] = {
+    local.map{row => {
+      val locale = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+
+      locale.map{e => {
+        if (e != null) e.toString() else "<NA>"
+      }}.toArray
+    }}
+  }
+
   def collectImplString(local: Array[Row], idx: Integer, separator: String) = {
     var text = local.map{row => {
       val el = row(idx)
@@ -127,6 +200,16 @@ object Utils {
     if (text.length() > 0) text + separator else text
   }
 
+  def collectImplStringArrArr(local: Array[Row], idx: Integer, separator: String): Array[Array[String]] = {
+    local.map{row => {
+      val locale = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+
+      locale.map{e => {
+        if (e.isInstanceOf[String]) e.asInstanceOf[String] else "<NA>"
+      }}.toArray
+    }}
+  }
+
   def collectImplDecimal(local: Array[Row], idx: Integer) = {
     local.map{row => {
       val el = row(idx)
@@ -134,6 +217,19 @@ object Utils {
         el.asInstanceOf[java.math.BigDecimal].doubleValue
       else
         scala.Double.NaN
+    }}
+  }
+
+  def collectImplDecimalArrArr(local: Array[Row], idx: Integer): Array[Array[Double]] = {
+    local.map{row => {
+      val localel = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+
+      localel.map(el => {
+        if (el.isInstanceOf[java.math.BigDecimal])
+          el.asInstanceOf[java.math.BigDecimal].doubleValue
+        else
+          scala.Double.NaN
+      }).toArray
     }}
   }
 
@@ -155,10 +251,28 @@ object Utils {
     }}
   }
 
+  def collectImplTimestampArrArr(local: Array[Row], idx: Integer): Array[Array[java.sql.Timestamp]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e =>
+        if (e.isInstanceOf[java.sql.Timestamp]) e.asInstanceOf[java.sql.Timestamp] else new java.sql.Timestamp(0)
+      ).toArray
+    }}
+  }
+
   def collectImplDate(local: Array[Row], idx: Integer) = {
     local.map{row => {
       val el = row(idx)
       if (el.isInstanceOf[java.sql.Date]) el.asInstanceOf[java.sql.Date] else new java.sql.Date(0)
+    }}
+  }
+
+  def collectImplDateArrArr(local: Array[Row], idx: Integer): Array[Array[java.sql.Date]] = {
+    local.map{row => {
+      val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+      el.map(e =>
+        if (e.isInstanceOf[java.sql.Date]) e.asInstanceOf[java.sql.Date] else new java.sql.Date(0)
+      ).toArray
     }}
   }
 
@@ -167,7 +281,6 @@ object Utils {
   }
 
   def collectImpl(local: Array[Row], idx: Integer, colType: String, separator: String) = {
-
     val ReDecimalType = "(DecimalType.*)".r
     val ReVectorType  = "(.*VectorUDT.*)".r
 
@@ -189,6 +302,32 @@ object Utils {
 
       case ReDecimalType(_)       => collectImplDecimal(local, idx)
       case ReVectorType(_)        => collectImplVector(local, idx)
+
+      case "ArrayType(BooleanType,true)"           => collectImplBooleanArrArr(local, idx)
+      case "ArrayType(IntegerType,true)"           => collectImplIntegerArrArr(local, idx)
+      case "ArrayType(DoubleType,true)"            => collectImplDoubleArrArr(local, idx)
+      case "ArrayType(StringType,true)"            => collectImplStringArrArr(local, idx, separator)
+      case "ArrayType(LongType,true)"              => collectImplLongArrArr(local, idx)
+      case "ArrayType(ByteType,true)"              => collectImplByteArrArr(local, idx)
+      case "ArrayType(FloatType,true)"             => collectImplFloatArrArr(local, idx)
+      case "ArrayType(ShortType,true)"             => collectImplShortArrArr(local, idx)
+      case "ArrayType(DecimalType,true)"           => collectImplDecimalArrArr(local, idx)
+      case "ArrayType(TimestampType,true)"         => collectImplTimestampArrArr(local, idx)
+      case "ArrayType(CalendarIntervalType,true)"  => collectImplForceStringArrArr(local, idx, separator)
+      case "ArrayType(DateType,true)"              => collectImplDateArrArr(local, idx)
+
+      case "ArrayType(BooleanType,false)"          => collectImplBooleanArrArr(local, idx)
+      case "ArrayType(IntegerType,false)"          => collectImplIntegerArrArr(local, idx)
+      case "ArrayType(DoubleType,false)"           => collectImplDoubleArrArr(local, idx)
+      case "ArrayType(StringType,false)"           => collectImplStringArrArr(local, idx, separator)
+      case "ArrayType(LongType,false)"             => collectImplLongArrArr(local, idx)
+      case "ArrayType(ByteType,false)"             => collectImplByteArrArr(local, idx)
+      case "ArrayType(FloatType,false)"            => collectImplFloatArrArr(local, idx)
+      case "ArrayType(ShortType,false)"            => collectImplShortArrArr(local, idx)
+      case "ArrayType(DecimalType,false)"          => collectImplDecimalArrArr(local, idx)
+      case "ArrayType(TimestampType,false)"        => collectImplTimestampArrArr(local, idx)
+      case "ArrayType(CalendarIntervalType,false)" => collectImplForceStringArrArr(local, idx, separator)
+      case "ArrayType(DateType,false)"             => collectImplDateArrArr(local, idx)
 
       case "NullType"             => collectImplForceString(local, idx, separator)
 

@@ -2,7 +2,10 @@
 
 ### Data
 
-- Add support in `copy_to()` for columns with nested lists.
+- Add support in `copy_to()` for columns with nested lists (#2247).
+
+- Significantly improve `collect()` performance for columns with nested
+  lists (#2252).
 
 # Sparklyr 1.1.0
 
