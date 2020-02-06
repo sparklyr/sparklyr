@@ -1,4 +1,8 @@
-# Sparklyr 1.1.0.9000
+# Sparklyr 1.1.0.9001
+
+### Connection
+
+- Add support for JDK11 for Spark 3 preview.
 
 ### Data
 

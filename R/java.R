@@ -45,7 +45,11 @@ validate_java_version <- function(master, spark_home) {
 
   # query its version
   version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
-  validate_java_version_line(master, version)
+  java_version <- validate_java_version_line(master, version)
+
+  spark_version <- spark_version_from_home(spark_home)
+  if (compareVersion(java_version, "11") >= 0 && compareVersion(spark_version, "3.0.0") < 0)
+    stop("Java 11 is only supported for Spark 3.0.0+", call. = FALSE)
 
   TRUE
 }
@@ -72,10 +76,13 @@ validate_java_version_line <- function(master, version) {
   if (length(versionLine) != 1)
     stop("Java version detected but couldn't parse version from ", paste(version, collapse = " - "))
 
-  # transform to usable R version string
-  splat <- strsplit(versionLine, "\\s+", perl = TRUE)[[1]]
+  splatVersion <- if (grepl("openjdk version", versionLine)) {
+    strsplit(versionLine, "\"")[[1]][[2]]
+  } else {
+    splat <- strsplit(versionLine, "\\s+", perl = TRUE)[[1]]
+    splat[grepl("9|[0-9]+\\.[0-9]+\\.[0-9]+", splat)]
+  }
 
-  splatVersion <- splat[grepl("9|[0-9]+\\.[0-9]+\\.[0-9]+", splat)]
   if (length(splatVersion) != 1)
     stop("Java version detected but couldn't parse version from: ", versionLine)
 
@@ -90,14 +97,18 @@ validate_java_version_line <- function(master, version) {
     stop("Java version detected but couldn't parse version from: ", versionLine)
 
   # ensure Java 1.7 or higher
-  if (compareVersion(parsedVersion, "1.7") < 0)
+  if (compareVersion(parsedVersion, "1.7")  == -1)
     stop("Java version", parsedVersion, " detected but 1.7+ is required. Please download and install Java from ",
          java_install_url())
 
-  if (compareVersion(parsedVersion, "1.9") >= 0 && spark_master_is_local(master)  && !getOption("sparklyr.java9", FALSE)) {
+  if (compareVersion(parsedVersion, "1.9") >= 0 &&
+      compareVersion(parsedVersion, "11") == -1 &&
+      spark_master_is_local(master)  && !getOption("sparklyr.java9", FALSE)) {
     stop(
       "Java 9 is currently unsupported in Spark distributions unless you manually install Hadoop 2.8 ",
       "and manually configure Spark. Please consider uninstalling Java 9 and reinstalling Java 8. ",
       "To override this failure set 'options(sparklyr.java9 = TRUE)'.")
   }
+
+  parsedVersion
 }

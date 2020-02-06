@@ -46,6 +46,11 @@ matrix:
       env:
         - SPARK_VERSION="master"
         - JAVA_VERSION=oraclejdk8
+    - name: "Spark master (R release, openjdk11)"
+      r: release
+      env:
+        - SPARK_VERSION="master"
+        - JAVA_URL="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz"
     - name: "Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)"
       r: release
       env:
@@ -118,7 +123,12 @@ matrix:
             - openjdk-8-jre
 
 before_install:
-  - if [[ ! -z "$JAVA_VERSION" ]]; then jdk_switcher use $JAVA_VERSION ; fi
+  - if [[ ! -z "$JAVA_VERSION" ]]; then jdk_switcher use $JAVA_VERSION;  fi
+  - |
+    if [[ ! -z "$JAVA_URL" ]]; then
+      wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+      source install-jdk.sh --url $JAVA_URL
+    fi
   - echo $JAVA_HOME
   - if [[ ! -z "$ARROW_VERSION" ]]; then chmod +x ./ci/arrow-$ARROW_SOURCE.sh ; "./ci/arrow-$ARROW_SOURCE.sh" $ARROW_VERSION; fi
   - if [[ $SPARK_VERSION == "master" ]]; then chmod +x ./ci/spark-master-install.sh ; "./ci/spark-master-install.sh"; fi
