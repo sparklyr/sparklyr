@@ -28,7 +28,26 @@ pipeline {
         }
         stage("Set up Databricks Connect") {
             steps {
-                echo "TODO 1"
+                script {
+                    withCredentials([
+                        string(credentialsId: 'databricks-connect-api-token', variable: 'API_TOKEN'),
+                        string(credentialsId: 'databricks-workspace-url', variable: 'WORKSPACE_URL')
+                    ]) {
+                        def dbConnectParams = [
+                            host: WORKSPACE_URL,
+                            token: API_TOKEN,
+                            cluster_id: clusterId,
+                            org_id: "0",
+                            port: "15001",
+                        ]
+                        def dbConnectParamsJson = JsonOutput.toJson(dbConnectParams)
+                        sh "echo '$dbConnectParamsJson' > ~/.databricks-connect"
+
+                        // Smoke test to check if databricks-connect is set up correctly
+                        def sparkHome = "/usr/lib/python3.7/site-packages/pyspark"
+                        sh "SPARK_HOME=${sparkHome} databricks-connect test"
+                    }
+                }
             }
         }
         stage("Run tests") {
