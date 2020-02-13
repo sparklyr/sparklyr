@@ -52,15 +52,14 @@ pipeline {
         }
         stage("Run tests") {
             steps {
-                echo "TODO 2"
+                sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE, repos="https://cran.microsoft.com/snapshot/2019-04-15/")'"""
+                sh """SPARK_HOME=${sparkHome} R --vanilla --slave -e 'devtools::test()'"""
             }
         }
-        stage("Terminate Databricks cluster") {
-            steps {
-                script {
-                    sh "databricks clusters delete --cluster-id ${clusterId}"
-                }
-            }
+    }
+    post {
+        always {
+            sh "databricks clusters delete --cluster-id ${clusterId}"
         }
     }
 }
