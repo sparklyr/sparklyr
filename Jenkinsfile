@@ -1,5 +1,7 @@
 import groovy.json.JsonOutput
 
+def sparkHome = "/usr/lib/python3.7/site-packages/pyspark"
+
 pipeline {
     agent any
     stages {
@@ -37,14 +39,12 @@ pipeline {
                             host: WORKSPACE_URL,
                             token: API_TOKEN,
                             cluster_id: clusterId,
-                            org_id: "0",
                             port: "15001",
                         ]
                         def dbConnectParamsJson = JsonOutput.toJson(dbConnectParams)
                         sh "echo '$dbConnectParamsJson' > ~/.databricks-connect"
 
                         // Smoke test to check if databricks-connect is set up correctly
-                        def sparkHome = "/usr/lib/python3.7/site-packages/pyspark"
                         sh "SPARK_HOME=${sparkHome} databricks-connect test"
                     }
                 }
