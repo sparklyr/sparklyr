@@ -33,7 +33,7 @@ testthat_spark_connection <- function() {
 
   livy_version <- Sys.getenv("LIVY_VERSION")
   test_databricks_connect <- Sys.getenv("TEST_DATABRICKS_CONNECT")
-  print(paste("test_databricks_connect:", test_databricks_connect))
+
   if (nchar(livy_version) > 0)
     testthat_livy_connection()
   else if (test_databricks_connect == "true")
