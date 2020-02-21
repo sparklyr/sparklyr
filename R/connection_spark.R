@@ -87,6 +87,10 @@ spark_config_shell_args <- function(config, master) {
   }))
 }
 
+no_databricks_guid <- function() {
+  mget("DATABRICKS_GUID", envir = .GlobalEnv, ifnotfound="") == ""
+}
+
 #' @name spark-connections
 #'
 #' @examples
@@ -104,7 +108,7 @@ spark_config_shell_args <- function(config, master) {
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell", "livy", "databricks", "test", "qubole", "databricks-connect"),
+                          method = c("shell", "livy", "databricks", "test", "qubole"),
                           app_name = "sparklyr",
                           version = NULL,
                           config = spark_config(),
@@ -115,6 +119,11 @@ spark_connect <- function(master,
   # validate method
   method <- match.arg(method)
 
+  # A Databricks GUID indicates that it is running on a Databricks cluster,
+  # so if there is no GUID, then method = "databricks" must refer to Databricks Connect
+  if (method == "databricks" && no_databricks_guid()) {
+    method <- "databricks-connect"
+  }
   hadoop_version <- list(...)$hadoop_version
 
   master_override <- spark_config_value(config, "sparklyr.connect.master", NULL)

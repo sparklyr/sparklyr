@@ -1,8 +1,10 @@
 context("databricks-connect")
 
+Sys.setenv(TEST_DATABRICKS_CONNECT = 'true')
+
 test_that("spark connection method is configured correctly", {
   spark_home <- Sys.getenv("SPARK_HOME")
-  sc <- testthat_spark_connection(method = "databricks-connect")
+  sc <- testthat_spark_connection()
 
   # test that the connection method is set correctly
   expect_equal(sc$method, "databricks-connect")
@@ -11,7 +13,7 @@ test_that("spark connection method is configured correctly", {
 })
 
 test_that("csv_file is disabled when using databricks-connect", {
-  sc <- testthat_spark_connection(method = "databricks-connect")
+  sc <- testthat_spark_connection()
   tryCatch(
     spark_data_copy(sc, NULL, "some_df", 1, serializer = "csv_file"),
     error = function(e) {
