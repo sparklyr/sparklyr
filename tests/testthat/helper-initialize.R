@@ -342,3 +342,8 @@ skip_on_spark_master <- function() {
   is_on_master <- identical(Sys.getenv("SPARK_VERSION"), "master")
   if (is_on_master) skip("Test skipped on spark master")
 }
+
+skip_unless_databricks_connect <- function() {
+  if (Sys.getenv("TEST_DATABRICKS_CONNECT") != "true")
+    skip("Test only run on Databricks Connect")
+}

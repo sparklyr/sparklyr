@@ -1,6 +1,6 @@
 context("databricks-connect")
 
-Sys.setenv(TEST_DATABRICKS_CONNECT = 'true')
+skip_unless_databricks_connect()
 
 test_that("spark connection method is configured correctly", {
   spark_home <- Sys.getenv("SPARK_HOME")
