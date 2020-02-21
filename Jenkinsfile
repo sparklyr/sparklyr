@@ -52,7 +52,7 @@ pipeline {
         }
         stage("Run tests") {
             steps {
-                sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE, repos="https://cran.microsoft.com/snapshot/2019-04-15/")'"""
+                sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)'"""
                 sh """SPARK_HOME=${sparkHome} R --vanilla --slave -e 'devtools::test()'"""
             }
         }
