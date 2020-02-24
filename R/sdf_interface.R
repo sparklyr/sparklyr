@@ -68,7 +68,7 @@ sdf_prepare_dataframe <- function(x) {
   as.data.frame(
     x,
     stringsAsFactors = FALSE,
-    row.names = FALSE,
+    row.names = NULL,
     optional = TRUE
   )
 }
