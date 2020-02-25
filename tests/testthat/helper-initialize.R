@@ -345,5 +345,5 @@ skip_on_spark_master <- function() {
 
 skip_unless_databricks_connect <- function() {
   if (Sys.getenv("TEST_DATABRICKS_CONNECT") != "true")
-    skip("Test only run on Databricks Connect")
+    skip("Test only runs on Databricks Connect")
 }

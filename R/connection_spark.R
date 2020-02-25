@@ -88,7 +88,7 @@ spark_config_shell_args <- function(config, master) {
 }
 
 no_databricks_guid <- function() {
-  mget("DATABRICKS_GUID", envir = .GlobalEnv, ifnotfound="") == ""
+  mget("DATABRICKS_GUID", envir = .GlobalEnv, ifnotfound = "") == ""
 }
 
 #' @name spark-connections
