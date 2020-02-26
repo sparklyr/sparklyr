@@ -10,7 +10,7 @@ shell_connection_validate_config <- function(config) {
 # create a shell connection
 shell_connection <- function(master,
                              spark_home,
-                             method,
+                             method = "",
                              app_name,
                              version,
                              hadoop_version,
