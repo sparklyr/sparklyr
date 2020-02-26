@@ -1,7 +1,6 @@
 Sys.setenv("R_TESTS" = "")
 library(testthat)
 library(sparklyr)
-library(uuid)
 
 spark_install_winutils <- function(version) {
   hadoop_version <- if (version < "2.0.0") "2.6" else "2.7"
@@ -305,6 +304,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   test_cases_dir <- "test_cases"
   test_cases <- list.files(path = test_cases_dir, pattern = "test-.*\\.R")
 
+  install.packages("uuid")
+  library(uuid)
   if (identical(Sys.getenv("RUN_TESTS_IN_PARALLEL"), "true")) {
     # run tests in parallel
     num_test_procs <- as.integer(Sys.getenv("NUM_TEST_PROCS", unset = 4))
