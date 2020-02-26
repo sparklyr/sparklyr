@@ -52,6 +52,7 @@ Imports:
     ellipsis (>= 0.1.0)
 Suggests:
     broom,
+    foreach,
     ggplot2,
     janeaustenr,
     Lahman,
