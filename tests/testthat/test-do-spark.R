@@ -11,6 +11,26 @@ register_test_spark_connection <- function() {
 
 register_test_spark_connection()
 
+u <- 1234
+v <- 5678
+x <- 123
+y <- 456
+z <- 789
+fn_1 <- function(x) {
+  list(fn_1 = list(x = x, u = u))
+ }
+fn_2 <- function(x) {
+  y <- 123456
+  inner_fn <- function(x) { list(inner_fn = list(x = x, y = y)) }
+  list(fn_2 = list(fn_1(list(fn_1(list(x = x, v = y)), z = z)), y = y, z = z, inner_fn(z)))
+}
+fn_3 <- function(x) {
+  u <- 789
+  inner_fn <- function(z) { list(inner_fn = list(u = u, v = v, x = x, y = y, z = z)) }
+  inner_fn
+}
+fn_4 <- fn_3(1357)
+
 '%test%' <- function(obj, quoted_expr) {
   res <- list()
   for (impl in c("do", "dopar"))
@@ -44,4 +64,8 @@ test_that("doSpark works for loop with arbitrary R objects with combine function
 
 test_that("doSpark works for loop with arbitrary R objects with multicombine", {
   foreach(x = 1:20, .combine = list, .multicombine = TRUE, .maxcombine = 5) %test% quote(x)
+})
+
+test_that("doSpark works for loop referencing external functions and variables", {
+  foreach(x = 1:20, .combine = list) %test% quote(fn_2(list(x, y, z, fn_3(x)(y), fn_4(x))))
 })
