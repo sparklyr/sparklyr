@@ -70,18 +70,25 @@ registerDoSpark <- function(spark_conn, ...) {
     # internal function to process spark data frames
     .process_spark_items <- function(...) {
       f <- function(item) {
-        # NOTE: if `expr` involves any object outside of its own environment then this current
-        # implementation will *attempt* to serialize and send those object(s) to Spark workers
-        # as well -- e.g., consider the following:
-        #
-        # foo <- 5
-        # foreach (bar = 1:100) %dopar% { foo * bar }  # `foo` is outside of `expr`'s environment
-        #
-        # However, last time I checked https://spark.rstudio.com/guides/distributed-r this is
-        # not a supported use case yet
-        # (see https://spark.rstudio.com/guides/distributed-r/#closures)
-        res <- eval(expr, envir=.decode_item(item$encoded), enclos=envir)
-        .encode_item(res)
+	tryCatch(
+	  {
+            # NOTE: if `expr` involves any object outside of its own environment then this current
+            # implementation will *attempt* to serialize and send those object(s) to Spark workers
+            # as well -- e.g., consider the following:
+            #
+            # foo <- 5
+            # foreach (bar = 1:100) %dopar% { foo * bar }  # `foo` is outside of `expr`'s environment
+            #
+            # However, last time I checked https://spark.rstudio.com/guides/distributed-r this is
+            # not a supported use case yet
+            # (see https://spark.rstudio.com/guides/distributed-r/#closures)
+            res <- eval(expr, envir=.decode_item(item$encoded), enclos=envir)
+            .encode_item(res)
+	  },
+	  error = function(ex) {
+            .encode_item(ex)
+	  }
+        )
       }
       encoded_res <- sdf_collect(spark_items %>% spark_apply(f, ...))[[1]]
       lapply(encoded_res, .decode_item)
