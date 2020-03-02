@@ -134,6 +134,16 @@ registerDoSpark <- function(spark_conn, ...) {
     switch(item,
       name = pkgName,
       version = packageDescription(pkgName, fields = "Version"),
+      workers = tryCatch(
+        {
+          spark_conf<-invoke(data$spark_conn$state$spark_context, "getConf")
+          # return an integer value greater than 1 as number of workers if
+          # "spark.executor.instances" is not set
+          invoke(spark_conf, "getInt", "spark.executor.instances", as.integer(2))
+        },
+        # return 0 as number of workers if there is an exception
+        error = function(e) { 0 }
+      ),
       NULL
     )
   }

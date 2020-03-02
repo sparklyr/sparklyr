@@ -40,6 +40,10 @@ fn_4 <- fn_3(1357)
   expect_equal(res$do, res$dopar)
 }
 
+test_that("num workers greater than 1", {
+  expect_gt(foreach::getDoParWorkers(), 1)
+})
+
 test_that("doSpark works for simple loop", {
   foreach(x = 1:10) %test% quote(x * x)
 })
