@@ -93,12 +93,19 @@ registerDoSpark <- function(spark_conn, ...) {
         }
         # `enclos` now contains a snapshot of all external variables and functions
         # needed for evaluating `expr`
-        res <- eval(
-          expr,
-          envir = as.list(.decode_item(item$encoded)),
-          enclos = enclos
-        )
-        .encode_item(res)
+	tryCatch(
+         {
+            res <- eval(
+              expr,
+              envir = as.list(.decode_item(item$encoded)),
+              enclos = enclos
+            )
+            .encode_item(res)
+	  },
+	  error = function(ex) {
+            .encode_item(ex)
+	  }
+	)
       }
       encoded_res <- sdf_collect(spark_items %>% spark_apply(f, ...))[[1]]
       lapply(encoded_res, .decode_item)
