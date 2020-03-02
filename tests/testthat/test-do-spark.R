@@ -40,6 +40,15 @@ fn_4 <- fn_3(1357)
   expect_equal(res$do, res$dopar)
 }
 
+test_that("doSpark preserves exception error message", {
+  expect_error(
+    foreach (x = 1:10) %dopar% {
+      if (x == 10) stop("runtime error")
+    },
+    regexp = "task 10 failed - \"runtime error\""
+  )
+})
+
 test_that("doSpark works for simple loop", {
   foreach(x = 1:10) %test% quote(x * x)
 })
