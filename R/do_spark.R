@@ -68,6 +68,8 @@ registerDoSpark <- function(spark_conn, ...) {
     .encode_item <- function(item) list(encoded = base64enc::base64encode(serialize(item, NULL)))
     .decode_item <- function(item) unserialize(base64enc::base64decode(item))
 
+    expr_globals <- globals::globalsOf(expr, envir = envir, recursive = TRUE, mustExist = FALSE)
+
     # internal function to process spark data frames
     .process_spark_items <- function(...) {
       # load necessary packages
@@ -75,17 +77,27 @@ registerDoSpark <- function(spark_conn, ...) {
         library(p, character.only=TRUE)
 
       f <- function(item) {
-        # NOTE: if `expr` involves any object outside of its own environment then this current
-        # implementation will *attempt* to serialize and send those object(s) to Spark workers
-        # as well -- e.g., consider the following:
-        #
-        # foo <- 5
-        # foreach (bar = 1:100) %dopar% { foo * bar }  # `foo` is outside of `expr`'s environment
-        #
-        # However, last time I checked https://spark.rstudio.com/guides/distributed-r this is
-        # not a supported use case yet
-        # (see https://spark.rstudio.com/guides/distributed-r/#closures)
-        res <- eval(expr, envir=.decode_item(item$encoded), enclos=envir)
+        enclos <- envir
+        expr_globals <- as.list(expr_globals)
+        for (k in names(expr_globals)) {
+          v <- expr_globals$k
+          if (identical(typeof(v), "closure")) {
+            # to make `enclos` truly self-contained, each of its element that is
+            # a closure will need to have its enclosing environment replaced with
+            # `enclos` itself
+            environment(v) <- enclos
+          }
+          if (!exists(k, where = enclos)) {
+            assign(k, v, pos = enclos)
+          }
+        }
+        # `enclos` now contains a snapshot of all external variables and functions
+        # needed for evaluating `expr`
+        res <- eval(
+          expr,
+          envir = as.list(.decode_item(item$encoded)),
+          enclos = enclos
+        )
         .encode_item(res)
       }
       encoded_res <- sdf_collect(spark_items %>% spark_apply(f, ...))[[1]]
@@ -127,6 +139,16 @@ registerDoSpark <- function(spark_conn, ...) {
     switch(item,
       name = pkgName,
       version = packageDescription(pkgName, fields = "Version"),
+      workers = tryCatch(
+        {
+          spark_conf<-invoke(data$spark_conn$state$spark_context, "getConf")
+          # return an integer value greater than 1 as number of workers if
+          # "spark.executor.instances" is not set
+          invoke(spark_conf, "getInt", "spark.executor.instances", as.integer(2))
+        },
+        # return 0 as number of workers if there is an exception
+        error = function(e) { 0 }
+      ),
       NULL
     )
   }

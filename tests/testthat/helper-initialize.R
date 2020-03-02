@@ -163,6 +163,31 @@ sdf_query_plan <- function(x) {
     unlist()
 }
 
+wait_for_svc <- function(svc_name, port, timeout_s) {
+  suppressWarnings({
+    socket <- NULL
+    on.exit(
+      if (!is.null(socket)) {
+        close(socket)
+      }
+    )
+    for (t in 1:timeout_s) {
+      try(
+        socket <- socketConnection(
+          host = "localhost", port = port, server = FALSE, open = "r+"
+        ),
+        silent = TRUE
+      )
+      if (is.null(socket)) {
+        sprintf("Waiting for %s socket to be in listening state...", svc_name)
+        Sys.sleep(1)
+      } else {
+        break
+      }
+    }
+  })
+}
+
 testthat_livy_connection <- function() {
   version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
   livy_version <- Sys.getenv("LIVY_VERSION", "0.5.0")
@@ -197,15 +222,20 @@ testthat_livy_connection <- function() {
     spark_install_winutils(version)
   }
 
+  livy_service_port <- 8998
   if (!connected) {
     livy_service_start(
       version = livy_version,
       spark_version = version,
       stdout = FALSE,
       stderr = FALSE)
-
+    wait_for_svc(
+      svc_name = "livy",
+      port = livy_service_port,
+      timeout_s = 30
+    )
     sc <- spark_connect(
-      master = "http://localhost:8998",
+      master = sprintf("http://localhost:%d", livy_service_port),
       method = "livy",
       config = list(
         sparklyr.verbose = TRUE,
