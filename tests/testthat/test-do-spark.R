@@ -20,6 +20,12 @@ register_test_spark_connection()
   expect_equal(res$do, res$dopar)
 }
 
+test_that("doSpark loads required packages", {
+  foreach(x = 1:10) %dopar% {
+    expect_true("testthat" %in% (.packages()))
+  }
+})
+
 test_that("doSpark works for simple loop", {
   foreach(x = 1:10) %test% quote(x * x)
 })
