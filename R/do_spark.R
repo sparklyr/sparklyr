@@ -50,6 +50,7 @@ registerDoSpark <- function(spark_conn, ...) {
 
   # internal function called by foreach
   .doSpark <- function(obj, expr, envir, data) {
+    obj$packages <- unique(c(obj$packages, (.packages())))
     # internal function to compile an expression if possible
     .compile <- function(expr, ...) {
       if (getRversion() < "2.13.0" || isTRUE(.globals$do_spark$options$nocompile))
@@ -71,6 +72,10 @@ registerDoSpark <- function(spark_conn, ...) {
 
     # internal function to process spark data frames
     .process_spark_items <- function(...) {
+      # load necessary packages
+      for (p in obj$packages)
+        library(p, character.only=TRUE)
+
       f <- function(item) {
         enclos <- envir
         expr_globals <- as.list(expr_globals)
