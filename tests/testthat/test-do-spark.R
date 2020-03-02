@@ -47,6 +47,14 @@ test_that("doSpark preserves exception error message", {
     },
     regexp = "task 10 failed - \"runtime error\""
   )
+
+test_that("doSpark loads required packages", {
+  foreach(x = 1:10) %dopar% {
+    expect_true("testthat" %in% (.packages()))
+  }
+
+test_that("num workers greater than 1", {
+  expect_gt(foreach::getDoParWorkers(), 1)
 })
 
 test_that("doSpark works for simple loop", {

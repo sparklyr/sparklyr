@@ -50,6 +50,7 @@ registerDoSpark <- function(spark_conn, ...) {
 
   # internal function called by foreach
   .doSpark <- function(obj, expr, envir, data) {
+    obj$packages <- unique(c(obj$packages, (.packages())))
     # internal function to compile an expression if possible
     .compile <- function(expr, ...) {
       if (getRversion() < "2.13.0" || isTRUE(.globals$do_spark$options$nocompile))
@@ -71,6 +72,10 @@ registerDoSpark <- function(spark_conn, ...) {
 
     # internal function to process spark data frames
     .process_spark_items <- function(...) {
+      # load necessary packages
+      for (p in obj$packages)
+        library(p, character.only=TRUE)
+
       f <- function(item) {
         enclos <- envir
         expr_globals <- as.list(expr_globals)
@@ -141,6 +146,16 @@ registerDoSpark <- function(spark_conn, ...) {
     switch(item,
       name = pkgName,
       version = packageDescription(pkgName, fields = "Version"),
+      workers = tryCatch(
+        {
+          spark_conf<-invoke(data$spark_conn$state$spark_context, "getConf")
+          # return an integer value greater than 1 as number of workers if
+          # "spark.executor.instances" is not set
+          invoke(spark_conf, "getInt", "spark.executor.instances", as.integer(2))
+        },
+        # return 0 as number of workers if there is an exception
+        error = function(e) { 0 }
+      ),
       NULL
     )
   }
