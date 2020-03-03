@@ -121,6 +121,11 @@ matrix:
         apt:
           packages:
             - openjdk-8-jre
+    - r: release
+      env:
+        - LIVY_VERSION="0.5.0"
+        - SPARK_VERSION="2.3.0"
+        - JAVA_VERSION=oraclejdk8
 
 before_install:
   - if [[ ! -z "$JAVA_VERSION" ]]; then jdk_switcher use $JAVA_VERSION;  fi
