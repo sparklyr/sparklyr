@@ -25,12 +25,12 @@ new_ml_model_naive_bayes <- function(pipeline_model, formula, dataset, label_col
 
 #' @export
 print.ml_model_naive_bayes <- function(x, ...) {
-  printf("A-priority probabilities:\n")
-  print(exp(x$pi))
+  printf("A-priori probabilities:\n")
+  print(exp(sort_named_list(x$pi)))
   print_newline()
 
   printf("Conditional probabilities:\n")
-  print(exp(x$theta))
+  print(exp(x$theta[order(row.names(x$theta)),]))
   print_newline()
 
   x
