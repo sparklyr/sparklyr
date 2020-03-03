@@ -1,5 +1,7 @@
 context("broom-naive_bayes")
 
+library(dplyr)
+
 test_that("naive_bayes.tidy() works", {
   skip_on_spark_master()
   sc <- testthat_spark_connection()
@@ -9,12 +11,13 @@ test_that("naive_bayes.tidy() works", {
   # for multiclass classification
   td1 <- iris_tbl %>%
     ml_naive_bayes(Species ~ Sepal_Length + Petal_Length) %>%
-    tidy()
+    tidy() %>%
+    arrange(.label)
 
   check_tidy(td1, exp.row = 3, exp.col = 4,
              exp.names = c(".label", "Sepal_Length",
                            "Petal_Length", ".pi"))
-  expect_equal(td1$Sepal_Length, c(-0.542, -0.612, -0.258), tolerance = 0.001)
+  expect_equal(td1$Sepal_Length, c(-0.258, -0.542, -0.612), tolerance = 0.001)
 
 })
 
