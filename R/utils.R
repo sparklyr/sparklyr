@@ -274,3 +274,7 @@ is.tbl_spark <- function(x) {
 
   invisible(NULL)
 }
+
+sort_named_list <- function(lst, ...) {
+  lst[order(names(lst), ...)]
+}
