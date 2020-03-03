@@ -35,6 +35,7 @@ Imports:
     digest,
     forge,
     generics,
+    globals,
     httr (>= 1.2.1),
     jsonlite (>= 1.4),
     methods,
