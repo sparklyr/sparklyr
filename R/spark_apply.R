@@ -290,9 +290,9 @@ spark_apply <- function(x,
   }
   else if (isTRUE(packages) || is.character(packages)) {
     bundle_base <- spark_apply_bundle_path()
-    bundle_path <- spark_apply_bundle_file(packages, bundle_base)
+    bundle_path <- spark_apply_bundle_file(packages, bundle_base, sc$sessionId)
     if (!file.exists(bundle_path)) {
-      bundle_path <- spark_apply_bundle(packages, bundle_base)
+      bundle_path <- spark_apply_bundle(packages, bundle_base, sc$sessionId)
     }
 
     if (!is.null(bundle_path)) {

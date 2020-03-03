@@ -4,12 +4,14 @@
 \alias{spark_apply_bundle}
 \title{Create Bundle for Spark Apply}
 \usage{
-spark_apply_bundle(packages = TRUE, base_path = getwd())
+spark_apply_bundle(packages = TRUE, base_path = getwd(), session_id = NULL)
 }
 \arguments{
 \item{packages}{List of packages to pack or \code{TRUE} to pack all.}
 
 \item{base_path}{Base path used to store the resulting bundle.}
+
+\item{session_id}{An optional ID string to include in the bundle file name to allow the bundle to be session-specific}
 }
 \description{
 Creates a bundle of packages for \code{spark_apply()}.
