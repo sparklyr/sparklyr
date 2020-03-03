@@ -55,7 +55,6 @@ Suggests:
     broom,
     foreach,
     ggplot2,
-    globals,
     janeaustenr,
     Lahman,
     mlbench,
