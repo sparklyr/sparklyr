@@ -2,11 +2,11 @@ spark_apply_bundle_path <- function() {
   file.path(tempdir(), "packages")
 }
 
-spark_apply_bundle_file <- function(packages, base_path) {
+spark_apply_bundle_file <- function(packages, base_path, session_id = NULL) {
   file.path(
     base_path,
     if (isTRUE(packages))
-      "packages.tar"
+      do.call(paste, as.list(c("packages", session_id, "tar", sep = ".")))
     else
       paste(
         substr(
@@ -29,12 +29,13 @@ spark_apply_bundle_file <- function(packages, base_path) {
 #'
 #' @param packages List of packages to pack or \code{TRUE} to pack all.
 #' @param base_path Base path used to store the resulting bundle.
+#' @param session_id An optional ID string to include in the bundle file name to allow the bundle to be session-specific
 #'
 #' @export
-spark_apply_bundle <- function(packages = TRUE, base_path = getwd()) {
+spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id = NULL) {
   packages <- if (is.character(packages)) spark_apply_packages(packages) else packages
 
-  packagesTar <- spark_apply_bundle_file(packages, base_path)
+  packagesTar <- spark_apply_bundle_file(packages, base_path, session_id)
 
   if (!dir.exists(spark_apply_bundle_path()))
     dir.create(spark_apply_bundle_path(), recursive = TRUE)
