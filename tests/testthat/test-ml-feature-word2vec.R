@@ -40,15 +40,22 @@ test_that("ft_word2vec() returns result with correct length", {
 })
 
 test_that("ml_find_synonyms works properly", {
+  # NOTE: this test case is functionally identical to the one in
+  # https://github.com/apache/spark/blob/87b93d32a6bfb0f2127019b97b3fc1d13e16a10b/mllib/src/test/scala/org/apache/spark/mllib/feature/Word2VecSuite.scala#L37
   skip_on_spark_master()
   test_requires_version("2.0.0", "spark computation different in 1.6.x")
   sc <- testthat_spark_connection()
-  tokenized_tbl <- testthat_tbl("tokenized")
-  model <- ft_word2vec(sc, "words", "result", vector_size= 3, min_count = 0) %>%
+  sentence <- data.frame(sentence = do.call(paste, as.list(c(rep("a b", 100), rep("a c", 10)))))
+  doc <- rbind(sentence, sentence)
+  sdf <- sdf_copy_to(sc, doc, overwrite = TRUE)
+  tokenized_tbl <- ft_tokenizer(sdf, "sentence", "words")
+
+  model <- ft_word2vec(sc, "words", "result", vector_size= 10, seed = 42L, min_count = 0) %>%
     ml_fit(tokenized_tbl)
 
-  synonyms <- ml_find_synonyms(model, "java", 2) %>% pull(word)
+  synonyms <- ml_find_synonyms(model, "a", 2) %>% pull(word)
 
-  expect_true("models" %in% synonyms)
+  # synonym-wise "b" should be closer to "a" than "c" is
+  expect_equal(synonyms, c("b", "c"))
 })
 
