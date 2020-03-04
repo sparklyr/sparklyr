@@ -1,4 +1,6 @@
-#' explicitly registers a sparklyr parallel backend
+#' Register a Prallel Backend
+#'
+#' Registers a parallel backend using the \code{foreach} package.
 #'
 #' @param spark_conn spark connection to use
 #' @param ... additional options for sparklyr parallel backend

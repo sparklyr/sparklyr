@@ -2,7 +2,7 @@
 % Please edit documentation in R/do_spark.R
 \name{registerDoSpark}
 \alias{registerDoSpark}
-\title{explicitly registers a sparklyr parallel backend}
+\title{Register a Prallel Backend}
 \usage{
 registerDoSpark(spark_conn, ...)
 }
@@ -16,10 +16,13 @@ registerDoSpark(spark_conn, ...)
 None
 }
 \description{
-explicitly registers a sparklyr parallel backend
+Registers a parallel backend using the \code{foreach} package.
 }
 \examples{
+\dontrun{
+
 sc <- spark_connect(master = "local")
 registerDoSpark(sc, nocompile = FALSE)
+}
 
 }
