@@ -1,5 +1,6 @@
 context("broom-naive_bayes")
 
+skip_databricks_connect()
 library(dplyr)
 
 test_that("naive_bayes.tidy() works", {

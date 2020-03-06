@@ -1,5 +1,6 @@
 context("broom-lda")
 
+skip_databricks_connect()
 test_that("lda.tidy() works", {
   skip_on_spark_master()
   sc <- testthat_spark_connection()

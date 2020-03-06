@@ -1,5 +1,6 @@
 context("broom-decision_tree")
 
+skip_databricks_connect()
 test_that("decision_tree.tidy() works", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
