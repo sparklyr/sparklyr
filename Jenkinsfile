@@ -56,14 +56,16 @@ pipeline {
                 // sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test()'"""
             }
         }
-    }
-    post {
-        always {
-            sh "databricks clusters delete --cluster-id ${clusterId}"
+        stage("Post results and logs") {
             if (env.CHANGE_ID) {
               def comment = pullRequest.comment('This PR is highly illogical..')
               pullRequest.addLabel('TEST COMMENT')
             }
+        }
+    }
+    post {
+        always {
+            sh "databricks clusters delete --cluster-id ${clusterId}"
         }
     }
 }
