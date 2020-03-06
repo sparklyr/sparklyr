@@ -55,11 +55,10 @@ pipeline {
                 sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)'"""
                 // sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test()'"""
             }
-        }
-        stage("Post results and logs") {
-            if (env.CHANGE_ID) {
-              def comment = pullRequest.comment('This PR is highly illogical..')
-              pullRequest.addLabel('TEST COMMENT')
+            steps {
+               if (env.CHANGE_ID) {
+                 def comment = pullRequest.comment('TEST COMMENT')
+               }
             }
         }
     }
