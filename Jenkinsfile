@@ -56,17 +56,18 @@ pipeline {
                 // sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test()'"""
             }
         }
-        stage("Post results") {
-            steps {
-               if (env.CHANGE_ID) {
-                 def comment = pullRequest.comment('TEST COMMENT')
-               }
-            }
-        }
     }
     post {
         always {
             sh "databricks clusters delete --cluster-id ${clusterId}"
+        }
+        failure {
+            script {
+                // CHANGE_ID is set only for pull requests, so it is safe to access the pullRequest global variable
+                if (env.CHANGE_ID) {
+                    def comment = pullRequest.comment('BUILD FAILED')
+                }
+            }
         }
     }
 }
