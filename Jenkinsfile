@@ -60,9 +60,9 @@ pipeline {
     post {
         always {
             sh "databricks clusters delete --cluster-id ${clusterId}"
-	    if (env.CHANGE_ID) {
-		def comment = pullRequest.comment('This PR is highly illogical..')
-                pullRequest.addLabel('TEST COMMENT')
+            if (env.CHANGE_ID) {
+              def comment = pullRequest.comment('This PR is highly illogical..')
+              pullRequest.addLabel('TEST COMMENT')
             }
         }
     }
