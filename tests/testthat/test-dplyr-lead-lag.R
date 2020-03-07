@@ -1,5 +1,6 @@
 context("lag & lead")
 
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("lead and lag take numeric values for 'n' (#925)", {

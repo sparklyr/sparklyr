@@ -1,5 +1,6 @@
 context("ml supervised - random forest")
 
+skip_databricks_connect()
 test_that("rf runs successfully when all args specified", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")

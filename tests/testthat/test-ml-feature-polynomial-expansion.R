@@ -1,5 +1,6 @@
 context("ml feature polynomial expansion")
 
+skip_databricks_connect()
 test_that("ft_polynomial_expansion() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

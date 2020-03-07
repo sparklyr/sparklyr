@@ -1,5 +1,6 @@
 context("ml clustering - kmeans")
 
+skip_databricks_connect()
 test_that("ml_kmeans() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

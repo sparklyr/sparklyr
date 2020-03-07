@@ -1,5 +1,6 @@
 context("ml feature vector slicer")
 
+skip_databricks_connect()
 test_that("ft_vector_slicer() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

@@ -1,5 +1,6 @@
 context("ml fpm fpgrowth")
 
+skip_databricks_connect()
 test_that("ml_fpgrowth() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

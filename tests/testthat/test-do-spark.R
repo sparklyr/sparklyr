@@ -1,5 +1,6 @@
 context("do-spark")
 
+skip_databricks_connect()
 test_requires("foreach")
 test_requires("iterators")
 test_requires("base64enc")

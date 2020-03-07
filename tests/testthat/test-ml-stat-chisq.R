@@ -1,5 +1,6 @@
 context("ml stat - chisq")
 
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 df_tbl <- sdf_copy_to(sc, data.frame(
   gender = sample(c("F", "M"), 200,replace = TRUE),
