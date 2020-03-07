@@ -1,5 +1,6 @@
 context("describe")
 
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("sdf_collect() works properly", {
