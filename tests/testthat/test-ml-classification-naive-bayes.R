@@ -1,5 +1,6 @@
 context("ml classification - naive bayes")
 
+skip_databricks_connect()
 test_that("ml_naive_bayes() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

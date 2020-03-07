@@ -1,5 +1,6 @@
 context("ml clustering - bisecting kmeans")
 
+skip_databricks_connect()
 test_that("ml_bisecting_kmeans() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

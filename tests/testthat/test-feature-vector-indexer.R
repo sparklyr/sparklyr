@@ -1,5 +1,6 @@
 context("ml feature vector indexer")
 
+skip_databricks_connect()
 test_that("ft_vector_indexer() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

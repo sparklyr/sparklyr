@@ -1,5 +1,6 @@
 context("ml tree feature importances")
 
+skip_databricks_connect()
 test_that("ml_tree_feature_importance() works properly", {
   test_requires_version("2.0.0", "feature importances not available prior to spark 2.0")
   sc <- testthat_spark_connection()

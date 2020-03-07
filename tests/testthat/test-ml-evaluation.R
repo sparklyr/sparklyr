@@ -1,5 +1,6 @@
 context("ml evaluator")
 
+skip_databricks_connect()
 test_that("basic binary classification evaluation works", {
   sc <- testthat_spark_connection()
   df <- data.frame(label = c(1, 1, 0, 0), features1 = c(1, 1, 0, 0))

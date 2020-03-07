@@ -1,5 +1,6 @@
 context("broom-multilayer_perceptron")
 
+skip_databricks_connect()
 test_that("multilayer_perceptron.tidy() works", {
   skip_on_spark_master()
   sc <- testthat_spark_connection()

@@ -1,5 +1,6 @@
 context("ml feature binarizer")
 
+skip_databricks_connect()
 test_that("ft_binarizer() default params", {
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_binarizer)

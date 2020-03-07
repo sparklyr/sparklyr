@@ -1,5 +1,6 @@
 context("install")
 
+skip_databricks_connect()
 test_that("supported spark_versions can be downloaded", {
   skip("")
   test_requires("RCurl")
