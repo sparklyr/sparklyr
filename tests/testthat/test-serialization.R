@@ -1,4 +1,6 @@
 context("serialization")
+
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_requires("nycflights13")

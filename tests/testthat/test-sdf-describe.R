@@ -1,5 +1,6 @@
 context("describe")
 
+skip_databricks_connect()
 test_requires("dplyr")
 
 sc <- testthat_spark_connection()
