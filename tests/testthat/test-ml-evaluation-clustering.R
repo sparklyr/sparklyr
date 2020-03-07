@@ -1,5 +1,6 @@
 context("ml evaluation - clustering")
 
+skip_databricks_connect()
 test_that("ml_clustering_evaluator() works", {
   test_requires_version("2.3.0", "ml clustering evaluator requires spark 2.3+")
   sc <- testthat_spark_connection()

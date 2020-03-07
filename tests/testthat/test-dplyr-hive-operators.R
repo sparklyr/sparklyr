@@ -1,5 +1,6 @@
 context("hive operators")
 
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("regex relational operators work", {

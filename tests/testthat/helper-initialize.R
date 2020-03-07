@@ -377,3 +377,8 @@ skip_unless_databricks_connect <- function() {
   if (Sys.getenv("TEST_DATABRICKS_CONNECT") != "true")
     skip("Test only runs on Databricks Connect")
 }
+
+skip_databricks_connect <- function() {
+  if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true")
+    skip("Test is skipped on Databricks Connect")
+}

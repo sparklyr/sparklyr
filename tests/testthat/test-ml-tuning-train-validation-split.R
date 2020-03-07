@@ -1,5 +1,6 @@
 context("ml tuning train validation split")
 
+skip_databricks_connect()
 test_that("ml_train_validation_split() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

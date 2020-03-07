@@ -1,5 +1,6 @@
 context("connections - shell")
 
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")

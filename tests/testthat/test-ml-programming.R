@@ -1,5 +1,6 @@
 context("ml programming")
 
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("one can program with ft_ functions (.tbl_spark)", {

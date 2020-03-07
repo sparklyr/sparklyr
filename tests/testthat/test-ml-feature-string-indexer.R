@@ -1,5 +1,6 @@
 context("ml feature string indexer + index to string")
 
+skip_databricks_connect()
 test_that("ft_index_to_string() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

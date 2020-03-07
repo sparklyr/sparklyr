@@ -1,5 +1,6 @@
 context("ml feature regex tokenizer")
 
+skip_databricks_connect()
 test_that("ft_regex_tokenizer() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

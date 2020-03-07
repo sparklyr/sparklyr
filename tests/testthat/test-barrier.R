@@ -1,5 +1,6 @@
 context("barrier")
 
+skip_databricks_connect()
 test_that("barrier-spark_apply works", {
   test_requires_version("2.4.0")
   sc <- testthat_spark_connection()

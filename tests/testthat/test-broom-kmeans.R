@@ -1,5 +1,6 @@
 context("broom-kmeans")
 
+skip_databricks_connect()
 test_that("kmeans.tidy() works", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
