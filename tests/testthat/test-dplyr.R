@@ -122,6 +122,7 @@ test_that("'sample_n' and 'sample_frac' work in nontrivial queries (#1299)", {
 })
 
 test_that("'sdf_broadcast' forces broadcast hash join", {
+  skip_databricks_connect()
   query_plan <- df1_tbl %>%
     sdf_broadcast() %>%
     left_join(df2_tbl, by = "b") %>%

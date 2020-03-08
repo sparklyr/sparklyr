@@ -10,6 +10,8 @@ test_that("sdf_repartition works", {
 })
 
 test_that("sdf_reparition: partitioning by column works", {
+
+  skip_databricks_connect()
   test_requires_version("2.0.0", "partitioning by column requires spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
   expect_match(iris_tbl %>%
