@@ -1,6 +1,5 @@
 context("read-write-multiple")
 
-skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_readwrite <- function(sc, writer, reader, name = "testtable", ...) {

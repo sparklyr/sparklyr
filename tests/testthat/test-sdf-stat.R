@@ -1,6 +1,5 @@
 context("sdf stat")
 
-skip_databricks_connect()
 test_that("sdf_crosstab() works", {
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")

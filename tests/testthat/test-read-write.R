@@ -1,6 +1,5 @@
 context("read-write")
 
-skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
