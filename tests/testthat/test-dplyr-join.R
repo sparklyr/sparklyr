@@ -1,6 +1,5 @@
 context("dplyr join")
 
-skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("left_join works as expected", {

@@ -1,6 +1,5 @@
 context("copy data")
 
-skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("sdf_copy_to works for default serializer", {
@@ -26,6 +25,7 @@ test_that("sdf_copy_to works for scala serializer", {
 })
 
 test_that("sdf_copy_to works for csv serializer", {
+  skip_databricks_connect()
   skip_livy()
 
   df <- matrix(0, ncol = 5, nrow = 2) %>% dplyr::as_tibble()

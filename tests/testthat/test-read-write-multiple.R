@@ -1,8 +1,8 @@
 context("read-write-multiple")
 
-skip_databricks_connect()
 sc <- testthat_spark_connection()
 
+skip_databricks_connect()
 test_readwrite <- function(sc, writer, reader, name = "testtable", ...) {
   path <- file.path(dirname(sc$output_file), c("batch_1", "batch_2"))
   path_glob <- file.path(dirname(sc$output_file), "batch*")

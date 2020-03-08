@@ -1,6 +1,5 @@
 context("pivot")
 
-skip_databricks_connect()
 test_requires("dplyr", "ggplot2")
 
 sc <- testthat_spark_connection()
