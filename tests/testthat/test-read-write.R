@@ -2,6 +2,7 @@ context("read-write")
 
 sc <- testthat_spark_connection()
 
+skip_databricks_connect()
 test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
   if (.Platform$OS.type == "windows")
     skip("CSV encoding is slightly different in windows")

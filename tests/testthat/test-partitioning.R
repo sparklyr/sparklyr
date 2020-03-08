@@ -1,6 +1,5 @@
 context("partitioning")
 
-skip_databricks_connect()
 test_that("sdf_repartition works", {
   iris_tbl <- testthat_tbl("iris")
 
