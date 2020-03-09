@@ -202,11 +202,8 @@ spark_connect <- function(master,
                                spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions,
                              batch = NULL)
-    if (method == "qubole") {
-      scon$method <- "qubole"
-    }
-    if (method == "databricks-connect") {
-      scon$method <- "databricks-connect"
+    if (method != "shell") {
+      scon$method <- method
     }
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
@@ -347,7 +344,7 @@ spark_log_file <- function(sc) {
 
 # TRUE if the Spark Connection is a local install
 spark_connection_is_local <- function(sc) {
-  spark_master_is_local(sc$master)
+  spark_master_is_local(sc$master) && !identical(sc$method, "databricks-connect")
 }
 
 spark_master_is_local <- function(master) {
