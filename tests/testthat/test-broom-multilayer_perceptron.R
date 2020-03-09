@@ -2,22 +2,36 @@ context("broom-multilayer_perceptron")
 
 skip_databricks_connect()
 test_that("multilayer_perceptron.tidy() works", {
-  skip_on_spark_master()
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
+  partitions <- iris_tbl %>%
+                sdf_random_split(train = 0.75, test = 0.25, seed = 1099)
 
   # for multiclass classification
-  td1 <- iris_tbl %>%
-    ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4,3,2,3)) %>%
-    tidy()
+  td1 <- partitions$train %>%
+         ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4, 6, 3, 3))
 
+  acc <- ml_predict(td1, partitions$test) %>%
+         ml_multiclass_classification_evaluator(metric_name = "accuracy")
+  expect_gt(acc, 0.94)
+
+  td1 <- td1 %>% tidy()
   check_tidy(td1, exp.row = 3, exp.col = 2,
              exp.names = c("layers", "weight_matrix"))
+
+  expected_coeffs <- ifelse(spark_version(sc) < "3.0.0",
+                            list(c(285.3834, -268.631159, -18.461112,
+                                   -41.7810, 8.394612, 35.739773,
+                                   -284.7548, 284.738913, -1.015223,
+                                   135.0024, -137.314854, 2.800369)),
+                            list(c(-377.28496, 70.13146, 306.6542,
+                                   -73.48908, 140.72911, -68.5861,
+                                   344.95784, -140.89405, -205.1463,
+                                   73.88816, 52.27940, -125.8437)))[[1]]
+
   expect_equal(td1$weight_matrix[[3]],
-               matrix(c(2.763929, -55.78433,  52.43706,
-                        15.121471,  21.68149, -34.84883,
-                        10.408809,   7.81120, -17.52432), nrow = 3, byrow = TRUE),
+               matrix(expected_coeffs, nrow = 4, byrow = TRUE),
                tolerance = 0.001)
 
 })
