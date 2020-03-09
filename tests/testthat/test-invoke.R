@@ -12,11 +12,14 @@ test_that("we can invoke_static with 1 scalar argument", {
 
     expect_error(invoke_static(sc, "sparklyr.Test", "unaryPrimitiveInt", NULL))
 
-    expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger",
-                               5L), 25)
+    expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", 0L), TRUE)
+    expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", -2147483647L), FALSE)
+    expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", 2147483647L), FALSE)
+    expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", 1L), FALSE)
 
-    skip_on_spark_master()
-    expect_error(invoke_static(sc, "sparklyr.Test", "unaryInteger", NULL))
+    # check (i == 0) evaluates to false in scala if i is null (i.e., serialization does not turn null value into 0)
+    expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", NULL), FALSE)
+    expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", NA), FALSE)
 
     expect_equal(invoke_static(sc, "sparklyr.Test", "unaryNullableInteger",
                                5L), 25)
