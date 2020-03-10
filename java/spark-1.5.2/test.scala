@@ -4,7 +4,9 @@ object Test {
   def nullary() = 0
 
   def unaryPrimitiveInt(i : Int) = i * i
-  def unaryInteger(i : Integer) = i * i
+  def unaryInteger(i : Integer) = {
+    i == 0
+  }
   def unaryNullableInteger(i : Integer) = Option(i) match {
     case None => -1
     case Some(j) => j * j
