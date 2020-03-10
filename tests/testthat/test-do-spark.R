@@ -51,7 +51,7 @@ test_that("doSpark preserves exception error message", {
 
 test_that("doSpark loads required packages", {
   foreach(x = 1:10) %dopar% {
-    expect_true("testthat" %in% (.packages()))
+    expect_true("package:testthat" %in% search())
   }
 })
 
