@@ -384,3 +384,33 @@ config <- livy_config(username="<username>", password="<password>")
 sc <- spark_connect(master = "<address>", method = "livy", config = config)
 spark_disconnect(sc)
 ```
+
+## Connecting through Databricks Connect
+[Databricks Connect](https://docs.databricks.com/dev-tools/databricks-connect.html#databricks-connect) allows you to connect 
+sparklyr to a remote Databricks Cluster. You can install [Databricks Connect Python pakcage](https://pypi.org/project/databricks-connect/) and use it to submit Spark jobs written in sparklyr APIs and have them execute remotely on a Databricks cluster instead of in the local Spark session.
+
+To use sparklyr with Databricks Connect first launch a Cluster on Databricks. Then follow [these instructions](https://docs.databricks.com/dev-tools/databricks-connect.html#client-setup) to setup the client:
+
+1. Make sure pyspark is not installed
+2. Install the latest version of Databricks Connect python package.
+3. Run `databricks-connect configure` and provide the configuration information
+    * Databricks account URL of the form `ttps://<account>.cloud.databricks.com`.
+    * [User token](https://docs.databricks.com/dev-tools/api/latest/authentication.html#token-management)
+    * Cluster ID
+    * Port (default port number is `15001`)
+
+To configure `sparklyr` with Databricks Connect, set the following environment variables:
+```{bash}
+$export SPARK_VERSION=2.4.4
+$export SPARK_HOME=`databricks-connect get-spark-home`
+```
+
+Now simply create a spark connection as follows
+```{r eval=FALSE}
+sc <- spark_connect(method = "databricks")
+copy_to(sc, iris)
+```
+
+```{r eval=FALSE}
+spark_disconnect(sc)
+```

@@ -123,6 +123,7 @@ spark_connect <- function(master,
   # so if there is no GUID, then method = "databricks" must refer to Databricks Connect
   if (method == "databricks" && no_databricks_guid()) {
     method <- "databricks-connect"
+    master <- "local"
   }
   hadoop_version <- list(...)$hadoop_version
 
