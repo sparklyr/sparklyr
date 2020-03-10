@@ -22,6 +22,7 @@ environment:
     INSTALL_WINUTILS: true
     R_VERSION: release
     USE_RTOOLS: true
+    TEMP: "C:\\Users\\appveyor"
 
   matrix:
   - SPARK_VERSION: "1.6.3"
