@@ -389,6 +389,9 @@ start_shell <- function(master,
     })
   }
 
+  message(paste("spark_version is", spark_version))
+  message(paste("versionSparkHome is", versionSparkHome))
+
   # batch connections only use the shell to submit an application, not to connect.
   if (identical(batch, TRUE)) return(NULL)
 
@@ -589,6 +592,8 @@ initialize_connection.spark_shell_connection <- function(sc) {
       default_config[default_config_remove] <- NULL
       apply_config(conf, default_config, "set", "spark.")
 
+      message(paste("home_version is", sc$home_version))
+
       # create the spark context and assign the connection to it
       # use spark home version since spark context is not yet initialized in shell connection
       # but spark_home might not be initialized in submit_batch while spark context is available
@@ -623,7 +628,10 @@ initialize_connection.spark_shell_connection <- function(sc) {
     }
 
     sc$state$hive_context <- sc$state$hive_context %||% tryCatch(
-      invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context),
+      {
+        message("instantiating HiveContext (!!)")
+        invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context)
+      },
       error = function(e) {
         warning(e$message)
         warning("Failed to create Hive context, falling back to SQL. Some operations, ",

@@ -1,8 +1,9 @@
-context("submit")
+context(paste("submit SPARK_HOME is", Sys.getenv("SPARK_HOME")))
+
+message(paste("test-submit.R: SPARK_HOME is", Sys.getenv("SPARK_HOME")))
 
 skip_databricks_connect()
 test_that("spark_submit() can submit batch jobs", {
-  skip_on_spark_master()
   if (.Platform$OS.type == "windows")
     skip("spark_submit() not yet implemented for windows")
 
@@ -12,8 +13,8 @@ test_that("spark_submit() can submit batch jobs", {
 
   withr::with_options(
     list(
-      sparklyr.log.console = FALSE,
-      sparklyr.verbose = FALSE
+      sparklyr.log.console = TRUE,
+      sparklyr.verbose = TRUE
     ),
     {
       spark_submit(master = "local", file = batch_file)

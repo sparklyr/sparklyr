@@ -52,8 +52,8 @@ spark_home_set <- function(path = NULL, ...) {
   if(is.null(path)) {
     path <- spark_install_find()$sparkVersionDir
   }
-  if(verbose) {
-    message("Setting SPARK_HOME environment variable to ", path)
-  }
+  # if(verbose) {
+  message("Setting SPARK_HOME environment variable to ", path)
+  # }
   Sys.setenv(SPARK_HOME = path)
 }

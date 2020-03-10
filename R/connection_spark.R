@@ -116,6 +116,7 @@ spark_connect <- function(master,
                           packages = NULL,
                           ...)
 {
+  message(paste("spark_connect: spark_home is", spark_home))
   # validate method
   method <- match.arg(method)
 
