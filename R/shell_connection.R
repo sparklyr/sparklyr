@@ -568,8 +568,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
     backend <- invoke_static(sc, "sparklyr.Shell", "getBackend")
     sc$state$spark_context <- invoke(backend, "getSparkContext")
 
-    if (is.null(spark_context(sc))) {
-      # create the spark config
+    create_spark_config <- function() {
       conf <- invoke_new(sc, "org.apache.spark.SparkConf")
       conf <- invoke(conf, "setAppName", sc$app_name)
 
@@ -589,20 +588,32 @@ initialize_connection.spark_shell_connection <- function(sc) {
       default_config[default_config_remove] <- NULL
       apply_config(conf, default_config, "set", "spark.")
 
+      conf
+    }
+
+    create_spark_session <- function(conf) {
+      invoke_static(
+        sc,
+        "org.apache.spark.sql.SparkSession",
+        "builder"
+      ) %>%
+        invoke("config", conf) %>%
+        apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.") %>%
+        invoke("enableHiveSupport") %>%
+        invoke("getOrCreate")
+    }
+
+    if (is.null(spark_context(sc))) {
+      # create the spark config
+      conf <- create_spark_config()
+
       # create the spark context and assign the connection to it
       # use spark home version since spark context is not yet initialized in shell connection
       # but spark_home might not be initialized in submit_batch while spark context is available
       if ((!identical(sc$home_version, NULL) && sc$home_version >= "2.0") ||
           (!identical(spark_context(sc), NULL) && spark_version(sc) >= "2.0")) {
         # For Spark 2.0+, we create a `SparkSession`.
-        session <- invoke_static(
-          sc,
-          "org.apache.spark.sql.SparkSession",
-          "builder"
-        ) %>%
-          invoke("config", conf) %>%
-          apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.") %>%
-          invoke("getOrCreate")
+        session <- create_spark_session(conf)
 
         # Cache the session as the "hive context".
         sc$state$hive_context <- session
@@ -623,7 +634,15 @@ initialize_connection.spark_shell_connection <- function(sc) {
     }
 
     sc$state$hive_context <- sc$state$hive_context %||% tryCatch(
-      invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context),
+      {
+        # In Spark 3.0, the deprecated HiveContext class has been removed.
+        if ((!identical(sc$home_version, NULL) && sc$home_version < "3.0.0") ||
+            (!identical(spark_context(sc), NULL) && spark_version(sc) < "3.0.0")) {
+          invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context)
+        } else {
+          create_spark_session(create_spark_config())
+        }
+      },
       error = function(e) {
         warning(e$message)
         warning("Failed to create Hive context, falling back to SQL. Some operations, ",
