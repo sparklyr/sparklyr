@@ -382,3 +382,7 @@ skip_databricks_connect <- function() {
   if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true")
     skip("Test is skipped on Databricks Connect")
 }
+
+random_table_name <- function(prefix) {
+  paste0(prefix, paste0(floor(runif(10, 0, 10)), collapse = ""))
+}

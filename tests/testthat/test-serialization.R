@@ -1,6 +1,5 @@
 context("serialization")
 
-skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_requires("nycflights13")
@@ -72,6 +71,7 @@ test_that("data.frames with '|' can be copied", {
 
 test_that("data.frames with many columns survive roundtrip", {
   skip_slow("takes too long to measure coverage")
+  skip_databricks_connect()
 
   n <- 1E3
   data <- as.data.frame(replicate(n, 1L, simplify = FALSE))
@@ -81,6 +81,7 @@ test_that("data.frames with many columns survive roundtrip", {
 })
 
 test_that("data.frames with many columns don't cause Java StackOverflows", {
+  skip_databricks_connect()
   version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
 
   n <- if (version >= "2.0.0") 500 else 5000
@@ -92,6 +93,7 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
 })
 
 test_that("'ml_predict()', 'predict()' return same results", {
+  skip_databricks_connect()
   test_requires("dplyr")
 
   model <- flights_tbl %>%
@@ -127,6 +129,7 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
 })
 
 test_that("collect() can retrieve all data types correctly", {
+  skip_databricks_connect()
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
   library(dplyr)
 
@@ -351,6 +354,7 @@ test_that("environments are sent to Scala Maps (#1058)", {
 })
 
 test_that("collect() can retrieve nested list efficiently", {
+  skip_databricks_connect()
   if (spark_version(sc) < "2.0.0") skip("performance improvement not available")
 
   temp_json <- tempfile(fileext = ".json")
