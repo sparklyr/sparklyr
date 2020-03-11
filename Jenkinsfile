@@ -50,7 +50,7 @@ pipeline {
                 }
             }
         }
-	stage("Prepare the test data") {
+        stage("Prepare the test data") {
 	    steps {
 		sh """dbfs mkdirs dbfs:/tmp/data"""
 		sh """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data"""
