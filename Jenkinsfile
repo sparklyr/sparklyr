@@ -66,7 +66,7 @@ pipeline {
     post {
         always {
             sh "databricks clusters delete --cluster-id ${clusterId}"
-	    sh """dbfs rm dbfs:/tmp/data"""
+	    sh """dbfs rm -r dbfs:/tmp/data"""
         }
     }
 }
