@@ -32,7 +32,6 @@ test_that("basic regression evaluation works", {
 
 test_that("ml evaluator print methods work", {
   sc <- testthat_spark_connection()
-  skip_on_spark_master()
 
   expect_known_output(
     ml_binary_classification_evaluator(sc, uid = "foo"),
@@ -41,8 +40,13 @@ test_that("ml evaluator print methods work", {
   )
 
   expect_known_output(
-   ml_multiclass_classification_evaluator(sc, uid = "foo"),
-    output_file("print/multiclass-classification-evaluator.txt"),
+    ml_multiclass_classification_evaluator(sc, uid = "foo"),
+    output_file(
+      ifelse(spark_version(sc) < "3.0.0",
+             "print/multiclass-classification-evaluator.txt",
+             "print/multiclass-classification-evaluator-spark-3.0.0.txt"
+      )
+    ),
     print = TRUE
   )
 
