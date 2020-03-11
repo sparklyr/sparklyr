@@ -1,6 +1,5 @@
 context("ml gaussian mixture")
 
-skip_databricks_connect()
 test_that("ml_gaussian_mixture() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
@@ -54,7 +53,7 @@ test_that("ml_gaussian_mixture() default params are correct", {
 test_that("ml_gaussian_mixture() works properly", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "gaussian mixture requires 2.0+")
-  sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_kmeans_data.txt", full.names = TRUE)
+  sample_data_path <- get_simple_data_path("sample_kmeans_data.txt")
   sample_data <- spark_read_libsvm(sc, "sample_data",
                                    sample_data_path, overwrite = TRUE)
 
